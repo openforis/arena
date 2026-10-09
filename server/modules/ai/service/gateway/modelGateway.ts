@@ -185,7 +185,8 @@ const pumpStream = async ({
     reader.releaseLock()
   }
   // cancel() ends the read cleanly for piped streams and for providers that ignore the abort signal
-  if (control.state.timedOut && !outcome.error) {
+  // (a timer firing after the finish part must not turn a completed answer into a timeout)
+  if (control.state.timedOut && !outcome.error && !outcome.usage) {
     outcome.error = control.signal.reason
     if (!isSseClosed(res))
       writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(outcome.error, control.state)) })

@@ -9,7 +9,9 @@ import { translateItems } from '@common/ai/tasks/translation'
 
 import { createServerTextGenerator } from '@server/modules/ai/service/serverTextGenerator'
 
-const BATCH_SIZE = AiLimits.translationMaxItems
+// Items per AI call: kept at 20 (not AiLimits.translationMaxItems) because each item is translated into up to
+// 20 languages and small local models truncate bigger answers.
+const BATCH_SIZE = 20
 
 /**
  * Splits an array into chunks of at most `size` elements.

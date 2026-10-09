@@ -37,6 +37,10 @@ const IPV4_BLOCKED: [string, number][] = [
 const IPV6_BLOCKED: [string, number][] = [
   ['::', 96], // unspecified, loopback, IPv4-compatible
   ['64:ff9b::', 96], // NAT64 (can reach internal IPv4)
+  ['64:ff9b:1::', 48], // local-use NAT64
+  ['2002::', 16], // 6to4 (embeds an IPv4)
+  ['2001::', 32], // Teredo (embeds an IPv4)
+  ['::ffff:0:0:0', 96], // IPv4-translated (SIIT)
   ['fc00::', 7], // unique local
   ['fe80::', 10], // link-local
   ['ff00::', 8], // multicast

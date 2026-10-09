@@ -22,7 +22,8 @@ export const requireAiFeaturesEnabled: Middleware = (req, res, next) => {
   next()
 }
 
-const permissionMiddlewares: Record<string, Middleware> = {
+/** Permission middleware per feature permission (exported so tests can lock the mapping). */
+export const permissionMiddlewares: Record<string, Middleware> = {
   [AiFeaturePermission.loggedIn]: AuthMiddleware.requireLoggedInUser,
   [AiFeaturePermission.surveyView]: AuthMiddleware.requireSurveyViewPermission,
   [AiFeaturePermission.surveyEdit]: AuthMiddleware.requireSurveyEditPermission,
