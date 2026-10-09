@@ -1,4 +1,4 @@
-import { AiDataClass, getMaxAiDataClass } from '@common/ai/features'
+import { type AiDataClass, getAiFeatureMinDataClass, getMaxAiDataClass } from '@common/ai/features'
 
 import type { ResolveModelParams } from '@webapp/ai/engines/resolveModel'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
@@ -41,7 +41,7 @@ export const resolveAssistantTurnModel = async <TModel>({
   resolve: (params: ResolveModelParams) => Promise<Resolved<TModel>>
 }): Promise<Resolved<TModel>> => {
   const resolved = await resolve(params)
-  const conversationDataClass = params.dataClass ?? AiDataClass.schema
+  const conversationDataClass = params.dataClass ?? getAiFeatureMinDataClass(params.feature)
   const dataClass = getTurnDataClass({
     conversationDataClass,
     tools: getToolsForHosting(resolved.engine.hostingClass),

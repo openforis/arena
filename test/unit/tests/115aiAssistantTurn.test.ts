@@ -167,6 +167,33 @@ describe('runAssistantTurn', () => {
     expect(JSON.stringify(model.doStreamCalls[1].prompt)).toContain('toolFailed')
   })
 
+  describe('data class escalation', () => {
+    const dataAccess = { effective: { schema: 'cloud', data: 'cloud' } as any, hostingClass: 'cloud' as const }
+    const makeDataTool = (execute: AiTool['execute']): AiTool => ({
+      ...makeTool('test_data', execute),
+      dataClass: 'data',
+    })
+    const runData = (execute: AiTool['execute']) =>
+      run({
+        model: scriptedModel(
+          () => toolCallStream('call-1', 'test_data', { summary: 'x' }),
+          () => textStream('Done.')
+        ),
+        tools: [makeDataTool(execute)],
+        access: dataAccess,
+      })
+
+    test('a successful data tool result escalates the conversation to data', async () => {
+      const result = await runData(async () => ({ rows: [], total: 0 }))
+      expect(result.dataClass).toBe('data')
+    })
+
+    test('a structured error result keeps the class', async () => {
+      const result = await runData(async () => ({ error: { code: 'unknownQuery', message: 'x' } }))
+      expect(result.dataClass).toBe('schema')
+    })
+  })
+
   test('stops at the step cap', async () => {
     const echo = makeTool('test_echo', async () => ({ ok: true }))
     let call = 0
