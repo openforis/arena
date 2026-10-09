@@ -184,6 +184,12 @@ const pumpStream = async ({
   } finally {
     reader.releaseLock()
   }
+  // cancel() ends the read cleanly for piped streams and for providers that ignore the abort signal
+  if (control.state.timedOut && !outcome.error) {
+    outcome.error = control.signal.reason
+    if (!isSseClosed(res))
+      writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(outcome.error, control.state)) })
+  }
   record(outcome)
   return outcome
 }
@@ -247,6 +253,8 @@ export const handleModelRequest = async ({
   try {
     prepared = await prepareCall({ req, user, deps })
   } catch (error) {
+    // unexpected failures (not our own SystemErrors) must leave a trace in the server log
+    if (!(error instanceof SystemError)) deps.logError(formatErrorForLog(req.body?.feature ?? 'unknown', error))
     sendJsonError(res, toAiSystemError(error))
     return
   }

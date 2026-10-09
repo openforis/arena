@@ -17,7 +17,7 @@ module.exports = {
   // transformed based on its own immediate package name, instead of being skipped just because an
   // earlier, non-allowlisted wrapper package appears earlier in the path.
   transformIgnorePatterns: [
-    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/|normalize-path/|readdir-glob/)',
+    '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/|@workflow/|archiver/|is-stream/|zip-stream/|compress-commons/|crc32-stream/)',
   ],
   // n2words (transitive dep of @openforis/arena-core, used by numberToWords) is exports-map-only,
   // no "main" field - jest-resolve 27 predates Node's package.json#exports resolution support, so
