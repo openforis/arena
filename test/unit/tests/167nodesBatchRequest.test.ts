@@ -29,6 +29,7 @@ describe('nodes batch request', () => {
   })
 
   test('invalid requests are refused with a reason', () => {
+    expect.assertions(12)
     expectInvalid(null, 'cycle')
     expectInvalid({ cycle: '0' }, 'edits')
     expectInvalid({ cycle: '0', edits: [] }, 'edits')
@@ -37,12 +38,19 @@ describe('nodes batch request', () => {
     expectInvalid({ cycle: '0', edits: [edit('r1', 'n1'), edit('r1', 'n1')] }, 'duplicateNode')
   })
 
+  test('exactly 200 edits are accepted', () => {
+    const edits = Array.from({ length: NodesBatchLimits.maxEdits }, (_, i) => edit('r1', `n${i}`))
+    expect(parseNodesBatchRequest({ cycle: '0', edits }).edits).toHaveLength(NodesBatchLimits.maxEdits)
+  })
+
   test('more than 200 edits are refused', () => {
+    expect.assertions(2)
     const edits = Array.from({ length: NodesBatchLimits.maxEdits + 1 }, (_, i) => edit('r1', `n${i}`))
     expectInvalid({ cycle: '0', edits }, 'tooManyEdits')
   })
 
   test('more than 50 records are refused; 50 are accepted', () => {
+    expect.assertions(3)
     const editsOf = (count: number) => Array.from({ length: count }, (_, i) => edit(`r${i}`, `n${i}`))
     expect(parseNodesBatchRequest({ cycle: '0', edits: editsOf(50) }).edits).toHaveLength(50)
     expectInvalid({ cycle: '0', edits: editsOf(51) }, 'tooManyRecords')
