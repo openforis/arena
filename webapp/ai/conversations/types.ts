@@ -4,6 +4,7 @@
 import type { AiDataClass } from '@common/ai/features'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { AiToolArea } from '@webapp/ai/tools/types'
 
 export type ConversationTextPart = { type: 'text'; text: string }
@@ -50,6 +51,8 @@ export type Conversation = {
   title: string
   messages: ConversationMessage[]
   changeSets: Record<string, ChangeSetCardState>
+  // analysis area: proposed queries by id (q1, q2, …)
+  queries?: Record<string, AnalysisQueryEntry>
   createdAt: string
   updatedAt: string
 }
