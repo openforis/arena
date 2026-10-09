@@ -25,6 +25,8 @@ export const useSurveyAiPolicy = ({ skip = false }: { skip?: boolean } = {}): {
   const [error, setError] = useState<unknown>(null)
 
   useEffect(() => {
+    // the error belongs to the current survey only
+    setError(null)
     if (skip || !surveyId) return undefined
     let active = true
     const load = (): void => {
