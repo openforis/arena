@@ -27,6 +27,8 @@ AI_FEATURES_ENABLED=true AI_MOCK_PROVIDER_ENABLED=true AI_DEFAULT_PROVIDER=mock 
 E2E_AI_MOCK=true PGDATABASE=arena_e2e yarn test:e2e specs/aiFeatures.spec.ts
 ```
 
+`specs/aiLocalEngine.spec.ts` starts its own stub local AI server (`test/e2e/stubs/localModelServer.ts`) on a free `127.0.0.1` port; nothing else to start.
+
 Set `E2E_KEEP_DATA=true` to keep the surveys created by the tests (e.g. to inspect them after a failure).
 
 ## Writing tests
