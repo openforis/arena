@@ -84,7 +84,7 @@ const AnswerPart = ({
       {cardState &&
         (isRecordEditChangeSet(cardState.changeSet) ? (
           <RecordEditCard
-            busy={api.busy}
+            busy={api.busy || api.applying}
             changeSet={cardState.changeSet}
             onApply={(operationIds, onProgress) =>
               api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)

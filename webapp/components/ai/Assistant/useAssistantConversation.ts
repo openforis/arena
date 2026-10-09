@@ -87,8 +87,6 @@ export const useAssistantConversation = ({
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const applyingRef = useRef(false)
-  // request of a record-edit Apply in flight
-  const recordEditsControllerRef = useRef<AbortController | null>(null)
   // location of the previous turn: kept across conversations (the notice is about the engine)
   const lastLocationRef = useRef<AiDataLocation | null>(null)
   // id of the conversation whose turn is running (its streaming answer is live, not left over)
@@ -110,13 +108,7 @@ export const useAssistantConversation = ({
   }, [])
 
   // the panel unmounts on logout: stop the running answer
-  useEffect(
-    () => () => {
-      controllerRef.current?.abort()
-      recordEditsControllerRef.current?.abort()
-    },
-    []
-  )
+  useEffect(() => () => controllerRef.current?.abort(), [])
 
   // another survey or user: start over
   useEffect(() => {
@@ -337,22 +329,15 @@ export const useAssistantConversation = ({
         const cardState = (await readConversation(id))?.changeSets[changeSetId]
         if (!cardState) return
         const { changeSet } = cardState
-        const controller = new AbortController()
-        recordEditsControllerRef.current = controller
-        let results
-        try {
-          results = await applyRecordEditsRequest({
-            changeSet,
-            operationIds,
-            cycle,
-            timezoneOffset: Dates.getTimezoneOffset(),
-            lang,
-            onProgress,
-            signal: controller.signal,
-          })
-        } finally {
-          if (recordEditsControllerRef.current === controller) recordEditsControllerRef.current = null
-        }
+        // no abort on unmount: the server keeps writing, and the results are saved by conversation id
+        const results = await applyRecordEditsRequest({
+          changeSet,
+          operationIds,
+          cycle,
+          timezoneOffset: Dates.getTimezoneOffset(),
+          lang,
+          onProgress,
+        })
         const note = summarizeRecordEditResults({ changeSet, results })
         // the user may have switched conversation meanwhile: write the results into the one that was applied
         const current = await readConversation(id)

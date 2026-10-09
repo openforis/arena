@@ -179,4 +179,33 @@ describe('updateNodesBatch', () => {
     expect(errors).toHaveLength(1)
     expect(errors[0]).toContain('db down')
   })
+
+  test('every record message carries the deadline of the request start, and the reply wait is shortened', async () => {
+    const waits: (number | undefined)[] = []
+    const { deps, posted } = buildDeps()
+    const registry = deps.replies
+    const waitFor = registry.waitFor
+    registry.waitFor = (requestId, timeoutMs) => {
+      waits.push(timeoutMs)
+      return waitFor(requestId, timeoutMs)
+    }
+    // the first record check is slow: 20 s pass before the second record is sent
+    let now = 1_000_000
+    const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
+    const slowDeps = {
+      ...deps,
+      fetchRecord: async () => {
+        now += 10_000
+        return record
+      },
+    }
+    try {
+      await run(admin, [edit(aUuid, 5), { ...edit(bUuid, 6), recordUuid: 'other-record' }], slowDeps)
+    } finally {
+      nowSpy.mockRestore()
+    }
+    expect(posted).toHaveLength(2)
+    expect(posted.map((msg) => msg.deadline)).toEqual([1_060_000, 1_060_000])
+    expect(waits).toEqual([60_000 - 10_000, 60_000 - 20_000])
+  })
 })
