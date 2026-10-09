@@ -184,9 +184,26 @@ export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] 
  * @returns {boolean} True when stale.
  */
 export const isCardStale = ({ cardState, survey }: { cardState: ChangeSetCardState; survey: any }): boolean => {
+  return getConflictingOperationIds({ cardState, survey }).length > 0
+}
+
+/**
+ * Returns the pending operations that conflict with the current survey (they stay unchecked and cannot be selected).
+ * @param {object} params - Parameters.
+ * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {object} params.survey - Current survey.
+ * @returns {string[]} Operation ids.
+ */
+export const getConflictingOperationIds = ({
+  cardState,
+  survey,
+}: {
+  cardState: ChangeSetCardState
+  survey: any
+}): string[] => {
   const operationIds = getPendingOperationIds(cardState)
-  if (operationIds.length === 0) return false
-  return findConflicts(cardState.changeSet, survey, { operationIds }).length > 0
+  if (operationIds.length === 0) return []
+  return findConflicts(cardState.changeSet, survey, { operationIds }).map((conflict) => conflict.id)
 }
 
 /**
