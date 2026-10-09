@@ -27,6 +27,7 @@ import * as RecordService from '../service/recordService'
 
 import {
   requireRecordAnalysisPermission,
+  requireRecordCleansePermission,
   requireRecordCreatePermission,
   requireRecordEditPermission,
   requireRecordListExportPermission,
@@ -36,7 +37,7 @@ import {
   requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
-  requireRecordsMergePermission,
+  requireSurveyViewPermission,
 } from '../../auth/authApiMiddleware'
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
@@ -47,6 +48,7 @@ import {
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
 import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
+import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -138,6 +140,34 @@ export const init = (app) => {
         sendOk(res)
       } catch (error) {
         next(error)
+      }
+    }
+  )
+
+  // batch attribute value edits (assistant record-edit change sets): synchronous, one result per edit
+  app.post(
+    '/survey/:surveyId/records/nodes/update',
+    requireSurveyViewPermission,
+    requireRecordCleansePermission,
+    async (req, res) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, timezoneOffset = null, lang = null } = Request.getParams(req)
+        const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req))
+
+        const results = await RecordService.updateNodesBatch({
+          user,
+          surveyId: Number(surveyId),
+          cycle,
+          edits,
+          timezoneOffset,
+          lang,
+        })
+        res.json({ results })
+      } catch (error) {
+        // sendErr (not next(error)): the error middleware runs before these routes, so next(error) would
+        // lose the key of the parser's 400 SystemError
+        Response.sendErr(res, error)
       }
     }
   )
