@@ -13,6 +13,11 @@
     }
   }
 
+  .users-backup-modal__info ul {
+    margin: 0;
+    text-align: left;
+  }
+
   .users-backup-modal__warning {
     color: $colorError;
   }

@@ -118,4 +118,7 @@ export default {
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
   userNotFound: 'Usuario no encontrado: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'El archivo no es una copia de seguridad de usuarios de Arena válida',
+  },
 }

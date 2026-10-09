@@ -90,8 +90,10 @@ $t(common.pressRefreshToReloadPage)`,
       'The backup file will contain the password hashes: keep it in a safe place and delete it after use.',
     restore: 'Restore users',
     restoreTitle: 'Restore users from backup',
-    restoreInfo:
-      'Users are matched by email; survey roles and user groups are matched by survey name and group name. Surveys not existing in this server are ignored. Run "Validate" first to check what will change.',
+    restoreInfo: `- Users are matched by email
+- Survey roles and user groups are matched by survey name and group name
+- Surveys not existing in this server are ignored
+- Run "Validate" first to check what will change`,
     conflictMode: {
       skip: 'Skip existing users',
       merge: 'Existing users: add missing survey roles and user groups',

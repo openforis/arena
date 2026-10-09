@@ -79,4 +79,38 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'ユーザー{{name}}を更新しました',
   userNotInvitedToAnySurvey: `このユーザーはどの調査にも招待されていません`,
   userSurveys: 'ユーザーの調査',
+  usersBackup: {
+    menu: 'バックアップ / 復元',
+    backup: 'ユーザーのバックアップ',
+    backupTitle: 'ユーザーのバックアップ',
+    backupInfo:
+      'すべてのユーザーが調査でのロールとユーザーグループとともにエクスポートされ、別のArenaサーバーに復元できます。2FAデバイスはエクスポートされません。',
+    includePasswords: 'パスワードを含める',
+    passwordsWarning:
+      'バックアップファイルにはパスワードのハッシュが含まれます。安全な場所に保管し、使用後は削除してください。',
+    restore: 'ユーザーの復元',
+    restoreTitle: 'バックアップからユーザーを復元',
+    restoreInfo: `- ユーザーはメールアドレスで照合されます
+- 調査でのロールとユーザーグループは、調査名とグループ名で照合されます
+- このサーバーに存在しない調査は無視されます
+- 変更内容を確認するため、まず「検証」を実行してください`,
+    conflictMode: {
+      skip: '既存のユーザーをスキップ',
+      merge: '既存のユーザー：不足している調査でのロールとユーザーグループを追加',
+      overwrite: '既存のユーザー：詳細（名前、パスワード、ステータス）、調査でのロール、ユーザーグループを上書き',
+    },
+    validate: '検証',
+    summaryDryRun: '検証が完了しました：まだ何も変更されていません',
+    summaryImported: 'ユーザーを復元しました',
+    summary: {
+      usersTotal: 'バックアップ内のユーザー：{{count}}',
+      usersInserted: '新規ユーザー：{{count}}',
+      usersUpdated: '更新されたユーザー：{{count}}',
+      usersSkipped: 'スキップされたユーザー：{{count}}',
+      authGroupsAdded: '追加された調査でのロール：{{count}}',
+      userGroupsAdded: '追加されたユーザーグループのメンバーシップ：{{count}}',
+    },
+    surveysNotFound: '見つからない調査（ロールは無視されました）：{{names}}',
+    userGroupsNotFound: '見つからないユーザーグループ（メンバーシップは無視されました）：{{names}}',
+  },
 }

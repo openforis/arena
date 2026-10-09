@@ -81,4 +81,39 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: "L'utilisateur {{name}} a été mis à jour",
   userNotInvitedToAnySurvey: `Utilisateur non invité à aucun formulaire`,
   userSurveys: "Formulaires de l'utilisateur",
+  usersBackup: {
+    menu: 'Sauvegarde / Restauration',
+    backup: 'Sauvegarder les utilisateurs',
+    backupTitle: 'Sauvegarder les utilisateurs',
+    backupInfo:
+      "Tous les utilisateurs seront exportés avec leurs rôles dans les formulaires et leurs groupes d'utilisateurs, afin de pouvoir les restaurer sur un autre serveur Arena. Les appareils 2FA ne sont pas exportés.",
+    includePasswords: 'Inclure les mots de passe',
+    passwordsWarning:
+      'Le fichier de sauvegarde contiendra les hachages des mots de passe : conservez-le en lieu sûr et supprimez-le après utilisation.',
+    restore: 'Restaurer les utilisateurs',
+    restoreTitle: 'Restaurer les utilisateurs depuis une sauvegarde',
+    restoreInfo: `- Les utilisateurs sont identifiés par leur adresse e-mail
+- Les rôles dans les formulaires et les groupes d'utilisateurs sont identifiés par le nom du formulaire et le nom du groupe
+- Les formulaires inexistants sur ce serveur sont ignorés
+- Lancez d'abord « Valider » pour vérifier ce qui va changer`,
+    conflictMode: {
+      skip: 'Ignorer les utilisateurs existants',
+      merge: "Utilisateurs existants : ajouter les rôles dans les formulaires et les groupes d'utilisateurs manquants",
+      overwrite:
+        "Utilisateurs existants : remplacer les informations (nom, mot de passe, statut), les rôles dans les formulaires et les groupes d'utilisateurs",
+    },
+    validate: 'Valider',
+    summaryDryRun: "Validation terminée : rien n'a encore été modifié",
+    summaryImported: 'Utilisateurs restaurés',
+    summary: {
+      usersTotal: 'Utilisateurs dans la sauvegarde : {{count}}',
+      usersInserted: 'Nouveaux utilisateurs : {{count}}',
+      usersUpdated: 'Utilisateurs mis à jour : {{count}}',
+      usersSkipped: 'Utilisateurs ignorés : {{count}}',
+      authGroupsAdded: 'Rôles dans les formulaires ajoutés : {{count}}',
+      userGroupsAdded: "Appartenances aux groupes d'utilisateurs ajoutées : {{count}}",
+    },
+    surveysNotFound: 'Formulaires introuvables (rôles ignorés) : {{names}}',
+    userGroupsNotFound: "Groupes d'utilisateurs introuvables (appartenances ignorées) : {{names}}",
+  },
 }

@@ -9,6 +9,7 @@ import {
   ButtonDownload,
   ButtonMenu,
   Dropzone,
+  Markdown,
   Modal,
   ModalBody,
   ModalFooter,
@@ -142,7 +143,7 @@ const UsersBackupImportModal = ({ onClose }: { onClose: () => void }) => {
   return (
     <Modal className="users-backup-modal" title="usersView:usersBackup.restoreTitle" onClose={onClose} showCloseButton>
       <ModalBody>
-        <p>{i18n.t('usersView:usersBackup.restoreInfo')}</p>
+        <Markdown className="users-backup-modal__info" source={i18n.t('usersView:usersBackup.restoreInfo')} />
         <Dropzone accept={acceptedFiles} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} disabled={imported} />
         <RadioButtonGroup
           items={conflictModes.map((mode) => ({ key: mode, label: `usersView:usersBackup.conflictMode.${mode}` }))}

@@ -76,4 +76,39 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'El usuario {{name}} ha sido actualizado',
   userNotInvitedToAnySurvey: 'Usuario no invitado a ninguna encuesta',
   userSurveys: 'Encuestas de usuario',
+  usersBackup: {
+    menu: 'Copia de seguridad / Restaurar',
+    backup: 'Copia de seguridad de usuarios',
+    backupTitle: 'Copia de seguridad de usuarios',
+    backupInfo:
+      'Todos los usuarios se exportarán con sus roles en las encuestas y sus grupos de usuarios, para poder restaurarlos en otro servidor de Arena. Los dispositivos 2FA no se exportan.',
+    includePasswords: 'Incluir contraseñas',
+    passwordsWarning:
+      'El archivo de copia de seguridad contendrá los hashes de las contraseñas: guárdelo en un lugar seguro y elimínelo después de usarlo.',
+    restore: 'Restaurar usuarios',
+    restoreTitle: 'Restaurar usuarios desde una copia de seguridad',
+    restoreInfo: `- Los usuarios se identifican por su correo electrónico
+- Los roles en las encuestas y los grupos de usuarios se identifican por el nombre de la encuesta y el nombre del grupo
+- Las encuestas que no existen en este servidor se ignoran
+- Ejecute primero "Validar" para comprobar qué cambiará`,
+    conflictMode: {
+      skip: 'Omitir usuarios existentes',
+      merge: 'Usuarios existentes: añadir los roles en las encuestas y los grupos de usuarios que faltan',
+      overwrite:
+        'Usuarios existentes: sobrescribir datos (nombre, contraseña, estado), roles en las encuestas y grupos de usuarios',
+    },
+    validate: 'Validar',
+    summaryDryRun: 'Validación completada: todavía no se ha modificado nada',
+    summaryImported: 'Usuarios restaurados',
+    summary: {
+      usersTotal: 'Usuarios en la copia de seguridad: {{count}}',
+      usersInserted: 'Usuarios nuevos: {{count}}',
+      usersUpdated: 'Usuarios actualizados: {{count}}',
+      usersSkipped: 'Usuarios omitidos: {{count}}',
+      authGroupsAdded: 'Roles en encuestas añadidos: {{count}}',
+      userGroupsAdded: 'Pertenencias a grupos de usuarios añadidas: {{count}}',
+    },
+    surveysNotFound: 'Encuestas no encontradas (roles ignorados): {{names}}',
+    userGroupsNotFound: 'Grupos de usuarios no encontrados (pertenencias ignoradas): {{names}}',
+  },
 }

@@ -79,4 +79,39 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'Usuário {{name}} foi atualizado',
   userNotInvitedToAnySurvey: `Usuário não foi convidado para nenhum inventário`,
   userSurveys: 'Inventários do usuário',
+  usersBackup: {
+    menu: 'Backup / Restaurar',
+    backup: 'Backup de usuários',
+    backupTitle: 'Backup de usuários',
+    backupInfo:
+      'Todos os usuários serão exportados com seus papéis nos inventários e seus grupos de usuários, para que possam ser restaurados em outro servidor Arena. Os dispositivos 2FA não são exportados.',
+    includePasswords: 'Incluir senhas',
+    passwordsWarning:
+      'O arquivo de backup conterá os hashes das senhas: guarde-o em um lugar seguro e exclua-o após o uso.',
+    restore: 'Restaurar usuários',
+    restoreTitle: 'Restaurar usuários a partir de um backup',
+    restoreInfo: `- Os usuários são identificados pelo e-mail
+- Os papéis nos inventários e os grupos de usuários são identificados pelo nome do inventário e pelo nome do grupo
+- Os inventários que não existem neste servidor são ignorados
+- Execute primeiro "Validar" para verificar o que será alterado`,
+    conflictMode: {
+      skip: 'Ignorar usuários existentes',
+      merge: 'Usuários existentes: adicionar os papéis nos inventários e os grupos de usuários que faltam',
+      overwrite:
+        'Usuários existentes: sobrescrever dados (nome, senha, status), papéis nos inventários e grupos de usuários',
+    },
+    validate: 'Validar',
+    summaryDryRun: 'Validação concluída: nada foi alterado ainda',
+    summaryImported: 'Usuários restaurados',
+    summary: {
+      usersTotal: 'Usuários no backup: {{count}}',
+      usersInserted: 'Novos usuários: {{count}}',
+      usersUpdated: 'Usuários atualizados: {{count}}',
+      usersSkipped: 'Usuários ignorados: {{count}}',
+      authGroupsAdded: 'Papéis nos inventários adicionados: {{count}}',
+      userGroupsAdded: 'Associações a grupos de usuários adicionadas: {{count}}',
+    },
+    surveysNotFound: 'Inventários não encontrados (papéis ignorados): {{names}}',
+    userGroupsNotFound: 'Grupos de usuários não encontrados (associações ignoradas): {{names}}',
+  },
 }
