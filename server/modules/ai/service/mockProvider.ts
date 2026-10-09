@@ -6,6 +6,8 @@ import type { LanguageModelV4, LanguageModelV4Prompt, LanguageModelV4StreamPart 
 
 import { stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
+import { getScriptedStep, toScriptedContent, toScriptedStream } from '@server/modules/ai/service/mockScripts'
+
 export const MOCK_PROVIDER = 'mock'
 
 const promptText = (prompt: LanguageModelV4Prompt): string =>
@@ -60,7 +62,7 @@ const streamOf = (text: string): ReadableStream<LanguageModelV4StreamPart> => {
 /**
  * Creates the mock model.
  * @param {object} [options] - Options.
- * @param {string} [options.text] - Fixed answer (default: per-feature canned answers).
+ * @param {string} [options.text] - Fixed answer (default: the assistant scripts, then the per-feature canned answers).
  * @returns {LanguageModelV4} The model.
  */
 export const createMockModel = ({ text }: { text?: string } = {}): LanguageModelV4 => ({
@@ -69,6 +71,12 @@ export const createMockModel = ({ text }: { text?: string } = {}): LanguageModel
   modelId: MOCK_PROVIDER,
   supportedUrls: {},
   async doGenerate(options) {
+    // a fixed text wins; then the assistant scripts; then the canned answers
+    const step = text === undefined ? getScriptedStep(options.prompt) : null
+    if (step) {
+      const { content, finishReason } = toScriptedContent(step, options.prompt)
+      return { content, finishReason, usage: unknownUsageV4(), warnings: [] }
+    }
     return {
       content: [{ type: 'text', text: text ?? mockAnswerFor(options.prompt) }],
       finishReason: stopFinishReason(),
@@ -77,6 +85,8 @@ export const createMockModel = ({ text }: { text?: string } = {}): LanguageModel
     }
   },
   async doStream(options) {
+    const step = text === undefined ? getScriptedStep(options.prompt) : null
+    if (step) return { stream: toScriptedStream(step, options.prompt) }
     return { stream: streamOf(text ?? mockAnswerFor(options.prompt)) }
   },
 })
