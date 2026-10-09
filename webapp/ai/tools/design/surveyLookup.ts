@@ -27,6 +27,11 @@ export const isDesignNodeDef = (nodeDef: any): boolean =>
  */
 export const getDesignNodeDefs = (survey: any): any[] => Survey.getNodeDefsArray(survey).filter(isDesignNodeDef)
 
+/**
+ * Groups node definitions by parent uuid (null for the root).
+ * @param {object[]} nodeDefs - Node definitions.
+ * @returns {Map<string|null, object[]>} The children per parent.
+ */
 const groupByParent = (nodeDefs: any[]): Map<string | null, any[]> => {
   const result = new Map<string | null, any[]>()
   for (const nodeDef of nodeDefs) {
@@ -36,6 +41,11 @@ const groupByParent = (nodeDefs: any[]): Map<string | null, any[]> => {
   return result
 }
 
+/**
+ * Orders the grouped node definitions depth-first.
+ * @param {Map<string|null, object[]>} childrenByParent - Children per parent uuid.
+ * @returns {object[]} The node definitions, each followed by its descendants.
+ */
 const depthFirst = (childrenByParent: Map<string | null, any[]>): any[] => {
   const result: any[] = []
   const stack = [...(childrenByParent.get(null) ?? [])].reverse()
@@ -63,6 +73,12 @@ export const getDesignNodeDefsDepthFirst = (survey: any): any[] => depthFirst(gr
 export const findNodeDefByName = (survey: any, name: string): any | null =>
   getDesignNodeDefs(survey).find((nodeDef) => NodeDef.getName(nodeDef) === name) ?? null
 
+/**
+ * Returns the edit distance between two strings.
+ * @param {string} a - First string.
+ * @param {string} b - Second string.
+ * @returns {number} The distance.
+ */
 const levenshtein = (a: string, b: string): number => {
   let previous = Array.from({ length: b.length + 1 }, (_value, index) => index)
   for (let i = 1; i <= a.length; i += 1) {

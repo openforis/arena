@@ -2,10 +2,14 @@ import { z } from 'zod'
 
 import * as Survey from '@core/survey/survey'
 
+import { AiLimits } from '@common/ai/limits'
+
 import type { AiTool } from '../types'
 import { canViewSurveyTool, describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
 
 export const OVERVIEW_MAX_NODE_DEFS = 300
+// the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
+export const OVERVIEW_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 /**
  * Builds the survey overview: name, languages, cycles and the node definitions depth-first.
@@ -29,7 +33,7 @@ export const buildSurveyOverview = ({
 }) => {
   const info = Survey.getSurveyInfo(survey)
   const ordered = getDesignNodeDefsDepthFirst(survey)
-  return {
+  const overview = {
     name: Survey.getName(info),
     label: Survey.getLabel(info, lang) || null,
     languages: Survey.getLanguages(info),
@@ -37,9 +41,19 @@ export const buildSurveyOverview = ({
     currentCycle: cycle,
     preferredLang: lang,
     total: ordered.length,
-    truncated: ordered.length > maxNodeDefs,
-    nodeDefs: ordered.slice(0, maxNodeDefs).map((nodeDef) => describeNodeDefBrief(survey, nodeDef, lang)),
+    truncated: false,
+    nodeDefs: [] as object[],
   }
+  // add entries while the whole result stays within the budget
+  let size = JSON.stringify(overview).length + 'true'.length
+  for (const nodeDef of ordered.slice(0, maxNodeDefs)) {
+    const entry = describeNodeDefBrief(survey, nodeDef, lang)
+    size += JSON.stringify(entry).length + 1
+    if (size > OVERVIEW_MAX_JSON_CHARS) break
+    overview.nodeDefs.push(entry)
+  }
+  overview.truncated = overview.nodeDefs.length < ordered.length
+  return overview
 }
 
 export const surveyGetOverviewTool: AiTool<Record<string, never>> = {
