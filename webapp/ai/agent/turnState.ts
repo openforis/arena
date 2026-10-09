@@ -1,6 +1,7 @@
 /**
  * Mutable holder of the conversation during a turn: each change makes a new conversation object and reports it.
  */
+import { getMaxAiDataClass, type AiDataClass } from '@common/ai/features'
 import { uuidv4 } from '@core/uuid'
 
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
@@ -18,6 +19,7 @@ export type TurnState = {
   startTool: (call: { toolCallId: string; toolName: string; input: unknown }) => void
   endTool: (result: { toolCallId: string; output: unknown }) => void
   addChangeSet: (changeSet: ChangeSet) => void
+  escalateDataClass: (dataClass: AiDataClass) => void
   finish: (status: AssistantMessageStatus, errorKey?: string) => void
 }
 
@@ -110,6 +112,10 @@ export const createTurnState = ({
       })),
     addChangeSet: (changeSet) =>
       set({ ...current, changeSets: { ...current.changeSets, [changeSet.id]: { changeSet } } }),
+    // never lowers the class (same rule as escalateConversationDataClass, without importing it: no cycle)
+    escalateDataClass: (dataClass) => {
+      if (getMaxAiDataClass(current.dataClass, dataClass) !== current.dataClass) set({ ...current, dataClass })
+    },
     finish: (status, errorKey) =>
       updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status })),
   }

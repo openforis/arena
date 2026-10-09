@@ -9,7 +9,7 @@ import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 
-export type AssistantPromptArea = 'design' | 'help'
+export type AssistantPromptArea = 'design' | 'help' | 'analysis'
 
 /**
  * Describes the current view for the model.
