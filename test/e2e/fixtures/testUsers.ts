@@ -74,14 +74,34 @@ export const getWorkerSurveyEditor = (parallelIndex: number): TestUser => ({
 })
 
 /**
+ * Returns the data editor (no record cleanse permission) used by the worker with the specified parallel index.
+ * @param {number} parallelIndex - Index of the Playwright worker.
+ * @returns {TestUser} - The user.
+ */
+export const getWorkerDataEditor = (parallelIndex: number): TestUser => ({
+  email: `e2e-data-editor-${parallelIndex}@openforis-arena.org`,
+  name: `E2E Data Editor ${parallelIndex}`,
+  password: TEST_USER_PASSWORD,
+})
+
+/**
  * Inserts the user if missing, adds it to the survey editor group of the survey and sets the survey as its
  * current survey (and marks the "What's new" items as seen).
  * @param {object} params - Parameters.
  * @param {TestUser} params.user - The user.
  * @param {number} params.surveyId - Survey id.
+ * @param {string} [params.groupName] - Survey group name (default surveyEditor).
  * @returns {Promise<void>} - Resolves when done.
  */
-export const insertSurveyEditor = async ({ user, surveyId }: { user: TestUser; surveyId: number }): Promise<void> =>
+export const insertSurveyEditor = async ({
+  user,
+  surveyId,
+  groupName = 'surveyEditor',
+}: {
+  user: TestUser
+  surveyId: number
+  groupName?: string
+}): Promise<void> =>
   DB.tx(async (tx) => {
     const { name, email } = user
     const userDb = await tx.oneOrNone(`SELECT uuid FROM "user" WHERE email = $1`, [email])
@@ -97,9 +117,9 @@ export const insertSurveyEditor = async ({ user, surveyId }: { user: TestUser; s
        SELECT u.uuid, g.uuid
        FROM "user" u
        JOIN survey s ON s.id = $2
-       JOIN auth_group g ON g.survey_uuid = s.uuid AND g.name = 'surveyEditor'
+       JOIN auth_group g ON g.survey_uuid = s.uuid AND g.name = $3
        WHERE u.email = $1`,
-      [email, surveyId]
+      [email, surveyId, groupName]
     )
     const whatsNewSeenIds = WhatsNew.whatsNewItems.map((item) => item.id)
     await tx.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) || $2::jsonb WHERE email = $1`, [

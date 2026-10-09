@@ -8,12 +8,14 @@ import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
 import { assistantAnalysisMockScripts } from './mockScriptsAnalysis'
+import { assistantCleaningMockScripts } from './mockScriptsCleaning'
 
 export type MockScriptParams = { lastUserMessage: string; lastToolOutput: unknown }
 
 // a text may be computed from the last tool output (D2); D3 lets a tool call input be computed too
 export type MockScriptStep =
-  { toolCall: { toolName: string; input: unknown } } | { text: string | ((params: MockScriptParams) => string) }
+  | { toolCall: { toolName: string; input: unknown | ((params: MockScriptParams) => unknown) } }
+  | { text: string | ((params: MockScriptParams) => string) }
 
 // a step as played by the model: texts resolved
 export type PlayedMockScriptStep = { toolCall: { toolName: string; input: unknown } } | { text: string }
@@ -74,6 +76,7 @@ export const MOCK_SCRIPTS: MockScript[] = [
     ],
   },
   ...assistantAnalysisMockScripts,
+  ...assistantCleaningMockScripts,
 ]
 
 /**
@@ -146,13 +149,17 @@ const getLastToolOutput = (prompt: LanguageModelV4Prompt, fromIndex: number): un
 }
 
 /**
- * Resolves the text of a step computed from the last tool output.
- * @param {PlayedMockScriptStep} step - Step.
- * @param {MockScriptParams} params - Parameters of the computed texts.
- * @returns {PlayedMockScriptStep} The step with its text resolved.
+ * Resolves the text or the tool call input of a step computed from the user message or the last tool output.
+ * @param {MockScriptStep} step - Step.
+ * @param {MockScriptParams} params - Parameters of the computed values.
+ * @returns {PlayedMockScriptStep} The step with its computed values resolved.
  */
-const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScriptStep =>
-  'text' in step && typeof step.text === 'function' ? { text: step.text(params) } : (step as PlayedMockScriptStep)
+const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScriptStep => {
+  if ('text' in step) return { text: typeof step.text === 'function' ? step.text(params) : step.text }
+  const { toolName, input } = step.toolCall
+  // a function input is built from the user message (D3: the row context's UUIDs)
+  return { toolCall: { toolName, input: typeof input === 'function' ? input(params) : input } }
+}
 
 /**
  * Returns the scripted step to play for a prompt.

@@ -1,3 +1,4 @@
+import en from '@core/i18n/resources/en'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
 import { buildRowContextDraft, cleaningRowContextMarker, parseRowContext } from '@common/ai/prompts/cleaningRowContext'
@@ -15,6 +16,14 @@ import {
   isCleaningRoute,
   startsAsDataConversation,
 } from '@webapp/components/ai/Assistant/cleaning/cleaningArea'
+
+import {
+  assistantCleaningMockScripts,
+  formatMockProposalAnswer,
+  MOCK_FIXED_VALUE,
+  proposeRowFixInput,
+} from '@server/modules/ai/service/mockScriptsCleaning'
+import { createMockModel } from '@server/modules/ai/service/mockProvider'
 
 import { cleaningTestSurvey, fakeI18n, newFakeCleaningApi } from '@test/unit/utils/aiCleaningTestUtils'
 
@@ -227,5 +236,71 @@ describe('cleaning tools', () => {
     for (const name of ['records_countByStep', 'records_countOverTime', 'category_findItems']) {
       expect(allTools.find((candidate) => candidate.name === name)?.area).toEqual(['analysis'])
     }
+  })
+})
+
+describe('cleaning mock script', () => {
+  const rowContext = {
+    recordUuid: '5f1f0b9c-2a1e-4b8e-9d55-0d6c1d0a8e11',
+    recordKeys: '1',
+    nodeUuid: '9a3c2f4e-77b1-4f0a-8a51-3e9f6d2c4b22',
+    path: 'Cluster[1] / Plot[1] / Tree[1] / Tree decimal 2',
+    messages: ['tree_dec_2 > 10'],
+  }
+  // the message sent by the e2e spec: the en row-action question with the row context
+  const e2eMessage = buildRowContextDraft({ question: en.common.aiCleaning.rowAction.question, context: rowContext })
+
+  const findScripts = (message: string) => assistantCleaningMockScripts.filter((script) => script.pattern.test(message))
+
+  test('the e2e message matches exactly one script, with the cleaning marker', () => {
+    expect(findScripts(e2eMessage)).toHaveLength(1)
+    for (const script of assistantCleaningMockScripts) expect(script.promptMarker).toBe(assistantMarkers.cleaning)
+  })
+
+  test('the tool input is built from the row context and is valid for records_proposeEdits', () => {
+    const input = proposeRowFixInput({ lastUserMessage: e2eMessage, lastToolOutput: null })
+    expect(input.edits).toEqual([
+      { recordUuid: rowContext.recordUuid, nodeUuid: rowContext.nodeUuid, value: MOCK_FIXED_VALUE },
+    ])
+    const tool = createCleaningTools({ api: newFakeCleaningApi().api, getI18n: () => fakeI18n }).find(
+      (candidate) => candidate.name === 'records_proposeEdits'
+    )!
+    expect(tool.inputSchema.safeParse(input).success).toBe(true)
+    // without a row context the input is refused by the schema (no edit), never invented
+    expect(proposeRowFixInput({ lastUserMessage: 'hello', lastToolOutput: null }).edits).toEqual([])
+  })
+
+  test('the answer reports the proposal or its failure', () => {
+    expect(formatMockProposalAnswer({ changeSetId: 'cs1', proposed: 1, rejected: [], shownToUser: true })).toMatch(
+      /proposed 1 edit/
+    )
+    expect(formatMockProposalAnswer({ error: { code: 'invalidProposal', message: 'x', issues: [] } })).toMatch(
+      /could not/i
+    )
+    expect(formatMockProposalAnswer(null)).toMatch(/could not/i)
+  })
+
+  test('the mock model plays the script: the tool call input comes from the user message', async () => {
+    const survey = await cleaningTestSurvey()
+    const system = buildAssistantCleaningPrompt({ survey, cycle: '0', lang: 'en', uiLang: 'en' })
+    const model = createMockModel()
+    const result: any = await model.doGenerate({
+      prompt: [
+        { role: 'system', content: system },
+        { role: 'user', content: [{ type: 'text', text: e2eMessage }] },
+      ],
+      tools: [
+        {
+          type: 'function',
+          name: 'records_proposeEdits',
+          description: 'x',
+          inputSchema: { type: 'object', properties: {} },
+        },
+      ],
+    } as any)
+    const toolCall = result.content.find((part: any) => part.type === 'tool-call')
+    expect(toolCall?.toolName).toBe('records_proposeEdits')
+    const input = typeof toolCall.input === 'string' ? JSON.parse(toolCall.input) : toolCall.input
+    expect(input.edits[0]).toMatchObject({ nodeUuid: rowContext.nodeUuid, value: MOCK_FIXED_VALUE })
   })
 })
