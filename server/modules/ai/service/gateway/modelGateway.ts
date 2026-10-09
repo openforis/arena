@@ -8,6 +8,7 @@ import type { User } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
+import { getAiFeature } from '@common/ai/features'
 import type { AiGatewayCall } from '@common/ai/wire'
 import { serializeGenerateResult, serializeStreamPart } from '@common/ai/wire'
 
@@ -131,7 +132,8 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
   if (!deps.rateLimiter.take(user.uuid)) {
     throw new SystemError('aiRateLimited', {}, TOO_MANY_REQUESTS)
   }
-  const call = sanitizeCall(request.call, deps.limits)
+  const allowTools = getAiFeature(request.feature)?.tools === true
+  const call = sanitizeCall(request.call, { ...deps.limits, allowTools })
   const { model, meta } = await deps.resolveModel({ user, feature: request.feature })
   await deps.assertPolicyAllows({
     surveyId: request.surveyId ?? null,

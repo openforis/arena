@@ -2,7 +2,7 @@
  * LanguageModelV4 backed by the Arena AI gateway (POST /api/ai/model): the browser runs the AI SDK, the
  * server only checks, resolves the provider and forwards the call.
  */
-import type { LanguageModelV4, LanguageModelV4CallOptions } from '@ai-sdk/provider'
+import type { LanguageModelV4, LanguageModelV4CallOptions, LanguageModelV4FunctionTool } from '@ai-sdk/provider'
 
 import SystemError from '@core/systemError'
 import { AI_GATEWAY_URL, deserializeGenerateResult, type AiGatewayCall } from '@common/ai/wire'
@@ -38,6 +38,17 @@ const KEY_BY_STATUS: Record<number, string> = {
  */
 export const getErrorKeyForHttpStatus = (status: number): string => KEY_BY_STATUS[status] ?? 'aiProviderUnavailable'
 
+const isFunctionTool = (tool: { type: string }): tool is LanguageModelV4FunctionTool => tool.type === 'function'
+
+// only the definition crosses: provider options and provider-defined tools are never sent
+const toGatewayTools = (tools: LanguageModelV4CallOptions['tools']) =>
+  (tools ?? []).filter(isFunctionTool).map(({ type, name, description, inputSchema }) => ({
+    type,
+    name,
+    description,
+    inputSchema,
+  }))
+
 /** Keeps only the call options the gateway accepts. */
 const toGatewayCall = (options: LanguageModelV4CallOptions): AiGatewayCall => {
   const call: Record<string, unknown> = {}
@@ -45,6 +56,11 @@ const toGatewayCall = (options: LanguageModelV4CallOptions): AiGatewayCall => {
     if (options[name] !== undefined) call[name] = options[name]
   }
   if (options.responseFormat) call.responseFormat = { type: options.responseFormat.type }
+  const tools = toGatewayTools(options.tools)
+  if (tools.length > 0) {
+    call.tools = tools
+    if (options.toolChoice) call.toolChoice = options.toolChoice
+  }
   return call as AiGatewayCall
 }
 

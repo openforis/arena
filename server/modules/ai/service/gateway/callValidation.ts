@@ -1,6 +1,7 @@
 /**
  * Validation of the gateway request (feature, data class, survey) and sanitising of the forwarded model
- * call: text-only prompt, no tools/files/provider options, capped output, bounded prompt size.
+ * call: text-only prompt (plus tool calls and results for tool features), function tools for tool features
+ * only, no files/provider options, capped output, bounded prompt size.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiFeaturePermission, getAiFeature, isGatewayFeature } from '@common/ai/features'
@@ -45,35 +46,127 @@ export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
   return { surveyId, feature, dataClass, stream, call: call as AiGatewayCall }
 }
 
-const isTextPart = (part: unknown): boolean => isObject(part) && part.type === 'text' && typeof part.text === 'string'
+const TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/
+const MAX_TOOLS = 32
+const MAX_TOOL_DESCRIPTION_CHARS = 4000
+const TOOL_CHOICE_TYPES = new Set(['auto', 'none', 'required'])
 
-// Rebuilds the message from { role, content } (and text parts from { type, text }) so that extra keys,
-// e.g. providerOptions, are dropped. System content is a string, user/assistant content text parts only.
-const rebuildMessage = (message: unknown): any => {
+export type SanitizeLimits = { maxPromptChars: number; maxOutputTokens: number; allowTools?: boolean }
+
+type GatewayTool = { type: 'function'; name: string; description?: string; inputSchema: Record<string, any> }
+
+const jsonSize = (value: unknown): number => JSON.stringify(value ?? null).length
+
+const isTextPart = (part: unknown): part is Record<string, any> =>
+  isObject(part) && part.type === 'text' && typeof part.text === 'string'
+
+const isReasoningPart = (part: unknown): part is Record<string, any> =>
+  isObject(part) && part.type === 'reasoning' && typeof part.text === 'string'
+
+const isToolPartOf = (part: unknown, type: string): part is Record<string, any> =>
+  isObject(part) &&
+  part.type === type &&
+  typeof part.toolCallId === 'string' &&
+  typeof part.toolName === 'string' &&
+  TOOL_NAME_PATTERN.test(part.toolName)
+
+// Rebuilds a tool result output from the known keys of its type; null when the output is not supported.
+const rebuildToolOutput = (output: unknown): Record<string, any> | null => {
+  if (!isObject(output)) return null
+  const { type, value, reason } = output
+  if (type === 'text' || type === 'error-text') return typeof value === 'string' ? { type, value } : null
+  if (type === 'json' || type === 'error-json') return value === undefined ? null : { type, value }
+  if (type === 'execution-denied') return typeof reason === 'string' ? { type, reason } : { type }
+  return null
+}
+
+// Rebuilds each part from the known keys of its type (providerOptions and any other key are dropped);
+// null when the part is not allowed in a message of this role.
+const rebuildPart = (part: unknown, role: string, allowTools: boolean): Record<string, any> | null => {
+  if (isTextPart(part)) return role === 'tool' ? null : { type: 'text', text: part.text }
+  if (!allowTools || role === 'user') return null
+  if (role === 'assistant') {
+    if (isReasoningPart(part)) return { type: 'reasoning', text: part.text }
+    if (isToolPartOf(part, 'tool-call')) {
+      return { type: 'tool-call', toolCallId: part.toolCallId, toolName: part.toolName, input: part.input }
+    }
+    return null
+  }
+  if (!isToolPartOf(part, 'tool-result')) return null
+  const output = rebuildToolOutput(part.output)
+  return output && { type: 'tool-result', toolCallId: part.toolCallId, toolName: part.toolName, output }
+}
+
+// Rebuilds the message from { role, content } so that extra keys, e.g. providerOptions, are dropped.
+// System content is a string; user content text parts; assistant and tool content depend on allowTools.
+const rebuildMessage = (message: unknown, allowTools: boolean): any => {
   if (!isObject(message)) throw invalid('prompt')
   const { role, content } = message
   if (role === 'system') {
     if (typeof content !== 'string') throw invalid('prompt.system')
     return { role, content }
   }
-  if (role !== 'user' && role !== 'assistant') throw invalid('prompt.role')
-  if (!Array.isArray(content) || !content.every(isTextPart)) throw invalid('prompt.content')
-  return { role, content: content.map((part) => ({ type: 'text', text: part.text })) }
+  const roleAllowed = role === 'user' || role === 'assistant' || (role === 'tool' && allowTools)
+  if (!roleAllowed) throw invalid('prompt.role')
+  if (!Array.isArray(content)) throw invalid('prompt.content')
+  const parts = content.map((part) => rebuildPart(part, role, allowTools))
+  if (!parts.every(Boolean)) throw invalid('prompt.content')
+  return { role, content: parts }
+}
+
+const partSize = (part: Record<string, any>): number => {
+  if (part.type === 'tool-call') return jsonSize(part.input)
+  if (part.type === 'tool-result') return jsonSize(part.output)
+  return part.text.length
 }
 
 const messageSize = (message: any): number =>
   typeof message.content === 'string'
     ? message.content.length
-    : message.content.reduce((total: number, part: any) => total + part.text.length, 0)
+    : message.content.reduce((total: number, part: any) => total + partSize(part), 0)
 
-const sanitizePrompt = (prompt: unknown, maxPromptChars: number): AiGatewayCall['prompt'] => {
+const sanitizePrompt = (
+  prompt: unknown,
+  { maxPromptChars, allowTools, extraSize }: { maxPromptChars: number; allowTools: boolean; extraSize: number }
+): AiGatewayCall['prompt'] => {
   if (!Array.isArray(prompt) || prompt.length === 0) throw invalid('prompt')
-  const rebuilt = prompt.map(rebuildMessage)
-  const size = rebuilt.reduce((total, message) => total + messageSize(message), 0)
+  const rebuilt = prompt.map((message) => rebuildMessage(message, allowTools))
+  const size = rebuilt.reduce((total, message) => total + messageSize(message), extraSize)
   if (size > maxPromptChars) {
     throw new SystemError('aiPromptTooLarge', { size, limit: maxPromptChars }, PAYLOAD_TOO_LARGE)
   }
   return rebuilt
+}
+
+const checkTool = (tool: unknown): GatewayTool => {
+  if (!isObject(tool) || tool.type !== 'function') throw invalid('tools')
+  const { name, description, inputSchema } = tool
+  if (typeof name !== 'string' || !TOOL_NAME_PATTERN.test(name)) throw invalid('tools.name')
+  const descriptionValid =
+    description === undefined || (typeof description === 'string' && description.length <= MAX_TOOL_DESCRIPTION_CHARS)
+  if (!descriptionValid) throw invalid('tools.description')
+  if (!isObject(inputSchema)) throw invalid('tools.inputSchema')
+  return description === undefined
+    ? { type: 'function', name, inputSchema }
+    : { type: 'function', name, description, inputSchema }
+}
+
+const pickTools = (value: unknown, allowTools: boolean): GatewayTool[] | undefined => {
+  if (value === undefined) return undefined
+  if (!allowTools || !Array.isArray(value) || value.length > MAX_TOOLS) throw invalid('tools')
+  const tools = value.map(checkTool)
+  if (new Set(tools.map((tool) => tool.name)).size !== tools.length) throw invalid('tools.name')
+  return tools.length > 0 ? tools : undefined
+}
+
+const pickToolChoice = (value: unknown, tools: GatewayTool[] | undefined): AiGatewayCall['toolChoice'] => {
+  if (value === undefined) return undefined
+  if (!tools || !isObject(value)) throw invalid('toolChoice')
+  if (TOOL_CHOICE_TYPES.has(value.type)) return { type: value.type }
+  if (value.type === 'tool' && tools.some((tool) => tool.name === value.toolName)) {
+    return { type: 'tool', toolName: value.toolName }
+  }
+  throw invalid('toolChoice')
 }
 
 const pickNumericOptions = (call: Record<string, any>): Partial<AiGatewayCall> => {
@@ -112,19 +205,18 @@ const capOutputTokens = (value: unknown, maxOutputTokens: number): number => {
 /**
  * Validates and reduces the model call to the forwarded options.
  * @param {unknown} call - The call sent by the browser.
- * @param {object} limits - Limits.
- * @param {number} limits.maxPromptChars - Max prompt size (chars).
- * @param {number} limits.maxOutputTokens - Max output tokens.
+ * @param {SanitizeLimits} limits - Limits; `allowTools` only for features flagged `tools`.
  * @returns {AiGatewayCall} The call to forward.
  */
 export const sanitizeCall = (
   call: unknown,
-  { maxPromptChars, maxOutputTokens }: { maxPromptChars: number; maxOutputTokens: number }
+  { maxPromptChars, maxOutputTokens, allowTools = false }: SanitizeLimits
 ): AiGatewayCall => {
   if (!isObject(call)) throw invalid('call')
-  if (call.tools !== undefined || call.toolChoice !== undefined) throw invalid('tools')
+  const tools = pickTools(call.tools, allowTools)
+  const toolChoice = pickToolChoice(call.toolChoice, tools)
   const sanitized: AiGatewayCall = {
-    prompt: sanitizePrompt(call.prompt, maxPromptChars),
+    prompt: sanitizePrompt(call.prompt, { maxPromptChars, allowTools, extraSize: tools ? jsonSize(tools) : 0 }),
     ...pickNumericOptions(call),
     maxOutputTokens: capOutputTokens(call.maxOutputTokens, maxOutputTokens),
   }
@@ -132,5 +224,7 @@ export const sanitizeCall = (
   if (stopSequences) sanitized.stopSequences = stopSequences
   const responseFormat = pickResponseFormat(call.responseFormat)
   if (responseFormat) sanitized.responseFormat = responseFormat
+  if (tools) sanitized.tools = tools as AiGatewayCall['tools']
+  if (toolChoice) sanitized.toolChoice = toolChoice
   return sanitized
 }

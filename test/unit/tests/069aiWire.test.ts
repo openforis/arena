@@ -45,13 +45,13 @@ describe('stream parts on the wire', () => {
     expect(part.error.key).toBe('aiProviderUnavailable')
   })
 
-  test.each(['raw', 'tool-call', 'file', 'source', 'tool-input-start'])('%s parts are not forwarded', (type) => {
+  test.each(['raw', 'file', 'source', 'tool-input-start', 'tool-result'])('%s parts are not forwarded', (type) => {
     expect(serializeStreamPart({ type } as any, mapError)).toBeNull()
   })
 })
 
 describe('generate results on the wire', () => {
-  test('keeps text and reasoning content, finish reason, usage, warnings and response metadata only', () => {
+  test('keeps text, reasoning and tool-call content, finish reason, usage, warnings and response metadata only', () => {
     const result: any = {
       content: [
         { type: 'reasoning', text: 'think' },
@@ -76,6 +76,7 @@ describe('generate results on the wire', () => {
       content: [
         { type: 'reasoning', text: 'think' },
         { type: 'text', text: 'answer' },
+        { type: 'tool-call', toolCallId: 'x', toolName: 'y', input: '{}' },
       ],
       finishReason: { unified: 'stop' },
       usage: { inputTokens: { total: 1 }, outputTokens: { total: 2 } },
