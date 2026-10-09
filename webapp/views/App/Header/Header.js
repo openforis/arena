@@ -17,6 +17,7 @@ import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { Button, Spinner } from '@webapp/components'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
+import { AssistantButton } from '@webapp/components/ai/Assistant'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
@@ -123,7 +124,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
-        <ThemeButtonMenu />
+        <AssistantButton />
         <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"

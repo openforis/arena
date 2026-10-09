@@ -1636,6 +1636,7 @@ $t(common.cantUndoWarning)`,
       docs_search: 'Искал «{{query}}» в руководстве',
       default: 'Использовал инструмент',
       failed: 'Ошибка',
+      interrupted: 'Прервано',
     },
     card: {
       title: 'Предлагаемые изменения',

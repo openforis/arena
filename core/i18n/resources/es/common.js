@@ -1425,6 +1425,7 @@ $t(common.appNameFull)
       docs_search: 'Buscó "{{query}}" en el manual',
       default: 'Usó una herramienta',
       failed: 'Falló',
+      interrupted: 'Interrumpido',
     },
     card: {
       title: 'Cambios propuestos',

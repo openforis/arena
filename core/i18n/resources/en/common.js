@@ -1536,6 +1536,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       docs_search: 'Searched the manual for "{{query}}"',
       default: 'Used a tool',
       failed: 'Failed',
+      interrupted: 'Interrupted',
     },
     card: {
       title: 'Proposed changes',
