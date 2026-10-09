@@ -1,3 +1,5 @@
+import type { Page } from '@playwright/test'
+
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
@@ -51,7 +53,7 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
    * @param {ArenaApi} api - The ArenaApi fixture.
    * @returns {Promise<void>} Resolves when the card shows the proposal.
    */
-  const proposeFix = async (page, api) => {
+  const proposeFix = async (page: Page, api: ArenaApi) => {
     await expectReportRowCount(page, 1)
     await useLocalServer(page, api, stub)
     await expectReportRowCount(page, 1)
@@ -159,10 +161,20 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
 
       await page.goto(Urls.records)
       await openAssistantPanel(page)
-      await expect(assistantPanel(page).getByRole('tab', { name: cleaningAreaLabel, exact: true })).toHaveCount(0)
+      const areaTabs = assistantPanel(page).getByRole('tab')
+      // positive control: the panel lists its areas, so the missing Cleaning tab is a real absence
+      await expect(areaTabs.first()).toBeVisible()
+      await expect(areaTabs.filter({ hasText: cleaningAreaLabel })).toHaveCount(0)
 
-      await page.goto(Urls.validationReport)
+      // the report is not even routed without the permission: wait for the app to boot, then check its absence
+      await Promise.all([
+        page.waitForResponse((response) => /\/api\/survey\/\d+\/full/.test(response.url()) && response.ok()),
+        page.goto(Urls.validationReport),
+      ])
       await expect(page.getByTestId(TestId.validationReport.askAssistantBtn)).toHaveCount(0)
+      await expect(
+        page.getByTestId(TestId.table.rows(TestId.validationReport.validationReport)).locator('div.table__row')
+      ).toHaveCount(0)
     } finally {
       await context.close()
     }
