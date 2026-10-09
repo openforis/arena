@@ -231,8 +231,11 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     if (dataUser !== undefined && dataUser !== userUuid) reset()
   }
 
+  // the newer run of the same user (running, or already stored), else (reset, other user) empty capabilities
   const newerRun = (userUuid: string | null): Promise<AiCapabilities> =>
-    inflight && inflight.userUuid === userUuid ? inflight.promise : Promise.resolve(capabilities)
+    inflight && inflight.userUuid === userUuid
+      ? inflight.promise
+      : Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
 
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence

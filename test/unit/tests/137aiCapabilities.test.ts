@@ -289,6 +289,18 @@ describe('user switch and failures', () => {
     expect((await loading).localServer.models).toEqual(['new'])
   })
 
+  test('a load overtaken by a run of another user resolves with empty capabilities', async () => {
+    const first = deferred<LocalServerProbeResult>()
+    const second = deferred<LocalServerProbeResult>()
+    const store = storeWithProbes([first, second])
+    const loading = store.load({ userUuid: 'u1' })
+    const other = store.load({ userUuid: 'u2' })
+    second.resolve({ ...reachableProbe, models: ['u2-model'] })
+    await other
+    first.resolve(reachableProbe)
+    expect((await loading).localServer.models).toEqual([])
+  })
+
   test('a late stale probe does not overwrite a newer one', async () => {
     const old = deferred<LocalServerProbeResult>()
     const recent = deferred<LocalServerProbeResult>()

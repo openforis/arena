@@ -42,6 +42,11 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
   }
 }
 
+// dynamic import: capabilitiesStore imports the redux store, which imports this module (no static cycle)
+const resetAiCapabilitiesLazily = () => {
+  import('@webapp/ai/engines/capabilitiesStore').then((m) => m.resetAiCapabilities()).catch(() => undefined)
+}
+
 export const login = (email, password, twoFactorToken) =>
   _createAction(async (dispatch) => {
     const {
@@ -50,6 +55,7 @@ export const login = (email, password, twoFactorToken) =>
     if (user) {
       ApiConstants.setAuthToken(authToken)
       resetAiSettingsCache()
+      resetAiCapabilitiesLazily()
       cancelAllConsentRequests()
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
@@ -90,6 +96,7 @@ export const logout =
     } finally {
       // also when the logout request fails (network error, expired session): no conversation stays in the browser
       resetAiSettingsCache()
+      resetAiCapabilitiesLazily()
       cancelAllConsentRequests()
       await clearAssistantData(userUuid)
     }
