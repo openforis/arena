@@ -59,3 +59,26 @@ export const isCategoryEnabledForUser = (user: User, category: string): boolean 
   if (!raw?.featuresEnabled) return false
   return !!sanitiseFeatureToggles(raw.featureToggles)[category]
 }
+
+/**
+ * Returns true when the user opted in to the anonymous capability statistics (default off).
+ * @param {User} user - Arena user.
+ * @returns {boolean} The opt-in state.
+ */
+export const isCapabilityStatsEnabledForUser = (user: User): boolean => getAiPrefs(user)?.capabilityStats === true
+
+/**
+ * Returns the capabilityStats value to store: a boolean in the update wins, otherwise the stored value is kept.
+ * @param {object} params - Parameters.
+ * @param {object|null} params.existing - Stored AI prefs.
+ * @param {object|null} params.update - Settings update from the request body.
+ * @returns {boolean} The value to store.
+ */
+export const resolveCapabilityStatsUpdate = ({
+  existing,
+  update,
+}: {
+  existing: Record<string, any> | null
+  update: Record<string, any> | null
+}): boolean =>
+  typeof update?.capabilityStats === 'boolean' ? update.capabilityStats : existing?.capabilityStats === true

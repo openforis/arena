@@ -3,6 +3,7 @@
  * "self-only": a user can only read or modify their own AI configuration.
  *
  *   GET    /api/ai/settings        — current settings + effective source
+ *                             (also orgHostedBaseUrls, policyCeilings, maxPromptChars for the browser engines)
  *   PUT    /api/ai/settings        — save / update
  *   POST   /api/ai/settings/test   — verify the saved key with a 5-token call
  *   POST   /api/ai/settings/models — list models from the provider for the dropdown
@@ -15,7 +16,7 @@ import * as AiSettingsService from '../service/aiSettingsService'
 import * as ProviderResolver from '../service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { getDisabledFeatureKeys } from '../service/featureGate'
-import { getAiPolicyCeilings } from '../service/policyCeilings'
+import { getEngineSettingsFields } from '../service/engineSettings'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
 const buildResponseBody = async (user) => {
@@ -26,11 +27,12 @@ const buildResponseBody = async (user) => {
     effectiveSource: effective.source,
     effectiveProvider: effective.provider,
     effectiveModel: effective.model,
-    // where the gateway sends the data, and the instance ceilings (browser policy check, Help chat)
+    // where the gateway sends the data
     hostingClass: effective.hostingClass,
-    policyCeilings: getAiPolicyCeilings(),
     encryptionConfigured: SecretBox.isConfigured(),
     disabledFeatures: getDisabledFeatureKeys(),
+    // orgHostedBaseUrls, policyCeilings (instance ceilings) and maxPromptChars, for the browser engines
+    ...getEngineSettingsFields(),
   }
 }
 
