@@ -262,6 +262,7 @@ export const {
   fetchSurveyIdsAndNames,
   fetchDependencies,
   fetchFilesTotalSpace,
+  fetchSurveyAiPolicy,
   fetchUserSurveys,
 } = SurveyRepository
 
@@ -693,7 +694,7 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
     maxValue: SurveyFileManager.maxSurveyFilesTotalSpaceMB,
   })(value)
   if (valueLimited === SurveyFileManager.defaultSurveyFilesTotalSpaceMB) {
-    await SurveyRepository.deleteSurveyConfigurationProp({ surveyId, key }, client)
+    await SurveyRepository.clearSurveyConfigurationProp({ surveyId, key }, client)
   } else {
     await SurveyRepository.updateSurveyConfigurationProp({ surveyId, key, value: String(valueLimited) }, client)
   }
