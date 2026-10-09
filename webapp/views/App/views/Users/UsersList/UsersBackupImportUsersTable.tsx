@@ -207,13 +207,7 @@ const UserRow = ({
           />
         </TableCell>
         <TableCell align="center">
-          {user.hasPassword && (
-            <Checkbox
-              checked={passwordRestorable && restorePassword}
-              disabled={!passwordRestorable}
-              onChange={onRestorePasswordChange}
-            />
-          )}
+          {passwordRestorable && <Checkbox checked={restorePassword} onChange={onRestorePasswordChange} />}
         </TableCell>
       </TableRow>
       <TableRow className="users-backup-import-users-table__details-row">
@@ -278,12 +272,13 @@ export const UsersBackupImportUsersTable = ({
               <TableCell align="center" title={i18n.t('usersView:usersBackup.restorePasswordInfo')}>
                 <div className="users-backup-import-users-table__password-header">
                   {i18n.t('usersView:usersBackup.restorePassword')}
-                  <Checkbox
-                    checked={allPasswordsRestored}
-                    disabled={passwordRestorableUsers.length === 0}
-                    indeterminate={restorePasswordCount > 0 && !allPasswordsRestored}
-                    onChange={onRestorePasswordChange(passwordRestorableUsers)}
-                  />
+                  {passwordRestorableUsers.length > 0 && (
+                    <Checkbox
+                      checked={allPasswordsRestored}
+                      indeterminate={restorePasswordCount > 0 && !allPasswordsRestored}
+                      onChange={onRestorePasswordChange(passwordRestorableUsers)}
+                    />
+                  )}
                 </div>
               </TableCell>
             </TableRow>
