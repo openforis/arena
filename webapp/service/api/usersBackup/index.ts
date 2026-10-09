@@ -32,5 +32,5 @@ export const startUsersBackupImport = async ({
   return job
 }
 
-export const cancelUsersBackupImport = async ({ tempFileName }: { tempFileName: string }) =>
+export const cancelUsersBackupImport = ({ tempFileName }: { tempFileName: string }) =>
   axios.post('/api/users/backup/import/cancel', { tempFileName })

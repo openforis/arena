@@ -45,7 +45,7 @@ export type UserGroupRow = {
 
 // READ
 
-export const fetchUsersForBackup = async (
+export const fetchUsersForBackup = (
   { includePasswords }: { includePasswords: boolean },
   client: any = db
 ): Promise<UserBackupRow[]> =>
@@ -60,7 +60,7 @@ export const fetchUsersForBackup = async (
     camelize
   )
 
-export const fetchAuthGroupMembershipsForBackup = async (client: any = db): Promise<AuthGroupMembershipRow[]> =>
+export const fetchAuthGroupMembershipsForBackup = (client: any = db): Promise<AuthGroupMembershipRow[]> =>
   client.map(
     `
     SELECT gu.user_uuid, g.name AS group_name, ${surveyNameField} AS survey_name, gu.props
@@ -71,7 +71,7 @@ export const fetchAuthGroupMembershipsForBackup = async (client: any = db): Prom
     (row: any) => ({ ...camelize(row), props: row.props })
   )
 
-export const fetchUserGroupMembershipsForBackup = async (client: any = db): Promise<UserGroupMembershipRow[]> =>
+export const fetchUserGroupMembershipsForBackup = (client: any = db): Promise<UserGroupMembershipRow[]> =>
   client.map(
     `
     SELECT ugu.user_uuid, ug.props ->> 'name' AS group_name, ${surveyNameField} AS survey_name
@@ -82,19 +82,21 @@ export const fetchUserGroupMembershipsForBackup = async (client: any = db): Prom
     camelize
   )
 
-export const fetchUserUuidByEmail = async ({ email }: { email: string }, client: any = db): Promise<string | null> =>
+export const fetchUserUuidByEmail = ({ email }: { email: string }, client: any = db): Promise<string | null> =>
   client.oneOrNone(`SELECT uuid FROM "user" WHERE email = $1`, [email], (row: any) => row?.uuid ?? null)
 
-export const fetchUserUuidsByEmails = async (
+export const fetchUserUuidsByEmails = (
   { emails }: { emails: string[] },
   client: any = db
 ): Promise<{ email: string; uuid: string }[]> =>
-  emails.length === 0 ? [] : client.map(`SELECT email, uuid FROM "user" WHERE email IN ($1:csv)`, [emails], camelize)
+  emails.length === 0
+    ? Promise.resolve([])
+    : client.map(`SELECT email, uuid FROM "user" WHERE email IN ($1:csv)`, [emails], camelize)
 
-export const existsUserByUuid = async ({ uuid }: { uuid: string }, client: any = db): Promise<boolean> =>
+export const existsUserByUuid = ({ uuid }: { uuid: string }, client: any = db): Promise<boolean> =>
   client.one(`SELECT EXISTS (SELECT 1 FROM "user" WHERE uuid = $1)`, [uuid], (row: any) => row.exists)
 
-export const fetchAuthGroups = async (client: any = db): Promise<AuthGroupRow[]> =>
+export const fetchAuthGroups = (client: any = db): Promise<AuthGroupRow[]> =>
   client.map(
     `
     SELECT g.uuid, g.name, g.survey_uuid, ${surveyNameField} AS survey_name
@@ -104,7 +106,7 @@ export const fetchAuthGroups = async (client: any = db): Promise<AuthGroupRow[]>
     camelize
   )
 
-export const fetchUserGroups = async (client: any = db): Promise<UserGroupRow[]> =>
+export const fetchUserGroups = (client: any = db): Promise<UserGroupRow[]> =>
   client.map(
     `
     SELECT ug.uuid, ug.props ->> 'name' AS name, ${surveyNameField} AS survey_name
@@ -114,21 +116,15 @@ export const fetchUserGroups = async (client: any = db): Promise<UserGroupRow[]>
     camelize
   )
 
-export const fetchUserAuthGroupUuids = async (
-  { userUuid }: { userUuid: string },
-  client: any = db
-): Promise<string[]> =>
+export const fetchUserAuthGroupUuids = ({ userUuid }: { userUuid: string }, client: any = db): Promise<string[]> =>
   client.map(`SELECT group_uuid FROM auth_group_user WHERE user_uuid = $1`, [userUuid], (row: any) => row.group_uuid)
 
-export const fetchUserUserGroupUuids = async (
-  { userUuid }: { userUuid: string },
-  client: any = db
-): Promise<string[]> =>
+export const fetchUserUserGroupUuids = ({ userUuid }: { userUuid: string }, client: any = db): Promise<string[]> =>
   client.map(`SELECT group_uuid FROM user_group_user WHERE user_uuid = $1`, [userUuid], (row: any) => row.group_uuid)
 
 // CREATE
 
-export const insertUser = async (
+export const insertUser = (
   {
     uuid,
     email,
@@ -155,7 +151,7 @@ export const insertUser = async (
     [uuid, email, name, password, status, props, profilePicture]
   )
 
-export const insertAuthGroupUser = async (
+export const insertAuthGroupUser = (
   { userUuid, groupUuid, props }: { userUuid: string; groupUuid: string; props: Record<string, any> | null },
   client: any = db
 ): Promise<void> =>
@@ -167,7 +163,7 @@ export const insertAuthGroupUser = async (
     [userUuid, groupUuid, props]
   )
 
-export const insertUserGroupUser = async (
+export const insertUserGroupUser = (
   { userUuid, groupUuid }: { userUuid: string; groupUuid: string },
   client: any = db
 ): Promise<void> =>
@@ -182,7 +178,7 @@ export const insertUserGroupUser = async (
 // UPDATE
 
 // password and profile picture are kept when not specified
-export const updateUser = async (
+export const updateUser = (
   {
     uuid,
     name,
@@ -214,7 +210,7 @@ export const updateUser = async (
 
 // DELETE
 
-export const deleteAuthGroupUsers = async (
+export const deleteAuthGroupUsers = (
   { userUuid, groupUuids }: { userUuid: string; groupUuids: string[] },
   client: any = db
 ): Promise<void> =>

@@ -83,7 +83,7 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
   const userGroupKeys = [
     ...new Set([...backup.userGroups, ...(current?.userGroups ?? [])].map((g) => `${g.surveyName} / ${g.name}`)),
   ].sort((a, b) => a.localeCompare(b))
-  const hasUserGroup = (groups: PreviewRoles['userGroups'] = [], key: string) =>
+  const hasUserGroup = (key: string, groups: PreviewRoles['userGroups'] = []) =>
     groups.find((g) => `${g.surveyName} / ${g.name}` === key)
 
   const notFoundLabel = (
@@ -129,7 +129,7 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
           </TableHead>
           <TableBody>
             {userGroupKeys.map((key) => {
-              const backupGroup = hasUserGroup(backup.userGroups, key)
+              const backupGroup = hasUserGroup(key, backup.userGroups)
               return (
                 <TableRow key={key}>
                   <TableCell>{key}</TableCell>
@@ -138,7 +138,7 @@ const UserRolesDetails = ({ user }: { user: ImportPreviewUser }) => {
                     {backupGroup?.groupExists === false && notFoundLabel}
                   </TableCell>
                   {existing && (
-                    <TableCell>{i18n.t(hasUserGroup(current?.userGroups, key) ? 'common.yes' : 'common.no')}</TableCell>
+                    <TableCell>{i18n.t(hasUserGroup(key, current?.userGroups) ? 'common.yes' : 'common.no')}</TableCell>
                   )}
                 </TableRow>
               )

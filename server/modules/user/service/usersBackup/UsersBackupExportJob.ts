@@ -56,7 +56,7 @@ export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
         })),
       })
       if (hasProfilePicture) {
-        const profilePicture = await UserRepository.fetchUserProfilePicture(uuid, tx)
+        const profilePicture = await UserRepository.fetchUserProfilePicture(uuid, tx) // NOSONAR
         archive.append(profilePicture, { name: UsersBackupFile.profilePicture({ userUuid: uuid }) })
       }
       this.incrementProcessedItems()

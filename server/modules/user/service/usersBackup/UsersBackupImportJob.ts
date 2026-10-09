@@ -64,7 +64,7 @@ export default class UsersBackupImportJob extends Job {
 
     for (const user of users) {
       if (this.isCanceled()) return
-      await this.importUser(user)
+      await this.importUser(user) // NOSONAR
       this.incrementProcessedItems()
     }
     this.summary.surveysNotFound.sort((a, b) => a.localeCompare(b))
@@ -176,12 +176,10 @@ export default class UsersBackupImportJob extends Job {
         ? currentGroupUuids.filter((uuid) => this.authGroupsByUuid[uuid]?.surveyUuid === group.surveyUuid)
         : []
       if (otherSurveyGroupUuids.length > 0) {
-        await UsersBackupRepository.deleteAuthGroupUsers({ userUuid, groupUuids: otherSurveyGroupUuids }, this.tx)
+        await UsersBackupRepository.deleteAuthGroupUsers({ userUuid, groupUuids: otherSurveyGroupUuids }, this.tx) // NOSONAR
       }
-      await UsersBackupRepository.insertAuthGroupUser(
-        { userUuid, groupUuid: group.uuid, props: authGroup.props ?? null },
-        this.tx
-      )
+      const authGroupUser = { userUuid, groupUuid: group.uuid, props: authGroup.props ?? null }
+      await UsersBackupRepository.insertAuthGroupUser(authGroupUser, this.tx) // NOSONAR
       added += 1
     }
     this.summary.authGroupsAdded += added
@@ -209,7 +207,7 @@ export default class UsersBackupImportJob extends Job {
       }
       if (currentGroupUuids.includes(group.uuid)) continue
 
-      await UsersBackupRepository.insertUserGroupUser({ userUuid, groupUuid: group.uuid }, this.tx)
+      await UsersBackupRepository.insertUserGroupUser({ userUuid, groupUuid: group.uuid }, this.tx) // NOSONAR
       added += 1
     }
     this.summary.userGroupsAdded += added
