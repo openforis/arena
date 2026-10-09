@@ -114,32 +114,6 @@ const generateDataQuery = async (params: Parameters<DataQueryModule['generateDat
 const summarizeDataQuery = async (params: Parameters<DataQueryModule['summarizeDataQueryWorkflow']>[0]) =>
   (await loadDataQuery()).summarizeDataQueryWorkflow(params)
 
-/**
- * Loads the chat workflow module on first use.
- * @returns {Promise<object>} The module.
- */
-const loadChat = () => import('./chat')
-
-/**
- * Streams the help chat answer.
- * @param {object} params - Messages, language and callbacks.
- * @returns {Function} cancel().
- */
-const streamChat = ({
-  onChunk,
-  onDone,
-  onError,
-  ...params
-}: StreamCallbacks & {
-  messages: { role: string; parts: { type: string; text?: string }[] }[]
-  language: string
-}): (() => void) =>
-  runStreamWithCallbacks({
-    run: async (signal) => (await loadChat()).streamChatWorkflow({ ...params, onChunk, signal } as any),
-    onDone,
-    onError,
-  })
-
 export const AiWorkflows = {
   generateExpression,
   explainExpression,
@@ -147,5 +121,4 @@ export const AiWorkflows = {
   summarizeActivityLog,
   generateDataQuery,
   summarizeDataQuery,
-  streamChat,
 }

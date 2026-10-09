@@ -126,8 +126,6 @@ Essayez de rafraîchir la page.`,
   aiTranslationItemsMissing: 'Rien à traduire.',
   aiTranslationInvalid: "L'IA n'a pas renvoyé de traduction exploitable. Veuillez réessayer.",
   aiTranslationTooManyItems: "Trop d'éléments dans un seul lot ({{count}}) ; la limite est de {{limit}}.",
-  aiChatbotPayloadTooLarge:
-    'Votre conversation est trop volumineuse. Effacez la discussion et essayez une question plus courte.',
   userHasPendingInvitation: `Il existe déjà une invitation en attente pour l'utilisateur avec l'email '{{email}}' ; il/elle ne peut pas être invité(e) à ce formulaire jusqu'à ce qu'elle soit acceptée`,
   userHasRole: "L'utilisateur a déjà un rôle dans ce formulaire",
   userHasRole_other: 'Les utilisateurs ont déjà un rôle dans ce formulaire',

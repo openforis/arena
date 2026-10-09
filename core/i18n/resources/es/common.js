@@ -1440,17 +1440,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     error: 'Error al obtener el resumen: {{message}}',
   },
 
-  aiChatbot: {
-    open: 'Ayuda y documentación',
-    title: 'Ayuda y documentación',
-    empty: 'Pregúnteme lo que quiera sobre Open Foris Arena.',
-    placeholder: 'Escriba su pregunta…',
-    send: 'Enviar',
-    stop: 'Detener',
-    clear: 'Borrar',
-    error: 'Error del chatbot: {{message}}',
-    language: 'Idioma de respuesta',
-  },
   aiAssistant: {
     open: 'Asistente de IA',
     title: 'Asistente de IA',

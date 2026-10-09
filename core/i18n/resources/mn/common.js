@@ -1592,17 +1592,6 @@ $t(common.cantUndoWarning)`,
     error: 'Хураангуйг авч чадсангүй: {{message}}',
   },
 
-  aiChatbot: {
-    open: 'Тусламж ба баримт бичиг',
-    title: 'Тусламж ба баримт бичиг',
-    empty: 'Open Foris Arena-ийн талаар юу ч асуугаарай.',
-    placeholder: 'Асуултаа бичнэ үү…',
-    send: 'Илгээх',
-    stop: 'Зогсоох',
-    clear: 'Цэвэрлэх',
-    error: 'Чатботын алдаа: {{message}}',
-    language: 'Хариултын хэл',
-  },
   aiAssistant: {
     open: 'Хиймэл оюуны туслах',
     title: 'Хиймэл оюуны туслах',

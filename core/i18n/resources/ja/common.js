@@ -1586,17 +1586,6 @@ $t(common.cantUndoWarning)`,
     error: '要約の取得に失敗しました：{{message}}',
   },
 
-  aiChatbot: {
-    open: 'ヘルプとドキュメント',
-    title: 'ヘルプとドキュメント',
-    empty: 'Open Foris Arenaについて何でも聞いてください。',
-    placeholder: '質問を入力してください…',
-    send: '送信',
-    stop: '停止',
-    clear: 'クリア',
-    error: 'チャットボットエラー：{{message}}',
-    language: '応答言語',
-  },
   aiAssistant: {
     open: 'AIアシスタント',
     title: 'AIアシスタント',

@@ -1614,17 +1614,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     error: 'Échec de la récupération du résumé : {{message}}',
   },
 
-  aiChatbot: {
-    open: 'Aide et documentation',
-    title: 'Aide et documentation',
-    empty: "Posez-moi n'importe quelle question sur Open Foris Arena.",
-    placeholder: 'Saisissez votre question…',
-    send: 'Envoyer',
-    stop: 'Arrêter',
-    clear: 'Effacer',
-    error: 'Erreur du chatbot : {{message}}',
-    language: 'Langue de réponse',
-  },
   aiAssistant: {
     open: 'Assistant IA',
     title: 'Assistant IA',

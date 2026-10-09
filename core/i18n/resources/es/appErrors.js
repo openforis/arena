@@ -125,7 +125,6 @@ export default {
   aiTranslationItemsMissing: 'Nada que traducir.',
   aiTranslationInvalid: 'La IA no devolvió una traducción utilizable. Inténtelo de nuevo.',
   aiTranslationTooManyItems: 'Demasiados elementos en un solo lote ({{count}}); el límite es {{limit}}.',
-  aiChatbotPayloadTooLarge: 'Su conversación es demasiado grande. Borre el chat e intente con una pregunta más corta.',
   userHasPendingInvitation:
     "Ya hay una invitación pendiente para el usuario con el correo electrónico '{{email}}'; no se le puede invitar a esta encuesta hasta que sea aceptada",
   userHasRole: 'El usuario dado ya tiene un rol en esta encuesta',

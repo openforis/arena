@@ -108,7 +108,6 @@ export default {
   aiTranslationItemsMissing: '翻訳する項目がありません。',
   aiTranslationInvalid: 'AIから利用可能な翻訳が返されませんでした。もう一度お試しください。',
   aiTranslationTooManyItems: '一度に処理できる項目数（{{limit}}件）を超えています（{{count}}件指定されました）。',
-  aiChatbotPayloadTooLarge: '会話が長すぎます。チャットをクリアして、もう少し短い質問をお試しください。',
   aiDataQueryDescriptionMissing: '表示したいデータを自然な言葉で説明してください。',
   aiDataQueryNoEntities: 'この調査にはクエリ可能な項目がありません。',
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',

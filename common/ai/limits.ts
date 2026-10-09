@@ -21,8 +21,6 @@ export const AiLimits = {
   assistantDefaultMaxPromptChars: 200000,
   handbookResultMaxChars: 2000,
   handbookOutlineMaxChars: 3000,
-  chatMaxMessages: 40,
-  chatMessageMaxChars: 8000,
   activityLogMaxEntries: 1000,
   activityLogAggregateKeyMaxChars: 64,
   dataDictionaryBatchSize: 10,
