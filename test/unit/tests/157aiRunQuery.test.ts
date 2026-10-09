@@ -52,7 +52,7 @@ beforeAll(async () => {
 })
 
 describe('unknown queryId', () => {
-  test.each([['q9'], ['q1 '], ['toString'], ['']])('refuses %p without any request', async (queryId) => {
+  test.each([['q9'], ['q1 '], ['toString'], ['__proto__'], ['']])('refuses %p without any request', async (queryId) => {
     const { countTool, runQueryTool, ctx, calls } = await setUp()
     for (const tool of [countTool, runQueryTool]) {
       const result = await runTool(tool, { queryId }, ctx)
@@ -165,5 +165,45 @@ describe('query_count', () => {
       expect(tool).toMatchObject({ dataClass: 'data', effect: 'read', area: ['analysis'] })
     }
     expect([countTool.name, runQueryTool.name]).toEqual(['query_count', 'query_run'])
+  })
+})
+
+describe('fix round 1', () => {
+  test('extra input keys are ignored: the stored query runs', async () => {
+    const { runQueryTool, ctx, calls } = await setUp({ input: rawInput, rows: [rawRow(1)] })
+    const stored = ctx.analysisQueries.get('q1').query
+    const injected = { entityDefUuid: 'injected' }
+    await runTool(runQueryTool, { queryId: 'q1', query: injected }, ctx)
+    expect(calls[0].params.query).toEqual(stored)
+    expect(calls[0].params.query).not.toEqual(injected)
+  })
+
+  test('the signal reaches the rows and count calls', async () => {
+    const rows = Array.from({ length: 51 }, (_, idx) => rawRow(idx))
+    const { runQueryTool, countTool, ctx, calls } = await setUp({ input: rawInput, rows, count: 60 })
+    await runTool(runQueryTool, { queryId: 'q1' }, ctx)
+    await runTool(countTool, { queryId: 'q1' }, ctx)
+    expect(calls.map((call) => call.name)).toEqual(['fetchQueryRows', 'fetchQueryCount', 'fetchQueryCount'])
+    for (const call of calls) expect(call.params.signal).toBe(ctx.signal)
+  })
+
+  test('query_count timeout becomes queryTimeout', async () => {
+    const { api } = newFakeAnalysisApi({ fetchQueryCount: () => Promise.reject(new SystemError('queryTimeout')) })
+    const [countTool] = createRunQueryTools({ api })
+    const ctx = newAnalysisToolContext({ survey })
+    await runTool(proposeQueryTool, aggregateInput, ctx)
+    expect((await runTool(countTool, { queryId: 'q1' }, ctx)).error.code).toBe('queryTimeout')
+  })
+
+  test('query_run: a timeout on the count request becomes queryTimeout', async () => {
+    const rows = Array.from({ length: 201 }, (_, idx) => aggregateRow(idx))
+    const { api } = newFakeAnalysisApi({
+      fetchQueryRows: () => rows,
+      fetchQueryCount: () => Promise.reject(new SystemError('queryTimeout')),
+    })
+    const [, runQueryTool] = createRunQueryTools({ api })
+    const ctx = newAnalysisToolContext({ survey })
+    await runTool(proposeQueryTool, aggregateInput, ctx)
+    expect((await runTool(runQueryTool, { queryId: 'q1' }, ctx)).error.code).toBe('queryTimeout')
   })
 })
