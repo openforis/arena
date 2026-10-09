@@ -22,6 +22,7 @@ type TextMessage = { role: 'user' | 'assistant'; content: string }
  */
 export const describeToolPart = (part: ConversationToolPart): string => {
   const output = part.output as any
+  if (part.state === 'running') return `[${part.toolName} was interrupted]`
   if (part.state === 'failed' || output?.error)
     return `[${part.toolName} failed: ${output?.error?.code ?? 'toolFailed'}]`
   if (typeof output?.changeSetId === 'string') {
@@ -31,6 +32,11 @@ export const describeToolPart = (part: ConversationToolPart): string => {
   return list ? `[${part.toolName} returned ${list.length} items]` : `[${part.toolName} done]`
 }
 
+/**
+ * Flattens an answer into text lines, tool calls as notes.
+ * @param {AssistantMessage} message - Assistant message.
+ * @returns {string} The text, empty when the answer has no content.
+ */
 const assistantText = (message: AssistantMessage): string => {
   const lines = message.parts
     .map((part) => (part.type === 'text' ? part.text.trim() : describeToolPart(part)))
@@ -39,6 +45,11 @@ const assistantText = (message: AssistantMessage): string => {
   return lines.join('\n')
 }
 
+/**
+ * Converts a conversation message to a plain text message.
+ * @param {ConversationMessage} message - Conversation message.
+ * @returns {TextMessage | null} The text message, or null when it is left out.
+ */
 const toTextMessage = (message: ConversationMessage): TextMessage | null => {
   if (message.role === 'user') return { role: 'user', content: message.text }
   if (message.role === 'applyNote') return { role: 'user', content: `${APPLY_NOTE_PREFIX}${message.text}` }
@@ -48,6 +59,11 @@ const toTextMessage = (message: ConversationMessage): TextMessage | null => {
 }
 
 // some providers refuse two consecutive messages of the same role
+/**
+ * Merges consecutive messages of the same role.
+ * @param {TextMessage[]} messages - Messages in order.
+ * @returns {TextMessage[]} Messages that alternate roles.
+ */
 const mergeSameRole = (messages: TextMessage[]): TextMessage[] => {
   const merged: TextMessage[] = []
   for (const message of messages) {
@@ -59,6 +75,13 @@ const mergeSameRole = (messages: TextMessage[]): TextMessage[] => {
   return merged
 }
 
+/**
+ * Drops the oldest messages until the text fits the budget.
+ * @param {TextMessage[]} earlier - Earlier messages, oldest first.
+ * @param {TextMessage} newMessage - The new user message, always kept.
+ * @param {number} budgetChars - Characters available.
+ * @returns {TextMessage[]} Kept messages, not starting with an answer, the new message last.
+ */
 const fitBudget = (earlier: TextMessage[], newMessage: TextMessage, budgetChars: number): TextMessage[] => {
   let total = newMessage.content.length
   let start = earlier.length

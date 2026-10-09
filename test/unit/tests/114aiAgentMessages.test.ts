@@ -42,6 +42,14 @@ describe('describeToolPart', () => {
   })
 })
 
+describe('describeToolPart interrupted', () => {
+  test('a call still running when the turn stopped', () => {
+    expect(describeToolPart({ ...tool('nodeDef_get', undefined), state: 'running' })).toBe(
+      '[nodeDef_get was interrupted]'
+    )
+  })
+})
+
 describe('buildHistory', () => {
   test('plain text turns, the new message last', () => {
     const history = buildHistory({
