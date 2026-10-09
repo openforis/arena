@@ -12,6 +12,7 @@ import type {
   LanguageModelV4StreamPart,
 } from '@ai-sdk/provider'
 
+import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import { createSseParser, stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
@@ -138,16 +139,25 @@ const readAll = async (response: Response, onText: (text: string) => void, signa
   }
 }
 
+const incompleteStreamError = () => new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
+
 const generateFullText = async (response: Response, signal: AbortSignal): Promise<string> => {
   let text = ''
+  let completed = false
   const parser = createSseParser({
     onEvent: (event: any) => {
       if (event?.type === 'error') throw new Error(getErrorText(event))
+      if (event?.type === 'finish') completed = true
       if (event?.type === 'text-delta') text += getDelta(event) ?? ''
+    },
+    onDone: (receivedDoneToken) => {
+      if (receivedDoneToken) completed = true
     },
   })
   await readAll(response, parser.push, signal)
   parser.end()
+  // upstream closing without [DONE] / finish means a truncated answer
+  if (!completed) throw incompleteStreamError()
   return text
 }
 
@@ -162,6 +172,8 @@ const createPartsStream = ({
   return new ReadableStream<LanguageModelV4StreamPart>({
     async start(controller) {
       let textStarted = false
+      let completed = false
+      let failed = false
       const enqueue = (part: LanguageModelV4StreamPart) => {
         if (!closed) controller.enqueue(part)
       }
@@ -173,24 +185,32 @@ const createPartsStream = ({
       const parser = createSseParser({
         onEvent: (event: any) => {
           if (event?.type === 'error') {
+            failed = true
             enqueue({ type: 'error', error: new Error(getErrorText(event)) })
             return
           }
+          if (event?.type === 'finish') completed = true
           const delta = event?.type === 'text-delta' ? getDelta(event) : null
           if (!delta) return
           if (!textStarted) enqueue({ type: 'text-start', id: TEXT_ID })
           textStarted = true
           enqueue({ type: 'text-delta', id: TEXT_ID, delta })
         },
-        onDone: () => {
-          if (textStarted) enqueue({ type: 'text-end', id: TEXT_ID })
-          enqueue({ type: 'finish', finishReason: stopFinishReason(), usage: unknownUsageV4() })
+        onDone: (receivedDoneToken) => {
+          if (receivedDoneToken) completed = true
         },
       })
       enqueue({ type: 'stream-start', warnings: [] })
       try {
         await readAll(response, parser.push, call.signal)
         parser.end()
+        if (completed && !failed) {
+          if (textStarted) enqueue({ type: 'text-end', id: TEXT_ID })
+          enqueue({ type: 'finish', finishReason: stopFinishReason(), usage: unknownUsageV4() })
+        } else if (!completed) {
+          // closed without [DONE] / finish: a truncated answer must not look complete
+          enqueue({ type: 'error', error: incompleteStreamError() })
+        }
       } catch (error) {
         enqueue({ type: 'error', error })
       } finally {

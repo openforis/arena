@@ -22,7 +22,7 @@ const parseJson = (payload: string): { ok: boolean; value?: unknown } => {
  * Creates a stateful parser fed with decoded text chunks.
  * @param {object} params - Parameters.
  * @param {Function} params.onEvent - Called with each JSON payload; errors it throws propagate to the caller.
- * @param {Function} [params.onDone] - Called once, on `[DONE]` or at `end()`.
+ * @param {Function} [params.onDone] - Called once, on `[DONE]` (argument true) or at `end()` (false).
  * @returns {SseParser} The parser.
  */
 export const createSseParser = ({
@@ -30,15 +30,15 @@ export const createSseParser = ({
   onDone,
 }: {
   onEvent: (event: unknown) => void
-  onDone?: () => void
+  onDone?: (receivedDoneToken: boolean) => void
 }): SseParser => {
   let buffer = ''
   let terminated = false
 
-  const terminate = () => {
+  const terminate = (receivedDoneToken: boolean) => {
     if (terminated) return
     terminated = true
-    onDone?.()
+    onDone?.(receivedDoneToken)
   }
 
   const handleFrame = (frame: string) => {
@@ -47,7 +47,7 @@ export const createSseParser = ({
       if (!line.startsWith(DATA_PREFIX)) continue
       const payload = line.slice(DATA_PREFIX.length).trim()
       if (payload === DONE_TOKEN) {
-        terminate()
+        terminate(true)
         return
       }
       const parsed = parseJson(payload)
@@ -74,7 +74,7 @@ export const createSseParser = ({
     end: () => {
       if (!terminated && buffer.length > 0) handleFrame(buffer)
       buffer = ''
-      terminate()
+      terminate(false)
     },
   }
 }
