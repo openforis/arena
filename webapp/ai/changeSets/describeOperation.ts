@@ -4,6 +4,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { isRecordEditOperation } from './recordEdits/types'
 import type { ChangeOperation, ChangeSet, OperationResult } from './types'
 
 const findName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
@@ -27,6 +28,7 @@ export const describeOperation = (
   op: ChangeOperation,
   { changeSet, survey }: { changeSet: ChangeSet; survey: any }
 ) => {
+  if (isRecordEditOperation(op)) return `${op.recordKeys}: ${op.path}`
   if (op.type === 'nodeDef.create') return `new ${NodeDef.getType(op.nodeDef)} \`${NodeDef.getName(op.nodeDef)}\``
   const name = `\`${findName(op.nodeDefUuid, changeSet, survey)}\``
   if (op.type === 'label.set') return `${name} ${op.kind === 'labels' ? 'label' : 'description'} (${op.lang})`

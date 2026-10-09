@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
+import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import type {
   ChangeOperation,
@@ -108,7 +109,7 @@ const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, l
  * @param {ChangeOperation} op - Operation other than create.
  * @returns {object} The row fields.
  */
-const toChangeRow = (op: Exclude<ChangeOperation, { type: 'nodeDef.create' }>) => {
+const toChangeRow = (op: Exclude<ChangeOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>) => {
   if (op.type === 'label.set') {
     return {
       titleKey: op.kind === 'labels' ? 'aiAssistant.card.label' : 'aiAssistant.card.description',
@@ -151,17 +152,20 @@ export const buildCardRows = ({
   lang: string
 }): CardRow[] => {
   const { changeSet, results = [] } = cardState
-  return changeSet.operations.map((op) => {
-    const result = results.find((item) => item.id === op.id) ?? null
-    if (op.type === 'nodeDef.create') return { id: op.id, result, ...toCreateRow(op, lang) }
-    return {
-      id: op.id,
-      result,
-      nodeDefUuid: op.nodeDefUuid,
-      nodeDefName: findNodeDefName(op.nodeDefUuid, changeSet, survey),
-      ...toChangeRow(op),
-    }
-  })
+  // record edits have their own card
+  return changeSet.operations
+    .filter((op) => !isRecordEditOperation(op))
+    .map((op) => {
+      const result = results.find((item) => item.id === op.id) ?? null
+      if (op.type === 'nodeDef.create') return { id: op.id, result, ...toCreateRow(op, lang) }
+      return {
+        id: op.id,
+        result,
+        nodeDefUuid: op.nodeDefUuid,
+        nodeDefName: findNodeDefName(op.nodeDefUuid, changeSet, survey),
+        ...toChangeRow(op),
+      }
+    })
 }
 
 /**

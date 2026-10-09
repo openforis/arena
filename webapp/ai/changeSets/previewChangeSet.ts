@@ -12,6 +12,7 @@ import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from
 import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { isAssistantNodeDefType } from './newNodeDef'
 import { applyOperationToSurvey, getOperationNodeDefUuid, getOperationTargetKey } from './operations'
+import { isRecordEditOperation } from './recordEdits/types'
 import { collectValidationIssues } from './validationIssues'
 import type {
   ChangeOperation,
@@ -134,6 +135,7 @@ const checkExpressionOperation = ({ survey, op, t }: CheckParams<ExpressionSetOp
 
 const checkStructure = (params: CheckParams<ChangeOperation>): FieldIssue[] => {
   const { op } = params
+  if (isRecordEditOperation(op)) return []
   if (op.type === 'nodeDef.create') return checkCreate({ ...params, op })
   if (op.type === 'nodeDef.update') return checkUpdate({ ...params, op })
   if (op.type === 'label.set') return checkLabel({ ...params, op })
@@ -159,6 +161,8 @@ const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate) => {
   const seenKeys = new Set<string>()
   let draft = survey
   for (const [index, op] of changeSet.operations.entries()) {
+    // record edits are previewed on the records, not on the survey
+    if (isRecordEditOperation(op)) continue
     const opIssues = [...checkStructure({ survey: draft, op, t }), ...checkDuplicate(op, seenKeys, draft, t)]
     if (opIssues.length > 0) {
       issues.push(...opIssues.map((opIssue) => ({ operation: index, ...opIssue })))
@@ -189,7 +193,7 @@ const validateTouchedNodeDefs = async (
 const checkOtherExpressions = async (changeSet: ChangeSet, draft: any, t: Translate): Promise<ChangeSetIssue[]> => {
   const issues: ChangeSetIssue[] = []
   for (const [index, op] of changeSet.operations.entries()) {
-    if (op.type !== 'expression.set' || PROPS_CHECKED_BY_VALIDATOR.has(op.prop)) continue
+    if (isRecordEditOperation(op) || op.type !== 'expression.set' || PROPS_CHECKED_BY_VALIDATOR.has(op.prop)) continue
     const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(draft)
     if (!nodeDef) continue
     for (const expression of op.to) {
