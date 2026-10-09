@@ -100,6 +100,15 @@ export class ArenaApi {
     await this.put('/api/ai/settings', { featuresEnabled: false, enabled: false })
   }
 
+  /**
+   * Returns the uuid of the logged-in test user (the key of C's localStorage settings).
+   * @returns {Promise<string>} - The user uuid.
+   */
+  async getCurrentUserUuid(): Promise<string> {
+    const { user } = await this.get('/auth/user')
+    return user.uuid
+  }
+
   async waitForJob(jobUuid: string): Promise<JobSummary> {
     const start = Date.now()
     for (;;) {

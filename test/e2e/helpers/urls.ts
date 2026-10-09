@@ -6,6 +6,7 @@ export const Urls = {
   templateNew: '/app/home/templateNew/',
   surveyInfo: '/app/home/surveyInfo/',
   dashboard: '/app/dashboard/',
+  userProfile: '/app/users/user/',
   formDesigner: '/app/designer/formDesigner/',
   records: '/app/data/records/',
   dataExplorer: '/app/data/explorer/',
