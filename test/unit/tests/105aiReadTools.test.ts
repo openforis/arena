@@ -6,8 +6,9 @@ import { nodeDefSearchTool } from '@webapp/ai/tools/design/nodeDefSearch'
 import { expressionCheckTool } from '@webapp/ai/tools/design/expressionCheck'
 import { getClosestNames } from '@webapp/ai/tools/design/surveyLookup'
 import { viewGetCurrentTool } from '@webapp/ai/tools/common/viewGetCurrent'
+import { AiLimits } from '@common/ai/limits'
 import { runTool } from '@webapp/ai/tools/registry'
-import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildAssistantSurvey, createToolContext, getDefByName, testUser } from '@test/unit/utils/assistantTestUtils'
 
 let survey: any
 
@@ -155,5 +156,46 @@ describe('expression_check', () => {
     const result: any = await runTool(expressionCheckTool, input, ctxWithSurvey())
     expect(result.ok).toBe(false)
     expect(result.errors[0]).toMatch(/^applyIf: /)
+  })
+})
+
+describe('result budget', () => {
+  const buildBigSurvey = async () => {
+    const { text } = NodeDef.nodeDefType
+    const SB = await import('@test/utils/surveyBuilder')
+    const attrs = (prefix: string, count: number) =>
+      Array.from({ length: count }, (_v, i) =>
+        SB.attribute(`${prefix}_${i}`, text).label(`A long descriptive label for attribute ${prefix} number ${i}`)
+      )
+    const big: any = await SB.survey(
+      testUser,
+      SB.entity(
+        'root',
+        SB.attribute('root_id', NodeDef.nodeDefType.integer).key(),
+        ...attrs('a', 400),
+        SB.entity('wide', ...attrs('w', 200)).multiple()
+      )
+    ).build()
+    return { ...big, id: 9 }
+  }
+
+  test('survey_getOverview stays valid JSON under the budget', async () => {
+    const big = await buildBigSurvey()
+    const result: any = await runTool(surveyGetOverviewTool, {}, createToolContext({ survey: big }))
+    expect(result.json).toBeUndefined()
+    expect(JSON.stringify(result).length).toBeLessThan(AiLimits.assistantToolResultMaxChars)
+    expect(result.truncated).toBe(true)
+    expect(result.total).toBe(603)
+    expect(result.nodeDefs.length).toBeLessThan(603)
+  })
+
+  test('nodeDef_get caps the children', async () => {
+    const big = await buildBigSurvey()
+    const result: any = await runTool(nodeDefGetTool, { name: 'wide' }, createToolContext({ survey: big }))
+    expect(result.json).toBeUndefined()
+    expect(JSON.stringify(result).length).toBeLessThan(AiLimits.assistantToolResultMaxChars)
+    expect(result.children).toHaveLength(50)
+    expect(result.childrenTruncated).toBe(true)
+    expect(result.childrenTotal).toBe(200)
   })
 })

@@ -7,6 +7,12 @@ import { canViewSurveyTool, describeNodeDefBrief, getDesignNodeDefsDepthFirst, r
 
 export const SEARCH_MAX_RESULTS = 20
 
+/**
+ * Returns true when the name or a label contains the (lower-case) text.
+ * @param {object} nodeDef - Node definition.
+ * @param {string} text - Lower-case text.
+ * @returns {boolean} True when it matches.
+ */
 const matches = (nodeDef: any, text: string): boolean => {
   const candidates = [NodeDef.getName(nodeDef), ...Object.values(NodeDef.getLabels(nodeDef) as Record<string, string>)]
   return candidates.some((candidate) => String(candidate).toLowerCase().includes(text))
@@ -24,7 +30,8 @@ export const nodeDefSearchTool: AiTool<{ text: string }> = {
   requires: canViewSurveyTool,
   execute: async ({ text }, ctx) => {
     const survey = requireSurvey(ctx)
-    const found = getDesignNodeDefsDepthFirst(survey).filter((nodeDef) => matches(nodeDef, text.toLowerCase()))
+    const lowerText = text.toLowerCase()
+    const found = getDesignNodeDefsDepthFirst(survey).filter((nodeDef) => matches(nodeDef, lowerText))
     return {
       results: found.slice(0, SEARCH_MAX_RESULTS).map((nodeDef) => describeNodeDefBrief(survey, nodeDef, ctx.lang)),
       truncated: found.length > SEARCH_MAX_RESULTS,
