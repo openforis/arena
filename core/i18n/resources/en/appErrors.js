@@ -46,6 +46,7 @@ export default {
     identifierNotFound: '$t(expression.identifierNotFound)',
     undefinedFunction: '$t(expression.undefinedFunction)',
   },
+  forbidden: 'You are not allowed to do this.',
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
@@ -75,6 +76,9 @@ export default {
     entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',
     updateSelfAndDependentsDefaultValues:
       '$t(appErrors:record.errorUpdating); error evaluating expression in node {{nodeDefName}}: {{details}}',
+    lockTimeout: 'The record is busy; try again in a few seconds.',
+    nodeNotInRecord: 'The node does not belong to record {{recordUuid}}.',
+    nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
@@ -150,6 +154,7 @@ Try to refresh the page.`,
   aiLocalServerConsentCancelled: 'The request was cancelled.',
   aiCapabilityStatsInvalid: 'The capability statistics are invalid.',
   aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
+  aiApplyTimeout: 'The server did not answer in time. Some changes may have been applied: reload to check.',
   userCannotDeleteHasMessages:
     'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',
   userCannotDeleteLastSystemAdmin: 'This user cannot be deleted: they are the last system administrator',
