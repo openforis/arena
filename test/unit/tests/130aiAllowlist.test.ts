@@ -15,6 +15,9 @@ describe('isAllowlisted (common)', () => {
     ['https://llm.internal.example/api/models', true],
     ['https://llm.internal.example/apis', false],
     ['https://llm.internal.example/', false],
+    ['https://llm.internal.example.evil.com/v1', false],
+    ['https://llm.internal.example@evil.com/v1', false],
+    ['https://llm.internal.example/v1/../admin', false],
   ])('%s → %s', (url, expected) => {
     expect(isAllowlisted(new URL(url), allowlist)).toBe(expected)
   })
