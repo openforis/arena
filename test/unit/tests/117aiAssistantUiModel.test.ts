@@ -130,28 +130,44 @@ describe('assistant areas', () => {
       { area: 'design', status: 'available', reasonKeys: [] },
       { area: 'help', status: 'available', reasonKeys: [] },
     ]
-    expect(pickArea({ statuses, current: null, userSelectedArea: null, module: 'designer' })).toBe('design')
-    expect(pickArea({ statuses, current: null, userSelectedArea: null, module: 'data' })).toBe('help')
-    expect(pickArea({ statuses, current: 'help', userSelectedArea: null, module: 'designer' })).toBe('help')
-    expect(pickArea({ statuses, current: 'help', userSelectedArea: 'design', module: 'data' })).toBe('design')
+    expect(pickArea({ statuses, panelOpen: true, current: null, userSelectedArea: null, module: 'designer' })).toBe(
+      'design'
+    )
+    expect(pickArea({ statuses, panelOpen: true, current: null, userSelectedArea: null, module: 'data' })).toBe('help')
+    expect(pickArea({ statuses, panelOpen: true, current: 'help', userSelectedArea: null, module: 'designer' })).toBe(
+      'help'
+    )
+    expect(pickArea({ statuses, panelOpen: true, current: 'help', userSelectedArea: 'design', module: 'data' })).toBe(
+      'design'
+    )
     const designOnly: AssistantAreaStatus[] = [statuses[0], { area: 'help', status: 'hidden', reasonKeys: [] }]
-    expect(pickArea({ statuses: designOnly, current: 'help', userSelectedArea: null, module: 'data' })).toBe('design')
+    expect(
+      pickArea({ statuses: designOnly, panelOpen: true, current: 'help', userSelectedArea: null, module: 'data' })
+    ).toBe('design')
     const designBlocked: AssistantAreaStatus[] = [
       { area: 'design', status: 'unavailable', reasonKeys: ['aiAssistant.unavailable.policy'] },
       statuses[1],
     ]
     // a click on an unavailable tab shows its reasons; the automatic choice skips it
-    expect(pickArea({ statuses: designBlocked, current: 'help', userSelectedArea: 'design', module: 'data' })).toBe(
-      'design'
-    )
-    expect(pickArea({ statuses: designBlocked, current: null, userSelectedArea: null, module: 'designer' })).toBe(
-      'help'
-    )
+    expect(
+      pickArea({
+        statuses: designBlocked,
+        panelOpen: true,
+        current: 'help',
+        userSelectedArea: 'design',
+        module: 'data',
+      })
+    ).toBe('design')
+    expect(
+      pickArea({ statuses: designBlocked, panelOpen: true, current: null, userSelectedArea: null, module: 'designer' })
+    ).toBe('help')
     const noneUsable: AssistantAreaStatus[] = [
       { area: 'design', status: 'unavailable', reasonKeys: ['aiAssistant.unavailable.noSurvey'] },
       { area: 'help', status: 'hidden', reasonKeys: [] },
     ]
-    expect(pickArea({ statuses: noneUsable, current: null, userSelectedArea: null, module: 'home' })).toBe('design')
+    expect(
+      pickArea({ statuses: noneUsable, panelOpen: true, current: null, userSelectedArea: null, module: 'home' })
+    ).toBe('design')
     expect(isAssistantShown(noneUsable)).toBe(true)
     expect(isAssistantShown([{ area: 'help', status: 'hidden', reasonKeys: [] }])).toBe(false)
   })
