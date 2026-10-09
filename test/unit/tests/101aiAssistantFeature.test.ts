@@ -11,6 +11,7 @@ describe('assistantDesign feature', () => {
       key: 'assistantDesign',
       category: AiFeatureCategory.assistant,
       dataClass: 'schema',
+      variableDataClass: true,
       permission: 'surveyEdit',
       gateway: true,
       tools: true,
@@ -23,7 +24,7 @@ describe('assistantDesign feature', () => {
       .filter((feature) => feature.tools)
       .map((feature) => feature.key)
       .sort()
-    expect(toolFeatures).toEqual(['assistantDesign', 'chatbot'])
+    expect(toolFeatures).toEqual(['assistantAnalysis', 'assistantDesign', 'chatbot'])
   })
 
   test('the gateway requires a survey for it', async () => {

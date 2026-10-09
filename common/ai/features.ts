@@ -42,6 +42,7 @@ export type AiFeatureKey =
   | 'dataQuerySummarize'
   | 'chatbot'
   | 'assistantDesign'
+  | 'assistantAnalysis'
   | 'dataDictionary'
   | 'internalPing'
 
@@ -49,6 +50,8 @@ export type AiFeatureDef = {
   key: AiFeatureKey
   category: AiFeatureCategory | null
   dataClass: AiDataClass
+  // true: a request may declare a data class at or below `dataClass` (assistant conversations start as schema)
+  variableDataClass?: boolean
   permission: AiFeaturePermission
   // true when the browser may call the model for this feature through POST /api/ai/model
   gateway: boolean
@@ -104,7 +107,18 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     key: 'assistantDesign',
     category: assistant,
     dataClass: schema,
+    variableDataClass: true,
     permission: surveyEdit,
+    gateway: true,
+    tools: true,
+  },
+  // Analysis area of the assistant: explores collected data through the Explorer endpoints
+  assistantAnalysis: {
+    key: 'assistantAnalysis',
+    category: assistant,
+    dataClass: data,
+    variableDataClass: true,
+    permission: recordListView,
     gateway: true,
     tools: true,
   },
@@ -143,3 +157,61 @@ export const isGatewayFeature = (key: string): boolean => getAiFeature(key)?.gat
  */
 export const isAiCategoryAvailable = (category: string, disabledFeatures: string[]): boolean =>
   Object.values(AiFeatures).some((feature) => feature.category === category && !disabledFeatures.includes(feature.key))
+
+const dataClassLevels: Record<AiDataClass, number> = { schema: 0, data: 1 }
+
+/**
+ * Returns true when the value is a known data class.
+ * @param {unknown} value - Value to check (untrusted input allowed).
+ * @returns {boolean} Whether the value is a data class.
+ */
+export const isAiDataClass = (value: unknown): value is AiDataClass =>
+  typeof value === 'string' && Object.hasOwn(dataClassLevels, value)
+
+/**
+ * Returns the level of a data class (schema 0, data 1).
+ * @param {AiDataClass} dataClass - The data class.
+ * @returns {number} The level.
+ */
+export const getAiDataClassLevel = (dataClass: AiDataClass): number => dataClassLevels[dataClass]
+
+/**
+ * Returns the highest of the given data classes.
+ * @param {...AiDataClass} dataClasses - Data classes.
+ * @returns {AiDataClass} The highest class, schema when none is given.
+ */
+export const getMaxAiDataClass = (...dataClasses: AiDataClass[]): AiDataClass =>
+  dataClasses.reduce<AiDataClass>(
+    (max, dataClass) => (getAiDataClassLevel(dataClass) > getAiDataClassLevel(max) ? dataClass : max),
+    AiDataClass.schema
+  )
+
+/**
+ * Returns true when a request for the feature may declare the given data class.
+ * @param {object} params - Parameters.
+ * @param {AiFeatureDef} params.featureDef - The feature.
+ * @param {unknown} params.dataClass - The declared class (untrusted input allowed).
+ * @returns {boolean} Whether the declared class is accepted.
+ */
+export const isDeclaredDataClassAllowed = ({
+  featureDef,
+  dataClass,
+}: {
+  featureDef: AiFeatureDef
+  dataClass: unknown
+}): boolean => {
+  if (!isAiDataClass(dataClass)) return false
+  if (featureDef.variableDataClass) return getAiDataClassLevel(dataClass) <= getAiDataClassLevel(featureDef.dataClass)
+  return dataClass === featureDef.dataClass
+}
+
+/**
+ * Returns the lowest data class a request for the feature can declare.
+ * @param {string} key - Feature key (untrusted input allowed).
+ * @returns {AiDataClass} Schema for variable features, otherwise the feature's class; data (fail closed) for an unknown key.
+ */
+export const getAiFeatureMinDataClass = (key: AiFeatureKey | string): AiDataClass => {
+  const featureDef = getAiFeature(key)
+  if (!featureDef) return AiDataClass.data
+  return featureDef.variableDataClass ? AiDataClass.schema : featureDef.dataClass
+}

@@ -34,6 +34,7 @@ describe('AI feature registry', () => {
     ).toEqual(
       [
         'activityLogSummary',
+        'assistantAnalysis',
         'assistantDesign',
         'chatbot',
         'dataQueryGenerate',
