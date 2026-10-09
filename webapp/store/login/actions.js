@@ -11,6 +11,7 @@ import * as User from '@core/user/user'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { abortAssistantTurns, settleAssistantSaves } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 import { assistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
+import { resetAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import * as UserState from '@webapp/store/user/state'
 
 import { ViewState } from './state'
@@ -47,6 +48,7 @@ export const login = (email, password, twoFactorToken) =>
     } = await axios.post('/auth/login', { email, password, twoFactorToken, appInfo: AppInfo.currentAppInfo })
     if (user) {
       ApiConstants.setAuthToken(authToken)
+      resetAiSettingsCache()
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
     } else if (twoFactorRequired) {
@@ -86,6 +88,7 @@ export const logout =
     } finally {
       // also when the logout request fails (network error, expired session): no conversation stays in the browser
       await clearAssistantData(userUuid)
+      resetAiSettingsCache()
     }
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())

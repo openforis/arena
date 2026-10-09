@@ -21,7 +21,12 @@ const settingsSnapshot = {
   maxPromptChars: 1000,
 }
 
-const reachableProbe: LocalServerProbeResult = { reachable: true, models: ['local-model'], contextTokens: 4096, error: null }
+const reachableProbe: LocalServerProbeResult = {
+  reachable: true,
+  models: ['local-model'],
+  contextTokens: 4096,
+  error: null,
+}
 
 const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServerProbeResult = reachableProbe) => {
   const calls = { settings: [] as boolean[], probes: [] as string[], device: 0 }
@@ -204,8 +209,93 @@ describe('detectDeviceCapabilities', () => {
       },
     })
     expect(failing).toEqual({ webGpu: false, deviceMemoryGb: null, promptApi: null })
-    expect((await detectDeviceCapabilities({ navigatorLike: { gpu: { requestAdapter: async () => null } } })).webGpu).toBe(
-      false
-    )
+    expect(
+      (await detectDeviceCapabilities({ navigatorLike: { gpu: { requestAdapter: async () => null } } })).webGpu
+    ).toBe(false)
+  })
+})
+
+describe('user switch and failures', () => {
+  const deferred = <T>() => {
+    let resolve!: (value: T) => void
+    const promise = new Promise<T>((r) => {
+      resolve = r
+    })
+    return { promise, resolve }
+  }
+
+  const storeWithProbes = (probes: Array<ReturnType<typeof deferred<LocalServerProbeResult>>>) => {
+    let index = 0
+    const { deps } = fakeDeps(enabledLocal)
+    const store = createCapabilitiesStore({ ...deps, probe: () => probes[index++].promise })
+    return store
+  }
+
+  test('another user sees empty capabilities while its load is pending, and after reset', async () => {
+    const { deps } = fakeDeps(enabledLocal)
+    const store = createCapabilitiesStore(deps)
+    await store.load({ userUuid: 'u1' })
+    expect(store.get().gateway.available).toBe(true)
+    const pending = store.load({ userUuid: 'u2' })
+    expect(store.get()).toEqual(emptyCapabilities())
+    expect(store.getSettings()).toBeNull()
+    await pending
+    expect(store.get().gateway.available).toBe(true)
+    store.reset()
+    expect(store.get()).toEqual(emptyCapabilities())
+  })
+
+  test('a load for another user starts its own run; the late result of the first is discarded', async () => {
+    const first = deferred<LocalServerProbeResult>()
+    const second = deferred<LocalServerProbeResult>()
+    const store = storeWithProbes([first, second])
+    const loadU1 = store.load({ userUuid: 'u1' })
+    const loadU2 = store.load({ userUuid: 'u2' })
+    second.resolve({ ...reachableProbe, models: ['u2-model'] })
+    await loadU2
+    first.resolve({ ...reachableProbe, models: ['u1-model'] })
+    await loadU1
+    expect(store.get().localServer.models).toEqual(['u2-model'])
+  })
+
+  test('concurrent refreshes of the same user share one run', async () => {
+    const first = deferred<LocalServerProbeResult>()
+    const { calls, deps } = fakeDeps(enabledLocal)
+    const store = createCapabilitiesStore({ ...deps, probe: () => first.promise })
+    const a = store.refresh({ userUuid: 'u1' })
+    const b = store.refresh({ userUuid: 'u1' })
+    first.resolve(reachableProbe)
+    await Promise.all([a, b])
+    expect(calls.settings).toEqual([true])
+  })
+
+  test('a late stale probe does not overwrite a newer one', async () => {
+    const old = deferred<LocalServerProbeResult>()
+    const recent = deferred<LocalServerProbeResult>()
+    const store = storeWithProbes([old, recent])
+    const first = store.refresh({ userUuid: 'u1' })
+    store.reset()
+    const second = store.refresh({ userUuid: 'u1' })
+    recent.resolve({ ...reachableProbe, models: ['new'] })
+    await second
+    old.resolve({ ...reachableProbe, models: ['old'] })
+    await first
+    expect(store.get().localServer.models).toEqual(['new'])
+  })
+
+  test('a failing dependency does not throw and gives the fallback state', async () => {
+    const { deps } = fakeDeps(enabledLocal)
+    const store = createCapabilitiesStore({
+      ...deps,
+      probe: async () => {
+        throw new Error('boom')
+      },
+      loadSettings: async () => {
+        throw new Error('boom')
+      },
+    })
+    const capabilities = await store.load({ userUuid: 'u1' })
+    expect(capabilities.gateway.available).toBe(false)
+    expect(capabilities.localServer.reachable).toBeNull()
   })
 })

@@ -7,7 +7,12 @@ import { fetchAiSettingsOnce, invalidateAiSettingsCache } from '@webapp/componen
 import { store as reduxStore } from '@webapp/store/store'
 import { UserState } from '@webapp/store/user'
 
-import { type AiCapabilitiesStore, type AiSettingsSnapshot, createCapabilitiesStore, detectDeviceCapabilities } from './capabilities'
+import {
+  type AiCapabilitiesStore,
+  type AiSettingsSnapshot,
+  createCapabilitiesStore,
+  detectDeviceCapabilities,
+} from './capabilities'
 import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
 import { probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
@@ -45,7 +50,8 @@ export const getCurrentUserUuid = (): string | null => User.getUuid(UserState.ge
  * Loads the capabilities once per session (probes the local server when it is enabled).
  * @returns {Promise<AiCapabilities>} The capabilities.
  */
-export const loadAiCapabilities = (): Promise<AiCapabilities> => capabilitiesStore.load({ userUuid: getCurrentUserUuid() })
+export const loadAiCapabilities = (): Promise<AiCapabilities> =>
+  capabilitiesStore.load({ userUuid: getCurrentUserUuid() })
 
 /**
  * Reloads the AI settings and probes the local server again (after a settings change, or Retry).
@@ -72,3 +78,9 @@ export const subscribeAiCapabilities = (listener: () => void): (() => void) => c
  * @returns {AiCapabilities} The capabilities.
  */
 export const getAiCapabilitiesSnapshot = (): AiCapabilities => capabilitiesStore.get()
+
+/**
+ * Drops the capabilities of the previous user (login, logout).
+ * @returns {void}
+ */
+export const resetAiCapabilities = (): void => capabilitiesStore.reset()

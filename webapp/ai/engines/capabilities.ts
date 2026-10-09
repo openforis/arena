@@ -43,6 +43,7 @@ export type AiCapabilitiesStore = {
   load: (params: { userUuid: string | null }) => Promise<AiCapabilities>
   refresh: (params: { userUuid: string | null }) => Promise<AiCapabilities>
   detectDevice: () => Promise<AiDeviceCapability>
+  reset: () => void
   subscribe: (listener: () => void) => () => void
   notify: () => void
 }
@@ -167,7 +168,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   let settings: AiSettingsSnapshot | null = null
   let localSettings = defaultLocalServerSettings()
   let loadedFor: string | null | undefined = undefined
-  let inflight: Promise<AiCapabilities> | null = null
+  let inflight: { promise: Promise<AiCapabilities>; userUuid: string | null; force: boolean } | null = null
   let sequence = 0
   const listeners = new Set<() => void>()
 
@@ -175,20 +176,49 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     for (const listener of [...listeners]) listener()
   }
 
+  // runs a dependency; a failure gives the fallback (the capabilities then say "not available")
+  const safely = async <T>(action: () => T | Promise<T>, fallback: T): Promise<T> => {
+    try {
+      return await action()
+    } catch {
+      return fallback
+    }
+  }
+
+  const reset = () => {
+    sequence += 1
+    inflight = null
+    capabilities = emptyCapabilities()
+    settings = null
+    localSettings = defaultLocalServerSettings()
+    loadedFor = undefined
+    emit()
+  }
+
+  // the data and the run in flight belong to another user: drop them before they can be read
+  const resetIfOtherUser = (userUuid: string | null) => {
+    const dataUser = inflight ? inflight.userUuid : loadedFor
+    if (dataUser !== undefined && dataUser !== userUuid) reset()
+  }
+
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
-    const nextSettings = await deps.loadSettings({ force })
-    const nextLocal = deps.loadLocalSettings(userUuid)
+    const nextSettings = await safely(() => deps.loadSettings({ force }), null)
+    const nextLocal = await safely(() => deps.loadLocalSettings(userUuid), defaultLocalServerSettings())
     const probe = nextLocal.enabled
-      ? await deps.probe({ baseUrl: nextLocal.baseUrl, modelId: nextLocal.modelId })
+      ? await safely(() => deps.probe({ baseUrl: nextLocal.baseUrl, modelId: nextLocal.modelId }), null)
       : null
-    // a newer refresh started meanwhile: its result wins
+    // a newer run or a reset started meanwhile: its result wins
     if (current !== sequence) return capabilities
     settings = nextSettings
     localSettings = nextLocal
     const instance = buildInstanceCapability(nextSettings)
     capabilities = {
-      localServer: buildLocalServerCapability({ localSettings: nextLocal, probe, allowlist: instance.orgHostedBaseUrls }),
+      localServer: buildLocalServerCapability({
+        localSettings: nextLocal,
+        probe,
+        allowlist: instance.orgHostedBaseUrls,
+      }),
       gateway: buildGatewayCapability(nextSettings),
       device: capabilities.device,
       instance,
@@ -199,11 +229,12 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   }
 
   const run = (params: { userUuid: string | null; force: boolean }): Promise<AiCapabilities> => {
-    const promise = compute(params).finally(() => {
-      if (inflight === promise) inflight = null
+    const entry = { promise: null as unknown as Promise<AiCapabilities>, ...params }
+    entry.promise = compute(params).finally(() => {
+      if (inflight === entry) inflight = null
     })
-    inflight = promise
-    return promise
+    inflight = entry
+    return entry.promise
   }
 
   return {
@@ -211,10 +242,17 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     getSettings: () => settings,
     getLocalSettings: () => localSettings,
     load: ({ userUuid }) => {
+      resetIfOtherUser(userUuid)
       if (loadedFor === userUuid) return Promise.resolve(capabilities)
-      return inflight ?? run({ userUuid, force: false })
+      if (inflight && inflight.userUuid === userUuid) return inflight.promise
+      return run({ userUuid, force: false })
     },
-    refresh: ({ userUuid }) => run({ userUuid, force: true }),
+    refresh: ({ userUuid }) => {
+      resetIfOtherUser(userUuid)
+      if (inflight && inflight.userUuid === userUuid && inflight.force) return inflight.promise
+      return run({ userUuid, force: true })
+    },
+    reset,
     detectDevice: async () => {
       const device = await deps.detectDevice()
       capabilities = { ...capabilities, device }
