@@ -35,6 +35,8 @@ import SurveysListExportJob from '@server/modules/survey/service/SurveysListExpo
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
+import UsersBackupExportJob from '@server/modules/user/service/usersBackup/UsersBackupExportJob'
+import UsersBackupImportJob from '@server/modules/user/service/usersBackup/UsersBackupImportJob'
 import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
@@ -73,6 +75,8 @@ const jobClasses = [
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
+  UsersBackupExportJob,
+  UsersBackupImportJob,
   VaidationReportGenerationJob,
 ]
 

@@ -1,0 +1,18 @@
+@use '~@webapp/style/vars' as *;
+
+.users-backup-modal {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 40rem;
+  }
+
+  .users-backup-modal__warning {
+    color: $colorError;
+  }
+
+  .users-backup-modal__summary ul {
+    margin: 0.5rem 0;
+  }
+}

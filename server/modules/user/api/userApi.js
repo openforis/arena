@@ -2,6 +2,7 @@ import { ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
+import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
@@ -19,6 +20,8 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { UserExportService } from '../service/userExportService'
+import { UsersBackupService } from '../service/usersBackup/usersBackupService'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 export const init = (app) => {
   // ==== CREATE
@@ -190,6 +193,43 @@ export const init = (app) => {
       const fileName = ExportFileNameGenerator.generate({ fileType: 'users', includeTimestamp: true, fileFormat })
       Response.setContentTypeFile({ res, fileName, fileFormat })
       await UserExportService.exportUsersIntoStream({ outputStream: res, fileFormat })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // users backup (to be imported into another server)
+  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { includePasswords = true } = Request.getParams(req)
+      const job = UsersBackupService.startExportJob({ user, includePasswords })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      FileUtils.checkIsValidTempFileName(tempFileName)
+      const path = FileUtils.tempFilePath(tempFileName)
+      const name = `arena_users_backup_${DateUtils.nowFormatDefault()}.zip`
+      // the file contains password hashes: delete it once downloaded
+      Response.sendFile({ res, path, name, onEnd: () => FileUtils.deleteFileAsync(path) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const filePath = Request.getFilePath(req)
+      const { conflictMode, dryRun = false } = Request.getParams(req)
+      const job = UsersBackupService.startImportJob({ user, filePath, conflictMode, dryRun })
+      res.json({ job })
     } catch (error) {
       next(error)
     }

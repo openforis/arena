@@ -162,6 +162,8 @@ export {
   createTempAuthToken,
 } from './user'
 
+export { startUsersBackupExport, getUsersBackupDownloadUrl, startUsersBackupImport } from './usersBackup'
+
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'

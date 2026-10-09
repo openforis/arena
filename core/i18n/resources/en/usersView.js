@@ -79,4 +79,35 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: 'User {{name}} has been updated',
   userNotInvitedToAnySurvey: `User not invited to any survey`,
   userSurveys: 'User Surveys',
+  usersBackup: {
+    backup: 'Backup users',
+    backupTitle: 'Backup users',
+    backupInfo:
+      'All users will be exported with their survey roles and user groups, so that they can be restored into another Arena server. 2FA devices are not exported.',
+    includePasswords: 'Include passwords',
+    passwordsWarning:
+      'The backup file will contain the password hashes: keep it in a safe place and delete it after use.',
+    restore: 'Restore users',
+    restoreTitle: 'Restore users from backup',
+    restoreInfo:
+      'Users are matched by email; survey roles and user groups are matched by survey name and group name. Surveys not existing in this server are ignored. Run "Validate" first to check what will change.',
+    conflictMode: {
+      skip: 'Skip existing users',
+      merge: 'Existing users: add missing survey roles and user groups',
+      overwrite: 'Existing users: overwrite details (name, password, status), survey roles and user groups',
+    },
+    validate: 'Validate',
+    summaryDryRun: 'Validation completed: nothing has been changed yet',
+    summaryImported: 'Users restored',
+    summary: {
+      usersTotal: 'Users in backup: {{count}}',
+      usersInserted: 'New users: {{count}}',
+      usersUpdated: 'Updated users: {{count}}',
+      usersSkipped: 'Skipped users: {{count}}',
+      authGroupsAdded: 'Survey roles added: {{count}}',
+      userGroupsAdded: 'User group memberships added: {{count}}',
+    },
+    surveysNotFound: 'Surveys not found (roles ignored): {{names}}',
+    userGroupsNotFound: 'User groups not found (memberships ignored): {{names}}',
+  },
 }
