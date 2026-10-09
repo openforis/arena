@@ -1,17 +1,14 @@
 import './LabelsEditor.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import classNames from 'classnames'
 
-import { uuidv4 } from '@core/uuid'
-import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
-
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs, useSurveyPreferredLang, useSurveyId } from '@webapp/store/survey'
-import { useNotifyInfo, useNotifyError, useOnWebSocketEvent } from '@webapp/components/hooks'
+import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 
 import { Button } from '@webapp/components/buttons'
 import { Spinner } from '@webapp/components/Spinner'
@@ -54,8 +51,6 @@ const LabelsEditor = (props) => {
   const notifyError = useNotifyError()
   const [editingLabels, setEditingLabels] = useState(false)
   const [translating, setTranslating] = useState(false)
-  const pendingRequestIdRef = useRef(null)
-  const translationTimeoutRef = useRef(null)
   const surveyLanguages = useSurveyLangs()
   const languages = useMemo(
     () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
@@ -84,72 +79,31 @@ const LabelsEditor = (props) => {
     emptyLangs.length > 0 &&
     onChange
 
-  const clearTranslationTimeout = useCallback(() => {
-    if (translationTimeoutRef.current) {
-      clearTimeout(translationTimeoutRef.current)
-      translationTimeoutRef.current = null
-    }
-  }, [])
-
-  useEffect(() => clearTranslationTimeout, [clearTranslationTimeout])
-
   const onTranslate = useCallback(async () => {
     if (!canTranslate) return
-    const requestId = uuidv4()
-    pendingRequestIdRef.current = requestId
     setTranslating(true)
     try {
-      await API.aiTranslation.translate({
+      const result = await AiWorkflows.translateLabels({
         surveyId,
-        requestId,
         sourceLang: populatedLang,
         targetLangs: emptyLangs,
         items: [{ id: 'label', text: labels[populatedLang], kind: 'nodeDefLabel' }],
       })
-      clearTranslationTimeout()
-      translationTimeoutRef.current = setTimeout(() => {
-        if (pendingRequestIdRef.current === requestId) {
-          pendingRequestIdRef.current = null
-          setTranslating(false)
-          notifyError({ key: 'aiTranslation.timeout' })
-        }
-      }, 60_000)
-    } catch (err) {
-      clearTranslationTimeout()
-      pendingRequestIdRef.current = null
-      setTranslating(false)
-      const errKey = err?.response?.data?.error?.key
-      const message = errKey ? i18n.t(errKey) : err?.message || 'unknown'
-      notifyError({ key: 'aiTranslation.failed', params: { message } })
-    }
-  }, [canTranslate, clearTranslationTimeout, emptyLangs, i18n, labels, notifyError, populatedLang, surveyId])
-
-  const onTranslationUpdate = useCallback(
-    (data) => {
-      if (data.requestId !== pendingRequestIdRef.current) return
-      clearTranslationTimeout()
-      pendingRequestIdRef.current = null
-      setTranslating(false)
-      if (data.error) {
-        const { key: errKey, params: errParams } = data.error
-        const message = errKey ? i18n.t(errKey, errParams ?? {}) : String(data.error)
-        notifyError({ key: 'aiTranslation.failed', params: { message } })
-      } else {
-        const byLang = data.result?.translations?.[0]?.byLang || {}
-        const merged = { ...labels }
-        Object.entries(byLang).forEach(([lang, text]) => {
-          if (emptyLangs.includes(lang) && typeof text === 'string') {
-            merged[lang] = text
-          }
-        })
-        onChange(merged)
-        notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
+      const byLang = result.translations?.[0]?.byLang ?? {}
+      const merged = { ...labels }
+      for (const [lang, text] of Object.entries(byLang)) {
+        if (emptyLangs.includes(lang) && typeof text === 'string') merged[lang] = text
       }
-    },
-    [clearTranslationTimeout, i18n, notifyError, labels, onChange, notifyInfo, emptyLangs]
-  )
-
-  useOnWebSocketEvent({ eventName: WebSocketEvents.translationUpdate, eventHandler: onTranslationUpdate })
+      onChange(merged)
+      notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
+    } catch (error) {
+      if (!isAiAbortError(error)) {
+        notifyError({ key: 'aiTranslation.failed', params: { message: getAiErrorMessage({ error, i18n }) } })
+      }
+    } finally {
+      setTranslating(false)
+    }
+  }, [canTranslate, emptyLangs, i18n, labels, notifyError, notifyInfo, onChange, populatedLang, surveyId])
 
   return (
     <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>

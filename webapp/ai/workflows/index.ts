@@ -50,7 +50,23 @@ const explainExpression = ({
     onError,
   })
 
+/**
+ * Loads the translation workflow module on first use.
+ * @returns {Promise<object>} The module.
+ */
+const loadTranslation = () => import('./translation')
+
+/**
+ * Translates labels (see workflows/translation).
+ * @param {object} params - Workflow parameters.
+ * @returns {Promise<object>} The translations.
+ */
+const translateLabels = async (
+  params: Parameters<Awaited<ReturnType<typeof loadTranslation>>['translateLabelsWorkflow']>[0]
+) => (await loadTranslation()).translateLabelsWorkflow(params)
+
 export const AiWorkflows = {
   generateExpression,
   explainExpression,
+  translateLabels,
 }

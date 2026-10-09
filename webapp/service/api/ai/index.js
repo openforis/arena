@@ -1,5 +1,4 @@
 export * as aiSettings from './settings'
-export * as aiTranslation from './translation'
 export * as aiActivityLog from './activityLog'
 export * as aiChatbot from './chatbot'
 export * as aiDataQuery from './dataQuery'
