@@ -3,40 +3,27 @@ import './AiGenerateQueryPopup.scss'
 
 import React, { useEffect, useRef, useState } from 'react'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorMessage, type AiDataQueryGenerateResult } from '@webapp/ai/workflows'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
-import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
-
-import type { AiDataQueryGenerateResult } from '@webapp/service/api/ai/dataQuery'
+import { useSurvey, useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useAuthCanUseAnalysis } from '@webapp/store/user'
 
 type Props = {
   onClose: () => void
   onGenerated: (result: AiDataQueryGenerateResult) => void
 }
 
-/**
- * Extracts a user-readable error message from a failed API request.
- * @param {object} params - The parameters.
- * @param {object} params.error - The error thrown by the request.
- * @param {object} params.i18n - The i18n instance.
- * @returns {string} - The error message.
- */
-const getErrorMessage = ({ error, i18n }) => {
-  const data = error?.response?.data
-  const key = data?.error?.key || data?.errorKey
-  const params = data?.error?.params || data?.errorParams
-  return key ? i18n.t(`appErrors:${key}`, params) : error?.message || 'unknown'
-}
-
 export const AiGenerateQueryPopup = (props: Props) => {
   const { onClose, onGenerated } = props
 
   const i18n = useI18n()
+  const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
+  const includeAnalysis = useAuthCanUseAnalysis()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
 
   const [description, setDescription] = useState('')
@@ -54,11 +41,18 @@ export const AiGenerateQueryPopup = (props: Props) => {
     setBusy(true)
     setError(null)
     try {
-      const result = await API.aiDataQuery.generate({ surveyId, cycle, lang, description: descriptionTrimmed })
+      const result = await AiWorkflows.generateDataQuery({
+        survey,
+        surveyId,
+        cycle,
+        lang,
+        description: descriptionTrimmed,
+        includeAnalysis,
+      })
       setBusy(false)
       onGenerated(result)
     } catch (err) {
-      setError(getErrorMessage({ error: err, i18n }))
+      setError(getAiErrorMessage({ error: err, i18n: { t: (key, params) => String(i18n.t(key, { ...params })) } }))
       setBusy(false)
     }
   }

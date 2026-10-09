@@ -19,6 +19,10 @@ import { safeParseJsonResponse, withOneRetry } from '../parsing'
 import { buildDataQueryGeneratePrompt } from '../prompts/dataQueryGenerate'
 import { buildDataQuerySummarizePrompt } from '../prompts/dataQuerySummarize'
 
+export type AiDataQueryGenerateResult = { query: any; explanation: string }
+
+export type AiDataQuerySummarizeResult = { name: string; label: string; description: string }
+
 const nullableStringArray = z
   .array(z.string())
   .nullish()
@@ -312,7 +316,7 @@ export const generateDataQuery = async ({
   description: string
   includeAnalysis: boolean
   signal?: AbortSignal
-}): Promise<{ query: any; explanation: string }> => {
+}): Promise<AiDataQueryGenerateResult> => {
   if (StringUtils.isBlank(description)) throw badRequest('aiDataQueryDescriptionMissing')
   if (description.length > AiLimits.dataQueryDescriptionMaxChars) {
     throw badRequest('aiInputTooLong', { field: 'description', limit: AiLimits.dataQueryDescriptionMaxChars })
@@ -394,7 +398,7 @@ export const summarizeDataQuery = async ({
   query: any
   lang: string
   signal?: AbortSignal
-}): Promise<{ name: string; label: string; description: string }> => {
+}): Promise<AiDataQuerySummarizeResult> => {
   if (!query || typeof query !== 'object' || !Query.hasSelection(query)) throw badRequest('aiDataQueryEmpty')
   assertLangLength(lang)
   if (!Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)) throw badRequest('aiDataQueryEmpty')

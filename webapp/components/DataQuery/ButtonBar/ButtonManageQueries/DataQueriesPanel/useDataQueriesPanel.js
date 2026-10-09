@@ -7,10 +7,12 @@ import { DataQuerySummaries, Objects } from '@openforis/arena-core'
 import { Query } from '@common/model/query'
 import * as Validation from '@core/validation/validation'
 
+import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
 import * as API from '@webapp/service/api'
 import { useNotifyError } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
-import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurvey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 
 import { DataQuerySummaryValidator } from './DataQuerySummaryValidator'
@@ -35,8 +37,9 @@ const toUniqueName = ({ name, dataQuerySummaries }) => {
 
 export const useDataQueriesPanel = () => {
   const dispatch = useDispatch()
+  const i18n = useI18n()
+  const survey = useSurvey()
   const surveyId = useSurveyId()
-  const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
   const notifyError = useNotifyError()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
@@ -174,7 +177,7 @@ export const useDataQueriesPanel = () => {
     if (summarizing) return
     setState((statePrev) => ({ ...statePrev, summarizing: true }))
     try {
-      const { name, label, description } = await API.aiDataQuery.summarize({ surveyId, cycle, lang, query })
+      const { name, label, description } = await AiWorkflows.summarizeDataQuery({ survey, surveyId, query, lang })
       const querySummaryUpdated = A.pipe(
         DataQuerySummaries.assocName(toUniqueName({ name, dataQuerySummaries })),
         DataQuerySummaries.assocLabels({ ...DataQuerySummaries.getLabels(editedQuerySummary), [lang]: label }),
@@ -185,24 +188,25 @@ export const useDataQueriesPanel = () => {
       )(editedQuerySummary)
       await setEditedQuerySummary(querySummaryUpdated)
     } catch (error) {
-      const errorData = error?.response?.data?.error
-      if (errorData?.key) {
-        notifyError({ key: `appErrors:${errorData.key}`, params: errorData.params })
-      } else {
-        notifyError({ key: 'dataView:dataQuery.ai.suggestSummaryFailed', params: { message: error?.message } })
+      if (!isAiAbortError(error)) {
+        notifyError({
+          key: 'dataView:dataQuery.ai.suggestSummaryFailed',
+          params: { message: getAiErrorMessage({ error, i18n }) },
+        })
       }
     } finally {
       setState((statePrev) => ({ ...statePrev, summarizing: false }))
     }
   }, [
-    cycle,
     dataQuerySummaries,
     editedQuerySummary,
+    i18n,
     lang,
     notifyError,
     query,
     setEditedQuerySummary,
     summarizing,
+    survey,
     surveyId,
   ])
 

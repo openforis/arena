@@ -11,7 +11,7 @@ import { useNotifyInfo } from '@webapp/components/hooks'
 import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { DialogConfirmActions } from '@webapp/store/ui'
 
-import type { AiDataQueryGenerateResult } from '@webapp/service/api/ai/dataQuery'
+import type { AiDataQueryGenerateResult } from '@webapp/ai/workflows'
 
 import { State } from '../store'
 import { AiGenerateQueryPopup } from './AiGenerateQueryPopup'

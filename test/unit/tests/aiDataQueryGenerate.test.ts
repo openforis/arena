@@ -5,12 +5,15 @@
  * - `buildDataQueryGeneratePrompt`: the schema description given to the model.
  * Both are pure functions, so they are tested without going through the LLM gateway.
  */
+import { MockLanguageModelV4 } from 'ai/test'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { Query, SortCriteria } from '@common/model/query'
 
 import { generateDataQuery, normalizeQueryName, summarizeDataQuery, toQuery } from '@common/ai/tasks/dataQuery'
+import { generateDataQueryWorkflow } from '@webapp/ai/workflows/dataQuery'
 import { buildDataQueryGeneratePrompt } from '@common/ai/prompts/dataQueryGenerate'
 import { buildDataQuerySummarizePrompt } from '@common/ai/prompts/dataQuerySummarize'
 
@@ -277,6 +280,33 @@ describe('AI data query generation', () => {
     test('rejects an empty query', async () => {
       const { generateText } = scriptedTextGenerator()
       await expectSystemErrorKey(summarizeDataQuery({ generateText, survey, query: {}, lang }), 'aiDataQueryEmpty')
+    })
+  })
+
+  describe('generateDataQueryWorkflow', () => {
+    test('runs the shared task on the given model', async () => {
+      const answer = JSON.stringify({ entity: 'tree', mode: 'raw', attributes: ['tree_species'], explanation: 'ok' })
+      const model = new MockLanguageModelV4({
+        doGenerate: async () =>
+          ({
+            content: [{ type: 'text', text: answer }],
+            finishReason: { unified: 'stop', raw: undefined },
+            usage: { inputTokens: { total: 1 }, outputTokens: { total: 1 } },
+            warnings: [],
+          }) as any,
+      })
+      const { query, explanation } = await generateDataQueryWorkflow({
+        survey,
+        surveyId: 1,
+        cycle,
+        lang,
+        description: 'tree species',
+        includeAnalysis: false,
+        model,
+      })
+      expect(Query.getEntityDefUuid(query)).toBe(getUuid('cluster/plot/tree'))
+      expect(explanation).toBe('ok')
+      expect(model.doGenerateCalls).toHaveLength(1)
     })
   })
 })
