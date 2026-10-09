@@ -310,6 +310,7 @@ export class RecordsUpdateThread extends Thread {
         // a malformed uuid would make the query fail and abort the record transaction
         isUuid(nodeUuid) ? NodeRepository.fetchNodeRecordUuid(msg.surveyId, nodeUuid, t) : null,
       logError: (message) => Logger.error(message),
+      now: () => Date.now(),
       persistNode: (params, t) => RecordManager.persistNode(params, t),
       cacheRecord: async ({ msg, recordUuid, record, t }) => {
         const { recordsCache } = await this.getOrFetchSurveyData(msg)

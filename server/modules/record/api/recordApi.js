@@ -8,6 +8,8 @@ import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import * as Log from '@server/log/log'
+import SystemError from '@core/systemError'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -44,6 +46,8 @@ import {
 } from './recordQualifierMiddleware'
 import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
 import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
+
+const Logger = Log.getLogger('RecordApi')
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -145,6 +149,7 @@ export const init = (app) => {
       } catch (error) {
         // sendErr (not next(error)): the error middleware runs before these routes, so next(error) would
         // lose the key of the parser's 400 SystemError
+        if (!(error instanceof SystemError)) Logger.error(`batch record edit failed: ${error?.stack ?? error}`)
         Response.sendErr(res, error)
       }
     }

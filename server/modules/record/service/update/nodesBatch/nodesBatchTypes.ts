@@ -50,6 +50,8 @@ export type NodesBatchPersistMessage = {
   edits: NodesBatchRecordEdit[]
   timezoneOffset: number | null
   lang: string | null
+  // epoch ms after which the caller has given up (reported applyTimeout): the thread must not apply the edits
+  deadline: number
 }
 
 export type NodesBatchPersistReply = { requestId: string; recordUuid: string; results: NodesBatchEditResult[] }

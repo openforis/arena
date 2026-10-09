@@ -58,6 +58,7 @@ describe('processNodesBatch', () => {
     edits: edits as any,
     timezoneOffset: 0,
     lang: 'en',
+    deadline: 10_000,
   })
 
   // in-memory stand-ins for the thread: persistNode merges the node and notifies the listeners
@@ -67,17 +68,20 @@ describe('processNodesBatch', () => {
     lockError = null,
     recordInDb = record,
     nodeRecordUuids = {},
+    now = 1000,
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
     lockError?: Error | null
     recordInDb?: any
     nodeRecordUuids?: Record<string, string>
+    now?: number
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
     const calls = { cacheRecord: 0, clearCachedRecord: 0, persistNode: 0, insideLock: false, postedInsideLock: 0 }
     const deps: NodesBatchProcessorDeps = {
+      now: () => now,
       getSurvey: async () => survey,
       runWithRecordLock: async (_recordUuid, fn) => {
         if (lockError) throw lockError
@@ -120,6 +124,37 @@ describe('processNodesBatch', () => {
     }
     return { deps, posted, calls, errors }
   }
+
+  test('a request past its deadline is failed with applyTimeout before the lock and writes nothing', async () => {
+    const { deps, calls, posted } = createDeps({ now: 10_001 })
+    const results = await processNodesBatch({
+      msg: msgOf([
+        { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+        { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+      ]),
+      deps,
+    })
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+      { index: 1, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+    ])
+    expect(calls.persistNode).toBe(0)
+    expect(posted).toEqual([])
+  })
+
+  test('a deadline passed while waiting for the lock also fails the edits without writing', async () => {
+    let clock = 1000
+    const { deps, calls } = createDeps()
+    const runWithRecordLock = deps.runWithRecordLock
+    deps.now = () => clock
+    deps.runWithRecordLock = (recordUuidParam, fn) => {
+      clock = 10_001 // the lock wait used up the time
+      return runWithRecordLock(recordUuidParam, fn)
+    }
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' }])
+    expect(calls.persistNode).toBe(0)
+  })
 
   test('applies the matching edits, refuses the changed ones, and posts events after commit', async () => {
     const { deps, posted, calls } = createDeps()
