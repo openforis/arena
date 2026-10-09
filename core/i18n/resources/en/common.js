@@ -1624,6 +1624,25 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     },
   },
 
+  aiAnalysis: {
+    area: 'Analysis',
+    empty:
+      'Ask about the survey data: for example, "Average tree height by plot". I propose queries that you can open in the Explorer.',
+    queryCard: {
+      title: 'Query {{queryId}}',
+      columns: 'Columns',
+      filter: 'Filter',
+      openInExplorer: 'Open in Explorer',
+      showAsChart: 'Show as chart',
+      missing: 'This query is no longer available.',
+    },
+    recordDataNotice: {
+      message: 'This conversation contains record data. Continue with a local AI server, or start a new conversation.',
+      newConversation: 'New conversation',
+    },
+    recordDataShared: 'Record data shared with the assistant',
+  },
+
   aiAssistant: {
     open: 'AI assistant',
     title: 'AI assistant',

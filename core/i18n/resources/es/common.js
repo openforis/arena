@@ -1471,6 +1471,26 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
   },
 
+  aiAnalysis: {
+    area: 'Análisis',
+    empty:
+      'Pregunte sobre los datos de la encuesta: por ejemplo, "Altura media de los árboles por parcela". Propongo consultas que puede abrir en el Explorador.',
+    queryCard: {
+      title: 'Consulta {{queryId}}',
+      columns: 'Columnas',
+      filter: 'Filtro',
+      openInExplorer: 'Abrir en el Explorador',
+      showAsChart: 'Mostrar como gráfico',
+      missing: 'Esta consulta ya no está disponible.',
+    },
+    recordDataNotice: {
+      message:
+        'Esta conversación contiene datos de registros. Continúe con un servidor de IA local o inicie una nueva conversación.',
+      newConversation: 'Nueva conversación',
+    },
+    recordDataShared: 'Datos de registros compartidos con el asistente',
+  },
+
   aiAssistant: {
     open: 'Asistente de IA',
     title: 'Asistente de IA',

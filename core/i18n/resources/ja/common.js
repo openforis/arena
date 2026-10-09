@@ -1616,6 +1616,26 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  aiAnalysis: {
+    area: '分析',
+    empty:
+      '調査データについて質問してください。例:「区画ごとの平均樹高」。エクスプローラーで開けるクエリを提案します。',
+    queryCard: {
+      title: 'クエリ {{queryId}}',
+      columns: '列',
+      filter: 'フィルター',
+      openInExplorer: 'エクスプローラーで開く',
+      showAsChart: 'グラフで表示',
+      missing: 'このクエリは利用できなくなりました。',
+    },
+    recordDataNotice: {
+      message:
+        'この会話にはレコードのデータが含まれています。ローカルAIサーバーで続けるか、新しい会話を始めてください。',
+      newConversation: '新しい会話',
+    },
+    recordDataShared: 'アシスタントと共有されたレコードデータ',
+  },
+
   aiAssistant: {
     open: 'AIアシスタント',
     title: 'AIアシスタント',

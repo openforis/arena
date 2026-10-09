@@ -1,0 +1,39 @@
+@use '~@webapp/style/vars' as *;
+
+.ai-query-card {
+  border: 1px solid $greyBorder;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  margin: 0.25rem 0;
+  background: $white;
+  font-size: 0.85rem;
+
+  &--missing {
+    color: var(--colorGrey700);
+  }
+
+  &__title {
+    font-weight: 600;
+    color: $colorTextPrimary;
+  }
+
+  &__explanation {
+    margin: 0.25rem 0 0.5rem;
+  }
+
+  &__row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  &__label {
+    color: var(--colorGrey700);
+    min-width: 6rem;
+  }
+
+  &__buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}

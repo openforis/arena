@@ -1645,6 +1645,26 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     },
   },
 
+  aiAnalysis: {
+    area: 'Analyse',
+    empty:
+      "Posez une question sur les données de l'enquête : par exemple, « Hauteur moyenne des arbres par placette ». Je propose des requêtes que vous pouvez ouvrir dans l'Explorateur.",
+    queryCard: {
+      title: 'Requête {{queryId}}',
+      columns: 'Colonnes',
+      filter: 'Filtre',
+      openInExplorer: "Ouvrir dans l'Explorateur",
+      showAsChart: 'Afficher en graphique',
+      missing: "Cette requête n'est plus disponible.",
+    },
+    recordDataNotice: {
+      message:
+        "Cette conversation contient des données d'enregistrements. Continuez avec un serveur d'IA local ou commencez une nouvelle conversation.",
+      newConversation: 'Nouvelle conversation',
+    },
+    recordDataShared: "Données d'enregistrements partagées avec l'assistant",
+  },
+
   aiAssistant: {
     open: 'Assistant IA',
     title: 'Assistant IA',

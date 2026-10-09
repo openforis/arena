@@ -1633,6 +1633,26 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     },
   },
 
+  aiAnalysis: {
+    area: 'Análise',
+    empty:
+      'Pergunte sobre os dados do levantamento: por exemplo, "Altura média das árvores por parcela". Proponho consultas que pode abrir no Explorador.',
+    queryCard: {
+      title: 'Consulta {{queryId}}',
+      columns: 'Colunas',
+      filter: 'Filtro',
+      openInExplorer: 'Abrir no Explorador',
+      showAsChart: 'Mostrar como gráfico',
+      missing: 'Esta consulta já não está disponível.',
+    },
+    recordDataNotice: {
+      message:
+        'Esta conversa contém dados de registros. Continue com um servidor de IA local ou inicie uma nova conversa.',
+      newConversation: 'Nova conversa',
+    },
+    recordDataShared: 'Dados de registros compartilhados com o assistente',
+  },
+
   aiAssistant: {
     open: 'Assistente de IA',
     title: 'Assistente de IA',
