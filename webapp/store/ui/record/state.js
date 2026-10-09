@@ -32,6 +32,15 @@ export const hasNoHeader = A.pipe(getState, A.prop(keys.noHeader))
 
 export const getRecordUuid = A.pipe(getRecord, Record.getUuid)
 
+// ====== READ (ui.record slice, as received by the reducer)
+
+export const getRecordEditInSlice = A.propOr(null, keys.recordEdit)
+
+export const getRecordUuidInSlice = (recordSliceState) => {
+  const record = getRecordEditInSlice(recordSliceState)
+  return record ? Record.getUuid(record) : null
+}
+
 // ====== UPDATE
 
 export const reset = () => ({})

@@ -9,6 +9,7 @@ import { SurveyFormActions } from '@webapp/store/ui/surveyForm'
 
 import * as RecordActions from './actions'
 import * as RecordState from './state'
+import { mergeNodesOfOpenRecord, mergeValidationsOfOpenRecord } from './recordEventFilter'
 
 const actionHandlers = {
   // Reset form
@@ -33,13 +34,11 @@ const actionHandlers = {
   [RecordActions.recordEditLock]: (state, { locked }) => RecordState.assocRecordEditLocked(locked)(state),
 
   // Node updates
-  [RecordActions.nodesUpdate]: (state, { nodes, removeDirtyFlag = true }) =>
-    RecordState.mergeRecordNodes(nodes, { removeDirtyFlag })(state),
+  [RecordActions.nodesUpdate]: mergeNodesOfOpenRecord,
   [RecordActions.nodeDelete]: (state, { node }) => RecordState.deleteRecordNode(node)(state),
 
   // Validation updates
-  [RecordActions.validationsUpdate]: (state, { validations }) =>
-    RecordState.mergeRecordNodeValidations(validations)(state),
+  [RecordActions.validationsUpdate]: mergeValidationsOfOpenRecord,
 
   // Record preview
   [RecordActions.recordUuidPreviewUpdate]: (state, { recordUuid }) =>
