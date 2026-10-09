@@ -4,9 +4,12 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as TranslationService from '@server/modules/ai/service/translationService'
+import { AiLimits } from '@common/ai/limits'
+import { translateItems } from '@common/ai/tasks/translation'
 
-const BATCH_SIZE = 20
+import { createServerTextGenerator } from '@server/modules/ai/service/serverTextGenerator'
+
+const BATCH_SIZE = AiLimits.translationMaxItems
 
 /**
  * Splits an array into chunks of at most `size` elements.
@@ -67,9 +70,9 @@ const applyBatchResult = (translations, itemInfoById, aiByNodeDef) => {
       aiByNodeDef[info.uuid] = { aiLabels: {}, aiDescs: {} }
     }
     if (info.field === 'label') {
-      aiByNodeDef[info.uuid].aiLabels = byLang
+      aiByNodeDef[info.uuid].aiLabels = { ...aiByNodeDef[info.uuid].aiLabels, ...byLang }
     } else {
-      aiByNodeDef[info.uuid].aiDescs = byLang
+      aiByNodeDef[info.uuid].aiDescs = { ...aiByNodeDef[info.uuid].aiDescs, ...byLang }
     }
   }
 }
@@ -114,16 +117,17 @@ export default class NodeDefsTranslationJob extends Job {
 
     const aiByNodeDef = {}
 
+    const generateText = createServerTextGenerator({ user, feature: 'translation' })
+    // the task accepts a limited number of target languages per call
+    const langGroups = chunkArray(otherLangs, AiLimits.translationMaxTargetLangs)
+
     for (const batch of batches) {
       if (this.isCanceled()) break
 
-      const result = await TranslationService.translate({
-        user,
-        sourceLang: defaultLang,
-        targetLangs: otherLangs,
-        items: batch,
-      })
-      applyBatchResult(result.translations, itemInfoById, aiByNodeDef)
+      for (const targetLangs of langGroups) {
+        const result = await translateItems({ generateText, sourceLang: defaultLang, targetLangs, items: batch })
+        applyBatchResult(result.translations, itemInfoById, aiByNodeDef)
+      }
       this.incrementProcessedItems()
     }
 

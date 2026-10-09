@@ -35,6 +35,8 @@ eliminando los valores existentes insertados en ellas (si los hay).
   schemaSummary_xlsx: 'Resumen del esquema (Excel)',
   schemaSummaryAiDescriptions_csv: 'Resumen del esquema + descripciones IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Resumen del esquema + descripciones IA (Excel)',
+  schemaSummaryAiDescriptionsFailed:
+    'No se pudieron generar descripciones con IA para {{count}} campos; se dejan vacías.',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
   move: `Mover '{{nodeDefLabel}}'`,

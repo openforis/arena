@@ -1,7 +1,7 @@
-import { z } from 'zod'
-
 import { Objects, Surveys } from '@openforis/arena-core'
 
+import { AiLimits } from '@common/ai/limits'
+import { generateDataDictionaryDescriptions } from '@common/ai/tasks/dataDictionary'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
 import * as Survey from '@core/survey/survey'
@@ -18,18 +18,9 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as Log from '@server/log/log'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import * as ModelClient from '@server/modules/ai/service/modelClient'
-import { buildDataDictionaryPrompt } from '@common/ai/prompts/dataDictionary'
-import { parseJsonResponse } from '@common/ai/parsing'
+import { createServerTextGenerator } from '@server/modules/ai/service/serverTextGenerator'
 
 const logger = Log.getLogger('SchemaSummary')
-
-const AI_DESCRIPTION_BATCH_SIZE = 10
-const MAX_AI_DESCRIPTIONS = 200
-
-const AiDescriptionsSchema = z.object({
-  descriptions: z.array(z.object({ uuid: z.string(), description: z.string() })),
-})
 
 const getParentPath = (nodeDef, survey) => {
   const parts = []
@@ -39,28 +30,6 @@ const getParentPath = (nodeDef, survey) => {
     cur = Survey.getNodeDefParent(cur)(survey)
   }
   return parts.join('/')
-}
-
-const runAiDescriptionBatch = async ({ user, surveyName, batch, previousError }) => {
-  const batchNodeDefs = batch.map((e) => ({ uuid: e.uuid, name: e.name, type: e.type, parentPath: e.parentPath }))
-  const { system, prompt } = buildDataDictionaryPrompt({ surveyName, nodeDefs: batchNodeDefs, previousError })
-  const { text } = await ModelClient.generate({ user, feature: 'dataDictionary', prompt, system })
-  const json = parseJsonResponse(text)
-  return AiDescriptionsSchema.parse(json)
-}
-
-const runAiDescriptionBatchWithRetry = async ({ user, surveyName, batch, batchIndex }) => {
-  try {
-    return await runAiDescriptionBatch({ user, surveyName, batch })
-  } catch (firstError) {
-    logger.info(`schemaSummary AI batch ${batchIndex} failed: ${firstError?.message || firstError}; retrying`)
-    return runAiDescriptionBatch({
-      user,
-      surveyName,
-      batch,
-      previousError: { message: firstError?.message || String(firstError) },
-    })
-  }
 }
 
 const getNodeDefPath = ({ survey, nodeDef }) => {
@@ -256,31 +225,54 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
   }
 }
 
-const addAiDescriptions = async ({ user, surveyName, items, processed, total, onProgress, stopIfFunction }) => {
-  const entriesNeedingDesc = items
+const toAiNodeDefs = (items) =>
+  items
     .filter((item) => !item._isRoot && !item._descriptionForAi?.trim())
     .map(({ uuid, name, type, _parentPath }) => ({ uuid, name, type, parentPath: _parentPath }))
 
-  if (entriesNeedingDesc.length > MAX_AI_DESCRIPTIONS) {
-    logger.warn(
-      `schemaSummary: ${entriesNeedingDesc.length} node defs need AI descriptions; capping at ${MAX_AI_DESCRIPTIONS}`
-    )
+/**
+ * Asks the model for the descriptions missing in the items, one batch at a time.
+ * @param {object} params - Parameters.
+ * @param {(args: object) => Promise<string>} params.generateText - Text generator (see common/ai/llm).
+ * @param {string} params.surveyName - Survey name.
+ * @param {object[]} params.items - Schema summary items (updated in place with `aiDescription`).
+ * @param {number} params.processed - Items processed so far (progress).
+ * @param {number} params.total - Total items (progress).
+ * @param {(progress: object) => void} [params.onProgress] - Progress callback.
+ * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {(batchSize: number) => void} [params.onBatchFailed] - Called with the batch size when a batch fails.
+ * @returns {Promise<void>} Resolves when all batches have been processed.
+ */
+export const addAiDescriptions = async ({
+  generateText,
+  surveyName,
+  items,
+  processed,
+  total,
+  onProgress,
+  stopIfFunction,
+  onBatchFailed,
+}) => {
+  const nodeDefs = toAiNodeDefs(items)
+  const { dataDictionaryBatchSize: batchSize, dataDictionaryMaxDescriptions: maxDescriptions } = AiLimits
+  if (nodeDefs.length > maxDescriptions) {
+    logger.warn(`schemaSummary: ${nodeDefs.length} node defs need AI descriptions; capping at ${maxDescriptions}`)
   }
-  const capped = entriesNeedingDesc.slice(0, MAX_AI_DESCRIPTIONS)
+  const capped = nodeDefs.slice(0, maxDescriptions)
   const itemByUuid = Object.fromEntries(items.map((item) => [item.uuid, item]))
 
   let processedCount = processed
-  for (let i = 0; i < capped.length; i += AI_DESCRIPTION_BATCH_SIZE) {
+  for (let start = 0; start < capped.length; start += batchSize) {
     if (stopIfFunction?.()) break
-    const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
-    const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
+    const batch = capped.slice(start, start + batchSize)
     try {
-      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
-      for (const { uuid, description } of result.descriptions) {
+      const { descriptions } = await generateDataDictionaryDescriptions({ generateText, surveyName, nodeDefs: batch })
+      for (const { uuid, description } of descriptions) {
         if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
       }
     } catch (error) {
-      logger.warn(`schemaSummary AI batch ${batchIndex}: ${error?.message || error}`)
+      logger.warn(`schemaSummary AI batch ${start / batchSize}: ${error?.message || error}`)
+      onBatchFailed?.(batch.length)
     }
     processedCount += batch.length
     onProgress?.({ total, processed: processedCount })
@@ -294,6 +286,7 @@ export const generateSchemaSummaryItems = async ({
   includeAiDescriptions = false,
   onProgress = null,
   stopIfFunction = null,
+  onAiBatchFailed = null,
 }) => {
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
   const nodeDefs = extractSchemaSummaryNodeDefs(survey, cycle)
@@ -306,7 +299,7 @@ export const generateSchemaSummaryItems = async ({
   const aiDescNeedingCount = includeAiDescriptions
     ? Math.min(
         nodeDefs.filter((nd) => !NodeDef.isRoot(nd) && !(NodeDef.getDescription(defaultLang)(nd) || '').trim()).length,
-        MAX_AI_DESCRIPTIONS
+        AiLimits.dataDictionaryMaxDescriptions
       )
     : 0
   const total = nodeDefs.length + aiDescNeedingCount
@@ -321,7 +314,16 @@ export const generateSchemaSummaryItems = async ({
   }
 
   if (includeAiDescriptions) {
-    await addAiDescriptions({ user, surveyName, items, processed, total, onProgress, stopIfFunction })
+    await addAiDescriptions({
+      generateText: createServerTextGenerator({ user, feature: 'dataDictionary' }),
+      surveyName,
+      items,
+      processed,
+      total,
+      onProgress,
+      stopIfFunction,
+      onBatchFailed: onAiBatchFailed,
+    })
   }
 
   return items.map(({ _isRoot, _descriptionForAi, _parentPath, ...rest }) => rest)

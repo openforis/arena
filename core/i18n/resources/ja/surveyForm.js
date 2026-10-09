@@ -35,6 +35,8 @@ export default {
   schemaSummary_xlsx: 'スキーマ概要（Excel）',
   schemaSummaryAiDescriptions_csv: 'スキーマ概要＋AI説明（CSV）',
   schemaSummaryAiDescriptions_xlsx: 'スキーマ概要＋AI説明（Excel）',
+  schemaSummaryAiDescriptionsFailed:
+    '{{count}}件のフィールドでAIによる説明を生成できませんでした。空のままになっています。',
   hidePages: 'ページを隠す',
   showPages: 'ページを表示',
   move: `「{{nodeDefLabel}}」を移動`,

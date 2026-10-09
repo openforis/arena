@@ -20,6 +20,7 @@ import * as Response from '../../../utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { requireAiFeaturesEnabled } from '../../ai/api/aiMiddleware'
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
 import * as SurveyService from '../service/surveyService'
@@ -328,6 +329,10 @@ export const init = (app) => {
       try {
         const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
         const user = Request.getUser(req)
+        if (includeAiDescriptions) {
+          // fail fast (403/404 with a clear key) instead of a job that silently skips the descriptions
+          assertFeatureEnabled('dataDictionary', user)
+        }
         const job = SurveyService.startSchemaSummaryExportJob({
           user,
           surveyId,

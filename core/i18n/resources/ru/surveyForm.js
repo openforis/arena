@@ -33,6 +33,7 @@ export default {
   schemaSummary_xlsx: 'Сводка схемы (Excel)',
   schemaSummaryAiDescriptions_csv: 'Сводка схемы + описания ИИ (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Сводка схемы + описания ИИ (Excel)',
+  schemaSummaryAiDescriptionsFailed: 'Не удалось сгенерировать описания ИИ для {{count}} полей; они оставлены пустыми.',
   hidePages: 'Скрыть страницы',
   showPages: 'Показать страницы',
   move: "Переместить '{{nodeDefLabel}}'",

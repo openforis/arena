@@ -35,6 +35,8 @@ Continue?`,
   schemaSummary_xlsx: 'Schema summary (Excel)',
   schemaSummaryAiDescriptions_csv: 'Schema summary + AI descriptions (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Schema summary + AI descriptions (Excel)',
+  schemaSummaryAiDescriptionsFailed:
+    'AI descriptions could not be generated for {{count}} fields; they are left empty.',
   hidePages: 'Hide pages',
   showPages: 'Show pages',
   move: `Move '{{nodeDefLabel}}'`,

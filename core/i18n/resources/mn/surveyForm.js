@@ -36,6 +36,7 @@ export default {
   schemaSummary_xlsx: 'Схемийн хураангуй (Excel)',
   schemaSummaryAiDescriptions_csv: 'Схемийн хураангуй + ХОС тайлбар (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Схемийн хураангуй + ХОС тайлбар (Excel)',
+  schemaSummaryAiDescriptionsFailed: '{{count}} талбарт AI тайлбар үүсгэж чадсангүй; хоосон үлдээлээ.',
   hidePages: 'Хуудсыг нуух',
   showPages: 'Хуудсыг харуулах',
   move: `'{{nodeDefLabel}}' зөөх`,

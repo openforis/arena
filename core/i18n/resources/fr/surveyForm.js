@@ -35,6 +35,8 @@ Continuer ?`,
   schemaSummary_xlsx: 'Résumé du schéma (Excel)',
   schemaSummaryAiDescriptions_csv: 'Résumé du schéma + descriptions IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Résumé du schéma + descriptions IA (Excel)',
+  schemaSummaryAiDescriptionsFailed:
+    "Les descriptions IA n'ont pas pu être générées pour {{count}} champs ; elles restent vides.",
   hidePages: 'Masquer les pages',
   showPages: 'Afficher les pages',
   move: `Déplacer '{{nodeDefLabel}}'`,

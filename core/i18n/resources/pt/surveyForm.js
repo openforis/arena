@@ -35,6 +35,8 @@ Continuar?`,
   schemaSummary_xlsx: 'Resumo do esquema (Excel)',
   schemaSummaryAiDescriptions_csv: 'Resumo do esquema + descrições IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Resumo do esquema + descrições IA (Excel)',
+  schemaSummaryAiDescriptionsFailed:
+    'Não foi possível gerar descrições por IA para {{count}} campos; elas ficaram vazias.',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
   move: `Mover '{{nodeDefLabel}}'`,
