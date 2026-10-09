@@ -13,6 +13,7 @@ import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigra
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
+import { getAiPolicyCeilingErrors } from '@server/modules/ai/service/policyCeilings'
 
 import * as apiRouter from './apiRouter'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
@@ -36,6 +37,11 @@ export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info('server initialization start')
+
+  // an invalid ceiling disables AI for that data class: make the misconfiguration visible
+  for (const message of getAiPolicyCeilingErrors()) {
+    logger.error(message)
+  }
 
   // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
   // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema

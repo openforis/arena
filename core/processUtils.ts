@@ -138,6 +138,9 @@ export const ENV = {
   aiOrgHostedBaseUrls: getList(process.env.AI_ORG_HOSTED_BASE_URLS),
   // Test servers only: enables the canned "mock" provider (AI_DEFAULT_PROVIDER=mock)
   aiMockProviderEnabled: isTrue(process.env.AI_MOCK_PROVIDER_ENABLED),
+  // Survey AI policy ceilings (off | onDevice | orgHosted | cloud); invalid values are treated as off
+  aiPolicyMaxSchema: process.env.AI_POLICY_MAX_SCHEMA ?? 'cloud',
+  aiPolicyMaxData: process.env.AI_POLICY_MAX_DATA ?? 'cloud',
 }
 
 export const isEnvDevelopment = ENV.nodeEnv === environments.development
