@@ -181,6 +181,27 @@ describe('previewChangeSet', () => {
     ])
   })
 
+  test('creates with a mismatched parent or a repeated uuid are refused', async () => {
+    const draft: any = createDraft({ parentName: 'cluster', type: 'text', name: 'cluster_remarks' })
+    const wrongParent = await preview([{ ...draft, parentUuid: uuidOf('plot') }])
+    expect(wrongParent.validation.valid).toBe(false)
+    expect(wrongParent.validation.issues[0]).toMatchObject({ operation: 0, field: 'parentUuid' })
+
+    const twice = await preview([draft, draft])
+    expect(twice.validation.valid).toBe(false)
+    expect(twice.validation.issues[0]).toMatchObject({ operation: 1, field: 'nodeDef' })
+
+    const existing = await preview([{ ...draft, nodeDef: getDefByName(survey, 'plot_id') }])
+    expect(existing.validation.issues[0]).toMatchObject({ operation: 0, field: 'nodeDef' })
+  })
+
+  test('previewing a create leaves the input survey untouched', async () => {
+    const before = JSON.stringify([survey.nodeDefs, survey.nodeDefsIndex])
+    const draft: any = createDraft({ parentName: 'cluster', type: 'text', name: 'cluster_remarks' })
+    await preview([draft])
+    expect(JSON.stringify([survey.nodeDefs, survey.nodeDefsIndex])).toBe(before)
+  })
+
   test('a root label can be translated', async () => {
     expect((await preview([labelDraft('cluster', 'en', 'Cluster plot')])).validation.valid).toBe(true)
   })

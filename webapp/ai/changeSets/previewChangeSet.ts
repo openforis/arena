@@ -39,6 +39,12 @@ const nodeDefNotFound = (t: Translate, uuid: string) => issue(t, 'nodeDefUuid', 
 const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): FieldIssue[] => {
   const { nodeDef, parentUuid } = op
   const type = NodeDef.getType(nodeDef)
+  if (Survey.getNodeDefByUuid(NodeDef.getUuid(nodeDef))(survey)) {
+    return issue(t, 'nodeDef', 'duplicateOperation', { name: NodeDef.getName(nodeDef) })
+  }
+  if (NodeDef.getParentUuid(nodeDef) !== parentUuid) {
+    return issue(t, 'parentUuid', 'parentNotFound', { name: String(NodeDef.getParentUuid(nodeDef)) })
+  }
   if (!isAssistantNodeDefType(type)) return issue(t, 'type', 'typeNotAllowed', { type })
   const parent = Survey.getNodeDefByUuid(parentUuid)(survey)
   if (!parent) return issue(t, 'parentUuid', 'parentNotFound', { name: parentUuid })
@@ -54,7 +60,7 @@ const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): Fi
 const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): FieldIssue[] => {
   const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)
   if (!nodeDef) return nodeDefNotFound(t, op.nodeDefUuid)
-  const field = `props.${op.prop}`
+  const field = op.prop
   if (NodeDef.isRoot(nodeDef)) return issue(t, field, 'rootEntity')
   if (op.prop === 'multiple' && NodeDef.isEntity(nodeDef)) return issue(t, field, 'entityMultipleChange')
   if (op.prop === 'multiple' && op.to === true && NodeDef.getDefaultValues(nodeDef).length > 0) {

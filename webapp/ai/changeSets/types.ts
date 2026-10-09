@@ -76,7 +76,7 @@ export type OperationStatus = 'applied' | 'conflict' | 'failed' | 'skipped'
 
 export type OperationResult = { id: string; status: OperationStatus; message?: string }
 
-// operation: index in the change set; field: what the message is about (e.g. "props.name", "defaultValues")
+// operation: index in the change set; field: what the message is about (e.g. "name", "defaultValues")
 export type ChangeSetIssue = { operation: number; field: string; message: string }
 
 export type ConflictReason = 'nodeDefMissing' | 'valueChanged' | 'parentMissing' | 'nameTaken' | 'alreadyExists'
