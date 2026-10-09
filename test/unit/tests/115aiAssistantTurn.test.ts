@@ -308,7 +308,7 @@ describe('runAssistantTurn', () => {
         calls.push(params)
         return { model, engine: localEngine }
       }
-      const access = { effective: { schema: 'onDevice', data: 'onDevice' } as any, hostingClass: 'onDevice' as const }
+      const access: any = { effective: { schema: 'onDevice', data: 'onDevice' }, hostingClass: 'onDevice' }
       await run({ tools: [dataTool], access, extra: { resolve } })
       expect(calls.map((call) => call.dataClass)).toEqual(['schema', 'data'])
       expect(model.doStreamCalls[0].tools?.map((tool: any) => tool.name)).toEqual(['test_data'])
