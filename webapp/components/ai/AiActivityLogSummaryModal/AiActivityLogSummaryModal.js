@@ -3,13 +3,15 @@ import './AiActivityLogSummaryModal.scss'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as API from '@webapp/service/api'
+import * as Survey from '@core/survey/survey'
+
+import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 
-const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
+const AiActivityLogSummaryModal = ({ onClose }) => {
   const i18n = useI18n()
   // Server-side error messages may contain quoted identifiers (Postgres
   // column names, etc.) which i18next escapes by default — appears as
@@ -17,6 +19,8 @@ const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
   // through unescapeHtml.
   const tUnescaped = useI18nT({ unescapeHtml: true })
   const surveyId = useSurveyId()
+  const surveyInfo = useSurveyInfo()
+  const surveyName = Survey.getName(surveyInfo)
   const cancelRef = useRef(null)
 
   const [text, setText] = useState('')
@@ -33,15 +37,13 @@ const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
     setDone(false)
 
     setError(null)
-    const cancel = API.aiActivityLog.summarizeStream({
+    const cancel = AiWorkflows.summarizeActivityLog({
       surveyId,
-      from,
-      to,
-      userUuid,
+      surveyName,
       onChunk: (chunk) => setText((prev) => prev + chunk),
       onDone: () => setDone(true),
       onError: (err) => {
-        setError(err?.message || 'unknown')
+        setError(getAiErrorMessage({ error: err, i18n }))
         setDone(true)
       },
     })
@@ -49,7 +51,7 @@ const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
     return () => {
       cancelRef.current?.()
     }
-  }, [surveyId, from, to, userUuid])
+  }, [surveyId, surveyName, i18n])
 
   const onCancel = () => {
     cancelRef.current?.()
@@ -83,9 +85,6 @@ const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
 }
 
 AiActivityLogSummaryModal.propTypes = {
-  from: PropTypes.string,
-  to: PropTypes.string,
-  userUuid: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 }
 

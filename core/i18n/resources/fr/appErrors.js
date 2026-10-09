@@ -53,6 +53,7 @@ export default {
   geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
+  invalidParams: 'Paramètres de requête invalides.',
   invalidType: 'Type invalide {{type}}',
   jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
   jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',

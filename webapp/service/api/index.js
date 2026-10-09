@@ -166,4 +166,4 @@ export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, 
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export { aiSettings, aiActivityLog, aiChatbot, aiDataQuery, streamSse as aiStreamSse } from './ai'
+export { aiSettings, aiChatbot, aiDataQuery, streamSse as aiStreamSse } from './ai'

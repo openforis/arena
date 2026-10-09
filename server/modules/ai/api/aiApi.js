@@ -7,7 +7,6 @@
  */
 import * as Log from '@server/log/log'
 
-import * as ActivityLogApi from './activityLogApi'
 import * as ChatbotApi from './chatbotApi'
 import * as DataQueryApi from './dataQueryApi'
 import * as InternalApi from './internalApi'
@@ -20,9 +19,8 @@ export const init = (app) => {
   ModelApi.init(app)
   SettingsApi.init(app)
   InternalApi.init(app)
-  ActivityLogApi.init(app)
   ChatbotApi.init(app)
   DataQueryApi.init(app)
 
-  logger.info('AI module initialised (model, settings, internal, activityLog, chatbot, dataQuery routes registered)')
+  logger.info('AI module initialised (model, settings, internal, chatbot, dataQuery routes registered)')
 }

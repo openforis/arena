@@ -47,6 +47,7 @@ export default {
   generic: 'Erro inesperado: {{text}}',
   geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
+  invalidParams: 'Parâmetros da requisição inválidos.',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',
   jobOrphanedOnRestart: 'O job foi interrompido por uma reinicialização do servidor. Tente novamente.',

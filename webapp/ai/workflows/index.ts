@@ -65,8 +65,32 @@ const translateLabels = async (
   params: Parameters<Awaited<ReturnType<typeof loadTranslation>>['translateLabelsWorkflow']>[0]
 ) => (await loadTranslation()).translateLabelsWorkflow(params)
 
+/**
+ * Loads the activity log workflow module on first use.
+ * @returns {Promise<object>} The module.
+ */
+const loadActivityLog = () => import('./activityLog')
+
+/**
+ * Streams the activity log summary.
+ * @param {object} params - Survey id/name and callbacks.
+ * @returns {Function} cancel().
+ */
+const summarizeActivityLog = ({
+  onChunk,
+  onDone,
+  onError,
+  ...params
+}: StreamCallbacks & { surveyId: number; surveyName: string }): (() => void) =>
+  runStreamWithCallbacks({
+    run: async (signal) => (await loadActivityLog()).summarizeActivityLogWorkflow({ ...params, onChunk, signal }),
+    onDone,
+    onError,
+  })
+
 export const AiWorkflows = {
   generateExpression,
   explainExpression,
   translateLabels,
+  summarizeActivityLog,
 }

@@ -36,6 +36,7 @@ export default {
   generic: '予期しないエラー：{{text}}',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
   importingDataIntoWrongCollectSurvey: '誤った調査へのデータインポートです。期待されるURI：{{collectSurveyUri}}',
+  invalidParams: 'リクエストパラメータが無効です。',
   invalidType: '無効な型です：{{type}}',
   jobCanceledOrErrorsFound: 'ジョブがキャンセルされたか、エラーが発生しました。トランザクションをロールバックします',
   jobOrphanedOnRestart: 'サーバーの再起動によりジョブが中断されました。もう一度お試しください。',

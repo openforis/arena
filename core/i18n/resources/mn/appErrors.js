@@ -48,6 +48,7 @@ export default {
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
+  invalidParams: 'Хүсэлтийн параметр буруу байна.',
   invalidType: 'Буруу төрөл {{type}}',
   jobCanceledOrErrorsFound: 'Ажил цуцлагдсан эсвэл алдаа олдсон; гүйлгээг буцаах',
   jobOrphanedOnRestart: 'Сервер дахин эхэлсний улмаас ажил тасалдлаа. Дахин оролдоно уу.',

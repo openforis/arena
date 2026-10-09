@@ -48,6 +48,7 @@ export default {
   generic: 'Неожиданная ошибка: {{text}}',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
+  invalidParams: 'Неверные параметры запроса.',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
   jobOrphanedOnRestart: 'Задача была прервана из-за перезапуска сервера. Повторите попытку.',
