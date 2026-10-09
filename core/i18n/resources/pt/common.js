@@ -1694,6 +1694,12 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       languageNotInSurvey: 'O inventário não tem o idioma {{lang}}.',
       entityMultipleChange: 'Altere "múltiplo" de uma entidade no designer de formulários.',
       multipleWithDefaultValues: 'Um atributo com valores padrão não pode ser múltiplo.',
+      multipleNotAllowed: 'A definição «múltiplo» de {{name}} não pode ser usada neste tipo de item.',
+      multipleEditDisabled:
+        'A definição «múltiplo» de {{name}} não pode ser alterada (está publicado, é chave, é só de leitura ou está numa tabela).',
+      keyNotAllowed: '{{name}} não pode ser um atributo chave.',
+      keyEditDisabled:
+        '{{name}} não pode passar a chave nem deixar de ser (é múltiplo, ou o limite de chaves foi atingido).',
       duplicateOperation: 'A mesma propriedade de {{name}} é alterada duas vezes.',
       singleExpressionOnly: 'Esta propriedade aceita apenas uma expressão.',
       expressionEmpty: 'Uma expressão está vazia.',

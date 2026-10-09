@@ -1531,6 +1531,12 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       languageNotInSurvey: 'La encuesta no tiene el idioma {{lang}}.',
       entityMultipleChange: 'Cambie "múltiple" de una entidad en el diseñador de formularios.',
       multipleWithDefaultValues: 'Un atributo con valores por defecto no puede ser múltiple.',
+      multipleNotAllowed: 'El ajuste «múltiple» de {{name}} no se puede usar con este tipo de elemento.',
+      multipleEditDisabled:
+        'El ajuste «múltiple» de {{name}} no se puede cambiar (está publicado, es clave, es de solo lectura o está en una tabla).',
+      keyNotAllowed: '{{name}} no puede ser un atributo clave.',
+      keyEditDisabled:
+        '{{name}} no se puede cambiar a clave ni dejar de serlo (es múltiple, o se alcanzó el límite de claves).',
       duplicateOperation: 'La misma propiedad de {{name}} se cambia dos veces.',
       singleExpressionOnly: 'Esta propiedad acepta una sola expresión.',
       expressionEmpty: 'Una expresión está vacía.',

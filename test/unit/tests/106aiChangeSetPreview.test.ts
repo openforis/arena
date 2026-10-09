@@ -181,6 +181,103 @@ describe('previewChangeSet', () => {
     ])
   })
 
+  describe('the designer guards on multiple and key', () => {
+    const update = (name: string, prop: 'multiple' | 'key', to: boolean, target = survey): ChangeOperationDraft => ({
+      type: 'nodeDef.update',
+      nodeDefUuid: NodeDef.getUuid(getDefByName(target, name)),
+      prop,
+      from: !to,
+      to,
+    })
+    const publish = (name: string) => {
+      const nodeDef = getDefByName(survey, name)
+      const uuid = NodeDef.getUuid(nodeDef)
+      return { ...survey, nodeDefs: { ...survey.nodeDefs, [uuid]: { ...nodeDef, published: true } } }
+    }
+
+    test('multiple on a published attribute is refused, on a draft one it is accepted', async () => {
+      const published = publish('cluster_notes')
+      const refused = await previewChangeSet(build([update('cluster_notes', 'multiple', true, published)]), published, {
+        t: fakeT,
+      })
+      expect(messages(refused)).toEqual(['aiAssistant.issues.multipleEditDisabled {"name":"cluster_notes"}'])
+      expect((await preview([update('cluster_notes', 'multiple', true)])).validation.valid).toBe(true)
+    })
+
+    test('multiple on a key attribute or on a type that cannot be multiple is refused', async () => {
+      const key = await preview([update('cluster_id', 'multiple', true)])
+      expect(messages(key)).toEqual(['aiAssistant.issues.multipleEditDisabled {"name":"cluster_id"}'])
+      const boolean = createDraft({ parentName: 'cluster', type: 'boolean', name: 'flag' })
+      const withBoolean = await preview([boolean])
+      const flagUuid = NodeDef.getUuid((boolean as any).nodeDef)
+      const toMultiple: ChangeOperationDraft = {
+        type: 'nodeDef.update',
+        nodeDefUuid: flagUuid,
+        prop: 'multiple',
+        from: false,
+        to: true,
+      }
+      const changeSet = build([boolean, toMultiple])
+      const result = await previewChangeSet(changeSet, survey, { t: fakeT })
+      expect(withBoolean.validation.valid).toBe(true)
+      expect(messages(result)).toEqual(['aiAssistant.issues.multipleNotAllowed {"name":"flag"}'])
+    })
+
+    test('a new boolean cannot be created multiple', async () => {
+      const parent = getDefByName(survey, 'cluster')
+      const nodeDef = createProposedNodeDef({ parent, cycle: '0', type: 'boolean', name: 'flag', multiple: true })
+      const result = await preview([
+        { type: 'nodeDef.create', nodeDef, parentUuid: NodeDef.getUuid(parent) } as ChangeOperationDraft,
+      ])
+      expect(messages(result)).toEqual(['aiAssistant.issues.multipleNotAllowed {"name":"flag"}'])
+    })
+
+    test('key on a multiple attribute, on an entity or on a boolean is refused', async () => {
+      const multipleText = await preview([
+        update('cluster_notes', 'multiple', true),
+        update('cluster_notes', 'key', true),
+      ])
+      expect(messages(multipleText)).toEqual(['aiAssistant.issues.keyEditDisabled {"name":"cluster_notes"}'])
+
+      const entity = await preview([update('plot', 'key', true)])
+      expect(messages(entity)).toEqual(['aiAssistant.issues.keyNotAllowed {"name":"plot"}'])
+
+      const parent = getDefByName(survey, 'cluster')
+      const newKey = (type: string, multiple = false) =>
+        ({
+          type: 'nodeDef.create',
+          nodeDef: createProposedNodeDef({ parent, cycle: '0', type, name: 'k_new', key: true, multiple }),
+          parentUuid: NodeDef.getUuid(parent),
+        }) as ChangeOperationDraft
+      expect(messages(await preview([newKey('boolean')]))).toEqual([
+        'aiAssistant.issues.keyNotAllowed {"name":"k_new"}',
+      ])
+      expect(messages(await preview([newKey('text', true)]))).toEqual([
+        'aiAssistant.issues.keyEditDisabled {"name":"k_new"}',
+      ])
+      expect((await preview([newKey('text')])).validation.valid).toBe(true)
+    })
+  })
+
+  test('labels and descriptions of a new node definition in a language not in the survey are refused', async () => {
+    const parent = getDefByName(survey, 'cluster')
+    const nodeDef = createProposedNodeDef({
+      parent,
+      cycle: '0',
+      type: 'text',
+      name: 'cluster_remarks',
+      labels: { en: 'Remarks', fr: 'Remarques' },
+      descriptions: { de: 'Hinweis' },
+    })
+    const result = await preview([
+      { type: 'nodeDef.create', nodeDef, parentUuid: NodeDef.getUuid(parent) } as ChangeOperationDraft,
+    ])
+    expect(result.validation.issues).toEqual([
+      { operation: 0, field: 'labels.fr', message: 'aiAssistant.issues.languageNotInSurvey {"lang":"fr"}' },
+      { operation: 0, field: 'descriptions.de', message: 'aiAssistant.issues.languageNotInSurvey {"lang":"de"}' },
+    ])
+  })
+
   test('creates with a mismatched parent or a repeated uuid are refused', async () => {
     const draft: any = createDraft({ parentName: 'cluster', type: 'text', name: 'cluster_remarks' })
     const wrongParent = await preview([{ ...draft, parentUuid: uuidOf('plot') }])

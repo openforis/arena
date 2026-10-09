@@ -1706,6 +1706,12 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       languageNotInSurvey: "Le formulaire n'a pas la langue {{lang}}.",
       entityMultipleChange: "Modifiez « multiple » d'une entité dans le concepteur de formulaire.",
       multipleWithDefaultValues: 'Un attribut avec des valeurs par défaut ne peut pas être multiple.',
+      multipleNotAllowed: "Le réglage « multiple » de {{name}} ne peut pas être utilisé pour ce type d'élément.",
+      multipleEditDisabled:
+        'Le réglage « multiple » de {{name}} ne peut pas être modifié (publié, clé, en lecture seule ou dans un tableau).',
+      keyNotAllowed: '{{name}} ne peut pas être un attribut clé.',
+      keyEditDisabled:
+        "{{name}} ne peut pas devenir clé ni cesser de l'être (il est multiple, ou la limite de clés est atteinte).",
       duplicateOperation: 'La même propriété de {{name}} est modifiée deux fois.',
       singleExpressionOnly: "Cette propriété n'accepte qu'une seule expression.",
       expressionEmpty: 'Une expression est vide.',
