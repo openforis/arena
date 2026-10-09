@@ -1503,6 +1503,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     thinking: "Agrégation des événements et demande de résumé à l'IA…",
     error: 'Échec de la récupération du résumé : {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'Non disponible',
     unavailable: {

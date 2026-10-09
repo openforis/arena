@@ -1482,6 +1482,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     thinking: 'Aggregating events and asking the AI to summarize…',
     error: 'Failed to fetch summary: {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'Not available',
     unavailable: {

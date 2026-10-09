@@ -7,6 +7,7 @@ import mn from '@core/i18n/resources/mn'
 import pt from '@core/i18n/resources/pt'
 import ru from '@core/i18n/resources/ru'
 
+import { createCapabilitiesStore, isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import {
   getAiEngineFeatureAvailability,
   getAiUnavailableAction,
@@ -51,6 +52,23 @@ const availability = (overrides: Partial<Parameters<typeof getAiEngineFeatureAva
     preferLocal: true,
     ...overrides,
   })
+
+describe('isCapabilitiesLoadedForUser', () => {
+  const store = createCapabilitiesStore({
+    loadSettings: async () => null,
+    loadLocalSettings: () => ({ enabled: false, baseUrl: '', modelId: null, preferLocal: true }) as never,
+    probe: async () => null as never,
+    detectDevice: async () => ({ webGpu: false, deviceMemoryGb: null, promptApi: null }),
+  })
+
+  test('false before the first load, so the empty snapshot is not reported as noEngine; true after, for that user only', async () => {
+    expect(isCapabilitiesLoadedForUser(store, 'u1')).toBe(false)
+    await store.load({ userUuid: 'u1' })
+    expect(isCapabilitiesLoadedForUser(store, 'u1')).toBe(true)
+    expect(isCapabilitiesLoadedForUser(store, 'u2')).toBe(false)
+    expect(isCapabilitiesLoadedForUser(store, null)).toBe(false)
+  })
+})
 
 const REASONS: AiUnavailableReason[] = [
   'localServerNotEnabled',

@@ -1370,6 +1370,7 @@ $t(common.appNameFull)
     thinking: 'Agregando eventos y pidiendo a la IA que los resuma…',
     error: 'Error al obtener el resumen: {{message}}',
   },
+
   aiEngine: {
     unavailableTitle: 'No disponible',
     unavailable: {
