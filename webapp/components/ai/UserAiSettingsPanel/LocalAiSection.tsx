@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
 import { getCurrentUserUuid, refreshAiCapabilities, testLocalServer } from '@webapp/ai/engines/capabilitiesStore'
@@ -48,6 +48,11 @@ export const LocalAiSection = (props: Props) => {
   const [testing, setTesting] = useState(false)
   const [testView, setTestView] = useState<LocalServerTestView | null>(null)
 
+  const settingsRef = useRef(settings)
+  useEffect(() => {
+    settingsRef.current = settings
+  }, [settings])
+
   const save = useCallback((next: AiLocalServerSettings) => {
     setSettings(next)
     saveLocalServerSettings({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), settings: next })
@@ -64,6 +69,9 @@ export const LocalAiSection = (props: Props) => {
       const probe = await testLocalServer({ baseUrl: current.baseUrl, modelId: current.modelId })
       // the user logged out or switched meanwhile: write nothing for the new session
       if (getCurrentUserUuid() !== testedUserUuid) return
+      // the URL was edited meanwhile: the result belongs to another server
+      const latest = normalizeLocalServerSettings(settingsRef.current)
+      if (latest.baseUrl !== current.baseUrl) return
       setTestView(
         getLocalServerTestView({
           probe,
@@ -72,13 +80,29 @@ export const LocalAiSection = (props: Props) => {
           pageProtocol: window.location.protocol,
         })
       )
-      // first successful test: pick the first model
-      const modelId = current.modelId ?? (probe.reachable ? (probe.models[0] ?? null) : null)
-      save({ ...current, modelId })
+      // reachable: keep the chosen model if the server lists it, else pick the first one
+      const modelId = probe.reachable
+        ? current.modelId && probe.models.includes(current.modelId)
+          ? current.modelId
+          : (probe.models[0] ?? null)
+        : current.modelId
+      save({ ...latest, modelId })
     } finally {
       setTesting(false)
     }
   }, [capabilities.instance.orgHostedBaseUrls, save, settings])
+
+  const onBaseUrlBlur = useCallback(() => {
+    const next = normalizeLocalServerSettings(settings)
+    const stored = loadSettings()
+    if (next.baseUrl === stored.baseUrl) {
+      // normalisation may differ from the typed text
+      setSettings((prev) => (prev.baseUrl === next.baseUrl ? prev : { ...prev, baseUrl: next.baseUrl }))
+      return
+    }
+    // a model of the previous server does not apply to the new one
+    save({ ...next, modelId: null })
+  }, [save, settings])
 
   const modelIds = useMemo(() => {
     const listed = testView?.models ?? capabilities.localServer.models
@@ -139,10 +163,10 @@ export const LocalAiSection = (props: Props) => {
                   setSettings((prev) => ({ ...prev, baseUrl: value }))
                   setTestView(null)
                 }}
-                onBlur={() => save(normalizeLocalServerSettings(settings))}
+                onBlur={onBaseUrlBlur}
               />
               <Button
-                label="userAiSettings:localServer.test"
+                label={testing ? 'userAiSettings:localServer.testing' : 'userAiSettings:localServer.test'}
                 onClick={onTest}
                 disabled={testing}
                 icon={testing ? <Spinner size={16} /> : null}
