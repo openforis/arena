@@ -6,7 +6,9 @@ import * as Survey from '@core/survey/survey'
 
 import { Button, LoadingBar } from '@webapp/components'
 import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useOnIntersect } from '@webapp/components/hooks'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -30,7 +32,7 @@ const RecentActivityContent = () => {
   const surveyInfo = useSurveyInfo()
   const { messages, hasError, loaded, onGetActivityLogMessagesNext } = useActivityLog()
   const [setLoadMoreTriggerElement] = useOnIntersect(onGetActivityLogMessagesNext)
-  const aiSummaryEnabled = useAiFeatureEnabled('userActivity')
+  const aiSummary = useAiFeatureAvailability('activityLogSummary')
   const [summaryOpen, setSummaryOpen] = useState(false)
 
   const activityLogSize = FileUtils.toHumanReadableFileSize(Survey.getActivityLogSize(surveyInfo))
@@ -42,13 +44,16 @@ const RecentActivityContent = () => {
     <>
       <div className="recent-activity__toolbar">
         <span>{i18n.t('homeView:dashboard.activityLog.size', { size: activityLogSize }) as string}</span>
-        {aiSummaryEnabled && messages.length > 0 && (
-          <Button
-            className="btn-s btn-ai-summary"
-            iconClassName="icon-stats-bars icon-14px"
-            label="aiActivityLog.summarizeButton"
-            onClick={() => setSummaryOpen(true)}
-          />
+        {isAiFeatureShown(aiSummary) && messages.length > 0 && (
+          <AiPolicyBlockedTooltip availability={aiSummary}>
+            <Button
+              className="btn-s btn-ai-summary"
+              disabled={!isAiFeatureUsable(aiSummary)}
+              iconClassName="icon-stats-bars icon-14px"
+              label="aiActivityLog.summarizeButton"
+              onClick={() => setSummaryOpen(true)}
+            />
+          </AiPolicyBlockedTooltip>
         )}
       </div>
       {hasError && (

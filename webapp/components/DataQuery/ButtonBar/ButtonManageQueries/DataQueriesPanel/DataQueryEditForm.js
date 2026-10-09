@@ -8,7 +8,10 @@ import * as Validation from '@core/validation/validation'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import { Spinner } from '@webapp/components'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { Button, ButtonDelete, ButtonNew, ButtonSave } from '@webapp/components/buttons'
@@ -20,22 +23,25 @@ export const DataQueryEditForm = (props) => {
   const validation = Validation.getValidation(querySummary)
 
   const selectedQuerySummaryUuid = DataExplorerSelectors.useSelectedQuerySummaryUuid()
-  const aiEnabled = useAiFeatureEnabled('dataQuery')
+  const aiSummarize = useAiFeatureAvailability('dataQuerySummarize')
 
   return (
     <div className="data-query-form">
-      {aiEnabled && (
+      {isAiFeatureShown(aiSummarize) && (
         <div className="data-query-form__ai-bar">
           {summarizing && <Spinner size={18} />}
-          <Button
-            className="btn-s btn-ai"
-            disabled={summarizing || validating}
-            iconClassName="icon-magic-wand icon-14px"
-            label="dataView:dataQuery.ai.suggestSummary"
-            onClick={onAiSuggestSummary}
-            title="dataView:dataQuery.ai.suggestSummaryTitle"
-            variant="outlined"
-          />
+          <AiPolicyBlockedTooltip availability={aiSummarize}>
+            <Button
+              className="btn-s btn-ai"
+              disabled={summarizing || validating || !isAiFeatureUsable(aiSummarize)}
+              iconClassName="icon-magic-wand icon-14px"
+              label="dataView:dataQuery.ai.suggestSummary"
+              onClick={onAiSuggestSummary}
+              title="dataView:dataQuery.ai.suggestSummaryTitle"
+              variant="outlined"
+            />
+          </AiPolicyBlockedTooltip>
+          {isAiFeatureUsable(aiSummarize) && <AiFeatureDataLocationBadge feature="dataQuerySummarize" />}
         </div>
       )}
 

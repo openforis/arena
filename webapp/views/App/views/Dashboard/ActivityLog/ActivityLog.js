@@ -14,7 +14,9 @@ import Message from './Message'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import { useI18n } from '@webapp/store/system'
 import AiActivityLogSummaryModal from '@webapp/components/ai/AiActivityLogSummaryModal'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 
 const minSizeToDisplayMessages = 1024 * 10 // 10KB
 
@@ -29,19 +31,22 @@ const ActivityLog = () => {
   const activityLogSizeText = FileUtils.toHumanReadableFileSize(activityLogSize)
 
   const [summaryOpen, setSummaryOpen] = useState(false)
-  const aiAnalysisEnabled = useAiFeatureEnabled('userActivity')
+  const aiSummary = useAiFeatureAvailability('activityLogSummary')
 
   return (
     <div className="activity-log__container">
       <h4 className="">
         {i18n.t('homeView:dashboard.activityLog.size', { size: activityLogSizeText })}
-        {aiAnalysisEnabled && messages.length > 0 && (
-          <Button
-            className="btn-s btn-ai-summary"
-            iconClassName="icon-stats-bars icon-14px"
-            label="aiActivityLog.summarizeButton"
-            onClick={() => setSummaryOpen(true)}
-          />
+        {isAiFeatureShown(aiSummary) && messages.length > 0 && (
+          <AiPolicyBlockedTooltip availability={aiSummary}>
+            <Button
+              className="btn-s btn-ai-summary"
+              disabled={!isAiFeatureUsable(aiSummary)}
+              iconClassName="icon-stats-bars icon-14px"
+              label="aiActivityLog.summarizeButton"
+              onClick={() => setSummaryOpen(true)}
+            />
+          </AiPolicyBlockedTooltip>
         )}
       </h4>
       {(messages.length > 0 || activityLogSize > minSizeToDisplayMessages) && (

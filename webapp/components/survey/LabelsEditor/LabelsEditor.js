@@ -13,7 +13,10 @@ import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { Button } from '@webapp/components/buttons'
 import { Spinner } from '@webapp/components/Spinner'
 import ValidationTooltip from '@webapp/components/validationTooltip'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureShown, isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { AiPolicyBlockedTooltip } from '@webapp/components/ai/AiPolicyBlockedTooltip'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 
 import Label from './Label'
 import ButtonToggle from './ButtonToggle'
@@ -76,9 +79,9 @@ const LabelsEditor = (props) => {
     () => languages.filter((lang) => !labels[lang] || !String(labels[lang]).trim().length),
     [languages, labels]
   )
-  const aiTranslationEnabled = useAiFeatureEnabled('translation')
+  const aiTranslation = useAiFeatureAvailability('translation')
   const canTranslate =
-    aiTranslationEnabled &&
+    isAiFeatureShown(aiTranslation) &&
     !readOnly &&
     !translating &&
     editingLabels &&
@@ -88,7 +91,7 @@ const LabelsEditor = (props) => {
     onChange
 
   const onTranslate = useCallback(async () => {
-    if (!canTranslate) return
+    if (!canTranslate || !isAiFeatureUsable(aiTranslation)) return
     const controller = new AbortController()
     translationAbortRef.current = controller
     setTranslating(true)
@@ -115,7 +118,18 @@ const LabelsEditor = (props) => {
     } finally {
       if (!controller.signal.aborted) setTranslating(false)
     }
-  }, [canTranslate, emptyLangs, i18n, labels, notifyError, notifyInfo, onChange, populatedLang, surveyId])
+  }, [
+    aiTranslation,
+    canTranslate,
+    emptyLangs,
+    i18n,
+    labels,
+    notifyError,
+    notifyInfo,
+    onChange,
+    populatedLang,
+    surveyId,
+  ])
 
   return (
     <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
@@ -124,13 +138,19 @@ const LabelsEditor = (props) => {
         {canToggleEditor && <ButtonToggle onClick={() => setEditingLabels(!editingLabels)} open={editingLabels} />}
         {translating && <Spinner size={18} />}
         {canTranslate && (
-          <Button
-            className="btn-s btn-ai-translate"
-            iconClassName="icon-earth icon-14px"
-            onClick={onTranslate}
-            title="aiTranslation.translateButton"
-            titleParams={{ count: emptyLangs.length }}
-          />
+          <>
+            <AiPolicyBlockedTooltip availability={aiTranslation}>
+              <Button
+                className="btn-s btn-ai-translate"
+                disabled={!isAiFeatureUsable(aiTranslation)}
+                iconClassName="icon-earth icon-14px"
+                onClick={onTranslate}
+                title="aiTranslation.translateButton"
+                titleParams={{ count: emptyLangs.length }}
+              />
+            </AiPolicyBlockedTooltip>
+            {isAiFeatureUsable(aiTranslation) && <AiFeatureDataLocationBadge feature="translation" compact />}
+          </>
         )}
       </div>
       <div className="labels-editor__labels">

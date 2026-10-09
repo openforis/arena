@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
 import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
+import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { useI18n } from '@webapp/store/system'
@@ -122,6 +123,7 @@ const AiExpressionPopup = (props) => {
   return (
     <Modal className="ai-expression-popup" title="aiExpression.title" showCloseButton onClose={onCancel}>
       <ModalBody>
+        <AiFeatureDataLocationBadge feature="expressionGenerate" />
         <div className="ai-expression-popup__hint">{i18n.t('aiExpression.hint')}</div>
 
         <textarea
