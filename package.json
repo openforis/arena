@@ -86,6 +86,7 @@
     "eslint-plugin-prettier": "^5.5.6",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
+    "fake-indexeddb": "^6.2.5",
     "git-revision-webpack-plugin": "^5.0.0",
     "glob": "^13.0.6",
     "html-replace-webpack-plugin": "^2.6.0",
