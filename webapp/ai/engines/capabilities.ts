@@ -40,6 +40,7 @@ export type AiCapabilitiesStore = {
   get: () => AiCapabilities
   getSettings: () => AiSettingsSnapshot | null
   getLocalSettings: () => AiLocalServerSettings
+  getLoadedFor: () => string | null | undefined
   load: (params: { userUuid: string | null }) => Promise<AiCapabilities>
   refresh: (params: { userUuid: string | null }) => Promise<AiCapabilities>
   detectDevice: () => Promise<AiDeviceCapability>
@@ -158,6 +159,23 @@ export const detectDeviceCapabilities = async ({
   promptApi: await detectPromptApi(languageModel),
 })
 
+const emptySnapshot = emptyCapabilities()
+
+/**
+ * Returns the capabilities for the logged-in user: data that belongs to another user (or to nobody) is never
+ * returned, a stable empty object is.
+ * @param {AiCapabilitiesStore} store - The store.
+ * @param {string|null} currentUserUuid - UUID of the logged-in user (null: nobody).
+ * @returns {AiCapabilities} The capabilities (same object until something changes).
+ */
+export const getCapabilitiesSnapshotForUser = (
+  store: AiCapabilitiesStore,
+  currentUserUuid: string | null
+): AiCapabilities => {
+  const loadedFor = store.getLoadedFor()
+  return loadedFor !== undefined && loadedFor !== currentUserUuid ? emptySnapshot : store.get()
+}
+
 /**
  * Creates a capabilities store.
  * @param {CapabilitiesStoreDeps} deps - Settings, local settings, probe and device readers.
@@ -241,6 +259,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     get: () => capabilities,
     getSettings: () => settings,
     getLocalSettings: () => localSettings,
+    getLoadedFor: () => loadedFor,
     load: ({ userUuid }) => {
       resetIfOtherUser(userUuid)
       if (loadedFor === userUuid) return Promise.resolve(capabilities)

@@ -14,11 +14,15 @@
 import { useEffect, useReducer } from 'react'
 
 import { isAiCategoryAvailable } from '@common/ai/features'
+import * as User from '@core/user/user'
 import * as API from '@webapp/service/api'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
 
 let cache = null
 let inflight = null
+// bumped by every reset/invalidate: a fetch that started before cannot write its result
+let generation = 0
 const listeners = new Set()
 
 const notify = () => listeners.forEach((cb) => cb())
@@ -26,24 +30,28 @@ const notify = () => listeners.forEach((cb) => cb())
 const fetchOnce = () => {
   if (cache) return Promise.resolve(cache)
   if (inflight) return inflight
+  const startedAt = generation
+  const isCurrent = () => startedAt === generation
   inflight = (async () => {
+    let result = null
     try {
-      cache = await API.aiSettings.fetchSettings()
+      result = await API.aiSettings.fetchSettings()
     } catch (error) {
       const data = error?.response?.data
       const code = data?.key ?? data?.error
       const status = error?.response?.status
       if (code === 'aiFeaturesDisabled' || status === 404 || status === 403) {
-        cache = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [] }
+        result = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [] }
       } else {
         // Network or other error: leave cache as the safest fallback so
         // we hide AI buttons rather than flashing them in.
-        cache = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [], _fetchError: true }
+        result = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [], _fetchError: true }
       }
-    } finally {
-      inflight = null
-      notify()
     }
+    if (!isCurrent()) return result
+    cache = result
+    inflight = null
+    notify()
     return cache
   })()
   return inflight
@@ -68,6 +76,7 @@ export const getAiSettingsSnapshot = () => cache
  * @returns {void}
  */
 export const invalidateAiSettingsCache = () => {
+  generation += 1
   cache = null
   inflight = null
   fetchOnce()
@@ -79,6 +88,7 @@ export const invalidateAiSettingsCache = () => {
  * @returns {void}
  */
 export const resetAiSettingsCache = () => {
+  generation += 1
   cache = null
   inflight = null
   notify()
@@ -93,6 +103,9 @@ export const resetAiSettingsCache = () => {
  */
 export const useAiFeatureEnabled = (category) => {
   const aiFeaturesEnabledInSystemConfig = useSystemConfigAiFeaturesEnabled()
+  // a login or logout drops the cache: the effect fetches again for the user who is logged in then
+  const user = useUser()
+  const userUuid = user ? (User.getUuid(user) ?? null) : null
   // re-render when the shared settings cache changes
   const [, forceRender] = useReducer((count) => count + 1, 0)
 
@@ -100,13 +113,13 @@ export const useAiFeatureEnabled = (category) => {
     const onChange = () => forceRender()
     listeners.add(onChange)
 
-    if (aiFeaturesEnabledInSystemConfig && !cache && !inflight) {
+    if (aiFeaturesEnabledInSystemConfig && userUuid && !cache && !inflight) {
       fetchOnce()
     }
     return () => {
       listeners.delete(onChange)
     }
-  }, [aiFeaturesEnabledInSystemConfig])
+  }, [aiFeaturesEnabledInSystemConfig, userUuid])
 
   if (!aiFeaturesEnabledInSystemConfig) return false
   if (!cache) return false
