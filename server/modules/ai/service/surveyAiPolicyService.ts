@@ -102,12 +102,30 @@ export const getSurveyAiPolicy = async (
   return toState({ policy, ceilings: deps.getCeilings() })
 }
 
-const assertWithinCeilings = (policy: AiPolicy, ceilings: AiPolicy): void => {
-  const [dataClass] = findLevelsAboveCeiling({ policy, ceilings })
+/**
+ * Rejects the classes whose level changed and is above its ceiling; unchanged classes are kept as stored
+ * (the runtime clamps them), so lowering a ceiling never blocks editing the other class.
+ * @param {object} params - Parameters.
+ * @param {AiPolicy} params.requested - Requested policy.
+ * @param {AiPolicy} params.from - Current normalized policy.
+ * @param {AiPolicy} params.ceilings - Instance ceilings.
+ * @returns {void}
+ */
+const assertChangesWithinCeilings = ({
+  requested,
+  from,
+  ceilings,
+}: {
+  requested: AiPolicy
+  from: AiPolicy
+  ceilings: AiPolicy
+}): void => {
+  const above = findLevelsAboveCeiling({ policy: requested, ceilings })
+  const dataClass = above.find((dc) => requested[dc] !== from[dc])
   if (!dataClass) return
   throw new SystemError(
     'aiPolicyAboveCeiling',
-    { dataClass, level: policy[dataClass], ceiling: ceilings[dataClass] },
+    { dataClass, level: requested[dataClass], ceiling: ceilings[dataClass] },
     StatusCodes.BAD_REQUEST
   )
 }
@@ -127,9 +145,9 @@ export const updateSurveyAiPolicy = async (
 ): Promise<SurveyAiPolicyState> => {
   const requested = parseAiPolicyBody(policy)
   const ceilings = deps.getCeilings()
-  assertWithinCeilings(requested, ceilings)
   return deps.runInTransaction(async (client) => {
     const from = normalizeAiPolicy(await deps.fetchRawPolicy(surveyId, client))
+    assertChangesWithinCeilings({ requested, from, ceilings })
     await deps.storePolicy({ surveyId, policy: requested }, client)
     if (!isSamePolicy(from, requested)) {
       await deps.insertActivityLog({ user, surveyId, content: { from, to: requested } }, client)

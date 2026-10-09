@@ -125,11 +125,18 @@ describe('PUT /survey/:surveyId/ai-policy', () => {
   })
 
   test('above the ceiling → 400 aiPolicyAboveCeiling', async () => {
-    const { routes, store } = createRoutes({ ceilings: { schema: 'orgHosted', data: 'cloud' } })
+    const { routes, store } = createRoutes({ ceilings: { schema: 'cloud', data: 'orgHosted' } })
     const res = await runChain(routes.put, { user: users.surveyAdmin, body: { schema: 'cloud', data: 'cloud' } })
     expect(res.statusCode).toBe(400)
     expect(res.body.key).toBe('aiPolicyAboveCeiling')
-    expect(res.body.params).toEqual({ dataClass: 'schema', level: 'cloud', ceiling: 'orgHosted' })
+    expect(res.body.params).toEqual({ dataClass: 'data', level: 'cloud', ceiling: 'orgHosted' })
     expect(store.raw).toBeNull()
+  })
+
+  test('an unchanged class above its ceiling does not block changing the other one', async () => {
+    const { routes, store } = createRoutes({ ceilings: { schema: 'orgHosted', data: 'cloud' } })
+    const res = await runChain(routes.put, { user: users.surveyAdmin, body: { schema: 'cloud', data: 'orgHosted' } })
+    expect(res.statusCode).toBe(200)
+    expect(store.raw).toEqual({ schema: 'cloud', data: 'orgHosted' })
   })
 })

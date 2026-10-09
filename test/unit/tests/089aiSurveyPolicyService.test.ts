@@ -107,6 +107,29 @@ describe('updateSurveyAiPolicy', () => {
     expect(state.stores).toEqual([])
   })
 
+  test('a class above its ceiling that the user did not change is stored as-is', async () => {
+    const { deps, state } = createDeps({ ceilings: { schema: 'orgHosted', data: 'cloud' } })
+    const result = await updateSurveyAiPolicy(
+      { user, surveyId: 3, policy: { schema: 'cloud', data: 'orgHosted' } },
+      deps
+    )
+    expect(state.stores).toEqual([{ surveyId: 3, policy: { schema: 'cloud', data: 'orgHosted' } }])
+    expect(result.effective).toEqual({ schema: 'orgHosted', data: 'orgHosted' })
+  })
+
+  test('changing a class to a level above its ceiling is still rejected', async () => {
+    const { deps, state } = createDeps({
+      stored: { schema: 'orgHosted', data: 'onDevice' },
+      ceilings: { schema: 'orgHosted', data: 'cloud' },
+    })
+    const error: any = await expectSystemErrorKey(
+      updateSurveyAiPolicy({ user, surveyId: 3, policy: { schema: 'cloud', data: 'onDevice' } }, deps),
+      'aiPolicyAboveCeiling'
+    )
+    expect(error.params).toEqual({ dataClass: 'schema', level: 'cloud', ceiling: 'orgHosted' })
+    expect(state.stores).toEqual([])
+  })
+
   test('an unknown level is rejected as invalid, not passed to the ceiling check, even with the strictest ceilings', async () => {
     const { deps, state } = createDeps({ ceilings: { schema: 'off', data: 'off' } })
     const error: any = await expectSystemErrorKey(
