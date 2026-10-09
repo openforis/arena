@@ -55,6 +55,18 @@ export const TestId = {
     toolRow: (toolName) => `ai-assistant-tool-${toolName}`,
     unavailable: 'ai-assistant-unavailable',
   },
+  aiCleaning: {
+    card: 'ai-cleaning-card',
+    record: 'ai-cleaning-card-record',
+    recordLink: 'ai-cleaning-card-record-link',
+    edit: 'ai-cleaning-card-edit',
+    editCheckbox: 'ai-cleaning-card-edit-checkbox',
+    badge: 'ai-cleaning-card-badge',
+    result: 'ai-cleaning-card-result',
+    applyBtn: 'ai-cleaning-card-apply-btn',
+    retryBtn: 'ai-cleaning-card-retry-btn',
+    progress: 'ai-cleaning-card-progress',
+  },
   aiQueryCard: {
     root: (queryId) => `ai-query-card-${queryId}`,
     openInExplorer: (queryId) => `ai-query-card-${queryId}-open-in-explorer`,
@@ -317,5 +329,6 @@ export const TestId = {
   validationReport: {
     validationReport: `validationReport`,
     cellMessages: `messages-cell`,
+    askAssistantBtn: 'validation-report-ask-assistant-btn',
   },
 }

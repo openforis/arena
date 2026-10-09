@@ -1,6 +1,7 @@
 import React from 'react'
 
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
+import { isRecordEditChangeSet } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import type {
   AssistantMessage,
@@ -19,6 +20,7 @@ import { getProposedChangeSetId, getToolRowLabel } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { QueryCard } from './analysis/QueryCard'
+import { RecordEditCard } from './cleaning/RecordEditCard'
 import { ChangeSetCard } from './ChangeSetCard'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
@@ -79,14 +81,24 @@ const AnswerPart = ({
   return (
     <>
       <ToolRow interrupted={part.state === 'running' && !streaming} part={part} />
-      {cardState && (
-        <ChangeSetCard
-          busy={api.busy}
-          cardState={cardState}
-          onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
-          onDiscard={() => api.discard(cardState.changeSet.id)}
-        />
-      )}
+      {cardState &&
+        (isRecordEditChangeSet(cardState.changeSet) ? (
+          <RecordEditCard
+            busy={api.busy}
+            changeSet={cardState.changeSet}
+            onApply={(operationIds, onProgress) =>
+              api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)
+            }
+            results={cardState.results}
+          />
+        ) : (
+          <ChangeSetCard
+            busy={api.busy}
+            cardState={cardState}
+            onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
+            onDiscard={() => api.discard(cardState.changeSet.id)}
+          />
+        ))}
       {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
     </>
   )

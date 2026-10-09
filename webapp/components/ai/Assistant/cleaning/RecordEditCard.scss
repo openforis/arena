@@ -1,0 +1,96 @@
+@use '~@webapp/style/vars' as *;
+
+.ai-cleaning-card {
+  border: 1px solid $greyBorder;
+  border-radius: 4px;
+  padding: 0.5rem;
+  background-color: $white;
+
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  &__summary {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+
+  &__record {
+    border-top: $tableRowBorder;
+    padding: 0.25rem 0;
+  }
+
+  &__record-header {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+  }
+
+  &__new-errors {
+    color: $orange;
+    font-size: 0.8rem;
+  }
+
+  &__edit {
+    display: flex;
+    gap: 0.25rem;
+    align-items: flex-start;
+    padding: 0.25rem 0;
+  }
+
+  &__path {
+    font-size: 0.8rem;
+    color: $grey;
+  }
+
+  &__from {
+    text-decoration: line-through;
+  }
+
+  &__badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    padding: 0 0.4rem;
+    border-radius: 8px;
+
+    &--fixes {
+      background-color: $greenLight;
+      color: $green;
+    }
+
+    &--stillInvalid {
+      background-color: $pink;
+      color: $red;
+    }
+
+    &--noErrors {
+      background-color: $greyAppBg;
+    }
+  }
+
+  &__result {
+    font-size: 0.8rem;
+
+    &--conflict {
+      color: $orange;
+    }
+
+    &--failed {
+      color: $colorError;
+    }
+  }
+
+  &__progress,
+  &__counts {
+    font-size: 0.8rem;
+    margin-top: 0.25rem;
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+}
