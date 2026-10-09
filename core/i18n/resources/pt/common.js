@@ -1493,17 +1493,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     thinking: 'Agregando eventos e pedindo à IA para resumir…',
     error: 'Falha ao obter o resumo: {{message}}',
   },
-  aiChatbot: {
-    open: 'Ajuda e documentação',
-    title: 'Ajuda e documentação',
-    empty: 'Pergunte-me qualquer coisa sobre o Open Foris Arena.',
-    placeholder: 'Digite sua pergunta…',
-    send: 'Enviar',
-    stop: 'Parar',
-    clear: 'Limpar',
-    error: 'Erro do chatbot: {{message}}',
-    language: 'Idioma da resposta',
-  },
+
   aiAssistant: {
     open: 'Assistente de IA',
     title: 'Assistente de IA',

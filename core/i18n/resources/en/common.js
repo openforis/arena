@@ -1482,17 +1482,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     thinking: 'Aggregating events and asking the AI to summarize…',
     error: 'Failed to fetch summary: {{message}}',
   },
-  aiChatbot: {
-    open: 'Help & documentation',
-    title: 'Help & documentation',
-    empty: 'Ask me anything about Open Foris Arena.',
-    placeholder: 'Type your question…',
-    send: 'Send',
-    stop: 'Stop',
-    clear: 'Clear',
-    error: 'Chatbot error: {{message}}',
-    language: 'Response language',
-  },
+
   aiAssistant: {
     open: 'AI assistant',
     title: 'AI assistant',

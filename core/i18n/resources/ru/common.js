@@ -1581,17 +1581,7 @@ $t(common.cantUndoWarning)`,
     thinking: 'Собираем события и запрашиваем у ИИ сводку…',
     error: 'Не удалось получить сводку: {{message}}',
   },
-  aiChatbot: {
-    open: 'Справка и документация',
-    title: 'Справка и документация',
-    empty: 'Задайте мне любой вопрос об Open Foris Arena.',
-    placeholder: 'Введите ваш вопрос…',
-    send: 'Отправить',
-    stop: 'Остановить',
-    clear: 'Очистить',
-    error: 'Ошибка чат-бота: {{message}}',
-    language: 'Язык ответа',
-  },
+
   aiAssistant: {
     open: 'ИИ-помощник',
     title: 'ИИ-помощник',
