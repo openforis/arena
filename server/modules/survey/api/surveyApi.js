@@ -20,6 +20,7 @@ import * as Response from '../../../utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { requireAiFeaturesEnabled } from '../../ai/api/aiMiddleware'
+import { assertSurveyAiAllowed } from '../../ai/service/surveyAiPolicyService'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
@@ -332,6 +333,8 @@ export const init = (app) => {
         if (includeAiDescriptions) {
           // fail fast (403/404 with a clear key) instead of a job that silently skips the descriptions
           assertFeatureEnabled('dataDictionary', user)
+          // the survey AI policy must allow the schema to reach the provider
+          await assertSurveyAiAllowed({ user, surveyId: Number(surveyId), dataClass: 'schema' })
         }
         const job = SurveyService.startSchemaSummaryExportJob({
           user,
@@ -473,6 +476,7 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
+        await assertSurveyAiAllowed({ user, surveyId: Number(surveyId), dataClass: 'schema' })
         const job = SurveyService.startNodeDefsTranslationJob({ user, surveyId })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
