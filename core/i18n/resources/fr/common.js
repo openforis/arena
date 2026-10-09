@@ -1613,6 +1613,36 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     thinking: "Agrégation des événements et demande de résumé à l'IA…",
     error: 'Échec de la récupération du résumé : {{message}}',
   },
+  aiEngine: {
+    unavailableTitle: 'Non disponible',
+    unavailable: {
+      localServerNotEnabled: "Aucun serveur d'IA local n'est activé.",
+      localServerUnreachable: "Le serveur d'IA local est injoignable.",
+      localServerNoModel: "Le modèle choisi pour le serveur d'IA local n'est pas disponible.",
+      gatewayNotConfigured: "Aucun fournisseur d'IA n'est configuré pour votre compte.",
+      policyForbidsCloud: "La politique d'IA de l'enquête n'autorise pas les modèles cloud pour ces données.",
+      policyForbidsOrgHosted:
+        "La politique d'IA de l'enquête n'autorise pas les serveurs de l'organisation pour ces données.",
+      policyForbidsAll: "La politique d'IA de l'enquête désactive l'IA pour ces données.",
+    },
+    action: {
+      turnOnLocalServer: "Activer un serveur d'IA local",
+      chooseModel: 'Choisir un modèle',
+      configureProvider: "Configurer un fournisseur d'IA",
+      retry: 'Réessayer',
+      changePolicy: "Modifier la politique d'IA de l'enquête",
+      openSettings: "Ouvrir les paramètres d'IA",
+    },
+    nowUsing: 'Utilisé maintenant : {{location}}',
+    consent: {
+      title: "Utiliser votre serveur d'IA local ?",
+      destination: 'Les requêtes de cette enquête seront envoyées à {{baseUrl}} ({{location}}).',
+      destinationNoSurvey: 'Les requêtes seront envoyées à {{baseUrl}} ({{location}}).',
+      model: 'Modèle : {{modelId}}',
+      continue: 'Continuer',
+      useOther: 'Utiliser un autre moteur',
+    },
+  },
 
   aiAssistant: {
     open: 'Assistant IA',
@@ -1763,6 +1793,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     orgHosted: "Serveur de l'organisation",
     onDevice: 'Sur cet appareil',
     onDeviceWithEngine: 'Sur cet appareil · {{engine}}',
+    orgHostedWithEngine: "Serveur de l'organisation · {{engine}}",
     ariaLabel: 'Données traitées par : {{location}}',
     modelTitle: '{{location}} ({{model}})',
   },

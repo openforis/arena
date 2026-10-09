@@ -1602,6 +1602,35 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     thinking: 'Agregando eventos e pedindo à IA para resumir…',
     error: 'Falha ao obter o resumo: {{message}}',
   },
+  aiEngine: {
+    unavailableTitle: 'Indisponível',
+    unavailable: {
+      localServerNotEnabled: 'Nenhum servidor de IA local está ativado.',
+      localServerUnreachable: 'Não é possível conectar ao servidor de IA local.',
+      localServerNoModel: 'O modelo escolhido para o servidor de IA local não está disponível.',
+      gatewayNotConfigured: 'Nenhum provedor de IA está configurado para sua conta.',
+      policyForbidsCloud: 'A política de IA da pesquisa não permite modelos na nuvem para estes dados.',
+      policyForbidsOrgHosted: 'A política de IA da pesquisa não permite servidores da organização para estes dados.',
+      policyForbidsAll: 'A política de IA da pesquisa desativa a IA para estes dados.',
+    },
+    action: {
+      turnOnLocalServer: 'Ativar um servidor de IA local',
+      chooseModel: 'Escolher um modelo',
+      configureProvider: 'Configurar um provedor de IA',
+      retry: 'Tentar novamente',
+      changePolicy: 'Alterar a política de IA da pesquisa',
+      openSettings: 'Abrir as configurações de IA',
+    },
+    nowUsing: 'Usando agora: {{location}}',
+    consent: {
+      title: 'Usar seu servidor de IA local?',
+      destination: 'As solicitações desta pesquisa irão para {{baseUrl}} ({{location}}).',
+      destinationNoSurvey: 'As solicitações irão para {{baseUrl}} ({{location}}).',
+      model: 'Modelo: {{modelId}}',
+      continue: 'Continuar',
+      useOther: 'Usar outro mecanismo',
+    },
+  },
 
   aiAssistant: {
     open: 'Assistente de IA',
@@ -1749,6 +1778,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     orgHosted: 'Servidor da organização',
     onDevice: 'Neste dispositivo',
     onDeviceWithEngine: 'Neste dispositivo · {{engine}}',
+    orgHostedWithEngine: 'Servidor da organização · {{engine}}',
     ariaLabel: 'Os dados são processados em: {{location}}',
     modelTitle: '{{location}} ({{model}})',
   },
