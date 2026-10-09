@@ -7,8 +7,8 @@ import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailabil
 
 export type AssistantArea = AssistantPromptArea
 
-// tab order (D2 inserts analysis, D3 cleaning)
-export const assistantAreas: AssistantArea[] = ['design', 'help']
+// tab order (D3 adds cleaning)
+export const assistantAreas: AssistantArea[] = ['design', 'analysis', 'help']
 
 export type AssistantAreaStatus = {
   area: AssistantArea
@@ -44,7 +44,7 @@ const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaSt
  * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
  * @returns {AssistantAreaStatus} The status.
  */
-const fromAvailability = (
+export const fromAvailability = (
   area: AssistantArea,
   availability: AiFeatureAvailability | AiEngineFeatureAvailability
 ): AssistantAreaStatus => {

@@ -3,12 +3,14 @@ import './Assistant.scss'
 import React, { useCallback, useEffect, useRef } from 'react'
 
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
+import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import { RecordDataSharedNote } from './analysis/RecordDataSharedNote'
 import { AssistantChat } from './AssistantChat'
 import { AssistantHistory } from './AssistantHistory'
 import type { AssistantArea, AssistantAreaStatus } from './assistantAreas'
@@ -16,6 +18,13 @@ import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
 import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
 import { useAssistantPanel } from './useAssistantPanel'
+
+// D3 adds cleaning (the Record type makes a missing area a type error)
+const areaTabLabelKeys: Record<AssistantArea, string> = {
+  design: 'aiAssistant.tabs.design',
+  analysis: 'aiAnalysis.area',
+  help: 'aiAssistant.tabs.help',
+}
 
 /**
  * Area tabs (disabled while an answer runs).
@@ -50,7 +59,7 @@ const AssistantTabs = ({
             role="tab"
             type="button"
           >
-            {t(`aiAssistant.tabs.${tabArea}`)}
+            {t(areaTabLabelKeys[tabArea])}
           </button>
         ))}
     </div>
@@ -177,7 +186,12 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
     >
       <div className="ai-assistant-panel__header">
         <h2 className="ai-assistant-panel__title">{t('aiAssistant.title')}</h2>
-        <AiFeatureDataLocationBadge compact feature={assistantAreaFeatures[area]} />
+        <AiFeatureDataLocationBadge
+          compact
+          dataClass={area === 'analysis' ? getConversationDataClass(api.conversation) : undefined}
+          feature={assistantAreaFeatures[area]}
+        />
+        <RecordDataSharedNote conversation={api.conversation} />
         <AssistantMenu api={api} />
         <ButtonIconClose label="aiAssistant.close" onClick={closeAssistantPanel} testId={TestId.aiAssistant.closeBtn} />
       </div>

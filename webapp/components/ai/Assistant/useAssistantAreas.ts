@@ -11,6 +11,7 @@ import { useSurveyInfo } from '@webapp/store/survey'
 import * as SurveyStatusState from '@webapp/store/survey/status/state'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
+import { useAnalysisAreaStatus } from './analysis/useAnalysisArea'
 import { getDesignAreaStatus, getHelpAreaStatus, parseAppPath, type AssistantAreaStatus } from './assistantAreas'
 
 export type AssistantAreasInfo = { statuses: AssistantAreaStatus[]; module: string | null; subModule: string | null }
@@ -25,6 +26,7 @@ export const useAssistantAreas = (): AssistantAreasInfo => {
   const helpAvailability = useAiFeatureAvailability('chatbot')
   const designEnabled = useAiFeatureEnabled(AiFeatureCategory.assistant)
   const helpEnabled = useAiFeatureEnabled(AiFeatureCategory.chat)
+  const analysisStatus = useAnalysisAreaStatus()
   const surveyInfo = useSurveyInfo()
   const canEditSurvey = useAuthCanEditSurvey()
   const hasDraftSurvey = useSelector(
@@ -38,6 +40,7 @@ export const useAssistantAreas = (): AssistantAreasInfo => {
       hasDraftSurvey,
       availability: designAvailability,
     }),
+    analysisStatus,
     getHelpAreaStatus({ categoryEnabled: helpEnabled, availability: helpAvailability }),
   ]
   return { statuses, ...parseAppPath(pathname) }

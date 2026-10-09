@@ -3,6 +3,7 @@ import './AiDataLocationBadge.scss'
 import React from 'react'
 import classNames from 'classnames'
 
+import type { AiDataClass } from '@common/ai/features'
 import type { AiHostingClass } from '@common/ai/policy'
 
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -63,11 +64,20 @@ export const AiDataLocationBadge = (props: Props) => {
 /**
  * Data-location badge of a feature (location from useAiFeatureAvailability).
  * @param {object} props - Props.
+ * @param {AiDataClass} [props.dataClass] - Data class of the request (the assistant passes its conversation's).
  * @param {string} props.feature - Feature key.
  * @param {boolean} [props.compact] - Icon only.
  * @returns {React.ReactElement|null} The badge.
  */
-export const AiFeatureDataLocationBadge = ({ feature, compact = false }: { feature: string; compact?: boolean }) => {
-  const { location } = useAiFeatureAvailability(feature)
+export const AiFeatureDataLocationBadge = ({
+  feature,
+  dataClass,
+  compact = false,
+}: {
+  feature: string
+  dataClass?: AiDataClass
+  compact?: boolean
+}) => {
+  const { location } = useAiFeatureAvailability(feature, { dataClass })
   return <AiDataLocationBadge {...location} compact={compact} />
 }
