@@ -3,11 +3,11 @@ import './AiExplainPanel.scss'
 import React, { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
-import * as API from '@webapp/service/api'
+import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
-import { useSurveyId } from '@webapp/store/survey'
+import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
 const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   const i18n = useI18n()
@@ -15,6 +15,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   // which mangles quoted identifiers (e.g. Postgres column names) in
   // server-side error strings. Render this template via unescapeHtml.
   const tUnescaped = useI18nT({ unescapeHtml: true })
+  const survey = useSurvey()
   const surveyId = useSurveyId()
   const cancelRef = useRef(null)
 
@@ -31,7 +32,8 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
     setDone(false)
 
     setError(null)
-    const cancel = API.aiExpression.explainStream({
+    const cancel = AiWorkflows.explainExpression({
+      survey,
       surveyId,
       nodeDefUuid,
       expression,
@@ -39,7 +41,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
       onChunk: (chunk) => setText((prev) => prev + chunk),
       onDone: () => setDone(true),
       onError: (err) => {
-        setError(err?.message || 'unknown')
+        setError(err)
         setDone(true)
       },
     })
@@ -47,7 +49,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
     return () => {
       cancelRef.current?.()
     }
-  }, [surveyId, nodeDefUuid, expression, errorMessage])
+  }, [survey, surveyId, nodeDefUuid, expression, errorMessage])
 
   const onCancel = () => {
     cancelRef.current?.()
@@ -66,9 +68,9 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
 
         {error ? (
           <div className="ai-explain-panel__error">
-            {error === 'aiRequestTimeout'
+            {getAiErrorKey(error) === 'aiRequestTimeout'
               ? i18n.t('aiExpression.explain.timeout')
-              : tUnescaped('aiExpression.explain.error', { message: error })}
+              : tUnescaped('aiExpression.explain.error', { message: getAiErrorMessage({ error, i18n }) })}
           </div>
         ) : null}
       </ModalBody>
