@@ -80,6 +80,7 @@ $t(common.pressRefreshToReloadPage)`,
   userNotInvitedToAnySurvey: `User not invited to any survey`,
   userSurveys: 'User Surveys',
   usersBackup: {
+    menu: 'Backup / Restore',
     backup: 'Backup users',
     backupTitle: 'Backup users',
     backupInfo:

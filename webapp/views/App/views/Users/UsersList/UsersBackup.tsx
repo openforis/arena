@@ -4,7 +4,16 @@ import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
-import { Button, ButtonDownload, Dropzone, Modal, ModalBody, ModalFooter, RadioButtonGroup } from '@webapp/components'
+import {
+  Button,
+  ButtonDownload,
+  ButtonMenu,
+  Dropzone,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  RadioButtonGroup,
+} from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
@@ -173,15 +182,24 @@ export const UsersBackupButtons = () => {
 
   return (
     <>
-      <Button
-        iconClassName="icon-download2 icon-14px"
-        label="usersView:usersBackup.backup"
-        onClick={() => setOpenModal('export')}
-      />
-      <Button
-        iconClassName="icon-upload2 icon-14px"
-        label="usersView:usersBackup.restore"
-        onClick={() => setOpenModal('import')}
+      <ButtonMenu
+        iconClassName="icon-cog icon-14px"
+        label="usersView:usersBackup.menu"
+        items={[
+          {
+            key: 'users-backup',
+            iconClassName: 'icon-download2 icon-14px',
+            label: 'usersView:usersBackup.backup',
+            onClick: () => setOpenModal('export'),
+          },
+          {
+            key: 'users-restore',
+            iconClassName: 'icon-upload2 icon-14px',
+            label: 'usersView:usersBackup.restore',
+            onClick: () => setOpenModal('import'),
+          },
+        ]}
+        variant="outlined"
       />
       {openModal === 'export' && <UsersBackupExportModal onClose={closeModal} />}
       {openModal === 'import' && <UsersBackupImportModal onClose={closeModal} />}
