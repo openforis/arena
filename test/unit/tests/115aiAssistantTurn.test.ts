@@ -299,5 +299,19 @@ describe('runAssistantTurn', () => {
       expect(model.doStreamCalls).toHaveLength(1)
       expect(answerOf(result).status).toBe('done')
     })
+
+    test('a data tool makes the turn re-resolve with data, and the model receives the tool', async () => {
+      const dataTool: AiTool = { ...makeTool('test_data', async () => ({ ok: true })), dataClass: 'data' }
+      const model = scriptedModel(() => textStream('ok'))
+      const calls: any[] = []
+      const resolve = async (params: any) => {
+        calls.push(params)
+        return { model, engine: localEngine }
+      }
+      const access = { effective: { schema: 'onDevice', data: 'onDevice' } as any, hostingClass: 'onDevice' as const }
+      await run({ tools: [dataTool], access, extra: { resolve } })
+      expect(calls.map((call) => call.dataClass)).toEqual(['schema', 'data'])
+      expect(model.doStreamCalls[0].tools?.map((tool: any) => tool.name)).toEqual(['test_data'])
+    })
   })
 })
