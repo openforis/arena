@@ -4,7 +4,13 @@ import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
 import { getQueryResultColumns, toResultRows } from './queryResult'
-import { canViewCurrentSurvey, fitListToBudget, getAnalysisContext, toolError } from './toolResults'
+import {
+  canViewCurrentSurvey,
+  fitListToBudget,
+  getAnalysisContext,
+  toolError,
+  toRequestErrorResult,
+} from './toolResults'
 
 export const aggregateRowsMax = 200
 export const rawRowsMax = 50
@@ -24,19 +30,12 @@ const unknownQuery = (queryId: string) =>
   toolError('unknownQuery', `Unknown query "${queryId}": propose it with query_propose and use the returned queryId`)
 
 /**
- * Turns a timeout into a result the model can act on; other errors are re-thrown.
+ * Turns an expected request failure into a result the model can act on; other errors are re-thrown.
  * @param {any} error - The error.
  * @returns {object} The error result.
  */
-const handleQueryError = (error: any) => {
-  if (error?.key === 'queryTimeout') {
-    return toolError(
-      'queryTimeout',
-      'The query took too long. Aggregate the data or add a filter, then propose a new query.'
-    )
-  }
-  throw error
-}
+const handleQueryError = (error: any) =>
+  toRequestErrorResult(error, 'The query took too long. Aggregate the data or add a filter, then propose a new query.')
 
 /**
  * Returns the request parameters of a stored query.

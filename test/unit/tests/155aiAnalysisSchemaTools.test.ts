@@ -1,6 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
+import SystemError from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 
 import { listEntitiesTool } from '@webapp/ai/tools/analysis/listEntities'
@@ -166,6 +167,26 @@ describe('category_findItems', () => {
     })
     expect(result.items).toHaveLength(20)
     expect(result).toMatchObject({ total: 30, truncated: true })
+  })
+
+  test('large categories: a timeout is queryTimeout, a 403 is noPermission, other errors are thrown', async () => {
+    const ctx = newAnalysisToolContext({ survey: withBigCategory('tree_type') })
+    const input = { attribute: 'tree_type', search: 'x' }
+    const runWith = (failure: unknown) =>
+      runTool(
+        createFindCategoryItemsTool({
+          api: newFakeAnalysisApi({ fetchCategoryItems: () => Promise.reject(failure) }).api,
+        }),
+        input,
+        ctx
+      )
+    const timeout = await runWith(new SystemError('queryTimeout'))
+    expect(timeout.error.code).toBe('queryTimeout')
+    expect(timeout.error.message).toMatch(/search/)
+    const forbidden = await runWith(Object.assign(new Error('forbidden'), { response: { status: 403 } }))
+    expect(forbidden.error.code).toBe('noPermission')
+    const failure = new Error('boom')
+    await expect(runWith(failure)).rejects.toBe(failure)
   })
 
   test('below the first level of a large category: largeCategoryLevel, no request', async () => {

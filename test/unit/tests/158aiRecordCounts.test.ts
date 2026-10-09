@@ -45,6 +45,14 @@ describe('records_countByStep', () => {
     expect(calls[0].params.signal).toBe(ctx.signal)
   })
 
+  test('a 403 becomes noPermission', async () => {
+    const forbidden = Object.assign(new Error('forbidden'), { response: { status: 403 } })
+    const { api } = newFakeAnalysisApi({ fetchRecordsCountByStep: () => Promise.reject(forbidden) })
+    const [countByStepTool] = createRecordCountTools({ api })
+    const ctx = newAnalysisToolContext({ survey })
+    expect((await runTool(countByStepTool, {}, ctx)).error.code).toBe('noPermission')
+  })
+
   test('a timeout becomes queryTimeout; other errors are thrown', async () => {
     const timeout = newFakeAnalysisApi({
       fetchRecordsCountByStep: () => Promise.reject(new SystemError('queryTimeout')),

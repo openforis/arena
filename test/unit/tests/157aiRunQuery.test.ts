@@ -136,6 +136,17 @@ describe('query_run', () => {
     })
   })
 
+  test('a 403 becomes noPermission with a hint', async () => {
+    const forbidden = Object.assign(new Error('forbidden'), { response: { status: 403 } })
+    const { api } = newFakeAnalysisApi({ fetchQueryRows: () => Promise.reject(forbidden) })
+    const [, runQueryTool] = createRunQueryTools({ api })
+    const ctx = newAnalysisToolContext({ survey })
+    await runTool(proposeQueryTool, aggregateInput, ctx)
+    const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
+    expect(result.error.code).toBe('noPermission')
+    expect(result.error.message).toMatch(/permission/)
+  })
+
   test('a timeout becomes queryTimeout with a hint; other errors are thrown', async () => {
     const timeout = newFakeAnalysisApi({ fetchQueryRows: () => Promise.reject(new SystemError('queryTimeout')) })
     const [, runQueryTool] = createRunQueryTools({ api: timeout.api })

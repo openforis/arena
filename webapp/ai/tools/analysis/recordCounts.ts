@@ -5,7 +5,13 @@ import * as RecordStep from '@core/record/recordStep'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import { canViewCurrentSurvey, fitListToBudget, getAnalysisContext, toolError } from './toolResults'
+import {
+  canViewCurrentSurvey,
+  fitListToBudget,
+  getAnalysisContext,
+  toolError,
+  toRequestErrorResult,
+} from './toolResults'
 
 export const dayRangeMaxDays = 366
 export const monthRangeMaxDays = 3660
@@ -69,16 +75,12 @@ const sumByMonth = (days: PeriodCount[]): PeriodCount[] => {
 }
 
 /**
- * Turns a timeout into a result the model can act on; other errors are re-thrown.
+ * Turns an expected request failure into a result the model can act on; other errors are re-thrown.
  * @param {any} error - The error.
  * @returns {object} The error result.
  */
-const handleCountError = (error: any) => {
-  if (error?.key === 'queryTimeout') {
-    return toolError('queryTimeout', 'The count took too long. Try a shorter date range.')
-  }
-  throw error
-}
+const handleCountError = (error: any) =>
+  toRequestErrorResult(error, 'The count took too long. Try a shorter date range.')
 
 /**
  * Creates records_countByStep and records_countOverTime.
