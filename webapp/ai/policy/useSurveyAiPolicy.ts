@@ -22,22 +22,21 @@ export const useSurveyAiPolicy = ({ skip = false }: { skip?: boolean } = {}): {
 } => {
   const surveyId = useSurveyId()
   const [, forceRender] = useReducer((count: number) => count + 1, 0)
-  const [error, setError] = useState<unknown>(null)
+  // the error is kept with its survey id, so it belongs to the current survey only
+  const [failure, setFailure] = useState<{ surveyId: unknown; error: unknown } | null>(null)
 
   useEffect(() => {
-    // the error belongs to the current survey only
-    setError(null)
     if (skip || !surveyId) return undefined
     let active = true
     const load = (): void => {
       fetchSurveyAiPolicy(surveyId)
         .then(() => {
           if (!active) return
-          setError(null)
+          setFailure(null)
           forceRender()
         })
         .catch((loadError: unknown) => {
-          if (active) setError(loadError)
+          if (active) setFailure({ surveyId, error: loadError })
         })
     }
     load()
@@ -50,5 +49,6 @@ export const useSurveyAiPolicy = ({ skip = false }: { skip?: boolean } = {}): {
     }
   }, [skip, surveyId])
 
+  const error = !skip && failure && failure.surveyId === surveyId ? failure.error : null
   return { state: skip || !surveyId ? null : peekSurveyAiPolicy(surveyId), error }
 }
