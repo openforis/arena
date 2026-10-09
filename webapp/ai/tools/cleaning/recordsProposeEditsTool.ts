@@ -2,7 +2,7 @@ import { z } from 'zod'
 import { Dates } from '@openforis/arena-core'
 
 import type { AiTool } from '@webapp/ai/tools/types'
-import { toolError } from '@webapp/ai/tools/analysis/toolResults'
+import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
 
@@ -33,6 +33,22 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>
 
+// same limit as the server's batch endpoint (records per Apply)
+const RECORDS_PER_PROPOSAL_MAX = 50
+
+const TIMEOUT_HINT = 'Loading the records is too slow. Retry with fewer edits.'
+
+const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+  area: ['cleaning'],
+  dataClass: 'data',
+  effect: 'propose',
+  requires: canCleanseCurrentSurvey,
+}
+
+const invalidProposal = (message: string, issues: { operation: number; field: string; message: string }[]) => ({
+  error: { ...fitListToBudget({ code: 'invalidProposal', message, issues }, 'issues') },
+})
+
 /**
  * Creates records_proposeEdits.
  * @param {object} deps - Dependencies.
@@ -47,16 +63,13 @@ export const createRecordsProposeEditsTool = ({
   api: CleaningApi
   getI18n: () => CleaningI18n
 }): AiTool<Input, unknown> => ({
+  ...common,
   name: 'records_proposeEdits',
   description:
     'Proposes attribute value corrections in records, shown to the user as a change set to review and apply. ' +
     `Fix one pattern per call, at most ${RECORD_EDITS_MAX} edits. Edits the user may not make, invalid values and ` +
     'unchanged values are returned in `rejected`.',
   inputSchema,
-  area: ['cleaning'],
-  dataClass: 'data',
-  effect: 'propose',
-  requires: canCleanseCurrentSurvey,
   /**
    * Builds the change set and hands it to the conversation; nothing is written.
    * @param {Input} input - Tool input.
@@ -70,29 +83,43 @@ export const createRecordsProposeEditsTool = ({
         `At most ${RECORD_EDITS_MAX} edits per change set: split into smaller change sets.`
       )
     }
-    const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
-    const { drafts, rejected } = await buildRecordEditProposal({
-      api,
-      i18n: getI18n(),
-      user: ctx.user,
-      survey,
-      surveyId,
-      cycle: cycle as string,
-      lang,
-      timezoneOffset: Dates.getTimezoneOffset(),
-      edits: edits.map((edit) => ({ ...edit, value: edit.value ?? null })),
-    })
-    if (drafts.length === 0) {
-      return {
-        error: {
-          code: 'invalidProposal',
-          message: 'No edit can be proposed.',
-          issues: rejected.map(({ index, code, message }) => ({ operation: index, field: code, message })),
+    if (new Set(edits.map((edit) => edit.recordUuid)).size > RECORDS_PER_PROPOSAL_MAX) {
+      return invalidProposal('Too many records in one change set.', [
+        {
+          operation: 0,
+          field: 'tooManyRecords',
+          message: `At most ${RECORDS_PER_PROPOSAL_MAX} records per change set: split into smaller change sets.`,
         },
-      }
+      ])
     }
-    const changeSet = buildChangeSet({ drafts, survey, summary })
-    ctx.onChangeSet(changeSet)
-    return { changeSetId: changeSet.id, proposed: drafts.length, rejected, shownToUser: true }
+    const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
+    if (!cycle) return toolError('noCycle', 'No survey cycle is selected: ask the user to open one.')
+    try {
+      const { drafts, rejected } = await buildRecordEditProposal({
+        api,
+        i18n: getI18n(),
+        user: ctx.user,
+        survey,
+        surveyId,
+        cycle,
+        lang,
+        timezoneOffset: Dates.getTimezoneOffset(),
+        signal: ctx.signal,
+        edits: edits.map((edit) => ({ ...edit, value: edit.value ?? null })),
+      })
+      if (drafts.length === 0) {
+        return invalidProposal(
+          'No edit can be proposed.',
+          rejected.map(({ index, code, message }) => ({ operation: index, field: code, message }))
+        )
+      }
+      const changeSet = buildChangeSet({ drafts, survey, summary })
+      ctx.onChangeSet(changeSet)
+      // `operations` is what the history note of the agent reads
+      const result = { changeSetId: changeSet.id, proposed: drafts.length, operations: drafts.length, rejected }
+      return { ...fitListToBudget(result, 'rejected'), shownToUser: true }
+    } catch (error) {
+      return toRequestErrorResult(error, TIMEOUT_HINT)
+    }
   },
 })
