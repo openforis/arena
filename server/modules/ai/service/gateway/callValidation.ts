@@ -4,7 +4,7 @@
  * only, no files/provider options, capped output, bounded prompt size.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
-import { AiFeaturePermission, getAiFeature, isGatewayFeature } from '@common/ai/features'
+import { AiFeaturePermission, getAiFeature, isDeclaredDataClassAllowed, isGatewayFeature } from '@common/ai/features'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
 
 const PAYLOAD_TOO_LARGE = 413
@@ -39,7 +39,7 @@ export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
     throw new SystemError('aiFeatureUnknown', { feature: String(feature).slice(0, 64) }, StatusCodes.BAD_REQUEST)
   }
   const featureDef = getAiFeature(feature)
-  if (dataClass !== featureDef.dataClass) throw invalid('dataClass')
+  if (!isDeclaredDataClassAllowed({ featureDef, dataClass })) throw invalid('dataClass')
   if (typeof stream !== 'boolean') throw invalid('stream')
   if (!isObject(call)) throw invalid('call')
   const surveyId = parseSurveyId(body.surveyId, featureDef.permission !== AiFeaturePermission.loggedIn)

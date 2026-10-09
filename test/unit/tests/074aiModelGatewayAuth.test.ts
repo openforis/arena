@@ -48,6 +48,7 @@ describe('gateway feature → permission middleware mapping', () => {
     activityLogSummary: AuthMiddleware.requireSurveyViewPermission,
     chatbot: AuthMiddleware.requireLoggedInUser,
     assistantDesign: AuthMiddleware.requireSurveyEditPermission,
+    assistantAnalysis: AuthMiddleware.requireRecordListViewPermission,
   }
   const gatewayFeatures = Object.keys(AiFeatures).filter((feature) => isGatewayFeature(feature))
 
