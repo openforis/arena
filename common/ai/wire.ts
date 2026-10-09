@@ -1,6 +1,6 @@
 /**
  * Wire format of the AI gateway (`POST /api/ai/model`): what crosses between the server proxy and the
- * browser model. Only text/reasoning content, finish data and mapped error keys are forwarded; provider
+ * browser model. Only text/reasoning content, client tool calls, finish data and mapped error keys are forwarded; provider
  * metadata, raw chunks and upstream request/response bodies stay on the server.
  */
 import type {
@@ -25,6 +25,8 @@ export type AiGatewayCall = Pick<
   | 'seed'
   | 'stopSequences'
   | 'responseFormat'
+  | 'tools'
+  | 'toolChoice'
 >
 
 export type AiGatewayRequest = {
@@ -46,7 +48,26 @@ const FORWARDED_TEXT_PARTS = new Set([
   'reasoning-end',
 ])
 
-const FORWARDED_CONTENT_TYPES = new Set(['text', 'reasoning'])
+const FORWARDED_CONTENT_TYPES = new Set(['text', 'reasoning', 'tool-call'])
+
+type ToolCallLike = {
+  type: 'tool-call'
+  toolCallId: string
+  toolName: string
+  input: string
+  providerExecuted?: boolean
+}
+
+// client tool calls only (the browser runs the tool); provider-executed ones stay on the server
+const isClientToolCall = (part: { type: string; providerExecuted?: boolean }): boolean =>
+  part.type === 'tool-call' && part.providerExecuted !== true
+
+const toWireToolCall = ({ toolCallId, toolName, input }: ToolCallLike) => ({
+  type: 'tool-call' as const,
+  toolCallId,
+  toolName,
+  input,
+})
 
 const withoutProviderMetadata = <T extends object>(value: T): T => {
   const copy = { ...value } as T & { providerMetadata?: unknown }
@@ -83,6 +104,8 @@ export const serializeStreamPart = (
       return { type: 'finish', finishReason: part.finishReason, usage: part.usage }
     case 'error':
       return { type: 'error', error: mapError(part.error) }
+    case 'tool-call':
+      return isClientToolCall(part) ? toWireToolCall(part as ToolCallLike) : null
     default:
       return null
   }
@@ -108,7 +131,9 @@ export const deserializeStreamPart = (json: any): LanguageModelV4StreamPart => {
  * @returns {object} The wire result.
  */
 export const serializeGenerateResult = (result: LanguageModelV4GenerateResult): object => ({
-  content: result.content.filter((part) => FORWARDED_CONTENT_TYPES.has(part.type)).map(withoutProviderMetadata),
+  content: result.content
+    .filter((part) => FORWARDED_CONTENT_TYPES.has(part.type) && (part.type !== 'tool-call' || isClientToolCall(part)))
+    .map((part) => (part.type === 'tool-call' ? toWireToolCall(part as ToolCallLike) : withoutProviderMetadata(part))),
   finishReason: result.finishReason,
   usage: result.usage,
   warnings: result.warnings ?? [],

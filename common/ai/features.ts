@@ -50,6 +50,8 @@ export type AiFeatureDef = {
   permission: AiFeaturePermission
   // true when the browser may call the model for this feature through POST /api/ai/model
   gateway: boolean
+  // true when the browser may send tool definitions and tool calls through the gateway (assistant areas)
+  tools?: boolean
 }
 
 const { chat, expressions, translation, dataDictionary, userActivity, dataQuery } = AiFeatureCategory
@@ -93,8 +95,8 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     permission: recordListView,
     gateway: true,
   },
-  // no survey content: the user's own questions only
-  chatbot: { key: 'chatbot', category: chat, dataClass: schema, permission: loggedIn, gateway: true },
+  // Help area of the assistant: no survey content, only the handbook tools
+  chatbot: { key: 'chatbot', category: chat, dataClass: schema, permission: loggedIn, gateway: true, tools: true },
   // server jobs
   dataDictionary: {
     key: 'dataDictionary',
