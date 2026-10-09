@@ -108,10 +108,13 @@ describe('gateway model: stream', () => {
     expect(error.key).toBe('aiNotConfigured')
   })
 
-  test('the abort signal reaches fetch', async () => {
+  test('aborting the caller signal aborts the signal fetch received', async () => {
     const { model, requests } = modelWith(() => sse([finish]))
     const controller = new AbortController()
     await streamTextChunks({ model, prompt: 'P', onChunk: () => {}, signal: controller.signal })
-    expect(requests[0].signal).toBeDefined()
+    const fetchSignal: AbortSignal = requests[0].signal
+    expect(fetchSignal.aborted).toBe(false)
+    controller.abort()
+    expect(fetchSignal.aborted).toBe(true)
   })
 })
