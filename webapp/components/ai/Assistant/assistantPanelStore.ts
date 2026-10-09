@@ -15,6 +15,8 @@ export type AssistantPanelState = {
   view: AssistantPanelView
   // composer text set by openWithDraft, never sent by itself
   draft: string | null
+  // area the draft was made for: another area's composer ignores it
+  draftArea: AssistantArea | null
 }
 
 export const initialAssistantPanelState: AssistantPanelState = {
@@ -24,6 +26,7 @@ export const initialAssistantPanelState: AssistantPanelState = {
   conversationId: null,
   view: 'chat',
   draft: null,
+  draftArea: null,
 }
 
 export type AssistantPanelStore = {
@@ -73,14 +76,16 @@ export const createAssistantPanelStore = (): AssistantPanelStore => {
         view: 'chat',
         // another area: another conversation
         conversationId: area === state.area ? state.conversationId : null,
+        // a draft made for another area is dropped
+        ...(area === state.draftArea ? {} : { draft: null, draftArea: null }),
         ...(byUser ? { userSelectedArea: area } : {}),
       }),
     setConversationId: (conversationId) => set({ conversationId, view: 'chat' }),
     showHistory: () => set({ view: 'history' }),
     showChat: () => set({ view: 'chat' }),
     openWithDraft: ({ area, draft }) =>
-      set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft }),
-    clearDraft: () => set({ draft: null }),
+      set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft, draftArea: area }),
+    clearDraft: () => set({ draft: null, draftArea: null }),
     reset: () => set(initialAssistantPanelState),
   }
 }

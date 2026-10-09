@@ -96,7 +96,7 @@ describe('query_propose', () => {
     ])
   })
 
-  test('is a schema propose tool of the analysis area', () => {
+  test('is a schema propose tool of the analysis and cleaning areas', () => {
     expect(proposeQueryTool).toMatchObject({
       name: 'query_propose',
       dataClass: 'schema',

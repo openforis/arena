@@ -33,7 +33,8 @@ const areaEmptyKeys: Record<AssistantArea, string> = {
 export const AssistantChat = ({ area, api }: { area: AssistantArea; api: AssistantConversationApi }) => {
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
-  const { draft } = useAssistantPanel()
+  const { draft: panelDraft, draftArea } = useAssistantPanel()
+  const draft = draftArea === area ? panelDraft : null
   const [appliedDraft, setAppliedDraft] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const { conversation, busy, applying, engineNotice } = api
@@ -89,6 +90,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
         {messages.map((message) => (
           <AssistantMessageView
             api={api}
+            area={area}
             changeSets={conversation?.changeSets ?? {}}
             isLast={message.id === lastId}
             key={message.id}

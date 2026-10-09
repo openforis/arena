@@ -2,6 +2,9 @@ import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
 import { buildRowContextDraft, cleaningRowContextMarker, parseRowContext } from '@common/ai/prompts/cleaningRowContext'
 
+import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
+import { normalizeLoadedConversation } from '@webapp/components/ai/Assistant/assistantPanelModel'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 import { analysisTools } from '@webapp/ai/tools/analysis'
 import { createCleaningTools } from '@webapp/ai/tools/cleaning'
@@ -103,8 +106,31 @@ describe('cleaning area', () => {
       view: 'chat',
       draft: 'Why?',
     })
+    expect(store.getState().draftArea).toBe('cleaning')
     store.clearDraft()
     expect(store.getState().draft).toBeNull()
+    expect(store.getState().draftArea).toBeNull()
+  })
+
+  test('a draft made for the cleaning area is dropped when another area is selected', () => {
+    const store = createAssistantPanelStore()
+    store.openWithDraft({ area: 'cleaning', draft: 'Why?' })
+    store.setArea('cleaning')
+    expect(store.getState().draft).toBe('Why?')
+    store.setArea('help', { byUser: true })
+    expect(store.getState()).toMatchObject({ draft: null, draftArea: null, area: 'help' })
+  })
+
+  test('a reopened cleaning conversation keeps its data class', () => {
+    const conversation = {
+      ...escalateConversationDataClass({
+        conversation: createConversation({ userUuid: 'u', surveyId: 1, area: 'cleaning' }),
+        dataClass: 'data',
+      }),
+    }
+    expect(normalizeLoadedConversation(conversation).dataClass).toBe('data')
+    const streaming = { ...conversation, messages: [{ id: 'm', role: 'assistant', status: 'streaming', parts: [] }] }
+    expect(normalizeLoadedConversation(streaming as any).dataClass).toBe('data')
   })
 
   test('cleaning conversations start as data', () => {
