@@ -1,5 +1,5 @@
 /**
- * What this browser can use for AI: the gateway (from the AI settings), the local server (probed) and device facts.
+ * What this browser can use for AI: the gateway (from the AI settings), the local server (probed) and the instance limits.
  * Pure store factory: the app instance is in capabilitiesStore.ts.
  */
 import { getLocalServerHostingClass } from '@common/ai/localServerAddress'
@@ -10,7 +10,6 @@ import { defaultLocalServerSettings } from './localServerSettings'
 import type { LocalServerProbeResult } from './localServerProbe'
 import type {
   AiCapabilities,
-  AiDeviceCapability,
   AiGatewayCapability,
   AiInstanceCapability,
   AiLocalServerCapability,
@@ -27,14 +26,12 @@ export type AiSettingsSnapshot = {
   orgHostedBaseUrls?: string[]
   policyCeilings?: AiPolicy
   maxPromptChars?: number
-  capabilityStats?: boolean
 }
 
 export type CapabilitiesStoreDeps = {
   loadSettings: (options: { force: boolean }) => Promise<AiSettingsSnapshot | null>
   loadLocalSettings: (userUuid: string | null) => AiLocalServerSettings
   probe: (params: { baseUrl: string; modelId: string | null }) => Promise<LocalServerProbeResult>
-  detectDevice: () => Promise<AiDeviceCapability>
 }
 
 export type AiCapabilitiesStore = {
@@ -44,17 +41,10 @@ export type AiCapabilitiesStore = {
   getLoadedFor: () => string | null | undefined
   load: (params: { userUuid: string | null }) => Promise<AiCapabilities>
   refresh: (params: { userUuid: string | null }) => Promise<AiCapabilities>
-  detectDevice: () => Promise<AiDeviceCapability>
   reset: () => void
   subscribe: (listener: () => void) => () => void
   notify: () => void
 }
-
-type NavigatorLike = {
-  gpu?: { requestAdapter?: () => Promise<unknown> }
-  deviceMemory?: number
-}
-type PromptApiLike = { availability?: () => Promise<unknown> } | undefined
 
 /**
  * Returns the gateway capability from the AI settings response.
@@ -120,45 +110,7 @@ export const buildLocalServerCapability = ({
 export const emptyCapabilities = (): AiCapabilities => ({
   localServer: buildLocalServerCapability({ localSettings: defaultLocalServerSettings(), probe: null, allowlist: [] }),
   gateway: buildGatewayCapability(null),
-  device: { webGpu: false, deviceMemoryGb: null, promptApi: null },
   instance: buildInstanceCapability(null),
-})
-
-const detectWebGpu = async (navigatorLike: NavigatorLike | undefined): Promise<boolean> => {
-  try {
-    const adapter = await navigatorLike?.gpu?.requestAdapter?.()
-    return !!adapter
-  } catch {
-    return false
-  }
-}
-
-const detectPromptApi = async (languageModel: PromptApiLike): Promise<string | null> => {
-  if (typeof languageModel?.availability !== 'function') return null
-  try {
-    return String(await languageModel.availability())
-  } catch {
-    return null
-  }
-}
-
-/**
- * Reads the device facts without downloading anything.
- * @param {object} params - Parameters.
- * @param {NavigatorLike} [params.navigatorLike] - The browser navigator.
- * @param {PromptApiLike} [params.languageModel] - The Prompt API global (LanguageModel), when present.
- * @returns {Promise<AiDeviceCapability>} WebGPU adapter availability, device memory and Prompt API availability.
- */
-export const detectDeviceCapabilities = async ({
-  navigatorLike,
-  languageModel,
-}: {
-  navigatorLike?: NavigatorLike
-  languageModel?: PromptApiLike
-}): Promise<AiDeviceCapability> => ({
-  webGpu: await detectWebGpu(navigatorLike),
-  deviceMemoryGb: typeof navigatorLike?.deviceMemory === 'number' ? navigatorLike.deviceMemory : null,
-  promptApi: await detectPromptApi(languageModel),
 })
 
 const emptySnapshot = emptyCapabilities()
@@ -190,7 +142,7 @@ export const isCapabilitiesLoadedForUser = (store: AiCapabilitiesStore, currentU
 
 /**
  * Creates a capabilities store.
- * @param {CapabilitiesStoreDeps} deps - Settings, local settings, probe and device readers.
+ * @param {CapabilitiesStoreDeps} deps - Settings, local settings and probe readers.
  * @returns {AiCapabilitiesStore} The store.
  */
 export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabilitiesStore => {
@@ -256,7 +208,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
         allowlist: instance.orgHostedBaseUrls,
       }),
       gateway: buildGatewayCapability(nextSettings),
-      device: capabilities.device,
       instance,
     }
     loadedFor = userUuid
@@ -290,12 +241,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
       return run({ userUuid, force: true })
     },
     reset,
-    detectDevice: async () => {
-      const device = await deps.detectDevice()
-      capabilities = { ...capabilities, device }
-      emit()
-      return device
-    },
     subscribe: (listener) => {
       listeners.add(listener)
       return () => {

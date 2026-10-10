@@ -91,8 +91,5 @@ export default {
     cloudWarning:
       "This address is neither on this device nor on the organisation's list of servers: the survey AI policy treats it as a cloud service.",
     deviceNote: 'These settings are stored in this browser only.',
-    capabilityStats: 'Share anonymous capability statistics',
-    capabilityStatsHint:
-      'Once per session: whether this browser has WebGPU and built-in AI, a memory range, the browser family and whether a local server is used. No user, address, model name or survey content.',
   },
 }

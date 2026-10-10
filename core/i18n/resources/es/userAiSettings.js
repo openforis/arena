@@ -91,8 +91,5 @@ export default {
     cloudWarning:
       'Esta dirección no está en este dispositivo ni en la lista de servidores de la organización: la política de IA de la encuesta la trata como un servicio en la nube.',
     deviceNote: 'Esta configuración se guarda solo en este navegador.',
-    capabilityStats: 'Compartir estadísticas anónimas de capacidades',
-    capabilityStatsHint:
-      'Una vez por sesión: si este navegador tiene WebGPU e IA integrada, un rango de memoria, la familia del navegador y si se usa un servidor local. Sin usuario, dirección, nombre de modelo ni contenido de encuestas.',
   },
 }

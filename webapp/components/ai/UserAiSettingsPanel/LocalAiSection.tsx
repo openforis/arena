@@ -31,22 +31,14 @@ const Button = ButtonJS as React.ComponentType<any>
 
 const LM_STUDIO_DOCS_URL = 'https://lmstudio.ai/docs'
 
-type Props = {
-  capabilityStats: boolean
-  onCapabilityStatsChange: (checked: boolean) => void
-}
-
 const loadSettings = (): AiLocalServerSettings =>
   loadLocalServerSettings({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid() })
 
 /**
- * Local AI server settings (this browser only, saved on change) and the capability statistics switch (user prefs,
- * saved with the panel).
- * @param {Props} props - Props.
+ * Local AI server settings (this browser only, saved on change).
  * @returns {React.ReactElement} The section.
  */
-export const LocalAiSection = (props: Props) => {
-  const { capabilityStats, onCapabilityStatsChange } = props
+export const LocalAiSection = () => {
   const i18n = useI18n()
   const capabilities = useAiCapabilities()
   const [settings, setSettings] = useState<AiLocalServerSettings>(loadSettings)
@@ -217,13 +209,6 @@ export const LocalAiSection = (props: Props) => {
           <div className="user-ai-settings-panel__hint">{t('userAiSettings:localServer.deviceNote')}</div>
         </>
       )}
-
-      <FormItem
-        label="userAiSettings:localServer.capabilityStats"
-        info={t('userAiSettings:localServer.capabilityStatsHint')}
-      >
-        <Checkbox checked={capabilityStats} onChange={onCapabilityStatsChange} testId={TestId.ai.capabilityStats} />
-      </FormItem>
     </Fieldset>
   )
 }

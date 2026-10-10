@@ -32,7 +32,6 @@ const capabilitiesFor = (local: LocalState, gateway: GatewayState): AiCapabiliti
     model: gateway === 'none' ? null : 'gateway-model',
     maxPromptChars: 200000,
   },
-  device: { webGpu: false, deviceMemoryGb: null, promptApi: null },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
 })
 

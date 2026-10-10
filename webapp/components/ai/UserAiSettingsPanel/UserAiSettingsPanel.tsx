@@ -55,7 +55,6 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onBaseUrlChange,
       onApiKeyChange,
       onFeaturesEnabledChange,
-      onCapabilityStatsChange,
       onFeatureToggleChange,
       onModelSelectChange,
       fetchModels,
@@ -221,7 +220,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
               )}
             </Fieldset>
 
-            <LocalAiSection capabilityStats={form.capabilityStats} onCapabilityStatsChange={onCapabilityStatsChange} />
+            <LocalAiSection />
           </>
         )}
 

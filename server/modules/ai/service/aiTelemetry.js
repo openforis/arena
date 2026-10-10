@@ -3,8 +3,6 @@
  * {@link track} or {@link record}, which records latency, token counts, and outcome via the
  * standard log4js logger.
  */
-import { formatCapabilityStats } from '@common/ai/capabilityStats'
-
 import * as Log from '@server/log/log'
 
 const logger = Log.getLogger('AiGateway')
@@ -63,13 +61,4 @@ export const track = async (ctx, fn) => {
     record(ctx, { latencyMs: Date.now() - start, error })
     throw error
   }
-}
-
-/**
- * Logs the anonymous capability statistics of one browser session (no user, URL or model).
- * @param {object} stats - Validated statistics (see common/ai/capabilityStats).
- * @returns {void}
- */
-export const recordCapabilityStats = (stats) => {
-  logger.info(`capabilityStats ${formatCapabilityStats(stats)}`)
 }

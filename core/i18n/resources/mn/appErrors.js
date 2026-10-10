@@ -10,7 +10,6 @@ export default {
   aiLocalServerError: 'Дотоод AI сервер алдаа буцаалаа (HTTP {{status}}).',
   aiNoEngineAvailable: 'Энэ хүсэлтэд ашиглах боломжтой AI хөдөлгүүр алга.',
   aiLocalServerConsentCancelled: 'Хүсэлтийг цуцаллаа.',
-  aiCapabilityStatsInvalid: 'Чадамжийн статистик буруу байна.',
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
   aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
   aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',

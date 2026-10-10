@@ -13,7 +13,7 @@ import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
 /**
- * Returns what this browser can use for AI (gateway, local server, device), loading it once per session.
+ * Returns what this browser can use for AI (gateway, local server, instance limits), loading it once per session.
  * @returns {AiCapabilities} The capabilities (nothing available until loaded).
  */
 export const useAiCapabilities = (): AiCapabilities => {
