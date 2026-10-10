@@ -202,18 +202,13 @@ const buildRecord = async ({ context, size }: { context: Context; size: Size }) 
   })(recordWithRoot)
   let record = recordWithRootKey
   for (let plotId = 1; plotId <= size.plots; plotId++) {
-    const { record: recordWithPlot } = await updateEntity({ context, record, plotId, insertMissingNodes: true })
+    const plotParams = { context, record, plotId, insertMissingNodes: true }
+    const { record: recordWithPlot } = await updateEntity(plotParams) // NOSONAR: sequential, uses the previous record
     record = recordWithPlot
     for (let treeId = 1; treeId <= size.treesPerPlot; treeId++) {
       const values = { [context.dbhDefUuid]: treeId, [context.heightDefUuid]: treeId * 2 }
-      const { record: recordUpdated } = await updateEntity({
-        context,
-        record,
-        plotId,
-        treeId,
-        values,
-        insertMissingNodes: true,
-      })
+      const updateParams = { context, record, plotId, treeId, values, insertMissingNodes: true }
+      const { record: recordUpdated } = await updateEntity(updateParams) // NOSONAR: sequential, uses the previous record
       record = recordUpdated
     }
   }
@@ -236,15 +231,9 @@ const measureUpdates = async ({
   for (let iteration = 0; iteration < updateIterations; iteration++) {
     const plotId = (iteration % size.plots) + 1
     const { treeId, values } = valuesGenerator(iteration)
+    const updateParams = { context, record, plotId, treeId, values, insertMissingNodes: true }
     const start = now()
-    const { record: recordUpdated } = await updateEntity({
-      context,
-      record,
-      plotId,
-      treeId,
-      values,
-      insertMissingNodes: true,
-    })
+    const { record: recordUpdated } = await updateEntity(updateParams) // NOSONAR: sequential, timed one by one
     times.push(now() - start)
     record = recordUpdated
   }
@@ -346,7 +335,7 @@ describe('Record update performance', () => {
     for (const level of expressionsLevels) {
       for (const size of sizes) {
         if (isScenarioSelected({ size, level })) {
-          results.push(await runScenario({ size, level }))
+          results.push(await runScenario({ size, level })) // NOSONAR: scenarios timed one by one
         }
       }
     }
