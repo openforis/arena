@@ -9,6 +9,14 @@ const _withLang =
 
 export const TestId = {
   ai: {
+    cloudBaseUrl: 'ai-cloud-base-url',
+    cloudBaseUrlHint: 'ai-cloud-base-url-hint',
+    cloudBaseUrlHintLink: 'ai-cloud-base-url-hint-link',
+    cloudModel: 'ai-cloud-model',
+    cloudProvider: 'ai-cloud-provider',
+    cloudRemove: 'ai-cloud-remove',
+    cloudTest: 'ai-cloud-test',
+    cloudTestResult: 'ai-cloud-test-result',
     consentContinue: 'ai-local-server-consent-continue',
     consentDialog: 'ai-local-server-consent',
     consentUseOther: 'ai-local-server-consent-use-other',
@@ -16,6 +24,7 @@ export const TestId = {
     engineNotice: 'ai-engine-notice',
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
+    engineStatus: 'ai-engine-status',
     localServerBaseUrl: 'ai-local-server-base-url',
     localServerEnabled: 'ai-local-server-enabled',
     localServerModel: 'ai-local-server-model',

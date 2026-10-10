@@ -2,71 +2,75 @@ import './UserAiSettingsPanel.scss'
 
 import React, { useEffect, useImperativeHandle } from 'react'
 
-import { AiProvider } from '@common/ai/aiProvider'
-
-import { Spinner } from '@webapp/components/Spinner'
-import { Button as ButtonJS } from '@webapp/components/buttons'
-import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
 import { Fieldset } from '@webapp/components/Fieldset'
-import { Checkbox, Dropdown } from '@webapp/components/form'
+import { Checkbox } from '@webapp/components/form'
+import { FormItem } from '@webapp/components/form/Input'
 
-import {
-  BASE_URL_PLACEHOLDERS,
-  FEATURE_CATEGORIES,
-  MODEL_PLACEHOLDERS,
-  OTHER_MODEL_VALUE,
-  PROVIDERS,
-} from './aiSettingsForm'
 import { AiEngineOrder } from './AiEngineOrder'
-import { useUserAiSettings } from './useUserAiSettings'
+import { AiEngineStatusLine } from './AiEngineStatusLine'
+import { FEATURE_CATEGORIES } from './aiSettingsForm'
+import { CloudProviderSection } from './CloudProviderSection'
 import { LocalAiSection } from './LocalAiSection'
-
-// forwardRef JS components lose their prop types in TS — cast to restore usability
-const Input = InputJS as React.ComponentType<any>
-const Button = ButtonJS as React.ComponentType<any>
+import { type UseUserAiSettingsResult, useUserAiSettings } from './useUserAiSettings'
 
 type UserAiSettingsPanelProps = {
   onDirtyChange?: ((dirty: boolean) => void) | null
 }
 
+type SectionsProps = {
+  panel: UseUserAiSettingsResult
+}
+
 /**
- * Embeddable panel that lets the logged-in user configure their personal
- * LLM provider. Designed to be dropped inline on the User Edit page next
- * to the Map API Keys fieldset.
- *
- * The ref exposes the panel's save function so a parent can trigger it
- * externally (e.g. as part of a combined save action).
+ * Category switches (interim: grouped by data class in the next step).
+ * @param {SectionsProps} props - Props.
+ * @returns {React.ReactElement} The fieldset.
+ */
+const CategorySwitches = ({ panel }: SectionsProps) => (
+  <Fieldset
+    className="user-ai-settings-panel__section user-ai-settings-panel__categories"
+    legend="userAiSettings:categoriesSection"
+  >
+    {FEATURE_CATEGORIES.map((category) => (
+      <FormItem
+        key={category}
+        label={`userAiSettings:categories.${category}`}
+        info={panel.i18n.t(`userAiSettings:categories.${category}Hint`)}
+      >
+        <Checkbox checked={!!panel.form.featureToggles[category]} onChange={panel.onFeatureToggleChange(category)} />
+      </FormItem>
+    ))}
+  </Fieldset>
+)
+
+/**
+ * Sections shown when the AI features are on: Where AI runs, then the switches.
+ * @param {SectionsProps} props - Props.
+ * @returns {React.ReactElement} The sections.
+ */
+const PanelSections = ({ panel }: SectionsProps) => {
+  const { local } = panel
+  return (
+    <>
+      <Fieldset className="user-ai-settings-panel__section" legend="userAiSettings:where.section">
+        <AiEngineStatusLine status={panel.engineStatus} />
+        <LocalAiSection local={local} />
+        <CloudProviderSection panel={panel} />
+        {local.draft.enabled && <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />}
+      </Fieldset>
+      <CategorySwitches panel={panel} />
+      <div className="user-ai-settings-panel__footer-note">{panel.i18n.t('userAiSettings:footerNote')}</div>
+    </>
+  )
+}
+
+/**
+ * AI panel of the User Profile page. The parent's Save calls the function exposed by the ref.
  */
 const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettingsPanelProps>(
   ({ onDirtyChange = null }, ref) => {
-    const {
-      i18n,
-      loading,
-      settings,
-      form,
-      dirty,
-      saving,
-      testing,
-      models,
-      modelsFetching,
-      modelsError,
-      providerSpec,
-      onProviderChange,
-      onModelChange,
-      onBaseUrlChange,
-      onApiKeyChange,
-      onFeaturesEnabledChange,
-      onFeatureToggleChange,
-      onModelSelectChange,
-      fetchModels,
-      onBaseUrlBlur,
-      onApiKeyBlur,
-      onSave,
-      onTest,
-      onClear,
-      testResultView,
-      local,
-    } = useUserAiSettings()
+    const panel = useUserAiSettings()
+    const { i18n, loading, settings, form, dirty, onSave } = panel
 
     useImperativeHandle(ref, () => onSave, [onSave])
 
@@ -86,177 +90,17 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       )
     }
 
-    const effective = settings?.effectiveSource
-    const encryptionMissing = !settings?.encryptionConfigured
-
-    const renderModelField = () => {
-      if (!providerSpec.supportsModelList) return null
-      const useDropdown = models.length > 0 && !form.modelFreeText
-      return (
-        <FormItem label="userAiSettings:model">
-          {useDropdown ? (
-            <div className="user-ai-settings-panel__model-row">
-              <select
-                className="user-ai-settings-panel__model-select"
-                value={form.model}
-                onChange={onModelSelectChange}
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.description ? `${m.id} — ${m.description}` : m.id}
-                  </option>
-                ))}
-                <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
-              </select>
-            </div>
-          ) : (
-            <div className="user-ai-settings-panel__model-row">
-              <Input value={form.model} onChange={onModelChange} placeholder={MODEL_PLACEHOLDERS[form.provider]} />
-              <button
-                type="button"
-                className="user-ai-settings-panel__fetch-models"
-                onClick={() => fetchModels({ force: true })}
-                disabled={modelsFetching}
-              >
-                {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
-              </button>
-            </div>
-          )}
-          {modelsError && (
-            <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
-              {i18n.t('userAiSettings:modelsFetchFailed', { message: modelsError })}
-            </div>
-          )}
-        </FormItem>
-      )
-    }
-
     return (
       <Fieldset className="user-ai-settings-panel" legend="userAiSettings:section">
-        {encryptionMissing && (
+        {!settings.encryptionConfigured && (
           <div className="user-ai-settings-panel__status user-ai-settings-panel__status--missing">
             {i18n.t('userAiSettings:encryptionMissing')}
           </div>
         )}
-
         <FormItem label="userAiSettings:enableFeatures">
-          <Checkbox checked={form.featuresEnabled} onChange={onFeaturesEnabledChange} />
+          <Checkbox checked={form.featuresEnabled} onChange={panel.onFeaturesEnabledChange} />
         </FormItem>
-
-        {form.featuresEnabled && (
-          <>
-            <Fieldset className="user-ai-settings-panel__categories" legend="userAiSettings:categoriesSection">
-              {FEATURE_CATEGORIES.map((category) => (
-                <FormItem
-                  key={category}
-                  label={`userAiSettings:categories.${category}`}
-                  info={i18n.t(`userAiSettings:categories.${category}Hint`)}
-                >
-                  <Checkbox checked={!!form.featureToggles[category]} onChange={onFeatureToggleChange(category)} />
-                </FormItem>
-              ))}
-            </Fieldset>
-
-            <Fieldset className="user-ai-settings-panel__provider" legend="userAiSettings:providerSection">
-              {effective && (
-                <div className="user-ai-settings-panel__effective">
-                  {settings.effectiveProvider} / {settings.effectiveModel}
-                </div>
-              )}
-
-              <FormItem label="userAiSettings:provider">
-                <Dropdown
-                  className="form-input-container"
-                  items={PROVIDERS}
-                  itemValue="value"
-                  itemLabel={(provider: any) => i18n.t(`userAiSettings:providers.${provider.value}`)}
-                  onChange={onProviderChange}
-                  selection={PROVIDERS.find((provider) => provider.value === form.provider) || PROVIDERS[0]}
-                  clearable={false}
-                  searchable={false}
-                />
-              </FormItem>
-
-              {providerSpec.isDefault ? (
-                <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:defaultProviderHint')}</div>
-              ) : (
-                <>
-                  {providerSpec.requiresBaseUrl && (
-                    <FormItem label="userAiSettings:baseUrl">
-                      <Input
-                        value={form.baseUrl}
-                        onChange={onBaseUrlChange}
-                        onBlur={onBaseUrlBlur}
-                        placeholder={BASE_URL_PLACEHOLDERS[form.provider]}
-                      />
-                    </FormItem>
-                  )}
-
-                  {form.provider !== AiProvider.vercelAiSdk && (
-                    <FormItem label="userAiSettings:apiKey">
-                      <Input
-                        type="password"
-                        value={form.apiKey}
-                        onChange={onApiKeyChange}
-                        onBlur={onApiKeyBlur}
-                        placeholder={settings?.hasApiKey ? '•'.repeat(16) : i18n.t('userAiSettings:apiKeyPlaceholder')}
-                        disabled={encryptionMissing}
-                      />
-                    </FormItem>
-                  )}
-                  {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== AiProvider.vercelAiSdk && (
-                    <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
-                  )}
-                  {settings?.hasApiKey && settings.apiKeyReadable === false && !form.apiKeyDirty && (
-                    <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--warning" role="alert">
-                      {i18n.t('userAiSettings:apiKeyUnreadable')}
-                    </div>
-                  )}
-
-                  {renderModelField()}
-
-                  {form.provider === AiProvider.vercelAiSdk && (
-                    <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:vercelAiSdkHint')}</div>
-                  )}
-                </>
-              )}
-            </Fieldset>
-
-            <Fieldset className="user-ai-settings-panel__section" legend="userAiSettings:where.section">
-              <LocalAiSection local={local} />
-              {local.draft.enabled && (
-                <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />
-              )}
-            </Fieldset>
-          </>
-        )}
-
-        <div className="user-ai-settings-panel__buttons">
-          {form.featuresEnabled && !providerSpec.isDefault && (
-            <Button
-              label="userAiSettings:testConnection"
-              onClick={onTest}
-              disabled={
-                saving ||
-                testing ||
-                encryptionMissing ||
-                (providerSpec.requiresApiKey && !settings?.hasApiKey && !form.apiKeyDirty)
-              }
-              icon={testing ? <Spinner size={16} /> : null}
-            />
-          )}
-          <span className="user-ai-settings-panel__buttons-spacer" />
-          {form.featuresEnabled && (
-            <Button
-              variant="text"
-              label="userAiSettings:clear"
-              onClick={onClear}
-              disabled={saving || (!settings?.hasApiKey && !settings?.provider)}
-            />
-          )}
-        </div>
-
-        {testResultView}
+        {form.featuresEnabled && <PanelSections panel={panel} />}
       </Fieldset>
     )
   }
