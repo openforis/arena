@@ -94,6 +94,12 @@ export class ArenaApi {
     return response.json()
   }
 
+  private async delete(url: string) {
+    const response = await this.requestContext.delete(url, { headers: this.headers })
+    expect(response.ok(), `DELETE ${url} failed: ${response.status()}`).toBeTruthy()
+    return response.json()
+  }
+
   /**
    * Turns on the AI features (all categories) for the test user, using the server default provider.
    * @returns {Promise<void>} - Resolves when saved.
@@ -135,6 +141,14 @@ export class ArenaApi {
       model,
       baseUrl,
     })
+  }
+
+  /**
+   * Removes the personal provider of the test user (DELETE /api/ai/settings); the feature switches stay.
+   * @returns {Promise<void>} - Resolves when removed.
+   */
+  async removeAiPersonalProvider(): Promise<void> {
+    await this.delete('/api/ai/settings')
   }
 
   /**
