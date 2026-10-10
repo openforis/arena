@@ -136,13 +136,10 @@ export const useAssistantConversation = ({
   // the panel unmounts on logout: stop the running answer
   useEffect(() => () => controllerRef.current?.abort(), [])
 
-  // another survey or user: start over
+  // another survey or user: stop the running answer (the panel host's scope restores that survey's conversation)
   useEffect(() => {
     const current = conversationRef.current
-    if (current && (current.surveyId !== surveyId || current.userUuid !== userUuid)) {
-      controllerRef.current?.abort()
-      assistantPanelStore.setConversationId(null)
-    }
+    if (current && (current.surveyId !== surveyId || current.userUuid !== userUuid)) controllerRef.current?.abort()
   }, [surveyId, userUuid])
 
   useEffect(() => {

@@ -1,6 +1,11 @@
 import React, { Suspense, useEffect, useState } from 'react'
 import { useLocation } from 'react-router-dom'
 
+import * as User from '@core/user/user'
+
+import { useSurveyId } from '@webapp/store/survey'
+import { useUser } from '@webapp/store/user'
+
 import { isAnalysisRoute } from './analysis/analysisArea'
 import { isCleaningRoute } from './cleaning/cleaningArea'
 import { useExplorerEditMode } from './cleaning/useCleaningArea'
@@ -24,6 +29,9 @@ export const AssistantPanelHost = () => {
   const shown = isAssistantShown(statuses)
   const { pathname } = useLocation()
   const explorerEditMode = useExplorerEditMode()
+  const user = useUser()
+  const userUuid: string | null = user ? User.getUuid(user) : null
+  const surveyId: number | null = useSurveyId() ?? null
 
   // mounted on the first open, then kept
   if (open && !mounted) setMounted(true)
@@ -31,6 +39,11 @@ export const AssistantPanelHost = () => {
   useEffect(() => {
     if (!shown && open) assistantPanelStore.close()
   }, [open, shown])
+
+  // the open conversation of each area is remembered per user and survey
+  useEffect(() => {
+    assistantPanelStore.setScope(userUuid ? { userUuid, surveyId } : null)
+  }, [surveyId, userUuid])
 
   useEffect(() => {
     const next = pickArea({

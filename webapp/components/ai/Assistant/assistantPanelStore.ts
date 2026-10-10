@@ -1,10 +1,15 @@
 /**
  * Panel state shared by the header button, the keyboard shortcut and the panel (no Redux: it is UI-only and the
- * panel code is lazy loaded).
+ * panel code is lazy loaded). The open conversation of each area is remembered per user and survey (scope).
  */
+import { browserOpenConversations, type OpenConversations } from '@webapp/ai/conversations/openConversations'
+
 import type { AssistantArea } from './assistantAreas'
 
 export type AssistantPanelView = 'chat' | 'history'
+
+// whose open conversations the panel restores: set by the panel host from the logged-in user and the survey
+export type AssistantPanelScope = { userUuid: string; surveyId: number | null }
 
 export type AssistantPanelState = {
   open: boolean
@@ -17,6 +22,7 @@ export type AssistantPanelState = {
   draft: string | null
   // area the draft was made for: another area's composer ignores it
   draftArea: AssistantArea | null
+  scope: AssistantPanelScope | null
 }
 
 export const initialAssistantPanelState: AssistantPanelState = {
@@ -27,6 +33,7 @@ export const initialAssistantPanelState: AssistantPanelState = {
   view: 'chat',
   draft: null,
   draftArea: null,
+  scope: null,
 }
 
 export type AssistantPanelStore = {
@@ -35,6 +42,7 @@ export type AssistantPanelStore = {
   open: () => void
   close: () => void
   toggle: () => void
+  setScope: (scope: AssistantPanelScope | null) => void
   setArea: (area: AssistantArea | null, options?: { byUser?: boolean }) => void
   setConversationId: (conversationId: string | null) => void
   showHistory: () => void
@@ -46,10 +54,23 @@ export type AssistantPanelStore = {
 }
 
 /**
+ * Returns true when two scopes are the same user and survey (two nulls are the same).
+ * @param {AssistantPanelScope|null} a - Scope.
+ * @param {AssistantPanelScope|null} b - Scope.
+ * @returns {boolean} True when equal.
+ */
+const sameScope = (a: AssistantPanelScope | null, b: AssistantPanelScope | null): boolean =>
+  a?.userUuid === b?.userUuid && a?.surveyId === b?.surveyId
+
+/**
  * Creates a panel store.
+ * @param {object} [params] - Parameters.
+ * @param {OpenConversations} [params.openConversations] - Remembered open conversations (default: localStorage).
  * @returns {AssistantPanelStore} The store.
  */
-export const createAssistantPanelStore = (): AssistantPanelStore => {
+export const createAssistantPanelStore = ({
+  openConversations = browserOpenConversations,
+}: { openConversations?: OpenConversations } = {}): AssistantPanelStore => {
   let state = initialAssistantPanelState
   const listeners = new Set<() => void>()
   /**
@@ -61,6 +82,22 @@ export const createAssistantPanelStore = (): AssistantPanelStore => {
     state = { ...state, ...changes }
     for (const listener of listeners) listener()
   }
+  /**
+   * Returns the remembered open conversation of an area.
+   * @param {AssistantPanelScope|null} scope - User and survey.
+   * @param {AssistantArea|null} area - Area.
+   * @returns {string|null} The conversation id, or null.
+   */
+  const openIdOf = (scope: AssistantPanelScope | null, area: AssistantArea | null): string | null =>
+    scope && area ? openConversations.get({ ...scope, area }) : null
+  /**
+   * Remembers (or forgets, with null) the conversation of the current area.
+   * @param {string|null} conversationId - Conversation id.
+   * @returns {void}
+   */
+  const remember = (conversationId: string | null) => {
+    if (state.scope && state.area) openConversations.set({ ...state.scope, area: state.area, conversationId })
+  }
   return {
     getState: () => state,
     subscribe: (listener) => {
@@ -70,21 +107,32 @@ export const createAssistantPanelStore = (): AssistantPanelStore => {
     open: () => set({ open: true }),
     close: () => set({ open: false, userSelectedArea: null, view: 'chat' }),
     toggle: () => (state.open ? set({ open: false, userSelectedArea: null, view: 'chat' }) : set({ open: true })),
+    setScope: (scope) => {
+      if (sameScope(state.scope, scope)) return
+      // another user or survey: the current area shows that survey's open conversation
+      set({ scope, conversationId: openIdOf(scope, state.area) })
+    },
     setArea: (area, { byUser = false } = {}) =>
       set({
         area,
         view: 'chat',
-        // another area: another conversation
-        conversationId: area === state.area ? state.conversationId : null,
+        // each area shows its own open conversation
+        conversationId: area === state.area ? state.conversationId : openIdOf(state.scope, area),
         // a draft made for another area is dropped
         ...(area === state.draftArea ? {} : { draft: null, draftArea: null }),
         ...(byUser ? { userSelectedArea: area } : {}),
       }),
-    setConversationId: (conversationId) => set({ conversationId, view: 'chat' }),
+    setConversationId: (conversationId) => {
+      remember(conversationId)
+      set({ conversationId, view: 'chat' })
+    },
     showHistory: () => set({ view: 'history' }),
     showChat: () => set({ view: 'chat' }),
-    openWithDraft: ({ area, draft }) =>
-      set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft, draftArea: area }),
+    openWithDraft: ({ area, draft }) => {
+      set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft, draftArea: area })
+      // the draft is a new question: the previous conversation stays in History
+      remember(null)
+    },
     clearDraft: () => set({ draft: null, draftArea: null }),
     reset: () => set(initialAssistantPanelState),
   }
