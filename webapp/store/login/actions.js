@@ -6,14 +6,10 @@ import { SystemActions } from '@webapp/store/system'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
 import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { AppInfo } from '@core/app/appInfo'
-import * as User from '@core/user/user'
 
-import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
-import { abortAssistantTurns, settleAssistantSaves } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
-import { assistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
+import { resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'
 import { cancelAllConsentRequests } from '@webapp/ai/engines/consentRequests'
 import { resetAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
-import * as UserState from '@webapp/store/user/state'
 
 import { ViewState } from './state'
 
@@ -66,39 +62,20 @@ export const login = (email, password, twoFactorToken) =>
     }
   })
 
-/**
- * Deletes the user's assistant conversations from this browser and resets the panel.
- * @param {string} userUuid - User uuid.
- * @returns {Promise<void>} - Resolves when done (storage errors are ignored: nothing to clear).
- */
-const clearAssistantData = async (userUuid) => {
-  // stop the running answers and wait for their saves, or they would write the conversation back
-  abortAssistantTurns()
-  await settleAssistantSaves()
-  assistantPanelStore.reset()
-  try {
-    const store = await getConversationStore()
-    await store.clearUser(userUuid)
-  } catch {
-    // storage blocked or unavailable: no conversation was kept
-  }
-}
-
 export const logout =
   ({ navigate }) =>
-  async (dispatch, getState) => {
-    const userUuid = User.getUuid(UserState.getUser(getState()))
+  async (dispatch) => {
     dispatch(LoaderActions.showLoader())
 
     try {
       await axios.post('/auth/logout')
       ApiConstants.setAuthToken(null)
     } finally {
-      // also when the logout request fails (network error, expired session): no conversation stays in the browser
+      // also when the logout request fails (network error, expired session); the conversations stay in this browser
       resetAiSettingsCache()
       resetAiCapabilitiesLazily()
       cancelAllConsentRequests()
-      await clearAssistantData(userUuid)
+      await resetAssistantOnLogout()
     }
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())

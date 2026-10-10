@@ -1702,6 +1702,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     },
     historyTitle: 'Conversas',
     historyEmpty: 'Nenhuma conversa salva.',
+    historyKept: 'As conversas ficam salvas neste navegador até você apagá-las.',
     back: 'Voltar',
     emptyDesign:
       'Peça-me para adicionar atributos ou escrever rótulos ou expressões. Eu proponho as alterações; você as aplica.',

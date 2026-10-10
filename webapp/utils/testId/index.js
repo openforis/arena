@@ -48,6 +48,7 @@ export const TestId = {
     history: 'ai-assistant-history',
     historyBtn: 'ai-assistant-history-btn',
     historyItem: 'ai-assistant-history-item',
+    historyKept: 'ai-assistant-history-kept',
     inMemoryOnly: 'ai-assistant-in-memory-only',
     input: 'ai-assistant-input',
     menuBtn: 'ai-assistant-menu-btn',

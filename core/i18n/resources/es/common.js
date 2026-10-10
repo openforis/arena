@@ -1540,6 +1540,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     historyTitle: 'Conversaciones',
     historyEmpty: 'No hay conversaciones guardadas.',
+    historyKept: 'Las conversaciones se guardan en este navegador hasta que las borres.',
     back: 'Volver',
     emptyDesign:
       'Pídame que agregue atributos o que escriba etiquetas o expresiones. Yo propongo los cambios; usted los aplica.',
