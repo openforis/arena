@@ -4,10 +4,13 @@ import * as ProcessUtils from '@core/processUtils'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
+import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 
 export type SurveyDataMigrationStep = {
   version: string
   migrate: (params: { surveyId: number; client: any }) => Promise<void>
+  // run outside of any transaction, after the survey data migration has been committed (e.g. VACUUM); best effort
+  migrateAfterCommit?: (params: { surveyId: number }) => Promise<void>
 }
 
 /**
@@ -37,6 +40,16 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
     // QR printable-export share table (arena-server) and related schema changes; no per-survey data transform.
     version: '2.8.5',
     migrate: async () => {},
+  },
+  {
+    // node table partial value indexes and meta empty dictionaries removal (arena-server schema migrations):
+    // reclaim the space of the rows updated by the schema migration.
+    // The release with this version must include the arena-server version with those migrations.
+    version: '2.9.8',
+    migrate: async () => {},
+    migrateAfterCommit: async ({ surveyId }) => {
+      await NodeRepository.vacuumFullNodeTable({ surveyId })
+    },
   },
   // future per-survey migration steps are appended here, each with its own version threshold
 ]
