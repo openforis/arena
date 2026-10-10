@@ -138,6 +138,8 @@ describe('account form', () => {
       baseUrl: '',
       apiKey: '',
       apiKeyDirty: false,
+      // the edit counter moves on, so a Test of the removed provider never matches the next draft
+      apiKeyVersion: form.apiKeyVersion + 1,
       modelFreeText: false,
     })
   })

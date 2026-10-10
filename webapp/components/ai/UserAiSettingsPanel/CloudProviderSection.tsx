@@ -193,7 +193,8 @@ const ModelField = ({ panel }: Props) => {
  */
 const CloudTestRow = ({ panel }: Props) => {
   const { i18n, form, settings, providerSpec, allowlist, cloud, saving } = panel
-  const busy = saving || cloud.testing || cloud.modelsFetching
+  // not disabled while the list loads: the blur of the field starts it, and Test lists the models itself
+  const busy = saving || cloud.testing
   const missingKey = providerSpec.requiresApiKey && !hasCloudApiKey({ form, settings })
   const canRemove = !!settings?.provider || !!settings?.hasApiKey
   return (
