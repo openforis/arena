@@ -17,6 +17,7 @@ import {
   OTHER_MODEL_VALUE,
   PROVIDERS,
 } from './aiSettingsForm'
+import { AiEngineOrder } from './AiEngineOrder'
 import { useUserAiSettings } from './useUserAiSettings'
 import { LocalAiSection } from './LocalAiSection'
 
@@ -64,6 +65,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onTest,
       onClear,
       testResultView,
+      local,
     } = useUserAiSettings()
 
     useImperativeHandle(ref, () => onSave, [onSave])
@@ -220,7 +222,12 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
               )}
             </Fieldset>
 
-            <LocalAiSection />
+            <Fieldset className="user-ai-settings-panel__section" legend="userAiSettings:where.section">
+              <LocalAiSection local={local} />
+              {local.draft.enabled && (
+                <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />
+              )}
+            </Fieldset>
           </>
         )}
 
