@@ -11,6 +11,7 @@ import {
   getSelectableOperationIds,
   groupOperationsByRecord,
 } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
+import { chunkOperationsByRecord } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { Button } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
@@ -116,7 +117,9 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
     async (operationIds: string[]) => {
       if (applyingRef.current) return
       applyingRef.current = true
-      setProgress({ done: 0, total: 0 })
+      // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
+      const selected = operations.filter((operation) => operationIds.includes(operation.id))
+      setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
       try {
         await onApply(operationIds, (done, total) => setProgress({ done, total }))
       } finally {
@@ -124,7 +127,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
         setProgress(null)
       }
     },
-    [onApply]
+    [onApply, operations]
   )
 
   const applicableSelectedIds = selectableIds.filter((id) => !deselectedIds.includes(id))
