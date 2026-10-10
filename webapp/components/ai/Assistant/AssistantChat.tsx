@@ -105,7 +105,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
         </div>
       )}
-      <AssistantContextMeter conversation={conversation} onNewConversation={api.newConversation} />
+      <AssistantContextMeter busy={busy} conversation={conversation} onNewConversation={api.newConversation} />
       {recordDataNotice ? (
         <RecordDataNotice onNewConversation={api.newConversation} />
       ) : (
