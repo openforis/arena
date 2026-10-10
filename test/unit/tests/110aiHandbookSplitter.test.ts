@@ -53,6 +53,7 @@ describe('handbook splitter', () => {
       title: 'System architecture',
       path: [],
       text: 'Arena runs on Node.js.',
+      anchor: null,
     })
     expect(byTitle('Acknowledgements').id).toBe('Acknowledgements')
   })

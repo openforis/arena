@@ -2,7 +2,8 @@
  * Splits the text export of the Arena handbook (Google Doc) into sections, using its numbered table of contents.
  * No imports and erasable TypeScript only: scripts/ai/updateHandbook.ts runs it with node --experimental-strip-types.
  */
-export type HandbookSection = { id: string; title: string; path: string[]; text: string }
+// anchor: id of the heading in the Google Doc ("h.xxxx"), null when the HTML export has no matching heading
+export type HandbookSection = { id: string; title: string; path: string[]; text: string; anchor?: string | null }
 
 export type Handbook = { source: string; version: string | null; fetchedAt: string; sections: HandbookSection[] }
 
@@ -116,9 +117,14 @@ const buildPath = (stack: TocEntry[], entry: TocEntry): string[] => {
  * Splits the export into sections.
  * @param {string} raw - Export text.
  * @param {number} [maxChars] - Longer sections are split into parts (" (2/3)" title suffix, same id).
+ * @param {Record<string, string>} [anchors] - Heading anchor ids by heading text (see handbookAnchors).
  * @returns {HandbookSection[]} The sections, in document order.
  */
-export const splitHandbook = (raw: string, maxChars: number = SECTION_MAX_CHARS): HandbookSection[] => {
+export const splitHandbook = (
+  raw: string,
+  maxChars: number = SECTION_MAX_CHARS,
+  anchors: Record<string, string> = {}
+): HandbookSection[] => {
   const lines = toLines(raw)
   const { entries, end } = readToc(lines)
   const headings = findHeadings(lines, entries, end)
@@ -128,9 +134,10 @@ export const splitHandbook = (raw: string, maxChars: number = SECTION_MAX_CHARS)
     const nextLine = index + 1 < headings.length ? headings[index + 1].line : lines.length
     const path = buildPath(stack, entry)
     const parts = splitLongText(cleanText(lines.slice(line + 1, nextLine)), maxChars)
+    const anchor = anchors[entry.heading.replace(/\s+/g, ' ')] ?? null
     for (const [partIndex, text] of parts.entries()) {
       const suffix = parts.length > 1 ? ` (${partIndex + 1}/${parts.length})` : ''
-      sections.push({ id: entry.id, title: `${entry.title}${suffix}`, path, text })
+      sections.push({ id: entry.id, title: `${entry.title}${suffix}`, path, text, anchor })
     }
   }
   return sections
@@ -163,21 +170,24 @@ export const countHeadings = (raw: string): { toc: number; found: number } => {
  * @param {string} params.raw - Export text.
  * @param {string} params.source - URL of the document.
  * @param {string} params.fetchedAt - Download date (ISO).
+ * @param {Record<string, string>} [params.anchors] - Heading anchor ids by heading text.
  * @returns {Handbook} The handbook.
  */
 export const buildHandbook = ({
   raw,
   source,
   fetchedAt,
+  anchors = {},
 }: {
   raw: string
   source: string
   fetchedAt: string
+  anchors?: Record<string, string>
 }): Handbook => ({
   source,
   version: readHandbookVersion(raw),
   fetchedAt,
-  sections: splitHandbook(raw),
+  sections: splitHandbook(raw, SECTION_MAX_CHARS, anchors),
 })
 
 /**

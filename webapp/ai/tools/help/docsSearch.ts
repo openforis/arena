@@ -30,7 +30,8 @@ export const createDocsSearchTool = ({
   effect: 'read',
   requires: () => true,
   execute: async ({ query }) => {
-    const results = searchHandbook(await loadIndex(), query)
+    // the anchors are for the links the app adds, not for the model
+    const results = searchHandbook(await loadIndex(), query).map(({ anchor: _anchor, ...result }) => result)
     return results.length > 0
       ? { results }
       : { results, note: 'No section matches: try other words, or a title from the outline.' }
