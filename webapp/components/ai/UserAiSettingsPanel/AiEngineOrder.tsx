@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useId } from 'react'
 
 import { RadioButtonGroup as RadioButtonGroupJS } from '@webapp/components/RadioButtonGroup'
 import { useI18n } from '@webapp/store/system'
@@ -26,10 +26,14 @@ type Props = {
  */
 export const AiEngineOrder = ({ preferLocal, onChange }: Props) => {
   const i18n = useI18n()
+  const titleId = useId()
   return (
     <div className="user-ai-settings-panel__order">
-      <div className="user-ai-settings-panel__order-title">{i18n.t('userAiSettings:where.order.title')}</div>
+      <div id={titleId} className="user-ai-settings-panel__order-title">
+        {i18n.t('userAiSettings:where.order.title')}
+      </div>
       <RadioButtonGroup
+        ariaLabelledBy={titleId}
         items={ORDER_ITEMS}
         value={preferLocal ? LOCAL_FIRST : CLOUD_FIRST}
         onChange={(value: string) => onChange(value === LOCAL_FIRST)}

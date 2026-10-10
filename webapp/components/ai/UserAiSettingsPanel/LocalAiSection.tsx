@@ -113,10 +113,14 @@ const LocalServerBody = ({ local }: Props) => {
           />
         </div>
       </FormItem>
-      <LocalTestResult testView={testView} />
+      {/* always rendered, so a screen reader announces the result when it appears */}
+      <div role="status" className="user-ai-settings-panel__live">
+        <LocalTestResult testView={testView} />
+      </div>
       <FormItem label="userAiSettings:localServer.model">
         <select
           className="user-ai-settings-panel__select"
+          aria-label={t('userAiSettings:localServer.model')}
           value={draft.modelId ?? ''}
           onChange={(event) => local.setModelId(event.target.value || null)}
           data-testid={TestId.ai.localServerModel}

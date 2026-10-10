@@ -78,6 +78,7 @@ export default {
     testOk: 'A répondu en {{latencyMs}} ms',
     remove: 'Supprimer mon fournisseur',
     removed: "Votre fournisseur a été supprimé. Les fonctionnalités IA utilisent la valeur par défaut d'Arena.",
+    removedNoDefault: 'Votre fournisseur a été supprimé.',
   },
   dataClasses: {
     none: 'Aucun contenu du formulaire',

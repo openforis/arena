@@ -78,6 +78,7 @@ export default {
     testOk: 'Ответ за {{latencyMs}} мс',
     remove: 'Удалить моего поставщика',
     removed: 'Ваш поставщик удалён. Функции ИИ используют настройку Arena по умолчанию.',
+    removedNoDefault: 'Ваш поставщик удалён.',
   },
   dataClasses: {
     none: 'Без содержимого опроса',

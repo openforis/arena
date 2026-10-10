@@ -38,6 +38,7 @@ const ProviderSelect = ({ panel }: Props) => (
   <FormItem label="userAiSettings:provider">
     <select
       className="user-ai-settings-panel__select"
+      aria-label={panel.i18n.t('userAiSettings:provider')}
       value={panel.form.provider}
       onChange={(event) => panel.onProviderChange(event.target.value)}
       data-testid={TestId.ai.cloudProvider}
@@ -154,6 +155,7 @@ const ModelField = ({ panel }: Props) => {
         {useSelect ? (
           <select
             className="user-ai-settings-panel__select"
+            aria-label={i18n.t('userAiSettings:model')}
             value={form.model}
             onChange={(event) => panel.onModelSelectChange(event.target.value)}
             data-testid={TestId.ai.cloudModel}
@@ -173,6 +175,7 @@ const ModelField = ({ panel }: Props) => {
             placeholder={MODEL_PLACEHOLDERS[form.provider]}
           />
         )}
+        {cloud.modelsFetching && <div className="user-ai-settings-panel__hint">{i18n.t('common.loading')}</div>}
         {cloud.modelsError && (
           <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
             {i18n.t('userAiSettings:modelsFetchFailed', {
@@ -207,19 +210,22 @@ const CloudTestRow = ({ panel }: Props) => {
         icon={cloud.testing ? <Spinner size={16} /> : null}
         testId={TestId.ai.cloudTest}
       />
-      {cloud.testResult && (
-        <StatusPill
-          tone={cloud.testResult.ok ? 'ok' : 'bad'}
-          text={getCloudTestMessage({
-            result: cloud.testResult,
-            spec: providerSpec,
-            baseUrl: form.baseUrl,
-            allowlist,
-            t: toT(i18n),
-          })}
-          testId={TestId.ai.cloudTestResult}
-        />
-      )}
+      {/* always rendered, so a screen reader announces the result when it appears */}
+      <span role="status" className="user-ai-settings-panel__live">
+        {cloud.testResult && (
+          <StatusPill
+            tone={cloud.testResult.ok ? 'ok' : 'bad'}
+            text={getCloudTestMessage({
+              result: cloud.testResult,
+              spec: providerSpec,
+              baseUrl: form.baseUrl,
+              allowlist,
+              t: toT(i18n),
+            })}
+            testId={TestId.ai.cloudTestResult}
+          />
+        )}
+      </span>
       <span className="user-ai-settings-panel__spacer" />
       <Button
         variant="text"

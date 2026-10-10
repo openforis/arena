@@ -78,6 +78,7 @@ export default {
     testOk: '{{latencyMs}} ms で応答しました',
     remove: '自分のプロバイダーを削除',
     removed: 'プロバイダーを削除しました。AI 機能は Arena のデフォルトを使用します。',
+    removedNoDefault: 'プロバイダーを削除しました。',
   },
   dataClasses: {
     none: '調査の内容なし',
