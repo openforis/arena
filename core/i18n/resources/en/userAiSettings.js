@@ -110,12 +110,13 @@ export default {
     },
     dataQuery: {
       label: 'Data queries',
-      sends: "The entity's attribute names and labels and your description. No record values.",
+      sends:
+        "The attribute names, types and labels of the survey's entities, category names, your description and, for a summary, the query with its filter. No record values.",
     },
     dataDictionary: {
       label: 'Data dictionary',
       sends: 'The full survey structure with labels.',
-      runs: "Runs on the Arena server's provider, never on your local server.",
+      runs: 'Runs on the Arena server, with your cloud provider or the Arena default; never on your local server.',
     },
     assistantAnalysis: {
       label: 'Analysis assistant',

@@ -1,9 +1,9 @@
 export default {
-  section: 'Fonctionnalites IA',
-  enableFeatures: 'Activer les fonctionnalites IA',
-  featuresDisabled: 'Les fonctionnalites IA sont desactivees sur ce deploiement.',
+  section: 'Fonctionnalités IA',
+  enableFeatures: 'Activer les fonctionnalités IA',
+  featuresDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',
   encryptionMissing:
-    'Le deploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les cles API personnelles ne peuvent pas etre enregistrees tant qu un administrateur ne l a pas configure.',
+    "Le déploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les clés API personnelles ne peuvent pas être enregistrées tant qu'un administrateur ne l'a pas configuré.",
 
   provider: 'Fournisseur',
   providers: {
@@ -14,20 +14,20 @@ export default {
     'openai-compatible': 'Compatible OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
-  model: 'Modele',
-  modelOther: 'Autre (saisir un identifiant de modele)...',
+  model: 'Modèle',
+  modelOther: 'Autre (saisir un identifiant de modèle)...',
   baseUrl: 'URL de base',
-  apiKey: 'Cle API',
-  apiKeyPlaceholder: 'Collez la cle API de votre fournisseur',
-  apiKeyKept: 'Laissez vide pour conserver la cle existante.',
+  apiKey: 'Clé API',
+  apiKeyPlaceholder: 'Collez la clé API de votre fournisseur',
+  apiKeyKept: 'Laissez vide pour conserver la clé existante.',
   apiKeyUnreadable:
     "La clé API enregistrée ne peut plus être lue (le secret de chiffrement du serveur a changé). Les fonctions IA utilisent le fournisseur par défaut jusqu'à ce que vous saisissiez à nouveau la clé.",
   vercelAiSdkHint:
-    'Un endpoint chat Vercel AI SDK est traite comme un agent fixe - la selection du modele et la cle API ne s appliquent pas. La generation de texte libre fonctionne ; les fonctionnalites de sortie structuree peuvent ne pas fonctionner.',
-  modelsFetchFailed: 'Impossible de recuperer les modeles : {{message}}',
+    "Un endpoint chat Vercel AI SDK est traité comme un agent fixe - la sélection du modèle et la clé API ne s'appliquent pas. La génération de texte libre fonctionne ; les fonctionnalités de sortie structurée peuvent ne pas fonctionner.",
+  modelsFetchFailed: 'Impossible de récupérer les modèles : {{message}}',
 
-  savedSuccessfully: 'Parametres IA enregistres.',
-  saveFailed: 'Echec de l enregistrement des parametres IA : {{message}}',
+  savedSuccessfully: 'Paramètres IA enregistrés.',
+  saveFailed: "Échec de l'enregistrement des paramètres IA : {{message}}",
 
   status: {
     now: 'Actuellement :',
@@ -62,7 +62,7 @@ export default {
     httpsHint:
       'Arena est servi en HTTPS : un serveur sur une autre machine de votre réseau doit être en HTTPS, ou il faut un navigateur avec Local Network Access (Chrome) et votre autorisation.',
     cloudWarning:
-      "Cette adresse n'est ni sur cet appareil ni dans la liste des serveurs de l'organisation : la politique d'IA de l'enquête la traite comme un service cloud.",
+      "Cette adresse n'est ni sur cet appareil ni dans la liste des serveurs de l'organisation : la politique d'IA du formulaire la traite comme un service cloud.",
     notSaved:
       "Les paramètres du serveur d'IA local n'ont pas pu être enregistrés dans ce navigateur (stockage bloqué ou plein).",
   },
@@ -114,12 +114,13 @@ export default {
     },
     dataQuery: {
       label: 'Requêtes de données',
-      sends: "Les noms et libellés des attributs de l'entité et votre description. Aucune valeur des enregistrements.",
+      sends:
+        'Les noms, types et libellés des attributs des entités du formulaire, les noms des catégories, votre description et, pour un résumé, la requête avec son filtre. Aucune valeur des enregistrements.',
     },
     dataDictionary: {
       label: 'Dictionnaire de données',
       sends: 'La structure complète du formulaire avec les libellés.',
-      runs: "S'exécute sur le fournisseur du serveur Arena, jamais sur votre serveur local.",
+      runs: "S'exécute sur le serveur Arena, avec votre fournisseur cloud ou celui par défaut d'Arena ; jamais sur votre serveur local.",
     },
     assistantAnalysis: {
       label: "Assistant d'analyse",

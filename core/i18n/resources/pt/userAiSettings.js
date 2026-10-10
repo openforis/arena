@@ -1,9 +1,9 @@
 export default {
   section: 'Recursos de IA',
   enableFeatures: 'Ativar recursos de IA',
-  featuresDisabled: 'Os recursos de IA estao desativados nesta implantacao.',
+  featuresDisabled: 'Os recursos de IA estão desativados nesta implantação.',
   encryptionMissing:
-    'A implantacao nao possui AI_USER_KEY_ENCRYPTION_SECRET; chaves API pessoais nao podem ser salvas ate que um administrador configure isso.',
+    'A implantação não possui AI_USER_KEY_ENCRYPTION_SECRET; chaves API pessoais não podem ser salvas até que um administrador configure isso.',
 
   provider: 'Provedor',
   providers: {
@@ -11,7 +11,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
-    'openai-compatible': 'Compativel com OpenAI (Azure, OpenRouter, Ollama, ...)',
+    'openai-compatible': 'Compatível com OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
   model: 'Modelo',
@@ -23,11 +23,11 @@ export default {
   apiKeyUnreadable:
     'A chave de API guardada já não pode ser lida (o segredo de encriptação do servidor mudou). As funcionalidades de IA usam o provedor predefinido até introduzir a chave novamente.',
   vercelAiSdkHint:
-    'Um endpoint de chat do Vercel AI SDK e tratado como um agente fixo - selecao de modelo e chave API nao se aplicam. A geracao de texto livre funciona; recursos de saida estruturada podem nao funcionar.',
-  modelsFetchFailed: 'Nao foi possivel buscar modelos: {{message}}',
+    'Um endpoint de chat do Vercel AI SDK é tratado como um agente fixo - seleção de modelo e chave API não se aplicam. A geração de texto livre funciona; recursos de saída estruturada podem não funcionar.',
+  modelsFetchFailed: 'Não foi possível buscar modelos: {{message}}',
 
-  savedSuccessfully: 'Configuracoes de IA salvas.',
-  saveFailed: 'Falha ao salvar configuracoes de IA: {{message}}',
+  savedSuccessfully: 'Configurações de IA salvas.',
+  saveFailed: 'Falha ao salvar configurações de IA: {{message}}',
 
   status: {
     now: 'Agora:',
@@ -62,7 +62,7 @@ export default {
     httpsHint:
       'O Arena é servido por HTTPS: um servidor em outra máquina da sua rede precisa de HTTPS, ou de um navegador com Local Network Access (Chrome) e sua permissão.',
     cloudWarning:
-      'Este endereço não está neste dispositivo nem na lista de servidores da organização: a política de IA da pesquisa o trata como um serviço na nuvem.',
+      'Este endereço não está neste dispositivo nem na lista de servidores da organização: a política de IA do inventário o trata como um serviço na nuvem.',
     notSaved:
       'As configurações do servidor de IA local não puderam ser salvas neste navegador (armazenamento bloqueado ou cheio).',
   },
@@ -113,12 +113,13 @@ export default {
     },
     dataQuery: {
       label: 'Consultas de dados',
-      sends: 'Os nomes e rótulos dos atributos da entidade e sua descrição. Nenhum valor dos registros.',
+      sends:
+        'Os nomes, tipos e rótulos dos atributos das entidades do inventário, os nomes das categorias, sua descrição e, para um resumo, a consulta com seu filtro. Nenhum valor dos registros.',
     },
     dataDictionary: {
       label: 'Dicionário de dados',
       sends: 'A estrutura completa do inventário com os rótulos.',
-      runs: 'É executado no provedor do servidor do Arena, nunca no seu servidor local.',
+      runs: 'É executado no servidor do Arena, com seu provedor na nuvem ou o padrão do Arena; nunca no seu servidor local.',
     },
     assistantAnalysis: {
       label: 'Assistente de análise',
