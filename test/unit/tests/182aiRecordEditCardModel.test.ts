@@ -53,6 +53,19 @@ describe('record edit card model', () => {
     expect(countOperationResults(results)).toEqual({ applied: 1, conflict: 1, failed: 1 })
   })
 
+  test('retry resends only transient failures, not deterministic ones', () => {
+    const results = [
+      { id: 'a/1', status: 'failed' as const, message: 'appErrors:record.lockTimeout' },
+      { id: 'a/2', status: 'failed' as const, message: 'appErrors:aiApplyTimeout' },
+      { id: 'a/3', status: 'failed' as const, message: 'appErrors:networkError' },
+      { id: 'a/4', status: 'failed' as const, message: 'validationErrors:record.keyDuplicate' },
+      { id: 'a/5', status: 'failed' as const, message: 'appErrors:record.nodeNotInRecord' },
+      { id: 'a/6', status: 'failed' as const, message: 'validationErrors:nodeValueParser.attributeNotEditable' },
+      { id: 'a/7', status: 'conflict' as const },
+    ]
+    expect(getRetryOperationIds(results)).toEqual(['a/1', 'a/2', 'a/3'])
+  })
+
   test('a retry replaces the results of the retried edits only', () => {
     const first = [
       { id: 'a/1', status: 'applied' as const },
