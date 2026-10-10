@@ -141,6 +141,22 @@ describe('nodeValueParser: parseNodeValueInput (the assistant layer)', () => {
     })
   })
 
+  test('a coordinate edit keeps the additional fields of the current value (swapped x and y)', async () => {
+    const nodeDef = Survey.getNodeDefByName('cluster_location')(survey)
+    const currentValue = { x: 41.9, y: 12.5, srs: '4326', accuracy: 3, altitude: 120, altitudeAccuracy: 5 }
+    const { value } = await parseNodeValueInput({
+      survey,
+      nodeDef,
+      input: { x: 12.5, y: 41.9, srs: '4326' },
+      record,
+      parentNode: rootNode,
+      currentValue,
+      categoryItemProvider,
+      taxonProvider,
+    })
+    expect(value).toEqual({ x: 12.5, y: 41.9, srs: '4326', accuracy: 3, altitude: 120, altitudeAccuracy: 5 })
+  })
+
   test('first-level codes are found in the survey index', async () => {
     const { value, refData } = await parse('region', '2')
     expect(value[Node.valuePropsCode.itemUuid]).toBe(

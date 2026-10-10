@@ -443,6 +443,7 @@ type InputParserParams = {
   input: NodeValueInput
   record: any
   parentNode: any
+  currentValue?: any
   categoryItemProvider: CategoryItemProvider
   taxonProvider: TaxonProvider
 }
@@ -570,7 +571,7 @@ const resolveSrsCode = (survey: any, srs: unknown): string | null => {
  * @param {InputParserParams} params - The parser parameters.
  * @returns {Promise<ParsedNodeValue>} The node value.
  */
-const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input }) => {
+const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input, currentValue }) => {
   const parts = toCoordinateParts(input)
   const x = Number(parts?.x)
   const y = Number(parts?.y)
@@ -588,7 +589,12 @@ const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input }) => 
       value: typeof input === 'object' ? JSON.stringify(input) : String(input),
     })
   }
-  return { value: Node.newNodeValueCoordinate({ x, y, srsId }), refData: null }
+  // x, y and srs are replaced; the other collected fields (accuracy, altitude...) belong to the same position fix, so
+  // they are kept rather than silently erased
+  const additionalValuesByField = Object.fromEntries(
+    Object.entries(currentValue ?? {}).filter(([field]) => !['x', 'y', 'srs'].includes(field))
+  )
+  return { value: { ...additionalValuesByField, ...Node.newNodeValueCoordinate({ x, y, srsId }) }, refData: null }
 }
 
 /**
@@ -690,6 +696,7 @@ const inputParserByNodeDefType: Record<string, InputParser> = {
  * @param {NodeValueInput} params.input - The value: a string, a number, a boolean, an object, or null to clear.
  * @param {object} [params.record] - The record (needed for hierarchical codes).
  * @param {object} [params.parentNode] - The parent entity of the attribute (needed for hierarchical codes).
+ * @param {object} [params.currentValue] - The current value of the node (a coordinate keeps its additional fields).
  * @param {CategoryItemProvider} params.categoryItemProvider - Finds items of big categories.
  * @param {TaxonProvider} params.taxonProvider - Finds taxa of big taxonomies, and by scientific name.
  * @returns {Promise<ParsedNodeValue>} The node value (null to clear) and its ref data.
@@ -700,6 +707,7 @@ export const parseNodeValueInput = async ({
   input,
   record = null,
   parentNode = null,
+  currentValue = null,
   categoryItemProvider,
   taxonProvider,
 }: {
@@ -708,6 +716,7 @@ export const parseNodeValueInput = async ({
   input: NodeValueInput
   record?: any
   parentNode?: any
+  currentValue?: any
   categoryItemProvider: CategoryItemProvider
   taxonProvider: TaxonProvider
 }): Promise<ParsedNodeValue> => {
@@ -726,5 +735,5 @@ export const parseNodeValueInput = async ({
   }
   if (isEmptyInput(input)) return { value: null, refData: null }
 
-  return parser({ survey, nodeDef, input, record, parentNode, categoryItemProvider, taxonProvider })
+  return parser({ survey, nodeDef, input, record, parentNode, currentValue, categoryItemProvider, taxonProvider })
 }
