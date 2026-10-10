@@ -3,6 +3,8 @@ import type { Page } from '@playwright/test'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
+import type { TestUser } from '../fixtures/testUsers'
+import { acceptConsentAndWait, setLocalServerSettings } from '../helpers/aiAnalysis'
 import {
   assistantPanel,
   closeAssistantPanel,
@@ -14,12 +16,46 @@ import {
 } from '../helpers/assistantPanel'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
+import {
+  type LocalModelServerStub,
+  STUB_CONTEXT_TOKENS,
+  STUB_CONTEXT_USED_TOKENS,
+  startLocalModelServer,
+} from '../stubs/localModelServer'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 // matches the design script /label/i of server/modules/ai/service/mockScripts.ts
 const LABEL_REQUEST = 'Change the label of cluster_id to Cluster identifier'
+
+const userMessages = (page: Page) => assistantPanel(page).getByTestId(TestId.aiAssistant.message('user'))
+
+/**
+ * Logs out from the header menu, then in again (the web app gets its token from the refresh cookie on the next load).
+ * @param {Page} page - The page.
+ * @param {object} params - Parameters.
+ * @param {string} params.baseURL - Arena base URL.
+ * @param {TestUser} params.user - The worker user.
+ * @returns {Promise<void>} Resolves when logged in again (no page loaded yet).
+ */
+const logOutAndBackIn = async (page: Page, { baseURL, user }: { baseURL: string; user: TestUser }): Promise<void> => {
+  await page.getByTestId(TestId.header.userBtn).click()
+  await page.getByTestId(TestId.header.userLogoutBtn).click()
+  await expect(page.locator('button.btn.login')).toBeVisible()
+  const response = await page.context().request.post(`${baseURL}/auth/login`, {
+    data: { email: user.email, password: user.password },
+  })
+  expect(response.ok(), `login of ${user.email} failed`).toBeTruthy()
+}
+
+/**
+ * Formats a token count as the meter does in English.
+ * @param {number} tokens - Tokens.
+ * @returns {string} For example 1.5K.
+ */
+const compact = (tokens: number): string =>
+  new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(tokens)
 
 test.describe('AI assistant (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
@@ -174,6 +210,91 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(panel.getByTestId(TestId.aiAssistant.historyItem)).toHaveCount(1)
   })
 
+  test('each area keeps its conversation across area switches, reloads and logout', async ({
+    page,
+    baseURL,
+    testUser,
+    sampleSurvey: _,
+  }) => {
+    const designer = await openDesignArea(page)
+    await proposeLabel(page)
+
+    await selectAssistantArea(page, 'Help')
+    await expect(userMessages(page)).toHaveCount(0)
+    await selectAssistantArea(page, 'Design')
+    await expect(userMessages(page)).toHaveCount(1)
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK: I proposed a new label for')
+
+    await page.reload()
+    await openAssistantPanel(page)
+    await expectDesignSelected(page)
+    await expect(userMessages(page)).toHaveCount(1)
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.changeSetCard)).toBeVisible()
+
+    await closeAssistantPanel(page)
+    await logOutAndBackIn(page, { baseURL: baseURL!, user: testUser })
+    await designer.goto()
+    await openAssistantPanel(page)
+    await expectDesignSelected(page)
+    await expect(userMessages(page)).toHaveCount(1)
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK: I proposed a new label for')
+  })
+
+  test('New conversation empties only the current area; the history says where conversations are kept', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openDesignArea(page)
+    await proposeLabel(page)
+    await selectAssistantArea(page, 'Help')
+    await sendAssistantMessage(page, 'How do I publish a survey?')
+    await waitForAssistantTurn(page)
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK help: publish the survey from the survey list')
+
+    const panel = assistantPanel(page)
+    // the menu items render in a popover outside the panel
+    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await expect(userMessages(page)).toHaveCount(0)
+
+    await selectAssistantArea(page, 'Design')
+    await expect(userMessages(page)).toHaveCount(1)
+    await selectAssistantArea(page, 'Help')
+    await expect(userMessages(page)).toHaveCount(0)
+
+    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.historyBtn).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.historyKept)).toHaveText(
+      'Conversations are kept in this browser until you clear them.'
+    )
+  })
+
+  test('each survey keeps its own conversation while the panel stays open', async ({ page, sampleSurvey, survey }) => {
+    // client-side navigation and clicks only: the panel stays mounted and open
+    const activateSurvey = async (name: string): Promise<void> => {
+      await navigateInApp(page, Urls.surveyList)
+      await page.getByTestId(name).click()
+      await expect(page.getByTestId(name)).toBeVisible()
+    }
+    await page.goto(Urls.surveyList)
+    await page.getByTestId(sampleSurvey.name).click()
+    await openAssistantPanel(page)
+    await selectAssistantArea(page, 'Help')
+    await sendAssistantMessage(page, 'How do I publish a survey?')
+    await waitForAssistantTurn(page)
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK help: publish the survey from the survey list')
+
+    await activateSurvey(survey.name)
+    await expect(assistantPanel(page)).toBeVisible()
+    await expect(userMessages(page)).toHaveCount(0)
+
+    await activateSurvey(sampleSurvey.name)
+    await expect(assistantPanel(page)).toBeVisible()
+    await expect(userMessages(page)).toHaveCount(1)
+    await expect(userMessages(page)).toContainText('How do I publish a survey?')
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK help: publish the survey from the survey list')
+  })
+
   test('the Design area shows why it is unavailable when the survey AI policy refuses', async ({
     page,
     api,
@@ -187,5 +308,82 @@ test.describe('AI assistant (mock provider)', () => {
     const panel = assistantPanel(page)
     await expect(panel.getByTestId(TestId.aiAssistant.unavailable)).not.toBeEmpty()
     await expect(panel.getByTestId(TestId.aiAssistant.input)).toHaveCount(0)
+  })
+})
+
+test.describe('AI assistant context meter (stub local server)', () => {
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+
+  test.use({ sampleSurveyOptions: { withExpressions: false, publish: false } })
+
+  let stub: LocalModelServerStub | null = null
+
+  test.beforeEach(async ({ api }) => {
+    await api.enableAiFeatures()
+    stub = await startLocalModelServer()
+  })
+
+  test.afterEach(async ({ api }) => {
+    await stub?.stop()
+    stub = null
+    await api.disableAiFeatures()
+  })
+
+  test('after an answer the meter shows the reported usage against the context size', async ({
+    page,
+    api,
+    sampleSurvey: _,
+  }) => {
+    const designer = new FormDesigner(page)
+    await designer.goto()
+    const userUuid = await api.getCurrentUserUuid()
+    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await designer.goto()
+    await openAssistantPanel(page)
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.contextMeter)).toHaveCount(0)
+
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await acceptConsentAndWait(page)
+
+    const meter = assistantPanel(page).getByTestId(TestId.aiAssistant.contextMeter)
+    await expect(meter).toContainText(`${compact(STUB_CONTEXT_USED_TOKENS)} / ${compact(STUB_CONTEXT_TOKENS)} tokens`)
+    await expect(meter).not.toContainText('≈')
+    await expect(meter).not.toContainText('(assumed)')
+    const bar = meter.getByRole('meter')
+    await expect(bar).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
+    await expect(bar).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
+    expect(stub!.requests.some((request) => request.path === '/v1/chat/completions')).toBe(true)
+  })
+
+  test('switching area and back while an answer streams keeps the conversation and its answer', async ({
+    page,
+    api,
+    sampleSurvey: _,
+  }) => {
+    const designer = new FormDesigner(page)
+    await designer.goto()
+    const userUuid = await api.getCurrentUserUuid()
+    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await designer.goto()
+    await openAssistantPanel(page)
+    // the first-use consent is asked once per user, survey and feature: take it with a quick turn, then start over
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await acceptConsentAndWait(page)
+    await assistantPanel(page).getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await expect(userMessages(page)).toHaveCount(0)
+
+    stub!.setChunkDelay(700)
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await expect(assistantPanel(page)).toHaveAttribute('data-busy', 'true')
+
+    // away and back before the answer is saved
+    await selectAssistantArea(page, 'Help')
+    await selectAssistantArea(page, 'Design')
+    await expect(userMessages(page)).toHaveCount(1)
+    await expect(userMessages(page)).toContainText(LABEL_REQUEST)
+    await waitForAssistantTurn(page)
+    await expect(lastAssistantAnswer(page)).toContainText('MOCK: I proposed a new label for')
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.changeSetCard)).toBeVisible()
   })
 })
