@@ -210,6 +210,11 @@ test.describe('AI settings panel', () => {
     await api.enableAiFeatures()
   })
 
+  // a test that fails before the panel removes the provider must not leave it to the next test
+  test.afterEach(async ({ api }) => {
+    await api.removeAiPersonalProvider()
+  })
+
   test('a localhost Base URL in the cloud block points to the local server', async ({ page }) => {
     await page.goto(Urls.userProfile)
     await page.getByTestId(TestId.ai.cloudProvider).selectOption('openai-compatible')
@@ -238,7 +243,7 @@ test.describe('AI settings panel', () => {
     // one click, no blur before it: the click itself blurs the field and starts the list
     await page.getByTestId(TestId.ai.cloudTest).click()
 
-    await expect(page.getByTestId(TestId.ai.cloudTestResult)).toBeVisible()
+    await expect(page.getByTestId(TestId.ai.cloudTestResult)).toContainText('Answered in 12 ms')
   })
 
   test('Remove my provider keeps the feature switches', async ({ page, api }) => {
