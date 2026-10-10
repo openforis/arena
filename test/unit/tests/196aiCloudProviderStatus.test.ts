@@ -26,6 +26,7 @@ import {
   isCloudDraftSaved,
   settingsToForm,
   shouldShowLocalUrlHint,
+  withoutCloudProvider,
 } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
 
 const ORG_URL = 'http://10.0.0.5:8000/v1'
@@ -136,6 +137,14 @@ describe('cloud Test result', () => {
     expect(getCurrentCloudTestResult({ test, form: { ...tested, baseUrl: `${tested.baseUrl} ` } })).toBe(result)
   })
 
+  test('Remove my provider drops it: the same draft typed again does not match', () => {
+    const tested = form({ apiKeyVersion: 2 })
+    const test = { key: buildCloudTestKey(tested), result }
+    const removed = withoutCloudProvider(tested)
+    const retyped = { ...removed, provider: tested.provider, baseUrl: tested.baseUrl, model: tested.model }
+    expect(getCurrentCloudTestResult({ test, form: retyped })).toBeNull()
+  })
+
   test('any edit drops it', () => {
     const tested = form()
     const test = { key: buildCloudTestKey(tested), result }
@@ -211,6 +220,10 @@ describe('form helpers', () => {
     const asDefault = form({ provider: DEFAULT_PROVIDER_VALUE, baseUrl: '', model: '' })
     expect(isCloudDraftSaved({ form: asDefault, settings: { ...savedSettings, enabled: false } })).toBe(true)
     expect(isCloudDraftSaved({ form: form(), settings: null })).toBe(false)
+    // the server trims the Base URL on save
+    expect(
+      isCloudDraftSaved({ form: form({ baseUrl: '  https://models.example.org/v1 ' }), settings: savedSettings })
+    ).toBe(true)
   })
 })
 

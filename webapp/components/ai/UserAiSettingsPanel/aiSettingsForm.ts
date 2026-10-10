@@ -194,6 +194,8 @@ export const withoutCloudProvider = (form: FormState): FormState => ({
   baseUrl: '',
   apiKey: '',
   apiKeyDirty: false,
+  // a new key edit counter: a Test of the removed provider never matches the next draft
+  apiKeyVersion: form.apiKeyVersion + 1,
   modelFreeText: false,
 })
 
@@ -209,6 +211,7 @@ export const toT =
   (key, params) =>
     // i18next's own return type is wider than string
     String(i18n.t(key, params ?? {}))
+
 /**
  * Returns the spec of a provider ("Arena default" for an unknown one).
  * @param {string} provider - Provider value.
@@ -354,7 +357,7 @@ export const isCloudDraftSaved = ({ form, settings }: { form: FormState; setting
     !!settings.enabled &&
     settings.provider === form.provider &&
     (settings.model || '') === form.model &&
-    (settings.baseUrl || '') === form.baseUrl
+    (settings.baseUrl || '') === form.baseUrl.trim()
   )
 }
 

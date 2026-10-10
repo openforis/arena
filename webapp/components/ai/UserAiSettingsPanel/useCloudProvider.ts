@@ -98,6 +98,8 @@ export const useCloudProvider = ({
   // Test awaits the list, then needs the form as it is then
   const formRef = useRef(form)
   const lastModelsKeyRef = useRef<string | null>(null)
+  // only the latest list request writes its result (a blur fetch must not overwrite the Test's)
+  const requestIdRef = useRef(0)
 
   useEffect(() => {
     formRef.current = form
@@ -117,10 +119,14 @@ export const useCloudProvider = ({
       // blur after blur: no new request while the inputs are the same
       if (!force && key === lastModelsKeyRef.current) return null
       lastModelsKeyRef.current = key
+      requestIdRef.current += 1
+      const requestId = requestIdRef.current
+      const isCurrent = () => requestId === requestIdRef.current
       setModelsFetching(true)
       setModelsError(null)
       try {
         const list = await requestModels({ form: current, spec })
+        if (!isCurrent()) return null
         setModels(list)
         if (list.length === 0) return null
         const model = chooseListedModel({ model: current.model, models: list })
@@ -129,11 +135,12 @@ export const useCloudProvider = ({
         if (model !== current.model) markDirty()
         return model
       } catch (error) {
+        if (!isCurrent()) return null
         setModels([])
         setModelsError(getApiErrorMessage({ error, t }))
         return null
       } finally {
-        setModelsFetching(false)
+        if (isCurrent()) setModelsFetching(false)
       }
     },
     [allowlist, markDirty, setForm, settings, spec, t]
@@ -152,9 +159,13 @@ export const useCloudProvider = ({
     }
   }, [fetchModels, spec])
 
+  // also on Remove and on a provider change: the Test and any in-flight list belong to the old provider
   const resetModels = useCallback(() => {
+    requestIdRef.current += 1
     setModels([])
     setModelsError(null)
+    setModelsFetching(false)
+    setTest(null)
     lastModelsKeyRef.current = null
   }, [])
 
