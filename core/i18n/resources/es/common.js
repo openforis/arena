@@ -1482,6 +1482,14 @@ $t(common.appNameFull)
     retry: 'Reintentar',
     stopped: 'Detenido.',
     inMemoryOnly: 'Este navegador no puede guardar conversaciones: se pierden al recargar la página.',
+    context: {
+      label: 'Contexto usado por esta conversación',
+      tokens: '{{used}} tokens',
+      tokensOfWindow: '{{used}} / {{window}} tokens',
+      assumed: '(supuesto)',
+      nearLimit: 'Cerca del límite.',
+      trimmed: 'Los mensajes más antiguos ya no se envían al modelo.',
+    },
     tools: {
       survey_getOverview: 'Leyó la estructura de la encuesta',
       nodeDef_get: 'Consultó {{name}}',

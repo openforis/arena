@@ -75,6 +75,49 @@
     color: var(--colorGrey700);
   }
 
+  &__context {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.25rem 0.5rem;
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    color: var(--colorGrey700);
+  }
+
+  &__context-bar {
+    flex: 0 0 6rem;
+    height: 6px;
+    border-radius: 3px;
+    background-color: var(--colorGrey200);
+    overflow: hidden;
+  }
+
+  &__context-fill {
+    display: block;
+    height: 100%;
+    background-color: var(--blue);
+
+    &--warning {
+      background-color: var(--orange);
+    }
+
+    &--critical {
+      background-color: var(--red);
+    }
+  }
+
+  &__context-warning {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  &__context-trimmed {
+    flex-basis: 100%;
+    margin: 0;
+  }
+
   &__messages {
     flex: 1;
     overflow-y: auto;

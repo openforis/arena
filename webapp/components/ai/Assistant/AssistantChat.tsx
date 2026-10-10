@@ -12,6 +12,7 @@ import type { AssistantArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
+import { AssistantContextMeter } from './AssistantContextMeter'
 import { AssistantMessageView } from './AssistantMessage'
 import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
@@ -104,6 +105,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
         </div>
       )}
+      <AssistantContextMeter conversation={conversation} onNewConversation={api.newConversation} />
       {recordDataNotice ? (
         <RecordDataNotice onNewConversation={api.newConversation} />
       ) : (
