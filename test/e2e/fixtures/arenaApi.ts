@@ -1,6 +1,7 @@
 import { APIRequestContext, expect, request } from '@playwright/test'
 
 import type { TestUser } from './testUsers'
+import { AiFeatureCategory } from '@common/ai/features'
 
 type JobSummary = {
   uuid: string
@@ -21,6 +22,13 @@ export type SurveyCreateParams = {
 const jobPollIntervalMs = 250
 const jobTimeoutMs = 30_000
 const jobThreadCleanupWaitMs = 1500
+
+/**
+ * Returns every AI category switched on (one per AiFeatureCategory, so new categories are included).
+ * @returns {Record<string, boolean>} The switches.
+ */
+const allAiFeatureToggles = (): Record<string, boolean> =>
+  Object.fromEntries(Object.values(AiFeatureCategory).map((category) => [category, true]))
 
 /**
  * Thin client of the Arena REST API, used to prepare (and clean up) the data needed by a test
@@ -80,16 +88,7 @@ export class ArenaApi {
    * @returns {Promise<void>} - Resolves when saved.
    */
   async enableAiFeatures(): Promise<void> {
-    const featureToggles = {
-      chat: true,
-      assistant: true,
-      expressions: true,
-      translation: true,
-      dataDictionary: true,
-      userActivity: true,
-      dataQuery: true,
-    }
-    await this.put('/api/ai/settings', { featuresEnabled: true, featureToggles, enabled: false })
+    await this.put('/api/ai/settings', { featuresEnabled: true, featureToggles: allAiFeatureToggles(), enabled: false })
   }
 
   /**

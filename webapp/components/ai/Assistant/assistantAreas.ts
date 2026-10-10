@@ -80,7 +80,7 @@ export const getHelpAreaStatus = ({
 /**
  * Returns the status of the Design area.
  * @param {object} params - Parameters.
- * @param {boolean} params.categoryEnabled - The user's "assistant" AI category is on.
+ * @param {boolean} params.categoryEnabled - The user's "assistantDesign" AI category is on.
  * @param {boolean} params.surveyOpen - A survey is selected.
  * @param {boolean} params.canEditSurvey - The user can edit the survey.
  * @param {boolean} params.hasDraftSurvey - The draft survey definitions are loaded.

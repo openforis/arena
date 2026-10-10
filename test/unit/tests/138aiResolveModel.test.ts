@@ -17,7 +17,7 @@ const memoryStorage = (): StorageLike => {
 
 const ON_SETTINGS: AiFeatureSwitches = {
   featuresEnabled: true,
-  featureToggles: { expressions: true, chat: true, dataQuery: true, userActivity: true, assistant: true },
+  featureToggles: { expressions: true, chat: true, dataQuery: true, userActivity: true, assistantDesign: true },
   disabledFeatures: [],
 }
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }

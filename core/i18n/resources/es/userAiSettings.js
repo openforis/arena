@@ -6,8 +6,14 @@ export default {
   categories: {
     chat: 'Asistente de ayuda',
     chatHint: 'Área del asistente que responde preguntas sobre Arena a partir del manual de usuario.',
-    assistant: 'Asistente de diseño',
-    assistantHint: 'Área del asistente que lee la encuesta y propone cambios (usted los revisa y aplica).',
+    assistantDesign: 'Asistente de diseño',
+    assistantDesignHint: 'Área del asistente que lee la encuesta y propone cambios (usted los revisa y aplica).',
+    assistantAnalysis: 'Asistente de análisis',
+    assistantAnalysisHint:
+      'Área del asistente que explora los datos recogidos con consultas. Envía datos de registros al modelo.',
+    assistantCleaning: 'Asistente de limpieza',
+    assistantCleaningHint:
+      'Área del asistente que lee los errores de validación y los valores de los registros y propone correcciones (usted las revisa). Envía datos de registros al modelo.',
     expressions: 'Generacion y validacion de expresiones',
     expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validacion de encuesta.',
     translation: 'Traduccion de etiquetas',

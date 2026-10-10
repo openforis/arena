@@ -11,7 +11,7 @@
  *
  *   user.prefs.ai = {
  *     featuresEnabled,        // master switch — user wants AI at all
- *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity, dataQuery } booleans
+ *     featureToggles,         // one boolean per AiFeatureCategory (common/ai/features.ts)
  *     capabilityStats,        // opt-in anonymous capability statistics (default false)
  *     provider, model, baseUrl, apiKeyEncrypted,
  *     enabled,                // use OWN provider vs. admin default

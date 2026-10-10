@@ -6,8 +6,14 @@ export default {
   categories: {
     chat: 'Help assistant',
     chatHint: 'Assistant area that answers questions about Arena from the user manual.',
-    assistant: 'Design assistant',
-    assistantHint: 'Assistant area that reads the survey and proposes changes to it (you review and apply them).',
+    assistantDesign: 'Design assistant',
+    assistantDesignHint: 'Assistant area that reads the survey and proposes changes to it (you review and apply them).',
+    assistantAnalysis: 'Analysis assistant',
+    assistantAnalysisHint:
+      'Assistant area that explores the collected data with queries. It sends record data to the model.',
+    assistantCleaning: 'Cleaning assistant',
+    assistantCleaningHint:
+      'Assistant area that reads validation errors and record values and proposes corrections (you review them). It sends record data to the model.',
     expressions: 'Expression generation & validation',
     expressionsHint: 'AI assistance to draft and explain survey validation expressions.',
     translation: 'Label translation',

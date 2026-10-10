@@ -6,10 +6,10 @@ import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]
 
 describe('assistantDesign feature', () => {
-  test('is a survey-edit, schema, gateway tool feature of the assistant category', () => {
+  test('is a survey-edit, schema, gateway tool feature of the assistantDesign category', () => {
     expect(getAiFeature('assistantDesign')).toEqual({
       key: 'assistantDesign',
-      category: AiFeatureCategory.assistant,
+      category: AiFeatureCategory.assistantDesign,
       dataClass: 'schema',
       variableDataClass: true,
       permission: 'surveyEdit',

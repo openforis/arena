@@ -10,7 +10,10 @@ export const AiFeatureCategory = {
   dataDictionary: 'dataDictionary',
   userActivity: 'userActivity',
   dataQuery: 'dataQuery',
-  assistant: 'assistant',
+  // one switch per assistant area: Analysis and Cleaning send record data, Design doesn't
+  assistantDesign: 'assistantDesign',
+  assistantAnalysis: 'assistantAnalysis',
+  assistantCleaning: 'assistantCleaning',
 } as const
 
 export type AiFeatureCategory = (typeof AiFeatureCategory)[keyof typeof AiFeatureCategory]
@@ -61,7 +64,17 @@ export type AiFeatureDef = {
   tools?: boolean
 }
 
-const { chat, expressions, translation, dataDictionary, userActivity, dataQuery, assistant } = AiFeatureCategory
+const {
+  chat,
+  expressions,
+  translation,
+  dataDictionary,
+  userActivity,
+  dataQuery,
+  assistantDesign,
+  assistantAnalysis,
+  assistantCleaning,
+} = AiFeatureCategory
 const { schema, data } = AiDataClass
 const { loggedIn, surveyView, surveyEdit, recordListView, recordCleanse, admin } = AiFeaturePermission
 
@@ -107,7 +120,7 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
   // Design area of the assistant: reads the draft survey, proposes change sets
   assistantDesign: {
     key: 'assistantDesign',
-    category: assistant,
+    category: assistantDesign,
     dataClass: schema,
     variableDataClass: true,
     permission: surveyEdit,
@@ -117,7 +130,7 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
   // Analysis area of the assistant: explores collected data through the Explorer endpoints
   assistantAnalysis: {
     key: 'assistantAnalysis',
-    category: assistant,
+    category: assistantAnalysis,
     dataClass: data,
     variableDataClass: true,
     permission: recordListView,
@@ -127,7 +140,7 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
   // the cleaning assistant reads and edits record values: data from the first message
   assistantCleaning: {
     key: 'assistantCleaning',
-    category: assistant,
+    category: assistantCleaning,
     dataClass: data,
     variableDataClass: false,
     permission: recordCleanse,

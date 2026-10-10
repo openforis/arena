@@ -6,8 +6,14 @@ export default {
   categories: {
     chat: 'ヘルプアシスタント',
     chatHint: 'ユーザーマニュアルをもとにArenaに関する質問に答えるアシスタントの領域です。',
-    assistant: 'デザインアシスタント',
-    assistantHint: '調査を読み取り、変更を提案するアシスタントの領域です（確認して適用するのはあなたです）。',
+    assistantDesign: 'デザインアシスタント',
+    assistantDesignHint: '調査を読み取り、変更を提案するアシスタントの領域です（確認して適用するのはあなたです）。',
+    assistantAnalysis: '分析アシスタント',
+    assistantAnalysisHint:
+      '収集したデータをクエリで調べるアシスタントの領域です。レコードのデータをモデルに送信します。',
+    assistantCleaning: 'クリーニングアシスタント',
+    assistantCleaningHint:
+      '検証エラーとレコードの値を読み取り、修正を提案するアシスタントの領域です（確認するのはあなたです）。レコードのデータをモデルに送信します。',
     expressions: '式の生成・検証',
     expressionsHint: '調査の検証式の下書き作成・説明を支援するAI機能です。',
     translation: 'ラベルの翻訳',

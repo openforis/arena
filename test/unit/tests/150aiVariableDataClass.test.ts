@@ -22,7 +22,7 @@ describe('AI data class helpers', () => {
   test('assistantAnalysis is a variable data-class feature', () => {
     expect(AiFeatures.assistantAnalysis).toEqual({
       key: 'assistantAnalysis',
-      category: 'assistant',
+      category: 'assistantAnalysis',
       dataClass: 'data',
       variableDataClass: true,
       permission: 'recordListView',
