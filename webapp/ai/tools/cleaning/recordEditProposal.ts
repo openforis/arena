@@ -102,6 +102,7 @@ const parseEditValue = async ({
       input: value,
       record,
       parentNode: Record.getParentNode(node)(record),
+      currentValue: Node.getValue(node, null),
       ...context.providers,
     })
     return { parsed }
