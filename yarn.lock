@@ -3928,9 +3928,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.3.19":
-  version: 2.3.19
-  resolution: "@openforis/arena-core@npm:2.3.19"
+"@openforis/arena-core@npm:^2.3.35":
+  version: 2.3.35
+  resolution: "@openforis/arena-core@npm:2.3.35"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/bearing": "npm:^7.4.0"
@@ -3938,26 +3938,26 @@ __metadata:
     "@turf/distance": "npm:^7.4.0"
     bignumber.js: "npm:^11.1.5"
     change-case: "npm:^5.4.4"
+    dayjs: "npm:^1.11.13"
     jsep: "npm:^1.4.0"
     lodash.differencewith: "npm:^4.5.0"
     lodash.frompairs: "npm:^4.0.1"
     lodash.isequal: "npm:^4.5.0"
     lodash.topairs: "npm:^4.3.0"
-    moment: "npm:^2.31.0"
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.2"
-  checksum: 10c0/8ed29226386c5ed07a1f821e72a9024553b16708754fbac0e79be6141cf0154cc22352cc8c112e410536bc5345fd7aed3732b673a1e670db6e53919f6fb47a02
+  checksum: 10c0/8bec05304cbca46f59519bf77b497f3a58c826e825f06608154cdd2f63bb8476b276d0b042c289bfe9c29be0dbd7a677eb71f64279a084b3a15d31edbff4d5e3
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.6.4":
-  version: 2.6.4
-  resolution: "@openforis/arena-server@npm:2.6.4"
+"@openforis/arena-server@npm:^2.6.6":
+  version: 2.6.6
+  resolution: "@openforis/arena-server@npm:2.6.6"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1145.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.3.19"
+    "@openforis/arena-core": "npm:^2.3.35"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
@@ -3979,7 +3979,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/00a86a9b611bbfda00f83fe569648066dc53943429e6ff5a22c6092cb42b071a23949c61f4e290ea6ad92fa1ad6c210df68e920579fbdd6171ad6a0a4cbdc0d3
+  checksum: 10c0/1c95e17f5c98ad0d9b3de8c5454b5d943be6ebfc50b3d81ad1d57ade2eb7dd52caa4932eb5fb5909cd0c9503ab315560432adb44b7631fa6283c62e030e55bbc
   languageName: node
   linkType: hard
 
@@ -8450,7 +8450,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dayjs@npm:^1.8.34":
+"dayjs@npm:^1.11.13, dayjs@npm:^1.8.34":
   version: 1.11.23
   resolution: "dayjs@npm:1.11.23"
   checksum: 10c0/69ab04bf19c676e44ab50cc2fca223d265f3dafd107151ef3b0f3ad74d360c37caa602abe62f87cb25d90bd9f6bee003698af47df5b0dbf10a998b7b5f3bb3f1
@@ -13672,13 +13672,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"moment@npm:^2.31.0":
-  version: 2.31.0
-  resolution: "moment@npm:2.31.0"
-  checksum: 10c0/3755b186b8ff62c565685ce69dde55bf46003c0329139be5c8dd7845cd567bfd7d02be3a13e379a25acb9e98f6b87136c4776745e440615a4f5ca8dd9a8815b9
-  languageName: node
-  linkType: hard
-
 "mongodb-uri@npm:>= 0.9.7":
   version: 0.9.7
   resolution: "mongodb-uri@npm:0.9.7"
@@ -14280,7 +14273,8 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
-    "@openforis/arena-server": "npm:^2.6.4"
+    "@openforis/arena-core": "npm:^2.3.35"
+    "@openforis/arena-server": "npm:^2.6.6"
     "@playwright/test": "npm:1.63.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.13.0"
@@ -14320,6 +14314,7 @@ __metadata:
     css-loader: "npm:^7.1.5"
     csv-load-sync: "npm:^2.3.1"
     d3: "npm:^7.9.0"
+    dayjs: "npm:^1.11.13"
     dompurify: "npm:^3.4.16"
     dotenv: "npm:^18.0.5"
     eslint: "npm:^9.39.5"
