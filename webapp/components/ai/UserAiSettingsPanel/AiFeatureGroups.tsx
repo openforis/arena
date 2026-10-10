@@ -22,12 +22,13 @@ type ToggleChange = (category: FeatureCategory) => (checked: boolean) => void
  * Data badge: a shape and the class name, never colour alone.
  * @param {object} props - Props.
  * @param {DataBadgeKind} props.kind - Data class, or none.
+ * @param {string} [props.id] - Element id, to label a group.
  * @returns {React.ReactElement} The badge.
  */
-const Badge = ({ kind }: { kind: DataBadgeKind }) => {
+const Badge = ({ kind, id = undefined }: { kind: DataBadgeKind; id?: string }) => {
   const i18n = useI18n()
   return (
-    <span className={`user-ai-settings-panel__badge user-ai-settings-panel__badge--${kind}`}>
+    <span id={id} className={`user-ai-settings-panel__badge user-ai-settings-panel__badge--${kind}`}>
       <span className="user-ai-settings-panel__badge-shape" aria-hidden="true" />
       {i18n.t(`userAiSettings:dataClasses.${kind}`)}
     </span>
@@ -52,6 +53,9 @@ const FeatureRow = ({
   onChange: (checked: boolean) => void
 }) => {
   const i18n = useI18n()
+  const sendsId = `ai-feature-sends-${category}`
+  const runsId = `ai-feature-runs-${category}`
+  const isDictionary = category === AiFeatureCategory.dataDictionary
   return (
     <div className="user-ai-settings-panel__feature">
       <Checkbox
@@ -59,13 +63,16 @@ const FeatureRow = ({
         onChange={onChange}
         label={`userAiSettings:features.${category}.label`}
         testId={TestId.ai.featureToggle(category)}
+        describedBy={isDictionary ? `${sendsId} ${runsId}` : sendsId}
       />
-      <div className="user-ai-settings-panel__sends">
+      <div id={sendsId} className="user-ai-settings-panel__sends">
         <span className="user-ai-settings-panel__sends-label">{i18n.t('userAiSettings:features.sendsLabel')}</span>{' '}
         {i18n.t(`userAiSettings:features.${category}.sends`)}
       </div>
-      {category === AiFeatureCategory.dataDictionary && (
-        <div className="user-ai-settings-panel__sends">{i18n.t('userAiSettings:features.dataDictionary.runs')}</div>
+      {isDictionary && (
+        <div id={runsId} className="user-ai-settings-panel__sends">
+          {i18n.t('userAiSettings:features.dataDictionary.runs')}
+        </div>
       )}
     </div>
   )
@@ -89,10 +96,15 @@ const FeatureGroupBlock = ({
   onToggleChange: ToggleChange
 }) => {
   const i18n = useI18n()
+  const badgeId = `ai-feature-group-${group.id}`
   return (
-    <div className={`user-ai-settings-panel__group user-ai-settings-panel__group--${group.id}`}>
+    <div
+      role="group"
+      aria-labelledby={badgeId}
+      className={`user-ai-settings-panel__group user-ai-settings-panel__group--${group.id}`}
+    >
       <div className="user-ai-settings-panel__group-header">
-        <Badge kind={getDataBadgeKind(group)} />
+        <Badge kind={getDataBadgeKind(group)} id={badgeId} />
         <span className="user-ai-settings-panel__hint">
           {i18n.t(`userAiSettings:features.groupHints.${group.hintKey}`)}
         </span>

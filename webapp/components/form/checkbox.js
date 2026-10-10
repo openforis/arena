@@ -21,6 +21,7 @@ const Checkbox = (props) => {
     className,
     checked = false,
     controlStyle = null,
+    describedBy = null,
     disabled = false,
     id = null,
     info,
@@ -65,6 +66,7 @@ const Checkbox = (props) => {
       disabled={disabled}
       indeterminate={indeterminate}
       onClick={onChange}
+      slotProps={describedBy ? { input: { 'aria-describedby': describedBy } } : undefined}
       size={size}
       style={controlStyle}
     />
@@ -94,6 +96,8 @@ Checkbox.propTypes = {
   id: PropTypes.string,
   checked: PropTypes.bool,
   controlStyle: PropTypes.object,
+  // id of the element describing the checkbox (aria-describedby)
+  describedBy: PropTypes.string,
   disabled: PropTypes.bool,
   indeterminate: PropTypes.bool,
   info: PropTypes.string,

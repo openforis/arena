@@ -1,7 +1,7 @@
 export default {
   section: 'Funciones de IA',
   enableFeatures: 'Habilitar funciones de IA',
-  featuresDisabled: 'Las funciones de IA estan deshabilitadas en este despliegue.',
+  featuresDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
 
@@ -23,11 +23,11 @@ export default {
   apiKeyUnreadable:
     'La clave API guardada ya no se puede leer (cambió el secreto de cifrado del servidor). Las funciones de IA usan el proveedor predeterminado hasta que vuelva a introducir la clave.',
   vercelAiSdkHint:
-    'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la seleccion de modelo y la clave API no aplican. La generacion de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
+    'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la selección de modelo y la clave API no aplican. La generación de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
   modelsFetchFailed: 'No se pudieron obtener modelos: {{message}}',
 
-  savedSuccessfully: 'Configuracion de IA guardada.',
-  saveFailed: 'Error al guardar la configuracion de IA: {{message}}',
+  savedSuccessfully: 'Configuración de IA guardada.',
+  saveFailed: 'Error al guardar la configuración de IA: {{message}}',
 
   status: {
     now: 'Ahora:',
@@ -113,12 +113,13 @@ export default {
     },
     dataQuery: {
       label: 'Consultas de datos',
-      sends: 'Los nombres y etiquetas de los atributos de la entidad y su descripción. Ningún valor de los registros.',
+      sends:
+        'Los nombres, tipos y etiquetas de los atributos de las entidades de la encuesta, los nombres de las categorías, su descripción y, para un resumen, la consulta con su filtro. Ningún valor de los registros.',
     },
     dataDictionary: {
       label: 'Diccionario de datos',
       sends: 'La estructura completa de la encuesta con las etiquetas.',
-      runs: 'Se ejecuta en el proveedor del servidor de Arena, nunca en su servidor local.',
+      runs: 'Se ejecuta en el servidor de Arena, con su proveedor en la nube o el predeterminado de Arena; nunca en su servidor local.',
     },
     assistantAnalysis: {
       label: 'Asistente de análisis',
