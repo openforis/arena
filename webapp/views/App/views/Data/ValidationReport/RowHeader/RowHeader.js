@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 
-const RowHeader = ({ handleSortBy, sort }) => {
+const RowHeader = ({ handleSortBy, sort, askAssistantAvailable = false }) => {
   const i18n = useI18n()
 
   return (
@@ -22,7 +22,7 @@ const RowHeader = ({ handleSortBy, sort }) => {
         {i18n.t('common.owner')}
       </div>
       <div />
-      <div />
+      {askAssistantAvailable && <div />}
     </>
   )
 }
@@ -30,6 +30,7 @@ const RowHeader = ({ handleSortBy, sort }) => {
 RowHeader.propTypes = {
   handleSortBy: PropTypes.func.isRequired,
   sort: PropTypes.object.isRequired,
+  askAssistantAvailable: PropTypes.bool,
 }
 
 export default RowHeader
