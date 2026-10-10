@@ -1,51 +1,19 @@
 export default {
-  title: 'Parametres IA',
   section: 'Fonctionnalites IA',
   enableFeatures: 'Activer les fonctionnalites IA',
-  categoriesSection: 'Niveaux d integration IA',
-  categories: {
-    chat: "Assistant d'aide",
-    chatHint: "Espace de l'assistant qui répond aux questions sur Arena à partir du manuel d'utilisation.",
-    assistantDesign: 'Assistant de conception',
-    assistantDesignHint:
-      "Espace de l'assistant qui lit le formulaire et propose des modifications (vous les vérifiez et les appliquez).",
-    assistantAnalysis: "Assistant d'analyse",
-    assistantAnalysisHint:
-      "Espace de l'assistant qui explore les données collectées avec des requêtes. Il envoie des données d'enregistrements au modèle.",
-    assistantCleaning: 'Assistant de nettoyage',
-    assistantCleaningHint:
-      "Espace de l'assistant qui lit les erreurs de validation et les valeurs des enregistrements et propose des corrections (vous les vérifiez). Il envoie des données d'enregistrements au modèle.",
-    expressions: 'Generation et validation d expressions',
-    expressionsHint: 'Assistance IA pour rediger et expliquer les expressions de validation de formulaire.',
-    translation: 'Traduction des libelles',
-    translationHint: 'Traduction automatique des libelles multilingues via votre fournisseur IA.',
-    dataDictionary: 'Dictionnaire de donnees',
-    dataDictionaryHint: 'Exports de dictionnaire de donnees rediges par IA.',
-    userActivity: 'Activite utilisateur',
-    userActivityHint: 'Resumes du journal d activite generes par IA.',
-    dataQuery: 'Requêtes de données',
-    dataQueryHint: "Générer des requêtes de l'Explorateur de données à partir d'une description en langage naturel.",
-  },
-  providerSection: 'Fournisseur IA',
-  currentlyUsing: 'Utilise actuellement : {{source}} - {{provider}} / {{model}}',
-  sourceUser: 'votre fournisseur personnel',
-  'sourceAdmin-default': 'la configuration par defaut de la plateforme',
-  notConfigured:
-    'L IA n est pas configuree pour votre compte ou ce deploiement. Configurez un fournisseur personnel ci-dessous ou contactez votre administrateur.',
   featuresDisabled: 'Les fonctionnalites IA sont desactivees sur ce deploiement.',
   encryptionMissing:
     'Le deploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les cles API personnelles ne peuvent pas etre enregistrees tant qu un administrateur ne l a pas configure.',
 
   provider: 'Fournisseur',
   providers: {
-    default: 'Par defaut',
+    default: "Valeur par défaut d'Arena",
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
     'openai-compatible': 'Compatible OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
-  defaultProviderHint: 'Utilise le fournisseur IA configure par votre administrateur Arena.',
   model: 'Modele',
   modelOther: 'Autre (saisir un identifiant de modele)...',
   baseUrl: 'URL de base',
@@ -56,41 +24,118 @@ export default {
     "La clé API enregistrée ne peut plus être lue (le secret de chiffrement du serveur a changé). Les fonctions IA utilisent le fournisseur par défaut jusqu'à ce que vous saisissiez à nouveau la clé.",
   vercelAiSdkHint:
     'Un endpoint chat Vercel AI SDK est traite comme un agent fixe - la selection du modele et la cle API ne s appliquent pas. La generation de texte libre fonctionne ; les fonctionnalites de sortie structuree peuvent ne pas fonctionner.',
-  fetchModels: 'Recuperer les modeles',
-  fetchingModels: 'Recuperation des modeles...',
   modelsFetchFailed: 'Impossible de recuperer les modeles : {{message}}',
-
-  save: 'Enregistrer',
-  testConnection: 'Tester la connexion',
-  clear: 'Effacer',
-
-  testing: 'Test de connexion...',
-  testOk: 'Connexion OK ({{latencyMs}} ms).',
-  testFailed: 'Echec de connexion : {{message}}',
 
   savedSuccessfully: 'Parametres IA enregistres.',
   saveFailed: 'Echec de l enregistrement des parametres IA : {{message}}',
-  cleared: 'Parametres IA personnels supprimes.',
+
+  status: {
+    now: 'Actuellement :',
+    ready: 'Prêt',
+    notTested: 'Non testé',
+    notAvailable: 'Indisponible',
+    none: 'Activez le serveur local ou choisissez un fournisseur.',
+  },
+  where: {
+    section: "Où s'exécute l'IA",
+    order: {
+      title: 'Ordre',
+      localFirst: "Utiliser d'abord le serveur local, le fournisseur cloud en secours",
+      cloudFirst: "Utiliser d'abord le fournisseur cloud",
+      hint: "La politique d'IA de chaque formulaire peut toujours bloquer un moteur. Par défaut, les données des enregistrements restent sur cet appareil.",
+    },
+  },
   localServer: {
-    section: "Serveur d'IA local",
-    enabled: "Utiliser un serveur d'IA local",
+    name: "Serveur d'IA local",
+    where: 'LM Studio sur cet ordinateur · enregistré dans ce navigateur',
+    use: 'Utiliser',
     baseUrl: 'URL du serveur',
-    test: 'Tester la connexion',
-    testing: 'Test en cours…',
-    reachable: 'Le serveur a répondu.',
+    test: 'Tester',
+    answered: 'A répondu',
     noModels: 'Le serveur ne liste aucun modèle. Chargez un modèle dans LM Studio.',
-    location: 'Emplacement : {{location}}',
     contextTokens: 'Contexte : {{count}} tokens',
     contextUnknown: 'Contexte : inconnu (8 192 tokens supposés)',
     model: 'Modèle',
     modelPlaceholder: 'Testez la connexion pour lister les modèles',
-    preferLocal: 'Préférer le serveur local quand il est autorisé',
     help: "LM Studio : démarrez le serveur et activez Enable CORS. Votre navigateur peut demander l'autorisation d'accéder aux appareils du réseau local.",
     docsLink: 'Documentation de LM Studio',
     httpsHint:
       'Arena est servi en HTTPS : un serveur sur une autre machine de votre réseau doit être en HTTPS, ou il faut un navigateur avec Local Network Access (Chrome) et votre autorisation.',
     cloudWarning:
       "Cette adresse n'est ni sur cet appareil ni dans la liste des serveurs de l'organisation : la politique d'IA de l'enquête la traite comme un service cloud.",
-    deviceNote: 'Ces paramètres sont enregistrés dans ce navigateur uniquement.',
+    notSaved:
+      "Les paramètres du serveur d'IA local n'ont pas pu être enregistrés dans ce navigateur (stockage bloqué ou plein).",
   },
+  cloud: {
+    name: 'Fournisseur cloud',
+    where: 'enregistré avec votre compte',
+    defaultHint: 'Utilise le fournisseur configuré par votre administrateur Arena.',
+    defaultNone: "Aucun n'est configuré sur ce serveur.",
+    localUrlHint:
+      "Cette adresse se trouve sur votre ordinateur ou votre réseau. Pour LM Studio, utilisez le Serveur d'IA local ci-dessus. Le serveur Arena ne peut pas l'atteindre.",
+    localUrlLink: "Utiliser le Serveur d'IA local",
+    test: 'Tester',
+    testOk: 'A répondu en {{latencyMs}} ms',
+    remove: 'Supprimer mon fournisseur',
+    removed: "Votre fournisseur a été supprimé. Les fonctionnalités IA utilisent la valeur par défaut d'Arena.",
+  },
+  dataClasses: {
+    none: 'Aucun contenu du formulaire',
+    schema: 'Conception du formulaire',
+    data: 'Données des enregistrements',
+  },
+  features: {
+    section: "Ce que l'IA peut faire et ce qu'elle voit",
+    keyHint:
+      "Conception du formulaire et Données des enregistrements correspondent aux deux réglages de la politique d'IA de chaque formulaire.",
+    sendsLabel: 'Envoie :',
+    groupHints: {
+      none: "N'importe quel moteur.",
+      cloud: 'Politique par défaut du formulaire : tout moteur, cloud compris.',
+      onDevice:
+        "Politique par défaut du formulaire : cet appareil uniquement. Un moteur cloud doit être autorisé par l'administrateur du formulaire.",
+    },
+    chat: {
+      label: "Assistant d'aide",
+      sends: "Votre question et des passages du manuel d'utilisation d'Arena.",
+    },
+    expressions: {
+      label: 'Expressions',
+      sends: "L'attribut et ses attributs voisins (noms, types, libellés), l'expression et votre description.",
+    },
+    translation: {
+      label: 'Traduction des libellés',
+      sends:
+        'Libellés des attributs, des éléments de catégories et noms communs des espèces, avec les codes de langue.',
+    },
+    assistantDesign: {
+      label: 'Assistant de conception',
+      sends: "La structure du formulaire qu'il demande : entités, attributs, libellés, catégories et expressions.",
+    },
+    dataQuery: {
+      label: 'Requêtes de données',
+      sends: "Les noms et libellés des attributs de l'entité et votre description. Aucune valeur des enregistrements.",
+    },
+    dataDictionary: {
+      label: 'Dictionnaire de données',
+      sends: 'La structure complète du formulaire avec les libellés.',
+      runs: "S'exécute sur le fournisseur du serveur Arena, jamais sur votre serveur local.",
+    },
+    assistantAnalysis: {
+      label: "Assistant d'analyse",
+      sends:
+        "La structure du formulaire, puis des comptages d'enregistrements et des résultats de requêtes (jusqu'à 200 groupes ou 50 lignes) à chaque requête qu'il exécute.",
+    },
+    assistantCleaning: {
+      label: 'Assistant de nettoyage',
+      sends:
+        "Les erreurs de validation avec les clés et les valeurs de leurs enregistrements, et les valeurs des enregistrements qu'il consulte. Il propose des modifications que vous vérifiez.",
+    },
+    userActivity: {
+      label: "Résumés d'activité",
+      sends:
+        "Le nom du formulaire, les noms des utilisateurs, les types d'activité, les comptages et les dates du journal d'activité.",
+    },
+  },
+  footerNote: 'Tous les paramètres IA sont enregistrés avec le bouton Enregistrer du profil.',
 }

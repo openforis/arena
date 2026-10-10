@@ -25,6 +25,7 @@ export const TestId = {
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
     engineStatus: 'ai-engine-status',
+    featureToggle: (category) => `ai-feature-toggle-${category}`,
     localServerBaseUrl: 'ai-local-server-base-url',
     localServerEnabled: 'ai-local-server-enabled',
     localServerModel: 'ai-local-server-model',

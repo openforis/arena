@@ -1,50 +1,19 @@
 export default {
-  title: 'Configuracion de IA',
   section: 'Funciones de IA',
   enableFeatures: 'Habilitar funciones de IA',
-  categoriesSection: 'Niveles de integracion de IA',
-  categories: {
-    chat: 'Asistente de ayuda',
-    chatHint: 'Área del asistente que responde preguntas sobre Arena a partir del manual de usuario.',
-    assistantDesign: 'Asistente de diseño',
-    assistantDesignHint: 'Área del asistente que lee la encuesta y propone cambios (usted los revisa y aplica).',
-    assistantAnalysis: 'Asistente de análisis',
-    assistantAnalysisHint:
-      'Área del asistente que explora los datos recogidos con consultas. Envía datos de registros al modelo.',
-    assistantCleaning: 'Asistente de limpieza',
-    assistantCleaningHint:
-      'Área del asistente que lee los errores de validación y los valores de los registros y propone correcciones (usted las revisa). Envía datos de registros al modelo.',
-    expressions: 'Generacion y validacion de expresiones',
-    expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validacion de encuesta.',
-    translation: 'Traduccion de etiquetas',
-    translationHint: 'Traduccion automatica de etiquetas de campos multilingues mediante su proveedor de IA.',
-    dataDictionary: 'Diccionario de datos',
-    dataDictionaryHint: 'Exportaciones de diccionario de datos redactadas por IA.',
-    userActivity: 'Actividad del usuario',
-    userActivityHint: 'Resumenes del registro de actividad generados por IA.',
-    dataQuery: 'Consultas de datos',
-    dataQueryHint: 'Generar consultas del Explorador de datos a partir de una descripción en lenguaje natural.',
-  },
-  providerSection: 'Proveedor de IA',
-  currentlyUsing: 'Usando actualmente: {{source}} - {{provider}} / {{model}}',
-  sourceUser: 'su proveedor personal',
-  'sourceAdmin-default': 'el valor predeterminado de la plataforma',
-  notConfigured:
-    'La IA no esta configurada para su cuenta o este despliegue. Configure un proveedor personal a continuacion o contacte al administrador.',
   featuresDisabled: 'Las funciones de IA estan deshabilitadas en este despliegue.',
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
 
   provider: 'Proveedor',
   providers: {
-    default: 'Predeterminado',
+    default: 'Predeterminado de Arena',
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
     'openai-compatible': 'Compatible con OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
-  defaultProviderHint: 'Usa el proveedor de IA configurado por el administrador de Arena.',
   model: 'Modelo',
   modelOther: 'Otro (escriba un id de modelo)...',
   baseUrl: 'URL base',
@@ -55,41 +24,117 @@ export default {
     'La clave API guardada ya no se puede leer (cambió el secreto de cifrado del servidor). Las funciones de IA usan el proveedor predeterminado hasta que vuelva a introducir la clave.',
   vercelAiSdkHint:
     'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la seleccion de modelo y la clave API no aplican. La generacion de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
-  fetchModels: 'Obtener modelos',
-  fetchingModels: 'Obteniendo modelos...',
   modelsFetchFailed: 'No se pudieron obtener modelos: {{message}}',
-
-  save: 'Guardar',
-  testConnection: 'Probar conexion',
-  clear: 'Limpiar',
-
-  testing: 'Probando conexion...',
-  testOk: 'Conexion correcta ({{latencyMs}} ms).',
-  testFailed: 'Fallo de conexion: {{message}}',
 
   savedSuccessfully: 'Configuracion de IA guardada.',
   saveFailed: 'Error al guardar la configuracion de IA: {{message}}',
-  cleared: 'Se eliminaron las configuraciones personales de IA.',
+
+  status: {
+    now: 'Ahora:',
+    ready: 'Listo',
+    notTested: 'Sin probar',
+    notAvailable: 'No disponible',
+    none: 'Active el servidor local o elija un proveedor.',
+  },
+  where: {
+    section: 'Dónde se ejecuta la IA',
+    order: {
+      title: 'Orden',
+      localFirst: 'Usar primero el servidor local y el proveedor en la nube como alternativa',
+      cloudFirst: 'Usar primero el proveedor en la nube',
+      hint: 'La política de IA de cada encuesta puede bloquear un motor. Por defecto, los datos de los registros se quedan en este dispositivo.',
+    },
+  },
   localServer: {
-    section: 'Servidor de IA local',
-    enabled: 'Usar un servidor de IA local',
+    name: 'Servidor de IA local',
+    where: 'LM Studio en este equipo · guardado en este navegador',
+    use: 'Usar',
     baseUrl: 'URL del servidor',
-    test: 'Probar conexión',
-    testing: 'Probando…',
-    reachable: 'El servidor respondió.',
+    test: 'Probar',
+    answered: 'Respondió',
     noModels: 'El servidor no lista ningún modelo. Cargue un modelo en LM Studio.',
-    location: 'Ubicación: {{location}}',
     contextTokens: 'Contexto: {{count}} tokens',
     contextUnknown: 'Contexto: desconocido (se suponen 8.192 tokens)',
     model: 'Modelo',
     modelPlaceholder: 'Pruebe la conexión para listar los modelos',
-    preferLocal: 'Preferir el servidor local cuando esté permitido',
     help: 'LM Studio: inicie el servidor y active Enable CORS. Su navegador puede pedir permiso para acceder a los dispositivos de la red local.',
     docsLink: 'Documentación de LM Studio',
     httpsHint:
       'Arena se sirve por HTTPS: un servidor en otro equipo de su red necesita HTTPS, o un navegador con Local Network Access (Chrome) y su permiso.',
     cloudWarning:
       'Esta dirección no está en este dispositivo ni en la lista de servidores de la organización: la política de IA de la encuesta la trata como un servicio en la nube.',
-    deviceNote: 'Esta configuración se guarda solo en este navegador.',
+    notSaved:
+      'La configuración del servidor de IA local no se pudo guardar en este navegador (almacenamiento bloqueado o lleno).',
   },
+  cloud: {
+    name: 'Proveedor en la nube',
+    where: 'guardado con su cuenta',
+    defaultHint: 'Usa el proveedor que configuró su administrador de Arena.',
+    defaultNone: 'No hay ninguno configurado en este servidor.',
+    localUrlHint:
+      'Esta dirección está en su equipo o en su red. Para LM Studio, use el Servidor de IA local de arriba. El servidor de Arena no puede acceder a ella.',
+    localUrlLink: 'Usar el Servidor de IA local',
+    test: 'Probar',
+    testOk: 'Respondió en {{latencyMs}} ms',
+    remove: 'Quitar mi proveedor',
+    removed: 'Se quitó su proveedor. Las funciones de IA usan el predeterminado de Arena.',
+  },
+  dataClasses: {
+    none: 'Sin contenido de la encuesta',
+    schema: 'Diseño de la encuesta',
+    data: 'Datos de los registros',
+  },
+  features: {
+    section: 'Con qué puede ayudar la IA y qué ve',
+    keyHint:
+      'Diseño de la encuesta y Datos de los registros corresponden a los dos ajustes de la política de IA de cada encuesta.',
+    sendsLabel: 'Envía:',
+    groupHints: {
+      none: 'Cualquier motor.',
+      cloud: 'Política predeterminada de la encuesta: cualquier motor, incluida la nube.',
+      onDevice:
+        'Política predeterminada de la encuesta: solo este dispositivo. Un motor en la nube requiere que el administrador de la encuesta lo permita.',
+    },
+    chat: {
+      label: 'Asistente de ayuda',
+      sends: 'Su pregunta y pasajes del manual de usuario de Arena.',
+    },
+    expressions: {
+      label: 'Expresiones',
+      sends: 'El atributo y sus atributos hermanos (nombres, tipos, etiquetas), la expresión y su descripción.',
+    },
+    translation: {
+      label: 'Traducción de etiquetas',
+      sends: 'Etiquetas de atributos, de ítems de categorías y nombres comunes de especies, con los códigos de idioma.',
+    },
+    assistantDesign: {
+      label: 'Asistente de diseño',
+      sends: 'La estructura de la encuesta que solicita: entidades, atributos, etiquetas, categorías y expresiones.',
+    },
+    dataQuery: {
+      label: 'Consultas de datos',
+      sends: 'Los nombres y etiquetas de los atributos de la entidad y su descripción. Ningún valor de los registros.',
+    },
+    dataDictionary: {
+      label: 'Diccionario de datos',
+      sends: 'La estructura completa de la encuesta con las etiquetas.',
+      runs: 'Se ejecuta en el proveedor del servidor de Arena, nunca en su servidor local.',
+    },
+    assistantAnalysis: {
+      label: 'Asistente de análisis',
+      sends:
+        'La estructura de la encuesta y, cada vez que ejecuta una consulta, recuentos de registros y resultados de la consulta (hasta 200 grupos o 50 filas).',
+    },
+    assistantCleaning: {
+      label: 'Asistente de limpieza',
+      sends:
+        'Los errores de validación con las claves y los valores de sus registros, y los valores de los registros que consulta. Propone cambios que usted revisa.',
+    },
+    userActivity: {
+      label: 'Resúmenes de actividad',
+      sends:
+        'El nombre de la encuesta, nombres de usuario, tipos de actividad, recuentos y fechas del registro de actividad.',
+    },
+  },
+  footerNote: 'Toda la configuración de IA se guarda con el botón Guardar del perfil.',
 }

@@ -1,3 +1,5 @@
+import { AiFeatureCategory } from '@common/ai/features'
+
 import en from '@core/i18n/resources/en/common'
 import es from '@core/i18n/resources/es/common'
 import fr from '@core/i18n/resources/fr/common'
@@ -57,23 +59,37 @@ describe('aiAssistant i18n', () => {
     }
   })
 
-  test.each(Object.keys(settingsByLang))('%s has the three assistant categories', (lang) => {
-    const { categories } = settingsByLang[lang]
-    expect(categories.assistant).toBeUndefined()
-    const keys = [
-      'chat',
-      'chatHint',
-      'assistantDesign',
-      'assistantDesignHint',
-      'assistantAnalysis',
-      'assistantAnalysisHint',
-      'assistantCleaning',
-      'assistantCleaningHint',
-    ]
-    for (const key of keys) {
-      expect([key, typeof categories[key]]).toEqual([key, 'string'])
-      const mustBeCyrillic = lang === 'ru' || lang === 'mn'
-      expect([key, !mustBeCyrillic || CYRILLIC.test(categories[key])]).toEqual([key, true])
+  const enSettingsKeys = flatten(enSettings)
+  // the panel blocks rewritten for the redesign: no English left in ru and mn
+  const PANEL_PREFIXES = ['status.', 'where.', 'localServer.', 'cloud.', 'dataClasses.', 'features.']
+
+  test.each(Object.keys(settingsByLang))('%s userAiSettings has the same keys as en', (lang) => {
+    expect(Object.keys(flatten(settingsByLang[lang])).sort()).toEqual(Object.keys(enSettingsKeys).sort())
+  })
+
+  test.each(Object.keys(settingsByLang))('%s userAiSettings keeps the placeholders of en', (lang) => {
+    const translated = flatten(settingsByLang[lang])
+    for (const [key, text] of Object.entries(enSettingsKeys)) {
+      expect([key, placeholders(translated[key] ?? '')]).toEqual([key, placeholders(text)])
+    }
+  })
+
+  test.each(['ru', 'mn'])('%s panel texts are written in Cyrillic', (lang) => {
+    for (const [key, text] of Object.entries(flatten(settingsByLang[lang]))) {
+      if (!PANEL_PREFIXES.some((prefix) => key.startsWith(prefix))) continue
+      expect([key, CYRILLIC.test(text)]).toEqual([key, true])
+    }
+  })
+
+  test.each(Object.keys(settingsByLang))('%s has a switch label and a "Sends:" text per category', (lang) => {
+    const { categories, features } = settingsByLang[lang]
+    expect(categories).toBeUndefined()
+    for (const category of Object.values(AiFeatureCategory)) {
+      expect([category, typeof features[category]?.label, typeof features[category]?.sends]).toEqual([
+        category,
+        'string',
+        'string',
+      ])
     }
   })
 })
