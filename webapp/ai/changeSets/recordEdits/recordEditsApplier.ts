@@ -106,7 +106,7 @@ const applyChunk = async ({
  * @param {object} params - Parameters.
  * @param {ChangeSet} params.changeSet - The change set.
  * @param {string[]} params.operationIds - Selected edits.
- * @param {string} params.cycle - Survey cycle.
+ * @param {string} params.cycle - Current survey cycle (used when the edits carry none).
  * @param {number} params.timezoneOffset - Browser timezone offset.
  * @param {string} params.lang - Survey language.
  * @param {PostRecordEdits} [params.post] - Endpoint call (injectable for tests).
@@ -138,7 +138,14 @@ export const applyRecordEdits = async ({
       isRecordEditOperation(operation) && operationIds.includes(operation.id)
   )
   const chunks = chunkOperationsByRecord(selected)
-  const request = { surveyId: changeSet.surveyId, cycle, timezoneOffset, lang, ...(signal ? { signal } : {}) }
+  // the cycle of the proposal wins over the current one (a record of another cycle would be a conflict)
+  const request = {
+    surveyId: changeSet.surveyId,
+    cycle: selected[0]?.cycle ?? cycle,
+    timezoneOffset,
+    lang,
+    ...(signal ? { signal } : {}),
+  }
   const results: OperationResult[] = []
   onProgress?.(0, chunks.length)
   for (const [index, chunk] of chunks.entries()) {
