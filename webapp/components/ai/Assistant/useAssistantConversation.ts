@@ -9,7 +9,10 @@ import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { applierDepsReady, createApplierDeps } from '@webapp/ai/changeSets/applierDeps'
 import { applyChangeSet } from '@webapp/ai/changeSets/applyChangeSet'
 import { summarizeRecordEditResults } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
-import { applyRecordEdits as applyRecordEditsRequest } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
+import {
+  applyRecordEdits as applyRecordEditsRequest,
+  toChunkErrorResult,
+} from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
@@ -18,6 +21,7 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
+import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -348,23 +352,36 @@ export const useAssistantConversation = ({
   const applyRecordEdits = useCallback(
     (changeSetId: string, operationIds: string[], onProgress?: (done: number, total: number) => void) =>
       runCardAction(async (id, generation) => {
-        const cardState = (await readConversation(id))?.changeSets[changeSetId]
-        if (!cardState) return
-        const { changeSet } = cardState
-        // no abort on unmount: the server keeps writing, and the results are saved by conversation id
-        const results = await applyRecordEditsRequest({
-          changeSet,
-          operationIds,
-          cycle,
-          timezoneOffset: Dates.getTimezoneOffset(),
-          lang,
-          onProgress,
-        })
-        const note = summarizeRecordEditResults({ changeSet, results })
-        // the user may have switched conversation meanwhile: write the results into the one that was applied
-        const current = await readConversation(id)
-        if (current)
-          await saveShown(withApplyResults({ conversation: current, changeSetId, results, note }), generation)
+        let changeSet: ChangeSet | undefined
+        let results: OperationResult[]
+        try {
+          const cardState = (await readConversation(id))?.changeSets[changeSetId]
+          if (!cardState) return
+          changeSet = cardState.changeSet
+          // no abort on unmount: the server keeps writing, and the results are saved by conversation id
+          results = await applyRecordEditsRequest({
+            changeSet,
+            operationIds,
+            cycle,
+            timezoneOffset: Dates.getTimezoneOffset(),
+            lang,
+            onProgress,
+          })
+        } catch (error) {
+          // the conversation could not be read: there is no card to update
+          if (!changeSet) return
+          // the card shows the edits as failed instead of an unhandled rejection
+          results = operationIds.map((operationId) => toChunkErrorResult(operationId, error))
+        }
+        try {
+          const note = summarizeRecordEditResults({ changeSet, results })
+          // the user may have switched conversation meanwhile: write the results into the one that was applied
+          const current = await readConversation(id)
+          if (current)
+            await saveShown(withApplyResults({ conversation: current, changeSetId, results, note }), generation)
+        } catch {
+          // the conversation can't be saved (store error): there is no card to update, and nothing to retry
+        }
       }),
     [cycle, lang, readConversation, runCardAction, saveShown]
   )
