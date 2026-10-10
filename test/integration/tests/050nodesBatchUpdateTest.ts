@@ -207,6 +207,40 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
     expect(Node.getValue(nodeOf(await fetchRecord(recordB), 'root/num'))).toBe(2)
   })
 
+  test('a key duplicate on the second edit of a record rolls back its first edit in the database', async () => {
+    const record = await insertRecord('9', 1)
+    await insertRecord('10', 1)
+
+    const results = await update([
+      {
+        recordUuid: Record.getUuid(record),
+        nodeUuid: Node.getUuid(nodeOf(record, 'root/num')),
+        from: 1,
+        to: 5,
+      },
+      {
+        recordUuid: Record.getUuid(record),
+        nodeUuid: Node.getUuid(nodeOf(record, 'root/root_key')),
+        from: '9',
+        to: '10',
+      },
+    ])
+
+    expect(results).toEqual([
+      expect.objectContaining({ index: 0, status: 'failed' }),
+      { index: 1, status: 'failed', messageKey: 'validationErrors:record.keyDuplicate' },
+    ])
+    const recordDb = await fetchRecord(record)
+    expect(Node.getValue(nodeOf(recordDb, 'root/num'))).toBe(1)
+    expect(Node.getValue(nodeOf(recordDb, 'root/root_key'))).toBe('9')
+    const row = await db.one(
+      `SELECT num, root_key FROM ${SchemaRdb.getName(String(surveyId))}.data_root WHERE record_uuid = $1`,
+      [Record.getUuid(recordDb)]
+    )
+    expect(Number(row.num)).toBe(1)
+    expect(row.root_key).toBe('9')
+  })
+
   test('a record locked for longer than the lock timeout fails with appErrors:record.lockTimeout', async () => {
     const record = await insertRecord('8', 1)
     const recordUuid = Record.getUuid(record)
