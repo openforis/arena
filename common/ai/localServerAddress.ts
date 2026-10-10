@@ -105,7 +105,12 @@ const isPrivateIpv4 = ([a, b]: number[]): boolean =>
 
 const isPrivateIpv6 = (groups: number[]): boolean => (groups[0] & 0xfe00) === 0xfc00 || (groups[0] & 0xffc0) === 0xfe80
 
-const isPrivateHost = (hostname: string): boolean => {
+/**
+ * Returns true for hosts of the local network: private and link-local IPv4, CGNAT, IPv6 ULA and link-local, .local.
+ * @param {string} hostname - URL hostname (IPv6 with or without brackets).
+ * @returns {boolean} True when private.
+ */
+export const isPrivateHost = (hostname: string): boolean => {
   const host = normalizeHost(hostname)
   if (host.endsWith('.local')) return true
   const ipv4 = toIpv4(host)
@@ -136,4 +141,43 @@ export const getTargetAddressSpace = (url: string): 'local' | null => {
   const parsed = parseHttpUrl(url)
   if (!parsed || isLoopbackHost(parsed.hostname)) return null
   return isPrivateHost(parsed.hostname) ? 'local' : null
+}
+
+// "any address" hosts: a server listening on them is reached through this machine
+const UNSPECIFIED_HOSTS = new Set(['0.0.0.0', '::'])
+const URL_SCHEME = /^[a-z][a-z\d+.-]*:\/\//i
+
+/**
+ * Adds http:// to an address typed without a scheme (localhost:1234/v1).
+ * @param {string} url - Typed address.
+ * @returns {string} The trimmed address with a scheme.
+ */
+export const withDefaultHttpScheme = (url: string): string => {
+  const trimmed = url.trim()
+  return URL_SCHEME.test(trimmed) ? trimmed : `http://${trimmed}`
+}
+
+/**
+ * Returns true when a typed base URL points to this computer or the local network (the Arena server never calls it).
+ * @param {string} url - Typed base URL, with or without scheme.
+ * @returns {boolean} True for loopback, unspecified, private, link-local and .local hosts.
+ */
+export const isLocalOrPrivateUrl = (url: string): boolean => {
+  if (typeof url !== 'string' || !url.trim()) return false
+  const parsed = parseHttpUrl(withDefaultHttpScheme(url))
+  if (!parsed) return false
+  const host = normalizeHost(parsed.hostname)
+  return UNSPECIFIED_HOSTS.has(host) || isLoopbackHost(host) || isPrivateHost(host)
+}
+
+/**
+ * Returns true when a typed base URL is on the organisation allowlist (org-hosted: the server may call it).
+ * @param {string} url - Typed base URL, with or without scheme.
+ * @param {string[]} allowlist - Org-hosted base URLs (AI_ORG_HOSTED_BASE_URLS).
+ * @returns {boolean} True when allowlisted.
+ */
+export const isOrgHostedUrl = (url: string, allowlist: string[]): boolean => {
+  if (typeof url !== 'string' || !url.trim()) return false
+  const parsed = parseHttpUrl(withDefaultHttpScheme(url))
+  return !!parsed && isAllowlisted(parsed, allowlist)
 }

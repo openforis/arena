@@ -98,7 +98,7 @@ Try to refresh the page.`,
   aiApiKeyMissing: 'API key is required for provider {{provider}}.',
   aiBaseUrlMissing: 'A base URL is required for the openai-compatible provider.',
   aiBaseUrlNotAllowed:
-    'This base URL points to an internal address and is not allowed. Ask your administrator to add it to the organisation model servers.',
+    "This base URL points to an internal address, which the Arena server doesn't call. For a model on your computer, use the Local AI server. For a server of your organisation, ask your administrator to add it to the organisation model servers.",
   aiProviderUnavailable: 'The AI provider could not be reached. Please try again later.',
   aiModelListFailed: 'Could not list models from the provider: {{message}}',
   aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',

@@ -128,7 +128,7 @@ Essayez de rafraîchir la page.`,
   aiApiKeyMissing: 'Une clé API est requise pour le fournisseur {{provider}}.',
   aiBaseUrlMissing: 'Une URL de base est requise pour le fournisseur compatible OpenAI.',
   aiBaseUrlNotAllowed:
-    "Cette URL de base pointe vers une adresse interne et n'est pas autorisée. Demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
+    "Cette URL de base pointe vers une adresse interne, que le serveur Arena n'appelle pas. Pour un modèle sur votre ordinateur, utilisez le Serveur d'IA local. Pour un serveur de votre organisation, demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
   aiProviderUnavailable: "Le fournisseur d'IA est injoignable. Veuillez réessayer plus tard.",
   aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",

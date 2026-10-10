@@ -122,7 +122,7 @@ Tente atualizar a página.`,
   aiApiKeyMissing: 'A chave de API é obrigatória para o provedor {{provider}}.',
   aiBaseUrlMissing: 'Uma URL base é obrigatória para o provedor compatível com OpenAI.',
   aiBaseUrlNotAllowed:
-    'Esta URL base aponta para um endereço interno e não é permitida. Peça ao administrador que a adicione aos servidores de modelos da organização.',
+    'Esta URL base aponta para um endereço interno, que o servidor do Arena não chama. Para um modelo no seu computador, use o Servidor de IA local. Para um servidor da sua organização, peça ao administrador que a adicione aos servidores de modelos da organização.',
   aiProviderUnavailable: 'Não foi possível contactar o provedor de IA. Tente novamente mais tarde.',
   aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
