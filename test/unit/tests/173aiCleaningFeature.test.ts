@@ -3,13 +3,13 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { permissionMiddlewares } from '@server/modules/ai/api/aiMiddleware'
 
 describe('assistantCleaning feature', () => {
-  test('is an assistant gateway feature on data, with a variable data class and the record cleanse permission', () => {
+  test('is an assistant gateway feature on data, with a fixed data class and the record cleanse permission', () => {
     expect(AiFeaturePermission.recordCleanse).toBe('recordCleanse')
     expect(getAiFeature('assistantCleaning')).toEqual({
       key: 'assistantCleaning',
       category: 'assistant',
       dataClass: 'data',
-      variableDataClass: true,
+      variableDataClass: false,
       permission: 'recordCleanse',
       gateway: true,
       tools: true,
