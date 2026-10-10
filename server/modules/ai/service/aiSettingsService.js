@@ -37,6 +37,7 @@ import {
   getAiPrefs as getRawPrefs,
   isCategoryEnabledForUser,
   sanitiseFeatureToggles,
+  withoutPersonalProvider,
 } from './aiUserPrefs'
 import * as AiTelemetry from './aiTelemetry'
 import * as ModelDiscovery from './modelDiscovery'
@@ -248,18 +249,17 @@ export const saveSettings = async ({ user, update }) => {
 }
 
 /**
- * Removes the user's AI override. Subsequent AI calls will fall through to
- * the admin default.
+ * Removes the user's personal provider (provider, model, base URL, API key); the AI switches stay. Subsequent AI
+ * calls fall through to the admin default.
  * @param {object} args - Args.
  * @param {object} args.user - The user.
- * @returns {Promise<object>} The new public settings descriptor (all empty).
+ * @returns {Promise<object>} The updated user.
  */
 export const clearSettings = async ({ user }) => {
   const prefs = User.getPrefs(user) || {}
-  if (!prefs[PREFS_KEY]) return user
-  const rest = { ...prefs }
-  delete rest[PREFS_KEY]
-  const userUpdated = { ...user, prefs: rest }
+  const aiPrefs = withoutPersonalProvider(prefs[PREFS_KEY] || null)
+  if (!aiPrefs) return user
+  const userUpdated = { ...user, prefs: { ...prefs, [PREFS_KEY]: aiPrefs } }
   await UserManager.updateUserPrefs(userUpdated)
   return userUpdated
 }

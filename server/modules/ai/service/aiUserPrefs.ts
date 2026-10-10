@@ -59,3 +59,22 @@ export const isCategoryEnabledForUser = (user: User, category: string): boolean 
   if (!raw?.featuresEnabled) return false
   return !!sanitiseFeatureToggles(raw.featureToggles)[category]
 }
+
+/**
+ * Returns the AI prefs without the personal provider: the switches stay and AI calls use the admin default.
+ * @param {object|null} aiPrefs - Stored AI prefs.
+ * @returns {object|null} The prefs to store, or null when nothing is stored.
+ */
+export const withoutPersonalProvider = (aiPrefs: Record<string, any> | null): Record<string, any> | null =>
+  aiPrefs
+    ? {
+        ...aiPrefs,
+        provider: null,
+        model: null,
+        baseUrl: null,
+        apiKeyEncrypted: null,
+        enabled: false,
+        lastTestOk: null,
+        lastTestAt: null,
+      }
+    : null

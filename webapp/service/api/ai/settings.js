@@ -65,9 +65,8 @@ export const fetchModels = async ({ provider, baseUrl, apiKey }) => {
 }
 
 /**
- * Removes the personal override. Subsequent AI calls fall through to the
- * admin default.
- * @returns {Promise<object>} The updated settings descriptor (now empty).
+ * Removes the personal provider; the AI switches stay. Subsequent AI calls fall through to the admin default.
+ * @returns {Promise<object>} The updated settings descriptor.
  */
 export const clearSettings = async () => {
   const { data } = await axios.delete(BASE)
