@@ -21,10 +21,11 @@ import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
-import { buildHistory, getHistoryBudget } from './agentMessages'
+import { buildTrimmedHistory, getHistoryBudget } from './agentMessages'
 import { buildAssistantSystemPrompt, type AssistantPromptArea } from './assistantSystemPrompt'
 import { resolveAssistantTurnModel } from './turnModel'
 import { createTurnState, type TurnState } from './turnState'
+import { buildTurnUsage, estimateContextTokens, toContextTokens, type TurnUsageInputs } from './turnUsage'
 
 export type AssistantLimits = { maxPromptChars: number; maxSteps: number }
 
@@ -84,7 +85,14 @@ const toolFailedOutput = (error: unknown) => ({
   error: { code: 'toolFailed', message: error instanceof Error ? error.message : String(error) },
 })
 
-type StreamOutcome = { aborted: boolean; error: unknown }
+type StreamOutcome = {
+  aborted: boolean
+  error: unknown
+  // tokens reported by the last finish-step (null: not reported)
+  stepTokens: number | null
+  // set once the request is built: from then on the answer gets a usage
+  sent: TurnUsageInputs | null
+}
 
 /**
  * Applies one stream part to the turn state.
@@ -106,6 +114,10 @@ const handleStreamPart = (part: any, state: TurnState, outcome: StreamOutcome): 
       break
     case 'tool-error':
       state.endTool({ toolCallId: part.toolCallId, output: toolFailedOutput(part.error) })
+      break
+    case 'finish-step':
+      // the last step is what the model held at the end of the turn
+      outcome.stepTokens = toContextTokens(part.usage)
       break
     case 'abort':
       outcome.aborted = true
@@ -164,7 +176,7 @@ export const runAssistantTurn = async ({
       ctx.onChangeSet(changeSet)
     },
   }
-  const outcome: StreamOutcome = { aborted: false, error: null }
+  const outcome: StreamOutcome = { aborted: false, error: null, stepTokens: null, sent: null }
   try {
     const feature = assistantAreaFeatures[area]
     // Help sends no survey content and no surveyId (deviation 9)
@@ -210,10 +222,16 @@ export const runAssistantTurn = async ({
       systemPrompt: system,
       tools: toolList,
     })
+    const history = buildTrimmedHistory({ messages: conversation.messages, userMessage, budgetChars })
+    outcome.sent = {
+      estimatedTokens: estimateContextTokens({ systemPrompt: system, tools: toolList, messages: history.messages }),
+      droppedCount: history.droppedCount,
+      contextWindow: turn.engine?.contextWindow ?? null,
+    }
     const result = streamText({
       model: turn.model,
       system,
-      messages: buildHistory({ messages: conversation.messages, userMessage, budgetChars }),
+      messages: history.messages,
       tools: toolList.length > 0 ? toAiSdkTools(toolList, turnCtx) : undefined,
       stopWhen: stepCountIs(turn.limits.maxSteps),
       abortSignal: signal,
@@ -232,6 +250,8 @@ export const runAssistantTurn = async ({
   } catch (error) {
     outcome.error = error
   }
+  // also on a stopped or failed answer: the meter then shows how full the context was
+  if (outcome.sent) state.setUsage(buildTurnUsage({ stepTokens: outcome.stepTokens, ...outcome.sent }))
   finishTurn(state, outcome, signal)
   return state.get()
 }

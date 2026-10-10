@@ -94,6 +94,35 @@ const fitBudget = (earlier: TextMessage[], newMessage: TextMessage, budgetChars:
   return [...kept, newMessage]
 }
 
+export type TrimmedHistory = { messages: ModelMessage[]; droppedCount: number }
+
+/**
+ * Builds the model messages of a turn and counts the earlier messages left out to fit the budget.
+ * @param {object} params - Parameters.
+ * @param {ConversationMessage[]} params.messages - Earlier messages of the conversation.
+ * @param {string} params.userMessage - The new user message.
+ * @param {number} params.budgetChars - Characters available for the history (new message included).
+ * @returns {TrimmedHistory} The messages (the new user message last) and the number of messages dropped.
+ */
+export const buildTrimmedHistory = ({
+  messages,
+  userMessage,
+  budgetChars,
+}: {
+  messages: ConversationMessage[]
+  userMessage: string
+  budgetChars: number
+}): TrimmedHistory => {
+  const all = mergeSameRole([
+    ...messages.map(toTextMessage).filter((message): message is TextMessage => message !== null),
+    { role: 'user', content: userMessage },
+  ])
+  const earlier = all.slice(0, -1)
+  const kept = fitBudget(earlier, all[all.length - 1], budgetChars)
+  // kept ends with the new message
+  return { messages: kept, droppedCount: earlier.length - (kept.length - 1) }
+}
+
 /**
  * Builds the model messages of a turn.
  * @param {object} params - Parameters.
@@ -102,22 +131,19 @@ const fitBudget = (earlier: TextMessage[], newMessage: TextMessage, budgetChars:
  * @param {number} params.budgetChars - Characters available for the history (new message included).
  * @returns {ModelMessage[]} The messages, the new user message last.
  */
-export const buildHistory = ({
-  messages,
-  userMessage,
-  budgetChars,
-}: {
+export const buildHistory = (params: {
   messages: ConversationMessage[]
   userMessage: string
   budgetChars: number
-}): ModelMessage[] => {
-  const all = mergeSameRole([
-    ...messages.map(toTextMessage).filter((message): message is TextMessage => message !== null),
-    { role: 'user', content: userMessage },
-  ])
-  const newMessage = all[all.length - 1]
-  return fitBudget(all.slice(0, -1), newMessage, budgetChars)
-}
+}): ModelMessage[] => buildTrimmedHistory(params).messages
+
+/**
+ * Returns the characters of the tool definitions sent to the model.
+ * @param {AiTool[]} tools - Tools offered.
+ * @returns {number} The length of their JSON descriptors (0 without tools).
+ */
+export const getToolDefinitionChars = (tools: AiTool[]): number =>
+  tools.length > 0 ? JSON.stringify(tools.map(toWebMcpDescriptor)).length : 0
 
 /**
  * Returns the characters left for the history of a turn.
@@ -135,7 +161,5 @@ export const getHistoryBudget = ({
   maxPromptChars: number
   systemPrompt: string
   tools: AiTool[]
-}): number => {
-  const toolChars = tools.length > 0 ? JSON.stringify(tools.map(toWebMcpDescriptor)).length : 0
-  return Math.max(0, Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - toolChars)
-}
+}): number =>
+  Math.max(0, Math.floor(maxPromptChars * HISTORY_SHARE) - systemPrompt.length - getToolDefinitionChars(tools))
