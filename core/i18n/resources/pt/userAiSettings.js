@@ -97,15 +97,16 @@ export default {
     },
     chat: {
       label: 'Assistente de ajuda',
-      sends: 'Sua pergunta e trechos do manual do usuário do Arena.',
+      sends: 'Sua pergunta, trechos do manual do usuário do Arena e onde você está no Arena (o nome do módulo).',
     },
     expressions: {
       label: 'Expressões',
-      sends: 'O atributo e seus atributos irmãos (nomes, tipos, rótulos), a expressão e sua descrição.',
+      sends:
+        'O atributo e seus atributos irmãos (nomes e tipos), a expressão e sua descrição. Se tenta de novo ou explica um erro, também a expressão que falhou e sua mensagem de erro.',
     },
     translation: {
       label: 'Tradução de rótulos',
-      sends: 'Rótulos de atributos, de itens de categorias e nomes comuns de espécies, com os códigos de idioma.',
+      sends: 'O rótulo ou a descrição que você traduz, com os códigos de idioma.',
     },
     assistantDesign: {
       label: 'Assistente de design',
@@ -118,7 +119,7 @@ export default {
     },
     dataDictionary: {
       label: 'Dicionário de dados',
-      sends: 'A estrutura completa do inventário com os rótulos.',
+      sends: 'O nome do inventário e, de cada atributo sem descrição, seu nome, tipo e entidades superiores.',
       runs: 'É executado no servidor do Arena, com seu provedor na nuvem ou o padrão do Arena; nunca no seu servidor local.',
     },
     assistantAnalysis: {
@@ -129,7 +130,7 @@ export default {
     assistantCleaning: {
       label: 'Assistente de limpeza',
       sends:
-        'Os erros de validação com as chaves e os valores dos registros, e os valores dos registros que ele consulta. Propõe alterações que você revisa.',
+        'A estrutura do inventário, os erros de validação com as chaves e os valores dos registros, os valores dos registros que ele consulta e, quando executa uma consulta, seus resultados (contagens de registros e até 200 grupos ou 50 linhas). Propõe alterações que você revisa.',
     },
     userActivity: {
       label: 'Resumos de atividade',

@@ -97,16 +97,17 @@ export default {
     },
     chat: {
       label: "Assistant d'aide",
-      sends: "Votre question et des passages du manuel d'utilisation d'Arena.",
+      sends:
+        "Votre question, des passages du manuel d'utilisation d'Arena et l'endroit où vous vous trouvez dans Arena (le nom du module).",
     },
     expressions: {
       label: 'Expressions',
-      sends: "L'attribut et ses attributs voisins (noms, types, libellés), l'expression et votre description.",
+      sends:
+        "L'attribut et ses attributs voisins (noms et types), l'expression et votre description. Si l'assistant réessaie ou explique une erreur, aussi l'expression en échec et son message d'erreur.",
     },
     translation: {
       label: 'Traduction des libellés',
-      sends:
-        'Libellés des attributs, des éléments de catégories et noms communs des espèces, avec les codes de langue.',
+      sends: 'Le libellé ou la description que vous traduisez, avec les codes de langue.',
     },
     assistantDesign: {
       label: 'Assistant de conception',
@@ -119,7 +120,8 @@ export default {
     },
     dataDictionary: {
       label: 'Dictionnaire de données',
-      sends: 'La structure complète du formulaire avec les libellés.',
+      sends:
+        'Le nom du formulaire et, pour chaque attribut sans description, son nom, son type et ses entités parentes.',
       runs: "S'exécute sur le serveur Arena, avec votre fournisseur cloud ou celui par défaut d'Arena ; jamais sur votre serveur local.",
     },
     assistantAnalysis: {
@@ -130,7 +132,7 @@ export default {
     assistantCleaning: {
       label: 'Assistant de nettoyage',
       sends:
-        "Les erreurs de validation avec les clés et les valeurs de leurs enregistrements, et les valeurs des enregistrements qu'il consulte. Il propose des modifications que vous vérifiez.",
+        "La structure du formulaire, les erreurs de validation avec les clés et les valeurs de leurs enregistrements, les valeurs des enregistrements qu'il consulte et, quand il exécute une requête, ses résultats (comptages d'enregistrements et jusqu'à 200 groupes ou 50 lignes). Il propose des modifications que vous vérifiez.",
     },
     userActivity: {
       label: "Résumés d'activité",
