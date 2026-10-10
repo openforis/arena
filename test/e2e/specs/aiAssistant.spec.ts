@@ -275,7 +275,7 @@ test.describe('AI assistant (mock provider)', () => {
     await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
     await page.getByTestId(TestId.aiAssistant.historyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.historyKept)).toHaveText(
-      'Conversations are kept in this browser until you clear them.'
+      'The latest 30 conversations of each survey are kept in this browser until you clear them.'
     )
   })
 

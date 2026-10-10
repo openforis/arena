@@ -1471,7 +1471,8 @@ $t(common.appNameFull)
     },
     historyTitle: 'Conversaciones',
     historyEmpty: 'No hay conversaciones guardadas.',
-    historyKept: 'Las conversaciones se guardan en este navegador hasta que las borre.',
+    historyKept:
+      'Las últimas {{count}} conversaciones de cada encuesta se guardan en este navegador hasta que las borre.',
     back: 'Volver',
     emptyDesign:
       'Pídame que agregue atributos o que escriba etiquetas o expresiones. Yo propongo los cambios; usted los aplica.',

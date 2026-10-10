@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react'
 
+import { AiLimits } from '@common/ai/limits'
+
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -29,7 +31,7 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
       </div>
       {api.persistent && (
         <p className="ai-assistant-panel__history-note" data-testid={TestId.aiAssistant.historyKept}>
-          {t('aiAssistant.historyKept')}
+          {t('aiAssistant.historyKept', { count: AiLimits.assistantConversationsKept })}
         </p>
       )}
       {history.length === 0 ? (
