@@ -210,3 +210,25 @@ export const decideLoadedConversation = ({
   const inScope = loaded.userUuid === scope.userUuid && loaded.area === scope.area && loaded.surveyId === scope.surveyId
   return inScope ? 'show' : 'forget'
 }
+
+/**
+ * Whether a finished save may update the UI. Saves always run (a stored conversation keeps its own user); the UI is
+ * left alone after a reset (logout, maybe another user next) or when the conversation is not the selected one.
+ * @param {object} params - Parameters.
+ * @param {number} params.startedGeneration - Registry generation when the work started.
+ * @param {number} params.currentGeneration - Registry generation now.
+ * @param {string|null} params.selectedId - Conversation selected in the panel.
+ * @param {string} params.id - Conversation that was saved.
+ * @returns {boolean} True when the conversation may be shown.
+ */
+export const canShowAfterSave = ({
+  startedGeneration,
+  currentGeneration,
+  selectedId,
+  id,
+}: {
+  startedGeneration: number
+  currentGeneration: number
+  selectedId: string | null
+  id: string
+}): boolean => startedGeneration === currentGeneration && selectedId === id

@@ -31,6 +31,7 @@ import { useUser } from '@webapp/store/user'
 
 import type { AssistantArea } from './assistantAreas'
 import {
+  canShowAfterSave,
   decideLoadedConversation,
   getRetryBase,
   normalizeLoadedConversation,
@@ -181,7 +182,7 @@ export const useAssistantConversation = ({
    * @param {string} text - User message.
    * @returns {Promise<void>} Resolves when the turn ends.
    */
-  const runTurn = useCallback(
+  const executeTurn = useCallback(
     async (base: Conversation, text: string) => {
       if (!conversationStore) return
       const controller = new AbortController()
@@ -189,14 +190,17 @@ export const useAssistantConversation = ({
       controllerRef.current = controller
       runningIdRef.current = base.id
       assistantTurnRegistry.register(controller)
-      // a stopped or replaced turn must not bring back a conversation the user left
+      // a stopped, replaced or reset (logout) turn must not bring back a conversation the user left: UI only
       const isCurrent = () =>
-        controllerRef.current === controller && assistantPanelStore.getState().conversationId === base.id
-      // saves are skipped after a reset (logout): a stopped answer left as streaming is shown as stopped on load
-      const persist = (next: Conversation) =>
-        assistantTurnRegistry.getGeneration() === generation
-          ? assistantTurnRegistry.track(conversationStore.save(next))
-          : Promise.resolve()
+        controllerRef.current === controller &&
+        canShowAfterSave({
+          startedGeneration: generation,
+          currentGeneration: assistantTurnRegistry.getGeneration(),
+          selectedId: assistantPanelStore.getState().conversationId,
+          id: base.id,
+        })
+      // always saved, even after a reset: the stored conversation keeps its own user and the last state of the answer
+      const persist = (next: Conversation) => assistantTurnRegistry.track(conversationStore.save(next))
       setBusy(true)
       setEngineNotice(null)
       show(base)
@@ -236,6 +240,12 @@ export const useAssistantConversation = ({
       }
     },
     [area, buildToolContext, conversationStore, show, surveyId]
+  )
+
+  // tracked as a whole: logout waits for the final save of an aborted turn too
+  const runTurn = useCallback(
+    (base: Conversation, text: string) => assistantTurnRegistry.track(executeTurn(base, text)),
+    [executeTurn]
   )
 
   const send = useCallback(
@@ -284,13 +294,14 @@ export const useAssistantConversation = ({
   /**
    * Saves a conversation (tracked, so logout can wait for it) and shows it when it is the selected one.
    * @param {Conversation} next - Conversation.
-   * @param {number} generation - Registry generation when the work started (a reset skips the save).
+   * @param {number} generation - Registry generation when the work started (after a reset it is saved, not shown).
    * @returns {Promise<void>} Resolves when saved.
    */
   const saveShown = useCallback(
     async (next: Conversation, generation: number) => {
-      if (assistantPanelStore.getState().conversationId === next.id) show(next)
-      if (assistantTurnRegistry.getGeneration() !== generation) return
+      const selectedId = assistantPanelStore.getState().conversationId
+      const currentGeneration = assistantTurnRegistry.getGeneration()
+      if (canShowAfterSave({ startedGeneration: generation, currentGeneration, selectedId, id: next.id })) show(next)
       await assistantTurnRegistry.track(conversationStore?.save(next) ?? Promise.resolve())
     },
     [conversationStore, show]
@@ -308,7 +319,8 @@ export const useAssistantConversation = ({
   )
 
   /**
-   * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile).
+   * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile). It is tracked, so
+   * logout waits for the results to be saved.
    * @param {Function} action - Receives the conversation id and the registry generation.
    * @returns {Promise<void>} Resolves when done.
    */
@@ -319,7 +331,7 @@ export const useAssistantConversation = ({
       applyingRef.current = true
       setApplying(true)
       try {
-        await action(id, assistantTurnRegistry.getGeneration())
+        await assistantTurnRegistry.track(action(id, assistantTurnRegistry.getGeneration()))
       } finally {
         applyingRef.current = false
         setApplying(false)
