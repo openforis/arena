@@ -57,10 +57,21 @@ describe('aiAssistant i18n', () => {
     }
   })
 
-  test.each(Object.keys(settingsByLang))('%s has the assistant category', (lang) => {
+  test.each(Object.keys(settingsByLang))('%s has the three assistant categories', (lang) => {
     const { categories } = settingsByLang[lang]
-    for (const key of ['chat', 'chatHint', 'assistant', 'assistantHint']) {
-      expect(typeof categories[key]).toBe('string')
+    expect(categories.assistant).toBeUndefined()
+    const keys = [
+      'chat',
+      'chatHint',
+      'assistantDesign',
+      'assistantDesignHint',
+      'assistantAnalysis',
+      'assistantAnalysisHint',
+      'assistantCleaning',
+      'assistantCleaningHint',
+    ]
+    for (const key of keys) {
+      expect([key, typeof categories[key]]).toEqual([key, 'string'])
       const mustBeCyrillic = lang === 'ru' || lang === 'mn'
       expect([key, !mustBeCyrillic || CYRILLIC.test(categories[key])]).toEqual([key, true])
     }

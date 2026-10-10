@@ -7,7 +7,7 @@ describe('assistantCleaning feature', () => {
     expect(AiFeaturePermission.recordCleanse).toBe('recordCleanse')
     expect(getAiFeature('assistantCleaning')).toEqual({
       key: 'assistantCleaning',
-      category: 'assistant',
+      category: 'assistantCleaning',
       dataClass: 'data',
       variableDataClass: false,
       permission: 'recordCleanse',

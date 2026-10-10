@@ -6,8 +6,14 @@ export default {
   categories: {
     chat: 'Assistente de ajuda',
     chatHint: 'Área do assistente que responde a perguntas sobre o Arena com base no manual do usuário.',
-    assistant: 'Assistente de design',
-    assistantHint: 'Área do assistente que lê o inventário e propõe alterações (você as revisa e aplica).',
+    assistantDesign: 'Assistente de design',
+    assistantDesignHint: 'Área do assistente que lê o inventário e propõe alterações (você as revisa e aplica).',
+    assistantAnalysis: 'Assistente de análise',
+    assistantAnalysisHint:
+      'Área do assistente que explora os dados coletados com consultas. Envia dados de registros ao modelo.',
+    assistantCleaning: 'Assistente de limpeza',
+    assistantCleaningHint:
+      'Área do assistente que lê os erros de validação e os valores dos registros e propõe correções (você as revisa). Envia dados de registros ao modelo.',
     expressions: 'Geracao e validacao de expressoes',
     expressionsHint: 'Assistencia de IA para criar e explicar expressoes de validacao de inventario.',
     translation: 'Traducao de rotulos',

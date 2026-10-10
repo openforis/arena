@@ -25,7 +25,7 @@ export const useAssistantAreas = (): AssistantAreasInfo => {
   const { pathname } = useLocation()
   const designAvailability = useAiFeatureAvailability('assistantDesign')
   const helpAvailability = useAiFeatureAvailability('chatbot')
-  const designEnabled = useAiFeatureEnabled(AiFeatureCategory.assistant)
+  const designEnabled = useAiFeatureEnabled(AiFeatureCategory.assistantDesign)
   const helpEnabled = useAiFeatureEnabled(AiFeatureCategory.chat)
   const analysisStatus = useAnalysisAreaStatus()
   const cleaningStatus = useCleaningAreaStatus()

@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { AiProvider } from '@common/ai/aiProvider'
+import { AiFeatureCategory } from '@common/ai/features'
 
 import * as API from '@webapp/service/api'
 
@@ -9,30 +10,18 @@ import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export type FeatureCategory =
-  'chat' | 'assistant' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
+export type FeatureCategory = AiFeatureCategory
 
-export const FEATURE_CATEGORIES: FeatureCategory[] = [
-  'chat',
-  'assistant',
-  'expressions',
-  'translation',
-  'dataDictionary',
-  'userActivity',
-  'dataQuery',
-]
+export const FEATURE_CATEGORIES: FeatureCategory[] = Object.values(AiFeatureCategory)
 
 type FeatureToggles = Record<FeatureCategory, boolean>
 
-const defaultFeatureToggles = (): FeatureToggles => ({
-  chat: false,
-  assistant: false,
-  expressions: false,
-  translation: false,
-  dataDictionary: false,
-  userActivity: false,
-  dataQuery: false,
-})
+/**
+ * Returns the category switches, all off.
+ * @returns {FeatureToggles} The switches.
+ */
+const defaultFeatureToggles = (): FeatureToggles =>
+  Object.fromEntries(FEATURE_CATEGORIES.map((category) => [category, false])) as FeatureToggles
 
 export const OTHER_MODEL_VALUE = '__other__'
 

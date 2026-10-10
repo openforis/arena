@@ -6,9 +6,15 @@ export default {
   categories: {
     chat: "Assistant d'aide",
     chatHint: "Espace de l'assistant qui répond aux questions sur Arena à partir du manuel d'utilisation.",
-    assistant: 'Assistant de conception',
-    assistantHint:
+    assistantDesign: 'Assistant de conception',
+    assistantDesignHint:
       "Espace de l'assistant qui lit le formulaire et propose des modifications (vous les vérifiez et les appliquez).",
+    assistantAnalysis: "Assistant d'analyse",
+    assistantAnalysisHint:
+      "Espace de l'assistant qui explore les données collectées avec des requêtes. Il envoie des données d'enregistrements au modèle.",
+    assistantCleaning: 'Assistant de nettoyage',
+    assistantCleaningHint:
+      "Espace de l'assistant qui lit les erreurs de validation et les valeurs des enregistrements et propose des corrections (vous les vérifiez). Il envoie des données d'enregistrements au modèle.",
     expressions: 'Generation et validation d expressions',
     expressionsHint: 'Assistance IA pour rediger et expliquer les expressions de validation de formulaire.',
     translation: 'Traduction des libelles',
