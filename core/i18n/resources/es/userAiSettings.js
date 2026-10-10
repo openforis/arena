@@ -97,15 +97,17 @@ export default {
     },
     chat: {
       label: 'Asistente de ayuda',
-      sends: 'Su pregunta y pasajes del manual de usuario de Arena.',
+      sends:
+        'Su pregunta, pasajes del manual de usuario de Arena y dónde se encuentra en Arena (el nombre del módulo).',
     },
     expressions: {
       label: 'Expresiones',
-      sends: 'El atributo y sus atributos hermanos (nombres, tipos, etiquetas), la expresión y su descripción.',
+      sends:
+        'El atributo y sus atributos hermanos (nombres y tipos), la expresión y su descripción. Si reintenta o explica un error, también la expresión fallida y su mensaje de error.',
     },
     translation: {
       label: 'Traducción de etiquetas',
-      sends: 'Etiquetas de atributos, de ítems de categorías y nombres comunes de especies, con los códigos de idioma.',
+      sends: 'La etiqueta o descripción que traduce, con los códigos de idioma.',
     },
     assistantDesign: {
       label: 'Asistente de diseño',
@@ -118,7 +120,7 @@ export default {
     },
     dataDictionary: {
       label: 'Diccionario de datos',
-      sends: 'La estructura completa de la encuesta con las etiquetas.',
+      sends: 'El nombre de la encuesta y, de cada atributo sin descripción, su nombre, tipo y entidades superiores.',
       runs: 'Se ejecuta en el servidor de Arena, con su proveedor en la nube o el predeterminado de Arena; nunca en su servidor local.',
     },
     assistantAnalysis: {
@@ -129,7 +131,7 @@ export default {
     assistantCleaning: {
       label: 'Asistente de limpieza',
       sends:
-        'Los errores de validación con las claves y los valores de sus registros, y los valores de los registros que consulta. Propone cambios que usted revisa.',
+        'La estructura de la encuesta, los errores de validación con las claves y los valores de sus registros, los valores de los registros que consulta y, cuando ejecuta una consulta, sus resultados (recuentos de registros y hasta 200 grupos o 50 filas). Propone cambios que usted revisa.',
     },
     userActivity: {
       label: 'Resúmenes de actividad',

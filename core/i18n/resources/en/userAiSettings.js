@@ -94,15 +94,16 @@ export default {
     },
     chat: {
       label: 'Help assistant',
-      sends: 'Your question and passages from the Arena user manual.',
+      sends: 'Your question, passages from the Arena user manual and where you are in Arena (the module name).',
     },
     expressions: {
       label: 'Expressions',
-      sends: 'The attribute and its sibling attributes (names, types, labels), the expression and your description.',
+      sends:
+        'The attribute and its sibling attributes (names and types), the expression and your description. If it retries or explains an error, also the failed expression and its error message.',
     },
     translation: {
       label: 'Label translation',
-      sends: 'Labels of attributes, category items and species common names, with the language codes.',
+      sends: 'The label or description you translate, with the language codes.',
     },
     assistantDesign: {
       label: 'Design assistant',
@@ -115,7 +116,7 @@ export default {
     },
     dataDictionary: {
       label: 'Data dictionary',
-      sends: 'The full survey structure with labels.',
+      sends: 'The survey name and, for each attribute without a description, its name, type and parent entities.',
       runs: 'Runs on the Arena server, with your cloud provider or the Arena default; never on your local server.',
     },
     assistantAnalysis: {
@@ -126,7 +127,7 @@ export default {
     assistantCleaning: {
       label: 'Cleaning assistant',
       sends:
-        'Validation errors with their record keys and values, and the values of the records it looks at. It proposes edits that you review.',
+        'The survey structure, validation errors with their record keys and values, the values of the records it looks at and, when it runs a query, its results (record counts and up to 200 groups or 50 rows). It proposes edits that you review.',
     },
     userActivity: {
       label: 'Activity summaries',
