@@ -10,6 +10,7 @@ import { toConversationTitle } from '@webapp/ai/conversations/conversationModel'
 import type {
   AssistantMessage,
   AssistantMessageStatus,
+  AssistantMessageUsage,
   Conversation,
   UserMessage,
 } from '@webapp/ai/conversations/types'
@@ -22,6 +23,7 @@ export type TurnState = {
   addChangeSet: (changeSet: ChangeSet) => void
   escalateDataClass: (dataClass: AiDataClass) => void
   setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
+  setUsage: (usage: AssistantMessageUsage) => void
   finish: (status: AssistantMessageStatus, errorKey?: string) => void
 }
 
@@ -119,6 +121,7 @@ export const createTurnState = ({
       if (getMaxAiDataClass(current.dataClass, dataClass) !== current.dataClass) set({ ...current, dataClass })
     },
     setQueries: (queries) => set({ ...current, queries }),
+    setUsage: (usage) => updateAnswer((message) => ({ ...message, usage })),
     finish: (status, errorKey) =>
       updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status })),
   }

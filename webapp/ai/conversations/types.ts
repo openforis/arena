@@ -24,6 +24,18 @@ export type UserMessage = { id: string; role: 'user'; text: string; createdAt: s
 
 export type AssistantMessageStatus = 'streaming' | 'done' | 'stopped' | 'error'
 
+// context the model held at the end of the answer (the context meter); estimated: the provider reported no usage
+export type AssistantMessageUsage = {
+  contextTokens: number
+  // model context size (local server); null when unknown (cloud models)
+  windowTokens: number | null
+  // the window is the 8,192-token default: the local server didn't report its context size
+  windowAssumed: boolean
+  estimated: boolean
+  // older messages were left out of the request
+  historyTrimmed: boolean
+}
+
 export type AssistantMessage = {
   id: string
   role: 'assistant'
@@ -31,6 +43,8 @@ export type AssistantMessage = {
   status: AssistantMessageStatus
   // appErrors key of a failed turn
   errorKey?: string
+  // absent on answers saved before the meter, and when no request was sent
+  usage?: AssistantMessageUsage
   createdAt: string
 }
 
