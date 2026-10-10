@@ -129,7 +129,7 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     key: 'assistantCleaning',
     category: assistant,
     dataClass: data,
-    variableDataClass: true,
+    variableDataClass: false,
     permission: recordCleanse,
     gateway: true,
     tools: true,
