@@ -45,7 +45,9 @@ describe('context meter text (206)', () => {
     expect(enT('aiAssistant.context.nearLimit')).toBe('Near the limit.')
     expect(enT('aiAssistant.context.trimmed')).toBe('Older messages are no longer sent to the model.')
     expect(enT('aiAssistant.menu.newConversation')).toBe('New conversation')
-    expect(enT('aiAssistant.historyKept')).toBe('Conversations are kept in this browser until you clear them.')
+    expect(enT('aiAssistant.historyKept', { count: 30 })).toBe(
+      'The latest 30 conversations of each survey are kept in this browser until you clear them.'
+    )
     expect(typeof enT('aiAssistant.context.label')).toBe('string')
   })
 })
