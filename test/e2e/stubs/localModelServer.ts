@@ -26,8 +26,12 @@ export type LocalModelServerStub = {
   baseUrl: string
   modelId: string
   requests: LocalModelServerRequest[]
+  // pause before each streamed chunk (default 0), to keep an answer running while a test acts
+  setChunkDelay: (ms: number) => void
   stop: () => Promise<void>
 }
+
+type StubSettings = { chunkDelayMs: number }
 
 type OpenAiToolCall = { id: string; type: 'function'; function: { name: string; arguments: string } }
 type OpenAiMessage = {
@@ -111,7 +115,9 @@ const toOpenAiToolCall = (part: { toolCallId: string; toolName: string; input: s
   function: { name: part.toolName, arguments: part.input },
 })
 
-const USAGE = { prompt_tokens: 0, completion_tokens: 0, total_tokens: 0 }
+// reported by every answer: the assistant's context meter shows it against STUB_CONTEXT_TOKENS
+export const STUB_USAGE = { prompt_tokens: 1500, completion_tokens: 20, total_tokens: 1520 }
+export const STUB_CONTEXT_USED_TOKENS = STUB_USAGE.prompt_tokens + STUB_USAGE.completion_tokens
 
 /**
  * Returns the non-streamed chat completion body of the mock model's answer.
@@ -133,7 +139,7 @@ export const toChatCompletion = (content: LanguageModelV4Content[]) => {
         finish_reason: toolCalls.length ? 'tool_calls' : 'stop',
       },
     ],
-    usage: USAGE,
+    usage: STUB_USAGE,
   }
 }
 
@@ -161,7 +167,7 @@ export const toChatCompletionChunks = (parts: LanguageModelV4StreamPart[]): obje
     }
   }
   chunks.push(chunk({}, toolCallIndex > 0 ? 'tool_calls' : 'stop'))
-  chunks.push({ ...chunk({}), choices: [], usage: USAGE })
+  chunks.push({ ...chunk({}), choices: [], usage: STUB_USAGE })
   return chunks
 }
 
@@ -208,7 +214,11 @@ const readBody = async (req: IncomingMessage): Promise<unknown> => {
   return text ? parseJson(text) : null
 }
 
-const answerChat = async (res: ServerResponse, request: OpenAiChatRequest): Promise<void> => {
+const answerChat = async (
+  res: ServerResponse,
+  request: OpenAiChatRequest,
+  { chunkDelayMs }: StubSettings
+): Promise<void> => {
   const model = createMockModel()
   const options = {
     prompt: toMockPrompt(request.messages ?? []),
@@ -222,14 +232,18 @@ const answerChat = async (res: ServerResponse, request: OpenAiChatRequest): Prom
   const { stream } = await model.doStream(options)
   const chunks = toChatCompletionChunks(await readStream(stream))
   res.writeHead(200, { 'Content-Type': 'text/event-stream', 'Cache-Control': 'no-cache' })
-  for (const data of chunks) res.write(`data: ${JSON.stringify(data)}\n\n`)
+  for (const data of chunks) {
+    if (chunkDelayMs > 0) await new Promise((resolve) => setTimeout(resolve, chunkDelayMs))
+    res.write(`data: ${JSON.stringify(data)}\n\n`)
+  }
   res.end('data: [DONE]\n\n')
 }
 
 const handle = async (
   req: IncomingMessage,
   res: ServerResponse,
-  requests: LocalModelServerRequest[]
+  requests: LocalModelServerRequest[],
+  settings: StubSettings
 ): Promise<void> => {
   setCors(req, res)
   if (req.method === 'OPTIONS') {
@@ -243,7 +257,8 @@ const handle = async (
 
   if (req.method === 'GET' && path === '/v1/models') return sendJson(res, 200, MODELS_V1)
   if (req.method === 'GET' && path === '/api/v0/models') return sendJson(res, 200, MODELS_LM_STUDIO)
-  if (req.method === 'POST' && path === '/v1/chat/completions') return answerChat(res, body as OpenAiChatRequest)
+  if (req.method === 'POST' && path === '/v1/chat/completions')
+    return answerChat(res, body as OpenAiChatRequest, settings)
   sendJson(res, 404, { error: { message: `Unexpected endpoint or method. (${req.method} ${path})` } })
 }
 
@@ -255,8 +270,9 @@ const handle = async (
  */
 export const startLocalModelServer = async ({ port = 0 }: { port?: number } = {}): Promise<LocalModelServerStub> => {
   const requests: LocalModelServerRequest[] = []
+  const settings: StubSettings = { chunkDelayMs: 0 }
   const server = http.createServer((req, res) => {
-    handle(req, res, requests).catch((error: Error) => {
+    handle(req, res, requests, settings).catch((error: Error) => {
       if (!res.headersSent) sendJson(res, 500, { error: { message: error.message } })
       else res.end()
     })
@@ -267,6 +283,9 @@ export const startLocalModelServer = async ({ port = 0 }: { port?: number } = {}
     baseUrl: `http://127.0.0.1:${actualPort}/v1`,
     modelId: STUB_MODEL_ID,
     requests,
+    setChunkDelay: (ms) => {
+      settings.chunkDelayMs = ms
+    },
     stop: () =>
       new Promise<void>((resolve) => {
         // the browser keeps connections alive: close them, or close() waits for them
