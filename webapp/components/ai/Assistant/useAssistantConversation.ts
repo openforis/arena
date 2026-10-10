@@ -17,9 +17,11 @@ import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
+import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
+import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -179,7 +181,7 @@ export const useAssistantConversation = ({
       // a stopped or replaced turn must not bring back a conversation the user left
       const isCurrent = () =>
         controllerRef.current === controller && assistantPanelStore.getState().conversationId === base.id
-      // saves are skipped after a reset (logout), which clears the store
+      // saves are skipped after a reset (logout): a stopped answer left as streaming is shown as stopped on load
       const persist = (next: Conversation) =>
         assistantTurnRegistry.getGeneration() === generation
           ? assistantTurnRegistry.track(conversationStore.save(next))
@@ -262,8 +264,8 @@ export const useAssistantConversation = ({
 
   const clearConversations = useCallback(async () => {
     if (!conversationStore) return
-    // all the conversations of the user, whatever the area and the survey
-    await conversationStore.clearUser(userUuid)
+    // all the conversations of the user, whatever the area and the survey, and the open ones of every area
+    await clearUserConversations({ conversationStore, openConversations: browserOpenConversations, userUuid })
     setHistory([])
     assistantPanelStore.setConversationId(null)
   }, [conversationStore, userUuid])

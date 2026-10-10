@@ -27,6 +27,11 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
         <Button label="aiAssistant.back" onClick={assistantPanelStore.showChat} size="small" variant="text" />
         <h3>{t('aiAssistant.historyTitle')}</h3>
       </div>
+      {api.persistent && (
+        <p className="ai-assistant-panel__history-note" data-testid={TestId.aiAssistant.historyKept}>
+          {t('aiAssistant.historyKept')}
+        </p>
+      )}
       {history.length === 0 ? (
         <p className="ai-assistant-panel__empty">{t('aiAssistant.historyEmpty')}</p>
       ) : (
