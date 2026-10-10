@@ -225,10 +225,10 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
+  // items with default values (e.g. empty child applicability) are not stored to save space
   const meta = {
-    ...Node.getMeta(node),
+    ...Node.compactMeta(Node.getMeta(node)),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
-    [Node.metaKeys.childApplicability]: {},
   }
 
   await client.query(
@@ -271,7 +271,7 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       parent_uuid: Node.getParentUuid(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
-      meta: Node.getMeta(node),
+      meta: Node.compactMeta(Node.getMeta(node)),
     }))
   )
   // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
@@ -335,15 +335,16 @@ export const updateNode = async (
   { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
+  // meta is merged into the stored one: items with default values are deleted instead of stored, to save space
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1::jsonb,
-    meta = meta || $2::jsonb, 
+    meta = (meta - $4::text[]) || $2::jsonb, 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [_toValueQueryParam(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), Node.compactMeta(meta), nodeUuid, Node.getMetaKeysWithDefaultValue(meta)]
   )
   if (!reloadNode) return null
 
@@ -357,7 +358,8 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
   const values = nodes.map((node) => [
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
-    Node.getMeta(node),
+    // meta is replaced as a whole: items with default values are not stored to save space
+    Node.compactMeta(Node.getMeta(node)),
     Dates.formatForStorage(Node.getDateModified(node)),
   ])
   await client.none(
@@ -416,3 +418,16 @@ export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
     [nodeUuids],
     dbTransformCallback
   )
+
+// ============== MAINTENANCE
+
+/**
+ * Rewrites the node table of the specified survey reclaiming the space of dead rows (it locks the table while running).
+ * It cannot be run inside a transaction.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey ID.
+ * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @returns {Promise<null>} - The query result.
+ */
+export const vacuumFullNodeTable = async ({ surveyId }, client = db) =>
+  DbUtils.vacuumTable({ schema: getSurveyDBSchema(surveyId), table: 'node', full: true, analyze: true }, client)
