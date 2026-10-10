@@ -107,7 +107,9 @@ export default {
     },
     translation: {
       label: 'Tradução de rótulos',
-      sends: 'O rótulo ou a descrição que você traduz, com os códigos de idioma.',
+      sends:
+        'O rótulo ou a descrição que você traduz, com os códigos de idioma. «IA: Traduzir rótulos» no designer de formulário envia os rótulos e as descrições de todas as entidades e atributos.',
+      runs: '«IA: Traduzir rótulos» é executado no servidor do Arena, com seu provedor na nuvem ou o padrão do Arena; nunca no seu servidor local.',
     },
     assistantDesign: {
       label: 'Assistente de design',
@@ -120,7 +122,8 @@ export default {
     },
     dataDictionary: {
       label: 'Dicionário de dados',
-      sends: 'O nome do inventário e, de cada atributo sem descrição, seu nome, tipo e entidades superiores.',
+      sends:
+        'O nome do inventário e, de cada entidade ou atributo sem descrição, seu nome, tipo e entidades superiores.',
       runs: 'É executado no servidor do Arena, com seu provedor na nuvem ou o padrão do Arena; nunca no seu servidor local.',
     },
     assistantAnalysis: {

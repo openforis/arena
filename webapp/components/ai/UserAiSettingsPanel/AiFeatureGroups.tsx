@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { AiFeatureCategory } from '@common/ai/features'
-
 import { Fieldset } from '@webapp/components/Fieldset'
 import { Checkbox } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
@@ -14,6 +12,7 @@ import {
   FEATURE_GROUPS,
   type FeatureGroup,
   getDataBadgeKind,
+  SERVER_RUN_CATEGORIES,
 } from './featureGroups'
 
 type ToggleChange = (category: FeatureCategory) => (checked: boolean) => void
@@ -55,7 +54,7 @@ const FeatureRow = ({
   const i18n = useI18n()
   const sendsId = `ai-feature-sends-${category}`
   const runsId = `ai-feature-runs-${category}`
-  const isDictionary = category === AiFeatureCategory.dataDictionary
+  const hasRuns = SERVER_RUN_CATEGORIES.includes(category)
   return (
     <div className="user-ai-settings-panel__feature">
       <Checkbox
@@ -63,15 +62,15 @@ const FeatureRow = ({
         onChange={onChange}
         label={`userAiSettings:features.${category}.label`}
         testId={TestId.ai.featureToggle(category)}
-        describedBy={isDictionary ? `${sendsId} ${runsId}` : sendsId}
+        describedBy={hasRuns ? `${sendsId} ${runsId}` : sendsId}
       />
       <div id={sendsId} className="user-ai-settings-panel__sends">
         <span className="user-ai-settings-panel__sends-label">{i18n.t('userAiSettings:features.sendsLabel')}</span>{' '}
         {i18n.t(`userAiSettings:features.${category}.sends`)}
       </div>
-      {isDictionary && (
+      {hasRuns && (
         <div id={runsId} className="user-ai-settings-panel__sends">
-          {i18n.t('userAiSettings:features.dataDictionary.runs')}
+          {i18n.t(`userAiSettings:features.${category}.runs`)}
         </div>
       )}
     </div>
