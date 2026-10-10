@@ -60,6 +60,21 @@ export const describeResolvedConfig = (resolved, allowlist = ENV.aiOrgHostedBase
 }
 
 /**
+ * Describes the instance default provider for the settings panel ("Arena default" hint, status line). Never the key.
+ * @param {object|null} [adminConfig] - Admin default config (injectable for tests).
+ * @param {string[]} [allowlist] - Org-hosted base URLs (defaults to AI_ORG_HOSTED_BASE_URLS).
+ * @returns {{provider: string, model: ?string, hostingClass: ?string}|null} The description, or null when none is set.
+ */
+export const describeAdminDefault = (adminConfig = adminDefaultConfig(), allowlist = ENV.aiOrgHostedBaseUrls) => {
+  if (!adminConfig) return null
+  const { provider, model, hostingClass } = describeResolvedConfig(
+    { cfg: adminConfig, source: sources.adminDefault },
+    allowlist
+  )
+  return { provider, model: model ?? null, hostingClass }
+}
+
+/**
  * Resolves the model handle for a (user, feature) pair.
  * @param {object} args - Resolver inputs.
  * @param {object} args.user - The Arena user object.

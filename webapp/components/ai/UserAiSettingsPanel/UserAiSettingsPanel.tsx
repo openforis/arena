@@ -11,13 +11,13 @@ import { Fieldset } from '@webapp/components/Fieldset'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 
 import {
+  BASE_URL_PLACEHOLDERS,
   FEATURE_CATEGORIES,
   MODEL_PLACEHOLDERS,
   OTHER_MODEL_VALUE,
   PROVIDERS,
-  BASE_URL_PLACEHOLDERS,
-  useUserAiSettings,
-} from './useUserAiSettings'
+} from './aiSettingsForm'
+import { useUserAiSettings } from './useUserAiSettings'
 import { LocalAiSection } from './LocalAiSection'
 
 // forwardRef JS components lose their prop types in TS — cast to restore usability

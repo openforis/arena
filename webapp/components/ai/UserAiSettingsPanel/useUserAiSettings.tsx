@@ -1,8 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 
-import { AiProvider } from '@common/ai/aiProvider'
-import { AiFeatureCategory } from '@common/ai/features'
-
 import * as API from '@webapp/service/api'
 
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
@@ -10,141 +7,22 @@ import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export type FeatureCategory = AiFeatureCategory
-
-export const FEATURE_CATEGORIES: FeatureCategory[] = Object.values(AiFeatureCategory)
-
-type FeatureToggles = Record<FeatureCategory, boolean>
-
-/**
- * Returns the category switches, all off.
- * @returns {FeatureToggles} The switches.
- */
-const defaultFeatureToggles = (): FeatureToggles =>
-  Object.fromEntries(FEATURE_CATEGORIES.map((category) => [category, false])) as FeatureToggles
-
-export const OTHER_MODEL_VALUE = '__other__'
-
-export const DEFAULT_PROVIDER_VALUE = 'default'
-
-// "default" is a UI-only sentinel meaning "use the admin-configured
-// provider". When the user picks it, we save `enabled: false` so the
-// backend resolver falls through to the admin default.
-export type ProviderSpec = {
-  value: string
-  isDefault?: boolean
-  requiresBaseUrl: boolean
-  requiresApiKey: boolean
-  supportsModelList: boolean
-}
-
-export const PROVIDERS: ProviderSpec[] = [
-  {
-    value: DEFAULT_PROVIDER_VALUE,
-    isDefault: true,
-    requiresBaseUrl: false,
-    requiresApiKey: false,
-    supportsModelList: false,
-  },
-  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.anthropic, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.openaiCompatible, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
-  { value: AiProvider.vercelAiSdk, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
-]
-
-export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
-  [AiProvider.openaiCompatible]: 'https://openrouter.ai/api/v1',
-  [AiProvider.vercelAiSdk]: 'https://your-app.example.com/api/chat',
-}
-
-export const MODEL_PLACEHOLDERS: Record<string, string> = {
-  [AiProvider.openai]: 'gpt-4o-mini',
-  [AiProvider.anthropic]: 'claude-haiku-4-5',
-  [AiProvider.google]: 'gemini-2.0-flash',
-  [AiProvider.openaiCompatible]: 'llama3.3:70b',
-}
-
-type AiSettings = {
-  featuresEnabled?: boolean
-  featureToggles?: Partial<FeatureToggles>
-  enabled?: boolean
-  provider?: string
-  model?: string
-  baseUrl?: string
-  hasApiKey?: boolean
-  apiKeyReadable?: boolean
-  aiFeaturesDisabled?: boolean
-  effectiveSource?: string
-  effectiveProvider?: string
-  effectiveModel?: string
-  encryptionConfigured?: boolean
-}
-
-type AiModel = {
-  id: string
-  description?: string
-}
-
-type TestResult = {
-  ok: boolean
-  latencyMs?: number
-  errorMessage?: string
-  errorKey?: string
-  errorParams?: Record<string, unknown>
-}
-
-type SettingsUpdate = {
-  featuresEnabled: boolean
-  featureToggles: FeatureToggles
-  enabled: boolean
-  provider?: string
-  model?: string | null
-  baseUrl?: string | null
-  apiKey?: string
-}
-
-type FormState = {
-  featuresEnabled: boolean
-  featureToggles: FeatureToggles
-  provider: string
-  model: string
-  baseUrl: string
-  apiKey: string
-  apiKeyDirty: boolean
-  apiKeyVersion: number
-  modelFreeText: boolean
-}
-
-const emptyForm: FormState = {
-  featuresEnabled: false,
-  featureToggles: defaultFeatureToggles(),
-  provider: DEFAULT_PROVIDER_VALUE,
-  model: '',
-  baseUrl: '',
-  apiKey: '',
-  apiKeyDirty: false,
-  apiKeyVersion: 0,
-  modelFreeText: false,
-}
-
-const buildModelsKey = ({
-  provider,
-  baseUrl,
-  apiKeyDirty,
-  apiKeyVersion,
-  hasSavedApiKey,
-}: {
-  provider: string
-  baseUrl: string
-  apiKeyDirty: boolean
-  apiKeyVersion: number
-  hasSavedApiKey: boolean
-}): string => {
-  const savedKeyFlag = hasSavedApiKey ? '1' : '0'
-  const apiKeySegment = apiKeyDirty ? `dirty:v${apiKeyVersion}` : `saved:${savedKeyFlag}`
-  return [provider, baseUrl || '', apiKeySegment].join('|')
-}
+import {
+  type AiModel,
+  type AiSettings,
+  buildModelsKey,
+  buildSettingsUpdate,
+  createEmptyForm,
+  DEFAULT_PROVIDER_VALUE,
+  defaultFeatureToggles,
+  type FeatureCategory,
+  type FormState,
+  OTHER_MODEL_VALUE,
+  type ProviderSpec,
+  PROVIDERS,
+  type TestResult,
+  withoutCloudProvider,
+} from './aiSettingsForm'
 
 type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
@@ -184,7 +62,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
 
   const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState<AiSettings | null>(null)
-  const [form, setForm] = useState<FormState>(emptyForm)
+  const [form, setForm] = useState<FormState>(createEmptyForm)
   const [dirty, setDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
@@ -368,21 +246,9 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     setSaving(true)
     setTestResult(null)
     try {
-      const useAdminDefault = providerSpec.isDefault
-      const update: SettingsUpdate = {
-        featuresEnabled: form.featuresEnabled,
-        featureToggles: form.featureToggles,
-        enabled: !useAdminDefault,
-        ...(useAdminDefault
-          ? {}
-          : {
-              provider: form.provider,
-              model: providerSpec.supportsModelList ? form.model : null,
-              baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
-              ...(form.apiKeyDirty ? { apiKey: form.apiKey } : {}),
-            }),
-      }
-      const data: AiSettings = await API.aiSettings.saveSettings(update as any)
+      const data: AiSettings = await API.aiSettings.saveSettings(
+        buildSettingsUpdate({ form, spec: providerSpec }) as any
+      )
       setSettings(data)
       setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
       setDirty(false)
@@ -395,20 +261,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     } finally {
       setSaving(false)
     }
-  }, [
-    providerSpec.isDefault,
-    providerSpec.supportsModelList,
-    providerSpec.requiresBaseUrl,
-    form.featuresEnabled,
-    form.featureToggles,
-    form.provider,
-    form.model,
-    form.baseUrl,
-    form.apiKeyDirty,
-    form.apiKey,
-    notifyInfo,
-    notifyError,
-  ])
+  }, [form, providerSpec, notifyInfo, notifyError])
 
   const onTest = useCallback(async () => {
     setTesting(true)
@@ -437,11 +290,11 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     try {
       const data: AiSettings = await API.aiSettings.clearSettings()
       setSettings(data)
-      setForm({ ...emptyForm, featureToggles: defaultFeatureToggles() })
+      // only the provider is removed: the switches, and their unsaved edits, stay
+      setForm(withoutCloudProvider)
       setModels([])
       setModelsError(null)
       setLastModelsKey(null)
-      setDirty(false)
       invalidateAiSettingsCache()
       // the gateway and its hosting class may have changed
       refreshAiCapabilities().catch(() => undefined)
