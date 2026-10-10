@@ -37,6 +37,9 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
 ]
 
+// categories with a `runs` line: jobs of the Arena server, never run on the browser's local server
+export const SERVER_RUN_CATEGORIES: AiFeatureCategory[] = [translation, dataDictionary]
+
 export const DATA_BADGE_KINDS: DataBadgeKind[] = ['none', AiDataClass.schema, AiDataClass.data]
 
 /**

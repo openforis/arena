@@ -108,7 +108,9 @@ export default {
     },
     translation: {
       label: 'Traduction des libellés',
-      sends: 'Le libellé ou la description que vous traduisez, avec les codes de langue.',
+      sends:
+        'Le libellé ou la description que vous traduisez, avec les codes de langue. « IA : Traduire les étiquettes » dans le concepteur de formulaire envoie les libellés et descriptions de toutes les entités et de tous les attributs.',
+      runs: "« IA : Traduire les étiquettes » s'exécute sur le serveur Arena, avec votre fournisseur cloud ou celui par défaut d'Arena ; jamais sur votre serveur local.",
     },
     assistantDesign: {
       label: 'Assistant de conception',
@@ -122,7 +124,7 @@ export default {
     dataDictionary: {
       label: 'Dictionnaire de données',
       sends:
-        'Le nom du formulaire et, pour chaque attribut sans description, son nom, son type et ses entités parentes.',
+        'Le nom du formulaire et, pour chaque entité ou attribut sans description, son nom, son type et ses entités parentes.',
       runs: "S'exécute sur le serveur Arena, avec votre fournisseur cloud ou celui par défaut d'Arena ; jamais sur votre serveur local.",
     },
     assistantAnalysis: {
