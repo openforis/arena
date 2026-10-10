@@ -60,6 +60,11 @@ export const insertTestUserIfMissing = async (user: TestUser): Promise<void> =>
       email,
       { [User.keysPrefs.whatsNewSeenIds]: whatsNewSeenIds },
     ])
+    // the profile requires a title: without it the profile Save button stays disabled
+    await tx.none(`UPDATE "user" SET props = COALESCE(props, '{}'::jsonb) || $2::jsonb WHERE email = $1`, [
+      email,
+      { [User.keysProps.title]: User.titleKeys.preferNotToSay },
+    ])
   })
 
 /**
