@@ -63,13 +63,24 @@ export const getSelectableOperationIds = (
 // D1's merge (an operation keeps its latest result, new ones appended): one rule for both cards
 export { mergeOperationResults } from '@webapp/components/ai/Assistant/assistantPanelModel'
 
+// failures that may succeed when sent again; the others (duplicate key, node not in the record, not editable...) are
+// deterministic, so resending them would only fail again
+const transientFailureKeys = new Set([
+  'appErrors:record.lockTimeout',
+  'appErrors:aiApplyTimeout',
+  'appErrors:networkError',
+  'appErrors:generic',
+])
+
 /**
- * Returns the ids of the failed edits (Retry).
+ * Returns the ids of the edits that failed for a transient reason (Retry).
  * @param {OperationResult[]} results - Results.
  * @returns {string[]} The ids.
  */
 export const getRetryOperationIds = (results: OperationResult[] = []): string[] =>
-  results.filter((result) => result.status === 'failed').map((result) => result.id)
+  results
+    .filter(({ status, message }) => status === 'failed' && message !== undefined && transientFailureKeys.has(message))
+    .map((result) => result.id)
 
 /**
  * Counts the results by status.
