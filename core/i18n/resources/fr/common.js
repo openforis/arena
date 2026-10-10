@@ -1714,7 +1714,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     },
     historyTitle: 'Conversations',
     historyEmpty: 'Aucune conversation enregistrée.',
-    historyKept: "Les conversations sont conservées dans ce navigateur jusqu'à ce que vous les effaciez.",
+    historyKept:
+      "Les {{count}} dernières conversations de chaque formulaire sont conservées dans ce navigateur jusqu'à ce que vous les effaciez.",
     back: 'Retour',
     emptyDesign:
       "Demandez-moi d'ajouter des attributs, ou d'écrire des libellés ou des expressions. Je propose les modifications ; vous les appliquez.",
