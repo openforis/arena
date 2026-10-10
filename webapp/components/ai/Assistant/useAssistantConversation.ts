@@ -30,7 +30,13 @@ import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/
 import { useUser } from '@webapp/store/user'
 
 import type { AssistantArea } from './assistantAreas'
-import { getRetryBase, normalizeLoadedConversation, withApplyResults, withDiscarded } from './assistantPanelModel'
+import {
+  decideLoadedConversation,
+  getRetryBase,
+  normalizeLoadedConversation,
+  withApplyResults,
+  withDiscarded,
+} from './assistantPanelModel'
 import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { startsAsDataConversation } from './cleaning/cleaningArea'
@@ -155,9 +161,14 @@ export const useAssistantConversation = ({
     let active = true
     conversationStore.get(conversationId).then((loaded) => {
       if (!active) return
-      if (loaded?.userUuid === userUuid && loaded.area === area && loaded.surveyId === surveyId) {
-        show(normalizeLoadedConversation(loaded, runningIdRef.current === loaded.id))
-      } else assistantPanelStore.setConversationId(null)
+      const decision = decideLoadedConversation({
+        loaded,
+        conversationId,
+        runningId: runningIdRef.current,
+        scope: { userUuid, area, surveyId },
+      })
+      if (decision === 'show' && loaded) show(normalizeLoadedConversation(loaded, runningIdRef.current === loaded.id))
+      else if (decision === 'forget') assistantPanelStore.setConversationId(null)
     })
     return () => {
       active = false

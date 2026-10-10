@@ -182,3 +182,31 @@ export const normalizeLoadedConversation = (conversation: Conversation, running 
     ),
   }
 }
+
+export type LoadedConversationDecision = 'show' | 'keep' | 'forget'
+
+/**
+ * Decides what the panel does with the remembered conversation id once the store answered.
+ * @param {object} params - Parameters.
+ * @param {Conversation|null} params.loaded - Conversation read from the store (null when missing).
+ * @param {string} params.conversationId - Remembered id.
+ * @param {string|null} params.runningId - Id of the conversation whose turn is running now.
+ * @param {object} params.scope - User, area and survey the panel shows.
+ * @returns {LoadedConversationDecision} `show` it, `keep` the id (its first save is pending) or `forget` the id.
+ */
+export const decideLoadedConversation = ({
+  loaded,
+  conversationId,
+  runningId,
+  scope,
+}: {
+  loaded: Conversation | null
+  conversationId: string
+  runningId: string | null
+  scope: { userUuid: string; area: string; surveyId: number | null }
+}): LoadedConversationDecision => {
+  // the running answer is saved after its first update: its id is valid before the store has it
+  if (!loaded) return runningId === conversationId ? 'keep' : 'forget'
+  const inScope = loaded.userUuid === scope.userUuid && loaded.area === scope.area && loaded.surveyId === scope.surveyId
+  return inScope ? 'show' : 'forget'
+}

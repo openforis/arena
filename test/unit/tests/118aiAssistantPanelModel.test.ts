@@ -2,6 +2,7 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import {
   DISCARD_NOTE,
+  decideLoadedConversation,
   getProposedChangeSetId,
   getRetryBase,
   getToolRowLabel,
@@ -140,5 +141,43 @@ describe('loaded conversations', () => {
     expect(normalizeLoadedConversation(loaded, true)).toBe(loaded)
     const clean = conversationWith([user, answer('done', 'Ok')])
     expect(normalizeLoadedConversation(clean)).toBe(clean)
+  })
+})
+
+describe('remembered conversation id once the store answered', () => {
+  const scope = { userUuid: 'u1', area: 'design', surveyId: 7 }
+  const loaded = createConversation({ userUuid: 'u1', surveyId: 7, area: 'design' })
+
+  test('a stored conversation of the scope is shown', () => {
+    expect(decideLoadedConversation({ loaded, conversationId: loaded.id, runningId: null, scope })).toBe('show')
+  })
+
+  test('a stored conversation of another scope is forgotten', () => {
+    expect(
+      decideLoadedConversation({
+        loaded,
+        conversationId: loaded.id,
+        runningId: null,
+        scope: { ...scope, area: 'help' },
+      })
+    ).toBe('forget')
+    expect(
+      decideLoadedConversation({
+        loaded,
+        conversationId: loaded.id,
+        runningId: null,
+        scope: { ...scope, userUuid: 'u2' },
+      })
+    ).toBe('forget')
+    expect(
+      decideLoadedConversation({ loaded, conversationId: loaded.id, runningId: null, scope: { ...scope, surveyId: 8 } })
+    ).toBe('forget')
+  })
+
+  test('a missing conversation is kept while its first answer runs, forgotten otherwise', () => {
+    expect(decideLoadedConversation({ loaded: null, conversationId: 'c-1', runningId: 'c-1', scope })).toBe('keep')
+    // the run ended (or another conversation runs): a truly missing id is dropped
+    expect(decideLoadedConversation({ loaded: null, conversationId: 'c-1', runningId: null, scope })).toBe('forget')
+    expect(decideLoadedConversation({ loaded: null, conversationId: 'c-1', runningId: 'c-2', scope })).toBe('forget')
   })
 })
