@@ -60,6 +60,23 @@ describe('chunkOperationsByRecord edit limit', () => {
 })
 
 describe('applyRecordEdits', () => {
+  test('sends the cycle of the proposal, not the current one', async () => {
+    const operations = [{ ...operation('r0', 'n'), cycle: '1' }]
+    const requests: any[] = []
+    await applyRecordEdits({
+      changeSet: changeSetOf(operations),
+      operationIds: [operations[0].id],
+      cycle: '0',
+      timezoneOffset: 0,
+      lang: 'en',
+      post: async (request: any) => {
+        requests.push(request)
+        return applied(request.edits)
+      },
+    })
+    expect(requests[0].cycle).toBe('1')
+  })
+
   test('posts each chunk and merges the results by edit, in operation order', async () => {
     const operations = Array.from({ length: 60 }, (_, index) => operation(`r${index}`, 'n'))
     const requests: any[] = []

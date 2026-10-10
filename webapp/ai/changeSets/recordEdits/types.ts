@@ -19,6 +19,8 @@ export type RecordAttributeUpdateOperation = {
   id: string
   type: typeof RECORD_ATTRIBUTE_UPDATE
   recordUuid: string
+  // the survey cycle of the proposal: Apply sends this one, not whichever cycle is current by then
+  cycle?: string
   nodeUuid: string
   nodeDefUuid: string
   recordKeys: string

@@ -126,6 +126,20 @@ describe('records_proposeEdits', () => {
     expect(JSON.stringify(result)).toContain('attributeNotEditable')
   })
 
+  test('a record of another cycle is rejected, and operations carry the proposal cycle', async () => {
+    const ctx = newCleaningToolContext({ survey })
+    const recordUuid = Record.getUuid(record)
+    const edit = { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'x' }
+    const { tool: otherCycleTool } = newTool(() => ({ ...record, cycle: 'other-cycle' }))
+    const refused = await runTool(otherCycleTool, { summary: 's', edits: [edit] }, ctx)
+    expect(ctx.changeSets).toEqual([])
+    expect(refused.error.issues).toEqual([{ operation: 0, field: 'recordOfOtherCycle', message: expect.any(String) }])
+
+    const { tool } = newTool()
+    await runTool(tool, { summary: 's', edits: [edit] }, ctx)
+    expect(ctx.changeSets[0].operations[0].cycle).toBe(Record.getCycle(record))
+  })
+
   test('a record the user may not see refuses all its edits', async () => {
     const { tool } = newTool(() => null)
     const ctx = newCleaningToolContext({ survey })

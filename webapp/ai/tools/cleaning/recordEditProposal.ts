@@ -197,6 +197,7 @@ const buildRecordDrafts = async ({
     return {
       type: RECORD_ATTRIBUTE_UPDATE,
       recordUuid: Record.getUuid(record),
+      cycle,
       nodeUuid,
       nodeDefUuid: Node.getNodeDefUuid(node),
       recordKeys,
@@ -211,6 +212,11 @@ const buildRecordDrafts = async ({
       },
     }
   })
+}
+
+const cycleRefusal: EditRefusal = {
+  code: 'recordOfOtherCycle',
+  message: 'This record belongs to another survey cycle than the one the user has open: it can not be edited here.',
 }
 
 /**
@@ -239,6 +245,11 @@ const proposeRecordEdits = async ({
     ? checkRecordEditable({ user: context.user, survey: context.survey, record })
     : { code: 'recordNotAvailable', message: 'The record does not exist or you may not see it.' }
   if (recordRefusal) return { drafts: [], rejected: edits.map((edit) => reject(edit, recordRefusal)) }
+
+  // a record of another cycle would be a conflict at Apply: say so now
+  if (Record.getCycle(record) !== context.cycle) {
+    return { drafts: [], rejected: edits.map((edit) => reject(edit, cycleRefusal)) }
+  }
 
   const rejected: RecordEditRejection[] = []
   const prepared: PreparedEdit[] = []
