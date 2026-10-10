@@ -37,7 +37,7 @@ export default {
 
   provider: 'Provider',
   providers: {
-    default: 'Default',
+    default: 'Arena default',
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
@@ -70,6 +70,27 @@ export default {
   savedSuccessfully: 'AI settings saved.',
   saveFailed: 'Failed to save AI settings: {{message}}',
   cleared: 'Personal AI settings removed.',
+  status: {
+    now: 'Now:',
+    ready: 'Ready',
+    notTested: 'Not tested',
+    notAvailable: 'Not available',
+    none: 'Turn on the local server or choose a provider.',
+  },
+  cloud: {
+    name: 'Cloud provider',
+    where: 'saved with your account',
+    defaultHint: 'Uses the provider your Arena administrator set up.',
+    defaultNone: 'None is set up on this server.',
+    localUrlHint:
+      "This address is on your computer or your network. For LM Studio, use the Local AI server above. The Arena server can't reach it.",
+    localUrlLink: 'Use the Local AI server',
+    test: 'Test',
+    testOk: 'Answered in {{latencyMs}} ms',
+    remove: 'Remove my provider',
+    removed: 'Your provider was removed. AI features use the Arena default.',
+  },
+  footerNote: "All AI settings save with the profile's Save button.",
   localServer: {
     name: 'Local AI server',
     where: 'LM Studio on this computer · saved in this browser',

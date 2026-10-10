@@ -1,62 +1,116 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+/**
+ * State of the AI settings panel: account settings form, cloud provider, local server draft and status line.
+ */
+import type React from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import * as API from '@webapp/service/api'
 
-import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 
 import {
-  type AiModel,
+  type AiEngineStatus,
+  getAiEngineStatus,
+  getCloudEngineCandidate,
+  getLocalEngineCandidate,
+} from './aiEngineStatus'
+import {
   type AiSettings,
-  buildModelsKey,
   buildSettingsUpdate,
   createEmptyForm,
-  DEFAULT_PROVIDER_VALUE,
-  defaultFeatureToggles,
   type FeatureCategory,
   type FormState,
+  getProviderSpec,
+  hasCloudApiKey,
+  isCloudDraftSaved,
   OTHER_MODEL_VALUE,
   type ProviderSpec,
-  PROVIDERS,
-  type TestResult,
+  settingsToForm,
   withoutCloudProvider,
 } from './aiSettingsForm'
 import { saveAiPanelSettings } from './localServerDraft'
+import { type CloudProviderApi, useCloudProvider } from './useCloudProvider'
 import { type LocalServerDraftApi, useLocalServerDraft } from './useLocalServerDraft'
 
-type UseUserAiSettingsResult = {
+const NO_ALLOWLIST: string[] = []
+
+export type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
   loading: boolean
   settings: AiSettings | null
   form: FormState
   dirty: boolean
   saving: boolean
-  testing: boolean
-  models: AiModel[]
-  modelsFetching: boolean
-  modelsError: string | null
   providerSpec: ProviderSpec
-  onProviderChange: (providerItem: ProviderSpec | null) => void
+  allowlist: string[]
+  local: LocalServerDraftApi
+  cloud: CloudProviderApi
+  engineStatus: AiEngineStatus
+  onProviderChange: (provider: string) => void
   onModelChange: (value: string) => void
+  onModelSelectChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
   onApiKeyChange: (value: string) => void
-  onFeaturesEnabledChange: (checked: boolean) => void
-  onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
-  onModelSelectChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
-  fetchModels: (opts?: { force?: boolean }) => Promise<void>
   onBaseUrlBlur: () => void
   onApiKeyBlur: () => void
+  onFeaturesEnabledChange: (checked: boolean) => void
+  onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
   onSave: () => Promise<void>
-  onTest: () => Promise<void>
-  onClear: () => Promise<void>
-  testResultView: React.ReactElement | null
-  local: LocalServerDraftApi
+  onRemoveProvider: () => Promise<void>
+}
+
+type SetForm = React.Dispatch<React.SetStateAction<FormState>>
+
+/**
+ * Returns the change handlers of the form fields; each edit marks the panel dirty.
+ * @param {SetForm} setForm - Form setter.
+ * @param {Function} markDirty - Marks the account settings as edited.
+ * @returns {object} The handlers.
+ */
+const useFormFieldHandlers = (setForm: SetForm, markDirty: () => void) => {
+  const update = useCallback(
+    (patch: (prev: FormState) => Partial<FormState>) => {
+      setForm((prev) => ({ ...prev, ...patch(prev) }))
+      markDirty()
+    },
+    [markDirty, setForm]
+  )
+  const onModelChange = useCallback((model: string) => update(() => ({ model })), [update])
+  const onModelSelectChange = useCallback(
+    (value: string) =>
+      update(() => (value === OTHER_MODEL_VALUE ? { modelFreeText: true } : { model: value, modelFreeText: false })),
+    [update]
+  )
+  const onBaseUrlChange = useCallback((baseUrl: string) => update(() => ({ baseUrl })), [update])
+  const onApiKeyChange = useCallback(
+    (apiKey: string) => update((prev) => ({ apiKey, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 })),
+    [update]
+  )
+  const onFeaturesEnabledChange = useCallback(
+    (featuresEnabled: boolean) => update(() => ({ featuresEnabled })),
+    [update]
+  )
+  const onFeatureToggleChange = useCallback(
+    (category: FeatureCategory) => (checked: boolean) =>
+      update((prev) => ({ featureToggles: { ...prev.featureToggles, [category]: checked } })),
+    [update]
+  )
+  return {
+    onModelChange,
+    onModelSelectChange,
+    onBaseUrlChange,
+    onApiKeyChange,
+    onFeaturesEnabledChange,
+    onFeatureToggleChange,
+  }
 }
 
 /**
- * Encapsulates all state and logic for the UserAiSettingsPanel component.
+ * Encapsulates the state and the logic of the UserAiSettingsPanel component.
+ * @returns {UseUserAiSettingsResult} State and handlers.
  */
 export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const i18n = useI18n()
@@ -68,44 +122,23 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const [form, setForm] = useState<FormState>(createEmptyForm)
   const [formDirty, setFormDirty] = useState(false)
   const [saving, setSaving] = useState(false)
-  const [testing, setTesting] = useState(false)
-  const [testResult, setTestResult] = useState<TestResult | null>(null)
 
-  const [models, setModels] = useState<AiModel[]>([])
-  const [modelsFetching, setModelsFetching] = useState(false)
-  const [modelsError, setModelsError] = useState<string | null>(null)
-  const [lastModelsKey, setLastModelsKey] = useState<string | null>(null)
-
+  const markDirty = useCallback(() => setFormDirty(true), [])
+  const providerSpec = useMemo(() => getProviderSpec(form.provider), [form.provider])
+  const allowlist = settings?.orgHostedBaseUrls ?? NO_ALLOWLIST
   const local = useLocalServerDraft()
+  const cloud = useCloudProvider({ form, setForm, spec: providerSpec, settings, allowlist, markDirty, i18n })
+  const { fetchModels, resetModels } = cloud
+  const fieldHandlers = useFormFieldHandlers(setForm, markDirty)
   // the account settings or the local server draft changed
   const dirty = formDirty || local.dirty
-
-  const providerSpec = useMemo(
-    (): ProviderSpec => PROVIDERS.find((p) => p.value === form.provider) ?? PROVIDERS[0],
-    [form.provider]
-  )
 
   const fetchSettings = useCallback(async () => {
     setLoading(true)
     try {
       const data: AiSettings = await API.aiSettings.fetchSettings()
       setSettings(data)
-      setForm({
-        featuresEnabled: !!data.featuresEnabled,
-        featureToggles: { ...defaultFeatureToggles(), ...data.featureToggles },
-        // When the user has an active override (`enabled`), show their
-        // provider; otherwise show "Default" (= admin-configured).
-        provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
-        model: data.model || '',
-        baseUrl: data.baseUrl || '',
-        apiKey: '',
-        apiKeyDirty: false,
-        apiKeyVersion: 0,
-        modelFreeText: false,
-      })
-      setModels([])
-      setModelsError(null)
-      setLastModelsKey(null)
+      setForm(settingsToForm(data))
       setFormDirty(false)
     } catch (error: any) {
       const code = error?.response?.data?.key ?? error?.response?.data?.error
@@ -124,130 +157,21 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     fetchSettings()
   }, [fetchSettings])
 
-  const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
-    const provider = providerItem?.value
-    if (!provider) return
-    setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
-    setModels([])
-    setModelsError(null)
-    setLastModelsKey(null)
-    setFormDirty(true)
-  }, [])
-
-  const onModelChange = useCallback((value: string) => {
-    setForm((prev) => ({ ...prev, model: value }))
-    setFormDirty(true)
-  }, [])
-  const onBaseUrlChange = useCallback((value: string) => {
-    setForm((prev) => ({ ...prev, baseUrl: value }))
-    setFormDirty(true)
-  }, [])
-  const onApiKeyChange = useCallback((value: string) => {
-    setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 }))
-    setFormDirty(true)
-  }, [])
-  const onFeaturesEnabledChange = useCallback((checked: boolean) => {
-    setForm((prev) => ({ ...prev, featuresEnabled: checked }))
-    setFormDirty(true)
-  }, [])
-  const onFeatureToggleChange = useCallback(
-    (category: FeatureCategory) => (checked: boolean) => {
-      setForm((prev) => ({
-        ...prev,
-        featureToggles: { ...prev.featureToggles, [category]: checked },
-      }))
-      setFormDirty(true)
+  const onProviderChange = useCallback(
+    (provider: string) => {
+      setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
+      resetModels()
+      markDirty()
     },
-    []
+    [markDirty, resetModels]
   )
 
-  const onModelSelectChange = useCallback((e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value
-    if (value === OTHER_MODEL_VALUE) {
-      setForm((prev) => ({ ...prev, modelFreeText: true }))
-    } else {
-      setForm((prev) => ({ ...prev, model: value, modelFreeText: false }))
-    }
-    setFormDirty(true)
-  }, [])
-
-  /**
-   * Fetch the model list when we have enough credentials. Called on blur of
-   * Base URL / API key (and from the explicit "Fetch models" button). Skips
-   * the call when the key inputs haven't changed since the last attempt.
-   * @param {object} [opts] - Options.
-   * @param {boolean} [opts.force] - Bypass the dedupe key check.
-   * @returns {Promise<void>} Nothing.
-   */
-  const fetchModels = useCallback(
-    async ({ force = false }: { force?: boolean } = {}) => {
-      if (!providerSpec.supportsModelList) return
-      const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
-      const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
-      if (!hasBaseUrl || !hasApiKey) return
-
-      const key = buildModelsKey({
-        provider: form.provider,
-        baseUrl: form.baseUrl,
-        apiKeyDirty: form.apiKeyDirty,
-        apiKeyVersion: form.apiKeyVersion,
-        hasSavedApiKey: !!settings?.hasApiKey,
-      })
-      if (!force && key === lastModelsKey) return
-
-      setModelsFetching(true)
-      setModelsError(null)
-      setLastModelsKey(key)
-      try {
-        const data = await API.aiSettings.fetchModels({
-          provider: form.provider,
-          baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
-          apiKey: form.apiKeyDirty ? form.apiKey : null,
-        })
-        const list: AiModel[] = Array.isArray(data?.models) ? data.models : []
-        setModels(list)
-        if (list.length > 0) {
-          // Show the dropdown after fetching. If the current model isn't in
-          // the list (empty, stale, or a hand-typed id), preselect the first
-          // returned model so the user immediately sees the available choices;
-          // they can still pick "Other (type a model id)…" to free-text.
-          const currentInList = !!form.model && list.some((m) => m.id === form.model)
-          if (currentInList) {
-            setForm((prev) => ({ ...prev, modelFreeText: false }))
-          } else {
-            setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
-          }
-        }
-      } catch (error: any) {
-        setModels([])
-        const data = error?.response?.data
-        // server keys may already carry the namespace prefix
-        const errorKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
-        setModelsError(
-          errorKey ? i18n.t(`appErrors:${errorKey}`, data.params) : data?.error || error?.message || 'unknown'
-        )
-      } finally {
-        setModelsFetching(false)
-      }
-    },
-    [
-      providerSpec.supportsModelList,
-      providerSpec.requiresBaseUrl,
-      providerSpec.requiresApiKey,
-      form.baseUrl,
-      form.apiKeyDirty,
-      form.apiKeyVersion,
-      form.provider,
-      form.apiKey,
-      form.model,
-      settings?.hasApiKey,
-      lastModelsKey,
-      i18n,
-    ]
-  )
-
-  const onBaseUrlBlur = useCallback(() => fetchModels(), [fetchModels])
-  const onApiKeyBlur = useCallback(() => fetchModels(), [fetchModels])
+  const onBaseUrlBlur = useCallback(() => {
+    fetchModels()
+  }, [fetchModels])
+  const onApiKeyBlur = useCallback(() => {
+    fetchModels()
+  }, [fetchModels])
 
   // the account part of Save (PUT); the local server settings are written after it
   const saveServerSettings = useCallback(async (): Promise<AiSettings> => {
@@ -261,7 +185,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
 
   const onSave = useCallback(async () => {
     setSaving(true)
-    setTestResult(null)
     try {
       const { localSaved } = await saveAiPanelSettings({
         saveServer: formDirty ? saveServerSettings : null,
@@ -277,64 +200,46 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     }
   }, [formDirty, local.save, notifyError, notifyInfo, saveServerSettings])
 
-  const onTest = useCallback(async () => {
-    setTesting(true)
-    setTestResult(null)
-    try {
-      const draft = providerSpec.isDefault
-        ? {}
-        : {
-            provider: form.provider,
-            model: providerSpec.supportsModelList ? form.model : undefined,
-            baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
-            apiKey: form.apiKeyDirty ? form.apiKey : undefined,
-          }
-      const result: TestResult = await API.aiSettings.testConnection(draft)
-      setTestResult(result)
-    } catch (error: any) {
-      setTestResult({ ok: false, errorMessage: error?.message || 'unknown' })
-    } finally {
-      setTesting(false)
-    }
-  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.model, form.provider, providerSpec])
-
-  const onClear = useCallback(async () => {
+  const onRemoveProvider = useCallback(async () => {
     setSaving(true)
-    setTestResult(null)
     try {
       const data: AiSettings = await API.aiSettings.clearSettings()
       setSettings(data)
-      // only the provider is removed: the switches, and their unsaved edits, stay
+      // the switch edits not saved yet stay, so the panel may stay dirty
       setForm(withoutCloudProvider)
-      setModels([])
-      setModelsError(null)
-      setLastModelsKey(null)
+      resetModels()
       invalidateAiSettingsCache()
       // the gateway and its hosting class may have changed
       refreshAiCapabilities().catch(() => undefined)
-      notifyInfo({ key: 'userAiSettings:cleared' })
+      notifyInfo({ key: 'userAiSettings:cloud.removed' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
     }
-  }, [notifyError, notifyInfo])
+  }, [notifyError, notifyInfo, resetModels])
 
-  const testResultView = useMemo((): React.ReactElement | null => {
-    if (testing) {
-      return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
-    }
-    if (testResult) {
-      const failureMessage = testResult.errorKey
-        ? i18n.t(`appErrors:${testResult.errorKey}`, testResult.errorParams)
-        : testResult.errorMessage || 'unknown'
-      const testResultMessage = testResult.ok
-        ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-        : i18n.t('userAiSettings:testFailed', { message: failureMessage })
-      return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
-    }
-    return null
-  }, [i18n, testResult, testing])
+  const engineStatus = useMemo(
+    () =>
+      getAiEngineStatus({
+        preferLocal: local.draft.preferLocal,
+        local: getLocalEngineCandidate({ draft: local.draft, testView: local.testView, allowlist }),
+        cloud: getCloudEngineCandidate({
+          spec: providerSpec,
+          draft: {
+            provider: form.provider,
+            model: form.model,
+            baseUrl: form.baseUrl,
+            hasApiKey: hasCloudApiKey({ form, settings }),
+          },
+          adminDefault: settings?.adminDefault ?? null,
+          allowlist,
+          saved: { matches: isCloudDraftSaved({ form, settings }), lastTestOk: settings?.lastTestOk ?? null },
+          testOk: cloud.testResult ? cloud.testResult.ok : null,
+        }),
+      }),
+    [allowlist, cloud.testResult, form, local.draft, local.testView, providerSpec, settings]
+  )
 
   return {
     i18n,
@@ -343,25 +248,16 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     form,
     dirty,
     saving,
-    testing,
-    models,
-    modelsFetching,
-    modelsError,
     providerSpec,
+    allowlist,
+    local,
+    cloud,
+    engineStatus,
     onProviderChange,
-    onModelChange,
-    onBaseUrlChange,
-    onApiKeyChange,
-    onFeaturesEnabledChange,
-    onFeatureToggleChange,
-    onModelSelectChange,
-    fetchModels,
+    ...fieldHandlers,
     onBaseUrlBlur,
     onApiKeyBlur,
     onSave,
-    onTest,
-    onClear,
-    testResultView,
-    local,
+    onRemoveProvider,
   }
 }
