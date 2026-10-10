@@ -152,30 +152,39 @@ const ModelField = ({ panel }: Props) => {
   return (
     <FormItem label="userAiSettings:model">
       <div className="user-ai-settings-panel__field">
-        {useSelect ? (
-          <select
-            className="user-ai-settings-panel__select"
-            aria-label={i18n.t('userAiSettings:model')}
-            value={form.model}
-            onChange={(event) => panel.onModelSelectChange(event.target.value)}
-            data-testid={TestId.ai.cloudModel}
-          >
-            {cloud.models.map((model) => (
-              <option key={model.id} value={model.id}>
-                {model.description ? `${model.id} — ${model.description}` : model.id}
-              </option>
-            ))}
-            <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
-          </select>
-        ) : (
-          <Input
-            id={TestId.ai.cloudModel}
-            value={form.model}
-            onChange={panel.onModelChange}
-            placeholder={MODEL_PLACEHOLDERS[form.provider]}
-          />
-        )}
-        {cloud.modelsFetching && <div className="user-ai-settings-panel__hint">{i18n.t('common.loading')}</div>}
+        {/* the loading text sits beside the field: a taller block would move the Test button under the click */}
+        <div className="user-ai-settings-panel__model-row">
+          <div className="user-ai-settings-panel__model-control">
+            {useSelect ? (
+              <select
+                className="user-ai-settings-panel__select"
+                aria-label={i18n.t('userAiSettings:model')}
+                value={form.model}
+                onChange={(event) => panel.onModelSelectChange(event.target.value)}
+                data-testid={TestId.ai.cloudModel}
+              >
+                {cloud.models.map((model) => (
+                  <option key={model.id} value={model.id}>
+                    {model.description ? `${model.id} — ${model.description}` : model.id}
+                  </option>
+                ))}
+                <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
+              </select>
+            ) : (
+              <Input
+                id={TestId.ai.cloudModel}
+                value={form.model}
+                onChange={panel.onModelChange}
+                placeholder={MODEL_PLACEHOLDERS[form.provider]}
+              />
+            )}
+          </div>
+          {cloud.modelsFetching && (
+            <span className="user-ai-settings-panel__hint user-ai-settings-panel__model-loading">
+              {i18n.t('common.loading')}
+            </span>
+          )}
+        </div>
         {cloud.modelsError && (
           <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
             {i18n.t('userAiSettings:modelsFetchFailed', {

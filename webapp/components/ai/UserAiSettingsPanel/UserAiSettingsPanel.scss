@@ -116,6 +116,21 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     font: inherit;
   }
 
+  &__model-row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__model-control {
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__model-loading {
+    flex: none;
+  }
+
   &__result {
     display: flex;
     flex-direction: column;
