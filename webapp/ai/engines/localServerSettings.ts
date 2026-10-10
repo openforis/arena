@@ -114,14 +114,12 @@ export const saveLocalServerSettings = ({
 }
 
 /**
- * Returns the browser's localStorage or sessionStorage, or null when it is not accessible.
- * @param {'local'|'session'} [kind] - Which storage (default local).
+ * Returns the browser's localStorage, or null when it is not accessible.
  * @returns {StorageLike|null} The storage.
  */
-export const getBrowserStorage = (kind: 'local' | 'session' = 'local'): StorageLike | null => {
+export const getBrowserStorage = (): StorageLike | null => {
   try {
-    const storage = kind === 'local' ? globalThis.localStorage : globalThis.sessionStorage
-    return storage ?? null
+    return globalThis.localStorage ?? null
   } catch {
     // accessing the property throws when storage is blocked
     return null

@@ -97,7 +97,11 @@ test.describe('Local AI engine (stub local server)', () => {
     stub = null
   })
 
-  test('turning on the local server: Test lists the stub model', async ({ page }) => {
+  test('turning on the local server: Test lists the stub model, Save writes the settings', async ({ page, api }) => {
+    const storageKey = `arena.ai.localServer.${await api.getCurrentUserUuid()}`
+    const readSaved = async () =>
+      JSON.parse((await page.evaluate((key) => localStorage.getItem(key), storageKey)) ?? 'null')
+
     await page.goto(Urls.userProfile)
     await page.getByTestId(TestId.ai.localServerEnabled).click()
     const baseUrlInput = page.locator(`input[data-testid="${TestId.ai.localServerBaseUrl}"]`)
@@ -106,11 +110,19 @@ test.describe('Local AI engine (stub local server)', () => {
     await page.getByTestId(TestId.ai.localServerTest).click()
 
     const result = page.getByTestId(TestId.ai.localServerTestResult)
-    await expect(result).toContainText('The server answered.')
+    await expect(result).toContainText('Answered')
     await expect(result).toContainText('On this device')
     // the first successful test picks the first model
     await expect(page.getByTestId(TestId.ai.localServerModel)).toHaveValue(stub!.modelId)
     expect(stub!.requests.some((request) => request.path === '/v1/models')).toBe(true)
+    // nothing is written before Save
+    expect(await readSaved()).toBeNull()
+
+    await page.locator('button.btn-save').click()
+    await expect.poll(readSaved).toMatchObject({ enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+
+    await page.reload()
+    await expect(page.getByTestId(TestId.ai.localServerModel)).toHaveValue(stub!.modelId)
   })
 
   test.describe('with the local server on', () => {

@@ -23,6 +23,8 @@ import {
   type TestResult,
   withoutCloudProvider,
 } from './aiSettingsForm'
+import { saveAiPanelSettings } from './localServerDraft'
+import { type LocalServerDraftApi, useLocalServerDraft } from './useLocalServerDraft'
 
 type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
@@ -50,6 +52,7 @@ type UseUserAiSettingsResult = {
   onTest: () => Promise<void>
   onClear: () => Promise<void>
   testResultView: React.ReactElement | null
+  local: LocalServerDraftApi
 }
 
 /**
@@ -63,7 +66,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const [loading, setLoading] = useState(true)
   const [settings, setSettings] = useState<AiSettings | null>(null)
   const [form, setForm] = useState<FormState>(createEmptyForm)
-  const [dirty, setDirty] = useState(false)
+  const [formDirty, setFormDirty] = useState(false)
   const [saving, setSaving] = useState(false)
   const [testing, setTesting] = useState(false)
   const [testResult, setTestResult] = useState<TestResult | null>(null)
@@ -72,6 +75,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const [modelsFetching, setModelsFetching] = useState(false)
   const [modelsError, setModelsError] = useState<string | null>(null)
   const [lastModelsKey, setLastModelsKey] = useState<string | null>(null)
+
+  const local = useLocalServerDraft()
+  // the account settings or the local server draft changed
+  const dirty = formDirty || local.dirty
 
   const providerSpec = useMemo(
     (): ProviderSpec => PROVIDERS.find((p) => p.value === form.provider) ?? PROVIDERS[0],
@@ -99,7 +106,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setModels([])
       setModelsError(null)
       setLastModelsKey(null)
-      setDirty(false)
+      setFormDirty(false)
     } catch (error: any) {
       const code = error?.response?.data?.key ?? error?.response?.data?.error
       if (code === 'aiFeaturesDisabled' || error?.response?.status === 404) {
@@ -124,24 +131,24 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
-    setDirty(true)
+    setFormDirty(true)
   }, [])
 
   const onModelChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, model: value }))
-    setDirty(true)
+    setFormDirty(true)
   }, [])
   const onBaseUrlChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, baseUrl: value }))
-    setDirty(true)
+    setFormDirty(true)
   }, [])
   const onApiKeyChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, apiKey: value, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 }))
-    setDirty(true)
+    setFormDirty(true)
   }, [])
   const onFeaturesEnabledChange = useCallback((checked: boolean) => {
     setForm((prev) => ({ ...prev, featuresEnabled: checked }))
-    setDirty(true)
+    setFormDirty(true)
   }, [])
   const onFeatureToggleChange = useCallback(
     (category: FeatureCategory) => (checked: boolean) => {
@@ -149,7 +156,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         ...prev,
         featureToggles: { ...prev.featureToggles, [category]: checked },
       }))
-      setDirty(true)
+      setFormDirty(true)
     },
     []
   )
@@ -161,7 +168,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     } else {
       setForm((prev) => ({ ...prev, model: value, modelFreeText: false }))
     }
-    setDirty(true)
+    setFormDirty(true)
   }, [])
 
   /**
@@ -242,26 +249,33 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onBaseUrlBlur = useCallback(() => fetchModels(), [fetchModels])
   const onApiKeyBlur = useCallback(() => fetchModels(), [fetchModels])
 
+  // the account part of Save (PUT); the local server settings are written after it
+  const saveServerSettings = useCallback(async (): Promise<AiSettings> => {
+    const data: AiSettings = await API.aiSettings.saveSettings(buildSettingsUpdate({ form, spec: providerSpec }) as any)
+    setSettings(data)
+    setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
+    setFormDirty(false)
+    invalidateAiSettingsCache()
+    return data
+  }, [form, providerSpec])
+
   const onSave = useCallback(async () => {
     setSaving(true)
     setTestResult(null)
     try {
-      const data: AiSettings = await API.aiSettings.saveSettings(
-        buildSettingsUpdate({ form, spec: providerSpec }) as any
-      )
-      setSettings(data)
-      setForm((prev) => ({ ...prev, apiKey: '', apiKeyDirty: false }))
-      setDirty(false)
-      invalidateAiSettingsCache()
-      // the gateway and its hosting class may have changed
-      refreshAiCapabilities().catch(() => undefined)
-      notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
+      const { localSaved } = await saveAiPanelSettings({
+        saveServer: formDirty ? saveServerSettings : null,
+        saveLocal: local.save,
+        refresh: refreshAiCapabilities,
+      })
+      if (localSaved) notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
+      else notifyError({ key: 'userAiSettings:localServer.notSaved' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {
       setSaving(false)
     }
-  }, [form, providerSpec, notifyInfo, notifyError])
+  }, [formDirty, local.save, notifyError, notifyInfo, saveServerSettings])
 
   const onTest = useCallback(async () => {
     setTesting(true)
@@ -348,5 +362,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     onTest,
     onClear,
     testResultView,
+    local,
   }
 }

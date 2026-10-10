@@ -195,3 +195,16 @@ export const withoutCloudProvider = (form: FormState): FormState => ({
   apiKeyDirty: false,
   modelFreeText: false,
 })
+
+export type TFunction = (key: string, params?: Record<string, unknown>) => string
+
+/**
+ * Returns a translation function bound to the i18n instance (the helpers here take a plain function).
+ * @param {object} i18n - i18n instance (useI18n()).
+ * @returns {TFunction} The translation function.
+ */
+export const toT =
+  (i18n: { t: (key: any, params?: any) => unknown }): TFunction =>
+  (key, params) =>
+    // i18next's own return type is wider than string
+    String(i18n.t(key, params ?? {}))
