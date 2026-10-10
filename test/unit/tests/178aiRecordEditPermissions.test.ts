@@ -1,7 +1,15 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
+import * as Record from '@core/record/record'
 
-import { checkAttributeEditable, checkRecordEditable } from '@webapp/ai/tools/cleaning/recordEditPermissions'
+import {
+  checkAttributeEditable,
+  checkNodeEditable,
+  checkRecordEditable,
+} from '@webapp/ai/tools/cleaning/recordEditPermissions'
+
+import * as RecordUtils from '../../utils/recordUtils'
 
 import {
   cleaningAdminUser,
@@ -90,5 +98,31 @@ describe('checkAttributeEditable', () => {
     const surveyAdmin = newCleaningSurveyUser({ survey, groupName: 'surveyAdmin' })
     expect(refusalCode(cleanser, qualifier)).toBe('qualifierNotEditable')
     expect(refusalCode(surveyAdmin, qualifier)).toBeNull()
+  })
+})
+
+describe('checkNodeEditable', () => {
+  const dbhPath = 'cluster/plot[0]/tree[0]/dbh'
+  const setup = (meta: Record<string, unknown>) => {
+    const record = cleaningTestRecord({ survey })
+    const node = RecordUtils.findNodeByPath(dbhPath)(survey, record)
+    const parent = Record.getParentNode(node)(record)
+    const nodeDefUuid = Node.getNodeDefUuid(node)
+    const metaByDef = Object.fromEntries(Object.entries(meta).map(([key, value]) => [key, { [nodeDefUuid]: value }]))
+    const parentWithMeta = { ...parent, meta: { ...parent.meta, ...metaByDef } }
+    const recordWithMeta = { ...record, nodes: { ...record.nodes, [Node.getUuid(parent)]: parentWithMeta } }
+    return { record: recordWithMeta, node, nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey) }
+  }
+
+  test('a node with no restriction is editable', () => {
+    expect(checkNodeEditable(setup({}))).toBeNull()
+  })
+
+  test('a node that the form shows read-only ("editable if") is refused', () => {
+    expect(checkNodeEditable(setup({ cEdit: false }))?.code).toBe('attributeNotEditable')
+  })
+
+  test('a node that is not applicable is refused', () => {
+    expect(checkNodeEditable(setup({ childApplicability: false }))?.code).toBe('attributeNotEditable')
   })
 })

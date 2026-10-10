@@ -102,6 +102,30 @@ describe('records_proposeEdits', () => {
     expect(changeSet.operations[1]).toMatchObject({ path: 'cluster[12] / remarks', from: '', to: 'checked' })
   })
 
+  test('a node that the form shows read-only is rejected, not proposed', async () => {
+    const remarks = RecordUtils.findNodeByPath('cluster/remarks')(survey, record)
+    const parent = Record.getParentNode(remarks)(record)
+    const lockedRecord = {
+      ...record,
+      nodes: {
+        ...record.nodes,
+        [Node.getUuid(parent)]: {
+          ...parent,
+          meta: { ...parent.meta, cEdit: { [Node.getNodeDefUuid(remarks)]: false } },
+        },
+      },
+    }
+    const { tool } = newTool(() => lockedRecord)
+    const ctx = newCleaningToolContext({ survey })
+    const result = await runTool(
+      tool,
+      { summary: 's', edits: [{ recordUuid: Record.getUuid(record), nodeUuid: Node.getUuid(remarks), value: 'x' }] },
+      ctx
+    )
+    expect(ctx.changeSets).toEqual([])
+    expect(JSON.stringify(result)).toContain('attributeNotEditable')
+  })
+
   test('a record the user may not see refuses all its edits', async () => {
     const { tool } = newTool(() => null)
     const ctx = newCleaningToolContext({ survey })
