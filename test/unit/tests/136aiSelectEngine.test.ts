@@ -139,6 +139,7 @@ describe('selectEngine: examples', () => {
       label: 'LM Studio',
       model: 'local-model',
       limits: { maxPromptChars: 18432, maxSteps: 6 },
+      contextWindow: { tokens: 8192, assumed: false },
     })
   })
 

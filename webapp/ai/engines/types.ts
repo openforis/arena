@@ -13,8 +13,11 @@ export type AiEngineLimits = { maxPromptChars: number; maxSteps: number }
 
 export type AiEngineInfo = { id: AiEngineId; hostingClass: AiHostingClass; label: string; model: string | null }
 
-// the engine chosen by selectEngine, with the limits the caller must respect
-export type AiSelectedEngine = AiEngineInfo & { limits: AiEngineLimits }
+// context size of the engine's model, in tokens; assumed: the default size, the server didn't report it
+export type AiContextWindow = { tokens: number; assumed: boolean }
+
+// the engine chosen by selectEngine, with the limits the caller must respect (contextWindow: local server only)
+export type AiSelectedEngine = AiEngineInfo & { limits: AiEngineLimits; contextWindow?: AiContextWindow }
 
 export type AiEngineModelOptions = { feature: AiFeatureKey; dataClass: AiDataClass; surveyId?: number }
 
