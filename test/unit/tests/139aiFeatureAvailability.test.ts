@@ -38,7 +38,6 @@ const capabilities = ({ local = 'off', gateway = true } = {}): AiCapabilities =>
     model: gateway ? 'gateway-model' : null,
     maxPromptChars: 200000,
   },
-  device: { webGpu: false, deviceMemoryGb: null, promptApi: null },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
 })
 
@@ -58,7 +57,6 @@ describe('isCapabilitiesLoadedForUser', () => {
     loadSettings: async () => null,
     loadLocalSettings: () => ({ enabled: false, baseUrl: '', modelId: null, preferLocal: true }) as never,
     probe: async () => null as never,
-    detectDevice: async () => ({ webGpu: false, deviceMemoryGb: null, promptApi: null }),
   })
 
   test('false before the first load, so the empty snapshot is not reported as noEngine; true after, for that user only', async () => {

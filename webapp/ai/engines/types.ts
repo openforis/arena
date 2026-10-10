@@ -41,15 +41,11 @@ export type AiGatewayCapability = {
   maxPromptChars: number | null
 }
 
-// statistics only in C (used by the deferred builtIn/webLlm engines)
-export type AiDeviceCapability = { webGpu: boolean; deviceMemoryGb: number | null; promptApi: string | null }
-
 export type AiInstanceCapability = { policyCeilings: AiPolicy | null; orgHostedBaseUrls: string[] }
 
 export type AiCapabilities = {
   localServer: AiLocalServerCapability
   gateway: AiGatewayCapability
-  device: AiDeviceCapability
   instance: AiInstanceCapability
 }
 

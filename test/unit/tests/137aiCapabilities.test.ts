@@ -3,7 +3,6 @@ import {
   buildInstanceCapability,
   buildLocalServerCapability,
   createCapabilitiesStore,
-  detectDeviceCapabilities,
   emptyCapabilities,
   getCapabilitiesSnapshotForUser,
 } from '@webapp/ai/engines/capabilities'
@@ -30,7 +29,7 @@ const reachableProbe: LocalServerProbeResult = {
 }
 
 const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServerProbeResult = reachableProbe) => {
-  const calls = { settings: [] as boolean[], probes: [] as string[], device: 0 }
+  const calls = { settings: [] as boolean[], probes: [] as string[] }
   const deps = {
     loadSettings: async ({ force }: { force: boolean }) => {
       calls.settings.push(force)
@@ -40,10 +39,6 @@ const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServer
     probe: async ({ baseUrl }: { baseUrl: string; modelId: string | null }) => {
       calls.probes.push(baseUrl)
       return probeResult
-    },
-    detectDevice: async () => {
-      calls.device += 1
-      return { webGpu: true, deviceMemoryGb: 8, promptApi: 'available' }
     },
   }
   return { calls, deps }
@@ -168,58 +163,12 @@ describe('createCapabilitiesStore', () => {
     expect(capabilities.localServer.error?.key).toBe('aiLocalServerUnreachable')
   })
 
-  test('device facts are read only on demand', async () => {
-    const { calls, deps } = fakeDeps(enabledLocal)
-    const store = createCapabilitiesStore(deps)
-    await store.load({ userUuid: 'u1' })
-    expect(calls.device).toBe(0)
-    expect(store.get().device).toEqual(emptyCapabilities().device)
-    await store.detectDevice()
-    expect(store.get().device).toEqual({ webGpu: true, deviceMemoryGb: 8, promptApi: 'available' })
-  })
-
   test('the stored settings are exposed', async () => {
     const { deps } = fakeDeps(enabledLocal)
     const store = createCapabilitiesStore(deps)
     await store.load({ userUuid: 'u1' })
     expect(store.getSettings()).toBe(settingsSnapshot)
     expect(store.getLocalSettings()).toBe(enabledLocal)
-  })
-})
-
-describe('detectDeviceCapabilities', () => {
-  test('reads WebGPU, memory and the Prompt API', async () => {
-    const device = await detectDeviceCapabilities({
-      navigatorLike: { gpu: { requestAdapter: async () => ({}) }, deviceMemory: 4 },
-      languageModel: { availability: async () => 'downloadable' },
-    })
-    expect(device).toEqual({ webGpu: true, deviceMemoryGb: 4, promptApi: 'downloadable' })
-  })
-
-  test('missing or failing APIs give the safe values', async () => {
-    expect(await detectDeviceCapabilities({ navigatorLike: {}, languageModel: undefined })).toEqual({
-      webGpu: false,
-      deviceMemoryGb: null,
-      promptApi: null,
-    })
-    const failing = await detectDeviceCapabilities({
-      navigatorLike: {
-        gpu: {
-          requestAdapter: async () => {
-            throw new Error('no')
-          },
-        },
-      },
-      languageModel: {
-        availability: async () => {
-          throw new Error('no')
-        },
-      },
-    })
-    expect(failing).toEqual({ webGpu: false, deviceMemoryGb: null, promptApi: null })
-    expect(
-      (await detectDeviceCapabilities({ navigatorLike: { gpu: { requestAdapter: async () => null } } })).webGpu
-    ).toBe(false)
   })
 })
 

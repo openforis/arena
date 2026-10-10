@@ -92,8 +92,5 @@ export default {
     cloudWarning:
       "Cette adresse n'est ni sur cet appareil ni dans la liste des serveurs de l'organisation : la politique d'IA de l'enquête la traite comme un service cloud.",
     deviceNote: 'Ces paramètres sont enregistrés dans ce navigateur uniquement.',
-    capabilityStats: 'Partager des statistiques anonymes de capacités',
-    capabilityStatsHint:
-      "Une fois par session : si ce navigateur dispose de WebGPU et d'une IA intégrée, une plage de mémoire, la famille du navigateur et si un serveur local est utilisé. Aucun utilisateur, adresse, nom de modèle ni contenu d'enquête.",
   },
 }

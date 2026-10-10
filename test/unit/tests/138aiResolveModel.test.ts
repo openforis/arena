@@ -41,7 +41,6 @@ const capabilities = ({
     error: null,
   },
   gateway: { available: true, hostingClass: 'cloud', provider: 'openai', model: 'gateway-model', maxPromptChars: 1000 },
-  device: { webGpu: false, deviceMemoryGb: null, promptApi: null },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
 })
 
