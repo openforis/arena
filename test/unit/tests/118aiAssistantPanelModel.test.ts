@@ -2,6 +2,7 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import type { AssistantMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import {
   DISCARD_NOTE,
+  canShowAfterSave,
   decideLoadedConversation,
   getProposedChangeSetId,
   getRetryBase,
@@ -179,5 +180,15 @@ describe('remembered conversation id once the store answered', () => {
     // the run ended (or another conversation runs): a truly missing id is dropped
     expect(decideLoadedConversation({ loaded: null, conversationId: 'c-1', runningId: null, scope })).toBe('forget')
     expect(decideLoadedConversation({ loaded: null, conversationId: 'c-1', runningId: 'c-2', scope })).toBe('forget')
+  })
+
+  test('a save after a reset (logout) does not update the UI, a save in the same generation does', () => {
+    const params = { startedGeneration: 2, currentGeneration: 2, selectedId: 'c-1', id: 'c-1' }
+    expect(canShowAfterSave(params)).toBe(true)
+    // logout bumped the generation: the next user must not see the conversation
+    expect(canShowAfterSave({ ...params, currentGeneration: 3 })).toBe(false)
+    // another conversation is selected (or none)
+    expect(canShowAfterSave({ ...params, selectedId: 'c-2' })).toBe(false)
+    expect(canShowAfterSave({ ...params, selectedId: null })).toBe(false)
   })
 })

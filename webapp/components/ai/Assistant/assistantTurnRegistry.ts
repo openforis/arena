@@ -1,6 +1,6 @@
 /**
  * Module-level registry of the running turns and in-flight saves, so logout can stop the answers and wait for
- * their saves before it clears the stored conversations.
+ * their final saves before it resets the panel. The saves are not skipped: the conversations stay stored.
  */
 
 export type AssistantTurnRegistry = {
@@ -21,7 +21,7 @@ export const RESET_REASON = 'reset'
 export const createAssistantTurnRegistry = (): AssistantTurnRegistry => {
   const controllers = new Set<AbortController>()
   const pending = new Set<Promise<unknown>>()
-  // bumped by abortAll: work started before a reset must not save afterwards
+  // bumped by abortAll: work started before a reset must not update the UI afterwards (it still saves)
   let generation = 0
   return {
     register: (controller) => {
@@ -54,13 +54,13 @@ export const createAssistantTurnRegistry = (): AssistantTurnRegistry => {
 export const assistantTurnRegistry = createAssistantTurnRegistry()
 
 /**
- * Aborts every running assistant turn for a reset (logout): their saves are skipped.
+ * Aborts every running assistant turn for a reset (logout): their last state is saved but they no longer update the UI.
  * @returns {void}
  */
 export const abortAssistantTurns = (): void => assistantTurnRegistry.abortAll()
 
 /**
- * Waits for the saves that are in flight.
+ * Waits for the tracked turns and saves (an aborted turn ends with a final save).
  * @returns {Promise<void>} Resolves when none is pending.
  */
 export const settleAssistantSaves = (): Promise<void> => assistantTurnRegistry.settle()
