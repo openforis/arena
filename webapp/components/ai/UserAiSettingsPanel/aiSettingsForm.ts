@@ -73,10 +73,6 @@ export type AiSettings = {
   apiKeyReadable?: boolean
   lastTestOk?: boolean | null
   aiFeaturesDisabled?: boolean
-  effectiveSource?: string | null
-  effectiveProvider?: string | null
-  effectiveModel?: string | null
-  hostingClass?: AiHostingClass | null
   adminDefault?: AdminDefault | null
   orgHostedBaseUrls?: string[]
   encryptionConfigured?: boolean

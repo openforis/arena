@@ -211,7 +211,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       invalidateAiSettingsCache()
       // the gateway and its hosting class may have changed
       refreshAiCapabilities().catch(() => undefined)
-      notifyInfo({ key: 'userAiSettings:cloud.removed' })
+      notifyInfo({ key: data.adminDefault ? 'userAiSettings:cloud.removed' : 'userAiSettings:cloud.removedNoDefault' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
     } finally {

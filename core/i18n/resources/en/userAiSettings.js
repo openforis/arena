@@ -77,6 +77,7 @@ export default {
     testOk: 'Answered in {{latencyMs}} ms',
     remove: 'Remove my provider',
     removed: 'Your provider was removed. AI features use the Arena default.',
+    removedNoDefault: 'Your provider was removed.',
   },
   dataClasses: {
     none: 'No survey content',

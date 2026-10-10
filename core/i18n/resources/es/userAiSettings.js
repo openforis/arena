@@ -78,6 +78,7 @@ export default {
     testOk: 'Respondió en {{latencyMs}} ms',
     remove: 'Quitar mi proveedor',
     removed: 'Se quitó su proveedor. Las funciones de IA usan el predeterminado de Arena.',
+    removedNoDefault: 'Se quitó su proveedor.',
   },
   dataClasses: {
     none: 'Sin contenido de la encuesta',

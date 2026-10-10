@@ -1,3 +1,9 @@
+// small texts: the status tokens darkened to at least 4.5:1 on white and on their 12% tint
+// (the tokens themselves stay on the borders and tints)
+$text-ok: color-mix(in srgb, var(--green) 60%, black);
+$text-warn: color-mix(in srgb, var(--orange) 55%, black);
+$text-bad: color-mix(in srgb, var(--red) 60%, black);
+
 .user-ai-settings-panel {
   display: flex;
   flex-direction: column;
@@ -122,29 +128,33 @@
     align-items: center;
     gap: 0.3rem;
     padding: 0.1rem 0.6rem;
-    border: 1px solid currentColor;
+    border: 1px solid;
     border-radius: 1rem;
     font-size: 0.8rem;
     overflow-wrap: anywhere;
 
     &--ok {
-      color: var(--green);
+      color: $text-ok;
+      border-color: var(--green);
       background: color-mix(in srgb, var(--green) 12%, transparent);
     }
 
     &--warn {
-      color: var(--orange);
+      color: $text-warn;
+      border-color: var(--orange);
       background: color-mix(in srgb, var(--orange) 12%, transparent);
     }
 
     &--bad {
-      color: var(--red);
+      color: $text-bad;
+      border-color: var(--red);
       background: color-mix(in srgb, var(--red) 12%, transparent);
     }
+  }
 
-    &--plain {
-      color: var(--colorGrey700);
-    }
+  // wraps a result that appears later, so it can be announced; adds no box of its own
+  &__live {
+    display: contents;
   }
 
   &__hint {
@@ -152,11 +162,11 @@
     color: var(--colorGrey700);
 
     &--error {
-      color: var(--red);
+      color: $text-bad;
     }
 
     &--warning {
-      color: var(--orange);
+      color: $text-warn;
     }
   }
 
@@ -164,7 +174,7 @@
     padding: 0;
     border: none;
     background: none;
-    color: var(--blue);
+    color: var(--blueDark);
     font: inherit;
     text-decoration: underline;
     cursor: pointer;
@@ -203,11 +213,11 @@
     }
 
     &--schema {
-      color: var(--blue);
+      color: var(--blueDark);
     }
 
     &--data {
-      color: var(--orange);
+      color: $text-warn;
     }
   }
 

@@ -22,7 +22,13 @@ export const AiEngineStatusLine = ({ status }: Props) => {
   const i18n = useI18n()
   const t = toT(i18n)
   return (
-    <div className="user-ai-settings-panel__status-line" data-testid={TestId.ai.engineStatus}>
+    // a live region: a screen reader announces when the engine or its state changes
+    <div
+      className="user-ai-settings-panel__status-line"
+      role="status"
+      aria-atomic="true"
+      data-testid={TestId.ai.engineStatus}
+    >
       <span className="user-ai-settings-panel__status-label">{t('userAiSettings:status.now')}</span>
       <span>{getAiEngineStatusText({ status, t })}</span>
       <StatusPill tone={PILL_TONES[status.pill]} text={t(`userAiSettings:status.${status.pill}`)} />

@@ -78,6 +78,7 @@ export default {
     testOk: 'Respondeu em {{latencyMs}} ms',
     remove: 'Remover meu provedor',
     removed: 'Seu provedor foi removido. Os recursos de IA usam o padrão do Arena.',
+    removedNoDefault: 'Seu provedor foi removido.',
   },
   dataClasses: {
     none: 'Sem conteúdo do inventário',
