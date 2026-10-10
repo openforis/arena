@@ -63,7 +63,7 @@ const toOperationResult = (id: string, result?: RecordEditResult): OperationResu
  * @param {unknown} error - The axios error.
  * @returns {OperationResult} The result.
  */
-const toChunkErrorResult = (id: string, error: any): OperationResult => {
+export const toChunkErrorResult = (id: string, error: any): OperationResult => {
   const data = error?.response?.data
   // the edits may have been written: the message tells the user to check the records
   if ((isTimeoutError(error) || error?.code === 'ERR_CANCELED') && !data?.key)
