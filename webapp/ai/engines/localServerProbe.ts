@@ -8,13 +8,14 @@ import {
   type LocalServerFetchImpl,
   toEngineErrorInfo,
 } from './localServerErrors'
-import type { AiEngineErrorInfo, AiEngineLimits } from './types'
+import type { AiContextWindow, AiEngineErrorInfo, AiEngineLimits } from './types'
 
 export const DEFAULT_LOCAL_CONTEXT_TOKENS = 8192
 export const LOCAL_SERVER_MAX_STEPS = 6 // adjusted from the manual matrix
 export const PROBE_TIMEOUT_MS = 3000
 
-const CHARS_PER_TOKEN = 3
+// also the ratio of the assistant's context estimate when a provider reports no usage
+export const CHARS_PER_TOKEN = 3
 const PROMPT_SHARE = 0.75 // a quarter of the context is kept for the answer
 
 export type LocalServerProbeResult = {
@@ -33,6 +34,16 @@ export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimi
   maxPromptChars: Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * CHARS_PER_TOKEN * PROMPT_SHARE),
   maxSteps: LOCAL_SERVER_MAX_STEPS,
 })
+
+/**
+ * Returns the context window of the local server's model.
+ * @param {number|null} contextTokens - Context size reported by the server, or null when unknown.
+ * @returns {AiContextWindow} The size, or 8,192 tokens marked as assumed.
+ */
+export const getLocalServerContextWindow = (contextTokens: number | null): AiContextWindow =>
+  contextTokens && contextTokens > 0
+    ? { tokens: contextTokens, assumed: false }
+    : { tokens: DEFAULT_LOCAL_CONTEXT_TOKENS, assumed: true }
 
 /**
  * Returns the object entries of the `data` array of a response body.

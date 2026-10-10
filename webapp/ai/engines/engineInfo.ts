@@ -1,7 +1,7 @@
 /**
  * Engine descriptions (label, model, limits) built from the capabilities. No AI SDK import.
  */
-import { getLocalServerLimits } from './localServerProbe'
+import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
 import type { AiGatewayCapability, AiLocalServerCapability, AiSelectedEngine } from './types'
 
 export const LOCAL_SERVER_LABEL = 'LM Studio'
@@ -30,6 +30,7 @@ export const getLocalServerEngineInfo = (localServer: AiLocalServerCapability): 
     label: hostingClass === 'onDevice' ? LOCAL_SERVER_LABEL : hostOf(baseUrl),
     model: localServer.modelId,
     limits: getLocalServerLimits(localServer.contextTokens),
+    contextWindow: getLocalServerContextWindow(localServer.contextTokens),
   }
 }
 

@@ -68,6 +68,7 @@ describe('engine info', () => {
       label: 'LM Studio',
       model: 'local-model',
       limits: { maxPromptChars: 9216, maxSteps: 6 },
+      contextWindow: { tokens: 4096, assumed: false },
     })
   })
 

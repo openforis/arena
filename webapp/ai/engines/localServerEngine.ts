@@ -34,6 +34,8 @@ export const createLocalServerEngine = ({
     name: 'localServer',
     baseURL: baseUrl,
     supportsStructuredOutputs: true,
+    // LM Studio sends the token usage of a stream only when asked (the assistant's context meter)
+    includeUsage: true,
     fetch: createLocalServerFetch({ fetchImpl, baseUrl, modelId }) as typeof fetch,
   })
   return { ...info, createModel: (): LanguageModel => provider(modelId) }
