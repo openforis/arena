@@ -202,3 +202,67 @@ test.describe('Local AI engine (stub local server)', () => {
     expect(stub!.requests).toEqual([])
   })
 })
+
+test.describe('AI settings panel', () => {
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+
+  test.beforeEach(async ({ api }) => {
+    await api.enableAiFeatures()
+  })
+
+  test('a localhost Base URL in the cloud block points to the local server', async ({ page }) => {
+    await page.goto(Urls.userProfile)
+    await page.getByTestId(TestId.ai.cloudProvider).selectOption('openai-compatible')
+    await page.locator(`input[data-testid="${TestId.ai.cloudBaseUrl}"]`).fill('localhost:1234/v1')
+
+    await expect(page.getByTestId(TestId.ai.cloudBaseUrlHint)).toBeVisible()
+    await page.getByTestId(TestId.ai.cloudBaseUrlHintLink).click()
+
+    await expect(page.getByTestId(TestId.ai.localServerEnabled)).toHaveClass(/Mui-checked/)
+    await expect(page.locator(`input[data-testid="${TestId.ai.localServerBaseUrl}"]`)).toBeFocused()
+  })
+
+  test('the cloud Test button answers on the first click, even when the model list is still loading', async ({
+    page,
+  }) => {
+    // the mock provider cannot reach a public model server: the two endpoints are answered here, the list slowly
+    await page.route('**/api/ai/settings/models', async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 1500))
+      await route.fulfill({ json: { models: [{ id: 'remote-model' }] } })
+    })
+    await page.route('**/api/ai/settings/test', (route) => route.fulfill({ json: { ok: true, latencyMs: 12 } }))
+    await page.goto(Urls.userProfile)
+    await page.getByTestId(TestId.ai.cloudProvider).selectOption('openai-compatible')
+    await page.locator(`input[data-testid="${TestId.ai.cloudBaseUrl}"]`).fill('https://models.example.org/v1')
+
+    // one click, no blur before it: the click itself blurs the field and starts the list
+    await page.getByTestId(TestId.ai.cloudTest).click()
+
+    await expect(page.getByTestId(TestId.ai.cloudTestResult)).toBeVisible()
+  })
+
+  test('Remove my provider keeps the feature switches', async ({ page, api }) => {
+    await api.saveAiPersonalProvider({
+      provider: 'openai-compatible',
+      model: 'remote-model',
+      baseUrl: 'https://models.example.org/v1',
+    })
+    await page.goto(Urls.userProfile)
+    const providerSelect = page.getByTestId(TestId.ai.cloudProvider)
+    await expect(providerSelect).toHaveValue('openai-compatible')
+
+    await page.getByTestId(TestId.ai.cloudRemove).click()
+
+    await expect(providerSelect).toHaveValue('default')
+    await expect(page.getByTestId(TestId.ai.featureToggle('assistantDesign'))).toHaveClass(/Mui-checked/)
+    await expect
+      .poll(() => api.getAiSettings())
+      .toMatchObject({
+        featuresEnabled: true,
+        provider: null,
+        hasApiKey: false,
+        enabled: false,
+        featureToggles: { assistantDesign: true },
+      })
+  })
+})

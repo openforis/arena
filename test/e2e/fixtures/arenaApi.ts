@@ -100,6 +100,41 @@ export class ArenaApi {
   }
 
   /**
+   * Saves a personal provider for the test user, with the AI features and every category on.
+   * @param {object} provider - Provider fields.
+   * @param {string} provider.provider - Provider key.
+   * @param {string} provider.model - Model id.
+   * @param {string} provider.baseUrl - Base URL (public: the server refuses internal addresses only when it calls them).
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async saveAiPersonalProvider({
+    provider,
+    model,
+    baseUrl,
+  }: {
+    provider: string
+    model: string
+    baseUrl: string
+  }): Promise<void> {
+    await this.put('/api/ai/settings', {
+      featuresEnabled: true,
+      featureToggles: allAiFeatureToggles(),
+      enabled: true,
+      provider,
+      model,
+      baseUrl,
+    })
+  }
+
+  /**
+   * Returns the AI settings of the test user (GET /api/ai/settings).
+   * @returns {Promise<Record<string, any>>} - The settings response.
+   */
+  async getAiSettings(): Promise<Record<string, any>> {
+    return this.get('/api/ai/settings')
+  }
+
+  /**
    * Returns the uuid of the logged-in test user (the key of C's localStorage settings).
    * @returns {Promise<string>} - The user uuid.
    */
