@@ -1726,6 +1726,14 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     stopped: 'Arrêté.',
     inMemoryOnly:
       'Ce navigateur ne peut pas enregistrer les conversations : elles sont perdues au rechargement de la page.',
+    context: {
+      label: 'Contexte utilisé par cette conversation',
+      tokens: '{{used}} tokens',
+      tokensOfWindow: '{{used}} / {{window}} tokens',
+      assumed: '(supposé)',
+      nearLimit: 'Proche de la limite.',
+      trimmed: 'Les messages les plus anciens ne sont plus envoyés au modèle.',
+    },
     tools: {
       survey_getOverview: 'A lu la structure du formulaire',
       nodeDef_get: 'A consulté {{name}}',

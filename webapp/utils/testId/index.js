@@ -44,6 +44,8 @@ export const TestId = {
     changeSetRowStatus: 'ai-assistant-change-set-row-status',
     clearBtn: 'ai-assistant-clear-btn',
     closeBtn: 'ai-assistant-close-btn',
+    contextMeter: 'ai-assistant-context-meter',
+    contextMeterNewConversationBtn: 'ai-assistant-context-meter-new-conversation-btn',
     discardBtn: 'ai-assistant-discard-btn',
     history: 'ai-assistant-history',
     historyBtn: 'ai-assistant-history-btn',

@@ -1713,6 +1713,14 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     retry: 'Tentar novamente',
     stopped: 'Interrompido.',
     inMemoryOnly: 'Este navegador não pode armazenar conversas: elas são perdidas ao recarregar a página.',
+    context: {
+      label: 'Contexto usado por esta conversa',
+      tokens: '{{used}} tokens',
+      tokensOfWindow: '{{used}} / {{window}} tokens',
+      assumed: '(presumido)',
+      nearLimit: 'Perto do limite.',
+      trimmed: 'As mensagens mais antigas não são mais enviadas ao modelo.',
+    },
     tools: {
       survey_getOverview: 'Leu a estrutura do inventário',
       nodeDef_get: 'Consultou {{name}}',
