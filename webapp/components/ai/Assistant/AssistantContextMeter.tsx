@@ -13,14 +13,17 @@ import { buildContextMeter, getContextMeterText } from './contextMeterModel'
  * @param {object} props - Props.
  * @param {Conversation|null} props.conversation - Shown conversation.
  * @param {Function} props.onNewConversation - Starts a new conversation in the area.
+ * @param {boolean} [props.busy] - An answer is running (New conversation is disabled, as in the menu).
  * @returns {React.ReactElement|null} The meter.
  */
 export const AssistantContextMeter = ({
   conversation,
   onNewConversation,
+  busy = false,
 }: {
   conversation: Conversation | null
   onNewConversation: () => void
+  busy?: boolean
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   const lang: string = useLang()
@@ -50,6 +53,7 @@ export const AssistantContextMeter = ({
         <span className="ai-assistant-panel__context-warning">
           {t('aiAssistant.context.nearLimit')}
           <Button
+            disabled={busy}
             label="aiAssistant.menu.newConversation"
             onClick={onNewConversation}
             size="small"
