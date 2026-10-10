@@ -8,7 +8,7 @@ import { FormItem } from '@webapp/components/form/Input'
 
 import { AiEngineOrder } from './AiEngineOrder'
 import { AiEngineStatusLine } from './AiEngineStatusLine'
-import { FEATURE_CATEGORIES } from './aiSettingsForm'
+import { AiFeatureGroups } from './AiFeatureGroups'
 import { CloudProviderSection } from './CloudProviderSection'
 import { LocalAiSection } from './LocalAiSection'
 import { type UseUserAiSettingsResult, useUserAiSettings } from './useUserAiSettings'
@@ -22,29 +22,7 @@ type SectionsProps = {
 }
 
 /**
- * Category switches (interim: grouped by data class in the next step).
- * @param {SectionsProps} props - Props.
- * @returns {React.ReactElement} The fieldset.
- */
-const CategorySwitches = ({ panel }: SectionsProps) => (
-  <Fieldset
-    className="user-ai-settings-panel__section user-ai-settings-panel__categories"
-    legend="userAiSettings:categoriesSection"
-  >
-    {FEATURE_CATEGORIES.map((category) => (
-      <FormItem
-        key={category}
-        label={`userAiSettings:categories.${category}`}
-        info={panel.i18n.t(`userAiSettings:categories.${category}Hint`)}
-      >
-        <Checkbox checked={!!panel.form.featureToggles[category]} onChange={panel.onFeatureToggleChange(category)} />
-      </FormItem>
-    ))}
-  </Fieldset>
-)
-
-/**
- * Sections shown when the AI features are on: Where AI runs, then the switches.
+ * Sections shown when the AI features are on: Where AI runs, then the feature switches.
  * @param {SectionsProps} props - Props.
  * @returns {React.ReactElement} The sections.
  */
@@ -58,7 +36,7 @@ const PanelSections = ({ panel }: SectionsProps) => {
         <CloudProviderSection panel={panel} />
         {local.draft.enabled && <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />}
       </Fieldset>
-      <CategorySwitches panel={panel} />
+      <AiFeatureGroups toggles={panel.form.featureToggles} onToggleChange={panel.onFeatureToggleChange} />
       <div className="user-ai-settings-panel__footer-note">{panel.i18n.t('userAiSettings:footerNote')}</div>
     </>
   )
