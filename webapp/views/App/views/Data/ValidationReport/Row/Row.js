@@ -58,7 +58,11 @@ const Row = (props) => {
       <div>
         <span className={`icon icon-12px icon-action ${canEdit ? 'icon-pencil2' : 'icon-eye'}`} />
       </div>
-      <div>{askAssistantAvailable && <AskAssistantButton row={row} />}</div>
+      {askAssistantAvailable && (
+        <div>
+          <AskAssistantButton row={row} />
+        </div>
+      )}
     </>
   )
 }

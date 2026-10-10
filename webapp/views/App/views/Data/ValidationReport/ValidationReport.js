@@ -114,7 +114,7 @@ const ValidationReport = () => {
         }}
         module="validationReport"
         restParams={restParams}
-        gridTemplateColumns="50px 1fr 2fr 6rem 50px 50px"
+        gridTemplateColumns={askAssistantAvailable ? '50px 1fr 2fr 6rem 50px 50px' : '50px 1fr 2fr 6rem 50px'}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
         rowProps={rowProps}
