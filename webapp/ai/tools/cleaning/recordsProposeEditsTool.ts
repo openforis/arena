@@ -68,7 +68,9 @@ export const createRecordsProposeEditsTool = ({
   description:
     'Proposes attribute value corrections in records, shown to the user as a change set to review and apply. ' +
     `Fix one pattern per call, at most ${RECORD_EDITS_MAX} edits. Edits the user may not make, invalid values and ` +
-    'unchanged values are returned in `rejected`.',
+    'unchanged values are returned in `rejected`. A hierarchical code is resolved against the record as it is now: ' +
+    'when a parent code and its child code both change, put the child edit in a separate, later change set, ' +
+    'once the parent edit is applied.',
   inputSchema,
   /**
    * Builds the change set and hands it to the conversation; nothing is written.
