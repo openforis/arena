@@ -57,6 +57,22 @@ const logOutAndBackIn = async (page: Page, { baseURL, user }: { baseURL: string;
 const compact = (tokens: number): string =>
   new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(tokens)
 
+/**
+ * Navigates inside the app, as a user reaches a page from the sidebar (no reload: a running answer goes on).
+ * @param {Page} page - The page.
+ * @param {string} uri - Route to go to.
+ * @returns {Promise<void>} Resolves when the route is pushed.
+ */
+const navigateInApp = async (page: Page, uri: string): Promise<void> => {
+  await page.evaluate((target) => {
+    window.history.pushState({}, '', target)
+    window.dispatchEvent(new PopStateEvent('popstate'))
+  }, uri)
+}
+
+const countChatRequests = (stub: LocalModelServerStub): number =>
+  stub.requests.filter((request) => request.path === '/v1/chat/completions').length
+
 test.describe('AI assistant (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
 
@@ -77,14 +93,6 @@ test.describe('AI assistant (mock provider)', () => {
       'aria-selected',
       'true'
     )
-  }
-
-  // client-side navigation, as a user reaches the designer from the sidebar
-  const navigateInApp = async (page: Page, uri: string): Promise<void> => {
-    await page.evaluate((target) => {
-      window.history.pushState({}, '', target)
-      window.dispatchEvent(new PopStateEvent('popstate'))
-    }, uri)
   }
 
   const openDesignArea = async (page: Page, { fromHome = false } = {}): Promise<FormDesigner> => {
@@ -121,6 +129,8 @@ test.describe('AI assistant (mock provider)', () => {
     const designer = await openDesignArea(page, { fromHome: true })
     await proposeLabel(page)
     const panel = assistantPanel(page)
+    // the mock provider reports no usage: the meter shows an estimate
+    await expect(panel.getByTestId(TestId.aiAssistant.contextMeter)).toContainText('≈')
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
     await expect(designer.surveyForm.getByText('Cluster identifier', { exact: true }).first()).toBeVisible()
@@ -353,9 +363,20 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await expect(bar).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
     await expect(bar).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
     expect(stub!.requests.some((request) => request.path === '/v1/chat/completions')).toBe(true)
+
+    // a reload shows the stored usage again: the meter needs no new answer (the status probes of the server are fine)
+    const chatRequestsBefore = countChatRequests(stub!)
+    await page.reload()
+    await openAssistantPanel(page)
+    await expect(meter).toContainText(`${compact(STUB_CONTEXT_USED_TOKENS)} / ${compact(STUB_CONTEXT_TOKENS)} tokens`)
+    await expect(bar).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
+    await expect(bar).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
+    expect(countChatRequests(stub!)).toBe(chatRequestsBefore)
   })
 
-  test('switching area and back while an answer streams keeps the conversation and its answer', async ({
+  // a route change is the real way the area changes during an answer (the tabs are disabled while busy); the window
+  // before the first save is pinned by unit test 118 (decideLoadedConversation)
+  test('leaving the designer and coming back while an answer streams keeps the conversation and its answer', async ({
     page,
     api,
     sampleSurvey: _,
@@ -373,13 +394,28 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
     await expect(userMessages(page)).toHaveCount(0)
 
-    stub!.setChunkDelay(700)
+    stub!.setChunkDelay(1000)
     await sendAssistantMessage(page, LABEL_REQUEST)
     await expect(assistantPanel(page)).toHaveAttribute('data-busy', 'true')
 
-    // away and back before the answer is saved
-    await selectAssistantArea(page, 'Help')
-    await selectAssistantArea(page, 'Design')
+    // closed, the panel follows the route: Help away from the designer (the answer goes on in the background)
+    await closeAssistantPanel(page)
+    await navigateInApp(page, Urls.home)
+    await openAssistantPanel(page)
+    await expect(assistantPanel(page).getByRole('tab', { name: 'Help', exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
+    await expect(userMessages(page)).toHaveCount(0)
+    await closeAssistantPanel(page)
+
+    await navigateInApp(page, Urls.formDesigner)
+    await expect(designer.surveyForm).toBeVisible()
+    await openAssistantPanel(page)
+    await expect(assistantPanel(page).getByRole('tab', { name: 'Design', exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true'
+    )
     await expect(userMessages(page)).toHaveCount(1)
     await expect(userMessages(page)).toContainText(LABEL_REQUEST)
     await waitForAssistantTurn(page)
