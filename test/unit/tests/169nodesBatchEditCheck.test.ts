@@ -102,6 +102,28 @@ describe('checkBatchEdit', () => {
     })
   })
 
+  test('a node that is read-only or not applicable in its parent fails', () => {
+    const parent = Record.getRootNode(record)
+    const nodeDefUuid = Node.getNodeDefUuid(numNode)
+    const withParentMeta = (meta: Record<string, unknown>) => ({
+      ...record,
+      nodes: { ...record.nodes, [Node.getUuid(parent)]: { ...parent, meta: { ...parent.meta, ...meta } } },
+    })
+    for (const meta of [{ cEdit: { [nodeDefUuid]: false } }, { childApplicability: { [nodeDefUuid]: false } }]) {
+      expect(
+        checkBatchEdit({
+          survey,
+          record: withParentMeta(meta),
+          recordUuid: Record.getUuid(record),
+          edit: { index: 0, nodeUuid: Node.getUuid(numNode), from: 5, to: 6 } as any,
+        })
+      ).toMatchObject({
+        ok: false,
+        result: { status: 'failed', messageKey: 'validationErrors:nodeValueParser.attributeNotEditable' },
+      })
+    }
+  })
+
   test('file attributes are not batch-editable', () => {
     expect(isNodeDefBatchEditable(Survey.getNodeDefByName('photo')(survey))).toBe(false)
     expect(isNodeDefBatchEditable(Survey.getNodeDefByName('num')(survey))).toBe(true)

@@ -31,6 +31,21 @@ export const isNodeDefBatchEditable = (nodeDef: any): boolean =>
   isNodeDefValueEditable(nodeDef) && !NodeDef.isFile(nodeDef)
 
 /**
+ * Returns false when the node is read-only ("editable if") or not applicable ("applicable if") for its parent, as the
+ * form enforces.
+ * @param {object} params - The parameters.
+ * @param {object} params.record - The record.
+ * @param {object} params.node - The attribute node.
+ * @returns {boolean} Whether the node may be edited.
+ */
+export const isNodeEditableInRecord = ({ record, node }: { record: any; node: any }): boolean => {
+  const parentNode = Record.getParentNode(node)(record)
+  if (!parentNode) return true
+  const nodeDefUuid = Node.getNodeDefUuid(node)
+  return Node.isChildEditable(nodeDefUuid)(parentNode) && Node.isChildApplicable(nodeDefUuid)(parentNode)
+}
+
+/**
  * Checks an edit against the record reloaded inside the record lock.
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey.
@@ -59,6 +74,14 @@ export const checkBatchEdit = ({
   }
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   if (!isNodeDefBatchEditable(nodeDef)) {
+    return {
+      ok: false,
+      result: failedResult(index, 'validationErrors:nodeValueParser.attributeNotEditable', {
+        attributeName: NodeDef.getName(nodeDef),
+      }),
+    }
+  }
+  if (!isNodeEditableInRecord({ record, node })) {
     return {
       ok: false,
       result: failedResult(index, 'validationErrors:nodeValueParser.attributeNotEditable', {

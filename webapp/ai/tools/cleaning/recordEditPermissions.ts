@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Authorizer from '@core/auth/authorizer'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
@@ -66,6 +67,41 @@ export const checkAttributeEditable = ({
     return {
       code: 'qualifierNotEditable',
       message: `\`${NodeDef.getName(nodeDef)}\` is a user group qualifier: only survey administrators may change it.`,
+    }
+  }
+  return null
+}
+
+/**
+ * Checks that the node is editable and applicable in its parent entity ("editable if" / "applicable if" of the survey).
+ * @param {object} params - Parameters.
+ * @param {object} params.record - The record.
+ * @param {object} params.node - The attribute node.
+ * @param {object} params.nodeDef - The node definition.
+ * @returns {EditRefusal|null} Why it can't be edited, or null.
+ */
+export const checkNodeEditable = ({
+  record,
+  node,
+  nodeDef,
+}: {
+  record: any
+  node: any
+  nodeDef: any
+}): EditRefusal | null => {
+  const parentNode = Record.getParentNode(node)(record)
+  if (!parentNode) return null
+  const nodeDefUuid = Node.getNodeDefUuid(node)
+  if (!Node.isChildEditable(nodeDefUuid)(parentNode)) {
+    return {
+      code: 'attributeNotEditable',
+      message: `\`${NodeDef.getName(nodeDef)}\` is read-only for this record (its "editable if" condition is false).`,
+    }
+  }
+  if (!Node.isChildApplicable(nodeDefUuid)(parentNode)) {
+    return {
+      code: 'attributeNotEditable',
+      message: `\`${NodeDef.getName(nodeDef)}\` is not applicable in this record.`,
     }
   }
   return null

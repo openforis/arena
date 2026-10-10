@@ -10,7 +10,12 @@ import { RECORD_ATTRIBUTE_UPDATE } from '@webapp/ai/changeSets/recordEdits/types
 
 import type { CleaningApi } from './cleaningApi'
 import { createRefDataProviders } from './refDataProviders'
-import { checkAttributeEditable, checkRecordEditable, type EditRefusal } from './recordEditPermissions'
+import {
+  checkAttributeEditable,
+  checkNodeEditable,
+  checkRecordEditable,
+  type EditRefusal,
+} from './recordEditPermissions'
 import { computeRecordEditPreview } from './recordEditPreview'
 import { describeNodePath, describeRecordKeys, formatNodeValue, getNodePage } from './recordNodeDescriber'
 import type { CleaningI18n } from './validationRows'
@@ -145,6 +150,8 @@ const prepareEdit = async ({
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(context.survey)
   const attributeRefusal = checkAttributeEditable({ user: context.user, survey: context.survey, nodeDef })
   if (attributeRefusal) return { refusal: attributeRefusal }
+  const nodeRefusal = checkNodeEditable({ record, node, nodeDef })
+  if (nodeRefusal) return { refusal: nodeRefusal }
 
   const { parsed, refusal } = await parseEditValue({ context, record, node, nodeDef, value: edit.value })
   if (refusal) return { refusal }
