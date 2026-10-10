@@ -131,6 +131,21 @@ const handleStreamPart = (part: any, state: TurnState, outcome: StreamOutcome): 
 }
 
 /**
+ * Escalates the conversation's data class when a tool result carries data.
+ * @param {object} params - Parameters.
+ * @param {any} params.part - Stream part.
+ * @param {AiTool[]} params.toolList - Tools offered in the turn.
+ * @param {TurnState} params.state - Turn state.
+ * @returns {void}
+ */
+const escalateOnDataResult = ({ part, toolList, state }: { part: any; toolList: AiTool[]; state: TurnState }): void => {
+  if (part.type !== 'tool-result') return
+  const tool = toolList.find((candidate) => candidate.name === part.toolName)
+  // saved with the tool result: a turn stopped after a data result keeps the class
+  if (tool && isDataToolResult({ tool, output: part.output })) state.escalateDataClass(tool.dataClass)
+}
+
+/**
  * Ends the turn from what the stream reported.
  * @param {TurnState} state - Turn state.
  * @param {StreamOutcome} outcome - Abort / error.
@@ -241,11 +256,7 @@ export const runAssistantTurn = async ({
     })
     for await (const part of result.fullStream) {
       handleStreamPart(part, state, outcome)
-      if (part.type === 'tool-result') {
-        const tool = toolList.find((candidate) => candidate.name === part.toolName)
-        // saved with the tool result: a turn stopped after a data result keeps the class
-        if (tool && isDataToolResult({ tool, output: part.output })) state.escalateDataClass(tool.dataClass)
-      }
+      escalateOnDataResult({ part, toolList, state })
     }
   } catch (error) {
     outcome.error = error
