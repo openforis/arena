@@ -140,6 +140,10 @@ describe('records_proposeEdits', () => {
     expect(ctx.changeSets[0].operations[0].cycle).toBe(Record.getCycle(record))
   })
 
+  test('the description tells to change a child code in a later change set', () => {
+    expect(newTool().tool.description).toContain('separate, later change set')
+  })
+
   test('a record the user may not see refuses all its edits', async () => {
     const { tool } = newTool(() => null)
     const ctx = newCleaningToolContext({ survey })
