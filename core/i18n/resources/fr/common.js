@@ -1781,6 +1781,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       yes: 'Oui',
       no: 'Non',
       newItem: 'Nouveau : {{type}}',
+      categoryItem: 'Élément {{ref}} ({{level}})',
       label: 'Libellé ({{lang}})',
       description: 'Description ({{lang}})',
       status: {

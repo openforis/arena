@@ -1772,6 +1772,7 @@ $t(common.cantUndoWarning)`,
       yes: 'Да',
       no: 'Нет',
       newItem: 'Новый элемент: {{type}}',
+      categoryItem: 'Элемент {{ref}} ({{level}})',
       label: 'Подпись ({{lang}})',
       description: 'Описание ({{lang}})',
       status: {

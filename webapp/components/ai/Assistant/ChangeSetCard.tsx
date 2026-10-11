@@ -12,6 +12,8 @@ import { useI18nT } from '@webapp/store/system'
 import { SurveyFormActions, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
+import { buildCategoryLabelGroups } from './categoryLabelCardModel'
+import { CategoryLabelGroups } from './CategoryLabelGroups'
 import {
   buildCardRows,
   getConflictingOperationIds,
@@ -161,6 +163,7 @@ export const ChangeSetCard = ({
   const applyingRef = useRef(false)
 
   const rows = useMemo(() => buildCardRows({ cardState, survey, lang }), [cardState, lang, survey])
+  const categoryGroups = useMemo(() => buildCategoryLabelGroups({ cardState, survey }), [cardState, survey])
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
   const stale = useMemo(() => isCardStale({ cardState, survey }), [cardState, survey])
   const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
@@ -252,6 +255,12 @@ export const ChangeSetCard = ({
           />
         ))}
       </ul>
+      <CategoryLabelGroups
+        groups={categoryGroups}
+        onToggle={toggle}
+        pendingIds={pendingIds}
+        selectedIds={selectedIds}
+      />
       {cardState.discarded && <p className="ai-assistant-card__hint">{t('aiAssistant.card.discarded')}</p>}
       {pendingIds.length > 0 && (
         <div className="ai-assistant-card__footer">

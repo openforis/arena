@@ -1606,6 +1606,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       yes: 'Sí',
       no: 'No',
       newItem: 'Nuevo: {{type}}',
+      categoryItem: 'Ítem {{ref}} ({{level}})',
       label: 'Etiqueta ({{lang}})',
       description: 'Descripción ({{lang}})',
       status: {

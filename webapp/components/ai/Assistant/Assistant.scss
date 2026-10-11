@@ -264,6 +264,12 @@
     padding: 0;
   }
 
+  &__category-name {
+    margin-top: 0.5rem;
+    font-family: monospace;
+    font-weight: 600;
+  }
+
   &__row {
     display: flex;
     gap: 0.5rem;
