@@ -20,6 +20,7 @@ import { resolveModel, type ResolveModelParams, type ResolvedModel } from '@weba
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { getTools, toAiSdkTools } from '@webapp/ai/tools/registry'
+import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import type { AiTool, AiToolContext } from '@webapp/ai/tools/types'
 
 import { buildTrimmedHistory, getHistoryBudget } from './agentMessages'
@@ -190,6 +191,8 @@ export const runAssistantTurn = async ({
     // a Do it conversation keeps its scope for every turn; the pending cards include the ones of this turn
     suggestionScope: conversation.suggestionScope ?? null,
     getPendingChangeSets: () => getPendingChangeSets(state.get()),
+    // kept across the turns of the conversation, so "continue" can propose items listed in an earlier turn
+    categoryItemRefs: ctx.categoryItemRefs ?? categoryItemRefsRegistry.forConversation(conversation.id),
     onChangeSet: (changeSet) => {
       state.addChangeSet(changeSet)
       ctx.onChangeSet(changeSet)

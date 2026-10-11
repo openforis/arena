@@ -18,6 +18,7 @@ import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
+import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
@@ -317,6 +318,7 @@ export const useAssistantConversation = ({
       suggestions: suggestionStore,
       userUuid,
     })
+    categoryItemRefsRegistry.clearAll()
     setHistory([])
     assistantPanelStore.setConversationId(null)
   }, [conversationStore, userUuid])
