@@ -10,13 +10,14 @@ import { collectDataLatLngs } from '../tools/collectDataLatLngs'
 import { exitFullScreen } from '../tools/useFullScreen'
 import type { FullScreenState } from '../tools/useFullScreen'
 import { computeBounds } from '../tools/zoomToData'
+import { measureAreaIconSrc, measureDistanceIconSrc } from '../tools/measure/measureIcons'
 import { ToolbarIconButton } from './ToolbarIconButton'
 
 const ZOOM_TO_DATA_PADDING = 32
 const ZOOM_TO_DATA_MAX_ZOOM = 16
 
 /**
- * Quick buttons of the top bar: measure distance (both bars), zoom to data and full screen (full bar).
+ * Quick buttons of the top bar: measure distance (both bars), measure area, zoom to data and full screen (full bar).
  * @param {object} props - Component props.
  * @param {FullScreenState} props.fullScreen - Full screen state of the workspace.
  * @returns {React.ReactElement} The buttons.
@@ -53,12 +54,20 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
         buttonKey="measureDistance"
         titleKey="mapWorkspace.tools.measureDistance"
         shortcut={MAP_SHORTCUT_LABELS.measureDistance}
-        iconSrc="/img/ruler-icon-24x24.png"
+        iconSrc={measureDistanceIconSrc}
         active={activeTool === 'measureDistance'}
         onClick={() => dispatch({ type: 'toggleTool', tool: 'measureDistance' })}
       />
       {variant === 'full' && (
         <>
+          <ToolbarIconButton
+            buttonKey="measureArea"
+            titleKey="mapWorkspace.measure.measureArea"
+            shortcut={MAP_SHORTCUT_LABELS.measureArea}
+            iconSrc={measureAreaIconSrc}
+            active={activeTool === 'measureArea'}
+            onClick={() => dispatch({ type: 'toggleTool', tool: 'measureArea' })}
+          />
           <ToolbarIconButton
             buttonKey="zoomToData"
             titleKey="mapWorkspace.quick.zoomToData"
