@@ -1,6 +1,8 @@
 import {
   isHttpUrl,
   isTileTemplateUrl,
+  isValidWmsLayerName,
+  MAP_CUSTOM_LAYERS_MAX,
   MAP_CUSTOM_LAYER_ATTRIBUTION_MAX_LENGTH,
   MAP_CUSTOM_LAYER_NAME_MAX_LENGTH,
   type MapCustomLayer,
@@ -58,6 +60,8 @@ export type WmsDialogFormAction =
   | { type: 'savingChanged'; saving: boolean; error?: WmsFormMessage }
 
 export const WMS_MIN_OPACITY_PERCENT = 10
+// whitespace and control characters are never valid inside a URL (the model refuses them)
+const URL_FORBIDDEN_PATTERN = /[\s\u0000-\u001f\u007f]/
 const DEFAULT_OPACITY_PERCENT_BY_ROLE: Record<MapCustomLayerRole, number> = { overlay: 80, baseMap: 100 }
 
 /**
@@ -93,9 +97,26 @@ export const createWmsDialogFormState = ({ canEditSurvey }: { canEditSurvey: boo
 export const getUrlLoadMode = (url: string): WmsUrlLoadMode => {
   const value = url.trim()
   if (value.length === 0) return 'empty'
+  if (URL_FORBIDDEN_PATTERN.test(value)) return 'invalid'
   if (value.includes('{')) return isTileTemplateUrl(value) ? 'xyz' : 'invalid'
   return isHttpUrl(value) ? 'capabilities' : 'invalid'
 }
+
+/**
+ * Tells whether a layer of a service can be selected: it needs Web Mercator tiles, and a WMS layer name the model
+ * accepts (a refused name would make the whole batch fail).
+ * @param {object} params - Parameters.
+ * @param {MapServiceCapabilities} params.capabilities - The service.
+ * @param {MapServiceLayer} params.layer - The layer.
+ * @returns {boolean} True when the layer can be added.
+ */
+export const isLayerSelectable = ({
+  capabilities,
+  layer,
+}: {
+  capabilities: MapServiceCapabilities
+  layer: MapServiceLayer
+}): boolean => layer.webMercator && (capabilities.kind !== 'wms' || isValidWmsLayerName(layer.name))
 
 /**
  * Returns the layers of the service that are selected, in service order.
@@ -158,21 +179,23 @@ const withAutoFields = (state: WmsDialogFormState): WmsDialogFormState => {
  * @returns {string[]} The preselected layer names.
  */
 const preselectLayers = (capabilities: MapServiceCapabilities): string[] => {
-  const usable = capabilities.layers.filter((layer) => layer.webMercator)
+  const usable = capabilities.layers.filter((layer) => isLayerSelectable({ capabilities, layer }))
   return usable.length === 1 ? [usable[0].name] : []
 }
 
 /**
- * Toggles a layer; layers without Web Mercator tiles cannot be selected.
+ * Toggles a layer; layers that are not selectable cannot be selected, and no more than the maximum can be.
  * @param {WmsDialogFormState} state - The state.
  * @param {string} name - The layer name.
  * @returns {string[]} The new selection.
  */
 const toggleLayerName = (state: WmsDialogFormState, name: string): string[] => {
-  const layer = state.capabilities?.layers.find((item) => item.name === name)
-  if (!layer?.webMercator) return state.selectedLayerNames
-  return state.selectedLayerNames.includes(name)
-    ? state.selectedLayerNames.filter((item) => item !== name)
+  const { capabilities } = state
+  const layer = capabilities?.layers.find((item) => item.name === name)
+  if (!capabilities || !layer || !isLayerSelectable({ capabilities, layer })) return state.selectedLayerNames
+  if (state.selectedLayerNames.includes(name)) return state.selectedLayerNames.filter((item) => item !== name)
+  return state.selectedLayerNames.length >= MAP_CUSTOM_LAYERS_MAX
+    ? state.selectedLayerNames
     : [...state.selectedLayerNames, name]
 }
 
@@ -228,6 +251,7 @@ export const wmsDialogFormReducer = (state: WmsDialogFormState, action: WmsDialo
     case 'setFormat':
       return { ...state, format: action.format }
     case 'setOpacity': {
+      if (!Number.isFinite(action.opacity)) return state
       const opacity = Math.min(100, Math.max(WMS_MIN_OPACITY_PERCENT, Math.round(action.opacity)))
       return { ...state, opacity, opacityEdited: true }
     }
@@ -293,7 +317,8 @@ export const isSingleLayer = (state: WmsDialogFormState): boolean => countLayers
  * @returns {boolean} True when something is loaded and selected, and the single layer has a name.
  */
 export const canSubmit = (state: WmsDialogFormState): boolean => {
-  if (state.saving || state.loadStatus !== 'loaded' || countLayersToAdd(state) === 0) return false
+  const count = countLayersToAdd(state)
+  if (state.saving || state.loadStatus !== 'loaded' || count === 0 || count > MAP_CUSTOM_LAYERS_MAX) return false
   return !isSingleLayer(state) || state.name.trim().length > 0
 }
 

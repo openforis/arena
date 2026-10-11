@@ -127,6 +127,17 @@ const sanitizeMaxZoom = (value: unknown): number | undefined | null => {
 }
 
 /**
+ * Tells whether a WMS layer name can be sent in the LAYERS parameter.
+ * @param {unknown} value - The layer name.
+ * @returns {boolean} True for a non-empty name (after trimming) within the length limit and without `& = % # ?` or
+ * control characters.
+ */
+export const isValidWmsLayerName = (value: unknown): boolean => {
+  const name = sanitizeText(value, MAP_CUSTOM_LAYER_WMS_LAYERS_MAX_LENGTH)
+  return Boolean(name) && !WMS_LAYERS_FORBIDDEN_PATTERN.test(name as string)
+}
+
+/**
  * Checks the WMS-only properties.
  * @param {Record<string, unknown>} value - The layer.
  * @returns {{wmsLayers: string, wmsVersion: MapWmsVersion}|null} The properties, or null when invalid.
@@ -134,7 +145,7 @@ const sanitizeMaxZoom = (value: unknown): number | undefined | null => {
 const sanitizeWmsProps = (value: Record<string, unknown>): { wmsLayers: string; wmsVersion: MapWmsVersion } | null => {
   const wmsLayers = sanitizeText(value.wmsLayers, MAP_CUSTOM_LAYER_WMS_LAYERS_MAX_LENGTH)
   const wmsVersion = value.wmsVersion ?? '1.3.0'
-  if (!wmsLayers || WMS_LAYERS_FORBIDDEN_PATTERN.test(wmsLayers) || !isOneOf(wmsVersions, wmsVersion)) return null
+  if (!wmsLayers || !isValidWmsLayerName(wmsLayers) || !isOneOf(wmsVersions, wmsVersion)) return null
   return { wmsLayers, wmsVersion }
 }
 

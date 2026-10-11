@@ -1,4 +1,5 @@
 import type { MapServiceCapabilities } from '@core/map/customLayers/mapServiceCapabilities'
+import { MAP_CUSTOM_LAYERS_MAX } from '@core/map/customLayers/mapCustomLayer'
 import {
   buildMapCustomLayers,
   canSubmit,
@@ -7,6 +8,7 @@ import {
   getSubmitLabel,
   getSummary,
   getUrlLoadMode,
+  isLayerSelectable,
   stopsMapShortcut,
   toErrorMessage,
   type WmsDialogFormAction,
@@ -225,5 +227,54 @@ describe('map WMS dialog form (273)', () => {
     expect(stopsMapShortcut('m')).toBe(true)
     expect(stopsMapShortcut('a')).toBe(true)
     expect(stopsMapShortcut('Escape')).toBe(false)
+  })
+
+  test('refuses WMS layer names the model refuses, and toggles a selected layer off', () => {
+    const names = ['a&b', 'x=y', '100%', 'a#b', 'a?b', 'a\u0001b', 'x'.repeat(1001)]
+    const capabilities: MapServiceCapabilities = {
+      ...wmsCapabilities,
+      layers: [
+        ...wmsCapabilities.layers.slice(0, 2),
+        ...names.map((name) => ({ name, title: name, webMercator: true, attribution: '' })),
+      ],
+    }
+    const loaded = run([{ type: 'capabilitiesLoaded', capabilities }])
+    let state = loaded
+    for (const name of names) state = wmsDialogFormReducer(state, { type: 'toggleLayer', name })
+    expect(state.selectedLayerNames).toEqual([])
+    expect(isLayerSelectable({ capabilities, layer: capabilities.layers[2] })).toBe(false)
+    expect(isLayerSelectable({ capabilities, layer: capabilities.layers[0] })).toBe(true)
+    state = wmsDialogFormReducer(state, { type: 'toggleLayer', name: 'cover' })
+    expect(state.selectedLayerNames).toEqual(['cover'])
+    state = wmsDialogFormReducer(state, { type: 'toggleLayer', name: 'cover' })
+    expect(state.selectedLayerNames).toEqual([])
+    expect(canSubmit(state)).toBe(false)
+  })
+
+  test('does not select more layers than the maximum', () => {
+    const layers = Array.from({ length: MAP_CUSTOM_LAYERS_MAX + 1 }, (_, index) => ({
+      name: `l${index}`,
+      title: `Layer ${index}`,
+      webMercator: true,
+      attribution: '',
+    }))
+    let state = run([{ type: 'capabilitiesLoaded', capabilities: { ...wmsCapabilities, layers } }])
+    for (const layer of layers) state = wmsDialogFormReducer(state, { type: 'toggleLayer', name: layer.name })
+    expect(state.selectedLayerNames).toHaveLength(MAP_CUSTOM_LAYERS_MAX)
+    expect(canSubmit(state)).toBe(true)
+    expect(canSubmit({ ...state, selectedLayerNames: layers.map((layer) => layer.name) })).toBe(false)
+  })
+
+  test('refuses URLs with whitespace or control characters', () => {
+    expect(getUrlLoadMode('https://a.org/a b/{z}/{x}/{y}.png')).toBe('invalid')
+    expect(getUrlLoadMode('https://a.org/wms?x=a b')).toBe('invalid')
+    expect(getUrlLoadMode('https://a.org/{z}/{x}/{y}\u0001.png')).toBe('invalid')
+    expect(getUrlLoadMode('  https://a.org/wms  ')).toBe('capabilities')
+  })
+
+  test('ignores a non-finite opacity', () => {
+    const state = run([{ type: 'setOpacity', opacity: 50 }])
+    expect(wmsDialogFormReducer(state, { type: 'setOpacity', opacity: Number.NaN })).toBe(state)
+    expect(wmsDialogFormReducer(state, { type: 'setOpacity', opacity: Number.POSITIVE_INFINITY })).toBe(state)
   })
 })
