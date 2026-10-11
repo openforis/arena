@@ -48,6 +48,13 @@ describe('Sentinel-2 COG URLs and colours (280)', () => {
     expect(getSceneCogUrls(null, 'swir')).toBeNull()
   })
 
+  test('refuses another file name, a port, a foreign bucket and http', () => {
+    expect(getSceneDirectoryUrl(THUMBNAIL.replace('L2A_PVI.jpg', 'other.jpg'))).toBeNull()
+    expect(getSceneDirectoryUrl(THUMBNAIL.replace('.amazonaws.com', '.amazonaws.com:8443'))).toBeNull()
+    expect(getSceneDirectoryUrl(THUMBNAIL.replace('e84-earth-search-sentinel-data', 'other-bucket'))).toBeNull()
+    expect(getSceneDirectoryUrl(THUMBNAIL.replace('https:', 'http:'))).toBeNull()
+  })
+
   test('colours true colour pixels and hides nodata', () => {
     expect(tciPixelToColor([0, 0, 0])).toBeNull()
     expect(tciPixelToColor([])).toBeNull()

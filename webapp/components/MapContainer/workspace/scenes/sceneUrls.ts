@@ -1,7 +1,9 @@
 import type { SceneBandMix } from './sceneTypes'
 
 // Earth Search COGs live on S3; anything else in the index is not fetched.
-export const SCENE_COG_HOST_PATTERN = /(^|\.)amazonaws\.com$/
+export const SCENE_COG_HOST_PATTERN = /^e84-earth-search-sentinel-data\.s3(\.[a-z0-9-]+)?\.amazonaws\.com$/
+
+const THUMBNAIL_FILE = 'L2A_PVI.jpg'
 
 export const SCENE_BAND_MIXES: SceneBandMix[] = ['trueColour', 'falseColourVegetation', 'swir']
 
@@ -26,7 +28,8 @@ export const getSceneDirectoryUrl = (thumbnailUrl: string | null): string | null
   } catch {
     return null
   }
-  if (url.protocol !== 'https:' || !SCENE_COG_HOST_PATTERN.test(url.hostname)) return null
+  if (url.protocol !== 'https:' || url.port !== '' || !SCENE_COG_HOST_PATTERN.test(url.hostname)) return null
+  if (!url.pathname.endsWith(`/${THUMBNAIL_FILE}`)) return null
   const lastSlash = url.pathname.lastIndexOf('/')
   return lastSlash > 0 ? `${url.origin}${url.pathname.slice(0, lastSlash + 1)}` : null
 }
