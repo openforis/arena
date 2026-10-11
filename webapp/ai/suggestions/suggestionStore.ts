@@ -39,7 +39,14 @@ export type SuggestionStore = {
   removeTargets: (p: { userUuid: string; surveyId: number | null; id: string; targetKeys: string[] }) => void
   remove: (p: { userUuid: string; surveyId: number | null; id: string }) => void
   dismiss: (p: { userUuid: string; surveyId: number | null; id: string }) => void
-  startProgress: (p: { userUuid: string; surveyId: number | null; id: string; conversationId: string }) => void
+  startProgress: (p: {
+    userUuid: string
+    surveyId: number | null
+    id: string
+    conversationId: string
+    // the targets sent to the model; the visible ones outside it (merged meanwhile) stay pending
+    targetKeys?: string[]
+  }) => void
   onConversationSettled: (p: { userUuid: string; conversationId: string; outcome: SettleOutcome }) => void
   getPending: (p: { userUuid: string; surveyId: number | null }) => AssistantSuggestion[] // raw, for resolvers
   getVisible: (p: {
@@ -200,8 +207,8 @@ export const createSuggestionStore = ({
       update(userUuid, (state) => withoutSuggestion(state, { bucket: toBucket(surveyId), id })),
     dismiss: ({ userUuid, surveyId, id }) =>
       update(userUuid, (state) => withDismissed(state, { bucket: toBucket(surveyId), id })),
-    startProgress: ({ userUuid, surveyId, id, conversationId }) =>
-      update(userUuid, (state) => withProgress(state, { bucket: toBucket(surveyId), id, conversationId })),
+    startProgress: ({ userUuid, surveyId, id, conversationId, targetKeys }) =>
+      update(userUuid, (state) => withProgress(state, { bucket: toBucket(surveyId), id, conversationId, targetKeys })),
     onConversationSettled: ({ userUuid, conversationId, outcome }) =>
       update(userUuid, (state) => withSettled(state, { conversationId, outcome })),
     getPending: ({ userUuid, surveyId }) => getPendingOf(read(userUuid), toBucket(surveyId)),

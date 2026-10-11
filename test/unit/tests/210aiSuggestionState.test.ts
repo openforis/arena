@@ -94,6 +94,18 @@ describe('suggestion state rules (210)', () => {
     )
   })
 
+  test('withProgress with targetKeys leaves a target merged after the request pending', () => {
+    let state = withPending(suggestion())
+    state = withAdded(state, suggestion({ targets: [{ key: 'b:labels' }, { key: 'new:labels' }] }))
+    state = withProgress(state, {
+      bucket: '1',
+      id: 'missingTranslations:fr',
+      conversationId: 'c1',
+      targetKeys: ['b:labels'],
+    })
+    expect(state.inProgress['1']['missingTranslations:fr'].targets).toEqual([{ key: 'b:labels' }])
+  })
+
   test('withKind prunes the dismissed and in-progress targets that left the gap', () => {
     let state = withPending(suggestion())
     state = withProgress(state, { bucket: '1', id: 'missingTranslations:fr', conversationId: 'c1' })

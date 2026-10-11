@@ -228,6 +228,25 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(visibleIn(store, 7, ['design'])).toEqual([])
   })
 
+  test('a target merged between the click and the send resolving is not put in progress', async () => {
+    const store = newStore()
+    store.add({ userUuid: 'u1', suggestion: designSuggestion })
+    const request = introRequest({
+      area: 'design',
+      suggestionId: designSuggestion.id,
+      scope: { kind: 'missingTranslations', targetKeys: ['a:labels', 'b:labels'] },
+    })
+    const send = async () => {
+      store.add({
+        userUuid: 'u1',
+        suggestion: { ...designSuggestion, targets: [{ key: 'a:labels' }, { key: 'b:labels' }, { key: 'c:labels' }] },
+      })
+      return 'c1'
+    }
+    await acceptSuggestion({ request, send, store, definitions })
+    expect(visibleIn(store, 7, ['design']).flatMap((item) => item.targets)).toEqual([{ key: 'c:labels' }])
+  })
+
   test('when send creates no turn (busy, applying, not ready) nothing is marked and the card stays', async () => {
     const store = newStore()
     store.add({ userUuid: 'u1', suggestion: designSuggestion })

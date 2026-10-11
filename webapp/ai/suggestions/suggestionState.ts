@@ -535,14 +535,21 @@ export const withDismissed = (
  * @param {string} params.bucket - Bucket.
  * @param {string} params.id - Suggestion id.
  * @param {string} params.conversationId - Accepting conversation.
+ * @param {string[]} [params.targetKeys] - Only the visible targets with these keys (the ones sent); all when omitted.
  * @returns {SuggestionUserState} The new state (the same object when no target is visible).
  */
 export const withProgress = (
   state: SuggestionUserState,
-  { bucket, id, conversationId }: { bucket: string; id: string; conversationId: string }
+  {
+    bucket,
+    id,
+    conversationId,
+    targetKeys,
+  }: { bucket: string; id: string; conversationId: string; targetKeys?: string[] }
 ): SuggestionUserState => {
   const pending = findPending(state, bucket, id)
-  const visible = pending ? getVisibleTargets(state, pending) : []
+  const visibleAll = pending ? getVisibleTargets(state, pending) : []
+  const visible = targetKeys ? visibleAll.filter((target) => targetKeys.includes(target.key)) : visibleAll
   if (visible.length === 0) return state
   const current = getNested(state.inProgress, bucket, id)?.targets ?? []
   return setInProgress(state, bucket, id, { conversationId, targets: mergeTargets(current, visible) })
