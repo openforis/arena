@@ -11,6 +11,7 @@ import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 import type { AnalysisQueryStore } from './analysis/queryStore'
+import type { CategoryItemRefs } from './design/categoryItemRefs'
 
 export type AiToolArea = 'design' | 'help' | 'analysis' | 'cleaning'
 
@@ -46,6 +47,8 @@ export type AiToolContext = {
   suggestionScope?: SuggestionScope | null
   // change sets of this conversation that are neither applied nor discarded (work lists skip their items)
   getPendingChangeSets?: () => ChangeSet[]
+  // category items listed in this conversation, by ref (categoryItems_listMissingLabels → categoryItemLabels_proposeSet)
+  categoryItemRefs?: CategoryItemRefs
 }
 
 export type AiTool<I = any, O = unknown> = {
