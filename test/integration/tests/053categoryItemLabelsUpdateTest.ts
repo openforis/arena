@@ -1,5 +1,3 @@
-import { UnauthorizedError } from '@openforis/arena-server'
-
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -20,7 +18,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import * as SB from '@test/utils/surveyBuilder'
-import { buildUserWithoutGroups, runRoutePermission } from '@test/utils/routePermissionTestUtils'
+import { expectEditPermissionOnly } from '@test/utils/routePermissionTestUtils'
 
 type Route = { method: string; path: string; handlers: any[] }
 
@@ -202,10 +200,7 @@ describe('Category item labels update (053)', () => {
       ({ method, path }) => method === 'put' && path === '/survey/:surveyId/categories/items/labels'
     )
     expect(route?.handlers[0]).toBe(AuthMiddleware.requireSurveyEditPermission)
-    // a user without the edit permission is refused (UnauthorizedError, the API error handler answers 403); an editor passes
-    const refused = await runRoutePermission({ route, user: buildUserWithoutGroups(user), surveyId })
-    expect(refused).toBeInstanceOf(UnauthorizedError)
-    expect(await runRoutePermission({ route, user, surveyId })).toBeUndefined()
+    await expectEditPermissionOnly({ routes: [route], admin: user, surveyId })
 
     const res = createFakeResponse()
     const items = [{ itemUuid: white, lang: 'fr', text: 'Blanc', expectedText: null }]
