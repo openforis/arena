@@ -28,6 +28,7 @@ export default {
   cannotInsertFileExceedingQuota: 'Não é possível inserir o arquivo: a cota de armazenamento seria excedida',
   cannotOverridePublishedTaxa: 'Não é possível sobrescrever táxons publicados',
   cantUpdateStep: `Não foi possível atualizar a etapa`,
+  categoryItemLabelsInvalid: 'Pedido de rótulos de categorias inválido ({{reason}}).',
   chainCannotBeSaved: 'A cadeia é inválida e não pode ser salva',
   csv: {
     emptyHeaderFound: 'Cabeçalho vazio encontrado na coluna {{columnPosition}}',

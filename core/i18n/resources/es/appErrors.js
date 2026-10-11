@@ -31,6 +31,7 @@ export default {
     'No se puede insertar el archivo: se excedería la cuota de almacenamiento de archivos',
   cannotOverridePublishedTaxa: 'No se pueden sobrescribir taxones publicados',
   cantUpdateStep: 'No se puede actualizar el paso',
+  categoryItemLabelsInvalid: 'Solicitud de etiquetas de categorías no válida ({{reason}}).',
   chainCannotBeSaved: 'La cadena no es válida y no se puede guardar',
   csv: {
     emptyHeaderFound: 'Encabezado vacío encontrado en la columna {{columnPosition}}',

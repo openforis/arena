@@ -26,6 +26,7 @@ export default {
   cannotInsertFileExceedingQuota: 'Файл оруулах боломжгүй: файл хадгалах квот хэтэрсэн',
   cannotOverridePublishedTaxa: 'Нийтлэгдсэн таксоныг дарж бичих боломжгүй',
   cantUpdateStep: 'Алхам шинэчлэх боломжгүй',
+  categoryItemLabelsInvalid: 'Ангиллын шошгын хүсэлт буруу байна ({{reason}}).',
   chainCannotBeSaved: 'Сүлжээ буруу тул хадгалах боломжгүй',
   csv: {
     emptyHeaderFound: '{{columnPosition}} баганад хоосон гарчиг олдсон',

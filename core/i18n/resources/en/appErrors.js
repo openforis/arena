@@ -4,6 +4,7 @@ export default {
   cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',
   cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
   cantUpdateStep: `Can't update step`,
+  categoryItemLabelsInvalid: 'Invalid category labels request ({{reason}}).',
   chainCannotBeSaved: 'Chain is invalid and cannot be saved',
   csv: {
     emptyHeaderFound: 'Empty header found at column {{columnPosition}}',

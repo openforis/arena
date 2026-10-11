@@ -183,6 +183,33 @@ export const init = (app) => {
   )
 
   // ==== READ
+  // assistant suggestion 6: edit permission, the labels are only read to be written
+  app.get(
+    '/survey/:surveyId/categories/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId } = Request.getParams(req)
+        res.json(await CategoryService.countItemsMissingLabels({ surveyId }))
+      } catch (error) {
+        // Response.sendErr (not next(error)): see convertToSamplingPointData, the error key would be lost
+        Response.sendErr(res, error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/items/missing-labels',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, lang, cursor, limit } = Request.getParams(req)
+        res.json(await CategoryService.fetchItemsMissingLabels({ surveyId, categoryUuid, lang, cursor, limit }))
+      } catch (error) {
+        Response.sendErr(res, error)
+      }
+    }
+  )
 
   app.get('/survey/:surveyId/categories', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {

@@ -31,6 +31,7 @@ export default {
   cannotInsertFileExceedingQuota: "Impossible d'insérer le fichier : le quota de stockage serait dépassé",
   cannotOverridePublishedTaxa: "Impossible d'écraser les taxons publiés",
   cantUpdateStep: `Impossible de mettre à jour l'étape`,
+  categoryItemLabelsInvalid: 'Requête de libellés de catégories invalide ({{reason}}).',
   chainCannotBeSaved: 'La chaîne est invalide et ne peut pas être sauvegardée',
   csv: {
     emptyHeaderFound: 'En-tête vide trouvé à la colonne {{columnPosition}}',

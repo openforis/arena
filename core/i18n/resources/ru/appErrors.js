@@ -27,6 +27,7 @@ export default {
   cannotInsertFileExceedingQuota: 'Невозможно вставить файл: будет превышена квота хранения файлов',
   cannotOverridePublishedTaxa: 'Невозможно перезаписать опубликованные таксоны',
   cantUpdateStep: 'Не удается обновить шаг',
+  categoryItemLabelsInvalid: 'Недопустимый запрос меток категорий ({{reason}}).',
   chainCannotBeSaved: 'Цепочка недействительна и не может быть сохранена',
   csv: {
     emptyHeaderFound: 'Обнаружен пустой заголовок в столбце {{columnPosition}}',

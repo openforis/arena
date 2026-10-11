@@ -4,6 +4,7 @@ export default {
   cannotInsertFileExceedingQuota: 'ファイルを追加できません：ファイルストレージの容量上限を超えます',
   cannotOverridePublishedTaxa: '公開済みの分類群を上書きできません',
   cantUpdateStep: `ステップを更新できません`,
+  categoryItemLabelsInvalid: 'カテゴリのラベルのリクエストが無効です ({{reason}})。',
   chainCannotBeSaved: '処理チェーンが無効なため保存できません',
   csv: {
     emptyHeaderFound: '列{{columnPosition}}に空のヘッダーが見つかりました',
