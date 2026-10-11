@@ -3,18 +3,20 @@ import type { ReactElement } from 'react'
 
 import { TestId } from '@webapp/utils/testId'
 
+import { useMapWorkspace } from '../MapWorkspaceContext'
 import { UPLOAD_ACCEPT } from '../uploaded/uploadedFiles'
 import { useUploadMapFile } from '../uploaded/useUploadMapFile'
 import { MenuActionItem } from './menuItems'
 import { ToolbarMenu } from './ToolbarMenu'
 
 /**
- * Add data menu (full bar): upload a file; Part 3 adds the WMS / WMTS service item.
+ * Add data menu (full bar): upload a file, or add a WMS / WMTS service (or an XYZ template).
  * @returns {React.ReactElement} The menu and its hidden file input.
  */
 export const AddDataMenu = (): ReactElement => {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const uploadMapFile = useUploadMapFile()
+  const { dispatch } = useMapWorkspace()
 
   return (
     <>
@@ -42,6 +44,13 @@ export const AddDataMenu = (): ReactElement => {
               inputRef.current?.click()
               close()
             }}
+          />,
+          <MenuActionItem
+            key="addWms"
+            itemKey="addWms"
+            labelKey="mapWorkspace.wms.menuItem"
+            // the dialog opens once the menu has given the focus back
+            onClick={() => close(() => dispatch({ type: 'openDialog', dialog: 'wms' }))}
           />,
         ]}
       </ToolbarMenu>

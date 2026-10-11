@@ -1,11 +1,12 @@
 import React from 'react'
 import type { ComponentType, ReactElement } from 'react'
 
+import { WmsDialog } from './customLayers/wms/WmsDialog'
 import { useMapWorkspace } from './MapWorkspaceContext'
 import type { MapDialogKey } from './mapWorkspaceTypes'
 
 // Part 3 adds `wms`, Part 5 adds `screenshot`; a dialog closes itself with dispatch({ type: 'closeDialog' })
-const dialogComponents: Partial<Record<MapDialogKey, ComponentType>> = {}
+const dialogComponents: Partial<Record<MapDialogKey, ComponentType>> = { wms: WmsDialog }
 
 /**
  * Renders the open workspace dialog, if any.

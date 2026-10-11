@@ -1,0 +1,101 @@
+.map-wms-dialog {
+  .map-wms-dialog__url {
+    display: flex;
+    gap: 0.5rem;
+    align-items: flex-start;
+    margin-top: 0.5rem;
+
+    .input-text {
+      flex: 1;
+    }
+  }
+
+  .map-wms-dialog__hint,
+  .map-wms-dialog__summary,
+  .map-wms-dialog__layer-name,
+  .map-wms-dialog__card-description {
+    color: var(--colorGrey700);
+    font-size: 0.85rem;
+  }
+
+  .map-wms-dialog__error {
+    color: #c62828;
+  }
+
+  .map-wms-dialog__section {
+    border: none;
+    margin: 1rem 0 0;
+    padding: 0;
+
+    legend {
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+  }
+
+  .map-wms-dialog__layers {
+    display: flex;
+    flex-direction: column;
+    max-height: 220px;
+    overflow-y: auto;
+    border: 1px solid var(--colorGrey400);
+    border-radius: 4px;
+    padding: 0.25rem 0.5rem;
+  }
+
+  .map-wms-dialog__layer-label {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .map-wms-dialog__cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.5rem;
+  }
+
+  .map-wms-dialog__card {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    text-align: left;
+    background: none;
+    border: 1px solid var(--colorGrey400);
+    border-radius: 6px;
+    padding: 0.5rem 0.75rem;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      border-color: var(--colorPrimary);
+      box-shadow: inset 0 0 0 1px var(--colorPrimary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--colorPrimary);
+      outline-offset: 2px;
+    }
+  }
+
+  .map-wms-dialog__card-title {
+    font-weight: 600;
+  }
+
+  .map-wms-dialog__fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .map-wms-dialog__opacity {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .map-wms-dialog .map-wms-dialog__cards {
+    grid-template-columns: 1fr;
+  }
+}
