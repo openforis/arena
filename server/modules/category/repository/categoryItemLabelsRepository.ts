@@ -217,6 +217,7 @@ export const fetchItemsLabelsByUuids = async (
      FROM ${schema}.category_item i
      JOIN ${schema}.category_level l ON l.uuid = i.level_uuid
      WHERE i.uuid = ANY($/itemUuids/::uuid[])
+     ORDER BY i.uuid
      FOR UPDATE OF i`,
     { itemUuids }
   )
