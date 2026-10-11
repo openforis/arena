@@ -1,5 +1,4 @@
 import * as Survey from '@core/survey/survey'
-import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
@@ -15,7 +14,8 @@ import {
   surveyGetValidationTool,
 } from '@webapp/ai/tools/design/surveyGetValidation'
 import { runTool } from '@webapp/ai/tools/registry'
-import { buildAssistantSurvey, createToolContext, fakeT, getDefByName } from '@test/unit/utils/assistantTestUtils'
+import { buildAssistantSurvey, createToolContext, fakeT } from '@test/unit/utils/assistantTestUtils'
+import { withValidation } from '@test/unit/utils/surveyValidationTestUtils'
 
 const { keysEmpty, childrenEmpty } = {
   keysEmpty: 'validationErrors:nodeDefEdit.keysEmpty',
@@ -27,14 +27,6 @@ const entityValidation = () =>
     keyAttributes: Validation.newInstance(false, {}, [ValidationResult.newInstance(keysEmpty)]),
     children: Validation.newInstance(false, {}, [ValidationResult.newInstance(childrenEmpty)]),
   })
-
-const withValidation = (survey: any, validationsByName: Record<string, any>) => {
-  const fields: Record<string, any> = {}
-  for (const [name, validation] of Object.entries(validationsByName)) {
-    fields[NodeDef.getUuid(getDefByName(survey, name))] = validation
-  }
-  return Survey.assocNodeDefsValidation(Validation.newInstance(false, fields))(survey)
-}
 
 let survey: any
 

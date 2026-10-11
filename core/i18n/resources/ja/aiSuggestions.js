@@ -29,4 +29,8 @@ export default {
     card_one: '{{count}}件の属性にカテゴリまたは分類体系がありません。選びますか？',
     card_other: '{{count}}件の属性にカテゴリまたは分類体系がありません。選びますか？',
   },
+  publishErrors: {
+    card_one: '{{count}}件の項目にエラーがあります。公開は失敗します。修正しますか？',
+    card_other: '{{count}}件の項目にエラーがあります。公開は失敗します。修正しますか？',
+  },
 }

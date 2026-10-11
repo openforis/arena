@@ -6,6 +6,7 @@ import { entityWithoutKeyDetector, entityWithoutKeyResolver } from './entityWith
 import { missingTranslationsDetector } from './missingTranslations'
 import { newEntriesDescriptionsDetector, newEntriesDescriptionsResolver } from './newEntriesDescriptions'
 import { moduleIntroDetector } from './moduleIntro'
+import { publishErrorsDetector, publishErrorsResolver } from './publishErrors'
 import type { EventDetector, StateDetector, TargetResolver } from './types'
 
 export type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, TargetResolver } from './types'
@@ -16,6 +17,11 @@ export const EVENT_DETECTORS: EventDetector[] = [
   moduleIntroDetector,
   newEntriesDescriptionsDetector,
   entityWithoutKeyDetector,
+  publishErrorsDetector,
 ]
 
-export const TARGET_RESOLVERS: TargetResolver[] = [newEntriesDescriptionsResolver, entityWithoutKeyResolver]
+export const TARGET_RESOLVERS: TargetResolver[] = [
+  newEntriesDescriptionsResolver,
+  entityWithoutKeyResolver,
+  publishErrorsResolver,
+]

@@ -30,4 +30,8 @@ export default {
     card_one: '{{count}} atributo no tiene categoría ni taxonomía. ¿Elegirla?',
     card_other: '{{count}} atributos no tienen categoría ni taxonomía. ¿Elegirlas?',
   },
+  publishErrors: {
+    card_one: '{{count}} entrada tiene errores. La publicación fallará. ¿Corregirla?',
+    card_other: '{{count}} entradas tienen errores. La publicación fallará. ¿Corregirlas?',
+  },
 }
