@@ -29,6 +29,8 @@ const DESIGN_RULES = [
   '- Check every expression with expression_check before proposing it.',
   '- When a propose tool answers with the error invalidProposal, fix the listed issues (operation = index in your ' +
     'proposal) and propose again. Do not show the raw error to the user.',
+  '- To translate category item labels, list them with categoryItems_listMissingLabels (pass nextCursor to go on) ' +
+    'and propose them with categoryItemLabels_proposeSet, using the refs it gives.',
   '- Write labels and descriptions only in the survey languages.',
   '- For "how do I…" questions about Arena, use docs_search and cite the section as §id title.',
   '- A message starting with "Note from Arena (not the user)" reports what the user applied: trust it over your ' +

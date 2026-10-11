@@ -65,7 +65,7 @@ type PageParams = {
  * @param {string} categoryName - Category name.
  * @returns {object} The category.
  */
-const requireCategory = (survey: any, categoryName: string): any => {
+export const requireCategory = (survey: any, categoryName: string): any => {
   const category = Survey.getCategoryByName(categoryName)(survey)
   if (!category) {
     throw new AiToolFailure('categoryNotFound', `No category is named "${categoryName}".`, { categoryName })
@@ -80,7 +80,7 @@ const requireCategory = (survey: any, categoryName: string): any => {
  * @param {string} categoryName - Category name.
  * @returns {void}
  */
-const checkScope = (ctx: AiToolContext, categoryUuid: string, categoryName: string): void => {
+export const checkScope = (ctx: AiToolContext, categoryUuid: string, categoryName: string): void => {
   const scope = ctx.suggestionScope
   if (scope?.kind !== 'categoryItemTranslations' || scope.targetKeys.includes(categoryUuid)) return
   throw new AiToolFailure(
