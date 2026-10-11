@@ -1748,6 +1748,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       record_getValues: 'Leu valores do registro',
       records_proposeEdits: 'Preparou edições de registros',
       categoryItems_listMissingLabels: 'Listou rótulos de categorias a traduzir',
+      categoryItemLabels_proposeSet: 'Preparou rótulos de categorias',
       default: 'Usou uma ferramenta',
       failed: 'Falhou',
       interrupted: 'Interrompido',

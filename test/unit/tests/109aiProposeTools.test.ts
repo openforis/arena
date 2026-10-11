@@ -210,6 +210,7 @@ describe('propose tools in the registry', () => {
       'nodeDef_proposeUpdate',
       'labels_proposeSet',
       'expressions_proposeSet',
+      'categoryItemLabels_proposeSet',
     ])
     expect(proposeNames(ctxWithSurvey({ canEditSurvey: false }))).toEqual([])
     expect(

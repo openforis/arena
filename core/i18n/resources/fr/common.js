@@ -1762,6 +1762,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       record_getValues: "A lu les valeurs de l'enregistrement",
       records_proposeEdits: "A préparé des modifications d'enregistrements",
       categoryItems_listMissingLabels: 'A listé des libellés de catégories à traduire',
+      categoryItemLabels_proposeSet: 'A préparé des libellés de catégories',
       default: 'A utilisé un outil',
       failed: 'Échec',
       interrupted: 'Interrompu',

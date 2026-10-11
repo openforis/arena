@@ -16,6 +16,8 @@ import { categoriesListTool, taxonomiesListTool } from './design/refLists'
 import { surveyGetOverviewTool } from './design/surveyGetOverview'
 import { surveyListMissingTextsTool } from './design/surveyListMissingTexts'
 import { surveyGetValidationTool } from './design/surveyGetValidation'
+import { categoryItemLabelsProposeSetTool } from './design/categoryItemLabelsProposeSet'
+import { categoryItemsListMissingLabelsTool } from './design/categoryItemsListMissingLabels'
 import { docsSearchTool } from './help/docsSearch'
 import type { AiTool } from './types'
 
@@ -33,6 +35,8 @@ export const ALL_TOOLS: AiTool[] = [
   surveyListMissingTextsTool,
   categoriesListTool,
   taxonomiesListTool,
+  categoryItemsListMissingLabelsTool,
+  categoryItemLabelsProposeSetTool,
   docsSearchTool,
   ...analysisTools,
   ...cleaningTools,

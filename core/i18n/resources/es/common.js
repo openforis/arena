@@ -1587,6 +1587,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       record_getValues: 'Leyó valores del registro',
       records_proposeEdits: 'Preparó ediciones de registros',
       categoryItems_listMissingLabels: 'Listó etiquetas de categorías por traducir',
+      categoryItemLabels_proposeSet: 'Preparó etiquetas de categorías',
       default: 'Usó una herramienta',
       failed: 'Falló',
       interrupted: 'Interrumpido',
