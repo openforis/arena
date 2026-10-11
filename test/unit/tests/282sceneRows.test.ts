@@ -3,6 +3,7 @@
  * duplicates (items + live tails) resolved by id.
  */
 import {
+  compactSceneRow,
   dedupeScenes,
   parseCloudCover,
   parseCoverage,
@@ -35,6 +36,21 @@ const scene = (id: string, cloud: number): SceneResult => ({
 })
 
 describe('Sentinel-2 index rows (282)', () => {
+  test('compacts a row to primitives that still parse', () => {
+    const raw = {
+      id: 'a',
+      _tile: '37MBU',
+      datetime: new Date('2026-10-01T00:00:00Z'),
+      extra: { big: 1 },
+      'eo:cloud_cover': 3,
+    }
+    const compact = compactSceneRow(raw, SCENE_INDEX_COLUMNS)
+    expect(Object.keys(compact).sort()).toEqual([...SCENE_INDEX_COLUMNS].sort())
+    expect(compact.datetime).toBe(Date.parse('2026-10-01T00:00:00Z'))
+    expect(compact.thumbnail_url).toBeNull()
+    expect(parseSceneRow(compact)?.datetime).toBe('2026-10-01T00:00:00.000Z')
+  })
+
   test('reads only the needed columns, never assets', () => {
     expect(SCENE_INDEX_COLUMNS).toEqual([
       'id',

@@ -33,6 +33,16 @@ const loadSceneIndexReader = (): Promise<SceneIndexReader> => {
 }
 
 /**
+ * Drops the session reader (parsed footers and cached rows) so the memory is released. The next search
+ * loads a fresh one.
+ *
+ * @returns {void}
+ */
+export const releaseSceneIndexReader = (): void => {
+  readerPromise = null
+}
+
+/**
  * Builds the key that identifies a search request.
  *
  * @param {string[]} tiles - Tiles.
@@ -54,6 +64,8 @@ const getRequestKey = (tiles: string[], period: ScenePeriod, attempt: number): s
 export const useSceneSearch = ({ tiles, period }: { tiles: string[]; period: ScenePeriod }): SceneSearchState => {
   const [attempt, setAttempt] = useState(0)
   const [finished, setFinished] = useState<FinishedSearch | null>(null)
+  // The reader caches tens of MB: release it when the map workspace goes away.
+  useEffect(() => releaseSceneIndexReader, [])
   const requestKey = tiles.length > 0 ? getRequestKey(tiles, period, attempt) : null
 
   useEffect(() => {

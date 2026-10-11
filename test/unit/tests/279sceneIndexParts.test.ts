@@ -9,6 +9,10 @@ import {
   SCENE_INDEX_TILE_COLUMN,
   selectRowGroups,
 } from '@webapp/components/MapContainer/workspace/scenes/sceneIndexParts'
+import {
+  createSceneIndexCache,
+  MAX_CACHED_ROW_GROUPS,
+} from '@webapp/components/MapContainer/workspace/scenes/sceneIndexCache'
 import { getScenePeriod } from '@webapp/components/MapContainer/workspace/scenes/scenePeriod'
 import type { RowGroupInfo } from '@webapp/components/MapContainer/workspace/scenes/sceneTypes'
 
@@ -119,5 +123,99 @@ describe('Sentinel-2 index parts (279)', () => {
         expect.objectContaining({ method: 'HEAD', cache: 'no-store' })
       )
     })
+  })
+})
+
+describe('Sentinel-2 index cache (279)', () => {
+  const URL_A = `${BASE}/a.parquet`
+  type Part = { groups: RowGroupInfo[] }
+  const partOf = (groupCount = 1): Part => ({
+    groups: Array.from({ length: groupCount }, (_, i) => group(i, null, null)),
+  })
+
+  const setup = (overrides: { openPart?: (url: string) => Promise<Part | null>; part?: Part } = {}) => {
+    const part = overrides.part ?? partOf(20)
+    const openPart = jest.fn(overrides.openPart ?? (async () => part))
+    const loadRows = jest.fn(async () => [{ id: 'x' }])
+    return { part, openPart, loadRows, reader: createSceneIndexCache<Part>({ openPart, loadRows }) }
+  }
+
+  test('caches an opened part and its decoded rows', async () => {
+    const { reader, openPart, loadRows, part } = setup()
+    await reader.readRows(URL_A, part.groups[0], ['id'])
+    await reader.readRows(URL_A, part.groups[0], ['id'])
+    await reader.readRowGroups(URL_A)
+    expect(openPart).toHaveBeenCalledTimes(1)
+    expect(loadRows).toHaveBeenCalledTimes(1)
+  })
+
+  test('caches a missing part (null)', async () => {
+    const { reader, openPart } = setup({ openPart: async () => null })
+    expect(await reader.readRowGroups(URL_A)).toBeNull()
+    expect(await reader.readRowGroups(URL_A)).toBeNull()
+    expect(await reader.readRows(URL_A, group(0, 'a', 'b'), ['id'])).toEqual([])
+    expect(openPart).toHaveBeenCalledTimes(1)
+  })
+
+  test('evicts a failed open so a retry opens the part again', async () => {
+    let calls = 0
+    const { reader, openPart } = setup({
+      openPart: async () => {
+        calls += 1
+        if (calls === 1) throw new Error('boom')
+        return partOf()
+      },
+    })
+    await expect(reader.readRowGroups(URL_A)).rejects.toThrow('boom')
+    await Promise.resolve()
+    expect(await reader.readRowGroups(URL_A)).toHaveLength(1)
+    expect(openPart).toHaveBeenCalledTimes(2)
+  })
+
+  test('evicts the part and every url# row group when a read fails', async () => {
+    const part = partOf(2)
+    let fail = true
+    const openPart = jest.fn(async () => part)
+    const loadRows = jest.fn(async (_p: Part, g: RowGroupInfo) => {
+      if (g.index === 1 && fail) throw new Error('read failed')
+      return [{ id: String(g.index) }]
+    })
+    const reader = createSceneIndexCache<Part>({ openPart, loadRows })
+    await reader.readRows(URL_A, part.groups[0], ['id'])
+    await expect(reader.readRows(URL_A, part.groups[1], ['id'])).rejects.toThrow('read failed')
+    await Promise.resolve()
+    fail = false
+    await reader.readRows(URL_A, part.groups[0], ['id'])
+    await reader.readRows(URL_A, part.groups[1], ['id'])
+    expect(openPart).toHaveBeenCalledTimes(2)
+    expect(loadRows).toHaveBeenCalledTimes(4)
+  })
+
+  test('keeps at most 16 decoded row groups, dropping the oldest', async () => {
+    expect(MAX_CACHED_ROW_GROUPS).toBe(16)
+    const { reader, loadRows, part } = setup()
+    for (const g of part.groups.slice(0, 17)) await reader.readRows(URL_A, g, ['id'])
+    expect(loadRows).toHaveBeenCalledTimes(17)
+    await reader.readRows(URL_A, part.groups[16], ['id'])
+    expect(loadRows).toHaveBeenCalledTimes(17)
+    await reader.readRows(URL_A, part.groups[0], ['id'])
+    expect(loadRows).toHaveBeenCalledTimes(18)
+  })
+
+  test('throws and evicts when the row range no longer matches the footer', async () => {
+    let version = 0
+    const openPart = jest.fn(async (): Promise<Part> => {
+      version += 1
+      return { groups: [{ index: 0, rowStart: 0, rowEnd: version === 1 ? 10 : 20, tileMin: null, tileMax: null }] }
+    })
+    const loadRows = jest.fn(async () => [])
+    const reader = createSceneIndexCache<Part>({ openPart, loadRows })
+    const stale = (await reader.readRowGroups(URL_A))![0]
+    // Another failure evicted the part; the next open describes different rows.
+    await expect(reader.readRows(`${URL_A}`, { ...stale, rowEnd: 99 }, ['id'])).rejects.toThrow('changed')
+    await Promise.resolve()
+    expect(loadRows).not.toHaveBeenCalled()
+    expect((await reader.readRowGroups(URL_A))![0].rowEnd).toBe(20)
+    expect(openPart).toHaveBeenCalledTimes(2)
   })
 })

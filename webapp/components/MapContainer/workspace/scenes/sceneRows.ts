@@ -11,6 +11,26 @@ export const SCENE_INDEX_COLUMNS = [
 ]
 
 /**
+ * Keeps only the given columns of a row, as primitives (a Date becomes epoch milliseconds), so cached rows
+ * stay small and hold no reference to decoder buffers.
+ *
+ * @param {SceneIndexRow} row - Decoded row.
+ * @param {string[]} columns - Columns to keep.
+ * @returns {SceneIndexRow} Compact row.
+ */
+export const compactSceneRow = (row: SceneIndexRow, columns: string[]): SceneIndexRow => {
+  const compact: SceneIndexRow = {}
+  for (const column of columns) {
+    const value = row[column]
+    if (value instanceof Date) compact[column] = value.getTime()
+    else if (typeof value === 'string') compact[column] = value
+    else if (typeof value === 'number') compact[column] = value
+    else compact[column] = null
+  }
+  return compact
+}
+
+/**
  * Returns a finite number clamped to 0–100, or null when the value is not a finite number.
  *
  * @param {unknown} value - Raw value.

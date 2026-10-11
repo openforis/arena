@@ -15,6 +15,10 @@ export const SCENE_BASE_Z_INDEX = 50
 // Pixels sampled per tile side: lower than the default 256 keeps the three-file band mixes responsive.
 const SCENE_LAYER_RESOLUTION = 128
 
+// georaster reads each header twice (main thread, then a worker with no error handling): a failed second read
+// would never settle, so the load is raced against this timeout.
+const COG_HEADER_TIMEOUT_MS = 60_000
+
 export type CreateSceneLayerParams = {
   map: L.Map
   scene: SceneResult
@@ -40,6 +44,19 @@ export const ensureScenePane = (map: L.Map, paneName: string): string => {
 }
 
 /**
+ * Rejects when a promise does not settle in time.
+ *
+ * @param {Promise<T>} promise - Promise to wait for.
+ * @param {number} timeoutMs - Timeout in milliseconds.
+ * @returns {Promise<T>} The promise result, or a rejection on timeout.
+ */
+const withTimeout = <T>(promise: Promise<T>, timeoutMs: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Timed out reading the scene headers.')), timeoutMs)
+    promise.then(resolve, reject).finally(() => clearTimeout(timer))
+  })
+
+/**
  * Creates the Leaflet layer of a scene: reads the COG headers (range requests) and returns a GridLayer
  * that reads only the pixels of the visible tiles.
  *
@@ -55,7 +72,8 @@ export const createSceneLayer = async ({
 }: CreateSceneLayerParams): Promise<L.GridLayer> => {
   const urls = getSceneCogUrls(scene.thumbnailUrl, bandMix)
   if (!urls) throw new Error(`Scene ${scene.id} has no cloud-optimised GeoTIFF URL.`)
-  const georasters = await Promise.all(urls.map((url) => parseGeoraster(url)))
+  // georaster also probes `<file>.ovr` with a HEAD request per COG (403/404 on S3): a known library cost.
+  const georasters = await withTimeout(Promise.all(urls.map((url) => parseGeoraster(url))), COG_HEADER_TIMEOUT_MS)
   const placement = asBase
     ? { pane: 'tilePane', zIndex: SCENE_BASE_Z_INDEX }
     : { pane: ensureScenePane(map, SCENE_OVERLAY_PANE) }
