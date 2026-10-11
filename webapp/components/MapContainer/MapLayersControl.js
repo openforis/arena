@@ -78,7 +78,18 @@ export const MapLayersControl = (props) => {
     })
     const result = []
     for (const baseLayer of selectableBaseLayers) {
-      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
+      const {
+        key,
+        apiKeyRequired,
+        name,
+        attribution,
+        provider,
+        maxZoom = 17,
+        type,
+        url,
+        style,
+        crossOrigin = false,
+      } = baseLayer
 
       // Equal Earth is never pre-selected (defaultBaseLayer skips it)
       const checked = contextBaseLayer ? contextBaseLayer.key === key : baseLayer === defaultBaseLayer
@@ -99,7 +110,14 @@ export const MapLayersControl = (props) => {
 
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={MAP_MIN_ZOOM} />
+          <TileLayer
+            id={key}
+            attribution={attribution}
+            url={tileUrl}
+            maxZoom={maxZoom}
+            minZoom={MAP_MIN_ZOOM}
+            crossOrigin={crossOrigin ? 'anonymous' : undefined}
+          />
         </LayersControl.BaseLayer>
       )
     }
