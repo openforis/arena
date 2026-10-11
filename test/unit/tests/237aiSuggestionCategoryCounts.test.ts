@@ -143,6 +143,22 @@ describe('category labels counts (237)', () => {
     expect(setKind.mock.calls[0][0].suggestions).toEqual([])
   })
 
+  test('a cancelled request does not throttle the next generation', async () => {
+    const { store } = createSetKindRecorder()
+    const pending = deferred<MissingLabelsCounts>()
+    const fetchCounts = jest.fn().mockReturnValueOnce(pending.promise).mockResolvedValue(counts)
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts })
+    const t0 = TEST_NOW.getTime()
+    const controller = new AbortController()
+    const first = detector.handle(event('generationStarted'), contextWith({ survey, store, controller, time: t0 }))
+    // defs reload of the same survey during the count
+    controller.abort()
+    await detector.handle(event('generationStarted'), contextWith({ survey, store, time: t0 + 1000 }))
+    expect(fetchCounts).toHaveBeenCalledTimes(2)
+    pending.resolve(counts)
+    await first
+  })
+
   test('a failed request is not throttled; nothing is fetched without draft defs the user can edit', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(counts)
