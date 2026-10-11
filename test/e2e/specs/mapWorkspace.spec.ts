@@ -26,6 +26,32 @@ const openMap = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(ids.menuButton('baseMap'))).toBeVisible()
 }
 
+// custom layers: a tile host that never resolves, answered by the route of the test
+const CUSTOM_TILE_HOST = 'https://tiles.arena-e2e.test'
+const CUSTOM_LAYER_NAME = 'Roads e2e'
+const ONE_PIXEL_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64'
+)
+
+/**
+ * Locates the rows of the custom overlays in the Layers panel.
+ * @param {Page} page - The page.
+ * @returns {Locator} The rows.
+ */
+const customOverlayRows = (page: Page): Locator =>
+  page.getByTestId(ids.railPanel('layers')).locator(`[data-testid^="${ids.overlayRow('custom-')}"]`)
+
+/**
+ * Waits for the response of a custom layers request.
+ * @param {Page} page - The page.
+ * @param {string} method - The HTTP method.
+ * @param {string} path - A part of the URL.
+ * @returns {Promise<Response>} The response.
+ */
+const waitForCustomLayersResponse = (page: Page, method: string, path: string) =>
+  page.waitForResponse((response) => response.url().includes(path) && response.request().method() === method)
+
 const layersControl = (page: Page): Locator =>
   page.getByTestId(ids.railPanel('layers')).locator('.leaflet-control-layers')
 
@@ -405,5 +431,78 @@ test.describe('Map workspace', () => {
     await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
     // the double-click did not move the record location
     await expect.poll(() => marker.boundingBox()).toEqual(markerBox)
+  })
+
+  test('adds an XYZ overlay for the current user, keeps it after a reload and removes it', async ({
+    page,
+    api,
+    sampleSurvey,
+  }) => {
+    let tileRequests = 0
+    await page.route(`${CUSTOM_TILE_HOST}/**`, (route) => {
+      tileRequests += 1
+      return route.fulfill({ status: 200, contentType: 'image/png', body: ONE_PIXEL_PNG })
+    })
+    await openMap(page)
+
+    await page.getByTestId(ids.menuButton('addData')).click()
+    await page.getByTestId(ids.menuItem('addWms')).click()
+    const dialog = page.getByTestId(ids.wmsDialog)
+    await expect(dialog).toBeVisible()
+    await dialog.getByTestId(ids.wmsUrlInput).fill(`${CUSTOM_TILE_HOST}/{z}/{x}/{y}.png`)
+    await dialog.getByTestId(ids.wmsLoadButton).click()
+    await expect(dialog.getByTestId(ids.wmsSummary)).toContainText('XYZ')
+
+    // "m" pressed on a focused button of the dialog must not start the measure tool
+    await dialog.getByTestId(ids.wmsAddAs('overlay')).focus()
+    await page.keyboard.press('m')
+    await expect(page.getByTestId(ids.quickButton('measureDistance'))).not.toHaveAttribute('aria-pressed', 'true')
+    await expect(dialog).toBeVisible()
+
+    await dialog.getByTestId(ids.wmsNameInput).fill(CUSTOM_LAYER_NAME)
+    await dialog.getByRole('radio', { name: 'Only me' }).check()
+    const saved = waitForCustomLayersResponse(page, 'POST', '/geo/map/custom-layers/user')
+    await dialog.getByTestId(ids.wmsSubmit).click()
+    expect((await saved).ok()).toBe(true)
+    await expect(dialog).toBeHidden()
+
+    // the dialog opens the Layers tab on an overlay
+    await expect(page.getByTestId(ids.railPanel('layers'))).toBeVisible()
+    await expect(customOverlayRows(page)).toHaveCount(1)
+    await expect(customOverlayRows(page)).toContainText(CUSTOM_LAYER_NAME)
+    await expect.poll(() => tileRequests).toBeGreaterThan(0)
+
+    await page.reload()
+    await expect(page.getByTestId(ids.railPanel('layers'))).toBeVisible()
+    await expect(customOverlayRows(page)).toHaveCount(1)
+
+    const removed = waitForCustomLayersResponse(page, 'DELETE', '/geo/map/custom-layers/user/')
+    await customOverlayRows(page)
+      .getByRole('button', { name: `Remove ${CUSTOM_LAYER_NAME}` })
+      .click()
+    expect((await removed).ok()).toBe(true)
+    await expect(customOverlayRows(page)).toHaveCount(0)
+
+    const { status, body } = await api.getRaw(`/api/survey/${sampleSurvey.id}/geo/map/custom-layers`)
+    expect(status).toBe(200)
+    expect(body).toEqual({ surveyLayers: [], userLayers: [] })
+  })
+
+  test('refuses capabilities URLs that point to the server or its network', async ({ api, sampleSurvey }) => {
+    const urls = [
+      'http://127.0.0.1/',
+      'http://0x7f.1/',
+      'http://169.254.169.254/latest/meta-data/',
+      'http://localhost:9096/',
+      'http://[::1]/',
+      'http://[::ffff:127.0.0.1]/',
+      'file:///etc/passwd',
+    ]
+    for (const url of urls) {
+      const params = new URLSearchParams({ url })
+      const { status, body } = await api.getRaw(`/api/survey/${sampleSurvey.id}/geo/map/capabilities?${params}`)
+      expect(status, url).toBe(400)
+      expect((body as { key?: string } | null)?.key, url).toBe('appErrors:mapCustomLayers.urlNotAllowed')
+    }
   })
 })
