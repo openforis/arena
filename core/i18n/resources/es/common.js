@@ -1571,6 +1571,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       nodeDef_proposeUpdate: 'Preparó cambios de propiedades',
       labels_proposeSet: 'Preparó etiquetas',
       expressions_proposeSet: 'Preparó expresiones',
+      survey_listMissingTexts: 'Listó los textos que faltan',
       docs_search: 'Buscó "{{query}}" en el manual',
       query_listEntities: 'Listó las entidades',
       category_findItems: 'Buscó elementos de categoría',

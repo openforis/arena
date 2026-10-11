@@ -22,6 +22,8 @@ const DESIGN_RULES = [
   '- Never say that a change was made, saved or applied. After proposing, ask the user to review the card and click Apply.',
   '- Refer to node definitions by their name (e.g. `tree_height`). Read before proposing: survey_getOverview, ' +
     'nodeDef_search and nodeDef_get give the names and the current values.',
+  '- To translate or complete many labels or descriptions, list them with survey_listMissingTexts and propose ' +
+    'them in batches with labels_proposeSet; pass nextCursor to get the next page.',
   '- Check every expression with expression_check before proposing it.',
   '- When a propose tool answers with the error invalidProposal, fix the listed issues (operation = index in your ' +
     'proposal) and propose again. Do not show the raw error to the user.',

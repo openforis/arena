@@ -1732,6 +1732,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       nodeDef_proposeUpdate: 'Preparou alterações de propriedades',
       labels_proposeSet: 'Preparou rótulos',
       expressions_proposeSet: 'Preparou expressões',
+      survey_listMissingTexts: 'Listou os textos em falta',
       docs_search: 'Pesquisou "{{query}}" no manual',
       query_listEntities: 'Listou as entidades',
       category_findItems: 'Pesquisou itens de categoria',
