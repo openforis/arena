@@ -12,6 +12,7 @@ export const DATA_IMPORTED_CARD_ONE_KEY = 'dataImported.cardOne'
 
 export const dataImportedDefinition: SuggestionDefinition = {
   kind: 'dataImported',
+  settlesWithoutCard: true,
   /**
    * Returns the card text key with the number of records of the visible import.
    * @param {AssistantSuggestion} suggestion - The suggestion (visible targets only).

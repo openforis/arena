@@ -13,7 +13,7 @@ import {
   withSuggestionScope,
 } from '@webapp/ai/suggestions/suggestionConversation'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
-import type { AssistantSuggestion, SuggestionRequest } from '@webapp/ai/suggestions/types'
+import type { AssistantSuggestion, SuggestionKind, SuggestionRequest } from '@webapp/ai/suggestions/types'
 import {
   createAssistantPanelStore,
   initialAssistantPanelState,
@@ -69,11 +69,13 @@ const conversationWith = ({
   cards = {},
   scoped = true,
   id = 'c1',
+  kind = SCOPE.kind,
 }: {
   status?: AssistantMessage['status'] | null
   cards?: Record<string, ChangeSetCardState>
   scoped?: boolean
   id?: string
+  kind?: SuggestionKind
 }): Conversation => {
   const base = createConversation({ userUuid: 'u1', surveyId: 7, area: 'design', now: NOW, idFactory: () => id })
   const conversation: Conversation = {
@@ -84,7 +86,7 @@ const conversationWith = ({
     ],
     changeSets: cards,
   }
-  return scoped ? withSuggestionScope(conversation, SCOPE) : conversation
+  return scoped ? withSuggestionScope(conversation, { ...SCOPE, kind }) : conversation
 }
 
 const suggestion: AssistantSuggestion = {
@@ -169,6 +171,12 @@ describe('Do it plumbing (214)', () => {
     expect(getSuggestionSettleOutcome(conversationWith({ status: 'done' }))).toBe('failed')
     expect(getSuggestionSettleOutcome(conversationWith({ status: 'error' }))).toBe('failed')
     expect(getSuggestionSettleOutcome(conversationWith({ status: 'streaming' }), { running: false })).toBe('failed')
+    // the explanation kinds have no card: a completed answer settles them, a failed or stopped one does not
+    for (const kind of ['validationErrors', 'dataImported'] as const) {
+      expect(getSuggestionSettleOutcome(conversationWith({ status: 'done', kind }))).toBe('settled')
+      expect(getSuggestionSettleOutcome(conversationWith({ status: 'error', kind }))).toBe('failed')
+      expect(getSuggestionSettleOutcome(conversationWith({ status: 'stopped', kind }))).toBe('failed')
+    }
   })
 
   test('the settle report moves the in-progress targets: failed shows the card again, settled dismisses it', () => {
