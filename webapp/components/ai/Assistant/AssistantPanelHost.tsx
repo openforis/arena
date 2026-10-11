@@ -13,14 +13,15 @@ import { isAssistantShown, pickArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { useAssistantAreas } from './useAssistantAreas'
 import { useAssistantPanel } from './useAssistantPanel'
+import { SuggestionsHost } from './suggestions/SuggestionsHost'
 
 // the panel, the agent and the AI SDK load on the first open
 const AssistantPanel = React.lazy(() => import('./AssistantPanel'))
 
 /**
- * Keeps the selected area valid and mounts the panel after the first open (it stays mounted, so closing the panel
- * doesn't stop a running answer).
- * @returns {React.ReactElement|null} The panel.
+ * Keeps the selected area valid, always mounts the suggestions host, and mounts the panel after the first open (it
+ * stays mounted, so closing the panel doesn't stop a running answer).
+ * @returns {React.ReactElement} The host and the panel.
  */
 export const AssistantPanelHost = () => {
   const { statuses, module } = useAssistantAreas()
@@ -58,11 +59,14 @@ export const AssistantPanelHost = () => {
     if (next !== area) assistantPanelStore.setArea(next)
   }, [area, explorerEditMode, module, open, pathname, statuses, userSelectedArea])
 
-  if (!mounted || !shown) return null
-
   return (
-    <Suspense fallback={null}>
-      <AssistantPanel statuses={statuses} />
-    </Suspense>
+    <>
+      <SuggestionsHost module={module} statuses={statuses} />
+      {mounted && shown && (
+        <Suspense fallback={null}>
+          <AssistantPanel statuses={statuses} />
+        </Suspense>
+      )}
+    </>
   )
 }
