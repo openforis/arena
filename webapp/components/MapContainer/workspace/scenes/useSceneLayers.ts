@@ -32,8 +32,8 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
   const lang = useLang()
   const overlaysRef = useRef(overlays)
   const pendingRef = useRef<Set<string>>(new Set())
-  // set synchronously with the first base request, so two concurrent requests cannot leave two base scenes
-  const baseIdRef = useRef<string | null>(null)
+  // incremented synchronously on each base request: the latest wins, so concurrent requests leave one base scene
+  const baseTokenRef = useRef(0)
   const [pendingIds, setPendingIds] = useState<ReadonlySet<string>>(() => new Set())
 
   useEffect(() => {
@@ -50,13 +50,14 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
     async ({ scene, bandMix, asBase }: AddSceneLayerParams): Promise<void> => {
       const id = getSceneOverlayId(scene.id, bandMix, asBase)
       if (pendingRef.current.has(id) || overlaysRef.current.some((overlay) => overlay.id === id)) return
-      if (asBase && baseIdRef.current !== null) return
-      if (asBase) baseIdRef.current = id
+      const token = asBase ? ++baseTokenRef.current : 0
+      const isSuperseded = (): boolean => asBase && baseTokenRef.current !== token
       setPending(id, true)
       try {
         const { createSceneLayer } = await import('./sceneLayer')
         const attribution = getSceneAttribution(scene.datetime)
         const layer = await createSceneLayer({ map, scene, bandMix, asBase, attribution })
+        if (isSuperseded()) return // a newer base request replaced this one while it loaded
         if (asBase) removeBaseSceneOverlays(overlaysRef.current, removeOverlay)
         const name = t('mapWorkspace.scenes.layerName', {
           date: formatSceneDate(scene.datetime, lang),
@@ -74,9 +75,8 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
           setOpacity: setSceneLayerOpacity,
         })
       } catch {
-        notifyError({ key: 'mapWorkspace.scenes.messages.layerError' })
+        if (!isSuperseded()) notifyError({ key: 'mapWorkspace.scenes.messages.layerError' })
       } finally {
-        if (asBase) baseIdRef.current = null
         setPending(id, false)
       }
     },

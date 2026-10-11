@@ -24,7 +24,7 @@ export type DrawAreaState = {
  * @returns {DrawAreaState} Drawn bounds, drawing flag and actions.
  */
 export const useDrawArea = (map: L.Map, active: boolean): DrawAreaState => {
-  const { dispatch } = useMapWorkspace()
+  const { dispatch, activeTool } = useMapWorkspace()
   const [bounds, setBounds] = useState<GeoBounds | null>(null)
   const [drawing, setDrawing] = useState(false)
 
@@ -37,8 +37,9 @@ export const useDrawArea = (map: L.Map, active: boolean): DrawAreaState => {
   const cancelDrawing = useCallback((): void => setDrawing(false), [])
 
   useEffect(() => {
-    // closing the tab mid-drawing pauses it; reopening the tab resumes it
-    if (!drawing || !active) return undefined
+    // closing the tab mid-drawing pauses it; reopening the tab resumes it, unless a measure tool has since
+    // started: two Geoman draw modes must not run at once
+    if (!drawing || !active || activeTool !== null) return undefined
     /**
      * Replaces Geoman's rectangle with the panel's own outline.
      *
@@ -72,7 +73,7 @@ export const useDrawArea = (map: L.Map, active: boolean): DrawAreaState => {
       map.off('pm:drawend', onDrawEnd)
       if (map.pm?.Draw.getActiveShape() === 'Rectangle') map.pm.disableDraw('Rectangle')
     }
-  }, [active, drawing, map])
+  }, [active, activeTool, drawing, map])
 
   useEffect(() => {
     if (!active || !bounds) return undefined
