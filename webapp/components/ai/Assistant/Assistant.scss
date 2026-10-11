@@ -349,3 +349,44 @@
   color: var(--colorGrey700);
   margin-left: 0.5rem;
 }
+
+// a tab with suggestions (the button's dot is in AssistantButton.scss)
+.ai-assistant-panel__tab-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  margin-left: 0.35rem;
+  border-radius: 50%;
+  background-color: var(--orange);
+  vertical-align: middle;
+}
+
+// the suggestion cards, above the messages; they never push the composer away
+.ai-assistant-suggestions {
+  flex: none;
+  max-height: 40%;
+  overflow-y: auto;
+  margin: 0;
+  padding: 0.5rem 0.75rem 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  &__card {
+    border: 1px solid var(--greyBorder);
+    border-left: 3px solid var(--orange);
+    border-radius: 4px;
+    padding: 0.5rem 0.75rem;
+  }
+
+  &__text {
+    margin: 0 0 0.5rem;
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.5rem;
+  }
+}

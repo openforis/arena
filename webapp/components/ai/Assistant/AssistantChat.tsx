@@ -7,6 +7,7 @@ import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
+import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
 import type { AssistantArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
@@ -14,6 +15,8 @@ import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { AssistantContextMeter } from './AssistantContextMeter'
 import { AssistantMessageView } from './AssistantMessage'
+import { AssistantSuggestions } from './suggestions/AssistantSuggestions'
+import { usePendingSuggestionRequest } from './suggestions/usePendingSuggestionRequest'
 import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
@@ -29,9 +32,18 @@ const areaEmptyKeys: Record<AssistantArea, string> = {
  * @param {object} props - Props.
  * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
+ * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area (cards above the messages).
  * @returns {React.ReactElement} The chat.
  */
-export const AssistantChat = ({ area, api }: { area: AssistantArea; api: AssistantConversationApi }) => {
+export const AssistantChat = ({
+  area,
+  api,
+  suggestions,
+}: {
+  area: AssistantArea
+  api: AssistantConversationApi
+  suggestions: AssistantSuggestion[]
+}) => {
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
   const { draft: panelDraft, draftArea } = useAssistantPanel()
@@ -42,6 +54,8 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
   const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area])
+  // Do it on a card of this area: sent here once the conversation hook is ready
+  usePendingSuggestionRequest({ api, area })
 
   // a composer text set by "Ask the assistant": shown for the user to send, never sent by itself
   if (draft !== appliedDraft) {
@@ -86,6 +100,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           {t('aiAssistant.inMemoryOnly')}
         </div>
       )}
+      <AssistantSuggestions api={api} suggestions={suggestions} />
       <div aria-live="polite" className="ai-assistant-panel__messages" ref={listRef}>
         {messages.length === 0 && <p className="ai-assistant-panel__empty">{t(areaEmptyKeys[area])}</p>}
         {messages.map((message) => (
