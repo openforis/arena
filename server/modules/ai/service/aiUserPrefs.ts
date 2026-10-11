@@ -30,7 +30,7 @@ export const defaultFeatureToggles = (): AiFeatureToggles =>
   ) as AiFeatureToggles
 
 /**
- * Keeps only the known categories with a boolean value; the others are off.
+ * Keeps only the known categories with a boolean value; the others keep their default (off, except the categories on by default).
  * @param {unknown} input - Toggles from the prefs or from a request body.
  * @returns {AiFeatureToggles} The sanitised toggles.
  */

@@ -229,7 +229,8 @@ export const listMissingTexts = ({
   for (const slot of wanted.filter((candidate) => candidate.index >= start)) {
     const item = lang === null ? toEmptyItem(slot) : toSourceItem(slot, lang, languages)
     size += JSON.stringify(item).length + 1
-    if (page.items.length >= limit || size > MISSING_TEXTS_MAX_JSON_CHARS) {
+    // a page is cut only when it has items, so an oversized text still makes progress
+    if (page.items.length > 0 && (page.items.length >= limit || size > MISSING_TEXTS_MAX_JSON_CHARS)) {
       page.nextCursor = String(slot.index)
       break
     }

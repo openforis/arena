@@ -308,6 +308,12 @@
     text-decoration: line-through;
   }
 
+  // long labels without spaces must not widen the card
+  &__from,
+  &__to {
+    overflow-wrap: anywhere;
+  }
+
   &__expressions {
     margin: 0;
     padding-left: 1rem;
