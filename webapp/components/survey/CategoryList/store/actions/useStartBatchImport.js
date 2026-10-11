@@ -2,6 +2,7 @@ import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 
 import * as API from '@webapp/service/api'
 
@@ -17,6 +18,7 @@ export const useStartBatchImport = ({ setState }) => {
     async (job) => {
       const { importedCategories, insertedCategories, updatedCategories } = JobSerialized.getResult(job)
       setState({ categoriesRequestedAt: Date.now() })
+      notifySuggestionEvent({ type: 'categoriesChanged' })
       dispatch(
         NotificationActions.notifyInfo({
           key: 'categoryList.batchImportCompleteSuccessfully',
