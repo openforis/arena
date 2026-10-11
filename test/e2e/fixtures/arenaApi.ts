@@ -172,6 +172,73 @@ export class ArenaApi {
   }
 
   /**
+   * Counts the validation report rows of a cycle, without filters (what the report shows before any filter).
+   * @param {number} surveyId - Survey id.
+   * @param {string} [cycle] - Cycle key.
+   * @returns {Promise<number>} - The count.
+   */
+  async countValidationReportRows(surveyId: number, cycle = '0'): Promise<number> {
+    const { count } = await this.get(`/api/survey/${surveyId}/validationReport/count?cycle=${cycle}`)
+    return Number(count)
+  }
+
+  /**
+   * Returns the uuid of the root entity of the published survey.
+   * @param {number} surveyId - Survey id.
+   * @returns {Promise<string>} - The uuid.
+   */
+  async getRootNodeDefUuid(surveyId: number): Promise<string> {
+    const { nodeDefs } = await this.get(
+      `/api/survey/${surveyId}/nodeDefs?cycle=0&draft=false&validate=false&includeAnalysis=false`
+    )
+    const root = Object.values(nodeDefs ?? {}).find((nodeDef: any) => !nodeDef.parentUuid) as any
+    expect(root, `survey ${surveyId} has no root entity`).toBeTruthy()
+    return root.uuid
+  }
+
+  /**
+   * Starts a flat data (CSV) import that inserts new records into the root entity (one upload, no chunks).
+   * @param {object} params - Parameters.
+   * @param {number} params.surveyId - Survey id.
+   * @param {string} params.nodeDefUuid - Root entity uuid.
+   * @param {string} params.csv - CSV content (header with the key attribute names).
+   * @param {string} [params.cycle] - Cycle key.
+   * @returns {Promise<{ uuid: string }>} - The job started.
+   */
+  async startFlatDataImport({
+    surveyId,
+    nodeDefUuid,
+    csv,
+    cycle = '0',
+  }: {
+    surveyId: number
+    nodeDefUuid: string
+    csv: string
+    cycle?: string
+  }): Promise<{ uuid: string }> {
+    const url = `/api/survey/${surveyId}/data-import/flat-data`
+    const response = await this.requestContext.post(url, {
+      headers: this.headers,
+      multipart: {
+        cycle,
+        nodeDefUuid,
+        fileFormat: 'csv',
+        dryRun: 'false',
+        insertNewRecords: 'true',
+        insertMissingNodes: 'false',
+        updateRecordsInAnalysis: 'false',
+        includeFiles: 'false',
+        deleteExistingEntities: 'false',
+        abortOnErrors: 'true',
+        file: { name: 'records.csv', mimeType: 'text/csv', buffer: Buffer.from(csv, 'utf8') },
+      },
+    })
+    expect(response.ok(), `POST ${url} failed: ${response.status()}`).toBeTruthy()
+    const { job } = await response.json()
+    return job
+  }
+
+  /**
    * Creates a new survey (and sets it as current survey of the user).
    * @param {SurveyCreateParams} params - Survey info.
    * @returns {Promise<number>} - The id of the survey created.
