@@ -61,7 +61,6 @@ export const MapTriggerButton = (props) => {
           markerPoint={mapMarkerPoint}
           markerTitle={mapMarkerTitle}
           onMarkerPointChange={onMapMarkerPointChange}
-          showOptions={false}
         />
       </PanelRight>
     ) : null

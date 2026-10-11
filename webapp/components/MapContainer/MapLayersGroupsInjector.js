@@ -1,5 +1,4 @@
 import { useEffect } from 'react'
-import { useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
 const GROUP_LABEL_CLASS = 'leaflet-control-layers-group-label'
@@ -9,17 +8,17 @@ const GROUP_LABEL_CLASS = 'leaflet-control-layers-group-label'
  * Must be rendered as a sibling of (and after) the LayersControl component so that
  * Leaflet has already created the overlays DOM by the time this component's effect runs.
  * @param {object} props - Component props.
+ * @param {L.Control.Layers|null} props.control - The layers control (its DOM may have been moved out of the map).
  * @param {string} [props.baseLayersLabel] - Label to prepend to the base layers section.
  * @param {Array<{label: string, count: number}>} [props.overlayGroups] - Overlay groups in display order.
  * @returns {null} Renders nothing.
  */
-export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups = [] }) => {
-  const map = useMap()
-
+export const MapLayersGroupsInjector = ({ control, baseLayersLabel, overlayGroups = [] }) => {
   const groupsKey = JSON.stringify(overlayGroups)
 
   useEffect(() => {
-    const container = map.getContainer()
+    const container = control?.getContainer()
+    if (!container) return undefined
     const injected = []
 
     const injectLabel = (label, referenceNode, parentNode) => {
@@ -57,12 +56,13 @@ export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups = [] })
     }
     // groupsKey is a stable serialisation of overlayGroups used as dep to avoid object reference churn
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [map, baseLayersLabel, groupsKey])
+  }, [control, baseLayersLabel, groupsKey])
 
   return null
 }
 
 MapLayersGroupsInjector.propTypes = {
+  control: PropTypes.object,
   baseLayersLabel: PropTypes.string,
   overlayGroups: PropTypes.arrayOf(
     PropTypes.shape({

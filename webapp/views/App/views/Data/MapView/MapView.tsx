@@ -1,6 +1,6 @@
 import './MapView.scss'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -14,9 +14,10 @@ import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
 import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import { useHorizontalResize } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
+import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
+import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
@@ -24,10 +25,7 @@ import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
 import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
-
-const PANEL_DEFAULT_WIDTH = 260
-const PANEL_MIN_WIDTH = 100
-const MAP_MIN_WIDTH = 300
+import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
   label: string
@@ -35,59 +33,46 @@ type LayerGroup = {
 }
 
 type MapViewContentProps = {
-  baseLayersLabel: string
   layers: React.ReactElement[]
   overlayGroups: LayerGroup[]
 }
 
-// MapContainer must always occupy the same position in the React tree so Leaflet never
-// unmounts. We achieve this with a stable flex layout where only the panel-pane width
-// changes — no conditional Split mount/unmount.
-const MapViewContent = ({ baseLayersLabel, layers, overlayGroups }: MapViewContentProps) => {
-  const { activeLayers, isPanelVisible } = useMapLayersPanel()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const panelOpen = experimentalFeatures && isPanelVisible && activeLayers.length > 0
+// the Records tab (experimental): the records of the shown layers, as in the former side panel
+const RECORDS_RAIL_TABS: MapRailTab[] = [
+  {
+    key: 'records',
+    labelKey: 'mapWorkspace.rail.tabs.records',
+    titleKey: 'mapWorkspace.rail.titles.records',
+    iconClassName: 'icon-list',
+    content: <MapLayersPanel />,
+  },
+]
+const NO_RAIL_TABS: MapRailTab[] = []
 
-  const {
-    width: panelWidth,
-    maxWidth: panelMaxWidth,
-    onGutterMouseDown,
-    onGutterKeyDown,
-    onGutterTouchStart,
-  } = useHorizontalResize({
-    containerRef,
-    initialWidth: PANEL_DEFAULT_WIDTH,
-    minLeftWidth: PANEL_MIN_WIDTH,
-    minRightWidth: MAP_MIN_WIDTH,
-  })
+// MapContainer must always occupy the same position in the React tree so Leaflet never unmounts
+const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
+  const { activeLayers, selectPoint } = useMapLayersPanel()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+
+  const records = useMemo<MapWorkspaceRecords | undefined>(
+    () =>
+      experimentalFeatures
+        ? {
+            candidates: buildRecordCandidates(activeLayers),
+            onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
+          }
+        : undefined,
+    [activeLayers, experimentalFeatures, selectPoint]
+  )
 
   return (
-    <div ref={containerRef} className="map-view-content">
-      <div
-        className="map-view-content__panel"
-        style={{ width: panelOpen ? panelWidth : 0, overflow: panelOpen ? 'hidden' : 'visible' }}
-      >
-        <MapLayersPanel />
-      </div>
-      {panelOpen && (
-        <div
-          role="slider"
-          aria-orientation="vertical"
-          aria-valuenow={panelWidth}
-          aria-valuemin={PANEL_MIN_WIDTH}
-          aria-valuemax={panelMaxWidth}
-          tabIndex={0}
-          className="map-view-content__gutter"
-          onMouseDown={onGutterMouseDown}
-          onKeyDown={onGutterKeyDown}
-          onTouchStart={onGutterTouchStart}
-        />
-      )}
-      <div className="map-view-content__map">
-        <MapContainer layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
-      </div>
-    </div>
+    <MapContainer
+      variant="full"
+      layers={layers}
+      overlayGroups={overlayGroups}
+      extraRailTabs={experimentalFeatures ? RECORDS_RAIL_TABS : NO_RAIL_TABS}
+      records={records}
+    />
   )
 }
 
@@ -151,6 +136,7 @@ const MapWrapper = () => {
 
   const onRecordEditClick = useCallback((params?: { recordUuid?: string; parentUuid?: string }) => {
     const { recordUuid, parentUuid } = params ?? {}
+    exitFullScreen()
     setState((statePrev) => ({
       ...statePrev,
       editingRecordUuid: recordUuid ?? null,
@@ -169,6 +155,7 @@ const MapWrapper = () => {
   const createRecordFromSamplingPointDataItem = useCallback(
     async ({ itemUuid, callback }: { itemUuid: string; callback?: (params: { recordUuid: string }) => void }) => {
       const recordUuid = await API.createRecordFromSamplingPointDataItem({ surveyId, itemUuid })
+      exitFullScreen()
       setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid }))
       callback?.({ recordUuid })
     },
@@ -213,8 +200,6 @@ const MapWrapper = () => {
     ]
   )
 
-  const baseLayersLabel = i18n.t('dataView:mapView.layersControl.baseLayers')
-
   const overlayGroups = useMemo(() => {
     const layersCountByGroup = {
       preloadedLayers: preloadedLayerSummaries.length,
@@ -237,7 +222,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapViewContent layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+        <MapViewContent layers={layers} overlayGroups={overlayGroups} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal

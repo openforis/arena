@@ -5,7 +5,6 @@ import { PointFactory, Points } from '@openforis/arena-core'
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 
 import { useSurveySrsIndex } from '@webapp/store/survey'
-import { useI18n } from '@webapp/store/system'
 
 const calculateActualCenterPoint = ({ centerPoint, geoJson, markerPoint, srsIndex }) => {
   if (markerPoint && Points.isValid(markerPoint, srsIndex)) {
@@ -29,7 +28,6 @@ const pointToString = (point) =>
 export const useMap = (props) => {
   const { centerPoint, geoJson, markerPoint, onMarkerPointChange } = props
 
-  const i18n = useI18n()
   const srsIndex = useSurveySrsIndex()
 
   const [markerPointUpdated, setMarkerPointUpdated] = useState(null)
@@ -45,17 +43,6 @@ export const useMap = (props) => {
     },
     [srsIndex]
   )
-
-  useEffect(() => {
-    // set ruler button tooltip on mount
-    setTimeout(() => {
-      const rulerTooltip = i18n.t('mapView.rulerTooltip')
-      const rulerButton = document.getElementsByClassName('leaflet-ruler')?.item(0)
-      if (rulerButton) {
-        rulerButton.setAttribute('title', rulerTooltip)
-      }
-    }, 500)
-  }, [i18n])
 
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
   const centerPositionLatLon = useMemo(() => {
