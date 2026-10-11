@@ -18,7 +18,8 @@ import {
 
 export const WMS_ROOT_NAMES = ['WMS_Capabilities', 'WMT_MS_Capabilities'] // 1.3.0, 1.1.x
 
-const WEB_MERCATOR_CODES = new Set(['EPSG:3857', 'EPSG:900913'])
+// Leaflet always sends EPSG:3857, which a strict server listing only EPSG:900913 would refuse
+const WEB_MERCATOR_CODE = 'EPSG:3857'
 // parameters Leaflet sets on every GetMap request
 const GET_MAP_PARAM_KEYS = new Set([
   'service',
@@ -45,12 +46,12 @@ type PendingLayer = { element: XmlElement; inherited: InheritedLayerProps }
  * Tells whether a layer itself declares a Web Mercator coordinate system (CRS in 1.3.0, SRS in 1.1.x, possibly space
  * separated).
  * @param {XmlElement} layer - The Layer element.
- * @returns {boolean} True when EPSG:3857 or EPSG:900913 is declared.
+ * @returns {boolean} True when EPSG:3857 is declared (EPSG:900913 alone does not count).
  */
 const declaresWebMercator = (layer: XmlElement): boolean => {
   for (const element of [...childElements(layer, 'CRS'), ...childElements(layer, 'SRS')]) {
     for (const code of textOf(element).split(/\s+/)) {
-      if (WEB_MERCATOR_CODES.has(code.toUpperCase())) return true
+      if (code.toUpperCase() === WEB_MERCATOR_CODE) return true
     }
   }
   return false

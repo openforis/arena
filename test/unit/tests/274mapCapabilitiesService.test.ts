@@ -61,15 +61,34 @@ describe('map capabilities service (274)', () => {
     expect(requests[1]).toBe('https://maps.example.org/ows?SERVICE=WMTS&REQUEST=GetCapabilities')
   })
 
-  test.each(['urlNotAllowed', 'timeout', 'responseTooLarge'] as const)(
-    'does not try WMTS after %s',
-    async (errorName) => {
-      const { fetcher, requests } = fakeFetcher([errorName, wmtsXml])
-      const key = await errorKeyOf(createMapCapabilitiesService(fetcher).fetchCapabilities('https://maps.example.org/'))
-      expect(key).toBe(`appErrors:mapCustomLayers.${errorName}`)
-      expect(requests).toHaveLength(1)
-    }
-  )
+  test.each([
+    'urlNotAllowed',
+    'timeout',
+    'responseTooLarge',
+    'redirectNotFollowed',
+    'hostNotFound',
+    'unreachable',
+  ] as const)('does not try WMTS after %s', async (errorName) => {
+    const { fetcher, requests } = fakeFetcher([errorName, wmtsXml])
+    const key = await errorKeyOf(createMapCapabilitiesService(fetcher).fetchCapabilities('https://maps.example.org/'))
+    expect(key).toBe(`appErrors:mapCustomLayers.${errorName}`)
+    expect(requests).toHaveLength(1)
+  })
+
+  test('does not fall back to WMTS when a WMS service names no layer', async () => {
+    const noLayersXml = '<WMS_Capabilities version="1.3.0"><Capability><Layer/></Capability></WMS_Capabilities>'
+    const { fetcher, requests } = fakeFetcher([noLayersXml, wmtsXml])
+    const key = await errorKeyOf(createMapCapabilitiesService(fetcher).fetchCapabilities('https://maps.example.org/'))
+    expect(key).toBe('appErrors:mapCustomLayers.noLayers')
+    expect(requests).toHaveLength(1)
+  })
+
+  test('fetches a URL that already asks for GetCapabilities once, with the same request', async () => {
+    const { fetcher, requests } = fakeFetcher([wmsXml])
+    const url = 'https://maps.example.org/ows?SERVICE=WMS&REQUEST=GetCapabilities'
+    await createMapCapabilitiesService(fetcher).fetchCapabilities(url)
+    expect(requests).toEqual([url])
+  })
 
   test('fails with notCapabilities when neither service answers', async () => {
     const { fetcher, requests } = fakeFetcher([exceptionXml, '<html/>'])

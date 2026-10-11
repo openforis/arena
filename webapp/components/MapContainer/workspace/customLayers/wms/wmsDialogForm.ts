@@ -103,8 +103,8 @@ export const getUrlLoadMode = (url: string): WmsUrlLoadMode => {
 }
 
 /**
- * Tells whether a layer of a service can be selected: it needs Web Mercator tiles, and a WMS layer name the model
- * accepts (a refused name would make the whole batch fail).
+ * Tells whether a layer of a service can be selected: it needs Web Mercator tiles, a WMS layer name the model
+ * accepts, and for WMTS a non-empty identifier (a refused or empty name would make the whole batch fail).
  * @param {object} params - Parameters.
  * @param {MapServiceCapabilities} params.capabilities - The service.
  * @param {MapServiceLayer} params.layer - The layer.
@@ -116,7 +116,8 @@ export const isLayerSelectable = ({
 }: {
   capabilities: MapServiceCapabilities
   layer: MapServiceLayer
-}): boolean => layer.webMercator && (capabilities.kind !== 'wms' || isValidWmsLayerName(layer.name))
+}): boolean =>
+  layer.webMercator && (capabilities.kind === 'wms' ? isValidWmsLayerName(layer.name) : layer.name.length > 0)
 
 /**
  * Returns the layers of the service that are selected, in service order.
@@ -424,3 +425,36 @@ export const toErrorMessage = (error: unknown, fallbackKey: string): WmsFormMess
  * @returns {boolean} True when the event propagation must stop.
  */
 export const stopsMapShortcut = (key: string): boolean => key !== 'Escape'
+
+/**
+ * Tells whether the URL being added would be blocked by the browser as mixed content: an http: tile URL on an https:
+ * page.
+ * @param {object} params - Parameters.
+ * @param {string} params.pageProtocol - The protocol of the page (window.location.protocol).
+ * @param {string|null|undefined} params.url - The XYZ template, or the GetMap / tile template URL of the service.
+ * @returns {boolean} True when the page is https: and the URL starts with http:.
+ */
+export const isInsecureTileUrl = ({
+  pageProtocol,
+  url,
+}: {
+  pageProtocol: string
+  url: string | null | undefined
+}): boolean => pageProtocol === 'https:' && /^http:/i.test((url ?? '').trim())
+
+/**
+ * Returns the URL the loaded source adds, to check its protocol.
+ * @param {WmsDialogFormState} state - The state.
+ * @returns {string|null} The typed template for XYZ; the GetMap URL for WMS; the first selected layer's tile template
+ * (else the first layer's) for WMTS; null before loading.
+ */
+export const getLoadedTileUrl = (state: WmsDialogFormState): string | null => {
+  if (state.loadStatus !== 'loaded') return null
+  if (state.source === 'xyz') return state.url
+  const { capabilities } = state
+  if (!capabilities) return null
+  if (capabilities.kind === 'wms') return capabilities.url
+  const [layer] = getSelectedLayers(state).concat(capabilities.layers)
+  const templates = layer?.tileUrlTemplates ?? {}
+  return templates[state.format] ?? Object.values(templates)[0] ?? null
+}

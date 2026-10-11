@@ -43,12 +43,16 @@ const wms111 = `<?xml version="1.0"?>
   <Capability>
     <Request><GetMap><Format>image/jpeg</Format></GetMap></Request>
     <Layer>
-      <SRS>EPSG:4326 EPSG:900913</SRS>
+      <SRS>EPSG:4326 EPSG:3857</SRS>
       <Layer><Name>roads</Name><Title>Roads</Title></Layer>
     </Layer>
     <Layer>
       <SRS>EPSG:4326</SRS>
       <Layer><Name>dem</Name><Title>DEM</Title></Layer>
+    </Layer>
+    <Layer>
+      <SRS>EPSG:4326 EPSG:900913</SRS>
+      <Layer><Name>legacy</Name><Title>Legacy</Title></Layer>
     </Layer>
   </Capability>
 </WMT_MS_Capabilities>`
@@ -89,6 +93,8 @@ describe('map WMS capabilities parser (268)', () => {
     expect(capabilities.layers.map(({ name, webMercator }) => ({ name, webMercator }))).toEqual([
       { name: 'roads', webMercator: true },
       { name: 'dem', webMercator: false },
+      // Leaflet asks for EPSG:3857, so a layer listing only EPSG:900913 is not usable
+      { name: 'legacy', webMercator: false },
     ])
   })
 

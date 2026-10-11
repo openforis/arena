@@ -15,8 +15,10 @@ import {
   canSubmit,
   createWmsDialogFormState,
   getAvailableFormats,
+  getLoadedTileUrl,
   getSubmitLabel,
   getUrlLoadMode,
+  isInsecureTileUrl,
   stopsMapShortcut,
   toErrorMessage,
   wmsDialogFormReducer,
@@ -106,11 +108,19 @@ export const WmsDialog = (): React.ReactElement => {
   const t = useI18nT()
   const { portalContainer, dispatch: workspaceDispatch } = useMapWorkspace()
   const onClose = useCallback(() => workspaceDispatch({ type: 'closeDialog' }), [workspaceDispatch])
-  const { addLayers, fetchFailed } = useMapCustomLayers()
+  const { addLayers, fetchFailed, retryFetch } = useMapCustomLayers()
   const { selectBaseLayer } = useMapBaseLayerApi()
   const { state, dispatch, canEditSurvey, onUrlChange, onLoad } = useWmsDialogForm()
   const loadMode = getUrlLoadMode(state.url)
   const submitLabel = getSubmitLabel(state)
+  const insecureUrl = isInsecureTileUrl({ pageProtocol: window.location.protocol, url: getLoadedTileUrl(state) })
+
+  // opening the dialog after a failed load tries again (the provider outlives the dialog)
+  const fetchFailedOnMountRef = useRef(fetchFailed)
+  useEffect(() => {
+    if (fetchFailedOnMountRef.current) retryFetch()
+  }, [retryFetch])
+
   // a ref (not state) so a second click in the same tick is also ignored
   const savingRef = useRef(false)
 
@@ -182,6 +192,11 @@ export const WmsDialog = (): React.ReactElement => {
         {state.error && (
           <p className="map-wms-dialog__error" role="alert" data-testid={TestId.mapWorkspace.wmsError}>
             {t(state.error.key, state.error.params)}
+          </p>
+        )}
+        {insecureUrl && (
+          <p className="map-wms-dialog__hint" role="note">
+            {t('mapWorkspace.wms.insecureUrlHint')}
           </p>
         )}
         <WmsSummary state={state} />

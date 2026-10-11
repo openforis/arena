@@ -7,7 +7,9 @@ import {
   getAvailableFormats,
   getSubmitLabel,
   getSummary,
+  getLoadedTileUrl,
   getUrlLoadMode,
+  isInsecureTileUrl,
   isLayerSelectable,
   stopsMapShortcut,
   toErrorMessage,
@@ -276,5 +278,36 @@ describe('map WMS dialog form (273)', () => {
     const state = run([{ type: 'setOpacity', opacity: 50 }])
     expect(wmsDialogFormReducer(state, { type: 'setOpacity', opacity: Number.NaN })).toBe(state)
     expect(wmsDialogFormReducer(state, { type: 'setOpacity', opacity: Number.POSITIVE_INFINITY })).toBe(state)
+  })
+
+  test('a WMTS layer needs an identifier to be selectable', () => {
+    const [ortho] = wmtsCapabilities.layers
+    expect(isLayerSelectable({ capabilities: wmtsCapabilities, layer: ortho })).toBe(true)
+    expect(isLayerSelectable({ capabilities: wmtsCapabilities, layer: { ...ortho, name: '', title: '' } })).toBe(false)
+  })
+
+  test('flags http: tile URLs only on an https: page', () => {
+    const url = 'http://tiles.example.org/{z}/{x}/{y}.png'
+    expect(isInsecureTileUrl({ pageProtocol: 'https:', url })).toBe(true)
+    expect(isInsecureTileUrl({ pageProtocol: 'https:', url: ` HTTP://tiles.example.org/` })).toBe(true)
+    expect(isInsecureTileUrl({ pageProtocol: 'http:', url })).toBe(false)
+    expect(isInsecureTileUrl({ pageProtocol: 'https:', url: 'https://tiles.example.org/{z}/{x}/{y}.png' })).toBe(false)
+    expect(isInsecureTileUrl({ pageProtocol: 'https:', url: null })).toBe(false)
+  })
+
+  test('finds the URL a loaded source adds', () => {
+    expect(getLoadedTileUrl(run([]))).toBeNull()
+    const xyzUrl = 'http://tiles.example.org/{z}/{x}/{y}.png'
+    expect(getLoadedTileUrl(run([{ type: 'setUrl', url: xyzUrl }, { type: 'xyzLoaded' }]))).toBe(xyzUrl)
+    const wms = run([
+      { type: 'setUrl', url: 'https://maps.example.org/wms' },
+      { type: 'capabilitiesLoaded', capabilities: wmsCapabilities },
+    ])
+    expect(getLoadedTileUrl(wms)).toBe('https://maps.example.org/wms')
+    const wmts = run([
+      { type: 'setUrl', url: 'https://tiles.example.org/wmts' },
+      { type: 'capabilitiesLoaded', capabilities: wmtsCapabilities },
+    ])
+    expect(getLoadedTileUrl(wmts)).toBe('https://tiles.example.org/ortho/{z}/{y}/{x}.jpg')
   })
 })

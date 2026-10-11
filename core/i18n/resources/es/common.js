@@ -454,6 +454,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       loadLayers: 'Cargar capas',
       loading: 'Cargando…',
       urlHint: 'URL GetCapabilities de un WMS o WMTS, o una plantilla de teselas XYZ con {z}/{x}/{y}',
+      insecureUrlHint: 'Este servicio usa http: el navegador puede bloquear sus teselas en esta página https',
       layersCount: '{{count}} capas',
       layersCount_one: '{{count}} capa',
       layersCount_other: '{{count}} capas',
@@ -486,7 +487,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       submitBaseMaps_other: 'Añadir {{count}} mapas base',
       removeSelectedBaseMap: 'Quitar el mapa base personalizado seleccionado',
       hiddenForSession:
-        'Capa oculta hasta que se vuelva a abrir el mapa: solo los gestores de la encuesta pueden quitar las capas compartidas con todos',
+        'Capa oculta hasta que se vuelva a abrir el mapa: solo quienes pueden editar la encuesta pueden quitar las capas compartidas con todos',
       errors: {
         fetchLayersFailed: 'No se pudieron cargar las capas de mapa personalizadas',
         loadFailed: 'No se pudieron cargar las capas de este servicio',

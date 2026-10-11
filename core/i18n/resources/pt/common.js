@@ -478,6 +478,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       loadLayers: 'Carregar camadas',
       loading: 'Carregando…',
       urlHint: 'URL GetCapabilities de um WMS ou WMTS, ou um modelo de blocos XYZ com {z}/{x}/{y}',
+      insecureUrlHint: 'Este serviço usa http: o navegador pode bloquear seus blocos nesta página https',
       layersCount: '{{count}} camadas',
       layersCount_one: '{{count}} camada',
       layersCount_other: '{{count}} camadas',
@@ -510,7 +511,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       submitBaseMaps_other: 'Adicionar {{count}} mapas base',
       removeSelectedBaseMap: 'Remover o mapa base personalizado selecionado',
       hiddenForSession:
-        'Camada oculta até o mapa ser reaberto: somente os gerentes de inventário podem remover camadas compartilhadas com todos',
+        'Camada oculta até o mapa ser reaberto: somente quem pode editar o inventário pode remover camadas compartilhadas com todos',
       errors: {
         fetchLayersFailed: 'Não foi possível carregar as camadas de mapa personalizadas',
         loadFailed: 'Não foi possível carregar as camadas deste serviço',

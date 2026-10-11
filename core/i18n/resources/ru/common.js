@@ -480,6 +480,7 @@ export default {
       loadLayers: 'Загрузить слои',
       loading: 'Загрузка…',
       urlHint: 'URL GetCapabilities сервиса WMS или WMTS либо шаблон тайлов XYZ с {z}/{x}/{y}',
+      insecureUrlHint: 'Этот сервис использует http: браузер может заблокировать его тайлы на этой странице https',
       layersCount: 'Слоёв: {{count}}',
       layersCount_one: 'Слоёв: {{count}}',
       layersCount_other: 'Слоёв: {{count}}',
@@ -511,7 +512,8 @@ export default {
       submitBaseMaps_one: 'Добавить базовые карты: {{count}}',
       submitBaseMaps_other: 'Добавить базовые карты: {{count}}',
       removeSelectedBaseMap: 'Удалить выбранную пользовательскую базовую карту',
-      hiddenForSession: 'Слой скрыт до повторного открытия карты: удалять общие слои могут только менеджеры опроса',
+      hiddenForSession:
+        'Слой скрыт до повторного открытия карты: удалять общие слои могут только те, кто может редактировать опрос',
       errors: {
         fetchLayersFailed: 'Не удалось загрузить пользовательские слои карты',
         loadFailed: 'Не удалось загрузить слои этого сервиса',

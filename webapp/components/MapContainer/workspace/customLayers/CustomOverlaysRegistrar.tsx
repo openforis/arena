@@ -28,6 +28,11 @@ export const CustomOverlaysRegistrar = (): null => {
   const { overlays, removeLayer } = useMapCustomLayers()
   const { addOverlay, removeOverlay } = useMapCustomOverlays()
   const registeredIdsRef = useRef(new Set<string>())
+  // read when a row is removed, so the permission and survey are the current ones, not those of the registration
+  const removeLayerRef = useRef(removeLayer)
+  useEffect(() => {
+    removeLayerRef.current = removeLayer
+  }, [removeLayer])
 
   useEffect(() => {
     const registeredIds = registeredIdsRef.current
@@ -52,11 +57,11 @@ export const CustomOverlaysRegistrar = (): null => {
         setOpacity: setTileLayerOpacity,
         onRemove: () => {
           if (!registeredIds.delete(id)) return
-          void removeLayer(layer)
+          void removeLayerRef.current(layer)
         },
       })
     }
-  }, [addOverlay, overlays, removeLayer, removeOverlay])
+  }, [addOverlay, overlays, removeOverlay])
 
   // unregisters everything only on unmount, whatever the identity of removeOverlay
   const removeOverlayRef = useRef(removeOverlay)

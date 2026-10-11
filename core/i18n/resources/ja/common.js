@@ -473,6 +473,8 @@ export default {
       loadLayers: 'レイヤーを読み込む',
       loading: '読み込み中…',
       urlHint: 'WMS または WMTS の GetCapabilities URL、または {z}/{x}/{y} を含む XYZ タイルテンプレート',
+      insecureUrlHint:
+        'このサービスは http を使用しています。この https ページではブラウザがタイルをブロックすることがあります',
       layersCount: '{{count}} レイヤー',
       layersCount_one: '{{count}} レイヤー',
       layersCount_other: '{{count}} レイヤー',
@@ -505,7 +507,7 @@ export default {
       submitBaseMaps_other: 'ベースマップを {{count}} 件追加',
       removeSelectedBaseMap: '選択中のカスタムベースマップを削除',
       hiddenForSession:
-        '地図を開き直すまでレイヤーを非表示にしました。全員と共有されたレイヤーを削除できるのは調査マネージャーのみです',
+        '地図を開き直すまでレイヤーを非表示にしました。全員と共有されたレイヤーを削除できるのは調査を編集できるユーザーのみです',
       errors: {
         fetchLayersFailed: 'カスタム地図レイヤーを読み込めませんでした',
         loadFailed: 'このサービスのレイヤーを読み込めませんでした',

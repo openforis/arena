@@ -28,6 +28,7 @@ export type MapCustomLayersContextValue = {
   overlays: MapCustomLayerWithScope[]
   baseMaps: CustomBaseLayerDef[]
   canEditSurveyLayers: boolean
+  retryFetch: () => void // loads the stored layers again (the dialog calls it when it opens after a failure)
   fetchFailed: boolean // shown in the WMS dialog too: notifications are hidden in full screen
   addLayers: (params: { scope: MapCustomLayerScope; layers: MapCustomLayer[] }) => Promise<void> // throws on failure
   removeLayer: (layer: MapCustomLayerWithScope) => Promise<void>
@@ -41,6 +42,7 @@ const MapCustomLayersContext = createContext<MapCustomLayersContextValue>({
   baseMaps: [],
   canEditSurveyLayers: false,
   fetchFailed: false,
+  retryFetch: () => undefined,
   addLayers: async () => undefined,
   removeLayer: async () => undefined,
 })
@@ -56,8 +58,8 @@ const storedKeyOf = (scope: MapCustomLayerScope): keyof StoredLayers =>
 /**
  * Loads the custom layers of the current survey (survey and user scope) when the user can use the map. The layers are
  * kept with the survey they belong to, so another survey never sees them, without resetting state in an effect.
- * @returns {{surveyId: number, stored: StoredLayers, setStored: Function, loaded: boolean, fetchFailed: boolean}} The
- * layers, their updater, whether they were loaded and whether loading them failed.
+ * @returns {{surveyId: number, stored: StoredLayers, setStored: Function, loaded: boolean, fetchFailed: boolean,
+ * retryFetch: Function}} The layers, their updater, whether they were loaded, whether loading them failed and a function to load them again.
  */
 const useStoredMapCustomLayers = () => {
   const surveyId = useSurveyId()
@@ -65,6 +67,7 @@ const useStoredMapCustomLayers = () => {
   const notifyError = useNotifyError()
   const [entry, setEntry] = useState<StoredEntry | null>(null)
   const [failedKey, setFailedKey] = useState<string | null>(null)
+  const [fetchAttempt, setFetchAttempt] = useState(0)
   const key = surveyId && canUseMap ? String(surveyId) : null
 
   useEffect(() => {
@@ -82,7 +85,7 @@ const useStoredMapCustomLayers = () => {
     return () => {
       cancelled = true
     }
-  }, [key, notifyError, surveyId])
+  }, [fetchAttempt, key, notifyError, surveyId])
 
   const loaded = key !== null && entry?.key === key
   const stored = loaded && entry ? entry.layers : emptyStoredLayers
@@ -92,7 +95,8 @@ const useStoredMapCustomLayers = () => {
     [key]
   )
   const fetchFailed = !loaded && key !== null && failedKey === key
-  return { surveyId, stored, setStored, loaded, fetchFailed }
+  const retryFetch = useCallback(() => setFetchAttempt((attempt) => attempt + 1), [])
+  return { surveyId, stored, setStored, loaded, fetchFailed, retryFetch }
 }
 
 /**
@@ -106,7 +110,7 @@ export const MapCustomLayersProvider = ({ children }: { children: React.ReactNod
   const notifyError = useNotifyError()
   const notifyInfo = useNotifyInfo()
   const { selectedBaseLayerKey, selectBaseLayer } = useMapBaseLayerApi()
-  const { surveyId, stored, setStored, loaded, fetchFailed } = useStoredMapCustomLayers()
+  const { surveyId, stored, setStored, loaded, fetchFailed, retryFetch } = useStoredMapCustomLayers()
   // survey layers a user who cannot edit the survey removed: hidden until the map is reopened
   const [hiddenLayerIds, setHiddenLayerIds] = useState<string[]>([])
 
@@ -132,6 +136,8 @@ export const MapCustomLayersProvider = ({ children }: { children: React.ReactNod
     async (layer: MapCustomLayerWithScope) => {
       if (!canRemoveMapCustomLayer({ scope: layer.scope, canEditSurvey: canEditSurveyLayers })) {
         setHiddenLayerIds((prev) => [...prev, layer.id])
+        // the notice must be visible: app notifications render outside the full screen workspace
+        exitFullScreen()
         notifyInfo({ key: 'mapWorkspace.wms.hiddenForSession' })
         return
       }
@@ -150,8 +156,8 @@ export const MapCustomLayersProvider = ({ children }: { children: React.ReactNod
   )
 
   const value = useMemo(
-    () => ({ layers, overlays, baseMaps, canEditSurveyLayers, fetchFailed, addLayers, removeLayer }),
-    [addLayers, baseMaps, canEditSurveyLayers, fetchFailed, layers, overlays, removeLayer]
+    () => ({ layers, overlays, baseMaps, canEditSurveyLayers, fetchFailed, retryFetch, addLayers, removeLayer }),
+    [addLayers, baseMaps, canEditSurveyLayers, fetchFailed, layers, overlays, removeLayer, retryFetch]
   )
 
   return <MapCustomLayersContext.Provider value={value}>{children}</MapCustomLayersContext.Provider>
