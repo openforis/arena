@@ -513,6 +513,7 @@ Réessayer ?`,
       unknownValue: '–',
       thumbnailAlt: 'Aperçu de la scène du {{date}}',
       addAsLayer: 'Ajouter comme couche',
+      alreadyOnMap: 'Déjà sur la carte',
       useAsBaseMap: 'Utiliser comme fond de carte',
       loadingScene: 'Chargement de la scène…',
       bands: {

@@ -32,8 +32,8 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
   const lang = useLang()
   const overlaysRef = useRef(overlays)
   const pendingRef = useRef<Set<string>>(new Set())
-  // incremented synchronously on each base request: the latest wins, so concurrent requests leave one base scene
-  const baseTokenRef = useRef(0)
+  // id of the latest base request: it wins, so concurrent requests leave one base scene
+  const latestBaseIdRef = useRef<string | null>(null)
   const [pendingIds, setPendingIds] = useState<ReadonlySet<string>>(() => new Set())
 
   useEffect(() => {
@@ -49,9 +49,11 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
   const loadSceneLayer = useCallback(
     async ({ scene, bandMix, asBase }: AddSceneLayerParams): Promise<void> => {
       const id = getSceneOverlayId(scene.id, bandMix, asBase)
-      if (pendingRef.current.has(id) || overlaysRef.current.some((overlay) => overlay.id === id)) return
-      const token = asBase ? ++baseTokenRef.current : 0
-      const isSuperseded = (): boolean => asBase && baseTokenRef.current !== token
+      // Recorded before the pending check: re-clicking a pending base scene makes it the latest again.
+      if (asBase) latestBaseIdRef.current = id
+      if (overlaysRef.current.some((overlay) => overlay.id === id)) return
+      if (pendingRef.current.has(id)) return
+      const isSuperseded = (): boolean => asBase && latestBaseIdRef.current !== id
       setPending(id, true)
       try {
         const { createSceneLayer } = await import('./sceneLayer')

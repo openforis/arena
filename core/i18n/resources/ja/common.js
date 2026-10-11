@@ -507,6 +507,7 @@ export default {
       unknownValue: '–',
       thumbnailAlt: '{{date}} のシーンのプレビュー',
       addAsLayer: 'レイヤーとして追加',
+      alreadyOnMap: '地図に追加済み',
       useAsBaseMap: 'ベースマップとして使用',
       loadingScene: 'シーンを読み込み中…',
       bands: {

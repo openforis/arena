@@ -512,6 +512,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       unknownValue: '–',
       thumbnailAlt: 'Pré-visualização da cena de {{date}}',
       addAsLayer: 'Adicionar como camada',
+      alreadyOnMap: 'Já está no mapa',
       useAsBaseMap: 'Usar como mapa base',
       loadingScene: 'Carregando a cena…',
       bands: {

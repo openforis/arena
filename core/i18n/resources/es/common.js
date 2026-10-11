@@ -488,6 +488,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       unknownValue: '–',
       thumbnailAlt: 'Vista previa de la escena del {{date}}',
       addAsLayer: 'Añadir como capa',
+      alreadyOnMap: 'Ya está en el mapa',
       useAsBaseMap: 'Usar como mapa base',
       loadingScene: 'Cargando la escena…',
       bands: {

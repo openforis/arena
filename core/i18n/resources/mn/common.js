@@ -511,6 +511,7 @@ export default {
       unknownValue: '–',
       thumbnailAlt: '{{date}}-ны зургийн урьдчилсан харагдац',
       addAsLayer: 'Давхарга болгон нэмэх',
+      alreadyOnMap: 'Газрын зураг дээр байна',
       useAsBaseMap: 'Үндсэн газрын зураг болгох',
       loadingScene: 'Зургийг ачаалж байна…',
       bands: {

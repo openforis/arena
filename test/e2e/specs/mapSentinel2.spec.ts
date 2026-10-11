@@ -79,8 +79,19 @@ const mapPoint = async (page: Page, dx: number, dy: number): Promise<{ x: number
 
 test.describe('Map Sentinel-2 scenes', () => {
   test('opens from the Imagery menu with the default filters, before Legend', async ({ page, sampleSurvey: _ }) => {
-    await blockSceneIndex(page)
+    const { aborted } = await blockSceneIndex(page)
     await openMap(page)
+    // A hidden panel never contacts the index, even when the view changes.
+    const from = await mapPoint(page, 100, 100)
+    const to = await mapPoint(page, 220, 160)
+    await page.mouse.move(from.x, from.y)
+    await page.mouse.down()
+    await page.mouse.move(to.x, to.y, { steps: 5 })
+    await page.mouse.up()
+    await page.mouse.wheel(0, -300)
+    // let the debounced view bounds settle
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 500)))
+    expect(aborted()).toBe(0)
     await openScenesPanel(page)
 
     await expect(page.getByTestId(ids.scenesArea('view'))).toHaveAttribute('aria-pressed', 'true')

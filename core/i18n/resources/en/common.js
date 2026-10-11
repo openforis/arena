@@ -509,6 +509,7 @@ Try again?`,
       unknownValue: '–',
       thumbnailAlt: 'Preview of the scene of {{date}}',
       addAsLayer: 'Add as layer',
+      alreadyOnMap: 'Already on the map',
       useAsBaseMap: 'Use as base map',
       loadingScene: 'Loading the scene…',
       bands: {

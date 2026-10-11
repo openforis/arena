@@ -2,6 +2,7 @@ import React from 'react'
 import Button from '@mui/material/Button'
 import classNames from 'classnames'
 
+import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -10,6 +11,19 @@ import { getSceneOverlayId } from './sceneLayerInfo'
 import { formatMonthLabel, formatSceneDate } from './scenePeriod'
 import type { SceneBandMix, SceneResult, SceneSort } from './sceneTypes'
 import { getSceneCogUrls, getSceneDirectoryUrl } from './sceneUrls'
+
+/**
+ * Returns the i18n key of a layer action button: loading, already added, or the action itself.
+ *
+ * @param {boolean} pending - Whether the layer is loading.
+ * @param {boolean} added - Whether the layer is already on the map.
+ * @param {string} actionKey - Key of the action label under mapWorkspace.scenes.
+ * @returns {string} Full i18n key.
+ */
+const getActionLabelKey = (pending: boolean, added: boolean, actionKey: string): string => {
+  if (pending) return 'mapWorkspace.scenes.loadingScene'
+  return `mapWorkspace.scenes.${added ? 'alreadyOnMap' : actionKey}`
+}
 
 type SceneRowProps = {
   scene: SceneResult
@@ -45,8 +59,13 @@ const SceneRow = ({
   const date = formatSceneDate(scene.datetime, lang)
   const directoryUrl = getSceneDirectoryUrl(scene.thumbnailUrl)
   const canDisplay = getSceneCogUrls(scene.thumbnailUrl, bandMix) !== null
-  const layerPending = pendingIds.has(getSceneOverlayId(scene.id, bandMix, false))
-  const basePending = pendingIds.has(getSceneOverlayId(scene.id, bandMix, true))
+  const { overlays } = useMapCustomOverlays()
+  const layerId = getSceneOverlayId(scene.id, bandMix, false)
+  const baseId = getSceneOverlayId(scene.id, bandMix, true)
+  const layerPending = pendingIds.has(layerId)
+  const basePending = pendingIds.has(baseId)
+  const layerAdded = overlays.some((overlay) => overlay.id === layerId)
+  const baseAdded = overlays.some((overlay) => overlay.id === baseId)
   /**
    * Formats a percentage or the unknown mark.
    *
@@ -97,20 +116,20 @@ const SceneRow = ({
           <Button
             size="small"
             variant="outlined"
-            disabled={!canDisplay || layerPending}
+            disabled={!canDisplay || layerPending || layerAdded}
             onClick={() => onAddLayer(scene, false)}
             data-testid={TestId.mapWorkspace.sceneAddLayer(scene.id)}
           >
-            {t(layerPending ? 'mapWorkspace.scenes.loadingScene' : 'mapWorkspace.scenes.addAsLayer')}
+            {t(getActionLabelKey(layerPending, layerAdded, 'addAsLayer'))}
           </Button>
           <Button
             size="small"
             variant="outlined"
-            disabled={!canDisplay || basePending}
+            disabled={!canDisplay || basePending || baseAdded}
             onClick={() => onAddLayer(scene, true)}
             data-testid={TestId.mapWorkspace.sceneUseAsBase(scene.id)}
           >
-            {t(basePending ? 'mapWorkspace.scenes.loadingScene' : 'mapWorkspace.scenes.useAsBaseMap')}
+            {t(getActionLabelKey(basePending, baseAdded, 'useAsBaseMap'))}
           </Button>
         </div>
       )}

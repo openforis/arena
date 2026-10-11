@@ -522,6 +522,7 @@ export default {
       unknownValue: '–',
       thumbnailAlt: 'Превью снимка от {{date}}',
       addAsLayer: 'Добавить как слой',
+      alreadyOnMap: 'Уже на карте',
       useAsBaseMap: 'Сделать базовой картой',
       loadingScene: 'Загрузка снимка…',
       bands: {
