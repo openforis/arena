@@ -190,4 +190,58 @@ test.describe('Map workspace', () => {
     await expect(page.getByTestId(ids.menuButton('addData'))).toBeVisible()
     await expect(page.getByTestId(ids.menuButton('imagery'))).toHaveCount(0)
   })
+
+  test('search goes to coordinates and marks them', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const search = page.getByTestId(ids.searchInput)
+    await page.locator('.leaflet-container').click()
+    await page.keyboard.press('Control+k')
+    await expect(search).toBeFocused()
+
+    await search.fill('41.9, 12.5')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('Go to 41.90000, 12.50000')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId(ids.statusZoom)).toHaveText('Zoom 14')
+    await expect(page.locator('.map-search-marker')).toHaveCount(1)
+
+    // Escape clears the text and the mark
+    await search.focus()
+    await page.keyboard.press('Escape')
+    await expect(search).toHaveValue('')
+    await expect(page.locator('.map-search-marker')).toHaveCount(0)
+
+    await search.fill('95, 12')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('Coordinates out of range')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  test('Go to coordinates in the Tools menu focuses the search box', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.menuButton('tools')).click()
+    await page.getByTestId(ids.menuItem('goToCoordinates')).click()
+    await expect(page.getByTestId(ids.searchInput)).toBeFocused()
+  })
+
+  test('typing m in the search box does not start measuring', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const measure = page.getByTestId(ids.quickButton('measureDistance'))
+    await page.getByTestId(ids.searchInput).fill('m')
+    await page.keyboard.press('m')
+    await expect(page.getByTestId(ids.searchInput)).toHaveValue('mm')
+    await expect(measure).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  test('letter shortcuts only act while focus is inside the workspace', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const measure = page.getByTestId(ids.quickButton('measureDistance'))
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+    await page.keyboard.press('m')
+    await expect(measure).toHaveAttribute('aria-pressed', 'false')
+
+    await page.locator('.leaflet-container').click()
+    await page.keyboard.press('m')
+    await expect(measure).toHaveAttribute('aria-pressed', 'true')
+    await page.keyboard.press('Escape')
+    await expect(measure).toHaveAttribute('aria-pressed', 'false')
+  })
 })

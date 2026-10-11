@@ -407,4 +407,74 @@
     align-items: center;
     gap: 6px;
   }
+
+  .map-search {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 4px 0 4px 8px;
+
+    &__input {
+      width: 240px;
+      height: 28px;
+      padding: 0 44px 0 8px;
+      border: 1px solid #d1d1dd;
+      border-radius: 4px;
+      font-size: 0.8rem;
+
+      &:focus {
+        border-color: #1f5c99;
+        outline: none;
+      }
+    }
+
+    &__kbd {
+      position: absolute;
+      right: 6px;
+      padding: 0 4px;
+      border: 1px solid #d1d1dd;
+      border-radius: 3px;
+      color: #5d616b;
+      font-family: inherit;
+      font-size: 0.7rem;
+      pointer-events: none;
+    }
+
+    &__results {
+      position: absolute;
+      top: 100%;
+      right: 0;
+      left: 0;
+      z-index: 3;
+      max-height: 280px;
+      margin: 2px 0 0;
+      padding: 4px 0;
+      overflow-y: auto;
+      border: 1px solid #d1d1dd;
+      border-radius: 4px;
+      background: #fff;
+      box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+      list-style: none;
+    }
+
+    &__result {
+      padding: 4px 8px;
+      font-size: 0.8rem;
+      cursor: pointer;
+
+      &[aria-selected='true'] {
+        background: #e3eefa;
+        color: #1f5c99;
+      }
+
+      &[aria-disabled='true'] {
+        color: #5d616b;
+        cursor: default;
+      }
+    }
+  }
+
+  &--compact .map-search__input {
+    width: 160px;
+  }
 }

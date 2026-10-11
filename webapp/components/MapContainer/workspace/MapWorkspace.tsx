@@ -11,6 +11,7 @@ import { MapWorkspaceDialogs } from './MapWorkspaceDialogs'
 import { useMapWorkspace, WorkspaceLeafletProvider } from './MapWorkspaceContext'
 import type { MapRailTab, MapWorkspaceRecords } from './mapWorkspaceTypes'
 import { MapRail } from './rail/MapRail'
+import { focusMapSearch } from './search/MapSearchBox'
 import { MapStatusBar } from './statusbar/MapStatusBar'
 import { MapToolbar } from './toolbar/MapToolbar'
 import { MapWorkspaceTools } from './tools/MapWorkspaceTools'
@@ -49,11 +50,7 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
 
   const fullScreen = useFullScreen(rootRef)
 
-  const focusSearch = useCallback(() => {
-    const input = searchInputRef.current
-    input?.focus()
-    input?.select()
-  }, [searchInputRef])
+  const focusSearch = useCallback(() => focusMapSearch(searchInputRef.current), [searchInputRef])
 
   // Part 2 adds measureArea, Part 5 adds screenshot
   const handlers = useMemo<MapShortcutHandlers>(
@@ -76,7 +73,7 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
         data-testid={TestId.mapWorkspace.toolbar}
       >
         <WorkspaceLeafletProvider>
-          <MapToolbar hint={hint} fullScreen={fullScreen} />
+          <MapToolbar hint={hint} fullScreen={fullScreen} records={records} />
         </WorkspaceLeafletProvider>
       </div>
       <div className="map-workspace__body">

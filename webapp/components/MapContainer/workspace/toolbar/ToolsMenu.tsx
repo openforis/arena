@@ -2,6 +2,7 @@ import React from 'react'
 import type { ReactElement } from 'react'
 
 import { useMapWorkspace } from '../MapWorkspaceContext'
+import { focusMapSearch } from '../search/MapSearchBox'
 import { MAP_SHORTCUT_LABELS } from '../shortcuts/mapShortcuts'
 import { MenuActionItem } from './menuItems'
 import { ToolbarMenu } from './ToolbarMenu'
@@ -11,7 +12,7 @@ import { ToolbarMenu } from './ToolbarMenu'
  * @returns {React.ReactElement} The menu.
  */
 export const ToolsMenu = (): ReactElement => {
-  const { dispatch } = useMapWorkspace()
+  const { dispatch, searchInputRef } = useMapWorkspace()
   return (
     <ToolbarMenu menuKey="tools" labelKey="mapWorkspace.menus.tools" iconClassName="icon-wrench">
       {(close) => [
@@ -21,6 +22,13 @@ export const ToolsMenu = (): ReactElement => {
           labelKey="mapWorkspace.tools.measureDistance"
           shortcut={MAP_SHORTCUT_LABELS.measureDistance}
           onClick={() => close(() => dispatch({ type: 'startTool', tool: 'measureDistance' }))}
+        />,
+        <MenuActionItem
+          key="goToCoordinates"
+          itemKey="goToCoordinates"
+          labelKey="mapWorkspace.tools.goToCoordinates"
+          shortcut={MAP_SHORTCUT_LABELS.goToCoordinates}
+          onClick={() => close(() => focusMapSearch(searchInputRef.current))}
         />,
       ]}
     </ToolbarMenu>
