@@ -89,8 +89,8 @@ test.describe('Map Sentinel-2 scenes', () => {
     await page.mouse.move(to.x, to.y, { steps: 5 })
     await page.mouse.up()
     await page.mouse.wheel(0, -300)
-    // let the debounced view bounds settle
-    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 500)))
+    // wait past the 800 ms view-bounds debounce, so a search would have started by now
+    await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 1200)))
     expect(aborted()).toBe(0)
     await openScenesPanel(page)
 
