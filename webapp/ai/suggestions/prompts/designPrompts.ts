@@ -74,3 +74,16 @@ export const buildEntityWithoutKeyPrompt = ({ names }: { names: string[] }): str
   `These entities have no key attribute: ${formatPromptNames(names)}. Records of a multiple entity are told apart ` +
   'by their keys. Look at their attributes with nodeDef_get and propose which to mark as key with ' +
   'nodeDef_proposeUpdate (prop key). If none fits, propose a new attribute with nodeDef_proposeCreate.'
+
+/**
+ * Builds the prompt of suggestion 5.
+ * @param {object} params - Parameters.
+ * @param {object[]} params.entries - Attribute names and types.
+ * @returns {string} The prompt.
+ */
+export const buildAttributeWithoutRefPrompt = ({ entries }: { entries: { name: string; type: string }[] }): string =>
+  `These attributes have no category or taxonomy: ${formatPromptList(
+    entries.map(({ name, type }) => `${pq(name, 100)} (${type})`)
+  )}. List the categories with categories_list and the taxonomies with taxonomies_list, then propose the best ` +
+  'match for each with nodeDef_proposeUpdate (prop categoryName or taxonomyName). If none fits, say so and suggest ' +
+  'creating one in the category or taxonomy editor.'

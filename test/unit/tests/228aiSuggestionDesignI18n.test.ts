@@ -2,8 +2,13 @@ import { CYRILLIC, LANGUAGES, enTextOf, expectedTexts, getText, placeholders } f
 
 // card keys of Part 2: plural ones get the language's i18next suffixes
 const CARD_KEYS = {
-  plural: ['missingTranslations.card', 'newEntriesDescriptions.card', 'entityWithoutKey.card'],
-  single: ['entityWithoutKey.cardSingle'],
+  plural: [
+    'missingTranslations.card',
+    'newEntriesDescriptions.card',
+    'entityWithoutKey.card',
+    'attributeWithoutRef.card',
+  ],
+  single: ['entityWithoutKey.cardSingle', 'attributeWithoutRef.cardCategory', 'attributeWithoutRef.cardTaxonomy'],
 }
 
 describe('card texts of the Design suggestions (228)', () => {
