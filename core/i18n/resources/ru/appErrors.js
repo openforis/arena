@@ -1,4 +1,18 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'Недопустимый URL сервиса',
+    urlNotAllowed: 'Можно использовать только публичные адреса http и https',
+    hostNotFound: 'Хост не найден: {{host}}',
+    redirectNotFollowed: 'Сервис перенаправляет на {{location}}: используйте этот URL',
+    responseTooLarge: 'Ответ сервиса больше {{limitMb}} МБ',
+    timeout: 'Сервис не ответил за {{seconds}} с',
+    fetchFailed: 'Сервис ответил с HTTP-статусом {{status}}',
+    unreachable: 'Сервис недоступен',
+    notCapabilities: 'По этому URL не найдены capabilities WMS или WMTS',
+    noLayers: 'У сервиса нет слоёв, которые можно показать',
+    invalidLayers: 'Недопустимые слои карты',
+    tooManyLayers: 'Можно добавить не более {{max}} пользовательских слоёв карты',
+  },
   aiDataQueryDescriptionMissing: 'Опишите обычным языком данные, которые вы хотите увидеть.',
   aiDataQueryEmpty: 'Сначала выберите сущность и атрибуты (или измерения и меры).',
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',

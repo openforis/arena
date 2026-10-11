@@ -1,4 +1,18 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'サービス URL が無効です',
+    urlNotAllowed: '使用できるのは公開された http および https アドレスのみです',
+    hostNotFound: 'ホストが見つかりません: {{host}}',
+    redirectNotFollowed: 'サービスは {{location}} にリダイレクトしています。その URL を使用してください',
+    responseTooLarge: 'サービスの応答が {{limitMb}} MB を超えています',
+    timeout: 'サービスが {{seconds}} 秒以内に応答しませんでした',
+    fetchFailed: 'サービスが HTTP ステータス {{status}} を返しました',
+    unreachable: 'サービスに接続できません',
+    notCapabilities: 'この URL に WMS または WMTS の capabilities が見つかりません',
+    noLayers: 'サービスに表示できるレイヤーがありません',
+    invalidLayers: '地図レイヤーが無効です',
+    tooManyLayers: 'カスタム地図レイヤーは最大 {{max}} 件まで追加できます',
+  },
   cannotGetChild: `属性{{name}}から子要素「{{childName}}」を取得できません`,
   cannotImportFilesExceedingQuota: '記録ファイルをインポートできません：ファイルストレージの容量上限を超えます',
   cannotInsertFileExceedingQuota: 'ファイルを追加できません：ファイルストレージの容量上限を超えます',

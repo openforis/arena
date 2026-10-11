@@ -1,4 +1,18 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'Үйлчилгээний URL буруу байна',
+    urlNotAllowed: 'Зөвхөн нийтийн http болон https хаяг ашиглах боломжтой',
+    hostNotFound: 'Хост олдсонгүй: {{host}}',
+    redirectNotFollowed: 'Үйлчилгээ {{location}} руу чиглүүлж байна: тэр URL-ийг ашиглана уу',
+    responseTooLarge: 'Үйлчилгээний хариу {{limitMb}} MB-аас их байна',
+    timeout: 'Үйлчилгээ {{seconds}} секундэд хариулсангүй',
+    fetchFailed: 'Үйлчилгээ HTTP {{status}} төлөвөөр хариулав',
+    unreachable: 'Үйлчилгээнд холбогдож чадсангүй',
+    notCapabilities: 'Энэ URL-д WMS эсвэл WMTS capabilities олдсонгүй',
+    noLayers: 'Үйлчилгээнд харуулах боломжтой давхарга алга',
+    invalidLayers: 'Газрын зургийн давхаргууд буруу байна',
+    tooManyLayers: 'Хамгийн ихдээ {{max}} хувийн газрын зургийн давхарга нэмэх боломжтой',
+  },
   aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
   aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
