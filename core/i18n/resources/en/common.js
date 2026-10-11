@@ -477,6 +477,103 @@ Try again?`,
     },
     selectedPeriod: 'Selected period',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Map tools',
+    menus: {
+      baseMap: 'Base map',
+      addData: 'Add data',
+      display: 'Display',
+      imagery: 'Imagery',
+      tools: 'Tools',
+    },
+    addData: {
+      uploadFile: 'Upload KML, KMZ or Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Location markers',
+      showMarkersLabels: 'Marker labels',
+      showUtmGrid: 'UTM grid',
+      imageInterpretation: 'Image interpretation',
+      showSamplingPolygon: 'Sampling polygon',
+      showControlPoints: 'Control points',
+      showPlotReferencePoint: 'Plot reference point',
+    },
+    imagery: {
+      planetPeriod: 'Planet period',
+      period: 'Period',
+      compareWith: 'Compare side by side with',
+      noComparison: 'No comparison',
+      falseColour: 'False colour',
+    },
+    tools: {
+      measureDistance: 'Measure distance',
+      goToCoordinates: 'Go to coordinates…',
+    },
+    quick: {
+      zoomToData: 'Zoom to data',
+      fullScreen: 'Full screen',
+      exitFullScreen: 'Exit full screen',
+      noDataToZoom: 'There is no data on the map to zoom to',
+    },
+    search: {
+      label: 'Search the map',
+      placeholderFull: 'Record key or coordinates',
+      placeholderCompact: 'Coordinates',
+      goTo: 'Go to {{coordinates}}',
+      invalidCoordinates: 'Coordinates out of range',
+      noMatch: 'No record or coordinates match',
+      coordinatesHint: 'Type coordinates, e.g. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Map panels',
+      close: 'Collapse panel',
+      tabs: {
+        layers: 'Layers',
+        records: 'Records',
+        legend: 'Legend',
+      },
+      titles: {
+        records: 'Records on the map',
+      },
+      recordsEmpty: 'Show a survey data layer to list its records',
+    },
+    layers: {
+      surveyData: 'Survey data',
+      noSurveyData: 'This survey has no data to show on the map',
+      groups: {
+        custom: 'Custom (WMS / WMTS)',
+        scenes: 'Sentinel-2 scenes',
+        uploaded: 'Uploaded files',
+      },
+      opacity: 'Opacity of {{name}}',
+      remove: 'Remove {{name}}',
+    },
+    legend: {
+      marker: 'Record location',
+      cluster: 'Group of nearby records',
+      samplingPolygon: 'Sampling polygon',
+      utmGrid: 'UTM grid',
+      addedLayers: 'Added layers',
+    },
+    status: {
+      changeNotation: 'Click to change notation',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'DMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Scale',
+      recordsInView_one: '{{count}} record in view',
+      recordsInView_other: '{{count}} records in view',
+    },
+    upload: {
+      unsupported: 'Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file',
+      error: 'The file could not be read: {{details}}',
+    },
+  },
+
   samplingPolygonOptions: {
     circle: 'Circle',
     controlPointOffsetEast: 'Reference Point Offset East (m)',

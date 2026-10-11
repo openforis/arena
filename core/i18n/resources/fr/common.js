@@ -481,6 +481,103 @@ Réessayer ?`,
     },
     selectedPeriod: 'Période sélectionnée',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Outils de la carte',
+    menus: {
+      baseMap: 'Fond de carte',
+      addData: 'Ajouter des données',
+      display: 'Affichage',
+      imagery: 'Imagerie',
+      tools: 'Outils',
+    },
+    addData: {
+      uploadFile: 'Importer un KML, KMZ ou Shapefile…',
+    },
+    display: {
+      showLocationMarkers: "Marqueurs d'emplacement",
+      showMarkersLabels: 'Étiquettes des marqueurs',
+      showUtmGrid: 'Grille UTM',
+      imageInterpretation: "Interprétation d'images",
+      showSamplingPolygon: "Polygone d'échantillonnage",
+      showControlPoints: 'Points de contrôle',
+      showPlotReferencePoint: 'Point de référence de la parcelle',
+    },
+    imagery: {
+      planetPeriod: 'Période Planet',
+      period: 'Période',
+      compareWith: 'Comparer côte à côte avec',
+      noComparison: 'Aucune comparaison',
+      falseColour: 'Fausses couleurs',
+    },
+    tools: {
+      measureDistance: 'Mesurer une distance',
+      goToCoordinates: 'Aller à des coordonnées…',
+    },
+    quick: {
+      zoomToData: 'Zoomer sur les données',
+      fullScreen: 'Plein écran',
+      exitFullScreen: 'Quitter le plein écran',
+      noDataToZoom: 'Aucune donnée sur la carte sur laquelle zoomer',
+    },
+    search: {
+      label: 'Rechercher sur la carte',
+      placeholderFull: "Clé d'enregistrement ou coordonnées",
+      placeholderCompact: 'Coordonnées',
+      goTo: 'Aller à {{coordinates}}',
+      invalidCoordinates: 'Coordonnées hors limites',
+      noMatch: 'Aucun enregistrement ni coordonnées ne correspondent',
+      coordinatesHint: 'Saisissez des coordonnées, p. ex. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Panneaux de la carte',
+      close: 'Réduire le panneau',
+      tabs: {
+        layers: 'Couches',
+        records: 'Enregistrements',
+        legend: 'Légende',
+      },
+      titles: {
+        records: 'Enregistrements sur la carte',
+      },
+      recordsEmpty: 'Affichez une couche de données du formulaire pour lister ses enregistrements',
+    },
+    layers: {
+      surveyData: 'Données du formulaire',
+      noSurveyData: "Ce formulaire n'a pas de données à afficher sur la carte",
+      groups: {
+        custom: 'Personnalisées (WMS / WMTS)',
+        scenes: 'Scènes Sentinel-2',
+        uploaded: 'Fichiers importés',
+      },
+      opacity: 'Opacité de {{name}}',
+      remove: 'Retirer {{name}}',
+    },
+    legend: {
+      marker: "Emplacement de l'enregistrement",
+      cluster: "Groupe d'enregistrements proches",
+      samplingPolygon: "Polygone d'échantillonnage",
+      utmGrid: 'Grille UTM',
+      addedLayers: 'Couches ajoutées',
+    },
+    status: {
+      changeNotation: 'Cliquez pour changer de notation',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'DMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Échelle',
+      recordsInView_one: '{{count}} enregistrement visible',
+      recordsInView_other: '{{count}} enregistrements visibles',
+    },
+    upload: {
+      unsupported: 'Fichier non pris en charge : choisissez un fichier KML, KMZ, Shapefile zippé ou GeoJSON',
+      error: "Le fichier n'a pas pu être lu : {{details}}",
+    },
+  },
+
   samplingPolygonOptions: {
     circle: 'Cercle',
     controlPointOffsetEast: 'Décalage Est du point de référence (m)',

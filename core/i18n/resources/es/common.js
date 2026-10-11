@@ -456,6 +456,102 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     selectedPeriod: 'Período seleccionado',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Herramientas del mapa',
+    menus: {
+      baseMap: 'Mapa base',
+      addData: 'Añadir datos',
+      display: 'Visualización',
+      imagery: 'Imágenes',
+      tools: 'Herramientas',
+    },
+    addData: {
+      uploadFile: 'Subir KML, KMZ o Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Marcadores de ubicación',
+      showMarkersLabels: 'Etiquetas de marcadores',
+      showUtmGrid: 'Cuadrícula UTM',
+      imageInterpretation: 'Interpretación de imágenes',
+      showSamplingPolygon: 'Polígono de muestreo',
+      showControlPoints: 'Puntos de control',
+      showPlotReferencePoint: 'Punto de referencia de parcela',
+    },
+    imagery: {
+      planetPeriod: 'Período de Planet',
+      period: 'Período',
+      compareWith: 'Comparar lado a lado con',
+      noComparison: 'Sin comparación',
+      falseColour: 'Color falso',
+    },
+    tools: {
+      measureDistance: 'Medir distancia',
+      goToCoordinates: 'Ir a coordenadas…',
+    },
+    quick: {
+      zoomToData: 'Ajustar a los datos',
+      fullScreen: 'Pantalla completa',
+      exitFullScreen: 'Salir de pantalla completa',
+      noDataToZoom: 'No hay datos en el mapa a los que acercarse',
+    },
+    search: {
+      label: 'Buscar en el mapa',
+      placeholderFull: 'Clave de registro o coordenadas',
+      placeholderCompact: 'Coordenadas',
+      goTo: 'Ir a {{coordinates}}',
+      invalidCoordinates: 'Coordenadas fuera de rango',
+      noMatch: 'Ningún registro ni coordenadas coinciden',
+      coordinatesHint: 'Escriba coordenadas, p. ej. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Paneles del mapa',
+      close: 'Contraer panel',
+      tabs: {
+        layers: 'Capas',
+        records: 'Registros',
+        legend: 'Leyenda',
+      },
+      titles: {
+        records: 'Registros en el mapa',
+      },
+      recordsEmpty: 'Muestre una capa de datos de la encuesta para listar sus registros',
+    },
+    layers: {
+      surveyData: 'Datos de la encuesta',
+      noSurveyData: 'Esta encuesta no tiene datos para mostrar en el mapa',
+      groups: {
+        custom: 'Personalizadas (WMS / WMTS)',
+        scenes: 'Escenas Sentinel-2',
+        uploaded: 'Archivos subidos',
+      },
+      opacity: 'Opacidad de {{name}}',
+      remove: 'Quitar {{name}}',
+    },
+    legend: {
+      marker: 'Ubicación del registro',
+      cluster: 'Grupo de registros cercanos',
+      samplingPolygon: 'Polígono de muestreo',
+      utmGrid: 'Cuadrícula UTM',
+      addedLayers: 'Capas añadidas',
+    },
+    status: {
+      changeNotation: 'Haga clic para cambiar la notación',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'GMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Escala',
+      recordsInView_one: '{{count}} registro visible',
+      recordsInView_other: '{{count}} registros visibles',
+    },
+    upload: {
+      unsupported: 'Archivo no compatible: elija un archivo KML, KMZ, Shapefile comprimido (zip) o GeoJSON',
+      error: 'No se pudo leer el archivo: {{details}}',
+    },
+  },
   samplingPolygonOptions: {
     circle: 'Círculo',
     controlPointOffsetEast: 'Desplazamiento del punto de referencia este (m)',

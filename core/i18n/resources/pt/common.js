@@ -480,6 +480,103 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     },
     selectedPeriod: 'Período selecionado',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Ferramentas do mapa',
+    menus: {
+      baseMap: 'Mapa base',
+      addData: 'Adicionar dados',
+      display: 'Exibição',
+      imagery: 'Imagens',
+      tools: 'Ferramentas',
+    },
+    addData: {
+      uploadFile: 'Carregar KML, KMZ ou Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Marcadores de localização',
+      showMarkersLabels: 'Rótulos dos marcadores',
+      showUtmGrid: 'Grade UTM',
+      imageInterpretation: 'Interpretação de imagens',
+      showSamplingPolygon: 'Polígono amostral',
+      showControlPoints: 'Pontos de controle',
+      showPlotReferencePoint: 'Ponto de referência da parcela',
+    },
+    imagery: {
+      planetPeriod: 'Período Planet',
+      period: 'Período',
+      compareWith: 'Comparar lado a lado com',
+      noComparison: 'Sem comparação',
+      falseColour: 'Falsa cor',
+    },
+    tools: {
+      measureDistance: 'Medir distância',
+      goToCoordinates: 'Ir para coordenadas…',
+    },
+    quick: {
+      zoomToData: 'Ajustar aos dados',
+      fullScreen: 'Tela cheia',
+      exitFullScreen: 'Sair da tela cheia',
+      noDataToZoom: 'Não há dados no mapa para ajustar o zoom',
+    },
+    search: {
+      label: 'Pesquisar no mapa',
+      placeholderFull: 'Chave do registro ou coordenadas',
+      placeholderCompact: 'Coordenadas',
+      goTo: 'Ir para {{coordinates}}',
+      invalidCoordinates: 'Coordenadas fora do intervalo',
+      noMatch: 'Nenhum registro ou coordenada corresponde',
+      coordinatesHint: 'Digite coordenadas, p. ex. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Painéis do mapa',
+      close: 'Recolher painel',
+      tabs: {
+        layers: 'Camadas',
+        records: 'Registros',
+        legend: 'Legenda',
+      },
+      titles: {
+        records: 'Registros no mapa',
+      },
+      recordsEmpty: 'Mostre uma camada de dados do inventário para listar seus registros',
+    },
+    layers: {
+      surveyData: 'Dados do inventário',
+      noSurveyData: 'Este inventário não tem dados para mostrar no mapa',
+      groups: {
+        custom: 'Personalizadas (WMS / WMTS)',
+        scenes: 'Cenas Sentinel-2',
+        uploaded: 'Arquivos carregados',
+      },
+      opacity: 'Opacidade de {{name}}',
+      remove: 'Remover {{name}}',
+    },
+    legend: {
+      marker: 'Localização do registro',
+      cluster: 'Grupo de registros próximos',
+      samplingPolygon: 'Polígono amostral',
+      utmGrid: 'Grade UTM',
+      addedLayers: 'Camadas adicionadas',
+    },
+    status: {
+      changeNotation: 'Clique para mudar a notação',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'GMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Escala',
+      recordsInView_one: '{{count}} registro visível',
+      recordsInView_other: '{{count}} registros visíveis',
+    },
+    upload: {
+      unsupported: 'Arquivo não suportado: escolha um arquivo KML, KMZ, Shapefile compactado (zip) ou GeoJSON',
+      error: 'Não foi possível ler o arquivo: {{details}}',
+    },
+  },
+
   samplingPolygonOptions: {
     circle: 'Círculo',
     controlPointOffsetEast: 'Deslocamento leste do ponto de referência (m)',

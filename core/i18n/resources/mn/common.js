@@ -479,6 +479,103 @@ export default {
     },
     selectedPeriod: 'Сонгогдсон хугацаа',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Газрын зургийн хэрэгслүүд',
+    menus: {
+      baseMap: 'Суурь зураг',
+      addData: 'Өгөгдөл нэмэх',
+      display: 'Харагдац',
+      imagery: 'Хиймэл дагуулын зураг',
+      tools: 'Хэрэгслүүд',
+    },
+    addData: {
+      uploadFile: 'KML, KMZ эсвэл Shapefile байршуулах…',
+    },
+    display: {
+      showLocationMarkers: 'Байршлын тэмдэглэгээ',
+      showMarkersLabels: 'Тэмдэглэгээний шошго',
+      showUtmGrid: 'UTM тор',
+      imageInterpretation: 'Зургийн тайлал',
+      showSamplingPolygon: 'Түүвэрлэх олон өнцөгт',
+      showControlPoints: 'Хяналтын цэгүүд',
+      showPlotReferencePoint: 'Газрын зургийн лавлах цэг',
+    },
+    imagery: {
+      planetPeriod: 'Planet хугацаа',
+      period: 'Хугацаа',
+      compareWith: 'Зэрэгцүүлэн харьцуулах',
+      noComparison: 'Харьцуулалтгүй',
+      falseColour: 'Худал өнгө',
+    },
+    tools: {
+      measureDistance: 'Зай хэмжих',
+      goToCoordinates: 'Координат руу очих…',
+    },
+    quick: {
+      zoomToData: 'Өгөгдөл рүү томруулах',
+      fullScreen: 'Бүтэн дэлгэц',
+      exitFullScreen: 'Бүтэн дэлгэцээс гарах',
+      noDataToZoom: 'Газрын зураг дээр томруулах өгөгдөл алга',
+    },
+    search: {
+      label: 'Газрын зургаас хайх',
+      placeholderFull: 'Бичлэгийн түлхүүр эсвэл координат',
+      placeholderCompact: 'Координат',
+      goTo: '{{coordinates}} руу очих',
+      invalidCoordinates: 'Координат хүрээнээс гадуур байна',
+      noMatch: 'Тохирох бичлэг эсвэл координат алга',
+      coordinatesHint: 'Координат оруулна уу, жишээ нь 41.9, 12.5',
+    },
+    rail: {
+      label: 'Газрын зургийн самбарууд',
+      close: 'Самбарыг хураах',
+      tabs: {
+        layers: 'Давхаргууд',
+        records: 'Бичлэгүүд',
+        legend: 'Тайлбар',
+      },
+      titles: {
+        records: 'Газрын зураг дээрх бичлэгүүд',
+      },
+      recordsEmpty: 'Бичлэгүүдийг жагсаахын тулд судалгааны өгөгдлийн давхаргыг харуулна уу',
+    },
+    layers: {
+      surveyData: 'Судалгааны өгөгдөл',
+      noSurveyData: 'Энэ судалгаанд газрын зураг дээр харуулах өгөгдөл алга',
+      groups: {
+        custom: 'Өөрийн (WMS / WMTS)',
+        scenes: 'Sentinel-2 зургууд',
+        uploaded: 'Байршуулсан файлууд',
+      },
+      opacity: '{{name}}: тунгалаг байдал',
+      remove: '{{name}}: устгах',
+    },
+    legend: {
+      marker: 'Бичлэгийн байршил',
+      cluster: 'Ойролцоох бичлэгүүдийн бүлэг',
+      samplingPolygon: 'Түүвэрлэх олон өнцөгт',
+      utmGrid: 'UTM тор',
+      addedLayers: 'Нэмсэн давхаргууд',
+    },
+    status: {
+      changeNotation: 'Тэмдэглэгээг өөрчлөхийн тулд товшино уу',
+      notations: {
+        latLon: 'Өргөрөг, Уртраг',
+        dms: 'ГМС',
+        utm: 'UTM',
+      },
+      zoom: 'Томруулалт',
+      scale: 'Масштаб',
+      recordsInView_one: '{{count}} бичлэг харагдаж байна',
+      recordsInView_other: '{{count}} бичлэг харагдаж байна',
+    },
+    upload: {
+      unsupported: 'Дэмжигдээгүй файл: KML, KMZ, zip-ээр шахсан Shapefile эсвэл GeoJSON файл сонгоно уу',
+      error: 'Файлыг уншиж чадсангүй: {{details}}',
+    },
+  },
+
   samplingPolygonOptions: {
     circle: 'Дугуй',
     controlPointOffsetEast: 'Лавлах цэгийн зүүн зүгт шилжилт (м)',

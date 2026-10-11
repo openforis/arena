@@ -482,6 +482,105 @@ export default {
     },
     selectedPeriod: 'Выбранный период',
   },
+
+  mapWorkspace: {
+    toolbarLabel: 'Инструменты карты',
+    menus: {
+      baseMap: 'Базовая карта',
+      addData: 'Добавить данные',
+      display: 'Отображение',
+      imagery: 'Снимки',
+      tools: 'Инструменты',
+    },
+    addData: {
+      uploadFile: 'Загрузить KML, KMZ или Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Маркеры местоположения',
+      showMarkersLabels: 'Подписи маркеров',
+      showUtmGrid: 'Сетка UTM',
+      imageInterpretation: 'Дешифрирование снимков',
+      showSamplingPolygon: 'Полигон выборки',
+      showControlPoints: 'Контрольные точки',
+      showPlotReferencePoint: 'Точка привязки участка',
+    },
+    imagery: {
+      planetPeriod: 'Период Planet',
+      period: 'Период',
+      compareWith: 'Сравнить рядом с',
+      noComparison: 'Без сравнения',
+      falseColour: 'Псевдоцвет',
+    },
+    tools: {
+      measureDistance: 'Измерить расстояние',
+      goToCoordinates: 'Перейти к координатам…',
+    },
+    quick: {
+      zoomToData: 'Приблизить к данным',
+      fullScreen: 'Полноэкранный режим',
+      exitFullScreen: 'Выйти из полноэкранного режима',
+      noDataToZoom: 'На карте нет данных для приближения',
+    },
+    search: {
+      label: 'Поиск по карте',
+      placeholderFull: 'Ключ записи или координаты',
+      placeholderCompact: 'Координаты',
+      goTo: 'Перейти к {{coordinates}}',
+      invalidCoordinates: 'Координаты вне допустимого диапазона',
+      noMatch: 'Нет подходящих записей или координат',
+      coordinatesHint: 'Введите координаты, например 41.9, 12.5',
+    },
+    rail: {
+      label: 'Панели карты',
+      close: 'Свернуть панель',
+      tabs: {
+        layers: 'Слои',
+        records: 'Записи',
+        legend: 'Легенда',
+      },
+      titles: {
+        records: 'Записи на карте',
+      },
+      recordsEmpty: 'Покажите слой данных опроса, чтобы увидеть его записи',
+    },
+    layers: {
+      surveyData: 'Данные опроса',
+      noSurveyData: 'В этом опросе нет данных для показа на карте',
+      groups: {
+        custom: 'Пользовательские (WMS / WMTS)',
+        scenes: 'Сцены Sentinel-2',
+        uploaded: 'Загруженные файлы',
+      },
+      opacity: 'Непрозрачность: {{name}}',
+      remove: 'Удалить {{name}}',
+    },
+    legend: {
+      marker: 'Местоположение записи',
+      cluster: 'Группа близких записей',
+      samplingPolygon: 'Полигон выборки',
+      utmGrid: 'Сетка UTM',
+      addedLayers: 'Добавленные слои',
+    },
+    status: {
+      changeNotation: 'Нажмите, чтобы сменить формат',
+      notations: {
+        latLon: 'Шир., Долг.',
+        dms: 'ГМС',
+        utm: 'UTM',
+      },
+      zoom: 'Зум',
+      scale: 'Масштаб',
+      recordsInView_one: '{{count}} запись в области просмотра',
+      recordsInView_few: '{{count}} записи в области просмотра',
+      recordsInView_many: '{{count}} записей в области просмотра',
+      recordsInView_other: '{{count}} записи в области просмотра',
+    },
+    upload: {
+      unsupported: 'Неподдерживаемый файл: выберите файл KML, KMZ, Shapefile в zip-архиве или GeoJSON',
+      error: 'Не удалось прочитать файл: {{details}}',
+    },
+  },
+
   samplingPolygonOptions: {
     circle: 'Круг',
     controlPointOffsetEast: 'Смещение опорной точки на восток (м)',

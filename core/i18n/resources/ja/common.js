@@ -475,6 +475,103 @@ export default {
     },
     selectedPeriod: '選択中の期間',
   },
+
+  mapWorkspace: {
+    toolbarLabel: '地図ツール',
+    menus: {
+      baseMap: 'ベースマップ',
+      addData: 'データを追加',
+      display: '表示',
+      imagery: '衛星画像',
+      tools: 'ツール',
+    },
+    addData: {
+      uploadFile: 'KML、KMZ、Shapefileをアップロード…',
+    },
+    display: {
+      showLocationMarkers: '位置マーカー',
+      showMarkersLabels: 'マーカーのラベル',
+      showUtmGrid: 'UTMグリッド',
+      imageInterpretation: '画像判読',
+      showSamplingPolygon: 'サンプリングポリゴン',
+      showControlPoints: '管理点',
+      showPlotReferencePoint: 'プロット基準点',
+    },
+    imagery: {
+      planetPeriod: 'Planetの期間',
+      period: '期間',
+      compareWith: '左右に並べて比較',
+      noComparison: '比較しない',
+      falseColour: '偽合成色（フォールスカラー）',
+    },
+    tools: {
+      measureDistance: '距離を測定',
+      goToCoordinates: '座標へ移動…',
+    },
+    quick: {
+      zoomToData: 'データにズーム',
+      fullScreen: '全画面表示',
+      exitFullScreen: '全画面表示を終了',
+      noDataToZoom: 'ズームする地図上のデータがありません',
+    },
+    search: {
+      label: '地図を検索',
+      placeholderFull: '記録キーまたは座標',
+      placeholderCompact: '座標',
+      goTo: '{{coordinates}} へ移動',
+      invalidCoordinates: '座標が範囲外です',
+      noMatch: '一致する記録または座標がありません',
+      coordinatesHint: '座標を入力してください（例: 41.9, 12.5）',
+    },
+    rail: {
+      label: '地図パネル',
+      close: 'パネルを折りたたむ',
+      tabs: {
+        layers: 'レイヤー',
+        records: '記録',
+        legend: '凡例',
+      },
+      titles: {
+        records: '地図上の記録',
+      },
+      recordsEmpty: '記録を一覧表示するには、調査データのレイヤーを表示してください',
+    },
+    layers: {
+      surveyData: '調査データ',
+      noSurveyData: 'この調査には地図に表示するデータがありません',
+      groups: {
+        custom: 'カスタム（WMS / WMTS）',
+        scenes: 'Sentinel-2シーン',
+        uploaded: 'アップロードしたファイル',
+      },
+      opacity: '{{name}} の不透明度',
+      remove: '{{name}} を削除',
+    },
+    legend: {
+      marker: '記録の位置',
+      cluster: '近くの記録のグループ',
+      samplingPolygon: 'サンプリングポリゴン',
+      utmGrid: 'UTMグリッド',
+      addedLayers: '追加したレイヤー',
+    },
+    status: {
+      changeNotation: 'クリックして表記を変更',
+      notations: {
+        latLon: '緯度, 経度',
+        dms: '度分秒',
+        utm: 'UTM',
+      },
+      zoom: 'ズーム',
+      scale: '縮尺',
+      recordsInView_one: '表示中の記録 {{count}} 件',
+      recordsInView_other: '表示中の記録 {{count}} 件',
+    },
+    upload: {
+      unsupported: '対応していないファイルです。KML、KMZ、ZIP圧縮したShapefile、GeoJSONのいずれかを選択してください',
+      error: 'ファイルを読み込めませんでした: {{details}}',
+    },
+  },
+
   samplingPolygonOptions: {
     circle: '円',
     controlPointOffsetEast: '基準点オフセット（東方向、m）',
