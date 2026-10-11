@@ -2,6 +2,7 @@
  * Card and prompt of each kind; cards of a kind without a definition are not shown.
  */
 import type { SuggestionKind } from '../types'
+import { entityWithoutKeyDefinition } from './entityWithoutKey'
 import { missingTranslationsDefinition } from './missingTranslations'
 import { moduleIntroDefinition } from './moduleIntro'
 import { newEntriesDescriptionsDefinition } from './newEntriesDescriptions'
@@ -13,4 +14,5 @@ export const SUGGESTION_DEFINITIONS: Partial<Record<SuggestionKind, SuggestionDe
   moduleIntro: moduleIntroDefinition,
   missingTranslations: missingTranslationsDefinition,
   newEntriesDescriptions: newEntriesDescriptionsDefinition,
+  entityWithoutKey: entityWithoutKeyDefinition,
 }

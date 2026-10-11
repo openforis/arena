@@ -19,4 +19,9 @@ export default {
     card_one: 'Agregaste {{count}} entrada sin descripción. ¿Escribir descripciones en todos los idiomas?',
     card_other: 'Agregaste {{count}} entradas sin descripción. ¿Escribir descripciones en todos los idiomas?',
   },
+  entityWithoutKey: {
+    cardSingle: '{{name}} no tiene atributo clave. ¿Sugerir uno?',
+    card_one: '{{count}} entidad no tiene atributo clave. ¿Sugerir claves?',
+    card_other: '{{count}} entidades no tienen atributo clave. ¿Sugerir claves?',
+  },
 }
