@@ -403,7 +403,12 @@ test.describe('Map workspace', () => {
     const panel = page.locator('.panel-right.map-panel')
     const marker = panel.locator('.leaflet-marker-icon').first()
     await expect(marker).toBeVisible()
-    // wait for the panel and map animations to settle
+    // wait for the panel slide-in animation to finish: two equal consecutive reads of the marker position are not
+    // enough, a slow frame under load repeats a value while the panel is still moving
+    await expect
+      .poll(() => panel.evaluate((element) => element.getAnimations({ subtree: true }).length))
+      .toBe(0)
+    // then for the map to settle on the final layout
     let previous = await marker.boundingBox()
     await expect
       .poll(async () => {
