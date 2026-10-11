@@ -9,6 +9,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { AiLimits } from '@common/ai/limits'
 
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
+import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
@@ -62,6 +63,7 @@ const expressionsAreSimilar = (from: any[], to: any[]): boolean =>
  * @returns {boolean} True when the operation changes nothing.
  */
 const changesNothing = (draft: ChangeOperationDraft): boolean => {
+  if (isCategoryItemLabelOperation(draft)) return (draft.expectedText ?? '') === draft.text
   if (draft.type === 'nodeDef.create') return false
   if (draft.type === 'expression.set') return expressionsAreSimilar(draft.from, draft.to)
   return isDeepEqual(draft.from, draft.to)

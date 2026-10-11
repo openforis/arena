@@ -11,15 +11,17 @@ import { getExpressionProp, setExpressionProp } from './expressionProps'
 import { isRecordEditOperation } from './recordEdits/types'
 import {
   isNodeDefRefProp,
-  type ChangeOperation,
-  type ChangeOperationDraft,
+  type NodeDefOperation,
+  type NodeDefOperationDraft,
   type LabelKind,
   type NodeDefBasicProp,
   type NodeDefRefProp,
   type NodeDefUpdateProp,
 } from './types'
 
-type AnyOperation = ChangeOperation | ChangeOperationDraft
+// category item label operations never reach these helpers (previewChangeSet, findConflicts and applyChangeSet route
+// them apart)
+type AnyOperation = NodeDefOperation | NodeDefOperationDraft
 
 /**
  * Returns the uuid of the node definition the operation works on.

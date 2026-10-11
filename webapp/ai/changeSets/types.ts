@@ -4,6 +4,7 @@
 import type { NodeDef as ArenaNodeDef, NodeDefExpression, NodeDefType } from '@openforis/arena-core'
 
 import type { RecordAttributeUpdateOperation } from './recordEdits/types'
+import type { CategoryItemLabelSetOperation } from './categoryItemLabels/types'
 
 export type NodeDefBasicProp = 'name' | 'key' | 'multiple' | 'readOnly'
 
@@ -79,11 +80,17 @@ export type ChangeOperation =
   | LabelSetOperation
   | ExpressionSetOperation
   | RecordAttributeUpdateOperation
+  | CategoryItemLabelSetOperation
 
 type DistributiveOmit<T, K extends PropertyKey> = T extends unknown ? Omit<T, K> : never
 
 // an operation before buildChangeSet gives it an id
 export type ChangeOperationDraft = DistributiveOmit<ChangeOperation, 'id'>
+
+// operations on node definitions (and record edits): category item labels take their own path
+export type NodeDefOperation = Exclude<ChangeOperation, CategoryItemLabelSetOperation>
+
+export type NodeDefOperationDraft = DistributiveOmit<NodeDefOperation, 'id'>
 
 export type ChangeSet = {
   id: string
@@ -106,6 +113,7 @@ export type OperationResult = {
 // operation: index in the change set; field: what the message is about (e.g. "name", "defaultValues")
 export type ChangeSetIssue = { operation: number; field: string; message: string }
 
+// prettier-ignore
 export type ConflictReason =
   | 'nodeDefMissing'
   | 'valueChanged'
@@ -113,6 +121,7 @@ export type ConflictReason =
   | 'nameTaken'
   | 'alreadyExists'
   | 'refMissing'
+  | 'itemMissing'
 
 export type OperationConflict = { id: string; reason: ConflictReason }
 

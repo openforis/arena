@@ -1578,6 +1578,7 @@ $t(common.appNameFull)
       singleExpressionOnly: 'Esta propiedad acepta una sola expresión.',
       expressionEmpty: 'Una expresión está vacía.',
       rootEntity: 'El asistente no puede cambiar la entidad raíz.',
+      categoryNotFound: 'No existe la categoría {{name}}.',
       refEditDisabled:
         '{{name}} no puede cambiar de categoría o taxonomía (está publicado, u otro atributo código depende de él).',
       refHasParentCode:
