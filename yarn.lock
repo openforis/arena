@@ -15167,7 +15167,6 @@ __metadata:
     react-i18next: "npm:^17.1.9"
     react-is: "npm:^19.3.1"
     react-leaflet: "npm:^5.0.0"
-    react-leaflet-ruler: "npm:^1.0.7"
     react-number-format: "npm:^5.4.5"
     react-redux: "npm:^9.3.1"
     react-refresh: "npm:^0.19.0"
@@ -16809,17 +16808,6 @@ __metadata:
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
   checksum: 10c0/33977da7a5f1a287936a0c85639fec6ca74f4f15ef1e59a6bc20338fc73dc69555381e211f7a3529b8150a1f71e4225525b41b60b52965bda53ce7d47377ada1
-  languageName: node
-  linkType: hard
-
-"react-leaflet-ruler@npm:^1.0.7":
-  version: 1.0.7
-  resolution: "react-leaflet-ruler@npm:1.0.7"
-  peerDependencies:
-    leaflet: ^1.9.4
-    react: ^18.2.0
-    react-leaflet: ^4.2.1
-  checksum: 10c0/acdfd8730081888331d80a0cfda60305f18220efd35c638098604761b38e4a6ca76c7c8bae521a109730ca2de1301729c369cfead772b471409f8b7df9f693f6
   languageName: node
   linkType: hard
 
