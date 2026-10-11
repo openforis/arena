@@ -101,6 +101,10 @@ export default {
       sends:
         'Su pregunta, pasajes del manual de usuario de Arena y dónde se encuentra en Arena (el nombre del módulo).',
     },
+    assistantSuggestions: {
+      label: 'Sugerencias proactivas',
+      sends: 'Nada hasta que pulse Hacerlo en una sugerencia. Las comprobaciones se hacen en su navegador.',
+    },
     expressions: {
       label: 'Expresiones',
       sends:

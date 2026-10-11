@@ -14,6 +14,8 @@ export const AiFeatureCategory = {
   assistantDesign: 'assistantDesign',
   assistantAnalysis: 'assistantAnalysis',
   assistantCleaning: 'assistantCleaning',
+  // proactive suggestions: checks run in the browser; Do it sends through the area's own feature
+  assistantSuggestions: 'assistantSuggestions',
 } as const
 
 export type AiFeatureCategory = (typeof AiFeatureCategory)[keyof typeof AiFeatureCategory]
@@ -48,6 +50,7 @@ export type AiFeatureKey =
   | 'assistantDesign'
   | 'assistantAnalysis'
   | 'assistantCleaning'
+  | 'assistantSuggestions'
   | 'dataDictionary'
   | 'internalPing'
 
@@ -74,6 +77,7 @@ const {
   assistantDesign,
   assistantAnalysis,
   assistantCleaning,
+  assistantSuggestions,
 } = AiFeatureCategory
 const { schema, data } = AiDataClass
 const { loggedIn, surveyView, surveyEdit, recordListView, recordCleanse, admin } = AiFeaturePermission
@@ -147,6 +151,15 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     gateway: true,
     tools: true,
   },
+  // proactive suggestions: no model call (detectors read the survey in the browser); the switch hides them
+  assistantSuggestions: {
+    key: 'assistantSuggestions',
+    category: assistantSuggestions,
+    dataClass: schema,
+    permission: loggedIn,
+    gateway: false,
+    tools: false,
+  },
   // server jobs
   dataDictionary: {
     key: 'dataDictionary',
@@ -182,6 +195,17 @@ export const isGatewayFeature = (key: string): boolean => getAiFeature(key)?.gat
  */
 export const isAiCategoryAvailable = (category: string, disabledFeatures: string[]): boolean =>
   Object.values(AiFeatures).some((feature) => feature.category === category && !disabledFeatures.includes(feature.key))
+
+// categories that are on until the user turns them off (an absent toggle); the others are off until turned on
+export const AI_CATEGORIES_ON_BY_DEFAULT: readonly AiFeatureCategory[] = [AiFeatureCategory.assistantSuggestions]
+
+/**
+ * Returns the value of a category toggle the user never set.
+ * @param {string} category - Feature category.
+ * @returns {boolean} True for the categories on by default.
+ */
+export const isAiCategoryOnByDefault = (category: string): boolean =>
+  (AI_CATEGORIES_ON_BY_DEFAULT as readonly string[]).includes(category)
 
 const dataClassLevels: Record<AiDataClass, number> = { schema: 0, data: 1 }
 

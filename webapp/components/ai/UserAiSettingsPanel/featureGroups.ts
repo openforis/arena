@@ -19,10 +19,11 @@ export type FeatureGroup = {
 }
 
 const { chat, expressions, translation, assistantDesign, dataQuery, dataDictionary } = AiFeatureCategory
-const { assistantAnalysis, assistantCleaning, userActivity } = AiFeatureCategory
+const { assistantAnalysis, assistantCleaning, assistantSuggestions, userActivity } = AiFeatureCategory
 
 export const FEATURE_GROUPS: FeatureGroup[] = [
-  { id: 'noSurveyContent', dataClass: null, hintKey: 'none', categories: [chat] },
+  // the suggestions read the survey in the browser and send nothing until Do it (then the area's switch applies)
+  { id: 'noSurveyContent', dataClass: null, hintKey: 'none', categories: [chat, assistantSuggestions] },
   {
     id: 'surveyDesign',
     dataClass: AiDataClass.schema,

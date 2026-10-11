@@ -97,6 +97,10 @@ export default {
       label: 'Help assistant',
       sends: 'Your question, passages from the Arena user manual and where you are in Arena (the module name).',
     },
+    assistantSuggestions: {
+      label: 'Proactive suggestions',
+      sends: 'Nothing until you click Do it on a suggestion. The checks run in your browser.',
+    },
     expressions: {
       label: 'Expressions',
       sends:

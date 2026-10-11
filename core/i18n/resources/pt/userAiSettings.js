@@ -100,6 +100,10 @@ export default {
       label: 'Assistente de ajuda',
       sends: 'Sua pergunta, trechos do manual do usuário do Arena e onde você está no Arena (o nome do módulo).',
     },
+    assistantSuggestions: {
+      label: 'Sugestões proativas',
+      sends: 'Nada até você clicar em Fazer em uma sugestão. As verificações são feitas no seu navegador.',
+    },
     expressions: {
       label: 'Expressões',
       sends:
