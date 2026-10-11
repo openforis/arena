@@ -6,17 +6,40 @@ const HTML_ENTITIES: Record<string, string> = {
   amp: '&',
   copy: '©',
   gt: '>',
+  hellip: '…',
   lt: '<',
   mdash: '—',
   nbsp: ' ',
   ndash: '–',
   quot: '"',
+  reg: '®',
+  trade: '™',
 }
 
 const SEPARATOR = ' · '
 
 /**
- * Turns an HTML attribution into plain text: tags removed, common entities decoded in one pass, spaces collapsed.
+ * Decodes one HTML entity (named from the table, or numeric decimal/hex); invalid ones are left as raw text.
+ * @param {string} match - The whole entity, e.g. "&#169;".
+ * @param {string|undefined} name - The entity name, for named entities.
+ * @param {string|undefined} decimal - The decimal code point digits, for "&#169;".
+ * @param {string|undefined} hex - The hexadecimal code point digits, for "&#xA9;".
+ * @returns {string} The decoded character, or the match itself when it cannot be decoded.
+ */
+const decodeEntity = (match: string, name?: string, decimal?: string, hex?: string): string => {
+  if (name !== undefined) return Object.prototype.hasOwnProperty.call(HTML_ENTITIES, name) ? HTML_ENTITIES[name] : match
+  const codePoint = decimal !== undefined ? Number.parseInt(decimal, 10) : Number.parseInt(hex ?? '', 16)
+  const valid =
+    Number.isInteger(codePoint) &&
+    codePoint > 0 &&
+    codePoint <= 0x10ffff &&
+    !(codePoint >= 0xd800 && codePoint <= 0xdfff)
+  return valid ? String.fromCodePoint(codePoint) : match
+}
+
+/**
+ * Turns an HTML attribution into plain text: tags removed, common and numeric entities decoded in one pass
+ * (nothing is decoded twice and no tag is stripped after decoding), spaces collapsed.
  * @param {string|null} [html] - The attribution HTML.
  * @returns {string} The plain text.
  */
@@ -24,7 +47,7 @@ export const stripHtml = (html?: string | null): string => {
   if (!html) return ''
   return html
     .replace(/<[^>]*>/g, '')
-    .replace(/&(#39|amp|copy|gt|lt|mdash|nbsp|ndash|quot);/g, (_match, entity: string) => HTML_ENTITIES[entity])
+    .replace(/&(?:([a-z]+)|#(\d{1,7})|#[xX]([0-9a-fA-F]{1,6}));/g, decodeEntity)
     .replace(/\s+/g, ' ')
     .trim()
 }

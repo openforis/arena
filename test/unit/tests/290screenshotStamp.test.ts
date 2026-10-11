@@ -17,6 +17,21 @@ describe('Screenshot stamp (290)', () => {
     expect(stripHtml(null)).toBe('')
   })
 
+  test('decodes the Part 3 escaped round trip without stripping tags after decoding', () => {
+    expect(stripHtml('Tom &amp; Jerry&#39;s &lt;b&gt;&quot;x&quot;&lt;/b&gt;')).toBe('Tom & Jerry\'s <b>"x"</b>')
+  })
+
+  test('decodes numeric entities and the extra named ones, leaving invalid ones raw', () => {
+    expect(stripHtml('&#169; OSM &#xA9; &#X27;a&#x27; &reg; &trade; &hellip;')).toBe("© OSM © 'a' ® ™ …")
+    expect(stripHtml('&#0; &#xD800; &#1114112; &eacute; &toString;')).toBe(
+      '&#0; &#xD800; &#1114112; &eacute; &toString;'
+    )
+  })
+
+  test('decodes in a single pass', () => {
+    expect(stripHtml('&amp;#169; &amp;lt;')).toBe('&#169; &lt;')
+  })
+
   test('collects the base layer attribution and those of the visible overlays, once each', () => {
     expect(
       collectAttributions({
