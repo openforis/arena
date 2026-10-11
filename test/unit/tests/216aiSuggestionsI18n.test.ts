@@ -2,10 +2,9 @@ import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import {
   CYRILLIC,
-  LANGUAGES as languages,
+  LANGUAGES,
   PLURAL_FORMS,
   PLURAL_SUFFIX,
-  RESOURCES as resources,
   baseKeys,
   enTextOf,
   flatten,
@@ -14,22 +13,22 @@ import {
 } from '@test/unit/utils/aiSuggestionsI18n'
 
 describe('aiSuggestions i18n (216)', () => {
-  test.each(languages)('%s registers the namespace', (lang) => {
-    expect(typeof resources[lang].aiSuggestions).toBe('object')
+  test.each(LANGUAGES)('%s registers the namespace', (lang) => {
+    expect(typeof getResource(lang)).toBe('object')
   })
 
-  test.each(languages)('%s has the same keys as en (plural suffixes aside)', (lang) => {
+  test.each(LANGUAGES)('%s has the same keys as en (plural suffixes aside)', (lang) => {
     expect(baseKeys(lang)).toEqual(baseKeys('en'))
   })
 
-  test.each(languages)('%s keeps the placeholders of en', (lang) => {
+  test.each(LANGUAGES)('%s keeps the placeholders of en', (lang) => {
     for (const [key, text] of Object.entries(flatten(getResource(lang)))) {
       const base = key.replace(PLURAL_SUFFIX, '')
       expect([key, placeholders(text)]).toEqual([key, placeholders(enTextOf(base))])
     }
   })
 
-  test.each(languages)('%s has the plural forms of its language', (lang) => {
+  test.each(LANGUAGES)('%s has the plural forms of its language', (lang) => {
     const texts = flatten(getResource(lang))
     const pluralBases = new Set(
       Object.keys(flatten(getResource('en')))
@@ -49,7 +48,7 @@ describe('aiSuggestions i18n (216)', () => {
     }
   })
 
-  test.each(languages)('%s texts differ from en (translated)', (lang) => {
+  test.each(LANGUAGES)('%s texts differ from en (translated)', (lang) => {
     if (lang === 'en') return
     const texts = flatten(getResource(lang))
     expect(texts['moduleIntro.card.designer']).not.toBe(enTextOf('moduleIntro.card.designer'))

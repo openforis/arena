@@ -28,7 +28,7 @@ export const withNodeDef = (survey: any, name: string, change: (nodeDef: any) =>
  */
 export const withSavedNodeDefs = (survey: any): any =>
   Survey.getNodeDefsArray(survey).reduce(
-    (acc: any, nodeDef: any) => Survey.assocNodeDef({ nodeDef: { ...nodeDef, temporary: false } })(acc),
+    (acc: any, nodeDef: any) => Survey.assocNodeDef({ nodeDef: NodeDef.dissocTemporary(nodeDef) })(acc),
     survey
   )
 
