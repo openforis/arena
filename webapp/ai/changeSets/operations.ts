@@ -69,7 +69,8 @@ export const getUpdatePropValue = (nodeDef: any, prop: NodeDefUpdateProp): strin
  */
 export const canUpdateNodeDefRef = (survey: any, nodeDef: any, prop: NodeDefRefProp): boolean =>
   prop === 'categoryUuid'
-    ? Survey.canUpdateCategory(nodeDef)(survey)
+    ? // a child code attribute keeps its parent: the designer resets it on a category change, the assistant does not
+      Survey.canUpdateCategory(nodeDef)(survey) && !NodeDef.getParentCodeDefUuid(nodeDef)
     : !NodeDef.isPublished(nodeDef) || Survey.isTemplate(Survey.getSurveyInfo(survey))
 
 /**

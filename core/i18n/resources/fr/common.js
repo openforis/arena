@@ -1824,6 +1824,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       rootEntity: "L'assistant ne peut pas modifier l'entité racine.",
       refEditDisabled:
         '{{name}} ne peut pas changer de catégorie ou de taxonomie (il est publié, ou un autre attribut code en dépend).',
+      refHasParentCode:
+        "{{name}} dépend d'un attribut code parent : sa catégorie ne peut pas être changée ici. Changez-la dans le concepteur.",
     },
   },
 

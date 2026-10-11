@@ -1810,6 +1810,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       rootEntity: 'O assistente não pode alterar a entidade raiz.',
       refEditDisabled:
         '{{name}} não pode mudar de categoria ou taxonomia (está publicado, ou outro atributo código depende dele).',
+      refHasParentCode:
+        '{{name}} depende de um atributo código pai, por isso a sua categoria não pode ser alterada aqui. Altere-a no designer.',
     },
   },
 

@@ -1797,6 +1797,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       rootEntity: 'The root entity cannot be changed by the assistant.',
       refEditDisabled:
         '{{name}} cannot get another category or taxonomy (it is published, or another code attribute depends on it).',
+      refHasParentCode:
+        '{{name}} depends on a parent code attribute, so its category cannot be changed here. Change it in the designer.',
     },
   },
 
