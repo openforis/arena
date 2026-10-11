@@ -111,13 +111,26 @@ export const WmsDialog = (): React.ReactElement => {
   const { state, dispatch, canEditSurvey, onUrlChange, onLoad } = useWmsDialogForm()
   const loadMode = getUrlLoadMode(state.url)
   const submitLabel = getSubmitLabel(state)
+  // a ref (not state) so a second click in the same tick is also ignored
+  const savingRef = useRef(false)
+
+  /**
+   * Closes the dialog on user request (Cancel, Escape, backdrop), except while the layers are being saved.
+   * @returns {void}
+   */
+  const onRequestClose = useCallback(() => {
+    if (!savingRef.current) onClose()
+  }, [onClose])
 
   const onSubmit = useCallback(async () => {
+    if (savingRef.current) return
+    savingRef.current = true
     const layers = buildMapCustomLayers({ state, newId: uuidv4 })
     dispatch({ type: 'savingChanged', saving: true })
     try {
       await addLayers({ scope: state.scope, layers })
     } catch (error) {
+      savingRef.current = false
       dispatch({
         type: 'savingChanged',
         saving: false,
@@ -138,7 +151,7 @@ export const WmsDialog = (): React.ReactElement => {
       maxWidth="sm"
       className="map-wms-dialog"
       data-testid={TestId.mapWorkspace.wmsDialog}
-      onClose={onClose}
+      onClose={onRequestClose}
       onKeyDown={onDialogKeyDown}
     >
       <DialogTitle>{t('mapWorkspace.wms.title')}</DialogTitle>
@@ -182,7 +195,7 @@ export const WmsDialog = (): React.ReactElement => {
         )}
       </DialogContent>
       <DialogActions>
-        <ButtonCancel onClick={onClose} />
+        <ButtonCancel onClick={onRequestClose} disabled={state.saving} />
         <Button
           primary
           label={submitLabel.key}

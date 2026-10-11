@@ -40,7 +40,7 @@ export const WmsSummary = ({ state }: { state: WmsDialogFormState }): React.Reac
   if (parts.length === 0) return null
   const text = parts.map((part) => part.text ?? t(part.key as string, part.params)).join(' · ')
   return (
-    <p className="map-wms-dialog__summary" data-testid={TestId.mapWorkspace.wmsSummary}>
+    <p className="map-wms-dialog__summary" role="status" data-testid={TestId.mapWorkspace.wmsSummary}>
       {text}
     </p>
   )
