@@ -1,0 +1,197 @@
+@use '~@webapp/style/vars' as *;
+
+.scenes-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 12px;
+  font-size: 13px;
+  color: $black;
+
+  &__intro,
+  &__note,
+  &__hint,
+  &__range {
+    margin: 0;
+    font-size: 12px;
+    color: $black;
+    opacity: 0.7;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  &__label-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  &__label {
+    font-weight: 600;
+  }
+
+  &__value,
+  &__count {
+    font-variant-numeric: tabular-nums;
+  }
+
+  &__draw-again {
+    align-self: flex-start;
+  }
+
+  &__message {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    background-color: $grey;
+  }
+
+  &__link {
+    padding: 0;
+    border: 0;
+    background: none;
+    color: $blue;
+    font-size: 12px;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      font-weight: 600;
+    }
+  }
+
+  &__bars {
+    display: flex;
+    align-items: stretch;
+    gap: 4px;
+    height: 96px;
+  }
+
+  &__bar {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 0;
+    border: 0;
+    background: none;
+    font-size: 11px;
+    cursor: pointer;
+
+    &:disabled {
+      cursor: default;
+    }
+  }
+
+  &__bar-track {
+    display: flex;
+    flex: 1;
+    align-items: flex-end;
+    width: 100%;
+  }
+
+  &__bar-fill {
+    width: 100%;
+    min-height: 2px;
+    border-radius: 2px 2px 0 0;
+    background-color: $blueLight;
+  }
+
+  &__bar--active &__bar-fill,
+  &__bar:hover:not(:disabled) &__bar-fill {
+    background-color: $blue;
+  }
+
+  &__results {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    &--stale {
+      opacity: 0.5;
+    }
+  }
+
+  &__sort {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  &__select {
+    padding: 2px 4px;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+    background-color: $white;
+    font-size: 12px;
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__row {
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+
+    &--selected {
+      border-color: $blue;
+    }
+  }
+
+  &__row-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 4px;
+    border: 0;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  &__thumbnail {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    border-radius: 2px;
+    background-color: $grey;
+    object-fit: cover;
+  }
+
+  &__row-text {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__row-date {
+    font-weight: 600;
+  }
+
+  &__row-details {
+    font-size: 11px;
+    opacity: 0.7;
+  }
+
+  &__row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 0 4px 6px;
+  }
+}
