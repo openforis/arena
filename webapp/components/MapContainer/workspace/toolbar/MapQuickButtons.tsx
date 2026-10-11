@@ -25,7 +25,7 @@ const ZOOM_TO_DATA_MAX_ZOOM = 16
 export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState }): ReactElement => {
   const map = useMap()
   const notifyWarning = useNotifyWarning()
-  const { variant, activeTool, dispatch } = useMapWorkspace()
+  const { variant, activeTool, dialog, dispatch } = useMapWorkspace()
 
   /**
    * Zooms the map to the data, or warns when there is none.
@@ -67,6 +67,14 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
             iconSrc={measureAreaIconSrc}
             active={activeTool === 'measureArea'}
             onClick={() => dispatch({ type: 'toggleTool', tool: 'measureArea' })}
+          />
+          <ToolbarIconButton
+            buttonKey="screenshot"
+            titleKey="mapWorkspace.screenshot.quickButton"
+            shortcut={MAP_SHORTCUT_LABELS.screenshot}
+            iconClassName="icon-camera"
+            active={dialog === 'screenshot'}
+            onClick={() => dispatch({ type: 'openDialog', dialog: 'screenshot' })}
           />
           <ToolbarIconButton
             buttonKey="zoomToData"

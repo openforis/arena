@@ -1,5 +1,6 @@
 import { formatCoordinates } from '@webapp/components/MapContainer/workspace/statusbar/coordinateFormat'
 import {
+  getBaseMapName,
   buildStampLines,
   collectAttributions,
   formatStampCoordinates,
@@ -76,5 +77,11 @@ describe('Screenshot stamp (290)', () => {
       left: ['2026-10-11'],
       right: [],
     })
+  })
+
+  test('names the base map by its label, else by its name', () => {
+    expect(getBaseMapName({ name: 'custom:1f2e', label: 'My WMTS' })).toBe('My WMTS')
+    expect(getBaseMapName({ name: 'ESRI Topographic' })).toBe('ESRI Topographic')
+    expect(getBaseMapName(null)).toBe('')
   })
 })

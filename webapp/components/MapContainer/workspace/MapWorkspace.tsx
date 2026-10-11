@@ -61,7 +61,6 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
    */
   const focusSearch = useCallback(() => focusMapSearch(searchInputRef.current), [searchInputRef])
 
-  // Part 5 adds screenshot
   const handlers = useMemo<MapShortcutHandlers>(
     () => ({
       focusSearch,
@@ -69,6 +68,7 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
       measureDistance: () => dispatch({ type: 'toggleTool', tool: 'measureDistance' }),
       // compact maps have no area button: no area shortcut either
       measureArea: variant === 'full' ? () => dispatch({ type: 'toggleTool', tool: 'measureArea' }) : undefined,
+      screenshot: variant === 'full' ? () => dispatch({ type: 'openDialog', dialog: 'screenshot' }) : undefined,
       escape: () => dispatch(dialog ? { type: 'closeDialog' } : { type: 'endTool' }),
     }),
     [dialog, dispatch, focusSearch, variant]

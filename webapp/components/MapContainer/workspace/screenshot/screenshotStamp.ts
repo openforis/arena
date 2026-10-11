@@ -114,3 +114,11 @@ export const buildStampLines = ({
     right: [baseMapName ?? '', attributions.join(SEPARATOR)].filter((line) => line.length > 0),
   }
 }
+
+/**
+ * Returns the name of the base map as the user sees it: a custom base map has a label (its key is custom:<uuid>).
+ * @param {object|null} [baseLayer] - The base layer definition.
+ * @returns {string} The visible name, or an empty string.
+ */
+export const getBaseMapName = (baseLayer?: { label?: string; name?: string } | null): string =>
+  baseLayer?.label ?? baseLayer?.name ?? ''
