@@ -176,6 +176,22 @@ export const TestId = {
     sceneRow: (id) => `map-scene-row-${id}`,
     sceneAddLayer: (id) => `map-scene-add-layer-${id}`,
     sceneUseAsBase: (id) => `map-scene-use-as-base-${id}`,
+    screenshotDialog: 'map-screenshot-dialog',
+    screenshotPreview: 'map-screenshot-preview',
+    screenshotCapture: (key) => `map-screenshot-capture-${key}`, // view, plot
+    screenshotInclude: (key) => `map-screenshot-include-${key}`, // data, scale, stamp
+    screenshotTarget: (key) => `map-screenshot-target-${key}`, // record, file
+    screenshotPlot: 'map-screenshot-plot',
+    screenshotAttribute: 'map-screenshot-attribute',
+    screenshotFileName: 'map-screenshot-file-name',
+    screenshotNotice: 'map-screenshot-notice',
+    screenshotReplace: 'map-screenshot-replace',
+    screenshotKeep: 'map-screenshot-keep',
+    screenshotAlsoDownload: 'map-screenshot-also-download',
+    screenshotSubmit: 'map-screenshot-submit',
+    screenshotCancel: 'map-screenshot-cancel',
+    screenshotDone: 'map-screenshot-done',
+    screenshotClose: 'map-screenshot-close',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',

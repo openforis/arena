@@ -707,6 +707,58 @@ export default {
       perimeter: '周囲長 {{value}}',
       done: '完了',
     },
+    screenshot: {
+      menuItem: 'スクリーンショットをプロットの記録へ…',
+      quickButton: 'スクリーンショット',
+      title: '地図のスクリーンショット',
+      capture: '範囲',
+      captureView: '現在の表示',
+      capturePlot: 'プロットに合わせる',
+      include: '含める',
+      includeData: 'マーカーと計測',
+      includeScale: '縮尺バーと方位記号',
+      includeStamp: 'プロット、日付、座標、ベースマップ',
+      saveTo: '保存先',
+      targetRecord: 'プロットの記録に添付',
+      targetRecordHint: '画像属性に保存されます',
+      targetFile: 'ダウンロードのみ',
+      targetFileHint: 'このコンピューターのPNGファイル',
+      plot: 'プロットの記録',
+      attribute: '画像属性',
+      fileName: 'ファイル名',
+      mobileNote:
+        'プロットの画像属性のみが表示されます。現地チームは記録を端末にダウンロードすると、Arena Mobileでこの画像を見られます。',
+      noPlots:
+        '地図上にプロットがありません。画像をプロットの記録に添付するには、レイヤータブで位置のレイヤーを表示してください。',
+      noImageAttributes: 'このプロットには編集できる画像属性がありません。',
+      previewLoading: 'プレビューを準備しています…',
+      previewAlt: '地図のスクリーンショットのプレビュー',
+      alsoDownload: 'ダウンロードもする',
+      downloadPng: 'PNGをダウンロード',
+      saveToPlot: '{{plot}}に保存',
+      saving: '保存しています…',
+      replace: '置き換える',
+      keep: '現在の画像を残す',
+      confirmReplace: 'この属性にはすでに画像「{{fileName}}」があります。スクリーンショットで置き換えますか？',
+      saved:
+        'スクリーンショットを{{plot}} › {{attribute}}に保存しました。現地チームは次回の記録ダウンロードで受け取ります。',
+      savedPending:
+        'スクリーンショットを{{plot}}に送信しました。記録はまだ更新中です。しばらくしてから確認してください。',
+      notices: {
+        tilesMissing: '省略された地図タイル（サーバーが許可していないか、読み込まれませんでした）：{{count}}',
+        equalEarth:
+          'Equal Earthのベースマップはキャプチャできません。ベースマップメニューで別のベースマップを選んでください。',
+      },
+      errors: {
+        captureFailed: '地図をキャプチャできませんでした：{{details}}',
+        cannotEditRecord: 'この記録を編集できません（または調査が公開されていません）。',
+        fileTooLarge: '画像は{{size}} MBで、この属性で許可されている{{limit}} MBを超えています。',
+        quotaExceeded: 'この調査にはファイル用の空き容量が足りません。',
+        plotNotFound: '記録にプロットが見つかりません。削除された可能性があります。',
+        saveFailed: 'スクリーンショットは保存されませんでした：{{details}}',
+        fileNameRequired: 'ファイル名を入力してください。',
+      },
+    },
   },
 
   samplingPolygonOptions: {
