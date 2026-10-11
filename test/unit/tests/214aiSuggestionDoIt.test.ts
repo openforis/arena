@@ -8,6 +8,7 @@ import { reconcileInProgress } from '@webapp/ai/suggestions/reconcileInProgress'
 import {
   getSuggestionSettleOutcome,
   getSuggestionTurnLockName,
+  holdSuggestionTurnLock,
   reportSuggestionSettle,
   withSuggestionScope,
 } from '@webapp/ai/suggestions/suggestionConversation'
@@ -217,6 +218,36 @@ describe('Do it plumbing (214)', () => {
       getHeldLockNames: async () => [getSuggestionTurnLockName('running'), 'other'],
     })
     expect(store.getInProgressConversationIds('u1')).toEqual(['running'])
+  })
+
+  test('the turn lock is requested by conversation and released when the turn ends, even by error', async () => {
+    const requested: string[] = []
+    let release: Promise<unknown> | null = null
+    const locks = {
+      request: ((name: string, callback: () => Promise<unknown>) => {
+        requested.push(name)
+        release = callback()
+        return release
+      }) as unknown as LockManager['request'],
+    }
+    let fail: (error: Error) => void = () => undefined
+    const done = new Promise<void>((_resolve, reject) => {
+      fail = reject
+    })
+    done.catch(() => undefined)
+    holdSuggestionTurnLock({ conversationId: 'c1', done, locks })
+    expect(requested).toEqual([getSuggestionTurnLockName('c1')])
+    let released = false
+    release!.then(() => {
+      released = true
+    })
+    await Promise.resolve()
+    expect(released).toBe(false)
+    fail(new Error('turn failed'))
+    await release
+    expect(released).toBe(true)
+    // no API: nothing happens
+    holdSuggestionTurnLock({ conversationId: 'c1', done, locks: null })
   })
 
   test('Clear conversations clears the suggestions of the user too', async () => {
