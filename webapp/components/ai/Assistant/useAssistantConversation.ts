@@ -26,6 +26,9 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
+import { reportSuggestionSettle, withSuggestionScope } from '@webapp/ai/suggestions/suggestionConversation'
+import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
+import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
@@ -43,6 +46,9 @@ import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { startsAsDataConversation } from './cleaning/cleaningArea'
 import { useAssistantToolContext } from './useAssistantToolContext'
 
+// Do it: a new conversation that keeps the suggestion's scope for its tools
+export type AssistantSendOptions = { suggestion?: { id: string; scope: SuggestionScope } }
+
 export type AssistantConversationApi = {
   conversation: Conversation | null
   busy: boolean
@@ -53,7 +59,10 @@ export type AssistantConversationApi = {
   // false when the browser can't store conversations (memory store)
   persistent: boolean
   history: Conversation[]
-  send: (text: string) => void
+  // the conversation store is open (a suggestion request waits for it)
+  ready: boolean
+  // resolves with the conversation id once the turn was created; null when nothing was sent (busy, applying, not ready)
+  send: (text: string, options?: AssistantSendOptions) => Promise<string | null>
   stop: () => void
   retry: () => void
   newConversation: () => void
@@ -230,6 +239,8 @@ export const useAssistantConversation = ({
         })
         if (isCurrent()) show(final)
         await persist(final)
+        // a Do it conversation: its targets settle once no card is pending, or show again when it made no card
+        reportSuggestionSettle({ conversation: final, running: false })
       } finally {
         assistantTurnRegistry.unregister(controller)
         if (controllerRef.current === controller) {
@@ -249,13 +260,18 @@ export const useAssistantConversation = ({
   )
 
   const send = useCallback(
-    (text: string) => {
-      if (busy || applyingRef.current) return
+    (text: string, { suggestion }: AssistantSendOptions = {}): Promise<string | null> => {
+      if (!conversationStore || busy || applyingRef.current) return Promise.resolve(null)
       // no selected id: a new conversation, whatever the ref still holds
       const selected = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
-      void runTurn(selected ?? createNewConversation({ userUuid, surveyId, area }), text)
+      const base = suggestion
+        ? withSuggestionScope(createNewConversation({ userUuid, surveyId, area }), suggestion.scope)
+        : (selected ?? createNewConversation({ userUuid, surveyId, area }))
+      // the turn shows and selects its conversation synchronously, before its first await
+      void runTurn(base, text)
+      return Promise.resolve(base.id)
     },
-    [area, busy, conversationId, runTurn, surveyId, userUuid]
+    [area, busy, conversationId, conversationStore, runTurn, surveyId, userUuid]
   )
 
   const retry = useCallback(() => {
@@ -286,7 +302,12 @@ export const useAssistantConversation = ({
   const clearConversations = useCallback(async () => {
     if (!conversationStore) return
     // all the conversations of the user, whatever the area and the survey, and the open ones of every area
-    await clearUserConversations({ conversationStore, openConversations: browserOpenConversations, userUuid })
+    await clearUserConversations({
+      conversationStore,
+      openConversations: browserOpenConversations,
+      suggestions: suggestionStore,
+      userUuid,
+    })
     setHistory([])
     assistantPanelStore.setConversationId(null)
   }, [conversationStore, userUuid])
@@ -303,6 +324,8 @@ export const useAssistantConversation = ({
       const currentGeneration = assistantTurnRegistry.getGeneration()
       if (canShowAfterSave({ startedGeneration: generation, currentGeneration, selectedId, id: next.id })) show(next)
       await assistantTurnRegistry.track(conversationStore?.save(next) ?? Promise.resolve())
+      // an Apply or Discard may settle the last pending card of a Do it conversation
+      reportSuggestionSettle({ conversation: next })
     },
     [conversationStore, show]
   )
@@ -429,6 +452,7 @@ export const useAssistantConversation = ({
     engineNotice,
     applying,
     persistent: conversationStore?.persistent ?? true,
+    ready: conversationStore !== null,
     history,
     send,
     stop,
