@@ -32,6 +32,11 @@ export const getDisplayMenuSections = ({
   options: Partial<Record<DisplayOptionKey, boolean>>
   sampleBasedImageInterpretationEnabled: boolean
 }): DisplayMenuSection[] => {
+  /**
+   * Builds the menu item of a display option.
+   * @param {DisplayOptionKey} key - The option key.
+   * @returns {DisplayMenuItem} The menu item.
+   */
   const toItem = (key: DisplayOptionKey): DisplayMenuItem => ({
     key,
     labelKey: `mapWorkspace.display.${key}`,

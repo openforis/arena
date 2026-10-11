@@ -17,13 +17,30 @@ export const initialMapWorkspaceState = (railTab: MapRailTabKey | null): MapWork
   dialog: null,
 })
 
-// each helper returns the same object when nothing changes, so React skips the re-render
+/**
+ * Sets the rail tab, returning the same state when nothing changes so React skips the re-render.
+ * @param {MapWorkspaceState} state - Current state.
+ * @param {MapRailTabKey|null} railTab - The rail tab to set.
+ * @returns {MapWorkspaceState} The new state.
+ */
 const withRailTab = (state: MapWorkspaceState, railTab: MapRailTabKey | null): MapWorkspaceState =>
   state.railTab === railTab ? state : { ...state, railTab }
 
+/**
+ * Sets the active tool, returning the same state when nothing changes.
+ * @param {MapWorkspaceState} state - Current state.
+ * @param {MapToolKey|null} activeTool - The tool to set.
+ * @returns {MapWorkspaceState} The new state.
+ */
 const withTool = (state: MapWorkspaceState, activeTool: MapToolKey | null): MapWorkspaceState =>
   state.activeTool === activeTool ? state : { ...state, activeTool }
 
+/**
+ * Sets the open dialog, returning the same state when nothing changes.
+ * @param {MapWorkspaceState} state - Current state.
+ * @param {MapDialogKey|null} dialog - The dialog to set.
+ * @returns {MapWorkspaceState} The new state.
+ */
 const withDialog = (state: MapWorkspaceState, dialog: MapDialogKey | null): MapWorkspaceState =>
   state.dialog === dialog ? state : { ...state, dialog }
 

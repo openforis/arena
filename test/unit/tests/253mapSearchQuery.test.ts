@@ -47,6 +47,8 @@ describe('Map search query (253)', () => {
   test('DMS in either order, with ASCII quotes and comma decimals', () => {
     expectPoint('0°25′23″ S, 36°57′04″ E', -0.42305556, 36.95111111)
     expectPoint(`36°57'04" E 0°25'23" S`, -0.42305556, 36.95111111)
+    expectPoint('0°25’23” S 36°57’04” E', -0.42305556, 36.95111111)
+    expectPoint('0º25′23″ S, 36˚57′04″ E', -0.42305556, 36.95111111)
     expectPoint(`41°54' N 12°30' E`, 41.9, 12.5)
     expectPoint('41°54′23,5″ N 12°30′ E', 41 + 54 / 60 + 23.5 / 3600, 12.5, 8)
   })

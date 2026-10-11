@@ -6,8 +6,11 @@ import { useI18nT } from '@webapp/store/system'
 import { useMapPlanetPeriod } from './MapPlanetPeriodContext'
 import { formatPeriodLabel, getPeriodValue } from './planetPeriods'
 
-// keys typed in the selects belong to them (MUI menu type-ahead and arrow keys must not take them);
-// Escape and Tab still reach the menu, which closes
+/**
+ * Keeps the keys typed in the selects inside them: MUI menu type-ahead and arrow keys must not take them (Escape and Tab still reach the menu, which closes).
+ * @param {KeyboardEvent<HTMLDivElement>} event - The key event.
+ * @returns {void}
+ */
 const keepKeysInSection = (event: KeyboardEvent<HTMLDivElement>): void => {
   if (event.key !== 'Escape' && event.key !== 'Tab') event.stopPropagation()
 }

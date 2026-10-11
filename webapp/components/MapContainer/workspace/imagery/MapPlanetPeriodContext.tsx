@@ -56,6 +56,10 @@ export const MapPlanetPeriodProvider = ({ children }: { children: ReactNode }): 
   useEffect(() => {
     if (!sourceKey || !provider) return undefined
     let cancelled = false
+    /**
+     * Loads the available periods of the provider.
+     * @returns {Promise<void>} Resolves when the periods are stored.
+     */
     const load = async (): Promise<void> => {
       try {
         const periods = ((await API.fetchAvailableMapPeriods({ provider, periodType })) ?? []) as MapPeriod[]
@@ -78,15 +82,33 @@ export const MapPlanetPeriodProvider = ({ children }: { children: ReactNode }): 
     }
   }, [periodType, provider, sourceKey])
 
+  /**
+   * Sets the period shown on the map.
+   * @param {number} value - The period value.
+   * @returns {void}
+   */
   const setLeftValue = useCallback((value: number) => setState((prev) => ({ ...prev, leftValue: value })), [])
+  /**
+   * Sets the period to compare with (null for none).
+   * @param {number|null} value - The period value.
+   * @returns {void}
+   */
   const setRightValue = useCallback(
     (value: number | null) => setState((prev) => ({ ...prev, rightValue: value, falseColourRight: false })),
     []
   )
+  /**
+   * Toggles the false colour of the shown period.
+   * @returns {void}
+   */
   const toggleFalseColourLeft = useCallback(
     () => setState((prev) => ({ ...prev, falseColourLeft: !prev.falseColourLeft })),
     []
   )
+  /**
+   * Toggles the false colour of the period to compare with.
+   * @returns {void}
+   */
   const toggleFalseColourRight = useCallback(
     () => setState((prev) => ({ ...prev, falseColourRight: !prev.falseColourRight })),
     []

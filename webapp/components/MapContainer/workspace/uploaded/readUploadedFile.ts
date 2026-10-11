@@ -11,10 +11,20 @@ type KmlLayerConstructor = new (kml: Document) => L.FeatureGroup
 type ZipEntry = { async: (type: 'string') => Promise<string> }
 type GeoJsonInput = Parameters<typeof L.geoJSON>[0]
 
+/**
+ * Formats a feature property value as text.
+ * @param {unknown} value - The property value.
+ * @returns {string} The text (objects as JSON).
+ */
 const formatPropertyValue = (value: unknown): string =>
   value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value)
 
-// properties of a feature as plain text (never HTML: the file comes from the user)
+/**
+ * Binds a popup with the properties of a feature as plain text (never HTML: the file comes from the user).
+ * @param {object} feature - The GeoJSON feature.
+ * @param {L.Layer} layer - The layer of the feature.
+ * @returns {void}
+ */
 const bindPropertiesPopup = (feature: { properties?: Record<string, unknown> | null }, layer: L.Layer): void => {
   const entries = Object.entries(feature.properties ?? {})
   if (entries.length === 0) return
@@ -27,8 +37,18 @@ const bindPropertiesPopup = (feature: { properties?: Record<string, unknown> | n
   layer.bindPopup(content)
 }
 
+/**
+ * Builds a layer from GeoJSON data.
+ * @param {GeoJsonInput} data - The GeoJSON data.
+ * @returns {L.GeoJSON} The layer.
+ */
 const toGeoJsonLayer = (data: GeoJsonInput): L.GeoJSON => L.geoJSON(data, { onEachFeature: bindPropertiesPopup })
 
+/**
+ * Builds a layer from KML text.
+ * @param {string} text - The KML text.
+ * @returns {L.Layer} The layer.
+ */
 const toKmlLayer = (text: string): L.Layer => {
   const xml = new DOMParser().parseFromString(text, 'text/xml')
   if (xml.getElementsByTagName('parsererror').length > 0) throw new Error('invalid KML')
@@ -36,6 +56,11 @@ const toKmlLayer = (text: string): L.Layer => {
   return new KmlLayer(xml)
 }
 
+/**
+ * Reads the KML files inside a KMZ file.
+ * @param {File} file - The KMZ file.
+ * @returns {Promise<string[]>} The text of each KML file.
+ */
 const readKmzTexts = async (file: File): Promise<string[]> => {
   const texts: string[] = []
   await ZipUtils.forEachFileInZip(file, async (relativePath: string, fileEntry: ZipEntry) => {

@@ -94,6 +94,7 @@ describe('Map coordinate formats (251)', () => {
   test('formatCoordinates formats each notation', () => {
     expect(formatCoordinates(-0.4231, 36.9512, 'latLon')).toBe('-0.42310, 36.95120')
     expect(formatCoordinates(-0.4231, 36.9512, 'dms')).toBe('0°25′23″ S, 36°57′04″ E')
+    expect(formatCoordinates(-0.000001, 0.000004, 'latLon')).toBe('0.00000, 0.00000')
     expect(formatCoordinates(-0.4231, 36.9512, 'utm')).toBe('37M 271977 E 9953205 N')
     expect(formatCoordinates(85, 0, 'utm')).toBe('—')
     expect(formatCoordinates(41.9, 372.5, 'latLon')).toBe('41.90000, 12.50000')

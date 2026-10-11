@@ -22,8 +22,23 @@ const ALPHA = [N / 2 - (2 * N ** 2) / 3 + (5 * N ** 3) / 16, (13 * N ** 2) / 48 
 const BETA = [N / 2 - (2 * N ** 2) / 3 + (37 * N ** 3) / 96, N ** 2 / 48 + N ** 3 / 15, (17 * N ** 3) / 480]
 const DELTA = [2 * N - (2 * N ** 2) / 3 - 2 * N ** 3, (7 * N ** 2) / 3 - (8 * N ** 3) / 5, (56 * N ** 3) / 15]
 
+/**
+ * Converts degrees to radians.
+ * @param {number} degrees - Angle in degrees.
+ * @returns {number} Angle in radians.
+ */
 const toRadians = (degrees: number): number => (degrees * Math.PI) / 180
+/**
+ * Converts radians to degrees.
+ * @param {number} radians - Angle in radians.
+ * @returns {number} Angle in degrees.
+ */
 const toDegrees = (radians: number): number => (radians * 180) / Math.PI
+/**
+ * Pads a number to two digits with a leading zero.
+ * @param {number} value - The number.
+ * @returns {string} The padded text.
+ */
 const pad2 = (value: number): string => String(value).padStart(2, '0')
 
 /**
@@ -70,6 +85,11 @@ export const getUtmZone = (lat: number, lng: number): number => {
 export const getUtmBand = (lat: number): string =>
   UTM_BANDS[Math.min(Math.floor((lat - UTM_MIN_LAT) / 8), UTM_BANDS.length - 1)]
 
+/**
+ * Gets the central meridian of a UTM zone.
+ * @param {number} zone - The UTM zone number.
+ * @returns {number} Longitude of the central meridian in degrees.
+ */
 const getCentralMeridian = (zone: number): number => zone * 6 - 183
 
 /**
@@ -140,6 +160,13 @@ export const utmToLatLon = ({
   return { lat: toDegrees(phi), lng: normalizeLongitude(getCentralMeridian(zone) + toDegrees(lambda)) }
 }
 
+/**
+ * Formats one coordinate as degrees, minutes and seconds with its hemisphere letter.
+ * @param {number} value - The coordinate in decimal degrees.
+ * @param {string} positiveLetter - Letter for values at or above zero.
+ * @param {string} negativeLetter - Letter for negative values.
+ * @returns {string} The formatted text.
+ */
 const formatDmsPart = (value: number, positiveLetter: string, negativeLetter: string): string => {
   // rounding on the total seconds carries 59.6″ into the next minute (and degree)
   const totalSeconds = Math.round(Math.abs(value) * 3600)
@@ -168,6 +195,13 @@ export const formatUtm = ({ zone, band, easting, northing }: UtmCoordinate): str
   `${zone}${band} ${Math.round(easting)} E ${Math.round(northing)} N`
 
 /**
+ * Formats a decimal degree value with five decimals, without a minus sign on values that round to zero.
+ * @param {number} value - The value in degrees.
+ * @returns {string} E.g. "-0.42310", or "0.00000" for -0.000001.
+ */
+const formatDecimal = (value: number): string => (Math.abs(value) < 5e-6 ? 0 : value).toFixed(5)
+
+/**
  * Formats a point in the given notation.
  * @param {number} lat - Latitude in degrees.
  * @param {number} lng - Longitude in degrees.
@@ -180,5 +214,5 @@ export const formatCoordinates = (lat: number, lng: number, notation: Coordinate
     const utm = latLonToUtm(lat, lng)
     return utm ? formatUtm(utm) : '—'
   }
-  return `${lat.toFixed(5)}, ${normalizeLongitude(lng).toFixed(5)}`
+  return `${formatDecimal(lat)}, ${formatDecimal(normalizeLongitude(lng))}`
 }

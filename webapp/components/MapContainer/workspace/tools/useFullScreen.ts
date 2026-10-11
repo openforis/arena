@@ -22,12 +22,20 @@ export const useFullScreen = (ref: RefObject<HTMLElement | null>): FullScreenSta
   const [isFullScreen, setIsFullScreen] = useState(false)
 
   useEffect(() => {
+    /**
+     * Updates the state when the full screen element changes.
+     * @returns {void}
+     */
     const onChange = (): void =>
       setIsFullScreen(document.fullscreenElement !== null && document.fullscreenElement === ref.current)
     document.addEventListener('fullscreenchange', onChange)
     return () => document.removeEventListener('fullscreenchange', onChange)
   }, [ref])
 
+  /**
+   * Enters or leaves full screen.
+   * @returns {void}
+   */
   const toggle = useCallback(() => {
     if (document.fullscreenElement) {
       exitFullScreen()

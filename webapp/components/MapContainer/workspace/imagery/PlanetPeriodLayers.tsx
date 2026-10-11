@@ -24,6 +24,12 @@ type SideBySideControl = L.Control & {
 type SideBySideFactory = (left: L.Layer, right: L.Layer) => SideBySideControl
 type PeriodUrlFunction = (params: { surveyId: number; period: MapPeriod; apiKey: string | null }) => string
 
+/**
+ * Finds the base tile layer of the map by its key.
+ * @param {L.Map} map - The Leaflet map.
+ * @param {string} key - The id of the tile layer.
+ * @returns {L.TileLayer|null} The layer, or null when it is not on the map.
+ */
 const findBaseTileLayer = (map: L.Map, key: string): L.TileLayer | null => {
   let found: L.TileLayer | null = null
   map.eachLayer((layer) => {
@@ -32,6 +38,16 @@ const findBaseTileLayer = (map: L.Map, key: string): L.TileLayer | null => {
   return found
 }
 
+/**
+ * Builds the tile url of a Planet period.
+ * @param {object} params - Parameters.
+ * @param {PeriodUrlFunction|undefined} params.urlFunction - The provider function that builds the url.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string|null} params.apiKey - The API key of the provider.
+ * @param {MapPeriod|undefined} params.period - The period.
+ * @param {boolean} params.falseColour - Whether to use the false colour processing.
+ * @returns {string|null} The url, or null when there is no function or period.
+ */
 const buildPeriodUrl = ({
   urlFunction,
   surveyId,

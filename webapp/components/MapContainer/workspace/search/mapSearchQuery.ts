@@ -17,9 +17,9 @@ export const MAP_SEARCH_MAX_RECORDS = 8
 
 // "37M 271977 E 9953205 N", "37m 271977 9953205", "37M 271977.5, 9953205"
 const UTM_PATTERN = /^(\d{1,2})\s*([C-HJ-NP-X])\s+(\d+(?:\.\d+)?)\s*E?\s*[,;]?\s*(\d+(?:\.\d+)?)\s*N?$/i
-// one "12°30′15″ N" part; minutes and seconds optional, ' and " accepted for ′ and ″, comma decimals accepted
+// one "12°30′15″ N" part; minutes and seconds optional, ' and ’ accepted for ′, " ” “ accepted for ″, comma decimals accepted
 const DMS_PART_PATTERN =
-  /(\d{1,3}(?:[.,]\d+)?)\s*°\s*(?:(\d{1,2}(?:[.,]\d+)?)\s*['′]\s*)?(?:(\d{1,2}(?:[.,]\d+)?)\s*(?:["″]|'')\s*)?([NSEW])/gi
+  /(\d{1,3}(?:[.,]\d+)?)\s*°\s*(?:(\d{1,2}(?:[.,]\d+)?)\s*['′’]\s*)?(?:(\d{1,2}(?:[.,]\d+)?)\s*(?:["″”“]|''|’’)\s*)?([NSEW])/gi
 // "41.9, 12.5", "41,9 12,5", "-0.42;36.95"
 const DECIMAL_PAIR_PATTERN = /^([+-]?\d+(?:[.,]\d+)?)\s*[,;\s]\s*([+-]?\d+(?:[.,]\d+)?)$/
 const UTM_MIN_EASTING = 100000
@@ -88,10 +88,12 @@ const dmsPartToDegrees = (degrees: string, minutes: string | undefined, seconds:
 
 /**
  * Parses a DMS coordinate text (latitude and longitude in either order).
- * @param {string} text - The trimmed search text.
+ * @param {string} rawText - The trimmed search text.
  * @returns {MapSearchQuery|null} The query, or null when the text has no degree sign.
  */
-const parseDms = (text: string): MapSearchQuery | null => {
+const parseDms = (rawText: string): MapSearchQuery | null => {
+  // º (ordinal indicator) and ˚ (ring above) are common stand-ins for the degree sign
+  const text = rawText.replace(/[º˚]/g, '°')
   if (!text.includes('°')) return null
   const values: Record<string, number> = {}
   for (const match of text.matchAll(DMS_PART_PATTERN)) {

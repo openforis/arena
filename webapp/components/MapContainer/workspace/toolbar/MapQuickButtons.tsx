@@ -26,6 +26,10 @@ export const MapQuickButtons = ({ fullScreen }: { fullScreen: FullScreenState })
   const notifyWarning = useNotifyWarning()
   const { variant, activeTool, dispatch } = useMapWorkspace()
 
+  /**
+   * Zooms the map to the data, or warns when there is none.
+   * @returns {void}
+   */
   const zoomToData = useCallback(() => {
     const bounds = computeBounds(collectDataLatLngs(map))
     if (!bounds) {
