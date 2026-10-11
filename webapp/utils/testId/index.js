@@ -125,6 +125,23 @@ export const TestId = {
   jobMonitor: {
     errorsContainer: '.app-job-monitor__job-errors',
   },
+  mapWorkspace: {
+    toolbar: 'map-toolbar',
+    menuButton: (key) => `map-menu-${key}`,
+    menuItem: (key) => `map-menu-item-${key}`,
+    quickButton: (key) => `map-quick-${key}`,
+    searchInput: 'map-search-input',
+    searchResult: (index) => `map-search-result-${index}`,
+    rail: 'map-rail',
+    railTab: (key) => `map-rail-tab-${key}`,
+    railPanel: (key) => `map-rail-panel-${key}`,
+    overlayRow: (id) => `map-overlay-row-${id}`,
+    statusBar: 'map-status-bar',
+    statusCoordinates: 'map-status-coordinates',
+    statusNotation: 'map-status-notation',
+    statusZoom: 'map-status-zoom',
+    uploadInput: 'map-upload-input',
+  },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',
     advanced: 'advanced',
