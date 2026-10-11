@@ -8,6 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { isDeepEqual } from './deepEqual'
 import { findNodeDefRef, getOperationCurrentValue } from './operations'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './recordEdits/types'
+import { isCategoryItemLabelOperation, type CategoryItemLabelSetOperation } from './categoryItemLabels/types'
 import { isNodeDefRefProp } from './types'
 import type { ChangeOperation, ChangeSet, ConflictReason, NodeDefCreateOperation, OperationConflict } from './types'
 
@@ -30,7 +31,7 @@ const isRefMissing = (op: ChangeOperation, survey: any): boolean =>
   op.type === 'nodeDef.update' && isNodeDefRefProp(op.prop) && findNodeDefRef(survey, op.prop, String(op.to)) === null
 
 const checkChange = (
-  op: Exclude<ChangeOperation, NodeDefCreateOperation | RecordAttributeUpdateOperation>,
+  op: Exclude<ChangeOperation, NodeDefCreateOperation | RecordAttributeUpdateOperation | CategoryItemLabelSetOperation>,
   survey: any,
   createdUuids: Set<string>
 ): ConflictReason | null => {
@@ -60,8 +61,8 @@ export const findConflicts = (
   const createdUuids = new Set<string>()
   const conflicts: OperationConflict[] = []
   for (const op of changeSet.operations) {
-    // record edits are checked by the server at Apply
-    if (isRecordEditOperation(op)) continue
+    // record edits and category labels are checked by the server at Apply
+    if (isRecordEditOperation(op) || isCategoryItemLabelOperation(op)) continue
     const reason =
       op.type === 'nodeDef.create' ? checkCreate(op, survey, createdUuids) : checkChange(op, survey, createdUuids)
     if (op.type === 'nodeDef.create' && reason === null) createdUuids.add(NodeDef.getUuid(op.nodeDef))

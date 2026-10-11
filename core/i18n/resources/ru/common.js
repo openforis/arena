@@ -1813,6 +1813,7 @@ $t(common.cantUndoWarning)`,
       singleExpressionOnly: 'Это свойство допускает только одно выражение.',
       expressionEmpty: 'Выражение пустое.',
       rootEntity: 'Помощник не может изменять корневую сущность.',
+      categoryNotFound: 'Категории {{name}} не существует.',
       refEditDisabled:
         'Для {{name}} нельзя сменить категорию или таксономию (он опубликован, или от него зависит другой атрибут-код).',
       refHasParentCode:

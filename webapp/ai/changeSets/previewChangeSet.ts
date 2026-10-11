@@ -10,6 +10,8 @@ import * as SurveyValidator from '@core/survey/surveyValidator'
 import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
 
 import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
+import { checkCategoryItemLabels } from './categoryItemLabels/checkCategoryItemLabels'
+import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import { isAssistantNodeDefType } from './newNodeDef'
 import {
   applyOperationToSurvey,
@@ -21,13 +23,13 @@ import { isRecordEditOperation } from './recordEdits/types'
 import { isNodeDefRefProp, type NodeDefRefProp } from './types'
 import { collectValidationIssues } from './validationIssues'
 import type {
-  ChangeOperation,
   ChangeSet,
   ChangeSetIssue,
   ChangeSetPreview,
   ExpressionSetOperation,
   LabelSetOperation,
   NodeDefCreateOperation,
+  NodeDefOperation,
   NodeDefUpdateOperation,
 } from './types'
 
@@ -153,7 +155,7 @@ const checkExpressionOperation = ({ survey, op, t }: CheckParams<ExpressionSetOp
   return []
 }
 
-const checkStructure = (params: CheckParams<ChangeOperation>): FieldIssue[] => {
+const checkStructure = (params: CheckParams<NodeDefOperation>): FieldIssue[] => {
   const { op } = params
   if (isRecordEditOperation(op)) return []
   if (op.type === 'nodeDef.create') return checkCreate({ ...params, op })
@@ -162,7 +164,7 @@ const checkStructure = (params: CheckParams<ChangeOperation>): FieldIssue[] => {
   return checkExpressionOperation({ ...params, op })
 }
 
-const checkDuplicate = (op: ChangeOperation, seenKeys: Set<string>, survey: any, t: Translate): FieldIssue[] => {
+const checkDuplicate = (op: NodeDefOperation, seenKeys: Set<string>, survey: any, t: Translate): FieldIssue[] => {
   const key = getOperationTargetKey(op)
   if (key === null) return []
   if (!seenKeys.has(key)) {
@@ -181,8 +183,8 @@ const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate) => {
   const seenKeys = new Set<string>()
   let draft = survey
   for (const [index, op] of changeSet.operations.entries()) {
-    // record edits are previewed on the records, not on the survey
-    if (isRecordEditOperation(op)) continue
+    // record edits are previewed on the records, category labels by checkCategoryItemLabels: not on the survey
+    if (isRecordEditOperation(op) || isCategoryItemLabelOperation(op)) continue
     const opIssues = [...checkStructure({ survey: draft, op, t }), ...checkDuplicate(op, seenKeys, draft, t)]
     if (opIssues.length > 0) {
       issues.push(...opIssues.map((opIssue) => ({ operation: index, ...opIssue })))
@@ -238,6 +240,7 @@ export const previewChangeSet = async (
   { t }: { t: Translate }
 ): Promise<ChangeSetPreview> => {
   const { draft, issues, firstOperationByUuid } = applyOperations(changeSet, survey, t)
+  issues.push(...checkCategoryItemLabels(changeSet, survey, t))
   if (issues.length === 0) {
     issues.push(...(await validateTouchedNodeDefs(draft, firstOperationByUuid, t)))
     issues.push(...(await checkOtherExpressions(changeSet, draft, t)))

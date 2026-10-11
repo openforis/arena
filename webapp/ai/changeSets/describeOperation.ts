@@ -3,8 +3,10 @@
  */
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
 
 import { isRecordEditOperation } from './recordEdits/types'
+import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import type { ChangeOperation, ChangeSet, OperationResult } from './types'
 
 const findName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
@@ -14,6 +16,17 @@ const findName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
     (op) => op.type === 'nodeDef.create' && NodeDef.getUuid(op.nodeDef) === uuid
   ) as { nodeDef: any } | undefined
   return create ? NodeDef.getName(create.nodeDef) : uuid
+}
+
+/**
+ * Returns the name of a category of the survey.
+ * @param {string} uuid - Category uuid.
+ * @param {object} survey - Survey.
+ * @returns {string} The name (the uuid when the category is gone).
+ */
+const findCategoryName = (uuid: string, survey: any): string => {
+  const category = Survey.getCategoryByUuid(uuid)(survey)
+  return category ? Category.getName(category) : uuid
 }
 
 /**
@@ -29,6 +42,9 @@ export const describeOperation = (
   { changeSet, survey }: { changeSet: ChangeSet; survey: any }
 ) => {
   if (isRecordEditOperation(op)) return `${op.recordKeys}: ${op.path}`
+  if (isCategoryItemLabelOperation(op)) {
+    return `category \`${findCategoryName(op.categoryUuid, survey)}\` item ${op.ref} label (${op.lang})`
+  }
   if (op.type === 'nodeDef.create') return `new ${NodeDef.getType(op.nodeDef)} \`${NodeDef.getName(op.nodeDef)}\``
   const name = `\`${findName(op.nodeDefUuid, changeSet, survey)}\``
   if (op.type === 'label.set') return `${name} ${op.kind === 'labels' ? 'label' : 'description'} (${op.lang})`

@@ -8,6 +8,7 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
+import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import { getNodeDefRefName } from '@webapp/ai/changeSets/operations'
 import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
@@ -16,6 +17,7 @@ import type {
   ChangeSet,
   ChangeSetCardState,
   NodeDefExpressionProp,
+  NodeDefOperation,
   OperationResult,
 } from '@webapp/ai/changeSets/types'
 import { TreeSelectViewMode } from '@webapp/model'
@@ -129,7 +131,7 @@ const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, l
  * @returns {object} The row fields.
  */
 const toChangeRow = (
-  op: Exclude<ChangeOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>,
+  op: Exclude<NodeDefOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>,
   survey: any
 ) => {
   if (op.type === 'label.set') {
@@ -174,9 +176,9 @@ export const buildCardRows = ({
   lang: string
 }): CardRow[] => {
   const { changeSet, results = [] } = cardState
-  // record edits have their own card
+  // record edits have their own card, category labels their own groups (CategoryLabelGroups)
   return changeSet.operations
-    .filter((op) => !isRecordEditOperation(op))
+    .filter((op) => !isRecordEditOperation(op) && !isCategoryItemLabelOperation(op))
     .map((op) => {
       const result = results.find((item) => item.id === op.id) ?? null
       if (op.type === 'nodeDef.create') return { id: op.id, result, ...toCreateRow(op, lang) }

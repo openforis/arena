@@ -1788,6 +1788,7 @@ $t(common.cantUndoWarning)`,
       singleExpressionOnly: 'このプロパティには式を1つだけ指定できます。',
       expressionEmpty: '空の式があります。',
       rootEntity: 'アシスタントはルートエンティティを変更できません。',
+      categoryNotFound: 'カテゴリ {{name}} はありません。',
       refEditDisabled:
         '{{name}}のカテゴリまたは分類体系は変更できません（公開済みか、別のコード属性がこれに依存しています）。',
       refHasParentCode:

@@ -9,7 +9,8 @@ import { isDeepEqual } from './deepEqual'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
-import type { ChangeOperation, ChangeSet, OperationResult } from './types'
+import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
+import type { ChangeSet, NodeDefOperation, OperationResult } from './types'
 
 export type ApplierDeps = {
   getSurvey: () => any
@@ -27,7 +28,7 @@ export type ApplierDeps = {
   onNodeDefSaved: (params: { nodeDef: any; nodeDefParent: any }) => void
 }
 
-type Group = { uuid: string; operations: ChangeOperation[] }
+type Group = { uuid: string; operations: NodeDefOperation[] }
 
 const pickChanged = (before: Record<string, unknown> = {}, after: Record<string, unknown> = {}) => {
   const result: Record<string, unknown> = {}
@@ -48,7 +49,7 @@ export const getChangedProps = (before: any, after: any) => ({
   propsAdvanced: pickChanged(NodeDef.getPropsAdvanced(before), NodeDef.getPropsAdvanced(after)),
 })
 
-const groupByNodeDef = (operations: ChangeOperation[]): Group[] => {
+const groupByNodeDef = (operations: NodeDefOperation[]): Group[] => {
   const groups = new Map<string, Group>()
   for (const op of operations) {
     const uuid = getOperationNodeDefUuid(op)
@@ -166,6 +167,9 @@ export const applyChangeSet = async ({
     results.set(id, { id, status: 'conflict', message: reason })
   }
   const toApply = selected.filter((op) => !results.has(op.id))
-  await applyGroups(groupByNodeDef(toApply), changeSet, deps, results)
+  await applyGroups(groupByNodeDef(toApply.filter((op) => !isCategoryItemLabelOperation(op))), changeSet, deps, results)
+  for (const op of toApply) {
+    if (isCategoryItemLabelOperation(op)) results.set(op.id, { id: op.id, status: 'skipped', message: 'notSupported' })
+  }
   return selected.map((op) => results.get(op.id) as OperationResult)
 }

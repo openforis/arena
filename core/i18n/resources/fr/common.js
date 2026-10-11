@@ -1822,6 +1822,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       singleExpressionOnly: "Cette propriété n'accepte qu'une seule expression.",
       expressionEmpty: 'Une expression est vide.',
       rootEntity: "L'assistant ne peut pas modifier l'entité racine.",
+      categoryNotFound: "Il n'existe pas de catégorie {{name}}.",
       refEditDisabled:
         '{{name}} ne peut pas changer de catégorie ou de taxonomie (il est publié, ou un autre attribut code en dépend).',
       refHasParentCode:
