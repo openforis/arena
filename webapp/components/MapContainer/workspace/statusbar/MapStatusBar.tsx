@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import type { ReactElement } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap, useMapEvents } from 'react-leaflet'
@@ -55,6 +55,22 @@ export const MapStatusBar = ({ records }: { records?: MapWorkspaceRecords }): Re
   const [attributionTarget, setAttributionTarget] = useState<HTMLSpanElement | null>(null)
 
   useControlContainerMove(map.attributionControl, attributionTarget)
+
+  // the attribution is cut with an ellipsis when it does not fit: its full text goes in the title
+  useEffect(() => {
+    if (!attributionTarget) return undefined
+    /**
+     * Copies the attribution text into the title.
+     * @returns {void}
+     */
+    const syncTitle = (): void => {
+      attributionTarget.setAttribute('title', attributionTarget.textContent ?? '')
+    }
+    syncTitle()
+    const observer = new MutationObserver(syncTitle)
+    observer.observe(attributionTarget, { childList: true, subtree: true, characterData: true })
+    return () => observer.disconnect()
+  }, [attributionTarget])
 
   useMapEvents({
     mousemove: (event) => setCursor({ lat: event.latlng.lat, lng: event.latlng.lng }),

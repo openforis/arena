@@ -525,7 +525,6 @@ export default {
       recordsEmpty: '記録を一覧表示するには、調査データのレイヤーを表示してください',
     },
     layers: {
-      surveyData: '調査データ',
       noSurveyData: 'この調査には地図に表示するデータがありません',
       groups: {
         custom: 'カスタム（WMS / WMTS）',

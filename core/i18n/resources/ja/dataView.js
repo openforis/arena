@@ -211,8 +211,6 @@ export default {
       samplingPointData: '抽出地点データ',
     },
     layersPanel: {
-      hidePanel: 'パネルを隠す',
-      showPanel: 'パネルを表示',
       markers: '{{count}}件のマーカー',
       markers_one: '{{count}}件のマーカー',
       markers_other: '{{count}}件のマーカー',

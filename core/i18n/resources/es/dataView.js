@@ -201,8 +201,6 @@ Es el formato utilizado por herramientas de análisis de vegetación como Turbov
       samplingPointData: 'Datos de puntos de muestreo',
     },
     layersPanel: {
-      hidePanel: 'Ocultar panel',
-      showPanel: 'Mostrar panel',
       markers: '{{count}} marcadores',
       markers_one: '{{count}} marcador',
       markers_other: '{{count}} marcadores',

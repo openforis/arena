@@ -14,6 +14,7 @@ import {
 
 import { SortOrder } from '@core/sortOrder'
 
+import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useI18n } from '@webapp/store/system'
 import {
   applySortOrder,
@@ -83,6 +84,7 @@ type SortButtonProps = {
 
 const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const i18n = useI18n()
+  const { portalContainer } = useMapWorkspace()
   const tooltipKeyBySortOrder: Record<MapSortOrder, string> = {
     [SortOrder.asc]: 'common.sortDesc',
     [SortOrder.desc]: 'common.sortNone',
@@ -91,7 +93,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const tooltipKey = tooltipKeyBySortOrder[sortOrder]
   const iconClass = sortOrder === SortOrder.desc ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
   return (
-    <Tooltip title={i18n.t(tooltipKey)} placement="right">
+    <Tooltip title={i18n.t(tooltipKey)} placement="right" slotProps={{ popper: { container: portalContainer } }}>
       <IconButton
         size="small"
         onClick={onClick}

@@ -487,7 +487,7 @@ export default {
       imageInterpretation: 'Зургийн тайлал',
       showSamplingPolygon: 'Түүвэрлэх олон өнцөгт',
       showControlPoints: 'Хяналтын цэгүүд',
-      showPlotReferencePoint: 'Газрын зургийн лавлах цэг',
+      showPlotReferencePoint: 'Талбайн лавлах цэг',
     },
     imagery: {
       planetPeriod: 'Planet хугацаа',
@@ -529,7 +529,6 @@ export default {
       recordsEmpty: 'Бичлэгүүдийг жагсаахын тулд судалгааны өгөгдлийн давхаргыг харуулна уу',
     },
     layers: {
-      surveyData: 'Судалгааны өгөгдөл',
       noSurveyData: 'Энэ судалгаанд газрын зураг дээр харуулах өгөгдөл алга',
       groups: {
         custom: 'Өөрийн (WMS / WMTS)',

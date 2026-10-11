@@ -212,8 +212,6 @@ Este é o formato usado por ferramentas de análise de vegetação como Turboveg
       samplingPointData: 'Dados de pontos de amostragem',
     },
     layersPanel: {
-      hidePanel: 'Ocultar painel',
-      showPanel: 'Mostrar painel',
       markers: '{{count}} marcadores',
       markers_one: '{{count}} marcador',
       markers_other: '{{count}} marcadores',

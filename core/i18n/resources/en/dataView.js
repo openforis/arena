@@ -211,8 +211,6 @@ This is the format used by vegetation analysis tools such as Turboveg, Juice and
       samplingPointData: 'Sampling point data',
     },
     layersPanel: {
-      hidePanel: 'Hide panel',
-      showPanel: 'Show panel',
       markers: '{{count}} markers',
       markers_one: '{{count}} marker',
       markers_other: '{{count}} markers',

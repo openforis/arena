@@ -22,7 +22,6 @@ export const LayersPanel = ({ dataLayersCount }: { dataLayersCount: number }): R
   const empty = dataLayersCount === 0
   return (
     <div className="map-layers-panel">
-      <h3 className="map-layers-panel__section-title">{t('mapWorkspace.layers.surveyData')}</h3>
       {empty && <p className="map-layers-panel__empty">{t('mapWorkspace.layers.noSurveyData')}</p>}
       <div
         ref={setLayersControlTarget}

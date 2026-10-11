@@ -527,7 +527,6 @@ Try again?`,
       recordsEmpty: 'Show a survey data layer to list its records',
     },
     layers: {
-      surveyData: 'Survey data',
       noSurveyData: 'This survey has no data to show on the map',
       groups: {
         custom: 'Custom (WMS / WMTS)',

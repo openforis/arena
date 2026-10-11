@@ -33,12 +33,20 @@ export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: Tool
   const open = anchorEl !== null
   const label = t(labelKey)
 
+  /**
+   * Closes the menu and optionally runs a callback once it has closed.
+   * @param {Function} [callback] - Runs after the menu is closed.
+   * @returns {void}
+   */
   const close = useCallback((callback?: () => void) => {
     setAfterClose(callback ? () => callback : null) // wrapped: a state setter would call the function
     setAnchorEl(null)
   }, [])
 
-  // runs after MUI gives the focus back to the menu button, so a focused input or dialog keeps it
+  /**
+   * Runs the pending callback after MUI gives the focus back to the menu button, so a focused input or dialog keeps it.
+   * @returns {void}
+   */
   const onExited = useCallback(() => {
     setAfterClose(null)
     afterClose?.()
@@ -53,7 +61,11 @@ export const ToolbarMenu = ({ menuKey, labelKey, iconClassName, children }: Tool
         aria-controls={open ? menuId : undefined}
         data-testid={TestId.mapWorkspace.menuButton(menuKey)}
         startIcon={<span className={`icon icon-14px ${iconClassName}`} aria-hidden="true" />}
-        endIcon={<span className="icon icon-8px icon-arrow-down" aria-hidden="true" />}
+        endIcon={
+          <span className="map-toolbar__menu-button__caret" aria-hidden="true">
+            ▾
+          </span>
+        }
         onClick={(event) => setAnchorEl(event.currentTarget)}
       >
         {label}

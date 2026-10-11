@@ -530,7 +530,6 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       recordsEmpty: 'Mostre uma camada de dados do inventário para listar seus registros',
     },
     layers: {
-      surveyData: 'Dados do inventário',
       noSurveyData: 'Este inventário não tem dados para mostrar no mapa',
       groups: {
         custom: 'Personalizadas (WMS / WMTS)',

@@ -211,8 +211,6 @@ export default {
       samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
     layersPanel: {
-      hidePanel: 'Самбарыг нуух',
-      showPanel: 'Самбарыг харуулах',
       markers: '{{count}} маркер',
       markers_one: '{{count}} маркер',
       markers_other: '{{count}} маркер',

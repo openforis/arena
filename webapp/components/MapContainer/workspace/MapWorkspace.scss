@@ -52,19 +52,34 @@
     gap: 12px;
     min-height: 24px;
     padding: 0 8px;
+    overflow: hidden;
     border-top: 1px solid #d1d1dd;
     background: #fafbfc;
     color: #4a4e57;
     font-size: 0.72rem;
+    white-space: nowrap;
   }
 
   // menus, tooltips and dialogs are rendered inside the workspace (full screen), so these rules reach them too
   .map-toolbar__menu-button {
+    gap: 6px;
     min-width: 0;
-    padding: 4px 8px;
+    height: 36px;
+    padding: 0 10px;
     color: #2f3138;
-    font-size: 0.8rem;
+    font-size: 13px;
     text-transform: none;
+
+    // the global rule (formBase.scss) sets negative margins on MUI button icons
+    .MuiButton-startIcon,
+    .MuiButton-endIcon {
+      margin: 0;
+    }
+
+    &__caret {
+      font-size: 11px;
+      line-height: 1;
+    }
 
     &--open {
       background: #e3eefa;
@@ -332,6 +347,12 @@
 }
 
 .map-status-bar {
+  &__coordinates,
+  &__item {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+
   &__coordinates {
     display: inline-flex;
     gap: 6px;
@@ -367,6 +388,12 @@
   }
 
   &__attribution {
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
     .leaflet-control-attribution {
       float: none;
       margin: 0;

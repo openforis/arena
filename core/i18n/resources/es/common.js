@@ -506,7 +506,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       recordsEmpty: 'Muestre una capa de datos de la encuesta para listar sus registros',
     },
     layers: {
-      surveyData: 'Datos de la encuesta',
       noSurveyData: 'Esta encuesta no tiene datos para mostrar en el mapa',
       groups: {
         custom: 'Personalizadas (WMS / WMTS)',

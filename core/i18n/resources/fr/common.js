@@ -531,7 +531,6 @@ Réessayer ?`,
       recordsEmpty: 'Affichez une couche de données du formulaire pour lister ses enregistrements',
     },
     layers: {
-      surveyData: 'Données du formulaire',
       noSurveyData: "Ce formulaire n'a pas de données à afficher sur la carte",
       groups: {
         custom: 'Personnalisées (WMS / WMTS)',

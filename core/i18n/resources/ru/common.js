@@ -495,7 +495,7 @@ export default {
     imagery: {
       planetPeriod: 'Период Planet',
       period: 'Период',
-      compareWith: 'Сравнить рядом с',
+      compareWith: 'Сравнить бок о бок с',
       noComparison: 'Без сравнения',
       falseColour: 'Псевдоцвет',
     },
@@ -532,7 +532,6 @@ export default {
       recordsEmpty: 'Покажите слой данных опроса, чтобы увидеть его записи',
     },
     layers: {
-      surveyData: 'Данные опроса',
       noSurveyData: 'В этом опросе нет данных для показа на карте',
       groups: {
         custom: 'Пользовательские (WMS / WMTS)',
