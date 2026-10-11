@@ -21,6 +21,7 @@ import { useUser } from '@webapp/store/user'
 import type { AssistantArea, AssistantAreaStatus } from '../assistantAreas'
 import { getAvailableAreas } from './suggestionsModel'
 import { useDesignerVisit } from './useDesignerVisit'
+import { useGenerationStartedEvent } from './useGenerationStartedEvent'
 import { useSuggestionGeneration } from './useSuggestionGeneration'
 
 /**
@@ -85,6 +86,9 @@ export const SuggestionsHost = ({ statuses, module }: { statuses: AssistantAreaS
       cancelled = true
     }
   }, [userUuid])
+
+  // declared after the controller update effect: React runs effects in order, so the event finds the generation
+  useGenerationStartedEvent({ generation, active: active && areasKey.split(',').includes('design') })
 
   return null
 }

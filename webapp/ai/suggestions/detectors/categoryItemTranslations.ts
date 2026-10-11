@@ -7,9 +7,14 @@ import * as Category from '@core/survey/category'
 
 import type { MissingLabelsCounts } from '@common/ai/categoryItemLabels'
 
+import {
+  fetchMissingLabelsCounts,
+  type FetchMissingLabelsCounts,
+} from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
+
 import type { AssistantSuggestion, SuggestionTarget } from '../types'
-import { newDesignSuggestion } from './designTargets'
-import type { TargetResolver } from './types'
+import { getDesignDetectorScope, newDesignSuggestion } from './designTargets'
+import type { DetectorContext, EventDetector, SuggestionEvent, TargetResolver } from './types'
 
 export const CATEGORY_ITEM_TRANSLATIONS_KIND = 'categoryItemTranslations'
 
@@ -62,3 +67,80 @@ export const categoryItemTranslationsResolver: TargetResolver = {
   kind: CATEGORY_ITEM_TRANSLATIONS_KIND,
   isResolved: (targetKey, survey) => !Survey.getCategoryByUuid(targetKey)(survey),
 }
+
+export const CATEGORY_COUNTS_THROTTLE_MS = 30000
+
+// frequent triggers: a generation per cycle switch or defs reload, a survey info save
+const THROTTLED_EVENTS: SuggestionEvent['type'][] = ['generationStarted', 'surveyInfoSaved']
+
+/**
+ * Returns the throttle key: user, survey and languages (a save that adds a language is never throttled).
+ * @param {DetectorContext} ctx - Detector context.
+ * @param {number} surveyId - Survey id.
+ * @param {object} survey - Survey.
+ * @returns {string} The key.
+ */
+const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): string => {
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+  return `${ctx.userUuid}|${surveyId}|${languages.join(',')}`
+}
+
+/**
+ * Creates the event detector of suggestion 6 (the fetcher and the throttle are injected in tests).
+ * @param {object} [deps] - Dependencies.
+ * @param {FetchMissingLabelsCounts} [deps.fetchCounts] - Counts fetcher.
+ * @param {number} [deps.throttleMs] - Throttle of the frequent triggers.
+ * @returns {EventDetector} The detector.
+ */
+export const createCategoryItemTranslationsDetector = ({
+  fetchCounts = fetchMissingLabelsCounts,
+  throttleMs = CATEGORY_COUNTS_THROTTLE_MS,
+}: { fetchCounts?: FetchMissingLabelsCounts; throttleMs?: number } = {}): EventDetector => {
+  const lastFetchAt = new Map<string, number>()
+  // only the latest request may land (an older answer would overwrite a newer one)
+  let latestRequest = 0
+
+  /**
+   * Tells whether a frequent trigger came too soon after the last fetch of the same key.
+   * @param {SuggestionEvent} event - Event.
+   * @param {string} key - Throttle key.
+   * @param {number} time - Current time.
+   * @returns {boolean} True when skipped.
+   */
+  const isThrottled = (event: SuggestionEvent, key: string, time: number): boolean => {
+    if (!THROTTLED_EVENTS.includes(event.type)) return false
+    const last = lastFetchAt.get(key)
+    return last !== undefined && time - last < throttleMs
+  }
+
+  return {
+    kind: CATEGORY_ITEM_TRANSLATIONS_KIND,
+    area: 'design',
+    needsDraft: true,
+    on: ['generationStarted', 'surveyInfoSaved', 'categoryEditorLeft', 'categoryLabelsApplied', 'categoriesChanged'],
+    handle: async (event, ctx) => {
+      const scope = getDesignDetectorScope(ctx)
+      const generation = ctx.generation
+      if (!scope || !generation) return
+      const { survey, surveyId } = scope
+      const key = getThrottleKey(ctx, surveyId, survey)
+      const time = ctx.now().getTime()
+      if (isThrottled(event, key, time)) return
+      lastFetchAt.set(key, time)
+      latestRequest += 1
+      const request = latestRequest
+      try {
+        const counts = await fetchCounts({ surveyId, signal: generation.signal })
+        // survey switch, defs reload or logout meanwhile, or a newer request: nothing lands
+        if (generation.signal.aborted || request !== latestRequest) return
+        const suggestions = detectCategoryItemTranslations(counts, survey, { surveyId, now: ctx.now() })
+        ctx.store.setKind({ userUuid: ctx.userUuid, surveyId, kind: CATEGORY_ITEM_TRANSLATIONS_KIND, suggestions })
+      } catch {
+        // offline or aborted: the next trigger tries again
+        lastFetchAt.delete(key)
+      }
+    },
+  }
+}
+
+export const categoryItemTranslationsDetector = createCategoryItemTranslationsDetector()

@@ -18,6 +18,7 @@ export type SuggestionEvent =
   | { type: 'categoryEditorLeft' }
   | { type: 'categoryLabelsApplied' }
   | { type: 'categoriesChanged' } // category import or delete
+  | { type: 'generationStarted' } // sent by the host once the controller has the new generation (server counts)
 
 export type DetectorContext = {
   userUuid: string
