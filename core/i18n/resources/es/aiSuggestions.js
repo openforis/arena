@@ -11,4 +11,8 @@ export default {
       analysis: '¿Es nuevo en el módulo Análisis? Pregúnteme cómo funciona.',
     },
   },
+  missingTranslations: {
+    card_one: 'Falta {{count}} texto en {{language}}. ¿Traducirlo?',
+    card_other: 'Faltan {{count}} textos en {{language}}. ¿Traducirlos?',
+  },
 }

@@ -10,4 +10,8 @@ export default {
       analysis: '分析モジュールは初めてですか？使い方を聞いてください。',
     },
   },
+  missingTranslations: {
+    card_one: '{{language}}のテキストが{{count}}件不足しています。翻訳しますか？',
+    card_other: '{{language}}のテキストが{{count}}件不足しています。翻訳しますか？',
+  },
 }
