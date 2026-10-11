@@ -28,10 +28,20 @@ export type GenerationTracker = {
 }
 
 /**
+ * Converts a survey id to a positive integer.
+ * @param {number|string|null} surveyId - Survey id (a number, or a numeric string).
+ * @returns {number|null} The id; null when it is not a positive integer.
+ */
+const toSurveyIdNumber = (surveyId: number | string | null): number | null => {
+  const value = typeof surveyId === 'string' && /^\d+$/.test(surveyId) ? Number(surveyId) : surveyId
+  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : null
+}
+
+/**
  * Returns the generation input, or null when there is no generation (no user, survey or cycle, defs not fetched).
  * @param {object} raw - Values from the stores.
  * @param {string|null} raw.userUuid - Logged-in user.
- * @param {number|string|null} raw.surveyId - Active survey (the user preferences may hold it as a numeric string).
+ * @param {number|string|null} raw.surveyId - Active survey (a numeric string is accepted).
  * @param {string|null} raw.cycle - Current cycle.
  * @param {boolean} raw.fetched - The defs are fetched.
  * @param {boolean} raw.draft - The fetched defs are the draft.
@@ -56,8 +66,8 @@ export const toGenerationInput = ({
   canEditSurvey: boolean
   loadCount: number
 }): SuggestionGenerationInput | null => {
-  const surveyIdNumber = surveyId === null ? Number.NaN : Number(surveyId)
-  if (!userUuid || !Number.isInteger(surveyIdNumber) || typeof cycle !== 'string' || !fetched) return null
+  const surveyIdNumber = toSurveyIdNumber(surveyId)
+  if (!userUuid || surveyIdNumber === null || typeof cycle !== 'string' || !fetched) return null
   return { userUuid, surveyId: surveyIdNumber, cycle, draft, canEditSurvey, loadCount }
 }
 
