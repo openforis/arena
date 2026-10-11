@@ -9,6 +9,7 @@ import { createCategoryLabelsApplierDeps } from '@webapp/ai/changeSets/categoryI
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { surveyCategoryUpdated } from '@webapp/store/survey/actions/category'
+import { resetSurveyDefs } from '@webapp/store/survey/actions/defs'
 import { metaUpdated } from '@webapp/store/survey/actions/metadata'
 import { getDefByName } from '@test/unit/utils/assistantTestUtils'
 import {
@@ -99,6 +100,16 @@ describe('Apply of category item labels (231)', () => {
     )
   })
 
+  test('an uppercase item uuid matches the lower-cased server answer', async () => {
+    const categoryLabels = createCategoryDeps(answerOf({ applied: [{ itemUuid: 'item-1', lang: 'fr' }] }))
+    const results = await apply(
+      categoryLabelChangeSet([{ ...op('c1', '1'), itemUuid: 'ITEM-1' }]),
+      ['c1'],
+      categoryLabels
+    )
+    expect(results).toEqual([{ id: 'c1', status: 'applied' }])
+  })
+
   test('sends only the selected operations, after the node definition saves', async () => {
     const order: string[] = []
     const clusterIdUuid = NodeDef.getUuid(getDefByName(survey, 'cluster_id'))
@@ -177,7 +188,7 @@ describe('Apply of category item labels (231)', () => {
     expect(categoryLabels.onCategoryLabelsApplied).not.toHaveBeenCalled()
   })
 
-  test('the app dependencies keep the item count, mark the survey draft and notify the suggestions', () => {
+  test('the app dependencies keep the item count, mark the survey draft, reset the defs and notify the suggestions', () => {
     const existing = Survey.getCategoryByUuid(speciesUuid)(survey)
     const loaded = Survey.assocCategory(Category.assocItemsCount(120)(existing))(survey)
     const dispatch = jest.fn()
@@ -191,6 +202,7 @@ describe('Apply of category item labels (231)', () => {
     expect(dispatch.mock.calls.map(([action]) => action)).toEqual([
       surveyCategoryUpdated(Category.assocItemsCount(120)(existing)),
       metaUpdated(),
+      resetSurveyDefs(),
     ])
     deps.onCategoryLabelsApplied()
     expect(notify).toHaveBeenCalledWith({ type: 'categoryLabelsApplied' })
