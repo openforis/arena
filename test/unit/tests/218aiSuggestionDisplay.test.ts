@@ -29,7 +29,7 @@ const suggestionOf = (
   overrides: Partial<AssistantSuggestion> = {}
 ): AssistantSuggestion => ({
   id,
-  kind: 'missingTranslations',
+  kind: 'dataImported',
   area,
   surveyId: 7,
   cycle: null,
@@ -53,7 +53,7 @@ describe('suggestion display (218)', () => {
   })
 
   test('cards of a kind without a definition are not shown; the others are grouped by area, in order', () => {
-    const design = suggestionOf('missingTranslations:fr', 'design')
+    const design = suggestionOf('dataImported:x', 'design')
     const visible = withDefinitions([design, intro], SUGGESTION_DEFINITIONS)
     expect(visible).toEqual([intro])
     const second = { ...intro, id: 'moduleIntro:data', targets: [{ key: 'data' }] }
@@ -87,9 +87,7 @@ describe('suggestion display (218)', () => {
     expect(getSuggestionCardText({ ...params, suggestion: intro })).toBe(
       'New to the form designer? Ask me how it works.'
     )
-    expect(
-      getSuggestionCardText({ ...params, suggestion: suggestionOf('missingTranslations:fr', 'design') })
-    ).toBeNull()
+    expect(getSuggestionCardText({ ...params, suggestion: suggestionOf('dataImported:x', 'design') })).toBeNull()
     // a hand-edited module: its definition throws, the card is skipped instead of breaking the panel
     expect(getSuggestionCardText({ ...params, suggestion: { ...intro, targets: [{ key: 'users' }] } })).toBeNull()
   })
