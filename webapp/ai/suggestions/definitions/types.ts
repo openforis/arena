@@ -21,6 +21,8 @@ export type SuggestionDefinition = {
   prompt: (suggestion: AssistantSuggestion, ctx: SuggestionDescribeContext) => string
   // what Do it does to the suggestion: in progress until its cards settle (default), or removed (no card expected)
   acceptMode?: 'progress' | 'remove'
+  // the kind has no change-set card: a completed answer settles it (default: it needs a card)
+  settlesWithoutCard?: boolean
   // after Do it or Dismiss, with the targets handled (the module introduction records the module as seen)
   onHandled?: (params: { userUuid: string; targetKeys: string[]; store: SuggestionStore }) => void
 }

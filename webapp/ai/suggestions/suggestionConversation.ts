@@ -5,6 +5,7 @@
 import { isChangeSetPending } from '@webapp/ai/conversations/pendingChangeSets'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
 
+import { SUGGESTION_DEFINITIONS } from './definitions'
 import { suggestionStore, type SuggestionStore } from './suggestionStore'
 import type { SettleOutcome, SuggestionScope } from './types'
 
@@ -48,7 +49,10 @@ export const getSuggestionSettleOutcome = (
   if (!answer || (running && answer.status === 'streaming')) return null
   const cards = Object.values(conversation.changeSets)
   if (cards.some(isChangeSetPending)) return null
-  return cards.length > 0 ? 'settled' : 'failed'
+  if (cards.length > 0) return 'settled'
+  // kinds without a card (explanations) are answered in the chat: a completed answer is their success
+  const settlesWithoutCard = SUGGESTION_DEFINITIONS[conversation.suggestionScope.kind]?.settlesWithoutCard
+  return settlesWithoutCard && answer.status === 'done' ? 'settled' : 'failed'
 }
 
 /**

@@ -187,11 +187,24 @@ test.describe('AI suggestion: many validation messages (stub local server)', () 
     expect(countChatRequests(stub)).toBeGreaterThan(0)
     // record data stays on this device
     expect(gatewayBodies).toEqual([])
-    // a turn that ends without a change-set card puts the suggestion back (spec §3.2)
-    await expect(card).toBeVisible()
-    // proof of the put-back from the stored state: pending again, no longer in progress
+    // a completed answer settles the suggestion (it has no card): gone, and its target stored as dismissed
+    await expect(card).toHaveCount(0)
     const userUuid = await api.getCurrentUserUuid()
-    await expectStoredPending(page, userUuid, sampleSurvey.id, `validationErrors:${cycle}`)
+    await expect
+      .poll(
+        async () => {
+          const stored = await readStoredSuggestion(page, userUuid, sampleSurvey.id, `validationErrors:${cycle}`)
+          return (
+            stored && {
+              pending: stored.pending,
+              inProgress: stored.inProgress,
+              dismissed: Object.keys(stored.dismissed),
+            }
+          )
+        },
+        { timeout: 15_000 }
+      )
+      .toEqual({ pending: false, inProgress: false, dismissed: ['cycle'] })
   })
 })
 

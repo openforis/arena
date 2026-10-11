@@ -10,6 +10,7 @@ export const VALIDATION_ERRORS_CARD_KEY = 'validationErrors.card'
 
 export const validationErrorsDefinition: SuggestionDefinition = {
   kind: 'validationErrors',
+  settlesWithoutCard: true,
   /**
    * Returns the card text key with the count of the visible target.
    * @param {AssistantSuggestion} suggestion - The suggestion (visible targets only).
