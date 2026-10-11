@@ -9,6 +9,7 @@ import { stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
 import { assistantAnalysisMockScripts } from './mockScriptsAnalysis'
 import { assistantCleaningMockScripts } from './mockScriptsCleaning'
+import { assistantSuggestionMockScripts } from './mockScriptsSuggestions'
 
 export type MockScriptParams = { lastUserMessage: string; lastToolOutput: unknown }
 
@@ -27,6 +28,8 @@ export const MOCK_SCRIPT_DEFAULT_TEXT = 'MOCK answer.'
 
 // D2 / D3 append their scripts here
 export const MOCK_SCRIPTS: MockScript[] = [
+  // first: the suggestion prompts name labels_proposeSet, which the /label/i script would catch
+  ...assistantSuggestionMockScripts,
   {
     promptMarker: assistantMarkers.design,
     pattern: /label/i,
