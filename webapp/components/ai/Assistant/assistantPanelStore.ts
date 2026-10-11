@@ -3,6 +3,7 @@
  * panel code is lazy loaded). The open conversation of each area is remembered per user and survey (scope).
  */
 import { browserOpenConversations, type OpenConversations } from '@webapp/ai/conversations/openConversations'
+import type { SuggestionRequest } from '@webapp/ai/suggestions/types'
 
 import type { AssistantArea } from './assistantAreas'
 
@@ -23,6 +24,8 @@ export type AssistantPanelState = {
   // area the draft was made for: another area's composer ignores it
   draftArea: AssistantArea | null
   scope: AssistantPanelScope | null
+  // a suggestion's Do it waiting for the chat of its area to send it (claimed once)
+  pendingRequest: SuggestionRequest | null
 }
 
 export const initialAssistantPanelState: AssistantPanelState = {
@@ -34,6 +37,7 @@ export const initialAssistantPanelState: AssistantPanelState = {
   draft: null,
   draftArea: null,
   scope: null,
+  pendingRequest: null,
 }
 
 export type AssistantPanelStore = {
@@ -50,6 +54,10 @@ export type AssistantPanelStore = {
   // opens an area as a user choice (the automatic selection keeps it), in a new conversation, with a composer text
   openWithDraft: (params: { area: AssistantArea; draft: string }) => void
   clearDraft: () => void
+  // Do it: opens the suggestion's area in a new conversation; the chat claims and sends the request
+  startWithPrompt: (request: SuggestionRequest) => void
+  // returns and clears the pending request when the id matches (so it is sent at most once)
+  claimPendingRequest: (requestId: string) => SuggestionRequest | null
   reset: () => void
 }
 
@@ -109,8 +117,9 @@ export const createAssistantPanelStore = ({
     toggle: () => (state.open ? set({ open: false, userSelectedArea: null, view: 'chat' }) : set({ open: true })),
     setScope: (scope) => {
       if (sameScope(state.scope, scope)) return
-      // another user or survey: the current area shows that survey's open conversation
-      set({ scope, conversationId: openIdOf(scope, state.area) })
+      // another user or survey: the current area shows that survey's open conversation; a request made for the
+      // previous survey is never sent
+      set({ scope, conversationId: openIdOf(scope, state.area), pendingRequest: null })
     },
     setArea: (area, { byUser = false } = {}) =>
       set({
@@ -120,6 +129,8 @@ export const createAssistantPanelStore = ({
         conversationId: area === state.area ? state.conversationId : openIdOf(state.scope, area),
         // a draft made for another area is dropped
         ...(area === state.draftArea ? {} : { draft: null, draftArea: null }),
+        // a suggestion request belongs to its area
+        ...(area === state.area ? {} : { pendingRequest: null }),
         ...(byUser ? { userSelectedArea: area } : {}),
       }),
     setConversationId: (conversationId) => {
@@ -134,6 +145,24 @@ export const createAssistantPanelStore = ({
       remember(null)
     },
     clearDraft: () => set({ draft: null, draftArea: null }),
+    startWithPrompt: (request) => {
+      set({
+        open: true,
+        area: request.area,
+        userSelectedArea: request.area,
+        conversationId: null,
+        view: 'chat',
+        pendingRequest: request,
+      })
+      // a new conversation: the previous one stays in History
+      remember(null)
+    },
+    claimPendingRequest: (requestId) => {
+      const request = state.pendingRequest
+      if (request?.requestId !== requestId) return null
+      set({ pendingRequest: null })
+      return request
+    },
     reset: () => set(initialAssistantPanelState),
   }
 }

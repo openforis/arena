@@ -6,6 +6,7 @@ import type { AiDataClass } from '@common/ai/features'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { AiToolArea } from '@webapp/ai/tools/types'
+import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 export type ConversationTextPart = { type: 'text'; text: string }
 
@@ -67,6 +68,8 @@ export type Conversation = {
   changeSets: Record<string, ChangeSetCardState>
   // analysis area: proposed queries by id (q1, q2, …)
   queries?: Record<string, AnalysisQueryEntry>
+  // started by a suggestion's Do it: the work lists of its tools stay within these targets (follow-ups included)
+  suggestionScope?: SuggestionScope
   createdAt: string
   updatedAt: string
 }

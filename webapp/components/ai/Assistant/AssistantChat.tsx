@@ -65,7 +65,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
     const text = input.trim()
     if (!text || busy || applying) return
     setInput('')
-    api.send(text)
+    void api.send(text)
   }
 
   /**
