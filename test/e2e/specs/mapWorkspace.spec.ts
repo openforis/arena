@@ -249,10 +249,12 @@ test.describe('Map workspace', () => {
     await page.keyboard.press('Escape')
   })
 
-  test('the Imagery menu is hidden when the base map has no periods', async ({ page, sampleSurvey: _ }) => {
+  test('the Imagery menu offers the Sentinel-2 search without Planet periods', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
-    await expect(page.getByTestId(ids.menuButton('addData'))).toBeVisible()
-    await expect(page.getByTestId(ids.menuButton('imagery'))).toHaveCount(0)
+    await page.getByTestId(ids.menuButton('imagery')).click()
+    await expect(page.getByTestId(ids.menuItem('searchScenes'))).toBeVisible()
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('menu')).toHaveCount(0)
   })
 
   test('search goes to coordinates and marks them', async ({ page, sampleSurvey: _ }) => {
