@@ -51,6 +51,17 @@ const mapPoint = async (page: Page, dx: number, dy: number): Promise<{ x: number
 }
 
 /**
+ * Returns the bounding box of a visible element.
+ * @param {Locator} locator - The element.
+ * @returns {Promise<{x: number, y: number, width: number, height: number}>} The box in page coordinates.
+ */
+const boxOf = async (locator: Locator): Promise<{ x: number; y: number; width: number; height: number }> => {
+  const box = await locator.boundingBox()
+  if (!box) throw new Error('The element is not visible')
+  return box
+}
+
+/**
  * Returns the permanent label of the finished measurement on the map.
  * @param {Page} page - The page.
  * @returns {Locator} The Leaflet tooltip.
@@ -293,7 +304,7 @@ test.describe('Map workspace', () => {
     await page.mouse.dblclick(point3.x, point3.y)
 
     await expect(total).toHaveText(AREA_TOTAL)
-    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d.*(m|km|ha)/)
+    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d.*(m|km)/)
     await expect(measureLabel(page)).toHaveText(AREA_TOTAL)
 
     const unit = page.getByTestId(ids.measureUnit)
@@ -372,12 +383,10 @@ test.describe('Map workspace', () => {
         return settled
       })
       .toBe(true)
-    const markerBox = await marker.boundingBox()
-    if (!markerBox) throw new Error('The marker is not visible')
+    const markerBox = await boxOf(marker)
 
     await panel.getByTestId(ids.quickButton('measureDistance')).click()
-    const mapBox = await panel.locator('.leaflet-container').boundingBox()
-    if (!mapBox) throw new Error('The map is not visible')
+    const mapBox = await boxOf(panel.locator('.leaflet-container'))
     const at = (dx: number, dy: number): { x: number; y: number } => ({
       x: mapBox.x + mapBox.width / 2 + dx,
       y: mapBox.y + mapBox.height / 2 + dy,
@@ -390,7 +399,9 @@ test.describe('Map workspace', () => {
     await page.mouse.dblclick(markerBox.x + markerBox.width / 2, markerBox.y + markerBox.height / 2)
 
     await expect(panel.getByTestId(ids.measureTotal)).toHaveText(DISTANCE_TOTAL)
+    // the permanent label proves the double-click finished the measurement
+    await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
     // the double-click did not move the record location
-    expect(await marker.boundingBox()).toEqual(markerBox)
+    await expect.poll(() => marker.boundingBox()).toEqual(markerBox)
   })
 })
