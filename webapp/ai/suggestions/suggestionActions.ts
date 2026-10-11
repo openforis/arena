@@ -126,7 +126,8 @@ export const takeRequestForScope = ({
  * @param {SuggestionSend} params.send - The conversation hook's send.
  * @param {SuggestionStore} [params.store] - Store.
  * @param {SuggestionDefinitions} [params.definitions] - Definitions.
- * @returns {Promise<string|null>} The new conversation id; null when nothing was sent (nothing changes).
+ * @returns {Promise<string|null>} The new conversation id; null when nothing was sent (nothing changes). A rejected
+ * send propagates and marks nothing.
  */
 export const acceptSuggestion = async ({
   request,
@@ -145,7 +146,7 @@ export const acceptSuggestion = async ({
   const surveyId = getRequestBucketSurveyId(request)
   const definition = definitions[scope.kind]
   if (definition?.acceptMode === 'remove') store.remove({ userUuid, surveyId, id })
-  else store.startProgress({ userUuid, surveyId, id, conversationId })
+  else store.startProgress({ userUuid, surveyId, id, conversationId, targetKeys: scope.targetKeys })
   definition?.onHandled?.({ userUuid, targetKeys: scope.targetKeys, store })
   return conversationId
 }
@@ -170,7 +171,7 @@ export const dismissSuggestion = ({
   store?: SuggestionStore
   definitions?: SuggestionDefinitions
 }): void => {
-  store.dismiss({ userUuid, surveyId: suggestion.surveyId, id: suggestion.id })
+  store.dismiss({ userUuid, surveyId: getRequestBucketSurveyId(suggestion), id: suggestion.id })
   const targetKeys = suggestion.targets.map((target) => target.key)
   definitions[suggestion.kind]?.onHandled?.({ userUuid, targetKeys, store })
 }
