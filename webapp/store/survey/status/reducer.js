@@ -10,9 +10,10 @@ const actionHandlers = {
   // Reset state
   [SystemActionTypes.SYSTEM_RESET]: () => ({}),
 
-  [SurveyActions.surveyCreate]: () => ({}),
-  [SurveyActions.surveyUpdate]: () => ({}),
-  [SurveyActions.surveyDelete]: () => ({}),
+  // the load count stays: the next load is a new suggestion generation
+  [SurveyActions.surveyCreate]: SurveyStatusState.resetDefsFetched,
+  [SurveyActions.surveyUpdate]: SurveyStatusState.resetDefsFetched,
+  [SurveyActions.surveyDelete]: SurveyStatusState.resetDefsFetched,
 
   [SurveyActions.surveyDefsReset]: SurveyStatusState.resetDefsFetched,
 
