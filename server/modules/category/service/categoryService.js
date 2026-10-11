@@ -277,4 +277,4 @@ export const {
 } = CategoryManager
 
 // assistant suggestion 6
-export const { countItemsMissingLabels, fetchItemsMissingLabels } = CategoryItemLabelsManager
+export const { countItemsMissingLabels, fetchItemsMissingLabels, updateItemsLabels } = CategoryItemLabelsManager

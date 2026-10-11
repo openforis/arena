@@ -472,6 +472,18 @@ export const init = (app) => {
 
   // ==== UPDATE
 
+  // assistant suggestion 6: compare-and-set of category item labels, one language per item
+  app.put('/survey/:surveyId/categories/items/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const { items } = Request.getBody(req) ?? {}
+      res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
+    } catch (error) {
+      Response.sendErr(res, error)
+    }
+  })
+
   app.put(
     '/survey/:surveyId/categories/:categoryUuid',
     AuthMiddleware.requireSurveyEditPermission,
