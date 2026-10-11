@@ -96,7 +96,7 @@ export const createCategoryItemTranslationsDetector = ({
   fetchCounts = fetchMissingLabelsCounts,
   throttleMs = CATEGORY_COUNTS_THROTTLE_MS,
 }: { fetchCounts?: FetchMissingLabelsCounts; throttleMs?: number } = {}): EventDetector => {
-  const lastFetchAt = new Map<string, number>()
+  const lastFetchAt = new Map<string, { time: number; request: number }>()
   // only the latest request may land (an older answer would overwrite a newer one)
   let latestRequest = 0
 
@@ -110,7 +110,7 @@ export const createCategoryItemTranslationsDetector = ({
   const isThrottled = (event: SuggestionEvent, key: string, time: number): boolean => {
     if (!THROTTLED_EVENTS.includes(event.type)) return false
     const last = lastFetchAt.get(key)
-    return last !== undefined && time - last < throttleMs
+    return last !== undefined && time - last.time < throttleMs
   }
 
   return {
@@ -126,18 +126,31 @@ export const createCategoryItemTranslationsDetector = ({
       const key = getThrottleKey(ctx, surveyId, survey)
       const time = ctx.now().getTime()
       if (isThrottled(event, key, time)) return
-      lastFetchAt.set(key, time)
       latestRequest += 1
       const request = latestRequest
+      lastFetchAt.set(key, { time, request })
+      /**
+       * Frees the throttle of this request (never a newer request's entry), as nothing landed.
+       * @returns {void}
+       */
+      const release = (): void => {
+        if (lastFetchAt.get(key)?.request === request) lastFetchAt.delete(key)
+      }
+      // a cancelled request (defs reload, survey switch, setting off) must not block the next run
+      generation.signal.addEventListener('abort', release, { once: true })
       try {
         const counts = await fetchCounts({ surveyId, signal: generation.signal })
         // survey switch, defs reload or logout meanwhile, or a newer request: nothing lands
-        if (generation.signal.aborted || request !== latestRequest) return
+        // a failed newer request drops this older answer by design; the next trigger recovers
+        if (generation.signal.aborted || request !== latestRequest) {
+          release()
+          return
+        }
         const suggestions = detectCategoryItemTranslations(counts, survey, { surveyId, now: ctx.now() })
         ctx.store.setKind({ userUuid: ctx.userUuid, surveyId, kind: CATEGORY_ITEM_TRANSLATIONS_KIND, suggestions })
       } catch {
         // offline or aborted: the next trigger tries again
-        lastFetchAt.delete(key)
+        release()
       }
     },
   }
