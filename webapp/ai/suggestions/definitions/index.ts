@@ -3,6 +3,7 @@
  */
 import type { SuggestionKind } from '../types'
 import { attributeWithoutRefDefinition } from './attributeWithoutRef'
+import { categoryItemTranslationsDefinition } from './categoryItemTranslations'
 import { entityWithoutKeyDefinition } from './entityWithoutKey'
 import { missingTranslationsDefinition } from './missingTranslations'
 import { moduleIntroDefinition } from './moduleIntro'
@@ -19,4 +20,5 @@ export const SUGGESTION_DEFINITIONS: Partial<Record<SuggestionKind, SuggestionDe
   entityWithoutKey: entityWithoutKeyDefinition,
   attributeWithoutRef: attributeWithoutRefDefinition,
   publishErrors: publishErrorsDefinition,
+  categoryItemTranslations: categoryItemTranslationsDefinition,
 }

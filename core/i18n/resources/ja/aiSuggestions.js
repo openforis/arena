@@ -33,4 +33,8 @@ export default {
     card_one: '{{count}}件の項目にエラーがあります。公開は失敗します。修正しますか？',
     card_other: '{{count}}件の項目にエラーがあります。公開は失敗します。修正しますか？',
   },
+  categoryItemTranslations: {
+    card_one: '{{language}}のカテゴリのラベルが{{count}}件不足しています。翻訳しますか？',
+    card_other: '{{language}}のカテゴリのラベルが{{count}}件不足しています。翻訳しますか？',
+  },
 }

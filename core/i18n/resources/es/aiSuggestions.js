@@ -34,4 +34,8 @@ export default {
     card_one: '{{count}} entrada tiene errores. La publicación fallará. ¿Corregirla?',
     card_other: '{{count}} entradas tienen errores. La publicación fallará. ¿Corregirlas?',
   },
+  categoryItemTranslations: {
+    card_one: 'Falta {{count}} etiqueta de categoría en {{language}}. ¿Traducirla?',
+    card_other: 'Faltan {{count}} etiquetas de categorías en {{language}}. ¿Traducirlas?',
+  },
 }

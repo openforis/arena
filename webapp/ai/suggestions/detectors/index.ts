@@ -2,6 +2,7 @@
  * Detector registries: each suggestion adds one import and one element to the arrays it uses.
  */
 import { attributeWithoutRefDetector } from './attributeWithoutRef'
+import { categoryItemTranslationsResolver } from './categoryItemTranslations'
 import { entityWithoutKeyDetector, entityWithoutKeyResolver } from './entityWithoutKey'
 import { missingTranslationsDetector } from './missingTranslations'
 import { newEntriesDescriptionsDetector, newEntriesDescriptionsResolver } from './newEntriesDescriptions'
@@ -24,4 +25,5 @@ export const TARGET_RESOLVERS: TargetResolver[] = [
   newEntriesDescriptionsResolver,
   entityWithoutKeyResolver,
   publishErrorsResolver,
+  categoryItemTranslationsResolver,
 ]
