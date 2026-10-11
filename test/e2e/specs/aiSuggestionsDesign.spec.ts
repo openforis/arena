@@ -71,18 +71,27 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
 }
 
 /**
- * Tells whether the stored pending suggestions of a user (any survey) include a suggestion.
+ * Tells whether a suggestion left every part of the stored state of a user: pending, in progress and dismissed targets.
+ * Dismissed targets are removed only by a detector run that finds no gap (Do it and settle put them there).
  * @param {Page} page - The page.
  * @param {string} userUuid - User.
  * @param {string} id - Suggestion id.
- * @returns {Promise<boolean>} True when it is pending.
+ * @returns {Promise<boolean>} True when the state exists and holds nothing of the suggestion.
  */
-const hasStoredSuggestion = async (page: Page, userUuid: string, id: string): Promise<boolean> =>
+const isSuggestionGone = async (page: Page, userUuid: string, id: string): Promise<boolean> =>
   page.evaluate(
     ([key, suggestionId]) => {
       const state = JSON.parse(window.localStorage.getItem(key) ?? 'null')
-      const buckets: { id: string }[][] = Object.values(state?.pending ?? {})
-      return buckets.some((bucket) => bucket.some((suggestion) => suggestion.id === suggestionId))
+      // no stored state yet: not gone, keep waiting
+      if (!state) return false
+      const pending: { id: string }[][] = Object.values(state.pending ?? {})
+      const dismissed: Record<string, Record<string, unknown>>[] = Object.values(state.dismissed ?? {})
+      const inProgress: Record<string, unknown>[] = Object.values(state.inProgress ?? {})
+      return (
+        !pending.some((bucket) => bucket.some((suggestion) => suggestion.id === suggestionId)) &&
+        !dismissed.some((bucket) => Object.keys(bucket[suggestionId] ?? {}).length > 0) &&
+        !inProgress.some((bucket) => suggestionId in bucket)
+      )
     },
     [`arena.ai.suggestions.${userUuid}`, id]
   )
@@ -134,9 +143,9 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
 
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
-    // the state detector runs 1 s after the survey changes and finds nothing left to translate: it removes the
-    // suggestion from the store (the card was already hidden)
-    await expect.poll(async () => await hasStoredSuggestion(page, userUuid, 'missingTranslations:fr')).toBe(false)
+    // settle moves the applied targets to the dismissed ones; they leave only when the state detector runs (1 s after
+    // the survey changes) and finds nothing left to translate
+    await expect.poll(async () => await isSuggestionGone(page, userUuid, 'missingTranslations:fr')).toBe(true)
   })
 
   test('a dismissed card stays gone after a reload and returns for a new text', async ({ page, sampleSurvey: _ }) => {
