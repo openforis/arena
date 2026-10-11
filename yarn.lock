@@ -15028,6 +15028,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"modern-screenshot@npm:4.7.0":
+  version: 4.7.0
+  resolution: "modern-screenshot@npm:4.7.0"
+  checksum: 10c0/9c5fbe4f4c73d3dcf0ba7fb76c1671ad148fdedffc84700e0b8ca1c1640a6ab1930718ae1424b0a6517b98d8f18c898ea0e62ee0ca57a25bfce7b914df721a63
+  languageName: node
+  linkType: hard
+
 "mongodb-uri@npm:>= 0.9.7":
   version: 0.9.7
   resolution: "mongodb-uri@npm:0.9.7"
@@ -15743,6 +15750,7 @@ __metadata:
     marked: "npm:^18.1.2"
     mgrs: "npm:2.2.0"
     mini-css-extract-plugin: "npm:^2.10.2"
+    modern-screenshot: "npm:4.7.0"
     morgan: "npm:^1.12.1"
     mui-color-input: "npm:^9.0.0"
     ncp: "npm:^2.0.0"

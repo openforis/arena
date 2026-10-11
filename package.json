@@ -186,6 +186,7 @@
     "maplibre-gl": "6.16.0",
     "marked": "^18.1.2",
     "mgrs": "2.2.0",
+    "modern-screenshot": "4.7.0",
     "morgan": "^1.12.1",
     "mui-color-input": "^9.0.0",
     "ncp": "^2.0.0",
