@@ -192,7 +192,9 @@ export const runAssistantTurn = async ({
     suggestionScope: conversation.suggestionScope ?? null,
     getPendingChangeSets: () => getPendingChangeSets(state.get()),
     // kept across the turns of the conversation, so "continue" can propose items listed in an earlier turn
-    categoryItemRefs: ctx.categoryItemRefs ?? categoryItemRefsRegistry.forConversation(conversation.id),
+    categoryItemRefs:
+      ctx.categoryItemRefs ??
+      (area === 'design' ? categoryItemRefsRegistry.forConversation(conversation.id) : undefined),
     onChangeSet: (changeSet) => {
       state.addChangeSet(changeSet)
       ctx.onChangeSet(changeSet)

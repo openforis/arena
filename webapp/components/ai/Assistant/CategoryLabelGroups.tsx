@@ -8,6 +8,7 @@ import type { CategoryLabelGroup, CategoryLabelRow } from './categoryLabelCardMo
 /**
  * One label row: checkbox, item, language, status and the change.
  * @param {object} props - Props.
+ * @param {string} props.categoryUuid - Category of the row.
  * @param {CategoryLabelRow} props.row - Row.
  * @param {boolean} props.pending - Row can still be applied.
  * @param {boolean} props.selected - Row is selected.
@@ -15,11 +16,13 @@ import type { CategoryLabelGroup, CategoryLabelRow } from './categoryLabelCardMo
  * @returns {React.ReactElement} The row.
  */
 const CategoryLabelRowView = ({
+  categoryUuid,
   row,
   pending,
   selected,
   onToggle,
 }: {
+  categoryUuid: string
   row: CategoryLabelRow
   pending: boolean
   selected: boolean
@@ -28,9 +31,12 @@ const CategoryLabelRowView = ({
   const t = useI18nT({ unescapeHtml: true })
   const { result } = row
   const title = t('aiAssistant.card.categoryItem', { ref: row.ref, level: row.levelName })
-  const statusTitle = row.currentText ? `${result?.message}: ${row.currentText}` : result?.message
+  const statusTitle = [result?.message, row.currentText].filter(Boolean).join(': ') || undefined
   return (
-    <li className="ai-assistant-card__row" data-testid={TestId.aiAssistant.categoryLabelRow(row.ref, row.lang)}>
+    <li
+      className="ai-assistant-card__row"
+      data-testid={TestId.aiAssistant.categoryLabelRow(categoryUuid, row.ref, row.lang)}
+    >
       {pending && (
         <input aria-label={`${title} (${row.lang})`} checked={selected} onChange={onToggle} type="checkbox" />
       )}
@@ -91,6 +97,7 @@ export const CategoryLabelGroups = ({
           <ul className="ai-assistant-card__rows">
             {group.rows.map((row) => (
               <CategoryLabelRowView
+                categoryUuid={group.categoryUuid}
                 key={row.id}
                 onToggle={() => onToggle(row.id)}
                 pending={pendingIds.includes(row.id)}

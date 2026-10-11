@@ -148,7 +148,15 @@ export const createSuggestionHostController = ({
   let queue: QueuedEvent[] = []
   // one derived controller per generation and area: aborted when the generation ends, the setting goes off or the area
   // leaves the available ones
-  const areaControllers = new Map<string, { generationId: number; area: AssistantArea; controller: AbortController }>()
+  const areaControllers = new Map<
+    string,
+    {
+      generationId: number
+      area: AssistantArea
+      controller: AbortController
+      detach: () => void
+    }
+  >()
 
   /**
    * Aborts and discards the derived controllers that no longer apply.
@@ -158,6 +166,7 @@ export const createSuggestionHostController = ({
   const pruneAreaControllers = (keep: (entry: { generationId: number; area: AssistantArea }) => boolean): void => {
     for (const [key, entry] of areaControllers) {
       if (keep(entry)) continue
+      entry.detach()
       entry.controller.abort()
       areaControllers.delete(key)
     }
@@ -177,9 +186,12 @@ export const createSuggestionHostController = ({
     let entry = areaControllers.get(key)
     if (!entry) {
       const controller = new AbortController()
+      const onAbort = () => controller.abort()
       if (generation.signal.aborted) controller.abort()
-      else generation.signal.addEventListener('abort', () => controller.abort(), { once: true })
-      entry = { generationId: generation.id, area, controller }
+      else generation.signal.addEventListener('abort', onAbort, { once: true })
+      // removed when the entry is pruned, so listeners do not pile up on a long generation signal
+      const detach = () => generation.signal.removeEventListener('abort', onAbort)
+      entry = { generationId: generation.id, area, controller, detach }
       areaControllers.set(key, entry)
     }
     return { ...ctx, generation: { ...generation, signal: entry.controller.signal } }

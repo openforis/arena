@@ -243,9 +243,10 @@ export const useAssistantConversation = ({
           },
         })
         if (isCurrent()) show(final)
-        await persist(final)
-        // a Do it conversation: its targets settle once no card is pending, or show again when it made no card
+        // a Do it conversation: its targets settle once no card is pending, or show again when it made no card;
+        // reported before the save, so a failed save does not skip it
         reportSuggestionSettle({ conversation: final, running: false })
+        await persist(final)
       } finally {
         assistantTurnRegistry.unregister(controller)
         if (controllerRef.current === controller) {

@@ -158,7 +158,12 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
     const pending = pendingItemUuids.has(item.uuid)
     const listed = pending ? null : toListedItem(item, lang, languages)
     const itemSize = listed ? JSON.stringify(listed).length + 1 : 0
-    if (listed && (state.items.length >= limit || state.size + itemSize > RESULT_MAX_JSON_CHARS)) {
+    // a page is cut only when it has items, so an oversized item still makes progress
+    if (
+      listed &&
+      state.items.length > 0 &&
+      (state.items.length >= limit || state.size + itemSize > RESULT_MAX_JSON_CHARS)
+    ) {
       state.full = true
       return
     }
