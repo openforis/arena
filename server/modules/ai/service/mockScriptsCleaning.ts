@@ -42,6 +42,18 @@ export const formatMockProposalAnswer = (lastToolOutput: unknown): string => {
   return `MOCK: I proposed ${output.proposed} edit(s). Review them in the card, then apply.`
 }
 
+/**
+ * Builds the scripted answer from the output of validation_summarize (suggestion 7 e2e).
+ * @param {unknown} lastToolOutput - Output of the last tool call.
+ * @returns {string} The answer.
+ */
+export const formatMockValidationSummaryAnswer = (lastToolOutput: unknown): string => {
+  const output = lastToolOutput as { total?: unknown; groups?: { path?: string }[] } | null
+  if (!output || typeof output.total !== 'number') return 'MOCK: I could not summarise the validation report.'
+  const mostFrequent = output.groups?.[0]?.path ?? '-'
+  return `MOCK: ${output.total} validation messages; the most frequent are in ${mostFrequent}.`
+}
+
 export const assistantCleaningMockScripts: MockScript[] = [
   {
     promptMarker: assistantMarkers.cleaning,
@@ -49,6 +61,15 @@ export const assistantCleaningMockScripts: MockScript[] = [
     steps: [
       { toolCall: { toolName: 'records_proposeEdits', input: proposeRowFixInput } },
       { text: ({ lastToolOutput }) => formatMockProposalAnswer(lastToolOutput) },
+    ],
+  },
+  {
+    // the prompt of suggestion 7 (webapp/ai/suggestions/prompts/validationErrors.ts, pinned by test 241)
+    promptMarker: assistantMarkers.cleaning,
+    pattern: /^Summarise the validation errors and warnings/i,
+    steps: [
+      { toolCall: { toolName: 'validation_summarize', input: {} } },
+      { text: ({ lastToolOutput }) => formatMockValidationSummaryAnswer(lastToolOutput) },
     ],
   },
 ]

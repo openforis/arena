@@ -38,4 +38,7 @@ export default {
     card_one: 'Falta {{count}} etiqueta de categoría en {{language}}. ¿Traducirla?',
     card_other: 'Faltan {{count}} etiquetas de categorías en {{language}}. ¿Traducirlas?',
   },
+  validationErrors: {
+    card: '{{count}} mensajes de validación en este ciclo. ¿Resumir los patrones?',
+  },
 }

@@ -10,6 +10,7 @@ import { moduleIntroDefinition } from './moduleIntro'
 import { newEntriesDescriptionsDefinition } from './newEntriesDescriptions'
 import { publishErrorsDefinition } from './publishErrors'
 import type { SuggestionDefinition } from './types'
+import { validationErrorsDefinition } from './validationErrors'
 
 export type { SuggestionDefinition, SuggestionDescribeContext } from './types'
 
@@ -21,4 +22,5 @@ export const SUGGESTION_DEFINITIONS: Partial<Record<SuggestionKind, SuggestionDe
   attributeWithoutRef: attributeWithoutRefDefinition,
   publishErrors: publishErrorsDefinition,
   categoryItemTranslations: categoryItemTranslationsDefinition,
+  validationErrors: validationErrorsDefinition,
 }

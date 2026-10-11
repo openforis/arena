@@ -39,4 +39,7 @@ export default {
     card_one: '{{count}} category label is missing in {{language}}. Translate it?',
     card_other: '{{count}} category labels are missing in {{language}}. Translate them?',
   },
+  validationErrors: {
+    card: '{{count}} validation messages in this cycle. Summarise the patterns?',
+  },
 }

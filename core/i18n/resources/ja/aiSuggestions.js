@@ -37,4 +37,7 @@ export default {
     card_one: '{{language}}のカテゴリのラベルが{{count}}件不足しています。翻訳しますか？',
     card_other: '{{language}}のカテゴリのラベルが{{count}}件不足しています。翻訳しますか？',
   },
+  validationErrors: {
+    card: 'このサイクルに検証メッセージが{{count}}件あります。傾向を要約しますか？',
+  },
 }

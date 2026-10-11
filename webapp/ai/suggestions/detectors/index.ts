@@ -1,6 +1,8 @@
 /**
  * Detector registries: each suggestion adds one import and one element to the arrays it uses.
  */
+import { axiosCleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
+
 import { attributeWithoutRefDetector } from './attributeWithoutRef'
 import { categoryItemTranslationsDetector, categoryItemTranslationsResolver } from './categoryItemTranslations'
 import { entityWithoutKeyDetector, entityWithoutKeyResolver } from './entityWithoutKey'
@@ -9,6 +11,7 @@ import { newEntriesDescriptionsDetector, newEntriesDescriptionsResolver } from '
 import { moduleIntroDetector } from './moduleIntro'
 import { publishErrorsDetector, publishErrorsResolver } from './publishErrors'
 import type { EventDetector, StateDetector, TargetResolver } from './types'
+import { createValidationErrorsDetector } from './validationErrors'
 
 export type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, TargetResolver } from './types'
 
@@ -20,6 +23,7 @@ export const EVENT_DETECTORS: EventDetector[] = [
   entityWithoutKeyDetector,
   publishErrorsDetector,
   categoryItemTranslationsDetector,
+  createValidationErrorsDetector({ countRows: axiosCleaningApi.countValidationReportRows }),
 ]
 
 export const TARGET_RESOLVERS: TargetResolver[] = [
