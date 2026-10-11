@@ -1,3 +1,5 @@
+import './AssistantButton.scss'
+
 import React, { useEffect } from 'react'
 
 import { Button } from '@webapp/components/buttons'
@@ -7,6 +9,8 @@ import { TestId } from '@webapp/utils/testId'
 import { isAssistantShown } from './assistantAreas'
 import { toggleAssistantPanel } from './assistantPanelActions'
 import { useAssistantAreas } from './useAssistantAreas'
+import { getAssistantButtonLabel } from './suggestions/suggestionsModel'
+import { useVisibleSuggestions } from './suggestions/useVisibleSuggestions'
 import { useAssistantPanel } from './useAssistantPanel'
 
 /**
@@ -17,13 +21,15 @@ import { useAssistantPanel } from './useAssistantPanel'
 const isToggleShortcut = (event: KeyboardEvent): boolean => (event.ctrlKey || event.metaKey) && event.key === '.'
 
 /**
- * Header button of the assistant (Ctrl/Cmd + . toggles the panel). Hidden when every area is hidden.
+ * Header button of the assistant (Ctrl/Cmd + . toggles the panel), with a dot while suggestions wait. Hidden when every
+ * area is hidden.
  * @returns {React.ReactElement|null} The button.
  */
 export const AssistantButton = () => {
   const t = useI18nT()
   const { statuses } = useAssistantAreas()
   const { open } = useAssistantPanel()
+  const { all: suggestions } = useVisibleSuggestions()
   const shown = isAssistantShown(statuses)
 
   useEffect(() => {
@@ -45,15 +51,20 @@ export const AssistantButton = () => {
   if (!shown) return null
 
   return (
-    <Button
-      active={open}
-      aria-expanded={open}
-      aria-label={t('aiAssistant.open')}
-      iconClassName="icon-magic-wand icon-16px"
-      onClick={toggleAssistantPanel}
-      testId={TestId.aiAssistant.openBtn}
-      title="aiAssistant.open"
-      variant="text"
-    />
+    <span className="ai-assistant-btn">
+      <Button
+        active={open}
+        aria-expanded={open}
+        aria-label={getAssistantButtonLabel({ count: suggestions.length, t })}
+        iconClassName="icon-magic-wand icon-16px"
+        onClick={toggleAssistantPanel}
+        testId={TestId.aiAssistant.openBtn}
+        title="aiAssistant.open"
+        variant="text"
+      />
+      {suggestions.length > 0 && (
+        <span aria-hidden="true" className="ai-assistant-btn__dot" data-testid={TestId.aiAssistant.suggestionsDot} />
+      )}
+    </span>
   )
 }

@@ -9,6 +9,7 @@ import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
+import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
 import { RecordDataSharedNote } from './analysis/RecordDataSharedNote'
 import { AssistantChat } from './AssistantChat'
@@ -18,6 +19,8 @@ import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
 import { useAssistantConversation, type AssistantConversationApi } from './useAssistantConversation'
 import { useAssistantPanel } from './useAssistantPanel'
+import type { SuggestionsByArea } from './suggestions/suggestionsModel'
+import { useVisibleSuggestions } from './suggestions/useVisibleSuggestions'
 
 // the Record type makes a missing area a type error
 const areaTabLabelKeys: Record<AssistantArea, string> = {
@@ -28,21 +31,24 @@ const areaTabLabelKeys: Record<AssistantArea, string> = {
 }
 
 /**
- * Area tabs (disabled while an answer runs).
+ * Area tabs (disabled while an answer runs); a dot marks the tabs with suggestions.
  * @param {object} props - Props.
  * @param {AssistantAreaStatus[]} props.statuses - Area statuses.
  * @param {AssistantArea} props.area - Current area.
  * @param {boolean} props.busy - An answer is running.
+ * @param {SuggestionsByArea} props.byArea - Visible suggestions of each area.
  * @returns {React.ReactElement} The tabs.
  */
 const AssistantTabs = ({
   statuses,
   area,
   busy,
+  byArea,
 }: {
   statuses: AssistantAreaStatus[]
   area: AssistantArea
   busy: boolean
+  byArea: SuggestionsByArea
 }) => {
   const t = useI18nT()
   return (
@@ -61,6 +67,14 @@ const AssistantTabs = ({
             type="button"
           >
             {t(areaTabLabelKeys[tabArea])}
+            {(byArea[tabArea]?.length ?? 0) > 0 && (
+              // the button's label reads the count; the tab keeps its name
+              <span
+                aria-hidden="true"
+                className="ai-assistant-panel__tab-dot"
+                data-testid={TestId.aiAssistant.tabDot}
+              />
+            )}
           </button>
         ))}
     </div>
@@ -110,6 +124,7 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => (
  * @param {AssistantPanelView} props.view - Chat or history.
  * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
+ * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area.
  * @returns {React.ReactElement} The body.
  */
 const AssistantBody = ({
@@ -117,11 +132,13 @@ const AssistantBody = ({
   view,
   area,
   api,
+  suggestions,
 }: {
   status: AssistantAreaStatus | undefined
   view: AssistantPanelView
   area: AssistantArea
   api: AssistantConversationApi
+  suggestions: AssistantSuggestion[]
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   if (status?.engineAvailability && status.status !== 'available') {
@@ -142,7 +159,7 @@ const AssistantBody = ({
     )
   }
   if (view === 'history') return <AssistantHistory api={api} />
-  return <AssistantChat api={api} area={area} />
+  return <AssistantChat api={api} area={area} suggestions={suggestions} />
 }
 
 /**
@@ -156,6 +173,7 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
   const { open, area: selectedArea, conversationId, view } = useAssistantPanel()
   const area: AssistantArea = selectedArea ?? 'help'
   const api = useAssistantConversation({ area, conversationId })
+  const { byArea } = useVisibleSuggestions()
   const dialogRef = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -196,8 +214,14 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
         <AssistantMenu api={api} />
         <ButtonIconClose label="aiAssistant.close" onClick={closeAssistantPanel} testId={TestId.aiAssistant.closeBtn} />
       </div>
-      <AssistantTabs area={area} busy={api.busy} statuses={statuses} />
-      <AssistantBody api={api} area={area} status={statuses.find((item) => item.area === area)} view={view} />
+      <AssistantTabs area={area} busy={api.busy} byArea={byArea} statuses={statuses} />
+      <AssistantBody
+        api={api}
+        area={area}
+        status={statuses.find((item) => item.area === area)}
+        suggestions={byArea[area] ?? []}
+        view={view}
+      />
     </dialog>
   )
 }
