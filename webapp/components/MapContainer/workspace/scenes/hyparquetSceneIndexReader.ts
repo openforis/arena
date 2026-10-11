@@ -42,6 +42,19 @@ export const createHyparquetSceneIndexReader = (
   const rowGroups = new Map<string, Promise<SceneIndexRow[]>>()
 
   /**
+   * Drops a part and all its cached row groups, so a retry never pairs stale rows with a fresh footer.
+   *
+   * @param {string} url - Part URL.
+   * @returns {void}
+   */
+  const evictPart = (url: string): void => {
+    parts.delete(url)
+    for (const key of [...rowGroups.keys()]) {
+      if (key.startsWith(`${url}#`)) rowGroups.delete(key)
+    }
+  }
+
+  /**
    * Returns the cached opened part, opening it on first use.
    *
    * @param {string} url - Part URL.
@@ -52,7 +65,7 @@ export const createHyparquetSceneIndexReader = (
     if (cached) return cached
     const part = openPart(url, fetchImpl)
     parts.set(url, part)
-    part.catch(() => parts.delete(url))
+    part.catch(() => evictPart(url))
     return part
   }
 
@@ -93,17 +106,28 @@ export const createHyparquetSceneIndexReader = (
   }
 
   return {
+    /**
+     * Reads the row-group statistics of an index part.
+     *
+     * @param {string} url - Part URL.
+     * @returns {Promise<RowGroupInfo[]|null>} Row groups, or null when the part does not exist.
+     */
     readRowGroups: async (url) => (await getPart(url))?.groups ?? null,
+    /**
+     * Reads the requested columns of one row group (cached).
+     *
+     * @param {string} url - Part URL.
+     * @param {RowGroupInfo} group - Row group.
+     * @param {string[]} columns - Columns to read.
+     * @returns {Promise<SceneIndexRow[]>} Rows.
+     */
     readRows: (url, group, columns) => {
       const key = `${url}#${group.rowStart}#${columns.join(',')}`
       const cached = rowGroups.get(key)
       if (cached) return cached
       const rows = loadRows(url, group, columns)
       rememberRows(key, rows)
-      rows.catch(() => {
-        rowGroups.delete(key)
-        parts.delete(url)
-      })
+      rows.catch(() => evictPart(url))
       return rows
     },
   }
