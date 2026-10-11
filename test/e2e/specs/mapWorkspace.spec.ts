@@ -293,7 +293,7 @@ test.describe('Map workspace', () => {
     await page.mouse.dblclick(point3.x, point3.y)
 
     await expect(total).toHaveText(AREA_TOTAL)
-    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d/)
+    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d.*(m|km|ha)/)
     await expect(measureLabel(page)).toHaveText(AREA_TOTAL)
 
     const unit = page.getByTestId(ids.measureUnit)
@@ -307,6 +307,10 @@ test.describe('Map workspace', () => {
     await expect(bar).toHaveCount(0)
     await expect(measureArea).toHaveAttribute('aria-pressed', 'false')
     await expect(measureLabel(page)).toHaveCount(0)
+
+    // the focus went back to the map: the shortcut starts the tool again
+    await page.keyboard.press('m')
+    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'true')
   })
 
   test('measures a distance, switches to area and ends with Done', async ({ page, sampleSurvey: _ }) => {
@@ -319,10 +323,16 @@ test.describe('Map workspace', () => {
     const point2 = await mapPoint(page, -40, 120)
     await page.mouse.click(point1.x, point1.y)
     await page.mouse.click(point2.x, point2.y)
-    // the clicks gave the map the focus: Enter finishes the line
-    await page.keyboard.press('Enter')
-
     const total = page.getByTestId(ids.measureTotal)
+    // Enter typed in the search box does not finish the line
+    await expect(total).toHaveText(DISTANCE_TOTAL)
+    await page.getByTestId(ids.searchInput).focus()
+    await page.keyboard.press('Enter')
+    await expect(measureLabel(page)).toHaveCount(0)
+
+    // the map has the focus again: Enter finishes the line
+    await page.locator('.leaflet-container').focus()
+    await page.keyboard.press('Enter')
     await expect(total).toHaveText(DISTANCE_TOTAL)
     await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
 
@@ -341,5 +351,46 @@ test.describe('Map workspace', () => {
     await expect(measureDistance).toHaveAttribute('aria-pressed', 'true')
     await page.keyboard.press('Escape')
     await expect(measureDistance).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  test('finishing a measurement by double-click in the record location picker keeps the marker', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openRecord(page, sampleRecords[0].cluster_id, { unlock: true })
+    await page.locator('.map-trigger-btn').first().click()
+    const panel = page.locator('.panel-right.map-panel')
+    const marker = panel.locator('.leaflet-marker-icon').first()
+    await expect(marker).toBeVisible()
+    // wait for the panel and map animations to settle
+    let previous = await marker.boundingBox()
+    await expect
+      .poll(async () => {
+        const current = await marker.boundingBox()
+        const settled = JSON.stringify(current) === JSON.stringify(previous)
+        previous = current
+        return settled
+      })
+      .toBe(true)
+    const markerBox = await marker.boundingBox()
+    if (!markerBox) throw new Error('The marker is not visible')
+
+    await panel.getByTestId(ids.quickButton('measureDistance')).click()
+    const mapBox = await panel.locator('.leaflet-container').boundingBox()
+    if (!mapBox) throw new Error('The map is not visible')
+    const at = (dx: number, dy: number): { x: number; y: number } => ({
+      x: mapBox.x + mapBox.width / 2 + dx,
+      y: mapBox.y + mapBox.height / 2 + dy,
+    })
+    // two points, then the double-click finishes on the marker itself
+    const p1 = at(-60, 60)
+    const p2 = at(60, 60)
+    await page.mouse.click(p1.x, p1.y)
+    await page.mouse.click(p2.x, p2.y)
+    await page.mouse.dblclick(markerBox.x + markerBox.width / 2, markerBox.y + markerBox.height / 2)
+
+    await expect(panel.getByTestId(ids.measureTotal)).toHaveText(DISTANCE_TOTAL)
+    // the double-click did not move the record location
+    expect(await marker.boundingBox()).toEqual(markerBox)
   })
 })
