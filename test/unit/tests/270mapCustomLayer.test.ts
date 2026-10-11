@@ -147,4 +147,98 @@ describe('map custom layer model (270)', () => {
     expect(canRemoveMapCustomLayer({ scope: 'survey', canEditSurvey: false })).toBe(false)
     expect(canRemoveMapCustomLayer({ scope: 'survey', canEditSurvey: true })).toBe(true)
   })
+
+  describe('hardening', () => {
+    test('trims the URL and refuses whitespace or control characters inside it', () => {
+      expect(sanitizeMapCustomLayer(wmsLayer({ url: '  https://maps.example.org/wms\n' }))).toEqual(wmsLayer())
+      expect(sanitizeMapCustomLayer(wmsLayer({ url: 'https://maps.example.org/w ms' }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ url: 'https://maps.example.org/w\tms' }))).toBeNull()
+      expect(sanitizeMapCustomLayer(xyzLayer({ url: ' https://tile.example.org/{z}/{x}/{y}.png ' }))).toEqual(
+        xyzLayer({ url: 'https://tile.example.org/{z}/{x}/{y}.png' })
+      )
+      expect(sanitizeMapCustomLayer(xyzLayer({ url: 'https://tile.example.org/{z}/{x}/{y}.png\u0000' }))).toBeNull()
+    })
+
+    test.each([['a&b'], ['a=b'], ['a%20b'], ['a#b'], ['a?b'], ['a\u0000b'], ['a\nb']])(
+      'refuses the WMS layer names %j',
+      (wmsLayers) => {
+        expect(sanitizeMapCustomLayer(wmsLayer({ wmsLayers }))).toBeNull()
+      }
+    )
+
+    test('keeps the usual WMS layer name characters', () => {
+      const wmsLayers = 'ns:forest_cover-2020.v1,ns:roads'
+      expect(sanitizeMapCustomLayer(wmsLayer({ wmsLayers }))).toEqual(wmsLayer({ wmsLayers }))
+    })
+
+    test('refuses a WMS URL with a closing brace', () => {
+      expect(sanitizeMapCustomLayer(wmsLayer({ url: 'https://maps.example.org/wms}' }))).toBeNull()
+    })
+
+    test('reads at most the maximum, dropping duplicate ids and keeping the first', () => {
+      const duplicate = wmsLayer({ name: 'Duplicate' })
+      expect(sanitizeMapCustomLayers([wmsLayer(), duplicate, xyzLayer()])).toEqual([wmsLayer(), xyzLayer()])
+      const many = Array.from({ length: MAP_CUSTOM_LAYERS_MAX + 5 }, (_unused, index) =>
+        wmsLayer({ id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}` })
+      )
+      expect(sanitizeMapCustomLayers(many)).toHaveLength(MAP_CUSTOM_LAYERS_MAX)
+    })
+
+    test('ignores prototype keys and prototype names', () => {
+      const polluted = JSON.parse(
+        `{"__proto__":{"polluted":true},"constructor":{"x":1},${JSON.stringify(wmsLayer()).slice(1)}`
+      )
+      expect(sanitizeMapCustomLayer(polluted)).toEqual(wmsLayer())
+      expect(({} as Record<string, unknown>).polluted).toBeUndefined()
+      expect(sanitizeMapCustomLayer(wmsLayer({ kind: 'constructor' as never }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ role: '__proto__' as never }))).toBeNull()
+    })
+
+    test('refuses non-object items and non-array lists', () => {
+      for (const item of [null, undefined, 42, 'layer', true, [], [wmsLayer()]]) {
+        expect(sanitizeMapCustomLayer(item)).toBeNull()
+      }
+      expect(sanitizeMapCustomLayers([null, 1, 'x', wmsLayer()])).toEqual([wmsLayer()])
+      expect(sanitizeMapCustomLayers({ length: 1, 0: wmsLayer() })).toEqual([])
+      expect(validateMapCustomLayers([null])).toBeNull()
+    })
+
+    test('refuses too long URLs and WMS layer names', () => {
+      expect(sanitizeMapCustomLayer(wmsLayer({ url: `https://maps.example.org/${'a'.repeat(2048)}` }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ wmsLayers: 'a'.repeat(1000) }))).not.toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ wmsLayers: 'a'.repeat(1001) }))).toBeNull()
+    })
+
+    test('checks the WMS version, format and attribution types', () => {
+      expect(sanitizeMapCustomLayer(wmsLayer({ wmsVersion: '1.0.0' as never }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ wmsVersion: 1.3 as never }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ format: null as never }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ attribution: 5 as never }))).toBeNull()
+      expect(sanitizeMapCustomLayer(wmsLayer({ attribution: null as never }))).toBeNull()
+    })
+
+    test('checks the zoom and opacity bounds', () => {
+      expect(sanitizeMapCustomLayer(xyzLayer({ maxZoom: null as never }))).toEqual(xyzLayer())
+      expect(sanitizeMapCustomLayer(xyzLayer({ maxZoom: 0 }))).toEqual(xyzLayer({ maxZoom: 0 }))
+      expect(sanitizeMapCustomLayer(xyzLayer({ maxZoom: 24 }))).toEqual(xyzLayer({ maxZoom: 24 }))
+      expect(sanitizeMapCustomLayer(xyzLayer({ maxZoom: -1 }))).toBeNull()
+      expect(sanitizeMapCustomLayer(xyzLayer({ opacity: 0.1 }))).toEqual(xyzLayer({ opacity: 0.1 }))
+      expect(sanitizeMapCustomLayer(xyzLayer({ opacity: 1 }))).toEqual(xyzLayer())
+      expect(sanitizeMapCustomLayer(xyzLayer({ opacity: Number.NaN }))).toBeNull()
+      expect(sanitizeMapCustomLayer(xyzLayer({ opacity: '1' as never }))).toBeNull()
+    })
+
+    test('accepts exactly the maximum number of layers and refuses duplicate ids', () => {
+      const layers = Array.from({ length: MAP_CUSTOM_LAYERS_MAX }, (_unused, index) =>
+        wmsLayer({ id: `00000000-0000-4000-8000-${String(index).padStart(12, '0')}` })
+      )
+      expect(validateMapCustomLayers(layers)).toHaveLength(MAP_CUSTOM_LAYERS_MAX)
+      expect(validateMapCustomLayers([wmsLayer(), wmsLayer()])).toBeNull()
+    })
+
+    test('merges duplicate ids of one scope once', () => {
+      const merged = mergeMapCustomLayers({ surveyLayers: [wmsLayer(), wmsLayer({ name: 'Again' })], userLayers: [] })
+      expect(merged).toEqual([{ ...wmsLayer(), scope: 'survey' }])
+    })
+  })
 })

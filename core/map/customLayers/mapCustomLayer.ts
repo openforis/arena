@@ -23,7 +23,7 @@ export type MapCustomLayer = {
 
 export type MapCustomLayerWithScope = MapCustomLayer & { scope: MapCustomLayerScope }
 
-export const MAP_CUSTOM_LAYERS_MAX = 50 // per survey, and per user and survey
+export const MAP_CUSTOM_LAYERS_MAX = 50 // per scope: the survey layers, and the layers of one user
 export const MAP_CUSTOM_LAYER_NAME_MAX_LENGTH = 100
 export const MAP_CUSTOM_LAYER_ATTRIBUTION_MAX_LENGTH = 200
 export const MAP_CUSTOM_LAYER_URL_MAX_LENGTH = 2048
@@ -38,6 +38,10 @@ const wmsVersions: readonly MapWmsVersion[] = ['1.1.1', '1.3.0']
 
 // Leaflet tile URL placeholders: {s} subdomain, {r} retina suffix, {-y} TMS row
 const TILE_PLACEHOLDERS = new Set(['z', 'x', 'y', '-y', 's', 'r'])
+// characters that would break out of a query parameter value, plus control characters
+const WMS_LAYERS_FORBIDDEN_PATTERN = /[&=%#?\u0000-\u001f\u007f]/
+// whitespace and control characters are never valid inside a URL
+const URL_FORBIDDEN_PATTERN = /[\s\u0000-\u001f\u007f]/
 const PLACEHOLDER_PATTERN = /\{([^{}]*)\}/g
 
 /**
@@ -130,7 +134,7 @@ const sanitizeMaxZoom = (value: unknown): number | undefined | null => {
 const sanitizeWmsProps = (value: Record<string, unknown>): { wmsLayers: string; wmsVersion: MapWmsVersion } | null => {
   const wmsLayers = sanitizeText(value.wmsLayers, MAP_CUSTOM_LAYER_WMS_LAYERS_MAX_LENGTH)
   const wmsVersion = value.wmsVersion ?? '1.3.0'
-  if (!wmsLayers || !isOneOf(wmsVersions, wmsVersion)) return null
+  if (!wmsLayers || WMS_LAYERS_FORBIDDEN_PATTERN.test(wmsLayers) || !isOneOf(wmsVersions, wmsVersion)) return null
   return { wmsLayers, wmsVersion }
 }
 
@@ -141,7 +145,7 @@ const sanitizeWmsProps = (value: Record<string, unknown>): { wmsLayers: string; 
  * @returns {boolean} WMS: an http(s) URL without braces; WMTS and XYZ: a tile URL template.
  */
 const isUrlValidForKind = (kind: MapCustomLayerKind, url: unknown): url is string =>
-  kind === 'wms' ? isHttpUrl(url) && !(url as string).includes('{') : isTileTemplateUrl(url)
+  kind === 'wms' ? isHttpUrl(url) && !/[{}]/.test(url as string) : isTileTemplateUrl(url)
 
 /**
  * Checks a stored or submitted custom layer and keeps only its known properties.
@@ -150,12 +154,16 @@ const isUrlValidForKind = (kind: MapCustomLayerKind, url: unknown): url is strin
  */
 export const sanitizeMapCustomLayer = (value: unknown): MapCustomLayer | null => {
   if (!isRecord(value)) return null
-  const { id, kind, role, url, format = 'image/png' } = value
+  const { id, kind, role, format = 'image/png' } = value
+  const url = typeof value.url === 'string' ? value.url.trim() : value.url
   if (typeof id !== 'string' || !isUuid(id)) return null
   if (!isOneOf(kinds, kind) || !isOneOf(roles, role) || !isOneOf(mapImageFormats, format)) return null
-  if (!isUrlValidForKind(kind, url)) return null
+  if (typeof url !== 'string' || URL_FORBIDDEN_PATTERN.test(url) || !isUrlValidForKind(kind, url)) return null
   const name = sanitizeText(value.name, MAP_CUSTOM_LAYER_NAME_MAX_LENGTH)
-  const attribution = sanitizeText(value.attribution ?? '', MAP_CUSTOM_LAYER_ATTRIBUTION_MAX_LENGTH)
+  const attribution = sanitizeText(
+    value.attribution === undefined ? '' : value.attribution,
+    MAP_CUSTOM_LAYER_ATTRIBUTION_MAX_LENGTH
+  )
   const opacity = sanitizeOpacity(value.opacity)
   const maxZoom = sanitizeMaxZoom(value.maxZoom)
   if (!name || attribution === null || opacity === null || maxZoom === null) return null
@@ -176,16 +184,21 @@ export const sanitizeMapCustomLayer = (value: unknown): MapCustomLayer | null =>
 }
 
 /**
- * Reads stored layers, dropping the invalid ones (stored data is never trusted blindly).
+ * Reads stored layers, dropping the invalid and duplicate ones (first wins) and keeping at most the maximum.
+ * Stored data is never trusted blindly.
  * @param {unknown} value - The stored value.
  * @returns {MapCustomLayer[]} The valid layers.
  */
 export const sanitizeMapCustomLayers = (value: unknown): MapCustomLayer[] => {
   if (!Array.isArray(value)) return []
   const layers: MapCustomLayer[] = []
+  const ids = new Set<string>()
   for (const item of value) {
+    if (layers.length >= MAP_CUSTOM_LAYERS_MAX) break
     const layer = sanitizeMapCustomLayer(item)
-    if (layer) layers.push(layer)
+    if (!layer || ids.has(layer.id)) continue
+    ids.add(layer.id)
+    layers.push(layer)
   }
   return layers
 }
