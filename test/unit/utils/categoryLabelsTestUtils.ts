@@ -3,6 +3,7 @@ import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
+import type { FetchMissingLabelsPage } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import {
   CATEGORY_ITEM_LABEL_SET,
   type CategoryItemLabelSetOperation,
@@ -118,3 +119,82 @@ export const createApplierDepsStub = (survey: any, overrides: Partial<ApplierDep
   onNodeDefSaved: () => undefined,
   ...overrides,
 })
+
+export type FakeCategoryItem = {
+  uuid: string
+  levelIndex: number
+  levelName: string
+  codePath: string[]
+  labels: Record<string, string>
+}
+
+/**
+ * Builds an item of the fake server: uuid `item-<ref>`, level genus (one code) or species (two codes).
+ * @param {string} ref - Code path, e.g. "2.14".
+ * @param {object} [labels] - Labels (default: `{ en: "Item <ref>" }`).
+ * @returns {FakeCategoryItem} The item.
+ */
+export const fakeCategoryItem = (
+  ref: string,
+  labels: Record<string, string> = { en: `Item ${ref}` }
+): FakeCategoryItem => {
+  const codePath = ref.split('.')
+  return {
+    uuid: `item-${ref}`,
+    levelIndex: codePath.length - 1,
+    levelName: codePath.length > 1 ? 'species' : 'genus',
+    codePath,
+    labels,
+  }
+}
+
+/**
+ * Tells whether a text is blank.
+ * @param {string} [text] - Text.
+ * @returns {boolean} True when empty or only spaces.
+ */
+const isBlankText = (text?: string): boolean => (text ?? '').trim() === ''
+
+/**
+ * Creates an in-memory missing-labels endpoint with the server's rules: missing = blank in the language and filled
+ * in another survey language; items in the given order; keyset cursor on any item (an unknown one restarts).
+ * @param {object} params - Parameters.
+ * @param {string[]} [params.languages] - Survey languages (default en, fr, es).
+ * @param {object} params.itemsByCategory - Items by category uuid, in server order.
+ * @returns {object} `{ fetchPage, calls, fill }`: the fetcher, its calls, and a way to fill a label (an Apply).
+ */
+export const createFakeMissingLabelsServer = ({
+  languages = ['en', 'fr', 'es'],
+  itemsByCategory,
+}: {
+  languages?: string[]
+  itemsByCategory: Record<string, FakeCategoryItem[]>
+}) => {
+  const calls: Parameters<FetchMissingLabelsPage>[0][] = []
+  const isMissing = (item: FakeCategoryItem, lang: string): boolean =>
+    isBlankText(item.labels[lang]) && languages.some((other) => other !== lang && !isBlankText(item.labels[other]))
+
+  const fetchPage: FetchMissingLabelsPage = async (params) => {
+    calls.push(params)
+    const { categoryUuid, lang, cursor, limit } = params
+    const items = itemsByCategory[categoryUuid] ?? []
+    const cursorIndex = cursor ? items.findIndex((item) => item.uuid === cursor) : -1
+    const remaining = items.slice(cursorIndex + 1).filter((item) => isMissing(item, lang))
+    const page = remaining.slice(0, limit)
+    return {
+      total: items.filter((item) => isMissing(item, lang)).length,
+      items: page.map((item) => ({ ...item, labels: { ...item.labels } })),
+      nextCursor: remaining.length > limit ? page[page.length - 1].uuid : null,
+    }
+  }
+
+  const fill = (itemUuid: string, lang: string, text: string): void => {
+    for (const items of Object.values(itemsByCategory)) {
+      for (const item of items) {
+        if (item.uuid === itemUuid) item.labels = { ...item.labels, [lang]: text }
+      }
+    }
+  }
+
+  return { fetchPage, calls, fill }
+}

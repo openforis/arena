@@ -1586,6 +1586,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       validation_list: 'Listó errores de validación',
       record_getValues: 'Leyó valores del registro',
       records_proposeEdits: 'Preparó ediciones de registros',
+      categoryItems_listMissingLabels: 'Listó etiquetas de categorías por traducir',
       default: 'Usó una herramienta',
       failed: 'Falló',
       interrupted: 'Interrumpido',

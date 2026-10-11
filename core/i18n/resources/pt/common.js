@@ -1747,6 +1747,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       validation_list: 'Listou erros de validação',
       record_getValues: 'Leu valores do registro',
       records_proposeEdits: 'Preparou edições de registros',
+      categoryItems_listMissingLabels: 'Listou rótulos de categorias a traduzir',
       default: 'Usou uma ferramenta',
       failed: 'Falhou',
       interrupted: 'Interrompido',
