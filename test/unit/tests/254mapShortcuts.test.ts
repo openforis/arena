@@ -16,6 +16,10 @@ const key = (value: string, modifiers: Modifiers = {}) => ({
 })
 
 describe('Map keyboard shortcuts (254)', () => {
+  test('a keydown without a key (browser autofill) is not a shortcut', () => {
+    expect(resolveMapShortcut({ ...key('m'), key: undefined } as unknown as ReturnType<typeof key>, false)).toBeNull()
+  })
+
   test('isEditableTarget recognises text fields only', () => {
     expect(isEditableTarget(null)).toBe(false)
     expect(isEditableTarget({})).toBe(false)

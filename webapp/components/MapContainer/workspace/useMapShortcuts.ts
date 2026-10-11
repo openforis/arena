@@ -1,5 +1,5 @@
-import { useEffect, useLayoutEffect, useRef } from 'react'
-import type { RefObject } from 'react'
+import { useCallback, useLayoutEffect, useRef } from 'react'
+import type { KeyboardEvent, RefObject } from 'react'
 
 import { isEditableTarget, resolveMapShortcut } from './shortcuts/mapShortcuts'
 import type { MapShortcutAction } from './shortcuts/mapShortcuts'
@@ -18,11 +18,13 @@ const isInPopup = (target: EventTarget | null): boolean =>
   target instanceof Element && target.closest(POPUP_SELECTOR) !== null
 
 /**
- * Runs the workspace keyboard shortcuts for key presses inside the workspace root.
+ * Builds the keydown handler of the workspace keyboard shortcuts.
+ * The handler is meant for the React onKeyDown of the workspace root, so it runs after the handlers of
+ * its descendants (which can call preventDefault to keep a key) and only acts for targets inside the root.
  * @param {object} params - Parameters.
  * @param {RefObject<HTMLElement|null>} params.rootRef - The workspace root element.
  * @param {MapShortcutHandlers} params.handlers - Handler of each action (missing actions are ignored).
- * @returns {void}
+ * @returns {Function} The onKeyDown handler.
  */
 export const useMapShortcuts = ({
   rootRef,
@@ -30,26 +32,28 @@ export const useMapShortcuts = ({
 }: {
   rootRef: RefObject<HTMLElement | null>
   handlers: MapShortcutHandlers
-}): void => {
-  // the listener is added once; it always reads the latest handlers
+}): ((event: KeyboardEvent<HTMLElement>) => void) => {
+  // the callback is stable; it always reads the latest handlers
   const handlersRef = useRef(handlers)
   useLayoutEffect(() => {
     handlersRef.current = handlers
   }, [handlers])
 
-  useEffect(() => {
-    const root = rootRef.current
-    if (!root) return undefined
-    const onKeyDown = (event: KeyboardEvent): void => {
-      if (event.defaultPrevented || event.repeat) return
+  return useCallback(
+    (event: KeyboardEvent<HTMLElement>): void => {
+      if (event.defaultPrevented) return
+      // React portals bubble through the React tree from outside the DOM subtree of the root
+      const root = rootRef.current
+      if (!root || !root.contains(event.target as Node)) return
       const ignoreKeys = isInPopup(event.target) || isEditableTarget(event.target)
-      const action = resolveMapShortcut(event, ignoreKeys)
+      const action = resolveMapShortcut(event.nativeEvent, ignoreKeys)
       const handler = action ? handlersRef.current[action] : undefined
       if (!handler) return
       event.preventDefault()
+      // a held key must not leak to the browser, but it does not repeat the action
+      if (event.repeat) return
       handler()
-    }
-    root.addEventListener('keydown', onKeyDown)
-    return () => root.removeEventListener('keydown', onKeyDown)
-  }, [rootRef])
+    },
+    [rootRef]
+  )
 }

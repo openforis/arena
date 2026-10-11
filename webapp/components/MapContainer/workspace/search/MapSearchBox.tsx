@@ -71,8 +71,17 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
   // the active result belongs to one list of results: new results (text or records changed) start at the first one
   const [active, setActive] = useState<{ results: MapSearchResult[]; index: number } | null>(null)
   const activeIndex = active?.results === results ? active.index : findSelectableIndex(results, 0, 1)
+  /**
+   * Marks a result as active.
+   * @param {number} index - Index of the result.
+   * @returns {void}
+   */
   const setActiveIndex = (index: number): void => setActive({ results, index })
 
+  /**
+   * Removes the marker of the searched place from the map.
+   * @returns {void}
+   */
   const removeMarker = useCallback(() => {
     markerRef.current?.remove()
     markerRef.current = null
@@ -154,11 +163,16 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
       default:
         return
     }
-    // handled here: the workspace shortcuts and the browser leave it alone
+    // handled here: the workspace shortcuts (a React handler on the root, which runs after this one) skip a prevented event
     event.preventDefault()
   }
 
   const expanded = listOpen && results.length > 0
+  /**
+   * Builds the DOM id of a result option.
+   * @param {number} index - Index of the result.
+   * @returns {string} The id.
+   */
   const optionId = (index: number): string => `${listId}-option-${index}`
 
   return (

@@ -40,6 +40,11 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
   const { variant, dialog, dispatch, searchInputRef, setPortalContainer } = useMapWorkspace()
   const rootRef = useRef<HTMLDivElement | null>(null)
 
+  /**
+   * Stores the root element and shares it as the portal container.
+   * @param {HTMLDivElement|null} element - The root element.
+   * @returns {void}
+   */
   const setRoot = useCallback(
     (element: HTMLDivElement | null) => {
       rootRef.current = element
@@ -50,6 +55,10 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
 
   const fullScreen = useFullScreen(rootRef)
 
+  /**
+   * Focuses the search box.
+   * @returns {void}
+   */
   const focusSearch = useCallback(() => focusMapSearch(searchInputRef.current), [searchInputRef])
 
   // Part 2 adds measureArea, Part 5 adds screenshot
@@ -62,10 +71,10 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
     }),
     [dialog, dispatch, focusSearch]
   )
-  useMapShortcuts({ rootRef, handlers })
+  const onKeyDown = useMapShortcuts({ rootRef, handlers })
 
   return (
-    <div ref={setRoot} className={classNames('map-workspace', `map-workspace--${variant}`)}>
+    <div ref={setRoot} className={classNames('map-workspace', `map-workspace--${variant}`)} onKeyDown={onKeyDown}>
       <div
         className="map-workspace__toolbar"
         role="toolbar"

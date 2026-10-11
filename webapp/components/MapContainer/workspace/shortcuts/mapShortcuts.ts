@@ -63,7 +63,7 @@ export const isEditableTarget = (target: EventTarget | EditableCandidate | null)
  * @returns {MapShortcutAction|null} The action, or null when the key is not a shortcut.
  */
 export const resolveMapShortcut = (event: MapShortcutEvent, targetIsEditable: boolean): MapShortcutAction | null => {
-  const key = event.key.toLowerCase()
+  const key = (event.key ?? '').toLowerCase()
   if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && key === 'k') return 'focusSearch'
   if (targetIsEditable) return null
   if (key === 'escape') return 'escape'
