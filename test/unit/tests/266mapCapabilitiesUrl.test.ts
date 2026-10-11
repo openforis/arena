@@ -31,6 +31,9 @@ describe('map capabilities URLs (266)', () => {
     expect(parseServiceUrl('http://0x7f.1/').hostname).toBe('127.0.0.1')
     expect(parseServiceUrl('http://2130706433/').hostname).toBe('127.0.0.1')
     expect(parseServiceUrl('http://127.1/').hostname).toBe('127.0.0.1')
+    expect(parseServiceUrl('http://0177.0.0.1/').hostname).toBe('127.0.0.1')
+    expect(parseServiceUrl('http://127.0.0.1./').hostname).toBe('127.0.0.1')
+    expect(parseServiceUrl('http://１２７.０.０.１/').hostname).toBe('127.0.0.1')
     expect(parseServiceUrl('http://[::ffff:127.0.0.1]/').hostname).toBe('[::ffff:7f00:1]')
   })
 

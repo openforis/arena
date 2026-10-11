@@ -14,12 +14,12 @@ describe('map capabilities IP address ranges (265)', () => {
     expect(parseIpv4('0x7f.0.0.1')).toBeNull()
   })
 
-  test('parses IPv6 addresses: compressed, bracketed, with an IPv4 tail or a zone id', () => {
+  test('parses IPv6 addresses: compressed, bracketed, with an IPv4 tail; zone ids are refused', () => {
     expect(parseIpv6('::1')).toEqual([0, 0, 0, 0, 0, 0, 0, 1])
     expect(parseIpv6('::')).toEqual([0, 0, 0, 0, 0, 0, 0, 0])
     expect(parseIpv6('[2001:db8::8a2e:370:7334]')).toEqual([0x2001, 0xdb8, 0, 0, 0, 0x8a2e, 0x370, 0x7334])
     expect(parseIpv6('::ffff:127.0.0.1')).toEqual([0, 0, 0, 0, 0, 0xffff, 0x7f00, 1])
-    expect(parseIpv6('fe80::1%eth0')).toEqual([0xfe80, 0, 0, 0, 0, 0, 0, 1])
+    expect(parseIpv6('fe80::1%eth0')).toBeNull()
     expect(parseIpv6('1:2:3:4:5:6:7:8:9')).toBeNull()
     expect(parseIpv6('1::2::3')).toBeNull()
     expect(parseIpv6('12345::1')).toBeNull()
@@ -29,6 +29,7 @@ describe('map capabilities IP address ranges (265)', () => {
   test('tells the IP family of a host', () => {
     expect(getIpFamily('8.8.8.8')).toBe(4)
     expect(getIpFamily('[::1]')).toBe(6)
+    expect(getIpFamily('[127.0.0.1]')).toBe(0)
     expect(getIpFamily('example.org')).toBe(0)
   })
 
@@ -42,7 +43,8 @@ describe('map capabilities IP address ranges (265)', () => {
     '2a00:1450:4001:80b::200e',
     '::ffff:8.8.8.8',
     '64:ff9b::808:808',
-    '2001:30::1',
+    '2001:200::1',
+    '2001:4860:4860::8888',
     '3fff:1000::1',
   ])('accepts the public address %s', (address) => {
     expect(isPublicIpAddress(address)).toBe(true)
@@ -79,6 +81,19 @@ describe('map capabilities IP address ranges (265)', () => {
     '2001::1',
     '2001:db8::1',
     '::ffff:0:0:1',
+    '::ffff:0:7f00:1',
+    '2002:808:808::1',
+    '2001:2:0:ffff:ffff:ffff:ffff:ffff',
+    'fe00::1',
+    '5f00::1',
+    '64:ff9b:2::1',
+    '64:ff9b::1:808:808',
+    '2001:f::1',
+    '2001:1ff::1',
+    '3ffe::1',
+    '::ffff:8.8.8.8%x',
+    '::%',
+    '[8.8.8.8]',
     '2001:2::1',
     '2001:10::1',
     '2001:1f:ffff::1',

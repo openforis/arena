@@ -14,16 +14,6 @@ export const stripBrackets = (host: string): string =>
   host.startsWith('[') && host.endsWith(']') ? host.slice(1, -1) : host
 
 /**
- * Removes the zone id of a link-local IPv6 address ("fe80::1%eth0").
- * @param {string} address - The address.
- * @returns {string} The address without zone id.
- */
-const stripZoneId = (address: string): string => {
-  const zoneIndex = address.indexOf('%')
-  return zoneIndex >= 0 ? address.slice(0, zoneIndex) : address
-}
-
-/**
  * Parses a dotted-decimal IPv4 address.
  * @param {string} text - The address, e.g. "192.168.1.20".
  * @returns {number[]|null} The four octets, or null when the text is not a dotted-decimal IPv4 address.
@@ -96,13 +86,14 @@ const expandHextets = (head: string, hextetCount: number): number[] | null => {
 }
 
 /**
- * Parses an IPv6 address, with or without brackets, zone id or IPv4 tail.
- * @param {string} text - The address, e.g. "[::ffff:127.0.0.1]" or "fe80::1%eth0".
+ * Parses an IPv6 address, with or without brackets or IPv4 tail.
+ * @param {string} text - The address, e.g. "[::ffff:127.0.0.1]".
  * @returns {number[]|null} The eight hextets, or null when the text is not an IPv6 address.
  */
 export const parseIpv6 = (text: string): number[] | null => {
-  const address = stripZoneId(stripBrackets(text)).toLowerCase()
-  if (!address.includes(':')) return null
+  const address = stripBrackets(text).toLowerCase()
+  // zone ids ("fe80::1%eth0") are refused: neither URL hosts nor DNS answers carry them
+  if (!address.includes(':') || address.includes('%')) return null
   const split = splitIpv4Tail(address)
   if (!split) return null
   const head = expandHextets(split.head, 8 - split.tail.length)
@@ -115,7 +106,7 @@ export const parseIpv6 = (text: string): number[] | null => {
  * @returns {number} 4 or 6 for IP literals, 0 for names.
  */
 export const getIpFamily = (host: string): 0 | 4 | 6 => {
-  if (parseIpv4(stripBrackets(host))) return 4
+  if (parseIpv4(host)) return 4
   if (parseIpv6(host)) return 6
   return 0
 }
@@ -202,17 +193,22 @@ const IPV6_EMBEDDING_IPV4: Ipv6Cidr[] = [
   ipv6Cidr('64:ff9b::', 96), // NAT64
 ]
 
+// the only IPv6 block allocated to global unicast: everything else is unrouted or special-purpose
+const IPV6_GLOBAL_UNICAST = ipv6Cidr('2000::', 3)
+
 const IPV6_NON_PUBLIC: Ipv6Cidr[] = [
   ipv6Cidr('::', 96), // unspecified, loopback, IPv4-compatible
   ipv6Cidr('::ffff:0:0:0', 96), // IPv4-translated (SIIT)
   ipv6Cidr('64:ff9b:1::', 48), // local-use NAT64
   ipv6Cidr('100::', 64), // discard
+  ipv6Cidr('2001::', 23), // IETF protocol assignments: only a few sub-blocks are global, none is a map service
   ipv6Cidr('2001::', 32), // Teredo
   ipv6Cidr('2001:2::', 48), // benchmarking
   ipv6Cidr('2001:10::', 28), // ORCHID
   ipv6Cidr('2001:20::', 28), // ORCHIDv2
   ipv6Cidr('2001:db8::', 32), // documentation
   ipv6Cidr('2002::', 16), // 6to4
+  ipv6Cidr('3ffe::', 16), // former 6bone
   ipv6Cidr('3fff::', 20), // documentation
   ipv6Cidr('fc00::', 7), // unique local
   ipv6Cidr('fe80::', 10), // link-local
@@ -231,7 +227,7 @@ const isPublicIpv4 = (octets: number[]): boolean => {
 }
 
 /**
- * Tells whether an IPv6 address is publicly routable; IPv4-mapped and NAT64 addresses are judged by their IPv4 part.
+ * Tells whether an IPv6 address is publicly routable; IPv4-mapped and NAT64 addresses are judged by their IPv4 part, the rest must be global unicast outside the special-purpose ranges.
  * @param {number[]} hextets - The eight hextets.
  * @returns {boolean} True when the address is in no special-purpose range.
  */
@@ -240,6 +236,7 @@ const isPublicIpv6 = (hextets: number[]): boolean => {
     const [high, low] = [hextets[6], hextets[7]]
     return isPublicIpv4([high >> 8, high & 0xff, low >> 8, low & 0xff])
   }
+  if (!isInIpv6Cidr(hextets, IPV6_GLOBAL_UNICAST)) return false
   return !IPV6_NON_PUBLIC.some((cidr) => isInIpv6Cidr(hextets, cidr))
 }
 
@@ -249,7 +246,7 @@ const isPublicIpv6 = (hextets: number[]): boolean => {
  * @returns {boolean} True for public addresses; false for special-purpose ranges and for anything that is not an IP.
  */
 export const isPublicIpAddress = (text: string): boolean => {
-  const ipv4 = parseIpv4(stripBrackets(text))
+  const ipv4 = parseIpv4(text)
   if (ipv4) return isPublicIpv4(ipv4)
   const ipv6 = parseIpv6(text)
   if (ipv6) return isPublicIpv6(ipv6)
