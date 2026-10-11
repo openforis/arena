@@ -1,3 +1,4 @@
+import { MAP_CUSTOM_LAYER_URL_MAX_LENGTH, isHttpUrl } from '@core/map/customLayers/mapCustomLayer'
 import {
   MAX_CAPABILITIES_LAYERS,
   type MapServiceCapabilities,
@@ -148,14 +149,19 @@ export const parseWmsCapabilities = ({
   requestUrl: string
 }): MapServiceCapabilities => {
   const capability = firstChild(root, 'Capability')
-  const { layers, truncated } = collectWmsLayers(capability)
+  const collected = collectWmsLayers(capability)
+  const { truncated } = collected
+  const url = readWmsGetMapUrl(capability, requestUrl)
+  // an endpoint saving would refuse (not http(s), too long, braces) makes every layer not selectable
+  const urlUsable = isHttpUrl(url) && url.length <= MAP_CUSTOM_LAYER_URL_MAX_LENGTH && !/[{}]/.test(url)
+  const layers = urlUsable ? collected.layers : collected.layers.map((layer) => ({ ...layer, webMercator: false }))
   const formats = toMapImageFormats(childElements(findPath(capability, ['Request', 'GetMap']), 'Format').map(textOf))
   return {
     kind: 'wms',
     // Leaflet speaks 1.1.1 (SRS) or 1.3.0 (CRS)
     version: (attributeOf(root, 'version') ?? '').startsWith('1.3') ? '1.3.0' : '1.1.1',
     title: childText(firstChild(root, 'Service'), 'Title'),
-    url: readWmsGetMapUrl(capability, requestUrl),
+    url,
     formats: formats.length > 0 ? formats : ['image/png'],
     webMercator: layers.some((layer) => layer.webMercator),
     layers,

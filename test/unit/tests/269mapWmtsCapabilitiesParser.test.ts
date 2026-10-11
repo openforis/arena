@@ -155,4 +155,102 @@ describe('map WMTS capabilities parser (269)', () => {
   test('returns null for a document without Contents', () => {
     expect(parse('<Capabilities version="1.0.0"><ows:ServiceIdentification/></Capabilities>')).toBeNull()
   })
+
+  /**
+   * Builds a one-layer document with a Web Mercator matrix set.
+   * @param {object} params - Parameters.
+   * @param {string} [params.layerExtra] - XML added to the layer.
+   * @param {string} [params.operations] - XML of the OperationsMetadata content.
+   * @param {string} [params.set] - The matrix set XML.
+   * @returns {string} The document.
+   */
+  const oneLayer = ({
+    layerExtra = '',
+    operations = '',
+    set = matrixSetXml({ id: 'G', crs: 'EPSG:3857', prefix: '', count: 3 }),
+  }: {
+    layerExtra?: string
+    operations?: string
+    set?: string
+  }): string =>
+    `<Capabilities version="1.0.0"><ows:OperationsMetadata>${operations}</ows:OperationsMetadata><Contents><Layer><ows:Identifier>a</ows:Identifier><Format>image/png</Format><TileMatrixSetLink><TileMatrixSet>G</TileMatrixSet></TileMatrixSetLink>${layerExtra}</Layer>${set}</Contents></Capabilities>`
+
+  const restResource =
+    '<ResourceURL format="image/png" resourceType="tile" template="https://t.example.org/{Style}/{Time}/{TileMatrix}/{TileRow}/{TileCol}.png"/>'
+
+  test('lists at most 500 layers and says so', () => {
+    const set = matrixSetXml({ id: 'G', crs: 'EPSG:3857', prefix: '', count: 3 })
+    const layer = (index: number) =>
+      `<Layer><ows:Identifier>l${index}</ows:Identifier><Format>image/png</Format><TileMatrixSetLink><TileMatrixSet>G</TileMatrixSet></TileMatrixSetLink><ResourceURL format="image/png" resourceType="tile" template="https://t.example.org/${index}/{TileMatrix}/{TileCol}/{TileRow}.png"/></Layer>`
+    const build = (count: number) =>
+      parse(
+        `<Capabilities version="1.0.0"><Contents>${Array.from({ length: count }, (_v, i) => layer(i)).join('')}${set}</Contents></Capabilities>`
+      )
+    expect(build(501)).toMatchObject({ truncated: true })
+    expect(build(501)?.layers).toHaveLength(500)
+    expect(build(500)).toMatchObject({ truncated: false })
+  })
+
+  test('URL-encodes style and dimension values in REST templates', () => {
+    const xml = oneLayer({
+      layerExtra: `<Style isDefault="true"><ows:Identifier>a?b#c</ows:Identifier></Style><Dimension><ows:Identifier>Time</ows:Identifier><Default>2024/01 02</Default></Dimension>${restResource}`,
+    })
+    expect(parse(xml)?.layers[0].tileUrlTemplates).toEqual({
+      'image/png': 'https://t.example.org/a%3Fb%23c/2024%2F01%2002/{z}/{y}/{x}.png',
+    })
+  })
+
+  test('does not leave an empty path segment for an empty dimension, and falls back to KVP', () => {
+    const xml = oneLayer({
+      layerExtra: `<Dimension><ows:Identifier>Time</ows:Identifier></Dimension>${restResource}`,
+      operations:
+        '<ows:Operation name="GetTile"><ows:DCP><ows:HTTP><ows:Get xlink:href="https://t.example.org/wmts"/></ows:HTTP></ows:DCP></ows:Operation>',
+    })
+    const templates = parse(xml)?.layers[0].tileUrlTemplates
+    expect(templates?.['image/png']).toContain('REQUEST=GetTile')
+    expect(templates?.['image/png']).not.toContain('//{')
+    expect(
+      parse(oneLayer({ layerExtra: `<Dimension><ows:Identifier>Time</ows:Identifier></Dimension>${restResource}` }))
+        ?.layers[0].webMercator
+    ).toBe(false)
+  })
+
+  test('accepts the ArcGIS Web Mercator identifiers 102100, 102113 and 3785', () => {
+    for (const crs of ['urn:ogc:def:crs:EPSG::102100', 'EPSG:102113', 'EPSG:3785']) {
+      const set = matrixSetXml({ id: 'G', crs, prefix: '', count: 3 })
+      expect(parse(oneLayer({ set, layerExtra: restResource.replace('{Time}/', '') }))?.layers[0].webMercator).toBe(
+        true
+      )
+    }
+  })
+
+  test('takes the KVP endpoint only from a Get that allows KVP', () => {
+    const get = (href: string, encoding: string) =>
+      `<ows:Get xlink:href="${href}"><ows:Constraint name="GetEncoding"><ows:AllowedValues><ows:Value>${encoding}</ows:Value></ows:AllowedValues></ows:Constraint></ows:Get>`
+    const operation = (gets: string) =>
+      `<ows:Operation name="GetTile"><ows:DCP><ows:HTTP>${gets}</ows:HTTP></ows:DCP></ows:Operation>`
+    const restOnly = parse(oneLayer({ operations: operation(get('https://t.example.org/rest/', 'RESTful')) }))
+    expect(restOnly?.layers[0].webMercator).toBe(false)
+    const both = parse(
+      oneLayer({
+        operations: operation(get('https://t.example.org/rest/', 'RESTful') + get('https://t.example.org/kvp?', 'KVP')),
+      })
+    )
+    expect(both?.layers[0].tileUrlTemplates?.['image/png']).toMatch(/^https:\/\/t\.example\.org\/kvp\?SERVICE=WMTS/)
+  })
+
+  test('finds the KVP endpoint in a later DCP when the first has no Get', () => {
+    const operations =
+      '<ows:Operation name="GetTile"><ows:DCP><ows:HTTP><ows:Post xlink:href="https://t.example.org/post"/></ows:HTTP></ows:DCP><ows:DCP><ows:HTTP><ows:Get xlink:href="https://t.example.org/kvp"/></ows:HTTP></ows:DCP></ows:Operation>'
+    expect(parse(oneLayer({ operations }))?.layers[0].tileUrlTemplates?.['image/png']).toMatch(
+      /^https:\/\/t\.example\.org\/kvp\?/
+    )
+  })
+
+  test('treats isDefault="1" as the default style', () => {
+    const xml = oneLayer({
+      layerExtra: `<Style><ows:Identifier>first</ows:Identifier></Style><Style isDefault="1"><ows:Identifier>second</ows:Identifier></Style>${restResource.replace('{Time}/', '')}`,
+    })
+    expect(parse(xml)?.layers[0].tileUrlTemplates?.['image/png']).toContain('/second/')
+  })
 })

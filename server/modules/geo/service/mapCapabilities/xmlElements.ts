@@ -63,19 +63,29 @@ export const firstChild = (element: XmlElement | undefined, name: string): XmlEl
   childElements(element, name)[0]
 
 /**
- * Follows a path of first children.
+ * Follows a path level by level, through every matching child (not only the first), so a first branch without the
+ * rest of the path does not hide a later one. Iterative; each level holds at most the document's elements.
  * @param {XmlElement|undefined} element - The start element.
  * @param {string[]} names - The local names of the path.
- * @returns {XmlElement|undefined} The element at the end of the path.
+ * @returns {XmlElement[]} The elements at the end of the path, in document order.
  */
-export const findPath = (element: XmlElement | undefined, names: string[]): XmlElement | undefined => {
-  let current = element
+export const findAllPath = (element: XmlElement | undefined, names: string[]): XmlElement[] => {
+  let level: XmlElement[] = element ? [element] : []
   for (const name of names) {
-    current = firstChild(current, name)
-    if (!current) return undefined
+    level = level.flatMap((parent) => childElements(parent, name))
+    if (level.length === 0) return []
   }
-  return current
+  return level
 }
+
+/**
+ * Follows a path of children and returns the first element at its end.
+ * @param {XmlElement|undefined} element - The start element.
+ * @param {string[]} names - The local names of the path.
+ * @returns {XmlElement|undefined} The first element at the end of the path.
+ */
+export const findPath = (element: XmlElement | undefined, names: string[]): XmlElement | undefined =>
+  findAllPath(element, names)[0]
 
 /**
  * Returns the text content (text and CDATA) of an element.

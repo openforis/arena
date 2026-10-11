@@ -106,15 +106,39 @@ describe('map WMS capabilities parser (268)', () => {
     expect(parse(xml, 'https://example.org/wms').layers.map((layer) => layer.name)).toEqual(['deep'])
   })
 
-  test('walks thousands of nested unnamed layers with CRS lists quickly', () => {
-    const depth = 5000
-    const open = '<Layer><CRS>EPSG:4326</CRS><CRS>EPSG:2154</CRS><CRS>EPSG:32631</CRS>'
-    const xml = `<WMS_Capabilities version="1.3.0"><Capability>${open.repeat(depth)}<Layer><CRS>EPSG:3857</CRS><Name>bottom</Name></Layer>${'</Layer>'.repeat(depth)}</Capability></WMS_Capabilities>`
+  test('walks tens of thousands of nested unnamed layers in linear time', () => {
+    // 20 000 levels: the quadratic CRS-array copy took about 2.8 s here, the boolean inheritance about 30 ms
+    const depth = 20000
+    const xml = `<WMS_Capabilities version="1.3.0"><Capability>${'<Layer><CRS>EPSG:4326</CRS>'.repeat(depth)}<Layer><CRS>EPSG:3857</CRS><Name>bottom</Name></Layer>${'</Layer>'.repeat(depth)}</Capability></WMS_Capabilities>`
     const root = parseXmlDocument(xml) as XmlElement
     const start = Date.now()
     const capabilities = parseWmsCapabilities({ root, requestUrl: 'https://example.org/wms' })
-    expect(Date.now() - start).toBeLessThan(2000)
+    expect(Date.now() - start).toBeLessThan(1000)
     expect(capabilities.layers).toEqual([{ name: 'bottom', title: 'bottom', webMercator: true, attribution: '' }])
+  })
+
+  test('lists exactly 500 layers without saying some were left out', () => {
+    const layers = Array.from({ length: 500 }, (_value, index) => `<Layer><Name>l${index}</Name></Layer>`).join('')
+    const xml = `<WMS_Capabilities version="1.3.0"><Capability><Layer><CRS>EPSG:3857</CRS>${layers}</Layer></Capability></WMS_Capabilities>`
+    const capabilities = parse(xml, 'https://example.org/wms')
+    expect(capabilities.layers).toHaveLength(500)
+    expect(capabilities.truncated).toBe(false)
+  })
+
+  test('finds the GetMap href in a later DCPType when the first one has only Post', () => {
+    const xml = `<WMS_Capabilities version="1.3.0"><Capability><Request><GetMap>
+      <DCPType><HTTP><Post><OnlineResource xlink:href="https://post.example.org/wms"/></Post></HTTP></DCPType>
+      <DCPType><HTTP><Get><OnlineResource xlink:href="https://get.example.org/wms"/></Get></HTTP></DCPType>
+    </GetMap></Request><Layer><CRS>EPSG:3857</CRS><Layer><Name>a</Name></Layer></Layer></Capability></WMS_Capabilities>`
+    expect(parse(xml, 'https://example.org/caps').url).toBe('https://get.example.org/wms')
+  })
+
+  test('marks every layer not selectable when the GetMap endpoint is too long for saving', () => {
+    const href = `https://maps.example.org/wms?${'a'.repeat(3000)}=1`
+    const xml = `<WMS_Capabilities version="1.3.0"><Capability><Request><GetMap><DCPType><HTTP><Get><OnlineResource xlink:href="${href}"/></Get></HTTP></DCPType></GetMap></Request><Layer><CRS>EPSG:3857</CRS><Layer><Name>a</Name></Layer></Layer></Capability></WMS_Capabilities>`
+    const capabilities = parse(xml, 'https://example.org/caps')
+    expect(capabilities.layers.map((layer) => layer.webMercator)).toEqual([false])
+    expect(capabilities.webMercator).toBe(false)
   })
 
   test('maps service MIME types to the supported image formats', () => {
@@ -128,5 +152,10 @@ describe('map WMS capabilities parser (268)', () => {
     expect(parseXmlDocument('not xml')).toBeNull()
     const entityBomb = `<?xml version="1.0"?><!DOCTYPE lolz [<!ENTITY lol "lol"><!ENTITY lol2 "&lol;&lol;&lol;">]><WMS_Capabilities>&lol2;</WMS_Capabilities>`
     expect(parseXmlDocument(entityBomb)).toBeNull()
+  })
+
+  test('does not resolve external entities: the document is not parsed and nothing is fetched', () => {
+    const external = `<?xml version="1.0"?><!DOCTYPE x [<!ENTITY ext SYSTEM "http://127.0.0.1:1/secret">]><WMS_Capabilities>&ext;</WMS_Capabilities>`
+    expect(parseXmlDocument(external)).toBeNull()
   })
 })

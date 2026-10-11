@@ -10,6 +10,7 @@ import {
   attributeOf,
   childElements,
   childText,
+  findAllPath,
   findPath,
   firstChild,
   textOf,
@@ -18,7 +19,7 @@ import {
 
 // scale denominator of zoom level 0 in the OGC GoogleMapsCompatible well-known scale set
 const WEB_MERCATOR_ZOOM_0_SCALE = 559082264.0287178
-const WEB_MERCATOR_CRS_PATTERN = /(?:^|\D)(3857|900913)$/
+const WEB_MERCATOR_CRS_PATTERN = /(?:^|\D)(3857|900913|102100|102113|3785)$/
 const GOOGLE_MAPS_SCALE_SET_PATTERN = /GoogleMapsCompatible/i
 const MAX_TILE_ZOOM = 24
 
@@ -77,6 +78,22 @@ const readMatrixSets = (contents: XmlElement): Map<string, WebMercatorMatrixSet>
 }
 
 /**
+ * Tells whether a GetTile Get entry allows KVP requests: no GetEncoding constraint means the default (KVP); a
+ * RESTful-only entry does not.
+ * @param {XmlElement} get - The Get element.
+ * @returns {boolean} True when KVP is allowed.
+ */
+const allowsKvp = (get: XmlElement): boolean => {
+  const constraints = childElements(get, 'Constraint').filter(
+    (constraint) => attributeOf(constraint, 'name') === 'GetEncoding'
+  )
+  if (constraints.length === 0) return true
+  return constraints.some((constraint) =>
+    childElements(findPath(constraint, ['AllowedValues']), 'Value').some((value) => textOf(value) === 'KVP')
+  )
+}
+
+/**
  * Reads the KVP GetTile endpoint from OperationsMetadata (a Get with a KVP encoding constraint wins).
  * @param {XmlElement} root - The Capabilities element.
  * @param {string} requestUrl - The capabilities request URL, to resolve relative links.
@@ -86,10 +103,8 @@ const readKvpHref = (root: XmlElement, requestUrl: string): string | null => {
   const operation = childElements(firstChild(root, 'OperationsMetadata'), 'Operation').find(
     (element) => attributeOf(element, 'name') === 'GetTile'
   )
-  const gets = childElements(findPath(operation, ['DCP', 'HTTP']), 'Get')
-  const isKvp = (get: XmlElement): boolean =>
-    childElements(findPath(get, ['Constraint', 'AllowedValues']), 'Value').some((value) => textOf(value) === 'KVP')
-  const get = gets.find(isKvp) ?? gets[0]
+  const gets = findAllPath(operation, ['DCP', 'HTTP', 'Get'])
+  const get = gets.find(allowsKvp)
   const href = attributeOf(get, 'href')
   return href ? resolveServiceHref(href, requestUrl) : null
 }
@@ -101,7 +116,7 @@ const readKvpHref = (root: XmlElement, requestUrl: string): string | null => {
  */
 const readStyle = (layer: XmlElement): string => {
   const styles = childElements(layer, 'Style')
-  const style = styles.find((element) => attributeOf(element, 'isDefault') === 'true') ?? styles[0]
+  const style = styles.find((element) => ['true', '1'].includes(attributeOf(element, 'isDefault') ?? '')) ?? styles[0]
   return childText(style, 'Identifier') || 'default'
 }
 
@@ -114,7 +129,8 @@ const readDimensions = (layer: XmlElement): Map<string, string> => {
   const dimensions = new Map<string, string>()
   for (const dimension of childElements(layer, 'Dimension')) {
     const value = childText(dimension, 'Default') || childText(dimension, 'Value')
-    dimensions.set(childText(dimension, 'Identifier').toLowerCase(), value)
+    // an empty value would leave "//" in a path; the placeholder stays unresolved instead
+    if (value) dimensions.set(childText(dimension, 'Identifier').toLowerCase(), value)
   }
   return dimensions
 }
@@ -262,11 +278,13 @@ const readWmtsLayer = ({
   if (!linked) return { ...base, webMercator: false }
   const style = readStyle(layer)
   const dimensions = readDimensions(layer)
+  // encoded like the KVP builder does, so a value cannot add path segments, a query or a fragment
+  const encodedDimensions = [...dimensions].map(([key, value]): [string, string] => [key, encodeURIComponent(value)])
   const values = new Map<string, string>([
-    ...dimensions,
-    ['tilematrixset', linked.id],
-    ['style', style],
-    ['tilematrix', `${linked.matrixSet.prefix}{z}`],
+    ...encodedDimensions,
+    ['tilematrixset', encodeURIComponent(linked.id)],
+    ['style', encodeURIComponent(style)],
+    ['tilematrix', `${encodeURIComponent(linked.matrixSet.prefix)}{z}`],
     ['tilerow', '{y}'],
     ['tilecol', '{x}'],
   ])
