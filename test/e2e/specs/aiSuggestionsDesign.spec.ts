@@ -19,6 +19,8 @@ import { Urls } from '../helpers/urls'
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 // the sample survey has 19 node definitions, each with an English label and no description
+// the category labels card also says "missing in French"; only the texts card says "text(s) ... missing"
+const TEXTS_MISSING = /texts? (is|are) missing in French/
 const TRANSLATIONS_CARD = '19 texts are missing in French. Translate them?'
 
 /**
@@ -96,7 +98,7 @@ const isSuggestionGone = async (page: Page, userUuid: string, id: string): Promi
     [`arena.ai.suggestions.${userUuid}`, id]
   )
 
-const suggestionCards = (page: Page, text: string) =>
+const suggestionCards = (page: Page, text: string | RegExp) =>
   assistantPanel(page).getByTestId(TestId.aiAssistant.suggestionCard).filter({ hasText: text })
 
 test.describe('AI assistant Design suggestions (mock provider)', () => {
@@ -128,12 +130,12 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     await openAssistantPanel(page)
     const panel = assistantPanel(page)
     await expect(panel.getByRole('tab', { name: 'Design', exact: true })).toHaveAttribute('aria-selected', 'true')
-    const card = suggestionCards(page, 'missing in French')
+    const card = suggestionCards(page, TEXTS_MISSING)
     await expect(card).toContainText(TRANSLATIONS_CARD)
 
     await card.getByTestId(TestId.aiAssistant.suggestionDoItBtn).click()
     // Do it hides the targets at once; only the store tells whether the detector resolved them
-    await expect(suggestionCards(page, 'missing in French')).toHaveCount(0)
+    await expect(suggestionCards(page, TEXTS_MISSING)).toHaveCount(0)
     await expect(panel.getByTestId(TestId.aiAssistant.message('user'))).toHaveCount(1)
     await waitForAssistantTurn(page)
     await expect(panel.getByTestId(TestId.aiAssistant.toolRow('survey_listMissingTexts'))).toContainText(
@@ -153,10 +155,10 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     const designer = new FormDesigner(page)
     await designer.goto()
     await openAssistantPanel(page)
-    const card = suggestionCards(page, 'missing in French')
+    const card = suggestionCards(page, TEXTS_MISSING)
     await expect(card).toContainText(TRANSLATIONS_CARD)
     await card.getByTestId(TestId.aiAssistant.suggestionDismissBtn).click()
-    await expect(suggestionCards(page, 'missing in French')).toHaveCount(0)
+    await expect(suggestionCards(page, TEXTS_MISSING)).toHaveCount(0)
 
     await closeAssistantPanel(page)
     await page.reload()
@@ -164,7 +166,7 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
 
     await designer.addChildWithDetails('cluster', 'text', { name: 'cluster_extra', label: 'Cluster extra' })
     await openAssistantPanel(page)
-    await expect(suggestionCards(page, 'missing in French')).toContainText('1 text is missing in French. Translate it?')
+    await expect(suggestionCards(page, TEXTS_MISSING)).toContainText('1 text is missing in French. Translate it?')
   })
 
   test('entries added in the designer get the descriptions card, scoped to them', async ({ page, sampleSurvey: _ }) => {
