@@ -1,5 +1,10 @@
+import http from 'node:http'
+import https from 'node:https'
+
 import SystemError from '@core/systemError'
 import {
+  buildAxiosConfig,
+  buildRequestConfig,
   createSafeHttpFetcher,
   type DnsLookup,
   type HttpGet,
@@ -180,6 +185,7 @@ describe('map capabilities safe HTTP fetcher (267)', () => {
       { limitMb: 2 },
       400,
     ],
+    [{ code: 'ERR_BAD_RESPONSE', message: 'stream has been aborted' }, 'unreachable', undefined, 502],
     [{ code: 'ECONNREFUSED', message: 'connect ECONNREFUSED 93.184.215.14:443' }, 'unreachable', undefined, 502],
   ])('maps the transport error %p to %s', (raw, name, params, statusCode) => {
     const error = toFetchError(raw, { timeoutMs: 10000, maxBytes: 2 * 1024 * 1024 }) as SystemError
@@ -227,5 +233,21 @@ describe('map capabilities safe HTTP fetcher (267)', () => {
     } finally {
       jest.useRealTimers()
     }
+  })
+
+  test('the axios configuration disables proxies and redirects, uses fresh agents and keeps the pinned lookup and size cap', () => {
+    const config = buildRequestConfig({
+      addresses: [{ address: '93.184.215.14', family: 4 }],
+      timeoutMs: 10000,
+      maxBytes: 2 * 1024 * 1024,
+    })
+    const axiosConfig = buildAxiosConfig(config)
+    expect(axiosConfig).toMatchObject({ proxy: false, maxRedirects: 0, maxContentLength: 2 * 1024 * 1024 })
+    expect(axiosConfig.httpAgent).toBeInstanceOf(http.Agent)
+    expect((axiosConfig.httpAgent as unknown as { options: object }).options).toMatchObject({ keepAlive: false })
+    expect(axiosConfig.httpsAgent).toBeInstanceOf(https.Agent)
+    expect((axiosConfig.httpsAgent as unknown as { options: object }).options).toMatchObject({ keepAlive: false })
+    expect(axiosConfig.lookup).toBe(config.lookup)
+    expect(buildAxiosConfig(config).httpAgent).not.toBe(axiosConfig.httpAgent)
   })
 })

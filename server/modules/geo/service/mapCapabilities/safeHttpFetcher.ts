@@ -50,19 +50,26 @@ const XML_LIKE_CONTENT_TYPES = ['', 'text/plain', 'application/octet-stream']
 const defaultDnsLookup: DnsLookup = (hostname) => dnsPromises.lookup(hostname, { all: true })
 
 /**
- * Sends the GET request with axios, on dedicated non-keep-alive agents.
+ * Builds the axios configuration of a request: the vetted settings plus dedicated non-keep-alive agents. Created per
+ * request, no socket is reused across hosts, and an agent set by the environment (NODE_USE_ENV_PROXY, HTTP_PROXY)
+ * cannot replace them, so the pinned lookup is always the one that connects.
+ * @param {SafeRequestConfig} config - The request configuration.
+ * @returns {AxiosRequestConfig} The axios configuration.
+ */
+export const buildAxiosConfig = (config: SafeRequestConfig): AxiosRequestConfig => ({
+  ...(config as unknown as AxiosRequestConfig),
+  httpAgent: new http.Agent({ keepAlive: false }),
+  httpsAgent: new https.Agent({ keepAlive: false }),
+})
+
+/**
+ * Sends the GET request with axios.
  * @param {string} url - The URL.
  * @param {SafeRequestConfig} config - The request configuration.
  * @returns {Promise<HttpResponse>} The response.
  */
 const defaultHttpGet: HttpGet = async (url, config) => {
-  // Dedicated agents, created per request: no socket is reused across hosts, and an agent set by the environment
-  // (NODE_USE_ENV_PROXY, HTTP_PROXY) cannot replace them, so the pinned lookup is always the one that connects.
-  const response = await axios.get(url, {
-    ...(config as unknown as AxiosRequestConfig),
-    httpAgent: new http.Agent({ keepAlive: false }),
-    httpsAgent: new https.Agent({ keepAlive: false }),
-  })
+  const response = await axios.get(url, buildAxiosConfig(config))
   return { status: response.status, headers: response.headers as Record<string, unknown>, data: response.data }
 }
 
@@ -193,7 +200,8 @@ export const toFetchError = (
 ): Error => {
   if (isMapCustomLayersError(error)) return error as Error
   const { code = '', name = '', message = '' } = (error ?? {}) as { code?: string; name?: string; message?: string }
-  if (String(message).includes('maxContentLength')) {
+  // axios 1.x raises the size error as ERR_BAD_RESPONSE with this exact text; other ERR_BAD_RESPONSE errors are not
+  if (/maxContentLength size of/.test(String(message))) {
     return newMapCustomLayersError('responseTooLarge', { limitMb: maxBytes / (1024 * 1024) })
   }
   if (TIMEOUT_ERROR_CODES.has(code) || TIMEOUT_ERROR_NAMES.has(name)) {
