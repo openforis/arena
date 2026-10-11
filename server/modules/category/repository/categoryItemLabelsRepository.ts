@@ -189,3 +189,59 @@ export const fetchItemsMissingLabels = async (
     })),
   }
 }
+
+export type ItemLabelsRow = {
+  uuid: string
+  categoryUuid: string
+  levelUuid: string
+  code: string
+  labels: Record<string, string>
+}
+
+/**
+ * Fetches the combined labels of items and locks their rows until the end of the transaction.
+ * @param {object} params - Parameters.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string[]} params.itemUuids - Item uuids.
+ * @param {object} client - Database client (a transaction).
+ * @returns {Promise<ItemLabelsRow[]>} The rows of the existing items.
+ */
+export const fetchItemsLabelsByUuids = async (
+  { surveyId, itemUuids }: { surveyId: number | string; itemUuids: string[] },
+  client: any
+): Promise<ItemLabelsRow[]> => {
+  const schema = getSurveyDBSchema(surveyId)
+  return client.any(
+    `SELECT i.uuid, l.category_uuid AS "categoryUuid", i.level_uuid AS "levelUuid", ${itemCode('i')} AS code,
+       ${combinedLabels('i')} AS labels
+     FROM ${schema}.category_item i
+     JOIN ${schema}.category_level l ON l.uuid = i.level_uuid
+     WHERE i.uuid = ANY($/itemUuids/::uuid[])
+     FOR UPDATE OF i`,
+    { itemUuids }
+  )
+}
+
+/**
+ * Writes the label of an item in one language, in the draft props (the other languages are kept).
+ * @param {object} params - Parameters.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string} params.itemUuid - Item uuid.
+ * @param {string} params.lang - Language.
+ * @param {string} params.text - Label.
+ * @param {object} client - Database client (a transaction).
+ * @returns {Promise<Record<string, string>>} The combined labels after the write.
+ */
+export const updateItemLabel = async (
+  { surveyId, itemUuid, lang, text }: { surveyId: number | string; itemUuid: string; lang: string; text: string },
+  client: any
+): Promise<Record<string, string>> =>
+  client.one(
+    `UPDATE ${getSurveyDBSchema(surveyId)}.category_item AS i
+     SET props_draft = COALESCE(i.props_draft, '{}'::jsonb)
+       || jsonb_build_object('labels', ${combinedLabels('i')} || jsonb_build_object($/lang/::text, $/text/::text))
+     WHERE i.uuid = $/itemUuid/
+     RETURNING ${combinedLabels('i')} AS labels`,
+    { itemUuid, lang, text },
+    (row: { labels: Record<string, string> }) => row.labels
+  )
