@@ -39,4 +39,7 @@ export default {
     card_one: '{{count}} libellé de catégorie manque en {{language}}. Le traduire ?',
     card_other: '{{count}} libellés de catégories manquent en {{language}}. Les traduire ?',
   },
+  validationErrors: {
+    card: '{{count}} messages de validation dans ce cycle. Résumer les tendances ?',
+  },
 }

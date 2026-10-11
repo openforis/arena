@@ -1,4 +1,4 @@
-import type { DetectorContext, SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS, type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
 import { getSuggestionExpiresAt, SUGGESTION_EXPIRY_DAYS } from '@webapp/ai/suggestions/detectors/suggestionExpiry'
 import {
   VALIDATION_MESSAGES_THRESHOLD,
@@ -232,5 +232,10 @@ describe('validation errors suggestion detector (240)', () => {
     const invalid = setup()
     await openWithCount(invalid.ctx, Number.NaN)
     expect(invalid.pending()).toEqual([])
+  })
+
+  test('registered among the event detectors', () => {
+    const detector = EVENT_DETECTORS.find((candidate) => candidate.kind === 'validationErrors')
+    expect(detector).toMatchObject({ area: 'cleaning', needsDraft: false, on: ['validationReportOpened'] })
   })
 })

@@ -38,4 +38,7 @@ export default {
     card_one: 'Falta {{count}} rótulo de categoria em {{language}}. Traduzi-lo?',
     card_other: 'Faltam {{count}} rótulos de categorias em {{language}}. Traduzi-los?',
   },
+  validationErrors: {
+    card: '{{count}} mensagens de validação neste ciclo. Resumir os padrões?',
+  },
 }

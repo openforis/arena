@@ -14,6 +14,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
 import Table from '@webapp/components/Table'
 import { ButtonBack } from '@webapp/components/buttons'
@@ -47,6 +48,13 @@ const ValidationReport = () => {
   useEffect(() => {
     setSelectedAttributeDefUuids(allAttributeDefUuids)
   }, [allAttributeDefUuids])
+
+  // the assistant counts the messages of the whole cycle itself (suggestion 7): only the cycle is passed
+  useEffect(() => {
+    if (surveyCycleKey) {
+      notifySuggestionEvent({ type: 'validationReportOpened', cycle: surveyCycleKey })
+    }
+  }, [surveyCycleKey])
 
   const allAttributesSelected = useMemo(() => {
     if (allAttributeDefUuids.length === 0) return true
