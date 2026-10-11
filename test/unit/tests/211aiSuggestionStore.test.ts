@@ -142,6 +142,26 @@ describe('suggestion store (211)', () => {
     expect(data.size).toBe(0)
   })
 
+  test('Clear after a failed write also removes the older stored value', () => {
+    const key = getSuggestionsKey('u1')
+    const data = new Map<string, string>([
+      [key, JSON.stringify({ pending: {}, dismissed: {}, inProgress: {}, seenModules: [] })],
+    ])
+    const full = {
+      getItem: (k: string) => data.get(k) ?? null,
+      setItem: () => {
+        throw new Error('QuotaExceededError')
+      },
+      removeItem: (k: string) => data.delete(k),
+    } as unknown as Storage
+    const store = createSuggestionStore({ access: memoryAccess(() => full), now: () => NOW })
+    store.add({ userUuid: 'u1', suggestion: suggestion() })
+    expect(data.has(key)).toBe(true)
+    store.clearUser('u1')
+    expect(data.has(key)).toBe(false)
+    expect(visible(store)).toEqual([])
+  })
+
   test('no storage at all (getStorage returns null): memory', () => {
     const store = createSuggestionStore({ access: memoryAccess(() => null), now: () => NOW })
     store.add({ userUuid: 'u1', suggestion: suggestion() })
