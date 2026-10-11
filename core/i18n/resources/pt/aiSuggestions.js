@@ -41,4 +41,8 @@ export default {
   validationErrors: {
     card: '{{count}} mensagens de validação neste ciclo. Resumir os padrões?',
   },
+  dataImported: {
+    card: '{{count}} registros importados. Ver um resumo rápido?',
+    cardOne: '1 registro importado. Ver um resumo rápido?',
+  },
 }

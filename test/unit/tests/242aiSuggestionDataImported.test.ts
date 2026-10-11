@@ -1,4 +1,4 @@
-import type { DetectorContext, SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS, type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
 import {
   DATA_IMPORTED_SUGGESTION_ID,
   dataImportedDetector,
@@ -191,5 +191,11 @@ describe('data imported suggestion detector (242)', () => {
     await dataImportedDetector.handle(succeeded(job()), ctx)
     setClock(new Date(start.getTime() + 7 * DAY_MS + 1))
     expect(visible()).toEqual([])
+  })
+
+  test('registered among the event detectors', () => {
+    const detector = EVENT_DETECTORS.find((candidate) => candidate.kind === 'dataImported')
+    expect(detector).toBe(dataImportedDetector)
+    expect(detector).toMatchObject({ area: 'analysis', needsDraft: false, on: ['jobSucceeded'] })
   })
 })

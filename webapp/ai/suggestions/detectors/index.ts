@@ -5,6 +5,7 @@ import { axiosCleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
 
 import { attributeWithoutRefDetector } from './attributeWithoutRef'
 import { categoryItemTranslationsDetector, categoryItemTranslationsResolver } from './categoryItemTranslations'
+import { dataImportedDetector } from './dataImported'
 import { entityWithoutKeyDetector, entityWithoutKeyResolver } from './entityWithoutKey'
 import { missingTranslationsDetector } from './missingTranslations'
 import { newEntriesDescriptionsDetector, newEntriesDescriptionsResolver } from './newEntriesDescriptions'
@@ -24,6 +25,7 @@ export const EVENT_DETECTORS: EventDetector[] = [
   publishErrorsDetector,
   categoryItemTranslationsDetector,
   createValidationErrorsDetector({ countRows: axiosCleaningApi.countValidationReportRows }),
+  dataImportedDetector,
 ]
 
 export const TARGET_RESOLVERS: TargetResolver[] = [
