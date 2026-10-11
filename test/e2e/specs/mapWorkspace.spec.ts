@@ -1,9 +1,12 @@
+import fs from 'node:fs'
+
 import { Locator, Page } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
-import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+import { RecordForm } from '../helpers/recordForm'
 import { openRecord } from '../helpers/records'
 import { Urls } from '../helpers/urls'
 
@@ -19,6 +22,20 @@ const uploadedRows = (page: Page): Locator =>
 
 // label of the coordinate attribute of the sample survey (its overlay in the layers control)
 const COORDINATE_LAYER = 'Cluster coordinate'
+
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+// tiles from the internet may be slow or missing (then they are left out and the PNG is still produced)
+const PREVIEW_TIMEOUT = 30_000
+
+/**
+ * Waits for the screenshot preview image and for the main button to be enabled.
+ * @param {Page} page - The page.
+ * @returns {Promise<void>} Resolves when the PNG is ready.
+ */
+const waitForScreenshotPreview = async (page: Page): Promise<void> => {
+  await expect(page.getByTestId(ids.screenshotPreview)).toBeVisible({ timeout: PREVIEW_TIMEOUT })
+  await expect(page.getByTestId(ids.screenshotSubmit)).toBeEnabled({ timeout: PREVIEW_TIMEOUT })
+}
 
 const openMap = async (page: Page): Promise<void> => {
   await page.goto(Urls.map)
@@ -405,9 +422,7 @@ test.describe('Map workspace', () => {
     await expect(marker).toBeVisible()
     // wait for the panel slide-in animation to finish: two equal consecutive reads of the marker position are not
     // enough, a slow frame under load repeats a value while the panel is still moving
-    await expect
-      .poll(() => panel.evaluate((element) => element.getAnimations({ subtree: true }).length))
-      .toBe(0)
+    await expect.poll(() => panel.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0)
     // then for the map to settle on the final layout
     let previous = await marker.boundingBox()
     await expect
@@ -511,5 +526,64 @@ test.describe('Map workspace', () => {
       expect(status, url).toBe(400)
       expect((body as { key?: string } | null)?.key, url).toBe('appErrors:mapCustomLayers.urlNotAllowed')
     }
+  })
+})
+
+test.describe('Map screenshot', () => {
+  test.use({ sampleSurveyOptions: { records: sampleRecords, withClusterImage: true } })
+
+  test('downloads the map as a PNG from the quick button', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.quickButton('screenshot')).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
+
+    await page.getByTestId(ids.screenshotTarget('file')).click()
+    await waitForScreenshotPreview(page)
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByTestId(ids.screenshotSubmit).click()
+    const download = await downloadPromise
+
+    expect(download.suggestedFilename()).toMatch(/^map_\d{4}-\d{2}-\d{2}\.png$/)
+    const bytes = fs.readFileSync(await download.path())
+    expect([...bytes.subarray(0, 8)]).toEqual(PNG_SIGNATURE)
+    await expect(page.getByTestId(ids.screenshotDialog)).toHaveCount(0)
+  })
+
+  test('saves the screenshot in the image attribute of a plot record', async ({ page, sampleSurvey: _ }) => {
+    const record = sampleRecords[1]
+    const plotLabel = `${cluster.label} ${record.cluster_id}`
+
+    await openMap(page)
+    // the points of the shown location layer are the plot list
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    await page.getByTestId(ids.menuButton('tools')).click()
+    await page.getByTestId(ids.menuItem('screenshot')).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
+
+    const plotSelect = page.getByTestId(ids.screenshotPlot)
+    await expect(plotSelect.locator('option')).toHaveCount(sampleRecords.length)
+    await plotSelect.selectOption({ label: plotLabel })
+    await expect(page.getByTestId(ids.screenshotAttribute).locator('option:checked')).toHaveText(clusterImage.label)
+
+    const fileNameInput = page.getByTestId(ids.screenshotFileName)
+    await expect(fileNameInput).toHaveValue(
+      new RegExp(String.raw`^${cluster.name}_${record.cluster_id}_\d{4}-\d{2}-\d{2}\.png$`)
+    )
+    const fileName = await fileNameInput.inputValue()
+
+    await waitForScreenshotPreview(page)
+    await page.getByTestId(ids.screenshotSubmit).click()
+    // the result is shown inside the dialog (notifications are hidden in full screen)
+    await expect(page.getByTestId(ids.screenshotDone)).toContainText(`Screenshot saved to ${plotLabel}`, {
+      timeout: PREVIEW_TIMEOUT,
+    })
+    await page.getByTestId(ids.screenshotClose).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toHaveCount(0)
+
+    await openRecord(page, record.cluster_id)
+    await expect(new RecordForm(page).nodeDefWrapper(clusterImage.name)).toContainText(fileName)
   })
 })

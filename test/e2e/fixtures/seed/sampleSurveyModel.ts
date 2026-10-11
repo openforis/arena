@@ -79,6 +79,12 @@ export const cluster = {
   },
 }
 
+/**
+ * Image attribute added to the cluster only by the specs asking for it (sampleSurveyOptions.withClusterImage);
+ * kept out of cluster.children so that the specs iterating the cluster attributes are unaffected.
+ */
+export const clusterImage = attribute('cluster_photo', 'Cluster photo', 'file')
+
 export const plot = {
   name: 'plot',
   label: 'Plot',
