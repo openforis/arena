@@ -1537,6 +1537,7 @@ $t(common.appNameFull)
       yes: 'Sí',
       no: 'No',
       newItem: 'Nuevo: {{type}}',
+      categoryItem: 'Ítem {{ref}} ({{level}})',
       label: 'Etiqueta ({{lang}})',
       description: 'Descripción ({{lang}})',
       status: {

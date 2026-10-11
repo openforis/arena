@@ -1652,6 +1652,7 @@ $t(common.cantUndoWarning)`,
       yes: 'Тийм',
       no: 'Үгүй',
       newItem: 'Шинэ: {{type}}',
+      categoryItem: 'Зүйл {{ref}} ({{level}})',
       label: 'Шошго ({{lang}})',
       description: 'Тайлбар ({{lang}})',
       status: {

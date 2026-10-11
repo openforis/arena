@@ -1650,6 +1650,7 @@ $t(common.cantUndoWarning)`,
       yes: 'はい',
       no: 'いいえ',
       newItem: '新規：{{type}}',
+      categoryItem: '項目 {{ref}}（{{level}}）',
       label: 'ラベル（{{lang}}）',
       description: '説明（{{lang}}）',
       status: {

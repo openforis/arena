@@ -39,6 +39,8 @@ export const TestId = {
   },
   aiAssistant: {
     applyBtn: 'ai-assistant-apply-btn',
+    categoryLabelGroup: (categoryName) => `ai-assistant-category-label-group-${categoryName}`,
+    categoryLabelRow: (ref, lang) => `ai-assistant-category-label-row-${ref}-${lang}`,
     changeSetCard: 'ai-assistant-change-set-card',
     changeSetRow: (nodeDefName) => `ai-assistant-change-set-row-${nodeDefName}`,
     changeSetRowStatus: 'ai-assistant-change-set-row-status',

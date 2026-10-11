@@ -1658,6 +1658,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       yes: 'Sim',
       no: 'Não',
       newItem: 'Novo: {{type}}',
+      categoryItem: 'Item {{ref}} ({{level}})',
       label: 'Rótulo ({{lang}})',
       description: 'Descrição ({{lang}})',
       status: {

@@ -1644,6 +1644,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       yes: 'Yes',
       no: 'No',
       newItem: 'New {{type}}',
+      categoryItem: 'Item {{ref}} ({{level}})',
       label: 'Label ({{lang}})',
       description: 'Description ({{lang}})',
       status: {
