@@ -177,6 +177,7 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   return (
     <div className="map-search">
+      <span className="icon icon-search map-search__icon" aria-hidden="true" />
       <input
         ref={searchInputRef}
         type="search"

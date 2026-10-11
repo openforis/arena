@@ -41,7 +41,11 @@ export const MapToolbar = ({
       {full && <ToolsMenu />}
       <span className="map-toolbar__separator" aria-hidden="true" />
       <MapQuickButtons fullScreen={fullScreen} />
-      {hint && <span className="map-toolbar__hint">{hint}</span>}
+      {hint && (
+        <span className="map-toolbar__hint" title={hint}>
+          {hint}
+        </span>
+      )}
       <span className="map-toolbar__spacer" />
       <MapSearchBox records={records} />
     </>
