@@ -8,6 +8,7 @@ import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-
 import type { AiDataClass } from '@common/ai/features'
 
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
+import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 import type { AnalysisQueryStore } from './analysis/queryStore'
 
@@ -41,6 +42,10 @@ export type AiToolContext = {
   onChangeSet: (changeSet: ChangeSet) => void
   // analysis area: queries proposed in the current conversation (D2)
   analysisQueries?: AnalysisQueryStore
+  // set by the turn when the conversation was started by Do it (kept for the whole conversation)
+  suggestionScope?: SuggestionScope | null
+  // change sets of this conversation that are neither applied nor discarded (work lists skip their items)
+  getPendingChangeSets?: () => ChangeSet[]
 }
 
 export type AiTool<I = any, O = unknown> = {
