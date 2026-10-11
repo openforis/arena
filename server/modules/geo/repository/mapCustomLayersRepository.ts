@@ -60,6 +60,20 @@ const toLayersOrNull = (row: LayersRow): MapCustomLayer[] | null => (row ? sanit
 const userLayersPath = (surveyId: number): string[] => [prefsKey, String(surveyId)]
 
 /**
+ * Builds the SQL expression selecting, in order, the incoming layers whose id is not stored yet, so a retried request
+ * does not duplicate layers and only the effective additions count for the limit. It reads the row being updated, so
+ * Postgres re-evaluates it on the newest row version when two requests race.
+ * @param {string} stored - The SQL expression of the stored layers array.
+ * @returns {string} The SQL expression of the layers to append.
+ */
+const freshLayersSql = (stored: string): string =>
+  `(SELECT coalesce(jsonb_agg(incoming.layer ORDER BY incoming.position), '[]'::jsonb)
+    FROM jsonb_array_elements($/layers:json/::jsonb) WITH ORDINALITY AS incoming(layer, position)
+    WHERE NOT EXISTS (
+      SELECT 1 FROM jsonb_array_elements(${stored}) AS saved(layer) WHERE saved.layer ->> 'id' = incoming.layer ->> 'id'
+    ))`
+
+/**
  * Fetches the layers every user of a survey sees.
  * @param {object} params - Parameters.
  * @param {number} params.surveyId - The survey id.
@@ -88,20 +102,19 @@ const fetchSurveyMapCustomLayers = async (
 const appendSurveyMapCustomLayers = async (
   { surveyId, layers, max }: { surveyId: number; layers: MapCustomLayer[]; max: number },
   client: MapCustomLayersDbClient = defaultClient
-): Promise<MapCustomLayer[] | null> =>
-  (await client.oneOrNone<LayersRow>(
+): Promise<MapCustomLayer[] | null> => {
+  const stored = `coalesce(config -> '${surveyKey}', '[]'::jsonb)`
+  const fresh = freshLayersSql(stored)
+  return (await client.oneOrNone<LayersRow>(
     `UPDATE survey
-    SET config = jsonb_set(
-      coalesce(config, '{}'::jsonb),
-      '{${surveyKey}}',
-      coalesce(config -> '${surveyKey}', '[]'::jsonb) || $/layers:json/::jsonb
-    )
+    SET config = jsonb_set(coalesce(config, '{}'::jsonb), '{${surveyKey}}', ${stored} || ${fresh})
     WHERE id = $/surveyId/
-      AND jsonb_array_length(coalesce(config -> '${surveyKey}', '[]'::jsonb)) + $/count/ <= $/max/
+      AND jsonb_array_length(${stored}) + jsonb_array_length(${fresh}) <= $/max/
     RETURNING config -> '${surveyKey}' AS layers`,
-    { surveyId, layers, count: layers.length, max },
+    { surveyId, layers, max },
     toLayersOrNull
   )) as MapCustomLayer[] | null
+}
 
 /**
  * Removes a layer from a survey, keeping the order of the others.
@@ -165,31 +178,23 @@ const fetchUserMapCustomLayers = async (
 const appendUserMapCustomLayers = async (
   { userUuid, surveyId, layers, max }: { userUuid: string; surveyId: number; layers: MapCustomLayer[]; max: number },
   client: MapCustomLayersDbClient = defaultClient
-): Promise<MapCustomLayer[] | null> =>
-  (await client.oneOrNone<LayersRow>(
+): Promise<MapCustomLayer[] | null> => {
+  const stored = `coalesce(prefs #> $/path/::text[], '[]'::jsonb)`
+  const fresh = freshLayersSql(stored)
+  return (await client.oneOrNone<LayersRow>(
     `UPDATE "user"
     SET prefs = jsonb_set(
       coalesce(prefs, '{}'::jsonb),
       '{${prefsKey}}',
-      coalesce(prefs -> '${prefsKey}', '{}'::jsonb)
-        || jsonb_build_object(
-          $/surveyKey/::text,
-          coalesce(prefs #> $/path/::text[], '[]'::jsonb) || $/layers:json/::jsonb
-        )
+      coalesce(prefs -> '${prefsKey}', '{}'::jsonb) || jsonb_build_object($/surveyKey/::text, ${stored} || ${fresh})
     )
     WHERE uuid = $/userUuid/
-      AND jsonb_array_length(coalesce(prefs #> $/path/::text[], '[]'::jsonb)) + $/count/ <= $/max/
+      AND jsonb_array_length(${stored}) + jsonb_array_length(${fresh}) <= $/max/
     RETURNING prefs #> $/path/::text[] AS layers`,
-    {
-      userUuid,
-      surveyKey: String(surveyId),
-      path: userLayersPath(surveyId),
-      layers,
-      count: layers.length,
-      max,
-    },
+    { userUuid, surveyKey: String(surveyId), path: userLayersPath(surveyId), layers, max },
     toLayersOrNull
   )) as MapCustomLayer[] | null
+}
 
 /**
  * Removes a layer from the user prefs of a survey, keeping the order of the others.

@@ -5,10 +5,13 @@ import {
   type MapCustomLayersRepository as MapCustomLayersRepositoryType,
 } from '@server/modules/geo/repository/mapCustomLayersRepository'
 import { createMapCustomLayersService } from '@server/modules/geo/service/mapCustomLayersService'
-import { clearSurveyConfigurationProp } from '@server/modules/survey/repository/surveyRepository'
 import {
+  deleteUserMapCustomLayersSurvey,
   deleteUserPrefsSurvey,
   deleteUsersPrefsSurvey,
+  fetchUserByUuid,
+  fetchUsers,
+  fetchUsersBySurveyId,
   updateUserPrefs,
 } from '@server/modules/user/repository/userRepository'
 
@@ -43,7 +46,13 @@ const fakeClient = (row: unknown = null) => {
       calls.push({ method, query, values })
       return callback ? callback(row) : row
     }
-  const client = { none: record('none'), one: record('one'), oneOrNone: record('oneOrNone'), query: record('query') }
+  const client = {
+    map: record('map'),
+    none: record('none'),
+    one: record('one'),
+    oneOrNone: record('oneOrNone'),
+    query: record('query'),
+  }
   return { client, calls }
 }
 
@@ -79,9 +88,12 @@ describe('map custom layers storage (271)', () => {
       client as unknown as MapCustomLayersDbClient
     )
     expect(result).toEqual([layer])
-    expect(calls[0].query).toContain("coalesce(config -> 'mapCustomLayers', '[]'::jsonb) || $/layers:json/::jsonb")
-    expect(calls[0].query).toContain('+ $/count/ <= $/max/')
-    expect(calls[0].values).toEqual({ surveyId: 7, layers: [layer], count: 1, max: 50 })
+    expect(calls[0].query).toContain("coalesce(config -> 'mapCustomLayers', '[]'::jsonb) || (SELECT")
+    // ids already stored are skipped, and only the effective additions count for the limit
+    expect(calls[0].query).toContain("saved.layer ->> 'id' = incoming.layer ->> 'id'")
+    expect(calls[0].query).toContain('+ jsonb_array_length((SELECT')
+    expect(calls[0].query).toContain('<= $/max/')
+    expect(calls[0].values).toEqual({ surveyId: 7, layers: [layer], max: 50 })
   })
 
   test('returns null when the limit stops the update, and drops malformed stored layers', async () => {
@@ -154,10 +166,24 @@ describe('map custom layers storage (271)', () => {
     expect(calls[0].values).toMatchObject({ layersKey: 'mapCustomLayers', surveyId: '7' })
   })
 
-  test('resetting the files quota keeps the survey layers', async () => {
+  test('removing a user from a survey drops the user layers whatever the current survey is', async () => {
     const { client, calls } = fakeClient()
-    await clearSurveyConfigurationProp({ surveyId: 7, key: 'filesTotalSpace' }, client as never)
-    expect(calls[0].query).toContain('config = config - $/key/')
-    expect(calls[0].values).toEqual({ surveyId: 7, key: 'filesTotalSpace' })
+    await deleteUserMapCustomLayersSurvey({ userUuid: 'u1', surveyId: 7 }, client as never)
+    expect(calls[0].query).toContain('#- ARRAY[$/layersKey/, $/surveyId/]::text[]')
+    expect(calls[0].query).not.toContain('current')
+    expect(calls[0].values).toEqual({ userUuid: 'u1', layersKey: 'mapCustomLayers', surveyId: '7' })
+  })
+
+  test('the users selects never return the custom map layers', async () => {
+    const { client, calls } = fakeClient()
+    await fetchUserByUuid('u1', client as never)
+    await fetchUsers({}, client as never)
+    await fetchUsersBySurveyId({ surveyId: 7 }, client as never)
+    const queries = calls.map((call) => call.query)
+    expect(queries).toHaveLength(3)
+    for (const query of queries) {
+      expect(query).toContain("u.prefs - 'mapCustomLayers' AS prefs")
+      expect(query).not.toMatch(/u\.prefs,/)
+    }
   })
 })
