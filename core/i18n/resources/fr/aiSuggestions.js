@@ -25,4 +25,10 @@ export default {
     card_one: "{{count}} entité n'a pas d'attribut clé. Suggérer des clés ?",
     card_other: "{{count}} entités n'ont pas d'attribut clé. Suggérer des clés ?",
   },
+  attributeWithoutRef: {
+    cardCategory: "{{name}} n'a pas de catégorie. En choisir une ?",
+    cardTaxonomy: "{{name}} n'a pas de taxonomie. En choisir une ?",
+    card_one: "{{count}} attribut n'a ni catégorie ni taxonomie. La choisir ?",
+    card_other: "{{count}} attributs n'ont ni catégorie ni taxonomie. Les choisir ?",
+  },
 }

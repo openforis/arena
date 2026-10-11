@@ -24,4 +24,10 @@ export default {
     card_one: '{{count}} entidade não tem atributo chave. Sugerir chaves?',
     card_other: '{{count}} entidades não têm atributo chave. Sugerir chaves?',
   },
+  attributeWithoutRef: {
+    cardCategory: '{{name}} não tem categoria. Escolher uma?',
+    cardTaxonomy: '{{name}} não tem taxonomia. Escolher uma?',
+    card_one: '{{count}} atributo não tem categoria nem taxonomia. Escolhê-la?',
+    card_other: '{{count}} atributos não têm categoria nem taxonomia. Escolhê-las?',
+  },
 }

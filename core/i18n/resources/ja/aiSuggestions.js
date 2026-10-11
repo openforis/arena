@@ -23,4 +23,10 @@ export default {
     card_one: '{{count}}件のエンティティにキー属性がありません。キーを提案しますか？',
     card_other: '{{count}}件のエンティティにキー属性がありません。キーを提案しますか？',
   },
+  attributeWithoutRef: {
+    cardCategory: '{{name}}にカテゴリがありません。選びますか？',
+    cardTaxonomy: '{{name}}に分類体系がありません。選びますか？',
+    card_one: '{{count}}件の属性にカテゴリまたは分類体系がありません。選びますか？',
+    card_other: '{{count}}件の属性にカテゴリまたは分類体系がありません。選びますか？',
+  },
 }
