@@ -7,6 +7,7 @@ import * as Category from '@core/survey/category'
 import type { SuggestionEvent } from '@webapp/ai/suggestions/detectors/types'
 import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { surveyCategoryUpdated } from '@webapp/store/survey/actions/category'
+import { resetSurveyDefs } from '@webapp/store/survey/actions/defs'
 import { metaUpdated } from '@webapp/store/survey/actions/metadata'
 
 import type { CategoryLabelsApplierDeps } from './applyCategoryItemLabels'
@@ -43,6 +44,8 @@ export const createCategoryLabelsApplierDeps = ({
     }
     // the survey now has unpublished changes
     dispatch(metaUpdated())
+    // the loaded node defs and the open category editor hold the old labels
+    dispatch(resetSurveyDefs())
   },
   onCategoryLabelsApplied: () => notify({ type: 'categoryLabelsApplied' }),
 })
