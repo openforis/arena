@@ -69,6 +69,19 @@ describe('categoryItemLabels_proposeSet (234)', () => {
     ])
   })
 
+  test('refuses an ambiguous ref and proposes nothing', async () => {
+    refs.register({
+      surveyId: 7,
+      categoryUuid: speciesUuid,
+      ref: '1.2',
+      entry: { itemUuid: 'item-other', levelName: 'species', labels: {} },
+    })
+    const { result, ctx } = await propose([{ categoryName: 'species', ref: '1.2', lang: 'fr', text: 'Pin noir' }])
+    expect(result.error).toMatchObject({ code: 'itemRefAmbiguous', ref: '1.2' })
+    expect(result.error.message).toContain('category editor')
+    expect(ctx.changeSets).toHaveLength(0)
+  })
+
   test('refuses a ref that was not listed, an unknown category, and a category outside the accepted suggestion', async () => {
     const notListed = await propose([{ categoryName: 'species', ref: '9', lang: 'fr', text: 'Neuf' }])
     expect(notListed.result.error).toMatchObject({ code: 'itemNotListed', ref: '9' })
