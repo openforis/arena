@@ -31,7 +31,7 @@ export type GenerationTracker = {
  * Returns the generation input, or null when there is no generation (no user, survey or cycle, defs not fetched).
  * @param {object} raw - Values from the stores.
  * @param {string|null} raw.userUuid - Logged-in user.
- * @param {number|null} raw.surveyId - Active survey.
+ * @param {number|string|null} raw.surveyId - Active survey (the user preferences may hold it as a numeric string).
  * @param {string|null} raw.cycle - Current cycle.
  * @param {boolean} raw.fetched - The defs are fetched.
  * @param {boolean} raw.draft - The fetched defs are the draft.
@@ -49,15 +49,16 @@ export const toGenerationInput = ({
   loadCount,
 }: {
   userUuid: string | null
-  surveyId: number | null
+  surveyId: number | string | null
   cycle: string | null
   fetched: boolean
   draft: boolean
   canEditSurvey: boolean
   loadCount: number
 }): SuggestionGenerationInput | null => {
-  if (!userUuid || typeof surveyId !== 'number' || typeof cycle !== 'string' || !fetched) return null
-  return { userUuid, surveyId, cycle, draft, canEditSurvey, loadCount }
+  const surveyIdNumber = surveyId === null ? Number.NaN : Number(surveyId)
+  if (!userUuid || !Number.isInteger(surveyIdNumber) || typeof cycle !== 'string' || !fetched) return null
+  return { userUuid, surveyId: surveyIdNumber, cycle, draft, canEditSurvey, loadCount }
 }
 
 /**
