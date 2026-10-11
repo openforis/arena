@@ -35,4 +35,8 @@ export default {
     card_one: '{{count}} entry has errors. Publishing will fail. Fix it?',
     card_other: '{{count}} entries have errors. Publishing will fail. Fix them?',
   },
+  categoryItemTranslations: {
+    card_one: '{{count}} category label is missing in {{language}}. Translate it?',
+    card_other: '{{count}} category labels are missing in {{language}}. Translate them?',
+  },
 }

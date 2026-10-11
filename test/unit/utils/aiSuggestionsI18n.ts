@@ -98,3 +98,13 @@ export const expectedTexts = (
   ...plural.flatMap((key) => PLURAL_FORMS[lang].map((form) => ({ path: `${key}_${form}`, enPath: `${key}_other` }))),
   ...single.map((key) => ({ path: key, enPath: key })),
 ]
+
+/**
+ * Returns the text at a dotted path of another namespace (common, appErrors...) of a language.
+ * @param {string} lang - Language.
+ * @param {string} namespace - Namespace.
+ * @param {string} path - Dotted path.
+ * @returns {unknown} The text; undefined when missing.
+ */
+export const getNamespaceText = (lang: string, namespace: string, path: string): unknown =>
+  path.split('.').reduce((value, key) => (value as any)?.[key], RESOURCES[lang][namespace] as unknown)

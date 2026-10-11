@@ -35,4 +35,8 @@ export default {
     card_one: '{{count}} entrée a des erreurs. La publication échouera. La corriger ?',
     card_other: '{{count}} entrées ont des erreurs. La publication échouera. Les corriger ?',
   },
+  categoryItemTranslations: {
+    card_one: '{{count}} libellé de catégorie manque en {{language}}. Le traduire ?',
+    card_other: '{{count}} libellés de catégories manquent en {{language}}. Les traduire ?',
+  },
 }
