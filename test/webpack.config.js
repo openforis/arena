@@ -71,7 +71,8 @@ const createWebpackConfig = (type) => ({
   target: 'node', // Ignore built-in modules like path, fs, etc.
   // Ignore all modules in node_modules folder, except the ESM-only ones: Jest can only require() ESM
   // natively on Node >= 24.9, so they are bundled (and transpiled) into the test bundle instead.
-  externals: [nodeExternals({ allowlist: [isEsmOnlyModule] })],
+  // @turf/* is bundled too: @turf/length needs its nested @turf/distance 7.x, but the hoisted one is 6.x
+  externals: [nodeExternals({ allowlist: [isEsmOnlyModule, /^@turf\//] })],
   mode: 'development',
   devtool: 'source-map',
   cache: {
