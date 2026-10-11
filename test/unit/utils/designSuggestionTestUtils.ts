@@ -7,7 +7,9 @@ import type { DetectorContext } from '@webapp/ai/suggestions/detectors'
 import type { SuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion, SuggestionKind } from '@webapp/ai/suggestions/types'
 
-import { fakeT, getDefByName } from './assistantTestUtils'
+import * as SB from '@test/utils/surveyBuilder'
+
+import { fakeT, getDefByName, testUser } from './assistantTestUtils'
 
 export const TEST_NOW = new Date('2026-10-11T10:00:00.000Z')
 
@@ -136,3 +138,30 @@ export const buildSuggestion = (kind: SuggestionKind, scopeKey: string, targetKe
  * @returns {SuggestionDescribeContext} The context.
  */
 export const describeContext = (survey: any, lang = 'en'): SuggestionDescribeContext => ({ survey, t: fakeT, lang })
+
+/**
+ * Builds survey 7 (en) with categories and a taxonomy: cluster > cluster_id (integer, key), country (code, category
+ * countries), region (code, no category), species (taxon, no taxonomy), tree_species (taxon, taxonomy trees),
+ * calc_code (code, analysis, no category). Categories land_use (class) and countries (country, region); taxonomy trees.
+ * @returns {Promise<object>} The survey.
+ */
+export const buildRefSurvey = async (): Promise<any> => {
+  const { code, integer, taxon } = NodeDef.nodeDefType
+  const survey: any = await SB.survey(
+    testUser,
+    SB.entity(
+      'cluster',
+      SB.attribute('cluster_id', integer).key().label('Cluster id'),
+      SB.attribute('country', code).category('countries').label('Country'),
+      SB.attribute('region', code).label('Region'),
+      SB.attribute('species', taxon).label('Species'),
+      SB.attribute('tree_species', taxon).taxonomy('trees').label('Tree species'),
+      SB.attribute('calc_code', code).analysis().label('Calc code')
+    ).label('Cluster')
+  )
+    .categories(SB.category('land_use').levels('class'), SB.category('countries').levels('country', 'region'))
+    .taxonomies(SB.taxonomy('trees').taxa(SB.taxon('ACA', 'Fabaceae', 'Acacia', 'Acacia sp.')))
+    .build()
+  // the builder returns the survey info at the top level, without id
+  return { ...survey, id: 7, props: { ...survey.props, languages: ['en'] } }
+}

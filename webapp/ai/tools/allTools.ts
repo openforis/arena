@@ -12,6 +12,7 @@ import { nodeDefGetTool } from './design/nodeDefGet'
 import { nodeDefProposeCreateTool } from './design/nodeDefProposeCreate'
 import { nodeDefProposeUpdateTool } from './design/nodeDefProposeUpdate'
 import { nodeDefSearchTool } from './design/nodeDefSearch'
+import { categoriesListTool, taxonomiesListTool } from './design/refLists'
 import { surveyGetOverviewTool } from './design/surveyGetOverview'
 import { surveyListMissingTextsTool } from './design/surveyListMissingTexts'
 import { surveyGetValidationTool } from './design/surveyGetValidation'
@@ -30,6 +31,8 @@ export const ALL_TOOLS: AiTool[] = [
   labelsProposeSetTool,
   expressionsProposeSetTool,
   surveyListMissingTextsTool,
+  categoriesListTool,
+  taxonomiesListTool,
   docsSearchTool,
   ...analysisTools,
   ...cleaningTools,

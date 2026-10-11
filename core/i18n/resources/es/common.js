@@ -1503,6 +1503,8 @@ $t(common.appNameFull)
       labels_proposeSet: 'Preparó etiquetas',
       expressions_proposeSet: 'Preparó expresiones',
       survey_listMissingTexts: 'Listó los textos que faltan',
+      categories_list: 'Listó las categorías',
+      taxonomies_list: 'Listó las taxonomías',
       docs_search: 'Buscó "{{query}}" en el manual',
       query_listEntities: 'Listó las entidades',
       category_findItems: 'Buscó elementos de categoría',
