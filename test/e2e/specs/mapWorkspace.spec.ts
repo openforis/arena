@@ -32,6 +32,31 @@ const layersControl = (page: Page): Locator =>
 const overlayCheckbox = (page: Page, name: string): Locator =>
   layersControl(page).locator('label', { hasText: name }).locator('input.leaflet-control-layers-selector')
 
+// English unit symbols (the test user's language)
+const AREA_TOTAL = /^\d+(\.\d+)? (m²|ha|km²)$/
+const DISTANCE_TOTAL = /^\d+(\.\d+)? (m|km)$/
+
+/**
+ * Returns a page point at an offset from the centre of the Leaflet map (south-west of the centre: away from the
+ * measure bar at the top and the zoom buttons at the bottom right; the data layers are off when the map opens).
+ * @param {Page} page - The page.
+ * @param {number} dx - Horizontal offset in pixels.
+ * @param {number} dy - Vertical offset in pixels.
+ * @returns {Promise<{x: number, y: number}>} The point in page coordinates.
+ */
+const mapPoint = async (page: Page, dx: number, dy: number): Promise<{ x: number; y: number }> => {
+  const box = await page.locator('.leaflet-container').boundingBox()
+  if (!box) throw new Error('The map is not visible')
+  return { x: box.x + box.width / 2 + dx, y: box.y + box.height / 2 + dy }
+}
+
+/**
+ * Returns the permanent label of the finished measurement on the map.
+ * @param {Page} page - The page.
+ * @returns {Locator} The Leaflet tooltip.
+ */
+const measureLabel = (page: Page): Locator => page.locator('.leaflet-tooltip-pane .leaflet-tooltip')
+
 test.describe('Map workspace', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
 
@@ -243,5 +268,78 @@ test.describe('Map workspace', () => {
     await expect(measure).toHaveAttribute('aria-pressed', 'true')
     await page.keyboard.press('Escape')
     await expect(measure).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  test('measures an area, changes its unit and ends with Escape in the unit select', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openMap(page)
+    const measureArea = page.getByTestId(ids.quickButton('measureArea'))
+    await measureArea.click()
+    const bar = page.getByTestId(ids.measureBar)
+    await expect(bar).toBeVisible()
+    await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
+    await expect(measureArea).toHaveAttribute('aria-pressed', 'true')
+    const total = page.getByTestId(ids.measureTotal)
+    await expect(total).toHaveText('—')
+
+    const point1 = await mapPoint(page, -160, 40)
+    const point2 = await mapPoint(page, -40, 120)
+    const point3 = await mapPoint(page, -170, 150)
+    await page.mouse.click(point1.x, point1.y)
+    await page.mouse.click(point2.x, point2.y)
+    // the third point, then the double-click finishes the polygon
+    await page.mouse.dblclick(point3.x, point3.y)
+
+    await expect(total).toHaveText(AREA_TOTAL)
+    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d/)
+    await expect(measureLabel(page)).toHaveText(AREA_TOTAL)
+
+    const unit = page.getByTestId(ids.measureUnit)
+    await unit.selectOption('ha')
+    await expect(total).toHaveText(/^\d+(\.\d+)? ha$/)
+    await expect(measureLabel(page)).toHaveText(/^\d+(\.\d+)? ha$/)
+
+    // the workspace shortcuts ignore keys typed in a select: the bar ends the tool itself
+    await unit.focus()
+    await page.keyboard.press('Escape')
+    await expect(bar).toHaveCount(0)
+    await expect(measureArea).toHaveAttribute('aria-pressed', 'false')
+    await expect(measureLabel(page)).toHaveCount(0)
+  })
+
+  test('measures a distance, switches to area and ends with Done', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const measureDistance = page.getByTestId(ids.quickButton('measureDistance'))
+    await measureDistance.click()
+    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'true')
+
+    const point1 = await mapPoint(page, -160, 40)
+    const point2 = await mapPoint(page, -40, 120)
+    await page.mouse.click(point1.x, point1.y)
+    await page.mouse.click(point2.x, point2.y)
+    // the clicks gave the map the focus: Enter finishes the line
+    await page.keyboard.press('Enter')
+
+    const total = page.getByTestId(ids.measureTotal)
+    await expect(total).toHaveText(DISTANCE_TOTAL)
+    await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
+
+    await page.getByTestId(ids.measureModeArea).click()
+    await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByTestId(ids.quickButton('measureArea'))).toHaveAttribute('aria-pressed', 'true')
+    await expect(measureDistance).toHaveAttribute('aria-pressed', 'false')
+    await expect(total).toHaveText('—')
+    await expect(measureLabel(page)).toHaveCount(0)
+
+    await page.getByTestId(ids.measureDone).click()
+    await expect(page.getByTestId(ids.measureBar)).toHaveCount(0)
+
+    // Done removed the focused button with the bar: the focus went back to the map, so the shortcuts still work
+    await page.keyboard.press('m')
+    await expect(measureDistance).toHaveAttribute('aria-pressed', 'true')
+    await page.keyboard.press('Escape')
+    await expect(measureDistance).toHaveAttribute('aria-pressed', 'false')
   })
 })
