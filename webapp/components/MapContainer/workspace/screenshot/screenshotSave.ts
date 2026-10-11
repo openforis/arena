@@ -64,7 +64,7 @@ const errorOutcome = (key: string, params?: Record<string, string | number>): Sc
  * @param {NodeSaveSubscribe} params.subscribe - Subscribes to the socket events, returns the unsubscribe function.
  * @param {number} params.timeoutMs - Time after which the result is "pending".
  * @param {SaveTimers} params.timers - Injected timers.
- * @returns {{result: Promise<NodeSaveResult>, cancel: Function}} The result and a way to stop listening.
+ * @returns {object} The result, startTimer (arms the timeout, call it once the POST is done) and cancel.
  */
 export const startNodeSaveWaiter = ({
   recordUuid,
@@ -78,7 +78,7 @@ export const startNodeSaveWaiter = ({
   subscribe: NodeSaveSubscribe
   timeoutMs: number
   timers: SaveTimers
-}): { result: Promise<NodeSaveResult>; cancel: () => void } => {
+}): { result: Promise<NodeSaveResult>; startTimer: () => void; cancel: () => void } => {
   let resolveResult: (value: NodeSaveResult) => void = () => undefined
   const result = new Promise<NodeSaveResult>((resolve) => {
     resolveResult = resolve
@@ -121,8 +121,12 @@ export const startNodeSaveWaiter = ({
       if (isForRecord(event)) finish({ status: 'error', details: event?.key ?? '' })
     },
   })
-  timerId = timers.setTimeout(() => finish({ status: 'pending' }), timeoutMs)
-  return { result, cancel: () => finish({ status: 'pending' }) }
+  // armed after the POST: the upload time (slow links) must not eat the wait for the server to process the node
+  const startTimer = (): void => {
+    if (settled || timerId !== null) return
+    timerId = timers.setTimeout(() => finish({ status: 'pending' }), timeoutMs)
+  }
+  return { result, startTimer, cancel: () => finish({ status: 'pending' }) }
 }
 
 /**
@@ -189,6 +193,7 @@ const sendAndWait = async (
       ? errorOutcome('quotaExceeded')
       : errorOutcome('saveFailed', { details })
   }
+  waiter.startTimer()
   return toOutcome(await waiter.result)
 }
 

@@ -72,23 +72,30 @@ export const ScreenshotDialog = (): React.ReactElement => {
     stamp: state.stamp,
   })
   const actions = useScreenshotActions({ state, preview, onClose })
-  const { saving, actionError, clearActionError } = actions
+  const { saving, actionError, clearActionError, replacePrompt, answerReplace } = actions
   /**
-   * Closes the dialog on user request (Cancel, X, Escape, backdrop), except while a save is running.
+   * Closes the dialog on user request (Cancel, X, Escape, backdrop). While the replace prompt is open it answers
+   * "keep" first; while saving without a prompt it does nothing.
    * @returns {void}
    */
   const onRequestClose = useCallback(() => {
-    if (!saving) onClose()
-  }, [onClose, saving])
+    if (replacePrompt) {
+      answerReplace(false)
+      onClose()
+    } else if (!saving) onClose()
+  }, [answerReplace, onClose, replacePrompt, saving])
+  const closeDisabled = saving && !replacePrompt
   /**
-   * Changes the file name and clears the previous action error.
-   * @param {string} fileName - The new file name.
-   * @returns {void}
+   * Wraps a state setter so that it also clears the previous action error.
+   * @param {Function} setter - The state setter.
+   * @returns {Function} The setter that clears the error first.
    */
-  const onFileNameChange = (fileName: string): void => {
-    if (actionError) clearActionError()
-    state.setFileName(fileName)
-  }
+  const clearingError =
+    <A extends unknown[]>(setter: (...args: A) => void) =>
+    (...args: A): void => {
+      if (actionError) clearActionError()
+      setter(...args)
+    }
   const notice = getDialogNotice({ actionError: actions.actionError, preview })
   const imageReady = Boolean(preview.blob) && !preview.loading && !preview.notice?.blocking
   const toRecord = state.target === 'record'
@@ -111,6 +118,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
             type="button"
             className="map-screenshot-dialog__close"
             aria-label={i18n.t('common.close')}
+            disabled={closeDisabled}
             onClick={onRequestClose}
           >
             <span className="icon icon-cross" />
@@ -121,9 +129,9 @@ export const ScreenshotDialog = (): React.ReactElement => {
           {!done && (
             <ScreenshotOptionsFields
               options={state.options}
-              onOptionChange={state.setOption}
+              onOptionChange={clearingError(state.setOption)}
               target={state.target}
-              onTargetChange={state.setTarget}
+              onTargetChange={clearingError(state.setTarget)}
               hasPlots={state.candidates.length > 0}
             />
           )}
@@ -131,12 +139,12 @@ export const ScreenshotDialog = (): React.ReactElement => {
             <ScreenshotAttachFields
               candidates={state.candidates}
               plot={state.plot}
-              onPlotChange={state.selectPlot}
+              onPlotChange={clearingError(state.selectPlot)}
               attributeOptions={state.attributeOptions}
               attribute={state.attribute}
-              onAttributeChange={state.selectAttribute}
+              onAttributeChange={clearingError(state.selectAttribute)}
               fileName={state.fileName}
-              onFileNameChange={onFileNameChange}
+              onFileNameChange={clearingError(state.setFileName)}
             />
           )}
           {notice && !done && <ScreenshotNoticeLine notice={notice} />}
@@ -152,6 +160,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
           canSave={canSave}
           saving={actions.saving && !actions.replacePrompt}
           plotLabel={state.plot?.label ?? ''}
+          closeDisabled={closeDisabled}
           onCancel={onRequestClose}
           onAlsoDownload={actions.alsoDownload}
           onSubmit={toRecord ? actions.saveToRecord : actions.downloadOnly}

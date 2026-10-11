@@ -44,6 +44,8 @@ export const baseLayerUrlByProviderFunction = {
     getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period }),
 }
 
+// crossOrigin: true only for hosts verified to send CORS headers. Without it a screenshot still works, with those tiles
+// left out. With it on a host without CORS, the map display itself breaks (blank base map for everyone).
 export const baseLayers = [
   {
     key: 'ESRI World Imagery',

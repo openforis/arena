@@ -2,6 +2,7 @@ import {
   createImageFailureCounter,
   getCaptureNotice,
   getFitToPlotZoom,
+  isMapAtCaptureView,
   shouldExcludeFromCapture,
   TRANSPARENT_PIXEL,
   waitUntil,
@@ -108,5 +109,16 @@ describe('Screenshot capture rules (294)', () => {
       key: 'mapWorkspace.screenshot.notices.equalEarth',
       blocking: true,
     })
+  })
+})
+
+describe('Screenshot capture view restore (294)', () => {
+  const set = { lat: 10, lng: 20 }
+  test('restores when the map is still at the view the capture set', () => {
+    expect(isMapAtCaptureView({ current: { lat: 10 + 1e-8, lng: 20 }, currentZoom: 17, set, setZoom: 17 })).toBe(true)
+  })
+  test('does not restore after the user panned or zoomed', () => {
+    expect(isMapAtCaptureView({ current: { lat: 10.01, lng: 20 }, currentZoom: 17, set, setZoom: 17 })).toBe(false)
+    expect(isMapAtCaptureView({ current: set, currentZoom: 15, set, setZoom: 17 })).toBe(false)
   })
 })

@@ -1,4 +1,5 @@
 import { useCallback, useState } from 'react'
+import { useI18n } from '@webapp/store/system'
 
 import { downloadBlob } from '@webapp/components/MapContainer/workspace/screenshot/downloadBlob'
 import { ensurePngFileName } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
@@ -24,6 +25,7 @@ export type ScreenshotDoneNotice = { key: string; params: Record<string, string>
  * @param {string} params.attributeLabel - Label of the image attribute.
  * @param {Function} params.setDone - Shows the done notice (the footer then only offers Close).
  * @param {Function} params.setActionError - Shows an inline error.
+ * @param {Function} params.translateServerKey - Turns a server error key into its text (other details are kept).
  * @returns {void}
  */
 const handleSaveOutcome = ({
@@ -32,12 +34,14 @@ const handleSaveOutcome = ({
   attributeLabel,
   setDone,
   setActionError,
+  translateServerKey,
 }: {
   outcome: ScreenshotSaveOutcome
   plotLabel: string
   attributeLabel: string
   setDone: (done: ScreenshotDoneNotice) => void
   setActionError: (notice: ScreenshotNotice | null) => void
+  translateServerKey: (details: string) => string
 }): void => {
   if (outcome.status === 'saved') {
     setDone({
@@ -48,7 +52,14 @@ const handleSaveOutcome = ({
   } else if (outcome.status === 'pending') {
     setDone({ key: 'mapWorkspace.screenshot.savedPending', params: { plot: plotLabel }, pending: true })
   } else if (outcome.status === 'error') {
-    setActionError({ key: outcome.key, params: outcome.params, blocking: false })
+    setActionError({
+      key: outcome.key,
+      params:
+        outcome.params && 'details' in outcome.params
+          ? { ...outcome.params, details: translateServerKey(String(outcome.params.details)) }
+          : outcome.params,
+      blocking: false,
+    })
   }
 }
 
@@ -79,6 +90,7 @@ export const useScreenshotActions = ({
   actionError: ScreenshotNotice | null
   done: ScreenshotDoneNotice | null
 } => {
+  const i18n = useI18n()
   const { save, saving, replacePrompt, answerReplace } = useScreenshotSave()
   const [actionError, setActionError] = useState<ScreenshotNotice | null>(null)
   const [done, setDone] = useState<ScreenshotDoneNotice | null>(null)
@@ -117,9 +129,11 @@ export const useScreenshotActions = ({
         attributeLabel: attribute.label,
         setDone,
         setActionError,
+        translateServerKey: (details) =>
+          i18n.exists(`appErrors:${details}`) ? i18n.t(`appErrors:${details}`) : details,
       })
     )
-  }, [attribute, blob, fileName, plot, save])
+  }, [attribute, blob, fileName, i18n, plot, save])
 
   return {
     downloadOnly,

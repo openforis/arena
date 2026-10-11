@@ -108,6 +108,19 @@ describe('Screenshot save (293)', () => {
     await expect(promise).resolves.toEqual({ status: 'pending' })
   })
 
+  test('arms the timeout only after the POST resolves, so a slow upload still ends as saved', async () => {
+    const { deps, socket, clock } = setup()
+    deps.postNode = jest.fn(async () => {
+      // the upload takes longer than timeoutMs: no timer may be running yet
+      expect(clock.timers.setTimeout).not.toHaveBeenCalled()
+    })
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    expect(clock.timers.setTimeout).toHaveBeenCalledTimes(1)
+    socket.saved()
+    await expect(promise).resolves.toEqual({ status: 'saved' })
+  })
+
   test('asks before replacing a photo and sends nothing when the user declines', async () => {
     const { deps } = setup()
     deps.buildChange = jest.fn(() => updateChange)

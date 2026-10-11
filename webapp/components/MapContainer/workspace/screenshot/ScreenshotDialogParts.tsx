@@ -6,7 +6,7 @@ import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import type { ScreenshotNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { PLAIN_TEXT, type ScreenshotNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 import type { ScreenshotDoneNotice } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotActions'
 
 const PREFIX = 'mapWorkspace.screenshot'
@@ -55,7 +55,7 @@ export const ScreenshotNoticeLine = ({ notice }: { notice: ScreenshotNotice }): 
       })}
       data-testid={TestId.mapWorkspace.screenshotNotice}
     >
-      {i18n.t(notice.key, notice.params)}
+      {i18n.t(notice.key, { ...notice.params, ...PLAIN_TEXT })}
     </p>
   )
 }
@@ -77,7 +77,7 @@ export const ScreenshotDoneLine = ({ done }: { done: ScreenshotDoneNotice }): Re
       })}
       data-testid={TestId.mapWorkspace.screenshotDone}
     >
-      {i18n.t(done.key, done.params)}
+      {i18n.t(done.key, { ...done.params, ...PLAIN_TEXT })}
     </p>
   )
 }
@@ -99,7 +99,7 @@ export const ScreenshotReplacePrompt = ({
   const i18n = useI18n()
   return (
     <div className="map-screenshot-dialog__replace" role="alert">
-      <span>{i18n.t(`${PREFIX}.confirmReplace`, { fileName })}</span>
+      <span>{i18n.t(`${PREFIX}.confirmReplace`, { fileName, ...PLAIN_TEXT })}</span>
       <Button
         label={`${PREFIX}.replace`}
         variant="contained"
@@ -123,6 +123,7 @@ type ScreenshotDialogFooterProps = {
   imageReady: boolean
   canSave: boolean
   saving: boolean
+  closeDisabled: boolean
   plotLabel: string
   onCancel: () => void
   onAlsoDownload: () => void
@@ -149,6 +150,7 @@ const getSubmitLabelKey = ({ toRecord, saving }: { toRecord: boolean; saving: bo
  * @param {boolean} props.imageReady - Whether the PNG is ready.
  * @param {boolean} props.canSave - Whether saving is possible.
  * @param {boolean} props.saving - Whether a save is running.
+ * @param {boolean} props.closeDisabled - Whether Cancel is disabled (saving without a prompt).
  * @param {string} props.plotLabel - Label of the selected plot.
  * @param {Function} props.onCancel - Closes the dialog.
  * @param {Function} props.onAlsoDownload - Downloads the PNG too.
@@ -161,6 +163,7 @@ export const ScreenshotDialogFooter = ({
   imageReady,
   canSave,
   saving,
+  closeDisabled,
   plotLabel,
   onCancel,
   onAlsoDownload,
@@ -185,6 +188,7 @@ export const ScreenshotDialogFooter = ({
         label="common.cancel"
         variant="outlined"
         testId={TestId.mapWorkspace.screenshotCancel}
+        disabled={closeDisabled}
         onClick={onCancel}
       />
       {toRecord && (
@@ -198,7 +202,7 @@ export const ScreenshotDialogFooter = ({
       )}
       <Button
         label={getSubmitLabelKey({ toRecord, saving })}
-        labelParams={{ plot: plotLabel }}
+        labelParams={{ plot: plotLabel, ...PLAIN_TEXT }}
         variant="contained"
         primary
         testId={TestId.mapWorkspace.screenshotSubmit}

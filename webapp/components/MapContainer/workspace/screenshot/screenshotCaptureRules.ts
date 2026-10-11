@@ -1,8 +1,11 @@
-import type { ScreenshotNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import type {
+  LatLngLiteral,
+  ScreenshotNotice,
+} from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
 export const FIT_TO_PLOT_MAX_ZOOM = 17
 
-// 1×1 transparent GIF (the library's own default placeholder)
+// 1×1 transparent GIF, standing in for tiles that fail to load
 export const TRANSPARENT_PIXEL = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
 const MAP_PANE_CLASS = 'leaflet-map-pane'
@@ -137,3 +140,30 @@ export const getCaptureNotice = ({
   }
   return null
 }
+
+const VIEW_CENTER_TOLERANCE_DEGREES = 1e-6
+
+/**
+ * Tells whether the map is still at the view a capture set, so the previous view can be restored without undoing
+ * a pan or zoom the user made meanwhile (for example after closing the dialog during a slow capture).
+ * @param {object} params - The parameters.
+ * @param {LatLngLiteral} params.current - Current map center.
+ * @param {number} params.currentZoom - Current map zoom.
+ * @param {LatLngLiteral} params.set - Center the capture set.
+ * @param {number} params.setZoom - Zoom the capture set.
+ * @returns {boolean} True when the map has not moved since.
+ */
+export const isMapAtCaptureView = ({
+  current,
+  currentZoom,
+  set,
+  setZoom,
+}: {
+  current: LatLngLiteral
+  currentZoom: number
+  set: LatLngLiteral
+  setZoom: number
+}): boolean =>
+  currentZoom === setZoom &&
+  Math.abs(current.lat - set.lat) <= VIEW_CENTER_TOLERANCE_DEGREES &&
+  Math.abs(current.lng - set.lng) <= VIEW_CENTER_TOLERANCE_DEGREES

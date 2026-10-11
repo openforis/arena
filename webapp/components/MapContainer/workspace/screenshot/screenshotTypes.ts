@@ -42,3 +42,6 @@ export type ScreenshotSaveOutcome =
   | { status: 'pending' }
   | { status: 'cancelled' }
   | { status: 'error'; key: string; params?: Record<string, string | number> }
+
+// Plain text rendered by React: do not HTML-escape the interpolated values (plot keys, labels, file names, details).
+export const PLAIN_TEXT = { interpolation: { escapeValue: false } } as const

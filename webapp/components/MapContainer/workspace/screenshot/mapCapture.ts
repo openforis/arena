@@ -3,6 +3,7 @@ import { domToCanvas } from 'modern-screenshot'
 
 import {
   createImageFailureCounter,
+  isMapAtCaptureView,
   shouldExcludeFromCapture,
   waitUntil,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCaptureRules'
@@ -137,9 +138,14 @@ export const captureMapAtPlot = async ({
   const previousCenter = map.getCenter()
   const previousZoom = map.getZoom()
   map.setView([plot.lat, plot.lng], zoom, { animate: false })
+  const setCenter = map.getCenter()
+  const setZoom = map.getZoom()
   try {
     return await captureMapView({ map, includeData })
   } finally {
-    map.setView(previousCenter, previousZoom, { animate: false })
+    // the user may have moved the map meanwhile (dialog closed during a slow capture): then leave it alone
+    if (isMapAtCaptureView({ current: map.getCenter(), currentZoom: map.getZoom(), set: setCenter, setZoom })) {
+      map.setView(previousCenter, previousZoom, { animate: false })
+    }
   }
 }
