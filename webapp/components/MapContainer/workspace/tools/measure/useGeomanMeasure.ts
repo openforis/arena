@@ -106,14 +106,14 @@ export const useGeomanMeasure = ({ map, mode, dispatch, barRef }: UseGeomanMeasu
     }
 
     /**
-     * Finishes the shape on Enter pressed on this map (not on the bar, whose buttons Enter activates).
+     * Finishes the shape on Enter pressed on the map container itself (not on controls or popups inside it).
      * @param {KeyboardEvent} event - The key event.
      * @returns {void}
      */
     const onKeyDown = (event: KeyboardEvent): void => {
       // this native listener runs before React's onKeyDown handlers: defaultPrevented only reflects earlier native
       // listeners, it cannot see a React preventDefault
-      if (event.key !== 'Enter' || event.defaultPrevented || barRef.current?.contains(event.target as Node)) return
+      if (event.key !== 'Enter' || event.defaultPrevented || event.target !== container) return
       if (finishIfComplete()) event.preventDefault()
     }
 

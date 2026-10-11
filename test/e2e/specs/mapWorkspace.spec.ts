@@ -119,6 +119,8 @@ test.describe('Map workspace', () => {
 
     await page.getByTestId(ids.menuButton('baseMap')).click()
     await expect(page.getByTestId(ids.menuItem('baseMap-ESRI Topographic'))).toHaveAttribute('aria-checked', 'true')
+    // wait for MUI to move focus into the menu, otherwise the workspace shortcut handler takes the Escape
+    await expect.poll(() => page.evaluate(() => !!document.activeElement?.closest('[role="menu"]'))).toBe(true)
     await page.keyboard.press('Escape')
     await expect(page.getByRole('menu')).toHaveCount(0)
   })
