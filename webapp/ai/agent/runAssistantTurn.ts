@@ -10,6 +10,7 @@ import { AiLimits } from '@common/ai/limits'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 
 import { isDataToolResult } from '@webapp/ai/conversations/dataClass'
+import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { getHandbookOutline } from '@webapp/ai/help/handbookSearch'
@@ -186,6 +187,9 @@ export const runAssistantTurn = async ({
     signal,
     // queries proposed in this turn are saved through the turn state, with the messages (ids continue: q3 after q2)
     analysisQueries: createAnalysisQueryStore({ queries: conversation.queries ?? {}, onChange: state.setQueries }),
+    // a Do it conversation keeps its scope for every turn; the pending cards include the ones of this turn
+    suggestionScope: conversation.suggestionScope ?? null,
+    getPendingChangeSets: () => getPendingChangeSets(state.get()),
     onChangeSet: (changeSet) => {
       state.addChangeSet(changeSet)
       ctx.onChangeSet(changeSet)
