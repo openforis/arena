@@ -1733,6 +1733,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       labels_proposeSet: 'Preparou rótulos',
       expressions_proposeSet: 'Preparou expressões',
       survey_listMissingTexts: 'Listou os textos em falta',
+      categories_list: 'Listou as categorias',
+      taxonomies_list: 'Listou as taxonomias',
       docs_search: 'Pesquisou "{{query}}" no manual',
       query_listEntities: 'Listou as entidades',
       category_findItems: 'Pesquisou itens de categoria',

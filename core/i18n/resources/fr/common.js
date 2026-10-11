@@ -1747,6 +1747,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       labels_proposeSet: 'A préparé des libellés',
       expressions_proposeSet: 'A préparé des expressions',
       survey_listMissingTexts: 'A listé les textes manquants',
+      categories_list: 'A listé les catégories',
+      taxonomies_list: 'A listé les taxonomies',
       docs_search: 'A recherché « {{query}} » dans le manuel',
       query_listEntities: 'A listé les entités',
       category_findItems: 'A recherché des éléments de catégorie',
