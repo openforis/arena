@@ -12,6 +12,7 @@ type RefKey = { surveyId: number; categoryUuid: string; ref: string }
 export type CategoryItemRefs = {
   register: (params: RefKey & { entry: CategoryItemRefEntry }) => void
   get: (params: RefKey) => CategoryItemRefEntry | null
+  isAmbiguous: (params: RefKey) => boolean
 }
 
 export type CategoryItemRefsRegistry = {
@@ -37,15 +38,24 @@ const toKey = ({ surveyId, categoryUuid, ref }: RefKey): string => `${surveyId}|
  */
 export const createCategoryItemRefs = (): CategoryItemRefs => {
   const entries = new Map<string, CategoryItemRefEntry>()
+  // refs shared by several items (dotted or duplicated codes): never resolved
+  const ambiguous = new Set<string>()
   return {
     register: ({ entry, ...key }) => {
       const mapKey = toKey(key)
+      const existing = entries.get(mapKey)
+      if (ambiguous.has(mapKey) || (existing && existing.itemUuid !== entry.itemUuid)) {
+        entries.delete(mapKey)
+        ambiguous.add(mapKey)
+        return
+      }
       // re-inserted, so it counts as the latest
       entries.delete(mapKey)
       entries.set(mapKey, entry)
       if (entries.size > CATEGORY_ITEM_REFS_MAX_ENTRIES) entries.delete(entries.keys().next().value as string)
     },
     get: (key) => entries.get(toKey(key)) ?? null,
+    isAmbiguous: (key) => ambiguous.has(toKey(key)),
   }
 }
 

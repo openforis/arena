@@ -119,6 +119,19 @@ describe('category item refs (232)', () => {
     expect(refs.get(KEY)?.labels.fr).toBe('Pin noir')
   })
 
+  test('a ref given to two different items is ambiguous, for good', () => {
+    const refs = createCategoryItemRefs()
+    refs.register({ ...KEY, entry: ENTRY })
+    expect(refs.isAmbiguous(KEY)).toBe(false)
+    refs.register({ ...KEY, entry: { ...ENTRY, itemUuid: 'item-other' } })
+    expect(refs.get(KEY)).toBeNull()
+    expect(refs.isAmbiguous(KEY)).toBe(true)
+    // listing one of them again does not bring it back
+    refs.register({ ...KEY, entry: ENTRY })
+    expect(refs.get(KEY)).toBeNull()
+    expect(refs.isAmbiguous(KEY)).toBe(true)
+  })
+
   test('keeps the most recently used conversations and the latest entries', () => {
     const registry = createCategoryItemRefsRegistry(2)
     registry.forConversation('a').register({ ...KEY, entry: ENTRY })

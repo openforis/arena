@@ -36,7 +36,15 @@ const toDraft = (
 ): ChangeOperationDraft => {
   const categoryUuid = Category.getUuid(requireCategory(survey, categoryName))
   checkScope(ctx, categoryUuid, categoryName)
-  const entry = ctx.categoryItemRefs?.get({ surveyId: Number(Survey.getId(survey)), categoryUuid, ref }) ?? null
+  const key = { surveyId: Number(Survey.getId(survey)), categoryUuid, ref }
+  if (ctx.categoryItemRefs?.isAmbiguous(key)) {
+    throw new AiToolFailure(
+      'itemRefAmbiguous',
+      `Ref "${ref}" matches more than one item; skip it and tell the user to fix the duplicated codes in the category editor.`,
+      { ref }
+    )
+  }
+  const entry = ctx.categoryItemRefs?.get(key) ?? null
   if (!entry) {
     throw new AiToolFailure(
       'itemNotListed',
