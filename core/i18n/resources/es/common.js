@@ -1617,6 +1617,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
         key: 'Clave',
         multiple: 'Múltiple',
         readOnly: 'Solo lectura',
+        categoryUuid: 'Categoría',
+        taxonomyUuid: 'Taxonomía',
       },
       expressionProps: {
         defaultValues: 'Valores por defecto',
@@ -1645,6 +1647,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       singleExpressionOnly: 'Esta propiedad acepta una sola expresión.',
       expressionEmpty: 'Una expresión está vacía.',
       rootEntity: 'El asistente no puede cambiar la entidad raíz.',
+      refEditDisabled:
+        '{{name}} no puede cambiar de categoría o taxonomía (está publicado, u otro atributo código depende de él).',
     },
   },
 

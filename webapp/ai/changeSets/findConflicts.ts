@@ -6,8 +6,9 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { isDeepEqual } from './deepEqual'
-import { getOperationCurrentValue } from './operations'
+import { findNodeDefRef, getOperationCurrentValue } from './operations'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './recordEdits/types'
+import { isNodeDefRefProp } from './types'
 import type { ChangeOperation, ChangeSet, ConflictReason, NodeDefCreateOperation, OperationConflict } from './types'
 
 const isNameTaken = (survey: any, name: unknown, ownUuid: string): boolean =>
@@ -24,6 +25,10 @@ const checkCreate = (op: NodeDefCreateOperation, survey: any, createdUuids: Set<
   return null
 }
 
+// the category or taxonomy to assign was deleted after the proposal
+const isRefMissing = (op: ChangeOperation, survey: any): boolean =>
+  op.type === 'nodeDef.update' && isNodeDefRefProp(op.prop) && findNodeDefRef(survey, op.prop, String(op.to)) === null
+
 const checkChange = (
   op: Exclude<ChangeOperation, NodeDefCreateOperation | RecordAttributeUpdateOperation>,
   survey: any,
@@ -33,6 +38,7 @@ const checkChange = (
   // a node definition this change set creates: nothing to compare yet
   if (!nodeDef) return createdUuids.has(op.nodeDefUuid) ? null : 'nodeDefMissing'
   if (!isDeepEqual(getOperationCurrentValue(nodeDef, op), op.from)) return 'valueChanged'
+  if (isRefMissing(op, survey)) return 'refMissing'
   if (op.type === 'nodeDef.update' && op.prop === 'name' && isNameTaken(survey, op.to, op.nodeDefUuid))
     return 'nameTaken'
   return null

@@ -9,6 +9,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
+import { getNodeDefRefName } from '@webapp/ai/changeSets/operations'
+import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
 import type {
   ChangeOperation,
   ChangeSet,
@@ -74,6 +76,22 @@ const toBasicValue = (value: string | boolean | null): CardValue =>
   typeof value === 'boolean' ? { kind: 'boolean', value } : { kind: 'text', text: value }
 
 /**
+ * Converts an update value to a card value: categories and taxonomies by name.
+ * @param {object} survey - Survey.
+ * @param {object} op - Update operation.
+ * @param {string|boolean|null} value - Its from or to value.
+ * @returns {CardValue} The card value.
+ */
+const toUpdateValue = (
+  survey: any,
+  op: Extract<ChangeOperation, { type: 'nodeDef.update' }>,
+  value: string | boolean | null
+): CardValue =>
+  isNodeDefRefProp(op.prop)
+    ? { kind: 'text', text: getNodeDefRefName(survey, op.prop, value as string | null) }
+    : toBasicValue(value)
+
+/**
  * Converts expressions to a card value.
  * @param {object[]} expressions - Node definition expressions.
  * @returns {CardValue} The card value.
@@ -107,9 +125,13 @@ const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, l
 /**
  * Returns the row fields of a change operation.
  * @param {ChangeOperation} op - Operation other than create.
+ * @param {object} survey - Survey (category and taxonomy names).
  * @returns {object} The row fields.
  */
-const toChangeRow = (op: Exclude<ChangeOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>) => {
+const toChangeRow = (
+  op: Exclude<ChangeOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>,
+  survey: any
+) => {
   if (op.type === 'label.set') {
     return {
       titleKey: op.kind === 'labels' ? 'aiAssistant.card.label' : 'aiAssistant.card.description',
@@ -122,8 +144,8 @@ const toChangeRow = (op: Exclude<ChangeOperation, { type: 'nodeDef.create' } | R
     return {
       titleKey: `aiAssistant.card.props.${op.prop}`,
       titleParams: {},
-      from: toBasicValue(op.from),
-      to: toBasicValue(op.to),
+      from: toUpdateValue(survey, op, op.from),
+      to: toUpdateValue(survey, op, op.to),
     }
   }
   return {
@@ -163,7 +185,7 @@ export const buildCardRows = ({
         result,
         nodeDefUuid: op.nodeDefUuid,
         nodeDefName: findNodeDefName(op.nodeDefUuid, changeSet, survey),
-        ...toChangeRow(op),
+        ...toChangeRow(op, survey),
       }
     })
 }

@@ -1766,6 +1766,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
         key: 'Key',
         multiple: 'Multiple',
         readOnly: 'Read only',
+        categoryUuid: 'Category',
+        taxonomyUuid: 'Taxonomy',
       },
       expressionProps: {
         defaultValues: 'Default values',
@@ -1793,6 +1795,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       singleExpressionOnly: 'This property accepts only one expression.',
       expressionEmpty: 'An expression is empty.',
       rootEntity: 'The root entity cannot be changed by the assistant.',
+      refEditDisabled:
+        '{{name}} cannot get another category or taxonomy (it is published, or another code attribute depends on it).',
     },
   },
 

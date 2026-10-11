@@ -24,6 +24,8 @@ const DESIGN_RULES = [
     'nodeDef_search and nodeDef_get give the names and the current values.',
   '- To translate or complete many labels or descriptions, list them with survey_listMissingTexts and propose ' +
     'them in batches with labels_proposeSet; pass nextCursor to get the next page.',
+  '- To give a code attribute a category or a taxon attribute a taxonomy, list them with categories_list or ' +
+    'taxonomies_list, then propose nodeDef_proposeUpdate with prop categoryName or taxonomyName.',
   '- Check every expression with expression_check before proposing it.',
   '- When a propose tool answers with the error invalidProposal, fix the listed issues (operation = index in your ' +
     'proposal) and propose again. Do not show the raw error to the user.',

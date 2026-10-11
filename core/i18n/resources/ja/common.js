@@ -1759,6 +1759,8 @@ $t(common.cantUndoWarning)`,
         key: 'キー',
         multiple: '複数',
         readOnly: '読み取り専用',
+        categoryUuid: 'カテゴリ',
+        taxonomyUuid: '分類体系',
       },
       expressionProps: {
         defaultValues: 'デフォルト値',
@@ -1786,6 +1788,8 @@ $t(common.cantUndoWarning)`,
       singleExpressionOnly: 'このプロパティには式を1つだけ指定できます。',
       expressionEmpty: '空の式があります。',
       rootEntity: 'アシスタントはルートエンティティを変更できません。',
+      refEditDisabled:
+        '{{name}}のカテゴリまたは分類体系は変更できません（公開済みか、別のコード属性がこれに依存しています）。',
     },
   },
 

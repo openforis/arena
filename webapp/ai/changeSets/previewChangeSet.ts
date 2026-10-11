@@ -11,8 +11,14 @@ import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from
 
 import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { isAssistantNodeDefType } from './newNodeDef'
-import { applyOperationToSurvey, getOperationNodeDefUuid, getOperationTargetKey } from './operations'
+import {
+  applyOperationToSurvey,
+  canUpdateNodeDefRef,
+  getOperationNodeDefUuid,
+  getOperationTargetKey,
+} from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
+import { isNodeDefRefProp } from './types'
 import { collectValidationIssues } from './validationIssues'
 import type {
   ChangeOperation,
@@ -105,11 +111,18 @@ const checkMultipleOrKeyUpdate = ({
   return isKeyEditDisabled({ nodeDef, maxKeysCountReached }) ? issue(t, op.prop, 'keyEditDisabled', { name }) : []
 }
 
+// the designer keeps the category of a published or parent code attribute, and the taxonomy of a published one
+const checkRefUpdate = ({ survey, nodeDef, op, t }: CheckParams<NodeDefUpdateOperation> & { nodeDef: any }) => {
+  if (!isNodeDefRefProp(op.prop) || canUpdateNodeDefRef(survey, nodeDef, op.prop)) return []
+  return issue(t, op.prop, 'refEditDisabled', { name: NodeDef.getName(nodeDef) })
+}
+
 const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): FieldIssue[] => {
   const nodeDef = Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)
   if (!nodeDef) return nodeDefNotFound(t, op.nodeDefUuid)
   const field = op.prop
   if (NodeDef.isRoot(nodeDef)) return issue(t, field, 'rootEntity')
+  if (isNodeDefRefProp(op.prop)) return checkRefUpdate({ survey, nodeDef, op, t })
   if (op.prop === 'multiple' && NodeDef.isEntity(nodeDef)) return issue(t, field, 'entityMultipleChange')
   if (op.prop === 'multiple' && op.to === true && NodeDef.getDefaultValues(nodeDef).length > 0) {
     return issue(t, field, 'multipleWithDefaultValues')
