@@ -14,4 +14,8 @@ export default {
     card_one: '{{language}}のテキストが{{count}}件不足しています。翻訳しますか？',
     card_other: '{{language}}のテキストが{{count}}件不足しています。翻訳しますか？',
   },
+  newEntriesDescriptions: {
+    card_one: '説明のない項目を{{count}}件追加しました。すべての言語で説明を書きますか？',
+    card_other: '説明のない項目を{{count}}件追加しました。すべての言語で説明を書きますか？',
+  },
 }

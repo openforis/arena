@@ -15,4 +15,8 @@ export default {
     card_one: 'Falta {{count}} texto en {{language}}. ¿Traducirlo?',
     card_other: 'Faltan {{count}} textos en {{language}}. ¿Traducirlos?',
   },
+  newEntriesDescriptions: {
+    card_one: 'Agregaste {{count}} entrada sin descripción. ¿Escribir descripciones en todos los idiomas?',
+    card_other: 'Agregaste {{count}} entradas sin descripción. ¿Escribir descripciones en todos los idiomas?',
+  },
 }

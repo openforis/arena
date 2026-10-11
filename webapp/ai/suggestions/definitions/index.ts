@@ -4,6 +4,7 @@
 import type { SuggestionKind } from '../types'
 import { missingTranslationsDefinition } from './missingTranslations'
 import { moduleIntroDefinition } from './moduleIntro'
+import { newEntriesDescriptionsDefinition } from './newEntriesDescriptions'
 import type { SuggestionDefinition } from './types'
 
 export type { SuggestionDefinition, SuggestionDescribeContext } from './types'
@@ -11,4 +12,5 @@ export type { SuggestionDefinition, SuggestionDescribeContext } from './types'
 export const SUGGESTION_DEFINITIONS: Partial<Record<SuggestionKind, SuggestionDefinition>> = {
   moduleIntro: moduleIntroDefinition,
   missingTranslations: missingTranslationsDefinition,
+  newEntriesDescriptions: newEntriesDescriptionsDefinition,
 }
