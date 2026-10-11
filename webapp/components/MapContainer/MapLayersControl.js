@@ -12,7 +12,6 @@ import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { MAP_MIN_ZOOM } from './mapZoom'
-import { WmtsComponent } from './WmtsComponent'
 import { useMapWorkspace } from './workspace/MapWorkspaceContext'
 import { useControlContainerMove } from './workspace/layers/useControlContainerMove'
 import { getSelectableBaseLayers } from './workspace/toolbar/baseMapItems'
@@ -104,7 +103,6 @@ export const MapLayersControl = (props) => {
       {/* collapsed is read only when the control is created; the variant of a map never changes */}
       <LayersControl ref={setControl} autoZIndex position="topright" collapsed={!full}>
         {baseLayersControls}
-        <WmtsComponent />
         {layers}
       </LayersControl>
       {showGroupsInjector && (
