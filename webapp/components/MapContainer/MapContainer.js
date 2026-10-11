@@ -17,6 +17,8 @@ import { UtmGrid } from './UtmGrid'
 import { INITIAL_ZOOM_LEVEL, MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
 import { MapInstanceBridge, MapWorkspaceProvider } from './workspace/MapWorkspaceContext'
 import { MapWorkspace } from './workspace/MapWorkspace'
+import { MapPlanetPeriodProvider } from './workspace/imagery/MapPlanetPeriodContext'
+import { PlanetPeriodLayers } from './workspace/imagery/PlanetPeriodLayers'
 import { MapCustomOverlaysProvider } from './workspace/layers/MapCustomOverlaysContext'
 import { useMapRailTabs } from './workspace/rail/useMapRailTabs'
 
@@ -114,6 +116,7 @@ export const MapContainer = (props) => {
       <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       <MapMarker editable={editable} point={markerPoint} onPointUpdated={onMarkerPointUpdated} title={markerTitle} />
       {geoJson && <GeoJSON data={geoJson} />}
+      {variant === 'full' && <PlanetPeriodLayers />}
       <UtmGrid />
       <ZoomControl position="bottomright" />
     </RLMapContainer>
@@ -122,16 +125,18 @@ export const MapContainer = (props) => {
   return (
     <div className={`map-wrapper map-wrapper--${variant}${editable ? ' editable' : ''}`}>
       <MapContextProvider>
-        <MapWorkspaceProvider variant={variant}>
-          <MapCustomOverlaysProvider>
-            <MapWorkspace
-              hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
-              railTabs={railTabs}
-              records={records}
-              mapElement={mapElement}
-            />
-          </MapCustomOverlaysProvider>
-        </MapWorkspaceProvider>
+        <MapPlanetPeriodProvider>
+          <MapWorkspaceProvider variant={variant}>
+            <MapCustomOverlaysProvider>
+              <MapWorkspace
+                hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
+                railTabs={railTabs}
+                records={records}
+                mapElement={mapElement}
+              />
+            </MapCustomOverlaysProvider>
+          </MapWorkspaceProvider>
+        </MapPlanetPeriodProvider>
       </MapContextProvider>
 
       {editable && (

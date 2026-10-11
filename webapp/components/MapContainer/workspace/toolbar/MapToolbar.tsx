@@ -3,8 +3,10 @@ import type { ReactElement } from 'react'
 
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import type { FullScreenState } from '../tools/useFullScreen'
+import { AddDataMenu } from './AddDataMenu'
 import { BaseMapMenu } from './BaseMapMenu'
 import { DisplayMenu } from './DisplayMenu'
+import { ImageryMenu } from './ImageryMenu'
 import { MapQuickButtons } from './MapQuickButtons'
 import { ToolsMenu } from './ToolsMenu'
 
@@ -28,7 +30,9 @@ export const MapToolbar = ({
   return (
     <>
       <BaseMapMenu />
+      {full && <AddDataMenu />}
       <DisplayMenu />
+      {full && <ImageryMenu />}
       {full && <ToolsMenu />}
       <span className="map-toolbar__separator" aria-hidden="true" />
       <MapQuickButtons fullScreen={fullScreen} />

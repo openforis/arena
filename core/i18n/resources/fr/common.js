@@ -461,18 +461,6 @@ Réessayer ?`,
     locationEditInfo: "Double-cliquez sur la carte ou faites glisser le marqueur pour mettre à jour l'emplacement",
     locationNotValidOrOutOfRange: 'Emplacement invalide ou hors de la plage de zone UTM',
     locationUpdated: 'Emplacement mis à jour',
-    options: {
-      showLocationMarkers: "Afficher les marqueurs d'emplacement",
-      showMarkersLabels: `Afficher les étiquettes des marqueurs`,
-      showSamplingPolygon: `Polygone d'échantillonnage`,
-      showControlPoints: `Points de contrôle`,
-      showPlotReferencePoint: `Point de référence de la parcelle`,
-      showUtmGrid: 'Afficher la grille UTM',
-    },
-    rulerTooltip: `Appuyez sur le bouton pour commencer à mesurer des distances.
-- cliquez plusieurs fois pour mesurer des chemins
-- double-cliquez ou appuyez sur la touche ÉCHAP pour terminer la mesure
-- appuyez à nouveau sur le bouton pour masquer les mesures`,
     samplingPointDataLayerName: "Données de points d'échantillonnage - niveau {{level}}",
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (chargement...)',
     samplingPointItemPopup: {
@@ -594,15 +582,7 @@ Réessayer ?`,
     samplingPolygon: "Polygone d'échantillonnage",
     shape: 'Forme',
   },
-  kmlUploader: {
-    opacity: 'opacité',
-    selectFile: 'Sélectionner un fichier',
-    title: 'Options KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Choisissez une période à comparer',
-    falseColor: 'Fausses couleurs',
-  },
+
   surveysView: {
     chains: 'Chaînes',
     confirmUpdateSurveyOwner: `Changer le propriétaire du formulaire "{{surveyName}}" en "{{ownerName}}" ?`,

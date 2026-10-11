@@ -377,3 +377,34 @@
     }
   }
 }
+
+.map-planet-period {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 240px;
+  padding: 4px 16px 8px;
+  font-size: 0.8rem;
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+
+    span {
+      color: #5d616b;
+      font-size: 0.72rem;
+    }
+
+    select {
+      padding: 2px 4px;
+      font: inherit;
+    }
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}

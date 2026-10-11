@@ -460,18 +460,6 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     locationEditInfo: 'Dê duplo clique no mapa ou arraste o marcador para atualizar a localização',
     locationNotValidOrOutOfRange: 'Localização inválida ou fora do alcance da zona UTM',
     locationUpdated: 'Localização atualizada',
-    options: {
-      showLocationMarkers: 'Mostrar marcadores de localização',
-      showMarkersLabels: `Mostrar rótulos dos marcadores`,
-      showSamplingPolygon: `Polígono amostral`,
-      showControlPoints: `Pontos de controle`,
-      showPlotReferencePoint: `Ponto de referência da parcela`,
-      showUtmGrid: 'Mostrar grade UTM',
-    },
-    rulerTooltip: `Pressione o botão para começar a medir distâncias.
-  - clique várias vezes para medir percursos
-  - dê duplo clique ou pressione ESC para finalizar a medição
-  - pressione o botão novamente para ocultar as medições`,
     samplingPointDataLayerName: 'Dados de ponto amostral - nível {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (carregando...)',
     samplingPointItemPopup: {
@@ -593,15 +581,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     samplingPolygon: 'Polígono amostral',
     shape: 'Forma',
   },
-  kmlUploader: {
-    opacity: 'opacidade',
-    selectFile: 'Selecionar arquivo',
-    title: 'Opções de KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Escolha um período para comparar',
-    falseColor: 'Falsa cor',
-  },
+
   surveysView: {
     chains: 'Cadeias',
     confirmUpdateSurveyOwner: `Alterar o proprietário do inventário "{{surveyName}}" para "{{ownerName}}"?`,

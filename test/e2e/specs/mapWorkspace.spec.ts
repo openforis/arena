@@ -9,6 +9,14 @@ import { Urls } from '../helpers/urls'
 
 const ids = TestId.mapWorkspace
 
+// one placemark near the sample records
+const KML = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><name>Plot A</name>
+<Point><coordinates>12.5,41.9,0</coordinates></Point></Placemark></Document></kml>`
+
+const uploadedRows = (page: Page): Locator =>
+  page.locator(`[data-testid^="${TestId.mapWorkspace.overlayRow('uploaded-')}"]`)
+
 // label of the coordinate attribute of the sample survey (its overlay in the layers control)
 const COORDINATE_LAYER = 'Cluster coordinate'
 
@@ -37,7 +45,9 @@ test.describe('Map workspace', () => {
     }
     await expect(page.getByTestId(ids.rail)).toBeVisible()
     await expect(page.getByTestId(ids.statusBar)).toBeVisible()
-    await expect(page.locator('.map-options, .map-kml-uploader-wrapper, .zoom-level, .leaflet-control-scale')).toHaveCount(0)
+    await expect(
+      page.locator('.map-options, .map-kml-uploader-wrapper, .zoom-level, .leaflet-control-scale')
+    ).toHaveCount(0)
     await expect(layersControl(page)).toHaveCount(1)
     await expect(page.locator('.leaflet-container .leaflet-control-layers')).toHaveCount(0)
     await expect(page.getByTestId(ids.statusBar).locator('.leaflet-control-attribution')).toHaveCount(1)
@@ -126,5 +136,58 @@ test.describe('Map workspace', () => {
     )
     // no overlays in the picker: no layers control
     await expect(panel.locator('.leaflet-control-layers')).toBeHidden()
+  })
+
+  test('uploads a KML file as a layer that can be hidden and removed', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.menuButton('addData')).click()
+    await expect(page.getByTestId(ids.menuItem('uploadFile'))).toBeVisible()
+    await page.keyboard.press('Escape')
+
+    await page
+      .getByTestId(ids.uploadInput)
+      .setInputFiles({ name: 'plots.kml', mimeType: 'application/vnd.google-earth.kml+xml', buffer: Buffer.from(KML) })
+    const row = uploadedRows(page)
+    await expect(row).toHaveCount(1)
+    await expect(row).toContainText('plots.kml')
+    // survey data overlays are off by default: the only marker is the placemark
+    const markers = page.locator('.leaflet-marker-pane .leaflet-marker-icon')
+    await expect(markers).toHaveCount(1)
+
+    await row.getByRole('checkbox').uncheck()
+    await expect(markers).toHaveCount(0)
+    await row.getByRole('checkbox').check()
+    await expect(markers).toHaveCount(1)
+
+    await row.getByRole('button', { name: 'Remove plots.kml' }).click()
+    await expect(row).toHaveCount(0)
+    await expect(markers).toHaveCount(0)
+  })
+
+  test('unsupported and broken files show a message', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const input = page.getByTestId(ids.uploadInput)
+
+    await input.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') })
+    await expect(page.getByText('Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file')).toBeVisible()
+
+    await input.setInputFiles({
+      name: 'broken.geojson',
+      mimeType: 'application/geo+json',
+      buffer: Buffer.from('{ "type": '),
+    })
+    await expect(page.getByText(/The file could not be read/)).toBeVisible()
+
+    await expect(uploadedRows(page)).toHaveCount(0)
+    // the map still works
+    await page.getByTestId(ids.menuButton('baseMap')).click()
+    await expect(page.getByRole('menu')).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
+
+  test('the Imagery menu is hidden when the base map has no periods', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await expect(page.getByTestId(ids.menuButton('addData'))).toBeVisible()
+    await expect(page.getByTestId(ids.menuButton('imagery'))).toHaveCount(0)
   })
 })

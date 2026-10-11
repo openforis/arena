@@ -455,18 +455,6 @@ export default {
     locationEditInfo: '地図をダブルクリックするか、マーカーをドラッグして位置を更新してください',
     locationNotValidOrOutOfRange: '位置が無効か、UTMゾーンの範囲外です',
     locationUpdated: '位置を更新しました',
-    options: {
-      showLocationMarkers: '位置マーカーを表示',
-      showMarkersLabels: `マーカーのラベルを表示`,
-      showSamplingPolygon: `サンプリングポリゴン`,
-      showControlPoints: `管理点`,
-      showPlotReferencePoint: `プロット基準点`,
-      showUtmGrid: 'UTMグリッドを表示',
-    },
-    rulerTooltip: `ボタンを押すと距離の測定を開始します。
-- 複数回クリックすると経路を測定できます
-- ダブルクリックまたはESCキーで測定を終了します
-- もう一度ボタンを押すと測定結果を非表示にします`,
     samplingPointDataLayerName: '抽出地点データ - レベル{{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName)（読み込み中...）',
     samplingPointItemPopup: {
@@ -588,15 +576,7 @@ export default {
     samplingPolygon: 'サンプリングポリゴン',
     shape: '形状',
   },
-  kmlUploader: {
-    opacity: '不透明度',
-    selectFile: 'ファイルを選択',
-    title: 'KML/KMZ/Shapefileオプション',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: '比較する期間を選択',
-    falseColor: '偽合成色（フォールスカラー）',
-  },
+
   surveysView: {
     chains: '処理チェーン',
     confirmUpdateSurveyOwner: `調査「{{surveyName}}」の所有者を「{{ownerName}}」に変更しますか？`,

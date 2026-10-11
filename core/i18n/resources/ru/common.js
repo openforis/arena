@@ -462,18 +462,6 @@ export default {
     locationEditInfo: 'Дважды щелкните на карте или перетащите маркер, чтобы обновить местоположение',
     locationNotValidOrOutOfRange: 'Местоположение недействительно или вне диапазона зоны UTM',
     locationUpdated: 'Местоположение обновлено',
-    options: {
-      showLocationMarkers: 'Показать маркеры местоположения',
-      showMarkersLabels: `Показать метки маркеров`,
-      showSamplingPolygon: `Полигон выборки`,
-      showControlPoints: `Контрольные точки`,
-      showPlotReferencePoint: `Точка привязки участка`,
-      showUtmGrid: 'Показать сетку UTM',
-    },
-    rulerTooltip: `Нажмите кнопку, чтобы начать измерение расстояний.
-- щелкните несколько раз, чтобы измерить путь
-- дважды щелкните или нажмите клавишу ESC, чтобы завершить измерение
-- нажмите кнопку еще раз, чтобы скрыть измерения`,
     samplingPointDataLayerName: 'Данные точки выборки - уровень {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (загрузка...)',
     samplingPointItemPopup: {
@@ -597,15 +585,7 @@ export default {
     samplingPolygon: 'Полигон выборки',
     shape: 'Форма',
   },
-  kmlUploader: {
-    opacity: 'непрозрачность',
-    selectFile: 'Выбрать файл',
-    title: 'Параметры KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Выберите период для сравнения',
-    falseColor: 'Псевдоцвет',
-  },
+
   surveysView: {
     chains: 'Цепочки',
     confirmUpdateSurveyOwner: `Изменить владельца опроса "{{surveyName}}" на "{{ownerName}}"?`,

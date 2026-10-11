@@ -459,18 +459,6 @@ export default {
     locationEditInfo: 'Байршлыг шинэчлэхийн тулд газрын зураг дээр давхар товших эсвэл тэмдэглэгээг чирэх',
     locationNotValidOrOutOfRange: 'Байршил хүчингүй эсвэл UTM бүсийн хязгаараас хэтэрсэн',
     locationUpdated: 'Байршил шинэчлэгдсэн',
-    options: {
-      showLocationMarkers: 'Байршлын тэмдэглэгээг харуулах',
-      showMarkersLabels: `Тэмдэглэгээний шошгыг харуулах`,
-      showSamplingPolygon: `Түүвэрлэх олон өнцөгт`,
-      showControlPoints: `Хяналтын цэгүүд`,
-      showPlotReferencePoint: `Газрын зургийн лавлах цэг`,
-      showUtmGrid: 'UTM торыг харуулах',
-    },
-    rulerTooltip: `Зай хэмжиж эхлэхийн тулд товчийг дарна уу.
-- замыг хэмжихийн тулд олон удаа дарна уу
-- хэмжилтийг дуусгахын тулд давхар дарах эсвэл ESC товчийг дарна уу
-- хэмжилтийг нуухын тулд товчийг дахин дарна уу`,
     samplingPointDataLayerName: 'Түүвэрлэх цэгийн өгөгдөл - түвшин {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (ачаалж байна...)',
     samplingPointItemPopup: {
@@ -592,15 +580,7 @@ export default {
     samplingPolygon: 'Түүвэрлэх олон өнцөгт',
     shape: 'Хэлбэр',
   },
-  kmlUploader: {
-    opacity: 'тунгалаг байдал',
-    selectFile: 'Файл сонгох',
-    title: 'KML/KMZ/Shapefile сонголтууд',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Харьцуулах хугацааг сонгоно уу',
-    falseColor: 'Худал өнгө',
-  },
+
   surveysView: {
     chains: 'Гинжүүд',
     confirmUpdateSurveyOwner: `Судалгаа "{{surveyName}}"-ийн эзэмшигчийг "{{ownerName}}" болгож өөрчлөх үү?`,

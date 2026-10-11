@@ -457,18 +457,6 @@ Try again?`,
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationNotValidOrOutOfRange: 'Location not valid or out of UTM zone range',
     locationUpdated: 'Location updated',
-    options: {
-      showLocationMarkers: 'Show location markers',
-      showMarkersLabels: `Show markers' labels`,
-      showSamplingPolygon: `Sampling polygon`,
-      showControlPoints: `Control points`,
-      showPlotReferencePoint: `Plot reference point`,
-      showUtmGrid: 'Show UTM grid',
-    },
-    rulerTooltip: `Press the button to start measuring distances.
-- click multiple times to measure paths
-- double click or press ESC button to finish measuring
-- press the button again to hide measurements`,
     samplingPointDataLayerName: 'Sampling point data - level {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
@@ -590,15 +578,7 @@ Try again?`,
     samplingPolygon: 'Sampling Polygon',
     shape: 'Shape',
   },
-  kmlUploader: {
-    opacity: 'opacity',
-    selectFile: 'Select File',
-    title: 'KML/KMZ/Shapefile Options',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Choose a period to compare with',
-    falseColor: 'False Color',
-  },
+
   surveysView: {
     chains: 'Chains',
     confirmUpdateSurveyOwner: `Change the owner of the survey "{{surveyName}}" into "{{ownerName}}"?`,

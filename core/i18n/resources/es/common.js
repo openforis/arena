@@ -436,18 +436,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     locationEditInfo: 'Haga doble clic en el mapa o arrastre el marcador para actualizar la ubicación',
     locationNotValidOrOutOfRange: 'Ubicación no válida o fuera del rango de la zona UTM',
     locationUpdated: 'Ubicación actualizada',
-    options: {
-      showLocationMarkers: 'Mostrar marcadores de ubicación',
-      showMarkersLabels: 'Mostrar etiquetas de marcadores',
-      showSamplingPolygon: 'Polígono de muestreo',
-      showControlPoints: 'Puntos de control',
-      showPlotReferencePoint: 'Punto de referencia de parcela',
-      showUtmGrid: 'Mostrar cuadrícula UTM',
-    },
-    rulerTooltip: `Presione el botón para comenzar a medir distancias.
-- haga clic varias veces para medir trayectos
-- haga doble clic o presione la tecla ESC para terminar de medir
-- presione el botón de nuevo para ocultar las mediciones`,
     samplingPointDataLayerName: 'Datos de puntos de muestreo - nivel {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (cargando...)',
     samplingPointItemPopup: {
@@ -567,15 +555,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     rectangle: 'Rectángulo',
     samplingPolygon: 'Polígono de muestreo',
     shape: 'Forma',
-  },
-  kmlUploader: {
-    opacity: 'opacidad',
-    selectFile: 'Seleccionar archivo',
-    title: 'Opciones de KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Elija un período para comparar',
-    falseColor: 'Color falso',
   },
   surveysView: {
     chains: 'Cadenas',
