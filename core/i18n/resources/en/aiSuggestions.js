@@ -16,4 +16,8 @@ export default {
     card_one: '{{count}} text is missing in {{language}}. Translate it?',
     card_other: '{{count}} texts are missing in {{language}}. Translate them?',
   },
+  newEntriesDescriptions: {
+    card_one: 'You added {{count}} entry without a description. Write descriptions in all languages?',
+    card_other: 'You added {{count}} entries without a description. Write descriptions in all languages?',
+  },
 }

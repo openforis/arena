@@ -1,7 +1,7 @@
 import { CYRILLIC, LANGUAGES, enTextOf, expectedTexts, getText, placeholders } from '@test/unit/utils/aiSuggestionsI18n'
 
 // card keys of Part 2: plural ones get the language's i18next suffixes
-const CARD_KEYS = { plural: ['missingTranslations.card'], single: [] as string[] }
+const CARD_KEYS = { plural: ['missingTranslations.card', 'newEntriesDescriptions.card'], single: [] as string[] }
 
 describe('card texts of the Design suggestions (228)', () => {
   test.each(LANGUAGES)('%s has every card text with the English placeholders', (lang) => {
