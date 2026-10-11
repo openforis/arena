@@ -7,6 +7,7 @@ import { useUser } from '@webapp/store/user'
 
 import { baseLayers } from '../../baseLayers'
 import { useMapContextBaseLayer } from '../../MapContext'
+import { useCustomBaseMapMenuItems } from '../customLayers/useCustomBaseMapMenuItems'
 import { useMapContextActions } from '../mapContextActions'
 import { getSelectableBaseLayers } from './baseMapItems'
 import type { SelectableBaseLayerDef } from './baseMapItems'
@@ -14,7 +15,7 @@ import { MenuRadioItem } from './menuItems'
 import { ToolbarMenu } from './ToolbarMenu'
 
 /**
- * Base map menu: one choice per base layer the user can use.
+ * Base map menu: one choice per base layer the user can use, then the custom WMS / WMTS / XYZ base maps.
  * @returns {React.ReactElement} The menu.
  */
 export const BaseMapMenu = (): ReactElement => {
@@ -22,6 +23,7 @@ export const BaseMapMenu = (): ReactElement => {
   const experimentalFeaturesEnabled = useSystemConfigExperimentalFeatures()
   const { onBaseLayerUpdate } = useMapContextActions()
   const currentBaseLayer = useMapContextBaseLayer() as SelectableBaseLayerDef
+  const customBaseMapItems = useCustomBaseMapMenuItems()
 
   const selectableBaseLayers = useMemo(
     () =>
@@ -35,8 +37,8 @@ export const BaseMapMenu = (): ReactElement => {
 
   return (
     <ToolbarMenu menuKey="baseMap" labelKey="mapWorkspace.menus.baseMap" iconClassName="icon-map2">
-      {(close) =>
-        selectableBaseLayers.map((baseLayer) => (
+      {(close) => [
+        ...selectableBaseLayers.map((baseLayer) => (
           <MenuRadioItem
             key={baseLayer.key}
             itemKey={`baseMap-${baseLayer.key}`}
@@ -47,8 +49,9 @@ export const BaseMapMenu = (): ReactElement => {
               close()
             }}
           />
-        ))
-      }
+        )),
+        ...customBaseMapItems(close),
+      ]}
     </ToolbarMenu>
   )
 }

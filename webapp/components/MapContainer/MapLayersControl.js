@@ -12,6 +12,9 @@ import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { MAP_MIN_ZOOM } from './mapZoom'
+import { CustomBaseLayer } from './workspace/customLayers/CustomBaseLayer'
+import { findCustomBaseLayerDef, isCustomBaseLayerKey } from './workspace/customLayers/customLayerLeaflet'
+import { useMapCustomLayers } from './workspace/customLayers/MapCustomLayersContext'
 import { useMapWorkspace } from './workspace/MapWorkspaceContext'
 import { useControlContainerMove } from './workspace/layers/useControlContainerMove'
 import { getSelectableBaseLayers } from './workspace/toolbar/baseMapItems'
@@ -29,6 +32,7 @@ export const MapLayersControl = (props) => {
   const { variant, layersControlTarget } = useMapWorkspace()
   const full = variant === 'full'
   const [control, setControl] = useState(null)
+  const { baseMaps: customBaseLayerDefs } = useMapCustomLayers()
 
   // full map: the control lives in the Layers tab of the rail; compact maps: it stays on the map, collapsed
   useControlContainerMove(full ? control : null, layersControlTarget)
@@ -41,6 +45,12 @@ export const MapLayersControl = (props) => {
   // on layer add, set selected layer in map context
   useMapEvents({
     baselayerchange(event) {
+      // custom base maps are named by their key ("custom:<uuid>"), never matched against the built-in names
+      if (isCustomBaseLayerKey(event.name)) {
+        const customBaseLayerDef = findCustomBaseLayerDef({ controlName: event.name, customBaseLayerDefs })
+        if (customBaseLayerDef) onBaseLayerUpdate(customBaseLayerDef)
+        return
+      }
       const baseLayerDef = baseLayers.find((baseLayer) => baseLayer.name === event.name)
       if (baseLayerDef) onBaseLayerUpdate(baseLayerDef)
     },
@@ -96,6 +106,18 @@ export const MapLayersControl = (props) => {
     return result
   }, [contextBaseLayer, experimentalFeaturesEnabled, getTileUrl, user])
 
+  // custom WMS / WMTS / XYZ base maps: rendered apart from the built-in ones, without crossOrigin (their hosts may
+  // not send CORS headers)
+  const customBaseLayersControls = useMemo(
+    () =>
+      customBaseLayerDefs.map((def) => (
+        <LayersControl.BaseLayer key={def.key} name={def.name} checked={contextBaseLayer?.key === def.key}>
+          <CustomBaseLayer layer={def.custom} />
+        </LayersControl.BaseLayer>
+      )),
+    [contextBaseLayer, customBaseLayerDefs]
+  )
+
   const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
 
   return (
@@ -103,6 +125,7 @@ export const MapLayersControl = (props) => {
       {/* collapsed is read only when the control is created; the variant of a map never changes */}
       <LayersControl ref={setControl} autoZIndex position="topright" collapsed={!full}>
         {baseLayersControls}
+        {customBaseLayersControls}
         {layers}
       </LayersControl>
       {showGroupsInjector && (

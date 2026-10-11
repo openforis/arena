@@ -20,6 +20,8 @@ import { MapWorkspace } from './workspace/MapWorkspace'
 import { MapPlanetPeriodProvider } from './workspace/imagery/MapPlanetPeriodContext'
 import { PlanetPeriodLayers } from './workspace/imagery/PlanetPeriodLayers'
 import { MapCustomOverlaysProvider } from './workspace/layers/MapCustomOverlaysContext'
+import { CustomOverlaysRegistrar } from './workspace/customLayers/CustomOverlaysRegistrar'
+import { MapCustomLayersProvider } from './workspace/customLayers/MapCustomLayersContext'
 import { useMapRailTabs } from './workspace/rail/useMapRailTabs'
 
 // start of workaround to show leaflet marker icon
@@ -128,12 +130,16 @@ export const MapContainer = (props) => {
         <MapPlanetPeriodProvider>
           <MapWorkspaceProvider variant={variant}>
             <MapCustomOverlaysProvider>
-              <MapWorkspace
-                hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
-                railTabs={railTabs}
-                records={records}
-                mapElement={mapElement}
-              />
+              <MapCustomLayersProvider>
+                {/* compact maps have no Layers tab: they get custom base maps only */}
+                {variant === 'full' && <CustomOverlaysRegistrar />}
+                <MapWorkspace
+                  hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
+                  railTabs={railTabs}
+                  records={records}
+                  mapElement={mapElement}
+                />
+              </MapCustomLayersProvider>
             </MapCustomOverlaysProvider>
           </MapWorkspaceProvider>
         </MapPlanetPeriodProvider>
