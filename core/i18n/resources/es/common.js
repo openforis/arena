@@ -1495,6 +1495,7 @@ $t(common.appNameFull)
       survey_getOverview: 'Leyó la estructura de la encuesta',
       nodeDef_get: 'Consultó {{name}}',
       nodeDef_search: 'Buscó "{{text}}"',
+      survey_getValidation: 'Revisó los errores de diseño',
       view_getCurrent: 'Revisó la vista actual',
       expression_check: 'Comprobó una expresión',
       nodeDef_proposeCreate: 'Preparó nuevos elementos',

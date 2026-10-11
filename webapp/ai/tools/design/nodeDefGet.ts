@@ -17,6 +17,9 @@ import {
   requireSurvey,
   toExpressionView,
 } from './surveyLookup'
+import { getNodeDefIssues } from './surveyGetValidation'
+
+type Translate = (key: string, params?: Record<string, unknown>) => string
 
 export const CHILDREN_MAX = 50
 const RESULT_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
@@ -62,9 +65,10 @@ const getChildrenView = (survey: any, nodeDef: any) => {
  * Describes one node definition in full for the model.
  * @param {object} survey - Survey.
  * @param {object} nodeDef - Node definition.
+ * @param {Translate} t - Translator (design errors and warnings).
  * @returns {object} The description.
  */
-export const describeNodeDef = (survey: any, nodeDef: any) => {
+export const describeNodeDef = (survey: any, nodeDef: any, t: Translate) => {
   const path = getNodeDefPathNames(survey, nodeDef)
   const validations = NodeDef.getValidations(nodeDef)
   return {
@@ -81,6 +85,7 @@ export const describeNodeDef = (survey: any, nodeDef: any) => {
     required: NodeDefValidations.isRequired(validations),
     expressions: getExpressionsView(nodeDef),
     ...(NodeDef.isEntity(nodeDef) ? getChildrenView(survey, nodeDef) : {}),
+    issues: getNodeDefIssues(survey, nodeDef, t),
   }
 }
 
@@ -88,10 +93,11 @@ export const describeNodeDef = (survey: any, nodeDef: any) => {
  * Describes a node definition and keeps the result within the tool result budget (drops expression messages if needed).
  * @param {object} survey - Survey.
  * @param {object} nodeDef - Node definition.
+ * @param {Translate} t - Translator.
  * @returns {object} The description.
  */
-export const describeNodeDefWithinBudget = (survey: any, nodeDef: any) => {
-  const description: any = describeNodeDef(survey, nodeDef)
+export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate) => {
+  const description: any = describeNodeDef(survey, nodeDef, t)
   if (JSON.stringify(description).length <= RESULT_MAX_JSON_CHARS) return description
   const expressions: Record<string, object[]> = {}
   for (const [prop, views] of Object.entries(description.expressions as Record<string, any[]>)) {
@@ -104,8 +110,8 @@ export const nodeDefGetTool: AiTool<{ name: string }> = {
   name: 'nodeDef_get',
   description:
     'Returns one node definition by name: labels and descriptions per language, key / multiple / readOnly flags, ' +
-    'its expressions (defaultValues, applicable, validations.expressions, visibleIf, editableIf), its parent path ' +
-    'and, for entities, the child names. Call it before proposing a change to that node definition.',
+    'its expressions (defaultValues, applicable, validations.expressions, visibleIf, editableIf), its parent path, ' +
+    'for entities the child names, and the design errors and warnings (issues) the designer shows. Call it before proposing a change to that node definition.',
   inputSchema: z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') }),
   area: ['design', 'cleaning'],
   dataClass: 'schema',
@@ -113,6 +119,6 @@ export const nodeDefGetTool: AiTool<{ name: string }> = {
   requires: canViewSurveyTool,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
-    return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name))
+    return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name), ctx.t)
   },
 }
