@@ -151,6 +151,9 @@ export const createCategoryItemTranslationsDetector = ({
       } catch {
         // offline or aborted: the next trigger tries again
         release()
+      } finally {
+        // settled: a later abort of the generation must not free the throttle of a successful request
+        generation.signal.removeEventListener('abort', release)
       }
     },
   }

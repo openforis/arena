@@ -159,6 +159,18 @@ describe('category labels counts (237)', () => {
     await first
   })
 
+  test('a generation abort after a successful request keeps its throttle', async () => {
+    const { store } = createSetKindRecorder()
+    const fetchCounts = jest.fn(async () => counts)
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts })
+    const t0 = TEST_NOW.getTime()
+    const controller = new AbortController()
+    await detector.handle(event('generationStarted'), contextWith({ survey, store, controller, time: t0 }))
+    controller.abort()
+    await detector.handle(event('generationStarted'), contextWith({ survey, store, time: t0 + 1000 }))
+    expect(fetchCounts).toHaveBeenCalledTimes(1)
+  })
+
   test('a failed request is not throttled; nothing is fetched without draft defs the user can edit', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(counts)
