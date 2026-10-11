@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
 import { useIsCategoriesRoute, useOnBrowserBack } from '@webapp/components/hooks'
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
@@ -23,6 +24,8 @@ export const useLocalState = (props) => {
     void (async () => {
       await Actions.init({ state, categoryUuid, onCategoryUpdate })
     })()
+    // labels typed in the editor change the missing counts (suggestion 6)
+    return () => notifySuggestionEvent({ type: 'categoryEditorLeft' })
   }, [])
 
   if (inCategoriesPath) {

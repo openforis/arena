@@ -4,6 +4,7 @@ import { useDispatch } from 'react-redux'
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 
 import { DialogConfirmActions, NotificationActions } from '@webapp/store/ui'
 import { SurveyActions, useSurvey } from '@webapp/store/survey'
@@ -18,6 +19,7 @@ const _delete =
     await API.deleteCategory({ surveyId, categoryUuid })
 
     dispatch(SurveyActions.surveyCategoryDeleted(categoryUuid))
+    notifySuggestionEvent({ type: 'categoriesChanged' })
 
     if (callback) {
       callback()
