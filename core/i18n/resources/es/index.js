@@ -1,3 +1,4 @@
+import aiSuggestions from './aiSuggestions'
 import appErrors from './appErrors'
 import auth from './auth'
 import common from './common'
@@ -18,6 +19,7 @@ import validationErrors from './validationErrors'
 import whatsNew from './whatsNew'
 
 export default {
+  aiSuggestions,
   appErrors,
   auth,
   common,
