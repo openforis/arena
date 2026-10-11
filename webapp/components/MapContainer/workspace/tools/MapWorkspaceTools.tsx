@@ -6,7 +6,7 @@ import { measureModeOfTool } from '@webapp/components/MapContainer/workspace/too
 
 /**
  * Renders the active map tool; it is inside WorkspaceLeafletProvider, so tools can use the Leaflet map.
- * One MeasureTool serves both measure tools, so switching Distance <-> Area keeps it mounted (and the chosen units).
+ * One MeasureTool serves both measure tools, so switching Distance and Area keeps it mounted (and the chosen units).
  * @returns {React.ReactElement|null} The active tool, or null when no tool is active.
  */
 export const MapWorkspaceTools = (): ReactElement | null => {

@@ -34,7 +34,7 @@ export type MeasureToolProps = { mode: MeasureMode }
 export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   const map = useMap()
   const t = useI18nT()
-  const { dispatch: dispatchWorkspace } = useMapWorkspace()
+  const { dispatch: dispatchWorkspace, variant } = useMapWorkspace()
   const [state, dispatch] = useReducer(measureReducer, initialMeasureState)
   const [distanceUnit, setDistanceUnit] = useState<MeasureDistanceUnit>('auto')
   const [areaUnit, setAreaUnit] = useState<MeasureAreaUnit>('auto')
@@ -61,9 +61,16 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   const summary = getMeasureSummary(mode, state)
   const { total, perimeter } = formatMeasureTexts({ mode, summary, distanceUnit, areaUnit, unitLabel })
 
-  useEffect(() => {
-    if (finishedLayer && total) finishedLayer.setTooltipContent(total)
-  }, [finishedLayer, total])
+  useEffect(
+    /**
+     * Mirrors the running total in the tooltip of the finished layer.
+     * @returns {void}
+     */
+    () => {
+      if (finishedLayer && total) finishedLayer.setTooltipContent(total)
+    },
+    [finishedLayer, total]
+  )
 
   // Done or Escape on a bar control unmounts the focused control with the bar and the focus falls to the body,
   // outside the workspace root: give it back to the map so the workspace shortcuts (m, a, Escape) keep working
@@ -119,6 +126,7 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
       unitOptions={unitOptionsOf(mode)}
       total={total}
       perimeter={perimeter}
+      showHint={variant === 'full'}
       onModeChange={onModeChange}
       onUnitChange={onUnitChange}
       onDone={onDone}

@@ -1,4 +1,4 @@
-import type { ReactElement } from 'react'
+import type { ChangeEvent, KeyboardEvent, ReactElement } from 'react'
 import Button from '@mui/material/Button'
 import NativeSelect from '@mui/material/NativeSelect'
 import Paper from '@mui/material/Paper'
@@ -15,6 +15,25 @@ import type {
 
 const NO_VALUE = '—'
 
+// Compact segmented look of the mockup: sentence case (MUI uppercases by default), white selected segment on a track
+const toggleSx = {
+  bgcolor: '#f0f1f4',
+  p: '2px',
+  gap: '2px',
+  '& .MuiToggleButton-root': {
+    textTransform: 'none',
+    fontSize: 12,
+    fontWeight: 600,
+    border: 0,
+    borderRadius: '6px !important',
+    px: 1.5,
+    py: 0.25,
+    color: 'text.secondary',
+  },
+  '& .MuiToggleButton-root.Mui-selected': { bgcolor: '#fff', color: '#1f5c99' },
+  '& .MuiToggleButton-root.Mui-selected:hover': { bgcolor: '#fff' },
+}
+
 export type MeasureBarProps = {
   barRef: (element: HTMLDivElement | null) => void
   mode: MeasureMode
@@ -22,6 +41,7 @@ export type MeasureBarProps = {
   unitOptions: MeasureUnitOption[]
   total: string | null
   perimeter: string | null
+  showHint: boolean
   onModeChange: (mode: MeasureMode) => void
   onUnitChange: (unit: MeasureUnitOption) => void
   onDone: () => void
@@ -39,13 +59,14 @@ export type MeasureBarProps = {
  * @param {MeasureUnitOption[]} props.unitOptions - The units of the mode.
  * @param {string|null} props.total - The running total, null when nothing is measured.
  * @param {string|null} props.perimeter - The perimeter (area mode), null otherwise.
+ * @param {boolean} props.showHint - Whether the usage hint fits (false on compact maps).
  * @param {Function} props.onModeChange - Called with the selected mode.
  * @param {Function} props.onUnitChange - Called with the selected unit.
  * @param {Function} props.onDone - Called by Done.
  * @returns {React.ReactElement} The bar.
  */
 export const MeasureBar = (props: MeasureBarProps): ReactElement => {
-  const { barRef, mode, unit, unitOptions, total, perimeter, onModeChange, onUnitChange, onDone } = props
+  const { barRef, mode, unit, unitOptions, total, perimeter, showHint, onModeChange, onUnitChange, onDone } = props
   const t = useI18nT()
 
   // The test id must sit on the native select (e2e uses selectOption on it)
@@ -53,6 +74,37 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
     'aria-label': t('mapWorkspace.measure.units'),
     'data-testid': TestId.mapWorkspace.measureUnit,
   }
+
+  /**
+   * Handles Escape typed in the unit select, which the workspace shortcuts ignore.
+   * @param {React.KeyboardEvent} event - The key event.
+   * @returns {void}
+   */
+  const onKeyDown = (event: KeyboardEvent<HTMLDivElement>): void => {
+    // useMapShortcuts skips text fields (a select is one) and defaultPrevented events: Escape is handled once
+    if (event.key === 'Escape' && event.target instanceof HTMLSelectElement) {
+      event.preventDefault()
+      onDone()
+    }
+  }
+
+  /**
+   * Selects the mode of the toggle, ignoring the deselect click on the active one.
+   * @param {React.MouseEvent} _event - The click event.
+   * @param {MeasureMode|null} value - The clicked mode, null when the active one was clicked.
+   * @returns {void}
+   */
+  const onToggleChange = (_event: unknown, value: MeasureMode | null): void => {
+    if (value) onModeChange(value)
+  }
+
+  /**
+   * Reports the unit chosen in the select.
+   * @param {React.ChangeEvent<HTMLSelectElement>} event - The change event.
+   * @returns {void}
+   */
+  const onSelectChange = (event: ChangeEvent<HTMLSelectElement>): void =>
+    onUnitChange(event.target.value as MeasureUnitOption)
 
   return (
     <Paper
@@ -67,29 +119,24 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         zIndex: 1000,
         display: 'flex',
         alignItems: 'center',
-        flexWrap: 'wrap',
+        flexWrap: 'nowrap',
+        whiteSpace: 'nowrap',
         gap: 1.5,
         p: 0.75,
+        borderRadius: 1,
         maxWidth: 'calc(100% - 24px)',
         fontSize: 13,
         cursor: 'default',
       }}
-      onKeyDown={(event) => {
-        // useMapShortcuts skips text fields (a select is one) and defaultPrevented events: Escape is handled once
-        if (event.key === 'Escape' && event.target instanceof HTMLSelectElement) {
-          event.preventDefault()
-          onDone()
-        }
-      }}
+      onKeyDown={onKeyDown}
     >
       <ToggleButtonGroup
         exclusive
         size="small"
         value={mode}
         aria-label={t('mapWorkspace.measure.barLabel')}
-        onChange={(_event, value: MeasureMode | null) => {
-          if (value) onModeChange(value)
-        }}
+        onChange={onToggleChange}
+        sx={toggleSx}
       >
         <ToggleButton value="distance" data-testid={TestId.mapWorkspace.measureModeDistance}>
           {t('mapWorkspace.measure.modes.distance')}
@@ -102,7 +149,8 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
       <Typography
         component="strong"
         data-testid={TestId.mapWorkspace.measureTotal}
-        sx={{ fontWeight: 700, fontSize: 14, minWidth: 64 }}
+        aria-live="polite"
+        sx={{ fontWeight: 700, fontSize: 14, minWidth: 64, flexShrink: 0 }}
       >
         {total ?? NO_VALUE}
       </Typography>
@@ -111,24 +159,23 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         <Typography
           component="span"
           data-testid={TestId.mapWorkspace.measurePerimeter}
-          sx={{ fontSize: 12, color: 'text.secondary' }}
+          sx={{ fontSize: 12, color: 'text.secondary', flexShrink: 0 }}
         >
           {t('mapWorkspace.measure.perimeter', { value: perimeter })}
         </Typography>
       )}
 
-      <Typography
-        component="span"
-        sx={{ fontSize: 12, color: 'text.secondary', display: { xs: 'none', md: 'inline' } }}
-      >
-        {t('mapWorkspace.measure.hint')}
-      </Typography>
+      {showHint && (
+        <Typography component="span" sx={{ fontSize: 12, color: 'text.secondary' }}>
+          {t('mapWorkspace.measure.hint')}
+        </Typography>
+      )}
 
       <NativeSelect
         value={unit}
-        onChange={(event) => onUnitChange(event.target.value as MeasureUnitOption)}
+        onChange={onSelectChange}
         inputProps={unitInputProps}
-        sx={{ fontSize: 12 }}
+        sx={{ fontSize: 12, height: 30 }}
       >
         {unitOptions.map((option) => (
           <option key={option} value={option}>
@@ -137,7 +184,13 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         ))}
       </NativeSelect>
 
-      <Button size="small" variant="outlined" data-testid={TestId.mapWorkspace.measureDone} onClick={onDone}>
+      <Button
+        size="small"
+        variant="outlined"
+        sx={{ height: 30, textTransform: 'none' }}
+        data-testid={TestId.mapWorkspace.measureDone}
+        onClick={onDone}
+      >
         {t('mapWorkspace.measure.done')}
       </Button>
     </Paper>
