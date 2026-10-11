@@ -9,6 +9,7 @@ import { isDeepEqual } from './deepEqual'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
+import { applyCategoryItemLabels, type CategoryLabelsApplierDeps } from './categoryItemLabels/applyCategoryItemLabels'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
 import type { ChangeSet, NodeDefOperation, OperationResult } from './types'
 
@@ -26,6 +27,8 @@ export type ApplierDeps = {
   onNodeDefCreated: (nodeDef: any) => void
   onNodeDefUpdated: (nodeDef: any, prevNodeDef: any) => void
   onNodeDefSaved: (params: { nodeDef: any; nodeDefParent: any }) => void
+  // category item labels (suggestion 6); without them, category operations are skipped (notSupported)
+  categoryLabels?: CategoryLabelsApplierDeps
 }
 
 type Group = { uuid: string; operations: NodeDefOperation[] }
@@ -142,7 +145,7 @@ const applyGroups = async (
 
 /**
  * Applies the selected operations: refused while the designer has an unsaved edit, conflicts re-checked against
- * the latest survey, then one save per node definition, in proposal order.
+ * the latest survey, then one save per node definition, in proposal order, then one request for the category labels.
  * @param {object} params - Parameters.
  * @param {ChangeSet} params.changeSet - Change set.
  * @param {string[]} params.operationIds - Selected operations.
@@ -168,8 +171,12 @@ export const applyChangeSet = async ({
   }
   const toApply = selected.filter((op) => !results.has(op.id))
   await applyGroups(groupByNodeDef(toApply.filter((op) => !isCategoryItemLabelOperation(op))), changeSet, deps, results)
-  for (const op of toApply) {
-    if (isCategoryItemLabelOperation(op)) results.set(op.id, { id: op.id, status: 'skipped', message: 'notSupported' })
-  }
+  await applyCategoryItemLabels({
+    changeSet,
+    operations: toApply.filter((op) => isCategoryItemLabelOperation(op)),
+    getSurvey: deps.getSurvey,
+    deps: deps.categoryLabels,
+    results,
+  })
   return selected.map((op) => results.get(op.id) as OperationResult)
 }

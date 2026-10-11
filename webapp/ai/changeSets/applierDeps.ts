@@ -6,6 +6,7 @@ import * as SurveyStatusState from '@webapp/store/survey/status/state'
 import * as NodeDefsActions from '@webapp/store/survey/nodeDefs/actions'
 
 import type { ApplierDeps } from './applyChangeSet'
+import { createCategoryLabelsApplierDeps } from './categoryItemLabels/categoryLabelsApplierDeps'
 
 /**
  * Creates the applier dependencies.
@@ -41,6 +42,7 @@ export const createApplierDeps = ({
         nodeDefValidation: null,
       })
     ),
+  categoryLabels: createCategoryLabelsApplierDeps({ dispatch, getSurvey: () => SurveyState.getSurvey(getState()) }),
 })
 
 /**
