@@ -118,6 +118,10 @@ const useMapCapture = ({
   useEffect(() => {
     if (!request) return undefined
     let current = true
+    /**
+     * Runs this request's capture, unless the request is stale.
+     * @returns {Promise<MapCaptureResult|null>} The capture, or null when stale.
+     */
     const run = (): Promise<MapCaptureResult | null> => {
       if (!current) return Promise.resolve(null)
       const plot = plotRef.current

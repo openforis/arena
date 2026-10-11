@@ -72,6 +72,23 @@ export const ScreenshotDialog = (): React.ReactElement => {
     stamp: state.stamp,
   })
   const actions = useScreenshotActions({ state, preview, onClose })
+  const { saving, actionError, clearActionError } = actions
+  /**
+   * Closes the dialog on user request (Cancel, X, Escape, backdrop), except while a save is running.
+   * @returns {void}
+   */
+  const onRequestClose = useCallback(() => {
+    if (!saving) onClose()
+  }, [onClose, saving])
+  /**
+   * Changes the file name and clears the previous action error.
+   * @param {string} fileName - The new file name.
+   * @returns {void}
+   */
+  const onFileNameChange = (fileName: string): void => {
+    if (actionError) clearActionError()
+    state.setFileName(fileName)
+  }
   const notice = getDialogNotice({ actionError: actions.actionError, preview })
   const imageReady = Boolean(preview.blob) && !preview.loading && !preview.notice?.blocking
   const toRecord = state.target === 'record'
@@ -79,7 +96,14 @@ export const ScreenshotDialog = (): React.ReactElement => {
   const { done } = actions
 
   return (
-    <Dialog open onClose={onClose} container={portalContainer} maxWidth="sm" fullWidth aria-labelledby={TITLE_ID}>
+    <Dialog
+      open
+      onClose={onRequestClose}
+      container={portalContainer}
+      maxWidth="sm"
+      fullWidth
+      aria-labelledby={TITLE_ID}
+    >
       <div className="map-screenshot-dialog" data-testid={TestId.mapWorkspace.screenshotDialog}>
         <DialogTitle id={TITLE_ID} className="map-screenshot-dialog__title">
           {i18n.t('mapWorkspace.screenshot.title')}
@@ -87,7 +111,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
             type="button"
             className="map-screenshot-dialog__close"
             aria-label={i18n.t('common.close')}
-            onClick={onClose}
+            onClick={onRequestClose}
           >
             <span className="icon icon-cross" />
           </button>
@@ -112,7 +136,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
               attribute={state.attribute}
               onAttributeChange={state.selectAttribute}
               fileName={state.fileName}
-              onFileNameChange={state.setFileName}
+              onFileNameChange={onFileNameChange}
             />
           )}
           {notice && !done && <ScreenshotNoticeLine notice={notice} />}
@@ -126,9 +150,9 @@ export const ScreenshotDialog = (): React.ReactElement => {
           toRecord={toRecord}
           imageReady={imageReady}
           canSave={canSave}
-          saving={actions.saving}
+          saving={actions.saving && !actions.replacePrompt}
           plotLabel={state.plot?.label ?? ''}
-          onCancel={onClose}
+          onCancel={onRequestClose}
           onAlsoDownload={actions.alsoDownload}
           onSubmit={toRecord ? actions.saveToRecord : actions.downloadOnly}
         />

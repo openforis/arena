@@ -72,6 +72,7 @@ export const useScreenshotActions = ({
   downloadOnly: () => void
   alsoDownload: () => void
   saveToRecord: () => void
+  clearActionError: () => void
   saving: boolean
   replacePrompt: ScreenshotReplacePrompt
   answerReplace: (replace: boolean) => void
@@ -92,8 +93,14 @@ export const useScreenshotActions = ({
 
   const alsoDownload = useCallback(() => {
     const name = ensurePngFileName(fileName)
-    if (blob && name) downloadBlob(blob, name)
+    if (!name) {
+      setActionError({ key: 'mapWorkspace.screenshot.errors.fileNameRequired', blocking: false })
+      return
+    }
+    if (blob) downloadBlob(blob, name)
   }, [blob, fileName])
+
+  const clearActionError = useCallback(() => setActionError(null), [])
 
   const saveToRecord = useCallback(() => {
     const name = ensurePngFileName(fileName)
@@ -114,5 +121,15 @@ export const useScreenshotActions = ({
     )
   }, [attribute, blob, fileName, plot, save])
 
-  return { downloadOnly, alsoDownload, saveToRecord, saving, replacePrompt, answerReplace, actionError, done }
+  return {
+    downloadOnly,
+    alsoDownload,
+    saveToRecord,
+    clearActionError,
+    saving,
+    replacePrompt,
+    answerReplace,
+    actionError,
+    done,
+  }
 }

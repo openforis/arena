@@ -153,7 +153,7 @@ describe('Screenshot save (293)', () => {
     await expect(saveScreenshotToRecord(deps, { ...input, blob: bigBlob })).resolves.toEqual({
       status: 'error',
       key: 'mapWorkspace.screenshot.errors.fileTooLarge',
-      params: { size: '11.0', limit: 10 },
+      params: { size: '11.0', limit: '10.0' },
     })
     expect(deps.fetchRecord).not.toHaveBeenCalled()
   })

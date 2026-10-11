@@ -148,7 +148,7 @@ const checkSize = (input: ScreenshotSaveInput): ScreenshotSaveOutcome | null => 
   })
   if (!('reason' in check)) return null
   if (check.reason === 'quota') return errorOutcome('quotaExceeded')
-  return errorOutcome('fileTooLarge', { size: check.sizeMb.toFixed(1), limit: check.limitMb })
+  return errorOutcome('fileTooLarge', { size: check.sizeMb.toFixed(1), limit: check.limitMb.toFixed(1) })
 }
 
 /**
