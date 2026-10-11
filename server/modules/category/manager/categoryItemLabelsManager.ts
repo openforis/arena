@@ -149,7 +149,7 @@ const parseUpdate = (raw: unknown, langs: string[]): CategoryItemLabelUpdate => 
   )
   requireValid(expectedText === undefined || expectedText === null || typeof expectedText === 'string', 'expectedText')
   return {
-    itemUuid: itemUuid as string,
+    itemUuid: (itemUuid as string).toLowerCase(),
     lang: lang as string,
     text: text as string,
     expectedText: (expectedText as string | null | undefined) ?? null,

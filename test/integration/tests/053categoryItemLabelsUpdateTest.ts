@@ -1,3 +1,5 @@
+import { UnauthorizedError } from '@openforis/arena-server'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -18,6 +20,7 @@ import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchem
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import * as SB from '@test/utils/surveyBuilder'
+import { buildUserWithoutGroups, runRoutePermission } from '@test/utils/routePermissionTestUtils'
 
 type Route = { method: string; path: string; handlers: any[] }
 
@@ -38,7 +41,7 @@ const collectRoutes = (init: (app: any) => void): Route[] => {
   return routes
 }
 
-const COLORS = ['Red', 'Green', 'Blue', 'Yellow', 'Black', 'White']
+const COLORS = ['Red', 'Green', 'Blue', 'Yellow', 'Black', 'White', 'Grey']
 
 describe('Category item labels update (053)', () => {
   let user: any
@@ -178,12 +181,31 @@ describe('Category item labels update (053)', () => {
     expect((await fetchStoredProps(white)).props_draft?.labels?.fr).toBeUndefined()
   })
 
+  test('an uppercase item uuid applies and is answered lower-cased; upper/lower duplicates are rejected', async () => {
+    const grey = uuidByCode.get('7') as string
+    const upper = grey.toUpperCase()
+    await expectInvalid(
+      [
+        { itemUuid: upper, lang: 'fr', text: 'Gris', expectedText: null },
+        { itemUuid: grey, lang: 'fr', text: 'Grise', expectedText: null },
+      ],
+      'duplicate'
+    )
+    const answer = await update([{ itemUuid: upper, lang: 'fr', text: 'Gris', expectedText: null }])
+    expect(answer.applied).toEqual([{ itemUuid: grey, lang: 'fr' }])
+    expect((await fetchStoredProps(grey)).props_draft.labels.fr).toBe('Gris')
+  })
+
   test('the route requires the survey edit permission and reads the items from the body', async () => {
     const white = uuidByCode.get('6') as string
     const route = collectRoutes(CategoryApi.init).find(
       ({ method, path }) => method === 'put' && path === '/survey/:surveyId/categories/items/labels'
     )
     expect(route?.handlers[0]).toBe(AuthMiddleware.requireSurveyEditPermission)
+    // a user without the edit permission is refused (UnauthorizedError, the API error handler answers 403); an editor passes
+    const refused = await runRoutePermission({ route, user: buildUserWithoutGroups(user), surveyId })
+    expect(refused).toBeInstanceOf(UnauthorizedError)
+    expect(await runRoutePermission({ route, user, surveyId })).toBeUndefined()
 
     const res = createFakeResponse()
     const items = [{ itemUuid: white, lang: 'fr', text: 'Blanc', expectedText: null }]

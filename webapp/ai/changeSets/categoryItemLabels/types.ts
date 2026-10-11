@@ -36,4 +36,4 @@ export const isCategoryItemLabelOperation = <T extends { type: string }>(
  * @returns {string} The key.
  */
 export const getCategoryItemLabelKey = ({ itemUuid, lang }: { itemUuid: string; lang: string }): string =>
-  `${itemUuid}|${lang}`
+  `${itemUuid.toLowerCase()}|${lang}`

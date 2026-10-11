@@ -34,6 +34,8 @@ describe('category item label operations in the change set paths (230)', () => {
     expect(isCategoryItemLabelOperation(op())).toBe(true)
     expect(isCategoryItemLabelOperation({ type: 'label.set' })).toBe(false)
     expect(getCategoryItemLabelKey({ itemUuid: 'i1', lang: 'fr' })).toBe('i1|fr')
+    // the server answers lower-cased uuids
+    expect(getCategoryItemLabelKey({ itemUuid: 'I1', lang: 'fr' })).toBe('i1|fr')
   })
 
   test('preview: valid category operations leave the survey as it is', async () => {
