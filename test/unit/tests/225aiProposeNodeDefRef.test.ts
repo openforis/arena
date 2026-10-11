@@ -183,7 +183,16 @@ describe('nodeDef_proposeUpdate with categoryName / taxonomyName (225)', () => {
     })
   })
 
-  test("Apply saves the uuid with the designer's save and leaves the parent code alone", async () => {
+  test('a child code attribute keeps its parent, so a category change is refused', async () => {
+    const child = withNodeDef(survey, 'country', (nodeDef) =>
+      NodeDef.assocProp({ key: 'parentCodeDefUuid', value: uuidOf('region') })(nodeDef)
+    )
+    const { result } = await propose([{ nodeDefName: 'country', prop: 'categoryName', value: 'land_use' }], child)
+    expect(result.error.code).toBe('invalidProposal')
+    expect(result.error.issues[0].message).toContain('refHasParentCode')
+  })
+
+  test("Apply saves the uuid with the designer's save", async () => {
     const { results, puts, survey: after } = await applyWithFakeDeps(survey, refChangeSet())
     expect(results).toEqual([{ id: 'o1', status: 'applied' }])
     expect(puts).toHaveLength(1)

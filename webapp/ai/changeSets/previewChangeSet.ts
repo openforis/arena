@@ -18,7 +18,7 @@ import {
   getOperationTargetKey,
 } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
-import { isNodeDefRefProp } from './types'
+import { isNodeDefRefProp, type NodeDefRefProp } from './types'
 import { collectValidationIssues } from './validationIssues'
 import type {
   ChangeOperation,
@@ -112,9 +112,16 @@ const checkMultipleOrKeyUpdate = ({
 }
 
 // the designer keeps the category of a published or parent code attribute, and the taxonomy of a published one
-const checkRefUpdate = ({ survey, nodeDef, op, t }: CheckParams<NodeDefUpdateOperation> & { nodeDef: any }) => {
-  if (!isNodeDefRefProp(op.prop) || canUpdateNodeDefRef(survey, nodeDef, op.prop)) return []
-  return issue(t, op.prop, 'refEditDisabled', { name: NodeDef.getName(nodeDef) })
+const checkRefUpdate = ({
+  survey,
+  nodeDef,
+  op,
+  t,
+}: CheckParams<NodeDefUpdateOperation> & { nodeDef: any; op: { prop: NodeDefRefProp } }) => {
+  if (canUpdateNodeDefRef(survey, nodeDef, op.prop)) return []
+  const name = NodeDef.getName(nodeDef)
+  const hasParentCode = op.prop === 'categoryUuid' && Boolean(NodeDef.getParentCodeDefUuid(nodeDef))
+  return issue(t, op.prop, hasParentCode ? 'refHasParentCode' : 'refEditDisabled', { name })
 }
 
 const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): FieldIssue[] => {
@@ -122,7 +129,7 @@ const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): Fi
   if (!nodeDef) return nodeDefNotFound(t, op.nodeDefUuid)
   const field = op.prop
   if (NodeDef.isRoot(nodeDef)) return issue(t, field, 'rootEntity')
-  if (isNodeDefRefProp(op.prop)) return checkRefUpdate({ survey, nodeDef, op, t })
+  if (isNodeDefRefProp(op.prop)) return checkRefUpdate({ survey, nodeDef, op: { ...op, prop: op.prop }, t })
   if (op.prop === 'multiple' && NodeDef.isEntity(nodeDef)) return issue(t, field, 'entityMultipleChange')
   if (op.prop === 'multiple' && op.to === true && NodeDef.getDefaultValues(nodeDef).length > 0) {
     return issue(t, field, 'multipleWithDefaultValues')

@@ -1580,6 +1580,8 @@ $t(common.appNameFull)
       rootEntity: 'El asistente no puede cambiar la entidad raíz.',
       refEditDisabled:
         '{{name}} no puede cambiar de categoría o taxonomía (está publicado, u otro atributo código depende de él).',
+      refHasParentCode:
+        '{{name}} depende de un atributo código padre, por lo que su categoría no se puede cambiar aquí. Cámbiala en el diseñador.',
     },
   },
 

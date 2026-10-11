@@ -23,7 +23,8 @@ import {
 
 let survey: any
 
-// region: code without category; species: taxon without taxonomy; calc_code: analysis (not eligible)
+// region: code without category; species: taxon without taxonomy; calc_code: analysis (not eligible);
+// country (code) and tree_species (taxon) already have their lists
 beforeAll(async () => {
   survey = withSavedNodeDefs(await buildRefSurvey())
 })
@@ -61,6 +62,15 @@ describe('attribute without a category or taxonomy detector (226)', () => {
       NodeDef.assocProp({ key: 'parentCodeDefUuid', value: uuidOf('region') })(nodeDef)
     )
     expect(targetsOf(parentCode)).toEqual([uuidOf('species')])
+  })
+
+  test('a saved, unpublished child code attribute without a category is left out', () => {
+    const child = withNodeDef(survey, 'country', (nodeDef) =>
+      NodeDef.assocProp({ key: 'categoryUuid', value: null })(
+        NodeDef.assocProp({ key: 'parentCodeDefUuid', value: uuidOf('region') })(nodeDef)
+      )
+    )
+    expect(targetsOf(child)).toEqual([uuidOf('species')])
   })
 
   test('nothing when every attribute has its list, for unsaved ones, or when detectors must not run', () => {
