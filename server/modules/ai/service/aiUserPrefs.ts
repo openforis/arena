@@ -4,7 +4,7 @@
 import type { User } from '@openforis/arena-core'
 
 import * as UserUtils from '@core/user/user'
-import { AiFeatureCategory } from '@common/ai/features'
+import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
 
 const PREFS_KEY = 'ai'
 
@@ -21,11 +21,13 @@ export const getAiPrefs = (user: User): Record<string, any> | null => {
 }
 
 /**
- * Returns the default (all off) category toggles.
+ * Returns the toggles of a user who set none: off, except the categories on by default.
  * @returns {AiFeatureToggles} The toggles.
  */
 export const defaultFeatureToggles = (): AiFeatureToggles =>
-  Object.fromEntries(Object.values(AiFeatureCategory).map((category) => [category, false])) as AiFeatureToggles
+  Object.fromEntries(
+    Object.values(AiFeatureCategory).map((category) => [category, isAiCategoryOnByDefault(category)])
+  ) as AiFeatureToggles
 
 /**
  * Keeps only the known categories with a boolean value; the others are off.

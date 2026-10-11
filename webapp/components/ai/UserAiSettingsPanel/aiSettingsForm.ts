@@ -2,7 +2,7 @@
  * Form model of the account part of the AI settings panel (switches and cloud provider). Pure.
  */
 import { AiProvider } from '@common/ai/aiProvider'
-import { AiFeatureCategory } from '@common/ai/features'
+import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
 import { isLocalOrPrivateUrl, isOrgHostedUrl } from '@common/ai/localServerAddress'
 import type { AiHostingClass } from '@common/ai/policy'
 
@@ -13,11 +13,22 @@ export const FEATURE_CATEGORIES: FeatureCategory[] = Object.values(AiFeatureCate
 export type FeatureToggles = Record<FeatureCategory, boolean>
 
 /**
- * Returns the category switches, all off.
+ * Returns the category switches of a user who set none: off, except the categories on by default.
  * @returns {FeatureToggles} The switches.
  */
 export const defaultFeatureToggles = (): FeatureToggles =>
-  Object.fromEntries(FEATURE_CATEGORIES.map((category) => [category, false])) as FeatureToggles
+  Object.fromEntries(
+    FEATURE_CATEGORIES.map((category) => [category, isAiCategoryOnByDefault(category)])
+  ) as FeatureToggles
+
+/**
+ * Returns a loaded switch: a stored boolean, else the category default.
+ * @param {unknown} value - Stored value.
+ * @param {FeatureCategory} category - Category.
+ * @returns {boolean} The switch.
+ */
+const toToggle = (value: unknown, category: FeatureCategory): boolean =>
+  typeof value === 'boolean' ? value : isAiCategoryOnByDefault(category)
 
 export const OTHER_MODEL_VALUE = '__other__'
 
@@ -226,7 +237,7 @@ export const settingsToForm = (data: AiSettings): FormState => ({
   featuresEnabled: !!data.featuresEnabled,
   // known categories only: a stored legacy `assistant` is never sent back
   featureToggles: Object.fromEntries(
-    FEATURE_CATEGORIES.map((category) => [category, !!data.featureToggles?.[category]])
+    FEATURE_CATEGORIES.map((category) => [category, toToggle(data.featureToggles?.[category], category)])
   ) as FeatureToggles,
   // an active personal provider (`enabled`) is shown; otherwise "Arena default"
   provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,

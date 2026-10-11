@@ -98,6 +98,10 @@ export default {
       label: 'ヘルプアシスタント',
       sends: '質問、Arena ユーザーマニュアルの抜粋、および Arena 内の現在位置 (モジュール名)。',
     },
+    assistantSuggestions: {
+      label: '先回りの提案',
+      sends: '提案の「実行する」をクリックするまで何も送信しません。確認はブラウザ内で行われます。',
+    },
     expressions: {
       label: '式',
       sends:
