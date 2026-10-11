@@ -7,9 +7,11 @@ export const DEFAULT_SAVE_TIMEOUT_MS = 30000
 const ERRORS_PREFIX = 'mapWorkspace.screenshot.errors'
 const SERVER_QUOTA_ERROR = 'cannotInsertFileExceedingQuota'
 
-export type NodeSaveEvent = { recordUuid?: string; key?: string } | null | undefined
+export type NodeSaveEvent =
+  { recordUuid?: string; key?: string; updatedNodes?: Record<string, unknown> } | null | undefined
 
 export type NodeSaveHandlers = {
+  onNodesUpdate: (event: NodeSaveEvent) => void
   onCompleted: (event: NodeSaveEvent) => void
   onError: (event: NodeSaveEvent) => void
 }
@@ -58,6 +60,7 @@ const errorOutcome = (key: string, params?: Record<string, string | number>): Sc
  * Must be started BEFORE the POST: the socket event can arrive before the HTTP response.
  * @param {object} params - The parameters.
  * @param {string} params.recordUuid - The record being updated.
+ * @param {string} params.nodeUuid - The uuid of the node sent: the completion counts only after an update including it.
  * @param {NodeSaveSubscribe} params.subscribe - Subscribes to the socket events, returns the unsubscribe function.
  * @param {number} params.timeoutMs - Time after which the result is "pending".
  * @param {SaveTimers} params.timers - Injected timers.
@@ -65,11 +68,13 @@ const errorOutcome = (key: string, params?: Record<string, string | number>): Sc
  */
 export const startNodeSaveWaiter = ({
   recordUuid,
+  nodeUuid,
   subscribe,
   timeoutMs,
   timers,
 }: {
   recordUuid: string
+  nodeUuid: string
   subscribe: NodeSaveSubscribe
   timeoutMs: number
   timers: SaveTimers
@@ -79,6 +84,7 @@ export const startNodeSaveWaiter = ({
     resolveResult = resolve
   })
   let settled = false
+  let nodeSeen = false
   let unsubscribe: () => void = () => undefined
   let timerId: unknown = null
 
@@ -103,9 +109,14 @@ export const startNodeSaveWaiter = ({
   const isForRecord = (event: NodeSaveEvent): boolean => event?.recordUuid === recordUuid
 
   unsubscribe = subscribe({
-    onCompleted: (event) => {
-      if (isForRecord(event)) finish({ status: 'saved' })
+    onNodesUpdate: (event) => {
+      if (isForRecord(event) && event?.updatedNodes?.[nodeUuid]) nodeSeen = true
     },
+    // the completion of another update of the same record (before this node is processed) is ignored
+    onCompleted: (event) => {
+      if (nodeSeen && isForRecord(event)) finish({ status: 'saved' })
+    },
+    // limit: the server sends no node or request id with the error, so the record is the only possible filter
     onError: (event) => {
       if (isForRecord(event)) finish({ status: 'error', details: event?.key ?? '' })
     },
@@ -159,11 +170,12 @@ const toOutcome = (result: NodeSaveResult): ScreenshotSaveOutcome => {
  */
 const sendAndWait = async (
   deps: ScreenshotSaveDeps,
-  params: { recordUuid: string; record: unknown; node: unknown; blob: Blob; fileName: string }
+  params: { recordUuid: string; nodeUuid: string; record: unknown; node: unknown; blob: Blob; fileName: string }
 ): Promise<ScreenshotSaveOutcome> => {
-  const { recordUuid, record, node, blob, fileName } = params
+  const { recordUuid, nodeUuid, record, node, blob, fileName } = params
   const waiter = startNodeSaveWaiter({
     recordUuid,
+    nodeUuid,
     subscribe: deps.subscribe,
     timeoutMs: deps.timeoutMs ?? DEFAULT_SAVE_TIMEOUT_MS,
     timers: deps.timers,
@@ -201,6 +213,7 @@ export const saveScreenshotToRecord = async (
   }
   return sendAndWait(deps, {
     recordUuid: input.recordUuid,
+    nodeUuid: (change.node as { uuid?: string } | undefined)?.uuid ?? '',
     record,
     node: change.node,
     blob: input.blob,

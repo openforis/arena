@@ -24,7 +24,12 @@ const createSocket = () => {
       handlers = nextHandlers
       return unsubscribe
     },
+    updated: (event: NodeSaveEvent) => handlers?.onNodesUpdate(event),
     completed: (event: NodeSaveEvent) => handlers?.onCompleted(event),
+    saved: (nodeUuid = 'node-new') => {
+      handlers?.onNodesUpdate({ recordUuid, updatedNodes: { [nodeUuid]: {} } })
+      handlers?.onCompleted({ recordUuid })
+    },
     error: (event: NodeSaveEvent) => handlers?.onError(event),
   }
 }
@@ -72,7 +77,7 @@ describe('Screenshot save (293)', () => {
     const { deps, socket, calls } = setup()
     deps.postNode = jest.fn(async () => {
       calls.push('post')
-      socket.completed({ recordUuid })
+      socket.saved()
     })
     await expect(saveScreenshotToRecord(deps, input)).resolves.toEqual({ status: 'saved' })
     expect(calls).toEqual(['subscribe', 'post'])
@@ -89,7 +94,7 @@ describe('Screenshot save (293)', () => {
       blob,
       fileName: input.fileName,
     })
-    socket.completed({ recordUuid })
+    socket.saved()
     await expect(promise).resolves.toEqual({ status: 'saved' })
   })
 
@@ -116,14 +121,14 @@ describe('Screenshot save (293)', () => {
   test('replaces the photo when the user confirms', async () => {
     const { deps, socket } = setup()
     deps.buildChange = jest.fn(() => updateChange)
-    deps.postNode = jest.fn(async () => socket.completed({ recordUuid }))
+    deps.postNode = jest.fn(async () => socket.saved('node-old'))
     await expect(saveScreenshotToRecord(deps, input)).resolves.toEqual({ status: 'saved' })
     expect(deps.postNode).toHaveBeenCalledWith(expect.objectContaining({ node: updateChange.node }))
   })
 
   test('does not ask when a new node is created', async () => {
     const { deps, socket } = setup()
-    deps.postNode = jest.fn(async () => socket.completed({ recordUuid }))
+    deps.postNode = jest.fn(async () => socket.saved())
     await saveScreenshotToRecord(deps, input)
     expect(deps.confirmReplace).not.toHaveBeenCalled()
   })
@@ -205,11 +210,41 @@ describe('Screenshot save (293)', () => {
     })
   })
 
+  test('ignores a completion of another update of the same record until this node is updated', async () => {
+    const { deps, socket } = setup()
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    socket.completed({ recordUuid })
+    socket.updated({ recordUuid, updatedNodes: { 'other-node': {} } })
+    socket.completed({ recordUuid })
+    socket.updated({ recordUuid: 'other-record', updatedNodes: { 'node-new': {} } })
+    socket.completed({ recordUuid })
+    expect(socket.unsubscribe).not.toHaveBeenCalled()
+    socket.saved()
+    await expect(promise).resolves.toEqual({ status: 'saved' })
+    expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
+  test('stops listening after the timeout', async () => {
+    const { deps, socket, clock } = setup()
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    clock.fireAll()
+    await expect(promise).resolves.toEqual({ status: 'pending' })
+    expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
   test('settles the waiter only once', async () => {
     const socket = createSocket()
     const clock = createTimers()
-    const waiter = startNodeSaveWaiter({ recordUuid, subscribe: socket.subscribe, timeoutMs: 10, timers: clock.timers })
-    socket.completed({ recordUuid })
+    const waiter = startNodeSaveWaiter({
+      recordUuid,
+      nodeUuid: 'node-1',
+      subscribe: socket.subscribe,
+      timeoutMs: 10,
+      timers: clock.timers,
+    })
+    socket.saved('node-1')
     socket.error({ recordUuid, key: 'late' })
     clock.fireAll()
     await expect(waiter.result).resolves.toEqual({ status: 'saved' })

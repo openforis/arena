@@ -17,13 +17,15 @@ const UPLOAD_TIMEOUT_MS = 120000
 
 /**
  * Listens to the socket events that end a record update.
- * @param {object} handlers - The handlers for completion and error.
+ * @param {object} handlers - The handlers for the nodes update, completion and error.
  * @returns {Function} Stops listening.
  */
-export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({ onCompleted, onError }) => {
+export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({ onNodesUpdate, onCompleted, onError }) => {
+  AppWebSocket.on(WebSocketEvents.nodesUpdate, onNodesUpdate)
   AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, onCompleted)
   AppWebSocket.on(WebSocketEvents.applicationError, onError)
   return () => {
+    AppWebSocket.off(WebSocketEvents.nodesUpdate, onNodesUpdate)
     AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted, onCompleted)
     AppWebSocket.off(WebSocketEvents.applicationError, onError)
   }
