@@ -10,6 +10,21 @@ export type NodeDefBasicProp = 'name' | 'key' | 'multiple' | 'readOnly'
 // tuples (as const), so zod's z.enum accepts them
 export const nodeDefBasicProps = ['name', 'key', 'multiple', 'readOnly'] as const satisfies readonly NodeDefBasicProp[]
 
+// category / taxonomy of a code / taxon attribute (uuids; the tool takes names)
+export type NodeDefRefProp = 'categoryUuid' | 'taxonomyUuid'
+
+export const nodeDefRefProps = ['categoryUuid', 'taxonomyUuid'] as const satisfies readonly NodeDefRefProp[]
+
+export type NodeDefUpdateProp = NodeDefBasicProp | NodeDefRefProp
+
+/**
+ * Tells whether an update property is a category or taxonomy reference.
+ * @param {string} prop - Property.
+ * @returns {boolean} True for categoryUuid and taxonomyUuid.
+ */
+export const isNodeDefRefProp = (prop: string): prop is NodeDefRefProp =>
+  (nodeDefRefProps as readonly string[]).includes(prop)
+
 export type NodeDefExpressionProp =
   'defaultValues' | 'applicable' | 'validations.expressions' | 'visibleIf' | 'editableIf'
 
@@ -34,7 +49,7 @@ export type NodeDefUpdateOperation = {
   id: string
   type: 'nodeDef.update'
   nodeDefUuid: string
-  prop: NodeDefBasicProp
+  prop: NodeDefUpdateProp
   from: string | boolean | null
   to: string | boolean
 }
@@ -91,7 +106,13 @@ export type OperationResult = {
 // operation: index in the change set; field: what the message is about (e.g. "name", "defaultValues")
 export type ChangeSetIssue = { operation: number; field: string; message: string }
 
-export type ConflictReason = 'nodeDefMissing' | 'valueChanged' | 'parentMissing' | 'nameTaken' | 'alreadyExists'
+export type ConflictReason =
+  | 'nodeDefMissing'
+  | 'valueChanged'
+  | 'parentMissing'
+  | 'nameTaken'
+  | 'alreadyExists'
+  | 'refMissing'
 
 export type OperationConflict = { id: string; reason: ConflictReason }
 

@@ -1669,6 +1669,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
         key: 'Chave',
         multiple: 'Múltiplo',
         readOnly: 'Somente leitura',
+        categoryUuid: 'Categoria',
+        taxonomyUuid: 'Taxonomia',
       },
       expressionProps: {
         defaultValues: 'Valores padrão',
@@ -1697,6 +1699,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       singleExpressionOnly: 'Esta propriedade aceita apenas uma expressão.',
       expressionEmpty: 'Uma expressão está vazia.',
       rootEntity: 'O assistente não pode alterar a entidade raiz.',
+      refEditDisabled:
+        '{{name}} não pode mudar de categoria ou taxonomia (está publicado, ou outro atributo código depende dele).',
     },
   },
 

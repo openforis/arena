@@ -1756,6 +1756,8 @@ $t(common.cantUndoWarning)`,
         key: 'Ключ',
         multiple: 'Множественный',
         readOnly: 'Только чтение',
+        categoryUuid: 'Категория',
+        taxonomyUuid: 'Таксономия',
       },
       expressionProps: {
         defaultValues: 'Значения по умолчанию',
@@ -1784,6 +1786,8 @@ $t(common.cantUndoWarning)`,
       singleExpressionOnly: 'Это свойство допускает только одно выражение.',
       expressionEmpty: 'Выражение пустое.',
       rootEntity: 'Помощник не может изменять корневую сущность.',
+      refEditDisabled:
+        'Для {{name}} нельзя сменить категорию или таксономию (он опубликован, или от него зависит другой атрибут-код).',
     },
   },
 

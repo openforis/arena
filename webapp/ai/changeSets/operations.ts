@@ -4,10 +4,20 @@
  */
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Category from '@core/survey/category'
+import * as Taxonomy from '@core/survey/taxonomy'
 
 import { getExpressionProp, setExpressionProp } from './expressionProps'
 import { isRecordEditOperation } from './recordEdits/types'
-import type { ChangeOperation, ChangeOperationDraft, LabelKind, NodeDefBasicProp } from './types'
+import {
+  isNodeDefRefProp,
+  type ChangeOperation,
+  type ChangeOperationDraft,
+  type LabelKind,
+  type NodeDefBasicProp,
+  type NodeDefRefProp,
+  type NodeDefUpdateProp,
+} from './types'
 
 type AnyOperation = ChangeOperation | ChangeOperationDraft
 
@@ -40,6 +50,53 @@ export const getBasicPropValue = (nodeDef: any, prop: NodeDefBasicProp): string 
   prop === 'name' ? NodeDef.getName(nodeDef) : Boolean(NodeDef.getProp(prop, false)(nodeDef))
 
 /**
+ * Returns the value of an update property.
+ * @param {object} nodeDef - Node definition.
+ * @param {NodeDefUpdateProp} prop - Property.
+ * @returns {string|boolean|null} The value; null for a reference that is not set.
+ */
+export const getUpdatePropValue = (nodeDef: any, prop: NodeDefUpdateProp): string | boolean | null =>
+  isNodeDefRefProp(prop)
+    ? (NodeDef.getProp(prop, null)(nodeDef) as string | null) || null
+    : getBasicPropValue(nodeDef, prop)
+
+/**
+ * Tells whether the designer lets the category or taxonomy of a node definition change.
+ * @param {object} survey - Survey.
+ * @param {object} nodeDef - Node definition.
+ * @param {NodeDefRefProp} prop - Reference property.
+ * @returns {boolean} True when it may change (CodeProps / TaxonProps rules).
+ */
+export const canUpdateNodeDefRef = (survey: any, nodeDef: any, prop: NodeDefRefProp): boolean =>
+  prop === 'categoryUuid'
+    ? Survey.canUpdateCategory(nodeDef)(survey)
+    : !NodeDef.isPublished(nodeDef) || Survey.isTemplate(Survey.getSurveyInfo(survey))
+
+/**
+ * Returns the category or taxonomy a reference points to.
+ * @param {object} survey - Survey.
+ * @param {NodeDefRefProp} prop - Reference property.
+ * @param {string} uuid - Category or taxonomy uuid.
+ * @returns {object|null} The category or taxonomy; null when it is not in the survey.
+ */
+export const findNodeDefRef = (survey: any, prop: NodeDefRefProp, uuid: string): any | null =>
+  (prop === 'categoryUuid' ? Survey.getCategoryByUuid(uuid)(survey) : Survey.getTaxonomyByUuid(uuid)(survey)) ?? null
+
+/**
+ * Returns the name of the category or taxonomy a reference points to.
+ * @param {object} survey - Survey.
+ * @param {NodeDefRefProp} prop - Reference property.
+ * @param {string|null} uuid - Category or taxonomy uuid.
+ * @returns {string|null} The name; the uuid when it is not in the survey; null when not set.
+ */
+export const getNodeDefRefName = (survey: any, prop: NodeDefRefProp, uuid: string | null): string | null => {
+  if (!uuid) return null
+  const ref = findNodeDefRef(survey, prop, uuid)
+  if (!ref) return uuid
+  return prop === 'categoryUuid' ? Category.getName(ref) : Taxonomy.getName(ref)
+}
+
+/**
  * Returns a label or description in a language.
  * @param {object} nodeDef - Node definition.
  * @param {LabelKind} kind - Labels or descriptions.
@@ -59,7 +116,7 @@ export const getLabelValue = (nodeDef: any, kind: LabelKind, lang: string): stri
  */
 export const getOperationCurrentValue = (nodeDef: any, op: AnyOperation): unknown => {
   if (isRecordEditOperation(op)) return null
-  if (op.type === 'nodeDef.update') return getBasicPropValue(nodeDef, op.prop)
+  if (op.type === 'nodeDef.update') return getUpdatePropValue(nodeDef, op.prop)
   if (op.type === 'label.set') return getLabelValue(nodeDef, op.kind, op.lang)
   if (op.type === 'expression.set') return getExpressionProp(nodeDef, op.prop)
   return null

@@ -1682,6 +1682,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
         key: 'Clé',
         multiple: 'Multiple',
         readOnly: 'Lecture seule',
+        categoryUuid: 'Catégorie',
+        taxonomyUuid: 'Taxonomie',
       },
       expressionProps: {
         defaultValues: 'Valeurs par défaut',
@@ -1710,6 +1712,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       singleExpressionOnly: "Cette propriété n'accepte qu'une seule expression.",
       expressionEmpty: 'Une expression est vide.',
       rootEntity: "L'assistant ne peut pas modifier l'entité racine.",
+      refEditDisabled:
+        '{{name}} ne peut pas changer de catégorie ou de taxonomie (il est publié, ou un autre attribut code en dépend).',
     },
   },
 

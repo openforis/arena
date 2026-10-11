@@ -1663,6 +1663,8 @@ $t(common.cantUndoWarning)`,
         key: 'Түлхүүр',
         multiple: 'Олон',
         readOnly: 'Зөвхөн унших',
+        categoryUuid: 'Ангилал',
+        taxonomyUuid: 'Таксоном',
       },
       expressionProps: {
         defaultValues: 'Анхдагч утга',
@@ -1691,6 +1693,8 @@ $t(common.cantUndoWarning)`,
       singleExpressionOnly: 'Энэ шинж чанар зөвхөн нэг илэрхийлэл хүлээн авна.',
       expressionEmpty: 'Илэрхийлэл хоосон байна.',
       rootEntity: 'Туслах үндсэн нэгжийг өөрчилж чадахгүй.',
+      refEditDisabled:
+        '{{name}}-ийн ангилал эсвэл таксономыг өөрчлөх боломжгүй (нийтлэгдсэн, эсвэл өөр код шинж чанар үүнээс хамаардаг).',
     },
   },
 

@@ -1548,6 +1548,8 @@ $t(common.appNameFull)
         key: 'Clave',
         multiple: 'Múltiple',
         readOnly: 'Solo lectura',
+        categoryUuid: 'Categoría',
+        taxonomyUuid: 'Taxonomía',
       },
       expressionProps: {
         defaultValues: 'Valores por defecto',
@@ -1576,6 +1578,8 @@ $t(common.appNameFull)
       singleExpressionOnly: 'Esta propiedad acepta una sola expresión.',
       expressionEmpty: 'Una expresión está vacía.',
       rootEntity: 'El asistente no puede cambiar la entidad raíz.',
+      refEditDisabled:
+        '{{name}} no puede cambiar de categoría o taxonomía (está publicado, u otro atributo código depende de él).',
     },
   },
 
