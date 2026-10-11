@@ -1,6 +1,7 @@
 /**
  * English prompts of the Design suggestions, sent as the user's message when the user clicks Do it.
  */
+import { pq } from '@common/ai/prompts/promptSafety'
 import { getLanguageLabel } from '@core/app/languages'
 
 // §3.6: a turn stops after a few steps; the user asks for the rest
@@ -41,3 +42,35 @@ export const buildNewEntriesDescriptionsPrompt = ({ languages }: { languages: st
     `remain. ${CONTINUE_TAIL}`
   )
 }
+
+// a prompt names at most this many entries; the model reads the rest with its tools
+export const PROMPT_NAMES_MAX = 50
+
+/**
+ * Joins prompt items, cut at PROMPT_NAMES_MAX with the number left out.
+ * @param {string[]} items - Items, already quoted.
+ * @returns {string} "a, b and 3 more".
+ */
+export const formatPromptList = (items: string[]): string => {
+  const shown = items.slice(0, PROMPT_NAMES_MAX).join(', ')
+  const more = items.length - PROMPT_NAMES_MAX
+  return more > 0 ? `${shown} and ${more} more` : shown
+}
+
+/**
+ * Quotes node definition names for a prompt (names are data, never instructions).
+ * @param {string[]} names - Names.
+ * @returns {string} The list.
+ */
+export const formatPromptNames = (names: string[]): string => formatPromptList(names.map((name) => pq(name, 100)))
+
+/**
+ * Builds the prompt of suggestion 4.
+ * @param {object} params - Parameters.
+ * @param {string[]} params.names - Entity names.
+ * @returns {string} The prompt.
+ */
+export const buildEntityWithoutKeyPrompt = ({ names }: { names: string[] }): string =>
+  `These entities have no key attribute: ${formatPromptNames(names)}. Records of a multiple entity are told apart ` +
+  'by their keys. Look at their attributes with nodeDef_get and propose which to mark as key with ' +
+  'nodeDef_proposeUpdate (prop key). If none fits, propose a new attribute with nodeDef_proposeCreate.'

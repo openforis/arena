@@ -20,4 +20,9 @@ export default {
     card_one: 'You added {{count}} entry without a description. Write descriptions in all languages?',
     card_other: 'You added {{count}} entries without a description. Write descriptions in all languages?',
   },
+  entityWithoutKey: {
+    cardSingle: '{{name}} has no key attribute. Suggest one?',
+    card_one: '{{count}} entity has no key attribute. Suggest keys?',
+    card_other: '{{count}} entities have no key attribute. Suggest keys?',
+  },
 }

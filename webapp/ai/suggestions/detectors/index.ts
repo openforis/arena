@@ -1,6 +1,7 @@
 /**
  * Detector registries: each suggestion adds one import and one element to the arrays it uses.
  */
+import { entityWithoutKeyDetector, entityWithoutKeyResolver } from './entityWithoutKey'
 import { missingTranslationsDetector } from './missingTranslations'
 import { newEntriesDescriptionsDetector, newEntriesDescriptionsResolver } from './newEntriesDescriptions'
 import { moduleIntroDetector } from './moduleIntro'
@@ -10,6 +11,10 @@ export type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, Ta
 
 export const STATE_DETECTORS: StateDetector[] = [missingTranslationsDetector]
 
-export const EVENT_DETECTORS: EventDetector[] = [moduleIntroDetector, newEntriesDescriptionsDetector]
+export const EVENT_DETECTORS: EventDetector[] = [
+  moduleIntroDetector,
+  newEntriesDescriptionsDetector,
+  entityWithoutKeyDetector,
+]
 
-export const TARGET_RESOLVERS: TargetResolver[] = [newEntriesDescriptionsResolver]
+export const TARGET_RESOLVERS: TargetResolver[] = [newEntriesDescriptionsResolver, entityWithoutKeyResolver]

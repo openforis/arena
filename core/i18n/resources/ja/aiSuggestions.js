@@ -18,4 +18,9 @@ export default {
     card_one: '説明のない項目を{{count}}件追加しました。すべての言語で説明を書きますか？',
     card_other: '説明のない項目を{{count}}件追加しました。すべての言語で説明を書きますか？',
   },
+  entityWithoutKey: {
+    cardSingle: '{{name}}にキー属性がありません。提案しますか？',
+    card_one: '{{count}}件のエンティティにキー属性がありません。キーを提案しますか？',
+    card_other: '{{count}}件のエンティティにキー属性がありません。キーを提案しますか？',
+  },
 }
