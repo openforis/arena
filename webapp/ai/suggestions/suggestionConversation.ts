@@ -81,6 +81,8 @@ export const reportSuggestionSettle = ({
  */
 export const getSuggestionTurnLockName = (conversationId: string): string => `arena.ai.suggestionTurn.${conversationId}`
 
+const noop = (): void => undefined
+
 /**
  * Returns the Web Locks manager, or null when the API is missing.
  * @returns {LockManager|null} The manager.
@@ -88,32 +90,28 @@ export const getSuggestionTurnLockName = (conversationId: string): string => `ar
 const getLockManager = (): LockManager | null => (typeof navigator !== 'undefined' && navigator.locks) || null
 
 /**
- * Runs a turn of a conversation holding its suggestion turn lock (other tabs then know it is running). A conversation
- * without suggestion scope, or a browser without Web Locks, runs the turn as it is; a lock error never breaks it.
+ * Holds the suggestion turn lock of a conversation until its turn ends (other tabs then know it is running). The
+ * turn itself is not wrapped: it starts as it always did. No-op without Web Locks; a lock error is swallowed.
  * @param {object} params - Parameters.
- * @param {Conversation} params.conversation - Conversation of the turn.
- * @param {Function} params.run - Runs the turn.
- * @returns {Promise<void>} Resolves when the turn ends.
+ * @param {string} params.conversationId - Conversation of the turn.
+ * @param {Promise<unknown>} params.done - The turn; settles when it ends.
+ * @param {LockManager|null} [params.locks] - Web Locks manager (the browser's by default).
+ * @returns {void}
  */
-export const withSuggestionTurnLock = async ({
-  conversation,
-  run,
+export const holdSuggestionTurnLock = ({
+  conversationId,
+  done,
+  locks = getLockManager(),
 }: {
-  conversation: Conversation
-  run: () => Promise<void>
-}): Promise<void> => {
-  const locks = conversation.suggestionScope ? getLockManager() : null
-  if (!locks) return run()
-  let started = false
+  conversationId: string
+  done: Promise<unknown>
+  locks?: Pick<LockManager, 'request'> | null
+}): void => {
+  if (!locks) return
   try {
-    await locks.request(getSuggestionTurnLockName(conversation.id), () => {
-      started = true
-      return run()
-    })
-  } catch (error) {
-    // the turn's own error goes on; a lock failure before it started runs the turn without the lock
-    if (started) throw error
-    await run()
+    locks.request(getSuggestionTurnLockName(conversationId), () => done.then(noop, noop)).catch(noop)
+  } catch {
+    // no lock: other tabs may settle this turn's entry early
   }
 }
 

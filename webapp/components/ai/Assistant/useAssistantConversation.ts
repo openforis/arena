@@ -29,7 +29,7 @@ import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import {
   reportSuggestionSettle,
   withSuggestionScope,
-  withSuggestionTurnLock,
+  holdSuggestionTurnLock,
 } from '@webapp/ai/suggestions/suggestionConversation'
 import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
@@ -259,8 +259,12 @@ export const useAssistantConversation = ({
 
   // tracked as a whole: logout waits for the final save of an aborted turn too
   const runTurn = useCallback(
-    (base: Conversation, text: string) =>
-      assistantTurnRegistry.track(withSuggestionTurnLock({ conversation: base, run: () => executeTurn(base, text) })),
+    (base: Conversation, text: string) => {
+      const turn = executeTurn(base, text)
+      // a Do it conversation: other tabs see its turn as running while the lock is held
+      if (base.suggestionScope) holdSuggestionTurnLock({ conversationId: base.id, done: turn })
+      return assistantTurnRegistry.track(turn)
+    },
     [executeTurn]
   )
 
