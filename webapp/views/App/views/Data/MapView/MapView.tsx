@@ -16,6 +16,7 @@ import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/syst
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
+import { MapPlotPointsProvider } from '@webapp/components/MapContainer/workspace/screenshot/MapPlotPointsContext'
 import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
 import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 
@@ -237,4 +238,8 @@ const MapWrapper = () => {
   )
 }
 
-export const MapView = () => <MapWrapper />
+export const MapView = () => (
+  <MapPlotPointsProvider>
+    <MapWrapper />
+  </MapPlotPointsProvider>
+)

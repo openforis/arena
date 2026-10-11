@@ -7,6 +7,7 @@ import { ClusterMarker, useFlyToPoint, useLayerRegistration } from '../common'
 import { CoordinateAttributeMarker } from './CoordinateAttributeMarker'
 import { useGeoAttributeDataLayer } from './useGeoAttributeDataLayer'
 import { applySortOrder, useMapLayersPanel } from '../MapLayersPanel/MapLayersPanelContext'
+import { useRegisterMapPlotPoints } from '@webapp/components/MapContainer/workspace/screenshot/MapPlotPointsContext'
 
 export const GeoAttributeDataLayer = (props) => {
   const {
@@ -57,6 +58,7 @@ export const GeoAttributeDataLayer = (props) => {
   const onMarkerPopupClose = useCallback(() => selectPoint(null), [selectPoint])
 
   useLayerRegistration({ layerKey, layerName: layerInnerName, points, flyToPoint })
+  useRegisterMapPlotPoints({ layerKey, attributeDef, points })
 
   return (
     <LayersControl.Overlay name={layerName} checked={checked}>
