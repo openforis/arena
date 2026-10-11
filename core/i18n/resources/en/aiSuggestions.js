@@ -42,4 +42,8 @@ export default {
   validationErrors: {
     card: '{{count}} validation messages in this cycle. Summarise the patterns?',
   },
+  dataImported: {
+    card: 'Imported {{count}} records. Get a quick overview?',
+    cardOne: 'Imported 1 record. Get a quick overview?',
+  },
 }

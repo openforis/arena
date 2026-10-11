@@ -42,4 +42,8 @@ export default {
   validationErrors: {
     card: '{{count}} messages de validation dans ce cycle. Résumer les tendances ?',
   },
+  dataImported: {
+    card: '{{count}} enregistrements importés. Voir un aperçu rapide ?',
+    cardOne: '1 enregistrement importé. Voir un aperçu rapide ?',
+  },
 }

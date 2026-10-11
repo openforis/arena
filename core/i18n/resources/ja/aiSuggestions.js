@@ -40,4 +40,8 @@ export default {
   validationErrors: {
     card: 'このサイクルに検証メッセージが{{count}}件あります。傾向を要約しますか？',
   },
+  dataImported: {
+    card: '{{count}}件の記録をインポートしました。概要をすばやく確認しますか？',
+    cardOne: '1件の記録をインポートしました。概要をすばやく確認しますか？',
+  },
 }
