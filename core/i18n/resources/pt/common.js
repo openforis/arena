@@ -1725,6 +1725,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       survey_getOverview: 'Leu a estrutura do inventário',
       nodeDef_get: 'Consultou {{name}}',
       nodeDef_search: 'Pesquisou "{{text}}"',
+      survey_getValidation: 'Verificou os erros de design',
       view_getCurrent: 'Verificou a visualização atual',
       expression_check: 'Verificou uma expressão',
       nodeDef_proposeCreate: 'Preparou novos itens',

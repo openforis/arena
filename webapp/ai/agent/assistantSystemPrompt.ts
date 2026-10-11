@@ -10,6 +10,7 @@ import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
 
+import { getNodeDefNamesWithIssues } from '@webapp/ai/tools/design/surveyGetValidation'
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 
 export type AssistantPromptArea = 'design' | 'help' | 'analysis' | 'cleaning'
@@ -58,6 +59,7 @@ export const buildAssistantSystemPrompt = ({
         languages: Survey.getLanguages(surveyInfo) as string[],
         cycle: ctx.cycle,
         viewDescription: describeView(ctx.getCurrentView(), ctx.survey),
+        nodeDefNamesWithIssues: getNodeDefNamesWithIssues(ctx.survey),
       })
     }
     case 'help':

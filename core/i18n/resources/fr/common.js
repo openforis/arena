@@ -1739,6 +1739,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       survey_getOverview: 'A lu la structure du formulaire',
       nodeDef_get: 'A consulté {{name}}',
       nodeDef_search: 'A recherché « {{text}} »',
+      survey_getValidation: 'A vérifié les erreurs de conception',
       view_getCurrent: 'A vérifié la vue actuelle',
       expression_check: 'A vérifié une expression',
       nodeDef_proposeCreate: 'A préparé de nouveaux éléments',
