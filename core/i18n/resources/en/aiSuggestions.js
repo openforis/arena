@@ -31,4 +31,8 @@ export default {
     card_one: '{{count}} attribute has no category or taxonomy. Pick it?',
     card_other: '{{count}} attributes have no category or taxonomy. Pick them?',
   },
+  publishErrors: {
+    card_one: '{{count}} entry has errors. Publishing will fail. Fix it?',
+    card_other: '{{count}} entries have errors. Publishing will fail. Fix them?',
+  },
 }

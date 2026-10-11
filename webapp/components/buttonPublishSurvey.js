@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
+import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { SurveyActions, useIsSurveyDirty, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { DialogConfirmActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
@@ -30,7 +31,9 @@ const ButtonPublishSurvey = (props) => {
       disabled={disabled || surveyIsDirty}
       iconClassName="icon-warning icon-left icon-10px"
       label="common.publish"
-      onClick={() =>
+      onClick={() => {
+        // suggestion 3: offer to fix the entries with errors before the server refuses the publish
+        notifySuggestionEvent({ type: 'publishClicked' })
         dispatch(
           DialogConfirmActions.showDialogConfirm({
             key: 'common.publishConfirm',
@@ -38,7 +41,7 @@ const ButtonPublishSurvey = (props) => {
             onOk: SurveyActions.publishSurvey({ cleanupRecords: shiftPressed }),
           })
         )
-      }
+      }}
       size="small"
       testId={TestId.header.surveyPublishBtn}
       variant={variant}

@@ -31,4 +31,8 @@ export default {
     card_one: "{{count}} attribut n'a ni catégorie ni taxonomie. La choisir ?",
     card_other: "{{count}} attributs n'ont ni catégorie ni taxonomie. Les choisir ?",
   },
+  publishErrors: {
+    card_one: '{{count}} entrée a des erreurs. La publication échouera. La corriger ?',
+    card_other: '{{count}} entrées ont des erreurs. La publication échouera. Les corriger ?',
+  },
 }

@@ -7,6 +7,7 @@ const CARD_KEYS = {
     'newEntriesDescriptions.card',
     'entityWithoutKey.card',
     'attributeWithoutRef.card',
+    'publishErrors.card',
   ],
   single: ['entityWithoutKey.cardSingle', 'attributeWithoutRef.cardCategory', 'attributeWithoutRef.cardTaxonomy'],
 }

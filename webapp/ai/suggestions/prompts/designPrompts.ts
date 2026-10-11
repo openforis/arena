@@ -87,3 +87,13 @@ export const buildAttributeWithoutRefPrompt = ({ entries }: { entries: { name: s
   )}. List the categories with categories_list and the taxonomies with taxonomies_list, then propose the best ` +
   'match for each with nodeDef_proposeUpdate (prop categoryName or taxonomyName). If none fits, say so and suggest ' +
   'creating one in the category or taxonomy editor.'
+
+/**
+ * Builds the prompt of suggestion 3.
+ * @param {object} params - Parameters.
+ * @param {string[]} params.names - Names of the entries with errors.
+ * @returns {string} The prompt.
+ */
+export const buildPublishErrorsPrompt = ({ names }: { names: string[] }): string =>
+  `The survey has validation errors that block publishing, in: ${formatPromptNames(names)}. Read them with ` +
+  "survey_getValidation and propose fixes. Leave errors you can't fix to me, and say what to do."
