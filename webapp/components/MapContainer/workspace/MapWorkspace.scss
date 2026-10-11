@@ -395,9 +395,12 @@
     white-space: nowrap;
 
     .leaflet-control-attribution {
+      overflow: hidden;
       float: none;
       margin: 0;
       padding: 0;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       background: none;
       color: #5d616b;
       font-size: 0.68rem;
