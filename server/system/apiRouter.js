@@ -7,6 +7,7 @@ import * as nodeDefApi from '@server/modules/nodeDef/api'
 import * as categoryApi from '@server/modules/category/api/categoryApi'
 import * as taxonomyApi from '@server/modules/taxonomy/api/taxonomyApi'
 import * as geoApi from '@server/modules/geo/api/geoApi'
+import * as mapCustomLayersApi from '@server/modules/geo/api/mapCustomLayersApi'
 import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
 import * as arenaImportApi from '@server/modules/arenaImport/api/arenaImportApi'
 import * as odkImportApi from '@server/modules/odkImport/api/odkImportApi'
@@ -39,6 +40,7 @@ nodeDefApi.init(router)
 categoryApi.init(router)
 taxonomyApi.init(router)
 geoApi.init(router)
+mapCustomLayersApi.init(router)
 
 collectImportApi.init(router)
 arenaImportApi.init(router)

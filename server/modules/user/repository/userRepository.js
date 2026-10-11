@@ -4,6 +4,7 @@ import camelize from 'camelize'
 
 import { Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -429,6 +430,7 @@ export const updatePassword = async ({ userUuid, password }, client = db) =>
 
 // ==== PREFS
 
+// mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it
 export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
@@ -436,7 +438,7 @@ export const updateUserPrefs = async (user, client = db) =>
     SET prefs = prefs || $1::jsonb
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,
-    [User.getPrefs(user), User.getUuid(user)],
+    [A.omit([User.keysPrefs.mapCustomLayers], User.getPrefs(user)), User.getUuid(user)],
     camelize
   )
 
@@ -453,7 +455,7 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
   // Remove from surveys pref
   await client.query(`
     UPDATE "user"
-    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}'
+    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}' #- '{${User.keysPrefs.mapCustomLayers},${surveyId}}'
 `)
 }
 
@@ -462,7 +464,7 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
     `
     UPDATE "user"
     SET prefs = jsonb_set(
-      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[],
+      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[] #- ARRAY[$/layersKey/, $/surveyId/]::text[],
       ${surveyCurrentJsonbPath},
       'null'
     )
@@ -472,6 +474,7 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
     {
       userUuid,
       surveysKey: User.keysPrefs.surveys,
+      layersKey: User.keysPrefs.mapCustomLayers,
       surveyId: String(surveyId),
     }
   )
