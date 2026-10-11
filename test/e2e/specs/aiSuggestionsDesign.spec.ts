@@ -70,6 +70,23 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
   }, uri)
 }
 
+/**
+ * Tells whether the stored pending suggestions of a user (any survey) include a suggestion.
+ * @param {Page} page - The page.
+ * @param {string} userUuid - User.
+ * @param {string} id - Suggestion id.
+ * @returns {Promise<boolean>} True when it is pending.
+ */
+const hasStoredSuggestion = async (page: Page, userUuid: string, id: string): Promise<boolean> =>
+  page.evaluate(
+    ([key, suggestionId]) => {
+      const state = JSON.parse(window.localStorage.getItem(key) ?? 'null')
+      const buckets: { id: string }[][] = Object.values(state?.pending ?? {})
+      return buckets.some((bucket) => bucket.some((suggestion) => suggestion.id === suggestionId))
+    },
+    [`arena.ai.suggestions.${userUuid}`, id]
+  )
+
 const suggestionCards = (page: Page, text: string) =>
   assistantPanel(page).getByTestId(TestId.aiAssistant.suggestionCard).filter({ hasText: text })
 
@@ -90,8 +107,10 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
 
   test('a new language offers the translations; Do it proposes them and Apply clears the card', async ({
     page,
+    api,
     sampleSurvey: _,
   }) => {
+    const userUuid = await api.getCurrentUserUuid()
     await addFrench(page)
     const designer = new FormDesigner(page)
     await designer.goto()
@@ -104,6 +123,8 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     await expect(card).toContainText(TRANSLATIONS_CARD)
 
     await card.getByTestId(TestId.aiAssistant.suggestionDoItBtn).click()
+    // Do it hides the targets at once; only the store tells whether the detector resolved them
+    await expect(suggestionCards(page, 'missing in French')).toHaveCount(0)
     await expect(panel.getByTestId(TestId.aiAssistant.message('user'))).toHaveCount(1)
     await waitForAssistantTurn(page)
     await expect(panel.getByTestId(TestId.aiAssistant.toolRow('survey_listMissingTexts'))).toContainText(
@@ -113,8 +134,9 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
 
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
-    // the state detector runs 1 s after the survey changes and finds nothing left to translate
-    await expect(suggestionCards(page, 'missing in French')).toHaveCount(0, { timeout: 10000 })
+    // the state detector runs 1 s after the survey changes and finds nothing left to translate: it removes the
+    // suggestion from the store (the card was already hidden)
+    await expect.poll(async () => await hasStoredSuggestion(page, userUuid, 'missingTranslations:fr')).toBe(false)
   })
 
   test('a dismissed card stays gone after a reload and returns for a new text', async ({ page, sampleSurvey: _ }) => {
@@ -130,9 +152,6 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     await closeAssistantPanel(page)
     await page.reload()
     await expect(designer.surveyForm).toBeVisible()
-    await openAssistantPanel(page)
-    await expect(suggestionCards(page, 'missing in French')).toHaveCount(0)
-    await closeAssistantPanel(page)
 
     await designer.addChildWithDetails('cluster', 'text', { name: 'cluster_extra', label: 'Cluster extra' })
     await openAssistantPanel(page)

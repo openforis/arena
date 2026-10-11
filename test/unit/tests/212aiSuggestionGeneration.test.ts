@@ -87,9 +87,10 @@ describe('suggestion events, registries, generation and designer visit (212)', (
     })
     expect(toGenerationInput({ ...raw, userUuid: null })).toBeNull()
     expect(toGenerationInput({ ...raw, surveyId: null })).toBeNull()
-    // the user preferences may hold the active survey as a numeric string
+    // the active survey id (Survey.getId) can be a numeric string
     expect(toGenerationInput({ ...raw, surveyId: '7' })?.surveyId).toBe(7)
-    expect(toGenerationInput({ ...raw, surveyId: 'abc' })).toBeNull()
+    for (const bad of ['abc', '', ' ', '0', 0, -1, '1.5'])
+      expect(toGenerationInput({ ...raw, surveyId: bad })).toBeNull()
     expect(toGenerationInput({ ...raw, cycle: null })).toBeNull()
     expect(toGenerationInput({ ...raw, fetched: false })).toBeNull()
   })
