@@ -218,12 +218,11 @@ export const createSuggestionStore = ({
     clearUser: (userUuid) => {
       const key = getSuggestionsKey(userUuid)
       memory.delete(key)
-      if (!blocked) {
-        try {
-          access.getStorage()?.removeItem(key)
-        } catch {
-          blocked = true
-        }
+      // also after a fallback to memory: an older value may still be in the storage and would come back on reload
+      try {
+        access.getStorage()?.removeItem(key)
+      } catch {
+        blocked = true
       }
       notify()
     },
