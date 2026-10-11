@@ -75,6 +75,15 @@ export const MOCK_SCRIPTS: MockScript[] = [
       { text: 'MOCK help: publish the survey from the survey list (see the cited section).' },
     ],
   },
+  {
+    // the module introduction's Do it (Part 1 e2e)
+    promptMarker: assistantMarkers.help,
+    pattern: /I'm new to the/i,
+    steps: [
+      { toolCall: { toolName: 'docs_search', input: { query: 'getting started' } } },
+      { text: 'MOCK help: start with the steps of the cited manual section.' },
+    ],
+  },
   ...assistantAnalysisMockScripts,
   ...assistantCleaningMockScripts,
 ]
