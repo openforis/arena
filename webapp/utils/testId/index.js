@@ -141,6 +141,13 @@ export const TestId = {
     statusNotation: 'map-status-notation',
     statusZoom: 'map-status-zoom',
     uploadInput: 'map-upload-input',
+    measureBar: 'map-measure-bar',
+    measureModeDistance: 'map-measure-mode-distance',
+    measureModeArea: 'map-measure-mode-area',
+    measureUnit: 'map-measure-unit',
+    measureTotal: 'map-measure-total',
+    measurePerimeter: 'map-measure-perimeter',
+    measureDone: 'map-measure-done',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',

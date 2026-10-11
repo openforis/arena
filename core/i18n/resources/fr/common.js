@@ -563,6 +563,33 @@ Réessayer ?`,
       unsupported: 'Fichier non pris en charge : choisissez un fichier KML, KMZ, Shapefile zippé ou GeoJSON',
       error: "Le fichier n'a pas pu être lu : {{details}}",
     },
+    measure: {
+      measureArea: 'Mesurer une surface',
+      barLabel: 'Mesure',
+      modes: {
+        distance: 'Distance',
+        area: 'Surface',
+      },
+      hint: 'Cliquez pour ajouter des points, double-cliquez pour terminer',
+      units: 'Unités',
+      unitOptions: {
+        auto: 'Automatique',
+        m: 'Mètres (m)',
+        km: 'Kilomètres (km)',
+        m2: 'Mètres carrés (m²)',
+        ha: 'Hectares (ha)',
+        km2: 'Kilomètres carrés (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Périmètre {{value}}',
+      done: 'Terminé',
+    },
   },
 
   samplingPolygonOptions: {

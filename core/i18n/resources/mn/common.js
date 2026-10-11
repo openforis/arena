@@ -561,6 +561,33 @@ export default {
       unsupported: 'Дэмжигдээгүй файл: KML, KMZ, zip-ээр шахсан Shapefile эсвэл GeoJSON файл сонгоно уу',
       error: 'Файлыг уншиж чадсангүй: {{details}}',
     },
+    measure: {
+      measureArea: 'Талбай хэмжих',
+      barLabel: 'Хэмжилт',
+      modes: {
+        distance: 'Зай',
+        area: 'Талбай',
+      },
+      hint: 'Цэг нэмэхийн тулд товшиж, дуусгахын тулд давхар товшино уу',
+      units: 'Нэгж',
+      unitOptions: {
+        auto: 'Автомат',
+        m: 'Метр (м)',
+        km: 'Километр (км)',
+        m2: 'Квадрат метр (м²)',
+        ha: 'Гектар (га)',
+        km2: 'Квадрат километр (км²)',
+      },
+      unitSymbols: {
+        m: 'м',
+        km: 'км',
+        m2: 'м²',
+        ha: 'га',
+        km2: 'км²',
+      },
+      perimeter: 'Периметр {{value}}',
+      done: 'Болсон',
+    },
   },
 
   samplingPolygonOptions: {

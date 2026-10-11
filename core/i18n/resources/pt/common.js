@@ -562,6 +562,33 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       unsupported: 'Arquivo não suportado: escolha um arquivo KML, KMZ, Shapefile compactado (zip) ou GeoJSON',
       error: 'Não foi possível ler o arquivo: {{details}}',
     },
+    measure: {
+      measureArea: 'Medir área',
+      barLabel: 'Medição',
+      modes: {
+        distance: 'Distância',
+        area: 'Área',
+      },
+      hint: 'Clique para adicionar pontos e clique duas vezes para terminar',
+      units: 'Unidades',
+      unitOptions: {
+        auto: 'Automática',
+        m: 'Metros (m)',
+        km: 'Quilômetros (km)',
+        m2: 'Metros quadrados (m²)',
+        ha: 'Hectares (ha)',
+        km2: 'Quilômetros quadrados (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perímetro {{value}}',
+      done: 'Concluído',
+    },
   },
 
   samplingPolygonOptions: {

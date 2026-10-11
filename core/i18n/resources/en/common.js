@@ -559,6 +559,33 @@ Try again?`,
       unsupported: 'Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file',
       error: 'The file could not be read: {{details}}',
     },
+    measure: {
+      measureArea: 'Measure area',
+      barLabel: 'Measure',
+      modes: {
+        distance: 'Distance',
+        area: 'Area',
+      },
+      hint: 'Click to add points, double-click to finish',
+      units: 'Units',
+      unitOptions: {
+        auto: 'Automatic',
+        m: 'Meters (m)',
+        km: 'Kilometers (km)',
+        m2: 'Square meters (m²)',
+        ha: 'Hectares (ha)',
+        km2: 'Square kilometers (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perimeter {{value}}',
+      done: 'Done',
+    },
   },
 
   samplingPolygonOptions: {

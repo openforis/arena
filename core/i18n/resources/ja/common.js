@@ -557,6 +557,33 @@ export default {
       unsupported: '対応していないファイルです。KML、KMZ、ZIP圧縮したShapefile、GeoJSONのいずれかを選択してください',
       error: 'ファイルを読み込めませんでした: {{details}}',
     },
+    measure: {
+      measureArea: '面積を測定',
+      barLabel: '測定',
+      modes: {
+        distance: '距離',
+        area: '面積',
+      },
+      hint: 'クリックで点を追加、ダブルクリックで終了',
+      units: '単位',
+      unitOptions: {
+        auto: '自動',
+        m: 'メートル (m)',
+        km: 'キロメートル (km)',
+        m2: '平方メートル (m²)',
+        ha: 'ヘクタール (ha)',
+        km2: '平方キロメートル (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: '周囲長 {{value}}',
+      done: '完了',
+    },
   },
 
   samplingPolygonOptions: {

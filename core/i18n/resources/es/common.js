@@ -538,6 +538,33 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       unsupported: 'Archivo no compatible: elija un archivo KML, KMZ, Shapefile comprimido (zip) o GeoJSON',
       error: 'No se pudo leer el archivo: {{details}}',
     },
+    measure: {
+      measureArea: 'Medir área',
+      barLabel: 'Medición',
+      modes: {
+        distance: 'Distancia',
+        area: 'Área',
+      },
+      hint: 'Haga clic para añadir puntos y doble clic para terminar',
+      units: 'Unidades',
+      unitOptions: {
+        auto: 'Automática',
+        m: 'Metros (m)',
+        km: 'Kilómetros (km)',
+        m2: 'Metros cuadrados (m²)',
+        ha: 'Hectáreas (ha)',
+        km2: 'Kilómetros cuadrados (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perímetro {{value}}',
+      done: 'Hecho',
+    },
   },
   samplingPolygonOptions: {
     circle: 'Círculo',

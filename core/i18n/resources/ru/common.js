@@ -566,6 +566,33 @@ export default {
       unsupported: 'Неподдерживаемый файл: выберите файл KML, KMZ, Shapefile в zip-архиве или GeoJSON',
       error: 'Не удалось прочитать файл: {{details}}',
     },
+    measure: {
+      measureArea: 'Измерить площадь',
+      barLabel: 'Измерение',
+      modes: {
+        distance: 'Расстояние',
+        area: 'Площадь',
+      },
+      hint: 'Щёлкните, чтобы добавить точки, дважды щёлкните, чтобы завершить',
+      units: 'Единицы',
+      unitOptions: {
+        auto: 'Автоматически',
+        m: 'Метры (м)',
+        km: 'Километры (км)',
+        m2: 'Квадратные метры (м²)',
+        ha: 'Гектары (га)',
+        km2: 'Квадратные километры (км²)',
+      },
+      unitSymbols: {
+        m: 'м',
+        km: 'км',
+        m2: 'м²',
+        ha: 'га',
+        km2: 'км²',
+      },
+      perimeter: 'Периметр {{value}}',
+      done: 'Готово',
+    },
   },
 
   samplingPolygonOptions: {
