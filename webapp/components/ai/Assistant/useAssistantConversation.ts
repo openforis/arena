@@ -26,7 +26,11 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
-import { reportSuggestionSettle, withSuggestionScope } from '@webapp/ai/suggestions/suggestionConversation'
+import {
+  reportSuggestionSettle,
+  withSuggestionScope,
+  withSuggestionTurnLock,
+} from '@webapp/ai/suggestions/suggestionConversation'
 import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -255,7 +259,8 @@ export const useAssistantConversation = ({
 
   // tracked as a whole: logout waits for the final save of an aborted turn too
   const runTurn = useCallback(
-    (base: Conversation, text: string) => assistantTurnRegistry.track(executeTurn(base, text)),
+    (base: Conversation, text: string) =>
+      assistantTurnRegistry.track(withSuggestionTurnLock({ conversation: base, run: () => executeTurn(base, text) })),
     [executeTurn]
   )
 

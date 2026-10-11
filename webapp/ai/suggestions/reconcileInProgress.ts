@@ -3,7 +3,7 @@
  */
 import type { Conversation } from '@webapp/ai/conversations/types'
 
-import { getSuggestionSettleOutcome } from './suggestionConversation'
+import { getHeldLockNames, getSuggestionSettleOutcome, getSuggestionTurnLockName } from './suggestionConversation'
 import type { SuggestionStore } from './suggestionStore'
 
 /**
@@ -29,18 +29,26 @@ const loadSafely = async (
  * @param {SuggestionStore} params.store - Suggestion store.
  * @param {string} params.userUuid - User.
  * @param {Function} params.load - Reads a stored conversation (null when missing).
+ * @param {Function} [params.getHeldLockNames] - Names of the Web Locks held now: a conversation whose turn lock is
+ * held runs in another tab and is left alone.
  * @returns {Promise<void>} Resolves when done.
  */
 export const reconcileInProgress = async ({
   store,
   userUuid,
   load,
+  getHeldLockNames: heldNames = getHeldLockNames,
 }: {
   store: SuggestionStore
   userUuid: string
   load: (id: string) => Promise<Conversation | null>
+  getHeldLockNames?: () => Promise<string[]>
 }): Promise<void> => {
-  for (const conversationId of store.getInProgressConversationIds(userUuid)) {
+  const ids = store.getInProgressConversationIds(userUuid)
+  if (ids.length === 0) return
+  const held = new Set(await heldNames().catch(() => []))
+  for (const conversationId of ids) {
+    if (held.has(getSuggestionTurnLockName(conversationId))) continue
     const conversation = await loadSafely(load, conversationId)
     // a deleted or unscoped conversation can never settle: its targets show again
     const outcome = conversation?.suggestionScope

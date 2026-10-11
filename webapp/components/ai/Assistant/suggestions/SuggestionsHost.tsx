@@ -30,6 +30,8 @@ import { useSuggestionGeneration } from './useSuggestionGeneration'
  * @returns {Promise<void>} Resolves when done.
  */
 const reconcileUser = async (userUuid: string, isCancelled: () => boolean): Promise<void> => {
+  // nothing in progress: the conversation store stays closed
+  if (suggestionStore.getInProgressConversationIds(userUuid).length === 0) return
   const conversations = await getConversationStore()
   if (isCancelled()) return
   await reconcileInProgress({ store: suggestionStore, userUuid, load: (id) => conversations.get(id) })

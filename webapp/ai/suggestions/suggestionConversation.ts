@@ -73,3 +73,61 @@ export const reportSuggestionSettle = ({
     store.onConversationSettled({ userUuid: conversation.userUuid, conversationId: conversation.id, outcome })
   return outcome
 }
+
+/**
+ * Returns the name of the Web Lock held by the tab running a turn of a Do it conversation.
+ * @param {string} conversationId - Conversation id.
+ * @returns {string} The lock name.
+ */
+export const getSuggestionTurnLockName = (conversationId: string): string => `arena.ai.suggestionTurn.${conversationId}`
+
+/**
+ * Returns the Web Locks manager, or null when the API is missing.
+ * @returns {LockManager|null} The manager.
+ */
+const getLockManager = (): LockManager | null => (typeof navigator !== 'undefined' && navigator.locks) || null
+
+/**
+ * Runs a turn of a conversation holding its suggestion turn lock (other tabs then know it is running). A conversation
+ * without suggestion scope, or a browser without Web Locks, runs the turn as it is; a lock error never breaks it.
+ * @param {object} params - Parameters.
+ * @param {Conversation} params.conversation - Conversation of the turn.
+ * @param {Function} params.run - Runs the turn.
+ * @returns {Promise<void>} Resolves when the turn ends.
+ */
+export const withSuggestionTurnLock = async ({
+  conversation,
+  run,
+}: {
+  conversation: Conversation
+  run: () => Promise<void>
+}): Promise<void> => {
+  const locks = conversation.suggestionScope ? getLockManager() : null
+  if (!locks) return run()
+  let started = false
+  try {
+    await locks.request(getSuggestionTurnLockName(conversation.id), () => {
+      started = true
+      return run()
+    })
+  } catch (error) {
+    // the turn's own error goes on; a lock failure before it started runs the turn without the lock
+    if (started) throw error
+    await run()
+  }
+}
+
+/**
+ * Returns the names of the Web Locks held now (empty without the API).
+ * @returns {Promise<string[]>} The names.
+ */
+export const getHeldLockNames = async (): Promise<string[]> => {
+  const locks = getLockManager()
+  if (!locks) return []
+  try {
+    const { held } = await locks.query()
+    return (held ?? []).map((lock) => lock.name ?? '')
+  } catch {
+    return []
+  }
+}
