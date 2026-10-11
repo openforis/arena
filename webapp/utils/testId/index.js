@@ -148,6 +148,17 @@ export const TestId = {
     measureTotal: 'map-measure-total',
     measurePerimeter: 'map-measure-perimeter',
     measureDone: 'map-measure-done',
+    // WMS / WMTS / XYZ dialog
+    wmsDialog: 'map-wms-dialog',
+    wmsUrlInput: 'map-wms-url',
+    wmsLoadButton: 'map-wms-load',
+    wmsSummary: 'map-wms-summary',
+    wmsError: 'map-wms-error',
+    wmsLayerItem: (name) => `map-wms-layer-${name}`,
+    wmsAddAs: (role) => `map-wms-add-as-${role}`,
+    wmsNameInput: 'map-wms-name',
+    wmsAttributionInput: 'map-wms-attribution',
+    wmsSubmit: 'map-wms-submit',
   },
   nodeDefDetails: {
     deleteBtn: 'node-def-delete-btn',
