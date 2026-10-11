@@ -7,6 +7,7 @@ import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/ty
 import { reconcileInProgress } from '@webapp/ai/suggestions/reconcileInProgress'
 import {
   getSuggestionSettleOutcome,
+  getSuggestionTurnLockName,
   reportSuggestionSettle,
   withSuggestionScope,
 } from '@webapp/ai/suggestions/suggestionConversation'
@@ -201,6 +202,21 @@ describe('Do it plumbing (214)', () => {
     await reconcileInProgress({ store, userUuid: 'u1', load })
     expect(store.getInProgressConversationIds('u1')).toEqual(['pendingCard'])
     expect(visibleCount(store)).toBe(3)
+  })
+
+  test('reconcile at mount leaves alone a conversation whose turn lock is held by another tab', async () => {
+    const store = newStore()
+    for (const id of ['running', 'gone']) {
+      store.add({ userUuid: 'u1', suggestion: { ...suggestion, id: `missingTranslations:${id}` } })
+      store.startProgress({ userUuid: 'u1', surveyId: 7, id: `missingTranslations:${id}`, conversationId: id })
+    }
+    await reconcileInProgress({
+      store,
+      userUuid: 'u1',
+      load: async () => null,
+      getHeldLockNames: async () => [getSuggestionTurnLockName('running'), 'other'],
+    })
+    expect(store.getInProgressConversationIds('u1')).toEqual(['running'])
   })
 
   test('Clear conversations clears the suggestions of the user too', async () => {

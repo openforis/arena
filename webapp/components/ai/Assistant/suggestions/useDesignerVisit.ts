@@ -14,7 +14,7 @@ import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
  * @param {SuggestionGeneration|null} params.generation - Current generation.
  * @param {object|null} params.survey - Survey of the generation (null without one).
  * @param {string|null} params.module - App module.
- * @returns {void}
+ * @returns {void} Nothing; the effect notifies.
  */
 export const useDesignerVisit = ({
   generation,
