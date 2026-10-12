@@ -38,7 +38,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   }
   let recordUpdated = A.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
 
-  const parentNode = Record.getParentNode(node)(recordUpdated)
+  const parentNode = Record.getParentNode({ node })(recordUpdated)
 
   recordUpdated = Record.assocDateModified(new Date())(recordUpdated)
   return {
@@ -264,7 +264,7 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
     // Find sibling entities with same key values
     const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
     if (!A.isEmpty(nodeDeletedKeyValues)) {
-      const nodeParent = Record.getParentNode(node)(record)
+      const nodeParent = Record.getParentNode({ node })(record)
       const nodeSiblings = A.pipe(
         Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
         A.reject(ObjectUtils.isEqual(node))

@@ -30,7 +30,7 @@ export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getPare
 
 export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
   try {
-    return getNodeChildren(parentNode, childDefUuid)(record)
+    return getNodeChildren({ parentNode, childDefUuid })(record)
   } catch (error) {
     return []
   }
@@ -67,14 +67,14 @@ export const getAncestorsAndSelf = (node) => (record) => {
 
 export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
   A.pipe(
-    getParentNode(node),
+    getParentNode({ node }),
     (parentNode) => getAncestorsAndSelf(parentNode)(record),
     A.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
 // Descendants
 export const getNodeChildrenByDefUuidUnsorted = (parentNode, nodeDefUuid) => (record) =>
-  getNodeChildren(parentNode, nodeDefUuid)(record)
+  getNodeChildren({ parentNode, childDefUuid: nodeDefUuid })(record)
 
 export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) => {
   const children = getNodeChildrenByDefUuidUnsorted(parentNode, nodeDefUuid)(record)
@@ -91,7 +91,7 @@ export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
   A.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), A.head)
 
 export const getNodeChildIndex = (node) => (record) => {
-  const parentNode = getParentNode(node)(record)
+  const parentNode = getParentNode({ node })(record)
   const siblings = getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
   return siblings.findIndex((sibling) => Node.isEqual(sibling)(node))
 }
@@ -111,7 +111,7 @@ export const visitDescendantsAndSelf =
       if (stopIfFn?.(node)) {
         break
       }
-      const children = getNodeChildren(node)(record)
+      const children = getNodeChildren({ parentNode: node })(record)
       queue.enqueueItems(children)
     }
   }
@@ -178,7 +178,7 @@ export const isNodeApplicable = (node) => (record) => {
     return true
   }
 
-  const nodeParent = getParentNode(node)(record)
+  const nodeParent = getParentNode({ node })(record)
   const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(nodeParent)
   if (isApplicable) {
     return isNodeApplicable(nodeParent)(record)
@@ -338,8 +338,8 @@ export const findDescendantByKeyValues =
 // ===== Unique
 
 export const getAttributesUniqueSibling = ({ record, attribute, attributeDef }) => {
-  const parentEntity = getParentNode(attribute)(record)
-  const ancestorEntity = getParentNode(parentEntity)(record)
+  const parentEntity = getParentNode({ node: attribute })(record)
+  const ancestorEntity = getParentNode({ node: parentEntity })(record)
   const siblingParentEntities = getNodeChildrenByDefUuid(ancestorEntity, NodeDef.getParentUuid(attributeDef))(record)
 
   return siblingParentEntities.reduce(

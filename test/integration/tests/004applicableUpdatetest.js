@@ -54,7 +54,7 @@ describe('Applicable Test', () => {
     let record = global.applicableRecord
     const nodeSource = RecordUtils.findNodeByPath('cluster/num')(survey, record)
     const nodeDependent = RecordUtils.findNodeByPath('cluster/dependent_node')(survey, record)
-    const nodeDependentParent = Record.getParentNode(nodeDependent)(record)
+    const nodeDependentParent = Record.getParentNode({ node: nodeDependent })(record)
     const nodeDependentParentUuid = Node.getUuid(nodeDependentParent)
     const nodeDependentDefUuid = Node.getNodeDefUuid(nodeDependent)
 

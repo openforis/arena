@@ -273,7 +273,7 @@ describe('Record Validation Test', () => {
     )(record)
     expect(Validation.isValid(validationCount)).toBe(false) // Min count = 1
 
-    await _deleteNode(Record.getParentNode(nodeParent)(record), 'plot', 5)
+    await _deleteNode(Record.getParentNode({ node: nodeParent })(record), 'plot', 5)
 
     const { record: recordUpdated } = getContext()
     const validationCountUpdated = A.path(

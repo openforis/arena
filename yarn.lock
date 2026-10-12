@@ -3929,8 +3929,8 @@ __metadata:
   linkType: hard
 
 "@openforis/arena-core@npm:^2.3.35, @openforis/arena-core@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@openforis/arena-core@npm:2.4.0"
+  version: 2.4.1
+  resolution: "@openforis/arena-core@npm:2.4.1"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.0.4"
     "@turf/bearing": "npm:^7.4.0"
@@ -3947,7 +3947,7 @@ __metadata:
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.2"
-  checksum: 10c0/abcb5059592f3f1fbef93fa8d37647d380dc46d7c0caeff723bc0d89c8c4b98dcc87d301917e2f5c0b36795058e5a8ee71c2f2f063a21dd7429caeee70756192
+  checksum: 10c0/d754039ae4395ce28c693dbc67ed896e1389bedf5a68ec66cbf81a6b5a078b4b123fe1fc25723f1f92a30185f0311d99f744639831f7e252d8cb939aeb9f4e55
   languageName: node
   linkType: hard
 
