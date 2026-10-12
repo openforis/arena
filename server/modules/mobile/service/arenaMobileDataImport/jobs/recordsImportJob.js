@@ -1,8 +1,7 @@
-import { Dates } from '@openforis/arena-core'
+import { Authorizer, Dates } from '@openforis/arena-core'
 
 import { RecordImportAction } from '@common/dataImport'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'

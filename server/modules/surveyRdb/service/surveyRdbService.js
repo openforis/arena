@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'

@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
 

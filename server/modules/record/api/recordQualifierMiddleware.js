@@ -3,7 +3,7 @@ import { Requests } from '@openforis/arena-server'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 
 import * as Request from '@server/utils/request'

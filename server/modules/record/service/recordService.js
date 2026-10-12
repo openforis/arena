@@ -1,7 +1,14 @@
 import * as fs from 'node:fs'
 import { randomBytes } from 'node:crypto'
 
-import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
+import {
+  Authorizer,
+  NodeValues,
+  Objects,
+  RecordExpressionEvaluator,
+  SurveyDocImages,
+  SurveyDocPlace,
+} from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -14,7 +21,6 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
-import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
