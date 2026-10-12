@@ -267,6 +267,7 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - Processing chains (analysis) comparison: follow-up after phase 2, the `chains/` zip entries are already available.
 - Three-way merge (base / mine / theirs). It would remove the "deleted in Dev or added in QA?" ambiguity, but needs
   the previous Dev export as a third input; the "removals unchecked by default" rule covers it for now.
+- Keeping track of which source file the target was last updated from (decided: too complex for now).
 
 ## Open questions
 
@@ -276,8 +277,6 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
    with a filter to hide them.
 3. `key` change on published node defs: confirm what publish validation allows today before marking it as warning
    vs not applicable.
-4. Should the uploaded file be kept (survey file / activity log) to know which Dev version QA was last updated from?
-   This would also give the base version needed for a future three-way merge.
 
 ## Testing
 
