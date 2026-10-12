@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1425,6 +1429,15 @@ $t(common.cantUndoWarning)`,
     reportingData: 'レポートデータ',
     exportToGeoPackage: 'GeoPackageにエクスポート',
     exportToGeoPackageSkippedItems: '有効な位置情報がないため{{count}}件の項目をスキップしました。',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Whisp分析を生成',
+      confirmMessage: `すべての抽出地点についてWhisp分析を生成しますか？
+
+- 位置情報を持つすべての抽出地点が分析のためにOpen Foris Whispに送信されます
+- 結果は抽出地点データと結合され、カテゴリ'${samplingPointDataWhispCategoryName}'に保存されます
+- カテゴリ'${samplingPointDataWhispCategoryName}'がすでに存在する場合、その内容は置き換えられます
+- 分析はバックグラウンドで実行され、抽出地点の数によっては数分かかる場合があります`,
+    },
     templateFor_samplingPointDataImport_csv: '抽出地点データインポート用テンプレート（CSV）',
     templateFor_samplingPointDataImport_xlsx: '抽出地点データインポート用テンプレート（Excel）',
   },
