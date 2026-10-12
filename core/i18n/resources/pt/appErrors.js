@@ -111,4 +111,7 @@ Tente atualizar a página.`,
   userNotAllowedToChangePref: 'Usuário sem permissão para alterar preferências',
   userNotAuthorized: 'Usuário {{userName}} não está autorizado',
   userNotFound: 'Usuário não encontrado: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'O arquivo não é um backup de usuários do Arena válido',
+  },
 }

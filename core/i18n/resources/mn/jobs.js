@@ -64,6 +64,8 @@ export default {
   TaxonomiesImportJob: 'Таксоном импортлох',
   TaxonomiesValidationJob: 'Таксоном баталгаажуулах',
   TaxonomyImportJob: 'Таксоном импортлох',
+  UsersBackupExportJob: 'Хэрэглэгчдийг нөөцлөх',
+  UsersBackupImportJob: 'Хэрэглэгчдийг сэргээх',
   // data export
   ArenaFileReadJob: 'Arena файл унших',
   DataExportJob: 'Өгөгдөл экспортлох',

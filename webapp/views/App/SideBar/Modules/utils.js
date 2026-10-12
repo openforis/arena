@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import {
   analysisModules,
@@ -38,89 +39,98 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.external]: module.external,
 })
 
-export const getModulesHierarchy = (user, surveyInfo) => {
+const getDesignerModule = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
-  const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
-  const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
-  const canImportRecords = Authorizer.canImportRecords(user, surveyInfo)
+  return getModule({
+    module: appModules.designer,
+    children: [
+      ...(canEditSurvey ? [designerModules.formDesigner] : []),
+      designerModules.surveyHierarchy,
+      ...(canEditSurvey ? [designerModules.surveyDependencyTree] : []),
+      designerModules.categories,
+      designerModules.taxonomies,
+    ],
+  })
+}
 
+const getDataModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.data,
+    children: [
+      dataModules.records,
+      ...(Authorizer.canUseExplorer(user, surveyInfo) ? [dataModules.explorer] : []),
+      ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
+      ...(Authorizer.canExportRecords(user, surveyInfo) ? [dataModules.export] : []),
+      ...(Authorizer.canImportRecords(user, surveyInfo) ? [dataModules.import] : []),
+      ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
+    ],
+    hidden: Survey.isTemplate(surveyInfo),
+  })
+
+const getAnalysisModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.analysis,
+    children: [
+      analysisModules.chains,
+      ...(Survey.isPublished(surveyInfo) ? [analysisModules.instances] : []),
+      // , analysisModules.entities
+    ],
+    hidden: !Authorizer.canAnalyzeRecords(user, surveyInfo),
+  })
+
+const getUsersModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.users,
+    children: [
+      userModules.usersSurvey,
+      ...(Authorizer.canManageUserGroups(user, surveyInfo) ? [userModules.userGroups] : []),
+    ],
+    hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
+  })
+
+const getSystemAdminModules = (user) => {
+  if (!User.isSystemAdmin(user)) return []
+  const canViewUsersAccessRequests =
+    ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)
   return [
-    // home
-    getModule({ module: appModules.home }),
-    getModule({ module: appModules.dashboard }),
-    // designer
     getModule({
-      module: appModules.designer,
-      children: [
-        ...(canEditSurvey ? [designerModules.formDesigner] : []),
-        designerModules.surveyHierarchy,
-        ...(canEditSurvey ? [designerModules.surveyDependencyTree] : []),
-        designerModules.categories,
-        designerModules.taxonomies,
-      ],
+      module: appModules.messages,
+      children: [messageModules.messages],
     }),
-    // data
     getModule({
-      module: appModules.data,
+      module: appModules.systemAdmin,
       children: [
-        dataModules.records,
-        ...(Authorizer.canUseExplorer(user, surveyInfo) ? [dataModules.explorer] : []),
-        ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
-        ...(canExportRecords ? [dataModules.export] : []),
-        ...(canImportRecords ? [dataModules.import] : []),
-        ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
-      ],
-      hidden: Survey.isTemplate(surveyInfo),
-    }),
-    // analysis
-    getModule({
-      module: appModules.analysis,
-      children: [
-        analysisModules.chains,
-        ...(Survey.isPublished(surveyInfo) ? [analysisModules.instances] : []),
-        // , analysisModules.entities
-      ],
-      hidden: !canAnalyzeRecords,
-    }),
-    // users
-    getModule({
-      module: appModules.users,
-      children: [
-        userModules.usersSurvey,
-        ...(Authorizer.canManageUserGroups(user, surveyInfo) ? [userModules.userGroups] : []),
-      ],
-      hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
-    }),
-    // message
-    ...(User.isSystemAdmin(user)
-      ? [
-          getModule({
-            module: appModules.messages,
-            children: [messageModules.messages],
-          }),
-        ]
-      : []),
-    // system admin
-    ...(User.isSystemAdmin(user)
-      ? [
-          getModule({
-            module: appModules.systemAdmin,
-            children: [systemAdminModules.jobMonitor, systemAdminModules.systemLogs],
-          }),
-        ]
-      : []),
-    getModule({
-      module: appModules.help,
-      children: [
-        helpModules.userManual,
-        helpModules.about,
-        helpModules.whatsNew,
-        ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
-        helpModules.disclaimer,
+        ...(canViewUsersAccessRequests ? [userModules.usersAccessRequest] : []),
+        ...(Authorizer.canViewAllUsers(user) ? [userModules.users] : []),
+        systemAdminModules.jobMonitor,
+        systemAdminModules.systemLogs,
       ],
     }),
   ]
 }
+
+const getHelpModule = (user) =>
+  getModule({
+    module: appModules.help,
+    children: [
+      helpModules.userManual,
+      helpModules.about,
+      helpModules.whatsNew,
+      ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
+      helpModules.disclaimer,
+    ],
+  })
+
+export const getModulesHierarchy = (user, surveyInfo) => [
+  getModule({ module: appModules.home }),
+  getModule({ module: appModules.dashboard }),
+  getDesignerModule(user, surveyInfo),
+  getDataModule(user, surveyInfo),
+  getAnalysisModule(user, surveyInfo),
+  getUsersModule(user, surveyInfo),
+  ...getSystemAdminModules(user),
+  getHelpModule(user),
+]
 
 export const getKey = A.prop(keys.key)
 export const getUri = A.prop(keys.uri)
