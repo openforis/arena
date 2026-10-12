@@ -39,40 +39,56 @@ to compare two surveys across different servers?"_
 ## Answer to the user (short)
 
 Today the Summary cannot confirm two surveys are identical; the only option is diffing two exported Summary files
-by hand. The feature below adds that check.
+by hand. Importing the Dev export in QA does not help either: it creates a **new** survey instead of updating the
+existing one. The feature below compares the two and copies the differences into the existing survey.
+
+## Main use case: promote changes Dev → QA → Prod
+
+The survey already exists in Dev, QA and Prod (QA and Prod were created by importing the Dev export, so they share
+its UUIDs). In Dev the user adds a new attribute and changes some validation expressions. To bring QA up to date:
+
+1. **Dev**: export the survey without data (dashboard → Export), as today.
+2. **QA**: open the survey → Designer → **"Update from survey file…"** → upload the Dev `.zip`.
+3. Arena compares the file (**source**, the reference) with the QA survey (**target**) and shows the tree of
+   differences:
+   - the new attribute: _added_ (checked by default), together with the layout change of its parent entity
+     (the parent's form layout lists its children, so it changes too) and any new category / items it uses;
+   - the attributes with changed validations: _changed_ (checked by default), with old vs new expression shown.
+4. The user reviews, unticks what they don't want, and clicks **Apply**. The changes are written as **draft** in
+   the QA survey: no records are touched yet.
+5. The user checks the result in the QA Designer (form preview) and **publishes** as usual. Publishing updates the
+   records and the data tables, exactly as if the changes had been made by hand.
+6. Run Compare again in QA: it should now report "Identical" (for the parts that were applied).
+7. Repeat steps 2–6 in Prod with the same file (or with an export from QA, once it has been tested).
+
+Why this works well with UUIDs: the new attribute is inserted in QA with the **same UUID** it has in Dev, so Dev,
+QA and Prod stay aligned and every later comparison matches elements by UUID, without guessing.
+
+### Direction and defaults
+
+- The sync goes one way: the uploaded file is the reference, only the open survey is changed.
+- Without a common base version, something that exists only in QA can mean "deleted in Dev" or "added in QA only".
+  So **removals are never checked by default**: they are shown in red, with a warning when the node def is
+  published (its data is deleted on publish), and the user must tick them one by one.
+- Added and changed elements are checked by default, unless the change is not allowed on the target (see
+  **Applicability rules**): then the row is disabled and shows why.
 
 ## Scope and phases
 
-The work is split into three phases. Each one is useful without the next.
+Phase 1 already covers the use case above. The other phases add more cases and a quick check.
 
 | Phase | Delivers | Main risk |
 | ----- | -------- | --------- |
-| 1. Fingerprint | One "definition hash" per survey, shown on the dashboard and in the Summary export | Picking the normalization rules |
-| 2. Compare | Upload an exported `.zip`, get a tree of node defs with differences highlighted, plus categories / taxonomies / survey info | Matching elements when UUIDs differ |
-| 3. Apply | Apply selected differences to the open survey (as draft), within published-survey rules | Ordering dependent changes and enforcing constraints |
+| 1. Compare + apply (MVP) | Upload an exported `.zip`, see the differences tree, apply **additions** and **property changes** (labels, expressions, validations, layout, category items added/changed) to the open survey as draft | Ordering dependent changes, published-survey rules |
+| 2. Full sync | Removals, moves, renames, cycles, survey info, taxonomies, survey files; matching by name path when UUIDs differ (surveys built by hand in each environment), "possible rename" suggestions | Matching without UUIDs |
+| 3. Fingerprint | One "definition hash" per survey on the dashboard: check that Dev, QA and Prod are identical without uploading anything | Picking the normalization rules |
 
-### Phase 1 — Definition fingerprint (quick win)
-
-Gives a quick yes/no on "identical?" without uploading anything: compare two short strings.
-
-- `core/survey/surveyFingerprint.ts`: `normalizeSurveyDefinition(survey, { categories, taxonomies })` →
-  canonical JSON (sorted keys, see **Normalization**); `computeSurveyFingerprint(...)` → SHA-256 hex
-  (Node `crypto` on the server, the hash is computed server side only).
-- Two fingerprints, both shown:
-  - **strict**: includes UUIDs. Equal when one survey was exported/imported/cloned from the other and has not
-    changed since;
-  - **structural**: UUIDs replaced by name paths. Equal when the two surveys define the same things, even if they
-    were created separately.
-- Computed on demand: `GET /api/survey/:surveyId/fingerprint?draft=true|false`. Draft and published give
-  different values, so a Prod survey with unpublished edits is visible as such.
-- UI: dashboard `SurveyInfo` card, a "Definition fingerprint" row (first 12 chars, click to copy the full value),
-  plus a column in the Schema Summary export header.
-
-### Phase 2 — Comparison
+### Comparison (phase 1, name-path matching in phase 2)
 
 #### User flow
 
-1. Designer → new **"Compare with…"** item (next to Schema Summary), opens `/app/designer/compare`.
+1. Designer → new **"Update from survey file…"** item (next to Schema Summary), opens `/app/designer/compare`.
+   Users without edit permission get the same view as **"Compare with survey file…"** (read only, no Apply).
 2. The user uploads an Arena survey `.zip` exported (without data) from another server. Later option: pick another
    survey on the same server instead (same code path, the source is loaded from the DB rather than from a zip).
 3. A job (`SurveyCompareJob`) reads the zip and builds the diff; progress is shown with the usual `JobMonitor`.
@@ -110,7 +126,7 @@ interface NodeDefDiff {
   status: DiffStatus
   props: PropDiff[]            // only differing props
   childrenStatus: 'identical' | 'hasDifferences'  // rolled up for the tree
-  applicability?: Applicability  // phase 3
+  applicability?: Applicability  // see Applicability rules
 }
 interface SurveyDiff {
   identical: boolean
@@ -167,13 +183,13 @@ interface SurveyDiff {
   Reuse the tree style of the existing `NodeDefsSelector` / survey hierarchy component.
 - **Detail panel** (right, or below on narrow screens) for the selected row: a table _Property | Uploaded |
   This survey_, expressions shown as code with word-level highlighting, labels grouped by language.
-  In phase 3 it also shows the "Apply" checkbox and the reason when a change cannot be applied.
+  It also shows the "Apply" checkbox and the reason when a change cannot be applied.
 - Other tabs: **Survey info**, **Categories** (list → levels / extra props / item diff table with paging),
   **Taxonomies** (same), **Files**.
 - **Export**: download the diff as Excel/CSV (one row per difference) and as JSON, so it can be attached to a
   change request.
 
-### Phase 3 — Apply changes to the open survey
+### Apply changes to the open survey (phase 1: additions and changes; phase 2: the rest)
 
 All changes land as **draft** (`propsDraft`, unpublished categories/items), never directly in published props.
 The user then reviews in the Designer and publishes as usual, so `SurveyPublishJob` stays the only path to
@@ -198,6 +214,11 @@ Per change, one of `applicable`, `applicableWithWarning`, `notApplicable` + a re
 | Delete category level / item | yes | **no** for published levels/items (item props can still change) |
 | Delete taxon | yes | warning (published taxa referenced by records) |
 
+Form layout: a parent entity's layout (`layoutChildren`, `indexChildren`, per cycle) lists its children by UUID.
+When a child is added, the parent's layout change is linked to it and applied with it; when UUIDs differ (phase 2),
+the UUIDs in the layout are mapped to the target ones. Layout entries of target-only children that are not
+removed are kept (appended at the end) so they don't vanish from the form.
+
 Dependent changes are linked: selecting an added attribute auto-selects its added parent entity and the
 category/taxonomy it references; deselecting a parent deselects its children. Expressions are re-validated against
 the resulting survey (`SurveyValidator` / `NodeDefExpressionValidator`); an expression referring to a node def not
@@ -216,26 +237,47 @@ selected for adding is blocked with that reason.
      when free, so later comparisons match by UUID), update props (`updateNodeDefProps`), move, mark deleted;
   5. survey files;
   6. regenerate dependency graphs, validate the survey, write one activity log entry summarizing the sync.
+- Concurrency: the apply job refuses to run while another survey job (publish, import, apply) is running on the same
+  survey.
 - On success the client reloads the survey defs (`SurveyDefsLoader`) and reruns the comparison: expected result is
   "identical" except for the changes that were not applicable.
+
+### Definition fingerprint (phase 3)
+
+Gives a quick yes/no on "identical?" without uploading anything: compare two short strings.
+
+- `core/survey/surveyFingerprint.ts`: `normalizeSurveyDefinition(survey, { categories, taxonomies })` →
+  canonical JSON (sorted keys, see **Normalization**); `computeSurveyFingerprint(...)` → SHA-256 hex
+  (Node `crypto` on the server, the hash is computed server side only).
+- Two fingerprints, both shown:
+  - **strict**: includes UUIDs. Equal when one survey was exported/imported/cloned from the other and has not
+    changed since;
+  - **structural**: UUIDs replaced by name paths. Equal when the two surveys define the same things, even if they
+    were created separately.
+- Computed on demand: `GET /api/survey/:surveyId/fingerprint?draft=true|false`. Draft and published give
+  different values, so a Prod survey with unpublished edits is visible as such.
+- UI: dashboard `SurveyInfo` card, a "Definition fingerprint" row (first 12 chars, click to copy the full value),
+  plus a column in the Schema Summary export header.
 
 ## Non-goals
 
 - Comparing or syncing records / data.
 - Direct server-to-server connection (credentials for another Arena instance, CORS, network rules). The `.zip`
   upload covers it; a remote source can be added later behind the same `SurveyCompareSourceReader` interface.
-- Processing chains (analysis) comparison: phase 2+ follow-up, the `chains/` zip entries are already available.
-- Three-way merge (base / mine / theirs).
+- Processing chains (analysis) comparison: follow-up after phase 2, the `chains/` zip entries are already available.
+- Three-way merge (base / mine / theirs). It would remove the "deleted in Dev or added in QA?" ambiguity, but needs
+  the previous Dev export as a third input; the "removals unchecked by default" rule covers it for now.
 
 ## Open questions
 
-1. Phase 1 alone may already answer the user; ship it first and collect feedback before phase 3?
-2. Default for layout differences: hidden or shown?
-3. When the target is published, should "apply" also offer to publish at the end, or always leave it to the user?
-4. Should the compare view also accept a Schema Summary file as source? (Simpler to produce, but lossy: no item
-   lists, no extra props.) Proposed: no.
-5. `key` change on published node defs: confirm what publish validation allows today before marking it as warning
+1. When the target is published, should "Apply" also offer to publish at the end, or always leave it to the user?
+   Proposed: leave it to the user (they should test the form first).
+2. Default for layout-only differences (e.g. a field resized in Dev): applied or not? Proposed: shown and checked,
+   with a filter to hide them.
+3. `key` change on published node defs: confirm what publish validation allows today before marking it as warning
    vs not applicable.
+4. Should the uploaded file be kept (survey file / activity log) to know which Dev version QA was last updated from?
+   This would also give the base version needed for a future three-way merge.
 
 ## Testing
 
@@ -245,10 +287,14 @@ selected for adding is blocked with that reason.
 - **Integration** (`test/integration/`): export a test survey, change it (rename attr, add attr, change category
   item label, change expression), compare → expected diff; apply → compare again → identical; apply on a published
   survey → non-applicable changes are rejected.
+- **Integration, main use case**: import survey A as survey B (same UUIDs), publish B, add an attribute and change
+  a validation in A, export A, apply to B → B has the new attribute (same UUID) and the new validation as draft;
+  publish B → records keep their data, the new column exists in the data tables.
 - **E2E** (`test/e2e/specs/`): upload a zip, check banner counts and badges in the tree, apply one change.
 
 ## Rough effort
 
-- Phase 1: ~2–3 days (normalization is reused in phase 2).
-- Phase 2: ~2 weeks (matching + diff ~1 week, UI ~1 week).
-- Phase 3: ~2 weeks, mostly applicability rules, ordering and tests.
+- Phase 1 (compare + apply additions and changes): ~3 weeks (diff + matching by UUID ~1 week, UI ~1 week,
+  apply job and rules ~1 week).
+- Phase 2 (full sync, name-path matching): ~2 weeks.
+- Phase 3 (fingerprint): ~2–3 days, it reuses the phase 1 normalization.
