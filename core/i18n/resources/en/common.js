@@ -1441,7 +1441,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       buttonLabel: 'Generate Whisp analysis',
       confirmMessage: `Generate the Whisp analysis for all the sampling points?
 
-- every sampling point with a location will be sent to Whisp for the analysis
+- every sampling point with a location will be sent to Open Foris Whisp for the analysis
 - the results will be combined with the sampling point data and stored in the category '${samplingPointDataWhispCategoryName}'
 - if the category '${samplingPointDataWhispCategoryName}' already exists, its content will be replaced
 - the analysis runs in the background and it can take several minutes, depending on the number of sampling points`,

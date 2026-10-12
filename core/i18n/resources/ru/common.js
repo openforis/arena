@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1440,6 +1444,15 @@ $t(common.cantUndoWarning)`,
     reportingData: 'Отчетные данные',
     exportToGeoPackage: 'Экспорт в GeoPackage',
     exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Сгенерировать анализ Whisp',
+      confirmMessage: `Сгенерировать анализ Whisp для всех точек выборки?
+
+- каждая точка выборки с местоположением будет отправлена в Open Foris Whisp для анализа
+- результаты будут объединены с данными точек выборки и сохранены в категории '${samplingPointDataWhispCategoryName}'
+- если категория '${samplingPointDataWhispCategoryName}' уже существует, её содержимое будет заменено
+- анализ выполняется в фоновом режиме и может занять несколько минут в зависимости от количества точек выборки`,
+    },
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },
