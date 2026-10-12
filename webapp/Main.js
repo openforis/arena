@@ -8,7 +8,7 @@ import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
 import { BrowserRouter } from 'react-router-dom'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
@@ -27,7 +27,7 @@ root.render(
     <SurveyThemeBridge>
       <I18nextProvider i18n={i18nInstance}>
         <BrowserRouter>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Arena />
           </LocalizationProvider>
         </BrowserRouter>
