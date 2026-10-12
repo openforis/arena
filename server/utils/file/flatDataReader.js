@@ -106,6 +106,30 @@ export const createReaderFromStream = ({
 export const createReaderFromFile = ({ filePath, fileFormat, onHeaders = null, onRow = null, onTotalChange = null }) =>
   createReaderFromStream({ stream: FileUtils.createReadStream(filePath), fileFormat, onHeaders, onRow, onTotalChange })
 
+/**
+ * Reads the rows of a CSV file one at a time, without keeping them in memory.
+ * @param {object} params - The parameters.
+ * @param {string} params.filePath - Path of the CSV file.
+ * @param {(headers: string[]) => void} [params.onHeaders] - Called with the headers, before the first row is yielded.
+ * @yields {object} The rows, as objects indexed by header.
+ */
+export async function* generateRowsFromCsvFile({ filePath, onHeaders = null }) {
+  const stream = FileUtils.createReadStream(filePath)
+  let headers = null
+  try {
+    for await (const row of stream.pipe(parse({ ignoreEmpty: true }))) {
+      if (headers) {
+        yield _rowToObject({ headers, row })
+      } else {
+        headers = _extractValidHeaders(row)
+        onHeaders?.(headers)
+      }
+    }
+  } finally {
+    stream.destroy()
+  }
+}
+
 export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.csv }) => {
   let result = []
 
