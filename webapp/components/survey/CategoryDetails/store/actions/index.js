@@ -10,6 +10,7 @@ import { useConvertGeoPackageCategoryToSimple } from './category/useConvertGeoPa
 import { useConvertSamplingPointDataCategoryToSimple } from './category/useConvertSamplingPointDataCategoryToSimple'
 import { useConvertToSimpleCategory } from './category/useConvertToSimpleCategory'
 import { useExportToGeoPackage } from './category/useExportToGeoPackage'
+import { useGenerateSamplingPointDataWhisp } from './category/useGenerateSamplingPointDataWhisp'
 import { useOnDoneClick } from './category/useOnDoneClick'
 import { useToggleEditExtraPropertiesPanel } from './category/useToggleEditExtraPropertiesPanel'
 import { useImportCategory } from './importSummary/useImportCategory'
@@ -44,6 +45,7 @@ export const useActions = ({ setState }) => ({
   convertSamplingPointDataCategoryToSimple: useConvertSamplingPointDataCategoryToSimple({ setState }),
   convertToSimpleCategory: useConvertToSimpleCategory({ setState }),
   exportToGeoPackage: useExportToGeoPackage(),
+  generateSamplingPointDataWhisp: useGenerateSamplingPointDataWhisp(),
   onDoneClick: useOnDoneClick({ setState }),
   toggleEditExtraPropertiesPanel: useToggleEditExtraPropertiesPanel({ setState }),
 

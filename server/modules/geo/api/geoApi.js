@@ -124,6 +124,21 @@ export const init = (app) => {
   })
 
   app.post(
+    `${uriPrefix}whisp/sampling-point-data/start`,
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const job = GeoService.startSamplingPointDataWhispJob({ user, surveyId })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,
     AuthMiddleware.requireMapUsePermission,
     async (req, res, next) => {

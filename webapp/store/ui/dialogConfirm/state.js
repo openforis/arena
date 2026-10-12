@@ -27,6 +27,8 @@ const keys = {
   checkboxCheckedContentParams: 'checkboxCheckedContentParams',
   // header
   headerText: 'headerText',
+  // false to show bullet lists entirely, without limiting their height (scrollbar)
+  scrollableList: 'scrollableList',
   // strong confirmation
   strongConfirm: 'strongConfirm', // boolean: true if strong confirmation is required
   strongConfirmInputLabel: 'strongConfirmInputLabel',
@@ -54,6 +56,7 @@ export const getCheckboxCheckedContentKey = A.pipe(getState, A.propOr(null, keys
 export const getCheckboxCheckedContentParams = A.pipe(getState, A.propOr({}, keys.checkboxCheckedContentParams))
 // header
 export const getHeaderText = A.pipe(getState, A.propOr(null, keys.headerText))
+export const isScrollableList = A.pipe(getState, A.propOr(true, keys.scrollableList))
 // strong confirmation
 export const isStrongConfirm = A.pipe(getState, A.propEq(keys.strongConfirm, true))
 export const getStrongConfirmInputLabel = A.pipe(getState, A.propOr(null, keys.strongConfirmInputLabel))
@@ -77,6 +80,7 @@ export const show = ({
   checkboxCheckedContentKey = null,
   checkboxCheckedContentParams = {},
   headerText = null,
+  scrollableList = true,
   strongConfirm = false,
   strongConfirmInputLabel = 'confirm.strongConfirmInputLabel',
   strongConfirmRequiredText = null,
@@ -96,6 +100,7 @@ export const show = ({
   [keys.checkboxCheckedContentKey]: checkboxCheckedContentKey,
   [keys.checkboxCheckedContentParams]: checkboxCheckedContentParams,
   [keys.headerText]: headerText,
+  [keys.scrollableList]: scrollableList,
   [keys.strongConfirm]: strongConfirm,
   [keys.strongConfirmInputLabel]: strongConfirmInputLabel,
   [keys.strongConfirmRequiredText]: strongConfirmRequiredText,
