@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1291,6 +1295,15 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     reportingData: 'Datos de informes',
     exportToGeoPackage: 'Exportar a GeoPackage',
     exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Generar análisis Whisp',
+      confirmMessage: `¿Generar el análisis Whisp para todos los puntos de muestreo?
+
+- cada punto de muestreo con una ubicación será enviado a Open Foris Whisp para el análisis
+- los resultados se combinarán con los datos de los puntos de muestreo y se guardarán en la categoría '${samplingPointDataWhispCategoryName}'
+- si la categoría '${samplingPointDataWhispCategoryName}' ya existe, su contenido será reemplazado
+- el análisis se ejecuta en segundo plano y puede tardar varios minutos, dependiendo del número de puntos de muestreo`,
+    },
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },

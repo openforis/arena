@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1442,6 +1446,15 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     reportingData: 'Dados de reporte',
     exportToGeoPackage: 'Exportar para GeoPackage',
     exportToGeoPackageSkippedItems: '{{count}} item(ns) sem localização válida foram ignorados.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Gerar análise Whisp',
+      confirmMessage: `Gerar a análise Whisp para todos os pontos amostrais?
+
+- cada ponto amostral com uma localização será enviado ao Open Foris Whisp para a análise
+- os resultados serão combinados com os dados dos pontos amostrais e armazenados na categoria '${samplingPointDataWhispCategoryName}'
+- se a categoria '${samplingPointDataWhispCategoryName}' já existir, o seu conteúdo será substituído
+- a análise é executada em segundo plano e pode levar vários minutos, dependendo do número de pontos amostrais`,
+    },
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },

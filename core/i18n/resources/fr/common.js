@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1452,6 +1456,15 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     reportingData: 'Données de rapport',
     exportToGeoPackage: 'Exporter vers GeoPackage',
     exportToGeoPackageSkippedItems: '{{count}} élément(s) sans emplacement valide ont été ignorés.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: "Générer l'analyse Whisp",
+      confirmMessage: `Générer l'analyse Whisp pour tous les points d'échantillonnage ?
+
+- chaque point d'échantillonnage avec un emplacement sera envoyé à Open Foris Whisp pour l'analyse
+- les résultats seront combinés avec les données des points d'échantillonnage et enregistrés dans la catégorie '${samplingPointDataWhispCategoryName}'
+- si la catégorie '${samplingPointDataWhispCategoryName}' existe déjà, son contenu sera remplacé
+- l'analyse s'exécute en arrière-plan et peut prendre plusieurs minutes, selon le nombre de points d'échantillonnage`,
+    },
     templateFor_samplingPointDataImport_csv: "Modèle pour l'importation de données de points d'échantillonnage (CSV)",
     templateFor_samplingPointDataImport_xlsx:
       "Modèle pour l'importation de données de points d'échantillonnage (Excel)",

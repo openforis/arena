@@ -1,4 +1,8 @@
-import { samplingPointDataCategoryName, locationItemExtraDefName } from '@core/survey/category'
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
 
 export default {
   common: {
@@ -1427,6 +1431,15 @@ $t(common.cantUndoWarning)`,
     reportingData: 'Тайлагнах өгөгдөл',
     exportToGeoPackage: 'GeoPackage рүү экспортлох',
     exportToGeoPackageSkippedItems: 'Хүчинтэй байршилгүй {{count}} элементийг алгаслаа.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Whisp шинжилгээ үүсгэх',
+      confirmMessage: `Бүх түүвэрлэлтийн цэгт Whisp шинжилгээ үүсгэх үү?
+
+- байршилтай түүвэрлэлтийн цэг бүрийг шинжилгээнд зориулж Open Foris Whisp руу илгээнэ
+- үр дүнг түүвэрлэлтийн цэгийн өгөгдөлтэй нэгтгэж '${samplingPointDataWhispCategoryName}' ангилалд хадгална
+- хэрэв '${samplingPointDataWhispCategoryName}' ангилал аль хэдийн байгаа бол түүний агуулгыг солино
+- шинжилгээ арын горимд ажиллах бөгөөд түүвэрлэлтийн цэгийн тооноос хамааран хэдэн минут үргэлжилж болно`,
+    },
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },
