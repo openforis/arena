@@ -107,7 +107,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }) => {
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getVisibleIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildVisible(parentNode, nodeDefUuid, value, false),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildVisible(parentNode, nodeDefUuid, value),
   })
 
   recordUpdated = await _recomputeBooleanState({
@@ -116,7 +116,7 @@ const recomputeUserDependentNodeState = async ({ user, survey, record }) => {
     record: recordUpdated,
     nodeDefs: nodeDefsUserDependent,
     getExpressions: NodeDef.getEditableIf,
-    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildEditable(parentNode, nodeDefUuid, value, false),
+    assocValue: ({ parentNode, nodeDefUuid, value }) => Nodes.assocChildEditable(parentNode, nodeDefUuid, value),
   })
 
   // Default values are recomputed last, using the applicability just recomputed above
