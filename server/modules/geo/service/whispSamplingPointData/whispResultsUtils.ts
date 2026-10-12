@@ -29,6 +29,8 @@ export type WhispColumn = {
 
 type CellValue = string | number
 
+export type WhispValues = Record<string, CellValue>
+
 const isPrimitive = (value: unknown): boolean =>
   value === null || value === undefined || ['string', 'number', 'boolean'].includes(typeof value)
 
@@ -49,46 +51,6 @@ const toColumnName = ({ prop, usedColumnNames }: { prop: string; usedColumnNames
 }
 
 /**
- * Extracts the Whisp properties to store in the category, in order of appearance, with their (lower case) column name.
- * Properties having non-primitive values (objects, arrays) are skipped.
- *
- * @param {object} params - The parameters.
- * @param {WhispFeature[]} params.features - Features returned by Whisp.
- * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
- * @returns {WhispColumn[]} The Whisp columns.
- */
-const extractCandidateProps = (features: WhispFeature[]): string[] => {
-  const candidateProps = new Set<string>()
-  const nonPrimitiveProps = new Set<string>()
-  for (const feature of features) {
-    for (const [prop, value] of Object.entries(feature.properties ?? {})) {
-      candidateProps.add(prop)
-      if (!isPrimitive(value)) nonPrimitiveProps.add(prop)
-    }
-  }
-  return [...candidateProps].filter((prop) => !isWhispPropExcluded(prop) && !nonPrimitiveProps.has(prop))
-}
-
-export const extractWhispColumns = ({
-  features,
-  existingColumnNames,
-}: {
-  features: WhispFeature[]
-  existingColumnNames: string[]
-}): WhispColumn[] => {
-  const candidateProps = extractCandidateProps(features)
-  const usedColumnNames = new Set(existingColumnNames)
-  const columns: WhispColumn[] = []
-  for (const prop of candidateProps) {
-    const column = toColumnName({ prop, usedColumnNames })
-    if (usedColumnNames.has(column)) continue
-    usedColumnNames.add(column)
-    columns.push({ prop, column })
-  }
-  return columns
-}
-
-/**
  * Converts a Whisp property value into a flat data cell value.
  *
  * @param {unknown} value - The value returned by Whisp.
@@ -100,6 +62,105 @@ export const toCellValue = (value: unknown): CellValue => {
   if (typeof value === 'boolean') return String(value)
   return ''
 }
+
+const isDefined = (value: unknown): boolean => value !== null && value !== undefined && value !== ''
+
+/**
+ * Collects what is needed to define the category columns, one Whisp feature at a time,
+ * so that the features (hundreds of properties each) don't have to be kept in memory.
+ */
+export class WhispColumnsCollector {
+  private readonly candidateProps = new Set<string>()
+  private readonly nonPrimitiveProps = new Set<string>()
+  private readonly definedProps = new Set<string>()
+  private readonly nonNumericProps = new Set<string>()
+
+  /**
+   * Updates the columns info with the specified feature.
+   *
+   * @param {WhispFeature} feature - Feature returned by Whisp.
+   * @returns {WhispValues} The (non-empty) cell values of the feature to store in the category, by Whisp property.
+   */
+  addFeature(feature: WhispFeature): WhispValues {
+    const values: WhispValues = {}
+    for (const [prop, value] of Object.entries(feature.properties ?? {})) {
+      if (isWhispPropExcluded(prop)) continue
+
+      this.candidateProps.add(prop)
+      if (!isPrimitive(value)) {
+        this.nonPrimitiveProps.add(prop)
+        continue
+      }
+      if (!isDefined(value)) continue
+
+      this.definedProps.add(prop)
+      if (typeof value !== 'number') this.nonNumericProps.add(prop)
+
+      const cellValue = toCellValue(value)
+      if (cellValue !== '') values[prop] = cellValue
+    }
+    return values
+  }
+
+  /**
+   * Returns the Whisp properties to store in the category, in order of appearance, with their (lower case) column name.
+   * Properties having non-primitive values (objects, arrays) are skipped.
+   *
+   * @param {object} params - The parameters.
+   * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
+   * @returns {WhispColumn[]} The Whisp columns.
+   */
+  getColumns({ existingColumnNames }: { existingColumnNames: string[] }): WhispColumn[] {
+    const usedColumnNames = new Set(existingColumnNames)
+    const columns: WhispColumn[] = []
+    for (const prop of this.candidateProps) {
+      if (this.nonPrimitiveProps.has(prop)) continue
+
+      const column = toColumnName({ prop, usedColumnNames })
+      if (usedColumnNames.has(column)) continue
+      usedColumnNames.add(column)
+      columns.push({ prop, column })
+    }
+    return columns
+  }
+
+  /**
+   * Determines the columns whose values are all numeric (at least one value must be defined).
+   *
+   * @param {WhispColumn[]} columns - The Whisp columns.
+   * @returns {string[]} The names of the numeric columns.
+   */
+  getNumericColumns(columns: WhispColumn[]): string[] {
+    return columns
+      .filter(({ prop }) => this.definedProps.has(prop) && !this.nonNumericProps.has(prop))
+      .map(({ column }) => column)
+  }
+}
+
+const collectColumns = (features: WhispFeature[]): WhispColumnsCollector => {
+  const collector = new WhispColumnsCollector()
+  for (const feature of features) {
+    collector.addFeature(feature)
+  }
+  return collector
+}
+
+/**
+ * Extracts the Whisp properties to store in the category, in order of appearance, with their (lower case) column name.
+ * Properties having non-primitive values (objects, arrays) are skipped.
+ *
+ * @param {object} params - The parameters.
+ * @param {WhispFeature[]} params.features - Features returned by Whisp.
+ * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
+ * @returns {WhispColumn[]} The Whisp columns.
+ */
+export const extractWhispColumns = ({
+  features,
+  existingColumnNames,
+}: {
+  features: WhispFeature[]
+  existingColumnNames: string[]
+}): WhispColumn[] => collectColumns(features).getColumns({ existingColumnNames })
 
 /**
  * Determines the Whisp columns whose values are all numeric (at least one value must be defined).
@@ -115,15 +176,7 @@ export const findNumericColumns = ({
 }: {
   columns: WhispColumn[]
   features: WhispFeature[]
-}): string[] =>
-  columns
-    .filter(({ prop }) => {
-      const values = features
-        .map((feature) => feature.properties?.[prop])
-        .filter((value) => value !== null && value !== undefined && value !== '')
-      return values.length > 0 && values.every((value) => typeof value === 'number')
-    })
-    .map(({ column }) => column)
+}): string[] => collectColumns(features).getNumericColumns(columns)
 
 /**
  * Splits an array into chunks of the specified size.
