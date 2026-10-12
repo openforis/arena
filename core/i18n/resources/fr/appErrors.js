@@ -119,4 +119,7 @@ Essayez de rafraîchir la page.`,
   userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
   userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
   userNotFound: 'Utilisateur introuvable : {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: "Le fichier n'est pas une sauvegarde d'utilisateurs Arena valide",
+  },
 }

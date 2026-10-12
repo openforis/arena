@@ -114,4 +114,7 @@ export default {
   userNotAllowedToChangePref: 'このユーザーは設定を変更する権限がありません',
   userNotAuthorized: 'ユーザー{{userName}}には権限がありません',
   userNotFound: 'ユーザーが見つかりません：{{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'このファイルは有効なArenaユーザーバックアップではありません',
+  },
 }

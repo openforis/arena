@@ -1,0 +1,128 @@
+@use '~@webapp/style/vars' as *;
+
+.users-backup-modal {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    text-align: center;
+
+    .dropzone {
+      align-self: stretch;
+    }
+  }
+
+  .users-backup-modal__info ul {
+    margin: 0;
+    text-align: left;
+  }
+
+  .users-backup-modal__warning {
+    color: $colorError;
+  }
+
+  .users-backup-modal__summary ul {
+    margin: 0.5rem 0;
+    padding: 0;
+    list-style: none;
+  }
+}
+
+.users-backup-import-users-modal {
+  .modal-content {
+    width: 90vw;
+    max-width: 75rem;
+    margin: 5vh auto auto;
+  }
+
+  .users-backup-import-users-modal__bulk-actions {
+    display: grid;
+    grid-template-columns: auto auto;
+    align-items: center;
+    gap: 0.5rem 1rem;
+    text-align: right;
+  }
+}
+
+.users-backup-import-users-table {
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  text-align: left;
+
+  .users-backup-import-users-table__search {
+    width: 20rem;
+  }
+
+  .users-backup-import-users-table__container {
+    max-height: 40vh;
+    background-color: white;
+    border: 1px solid $greyBorder;
+    border-radius: 4px;
+
+    th {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    // long emails can break anywhere
+    .users-backup-import-users-table__email-cell {
+      overflow-wrap: anywhere;
+    }
+
+    .users-backup-import-users-table__action-cell {
+      white-space: nowrap;
+
+      .btn {
+        white-space: nowrap;
+      }
+    }
+  }
+
+  tr.expanded > td {
+    border-bottom: none;
+  }
+
+  .users-backup-import-users-table__details-row > td {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+
+.users-backup-user-status {
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  background-color: $grey;
+  white-space: nowrap;
+
+  &.users-backup-user-status--new {
+    background-color: $green;
+    color: white;
+  }
+}
+
+.users-backup-roles-details {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0 1rem 3rem;
+
+  table {
+    width: auto;
+  }
+
+  .users-backup-roles-details__not-found {
+    color: $colorError;
+    font-size: 0.8rem;
+  }
+}
+
+.users-backup-import-users-table__password-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}

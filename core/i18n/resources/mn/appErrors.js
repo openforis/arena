@@ -113,4 +113,7 @@ export default {
   userNotAllowedToChangePref: 'Хэрэглэгч тохиргоог өөрчлөх боломжгүй',
   userNotAuthorized: 'Хэрэглэгч {{userName}} эрхгүй байна',
   userNotFound: 'Хэрэглэгч олдсонгүй: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'Файл нь хүчинтэй Arena хэрэглэгчийн нөөц биш байна',
+  },
 }

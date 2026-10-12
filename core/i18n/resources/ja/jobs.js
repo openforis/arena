@@ -64,6 +64,8 @@ export default {
   TaxonomiesImportJob: '分類体系のインポート',
   TaxonomiesValidationJob: '分類体系の検証',
   TaxonomyImportJob: '分類体系のインポート',
+  UsersBackupExportJob: 'ユーザーのバックアップ',
+  UsersBackupImportJob: 'ユーザーの復元',
   // data export
   ArenaFileReadJob: 'Arenaファイルの読み込み',
   DataExportJob: 'データのエクスポート',

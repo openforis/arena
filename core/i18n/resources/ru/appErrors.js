@@ -112,4 +112,7 @@ export default {
   userNotAllowedToChangePref: 'Пользователю не разрешено изменять настройки',
   userNotAuthorized: 'Пользователь {{userName}} не авторизован',
   userNotFound: 'Пользователь не найден: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'Файл не является корректной резервной копией пользователей Arena',
+  },
 }
