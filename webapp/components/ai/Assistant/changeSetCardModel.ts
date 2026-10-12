@@ -60,7 +60,7 @@ const expressionPropTitleKeys: Record<NodeDefExpressionProp, string> = {
  * @param {object} survey - Survey.
  * @returns {string} The name (the uuid when unknown).
  */
-const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
+export const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
   const existing = Survey.getNodeDefByUuid(uuid)(survey)
   if (existing) return NodeDef.getName(existing)
   const create = changeSet.operations.find(

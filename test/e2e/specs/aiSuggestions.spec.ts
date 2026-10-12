@@ -7,6 +7,7 @@ import {
   assistantPanel,
   lastAssistantAnswer,
   openAssistantPanel,
+  openSuggestionCard,
   selectAssistantArea,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
@@ -89,10 +90,12 @@ test.describe('Module introduction (mock provider)', () => {
     const card = cards(page).filter({ hasText: 'New to the form designer?' })
     await expect(card).toContainText('New to the form designer? Ask me how it works.')
 
+    await openSuggestionCard(card)
     await card.getByTestId(TestId.aiAssistant.suggestionDoItBtn).click()
-    // a new conversation with the introduction prompt, answered by the Help script of the mock provider
+    // a new conversation showing the short request (the model gets the longer prompt), answered by the Help script of
+    // the mock provider
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.message('user')).last()).toContainText(
-      "I'm new to the form designer."
+      'How does the form designer work?'
     )
     await waitForAssistantTurn(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.toolRow('docs_search'))).toContainText(
@@ -133,7 +136,7 @@ test.describe('Module introduction (mock provider)', () => {
     await designer.goto()
     await openAssistantPanel(page)
     await selectAssistantArea(page, 'Help')
-    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible()
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.startScreen)).toBeVisible()
     await expect(cards(page)).toHaveCount(0)
     await expect(page.getByTestId(TestId.aiAssistant.suggestionsDot)).toHaveCount(0)
     await expect(page.getByTestId(TestId.aiAssistant.openBtn)).toHaveAttribute('aria-label', 'AI assistant')

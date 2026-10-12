@@ -83,6 +83,12 @@ describe('assistant panel model', () => {
     expect(retry?.base.messages.map((message) => message.id)).toEqual(['u-1', 'a-done'])
     expect(getRetryBase(conversationWith([first, answer('done', 'Done.')]))).toBeNull()
     expect(getRetryBase(conversationWith([]))).toBeNull()
+    // a Do it message keeps showing its request text after Retry
+    const doIt = { ...first, displayText: 'Add remarks to the plots' }
+    expect(getRetryBase(conversationWith([doIt, answer('error', '')]))).toMatchObject({
+      text: 'Add remarks',
+      displayText: 'Add remarks to the plots',
+    })
   })
 
   test('operation results: the latest result of an operation wins', () => {

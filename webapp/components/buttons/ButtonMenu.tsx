@@ -32,6 +32,7 @@ type ButtonMenuProps = ButtonProps & {
   menuClassName?: string
   onItemClick?: (item: ButtonMenuItem) => void
   selectedItemKey?: string
+  showCaret?: boolean
 }
 
 type ButtonMenuPopupProps = {
@@ -110,6 +111,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
     items,
     onItemClick: onItemClickProp,
     selectedItemKey,
+    showCaret = true,
     testId = null,
     variant = 'text',
     ...otherProps
@@ -134,7 +136,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
         variant={variant}
         {...otherProps}
       >
-        <span className="icon icon-ctrl button-menu__button-icon" />
+        {showCaret && <span className="icon icon-ctrl button-menu__button-icon" />}
       </Button>
 
       <ButtonMenuPopup

@@ -10,6 +10,9 @@ import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
 export type ConversationTextPart = { type: 'text'; text: string }
 
+// the model's thinking: shown collapsed, never sent back to the model
+export type ConversationReasoningPart = { type: 'reasoning'; text: string }
+
 export type ConversationToolPart = {
   type: 'tool'
   toolCallId: string
@@ -19,9 +22,10 @@ export type ConversationToolPart = {
   state: 'running' | 'done' | 'failed'
 }
 
-export type AssistantMessagePart = ConversationTextPart | ConversationToolPart
+export type AssistantMessagePart = ConversationTextPart | ConversationReasoningPart | ConversationToolPart
 
-export type UserMessage = { id: string; role: 'user'; text: string; createdAt: string }
+// text: what the model gets; displayText: what the chat shows instead (a Do it request in the user's words)
+export type UserMessage = { id: string; role: 'user'; text: string; displayText?: string; createdAt: string }
 
 export type AssistantMessageStatus = 'streaming' | 'done' | 'stopped' | 'error'
 

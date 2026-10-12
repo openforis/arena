@@ -7,50 +7,36 @@ import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
 import type { AssistantArea } from './assistantAreas'
 import { assistantPanelStore } from './assistantPanelStore'
 import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
-import { AssistantContextMeter } from './AssistantContextMeter'
+import { AssistantComposerFooter } from './AssistantComposerFooter'
+import { AssistantContextNotice } from './AssistantContextMeter'
+import { AssistantConversationBar } from './AssistantConversationBar'
 import { AssistantMessageView } from './AssistantMessage'
-import { AssistantSuggestions } from './suggestions/AssistantSuggestions'
 import { usePendingSuggestionRequest } from './suggestions/usePendingSuggestionRequest'
 import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
 
-const areaEmptyKeys: Record<AssistantArea, string> = {
-  design: 'aiAssistant.emptyDesign',
-  analysis: 'aiAnalysis.empty',
-  cleaning: 'aiCleaning.empty',
-  help: 'aiAssistant.emptyHelp',
-}
-
 /**
- * Messages and composer of the current conversation.
+ * Messages and composer of the current conversation; blank until the first message of a new one.
  * @param {object} props - Props.
  * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
- * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area (cards above the messages).
  * @returns {React.ReactElement} The chat.
  */
-export const AssistantChat = ({
-  area,
-  api,
-  suggestions,
-}: {
-  area: AssistantArea
-  api: AssistantConversationApi
-  suggestions: AssistantSuggestion[]
-}) => {
+export const AssistantChat = ({ area, api }: { area: AssistantArea; api: AssistantConversationApi }) => {
   const t = useI18nT({ unescapeHtml: true })
   const [input, setInput] = useState('')
-  const { draft: panelDraft, draftArea } = useAssistantPanel()
+  const { draft: panelDraft, draftArea, conversationId } = useAssistantPanel()
   const draft = draftArea === area ? panelDraft : null
   const [appliedDraft, setAppliedDraft] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const { conversation, busy, applying, engineNotice } = api
+  // null while a remembered conversation loads (no "new conversation" title flash)
+  const barTitle = conversation?.title ?? (conversationId ? null : '')
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
   const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area])
@@ -100,9 +86,8 @@ export const AssistantChat = ({
           {t('aiAssistant.inMemoryOnly')}
         </div>
       )}
-      <AssistantSuggestions api={api} suggestions={suggestions} />
+      <AssistantConversationBar busy={busy} title={barTitle} />
       <div aria-live="polite" className="ai-assistant-panel__messages" ref={listRef}>
-        {messages.length === 0 && <p className="ai-assistant-panel__empty">{t(areaEmptyKeys[area])}</p>}
         {messages.map((message) => (
           <AssistantMessageView
             api={api}
@@ -120,11 +105,11 @@ export const AssistantChat = ({
           {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
         </div>
       )}
-      <AssistantContextMeter busy={busy} conversation={conversation} onNewConversation={api.newConversation} />
-      {recordDataNotice ? (
-        <RecordDataNotice onNewConversation={api.newConversation} />
-      ) : (
-        <div className="ai-assistant-panel__composer">
+      <AssistantContextNotice busy={busy} conversation={conversation} onNewConversation={api.newConversation} />
+      <div className="ai-assistant-panel__composer">
+        {recordDataNotice ? (
+          <RecordDataNotice onNewConversation={api.newConversation} />
+        ) : (
           <textarea
             aria-label={t('aiAssistant.placeholder')}
             data-testid={TestId.aiAssistant.input}
@@ -132,22 +117,35 @@ export const AssistantChat = ({
             onChange={(event) => setInput(event.target.value)}
             onKeyDown={onKeyDown}
             placeholder={t('aiAssistant.placeholder')}
-            rows={3}
+            rows={2}
             value={input}
           />
-          {busy ? (
-            <Button label="aiAssistant.stop" onClick={api.stop} testId={TestId.aiAssistant.stopBtn} />
-          ) : (
+        )}
+        <AssistantComposerFooter area={area} conversation={conversation}>
+          {!recordDataNotice && busy && (
             <Button
+              label="aiAssistant.stop"
+              onClick={api.stop}
+              size="small"
+              testId={TestId.aiAssistant.stopBtn}
+              variant="text"
+            />
+          )}
+          {!recordDataNotice && !busy && (
+            <Button
+              className="ai-assistant-panel__send"
               disabled={!input.trim() || applying}
+              iconClassName="icon-arrow-up2 icon-14px"
               label="aiAssistant.send"
               onClick={onSend}
               primary
+              showLabel={false}
+              size="small"
               testId={TestId.aiAssistant.sendBtn}
             />
           )}
-        </div>
-      )}
+        </AssistantComposerFooter>
+      </div>
     </>
   )
 }

@@ -210,7 +210,7 @@ describe('assistant panel store', () => {
       area: 'help',
       userSelectedArea: 'help',
       conversationId: null,
-      view: 'chat',
+      view: 'home',
     })
     store.setConversationId('c2')
     store.setArea('help')

@@ -18,12 +18,14 @@ import type {
 export type TurnState = {
   get: () => Conversation
   appendText: (text: string) => void
+  appendReasoning: (text: string) => void
   startTool: (call: { toolCallId: string; toolName: string; input: unknown }) => void
   endTool: (result: { toolCallId: string; output: unknown }) => void
   addChangeSet: (changeSet: ChangeSet) => void
   escalateDataClass: (dataClass: AiDataClass) => void
   setQueries: (queries: Record<string, AnalysisQueryEntry>) => void
   setUsage: (usage: AssistantMessageUsage) => void
+  setTitle: (title: string) => void
   finish: (status: AssistantMessageStatus, errorKey?: string) => void
 }
 
@@ -36,17 +38,18 @@ export const isToolErrorOutput = (output: unknown): boolean =>
   typeof output === 'object' && output !== null && 'error' in output
 
 /**
- * Appends text to the last text part of an answer (or starts a new one after a tool part).
+ * Appends text to the last part of an answer when it has the same type (or starts a new part).
  * @param {AssistantMessage} message - Answer.
+ * @param {'text'|'reasoning'} type - Part type.
  * @param {string} text - Text to append.
  * @returns {AssistantMessage} The new answer.
  */
-const appendTextPart = (message: AssistantMessage, text: string): AssistantMessage => {
+const appendToPart = (message: AssistantMessage, type: 'text' | 'reasoning', text: string): AssistantMessage => {
   const last = message.parts.at(-1)
-  if (last?.type === 'text') {
-    return { ...message, parts: [...message.parts.slice(0, -1), { type: 'text', text: last.text + text }] }
+  if (last?.type === type) {
+    return { ...message, parts: [...message.parts.slice(0, -1), { type, text: last.text + text }] }
   }
-  return { ...message, parts: [...message.parts, { type: 'text', text }] }
+  return { ...message, parts: [...message.parts, { type, text }] }
 }
 
 /**
@@ -54,24 +57,32 @@ const appendTextPart = (message: AssistantMessage, text: string): AssistantMessa
  * @param {object} params - Parameters.
  * @param {Conversation} params.conversation - Conversation before the turn.
  * @param {string} params.userMessage - User message.
+ * @param {string} [params.displayText] - What the chat shows instead of the user message.
  * @param {Function} params.onUpdate - Called with every new conversation object.
  * @returns {TurnState} The turn state.
  */
 export const createTurnState = ({
   conversation,
   userMessage,
+  displayText,
   onUpdate,
 }: {
   conversation: Conversation
   userMessage: string
+  displayText?: string
   onUpdate: (conversation: Conversation) => void
 }): TurnState => {
   const now = new Date().toISOString()
-  const user: UserMessage = { id: uuidv4(), role: 'user', text: userMessage, createdAt: now }
+  const user: UserMessage = {
+    id: uuidv4(),
+    role: 'user',
+    text: userMessage,
+    ...(displayText ? { displayText } : {}),
+    createdAt: now,
+  }
   const answer: AssistantMessage = { id: uuidv4(), role: 'assistant', parts: [], status: 'streaming', createdAt: now }
   let current: Conversation = {
     ...conversation,
-    title: conversation.title || toConversationTitle(userMessage),
     messages: [...conversation.messages, user, answer],
     updatedAt: now,
   }
@@ -99,7 +110,8 @@ export const createTurnState = ({
   onUpdate(current)
   return {
     get: () => current,
-    appendText: (text) => updateAnswer((message) => appendTextPart(message, text)),
+    appendText: (text) => updateAnswer((message) => appendToPart(message, 'text', text)),
+    appendReasoning: (text) => updateAnswer((message) => appendToPart(message, 'reasoning', text)),
     startTool: ({ toolCallId, toolName, input }) =>
       updateAnswer((message) => ({
         ...message,
@@ -122,7 +134,11 @@ export const createTurnState = ({
     },
     setQueries: (queries) => set({ ...current, queries }),
     setUsage: (usage) => updateAnswer((message) => ({ ...message, usage })),
-    finish: (status, errorKey) =>
-      updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status })),
+    setTitle: (title) => set({ ...current, title }),
+    finish: (status, errorKey) => {
+      // the model gave no title (conversation_setTitle): the first message is the title
+      if (!current.title) current = { ...current, title: toConversationTitle(displayText || userMessage) }
+      updateAnswer((message) => (errorKey ? { ...message, status, errorKey } : { ...message, status }))
+    },
   }
 }

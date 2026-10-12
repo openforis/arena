@@ -41,6 +41,8 @@ export type AiToolContext = {
   t: AiTranslate
   // a propose tool hands its validated change set to the conversation here (never persisted by the tool)
   onChangeSet: (changeSet: ChangeSet) => void
+  // first message of a conversation only: the model's title for it (conversation_setTitle)
+  setConversationTitle?: (title: string) => void
   // analysis area: queries proposed in the current conversation (D2)
   analysisQueries?: AnalysisQueryStore
   // set by the turn when the conversation was started by Do it (kept for the whole conversation)

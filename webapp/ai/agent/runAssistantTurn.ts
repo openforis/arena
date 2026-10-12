@@ -8,6 +8,7 @@ import * as Survey from '@core/survey/survey'
 import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
+import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
 
 import { isDataToolResult } from '@webapp/ai/conversations/dataClass'
 import { getPendingChangeSets } from '@webapp/ai/conversations/pendingChangeSets'
@@ -50,6 +51,8 @@ const PROVIDER_ERROR_KEY = 'aiProviderUnavailable'
 export type RunAssistantTurnParams = {
   conversation: Conversation
   userMessage: string
+  // what the chat shows instead of the user message (the model still gets userMessage)
+  displayText?: string
   area: AssistantPromptArea
   ctx: AiToolContext
   access: { effective: AiPolicy | null; hostingClass: AiHostingClass | null }
@@ -107,6 +110,9 @@ const handleStreamPart = (part: any, state: TurnState, outcome: StreamOutcome): 
   switch (part.type) {
     case 'text-delta':
       state.appendText(part.text)
+      break
+    case 'reasoning-delta':
+      state.appendReasoning(part.text)
       break
     case 'tool-call':
       state.startTool({ toolCallId: part.toolCallId, toolName: part.toolName, input: part.input })
@@ -170,6 +176,7 @@ const finishTurn = (state: TurnState, outcome: StreamOutcome, signal: AbortSigna
 export const runAssistantTurn = async ({
   conversation,
   userMessage,
+  displayText,
   area,
   ctx,
   access,
@@ -182,7 +189,7 @@ export const runAssistantTurn = async ({
   onEngine,
   resolve = resolveModel,
 }: RunAssistantTurnParams): Promise<Conversation> => {
-  const state = createTurnState({ conversation, userMessage, onUpdate })
+  const state = createTurnState({ conversation, userMessage, displayText, onUpdate })
   const turnCtx: AiToolContext = {
     ...ctx,
     signal,
@@ -199,6 +206,8 @@ export const runAssistantTurn = async ({
       state.addChangeSet(changeSet)
       ctx.onChangeSet(changeSet)
     },
+    // the model names the conversation on its first message (the later turns keep the title)
+    setConversationTitle: conversation.messages.length === 0 ? state.setTitle : undefined,
   }
   const outcome: StreamOutcome = { aborted: false, error: null, stepTokens: null, sent: null }
   try {
@@ -240,6 +249,7 @@ export const runAssistantTurn = async ({
         ctx: turnCtx,
         outline,
         dataToolsAvailable: toolList.some((tool) => tool.dataClass === 'data'),
+        titleToolAvailable: toolList.some((tool) => tool.name === CONVERSATION_TITLE_TOOL_NAME),
       })
     const budgetChars = getHistoryBudget({
       maxPromptChars: turn.limits.maxPromptChars,

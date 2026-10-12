@@ -23,7 +23,7 @@ export type SuggestionRequestScope = {
 // the conversation hook's send (resolves with the new conversation id, or null when no turn was created)
 export type SuggestionSend = (
   text: string,
-  options: { suggestion: { id: string; scope: SuggestionScope } }
+  options: { suggestion: { id: string; scope: SuggestionScope }; displayText: string }
 ) => Promise<string | null>
 
 /**
@@ -33,6 +33,28 @@ export type SuggestionSend = (
  */
 export const getRequestBucketSurveyId = (request: Pick<SuggestionRequest, 'area' | 'surveyId'>): number | null =>
   request.area === 'help' ? null : request.surveyId
+
+/**
+ * Returns the request text the chat shows for a card: the card's key with `card` replaced by `request`
+ * ("missingTranslations.card" → "missingTranslations.request", "dataImported.cardOne" → "dataImported.requestOne").
+ * @param {object} params - Parameters.
+ * @param {SuggestionDefinition} params.definition - Definition.
+ * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
+ * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
+ * @returns {string} The text, in the interface language.
+ */
+export const getSuggestionRequestText = ({
+  definition,
+  suggestion,
+  describeContext,
+}: {
+  definition: SuggestionDefinition
+  suggestion: AssistantSuggestion
+  describeContext: SuggestionDescribeContext
+}): string => {
+  const { key, params } = definition.card(suggestion, describeContext)
+  return describeContext.t(`aiSuggestions:${key.replace(/\.card/, '.request')}`, params)
+}
 
 /**
  * Builds the request of Do it from a visible suggestion (its targets are the visible ones).
@@ -66,8 +88,10 @@ export const buildSuggestionRequest = ({
   const definition = definitions[suggestion.kind]
   if (!definition || suggestion.targets.length === 0) return null
   let prompt: string
+  let displayText: string
   try {
     prompt = definition.prompt(suggestion, describeContext)
+    displayText = getSuggestionRequestText({ definition, suggestion, describeContext })
   } catch {
     // a target that no longer describes (e.g. a node def deleted meanwhile): nothing is sent
     return null
@@ -81,6 +105,7 @@ export const buildSuggestionRequest = ({
     suggestionId: suggestion.id,
     scope: { kind: suggestion.kind, targetKeys: suggestion.targets.map((target) => target.key) },
     prompt,
+    displayText,
   }
 }
 
@@ -141,7 +166,7 @@ export const acceptSuggestion = async ({
   definitions?: SuggestionDefinitions
 }): Promise<string | null> => {
   const { userUuid, suggestionId: id, scope } = request
-  const conversationId = await send(request.prompt, { suggestion: { id, scope } })
+  const conversationId = await send(request.prompt, { suggestion: { id, scope }, displayText: request.displayText })
   if (!conversationId) return null
   const surveyId = getRequestBucketSurveyId(request)
   const definition = definitions[scope.kind]

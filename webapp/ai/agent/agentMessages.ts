@@ -38,8 +38,12 @@ export const describeToolPart = (part: ConversationToolPart): string => {
  * @returns {string} The text, empty when the answer has no content.
  */
 const assistantText = (message: AssistantMessage): string => {
+  // thinking stays out of the history (empty line, filtered below): the model only needs its answers
   const lines = message.parts
-    .map((part) => (part.type === 'text' ? part.text.trim() : describeToolPart(part)))
+    .map((part) => {
+      if (part.type === 'reasoning') return ''
+      return part.type === 'text' ? part.text.trim() : describeToolPart(part)
+    })
     .filter((line) => line.length > 0)
   if (lines.length > 0 && message.status === 'stopped') lines.push(STOPPED_NOTE)
   return lines.join('\n')

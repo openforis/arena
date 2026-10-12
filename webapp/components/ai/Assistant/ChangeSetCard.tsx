@@ -1,56 +1,22 @@
-import React, { useMemo, useRef, useState } from 'react'
-import { useDispatch } from 'react-redux'
-import { useLocation, useNavigate } from 'react-router-dom'
+import React, { useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { Button } from '@webapp/components/buttons'
-import { useIsSurveyDirty, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useIsSurveyDirty, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
-import { SurveyFormActions, useTreeSelectViewMode } from '@webapp/store/ui/surveyForm'
 import { TestId } from '@webapp/utils/testId'
 
+import { CardValueView } from './CardValueView'
 import { buildCategoryLabelGroups } from './categoryLabelCardModel'
 import { CategoryLabelGroups } from './CategoryLabelGroups'
-import {
-  buildCardRows,
-  getConflictingOperationIds,
-  getNodeDefNavigation,
-  getPendingOperationIds,
-  isCardStale,
-  type CardRow,
-  type CardValue,
-} from './changeSetCardModel'
-
-/**
- * A value of a card row (text, boolean or expression list).
- * @param {object} props - Props.
- * @param {CardValue} props.value - Value.
- * @returns {React.ReactElement} The value.
- */
-const CardValueView = ({ value }: { value: CardValue }) => {
-  const t = useI18nT({ unescapeHtml: true })
-  if (value.kind === 'boolean') return <span>{t(value.value ? 'aiAssistant.card.yes' : 'aiAssistant.card.no')}</span>
-  if (value.kind === 'text') return <span>{value.text || t('aiAssistant.card.empty')}</span>
-  if (value.items.length === 0) return <span>{t('aiAssistant.card.empty')}</span>
-  return (
-    <ul className="ai-assistant-card__expressions">
-      {value.items.map((item, index) => (
-        <li key={`${index}-${item.expression}`}>
-          <code>{item.expression}</code>
-          {item.applyIf && (
-            <>
-              {' '}
-              <span>{t('nodeDefEdit.expressionsProp.applyIf')}</span> <code>{item.applyIf}</code>
-            </>
-          )}
-        </li>
-      ))}
-    </ul>
-  )
-}
+import { ChangeSetCompactCard } from './ChangeSetCompactCard'
+import { ChangeSetReviewDialog } from './ChangeSetReviewDialog'
+import { buildCardRows, type CardRow } from './changeSetCardModel'
+import { buildReviewItems, isCompactCard } from './changeSetReviewModel'
+import { useChangeSetSelection, type ChangeSetSelection } from './useChangeSetSelection'
+import { useShowNodeDef } from './useShowNodeDef'
 
 /**
  * One row of the card: checkbox, item name, title, status and the change.
@@ -129,101 +95,31 @@ const CardRowView = ({
 }
 
 /**
- * Change set card: the proposed operations with checkboxes, Apply selected and Discard.
+ * The card with every change listed (short change sets).
  * @param {object} props - Props.
  * @param {ChangeSetCardState} props.cardState - Card state.
+ * @param {ChangeSetSelection} props.selection - Selection and actions.
  * @param {boolean} props.busy - An answer is running (Apply waits for it).
- * @param {Function} props.onApply - Applies the selected operations.
- * @param {Function} props.onDiscard - Discards the card.
  * @returns {React.ReactElement} The card.
  */
-export const ChangeSetCard = ({
+const ChangeSetFullCard = ({
   cardState,
+  selection,
   busy,
-  onApply,
-  onDiscard,
 }: {
   cardState: ChangeSetCardState
+  selection: ChangeSetSelection
   busy: boolean
-  onApply: (operationIds: string[]) => Promise<void>
-  onDiscard: () => Promise<void> | void
 }) => {
   const t = useI18nT({ unescapeHtml: true })
-  const dispatch = useDispatch<any>()
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const cycle = useSurveyCycleKey()
   const dirty = useIsSurveyDirty()
-  const viewMode = useTreeSelectViewMode()
-  const [deselected, setDeselected] = useState<string[]>([])
-  const [applying, setApplying] = useState(false)
-  // set before the re-render, so two quick clicks can't both start an Apply
-  const applyingRef = useRef(false)
+  const showNodeDef = useShowNodeDef()
+  const { pendingIds, conflictIds, selectedIds, applying, toggle } = selection
 
   const rows = useMemo(() => buildCardRows({ cardState, survey, lang }), [cardState, lang, survey])
   const categoryGroups = useMemo(() => buildCategoryLabelGroups({ cardState, survey }), [cardState, survey])
-  const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
-  const stale = useMemo(() => isCardStale({ cardState, survey }), [cardState, survey])
-  const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
-  const selectedIds = pendingIds.filter((id) => !deselected.includes(id) && !conflictIds.includes(id))
-
-  /**
-   * Toggles the selection of an operation.
-   * @param {string} id - Operation id.
-   * @returns {void} Nothing.
-   */
-  const toggle = (id: string) =>
-    setDeselected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]))
-
-  /**
-   * Shows an item in the form designer.
-   * @param {string} nodeDefUuid - Item uuid.
-   * @returns {void} Nothing.
-   */
-  const showNodeDef = (nodeDefUuid: string) => {
-    const navigation = getNodeDefNavigation({ survey, nodeDefUuid, cycle, viewMode })
-    if (!navigation) return
-    if (navigation.type === 'select') {
-      dispatch(SurveyFormActions.setFormActiveNodeDefUuid(navigation.nodeDefUuid))
-    } else {
-      dispatch(
-        SurveyFormActions.setFormActivePage({ nodeDef: Survey.getNodeDefByUuid(navigation.pageNodeDefUuid)(survey) })
-      )
-    }
-    const formDesignerUri = appModuleUri(designerModules.formDesigner)
-    if (!pathname.startsWith(formDesignerUri)) navigate(formDesignerUri)
-  }
-
-  /**
-   * Runs an Apply or Discard unless one is already running.
-   * @param {Function} action - The action to run.
-   * @returns {Promise<void>} Resolves when the action ends.
-   */
-  const runExclusive = async (action: () => Promise<void> | void) => {
-    if (applyingRef.current) return
-    applyingRef.current = true
-    setApplying(true)
-    try {
-      await action()
-    } finally {
-      applyingRef.current = false
-      setApplying(false)
-    }
-  }
-
-  /**
-   * Applies the selected operations.
-   * @returns {Promise<void>} Resolves when the Apply ends.
-   */
-  const onApplyClick = () => runExclusive(() => onApply(selectedIds))
-
-  /**
-   * Discards the card.
-   * @returns {Promise<void>} Resolves when the Discard ends.
-   */
-  const onDiscardClick = () => runExclusive(onDiscard)
 
   return (
     <section
@@ -236,7 +132,7 @@ export const ChangeSetCard = ({
         <strong>{t('aiAssistant.card.title')}</strong>
         <span>{cardState.changeSet.summary}</span>
       </div>
-      {stale && (
+      {conflictIds.length > 0 && (
         <div className="ai-assistant-card__stale" data-testid={TestId.aiAssistant.stale} role="status">
           {t('aiAssistant.card.stale')}
         </div>
@@ -268,19 +164,70 @@ export const ChangeSetCard = ({
           <Button
             disabled={busy || applying || dirty || selectedIds.length === 0}
             label="aiAssistant.card.applySelected"
-            onClick={onApplyClick}
+            onClick={selection.apply}
             primary
             testId={TestId.aiAssistant.applyBtn}
           />
           <Button
             disabled={busy || applying}
             label="aiAssistant.card.discard"
-            onClick={onDiscardClick}
+            onClick={selection.discard}
             testId={TestId.aiAssistant.discardBtn}
             variant="text"
           />
         </div>
       )}
     </section>
+  )
+}
+
+/**
+ * Change set card: up to COMPACT_CARD_MAX_INLINE changes listed with checkboxes, Apply selected and Discard; above
+ * that, a compact card whose changes are reviewed in a dialog. Both share one selection.
+ * @param {object} props - Props.
+ * @param {ChangeSetCardState} props.cardState - Card state.
+ * @param {boolean} props.busy - An answer is running (Apply waits for it).
+ * @param {Function} props.onApply - Applies the selected operations.
+ * @param {Function} props.onDiscard - Discards the card.
+ * @returns {React.ReactElement} The card.
+ */
+export const ChangeSetCard = ({
+  cardState,
+  busy,
+  onApply,
+  onDiscard,
+}: {
+  cardState: ChangeSetCardState
+  busy: boolean
+  onApply: (operationIds: string[]) => Promise<void>
+  onDiscard: () => Promise<void> | void
+}) => {
+  const survey = useSurvey()
+  const lang = useSurveyPreferredLang()
+  const selection = useChangeSetSelection({ cardState, survey, onApply, onDiscard })
+  const [reviewOpen, setReviewOpen] = useState(false)
+  const items = useMemo(() => buildReviewItems({ cardState, survey, lang }), [cardState, lang, survey])
+
+  if (!isCompactCard(items.length)) return <ChangeSetFullCard busy={busy} cardState={cardState} selection={selection} />
+
+  return (
+    <>
+      <ChangeSetCompactCard
+        busy={busy}
+        cardState={cardState}
+        items={items}
+        onReview={() => setReviewOpen(true)}
+        selection={selection}
+      />
+      {reviewOpen && (
+        <ChangeSetReviewDialog
+          busy={busy}
+          cardState={cardState}
+          items={items}
+          onClose={() => setReviewOpen(false)}
+          selection={selection}
+        />
+      )}
+    </>
   )
 }

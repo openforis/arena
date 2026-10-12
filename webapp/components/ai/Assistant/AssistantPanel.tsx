@@ -1,19 +1,21 @@
 import './Assistant.scss'
 
 import React, { useCallback, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router'
+import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 
-import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
-import { getConversationDataClass } from '@webapp/ai/conversations/dataClass'
-import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
+import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
-import { ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
+import { ButtonIconAdd, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
+import { useConfirm } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
-import { RecordDataSharedNote } from './analysis/RecordDataSharedNote'
 import { AssistantChat } from './AssistantChat'
 import { AssistantHistory } from './AssistantHistory'
+import { AssistantStartScreen } from './AssistantStartScreen'
+import { AssistantSuggestionList } from './AssistantSuggestionList'
 import type { AssistantArea, AssistantAreaStatus } from './assistantAreas'
 import { closeAssistantPanel } from './assistantPanelActions'
 import { assistantPanelStore, type AssistantPanelView } from './assistantPanelStore'
@@ -82,46 +84,55 @@ const AssistantTabs = ({
 }
 
 /**
- * Panel menu: new conversation, history, clear.
+ * Panel menu: the user's AI settings and the guarded delete of every conversation.
  * @param {object} props - Props.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement} The menu.
  */
-const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => (
-  <ButtonMenu
-    className="btn-s"
-    disabled={api.busy}
-    iconClassName="icon-menu icon-12px"
-    items={[
-      {
-        key: 'newConversation',
-        label: 'aiAssistant.menu.newConversation',
-        onClick: api.newConversation,
-        testId: TestId.aiAssistant.newConversationBtn,
-      },
-      {
-        key: 'history',
-        label: 'aiAssistant.menu.history',
-        onClick: assistantPanelStore.showHistory,
-        testId: TestId.aiAssistant.historyBtn,
-      },
-      {
-        key: 'clear',
-        label: 'aiAssistant.menu.clear',
-        onClick: () => void api.clearConversations(),
-        testId: TestId.aiAssistant.clearBtn,
-      },
-    ]}
-    testId={TestId.aiAssistant.menuBtn}
-    title="aiAssistant.menu.label"
-  />
-)
+const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
+  const navigate = useNavigate()
+  const confirm = useConfirm()
+  return (
+    <ButtonMenu
+      className="btn-s"
+      disabled={api.busy}
+      icon={<MoreHorizIcon fontSize="small" />}
+      items={[
+        {
+          key: 'aiSettings',
+          iconClassName: 'icon-cog icon-12px',
+          label: 'aiAssistant.menu.aiSettings',
+          // own profile: the AI settings panel (as the not-available actions do)
+          onClick: () => navigate(appModuleUri(userModules.user)),
+          testId: TestId.aiAssistant.aiSettingsBtn,
+        },
+        {
+          key: 'deleteAll',
+          className: 'ai-assistant-panel__menu-danger',
+          iconClassName: 'icon-bin2 icon-12px',
+          label: 'aiAssistant.menu.deleteAll',
+          // onCancel is required by useConfirm's inferred (untyped) parameter
+          onClick: () =>
+            confirm({
+              key: 'aiAssistant.deleteAllConfirm',
+              onOk: () => void api.clearConversations(),
+              onCancel: undefined,
+            }),
+          testId: TestId.aiAssistant.deleteAllBtn,
+        },
+      ]}
+      showCaret={false}
+      testId={TestId.aiAssistant.menuBtn}
+      title="aiAssistant.menu.label"
+    />
+  )
+}
 
 /**
- * Chat, history, or the reasons why the area is unavailable.
+ * Home page, chat, conversation or suggestion list, or the reasons why the area is unavailable.
  * @param {object} props - Props.
  * @param {AssistantAreaStatus|undefined} props.status - Status of the area.
- * @param {AssistantPanelView} props.view - Chat or history.
+ * @param {AssistantPanelView} props.view - Home, chat or one of the lists.
  * @param {AssistantArea} props.area - Current area.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @param {AssistantSuggestion[]} props.suggestions - Visible suggestions of the area.
@@ -158,8 +169,16 @@ const AssistantBody = ({
       </div>
     )
   }
-  if (view === 'history') return <AssistantHistory api={api} />
-  return <AssistantChat api={api} area={area} suggestions={suggestions} />
+  switch (view) {
+    case 'home':
+      return <AssistantStartScreen api={api} area={area} suggestions={suggestions} />
+    case 'history':
+      return <AssistantHistory api={api} />
+    case 'suggestions':
+      return <AssistantSuggestionList api={api} suggestions={suggestions} />
+    default:
+      return <AssistantChat api={api} area={area} />
+  }
 }
 
 /**
@@ -205,12 +224,13 @@ const AssistantPanel = ({ statuses }: { statuses: AssistantAreaStatus[] }) => {
     >
       <div className="ai-assistant-panel__header">
         <h2 className="ai-assistant-panel__title">{t('aiAssistant.title')}</h2>
-        <AiFeatureDataLocationBadge
-          compact
-          dataClass={area === 'analysis' ? getConversationDataClass(api.conversation) : undefined}
-          feature={assistantAreaFeatures[area]}
+        <ButtonIconAdd
+          disabled={api.busy}
+          label="aiAssistant.menu.newConversation"
+          onClick={api.newConversation}
+          size="small"
+          testId={TestId.aiAssistant.newConversationBtn}
         />
-        <RecordDataSharedNote conversation={api.conversation} />
         <AssistantMenu api={api} />
         <ButtonIconClose label="aiAssistant.close" onClick={closeAssistantPanel} testId={TestId.aiAssistant.closeBtn} />
       </div>

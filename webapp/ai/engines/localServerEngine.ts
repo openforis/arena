@@ -3,7 +3,7 @@
  * Loaded only through dynamic import: it pulls @ai-sdk/openai-compatible into the lazy AI bundle.
  */
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import type { LanguageModel } from 'ai'
+import { extractReasoningMiddleware, wrapLanguageModel, type LanguageModel } from 'ai'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 
@@ -38,5 +38,10 @@ export const createLocalServerEngine = ({
     includeUsage: true,
     fetch: createLocalServerFetch({ fetchImpl, baseUrl, modelId }) as typeof fetch,
   })
-  return { ...info, createModel: (): LanguageModel => provider(modelId) }
+  // models whose server doesn't split the thinking out write it inline in <think> tags: move it to reasoning parts
+  const reasoning = extractReasoningMiddleware({ tagName: 'think' })
+  return {
+    ...info,
+    createModel: (): LanguageModel => wrapLanguageModel({ model: provider(modelId), middleware: reasoning }),
+  }
 }

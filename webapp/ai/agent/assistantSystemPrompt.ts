@@ -6,6 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { buildAssistantAnalysisPrompt } from '@common/ai/prompts/assistantAnalysis'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
+import { buildConversationTitleInstruction } from '@common/ai/prompts/assistantConversationTitle'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import { buildAssistantHelpPrompt } from '@common/ai/prompts/assistantHelp'
 import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
@@ -30,7 +31,7 @@ export const describeView = (view: AiCurrentView, survey: any): string | null =>
 }
 
 /**
- * Builds the system prompt of a turn.
+ * Builds the system prompt of an area.
  * @param {object} params - Parameters.
  * @param {AssistantPromptArea} params.area - Area.
  * @param {AiToolContext} params.ctx - Tool context of the turn.
@@ -38,7 +39,7 @@ export const describeView = (view: AiCurrentView, survey: any): string | null =>
  * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
  * @returns {string} The system prompt.
  */
-export const buildAssistantSystemPrompt = ({
+const buildAreaPrompt = ({
   area,
   ctx,
   outline,
@@ -89,4 +90,28 @@ export const buildAssistantSystemPrompt = ({
     default:
       throw new Error(`Unknown assistant area: ${area}`)
   }
+}
+
+/**
+ * Builds the system prompt of a turn.
+ * @param {object} params - Parameters.
+ * @param {AssistantPromptArea} params.area - Area.
+ * @param {AiToolContext} params.ctx - Tool context of the turn.
+ * @param {string|null} params.outline - Handbook outline (Help only).
+ * @param {boolean} [params.dataToolsAvailable] - Whether a data tool is offered in the turn (Analysis).
+ * @param {boolean} [params.titleToolAvailable] - Whether conversation_setTitle is offered (first message).
+ * @returns {string} The system prompt.
+ */
+export const buildAssistantSystemPrompt = ({
+  titleToolAvailable = false,
+  ...params
+}: {
+  area: AssistantPromptArea
+  ctx: AiToolContext
+  outline: string | null
+  dataToolsAvailable?: boolean
+  titleToolAvailable?: boolean
+}): string => {
+  const prompt = buildAreaPrompt(params)
+  return titleToolAvailable ? `${prompt}\n\n${buildConversationTitleInstruction(params.ctx.uiLang)}` : prompt
 }

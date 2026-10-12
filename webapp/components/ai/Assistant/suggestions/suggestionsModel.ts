@@ -12,6 +12,19 @@ const MAX_TIMER_MS = 2_147_483_647
 
 export type SuggestionsByArea = Partial<Record<AssistantArea, AssistantSuggestion[]>>
 
+// suggestions on the home page; "See all" lists the others
+export const START_SCREEN_SUGGESTION_COUNT = 3
+
+/**
+ * Returns the suggestions the home page shows and how many there are in all.
+ * @param {Array} items - Suggestions (or their cards), in order.
+ * @returns {{shown: Array, total: number}} The first ones and the total.
+ */
+export const getStartScreenSuggestions = <T>(items: T[]): { shown: T[]; total: number } => ({
+  shown: items.slice(0, START_SCREEN_SUGGESTION_COUNT),
+  total: items.length,
+})
+
 /**
  * Returns the areas whose suggestions may show: the available ones (an unavailable area hides them, they stay stored).
  * @param {AssistantAreaStatus[]} statuses - Area statuses.

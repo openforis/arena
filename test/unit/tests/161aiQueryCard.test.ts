@@ -99,7 +99,6 @@ describe('translations', () => {
         'queryCard.title',
         'recordDataNotice.message',
         'recordDataNotice.newConversation',
-        'recordDataShared',
       ].sort()
     )
     for (const resources of [es, fr, ja, mn, pt, ru]) {
@@ -114,7 +113,7 @@ describe('translations', () => {
 
   test('ru and mn are written in Cyrillic', () => {
     for (const resources of [ru, mn]) {
-      expect(resources.common.aiAnalysis.recordDataShared).toMatch(/[Ѐ-ӿ]/)
+      expect(resources.common.aiAnalysis.recordDataNotice.message).toMatch(/[Ѐ-ӿ]/)
     }
   })
 })

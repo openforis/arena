@@ -82,17 +82,17 @@ export const acceptConsentAndWait = async (page: Page): Promise<void> => {
 }
 
 /**
- * Reopens the most recent conversation of the current area from D1's History (after a reload).
+ * Reopens the most recent conversation of the current area (after a reload) from the home page (back from the
+ * conversation when one is already open).
  * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the conversation is shown.
  */
 export const reopenLastConversation = async (page: Page): Promise<void> => {
   const panel = assistantPanel(page)
-  // the menu items render in a popover outside the panel
-  await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
-  await page.getByTestId(TestId.aiAssistant.historyBtn).click()
-  await expect(panel.getByTestId(TestId.aiAssistant.history)).toBeVisible()
-  await panel.getByTestId(TestId.aiAssistant.historyItem).first().click()
+  const bar = panel.getByTestId(TestId.aiAssistant.conversationBar)
+  if (await bar.isVisible()) await bar.getByTestId(TestId.aiAssistant.conversationBackBtn).click()
+  await panel.getByTestId(TestId.aiAssistant.recentItem).first().click()
+  await expect(bar).toBeVisible()
 }
 
 /**

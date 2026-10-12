@@ -44,7 +44,19 @@ export const selectAssistantArea = async (page: Page, label: string): Promise<vo
 }
 
 /**
- * Sends a message; resolves when it is shown (the answer is still running).
+ * Opens the card of a suggestion row (no-op when open), showing its Dismiss and Do it buttons.
+ * @param {Locator} card - The suggestion (TestId.aiAssistant.suggestionCard).
+ * @returns {Promise<void>} - Resolves when the card is open.
+ */
+export const openSuggestionCard = async (card: Locator): Promise<void> => {
+  const toggle = card.getByTestId(TestId.aiAssistant.suggestionToggle)
+  if ((await toggle.getAttribute('aria-expanded')) !== 'true') await toggle.click()
+  await expect(toggle).toHaveAttribute('aria-expanded', 'true')
+}
+
+/**
+ * Sends a message; resolves when it is shown (the answer is still running). From the home page, it starts a new
+ * conversation first (the home page has no message box).
  * @param {Page} page - Page.
  * @param {string} text - Message.
  * @returns {Promise<void>} - Resolves when the message is in the conversation.
@@ -52,6 +64,11 @@ export const selectAssistantArea = async (page: Page, label: string): Promise<vo
 export const sendAssistantMessage = async (page: Page, text: string): Promise<void> => {
   const panel = assistantPanel(page)
   const userMessages = panel.getByTestId(TestId.aiAssistant.message('user'))
+  const home = panel.getByTestId(TestId.aiAssistant.startScreen)
+  if (await home.isVisible()) {
+    await home.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.input)).toBeVisible()
+  }
   const before = await userMessages.count()
   await panel.getByTestId(TestId.aiAssistant.input).fill(text)
   await panel.getByTestId(TestId.aiAssistant.sendBtn).click()

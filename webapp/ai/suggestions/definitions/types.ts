@@ -1,5 +1,6 @@
 /**
- * How a suggestion is shown (card) and what Do it sends (prompt), both built from its visible targets only.
+ * How a suggestion is shown (card) and what Do it sends (prompt), both built from its visible targets only. The chat
+ * shows the request text instead of the prompt: the card's key with `card` replaced by `request`, same params.
  */
 import type { SuggestionStore } from '../suggestionStore'
 import type { AssistantSuggestion, SuggestionKind } from '../types'

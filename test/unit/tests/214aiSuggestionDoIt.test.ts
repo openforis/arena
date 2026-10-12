@@ -1,3 +1,5 @@
+import { buildHistory } from '@webapp/ai/agent/agentMessages'
+import { createTurnState } from '@webapp/ai/agent/turnState'
 import type { ChangeSet, ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
@@ -32,6 +34,7 @@ const request = (overrides: Partial<SuggestionRequest> = {}): SuggestionRequest 
   suggestionId: 'missingTranslations:fr',
   scope: SCOPE,
   prompt: 'Translate',
+  displayText: 'Translate the missing texts',
   ...overrides,
 })
 
@@ -104,6 +107,32 @@ const visibleCount = (store: ReturnType<typeof newStore>) =>
   store.getVisible({ userUuid: 'u1', surveyId: 7, cycle: '0', availableAreas: ['design'], enabled: true }).length
 
 describe('Do it plumbing (214)', () => {
+  test('a Do it message shows its request text (also the title); the model gets the prompt, in later turns too', () => {
+    const base = createConversation({ userUuid: 'u1', surveyId: 7, area: 'design', now: NOW, idFactory: () => 'c1' })
+    const state = createTurnState({
+      conversation: base,
+      userMessage: 'Translate the survey texts with survey_listMissingTexts',
+      displayText: 'Translate the 3 missing texts into Italian.',
+      onUpdate: () => undefined,
+    })
+    const conversation = state.get()
+    expect(conversation.messages[0]).toMatchObject({
+      role: 'user',
+      text: 'Translate the survey texts with survey_listMissingTexts',
+      displayText: 'Translate the 3 missing texts into Italian.',
+    })
+    // no title while the model may still name it; the request text when it didn't
+    expect(conversation.title).toBe('')
+    state.appendText('Proposed 1 batch. 2 remain.')
+    state.finish('done')
+    expect(state.get().title).toBe('Translate the 3 missing texts into Italian.')
+    const history = buildHistory({ messages: state.get().messages, userMessage: 'continue', budgetChars: 10000 })
+    expect(history[0]).toEqual({ role: 'user', content: 'Translate the survey texts with survey_listMissingTexts' })
+    // a typed message has no display text
+    const typed = createTurnState({ conversation: base, userMessage: 'Hi', onUpdate: () => undefined }).get()
+    expect(typed.messages[0]).not.toHaveProperty('displayText')
+  })
+
   test('startWithPrompt opens the area in a new conversation with the request; the previous one stays in History', () => {
     const { openConversations, store } = newPanel()
     store.setArea('design')

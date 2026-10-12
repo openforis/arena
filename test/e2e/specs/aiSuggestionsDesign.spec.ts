@@ -9,6 +9,7 @@ import {
   closeAssistantPanel,
   lastAssistantAnswer,
   openAssistantPanel,
+  openSuggestionCard,
   selectAssistantArea,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
@@ -133,6 +134,7 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     const card = suggestionCards(page, TEXTS_MISSING)
     await expect(card).toContainText(TRANSLATIONS_CARD)
 
+    await openSuggestionCard(card)
     await card.getByTestId(TestId.aiAssistant.suggestionDoItBtn).click()
     // Do it hides the targets at once; only the store tells whether the detector resolved them
     await expect(suggestionCards(page, TEXTS_MISSING)).toHaveCount(0)
@@ -141,10 +143,11 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     await expect(panel.getByTestId(TestId.aiAssistant.toolRow('survey_listMissingTexts'))).toContainText(
       'Listed the missing texts'
     )
-    await expect(panel.getByTestId(TestId.aiAssistant.changeSetRow('cluster_id'))).toContainText('Cluster id (fr)')
+    // many changes: the compact card previews the first ones and counts the results
+    await expect(panel.getByTestId(TestId.aiAssistant.changeSetCard)).toContainText('Cluster id (fr)')
 
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
-    await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
+    await expect(panel.getByTestId(TestId.aiAssistant.changeSetCard)).toContainText('Applied: 19')
     // settle moves the applied targets to the dismissed ones; they leave only when the state detector runs (1 s after
     // the survey changes) and finds nothing left to translate
     await expect.poll(async () => await isSuggestionGone(page, userUuid, 'missingTranslations:fr')).toBe(true)
@@ -157,6 +160,7 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     await openAssistantPanel(page)
     const card = suggestionCards(page, TEXTS_MISSING)
     await expect(card).toContainText(TRANSLATIONS_CARD)
+    await openSuggestionCard(card)
     await card.getByTestId(TestId.aiAssistant.suggestionDismissBtn).click()
     await expect(suggestionCards(page, TEXTS_MISSING)).toHaveCount(0)
 
@@ -182,6 +186,7 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     const card = suggestionCards(page, 'without a description')
     await expect(card).toContainText('You added 2 entries without a description. Write descriptions in all languages?')
 
+    await openSuggestionCard(card)
     await card.getByTestId(TestId.aiAssistant.suggestionDoItBtn).click()
     await waitForAssistantTurn(page)
     // the mock names what survey_listMissingTexts returned: only the two new entries (the suggestion scope)
