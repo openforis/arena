@@ -18,6 +18,19 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # arena and @openforis/arena-server must share the same @openforis/arena-core copy: services registered
+      # by arena-server in the ServiceRegistry singleton are read by arena (a second copy has its own registry)
+      - name: Check a single @openforis/arena-core version
+        run: |
+          versions=$(grep -E '^  resolution: "@openforis/arena-core@npm:' yarn.lock | sed -E 's/.*@npm:([^"]+)".*/\1/')
+          count=$(echo "$versions" | grep -c .)
+          if [ "$count" -ne 1 ]; then
+            echo "::error::@openforis/arena-core must be resolved to a single version, found $count: $(echo $versions)." \
+              "Align the @openforis/arena-core version range with the one required by @openforis/arena-server," \
+              "then run: yarn dedupe @openforis/arena-core"
+            exit 1
+          fi
+          echo "@openforis/arena-core resolved to a single version: $versions"
       - uses: ./.github/actions/setup
       - name: Build
         run: yarn build
