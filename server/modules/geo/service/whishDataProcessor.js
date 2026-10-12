@@ -40,8 +40,9 @@ const wrapWhispApiError = (error) => {
 
 // Whisp rate limit error message is like "Rate limit exceeded. Try again in 12 seconds."
 const extractRateLimitWaitMs = (error) => {
-  const message = error.response?.data?.message ?? ''
-  const seconds = Number(/(\d+) seconds/.exec(message)?.[1])
+  const words = String(error.response?.data?.message ?? '').split(' ')
+  const secondsWordIndex = words.findIndex((word) => word.startsWith('seconds'))
+  const seconds = secondsWordIndex > 0 ? Number(words[secondsWordIndex - 1]) : 0
   return seconds > 0 ? (seconds + 1) * 1000 : rateLimitDefaultWaitMs
 }
 

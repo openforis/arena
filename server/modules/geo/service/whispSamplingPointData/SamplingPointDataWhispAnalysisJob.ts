@@ -29,7 +29,7 @@ import {
 // max number of features submitted to Whisp in a single analysis request
 const whispBatchSize = 1000
 // long analyses: poll less frequently, to stay within the Whisp API rate limit
-const whispPollingPeriod = 10000
+const pollingPeriod = 10000
 
 const locationColumnNames = CategoryExportFile.geometryPointColumnsSuffixes.map(
   (suffix: string) => `${Category.locationItemExtraDefName}${suffix}`
@@ -139,10 +139,10 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
       const reader = FlatDataReader.createReaderFromFile({
         filePath: exportFilePath,
         fileFormat: FileFormats.csv,
-        onHeaders: async (headersRead: string[]) => {
+        onHeaders: (headersRead: string[]) => {
           headers = headersRead
         },
-        onRow: async (row: FlatRow) => {
+        onRow: (row: FlatRow) => {
           rows.push({ ...row })
         },
       })
@@ -185,11 +185,10 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     for (const batch of batches) {
       if (this.isCanceled()) break
 
-      const { data } = await WhishDataProcessor.generateData({
-        geojson: { type: 'FeatureCollection', features: batch },
-        analysisOptions: { externalIdColumn: whispExternalIdProp },
-        pollingPeriod: whispPollingPeriod,
-      })
+      const geojson = { type: 'FeatureCollection', features: batch }
+      const analysisOptions = { externalIdColumn: whispExternalIdProp }
+      // batches processed sequentially, to stay within the Whisp API rate limit
+      const { data } = await WhishDataProcessor.generateData({ geojson, analysisOptions, pollingPeriod }) // NOSONAR
       whispFeatures.push(...(data?.features ?? []))
       this.incrementProcessedItems()
     }
@@ -209,8 +208,10 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
   }) {
     for (const whispFeature of whispFeatures) {
       const properties = whispFeature.properties ?? {}
-      const rowIndex = rowIndexByExternalId[String(properties[whispExternalIdProp])]
-      const row = rows[rowIndex]
+      const externalId = properties[whispExternalIdProp]
+      if (typeof externalId !== 'string') continue
+
+      const row = rows[rowIndexByExternalId[externalId]]
       if (!row) continue
 
       for (const { prop, column } of whispColumns) {

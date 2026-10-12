@@ -57,6 +57,18 @@ const toColumnName = ({ prop, usedColumnNames }: { prop: string; usedColumnNames
  * @param {string[]} params.existingColumnNames - Column names already used (sampling point data columns).
  * @returns {WhispColumn[]} The Whisp columns.
  */
+const extractCandidateProps = (features: WhispFeature[]): string[] => {
+  const candidateProps = new Set<string>()
+  const nonPrimitiveProps = new Set<string>()
+  for (const feature of features) {
+    for (const [prop, value] of Object.entries(feature.properties ?? {})) {
+      candidateProps.add(prop)
+      if (!isPrimitive(value)) nonPrimitiveProps.add(prop)
+    }
+  }
+  return [...candidateProps].filter((prop) => !isWhispPropExcluded(prop) && !nonPrimitiveProps.has(prop))
+}
+
 export const extractWhispColumns = ({
   features,
   existingColumnNames,
@@ -64,19 +76,10 @@ export const extractWhispColumns = ({
   features: WhispFeature[]
   existingColumnNames: string[]
 }): WhispColumn[] => {
-  const candidateProps: string[] = []
-  const nonPrimitiveProps = new Set<string>()
-  for (const feature of features) {
-    for (const [prop, value] of Object.entries(feature.properties ?? {})) {
-      if (isWhispPropExcluded(prop)) continue
-      if (!candidateProps.includes(prop)) candidateProps.push(prop)
-      if (!isPrimitive(value)) nonPrimitiveProps.add(prop)
-    }
-  }
+  const candidateProps = extractCandidateProps(features)
   const usedColumnNames = new Set(existingColumnNames)
   const columns: WhispColumn[] = []
   for (const prop of candidateProps) {
-    if (nonPrimitiveProps.has(prop)) continue
     const column = toColumnName({ prop, usedColumnNames })
     if (usedColumnNames.has(column)) continue
     usedColumnNames.add(column)
@@ -92,9 +95,10 @@ export const extractWhispColumns = ({
  * @returns {string|number} The cell value (empty string for missing values).
  */
 export const toCellValue = (value: unknown): CellValue => {
-  if (value === null || value === undefined) return ''
   if (typeof value === 'number') return Number.isFinite(value) ? value : ''
-  return String(value)
+  if (typeof value === 'string') return value
+  if (typeof value === 'boolean') return String(value)
+  return ''
 }
 
 /**
