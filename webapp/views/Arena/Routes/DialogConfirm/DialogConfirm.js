@@ -27,6 +27,7 @@ const DialogConfirm = () => {
     checkboxCheckedContentKey,
     checkboxCheckedContentParams,
     headerText,
+    scrollableList,
     strongConfirm,
     strongConfirmInputLabel,
     strongConfirmRequiredText,
@@ -49,7 +50,11 @@ const DialogConfirm = () => {
   const strongConfirmActive = strongConfirm && (!checkboxLabel || checkboxChecked)
 
   return (
-    <Modal className="dialog-confirm" onClose={onClose} title={headerText}>
+    <Modal
+      className={classNames('dialog-confirm', { 'dialog-confirm--list-not-scrollable': !scrollableList })}
+      onClose={onClose}
+      title={headerText}
+    >
       <ModalBody>
         <Markdown className={headerText ? 'highlight' : undefined} source={i18n.t(key, params)} />
 

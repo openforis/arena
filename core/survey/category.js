@@ -40,6 +40,7 @@ const samplingUnitsPlanCategoryName = 'sampling_units_plan'
 // single source of truth for this name: other modules must import it from here rather than
 // hard-coding the string or re-defining it
 export const samplingPointDataCategoryName = 'sampling_point_data'
+export const samplingPointDataWhispCategoryName = 'sampling_point_data_whisp'
 
 // ========
 // LEVELS

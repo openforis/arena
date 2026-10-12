@@ -42,4 +42,9 @@
       }
     }
   }
+
+  &.dialog-confirm--list-not-scrollable .modal-body ul {
+    max-height: none;
+    overflow-y: visible;
+  }
 }
