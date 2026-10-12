@@ -253,6 +253,21 @@ const CategoryDetails = (props) => {
               )}
             </div>
 
+            {!readOnly && isSamplingPointData && hasLocationExtraProp && (
+              <div className="row">
+                <Button
+                  className="generate-whisp-btn"
+                  iconAlt="Whisp"
+                  iconHeight={20}
+                  iconSrc="/img/of_whisp_icon.png"
+                  iconWidth={20}
+                  label="categoryEdit.generateSamplingPointDataWhisp.buttonLabel"
+                  onClick={Actions.generateSamplingPointDataWhisp}
+                  variant="outlined"
+                />
+              </div>
+            )}
+
             {Category.isReportingData(category) && (
               <div className="row">
                 <Checkbox

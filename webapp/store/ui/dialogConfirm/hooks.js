@@ -19,6 +19,7 @@ export const useDialogConfirm = () => {
   const checkboxCheckedContentKey = useSelector(DialogConfirmState.getCheckboxCheckedContentKey)
   const checkboxCheckedContentParams = useSelector(DialogConfirmState.getCheckboxCheckedContentParams)
   const headerText = useSelector(DialogConfirmState.getHeaderText)
+  const scrollableList = useSelector(DialogConfirmState.isScrollableList)
   const strongConfirm = useSelector(DialogConfirmState.isStrongConfirm)
   const strongConfirmInputLabel = useSelector(DialogConfirmState.getStrongConfirmInputLabel)
   const strongConfirmRequiredText = useSelector(DialogConfirmState.getStrongConfirmRequiredText)
@@ -62,6 +63,7 @@ export const useDialogConfirm = () => {
     checkboxCheckedContentKey,
     checkboxCheckedContentParams,
     headerText,
+    scrollableList,
     strongConfirm,
     strongConfirmInputLabel,
     strongConfirmRequiredText,

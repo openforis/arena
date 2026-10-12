@@ -105,6 +105,7 @@ export {
   testMapApiKey,
   fetchMapWmtsCapabilities,
   startGeoAttributeJsonDataExport,
+  startSamplingPointDataWhispJob,
   getGeoJsonDataDownloadUrl,
   getEarthMapJsonDownloadUrl,
   getEarthMapPolygonUrl,
