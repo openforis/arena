@@ -8,6 +8,7 @@ import type {
   AssistantMessage,
   AssistantMessagePart,
   ConversationMessage,
+  ConversationReasoningPart,
   ConversationToolPart,
 } from '@webapp/ai/conversations/types'
 import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'
@@ -18,7 +19,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
 import { AssistantMarkdown } from './AssistantMarkdown'
-import { getProposedChangeSetId, getToolRowLabel } from './assistantPanelModel'
+import { getProposedChangeSetId, getToolRowLabel, isHiddenToolPart } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { QueryCard } from './analysis/QueryCard'
@@ -53,12 +54,32 @@ const ToolRow = ({ part, interrupted }: { part: ConversationToolPart; interrupte
 }
 
 /**
- * One part of an answer: markdown text, or a tool row with the change set card it proposed.
+ * The model's thinking, collapsed: the user opens it to read it.
+ * @param {object} props - Props.
+ * @param {ConversationReasoningPart} props.part - Reasoning part.
+ * @param {boolean} props.active - The model is still thinking (last part of a streaming answer).
+ * @returns {React.ReactElement} The section.
+ */
+const ThinkingSection = ({ part, active }: { part: ConversationReasoningPart; active: boolean }) => {
+  const t = useI18nT({ unescapeHtml: true })
+  return (
+    <details className="ai-assistant-thinking" data-testid={TestId.aiAssistant.thinking}>
+      <summary>{t(active ? 'aiAssistant.thinkingActive' : 'aiAssistant.thinking')}</summary>
+      <div className="ai-assistant-thinking__text">
+        <AssistantMarkdown text={part.text} />
+      </div>
+    </details>
+  )
+}
+
+/**
+ * One part of an answer: markdown text, the collapsed thinking, or a tool row with the change set card it proposed.
  * @param {object} props - Props.
  * @param {AssistantMessagePart} props.part - Part.
  * @param {ChangeSets} props.changeSets - Cards of the conversation.
  * @param {object} props.queries - Queries of the conversation.
  * @param {boolean} props.streaming - The answer is still streaming.
+ * @param {boolean} props.isLastPart - Last part of the answer.
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement} The part.
  */
@@ -67,15 +88,19 @@ const AnswerPart = ({
   changeSets,
   queries,
   streaming,
+  isLastPart,
   api,
 }: {
   part: AssistantMessagePart
   changeSets: ChangeSets
   queries: Queries
   streaming: boolean
+  isLastPart: boolean
   api: AssistantConversationApi
 }) => {
   if (part.type === 'text') return <AssistantMarkdown text={part.text} />
+  if (part.type === 'reasoning') return <ThinkingSection active={streaming && isLastPart} part={part} />
+  if (isHiddenToolPart(part)) return null
   const changeSetId = getProposedChangeSetId(part)
   const cardState = changeSetId ? changeSets[changeSetId] : undefined
   const queryId = getProposedQueryId({ toolName: part.toolName, output: part.output })
@@ -184,7 +209,7 @@ export const AssistantMessageView = ({
   if (message.role === 'user') {
     return (
       <div className="ai-assistant-message ai-assistant-message--user" data-testid={TestId.aiAssistant.message('user')}>
-        {message.text}
+        {message.displayText || message.text}
       </div>
     )
   }
@@ -199,7 +224,8 @@ export const AssistantMessageView = ({
           api={api}
           changeSets={changeSets}
           queries={queries}
-          key={part.type === 'tool' ? part.toolCallId : `text-${index}`}
+          isLastPart={index === message.parts.length - 1}
+          key={part.type === 'tool' ? part.toolCallId : `${part.type}-${index}`}
           part={part}
           streaming={message.status === 'streaming'}
         />

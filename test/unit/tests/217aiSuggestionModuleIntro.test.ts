@@ -56,13 +56,14 @@ const introRequest = (overrides: Partial<SuggestionRequest> = {}): SuggestionReq
   suggestionId: 'moduleIntro:designer',
   scope: { kind: 'moduleIntro', targetKeys: ['designer'] },
   prompt: buildModuleIntroPrompt('designer'),
+  displayText: 'How does the form designer work?',
   ...overrides,
 })
 
 // a Design kind that goes in progress on Do it (the default accept mode)
 const designDefinition: SuggestionDefinition = {
   kind: 'missingTranslations',
-  card: () => ({ key: 'x', params: {} }),
+  card: () => ({ key: 'missingTranslations.card', params: { count: 2 } }),
   prompt: (suggestion) => `Translate ${suggestion.targets.map((target) => target.key).join(', ')}`,
 }
 const definitions: SuggestionDefinitions = { ...SUGGESTION_DEFINITIONS, missingTranslations: designDefinition }
@@ -162,7 +163,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(() => moduleIntroDefinition.card(intro('users'), describeContext)).toThrow()
   })
 
-  test('Do it builds a request from the visible targets; no request without a definition or when the prompt fails', () => {
+  test('Do it builds a request from the visible targets, shown as the request text of its card; no request without a definition or when the prompt fails', () => {
     const visible = { ...designSuggestion, targets: [{ key: 'b:labels' }] }
     const params = { userUuid: 'u1', surveyId: 7, cycle: '0', describeContext, definitions, newId: () => 'r9' }
     expect(buildSuggestionRequest({ ...params, suggestion: visible })).toEqual({
@@ -174,6 +175,7 @@ describe('module introduction and suggestion actions (217)', () => {
       suggestionId: 'missingTranslations:fr',
       scope: { kind: 'missingTranslations', targetKeys: ['b:labels'] },
       prompt: 'Translate b:labels',
+      displayText: 'aiSuggestions:missingTranslations.request',
     })
     expect(buildSuggestionRequest({ ...params, suggestion: visible, definitions: {} })).toBeNull()
     const failing = {
@@ -221,8 +223,15 @@ describe('module introduction and suggestion actions (217)', () => {
       prompt: 'Translate a:labels, b:labels',
     })
     expect(await acceptSuggestion({ request, send, store, definitions })).toBe('c1')
+    // the model gets the prompt, the chat shows the request text
     expect(calls).toEqual([
-      ['Translate a:labels, b:labels', { suggestion: { id: designSuggestion.id, scope: request.scope } }],
+      [
+        'Translate a:labels, b:labels',
+        {
+          suggestion: { id: designSuggestion.id, scope: request.scope },
+          displayText: 'How does the form designer work?',
+        },
+      ],
     ])
     expect(store.getInProgressConversationIds('u1')).toEqual(['c1'])
     expect(visibleIn(store, 7, ['design'])).toEqual([])

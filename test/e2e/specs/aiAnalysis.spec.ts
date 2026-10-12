@@ -113,6 +113,9 @@ test.describe('AI analysis assistant (mock provider)', () => {
       const answer = page.getByText(/Average of tree_dec_1 by cluster_id \(query q1\)/)
       await expect(answer).toContainText('1: 30.5')
       await expect(answer).toContainText('3: 32.5')
+      await expect(
+        assistantPanel(page).getByTestId(TestId.aiAssistant.composerFooter).getByTestId(TestId.aiAssistant.sentDataChip)
+      ).toHaveAttribute('data-level', 'data')
       // query_run asks for one row more than the aggregate cap
       expect(queryBodies.some((body) => body.limit === 201)).toBe(true)
       // the data turn never went to the gateway; the stub received the turn's model calls

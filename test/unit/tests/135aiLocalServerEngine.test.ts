@@ -123,6 +123,20 @@ describe('createLocalServerEngine', () => {
     expect((calls[0].init as any).targetAddressSpace).toBe('local')
   })
 
+  test('inline <think> tags become reasoning, not text', async () => {
+    const { fetchImpl } = recorder(async () => sse(['<think>They greet', ' me.</think>', 'Hello!']))
+    const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl })
+    const result = streamText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
+    let text = ''
+    let reasoning = ''
+    for await (const part of result.fullStream) {
+      if (part.type === 'text-delta') text += part.text
+      if (part.type === 'reasoning-delta') reasoning += part.text
+    }
+    expect(text).toBe('Hello!')
+    expect(reasoning).toBe('They greet me.')
+  })
+
   test('errors keep their specific key through the AI SDK', async () => {
     const missing = recorder(async () => new Response('{"error":{"message":"Model not found"}}', { status: 404 }))
     const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl: missing.fetchImpl })

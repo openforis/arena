@@ -51,8 +51,9 @@ import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { startsAsDataConversation } from './cleaning/cleaningArea'
 import { useAssistantToolContext } from './useAssistantToolContext'
 
-// Do it: a new conversation that keeps the suggestion's scope for its tools
-export type AssistantSendOptions = { suggestion?: { id: string; scope: SuggestionScope } }
+// Do it: a new conversation that keeps the suggestion's scope for its tools; displayText: what the chat shows instead
+// of the text (the model still gets the text)
+export type AssistantSendOptions = { suggestion?: { id: string; scope: SuggestionScope }; displayText?: string }
 
 export type AssistantConversationApi = {
   conversation: Conversation | null
@@ -74,6 +75,8 @@ export type AssistantConversationApi = {
   openConversation: (id: string) => void
   loadHistory: () => Promise<void>
   clearConversations: () => Promise<void>
+  // deletes one conversation of the list; the open one leaves the chat on the start screen
+  deleteConversation: (id: string) => Promise<void>
   apply: (changeSetId: string, operationIds: string[]) => Promise<void>
   // record-edit card: sends the edits to the batch endpoint (onProgress: chunks done, chunks total) and stores the results
   applyRecordEdits: (
@@ -140,6 +143,8 @@ export const useAssistantConversation = ({
   const lastLocationRef = useRef<AiDataLocation | null>(null)
   // id of the conversation whose turn is running (its streaming answer is live, not left over)
   const runningIdRef = useRef<string | null>(null)
+  // latest loadHistory request: an older, slower one must not overwrite a newer list
+  const historyRequestRef = useRef(0)
 
   const show = useCallback((next: Conversation | null) => {
     conversationRef.current = next
@@ -194,10 +199,11 @@ export const useAssistantConversation = ({
    * Runs one turn on a base conversation, saving it when it starts and when it ends.
    * @param {Conversation} base - Conversation before the turn.
    * @param {string} text - User message.
+   * @param {string} [displayText] - What the chat shows instead of the user message.
    * @returns {Promise<void>} Resolves when the turn ends.
    */
   const executeTurn = useCallback(
-    async (base: Conversation, text: string) => {
+    async (base: Conversation, text: string, displayText?: string) => {
       if (!conversationStore) return
       const controller = new AbortController()
       const generation = assistantTurnRegistry.getGeneration()
@@ -225,6 +231,7 @@ export const useAssistantConversation = ({
         const final = await runAssistantTurn({
           conversation: base,
           userMessage: text,
+          displayText,
           area,
           ctx: buildToolContext(area),
           access,
@@ -261,8 +268,8 @@ export const useAssistantConversation = ({
 
   // tracked as a whole: logout waits for the final save of an aborted turn too
   const runTurn = useCallback(
-    (base: Conversation, text: string) => {
-      const turn = executeTurn(base, text)
+    (base: Conversation, text: string, displayText?: string) => {
+      const turn = executeTurn(base, text, displayText)
       // a Do it conversation: other tabs see its turn as running while the lock is held
       if (base.suggestionScope) holdSuggestionTurnLock({ conversationId: base.id, done: turn })
       return assistantTurnRegistry.track(turn)
@@ -271,7 +278,7 @@ export const useAssistantConversation = ({
   )
 
   const send = useCallback(
-    (text: string, { suggestion }: AssistantSendOptions = {}): Promise<string | null> => {
+    (text: string, { suggestion, displayText }: AssistantSendOptions = {}): Promise<string | null> => {
       if (!conversationStore || busy || applyingRef.current) return Promise.resolve(null)
       // no selected id: a new conversation, whatever the ref still holds
       const selected = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
@@ -279,7 +286,7 @@ export const useAssistantConversation = ({
         ? withSuggestionScope(createNewConversation({ userUuid, surveyId, area }), suggestion.scope)
         : (selected ?? createNewConversation({ userUuid, surveyId, area }))
       // the turn shows and selects its conversation synchronously, before its first await
-      void runTurn(base, text)
+      void runTurn(base, text, displayText)
       return Promise.resolve(base.id)
     },
     [area, busy, conversationId, conversationStore, runTurn, surveyId, userUuid]
@@ -287,14 +294,15 @@ export const useAssistantConversation = ({
 
   const retry = useCallback(() => {
     const retryBase = conversationRef.current ? getRetryBase(conversationRef.current) : null
-    if (retryBase && !busy && !applyingRef.current) void runTurn(retryBase.base, retryBase.text)
+    if (retryBase && !busy && !applyingRef.current) void runTurn(retryBase.base, retryBase.text, retryBase.displayText)
   }, [busy, runTurn])
 
   const stop = useCallback(() => controllerRef.current?.abort(), [])
 
+  // a blank chat: the conversation is created by its first message
   const newConversation = useCallback(() => {
     setEngineNotice(null)
-    assistantPanelStore.setConversationId(null)
+    assistantPanelStore.startNewConversation()
   }, [])
 
   const openConversation = useCallback((id: string) => {
@@ -308,7 +316,23 @@ export const useAssistantConversation = ({
     return all.filter((item) => item.area === area)
   }, [area, conversationStore, surveyId, userUuid])
 
-  const loadHistory = useCallback(async () => setHistory(await listAreaConversations()), [listAreaConversations])
+  // another area, survey or user: the previous list is not shown while the new one loads
+  const historyScope = `${userUuid}|${surveyId}|${area}`
+  // set while rendering: the children's effects (loadHistory) run before this hook's effects
+  const historyScopeRef = useRef(historyScope)
+  historyScopeRef.current = historyScope
+  useEffect(() => {
+    setHistory([])
+  }, [historyScope])
+
+  const loadHistory = useCallback(async () => {
+    historyRequestRef.current += 1
+    const request = historyRequestRef.current
+    const scope = historyScopeRef.current
+    const items = await listAreaConversations()
+    // dropped when a newer request started, or the scope changed meanwhile
+    if (request === historyRequestRef.current && scope === historyScopeRef.current) setHistory(items)
+  }, [listAreaConversations])
 
   const clearConversations = useCallback(async () => {
     if (!conversationStore) return
@@ -323,6 +347,22 @@ export const useAssistantConversation = ({
     setHistory([])
     assistantPanelStore.setConversationId(null)
   }, [conversationStore, userUuid])
+
+  const deleteConversation = useCallback(
+    async (id: string) => {
+      if (!conversationStore) return
+      await conversationStore.remove(id)
+      // a deleted Do it conversation can never settle: its suggestion targets show again
+      suggestionStore.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
+      setHistory((items) => items.filter((item) => item.id !== id))
+      if (assistantPanelStore.getState().conversationId !== id) return
+      setEngineNotice(null)
+      // forgets it as the area's open conversation (home page), then back to the list
+      assistantPanelStore.setConversationId(null)
+      assistantPanelStore.showHistory()
+    },
+    [conversationStore, userUuid]
+  )
 
   /**
    * Saves a conversation (tracked, so logout can wait for it) and shows it when it is the selected one.
@@ -473,6 +513,7 @@ export const useAssistantConversation = ({
     openConversation,
     loadHistory,
     clearConversations,
+    deleteConversation,
     apply,
     applyRecordEdits,
     discard,

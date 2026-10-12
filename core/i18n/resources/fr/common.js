@@ -1662,7 +1662,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
         "Cette conversation contient des données d'enregistrements. Continuez avec un serveur d'IA local ou commencez une nouvelle conversation.",
       newConversation: 'Nouvelle conversation',
     },
-    recordDataShared: "Données d'enregistrements partagées avec l'assistant",
   },
 
   aiCleaning: {
@@ -1709,14 +1708,50 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     menu: {
       label: "Menu de l'assistant",
       newConversation: 'Nouvelle conversation',
-      history: 'Historique',
-      clear: 'Effacer les conversations',
+      aiSettings: 'Paramètres IA…',
+      deleteAll: 'Supprimer toutes les conversations…',
     },
     historyTitle: 'Conversations',
+    newConversationTitle: 'Nouvelle conversation',
+    noSuggestions: 'Aucune suggestion.',
     historyEmpty: 'Aucune conversation enregistrée.',
     historyKept:
-      "Les {{count}} dernières conversations de chaque formulaire sont conservées dans ce navigateur jusqu'à ce que vous les effaciez.",
+      "Les {{count}} dernières conversations de chaque formulaire sont conservées dans ce navigateur jusqu'à ce que vous les supprimiez.",
     back: 'Retour',
+    deleteAllConfirm:
+      "Supprimer toutes vos conversations avec l'assistant IA, dans tous les formulaires et tous les domaines ? Cette action est irréversible.",
+    start: {
+      suggestions: 'Suggestions',
+      recent: 'Conversations récentes',
+      seeAll: 'Voir les {{count}} conversations',
+      seeAllSuggestions: 'Voir les {{count}} suggestions',
+    },
+    conversations: 'Conversations',
+    searchConversations: 'Rechercher des conversations',
+    historyNoMatch: 'Aucune conversation ne correspond.',
+    deleteConversation: 'Supprimer la conversation',
+    day: {
+      today: "Aujourd'hui",
+      yesterday: 'Hier',
+      earlier: 'Plus ancien',
+    },
+    sentData: {
+      ariaLabel: 'Données envoyées : {{label}}',
+      questions: {
+        label: 'Questions uniquement',
+        tooltip:
+          "Seules vos questions sont envoyées, avec des extraits du manuel d'Arena. Aucun contenu du formulaire.",
+      },
+      schema: {
+        label: 'Conception du formulaire',
+        tooltip:
+          'La conception du formulaire est envoyée : entités, attributs, catégories et libellés. Aucune donnée des enregistrements.',
+      },
+      data: {
+        label: 'Données des enregistrements',
+        tooltip: 'Des données des enregistrements sont envoyées, avec la conception du formulaire.',
+      },
+    },
     emptyDesign:
       "Demandez-moi d'ajouter des attributs, ou d'écrire des libellés ou des expressions. Je propose les modifications ; vous les appliquez.",
     emptyHelp: "Posez-moi n'importe quelle question sur Open Foris Arena. Je réponds à partir du manuel d'utilisation.",
@@ -1725,6 +1760,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     stop: 'Arrêter',
     retry: 'Réessayer',
     stopped: 'Arrêté.',
+    thinking: 'Réflexion',
+    thinkingActive: 'Réflexion en cours…',
     inMemoryOnly:
       'Ce navigateur ne peut pas enregistrer les conversations : elles sont perdues au rechargement de la page.',
     context: {
@@ -1741,6 +1778,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       nodeDef_search: 'A recherché « {{text}} »',
       survey_getValidation: 'A vérifié les erreurs de conception',
       view_getCurrent: 'A vérifié la vue actuelle',
+      conversation_setTitle: 'A donné un titre à la conversation',
       expression_check: 'A vérifié une expression',
       nodeDef_proposeCreate: 'A préparé de nouveaux éléments',
       nodeDef_proposeUpdate: 'A préparé des modifications de propriétés',
@@ -1782,6 +1820,36 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       no: 'Non',
       newItem: 'Nouveau : {{type}}',
       categoryItem: 'Élément {{ref}} ({{level}})',
+      changes: '{{count}} modifications',
+      more: '+ {{count}} de plus',
+      reviewAll: 'Tout examiner ({{count}})',
+      applyAll: 'Tout appliquer',
+      applySelectedCount: 'Appliquer la sélection ({{count}})',
+      review: {
+        title: 'Examiner les modifications proposées',
+        search: 'Rechercher',
+        groupBy: 'Grouper par',
+        byEntity: 'Entité',
+        byField: 'Modification',
+        show: 'Afficher',
+        groups: 'Groupes',
+        all: 'Toutes ({{count}})',
+        selected: 'Sélectionnées ({{count}})',
+        conflicts: 'Conflits ({{count}})',
+        allChanges: 'Toutes les modifications',
+        item: 'Élément',
+        change: 'Modification',
+        current: 'Actuel',
+        proposed: 'Proposé',
+        status: 'État',
+        selectShown: 'Sélectionner les modifications affichées',
+        selectGroup: 'Sélectionner {{name}}',
+        selectedOf: '{{selected}} sur {{total}} sélectionnées',
+        noMatch: 'Aucune modification ne correspond.',
+        close: 'Fermer',
+        discardAll: 'Tout rejeter',
+        categoryGroup: 'Catégorie {{name}}',
+      },
       label: 'Libellé ({{lang}})',
       description: 'Description ({{lang}})',
       status: {

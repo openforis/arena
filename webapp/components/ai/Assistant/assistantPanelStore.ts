@@ -7,7 +7,8 @@ import type { SuggestionRequest } from '@webapp/ai/suggestions/types'
 
 import type { AssistantArea } from './assistantAreas'
 
-export type AssistantPanelView = 'chat' | 'history'
+// home: suggestions and recent conversations; chat: a conversation, or a blank one (no id) until the first message
+export type AssistantPanelView = 'home' | 'chat' | 'history' | 'suggestions'
 
 // whose open conversations the panel restores: set by the panel host from the logged-in user and the survey
 export type AssistantPanelScope = { userUuid: string; surveyId: number | null }
@@ -33,7 +34,7 @@ export const initialAssistantPanelState: AssistantPanelState = {
   area: null,
   userSelectedArea: null,
   conversationId: null,
-  view: 'chat',
+  view: 'home',
   draft: null,
   draftArea: null,
   scope: null,
@@ -48,9 +49,14 @@ export type AssistantPanelStore = {
   toggle: () => void
   setScope: (scope: AssistantPanelScope | null) => void
   setArea: (area: AssistantArea | null, options?: { byUser?: boolean }) => void
+  // a conversation shows the chat, null the home page
   setConversationId: (conversationId: string | null) => void
+  // the blank chat of a new conversation (created by its first message)
+  startNewConversation: () => void
+  // leaves the conversation for the home page (it is no longer the area's open one)
+  showHome: () => void
   showHistory: () => void
-  showChat: () => void
+  showSuggestions: () => void
   // opens an area as a user choice (the automatic selection keeps it), in a new conversation, with a composer text
   openWithDraft: (params: { area: AssistantArea; draft: string }) => void
   clearDraft: () => void
@@ -69,6 +75,13 @@ export type AssistantPanelStore = {
  */
 const sameScope = (a: AssistantPanelScope | null, b: AssistantPanelScope | null): boolean =>
   a?.userUuid === b?.userUuid && a?.surveyId === b?.surveyId
+
+/**
+ * Returns the view of a conversation id: its chat, or the home page without one.
+ * @param {string|null} conversationId - Conversation id.
+ * @returns {AssistantPanelView} The view.
+ */
+const viewOf = (conversationId: string | null): AssistantPanelView => (conversationId ? 'chat' : 'home')
 
 /**
  * Creates a panel store.
@@ -106,6 +119,20 @@ export const createAssistantPanelStore = ({
   const remember = (conversationId: string | null) => {
     if (state.scope && state.area) openConversations.set({ ...state.scope, area: state.area, conversationId })
   }
+  // closing drops the lists and the blank chat: the panel reopens on the conversation or the home page
+  const closedState = (): Partial<AssistantPanelState> => ({
+    open: false,
+    userSelectedArea: null,
+    view: viewOf(state.conversationId),
+  })
+  /**
+   * Returns the view after selecting an area: the same area keeps a chat (a blank one too), a list goes back.
+   * @param {AssistantArea|null} area - Selected area.
+   * @param {string|null} conversationId - Conversation shown in that area.
+   * @returns {AssistantPanelView} The view.
+   */
+  const viewAfterSetArea = (area: AssistantArea | null, conversationId: string | null): AssistantPanelView =>
+    area === state.area && state.view === 'chat' ? 'chat' : viewOf(conversationId)
   return {
     getState: () => state,
     subscribe: (listener) => {
@@ -113,32 +140,44 @@ export const createAssistantPanelStore = ({
       return () => listeners.delete(listener)
     },
     open: () => set({ open: true }),
-    close: () => set({ open: false, userSelectedArea: null, view: 'chat' }),
-    toggle: () => (state.open ? set({ open: false, userSelectedArea: null, view: 'chat' }) : set({ open: true })),
+    close: () => set(closedState()),
+    toggle: () => (state.open ? set(closedState()) : set({ open: true })),
     setScope: (scope) => {
       if (sameScope(state.scope, scope)) return
       // another user or survey: the current area shows that survey's open conversation; a request made for the
       // previous survey is never sent
-      set({ scope, conversationId: openIdOf(scope, state.area), pendingRequest: null })
+      const conversationId = openIdOf(scope, state.area)
+      set({ scope, conversationId, view: viewOf(conversationId), pendingRequest: null })
     },
-    setArea: (area, { byUser = false } = {}) =>
+    setArea: (area, { byUser = false } = {}) => {
+      // each area shows its own open conversation
+      const conversationId = area === state.area ? state.conversationId : openIdOf(state.scope, area)
       set({
         area,
-        view: 'chat',
-        // each area shows its own open conversation
-        conversationId: area === state.area ? state.conversationId : openIdOf(state.scope, area),
+        view: viewAfterSetArea(area, conversationId),
+        conversationId,
         // a draft made for another area is dropped
         ...(area === state.draftArea ? {} : { draft: null, draftArea: null }),
         // a suggestion request belongs to its area
         ...(area === state.area ? {} : { pendingRequest: null }),
         ...(byUser ? { userSelectedArea: area } : {}),
-      }),
+      })
+    },
     setConversationId: (conversationId) => {
       remember(conversationId)
-      set({ conversationId, view: 'chat' })
+      set({ conversationId, view: viewOf(conversationId) })
+    },
+    startNewConversation: () => {
+      // the previous conversation stays in the list
+      remember(null)
+      set({ conversationId: null, view: 'chat' })
+    },
+    showHome: () => {
+      remember(null)
+      set({ conversationId: null, view: 'home' })
     },
     showHistory: () => set({ view: 'history' }),
-    showChat: () => set({ view: 'chat' }),
+    showSuggestions: () => set({ view: 'suggestions' }),
     openWithDraft: ({ area, draft }) => {
       set({ open: true, area, userSelectedArea: area, conversationId: null, view: 'chat', draft, draftArea: area })
       // the draft is a new question: the previous conversation stays in History

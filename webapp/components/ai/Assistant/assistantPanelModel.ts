@@ -3,6 +3,8 @@
  */
 import { uuidv4 } from '@core/uuid'
 
+import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
+
 import type { OperationResult } from '@webapp/ai/changeSets/types'
 import type { ApplyNoteMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import type { AiTranslate } from '@webapp/ai/tools/types'
@@ -26,6 +28,13 @@ const toLabelParams = (input: unknown): Record<string, string> => {
   }
   return params
 }
+
+/**
+ * Returns true for the tool calls the chat doesn't list (the conversation title).
+ * @param {ConversationToolPart} part - Tool part.
+ * @returns {boolean} True when hidden.
+ */
+export const isHiddenToolPart = (part: ConversationToolPart): boolean => part.toolName === CONVERSATION_TITLE_TOOL_NAME
 
 /**
  * Returns the label of a tool row ("Looked up tree_height"); tools without a label key get the default label.
@@ -52,9 +61,11 @@ export const getProposedChangeSetId = (part: ConversationToolPart): string | nul
 /**
  * Returns what Retry resends: the conversation without the failed pair, and the user message of that pair.
  * @param {Conversation} conversation - Conversation.
- * @returns {{base: Conversation, text: string}|null} Null when the last answer did not fail.
+ * @returns {{base: Conversation, text: string, displayText?: string}|null} Null when the last answer did not fail.
  */
-export const getRetryBase = (conversation: Conversation): { base: Conversation; text: string } | null => {
+export const getRetryBase = (
+  conversation: Conversation
+): { base: Conversation; text: string; displayText?: string } | null => {
   const { messages } = conversation
   const last = messages.at(-1)
   if (last?.role !== 'assistant' || last.status !== 'error') return null
@@ -62,7 +73,12 @@ export const getRetryBase = (conversation: Conversation): { base: Conversation; 
   while (index >= 0 && messages[index].role !== 'user') index -= 1
   const userMessage = messages[index]
   if (userMessage?.role !== 'user') return null
-  return { base: { ...conversation, messages: messages.slice(0, index) }, text: userMessage.text }
+  const { text, displayText } = userMessage
+  return {
+    base: { ...conversation, messages: messages.slice(0, index) },
+    text,
+    ...(displayText ? { displayText } : {}),
+  }
 }
 
 /**

@@ -24,7 +24,7 @@
   &__header {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
+    gap: 0.25rem;
     padding: 0.5rem 0.75rem;
     border-bottom: 1px solid var(--greyBorder);
   }
@@ -60,7 +60,6 @@
   }
 
   &__unavailable,
-  &__history,
   &__notice {
     padding: 0.75rem;
   }
@@ -85,25 +84,53 @@
     color: var(--colorGrey700);
   }
 
-  &__context-bar {
-    flex: 0 0 6rem;
-    height: 6px;
-    border-radius: 3px;
-    background-color: var(--colorGrey200);
-    overflow: hidden;
+  &__context-ring {
+    // block-level: TooltipNew wraps the ring in an inline span, where an inline box would sit on the text baseline
+    // above the header's centre line
+    display: flex;
+    flex: none;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+
+    &:focus-visible {
+      outline: 2px solid var(--colorPrimary);
+      outline-offset: 2px;
+    }
+
+    svg {
+      width: 100%;
+      height: 100%;
+      // the arc starts at 12 o'clock and fills clockwise
+      transform: rotate(-90deg);
+    }
   }
 
-  &__context-fill {
-    display: block;
-    height: 100%;
-    background-color: var(--blue);
+  &__context-ring-track {
+    fill: none;
+    stroke: var(--colorGrey400);
+    stroke-width: 3;
+
+    // unknown window (cloud): nothing to fill
+    &--unknown {
+      stroke: var(--colorGrey500);
+      stroke-width: 2;
+      stroke-dasharray: 2 2.4;
+    }
+  }
+
+  &__context-ring-fill {
+    fill: none;
+    stroke: var(--blue);
+    stroke-width: 3;
+    stroke-linecap: round;
 
     &--warning {
-      background-color: var(--orange);
+      stroke: var(--orange);
     }
 
     &--critical {
-      background-color: var(--red);
+      stroke: var(--red);
     }
   }
 
@@ -131,57 +158,311 @@
     color: var(--colorGrey600);
   }
 
-  &__history-note {
-    margin: 0;
-    padding: 0 0.75rem 0.5rem;
-    font-size: 0.8rem;
-    color: var(--colorGrey600);
-  }
-
   &__composer {
     display: flex;
-    align-items: flex-end;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border-top: 1px solid var(--greyBorder);
+    flex-direction: column;
+    margin: 0.5rem 0.75rem 0.75rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 8px;
+
+    &:focus-within {
+      border-color: var(--colorPrimary);
+    }
 
     textarea {
-      flex: 1;
+      width: 100%;
+      min-height: 3rem;
+      padding: 0.5rem 0.75rem 0.25rem;
+      border: none;
+      outline: none;
       resize: vertical;
+      background: none;
+    }
+
+    .ai-record-data-notice {
+      border-top: none;
     }
   }
 
-  &__history-header {
+  &__composer-footer {
+    // the narrow rules below query this width
+    container-type: inline-size;
     display: flex;
     align-items: center;
     gap: 0.5rem;
+    padding: 0.25rem 0.4rem 0.4rem 0.6rem;
+    font-size: 0.75rem;
+    color: var(--colorGrey700);
 
-    h3 {
-      margin: 0;
+    > * {
+      flex: none;
+    }
+
+    // the only item that shrinks: its text ends with an ellipsis
+    > .ai-data-location-badge {
+      flex: 0 1 auto;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .ai-data-location-badge__text {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    @container (max-width: 340px) {
+      .ai-data-location-badge__text,
+      .ai-assistant-panel__context-text,
+      .ai-assistant-panel__sent-data-text {
+        display: none;
+      }
     }
   }
 
-  &__history-list {
-    list-style: none;
+  &__composer-spacer {
+    flex: 1 1 0;
+  }
+
+  &__send.btn {
+    min-width: 0;
+    width: 28px;
+    height: 28px;
     padding: 0;
+  }
+
+  &__sent-data {
+    // block-level: TooltipNew wraps it in an inline span (see the context ring)
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.1rem 0.45rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 0.75rem;
+    line-height: 1.2;
+    white-space: nowrap;
+
+    &:focus-visible {
+      outline: 2px solid var(--colorPrimary);
+      outline-offset: 2px;
+    }
+
+    // record data: the step up from the survey design must be noticed
+    &--data {
+      border-color: var(--orange);
+      color: var(--orange);
+      background-color: var(--orangeLight);
+    }
+  }
+
+  &__context-usage {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  // conversation bar and the list's top bar
+  &__bar {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 2.25rem;
+    padding: 0.15rem 0.75rem 0.15rem 0.35rem;
+    border-bottom: 1px solid var(--greyBorder);
+  }
+
+  &__bar-title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    // a new conversation the model has not named yet
+    &--untitled {
+      font-weight: 400;
+      color: var(--colorGrey600);
+    }
+  }
+
+  &__history {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__history-body {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0.75rem 0.75rem;
+  }
+
+  &__history-search {
+    width: 100%;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 0.25rem;
+
+    &:focus-visible {
+      border-color: var(--colorPrimary);
+    }
+  }
+
+  &__section-title {
+    margin: 0.5rem 0 0.25rem;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--colorGrey600);
+  }
+
+  &__history-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__history-row {
+    display: flex;
+    align-items: center;
+    border-bottom: 1px solid var(--colorGrey200);
+
+    &:hover,
+    &:focus-within {
+      background-color: var(--colorGrey200);
+
+      .ai-assistant-panel__history-delete {
+        visibility: visible;
+      }
+    }
   }
 
   &__history-item {
     display: flex;
-    justify-content: space-between;
-    width: 100%;
-    padding: 0.5rem;
+    flex: 1;
+    gap: 0.5rem;
+    align-items: baseline;
+    min-width: 0;
+    padding: 0.4rem 0.25rem;
     border: none;
-    border-bottom: 1px solid var(--greyBorder);
     background: none;
     text-align: left;
     cursor: pointer;
 
+    &[aria-current='true'] {
+      font-weight: 600;
+    }
+
     time {
+      flex: none;
+      font-size: 0.75rem;
       color: var(--colorGrey600);
-      font-size: 0.8rem;
+      font-variant-numeric: tabular-nums;
     }
   }
+
+  &__history-title {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // shown on the hovered or focused row
+  &__history-delete.btn {
+    visibility: hidden;
+  }
+
+  &__history-note {
+    margin: 0.75rem 0 0;
+    font-size: 0.8rem;
+    color: var(--colorGrey600);
+  }
+
+  // home page: suggestions and recent conversations scroll above the New conversation button
+  &__home {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  &__start {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.75rem;
+    overflow-y: auto;
+    padding: 0.75rem;
+  }
+
+  &__home-footer {
+    padding: 0.5rem 0.75rem 0.75rem;
+    border-top: 1px solid var(--greyBorder);
+  }
+
+  &__home-new.btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  &__recent {
+    display: grid;
+    // minmax(0, ...): the implicit auto column would grow with the nowrap rows past the panel
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.35rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__recent-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 6px;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:hover,
+    &:focus-visible {
+      border-color: var(--colorPrimary);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--colorPrimary);
+      outline-offset: 1px;
+    }
+
+    .icon {
+      color: var(--colorGrey600);
+    }
+
+    time {
+      flex: none;
+      font-size: 0.75rem;
+      color: var(--colorGrey600);
+      font-variant-numeric: tabular-nums;
+    }
+  }
+}
+
+// ⋯ menu of the panel header (rendered in a portal)
+.ai-assistant-panel__menu-danger.btn {
+  color: var(--red);
 }
 
 .ai-assistant-message {
@@ -220,6 +501,21 @@
   &:hover,
   &:visited {
     color: var(--blueDark);
+  }
+}
+
+.ai-assistant-thinking {
+  font-size: 0.8rem;
+  color: var(--colorGrey600);
+
+  summary {
+    cursor: pointer;
+  }
+
+  &__text {
+    margin-top: 0.25rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid var(--greyBorder);
   }
 }
 
@@ -348,18 +644,74 @@
     margin: 0;
     color: var(--colorGrey600);
   }
+
+  // long change sets: counts and a preview; the changes are reviewed in a dialog
+  &__title-row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__count {
+    color: var(--colorGrey600);
+    white-space: nowrap;
+  }
+
+  &__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin: 0.5rem 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  &__chip {
+    padding: 0.1rem 0.5rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 1rem;
+    font-size: 0.8rem;
+
+    &--applied {
+      color: var(--green);
+    }
+
+    &--conflict,
+    &--failed {
+      color: var(--red);
+    }
+
+    &--skipped {
+      color: var(--orange);
+    }
+  }
+
+  &__preview {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.15rem 0;
+      border-bottom: 1px solid var(--colorGrey200);
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    span {
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
 }
 
 .ai-record-data-notice {
   border-top: 1px solid var(--greyBorder);
   padding: 0.5rem 0.75rem;
   color: var(--colorGrey700);
-}
-
-.ai-record-data-shared {
-  font-size: 0.75rem;
-  color: var(--colorGrey700);
-  margin-left: 0.5rem;
 }
 
 // a tab with suggestions (the button's dot is in AssistantButton.scss)
@@ -373,32 +725,77 @@
   vertical-align: middle;
 }
 
-// the suggestion cards, above the messages; they never push the composer away
+// the suggestions: rows (like the recent conversations) that open into their card
 .ai-assistant-suggestions {
   flex: none;
-  max-height: 40%;
-  overflow-y: auto;
   margin: 0;
-  padding: 0.5rem 0.75rem 0;
+  padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  display: grid;
+  // minmax(0, ...): the nowrap rows must not widen the panel
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.35rem;
 
   &__card {
     border: 1px solid var(--greyBorder);
     border-left: 3px solid var(--orange);
-    border-radius: 4px;
-    padding: 0.5rem 0.75rem;
+    border-radius: 6px;
+
+    &:hover,
+    &:focus-within {
+      border-color: var(--colorPrimary);
+      border-left-color: var(--orange);
+    }
+  }
+
+  &__toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.45rem 0.6rem;
+    border: none;
+    background: none;
+    text-align: left;
+    cursor: pointer;
+
+    &:focus-visible {
+      outline: 2px solid var(--colorPrimary);
+      outline-offset: 1px;
+    }
   }
 
   &__text {
-    margin: 0 0 0.5rem;
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  // a CSS chevron: right on a row, up on an open card
+  &__chevron {
+    flex: none;
+    width: 6px;
+    height: 6px;
+    margin-right: 0.15rem;
+    border-right: 1.5px solid var(--colorGrey600);
+    border-bottom: 1.5px solid var(--colorGrey600);
+    transform: rotate(-45deg);
+  }
+
+  &__card--open &__text {
+    white-space: normal;
+  }
+
+  &__card--open &__chevron {
+    transform: rotate(-135deg);
   }
 
   &__actions {
     display: flex;
     justify-content: flex-end;
     gap: 0.5rem;
+    padding: 0 0.6rem 0.45rem;
   }
 }

@@ -118,6 +118,27 @@ describe('runAssistantTurn', () => {
     expect(fresh.title).toBe('Add a remarks field')
   })
 
+  test('thinking goes to one reasoning part before the text', async () => {
+    const model = scriptedModel(() =>
+      convertArrayToReadableStream([
+        { type: 'stream-start', warnings: [] },
+        { type: 'reasoning-start', id: 'r' },
+        { type: 'reasoning-delta', id: 'r', delta: 'They want ' },
+        { type: 'reasoning-delta', id: 'r', delta: 'a field.' },
+        { type: 'reasoning-end', id: 'r' },
+        { type: 'text-start', id: 't' },
+        { type: 'text-delta', id: 't', delta: 'Done.' },
+        { type: 'text-end', id: 't' },
+        finish('stop'),
+      ] as any[])
+    )
+    const result = await run({ model })
+    expect(answerOf(result).parts).toEqual([
+      { type: 'reasoning', text: 'They want a field.' },
+      { type: 'text', text: 'Done.' },
+    ])
+  })
+
   test('onUpdate reports every change and the result is the last report', async () => {
     const reports: Conversation[] = []
     const result = await run({ model: scriptedModel(() => textStream('Hello!')), onUpdate: (c) => reports.push(c) })

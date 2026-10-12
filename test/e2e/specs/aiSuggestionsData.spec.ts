@@ -6,7 +6,13 @@ import { expect, test } from '../fixtures'
 import { sampleRecords, type SampleRecord } from '../fixtures/seed/sampleSurveyModel'
 import { acceptConsentAndWait, analysisAreaLabel, collectRequestBodies, isGatewayRequest } from '../helpers/aiAnalysis'
 import { cleaningAreaLabel, useLocalServer } from '../helpers/aiCleaning'
-import { assistantPanel, lastAssistantAnswer, openAssistantPanel, selectAssistantArea } from '../helpers/assistantPanel'
+import {
+  assistantPanel,
+  lastAssistantAnswer,
+  openAssistantPanel,
+  openSuggestionCard,
+  selectAssistantArea,
+} from '../helpers/assistantPanel'
 import { Urls } from '../helpers/urls'
 import { startLocalModelServer, type LocalModelServerStub } from '../stubs/localModelServer'
 
@@ -72,7 +78,7 @@ const reloadAndWaitForAiSettings = async (page: Page): Promise<void> => {
 }
 
 /**
- * Opens the panel on an area and waits until the area is available (the composer shows only then).
+ * Opens the panel on an area and waits until the area is available (its home page shows only then).
  * @param {Page} page - The page.
  * @param {string} label - Area tab label.
  * @returns {Promise<void>} Resolves when the area is usable.
@@ -80,7 +86,9 @@ const reloadAndWaitForAiSettings = async (page: Page): Promise<void> => {
 const openArea = async (page: Page, label: string): Promise<void> => {
   await openAssistantPanel(page)
   await selectAssistantArea(page, label)
-  await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible({ timeout: 15_000 })
+  await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.homeNewConversationBtn)).toBeVisible({
+    timeout: 15_000,
+  })
 }
 
 /**
@@ -178,10 +186,13 @@ test.describe('AI suggestion: many validation messages (stub local server)', () 
     expect(countChatRequests(stub)).toBe(0)
     expect(gatewayBodies).toEqual([])
 
+    await openSuggestionCard(
+      panel.getByTestId(TestId.aiAssistant.suggestionCard).filter({ has: page.getByText(validationCardText) })
+    )
     await panel.getByRole('button', { name: 'Do it', exact: true }).click()
     await acceptConsentAndWait(page)
     await expect(panel.getByTestId(TestId.aiAssistant.message('user')).last()).toContainText(
-      'Summarise the validation errors and warnings of this survey in the current cycle.'
+      `Summarise the patterns of the ${count} validation messages in this cycle.`
     )
     await expect(lastAssistantAnswer(page)).toContainText(`MOCK: ${count} validation messages`)
     expect(countChatRequests(stub)).toBeGreaterThan(0)
@@ -258,6 +269,7 @@ test.describe('AI suggestion: data imported (mock provider)', () => {
     expect(gatewayBodies).toEqual([])
 
     const importCard = panel.getByText(importCardText, { exact: true })
+    await openSuggestionCard(panel.getByTestId(TestId.aiAssistant.suggestionCard).filter({ hasText: importCardText }))
     await panel.getByRole('button', { name: 'Dismiss', exact: true }).click()
     await expectDismissedInStore()
     await expect(importCard).toHaveCount(0)

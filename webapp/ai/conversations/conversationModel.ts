@@ -58,3 +58,16 @@ export const toConversationTitle = (text: string): string => {
   const firstLine = text.trim().split('\n')[0].trim()
   return firstLine.length > TITLE_MAX_CHARS ? `${firstLine.slice(0, TITLE_MAX_CHARS - 1)}…` : firstLine
 }
+
+// quotes and markdown emphasis models wrap titles in
+const TITLE_WRAPPERS = /^["'`*_#«»“”‘’\s]+|["'`*_«»“”‘’\s]+$/g
+
+/**
+ * Cleans a title written by the model: one line, without wrapping quotes or emphasis, no final period.
+ * @param {string} title - Model title.
+ * @returns {string} The title, at most 60 characters (empty when nothing is left).
+ */
+export const cleanConversationTitle = (title: string): string => {
+  const oneLine = title.replaceAll(/\s+/g, ' ').replaceAll(TITLE_WRAPPERS, '')
+  return toConversationTitle(oneLine.replace(/[.。]+$/, '').replaceAll(TITLE_WRAPPERS, ''))
+}

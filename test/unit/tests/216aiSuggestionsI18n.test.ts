@@ -42,6 +42,17 @@ describe('aiSuggestions i18n (216)', () => {
     }
   })
 
+  test('every card text has a request text (what the chat shows on Do it) with the same placeholders', () => {
+    const texts = flatten(getResource('en'))
+    const cardKeys = Object.keys(texts).filter((key) => /\.card/.test(key))
+    expect(cardKeys.length).toBeGreaterThan(0)
+    for (const key of cardKeys) {
+      const requestKey = key.replace(/\.card/, '.request')
+      expect([requestKey, typeof texts[requestKey]]).toEqual([requestKey, 'string'])
+      expect([requestKey, placeholders(texts[requestKey])]).toEqual([requestKey, placeholders(texts[key])])
+    }
+  })
+
   test.each(['ru', 'mn'])('%s texts are written in Cyrillic', (lang) => {
     for (const [key, text] of Object.entries(flatten(getResource(lang)))) {
       expect([key, CYRILLIC.test(text)]).toEqual([key, true])

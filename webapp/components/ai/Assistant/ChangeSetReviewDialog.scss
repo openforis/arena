@@ -1,0 +1,236 @@
+// review dialog of a long change set: most of the screen, its own header and footer
+.modal.ai-change-review .modal-content {
+  width: 92vw;
+  height: 92vh;
+  margin: 4vh auto;
+  padding: 0;
+  overflow: hidden;
+  background-color: var(--white);
+}
+
+.ai-change-review {
+  &__content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--greyBorder);
+
+    h2 {
+      margin: 0;
+      font-size: 1.1rem;
+      white-space: nowrap;
+    }
+
+    .close-btn {
+      margin-left: auto;
+    }
+  }
+
+  &__summary {
+    overflow: hidden;
+    color: var(--colorGrey600);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .ai-assistant-card__stale {
+    margin: 0;
+  }
+
+  &__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    border-bottom: 1px solid var(--greyBorder);
+  }
+
+  &__search {
+    flex: 1 1 15rem;
+    max-width: 25rem;
+    padding: 0.3rem 0.5rem;
+    border: 1px solid var(--greyBorder);
+    border-radius: 0.25rem;
+  }
+
+  &__segmented {
+    display: flex;
+
+    button {
+      padding: 0.25rem 0.75rem;
+      border: 1px solid var(--greyBorder);
+      background: var(--white);
+      cursor: pointer;
+
+      & + button {
+        border-left: none;
+      }
+
+      &:first-child {
+        border-radius: 0.25rem 0 0 0.25rem;
+      }
+
+      &:last-child {
+        border-radius: 0 0.25rem 0.25rem 0;
+      }
+
+      &[aria-pressed='true'] {
+        background: var(--colorPrimary);
+        color: var(--white);
+      }
+    }
+  }
+
+  &__main {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+  }
+
+  &__side {
+    display: flex;
+    flex: none;
+    flex-direction: column;
+    width: 14rem;
+    overflow-y: auto;
+    border-right: 1px solid var(--greyBorder);
+
+    button {
+      display: flex;
+      justify-content: space-between;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border: none;
+      background: none;
+      text-align: left;
+      cursor: pointer;
+
+      span:first-child {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+
+      span:last-child {
+        color: var(--colorGrey600);
+      }
+
+      &:hover {
+        background: var(--colorGrey200);
+      }
+
+      &[aria-pressed='true'] {
+        background: var(--colorGrey200);
+        font-weight: 600;
+      }
+    }
+  }
+
+  &__table-wrap {
+    flex: 1;
+    min-width: 0;
+    overflow: auto;
+  }
+
+  &__table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      padding: 0.4rem 0.5rem;
+      background: var(--white);
+      border-bottom: 1px solid var(--greyBorder);
+      text-align: left;
+    }
+
+    td {
+      padding: 0.3rem 0.5rem;
+      border-bottom: 1px solid var(--colorGrey200);
+      vertical-align: top;
+    }
+  }
+
+  &__check {
+    width: 2rem;
+  }
+
+  &__group td {
+    background: var(--colorGrey200);
+    font-weight: 600;
+  }
+
+  &__group-count {
+    margin-left: 0.25rem;
+    color: var(--colorGrey600);
+    font-weight: normal;
+  }
+
+  &__row--conflict td {
+    background: var(--orangeLight);
+  }
+
+  &__item {
+    white-space: nowrap;
+  }
+
+  &__detail {
+    margin-left: 0.5rem;
+    color: var(--colorGrey600);
+  }
+
+  &__badge {
+    margin-left: 0.5rem;
+    color: var(--red);
+    font-weight: 600;
+  }
+
+  &__from {
+    color: var(--colorGrey600);
+    text-decoration: line-through;
+  }
+
+  &__from,
+  &__to {
+    overflow-wrap: anywhere;
+  }
+
+  &__sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  &__empty {
+    padding: 2rem;
+    color: var(--colorGrey600);
+    text-align: center;
+  }
+
+  &__footer {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--greyBorder);
+  }
+
+  &__selected {
+    margin-right: auto;
+    color: var(--colorGrey600);
+  }
+}

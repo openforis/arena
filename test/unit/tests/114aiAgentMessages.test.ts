@@ -51,6 +51,19 @@ describe('describeToolPart interrupted', () => {
 })
 
 describe('buildHistory', () => {
+  test('thinking stays out of the history', () => {
+    const history = buildHistory({
+      messages: [user('u1', 'Hi'), assistant('a1', [{ type: 'reasoning', text: 'They greet me.' }, text('Hello!')])],
+      userMessage: 'Add a field',
+      budgetChars: 10000,
+    })
+    expect(history).toEqual([
+      { role: 'user', content: 'Hi' },
+      { role: 'assistant', content: 'Hello!' },
+      { role: 'user', content: 'Add a field' },
+    ])
+  })
+
   test('plain text turns, the new message last', () => {
     const history = buildHistory({
       messages: [user('u1', 'Hi'), assistant('a1', [text('Hello!')])],

@@ -114,3 +114,25 @@ export const getContextMeterText = ({ meter, t }: { meter: ContextMeter; t: Tran
   const withAssumed = meter.windowAssumed ? `${base} ${t('aiAssistant.context.assumed')}` : base
   return meter.estimated ? `≈ ${withAssumed}` : withAssumed
 }
+
+/**
+ * Returns the short text shown next to the ring in the composer footer.
+ * @param {ContextMeter} meter - Meter.
+ * @returns {string} For example "≈ 6K / 8.2K" (the full text with "tokens" is in the ring's tooltip).
+ */
+export const getContextMeterShortText = (meter: ContextMeter): string => {
+  const text = meter.windowText === null ? meter.usedText : `${meter.usedText} / ${meter.windowText}`
+  return meter.estimated ? `≈ ${text}` : text
+}
+
+// radius of the ring in its 20 × 20 view box
+export const CONTEXT_RING_RADIUS = 7
+export const CONTEXT_RING_CIRCUMFERENCE = 2 * Math.PI * CONTEXT_RING_RADIUS
+
+/**
+ * Returns the stroke-dasharray of the ring's filled arc.
+ * @param {number|null} ratio - Share of the window, 0–1 (null: no window).
+ * @returns {string|null} "<filled> <circumference>"; null without a window (the ring stays empty).
+ */
+export const getContextRingDashArray = (ratio: number | null): string | null =>
+  ratio === null ? null : `${CONTEXT_RING_CIRCUMFERENCE * ratio} ${CONTEXT_RING_CIRCUMFERENCE}`

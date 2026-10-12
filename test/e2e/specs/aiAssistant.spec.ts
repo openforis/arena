@@ -129,8 +129,8 @@ test.describe('AI assistant (mock provider)', () => {
     const designer = await openDesignArea(page, { fromHome: true })
     await proposeLabel(page)
     const panel = assistantPanel(page)
-    // the mock provider reports no usage: the meter shows an estimate
-    await expect(panel.getByTestId(TestId.aiAssistant.contextMeter)).toContainText('≈')
+    // the mock provider reports no usage: the ring shows an estimate (its tokens are in the label and the tooltip)
+    await expect(panel.getByTestId(TestId.aiAssistant.contextMeter)).toHaveAttribute('aria-label', /≈/)
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetRowStatus).first()).toHaveText('Applied')
     await expect(designer.surveyForm.getByText('Cluster identifier', { exact: true }).first()).toBeVisible()
@@ -191,33 +191,65 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(designer.surveyForm.getByText('Cluster code', { exact: true }).first()).toBeVisible()
   })
 
-  test('conversations are listed in the history and survive a reload', async ({ page, sampleSurvey: _ }) => {
+  test('+ opens a blank chat; back shows the home page with the recent conversations and no message box', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
     await openDesignArea(page)
     await proposeLabel(page)
     const panel = assistantPanel(page)
+    const bar = panel.getByTestId(TestId.aiAssistant.conversationBar)
+    const home = panel.getByTestId(TestId.aiAssistant.startScreen)
+    await expect(bar).toContainText(LABEL_REQUEST)
 
-    // the menu items render in a popover outside the panel
-    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
-    await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
-    await expect(panel.getByTestId(TestId.aiAssistant.message('user'))).toHaveCount(0)
+    // + : a blank chat, neither suggestions nor recent conversations
+    await panel.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await expect(home).toHaveCount(0)
+    await expect(bar).toContainText('New conversation')
+    await expect(userMessages(page)).toHaveCount(0)
+    await expect(panel.getByTestId(TestId.aiAssistant.input)).toBeVisible()
 
-    const openHistory = async () => {
-      await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
-      await page.getByTestId(TestId.aiAssistant.historyBtn).click()
-      await expect(panel.getByTestId(TestId.aiAssistant.history)).toBeVisible()
-    }
-    await openHistory()
-    const item = panel.getByTestId(TestId.aiAssistant.historyItem)
-    await expect(item).toHaveCount(1)
-    await expect(item).toContainText(LABEL_REQUEST)
-    await item.click()
+    // back: the home page, with a New conversation button instead of the message box
+    await bar.getByTestId(TestId.aiAssistant.conversationBackBtn).click()
+    await expect(home).toBeVisible()
+    await expect(bar).toHaveCount(0)
+    await expect(panel.getByTestId(TestId.aiAssistant.input)).toHaveCount(0)
+    await expect(home.getByTestId(TestId.aiAssistant.homeNewConversationBtn)).toBeVisible()
+    const recent = panel.getByTestId(TestId.aiAssistant.recentItem)
+    await expect(recent).toHaveCount(1)
+    await expect(recent).toContainText(LABEL_REQUEST)
+    // a long title never pushes the row (and its time) past the panel
+    const panelBox = await panel.boundingBox()
+    const rowBox = await recent.boundingBox()
+    expect(rowBox!.x + rowBox!.width).toBeLessThanOrEqual(panelBox!.x + panelBox!.width)
+    await recent.click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetCard)).toBeVisible()
 
+    // a reload shows the remembered conversation, never the start screen (not even for a moment)
+    await page.addInitScript(() => {
+      const w = window as unknown as { __startScreenSeen: boolean }
+      w.__startScreenSeen = false
+      const check = () => {
+        if (document.querySelector('[data-testid="ai-assistant-start-screen"]')) w.__startScreenSeen = true
+      }
+      new MutationObserver(check).observe(document, { childList: true, subtree: true })
+    })
     await page.reload()
     await openAssistantPanel(page)
     await expectDesignSelected(page)
-    await openHistory()
+    await expect(panel.getByTestId(TestId.aiAssistant.conversationBar)).toContainText(LABEL_REQUEST)
+    await expect(panel.getByTestId(TestId.aiAssistant.startScreen)).toHaveCount(0)
+    expect(await page.evaluate(() => (window as unknown as { __startScreenSeen: boolean }).__startScreenSeen)).toBe(
+      false
+    )
+
+    // the full list, from the home page; its back goes home too
+    await bar.getByTestId(TestId.aiAssistant.conversationBackBtn).click()
+    await panel.getByTestId(TestId.aiAssistant.seeAllBtn).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.history)).toBeVisible()
     await expect(panel.getByTestId(TestId.aiAssistant.historyItem)).toHaveCount(1)
+    await panel.getByTestId(TestId.aiAssistant.historyBackBtn).click()
+    await expect(home).toBeVisible()
   })
 
   test('each area keeps its conversation across area switches, reloads and logout', async ({
@@ -262,9 +294,7 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(lastAssistantAnswer(page)).toContainText('MOCK help: publish the survey from the survey list')
 
     const panel = assistantPanel(page)
-    // the menu items render in a popover outside the panel
-    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
-    await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await panel.getByTestId(TestId.aiAssistant.newConversationBtn).click()
     await expect(userMessages(page)).toHaveCount(0)
 
     await selectAssistantArea(page, 'Design')
@@ -272,10 +302,11 @@ test.describe('AI assistant (mock provider)', () => {
     await selectAssistantArea(page, 'Help')
     await expect(userMessages(page)).toHaveCount(0)
 
-    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
-    await page.getByTestId(TestId.aiAssistant.historyBtn).click()
+    // the Help area has one conversation: the home page lists it, the list says where conversations are kept
+    await expect(panel.getByTestId(TestId.aiAssistant.recentItem)).toHaveCount(1)
+    await panel.getByTestId(TestId.aiAssistant.seeAllBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.historyKept)).toHaveText(
-      'The latest 30 conversations of each survey are kept in this browser until you clear them.'
+      'The latest 30 conversations of each survey are kept in this browser until you delete them.'
     )
   })
 
@@ -319,6 +350,105 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(panel.getByTestId(TestId.aiAssistant.unavailable)).not.toBeEmpty()
     await expect(panel.getByTestId(TestId.aiAssistant.input)).toHaveCount(0)
   })
+
+  test('the list searches titles and deletes rows, staying on the list', async ({ page, sampleSurvey: _ }) => {
+    await openDesignArea(page)
+    await proposeLabel(page)
+    const panel = assistantPanel(page)
+    await panel.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await sendAssistantMessage(page, 'Add a text attribute notes to cluster')
+    await waitForAssistantTurn(page)
+
+    await panel.getByTestId(TestId.aiAssistant.conversationBackBtn).click()
+    await panel.getByTestId(TestId.aiAssistant.seeAllBtn).click()
+    const rows = panel.getByTestId(TestId.aiAssistant.historyItem)
+    await expect(rows).toHaveCount(2)
+
+    const search = panel.getByTestId(TestId.aiAssistant.historySearch)
+    await search.fill('CLUSTER_ID')
+    await expect(rows).toHaveCount(1)
+    await expect(rows).toContainText(LABEL_REQUEST)
+    await search.fill('no such title')
+    await expect(rows).toHaveCount(0)
+    await expect(panel).toContainText('No conversation matches.')
+    await search.fill('')
+
+    const notesRow = panel.locator('li', {
+      has: page.getByTestId(TestId.aiAssistant.historyItem).filter({ hasText: 'notes' }),
+    })
+    await notesRow.hover()
+    await notesRow.getByTestId(TestId.aiAssistant.historyDeleteBtn).click()
+    await expect(rows).toHaveCount(1)
+    await expect(rows).toContainText(LABEL_REQUEST)
+    await expect(panel.getByTestId(TestId.aiAssistant.history)).toBeVisible()
+
+    await panel.getByTestId(TestId.aiAssistant.historyBackBtn).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.startScreen)).toBeVisible()
+    await expect(panel.getByTestId(TestId.aiAssistant.recentItem)).toHaveCount(1)
+  })
+
+  test('Delete all asks first; Cancel keeps the conversations, Ok deletes them', async ({ page, sampleSurvey: _ }) => {
+    await openDesignArea(page)
+    await proposeLabel(page)
+    const panel = assistantPanel(page)
+    const modal = page.getByTestId(TestId.modal.modal)
+
+    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.deleteAllBtn).click()
+    await expect(modal).toContainText('in every survey and every area')
+    await modal.getByRole('button', { name: 'Cancel' }).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.conversationBar)).toBeVisible()
+
+    await panel.getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.deleteAllBtn).click()
+    await modal.getByRole('button', { name: 'Ok' }).click()
+    await expect(panel.getByTestId(TestId.aiAssistant.startScreen)).toBeVisible()
+    await expect(panel.getByTestId(TestId.aiAssistant.recentItem)).toHaveCount(0)
+  })
+
+  test('AI settings opens the user profile', async ({ page, sampleSurvey: _ }) => {
+    await openDesignArea(page)
+    await assistantPanel(page).getByTestId(TestId.aiAssistant.menuBtn).click()
+    await page.getByTestId(TestId.aiAssistant.aiSettingsBtn).click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.userProfile}$`))
+  })
+
+  test('the footer shows where data goes, what is sent and the context used, aligned', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openDesignArea(page)
+    const panel = assistantPanel(page)
+    // the composer (and its footer) is in the chat, not on the home page
+    await panel.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
+    const footer = panel.getByTestId(TestId.aiAssistant.composerFooter)
+    await expect(footer.getByTestId(TestId.ai.dataLocationBadge)).toBeVisible()
+    await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute('data-level', 'schema')
+    await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute(
+      'aria-label',
+      'Data sent: Survey design'
+    )
+    await expect(footer.getByTestId(TestId.aiAssistant.contextMeter)).toHaveCount(0)
+
+    await proposeLabel(page)
+    const ring = footer.getByTestId(TestId.aiAssistant.contextMeter)
+    await expect(ring).toBeVisible()
+
+    // every item is centred on the footer's middle line (TooltipNew's inline wrapper must not shift them)
+    // and Send stays inside the footer
+    const box = (await footer.boundingBox())!
+    const middle = box.y + box.height / 2
+    for (const item of [ring, footer.getByTestId(TestId.aiAssistant.sentDataChip)]) {
+      const itemBox = (await item.boundingBox())!
+      expect(Math.abs(itemBox.y + itemBox.height / 2 - middle)).toBeLessThan(2)
+    }
+    const send = (await footer.getByTestId(TestId.aiAssistant.sendBtn).boundingBox())!
+    expect(send.x + send.width).toBeLessThanOrEqual(box.x + box.width)
+
+    await selectAssistantArea(page, 'Help')
+    await panel.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
+    await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute('data-level', 'questions')
+  })
 })
 
 test.describe('AI assistant context meter (stub local server)', () => {
@@ -339,6 +469,36 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await api.disableAiFeatures()
   })
 
+  test('with a local server the footer keeps Send inside and truncates the long badge text', async ({
+    page,
+    api,
+    sampleSurvey: _,
+  }) => {
+    const designer = new FormDesigner(page)
+    await designer.goto()
+    const userUuid = await api.getCurrentUserUuid()
+    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await designer.goto()
+    await openAssistantPanel(page)
+    // all footer items shown: the ring needs a finished answer
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await acceptConsentAndWait(page)
+
+    const footer = assistantPanel(page).getByTestId(TestId.aiAssistant.composerFooter)
+    const text = footer.locator('.ai-data-location-badge__text')
+    await expect(footer.getByTestId(TestId.aiAssistant.contextMeter)).toBeVisible()
+    await expect(text).toHaveText('On this device · LM Studio')
+    // the badge text is the only item that shrinks; Send keeps its place inside the footer
+    await expect.poll(async () => await text.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
+    await expect
+      .poll(async () => {
+        const box = (await footer.boundingBox())!
+        const send = (await footer.getByTestId(TestId.aiAssistant.sendBtn).boundingBox())!
+        return send.x >= box.x && send.x + send.width <= box.x + box.width
+      })
+      .toBe(true)
+  })
+
   test('after an answer the meter shows the reported usage against the context size', async ({
     page,
     api,
@@ -356,21 +516,23 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await acceptConsentAndWait(page)
 
     const meter = assistantPanel(page).getByTestId(TestId.aiAssistant.contextMeter)
-    await expect(meter).toContainText(`${compact(STUB_CONTEXT_USED_TOKENS)} / ${compact(STUB_CONTEXT_TOKENS)} tokens`)
-    await expect(meter).not.toContainText('≈')
-    await expect(meter).not.toContainText('(assumed)')
-    const bar = meter.getByRole('meter')
-    await expect(bar).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
-    await expect(bar).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
+    const tokensText = `${compact(STUB_CONTEXT_USED_TOKENS)} / ${compact(STUB_CONTEXT_TOKENS)} tokens`
+    await expect(meter).toHaveAttribute('role', 'meter')
+    await expect(meter).toHaveAttribute('aria-valuetext', tokensText)
+    await expect(meter).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
+    await expect(meter).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
+    // the header ring shows the tokens in its tooltip
+    await meter.hover()
+    await expect(page.getByRole('tooltip')).toHaveText(tokensText)
     expect(stub!.requests.some((request) => request.path === '/v1/chat/completions')).toBe(true)
 
     // a reload shows the stored usage again: the meter needs no new answer (the status probes of the server are fine)
     const chatRequestsBefore = countChatRequests(stub!)
     await page.reload()
     await openAssistantPanel(page)
-    await expect(meter).toContainText(`${compact(STUB_CONTEXT_USED_TOKENS)} / ${compact(STUB_CONTEXT_TOKENS)} tokens`)
-    await expect(bar).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
-    await expect(bar).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
+    await expect(meter).toHaveAttribute('aria-valuetext', tokensText)
+    await expect(meter).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
+    await expect(meter).toHaveAttribute('aria-valuemax', String(STUB_CONTEXT_TOKENS))
     expect(countChatRequests(stub!)).toBe(chatRequestsBefore)
   })
 
@@ -390,13 +552,14 @@ test.describe('AI assistant context meter (stub local server)', () => {
     // the first-use consent is asked once per user, survey and feature: take it with a quick turn, then start over
     await sendAssistantMessage(page, LABEL_REQUEST)
     await acceptConsentAndWait(page)
-    await assistantPanel(page).getByTestId(TestId.aiAssistant.menuBtn).click()
-    await page.getByTestId(TestId.aiAssistant.newConversationBtn).click()
+    await assistantPanel(page).getByTestId(TestId.aiAssistant.newConversationBtn).click()
     await expect(userMessages(page)).toHaveCount(0)
 
     stub!.setChunkDelay(1000)
     await sendAssistantMessage(page, LABEL_REQUEST)
     await expect(assistantPanel(page)).toHaveAttribute('data-busy', 'true')
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.newConversationBtn)).toBeDisabled()
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.menuBtn)).toBeDisabled()
 
     // closed, the panel follows the route: Help away from the designer (the answer goes on in the background)
     await closeAssistantPanel(page)

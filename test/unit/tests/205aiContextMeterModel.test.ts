@@ -2,10 +2,13 @@ import type { AssistantMessageUsage, ConversationMessage } from '@webapp/ai/conv
 import {
   buildContextMeter,
   CONTEXT_CRITICAL_RATIO,
+  CONTEXT_RING_CIRCUMFERENCE,
   CONTEXT_WARNING_RATIO,
   formatTokenCount,
   getContextMeterLevel,
+  getContextMeterShortText,
   getContextMeterText,
+  getContextRingDashArray,
   getLatestUsage,
 } from '@webapp/components/ai/Assistant/contextMeterModel'
 import { fakeT } from '@test/unit/utils/assistantTestUtils'
@@ -114,5 +117,19 @@ describe('context meter model (205)', () => {
     )
     const cloud = meterOf(usage({ windowTokens: null }))!
     expect(getContextMeterText({ meter: cloud, t: fakeT })).toBe('aiAssistant.context.tokens {"used":"12.4K"}')
+  })
+
+  test('ring: the filled arc is the share of the window; no arc without a window', () => {
+    const c = CONTEXT_RING_CIRCUMFERENCE
+    expect(getContextRingDashArray(0)).toBe(`0 ${c}`)
+    expect(getContextRingDashArray(0.25)).toBe(`${c * 0.25} ${c}`)
+    expect(getContextRingDashArray(1)).toBe(`${c} ${c}`)
+    expect(getContextRingDashArray(null)).toBeNull()
+  })
+
+  test('short text: used and window, without the word tokens', () => {
+    expect(getContextMeterShortText(meterOf(usage()))).toBe('12.4K / 120K')
+    expect(getContextMeterShortText(meterOf(usage({ windowTokens: null })))).toBe('12.4K')
+    expect(getContextMeterShortText(meterOf(usage({ estimated: true })))).toBe('≈ 12.4K / 120K')
   })
 })

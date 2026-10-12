@@ -44,7 +44,10 @@ export type SuggestionRequest = {
   area: AssistantArea
   suggestionId: string
   scope: SuggestionScope
+  // English prompt for the model
   prompt: string
+  // what the chat shows as the user's message, in the interface language
+  displayText: string
 }
 
 export type SettleOutcome = 'settled' | 'failed' // settled: every card applied or discarded; failed: error, stop, or no card

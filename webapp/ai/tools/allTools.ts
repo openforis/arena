@@ -4,6 +4,7 @@
  */
 import { analysisTools } from './analysis'
 import { cleaningTools } from './cleaning'
+import { conversationSetTitleTool } from './common/conversationSetTitle'
 import { viewGetCurrentTool } from './common/viewGetCurrent'
 import { expressionCheckTool } from './design/expressionCheck'
 import { expressionsProposeSetTool } from './design/expressionsProposeSet'
@@ -27,6 +28,7 @@ export const ALL_TOOLS: AiTool[] = [
   nodeDefSearchTool,
   surveyGetValidationTool,
   viewGetCurrentTool,
+  conversationSetTitleTool,
   expressionCheckTool,
   nodeDefProposeCreateTool,
   nodeDefProposeUpdateTool,
