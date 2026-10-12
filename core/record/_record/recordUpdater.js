@@ -31,7 +31,7 @@ export const mergeNodes =
       if (Node.isDeleted(n)) {
         recordUpdated = deleteNode(n, { sideEffect })(recordUpdated)
       } else {
-        const nodeExisting = RecordReader.getNodeByUuid(nodeUuid)(recordUpdated)
+        const nodeExisting = RecordReader.getNodeByUuid({ uuid: nodeUuid })(recordUpdated)
         // Exclude dirty nodes currently being edited by the user
         const toBeAdded =
           !nodeExisting || // NodeExisting does not exist, n is new node

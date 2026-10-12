@@ -702,7 +702,7 @@ const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
   }
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+  const entityNode = Record.getNodeByUuid({ uuid: entityNodeUuid })(record)
   if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
     throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
   }

@@ -33,7 +33,7 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
     const recordUuid = Record.getUuid(currentRecord)
     const sideEffect = !includeFiles
-    const nodes = Record.getNodesByDefUuid(nodeDefUuid)(currentRecord)
+    const nodes = Record.getNodesByDefUuid({ nodeDefUuid })(currentRecord)
     const nodeUuidsToDelete = []
     for (const node of nodes) {
       const nodeUuid = Node.getUuid(node)

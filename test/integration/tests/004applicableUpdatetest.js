@@ -87,7 +87,7 @@ describe('Applicable Test', () => {
       record = recordUpdate
       global.applicableRecord = record
 
-      const nodeDependentParentUpdated = Record.getNodeByUuid(nodeDependentParentUuid)(record)
+      const nodeDependentParentUpdated = Record.getNodeByUuid({ uuid: nodeDependentParentUuid })(record)
 
       const applicable = Node.isChildApplicable(nodeDependentDefUuid)(nodeDependentParentUpdated)
 
