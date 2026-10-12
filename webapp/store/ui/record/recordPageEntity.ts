@@ -39,9 +39,9 @@ export const getPageEntityFromParent = ({
 }: GetPageEntityFromParentParams) => {
   const parentDef = Survey.getNodeDefByUuid(parentDefUuid)(survey)
   const parentMappedUuid = pagesUuidMap?.[parentDefUuid]
-  let parentEntity = parentMappedUuid ? RecordCore.getNodeByUuid(parentMappedUuid)(record) : null
+  let parentEntity = parentMappedUuid ? RecordCore.getNodeByUuid({ uuid: parentMappedUuid })(record) : null
   if (!parentEntity && parentDef && !NodeDef.isMultiple(parentDef)) {
-    parentEntity = RecordCore.getNodesByDefUuid(parentDefUuid)(record)?.[0] ?? null
+    parentEntity = RecordCore.getNodesByDefUuid({ nodeDefUuid: parentDefUuid })(record)?.[0] ?? null
   }
   if (!parentEntity) return null
 
@@ -64,7 +64,7 @@ export const getPageEntity = ({ survey, record, pagesUuidMap, pageNodeDefUuid }:
 
   const mappedUuid = pagesUuidMap?.[pageNodeDefUuid]
   if (mappedUuid) {
-    const mappedEntity = RecordCore.getNodeByUuid(mappedUuid)(record)
+    const mappedEntity = RecordCore.getNodeByUuid({ uuid: mappedUuid })(record)
     if (mappedEntity) return mappedEntity
   }
 
@@ -84,7 +84,7 @@ export const getPageEntity = ({ survey, record, pagesUuidMap, pageNodeDefUuid }:
   }
 
   if (NodeDef.isMultiple(pageNodeDef)) return null
-  return RecordCore.getNodesByDefUuid(pageNodeDefUuid)(record)?.[0] ?? null
+  return RecordCore.getNodesByDefUuid({ nodeDefUuid: pageNodeDefUuid })(record)?.[0] ?? null
 }
 
 /**

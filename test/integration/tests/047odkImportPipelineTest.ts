@@ -205,17 +205,17 @@ describe('ODK import pipeline - real form + real submissions (onaio/onadata)', (
 
       // real multi-select answer "ambulance bicycle" -> one sibling node per selected code, each
       // resolved to the real category item inserted from the form's own static <item> choices
-      const multiSelectNodes = Record.getNodesByDefUuid(multiSelectDefUuid)(record)
+      const multiSelectNodes = Record.getNodesByDefUuid({ nodeDefUuid: multiSelectDefUuid })(record)
       const selectedItemUuids = multiSelectNodes
         .map((node: any) => Node.getCategoryItemUuid(node))
         .sort((a: string, b: string) => a.localeCompare(b))
       expect(selectedItemUuids).toEqual([ambulanceItemUuid, bicycleItemUuid].sort((a, b) => a.localeCompare(b)))
 
       // real nested select1 answers ("daily" for ambulance, "weekly" for bicycle), 3 levels deep
-      const ambulanceFrequencyNode = Record.getNodesByDefUuid(ambulanceFrequencyDefUuid)(record)[0]
+      const ambulanceFrequencyNode = Record.getNodesByDefUuid({ nodeDefUuid: ambulanceFrequencyDefUuid })(record)[0]
       expect(Node.getCategoryItemUuid(ambulanceFrequencyNode)).toBe(dailyItemUuid)
 
-      const bicycleFrequencyNode = Record.getNodesByDefUuid(bicycleFrequencyDefUuid)(record)[0]
+      const bicycleFrequencyNode = Record.getNodesByDefUuid({ nodeDefUuid: bicycleFrequencyDefUuid })(record)[0]
       expect(Node.getCategoryItemUuid(bicycleFrequencyNode)).toBe(weeklyItemUuid)
     }
 
@@ -251,6 +251,6 @@ describe('ODK import pipeline - real form + real submissions (onaio/onadata)', (
     )
     // the field was missing from the submission entirely (not just empty) - no value node at all,
     // never guessed at
-    expect(Record.getNodesByDefUuid(multiSelectDefUuid)(record)).toHaveLength(0)
+    expect(Record.getNodesByDefUuid({ nodeDefUuid: multiSelectDefUuid })(record)).toHaveLength(0)
   })
 })

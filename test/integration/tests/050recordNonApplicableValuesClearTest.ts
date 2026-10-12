@@ -119,7 +119,7 @@ const updateNum = async ({ thread, survey, record, value, clearNonApplicableValu
 
 const getIndividuals = ({ survey, record }) => {
   const individualDef = Survey.getNodeDefByName('individual')(survey)
-  return Record.getNodesByDefUuid(NodeDef.getUuid(individualDef))(record)
+  return Record.getNodesByDefUuid({ nodeDefUuid: NodeDef.getUuid(individualDef) })(record)
 }
 
 const getValue = ({ survey, record, path }) => RecordUtils.findNodeValueByPath(path)(survey, record)

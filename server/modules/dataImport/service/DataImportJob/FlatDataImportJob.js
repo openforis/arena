@@ -356,7 +356,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
     const nodesUpdated = {}
     pendingNodesByUuid.forEach((_node, nodeUuid) => {
-      const node = Record.getNodeByUuid(nodeUuid)(currentRecord)
+      const node = Record.getNodeByUuid({ uuid: nodeUuid })(currentRecord)
       if (node) {
         nodesUpdated[nodeUuid] = node
       }
@@ -444,7 +444,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       if (NodeDef.isFile(nodeDef)) {
-        const oldNode = Record.getNodeByUuid(Node.getUuid(node))(originalRecord)
+        const oldNode = Record.getNodeByUuid({ uuid: Node.getUuid(node) })(originalRecord)
         if (!Node.isValueBlank(oldNode)) {
           const fileToDeleteUuid = Node.getFileUuid(oldNode)
           filesToDeleteByUuid[fileToDeleteUuid] = SurveyFile.createFileFromNode({ node: oldNode })
