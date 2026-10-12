@@ -1,4 +1,4 @@
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as AuthGroup from '@core/auth/authGroup'
 
 const surveyUuid = 'survey-1'

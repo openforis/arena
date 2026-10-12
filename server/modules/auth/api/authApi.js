@@ -6,7 +6,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as ProcessUtils from '@core/processUtils'
 import SystemError from '@core/systemError'
 

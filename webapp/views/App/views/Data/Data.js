@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { appModules, dataModules } from '@webapp/app/appModules'
 

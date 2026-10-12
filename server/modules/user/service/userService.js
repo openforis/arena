@@ -1,6 +1,6 @@
 import * as fs from 'node:fs'
 
-import { ServiceRegistry } from '@openforis/arena-core'
+import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
@@ -15,7 +15,6 @@ import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'

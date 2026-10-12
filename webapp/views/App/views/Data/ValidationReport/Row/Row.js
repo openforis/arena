@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 import { useI18n } from '@webapp/store/system'

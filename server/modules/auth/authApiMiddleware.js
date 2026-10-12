@@ -2,7 +2,7 @@ import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 

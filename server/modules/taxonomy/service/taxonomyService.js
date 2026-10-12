@@ -5,7 +5,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import { DataImportTemplateTypes } from '@core/dataImport'
 import * as User from '@core/user/user'
 import * as NumberUtils from '@core/numberUtils'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as DbUtils from '@server/db/dbUtils'
