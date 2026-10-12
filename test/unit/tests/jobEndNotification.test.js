@@ -93,8 +93,8 @@ describe('Job end notification', () => {
     const [notification] = notifications
     expect(notification.ended).toBe(true)
     expect(notification.status).toBe(jobStatus.failed)
-    // the original error is swallowed by JobBase.start when the job is not running yet
-    expect(JSON.stringify(notification.errors)).toContain('Job terminated unexpectedly')
+    // JobBase.start reports the original error also when the job is not running yet
+    expect(JSON.stringify(notification.errors)).toContain('cannot connect to db')
   })
 })
 

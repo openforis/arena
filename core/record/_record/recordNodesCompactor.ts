@@ -1,4 +1,4 @@
-import type { Node as ArenaNode } from '@openforis/arena-core'
+import type { ArenaRecordNode as ArenaNode } from '@openforis/arena-core'
 
 import { NodeMeta } from '../_node/nodeMeta'
 import * as NodeRefData from '../nodeRefData'

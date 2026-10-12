@@ -48,12 +48,11 @@ export default class RecordsValidationJob extends Job {
 
     const nodesArray = []
     Records.visitDescendantsAndSelf({
-      record,
       node: Records.getRoot(record),
       visitor: (node) => {
         nodesArray.push(node)
       },
-    })
+    })(record)
     await RecordManager.validateSortedNodesAndPersistValidation(
       {
         user,

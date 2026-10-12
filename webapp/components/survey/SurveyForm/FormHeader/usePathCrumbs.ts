@@ -63,8 +63,8 @@ export const usePathCrumbs = (entry: boolean): FormPathCrumb[] => {
       const nodeUuidCurrent = pagesUuidMap[nodeDefUuidCurrent]
 
       const nodeCurrent = NodeDef.isSingle(nodeDefCurrent)
-        ? Record.getNodesByDefUuid(nodeDefUuidCurrent)(record)[0]
-        : Record.getNodeByUuid(nodeUuidCurrent)(record)
+        ? Record.getNodesByDefUuid({ nodeDefUuid: nodeDefUuidCurrent })(record)[0]
+        : Record.getNodeByUuid({ uuid: nodeUuidCurrent })(record)
 
       if (nodeCurrent) {
         const nodeDefKeys = Survey.getNodeDefKeysSorted({ nodeDef: nodeDefCurrent, cycle })(survey)

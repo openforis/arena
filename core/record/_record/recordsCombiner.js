@@ -20,12 +20,12 @@ const findEntityByUuidOrKeys = ({
   uuid = null,
   keyValuesByDefUuid = null,
 }) => {
-  const entityWithSameUuid = uuid ? Records.getNodeByUuid(uuid)(record) : null
+  const entityWithSameUuid = uuid ? Records.getNodeByUuid({ uuid })(record) : null
   if (entityWithSameUuid) {
     return entityWithSameUuid
   }
   return keyValuesByDefUuid
-    ? Records.findEntityByKeyValues({ survey, record, parentEntity, entityDefUuid, keyValuesByDefUuid })
+    ? Records.findEntityByKeyValues({ survey, parentEntity, entityDefUuid, keyValuesByDefUuid })(record)
     : null
 }
 
@@ -199,7 +199,8 @@ const _addNodeToUpdateResult = ({
   newNodeToAdd[Node.keys.id] = undefined
   newNodeToAdd[Node.keys.recordUuid] = updateResult.record.uuid
 
-  const parentEntity = parentEntityParam ?? RecordReader.getNodeByUuid(Node.getParentUuid(node))(updateResult.record)
+  const parentEntity =
+    parentEntityParam ?? RecordReader.getNodeByUuid({ uuid: Node.getParentUuid(node) })(updateResult.record)
   _recalculateNodeHierarchy({ node: newNodeToAdd, parentEntity })
   updateResult.addNode(newNodeToAdd, { sideEffect })
 }
@@ -209,7 +210,7 @@ const _addNodeToUpdateResult = ({
 // on its own copy and merge it again without the same nodes being added twice (or not found anymore).
 // Nodes coming from a different record always get new uuids: the source record can exist on its own.
 const _canKeepNodeUuid = ({ keepNodeUuids, record, node }) =>
-  keepNodeUuids && !RecordReader.getNodeByUuid(Node.getUuid(node))(record)
+  keepNodeUuids && !RecordReader.getNodeByUuid({ uuid: Node.getUuid(node) })(record)
 
 const _mergeSingleAttributeValues = ({
   survey,
@@ -359,9 +360,8 @@ const _mergeMultipleEntities = ({
     const keyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({
       survey,
       cycle: recordSource.cycle,
-      record: recordSource,
       entity: childSource,
-    })
+    })(recordSource)
     const childTarget = findEntityByUuidOrKeys({
       survey,
       record: updateResult.record,

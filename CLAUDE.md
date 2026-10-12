@@ -206,6 +206,9 @@ New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When s
 **Types from `@openforis/arena-core`:**
 Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
 
+**Single `@openforis/arena-core` version:**
+`@openforis/arena-core` is a direct dependency and a dependency of `@openforis/arena-server`: both must resolve to the same version (one copy), otherwise the services registered by arena-server in the `ServiceRegistry` singleton are not visible to arena. When updating either package, align the arena-core version range with the one required by arena-server and run `yarn dedupe @openforis/arena-core`; the CI `build` job fails if `yarn.lock` resolves more than one arena-core version.
+
 **Cognitive complexity:**
 Keep the cognitive complexity of every function at 15 or below (SonarCloud rule). Split complex logic into small helper functions, use early returns, and avoid deeply nested conditions/loops.
 
