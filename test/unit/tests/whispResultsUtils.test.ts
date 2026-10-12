@@ -1,4 +1,5 @@
 import {
+  WhispColumnsCollector,
   extractWhispColumns,
   findNumericColumns,
   isWhispPropExcluded,
@@ -57,5 +58,17 @@ describe('Whisp results utils', () => {
 
   test('chunks', () => {
     expect(toChunks([1, 2, 3, 4, 5], 2)).toEqual([[1, 2], [3, 4], [5]])
+  })
+
+  test('columns collector: features added one at a time, only non-empty values to store are returned', () => {
+    const collector = new WhispColumnsCollector()
+    const values = features.map((feature) => collector.addFeature(feature))
+    expect(values).toEqual([
+      { Area: 1.5, Country: 'GHA', GFC_TC_2020: 0.3, risk_pcrop: 'low' },
+      { Country: 'CIV', GFC_TC_2020: 0.1, risk_pcrop: 'high' },
+    ])
+    const columns = collector.getColumns({ existingColumnNames: [] })
+    expect(columns).toEqual(extractWhispColumns({ features, existingColumnNames: [] }))
+    expect(collector.getNumericColumns(columns)).toEqual(['area', 'gfc_tc_2020'])
   })
 })
