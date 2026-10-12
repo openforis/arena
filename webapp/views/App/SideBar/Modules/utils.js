@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import * as User from '@core/user/user'
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import {
   analysisModules,
@@ -43,6 +44,8 @@ export const getModulesHierarchy = (user, surveyInfo) => {
   const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
   const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
   const canImportRecords = Authorizer.canImportRecords(user, surveyInfo)
+  const canViewUsersAccessRequests =
+    ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)
 
   return [
     // home
@@ -105,7 +108,12 @@ export const getModulesHierarchy = (user, surveyInfo) => {
       ? [
           getModule({
             module: appModules.systemAdmin,
-            children: [systemAdminModules.jobMonitor, systemAdminModules.systemLogs],
+            children: [
+              ...(canViewUsersAccessRequests ? [userModules.usersAccessRequest] : []),
+              ...(Authorizer.canViewAllUsers(user) ? [userModules.users] : []),
+              systemAdminModules.jobMonitor,
+              systemAdminModules.systemLogs,
+            ],
           }),
         ]
       : []),
