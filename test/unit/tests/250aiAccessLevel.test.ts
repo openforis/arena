@@ -72,7 +72,7 @@ describe('access level (250)', () => {
   })
 
   test('raising the level switches on the newly included ranks only', () => {
-    const custom = { ...allOff, chat: true, assistantSuggestions: false, expressions: true }
+    const custom: Record<string, boolean> = { ...allOff, chat: true, assistantSuggestions: false, expressions: true }
     const raised = raiseAccessLevelToggles({ from: 1, to: 3, toggles: custom })
     // rank 1 was already included: kept as customized
     expect(raised.assistantSuggestions).toBe(false)
