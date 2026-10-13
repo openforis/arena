@@ -61,7 +61,7 @@ describe('aiAssistant i18n', () => {
 
   const enSettingsKeys = flatten(enSettings)
   // the panel blocks rewritten for the redesign: no English left in ru and mn
-  const PANEL_PREFIXES = ['status.', 'where.', 'localServer.', 'cloud.', 'dataClasses.', 'features.']
+  const PANEL_PREFIXES = ['status.', 'where.', 'localServer.', 'cloud.', 'dataClasses.', 'access.', 'features.']
 
   test.each(Object.keys(settingsByLang))('%s userAiSettings has the same keys as en', (lang) => {
     expect(Object.keys(flatten(settingsByLang[lang])).sort()).toEqual(Object.keys(enSettingsKeys).sort())

@@ -1,6 +1,5 @@
 export default {
   section: 'Recursos de IA',
-  enableFeatures: 'Ativar recursos de IA',
   featuresDisabled: 'Os recursos de IA estão desativados nesta implantação.',
   encryptionMissing:
     'A implantação não possui AI_USER_KEY_ENCRYPTION_SECRET; chaves API pessoais não podem ser salvas até que um administrador configure isso.',
@@ -85,17 +84,32 @@ export default {
     schema: 'Estrutura do inventário',
     data: 'Dados dos registros',
   },
-  features: {
-    section: 'Com o que a IA pode ajudar e o que ela vê',
-    keyHint:
-      'Estrutura do inventário e Dados dos registros correspondem às duas configurações da política de IA de cada inventário.',
-    sendsLabel: 'Envia:',
-    groupHints: {
-      none: 'Qualquer motor.',
-      cloud: 'Política padrão do inventário: qualquer motor, incluindo a nuvem.',
-      onDevice:
-        'Política padrão do inventário: somente este dispositivo. Um motor na nuvem precisa da permissão do administrador do inventário.',
+  access: {
+    section: 'O que a IA pode ver',
+    levels: {
+      off: 'Desativada',
+      help: 'Só ajuda',
+      design: '+ Estrutura do inventário',
+      data: '+ Dados dos registros',
     },
+    classes: {
+      help: { title: 'Ajuda do Arena', text: 'Sua pergunta e trechos do manual do usuário do Arena.' },
+      design: {
+        title: 'Estrutura do inventário',
+        text: 'Entidades, atributos, rótulos, categorias e expressões. Sem valores de registros.',
+      },
+      data: {
+        title: 'Dados dos registros',
+        text: 'Valores dos registros e resultados de consultas. Por padrão, apenas um servidor neste dispositivo pode recebê-los.',
+      },
+    },
+    count: '{{on}} de {{total}} recursos ativados',
+    off: 'Os recursos de IA estão desativados',
+    customize: 'Personalizar',
+    customizeHint: 'A política de IA de cada inventário ainda pode bloquear um provedor.',
+    sendsInfo: 'O que é enviado',
+  },
+  features: {
     chat: {
       label: 'Assistente de ajuda',
       sends: 'Sua pergunta, trechos do manual do usuário do Arena e onde você está no Arena (o nome do módulo).',

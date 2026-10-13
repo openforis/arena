@@ -1,6 +1,5 @@
 export default {
   section: 'Funciones de IA',
-  enableFeatures: 'Habilitar funciones de IA',
   featuresDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
@@ -85,17 +84,32 @@ export default {
     schema: 'Diseño de la encuesta',
     data: 'Datos de los registros',
   },
-  features: {
-    section: 'Con qué puede ayudar la IA y qué ve',
-    keyHint:
-      'Diseño de la encuesta y Datos de los registros corresponden a los dos ajustes de la política de IA de cada encuesta.',
-    sendsLabel: 'Envía:',
-    groupHints: {
-      none: 'Cualquier motor.',
-      cloud: 'Política predeterminada de la encuesta: cualquier motor, incluida la nube.',
-      onDevice:
-        'Política predeterminada de la encuesta: solo este dispositivo. Un motor en la nube requiere que el administrador de la encuesta lo permita.',
+  access: {
+    section: 'Qué puede ver la IA',
+    levels: {
+      off: 'Desactivada',
+      help: 'Solo ayuda',
+      design: '+ Diseño de la encuesta',
+      data: '+ Datos de los registros',
     },
+    classes: {
+      help: { title: 'Ayuda de Arena', text: 'Su pregunta y fragmentos del manual de usuario de Arena.' },
+      design: {
+        title: 'Diseño de la encuesta',
+        text: 'Entidades, atributos, etiquetas, categorías y expresiones. Sin valores de registros.',
+      },
+      data: {
+        title: 'Datos de los registros',
+        text: 'Valores de registros y resultados de consultas. De forma predeterminada, solo un servidor en este dispositivo puede recibirlos.',
+      },
+    },
+    count: '{{on}} de {{total}} funciones activadas',
+    off: 'Las funciones de IA están desactivadas',
+    customize: 'Personalizar',
+    customizeHint: 'La política de IA de cada encuesta aún puede bloquear un proveedor.',
+    sendsInfo: 'Qué envía',
+  },
+  features: {
     chat: {
       label: 'Asistente de ayuda',
       sends:

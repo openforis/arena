@@ -9,6 +9,8 @@ const _withLang =
 
 export const TestId = {
   ai: {
+    accessCustomize: 'ai-access-customize',
+    accessLevel: (level) => `ai-access-level-${level}`,
     cloudBaseUrl: 'ai-cloud-base-url',
     cloudBaseUrlHint: 'ai-cloud-base-url-hint',
     cloudBaseUrlHintLink: 'ai-cloud-base-url-hint-link',

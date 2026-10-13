@@ -2,7 +2,6 @@
  * Feature switches of the AI settings panel, grouped by the data they send. Pure.
  */
 import { AiDataClass, AiFeatureCategory } from '@common/ai/features'
-import type { AiPolicyLevel } from '@common/ai/policy'
 
 export type FeatureGroupId = 'noSurveyContent' | 'surveyDesign' | 'recordData'
 
@@ -13,8 +12,6 @@ export type FeatureGroup = {
   id: FeatureGroupId
   // null: the features read no survey (the Help chat)
   dataClass: AiDataClass | null
-  // default survey policy level of the data class (features.groupHints.<hintKey>)
-  hintKey: AiPolicyLevel | 'none'
   categories: AiFeatureCategory[]
 }
 
@@ -23,17 +20,15 @@ const { assistantAnalysis, assistantCleaning, assistantSuggestions, userActivity
 
 export const FEATURE_GROUPS: FeatureGroup[] = [
   // the suggestions read the survey in the browser and send nothing until Do it (then the area's switch applies)
-  { id: 'noSurveyContent', dataClass: null, hintKey: 'none', categories: [chat, assistantSuggestions] },
+  { id: 'noSurveyContent', dataClass: null, categories: [chat, assistantSuggestions] },
   {
     id: 'surveyDesign',
     dataClass: AiDataClass.schema,
-    hintKey: 'cloud',
     categories: [expressions, translation, assistantDesign, dataQuery, dataDictionary],
   },
   {
     id: 'recordData',
     dataClass: AiDataClass.data,
-    hintKey: 'onDevice',
     categories: [assistantAnalysis, assistantCleaning, userActivity],
   },
 ]
