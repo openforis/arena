@@ -98,7 +98,6 @@ describe('handleModelRequest: generate', () => {
 
   test.each([
     [body({ feature: 'nope' }), 400, 'aiFeatureUnknown'],
-    [body({ feature: 'dataDictionary' }), 400, 'aiFeatureUnknown'],
     [body({ call: { prompt, tools: [{}] } }), 400, 'aiCallInvalid'],
     [
       body({ call: { prompt: [{ role: 'user', content: [{ type: 'text', text: 'x'.repeat(1001) }] }] } }),

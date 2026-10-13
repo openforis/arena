@@ -19,11 +19,24 @@ const promptText = (prompt: LanguageModelV4Prompt): string =>
     )
     .join('\n')
 
+type CannedAnswer = string | ((text: string) => string)
+
+/**
+ * Describes every field of the data dictionary prompt (its field list has `uuid=...`).
+ * @param {string} text - Prompt text.
+ * @returns {string} The JSON answer.
+ */
+const describeEveryField = (text: string): string =>
+  JSON.stringify({
+    descriptions: [...text.matchAll(/uuid="([^"]+)"/g)].map(([, uuid]) => ({ uuid, description: 'MOCK description.' })),
+  })
+
 // matched against the system prompts of common/ai/prompts (keep in sync with test/e2e/specs/aiFeatures.spec.ts)
-const CANNED_ANSWERS: [RegExp, string][] = [
+const CANNED_ANSWERS: [RegExp, CannedAnswer][] = [
   // node def names of the e2e sample survey (test/e2e/fixtures/seed/sampleSurveyModel.ts)
   [/<expression>/, '<expression>tree_dec_1 > 0</expression><explanation>MOCK: must be positive.</explanation>'],
   [/translate survey labels/i, '{"translations":[]}'],
+  [/field descriptions for an Open Foris Arena/i, describeEveryField],
   // the two data-query prompts both mention the Data Explorer: match the summarize one first
   [/names data queries/i, '{"name":"mock_query","label":"MOCK label","description":"MOCK"}'],
   [/builds data queries/i, '{"entity":"tree","mode":"raw","attributes":["tree_dec_1"],"explanation":"MOCK query"}'],
@@ -38,7 +51,9 @@ const CANNED_ANSWERS: [RegExp, string][] = [
 export const mockAnswerFor = (prompt: LanguageModelV4Prompt): string => {
   const text = promptText(prompt)
   const match = CANNED_ANSWERS.find(([pattern]) => pattern.test(text))
-  return match ? match[1] : 'MOCK answer.'
+  if (!match) return 'MOCK answer.'
+  const [, answer] = match
+  return typeof answer === 'function' ? answer(text) : answer
 }
 
 const streamOf = (text: string): ReadableStream<LanguageModelV4StreamPart> => {

@@ -17,15 +17,12 @@ const runMiddleware = async (body: any, user: any = null) => {
 }
 
 describe('requireAiFeaturePermission', () => {
-  test.each(['nope', 'dataDictionary', 'internalPing', undefined])(
-    'refuses feature %p with 400 aiFeatureUnknown',
-    async (feature) => {
-      const { res, nextArg } = await runMiddleware({ feature })
-      expect(res.statusCode).toBe(400)
-      expect(res.body.key).toBe('aiFeatureUnknown')
-      expect(nextArg).toBe('not called')
-    }
-  )
+  test.each(['nope', 'internalPing', undefined])('refuses feature %p with 400 aiFeatureUnknown', async (feature) => {
+    const { res, nextArg } = await runMiddleware({ feature })
+    expect(res.statusCode).toBe(400)
+    expect(res.body.key).toBe('aiFeatureUnknown')
+    expect(nextArg).toBe('not called')
+  })
 
   test('chat: anonymous → 401 written by requireLoggedInUser, logged in → next()', async () => {
     const anonymous = await runMiddleware({ feature: 'chatbot' })
@@ -46,6 +43,7 @@ describe('gateway feature → permission middleware mapping', () => {
     dataQueryGenerate: AuthMiddleware.requireRecordListViewPermission,
     dataQuerySummarize: AuthMiddleware.requireRecordListViewPermission,
     activityLogSummary: AuthMiddleware.requireSurveyViewPermission,
+    dataDictionary: AuthMiddleware.requireSurveyViewPermission,
     chatbot: AuthMiddleware.requireLoggedInUser,
     assistantDesign: AuthMiddleware.requireSurveyEditPermission,
     assistantAnalysis: AuthMiddleware.requireRecordListViewPermission,

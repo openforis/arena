@@ -97,6 +97,24 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
   return { job }
 }
 
+/**
+ * Fetches the node defs of the schema summary that need an AI description.
+ * @param {object} params - Params.
+ * @param {number} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @returns {Promise<{surveyName: string, nodeDefs: object[]}>} The items.
+ */
+export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle, signal }) => {
+  // errorHandledLocally: the progress dialog shows the error
+  const { data } = await axios.get(`/api/survey/${surveyId}/schema-summary/ai-items`, {
+    params: { cycle },
+    signal,
+    errorHandledLocally: true,
+  })
+  return data
+}
+
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
 
