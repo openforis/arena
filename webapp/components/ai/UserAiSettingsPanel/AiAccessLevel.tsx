@@ -32,7 +32,7 @@ type Props = {
 }
 
 /**
- * The 4 steps as a radio group (arrow keys move the selection, as in a native radio group).
+ * The 4 steps as a radio group (arrow keys move the selection one step and stop at the first and last step).
  * @param {object} props - Props.
  * @param {AccessLevel} props.accessLevel - Selected level.
  * @param {Function} props.onLevelChange - Called with the new level.
@@ -47,12 +47,16 @@ const LevelSteps = ({
 }) => {
   const i18n = useI18n()
   const buttonsRef = useRef<(HTMLButtonElement | null)[]>([])
+  // why: re-selecting the current level changes nothing, so it must not mark the profile dirty
+  const select = (level: AccessLevel) => {
+    if (level !== accessLevel) onLevelChange(level)
+  }
   const onKeyDown = (event: React.KeyboardEvent) => {
     const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key]
     if (!step) return
     event.preventDefault()
     const next = Math.min(3, Math.max(0, accessLevel + step)) as AccessLevel
-    onLevelChange(next)
+    select(next)
     buttonsRef.current[next]?.focus()
   }
   return (
@@ -74,7 +78,7 @@ const LevelSteps = ({
           // roving tab stop: Tab enters on the selected step
           tabIndex={level === accessLevel ? 0 : -1}
           className={`user-ai-settings-panel__level${level === accessLevel ? ' user-ai-settings-panel__level--on' : ''}`}
-          onClick={() => onLevelChange(level)}
+          onClick={() => select(level)}
           data-testid={TestId.ai.accessLevel(level)}
         >
           {i18n.t(`userAiSettings:access.levels.${LEVEL_KEYS[level]}`)}
@@ -137,11 +141,12 @@ const FeatureChip = ({
   const i18n = useI18n()
   const sendsText = i18n.t(`userAiSettings:features.${category}.sends`)
   // server-run jobs: say they run on the Arena server, not the local one
-  const sends = SERVER_RUN_CATEGORIES.includes(category)
+  const description = SERVER_RUN_CATEGORIES.includes(category)
     ? `${sendsText} ${i18n.t(`userAiSettings:features.${category}.runs`)}`
     : sendsText
+  const label = i18n.t(`userAiSettings:features.${category}.label`)
   return (
-    <span className={`user-ai-settings-panel__chip${checked ? ' user-ai-settings-panel__chip--on' : ''}`}>
+    <span className={`user-ai-settings-panel__chip${checked && !disabled ? ' user-ai-settings-panel__chip--on' : ''}`}>
       <button
         type="button"
         aria-pressed={checked}
@@ -149,14 +154,15 @@ const FeatureChip = ({
         onClick={() => onChange(!checked)}
         data-testid={TestId.ai.featureToggle(category)}
       >
-        {i18n.t(`userAiSettings:features.${category}.label`)}
+        {label}
       </button>
-      <Tooltip title={sends} describeChild>
+      <Tooltip title={description} describeChild>
         <span
           className="user-ai-settings-panel__chip-info"
           tabIndex={0}
           role="img"
-          aria-label={`${i18n.t('userAiSettings:access.sendsInfo')}: ${sends}`}
+          // short name: the tooltip (describeChild) carries the sends text as the description
+          aria-label={`${i18n.t('userAiSettings:access.sendsInfo')}: ${label}`}
         >
           i
         </span>
@@ -236,7 +242,7 @@ export const AiAccessLevel = ({ accessLevel, toggles, onLevelChange, onToggleCha
             type="button"
             className="user-ai-settings-panel__link user-ai-settings-panel__customize"
             aria-expanded={open}
-            aria-controls={chipsId}
+            aria-controls={open ? chipsId : undefined}
             onClick={() => setOpen((prev) => !prev)}
             data-testid={TestId.ai.accessCustomize}
           >
