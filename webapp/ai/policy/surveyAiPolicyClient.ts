@@ -9,9 +9,9 @@ import type { AiPolicy } from '@common/ai/policy'
 import { createSurveyAiPolicyCache, type SurveyAiPolicyClientState } from './surveyAiPolicyCache'
 
 // read by appErrorsMiddleware: the caller shows the error
-const localErrors: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
+export const localErrors: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
 
-const getUrl = (surveyId: number): string => `/api/survey/${surveyId}/ai-policy`
+export const getUrl = (surveyId: number): string => `/api/survey/${surveyId}/ai-policy`
 
 const cache = createSurveyAiPolicyCache({
   fetchPolicy: async (surveyId) => (await axios.get(getUrl(surveyId), localErrors)).data,
