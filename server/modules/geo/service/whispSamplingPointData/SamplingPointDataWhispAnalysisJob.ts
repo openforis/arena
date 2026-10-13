@@ -5,7 +5,6 @@ import { Points } from '@openforis/arena-core'
 
 import { FileFormats } from '@core/fileFormats'
 import SystemError from '@core/systemError'
-import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
@@ -19,14 +18,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 import { WhishDataProcessor } from '../whishDataProcessor'
-import {
-  WhispColumn,
-  WhispColumnsCollector,
-  WhispFeature,
-  WhispValues,
-  toChunks,
-  whispExternalIdProp,
-} from './whispResultsUtils'
+import { WhispColumn, WhispColumnsCollector, WhispFeature, WhispValues, whispExternalIdProp } from './whispResultsUtils'
 
 // max number of features submitted to Whisp in a single analysis request
 const whispBatchSize = 1000
@@ -44,6 +36,13 @@ type FlatRow = Record<string, any>
 
 // line of the Whisp values temp file: index of the sampling point data row and its Whisp values
 type WhispValuesLine = [number, WhispValues]
+
+// sampling points with a location, stored in flat arrays of numbers to keep the memory usage low
+type SamplingPoints = {
+  rowIndexes: number[]
+  // longitude and latitude of every point, one after the other
+  coordinates: number[]
+}
 
 type SamplingPointFeature = {
   type: 'Feature'
@@ -69,36 +68,53 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     const srsIndex = Survey.getSRSIndex(Survey.getSurveyInfo(survey))
 
     const category = await this.fetchSamplingPointDataCategory()
-    const { headers, rows } = await this.readSamplingPointData({ survey, category })
-
-    const { features, rowIndexByExternalId } = SamplingPointDataWhispAnalysisJob.buildFeatures({ rows, srsIndex })
-    if (features.length === 0) {
-      throw new SystemError('geoWhispSamplingPointDataLocationsMissing')
-    }
-    // Whisp values stored in a temp file (one line per sampling point), to keep the memory usage low
+    // sampling point data kept in a temp file and read one row at a time, to keep the memory usage low
+    const samplingPointDataFilePath = FileUtils.newTempFilePath()
+    // Whisp values stored in a temp file (one line per sampling point)
     const whispValuesFilePath = FileUtils.newTempFilePath()
-    await FileUtils.writeFile(whispValuesFilePath)
     try {
-      const columnsCollector = await this.runWhispAnalysis({ features, rowIndexByExternalId, whispValuesFilePath })
+      await this.exportSamplingPointData({ survey, category, filePath: samplingPointDataFilePath })
+      const { headers, points } = await SamplingPointDataWhispAnalysisJob.readSamplingPoints({
+        filePath: samplingPointDataFilePath,
+        srsIndex,
+      })
+      if (points.rowIndexes.length === 0) {
+        throw new SystemError('geoWhispSamplingPointDataLocationsMissing')
+      }
+      await FileUtils.writeFile(whispValuesFilePath)
+      const columnsCollector = await this.runWhispAnalysis({ points, whispValuesFilePath })
       if (this.isCanceled()) return
 
-      await this.writeWhispCategoryFile({ category, headers, rows, columnsCollector, whispValuesFilePath })
+      await this.writeWhispCategoryFile({
+        category,
+        headers,
+        samplingPointDataFilePath,
+        columnsCollector,
+        whispValuesFilePath,
+      })
     } finally {
-      await FileUtils.deleteFileAsync(whispValuesFilePath)
+      await SamplingPointDataWhispAnalysisJob.deleteFileIfExists(samplingPointDataFilePath)
+      await SamplingPointDataWhispAnalysisJob.deleteFileIfExists(whispValuesFilePath)
     }
     this.incrementProcessedItems()
+  }
+
+  static async deleteFileIfExists(filePath: string) {
+    if (FileUtils.exists(filePath)) {
+      await FileUtils.deleteFileAsync(filePath)
+    }
   }
 
   async writeWhispCategoryFile({
     category,
     headers,
-    rows,
+    samplingPointDataFilePath,
     columnsCollector,
     whispValuesFilePath,
   }: {
     category: any
     headers: string[]
-    rows: FlatRow[]
+    samplingPointDataFilePath: string
     columnsCollector: WhispColumnsCollector
     whispValuesFilePath: string
   }) {
@@ -107,7 +123,11 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     const whispCategoryFilePath = FileUtils.newTempFilePath()
     await FlatDataWriter.writeItemsStreamToStream({
       stream: Readable.from(
-        SamplingPointDataWhispAnalysisJob.generateCombinedRows({ rows, whispColumns, whispValuesFilePath })
+        SamplingPointDataWhispAnalysisJob.generateCombinedRows({
+          samplingPointDataFilePath,
+          whispColumns,
+          whispValuesFilePath,
+        })
       ),
       outputStream: FileUtils.createWriteStream(whispCategoryFilePath),
       fields: [...headers, ...whispColumns.map(({ column }) => column)],
@@ -134,86 +154,99 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     return category
   }
 
-  async readSamplingPointData({
-    survey,
-    category,
-  }: {
-    survey: any
-    category: any
-  }): Promise<{ headers: string[]; rows: FlatRow[] }> {
-    const exportFilePath = FileUtils.newTempFilePath()
-    try {
-      await CategoryManager.exportCategoryToStream(
-        {
-          survey,
-          categoryUuid: Category.getUuid(category),
-          draft: true,
-          outputStream: FileUtils.createWriteStream(exportFilePath),
-          fileFormat: FileFormats.csv,
-        },
-        this.tx
-      )
-      let headers: string[] = []
-      const rows: FlatRow[] = []
-      const reader = FlatDataReader.createReaderFromFile({
-        filePath: exportFilePath,
+  async exportSamplingPointData({ survey, category, filePath }: { survey: any; category: any; filePath: string }) {
+    await CategoryManager.exportCategoryToStream(
+      {
+        survey,
+        categoryUuid: Category.getUuid(category),
+        draft: true,
+        outputStream: FileUtils.createWriteStream(filePath),
         fileFormat: FileFormats.csv,
-        onHeaders: (headersRead: string[]) => {
-          headers = headersRead
-        },
-        onRow: (row: FlatRow) => {
-          rows.push({ ...row })
-        },
-      })
-      await reader.start()
-      return { headers, rows }
-    } finally {
-      await FileUtils.deleteFileAsync(exportFilePath)
-    }
+      },
+      this.tx
+    )
   }
 
-  static buildFeatures({ rows, srsIndex }: { rows: FlatRow[]; srsIndex: any }) {
+  // only the location of the sampling points is kept in memory, not the whole rows
+  static async readSamplingPoints({
+    filePath,
+    srsIndex,
+  }: {
+    filePath: string
+    srsIndex: any
+  }): Promise<{ headers: string[]; points: SamplingPoints }> {
+    let headers: string[] = []
+    const points: SamplingPoints = { rowIndexes: [], coordinates: [] }
+    let rowIndex = 0
+    const rows = FlatDataReader.generateRowsFromFile({
+      filePath,
+      fileFormat: FileFormats.csv,
+      onHeaders: (headersRead: string[]) => {
+        headers = headersRead
+      },
+    })
+    for await (const row of rows) {
+      const pointLatLong = SamplingPointDataWhispAnalysisJob.toLatLong({ row, srsIndex })
+      if (pointLatLong) {
+        points.rowIndexes.push(rowIndex)
+        points.coordinates.push(pointLatLong.x, pointLatLong.y)
+      }
+      rowIndex++
+    }
+    return { headers, points }
+  }
+
+  static toLatLong({ row, srsIndex }: { row: FlatRow; srsIndex: any }) {
+    const [x, y, srs] = locationColumnNames.map((columnName: string) => row[columnName])
+    if (!x || !y || !srs) return null
+
+    const point = Points.parse({ x: Number(x), y: Number(y), srs })
+    return point ? Points.toLatLong(point, srsIndex) : null
+  }
+
+  // features built only when submitting a batch; the row index is used as id preserved by Whisp
+  static buildBatchFeatures({
+    points,
+    start,
+    end,
+  }: {
+    points: SamplingPoints
+    start: number
+    end: number
+  }): SamplingPointFeature[] {
     const features: SamplingPointFeature[] = []
-    const rowIndexByExternalId: Record<string, number> = {}
-    for (const [rowIndex, row] of rows.entries()) {
-      const [x, y, srs] = locationColumnNames.map((columnName: string) => row[columnName])
-      if (!x || !y || !srs) continue
-
-      const point = Points.parse({ x: Number(x), y: Number(y), srs })
-      const pointLatLong = point ? Points.toLatLong(point, srsIndex) : null
-      if (!pointLatLong) continue
-
-      // id preserved by Whisp, used to join its results back to the sampling points
-      const externalId = uuidv4()
-      rowIndexByExternalId[externalId] = rowIndex
+    for (let index = start; index < end; index++) {
       features.push({
         type: 'Feature',
-        geometry: { type: 'Point', coordinates: [pointLatLong.x, pointLatLong.y] },
-        properties: { [whispExternalIdProp]: externalId },
+        geometry: { type: 'Point', coordinates: [points.coordinates[index * 2], points.coordinates[index * 2 + 1]] },
+        properties: { [whispExternalIdProp]: String(points.rowIndexes[index]) },
       })
     }
-    return { features, rowIndexByExternalId }
+    return features
   }
 
   async runWhispAnalysis({
-    features,
-    rowIndexByExternalId,
+    points,
     whispValuesFilePath,
   }: {
-    features: SamplingPointFeature[]
-    rowIndexByExternalId: Record<string, number>
+    points: SamplingPoints
     whispValuesFilePath: string
   }): Promise<WhispColumnsCollector> {
-    const batches = toChunks(features, whispBatchSize)
+    const pointsCount = points.rowIndexes.length
     // +1: writing of the output file
-    this.total = batches.length + 1
+    this.total = Math.ceil(pointsCount / whispBatchSize) + 1
 
     const columnsCollector = new WhispColumnsCollector()
-    for (const batch of batches) {
+    for (let start = 0; start < pointsCount; start += whispBatchSize) {
       if (this.isCanceled()) break
 
+      const batch = SamplingPointDataWhispAnalysisJob.buildBatchFeatures({
+        points,
+        start,
+        end: Math.min(start + whispBatchSize, pointsCount),
+      })
       // batches processed sequentially, to stay within the Whisp API rate limit
-      await this.processBatch({ batch, rowIndexByExternalId, columnsCollector, whispValuesFilePath }) // NOSONAR
+      await this.processBatch({ batch, columnsCollector, whispValuesFilePath }) // NOSONAR
       this.incrementProcessedItems()
     }
     return columnsCollector
@@ -222,12 +255,10 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
   // in its own function: the Whisp response of a batch can be garbage collected before requesting the next one
   async processBatch({
     batch,
-    rowIndexByExternalId,
     columnsCollector,
     whispValuesFilePath,
   }: {
     batch: SamplingPointFeature[]
-    rowIndexByExternalId: Record<string, number>
     columnsCollector: WhispColumnsCollector
     whispValuesFilePath: string
   }) {
@@ -236,7 +267,6 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     const { data } = await WhishDataProcessor.generateData({ geojson, analysisOptions, pollingPeriod })
     const lines = SamplingPointDataWhispAnalysisJob.toWhispValuesLines({
       whispFeatures: data?.features ?? [],
-      rowIndexByExternalId,
       columnsCollector,
     })
     await FileUtils.appendFile(whispValuesFilePath, lines.map((line) => `${JSON.stringify(line)}\n`).join(''))
@@ -245,31 +275,34 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
   // keeps only the Whisp values to store in the category, sorted by sampling point data row index
   static toWhispValuesLines({
     whispFeatures,
-    rowIndexByExternalId,
     columnsCollector,
   }: {
     whispFeatures: WhispFeature[]
-    rowIndexByExternalId: Record<string, number>
     columnsCollector: WhispColumnsCollector
   }): WhispValuesLine[] {
     const valuesByRowIndex = new Map<number, WhispValues>()
     for (const whispFeature of whispFeatures) {
-      const externalId = whispFeature.properties?.[whispExternalIdProp]
-      const rowIndex = typeof externalId === 'string' ? rowIndexByExternalId[externalId] : undefined
-      if (rowIndex === undefined) continue
+      const rowIndex = SamplingPointDataWhispAnalysisJob.parseRowIndex(whispFeature.properties?.[whispExternalIdProp])
+      if (rowIndex === null) continue
 
       valuesByRowIndex.set(rowIndex, columnsCollector.addFeature(whispFeature))
     }
     return [...valuesByRowIndex.entries()].sort(([rowIndexA], [rowIndexB]) => rowIndexA - rowIndexB)
   }
 
+  static parseRowIndex(externalId: unknown): number | null {
+    if (typeof externalId !== 'string' && typeof externalId !== 'number') return null
+    const rowIndex = Number(externalId)
+    return Number.isInteger(rowIndex) && rowIndex >= 0 ? rowIndex : null
+  }
+
   // sampling point data rows combined with their Whisp values (both sorted by row index), read one line at a time
   static async *generateCombinedRows({
-    rows,
+    samplingPointDataFilePath,
     whispColumns,
     whispValuesFilePath,
   }: {
-    rows: FlatRow[]
+    samplingPointDataFilePath: string
     whispColumns: WhispColumn[]
     whispValuesFilePath: string
   }): AsyncGenerator<FlatRow> {
@@ -284,18 +317,21 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     }
     try {
       let line = await readNextLine()
-      for (const [rowIndex, row] of rows.entries()) {
-        if (line?.[0] !== rowIndex) {
-          yield row
-          continue
+      let rowIndex = 0
+      const rows = FlatDataReader.generateRowsFromFile({
+        filePath: samplingPointDataFilePath,
+        fileFormat: FileFormats.csv,
+      })
+      for await (const row of rows) {
+        if (line?.[0] === rowIndex) {
+          const whispValues = line[1]
+          for (const { prop, column } of whispColumns) {
+            row[column] = whispValues[prop] ?? ''
+          }
+          line = await readNextLine() // NOSONAR
         }
-        const whispValues = line[1]
-        const rowCombined = { ...row }
-        for (const { prop, column } of whispColumns) {
-          rowCombined[column] = whispValues[prop] ?? ''
-        }
-        yield rowCombined
-        line = await readNextLine() // NOSONAR
+        yield row
+        rowIndex++
       }
     } finally {
       linesReader.close()
