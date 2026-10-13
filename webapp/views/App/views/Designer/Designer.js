@@ -16,6 +16,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 import FormDesigner from './FormDesigner'
 import SurveyHierarchy from './SurveyHierarchy'
 import { SurveyDependencyTree } from './SurveyDependencyTree'
+import { SurveyCompare } from './SurveyCompare'
 
 const Designer = () => {
   const canEditSurvey = useAuthCanEditSurvey()
@@ -45,6 +46,10 @@ const Designer = () => {
       {
         component: SurveyDependencyTree,
         path: designerModules.surveyDependencyTree.path,
+      },
+      {
+        component: SurveyCompare,
+        path: designerModules.surveyCompare.path,
       },
       // Category
       {

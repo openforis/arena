@@ -1,7 +1,7 @@
 # Survey Comparison (and Sync) — Design Spec
 
 **Date:** 2026-10-12  
-**Status:** Proposed (not implemented)
+**Status:** Phase 1 implemented (compare + apply additions and changes)
 
 ## Goal
 
@@ -259,6 +259,22 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
   different values, so a Prod survey with unpublished edits is visible as such.
 - UI: dashboard `SurveyInfo` card, a "Definition fingerprint" row (first 12 chars, click to copy the full value),
   plus a column in the Schema Summary export header.
+
+## Implementation (phase 1)
+
+- `core/survey/surveyCompare/`: comparison (`compareSurveys`) and apply plan (`buildApplyPlan`), pure functions.
+  Node defs are matched by uuid, then by name among the children of matched parents (so surveys built separately
+  are compared too); category items by code path.
+- `server/modules/surveyCompare/`: `SurveyCompareJob` (reads the uploaded zip, keeps it as a temp file, writes the
+  result to a temp file), `SurveyCompareApplyJob` (computes the comparison again and applies the selected changes as
+  draft), API under `/survey/:surveyId/compare`.
+- `webapp/views/App/views/Designer/SurveyCompare/`: Designer → "Compare / update from file".
+- Applied in phase 1: added node defs (same uuid as in the source, parent layout updated), changed node def props
+  (expressions, validations, labels, layout, ...), added categories, added/changed category items, category name and
+  extra props definitions.
+- Shown but not applied yet (phase 2): removals, moves, category level changes, taxonomies, survey info.
+- Tests: `test/unit/tests/054surveyCompare.test.ts`, `test/integration/tests/053surveyCompareApplyTest.ts`
+  (Dev survey → QA imported and published → changes in Dev → compare, apply, compare again, publish QA).
 
 ## Non-goals
 

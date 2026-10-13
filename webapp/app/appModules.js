@@ -135,6 +135,10 @@ export const designerModules = {
     key: 'surveyDependencyTree',
     path: 'surveyDependencyTree',
   },
+  surveyCompare: {
+    key: 'surveyCompare',
+    path: 'surveyCompare',
+  },
   categories: {
     key: 'categories',
     path: 'categories',
