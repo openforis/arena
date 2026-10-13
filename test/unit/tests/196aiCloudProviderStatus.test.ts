@@ -41,7 +41,7 @@ const t = (key: string, params?: Record<string, unknown>): string => (params ? `
 
 const form = (overrides: Partial<FormState> = {}): FormState => ({
   ...createEmptyForm(),
-  featuresEnabled: true,
+  accessLevel: 3,
   provider: AiProvider.openaiCompatible,
   baseUrl: 'https://models.example.org/v1',
   model: 'remote-model',
