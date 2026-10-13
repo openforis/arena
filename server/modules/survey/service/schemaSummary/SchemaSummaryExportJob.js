@@ -12,20 +12,15 @@ export default class SchemaSummaryExportJob extends Job {
   }
 
   async execute() {
-    const { user, surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = this.context
+    const { surveyId, cycle, fileFormat = FileFormats.xlsx, aiDescriptions = null } = this.context
 
-    let aiDescriptionsFailedCount = 0
     const items = await generateSchemaSummaryItems({
       surveyId,
       cycle,
-      user,
-      includeAiDescriptions,
+      aiDescriptions,
       onProgress: ({ total, processed }) => {
         this.total = total
         this.processed = processed
-      },
-      onAiBatchFailed: (batchSize) => {
-        aiDescriptionsFailedCount += batchSize
       },
       stopIfFunction: () => this.isCanceled(),
     })
@@ -36,11 +31,12 @@ export default class SchemaSummaryExportJob extends Job {
 
     await FlatDataWriter.writeItemsToStream({ outputStream, items, options: { removeNewLines: false }, fileFormat })
 
-    this.setContext({ tempFileName, aiDescriptionsFailedCount })
+    this.setContext({ tempFileName })
   }
 
   async beforeSuccess() {
-    const { tempFileName, aiDescriptionsFailedCount } = this.context
+    // counted in the browser, which generated the descriptions
+    const { tempFileName, aiDescriptionsFailedCount = 0 } = this.context
     this.setResult({ tempFileName, aiDescriptionsFailedCount })
   }
 }

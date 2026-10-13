@@ -25,4 +25,6 @@ export const AiLimits = {
   activityLogAggregateKeyMaxChars: 64,
   dataDictionaryBatchSize: 10,
   dataDictionaryMaxDescriptions: 200,
+  // longest AI description accepted with a schema summary export (the browser truncates to it)
+  dataDictionaryMaxDescriptionChars: 1000,
 } as const
