@@ -1,6 +1,12 @@
 /**
  * Form model of the account part of the AI settings panel (switches and cloud provider). Pure.
  */
+import {
+  type AiAccessLevel,
+  isCategoryWithinAccessLevel,
+  raiseAccessLevelToggles,
+  resolveAiAccessLevel,
+} from '@common/ai/accessLevel'
 import { AiProvider } from '@common/ai/aiProvider'
 import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
 import { isLocalOrPrivateUrl, isOrgHostedUrl } from '@common/ai/localServerAddress'
@@ -74,6 +80,7 @@ export const MODEL_PLACEHOLDERS: Record<string, string> = {
 export type AdminDefault = { provider: string; model: string | null; hostingClass: AiHostingClass | null }
 
 export type AiSettings = {
+  accessLevel?: number
   featuresEnabled?: boolean
   featureToggles?: Partial<FeatureToggles>
   enabled?: boolean
@@ -103,6 +110,7 @@ export type TestResult = {
 }
 
 export type SettingsUpdate = {
+  accessLevel: AiAccessLevel
   featuresEnabled: boolean
   featureToggles: FeatureToggles
   enabled: boolean
@@ -113,7 +121,7 @@ export type SettingsUpdate = {
 }
 
 export type FormState = {
-  featuresEnabled: boolean
+  accessLevel: AiAccessLevel
   featureToggles: FeatureToggles
   provider: string
   model: string
@@ -129,7 +137,7 @@ export type FormState = {
  * @returns {FormState} The form.
  */
 export const createEmptyForm = (): FormState => ({
-  featuresEnabled: false,
+  accessLevel: 0,
   featureToggles: defaultFeatureToggles(),
   provider: DEFAULT_PROVIDER_VALUE,
   model: '',
@@ -176,7 +184,12 @@ export const buildModelsKey = ({
  * @returns {SettingsUpdate} The update.
  */
 export const buildSettingsUpdate = ({ form, spec }: { form: FormState; spec: ProviderSpec }): SettingsUpdate => {
-  const base = { featuresEnabled: form.featuresEnabled, featureToggles: form.featureToggles }
+  // featuresEnabled too: the server derives it anyway, but readers of the response see it at once
+  const base = {
+    accessLevel: form.accessLevel,
+    featuresEnabled: form.accessLevel > 0,
+    featureToggles: form.featureToggles,
+  }
   // "Arena default": enabled false, so the server falls through to the admin default
   if (spec.isDefault) return { ...base, enabled: false }
   return {
@@ -232,18 +245,55 @@ export const getProviderSpec = (provider: string): ProviderSpec =>
  * @param {AiSettings} data - GET /api/ai/settings response.
  * @returns {FormState} The form.
  */
-export const settingsToForm = (data: AiSettings): FormState => ({
-  ...createEmptyForm(),
-  featuresEnabled: !!data.featuresEnabled,
+export const settingsToForm = (data: AiSettings): FormState => {
   // known categories only: a stored legacy `assistant` is never sent back
-  featureToggles: Object.fromEntries(
+  const featureToggles = Object.fromEntries(
     FEATURE_CATEGORIES.map((category) => [category, toToggle(data.featureToggles?.[category], category)])
-  ) as FeatureToggles,
-  // an active personal provider (`enabled`) is shown; otherwise "Arena default"
-  provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
-  model: data.model || '',
-  baseUrl: data.baseUrl || '',
+  ) as FeatureToggles
+  return {
+    ...createEmptyForm(),
+    accessLevel: resolveAiAccessLevel({
+      accessLevel: data.accessLevel,
+      featuresEnabled: !!data.featuresEnabled,
+      featureToggles,
+    }),
+    featureToggles,
+    // an active personal provider (`enabled`) is shown; otherwise "Arena default"
+    provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
+    model: data.model || '',
+    baseUrl: data.baseUrl || '',
+  }
+}
+
+/**
+ * Returns the form with a new access level; a higher level switches on the features it adds.
+ * @param {FormState} form - Form.
+ * @param {AiAccessLevel} accessLevel - New level.
+ * @returns {FormState} The new form.
+ */
+export const withAccessLevel = (form: FormState, accessLevel: AiAccessLevel): FormState => ({
+  ...form,
+  accessLevel,
+  featureToggles: raiseAccessLevelToggles({ from: form.accessLevel, to: accessLevel, toggles: form.featureToggles }),
 })
+
+/**
+ * Returns how many features of the level are on ("8 of 10 features on").
+ * @param {object} params - Parameters.
+ * @param {AiAccessLevel} params.accessLevel - Level.
+ * @param {FeatureToggles} params.featureToggles - Switches.
+ * @returns {{on: number, total: number}} The counts.
+ */
+export const countAccessLevelFeatures = ({
+  accessLevel,
+  featureToggles,
+}: {
+  accessLevel: AiAccessLevel
+  featureToggles: FeatureToggles
+}): { on: number; total: number } => {
+  const within = FEATURE_CATEGORIES.filter((category) => isCategoryWithinAccessLevel(category, accessLevel))
+  return { on: within.filter((category) => featureToggles[category]).length, total: within.length }
+}
 
 /**
  * Returns true when the server has an API key to use: the typed one, else the stored one.

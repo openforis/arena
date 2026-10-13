@@ -90,8 +90,9 @@ describe('account form', () => {
   const togglesOn = { ...createEmptyForm().featureToggles, chat: true, assistantCleaning: true }
 
   test('the Arena default saves the switches only, with enabled false', () => {
-    const form: FormState = { ...createEmptyForm(), featuresEnabled: true, featureToggles: togglesOn }
+    const form: FormState = { ...createEmptyForm(), accessLevel: 3, featureToggles: togglesOn }
     expect(buildSettingsUpdate({ form, spec: spec(DEFAULT_PROVIDER_VALUE) })).toEqual({
+      accessLevel: 3,
       featuresEnabled: true,
       featureToggles: togglesOn,
       enabled: false,
@@ -101,13 +102,14 @@ describe('account form', () => {
   test('a personal provider sends its fields, and the key only when typed', () => {
     const form: FormState = {
       ...createEmptyForm(),
-      featuresEnabled: true,
+      accessLevel: 3,
       featureToggles: togglesOn,
       provider: 'openai',
       model: 'gpt-x',
       baseUrl: 'ignored for openai',
     }
     expect(buildSettingsUpdate({ form, spec: spec('openai') })).toEqual({
+      accessLevel: 3,
       featuresEnabled: true,
       featureToggles: togglesOn,
       enabled: true,
@@ -122,7 +124,7 @@ describe('account form', () => {
   test('removing the provider keeps the unsaved switches', () => {
     const form: FormState = {
       ...createEmptyForm(),
-      featuresEnabled: true,
+      accessLevel: 3,
       featureToggles: togglesOn,
       provider: 'openai-compatible',
       model: 'm',
