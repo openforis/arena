@@ -29,6 +29,8 @@ import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
 import SurveyCreatorJob from '@server/modules/survey/service/surveyCreateJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import SurveyCompareJob from '@server/modules/surveyCompare/service/surveyCompareJob'
+import SurveyCompareApplyJob from '@server/modules/surveyCompare/service/surveyCompareApplyJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import SchemaSummaryExportJob from '@server/modules/survey/service/schemaSummary/SchemaSummaryExportJob'
@@ -67,6 +69,8 @@ const jobClasses = [
   SamplingPointDataWhispJob,
   SelectedRecordsExportJob,
   SurveyCloneJob,
+  SurveyCompareJob,
+  SurveyCompareApplyJob,
   SurveyActivityLogClearJob,
   SurveyCreatorJob,
   SurveyExportJob,

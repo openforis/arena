@@ -343,6 +343,14 @@ const planNodeDefUpdate = ({ context, diff, plan, layoutUpdatedUuids }) => {
       insertedNodeDefs: plan.nodeDefsToInsert,
     })
   }
+  if (update.type) {
+    // the type is updated together with all the props (props are replaced)
+    update.props = {
+      ...mapRefs({ context, props: NodeDef.getProps(sourceNodeDef) }),
+      layout: update.props.layout ?? NodeDef.getLayout(targetNodeDef),
+    }
+    update.propsAdvanced = { ...NodeDef.getPropsAdvanced(sourceNodeDef) }
+  }
   plan.nodeDefsToUpdate.push(update)
 }
 
