@@ -24,7 +24,28 @@ import { assertSurveyAiAllowed } from '../../ai/service/surveyAiPolicyService'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
+import { parseAiDescriptions, parseAiDescriptionsFailedCount } from '../service/schemaSummary/aiDescriptions'
 import * as SurveyService from '../service/surveyService'
+
+/**
+ * Validates the AI descriptions of a schema summary export (generated in the browser).
+ * @param {object} params - Parameters.
+ * @param {object} params.user - Acting user.
+ * @param {number|string} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {unknown} params.aiDescriptions - Descriptions by uuid from the request.
+ * @param {unknown} params.aiDescriptionsFailedCount - Failed count from the request.
+ * @returns {Promise<{aiDescriptions: object, aiDescriptionsFailedCount: number}>} The validated values.
+ */
+const parseExportAiDescriptions = async ({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount }) => {
+  // the descriptions come from the user's AI: their data dictionary switch still applies
+  assertFeatureEnabled('dataDictionary', user)
+  const knownUuids = await SchemaSummary.fetchSchemaSummaryNodeDefUuids({ surveyId, cycle })
+  return {
+    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions, knownUuids }),
+    aiDescriptionsFailedCount: parseAiDescriptionsFailedCount(aiDescriptionsFailedCount),
+  }
+}
 
 export const init = (app) => {
   // ==== CREATE
@@ -322,27 +343,41 @@ export const init = (app) => {
     }
   })
 
-  // schema summary export (start job)
+  // schema summary: the node defs that need an AI description (described in the browser, see
+  // webapp/ai/workflows/dataDictionary.ts); names, types and paths only
+  app.get(
+    '/survey/:surveyId/schema-summary/ai-items',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle } = Request.getParams(req)
+        assertFeatureEnabled('dataDictionary', Request.getUser(req))
+        res.json(await SchemaSummary.fetchSchemaSummaryAiItems({ surveyId, cycle }))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  // schema summary export (start job); aiDescriptions: AI descriptions generated in the browser
   app.post(
     '/survey/:surveyId/schema-summary/export',
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, fileFormat = FileFormats.xlsx, includeAiDescriptions = false } = Request.getParams(req)
-        const user = Request.getUser(req)
-        if (includeAiDescriptions) {
-          // fail fast (403/404 with a clear key) instead of a job that silently skips the descriptions
-          assertFeatureEnabled('dataDictionary', user)
-          // the survey AI policy must allow the schema to reach the provider
-          await assertSurveyAiAllowed({ user, surveyId: Number(surveyId), dataClass: 'schema' })
-        }
-        const job = SurveyService.startSchemaSummaryExportJob({
-          user,
+        const {
           surveyId,
           cycle,
-          fileFormat,
-          includeAiDescriptions,
-        })
+          fileFormat = FileFormats.xlsx,
+          aiDescriptions = null,
+          aiDescriptionsFailedCount = 0,
+        } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const ai =
+          aiDescriptions === null
+            ? {}
+            : await parseExportAiDescriptions({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount })
+        const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
         next(error)

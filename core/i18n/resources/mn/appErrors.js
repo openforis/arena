@@ -115,6 +115,7 @@ export default {
   aiProviderRateLimited: 'AI үйлчилгээ үзүүлэгч хүсэлтийг хязгаарлаж байна. Түр хүлээгээд дахин оролдоно уу.',
   aiProviderRejected: 'AI үйлчилгээ үзүүлэгч хүсэлтийг татгалзлаа (AI тохиргооны загварын нэрийг шалгана уу).',
   aiDataDictionaryInvalid: 'AI ашиглах боломжтой талбарын тайлбар буцаасангүй.',
+  aiDescriptionsInvalid: 'Экспорттой хамт илгээсэн AI талбарын тайлбар буруу байна.',
   aiSchemaMissing: '"{{feature}}" функцийн AI бүтэцлэгдсэн гаралтын схем байхгүй байна.',
   aiProviderInvalid: 'Дэмжигдээгүй AI үйлчилгээ үзүүлэгч: {{provider}}.',
   aiModelMissing: 'AI загварын танигч шаардлагатай.',

@@ -149,8 +149,33 @@ export const startNodeDefsTranslationJob = ({ user, surveyId }) => {
   return job
 }
 
-export const startSchemaSummaryExportJob = ({ user, surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
-  const job = new SchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, includeAiDescriptions })
+/**
+ * Starts the schema summary export job.
+ * @param {object} params - Params.
+ * @param {object} params.user - Acting user.
+ * @param {number} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {string} params.fileFormat - csv or xlsx.
+ * @param {Record<string, string>|null} [params.aiDescriptions] - Validated AI descriptions (null: no AI column).
+ * @param {number} [params.aiDescriptionsFailedCount] - Node defs the browser could not describe.
+ * @returns {object} The enqueued job.
+ */
+export const startSchemaSummaryExportJob = ({
+  user,
+  surveyId,
+  cycle,
+  fileFormat,
+  aiDescriptions = null,
+  aiDescriptionsFailedCount = 0,
+}) => {
+  const job = new SchemaSummaryExportJob({
+    user,
+    surveyId,
+    cycle,
+    fileFormat,
+    aiDescriptions,
+    aiDescriptionsFailedCount,
+  })
   JobManager.enqueueJob(job)
   return job
 }

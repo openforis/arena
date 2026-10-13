@@ -122,6 +122,7 @@ export default {
   aiProviderRateLimited: 'El proveedor de IA está limitando las solicitudes. Inténtelo de nuevo en un momento.',
   aiProviderRejected: 'El proveedor de IA rechazó la solicitud (compruebe el nombre del modelo en Ajustes de IA).',
   aiDataDictionaryInvalid: 'La IA no devolvió descripciones de campos utilizables.',
+  aiDescriptionsInvalid: 'Las descripciones de campos de la IA enviadas con la exportación no son válidas.',
   aiSchemaMissing: 'Falta el esquema de salida estructurada de IA para la función "{{feature}}".',
   aiProviderInvalid: 'Proveedor de IA no compatible: {{provider}}.',
   aiModelMissing: 'El identificador del modelo de IA es obligatorio.',
