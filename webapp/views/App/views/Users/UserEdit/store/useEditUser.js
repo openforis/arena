@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { useQuery } from '@webapp/components/hooks'
 import { appModuleUri, userModules } from '@webapp/app/appModules'

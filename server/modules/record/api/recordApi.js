@@ -1,9 +1,8 @@
 import exifr from 'exifr'
 
-import { Objects } from '@openforis/arena-core'
+import { Authorizer, Objects } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'

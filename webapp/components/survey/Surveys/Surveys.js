@@ -7,7 +7,7 @@ import { useNavigate } from 'react-router'
 
 import * as DateUtils from '@core/dateUtils'
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
 
 import { useBrowserLanguageCode, useOnUpdate } from '@webapp/components/hooks'

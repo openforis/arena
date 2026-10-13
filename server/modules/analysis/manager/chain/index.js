@@ -1,4 +1,4 @@
-import { ChainFactory } from '@openforis/arena-core'
+import { Authorizer, ChainFactory } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
@@ -10,7 +10,6 @@ import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import { uuidv4 } from '@core/uuid'
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
 
 import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -110,6 +109,11 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
 
 // ====== PERSIST
 /**
+ * @param root0
+ * @param root0.user
+ * @param root0.surveyId
+ * @param root0.chain
+ * @param client
  * @deprecated
  */
 export const persistChain = async ({ user, surveyId, chain }, client) => {
@@ -159,7 +163,6 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
 /**
  * Remaps nodeDef UUID from source survey to target survey by node name.
  * Returns undefined when the nodeDef cannot be found in the target.
- *
  * @param {object} params - Parameters.
  * @param {string} params.uuid - NodeDef UUID in the source survey.
  * @param {object} params.sourceSurvey - Source survey object.
@@ -178,7 +181,6 @@ const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
  * Sanitizes chain props before inserting into a different survey.
  * Remaps nodeDef UUIDs by name where possible, clears category UUIDs and
  * selected record UUIDs that are meaningless outside the source survey.
- *
  * @param {object} params - Parameters.
  * @param {object} params.sourceChain - The chain being cloned.
  * @param {object} params.sourceSurvey - Survey the chain belongs to.
@@ -253,7 +255,6 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
  * Checks that the given user is allowed to view the source survey used as a chain-clone source
  * (a survey they have access to, or a published template, per
  * `Authorizer.canViewSurveyOrPublishedTemplate`). Throws when the check fails.
- *
  * @param {object} params - Parameters.
  * @param {object} params.user - User requesting to view the source survey.
  * @param {number} params.sourceSurveyId - Id of the survey to be used as a chain-clone source.
@@ -270,7 +271,6 @@ const _checkCanViewSourceSurveyForClone = async ({ user, sourceSurveyId }) => {
 /**
  * Fetches the chains of a survey to be offered as clone sources, after checking that the user is
  * allowed to view that source survey (own survey, membership survey, or published template).
- *
  * @param {object} params - Parameters.
  * @param {object} params.user - User requesting the list of chains.
  * @param {number} params.sourceSurveyId - Id of the source survey to fetch chains from.
@@ -286,7 +286,6 @@ export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) =>
  * Fetches the distinct names of the entities holding analysis attributes of a source chain, after
  * checking that the user is allowed to view the source survey (own survey, membership survey, or
  * published template). Used to check entity compatibility with a target survey before cloning.
- *
  * @param {object} params - Parameters.
  * @param {object} params.user - User requesting the entity names.
  * @param {number} params.sourceSurveyId - Id of the source survey the chain belongs to.

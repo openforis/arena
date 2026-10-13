@@ -1,7 +1,7 @@
 import PropTypes from 'prop-types'
 
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { TestId } from '@webapp/utils/testId'
 import { useI18n } from '@webapp/store/system'

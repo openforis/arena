@@ -6,7 +6,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
