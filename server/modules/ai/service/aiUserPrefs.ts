@@ -4,6 +4,7 @@
 import type { User } from '@openforis/arena-core'
 
 import * as UserUtils from '@core/user/user'
+import { type AiAccessLevel, isCategoryWithinAccessLevel, resolveAiAccessLevel } from '@common/ai/accessLevel'
 import { AiFeatureCategory, isAiCategoryOnByDefault } from '@common/ai/features'
 
 const PREFS_KEY = 'ai'
@@ -44,22 +45,54 @@ export const sanitiseFeatureToggles = (input: unknown): AiFeatureToggles => {
 }
 
 /**
- * Returns true when the user has switched AI features on (user master switch).
+ * Returns the user's access level: the stored one, else the one derived from the old master switch and toggles.
+ * @param {User} user - Arena user.
+ * @returns {AiAccessLevel} The level (0 when nothing is stored).
+ */
+export const getAccessLevelForUser = (user: User): AiAccessLevel => {
+  const raw = getAiPrefs(user)
+  if (!raw) return 0
+  return resolveAiAccessLevel({
+    accessLevel: raw.accessLevel,
+    featuresEnabled: !!raw.featuresEnabled,
+    featureToggles: sanitiseFeatureToggles(raw.featureToggles),
+  })
+}
+
+/**
+ * Returns true when the user has switched AI features on (access level above Off).
  * @param {User} user - Arena user.
  * @returns {boolean} The master switch state (default false).
  */
-export const areFeaturesEnabledForUser = (user: User): boolean => !!getAiPrefs(user)?.featuresEnabled
+export const areFeaturesEnabledForUser = (user: User): boolean => getAccessLevelForUser(user) > 0
 
 /**
- * Returns true when the user master switch and the given category toggle are both on.
+ * Returns true when the access level covers the category and its toggle is on.
  * @param {User} user - Arena user.
  * @param {string} category - Feature category.
  * @returns {boolean} Whether the category is enabled.
  */
 export const isCategoryEnabledForUser = (user: User, category: string): boolean => {
-  const raw = getAiPrefs(user)
-  if (!raw?.featuresEnabled) return false
-  return !!sanitiseFeatureToggles(raw.featureToggles)[category]
+  const level = getAccessLevelForUser(user)
+  if (!isCategoryWithinAccessLevel(category, level)) return false
+  return !!sanitiseFeatureToggles(getAiPrefs(user)?.featureToggles)[category]
+}
+
+/**
+ * Returns the access part of a settings save: the sent level when valid, else the one derived from the old body.
+ * @param {object} update - Request body of PUT /api/ai/settings (untrusted).
+ * @returns {object} `{ accessLevel, featuresEnabled, featureToggles }` to store.
+ */
+export const resolveSavedAccess = (
+  update: Record<string, any>
+): { accessLevel: AiAccessLevel; featuresEnabled: boolean; featureToggles: AiFeatureToggles } => {
+  const featureToggles = sanitiseFeatureToggles(update?.featureToggles)
+  const accessLevel = resolveAiAccessLevel({
+    accessLevel: update?.accessLevel,
+    featuresEnabled: !!update?.featuresEnabled,
+    featureToggles,
+  })
+  return { accessLevel, featuresEnabled: accessLevel > 0, featureToggles }
 }
 
 /**

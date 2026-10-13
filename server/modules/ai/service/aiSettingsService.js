@@ -10,7 +10,8 @@
  * migration. The shape is:
  *
  *   user.prefs.ai = {
- *     featuresEnabled,        // master switch — user wants AI at all
+ *     accessLevel,            // 0 off, 1 help only, 2 + survey design, 3 + record data (common/ai/accessLevel.ts)
+ *     featuresEnabled,        // accessLevel > 0, kept for existing readers
  *     featureToggles,         // one boolean per AiFeatureCategory (common/ai/features.ts)
  *     provider, model, baseUrl, apiKeyEncrypted,
  *     enabled,                // use OWN provider vs. admin default
@@ -34,8 +35,10 @@ import { AiFeatureCategory } from '@common/ai/features'
 import {
   areFeaturesEnabledForUser,
   defaultFeatureToggles,
+  getAccessLevelForUser,
   getAiPrefs as getRawPrefs,
   isCategoryEnabledForUser,
+  resolveSavedAccess,
   sanitiseFeatureToggles,
   withoutPersonalProvider,
 } from './aiUserPrefs'
@@ -96,6 +99,7 @@ export const getPublicSettings = (user) => {
   const raw = getRawPrefs(user)
   if (!raw) {
     return {
+      accessLevel: 0,
       featuresEnabled: false,
       featureToggles: defaultFeatureToggles(),
       provider: null,
@@ -109,7 +113,8 @@ export const getPublicSettings = (user) => {
     }
   }
   return {
-    featuresEnabled: !!raw.featuresEnabled,
+    accessLevel: getAccessLevelForUser(user),
+    featuresEnabled: getAccessLevelForUser(user) > 0,
     featureToggles: sanitiseFeatureToggles(raw.featureToggles),
     provider: raw.provider || null,
     model: raw.model || null,
@@ -195,6 +200,7 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  * @param {object} args - Update args.
  * @param {object} args.user - The user (will be re-fetched fresh from DB).
  * @param {object} args.update - The new settings.
+ * @param {number} [args.update.accessLevel] - Access level (0-3); derived from featuresEnabled when absent.
  * @param {boolean} [args.update.featuresEnabled] - User-level master toggle.
  * @param {object} [args.update.featureToggles] - Per-category booleans.
  * @param {string} [args.update.provider] - Provider key.
@@ -206,8 +212,7 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  */
 export const saveSettings = async ({ user, update }) => {
   const existing = getRawPrefs(user) || {}
-  const featuresEnabled = !!update.featuresEnabled
-  const featureToggles = sanitiseFeatureToggles(update.featureToggles)
+  const { accessLevel, featuresEnabled, featureToggles } = resolveSavedAccess(update)
   const overrideEnabled = !!update.enabled
 
   // Encrypt-or-clear the API key independently of featuresEnabled so the
@@ -228,6 +233,7 @@ export const saveSettings = async ({ user, update }) => {
   }
 
   const newAi = {
+    accessLevel,
     featuresEnabled,
     featureToggles,
     provider,
