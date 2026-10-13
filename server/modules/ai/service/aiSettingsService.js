@@ -18,7 +18,8 @@
  *     lastTestOk, lastTestAt,
  *   }
  *
- * `featuresEnabled` is the user-level master kill switch. `enabled` is the
+ * The access level is the user-level master switch (0 turns every AI feature off;
+ * `featuresEnabled` mirrors `accessLevel > 0` for existing readers). `enabled` is the
  * narrower provider-override flag (user provider vs. admin default).
  */
 import { generateText } from 'ai'
@@ -141,7 +142,7 @@ export const getPublicSettings = (user) => {
  */
 export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   const raw = getRawPrefs(user)
-  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
+  if (!areFeaturesEnabledForUser(user) || !raw?.enabled || !raw.provider || !raw.model) return null
   let apiKey = null
   if (decrypt && raw.apiKeyEncrypted) {
     apiKey = tryDecrypt(raw.apiKeyEncrypted)
@@ -188,12 +189,12 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  * existing key untouched; pass `apiKey: ''` to clear it.
  *
  * Validation rules:
- *   - When `featuresEnabled` is false, no provider validation is performed
+ *   - When the access level is 0 (`featuresEnabled` false), no provider validation is performed
  *     (user is opting out — we just store the toggles and preserve any
  *     prior provider config in case they re-enable later).
- *   - When `featuresEnabled` is true and `enabled` (provider override) is
+ *   - When the access level is above 0 and `enabled` (provider override) is
  *     true, provider + model + (where applicable) baseUrl are required.
- *   - When `featuresEnabled` is true and `enabled` is false, the user is
+ *   - When the access level is above 0 and `enabled` is false, the user is
  *     relying on the admin default — provider fields are persisted as-is
  *     without strict validation, so the form can be saved with empty
  *     provider config.
