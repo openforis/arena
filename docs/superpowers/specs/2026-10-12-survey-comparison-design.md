@@ -165,7 +165,8 @@ interface SurveyDiff {
   Arrays of expression objects compared without their `uuid`s.
 - Labels / descriptions: compare per language; a language present on one side only is a survey info difference.
 - Layout (`layout` prop, per cycle): compared separately and flagged as **layout-only** so the user can hide it
-  (layout differences are common and harmless for data). Default: shown but collapsed.
+  (layout differences are common and harmless for data). Shown and checked by default, like any other change;
+  the "Hide layout-only differences" filter hides them from the tree.
 - Sort keys recursively; treat `undefined`, `null`, `''`, `[]` and `{}` as equal (empty props are stored
   inconsistently).
 
@@ -206,7 +207,7 @@ Per change, one of `applicable`, `applicableWithWarning`, `notApplicable` + a re
 | Rename (`name`) | yes | warning: breaks expressions using the old name in the target, RDB column renamed on publish |
 | Type change | yes | **no** (would require delete + re-add, data lost) |
 | `multiple` change | yes | **no** |
-| `key` change | yes | warning: changes record uniqueness, existing records may become duplicates (to verify against publish validation) |
+| `key` change | yes | **no** (record uniqueness must not change once published) |
 | Category / taxonomy reference change | yes | **no** |
 | Move to another entity | yes | **no** |
 | Delete node def | yes | warning: data of that attribute is deleted on publish |
@@ -267,16 +268,16 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - Processing chains (analysis) comparison: follow-up after phase 2, the `chains/` zip entries are already available.
 - Three-way merge (base / mine / theirs). It would remove the "deleted in Dev or added in QA?" ambiguity, but needs
   the previous Dev export as a third input; the "removals unchecked by default" rule covers it for now.
-- Keeping track of which source file the target was last updated from (decided: too complex for now).
+- Keeping track of which source file the target was last updated from (too complex for now).
 
-## Open questions
+## Decisions
 
-1. When the target is published, should "Apply" also offer to publish at the end, or always leave it to the user?
-   Proposed: leave it to the user (they should test the form first).
-2. Default for layout-only differences (e.g. a field resized in Dev): applied or not? Proposed: shown and checked,
-   with a filter to hide them.
-3. `key` change on published node defs: confirm what publish validation allows today before marking it as warning
-   vs not applicable.
+| Topic | Decision |
+| ----- | -------- |
+| Publish after Apply | No: Apply only writes draft changes, the user tests the form and publishes from the Designer |
+| Layout-only differences | Shown and checked by default, with a filter to hide them |
+| `key` on published node defs | Cannot change: not applicable |
+| Tracking the source file of the last update | Skipped (too complex for now) |
 
 ## Testing
 
