@@ -107,17 +107,22 @@ export const createReaderFromFile = ({ filePath, fileFormat, onHeaders = null, o
   createReaderFromStream({ stream: FileUtils.createReadStream(filePath), fileFormat, onHeaders, onRow, onTotalChange })
 
 /**
- * Reads the rows of a CSV file one at a time, without keeping them in memory.
+ * Reads the rows of a flat data file one at a time (CSV rows are not kept in memory).
  * @param {object} params - The parameters.
- * @param {string} params.filePath - Path of the CSV file.
+ * @param {string} params.filePath - Path of the file.
+ * @param {string} [params.fileFormat] - Format of the file (csv or xlsx).
  * @param {(headers: string[]) => void} [params.onHeaders] - Called with the headers, before the first row is yielded.
  * @yields {object} The rows, as objects indexed by header.
  */
-export async function* generateRowsFromCsvFile({ filePath, onHeaders = null }) {
+export async function* generateRowsFromFile({ filePath, fileFormat = FileFormats.csv, onHeaders = null }) {
   const stream = FileUtils.createReadStream(filePath)
   let headers = null
   try {
-    for await (const row of stream.pipe(parse({ ignoreEmpty: true }))) {
+    const rows =
+      fileFormat === FileFormats.csv
+        ? stream.pipe(parse({ ignoreEmpty: true }))
+        : await ExcelReader.extractRowsFromExcelStream({ stream })
+    for await (const row of rows) {
       if (headers) {
         yield _rowToObject({ headers, row })
       } else {

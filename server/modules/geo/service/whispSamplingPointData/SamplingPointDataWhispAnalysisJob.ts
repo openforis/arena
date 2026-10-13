@@ -178,8 +178,9 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     let headers: string[] = []
     const points: SamplingPoints = { rowIndexes: [], coordinates: [] }
     let rowIndex = 0
-    const rows = FlatDataReader.generateRowsFromCsvFile({
+    const rows = FlatDataReader.generateRowsFromFile({
       filePath,
+      fileFormat: FileFormats.csv,
       onHeaders: (headersRead: string[]) => {
         headers = headersRead
       },
@@ -317,7 +318,11 @@ export default class SamplingPointDataWhispAnalysisJob extends Job {
     try {
       let line = await readNextLine()
       let rowIndex = 0
-      for await (const row of FlatDataReader.generateRowsFromCsvFile({ filePath: samplingPointDataFilePath })) {
+      const rows = FlatDataReader.generateRowsFromFile({
+        filePath: samplingPointDataFilePath,
+        fileFormat: FileFormats.csv,
+      })
+      for await (const row of rows) {
         if (line?.[0] === rowIndex) {
           const whispValues = line[1]
           for (const { prop, column } of whispColumns) {
