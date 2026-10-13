@@ -2,8 +2,6 @@
  * App wiring of the model resolver: current user, survey AI policy (B's cache), capabilities, consent dialog,
  * gateway model (A) and the lazily loaded local server engine.
  */
-import type { AiPolicy } from '@common/ai/policy'
-
 import { isConfigAiFeaturesEnabled } from '@webapp/store/system/info/state'
 import { store as reduxStore } from '@webapp/store/store'
 import { isSurveyScopedFeature } from '@webapp/ai/policy/aiFeatureAvailability'
@@ -18,10 +16,7 @@ import {
 } from './capabilitiesStore'
 import { requestLocalServerConsent } from './consentRequests'
 import { getBrowserStorage } from './localServerSettings'
-import type { ModelResolverDeps } from './resolveModel'
-
-// nothing known (no survey for a survey feature, settings not loaded): nothing is allowed
-const OFF_POLICY: AiPolicy = { schema: 'off', data: 'off' }
+import { type ModelResolverDeps, OFF_POLICY } from './resolveModel'
 
 export const appModelResolverDeps: ModelResolverDeps = {
   getUserUuid: getCurrentUserUuid,

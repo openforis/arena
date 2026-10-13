@@ -23,6 +23,9 @@ import type {
   StorageLike,
 } from './types'
 
+// nothing known (no survey for a survey feature, settings not loaded): nothing is allowed
+export const OFF_POLICY: AiPolicy = { schema: 'off', data: 'off' }
+
 export type LocalServerConsentRequest = {
   surveyId?: number
   baseUrl: string
@@ -83,7 +86,7 @@ const consentCancelled = () => new SystemError('aiLocalServerConsentCancelled', 
  * Builds the error of an aborted request (recognised by isAiAbortError).
  * @returns {DOMException} The error.
  */
-const aborted = () => new DOMException('The request was aborted.', 'AbortError')
+export const aborted = () => new DOMException('The request was aborted.', 'AbortError')
 
 /**
  * Returns the address of the server the model is built from (normalized, from the capabilities).
