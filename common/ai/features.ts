@@ -160,14 +160,15 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     gateway: false,
     tools: false,
   },
-  // server jobs
+  // schema summary export with AI descriptions (generated in the browser)
   dataDictionary: {
     key: 'dataDictionary',
     category: dataDictionary,
     dataClass: schema,
     permission: surveyView,
-    gateway: false,
+    gateway: true,
   },
+  // admin "Test" of the AI settings (server only)
   internalPing: { key: 'internalPing', category: null, dataClass: schema, permission: admin, gateway: false },
 }
 

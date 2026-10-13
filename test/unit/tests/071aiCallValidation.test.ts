@@ -20,7 +20,6 @@ describe('parseGatewayRequest', () => {
 
   test.each([
     [{ feature: 'nope' }, 'aiFeatureUnknown'],
-    [{ feature: 'dataDictionary' }, 'aiFeatureUnknown'],
     [{ feature: 'internalPing' }, 'aiFeatureUnknown'],
     [{ dataClass: 'data' }, 'aiCallInvalid'],
     [{ dataClass: 'secret' }, 'aiCallInvalid'],
@@ -41,6 +40,12 @@ describe('parseGatewayRequest', () => {
   test('the activity log summary is a data-class feature', () => {
     const body = { ...validBody, feature: 'activityLogSummary', dataClass: 'data' }
     expect(parseGatewayRequest(body).dataClass).toBe('data')
+  })
+
+  test('the data dictionary is a survey feature of the gateway', async () => {
+    const body = { ...validBody, feature: 'dataDictionary' }
+    expect(parseGatewayRequest(body).feature).toBe('dataDictionary')
+    await expectSystemErrorKey(() => parseGatewayRequest({ ...body, surveyId: undefined }), 'aiCallInvalid')
   })
 })
 

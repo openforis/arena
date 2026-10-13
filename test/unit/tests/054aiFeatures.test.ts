@@ -38,6 +38,7 @@ describe('AI feature registry', () => {
         'assistantCleaning',
         'assistantDesign',
         'chatbot',
+        'dataDictionary',
         'dataQueryGenerate',
         'dataQuerySummarize',
         'expressionExplain',
@@ -45,12 +46,12 @@ describe('AI feature registry', () => {
         'translation',
       ].sort()
     )
-    expect(isGatewayFeature('dataDictionary')).toBe(false)
+    expect(isGatewayFeature('dataDictionary')).toBe(true)
     expect(isGatewayFeature('internalPing')).toBe(false)
     expect(isGatewayFeature('nope')).toBe(false)
   })
 
-  test('the data dictionary job uses the documented flag key', () => {
+  test('the data dictionary uses the documented flag key', () => {
     expect(getAiFeature('dataDictionary')?.category).toBe(AiFeatureCategory.dataDictionary)
     expect(getAiFeature('schemaSummary')).toBeNull()
   })

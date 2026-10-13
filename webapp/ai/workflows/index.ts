@@ -85,6 +85,22 @@ const translateAllLabels = async (params: Parameters<TranslateAllLabelsModule['t
   (await loadTranslateAllLabels()).translateAllLabelsWorkflow(params)
 
 /**
+ * Loads the data dictionary module on first use.
+ * @returns {Promise<object>} The module.
+ */
+const loadDataDictionary = () => import('./dataDictionary')
+
+type DataDictionaryModule = Awaited<ReturnType<typeof loadDataDictionary>>
+
+/**
+ * Generates the AI descriptions of the schema summary export (see workflows/dataDictionary).
+ * @param {object} params - Workflow parameters (surveyId, cycle, signal, onProgress).
+ * @returns {Promise<object>} { aiDescriptions, failedCount }.
+ */
+const generateDataDictionary = async (params: Parameters<DataDictionaryModule['generateDataDictionaryWorkflow']>[0]) =>
+  (await loadDataDictionary()).generateDataDictionaryWorkflow(params)
+
+/**
  * Loads the activity log workflow module on first use.
  * @returns {Promise<object>} The module.
  */
@@ -136,6 +152,7 @@ export const AiWorkflows = {
   explainExpression,
   translateLabels,
   translateAllLabels,
+  generateDataDictionary,
   summarizeActivityLog,
   generateDataQuery,
   summarizeDataQuery,
