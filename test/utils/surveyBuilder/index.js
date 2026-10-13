@@ -66,9 +66,13 @@ class SurveyBuilder {
     return this
   }
 
-  // additional survey info props (e.g. survey settings)
-  props(props) {
-    this.extraProps = props
+  /**
+   * Sets the survey languages (the first one is the default language).
+   * @param {...string} langs - Language codes.
+   * @returns {SurveyBuilder} - This builder.
+   */
+  languages(...langs) {
+    this.langs = langs
     return this
   }
 
@@ -77,7 +81,7 @@ class SurveyBuilder {
       ownerUuid: User.getUuid(this.user),
       name: this.name,
       label: this.label,
-      languages: [this.lang],
+      languages: this.langs ?? [this.lang],
       template: this.isTemplate,
       ...this.extraProps,
     })
