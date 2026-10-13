@@ -1,6 +1,5 @@
 export default {
   section: 'Fonctionnalités IA',
-  enableFeatures: 'Activer les fonctionnalités IA',
   featuresDisabled: 'Les fonctionnalités IA sont désactivées sur ce déploiement.',
   encryptionMissing:
     "Le déploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les clés API personnelles ne peuvent pas être enregistrées tant qu'un administrateur ne l'a pas configuré.",
@@ -85,17 +84,32 @@ export default {
     schema: 'Conception du formulaire',
     data: 'Données des enregistrements',
   },
-  features: {
-    section: "Ce que l'IA peut faire et ce qu'elle voit",
-    keyHint:
-      "Conception du formulaire et Données des enregistrements correspondent aux deux réglages de la politique d'IA de chaque formulaire.",
-    sendsLabel: 'Envoie :',
-    groupHints: {
-      none: "N'importe quel moteur.",
-      cloud: 'Politique par défaut du formulaire : tout moteur, cloud compris.',
-      onDevice:
-        "Politique par défaut du formulaire : cet appareil uniquement. Un moteur cloud doit être autorisé par l'administrateur du formulaire.",
+  access: {
+    section: "Ce que l'IA peut voir",
+    levels: {
+      off: 'Désactivée',
+      help: 'Aide seulement',
+      design: '+ Conception du formulaire',
+      data: '+ Données des enregistrements',
     },
+    classes: {
+      help: { title: "Aide d'Arena", text: "Votre question et des extraits du manuel d'utilisation d'Arena." },
+      design: {
+        title: 'Conception du formulaire',
+        text: "Entités, attributs, libellés, catégories et expressions. Aucune valeur d'enregistrement.",
+      },
+      data: {
+        title: 'Données des enregistrements',
+        text: 'Valeurs des enregistrements et résultats des requêtes. Par défaut, seul un serveur sur cet appareil peut les recevoir.',
+      },
+    },
+    count: '{{on}} fonctionnalités actives sur {{total}}',
+    off: 'Les fonctionnalités IA sont désactivées',
+    customize: 'Personnaliser',
+    customizeHint: 'La politique IA de chaque formulaire peut toujours bloquer un fournisseur.',
+    sendsInfo: 'Ce qui est envoyé',
+  },
+  features: {
     chat: {
       label: "Assistant d'aide",
       sends:

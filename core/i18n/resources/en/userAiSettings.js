@@ -1,6 +1,5 @@
 export default {
   section: 'AI features',
-  enableFeatures: 'Enable AI features',
   featuresDisabled: 'AI features are disabled on this deployment.',
   encryptionMissing:
     'The deployment is missing AI_USER_KEY_ENCRYPTION_SECRET; personal API keys cannot be saved until an administrator configures it.',
@@ -84,15 +83,32 @@ export default {
     schema: 'Survey design',
     data: 'Record data',
   },
-  features: {
-    section: 'What AI can help with, and what it sees',
-    keyHint: "Survey design and Record data match the two settings of each survey's AI policy.",
-    sendsLabel: 'Sends:',
-    groupHints: {
-      none: 'Any engine.',
-      cloud: 'Default survey policy: any engine, cloud included.',
-      onDevice: 'Default survey policy: this device only. A cloud engine needs the survey admin to allow it.',
+  access: {
+    section: 'What AI can see',
+    levels: {
+      off: 'Off',
+      help: 'Help only',
+      design: '+ Survey design',
+      data: '+ Record data',
     },
+    classes: {
+      help: { title: 'Arena help', text: 'Your question and passages from the Arena user manual.' },
+      design: {
+        title: 'Survey design',
+        text: 'Entities, attributes, labels, categories and expressions. No record values.',
+      },
+      data: {
+        title: 'Record data',
+        text: 'Record values and query results. By default, only a server on this device may receive them.',
+      },
+    },
+    count: '{{on}} of {{total}} features on',
+    off: 'AI features are off',
+    customize: 'Customize',
+    customizeHint: "Each survey's AI policy can still block a provider.",
+    sendsInfo: 'What it sends',
+  },
+  features: {
     chat: {
       label: 'Help assistant',
       sends: 'Your question, passages from the Arena user manual and where you are in Arena (the module name).',

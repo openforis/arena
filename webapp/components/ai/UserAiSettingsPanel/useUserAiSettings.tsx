@@ -4,6 +4,8 @@
 import type React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 
+import type { AiAccessLevel } from '@common/ai/accessLevel'
+
 import * as API from '@webapp/service/api'
 
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
@@ -29,6 +31,7 @@ import {
   OTHER_MODEL_VALUE,
   type ProviderSpec,
   settingsToForm,
+  withAccessLevel,
   withoutCloudProvider,
 } from './aiSettingsForm'
 import { saveAiPanelSettings } from './localServerDraft'
@@ -56,7 +59,7 @@ export type UseUserAiSettingsResult = {
   onApiKeyChange: (value: string) => void
   onBaseUrlBlur: () => void
   onApiKeyBlur: () => void
-  onFeaturesEnabledChange: (checked: boolean) => void
+  onAccessLevelChange: (level: AiAccessLevel) => void
   onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
   onSave: () => Promise<void>
   onRemoveProvider: () => Promise<void>
@@ -89,9 +92,12 @@ const useFormFieldHandlers = (setForm: SetForm, markDirty: () => void) => {
     (apiKey: string) => update((prev) => ({ apiKey, apiKeyDirty: true, apiKeyVersion: prev.apiKeyVersion + 1 })),
     [update]
   )
-  const onFeaturesEnabledChange = useCallback(
-    (featuresEnabled: boolean) => update(() => ({ featuresEnabled })),
-    [update]
+  const onAccessLevelChange = useCallback(
+    (level: AiAccessLevel) => {
+      setForm((prev) => withAccessLevel(prev, level))
+      markDirty()
+    },
+    [markDirty, setForm]
   )
   const onFeatureToggleChange = useCallback(
     (category: FeatureCategory) => (checked: boolean) =>
@@ -103,7 +109,7 @@ const useFormFieldHandlers = (setForm: SetForm, markDirty: () => void) => {
     onModelSelectChange,
     onBaseUrlChange,
     onApiKeyChange,
-    onFeaturesEnabledChange,
+    onAccessLevelChange,
     onFeatureToggleChange,
   }
 }

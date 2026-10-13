@@ -1,6 +1,5 @@
 export default {
   section: 'AI機能',
-  enableFeatures: 'AI機能を有効にする',
   featuresDisabled: 'このデプロイメントではAI機能が無効になっています。',
   encryptionMissing:
     'このデプロイメントにはAI_USER_KEY_ENCRYPTION_SECRETが設定されていません。管理者が設定するまで、個人用APIキーは保存できません。',
@@ -85,15 +84,32 @@ export default {
     schema: '調査の設計',
     data: 'レコードデータ',
   },
-  features: {
-    section: 'AI ができることと AI が見るもの',
-    keyHint: '「調査の設計」と「レコードデータ」は、各調査の AI ポリシーの 2 つの設定に対応します。',
-    sendsLabel: '送信内容:',
-    groupHints: {
-      none: '任意のエンジン。',
-      cloud: '調査の既定ポリシー: クラウドを含む任意のエンジン。',
-      onDevice: '調査の既定ポリシー: このデバイスのみ。クラウドエンジンには調査管理者の許可が必要です。',
+  access: {
+    section: 'AI が参照できるもの',
+    levels: {
+      off: 'オフ',
+      help: 'ヘルプのみ',
+      design: '+ 調査の設計',
+      data: '+ レコードデータ',
     },
+    classes: {
+      help: { title: 'Arena ヘルプ', text: '質問と Arena ユーザーマニュアルの抜粋。' },
+      design: {
+        title: '調査の設計',
+        text: 'エンティティ、属性、ラベル、カテゴリ、式。レコードの値は含みません。',
+      },
+      data: {
+        title: 'レコードデータ',
+        text: 'レコードの値とクエリ結果。既定では、このデバイス上のサーバーだけが受け取れます。',
+      },
+    },
+    count: '{{total}} 件中 {{on}} 件の機能がオン',
+    off: 'AI 機能はオフです',
+    customize: 'カスタマイズ',
+    customizeHint: '各調査の AI ポリシーにより、プロバイダーがブロックされる場合があります。',
+    sendsInfo: '送信される内容',
+  },
+  features: {
     chat: {
       label: 'ヘルプアシスタント',
       sends: '質問、Arena ユーザーマニュアルの抜粋、および Arena 内の現在位置 (モジュール名)。',

@@ -3,12 +3,10 @@ import './UserAiSettingsPanel.scss'
 import React, { useEffect, useImperativeHandle } from 'react'
 
 import { Fieldset } from '@webapp/components/Fieldset'
-import { Checkbox } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
 
+import { AiAccessLevel } from './AiAccessLevel'
 import { AiEngineOrder } from './AiEngineOrder'
 import { AiEngineStatusLine } from './AiEngineStatusLine'
-import { AiFeatureGroups } from './AiFeatureGroups'
 import { CloudProviderSection } from './CloudProviderSection'
 import { LocalAiSection } from './LocalAiSection'
 import { type UseUserAiSettingsResult, useUserAiSettings } from './useUserAiSettings'
@@ -22,7 +20,7 @@ type SectionsProps = {
 }
 
 /**
- * Sections shown when the AI features are on: Where AI runs, then the feature switches.
+ * Sections shown when AI can see something: Where AI runs, then the footer note.
  * @param {SectionsProps} props - Props.
  * @returns {React.ReactElement} The sections.
  */
@@ -36,7 +34,6 @@ const PanelSections = ({ panel }: SectionsProps) => {
         <CloudProviderSection panel={panel} />
         {local.draft.enabled && <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />}
       </Fieldset>
-      <AiFeatureGroups toggles={panel.form.featureToggles} onToggleChange={panel.onFeatureToggleChange} />
       <div className="user-ai-settings-panel__footer-note">{panel.i18n.t('userAiSettings:footerNote')}</div>
     </>
   )
@@ -75,10 +72,13 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
             {i18n.t('userAiSettings:encryptionMissing')}
           </div>
         )}
-        <FormItem label="userAiSettings:enableFeatures">
-          <Checkbox checked={form.featuresEnabled} onChange={panel.onFeaturesEnabledChange} />
-        </FormItem>
-        {form.featuresEnabled && <PanelSections panel={panel} />}
+        <AiAccessLevel
+          accessLevel={form.accessLevel}
+          toggles={form.featureToggles}
+          onLevelChange={panel.onAccessLevelChange}
+          onToggleChange={panel.onFeatureToggleChange}
+        />
+        {form.accessLevel > 0 && <PanelSections panel={panel} />}
       </Fieldset>
     )
   }

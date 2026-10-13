@@ -1,5 +1,4 @@
 import { AiFeatureCategory, AiFeaturePermission, AiFeatures } from '@common/ai/features'
-import { defaultAiPolicy } from '@common/ai/policy'
 
 import enSettings from '@core/i18n/resources/en/userAiSettings'
 import esSettings from '@core/i18n/resources/es/userAiSettings'
@@ -38,13 +37,6 @@ describe('feature groups', () => {
         const expected = feature.permission === AiFeaturePermission.loggedIn ? null : feature.dataClass
         expect([feature.key, group.dataClass]).toEqual([feature.key, expected])
       }
-    }
-  })
-
-  test('the hints describe the default survey AI policy', () => {
-    for (const group of FEATURE_GROUPS) {
-      const expected = group.dataClass ? defaultAiPolicy[group.dataClass] : 'none'
-      expect([group.id, group.hintKey]).toEqual([group.id, expected])
     }
   })
 
