@@ -65,12 +65,22 @@ class SurveyBuilder {
     return this
   }
 
+  /**
+   * Sets the survey languages (the first one is the default language).
+   * @param {...string} langs - Language codes.
+   * @returns {SurveyBuilder} - This builder.
+   */
+  languages(...langs) {
+    this.langs = langs
+    return this
+  }
+
   async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),
       name: this.name,
       label: this.label,
-      languages: [this.lang],
+      languages: this.langs ?? [this.lang],
       template: this.isTemplate,
     })
 

@@ -5,6 +5,7 @@
 import type { AiExpressionResult } from '@common/ai/tasks/expression'
 
 export type { AiDataQueryGenerateResult, AiDataQuerySummarizeResult } from '@common/ai/tasks/dataQuery'
+export type { NodeDefsTranslationResult } from './translateAllLabels'
 
 import { runStreamWithCallbacks } from '../runtime/streamCallbacks'
 
@@ -68,6 +69,22 @@ const translateLabels = async (
 ) => (await loadTranslation()).translateLabelsWorkflow(params)
 
 /**
+ * Loads the "AI: Translate labels" batch module on first use.
+ * @returns {Promise<object>} The module.
+ */
+const loadTranslateAllLabels = () => import('./translateAllLabels')
+
+type TranslateAllLabelsModule = Awaited<ReturnType<typeof loadTranslateAllLabels>>
+
+/**
+ * Translates every label and description of the survey (see workflows/translateAllLabels).
+ * @param {object} params - Workflow parameters (survey, surveyId, signal, onProgress).
+ * @returns {Promise<object>} The review data of the translation modal.
+ */
+const translateAllLabels = async (params: Parameters<TranslateAllLabelsModule['translateAllLabelsWorkflow']>[0]) =>
+  (await loadTranslateAllLabels()).translateAllLabelsWorkflow(params)
+
+/**
  * Loads the activity log workflow module on first use.
  * @returns {Promise<object>} The module.
  */
@@ -118,6 +135,7 @@ export const AiWorkflows = {
   generateExpression,
   explainExpression,
   translateLabels,
+  translateAllLabels,
   summarizeActivityLog,
   generateDataQuery,
   summarizeDataQuery,
