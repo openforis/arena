@@ -128,8 +128,8 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   getDataModule(user, surveyInfo),
   getAnalysisModule(user, surveyInfo),
   getUsersModule(user, surveyInfo),
-  ...getSystemAdminModules(user),
   getHelpModule(user),
+  ...getSystemAdminModules(user),
 ]
 
 export const getKey = A.prop(keys.key)
