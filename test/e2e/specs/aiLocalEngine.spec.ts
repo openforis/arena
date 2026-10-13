@@ -259,7 +259,8 @@ test.describe('AI settings panel', () => {
     await page.getByTestId(TestId.ai.cloudRemove).click()
 
     await expect(providerSelect).toHaveValue('default')
-    await expect(page.getByTestId(TestId.ai.featureToggle('assistantDesign'))).toHaveClass(/Mui-checked/)
+    await page.getByTestId(TestId.ai.accessCustomize).click()
+    await expect(page.getByTestId(TestId.ai.featureToggle('assistantDesign'))).toHaveAttribute('aria-pressed', 'true')
     await expect
       .poll(() => api.getAiSettings())
       .toMatchObject({

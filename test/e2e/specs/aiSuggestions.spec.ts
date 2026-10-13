@@ -124,11 +124,12 @@ test.describe('Module introduction (mock provider)', () => {
   test('with Proactive suggestions off there is no dot and no card', async ({ page, api, sampleSurvey: _ }) => {
     const userUuid = await api.getCurrentUserUuid()
     await page.goto(Urls.userProfile)
+    await page.getByTestId(TestId.ai.accessCustomize).click()
     const toggle = page.getByTestId(TestId.ai.featureToggle('assistantSuggestions'))
     // on by default (enableAiFeatures turns every category on)
-    await expect(toggle).toHaveClass(/Mui-checked/)
+    await expect(toggle).toHaveAttribute('aria-pressed', 'true')
     await toggle.click()
-    await expect(toggle).not.toHaveClass(/Mui-checked/)
+    await expect(toggle).toHaveAttribute('aria-pressed', 'false')
     await page.locator('button.btn-save').click()
     await expect.poll(async () => (await api.getAiSettings()).featureToggles?.assistantSuggestions).toBe(false)
 
