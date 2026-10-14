@@ -187,4 +187,4 @@ export {
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export { aiSettings } from './ai'
+export { aiProviders, aiSettings } from './ai'
