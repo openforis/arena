@@ -8,8 +8,10 @@ export default {
   },
   fileTooLarge:
     'The selected file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',
-  compareAgain: 'Compare again',
-  compareAnotherFile: 'Compare another file',
+  selectNewFile: 'Select a new file',
+  selectNewFileInfo: 'Discard this comparison and upload another survey file',
+  refreshComparison: 'Refresh comparison',
+  refreshComparisonInfo: 'Compare the same file again with the current version of this survey (e.g. after editing it)',
   sourceSurvey: 'Uploaded survey: {{name}}',
   identical: 'The surveys are identical',
   counts: '{{added}} only in the uploaded survey, {{changed}} changed, {{removed}} only in this survey',

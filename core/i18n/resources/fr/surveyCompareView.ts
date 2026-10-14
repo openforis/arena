@@ -10,8 +10,11 @@ export default {
   },
   fileTooLarge:
     'Le fichier sélectionné est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
-  compareAgain: 'Comparer à nouveau',
-  compareAnotherFile: 'Comparer un autre fichier',
+  selectNewFile: 'Sélectionner un nouveau fichier',
+  selectNewFileInfo: 'Abandonner cette comparaison et charger un autre fichier de formulaire',
+  refreshComparison: 'Actualiser la comparaison',
+  refreshComparisonInfo:
+    "Comparer à nouveau le même fichier avec la version actuelle de ce formulaire (par ex. après l'avoir modifié)",
   sourceSurvey: 'Formulaire chargé : {{name}}',
   identical: 'Les formulaires sont identiques',
   counts:

@@ -296,7 +296,8 @@ export const SurveyCompare = () => {
         {result && (
           <Button
             iconClassName="icon-upload2 icon-12px"
-            label="surveyCompareView:compareAnotherFile"
+            label="surveyCompareView:selectNewFile"
+            title="surveyCompareView:selectNewFileInfo"
             onClick={onReset}
             variant="outlined"
           />
@@ -304,7 +305,8 @@ export const SurveyCompare = () => {
         {sourceFileName && (
           <Button
             iconClassName="icon-loop2 icon-12px"
-            label="surveyCompareView:compareAgain"
+            label="surveyCompareView:refreshComparison"
+            title="surveyCompareView:refreshComparisonInfo"
             onClick={() => startCompare({ sourceFileName, manualMatches })}
             variant="outlined"
           />

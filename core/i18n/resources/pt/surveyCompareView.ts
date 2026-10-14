@@ -10,8 +10,11 @@ export default {
   },
   fileTooLarge:
     'O arquivo selecionado é grande demais (máx. {{maxSize}} MB): exporte o inventário sem dados, os registros e seus arquivos não são necessários para comparar inventários',
-  compareAgain: 'Comparar novamente',
-  compareAnotherFile: 'Comparar outro arquivo',
+  selectNewFile: 'Selecionar um novo arquivo',
+  selectNewFileInfo: 'Descartar esta comparação e carregar outro arquivo de inventário',
+  refreshComparison: 'Atualizar comparação',
+  refreshComparisonInfo:
+    'Comparar novamente o mesmo arquivo com a versão atual deste inventário (por ex. depois de editá-lo)',
   sourceSurvey: 'Inventário carregado: {{name}}',
   identical: 'Os inventários são idênticos',
   counts: '{{added}} somente no inventário carregado, {{changed}} alterados, {{removed}} somente neste inventário',

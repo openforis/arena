@@ -7,8 +7,10 @@ export default {
   },
   fileTooLarge:
     '選択したファイルが大きすぎます（最大 {{maxSize}} MB）：データなしで調査をエクスポートしてください。調査の比較にレコードとそのファイルは不要です',
-  compareAgain: '再比較',
-  compareAnotherFile: '別のファイルを比較',
+  selectNewFile: '新しいファイルを選択',
+  selectNewFileInfo: 'この比較を破棄して、別の調査ファイルをアップロードします',
+  refreshComparison: '比較を更新',
+  refreshComparisonInfo: '同じファイルをこの調査の現在のバージョンと再度比較します（例：編集後）',
   sourceSurvey: 'アップロードした調査：{{name}}',
   identical: '調査は同一です',
   counts: 'アップロードした調査のみ {{added}}、変更 {{changed}}、この調査のみ {{removed}}',
