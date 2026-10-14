@@ -33,7 +33,14 @@ export default {
   schemaSummary_xlsx: 'Сводка схемы (Excel)',
   schemaSummaryAiDescriptions_csv: 'Сводка схемы + описания ИИ (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Сводка схемы + описания ИИ (Excel)',
-  schemaSummaryAiDescriptionsFailed: 'Не удалось сгенерировать описания ИИ для {{count}} полей; они оставлены пустыми.',
+  schemaSummaryAiDescriptionsFailed_one:
+    'Не удалось сгенерировать описание ИИ для {{count}} поля; оно оставлено пустым.',
+  schemaSummaryAiDescriptionsFailed_few:
+    'Не удалось сгенерировать описания ИИ для {{count}} полей; они оставлены пустыми.',
+  schemaSummaryAiDescriptionsFailed_many:
+    'Не удалось сгенерировать описания ИИ для {{count}} полей; они оставлены пустыми.',
+  schemaSummaryAiDescriptionsFailed_other:
+    'Не удалось сгенерировать описания ИИ для {{count}} полей; они оставлены пустыми.',
   hidePages: 'Скрыть страницы',
   showPages: 'Показать страницы',
   move: "Переместить '{{nodeDefLabel}}'",
@@ -179,7 +186,10 @@ export default {
     custom: 'Пользовательский',
     defaultDescription: 'Описание по умолчанию',
     defaultLabel: 'Метка по умолчанию',
-    failed: 'ИИ не смог создать {{count}} переводов; для них нет предложения ИИ.',
+    failed_one: 'ИИ не смог создать {{count}} перевод; для него нет предложения ИИ.',
+    failed_few: 'ИИ не смог создать {{count}} перевода; для них нет предложения ИИ.',
+    failed_many: 'ИИ не смог создать {{count}} переводов; для них нет предложения ИИ.',
+    failed_other: 'ИИ не смог создать {{count}} перевода; для них нет предложения ИИ.',
     path: 'Путь',
     showDescriptions: 'Показать описания',
     title: 'Перевести метки определений узлов',

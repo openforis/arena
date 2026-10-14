@@ -12,6 +12,7 @@ import ptErrors from '@core/i18n/resources/pt/appErrors'
 import ruErrors from '@core/i18n/resources/ru/appErrors'
 
 import {
+  assertNoLegacyIncludeAiDescriptions,
   parseAiDescriptions,
   parseAiDescriptionsFailedCount,
 } from '@server/modules/survey/service/schemaSummary/aiDescriptions'
@@ -128,6 +129,22 @@ describe('schema summary AI descriptions on the server (255)', () => {
     for (const raw of [-1, 1.5, '3', AiLimits.dataDictionaryMaxDescriptions + 1]) {
       await expectSystemErrorKey(() => parseAiDescriptionsFailedCount(raw), 'aiDescriptionsInvalid')
     }
+  })
+
+  test('a body with the removed includeAiDescriptions is rejected with a 400, not exported without the column', async () => {
+    const error: any = await expectSystemErrorKey(
+      () => assertNoLegacyIncludeAiDescriptions({ surveyId: 1, includeAiDescriptions: true }),
+      'aiIncludeAiDescriptionsRemoved'
+    )
+    expect(error.statusCode).toBe(400)
+    expect(() => assertNoLegacyIncludeAiDescriptions({ surveyId: 1, aiDescriptions: {} })).not.toThrow()
+  })
+
+  test.each(Object.keys(errorsByLang))('%s has the aiIncludeAiDescriptionsRemoved message', (lang) => {
+    const text = errorsByLang[lang].aiIncludeAiDescriptionsRemoved
+    expect(typeof text).toBe('string')
+    const cyrillic = lang === 'ru' || lang === 'mn'
+    expect(/[Ѐ-ӿ]/.test(text) || !cyrillic).toBe(true)
   })
 
   test.each(Object.keys(errorsByLang))('%s has the aiDescriptionsInvalid message', (lang) => {

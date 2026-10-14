@@ -95,6 +95,7 @@ export default {
   aiProviderRejected: 'AIプロバイダーがリクエストを拒否しました（AI設定のモデル名を確認してください）。',
   aiDataDictionaryInvalid: 'AIから利用可能なフィールド説明が返されませんでした。',
   aiDescriptionsInvalid: 'エクスポートと一緒に送信されたAIのフィールド説明が無効です。',
+  aiIncludeAiDescriptionsRemoved: 'このページは古くなっています。再読み込みして、もう一度エクスポートしてください。',
   aiSchemaMissing: '機能「{{feature}}」のAI構造化出力スキーマが見つかりません。',
   aiProviderInvalid: 'サポートされていないAIプロバイダーです：{{provider}}。',
   aiModelMissing: 'AIモデルの識別子が必要です。',

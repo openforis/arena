@@ -22,7 +22,11 @@ import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as UserService from '../../user/service/userService'
 import { SchemaSummary } from '../service/schemaSummary'
-import { parseAiDescriptions, parseAiDescriptionsFailedCount } from '../service/schemaSummary/aiDescriptions'
+import {
+  assertNoLegacyIncludeAiDescriptions,
+  parseAiDescriptions,
+  parseAiDescriptionsFailedCount,
+} from '../service/schemaSummary/aiDescriptions'
 import * as SurveyService from '../service/surveyService'
 
 /**
@@ -363,13 +367,15 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
+        const params = Request.getParams(req)
+        assertNoLegacyIncludeAiDescriptions(params)
         const {
           surveyId,
           cycle,
           fileFormat = FileFormats.xlsx,
           aiDescriptions = null,
           aiDescriptionsFailedCount = 0,
-        } = Request.getParams(req)
+        } = params
         const user = Request.getUser(req)
         const ai =
           aiDescriptions === null

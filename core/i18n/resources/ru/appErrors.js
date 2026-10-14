@@ -117,6 +117,7 @@ export default {
   aiProviderRejected: 'Поставщик ИИ отклонил запрос (проверьте название модели в настройках ИИ).',
   aiDataDictionaryInvalid: 'ИИ не вернул пригодные описания полей.',
   aiDescriptionsInvalid: 'Описания полей от ИИ, отправленные с экспортом, недействительны.',
+  aiIncludeAiDescriptionsRemoved: 'Эта страница устарела. Перезагрузите её и повторите экспорт.',
   aiSchemaMissing: 'Отсутствует схема структурированного вывода ИИ для функции "{{feature}}".',
   aiProviderInvalid: 'Неподдерживаемый провайдер ИИ: {{provider}}.',
   aiModelMissing: 'Требуется идентификатор модели ИИ.',

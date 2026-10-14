@@ -35,7 +35,9 @@ eliminando los valores existentes insertados en ellas (si los hay).
   schemaSummary_xlsx: 'Resumen del esquema (Excel)',
   schemaSummaryAiDescriptions_csv: 'Resumen del esquema + descripciones IA (CSV)',
   schemaSummaryAiDescriptions_xlsx: 'Resumen del esquema + descripciones IA (Excel)',
-  schemaSummaryAiDescriptionsFailed:
+  schemaSummaryAiDescriptionsFailed_one:
+    'No se pudo generar la descripción con IA para {{count}} campo; se deja vacía.',
+  schemaSummaryAiDescriptionsFailed_other:
     'No se pudieron generar descripciones con IA para {{count}} campos; se dejan vacías.',
   hidePages: 'Ocultar páginas',
   showPages: 'Mostrar páginas',
@@ -183,7 +185,8 @@ En Arena Mobile:
     custom: 'Personalizado',
     defaultDescription: 'Descripción por defecto',
     defaultLabel: 'Etiqueta por defecto',
-    failed: 'La IA no pudo generar {{count}} traducciones; no tienen sugerencia de la IA.',
+    failed_one: 'La IA no pudo generar {{count}} traducción; no tiene sugerencia de la IA.',
+    failed_other: 'La IA no pudo generar {{count}} traducciones; no tienen sugerencia de la IA.',
     path: 'Ruta',
     showDescriptions: 'Mostrar descripciones',
     title: 'Traducir etiquetas de definiciones de nodos',

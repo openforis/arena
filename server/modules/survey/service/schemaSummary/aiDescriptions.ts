@@ -1,4 +1,3 @@
-// server/modules/survey/service/schemaSummary/aiDescriptions.ts
 /**
  * Validation of the AI descriptions sent with a schema summary export: they are generated in the browser, so the
  * server checks them like any other user input before writing them in the aiDescription column.
@@ -56,4 +55,17 @@ export const parseAiDescriptionsFailedCount = (raw: unknown): number => {
   const count = raw as number
   if (count < 0 || count > AiLimits.dataDictionaryMaxDescriptions) throw invalid('failedCount')
   return count
+}
+
+/**
+ * Rejects the body of a tab opened before the deploy: it asks for server-generated descriptions, which no longer
+ * exist, and would otherwise get an export silently without the column.
+ * @param {object} body - Request parameters.
+ * @returns {void}
+ * @throws {SystemError} aiIncludeAiDescriptionsRemoved (400) when the body has includeAiDescriptions.
+ */
+export const assertNoLegacyIncludeAiDescriptions = (body: Record<string, unknown>): void => {
+  if (body && Object.hasOwn(body, 'includeAiDescriptions')) {
+    throw new SystemError('aiIncludeAiDescriptionsRemoved', {}, StatusCodes.BAD_REQUEST)
+  }
 }

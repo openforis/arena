@@ -123,6 +123,7 @@ export default {
   aiProviderRejected: 'El proveedor de IA rechazó la solicitud (compruebe el nombre del modelo en Ajustes de IA).',
   aiDataDictionaryInvalid: 'La IA no devolvió descripciones de campos utilizables.',
   aiDescriptionsInvalid: 'Las descripciones de campos de la IA enviadas con la exportación no son válidas.',
+  aiIncludeAiDescriptionsRemoved: 'Esta página está desactualizada. Recárguela y vuelva a exportar.',
   aiSchemaMissing: 'Falta el esquema de salida estructurada de IA para la función "{{feature}}".',
   aiProviderInvalid: 'Proveedor de IA no compatible: {{provider}}.',
   aiModelMissing: 'El identificador del modelo de IA es obligatorio.',

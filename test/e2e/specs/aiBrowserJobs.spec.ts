@@ -58,6 +58,8 @@ test.describe('AI batches run in the browser (mock provider)', () => {
       await expect(modal).toBeVisible({ timeout: 30_000 })
       await expect(modal).toContainText('Translate Node Definition Labels')
       await expect(modal).toContainText(cluster.label)
+      // the mock translates every text into every language: the suggestion shows and nothing is reported as failed
+      await expect(modal).toContainText('MOCK fr')
       await expect(page.getByTestId(TestId.ai.translationFailedNotice)).toHaveCount(0)
     })
   })
