@@ -4,15 +4,6 @@ export default {
   encryptionMissing:
     'A implantação não possui AI_USER_KEY_ENCRYPTION_SECRET; chaves API pessoais não podem ser salvas até que um administrador configure isso.',
 
-  provider: 'Provedor',
-  providers: {
-    default: 'Padrão do Arena',
-    openai: 'OpenAI',
-    anthropic: 'Anthropic (Claude)',
-    google: 'Google (Gemini)',
-    'openai-compatible': 'Compatível com OpenAI (Azure, OpenRouter, Ollama, ...)',
-    'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
-  },
   model: 'Modelo',
   modelOther: 'Outro (digite um id de modelo)...',
   baseUrl: 'URL base',
@@ -29,27 +20,20 @@ export default {
   saveFailed: 'Falha ao salvar configurações de IA: {{message}}',
 
   status: {
-    now: 'Agora:',
     ready: 'Pronto',
     notTested: 'Não testado',
     notAvailable: 'Indisponível',
-    none: 'Ative o servidor local ou escolha um provedor.',
+    notSetUp: 'Não configurado',
   },
   where: {
-    section: 'Onde a IA é executada',
-    order: {
-      title: 'Ordem',
-      localFirst: 'Usar primeiro o servidor local, com o provedor na nuvem como alternativa',
-      cloudFirst: 'Usar primeiro o provedor na nuvem',
-      hint: 'A política de IA de cada inventário ainda pode bloquear um motor. Por padrão, os dados dos registros ficam neste dispositivo.',
-    },
+    onDevice: 'Este computador',
+    orgHosted: 'Servidor da organização',
+    cloudOwnKey: 'Nuvem · sua chave',
+    cloud: 'Nuvem',
   },
   localServer: {
-    name: 'Servidor de IA local',
     where: 'Neste computador ou na sua rede',
-    use: 'Usar',
     baseUrl: 'URL do servidor',
-    test: 'Testar',
     answered: 'Respondeu',
     noModels: 'O servidor não lista nenhum modelo. Carregue um modelo no seu servidor local.',
     contextTokens: 'Contexto: {{count}} tokens',
@@ -57,7 +41,6 @@ export default {
     model: 'Modelo',
     modelPlaceholder: 'Teste a conexão para listar os modelos',
     help: 'Inicie seu servidor local (por exemplo LM Studio ou Ollama) e permita as solicitações deste site (CORS). Seu navegador pode pedir permissão para acessar dispositivos da rede local.',
-    docsLink: 'Documentação do LM Studio',
     httpsHint:
       'O Arena é servido por HTTPS: um servidor em outra máquina da sua rede precisa de HTTPS, ou de um navegador com Local Network Access (Chrome) e sua permissão.',
     cloudWarning:
@@ -65,19 +48,25 @@ export default {
     notSaved:
       'As configurações do servidor de IA local não puderam ser salvas neste navegador (armazenamento bloqueado ou cheio).',
   },
-  cloud: {
-    name: 'Provedor na nuvem',
-    where: 'salvo com sua conta',
-    defaultHint: 'Usa o provedor configurado pelo administrador do Arena.',
-    defaultNone: 'Nenhum está configurado neste servidor.',
-    localUrlHint:
-      'Este endereço está no seu computador ou na sua rede. Para o LM Studio, use o Servidor de IA local acima. O servidor do Arena não consegue acessá-lo.',
-    localUrlLink: 'Usar o Servidor de IA local',
-    test: 'Testar',
-    testOk: 'Respondeu em {{latencyMs}} ms',
-    remove: 'Remover meu provedor',
-    removed: 'Seu provedor foi removido. Os recursos de IA usam o padrão do Arena.',
-    removedNoDefault: 'Seu provedor foi removido.',
+  list: {
+    section: 'Provedores',
+    add: 'Adicionar provedor',
+    arenaDefault: 'Padrão do Arena',
+    default: 'Padrão',
+    defaultMissing:
+      'Seu provedor padrão é um servidor local salvo em outro navegador. Torne outro provedor o padrão para usar a IA aqui.',
+    footerHint: 'Os provedores são salvos quando você os adiciona. O que a IA pode ver é salvo com Salvar.',
+    menu: 'Ações para {{name}}',
+    makeDefault: 'Tornar padrão',
+    test: 'Testar conexão',
+    edit: 'Editar…',
+    remove: 'Remover',
+    removeConfirm: 'Remover {{name}}? As conversas que o usam passarão a usar seu provedor padrão.',
+    removed: '{{name}} foi removido.',
+    defaultChanged: '{{name}} agora é seu provedor padrão.',
+    testOk: '{{name}} respondeu.',
+    testFailed: '{{name}} não respondeu. Edite-o para verificar suas configurações.',
+    actionFailed: 'Não foi possível salvar a alteração: {{message}}',
   },
   types: {
     local: 'Servidor local',
@@ -192,5 +181,4 @@ export default {
         'O nome do inventário, nomes de usuários, tipos de atividade, contagens e datas do registro de atividades.',
     },
   },
-  footerNote: 'Todas as configurações de IA são salvas com o botão Salvar do perfil.',
 }

@@ -3,8 +3,6 @@ import {
   buildSettingsUpdate,
   countAccessLevelFeatures,
   createEmptyForm,
-  DEFAULT_PROVIDER_VALUE,
-  getProviderSpec,
   settingsToForm,
   withAccessLevel,
 } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
@@ -58,13 +56,12 @@ describe('access level in the browser (252)', () => {
     expect(countAccessLevelFeatures({ accessLevel: 0, featureToggles })).toEqual({ on: 0, total: 0 })
   })
 
-  test('the save body sends the level and the derived master switch', () => {
+  test('the save body sends the level and the derived master switch, never a provider field', () => {
     const form = withAccessLevel(createEmptyForm(), 1)
-    expect(buildSettingsUpdate({ form, spec: getProviderSpec(DEFAULT_PROVIDER_VALUE) })).toEqual({
+    expect(buildSettingsUpdate(form)).toEqual({
       accessLevel: 1,
       featuresEnabled: true,
       featureToggles: form.featureToggles,
-      enabled: false,
     })
   })
 })

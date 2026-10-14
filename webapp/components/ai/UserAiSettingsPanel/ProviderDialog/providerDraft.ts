@@ -4,7 +4,7 @@
  * saved with: a changed base URL asks for the key again. Pure.
  */
 import { AiProvider } from '@common/ai/aiProvider'
-import { isOrgHostedUrl, withDefaultHttpScheme } from '@common/ai/localServerAddress'
+import { isLocalOrPrivateUrl, isOrgHostedUrl, withDefaultHttpScheme } from '@common/ai/localServerAddress'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   getDefaultProviderName,
@@ -19,7 +19,38 @@ import type { AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 import type { AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
 import type { AiProviderRequest, AiProviderTestResponse } from '@webapp/service/api/ai/providers'
 
-import { shouldShowLocalUrlHint as isLocalUrlWithoutAllowlist, type TFunction } from '../aiSettingsForm'
+import type { TFunction } from '../aiSettingsForm'
+
+// the value of the model select that switches to a typed model id
+export const OTHER_MODEL_VALUE = '__other__'
+
+// placeholders by stored provider type
+export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
+  [AiProvider.openaiCompatible]: 'https://openrouter.ai/api/v1',
+  [AiProvider.vercelAiSdk]: 'https://your-app.example.com/api/chat',
+}
+
+export const MODEL_PLACEHOLDERS: Record<string, string> = {
+  [AiProvider.openai]: 'gpt-4o-mini',
+  [AiProvider.anthropic]: 'claude-haiku-4-5',
+  [AiProvider.google]: 'gemini-2.0-flash',
+  [AiProvider.openaiCompatible]: 'llama3.3:70b',
+}
+
+export type AiModel = {
+  id: string
+  description?: string
+}
+
+/**
+ * Returns the model to keep after the list was fetched.
+ * @param {object} params - Parameters.
+ * @param {string} params.model - Model in the draft.
+ * @param {AiModel[]} params.models - Listed models.
+ * @returns {string} The model when listed, else the first listed (unchanged for an empty list).
+ */
+export const chooseListedModel = ({ model, models }: { model: string; models: AiModel[] }): string =>
+  models.some((listed) => listed.id === model) ? model : (models[0]?.id ?? model)
 
 export type ProviderDialogType =
   'local' | 'orgServer' | 'openai' | 'anthropic' | 'google' | 'openai-compatible' | 'vercel-ai-sdk' | 'mock'
@@ -357,7 +388,11 @@ export const shouldShowLocalUrlHint = ({
   baseUrl: string
   allowlist: string[]
 }): boolean =>
-  spec.kind === 'account' && spec.value !== 'orgServer' && isLocalUrlWithoutAllowlist({ spec, baseUrl, allowlist })
+  spec.kind === 'account' &&
+  spec.value !== 'orgServer' &&
+  spec.requiresBaseUrl &&
+  isLocalOrPrivateUrl(baseUrl) &&
+  !isOrgHostedUrl(baseUrl, allowlist)
 
 /**
  * Returns true when an Organisation server URL is typed but not on the allowlist.

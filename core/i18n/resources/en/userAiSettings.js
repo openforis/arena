@@ -4,15 +4,6 @@ export default {
   encryptionMissing:
     'The deployment is missing AI_USER_KEY_ENCRYPTION_SECRET; personal API keys cannot be saved until an administrator configures it.',
 
-  provider: 'Provider',
-  providers: {
-    default: 'Arena default',
-    openai: 'OpenAI',
-    anthropic: 'Anthropic (Claude)',
-    google: 'Google (Gemini)',
-    'openai-compatible': 'OpenAI-compatible (Azure, OpenRouter, Ollama, ...)',
-    'vercel-ai-sdk': 'Vercel AI SDK (chat endpoint)',
-  },
   model: 'Model',
   modelOther: 'Other (type a model id)...',
   baseUrl: 'Base URL',
@@ -29,27 +20,20 @@ export default {
   saveFailed: 'Failed to save AI settings: {{message}}',
 
   status: {
-    now: 'Now:',
     ready: 'Ready',
     notTested: 'Not tested',
     notAvailable: 'Not available',
-    none: 'Turn on the local server or choose a provider.',
+    notSetUp: 'Not set up',
   },
   where: {
-    section: 'Where AI runs',
-    order: {
-      title: 'Order',
-      localFirst: 'Use the local server first, the cloud provider as fallback',
-      cloudFirst: 'Use the cloud provider first',
-      hint: "Each survey's AI policy can still block an engine. Record data stays on this device by default.",
-    },
+    onDevice: 'This computer',
+    orgHosted: 'Organisation server',
+    cloudOwnKey: 'Cloud · your key',
+    cloud: 'Cloud',
   },
   localServer: {
-    name: 'Local AI server',
     where: 'On this computer or your network',
-    use: 'Use',
     baseUrl: 'Server URL',
-    test: 'Test',
     answered: 'Answered',
     noModels: 'The server lists no model. Load a model in your local server.',
     contextTokens: 'Context: {{count}} tokens',
@@ -57,26 +41,31 @@ export default {
     model: 'Model',
     modelPlaceholder: 'Test the connection to list the models',
     help: 'Start your local server (for example LM Studio or Ollama) and allow requests from this site (CORS). Your browser may ask to allow access to local network devices.',
-    docsLink: 'LM Studio documentation',
     httpsHint:
       'Arena is served over HTTPS: a server on another machine of your network needs HTTPS, or a browser with Local Network Access (Chrome) and your permission.',
     cloudWarning:
       "This address is neither on this device nor on the organisation's list of servers: the survey AI policy treats it as a cloud service.",
     notSaved: 'The local AI server settings could not be saved in this browser (storage blocked or full).',
   },
-  cloud: {
-    name: 'Cloud provider',
-    where: 'saved with your account',
-    defaultHint: 'Uses the provider your Arena administrator set up.',
-    defaultNone: 'None is set up on this server.',
-    localUrlHint:
-      "This address is on your computer or your network. For LM Studio, use the Local AI server above. The Arena server can't reach it.",
-    localUrlLink: 'Use the Local AI server',
-    test: 'Test',
-    testOk: 'Answered in {{latencyMs}} ms',
-    remove: 'Remove my provider',
-    removed: 'Your provider was removed. AI features use the Arena default.',
-    removedNoDefault: 'Your provider was removed.',
+  list: {
+    section: 'Providers',
+    add: 'Add provider',
+    arenaDefault: 'Arena default',
+    default: 'Default',
+    defaultMissing:
+      'Your default provider is a Local server saved in another browser. Make another provider the default to use AI here.',
+    footerHint: 'Providers save when you add them. What AI can see saves with Save.',
+    menu: 'Actions for {{name}}',
+    makeDefault: 'Make default',
+    test: 'Test connection',
+    edit: 'Edit…',
+    remove: 'Remove',
+    removeConfirm: 'Remove {{name}}? Conversations that use it will use your default.',
+    removed: '{{name}} was removed.',
+    defaultChanged: '{{name}} is now your default.',
+    testOk: '{{name}} answered.',
+    testFailed: '{{name}} did not answer. Edit it to check its settings.',
+    actionFailed: 'The change could not be saved: {{message}}',
   },
   types: {
     local: 'Local server',
@@ -190,5 +179,4 @@ export default {
       sends: 'The survey name, user names, activity types, counts and dates from the activity log.',
     },
   },
-  footerNote: "All AI settings save with the profile's Save button.",
 }
