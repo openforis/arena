@@ -27,7 +27,6 @@ import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
 import { SurveyLabelsExport } from './surveyLabelsExport'
-import NodeDefsTranslationJob from './NodeDefsTranslationJob'
 import SurveyLabelsImportJob from './surveyLabelsImportJob'
 import SurveysListExportJob from './SurveysListExportJob'
 import SurveyUnpublishJob from './unpublish/surveyUnpublishJob'
@@ -134,19 +133,6 @@ export const startCreateSurveyJob = ({ user, surveyInfo }) => {
   const job = new SurveyCreatorJob({ user, surveyInfo })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
-}
-
-/**
- * Starts the node definitions AI translation job.
- * @param {object} params - Params.
- * @param {object} params.user - Acting user.
- * @param {number} params.surveyId - Survey id.
- * @returns {object} The enqueued job.
- */
-export const startNodeDefsTranslationJob = ({ user, surveyId }) => {
-  const job = new NodeDefsTranslationJob({ user, surveyId })
-  JobManager.enqueueJob(job)
-  return job
 }
 
 /**

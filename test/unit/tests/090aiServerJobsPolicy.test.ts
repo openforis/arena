@@ -4,8 +4,6 @@ import { z } from 'zod'
 import SystemError from '@core/systemError'
 
 import * as ModelClient from '@server/modules/ai/service/modelClient'
-import { createServerTextGenerator } from '@server/modules/ai/service/serverTextGenerator'
-import { assertSurveyAiAllowed } from '@server/modules/ai/service/surveyAiPolicyService'
 
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
@@ -80,56 +78,5 @@ describe('ModelClient and the survey AI policy', () => {
     await expect(ModelClient.generate({ user, feature: 'translation', prompt: 'p' } as any, deps)).rejects.toThrow(
       'surveyId is required'
     )
-  })
-})
-
-describe('createServerTextGenerator', () => {
-  test('passes the survey to ModelClient.generate', async () => {
-    const calls: any[] = []
-    const generateText = createServerTextGenerator(
-      { user, feature: 'translation', surveyId: 9 },
-      {
-        generate: async (args: any) => {
-          calls.push(args)
-          return { text: 'done' } as any
-        },
-      }
-    )
-    expect(await generateText({ system: 's', prompt: 'p' })).toBe('done')
-    expect(calls[0]).toMatchObject({ user, feature: 'translation', surveyId: 9, system: 's', prompt: 'p' })
-  })
-})
-
-describe('assertSurveyAiAllowed (job pre-start check)', () => {
-  const createCheckDeps = (resolved: any) => {
-    const checks: any[] = []
-    return {
-      checks,
-      deps: {
-        resolveConfigForUser: () => resolved,
-        assertPolicyAllows: async (check: any) => {
-          checks.push(check)
-        },
-        allowlist: ['http://llm.org.internal/v1'],
-      },
-    }
-  }
-
-  test('no provider → aiNotConfigured (503)', async () => {
-    const { deps } = createCheckDeps(null)
-    const error: any = await expectSystemErrorKey(
-      assertSurveyAiAllowed({ user, surveyId: 9, dataClass: 'schema' }, deps),
-      'aiNotConfigured'
-    )
-    expect(error.statusCode).toBe(503)
-  })
-
-  test('checks the policy with the hosting class of the resolved config, without building the model', async () => {
-    const { deps, checks } = createCheckDeps({
-      cfg: { provider: 'openai-compatible', model: 'm', baseUrl: 'http://llm.org.internal/v1' },
-      source: 'user',
-    })
-    await assertSurveyAiAllowed({ user, surveyId: '9' as any, dataClass: 'schema' }, deps)
-    expect(checks).toEqual([{ surveyId: 9, dataClass: 'schema', hostingClass: 'orgHosted' }])
   })
 })

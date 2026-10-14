@@ -13,7 +13,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { countAccessLevelFeatures, type FeatureCategory, type FeatureToggles } from './aiSettingsForm'
 import { DataBadge } from './DataBadge'
-import { FEATURE_GROUPS, getDataBadgeKind, SERVER_RUN_CATEGORIES } from './featureGroups'
+import { FEATURE_GROUPS, getDataBadgeKind } from './featureGroups'
 
 // level → i18n key of its step; index = level
 const LEVEL_KEYS = ['off', 'help', 'design', 'data'] as const
@@ -139,11 +139,7 @@ const FeatureChip = ({
   onChange: (checked: boolean) => void
 }) => {
   const i18n = useI18n()
-  const sendsText = i18n.t(`userAiSettings:features.${category}.sends`)
-  // server-run jobs: say they run on the Arena server, not the local one
-  const description = SERVER_RUN_CATEGORIES.includes(category)
-    ? `${sendsText} ${i18n.t(`userAiSettings:features.${category}.runs`)}`
-    : sendsText
+  const description = i18n.t(`userAiSettings:features.${category}.sends`)
   const label = i18n.t(`userAiSettings:features.${category}.label`)
   return (
     <span className={`user-ai-settings-panel__chip${checked && !disabled ? ' user-ai-settings-panel__chip--on' : ''}`}>

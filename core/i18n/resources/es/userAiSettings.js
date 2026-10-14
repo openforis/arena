@@ -128,7 +128,6 @@ export default {
       label: 'Traducción de etiquetas',
       sends:
         'La etiqueta o descripción que traduce, con los códigos de idioma. «IA: Traducir etiquetas» en el Diseñador de formularios envía las etiquetas y descripciones de todas las entidades y atributos.',
-      runs: '«IA: Traducir etiquetas» se ejecuta en el servidor de Arena, con su proveedor en la nube o el predeterminado de Arena; nunca en su servidor local.',
     },
     assistantDesign: {
       label: 'Asistente de diseño',
@@ -143,7 +142,6 @@ export default {
       label: 'Diccionario de datos',
       sends:
         'El nombre de la encuesta y, de cada entidad o atributo sin descripción, su nombre, tipo y entidades superiores.',
-      runs: 'Se ejecuta en el servidor de Arena, con su proveedor en la nube o el predeterminado de Arena; nunca en su servidor local.',
     },
     assistantAnalysis: {
       label: 'Asistente de análisis',

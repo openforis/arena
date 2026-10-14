@@ -147,16 +147,3 @@ export const startSchemaSummaryExportJob = async ({
   )
   return { job }
 }
-
-/**
- * Starts the AI node definitions translation job.
- * @param {object} params - Params.
- * @param {number} params.surveyId - Survey id.
- * @returns {Promise<object>} The created job.
- */
-export const startNodeDefsTranslationJob = async ({ surveyId }) => {
-  const {
-    data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/nodeDefs/translation/start`)
-  return { job }
-}

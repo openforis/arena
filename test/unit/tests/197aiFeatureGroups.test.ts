@@ -8,7 +8,7 @@ import mnSettings from '@core/i18n/resources/mn/userAiSettings'
 import ptSettings from '@core/i18n/resources/pt/userAiSettings'
 import ruSettings from '@core/i18n/resources/ru/userAiSettings'
 
-import { FEATURE_GROUPS, SERVER_RUN_CATEGORIES } from '@webapp/components/ai/UserAiSettingsPanel/featureGroups'
+import { FEATURE_GROUPS } from '@webapp/components/ai/UserAiSettingsPanel/featureGroups'
 
 const settingsByLang: Record<string, any> = {
   en: enSettings,
@@ -40,20 +40,10 @@ describe('feature groups', () => {
     }
   })
 
-  test('only the label translation and the data dictionary have a runs line (jobs of the Arena server)', () => {
-    expect([...SERVER_RUN_CATEGORIES].sort()).toEqual(
-      [AiFeatureCategory.translation, AiFeatureCategory.dataDictionary].sort()
-    )
-  })
-
-  test.each(Object.keys(settingsByLang))(
-    '%s has a runs text for the categories with a runs line, and for no other',
-    (lang) => {
-      const { features } = settingsByLang[lang]
-      for (const category of Object.values(AiFeatureCategory)) {
-        const hasRunsText = typeof features[category]?.runs === 'string' && features[category].runs.length > 0
-        expect([category, hasRunsText]).toEqual([category, SERVER_RUN_CATEGORIES.includes(category)])
-      }
+  test.each(Object.keys(settingsByLang))('%s has no runs text: every feature runs in the browser', (lang) => {
+    const { features } = settingsByLang[lang]
+    for (const category of Object.values(AiFeatureCategory)) {
+      expect([category, features[category]?.runs]).toEqual([category, undefined])
     }
-  )
+  })
 })
