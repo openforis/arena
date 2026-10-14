@@ -17,6 +17,7 @@ import {
   isApiKeyCleared,
   isApiKeyMissing,
   isTestPassed,
+  resolveFetchedModel,
   type ProviderDraft,
   type ProviderTypeGroup,
   type ProviderTypeSpec,
@@ -66,14 +67,12 @@ const savedLocal: SavedProvider = {
 }
 
 /** Returns the draft of a type with changes on top. */
-
 const draftOf = (spec: ProviderTypeSpec, saved: SavedProvider | null, patch: Partial<ProviderDraft> = {}) => ({
   ...createDraft({ type: spec.value, saved }),
   ...patch,
 })
 
 /** Returns a passing test of the draft. */
-
 const passed = (spec: ProviderTypeSpec, draft: ProviderDraft): DraftTest => ({
   key: buildTestKey({ spec, draft }),
   account: { ok: true, latencyMs: 12 },
@@ -81,7 +80,6 @@ const passed = (spec: ProviderTypeSpec, draft: ProviderDraft): DraftTest => ({
 })
 
 /** Returns a Local server result that answered with the models. */
-
 const answered = (models: string[]): LocalServerTestView => ({
   reachable: true,
   models,
@@ -93,7 +91,6 @@ const answered = (models: string[]): LocalServerTestView => ({
 })
 
 /** Returns the group keys with their option values. */
-
 const groupValues = (groups: ProviderTypeGroup[]) =>
   groups.map((group) => [group.key, group.options.map((option) => option.spec.value)])
 
@@ -307,6 +304,30 @@ describe('provider dialog draft (267)', () => {
     expect(canListModels({ spec: vercel, draft: chat, saved: null, allowlist })).toBe(false)
   })
 
+  test('a typed or saved model that is not listed is kept; only an empty one takes the first listed', () => {
+    const models = [{ id: 'a' }, { id: 'b' }]
+    const typed = draftOf(compatible, null, { model: 'my/deployment', modelFreeText: true })
+    expect(resolveFetchedModel({ draft: typed, models })).toEqual({ model: 'my/deployment', modelFreeText: true })
+    expect(resolveFetchedModel({ draft: draftOf(compatible, null), models })).toEqual({
+      model: 'a',
+      modelFreeText: false,
+    })
+    expect(resolveFetchedModel({ draft: draftOf(compatible, null, { model: 'b' }), models })).toEqual({
+      model: 'b',
+      modelFreeText: false,
+    })
+    // editing a provider whose saved model is unlisted: kept as typed text, and a rename still saves without a test
+    const unlisted = { ...savedCompatible, model: 'private-model' }
+    const edit = draftOf(compatible, unlisted)
+    const fetched = resolveFetchedModel({ draft: edit, models })
+    expect(fetched).toEqual({ model: 'private-model', modelFreeText: true })
+    const renamed = { ...edit, ...fetched, name: 'Renamed' }
+    expect(canSaveDraft({ spec: compatible, draft: renamed, saved: unlisted, test: null })).toBe(true)
+    expect(buildAccountRequest({ spec: compatible, draft: renamed, saved: unlisted })).toMatchObject({
+      model: 'private-model',
+    })
+  })
+
   test('local test: passes when the server answered and the chosen model is listed', () => {
     const draft = draftOf(local, null, { model: 'm1' })
     expect(draft.baseUrl).toBe('http://localhost:1234/v1')
@@ -379,6 +400,10 @@ describe('provider dialog draft (267)', () => {
     ).toBeNull()
     expect(
       getInitialLocalTest({ saved: savedLocal, capability: null, allowlist: [], pageProtocol: 'http:' })
+    ).toBeNull()
+    const moved = { ...capability, baseUrl: 'http://localhost:2/v1' }
+    expect(
+      getInitialLocalTest({ saved: savedLocal, capability: moved, allowlist: [], pageProtocol: 'http:' })
     ).toBeNull()
     expect(getInitialLocalTest({ saved: null, capability, allowlist: [], pageProtocol: 'http:' })).toBeNull()
   })

@@ -52,6 +52,27 @@ export type AiModel = {
 export const chooseListedModel = ({ model, models }: { model: string; models: AiModel[] }): string =>
   models.some((listed) => listed.id === model) ? model : (models[0]?.id ?? model)
 
+/**
+ * Returns the model and the free-text flag to keep after the list was fetched: a typed ("Other") or saved model that
+ * is not listed stays (OpenRouter, Azure deployments), only an empty one takes the first listed model.
+ * @param {object} params - Parameters.
+ * @param {ProviderDraft} params.draft - Draft now.
+ * @param {AiModel[]} params.models - Listed models.
+ * @returns {{model: string, modelFreeText: boolean}} The model and whether it is typed.
+ */
+export const resolveFetchedModel = ({
+  draft,
+  models,
+}: {
+  draft: ProviderDraft
+  models: AiModel[]
+}): { model: string; modelFreeText: boolean } => {
+  if (draft.modelFreeText) return { model: draft.model, modelFreeText: true }
+  if (!draft.model.trim()) return { model: chooseListedModel({ model: '', models }), modelFreeText: false }
+  const listed = models.some((candidate) => candidate.id === draft.model)
+  return { model: draft.model, modelFreeText: !listed }
+}
+
 export type ProviderDialogType =
   'local' | 'orgServer' | 'openai' | 'anthropic' | 'google' | 'openai-compatible' | 'vercel-ai-sdk' | 'mock'
 
@@ -658,6 +679,8 @@ export const getInitialLocalTest = ({
   pageProtocol: string
 }): DraftTest | null => {
   if (saved?.kind !== 'local' || !saved.baseUrl || !capability || capability.reachable === null) return null
+  // the probe belongs to the saved address; another address is not its result
+  if (!isSameBaseUrl(capability.baseUrl, saved.baseUrl)) return null
   const { reachable, models, contextTokens, error } = capability
   const draft = createDraft({ type: 'local', saved })
   return {
