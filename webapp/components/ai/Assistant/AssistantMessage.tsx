@@ -155,7 +155,7 @@ const AnswerFooter = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   // the record-data notice replaces the composer: the conversation can't continue, so no Retry
-  const recordDataNotice = useRecordDataNotice(api.conversation, assistantAreaFeatures[area])
+  const recordDataNotice = useRecordDataNotice(api.conversation, assistantAreaFeatures[area], api.providerId)
   const capabilities = useAiCapabilities()
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null

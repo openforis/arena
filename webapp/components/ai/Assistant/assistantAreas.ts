@@ -38,40 +38,50 @@ const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaSt
   reasonKeys,
 })
 
+// reasons the user fixes by switching provider in the chat; notSetUp stays on the panel (nothing to switch to)
+const SWITCHABLE_REASONS: AiEngineFeatureAvailability['reasons'] = [
+  'missingOnThisBrowser',
+  'notAvailable',
+  'policyForbids',
+]
+
 /**
- * Returns true when the only reason is a default local provider saved on another computer.
+ * Returns true when every reason belongs to the provider (not to the data class or the setup), so another provider
+ * may answer.
  * @param {AiEngineFeatureAvailability} availability - Engine availability.
  * @returns {boolean} True when the chat should open for the user to choose a provider.
  */
-const isOnlyMissingOnThisBrowser = (availability: AiEngineFeatureAvailability): boolean =>
-  availability.status === 'noEngine' &&
-  availability.reasons.length > 0 &&
-  availability.reasons.every((reason) => reason === 'missingOnThisBrowser')
+const isProviderLevelProblem = (availability: AiEngineFeatureAvailability): boolean =>
+  availability.reasons.length > 0 && availability.reasons.every((reason) => SWITCHABLE_REASONS.includes(reason))
 
 /**
  * Maps the availability of a feature (B) to an area status.
  * @param {AssistantArea} area - Area.
  * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
+ * @param {boolean} [canSwitchProvider] - A provider row can be picked in the chat (hasPickableProvider).
  * @returns {AssistantAreaStatus} The status.
  */
 export const fromAvailability = (
   area: AssistantArea,
-  availability: AiFeatureAvailability | AiEngineFeatureAvailability
+  availability: AiFeatureAvailability | AiEngineFeatureAvailability,
+  canSwitchProvider = false
 ): AssistantAreaStatus => {
   const { status, reasonKeys = [] } = availability
   if (status === 'disabled') return hidden(area)
   if (status === 'available') return { area, status: 'available', reasonKeys: [] }
   const engineAvailability = 'reasons' in availability ? availability : undefined
+  // the default provider is blocked, down or on another computer: the chat opens with its chip, which names the
+  // problem and opens the switcher ("if it is blocked or unreachable, the user switches"). Nothing is sent until a
+  // usable provider answers: resolveModel refuses the rest. A data class turned off, or no provider set up, keep the
+  // panel with the reasons.
+  if (engineAvailability && canSwitchProvider && isProviderLevelProblem(engineAvailability)) {
+    return { area, status: 'available', reasonKeys: [], engineAvailability }
+  }
   if (status === 'policyBlocked') {
     return {
       ...unavailable(area, reasonKeys.length > 0 ? reasonKeys : ['aiAssistant.unavailable.policy']),
       engineAvailability,
     }
-  }
-  // the default is a local provider of another computer: the chat opens with its chip, which names the problem and
-  // opens the switcher; nothing is sent until another provider is picked
-  if (engineAvailability && isOnlyMissingOnThisBrowser(engineAvailability)) {
-    return { area, status: 'available', reasonKeys: [], engineAvailability }
   }
   // noEngine (C)
   return { ...unavailable(area, reasonKeys), engineAvailability }
@@ -82,15 +92,19 @@ export const fromAvailability = (
  * @param {object} params - Parameters.
  * @param {boolean} params.categoryEnabled - The user's "chat" AI category is on.
  * @param {AiFeatureAvailability} params.availability - Availability of the chatbot feature (B).
+ * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
  * @returns {AssistantAreaStatus} The status.
  */
 export const getHelpAreaStatus = ({
   categoryEnabled,
   availability,
+  canSwitchProvider,
 }: {
   categoryEnabled: boolean
   availability: AiFeatureAvailability | AiEngineFeatureAvailability
-}): AssistantAreaStatus => (categoryEnabled ? fromAvailability('help', availability) : hidden('help'))
+  canSwitchProvider?: boolean
+}): AssistantAreaStatus =>
+  categoryEnabled ? fromAvailability('help', availability, canSwitchProvider) : hidden('help')
 
 /**
  * Returns the status of the Design area.
@@ -100,6 +114,7 @@ export const getHelpAreaStatus = ({
  * @param {boolean} params.canEditSurvey - The user can edit the survey.
  * @param {boolean} params.hasDraftSurvey - The draft survey definitions are loaded.
  * @param {AiFeatureAvailability} params.availability - Availability of the assistantDesign feature (B).
+ * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
  * @returns {AssistantAreaStatus} The status.
  */
 export const getDesignAreaStatus = ({
@@ -108,19 +123,21 @@ export const getDesignAreaStatus = ({
   canEditSurvey,
   hasDraftSurvey,
   availability,
+  canSwitchProvider,
 }: {
   categoryEnabled: boolean
   surveyOpen: boolean
   canEditSurvey: boolean
   hasDraftSurvey: boolean
   availability: AiFeatureAvailability | AiEngineFeatureAvailability
+  canSwitchProvider?: boolean
 }): AssistantAreaStatus => {
   if (!categoryEnabled) return hidden('design')
   if (!surveyOpen) return unavailable('design', ['aiAssistant.unavailable.noSurvey'])
   if (!canEditSurvey) return unavailable('design', ['aiAssistant.unavailable.noPermission'])
   // the designer loads the draft definitions for editors only (survey/actions/active.js)
   if (!hasDraftSurvey) return unavailable('design', ['aiAssistant.unavailable.noSurvey'])
-  return fromAvailability('design', availability)
+  return fromAvailability('design', availability, canSwitchProvider)
 }
 
 /**

@@ -8,6 +8,8 @@ import pt from '@core/i18n/resources/pt'
 import ru from '@core/i18n/resources/ru'
 
 import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
+import { selectEngine } from '@webapp/ai/engines/selectEngine'
 import { isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
 import {
@@ -16,6 +18,7 @@ import {
   getConversationProvider,
   getProviderChipLabel,
   getProviderChipView,
+  hasPickableProvider,
   shouldShowProviderRemoved,
 } from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
 
@@ -187,14 +190,59 @@ describe('provider chip (271)', () => {
     expect(canOpenProviderChooser(capabilities({ providers: [ARENA_NOT_SET_UP] }))).toBe(false)
   })
 
-  test('a default of another computer keeps the chat open; other engine problems do not', () => {
+  test('provider-level problems keep the chat open when a provider can be picked', () => {
     const base = { status: 'noEngine', reasonKeys: ['k'], surveyScoped: true, engine: null } as any
     const missing = { ...base, reasons: ['missingOnThisBrowser'] }
-    expect(fromAvailability('design', missing)).toMatchObject({ status: 'available', engineAvailability: missing })
-    expect(fromAvailability('design', { ...base, reasons: ['notAvailable'] }).status).toBe('unavailable')
-    expect(fromAvailability('design', { ...base, reasons: ['missingOnThisBrowser', 'policyForbids'] }).status).toBe(
-      'unavailable'
-    )
+    expect(fromAvailability('design', missing, true)).toMatchObject({
+      status: 'available',
+      engineAvailability: missing,
+    })
+    const down = { ...base, reasons: ['notAvailable'] }
+    expect(fromAvailability('design', down, true)).toMatchObject({ status: 'available', engineAvailability: down })
+    const hosting = { ...base, status: 'policyBlocked', reasons: ['policyForbids'] }
+    expect(fromAvailability('design', hosting, true)).toMatchObject({
+      status: 'available',
+      engineAvailability: hosting,
+    })
+  })
+
+  test('without a provider to pick, or with nothing set up, the panel with the reasons stays', () => {
+    const base = { status: 'noEngine', reasonKeys: ['k'], surveyScoped: true, engine: null } as any
+    expect(fromAvailability('design', { ...base, reasons: ['missingOnThisBrowser'] }).status).toBe('unavailable')
+    expect(fromAvailability('design', { ...base, reasons: ['notAvailable'] }, false).status).toBe('unavailable')
+    expect(fromAvailability('design', { ...base, reasons: ['notSetUp'] }, true).status).toBe('unavailable')
+    const off = { ...base, status: 'policyBlocked', reasons: ['policyForbids'] }
+    expect(fromAvailability('design', off, false).status).toBe('unavailable')
+  })
+
+  test('the switcher can be reached only when a row can be picked', () => {
+    const rows = (policy: AiPolicy, providers = [ACCOUNT, LOCAL, ARENA]) => ({
+      capabilities: capabilities({ providers }),
+      effective: policy,
+      dataClass: 'data' as const,
+      surveyScoped: true,
+    })
+    expect(hasPickableProvider(rows(KEEP_DATA_ON_DEVICE))).toBe(true)
+    expect(hasPickableProvider(rows(KEEP_DATA_ON_DEVICE, [ACCOUNT, ARENA]))).toBe(false)
+    expect(hasPickableProvider(rows({ schema: 'cloud', data: 'off' }))).toBe(false)
+    expect(hasPickableProvider(rows(CLOUD, [ARENA_NOT_SET_UP]))).toBe(false)
+    expect(hasPickableProvider({ ...rows(CLOUD), effective: null })).toBe(false)
+  })
+
+  test('nothing is sent to a blocked provider: the selection stays an error although the chat opens', () => {
+    const blocked = getAiEngineFeatureAvailability({
+      enabled: true,
+      effective: KEEP_DATA_ON_DEVICE,
+      dataClass: 'data',
+      surveyScoped: true,
+      capabilities: capabilities(),
+    })
+    expect(blocked.engine).toBeNull()
+    expect(blocked.reasons).toEqual(['policyForbids'])
+    expect(fromAvailability('analysis', blocked, true).status).toBe('available')
+    expect(selectEngine({ effective: KEEP_DATA_ON_DEVICE, dataClass: 'data', capabilities: capabilities() })).toEqual({
+      unavailable: ['policyForbids'],
+    })
   })
 
   test('errors of the provider offer the switcher', () => {

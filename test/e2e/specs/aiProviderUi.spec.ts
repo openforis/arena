@@ -4,7 +4,12 @@ import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
-import { collectRequestBodies, isGatewayRequest, reopenLastConversation } from '../helpers/aiAnalysis'
+import {
+  collectRequestBodies,
+  E2E_LOCAL_PROVIDER_ID,
+  isGatewayRequest,
+  reopenLastConversation,
+} from '../helpers/aiAnalysis'
 import {
   assistantPanel,
   lastAssistantAnswer,
@@ -208,6 +213,44 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
 
     await providerChip(page).click()
     await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
+    expect(gatewayBodies).toEqual([])
+    await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
+    await expect(providerChip(page)).toContainText('Arena default · mock')
+
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await waitForAssistantTurn(page)
+    expect(gatewayBodies.length).toBeGreaterThan(0)
+    expect(gatewayBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
+  })
+
+  // review I1: a default that is down does not hide the chat and its switcher
+  test('a default local server that is not running: the chat opens and the user switches provider', async ({
+    page,
+    api,
+    sampleSurvey: _,
+  }) => {
+    const userUuid = await api.getCurrentUserUuid()
+    // nothing listens on the discard port: the probe fails and the provider is not available
+    const providers = [
+      { id: E2E_LOCAL_PROVIDER_ID, name: 'Local server', baseUrl: 'http://127.0.0.1:9/v1', modelId: 'm' },
+    ]
+    await page.addInitScript(
+      ({ key, value }) => {
+        try {
+          localStorage.setItem(key, value)
+        } catch {
+          // about:blank and other origins without storage
+        }
+      },
+      { key: `arena.ai.localProviders.${userUuid}`, value: JSON.stringify(providers) }
+    )
+    await api.setAiDefaultProvider(E2E_LOCAL_PROVIDER_ID)
+    const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
+    await openNewDesignConversation(page)
+    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible()
+    await expect(providerChip(page)).toContainText('Local server')
+
+    await providerChip(page).click()
     expect(gatewayBodies).toEqual([])
     await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
     await expect(providerChip(page)).toContainText('Arena default · mock')

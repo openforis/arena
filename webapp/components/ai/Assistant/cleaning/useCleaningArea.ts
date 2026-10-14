@@ -5,13 +5,13 @@ import * as Survey from '@core/survey/survey'
 
 import { buildRowContextDraft } from '@common/ai/prompts/cleaningRowContext'
 import { toValidationListItems } from '@webapp/ai/tools/cleaning/validationList'
-import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { DataExplorerState } from '@webapp/store/dataExplorer'
 import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanCleanseRecords, useUser } from '@webapp/store/user'
 
 import type { AssistantAreaStatus } from '../assistantAreas'
+import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
 import { useAssistantOpenWithDraft } from '../useAssistantPanel'
 import { getCleaningAreaStatus } from './cleaningArea'
 
@@ -22,8 +22,15 @@ import { getCleaningAreaStatus } from './cleaningArea'
 export const useCleaningAreaStatus = (): AssistantAreaStatus => {
   const surveyInfo = useSurveyInfo()
   const canCleanseRecords = useAuthCanCleanseRecords()
-  const availability = useAiFeatureAvailability('assistantCleaning', { dataClass: 'data' })
-  return getCleaningAreaStatus({ surveyOpen: Survey.isValid(surveyInfo), canCleanseRecords, availability })
+  const { availability, canSwitchProvider } = useAssistantFeatureAvailability('assistantCleaning', {
+    dataClass: 'data',
+  })
+  return getCleaningAreaStatus({
+    surveyOpen: Survey.isValid(surveyInfo),
+    canCleanseRecords,
+    availability,
+    canSwitchProvider,
+  })
 }
 
 /**
