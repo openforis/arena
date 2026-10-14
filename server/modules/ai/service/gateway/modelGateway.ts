@@ -34,7 +34,11 @@ const TOO_MANY_REQUESTS = 429
 type TelemetryContext = { feature: string; source: string; provider: string; model: string; userUuid: string }
 
 export type ModelGatewayDeps = {
-  resolveModel: (args: { user: User; feature: string }) => Promise<{ model: LanguageModelV4; meta: any }>
+  resolveModel: (args: {
+    user: User
+    feature: string
+    providerId?: string
+  }) => Promise<{ model: LanguageModelV4; meta: any }>
   assertPolicyAllows: (check: AiPolicyCheck) => Promise<void>
   rateLimiter: RateLimiter
   recordTelemetry: (ctx: TelemetryContext, outcome: { latencyMs: number; usage?: unknown; error?: unknown }) => void
@@ -134,7 +138,7 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
   }
   const allowTools = getAiFeature(request.feature)?.tools === true
   const call = sanitizeCall(request.call, { ...deps.limits, allowTools })
-  const { model, meta } = await deps.resolveModel({ user, feature: request.feature })
+  const { model, meta } = await deps.resolveModel({ user, feature: request.feature, providerId: request.providerId })
   await deps.assertPolicyAllows({
     surveyId: request.surveyId ?? null,
     dataClass: request.dataClass,

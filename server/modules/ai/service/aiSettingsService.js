@@ -27,11 +27,11 @@ import { generateText } from 'ai'
 import * as User from '@core/user/user'
 import SystemError from '@core/systemError'
 
-import * as Log from '@server/log/log'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import { AiFeatureCategory } from '@common/ai/features'
+import { LEGACY_ACCOUNT_PROVIDER_ID } from '@common/ai/providerIds'
 
 import {
   areFeaturesEnabledForUser,
@@ -43,6 +43,7 @@ import {
   sanitiseFeatureToggles,
   withoutPersonalProvider,
 } from './aiUserPrefs'
+import { findStoredProvider, getProviderPrefs } from './aiProviderPrefs'
 import * as AiTelemetry from './aiTelemetry'
 import * as ModelDiscovery from './modelDiscovery'
 import * as ProviderRegistry from './providerRegistry'
@@ -52,8 +53,6 @@ export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
 export const featureCategories = AiFeatureCategory
 
 const PREFS_KEY = 'ai'
-
-const logger = Log.getLogger('AiSettings')
 
 /**
  * Decrypts a saved API key, returning null when it can't be read (e.g. the encryption secret was rotated).
@@ -129,30 +128,16 @@ export const getPublicSettings = (user) => {
 }
 
 /**
- * Returns a fully-resolved provider config (including the decrypted API key)
- * for the user, or `null` when the user has not enabled a personal provider.
- *
- * Pass `{ decrypt: false }` to skip the key decryption when the caller only
- * needs metadata (e.g. the "Currently using:" label).
+ * Returns the call config of the converted personal provider (`acct:legacy`), for the old panel's test without
+ * draft fields.
  * @param {object} user - Arena user.
- * @param {object} [options] - Tuning.
- * @param {boolean} [options.decrypt] - Decrypt the API key (default true).
- * Returns null when the saved key can't be decrypted.
- * @returns {?object} Provider config or null.
+ * @returns {object|null} The config, or null when the user has no converted provider.
  */
-export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
-  const raw = getRawPrefs(user)
-  if (!areFeaturesEnabledForUser(user) || !raw?.enabled || !raw.provider || !raw.model) return null
-  let apiKey = null
-  if (decrypt && raw.apiKeyEncrypted) {
-    apiKey = tryDecrypt(raw.apiKeyEncrypted)
-    if (apiKey === null) {
-      // never fail the request: fall back to the admin default, the settings panel flags the key
-      logger.warn(`user ${user?.uuid}: saved AI API key can't be decrypted (secret rotated?); using admin default`)
-      return null
-    }
-  }
-  return { provider: raw.provider, model: raw.model, baseUrl: raw.baseUrl || null, apiKey }
+const getLegacyProviderConfig = (user) => {
+  const legacy = findStoredProvider(getProviderPrefs(getRawPrefs(user)), LEGACY_ACCOUNT_PROVIDER_ID)
+  if (!legacy) return null
+  const apiKey = legacy.apiKeyEncrypted ? tryDecrypt(legacy.apiKeyEncrypted) : null
+  return { provider: legacy.type, model: legacy.model, baseUrl: legacy.baseUrl, apiKey }
 }
 
 // Throws when the provider config is incomplete.
@@ -301,7 +286,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
       apiKey: effectiveApiKey,
     }
   } else {
-    cfg = getEffectiveUserConfig(user)
+    cfg = getLegacyProviderConfig(user)
   }
   if (!cfg) {
     return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
