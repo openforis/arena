@@ -92,6 +92,6 @@ export const deleteNode =
   (node, { sideEffect = false } = {}) =>
   (record) => {
     const nodeUuid = Node.getUuid(node)
-    const { record: recordUpdated } = Records.deleteNode(nodeUuid, { sideEffect })(record)
+    const { record: recordUpdated } = Records.removeNode(nodeUuid, { sideEffect })(record)
     return recordUpdated
   }

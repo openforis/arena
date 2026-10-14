@@ -201,7 +201,7 @@ const _addEntityAndKeyValues =
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
-    const updateResultDescendants = await CoreRecordNodesUpdater.createNodeAndDescendants({
+    const updateResultDescendants = await CoreRecordNodesUpdater.addNodeAndDescendants({
       user,
       survey,
       categoryItemProvider,
