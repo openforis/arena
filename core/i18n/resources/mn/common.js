@@ -1472,6 +1472,14 @@ $t(common.cantUndoWarning)`,
       timeout: 'AI хариу өгөхөд хэт удлаа. Дахин оролдоно уу.',
     },
   },
+
+  aiBatch: {
+    translateTitle: 'AI: Шошгыг орчуулах',
+    dataDictionaryTitle: 'AI: Талбарын тайлбар',
+    preparing: 'Бэлтгэж байна…',
+    progress: '{{total}} AI хүсэлтээс {{done}} нь дууссан',
+  },
+
   aiTranslation: {
     translateButton_one: 'Өөр {{count}} хэл рүү орчуулах',
     translateButton_other: 'Өөр {{count}} хэл рүү орчуулах',

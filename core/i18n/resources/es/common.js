@@ -1355,6 +1355,14 @@ $t(common.appNameFull)
       timeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
     },
   },
+
+  aiBatch: {
+    translateTitle: 'IA: Traducir etiquetas',
+    dataDictionaryTitle: 'IA: Descripciones de campos',
+    preparing: 'Preparando…',
+    progress: '{{done}} de {{total}} solicitudes a la IA completadas',
+  },
+
   aiTranslation: {
     translateButton_one: 'Traducir a {{count}} otro idioma',
     translateButton_other: 'Traducir a {{count}} otros idiomas',

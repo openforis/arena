@@ -18,6 +18,7 @@ import {
 } from '@webapp/store/survey'
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useNodeDefPage } from '@webapp/store/ui/surveyForm'
+import { AiBatchProgressDialog } from '@webapp/components/ai/AiBatchProgressDialog'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { TestId } from '@webapp/utils/testId'
 
@@ -29,9 +30,17 @@ import { OpenFileUploadDialogButton } from '@webapp/components/form'
 import SurveySchemaSummaryDownloadButton from '../../SurveySchemaSummaryDownloadButton'
 import { NodeDefCloneFromSurveyDialog } from '../nodeDefs/components/nodeDefCloneFromSurveyDialog'
 import { NodeDefsTranslationModal } from './NodeDefsTranslationModal'
+import { useFormHeaderAiJobs } from './useFormHeaderAiJobs'
 
 const labelsExportAllowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
+const schemaSummaryAiFileFormats = [FileFormats.csv, FileFormats.xlsx]
 
+/**
+ * Advanced functions menu of the Form Designer (exports, imports, clone and the browser AI batches).
+ * @param {object} props - Props.
+ * @param {boolean} props.canEditDef - Whether the user can edit the survey definition.
+ * @returns {React.ReactElement} The menu and its dialogs.
+ */
 const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const dispatch = useDispatch()
 
@@ -45,9 +54,16 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const dataDictionaryAiEnabled = useAiFeatureEnabled('dataDictionary')
   const aiTranslationEnabled = useAiFeatureEnabled('translation')
   const surveyLangs = useSurveyLangs()
+  const {
+    batchRun,
+    closeBatchRun,
+    translationResult,
+    closeTranslationResult,
+    startTranslation,
+    startDataDictionaryExport,
+  } = useFormHeaderAiJobs()
 
   const [cloneFromSurveyDialogOpen, setCloneFromSurveyDialogOpen] = useState(false)
-  const [translationResult, setTranslationResult] = useState(null)
 
   const onLabelsImportFileSelected = useCallback(
     async (file) => {
@@ -64,17 +80,6 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
     },
     [dispatch, surveyId]
   )
-
-  const onStartTranslation = useCallback(async () => {
-    const { job } = await API.startNodeDefsTranslationJob({ surveyId })
-    dispatch(
-      JobActions.showJobMonitor({
-        autoHide: true,
-        job,
-        onComplete: (completedJob) => setTranslationResult(completedJob.result),
-      })
-    )
-  }, [dispatch, surveyId])
 
   const openCloneFromSurveyDialog = useCallback(() => {
     setCloneFromSurveyDialogOpen(true)
@@ -104,17 +109,15 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
         key: 'schema-summary-excel',
         content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} />,
       },
+      // the AI descriptions are generated in the browser before the export job (useFormHeaderAiJobs)
       ...(dataDictionaryAiEnabled
-        ? [
-            {
-              key: 'schema-summary-csv-ai',
-              content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.csv} includeAiDescriptions />,
-            },
-            {
-              key: 'schema-summary-excel-ai',
-              content: <SurveySchemaSummaryDownloadButton fileFormat={FileFormats.xlsx} includeAiDescriptions />,
-            },
-          ]
+        ? schemaSummaryAiFileFormats.map((fileFormat) => ({
+            key: `schema-summary-${fileFormat}-ai`,
+            iconClassName: 'icon-download2 icon-14px',
+            label: `surveyForm:schemaSummaryAiDescriptions_${fileFormat}`,
+            onClick: () => startDataDictionaryExport(fileFormat),
+            testId: TestId.surveyForm.schemaSummaryAi(fileFormat),
+          }))
         : []),
       ...(canEditDef
         ? [
@@ -179,14 +182,10 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
         ? [
             {
               key: 'translate-labels-ai',
-              content: (
-                <Button
-                  iconClassName="icon-earth icon-14px"
-                  label="surveyForm:aiTranslateLabels"
-                  onClick={onStartTranslation}
-                  variant="text"
-                />
-              ),
+              iconClassName: 'icon-earth icon-14px',
+              label: 'surveyForm:aiTranslateLabels',
+              onClick: startTranslation,
+              testId: TestId.surveyForm.aiTranslateLabelsBtn,
             },
           ]
         : []),
@@ -198,8 +197,9 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
       dataDictionaryAiEnabled,
       lang,
       onLabelsImportFileSelected,
-      onStartTranslation,
       openCloneFromSurveyDialog,
+      startDataDictionaryExport,
+      startTranslation,
       surveyId,
       surveyIsDraft,
       surveyLangs,
@@ -224,9 +224,8 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
           onConfirm={onCloneFromSurveyConfirm}
         />
       )}
-      {translationResult && (
-        <NodeDefsTranslationModal result={translationResult} onClose={() => setTranslationResult(null)} />
-      )}
+      {batchRun && <AiBatchProgressDialog run={batchRun} onClose={closeBatchRun} />}
+      {translationResult && <NodeDefsTranslationModal result={translationResult} onClose={closeTranslationResult} />}
     </>
   )
 }

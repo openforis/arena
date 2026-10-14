@@ -4,19 +4,30 @@ import { useDispatch } from 'react-redux'
 
 import { FileFormats } from '@core/fileFormats'
 
-import { Button, ButtonDownload } from '@webapp/components/buttons'
-import * as API from '@webapp/service/api'
+import { ButtonDownload } from '@webapp/components/buttons'
 import { JobActions } from '@webapp/store/app'
 import { useSurveyId, useSurveyCycleKey } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { TestId } from '@webapp/utils/testId'
 
-const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
+/**
+ * Close button of the job monitor of the schema summary export with AI descriptions: warning and Download.
+ * @param {object} props - Props.
+ * @param {object} props.job - The completed export job.
+ * @param {string} props.fileFormat - csv or xlsx.
+ * @returns {React.ReactElement} The warning (if any) and the download button.
+ */
+export const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
   const { tempFileName, aiDescriptionsFailedCount = 0 } = job.result
   const i18n = useI18n()
   const dispatch = useDispatch()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
 
+  /**
+   * Hides the job monitor when the download starts.
+   * @returns {void}
+   */
   const onDownload = useCallback(() => dispatch(JobActions.hideJobMonitor()), [dispatch])
 
   return (
@@ -30,6 +41,7 @@ const SchemaSummaryExportCloseButton = ({ job, fileFormat }) => {
         href={`/api/survey/${surveyId}/schema-summary/export/download`}
         requestParams={{ tempFileName, cycle, fileFormat }}
         onClick={onDownload}
+        testId={TestId.surveyForm.schemaSummaryAiDownloadBtn}
         variant="contained"
       />
     </>
@@ -41,41 +53,16 @@ SchemaSummaryExportCloseButton.propTypes = {
   fileFormat: PropTypes.string.isRequired,
 }
 
+/**
+ * Download button of the schema summary (without AI descriptions; those are generated in the advanced menu).
+ * @param {object} props - Props.
+ * @returns {React.ReactElement} The button.
+ */
 const SurveySchemaSummaryDownloadButton = (props) => {
-  const { className, fileFormat = FileFormats.xlsx, includeAiDescriptions = false, testId } = props
+  const { className, fileFormat = FileFormats.xlsx, testId } = props
 
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
-  const dispatch = useDispatch()
-
-  const onClickAi = useCallback(async () => {
-    const { job } = await API.startSchemaSummaryExportJob({ surveyId, cycle, fileFormat, includeAiDescriptions: true })
-
-    dispatch(
-      JobActions.showJobMonitor({
-        job,
-        closeButton: SchemaSummaryExportCloseButton,
-        closeButtonProps: { fileFormat },
-      })
-    )
-  }, [cycle, dispatch, fileFormat, surveyId])
-
-  const labelKey = includeAiDescriptions
-    ? `surveyForm:schemaSummaryAiDescriptions_${fileFormat}`
-    : `surveyForm:schemaSummary_${fileFormat}`
-
-  if (includeAiDescriptions) {
-    return (
-      <Button
-        className={className}
-        iconClassName="icon-download2 icon-14px"
-        testId={testId}
-        onClick={onClickAi}
-        label={labelKey}
-        variant="text"
-      />
-    )
-  }
 
   return (
     <ButtonDownload
@@ -83,7 +70,7 @@ const SurveySchemaSummaryDownloadButton = (props) => {
       testId={testId}
       href={`/api/survey/${surveyId}/schema-summary`}
       requestParams={{ cycle, fileFormat }}
-      label={labelKey}
+      label={`surveyForm:schemaSummary_${fileFormat}`}
       variant="text"
     />
   )
@@ -92,7 +79,6 @@ const SurveySchemaSummaryDownloadButton = (props) => {
 SurveySchemaSummaryDownloadButton.propTypes = {
   className: PropTypes.string,
   fileFormat: PropTypes.string,
-  includeAiDescriptions: PropTypes.bool,
   testId: PropTypes.string,
 }
 

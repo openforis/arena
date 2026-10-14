@@ -1465,6 +1465,14 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       timeout: 'The AI took too long to respond. Please try again.',
     },
   },
+
+  aiBatch: {
+    translateTitle: 'AI: Translate labels',
+    dataDictionaryTitle: 'AI: Field descriptions',
+    preparing: 'Preparing…',
+    progress: '{{done}} of {{total}} AI requests done',
+  },
+
   aiTranslation: {
     translateButton_one: 'Translate to {{count}} other language',
     translateButton_other: 'Translate to {{count}} other languages',

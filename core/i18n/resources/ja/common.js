@@ -1470,6 +1470,14 @@ $t(common.cantUndoWarning)`,
       timeout: 'AIの応答に時間がかかりすぎました。もう一度お試しください。',
     },
   },
+
+  aiBatch: {
+    translateTitle: 'AI：ラベルを翻訳',
+    dataDictionaryTitle: 'AI：フィールドの説明',
+    preparing: '準備中…',
+    progress: 'AIリクエスト {{done}} / {{total}} 件完了',
+  },
+
   aiTranslation: {
     translateButton_one: '他の{{count}}言語に翻訳',
     translateButton_other: '他の{{count}}言語に翻訳',
