@@ -1,13 +1,22 @@
 /**
- * What this browser can use for AI: the gateway (from the AI settings), the local server (probed) and the instance limits.
- * Pure store factory: the app instance is in capabilitiesStore.ts.
+ * What this browser can use for AI: one entry per provider (account providers from the AI settings, local providers
+ * probed in this browser, Arena default), the instance limits, and (until the single-provider selection replaces
+ * them) the old gateway and local server capabilities. Pure store factory: the app instance is in capabilitiesStore.ts.
  */
 import { getLocalServerHostingClass } from '@common/ai/localServerAddress'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import { normalizeAiPolicy } from '@common/ai/policy'
+import type { AiDefaultProviderOrigin } from '@common/ai/providerIds'
 
+import type { LocalProvider } from './localProviders'
 import { defaultLocalServerSettings } from './localServerSettings'
 import type { LocalServerProbeResult } from './localServerProbe'
+import {
+  type AiAdminDefault,
+  type AiPublicProvider,
+  buildProviderEntries,
+  getDefaultProviderId,
+} from './providerEntries'
 import type {
   AiCapabilities,
   AiGatewayCapability,
@@ -26,11 +35,16 @@ export type AiSettingsSnapshot = {
   orgHostedBaseUrls?: string[]
   policyCeilings?: AiPolicy
   maxPromptChars?: number
+  defaultProviderId?: string
+  defaultProviderOrigin?: AiDefaultProviderOrigin
+  providers?: AiPublicProvider[]
+  adminDefault?: AiAdminDefault | null
 }
 
 export type CapabilitiesStoreDeps = {
-  loadSettings: (options: { force: boolean }) => Promise<AiSettingsSnapshot | null>
+  loadSettings: (options: { force: boolean; userUuid: string | null }) => Promise<AiSettingsSnapshot | null>
   loadLocalSettings: (userUuid: string | null) => AiLocalServerSettings
+  loadLocalProviders: (userUuid: string | null) => LocalProvider[]
   probe: (params: { baseUrl: string; modelId: string | null }) => Promise<LocalServerProbeResult>
 }
 
@@ -104,14 +118,93 @@ export const buildLocalServerCapability = ({
 }
 
 /**
+ * Returns the capability of one local provider from its last probe.
+ * @param {object} params - Parameters.
+ * @param {LocalProvider} params.provider - Local provider.
+ * @param {LocalServerProbeResult|null} params.probe - Last probe (null: not probed, or the probe failed).
+ * @param {string[]} params.allowlist - Org-hosted base URLs.
+ * @returns {AiLocalServerCapability} The capability.
+ */
+export const buildLocalProviderCapability = ({
+  provider,
+  probe,
+  allowlist,
+}: {
+  provider: LocalProvider
+  probe: LocalServerProbeResult | null
+  allowlist: string[]
+}): AiLocalServerCapability => ({
+  enabled: true,
+  reachable: probe ? probe.reachable : null,
+  models: probe ? probe.models : [],
+  hostingClass: getLocalServerHostingClass(provider.baseUrl, allowlist),
+  contextTokens: probe ? probe.contextTokens : null,
+  baseUrl: provider.baseUrl,
+  modelId: provider.modelId,
+  error: probe ? probe.error : null,
+})
+
+type CapabilityInputs = {
+  settings: AiSettingsSnapshot | null
+  localSettings: AiLocalServerSettings
+  localProbe: LocalServerProbeResult | null
+  localProviders: LocalProvider[]
+  // same order as localProviders
+  probes: Array<LocalServerProbeResult | null>
+}
+
+/**
+ * Builds the capabilities from the loaded settings, local providers and probes.
+ * @param {CapabilityInputs} inputs - Loaded data.
+ * @returns {AiCapabilities} The capabilities.
+ */
+const buildCapabilities = ({
+  settings,
+  localSettings,
+  localProbe,
+  localProviders,
+  probes,
+}: CapabilityInputs): AiCapabilities => {
+  const instance = buildInstanceCapability(settings)
+  const local: Record<string, AiLocalServerCapability> = {}
+  for (const [index, provider] of localProviders.entries()) {
+    local[provider.id] = buildLocalProviderCapability({
+      provider,
+      probe: probes[index] ?? null,
+      allowlist: instance.orgHostedBaseUrls,
+    })
+  }
+  return {
+    localServer: buildLocalServerCapability({
+      localSettings,
+      probe: localProbe,
+      allowlist: instance.orgHostedBaseUrls,
+    }),
+    gateway: buildGatewayCapability(settings),
+    instance,
+    providers: buildProviderEntries({
+      accountProviders: Array.isArray(settings?.providers) ? settings.providers : [],
+      localProviders,
+      local,
+      adminDefault: settings?.adminDefault ?? null,
+    }),
+    defaultProviderId: getDefaultProviderId(settings),
+    local,
+  }
+}
+
+/**
  * Returns the capabilities before anything is loaded (nothing available).
  * @returns {AiCapabilities} The capabilities.
  */
-export const emptyCapabilities = (): AiCapabilities => ({
-  localServer: buildLocalServerCapability({ localSettings: defaultLocalServerSettings(), probe: null, allowlist: [] }),
-  gateway: buildGatewayCapability(null),
-  instance: buildInstanceCapability(null),
-})
+export const emptyCapabilities = (): AiCapabilities =>
+  buildCapabilities({
+    settings: null,
+    localSettings: defaultLocalServerSettings(),
+    localProbe: null,
+    localProviders: [],
+    probes: [],
+  })
 
 const emptySnapshot = emptyCapabilities()
 
@@ -142,7 +235,7 @@ export const isCapabilitiesLoadedForUser = (store: AiCapabilitiesStore, currentU
 
 /**
  * Creates a capabilities store.
- * @param {CapabilitiesStoreDeps} deps - Settings, local settings and probe readers.
+ * @param {CapabilitiesStoreDeps} deps - Settings, local settings, local providers and probe readers.
  * @returns {AiCapabilitiesStore} The store.
  */
 export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabilitiesStore => {
@@ -154,11 +247,18 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   let sequence = 0
   const listeners = new Set<() => void>()
 
+  /** Calls every subscriber. */
   const emit = () => {
     for (const listener of [...listeners]) listener()
   }
 
   // runs a dependency; a failure gives the fallback (the capabilities then say "not available")
+  /**
+   * Runs a dependency, a failure gives the fallback.
+   * @param {Function} action - Dependency call.
+   * @param {*} fallback - Value on failure.
+   * @returns {Promise<*>} The result or the fallback.
+   */
   const safely = async <T>(action: () => T | Promise<T>, fallback: T): Promise<T> => {
     try {
       return await action()
@@ -167,6 +267,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     }
   }
 
+  /** Drops everything loaded and tells the subscribers. */
   const reset = () => {
     sequence += 1
     inflight = null
@@ -178,43 +279,75 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   }
 
   // the data and the run in flight belong to another user: drop them before they can be read
+  /**
+   * Resets when the data or the run in flight belongs to another user.
+   * @param {string|null} userUuid - Current user.
+   */
   const resetIfOtherUser = (userUuid: string | null) => {
     const dataUser = inflight ? inflight.userUuid : loadedFor
     if (dataUser !== undefined && dataUser !== userUuid) reset()
   }
 
   // the newer run of the same user (running, or already stored), else (reset, other user) empty capabilities
+  /**
+   * Returns the result of the newer run of this user, else empty capabilities.
+   * @param {string|null} userUuid - Current user.
+   * @returns {Promise<AiCapabilities>} The capabilities.
+   */
   const newerRun = (userUuid: string | null): Promise<AiCapabilities> =>
     inflight && inflight.userUuid === userUuid
       ? inflight.promise
       : Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
 
+  /**
+   * Probes a local server, a failure gives null (not tested).
+   * @param {string} baseUrl - Server URL.
+   * @param {string|null} modelId - Chosen model.
+   * @returns {Promise<LocalServerProbeResult|null>} The probe result, or null.
+   */
+  const probeSafely = (baseUrl: string, modelId: string | null) =>
+    safely<LocalServerProbeResult | null>(() => deps.probe({ baseUrl, modelId }), null)
+
+  /**
+   * Loads settings, local providers and probes, then stores the capabilities.
+   * @param {object} params - Parameters.
+   * @param {string|null} params.userUuid - Current user.
+   * @param {boolean} params.force - Skip the settings cache.
+   * @returns {Promise<AiCapabilities>} The capabilities.
+   */
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
-    const nextSettings = await safely(() => deps.loadSettings({ force }), null)
+    const nextSettings = await safely(() => deps.loadSettings({ force, userUuid }), null)
     const nextLocal = await safely(() => deps.loadLocalSettings(userUuid), defaultLocalServerSettings())
-    const probe = nextLocal.enabled
-      ? await safely(() => deps.probe({ baseUrl: nextLocal.baseUrl, modelId: nextLocal.modelId }), null)
-      : null
+    const localProviders = await safely(() => deps.loadLocalProviders(userUuid), [] as LocalProvider[])
+    // every server is probed at the same time: one slow server does not delay the others
+    const [localProbe, ...probes] = await Promise.all([
+      nextLocal.enabled ? probeSafely(nextLocal.baseUrl, nextLocal.modelId) : Promise.resolve(null),
+      ...localProviders.map((provider) => probeSafely(provider.baseUrl, provider.modelId)),
+    ])
     // a newer run started meanwhile: wait for its result; after a reset or a user change nothing is returned
     if (current !== sequence) return newerRun(userUuid)
     settings = nextSettings
     localSettings = nextLocal
-    const instance = buildInstanceCapability(nextSettings)
-    capabilities = {
-      localServer: buildLocalServerCapability({
-        localSettings: nextLocal,
-        probe,
-        allowlist: instance.orgHostedBaseUrls,
-      }),
-      gateway: buildGatewayCapability(nextSettings),
-      instance,
-    }
+    capabilities = buildCapabilities({
+      settings: nextSettings,
+      localSettings: nextLocal,
+      localProbe,
+      localProviders,
+      probes,
+    })
     loadedFor = userUuid
     emit()
     return capabilities
   }
 
+  /**
+   * Starts a run and keeps it as the one in flight.
+   * @param {object} params - Parameters.
+   * @param {string|null} params.userUuid - Current user.
+   * @param {boolean} params.force - Skip the settings cache.
+   * @returns {Promise<AiCapabilities>} The capabilities.
+   */
   const run = (params: { userUuid: string | null; force: boolean }): Promise<AiCapabilities> => {
     const entry = { promise: null as unknown as Promise<AiCapabilities>, ...params }
     entry.promise = compute(params).finally(() => {

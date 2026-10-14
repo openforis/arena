@@ -13,6 +13,7 @@ import {
   createCapabilitiesStore,
   getCapabilitiesSnapshotForUser,
 } from './capabilities'
+import { loadLocalProviders } from './localProviders'
 import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
 import { type LocalServerProbeResult, probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
@@ -26,6 +27,7 @@ const capabilitiesStore = createCapabilitiesStore({
     return (await fetchAiSettingsOnce()) as AiSettingsSnapshot
   },
   loadLocalSettings: (userUuid) => loadLocalServerSettings({ storage: getBrowserStorage(), userUuid }),
+  loadLocalProviders: (userUuid) => loadLocalProviders({ storage: getBrowserStorage(), userUuid }),
   probe: ({ baseUrl, modelId }) => probeLocalServer({ baseUrl, modelId, fetchImpl: browserFetch }),
 })
 
