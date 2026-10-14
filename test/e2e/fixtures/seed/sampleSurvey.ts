@@ -56,6 +56,8 @@ export type SampleSurveyOptions = {
   /** Whether to publish the survey; default true (records can be inserted only in a published survey). */
   publish?: boolean
   template?: boolean
+  /** Survey languages, the first is the default one; default ['en']. Labels are in en only. */
+  languages?: string[]
   records?: SampleRecord[]
   /** Whether to add the image attribute "cluster_photo" to the cluster; default false. */
   withClusterImage?: boolean
@@ -114,7 +116,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     publish = true,
     template = false,
     records = [],
-    withClusterImage = false,
+    languages,
   } = options
 
   const user = await UserManager.fetchUserByEmail(userEmail)
@@ -157,6 +159,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
   surveyBuilder.name = name
   surveyBuilder.label = label
   if (template) surveyBuilder.template()
+  if (languages) surveyBuilder.languages(...languages)
 
   const survey = await withConsoleLogSilenced(() => surveyBuilder.buildAndStore(publish))
 
