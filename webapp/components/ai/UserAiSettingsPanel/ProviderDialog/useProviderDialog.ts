@@ -22,7 +22,6 @@ import { useI18n } from '@webapp/store/system'
 import { getApiErrorMessage, type TFunction, toT } from '../aiSettingsForm'
 import {
   type AiModel,
-  chooseListedModel,
   OTHER_MODEL_VALUE,
   buildAccountRequest,
   buildLocalProviderSave,
@@ -41,6 +40,7 @@ import {
   isOrgServerUrlRefused,
   listLocalModels,
   pickLocalModel,
+  resolveFetchedModel,
   type ProviderDialogType,
   type ProviderDraft,
   type ProviderTypeGroup,
@@ -139,7 +139,7 @@ const withoutId = (request: AiProviderRequest): AiProviderRequest => {
 
 /**
  * Keeps the draft in a ref too: the async test and save need the latest values, not the ones of their render.
- * @param {ProviderDraft} initial - First draft.
+ * @param {Function} initial - Returns the first draft.
  * @returns {object} The draft, its ref and the updater.
  */
 const useDraftState = (initial: () => ProviderDraft) => {
@@ -177,7 +177,6 @@ const useAccountModels = ({ spec, saved, allowlist, draftRef, update, t }: Model
   const requestIdRef = useRef(0)
 
   /** Fetches the model list of the draft; returns the model kept, or null. */
-
   const fetchModels = useCallback(
     async ({ force = false }: { force?: boolean } = {}): Promise<string | null> => {
       const current = draftRef.current
@@ -198,8 +197,8 @@ const useAccountModels = ({ spec, saved, allowlist, draftRef, update, t }: Model
         const list = Array.isArray(data?.models) ? data.models : []
         setModels(list)
         if (list.length === 0) return null
-        const model = chooseListedModel({ model: draftRef.current.model, models: list })
-        update((prev) => ({ ...prev, model, modelFreeText: false }))
+        const { model, modelFreeText } = resolveFetchedModel({ draft: draftRef.current, models: list })
+        update((prev) => ({ ...prev, model, modelFreeText }))
         return model
       } catch (error) {
         if (!isCurrent()) return null
@@ -214,7 +213,6 @@ const useAccountModels = ({ spec, saved, allowlist, draftRef, update, t }: Model
   )
 
   /** Forgets the list (another type or step). */
-
   const resetModels = useCallback(() => {
     requestIdRef.current += 1
     lastKeyRef.current = null
@@ -266,7 +264,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [])
 
   /** Starts a new draft of the type and clears the list, the test and the error. */
-
   const startDraft = useCallback(
     (type: ProviderDialogType, patch: Partial<ProviderDraft> = {}) => {
       update(() => ({ ...createDraft({ type, saved: null }), ...patch }))
@@ -278,7 +275,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   )
 
   /** Opens step 2 with a new draft of the type. */
-
   const chooseType = useCallback(
     (type: ProviderDialogType) => {
       startDraft(type)
@@ -288,7 +284,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   )
 
   /** Returns to step 1. */
-
   const back = useCallback(() => {
     resetModels()
     setTest(null)
@@ -304,7 +299,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [draftRef, startDraft])
 
   /** Sets the name. */
-
   const setName = useCallback((name: string) => update((prev) => ({ ...prev, name })), [update])
   /** Sets the base URL. */
   const setBaseUrl = useCallback((baseUrl: string) => update((prev) => ({ ...prev, baseUrl })), [update])
@@ -333,7 +327,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [fetchModels])
 
   /** Probes the Local server and keeps the result for the current address. */
-
   const runLocalTest = useCallback(async () => {
     const baseUrl = getLocalDraftUrl(draftRef.current)
     if (!baseUrl) return
@@ -354,9 +347,8 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [allowlist, draftRef, update])
 
   /** Lists the models, then tests the account draft. */
-
   const runAccountTest = useCallback(async () => {
-    // the list first: a stale model is replaced by a listed one before the test
+    // the list first: an empty model is filled before the test; a typed or saved one is kept
     await fetchModels({ force: true })
     const tested = draftRef.current
     const result = await testAccountDraft(buildAccountRequest({ spec, draft: tested, saved }))
@@ -364,7 +356,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [draftRef, fetchModels, saved, spec])
 
   /** Runs the test of the current type. */
-
   const runTest = useCallback(async () => {
     setTesting(true)
     setTest(null)
@@ -378,7 +369,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [runAccountTest, runLocalTest, spec.kind])
 
   /** Stores the Local server in this browser; false when it could not be saved. */
-
   const saveLocal = useCallback(async (): Promise<boolean> => {
     const storage = getBrowserStorage()
     const userUuid = getCurrentUserUuid()
@@ -400,7 +390,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [context, draftRef, saved, t])
 
   /** Adds or updates the account provider on the server. */
-
   const saveAccount = useCallback(async (): Promise<boolean> => {
     const request = buildAccountRequest({ spec, draft: draftRef.current, saved })
     if (saved) await API.aiProviders.updateProvider(saved.id, withoutId(request))
@@ -409,11 +398,12 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
   }, [draftRef, saved, spec])
 
   /** Saves the provider, refreshes the settings and closes; errors stay in the dialog. */
-
   const save = useCallback(async () => {
     setSaving(true)
     setSaveError(null)
     try {
+      // the button is disabled then; this also guards a double click
+      if (!canSaveDraft({ spec, draft: draftRef.current, saved, test })) return
       const ok = spec.kind === 'local' ? await saveLocal() : await saveAccount()
       if (!ok) return
       invalidateAiSettingsCache()
@@ -425,10 +415,9 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
     } finally {
       setSaving(false)
     }
-  }, [onSaved, saveAccount, saveLocal, spec.kind, t])
+  }, [draftRef, onSaved, saveAccount, saveLocal, saved, spec, t, test])
 
   /** Spec, draft and saved provider, for the key rules. */
-
   const keyParams = { spec, draft, saved }
   /** The test, only while it matches the current values. */
   const currentTest = test && test.key === buildTestKey({ spec, draft }) ? test : null

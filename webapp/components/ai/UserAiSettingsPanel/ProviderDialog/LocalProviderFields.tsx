@@ -1,5 +1,6 @@
 import React from 'react'
 
+import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
@@ -97,7 +98,7 @@ export const LocalProviderFields = ({ dialog }: Props) => {
             value={draft.baseUrl}
             id={TestId.ai.providerBaseUrl}
             onChange={dialog.setBaseUrl}
-            placeholder={dialog.spec.value === 'local' ? 'http://localhost:1234/v1' : undefined}
+            placeholder={DEFAULT_LOCAL_SERVER_BASE_URL}
           />
           <Button
             variant="outlined"
