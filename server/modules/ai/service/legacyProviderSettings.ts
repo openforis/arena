@@ -5,17 +5,21 @@
  */
 import { ARENA_DEFAULT_PROVIDER_ID, getDefaultProviderName, LEGACY_ACCOUNT_PROVIDER_ID } from '@common/ai/providerIds'
 
+import { resolveSavedAccess } from './aiUserPrefs'
 import {
   type AiProviderPrefs,
   findStoredProvider,
   isSameEndpoint,
+  trimmedOrNull,
   type PublicAiProvider,
   type StoredAiProvider,
 } from './aiProviderPrefs'
 import {
   assertCompleteConfig,
+  type AiProviderServiceDeps,
   assertType,
   createDefaultAiProviderServiceDeps,
+  encryptKey,
   normalizeInput,
   pickBaseUrl,
   pickModel,
@@ -26,19 +30,19 @@ import {
  * @param {object} params - Parameters.
  * @param {StoredAiProvider|null} params.previous - The current `acct:legacy`, if any.
  * @param {object} params.update - Old PUT body (untrusted).
- * @param {Function} params.encrypt - Key encryption (throws aiEncryptionMissing without a server secret).
+ * @param {AiProviderServiceDeps} params.deps - Service dependencies (key encryption throws aiEncryptionMissing without a server secret).
  * @returns {StoredAiProvider} The provider to store.
  */
 const buildLegacyProvider = ({
   previous,
   update,
-  encrypt,
+  deps,
 }: {
   previous: StoredAiProvider | null
   update: Record<string, any>
-  encrypt: (plain: string) => string | null
+  deps: AiProviderServiceDeps
 }): StoredAiProvider => {
-  const type = assertType(update.provider, createDefaultAiProviderServiceDeps())
+  const type = assertType(update.provider, deps)
   const model = pickModel(type, update, null)
   const baseUrl = pickBaseUrl(type, update, null)
   assertCompleteConfig({ provider: type, model, baseUrl, apiKey: null })
@@ -46,13 +50,16 @@ const buildLegacyProvider = ({
   const { apiKey } = normalizeInput(update)
   const sameEndpoint = !!previous && previous.type === type && isSameEndpoint(previous.baseUrl, baseUrl)
   const keptKey = sameEndpoint ? (previous?.apiKeyEncrypted ?? null) : null
+  // the typed key is trimmed like the service does, so Test and Save agree; '' clears
+  const typedKey = typeof apiKey === 'string' ? trimmedOrNull(apiKey) : undefined
+  const apiKeyEncrypted = typeof apiKey === 'string' ? encryptKey(typedKey ?? null, deps) : keptKey
   return {
     id: LEGACY_ACCOUNT_PROVIDER_ID,
     type,
     name: previous?.name ?? getDefaultProviderName(type),
     model,
     baseUrl,
-    apiKeyEncrypted: typeof apiKey === 'string' ? (apiKey ? encrypt(apiKey) : null) : keptKey,
+    apiKeyEncrypted,
     lastTestOk: null,
     lastTestAt: previous?.lastTestAt ?? null,
   }
@@ -61,29 +68,37 @@ const buildLegacyProvider = ({
 /**
  * Applies the provider part of an old PUT /api/ai/settings body: `enabled: true` with a provider saves it as
  * `acct:legacy` and makes it the default; `enabled: false` makes Arena default the default again when it was
- * `acct:legacy`; a body without `enabled` (the new panel) changes nothing.
+ * `acct:legacy`; a body without `enabled` (the new panel) changes nothing. A body that turns AI off (access level 0)
+ * does not save a provider, as the old save only processed it while features were on.
  * @param {object} params - Parameters.
  * @param {AiProviderPrefs} params.prefs - Current provider prefs.
  * @param {object} params.update - Request body (untrusted).
- * @param {Function} params.encrypt - Key encryption.
+ * @param {AiProviderServiceDeps} [params.deps] - Service dependencies (default: the real ones).
  * @returns {AiProviderPrefs} The provider prefs to store (the same object when nothing changes).
  */
 export const applyLegacyProviderUpdate = ({
   prefs,
   update,
-  encrypt,
+  deps = createDefaultAiProviderServiceDeps(),
 }: {
   prefs: AiProviderPrefs
   update: Record<string, any>
-  encrypt: (plain: string) => string | null
+  deps?: AiProviderServiceDeps
 }): AiProviderPrefs => {
-  if (update?.enabled === true && update.provider) {
+  const aiOff = resolveSavedAccess(update).accessLevel === 0
+  if (update?.enabled === true && update.provider && !aiOff) {
     const previous = findStoredProvider(prefs, LEGACY_ACCOUNT_PROVIDER_ID)
-    const legacy = buildLegacyProvider({ previous, update, encrypt })
+    const legacy = buildLegacyProvider({ previous, update, deps })
     const providers = previous
       ? prefs.providers.map((provider) => (provider.id === legacy.id ? legacy : provider))
       : [...prefs.providers, legacy]
-    return { defaultProviderId: legacy.id, defaultProviderOrigin: 'user', providers }
+    // saving the same default again is not a choice: plan 3b converts a 'converted' default only while it is untouched
+    const unchanged = prefs.defaultProviderId === legacy.id
+    return {
+      defaultProviderId: legacy.id,
+      defaultProviderOrigin: unchanged ? prefs.defaultProviderOrigin : 'user',
+      providers,
+    }
   }
   if (update?.enabled === false && prefs.defaultProviderId === LEGACY_ACCOUNT_PROVIDER_ID) {
     return { ...prefs, defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, defaultProviderOrigin: 'user' }
