@@ -151,6 +151,34 @@ export const buildProviderChoices = ({
   })
 
 /**
+ * Returns true when at least one row of the "Answer with" popover can be picked under the policy.
+ * @param {object} params - Parameters (those of buildProviderChoices, without the selected provider).
+ * @param {AiCapabilities} params.capabilities - Capabilities.
+ * @param {AiPolicy|null} params.effective - Effective policy (null while loading: nothing can be picked).
+ * @param {AiDataClass} params.dataClass - Data class of the conversation.
+ * @param {boolean} params.surveyScoped - The conversation belongs to a survey.
+ * @returns {boolean} True when the user can switch to a usable provider.
+ */
+export const hasPickableProvider = ({
+  capabilities,
+  effective,
+  dataClass,
+  surveyScoped,
+}: {
+  capabilities: AiCapabilities
+  effective: AiPolicy | null
+  dataClass: AiDataClass
+  surveyScoped: boolean
+}): boolean =>
+  buildProviderChoices({
+    capabilities,
+    effective,
+    dataClass,
+    surveyScoped,
+    selectedId: capabilities.defaultProviderId,
+  }).some((choice) => !choice.disabled)
+
+/**
  * Returns what the chip shows.
  * @param {object} params - Parameters.
  * @param {AiCapabilities} params.capabilities - Capabilities.

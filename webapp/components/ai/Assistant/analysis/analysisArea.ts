@@ -27,26 +27,30 @@ export const isAnalysisRoute = (pathname: string): boolean => {
  * @param {boolean} params.surveyOpen - Whether a survey is open.
  * @param {boolean} params.canUseExplorer - Whether the user can use the Explorer.
  * @param {Availability} params.availability - Feature availability for the schema class.
+ * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
  * @returns {AssistantAreaStatus} The tab state, in D1's shape (with the engine availability behind the reasons).
  */
 export const getAnalysisAreaStatus = ({
   surveyOpen,
   canUseExplorer,
   availability,
+  canSwitchProvider,
 }: {
   surveyOpen: boolean
   canUseExplorer: boolean
   availability: Availability
+  canSwitchProvider?: boolean
 }): AssistantAreaStatus => {
   if (!surveyOpen || !canUseExplorer) return { area: 'analysis', status: 'hidden', reasonKeys: [] }
-  return fromAvailability('analysis', availability)
+  return fromAvailability('analysis', availability, canSwitchProvider)
 }
 
 /**
- * Tells whether a conversation with record data can no longer continue on any allowed engine.
+ * Tells whether the policy forbids the conversation's provider to receive its record data.
+ * An unreachable provider is not a policy lock: the error card and the switcher handle it.
  * @param {object} params - Parameters.
  * @param {AiDataClass} params.conversationDataClass - Conversation class.
- * @param {Availability} params.dataAvailability - Feature availability for the data class.
+ * @param {Availability} params.dataAvailability - Feature availability for the data class, with the conversation's provider.
  * @returns {boolean} True to show the "contains record data" notice.
  */
 export const shouldShowRecordDataNotice = ({
@@ -57,7 +61,7 @@ export const shouldShowRecordDataNotice = ({
   dataAvailability: Availability
 }): boolean =>
   // 'disabled' also covers capabilities not loaded yet: no notice until the availability is known
-  conversationDataClass === 'data' && dataAvailability.status !== 'available' && dataAvailability.status !== 'disabled'
+  conversationDataClass === 'data' && dataAvailability.status === 'policyBlocked'
 
 /**
  * Returns the id of the query shown by a query_propose result.

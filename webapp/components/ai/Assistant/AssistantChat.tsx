@@ -2,10 +2,15 @@ import React, { useEffect, useRef, useState } from 'react'
 
 import { AiLimits } from '@common/ai/limits'
 
+import * as User from '@core/user/user'
+
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
+import { isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
+import { getAiCapabilitiesStore } from '@webapp/ai/engines/capabilitiesStore'
 import { Button } from '@webapp/components/buttons'
-import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
 import { useI18nT } from '@webapp/store/system'
+import { useUser } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
@@ -36,7 +41,9 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const [appliedDraft, setAppliedDraft] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
   const { conversation, busy, applying } = api
-  const { capabilities, loaded } = useAiFeaturePolicy(assistantAreaFeatures[area])
+  const capabilities = useAiCapabilities()
+  const user = useUser()
+  const loaded = isCapabilitiesLoadedForUser(getAiCapabilitiesStore(), user ? (User.getUuid(user) ?? null) : null)
   // the conversation's provider was removed: the default answers, and the chat says so (only once the provider
   // list of this user is loaded: the empty snapshot before would flag every conversation)
   const providerRemoved = shouldShowProviderRemoved({ capabilities, loaded, providerId: api.providerId })
@@ -44,7 +51,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const barTitle = conversation?.title ?? (conversationId ? null : '')
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
-  const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area])
+  const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area], api.providerId)
   // Do it on a card of this area: sent here once the conversation hook is ready
   usePendingSuggestionRequest({ api, area })
 

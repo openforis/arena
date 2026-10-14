@@ -5,6 +5,7 @@ import {
   shouldShowRecordDataNotice,
 } from '@webapp/components/ai/Assistant/analysis/analysisArea'
 
+import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { pickArea } from '@webapp/components/ai/Assistant/assistantAreas'
 import { createTurnState } from '@webapp/ai/agent/turnState'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
@@ -78,14 +79,61 @@ describe('area status', () => {
 })
 
 describe('record data notice (review focus 3)', () => {
-  test('shown for a data conversation when no engine allows data any more', () => {
-    expect(shouldShowRecordDataNotice({ conversationDataClass: 'data', dataAvailability: noEngine })).toBe(true)
+  test('shown for a data conversation when the policy blocks the conversation provider', () => {
     expect(
       shouldShowRecordDataNotice({
         conversationDataClass: 'data',
         dataAvailability: { status: 'policyBlocked' } as any,
       })
     ).toBe(true)
+  })
+
+  test('not shown when the provider is merely unreachable: the error card and the switcher handle it', () => {
+    expect(shouldShowRecordDataNotice({ conversationDataClass: 'data', dataAvailability: noEngine })).toBe(false)
+  })
+
+  test('follows the conversation provider: an on-device one gets no notice although the default is cloud', () => {
+    const entry = (id: string, hostingClass: 'cloud' | 'onDevice', kind: 'account' | 'local') => ({
+      id,
+      kind,
+      type: kind === 'local' ? 'local' : 'openai',
+      name: id,
+      model: 'm',
+      baseUrl: null,
+      hostingClass,
+      status: 'ready',
+    })
+    const capabilities: any = {
+      instance: { policyCeilings: null, orgHostedBaseUrls: [], maxPromptChars: 1000 },
+      providers: [entry('acct:a1', 'cloud', 'account'), entry('local:l1', 'onDevice', 'local')],
+      defaultProviderId: 'acct:a1',
+      local: {
+        'local:l1': {
+          enabled: true,
+          reachable: true,
+          models: ['m'],
+          hostingClass: 'onDevice',
+          contextTokens: 8192,
+          baseUrl: 'http://localhost:1234/v1',
+          modelId: 'm',
+          error: null,
+        },
+      },
+    }
+    const getNotice = (providerId?: string) =>
+      shouldShowRecordDataNotice({
+        conversationDataClass: 'data',
+        dataAvailability: getAiEngineFeatureAvailability({
+          enabled: true,
+          effective: { schema: 'cloud', data: 'onDevice' },
+          dataClass: 'data',
+          surveyScoped: true,
+          capabilities,
+          providerId,
+        }),
+      })
+    expect(getNotice()).toBe(true)
+    expect(getNotice('local:l1')).toBe(false)
   })
 
   test('not shown while the availability is not known yet (disabled)', () => {

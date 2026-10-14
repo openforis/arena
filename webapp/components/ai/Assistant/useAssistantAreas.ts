@@ -5,7 +5,6 @@ import * as Survey from '@core/survey/survey'
 
 import { AiFeatureCategory } from '@common/ai/features'
 
-import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useSurveyInfo } from '@webapp/store/survey'
 import * as SurveyStatusState from '@webapp/store/survey/status/state'
@@ -13,6 +12,7 @@ import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { useAnalysisAreaStatus } from './analysis/useAnalysisArea'
 import { useCleaningAreaStatus } from './cleaning/useCleaningArea'
+import { useAssistantFeatureAvailability } from './useAssistantFeatureAvailability'
 import { getDesignAreaStatus, getHelpAreaStatus, parseAppPath, type AssistantAreaStatus } from './assistantAreas'
 
 export type AssistantAreasInfo = { statuses: AssistantAreaStatus[]; module: string | null; subModule: string | null }
@@ -23,8 +23,8 @@ export type AssistantAreasInfo = { statuses: AssistantAreaStatus[]; module: stri
  */
 export const useAssistantAreas = (): AssistantAreasInfo => {
   const { pathname } = useLocation()
-  const designAvailability = useAiFeatureAvailability('assistantDesign')
-  const helpAvailability = useAiFeatureAvailability('chatbot')
+  const design = useAssistantFeatureAvailability('assistantDesign')
+  const help = useAssistantFeatureAvailability('chatbot')
   const designEnabled = useAiFeatureEnabled(AiFeatureCategory.assistantDesign)
   const helpEnabled = useAiFeatureEnabled(AiFeatureCategory.chat)
   const analysisStatus = useAnalysisAreaStatus()
@@ -40,11 +40,16 @@ export const useAssistantAreas = (): AssistantAreasInfo => {
       surveyOpen: Survey.isValid(surveyInfo),
       canEditSurvey,
       hasDraftSurvey,
-      availability: designAvailability,
+      availability: design.availability,
+      canSwitchProvider: design.canSwitchProvider,
     }),
     analysisStatus,
     cleaningStatus,
-    getHelpAreaStatus({ categoryEnabled: helpEnabled, availability: helpAvailability }),
+    getHelpAreaStatus({
+      categoryEnabled: helpEnabled,
+      availability: help.availability,
+      canSwitchProvider: help.canSwitchProvider,
+    }),
   ]
   return { statuses, ...parseAppPath(pathname) }
 }
