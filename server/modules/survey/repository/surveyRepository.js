@@ -4,7 +4,7 @@ import camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DB from '@server/db'
 
-import { selectDate } from '@server/db/dbUtils'
+import { now as dbNow, selectDate } from '@server/db/dbUtils'
 
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
@@ -312,6 +312,9 @@ export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {},
   )
 
 // ============== UPDATE
+export const markSurveyDraft = async (surveyId, client = db) =>
+  client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
+
 export const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = { [key]: value }
 
