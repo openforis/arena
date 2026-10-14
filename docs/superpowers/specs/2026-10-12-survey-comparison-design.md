@@ -88,7 +88,7 @@ Phase 1 already covers the use case above. The other phases add more cases and a
 #### User flow
 
 1. Designer → new **"Update from survey file…"** item (next to Schema Summary), opens `/app/designer/compare`.
-   Users without edit permission get the same view as **"Compare with survey file…"** (read only, no Apply).
+   The view (and its API) is available only to users with survey edit permission.
 2. The user uploads an Arena survey `.zip` exported (without data) from another server. Later option: pick another
    survey on the same server instead (same code path, the source is loaded from the DB rather than from a zip).
 3. A job (`SurveyCompareJob`) reads the zip and builds the diff; progress is shown with the usual `JobMonitor`.

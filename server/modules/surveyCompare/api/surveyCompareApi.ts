@@ -42,7 +42,7 @@ export const init = (app: any) => {
   // starts the comparison with an uploaded survey file (or with the one uploaded before: sourceFileName)
   app.post(
     '/survey/:surveyId/compare',
-    AuthMiddleware.requireSurveyViewPermission,
+    AuthMiddleware.requireSurveyEditPermission,
     async (req: any, res: any, next: any) => {
       try {
         const user = Request.getUser(req)
@@ -62,7 +62,7 @@ export const init = (app: any) => {
 
   app.get(
     '/survey/:surveyId/compare/result',
-    AuthMiddleware.requireSurveyViewPermission,
+    AuthMiddleware.requireSurveyEditPermission,
     async (req: any, res: any, next: any) => {
       try {
         const { resultFileName } = Request.getParams(req)

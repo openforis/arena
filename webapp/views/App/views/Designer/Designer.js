@@ -37,6 +37,10 @@ const Designer = () => {
               component: NodeDefDetails,
               path: `${designerModules.nodeDef.path}/:nodeDefUuid/`,
             },
+            {
+              component: SurveyCompare,
+              path: designerModules.surveyCompare.path,
+            },
           ]
         : []),
       {
@@ -46,10 +50,6 @@ const Designer = () => {
       {
         component: SurveyDependencyTree,
         path: designerModules.surveyDependencyTree.path,
-      },
-      {
-        component: SurveyCompare,
-        path: designerModules.surveyCompare.path,
       },
       // Category
       {
