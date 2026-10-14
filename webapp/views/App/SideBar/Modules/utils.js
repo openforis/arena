@@ -49,7 +49,6 @@ const getDesignerModule = (user, surveyInfo) => {
       ...(canEditSurvey ? [designerModules.surveyDependencyTree] : []),
       designerModules.categories,
       designerModules.taxonomies,
-      ...(canEditSurvey ? [designerModules.surveyCompare] : []),
     ],
   })
 }

@@ -1,4 +1,6 @@
 export * from './surveyCompareTypes'
 export { compareSurveys } from './surveyComparator'
-export { buildApplyPlan } from './surveyCompareApplyPlanner'
+export { buildApplyPlan, expandSelection } from './surveyCompareApplyPlanner'
 export type { SurveyCompareApplyPlan, NodeDefUpdate } from './surveyCompareApplyPlanner'
+export { buildSurveyInfoApplyPlan } from './surveyCompareSurveyInfo'
+export type { SurveyInfoApplyPlan } from './surveyCompareSurveyInfo'

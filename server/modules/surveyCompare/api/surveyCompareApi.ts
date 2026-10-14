@@ -47,7 +47,13 @@ export const init = (app: any) => {
       const { surveyId } = Request.getParams(req)
       const fileParams = await getSourceFileParams(req)
       if (fileParams) {
-        const job = SurveyCompareService.startSurveyCompareJob({ user, surveyId: Number(surveyId), ...fileParams })
+        const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
+        const job = SurveyCompareService.startSurveyCompareJob({
+          user,
+          surveyId: Number(surveyId),
+          manualMatches,
+          ...fileParams,
+        })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {
         res.json({ chunkProcessing: true })
@@ -76,11 +82,13 @@ export const init = (app: any) => {
       const user = Request.getUser(req)
       const { surveyId, sourceFileName } = Request.getParams(req)
       const selectedIds = Request.getJsonParam(req, 'selectedIds', [])
+      const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
       const job = SurveyCompareService.startSurveyCompareApplyJob({
         user,
         surveyId: Number(surveyId),
         sourceFileName,
         selectedIds,
+        manualMatches,
       })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

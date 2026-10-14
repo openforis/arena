@@ -12,6 +12,7 @@ export const startSurveyCompareJob = (params: {
   totalChunks?: number
   totalFileSize?: number
   sourceFileName?: string
+  manualMatches?: Record<string, string>
 }) => JobManager.enqueueJob(new SurveyCompareJob(params))
 
 export const startSurveyCompareApplyJob = (params: {
@@ -19,6 +20,7 @@ export const startSurveyCompareApplyJob = (params: {
   surveyId: number
   sourceFileName: string
   selectedIds: string[]
+  manualMatches?: Record<string, string>
 }) => JobManager.enqueueJob(new SurveyCompareApplyJob(params))
 
 export const readSurveyCompareResult = async ({ resultFileName }: { resultFileName: string }) => {

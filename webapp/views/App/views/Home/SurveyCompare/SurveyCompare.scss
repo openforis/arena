@@ -26,6 +26,11 @@
     font-size: 0.85rem;
   }
 
+  // the dropzone must not grow to fill the view
+  .dropzone {
+    flex: none;
+  }
+
   &__intro {
     margin: 0;
     padding-left: 1.5rem;
@@ -244,4 +249,34 @@
   &__simple-item {
     margin-bottom: 0.75rem;
   }
+}
+
+.survey-compare__removal {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: 4px;
+  background-color: rgba(244, 67, 54, 0.05);
+}
+
+.survey-compare__removal-header,
+.survey-compare__rename {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.survey-compare__deletion-note {
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background-color: #d32f2f;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.survey-compare__deletion-info {
+  margin: 0.5rem 0;
+  color: #d32f2f;
+  font-size: 0.9rem;
 }

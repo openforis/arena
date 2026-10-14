@@ -116,6 +116,10 @@ export const homeModules = {
     key: 'collectImportReport',
     path: 'collectImportReport',
   },
+  surveyCompare: {
+    key: 'surveyCompare',
+    path: 'surveyCompare',
+  },
 }
 
 export const designerModules = {
@@ -134,10 +138,6 @@ export const designerModules = {
   surveyDependencyTree: {
     key: 'surveyDependencyTree',
     path: 'surveyDependencyTree',
-  },
-  surveyCompare: {
-    key: 'surveyCompare',
-    path: 'surveyCompare',
   },
   categories: {
     key: 'categories',

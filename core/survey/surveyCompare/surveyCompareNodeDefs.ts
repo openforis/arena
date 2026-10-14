@@ -10,7 +10,7 @@ import {
 } from './surveyCompareTypes'
 import { NodeDefsIndex, getChildren } from './surveyCompareNodeDefsIndex'
 import { normalizeNodeDef } from './surveyCompareNodeDefNormalizer'
-import { getDifferentKeys } from './surveyCompareValues'
+import { areNormalizedValuesEqual, getDifferentKeys } from './surveyCompareValues'
 
 export interface NodeDefMatches {
   /** Target node def uuid by source node def uuid. */
@@ -57,19 +57,47 @@ const matchByName = ({ sourceIndex, targetIndex, matches, sourceNodeDef }) => {
   }
 }
 
+// manual matches are used only when both node defs are still unmatched
+const addManualMatches = ({
+  sourceIndex,
+  targetIndex,
+  matches,
+  manualMatches,
+}: {
+  sourceIndex: NodeDefsIndex
+  targetIndex: NodeDefsIndex
+  matches: NodeDefMatches
+  manualMatches: Record<string, string>
+}) => {
+  for (const [sourceUuid, targetUuid] of Object.entries(manualMatches ?? {})) {
+    const valid =
+      sourceIndex.byUuid[sourceUuid] &&
+      targetIndex.byUuid[targetUuid] &&
+      !matches.targetUuidBySourceUuid[sourceUuid] &&
+      !matches.sourceUuidByTargetUuid[targetUuid]
+    if (valid) {
+      addMatch({ matches, sourceUuid, targetUuid, matchedBy: SurveyCompareMatchType.manual })
+    }
+  }
+}
+
 /**
- * Matches the node defs of two surveys: by uuid first, then by name (among children of matched parents).
+ * Matches the node defs of two surveys: by uuid first, then the manual matches, then by name (among children of
+ * matched parents).
  * @param {object} params - The parameters.
  * @param {NodeDefsIndex} params.sourceIndex - Source survey node defs index.
  * @param {NodeDefsIndex} params.targetIndex - Target survey node defs index.
+ * @param {Record<string, string>} [params.manualMatches] - Target node def uuid by source node def uuid.
  * @returns {NodeDefMatches} - The matches.
  */
 export const matchNodeDefs = ({
   sourceIndex,
   targetIndex,
+  manualMatches = {},
 }: {
   sourceIndex: NodeDefsIndex
   targetIndex: NodeDefsIndex
+  manualMatches?: Record<string, string>
 }): NodeDefMatches => {
   const matches: NodeDefMatches = { targetUuidBySourceUuid: {}, matchedByBySourceUuid: {}, sourceUuidByTargetUuid: {} }
   for (const sourceUuid of Object.keys(sourceIndex.pathByUuid)) {
@@ -77,6 +105,7 @@ export const matchNodeDefs = ({
       addMatch({ matches, sourceUuid, targetUuid: sourceUuid, matchedBy: SurveyCompareMatchType.uuid })
     }
   }
+  addManualMatches({ sourceIndex, targetIndex, matches, manualMatches })
   const { root: sourceRoot } = sourceIndex
   const { root: targetRoot } = targetIndex
   if (sourceRoot && targetRoot && !matches.targetUuidBySourceUuid[NodeDef.getUuid(sourceRoot)]) {
@@ -252,6 +281,50 @@ const rollUpDifferences = (diffs: SurveyCompareNodeDefDiff[]): void => {
   }
 }
 
+const withoutName = (props: Record<string, any>) => {
+  const others = { ...props }
+  delete others.name
+  return others
+}
+
+// a node def only in the target survey is a rename candidate of an added one when it has the same type and the same
+// labels or the same props (name excluded)
+const isRenameCandidate = ({ context, addedDiff, removedDiff }): boolean => {
+  if (addedDiff.type !== removedDiff.type) return false
+  const { sourceIndex, targetIndex } = context
+  const source = normalizeNodeDef({ index: sourceIndex, nodeDef: sourceIndex.byUuid[addedDiff.sourceUuid] })
+  const target = normalizeNodeDef({ index: targetIndex, nodeDef: targetIndex.byUuid[removedDiff.targetUuid] })
+  const sameLabels =
+    source.props.labels !== undefined && areNormalizedValuesEqual(source.props.labels, target.props.labels)
+  return sameLabels || areNormalizedValuesEqual(withoutName(source.props), withoutName(target.props))
+}
+
+// suggests renames: an added node def with a single candidate (not claimed by other added node defs)
+const addRenameCandidates = ({ context, diffs }: { context: any; diffs: SurveyCompareNodeDefDiff[] }): void => {
+  const candidatesByAddedId: Record<string, SurveyCompareNodeDefDiff[]> = {}
+  const claimsByRemovedId: Record<string, number> = {}
+  for (const addedDiff of diffs) {
+    if (addedDiff.status !== SurveyCompareStatus.added || !addedDiff.parentId) continue
+    const candidates = diffs.filter(
+      (removedDiff) =>
+        removedDiff.status === SurveyCompareStatus.removed &&
+        removedDiff.parentId === addedDiff.parentId &&
+        isRenameCandidate({ context, addedDiff, removedDiff })
+    )
+    candidatesByAddedId[addedDiff.id] = candidates
+    for (const candidate of candidates) {
+      claimsByRemovedId[candidate.id] = (claimsByRemovedId[candidate.id] ?? 0) + 1
+    }
+  }
+  for (const addedDiff of diffs) {
+    const candidates = candidatesByAddedId[addedDiff.id] ?? []
+    const [candidate] = candidates
+    if (candidates.length === 1 && claimsByRemovedId[candidate.id] === 1) {
+      addedDiff.renameCandidate = { targetUuid: candidate.targetUuid, name: candidate.name, path: candidate.path }
+    }
+  }
+}
+
 /**
  * Compares the node defs of two surveys.
  * Node defs are returned in hierarchical order (depth first), following the source survey hierarchy;
@@ -277,5 +350,6 @@ export const compareNodeDefs = ({
     visitSource({ context, sourceNodeDef: sourceIndex.root, parentId: undefined, depth: 0 })
   }
   rollUpDifferences(result)
+  addRenameCandidates({ context, diffs: result })
   return result
 }

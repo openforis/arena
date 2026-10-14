@@ -14,7 +14,7 @@ import {
   SurveyCompareReason,
   SurveyCompareStatus,
 } from './surveyCompareTypes'
-import { areNormalizedValuesEqual, getDifferentKeys, normalizeValue } from './surveyCompareValues'
+import { getDifferentKeys, normalizeValue } from './surveyCompareValues'
 
 export interface CategoryMatch {
   source?: any
@@ -23,6 +23,7 @@ export interface CategoryMatch {
 }
 
 export const categoryChangeId = (uuid: string): string => `category:${uuid}`
+export const categoryRemovalChangeId = (uuid: string): string => `categoryRemoval:${uuid}`
 
 /**
  * Matches the categories of two surveys: by uuid first, then by name.
@@ -132,9 +133,10 @@ const compareItems = ({ sourceItems, targetItems }): SurveyCompareCategoryItemDi
       diffs.push({ codePath, status: SurveyCompareStatus.changed, propDiffs })
     }
   }
-  for (const [key, { codePath }] of Object.entries(targetIndex)) {
+  for (const [key, { item, codePath }] of Object.entries(targetIndex)) {
     if (!sourceIndex[key]) {
-      diffs.push({ codePath, status: SurveyCompareStatus.removed, propDiffs: [] })
+      const published = CategoryItem.isPublished(item) || undefined
+      diffs.push({ codePath, status: SurveyCompareStatus.removed, propDiffs: [], published })
     }
   }
   return diffs
@@ -158,28 +160,49 @@ const getCategoryPropDiffs = ({ source, target }): SurveyComparePropDiff[] => {
 }
 
 /** Category props that can be updated from the comparison. */
-export const updatableCategoryProps: string[] = [Category.keysProps.name, Category.keysProps.itemExtraDef]
+export const updatableCategoryProps: string[] = [
+  Category.keysProps.name,
+  Category.keysProps.itemExtraDef,
+  Category.keysProps.reportingData,
+]
 
-const getMatchedCategoryApplicability = ({ propDiffs, itemsCount }) => {
-  if (propDiffs.some((propDiff) => propDiff.key === 'levels')) {
-    return {
-      status: SurveyCompareApplicabilityStatus.notApplicable,
-      reasons: [SurveyCompareReason.categoryLevelsChanged],
-    }
+const getLevelNames = (category: any): string[] => Category.getLevelsArray(category).map(CategoryLevel.getName)
+
+/**
+ * Levels of the target category to delete: the ones beyond the levels of the source category.
+ * @param {object} params - The parameters.
+ * @param {any} params.source - Source category.
+ * @param {any} params.target - Target category.
+ * @returns {{deletable: any[], published: any[]}} - Unpublished (deletable) and published extra levels.
+ */
+export const getExtraTargetLevels = ({ source, target }) => {
+  const extraLevels = Category.getLevelsArray(target).slice(Category.getLevelsArray(source).length)
+  return {
+    deletable: extraLevels.filter((level) => !CategoryLevel.isPublished(level)),
+    published: extraLevels.filter(CategoryLevel.isPublished),
   }
-  const reasons = []
-  if (itemsCount.removed > 0) {
-    // items only in the target survey are kept
-    reasons.push(SurveyCompareReason.categoryItemsRemovalNotSupported)
-  }
-  if (propDiffs.some((propDiff) => propDiff.key === Category.keysProps.reportingData)) {
-    reasons.push(SurveyCompareReason.categoryReportingDataChanged)
-  }
+}
+
+// levels are renamed or added at the end
+const hasLevelsToUpdate = ({ source, target }): boolean => {
+  const sourceNames = getLevelNames(source)
+  const targetNames = getLevelNames(target)
+  return sourceNames.length > targetNames.length || sourceNames.some((name, index) => name !== targetNames[index])
+}
+
+const getMatchedCategoryApplicability = ({ source, target, propDiffs, itemsCount }) => {
   const hasApplicableChanges =
     itemsCount.added > 0 ||
     itemsCount.changed > 0 ||
+    hasLevelsToUpdate({ source, target }) ||
     propDiffs.some((propDiff) => updatableCategoryProps.includes(propDiff.key))
-  if (!hasApplicableChanges) {
+  return hasApplicableChanges
+    ? { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] }
+    : { status: SurveyCompareApplicabilityStatus.notApplicable, reasons: [] }
+}
+
+const toRemovalApplicability = ({ deletableCount, reasons }) => {
+  if (deletableCount === 0) {
     return { status: SurveyCompareApplicabilityStatus.notApplicable, reasons }
   }
   return {
@@ -188,6 +211,26 @@ const getMatchedCategoryApplicability = ({ propDiffs, itemsCount }) => {
         ? SurveyCompareApplicabilityStatus.applicableWithWarning
         : SurveyCompareApplicabilityStatus.applicable,
     reasons,
+  }
+}
+
+// items and levels only in the target survey: unpublished ones can be deleted, published ones are kept
+const getCategoryRemoval = ({ source, target, items }) => {
+  const removedItems = items.filter((item) => item.status === SurveyCompareStatus.removed)
+  const extraLevels = getExtraTargetLevels({ source, target })
+  if (removedItems.length === 0 && extraLevels.deletable.length + extraLevels.published.length === 0) {
+    return undefined
+  }
+  const reasons = []
+  if (removedItems.some((item) => item.published)) reasons.push(SurveyCompareReason.publishedCategoryItemsKept)
+  if (extraLevels.published.length > 0) reasons.push(SurveyCompareReason.publishedCategoryLevelsKept)
+  const deletableCount = removedItems.filter((item) => !item.published).length + extraLevels.deletable.length
+  return {
+    id: categoryRemovalChangeId(Category.getUuid(source)),
+    status: SurveyCompareStatus.removed,
+    applicability: toRemovalApplicability({ deletableCount, reasons }),
+    dependsOn: [],
+    linkedTo: [],
   }
 }
 
@@ -202,6 +245,11 @@ const compareMatchedCategories = ({ match, sourceItemsByCategoryUuid, targetItem
   })
   const itemsCount = countItemsByStatus(items)
   const changed = propDiffs.length > 0 || items.length > 0
+  const onlyRemovals =
+    changed &&
+    itemsCount.added + itemsCount.changed === 0 &&
+    getMatchedCategoryApplicability({ source, target, propDiffs, itemsCount }).status ===
+      SurveyCompareApplicabilityStatus.notApplicable
   return {
     id: categoryChangeId(sourceUuid),
     sourceUuid,
@@ -212,7 +260,10 @@ const compareMatchedCategories = ({ match, sourceItemsByCategoryUuid, targetItem
     propDiffs,
     items,
     itemsCount,
-    applicability: changed ? getMatchedCategoryApplicability({ propDiffs, itemsCount }) : undefined,
+    // when only removals differ, the category change itself has nothing to apply: only its removal can be selected
+    applicability:
+      changed && !onlyRemovals ? getMatchedCategoryApplicability({ source, target, propDiffs, itemsCount }) : undefined,
+    removal: changed ? getCategoryRemoval({ source, target, items }) : undefined,
     dependsOn: [],
     linkedTo: [],
   }
@@ -253,20 +304,10 @@ export const compareCategories = ({
         propDiffs: [],
         items: [],
         itemsCount: { added: source ? items.length : 0, changed: 0, removed: source ? 0 : items.length },
-        applicability: source
-          ? { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] }
-          : {
-              status: SurveyCompareApplicabilityStatus.notApplicable,
-              reasons: [SurveyCompareReason.categoryRemovalNotSupported],
-            },
+        // removals: applicability depends on the node defs using the category (see evaluateApplicability)
+        applicability: { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] },
         dependsOn: [],
         linkedTo: [],
       }
     })
     .sort((diffA, diffB) => diffA.name.localeCompare(diffB.name))
-
-export const areCategoryLevelsEqual = ({ source, target }): boolean =>
-  areNormalizedValuesEqual(
-    Category.getLevelsArray(source).map(CategoryLevel.getName),
-    Category.getLevelsArray(target).map(CategoryLevel.getName)
-  )

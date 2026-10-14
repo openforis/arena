@@ -1,4 +1,4 @@
-import { formatValue } from '@webapp/views/App/views/Designer/SurveyCompare/surveyCompareValueFormatter'
+import { formatValue } from '@webapp/views/App/views/Home/SurveyCompare/surveyCompareValueFormatter'
 
 const t = (key: string, params?: Record<string, unknown>) => (params ? `${key} ${JSON.stringify(params)}` : key)
 

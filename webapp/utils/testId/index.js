@@ -35,6 +35,7 @@ export const TestId = {
     advancedFunctionsBtn: 'survey-advanced-functions',
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
+    surveyCompareBtn: 'survey-compare-btn',
     surveyExportBtn: 'survey-export-btn',
     surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
