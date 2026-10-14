@@ -1,0 +1,45 @@
+// white text on each background: contrast at least 4.5:1
+.provider-monogram {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+  background: #646b78;
+
+  &--small {
+    width: 24px;
+    height: 24px;
+    font-size: 0.7rem;
+    border-radius: 4px;
+  }
+
+  &--local {
+    background: #4f6d7a;
+  }
+
+  &--openai {
+    background: #3e7a6a;
+  }
+
+  &--anthropic {
+    background: #8a6a4f;
+  }
+
+  &--google {
+    background: #5468a8;
+  }
+
+  &--compatible {
+    background: #6d5b8f;
+  }
+
+  &--default,
+  &--other {
+    background: #646b78;
+  }
+}
