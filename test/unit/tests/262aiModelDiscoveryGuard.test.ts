@@ -1,4 +1,3 @@
-// test/unit/tests/262aiModelDiscoveryGuard.test.ts
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
@@ -15,7 +14,7 @@ const lookupTo =
 
 /**
  * A DNS lookup that fails the test when called.
- * @returns {Promise<never>} Never resolves.
+ * @returns {Promise<never>} Always rejects.
  */
 const neverCalledLookup = async () => {
   throw new Error('lookup must not be called')

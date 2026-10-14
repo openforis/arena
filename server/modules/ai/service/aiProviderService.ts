@@ -74,21 +74,9 @@ export type AiProviderServiceDeps = {
   encrypt: (plain: string) => string
   decrypt: (envelope: string) => string
   isEncryptionConfigured: () => boolean
-  /**
-   * Tells whether the admin configured a default provider.
-   * @returns {boolean} Whether there is an admin default.
-   */
   hasAdminDefault: () => boolean
-  /**
-   * Tells whether the mock provider is enabled (test servers).
-   * @returns {boolean} Whether the mock is enabled.
-   */
   isMockEnabled: () => boolean
   newId: () => string
-  /**
-   * Returns the current time.
-   * @returns {string} ISO timestamp.
-   */
   now: () => string
   allowlist: string[]
 }
@@ -410,7 +398,7 @@ const assertTestPasses = async ({
 const isKeyReadable = (provider: StoredAiProvider, deps: AiProviderServiceDeps): boolean => {
   if (!provider.apiKeyEncrypted) return false
   try {
-    deps.decrypt(provider.apiKeyEncrypted)
+    decryptStoredKey(provider, deps)
     return true
   } catch {
     return false
@@ -446,6 +434,18 @@ export const getPublicProviders = (
 ): PublicAiProvider[] => getProviderPrefs(getAiPrefs(user)).providers.map((provider) => toPublic(provider, deps))
 
 /**
+ * Returns the input with a single meaning of "key sent": a string (an empty one clears the key); anything else, such
+ * as null or whitespace only, is "not sent" and keeps the stored key.
+ * @param {AiProviderInput} input - Request input (untrusted).
+ * @returns {AiProviderInput} The input with a normalised `apiKey`.
+ */
+const normalizeInput = (input: AiProviderInput): AiProviderInput => {
+  const { apiKey } = input
+  const sent = typeof apiKey === 'string' && (apiKey === '' || apiKey.trim() !== '')
+  return { ...input, apiKey: sent ? apiKey : undefined }
+}
+
+/**
  * Tests a draft or a saved provider; stamps `lastTest*` only for a saved provider tested with its saved values.
  * @param {object} params - Parameters.
  * @param {User} params.user - The user.
@@ -455,13 +455,14 @@ export const getPublicProviders = (
  */
 export const testProvider = async ({
   user,
-  input,
+  input: rawInput,
   deps = createDefaultAiProviderServiceDeps(),
 }: {
   user: User
   input: AiProviderInput
   deps?: AiProviderServiceDeps
 }): Promise<AiProviderTestResult> => {
+  const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
   const resolved = withStoredKey({ resolved: resolveCallConfig({ prefs, input, deps }), input, deps })
   try {
@@ -487,13 +488,14 @@ export const testProvider = async ({
  */
 export const listProviderModels = async ({
   user,
-  input,
+  input: rawInput,
   deps = createDefaultAiProviderServiceDeps(),
 }: {
   user: User
   input: AiProviderInput
   deps?: AiProviderServiceDeps
 }): Promise<{ models: AiProviderModel[] }> => {
+  const input = normalizeInput(rawInput)
   const { cfg } = withStoredKey({
     resolved: resolveCallConfig({ prefs: getProviderPrefs(getAiPrefs(user)), input, deps }),
     input,
@@ -516,13 +518,14 @@ export const listProviderModels = async ({
  */
 export const addProvider = async ({
   user,
-  input,
+  input: rawInput,
   deps = createDefaultAiProviderServiceDeps(),
 }: {
   user: User
   input: AiProviderInput
   deps?: AiProviderServiceDeps
 }): Promise<{ user: User; provider: PublicAiProvider }> => {
+  const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
   // an added provider is always a draft: it never takes the key of a saved one
   const draftInput = { ...input, id: undefined }
@@ -575,7 +578,7 @@ const keyToStore = ({
   saved: StoredAiProvider
   deps: AiProviderServiceDeps
 }): string | null => {
-  if (typeof input.apiKey === 'string') return encryptKey(resolved.cfg.apiKey, deps)
+  if (input.apiKey !== undefined) return encryptKey(resolved.cfg.apiKey, deps)
   return resolved.sameEndpoint ? saved.apiKeyEncrypted : null
 }
 
@@ -592,7 +595,7 @@ const keyToStore = ({
 export const updateProvider = async ({
   user,
   id,
-  input,
+  input: rawInput,
   deps = createDefaultAiProviderServiceDeps(),
 }: {
   user: User
@@ -600,6 +603,7 @@ export const updateProvider = async ({
   input: AiProviderInput
   deps?: AiProviderServiceDeps
 }): Promise<{ user: User; provider: PublicAiProvider }> => {
+  const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
   const saved = findOwnProvider(prefs, id)
   const savedInput = { ...input, id: saved.id, type: saved.type }
