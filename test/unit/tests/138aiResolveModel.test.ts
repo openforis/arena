@@ -42,6 +42,9 @@ const capabilities = ({
   },
   gateway: { available: true, hostingClass: 'cloud', provider: 'openai', model: 'gateway-model', maxPromptChars: 1000 },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+  providers: [],
+  defaultProviderId: 'arena-default',
+  local: {},
 })
 
 const setup = ({

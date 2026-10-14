@@ -33,6 +33,9 @@ const capabilitiesFor = (local: LocalState, gateway: GatewayState): AiCapabiliti
     maxPromptChars: 200000,
   },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+  providers: [],
+  defaultProviderId: 'arena-default',
+  local: {},
 })
 
 // plain oracle, written independently of selectEngine

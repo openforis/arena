@@ -39,6 +39,9 @@ const capabilities = ({ local = 'off', gateway = true } = {}): AiCapabilities =>
     maxPromptChars: 200000,
   },
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+  providers: [],
+  defaultProviderId: 'arena-default',
+  local: {},
 })
 
 const availability = (overrides: Partial<Parameters<typeof getAiEngineFeatureAvailability>[0]> = {}) =>
@@ -56,6 +59,7 @@ describe('isCapabilitiesLoadedForUser', () => {
   const store = createCapabilitiesStore({
     loadSettings: async () => null,
     loadLocalSettings: () => ({ enabled: false, baseUrl: '', modelId: null, preferLocal: true }) as never,
+    loadLocalProviders: () => [],
     probe: async () => null as never,
   })
 

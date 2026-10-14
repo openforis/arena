@@ -6,6 +6,7 @@ import type { LanguageModel } from 'ai'
 
 import type { AiDataClass, AiFeatureKey } from '@common/ai/features'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
+import type { AiProviderKind } from '@common/ai/providerIds'
 
 export type AiEngineId = 'gateway' | 'localServer' // 'builtIn' | 'webLlm' later (overview to-do list)
 
@@ -46,10 +47,29 @@ export type AiGatewayCapability = {
 
 export type AiInstanceCapability = { policyCeilings: AiPolicy | null; orgHostedBaseUrls: string[] }
 
+export type AiProviderStatus = 'ready' | 'notTested' | 'notAvailable' | 'notSetUp'
+
+// one provider the user can pick (spec section 1); hostingClass null: not known (not set up, invalid URL)
+export type AiProviderEntry = {
+  id: string
+  kind: AiProviderKind
+  type: string
+  name: string
+  model: string | null
+  baseUrl: string | null
+  hostingClass: AiHostingClass | null
+  status: AiProviderStatus
+}
+
 export type AiCapabilities = {
   localServer: AiLocalServerCapability
   gateway: AiGatewayCapability
   instance: AiInstanceCapability
+  // account providers, then local providers, then Arena default
+  providers: AiProviderEntry[]
+  defaultProviderId: string
+  // the probe of each local provider, by id
+  local: Record<string, AiLocalServerCapability>
 }
 
 export type AiUnavailableReason =

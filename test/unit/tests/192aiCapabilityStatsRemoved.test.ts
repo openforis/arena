@@ -5,17 +5,32 @@ import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettin
 
 describe('capability statistics and device detection are removed', () => {
   test('the capabilities have no device facts', () => {
-    expect(Object.keys(emptyCapabilities()).sort()).toEqual(['gateway', 'instance', 'localServer'])
+    expect(Object.keys(emptyCapabilities()).sort()).toEqual([
+      'defaultProviderId',
+      'gateway',
+      'instance',
+      'local',
+      'localServer',
+      'providers',
+    ])
   })
 
   test('the store loads without a device reader', async () => {
     const store = createCapabilitiesStore({
       loadSettings: async () => null,
       loadLocalSettings: () => defaultLocalServerSettings(),
+      loadLocalProviders: () => [],
       probe: async () => ({ reachable: false, models: [], contextTokens: null, error: null }),
     })
     const capabilities = await store.load({ userUuid: 'u1' })
-    expect(Object.keys(capabilities).sort()).toEqual(['gateway', 'instance', 'localServer'])
+    expect(Object.keys(capabilities).sort()).toEqual([
+      'defaultProviderId',
+      'gateway',
+      'instance',
+      'local',
+      'localServer',
+      'providers',
+    ])
     expect('detectDevice' in store).toBe(false)
   })
 

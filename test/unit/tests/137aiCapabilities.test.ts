@@ -36,6 +36,7 @@ const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServer
       return settingsSnapshot
     },
     loadLocalSettings: () => localSettings,
+    loadLocalProviders: () => [],
     probe: async ({ baseUrl }: { baseUrl: string; modelId: string | null }) => {
       calls.probes.push(baseUrl)
       return probeResult
