@@ -1,6 +1,11 @@
 export default {
-  intro:
-    'Seleccione un archivo de encuesta exportado (sin datos) desde otro servidor de Arena, p. ej. Dev o QA.\nEl archivo se compara con esta encuesta y se muestran las diferencias: luego puede aplicar los cambios seleccionados a esta encuesta.\nLos cambios se guardan como borrador: pruebe el formulario y publique la encuesta para que sean efectivos.',
+  introSteps: {
+    exportFile: 'Exporte la encuesta sin datos desde el otro servidor de Arena (p. ej. Dev o QA)',
+    selectFile: 'Seleccione el archivo exportado (.zip): se compara con esta encuesta y se muestran las diferencias',
+    applyChanges: 'Revise las diferencias y aplique los cambios seleccionados a esta encuesta',
+    publish:
+      'Los cambios se guardan como borrador: pruebe el formulario y publique la encuesta para que sean efectivos',
+  },
   selectFile: 'Seleccionar archivo de encuesta (.zip)',
   fileTooLarge:
     'El archivo seleccionado es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',

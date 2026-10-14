@@ -1,7 +1,10 @@
 export default {
-  intro: `Select a survey file exported (without data) from another Arena server, e.g. Dev or QA.
-The file is compared with this survey and the differences are shown: you can then apply the selected changes to this survey.
-Changes are saved as draft: test the form and publish the survey to make them effective.`,
+  introSteps: {
+    exportFile: 'Export the survey without data from the other Arena server (e.g. Dev or QA)',
+    selectFile: 'Select the exported file (.zip): it is compared with this survey and the differences are shown',
+    applyChanges: 'Review the differences and apply the selected changes to this survey',
+    publish: 'Changes are saved as draft: test the form and publish the survey to make them effective',
+  },
   selectFile: 'Select survey file (.zip)',
   fileTooLarge:
     'The selected file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',

@@ -1,6 +1,12 @@
 export default {
-  intro:
-    'Selecione um arquivo de inventário exportado (sem dados) de outro servidor Arena, por ex. Dev ou QA.\nO arquivo é comparado com este inventário e as diferenças são exibidas: em seguida, você pode aplicar as alterações selecionadas a este inventário.\nAs alterações são salvas como rascunho: teste o formulário e publique o inventário para torná-las efetivas.',
+  introSteps: {
+    exportFile: 'Exporte o inventário sem dados do outro servidor Arena (por ex. Dev ou QA)',
+    selectFile:
+      'Selecione o arquivo exportado (.zip): ele é comparado com este inventário e as diferenças são exibidas',
+    applyChanges: 'Revise as diferenças e aplique as alterações selecionadas a este inventário',
+    publish:
+      'As alterações são salvas como rascunho: teste o formulário e publique o inventário para torná-las efetivas',
+  },
   selectFile: 'Selecionar arquivo do inventário (.zip)',
   fileTooLarge:
     'O arquivo selecionado é grande demais (máx. {{maxSize}} MB): exporte o inventário sem dados, os registros e seus arquivos não são necessários para comparar inventários',

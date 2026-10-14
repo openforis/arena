@@ -25,6 +25,8 @@ import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
 
+const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
+
 type CompareResultWithSource = SurveyCompareResult & { source?: { name?: string } }
 
 interface CompareState {
@@ -204,7 +206,13 @@ export const SurveyCompare = () => {
         )}
       </div>
 
-      {!result && <div className="survey-compare__intro">{i18n.t('surveyCompareView:intro')}</div>}
+      {!result && (
+        <ol className="survey-compare__intro">
+          {introStepKeys.map((key) => (
+            <li key={key}>{i18n.t(`surveyCompareView:introSteps.${key}`)}</li>
+          ))}
+        </ol>
+      )}
 
       {result && (
         <>

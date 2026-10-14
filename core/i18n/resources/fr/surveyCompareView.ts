@@ -1,6 +1,12 @@
 export default {
-  intro:
-    'Sélectionnez un fichier de formulaire exporté (sans données) depuis un autre serveur Arena, par ex. Dev ou QA.\nLe fichier est comparé avec ce formulaire et les différences sont affichées : vous pouvez ensuite appliquer les modifications sélectionnées à ce formulaire.\nLes modifications sont enregistrées en brouillon : testez le formulaire et publiez-le pour les rendre effectives.',
+  introSteps: {
+    exportFile: "Exportez le formulaire sans données depuis l'autre serveur Arena (par ex. Dev ou QA)",
+    selectFile:
+      'Sélectionnez le fichier exporté (.zip) : il est comparé avec ce formulaire et les différences sont affichées',
+    applyChanges: 'Vérifiez les différences et appliquez les modifications sélectionnées à ce formulaire',
+    publish:
+      'Les modifications sont enregistrées en brouillon : testez le formulaire et publiez-le pour les rendre effectives',
+  },
   selectFile: 'Sélectionner le fichier du formulaire (.zip)',
   fileTooLarge:
     'Le fichier sélectionné est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
