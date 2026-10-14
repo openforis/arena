@@ -149,6 +149,60 @@ export class ArenaApi {
   }
 
   /**
+   * Sends a request and returns its status and JSON body without asserting success (for error cases).
+   * @param {string} method - HTTP method.
+   * @param {string} url - URL (relative to the base URL).
+   * @param {unknown} [data] - JSON body.
+   * @returns {Promise<{status: number, body: any}>} - Status and body (null when the body is not JSON).
+   */
+  async requestRaw(
+    method: 'get' | 'post' | 'put' | 'delete',
+    url: string,
+    data?: unknown
+  ): Promise<{ status: number; body: any }> {
+    const response = await this.requestContext.fetch(url, { method: method.toUpperCase(), headers: this.headers, data })
+    return { status: response.status(), body: await response.json().catch(() => null) }
+  }
+
+  /**
+   * Adds an account AI provider for the test user (POST /api/ai/providers; the server tests it first).
+   * @param {object} provider - Provider fields.
+   * @param {string} provider.type - Provider type (`mock` on the e2e server).
+   * @param {string} [provider.name] - Display name.
+   * @param {string} provider.model - Model id.
+   * @param {string} [provider.baseUrl] - Base URL (openai-compatible, vercel-ai-sdk).
+   * @param {string} [provider.apiKey] - API key.
+   * @returns {Promise<{provider: Record<string, any>, settings: Record<string, any>}>} - The new entry and the settings.
+   */
+  async addAiAccountProvider(provider: {
+    type: string
+    name?: string
+    model: string
+    baseUrl?: string
+    apiKey?: string
+  }): Promise<{ provider: Record<string, any>; settings: Record<string, any> }> {
+    return this.post('/api/ai/providers', provider)
+  }
+
+  /**
+   * Removes an account AI provider of the test user.
+   * @param {string} id - Provider id (`acct:<id>`).
+   * @returns {Promise<void>} - Resolves when removed.
+   */
+  async removeAiAccountProvider(id: string): Promise<void> {
+    await this.delete(`/api/ai/providers/${encodeURIComponent(id)}`)
+  }
+
+  /**
+   * Sets the default AI provider of the test user.
+   * @param {string} providerId - Provider id.
+   * @returns {Promise<void>} - Resolves when saved.
+   */
+  async setAiDefaultProvider(providerId: string): Promise<void> {
+    await this.put('/api/ai/settings/default', { providerId })
+  }
+
+  /**
    * Returns the uuid of the logged-in test user (the key of C's localStorage settings).
    * @returns {Promise<string>} - The user uuid.
    */
