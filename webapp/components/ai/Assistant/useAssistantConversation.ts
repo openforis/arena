@@ -14,18 +14,14 @@ import {
   toChunkErrorResult,
 } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { summarizeResults } from '@webapp/ai/changeSets/describeOperation'
-import { getEngineChangeNotice } from '@webapp/ai/engines/assistantEngine'
-import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
-import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
-import { createConversation } from '@webapp/ai/conversations/conversationModel'
+import { createConversation, withConversationProvider } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import { getConversationStore, type ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
-import type { AiDataLocation } from '@webapp/ai/policy/aiFeatureAvailability'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import {
   reportSuggestionSettle,
@@ -58,8 +54,13 @@ export type AssistantSendOptions = { suggestion?: { id: string; scope: Suggestio
 export type AssistantConversationApi = {
   conversation: Conversation | null
   busy: boolean
-  // "Now using: …" when the engine changed since the previous turn
-  engineNotice: AiDataLocation | null
+  // provider of the conversation (undefined: the user's default); a blank chat keeps the pick for its first message
+  providerId: string | undefined
+  // sets the provider of the shown conversation (saved with it), or of the next new one
+  chooseProvider: (providerId: string) => void
+  // the "Answer with" popover of the composer is open (the error card's "Choose another provider" opens it)
+  providerChooserOpen: boolean
+  setProviderChooserOpen: (open: boolean) => void
   // a change set card is being applied or discarded
   applying: boolean
   // false when the browser can't store conversations (memory store)
@@ -133,14 +134,14 @@ export const useAssistantConversation = ({
   const [conversationStore, setConversationStore] = useState<ConversationStore | null>(null)
   const [conversation, setConversation] = useState<Conversation | null>(null)
   const [busy, setBusy] = useState(false)
-  const [engineNotice, setEngineNotice] = useState<AiDataLocation | null>(null)
+  // a provider picked in a blank chat, for the conversation its first message creates
+  const [pendingProviderId, setPendingProviderId] = useState<string | undefined>(undefined)
+  const [providerChooserOpen, setProviderChooserOpen] = useState(false)
   const [applying, setApplying] = useState(false)
   const [history, setHistory] = useState<Conversation[]>([])
   const conversationRef = useRef<Conversation | null>(null)
   const controllerRef = useRef<AbortController | null>(null)
   const applyingRef = useRef(false)
-  // location of the previous turn: kept across conversations (the notice is about the engine)
-  const lastLocationRef = useRef<AiDataLocation | null>(null)
   // id of the conversation whose turn is running (its streaming answer is live, not left over)
   const runningIdRef = useRef<string | null>(null)
   // latest loadHistory request: an older, slower one must not overwrite a newer list
@@ -222,7 +223,6 @@ export const useAssistantConversation = ({
       // always saved, even after a reset: the stored conversation keeps its own user and the last state of the answer
       const persist = (next: Conversation) => assistantTurnRegistry.track(conversationStore.save(next))
       setBusy(true)
-      setEngineNotice(null)
       show(base)
       assistantPanelStore.setConversationId(base.id)
       let saved = false
@@ -235,11 +235,6 @@ export const useAssistantConversation = ({
           area,
           ctx: buildToolContext(area),
           access,
-          onEngine: (engine: AiSelectedEngine) => {
-            if (!isCurrent()) return
-            setEngineNotice(getEngineChangeNotice({ previous: lastLocationRef.current, engine }))
-            lastLocationRef.current = toDataLocation(engine)
-          },
           signal: controller.signal,
           onUpdate: (next) => {
             if (isCurrent()) show(next)
@@ -282,14 +277,16 @@ export const useAssistantConversation = ({
       if (!conversationStore || busy || applyingRef.current) return Promise.resolve(null)
       // no selected id: a new conversation, whatever the ref still holds
       const selected = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
-      const base = suggestion
-        ? withSuggestionScope(createNewConversation({ userUuid, surveyId, area }), suggestion.scope)
-        : (selected ?? createNewConversation({ userUuid, surveyId, area }))
+      const created = createNewConversation({ userUuid, surveyId, area })
+      const fresh = pendingProviderId
+        ? withConversationProvider({ conversation: created, providerId: pendingProviderId })
+        : created
+      const base = suggestion ? withSuggestionScope(fresh, suggestion.scope) : (selected ?? fresh)
       // the turn shows and selects its conversation synchronously, before its first await
       void runTurn(base, text, displayText)
       return Promise.resolve(base.id)
     },
-    [area, busy, conversationId, conversationStore, runTurn, surveyId, userUuid]
+    [area, busy, conversationId, conversationStore, pendingProviderId, runTurn, surveyId, userUuid]
   )
 
   const retry = useCallback(() => {
@@ -299,14 +296,34 @@ export const useAssistantConversation = ({
 
   const stop = useCallback(() => controllerRef.current?.abort(), [])
 
+  /**
+   * Sets the provider of the shown conversation (saved with it), or of the next new one.
+   * @param {string} providerId - Provider id.
+   * @returns {void} Nothing.
+   */
+  const chooseProvider = useCallback(
+    (providerId: string) => {
+      const shown = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
+      if (!shown) {
+        setPendingProviderId(providerId)
+        return
+      }
+      const next = withConversationProvider({ conversation: shown, providerId })
+      show(next)
+      // tracked: logout waits for the save
+      if (conversationStore) void assistantTurnRegistry.track(conversationStore.save(next))
+    },
+    [conversationId, conversationStore, show]
+  )
+
   // a blank chat: the conversation is created by its first message
   const newConversation = useCallback(() => {
-    setEngineNotice(null)
+    setPendingProviderId(undefined)
     assistantPanelStore.startNewConversation()
   }, [])
 
   const openConversation = useCallback((id: string) => {
-    setEngineNotice(null)
+    setPendingProviderId(undefined)
     assistantPanelStore.setConversationId(id)
   }, [])
 
@@ -356,7 +373,6 @@ export const useAssistantConversation = ({
       suggestionStore.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
       setHistory((items) => items.filter((item) => item.id !== id))
       if (assistantPanelStore.getState().conversationId !== id) return
-      setEngineNotice(null)
       // forgets it as the area's open conversation (home page), then back to the list
       assistantPanelStore.setConversationId(null)
       assistantPanelStore.showHistory()
@@ -497,11 +513,15 @@ export const useAssistantConversation = ({
     [readConversation, runCardAction, saveShown]
   )
 
+  // a stale conversation (New conversation, or another one still loading) is not shown
+  const shownConversation = conversation?.id === conversationId ? conversation : null
   return {
-    // a stale conversation (New conversation, or another one still loading) is not shown
-    conversation: conversation?.id === conversationId ? conversation : null,
+    conversation: shownConversation,
     busy,
-    engineNotice,
+    providerId: shownConversation ? shownConversation.providerId : pendingProviderId,
+    chooseProvider,
+    providerChooserOpen,
+    setProviderChooserOpen,
     applying,
     persistent: conversationStore?.persistent ?? true,
     ready: conversationStore !== null,

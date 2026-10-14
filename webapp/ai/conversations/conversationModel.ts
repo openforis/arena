@@ -50,6 +50,21 @@ export const createConversation = ({
 })
 
 /**
+ * Returns the conversation with the provider picked in the chat.
+ * @param {object} params - Parameters.
+ * @param {Conversation} params.conversation - Conversation.
+ * @param {string} params.providerId - Provider id.
+ * @returns {Conversation} The conversation (its history order is unchanged: updatedAt is kept).
+ */
+export const withConversationProvider = ({
+  conversation,
+  providerId,
+}: {
+  conversation: Conversation
+  providerId: string
+}): Conversation => ({ ...conversation, providerId })
+
+/**
  * Returns the history title of a conversation from its first user message.
  * @param {string} text - First user message.
  * @returns {string} The first line, at most 60 characters.

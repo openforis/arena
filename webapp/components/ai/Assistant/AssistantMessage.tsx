@@ -11,7 +11,7 @@ import type {
   ConversationReasoningPart,
   ConversationToolPart,
 } from '@webapp/ai/conversations/types'
-import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'
+import { getAiEngineErrorView, isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import { Button } from '@webapp/components/buttons'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { useI18nT } from '@webapp/store/system'
@@ -164,6 +164,16 @@ const AnswerFooter = ({
       <span>{t(`appErrors:${message.errorKey ?? 'aiProviderUnavailable'}`)}</span>
       {isLast && !recordDataNotice && (
         <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />
+      )}
+      {isLast && !recordDataNotice && isProviderChoiceError(message.errorKey) && (
+        <Button
+          disabled={api.busy}
+          label="aiAssistant.providerChip.chooseAnother"
+          onClick={() => api.setProviderChooserOpen(true)}
+          size="small"
+          testId={TestId.aiAssistant.chooseProviderBtn}
+          variant="outlined"
+        />
       )}
       {isLast && !recordDataNotice && !hasEngineRetry && (
         <Button

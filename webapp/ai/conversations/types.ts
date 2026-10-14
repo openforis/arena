@@ -74,6 +74,8 @@ export type Conversation = {
   queries?: Record<string, AnalysisQueryEntry>
   // started by a suggestion's Do it: the work lists of its tools stay within these targets (follow-ups included)
   suggestionScope?: SuggestionScope
+  // provider picked in the chat for this conversation (absent: the user's default; a removed one falls back to it)
+  providerId?: string
   createdAt: string
   updatedAt: string
 }

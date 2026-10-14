@@ -3,8 +3,8 @@ import React, { useEffect, useRef, useState } from 'react'
 import { AiLimits } from '@common/ai/limits'
 
 import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
-import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
+import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -16,6 +16,7 @@ import { AssistantComposerFooter } from './AssistantComposerFooter'
 import { AssistantContextNotice } from './AssistantContextMeter'
 import { AssistantConversationBar } from './AssistantConversationBar'
 import { AssistantMessageView } from './AssistantMessage'
+import { shouldShowProviderRemoved } from './providerChip/providerChipModel'
 import { usePendingSuggestionRequest } from './suggestions/usePendingSuggestionRequest'
 import { useAssistantPanel } from './useAssistantPanel'
 import type { AssistantConversationApi } from './useAssistantConversation'
@@ -34,7 +35,11 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const draft = draftArea === area ? panelDraft : null
   const [appliedDraft, setAppliedDraft] = useState<string | null>(null)
   const listRef = useRef<HTMLDivElement>(null)
-  const { conversation, busy, applying, engineNotice } = api
+  const { conversation, busy, applying } = api
+  const { capabilities, loaded } = useAiFeaturePolicy(assistantAreaFeatures[area])
+  // the conversation's provider was removed: the default answers, and the chat says so (only once the provider
+  // list of this user is loaded: the empty snapshot before would flag every conversation)
+  const providerRemoved = shouldShowProviderRemoved({ capabilities, loaded, providerId: api.providerId })
   // null while a remembered conversation loads (no "new conversation" title flash)
   const barTitle = conversation?.title ?? (conversationId ? null : '')
   const messages = conversation?.messages ?? []
@@ -100,9 +105,9 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           />
         ))}
       </div>
-      {engineNotice && (
-        <div className="ai-assistant-panel__engine-notice" data-testid={TestId.ai.engineNotice}>
-          {t('aiEngine.nowUsing', { location: getAiDataLocationText({ location: engineNotice, t }) })}
+      {providerRemoved && (
+        <div className="ai-assistant-panel__provider-notice" data-testid={TestId.aiAssistant.providerRemovedNotice}>
+          {t('aiAssistant.providerChip.removedNotice')}
         </div>
       )}
       <AssistantContextNotice busy={busy} conversation={conversation} onNewConversation={api.newConversation} />
@@ -121,7 +126,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
             value={input}
           />
         )}
-        <AssistantComposerFooter area={area} conversation={conversation}>
+        <AssistantComposerFooter api={api} area={area}>
           {!recordDataNotice && busy && (
             <Button
               label="aiAssistant.stop"

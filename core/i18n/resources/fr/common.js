@@ -1634,7 +1634,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       changePolicy: "Modifier la politique d'IA de l'enquête",
       openSettings: "Ouvrir les paramètres d'IA",
     },
-    nowUsing: 'Utilisé maintenant : {{location}}',
     consent: {
       title: "Utiliser votre serveur d'IA local ?",
       destination: 'Les requêtes de cette enquête seront envoyées à {{baseUrl}} ({{location}}).',
@@ -1696,6 +1695,18 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     open: 'Assistant IA',
     title: 'Assistant IA',
     close: 'Fermer',
+    providerChip: {
+      answerWith: 'Répondre avec',
+      makeDefault: 'En faire mon fournisseur par défaut',
+      manage: 'Gérer les fournisseurs…',
+      none: 'Aucun fournisseur · En ajouter un',
+      missing: "Le fournisseur par défaut n'est pas sur cet ordinateur",
+      removedNotice: 'Le fournisseur de cette conversation a été supprimé. Votre fournisseur par défaut est utilisé.',
+      chooseAnother: 'Choisir un autre fournisseur',
+      defaultFailed: "Le fournisseur par défaut n'a pas pu être modifié : {{message}}",
+      title: "Fournisseur d'IA de cette conversation : {{name}}",
+      isDefault: 'par défaut',
+    },
     tabs: {
       design: 'Conception',
       help: 'Aide',

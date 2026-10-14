@@ -1623,7 +1623,6 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       changePolicy: 'Alterar a política de IA da pesquisa',
       openSettings: 'Abrir as configurações de IA',
     },
-    nowUsing: 'Usando agora: {{location}}',
     consent: {
       title: 'Usar seu servidor de IA local?',
       destination: 'As solicitações desta pesquisa irão para {{baseUrl}} ({{location}}).',
@@ -1685,6 +1684,18 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     open: 'Assistente de IA',
     title: 'Assistente de IA',
     close: 'Fechar',
+    providerChip: {
+      answerWith: 'Responder com',
+      makeDefault: 'Tornar meu padrão',
+      manage: 'Gerenciar provedores…',
+      none: 'Nenhum provedor · Adicionar um',
+      missing: 'O provedor padrão não está neste computador',
+      removedNotice: 'O provedor desta conversa foi removido. Usando o seu padrão.',
+      chooseAnother: 'Escolher outro provedor',
+      defaultFailed: 'Não foi possível alterar o provedor padrão: {{message}}',
+      title: 'Provedor de IA desta conversa: {{name}}',
+      isDefault: 'padrão',
+    },
     tabs: {
       design: 'Design',
       help: 'Ajuda',

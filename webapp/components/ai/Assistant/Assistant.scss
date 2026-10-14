@@ -68,7 +68,7 @@
     background-color: var(--orangeLight);
   }
 
-  &__engine-notice {
+  &__provider-notice {
     padding: 0 0.75rem 0.5rem;
     font-size: 0.8rem;
     color: var(--colorGrey700);
@@ -199,21 +199,12 @@
     }
 
     // the only item that shrinks: its text ends with an ellipsis
-    > .ai-data-location-badge {
+    > .ai-provider-chip {
       flex: 0 1 auto;
-      min-width: 0;
-      overflow: hidden;
-    }
-
-    .ai-data-location-badge__text {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
 
     @container (max-width: 340px) {
-      .ai-data-location-badge__text,
+      .ai-provider-chip__text,
       .ai-assistant-panel__context-text,
       .ai-assistant-panel__sent-data-text {
         display: none;

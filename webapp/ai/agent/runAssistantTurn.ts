@@ -223,6 +223,8 @@ export const runAssistantTurn = async ({
       surveyId,
       // the conversation's class ('schema' for the assistant)
       dataClass: conversation.dataClass,
+      // the provider picked in the chat (the default when absent or removed)
+      providerId: conversation.providerId,
       signal,
       // D2: declare data when the selected engine is offered a data tool (wraps the injected resolver)
       resolve: (params) =>
