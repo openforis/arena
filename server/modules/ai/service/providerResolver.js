@@ -12,8 +12,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import { ARENA_DEFAULT_PROVIDER_ID, isAccountProviderId, isLocalProviderId } from '@common/ai/providerIds'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
-import { findStoredProvider, getProviderPrefs } from './aiProviderPrefs'
-import { decryptStoredKey } from './aiProviderService'
+import { decryptStoredKey, findStoredProvider, getProviderPrefs } from './aiProviderPrefs'
 import { getAiPrefs } from './aiUserPrefs'
 import { getProviderHostingClass } from './hostingClass'
 import * as ProviderRegistry from './providerRegistry'
@@ -63,7 +62,7 @@ const resolveAccountConfig = ({ user, providerId, decrypt }) => {
     provider: stored.type,
     model: stored.model,
     baseUrl: stored.baseUrl,
-    apiKey: decrypt ? decryptStoredKey(stored, { decrypt: SecretBox.decrypt }) : null,
+    apiKey: decrypt ? decryptStoredKey(stored, SecretBox.decrypt) : null,
   }
   return { cfg, source: sources.user, providerId }
 }

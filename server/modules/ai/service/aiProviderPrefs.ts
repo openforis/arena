@@ -2,6 +2,7 @@
  * The account providers stored in `user.prefs.ai` (pure: no database, no secret read), and the read-time conversion
  * of the single provider slot saved before the list existed (spec section 1.3).
  */
+import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
@@ -237,3 +238,20 @@ export const toPublicProvider = ({
   lastTestOk: provider.lastTestOk,
   lastTestAt: provider.lastTestAt,
 })
+
+/**
+ * Decrypts the stored key of a provider.
+ * @param {StoredAiProvider} stored - Stored provider.
+ * @param {(encrypted: string) => string} decrypt - Decrypt function.
+ * @returns {string|null} The key, or null when none is stored.
+ * @throws {SystemError} aiApiKeyUnreadable (409) when the key cannot be decrypted (secret rotated).
+ */
+export const decryptStoredKey = (stored: StoredAiProvider, decrypt: (encrypted: string) => string): string | null => {
+  if (!stored.apiKeyEncrypted) return null
+  try {
+    return decrypt(stored.apiKeyEncrypted)
+  } catch {
+    // no silent switch to another provider: the user enters the key again (spec section 9)
+    throw new SystemError('aiApiKeyUnreadable', { providerId: stored.id }, StatusCodes.CONFLICT)
+  }
+}

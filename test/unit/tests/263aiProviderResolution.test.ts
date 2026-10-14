@@ -1,4 +1,3 @@
-// test/unit/tests/263aiProviderResolution.test.ts
 import { MockLanguageModelV4 } from 'ai/test'
 
 import { parseGatewayRequest } from '@server/modules/ai/service/gateway/callValidation'
@@ -17,6 +16,11 @@ const adminConfig = {
   apiKey: 'sk-admin',
 }
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]
+/**
+ * Builds a chatbot gateway body.
+ * @param {Record<string, unknown>} override - Fields to override.
+ * @returns {object} The body.
+ */
 const chatBody = (override: Record<string, unknown> = {}) => ({
   feature: 'chatbot',
   dataClass: 'schema',
@@ -25,6 +29,11 @@ const chatBody = (override: Record<string, unknown> = {}) => ({
   ...override,
 })
 
+/**
+ * Builds a user with the given AI prefs on top of an enabled chat setup.
+ * @param {Record<string, unknown>} ai - AI prefs to add.
+ * @returns {any} The user.
+ */
 const userWith = (ai: Record<string, unknown>): any => ({
   uuid: 'u1',
   prefs: { ai: { accessLevel: 1, featuresEnabled: true, featureToggles: { chat: true }, ...ai } },
@@ -133,6 +142,13 @@ describe('provider resolution by id (263)', () => {
     expect([error.statusCode, error.params]).toEqual([400, { reason: 'providerId' }])
   })
 
+  /**
+   * Runs the gateway handler with a resolver and returns the response and the policy checks.
+   * @param {unknown} body - Request body.
+   * @param {any} user - Caller.
+   * @param {any} resolveModel - Model resolver dependency.
+   * @returns {Promise<{res: any, checks: any[]}>} The response and the checks.
+   */
   const runGateway = async (body: unknown, user: any, resolveModel: any) => {
     const checks: any[] = []
     const deps: any = {

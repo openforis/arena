@@ -1,4 +1,3 @@
-// test/unit/tests/260aiProviderPrefs.test.ts
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   getAiProviderKind,
