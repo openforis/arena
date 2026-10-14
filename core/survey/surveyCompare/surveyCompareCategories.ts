@@ -157,6 +157,9 @@ const getCategoryPropDiffs = ({ source, target }): SurveyComparePropDiff[] => {
   }))
 }
 
+/** Category props that can be updated from the comparison. */
+export const updatableCategoryProps: string[] = [Category.keysProps.name, Category.keysProps.itemExtraDef]
+
 const getMatchedCategoryApplicability = ({ propDiffs, itemsCount }) => {
   if (propDiffs.some((propDiff) => propDiff.key === 'levels')) {
     return {
@@ -164,14 +167,28 @@ const getMatchedCategoryApplicability = ({ propDiffs, itemsCount }) => {
       reasons: [SurveyCompareReason.categoryLevelsChanged],
     }
   }
+  const reasons = []
   if (itemsCount.removed > 0) {
     // items only in the target survey are kept
-    return {
-      status: SurveyCompareApplicabilityStatus.applicableWithWarning,
-      reasons: [SurveyCompareReason.categoryItemsRemovalNotSupported],
-    }
+    reasons.push(SurveyCompareReason.categoryItemsRemovalNotSupported)
   }
-  return { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] }
+  if (propDiffs.some((propDiff) => propDiff.key === Category.keysProps.reportingData)) {
+    reasons.push(SurveyCompareReason.categoryReportingDataChanged)
+  }
+  const hasApplicableChanges =
+    itemsCount.added > 0 ||
+    itemsCount.changed > 0 ||
+    propDiffs.some((propDiff) => updatableCategoryProps.includes(propDiff.key))
+  if (!hasApplicableChanges) {
+    return { status: SurveyCompareApplicabilityStatus.notApplicable, reasons }
+  }
+  return {
+    status:
+      reasons.length > 0
+        ? SurveyCompareApplicabilityStatus.applicableWithWarning
+        : SurveyCompareApplicabilityStatus.applicable,
+    reasons,
+  }
 }
 
 const compareMatchedCategories = ({ match, sourceItemsByCategoryUuid, targetItemsByCategoryUuid }) => {

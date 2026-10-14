@@ -70,6 +70,7 @@ Changes are saved as draft: they will reach the records only when the survey is 
   reasons: {
     categoryLevelsChanged: 'Category levels are different: update them manually',
     categoryMissing: 'The category is missing in this survey',
+    categoryReportingDataChanged: 'The "reporting data" setting of the category cannot be updated from here',
     categoryRemovalNotSupported: 'Categories only in this survey are not deleted',
     categoryItemsRemovalNotSupported: 'Items only in this survey are kept',
     cycleMissing: 'A cycle is missing in this survey',

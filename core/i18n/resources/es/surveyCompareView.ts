@@ -73,6 +73,7 @@ export default {
   reasons: {
     categoryLevelsChanged: 'Los niveles de la categoría son diferentes: actualícelos manualmente',
     categoryMissing: 'La categoría no existe en esta encuesta',
+    categoryReportingDataChanged: 'La opción "datos de informe" de la categoría no se puede actualizar desde aquí',
     categoryRemovalNotSupported: 'Las categorías que solo están en esta encuesta no se eliminan',
     categoryItemsRemovalNotSupported: 'Los elementos que solo están en esta encuesta se mantienen',
     cycleMissing: 'Falta un ciclo en esta encuesta',

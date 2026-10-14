@@ -69,6 +69,7 @@ export default {
   reasons: {
     categoryLevelsChanged: 'カテゴリのレベルが異なります：手動で更新してください',
     categoryMissing: 'このカテゴリはこの調査にありません',
+    categoryReportingDataChanged: 'カテゴリの「レポートデータ」設定はここからは更新できません',
     categoryRemovalNotSupported: 'この調査にのみあるカテゴリは削除されません',
     categoryItemsRemovalNotSupported: 'この調査にのみある項目は保持されます',
     cycleMissing: 'この調査にサイクルがありません',

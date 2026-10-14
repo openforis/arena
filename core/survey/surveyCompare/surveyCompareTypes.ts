@@ -40,6 +40,7 @@ export const SurveyCompareReason = {
   // not applicable
   categoryLevelsChanged: 'categoryLevelsChanged',
   categoryMissing: 'categoryMissing',
+  categoryReportingDataChanged: 'categoryReportingDataChanged',
   categoryRemovalNotSupported: 'categoryRemovalNotSupported',
   categoryItemsRemovalNotSupported: 'categoryItemsRemovalNotSupported',
   cycleMissing: 'cycleMissing',

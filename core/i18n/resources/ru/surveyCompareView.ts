@@ -71,6 +71,7 @@ export default {
   reasons: {
     categoryLevelsChanged: 'Уровни категории различаются: обновите их вручную',
     categoryMissing: 'Категория отсутствует в этом опросе',
+    categoryReportingDataChanged: 'Параметр «данные отчёта» категории нельзя обновить отсюда',
     categoryRemovalNotSupported: 'Категории, которые есть только в этом опросе, не удаляются',
     categoryItemsRemovalNotSupported: 'Элементы, которые есть только в этом опросе, сохраняются',
     cycleMissing: 'В этом опросе отсутствует цикл',

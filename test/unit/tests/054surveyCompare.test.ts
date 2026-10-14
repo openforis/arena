@@ -305,6 +305,53 @@ describe('SurveyCompare', () => {
     expect(CategoryItem.getLabels(updatedItem)).toEqual({ en: 'Quercus' })
   })
 
+  test('items only in this survey cannot be applied (they are not deleted)', async () => {
+    const { survey: target, items: targetItems } = await buildSurvey()
+    const source = clone(target)
+    const levelUuid = CategoryItem.getLevelUuid(targetItems[0])
+    const targetItemsWithExtra = [
+      ...targetItems,
+      CategoryItem.newItem(levelUuid, null, { code: '9', labels: { en: 'Other' } }),
+    ]
+
+    const result = compare({ source, target, sourceItems: targetItems, targetItems: targetItemsWithExtra })
+    const [categoryDiff] = result.categories
+    expect(categoryDiff.status).toBe(SurveyCompareStatus.changed)
+    expect(categoryDiff.itemsCount).toEqual({ added: 0, changed: 0, removed: 1 })
+    expect(categoryDiff.applicability).toEqual({
+      status: SurveyCompareApplicabilityStatus.notApplicable,
+      reasons: [SurveyCompareReason.categoryItemsRemovalNotSupported],
+    })
+    const plan = buildApplyPlan({
+      sourceSurvey: source,
+      targetSurvey: target,
+      sourceItemsByCategoryUuid: itemsByCategoryUuid(source, targetItems),
+      targetItemsByCategoryUuid: itemsByCategoryUuid(target, targetItemsWithExtra),
+      result,
+      selectedIds: [categoryDiff.id],
+    })
+    expect(plan.appliedIds).toEqual([])
+    expect(plan.skippedIds).toEqual([categoryDiff.id])
+  })
+
+  test('items only in this survey are a warning when other item changes can be applied', async () => {
+    const { survey: target, items: targetItems } = await buildSurvey()
+    const source = clone(target)
+    const sourceItems = clone(targetItems)
+    sourceItems[0].props.labels = { en: 'Quercus' }
+    const levelUuid = CategoryItem.getLevelUuid(targetItems[0])
+    const targetItemsWithExtra = [
+      ...targetItems,
+      CategoryItem.newItem(levelUuid, null, { code: '9', labels: { en: 'Other' } }),
+    ]
+
+    const result = compare({ source, target, sourceItems, targetItems: targetItemsWithExtra })
+    expect(result.categories[0].applicability).toEqual({
+      status: SurveyCompareApplicabilityStatus.applicableWithWarning,
+      reasons: [SurveyCompareReason.categoryItemsRemovalNotSupported],
+    })
+  })
+
   test('a new attribute using a new category depends on it', async () => {
     const { survey: target, items } = await buildSurvey()
     const newCategory = Category.newCategory({ [Category.keysProps.name]: 'tree_health' })

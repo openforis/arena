@@ -71,6 +71,7 @@ export default {
   reasons: {
     categoryLevelsChanged: 'Ангиллын түвшингүүд ялгаатай байна: гараар шинэчилнэ үү',
     categoryMissing: 'Энэ судалгаанд ангилал байхгүй байна',
+    categoryReportingDataChanged: 'Ангиллын "тайлангийн өгөгдөл" тохиргоог эндээс шинэчлэх боломжгүй',
     categoryRemovalNotSupported: 'Зөвхөн энэ судалгаанд байгаа ангиллуудыг устгахгүй',
     categoryItemsRemovalNotSupported: 'Зөвхөн энэ судалгаанд байгаа зүйлсийг хадгална',
     cycleMissing: 'Энэ судалгаанд мөчлөг дутуу байна',

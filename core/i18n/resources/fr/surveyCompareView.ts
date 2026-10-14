@@ -75,6 +75,8 @@ export default {
   reasons: {
     categoryLevelsChanged: 'Les niveaux de la catégorie sont différents : mettez-les à jour manuellement',
     categoryMissing: "La catégorie n'existe pas dans ce formulaire",
+    categoryReportingDataChanged:
+      "Le paramètre « données de rapport » de la catégorie ne peut pas être mis à jour d'ici",
     categoryRemovalNotSupported: 'Les catégories présentes uniquement dans ce formulaire ne sont pas supprimées',
     categoryItemsRemovalNotSupported: 'Les éléments présents uniquement dans ce formulaire sont conservés',
     cycleMissing: 'Un cycle est manquant dans ce formulaire',

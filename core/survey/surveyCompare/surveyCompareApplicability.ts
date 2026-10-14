@@ -92,6 +92,13 @@ const checkChanged = ({ check, context, diff }) => {
   const sourceNodeDef = context.sourceIndex.byUuid[diff.sourceUuid]
   const targetNodeDef = context.targetIndex.byUuid[diff.targetUuid]
   const published = NodeDef.isPublished(targetNodeDef) && !context.targetTemplate
+  // layouts of cycles missing in the target survey are not applied
+  const hasApplicableDiffs = diff.propDiffs.some(
+    ({ group, cycle }) => group !== SurveyComparePropGroup.layout || context.targetCycleKeys.includes(cycle)
+  )
+  if (!hasApplicableDiffs) {
+    check.errors.add(SurveyCompareReason.cycleMissing)
+  }
   for (const { key, group } of diff.propDiffs) {
     if (group === SurveyComparePropGroup.structure) {
       if (key === 'parent') {

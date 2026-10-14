@@ -16,7 +16,7 @@ import {
   SurveyCompareResult,
   SurveyCompareStatus,
 } from './surveyCompareTypes'
-import { indexItemsByCodePath } from './surveyCompareCategories'
+import { indexItemsByCodePath, updatableCategoryProps } from './surveyCompareCategories'
 
 export interface NodeDefUpdate {
   nodeDefUuid: string
@@ -45,8 +45,6 @@ interface PlanContext extends SurveyCompareParams {
   categoryUuidMap: Record<string, string>
   taxonomyUuidMap: Record<string, string>
 }
-
-const updatableCategoryProps = [Category.keysProps.name, Category.keysProps.itemExtraDef]
 
 const isApplicable = (diff: { applicability?: { status: string } }): boolean =>
   Boolean(diff.applicability) && diff.applicability.status !== SurveyCompareApplicabilityStatus.notApplicable

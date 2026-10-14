@@ -74,6 +74,7 @@ export default {
   reasons: {
     categoryLevelsChanged: 'Os níveis da categoria são diferentes: atualize-os manualmente',
     categoryMissing: 'A categoria não existe neste inventário',
+    categoryReportingDataChanged: 'A configuração "dados de relatório" da categoria não pode ser atualizada aqui',
     categoryRemovalNotSupported: 'As categorias presentes somente neste inventário não são excluídas',
     categoryItemsRemovalNotSupported: 'Os itens presentes somente neste inventário são mantidos',
     cycleMissing: 'Falta um ciclo neste inventário',
