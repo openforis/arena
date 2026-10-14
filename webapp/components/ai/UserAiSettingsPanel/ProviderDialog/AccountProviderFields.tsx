@@ -6,8 +6,7 @@ import { Spinner } from '@webapp/components/Spinner'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
-import { BASE_URL_PLACEHOLDERS, MODEL_PLACEHOLDERS, OTHER_MODEL_VALUE } from './providerDraft'
-import { getAccountTestMessage } from './providerDraft'
+import { BASE_URL_PLACEHOLDERS, getAccountTestMessage, MODEL_PLACEHOLDERS, OTHER_MODEL_VALUE } from './providerDraft'
 import type { ProviderDialogApi } from './useProviderDialog'
 
 // forwardRef components lose their prop types in TS (same cast as the panel)

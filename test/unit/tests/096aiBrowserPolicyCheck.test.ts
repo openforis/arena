@@ -14,7 +14,6 @@ describe('createPolicyContextLoader', () => {
     })
     expect(await load({ surveyId: 4 })).toEqual({
       effective: { schema: 'off', data: 'onDevice' },
-      hostingClass: null,
     })
   })
 
@@ -29,7 +28,6 @@ describe('createPolicyContextLoader', () => {
     })
     expect(await load({ surveyId: null })).toEqual({
       effective: { schema: 'orgHosted', data: 'cloud' },
-      hostingClass: null,
     })
     expect(surveyCalls).toEqual([])
   })
@@ -39,6 +37,6 @@ describe('createPolicyContextLoader', () => {
       fetchSettings: async () => ({ featuresEnabled: false }),
       fetchSurveyPolicy: async () => surveyState({ schema: 'cloud', data: 'cloud' }) as any,
     })
-    expect(await load({})).toEqual({ effective: { schema: 'off', data: 'off' }, hostingClass: null })
+    expect(await load({})).toEqual({ effective: { schema: 'off', data: 'off' } })
   })
 })

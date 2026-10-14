@@ -7,7 +7,7 @@ import * as Survey from '@core/survey/survey'
 
 import type { AiFeatureKey } from '@common/ai/features'
 import { AiLimits } from '@common/ai/limits'
-import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
+import type { AiPolicy } from '@common/ai/policy'
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
 
 import { isDataToolResult } from '@webapp/ai/conversations/dataClass'
@@ -54,7 +54,7 @@ export type RunAssistantTurnParams = {
   displayText?: string
   area: AssistantPromptArea
   ctx: AiToolContext
-  access: { effective: AiPolicy | null; hostingClass: AiHostingClass | null }
+  access: { effective: AiPolicy | null }
   onUpdate: (conversation: Conversation) => void
   signal: AbortSignal
   model?: LanguageModel

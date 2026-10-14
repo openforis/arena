@@ -194,11 +194,18 @@ const addLegacyProvider = ({
   modelId: string | null
 }): boolean => {
   const providers = loadLocalProviders({ storage, userUuid })
+  // a user who removed local:legacy in the UI while the old key was still there (an earlier run failed after adding
+  // it) gets it back once: the old key is removed right after, so this cannot repeat
   if (providers.some((provider) => provider.id === LEGACY_LOCAL_PROVIDER_ID)) return true
   // the old settings accepted an address without a scheme
   const normalizedUrl = normalizeLocalProviderBaseUrl(withDefaultHttpScheme(baseUrl))
   if (!normalizedUrl) return false
-  const legacy: LocalProvider = { id: LEGACY_LOCAL_PROVIDER_ID, name: 'Local server', baseUrl: normalizedUrl, modelId }
+  const legacy: LocalProvider = {
+    id: LEGACY_LOCAL_PROVIDER_ID,
+    name: normalizeProviderName('', LOCAL_PROVIDER_TYPE),
+    baseUrl: normalizedUrl,
+    modelId,
+  }
   if (!saveLocalProviders({ storage, userUuid, providers: [...providers, legacy] })) return false
   // a write that was dropped or normalized away must not cost the old key
   return loadLocalProviders({ storage, userUuid }).some((provider) => provider.id === LEGACY_LOCAL_PROVIDER_ID)
@@ -234,6 +241,7 @@ export const convertLegacyLocalServer = async ({
   if (!found) return none
   // an old server that was off (or a corrupt entry) has nothing to convert
   if (!settings?.enabled) {
+    // a key that cannot be removed is harmless: nothing is converted, and the next load removes it again
     removeKey(storage, key)
     return none
   }
@@ -279,5 +287,6 @@ export const loadSettingsWithLocalConversion = async <S extends object>({
   // a failed settings fetch has no origin: the conversion waits for a load that knows it
   if (!userUuid || (origin !== 'converted' && origin !== 'user')) return settings
   const { defaultApplied } = await convert({ userUuid, defaultProviderOrigin: origin })
+  // the first load was read before the conversion set the default, so its default and origin are stale
   return defaultApplied ? loadSettings({ force: true }) : settings
 }

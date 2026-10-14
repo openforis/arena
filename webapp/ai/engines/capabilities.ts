@@ -176,11 +176,21 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   let sequence = 0
   const listeners = new Set<() => void>()
 
+  /**
+   * Tells every subscriber that the capabilities changed.
+   * @returns {void} Nothing.
+   */
   const emit = () => {
     for (const listener of [...listeners]) listener()
   }
 
-  // runs a dependency; a failure gives the fallback (the capabilities then say "not available")
+  /**
+   * Runs a dependency; a failure gives the fallback (the capabilities then say "not available").
+   * @param {Function} action - The dependency call.
+   * @param {T} fallback - The value to return when it throws.
+   * @returns {Promise<T>} The result, or the fallback.
+   */
+  // the fallback is reachable only when localStorage is unreadable, which the spec treats like "not on this browser"
   const safely = async <T>(action: () => T | Promise<T>, fallback: T): Promise<T> => {
     try {
       return await action()
@@ -189,6 +199,10 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     }
   }
 
+  /**
+   * Drops the data and the run in flight, so nothing from before can be read or stored.
+   * @returns {void} Nothing.
+   */
   const reset = () => {
     sequence += 1
     inflight = null
@@ -198,21 +212,43 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     emit()
   }
 
-  // the data and the run in flight belong to another user: drop them before they can be read
+  /**
+   * Drops the data and the run in flight when they belong to another user, before they can be read.
+   * @param {string|null} userUuid - UUID of the current user.
+   * @returns {void} Nothing.
+   */
   const resetIfOtherUser = (userUuid: string | null) => {
     const dataUser = inflight ? inflight.userUuid : loadedFor
     if (dataUser !== undefined && dataUser !== userUuid) reset()
   }
 
-  // the newer run of the same user (running, or already stored), else (reset, other user) empty capabilities
+  /**
+   * Returns the result of the newer run of the same user (running, or already stored); after a reset or a user
+   * change, empty capabilities.
+   * @param {string|null} userUuid - UUID of the user whose run is waited for.
+   * @returns {Promise<AiCapabilities>} The capabilities.
+   */
   const newerRun = (userUuid: string | null): Promise<AiCapabilities> =>
     inflight && inflight.userUuid === userUuid
       ? inflight.promise
       : Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
 
+  /**
+   * Probes a local server; a failure gives null (not available).
+   * @param {string} baseUrl - Server base URL.
+   * @param {string|null} modelId - Chosen model.
+   * @returns {Promise<LocalServerProbeResult|null>} The probe result, or null.
+   */
   const probeSafely = (baseUrl: string, modelId: string | null) =>
     safely<LocalServerProbeResult | null>(() => deps.probe({ baseUrl, modelId }), null)
 
+  /**
+   * Loads the settings and the local providers, probes every local server and stores the capabilities.
+   * @param {object} params - Parameters.
+   * @param {string|null} params.userUuid - UUID of the user.
+   * @param {boolean} params.force - Read the settings again instead of using the cache.
+   * @returns {Promise<AiCapabilities>} The capabilities (those of a newer run when one started meanwhile).
+   */
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
     const nextSettings = await safely(() => deps.loadSettings({ force, userUuid }), null)
@@ -228,6 +264,13 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     return capabilities
   }
 
+  /**
+   * Starts a load and registers it as the run in flight until it ends.
+   * @param {object} params - Parameters.
+   * @param {string|null} params.userUuid - UUID of the user.
+   * @param {boolean} params.force - Read the settings again instead of using the cache.
+   * @returns {Promise<AiCapabilities>} The capabilities.
+   */
   const run = (params: { userUuid: string | null; force: boolean }): Promise<AiCapabilities> => {
     const entry = { promise: null as unknown as Promise<AiCapabilities>, ...params }
     entry.promise = compute(params).finally(() => {

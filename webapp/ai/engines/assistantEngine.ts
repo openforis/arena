@@ -8,12 +8,13 @@ import type { AiHostingClass } from '@common/ai/policy'
 import type { ResolveModelParams } from './resolveModel'
 import type { AiEngineLimits, AiSelectedEngine } from './types'
 
-type Access = { hostingClass: AiHostingClass | null }
+// the hosting class is set from the selected engine; only a caller that passes its own model (tests) can give it
+type Access = { hostingClass?: AiHostingClass | null }
 
-export type AssistantEngine<TModel, TAccess extends Access> = {
+export type AssistantEngine<TModel, TAccess extends object> = {
   model: TModel
   limits: AiEngineLimits
-  access: TAccess
+  access: TAccess & Access
   // null when the caller passed its own model (tests)
   engine: AiSelectedEngine | null
 }
@@ -34,7 +35,7 @@ export type AssistantEngine<TModel, TAccess extends Access> = {
  * @param {Function} params.resolve - resolveModel.
  * @returns {Promise<AssistantEngine>} The turn's engine.
  */
-export const resolveAssistantEngine = async <TModel, TAccess extends Access>({
+export const resolveAssistantEngine = async <TModel, TAccess extends object>({
   model,
   limits,
   defaultLimits,
@@ -57,7 +58,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends Access>({
   signal?: AbortSignal
   resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine }>
 }): Promise<AssistantEngine<TModel, TAccess>> => {
-  if (model) return { model, limits: limits ?? defaultLimits, access, engine: null }
+  if (model) return { model, limits: limits ?? defaultLimits, access: access as TAccess & Access, engine: null }
   const resolved = await resolve({ feature, surveyId, dataClass, providerId, signal })
   return {
     model: resolved.model,

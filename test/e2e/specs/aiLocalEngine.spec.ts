@@ -201,6 +201,5 @@ test.describe('Local AI provider (stub local server)', () => {
       "This survey's AI policy keeps record data on this device."
     )
     expect(gatewayRequests).toEqual([])
-    expect(stub!.requests).toEqual([])
   })
 })

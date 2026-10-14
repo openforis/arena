@@ -13,6 +13,7 @@ type Level = (typeof LEVELS)[number]
 const DATA_CLASSES: AiDataClass[] = ['schema', 'data']
 const RANK: Record<Level, number> = { off: 0, onDevice: 1, orgHosted: 2, cloud: 3 }
 
+/** Builds a local server probe result. */
 const probe = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
   enabled: true,
   reachable: true,
@@ -25,6 +26,7 @@ const probe = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerC
   ...overrides,
 })
 
+/** Builds a provider entry. */
 const entry = (overrides: Partial<AiProviderEntry> & Pick<AiProviderEntry, 'id' | 'kind'>): AiProviderEntry => ({
   type: 'openai',
   name: 'Provider',
@@ -47,6 +49,7 @@ type ProviderState = {
   usable: boolean
 }
 
+/** Builds a local provider entry. */
 const localEntry = (id: string, overrides: Partial<AiProviderEntry> = {}) =>
   entry({ id, kind: 'local', type: 'local', model: 'local-model', hostingClass: 'onDevice', ...overrides })
 
@@ -121,10 +124,12 @@ const STATES: ProviderState[] = [
   },
 ]
 
+/** Builds the instance part of the capabilities. */
 const baseCapabilities = (): Pick<AiCapabilities, 'instance'> => ({
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars: 200000 },
 })
 
+/** Builds the capabilities of a provider state. */
 const capabilitiesFor = (state: ProviderState): AiCapabilities => {
   const providers = state.entry ? [state.entry] : []
   // Arena default is always listed: a default that cannot be used must not fall back to it
@@ -148,6 +153,7 @@ const oracle = (policy: AiPolicy, dataClass: AiDataClass, state: ProviderState):
   return `${state.id}@${state.hostingClass}`
 }
 
+/** Summarizes a selection as its engine or its reasons. */
 const summarize = (selection: AiEngineSelection): string =>
   'engine' in selection
     ? `${selection.engine.providerId}@${selection.engine.hostingClass}`
@@ -176,6 +182,7 @@ describe('selectEngine: every policy × data class × default provider state', (
 describe('selectEngine: examples', () => {
   const policy: AiPolicy = { schema: 'cloud', data: 'onDevice' }
   const localState = STATES[4]
+  /** Runs the selection with overrides of the default inputs. */
   const run = (overrides: Record<string, unknown>) =>
     selectEngine({
       effective: policy,
