@@ -17,7 +17,7 @@ const computedDefaultValue = 'computed default'
 // Simulates the record shape produced by a Collect data import: the record row and only the nodes
 // that have a matching path in the Collect data get created (see RecordsImportJob.
 // traverseCollectRecordAndInsertNodes), bypassing the normal node-creation machinery
-// (NodeCreationManager.insertNode / RecordNodesUpdater.createDescendants) that would otherwise also
+// (NodeCreationManager.insertNode / RecordNodesUpdater.addDescendants) that would otherwise also
 // create every other single-cardinality attribute of the entity - including computedAttrName here -
 // and apply its default value.
 const _insertRecordMissingComputedNode = async ({ user, survey, keyValue }) => {
