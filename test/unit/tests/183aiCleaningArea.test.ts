@@ -55,12 +55,12 @@ describe('cleaning area', () => {
       status: 'available',
       reasonKeys: [],
     })
-    const noEngine = { status: 'noEngine', reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'] } as any
+    const noEngine = { status: 'noEngine', reasonKeys: ['aiEngine.unavailable.notAvailable'] } as any
     // built with fromAvailability: it carries the engine availability when the engine reasons are present
     expect(getCleaningAreaStatus({ surveyOpen: true, canCleanseRecords: true, availability: noEngine })).toMatchObject({
       area: 'cleaning',
       status: 'unavailable',
-      reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'],
+      reasonKeys: ['aiEngine.unavailable.notAvailable'],
     })
     const withReasons = { status: 'noEngine', reasonKeys: ['x'], reasons: [{ key: 'x' }] } as any
     expect(

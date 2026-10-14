@@ -11,7 +11,7 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
 
 const available = { status: 'available' } as any
-const noEngine = { status: 'noEngine', reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'] } as any
+const noEngine = { status: 'noEngine', reasonKeys: ['aiEngine.unavailable.notAvailable'] } as any
 
 describe('analysis routes', () => {
   test('explorer and dashboard', () => {
@@ -42,7 +42,7 @@ describe('area status', () => {
     expect(getAnalysisAreaStatus({ surveyOpen: true, canUseExplorer: true, availability: noEngine })).toEqual({
       area: 'analysis',
       status: 'unavailable',
-      reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'],
+      reasonKeys: ['aiEngine.unavailable.notAvailable'],
     })
     expect(
       getAnalysisAreaStatus({
@@ -141,7 +141,7 @@ describe('analysis status keeps the engine availability (F5)', () => {
   test('an unavailable engine status carries engineAvailability for the panel actions', () => {
     const availability = {
       status: 'noEngine',
-      reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'],
+      reasonKeys: ['aiEngine.unavailable.notAvailable'],
       reasons: [],
     } as any
     const status = getAnalysisAreaStatus({ surveyOpen: true, canUseExplorer: true, availability })

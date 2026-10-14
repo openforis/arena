@@ -4,7 +4,7 @@
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
 import type { AiGatewayCapability, AiLocalServerCapability, AiSelectedEngine } from './types'
 
-export const LOCAL_SERVER_LABEL = 'LM Studio'
+export const LOCAL_SERVER_LABEL = 'Local server'
 export const GATEWAY_MAX_STEPS = 10
 export const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = 200000 // A's AI_MAX_PROMPT_CHARS default
 
@@ -19,15 +19,20 @@ const hostOf = (baseUrl: string): string => {
 /**
  * Returns the local server engine description, or null when no URL or hosting class is known.
  * @param {AiLocalServerCapability} localServer - Local server capability.
+ * @param {string} [label] - Name of the local provider (default: "Local server", or the host of an organisation server).
  * @returns {AiSelectedEngine|null} The description.
  */
-export const getLocalServerEngineInfo = (localServer: AiLocalServerCapability): AiSelectedEngine | null => {
+export const getLocalServerEngineInfo = (
+  localServer: AiLocalServerCapability,
+  label?: string
+): AiSelectedEngine | null => {
   const { baseUrl, hostingClass } = localServer
   if (!baseUrl || !hostingClass) return null
+  const defaultLabel = hostingClass === 'onDevice' ? LOCAL_SERVER_LABEL : hostOf(baseUrl)
   return {
     id: 'localServer',
     hostingClass,
-    label: hostingClass === 'onDevice' ? LOCAL_SERVER_LABEL : hostOf(baseUrl),
+    label: label ?? defaultLabel,
     model: localServer.modelId,
     limits: getLocalServerLimits(localServer.contextTokens),
     contextWindow: getLocalServerContextWindow(localServer.contextTokens),

@@ -3,7 +3,7 @@ import { generateText, streamText } from 'ai'
 import { createGatewayEngine } from '@webapp/ai/engines/gatewayEngine'
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from '@webapp/ai/engines/engineInfo'
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import type { AiGatewayCapability, AiLocalServerCapability } from '@webapp/ai/engines/types'
+import type { AiGatewayCapability, AiLocalServerCapability, AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey } from '@webapp/ai/runtime/runtimeErrors'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
@@ -61,11 +61,11 @@ const recorder = (respond: () => Promise<Response>) => {
 const modelOptions = { feature: 'expressionExplain', dataClass: 'schema' } as const
 
 describe('engine info', () => {
-  test('local server on this device: LM Studio label, limits from the context', () => {
+  test('local server on this device: Local server label, limits from the context', () => {
     expect(getLocalServerEngineInfo(localServer())).toEqual({
       id: 'localServer',
       hostingClass: 'onDevice',
-      label: 'LM Studio',
+      label: 'Local server',
       model: 'local-model',
       limits: { maxPromptChars: 9216, maxSteps: 6 },
       contextWindow: { tokens: 4096, assumed: false },
@@ -83,6 +83,10 @@ describe('engine info', () => {
   test('no URL or class: no engine', () => {
     expect(getLocalServerEngineInfo(localServer({ baseUrl: null }))).toBeNull()
     expect(getLocalServerEngineInfo(localServer({ hostingClass: null }))).toBeNull()
+  })
+
+  test("a local provider's name as label", () => {
+    expect(getLocalServerEngineInfo(localServer(), 'Desk server')?.label).toBe('Desk server')
   })
 
   test('gateway: provider label, 10 steps, the instance prompt cap', () => {
@@ -160,24 +164,26 @@ describe('createLocalServerEngine', () => {
 })
 
 describe('createGatewayEngine', () => {
-  test('passes the request options to the gateway model factory', () => {
+  const engine = { ...getGatewayEngineInfo(gateway()), providerId: 'acct:a1' } as AiSelectedEngine
+
+  test('passes the request options and the provider to the gateway model factory', () => {
     const received: unknown[] = []
     const fakeModel = { modelId: 'gateway' } as any
-    const engine = createGatewayEngine({
-      gateway: gateway(),
+    const gatewayEngine = createGatewayEngine({
+      engine,
       createGatewayModel: (options) => {
         received.push(options)
         return fakeModel
       },
     })
-    expect(engine.createModel({ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7 })).toBe(fakeModel)
-    expect(received).toEqual([{ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7 }])
-    expect(engine.id).toBe('gateway')
+    expect(gatewayEngine.createModel({ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7 })).toBe(fakeModel)
+    expect(received).toEqual([{ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7, providerId: 'acct:a1' }])
+    expect(gatewayEngine.id).toBe('gateway')
   })
 
-  test('refuses an unconfigured gateway', () => {
+  test('refuses an engine without a provider', () => {
     expect(() =>
-      createGatewayEngine({ gateway: gateway({ hostingClass: null }), createGatewayModel: () => ({}) as any })
+      createGatewayEngine({ engine: { ...engine, providerId: undefined }, createGatewayModel: () => ({}) as any })
     ).toThrow('aiNoEngineAvailable')
   })
 })

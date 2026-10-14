@@ -1,7 +1,7 @@
 /**
  * First-use consent for the local AI server, per user, survey and server URL (localStorage).
  */
-import type { AiConsentDecision, AiLocalServerSettings, StorageLike } from './types'
+import type { AiConsentDecision, StorageLike } from './types'
 
 type ConsentEntry = { decision: AiConsentDecision; baseUrl: string }
 type ConsentMap = Record<string, ConsentEntry>
@@ -95,18 +95,3 @@ export const saveLocalServerConsent = ({
     return false
   }
 }
-
-/**
- * Returns whether the local server comes first for this survey: the user's preference, unless they declined it here.
- * @param {object} params - Parameters.
- * @param {AiLocalServerSettings} params.settings - Local server settings.
- * @param {AiConsentDecision|null} params.consent - Stored decision for the survey.
- * @returns {boolean} True when local comes first.
- */
-export const getEffectivePreferLocal = ({
-  settings,
-  consent,
-}: {
-  settings: AiLocalServerSettings
-  consent: AiConsentDecision | null
-}): boolean => settings.preferLocal && consent !== 'declined'

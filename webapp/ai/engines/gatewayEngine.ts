@@ -1,30 +1,33 @@
 /**
- * Gateway engine: A's gateway model (POST /api/ai/model), described with the hosting class of the AI settings.
+ * Gateway engine: A's gateway model (POST /api/ai/model) for one provider (an account provider or Arena default).
  */
 import type { LanguageModel } from 'ai'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 
-import { getGatewayEngineInfo } from './engineInfo'
-import type { AiEngine, AiEngineModelOptions, AiGatewayCapability } from './types'
+import type { AiEngine, AiEngineModelOptions, AiSelectedEngine } from './types'
 
-export type GatewayModelFactory = (options: AiEngineModelOptions) => LanguageModel
+// the server calls exactly the provider the request names (no fallback)
+export type GatewayModelFactory = (options: AiEngineModelOptions & { providerId: string }) => LanguageModel
 
 /**
- * Creates the gateway engine.
+ * Creates the gateway engine of a selected provider.
  * @param {object} params - Parameters.
- * @param {AiGatewayCapability} params.gateway - Gateway capability.
+ * @param {AiSelectedEngine} params.engine - Engine chosen by selectEngine (with its providerId).
  * @param {GatewayModelFactory} params.createGatewayModel - Creates the gateway model for a request.
  * @returns {AiEngine} The engine.
  */
 export const createGatewayEngine = ({
-  gateway,
+  engine,
   createGatewayModel,
 }: {
-  gateway: AiGatewayCapability
+  engine: AiSelectedEngine
   createGatewayModel: GatewayModelFactory
 }): AiEngine => {
-  const info = getGatewayEngineInfo(gateway)
-  if (!info) throw new SystemError('aiNoEngineAvailable', { reasons: ['gatewayNotConfigured'] }, StatusCodes.CONFLICT)
-  return { ...info, createModel: (options) => createGatewayModel(options) }
+  const { providerId } = engine
+  // without a provider id the server would pick one: refused, so a request never goes to an unnamed provider
+  if (engine.id !== 'gateway' || !providerId) {
+    throw new SystemError('aiNoEngineAvailable', { reasons: ['notAvailable'] }, StatusCodes.CONFLICT)
+  }
+  return { ...engine, createModel: (options) => createGatewayModel({ ...options, providerId }) }
 }

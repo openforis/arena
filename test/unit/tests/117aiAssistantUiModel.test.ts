@@ -91,8 +91,8 @@ describe('assistant areas', () => {
     const noEngine = {
       status: 'noEngine',
       location,
-      reasonKeys: ['aiEngine.unavailable.localServerNotEnabled'],
-      reasons: ['localServerNotEnabled'],
+      reasonKeys: ['aiEngine.unavailable.notAvailable'],
+      reasons: ['notAvailable'],
       engine: null,
       surveyScoped: false,
     } as any

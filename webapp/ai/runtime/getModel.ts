@@ -19,21 +19,24 @@ const authorizedFetch = createAuthorizedFetch({
 })
 
 /**
- * Returns the gateway model for a feature.
+ * Returns the gateway model for a feature and a provider.
  * @param {object} params - Parameters.
  * @param {string} params.feature - Feature key.
  * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
  * @param {AiDataClass} [params.dataClass] - Data class of the request (default: the feature's).
+ * @param {string} params.providerId - Provider the server calls.
  * @returns {LanguageModelV4} The model.
  */
 export const getGatewayModel = ({
   feature,
   surveyId,
   dataClass,
+  providerId,
 }: {
   feature: string
   surveyId?: number
   dataClass?: AiDataClass
+  providerId: string
 }): LanguageModelV4 => {
   const aiFeature = getAiFeature(feature)
   if (!aiFeature) throw new SystemError('aiFeatureUnknown', { feature }, 400)
@@ -41,6 +44,7 @@ export const getGatewayModel = ({
     feature,
     dataClass: dataClass ?? aiFeature.dataClass,
     surveyId,
+    providerId,
     fetchImpl: authorizedFetch,
   })
 }

@@ -1,21 +1,18 @@
 /**
- * Picks the engine for a request from the policy, the data class, the capabilities and the user's preference.
+ * Picks the engine of a request from one provider (the request's, else the user's default), the policy and the data
+ * class. No fallback: when that provider cannot be used, the request fails with the reason.
  * Pure (no AI SDK import): the UI uses it for the availability and the badge, resolveModel for the request.
  */
 import type { AiDataClass } from '@common/ai/features'
-import { type AiHostingClass, type AiPolicy, isHostingAllowed } from '@common/ai/policy'
+import { type AiPolicy, isHostingAllowed } from '@common/ai/policy'
+import { isLocalProviderId } from '@common/ai/providerIds'
 
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from './engineInfo'
-import type { AiCapabilities, AiEngineSelection, AiSelectedEngine, AiUnavailableReason } from './types'
-
-type Candidate = { engine: AiSelectedEngine | null; reason: AiUnavailableReason | null }
+import { getLocalProviderStatus } from './providerEntries'
+import type { AiCapabilities, AiEngineSelection, AiProviderEntry, AiUnavailableReason } from './types'
 
 /** Reasons that only a change of the survey AI policy can fix. */
-export const POLICY_REASONS: AiUnavailableReason[] = [
-  'policyForbidsCloud',
-  'policyForbidsOrgHosted',
-  'policyForbidsAll',
-]
+export const POLICY_REASONS: AiUnavailableReason[] = ['policyForbids']
 
 /**
  * Returns true when the reason comes from the survey AI policy (only a policy change fixes it).
@@ -25,93 +22,92 @@ export const POLICY_REASONS: AiUnavailableReason[] = [
 export const isPolicyReason = (reason: AiUnavailableReason): boolean => POLICY_REASONS.includes(reason)
 
 /**
- * Returns the unavailable reason for a hosting class the policy forbids.
- * @param {AiHostingClass} hostingClass - Hosting class of the engine.
- * @returns {AiUnavailableReason} The policy reason.
- */
-const policyReason = (hostingClass: AiHostingClass): AiUnavailableReason => {
-  if (hostingClass === 'cloud') return 'policyForbidsCloud'
-  if (hostingClass === 'orgHosted') return 'policyForbidsOrgHosted'
-  return 'policyForbidsAll'
-}
-
-/**
- * Builds the local server candidate, or the capability reason why it cannot be used.
- * @param {AiCapabilities} capabilities - Capabilities.
- * @returns {Candidate} The candidate.
- */
-const localCandidate = (capabilities: AiCapabilities): Candidate => {
-  const { localServer } = capabilities
-  if (!localServer.enabled) return { engine: null, reason: 'localServerNotEnabled' }
-  if (localServer.reachable !== true) return { engine: null, reason: 'localServerUnreachable' }
-  const { modelId } = localServer
-  if (!modelId || !localServer.models.includes(modelId)) return { engine: null, reason: 'localServerNoModel' }
-  const engine = getLocalServerEngineInfo(localServer)
-  return engine ? { engine, reason: null } : { engine: null, reason: 'localServerUnreachable' }
-}
-
-/**
- * Builds the gateway candidate, or the reason why it cannot be used.
- * @param {AiCapabilities} capabilities - Capabilities.
- * @returns {Candidate} The candidate.
- */
-const gatewayCandidate = (capabilities: AiCapabilities): Candidate => {
-  const engine = capabilities.gateway.available ? getGatewayEngineInfo(capabilities.gateway) : null
-  return engine ? { engine, reason: null } : { engine: null, reason: 'gatewayNotConfigured' }
-}
-
-/**
- * Turns a candidate into a policy reason when the policy forbids its hosting class.
- * @param {Candidate} candidate - Candidate.
+ * Returns the provider a request uses: the requested one while it is in the list, else the user's default.
  * @param {object} params - Parameters.
- * @param {AiPolicy} params.effective - Effective policy.
- * @param {AiDataClass} params.dataClass - Data class of the request.
- * @returns {Candidate} The candidate, or a policy-forbidden one.
+ * @param {AiCapabilities} params.capabilities - Capabilities (provider list and default).
+ * @param {string|null} [params.providerId] - Requested provider (the conversation's).
+ * @returns {string} The provider id (the default may itself be missing from the list).
  */
-const applyPolicy = (
-  candidate: Candidate,
-  { effective, dataClass }: { effective: AiPolicy; dataClass: AiDataClass }
-): Candidate => {
-  const { engine } = candidate
-  if (!engine) return candidate
-  return isHostingAllowed({ effective, dataClass, hostingClass: engine.hostingClass })
-    ? candidate
-    : { engine: null, reason: policyReason(engine.hostingClass) }
+export const getEffectiveProviderId = ({
+  capabilities,
+  providerId,
+}: {
+  capabilities: AiCapabilities
+  providerId?: string | null
+}): string =>
+  providerId && capabilities.providers.some((entry) => entry.id === providerId)
+    ? providerId
+    : capabilities.defaultProviderId
+
+/**
+ * Returns a selection with one reason.
+ * @param {AiUnavailableReason} reason - Reason.
+ * @returns {AiEngineSelection} The selection.
+ */
+const unavailable = (reason: AiUnavailableReason): AiEngineSelection => ({ unavailable: [reason] })
+
+/**
+ * Returns the engine of a local provider from its probe.
+ * @param {AiProviderEntry} entry - Local provider.
+ * @param {AiCapabilities} capabilities - Capabilities (probes by id).
+ * @returns {AiEngineSelection} The engine, or notAvailable.
+ */
+const selectLocal = (entry: AiProviderEntry, capabilities: AiCapabilities): AiEngineSelection => {
+  const capability = capabilities.local[entry.id] ?? null
+  if (!capability || getLocalProviderStatus(capability) !== 'ready') return unavailable('notAvailable')
+  const info = getLocalServerEngineInfo(capability, entry.name)
+  return info ? { engine: { ...info, providerId: entry.id } } : unavailable('notAvailable')
 }
 
 /**
- * Selects the engine for a request.
+ * Returns the gateway engine of an account provider or of Arena default.
+ * @param {AiProviderEntry} entry - Provider.
+ * @param {AiCapabilities} capabilities - Capabilities (instance prompt cap).
+ * @returns {AiEngineSelection} The engine, or notAvailable.
+ */
+const selectGateway = (entry: AiProviderEntry, capabilities: AiCapabilities): AiEngineSelection => {
+  // a provider whose last test failed (or whose key is unreadable) fails every call; not tested yet is still tried
+  if (entry.status === 'notAvailable' || !entry.hostingClass) return unavailable('notAvailable')
+  const info = getGatewayEngineInfo({
+    available: true,
+    hostingClass: entry.hostingClass,
+    // Arena default is shown by its admin provider type ("OpenAI"), an account provider by the user's name for it
+    provider: entry.kind === 'arenaDefault' ? entry.type : entry.name,
+    model: entry.model,
+    maxPromptChars: capabilities.gateway.maxPromptChars,
+  })
+  return info ? { engine: { ...info, providerId: entry.id } } : unavailable('notAvailable')
+}
+
+/**
+ * Selects the engine of a request.
  * @param {object} params - Parameters.
  * @param {AiPolicy|null} params.effective - Effective policy, null fails closed (survey policy within the instance ceilings).
  * @param {AiDataClass} params.dataClass - Data class of the request.
- * @param {AiCapabilities} params.capabilities - What this browser can use.
- * @param {object} params.prefs - User preferences.
- * @param {boolean} params.prefs.preferLocal - Local server first.
- * @returns {AiEngineSelection} The engine, or the reasons why none qualifies.
+ * @param {AiCapabilities} params.capabilities - Providers of this user and browser.
+ * @param {string|null} [params.providerId] - The conversation's provider (default: the user's default).
+ * @returns {AiEngineSelection} The engine, or the one reason why the provider cannot be used.
  */
 export const selectEngine = ({
   effective,
   dataClass,
   capabilities,
-  prefs,
+  providerId,
 }: {
   effective: AiPolicy | null
   dataClass: AiDataClass
   capabilities: AiCapabilities
-  prefs: { preferLocal: boolean }
+  providerId?: string | null
 }): AiEngineSelection => {
-  if (!effective || effective[dataClass] === 'off') return { unavailable: ['policyForbidsAll'] }
-
-  const local = applyPolicy(localCandidate(capabilities), { effective, dataClass })
-  const gateway = applyPolicy(gatewayCandidate(capabilities), { effective, dataClass })
-  const ordered = prefs.preferLocal ? [local, gateway] : [gateway, local]
-
-  const chosen = ordered.find((candidate) => candidate.engine)
-  if (chosen?.engine) return { engine: chosen.engine }
-
-  const reasons: AiUnavailableReason[] = []
-  for (const { reason } of ordered) {
-    if (reason && !reasons.includes(reason)) reasons.push(reason)
+  if (!effective || effective[dataClass] === 'off') return unavailable('policyForbids')
+  const id = getEffectiveProviderId({ capabilities, providerId })
+  const entry = capabilities.providers.find((candidate) => candidate.id === id)
+  // a local default saved on another computer: never replaced by another provider
+  if (!entry) return unavailable(isLocalProviderId(id) ? 'missingOnThisBrowser' : 'notAvailable')
+  // the policy first: a blocked provider says so even while it is down
+  if (entry.hostingClass && !isHostingAllowed({ effective, dataClass, hostingClass: entry.hostingClass })) {
+    return unavailable('policyForbids')
   }
-  return { unavailable: reasons }
+  if (entry.status === 'notSetUp') return unavailable('notSetUp')
+  return entry.kind === 'local' ? selectLocal(entry, capabilities) : selectGateway(entry, capabilities)
 }

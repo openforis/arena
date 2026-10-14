@@ -28,7 +28,6 @@ export const appModelResolverDeps: ModelResolverDeps = {
     if (!isSurveyScopedFeature(feature)) return capabilities.instance.policyCeilings ?? OFF_POLICY
     return surveyId ? (await fetchSurveyAiPolicy(surveyId)).effective : OFF_POLICY
   },
-  getLocalSettings: () => getAiCapabilitiesStore().getLocalSettings(),
   storage: getBrowserStorage(),
   requestConsent: requestLocalServerConsent,
   onConsentChange: notifyAiCapabilities,

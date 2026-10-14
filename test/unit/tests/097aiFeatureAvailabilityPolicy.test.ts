@@ -94,7 +94,6 @@ describe('resolveEffectivePolicy', () => {
       dataClass: 'schema',
       surveyScoped: true,
       capabilities,
-      preferLocal: true,
     })
     expect(result.status).toBe('disabled')
     expect(isAiFeatureShown(result)).toBe(false)
