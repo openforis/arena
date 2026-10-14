@@ -275,9 +275,46 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - Applied in phase 1: added node defs (same uuid as in the source, parent layout updated), changed node def props
   (expressions, validations, labels, layout, ...), added categories, added/changed category items, category name and
   extra props definitions.
-- Shown but not applied yet (phase 2): removals, moves, category level changes, taxonomies, survey info.
+- Shown but not applied yet: see *Remaining work*.
 - Tests: `test/unit/tests/054surveyCompare.test.ts`, `test/integration/tests/053surveyCompareApplyTest.ts`
   (Dev survey → QA imported and published → changes in Dev → compare, apply, compare again, publish QA).
+
+## Remaining work
+
+Checklist of what is not implemented yet (as of the phase 1 merge, openforis/arena#4540). Where the design is
+already described above, the item points to its section.
+
+### Phase 2 — apply the differences that are only shown today
+
+- [ ] **Deletions** (elements only in the open survey: node defs, categories, category items, taxonomies). Never
+  selected by default; warning when a published node def has data (deleted on publish); published category
+  levels/items stay not deletable. See *Direction and defaults* and *Applicability rules*.
+- [ ] **Moves** of a node def to another entity (only on unpublished node defs / templates).
+- [ ] **Category level changes** (levels added or renamed): today the whole category is not applicable.
+- [ ] **Category "reporting data" setting**: shown, not applied.
+- [ ] **Taxonomies**: compare taxa (by code) and vernacular names, insert new taxonomies and update taxa; today only
+  the taxonomy props are compared and nothing is applied (a new taxon attribute using a new taxonomy is blocked).
+- [ ] **Survey info**: languages, cycles, labels, SRS. Adding missing cycles/languages first would unblock node defs
+  that use them (today: `cycleMissing`).
+- [ ] **Survey files**: preloaded map layers, survey doc images, branding images (not compared at all).
+- [ ] **Possible rename suggestions** when uuids differ (a rename shows as removed + added), confirmed by the user
+  and applied as a rename. See *Matching*.
+
+### Phase 3 and other features
+
+- [ ] **Definition fingerprint** on the dashboard. See *Definition fingerprint*.
+- [ ] **Export the differences** as Excel/CSV and JSON. See *UI*.
+- [ ] **Compare with another survey on the same server**, without exporting a file. See *User flow*.
+- [ ] **Processing chains** comparison. See *Non-goals*.
+
+### Technical
+
+- [ ] **Temp files across app instances**: the uploaded file and the comparison result are kept in the server temp
+  folder between "Compare" and "Apply"; with several instances not sharing it, "Apply" can run on an instance
+  without the file. Store them in a shared place (e.g. the DB or the shared file storage).
+- [ ] **Chunked upload** of the survey file, like the survey import (today a single request, max 20 MB).
+- [ ] **E2E test** (Playwright) for the view: upload, differences, apply. See *Testing*.
+- [ ] **Translations review** by native speakers (es, fr, ja, mn, pt, ru).
 
 ## Non-goals
 
