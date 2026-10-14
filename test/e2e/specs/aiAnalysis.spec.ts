@@ -16,7 +16,7 @@ import {
   isGatewayRequest,
   queryCard,
   reopenLastConversation,
-  setLocalServerSettings,
+  setLocalProvider,
 } from '../helpers/aiAnalysis'
 import { assistantPanel, openAssistantPanel, waitForAssistantTurn } from '../helpers/assistantPanel'
 import { Urls } from '../helpers/urls'
@@ -87,21 +87,19 @@ test.describe('AI analysis assistant (mock provider)', () => {
     })
 
     /**
-     * Runs the scripted "run the average" turn on the local server until its query card shows.
+     * Runs the scripted "run the average" turn on the local provider until its query card shows.
      * @param {Page} page - The page.
      * @param {ArenaApi} api - The ArenaApi fixture.
-     * @returns {Promise<string>} The user uuid.
+     * @returns {Promise<void>} Resolves when the query card shows.
      */
-    const runAverageLocally = async (page: Page, api: ArenaApi): Promise<string> => {
+    const runAverageLocally = async (page: Page, api: ArenaApi): Promise<void> => {
       await page.goto(Urls.dataExplorer)
-      const userUuid = await api.getCurrentUserUuid()
-      await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
+      await setLocalProvider(page, api, { enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
       await page.reload()
 
       await askAnalysis(page, analysisMessages.run)
       await acceptConsentAndWait(page)
       await expect(queryCard(page, 'q1')).toBeVisible()
-      return userUuid
     }
 
     test('runs the query and answers with its result', async ({ page, api, sampleSurvey: _ }) => {
@@ -128,11 +126,11 @@ test.describe('AI analysis assistant (mock provider)', () => {
       api,
       sampleSurvey: _,
     }) => {
-      const userUuid = await runAverageLocally(page, api)
+      await runAverageLocally(page, api)
       const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
 
-      // review focus 3: the local server is switched off
-      await setLocalServerSettings(page, { userUuid, enabled: false, baseUrl: stub.baseUrl, modelId: stub.modelId })
+      // the local provider is removed: Arena default (cloud) is the default again
+      await setLocalProvider(page, api, { enabled: false, baseUrl: stub.baseUrl, modelId: stub.modelId })
       await page.reload()
       await openAssistantPanel(page)
       // the Explorer selects the Analysis area (schema still allowed on the gateway); the panel starts empty

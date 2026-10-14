@@ -90,54 +90,21 @@ export class ArenaApi {
   }
 
   /**
-   * Turns on the AI features (all categories) for the test user, using the server default provider.
+   * Turns on the AI features (access level 3, every category) for the test user, with Arena default as the default
+   * provider: an earlier spec of the same worker may have left a local default.
    * @returns {Promise<void>} - Resolves when saved.
    */
   async enableAiFeatures(): Promise<void> {
-    await this.put('/api/ai/settings', { featuresEnabled: true, featureToggles: allAiFeatureToggles(), enabled: false })
+    await this.put('/api/ai/settings', { accessLevel: 3, featureToggles: allAiFeatureToggles() })
+    await this.setAiDefaultProvider('arena-default')
   }
 
   /**
-   * Turns off the AI features for the test user.
+   * Turns off the AI features for the test user (access level 0).
    * @returns {Promise<void>} - Resolves when saved.
    */
   async disableAiFeatures(): Promise<void> {
-    await this.put('/api/ai/settings', { featuresEnabled: false, enabled: false })
-  }
-
-  /**
-   * Saves a personal provider for the test user, with the AI features and every category on.
-   * @param {object} provider - Provider fields.
-   * @param {string} provider.provider - Provider key.
-   * @param {string} provider.model - Model id.
-   * @param {string} provider.baseUrl - Base URL (public: the server refuses internal addresses only when it calls them).
-   * @returns {Promise<void>} - Resolves when saved.
-   */
-  async saveAiPersonalProvider({
-    provider,
-    model,
-    baseUrl,
-  }: {
-    provider: string
-    model: string
-    baseUrl: string
-  }): Promise<void> {
-    await this.put('/api/ai/settings', {
-      featuresEnabled: true,
-      featureToggles: allAiFeatureToggles(),
-      enabled: true,
-      provider,
-      model,
-      baseUrl,
-    })
-  }
-
-  /**
-   * Removes the personal provider of the test user (DELETE /api/ai/settings); the feature switches stay.
-   * @returns {Promise<void>} - Resolves when removed.
-   */
-  async removeAiPersonalProvider(): Promise<void> {
-    await this.delete('/api/ai/settings')
+    await this.put('/api/ai/settings', { accessLevel: 0 })
   }
 
   /**

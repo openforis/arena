@@ -1,7 +1,6 @@
 import { buildLocalProviderCapability, createCapabilitiesStore } from '@webapp/ai/engines/capabilities'
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { LocalServerProbeResult } from '@webapp/ai/engines/localServerProbe'
-import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettings'
 import {
   type AiPublicProvider,
   buildProviderEntries,
@@ -160,7 +159,6 @@ describe('capabilities store with providers (266)', () => {
     const probed: string[] = []
     const store = createCapabilitiesStore({
       loadSettings: async () => ({ providers: [account], defaultProviderId: 'local:l2', adminDefault: null }),
-      loadLocalSettings: () => defaultLocalServerSettings(),
       loadLocalProviders: () => [laptop, lan],
       // records the URL and answers when the test resolves that probe
       probe: ({ baseUrl }) => {
@@ -188,7 +186,6 @@ describe('capabilities store with providers (266)', () => {
   test('a failing provider loader or probe gives no local providers or a not tested one', async () => {
     const store = createCapabilitiesStore({
       loadSettings: async () => null,
-      loadLocalSettings: () => defaultLocalServerSettings(),
       loadLocalProviders: () => {
         throw new Error('blocked')
       },
@@ -200,7 +197,6 @@ describe('capabilities store with providers (266)', () => {
 
     const failingProbe = createCapabilitiesStore({
       loadSettings: async () => null,
-      loadLocalSettings: () => defaultLocalServerSettings(),
       loadLocalProviders: () => [laptop],
       probe: async () => {
         throw new Error('boom')
@@ -219,7 +215,6 @@ describe('capabilities store with providers (266)', () => {
         users.push(userUuid)
         return null
       },
-      loadLocalSettings: () => defaultLocalServerSettings(),
       loadLocalProviders: () => [],
       probe: async () => reachable([]),
     })

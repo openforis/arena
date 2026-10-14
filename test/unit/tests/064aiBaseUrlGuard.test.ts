@@ -1,4 +1,4 @@
-import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
+import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
 import { assertBaseUrlAllowed, isAllowlisted, isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
@@ -162,13 +162,10 @@ describe('guard wiring', () => {
     )
   })
 
-  test('testConnection reports aiBaseUrlNotAllowed for an internal base URL', async () => {
-    const result: any = await AiSettingsService.testConnection({
+  test('testProvider reports aiBaseUrlNotAllowed for an internal base URL', async () => {
+    const result: any = await AiProviderService.testProvider({
       user: { uuid: 'u1' } as any,
-      provider: 'openai-compatible',
-      model: 'm',
-      baseUrl: internalUrl,
-      apiKey: 'k',
+      input: { type: 'openai-compatible', model: 'm', baseUrl: internalUrl, apiKey: 'k' },
     })
     expect(result.ok).toBe(false)
     expect(result.errorKey).toBe('aiBaseUrlNotAllowed')

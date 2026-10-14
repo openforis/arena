@@ -3,26 +3,25 @@ import type { Page } from '@playwright/test'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
+import type { ArenaApi } from '../fixtures/arenaApi'
+import { E2E_LOCAL_PROVIDER_ID } from '../helpers/aiAnalysis'
 import { Urls } from '../helpers/urls'
 import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
-type LocalSettings = { enabled: boolean; baseUrl: string; modelId: string | null; preferLocal: boolean }
-
 /**
- * Writes C's local server settings before any page script runs (on every navigation of this page).
+ * Writes C's stub server as the only local provider before any page script runs (on every navigation of this page),
+ * and makes it the default provider.
  * @param {Page} page - The page.
- * @param {object} params - Parameters.
- * @param {string} params.userUuid - Logged-in user.
- * @param {LocalSettings} params.settings - Settings.
- * @returns {Promise<void>} Resolves when registered.
+ * @param {ArenaApi} api - The ArenaApi fixture of the same user.
+ * @param {LocalModelServerStub} stub - C's stub server.
+ * @returns {Promise<void>} Resolves when registered and saved.
  */
-const seedLocalServerSettings = async (
-  page: Page,
-  { userUuid, settings }: { userUuid: string; settings: LocalSettings }
-): Promise<void> => {
+const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServerStub): Promise<void> => {
+  const userUuid = await api.getCurrentUserUuid()
+  const providers = [{ id: E2E_LOCAL_PROVIDER_ID, name: 'Local server', baseUrl: stub.baseUrl, modelId: stub.modelId }]
   await page.addInitScript(
     ({ key, value }) => {
       try {
@@ -31,8 +30,9 @@ const seedLocalServerSettings = async (
         // about:blank and other origins without storage
       }
     },
-    { key: `arena.ai.localServer.${userUuid}`, value: JSON.stringify(settings) }
+    { key: `arena.ai.localProviders.${userUuid}`, value: JSON.stringify(providers) }
   )
+  await api.setAiDefaultProvider(E2E_LOCAL_PROVIDER_ID)
 }
 
 /**
@@ -58,6 +58,7 @@ const openActivitySection = async (page: Page): Promise<void> => {
   await page.getByTestId(TestId.dashboard.activityToggle).click()
 }
 
+/** Returns the activity log summary modal. */
 const summaryModal = (page: Page) => page.locator('.ai-activity-log-summary-modal')
 
 /**
@@ -77,12 +78,17 @@ const summarize = async (page: Page, { expectConsent }: { expectConsent: boolean
   if (!expectConsent) await expect(page.getByTestId(TestId.ai.consentDialog)).toHaveCount(0)
 }
 
+/**
+ * Closes the summary modal.
+ * @param {Page} page - The page.
+ * @returns {Promise<void>} Resolves when closed.
+ */
 const closeSummary = async (page: Page): Promise<void> => {
   await summaryModal(page).locator('.modal-close').click()
   await expect(summaryModal(page)).toHaveCount(0)
 }
 
-test.describe('Local AI engine (stub local server)', () => {
+test.describe('Local AI provider (stub local server)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
 
   let stub: LocalModelServerStub | null = null
@@ -92,46 +98,15 @@ test.describe('Local AI engine (stub local server)', () => {
     stub = await startLocalModelServer()
   })
 
-  test.afterEach(async () => {
+  test.afterEach(async ({ api }) => {
     await stub?.stop()
     stub = null
+    await api.setAiDefaultProvider('arena-default')
   })
 
-  test('turning on the local server: Test lists the stub model, Save writes the settings', async ({ page, api }) => {
-    const storageKey = `arena.ai.localServer.${await api.getCurrentUserUuid()}`
-    const readSaved = async () =>
-      JSON.parse((await page.evaluate((key) => localStorage.getItem(key), storageKey)) ?? 'null')
-
-    await page.goto(Urls.userProfile)
-    await page.getByTestId(TestId.ai.localServerEnabled).click()
-    const baseUrlInput = page.locator(`input[data-testid="${TestId.ai.localServerBaseUrl}"]`)
-    await baseUrlInput.fill(stub!.baseUrl)
-    await baseUrlInput.blur()
-    await page.getByTestId(TestId.ai.localServerTest).click()
-
-    const result = page.getByTestId(TestId.ai.localServerTestResult)
-    await expect(result).toContainText('Answered')
-    await expect(result).toContainText('On this device')
-    // the first successful test picks the first model
-    await expect(page.getByTestId(TestId.ai.localServerModel)).toHaveValue(stub!.modelId)
-    expect(stub!.requests.some((request) => request.path === '/v1/models')).toBe(true)
-    // nothing is written before Save
-    expect(await readSaved()).toBeNull()
-
-    await page.locator('button.btn-save').click()
-    await expect.poll(readSaved).toMatchObject({ enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
-
-    await page.reload()
-    await expect(page.getByTestId(TestId.ai.localServerModel)).toHaveValue(stub!.modelId)
-  })
-
-  test.describe('with the local server on', () => {
+  test.describe('with the local provider as the default', () => {
     test.beforeEach(async ({ page, api }) => {
-      const userUuid = await api.getCurrentUserUuid()
-      await seedLocalServerSettings(page, {
-        userUuid,
-        settings: { enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId, preferLocal: true },
-      })
+      await seedLocalProvider(page, api, stub!)
     })
 
     test('the activity log summary runs on the stub, not on the gateway', async ({ page, sampleSurvey: _ }) => {
@@ -145,7 +120,11 @@ test.describe('Local AI engine (stub local server)', () => {
       expect(gatewayRequests).toEqual([])
     })
 
-    test('the stub stops: unreachable message with Retry', async ({ page, sampleSurvey: _ }) => {
+    test('the stub stops: unreachable message with Retry, and no other provider is used', async ({
+      page,
+      sampleSurvey: _,
+    }) => {
+      const gatewayRequests = collectGatewayRequests(page)
       await openActivitySection(page)
       await summarize(page, { expectConsent: true })
       await expect(summaryModal(page)).toContainText('MOCK activity summary.')
@@ -157,13 +136,16 @@ test.describe('Local AI engine (stub local server)', () => {
       await expect(summaryModal(page)).toContainText('could not be reached')
       await expect(page.getByTestId(TestId.ai.engineErrorRetry)).toBeVisible()
 
-      // Retry probes again: the local server is now known to be unreachable, so no engine is left
+      // Retry probes again: the provider is now known to be unreachable, and nothing falls back to another one
       await page.getByTestId(TestId.ai.engineErrorRetry).click()
       await expect(summaryModal(page)).toContainText('No AI engine can be used for this request.')
       await closeSummary(page)
       await expect(page.locator('.btn-ai-summary')).toBeDisabled()
       await page.getByTestId(TestId.ai.policyBlocked).hover()
-      await expect(page.getByTestId(TestId.ai.notAvailable)).toContainText('The local AI server cannot be reached.')
+      await expect(page.getByTestId(TestId.ai.notAvailable)).toContainText(
+        'The selected AI provider is not available right now.'
+      )
+      expect(gatewayRequests).toEqual([])
     })
 
     test('the first-use dialog appears once per survey', async ({ page, sampleSurvey: _ }) => {
@@ -183,7 +165,29 @@ test.describe('Local AI engine (stub local server)', () => {
     })
   })
 
-  test('local server off, record data on this device only: the reasons are shown', async ({
+  // review focus 1: the default is a local provider saved on another computer
+  test('a default local provider of another computer: nothing is sent, the profile says so', async ({
+    page,
+    api,
+    sampleSurvey: _,
+  }) => {
+    await api.setAiDefaultProvider('local:elsewhere')
+    const gatewayRequests = collectGatewayRequests(page)
+    await openActivitySection(page)
+
+    await expect(page.locator('.btn-ai-summary')).toBeDisabled()
+    await page.getByTestId(TestId.ai.policyBlocked).hover()
+    await expect(page.getByTestId(TestId.ai.notAvailable)).toContainText(
+      'Your default provider is on another computer.'
+    )
+    await page.getByTestId(TestId.ai.notAvailableAction('openSettings')).click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.userProfile}$`))
+    await expect(page.getByTestId(TestId.ai.providerDefaultMissing)).toBeVisible()
+    expect(gatewayRequests).toEqual([])
+    expect(stub!.requests).toEqual([])
+  })
+
+  test('Arena default with record data kept on this device: the policy reason is shown', async ({
     page,
     sampleSurvey: _,
   }) => {
@@ -192,83 +196,11 @@ test.describe('Local AI engine (stub local server)', () => {
 
     await expect(page.locator('.btn-ai-summary')).toBeDisabled()
     await page.getByTestId(TestId.ai.policyBlocked).hover()
-    const notAvailable = page.getByTestId(TestId.ai.notAvailable)
-    await expect(notAvailable).toContainText('No local AI server is turned on.')
-    await expect(notAvailable).toContainText("The survey AI policy doesn't allow cloud models for this data.")
-
-    await page.getByTestId(TestId.ai.notAvailableAction('turnOnLocalServer')).click()
-    await expect(page).toHaveURL(new RegExp(`${Urls.userProfile}$`))
+    // Arena default is the only candidate and the policy forbids it: only the policy reason is shown
+    await expect(page.getByTestId(TestId.ai.policyBlockedTooltip)).toContainText(
+      "This survey's AI policy keeps record data on this device."
+    )
     expect(gatewayRequests).toEqual([])
     expect(stub!.requests).toEqual([])
-  })
-})
-
-test.describe('AI settings panel', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
-
-  test.beforeEach(async ({ api }) => {
-    await api.enableAiFeatures()
-  })
-
-  // a test that fails before the panel removes the provider must not leave it to the next test
-  test.afterEach(async ({ api }) => {
-    await api.removeAiPersonalProvider()
-  })
-
-  test('a localhost Base URL in the cloud block points to the local server', async ({ page }) => {
-    await page.goto(Urls.userProfile)
-    await page.getByTestId(TestId.ai.cloudProvider).selectOption('openai-compatible')
-    await page.locator(`input[data-testid="${TestId.ai.cloudBaseUrl}"]`).fill('localhost:1234/v1')
-
-    await expect(page.getByTestId(TestId.ai.cloudBaseUrlHint)).toBeVisible()
-    await page.getByTestId(TestId.ai.cloudBaseUrlHintLink).click()
-
-    await expect(page.getByTestId(TestId.ai.localServerEnabled)).toHaveClass(/Mui-checked/)
-    await expect(page.locator(`input[data-testid="${TestId.ai.localServerBaseUrl}"]`)).toBeFocused()
-  })
-
-  test('the cloud Test button answers on the first click, even when the model list is still loading', async ({
-    page,
-  }) => {
-    // the mock provider cannot reach a public model server: the two endpoints are answered here, the list slowly
-    await page.route('**/api/ai/settings/models', async (route) => {
-      await new Promise((resolve) => setTimeout(resolve, 1500))
-      await route.fulfill({ json: { models: [{ id: 'remote-model' }] } })
-    })
-    await page.route('**/api/ai/settings/test', (route) => route.fulfill({ json: { ok: true, latencyMs: 12 } }))
-    await page.goto(Urls.userProfile)
-    await page.getByTestId(TestId.ai.cloudProvider).selectOption('openai-compatible')
-    await page.locator(`input[data-testid="${TestId.ai.cloudBaseUrl}"]`).fill('https://models.example.org/v1')
-
-    // one click, no blur before it: the click itself blurs the field and starts the list
-    await page.getByTestId(TestId.ai.cloudTest).click()
-
-    await expect(page.getByTestId(TestId.ai.cloudTestResult)).toContainText('Answered in 12 ms')
-  })
-
-  test('Remove my provider keeps the feature switches', async ({ page, api }) => {
-    await api.saveAiPersonalProvider({
-      provider: 'openai-compatible',
-      model: 'remote-model',
-      baseUrl: 'https://models.example.org/v1',
-    })
-    await page.goto(Urls.userProfile)
-    const providerSelect = page.getByTestId(TestId.ai.cloudProvider)
-    await expect(providerSelect).toHaveValue('openai-compatible')
-
-    await page.getByTestId(TestId.ai.cloudRemove).click()
-
-    await expect(providerSelect).toHaveValue('default')
-    await page.getByTestId(TestId.ai.accessCustomize).click()
-    await expect(page.getByTestId(TestId.ai.featureToggle('assistantDesign'))).toHaveAttribute('aria-pressed', 'true')
-    await expect
-      .poll(() => api.getAiSettings())
-      .toMatchObject({
-        featuresEnabled: true,
-        provider: null,
-        hasApiKey: false,
-        enabled: false,
-        featureToggles: { assistantDesign: true },
-      })
   })
 })

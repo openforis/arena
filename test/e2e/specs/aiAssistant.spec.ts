@@ -4,7 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
 import type { TestUser } from '../fixtures/testUsers'
-import { acceptConsentAndWait, setLocalServerSettings } from '../helpers/aiAnalysis'
+import { acceptConsentAndWait, setLocalProvider } from '../helpers/aiAnalysis'
 import {
   assistantPanel,
   closeAssistantPanel,
@@ -28,6 +28,9 @@ const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 // matches the design script /label/i of server/modules/ai/service/mockScripts.ts
 const LABEL_REQUEST = 'Change the label of cluster_id to Cluster identifier'
+
+// long enough to be cut by the provider chip
+const LONG_LOCAL_NAME = 'Local server on the workstation in the field office'
 
 const userMessages = (page: Page) => assistantPanel(page).getByTestId(TestId.aiAssistant.message('user'))
 
@@ -413,7 +416,7 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(page).toHaveURL(new RegExp(`${Urls.userProfile}$`))
   })
 
-  test('the footer shows where data goes, what is sent and the context used, aligned', async ({
+  test('the footer shows the provider, what is sent and the context used, aligned', async ({
     page,
     sampleSurvey: _,
   }) => {
@@ -422,7 +425,7 @@ test.describe('AI assistant (mock provider)', () => {
     // the composer (and its footer) is in the chat, not on the home page
     await panel.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
     const footer = panel.getByTestId(TestId.aiAssistant.composerFooter)
-    await expect(footer.getByTestId(TestId.ai.dataLocationBadge)).toBeVisible()
+    await expect(footer.getByTestId(TestId.aiAssistant.providerChip)).toContainText('Arena default')
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute('data-level', 'schema')
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute(
       'aria-label',
@@ -469,15 +472,19 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await api.disableAiFeatures()
   })
 
-  test('with a local server the footer keeps Send inside and truncates the long badge text', async ({
+  test('with a local provider the footer keeps Send inside and truncates a long provider name', async ({
     page,
     api,
     sampleSurvey: _,
   }) => {
     const designer = new FormDesigner(page)
     await designer.goto()
-    const userUuid = await api.getCurrentUserUuid()
-    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await setLocalProvider(page, api, {
+      enabled: true,
+      baseUrl: stub!.baseUrl,
+      modelId: stub!.modelId,
+      name: LONG_LOCAL_NAME,
+    })
     await designer.goto()
     await openAssistantPanel(page)
     // all footer items shown: the ring needs a finished answer
@@ -485,10 +492,10 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await acceptConsentAndWait(page)
 
     const footer = assistantPanel(page).getByTestId(TestId.aiAssistant.composerFooter)
-    const text = footer.locator('.ai-data-location-badge__text')
+    const text = footer.locator('.ai-provider-chip__text')
     await expect(footer.getByTestId(TestId.aiAssistant.contextMeter)).toBeVisible()
-    await expect(text).toHaveText('On this device · LM Studio')
-    // the badge text is the only item that shrinks; Send keeps its place inside the footer
+    await expect(text).toHaveText(`${LONG_LOCAL_NAME} · ${stub!.modelId}`)
+    // the chip text is the only item that shrinks; Send keeps its place inside the footer
     await expect.poll(async () => await text.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
     await expect
       .poll(async () => {
@@ -506,8 +513,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
   }) => {
     const designer = new FormDesigner(page)
     await designer.goto()
-    const userUuid = await api.getCurrentUserUuid()
-    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await setLocalProvider(page, api, { enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
     await designer.goto()
     await openAssistantPanel(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.contextMeter)).toHaveCount(0)
@@ -545,8 +551,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
   }) => {
     const designer = new FormDesigner(page)
     await designer.goto()
-    const userUuid = await api.getCurrentUserUuid()
-    await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
+    await setLocalProvider(page, api, { enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
     await designer.goto()
     await openAssistantPanel(page)
     // the first-use consent is asked once per user, survey and feature: take it with a quick turn, then start over

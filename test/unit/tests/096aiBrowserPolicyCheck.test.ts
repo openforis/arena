@@ -1,18 +1,20 @@
 import { createPolicyContextLoader } from '@webapp/ai/policy/policyContextLoader'
 
+/** Returns a survey policy client state with the given effective policy. */
 const surveyState = (effective: any) => ({ policy: effective, ceilings: effective, effective, canEdit: false })
 
 describe('createPolicyContextLoader', () => {
-  const settings = { hostingClass: 'cloud', policyCeilings: { schema: 'orgHosted', data: 'cloud' } }
+  const settings = { policyCeilings: { schema: 'orgHosted', data: 'cloud' } }
 
-  test('a survey feature uses the survey effective policy', async () => {
+  test('a survey feature uses the survey effective policy; the hosting class is left to the engine', async () => {
     const load = createPolicyContextLoader({
-      fetchSettings: async () => settings,
+      // an old server response still names a hosting class: it is not used
+      fetchSettings: async () => ({ ...settings, hostingClass: 'cloud' }),
       fetchSurveyPolicy: async () => surveyState({ schema: 'off', data: 'onDevice' }) as any,
     })
     expect(await load({ surveyId: 4 })).toEqual({
       effective: { schema: 'off', data: 'onDevice' },
-      hostingClass: 'cloud',
+      hostingClass: null,
     })
   })
 
@@ -27,7 +29,7 @@ describe('createPolicyContextLoader', () => {
     })
     expect(await load({ surveyId: null })).toEqual({
       effective: { schema: 'orgHosted', data: 'cloud' },
-      hostingClass: 'cloud',
+      hostingClass: null,
     })
     expect(surveyCalls).toEqual([])
   })

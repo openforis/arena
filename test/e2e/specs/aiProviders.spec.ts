@@ -92,25 +92,4 @@ test.describe('AI account providers API (mock provider)', () => {
     }
     expect((await api.getAiSettings()).providers[0]).toMatchObject({ id: provider.id, hasApiKey: true })
   })
-
-  test('the old settings body still saves and removes a personal provider', async ({ api }) => {
-    await api.saveAiPersonalProvider({
-      provider: 'openai-compatible',
-      model: 'remote-model',
-      baseUrl: 'https://models.example.org/v1',
-    })
-    expect(await api.getAiSettings()).toMatchObject({
-      defaultProviderId: 'acct:legacy',
-      enabled: true,
-      provider: 'openai-compatible',
-      providers: [expect.objectContaining({ id: 'acct:legacy', model: 'remote-model' })],
-    })
-    await api.removeAiPersonalProvider()
-    expect(await api.getAiSettings()).toMatchObject({
-      defaultProviderId: 'arena-default',
-      enabled: false,
-      provider: null,
-      providers: [],
-    })
-  })
 })

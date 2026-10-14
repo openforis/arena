@@ -1,14 +1,15 @@
 /**
  * Builds what the browser policy check needs: the effective policy (survey, or instance ceilings for features
- * without a survey) and the hosting class of the gateway provider. Pure: transports are injected.
+ * without a survey). The settings name no single provider any more: the hosting class is the one of the engine the
+ * request uses (resolveAssistantEngine sets it), so it is null here. Pure: transports are injected.
  */
-import { aiHostingClasses, normalizeAiPolicy, type AiHostingClass, type AiPolicy } from '@common/ai/policy'
+import { normalizeAiPolicy, type AiHostingClass, type AiPolicy } from '@common/ai/policy'
 
 import type { SurveyAiPolicyClientState } from './surveyAiPolicyCache'
 
 export type PolicyContext = { effective: AiPolicy; hostingClass: AiHostingClass | null }
 
-type AiSettingsLike = { hostingClass?: string | null; policyCeilings?: unknown; [key: string]: unknown }
+type AiSettingsLike = { policyCeilings?: unknown; [key: string]: unknown }
 
 export type PolicyContextLoaderDeps = {
   fetchSettings: () => Promise<AiSettingsLike>
@@ -16,14 +17,6 @@ export type PolicyContextLoaderDeps = {
 }
 
 const allOff: AiPolicy = Object.freeze({ schema: 'off', data: 'off' })
-
-/**
- * Returns the value when it is a known hosting class, else null (fail closed).
- * @param {unknown} value - Hosting class sent by the settings.
- * @returns {AiHostingClass | null} The hosting class or null.
- */
-export const toHostingClass = (value: unknown): AiHostingClass | null =>
-  (aiHostingClasses as readonly unknown[]).includes(value) ? (value as AiHostingClass) : null
 
 /**
  * Returns the instance ceilings sent with the AI settings; both off when they are missing (fetch failed).
@@ -46,5 +39,6 @@ export const createPolicyContextLoader =
       surveyId ? fetchSurveyPolicy(surveyId) : Promise.resolve(null),
     ])
     const effective = surveyPolicy ? surveyPolicy.effective : getCeilingsFromSettings(settings)
-    return { effective, hostingClass: toHostingClass(settings?.hostingClass) }
+    // the engine of the request sets the hosting class; until then no tool is offered for an unknown location
+    return { effective, hostingClass: null }
   }

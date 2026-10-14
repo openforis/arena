@@ -1,36 +1,20 @@
 import * as AiUserPrefs from '@server/modules/ai/service/aiUserPrefs'
 import { getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
 import { createCapabilitiesStore, emptyCapabilities } from '@webapp/ai/engines/capabilities'
-import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettings'
 
 describe('capability statistics and device detection are removed', () => {
   test('the capabilities have no device facts', () => {
-    expect(Object.keys(emptyCapabilities()).sort()).toEqual([
-      'defaultProviderId',
-      'gateway',
-      'instance',
-      'local',
-      'localServer',
-      'providers',
-    ])
+    expect(Object.keys(emptyCapabilities()).sort()).toEqual(['defaultProviderId', 'instance', 'local', 'providers'])
   })
 
   test('the store loads without a device reader', async () => {
     const store = createCapabilitiesStore({
       loadSettings: async () => null,
-      loadLocalSettings: () => defaultLocalServerSettings(),
       loadLocalProviders: () => [],
       probe: async () => ({ reachable: false, models: [], contextTokens: null, error: null }),
     })
     const capabilities = await store.load({ userUuid: 'u1' })
-    expect(Object.keys(capabilities).sort()).toEqual([
-      'defaultProviderId',
-      'gateway',
-      'instance',
-      'local',
-      'localServer',
-      'providers',
-    ])
+    expect(Object.keys(capabilities).sort()).toEqual(['defaultProviderId', 'instance', 'local', 'providers'])
     expect('detectDevice' in store).toBe(false)
   })
 

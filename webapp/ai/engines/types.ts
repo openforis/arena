@@ -42,15 +42,21 @@ export type AiLocalServerCapability = {
   error: AiEngineErrorInfo | null // why the last probe failed
 }
 
-export type AiGatewayCapability = {
-  available: boolean
+// what a gateway engine description is built from: the provider (account provider or Arena default) and the
+// instance prompt cap
+export type AiGatewayEngineSource = {
   hostingClass: AiHostingClass | null
   provider: string | null
   model: string | null
   maxPromptChars: number | null
 }
 
-export type AiInstanceCapability = { policyCeilings: AiPolicy | null; orgHostedBaseUrls: string[] }
+// maxPromptChars: the gateway prompt cap of the instance (AI_MAX_PROMPT_CHARS), null when unknown
+export type AiInstanceCapability = {
+  policyCeilings: AiPolicy | null
+  orgHostedBaseUrls: string[]
+  maxPromptChars: number | null
+}
 
 export type AiProviderStatus = 'ready' | 'notTested' | 'notAvailable' | 'notSetUp'
 
@@ -67,8 +73,6 @@ export type AiProviderEntry = {
 }
 
 export type AiCapabilities = {
-  localServer: AiLocalServerCapability
-  gateway: AiGatewayCapability
   instance: AiInstanceCapability
   // account providers, then local providers, then Arena default
   providers: AiProviderEntry[]

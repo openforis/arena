@@ -4,7 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { sampleRecords, SampleRecord } from '../fixtures/seed/sampleSurveyModel'
 import type { ArenaApi } from '../fixtures/arenaApi'
-import { setLocalServerSettings } from './aiAnalysis'
+import { setLocalProvider } from './aiAnalysis'
 import { sendAssistantMessage } from './assistantPanel'
 import { Urls } from './urls'
 
@@ -54,9 +54,9 @@ export const expectReportRowCount = async (page: Page, count: number): Promise<v
 }
 
 /**
- * Turns on C's local AI server settings for the logged-in user and reloads the page.
+ * Makes C's stub server the default local provider of the logged-in user and reloads the page.
  * @param {Page} page - The page (already on an app URL).
- * @param {ArenaApi} api - The ArenaApi fixture of the same user (C's getCurrentUserUuid).
+ * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {{ baseUrl: string, modelId: string }} stub - C's stub server.
  * @returns {Promise<void>} Resolves after the reload.
  */
@@ -65,8 +65,7 @@ export const useLocalServer = async (
   api: ArenaApi,
   stub: { baseUrl: string; modelId: string }
 ): Promise<void> => {
-  const userUuid = await api.getCurrentUserUuid()
-  await setLocalServerSettings(page, { userUuid, enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
+  await setLocalProvider(page, api, { enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
   // wait for the app to boot: refresh tokens rotate, so a navigation that aborts the boot's refresh logs the user out
   await Promise.all([
     page.waitForResponse(

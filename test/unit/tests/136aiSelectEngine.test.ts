@@ -121,19 +121,8 @@ const STATES: ProviderState[] = [
   },
 ]
 
-const baseCapabilities = (): Pick<AiCapabilities, 'localServer' | 'gateway' | 'instance'> => ({
-  localServer: {
-    enabled: false,
-    reachable: null,
-    models: [],
-    hostingClass: null,
-    contextTokens: null,
-    baseUrl: null,
-    modelId: null,
-    error: null,
-  },
-  gateway: { available: false, hostingClass: null, provider: null, model: null, maxPromptChars: 200000 },
-  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+const baseCapabilities = (): Pick<AiCapabilities, 'instance'> => ({
+  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars: 200000 },
 })
 
 const capabilitiesFor = (state: ProviderState): AiCapabilities => {

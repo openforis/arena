@@ -2,6 +2,8 @@ import { expect, Page, Request } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
 
+import type { ArenaApi } from '../fixtures/arenaApi'
+
 import {
   assistantPanel,
   openAssistantPanel,
@@ -38,24 +40,39 @@ export const isGatewayRequest = (request: Request) => request.url().includes('/a
 
 export const isExplorerQueryRequest = (request: Request) => /\/api\/surveyRdb\/\d+\/[^/]+\/query$/.test(request.url())
 
+// the id of the local provider the e2e specs write in the browser
+export const E2E_LOCAL_PROVIDER_ID = 'local:e2e'
+
 /**
- * Turns the local AI server on or off in C's browser settings.
+ * Makes C's stub server the only local provider of this browser and the default provider, or removes it and makes
+ * Arena default the default again. The page must be on an app URL; reload it afterwards (the capabilities are read
+ * when the app loads).
  * @param {Page} page - The page.
+ * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {object} params - Parameters.
- * @param {string} params.userUuid - User uuid.
- * @param {boolean} params.enabled - Whether the local server is on.
+ * @param {boolean} params.enabled - Add (true) or remove (false) the local provider.
  * @param {string} params.baseUrl - Stub base URL.
  * @param {string} params.modelId - Stub model id.
+ * @param {string} [params.name] - Provider name.
  * @returns {Promise<void>} Resolves when saved.
  */
-export const setLocalServerSettings = async (
+export const setLocalProvider = async (
   page: Page,
-  { userUuid, enabled, baseUrl, modelId }: { userUuid: string; enabled: boolean; baseUrl: string; modelId: string }
+  api: ArenaApi,
+  {
+    enabled,
+    baseUrl,
+    modelId,
+    name = 'Local server',
+  }: { enabled: boolean; baseUrl: string; modelId: string; name?: string }
 ): Promise<void> => {
+  const userUuid = await api.getCurrentUserUuid()
+  const providers = enabled ? [{ id: E2E_LOCAL_PROVIDER_ID, name, baseUrl, modelId }] : []
   await page.evaluate(
     ([key, value]) => localStorage.setItem(key, value),
-    [`arena.ai.localServer.${userUuid}`, JSON.stringify({ enabled, baseUrl, modelId, preferLocal: true })]
+    [`arena.ai.localProviders.${userUuid}`, JSON.stringify(providers)]
   )
+  await api.setAiDefaultProvider(enabled ? E2E_LOCAL_PROVIDER_ID : 'arena-default')
 }
 
 /**

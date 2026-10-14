@@ -15,7 +15,7 @@ import {
   getCapabilitiesSnapshotForUser,
 } from './capabilities'
 import { convertLegacyLocalServer, loadLocalProviders, loadSettingsWithLocalConversion } from './localProviders'
-import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
+import { getBrowserStorage } from './localServerSettings'
 import { type LocalServerProbeResult, probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
 
@@ -40,7 +40,6 @@ const capabilitiesStore = createCapabilitiesStore({
           setDefault: async (providerId) => (await setDefaultProvider({ providerId, origin: 'converted' })).applied,
         }),
     }),
-  loadLocalSettings: (userUuid) => loadLocalServerSettings({ storage: getBrowserStorage(), userUuid }),
   loadLocalProviders: (userUuid) => loadLocalProviders({ storage: getBrowserStorage(), userUuid }),
   probe: ({ baseUrl, modelId }) => probeLocalServer({ baseUrl, modelId, fetchImpl: browserFetch }),
 })
