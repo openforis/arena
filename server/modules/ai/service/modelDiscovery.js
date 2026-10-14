@@ -123,10 +123,11 @@ const listGoogle = async ({ apiKey }) => {
  * @param {string} args.provider - Provider key from `ProviderRegistry.providers`.
  * @param {string} [args.baseUrl] - Required for openai-compatible.
  * @param {string} [args.apiKey] - Required for cloud providers.
+ * @param {object} [guardOptions] - Base URL guard options (`allowlist`, `lookup`), the same guard as model calls.
  * @returns {Promise<Array<{id: string, description?: string}>>} The models.
  * @throws {SystemError} `aiModelListFailed` on any upstream failure.
  */
-export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
+export const listForProvider = async ({ provider, baseUrl, apiKey }, guardOptions = {}) => {
   try {
     switch (provider) {
       case ProviderRegistry.providers.openai:
@@ -137,7 +138,7 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
         return await listGoogle({ apiKey })
       case ProviderRegistry.providers.openaiCompatible: {
         if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
-        await assertBaseUrlAllowed(baseUrl)
+        await assertBaseUrlAllowed(baseUrl, guardOptions)
         return await listOpenAiCompatible({ baseUrl, apiKey })
       }
       case ProviderRegistry.providers.vercelAiSdk:
