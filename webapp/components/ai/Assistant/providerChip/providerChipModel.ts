@@ -61,6 +61,14 @@ export const getConversationProvider = ({
 }
 
 /**
+ * Returns true when the chip can open the "Answer with" popover (at least one provider is set up).
+ * @param {AiCapabilities} capabilities - Capabilities.
+ * @returns {boolean} True when the switcher can be opened.
+ */
+export const canOpenProviderChooser = (capabilities: AiCapabilities): boolean =>
+  capabilities.providers.some((entry) => entry.status !== 'notSetUp')
+
+/**
  * Returns true when the "provider was removed" notice applies: only once the user's providers are loaded.
  * @param {object} params - Parameters.
  * @param {AiCapabilities} params.capabilities - Capabilities (provider list and default).
@@ -160,7 +168,7 @@ export const getProviderChipView = ({
   status: AiFeatureAvailabilityStatus
 }): ProviderChipView => {
   // only Arena default, without an admin default: nothing can answer until the user adds a provider
-  if (capabilities.providers.every((entry) => entry.status === 'notSetUp')) return { kind: 'none' }
+  if (!canOpenProviderChooser(capabilities)) return { kind: 'none' }
   if (!current.entry) return { kind: 'missing' }
   return { kind: 'provider', entry: current.entry, tone: status === 'available' ? 'ok' : 'bad' }
 }

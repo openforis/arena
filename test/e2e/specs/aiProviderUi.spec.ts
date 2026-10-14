@@ -195,19 +195,26 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     expect(defaultBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
   })
 
-  // review focus 1, in the assistant: the area is unavailable (no chat, so no chip) and nothing is sent
-  test('a default local provider of another computer: the assistant says so and sends nothing', async ({
+  // review focus 1, in the chat
+  test('a default local provider of another computer: nothing is sent until another provider is chosen', async ({
     page,
     api,
     sampleSurvey: _,
   }) => {
     await api.setAiDefaultProvider('local:elsewhere')
     const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
-    await new FormDesigner(page).goto()
-    await openAssistantPanel(page)
-    await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.unavailable)).toContainText(
-      'Your default provider is on another computer.'
-    )
+    await openNewDesignConversation(page)
+    await expect(providerChip(page)).toContainText('Default provider not on this computer')
+
+    await providerChip(page).click()
+    await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
     expect(gatewayBodies).toEqual([])
+    await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
+    await expect(providerChip(page)).toContainText('Arena default · mock')
+
+    await sendAssistantMessage(page, LABEL_REQUEST)
+    await waitForAssistantTurn(page)
+    expect(gatewayBodies.length).toBeGreaterThan(0)
+    expect(gatewayBodies.every((body) => body.providerId === 'arena-default')).toBe(true)
   })
 })

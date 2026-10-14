@@ -83,7 +83,7 @@
     text-align: left;
     cursor: pointer;
 
-    &:hover:not(:disabled),
+    &:hover:not([aria-disabled='true']),
     &--selected {
       background-color: var(--blueLight);
     }
@@ -114,6 +114,12 @@
 
   &__row--selected &__radio {
     border: 4px solid var(--blue);
+  }
+
+  &__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
   }
 
   &__text {

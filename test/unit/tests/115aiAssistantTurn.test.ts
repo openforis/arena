@@ -311,16 +311,20 @@ describe('runAssistantTurn', () => {
       expect(answerOf(result).errorKey).toBeUndefined()
     })
 
-    test('onEngine is called once and the engine limits and hosting class are used', async () => {
+    test('the turn resolves its engine once and uses the engine limits', async () => {
       const echo = makeTool('test_echo', async () => ({ ok: true }))
       const model = scriptedModel(
         () => toolCallStream('c1', 'test_echo', { summary: 'a' }),
         () => textStream('never')
       )
-      const resolve = async () => ({ model, engine: localEngine })
-      const engines: unknown[] = []
-      const result = await run({ tools: [echo], extra: { resolve, onEngine: (engine) => engines.push(engine) } })
-      expect(engines).toEqual([localEngine])
+      const calls: unknown[] = []
+      /** Resolves the local engine and records the call. */
+      const resolve = async (params: unknown) => {
+        calls.push(params)
+        return { model, engine: localEngine }
+      }
+      const result = await run({ tools: [echo], extra: { resolve } })
+      expect(calls).toHaveLength(1)
       // maxSteps 1: the loop stops after the first model call
       expect(model.doStreamCalls).toHaveLength(1)
       expect(answerOf(result).status).toBe('done')

@@ -29,7 +29,7 @@ export const AssistantComposerFooter = ({
     <AssistantProviderChip
       area={area}
       conversation={api.conversation}
-      disabled={api.busy}
+      disabled={api.busy || api.applying}
       onChoose={api.chooseProvider}
       onOpenChange={api.setProviderChooserOpen}
       open={api.providerChooserOpen}

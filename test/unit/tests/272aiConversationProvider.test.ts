@@ -16,6 +16,7 @@ const engine: AiSelectedEngine = {
 /** Builds a resolve function that records its calls. */
 const createResolve = () => {
   const calls: any[] = []
+  /** Records the call and returns the engine's model. */
   const resolve = async (params: unknown) => {
     calls.push(params)
     return { model: 'model', engine }
