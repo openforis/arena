@@ -11,6 +11,7 @@ import jobs from './jobs'
 import jobMonitorView from './jobMonitorView'
 import messageView from './messageView'
 import surveyCreate from './surveyCreate'
+import surveyCompareView from './surveyCompareView'
 import surveyForm from './surveyForm'
 import systemLogsView from './systemLogsView'
 import userAiSettings from './userAiSettings'
@@ -33,6 +34,7 @@ export default {
   jobMonitorView,
   messageView,
   surveyCreate,
+  surveyCompareView,
   surveyForm,
   systemLogsView,
   userAiSettings,

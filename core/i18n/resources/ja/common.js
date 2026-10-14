@@ -349,6 +349,7 @@ export default {
     formDesigner: 'フォームデザイナー',
     surveyHierarchy: '階層構造',
     surveyDependencyTree: '依存関係ツリー',
+    surveyCompare: '比較 / ファイルから更新',
     category: 'カテゴリ',
     categories: 'カテゴリ',
     nodeDef: 'ノード定義',
