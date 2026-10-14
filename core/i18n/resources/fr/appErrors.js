@@ -134,6 +134,13 @@ Essayez de rafraîchir la page.`,
     "Cette URL de base pointe vers une adresse interne, que le serveur Arena n'appelle pas. Pour un modèle sur votre ordinateur, utilisez le Serveur d'IA local. Pour un serveur de votre organisation, demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
   aiProviderUnavailable: "Le fournisseur d'IA est injoignable. Veuillez réessayer plus tard.",
   aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
+  aiProviderNotFound: "Ce fournisseur d'IA n'existe pas ou ne vous appartient pas. Choisissez un autre fournisseur.",
+  aiProviderNotGateway:
+    'Un fournisseur enregistré dans ce navigateur est appelé depuis le navigateur, jamais via le serveur Arena.',
+  aiApiKeyUnreadable:
+    'La clé API enregistrée de ce fournisseur ne peut plus être lue (le secret de chiffrement du serveur a changé). Modifiez le fournisseur dans vos paramètres IA et saisissez de nouveau la clé.',
+  aiEncryptionMissing:
+    "Les clés API ne peuvent pas être enregistrées : le serveur n'a pas de secret de chiffrement. Demandez à votre administrateur de définir AI_USER_KEY_ENCRYPTION_SECRET.",
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
   aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
   aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',

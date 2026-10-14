@@ -133,6 +133,13 @@ export default {
     'Esta URL base apunta a una dirección interna, a la que el servidor de Arena no llama. Para un modelo en su equipo, use el Servidor de IA local. Para un servidor de su organización, pida a su administrador que la añada a los servidores de modelos de la organización.',
   aiProviderUnavailable: 'No se pudo contactar con el proveedor de IA. Inténtelo de nuevo más tarde.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
+  aiProviderNotFound: 'Este proveedor de IA no existe o no es suyo. Elija otro proveedor.',
+  aiProviderNotGateway:
+    'Un proveedor guardado en este navegador se llama desde el navegador, nunca a través del servidor de Arena.',
+  aiApiKeyUnreadable:
+    'La clave de API guardada de este proveedor ya no se puede leer (cambió el secreto de cifrado del servidor). Edite el proveedor en su configuración de IA e introduzca la clave de nuevo.',
+  aiEncryptionMissing:
+    'No se pueden guardar claves de API: el servidor no tiene un secreto de cifrado. Pida a su administrador que configure AI_USER_KEY_ENCRYPTION_SECRET.',
   aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
   aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',

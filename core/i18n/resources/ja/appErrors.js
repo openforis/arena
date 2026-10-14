@@ -105,6 +105,14 @@ export default {
     'このベースURLは内部アドレスを指しており、Arena サーバーからは呼び出しません。お使いのコンピューター上のモデルには、ローカル AI サーバーを使用してください。組織のサーバーの場合は、組織のモデルサーバーへの追加を管理者に依頼してください。',
   aiProviderUnavailable: 'AIプロバイダーに接続できませんでした。しばらくしてから再度お試しください。',
   aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
+  aiProviderNotFound:
+    'このAIプロバイダーは存在しないか、あなたのものではありません。別のプロバイダーを選んでください。',
+  aiProviderNotGateway:
+    'このブラウザーに保存されたプロバイダーはブラウザーから呼び出され、Arenaサーバーを経由することはありません。',
+  aiApiKeyUnreadable:
+    'このプロバイダーの保存済みAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。AI設定でプロバイダーを編集し、キーをもう一度入力してください。',
+  aiEncryptionMissing:
+    'APIキーを保存できません：サーバーに暗号化シークレットがありません。管理者にAI_USER_KEY_ENCRYPTION_SECRETの設定を依頼してください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',
   aiExpressionNodeDefMissing: '対象フィールドが指定されていないため式を生成できません。',

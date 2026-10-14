@@ -128,6 +128,13 @@ Tente atualizar a página.`,
     'Esta URL base aponta para um endereço interno, que o servidor do Arena não chama. Para um modelo no seu computador, use o Servidor de IA local. Para um servidor da sua organização, peça ao administrador que a adicione aos servidores de modelos da organização.',
   aiProviderUnavailable: 'Não foi possível contactar o provedor de IA. Tente novamente mais tarde.',
   aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
+  aiProviderNotFound: 'Este provedor de IA não existe ou não é seu. Escolha outro provedor.',
+  aiProviderNotGateway:
+    'Um provedor salvo neste navegador é chamado a partir do navegador, nunca através do servidor do Arena.',
+  aiApiKeyUnreadable:
+    'A chave de API salva deste provedor já não pode ser lida (o segredo de criptografia do servidor mudou). Edite o provedor nas suas configurações de IA e insira a chave novamente.',
+  aiEncryptionMissing:
+    'Não é possível salvar chaves de API: o servidor não tem um segredo de criptografia. Peça ao seu administrador para definir AI_USER_KEY_ENCRYPTION_SECRET.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',

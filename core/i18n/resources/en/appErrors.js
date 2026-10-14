@@ -104,6 +104,12 @@ Try to refresh the page.`,
     "This base URL points to an internal address, which the Arena server doesn't call. For a model on your computer, use the Local AI server. For a server of your organisation, ask your administrator to add it to the organisation model servers.",
   aiProviderUnavailable: 'The AI provider could not be reached. Please try again later.',
   aiModelListFailed: 'Could not list models from the provider: {{message}}',
+  aiProviderNotFound: 'This AI provider does not exist or is not yours. Choose another provider.',
+  aiProviderNotGateway: 'A provider saved in this browser is called from the browser, never through the Arena server.',
+  aiApiKeyUnreadable:
+    'The saved API key of this provider can no longer be read (the server encryption secret changed). Edit the provider in your AI settings and enter the key again.',
+  aiEncryptionMissing:
+    'API keys cannot be saved: the server has no encryption secret. Ask your administrator to set AI_USER_KEY_ENCRYPTION_SECRET.',
   aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',
   aiExpressionTypeInvalid: 'Unknown expression kind: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Cannot generate an expression without a target field.',
