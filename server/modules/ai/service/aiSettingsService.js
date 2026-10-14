@@ -1,52 +1,39 @@
 /**
- * Reads and writes per-user AI configuration from `user.prefs.ai`.
+ * Reads and writes the per-user AI settings in `user.prefs.ai`.
  *
- * The API key is encrypted at rest (AES-256-GCM via `secretBox`) and never
- * crosses back to the frontend; read endpoints surface only `hasApiKey`.
- *
- * Why prefs and not a dedicated table: the existing `"user".prefs` JSONB
- * column is the established home for all per-user preferences in Arena
- * (see `core/user/_user/userPrefs.js`), and using it avoids a schema
- * migration. The shape is:
+ * Why prefs and not a dedicated table: the existing `"user".prefs` JSONB column is the established home for all
+ * per-user preferences in Arena (see `core/user/_user/userPrefs.js`), and using it avoids a schema migration. The
+ * shape is:
  *
  *   user.prefs.ai = {
  *     accessLevel,            // 0 off, 1 help only, 2 + survey design, 3 + record data (common/ai/accessLevel.ts)
  *     featuresEnabled,        // accessLevel > 0, kept for existing readers
  *     featureToggles,         // one boolean per AiFeatureCategory (common/ai/features.ts)
- *     provider, model, baseUrl, apiKeyEncrypted,
- *     enabled,                // use OWN provider vs. admin default
- *     lastTestOk, lastTestAt,
+ *     defaultProviderId,      // 'arena-default' | 'acct:<id>' | 'local:<id>' (common/ai/providerIds.ts)
+ *     defaultProviderOrigin,  // 'converted' until the user picks a default
+ *     providers,              // account providers (aiProviderPrefs.ts); keys encrypted (secretBox), never sent back
  *   }
  *
- * The access level is the user-level master switch (0 turns every AI feature off;
- * `featuresEnabled` mirrors `accessLevel > 0` for existing readers). `enabled` is the
- * narrower provider-override flag (user provider vs. admin default).
+ * The providers are edited by aiProviderService.ts. This module keeps the old single-provider body and fields working
+ * (legacyProviderSettings.ts) until the old panel is gone.
  */
-import { generateText } from 'ai'
-
 import * as User from '@core/user/user'
-import SystemError from '@core/systemError'
+import { LEGACY_ACCOUNT_PROVIDER_ID } from '@common/ai/providerIds'
+import { AiFeatureCategory } from '@common/ai/features'
 
 import * as UserManager from '@server/modules/user/manager/userManager'
-import * as SecretBox from '@server/utils/crypto/secretBox'
 
-import { AiFeatureCategory } from '@common/ai/features'
-import { LEGACY_ACCOUNT_PROVIDER_ID } from '@common/ai/providerIds'
-
+import { findStoredProvider, getProviderPrefs, withProviderPrefs } from './aiProviderPrefs'
+import * as AiProviderService from './aiProviderService'
 import {
   areFeaturesEnabledForUser,
-  defaultFeatureToggles,
   getAccessLevelForUser,
   getAiPrefs as getRawPrefs,
   isCategoryEnabledForUser,
   resolveSavedAccess,
   sanitiseFeatureToggles,
-  withoutPersonalProvider,
 } from './aiUserPrefs'
-import { findStoredProvider, getProviderPrefs } from './aiProviderPrefs'
-import * as AiTelemetry from './aiTelemetry'
-import * as ModelDiscovery from './modelDiscovery'
-import * as ProviderRegistry from './providerRegistry'
+import { applyLegacyProviderUpdate, removeLegacyProvider, toLegacyPublicFields } from './legacyProviderSettings'
 
 export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
 
@@ -55,303 +42,112 @@ export const featureCategories = AiFeatureCategory
 const PREFS_KEY = 'ai'
 
 /**
- * Decrypts a saved API key, returning null when it can't be read (e.g. the encryption secret was rotated).
- * @param {string} apiKeyEncrypted - Encrypted key.
- * @returns {string|null} The key, or null.
- */
-const tryDecrypt = (apiKeyEncrypted) => {
-  try {
-    return SecretBox.decrypt(apiKeyEncrypted)
-  } catch {
-    return null
-  }
-}
-
-const sanitiseProvider = (provider) => {
-  if (!ProviderRegistry.isSupported(provider)) {
-    throw new SystemError('aiProviderInvalid', { provider })
-  }
-  return provider
-}
-
-/**
- * Returns the effective API key to use: the draft value when supplied,
- * otherwise decrypts and returns the user's saved key (null on failure).
- * @param {object} args - Args.
- * @param {object} args.user - Arena user.
- * @param {string} [args.apiKey] - Draft API key from the form.
- * @returns {string|null} Decrypted key, or null when unavailable.
- */
-const resolveApiKey = ({ user, apiKey }) => {
-  if (typeof apiKey === 'string' && apiKey.length > 0) return apiKey
-  const raw = getRawPrefs(user)
-  if (!raw?.apiKeyEncrypted) return null
-  return tryDecrypt(raw.apiKeyEncrypted)
-}
-
-/**
- * Returns the user-facing settings shape (no secrets) for the AI Settings
- * page.
+ * Returns the user-facing settings (no secrets) for the AI settings panel.
  * @param {object} user - Arena user.
- * @returns {object} Settings descriptor with `hasApiKey` rather than the key itself.
+ * @returns {object} The access level, toggles, default provider, public provider entries and the old flat fields.
  */
 export const getPublicSettings = (user) => {
   const raw = getRawPrefs(user)
-  if (!raw) {
-    return {
-      accessLevel: 0,
-      featuresEnabled: false,
-      featureToggles: defaultFeatureToggles(),
-      provider: null,
-      model: null,
-      baseUrl: null,
-      enabled: false,
-      hasApiKey: false,
-      apiKeyReadable: false,
-      lastTestOk: null,
-      lastTestAt: null,
-    }
-  }
+  const accessLevel = getAccessLevelForUser(user)
+  const { defaultProviderId, defaultProviderOrigin } = getProviderPrefs(raw)
+  const providers = AiProviderService.getPublicProviders(user)
   return {
-    accessLevel: getAccessLevelForUser(user),
-    featuresEnabled: getAccessLevelForUser(user) > 0,
-    featureToggles: sanitiseFeatureToggles(raw.featureToggles),
-    provider: raw.provider || null,
-    model: raw.model || null,
-    baseUrl: raw.baseUrl || null,
-    enabled: !!raw.enabled,
-    hasApiKey: !!raw.apiKeyEncrypted,
-    apiKeyReadable: !!raw.apiKeyEncrypted && tryDecrypt(raw.apiKeyEncrypted) !== null,
-    lastTestOk: raw.lastTestOk ?? null,
-    lastTestAt: raw.lastTestAt || null,
-  }
-}
-
-/**
- * Returns the call config of the converted personal provider (`acct:legacy`), for the old panel's test without
- * draft fields.
- * @param {object} user - Arena user.
- * @returns {object|null} The config, or null when the user has no converted provider.
- */
-const getLegacyProviderConfig = (user) => {
-  const legacy = findStoredProvider(getProviderPrefs(getRawPrefs(user)), LEGACY_ACCOUNT_PROVIDER_ID)
-  if (!legacy) return null
-  const apiKey = legacy.apiKeyEncrypted ? tryDecrypt(legacy.apiKeyEncrypted) : null
-  return { provider: legacy.type, model: legacy.model, baseUrl: legacy.baseUrl, apiKey }
-}
-
-// Throws when the provider config is incomplete.
-const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
-  if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
-  const requiresBaseUrl =
-    provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
-  if (requiresBaseUrl && !baseUrl) {
-    throw new SystemError('aiBaseUrlMissing', { provider })
-  }
-}
-
-/**
- * Sanitises the submitted provider config, validating it only when the override is enabled.
- * @param {object} args - Args.
- * @param {object} args.update - The submitted settings.
- * @param {boolean} args.overrideEnabled - Whether the user-provider override is active.
- * @returns {{provider: string, model: string|null, baseUrl: string|null}} - The sanitised provider config.
- */
-const extractProviderConfig = ({ update, overrideEnabled }) => {
-  const provider = sanitiseProvider(update.provider)
-  const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
-  const model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
-  const baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
-  if (overrideEnabled) {
-    validateProviderConfig({ provider, model, baseUrl, isFixedEndpoint })
-  }
-  return { provider, model, baseUrl }
-}
-
-/**
- * Persists the user's AI settings, merging into the existing prefs blob and
- * encrypting the key before storage. Pass `apiKey: undefined` to leave the
- * existing key untouched; pass `apiKey: ''` to clear it.
- *
- * Validation rules:
- *   - When the access level is 0 (`featuresEnabled` false), no provider validation is performed
- *     (user is opting out — we just store the toggles and preserve any
- *     prior provider config in case they re-enable later).
- *   - When the access level is above 0 and `enabled` (provider override) is
- *     true, provider + model + (where applicable) baseUrl are required.
- *   - When the access level is above 0 and `enabled` is false, the user is
- *     relying on the admin default — provider fields are persisted as-is
- *     without strict validation, so the form can be saved with empty
- *     provider config.
- * @param {object} args - Update args.
- * @param {object} args.user - The user (will be re-fetched fresh from DB).
- * @param {object} args.update - The new settings.
- * @param {number} [args.update.accessLevel] - Access level (0-3); derived from featuresEnabled when absent.
- * @param {boolean} [args.update.featuresEnabled] - User-level master toggle.
- * @param {object} [args.update.featureToggles] - Per-category booleans.
- * @param {string} [args.update.provider] - Provider key.
- * @param {string} [args.update.model] - Model identifier.
- * @param {string} [args.update.baseUrl] - Optional custom base URL.
- * @param {string} [args.update.apiKey] - New API key (omit to keep existing).
- * @param {boolean} [args.update.enabled] - Whether the user-provider override is active.
- * @returns {Promise<object>} The new public settings descriptor.
- */
-export const saveSettings = async ({ user, update }) => {
-  const existing = getRawPrefs(user) || {}
-  const { accessLevel, featuresEnabled, featureToggles } = resolveSavedAccess(update)
-  const overrideEnabled = !!update.enabled
-
-  // Encrypt-or-clear the API key independently of featuresEnabled so the
-  // user can drop their key without flipping the master toggle off.
-  let apiKeyEncrypted = existing.apiKeyEncrypted || null
-  if (typeof update.apiKey === 'string') {
-    apiKeyEncrypted = update.apiKey.length === 0 ? null : SecretBox.encrypt(update.apiKey)
-  }
-
-  // Provider config defaults: preserve existing values when the user isn't
-  // submitting a new one.
-  let provider = existing.provider || null
-  let model = existing.model || null
-  let baseUrl = existing.baseUrl || null
-
-  if (featuresEnabled && update.provider) {
-    ;({ provider, model, baseUrl } = extractProviderConfig({ update, overrideEnabled }))
-  }
-
-  const newAi = {
     accessLevel,
-    featuresEnabled,
-    featureToggles,
-    provider,
-    model,
-    baseUrl,
-    apiKeyEncrypted,
-    enabled: overrideEnabled,
-    // Saving invalidates the previous test result.
-    lastTestOk: null,
-    lastTestAt: existing.lastTestAt || null,
+    featuresEnabled: accessLevel > 0,
+    featureToggles: sanitiseFeatureToggles(raw?.featureToggles),
+    defaultProviderId,
+    defaultProviderOrigin,
+    providers,
+    // single-provider fields of the old panel (removed with it in plan 3b)
+    ...toLegacyPublicFields({ providers, defaultProviderId }),
   }
-
-  const prefs = User.getPrefs(user) || {}
-  const newPrefs = { ...prefs, [PREFS_KEY]: newAi }
-  const userUpdated = { ...user, prefs: newPrefs }
-
-  await UserManager.updateUserPrefs(userUpdated)
-  return userUpdated
 }
 
 /**
- * Removes the user's personal provider (provider, model, base URL, API key); the AI switches stay. Subsequent AI
- * calls fall through to the admin default.
- * @param {object} args - Args.
- * @param {object} args.user - The user.
+ * Stores the AI prefs of the user.
+ * @param {object} user - Arena user.
+ * @param {object} aiPrefs - AI prefs to store.
  * @returns {Promise<object>} The updated user.
  */
-export const clearSettings = async ({ user }) => {
+const writeAiPrefs = async (user, aiPrefs) => {
   const prefs = User.getPrefs(user) || {}
-  const aiPrefs = withoutPersonalProvider(prefs[PREFS_KEY] || null)
-  if (!aiPrefs) return user
   const userUpdated = { ...user, prefs: { ...prefs, [PREFS_KEY]: aiPrefs } }
   await UserManager.updateUserPrefs(userUpdated)
   return userUpdated
 }
 
 /**
- * Issues a tiny "say ok" call to the configured provider so the user knows
- * their key works before relying on it. Stamps `lastTestOk` / `lastTestAt`
- * on success and on failure so the AI Settings UI can surface staleness.
- *
- * When draft params (provider, model, baseUrl, apiKey) are supplied they take
- * precedence over the persisted config so the UI can test unsaved changes.
- * If apiKey is omitted the saved encrypted key is used as a fallback.
- * @param {object} args - Args.
+ * Saves the profile part of the AI settings (access level and toggles). The old body (`featuresEnabled`, `enabled`,
+ * `provider`, `model`, `baseUrl`, `apiKey`) still saves the personal provider as `acct:legacy`.
+ * @param {object} args - Update args.
  * @param {object} args.user - The user.
- * @param {string} [args.provider] - Draft provider (overrides saved config).
- * @param {string} [args.model] - Draft model.
- * @param {string} [args.baseUrl] - Draft base URL.
- * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
- * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} Test result.
+ * @param {object} args.update - Request body (untrusted).
+ * @returns {Promise<object>} The updated user.
  */
-export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
-  let cfg
-  if (provider) {
-    const providerSanitised = sanitiseProvider(String(provider))
-    const trimmedModel = model ? String(model).trim() : null
-    const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
-    const effectiveApiKey = resolveApiKey({ user, apiKey })
-    cfg = {
-      provider: providerSanitised,
-      model: trimmedModel || null,
-      baseUrl: trimmedBaseUrl || null,
-      apiKey: effectiveApiKey,
-    }
-  } else {
-    cfg = getLegacyProviderConfig(user)
-  }
-  if (!cfg) {
-    return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
-  }
-  const start = Date.now()
-  try {
-    const model = await ProviderRegistry.buildUserModel(cfg)
-    const ctx = {
-      feature: 'testConnection',
-      source: 'user',
-      provider: cfg.provider,
-      model: cfg.model,
-      userUuid: user.uuid,
-    }
-    await AiTelemetry.track(ctx, () =>
-      generateText({ model, prompt: 'Reply with the single word: ok', maxOutputTokens: 16, maxRetries: 0 })
-    )
-    const latencyMs = Date.now() - start
-    await stampTestResult({ user, ok: true })
-    return { ok: true, latencyMs }
-  } catch (error) {
-    const latencyMs = Date.now() - start
-    await stampTestResult({ user, ok: false })
-    return {
-      ok: false,
-      latencyMs,
-      errorMessage: error?.message || String(error),
-      errorKey: error instanceof SystemError ? error.key : undefined,
-      errorParams: error instanceof SystemError ? error.params : undefined,
-    }
-  }
+export const saveSettings = async ({ user, update }) => {
+  const existing = getRawPrefs(user)
+  const access = resolveSavedAccess(update)
+  const deps = AiProviderService.createDefaultAiProviderServiceDeps()
+  const providerPrefs = applyLegacyProviderUpdate({
+    prefs: getProviderPrefs(existing),
+    update,
+    // encryptKey: 409 aiEncryptionMissing, not a 500, when the server has no secret
+    encrypt: (plain) => AiProviderService.encryptKey(plain, deps),
+  })
+  return writeAiPrefs(user, withProviderPrefs({ ...existing, ...access }, providerPrefs))
 }
 
 /**
- * List the models offered by the given provider, so the AI Settings panel
- * can populate the Model field as a dropdown instead of free-text.
- *
- * If `apiKey` is omitted/empty but the user already has a saved encrypted
- * key, that saved key is decrypted and used — this lets the panel
- * auto-fetch on blur without forcing the user to re-enter the key on every
- * edit.
+ * Removes the personal provider of the old panel (`acct:legacy`); the access settings and the other providers stay.
+ * @param {object} args - Args.
+ * @param {object} args.user - The user.
+ * @returns {Promise<object>} The updated user.
+ */
+export const clearSettings = async ({ user }) => {
+  const existing = getRawPrefs(user)
+  if (!existing) return user
+  return writeAiPrefs(user, withProviderPrefs(existing, removeLegacyProvider(getProviderPrefs(existing))))
+}
+
+/**
+ * Returns `acct:legacy` when the user has it, so the old panel's calls are checked as a saved provider.
+ * @param {object} user - Arena user.
+ * @returns {string|undefined} The id, or undefined.
+ */
+const getLegacyProviderId = (user) =>
+  findStoredProvider(getProviderPrefs(getRawPrefs(user)), LEGACY_ACCOUNT_PROVIDER_ID)
+    ? LEGACY_ACCOUNT_PROVIDER_ID
+    : undefined
+
+/**
+ * Old panel test (POST /api/ai/settings/test): the draft is checked against `acct:legacy`, whose key is reused only
+ * on its own endpoint.
+ * @param {object} args - Args.
+ * @param {object} args.user - The user.
+ * @param {string} [args.provider] - Draft provider.
+ * @param {string} [args.model] - Draft model.
+ * @param {string} [args.baseUrl] - Draft base URL.
+ * @param {string} [args.apiKey] - Draft API key.
+ * @returns {Promise<object>} The test result.
+ */
+export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
+  const id = getLegacyProviderId(user)
+  if (!provider && !id) return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
+  const input = provider ? { id, type: provider, model, baseUrl, apiKey } : { id }
+  return AiProviderService.testProvider({ user, input })
+}
+
+/**
+ * Old panel model list (POST /api/ai/settings/models), with the same key rule as testConnection.
  * @param {object} args - Args.
  * @param {object} args.user - Arena user.
  * @param {string} args.provider - Provider key.
- * @param {string} [args.baseUrl] - Base URL (for openai-compatible / Vercel AI SDK).
- * @param {string} [args.apiKey] - API key from the form, if any.
+ * @param {string} [args.baseUrl] - Base URL.
+ * @param {string} [args.apiKey] - API key typed in the form.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models.
  */
-export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
-  sanitiseProvider(provider)
-  const effectiveApiKey = resolveApiKey({ user, apiKey })
-  const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
-  const models = await ModelDiscovery.listForProvider({
-    provider,
-    baseUrl: trimmedBaseUrl,
-    apiKey: effectiveApiKey,
+export const listModels = async ({ user, provider, baseUrl, apiKey }) =>
+  AiProviderService.listProviderModels({
+    user,
+    input: { id: getLegacyProviderId(user), type: provider, baseUrl, apiKey },
   })
-  return { models }
-}
-
-const stampTestResult = async ({ user, ok }) => {
-  const prefs = User.getPrefs(user) || {}
-  const existing = prefs[PREFS_KEY]
-  if (!existing) return
-  const newAi = { ...existing, lastTestOk: ok, lastTestAt: new Date().toISOString() }
-  const userUpdated = { ...user, prefs: { ...prefs, [PREFS_KEY]: newAi } }
-  await UserManager.updateUserPrefs(userUpdated)
-}

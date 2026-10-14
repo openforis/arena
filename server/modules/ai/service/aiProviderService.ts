@@ -187,7 +187,7 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
  * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {string} The type.
  */
-const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
+export const assertType = (type: unknown, deps: AiProviderServiceDeps): string => {
   const valid =
     typeof type === 'string' && (ProviderRegistry.isSupported(type) || (type === MOCK_PROVIDER && deps.isMockEnabled()))
   if (!valid) throw badRequest('aiProviderInvalid', { provider: String(type).slice(0, 64) })
@@ -213,7 +213,7 @@ const findOwnProvider = (prefs: AiProviderPrefs, id: unknown): StoredAiProvider 
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
  * @returns {string|null} The model.
  */
-const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
+export const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
   // the Vercel AI SDK endpoint has no model choice
   if (type === AiProvider.vercelAiSdk) return AiProvider.vercelAiSdk
   return input.model === undefined ? (saved?.model ?? null) : trimmedOrNull(input.model)
@@ -226,7 +226,7 @@ const pickModel = (type: string, input: AiProviderInput, saved: StoredAiProvider
  * @param {StoredAiProvider|null} saved - Saved provider, if any.
  * @returns {string|null} The base URL.
  */
-const pickBaseUrl = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
+export const pickBaseUrl = (type: string, input: AiProviderInput, saved: StoredAiProvider | null): string | null => {
   if (!providerTypeUsesBaseUrl(type)) return null
   return input.baseUrl === undefined ? (saved?.baseUrl ?? null) : trimmedOrNull(input.baseUrl)
 }
@@ -292,14 +292,23 @@ const assertKeyPresent = (cfg: AiProviderCallConfig): void => {
 }
 
 /**
+ * Throws when the config lacks a model or a required base URL.
+ * @param {AiProviderCallConfig} cfg - Call config.
+ * @returns {void}
+ */
+export const assertCompleteConfig = (cfg: AiProviderCallConfig): void => {
+  if (!cfg.model) throw badRequest('aiModelMissing', { provider: cfg.provider })
+  if (providerTypeUsesBaseUrl(cfg.provider) && !cfg.baseUrl)
+    throw badRequest('aiBaseUrlMissing', { provider: cfg.provider })
+}
+
+/**
  * Throws when the config cannot make a call (model, base URL, key).
  * @param {AiProviderCallConfig} cfg - Call config.
  * @returns {void}
  */
 const validateConfig = (cfg: AiProviderCallConfig): void => {
-  if (!cfg.model) throw badRequest('aiModelMissing', { provider: cfg.provider })
-  if (providerTypeUsesBaseUrl(cfg.provider) && !cfg.baseUrl)
-    throw badRequest('aiBaseUrlMissing', { provider: cfg.provider })
+  assertCompleteConfig(cfg)
   assertKeyPresent(cfg)
 }
 
@@ -424,7 +433,7 @@ export const getPublicProviders = (
  * @param {AiProviderInput} input - Request input (untrusted).
  * @returns {AiProviderInput} The input with a normalised `apiKey`.
  */
-const normalizeInput = (input: AiProviderInput): AiProviderInput => {
+export const normalizeInput = (input: AiProviderInput): AiProviderInput => {
   const { apiKey } = input
   const sent = typeof apiKey === 'string' && (apiKey === '' || apiKey.trim() !== '')
   return { ...input, apiKey: sent ? apiKey : undefined }

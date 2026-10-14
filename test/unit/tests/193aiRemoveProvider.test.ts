@@ -1,5 +1,7 @@
+import { getProviderPrefs, withProviderPrefs } from '@server/modules/ai/service/aiProviderPrefs'
 import { getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
-import { defaultFeatureToggles, withoutPersonalProvider } from '@server/modules/ai/service/aiUserPrefs'
+import { defaultFeatureToggles } from '@server/modules/ai/service/aiUserPrefs'
+import { removeLegacyProvider } from '@server/modules/ai/service/legacyProviderSettings'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import {
   buildSettingsUpdate,
@@ -25,28 +27,20 @@ const storedAi = {
 const spec = (value: string) => PROVIDERS.find((provider) => provider.value === value)!
 
 describe('Remove my provider (server)', () => {
-  test('removes the provider fields and keeps the switches', () => {
-    expect(withoutPersonalProvider(storedAi)).toEqual({
-      featuresEnabled: true,
-      featureToggles: { chat: true, assistantDesign: true },
-      provider: null,
-      model: null,
-      baseUrl: null,
-      apiKeyEncrypted: null,
-      enabled: false,
-      lastTestOk: null,
-      lastTestAt: null,
+  test('removes the converted provider and resets the default; the stored object is not changed', () => {
+    const prefs = getProviderPrefs(storedAi)
+    expect(removeLegacyProvider(prefs)).toEqual({
+      defaultProviderId: 'arena-default',
+      defaultProviderOrigin: 'user',
+      providers: [],
     })
-    // the stored object is not changed
+    expect(prefs.providers).toHaveLength(1)
     expect(storedAi.provider).toBe('openai')
   })
 
-  test('nothing stored: nothing to write', () => {
-    expect(withoutPersonalProvider(null)).toBeNull()
-  })
-
-  test('after the removal the user has the switches and falls back to the admin default', () => {
-    const user = { uuid: 'u1', prefs: { ai: withoutPersonalProvider(storedAi) } }
+  test('after the removal the user has the switches and calls use the admin default', () => {
+    const ai = withProviderPrefs(storedAi, removeLegacyProvider(getProviderPrefs(storedAi)))
+    const user = { uuid: 'u1', prefs: { ai } }
     expect(getPublicSettings(user)).toMatchObject({
       featuresEnabled: true,
       featureToggles: { ...defaultFeatureToggles(), chat: true, assistantDesign: true },
@@ -54,6 +48,7 @@ describe('Remove my provider (server)', () => {
       model: null,
       enabled: false,
       hasApiKey: false,
+      providers: [],
     })
     expect(ProviderResolver.getDefaultGatewayProviderId(user)).toBe('arena-default')
   })
