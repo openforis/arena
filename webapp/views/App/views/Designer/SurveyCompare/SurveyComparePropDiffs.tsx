@@ -1,35 +1,47 @@
 import React from 'react'
 
-import { SurveyComparePropDiff, SurveyComparePropGroup } from '@core/survey/surveyCompare/surveyCompareTypes'
+import { SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import { useI18n } from '@webapp/store/system'
 
-const isEmpty = (value: unknown): boolean => value === undefined || value === null
+import { formatValue, getPropLabel } from './surveyCompareValueFormatter'
 
-const PropValue = ({ value }: { value: unknown }) => {
+const PropValue = ({ propKey, value }: { propKey: string; value: unknown }) => {
   const i18n = useI18n()
-  if (isEmpty(value)) {
+  const lines = formatValue({ t: i18n.t, key: propKey, value })
+  if (lines.length === 0) {
     return <span className="survey-compare__value-empty">{i18n.t('surveyCompareView.emptyValue')}</span>
   }
-  if (typeof value === 'object') {
-    return <pre className="survey-compare__value">{JSON.stringify(value, null, 2)}</pre>
-  }
-  return <span className="survey-compare__value">{String(value)}</span>
+  return (
+    <div className="survey-compare__value">
+      {lines.map(({ label, value: lineValue, indent, separator, code }, index) =>
+        separator ? (
+          <hr key={index} className="survey-compare__value-separator" />
+        ) : (
+          <div key={index} className="survey-compare__value-line" style={{ paddingLeft: `${indent}rem` }}>
+            {label && <span className="survey-compare__value-label">{label}</span>}
+            {label && lineValue !== undefined && ': '}
+            {lineValue !== undefined && (
+              <span className={code ? 'survey-compare__value-code' : undefined}>{lineValue}</span>
+            )}
+          </div>
+        )
+      )}
+    </div>
+  )
 }
 
 const PropLabel = ({ propDiff }: { propDiff: SurveyComparePropDiff }) => {
   const i18n = useI18n()
-  const { key, group, cycle } = propDiff
-  const groupLabel = group === SurveyComparePropGroup.props ? null : i18n.t(`surveyCompareView.propGroups.${group}`)
-  const cycleLabel = cycle === undefined ? null : i18n.t('surveyCompareView.cycle', { cycle: Number(cycle) + 1 })
+  const { key, cycle } = propDiff
   return (
     <>
-      <span className="survey-compare__prop-key">{key}</span>
-      {[groupLabel, cycleLabel].filter(Boolean).map((label) => (
-        <span key={label} className="survey-compare__prop-group">
-          {label}
+      <span className="survey-compare__prop-key">{getPropLabel({ t: i18n.t, key })}</span>
+      {cycle !== undefined && (
+        <span className="survey-compare__prop-group">
+          {i18n.t('surveyCompareView.cycle', { cycle: Number(cycle) + 1 })}
         </span>
-      ))}
+      )}
     </>
   )
 }
@@ -53,10 +65,10 @@ export const SurveyComparePropDiffs = ({ propDiffs }: { propDiffs: SurveyCompare
               <PropLabel propDiff={propDiff} />
             </td>
             <td className="survey-compare__source">
-              <PropValue value={propDiff.source} />
+              <PropValue propKey={propDiff.key} value={propDiff.source} />
             </td>
             <td className="survey-compare__target">
-              <PropValue value={propDiff.target} />
+              <PropValue propKey={propDiff.key} value={propDiff.target} />
             </td>
           </tr>
         ))}

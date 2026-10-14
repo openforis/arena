@@ -180,7 +180,7 @@
   }
 
   &__prop-key {
-    font-family: monospace;
+    font-weight: 600;
   }
 
   &__prop-group {
@@ -190,10 +190,26 @@
   }
 
   &__value {
-    margin: 0;
-    white-space: pre-wrap;
+    font-size: 0.85rem;
     word-break: break-word;
-    font-size: 0.8rem;
+  }
+
+  &__value-line {
+    white-space: pre-wrap;
+  }
+
+  &__value-label {
+    color: #666;
+  }
+
+  &__value-code {
+    font-family: monospace;
+  }
+
+  &__value-separator {
+    margin: 0.25rem 0;
+    border: none;
+    border-top: 1px dashed rgba(0, 0, 0, 0.15);
   }
 
   &__value-empty {
