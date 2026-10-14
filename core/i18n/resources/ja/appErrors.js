@@ -110,6 +110,8 @@ export default {
   userHasRole: 'このユーザーは既にこの調査で役割を持っています',
   userHasRole_other: 'これらのユーザーは既にこの調査で役割を持っています',
   userInvalid: '無効なユーザーです',
+  surveyCompareFileTooLarge:
+    '調査ファイルが大きすぎます（最大 {{maxSize}} MB）：データなしで調査をエクスポートしてください。調査の比較にレコードとそのファイルは不要です',
   userIsAdmin: 'このユーザーは既にシステム管理者です',
   userNotAllowedToChangePref: 'このユーザーは設定を変更する権限がありません',
   userNotAuthorized: 'ユーザー{{userName}}には権限がありません',

@@ -354,6 +354,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     formDesigner: 'Designer de formulário',
     surveyHierarchy: 'Hierarquia',
     surveyDependencyTree: 'Árvore de dependências',
+    surveyCompare: 'Comparar / atualizar a partir de arquivo',
     category: 'Categoria',
     categories: 'Categorias',
     nodeDef: 'Definição de nó',

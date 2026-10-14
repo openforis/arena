@@ -353,6 +353,7 @@ export default {
     formDesigner: 'Дизайнер форм',
     surveyHierarchy: 'Иерархия',
     surveyDependencyTree: 'Дерево зависимостей',
+    surveyCompare: 'Сравнить / обновить из файла',
     category: 'Категория',
     categories: 'Категории',
     nodeDef: 'Определение узла',

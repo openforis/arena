@@ -325,6 +325,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     formDesigner: 'Diseñador de formularios',
     surveyHierarchy: 'Jerarquía',
     surveyDependencyTree: 'Árbol de dependencias',
+    surveyCompare: 'Comparar / actualizar desde archivo',
     category: 'Categoría',
     categories: 'Categorías',
     nodeDef: 'Definición de nodo',

@@ -114,6 +114,8 @@ export default {
   userHasRole: 'El usuario dado ya tiene un rol en esta encuesta',
   userHasRole_other: 'Los usuarios dados ya tienen un rol en esta encuesta',
   userInvalid: 'Usuario inválido',
+  surveyCompareFileTooLarge:
+    'El archivo de la encuesta es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',

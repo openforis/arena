@@ -354,6 +354,7 @@ export default {
     formDesigner: 'Маягтын дизайнер',
     surveyHierarchy: 'Иерархи',
     surveyDependencyTree: 'Хамаарлын мод',
+    surveyCompare: 'Харьцуулах / файлаас шинэчлэх',
     category: 'Ангилал',
     categories: 'Ангилалууд',
     nodeDef: 'Зангилааны тодорхойлолт',

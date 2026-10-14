@@ -115,6 +115,8 @@ Essayez de rafraîchir la page.`,
   userHasRole: "L'utilisateur a déjà un rôle dans ce formulaire",
   userHasRole_other: 'Les utilisateurs ont déjà un rôle dans ce formulaire',
   userInvalid: 'Utilisateur invalide',
+  surveyCompareFileTooLarge:
+    'Le fichier du formulaire est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
   userIsAdmin: "L'utilisateur est déjà administrateur système",
   userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
   userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
