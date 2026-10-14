@@ -387,6 +387,28 @@ describe('AI provider service (261)', () => {
     )
   })
 
+  test('a null or blank key is "not sent": the stored key is used and kept', async () => {
+    const { deps, tests, saved, listed } = createDeps()
+    const user = userWithProviders()
+    await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: null }, deps })
+    await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: '   ' }, deps })
+    expect(tests.map((cfg) => cfg.apiKey)).toEqual(['sk-org', 'sk-org'])
+    await AiProviderService.updateProvider({ user, id: 'acct:org', input: { model: 'llama-2', apiKey: null }, deps })
+    expect(tests[2].apiKey).toBe('sk-org')
+    expect(saved.at(-1).providers[1].apiKeyEncrypted).toBe('enc:sk-org')
+    // a changed endpoint never gets the stored key, for model lists either
+    await AiProviderService.listProviderModels({
+      user,
+      input: { id: 'acct:org', baseUrl: 'https://evil.example.com/v1' },
+      deps,
+    })
+    expect(listed).toEqual([
+      { provider: 'openai-compatible', model: 'llama', baseUrl: 'https://evil.example.com/v1', apiKey: null },
+    ])
+    await AiProviderService.listProviderModels({ user, input: { id: 'acct:org' }, deps })
+    expect(listed[1].apiKey).toBe('sk-org')
+  })
+
   test('the new error keys exist in every language', () => {
     const keys = ['aiProviderNotFound', 'aiProviderNotGateway', 'aiApiKeyUnreadable', 'aiEncryptionMissing']
     for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
