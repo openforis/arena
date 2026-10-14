@@ -21,6 +21,26 @@ const ENGINE_ERROR_VIEWS: Record<string, AiEngineErrorView> = {
   aiApiKeyUnreadable: { retry: false, openSettings: true },
 }
 
+// errors of the conversation's provider (down, refused, blocked, removed): the chat offers to pick another one
+const PROVIDER_CHOICE_ERROR_KEYS = new Set([
+  'aiNoEngineAvailable',
+  'aiLocalServerUnreachable',
+  'aiLocalServerModelMissing',
+  'aiProviderChooseAnother',
+  'aiProviderNotFound',
+  'aiApiKeyUnreadable',
+  'aiProviderAuth',
+  'aiProviderUnavailable',
+])
+
+/**
+ * Returns true when another provider may answer where this one failed.
+ * @param {string|null|undefined} errorKey - Stored error key of the answer.
+ * @returns {boolean} True for provider errors.
+ */
+export const isProviderChoiceError = (errorKey: string | null | undefined): boolean =>
+  typeof errorKey === 'string' && PROVIDER_CHOICE_ERROR_KEYS.has(errorKey)
+
 /**
  * Returns the actions offered for the reasons, once each, in the reasons' order.
  * @param {object} params - Parameters.

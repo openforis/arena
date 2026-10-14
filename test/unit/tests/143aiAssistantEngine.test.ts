@@ -1,4 +1,4 @@
-import { getEngineChangeNotice, resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
+import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 
 const DEFAULT_LIMITS = { maxPromptChars: 200000, maxSteps: 10 }
@@ -19,6 +19,7 @@ const gatewayEngine: AiSelectedEngine = {
   limits: DEFAULT_LIMITS,
 }
 
+/** Builds a resolve function that records its calls and returns the given engine. */
 const createResolve = (engine: AiSelectedEngine) => {
   const calls: unknown[] = []
   const resolve = async (params: unknown) => {
@@ -102,23 +103,5 @@ describe('resolveAssistantEngine', () => {
         resolve,
       })
     ).rejects.toBe(error)
-  })
-})
-
-describe('getEngineChangeNotice', () => {
-  test('nothing on the first turn, nor when the engine is the same', () => {
-    expect(getEngineChangeNotice({ previous: null, engine: localEngine })).toBeNull()
-    const previous = { hostingClass: 'onDevice' as const, provider: null, model: 'local-model', engine: 'LM Studio' }
-    expect(getEngineChangeNotice({ previous, engine: localEngine })).toBeNull()
-  })
-
-  test('the new location when the engine changed (local server stopped)', () => {
-    const previous = { hostingClass: 'onDevice' as const, provider: null, model: 'local-model', engine: 'LM Studio' }
-    expect(getEngineChangeNotice({ previous, engine: gatewayEngine })).toEqual({
-      hostingClass: 'cloud',
-      provider: 'openai',
-      model: 'gateway-model',
-      engine: null,
-    })
   })
 })

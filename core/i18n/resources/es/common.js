@@ -1392,7 +1392,6 @@ $t(common.appNameFull)
       changePolicy: 'Cambiar la política de IA de la encuesta',
       openSettings: 'Abrir la configuración de IA',
     },
-    nowUsing: 'Ahora se usa: {{location}}',
     consent: {
       title: '¿Usar su servidor de IA local?',
       destination: 'Las solicitudes de esta encuesta irán a {{baseUrl}} ({{location}}).',
@@ -1454,6 +1453,18 @@ $t(common.appNameFull)
     open: 'Asistente de IA',
     title: 'Asistente de IA',
     close: 'Cerrar',
+    providerChip: {
+      answerWith: 'Responder con',
+      makeDefault: 'Usarlo como predeterminado',
+      manage: 'Administrar proveedores…',
+      none: 'Sin proveedor · Añadir uno',
+      missing: 'El proveedor predeterminado no está en este equipo',
+      removedNotice: 'Se eliminó el proveedor de esta conversación. Se usa su proveedor predeterminado.',
+      chooseAnother: 'Elegir otro proveedor',
+      defaultFailed: 'No se pudo cambiar el proveedor predeterminado: {{message}}',
+      title: 'Proveedor de IA de esta conversación: {{name}}',
+      isDefault: 'predeterminado',
+    },
     tabs: {
       design: 'Diseño',
       help: 'Ayuda',
