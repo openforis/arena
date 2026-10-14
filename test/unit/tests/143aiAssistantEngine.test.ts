@@ -22,6 +22,7 @@ const gatewayEngine: AiSelectedEngine = {
 /** Builds a resolve function that records its calls and returns the given engine. */
 const createResolve = (engine: AiSelectedEngine) => {
   const calls: unknown[] = []
+  /** Records the call and returns the engine's model. */
   const resolve = async (params: unknown) => {
     calls.push(params)
     return { model: `model of ${engine.id}`, engine }

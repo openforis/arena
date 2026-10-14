@@ -7,10 +7,12 @@ import mn from '@core/i18n/resources/mn'
 import pt from '@core/i18n/resources/pt'
 import ru from '@core/i18n/resources/ru'
 
+import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
 import { isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
 import {
   buildProviderChoices,
+  canOpenProviderChooser,
   getConversationProvider,
   getProviderChipLabel,
   getProviderChipView,
@@ -178,6 +180,21 @@ describe('provider chip (271)', () => {
     const current = getConversationProvider({ capabilities: elsewhere })
     expect(current).toEqual({ providerId: 'local:at-home', entry: null, removed: false })
     expect(getProviderChipView({ capabilities: elsewhere, current, status: 'noEngine' })).toEqual({ kind: 'missing' })
+  })
+
+  test('the switcher cannot open when no provider is set up', () => {
+    expect(canOpenProviderChooser(capabilities())).toBe(true)
+    expect(canOpenProviderChooser(capabilities({ providers: [ARENA_NOT_SET_UP] }))).toBe(false)
+  })
+
+  test('a default of another computer keeps the chat open; other engine problems do not', () => {
+    const base = { status: 'noEngine', reasonKeys: ['k'], surveyScoped: true, engine: null } as any
+    const missing = { ...base, reasons: ['missingOnThisBrowser'] }
+    expect(fromAvailability('design', missing)).toMatchObject({ status: 'available', engineAvailability: missing })
+    expect(fromAvailability('design', { ...base, reasons: ['notAvailable'] }).status).toBe('unavailable')
+    expect(fromAvailability('design', { ...base, reasons: ['missingOnThisBrowser', 'policyForbids'] }).status).toBe(
+      'unavailable'
+    )
   })
 
   test('errors of the provider offer the switcher', () => {

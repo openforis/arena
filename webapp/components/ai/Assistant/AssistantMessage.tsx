@@ -14,11 +14,13 @@ import type {
 import { getAiEngineErrorView, isProviderChoiceError } from '@webapp/ai/engines/engineUi'
 import { Button } from '@webapp/components/buttons'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
+import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import type { AssistantArea } from './assistantAreas'
 import { AssistantMarkdown } from './AssistantMarkdown'
+import { canOpenProviderChooser } from './providerChip/providerChipModel'
 import { getProposedChangeSetId, getToolRowLabel, isHiddenToolPart } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
@@ -154,10 +156,12 @@ const AnswerFooter = ({
   const t = useI18nT({ unescapeHtml: true })
   // the record-data notice replaces the composer: the conversation can't continue, so no Retry
   const recordDataNotice = useRecordDataNotice(api.conversation, assistantAreaFeatures[area])
+  const capabilities = useAiCapabilities()
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
   // only the key is stored with the message: engine errors get their own Retry / Open settings buttons
   const engineError = { key: message.errorKey }
+  const canChooseProvider = canOpenProviderChooser(capabilities)
   const hasEngineRetry = getAiEngineErrorView(engineError)?.retry === true
   return (
     <div className="ai-assistant-message__error" role="alert">
@@ -165,7 +169,7 @@ const AnswerFooter = ({
       {isLast && !recordDataNotice && (
         <AiEngineErrorActions disabled={api.busy} error={engineError} onRetry={api.retry} />
       )}
-      {isLast && !recordDataNotice && isProviderChoiceError(message.errorKey) && (
+      {isLast && !recordDataNotice && canChooseProvider && isProviderChoiceError(message.errorKey) && (
         <Button
           disabled={api.busy}
           label="aiAssistant.providerChip.chooseAnother"

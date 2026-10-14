@@ -39,6 +39,16 @@ const unavailable = (area: AssistantArea, reasonKeys: string[]): AssistantAreaSt
 })
 
 /**
+ * Returns true when the only reason is a default local provider saved on another computer.
+ * @param {AiEngineFeatureAvailability} availability - Engine availability.
+ * @returns {boolean} True when the chat should open for the user to choose a provider.
+ */
+const isOnlyMissingOnThisBrowser = (availability: AiEngineFeatureAvailability): boolean =>
+  availability.status === 'noEngine' &&
+  availability.reasons.length > 0 &&
+  availability.reasons.every((reason) => reason === 'missingOnThisBrowser')
+
+/**
  * Maps the availability of a feature (B) to an area status.
  * @param {AssistantArea} area - Area.
  * @param {AiFeatureAvailability|AiEngineFeatureAvailability} availability - Feature availability.
@@ -57,6 +67,11 @@ export const fromAvailability = (
       ...unavailable(area, reasonKeys.length > 0 ? reasonKeys : ['aiAssistant.unavailable.policy']),
       engineAvailability,
     }
+  }
+  // the default is a local provider of another computer: the chat opens with its chip, which names the problem and
+  // opens the switcher; nothing is sent until another provider is picked
+  if (engineAvailability && isOnlyMissingOnThisBrowser(engineAvailability)) {
+    return { area, status: 'available', reasonKeys: [], engineAvailability }
   }
   // noEngine (C)
   return { ...unavailable(area, reasonKeys), engineAvailability }

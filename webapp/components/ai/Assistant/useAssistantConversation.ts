@@ -282,6 +282,8 @@ export const useAssistantConversation = ({
         ? withConversationProvider({ conversation: created, providerId: pendingProviderId })
         : created
       const base = suggestion ? withSuggestionScope(fresh, suggestion.scope) : (selected ?? fresh)
+      // the pick belongs to the conversation it created: later new chats start from the default
+      setPendingProviderId(undefined)
       // the turn shows and selects its conversation synchronously, before its first await
       void runTurn(base, text, displayText)
       return Promise.resolve(base.id)
@@ -304,6 +306,8 @@ export const useAssistantConversation = ({
   const chooseProvider = useCallback(
     (providerId: string) => {
       const shown = conversationId && conversationRef.current?.id === conversationId ? conversationRef.current : null
+      // the conversation is still loading: a pick would be lost
+      if (conversationId && !shown) return
       if (!shown) {
         setPendingProviderId(providerId)
         return
@@ -319,11 +323,13 @@ export const useAssistantConversation = ({
   // a blank chat: the conversation is created by its first message
   const newConversation = useCallback(() => {
     setPendingProviderId(undefined)
+    setProviderChooserOpen(false)
     assistantPanelStore.startNewConversation()
   }, [])
 
   const openConversation = useCallback((id: string) => {
     setPendingProviderId(undefined)
+    setProviderChooserOpen(false)
     assistantPanelStore.setConversationId(id)
   }, [])
 

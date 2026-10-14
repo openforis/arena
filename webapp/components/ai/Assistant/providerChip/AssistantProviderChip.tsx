@@ -14,7 +14,11 @@ import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvai
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
-import { getProviderDisplayName, getProviderMonogramType } from '@webapp/components/ai/UserAiSettingsPanel/providerList'
+import {
+  getProviderDisplayName,
+  getProviderMonogramType,
+  getProviderWhereKey,
+} from '@webapp/components/ai/UserAiSettingsPanel/providerList'
 import { useNotifyError } from '@webapp/components/hooks'
 import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { useI18nT } from '@webapp/store/system'
@@ -68,14 +72,17 @@ const ProviderChoiceRow = ({
   return (
     <button
       aria-checked={selected}
+      // not `disabled`: a blocked row stays focusable so its reason is read out
+      aria-disabled={disabled}
       className={classNames('ai-provider-chooser__row', {
         'ai-provider-chooser__row--selected': selected,
         'ai-provider-chooser__row--blocked': disabled,
       })}
       data-testid={TestId.aiAssistant.providerChoice(entry.id)}
-      disabled={disabled}
-      onClick={() => onChoose(entry.id)}
-      role="menuitemradio"
+      onClick={() => {
+        if (!disabled) onChoose(entry.id)
+      }}
+      role="radio"
       type="button"
     >
       <span aria-hidden="true" className="ai-provider-chooser__radio" />
@@ -190,20 +197,23 @@ export const AssistantProviderChip = (props: Props) => {
   }
   const label =
     view.kind === 'provider' ? getProviderChipLabel({ entry: view.entry, t }) : t('aiAssistant.providerChip.missing')
+  // where the provider runs is part of the accessible name and the tooltip, not of the visible text
+  const whereKey = view.kind === 'provider' ? getProviderWhereKey(view.entry) : null
+  const fullLabel = whereKey ? `${label} · ${t(`userAiSettings:where.${whereKey}`)}` : label
   const tone = view.kind === 'provider' ? view.tone : 'bad'
 
   return (
     <>
       <button
         aria-expanded={open}
-        aria-haspopup="menu"
-        aria-label={t('aiAssistant.providerChip.title', { name: label })}
+        aria-haspopup="dialog"
+        aria-label={t('aiAssistant.providerChip.title', { name: fullLabel })}
         className={`ai-provider-chip ai-provider-chip--${tone}`}
         data-testid={TestId.aiAssistant.providerChip}
         disabled={disabled}
         onClick={() => onOpenChange(!open)}
         ref={setAnchor}
-        title={label}
+        title={fullLabel}
         type="button"
       >
         <span aria-hidden="true" className="ai-provider-chip__dot" />
@@ -223,12 +233,18 @@ export const AssistantProviderChip = (props: Props) => {
           aria-label={t('aiAssistant.providerChip.answerWith')}
           className="ai-provider-chooser"
           data-testid={TestId.aiAssistant.providerChooser}
-          role="menu"
+          role="dialog"
         >
           <span className="ai-provider-chooser__title">{t('aiAssistant.providerChip.answerWith')}</span>
-          {choices.map((choice) => (
-            <ProviderChoiceRow choice={choice} key={choice.entry.id} onChoose={choose} t={t} />
-          ))}
+          <div
+            aria-label={t('aiAssistant.providerChip.answerWith')}
+            className="ai-provider-chooser__rows"
+            role="radiogroup"
+          >
+            {choices.map((choice) => (
+              <ProviderChoiceRow choice={choice} key={choice.entry.id} onChoose={choose} t={t} />
+            ))}
+          </div>
           <div className="ai-provider-chooser__footer">
             <label className="ai-provider-chooser__default">
               <input
