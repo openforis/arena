@@ -268,7 +268,8 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - `server/modules/surveyCompare/`: `SurveyCompareJob` (reads the uploaded zip, keeps it as a temp file, writes the
   result to a temp file), `SurveyCompareApplyJob` (computes the comparison again and applies the selected changes as
   draft), API under `/survey/:surveyId/compare`.
-- `webapp/views/App/views/Designer/SurveyCompare/`: Designer → "Compare / update from file".
+- `webapp/views/App/views/Designer/SurveyCompare/`: Designer → "Compare / update from file"; texts in the
+  `surveyCompareView` i18n namespace (`core/i18n/resources/en/surveyCompareView.ts`).
 - Applied in phase 1: added node defs (same uuid as in the source, parent layout updated), changed node def props
   (expressions, validations, labels, layout, ...), added categories, added/changed category items, category name and
   extra props definitions.

@@ -20,7 +20,7 @@ const ItemsCount = ({ diff }: { diff: SurveyCompareCategoryDiff }) => {
   if (added + changed + removed === 0) return null
   return (
     <span className="survey-compare__row-note">
-      {i18n.t('surveyCompareView.itemsCount', { added, changed, removed })}
+      {i18n.t('surveyCompareView:itemsCount', { added, changed, removed })}
     </span>
   )
 }
@@ -28,7 +28,7 @@ const ItemsCount = ({ diff }: { diff: SurveyCompareCategoryDiff }) => {
 const CategoryDiffDetails = ({ diff }: { diff?: SurveyCompareCategoryDiff }) => {
   const i18n = useI18n()
   if (!diff) {
-    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.selectItem')}</div>
+    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:selectItem')}</div>
   }
   const itemsShown = diff.items.slice(0, maxItemsShown)
   return (
@@ -43,9 +43,9 @@ const CategoryDiffDetails = ({ diff }: { diff?: SurveyCompareCategoryDiff }) => 
         <table className="survey-compare__prop-diffs">
           <thead>
             <tr>
-              <th>{i18n.t('surveyCompareView.itemCode')}</th>
-              <th>{i18n.t('surveyCompareView.statusLabel')}</th>
-              <th>{i18n.t('surveyCompareView.changes')}</th>
+              <th>{i18n.t('surveyCompareView:itemCode')}</th>
+              <th>{i18n.t('surveyCompareView:statusLabel')}</th>
+              <th>{i18n.t('surveyCompareView:changes')}</th>
             </tr>
           </thead>
           <tbody>
@@ -65,7 +65,7 @@ const CategoryDiffDetails = ({ diff }: { diff?: SurveyCompareCategoryDiff }) => 
       )}
       {diff.items.length > maxItemsShown && (
         <div className="survey-compare__details-info">
-          {i18n.t('surveyCompareView.moreItems', { count: diff.items.length - maxItemsShown })}
+          {i18n.t('surveyCompareView:moreItems', { count: diff.items.length - maxItemsShown })}
         </div>
       )}
     </div>
@@ -95,7 +95,7 @@ export const SurveyCompareCategories = ({
     <div className="survey-compare__split">
       <div className="survey-compare__tree">
         {diffs.length === 0 && (
-          <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.noDifferences')}</div>
+          <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
         )}
         {diffs.map((diff) => (
           <div

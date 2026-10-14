@@ -42,7 +42,7 @@ const NodeDefDiffDetails = ({
 }) => {
   const i18n = useI18n()
   if (!diff) {
-    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.selectItem')}</div>
+    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:selectItem')}</div>
   }
   return (
     <div className="survey-compare__details">
@@ -51,17 +51,17 @@ const NodeDefDiffDetails = ({
         <span className="survey-compare__details-path">{diff.path}</span>
       </div>
       {diff.matchedBy && (
-        <div className="survey-compare__details-info">{i18n.t(`surveyCompareView.matchedBy.${diff.matchedBy}`)}</div>
+        <div className="survey-compare__details-info">{i18n.t(`surveyCompareView:matchedBy.${diff.matchedBy}`)}</div>
       )}
       <ApplicabilityMessages applicability={diff.applicability} />
       {diff.dependsOn.length > 0 && (
         <div className="survey-compare__details-info">
-          {i18n.t('surveyCompareView.dependsOn')}{' '}
+          {i18n.t('surveyCompareView:dependsOn')}{' '}
           {diff.dependsOn.map((id: string) => diffsById[id]?.path ?? diffsById[id]?.name ?? id).join(', ')}
         </div>
       )}
       {diff.status === SurveyCompareStatus.identical && (
-        <div className="survey-compare__details-info">{i18n.t('surveyCompareView.identicalItem')}</div>
+        <div className="survey-compare__details-info">{i18n.t('surveyCompareView:identicalItem')}</div>
       )}
       <SurveyComparePropDiffs propDiffs={diff.propDiffs} />
     </div>
@@ -103,7 +103,7 @@ export const SurveyCompareNodeDefs = ({
     <div className="survey-compare__split">
       <div className="survey-compare__tree">
         {visibleDiffs.length === 0 && (
-          <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.noDifferences')}</div>
+          <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
         )}
         {visibleDiffs.map((diff) => (
           <div
@@ -125,7 +125,7 @@ export const SurveyCompareNodeDefs = ({
             <span className="survey-compare__row-type">{diff.type}</span>
             <StatusBadge status={diff.status} />
             {diff.layoutOnly && (
-              <span className="survey-compare__row-note">{i18n.t('surveyCompareView.layoutOnly')}</span>
+              <span className="survey-compare__row-note">{i18n.t('surveyCompareView:layoutOnly')}</span>
             )}
             <ApplicabilityIcon applicability={diff.applicability} />
           </div>

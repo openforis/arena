@@ -28,7 +28,7 @@ describe('SurveyCompare value formatter', () => {
       'nodeDefEdit.validationsProps.expressions',
       'nodeDefEdit.expressionsProp.expression: dbh < height',
       'nodeDefEdit.expressionsProp.severity: common.warning',
-      'surveyCompareView.props.messages',
+      'surveyCompareView:props.messages',
       'en: Too big',
     ])
   })
@@ -47,8 +47,8 @@ describe('SurveyCompare value formatter', () => {
     const value = { renderType: 'form', layoutChildren: [{ i: 'dbh', x: 0, y: 1, w: 1, h: 1 }] }
     expect(toText(formatValue({ t, key: 'layout', value }))).toEqual([
       'nodeDefEdit.basicProps.displayAs: form',
-      'surveyCompareView.props.formLayout',
-      'dbh: surveyCompareView.props.gridPosition {"row":2,"column":1,"width":1,"height":1}',
+      'surveyCompareView:props.formLayout',
+      'dbh: surveyCompareView:props.gridPosition {"row":2,"column":1,"width":1,"height":1}',
     ])
   })
 })

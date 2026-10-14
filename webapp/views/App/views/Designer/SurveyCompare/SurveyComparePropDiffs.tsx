@@ -10,7 +10,7 @@ const PropValue = ({ propKey, value }: { propKey: string; value: unknown }) => {
   const i18n = useI18n()
   const lines = formatValue({ t: i18n.t, key: propKey, value })
   if (lines.length === 0) {
-    return <span className="survey-compare__value-empty">{i18n.t('surveyCompareView.emptyValue')}</span>
+    return <span className="survey-compare__value-empty">{i18n.t('surveyCompareView:emptyValue')}</span>
   }
   return (
     <div className="survey-compare__value">
@@ -39,7 +39,7 @@ const PropLabel = ({ propDiff }: { propDiff: SurveyComparePropDiff }) => {
       <span className="survey-compare__prop-key">{getPropLabel({ t: i18n.t, key })}</span>
       {cycle !== undefined && (
         <span className="survey-compare__prop-group">
-          {i18n.t('surveyCompareView.cycle', { cycle: Number(cycle) + 1 })}
+          {i18n.t('surveyCompareView:cycle', { cycle: Number(cycle) + 1 })}
         </span>
       )}
     </>
@@ -53,9 +53,9 @@ export const SurveyComparePropDiffs = ({ propDiffs }: { propDiffs: SurveyCompare
     <table className="survey-compare__prop-diffs">
       <thead>
         <tr>
-          <th>{i18n.t('surveyCompareView.property')}</th>
-          <th>{i18n.t('surveyCompareView.sourceValue')}</th>
-          <th>{i18n.t('surveyCompareView.targetValue')}</th>
+          <th>{i18n.t('surveyCompareView:property')}</th>
+          <th>{i18n.t('surveyCompareView:sourceValue')}</th>
+          <th>{i18n.t('surveyCompareView:targetValue')}</th>
         </tr>
       </thead>
       <tbody>

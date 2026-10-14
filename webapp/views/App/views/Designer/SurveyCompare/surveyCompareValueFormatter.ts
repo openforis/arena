@@ -15,11 +15,11 @@ const propLabelKeys: Record<string, string> = {
   applicable: 'nodeDefEdit.advancedProps.relevantIf',
   categoryUuid: 'nodeDefEdit.codeProps.category',
   codeShown: 'nodeDefEdit.codeProps.codeShown',
-  columnsNo: 'surveyCompareView.props.columnsNo',
-  cycles: 'surveyCompareView.props.cycles',
+  columnsNo: 'surveyCompareView:props.columnsNo',
+  cycles: 'surveyCompareView:props.cycles',
   defaultValueEvaluatedOneTime: 'nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime',
   defaultValues: 'nodeDefEdit.advancedProps.defaultValues',
-  descriptions: 'surveyCompareView.props.descriptions',
+  descriptions: 'surveyCompareView:props.descriptions',
   editableIf: 'nodeDefEdit.advancedProps.editableIf',
   fileNameExpression: 'nodeDefEdit.fileProps.fileNameExpression',
   fileType: 'nodeDefEdit.fileProps.fileType',
@@ -28,20 +28,20 @@ const propLabelKeys: Record<string, string> = {
   hiddenInReport: 'nodeDefEdit.advancedProps.hiddenInReport',
   hiddenWhenNotRelevant: 'nodeDefEdit.advancedProps.hiddenWhenNotRelevant',
   includeSeconds: 'nodeDefEdit.timeProps.includeSeconds',
-  itemExtraDef: 'surveyCompareView.props.itemExtraDef',
+  itemExtraDef: 'surveyCompareView:props.itemExtraDef',
   itemsFilter: 'nodeDefEdit.advancedProps.itemsFilter',
   key: 'nodeDefEdit.basicProps.key',
-  labels: 'surveyCompareView.props.labels',
+  labels: 'surveyCompareView:props.labels',
   labelValue: 'nodeDefEdit.booleanProps.labelValue',
-  layout: 'surveyCompareView.props.layout',
-  levels: 'surveyCompareView.props.levels',
+  layout: 'surveyCompareView:props.layout',
+  levels: 'surveyCompareView:props.levels',
   mapMarkerColor: 'nodeDefEdit.coordinateProps.mapMarkerColor',
   maxFileSize: 'nodeDefEdit.fileProps.maxFileSize',
   maxNumberDecimalDigits: 'nodeDefEdit.decimalProps.maxNumberDecimalDigits',
   multiple: 'nodeDefEdit.basicProps.multiple',
   name: 'common.name',
   ownPage: 'nodeDefEdit.basicProps.ownPage',
-  parent: 'surveyCompareView.props.parent',
+  parent: 'surveyCompareView:props.parent',
   parentCodeDefUuid: 'nodeDefEdit.codeProps.parentCode',
   readOnly: 'nodeDefEdit.advancedProps.readOnly',
   renderType: 'nodeDefEdit.basicProps.displayAs',
@@ -50,7 +50,7 @@ const propLabelKeys: Record<string, string> = {
   textTransform: 'nodeDefEdit.textProps.textTransform',
   type: 'common.type',
   unit: 'nodeDefEdit.numericProps.unit',
-  validations: 'surveyCompareView.props.validations',
+  validations: 'surveyCompareView:props.validations',
   visibleIf: 'nodeDefEdit.advancedProps.visibleIf',
 }
 
@@ -93,7 +93,7 @@ const formatExpression = ({ t, expression, indent }: { t: Translate; expression:
   if (applyIf) lines.push({ label: t('nodeDefEdit.expressionsProp.applyIf'), value: applyIf, indent })
   if (severity) lines.push({ label: t('nodeDefEdit.expressionsProp.severity'), value: t(`common.${severity}`), indent })
   if (isPlainObject(messages)) {
-    lines.push({ label: t('surveyCompareView.props.messages'), indent })
+    lines.push({ label: t('surveyCompareView:props.messages'), indent })
     lines.push(...formatLabelsByLang({ value: messages, indent: indent + 1 }))
   }
   return lines
@@ -135,14 +135,14 @@ const formatValidations = ({ t, value, indent }: { t: Translate; value: any; ind
 
 const formatLayoutChildren = ({ t, layoutChildren, indent }) => {
   if (layoutChildren.every((child: unknown) => typeof child === 'string')) {
-    return [{ label: t('surveyCompareView.props.columnsOrder'), value: layoutChildren.join(', '), indent }]
+    return [{ label: t('surveyCompareView:props.columnsOrder'), value: layoutChildren.join(', '), indent }]
   }
   const sorted = [...layoutChildren].sort((childA, childB) => childA.y - childB.y || childA.x - childB.x)
   return [
-    { label: t('surveyCompareView.props.formLayout'), indent },
+    { label: t('surveyCompareView:props.formLayout'), indent },
     ...sorted.map(({ i, x = 0, y = 0, w = 1, h = 1 }) => ({
       label: i,
-      value: t('surveyCompareView.props.gridPosition', { row: y + 1, column: x + 1, width: w, height: h }),
+      value: t('surveyCompareView:props.gridPosition', { row: y + 1, column: x + 1, width: w, height: h }),
       indent: indent + 1,
     })),
   ]
@@ -155,7 +155,7 @@ const formatLayout = ({ t, value, indent }: { t: Translate; value: any; indent: 
     lines.push(...formatLayoutChildren({ t, layoutChildren, indent }))
   }
   if (Array.isArray(indexChildren)) {
-    lines.push({ label: t('surveyCompareView.props.pagesOrder'), value: indexChildren.join(', '), indent })
+    lines.push({ label: t('surveyCompareView:props.pagesOrder'), value: indexChildren.join(', '), indent })
   }
   return lines
 }

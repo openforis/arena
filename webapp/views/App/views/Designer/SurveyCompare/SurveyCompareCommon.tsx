@@ -17,7 +17,7 @@ export const StatusBadge = ({ status }: { status: string }) => {
   if (status === SurveyCompareStatus.identical) return null
   return (
     <span className={classNames('survey-compare__badge', `survey-compare__badge--${status}`)}>
-      {i18n.t(`surveyCompareView.status.${status}`)}
+      {i18n.t(`surveyCompareView:status.${status}`)}
     </span>
   )
 }
@@ -34,7 +34,7 @@ export const ApplicabilityMessages = ({ applicability }: { applicability?: Surve
       })}
     >
       {applicability.reasons.map((reason) => (
-        <li key={reason}>{i18n.t(`surveyCompareView.reasons.${reason}`)}</li>
+        <li key={reason}>{i18n.t(`surveyCompareView:reasons.${reason}`)}</li>
       ))}
     </ul>
   )
@@ -44,7 +44,7 @@ export const ApplicabilityIcon = ({ applicability }: { applicability?: SurveyCom
   const i18n = useI18n()
   if (!applicability || applicability.status === SurveyCompareApplicabilityStatus.applicable) return null
   const notApplicable = applicability.status === SurveyCompareApplicabilityStatus.notApplicable
-  const title = applicability.reasons.map((reason) => i18n.t(`surveyCompareView.reasons.${reason}`)).join('\n')
+  const title = applicability.reasons.map((reason) => i18n.t(`surveyCompareView:reasons.${reason}`)).join('\n')
   return (
     <span className={classNames('icon icon-12px', notApplicable ? 'icon-blocked' : 'icon-warning')} title={title} />
   )

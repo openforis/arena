@@ -43,7 +43,7 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
   if (result.identical) {
     return (
       <div className="survey-compare__summary survey-compare__summary--identical">
-        {i18n.t('surveyCompareView.identical')}
+        {i18n.t('surveyCompareView:identical')}
       </div>
     )
   }
@@ -52,10 +52,10 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
     <div className="survey-compare__summary">
       {(['nodeDefs', 'categories', 'taxonomies'] as const).map((key) => (
         <div key={key}>
-          <strong>{i18n.t(`surveyCompareView.tabs.${key}`)}:</strong> {i18n.t('surveyCompareView.counts', counts[key])}
+          <strong>{i18n.t(`surveyCompareView:tabs.${key}`)}:</strong> {i18n.t('surveyCompareView:counts', counts[key])}
         </div>
       ))}
-      {result.surveyInfo.length > 0 && <div>{i18n.t('surveyCompareView.surveyInfoChanged')}</div>}
+      {result.surveyInfo.length > 0 && <div>{i18n.t('surveyCompareView:surveyInfoChanged')}</div>}
     </div>
   )
 }
@@ -64,11 +64,11 @@ const Taxonomies = ({ result, onlyDifferences }: { result: SurveyCompareResult; 
   const i18n = useI18n()
   const diffs = result.taxonomies.filter((diff) => !onlyDifferences || diff.status !== 'identical')
   if (diffs.length === 0) {
-    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.noDifferences')}</div>
+    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
   }
   return (
     <div className="survey-compare__simple-list">
-      <div className="survey-compare__details-info">{i18n.t('surveyCompareView.taxonomiesNote')}</div>
+      <div className="survey-compare__details-info">{i18n.t('surveyCompareView:taxonomiesNote')}</div>
       {diffs.map((diff) => (
         <div key={diff.id} className="survey-compare__simple-item">
           <div className={classNames('survey-compare__row', `survey-compare__row--${diff.status}`)}>
@@ -131,7 +131,7 @@ export const SurveyCompare = () => {
 
   const onApply = useCallback(() => {
     confirm({
-      key: 'surveyCompareView.applyConfirm',
+      key: 'surveyCompareView:applyConfirm',
       params: { count: selectedIds.size },
       onCancel: undefined,
       onOk: async () => {
@@ -148,7 +148,7 @@ export const SurveyCompare = () => {
               const { appliedIds = [], skippedIds = [] } = JobSerialized.getResult(jobCompleted) ?? {}
               dispatch(
                 NotificationActions.notifyInfo({
-                  key: 'surveyCompareView.applyCompleted',
+                  key: 'surveyCompareView:applyCompleted',
                   params: { applied: appliedIds.length, skipped: skippedIds.length },
                   text: undefined,
                 }) as any
@@ -169,26 +169,26 @@ export const SurveyCompare = () => {
       <div className="survey-compare__header">
         <UploadButton
           accept=".zip"
-          label="surveyCompareView.selectFile"
+          label="surveyCompareView:selectFile"
           maxSize={maxFileSizeMB}
           onChange={(files: FileList) => startCompare({ file: files[0] })}
         />
         {sourceFileName && (
           <Button
             iconClassName="icon-loop2 icon-12px"
-            label="surveyCompareView.compareAgain"
+            label="surveyCompareView:compareAgain"
             onClick={() => startCompare({ sourceFileName })}
             variant="outlined"
           />
         )}
         {result?.source?.name && (
           <span className="survey-compare__source-name">
-            {i18n.t('surveyCompareView.sourceSurvey', { name: result.source.name })}
+            {i18n.t('surveyCompareView:sourceSurvey', { name: result.source.name })}
           </span>
         )}
       </div>
 
-      {!result && <div className="survey-compare__intro">{i18n.t('surveyCompareView.intro')}</div>}
+      {!result && <div className="survey-compare__intro">{i18n.t('surveyCompareView:intro')}</div>}
 
       {result && (
         <>
@@ -196,15 +196,15 @@ export const SurveyCompare = () => {
           <div className="survey-compare__toolbar">
             <Checkbox
               checked={onlyDifferences}
-              label="surveyCompareView.onlyDifferences"
+              label="surveyCompareView:onlyDifferences"
               onChange={setOnlyDifferences}
             />
-            <Checkbox checked={hideLayoutOnly} label="surveyCompareView.hideLayoutOnly" onChange={setHideLayoutOnly} />
+            <Checkbox checked={hideLayoutOnly} label="surveyCompareView:hideLayoutOnly" onChange={setHideLayoutOnly} />
             {canEdit && !result.identical && (
               <Button
                 className="survey-compare__apply-btn"
                 disabled={selectedIds.size === 0}
-                label="surveyCompareView.apply"
+                label="surveyCompareView:apply"
                 labelParams={{ count: selectedIds.size }}
                 onClick={onApply}
                 primary
@@ -215,27 +215,27 @@ export const SurveyCompare = () => {
             items={[
               {
                 key: 'nodeDefs',
-                label: 'surveyCompareView.tabs.nodeDefs',
+                label: 'surveyCompareView:tabs.nodeDefs',
                 renderContent: () => <SurveyCompareNodeDefs {...tabProps} hideLayoutOnly={hideLayoutOnly} />,
               },
               {
                 key: 'categories',
-                label: 'surveyCompareView.tabs.categories',
+                label: 'surveyCompareView:tabs.categories',
                 renderContent: () => <SurveyCompareCategories {...tabProps} />,
               },
               {
                 key: 'taxonomies',
-                label: 'surveyCompareView.tabs.taxonomies',
+                label: 'surveyCompareView:tabs.taxonomies',
                 renderContent: () => <Taxonomies result={result} onlyDifferences={onlyDifferences} />,
               },
               {
                 key: 'surveyInfo',
-                label: 'surveyCompareView.tabs.surveyInfo',
+                label: 'surveyCompareView:tabs.surveyInfo',
                 renderContent: () =>
                   result.surveyInfo.length > 0 ? (
                     <SurveyComparePropDiffs propDiffs={result.surveyInfo} />
                   ) : (
-                    <div className="survey-compare__details-empty">{i18n.t('surveyCompareView.noDifferences')}</div>
+                    <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
                   ),
               },
             ]}
