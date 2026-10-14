@@ -84,28 +84,72 @@ const formatPrimitive = ({ t, value }: { t: Translate; value: unknown }): string
   return String(value)
 }
 
-const formatLabelsByLang = ({ value, indent }: { value: Record<string, string>; indent: number }): FormattedLine[] =>
-  Object.entries(value).map(([lang, text]) => ({ label: lang, value: text, indent }))
+// the language code is omitted when the survey has only one language
+const formatLabelsByLang = ({
+  singleLang,
+  value,
+  indent,
+}: {
+  singleLang?: string
+  value: Record<string, string>
+  indent: number
+}): FormattedLine[] => {
+  const entries = Object.entries(value)
+  if (singleLang && entries.length === 1 && entries[0][0] === singleLang) {
+    return [{ value: entries[0][1], indent }]
+  }
+  return entries.map(([lang, text]) => ({ label: lang, value: text, indent }))
+}
 
-const formatExpression = ({ t, expression, indent }: { t: Translate; expression: any; indent: number }) => {
+const formatExpression = ({
+  t,
+  singleLang,
+  expression,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  expression: any
+  indent: number
+}) => {
   const { expression: expr, applyIf, severity, messages } = expression
   const lines: FormattedLine[] = [{ label: t('nodeDefEdit.expressionsProp.expression'), value: expr ?? '', indent }]
   if (applyIf) lines.push({ label: t('nodeDefEdit.expressionsProp.applyIf'), value: applyIf, indent })
   if (severity) lines.push({ label: t('nodeDefEdit.expressionsProp.severity'), value: t(`common.${severity}`), indent })
   if (isPlainObject(messages)) {
     lines.push({ label: t('surveyCompareView:props.messages'), indent })
-    lines.push(...formatLabelsByLang({ value: messages, indent: indent + 1 }))
+    lines.push(...formatLabelsByLang({ singleLang, value: messages, indent: indent + 1 }))
   }
   return lines
 }
 
-const formatExpressions = ({ t, expressions, indent }: { t: Translate; expressions: any[]; indent: number }) =>
+const formatExpressions = ({
+  t,
+  singleLang,
+  expressions,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  expressions: any[]
+  indent: number
+}) =>
   expressions.flatMap((expression, index) => [
     ...(index > 0 ? [{ separator: true, indent }] : []),
-    ...formatExpression({ t, expression, indent }),
+    ...formatExpression({ t, singleLang, expression, indent }),
   ])
 
-const formatValidations = ({ t, value, indent }: { t: Translate; value: any; indent: number }): FormattedLine[] => {
+const formatValidations = ({
+  t,
+  singleLang,
+  value,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  value: any
+  indent: number
+}): FormattedLine[] => {
   const { required, unique, count, expressions, ...others } = value
   const lines: FormattedLine[] = []
   if (required) lines.push({ value: t('common.required'), indent })
@@ -119,7 +163,7 @@ const formatValidations = ({ t, value, indent }: { t: Translate; value: any; ind
     if (Array.isArray(countValue)) {
       lines.push(
         { label: t(labelKey), indent },
-        ...formatExpressions({ t, expressions: countValue, indent: indent + 1 })
+        ...formatExpressions({ t, singleLang, expressions: countValue, indent: indent + 1 })
       )
     } else {
       lines.push({ label: t(labelKey), value: String(countValue), indent })
@@ -127,9 +171,9 @@ const formatValidations = ({ t, value, indent }: { t: Translate; value: any; ind
   }
   if (Array.isArray(expressions)) {
     lines.push({ label: t('nodeDefEdit.validationsProps.expressions'), indent })
-    lines.push(...formatExpressions({ t, expressions, indent: indent + 1 }))
+    lines.push(...formatExpressions({ t, singleLang, expressions, indent: indent + 1 }))
   }
-  lines.push(...formatObject({ t, value: others, indent }))
+  lines.push(...formatObject({ t, singleLang, value: others, indent }))
   return lines
 }
 
@@ -148,9 +192,19 @@ const formatLayoutChildren = ({ t, layoutChildren, indent }) => {
   ]
 }
 
-const formatLayout = ({ t, value, indent }: { t: Translate; value: any; indent: number }): FormattedLine[] => {
+const formatLayout = ({
+  t,
+  singleLang,
+  value,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  value: any
+  indent: number
+}): FormattedLine[] => {
   const { layoutChildren, indexChildren, ...others } = value
-  const lines = formatObject({ t, value: others, indent })
+  const lines = formatObject({ t, singleLang, value: others, indent })
   if (Array.isArray(layoutChildren)) {
     lines.push(...formatLayoutChildren({ t, layoutChildren, indent }))
   }
@@ -160,18 +214,38 @@ const formatLayout = ({ t, value, indent }: { t: Translate; value: any; indent: 
   return lines
 }
 
-const formatArray = ({ t, value, indent }: { t: Translate; value: any[]; indent: number }): FormattedLine[] => {
-  if (value.every(isExpression)) return formatExpressions({ t, expressions: value, indent })
+const formatArray = ({
+  t,
+  singleLang,
+  value,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  value: any[]
+  indent: number
+}): FormattedLine[] => {
+  if (value.every(isExpression)) return formatExpressions({ t, singleLang, expressions: value, indent })
   if (value.every(isPrimitive)) {
     return [{ value: value.map((item) => formatPrimitive({ t, value: item })).join(', '), indent }]
   }
   return value.flatMap((item, index) => [
     ...(index > 0 ? [{ separator: true, indent }] : []),
-    ...formatValue({ t, value: item, indent }),
+    ...formatValue({ t, singleLang, value: item, indent }),
   ])
 }
 
-function formatObject({ t, value, indent }: { t: Translate; value: Record<string, any>; indent: number }) {
+function formatObject({
+  t,
+  singleLang,
+  value,
+  indent,
+}: {
+  t: Translate
+  singleLang?: string
+  value: Record<string, any>
+  indent: number
+}) {
   const lines: FormattedLine[] = []
   for (const [childKey, childValue] of Object.entries(value)) {
     if (childValue === undefined || childValue === null) continue
@@ -179,7 +253,10 @@ function formatObject({ t, value, indent }: { t: Translate; value: Record<string
     if (isPrimitive(childValue)) {
       lines.push({ label, value: formatPrimitive({ t, value: childValue }), indent })
     } else {
-      lines.push({ label, indent }, ...formatValue({ t, key: childKey, value: childValue, indent: indent + 1 }))
+      lines.push(
+        { label, indent },
+        ...formatValue({ t, singleLang, key: childKey, value: childValue, indent: indent + 1 })
+      )
     }
   }
   return lines
@@ -189,6 +266,7 @@ function formatObject({ t, value, indent }: { t: Translate; value: Record<string
  * Formats a value of a survey comparison as a list of labelled lines.
  * @param {object} params - Parameters.
  * @param {Translate} params.t - Translation function.
+ * @param {string} [params.singleLang] - The only language of the survey (if any): its code is not shown in labels.
  * @param {string} [params.key] - Key of the property the value belongs to.
  * @param {any} params.value - The value to format.
  * @param {number} [params.indent] - Indentation level.
@@ -196,11 +274,13 @@ function formatObject({ t, value, indent }: { t: Translate; value: Record<string
  */
 export function formatValue({
   t,
+  singleLang = undefined,
   key = undefined,
   value,
   indent = 0,
 }: {
   t: Translate
+  singleLang?: string
   key?: string
   value: any
   indent?: number
@@ -210,10 +290,10 @@ export function formatValue({
     return [{ value: value.map((cycle) => Number(cycle) + 1).join(', '), indent }]
   }
   if (isPrimitive(value)) return [{ value: formatPrimitive({ t, value }), indent }]
-  if (Array.isArray(value)) return formatArray({ t, value, indent })
-  if (key === 'validations') return formatValidations({ t, value, indent })
-  if (key === 'layout') return formatLayout({ t, value, indent })
-  if (isLabelsByLang(value)) return formatLabelsByLang({ value, indent })
-  if (isExpression(value)) return formatExpression({ t, expression: value, indent })
-  return formatObject({ t, value, indent })
+  if (Array.isArray(value)) return formatArray({ t, singleLang, value, indent })
+  if (key === 'validations') return formatValidations({ t, singleLang, value, indent })
+  if (key === 'layout') return formatLayout({ t, singleLang, value, indent })
+  if (isLabelsByLang(value)) return formatLabelsByLang({ singleLang, value, indent })
+  if (isExpression(value)) return formatExpression({ t, singleLang, expression: value, indent })
+  return formatObject({ t, singleLang, value, indent })
 }

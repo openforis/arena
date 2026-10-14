@@ -2,13 +2,16 @@ import React from 'react'
 
 import { SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
 
+import { useSurveyLangs } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 import { formatValue, getPropLabel } from './surveyCompareValueFormatter'
 
 const PropValue = ({ propKey, value }: { propKey: string; value: unknown }) => {
   const i18n = useI18n()
-  const lines = formatValue({ t: i18n.t, key: propKey, value })
+  const langs = useSurveyLangs() as string[]
+  const singleLang = langs.length === 1 ? langs[0] : undefined
+  const lines = formatValue({ t: i18n.t, singleLang, key: propKey, value })
   if (lines.length === 0) {
     return <span className="survey-compare__value-empty">{i18n.t('surveyCompareView:emptyValue')}</span>
   }

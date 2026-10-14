@@ -43,6 +43,11 @@ describe('SurveyCompare value formatter', () => {
     expect(formatValue({ t, key: 'labels', value: undefined })).toEqual([])
   })
 
+  test('language code is omitted when the survey has only one language', () => {
+    expect(toText(formatValue({ t, singleLang: 'en', key: 'labels', value: { en: 'Tree' } }))).toEqual(['Tree'])
+    expect(toText(formatValue({ t, singleLang: 'en', key: 'labels', value: { es: 'Árbol' } }))).toEqual(['es: Árbol'])
+  })
+
   test('form layout', () => {
     const value = { renderType: 'form', layoutChildren: [{ i: 'dbh', x: 0, y: 1, w: 1, h: 1 }] }
     expect(toText(formatValue({ t, key: 'layout', value }))).toEqual([
