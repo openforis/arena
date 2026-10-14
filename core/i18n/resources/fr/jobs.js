@@ -24,7 +24,6 @@ export default {
   EntitiesDeleteJob: 'Suppression des entités existantes',
   FilesImportJob: 'Importation de fichiers',
   MessageSendJob: 'Envoi de message',
-  NodeDefsTranslationJob: 'Traduction des libellés des définitions de nœud',
   NodeDefsImportJob: 'Importation des définitions de nœud',
   NodeDefsValidationJob: 'Validation des définitions de nœud',
   OdkImportJob: 'Importation ODK',

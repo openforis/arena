@@ -126,7 +126,6 @@ export default {
       label: 'Label translation',
       sends:
         "The label or description you translate, with the language codes. 'AI: Translate labels' in the Form Designer sends the labels and descriptions of all entities and attributes.",
-      runs: "'AI: Translate labels' runs on the Arena server, with your cloud provider or the Arena default; never on your local server.",
     },
     assistantDesign: {
       label: 'Design assistant',
@@ -141,7 +140,6 @@ export default {
       label: 'Data dictionary',
       sends:
         'The survey name and, for each entity or attribute without a description, its name, type and parent entities.',
-      runs: 'Runs on the Arena server, with your cloud provider or the Arena default; never on your local server.',
     },
     assistantAnalysis: {
       label: 'Analysis assistant',

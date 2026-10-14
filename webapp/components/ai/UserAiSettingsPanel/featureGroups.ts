@@ -33,9 +33,6 @@ export const FEATURE_GROUPS: FeatureGroup[] = [
   },
 ]
 
-// categories with a `runs` line: jobs of the Arena server, never run on the browser's local server
-export const SERVER_RUN_CATEGORIES: AiFeatureCategory[] = [translation, dataDictionary]
-
 /**
  * Returns the badge of a group.
  * @param {FeatureGroup} group - Group.
