@@ -31,11 +31,27 @@ const describeEveryField = (text: string): string =>
     descriptions: [...text.matchAll(/uuid="([^"]+)"/g)].map(([, uuid]) => ({ uuid, description: 'MOCK description.' })),
   })
 
+/**
+ * Translates every item of the translation prompt (its items have `id="..."`) into every target language.
+ * @param {string} text - Prompt text.
+ * @returns {string} The JSON answer.
+ */
+const translateEveryItem = (text: string): string => {
+  const targetLangs = (/^Target languages: (.*)$/m.exec(text)?.[1] ?? '').split(',').map((lang) => lang.trim())
+  const ids = [...text.matchAll(/\bid=("(?:[^"\\]|\\.)*")/g)].map(([, quoted]) => JSON.parse(quoted) as string)
+  return JSON.stringify({
+    translations: ids.map((id) => ({
+      id,
+      byLang: Object.fromEntries(targetLangs.filter(Boolean).map((lang) => [lang, `MOCK ${lang}`])),
+    })),
+  })
+}
+
 // matched against the system prompts of common/ai/prompts (keep in sync with test/e2e/specs/aiFeatures.spec.ts)
 const CANNED_ANSWERS: [RegExp, CannedAnswer][] = [
   // node def names of the e2e sample survey (test/e2e/fixtures/seed/sampleSurveyModel.ts)
   [/<expression>/, '<expression>tree_dec_1 > 0</expression><explanation>MOCK: must be positive.</explanation>'],
-  [/translate survey labels/i, '{"translations":[]}'],
+  [/translate survey labels/i, translateEveryItem],
   [/field descriptions for an Open Foris Arena/i, describeEveryField],
   // the two data-query prompts both mention the Data Explorer: match the summarize one first
   [/names data queries/i, '{"name":"mock_query","label":"MOCK label","description":"MOCK"}'],

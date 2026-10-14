@@ -1,4 +1,3 @@
-// webapp/ai/workflows/translateAllLabels.ts
 /**
  * "AI: Translate labels" of the Form Designer, run in the browser (it was the server job NodeDefsTranslationJob):
  * the label and description of every node def, in the default language, translated into the other survey languages
@@ -43,6 +42,9 @@ export type NodeDefsTranslationResult = {
   // label or description translations (text × language) the AI did not produce
   failedCount: number
 }
+
+// what applyTranslations needs to know about the call a translation list answers
+type TranslationOutcome = AiTranslationResult & { itemIds: string[]; targetLangs: string[] }
 
 type ProgressListener = (progress: AiBatchProgress) => void
 
@@ -137,38 +139,50 @@ const buildTranslationCalls = ({
   translate: typeof translateItems
   batchSize: number
   maxTargetLangs: number
-}): AiBatchCall<AiTranslationResult>[] => {
+}): AiBatchCall<TranslationOutcome>[] => {
   // the task accepts a limited number of target languages per call
   const langGroups = chunkArray(otherLangs, maxTargetLangs)
   return chunkArray(items, batchSize).flatMap((batch) =>
     langGroups.map((targetLangs) => ({
       size: batch.length * targetLangs.length,
-      run: (signal?: AbortSignal) => translate({ generateText, sourceLang, targetLangs, items: batch, signal }),
+      run: async (signal?: AbortSignal) => ({
+        ...(await translate({ generateText, sourceLang, targetLangs, items: batch, signal })),
+        itemIds: batch.map(({ id }) => id),
+        targetLangs,
+      }),
     }))
   )
 }
 
 /**
  * Merges the translations of one call into the AI suggestions by node def.
- * @param {Array} translations - Translations of the call.
+ * @param {TranslationOutcome} outcome - Translations of the call, with the items and languages it asked for.
  * @param {object} itemInfoById - Node def and field of each item id.
  * @param {AiTranslationsByNodeDef} aiByNodeDef - Accumulator (mutated).
- * @returns {void}
+ * @returns {number} The translations kept (item of the call × target language of the call, not blank).
  */
 const applyTranslations = (
-  translations: AiTranslationResult['translations'],
+  { translations, itemIds, targetLangs }: TranslationOutcome,
   itemInfoById: Record<string, ItemInfo>,
   aiByNodeDef: AiTranslationsByNodeDef
-): void => {
+): number => {
+  const askedIds = new Set(itemIds)
+  const keptKeys = new Set<string>()
   for (const { id, byLang } of translations) {
-    // the model may return ids it was not asked for
-    if (!Object.hasOwn(itemInfoById, id)) continue
+    // the model may return ids or languages it was not asked for
+    if (!askedIds.has(id) || !Object.hasOwn(itemInfoById, id)) continue
+    const kept = Object.fromEntries(
+      Object.entries(byLang).filter(([lang, text]) => targetLangs.includes(lang) && StringUtils.isNotBlank(text))
+    )
+    if (Object.keys(kept).length === 0) continue
+    for (const lang of Object.keys(kept)) keptKeys.add(`${id}\u0000${lang}`)
     const { uuid, field } = itemInfoById[id]
     const entry = aiByNodeDef[uuid] ?? { aiLabels: {}, aiDescs: {} }
-    if (field === 'label') entry.aiLabels = { ...entry.aiLabels, ...byLang }
-    else entry.aiDescs = { ...entry.aiDescs, ...byLang }
+    if (field === 'label') entry.aiLabels = { ...entry.aiLabels, ...kept }
+    else entry.aiDescs = { ...entry.aiDescs, ...kept }
     aiByNodeDef[uuid] = entry
   }
+  return keptKeys.size
 }
 
 /**
@@ -255,6 +269,7 @@ export const runTranslateAllLabels = async ({
 }): Promise<NodeDefsTranslationResult> => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const defaultLang: string = Survey.getDefaultLanguage(surveyInfo)
+  // core/survey is untyped JS: the inferred return type of getLanguages is not string[], but it is the codes array
   const languages = Survey.getLanguages(surveyInfo) as unknown as string[]
   const otherLangs = languages.filter((lang) => lang !== defaultLang)
   const aiByNodeDef: AiTranslationsByNodeDef = {}
@@ -274,18 +289,37 @@ export const runTranslateAllLabels = async ({
     batchSize,
     maxTargetLangs,
   })
+  // translations the model silently dropped in calls that succeeded
+  let missingCount = 0
   const { failedCount } = await runAiBatchCalls({
     calls,
     guard,
     signal,
     onProgress,
-    onResult: ({ translations }) => applyTranslations(translations, itemInfoById, aiByNodeDef),
+    onResult: (outcome) => {
+      const kept = applyTranslations(outcome, itemInfoById, aiByNodeDef)
+      missingCount += outcome.itemIds.length * outcome.targetLangs.length - kept
+    },
   })
   // a text too long for the task is never sent: it counts as failed in every language
   return buildNodeDefsTranslationResult({
     ...resultParams,
-    failedCount: failedCount + skippedCount * otherLangs.length,
+    failedCount: failedCount + missingCount + skippedCount * otherLangs.length,
   })
+}
+
+/**
+ * Tells whether the survey has another language and at least one text to send to the model.
+ * @param {object} survey - Survey with its node defs.
+ * @returns {boolean} True when a call is needed.
+ */
+const hasTextToTranslate = (survey: any): boolean => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const defaultLang: string = Survey.getDefaultLanguage(surveyInfo)
+  const hasOtherLang = (Survey.getLanguages(surveyInfo) as unknown as string[]).some((lang) => lang !== defaultLang)
+  return (
+    hasOtherLang && buildTranslationItems({ nodeDefs: Survey.getNodeDefsArray(survey), defaultLang }).items.length > 0
+  )
 }
 
 /**
@@ -308,6 +342,13 @@ export const translateAllLabelsWorkflow = async ({
   signal?: AbortSignal
   onProgress?: ProgressListener
 }): Promise<NodeDefsTranslationResult> => {
+  const noModel: AiGenerateText = async () => {
+    throw new Error('no AI call expected')
+  }
+  // nothing to translate (one language, or no text): no model, no consent dialog
+  if (!hasTextToTranslate(survey)) {
+    return runTranslateAllLabels({ survey, generateText: noModel, guard: async () => {} })
+  }
   const { generateText, guard } = await resolveBatchModel({ feature: 'translation', surveyId, signal })
   return runTranslateAllLabels({ survey, generateText, guard, signal, onProgress })
 }

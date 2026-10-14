@@ -190,6 +190,49 @@ describe('translate all labels in the browser (254)', () => {
     expect(translated).toHaveLength(5)
   })
 
+  test('translations the model drops are counted: missing, partial, foreign language, foreign id and blank', async () => {
+    const survey = await buildWideSurvey(3, ['en', 'fr', 'es']) // 4 texts (root has no label: 3) x 2 languages
+    const uuids = ['a_0', 'a_1', 'a_2'].map((name) => uuidOf(survey, name))
+    const result = await runTranslateAllLabels({
+      survey,
+      generateText,
+      guard: noGuard,
+      translate: async () => ({
+        translations: [
+          { id: `${uuids[0]}_label`, byLang: { fr: 'ok fr', es: 'ok es' } }, // complete
+          { id: `${uuids[1]}_label`, byLang: { fr: 'seulement', de: 'Fremdsprache' } }, // es missing, de foreign
+          { id: `${uuids[2]}_label`, byLang: { fr: '  ', es: '' } }, // blank values
+          { id: 'unknown_id', byLang: { fr: 'x', es: 'y' } }, // foreign id
+        ],
+      }),
+    })
+    // 3 texts x 2 languages = 6 asked, 3 kept (a_0 fr+es, a_1 fr)
+    expect(result.failedCount).toBe(3)
+    const byName = (name: string) => result.items.find((item) => item.nodeDefUuid === uuidOf(survey, name))!
+    expect(byName('a_0').aiLabelsByLang).toEqual({ fr: 'ok fr', es: 'ok es' })
+    expect(byName('a_1').aiLabelsByLang).toEqual({ fr: 'seulement' })
+    expect(byName('a_2').aiLabelsByLang).toEqual({})
+  })
+
+  test('a model that answers with no translation counts every text x language as failed', async () => {
+    const survey = await buildWideSurvey(2, ['en', 'fr'])
+    const result = await runTranslateAllLabels({
+      survey,
+      generateText,
+      guard: noGuard,
+      translate: async () => ({ translations: [] }),
+    })
+    expect(result.failedCount).toBe(2)
+  })
+
+  test('the workflow with nothing to translate resolves no model', async () => {
+    const survey = await buildWideSurvey(0, ['en', 'fr'])
+    const { translateAllLabelsWorkflow } = await import('@webapp/ai/workflows/translateAllLabels')
+    const result = await translateAllLabelsWorkflow({ survey, surveyId: 1 })
+    expect(result.failedCount).toBe(0)
+    expect(result.items.length).toBeGreaterThan(0)
+  })
+
   test('cancel during a call: no result and no further call', async () => {
     const survey = await buildWideSurvey(45, ['en', 'fr'])
     const controller = new AbortController()

@@ -350,4 +350,29 @@ describe('mock provider canned answers', () => {
     expect(JSON.parse(summarize)).toEqual({ name: 'mock_query', label: 'MOCK label', description: 'MOCK' })
     expect(JSON.parse(generate)).toMatchObject({ entity: 'tree', mode: 'raw' })
   })
+
+  test('the translation prompt gets a translation for every item id and target language', async () => {
+    const { buildTranslationPrompt } = await import('@common/ai/prompts/translation')
+    const { system, prompt } = buildTranslationPrompt({
+      sourceLang: 'en',
+      glossary: undefined,
+      previousError: undefined,
+      targetLangs: ['fr', 'es'],
+      items: [
+        { id: 'u1_label', text: 'Tree', kind: 'nodeDefLabel' },
+        { id: 'u2_desc', text: 'A "quoted" help', kind: 'nodeDefDescription' },
+      ],
+    })
+    const { mockAnswerFor } = await import('@server/modules/ai/service/mockProvider')
+    const answered = JSON.parse(
+      mockAnswerFor([
+        { role: 'system', content: system },
+        { role: 'user', content: [{ type: 'text', text: prompt }] },
+      ] as any)
+    )
+    expect(answered.translations).toEqual([
+      { id: 'u1_label', byLang: { fr: 'MOCK fr', es: 'MOCK es' } },
+      { id: 'u2_desc', byLang: { fr: 'MOCK fr', es: 'MOCK es' } },
+    ])
+  })
 })

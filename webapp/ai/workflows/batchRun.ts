@@ -1,4 +1,3 @@
-// webapp/ai/workflows/batchRun.ts
 /**
  * Runs the many AI calls of a browser batch (label translation, data dictionary): the AI switch and the survey
  * policy are checked again before each call, progress is reported, the run can be cancelled, and a failed call is
@@ -67,6 +66,7 @@ export const chunkArray = <T>(array: readonly T[], size: number): T[][] => {
   return chunks
 }
 
+// re-exported so the workflows stop a run with the same abort error as the engine layer (isAiAbortError)
 export { createAbortError }
 
 /**

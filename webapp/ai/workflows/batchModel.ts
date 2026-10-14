@@ -1,4 +1,3 @@
-// webapp/ai/workflows/batchModel.ts
 /**
  * Model and guard of a browser batch: the model an AI request of the feature gets today (resolveModel: engine
  * selection, local server consent, feature gate) and a guard that re-checks, before each call, that the feature and

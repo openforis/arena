@@ -23,6 +23,23 @@ const formByLang: Record<string, any> = {
   pt: ptForm,
   ru: ruForm,
 }
+
+/**
+ * Returns every plural form of the failed translations text of a language.
+ * @param {string} lang - Language.
+ * @returns {string[]} The texts.
+ */
+const failedTexts = (lang: string): string[] =>
+  Object.entries(formByLang[lang].nodeDefsTranslation)
+    .filter(([key]) => key.startsWith('failed_'))
+    .map(([, text]) => text as string)
+
+const PLURAL_FORMS: Record<string, string[]> = {
+  ru: ['one', 'few', 'many', 'other'],
+  ja: ['other'],
+}
+for (const lang of ['en', 'es', 'fr', 'mn', 'pt']) PLURAL_FORMS[lang] = ['one', 'other']
+
 const CYRILLIC = /[Ѐ-ӿ]/
 
 /**
@@ -43,11 +60,22 @@ describe('AI batch texts (257)', () => {
   })
 
   test.each(Object.keys(formByLang))('%s tells how many translations could not be produced', (lang) => {
-    expect(formByLang[lang].nodeDefsTranslation.failed).toContain('{{count}}')
+    const texts = failedTexts(lang)
+    expect(texts.length).toBeGreaterThan(0)
+    for (const text of texts) expect(text).toContain('{{count}}')
+  })
+
+  test.each(Object.keys(formByLang))('%s has the plural forms of its language for the failed counts', (lang) => {
+    // the forms i18next uses (Intl also lists "many" for es/fr/pt, which the other plural keys do not write)
+    const forms = PLURAL_FORMS[lang]
+    for (const base of [formByLang[lang].nodeDefsTranslation, formByLang[lang]]) {
+      const key = base === formByLang[lang] ? 'schemaSummaryAiDescriptionsFailed' : 'failed'
+      expect(forms.filter((form) => typeof base[`${key}_${form}`] === 'string')).toEqual(forms)
+    }
   })
 
   test.each(['ru', 'mn'])('%s texts are written in Cyrillic', (lang) => {
-    const texts = [...Object.values(commonByLang[lang].aiBatch), formByLang[lang].nodeDefsTranslation.failed]
+    const texts = [...Object.values(commonByLang[lang].aiBatch), ...failedTexts(lang)]
     for (const text of texts) {
       expect([text, CYRILLIC.test(text as string)]).toEqual([text, true])
     }

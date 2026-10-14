@@ -49,6 +49,7 @@ export const useAiBatchRun = () => {
       controllerRef.current = controller
       const { signal } = controller
       setRun({ titleKey, progress: null, error: null })
+      let completed: { result: T } | null = null
       try {
         const result = await runBatch({
           signal,
@@ -58,7 +59,7 @@ export const useAiBatchRun = () => {
         })
         if (signal.aborted) return
         setRun(null)
-        onDone(result)
+        completed = { result }
       } catch (error) {
         // cancelled: the dialog is already closed
         if (signal.aborted) return
@@ -71,6 +72,8 @@ export const useAiBatchRun = () => {
       } finally {
         if (controllerRef.current === controller) controllerRef.current = null
       }
+      // outside the try: an error of onDone is not an AI error and the run is already cleared
+      if (completed) onDone(completed.result)
     },
     [i18n]
   )

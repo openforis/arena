@@ -1,5 +1,5 @@
 /**
- * Model calls made by the server (jobs, admin ping): `generate` for plain text and `generateStructured` for an
+ * Model calls made by the server (the admin ping): `generate` for plain text and `generateStructured` for an
  * object validated against a zod schema. Each call checks the feature gate and the prompt size, resolves the
  * model, checks the survey AI policy (before the provider is called) and records telemetry.
  */
