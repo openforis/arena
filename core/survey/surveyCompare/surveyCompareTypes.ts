@@ -1,3 +1,6 @@
+/** Max size of the survey file to compare: a survey exported with records and files is not accepted. */
+export const SurveyCompareMaxFileSizeMB = 20
+
 export const SurveyCompareStatus = {
   identical: 'identical',
   changed: 'changed',

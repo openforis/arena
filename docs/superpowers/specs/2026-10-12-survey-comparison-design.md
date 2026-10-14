@@ -270,6 +270,8 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
   draft), API under `/survey/:surveyId/compare`.
 - `webapp/views/App/views/Designer/SurveyCompare/`: Designer → "Compare / update from file"; texts in the
   `surveyCompareView` i18n namespace (`core/i18n/resources/en/surveyCompareView.ts`).
+- The uploaded file is limited to 20 MB (`SurveyCompareMaxFileSizeMB`), checked in the browser and on the server, so
+  exports with records and record files are rejected.
 - Applied in phase 1: added node defs (same uuid as in the source, parent layout updated), changed node def props
   (expressions, validations, labels, layout, ...), added categories, added/changed category items, category name and
   extra props definitions.

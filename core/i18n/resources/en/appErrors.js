@@ -109,6 +109,8 @@ Try to refresh the page.`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',
   userInvalid: 'Invalid user',
+  surveyCompareFileTooLarge:
+    'The survey file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',

@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router'
 import classNames from 'classnames'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-import { SurveyCompareResult } from '@core/survey/surveyCompare/surveyCompareTypes'
+import { SurveyCompareMaxFileSizeMB, SurveyCompareResult } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import * as API from '@webapp/service/api'
 import { Button } from '@webapp/components/buttons'
@@ -24,8 +24,6 @@ import { StatusBadge } from './SurveyCompareCommon'
 import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
-
-const maxFileSizeMB = 1000
 
 type CompareResultWithSource = SurveyCompareResult & { source?: { name?: string } }
 
@@ -118,6 +116,24 @@ export const SurveyCompare = () => {
     [dispatch, surveyId]
   )
 
+  const onFileSelected = useCallback(
+    (files: FileList) => {
+      const file = files[0]
+      if (file.size > SurveyCompareMaxFileSizeMB * 1024 * 1024) {
+        dispatch(
+          NotificationActions.notifyWarning({
+            key: 'surveyCompareView:fileTooLarge',
+            params: { maxSize: SurveyCompareMaxFileSizeMB },
+            text: undefined,
+          }) as any
+        )
+        return
+      }
+      startCompare({ file })
+    },
+    [dispatch, startCompare]
+  )
+
   const onToggle = useCallback(
     (id: string, selected: boolean) =>
       setState((statePrev) => ({
@@ -170,8 +186,8 @@ export const SurveyCompare = () => {
         <UploadButton
           accept=".zip"
           label="surveyCompareView:selectFile"
-          maxSize={maxFileSizeMB}
-          onChange={(files: FileList) => startCompare({ file: files[0] })}
+          maxSize={Number.MAX_SAFE_INTEGER} // size checked in onFileSelected, with a specific message
+          onChange={onFileSelected}
         />
         {sourceFileName && (
           <Button

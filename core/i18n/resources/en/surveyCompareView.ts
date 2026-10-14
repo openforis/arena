@@ -3,6 +3,8 @@ export default {
 The file is compared with this survey and the differences are shown: you can then apply the selected changes to this survey.
 Changes are saved as draft: test the form and publish the survey to make them effective.`,
   selectFile: 'Select survey file (.zip)',
+  fileTooLarge:
+    'The selected file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',
   compareAgain: 'Compare again',
   sourceSurvey: 'Uploaded survey: {{name}}',
   identical: 'The surveys are identical',
