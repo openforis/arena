@@ -10,12 +10,14 @@ export default {
   },
   fileTooLarge:
     'Le fichier sélectionné est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
-  selectNewFile: 'Sélectionner un nouveau fichier',
-  selectNewFileInfo: 'Abandonner cette comparaison et charger un autre fichier de formulaire',
+  selectNewSource: 'Sélectionner une nouvelle source',
+  selectNewSourceInfo:
+    'Abandonner cette comparaison et sélectionner un autre fichier de formulaire ou un autre formulaire',
   refreshComparison: 'Actualiser la comparaison',
   refreshComparisonInfo:
     "Comparer à nouveau le même fichier avec la version actuelle de ce formulaire (par ex. après l'avoir modifié)",
-  sourceSurvey: 'Formulaire chargé : {{name}}',
+  sourceSurvey: 'Formulaire comparé : {{name}}',
+  compareWithSurvey: 'Ou comparez avec un autre formulaire de ce serveur :',
   identical: 'Les formulaires sont identiques',
   counts:
     '{{added}} uniquement dans le formulaire chargé, {{changed}} modifiés, {{removed}} uniquement dans ce formulaire',

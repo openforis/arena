@@ -9,12 +9,13 @@ export default {
   },
   fileTooLarge:
     'El archivo seleccionado es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
-  selectNewFile: 'Seleccionar un nuevo archivo',
-  selectNewFileInfo: 'Descartar esta comparación y cargar otro archivo de encuesta',
+  selectNewSource: 'Seleccionar un nuevo origen',
+  selectNewSourceInfo: 'Descartar esta comparación y seleccionar otro archivo de encuesta u otra encuesta',
   refreshComparison: 'Actualizar comparación',
   refreshComparisonInfo:
     'Comparar de nuevo el mismo archivo con la versión actual de esta encuesta (p. ej. después de editarla)',
-  sourceSurvey: 'Encuesta cargada: {{name}}',
+  sourceSurvey: 'Encuesta comparada: {{name}}',
+  compareWithSurvey: 'O compare con otra encuesta de este servidor:',
   identical: 'Las encuestas son idénticas',
   counts: '{{added}} solo en la encuesta cargada, {{changed}} modificados, {{removed}} solo en esta encuesta',
   surveyInfoChanged:

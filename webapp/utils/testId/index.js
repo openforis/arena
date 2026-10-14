@@ -37,6 +37,7 @@ export const TestId = {
     surveyDeleteBtn: 'survey-delete-btn',
     surveyCompareBtn: 'survey-compare-btn',
     surveyExportBtn: 'survey-export-btn',
+    surveyFingerprint: 'survey-fingerprint',
     surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
     surveyExportWithDataNoResultAttributesBtn: 'survey-export-with-data-no-result-attributes-btn',
@@ -169,6 +170,11 @@ export const TestId = {
   sidebar: {
     module: (module) => `sidebar-module-${module}`,
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,
+  },
+  surveyCompare: {
+    applyBtn: 'survey-compare-apply-btn',
+    sourceSurveyDropdown: 'survey-compare-source-survey',
+    summary: 'survey-compare-summary',
   },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,

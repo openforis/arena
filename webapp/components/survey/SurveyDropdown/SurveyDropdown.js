@@ -11,8 +11,15 @@ import { SurveyType } from '@webapp/model'
 import { useSurveyDropdownOptions } from './useSurveyDropdownOptions'
 
 const SurveyDropdown = (props) => {
-  const { onChange, selection = null, type = SurveyType.survey } = props
-  const { loading, options } = useSurveyDropdownOptions({ type })
+  const {
+    excludedSurveyIds = [],
+    onChange,
+    selection = null,
+    testId = TestId.surveyCreate.surveyCloneFrom,
+    type = SurveyType.survey,
+  } = props
+  const { loading, options: allOptions } = useSurveyDropdownOptions({ type })
+  const options = allOptions.filter((option) => !excludedSurveyIds.includes(option.value))
 
   const selectedOption = options.find((option) => option.value === selection)
 
@@ -41,14 +48,16 @@ const SurveyDropdown = (props) => {
         )
       }}
       selection={selectedOption}
-      testId={TestId.surveyCreate.surveyCloneFrom}
+      testId={testId}
     />
   )
 }
 
 SurveyDropdown.propTypes = {
+  excludedSurveyIds: PropTypes.array,
   onChange: PropTypes.func.isRequired,
-  selection: PropTypes.string,
+  selection: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+  testId: PropTypes.string,
   type: PropTypes.oneOf(Object.values(SurveyType)),
 }
 

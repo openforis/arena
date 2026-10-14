@@ -154,13 +154,13 @@ const fetchTaxa = async ({ surveyId, taxonomyUuid }, client: any) => {
 }
 
 /**
- * Fetches the survey (draft) to update and the items of its categories.
+ * Fetches a survey (draft) with the items of its categories and its taxa.
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {any} [client] - Database client.
  * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
  */
-export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, client: any = db) => {
+export const fetchSurveyFromDb = async ({ surveyId }: { surveyId: number }, client: any = db) => {
   const surveyWithDeleted = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, draft: true, advanced: true, includeDeleted: true },
     client
