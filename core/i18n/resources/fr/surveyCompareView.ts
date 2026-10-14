@@ -26,6 +26,17 @@ export default {
   apply: 'Appliquer les modifications sélectionnées ({{count}})',
   applyConfirm: `Appliquer {{count}} modifications sélectionnées à ce formulaire ?
 Les modifications sont enregistrées en brouillon : elles n'atteindront les enregistrements qu'à la publication du formulaire.`,
+  willBeDeleted: 'sera supprimé',
+  removedNodeDefInfo:
+    "Cette définition de nœud n'existe que dans ce formulaire : appliquer cette modification la supprime (avec ses descendants) de ce formulaire.",
+  removedItemInfo: 'Uniquement dans ce formulaire : appliquer cette modification le supprime de ce formulaire.',
+  applyConfirmWithDeletionsHeader: 'Confirmer les suppressions',
+  applyConfirmWithDeletions:
+    "Appliquer {{count}} modifications sélectionnées à ce formulaire ?\n\n**{{deletionsCount}} d'entre elles suppriment des éléments de ce formulaire** (éléments absents du formulaire chargé) :\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)",
+  applyWithDeletions: 'Appliquer et supprimer',
+  confirmSurveyName: 'Saisissez le nom de ce formulaire pour confirmer :',
+  deletionOfItemsOf: 'éléments uniquement dans ce formulaire de **{{name}}**',
+  moreDeletions: '... et {{count}} de plus',
   applyCompleted:
     'Modifications appliquées : {{applied}}, ignorées : {{skipped}}. Publiez le formulaire pour les rendre effectives.',
   tabs: {

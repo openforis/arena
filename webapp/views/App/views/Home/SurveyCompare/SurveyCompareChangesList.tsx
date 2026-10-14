@@ -5,7 +5,13 @@ import { SurveyCompareChange, SurveyComparePropDiff } from '@core/survey/surveyC
 
 import { useI18n } from '@webapp/store/system'
 
-import { ApplicabilityIcon, ApplicabilityMessages, SelectionCheckbox, StatusBadge } from './SurveyCompareCommon'
+import {
+  ApplicabilityIcon,
+  ApplicabilityMessages,
+  DeletionNote,
+  SelectionCheckbox,
+  StatusBadge,
+} from './SurveyCompareCommon'
 import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
 
 type ChangeWithProps = SurveyCompareChange & { propDiffs: SurveyComparePropDiff[] }
@@ -43,6 +49,7 @@ export const SurveyCompareChangesList = <T extends ChangeWithProps>({
             {getNote && <span className="survey-compare__row-type">{getNote(diff)}</span>}
             <StatusBadge status={diff.status} />
             <ApplicabilityIcon applicability={diff.applicability} />
+            <DeletionNote diff={diff} selected={selectedIds.has(diff.id)} />
           </div>
           <ApplicabilityMessages applicability={diff.applicability} />
           <SurveyComparePropDiffs propDiffs={diff.propDiffs} />

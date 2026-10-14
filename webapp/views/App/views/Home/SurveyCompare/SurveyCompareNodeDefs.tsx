@@ -11,7 +11,13 @@ import {
 import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 
-import { ApplicabilityIcon, ApplicabilityMessages, SelectionCheckbox, StatusBadge } from './SurveyCompareCommon'
+import {
+  ApplicabilityIcon,
+  ApplicabilityMessages,
+  DeletionNote,
+  SelectionCheckbox,
+  StatusBadge,
+} from './SurveyCompareCommon'
 import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
 
 const indentPx = 18
@@ -105,6 +111,9 @@ const NodeDefDiffDetails = ({
         <div className="survey-compare__details-info">{i18n.t(`surveyCompareView:matchedBy.${diff.matchedBy}`)}</div>
       )}
       <RenameMatch canEdit={canEdit} diff={diff} onMatch={onMatch} onUnmatch={onUnmatch} />
+      {diff.status === SurveyCompareStatus.removed && (
+        <div className="survey-compare__deletion-info">{i18n.t('surveyCompareView:removedNodeDefInfo')}</div>
+      )}
       <ApplicabilityMessages applicability={diff.applicability} />
       {diff.dependsOn.length > 0 && (
         <div className="survey-compare__details-info">
@@ -185,6 +194,7 @@ export const SurveyCompareNodeDefs = ({
                 <span className="survey-compare__row-note">{i18n.t('surveyCompareView:possibleRename')}</span>
               )}
               <ApplicabilityIcon applicability={diff.applicability} />
+              <DeletionNote diff={diff} selected={selectedIds.has(diff.id)} />
             </button>
           </div>
         ))}

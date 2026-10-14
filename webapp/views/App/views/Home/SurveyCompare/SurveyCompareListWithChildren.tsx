@@ -15,6 +15,7 @@ import {
   ApplicabilityIcon,
   ApplicabilityMessages,
   ChildItemStatus,
+  DeletionNote,
   RemovalChange,
   SelectionCheckbox,
   StatusBadge,
@@ -76,6 +77,9 @@ const Details = <T extends DiffWithChildren>({
         <span className="survey-compare__details-path">{diff.name}</span>
       </div>
       <ApplicabilityMessages applicability={diff.applicability} />
+      {diff.status === SurveyCompareStatus.removed && (
+        <div className="survey-compare__deletion-info">{i18n.t('surveyCompareView:removedItemInfo')}</div>
+      )}
       <RemovalChange
         canEdit={canEdit}
         removal={diff.removal}
@@ -161,6 +165,7 @@ export const SurveyCompareListWithChildren = <T extends DiffWithChildren>({
               <StatusBadge status={diff.status} />
               <Counts counts={config.getCounts(diff)} labelKey={config.countsLabelKey} />
               <ApplicabilityIcon applicability={diff.applicability} />
+              <DeletionNote diff={diff} selected={selectedIds.has(diff.id)} />
               {diff.removal && selectedIds.has(diff.removal.id) && (
                 <span className="survey-compare__row-note">{i18n.t('surveyCompareView:removalSelected')}</span>
               )}

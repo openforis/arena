@@ -18,6 +18,8 @@ import {
   expandSelection,
 } from '@core/survey/surveyCompare'
 
+import { getSelectedDeletions } from '@webapp/views/App/views/Home/SurveyCompare/surveyCompareSelection'
+
 import * as SB from '../../utils/surveyBuilder'
 import {
   buildCategory,
@@ -413,5 +415,16 @@ describe('SurveyCompare: full sync', () => {
         expect.objectContaining({ nodeDefUuid: getUuid(target, 'dbh'), props: { name: 'dbh_cm' } }),
       ])
     })
+  })
+
+  test('selected deletions are listed for the strong confirmation', async () => {
+    const { survey: target, items } = await buildSurvey()
+    const source = dissocNodeDefs({ survey: clone(target), names: ['dbh'] })
+    const result = compare({ source, target, sourceItems: items, targetItems: items })
+    const dbhDiff = findDiff(result, 'dbh')
+    expect(getSelectedDeletions({ result, selectedIds: new Set() })).toEqual([])
+    expect(getSelectedDeletions({ result, selectedIds: new Set([dbhDiff.id]) })).toEqual([
+      { id: dbhDiff.id, label: 'cluster/tree/dbh', partial: false },
+    ])
   })
 })

@@ -84,3 +84,36 @@ export const updateSelection = ({
   }
   return updated
 }
+
+const getRemovalLabel = ({ change, result }: { change: SurveyCompareChange; result: SurveyCompareResult }): string => {
+  const owner = [...result.categories, ...result.taxonomies].find((diff) => diff.removal?.id === change.id)
+  if (owner) return owner.name
+  const diff: any = change
+  return diff.path ?? diff.name ?? diff.key ?? change.id
+}
+
+/**
+ * Returns the selected changes that delete something in this survey (elements only in this survey).
+ * @param {object} params - Parameters.
+ * @param {SurveyCompareResult} params.result - The comparison result.
+ * @param {Set<string>} params.selectedIds - Selected ids.
+ * @returns {{id: string, label: string, partial: boolean}[]} - The selected deletions (partial: removal of category items or taxa).
+ */
+export const getSelectedDeletions = ({
+  result,
+  selectedIds,
+}: {
+  result: SurveyCompareResult
+  selectedIds: Set<string>
+}): { id: string; label: string; partial: boolean }[] => {
+  const removalIds = new Set(
+    [...result.categories, ...result.taxonomies].flatMap((diff) => (diff.removal ? [diff.removal.id] : []))
+  )
+  return getDiffs(result)
+    .filter((change) => change.status === SurveyCompareStatus.removed && selectedIds.has(change.id))
+    .map((change) => ({
+      id: change.id,
+      label: getRemovalLabel({ change, result }),
+      partial: removalIds.has(change.id),
+    }))
+}

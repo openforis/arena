@@ -21,6 +21,17 @@ export default {
   apply: 'Apply selected changes ({{count}})',
   applyConfirm: `Apply {{count}} selected changes to this survey?
 Changes are saved as draft: they will reach the records only when the survey is published.`,
+  willBeDeleted: 'will be deleted',
+  removedNodeDefInfo:
+    'This node definition is only in this survey: applying this change deletes it (together with its descendants) from this survey.',
+  removedItemInfo: 'Only in this survey: applying this change deletes it from this survey.',
+  applyConfirmWithDeletionsHeader: 'Confirm the deletions',
+  applyConfirmWithDeletions:
+    'Apply {{count}} selected changes to this survey?\n\n**{{deletionsCount}} of them delete elements of this survey** (elements not in the uploaded survey):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+  applyWithDeletions: 'Apply and delete',
+  confirmSurveyName: 'Enter the name of this survey to confirm:',
+  deletionOfItemsOf: 'elements only in this survey of **{{name}}**',
+  moreDeletions: '... and {{count}} more',
   applyCompleted: 'Changes applied: {{applied}}, skipped: {{skipped}}. Publish the survey to make them effective.',
   tabs: {
     nodeDefs: 'Node definitions',

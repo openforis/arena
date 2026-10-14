@@ -20,6 +20,17 @@ export default {
   apply: '選択した変更を適用（{{count}}）',
   applyConfirm: `選択した {{count}} 件の変更をこの調査に適用しますか？
 変更は下書きとして保存され、調査を公開したときにのみレコードに反映されます。`,
+  willBeDeleted: '削除されます',
+  removedNodeDefInfo:
+    'このノード定義はこの調査にのみ存在します：この変更を適用すると、この調査から（子孫とともに）削除されます。',
+  removedItemInfo: 'この調査にのみ存在：この変更を適用すると、この調査から削除されます。',
+  applyConfirmWithDeletionsHeader: '削除の確認',
+  applyConfirmWithDeletions:
+    '選択した{{count}}件の変更をこの調査に適用しますか？\n\n**そのうち{{deletionsCount}}件はこの調査の要素を削除します**（アップロードされた調査にない要素）：\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+  applyWithDeletions: '適用して削除',
+  confirmSurveyName: '確認のため、この調査の名前を入力してください：',
+  deletionOfItemsOf: '**{{name}}** のこの調査にのみ存在する要素',
+  moreDeletions: '... ほか{{count}}件',
   applyCompleted: '適用した変更：{{applied}}、スキップ：{{skipped}}。調査を公開すると有効になります。',
   tabs: {
     nodeDefs: 'ノード定義',

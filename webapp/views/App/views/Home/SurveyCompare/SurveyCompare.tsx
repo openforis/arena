@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import * as JobSerialized from '@common/job/jobSerialized'
+import * as Survey from '@core/survey/survey'
 import { SurveyCompareMaxFileSizeMB, SurveyCompareResult } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import * as API from '@webapp/service/api'
@@ -14,12 +15,12 @@ import { Checkbox } from '@webapp/components/form'
 import { Tabs } from '@webapp/components/Tabs'
 import { useConfirm } from '@webapp/components/hooks'
 import { JobActions } from '@webapp/store/app'
-import { SurveyActions, useSurveyId } from '@webapp/store/survey'
+import { SurveyActions, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
-import { getDefaultSelectedIds, updateSelection } from './surveyCompareSelection'
+import { getDefaultSelectedIds, getSelectedDeletions, updateSelection } from './surveyCompareSelection'
 import { getPropLabel } from './surveyCompareValueFormatter'
 import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
@@ -33,6 +34,9 @@ const acceptedFiles = { 'application/zip': ['.zip'] }
 
 // the dropzone max size unit is 1000 * 1000 bytes: the max size in MiB is converted to it
 const maxFileSizeInDropzoneUnits = (SurveyCompareMaxFileSizeMB * 1024 * 1024) / (1000 * 1000)
+
+// deletions listed in the confirm message
+const maxDeletionsListed = 10
 
 const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
 
@@ -88,6 +92,7 @@ export const SurveyCompare = () => {
   const i18n = useI18n()
   const confirm = useConfirm()
   const surveyId = useSurveyId()
+  const surveyInfo = useSurveyInfo()
   const canEdit = useAuthCanEditSurvey()
 
   const [state, setState] = useState<CompareState>(initialState)
@@ -181,39 +186,68 @@ export const SurveyCompare = () => {
     [manualMatches, sourceFileName, startCompare]
   )
 
-  const onApply = useCallback(() => {
-    confirm({
-      key: 'surveyCompareView:applyConfirm',
-      params: { count: selectedIds.size },
-      onCancel: undefined,
-      onOk: async () => {
-        const { job } = await API.startSurveyCompareApplyJob({
-          surveyId,
-          sourceFileName,
-          selectedIds: [...selectedIds],
-          manualMatches,
-        })
-        dispatch(
-          JobActions.showJobMonitor({
-            job,
-            autoHide: true,
-            onComplete: async (jobCompleted: any) => {
-              const { appliedIds = [], skippedIds = [] } = JobSerialized.getResult(jobCompleted) ?? {}
-              dispatch(
-                NotificationActions.notifyInfo({
-                  key: 'surveyCompareView:applyCompleted',
-                  params: { applied: appliedIds.length, skipped: skippedIds.length },
-                  text: undefined,
-                }) as any
-              )
-              dispatch(SurveyActions.refreshSurveyDefs({ navigate }) as any)
-              await startCompare({ sourceFileName, manualMatches })
-            },
-          }) as any
-        )
-      },
+  const startApply = useCallback(async () => {
+    const { job } = await API.startSurveyCompareApplyJob({
+      surveyId,
+      sourceFileName,
+      selectedIds: [...selectedIds],
+      manualMatches,
     })
-  }, [confirm, dispatch, manualMatches, navigate, selectedIds, sourceFileName, startCompare, surveyId])
+    dispatch(
+      JobActions.showJobMonitor({
+        job,
+        autoHide: true,
+        onComplete: async (jobCompleted: any) => {
+          const { appliedIds = [], skippedIds = [] } = JobSerialized.getResult(jobCompleted) ?? {}
+          dispatch(
+            NotificationActions.notifyInfo({
+              key: 'surveyCompareView:applyCompleted',
+              params: { applied: appliedIds.length, skipped: skippedIds.length },
+              text: undefined,
+            }) as any
+          )
+          dispatch(SurveyActions.refreshSurveyDefs({ navigate }) as any)
+          await startCompare({ sourceFileName, manualMatches })
+        },
+      }) as any
+    )
+  }, [dispatch, manualMatches, navigate, selectedIds, sourceFileName, startCompare, surveyId])
+
+  // deletions need a strong confirmation: the survey name must be typed
+  const onApply = useCallback(() => {
+    const deletions = getSelectedDeletions({ result, selectedIds })
+    if (deletions.length === 0) {
+      confirm({
+        key: 'surveyCompareView:applyConfirm',
+        params: { count: selectedIds.size },
+        onOk: startApply,
+        onCancel: undefined,
+      })
+      return
+    }
+    const deletionsList = deletions
+      .slice(0, maxDeletionsListed)
+      .map(({ label, partial }) =>
+        partial ? `- ${i18n.t('surveyCompareView:deletionOfItemsOf', { name: label })}` : `- **${label}**`
+      )
+      .join('\n')
+    const moreDeletions =
+      deletions.length > maxDeletionsListed
+        ? `\n- ${i18n.t('surveyCompareView:moreDeletions', { count: deletions.length - maxDeletionsListed })}`
+        : ''
+    confirm({
+      key: 'surveyCompareView:applyConfirmWithDeletions',
+      params: { count: selectedIds.size, deletionsCount: deletions.length, deletions: deletionsList + moreDeletions },
+      headerText: 'surveyCompareView:applyConfirmWithDeletionsHeader',
+      okButtonLabel: 'surveyCompareView:applyWithDeletions',
+      okButtonClass: 'btn-danger',
+      strongConfirm: true,
+      strongConfirmInputLabel: 'surveyCompareView:confirmSurveyName',
+      strongConfirmRequiredText: Survey.getName(surveyInfo),
+      onOk: startApply,
+      onCancel: undefined,
+    })
+  }, [confirm, i18n, result, selectedIds, startApply, surveyInfo])
 
   const tabProps = { result, canEdit, selectedIds, onToggle, onlyDifferences, selectedItemId, onSelectItem }
   const listProps = { canEdit, selectedIds, onToggle }

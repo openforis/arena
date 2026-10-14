@@ -93,6 +93,7 @@ export const RemovalChange = ({
         <SelectionCheckbox canEdit={canEdit} diff={removal} selected={selected} onToggle={onToggle} />
         <span>{i18n.t(label)}</span>
         <ApplicabilityIcon applicability={removal.applicability} />
+        <DeletionNote diff={removal} selected={selected} />
       </div>
       <ApplicabilityMessages applicability={removal.applicability} />
     </div>
@@ -110,4 +111,13 @@ export const ChildItemStatus = ({ item }: { item: SurveyCompareChildItemDiff }) 
       {item.published && <span className="survey-compare__row-note"> {i18n.t('surveyCompareView:publishedKept')}</span>}
     </>
   )
+}
+
+/**
+ * Shown on selected changes that delete something only in this survey.
+ */
+export const DeletionNote = ({ diff, selected }: { diff: SurveyCompareChange; selected: boolean }) => {
+  const i18n = useI18n()
+  if (!selected || diff.status !== SurveyCompareStatus.removed) return null
+  return <span className="survey-compare__deletion-note">{i18n.t('surveyCompareView:willBeDeleted')}</span>
 }

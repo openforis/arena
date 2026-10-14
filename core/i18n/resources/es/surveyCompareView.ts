@@ -24,6 +24,17 @@ export default {
   apply: 'Aplicar los cambios seleccionados ({{count}})',
   applyConfirm: `¿Aplicar {{count}} cambios seleccionados a esta encuesta?
 Los cambios se guardan como borrador: llegarán a los registros solo cuando se publique la encuesta.`,
+  willBeDeleted: 'se eliminará',
+  removedNodeDefInfo:
+    'Esta definición de nodo solo está en esta encuesta: aplicar este cambio la elimina (junto con sus descendientes) de esta encuesta.',
+  removedItemInfo: 'Solo en esta encuesta: aplicar este cambio lo elimina de esta encuesta.',
+  applyConfirmWithDeletionsHeader: 'Confirmar las eliminaciones',
+  applyConfirmWithDeletions:
+    '¿Aplicar {{count}} cambios seleccionados a esta encuesta?\n\n**{{deletionsCount}} de ellos eliminan elementos de esta encuesta** (elementos que no están en la encuesta cargada):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+  applyWithDeletions: 'Aplicar y eliminar',
+  confirmSurveyName: 'Introduzca el nombre de esta encuesta para confirmar:',
+  deletionOfItemsOf: 'elementos solo en esta encuesta de **{{name}}**',
+  moreDeletions: '... y {{count}} más',
   applyCompleted:
     'Cambios aplicados: {{applied}}, omitidos: {{skipped}}. Publique la encuesta para que sean efectivos.',
   tabs: {

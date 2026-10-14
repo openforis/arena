@@ -25,6 +25,17 @@ export default {
   apply: 'Aplicar as alterações selecionadas ({{count}})',
   applyConfirm: `Aplicar {{count}} alterações selecionadas a este inventário?
 As alterações são salvas como rascunho: chegarão aos registros somente quando o inventário for publicado.`,
+  willBeDeleted: 'será eliminado',
+  removedNodeDefInfo:
+    'Esta definição de nó existe apenas neste inventário: aplicar esta alteração elimina-a (juntamente com os seus descendentes) deste inventário.',
+  removedItemInfo: 'Apenas neste inventário: aplicar esta alteração elimina-o deste inventário.',
+  applyConfirmWithDeletionsHeader: 'Confirmar as eliminações',
+  applyConfirmWithDeletions:
+    'Aplicar {{count}} alterações selecionadas a este inventário?\n\n**{{deletionsCount}} delas eliminam elementos deste inventário** (elementos que não estão no inventário carregado):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+  applyWithDeletions: 'Aplicar e eliminar',
+  confirmSurveyName: 'Introduza o nome deste inventário para confirmar:',
+  deletionOfItemsOf: 'elementos apenas neste inventário de **{{name}}**',
+  moreDeletions: '... e mais {{count}}',
   applyCompleted:
     'Alterações aplicadas: {{applied}}, ignoradas: {{skipped}}. Publique o inventário para torná-las efetivas.',
   tabs: {
