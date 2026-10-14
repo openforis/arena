@@ -64,3 +64,21 @@ export const startSurveyCompareApplyJob = async ({
   })
   return { job: data.job }
 }
+
+/**
+ * Fetches the fingerprints (SHA-256, strict and structural) of a survey definition.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {boolean} [params.draft] - Whether to use the draft (default) or the published version of the survey.
+ * @returns {Promise<{strict: string, structural: string}>} - The fingerprints.
+ */
+export const fetchSurveyFingerprint = async ({
+  surveyId,
+  draft = true,
+}: {
+  surveyId: number
+  draft?: boolean
+}): Promise<{ strict: string; structural: string }> => {
+  const { data } = await axios.get(`/api/survey/${surveyId}/fingerprint`, { params: { draft } })
+  return data
+}

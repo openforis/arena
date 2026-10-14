@@ -17,6 +17,13 @@ export default {
     'Comparar novamente o mesmo arquivo com a versão atual deste inventário (por ex. depois de editá-lo)',
   sourceSurvey: 'Inventário comparado: {{name}}',
   compareWithSurvey: 'Ou compare com outro inventário deste servidor:',
+  fingerprint: {
+    label: 'Impressão digital',
+    structural: 'estrutural',
+    info: 'Impressões digitais da definição do inventário (rascunho). Impressões iguais significam definições iguais. A primeira inclui os identificadores internos: é igual apenas para cópias do mesmo inventário (por ex. exportado e importado em outro servidor). A estrutural usa nomes e códigos: é igual também para inventários criados separadamente com a mesma estrutura. Nomes, rótulos, identificadores, datas e estado de publicação não fazem parte dela.',
+    copy: 'Clique para copiar: {{value}}',
+    copied: 'Impressão digital copiada para a área de transferência',
+  },
   identical: 'Os inventários são idênticos',
   counts: '{{added}} somente no inventário carregado, {{changed}} alterados, {{removed}} somente neste inventário',
   surveyInfoChanged:

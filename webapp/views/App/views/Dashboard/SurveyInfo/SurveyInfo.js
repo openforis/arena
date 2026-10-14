@@ -20,6 +20,9 @@ import { TestId } from '@webapp/utils/testId'
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
 import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+
+import { SurveyFingerprint } from './SurveyFingerprint'
+
 const SurveyInfo = (props) => {
   const { firstTime = false } = props
 
@@ -251,6 +254,7 @@ const SurveyInfo = (props) => {
           </Link>
         )}
       </div>
+      {!firstTime && <SurveyFingerprint />}
     </div>
   )
 }

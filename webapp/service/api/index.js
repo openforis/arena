@@ -173,7 +173,12 @@ export {
 
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
 
-export { startSurveyCompareJob, fetchSurveyCompareResult, startSurveyCompareApplyJob } from './surveyCompare'
+export {
+  startSurveyCompareJob,
+  fetchSurveyCompareResult,
+  startSurveyCompareApplyJob,
+  fetchSurveyFingerprint,
+} from './surveyCompare'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 

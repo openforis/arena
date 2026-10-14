@@ -16,6 +16,13 @@ export default {
     'Comparar de nuevo el mismo archivo con la versión actual de esta encuesta (p. ej. después de editarla)',
   sourceSurvey: 'Encuesta comparada: {{name}}',
   compareWithSurvey: 'O compare con otra encuesta de este servidor:',
+  fingerprint: {
+    label: 'Huella',
+    structural: 'estructural',
+    info: 'Huellas de la definición de la encuesta (borrador). Huellas iguales significan definiciones iguales. La primera incluye los identificadores internos: es igual solo para copias de la misma encuesta (p. ej. exportada e importada en otro servidor). La estructural usa nombres y códigos: es igual también para encuestas creadas por separado con la misma estructura. Nombres, etiquetas, identificadores, fechas y estado de publicación no forman parte de ella.',
+    copy: 'Haga clic para copiar: {{value}}',
+    copied: 'Huella copiada al portapapeles',
+  },
   identical: 'Las encuestas son idénticas',
   counts: '{{added}} solo en la encuesta cargada, {{changed}} modificados, {{removed}} solo en esta encuesta',
   surveyInfoChanged:

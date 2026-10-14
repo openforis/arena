@@ -252,9 +252,10 @@ selected for adding is blocked with that reason.
 
 Gives a quick yes/no on "identical?" without uploading anything: compare two short strings.
 
-- `core/survey/surveyFingerprint.ts`: `normalizeSurveyDefinition(survey, { categories, taxonomies })` →
-  canonical JSON (sorted keys, see **Normalization**); `computeSurveyFingerprint(...)` → SHA-256 hex
-  (Node `crypto` on the server, the hash is computed server side only).
+- `core/survey/surveyCompare/surveyFingerprint.ts`: `buildSurveyFingerprintContent({ survey, itemsByCategoryUuid,
+taxaByTaxonomyUuid, type })` → canonical JSON, built with the same normalizers as the comparison (see
+  **Normalization**); `server/modules/surveyCompare/service/surveyFingerprintService.ts` hashes it (SHA-256, Node
+  `crypto`, server side only). Survey name, labels, descriptions, branding and survey files are not part of it.
 - Two fingerprints, both shown:
   - **strict**: includes UUIDs. Equal when one survey was exported/imported/cloned from the other and has not
     changed since;
@@ -262,8 +263,8 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
     were created separately.
 - Computed on demand: `GET /api/survey/:surveyId/fingerprint?draft=true|false`. Draft and published give
   different values, so a Prod survey with unpublished edits is visible as such.
-- UI: dashboard `SurveyInfo` card, a "Definition fingerprint" row (first 12 chars, click to copy the full value),
-  plus a column in the Schema Summary export header.
+- UI: dashboard `SurveyInfo` card, a "Fingerprint" row with the draft strict and structural values (first 12 chars,
+  click to copy the full value).
 
 ## Implementation (phase 1)
 
@@ -310,6 +311,22 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
   `test/integration/tests/053surveyCompareApplyTest.ts` (deletions, new taxonomy, new language applied to a published
   survey, then published).
 
+## Implementation (phase 3)
+
+- **Compare with another survey on the same server**: the view offers a survey dropdown next to the dropzone. The
+  source of a comparison is a reference (`SurveyCompareSourceRef`): `sourceFileId` (uploaded file) or
+  `sourceSurveyId` (read from the DB, draft; survey file contents read from the file storage). The compare and apply
+  endpoints check that the user can view the source survey (`requireSurveyCompareSourceViewPermission`, published
+  templates allowed).
+- **Shared temp storage**: the uploaded file and the comparison result are kept with the temp file manager
+  (`keepFileForLaterUse`, file system or S3, see `surveyCompareSource.ts`), identified by uuids (`sourceFileId`,
+  `resultFileId`), so "Refresh comparison" and "Apply" work on any server instance. The result is deleted once read;
+  the source file is removed by the periodic temp files cleanup.
+- **Definition fingerprint**: see _Definition fingerprint_.
+- Tests: `test/unit/tests/057surveyFingerprint.test.ts`, third and fourth tests in
+  `test/integration/tests/053surveyCompareApplyTest.ts` (source survey on the same server, fingerprints of surveys in
+  sync), `test/e2e/specs/surveyCompare.spec.ts` (fingerprint on the dashboard, compare with another survey, apply).
+
 ## Remaining work
 
 Checklist of what is not implemented yet (as of the phase 1 merge, openforis/arena#4540). Where the design is
@@ -331,18 +348,19 @@ already described above, the item points to its section.
 
 ### Phase 3 and other features
 
-- [ ] **Definition fingerprint** on the dashboard. See _Definition fingerprint_.
-- [ ] **Export the differences** as Excel/CSV and JSON. See _UI_.
-- [ ] **Compare with another survey on the same server**, without exporting a file. See _User flow_.
+- [x] **Definition fingerprint** on the dashboard. See _Definition fingerprint_.
+- [ ] **Export the differences** as Excel/CSV and JSON. See _UI_. (Not planned for now.)
+- [x] **Compare with another survey on the same server**, without exporting a file. See _Implementation (phase 3)_.
 - [ ] **Processing chains** comparison. See _Non-goals_.
 
 ### Technical
 
-- [ ] **Temp files across app instances**: the uploaded file and the comparison result are kept in the server temp
-      folder between "Compare" and "Apply"; with several instances not sharing it, "Apply" can run on an instance
-      without the file. Store them in a shared place (e.g. the DB or the shared file storage).
-- [ ] **Chunked upload** of the survey file, like the survey import (today a single request, max 20 MB).
-- [ ] **E2E test** (Playwright) for the view: upload, differences, apply. See _Testing_.
+- [x] **Temp files across app instances**: the uploaded file and the comparison result are kept in the shared temp
+      storage. See _Implementation (phase 3)_.
+- [ ] **Chunked upload** of the survey file, like the survey import (today a single request, max 20 MB). (Not
+      planned for now.)
+- [x] **E2E test** (Playwright): compare with another survey on the same server and apply. The file upload is
+      covered by the integration tests.
 - [ ] **Translations review** by native speakers (es, fr, ja, mn, pt, ru).
 
 ## Non-goals

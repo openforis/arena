@@ -9,6 +9,7 @@ import * as Response from '@server/utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyCompareService from '../service/surveyCompareService'
+import * as SurveyFingerprintService from '../service/surveyFingerprintService'
 
 const maxFileSizeBytes = SurveyCompareMaxFileSizeMB * 1024 * 1024
 
@@ -108,4 +109,15 @@ export const init = (app: any) => {
       }
     }
   )
+
+  // fingerprints of the survey definition: they tell whether two surveys have the same definition
+  app.get('/survey/:surveyId/fingerprint', AuthMiddleware.requireSurveyViewPermission, async (req: any, res: any) => {
+    try {
+      const { surveyId, draft } = Request.getParams(req)
+      const fingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(surveyId), draft })
+      res.json(fingerprint)
+    } catch (error) {
+      Response.sendErr(res, error)
+    }
+  })
 }

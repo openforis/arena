@@ -14,6 +14,13 @@ export default {
   refreshComparisonInfo: 'Compare the same file again with the current version of this survey (e.g. after editing it)',
   sourceSurvey: 'Compared survey: {{name}}',
   compareWithSurvey: 'Or compare with another survey on this server:',
+  fingerprint: {
+    label: 'Fingerprint',
+    structural: 'structural',
+    info: 'Fingerprints of the survey definition (draft). Equal fingerprints mean equal definitions. The first one includes the internal ids: it is equal only for copies of the same survey (e.g. exported and imported on another server). The structural one uses names and codes: it is equal also for surveys created separately with the same structure. Names, labels, ids, dates and publishing status are not part of it.',
+    copy: 'Click to copy: {{value}}',
+    copied: 'Fingerprint copied to clipboard',
+  },
   identical: 'The surveys are identical',
   counts: '{{added}} only in the uploaded survey, {{changed}} changed, {{removed}} only in this survey',
   surveyInfoChanged: 'Survey info (languages, cycles, labels) differs: see the "Survey info" tab',

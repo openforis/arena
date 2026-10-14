@@ -18,6 +18,13 @@ export default {
     "Comparer à nouveau le même fichier avec la version actuelle de ce formulaire (par ex. après l'avoir modifié)",
   sourceSurvey: 'Formulaire comparé : {{name}}',
   compareWithSurvey: 'Ou comparez avec un autre formulaire de ce serveur :',
+  fingerprint: {
+    label: 'Empreinte',
+    structural: 'structurelle',
+    info: "Empreintes de la définition du formulaire (brouillon). Des empreintes égales signifient des définitions égales. La première inclut les identifiants internes : elle est égale uniquement pour des copies du même formulaire (par ex. exporté et importé sur un autre serveur). La structurelle utilise les noms et les codes : elle est égale aussi pour des formulaires créés séparément avec la même structure. Les noms, libellés, identifiants, dates et l'état de publication n'en font pas partie.",
+    copy: 'Cliquez pour copier : {{value}}',
+    copied: 'Empreinte copiée dans le presse-papiers',
+  },
   identical: 'Les formulaires sont identiques',
   counts:
     '{{added}} uniquement dans le formulaire chargé, {{changed}} modifiés, {{removed}} uniquement dans ce formulaire',

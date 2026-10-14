@@ -24,6 +24,7 @@ import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/aren
 import SurveyCompareJob from '@server/modules/surveyCompare/service/surveyCompareJob'
 import SurveyCompareApplyJob from '@server/modules/surveyCompare/service/surveyCompareApplyJob'
 import * as SurveyCompareService from '@server/modules/surveyCompare/service/surveyCompareService'
+import * as SurveyFingerprintService from '@server/modules/surveyCompare/service/surveyFingerprintService'
 
 import * as SB from '../../utils/surveyBuilder'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -308,5 +309,33 @@ describe('Survey compare: apply changes made in another environment', () => {
 
     const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceSurveyId: devSurveyId })
     expect(getAllChanges(resultAfter).filter((diff) => diff.status !== SurveyCompareStatus.identical)).toEqual([])
+
+    // surveys in sync: same definition fingerprints
+    const devFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    const qaFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(qaSurveyId) })
+    expect(qaFingerprint).toEqual(devFingerprint)
+  }, 60000)
+
+  test('the fingerprint changes when the definition changes', async () => {
+    const user = getContextUser()
+    const fingerprintBefore = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    const dev = await fetchSurvey(devSurveyId)
+    await NodeDefService.insertNodeDef({
+      user,
+      surveyId: devSurveyId,
+      cycle,
+      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.text, [cycle], {
+        name: 'remarks',
+      }),
+    })
+    const fingerprintAfter = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    expect(fingerprintAfter.strict).not.toBe(fingerprintBefore.strict)
+    expect(fingerprintAfter.structural).not.toBe(fingerprintBefore.structural)
+    // the published version can be fingerprinted too
+    const publishedFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({
+      surveyId: devSurveyId,
+      draft: false,
+    })
+    expect(publishedFingerprint.strict).toMatch(/^[0-9a-f]{64}$/)
   }, 60000)
 })
