@@ -8,13 +8,17 @@ import type { AiUnavailableReason } from './types'
 
 export type AiEngineErrorView = { retry: boolean; openSettings: boolean }
 
-// errors the user can fix outside Arena (start LM Studio, load a model) or in the settings (the appErrors text has the hint)
+// errors the user can fix outside Arena (start the local server, load a model) or in the settings (the appErrors text
+// has the hint); a provider error is fixed only by choosing or editing a provider, so it has no Retry
 const ENGINE_ERROR_VIEWS: Record<string, AiEngineErrorView> = {
   aiLocalServerUnreachable: { retry: true, openSettings: true },
   aiLocalServerModelMissing: { retry: true, openSettings: true },
   aiLocalServerError: { retry: true, openSettings: false },
   aiLocalServerContextExceeded: { retry: false, openSettings: false },
   aiNoEngineAvailable: { retry: true, openSettings: true },
+  aiProviderChooseAnother: { retry: false, openSettings: true },
+  aiProviderNotFound: { retry: false, openSettings: true },
+  aiApiKeyUnreadable: { retry: false, openSettings: true },
 }
 
 /**

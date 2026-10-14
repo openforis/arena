@@ -1399,7 +1399,7 @@ $t(common.appNameFull)
       destinationNoSurvey: 'Las solicitudes irán a {{baseUrl}} ({{location}}).',
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
-      useOther: 'Usar otro motor',
+      chooseOther: 'Elegir otro proveedor',
     },
   },
 

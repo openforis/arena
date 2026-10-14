@@ -1516,7 +1516,7 @@ $t(common.cantUndoWarning)`,
       destinationNoSurvey: 'リクエストは {{baseUrl}} ({{location}}) に送信されます。',
       model: 'モデル: {{modelId}}',
       continue: '続行',
-      useOther: '別のエンジンを使用',
+      chooseOther: '別のプロバイダーを選択',
     },
   },
 

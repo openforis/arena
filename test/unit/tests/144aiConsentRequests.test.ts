@@ -5,7 +5,6 @@ const request = (surveyId?: number, baseUrl = 'http://localhost:1234/v1') => ({
   baseUrl,
   modelId: 'local-model',
   hostingClass: 'onDevice' as const,
-  canUseOther: false,
 })
 
 describe('consent request queue', () => {
@@ -21,14 +20,6 @@ describe('consent request queue', () => {
     expect(queue.getPending()).toBeNull()
   })
 
-  test('a request without an alternative never shares a card that offers another engine', () => {
-    const queue = createConsentRequestQueue()
-    queue.request({ ...request(1), canUseOther: true })
-    queue.request(request(1))
-    queue.answer(queue.getPending()!.id, 'continue')
-    expect(queue.getPending()).toEqual({ id: 2, ...request(1) })
-  })
-
   test('requests for other surveys wait for their turn', async () => {
     const queue = createConsentRequestQueue()
     const forOne = queue.request(request(1))
@@ -37,8 +28,8 @@ describe('consent request queue', () => {
     queue.answer(queue.getPending()!.id, 'cancel')
     expect(await forOne).toBe('cancel')
     expect(queue.getPending()?.surveyId).toBe(2)
-    queue.answer(queue.getPending()!.id, 'useOther')
-    expect(await forTwo).toBe('useOther')
+    queue.answer(queue.getPending()!.id, 'chooseOther')
+    expect(await forTwo).toBe('chooseOther')
   })
 
   test('another server URL is another request', () => {

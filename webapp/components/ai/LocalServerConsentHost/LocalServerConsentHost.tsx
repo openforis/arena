@@ -7,6 +7,7 @@ import {
   getPendingConsentRequest,
   subscribeConsentRequests,
 } from '@webapp/ai/engines/consentRequests'
+import type { LocalServerConsentAnswer } from '@webapp/ai/engines/resolveModel'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
@@ -14,7 +15,8 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 /**
- * First-use dialog of the local AI server: says where the requests of this survey will go and asks to continue.
+ * First-use dialog of a local provider: says where the requests of this survey will go and asks to continue, or to
+ * choose another provider (the request then fails with aiProviderChooseAnother).
  * Mounted once in AppView; resolveModel opens it through the consent queue.
  * @returns {React.ReactElement|null} The dialog, or null when nothing is pending.
  */
@@ -24,13 +26,13 @@ export const LocalServerConsentHost = () => {
   const requestId = request?.id
 
   const answer = useCallback(
-    (value: 'continue' | 'useOther' | 'cancel') => {
+    (value: LocalServerConsentAnswer) => {
       if (requestId !== undefined) answerConsentRequest(requestId, value)
     },
     [requestId]
   )
   const onContinue = useCallback(() => answer('continue'), [answer])
-  const onUseOther = useCallback(() => answer('useOther'), [answer])
+  const onChooseOther = useCallback(() => answer('chooseOther'), [answer])
   const onCancel = useCallback(() => answer('cancel'), [answer])
 
   if (!request) return null
@@ -53,14 +55,12 @@ export const LocalServerConsentHost = () => {
       </ModalBody>
       <ModalFooter>
         <Button label="aiEngine.consent.continue" onClick={onContinue} testId={TestId.ai.consentContinue} />
-        {request.canUseOther && (
-          <Button
-            label="aiEngine.consent.useOther"
-            onClick={onUseOther}
-            testId={TestId.ai.consentUseOther}
-            variant="outlined"
-          />
-        )}
+        <Button
+          label="aiEngine.consent.chooseOther"
+          onClick={onChooseOther}
+          testId={TestId.ai.consentChooseOther}
+          variant="outlined"
+        />
       </ModalFooter>
     </Modal>
   )

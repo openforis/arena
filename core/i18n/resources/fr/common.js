@@ -1532,7 +1532,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       destinationNoSurvey: 'Les requêtes seront envoyées à {{baseUrl}} ({{location}}).',
       model: 'Modèle : {{modelId}}',
       continue: 'Continuer',
-      useOther: 'Utiliser un autre moteur',
+      chooseOther: 'Choisir un autre fournisseur',
     },
   },
 
