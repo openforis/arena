@@ -9,19 +9,25 @@ import {
   SurveyCompareReason,
   SurveyCompareReasonValue,
   SurveyCompareStatus,
+  SurveyCompareTaxonomyDiff,
 } from './surveyCompareTypes'
-import { NodeDefsIndex } from './surveyCompareNodeDefsIndex'
+import { NodeDefsIndex, getChildren } from './surveyCompareNodeDefsIndex'
 import { NodeDefMatches, nodeDefChangeId } from './surveyCompareNodeDefs'
 
 export interface ApplicabilityContext {
   sourceSurvey: any
+  targetSurvey: any
   sourceIndex: NodeDefsIndex
   targetIndex: NodeDefsIndex
   matches: NodeDefMatches
   categoryDiffBySourceUuid: Record<string, SurveyCompareCategoryDiff>
-  taxonomyTargetUuidBySourceUuid: Record<string, string>
+  taxonomyDiffBySourceUuid: Record<string, SurveyCompareTaxonomyDiff>
   targetTemplate: boolean
   targetCycleKeys: string[]
+  /** Id of the survey info change adding the missing cycles (if any). */
+  cyclesChangeId?: string
+  /** Cycles of the source survey (added to the target by the cycles change). */
+  sourceCycleKeys: string[]
 }
 
 interface ApplicabilityCheck {
@@ -37,11 +43,28 @@ const notApplicableReasonByPublishedProp = {
   [NodeDef.propKeys.taxonomyUuid]: SurveyCompareReason.publishedTaxonomyChanged,
 }
 
-const checkCycles = ({ check, context, sourceNodeDef, targetNodeDef, published }) => {
-  const sourceCycles: string[] = NodeDef.getCycles(sourceNodeDef)
-  if (sourceCycles.some((cycle) => !context.targetCycleKeys.includes(cycle))) {
+// cycles missing in the target survey can be added by the survey info change
+const checkCyclesExist = ({
+  check,
+  context,
+  cycles,
+}: {
+  check: ApplicabilityCheck
+  context: ApplicabilityContext
+  cycles: string[]
+}) => {
+  const missing = cycles.filter((cycle) => !context.targetCycleKeys.includes(cycle))
+  if (missing.length === 0) return
+  if (context.cyclesChangeId && missing.every((cycle) => context.sourceCycleKeys.includes(cycle))) {
+    check.dependsOn.add(context.cyclesChangeId)
+  } else {
     check.errors.add(SurveyCompareReason.cycleMissing)
   }
+}
+
+const checkCycles = ({ check, context, sourceNodeDef, targetNodeDef, published }) => {
+  const sourceCycles: string[] = NodeDef.getCycles(sourceNodeDef)
+  checkCyclesExist({ check, context, cycles: sourceCycles })
   if (published && NodeDef.getCycles(targetNodeDef).some((cycle: string) => !sourceCycles.includes(cycle))) {
     check.warnings.add(SurveyCompareReason.publishedCyclesRemoved)
   }
@@ -70,8 +93,12 @@ const checkCategoryReference = ({ check, context, sourceNodeDef }) => {
 
 const checkTaxonomyReference = ({ check, context, sourceNodeDef }) => {
   const taxonomyUuid = NodeDef.getTaxonomyUuid(sourceNodeDef)
-  if (taxonomyUuid && !context.taxonomyTargetUuidBySourceUuid[taxonomyUuid]) {
+  if (!taxonomyUuid) return
+  const taxonomyDiff = context.taxonomyDiffBySourceUuid[taxonomyUuid]
+  if (!taxonomyDiff) {
     check.errors.add(SurveyCompareReason.taxonomyMissing)
+  } else if (taxonomyDiff.status === SurveyCompareStatus.added) {
+    check.dependsOn.add(taxonomyDiff.id)
   }
 }
 
@@ -88,11 +115,19 @@ const checkAdded = ({ check, context, diff }) => {
   checkReferences({ check, context, sourceNodeDef })
 }
 
+// a node def can be moved only when not published; its new parent must exist or be added together with it
+const checkMove = ({ check, context, sourceNodeDef, published }) => {
+  if (published) {
+    check.errors.add(SurveyCompareReason.publishedMoveNotSupported)
+  }
+  checkNodeDefReference({ check, context, sourceUuid: NodeDef.getParentUuid(sourceNodeDef) })
+}
+
 const checkChangedPropDiff = ({ check, context, sourceNodeDef, targetNodeDef, published, propDiff }) => {
   const { key, group } = propDiff
   if (group === SurveyComparePropGroup.structure) {
     if (key === 'parent') {
-      check.errors.add(SurveyCompareReason.moveNotSupported)
+      checkMove({ check, context, sourceNodeDef, published })
     } else if (published) {
       check.errors.add(SurveyCompareReason.publishedTypeChanged)
     }
@@ -113,17 +148,47 @@ const checkChanged = ({ check, context, diff }) => {
   const sourceNodeDef = context.sourceIndex.byUuid[diff.sourceUuid]
   const targetNodeDef = context.targetIndex.byUuid[diff.targetUuid]
   const published = NodeDef.isPublished(targetNodeDef) && !context.targetTemplate
-  // layouts of cycles missing in the target survey are not applied
-  const hasApplicableDiffs = diff.propDiffs.some(
+  // layouts of cycles missing in the target survey are applied only when the cycles are added
+  const hasDiffsInExistingCycles = diff.propDiffs.some(
     ({ group, cycle }) => group !== SurveyComparePropGroup.layout || context.targetCycleKeys.includes(cycle)
   )
-  if (!hasApplicableDiffs) {
-    check.errors.add(SurveyCompareReason.cycleMissing)
+  if (!hasDiffsInExistingCycles) {
+    checkCyclesExist({ check, context, cycles: diff.propDiffs.map(({ cycle }) => cycle) })
   }
   for (const propDiff of diff.propDiffs) {
     checkChangedPropDiff({ check, context, sourceNodeDef, targetNodeDef, published, propDiff })
   }
   checkReferences({ check, context, sourceNodeDef })
+}
+
+const getTargetDependentUuids = ({ context, targetUuid }): string[] => {
+  try {
+    return Survey.getNodeDefDependentsUuids(targetUuid)(context.targetSurvey)
+  } catch {
+    return [] // dependency graph not available
+  }
+}
+
+// a node def only in the target survey is deleted together with its descendants
+const checkRemoved = ({ check, context, diff, diffsById }) => {
+  const targetNodeDef = context.targetIndex.byUuid[diff.targetUuid]
+  if (NodeDef.isPublished(targetNodeDef) && !context.targetTemplate) {
+    check.warnings.add(SurveyCompareReason.publishedNodeDefDeleted)
+  }
+  for (const child of getChildren(context.targetIndex, diff.targetUuid)) {
+    const childUuid = NodeDef.getUuid(child)
+    const childSourceUuid = context.matches.sourceUuidByTargetUuid[childUuid]
+    // a child matched elsewhere must be moved before its parent is deleted
+    check.dependsOn.add(nodeDefChangeId(childSourceUuid ?? childUuid))
+  }
+  const usedByOthers = getTargetDependentUuids({ context, targetUuid: diff.targetUuid }).some((dependentUuid) => {
+    if (dependentUuid === diff.targetUuid) return false
+    const sourceUuid = context.matches.sourceUuidByTargetUuid[dependentUuid]
+    return sourceUuid || diffsById[nodeDefChangeId(dependentUuid)]?.status !== SurveyCompareStatus.removed
+  })
+  if (usedByOthers) {
+    check.warnings.add(SurveyCompareReason.nodeDefUsedByOthers)
+  }
 }
 
 const toApplicability = (check: ApplicabilityCheck) => {
@@ -136,14 +201,22 @@ const toApplicability = (check: ApplicabilityCheck) => {
   return { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] }
 }
 
-const checkNodeDefDiff = ({ context, diff }: { context: ApplicabilityContext; diff: SurveyCompareNodeDefDiff }) => {
+const checkNodeDefDiff = ({
+  context,
+  diff,
+  diffsById,
+}: {
+  context: ApplicabilityContext
+  diff: SurveyCompareNodeDefDiff
+  diffsById: Record<string, any>
+}) => {
   const check: ApplicabilityCheck = { errors: new Set(), warnings: new Set(), dependsOn: new Set() }
   if (diff.status === SurveyCompareStatus.added) {
     checkAdded({ check, context, diff })
   } else if (diff.status === SurveyCompareStatus.changed) {
     checkChanged({ check, context, diff })
   } else {
-    check.errors.add(SurveyCompareReason.removalNotSupported)
+    checkRemoved({ check, context, diff, diffsById })
   }
   diff.applicability = toApplicability(check)
   diff.dependsOn = [...check.dependsOn]
@@ -188,6 +261,50 @@ const addLinks = ({ context, diffsById }) => {
   return context
 }
 
+// a category (or taxonomy) only in the target survey can be deleted only together with the node defs using it
+const checkReferencedItemRemoval = ({ context, diff, getReferenceUuid, inUseReason, diffsById }) => {
+  const usingNodeDefs = Object.values(context.targetIndex.byUuid).filter(
+    (nodeDef) => getReferenceUuid(nodeDef) === diff.targetUuid
+  )
+  const dependsOn = []
+  let inUse = false
+  for (const nodeDef of usingNodeDefs) {
+    const nodeDefDiff = diffsById[nodeDefChangeId(NodeDef.getUuid(nodeDef))]
+    if (nodeDefDiff?.status === SurveyCompareStatus.removed) {
+      dependsOn.push(nodeDefDiff.id)
+    } else {
+      inUse = true
+    }
+  }
+  diff.dependsOn = dependsOn
+  diff.applicability = inUse
+    ? { status: SurveyCompareApplicabilityStatus.notApplicable, reasons: [inUseReason] }
+    : { status: SurveyCompareApplicabilityStatus.applicable, reasons: [] }
+}
+
+const checkRemovedCategoriesAndTaxonomies = ({ context, categoryDiffs, taxonomyDiffs, diffsById }) => {
+  for (const diff of categoryDiffs) {
+    if (diff.status !== SurveyCompareStatus.removed) continue
+    checkReferencedItemRemoval({
+      context,
+      diff,
+      getReferenceUuid: NodeDef.getCategoryUuid,
+      inUseReason: SurveyCompareReason.categoryInUse,
+      diffsById,
+    })
+  }
+  for (const diff of taxonomyDiffs) {
+    if (diff.status !== SurveyCompareStatus.removed) continue
+    checkReferencedItemRemoval({
+      context,
+      diff,
+      getReferenceUuid: NodeDef.getTaxonomyUuid,
+      inUseReason: SurveyCompareReason.taxonomyInUse,
+      diffsById,
+    })
+  }
+}
+
 const propagateNotApplicable = (diffsById: Record<string, any>) => {
   let changed = true
   while (changed) {
@@ -210,28 +327,37 @@ const propagateNotApplicable = (diffsById: Record<string, any>) => {
 }
 
 /**
- * Sets applicability, dependencies and links of node def and category diffs (diffs are modified in place).
+ * Sets applicability, dependencies and links of node def, category and taxonomy diffs (diffs are modified in place).
  * @param {object} params - The parameters.
  * @param {ApplicabilityContext} params.context - The applicability context.
  * @param {SurveyCompareNodeDefDiff[]} params.nodeDefDiffs - Node def diffs.
  * @param {SurveyCompareCategoryDiff[]} params.categoryDiffs - Category diffs.
+ * @param {SurveyCompareTaxonomyDiff[]} params.taxonomyDiffs - Taxonomy diffs.
+ * @param {any[]} params.otherChanges - Other changes the diffs can depend on (e.g. survey info).
  * @returns {void}
  */
 export const evaluateApplicability = ({
   context,
   nodeDefDiffs,
   categoryDiffs,
+  taxonomyDiffs,
+  otherChanges,
 }: {
   context: ApplicabilityContext
   nodeDefDiffs: SurveyCompareNodeDefDiff[]
   categoryDiffs: SurveyCompareCategoryDiff[]
+  taxonomyDiffs: SurveyCompareTaxonomyDiff[]
+  otherChanges: any[]
 }): void => {
+  const diffsById = Object.fromEntries(
+    [...nodeDefDiffs, ...categoryDiffs, ...taxonomyDiffs, ...otherChanges].map((diff) => [diff.id, diff])
+  )
   for (const diff of nodeDefDiffs) {
     if (diff.status !== SurveyCompareStatus.identical) {
-      checkNodeDefDiff({ context, diff })
+      checkNodeDefDiff({ context, diff, diffsById })
     }
   }
-  const diffsById = Object.fromEntries([...nodeDefDiffs, ...categoryDiffs].map((diff) => [diff.id, diff]))
+  checkRemovedCategoriesAndTaxonomies({ context, categoryDiffs, taxonomyDiffs, diffsById })
   addExpressionDependencies({ context, diffsById })
   addLinks({ context, diffsById })
   propagateNotApplicable(diffsById)

@@ -3,20 +3,18 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
-import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
 
 import {
   SurveyCompareApplicabilityStatus,
-  SurveyCompareCategoryDiff,
   SurveyCompareNodeDefDiff,
   SurveyCompareParams,
   SurveyComparePropGroup,
   SurveyCompareResult,
   SurveyCompareStatus,
+  getAllChanges,
 } from './surveyCompareTypes'
-import { indexItemsByCodePath, updatableCategoryProps } from './surveyCompareCategories'
+import { CategoriesApplyPlan, newCategoriesApplyPlan, planCategories } from './surveyCompareApplyPlannerCategories'
+import { TaxonomiesApplyPlan, newTaxonomiesApplyPlan, planTaxonomies } from './surveyCompareApplyPlannerTaxonomies'
 
 export interface NodeDefUpdate {
   nodeDefUuid: string
@@ -24,15 +22,15 @@ export interface NodeDefUpdate {
   type?: string
   props: Record<string, any>
   propsAdvanced: Record<string, any>
+  /** Meta (hierarchy) to update when the node def (or one of its ancestors) is moved. */
+  meta?: { h: string[] }
 }
 
-export interface SurveyCompareApplyPlan {
-  categoriesToInsert: { category: any; items: any[] }[]
-  categoryPropsToUpdate: { categoryUuid: string; key: string; value: any }[]
-  categoryItemsToInsert: { categoryUuid: string; items: any[] }[]
-  categoryItemsToUpdate: { categoryUuid: string; items: any[] }[]
+export interface SurveyCompareApplyPlan extends CategoriesApplyPlan, TaxonomiesApplyPlan {
   nodeDefsToInsert: any[]
   nodeDefsToUpdate: NodeDefUpdate[]
+  /** Node defs to mark as deleted (their descendants are deleted with them). */
+  nodeDefUuidsToDelete: string[]
   appliedIds: string[]
   skippedIds: string[]
 }
@@ -44,15 +42,27 @@ interface PlanContext extends SurveyCompareParams {
   nodeDefUuidMap: Record<string, string>
   categoryUuidMap: Record<string, string>
   taxonomyUuidMap: Record<string, string>
+  /** Parent uuid of every node def of the target survey once the changes are applied (deleted ones excluded). */
+  parentUuidByUuid: Record<string, string | null>
+  /** Target node defs deleted (descendants of deleted node defs included). */
+  deletedUuids: Set<string>
+  /** New parent uuid of the moved node defs. */
+  newParentUuidByMovedUuid: Record<string, string>
+  insertedByUuid: Record<string, any>
 }
 
 const isApplicable = (diff: { applicability?: { status: string } }): boolean =>
-  Boolean(diff.applicability) && diff.applicability.status !== SurveyCompareApplicabilityStatus.notApplicable
+  Boolean(diff?.applicability) && diff.applicability.status !== SurveyCompareApplicabilityStatus.notApplicable
 
-const expandSelection = ({ result, selectedIds }: { result: SurveyCompareResult; selectedIds: string[] }) => {
-  const diffsById = Object.fromEntries(
-    [...result.nodeDefs, ...result.categories, ...result.taxonomies].map((diff) => [diff.id, diff])
-  )
+/**
+ * Expands the selected changes with the changes they depend on; not applicable changes are skipped.
+ * @param {object} params - The parameters.
+ * @param {SurveyCompareResult} params.result - The comparison result.
+ * @param {string[]} params.selectedIds - Ids of the selected changes.
+ * @returns {{appliedIds: Set<string>, skippedIds: string[]}} - Ids of the changes to apply and of the skipped ones.
+ */
+export const expandSelection = ({ result, selectedIds }: { result: SurveyCompareResult; selectedIds: string[] }) => {
+  const diffsById = Object.fromEntries(getAllChanges(result).map((diff) => [diff.id, diff]))
   const expanded = new Set<string>()
   const stack = [...selectedIds]
   while (stack.length > 0) {
@@ -96,8 +106,8 @@ const buildCategoryAndTaxonomyUuidMaps = ({
     }
   }
   for (const diff of result.taxonomies) {
-    if (diff.sourceUuid && diff.targetUuid) {
-      context.taxonomyUuidMap[diff.sourceUuid] = diff.targetUuid
+    if (diff.sourceUuid && (diff.targetUuid || appliedIds.has(diff.id))) {
+      context.taxonomyUuidMap[diff.sourceUuid] = diff.targetUuid ?? diff.sourceUuid
     }
   }
 }
@@ -105,95 +115,6 @@ const buildCategoryAndTaxonomyUuidMaps = ({
 const buildUuidMaps = ({ context, appliedIds }: { context: PlanContext; appliedIds: Set<string> }) => {
   buildNodeDefUuidMap({ context, appliedIds })
   buildCategoryAndTaxonomyUuidMaps({ context, appliedIds })
-}
-
-// ===== CATEGORIES
-
-const planCategoryInsert = ({ context, diff, plan }) => {
-  const category = Survey.getCategoryByUuid(diff.sourceUuid)(context.sourceSurvey)
-  const categoryUuid = Category.getUuid(category)
-  const levels = Category.getLevelsArray(category).map(CategoryLevel.assocCategoryUuid(categoryUuid))
-  plan.categoriesToInsert.push({
-    category: Category.assocLevelsArray(levels)(category),
-    items: context.sourceItemsByCategoryUuid[categoryUuid] ?? [],
-  })
-}
-
-const sortByCodePathLength = <T extends { codePath: string[] }>(entries: T[]): T[] =>
-  [...entries].sort((entryA, entryB) => entryA.codePath.length - entryB.codePath.length)
-
-const planCategoryItemsChanges = ({
-  context,
-  diff,
-  plan,
-  targetCategory,
-}: {
-  context: PlanContext
-  diff: SurveyCompareCategoryDiff
-  plan: SurveyCompareApplyPlan
-  targetCategory: any
-}) => {
-  const targetItems = context.targetItemsByCategoryUuid[diff.targetUuid] ?? []
-  const sourceIndex = indexItemsByCodePath(context.sourceItemsByCategoryUuid[diff.sourceUuid])
-  const targetIndex = indexItemsByCodePath(targetItems)
-  const targetItemUuids = new Set(targetItems.map(CategoryItem.getUuid))
-  const targetLevels = Category.getLevelsArray(targetCategory)
-  const itemUuidByCodePathKey = Object.fromEntries(
-    Object.entries(targetIndex).map(([key, { item }]) => [key, CategoryItem.getUuid(item)])
-  )
-  const itemsToInsert = []
-  const itemsToUpdate = []
-  for (const { codePath, status } of sortByCodePathLength(diff.items)) {
-    const key = JSON.stringify(codePath)
-    const sourceItem = sourceIndex[key]?.item
-    if (status === SurveyCompareStatus.added) {
-      const sourceItemUuid = CategoryItem.getUuid(sourceItem)
-      const uuid = targetItemUuids.has(sourceItemUuid) ? uuidv4() : sourceItemUuid
-      const parentKey = codePath.length > 1 ? JSON.stringify(codePath.slice(0, -1)) : null
-      itemUuidByCodePathKey[key] = uuid
-      itemsToInsert.push({
-        ...sourceItem,
-        uuid,
-        levelUuid: CategoryLevel.getUuid(targetLevels[codePath.length - 1]),
-        parentUuid: parentKey ? itemUuidByCodePathKey[parentKey] : null,
-      })
-    } else if (status === SurveyCompareStatus.changed) {
-      const targetItem = targetIndex[key].item
-      itemsToUpdate.push({
-        ...targetItem,
-        props: { ...CategoryItem.getProps(sourceItem), index: CategoryItem.getIndex(targetItem) },
-      })
-    }
-  }
-  const categoryUuid = Category.getUuid(targetCategory)
-  if (itemsToInsert.length > 0) plan.categoryItemsToInsert.push({ categoryUuid, items: itemsToInsert })
-  if (itemsToUpdate.length > 0) plan.categoryItemsToUpdate.push({ categoryUuid, items: itemsToUpdate })
-}
-
-const planCategoryUpdate = ({ context, diff, plan }) => {
-  const sourceCategory = Survey.getCategoryByUuid(diff.sourceUuid)(context.sourceSurvey)
-  const targetCategory = Survey.getCategoryByUuid(diff.targetUuid)(context.targetSurvey)
-  for (const { key } of diff.propDiffs) {
-    if (updatableCategoryProps.includes(key)) {
-      plan.categoryPropsToUpdate.push({
-        categoryUuid: diff.targetUuid,
-        key,
-        value: Category.getProps(sourceCategory)[key] ?? null,
-      })
-    }
-  }
-  planCategoryItemsChanges({ context, diff, plan, targetCategory })
-}
-
-const planCategories = ({ context, appliedIds, plan }) => {
-  for (const diff of context.result.categories as SurveyCompareCategoryDiff[]) {
-    if (!appliedIds.has(diff.id)) continue
-    if (diff.status === SurveyCompareStatus.added) {
-      planCategoryInsert({ context, diff, plan })
-    } else if (diff.status === SurveyCompareStatus.changed) {
-      planCategoryUpdate({ context, diff, plan })
-    }
-  }
 }
 
 // ===== NODE DEFS
@@ -206,6 +127,9 @@ const mapRefs = ({ context, props }: { context: PlanContext; props: Record<strin
   if (parentCodeDefUuid) result.parentCodeDefUuid = context.nodeDefUuidMap[parentCodeDefUuid] ?? parentCodeDefUuid
   return result
 }
+
+const getTargetNodeDef = (context: PlanContext, uuid: string): any =>
+  context.insertedByUuid[uuid] ?? Survey.getNodeDefByUuid(uuid)(context.targetSurvey)
 
 const mapLayoutChildUuid = (context: PlanContext, uuid: string): string | undefined => context.nodeDefUuidMap[uuid]
 
@@ -267,18 +191,16 @@ const mapCycleLayout = ({ context, cycle, cycleLayout, children, targetCycleLayo
   return appendMissingChildren({ cycle, cycleLayout: result, children, targetCycleLayout })
 }
 
-const getTargetChildren = ({ context, targetUuid, insertedNodeDefs }) => {
-  const existing = Survey.getNodeDefsArray(context.targetSurvey).filter(
-    (nodeDef) => NodeDef.getParentUuid(nodeDef) === targetUuid && !NodeDef.isDeleted(nodeDef)
-  )
-  const inserted = insertedNodeDefs.filter((nodeDef) => NodeDef.getParentUuid(nodeDef) === targetUuid)
-  return [...existing, ...inserted]
-}
+// children of a node def once the changes are applied (inserted, moved and deleted node defs considered)
+const getTargetChildren = ({ context, targetUuid }: { context: PlanContext; targetUuid: string }) =>
+  Object.entries(context.parentUuidByUuid)
+    .filter(([, parentUuid]) => parentUuid === targetUuid)
+    .map(([uuid]) => getTargetNodeDef(context, uuid))
 
-const buildLayout = ({ context, sourceNodeDef, targetNodeDef, targetUuid, cycles, insertedNodeDefs }) => {
+const buildLayout = ({ context, sourceNodeDef, targetNodeDef, targetUuid, cycles }) => {
   const sourceLayout = NodeDef.getLayout(sourceNodeDef) ?? {}
   const targetLayout = targetNodeDef ? (NodeDef.getLayout(targetNodeDef) ?? {}) : {}
-  const children = getTargetChildren({ context, targetUuid, insertedNodeDefs })
+  const children = getTargetChildren({ context, targetUuid })
   const layout = { ...targetLayout }
   for (const cycle of cycles) {
     if (!context.targetCycleKeys.includes(cycle) || !sourceLayout[cycle]) continue
@@ -293,12 +215,11 @@ const buildLayout = ({ context, sourceNodeDef, targetNodeDef, targetUuid, cycles
   return layout
 }
 
-const planNodeDefInsert = ({ context, diff, plan, insertedByUuid, sourceUuidByInsertedUuid }) => {
+const planNodeDefInsert = ({ context, diff, plan, sourceUuidByInsertedUuid }) => {
   const sourceNodeDef = Survey.getNodeDefByUuid(diff.sourceUuid)(context.sourceSurvey)
   const uuid = context.nodeDefUuidMap[diff.sourceUuid]
   const parentUuid = context.nodeDefUuidMap[NodeDef.getParentUuid(sourceNodeDef)]
-  const parent = insertedByUuid[parentUuid] ?? Survey.getNodeDefByUuid(parentUuid)(context.targetSurvey)
-  // layout is set later, when all the inserted node defs are known
+  // layout and hierarchy are set later, when all the inserted node defs are known
   const props = { ...NodeDef.getProps(sourceNodeDef) }
   delete props.layout
   const nodeDef = {
@@ -307,11 +228,11 @@ const planNodeDefInsert = ({ context, diff, plan, insertedByUuid, sourceUuidByIn
     type: NodeDef.getType(sourceNodeDef),
     props: mapRefs({ context, props }),
     propsAdvanced: NodeDef.getPropsAdvanced(sourceNodeDef),
-    meta: { h: [...NodeDef.getMetaHierarchy(parent), parentUuid] },
+    meta: { h: [] },
     analysis: false,
     virtual: false,
   }
-  insertedByUuid[uuid] = nodeDef
+  context.insertedByUuid[uuid] = nodeDef
   sourceUuidByInsertedUuid[uuid] = diff.sourceUuid
   plan.nodeDefsToInsert.push(nodeDef)
 }
@@ -324,18 +245,21 @@ const getRawPropValue = ({ context, sourceNodeDef, group, key }) => {
   return props[key] ?? null
 }
 
+const newNodeDefUpdate = ({ context, nodeDefUuid }: { context: PlanContext; nodeDefUuid: string }): NodeDefUpdate => ({
+  nodeDefUuid,
+  parentUuid: context.parentUuidByUuid[nodeDefUuid],
+  props: {},
+  propsAdvanced: {},
+})
+
 const planNodeDefUpdate = ({ context, diff, plan, layoutUpdatedUuids }) => {
   const sourceNodeDef = Survey.getNodeDefByUuid(diff.sourceUuid)(context.sourceSurvey)
   const targetNodeDef = Survey.getNodeDefByUuid(diff.targetUuid)(context.targetSurvey)
-  const update: NodeDefUpdate = {
-    nodeDefUuid: diff.targetUuid,
-    parentUuid: NodeDef.getParentUuid(targetNodeDef),
-    props: {},
-    propsAdvanced: {},
-  }
+  const update = newNodeDefUpdate({ context, nodeDefUuid: diff.targetUuid })
   const layoutCycles = []
   for (const { group, key, cycle } of diff.propDiffs) {
     if (group === SurveyComparePropGroup.structure) {
+      // moves are applied through the parent uuid (see buildParentUuidByUuid)
       if (key === 'type') update.type = NodeDef.getType(sourceNodeDef)
     } else if (group === SurveyComparePropGroup.layout) {
       layoutCycles.push(cycle)
@@ -353,7 +277,6 @@ const planNodeDefUpdate = ({ context, diff, plan, layoutUpdatedUuids }) => {
       targetNodeDef,
       targetUuid: diff.targetUuid,
       cycles: layoutCycles,
-      insertedNodeDefs: plan.nodeDefsToInsert,
     })
   }
   if (update.type) {
@@ -367,12 +290,18 @@ const planNodeDefUpdate = ({ context, diff, plan, layoutUpdatedUuids }) => {
   plan.nodeDefsToUpdate.push(update)
 }
 
-// inserted node defs need to be added to the layout of their parent, when not already done by a source layout
-const addInsertedNodeDefsToParentLayout = ({ context, plan, layoutUpdatedUuids }) => {
+// ===== PARENT LAYOUTS (inserted, moved and deleted node defs)
+
+interface ParentLayoutsContext {
+  context: PlanContext
+  plan: SurveyCompareApplyPlan
+  layoutUpdatedUuids: Set<string>
+  updatesByUuid: Record<string, NodeDefUpdate>
+  survey: any
+}
+
+const buildSimulatedSurvey = ({ context, plan }: { context: PlanContext; plan: SurveyCompareApplyPlan }) => {
   let survey = context.targetSurvey
-  const updatesByUuid: Record<string, NodeDefUpdate> = Object.fromEntries(
-    plan.nodeDefsToUpdate.map((update) => [update.nodeDefUuid, update])
-  )
   for (const update of plan.nodeDefsToUpdate) {
     const nodeDef = Survey.getNodeDefByUuid(update.nodeDefUuid)(survey)
     const nodeDefUpdated = { ...nodeDef, props: { ...NodeDef.getProps(nodeDef), ...update.props } }
@@ -381,43 +310,157 @@ const addInsertedNodeDefsToParentLayout = ({ context, plan, layoutUpdatedUuids }
   for (const nodeDef of plan.nodeDefsToInsert) {
     survey = Survey.assocNodeDef({ nodeDef })(survey)
   }
+  return survey
+}
+
+const setParentLayout = ({ parentsContext, parentUpdated }) => {
+  const { context, plan, updatesByUuid } = parentsContext
+  const parentUuid = NodeDef.getUuid(parentUpdated)
+  parentsContext.survey = Survey.mergeNodeDefs({ [parentUuid]: parentUpdated })(parentsContext.survey)
+  const layout = NodeDef.getLayout(parentUpdated)
+  const insertedParent = context.insertedByUuid[parentUuid]
+  if (insertedParent) {
+    insertedParent.props = { ...insertedParent.props, layout }
+    return
+  }
+  let update = updatesByUuid[parentUuid]
+  if (!update) {
+    update = newNodeDefUpdate({ context, nodeDefUuid: parentUuid })
+    updatesByUuid[parentUuid] = update
+    plan.nodeDefsToUpdate.push(update)
+  }
+  update.props = { ...update.props, layout }
+}
+
+// parent layouts already built from the source layout (or of deleted parents) are not changed
+const canUpdateParentLayout = (parentsContext: ParentLayoutsContext, parentUuid: string): boolean =>
+  Boolean(parentUuid) &&
+  !parentsContext.layoutUpdatedUuids.has(parentUuid) &&
+  !parentsContext.context.deletedUuids.has(parentUuid)
+
+const updateParentLayout = ({ parentsContext, nodeDef, cyclesAdded = [], cyclesDeleted = [] }) => {
+  if (!canUpdateParentLayout(parentsContext, NodeDef.getParentUuid(nodeDef))) return
+  const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
+    survey: parentsContext.survey,
+    nodeDef,
+    cyclesAdded,
+    cyclesDeleted,
+  })
+  if (parentUpdated) {
+    setParentLayout({ parentsContext, parentUpdated })
+  }
+}
+
+const getExistingCycles = (context: PlanContext, nodeDef: any): string[] =>
+  NodeDef.getCycles(nodeDef).filter((cycle: string) => context.targetCycleKeys.includes(cycle))
+
+const updateParentLayouts = ({ context, plan, layoutUpdatedUuids }) => {
+  const parentsContext: ParentLayoutsContext = {
+    context,
+    plan,
+    layoutUpdatedUuids,
+    updatesByUuid: Object.fromEntries(plan.nodeDefsToUpdate.map((update) => [update.nodeDefUuid, update])),
+    survey: buildSimulatedSurvey({ context, plan }),
+  }
   for (const nodeDef of plan.nodeDefsToInsert) {
-    const parentUuid = NodeDef.getParentUuid(nodeDef)
-    if (layoutUpdatedUuids.has(parentUuid)) continue
-    const cyclesAdded = NodeDef.getCycles(nodeDef).filter((cycle: string) => context.targetCycleKeys.includes(cycle))
-    const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded })
-    if (!parentUpdated) continue
-    survey = Survey.mergeNodeDefs({ [parentUuid]: parentUpdated })(survey)
-    const insertedParent = plan.nodeDefsToInsert.find((inserted) => NodeDef.getUuid(inserted) === parentUuid)
-    if (insertedParent) {
-      insertedParent.props = { ...insertedParent.props, layout: NodeDef.getLayout(parentUpdated) }
-    } else {
-      const update = updatesByUuid[parentUuid] ?? {
-        nodeDefUuid: parentUuid,
-        parentUuid: NodeDef.getParentUuid(parentUpdated),
-        props: {},
-        propsAdvanced: {},
-      }
-      update.props = { ...update.props, layout: NodeDef.getLayout(parentUpdated) }
-      if (!updatesByUuid[parentUuid]) {
-        updatesByUuid[parentUuid] = update
-        plan.nodeDefsToUpdate.push(update)
-      }
+    updateParentLayout({ parentsContext, nodeDef, cyclesAdded: getExistingCycles(context, nodeDef) })
+  }
+  for (const [uuid, newParentUuid] of Object.entries(context.newParentUuidByMovedUuid)) {
+    const nodeDef = Survey.getNodeDefByUuid(uuid)(parentsContext.survey)
+    const cycles = getExistingCycles(context, nodeDef)
+    updateParentLayout({ parentsContext, nodeDef, cyclesDeleted: cycles })
+    const nodeDefMoved = { ...nodeDef, parentUuid: newParentUuid }
+    parentsContext.survey = Survey.mergeNodeDefs({ [uuid]: nodeDefMoved })(parentsContext.survey)
+    updateParentLayout({ parentsContext, nodeDef: nodeDefMoved, cyclesAdded: cycles })
+  }
+  for (const uuid of plan.nodeDefUuidsToDelete) {
+    const nodeDef = Survey.getNodeDefByUuid(uuid)(parentsContext.survey)
+    updateParentLayout({ parentsContext, nodeDef, cyclesDeleted: getExistingCycles(context, nodeDef) })
+  }
+}
+
+// ===== HIERARCHY
+
+const computeHierarchy = (context: PlanContext, uuid: string, cache: Record<string, string[]>): string[] => {
+  const cached = cache[uuid]
+  if (cached) return cached
+  const parentUuid = context.parentUuidByUuid[uuid]
+  const h = parentUuid ? [...computeHierarchy(context, parentUuid, cache), parentUuid] : []
+  cache[uuid] = h
+  return h
+}
+
+// inserted node defs get their hierarchy; moved node defs (and their descendants) get the updated one
+const updateHierarchies = ({ context, plan }: { context: PlanContext; plan: SurveyCompareApplyPlan }) => {
+  const cache: Record<string, string[]> = {}
+  for (const nodeDef of plan.nodeDefsToInsert) {
+    nodeDef.meta = { ...nodeDef.meta, h: computeHierarchy(context, NodeDef.getUuid(nodeDef), cache) }
+  }
+  if (Object.keys(context.newParentUuidByMovedUuid).length === 0) return
+  const updatesByUuid = Object.fromEntries(plan.nodeDefsToUpdate.map((update) => [update.nodeDefUuid, update]))
+  for (const uuid of Object.keys(context.parentUuidByUuid)) {
+    const nodeDef = Survey.getNodeDefByUuid(uuid)(context.targetSurvey)
+    if (!nodeDef || context.insertedByUuid[uuid]) continue
+    const h = computeHierarchy(context, uuid, cache)
+    if (JSON.stringify(h) === JSON.stringify(NodeDef.getMetaHierarchy(nodeDef))) continue
+    let update = updatesByUuid[uuid]
+    if (!update) {
+      update = newNodeDefUpdate({ context, nodeDefUuid: uuid })
+      updatesByUuid[uuid] = update
+      plan.nodeDefsToUpdate.push(update)
+    }
+    update.meta = { h }
+  }
+}
+
+// ===== FINAL HIERARCHY (moves and deletions)
+
+const planDeletionsAndMoves = ({ context, appliedIds, plan }) => {
+  const nodeDefDiffs = context.result.nodeDefs as SurveyCompareNodeDefDiff[]
+  const diffsById = Object.fromEntries(nodeDefDiffs.map((diff) => [diff.id, diff]))
+  const isAppliedRemoval = (diff: SurveyCompareNodeDefDiff) =>
+    diff?.status === SurveyCompareStatus.removed && appliedIds.has(diff.id)
+  for (const diff of nodeDefDiffs) {
+    if (isAppliedRemoval(diff)) {
+      context.deletedUuids.add(diff.targetUuid)
+      // descendants are deleted together with their ancestor
+      if (!isAppliedRemoval(diffsById[diff.parentId])) plan.nodeDefUuidsToDelete.push(diff.targetUuid)
+    } else if (
+      diff.status === SurveyCompareStatus.changed &&
+      appliedIds.has(diff.id) &&
+      diff.propDiffs.some(
+        (propDiff) => propDiff.key === 'parent' && propDiff.group === SurveyComparePropGroup.structure
+      )
+    ) {
+      const sourceNodeDef = Survey.getNodeDefByUuid(diff.sourceUuid)(context.sourceSurvey)
+      context.newParentUuidByMovedUuid[diff.targetUuid] = context.nodeDefUuidMap[NodeDef.getParentUuid(sourceNodeDef)]
     }
   }
 }
 
+const buildParentUuidByUuid = (context: PlanContext) => {
+  for (const nodeDef of Survey.getNodeDefsArray(context.targetSurvey)) {
+    const uuid = NodeDef.getUuid(nodeDef)
+    if (NodeDef.isDeleted(nodeDef) || context.deletedUuids.has(uuid)) continue
+    context.parentUuidByUuid[uuid] = context.newParentUuidByMovedUuid[uuid] ?? NodeDef.getParentUuid(nodeDef) ?? null
+  }
+  for (const nodeDef of Object.values(context.insertedByUuid)) {
+    context.parentUuidByUuid[NodeDef.getUuid(nodeDef)] = NodeDef.getParentUuid(nodeDef)
+  }
+}
+
 const planNodeDefs = ({ context, appliedIds, plan }) => {
-  const insertedByUuid = {}
   const sourceUuidByInsertedUuid = {}
   const layoutUpdatedUuids = new Set<string>()
   const nodeDefDiffs = context.result.nodeDefs as SurveyCompareNodeDefDiff[]
+  planDeletionsAndMoves({ context, appliedIds, plan })
   // diffs are in hierarchical order: parents are inserted before their children
   for (const diff of nodeDefDiffs) {
     if (appliedIds.has(diff.id) && diff.status === SurveyCompareStatus.added) {
-      planNodeDefInsert({ context, diff, plan, insertedByUuid, sourceUuidByInsertedUuid })
+      planNodeDefInsert({ context, diff, plan, sourceUuidByInsertedUuid })
     }
   }
+  buildParentUuidByUuid(context)
   // inserted node defs get their own layout from the source (children already mapped)
   for (const nodeDef of plan.nodeDefsToInsert) {
     const sourceUuid = sourceUuidByInsertedUuid[NodeDef.getUuid(nodeDef)]
@@ -429,7 +472,6 @@ const planNodeDefs = ({ context, appliedIds, plan }) => {
         targetNodeDef: null,
         targetUuid: NodeDef.getUuid(nodeDef),
         cycles: Object.keys(NodeDef.getLayout(sourceNodeDef)),
-        insertedNodeDefs: plan.nodeDefsToInsert,
       })
       layoutUpdatedUuids.add(NodeDef.getUuid(nodeDef))
     }
@@ -439,11 +481,13 @@ const planNodeDefs = ({ context, appliedIds, plan }) => {
       planNodeDefUpdate({ context, diff, plan, layoutUpdatedUuids })
     }
   }
-  addInsertedNodeDefsToParentLayout({ context, plan, layoutUpdatedUuids })
+  updateParentLayouts({ context, plan, layoutUpdatedUuids })
+  updateHierarchies({ context, plan })
 }
 
 /**
- * Builds the operations needed to apply the selected changes of a survey comparison to the target survey.
+ * Builds the operations needed to apply the selected changes of a survey comparison to the target survey
+ * (categories, taxonomies and node defs; survey info and survey files are planned by buildSurveyInfoApplyPlan).
  * Changes required by the selected ones are applied too; not applicable changes are skipped.
  * @param {object} params - The parameters.
  * @param {SurveyCompareResult} params.result - The comparison result (computed on the same surveys).
@@ -452,43 +496,42 @@ const planNodeDefs = ({ context, appliedIds, plan }) => {
  * @returns {SurveyCompareApplyPlan} - The apply plan.
  */
 export const buildApplyPlan = ({
-  sourceSurvey,
-  targetSurvey,
-  sourceItemsByCategoryUuid,
-  targetItemsByCategoryUuid,
   result,
   selectedIds,
   usedNodeDefUuids = [],
+  ...params
 }: SurveyCompareParams & {
   result: SurveyCompareResult
   selectedIds: string[]
   usedNodeDefUuids?: string[]
 }): SurveyCompareApplyPlan => {
   const { appliedIds, skippedIds } = expandSelection({ result, selectedIds })
+  const { targetSurvey } = params
   const context: PlanContext = {
-    sourceSurvey,
-    targetSurvey,
-    sourceItemsByCategoryUuid,
-    targetItemsByCategoryUuid,
+    ...params,
     result,
     usedNodeDefUuids: new Set([...usedNodeDefUuids, ...Object.keys(Survey.getNodeDefs(targetSurvey))]),
     targetCycleKeys: Survey.getCycleKeys(Survey.getSurveyInfo(targetSurvey)),
     nodeDefUuidMap: {},
     categoryUuidMap: {},
     taxonomyUuidMap: {},
+    parentUuidByUuid: {},
+    deletedUuids: new Set(),
+    newParentUuidByMovedUuid: {},
+    insertedByUuid: {},
   }
   buildUuidMaps({ context, appliedIds })
   const plan: SurveyCompareApplyPlan = {
-    categoriesToInsert: [],
-    categoryPropsToUpdate: [],
-    categoryItemsToInsert: [],
-    categoryItemsToUpdate: [],
+    ...newCategoriesApplyPlan(),
+    ...newTaxonomiesApplyPlan(),
     nodeDefsToInsert: [],
     nodeDefsToUpdate: [],
+    nodeDefUuidsToDelete: [],
     appliedIds: [...appliedIds],
     skippedIds,
   }
-  planCategories({ context, appliedIds, plan })
+  planCategories({ params, diffs: result.categories, appliedIds, plan })
+  planTaxonomies({ params, diffs: result.taxonomies, appliedIds, plan })
   planNodeDefs({ context, appliedIds, plan })
   return plan
 }

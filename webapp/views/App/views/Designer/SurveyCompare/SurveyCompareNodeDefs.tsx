@@ -2,11 +2,13 @@ import React, { useMemo } from 'react'
 import classNames from 'classnames'
 
 import {
+  SurveyCompareMatchType,
   SurveyCompareNodeDefDiff,
   SurveyCompareResult,
   SurveyCompareStatus,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
 
+import { Button } from '@webapp/components/buttons'
 import { useI18n } from '@webapp/store/system'
 
 import { ApplicabilityIcon, ApplicabilityMessages, SelectionCheckbox, StatusBadge } from './SurveyCompareCommon'
@@ -33,13 +35,62 @@ const getVisibleIds = ({ diffs, onlyDifferences, hideLayoutOnly }) => {
   return visible
 }
 
+export interface RenameMatchHandlers {
+  onMatch: (params: { sourceUuid: string; targetUuid: string }) => void
+  onUnmatch: (params: { sourceUuid: string }) => void
+}
+
+// an added node def can be matched with a node def only in this survey: it is then applied as a rename
+const RenameMatch = ({
+  canEdit,
+  diff,
+  onMatch,
+  onUnmatch,
+}: { canEdit: boolean; diff: SurveyCompareNodeDefDiff } & RenameMatchHandlers) => {
+  const i18n = useI18n()
+  if (diff.matchedBy === SurveyCompareMatchType.manual) {
+    return (
+      <div className="survey-compare__details-info survey-compare__rename">
+        <span>{i18n.t('surveyCompareView:matchedBy.manual')}</span>
+        {canEdit && (
+          <Button
+            label="surveyCompareView:unmatch"
+            onClick={() => onUnmatch({ sourceUuid: diff.sourceUuid })}
+            size="small"
+            variant="outlined"
+          />
+        )}
+      </div>
+    )
+  }
+  const { renameCandidate } = diff
+  if (!renameCandidate) return null
+  return (
+    <div className="survey-compare__details-info survey-compare__rename">
+      <span>{i18n.t('surveyCompareView:renameCandidate', { name: renameCandidate.name })}</span>
+      {canEdit && (
+        <Button
+          label="surveyCompareView:matchAsRename"
+          onClick={() => onMatch({ sourceUuid: diff.sourceUuid, targetUuid: renameCandidate.targetUuid })}
+          size="small"
+          variant="outlined"
+        />
+      )}
+    </div>
+  )
+}
+
 const NodeDefDiffDetails = ({
+  canEdit,
   diff,
   diffsById,
+  onMatch,
+  onUnmatch,
 }: {
+  canEdit: boolean
   diff: SurveyCompareNodeDefDiff | null
   diffsById: Record<string, any>
-}) => {
+} & RenameMatchHandlers) => {
   const i18n = useI18n()
   if (!diff) {
     return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:selectItem')}</div>
@@ -50,14 +101,17 @@ const NodeDefDiffDetails = ({
         <StatusBadge status={diff.status} />
         <span className="survey-compare__details-path">{diff.path}</span>
       </div>
-      {diff.matchedBy && (
+      {diff.matchedBy && diff.matchedBy !== SurveyCompareMatchType.manual && (
         <div className="survey-compare__details-info">{i18n.t(`surveyCompareView:matchedBy.${diff.matchedBy}`)}</div>
       )}
+      <RenameMatch canEdit={canEdit} diff={diff} onMatch={onMatch} onUnmatch={onUnmatch} />
       <ApplicabilityMessages applicability={diff.applicability} />
       {diff.dependsOn.length > 0 && (
         <div className="survey-compare__details-info">
           {i18n.t('surveyCompareView:dependsOn')}{' '}
-          {diff.dependsOn.map((id: string) => diffsById[id]?.path ?? diffsById[id]?.name ?? id).join(', ')}
+          {diff.dependsOn
+            .map((id: string) => diffsById[id]?.path ?? diffsById[id]?.name ?? diffsById[id]?.key ?? id)
+            .join(', ')}
         </div>
       )}
       {diff.status === SurveyCompareStatus.identical && (
@@ -77,6 +131,8 @@ export const SurveyCompareNodeDefs = ({
   hideLayoutOnly,
   selectedItemId,
   onSelectItem,
+  onMatch,
+  onUnmatch,
 }: {
   result: SurveyCompareResult
   canEdit: boolean
@@ -86,12 +142,15 @@ export const SurveyCompareNodeDefs = ({
   hideLayoutOnly: boolean
   selectedItemId: string | null
   onSelectItem: (id: string) => void
-}) => {
+} & RenameMatchHandlers) => {
   const i18n = useI18n()
   const diffs = result.nodeDefs
   const diffsById = useMemo(
-    () => Object.fromEntries([...diffs, ...result.categories].map((diff) => [diff.id, diff])),
-    [diffs, result.categories]
+    () =>
+      Object.fromEntries(
+        [...diffs, ...result.categories, ...result.taxonomies, ...result.surveyInfo].map((diff) => [diff.id, diff])
+      ),
+    [diffs, result.categories, result.taxonomies, result.surveyInfo]
   )
   const visibleIds = useMemo(
     () => getVisibleIds({ diffs, onlyDifferences, hideLayoutOnly }),
@@ -122,12 +181,21 @@ export const SurveyCompareNodeDefs = ({
               {diff.layoutOnly && (
                 <span className="survey-compare__row-note">{i18n.t('surveyCompareView:layoutOnly')}</span>
               )}
+              {diff.renameCandidate && (
+                <span className="survey-compare__row-note">{i18n.t('surveyCompareView:possibleRename')}</span>
+              )}
               <ApplicabilityIcon applicability={diff.applicability} />
             </button>
           </div>
         ))}
       </div>
-      <NodeDefDiffDetails diff={diffs.find((diff) => diff.id === selectedItemId) ?? null} diffsById={diffsById} />
+      <NodeDefDiffDetails
+        canEdit={canEdit}
+        diff={diffs.find((diff) => diff.id === selectedItemId) ?? null}
+        diffsById={diffsById}
+        onMatch={onMatch}
+        onUnmatch={onUnmatch}
+      />
     </div>
   )
 }

@@ -1,12 +1,12 @@
 import {
   SurveyCompareApplicabilityStatus,
+  SurveyCompareChange,
   SurveyCompareResult,
   SurveyCompareStatus,
+  getAllChanges,
 } from '@core/survey/surveyCompare/surveyCompareTypes'
 
-type Diff = SurveyCompareResult['nodeDefs'][number] | SurveyCompareResult['categories'][number]
-
-const getDiffs = (result: SurveyCompareResult): Diff[] => [...result.nodeDefs, ...result.categories]
+const getDiffs = (result: SurveyCompareResult): SurveyCompareChange[] => getAllChanges(result)
 
 export const isSelectable = (diff: any): boolean =>
   diff?.status !== SurveyCompareStatus.identical &&
@@ -14,7 +14,8 @@ export const isSelectable = (diff: any): boolean =>
   diff.applicability.status !== SurveyCompareApplicabilityStatus.notApplicable
 
 /**
- * Returns the ids of the changes selected by default: all the applicable additions and changes.
+ * Returns the ids of the changes selected by default: all the applicable additions and changes (removals are never
+ * selected by default).
  * @param {SurveyCompareResult} result - The comparison result.
  * @returns {Set<string>} - Ids of the selected changes.
  */

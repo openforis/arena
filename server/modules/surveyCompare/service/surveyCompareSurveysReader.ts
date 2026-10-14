@@ -1,13 +1,16 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
+import * as Taxon from '@core/survey/taxon'
+import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as ObjectUtils from '@core/objectUtils'
-import { CategoryItemsByCategoryUuid } from '@core/survey/surveyCompare'
+import { CategoryItemsByCategoryUuid, TaxaByTaxonomyUuid } from '@core/survey/surveyCompare'
 
 import FileZip from '@server/utils/file/fileZip'
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryService from '@server/modules/category/service/categoryService'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import { db } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -47,17 +50,51 @@ const readCategoryItems = async ({ zipFile, categoryUuid }): Promise<any[]> => {
   return result
 }
 
+const readTaxa = async ({ zipFile, taxonomyUuid }): Promise<any[]> => {
+  const taxa = await ArenaSurveyFileZip.getTaxa(zipFile, taxonomyUuid)
+  if (taxa.length > 0) return taxa
+  const partsCount = ArenaSurveyFileZip.getTaxaPartsCount({ zipFile, taxonomyUuid })
+  const result = []
+  for (let index = 0; index < partsCount; index++) {
+    const partTaxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index }) // NOSONAR
+    result.push(...partTaxa)
+  }
+  return result
+}
+
+const combineTaxonProps = (taxon: any) => {
+  const vernacularNames = Object.fromEntries(
+    Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
+      lang,
+      names.map(combineProps),
+    ])
+  )
+  return Taxon.assocVernacularNamesByLang(vernacularNames)(combineProps(taxon))
+}
+
+const readTaxaByTaxonomyUuid = async ({ zipFile, taxonomyUuids }): Promise<TaxaByTaxonomyUuid> => {
+  const result: TaxaByTaxonomyUuid = {}
+  for (const taxonomyUuid of taxonomyUuids) {
+    const taxa = await readTaxa({ zipFile, taxonomyUuid }) // NOSONAR
+    result[taxonomyUuid] = taxa.map(combineTaxonProps)
+  }
+  return result
+}
+
+export interface SurveyCompareSourceSurvey {
+  survey: any
+  itemsByCategoryUuid: CategoryItemsByCategoryUuid
+  taxaByTaxonomyUuid: TaxaByTaxonomyUuid
+}
+
 /**
- * Reads the survey (node defs, categories, taxonomies) and the category items from an Arena survey export file.
+ * Reads the survey (node defs, categories, taxonomies), the category items and the taxa from an Arena survey export
+ * file.
  * @param {object} params - The parameters.
  * @param {string} params.filePath - Path of the exported survey (zip) file.
- * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid}>} - The survey and the items.
+ * @returns {Promise<SurveyCompareSourceSurvey>} - The survey, the items and the taxa.
  */
-export const readSurveyFromFile = async ({
-  filePath,
-}: {
-  filePath: string
-}): Promise<{ survey: any; itemsByCategoryUuid: CategoryItemsByCategoryUuid }> => {
+export const readSurveyFromFile = async ({ filePath }: { filePath: string }): Promise<SurveyCompareSourceSurvey> => {
   const zipFile = new FileZip(filePath)
   await zipFile.init()
   try {
@@ -88,10 +125,32 @@ export const readSurveyFromFile = async ({
       const items = await readCategoryItems({ zipFile, categoryUuid }) // NOSONAR
       itemsByCategoryUuid[categoryUuid] = items.map(combineProps)
     }
-    return { survey, itemsByCategoryUuid }
+    const taxaByTaxonomyUuid = await readTaxaByTaxonomyUuid({ zipFile, taxonomyUuids: Object.keys(taxonomies) })
+    return { survey, itemsByCategoryUuid, taxaByTaxonomyUuid }
   } finally {
     zipFile.close()
   }
+}
+
+// vernacular names are fetched with draft props: their published flag is fetched separately
+const fetchTaxa = async ({ surveyId, taxonomyUuid }, client: any) => {
+  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft: true }, client)
+  const publishedVernacularNameUuids = new Set(
+    await TaxonomyRepository.fetchPublishedVernacularNameUuids({ surveyId, taxonomyUuid }, client)
+  )
+  return taxa.map((taxon: any) =>
+    Taxon.assocVernacularNamesByLang(
+      Object.fromEntries(
+        Object.entries(Taxon.getVernacularNames(taxon) as Record<string, any[]>).map(([lang, names]) => [
+          lang,
+          names.map((name) => ({
+            ...name,
+            published: publishedVernacularNameUuids.has(TaxonVernacularName.getUuid(name)),
+          })),
+        ])
+      )
+    )(taxon)
+  )
 }
 
 /**
@@ -99,7 +158,7 @@ export const readSurveyFromFile = async ({
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {any} [client] - Database client.
- * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid, usedNodeDefUuids: string[]}>} - The survey, the items and all the node def uuids (deleted ones included).
+ * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
  */
 export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, client: any = db) => {
   const surveyWithDeleted = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
@@ -121,5 +180,13 @@ export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, clie
   const itemsByCategoryUuid: CategoryItemsByCategoryUuid = Object.fromEntries(
     categoryUuids.map((categoryUuid, index) => [categoryUuid, itemsArrays[index]])
   )
-  return { survey, itemsByCategoryUuid, usedNodeDefUuids }
+  const taxonomyUuids = Survey.getTaxonomiesArray(survey).map((taxonomy: any) => taxonomy.uuid)
+  const taxaArrays = await DbUtils.runQueries(
+    client,
+    taxonomyUuids.map((taxonomyUuid) => () => fetchTaxa({ surveyId, taxonomyUuid }, client))
+  )
+  const taxaByTaxonomyUuid: TaxaByTaxonomyUuid = Object.fromEntries(
+    taxonomyUuids.map((taxonomyUuid, index) => [taxonomyUuid, taxaArrays[index]])
+  )
+  return { survey, itemsByCategoryUuid, taxaByTaxonomyUuid, usedNodeDefUuids }
 }

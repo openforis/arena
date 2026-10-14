@@ -3,14 +3,14 @@ import './SurveyCompare.scss'
 import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
-import classNames from 'classnames'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import { SurveyCompareMaxFileSizeMB, SurveyCompareResult } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import * as API from '@webapp/service/api'
+import { Dropzone } from '@webapp/components'
 import { Button } from '@webapp/components/buttons'
-import { Checkbox, UploadButton } from '@webapp/components/form'
+import { Checkbox } from '@webapp/components/form'
 import { Tabs } from '@webapp/components/Tabs'
 import { useConfirm } from '@webapp/components/hooks'
 import { JobActions } from '@webapp/store/app'
@@ -20,13 +20,19 @@ import { NotificationActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import { getDefaultSelectedIds, updateSelection } from './surveyCompareSelection'
-import { StatusBadge } from './SurveyCompareCommon'
+import { getPropLabel } from './surveyCompareValueFormatter'
 import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
-import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
+import { SurveyCompareTaxonomies } from './SurveyCompareTaxonomies'
+import { SurveyCompareChangesList } from './SurveyCompareChangesList'
 
 const hasDifferences = ({ added, changed, removed }: { added: number; changed: number; removed: number }) =>
   added + changed + removed > 0
+
+const acceptedFiles = { 'application/zip': ['.zip'] }
+
+// the dropzone max size unit is 1000 * 1000 bytes: the max size in MiB is converted to it
+const maxFileSizeInDropzoneUnits = (SurveyCompareMaxFileSizeMB * 1024 * 1024) / (1000 * 1000)
 
 const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
 
@@ -37,9 +43,19 @@ interface CompareState {
   sourceFileName: string | null
   selectedIds: Set<string>
   selectedItemId: string | null
+  /** Node defs matched by the user (renames): target uuid by source uuid. */
+  manualMatches: Record<string, string>
 }
 
-const initialState: CompareState = { result: null, sourceFileName: null, selectedIds: new Set(), selectedItemId: null }
+const initialState: CompareState = {
+  result: null,
+  sourceFileName: null,
+  selectedIds: new Set(),
+  selectedItemId: null,
+  manualMatches: {},
+}
+
+const summaryKeys = ['nodeDefs', 'categories', 'taxonomies', 'surveyFiles'] as const
 
 const Summary = ({ result }: { result: CompareResultWithSource }) => {
   const i18n = useI18n()
@@ -53,34 +69,15 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
   const { counts } = result
   return (
     <div className="survey-compare__summary">
-      {(['nodeDefs', 'categories', 'taxonomies'] as const).map((key) => (
-        <div key={key}>
-          <strong>{i18n.t(`surveyCompareView:tabs.${key}`)}:</strong> {i18n.t('surveyCompareView:counts', counts[key])}
-        </div>
-      ))}
-      {result.surveyInfo.length > 0 && <div>{i18n.t('surveyCompareView:surveyInfoChanged')}</div>}
-    </div>
-  )
-}
-
-const Taxonomies = ({ result, onlyDifferences }: { result: SurveyCompareResult; onlyDifferences: boolean }) => {
-  const i18n = useI18n()
-  const diffs = result.taxonomies.filter((diff) => !onlyDifferences || diff.status !== 'identical')
-  if (diffs.length === 0) {
-    return <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
-  }
-  return (
-    <div className="survey-compare__simple-list">
-      <div className="survey-compare__details-info">{i18n.t('surveyCompareView:taxonomiesNote')}</div>
-      {diffs.map((diff) => (
-        <div key={diff.id} className="survey-compare__simple-item">
-          <div className={classNames('survey-compare__row', `survey-compare__row--${diff.status}`)}>
-            <span className="survey-compare__row-name">{diff.name}</span>
-            <StatusBadge status={diff.status} />
+      {summaryKeys
+        .filter((key) => hasDifferences(counts[key]))
+        .map((key) => (
+          <div key={key}>
+            <strong>{i18n.t(`surveyCompareView:tabs.${key}`)}:</strong>{' '}
+            {i18n.t('surveyCompareView:counts', { ...counts[key] })}
           </div>
-          <SurveyComparePropDiffs propDiffs={diff.propDiffs} />
-        </div>
-      ))}
+        ))}
+      {result.surveyInfo.length > 0 && <div>{i18n.t('surveyCompareView:surveyInfoChanged')}</div>}
     </div>
   )
 }
@@ -94,14 +91,20 @@ export const SurveyCompare = () => {
   const canEdit = useAuthCanEditSurvey()
 
   const [state, setState] = useState<CompareState>(initialState)
+  const [file, setFile] = useState<File | null>(null)
   const [onlyDifferences, setOnlyDifferences] = useState(true)
   const [hideLayoutOnly, setHideLayoutOnly] = useState(false)
   const [tabKey, setTabKey] = useState<string | null>(null)
-  const { result, sourceFileName, selectedIds, selectedItemId } = state
+  const { result, sourceFileName, selectedIds, selectedItemId, manualMatches } = state
 
   const startCompare = useCallback(
-    async ({ file = undefined, sourceFileName: sourceFileNameParam = undefined }) => {
-      const { job } = await API.startSurveyCompareJob({ surveyId, file, sourceFileName: sourceFileNameParam })
+    async ({ file = undefined, sourceFileName: sourceFileNameParam = undefined, manualMatches: matches = {} }) => {
+      const { job } = await API.startSurveyCompareJob({
+        surveyId,
+        file,
+        sourceFileName: sourceFileNameParam,
+        manualMatches: matches,
+      })
       dispatch(
         JobActions.showJobMonitor({
           job,
@@ -109,12 +112,13 @@ export const SurveyCompare = () => {
           onComplete: async (jobCompleted: any) => {
             const { resultFileName, sourceFileName: sourceFileNameResult } = JobSerialized.getResult(jobCompleted)
             const resultFetched = await API.fetchSurveyCompareResult({ surveyId, resultFileName })
-            setState({
+            setState((statePrev) => ({
               result: resultFetched,
               sourceFileName: sourceFileNameResult,
               selectedIds: getDefaultSelectedIds(resultFetched),
-              selectedItemId: null,
-            })
+              selectedItemId: statePrev.selectedItemId,
+              manualMatches: matches,
+            }))
           },
         }) as any
       )
@@ -123,9 +127,10 @@ export const SurveyCompare = () => {
   )
 
   const onFileSelected = useCallback(
-    (files: FileList) => {
-      const file = files[0]
-      if (file.size > SurveyCompareMaxFileSizeMB * 1024 * 1024) {
+    (files: File[]) => {
+      const fileSelected = files[0]
+      if (!fileSelected) return
+      if (fileSelected.size > SurveyCompareMaxFileSizeMB * 1024 * 1024) {
         dispatch(
           NotificationActions.notifyWarning({
             key: 'surveyCompareView:fileTooLarge',
@@ -135,7 +140,9 @@ export const SurveyCompare = () => {
         )
         return
       }
-      startCompare({ file })
+      setFile(fileSelected)
+      setState(initialState)
+      startCompare({ file: fileSelected })
     },
     [dispatch, startCompare]
   )
@@ -151,6 +158,22 @@ export const SurveyCompare = () => {
 
   const onSelectItem = useCallback((id: string) => setState((statePrev) => ({ ...statePrev, selectedItemId: id })), [])
 
+  // a confirmed (or undone) rename changes the matching: the comparison is computed again
+  const onMatch = useCallback(
+    ({ sourceUuid, targetUuid }: { sourceUuid: string; targetUuid: string }) =>
+      startCompare({ sourceFileName, manualMatches: { ...manualMatches, [sourceUuid]: targetUuid } }),
+    [manualMatches, sourceFileName, startCompare]
+  )
+
+  const onUnmatch = useCallback(
+    ({ sourceUuid }: { sourceUuid: string }) => {
+      const matches = { ...manualMatches }
+      delete matches[sourceUuid]
+      startCompare({ sourceFileName, manualMatches: matches })
+    },
+    [manualMatches, sourceFileName, startCompare]
+  )
+
   const onApply = useCallback(() => {
     confirm({
       key: 'surveyCompareView:applyConfirm',
@@ -161,6 +184,7 @@ export const SurveyCompare = () => {
           surveyId,
           sourceFileName,
           selectedIds: [...selectedIds],
+          manualMatches,
         })
         dispatch(
           JobActions.showJobMonitor({
@@ -176,15 +200,16 @@ export const SurveyCompare = () => {
                 }) as any
               )
               dispatch(SurveyActions.refreshSurveyDefs({ navigate }) as any)
-              await startCompare({ sourceFileName })
+              await startCompare({ sourceFileName, manualMatches })
             },
           }) as any
         )
       },
     })
-  }, [confirm, dispatch, navigate, selectedIds, sourceFileName, startCompare, surveyId])
+  }, [confirm, dispatch, manualMatches, navigate, selectedIds, sourceFileName, startCompare, surveyId])
 
   const tabProps = { result, canEdit, selectedIds, onToggle, onlyDifferences, selectedItemId, onSelectItem }
+  const listProps = { canEdit, selectedIds, onToggle }
 
   // tabs of sections without differences are hidden
   const tabItems = result
@@ -193,13 +218,26 @@ export const SurveyCompare = () => {
           key: 'surveyInfo',
           label: 'surveyCompareView:tabs.surveyInfo',
           hasDifferences: result.surveyInfo.length > 0,
-          renderContent: () => <SurveyComparePropDiffs propDiffs={result.surveyInfo} />,
+          renderContent: () => (
+            <SurveyCompareChangesList
+              diffs={result.surveyInfo}
+              getLabel={(diff) => getPropLabel({ t: i18n.t, key: diff.key })}
+              {...listProps}
+            />
+          ),
         },
         {
           key: 'nodeDefs',
           label: 'surveyCompareView:tabs.nodeDefs',
           hasDifferences: hasDifferences(result.counts.nodeDefs),
-          renderContent: () => <SurveyCompareNodeDefs {...tabProps} hideLayoutOnly={hideLayoutOnly} />,
+          renderContent: () => (
+            <SurveyCompareNodeDefs
+              {...tabProps}
+              hideLayoutOnly={hideLayoutOnly}
+              onMatch={onMatch}
+              onUnmatch={onUnmatch}
+            />
+          ),
         },
         {
           key: 'categories',
@@ -211,7 +249,20 @@ export const SurveyCompare = () => {
           key: 'taxonomies',
           label: 'surveyCompareView:tabs.taxonomies',
           hasDifferences: hasDifferences(result.counts.taxonomies),
-          renderContent: () => <Taxonomies result={result} onlyDifferences={onlyDifferences} />,
+          renderContent: () => <SurveyCompareTaxonomies {...tabProps} />,
+        },
+        {
+          key: 'surveyFiles',
+          label: 'surveyCompareView:tabs.surveyFiles',
+          hasDifferences: hasDifferences(result.counts.surveyFiles),
+          renderContent: () => (
+            <SurveyCompareChangesList
+              diffs={result.surveyFiles}
+              getLabel={(diff) => diff.name}
+              getNote={(diff) => i18n.t(`surveyCompareView:fileTypes.${diff.fileType}`)}
+              {...listProps}
+            />
+          ),
         },
       ].filter((item) => item.hasDifferences)
     : []
@@ -219,18 +270,25 @@ export const SurveyCompare = () => {
 
   return (
     <div className="survey-compare">
+      {!result && (
+        <ol className="survey-compare__intro">
+          {introStepKeys.map((key) => (
+            <li key={key}>{i18n.t(`surveyCompareView:introSteps.${key}`)}</li>
+          ))}
+        </ol>
+      )}
+      <Dropzone
+        accept={acceptedFiles}
+        droppedFiles={file ? [file] : []}
+        maxSize={maxFileSizeInDropzoneUnits}
+        onDrop={onFileSelected}
+      />
       <div className="survey-compare__header">
-        <UploadButton
-          accept=".zip"
-          label="surveyCompareView:selectFile"
-          maxSize={Number.MAX_SAFE_INTEGER} // size checked in onFileSelected, with a specific message
-          onChange={onFileSelected}
-        />
         {sourceFileName && (
           <Button
             iconClassName="icon-loop2 icon-12px"
             label="surveyCompareView:compareAgain"
-            onClick={() => startCompare({ sourceFileName })}
+            onClick={() => startCompare({ sourceFileName, manualMatches })}
             variant="outlined"
           />
         )}
@@ -240,14 +298,6 @@ export const SurveyCompare = () => {
           </span>
         )}
       </div>
-
-      {!result && (
-        <ol className="survey-compare__intro">
-          {introStepKeys.map((key) => (
-            <li key={key}>{i18n.t(`surveyCompareView:introSteps.${key}`)}</li>
-          ))}
-        </ol>
-      )}
 
       {result && (
         <>

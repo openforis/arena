@@ -1,7 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Category from '@core/survey/category'
@@ -13,85 +12,20 @@ import {
   SurveyCompareReason,
   SurveyCompareStatus,
   buildApplyPlan,
-  compareSurveys,
 } from '@core/survey/surveyCompare'
 
-import * as SB from '../../utils/surveyBuilder'
-
-const cycle = Survey.cycleOneKey
-
-const buildCategory = () =>
-  SB.category('tree_species')
-    .levels('species')
-    .items(SB.categoryItem('1').label('Oak'), SB.categoryItem('2').label('Pine'))
-
-const buildSurvey = async ({ categoryBuilder = buildCategory() } = {}) => {
-  const survey = await SB.survey(
-    null,
-    SB.entity(
-      'cluster',
-      SB.attribute('cluster_id', NodeDef.nodeDefType.integer).key(),
-      SB.entity(
-        'tree',
-        SB.attribute('tree_id', NodeDef.nodeDefType.integer).key(),
-        SB.attribute('species', NodeDef.nodeDefType.code).category('tree_species'),
-        SB.attribute('dbh', NodeDef.nodeDefType.decimal)
-      ).multiple()
-    )
-  )
-    .categories(categoryBuilder)
-    .build()
-  return { survey, items: categoryBuilder.build().items }
-}
-
-const clone = (obj: any) => JSON.parse(JSON.stringify(obj))
-
-const itemsByCategoryUuid = (survey: any, items: any[]) => ({
-  [Category.getUuid(Survey.getCategoryByName('tree_species')(survey))]: items,
-})
-
-const compare = ({ source, target, sourceItems, targetItems }) =>
-  compareSurveys({
-    sourceSurvey: source,
-    targetSurvey: target,
-    sourceItemsByCategoryUuid: itemsByCategoryUuid(source, sourceItems),
-    targetItemsByCategoryUuid: itemsByCategoryUuid(target, targetItems),
-  })
-
-const addAttribute = async ({ survey, parentName, name, type = NodeDef.nodeDefType.text, props = {} }) => {
-  const parent = Survey.getNodeDefByName(parentName)(survey)
-  const nodeDef = NodeDef.newNodeDef(parent, type, [cycle], { name, ...props })
-  delete nodeDef.temporary
-  let surveyUpdated = Survey.assocNodeDef({ nodeDef })(survey)
-  const parentUpdated = NodeDefLayoutUpdater.updateParentLayout({
-    survey: surveyUpdated,
-    nodeDef,
-    cyclesAdded: [cycle],
-  })
-  surveyUpdated = Survey.mergeNodeDefs({ [NodeDef.getUuid(parent)]: parentUpdated })(surveyUpdated)
-  return { survey: await Survey.buildAndAssocDependencyGraph(surveyUpdated), nodeDef }
-}
-
-const updateNodeDef = ({ survey, name, updateFn }) => {
-  const nodeDef = Survey.getNodeDefByName(name)(survey)
-  return Survey.mergeNodeDefs({ [NodeDef.getUuid(nodeDef)]: updateFn(nodeDef) })(survey)
-}
-
-const setValidationExpression = (expression: string) => (nodeDef: any) =>
-  NodeDef.mergePropsAdvanced({
-    [NodeDef.keysPropsAdvanced.validations]: NodeDefValidations.assocExpressions([
-      NodeDefExpression.createExpression({ expression }),
-    ])(NodeDef.getValidations(nodeDef)),
-  })(nodeDef)
-
-const markAllPublished = (survey: any) => {
-  const nodeDefs = Object.fromEntries(
-    Survey.getNodeDefsArray(survey).map((nodeDef) => [NodeDef.getUuid(nodeDef), { ...nodeDef, published: true }])
-  )
-  return Survey.mergeNodeDefs(nodeDefs)(survey)
-}
-
-const findDiff = (result: any, name: string) => result.nodeDefs.find((diff) => diff.name === name)
+import {
+  addAttribute,
+  buildSurvey,
+  clone,
+  compare,
+  cycle,
+  findDiff,
+  itemsByCategoryUuid,
+  markAllPublished,
+  setValidationExpression,
+  updateNodeDef,
+} from '../../utils/surveyCompareTestUtils'
 
 describe('SurveyCompare', () => {
   test('a survey and its copy are identical', async () => {
@@ -265,7 +199,7 @@ describe('SurveyCompare', () => {
     })
   })
 
-  test('node defs only in the target survey are reported as removed and not applicable', async () => {
+  test('node defs only in the target survey are reported as removed and can be deleted', async () => {
     const { survey: target, items } = await buildSurvey()
     const dbhUuid = NodeDef.getUuid(Survey.getNodeDefByName('dbh')(target))
     const source = Survey.dissocNodeDef(dbhUuid)(clone(target))
@@ -274,7 +208,21 @@ describe('SurveyCompare', () => {
     const dbhDiff = findDiff(result, 'dbh')
     expect(dbhDiff.status).toBe(SurveyCompareStatus.removed)
     expect(dbhDiff.parentId).toBe(findDiff(result, 'tree').id)
-    expect(dbhDiff.applicability.reasons).toEqual([SurveyCompareReason.removalNotSupported])
+    expect(dbhDiff.applicability.status).toBe(SurveyCompareApplicabilityStatus.applicable)
+
+    const plan = buildApplyPlan({
+      sourceSurvey: source,
+      targetSurvey: target,
+      sourceItemsByCategoryUuid: itemsByCategoryUuid(source, items),
+      targetItemsByCategoryUuid: itemsByCategoryUuid(target, items),
+      result,
+      selectedIds: [dbhDiff.id],
+    })
+    expect(plan.nodeDefUuidsToDelete).toEqual([dbhUuid])
+    // removed from the parent layout
+    const treeUuid = NodeDef.getUuid(Survey.getNodeDefByName('tree')(target))
+    const treeUpdate = plan.nodeDefsToUpdate.find((update) => update.nodeDefUuid === treeUuid)
+    expect(JSON.stringify(treeUpdate.props.layout)).not.toContain(dbhUuid)
   })
 
   test('category items are compared by code', async () => {
@@ -305,7 +253,7 @@ describe('SurveyCompare', () => {
     expect(CategoryItem.getLabels(updatedItem)).toEqual({ en: 'Quercus' })
   })
 
-  test('items only in this survey cannot be applied (they are not deleted)', async () => {
+  test('items only in this survey are deleted by a separate removal change', async () => {
     const { survey: target, items: targetItems } = await buildSurvey()
     const source = clone(target)
     const levelUuid = CategoryItem.getLevelUuid(targetItems[0])
@@ -318,23 +266,24 @@ describe('SurveyCompare', () => {
     const [categoryDiff] = result.categories
     expect(categoryDiff.status).toBe(SurveyCompareStatus.changed)
     expect(categoryDiff.itemsCount).toEqual({ added: 0, changed: 0, removed: 1 })
-    expect(categoryDiff.applicability).toEqual({
-      status: SurveyCompareApplicabilityStatus.notApplicable,
-      reasons: [SurveyCompareReason.categoryItemsRemovalNotSupported],
-    })
+    // nothing else to apply: only the removal can be selected
+    expect(categoryDiff.applicability).toBeUndefined()
+    expect(categoryDiff.removal.applicability.status).toBe(SurveyCompareApplicabilityStatus.applicable)
     const plan = buildApplyPlan({
       sourceSurvey: source,
       targetSurvey: target,
       sourceItemsByCategoryUuid: itemsByCategoryUuid(source, targetItems),
       targetItemsByCategoryUuid: itemsByCategoryUuid(target, targetItemsWithExtra),
       result,
-      selectedIds: [categoryDiff.id],
+      selectedIds: [categoryDiff.removal.id],
     })
-    expect(plan.appliedIds).toEqual([])
-    expect(plan.skippedIds).toEqual([categoryDiff.id])
+    expect(plan.appliedIds).toEqual([categoryDiff.removal.id])
+    expect(plan.categoryItemsToDelete).toEqual([
+      { categoryUuid: categoryDiff.targetUuid, itemUuids: [CategoryItem.getUuid(targetItemsWithExtra[2])] },
+    ])
   })
 
-  test('items only in this survey are a warning when other item changes can be applied', async () => {
+  test('published items only in this survey are kept', async () => {
     const { survey: target, items: targetItems } = await buildSurvey()
     const source = clone(target)
     const sourceItems = clone(targetItems)
@@ -342,13 +291,14 @@ describe('SurveyCompare', () => {
     const levelUuid = CategoryItem.getLevelUuid(targetItems[0])
     const targetItemsWithExtra = [
       ...targetItems,
-      CategoryItem.newItem(levelUuid, null, { code: '9', labels: { en: 'Other' } }),
+      { ...CategoryItem.newItem(levelUuid, null, { code: '9', labels: { en: 'Other' } }), published: true },
     ]
 
     const result = compare({ source, target, sourceItems, targetItems: targetItemsWithExtra })
-    expect(result.categories[0].applicability).toEqual({
-      status: SurveyCompareApplicabilityStatus.applicableWithWarning,
-      reasons: [SurveyCompareReason.categoryItemsRemovalNotSupported],
+    expect(result.categories[0].applicability.status).toBe(SurveyCompareApplicabilityStatus.applicable)
+    expect(result.categories[0].removal.applicability).toEqual({
+      status: SurveyCompareApplicabilityStatus.notApplicable,
+      reasons: [SurveyCompareReason.publishedCategoryItemsKept],
     })
   })
 

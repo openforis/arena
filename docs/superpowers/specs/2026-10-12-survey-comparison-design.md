@@ -275,30 +275,54 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - Applied in phase 1: added node defs (same uuid as in the source, parent layout updated), changed node def props
   (expressions, validations, labels, layout, ...), added categories, added/changed category items, category name and
   extra props definitions.
-- Shown but not applied yet: see *Remaining work*.
 - Tests: `test/unit/tests/054surveyCompare.test.ts`, `test/integration/tests/053surveyCompareApplyTest.ts`
   (Dev survey → QA imported and published → changes in Dev → compare, apply, compare again, publish QA).
+
+## Implementation (phase 2)
+
+- Every change has an id and can be selected; removals are never selected by default.
+- **Deletions**: node defs (descendants deleted together, parent layout updated; warning when published or used by
+  other node defs' expressions), categories/taxonomies (only together with the node defs using them). Items and levels
+  only in the target category, taxa and vernacular names only in the target taxonomy are a separate "removal" change
+  of the category/taxonomy; published ones are kept.
+- **Moves**: the parent uuid and the hierarchy (`meta.h`) of the moved node def and of its descendants are updated, the
+  layouts of the old and new parents too. Not applicable to published node defs.
+- **Categories**: levels renamed or added at the end; `reportingData` updated like the other props.
+- **Taxonomies** (`surveyCompareTaxonomies.ts`): taxa matched by code, compared by family, genus, scientific name,
+  extra props and vernacular names; new taxonomies inserted with their taxa (uuids kept), taxa added and updated
+  (vernacular names added). A new taxon attribute depends on its new taxonomy.
+- **Survey info and files** (`surveyCompareSurveyInfo.ts`): one change per survey info prop (languages, labels,
+  descriptions, cycles, default cycle, SRS, field manual links, sampling polygon, branding settings, ...); survey files
+  (preloaded map layers, survey doc images, branding images) matched by name (branding images by slot) and compared
+  by size and labels; changed files are replaced by new files read from the uploaded zip. The apply job applies them
+  first, then computes the comparison again (e.g. node defs in a new cycle can be applied only after the cycle is
+  added) and applies the other changes.
+- **Renames**: when an added node def has a single node def only in the target survey under the same parent, with the
+  same type and the same labels (or the same props), it is suggested as a rename; "Match as renamed" adds a manual
+  match (`manualMatches`, sent to the compare and apply jobs) and the node def is then compared as changed.
+- The survey file is selected with the `Dropzone` component.
+- Tests: `test/unit/tests/056surveyCompareSync.test.ts`, second test in
+  `test/integration/tests/053surveyCompareApplyTest.ts` (deletions, new taxonomy, new language applied to a published
+  survey, then published).
 
 ## Remaining work
 
 Checklist of what is not implemented yet (as of the phase 1 merge, openforis/arena#4540). Where the design is
 already described above, the item points to its section.
 
-### Phase 2 — apply the differences that are only shown today
+### Phase 2 — apply the differences that are only shown today (done, see *Implementation (phase 2)*)
 
-- [ ] **Deletions** (elements only in the open survey: node defs, categories, category items, taxonomies). Never
-  selected by default; warning when a published node def has data (deleted on publish); published category
-  levels/items stay not deletable. See *Direction and defaults* and *Applicability rules*.
-- [ ] **Moves** of a node def to another entity (only on unpublished node defs / templates).
-- [ ] **Category level changes** (levels added or renamed): today the whole category is not applicable.
-- [ ] **Category "reporting data" setting**: shown, not applied.
-- [ ] **Taxonomies**: compare taxa (by code) and vernacular names, insert new taxonomies and update taxa; today only
-  the taxonomy props are compared and nothing is applied (a new taxon attribute using a new taxonomy is blocked).
-- [ ] **Survey info**: languages, cycles, labels, SRS. Adding missing cycles/languages first would unblock node defs
-  that use them (today: `cycleMissing`).
-- [ ] **Survey files**: preloaded map layers, survey doc images, branding images (not compared at all).
-- [ ] **Possible rename suggestions** when uuids differ (a rename shows as removed + added), confirmed by the user
-  and applied as a rename. See *Matching*.
+- [x] **Deletions** (node defs, categories, category items and levels, taxonomies, taxa, vernacular names). Never
+  selected by default; warning when a published node def is deleted (data deleted on publish); published category
+  levels/items, taxa and vernacular names are kept.
+- [x] **Moves** of a node def to another entity (only on unpublished node defs / templates).
+- [x] **Category level changes** (levels renamed or added at the end; unpublished extra levels deleted).
+- [x] **Category "reporting data" setting**.
+- [x] **Taxonomies**: taxa compared by code (with vernacular names), new taxonomies inserted, taxa added/updated.
+- [x] **Survey info**: languages, labels, descriptions, cycles, default cycle, SRS and other settings; node defs using a
+  missing cycle depend on the cycles change.
+- [x] **Survey files**: preloaded map layers, survey doc images, branding images (compared by name and size).
+- [x] **Possible rename suggestions** when uuids differ, confirmed by the user and applied as a rename.
 
 ### Phase 3 and other features
 

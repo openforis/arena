@@ -20,7 +20,7 @@ class SurveyCompareDiffJob extends Job {
 
   async execute() {
     const context: any = this.context
-    const { surveyId, filePath } = context
+    const { surveyId, filePath, manualMatches = {} } = context
     let { sourceFileName } = context
     if (sourceFileName) {
       FileUtils.checkIsValidTempFileName(sourceFileName)
@@ -28,18 +28,17 @@ class SurveyCompareDiffJob extends Job {
       sourceFileName = FileUtils.newTempFileName()
       await FileUtils.copyFile(filePath, FileUtils.tempFilePath(sourceFileName))
     }
-    const { survey: sourceSurvey, itemsByCategoryUuid: sourceItemsByCategoryUuid } = await readSurveyFromFile({
-      filePath: FileUtils.tempFilePath(sourceFileName),
-    })
-    const { survey: targetSurvey, itemsByCategoryUuid: targetItemsByCategoryUuid } = await fetchTargetSurvey(
-      { surveyId },
-      this.tx
-    )
+    const source = await readSurveyFromFile({ filePath: FileUtils.tempFilePath(sourceFileName) })
+    const target = await fetchTargetSurvey({ surveyId }, this.tx)
+    const sourceSurvey = source.survey
     const result = compareSurveys({
       sourceSurvey,
-      targetSurvey,
-      sourceItemsByCategoryUuid,
-      targetItemsByCategoryUuid,
+      targetSurvey: target.survey,
+      sourceItemsByCategoryUuid: source.itemsByCategoryUuid,
+      targetItemsByCategoryUuid: target.itemsByCategoryUuid,
+      sourceTaxaByTaxonomyUuid: source.taxaByTaxonomyUuid,
+      targetTaxaByTaxonomyUuid: target.taxaByTaxonomyUuid,
+      manualMatches,
     })
     const sourceSurveyInfo = Survey.getSurveyInfo(sourceSurvey)
     const resultFileName = FileUtils.newTempFileName()
@@ -64,6 +63,7 @@ export default class SurveyCompareJob extends Job {
    * @param {number} params.surveyId - Id of the survey to compare (target).
    * @param {string} [params.filePath] - Path of the uploaded survey file (source).
    * @param {string} [params.sourceFileName] - Temp file name of a previously uploaded survey file (source).
+   * @param {Record<string, string>} [params.manualMatches] - Node defs matched by the user (target uuid by source uuid).
    */
   constructor(params?: any) {
     super(SurveyCompareJob.type, params, [new PrepareImportFileJob(), new SurveyCompareDiffJob()])

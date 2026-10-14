@@ -617,6 +617,17 @@ export const fetchTaxonWithVernacularNamesByCode = async (
   return fetchTaxonWithVernacularNamesByUuid({ surveyId, taxonUuid, draft }, client)
 }
 
+export const fetchPublishedVernacularNameUuids = async ({ surveyId, taxonomyUuid }, client = db) =>
+  client.map(
+    `SELECT vn.uuid
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
+       JOIN ${Schemata.getSchemaSurvey(surveyId)}.taxon t ON t.uuid = vn.taxon_uuid
+     WHERE t.taxonomy_uuid = $1
+       AND vn.props <> '{}'::jsonb`,
+    [taxonomyUuid],
+    (row) => row.uuid
+  )
+
 // ============== UPDATE
 
 export const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
@@ -674,6 +685,24 @@ export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db)
 
 export const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyUuid, client)
+
+// only unpublished taxa are deleted
+export const deleteDraftTaxaByUuids = async (surveyId, taxonUuids, client = db) =>
+  client.none(
+    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
+     WHERE uuid IN ($1:csv)
+       AND props::text = '{}'::text`,
+    [taxonUuids]
+  )
+
+// only unpublished vernacular names are deleted
+export const deleteDraftVernacularNamesByUuids = async (surveyId, vernacularNameUuids, client = db) =>
+  client.none(
+    `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name
+     WHERE uuid IN ($1:csv)
+       AND props::text = '{}'::text`,
+    [vernacularNameUuids]
+  )
 
 export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db) =>
   client.none(

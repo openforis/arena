@@ -13,6 +13,26 @@ type Translate = (key: string, params?: Record<string, unknown>) => string
 // i18n keys of the property labels used in the node def editor
 const propLabelKeys: Record<string, string> = {
   applicable: 'nodeDefEdit.advancedProps.relevantIf',
+  branding: 'surveyCompareView:props.branding',
+  defaultCycleKey: 'surveyCompareView:props.defaultCycleKey',
+  extra: 'surveyCompareView:props.extra',
+  extraPropsDefs: 'surveyCompareView:props.itemExtraDef',
+  family: 'surveyCompareView:props.family',
+  fieldManualLinks: 'surveyCompareView:props.fieldManualLinks',
+  genus: 'surveyCompareView:props.genus',
+  keepNonApplicableValues: 'surveyCompareView:props.keepNonApplicableValues',
+  languages: 'surveyCompareView:props.languages',
+  preloadedMapLayersEnabled: 'surveyCompareView:props.preloadedMapLayersEnabled',
+  reportingData: 'surveyCompareView:props.reportingData',
+  sampleBasedImageInterpretationEnabled: 'surveyCompareView:props.sampleBasedImageInterpretationEnabled',
+  samplingPolygon: 'surveyCompareView:props.samplingPolygon',
+  scientificName: 'surveyCompareView:props.scientificName',
+  size: 'surveyCompareView:props.size',
+  srs: 'surveyCompareView:props.srs',
+  surveyDocOptions: 'surveyCompareView:props.surveyDocOptions',
+  userExtraPropDefs: 'surveyCompareView:props.userExtraPropDefs',
+  vernacularLanguageCodes: 'surveyCompareView:props.vernacularLanguageCodes',
+  vernacularNames: 'surveyCompareView:props.vernacularNames',
   categoryUuid: 'nodeDefEdit.codeProps.category',
   codeShown: 'nodeDefEdit.codeProps.codeShown',
   columnsNo: 'surveyCompareView:props.columnsNo',
@@ -268,6 +288,32 @@ function formatObject({
   return lines
 }
 
+const formatCycleNumber = (cycleKey: unknown): string => String(Number(cycleKey) + 1)
+
+// survey cycles: { "0": { dateStart, dateEnd }, ... }
+const formatSurveyCycles = ({ t, value, indent }: { t: Translate; value: Record<string, any>; indent: number }) =>
+  Object.entries(value).map(([cycleKey, cycle]) => ({
+    label: t('surveyCompareView:cycle', { cycle: formatCycleNumber(cycleKey) }),
+    value: [cycle?.dateStart, cycle?.dateEnd].filter(Boolean).join(' - '),
+    indent,
+  }))
+
+const formatFileSize = (size: number): string => {
+  if (size < 1024) return `${size} B`
+  if (size < 1024 * 1024) return `${(size / 1024).toFixed(1)} KB`
+  return `${(size / (1024 * 1024)).toFixed(1)} MB`
+}
+
+const formatByKey = ({ t, key, value, indent }): FormattedLine[] | null => {
+  if (key === 'cycles' && Array.isArray(value)) {
+    return [{ value: value.map(formatCycleNumber).join(', '), indent }]
+  }
+  if (key === 'cycles' && isPlainObject(value)) return formatSurveyCycles({ t, value, indent })
+  if (key === 'defaultCycleKey') return [{ value: formatCycleNumber(value), indent }]
+  if (key === 'size' && typeof value === 'number') return [{ value: formatFileSize(value), indent }]
+  return null
+}
+
 /**
  * Formats a value of a survey comparison as a list of labelled lines.
  * @param {object} params - Parameters.
@@ -292,9 +338,8 @@ export function formatValue({
   indent?: number
 }): FormattedLine[] {
   if (value === undefined || value === null) return []
-  if (key === 'cycles' && Array.isArray(value)) {
-    return [{ value: value.map((cycle) => Number(cycle) + 1).join(', '), indent }]
-  }
+  const formattedByKey = formatByKey({ t, key, value, indent })
+  if (formattedByKey) return formattedByKey
   if (isPrimitive(value)) return [{ value: formatPrimitive({ t, value }), indent }]
   if (Array.isArray(value)) return formatArray({ t, singleLang, value, indent })
   if (key === 'validations') return formatValidations({ t, singleLang, value, indent })

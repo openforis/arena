@@ -1,22 +1,39 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { SurveyCompareApplyPlan, buildApplyPlan, compareSurveys } from '@core/survey/surveyCompare'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as ObjectUtils from '@core/objectUtils'
+import {
+  SurveyCompareApplyPlan,
+  SurveyCompareParams,
+  buildApplyPlan,
+  buildSurveyInfoApplyPlan,
+  compareSurveys,
+  expandSelection,
+} from '@core/survey/surveyCompare'
 
 import Job from '@server/job/job'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import FileZip from '@server/utils/file/fileZip'
+import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { fetchTargetSurvey, readSurveyFromFile } from './surveyCompareSurveysReader'
+import { SurveyCompareSourceSurvey, fetchTargetSurvey, readSurveyFromFile } from './surveyCompareSurveysReader'
 
 /**
  * Applies the selected changes of a survey comparison to the survey with the specified id.
  * Changes are written as draft: they reach the records only when the survey is published.
+ * Survey info and survey files are applied first (e.g. new cycles), then the comparison is computed again and the
+ * other changes are applied: categories and taxonomies, node defs, then deletions.
  */
 export default class SurveyCompareApplyJob extends Job {
   static readonly type = 'SurveyCompareApplyJob'
@@ -28,6 +45,7 @@ export default class SurveyCompareApplyJob extends Job {
    * @param {number} params.surveyId - Id of the survey to update.
    * @param {string} params.sourceFileName - Temp file name of the uploaded survey file.
    * @param {string[]} params.selectedIds - Ids of the changes to apply.
+   * @param {Record<string, string>} [params.manualMatches] - Node defs matched by the user (target uuid by source uuid).
    */
   constructor(params?: any) {
     super(SurveyCompareApplyJob.type, params)
@@ -37,30 +55,120 @@ export default class SurveyCompareApplyJob extends Job {
     const { surveyId, sourceFileName, selectedIds = [] }: any = this.context
     FileUtils.checkIsValidTempFileName(sourceFileName)
 
-    const { survey: sourceSurvey, itemsByCategoryUuid: sourceItemsByCategoryUuid } = await readSurveyFromFile({
-      filePath: FileUtils.tempFilePath(sourceFileName),
-    })
+    const source = await readSurveyFromFile({ filePath: FileUtils.tempFilePath(sourceFileName) })
     // the comparison is computed again: the survey could have been changed in the meantime
-    const {
-      survey: targetSurvey,
-      itemsByCategoryUuid: targetItemsByCategoryUuid,
-      usedNodeDefUuids,
-    } = await fetchTargetSurvey({ surveyId }, this.tx)
-    const params = { sourceSurvey, targetSurvey, sourceItemsByCategoryUuid, targetItemsByCategoryUuid }
+    let params = await this.fetchCompareParams(source)
+    const surveyInfoAppliedIds = await this.applySurveyInfoChanges({ params, selectedIds })
+    if (surveyInfoAppliedIds.length > 0) {
+      // node defs depending on the survey info (e.g. new cycles) can be applied only now
+      params = await this.fetchCompareParams(source)
+    }
+    const { usedNodeDefUuids } = params
     const result = compareSurveys(params)
     const plan = buildApplyPlan({ ...params, result, selectedIds, usedNodeDefUuids })
+    const appliedIds = [...new Set([...surveyInfoAppliedIds, ...plan.appliedIds])]
+    const skippedIds = plan.skippedIds.filter((id) => !appliedIds.includes(id))
 
-    this.total = plan.appliedIds.length
+    this.total = appliedIds.length
 
     await this.applyCategoriesChanges(plan)
+    await this.applyTaxonomiesChanges(plan)
     await this.applyNodeDefsChanges(plan)
+    await this.applyDeletions(plan)
 
-    if (plan.appliedIds.length > 0) {
+    if (appliedIds.length > 0) {
       await SurveyRepository.markSurveyDraft(surveyId, this.tx)
-      await CategoryManager.validateCategories(targetSurvey, this.tx)
+      // categories could have been inserted or deleted: validate the updated survey
+      const surveyUpdated = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+        { surveyId, draft: true, advanced: true },
+        this.tx
+      )
+      await CategoryManager.validateCategories(surveyUpdated, this.tx)
     }
-    this.processed = plan.appliedIds.length
-    this.setContext({ appliedIds: plan.appliedIds, skippedIds: plan.skippedIds })
+    this.processed = appliedIds.length
+    this.setContext({ appliedIds, skippedIds })
+  }
+
+  async fetchCompareParams(
+    source: SurveyCompareSourceSurvey
+  ): Promise<SurveyCompareParams & { usedNodeDefUuids: string[] }> {
+    const { surveyId, manualMatches = {} }: any = this.context
+    const target = await fetchTargetSurvey({ surveyId }, this.tx)
+    return {
+      sourceSurvey: source.survey,
+      targetSurvey: target.survey,
+      sourceItemsByCategoryUuid: source.itemsByCategoryUuid,
+      targetItemsByCategoryUuid: target.itemsByCategoryUuid,
+      sourceTaxaByTaxonomyUuid: source.taxaByTaxonomyUuid,
+      targetTaxaByTaxonomyUuid: target.taxaByTaxonomyUuid,
+      manualMatches,
+      usedNodeDefUuids: target.usedNodeDefUuids,
+    }
+  }
+
+  async applySurveyInfoChanges({ params, selectedIds }): Promise<string[]> {
+    const { user, surveyId, sourceFileName }: any = this.context
+    const result = compareSurveys(params)
+    const { appliedIds } = expandSelection({ result, selectedIds })
+    const plan = buildSurveyInfoApplyPlan({
+      sourceSurvey: params.sourceSurvey,
+      targetSurvey: params.targetSurvey,
+      surveyInfoDiffs: result.surveyInfo,
+      surveyFileDiffs: result.surveyFiles,
+      appliedIds,
+    })
+    if (Object.keys(plan.surveyProps).length === 0) return []
+
+    await this.insertSurveyFiles({
+      files: plan.surveyFilesToInsert,
+      sourceFilePath: FileUtils.tempFilePath(sourceFileName),
+    })
+    const targetProps = ObjectUtils.getProps(Survey.getSurveyInfo(params.targetSurvey))
+    // the id of the fetched survey is used: the survey name uniqueness check compares ids strictly
+    const targetSurveyId = Survey.getId(Survey.getSurveyInfo(params.targetSurvey))
+    const surveyUpdated = await SurveyManager.updateSurveyProps(
+      user,
+      targetSurveyId,
+      { ...targetProps, ...plan.surveyProps },
+      this.tx
+    )
+    // when the props are not valid, only the validation is returned
+    if (!Survey.getId(Survey.getSurveyInfo(surveyUpdated))) {
+      throw new Error(`Invalid survey info: ${JSON.stringify(surveyUpdated?.validation)}`)
+    }
+    await DbUtils.runQueries(
+      this.tx,
+      plan.surveyFileUuidsToDelete.map(
+        (fileUuid) => () => SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, this.tx)
+      )
+    )
+    const surveyChangeIds = [...result.surveyInfo, ...result.surveyFiles].map((diff) => diff.id)
+    return [...appliedIds].filter((id) => surveyChangeIds.includes(id))
+  }
+
+  async insertSurveyFiles({
+    files,
+    sourceFilePath,
+  }: {
+    files: { sourceUuid: string; file: any }[]
+    sourceFilePath: string
+  }) {
+    if (files.length === 0) return
+    const { surveyId }: any = this.context
+    const zipFile = new FileZip(sourceFilePath)
+    await zipFile.init()
+    try {
+      for (const { sourceUuid, file } of files) {
+        const content = await ArenaSurveyFileZip.getSurveyFile(zipFile, sourceUuid) // NOSONAR
+        if (!content) {
+          throw new Error(`Missing content for survey file ${SurveyFile.getName(file)}`)
+        }
+        const fileWithContent = SurveyFile.assocSize(Buffer.byteLength(content))(SurveyFile.assocContent(content)(file))
+        await SurveyFileService.insertFile(surveyId, fileWithContent, this.tx) // NOSONAR
+      }
+    } finally {
+      zipFile.close()
+    }
   }
 
   async applyCategoriesChanges(plan: SurveyCompareApplyPlan) {
@@ -78,6 +186,16 @@ export default class SurveyCompareApplyJob extends Job {
     for (const { categoryUuid, key, value } of plan.categoryPropsToUpdate) {
       await CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, tx) // NOSONAR
       activities.push(ActivityLog.newActivity(ActivityLog.type.categoryPropUpdate, { uuid: categoryUuid, key, value }))
+    }
+    for (const level of plan.categoryLevelsToInsert) {
+      await CategoryRepository.insertLevel({ surveyId, level, client: tx }) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.categoryLevelInsert, level))
+    }
+    for (const { categoryUuid, levelUuid, key, value } of plan.categoryLevelPropsToUpdate) {
+      await CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, tx) // NOSONAR
+      activities.push(
+        ActivityLog.newActivity(ActivityLog.type.categoryLevelPropUpdate, { uuid: levelUuid, categoryUuid, key, value })
+      )
     }
     for (const { categoryUuid, items } of plan.categoryItemsToInsert) {
       await CategoryManager.insertItemsInBatch({ surveyId, items }, tx) // NOSONAR
@@ -99,6 +217,28 @@ export default class SurveyCompareApplyJob extends Job {
     await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   }
 
+  async applyTaxonomiesChanges(plan: SurveyCompareApplyPlan) {
+    const { user, surveyId }: any = this.context
+    const tx = this.tx
+    const activities = []
+    for (const { taxonomy, taxa } of plan.taxonomiesToInsert) {
+      await TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy }, tx) // NOSONAR
+      await TaxonomyRepository.insertTaxa({ surveyId, taxa, client: tx }) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.taxonomyCreate, taxonomy))
+    }
+    for (const { taxonomyUuid, key, value } of plan.taxonomyPropsToUpdate) {
+      await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, tx) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }))
+    }
+    for (const { taxa } of plan.taxaToInsert) {
+      await TaxonomyRepository.insertTaxa({ surveyId, taxa, client: tx }) // NOSONAR
+    }
+    for (const { taxa } of plan.taxaToUpdate) {
+      await TaxonomyRepository.updateTaxa(surveyId, taxa, tx) // NOSONAR
+    }
+    await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  }
+
   async applyNodeDefsChanges(plan: SurveyCompareApplyPlan) {
     const { user, surveyId }: any = this.context
     const tx = this.tx
@@ -110,15 +250,50 @@ export default class SurveyCompareApplyJob extends Job {
         ...plan.nodeDefsToInsert.map((nodeDef) => ActivityLog.newActivity(ActivityLog.type.nodeDefCreate, nodeDef))
       )
     }
-    for (const { nodeDefUuid, parentUuid, type, props, propsAdvanced } of plan.nodeDefsToUpdate) {
+    for (const { nodeDefUuid, parentUuid, type, props, propsAdvanced, meta } of plan.nodeDefsToUpdate) {
       if (type) {
         await NodeDefRepository.updateNodeDefTypeAndProps({ surveyId, nodeDefUuid, type, props, propsAdvanced }, tx) // NOSONAR
-      } else {
-        await NodeDefRepository.updateNodeDefProps({ surveyId, nodeDefUuid, parentUuid, props, propsAdvanced }, tx) // NOSONAR
       }
+      await NodeDefRepository.updateNodeDefProps(
+        { surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, meta: meta ?? {} },
+        tx
+      ) // NOSONAR
       activities.push(
         ActivityLog.newActivity(ActivityLog.type.nodeDefUpdate, { uuid: nodeDefUuid, props, propsAdvanced })
       )
+    }
+    await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
+  }
+
+  // node defs first: categories and taxonomies can be deleted only when not used anymore
+  async applyDeletions(plan: SurveyCompareApplyPlan) {
+    const { user, surveyId }: any = this.context
+    const tx = this.tx
+    const activities = []
+    for (const nodeDefUuid of plan.nodeDefUuidsToDelete) {
+      await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, tx) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.nodeDefMarkDeleted, { uuid: nodeDefUuid }))
+    }
+    for (const { itemUuids } of plan.categoryItemsToDelete) {
+      await CategoryRepository.deleteItems(surveyId, itemUuids, tx) // NOSONAR
+    }
+    for (const { categoryUuid, levelUuid } of plan.categoryLevelsToDelete) {
+      await CategoryRepository.deleteLevel(surveyId, levelUuid, tx) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.categoryLevelDelete, { uuid: levelUuid, categoryUuid }))
+    }
+    for (const categoryUuid of plan.categoryUuidsToDelete) {
+      await CategoryRepository.deleteCategory(surveyId, categoryUuid, tx) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.categoryDelete, { uuid: categoryUuid }))
+    }
+    if (plan.vernacularNameUuidsToDelete.length > 0) {
+      await TaxonomyRepository.deleteDraftVernacularNamesByUuids(surveyId, plan.vernacularNameUuidsToDelete, tx)
+    }
+    if (plan.taxonUuidsToDelete.length > 0) {
+      await TaxonomyRepository.deleteDraftTaxaByUuids(surveyId, plan.taxonUuidsToDelete, tx)
+    }
+    for (const taxonomyUuid of plan.taxonomyUuidsToDelete) {
+      await TaxonomyRepository.deleteTaxonomy(surveyId, taxonomyUuid, tx) // NOSONAR
+      activities.push(ActivityLog.newActivity(ActivityLog.type.taxonomyDelete, { uuid: taxonomyUuid }))
     }
     await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   }
