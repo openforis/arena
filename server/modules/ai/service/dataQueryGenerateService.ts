@@ -15,7 +15,7 @@
  */
 import { z } from 'zod'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'

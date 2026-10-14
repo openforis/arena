@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
 
@@ -129,8 +129,8 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   getDataModule(user, surveyInfo),
   getAnalysisModule(user, surveyInfo),
   getUsersModule(user, surveyInfo),
-  ...getSystemAdminModules(user),
   getHelpModule(user),
+  ...getSystemAdminModules(user),
 ]
 
 export const getKey = A.prop(keys.key)

@@ -4,9 +4,8 @@ import { useNavigate } from 'react-router'
 import axios from 'axios'
 import * as A from '@core/arena'
 
-import { Objects } from '@openforis/arena-core'
+import { Authorizer, Objects } from '@openforis/arena-core'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'

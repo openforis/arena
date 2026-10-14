@@ -5,7 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 

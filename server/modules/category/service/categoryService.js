@@ -1,4 +1,4 @@
-import { Points } from '@openforis/arena-core'
+import { Authorizer, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -7,7 +7,6 @@ import * as Record from '@core/record/record'
 import * as User from '@core/user/user'
 import { FileFormats } from '@core/fileFormats'
 import * as NumberUtils from '@core/numberUtils'
-import * as Authorizer from '@core/auth/authorizer'
 
 import * as JobManager from '@server/job/jobManager'
 import * as Response from '@server/utils/response'

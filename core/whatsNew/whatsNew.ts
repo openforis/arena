@@ -1,4 +1,4 @@
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as User from '@core/user/user'
 
 import { WhatsNewAudience, WhatsNewItem, whatsNewAudiences, whatsNewItems } from './whatsNewItems'
