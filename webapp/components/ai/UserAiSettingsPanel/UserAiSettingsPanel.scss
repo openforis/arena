@@ -47,97 +47,6 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     }
   }
 
-  &__status-line {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-  }
-
-  &__status-label {
-    font-weight: 600;
-  }
-
-  &__engine {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-    padding: 0.5rem 0.75rem;
-    border: 1px solid var(--colorGrey300);
-    border-radius: 4px;
-  }
-
-  &__engine-header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  &__engine-name {
-    font-weight: 600;
-  }
-
-  &__engine-where {
-    font-size: 0.8rem;
-    color: var(--colorGrey700);
-  }
-
-  &__spacer {
-    flex: 1;
-  }
-
-  &__row {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-    min-width: 0;
-  }
-
-  &__field {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    min-width: 0;
-  }
-
-  // both Model fields and the Provider field
-  &__select {
-    width: 100%;
-    min-width: 0;
-    height: 2rem;
-    padding: 0 0.5rem;
-    border: 1px solid var(--colorGrey500);
-    border-radius: 4px;
-    background: inherit;
-    color: inherit;
-    font: inherit;
-  }
-
-  &__model-row {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  &__model-control {
-    flex: 1;
-    min-width: 0;
-  }
-
-  &__model-loading {
-    flex: none;
-  }
-
-  &__result {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.25rem;
-  }
-
   &__pill {
     display: inline-flex;
     align-items: center;
@@ -167,11 +76,6 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     }
   }
 
-  // wraps a result that appears later, so it can be announced; adds no box of its own
-  &__live {
-    display: contents;
-  }
-
   &__hint {
     font-size: 0.8rem;
     color: var(--colorGrey700);
@@ -193,17 +97,6 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     font: inherit;
     text-decoration: underline;
     cursor: pointer;
-  }
-
-  &__order {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-  }
-
-  &__order-title {
-    font-size: 0.85rem;
-    font-weight: 600;
   }
 
   &__badge {
@@ -417,9 +310,96 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     }
   }
 
-  &__footer-note {
+  &__providers-header {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  &__providers {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 1px solid var(--colorGrey500);
+    border-radius: 6px;
+  }
+
+  &__provider {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.5rem 0.6rem;
+
+    & + & {
+      border-top: 1px solid var(--colorGrey500);
+    }
+
+    &--default {
+      background: color-mix(in srgb, var(--blueDark) 6%, transparent);
+    }
+  }
+
+  &__provider-text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-width: 0;
+  }
+
+  &__provider-name {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__provider-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.4rem;
+    min-width: 0;
     font-size: 0.8rem;
     color: var(--colorGrey700);
-    text-align: center;
+  }
+
+  &__provider-model {
+    overflow-wrap: anywhere;
+  }
+
+  &__where {
+    padding: 0 0.45rem;
+    border: 1px solid var(--colorGrey500);
+    border-radius: 1rem;
+    white-space: nowrap;
+  }
+
+  &__provider-tags {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  // white on the dark blue: at least 4.5:1
+  &__default {
+    padding: 0.05rem 0.45rem;
+    border-radius: 4px;
+    background: var(--blueDark);
+    color: #fff;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  &__provider-menu {
+    min-width: 2rem;
+  }
+
+  &__footer-hint {
+    font-size: 0.8rem;
+    color: var(--colorGrey700);
   }
 }

@@ -3,14 +3,6 @@ import { getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
 import { defaultFeatureToggles } from '@server/modules/ai/service/aiUserPrefs'
 import { removeLegacyProvider } from '@server/modules/ai/service/legacyProviderSettings'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
-import {
-  buildSettingsUpdate,
-  createEmptyForm,
-  DEFAULT_PROVIDER_VALUE,
-  type FormState,
-  PROVIDERS,
-  withoutCloudProvider,
-} from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
 
 const storedAi = {
   featuresEnabled: true,
@@ -23,8 +15,6 @@ const storedAi = {
   lastTestOk: true,
   lastTestAt: '2026-10-01T00:00:00.000Z',
 }
-
-const spec = (value: string) => PROVIDERS.find((provider) => provider.value === value)!
 
 describe('Remove my provider (server)', () => {
   test('removes the converted provider and resets the default; the stored object is not changed', () => {
@@ -78,66 +68,5 @@ describe('describeAdminDefault', () => {
     const described = ProviderResolver.describeAdminDefault(adminConfig, [])
     expect(described).toEqual({ provider: 'openai', model: null, hostingClass: 'cloud' })
     expect(JSON.stringify(described)).not.toContain('sk-admin')
-  })
-})
-
-describe('account form', () => {
-  const togglesOn = { ...createEmptyForm().featureToggles, chat: true, assistantCleaning: true }
-
-  test('the Arena default saves the switches only, with enabled false', () => {
-    const form: FormState = { ...createEmptyForm(), accessLevel: 3, featureToggles: togglesOn }
-    expect(buildSettingsUpdate({ form, spec: spec(DEFAULT_PROVIDER_VALUE) })).toEqual({
-      accessLevel: 3,
-      featuresEnabled: true,
-      featureToggles: togglesOn,
-      enabled: false,
-    })
-  })
-
-  test('a personal provider sends its fields, and the key only when typed', () => {
-    const form: FormState = {
-      ...createEmptyForm(),
-      accessLevel: 3,
-      featureToggles: togglesOn,
-      provider: 'openai',
-      model: 'gpt-x',
-      baseUrl: 'ignored for openai',
-    }
-    expect(buildSettingsUpdate({ form, spec: spec('openai') })).toEqual({
-      accessLevel: 3,
-      featuresEnabled: true,
-      featureToggles: togglesOn,
-      enabled: true,
-      provider: 'openai',
-      model: 'gpt-x',
-      baseUrl: null,
-    })
-    const typed = buildSettingsUpdate({ form: { ...form, apiKey: 'sk-1', apiKeyDirty: true }, spec: spec('openai') })
-    expect(typed.apiKey).toBe('sk-1')
-  })
-
-  test('removing the provider keeps the unsaved switches', () => {
-    const form: FormState = {
-      ...createEmptyForm(),
-      accessLevel: 3,
-      featureToggles: togglesOn,
-      provider: 'openai-compatible',
-      model: 'm',
-      baseUrl: 'https://models.example.org/v1',
-      apiKey: 'sk',
-      apiKeyDirty: true,
-      modelFreeText: true,
-    }
-    expect(withoutCloudProvider(form)).toEqual({
-      ...form,
-      provider: DEFAULT_PROVIDER_VALUE,
-      model: '',
-      baseUrl: '',
-      apiKey: '',
-      apiKeyDirty: false,
-      // the edit counter moves on, so a Test of the removed provider never matches the next draft
-      apiKeyVersion: form.apiKeyVersion + 1,
-      modelFreeText: false,
-    })
   })
 })

@@ -4,15 +4,6 @@ export default {
   encryptionMissing:
     'En el despliegue falta AI_USER_KEY_ENCRYPTION_SECRET; las claves API personales no se pueden guardar hasta que un administrador lo configure.',
 
-  provider: 'Proveedor',
-  providers: {
-    default: 'Predeterminado de Arena',
-    openai: 'OpenAI',
-    anthropic: 'Anthropic (Claude)',
-    google: 'Google (Gemini)',
-    'openai-compatible': 'Compatible con OpenAI (Azure, OpenRouter, Ollama, ...)',
-    'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
-  },
   model: 'Modelo',
   modelOther: 'Otro (escriba un id de modelo)...',
   baseUrl: 'URL base',
@@ -29,27 +20,20 @@ export default {
   saveFailed: 'Error al guardar la configuración de IA: {{message}}',
 
   status: {
-    now: 'Ahora:',
     ready: 'Listo',
     notTested: 'Sin probar',
     notAvailable: 'No disponible',
-    none: 'Active el servidor local o elija un proveedor.',
+    notSetUp: 'No configurado',
   },
   where: {
-    section: 'Dónde se ejecuta la IA',
-    order: {
-      title: 'Orden',
-      localFirst: 'Usar primero el servidor local y el proveedor en la nube como alternativa',
-      cloudFirst: 'Usar primero el proveedor en la nube',
-      hint: 'La política de IA de cada encuesta puede bloquear un motor. Por defecto, los datos de los registros se quedan en este dispositivo.',
-    },
+    onDevice: 'Este equipo',
+    orgHosted: 'Servidor de la organización',
+    cloudOwnKey: 'Nube · su clave',
+    cloud: 'Nube',
   },
   localServer: {
-    name: 'Servidor de IA local',
     where: 'En este equipo o en su red',
-    use: 'Usar',
     baseUrl: 'URL del servidor',
-    test: 'Probar',
     answered: 'Respondió',
     noModels: 'El servidor no lista ningún modelo. Cargue un modelo en su servidor local.',
     contextTokens: 'Contexto: {{count}} tokens',
@@ -57,7 +41,6 @@ export default {
     model: 'Modelo',
     modelPlaceholder: 'Pruebe la conexión para listar los modelos',
     help: 'Inicie su servidor local (por ejemplo LM Studio u Ollama) y permita las solicitudes de este sitio (CORS). Su navegador puede pedir permiso para acceder a los dispositivos de la red local.',
-    docsLink: 'Documentación de LM Studio',
     httpsHint:
       'Arena se sirve por HTTPS: un servidor en otro equipo de su red necesita HTTPS, o un navegador con Local Network Access (Chrome) y su permiso.',
     cloudWarning:
@@ -65,19 +48,25 @@ export default {
     notSaved:
       'La configuración del servidor de IA local no se pudo guardar en este navegador (almacenamiento bloqueado o lleno).',
   },
-  cloud: {
-    name: 'Proveedor en la nube',
-    where: 'guardado con su cuenta',
-    defaultHint: 'Usa el proveedor que configuró su administrador de Arena.',
-    defaultNone: 'No hay ninguno configurado en este servidor.',
-    localUrlHint:
-      'Esta dirección está en su equipo o en su red. Para LM Studio, use el Servidor de IA local de arriba. El servidor de Arena no puede acceder a ella.',
-    localUrlLink: 'Usar el Servidor de IA local',
-    test: 'Probar',
-    testOk: 'Respondió en {{latencyMs}} ms',
-    remove: 'Quitar mi proveedor',
-    removed: 'Se quitó su proveedor. Las funciones de IA usan el predeterminado de Arena.',
-    removedNoDefault: 'Se quitó su proveedor.',
+  list: {
+    section: 'Proveedores',
+    add: 'Añadir proveedor',
+    arenaDefault: 'Predeterminado de Arena',
+    default: 'Predeterminado',
+    defaultMissing:
+      'Su proveedor predeterminado es un servidor local guardado en otro navegador. Elija otro proveedor predeterminado para usar la IA aquí.',
+    footerHint: 'Los proveedores se guardan al añadirlos. Lo que la IA puede ver se guarda con Guardar.',
+    menu: 'Acciones de {{name}}',
+    makeDefault: 'Hacer predeterminado',
+    test: 'Probar la conexión',
+    edit: 'Editar…',
+    remove: 'Eliminar',
+    removeConfirm: '¿Eliminar {{name}}? Las conversaciones que lo usan usarán su proveedor predeterminado.',
+    removed: '{{name}} se eliminó.',
+    defaultChanged: '{{name}} es ahora su proveedor predeterminado.',
+    testOk: '{{name}} respondió.',
+    testFailed: '{{name}} no respondió. Edítelo para revisar su configuración.',
+    actionFailed: 'No se pudo guardar el cambio: {{message}}',
   },
   types: {
     local: 'Servidor local',
@@ -193,5 +182,4 @@ export default {
         'El nombre de la encuesta, nombres de usuario, tipos de actividad, recuentos y fechas del registro de actividad.',
     },
   },
-  footerNote: 'Toda la configuración de IA se guarda con el botón Guardar del perfil.',
 }

@@ -5,42 +5,16 @@ import React, { useEffect, useImperativeHandle } from 'react'
 import { Fieldset } from '@webapp/components/Fieldset'
 
 import { AiAccessLevel } from './AiAccessLevel'
-import { AiEngineOrder } from './AiEngineOrder'
-import { AiEngineStatusLine } from './AiEngineStatusLine'
-import { CloudProviderSection } from './CloudProviderSection'
-import { LocalAiSection } from './LocalAiSection'
-import { type UseUserAiSettingsResult, useUserAiSettings } from './useUserAiSettings'
+import { ProviderList } from './ProviderList'
+import { useUserAiSettings } from './useUserAiSettings'
 
 type UserAiSettingsPanelProps = {
   onDirtyChange?: ((dirty: boolean) => void) | null
 }
 
-type SectionsProps = {
-  panel: UseUserAiSettingsResult
-}
-
 /**
- * Sections shown when AI can see something: Where AI runs, then the footer note.
- * @param {SectionsProps} props - Props.
- * @returns {React.ReactElement} The sections.
- */
-const PanelSections = ({ panel }: SectionsProps) => {
-  const { local } = panel
-  return (
-    <>
-      <Fieldset className="user-ai-settings-panel__section" legend="userAiSettings:where.section">
-        <AiEngineStatusLine status={panel.engineStatus} />
-        <LocalAiSection local={local} />
-        <CloudProviderSection panel={panel} />
-        {local.draft.enabled && <AiEngineOrder preferLocal={local.draft.preferLocal} onChange={local.setPreferLocal} />}
-      </Fieldset>
-      <div className="user-ai-settings-panel__footer-note">{panel.i18n.t('userAiSettings:footerNote')}</div>
-    </>
-  )
-}
-
-/**
- * AI panel of the User Profile page. The parent's Save calls the function exposed by the ref.
+ * AI panel of the User Profile page: what AI can see (saved by the parent's Save, through the function exposed by
+ * the ref) and the providers (saved by their own dialog and menu).
  */
 const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettingsPanelProps>(
   ({ onDirtyChange = null }, ref) => {
@@ -78,7 +52,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
           onLevelChange={panel.onAccessLevelChange}
           onToggleChange={panel.onFeatureToggleChange}
         />
-        {form.accessLevel > 0 && <PanelSections panel={panel} />}
+        {form.accessLevel > 0 && <ProviderList settings={settings} reloadSettings={panel.reloadSettings} />}
       </Fieldset>
     )
   }

@@ -18,14 +18,11 @@ export const fetchSettings = async () => {
 }
 
 /**
- * Saves the user's AI settings. Pass `apiKey: undefined` to keep the
- * existing key untouched; pass `apiKey: ''` to clear it.
+ * Saves the access level and the feature switches; the providers keep their own routes (/api/ai/providers).
  * @param {object} update - Settings to save.
- * @param {string} update.provider - openai|anthropic|google|openai-compatible.
- * @param {string} update.model - Model identifier.
- * @param {string} [update.baseUrl] - For openai-compatible only.
- * @param {string} [update.apiKey] - New API key (omit to keep existing, '' to clear).
- * @param {boolean} update.enabled - Whether the personal override is active.
+ * @param {number} update.accessLevel - Access level.
+ * @param {boolean} update.featuresEnabled - Master switch (derived from the level).
+ * @param {object} update.featureToggles - Switch by feature category.
  * @returns {Promise<object>} The updated settings descriptor.
  */
 export const saveSettings = async (update) => {

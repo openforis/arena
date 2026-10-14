@@ -4,15 +4,6 @@ export default {
   encryptionMissing:
     "Le déploiement ne dispose pas de AI_USER_KEY_ENCRYPTION_SECRET ; les clés API personnelles ne peuvent pas être enregistrées tant qu'un administrateur ne l'a pas configuré.",
 
-  provider: 'Fournisseur',
-  providers: {
-    default: "Valeur par défaut d'Arena",
-    openai: 'OpenAI',
-    anthropic: 'Anthropic (Claude)',
-    google: 'Google (Gemini)',
-    'openai-compatible': 'Compatible OpenAI (Azure, OpenRouter, Ollama, ...)',
-    'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
-  },
   model: 'Modèle',
   modelOther: 'Autre (saisir un identifiant de modèle)...',
   baseUrl: 'URL de base',
@@ -29,27 +20,20 @@ export default {
   saveFailed: "Échec de l'enregistrement des paramètres IA : {{message}}",
 
   status: {
-    now: 'Actuellement :',
     ready: 'Prêt',
     notTested: 'Non testé',
     notAvailable: 'Indisponible',
-    none: 'Activez le serveur local ou choisissez un fournisseur.',
+    notSetUp: 'Non configuré',
   },
   where: {
-    section: "Où s'exécute l'IA",
-    order: {
-      title: 'Ordre',
-      localFirst: "Utiliser d'abord le serveur local, le fournisseur cloud en secours",
-      cloudFirst: "Utiliser d'abord le fournisseur cloud",
-      hint: "La politique d'IA de chaque formulaire peut toujours bloquer un moteur. Par défaut, les données des enregistrements restent sur cet appareil.",
-    },
+    onDevice: 'Cet ordinateur',
+    orgHosted: "Serveur de l'organisation",
+    cloudOwnKey: 'Cloud · votre clé',
+    cloud: 'Cloud',
   },
   localServer: {
-    name: "Serveur d'IA local",
     where: 'Sur cet ordinateur ou votre réseau',
-    use: 'Utiliser',
     baseUrl: 'URL du serveur',
-    test: 'Tester',
     answered: 'A répondu',
     noModels: 'Le serveur ne liste aucun modèle. Chargez un modèle dans votre serveur local.',
     contextTokens: 'Contexte : {{count}} tokens',
@@ -57,7 +41,6 @@ export default {
     model: 'Modèle',
     modelPlaceholder: 'Testez la connexion pour lister les modèles',
     help: "Démarrez votre serveur local (par exemple LM Studio ou Ollama) et autorisez les requêtes de ce site (CORS). Votre navigateur peut demander l'autorisation d'accéder aux appareils du réseau local.",
-    docsLink: 'Documentation de LM Studio',
     httpsHint:
       'Arena est servi en HTTPS : un serveur sur une autre machine de votre réseau doit être en HTTPS, ou il faut un navigateur avec Local Network Access (Chrome) et votre autorisation.',
     cloudWarning:
@@ -65,19 +48,26 @@ export default {
     notSaved:
       "Les paramètres du serveur d'IA local n'ont pas pu être enregistrés dans ce navigateur (stockage bloqué ou plein).",
   },
-  cloud: {
-    name: 'Fournisseur cloud',
-    where: 'enregistré avec votre compte',
-    defaultHint: 'Utilise le fournisseur configuré par votre administrateur Arena.',
-    defaultNone: "Aucun n'est configuré sur ce serveur.",
-    localUrlHint:
-      "Cette adresse se trouve sur votre ordinateur ou votre réseau. Pour LM Studio, utilisez le Serveur d'IA local ci-dessus. Le serveur Arena ne peut pas l'atteindre.",
-    localUrlLink: "Utiliser le Serveur d'IA local",
-    test: 'Tester',
-    testOk: 'A répondu en {{latencyMs}} ms',
-    remove: 'Supprimer mon fournisseur',
-    removed: "Votre fournisseur a été supprimé. Les fonctionnalités IA utilisent la valeur par défaut d'Arena.",
-    removedNoDefault: 'Votre fournisseur a été supprimé.',
+  list: {
+    section: 'Fournisseurs',
+    add: 'Ajouter un fournisseur',
+    arenaDefault: "Fournisseur par défaut d'Arena",
+    default: 'Par défaut',
+    defaultMissing:
+      "Votre fournisseur par défaut est un serveur local enregistré dans un autre navigateur. Choisissez un autre fournisseur par défaut pour utiliser l'IA ici.",
+    footerHint:
+      "Les fournisseurs sont enregistrés dès que vous les ajoutez. Ce que l'IA peut voir est enregistré avec Enregistrer.",
+    menu: 'Actions pour {{name}}',
+    makeDefault: 'Définir par défaut',
+    test: 'Tester la connexion',
+    edit: 'Modifier…',
+    remove: 'Supprimer',
+    removeConfirm: "Supprimer {{name}} ? Les conversations qui l'utilisent utiliseront votre fournisseur par défaut.",
+    removed: '{{name}} a été supprimé.',
+    defaultChanged: '{{name}} est maintenant votre fournisseur par défaut.',
+    testOk: '{{name}} a répondu.',
+    testFailed: "{{name}} n'a pas répondu. Modifiez-le pour vérifier ses paramètres.",
+    actionFailed: "La modification n'a pas pu être enregistrée : {{message}}",
   },
   types: {
     local: 'Serveur local',
@@ -194,5 +184,4 @@ export default {
         "Le nom du formulaire, les noms des utilisateurs, les types d'activité, les comptages et les dates du journal d'activité.",
     },
   },
-  footerNote: 'Tous les paramètres IA sont enregistrés avec le bouton Enregistrer du profil.',
 }

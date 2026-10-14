@@ -19,15 +19,11 @@ import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
+import { getApiErrorMessage, type TFunction, toT } from '../aiSettingsForm'
 import {
   type AiModel,
   chooseListedModel,
-  getApiErrorMessage,
   OTHER_MODEL_VALUE,
-  type TFunction,
-  toT,
-} from '../aiSettingsForm'
-import {
   buildAccountRequest,
   buildLocalProviderSave,
   buildTestKey,
