@@ -88,7 +88,7 @@ export type AssistantConversationApi = {
   discard: (changeSetId: string) => Promise<void>
 }
 
-const NO_ACCESS = { effective: null, hostingClass: null }
+const NO_ACCESS = { effective: null }
 
 /**
  * Creates the conversation of a first message. A Cleaning conversation has record content from its first turn, so

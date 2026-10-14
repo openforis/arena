@@ -24,6 +24,7 @@ const ENGINE_ERROR_VIEWS: Record<string, AiEngineErrorView> = {
 // errors of the conversation's provider (down, refused, blocked, removed): the chat offers to pick another one
 const PROVIDER_CHOICE_ERROR_KEYS = new Set([
   'aiNoEngineAvailable',
+  'aiNotConfigured',
   'aiLocalServerUnreachable',
   'aiLocalServerModelMissing',
   'aiProviderChooseAnother',

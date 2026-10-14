@@ -1,13 +1,13 @@
 /**
  * Builds what the browser policy check needs: the effective policy (survey, or instance ceilings for features
- * without a survey). The settings name no single provider any more: the hosting class is the one of the engine the
- * request uses (resolveAssistantEngine sets it), so it is null here. Pure: transports are injected.
+ * without a survey). The hosting class is not here: it is the one of the engine the request uses
+ * (resolveAssistantEngine sets it). Pure: transports are injected.
  */
-import { normalizeAiPolicy, type AiHostingClass, type AiPolicy } from '@common/ai/policy'
+import { normalizeAiPolicy, type AiPolicy } from '@common/ai/policy'
 
 import type { SurveyAiPolicyClientState } from './surveyAiPolicyCache'
 
-export type PolicyContext = { effective: AiPolicy; hostingClass: AiHostingClass | null }
+export type PolicyContext = { effective: AiPolicy }
 
 type AiSettingsLike = { policyCeilings?: unknown; [key: string]: unknown }
 
@@ -39,6 +39,5 @@ export const createPolicyContextLoader =
       surveyId ? fetchSurveyPolicy(surveyId) : Promise.resolve(null),
     ])
     const effective = surveyPolicy ? surveyPolicy.effective : getCeilingsFromSettings(settings)
-    // the engine of the request sets the hosting class; until then no tool is offered for an unknown location
-    return { effective, hostingClass: null }
+    return { effective }
   }

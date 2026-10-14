@@ -186,7 +186,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     const answer = await deps.requestConsent(
       {
         surveyId: context.options.surveyId,
-        baseUrl: capability.baseUrl ?? '',
+        baseUrl: consentParams(context, capability).baseUrl,
         modelId: engine.model,
         hostingClass: engine.hostingClass,
       },

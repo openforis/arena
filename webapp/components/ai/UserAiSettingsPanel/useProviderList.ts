@@ -118,12 +118,20 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     [defaultProviderId, providers, settings]
   )
 
-  // after every immediate save: the cached settings, the capabilities and the panel's settings are read again
+  /**
+   * Reads the cached settings, the capabilities and the panel's settings again, after every immediate save.
+   * @returns {Promise<void>} Resolves when everything is refreshed.
+   */
   const refreshAll = useCallback(async () => {
     invalidateAiSettingsCache()
     await Promise.all([refreshAiCapabilities().catch(() => undefined), reloadSettings()])
   }, [reloadSettings])
 
+  /**
+   * Makes a provider the default one and tells the user.
+   * @param {AiProviderEntry} entry - The provider.
+   * @returns {Promise<void>} Resolves when saved and refreshed.
+   */
   const makeDefault = useCallback(
     async (entry: AiProviderEntry) => {
       await API.aiProviders.setDefaultProvider({ providerId: entry.id })
@@ -133,6 +141,11 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     [notifyInfo, refreshAll, t]
   )
 
+  /**
+   * Tests a saved provider and tells the user whether it answered.
+   * @param {AiProviderEntry} entry - The provider.
+   * @returns {Promise<void>} Resolves when tested and refreshed.
+   */
   const testConnection = useCallback(
     async (entry: AiProviderEntry) => {
       const ok = entry.kind === 'local' ? await testLocalProvider(entry.id) : await testAccountProvider(entry.id)
@@ -144,25 +157,41 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     [notifyError, notifyInfo, refreshAll]
   )
 
+  /**
+   * Removes a provider after the user confirms.
+   * @param {AiProviderEntry} entry - The provider.
+   * @returns {Promise<void>} Resolves when removed and refreshed.
+   */
   const remove = useCallback(
     async (entry: AiProviderEntry) => {
       const name = getProviderDisplayName({ entry, t })
       if (!(await confirm({ key: 'userAiSettings:list.removeConfirm', params: { name } }))) return
-      if (entry.kind === 'local') {
-        if (!(await removeLocalProvider({ id: entry.id, defaultProviderId }))) {
-          notifyError({ key: 'userAiSettings:localServer.notSaved' })
-          return
+      let removed = false
+      try {
+        if (entry.kind === 'local') {
+          if (!(await removeLocalProvider({ id: entry.id, defaultProviderId }))) {
+            notifyError({ key: 'userAiSettings:localServer.notSaved' })
+            return
+          }
+        } else {
+          // the server resets the default when it was this provider
+          await API.aiProviders.removeProvider(entry.id)
         }
-      } else {
-        // the server resets the default when it was this provider
-        await API.aiProviders.removeProvider(entry.id)
+        removed = true
+      } finally {
+        // also when resetting the default failed after the local provider was removed: the list must not go stale
+        await refreshAll()
       }
-      await refreshAll()
-      notifyInfo({ key: 'userAiSettings:list.removed', params: { name } })
+      if (removed) notifyInfo({ key: 'userAiSettings:list.removed', params: { name } })
     },
     [confirm, defaultProviderId, notifyError, notifyInfo, refreshAll, t]
   )
 
+  /**
+   * Opens the dialog on a saved provider.
+   * @param {AiProviderEntry} entry - The provider.
+   * @returns {void} Nothing.
+   */
   const openEdit = useCallback(
     (entry: AiProviderEntry) => {
       const saved = toSavedProvider({
@@ -175,6 +204,12 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     [dialogContext.allowlist, settings.providers]
   )
 
+  /**
+   * Runs a menu action of a row; a failure is shown to the user.
+   * @param {ProviderRow} row - The row.
+   * @param {ProviderMenuAction} action - The action.
+   * @returns {Promise<void>} Resolves when the action ended.
+   */
   const runAction = useCallback(
     async (row: ProviderRow, action: ProviderMenuAction) => {
       const { entry } = row
@@ -195,9 +230,21 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     [makeDefault, notifyError, openEdit, remove, t, testConnection]
   )
 
+  /**
+   * Opens the dialog on a new provider.
+   * @returns {void} Nothing.
+   */
   const openAdd = useCallback(() => setDialog({ saved: null }), [])
+  /**
+   * Closes the dialog.
+   * @returns {void} Nothing.
+   */
   const closeDialog = useCallback(() => setDialog(null), [])
-  // the dialog already refreshed the cache and the capabilities; the key flags come with the settings
+  /**
+   * Closes the dialog after a save. The dialog already refreshed the cache and the capabilities; the key flags come
+   * with the settings.
+   * @returns {void} Nothing.
+   */
   const onDialogSaved = useCallback(() => {
     setDialog(null)
     reloadSettings()

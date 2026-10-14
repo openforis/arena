@@ -208,6 +208,24 @@ describe('capabilities store with providers (266)', () => {
     })
   })
 
+  test('one failing probe does not cost the other provider its capability', async () => {
+    const store = createCapabilitiesStore({
+      loadSettings: async () => null,
+      loadLocalProviders: () => [laptop, lan],
+      probe: async ({ baseUrl }) => {
+        if (baseUrl === laptop.baseUrl) throw new Error('boom')
+        return reachable(['m2'])
+      },
+    })
+    const capabilities = await store.load({ userUuid: 'u1' })
+    expect(capabilities.providers.map((entry) => [entry.id, entry.status])).toEqual([
+      ['local:l1', 'notTested'],
+      ['local:l2', 'ready'],
+      ['arena-default', 'notSetUp'],
+    ])
+    expect(capabilities.local['local:l2']).toMatchObject({ reachable: true, models: ['m2'] })
+  })
+
   test('the settings loader gets the user of the run', async () => {
     const users: Array<string | null> = []
     const store = createCapabilitiesStore({

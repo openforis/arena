@@ -25,6 +25,7 @@ import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }
 
+/** Builds a local provider entry. */
 const localEntry = (id: string, name: string, baseUrl: string, hostingClass: AiHostingClass): AiProviderEntry => ({
   id,
   kind: 'local',
@@ -36,6 +37,7 @@ const localEntry = (id: string, name: string, baseUrl: string, hostingClass: AiH
   status: 'ready',
 })
 
+/** Builds a local server probe result. */
 const probe = (baseUrl: string, hostingClass: AiHostingClass): AiLocalServerCapability => ({
   enabled: true,
   reachable: true,
@@ -72,6 +74,7 @@ const PROVIDERS: AiProviderEntry[] = [
   },
 ]
 
+/** Builds capabilities with the given default. */
 const capabilities = (defaultProviderId = 'acct:a1'): AiCapabilities => ({
   instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars: 200000 },
   providers: PROVIDERS,
@@ -82,6 +85,7 @@ const capabilities = (defaultProviderId = 'acct:a1'): AiCapabilities => ({
   },
 })
 
+/** Computes the feature availability with overrides of the default inputs. */
 const availability = (overrides: Partial<Parameters<typeof getAiEngineFeatureAvailability>[0]> = {}) =>
   getAiEngineFeatureAvailability({
     enabled: true,
@@ -199,6 +203,7 @@ describe('helpers', () => {
   })
 
   test("B's location text names the organisation server's host", () => {
+    /** Test translation function: the key and its params. */
     const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
     const location = { hostingClass: 'orgHosted', provider: null, model: null } as const
     expect(getAiDataLocationText({ location: { ...location, engine: '10.0.0.5:8000' }, t })).toBe(

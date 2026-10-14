@@ -9,6 +9,7 @@ import {
 } from '@webapp/ai/engines/resolveModel'
 import type { AiCapabilities, AiEngine, AiProviderEntry, StorageLike } from '@webapp/ai/engines/types'
 
+/** Builds an in-memory storage. */
 const memoryStorage = (): StorageLike => {
   const data = new Map<string, string>()
   return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }
@@ -43,6 +44,7 @@ const ARENA: AiProviderEntry = {
   status: 'ready',
 }
 
+/** Builds capabilities with the given provider list and default. */
 const capabilities = ({
   defaultProviderId,
   baseUrl,
@@ -82,6 +84,7 @@ const capabilities = ({
   },
 })
 
+/** Builds a model resolver over the capabilities, recording every call. */
 const setup = ({
   defaultProviderId = 'local:l1',
   localUp = true,

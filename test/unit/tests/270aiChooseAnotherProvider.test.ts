@@ -64,6 +64,7 @@ const CAPABILITIES: AiCapabilities = {
   },
 }
 
+/** Builds an in-memory storage. */
 const memoryStorage = (): StorageLike => {
   const data = new Map<string, string>()
   return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }

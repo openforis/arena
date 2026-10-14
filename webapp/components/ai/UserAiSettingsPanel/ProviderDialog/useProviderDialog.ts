@@ -22,7 +22,6 @@ import { useI18n } from '@webapp/store/system'
 import { getApiErrorMessage, type TFunction, toT } from '../aiSettingsForm'
 import {
   type AiModel,
-  OTHER_MODEL_VALUE,
   buildAccountRequest,
   buildLocalProviderSave,
   buildTestKey,
@@ -39,12 +38,13 @@ import {
   isApiKeyMissing,
   isOrgServerUrlRefused,
   listLocalModels,
+  OTHER_MODEL_VALUE,
   pickLocalModel,
-  resolveFetchedModel,
   type ProviderDialogType,
   type ProviderDraft,
   type ProviderTypeGroup,
   type ProviderTypeSpec,
+  resolveFetchedModel,
   type SavedProvider,
   shouldBecomeDefault,
   shouldShowLocalUrlHint,
