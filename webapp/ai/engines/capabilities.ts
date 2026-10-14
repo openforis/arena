@@ -190,7 +190,6 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @param {T} fallback - The value to return when it throws.
    * @returns {Promise<T>} The result, or the fallback.
    */
-  // the fallback is reachable only when localStorage is unreadable, which the spec treats like "not on this browser"
   const safely = async <T>(action: () => T | Promise<T>, fallback: T): Promise<T> => {
     try {
       return await action()
@@ -252,6 +251,8 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   const compute = async ({ userUuid, force }: { userUuid: string | null; force: boolean }) => {
     const current = ++sequence
     const nextSettings = await safely(() => deps.loadSettings({ force, userUuid }), null)
+    // loadLocalProviders catches its own storage errors; this fallback is reached only when localStorage is unreadable,
+    // which the spec treats like "not on this browser"
     const localProviders = await safely(() => deps.loadLocalProviders(userUuid), [] as LocalProvider[])
     // every server is probed at the same time: one slow server does not delay the others
     const probes = await Promise.all(localProviders.map((provider) => probeSafely(provider.baseUrl, provider.modelId)))
