@@ -3,7 +3,7 @@ import { generateText, streamText } from 'ai'
 import { createGatewayEngine } from '@webapp/ai/engines/gatewayEngine'
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from '@webapp/ai/engines/engineInfo'
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import type { AiGatewayCapability, AiLocalServerCapability, AiSelectedEngine } from '@webapp/ai/engines/types'
+import type { AiGatewayEngineSource, AiLocalServerCapability, AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey } from '@webapp/ai/runtime/runtimeErrors'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
@@ -18,8 +18,7 @@ const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalS
   ...overrides,
 })
 
-const gateway = (overrides: Partial<AiGatewayCapability> = {}): AiGatewayCapability => ({
-  available: true,
+const gateway = (overrides: Partial<AiGatewayEngineSource> = {}): AiGatewayEngineSource => ({
   hostingClass: 'cloud',
   provider: 'openai',
   model: 'gateway-model',

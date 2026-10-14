@@ -40,8 +40,7 @@ describe('saved API key encrypted with a rotated secret', () => {
 
   test('the public settings still load and flag the key as unreadable', () => {
     const settings = AiSettingsService.getPublicSettings(userWithKey(encrypted))
-    expect(settings.hasApiKey).toBe(true)
-    expect(settings.apiKeyReadable).toBe(false)
+    expect(settings.providers[0]).toMatchObject({ id: 'acct:legacy', hasApiKey: true, apiKeyReadable: false })
   })
 
   test('the resolver refuses the provider instead of switching to the admin default', async () => {
@@ -54,7 +53,7 @@ describe('saved API key encrypted with a rotated secret', () => {
 
   test('a readable key is used', () => {
     const readable = SecretBox.encrypt('sk-new')
-    expect(AiSettingsService.getPublicSettings(userWithKey(readable)).apiKeyReadable).toBe(true)
+    expect(AiSettingsService.getPublicSettings(userWithKey(readable)).providers[0].apiKeyReadable).toBe(true)
     expect(ProviderResolver.resolveProviderConfig({ user: userWithKey(readable), adminConfig })).toMatchObject({
       source: ProviderResolver.sources.user,
       providerId: 'acct:legacy',

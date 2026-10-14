@@ -69,12 +69,11 @@ const selectGateway = (entry: AiProviderEntry, capabilities: AiCapabilities): Ai
   // a provider whose last test failed (or whose key is unreadable) fails every call; not tested yet is still tried
   if (entry.status === 'notAvailable' || !entry.hostingClass) return unavailable('notAvailable')
   const info = getGatewayEngineInfo({
-    available: true,
     hostingClass: entry.hostingClass,
     // Arena default is shown by its admin provider type ("OpenAI"), an account provider by the user's name for it
     provider: entry.kind === 'arenaDefault' ? entry.type : entry.name,
     model: entry.model,
-    maxPromptChars: capabilities.gateway.maxPromptChars,
+    maxPromptChars: capabilities.instance.maxPromptChars,
   })
   return info ? { engine: { ...info, providerId: entry.id } } : unavailable('notAvailable')
 }

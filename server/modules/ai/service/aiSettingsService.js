@@ -14,16 +14,14 @@
  *     providers,              // account providers (aiProviderPrefs.ts); keys encrypted (secretBox), never sent back
  *   }
  *
- * The providers are edited by aiProviderService.ts. This module keeps the old single-provider body and fields working
- * (legacyProviderSettings.ts) until the old panel is gone.
+ * The providers and the default are edited by aiProviderService.ts; this module saves the access level and toggles.
  */
 import * as User from '@core/user/user'
-import { LEGACY_ACCOUNT_PROVIDER_ID } from '@common/ai/providerIds'
 import { AiFeatureCategory } from '@common/ai/features'
 
 import * as UserManager from '@server/modules/user/manager/userManager'
 
-import { findStoredProvider, getProviderPrefs, withProviderPrefs } from './aiProviderPrefs'
+import { getProviderPrefs, withProviderPrefs } from './aiProviderPrefs'
 import * as AiProviderService from './aiProviderService'
 import {
   areFeaturesEnabledForUser,
@@ -33,7 +31,6 @@ import {
   resolveSavedAccess,
   sanitiseFeatureToggles,
 } from './aiUserPrefs'
-import { applyLegacyProviderUpdate, removeLegacyProvider, toLegacyPublicFields } from './legacyProviderSettings'
 
 export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
 
@@ -44,22 +41,19 @@ const PREFS_KEY = 'ai'
 /**
  * Returns the user-facing settings (no secrets) for the AI settings panel.
  * @param {object} user - Arena user.
- * @returns {object} The access level, toggles, default provider, public provider entries and the old flat fields.
+ * @returns {object} The access level, toggles, default provider and the public entries of the account providers.
  */
 export const getPublicSettings = (user) => {
   const raw = getRawPrefs(user)
   const accessLevel = getAccessLevelForUser(user)
   const { defaultProviderId, defaultProviderOrigin } = getProviderPrefs(raw)
-  const providers = AiProviderService.getPublicProviders(user)
   return {
     accessLevel,
     featuresEnabled: accessLevel > 0,
     featureToggles: sanitiseFeatureToggles(raw?.featureToggles),
     defaultProviderId,
     defaultProviderOrigin,
-    providers,
-    // single-provider fields of the old panel (removed with it in plan 3b)
-    ...toLegacyPublicFields({ providers, defaultProviderId }),
+    providers: AiProviderService.getPublicProviders(user),
   }
 }
 
@@ -77,73 +71,23 @@ const writeAiPrefs = async (user, aiPrefs) => {
 }
 
 /**
- * Saves the profile part of the AI settings (access level and toggles). The old body (`featuresEnabled`, `enabled`,
- * `provider`, `model`, `baseUrl`, `apiKey`) still saves the personal provider as `acct:legacy`.
+ * Returns the AI prefs to store after a profile save: the access level and toggles of the request; the providers and
+ * the default as stored. Any other field of the request (the old single-provider fields included) is ignored. An old
+ * single-provider slot is written as `acct:legacy`, so a user who never opened the provider list keeps it.
+ * @param {object} args - Args.
+ * @param {object|null} args.existing - Stored AI prefs.
+ * @param {object} args.update - Request body (untrusted).
+ * @returns {object} The AI prefs to store.
+ */
+export const buildSavedAiPrefs = ({ existing, update }) =>
+  withProviderPrefs({ ...existing, ...resolveSavedAccess(update) }, getProviderPrefs(existing))
+
+/**
+ * Saves the profile part of the AI settings (access level and toggles).
  * @param {object} args - Update args.
  * @param {object} args.user - The user.
  * @param {object} args.update - Request body (untrusted).
- * @param {object} [args.deps] - Provider service dependencies (default: the real ones).
  * @returns {Promise<object>} The updated user.
  */
-export const saveSettings = async ({ user, update, deps = AiProviderService.createDefaultAiProviderServiceDeps() }) => {
-  const existing = getRawPrefs(user)
-  const access = resolveSavedAccess(update)
-  // the deps encrypt with encryptKey: 409 aiEncryptionMissing, not a 500, when the server has no secret
-  const providerPrefs = applyLegacyProviderUpdate({ prefs: getProviderPrefs(existing), update, deps })
-  return writeAiPrefs(user, withProviderPrefs({ ...existing, ...access }, providerPrefs))
-}
-
-/**
- * Removes the personal provider of the old panel (`acct:legacy`); the access settings and the other providers stay.
- * @param {object} args - Args.
- * @param {object} args.user - The user.
- * @returns {Promise<object>} The updated user.
- */
-export const clearSettings = async ({ user }) => {
-  const existing = getRawPrefs(user)
-  if (!existing) return user
-  return writeAiPrefs(user, withProviderPrefs(existing, removeLegacyProvider(getProviderPrefs(existing))))
-}
-
-/**
- * Returns `acct:legacy` when the user has it, so the old panel's calls are checked as a saved provider.
- * @param {object} user - Arena user.
- * @returns {string|undefined} The id, or undefined.
- */
-const getLegacyProviderId = (user) =>
-  findStoredProvider(getProviderPrefs(getRawPrefs(user)), LEGACY_ACCOUNT_PROVIDER_ID)
-    ? LEGACY_ACCOUNT_PROVIDER_ID
-    : undefined
-
-/**
- * Old panel test (POST /api/ai/settings/test): the draft is checked against `acct:legacy`, whose key is reused only
- * on its own endpoint.
- * @param {object} args - Args.
- * @param {object} args.user - The user.
- * @param {string} [args.provider] - Draft provider.
- * @param {string} [args.model] - Draft model.
- * @param {string} [args.baseUrl] - Draft base URL.
- * @param {string} [args.apiKey] - Draft API key.
- * @returns {Promise<object>} The test result.
- */
-export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
-  const id = getLegacyProviderId(user)
-  if (!provider && !id) return { ok: false, latencyMs: 0, errorMessage: 'No personal provider configured' }
-  const input = provider ? { id, type: provider, model, baseUrl, apiKey } : { id }
-  return AiProviderService.testProvider({ user, input })
-}
-
-/**
- * Old panel model list (POST /api/ai/settings/models), with the same key rule as testConnection.
- * @param {object} args - Args.
- * @param {object} args.user - Arena user.
- * @param {string} args.provider - Provider key.
- * @param {string} [args.baseUrl] - Base URL.
- * @param {string} [args.apiKey] - API key typed in the form.
- * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models.
- */
-export const listModels = async ({ user, provider, baseUrl, apiKey }) =>
-  AiProviderService.listProviderModels({
-    user,
-    input: { id: getLegacyProviderId(user), type: provider, baseUrl, apiKey },
-  })
+export const saveSettings = async ({ user, update }) =>
+  writeAiPrefs(user, buildSavedAiPrefs({ existing: getRawPrefs(user), update }))

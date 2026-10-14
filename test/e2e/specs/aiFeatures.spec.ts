@@ -107,10 +107,9 @@ test.describe('Survey AI policy (mock provider)', () => {
     await openActivitySection(page)
     await expect(page.locator('.btn-ai-summary')).toBeDisabled()
     await page.getByTestId(TestId.ai.policyBlocked).hover()
-    // with no local AI server, the on-device policy shows the reasons of the not-available panel
-    await expect(page.getByTestId(TestId.ai.notAvailable)).toContainText('No local AI server is turned on.')
-    await expect(page.getByTestId(TestId.ai.notAvailable)).toContainText(
-      "The survey AI policy doesn't allow cloud models for this data."
+    // one provider per request: Arena default (cloud) is the only candidate, so only the policy reason is shown
+    await expect(page.getByTestId(TestId.ai.policyBlockedTooltip)).toContainText(
+      "This survey's AI policy keeps record data on this device."
     )
   })
 

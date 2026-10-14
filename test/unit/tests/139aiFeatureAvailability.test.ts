@@ -73,18 +73,7 @@ const PROVIDERS: AiProviderEntry[] = [
 ]
 
 const capabilities = (defaultProviderId = 'acct:a1'): AiCapabilities => ({
-  localServer: {
-    enabled: false,
-    reachable: null,
-    models: [],
-    hostingClass: null,
-    contextTokens: null,
-    baseUrl: null,
-    modelId: null,
-    error: null,
-  },
-  gateway: { available: false, hostingClass: null, provider: null, model: null, maxPromptChars: 200000 },
-  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars: 200000 },
   providers: PROVIDERS,
   defaultProviderId,
   local: {
@@ -106,7 +95,6 @@ const availability = (overrides: Partial<Parameters<typeof getAiEngineFeatureAva
 describe('isCapabilitiesLoadedForUser', () => {
   const store = createCapabilitiesStore({
     loadSettings: async () => null,
-    loadLocalSettings: () => ({ enabled: false, baseUrl: '', modelId: null, preferLocal: true }) as never,
     loadLocalProviders: () => [],
     probe: async () => null as never,
   })

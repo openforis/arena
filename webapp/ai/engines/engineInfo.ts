@@ -2,7 +2,7 @@
  * Engine descriptions (label, model, limits) built from the capabilities. No AI SDK import.
  */
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
-import type { AiGatewayCapability, AiLocalServerCapability, AiSelectedEngine } from './types'
+import type { AiGatewayEngineSource, AiLocalServerCapability, AiSelectedEngine } from './types'
 
 export const LOCAL_SERVER_LABEL = 'Local server'
 export const GATEWAY_MAX_STEPS = 10
@@ -41,10 +41,10 @@ export const getLocalServerEngineInfo = (
 
 /**
  * Returns the gateway engine description, or null when its hosting class is unknown.
- * @param {AiGatewayCapability} gateway - Gateway capability.
+ * @param {AiGatewayEngineSource} gateway - The provider (account provider or Arena default) and the instance prompt cap.
  * @returns {AiSelectedEngine|null} The description.
  */
-export const getGatewayEngineInfo = (gateway: AiGatewayCapability): AiSelectedEngine | null => {
+export const getGatewayEngineInfo = (gateway: AiGatewayEngineSource): AiSelectedEngine | null => {
   if (!gateway.hostingClass) return null
   return {
     id: 'gateway',

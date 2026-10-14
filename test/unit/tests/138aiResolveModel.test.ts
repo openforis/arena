@@ -52,18 +52,7 @@ const capabilities = ({
   baseUrl: string
   localUp: boolean
 }): AiCapabilities => ({
-  localServer: {
-    enabled: false,
-    reachable: null,
-    models: [],
-    hostingClass: null,
-    contextTokens: null,
-    baseUrl: null,
-    modelId: null,
-    error: null,
-  },
-  gateway: { available: false, hostingClass: null, provider: null, model: null, maxPromptChars: 1000 },
-  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [] },
+  instance: { policyCeilings: { schema: 'cloud', data: 'cloud' }, orgHostedBaseUrls: [], maxPromptChars: 1000 },
   providers: [
     ACCOUNT,
     {

@@ -26,18 +26,7 @@ const ON_SETTINGS: AiFeatureSwitches = {
 }
 
 const CAPABILITIES: AiCapabilities = {
-  localServer: {
-    enabled: false,
-    reachable: null,
-    models: [],
-    hostingClass: null,
-    contextTokens: null,
-    baseUrl: null,
-    modelId: null,
-    error: null,
-  },
-  gateway: { available: false, hostingClass: null, provider: null, model: null, maxPromptChars: 200000 },
-  instance: { policyCeilings: CLOUD, orgHostedBaseUrls: [] },
+  instance: { policyCeilings: CLOUD, orgHostedBaseUrls: [], maxPromptChars: 200000 },
   providers: [
     {
       id: 'local:l1',

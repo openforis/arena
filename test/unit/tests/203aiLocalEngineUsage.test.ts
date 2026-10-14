@@ -52,7 +52,6 @@ describe('local engine usage and context window (203)', () => {
 
   test('the gateway has no known window', () => {
     const gateway = getGatewayEngineInfo({
-      available: true,
       hostingClass: 'cloud',
       provider: 'openai',
       model: 'gateway-model',

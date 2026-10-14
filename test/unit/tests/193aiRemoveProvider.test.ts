@@ -1,48 +1,4 @@
-import { getProviderPrefs, withProviderPrefs } from '@server/modules/ai/service/aiProviderPrefs'
-import { getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
-import { defaultFeatureToggles } from '@server/modules/ai/service/aiUserPrefs'
-import { removeLegacyProvider } from '@server/modules/ai/service/legacyProviderSettings'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
-
-const storedAi = {
-  featuresEnabled: true,
-  featureToggles: { chat: true, assistantDesign: true },
-  provider: 'openai',
-  model: 'gpt-x',
-  baseUrl: null,
-  apiKeyEncrypted: 'iv:tag:data',
-  enabled: true,
-  lastTestOk: true,
-  lastTestAt: '2026-10-01T00:00:00.000Z',
-}
-
-describe('Remove my provider (server)', () => {
-  test('removes the converted provider and resets the default; the stored object is not changed', () => {
-    const prefs = getProviderPrefs(storedAi)
-    expect(removeLegacyProvider(prefs)).toEqual({
-      defaultProviderId: 'arena-default',
-      defaultProviderOrigin: 'user',
-      providers: [],
-    })
-    expect(prefs.providers).toHaveLength(1)
-    expect(storedAi.provider).toBe('openai')
-  })
-
-  test('after the removal the user has the switches and calls use the admin default', () => {
-    const ai = withProviderPrefs(storedAi, removeLegacyProvider(getProviderPrefs(storedAi)))
-    const user = { uuid: 'u1', prefs: { ai } }
-    expect(getPublicSettings(user)).toMatchObject({
-      featuresEnabled: true,
-      featureToggles: { ...defaultFeatureToggles(), chat: true, assistantDesign: true },
-      provider: null,
-      model: null,
-      enabled: false,
-      hasApiKey: false,
-      providers: [],
-    })
-    expect(ProviderResolver.getDefaultGatewayProviderId(user)).toBe('arena-default')
-  })
-})
 
 describe('describeAdminDefault', () => {
   test('no admin default', () => {

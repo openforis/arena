@@ -84,9 +84,10 @@ describe('resolveEffectivePolicy', () => {
   test('a failed refetch makes the feature disabled, never available', () => {
     const effective = resolveEffectivePolicy({ surveyScoped: true, state, error: new Error('network'), ceilings })
     const capabilities = {
-      localServer: { enabled: false },
-      gateway: { available: true, hostingClass: 'cloud', provider: 'openai', model: 'm', maxPromptChars: 1000 },
-      instance: { policyCeilings: ceilings, orgHostedBaseUrls: [] },
+      instance: { policyCeilings: ceilings, orgHostedBaseUrls: [], maxPromptChars: 1000 },
+      providers: [],
+      defaultProviderId: 'arena-default',
+      local: {},
     } as unknown as AiCapabilities
     const result = getAiEngineFeatureAvailability({
       enabled: true,

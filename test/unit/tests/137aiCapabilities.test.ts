@@ -1,24 +1,27 @@
 import {
-  buildGatewayCapability,
   buildInstanceCapability,
-  buildLocalServerCapability,
   createCapabilitiesStore,
   emptyCapabilities,
   getCapabilitiesSnapshotForUser,
 } from '@webapp/ai/engines/capabilities'
-import { defaultLocalServerSettings } from '@webapp/ai/engines/localServerSettings'
+import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { LocalServerProbeResult } from '@webapp/ai/engines/localServerProbe'
-import type { AiLocalServerSettings } from '@webapp/ai/engines/types'
+import type { AiCapabilities } from '@webapp/ai/engines/types'
 
 const settingsSnapshot = {
   featuresEnabled: true,
-  effectiveSource: 'admin-default',
-  effectiveProvider: 'openai',
-  effectiveModel: 'gateway-model',
-  hostingClass: 'cloud' as const,
   orgHostedBaseUrls: ['http://10.0.0.5:8000/v1'],
   policyCeilings: { schema: 'cloud' as const, data: 'cloud' as const },
   maxPromptChars: 1000,
+  defaultProviderId: 'arena-default',
+  adminDefault: { provider: 'openai', model: 'gateway-model', hostingClass: 'cloud' },
+}
+
+const desk: LocalProvider = {
+  id: 'local:l1',
+  name: 'Desk server',
+  baseUrl: 'http://localhost:1234/v1',
+  modelId: 'local-model',
 }
 
 const reachableProbe: LocalServerProbeResult = {
@@ -28,15 +31,20 @@ const reachableProbe: LocalServerProbeResult = {
   error: null,
 }
 
-const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServerProbeResult = reachableProbe) => {
+/**
+ * Returns store dependencies that record the settings loads and the probes.
+ * @param {LocalProvider[]} localProviders - Local providers of this browser.
+ * @param {LocalServerProbeResult} [probeResult] - Result of every probe.
+ * @returns {object} `{ calls, deps }`.
+ */
+const fakeDeps = (localProviders: LocalProvider[], probeResult: LocalServerProbeResult = reachableProbe) => {
   const calls = { settings: [] as boolean[], probes: [] as string[] }
   const deps = {
-    loadSettings: async ({ force }: { force: boolean }) => {
+    loadSettings: async ({ force }: { force: boolean; userUuid: string | null }) => {
       calls.settings.push(force)
       return settingsSnapshot
     },
-    loadLocalSettings: () => localSettings,
-    loadLocalProviders: () => [],
+    loadLocalProviders: () => localProviders,
     probe: async ({ baseUrl }: { baseUrl: string; modelId: string | null }) => {
       calls.probes.push(baseUrl)
       return probeResult
@@ -45,88 +53,51 @@ const fakeDeps = (localSettings: AiLocalServerSettings, probeResult: LocalServer
   return { calls, deps }
 }
 
-const enabledLocal: AiLocalServerSettings = { ...defaultLocalServerSettings(), enabled: true, modelId: 'local-model' }
+/** Returns the status of the Arena default entry. */
+const arenaStatus = (capabilities: AiCapabilities) =>
+  capabilities.providers.find((entry) => entry.id === 'arena-default')?.status
 
 describe('builders', () => {
-  test('gateway: available only with an effective source and a hosting class', () => {
-    expect(buildGatewayCapability(settingsSnapshot)).toEqual({
-      available: true,
-      hostingClass: 'cloud',
-      provider: 'openai',
-      model: 'gateway-model',
-      maxPromptChars: 1000,
-    })
-    expect(buildGatewayCapability({ ...settingsSnapshot, effectiveSource: null }).available).toBe(false)
-    expect(buildGatewayCapability({ ...settingsSnapshot, hostingClass: null }).available).toBe(false)
-    expect(buildGatewayCapability(null)).toEqual({
-      available: false,
-      hostingClass: null,
-      provider: null,
-      model: null,
-      maxPromptChars: null,
-    })
-  })
-
-  test('instance: ceilings and allowlist, empty when unknown', () => {
+  test('instance: ceilings, allowlist and prompt cap, empty when unknown', () => {
     expect(buildInstanceCapability(settingsSnapshot)).toEqual({
       policyCeilings: { schema: 'cloud', data: 'cloud' },
       orgHostedBaseUrls: ['http://10.0.0.5:8000/v1'],
+      maxPromptChars: 1000,
     })
-    expect(buildInstanceCapability(null)).toEqual({ policyCeilings: null, orgHostedBaseUrls: [] })
+    expect(buildInstanceCapability(null)).toEqual({ policyCeilings: null, orgHostedBaseUrls: [], maxPromptChars: null })
   })
 
   test('instance: partial ceilings get the defaults, garbled ones fail closed', () => {
+    /** Builds the instance capability from the snapshot with the given ceilings. */
     const build = (policyCeilings: unknown) => buildInstanceCapability({ ...settingsSnapshot, policyCeilings } as never)
     expect(build({ schema: 'cloud' }).policyCeilings).toEqual({ schema: 'cloud', data: 'onDevice' })
     expect(build({ schema: 'bogus', data: 7 }).policyCeilings).toEqual({ schema: 'off', data: 'off' })
     expect(build('cloud').policyCeilings).toEqual({ schema: 'off', data: 'off' })
   })
-
-  test('local server: class from the URL and the allowlist, probe results', () => {
-    const local = buildLocalServerCapability({
-      localSettings: { ...enabledLocal, baseUrl: 'http://10.0.0.5:8000/v1' },
-      probe: reachableProbe,
-      allowlist: ['http://10.0.0.5:8000/v1'],
-    })
-    expect(local).toEqual({
-      enabled: true,
-      reachable: true,
-      models: ['local-model'],
-      hostingClass: 'orgHosted',
-      contextTokens: 4096,
-      baseUrl: 'http://10.0.0.5:8000/v1',
-      modelId: 'local-model',
-      error: null,
-    })
-    const off = buildLocalServerCapability({ localSettings: defaultLocalServerSettings(), probe: null, allowlist: [] })
-    expect(off.enabled).toBe(false)
-    expect(off.reachable).toBeNull()
-  })
 })
 
 describe('createCapabilitiesStore', () => {
-  test('load probes an enabled local server once per session', async () => {
-    const { calls, deps } = fakeDeps(enabledLocal)
+  test('load probes each local provider once per session', async () => {
+    const { calls, deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     const [first] = await Promise.all([store.load({ userUuid: 'u1' }), store.load({ userUuid: 'u1' })])
     await store.load({ userUuid: 'u1' })
     expect(calls.probes).toEqual(['http://localhost:1234/v1'])
-    expect(first.localServer.reachable).toBe(true)
-    expect(first.localServer.hostingClass).toBe('onDevice')
-    expect(first.gateway.available).toBe(true)
+    expect(first.local['local:l1']).toMatchObject({ reachable: true, hostingClass: 'onDevice' })
+    expect(arenaStatus(first)).toBe('ready')
     expect(store.get()).toBe(first)
   })
 
-  test('a disabled local server is never probed', async () => {
-    const { calls, deps } = fakeDeps(defaultLocalServerSettings())
-    const store = createCapabilitiesStore(deps)
-    const capabilities = await store.load({ userUuid: 'u1' })
+  test('without local providers nothing is probed', async () => {
+    const { calls, deps } = fakeDeps([])
+    const capabilities = await createCapabilitiesStore(deps).load({ userUuid: 'u1' })
     expect(calls.probes).toEqual([])
-    expect(capabilities.localServer.enabled).toBe(false)
+    expect(capabilities.local).toEqual({})
+    expect(capabilities.providers.map((entry) => entry.id)).toEqual(['arena-default'])
   })
 
   test('refresh reloads the settings and probes again; listeners are notified', async () => {
-    const { calls, deps } = fakeDeps(enabledLocal)
+    const { calls, deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     let notified = 0
     const unsubscribe = store.subscribe(() => {
@@ -143,37 +114,38 @@ describe('createCapabilitiesStore', () => {
   })
 
   test('another user reloads', async () => {
-    const { calls, deps } = fakeDeps(enabledLocal)
+    const { calls, deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     await store.load({ userUuid: 'u1' })
     await store.load({ userUuid: 'u2' })
     expect(calls.probes.length).toBe(2)
   })
 
-  test('an unreachable server keeps the probe error', async () => {
+  test('an unreachable server keeps the probe error and is not available', async () => {
     const down: LocalServerProbeResult = {
       reachable: false,
       models: [],
       contextTokens: null,
       error: { key: 'aiLocalServerUnreachable', params: { baseUrl: 'http://localhost:1234/v1' } },
     }
-    const { deps } = fakeDeps(enabledLocal, down)
-    const store = createCapabilitiesStore(deps)
-    const capabilities = await store.load({ userUuid: 'u1' })
-    expect(capabilities.localServer.reachable).toBe(false)
-    expect(capabilities.localServer.error?.key).toBe('aiLocalServerUnreachable')
+    const { deps } = fakeDeps([desk], down)
+    const capabilities = await createCapabilitiesStore(deps).load({ userUuid: 'u1' })
+    expect(capabilities.local['local:l1'].reachable).toBe(false)
+    expect(capabilities.local['local:l1'].error?.key).toBe('aiLocalServerUnreachable')
+    expect(capabilities.providers.find((entry) => entry.id === 'local:l1')?.status).toBe('notAvailable')
   })
 
-  test('the stored settings are exposed', async () => {
-    const { deps } = fakeDeps(enabledLocal)
+  test('the stored settings are exposed; there is no single local server reader', async () => {
+    const { deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     await store.load({ userUuid: 'u1' })
     expect(store.getSettings()).toBe(settingsSnapshot)
-    expect(store.getLocalSettings()).toBe(enabledLocal)
+    expect('getLocalSettings' in store).toBe(false)
   })
 })
 
 describe('user switch and failures', () => {
+  /** Returns a promise and the function that resolves it. */
   const deferred = <T>() => {
     let resolve!: (value: T) => void
     const promise = new Promise<T>((r) => {
@@ -182,23 +154,23 @@ describe('user switch and failures', () => {
     return { promise, resolve }
   }
 
+  /** Returns a store whose successive probes wait for the given deferred results. */
   const storeWithProbes = (probes: Array<ReturnType<typeof deferred<LocalServerProbeResult>>>) => {
     let index = 0
-    const { deps } = fakeDeps(enabledLocal)
-    const store = createCapabilitiesStore({ ...deps, probe: () => probes[index++].promise })
-    return store
+    const { deps } = fakeDeps([desk])
+    return createCapabilitiesStore({ ...deps, probe: () => probes[index++].promise })
   }
 
   test('another user sees empty capabilities while its load is pending, and after reset', async () => {
-    const { deps } = fakeDeps(enabledLocal)
+    const { deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     await store.load({ userUuid: 'u1' })
-    expect(store.get().gateway.available).toBe(true)
+    expect(arenaStatus(store.get())).toBe('ready')
     const pending = store.load({ userUuid: 'u2' })
     expect(store.get()).toEqual(emptyCapabilities())
     expect(store.getSettings()).toBeNull()
     await pending
-    expect(store.get().gateway.available).toBe(true)
+    expect(arenaStatus(store.get())).toBe('ready')
     store.reset()
     expect(store.get()).toEqual(emptyCapabilities())
   })
@@ -213,12 +185,12 @@ describe('user switch and failures', () => {
     await loadU2
     first.resolve({ ...reachableProbe, models: ['u1-model'] })
     await loadU1
-    expect(store.get().localServer.models).toEqual(['u2-model'])
+    expect(store.get().local['local:l1'].models).toEqual(['u2-model'])
   })
 
   test('concurrent refreshes of the same user share one run', async () => {
     const first = deferred<LocalServerProbeResult>()
-    const { calls, deps } = fakeDeps(enabledLocal)
+    const { calls, deps } = fakeDeps([desk])
     const store = createCapabilitiesStore({ ...deps, probe: () => first.promise })
     const a = store.refresh({ userUuid: 'u1' })
     const b = store.refresh({ userUuid: 'u1' })
@@ -236,7 +208,7 @@ describe('user switch and failures', () => {
     second.resolve({ ...reachableProbe, models: ['new'] })
     await refreshing
     first.resolve({ ...reachableProbe, models: ['old'] })
-    expect((await loading).localServer.models).toEqual(['new'])
+    expect((await loading).local['local:l1'].models).toEqual(['new'])
   })
 
   test('a load overtaken by a run of another user resolves with empty capabilities', async () => {
@@ -248,7 +220,7 @@ describe('user switch and failures', () => {
     second.resolve({ ...reachableProbe, models: ['u2-model'] })
     await other
     first.resolve(reachableProbe)
-    expect((await loading).localServer.models).toEqual([])
+    expect((await loading).local).toEqual({})
   })
 
   test('a late stale probe does not overwrite a newer one', async () => {
@@ -262,11 +234,11 @@ describe('user switch and failures', () => {
     await second
     old.resolve({ ...reachableProbe, models: ['old'] })
     await first
-    expect(store.get().localServer.models).toEqual(['new'])
+    expect(store.get().local['local:l1'].models).toEqual(['new'])
   })
 
   test('a failing dependency does not throw and gives the fallback state', async () => {
-    const { deps } = fakeDeps(enabledLocal)
+    const { deps } = fakeDeps([desk])
     const store = createCapabilitiesStore({
       ...deps,
       probe: async () => {
@@ -277,14 +249,14 @@ describe('user switch and failures', () => {
       },
     })
     const capabilities = await store.load({ userUuid: 'u1' })
-    expect(capabilities.gateway.available).toBe(false)
-    expect(capabilities.localServer.reachable).toBeNull()
+    expect(arenaStatus(capabilities)).toBe('notSetUp')
+    expect(capabilities.local['local:l1'].reachable).toBeNull()
   })
 })
 
 describe('getCapabilitiesSnapshotForUser', () => {
   test('is a stable empty object for a different current user or nobody, the data for its owner', async () => {
-    const { deps } = fakeDeps(enabledLocal)
+    const { deps } = fakeDeps([desk])
     const store = createCapabilitiesStore(deps)
     expect(getCapabilitiesSnapshotForUser(store, null)).toBe(store.get())
     await store.load({ userUuid: 'u1' })
