@@ -73,3 +73,6 @@ export type AiLocalServerSettings = {
 export type AiConsentDecision = 'accepted' | 'declined'
 
 export type StorageLike = Pick<Storage, 'getItem' | 'setItem'>
+
+// the conversion of the old local server settings removes the old key
+export type RemovableStorage = StorageLike & Pick<Storage, 'removeItem'>

@@ -1,12 +1,12 @@
 /**
  * Local AI server settings, per user and per device, in localStorage (never sent to the Arena server).
  */
-import type { AiLocalServerSettings, StorageLike } from './types'
+import type { AiLocalServerSettings, RemovableStorage, StorageLike } from './types'
 
 export const DEFAULT_LOCAL_SERVER_BASE_URL = 'http://localhost:1234/v1'
 
-const MAX_BASE_URL_LENGTH = 2048
-const MAX_MODEL_ID_LENGTH = 512
+export const MAX_BASE_URL_LENGTH = 2048
+export const MAX_MODEL_ID_LENGTH = 512
 
 /**
  * Returns the default settings (local server off).
@@ -32,11 +32,18 @@ export const getLocalServerSettingsKey = (userUuid: string): string => `arena.ai
  * @param {number} maxLength - Maximum length.
  * @returns {string|null} The trimmed string, or null.
  */
-const trimmedString = (value: unknown, maxLength: number): string | null => {
+export const trimmedString = (value: unknown, maxLength: number): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
   return trimmed.length > 0 && trimmed.length <= maxLength ? trimmed : null
 }
+
+/**
+ * Removes the trailing slashes of a URL.
+ * @param {string} url - URL.
+ * @returns {string} The URL without trailing slashes.
+ */
+export const stripTrailingSlashes = (url: string): string => url.replace(/\/+$/, '')
 
 /**
  * Trims the URL and its trailing slashes; invalid values give the default URL.
@@ -45,7 +52,7 @@ const trimmedString = (value: unknown, maxLength: number): string | null => {
  */
 const normalizeBaseUrl = (value: unknown): string => {
   const trimmed = trimmedString(value, MAX_BASE_URL_LENGTH)
-  const withoutSlashes = trimmed?.replace(/\/+$/, '')
+  const withoutSlashes = trimmed ? stripTrailingSlashes(trimmed) : null
   return withoutSlashes || DEFAULT_LOCAL_SERVER_BASE_URL
 }
 
@@ -115,9 +122,9 @@ export const saveLocalServerSettings = ({
 
 /**
  * Returns the browser's localStorage, or null when it is not accessible.
- * @returns {StorageLike|null} The storage.
+ * @returns {RemovableStorage|null} The storage.
  */
-export const getBrowserStorage = (): StorageLike | null => {
+export const getBrowserStorage = (): RemovableStorage | null => {
   try {
     return globalThis.localStorage ?? null
   } catch {

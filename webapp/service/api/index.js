@@ -165,4 +165,4 @@ export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, 
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export { aiSettings } from './ai'
+export { aiProviders, aiSettings } from './ai'
