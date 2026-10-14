@@ -183,6 +183,7 @@ No Arena Mobile:
     custom: 'Personalizado',
     defaultDescription: 'Descrição padrão',
     defaultLabel: 'Rótulo padrão',
+    failed: 'A IA não conseguiu gerar {{count}} traduções; elas não têm sugestão da IA.',
     path: 'Caminho',
     showDescriptions: 'Mostrar descrições',
     title: 'Traduzir rótulos de definições de nós',

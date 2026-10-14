@@ -1597,6 +1597,13 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     },
   },
 
+  aiBatch: {
+    translateTitle: 'IA : Traduire les étiquettes',
+    dataDictionaryTitle: 'IA : Descriptions des champs',
+    preparing: 'Préparation…',
+    progress: '{{done}} requêtes IA terminées sur {{total}}',
+  },
+
   aiTranslation: {
     translateButton_one: 'Traduire dans {{count}} autre langue',
     translateButton_other: 'Traduire dans {{count}} autres langues',

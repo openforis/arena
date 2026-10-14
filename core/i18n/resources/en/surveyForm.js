@@ -183,6 +183,7 @@ In Arena Mobile:
     custom: 'Custom',
     defaultDescription: 'Default description',
     defaultLabel: 'Default label',
+    failed: 'The AI could not produce {{count}} translations; they have no AI suggestion.',
     path: 'Path',
     showDescriptions: 'Show descriptions',
     title: 'Translate Node Definition Labels',

@@ -183,6 +183,7 @@ Dans Arena Mobile :
     custom: 'Personnalisé',
     defaultDescription: 'Description par défaut',
     defaultLabel: 'Étiquette par défaut',
+    failed: "L'IA n'a pas pu produire {{count}} traductions ; elles n'ont pas de suggestion de l'IA.",
     path: 'Chemin',
     showDescriptions: 'Afficher les descriptions',
     title: 'Traduire les étiquettes des définitions de nœuds',

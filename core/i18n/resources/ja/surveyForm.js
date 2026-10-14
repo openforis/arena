@@ -182,6 +182,7 @@ Arena Mobileでは：
     custom: 'カスタム',
     defaultDescription: 'デフォルトの説明',
     defaultLabel: 'デフォルトのラベル',
+    failed: 'AIは{{count}}件の翻訳を生成できませんでした。これらにはAIの提案がありません。',
     path: 'パス',
     showDescriptions: '説明を表示',
     title: 'ノード定義ラベルを翻訳',

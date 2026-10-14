@@ -1423,6 +1423,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
   },
 
+  aiBatch: {
+    translateTitle: 'IA: Traducir etiquetas',
+    dataDictionaryTitle: 'IA: Descripciones de campos',
+    preparing: 'Preparando…',
+    progress: '{{done}} de {{total}} solicitudes a la IA completadas',
+  },
+
   aiTranslation: {
     translateButton_one: 'Traducir a {{count}} otro idioma',
     translateButton_other: 'Traducir a {{count}} otros idiomas',

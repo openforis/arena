@@ -1588,6 +1588,13 @@ $t(common.cantUndoWarning)`,
     },
   },
 
+  aiBatch: {
+    translateTitle: 'ИИ: Перевести метки',
+    dataDictionaryTitle: 'ИИ: Описания полей',
+    preparing: 'Подготовка…',
+    progress: 'Выполнено запросов к ИИ: {{done}} из {{total}}',
+  },
+
   aiTranslation: {
     translateButton_one: 'Перевести на {{count}} другой язык',
     translateButton_few: 'Перевести на {{count}} других языка',

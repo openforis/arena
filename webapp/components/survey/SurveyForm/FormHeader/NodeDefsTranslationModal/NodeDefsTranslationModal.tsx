@@ -12,6 +12,7 @@ import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { RadioButton } from '@webapp/components/RadioButton'
 import Checkbox from '@webapp/components/form/checkbox'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
+import { TestId } from '@webapp/utils/testId'
 
 type TranslationMode = 'existing' | 'ai' | 'custom'
 
@@ -42,6 +43,8 @@ type JobResult = {
   languages: string[]
   otherLangs: string[]
   items: TranslationItem[]
+  // translations the AI did not produce (browser run); absent: none
+  failedCount?: number
 }
 
 type PerLangSelections = Record<string, CellSelection>
@@ -201,7 +204,7 @@ type NodeDefsTranslationModalProps = {
 }
 
 const NodeDefsTranslationModal = ({ result, onClose }: NodeDefsTranslationModalProps) => {
-  const { defaultLang, otherLangs, items } = result
+  const { defaultLang, otherLangs, items, failedCount = 0 } = result
 
   const rootPrefix = items.find((item) => !item.path.includes(' / '))?.path
   const displayPath = (path: string) =>
@@ -323,6 +326,15 @@ const NodeDefsTranslationModal = ({ result, onClose }: NodeDefsTranslationModalP
             onChange={onToggleDescriptions}
           />
         </div>
+        {failedCount > 0 && (
+          <div
+            className="node-defs-translation-modal__failed"
+            data-testid={TestId.ai.translationFailedNotice}
+            role="status"
+          >
+            {i18n.t('surveyForm:nodeDefsTranslation.failed', { count: failedCount })}
+          </div>
+        )}
         <div className="node-defs-translation-modal__table-wrapper">
           <table className="node-defs-translation-modal__table">
             <thead>

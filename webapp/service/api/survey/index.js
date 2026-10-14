@@ -118,10 +118,33 @@ export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle, signal }) => 
 export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
   `/api/surveys/export/download?${new URLSearchParams({ tempFileName })}`
 
-export const startSchemaSummaryExportJob = async ({ surveyId, cycle, fileFormat, includeAiDescriptions = false }) => {
+/**
+ * Starts the schema summary export with the AI descriptions generated in the browser.
+ * @param {object} params - Params.
+ * @param {number} params.surveyId - Survey id.
+ * @param {string} params.cycle - Cycle key.
+ * @param {string} params.fileFormat - csv or xlsx.
+ * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid.
+ * @param {number} [params.aiDescriptionsFailedCount] - Node defs left without a description.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @returns {Promise<{job: object}>} The started job.
+ */
+export const startSchemaSummaryExportJob = async ({
+  surveyId,
+  cycle,
+  fileFormat,
+  aiDescriptions,
+  aiDescriptionsFailedCount = 0,
+  signal,
+}) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/schema-summary/export`, { cycle, fileFormat, includeAiDescriptions })
+  } = await axios.post(
+    `/api/survey/${surveyId}/schema-summary/export`,
+    { cycle, fileFormat, aiDescriptions, aiDescriptionsFailedCount },
+    // the progress dialog shows the error
+    { errorHandledLocally: true, signal }
+  )
   return { job }
 }
 

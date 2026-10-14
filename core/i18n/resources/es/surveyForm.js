@@ -183,6 +183,7 @@ En Arena Mobile:
     custom: 'Personalizado',
     defaultDescription: 'Descripción por defecto',
     defaultLabel: 'Etiqueta por defecto',
+    failed: 'La IA no pudo generar {{count}} traducciones; no tienen sugerencia de la IA.',
     path: 'Ruta',
     showDescriptions: 'Mostrar descripciones',
     title: 'Traducir etiquetas de definiciones de nodos',

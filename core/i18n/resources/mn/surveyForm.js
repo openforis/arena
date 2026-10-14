@@ -182,6 +182,7 @@ Arena Mobile дээр:
     custom: 'Захиалгат',
     defaultDescription: 'Үндсэн тайлбар',
     defaultLabel: 'Үндсэн шошго',
+    failed: 'AI {{count}} орчуулга гаргаж чадсангүй; тэдгээрт AI-ийн санал байхгүй.',
     path: 'Зам',
     showDescriptions: 'Тайлбар харуулах',
     title: 'Зангилааны тодорхойлолтын шошгыг орчуулах',

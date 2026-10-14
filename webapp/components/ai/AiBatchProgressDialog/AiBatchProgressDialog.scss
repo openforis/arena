@@ -1,0 +1,16 @@
+.ai-batch-progress-dialog {
+  .modal-content {
+    width: 420px;
+    max-width: 90vw;
+  }
+
+  &__status {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  &__error {
+    white-space: pre-wrap;
+  }
+}

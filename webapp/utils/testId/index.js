@@ -11,6 +11,10 @@ export const TestId = {
   ai: {
     accessCustomize: 'ai-access-customize',
     accessLevel: (level) => `ai-access-level-${level}`,
+    batchCancel: 'ai-batch-cancel',
+    batchClose: 'ai-batch-close',
+    batchError: 'ai-batch-error',
+    batchProgress: 'ai-batch-progress',
     cloudBaseUrl: 'ai-cloud-base-url',
     cloudBaseUrlHint: 'ai-cloud-base-url-hint',
     cloudBaseUrlHintLink: 'ai-cloud-base-url-hint-link',
@@ -38,6 +42,7 @@ export const TestId = {
     openPolicyTabBtn: 'ai-policy-open-tab-btn',
     policyBlocked: 'ai-policy-blocked',
     policyBlockedTooltip: 'ai-policy-blocked-tooltip',
+    translationFailedNotice: 'ai-translation-failed-notice',
   },
   aiAssistant: {
     aiSettingsBtn: 'ai-assistant-ai-settings-btn',
@@ -298,6 +303,7 @@ export const TestId = {
   surveyForm: {
     addSubPageBtn: 'add-sub-page-btn',
     advancedFunctionBtn: 'advanced-functions-btn',
+    aiTranslateLabelsBtn: 'ai-translate-labels-btn',
     codeInputDropdown: (name) => `${name}-code`,
     coordinateX: (name) => `${name}-x`,
     coordinateY: (name) => `${name}-y`,
@@ -317,6 +323,8 @@ export const TestId = {
     previewOpenBtn: 'preview-open-btn',
     qualifierLockToggle: (name) => `qualifier-lock-toggle-${name}`,
     schemaSummary: 'schema-summary-btn',
+    schemaSummaryAi: (fileFormat) => `schema-summary-ai-${fileFormat}-btn`,
+    schemaSummaryAiDownloadBtn: 'schema-summary-ai-download-btn',
     surveyForm: 'survey-form',
     taxonField: (name, field) => `${name}-${field}`,
   },
