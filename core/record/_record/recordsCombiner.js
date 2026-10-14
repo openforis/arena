@@ -100,7 +100,7 @@ const _replaceUpdatedNodesInEntities = ({
     const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
     if (childrenTargetToDelete.length > 0) {
       const childrenTargetToDeleteUuids = childrenTargetToDelete.map(Node.getUuid)
-      const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(
+      const nodesDeleteUpdateResult = Records.removeNodes(childrenTargetToDeleteUuids, { sideEffect })(
         updateResult.record
       )
       updateResult.merge(nodesDeleteUpdateResult)
@@ -263,7 +263,7 @@ const _areNotSameValues = ({ survey, childDef, updateResult, entityTarget, sourc
 
 const replaceNodes = ({ childrenSource, childrenTarget, entityTarget, sideEffect, updateResult }) => {
   const childrenTargetToDeleteUuids = childrenTarget.map(Node.getUuid)
-  const nodesDeleteUpdateResult = Records.deleteNodes(childrenTargetToDeleteUuids, { sideEffect })(updateResult.record)
+  const nodesDeleteUpdateResult = Records.removeNodes(childrenTargetToDeleteUuids, { sideEffect })(updateResult.record)
   updateResult.merge(nodesDeleteUpdateResult)
   childrenSource.forEach((childSource) => {
     _addNodeToUpdateResult({ updateResult, node: childSource, parentEntity: entityTarget })

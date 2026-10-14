@@ -93,7 +93,7 @@ export const insertNode = async (
   let recordUpdated = Record.assocNode(node, { sideEffect })(record)
 
   if (NodeDef.isEntity(nodeDef)) {
-    const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
+    const descendantsCreateResult = await RecordNodesUpdater.addDescendants({
       user,
       survey,
       record: recordUpdated,
