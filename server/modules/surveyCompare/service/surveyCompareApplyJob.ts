@@ -134,7 +134,7 @@ export default class SurveyCompareApplyJob extends Job {
     )
     // when the props are not valid, only the validation is returned
     if (!Survey.getId(Survey.getSurveyInfo(surveyUpdated))) {
-      throw new Error(`Invalid survey info: ${JSON.stringify(surveyUpdated?.validation)}`)
+      throw new Error(`Invalid survey info: ${JSON.stringify(surveyUpdated.validation)}`)
     }
     await DbUtils.runQueries(
       this.tx,
@@ -142,8 +142,8 @@ export default class SurveyCompareApplyJob extends Job {
         (fileUuid) => () => SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, this.tx)
       )
     )
-    const surveyChangeIds = [...result.surveyInfo, ...result.surveyFiles].map((diff) => diff.id)
-    return [...appliedIds].filter((id) => surveyChangeIds.includes(id))
+    const surveyChangeIds = new Set([...result.surveyInfo, ...result.surveyFiles].map((diff) => diff.id))
+    return [...appliedIds].filter((id) => surveyChangeIds.has(id))
   }
 
   async insertSurveyFiles({
@@ -250,18 +250,24 @@ export default class SurveyCompareApplyJob extends Job {
         ...plan.nodeDefsToInsert.map((nodeDef) => ActivityLog.newActivity(ActivityLog.type.nodeDefCreate, nodeDef))
       )
     }
-    for (const { nodeDefUuid, parentUuid, type, props, propsAdvanced, meta } of plan.nodeDefsToUpdate) {
-      if (type) {
-        await NodeDefRepository.updateNodeDefTypeAndProps({ surveyId, nodeDefUuid, type, props, propsAdvanced }, tx) // NOSONAR
-      }
-      await NodeDefRepository.updateNodeDefProps(
-        { surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, meta: meta ?? {} },
-        tx
-      ) // NOSONAR
-      activities.push(
+    // queries run one after the other in the transaction
+    await DbUtils.runQueries(
+      tx,
+      plan.nodeDefsToUpdate.map(({ nodeDefUuid, parentUuid, type, props, propsAdvanced, meta }) => async () => {
+        if (type) {
+          await NodeDefRepository.updateNodeDefTypeAndProps({ surveyId, nodeDefUuid, type, props, propsAdvanced }, tx)
+        }
+        await NodeDefRepository.updateNodeDefProps(
+          { surveyId, nodeDefUuid, parentUuid, props, propsAdvanced, meta: meta ?? {} },
+          tx
+        )
+      })
+    )
+    activities.push(
+      ...plan.nodeDefsToUpdate.map(({ nodeDefUuid, props, propsAdvanced }) =>
         ActivityLog.newActivity(ActivityLog.type.nodeDefUpdate, { uuid: nodeDefUuid, props, propsAdvanced })
       )
-    }
+    )
     await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   }
 

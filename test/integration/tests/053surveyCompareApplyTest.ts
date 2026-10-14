@@ -52,7 +52,7 @@ const runCompare = async ({ user, surveyId, filePath = undefined, sourceFileName
 
 describe('Survey compare: apply changes made in another environment', () => {
   let devSurveyId: number
-  let qaSurveyId: number
+  let qaSurveyId: any
 
   beforeAll(async () => {
     ArenaServer.initServices()
@@ -88,8 +88,7 @@ describe('Survey compare: apply changes made in another environment', () => {
     })
     await importJob.start()
     if (!importJob.isSucceeded()) throw new Error('Survey import failed')
-    // the API passes numeric survey ids
-    qaSurveyId = Number((importJob.result as any).surveyId)
+    qaSurveyId = (importJob.result as any).surveyId
     await SurveyUtils.publishSurvey(user, qaSurveyId)
 
     // changes in Dev: new attribute, validation expression, new category item
@@ -143,7 +142,8 @@ describe('Survey compare: apply changes made in another environment', () => {
       .filter((diff) => diff.applicability?.status === SurveyCompareApplicabilityStatus.applicable)
       .map((diff) => diff.id)
 
-    const applyJob = new SurveyCompareApplyJob({ user, surveyId: qaSurveyId, sourceFileName, selectedIds })
+    // the API passes numeric survey ids
+    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileName, selectedIds })
     await applyJob.start()
     expect(applyJob.isSucceeded()).toBe(true)
     expect((applyJob.result as any).skippedIds).toEqual([])
@@ -245,7 +245,8 @@ describe('Survey compare: apply changes made in another environment', () => {
     const selectedIds = getAllChanges(result)
       .filter((diff) => diff.status !== SurveyCompareStatus.identical)
       .map((diff) => diff.id)
-    const applyJob = new SurveyCompareApplyJob({ user, surveyId: qaSurveyId, sourceFileName, selectedIds })
+    // the API passes numeric survey ids
+    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileName, selectedIds })
     await applyJob.start()
     expect(applyJob.isSucceeded()).toBe(true)
 

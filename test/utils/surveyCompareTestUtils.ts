@@ -36,7 +36,7 @@ export const buildSurvey = async ({ categoryBuilder = buildCategory() } = {}) =>
   return { survey, items: categoryBuilder.build().items }
 }
 
-export const clone = (obj: any) => JSON.parse(JSON.stringify(obj))
+export const clone = (obj: any) => structuredClone(obj)
 
 export const itemsByCategoryUuid = (survey: any, items: any[]) => ({
   [Category.getUuid(Survey.getCategoryByName('tree_species')(survey))]: items,
