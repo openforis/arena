@@ -81,7 +81,9 @@ const isLabelsByLang = (value: unknown): boolean =>
 const formatPrimitive = ({ t, value }: { t: Translate; value: unknown }): string => {
   if (value === true) return t('common.yes')
   if (value === false) return t('common.no')
-  return typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'bigint') return value.toString()
+  return JSON.stringify(value) ?? ''
 }
 
 // the language code is omitted when the survey has only one language
