@@ -1,6 +1,6 @@
 import './SurveyCompare.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import classNames from 'classnames'
@@ -238,6 +238,16 @@ export const SurveyCompare = () => {
           <Tabs
             items={[
               {
+                key: 'surveyInfo',
+                label: 'surveyCompareView:tabs.surveyInfo',
+                renderContent: () =>
+                  result.surveyInfo.length > 0 ? (
+                    <SurveyComparePropDiffs propDiffs={result.surveyInfo} />
+                  ) : (
+                    <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
+                  ),
+              },
+              {
                 key: 'nodeDefs',
                 label: 'surveyCompareView:tabs.nodeDefs',
                 renderContent: () => <SurveyCompareNodeDefs {...tabProps} hideLayoutOnly={hideLayoutOnly} />,
@@ -251,16 +261,6 @@ export const SurveyCompare = () => {
                 key: 'taxonomies',
                 label: 'surveyCompareView:tabs.taxonomies',
                 renderContent: () => <Taxonomies result={result} onlyDifferences={onlyDifferences} />,
-              },
-              {
-                key: 'surveyInfo',
-                label: 'surveyCompareView:tabs.surveyInfo',
-                renderContent: () =>
-                  result.surveyInfo.length > 0 ? (
-                    <SurveyComparePropDiffs propDiffs={result.surveyInfo} />
-                  ) : (
-                    <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
-                  ),
               },
             ]}
           />
