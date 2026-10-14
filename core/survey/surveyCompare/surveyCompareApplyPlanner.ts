@@ -70,7 +70,7 @@ const expandSelection = ({ result, selectedIds }: { result: SurveyCompareResult;
 
 // ===== UUID MAPS
 
-const buildUuidMaps = ({ context, appliedIds }: { context: PlanContext; appliedIds: Set<string> }) => {
+const buildNodeDefUuidMap = ({ context, appliedIds }: { context: PlanContext; appliedIds: Set<string> }) => {
   const { result, usedNodeDefUuids } = context
   for (const diff of result.nodeDefs) {
     if (diff.sourceUuid && diff.targetUuid) {
@@ -80,6 +80,16 @@ const buildUuidMaps = ({ context, appliedIds }: { context: PlanContext; appliedI
       context.nodeDefUuidMap[diff.sourceUuid] = usedNodeDefUuids.has(diff.sourceUuid) ? uuidv4() : diff.sourceUuid
     }
   }
+}
+
+const buildCategoryAndTaxonomyUuidMaps = ({
+  context,
+  appliedIds,
+}: {
+  context: PlanContext
+  appliedIds: Set<string>
+}) => {
+  const { result } = context
   for (const diff of result.categories) {
     if (diff.sourceUuid && (diff.targetUuid || appliedIds.has(diff.id))) {
       context.categoryUuidMap[diff.sourceUuid] = diff.targetUuid ?? diff.sourceUuid
@@ -90,6 +100,11 @@ const buildUuidMaps = ({ context, appliedIds }: { context: PlanContext; appliedI
       context.taxonomyUuidMap[diff.sourceUuid] = diff.targetUuid
     }
   }
+}
+
+const buildUuidMaps = ({ context, appliedIds }: { context: PlanContext; appliedIds: Set<string> }) => {
+  buildNodeDefUuidMap({ context, appliedIds })
+  buildCategoryAndTaxonomyUuidMaps({ context, appliedIds })
 }
 
 // ===== CATEGORIES

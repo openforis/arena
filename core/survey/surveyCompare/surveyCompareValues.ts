@@ -15,32 +15,38 @@ const normalizeString = ({ value, key }: { value: string; key?: string }): strin
   return key && expressionKeys.has(key) ? trimmed.replaceAll(/\s+/g, ' ') : trimmed
 }
 
+const normalizeArray = (value: any[]): any[] | undefined => {
+  const items = value.map((item) => normalizeValue(item)).filter((item) => item !== undefined)
+  return items.length === 0 ? undefined : items
+}
+
+const normalizeObject = (value: Record<string, any>): Record<string, any> | undefined => {
+  const result = {}
+  const keys = Object.keys(value)
+    .filter((childKey) => !ignoredKeys.has(childKey))
+    .sort((a, b) => a.localeCompare(b))
+  for (const childKey of keys) {
+    const childValue = normalizeValue(value[childKey], childKey)
+    if (childValue !== undefined) {
+      result[childKey] = childValue
+    }
+  }
+  return isEmptyValue(result) ? undefined : result
+}
+
 /**
  * Normalizes a value for comparison: drops ids and empty values, trims strings, sorts object keys.
  * @param {any} value - The value to normalize.
  * @param {string} [key] - The key of the value in its parent object.
  * @returns {any} - The normalized value (undefined when empty).
  */
-export const normalizeValue = (value: any, key?: string): any => {
+export function normalizeValue(value: any, key?: string): any {
   if (typeof value === 'string') {
     const normalized = normalizeString({ value, key })
     return normalized === '' ? undefined : normalized
   }
-  if (Array.isArray(value)) {
-    const items = value.map((item) => normalizeValue(item)).filter((item) => item !== undefined)
-    return items.length === 0 ? undefined : items
-  }
-  if (value && typeof value === 'object') {
-    const result = {}
-    for (const childKey of Object.keys(value).sort((a, b) => a.localeCompare(b))) {
-      if (ignoredKeys.has(childKey)) continue
-      const childValue = normalizeValue(value[childKey], childKey)
-      if (childValue !== undefined) {
-        result[childKey] = childValue
-      }
-    }
-    return isEmptyValue(result) ? undefined : result
-  }
+  if (Array.isArray(value)) return normalizeArray(value)
+  if (value && typeof value === 'object') return normalizeObject(value)
   return isEmptyValue(value) ? undefined : value
 }
 

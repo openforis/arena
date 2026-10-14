@@ -9,7 +9,8 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRepository'
-import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
+import * as DbUtils from '@server/db/dbUtils'
 
 import { fetchTargetSurvey, readSurveyFromFile } from './surveyCompareSurveysReader'
 
@@ -55,7 +56,7 @@ export default class SurveyCompareApplyJob extends Job {
     await this.applyNodeDefsChanges(plan)
 
     if (plan.appliedIds.length > 0) {
-      await markSurveyDraft(surveyId, this.tx)
+      await SurveyRepository.markSurveyDraft(surveyId, this.tx)
       await CategoryManager.validateCategories(targetSurvey, this.tx)
     }
     this.processed = plan.appliedIds.length
@@ -85,13 +86,16 @@ export default class SurveyCompareApplyJob extends Job {
     for (const { items } of plan.categoryItemsToUpdate) {
       await CategoryRepository.updateItemsProps({ surveyId, items }, tx) // NOSONAR
     }
-    for (const categoryUuid of categoryUuidsWithInsertedItems) {
-      const category = await CategoryRepository.fetchCategoryAndLevelsByUuid(
-        { surveyId, categoryUuid, draft: true },
-        tx
-      ) // NOSONAR
-      await CategoryManager.initializeSurveyCategoryItemsIndexes({ surveyId, category }, tx) // NOSONAR
-    }
+    await DbUtils.runQueries(
+      tx,
+      [...categoryUuidsWithInsertedItems].map((categoryUuid) => async () => {
+        const category = await CategoryRepository.fetchCategoryAndLevelsByUuid(
+          { surveyId, categoryUuid, draft: true },
+          tx
+        )
+        await CategoryManager.initializeSurveyCategoryItemsIndexes({ surveyId, category }, tx)
+      })
+    )
     await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
   }
 

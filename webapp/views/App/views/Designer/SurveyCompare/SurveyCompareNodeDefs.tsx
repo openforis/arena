@@ -108,26 +108,22 @@ export const SurveyCompareNodeDefs = ({
         {visibleDiffs.map((diff) => (
           <div
             key={diff.id}
-            role="button"
-            tabIndex={0}
             className={classNames('survey-compare__row', `survey-compare__row--${diff.status}`, {
               'survey-compare__row--active': diff.id === selectedItemId,
               'survey-compare__row--layout-only': diff.layoutOnly,
             })}
             style={{ paddingLeft: diff.depth * indentPx }}
-            onClick={() => onSelectItem(diff.id)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') onSelectItem(diff.id)
-            }}
           >
             <SelectionCheckbox canEdit={canEdit} diff={diff} selected={selectedIds.has(diff.id)} onToggle={onToggle} />
-            <span className="survey-compare__row-name">{diff.name}</span>
-            <span className="survey-compare__row-type">{diff.type}</span>
-            <StatusBadge status={diff.status} />
-            {diff.layoutOnly && (
-              <span className="survey-compare__row-note">{i18n.t('surveyCompareView:layoutOnly')}</span>
-            )}
-            <ApplicabilityIcon applicability={diff.applicability} />
+            <button type="button" className="survey-compare__row-button" onClick={() => onSelectItem(diff.id)}>
+              <span className="survey-compare__row-name">{diff.name}</span>
+              <span className="survey-compare__row-type">{diff.type}</span>
+              <StatusBadge status={diff.status} />
+              {diff.layoutOnly && (
+                <span className="survey-compare__row-note">{i18n.t('surveyCompareView:layoutOnly')}</span>
+              )}
+              <ApplicabilityIcon applicability={diff.applicability} />
+            </button>
           </div>
         ))}
       </div>

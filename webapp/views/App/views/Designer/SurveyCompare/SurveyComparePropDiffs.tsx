@@ -5,7 +5,19 @@ import { SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareT
 import { useSurveyLangs } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
-import { formatValue, getPropLabel } from './surveyCompareValueFormatter'
+import { FormattedLine, formatValue, getPropLabel } from './surveyCompareValueFormatter'
+
+// keys built from the line content (a counter makes identical lines unique)
+const withKeys = (lines: FormattedLine[]) => {
+  const countByBaseKey: Record<string, number> = {}
+  return lines.map((line) => {
+    const { label = '', value = '', indent, separator } = line
+    const baseKey = separator ? `separator-${indent}` : `${indent}|${label}|${value}`
+    const count = (countByBaseKey[baseKey] ?? 0) + 1
+    countByBaseKey[baseKey] = count
+    return { ...line, key: `${baseKey}#${count}` }
+  })
+}
 
 const PropValue = ({ propKey, value }: { propKey: string; value: unknown }) => {
   const i18n = useI18n()
@@ -17,11 +29,11 @@ const PropValue = ({ propKey, value }: { propKey: string; value: unknown }) => {
   }
   return (
     <div className="survey-compare__value">
-      {lines.map(({ label, value: lineValue, indent, separator, code }, index) =>
+      {withKeys(lines).map(({ key, label, value: lineValue, indent, separator, code }) =>
         separator ? (
-          <hr key={index} className="survey-compare__value-separator" />
+          <hr key={key} className="survey-compare__value-separator" />
         ) : (
-          <div key={index} className="survey-compare__value-line" style={{ paddingLeft: `${indent}rem` }}>
+          <div key={key} className="survey-compare__value-line" style={{ paddingLeft: `${indent}rem` }}>
             {label && <span className="survey-compare__value-label">{label}</span>}
             {label && lineValue !== undefined && ': '}
             {lineValue !== undefined && (

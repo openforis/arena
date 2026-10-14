@@ -88,6 +88,27 @@ const checkAdded = ({ check, context, diff }) => {
   checkReferences({ check, context, sourceNodeDef })
 }
 
+const checkChangedPropDiff = ({ check, context, sourceNodeDef, targetNodeDef, published, propDiff }) => {
+  const { key, group } = propDiff
+  if (group === SurveyComparePropGroup.structure) {
+    if (key === 'parent') {
+      check.errors.add(SurveyCompareReason.moveNotSupported)
+    } else if (published) {
+      check.errors.add(SurveyCompareReason.publishedTypeChanged)
+    }
+    return
+  }
+  if (group !== SurveyComparePropGroup.props) return
+  const publishedReason = notApplicableReasonByPublishedProp[key]
+  if (published && publishedReason) {
+    check.errors.add(publishedReason)
+  } else if (published && key === NodeDef.propKeys.name) {
+    check.warnings.add(SurveyCompareReason.publishedNameChanged)
+  } else if (key === NodeDef.propKeys.cycles) {
+    checkCycles({ check, context, sourceNodeDef, targetNodeDef, published })
+  }
+}
+
 const checkChanged = ({ check, context, diff }) => {
   const sourceNodeDef = context.sourceIndex.byUuid[diff.sourceUuid]
   const targetNodeDef = context.targetIndex.byUuid[diff.targetUuid]
@@ -99,23 +120,8 @@ const checkChanged = ({ check, context, diff }) => {
   if (!hasApplicableDiffs) {
     check.errors.add(SurveyCompareReason.cycleMissing)
   }
-  for (const { key, group } of diff.propDiffs) {
-    if (group === SurveyComparePropGroup.structure) {
-      if (key === 'parent') {
-        check.errors.add(SurveyCompareReason.moveNotSupported)
-      } else if (published) {
-        check.errors.add(SurveyCompareReason.publishedTypeChanged)
-      }
-    } else if (group === SurveyComparePropGroup.props) {
-      const publishedReason = notApplicableReasonByPublishedProp[key]
-      if (published && publishedReason) {
-        check.errors.add(publishedReason)
-      } else if (published && key === NodeDef.propKeys.name) {
-        check.warnings.add(SurveyCompareReason.publishedNameChanged)
-      } else if (key === NodeDef.propKeys.cycles) {
-        checkCycles({ check, context, sourceNodeDef, targetNodeDef, published })
-      }
-    }
+  for (const propDiff of diff.propDiffs) {
+    checkChangedPropDiff({ check, context, sourceNodeDef, targetNodeDef, published, propDiff })
   }
   checkReferences({ check, context, sourceNodeDef })
 }

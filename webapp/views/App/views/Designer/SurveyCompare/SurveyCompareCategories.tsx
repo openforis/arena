@@ -100,21 +100,17 @@ export const SurveyCompareCategories = ({
         {diffs.map((diff) => (
           <div
             key={diff.id}
-            role="button"
-            tabIndex={0}
             className={classNames('survey-compare__row', `survey-compare__row--${diff.status}`, {
               'survey-compare__row--active': diff.id === selectedItemId,
             })}
-            onClick={() => onSelectItem(diff.id)}
-            onKeyDown={(event) => {
-              if (event.key === 'Enter') onSelectItem(diff.id)
-            }}
           >
             <SelectionCheckbox canEdit={canEdit} diff={diff} selected={selectedIds.has(diff.id)} onToggle={onToggle} />
-            <span className="survey-compare__row-name">{diff.name}</span>
-            <StatusBadge status={diff.status} />
-            <ItemsCount diff={diff} />
-            <ApplicabilityIcon applicability={diff.applicability} />
+            <button type="button" className="survey-compare__row-button" onClick={() => onSelectItem(diff.id)}>
+              <span className="survey-compare__row-name">{diff.name}</span>
+              <StatusBadge status={diff.status} />
+              <ItemsCount diff={diff} />
+              <ApplicabilityIcon applicability={diff.applicability} />
+            </button>
           </div>
         ))}
       </div>

@@ -9,6 +9,7 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 const hasDraftProps = (obj: any): boolean => Boolean(obj?.propsDraft || obj?.propsAdvancedDraft)
 
@@ -18,7 +19,7 @@ const combineProps = (obj: any): any => {
   const result = {
     ...obj,
     props: ObjectUtils.getPropsAndPropsDraftCombined(obj),
-    propsAdvanced: { ...(obj.propsAdvanced ?? {}), ...(obj.propsAdvancedDraft ?? {}) },
+    propsAdvanced: { ...obj.propsAdvanced, ...obj.propsAdvancedDraft },
   }
   delete result.propsDraft
   delete result.propsAdvancedDraft
@@ -66,7 +67,7 @@ export const readSurveyFromFile = async ({
     }
     const categoriesInZip = await ArenaSurveyFileZip.getCategories(zipFile)
     const categoriesByUuid = Object.fromEntries(
-      Object.values({ ...(arenaSurvey.categories ?? {}), ...(categoriesInZip ?? {}) }).map((category: any) => [
+      Object.values({ ...arenaSurvey.categories, ...categoriesInZip }).map((category: any) => [
         Category.getUuid(category),
         combineCategoryProps(category),
       ])
@@ -110,13 +111,15 @@ export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, clie
   const survey = await Survey.buildAndAssocDependencyGraph(
     Survey.assocNodeDefsSimple({ nodeDefs: ObjectUtils.toUuidIndexedObj(nodeDefs) })(surveyWithDeleted)
   )
-  const itemsByCategoryUuid: CategoryItemsByCategoryUuid = {}
-  for (const category of Survey.getCategoriesArray(survey)) {
-    const categoryUuid = Category.getUuid(category)
-    itemsByCategoryUuid[categoryUuid] = await CategoryService.fetchItemsByCategoryUuid(
-      { surveyId, categoryUuid, draft: true },
-      client
-    ) // NOSONAR
-  }
+  const categoryUuids = Survey.getCategoriesArray(survey).map(Category.getUuid)
+  const itemsArrays = await DbUtils.runQueries(
+    client,
+    categoryUuids.map(
+      (categoryUuid) => () => CategoryService.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
+    )
+  )
+  const itemsByCategoryUuid: CategoryItemsByCategoryUuid = Object.fromEntries(
+    categoryUuids.map((categoryUuid, index) => [categoryUuid, itemsArrays[index]])
+  )
   return { survey, itemsByCategoryUuid, usedNodeDefUuids }
 }

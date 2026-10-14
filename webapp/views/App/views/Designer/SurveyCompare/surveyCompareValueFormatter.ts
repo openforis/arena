@@ -81,7 +81,7 @@ const isLabelsByLang = (value: unknown): boolean =>
 const formatPrimitive = ({ t, value }: { t: Translate; value: unknown }): string => {
   if (value === true) return t('common.yes')
   if (value === false) return t('common.no')
-  return String(value)
+  return typeof value === 'object' && value !== null ? JSON.stringify(value) : String(value)
 }
 
 // the language code is omitted when the survey has only one language
@@ -117,8 +117,10 @@ const formatExpression = ({
   if (applyIf) lines.push({ label: t('nodeDefEdit.expressionsProp.applyIf'), value: applyIf, indent })
   if (severity) lines.push({ label: t('nodeDefEdit.expressionsProp.severity'), value: t(`common.${severity}`), indent })
   if (isPlainObject(messages)) {
-    lines.push({ label: t('surveyCompareView:props.messages'), indent })
-    lines.push(...formatLabelsByLang({ singleLang, value: messages, indent: indent + 1 }))
+    lines.push(
+      { label: t('surveyCompareView:props.messages'), indent },
+      ...formatLabelsByLang({ singleLang, value: messages, indent: indent + 1 })
+    )
   }
   return lines
 }
@@ -170,8 +172,10 @@ const formatValidations = ({
     }
   }
   if (Array.isArray(expressions)) {
-    lines.push({ label: t('nodeDefEdit.validationsProps.expressions'), indent })
-    lines.push(...formatExpressions({ t, singleLang, expressions, indent: indent + 1 }))
+    lines.push(
+      { label: t('nodeDefEdit.validationsProps.expressions'), indent },
+      ...formatExpressions({ t, singleLang, expressions, indent: indent + 1 })
+    )
   }
   lines.push(...formatObject({ t, singleLang, value: others, indent }))
   return lines
