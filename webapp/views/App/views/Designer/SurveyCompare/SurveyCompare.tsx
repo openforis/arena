@@ -25,6 +25,9 @@ import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyComparePropDiffs } from './SurveyComparePropDiffs'
 
+const hasDifferences = ({ added, changed, removed }: { added: number; changed: number; removed: number }) =>
+  added + changed + removed > 0
+
 const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
 
 type CompareResultWithSource = SurveyCompareResult & { source?: { name?: string } }
@@ -93,6 +96,7 @@ export const SurveyCompare = () => {
   const [state, setState] = useState<CompareState>(initialState)
   const [onlyDifferences, setOnlyDifferences] = useState(true)
   const [hideLayoutOnly, setHideLayoutOnly] = useState(false)
+  const [tabKey, setTabKey] = useState<string | null>(null)
   const { result, sourceFileName, selectedIds, selectedItemId } = state
 
   const startCompare = useCallback(
@@ -182,6 +186,37 @@ export const SurveyCompare = () => {
 
   const tabProps = { result, canEdit, selectedIds, onToggle, onlyDifferences, selectedItemId, onSelectItem }
 
+  // tabs of sections without differences are hidden
+  const tabItems = result
+    ? [
+        {
+          key: 'surveyInfo',
+          label: 'surveyCompareView:tabs.surveyInfo',
+          hasDifferences: result.surveyInfo.length > 0,
+          renderContent: () => <SurveyComparePropDiffs propDiffs={result.surveyInfo} />,
+        },
+        {
+          key: 'nodeDefs',
+          label: 'surveyCompareView:tabs.nodeDefs',
+          hasDifferences: hasDifferences(result.counts.nodeDefs),
+          renderContent: () => <SurveyCompareNodeDefs {...tabProps} hideLayoutOnly={hideLayoutOnly} />,
+        },
+        {
+          key: 'categories',
+          label: 'surveyCompareView:tabs.categories',
+          hasDifferences: hasDifferences(result.counts.categories),
+          renderContent: () => <SurveyCompareCategories {...tabProps} />,
+        },
+        {
+          key: 'taxonomies',
+          label: 'surveyCompareView:tabs.taxonomies',
+          hasDifferences: hasDifferences(result.counts.taxonomies),
+          renderContent: () => <Taxonomies result={result} onlyDifferences={onlyDifferences} />,
+        },
+      ].filter((item) => item.hasDifferences)
+    : []
+  const selectedTabKey = tabItems.some((item) => item.key === tabKey) ? tabKey : tabItems[0]?.key
+
   return (
     <div className="survey-compare">
       <div className="survey-compare__header">
@@ -217,53 +252,33 @@ export const SurveyCompare = () => {
       {result && (
         <>
           <Summary result={result} />
-          <div className="survey-compare__toolbar">
-            <Checkbox
-              checked={onlyDifferences}
-              label="surveyCompareView:onlyDifferences"
-              onChange={setOnlyDifferences}
-            />
-            <Checkbox checked={hideLayoutOnly} label="surveyCompareView:hideLayoutOnly" onChange={setHideLayoutOnly} />
-            {canEdit && !result.identical && (
-              <Button
-                className="survey-compare__apply-btn"
-                disabled={selectedIds.size === 0}
-                label="surveyCompareView:apply"
-                labelParams={{ count: selectedIds.size }}
-                onClick={onApply}
-                primary
-              />
-            )}
-          </div>
-          <Tabs
-            items={[
-              {
-                key: 'surveyInfo',
-                label: 'surveyCompareView:tabs.surveyInfo',
-                renderContent: () =>
-                  result.surveyInfo.length > 0 ? (
-                    <SurveyComparePropDiffs propDiffs={result.surveyInfo} />
-                  ) : (
-                    <div className="survey-compare__details-empty">{i18n.t('surveyCompareView:noDifferences')}</div>
-                  ),
-              },
-              {
-                key: 'nodeDefs',
-                label: 'surveyCompareView:tabs.nodeDefs',
-                renderContent: () => <SurveyCompareNodeDefs {...tabProps} hideLayoutOnly={hideLayoutOnly} />,
-              },
-              {
-                key: 'categories',
-                label: 'surveyCompareView:tabs.categories',
-                renderContent: () => <SurveyCompareCategories {...tabProps} />,
-              },
-              {
-                key: 'taxonomies',
-                label: 'surveyCompareView:tabs.taxonomies',
-                renderContent: () => <Taxonomies result={result} onlyDifferences={onlyDifferences} />,
-              },
-            ]}
-          />
+          {!result.identical && (
+            <>
+              <div className="survey-compare__toolbar">
+                <Checkbox
+                  checked={onlyDifferences}
+                  label="surveyCompareView:onlyDifferences"
+                  onChange={setOnlyDifferences}
+                />
+                <Checkbox
+                  checked={hideLayoutOnly}
+                  label="surveyCompareView:hideLayoutOnly"
+                  onChange={setHideLayoutOnly}
+                />
+                {canEdit && (
+                  <Button
+                    className="survey-compare__apply-btn"
+                    disabled={selectedIds.size === 0}
+                    label="surveyCompareView:apply"
+                    labelParams={{ count: selectedIds.size }}
+                    onClick={onApply}
+                    primary
+                  />
+                )}
+              </div>
+              <Tabs items={tabItems} selectedItemKey={selectedTabKey} onChange={setTabKey} />
+            </>
+          )}
         </>
       )}
     </div>
