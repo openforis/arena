@@ -22,6 +22,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import {
+  decryptStoredKey,
   type AiProviderPrefs,
   findStoredProvider,
   getProviderPrefs,
@@ -206,22 +207,6 @@ const findOwnProvider = (prefs: AiProviderPrefs, id: unknown): StoredAiProvider 
 }
 
 /**
- * Decrypts the stored key of a provider.
- * @param {StoredAiProvider} stored - Stored provider.
- * @param {AiProviderServiceDeps} deps - Dependencies.
- * @returns {string|null} The key, or null when none is stored.
- */
-export const decryptStoredKey = (stored: StoredAiProvider, deps: AiProviderServiceDeps): string | null => {
-  if (!stored.apiKeyEncrypted) return null
-  try {
-    return deps.decrypt(stored.apiKeyEncrypted)
-  } catch {
-    // no silent switch to another provider: the user enters the key again (spec section 9)
-    throw new SystemError('aiApiKeyUnreadable', { providerId: stored.id }, StatusCodes.CONFLICT)
-  }
-}
-
-/**
  * Returns the model of the call: the input's when sent, else the saved one.
  * @param {string} type - Provider type.
  * @param {AiProviderInput} input - Request input.
@@ -293,7 +278,7 @@ const withStoredKey = ({
 }): ResolvedCallConfig => {
   const { saved, sameEndpoint, cfg } = resolved
   if (!saved || !sameEndpoint || input.apiKey !== undefined) return resolved
-  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, deps) } }
+  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, deps.decrypt) } }
 }
 
 /**
@@ -398,7 +383,7 @@ const assertTestPasses = async ({
 const isKeyReadable = (provider: StoredAiProvider, deps: AiProviderServiceDeps): boolean => {
   if (!provider.apiKeyEncrypted) return false
   try {
-    decryptStoredKey(provider, deps)
+    decryptStoredKey(provider, deps.decrypt)
     return true
   } catch {
     return false
