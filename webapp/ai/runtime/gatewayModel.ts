@@ -88,6 +88,7 @@ const toHttpError = async (response: Response): Promise<SystemError> => {
  * @param {string} params.feature - Feature key (see common/ai/features).
  * @param {string} params.dataClass - Data class of the feature.
  * @param {number} [params.surveyId] - Survey (required for survey-scoped features).
+ * @param {string} params.providerId - Provider the server calls (`acct:…` or `arena-default`).
  * @param {FetchLike} params.fetchImpl - Authorized fetch.
  * @returns {LanguageModelV4} The model.
  */
@@ -95,18 +96,20 @@ export const createGatewayModel = ({
   feature,
   dataClass,
   surveyId,
+  providerId,
   fetchImpl,
 }: {
   feature: string
   dataClass: 'schema' | 'data'
   surveyId?: number
+  providerId: string
   fetchImpl: FetchLike
 }): LanguageModelV4 => {
   const post = async (options: LanguageModelV4CallOptions, stream: boolean): Promise<Response> => {
     const response = await fetchImpl(AI_GATEWAY_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: stream ? 'text/event-stream' : 'application/json' },
-      body: JSON.stringify({ surveyId, feature, dataClass, stream, call: toGatewayCall(options) }),
+      body: JSON.stringify({ surveyId, feature, dataClass, providerId, stream, call: toGatewayCall(options) }),
       signal: options.abortSignal,
     })
     if (!response.ok) throw await toHttpError(response)

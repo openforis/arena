@@ -3,7 +3,7 @@
  */
 import { getAiErrorKey } from '@webapp/ai/runtime/runtimeErrors'
 
-import { type AiUnavailableAction, getAiUnavailableAction } from './featureAvailability'
+import { type AiUnavailableAction, getAiUnavailableReasonActions } from './featureAvailability'
 import type { AiUnavailableReason } from './types'
 
 export type AiEngineErrorView = { retry: boolean; openSettings: boolean }
@@ -31,7 +31,9 @@ export const getAiUnavailableActions = ({
   reasons: AiUnavailableReason[]
   canChangePolicy: boolean
 }): AiUnavailableAction[] => {
-  const actions = reasons.map(getAiUnavailableAction).filter((action) => action !== 'changePolicy' || canChangePolicy)
+  const actions = reasons
+    .flatMap(getAiUnavailableReasonActions)
+    .filter((action) => action !== 'changePolicy' || canChangePolicy)
   return [...new Set(actions)]
 }
 

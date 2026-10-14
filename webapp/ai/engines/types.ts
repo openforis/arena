@@ -17,8 +17,13 @@ export type AiEngineInfo = { id: AiEngineId; hostingClass: AiHostingClass; label
 // context size of the engine's model, in tokens; assumed: the default size, the server didn't report it
 export type AiContextWindow = { tokens: number; assumed: boolean }
 
-// the engine chosen by selectEngine, with the limits the caller must respect (contextWindow: local server only)
-export type AiSelectedEngine = AiEngineInfo & { limits: AiEngineLimits; contextWindow?: AiContextWindow }
+// the engine chosen by selectEngine, with the limits the caller must respect (contextWindow: local server only);
+// providerId: the provider it calls (every gateway request names it)
+export type AiSelectedEngine = AiEngineInfo & {
+  limits: AiEngineLimits
+  contextWindow?: AiContextWindow
+  providerId?: string
+}
 
 export type AiEngineModelOptions = { feature: AiFeatureKey; dataClass: AiDataClass; surveyId?: number }
 
@@ -72,14 +77,8 @@ export type AiCapabilities = {
   local: Record<string, AiLocalServerCapability>
 }
 
-export type AiUnavailableReason =
-  | 'localServerNotEnabled'
-  | 'localServerUnreachable'
-  | 'localServerNoModel'
-  | 'gatewayNotConfigured'
-  | 'policyForbidsCloud'
-  | 'policyForbidsOrgHosted'
-  | 'policyForbidsAll'
+// why the one provider of a request cannot be used (no fallback: there is never a second candidate)
+export type AiUnavailableReason = 'policyForbids' | 'notAvailable' | 'missingOnThisBrowser' | 'notSetUp'
 
 export type AiEngineSelection = { engine: AiSelectedEngine } | { unavailable: AiUnavailableReason[] }
 

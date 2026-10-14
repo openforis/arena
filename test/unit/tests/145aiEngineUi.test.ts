@@ -4,19 +4,17 @@ import { getAiEngineErrorView, getAiUnavailableActions } from '@webapp/ai/engine
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 
 describe('getAiUnavailableActions', () => {
-  test('one action per reason, in order, without duplicates', () => {
+  test('the actions of each reason, in order, without duplicates', () => {
     expect(
-      getAiUnavailableActions({
-        reasons: ['localServerUnreachable', 'policyForbidsCloud', 'policyForbidsOrgHosted'],
-        canChangePolicy: true,
-      })
-    ).toEqual(['retry', 'changePolicy'])
+      getAiUnavailableActions({ reasons: ['notAvailable', 'missingOnThisBrowser'], canChangePolicy: true })
+    ).toEqual(['retry', 'openSettings'])
   })
 
   test('the policy action only for users who may change it', () => {
-    expect(
-      getAiUnavailableActions({ reasons: ['localServerNotEnabled', 'policyForbidsCloud'], canChangePolicy: false })
-    ).toEqual(['turnOnLocalServer'])
+    expect(getAiUnavailableActions({ reasons: ['policyForbids'], canChangePolicy: true })).toEqual(['changePolicy'])
+    expect(getAiUnavailableActions({ reasons: ['policyForbids', 'notSetUp'], canChangePolicy: false })).toEqual([
+      'openSettings',
+    ])
   })
 
   test('no reasons, no actions', () => {

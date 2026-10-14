@@ -1450,19 +1450,12 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
   aiEngine: {
     unavailableTitle: 'No disponible',
     unavailable: {
-      localServerNotEnabled: 'No hay ningún servidor de IA local activado.',
-      localServerUnreachable: 'No se puede conectar con el servidor de IA local.',
-      localServerNoModel: 'El modelo elegido para el servidor de IA local no está disponible.',
-      gatewayNotConfigured: 'No hay ningún proveedor de IA configurado para su cuenta.',
-      policyForbidsCloud: 'La política de IA de la encuesta no permite modelos en la nube para estos datos.',
-      policyForbidsOrgHosted:
-        'La política de IA de la encuesta no permite servidores de la organización para estos datos.',
-      policyForbidsAll: 'La política de IA de la encuesta desactiva la IA para estos datos.',
+      policyForbids: 'La política de IA de la encuesta no permite este proveedor para estos datos.',
+      notAvailable: 'El proveedor de IA elegido no está disponible ahora.',
+      missingOnThisBrowser: 'Su proveedor predeterminado está en otro equipo.',
+      notSetUp: 'No hay ningún proveedor de IA configurado. Añada uno en la configuración de IA.',
     },
     action: {
-      turnOnLocalServer: 'Activar un servidor de IA local',
-      chooseModel: 'Elegir un modelo',
-      configureProvider: 'Configurar un proveedor de IA',
       retry: 'Reintentar',
       changePolicy: 'Cambiar la política de IA de la encuesta',
       openSettings: 'Abrir la configuración de IA',

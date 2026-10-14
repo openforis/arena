@@ -1,6 +1,6 @@
 /**
  * Availability of an AI feature from the engine selection: the engine a click would use and where the data goes,
- * or why no engine qualifies. Same selectEngine inputs as resolveModel, so the badge names the engine actually used.
+ * or why its provider cannot be used. Same selectEngine inputs as resolveModel, so the badge names the engine used.
  */
 import type { AiDataClass } from '@common/ai/features'
 import type { AiPolicy } from '@common/ai/policy'
@@ -22,7 +22,7 @@ export type AiEngineFeatureAvailability = AiFeatureAvailability & {
   surveyScoped: boolean
 }
 
-export type AiUnavailableAction = 'turnOnLocalServer' | 'chooseModel' | 'configureProvider' | 'retry' | 'changePolicy'
+export type AiUnavailableAction = 'retry' | 'changePolicy' | 'openSettings'
 
 // no engine, no badge
 export const NO_DATA_LOCATION: AiDataLocation = Object.freeze({
@@ -32,14 +32,12 @@ export const NO_DATA_LOCATION: AiDataLocation = Object.freeze({
   engine: null,
 })
 
-const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction> = {
-  localServerNotEnabled: 'turnOnLocalServer',
-  localServerUnreachable: 'retry',
-  localServerNoModel: 'chooseModel',
-  gatewayNotConfigured: 'configureProvider',
-  policyForbidsCloud: 'changePolicy',
-  policyForbidsOrgHosted: 'changePolicy',
-  policyForbidsAll: 'changePolicy',
+// what would fix each reason; the profile holds the provider list (add, test, make default)
+const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction[]> = {
+  policyForbids: ['changePolicy'],
+  notAvailable: ['retry', 'openSettings'],
+  missingOnThisBrowser: ['openSettings'],
+  notSetUp: ['openSettings'],
 }
 
 /**
@@ -50,11 +48,11 @@ const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction> = {
 export const getAiUnavailableReasonKey = (reason: AiUnavailableReason): string => `aiEngine.unavailable.${reason}`
 
 /**
- * Returns the action that would fix a reason.
+ * Returns the actions that would fix a reason.
  * @param {AiUnavailableReason} reason - Reason.
- * @returns {AiUnavailableAction} The action.
+ * @returns {AiUnavailableAction[]} The actions, most direct first.
  */
-export const getAiUnavailableAction = (reason: AiUnavailableReason): AiUnavailableAction => ACTIONS[reason]
+export const getAiUnavailableReasonActions = (reason: AiUnavailableReason): AiUnavailableAction[] => ACTIONS[reason]
 
 /**
  * Returns where the data goes with the engine (the props of B's AiDataLocationBadge).
@@ -66,6 +64,15 @@ export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
     ? { hostingClass: engine.hostingClass, provider: engine.label || null, model: engine.model, engine: null }
     : { hostingClass: engine.hostingClass, provider: null, model: engine.model, engine: engine.label }
 
+/**
+ * Returns an availability without an engine.
+ * @param {object} params - Parameters.
+ * @param {string} params.status - Status.
+ * @param {AiUnavailableReason[]} [params.reasons] - Reasons.
+ * @param {string[]} [params.reasonKeys] - i18n keys of the texts.
+ * @param {boolean} params.surveyScoped - The request belongs to a survey.
+ * @returns {AiEngineFeatureAvailability} The availability.
+ */
 const notAvailable = ({
   status,
   reasons = [],
@@ -93,7 +100,7 @@ const notAvailable = ({
  * @param {AiDataClass} params.dataClass - Data class of the request.
  * @param {boolean} params.surveyScoped - The request belongs to a survey (false: checked against the instance ceilings).
  * @param {AiCapabilities} params.capabilities - Capabilities.
- * @param {boolean} params.preferLocal - Local first (preference after the consent decision).
+ * @param {string|null} [params.providerId] - The conversation's provider (default: the user's default).
  * @returns {AiEngineFeatureAvailability} The availability.
  */
 export const getAiEngineFeatureAvailability = ({
@@ -102,17 +109,17 @@ export const getAiEngineFeatureAvailability = ({
   dataClass,
   surveyScoped,
   capabilities,
-  preferLocal,
+  providerId,
 }: {
   enabled: boolean
   effective: AiPolicy | null
   dataClass: AiDataClass
   surveyScoped: boolean
   capabilities: AiCapabilities
-  preferLocal: boolean
+  providerId?: string | null
 }): AiEngineFeatureAvailability => {
   if (!enabled || !effective) return notAvailable({ status: 'disabled', surveyScoped })
-  const selection = selectEngine({ effective, dataClass, capabilities, prefs: { preferLocal } })
+  const selection = selectEngine({ effective, dataClass, capabilities, providerId })
   if ('engine' in selection) {
     const { engine } = selection
     return { status: 'available', location: toDataLocation(engine), reasonKeys: [], reasons: [], engine, surveyScoped }

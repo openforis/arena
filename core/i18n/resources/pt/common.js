@@ -1613,18 +1613,12 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
   aiEngine: {
     unavailableTitle: 'Indisponível',
     unavailable: {
-      localServerNotEnabled: 'Nenhum servidor de IA local está ativado.',
-      localServerUnreachable: 'Não é possível conectar ao servidor de IA local.',
-      localServerNoModel: 'O modelo escolhido para o servidor de IA local não está disponível.',
-      gatewayNotConfigured: 'Nenhum provedor de IA está configurado para sua conta.',
-      policyForbidsCloud: 'A política de IA da pesquisa não permite modelos na nuvem para estes dados.',
-      policyForbidsOrgHosted: 'A política de IA da pesquisa não permite servidores da organização para estes dados.',
-      policyForbidsAll: 'A política de IA da pesquisa desativa a IA para estes dados.',
+      policyForbids: 'A política de IA da pesquisa não permite este provedor para estes dados.',
+      notAvailable: 'O provedor de IA escolhido não está disponível no momento.',
+      missingOnThisBrowser: 'Seu provedor padrão está em outro computador.',
+      notSetUp: 'Nenhum provedor de IA está configurado. Adicione um nas configurações de IA.',
     },
     action: {
-      turnOnLocalServer: 'Ativar um servidor de IA local',
-      chooseModel: 'Escolher um modelo',
-      configureProvider: 'Configurar um provedor de IA',
       retry: 'Tentar novamente',
       changePolicy: 'Alterar a política de IA da pesquisa',
       openSettings: 'Abrir as configurações de IA',

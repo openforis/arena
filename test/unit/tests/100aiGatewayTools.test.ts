@@ -270,7 +270,12 @@ describe('gateway model', () => {
       const result = { content: [], finishReason: { unified: 'stop' }, usage: {}, warnings: [] }
       return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    const model = createGatewayModel({ feature: 'chatbot', dataClass: 'schema', fetchImpl: fetchImpl as any })
+    const model = createGatewayModel({
+      feature: 'chatbot',
+      dataClass: 'schema',
+      providerId: 'arena-default',
+      fetchImpl: fetchImpl as any,
+    })
     await model.doGenerate({
       prompt: prompt as any,
       tools: [{ ...tool, providerOptions: { x: { y: 1 } } } as any],
@@ -287,7 +292,12 @@ describe('gateway model', () => {
       const result = { content: [], finishReason: { unified: 'stop' }, usage: {}, warnings: [] }
       return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } })
     }
-    const model = createGatewayModel({ feature: 'chatbot', dataClass: 'schema', fetchImpl: fetchImpl as any })
+    const model = createGatewayModel({
+      feature: 'chatbot',
+      dataClass: 'schema',
+      providerId: 'arena-default',
+      fetchImpl: fetchImpl as any,
+    })
     await model.doGenerate({ prompt: prompt as any, toolChoice: { type: 'auto' } })
     expect(bodies[0].call.tools).toBeUndefined()
     expect(bodies[0].call.toolChoice).toBeUndefined()

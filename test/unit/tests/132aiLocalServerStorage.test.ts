@@ -7,7 +7,6 @@ import {
   saveLocalServerSettings,
 } from '@webapp/ai/engines/localServerSettings'
 import {
-  getEffectivePreferLocal,
   getLocalServerConsentKey,
   loadLocalServerConsent,
   saveLocalServerConsent,
@@ -127,13 +126,5 @@ describe('first-use consent', () => {
     expect(loadLocalServerConsent({ storage, ...base, surveyId: 1 })).toBeNull()
     expect(loadLocalServerConsent({ storage: throwingStorage, ...base, surveyId: 1 })).toBeNull()
     expect(saveLocalServerConsent({ storage: throwingStorage, ...base, surveyId: 1, decision: 'accepted' })).toBe(false)
-  })
-
-  test('a decline turns the local preference off for that survey', () => {
-    const settings = { ...defaultLocalServerSettings(), enabled: true }
-    expect(getEffectivePreferLocal({ settings, consent: null })).toBe(true)
-    expect(getEffectivePreferLocal({ settings, consent: 'accepted' })).toBe(true)
-    expect(getEffectivePreferLocal({ settings, consent: 'declined' })).toBe(false)
-    expect(getEffectivePreferLocal({ settings: { ...settings, preferLocal: false }, consent: 'accepted' })).toBe(false)
   })
 })

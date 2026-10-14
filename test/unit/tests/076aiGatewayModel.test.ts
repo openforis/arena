@@ -30,7 +30,13 @@ const modelWith = (respond: (body: any) => Response) => {
     requests.push({ url, body, signal: init.signal })
     return respond(body)
   }
-  const model = createGatewayModel({ feature: 'expressionGenerate', dataClass: 'schema', surveyId: 7, fetchImpl })
+  const model = createGatewayModel({
+    feature: 'expressionGenerate',
+    dataClass: 'schema',
+    surveyId: 7,
+    providerId: 'arena-default',
+    fetchImpl,
+  })
   return { model, requests }
 }
 
@@ -44,7 +50,13 @@ describe('gateway model: generate', () => {
 
     const [{ url, body }] = requests
     expect(url).toBe('/api/ai/model')
-    expect(body).toMatchObject({ surveyId: 7, feature: 'expressionGenerate', dataClass: 'schema', stream: false })
+    expect(body).toMatchObject({
+      surveyId: 7,
+      feature: 'expressionGenerate',
+      dataClass: 'schema',
+      providerId: 'arena-default',
+      stream: false,
+    })
     expect(body.call.prompt[0]).toEqual({ role: 'system', content: 'S' })
     expect(body.call.abortSignal).toBeUndefined()
   })

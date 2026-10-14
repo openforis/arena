@@ -10,12 +10,9 @@ import {
   getAiEngineFeatureAvailability,
 } from '@webapp/ai/engines/featureAvailability'
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from '@webapp/ai/engines/featureSwitches'
-import { getEffectivePreferLocal, loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
-import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
 import { isSurveyScopedFeature, resolveEffectivePolicy } from '@webapp/ai/policy/aiFeatureAvailability'
 import { getCeilingsFromSettings } from '@webapp/ai/policy/policyContextLoader'
 import { useSurveyAiPolicy } from '@webapp/ai/policy/useSurveyAiPolicy'
-import { useSurveyId } from '@webapp/store/survey'
 import { useUser } from '@webapp/store/user'
 
 import { useAiCapabilities } from './useAiCapabilities'
@@ -29,11 +26,12 @@ type AiSettingsSnapshot = AiFeatureSwitches & { policyCeilings?: unknown }
  * @param {string} feature - Feature key (common/ai/features).
  * @param {object} [options] - Options.
  * @param {AiDataClass} [options.dataClass] - Data class of the request (default: the feature's lowest; the assistant passes its conversation's).
+ * @param {string} [options.providerId] - The conversation's provider (default: the user's default provider).
  * @returns {AiEngineFeatureAvailability} The availability.
  */
 export const useAiFeatureAvailability = (
   feature: string,
-  { dataClass }: { dataClass?: AiDataClass } = {}
+  { dataClass, providerId }: { dataClass?: AiDataClass; providerId?: string } = {}
 ): AiEngineFeatureAvailability => {
   const definition = getAiFeature(feature)
   // re-renders on every settings change, so the snapshot below is current
@@ -42,7 +40,6 @@ export const useAiFeatureAvailability = (
   // useAiFeatureEnabled checks the category; one feature of it may still be off on the server
   const enabled = categoryEnabled && isAiFeatureEnabledInSettings(settings, feature)
   const surveyScoped = isSurveyScopedFeature(feature)
-  const surveyId = useSurveyId()
   const { state, error } = useSurveyAiPolicy({ skip: !enabled || !surveyScoped })
   const capabilities = useAiCapabilities()
   const user = useUser()
@@ -56,23 +53,16 @@ export const useAiFeatureAvailability = (
   // the empty snapshot before the first load must not read as "no engine": nothing is shown until it is loaded
   const loaded = isCapabilitiesLoadedForUser(getAiCapabilitiesStore(), userUuid)
 
-  return useMemo(() => {
-    const localSettings = getAiCapabilitiesStore().getLocalSettings()
-    const consent = localSettings.enabled
-      ? loadLocalServerConsent({
-          storage: getBrowserStorage(),
-          userUuid,
-          surveyId: surveyScoped ? surveyId : undefined,
-          baseUrl: capabilities.localServer.baseUrl ?? '',
-        })
-      : null
-    return getAiEngineFeatureAvailability({
-      enabled: enabled && loaded,
-      effective,
-      dataClass: requestDataClass,
-      surveyScoped,
-      capabilities,
-      preferLocal: getEffectivePreferLocal({ settings: localSettings, consent }),
-    })
-  }, [capabilities, effective, enabled, loaded, requestDataClass, surveyId, surveyScoped, userUuid])
+  return useMemo(
+    () =>
+      getAiEngineFeatureAvailability({
+        enabled: enabled && loaded,
+        effective,
+        dataClass: requestDataClass,
+        surveyScoped,
+        capabilities,
+        providerId,
+      }),
+    [capabilities, effective, enabled, loaded, providerId, requestDataClass, surveyScoped]
+  )
 }

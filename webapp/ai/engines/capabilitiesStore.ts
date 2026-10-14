@@ -3,6 +3,7 @@
  */
 import * as User from '@core/user/user'
 
+import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { fetchAiSettingsOnce, invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { store as reduxStore } from '@webapp/store/store'
 import { UserState } from '@webapp/store/user'
@@ -13,7 +14,7 @@ import {
   createCapabilitiesStore,
   getCapabilitiesSnapshotForUser,
 } from './capabilities'
-import { loadLocalProviders } from './localProviders'
+import { convertLegacyLocalServer, loadLocalProviders, loadSettingsWithLocalConversion } from './localProviders'
 import { getBrowserStorage, loadLocalServerSettings } from './localServerSettings'
 import { type LocalServerProbeResult, probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
@@ -22,10 +23,23 @@ import type { AiCapabilities } from './types'
 const browserFetch = (url: string, init?: RequestInit): Promise<Response> => fetch(url, init)
 
 const capabilitiesStore = createCapabilitiesStore({
-  loadSettings: async ({ force }) => {
-    if (force) invalidateAiSettingsCache()
-    return (await fetchAiSettingsOnce()) as AiSettingsSnapshot
-  },
+  loadSettings: ({ force, userUuid }) =>
+    loadSettingsWithLocalConversion({
+      force,
+      userUuid,
+      loadSettings: async ({ force: reload }) => {
+        if (reload) invalidateAiSettingsCache()
+        return (await fetchAiSettingsOnce()) as AiSettingsSnapshot
+      },
+      // the old local server becomes local:legacy; its default is applied only while the account default was never picked
+      convert: ({ userUuid: uuid, defaultProviderOrigin }) =>
+        convertLegacyLocalServer({
+          storage: getBrowserStorage(),
+          userUuid: uuid,
+          defaultProviderOrigin,
+          setDefault: async (providerId) => (await setDefaultProvider({ providerId, origin: 'converted' })).applied,
+        }),
+    }),
   loadLocalSettings: (userUuid) => loadLocalServerSettings({ storage: getBrowserStorage(), userUuid }),
   loadLocalProviders: (userUuid) => loadLocalProviders({ storage: getBrowserStorage(), userUuid }),
   probe: ({ baseUrl, modelId }) => probeLocalServer({ baseUrl, modelId, fetchImpl: browserFetch }),

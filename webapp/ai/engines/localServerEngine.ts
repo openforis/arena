@@ -28,7 +28,7 @@ export const createLocalServerEngine = ({
   const info = getLocalServerEngineInfo(localServer)
   const { baseUrl, modelId } = localServer
   if (!info || !baseUrl || !modelId) {
-    throw new SystemError('aiNoEngineAvailable', { reasons: ['localServerNoModel'] }, StatusCodes.CONFLICT)
+    throw new SystemError('aiNoEngineAvailable', { reasons: ['notAvailable'] }, StatusCodes.CONFLICT)
   }
   const provider = createOpenAICompatible({
     name: 'localServer',

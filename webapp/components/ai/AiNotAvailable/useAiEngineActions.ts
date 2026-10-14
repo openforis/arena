@@ -9,16 +9,16 @@ import { appModuleUri, homeModules, userModules } from '@webapp/app/appModules'
  * Returns the handler of the not-available and engine error actions.
  * @returns {Function} Runs an action: re-probe, or open the user's AI settings or the survey AI policy tab.
  */
-export const useAiEngineActions = (): ((action: AiUnavailableAction | 'openSettings') => Promise<void>) => {
+export const useAiEngineActions = (): ((action: AiUnavailableAction) => Promise<void>) => {
   const navigate = useNavigate()
   return useCallback(
-    async (action: AiUnavailableAction | 'openSettings'): Promise<void> => {
+    async (action: AiUnavailableAction): Promise<void> => {
       if (action === 'retry') {
         await refreshAiCapabilities()
       } else if (action === 'changePolicy') {
         navigate(appModuleUri(homeModules.surveyInfo), { state: { tab: 'aiPolicy' } })
       } else {
-        // own profile: the AI settings panel (local server, provider)
+        // openSettings: the provider list in the user's profile
         navigate(appModuleUri(userModules.user))
       }
     },
