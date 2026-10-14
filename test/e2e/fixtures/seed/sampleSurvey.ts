@@ -54,6 +54,8 @@ export type SampleSurveyOptions = {
   /** Whether to publish the survey; default true (records can be inserted only in a published survey). */
   publish?: boolean
   template?: boolean
+  /** Survey languages, the first is the default one; default ['en']. Labels are in en only. */
+  languages?: string[]
   records?: SampleRecord[]
 }
 
@@ -102,7 +104,16 @@ const createTaxonBuilders = () =>
  * @returns {Promise<number>} - The id of the survey inserted.
  */
 export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<number> => {
-  const { userEmail, name, label, withExpressions = true, publish = true, template = false, records = [] } = options
+  const {
+    userEmail,
+    name,
+    label,
+    withExpressions = true,
+    publish = true,
+    template = false,
+    records = [],
+    languages,
+  } = options
 
   const user = await UserManager.fetchUserByEmail(userEmail)
 
@@ -139,6 +150,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
   surveyBuilder.name = name
   surveyBuilder.label = label
   if (template) surveyBuilder.template()
+  if (languages) surveyBuilder.languages(...languages)
 
   const survey = await withConsoleLogSilenced(() => surveyBuilder.buildAndStore(publish))
 
