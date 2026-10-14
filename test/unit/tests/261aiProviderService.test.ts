@@ -241,6 +241,21 @@ describe('AI provider service (261)', () => {
     expect(org.provider).toMatchObject({ hostingClass: 'orgHosted', hasApiKey: false, name: 'OpenAI-compatible' })
   })
 
+  test('an upstream failure that is not a SystemError keeps its message, truncated', async () => {
+    const long = 'x'.repeat(300)
+    const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorMessage: long }) })
+    const error: any = await expectSystemErrorKey(
+      AiProviderService.addProvider({
+        user: userWith({}),
+        input: { type: 'openai', model: 'm', apiKey: 'sk' },
+        deps: failing.deps,
+      }),
+      'aiProviderTestFailed'
+    )
+    expect(error.params.message).toBe('x'.repeat(200))
+    expect(failing.saved).toEqual([])
+  })
+
   test('a failed test or a missing secret saves nothing', async () => {
     const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }) })
     await expectSystemErrorKey(
@@ -410,7 +425,13 @@ describe('AI provider service (261)', () => {
   })
 
   test('the new error keys exist in every language', () => {
-    const keys = ['aiProviderNotFound', 'aiProviderNotGateway', 'aiApiKeyUnreadable', 'aiEncryptionMissing']
+    const keys = [
+      'aiProviderNotFound',
+      'aiProviderNotGateway',
+      'aiApiKeyUnreadable',
+      'aiEncryptionMissing',
+      'aiProviderTestFailed',
+    ]
     for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
       for (const key of keys) {
         expect([lang, key, typeof (resources as Record<string, unknown>)[key]]).toEqual([lang, key, 'string'])

@@ -174,9 +174,21 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
   encrypt: SecretBox.encrypt,
   decrypt: SecretBox.decrypt,
   isEncryptionConfigured: SecretBox.isConfigured,
+  /**
+   * Returns true when the admin has configured the Arena default provider.
+   * @returns {boolean} Whether there is an admin default.
+   */
   hasAdminDefault: () => ProviderResolver.describeAdminDefault() !== null,
+  /**
+   * Returns true on test servers that accept the mock provider.
+   * @returns {boolean} Whether the mock provider is enabled.
+   */
   isMockEnabled: () => !!ENV.aiMockProviderEnabled,
   newId: uuidv4,
+  /**
+   * Returns the current time.
+   * @returns {string} ISO timestamp.
+   */
   now: () => new Date().toISOString(),
   allowlist: ENV.aiOrgHostedBaseUrls ?? [],
 })
@@ -380,7 +392,11 @@ const assertTestPasses = async ({
   deps: AiProviderServiceDeps
 }) => {
   const result = await deps.runTest({ user, cfg })
-  if (!result.ok) throw badRequest(result.errorKey ?? 'aiProviderUnavailable', result.errorParams ?? {})
+  if (result.ok) return
+  // an upstream failure that is not a SystemError keeps its message (truncated), not a generic "unavailable"
+  if (!result.errorKey)
+    throw badRequest('aiProviderTestFailed', { message: String(result.errorMessage ?? '').slice(0, 200) })
+  throw badRequest(result.errorKey, result.errorParams ?? {})
 }
 
 /**

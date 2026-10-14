@@ -50,6 +50,7 @@ test.describe('AI account providers API (mock provider)', () => {
   })
 
   test("ids that are not the user's are refused", async ({ api }) => {
+    const before = await api.getAiSettings()
     expect(await api.requestRaw('post', '/api/ai/model', chatCall('acct:not-mine'))).toMatchObject({
       status: 404,
       body: { key: 'aiProviderNotFound' },
@@ -62,6 +63,8 @@ test.describe('AI account providers API (mock provider)', () => {
     expect((await api.requestRaw('post', '/api/ai/providers/test', { id: 'acct:not-mine' })).status).toBe(404)
     expect((await api.requestRaw('put', '/api/ai/providers/acct%3Anot-mine', { name: 'x' })).status).toBe(404)
     expect((await api.requestRaw('delete', '/api/ai/providers/acct%3Anot-mine')).status).toBe(404)
+    // the refused calls wrote nothing
+    expect(await api.getAiSettings()).toEqual(before)
   })
 
   test('no response contains the API key', async ({ api }) => {
@@ -72,7 +75,15 @@ test.describe('AI account providers API (mock provider)', () => {
     })
     expect(edit.status).toBe(200)
 
-    const responses = [provider, settings, edit.body, await api.getAiSettings()]
+    // the secret must not come back from test and model listing either, for a draft and for the saved id
+    const draft = { type: 'mock', model: 'mock', apiKey: secret }
+    const probes = [
+      await api.requestRaw('post', '/api/ai/providers/test', draft),
+      await api.requestRaw('post', '/api/ai/providers/test', { id: provider.id }),
+      await api.requestRaw('post', '/api/ai/providers/models', draft),
+      await api.requestRaw('post', '/api/ai/providers/models', { id: provider.id }),
+    ]
+    const responses = [provider, settings, edit.body, await api.getAiSettings(), ...probes.map((probe) => probe.body)]
     for (const response of responses) {
       const json = JSON.stringify(response)
       expect(json).not.toContain('apiKeyEncrypted')

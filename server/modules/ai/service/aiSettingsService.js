@@ -82,18 +82,14 @@ const writeAiPrefs = async (user, aiPrefs) => {
  * @param {object} args - Update args.
  * @param {object} args.user - The user.
  * @param {object} args.update - Request body (untrusted).
+ * @param {object} [args.deps] - Provider service dependencies (default: the real ones).
  * @returns {Promise<object>} The updated user.
  */
-export const saveSettings = async ({ user, update }) => {
+export const saveSettings = async ({ user, update, deps = AiProviderService.createDefaultAiProviderServiceDeps() }) => {
   const existing = getRawPrefs(user)
   const access = resolveSavedAccess(update)
-  const deps = AiProviderService.createDefaultAiProviderServiceDeps()
-  const providerPrefs = applyLegacyProviderUpdate({
-    prefs: getProviderPrefs(existing),
-    update,
-    // encryptKey: 409 aiEncryptionMissing, not a 500, when the server has no secret
-    encrypt: (plain) => AiProviderService.encryptKey(plain, deps),
-  })
+  // the deps encrypt with encryptKey: 409 aiEncryptionMissing, not a 500, when the server has no secret
+  const providerPrefs = applyLegacyProviderUpdate({ prefs: getProviderPrefs(existing), update, deps })
   return writeAiPrefs(user, withProviderPrefs({ ...existing, ...access }, providerPrefs))
 }
 
