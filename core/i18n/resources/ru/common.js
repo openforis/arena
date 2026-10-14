@@ -1636,7 +1636,7 @@ $t(common.cantUndoWarning)`,
       destinationNoSurvey: 'Запросы будут отправляться на {{baseUrl}} ({{location}}).',
       model: 'Модель: {{modelId}}',
       continue: 'Продолжить',
-      useOther: 'Использовать другой движок',
+      chooseOther: 'Выбрать другого поставщика',
     },
   },
 

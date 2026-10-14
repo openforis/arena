@@ -207,7 +207,7 @@ describe('createModelResolver', () => {
     expect(first.model).toBe(localModel)
     expect(first.engine.providerId).toBe('local:l1')
     expect(state.requests).toEqual([
-      { surveyId: 1, baseUrl: BASE_URL, modelId: 'local-model', hostingClass: 'onDevice', canUseOther: false },
+      { surveyId: 1, baseUrl: BASE_URL, modelId: 'local-model', hostingClass: 'onDevice' },
     ])
     expect(state.consentChanges).toBe(1)
     expect(loadLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: BASE_URL })).toBe('accepted')
@@ -230,10 +230,10 @@ describe('createModelResolver', () => {
     expect(engine.id).toBe('localServer')
   })
 
-  test('Use another engine cancels: no other provider is tried', async () => {
-    const { resolve, state } = setup({ answers: ['useOther'] })
+  test('Choose another provider fails the request: no other provider is tried', async () => {
+    const { resolve, state } = setup({ answers: ['chooseOther'] })
     const error = await resolve({ feature: 'expressionExplain', surveyId: 1 }).catch((e) => e)
-    expect(error.key).toBe('aiLocalServerConsentCancelled')
+    expect(error.key).toBe('aiProviderChooseAnother')
     expect(state.gatewayCalls).toEqual([])
     expect(state.localEngines).toEqual([])
   })

@@ -27,6 +27,7 @@ export type AiBatchGuardDeps = {
 // errors that will fail every following call too: the run stops at once with this message
 export const RUN_STOPPING_ERROR_KEYS: readonly string[] = [
   'aiApiKeyMissing',
+  'aiApiKeyUnreadable',
   'aiFeatureDisabled',
   'aiFeaturesDisabled',
   'aiLocalServerModelMissing',
@@ -36,6 +37,8 @@ export const RUN_STOPPING_ERROR_KEYS: readonly string[] = [
   'aiNotConfigured',
   'aiPolicyRefused',
   'aiProviderAuth',
+  'aiProviderChooseAnother',
+  'aiProviderNotFound',
   'aiProviderRejected',
   'aiProviderUnavailable',
   'aiRateLimited',

@@ -1630,7 +1630,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       destinationNoSurvey: 'As solicitações irão para {{baseUrl}} ({{location}}).',
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
-      useOther: 'Usar outro mecanismo',
+      chooseOther: 'Escolher outro provedor',
     },
   },
 

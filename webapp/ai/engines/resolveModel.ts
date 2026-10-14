@@ -30,11 +30,10 @@ export type LocalServerConsentRequest = {
   baseUrl: string
   modelId: string | null
   hostingClass: AiHostingClass
-  // always false: a request has one provider, so there is no other engine to offer
-  canUseOther: boolean
 }
 
-export type LocalServerConsentAnswer = 'continue' | 'useOther' | 'cancel'
+// chooseOther: the user wants another provider; the request fails so the UI can offer the switcher or the settings
+export type LocalServerConsentAnswer = 'continue' | 'chooseOther' | 'cancel'
 
 export type ResolveModelParams = {
   feature: AiFeatureKey
@@ -80,6 +79,12 @@ type Context = {
  * @returns {SystemError} The error.
  */
 const consentCancelled = () => new SystemError('aiLocalServerConsentCancelled', {}, StatusCodes.CONFLICT)
+
+/**
+ * Builds the error for "Choose another provider" in the consent card.
+ * @returns {SystemError} The error.
+ */
+const chooseAnother = () => new SystemError('aiProviderChooseAnother', {}, StatusCodes.CONFLICT)
 
 /**
  * Builds the error of an aborted request (recognised by isAiAbortError).
@@ -171,7 +176,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @param {AiLocalServerCapability} capability - Its capability.
    * @returns {Promise<ResolvedModel>} The model and the engine.
-   * @throws {SystemError} aiLocalServerConsentCancelled for any other answer.
+   * @throws {SystemError} aiProviderChooseAnother for "Choose another provider", aiLocalServerConsentCancelled otherwise.
    */
   const askConsent = async (
     context: Context,
@@ -184,13 +189,13 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
         baseUrl: capability.baseUrl ?? '',
         modelId: engine.model,
         hostingClass: engine.hostingClass,
-        canUseOther: false,
       },
       context.signal
     )
     if (context.signal?.aborted) throw aborted()
     // logged out (or another user logged in) while the dialog was open: nothing is stored for the new user
     if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
+    if (answer === 'chooseOther') throw chooseAnother()
     if (answer !== 'continue') throw consentCancelled()
     saveLocalServerConsent({ ...consentParams(context, capability), decision: 'accepted' })
     deps.onConsentChange()

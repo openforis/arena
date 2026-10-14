@@ -134,6 +134,7 @@ Try to refresh the page.`,
   aiLocalServerError: 'The local AI server returned an error (HTTP {{status}}).',
   aiNoEngineAvailable: 'No AI engine can be used for this request.',
   aiLocalServerConsentCancelled: 'The request was cancelled.',
+  aiProviderChooseAnother: 'The request was not sent. Choose another AI provider.',
   aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
   aiApplyTimeout: 'The server did not answer in time. Some changes may have been applied: reload to check.',
   userCannotDeleteHasMessages:

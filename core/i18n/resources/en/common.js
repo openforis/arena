@@ -1621,7 +1621,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       destinationNoSurvey: 'Requests will go to {{baseUrl}} ({{location}}).',
       model: 'Model: {{modelId}}',
       continue: 'Continue',
-      useOther: 'Use another engine',
+      chooseOther: 'Choose another provider',
     },
   },
 

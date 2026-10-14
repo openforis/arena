@@ -1619,7 +1619,7 @@ $t(common.cantUndoWarning)`,
       destinationNoSurvey: 'Хүсэлтүүд {{baseUrl}} ({{location}}) руу илгээгдэнэ.',
       model: 'Загвар: {{modelId}}',
       continue: 'Үргэлжлүүлэх',
-      useOther: 'Өөр хөдөлгүүр ашиглах',
+      chooseOther: 'Өөр үйлчилгээ үзүүлэгч сонгох',
     },
   },
 

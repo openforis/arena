@@ -1467,7 +1467,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       destinationNoSurvey: 'Las solicitudes irán a {{baseUrl}} ({{location}}).',
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
-      useOther: 'Usar otro motor',
+      chooseOther: 'Elegir otro proveedor',
     },
   },
 

@@ -16,10 +16,9 @@ type Entry = {
 /**
  * Returns the key two requests share when they must show one dialog.
  * @param {LocalServerConsentRequest} request - The request.
- * @returns {string} The key (survey, server URL and whether another engine is offered).
+ * @returns {string} The key (survey and server URL: the consent is stored per survey and URL).
  */
-const keyOf = ({ surveyId, baseUrl, canUseOther }: LocalServerConsentRequest): string =>
-  `${surveyId ?? 'none'}|${baseUrl}|${canUseOther}`
+const keyOf = ({ surveyId, baseUrl }: LocalServerConsentRequest): string => `${surveyId ?? 'none'}|${baseUrl}`
 
 /**
  * Creates a consent request queue.

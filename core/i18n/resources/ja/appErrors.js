@@ -137,6 +137,7 @@ export default {
   aiLocalServerError: 'ローカル AI サーバーがエラーを返しました (HTTP {{status}})。',
   aiNoEngineAvailable: 'このリクエストに使用できる AI エンジンがありません。',
   aiLocalServerConsentCancelled: 'リクエストはキャンセルされました。',
+  aiProviderChooseAnother: 'リクエストは送信されませんでした。別の AI プロバイダーを選択してください。',
   aiDataQuerySummaryInvalid: 'AIはこのクエリの名前と説明を提案できませんでした。もう一度お試しください。',
   aiApplyTimeout:
     'サーバーが時間内に応答しませんでした。一部の変更が適用された可能性があります。再読み込みして確認してください。',
