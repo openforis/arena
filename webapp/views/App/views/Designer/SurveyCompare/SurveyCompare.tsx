@@ -156,6 +156,13 @@ export const SurveyCompare = () => {
     []
   )
 
+  // the comparison is discarded: a new file can be selected
+  const onReset = useCallback(() => {
+    setFile(null)
+    setTabKey(null)
+    setState(initialState)
+  }, [])
+
   const onSelectItem = useCallback((id: string) => setState((statePrev) => ({ ...statePrev, selectedItemId: id })), [])
 
   // a confirmed (or undone) rename changes the matching: the comparison is computed again
@@ -277,13 +284,23 @@ export const SurveyCompare = () => {
           ))}
         </ol>
       )}
-      <Dropzone
-        accept={acceptedFiles}
-        droppedFiles={file ? [file] : []}
-        maxSize={maxFileSizeInDropzoneUnits}
-        onDrop={onFileSelected}
-      />
+      {!result && (
+        <Dropzone
+          accept={acceptedFiles}
+          droppedFiles={file ? [file] : []}
+          maxSize={maxFileSizeInDropzoneUnits}
+          onDrop={onFileSelected}
+        />
+      )}
       <div className="survey-compare__header">
+        {result && (
+          <Button
+            iconClassName="icon-upload2 icon-12px"
+            label="surveyCompareView:compareAnotherFile"
+            onClick={onReset}
+            variant="outlined"
+          />
+        )}
         {sourceFileName && (
           <Button
             iconClassName="icon-loop2 icon-12px"
@@ -295,6 +312,7 @@ export const SurveyCompare = () => {
         {result?.source?.name && (
           <span className="survey-compare__source-name">
             {i18n.t('surveyCompareView:sourceSurvey', { name: result.source.name })}
+            {file && ` (${file.name})`}
           </span>
         )}
       </div>

@@ -11,6 +11,7 @@ export default {
   fileTooLarge:
     'Le fichier sélectionné est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
   compareAgain: 'Comparer à nouveau',
+  compareAnotherFile: 'Comparer un autre fichier',
   sourceSurvey: 'Formulaire chargé : {{name}}',
   identical: 'Les formulaires sont identiques',
   counts:
