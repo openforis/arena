@@ -15,6 +15,7 @@
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SecretBox from '@server/utils/crypto/secretBox'
+import { ENV } from '@core/processUtils'
 
 import * as AiProviderService from '../service/aiProviderService'
 import * as AiSettingsService from '../service/aiSettingsService'
@@ -41,6 +42,8 @@ const buildResponseBody = async (user) => {
     // the instance default (no key), for the "Arena default" row
     adminDefault: ProviderResolver.describeAdminDefault(),
     encryptionConfigured: SecretBox.isConfigured(),
+    // the dialog offers the mock type only where the server accepts it (e2e servers)
+    mockProviderEnabled: ENV.aiMockProviderEnabled === true,
     disabledFeatures: getDisabledFeatureKeys(),
     // orgHostedBaseUrls, policyCeilings (instance ceilings) and maxPromptChars, for the browser engines
     ...getEngineSettingsFields(),
