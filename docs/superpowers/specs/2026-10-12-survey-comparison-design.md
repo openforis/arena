@@ -48,7 +48,7 @@ The survey already exists in Dev, QA and Prod (QA and Prod were created by impor
 its UUIDs). In Dev the user adds a new attribute and changes some validation expressions. To bring QA up to date:
 
 1. **Dev**: export the survey without data (dashboard → Export), as today.
-2. **QA**: open the survey → Designer → **"Update from survey file…"** → upload the Dev `.zip`.
+2. **QA**: open the survey → dashboard → Advanced functions → **"Compare / update from file"** → upload the Dev `.zip`.
 3. Arena compares the file (**source**, the reference) with the QA survey (**target**) and shows the tree of
    differences:
    - the new attribute: _added_ (checked by default), together with the layout change of its parent entity
@@ -77,17 +77,17 @@ QA and Prod stay aligned and every later comparison matches elements by UUID, wi
 
 Phase 1 already covers the use case above. The other phases add more cases and a quick check.
 
-| Phase | Delivers | Main risk |
-| ----- | -------- | --------- |
+| Phase                    | Delivers                                                                                                                                                                                               | Main risk                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
 | 1. Compare + apply (MVP) | Upload an exported `.zip`, see the differences tree, apply **additions** and **property changes** (labels, expressions, validations, layout, category items added/changed) to the open survey as draft | Ordering dependent changes, published-survey rules |
-| 2. Full sync | Removals, moves, renames, cycles, survey info, taxonomies, survey files; matching by name path when UUIDs differ (surveys built by hand in each environment), "possible rename" suggestions | Matching without UUIDs |
-| 3. Fingerprint | One "definition hash" per survey on the dashboard: check that Dev, QA and Prod are identical without uploading anything | Picking the normalization rules |
+| 2. Full sync             | Removals, moves, renames, cycles, survey info, taxonomies, survey files; matching by name path when UUIDs differ (surveys built by hand in each environment), "possible rename" suggestions            | Matching without UUIDs                             |
+| 3. Fingerprint           | One "definition hash" per survey on the dashboard: check that Dev, QA and Prod are identical without uploading anything                                                                                | Picking the normalization rules                    |
 
 ### Comparison (phase 1, name-path matching in phase 2)
 
 #### User flow
 
-1. Designer → new **"Update from survey file…"** item (next to Schema Summary), opens `/app/designer/compare`.
+1. Home dashboard → Advanced functions → **"Compare / update from file"**, opens `/app/home/surveyCompare`.
    The view (and its API) is available only to users with survey edit permission.
 2. The user uploads an Arena survey `.zip` exported (without data) from another server. Later option: pick another
    survey on the same server instead (same code path, the source is loaded from the DB rather than from a zip).
@@ -118,24 +118,29 @@ like the uploaded one").
 
 ```ts
 type DiffStatus = 'identical' | 'changed' | 'added' | 'removed' | 'moved'
-interface PropDiff { key: string; source: unknown; target: unknown }
+interface PropDiff {
+  key: string
+  source: unknown
+  target: unknown
+}
 interface NodeDefDiff {
-  sourceUuid?: string; targetUuid?: string
-  path: string                 // e.g. cluster/plot/tree/dbh, from the source when present
+  sourceUuid?: string
+  targetUuid?: string
+  path: string // e.g. cluster/plot/tree/dbh, from the source when present
   matchedBy?: 'uuid' | 'path' | 'manual'
   status: DiffStatus
-  props: PropDiff[]            // only differing props
-  childrenStatus: 'identical' | 'hasDifferences'  // rolled up for the tree
-  applicability?: Applicability  // see Applicability rules
+  props: PropDiff[] // only differing props
+  childrenStatus: 'identical' | 'hasDifferences' // rolled up for the tree
+  applicability?: Applicability // see Applicability rules
 }
 interface SurveyDiff {
   identical: boolean
   fingerprints: { source: string; target: string }
-  surveyInfo: PropDiff[]       // languages, labels, cycles, SRS, sampling design flags…
+  surveyInfo: PropDiff[] // languages, labels, cycles, SRS, sampling design flags…
   nodeDefs: NodeDefDiff[]
-  categories: CategoryDiff[]   // by name: levels, extra props defs, items by code path
-  taxonomies: TaxonomyDiff[]   // by name: taxa by code, vernacular names, extra props
-  surveyFiles: FileDiff[]      // map layers, doc images (by name + size/hash)
+  categories: CategoryDiff[] // by name: levels, extra props defs, items by code path
+  taxonomies: TaxonomyDiff[] // by name: taxa by code, vernacular names, extra props
+  surveyFiles: FileDiff[] // map layers, doc images (by name + size/hash)
 }
 ```
 
@@ -170,7 +175,7 @@ interface SurveyDiff {
 - Sort keys recursively; treat `undefined`, `null`, `''`, `[]` and `{}` as equal (empty props are stored
   inconsistently).
 
-#### UI (`webapp/views/App/views/Designer/SurveyCompare/`, TSX)
+#### UI (`webapp/views/App/views/Home/SurveyCompare/`, TSX)
 
 - **Header**: verdict banner — "Identical" (green) / "N differences" with counts per category (node defs added /
   removed / changed / moved; categories; taxonomies; survey info), the two fingerprints, the source file name and
@@ -200,20 +205,20 @@ records and the RDB.
 
 Per change, one of `applicable`, `applicableWithWarning`, `notApplicable` + a reason key (i18n):
 
-| Change on target | Unpublished def / template | Published def |
-| ---------------- | -------------------------- | ------------- |
-| Add node def / category / taxonomy | yes | yes |
-| Labels, descriptions, expressions, validations, layout, `readOnly`, `hidden`, cycles added | yes | yes |
-| Rename (`name`) | yes | warning: breaks expressions using the old name in the target, RDB column renamed on publish |
-| Type change | yes | **no** (would require delete + re-add, data lost) |
-| `multiple` change | yes | **no** |
-| `key` change | yes | **no** (record uniqueness must not change once published) |
-| Category / taxonomy reference change | yes | **no** |
-| Move to another entity | yes | **no** |
-| Delete node def | yes | warning: data of that attribute is deleted on publish |
-| Remove a cycle | yes | warning: `CyclesDeletedCheckJob` deletes records of that cycle |
-| Delete category level / item | yes | **no** for published levels/items (item props can still change) |
-| Delete taxon | yes | warning (published taxa referenced by records) |
+| Change on target                                                                           | Unpublished def / template | Published def                                                                               |
+| ------------------------------------------------------------------------------------------ | -------------------------- | ------------------------------------------------------------------------------------------- |
+| Add node def / category / taxonomy                                                         | yes                        | yes                                                                                         |
+| Labels, descriptions, expressions, validations, layout, `readOnly`, `hidden`, cycles added | yes                        | yes                                                                                         |
+| Rename (`name`)                                                                            | yes                        | warning: breaks expressions using the old name in the target, RDB column renamed on publish |
+| Type change                                                                                | yes                        | **no** (would require delete + re-add, data lost)                                           |
+| `multiple` change                                                                          | yes                        | **no**                                                                                      |
+| `key` change                                                                               | yes                        | **no** (record uniqueness must not change once published)                                   |
+| Category / taxonomy reference change                                                       | yes                        | **no**                                                                                      |
+| Move to another entity                                                                     | yes                        | **no**                                                                                      |
+| Delete node def                                                                            | yes                        | warning: data of that attribute is deleted on publish                                       |
+| Remove a cycle                                                                             | yes                        | warning: `CyclesDeletedCheckJob` deletes records of that cycle                              |
+| Delete category level / item                                                               | yes                        | **no** for published levels/items (item props can still change)                             |
+| Delete taxon                                                                               | yes                        | warning (published taxa referenced by records)                                              |
 
 Form layout: a parent entity's layout (`layoutChildren`, `indexChildren`, per cycle) lists its children by UUID.
 When a child is added, the parent's layout change is linked to it and applied with it; when UUIDs differ (phase 2),
@@ -268,7 +273,7 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 - `server/modules/surveyCompare/`: `SurveyCompareJob` (reads the uploaded zip, keeps it as a temp file, writes the
   result to a temp file), `SurveyCompareApplyJob` (computes the comparison again and applies the selected changes as
   draft), API under `/survey/:surveyId/compare`.
-- `webapp/views/App/views/Designer/SurveyCompare/`: Designer → "Compare / update from file"; texts in the
+- `webapp/views/App/views/Home/SurveyCompare/`: Home dashboard → Advanced functions → "Compare / update from file"; texts in the
   `surveyCompareView` i18n namespace (`core/i18n/resources/en/surveyCompareView.ts`).
 - The uploaded file is limited to 20 MB (`SurveyCompareMaxFileSizeMB`), checked in the browser and on the server, so
   exports with records and record files are rejected.
@@ -310,34 +315,34 @@ Gives a quick yes/no on "identical?" without uploading anything: compare two sho
 Checklist of what is not implemented yet (as of the phase 1 merge, openforis/arena#4540). Where the design is
 already described above, the item points to its section.
 
-### Phase 2 — apply the differences that are only shown today (done, see *Implementation (phase 2)*)
+### Phase 2 — apply the differences that are only shown today (done, see _Implementation (phase 2)_)
 
 - [x] **Deletions** (node defs, categories, category items and levels, taxonomies, taxa, vernacular names). Never
-  selected by default; warning when a published node def is deleted (data deleted on publish); published category
-  levels/items, taxa and vernacular names are kept.
+      selected by default; warning when a published node def is deleted (data deleted on publish); published category
+      levels/items, taxa and vernacular names are kept.
 - [x] **Moves** of a node def to another entity (only on unpublished node defs / templates).
 - [x] **Category level changes** (levels renamed or added at the end; unpublished extra levels deleted).
 - [x] **Category "reporting data" setting**.
 - [x] **Taxonomies**: taxa compared by code (with vernacular names), new taxonomies inserted, taxa added/updated.
 - [x] **Survey info**: languages, labels, descriptions, cycles, default cycle, SRS and other settings; node defs using a
-  missing cycle depend on the cycles change.
+      missing cycle depend on the cycles change.
 - [x] **Survey files**: preloaded map layers, survey doc images, branding images (compared by name and size).
 - [x] **Possible rename suggestions** when uuids differ, confirmed by the user and applied as a rename.
 
 ### Phase 3 and other features
 
-- [ ] **Definition fingerprint** on the dashboard. See *Definition fingerprint*.
-- [ ] **Export the differences** as Excel/CSV and JSON. See *UI*.
-- [ ] **Compare with another survey on the same server**, without exporting a file. See *User flow*.
-- [ ] **Processing chains** comparison. See *Non-goals*.
+- [ ] **Definition fingerprint** on the dashboard. See _Definition fingerprint_.
+- [ ] **Export the differences** as Excel/CSV and JSON. See _UI_.
+- [ ] **Compare with another survey on the same server**, without exporting a file. See _User flow_.
+- [ ] **Processing chains** comparison. See _Non-goals_.
 
 ### Technical
 
 - [ ] **Temp files across app instances**: the uploaded file and the comparison result are kept in the server temp
-  folder between "Compare" and "Apply"; with several instances not sharing it, "Apply" can run on an instance
-  without the file. Store them in a shared place (e.g. the DB or the shared file storage).
+      folder between "Compare" and "Apply"; with several instances not sharing it, "Apply" can run on an instance
+      without the file. Store them in a shared place (e.g. the DB or the shared file storage).
 - [ ] **Chunked upload** of the survey file, like the survey import (today a single request, max 20 MB).
-- [ ] **E2E test** (Playwright) for the view: upload, differences, apply. See *Testing*.
+- [ ] **E2E test** (Playwright) for the view: upload, differences, apply. See _Testing_.
 - [ ] **Translations review** by native speakers (es, fr, ja, mn, pt, ru).
 
 ## Non-goals
@@ -352,12 +357,12 @@ already described above, the item points to its section.
 
 ## Decisions
 
-| Topic | Decision |
-| ----- | -------- |
-| Publish after Apply | No: Apply only writes draft changes, the user tests the form and publishes from the Designer |
-| Layout-only differences | Shown and checked by default, with a filter to hide them |
-| `key` on published node defs | Cannot change: not applicable |
-| Tracking the source file of the last update | Skipped (too complex for now) |
+| Topic                                       | Decision                                                                                     |
+| ------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| Publish after Apply                         | No: Apply only writes draft changes, the user tests the form and publishes from the Designer |
+| Layout-only differences                     | Shown and checked by default, with a filter to hide them                                     |
+| `key` on published node defs                | Cannot change: not applicable                                                                |
+| Tracking the source file of the last update | Skipped (too complex for now)                                                                |
 
 ## Testing
 

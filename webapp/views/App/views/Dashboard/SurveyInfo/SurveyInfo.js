@@ -81,8 +81,23 @@ const SurveyInfo = (props) => {
     })
   }, [confirm, dispatch, surveyName])
 
+  const navigateToSurveyCompare = useCallback(() => navigate(appModuleUri(homeModules.surveyCompare)), [navigate])
+
   const advancedFunctionsItems = useMemo(() => {
-    const items = []
+    const items = [
+      {
+        key: 'survey-compare',
+        content: (
+          <Button
+            iconClassName="icon-loop2 icon-12px icon-left"
+            label="appModules.surveyCompare"
+            onClick={navigateToSurveyCompare}
+            variant="text"
+            testId={TestId.dashboard.surveyCompareBtn}
+          />
+        ),
+      },
+    ]
     if (Survey.isPublished(surveyInfo)) {
       items.push({
         key: 'survey-info-unpublish',
@@ -118,7 +133,14 @@ const SurveyInfo = (props) => {
       content: <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />,
     })
     return items
-  }, [activityLogDisabled, onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
+  }, [
+    activityLogDisabled,
+    navigateToSurveyCompare,
+    onDeleteActivityLogDataClick,
+    onDeleteClick,
+    onUnpublishClick,
+    surveyInfo,
+  ])
 
   const exportMenuItems = useMemo(() => {
     const items = [
