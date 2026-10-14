@@ -1,4 +1,4 @@
-import { getEffectiveUserConfig, getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
+import { getPublicSettings } from '@server/modules/ai/service/aiSettingsService'
 import { defaultFeatureToggles, withoutPersonalProvider } from '@server/modules/ai/service/aiUserPrefs'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import {
@@ -55,7 +55,7 @@ describe('Remove my provider (server)', () => {
       enabled: false,
       hasApiKey: false,
     })
-    expect(getEffectiveUserConfig(user, { decrypt: false })).toBeNull()
+    expect(ProviderResolver.getDefaultGatewayProviderId(user)).toBe('arena-default')
   })
 })
 

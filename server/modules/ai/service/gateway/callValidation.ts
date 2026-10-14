@@ -4,6 +4,7 @@
  * only, no files/provider options, capped output, bounded prompt size.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
+import { isAiProviderId } from '@common/ai/providerIds'
 import { AiFeaturePermission, getAiFeature, isDeclaredDataClassAllowed, isGatewayFeature } from '@common/ai/features'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
 
@@ -28,6 +29,17 @@ const parseSurveyId = (value: unknown, required: boolean): number | undefined =>
 }
 
 /**
+ * Returns the provider id of the request: undefined when absent, else a valid id.
+ * @param {unknown} value - `providerId` of the body (untrusted).
+ * @returns {string|undefined} The id.
+ */
+const parseProviderId = (value: unknown): string | undefined => {
+  if (value === undefined || value === null) return undefined
+  if (!isAiProviderId(value)) throw invalid('providerId')
+  return value
+}
+
+/**
  * Validates the envelope of a gateway request (the call itself is checked by sanitizeCall).
  * @param {unknown} body - Request body.
  * @returns {AiGatewayRequest} The request.
@@ -43,7 +55,9 @@ export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
   if (typeof stream !== 'boolean') throw invalid('stream')
   if (!isObject(call)) throw invalid('call')
   const surveyId = parseSurveyId(body.surveyId, featureDef.permission !== AiFeaturePermission.loggedIn)
-  return { surveyId, feature, dataClass, stream, call: call as AiGatewayCall }
+  const providerId = parseProviderId(body.providerId)
+  // the key is added only when sent, so requests without it keep their exact shape
+  return { surveyId, feature, dataClass, stream, call: call as AiGatewayCall, ...(providerId ? { providerId } : {}) }
 }
 
 const TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/

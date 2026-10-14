@@ -1,6 +1,7 @@
 import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
+import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const KEY_A = 'a'.repeat(64)
 const KEY_B = 'b'.repeat(64)
@@ -37,33 +38,34 @@ describe('saved API key encrypted with a rotated secret', () => {
     else process.env.AI_USER_KEY_ENCRYPTION_SECRET = originalKey
   })
 
-  test('the user config is ignored instead of throwing', () => {
-    expect(AiSettingsService.getEffectiveUserConfig(userWithKey(encrypted))).toBeNull()
-  })
-
   test('the public settings still load and flag the key as unreadable', () => {
     const settings = AiSettingsService.getPublicSettings(userWithKey(encrypted))
     expect(settings.hasApiKey).toBe(true)
     expect(settings.apiKeyReadable).toBe(false)
   })
 
-  test('the resolver falls back to the admin default', () => {
-    expect(ProviderResolver.resolveConfigForUser(userWithKey(encrypted), adminConfig)).toEqual({
-      cfg: adminConfig,
-      source: ProviderResolver.sources.adminDefault,
-    })
+  test('the resolver refuses the provider instead of switching to the admin default', async () => {
+    const error: any = await expectSystemErrorKey(
+      () => ProviderResolver.resolveProviderConfig({ user: userWithKey(encrypted), adminConfig }),
+      'aiApiKeyUnreadable'
+    )
+    expect(error.statusCode).toBe(409)
   })
 
   test('a readable key is used', () => {
     const readable = SecretBox.encrypt('sk-new')
-    expect(AiSettingsService.getEffectiveUserConfig(userWithKey(readable))?.apiKey).toBe('sk-new')
     expect(AiSettingsService.getPublicSettings(userWithKey(readable)).apiKeyReadable).toBe(true)
-    expect(ProviderResolver.resolveConfigForUser(userWithKey(readable), adminConfig)?.source).toBe(
-      ProviderResolver.sources.user
-    )
+    expect(ProviderResolver.resolveProviderConfig({ user: userWithKey(readable), adminConfig })).toMatchObject({
+      source: ProviderResolver.sources.user,
+      providerId: 'acct:legacy',
+      cfg: { apiKey: 'sk-new' },
+    })
   })
 
-  test('no config at all resolves to null', () => {
-    expect(ProviderResolver.resolveConfigForUser({ uuid: 'u', prefs: {} } as any, null)).toBeNull()
+  test('no config at all is aiNotConfigured', async () => {
+    await expectSystemErrorKey(
+      () => ProviderResolver.resolveProviderConfig({ user: { uuid: 'u', prefs: {} } as any, adminConfig: null }),
+      'aiNotConfigured'
+    )
   })
 })
