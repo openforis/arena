@@ -168,6 +168,33 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       await untilClientClosed()
     })
 
+    test('the body of an error is cut at 64 KiB, far below the cap of a success', async () => {
+      answer(500, 'e'.repeat(100 * 1024))
+      const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls })
+      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      await expect(response.text()).rejects.toBeDefined()
+      await untilClientClosed()
+    })
+
+    test('an error body of 60 KiB is read whole', async () => {
+      answer(500, 'e'.repeat(60 * 1024))
+      const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls })
+      const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
+      expect((await response.text()).length).toBe(60 * 1024)
+    })
+
+    test('a call with no signal times out, and one with a signal keeps its own', async () => {
+      handler = () => undefined
+      const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, timeoutMs: 50 })
+      const start = Date.now()
+      await expect(guardedFetch(`http://127.0.0.1:${port}/x`)).rejects.toMatchObject({ name: 'TimeoutError' })
+      expect(Date.now() - start).toBeLessThan(PROMPT_MS)
+      const controller = new AbortController()
+      const own = guardedFetch(`http://127.0.0.1:${port}/x`, { signal: controller.signal })
+      setTimeout(() => controller.abort(new Error('mine')), 150)
+      await expect(own).rejects.toThrow('mine')
+    })
+
     test('a body within its cap is read whole', async () => {
       answer(200, 'a'.repeat(50_000))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, maxBodyBytes: 100_000 })
