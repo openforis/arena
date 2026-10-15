@@ -25,6 +25,61 @@
     }
   }
 
+  &__fingerprints {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: #666;
+  }
+
+  // rows share the grid columns, so the values are aligned
+  &__fingerprint-grid {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    column-gap: 0.75rem;
+    line-height: 1.6;
+  }
+
+  &__fingerprint-row {
+    display: contents;
+  }
+
+  &__fingerprint-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__fingerprint-value {
+    padding: 0 0.25rem;
+    border: none;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.05);
+    color: inherit;
+    font-family: monospace;
+    font-size: 0.75rem;
+    cursor: copy;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  &__fingerprint--equal {
+    color: #2e7d32;
+  }
+
+  &__fingerprint--different {
+    color: #c62828;
+  }
+
+  &__fingerprint-info {
+    text-decoration: underline dotted;
+    cursor: help;
+  }
+
   &__apply-btn {
     margin-left: auto;
   }

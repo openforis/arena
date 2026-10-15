@@ -18,6 +18,11 @@ export default {
   sourceSurvey: 'Inventário comparado: {{name}}',
   compareWithSurvey: 'Ou compare com outro inventário deste servidor:',
   fingerprint: {
+    thisSurvey: 'Este inventário',
+    comparedSurvey: 'Inventário comparado',
+    equal: 'Igual a este inventário',
+    different: 'Diferente deste inventário',
+    whatIsIt: 'O que é?',
     label: 'Impressão digital',
     structural: 'estrutural',
     info: 'Impressões digitais da definição do inventário (rascunho). Impressões iguais significam definições iguais. A primeira inclui os identificadores internos: é igual apenas para cópias do mesmo inventário (por ex. exportado e importado em outro servidor). A estrutural usa nomes e códigos: é igual também para inventários criados separadamente com a mesma estrutura. Nomes, rótulos, identificadores, datas e estado de publicação não fazem parte dela.',
@@ -25,7 +30,7 @@ export default {
     copied: 'Impressão digital copiada para a área de transferência',
   },
   identical: 'Os inventários são idênticos',
-  counts: '{{added}} somente no inventário carregado, {{changed}} alterados, {{removed}} somente neste inventário',
+  counts: '{{added}} somente no inventário comparado, {{changed}} alterados, {{removed}} somente neste inventário',
   surveyInfoChanged:
     'As informações do inventário (idiomas, ciclos, rótulos) são diferentes: veja a aba "Informações do inventário"',
   onlyDifferences: 'Mostrar somente as diferenças',
@@ -39,7 +44,7 @@ As alterações são salvas como rascunho: chegarão aos registros somente quand
   removedItemInfo: 'Apenas neste inventário: aplicar esta alteração elimina-o deste inventário.',
   applyConfirmWithDeletionsHeader: 'Confirmar as eliminações',
   applyConfirmWithDeletions:
-    'Aplicar {{count}} alterações selecionadas a este inventário?\n\n**{{deletionsCount}} delas eliminam elementos deste inventário** (elementos que não estão no inventário carregado):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+    'Aplicar {{count}} alterações selecionadas a este inventário?\n\n**{{deletionsCount}} delas eliminam elementos deste inventário** (elementos que não estão no inventário comparado):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
   applyWithDeletions: 'Aplicar e eliminar',
   confirmSurveyName: 'Introduza o nome deste inventário para confirmar:',
   deletionOfItemsOf: 'elementos apenas neste inventário de **{{name}}**',
@@ -54,7 +59,7 @@ As alterações são salvas como rascunho: chegarão aos registros somente quand
     surveyFiles: 'Arquivos',
   },
   status: {
-    added: 'Somente no inventário carregado',
+    added: 'Somente no inventário comparado',
     changed: 'Alterado',
     removed: 'Somente neste inventário',
   },
@@ -113,7 +118,7 @@ As alterações são salvas como rascunho: chegarão aos registros somente quand
   },
   cycle: 'ciclo {{cycle}}',
   property: 'Propriedade',
-  sourceValue: 'Inventário carregado',
+  sourceValue: 'Inventário comparado',
   targetValue: 'Este inventário',
   emptyValue: '(vazio)',
   layoutOnly: 'somente layout',

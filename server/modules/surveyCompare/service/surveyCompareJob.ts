@@ -7,6 +7,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { SurveyCompareSourceRef, keepFile, keepJson, withSource } from './surveyCompareSource'
 import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
+import { computeSurveyFingerprint } from './surveyFingerprintService'
 
 /**
  * Compares the source survey (uploaded file or another survey on this server) with the survey with the specified id.
@@ -46,7 +47,12 @@ class SurveyCompareDiffJob extends Job {
             targetTaxaByTaxonomyUuid: target.taxaByTaxonomyUuid,
             manualMatches,
           }),
-          source: { name: Survey.getName(sourceSurveyInfo), labels: Survey.getLabels(sourceSurveyInfo) },
+          source: {
+            name: Survey.getName(sourceSurveyInfo),
+            labels: Survey.getLabels(sourceSurveyInfo),
+            fingerprint: computeSurveyFingerprint(source),
+          },
+          target: { fingerprint: computeSurveyFingerprint(target) },
         }
       },
       this.tx

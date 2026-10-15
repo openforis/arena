@@ -37,7 +37,6 @@ export const TestId = {
     surveyDeleteBtn: 'survey-delete-btn',
     surveyCompareBtn: 'survey-compare-btn',
     surveyExportBtn: 'survey-export-btn',
-    surveyFingerprint: 'survey-fingerprint',
     surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
     surveyExportWithDataNoResultAttributesBtn: 'survey-export-with-data-no-result-attributes-btn',
@@ -173,6 +172,8 @@ export const TestId = {
   },
   surveyCompare: {
     applyBtn: 'survey-compare-apply-btn',
+    fingerprint: (type) => `survey-compare-fingerprint-${type}`,
+    sourceFingerprint: (type) => `survey-compare-source-fingerprint-${type}`,
     sourceSurveyDropdown: 'survey-compare-source-survey',
     summary: 'survey-compare-summary',
   },

@@ -11,6 +11,8 @@ import { Urls } from '../helpers/urls'
 // the current survey has no expressions: the survey used as source adds them
 test.use({ sampleSurveyOptions: { withExpressions: false } })
 
+const shortFingerprintRegExp = /^[0-9a-f]{12}$/
+
 test.describe('Survey compare', () => {
   let sourceSurveyId: number | null = null
 
@@ -19,7 +21,7 @@ test.describe('Survey compare', () => {
     sourceSurveyId = null
   })
 
-  test('shows the definition fingerprint and applies the changes of another survey', async ({
+  test('compares with another survey, shows the fingerprints and applies the changes', async ({
     page,
     sampleSurvey,
     testUser,
@@ -32,12 +34,13 @@ test.describe('Survey compare', () => {
 
     await page.goto(Urls.dashboard)
     await expect(page.getByTestId(TestId.dashboard.surveyName)).toHaveText(sampleSurvey.name)
-    const fingerprint = page.getByTestId(TestId.dashboard.surveyFingerprint)
-    await expect(fingerprint).toHaveText(/^[0-9a-f]{12}$/)
-    const fingerprintBefore = await fingerprint.textContent()
-
     await page.getByTestId(TestId.dashboard.advancedFunctionsBtn).click()
     await page.getByTestId(TestId.dashboard.surveyCompareBtn).click()
+
+    // fingerprint of this survey, before comparing
+    const fingerprint = page.getByTestId(TestId.surveyCompare.fingerprint('structural'))
+    await expect(fingerprint).toHaveText(shortFingerprintRegExp)
+    const fingerprintBefore = await fingerprint.textContent()
 
     await selectDropdownItem({
       page,
@@ -47,17 +50,20 @@ test.describe('Survey compare', () => {
     const summary = page.getByTestId(TestId.surveyCompare.summary)
     await expect(summary).toContainText('Node definitions', { timeout: 30_000 })
     await expect(page.getByText(`Compared survey: ${sourceName}`)).toBeVisible()
+    const sourceFingerprint = page.getByTestId(TestId.surveyCompare.sourceFingerprint('structural'))
+    await expect(sourceFingerprint).toHaveText(shortFingerprintRegExp)
+    await expect(sourceFingerprint).not.toHaveText(fingerprintBefore!)
 
     const applyBtn = page.getByTestId(TestId.surveyCompare.applyBtn)
     await expect(applyBtn).toBeEnabled()
     await applyBtn.click()
     await page.getByTestId(TestId.modal.modal).getByRole('button', { name: 'Ok', exact: true }).click()
 
-    // the comparison is computed again after applying the changes
+    // the comparison is computed again after applying the changes: same structure, different ids
     await expect(summary).toHaveText('The surveys are identical', { timeout: 30_000 })
-
-    await page.goto(Urls.dashboard)
-    await expect(fingerprint).toHaveText(/^[0-9a-f]{12}$/)
-    await expect(fingerprint).not.toHaveText(fingerprintBefore!)
+    await expect(fingerprint).toHaveText((await sourceFingerprint.textContent())!)
+    await expect(page.getByTestId(TestId.surveyCompare.sourceFingerprint('strict'))).not.toHaveText(
+      (await page.getByTestId(TestId.surveyCompare.fingerprint('strict')).textContent())!
+    )
   })
 })

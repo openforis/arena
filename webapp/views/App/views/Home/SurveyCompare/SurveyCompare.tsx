@@ -28,6 +28,7 @@ import { getPropLabel } from './surveyCompareValueFormatter'
 import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyCompareTaxonomies } from './SurveyCompareTaxonomies'
+import { SurveyCompareFingerprints, SurveyFingerprint } from './SurveyCompareFingerprints'
 import { SurveyCompareChangesList } from './SurveyCompareChangesList'
 
 const hasDifferences = ({ added, changed, removed }: { added: number; changed: number; removed: number }) =>
@@ -43,7 +44,10 @@ const maxDeletionsListed = 10
 
 const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
 
-type CompareResultWithSource = SurveyCompareResult & { source?: { name?: string } }
+type CompareResultWithSource = SurveyCompareResult & {
+  source?: { name?: string; fingerprint?: SurveyFingerprint }
+  target?: { fingerprint?: SurveyFingerprint }
+}
 
 interface CompareState {
   result: CompareResultWithSource | null
@@ -392,6 +396,11 @@ export const SurveyCompare = () => {
           </span>
         )}
       </div>
+      <SurveyCompareFingerprints
+        surveyId={surveyId}
+        targetFingerprint={result?.target?.fingerprint}
+        sourceFingerprint={result?.source?.fingerprint}
+      />
 
       {result && (
         <>

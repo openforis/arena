@@ -17,6 +17,11 @@ export default {
   sourceSurvey: 'Encuesta comparada: {{name}}',
   compareWithSurvey: 'O compare con otra encuesta de este servidor:',
   fingerprint: {
+    thisSurvey: 'Esta encuesta',
+    comparedSurvey: 'Encuesta comparada',
+    equal: 'Igual que esta encuesta',
+    different: 'Diferente de esta encuesta',
+    whatIsIt: '¿Qué es?',
     label: 'Huella',
     structural: 'estructural',
     info: 'Huellas de la definición de la encuesta (borrador). Huellas iguales significan definiciones iguales. La primera incluye los identificadores internos: es igual solo para copias de la misma encuesta (p. ej. exportada e importada en otro servidor). La estructural usa nombres y códigos: es igual también para encuestas creadas por separado con la misma estructura. Nombres, etiquetas, identificadores, fechas y estado de publicación no forman parte de ella.',
@@ -24,7 +29,7 @@ export default {
     copied: 'Huella copiada al portapapeles',
   },
   identical: 'Las encuestas son idénticas',
-  counts: '{{added}} solo en la encuesta cargada, {{changed}} modificados, {{removed}} solo en esta encuesta',
+  counts: '{{added}} solo en la encuesta comparada, {{changed}} modificados, {{removed}} solo en esta encuesta',
   surveyInfoChanged:
     'La información de la encuesta (idiomas, ciclos, etiquetas) es diferente: vea la pestaña "Información de la encuesta"',
   onlyDifferences: 'Mostrar solo las diferencias',
@@ -38,7 +43,7 @@ Los cambios se guardan como borrador: llegarán a los registros solo cuando se p
   removedItemInfo: 'Solo en esta encuesta: aplicar este cambio lo elimina de esta encuesta.',
   applyConfirmWithDeletionsHeader: 'Confirmar las eliminaciones',
   applyConfirmWithDeletions:
-    '¿Aplicar {{count}} cambios seleccionados a esta encuesta?\n\n**{{deletionsCount}} de ellos eliminan elementos de esta encuesta** (elementos que no están en la encuesta cargada):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
+    '¿Aplicar {{count}} cambios seleccionados a esta encuesta?\n\n**{{deletionsCount}} de ellos eliminan elementos de esta encuesta** (elementos que no están en la encuesta comparada):\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)',
   applyWithDeletions: 'Aplicar y eliminar',
   confirmSurveyName: 'Introduzca el nombre de esta encuesta para confirmar:',
   deletionOfItemsOf: 'elementos solo en esta encuesta de **{{name}}**',
@@ -53,7 +58,7 @@ Los cambios se guardan como borrador: llegarán a los registros solo cuando se p
     surveyFiles: 'Archivos',
   },
   status: {
-    added: 'Solo en la encuesta cargada',
+    added: 'Solo en la encuesta comparada',
     changed: 'Modificado',
     removed: 'Solo en esta encuesta',
   },
@@ -112,7 +117,7 @@ Los cambios se guardan como borrador: llegarán a los registros solo cuando se p
   },
   cycle: 'ciclo {{cycle}}',
   property: 'Propiedad',
-  sourceValue: 'Encuesta cargada',
+  sourceValue: 'Encuesta comparada',
   targetValue: 'Esta encuesta',
   emptyValue: '(vacío)',
   layoutOnly: 'solo diseño',

@@ -81,7 +81,7 @@ Phase 1 already covers the use case above. The other phases add more cases and a
 | ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------- |
 | 1. Compare + apply (MVP) | Upload an exported `.zip`, see the differences tree, apply **additions** and **property changes** (labels, expressions, validations, layout, category items added/changed) to the open survey as draft | Ordering dependent changes, published-survey rules |
 | 2. Full sync             | Removals, moves, renames, cycles, survey info, taxonomies, survey files; matching by name path when UUIDs differ (surveys built by hand in each environment), "possible rename" suggestions            | Matching without UUIDs                             |
-| 3. Fingerprint           | One "definition hash" per survey on the dashboard: check that Dev, QA and Prod are identical without uploading anything                                                                                | Picking the normalization rules                    |
+| 3. Fingerprint           | One "definition hash" per survey in the compare view: check that Dev, QA and Prod are identical without uploading anything                                                                             | Picking the normalization rules                    |
 
 ### Comparison (phase 1, name-path matching in phase 2)
 
@@ -263,8 +263,10 @@ taxaByTaxonomyUuid, type })` → canonical JSON, built with the same normalizers
     were created separately.
 - Computed on demand: `GET /api/survey/:surveyId/fingerprint?draft=true|false`. Draft and published give
   different values, so a Prod survey with unpublished edits is visible as such.
-- UI: dashboard `SurveyInfo` card, a "Fingerprint" row with the draft strict and structural values (first 12 chars,
-  click to copy the full value).
+- UI: in the compare view only (not on the dashboard). Before comparing, the fingerprints of this survey (fetched
+  from the endpoint); after comparing, those of this survey and of the compared survey (computed by the compare job
+  and stored in the result), with a mark telling whether they are equal. First 12 chars shown, click to copy the full
+  value.
 
 ## Implementation (phase 1)
 
@@ -325,7 +327,7 @@ taxaByTaxonomyUuid, type })` → canonical JSON, built with the same normalizers
 - **Definition fingerprint**: see _Definition fingerprint_.
 - Tests: `test/unit/tests/057surveyFingerprint.test.ts`, third and fourth tests in
   `test/integration/tests/053surveyCompareApplyTest.ts` (source survey on the same server, fingerprints of surveys in
-  sync), `test/e2e/specs/surveyCompare.spec.ts` (fingerprint on the dashboard, compare with another survey, apply).
+  sync), `test/e2e/specs/surveyCompare.spec.ts` (compare with another survey, fingerprints, apply).
 
 ## Remaining work
 
@@ -348,7 +350,7 @@ already described above, the item points to its section.
 
 ### Phase 3 and other features
 
-- [x] **Definition fingerprint** on the dashboard. See _Definition fingerprint_.
+- [x] **Definition fingerprint** in the compare view. See _Definition fingerprint_.
 - [ ] **Export the differences** as Excel/CSV and JSON. See _UI_. (Not planned for now.)
 - [x] **Compare with another survey on the same server**, without exporting a file. See _Implementation (phase 3)_.
 - [ ] **Processing chains** comparison. See _Non-goals_.
