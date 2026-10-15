@@ -64,6 +64,15 @@ describe.each([
     expect(await store.get(mine.id, '')).toBeNull()
   })
 
+  test('remove deletes the conversation of its owner only', async () => {
+    const mine = conversation({ userUuid: 'u1', surveyId: 7 })
+    await store.save(mine)
+    await store.remove(mine.id, 'u2')
+    expect(await store.get(mine.id, 'u1')).not.toBeNull()
+    await store.remove(mine.id, 'u1')
+    expect(await store.get(mine.id, 'u1')).toBeNull()
+  })
+
   test('removeSurvey deletes the survey conversations of every user and keeps the rest', async () => {
     const mine = conversation({ userUuid: 'u1', surveyId: 7 })
     const theirs = conversation({ userUuid: 'u2', surveyId: 7 })
