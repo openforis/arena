@@ -116,17 +116,25 @@ const parseInProgressEntry = (value: unknown, id: string): InProgressEntry | nul
 /**
  * Parses a stored value.
  * @param {string|null} raw - Stored JSON.
+ * @param {Function} [onCorrupt] - Called when the value is not a state: it is dropped, and so are its dismissals.
  * @returns {SuggestionUserState} The state.
  */
-export const parseSuggestionState = (raw: string | null): SuggestionUserState => {
+export const parseSuggestionState = (
+  raw: string | null,
+  onCorrupt?: (error?: unknown) => void
+): SuggestionUserState => {
   if (!raw) return emptySuggestionState()
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
-  } catch {
+  } catch (error) {
+    onCorrupt?.(error)
     return emptySuggestionState()
   }
-  if (!isPlainObject(parsed)) return emptySuggestionState()
+  if (!isPlainObject(parsed)) {
+    onCorrupt?.()
+    return emptySuggestionState()
+  }
   const { pending, dismissed, inProgress, seenModules } = parsed
   return {
     pending: parseRecord(pending, parsePendingBucket) ?? {},

@@ -3,6 +3,7 @@
  * key, applies the change and writes it back in one synchronous step; the `storage` event of the other tabs notifies
  * the subscribers. When the storage is blocked or full, the values live in memory for the session.
  */
+import { logAiWarning } from '@webapp/ai/log/aiLog'
 import {
   createResilientStorage,
   getBrowserLocalStorage,
@@ -133,6 +134,20 @@ export const createSuggestionStore = ({
 } = {}): SuggestionStore => {
   const storage = createResilientStorage({ getStorage: () => access.getStorage(), log })
   const listeners = new Set<() => void>()
+  // a corrupt value is read many times before the next write replaces it: reported once
+  let reportedCorrupt: string | null = null
+
+  /**
+   * Parses a stored value; a corrupt one is reported (it loses the dismissals) and replaced by an empty state.
+   * @param {string|null} raw - Stored JSON.
+   * @returns {SuggestionUserState} The state.
+   */
+  const parse = (raw: string | null): SuggestionUserState =>
+    parseSuggestionState(raw, (error) => {
+      if (raw === reportedCorrupt) return
+      reportedCorrupt = raw
+      ;(log ?? logAiWarning)('The stored suggestions are corrupt: they were reset, and the dismissals are lost', error)
+    })
 
   /**
    * Notifies the subscribers.
@@ -147,8 +162,7 @@ export const createSuggestionStore = ({
    * @param {string} userUuid - User UUID.
    * @returns {SuggestionUserState} The state.
    */
-  const read = (userUuid: string): SuggestionUserState =>
-    parseSuggestionState(storage.read(getSuggestionsKey(userUuid)))
+  const read = (userUuid: string): SuggestionUserState => parse(storage.read(getSuggestionsKey(userUuid)))
 
   /**
    * Re-reads, changes and writes the state of a user; notifies only when it changed. The state is kept within its
@@ -164,7 +178,7 @@ export const createSuggestionStore = ({
     keepBucket: string | null = null
   ): void => {
     const key = getSuggestionsKey(userUuid)
-    const current = parseSuggestionState(storage.read(key))
+    const current = parse(storage.read(key))
     const options = { keepBucket }
     const next = normalizeSuggestionState(change(current), now(), options)
     const json = JSON.stringify(next)
@@ -231,7 +245,7 @@ export const createSuggestionStore = ({
     },
     removeSurvey: (surveyId) => {
       for (const key of storage.keys(KEY_PREFIX)) {
-        const current = parseSuggestionState(storage.read(key))
+        const current = parse(storage.read(key))
         const next = withoutBucket(current, toBucket(surveyId))
         if (JSON.stringify(next) !== JSON.stringify(current)) storage.write(key, JSON.stringify(next))
       }

@@ -202,4 +202,19 @@ describe('suggestion store: quota, expiry and the stored shape (426)', () => {
     expect(stored.pending['1'][0].targets).toEqual([{ key: 'b:labels' }])
     expect(stored.dismissed['1']['missingTranslations:fr'].targets).toEqual({ 'a:labels': expect.anything() })
   })
+
+  test('a corrupt stored state is reported once, however often it is read, and starts empty', () => {
+    const { data, storage } = limitedStorage(100_000)
+    data.set(KEY, '{"pending": oops')
+    const { store, log } = newStore({ storage })
+    expect(store.getPending({ userUuid, surveyId: 1 })).toEqual([])
+    expect(store.getPending({ userUuid, surveyId: 1 })).toEqual([])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log).toHaveBeenCalledWith(expect.stringMatching(/corrupt.*dismissals are lost/), expect.any(Error))
+    // the next write replaces it
+    store.markModuleSeen({ userUuid, module: 'designer' })
+    expect(JSON.parse(data.get(KEY) ?? 'null').seenModules).toEqual(['designer'])
+    store.getPending({ userUuid, surveyId: 1 })
+    expect(log).toHaveBeenCalledTimes(1)
+  })
 })
