@@ -6,8 +6,6 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
   .modal-content {
     width: 34rem;
     max-width: calc(100vw - 2rem);
-    // the shared modal's 20vw side margins pin a fixed-width dialog to the left: center it instead
-    margin: 10vh auto auto;
   }
 
   &__body,

@@ -197,7 +197,7 @@ export const ProviderDialog = ({ saved, context, onClose, onSaved }: Props) => {
   const providerType = saved ? getProviderTypeSpec(saved.dialogType).providerType : ''
   return (
     <Modal
-      className="provider-dialog"
+      className="provider-dialog modal--centered"
       title={saved ? 'userAiSettings:dialog.editTitle' : 'userAiSettings:dialog.addTitle'}
       // the name is shown as text (React escapes it)
       titleParams={{
