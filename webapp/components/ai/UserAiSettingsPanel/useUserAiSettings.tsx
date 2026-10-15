@@ -19,9 +19,11 @@ import {
   createEmptyForm,
   type FeatureCategory,
   type FormState,
+  getApiErrorMessage,
   settingsToForm,
   withAccessLevel,
 } from './aiSettingsForm'
+import { useT } from './useT'
 
 export type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
@@ -52,6 +54,7 @@ const isAiDisabledError = (error: any): boolean => {
  */
 export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const i18n = useI18n()
+  const t = useT()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
 
@@ -70,16 +73,18 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       setDirty(false)
     } catch (error: any) {
       if (isAiDisabledError(error)) setSettings({ aiFeaturesDisabled: true })
-      else notifyError({ key: 'common.fetchError', params: { message: error?.message || 'unknown' } })
+      else notifyError({ key: 'common.fetchError', params: { message: getApiErrorMessage({ error, t }) } })
     } finally {
       setLoading(false)
     }
-  }, [notifyError])
+  }, [notifyError, t])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch settings on mount
     fetchSettings()
-  }, [fetchSettings])
+    // only on mount: a language change must not reload the settings and drop the unsaved form
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // after a provider action: new settings, the unsaved level and switches stay
   const reloadSettings = useCallback(async () => {
@@ -114,11 +119,11 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       refreshAiCapabilities().catch(() => undefined)
       notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
     } catch (error: any) {
-      notifyError({ key: 'userAiSettings:saveFailed', params: { message: error?.message || 'unknown' } })
+      notifyError({ key: 'userAiSettings:saveFailed', params: { message: getApiErrorMessage({ error, t }) } })
     } finally {
       setSaving(false)
     }
-  }, [form, notifyError, notifyInfo])
+  }, [form, notifyError, notifyInfo, t])
 
   return {
     i18n,
