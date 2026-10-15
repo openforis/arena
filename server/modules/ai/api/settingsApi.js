@@ -27,7 +27,7 @@ import { requireAiFeaturesEnabled } from './aiMiddleware'
 import { limitProviderCalls } from './providerRateLimit'
 
 /**
- * Returns the body of GET /api/ai/settings (spec section 3): the settings, the providers and the instance fields.
+ * Returns the body of GET /api/ai/settings: the settings, the providers and the instance fields.
  * @param {object} user - Arena user.
  * @returns {object} The settings body.
  */

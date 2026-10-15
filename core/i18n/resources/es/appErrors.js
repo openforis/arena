@@ -143,6 +143,8 @@ export default {
     'No se pueden guardar claves de API: el servidor no tiene un secreto de cifrado. Pida a su administrador que configure AI_USER_KEY_ENCRYPTION_SECRET.',
   aiProviderChanged:
     'Este proveedor de IA se modificó o se eliminó mientras se comprobaba. Recargue los ajustes de IA e inténtelo de nuevo.',
+  aiProviderFieldTooLong: 'Un valor del proveedor es demasiado largo: {{field}} admite como máximo {{max}} caracteres.',
+  aiProviderLimitReached: 'Puede guardar como máximo {{max}} proveedores de IA. Elimine uno para añadir otro.',
   aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
   aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',

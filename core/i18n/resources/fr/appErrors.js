@@ -144,6 +144,10 @@ Essayez de rafraîchir la page.`,
     "Les clés API ne peuvent pas être enregistrées : le serveur n'a pas de secret de chiffrement. Demandez à votre administrateur de définir AI_USER_KEY_ENCRYPTION_SECRET.",
   aiProviderChanged:
     "Ce fournisseur d'IA a été modifié ou supprimé pendant sa vérification. Rechargez les paramètres d'IA et réessayez.",
+  aiProviderFieldTooLong:
+    'Une valeur du fournisseur est trop longue : {{field}} peut avoir {{max}} caractères au plus.',
+  aiProviderLimitReached:
+    "Vous pouvez enregistrer au plus {{max}} fournisseurs d'IA. Supprimez-en un pour en ajouter un autre.",
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
   aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
   aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',

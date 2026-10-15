@@ -138,6 +138,8 @@ Tente atualizar a página.`,
     'Não é possível salvar chaves de API: o servidor não tem um segredo de criptografia. Peça ao seu administrador para definir AI_USER_KEY_ENCRYPTION_SECRET.',
   aiProviderChanged:
     'Este provedor de IA foi alterado ou removido durante a verificação. Recarregue as configurações de IA e tente novamente.',
+  aiProviderFieldTooLong: 'Um valor do provedor é demasiado longo: {{field}} pode ter no máximo {{max}} caracteres.',
+  aiProviderLimitReached: 'Pode guardar no máximo {{max}} provedores de IA. Remova um para adicionar outro.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',

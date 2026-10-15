@@ -112,6 +112,8 @@ Try to refresh the page.`,
     'API keys cannot be saved: the server has no encryption secret. Ask your administrator to set AI_USER_KEY_ENCRYPTION_SECRET.',
   aiProviderChanged:
     'This AI provider was changed or removed while it was being checked. Reload the AI settings and try again.',
+  aiProviderFieldTooLong: 'A provider value is too long: {{field}} can have at most {{max}} characters.',
+  aiProviderLimitReached: 'You can save at most {{max}} AI providers. Remove one to add another.',
   aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',
   aiExpressionTypeInvalid: 'Unknown expression kind: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Cannot generate an expression without a target field.',
