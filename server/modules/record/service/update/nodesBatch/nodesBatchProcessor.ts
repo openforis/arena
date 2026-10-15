@@ -33,6 +33,12 @@ export type NodesBatchProcessorDeps = {
   getSurvey: (msg: NodesBatchPersistMessage) => Promise<any>
   runWithRecordLock: <T>(recordUuid: string, fn: (t: any) => Promise<T>) => Promise<T>
   getOrFetchRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string; t: any }) => Promise<any | null>
+  // step and owner as they are in the database: the thread cache does not see their changes
+  fetchRecordStepAndOwner: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    t: any
+  }) => Promise<{ step: string; ownerUuid: string } | null>
   // the group qualifier filters of the user (the same rule as the request check, see the batch service)
   fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: any; t: any }) => Promise<any>
   recordMatchesQualifierFilters: (params: {
@@ -224,6 +230,21 @@ const isRecordEditAllowed = (state: BatchState, record: any): boolean =>
   matchesQualifiers(state, record, null)
 
 /**
+ * Returns the record with the step and owner stored in the database. The thread cache is checked with the date of
+ * the last modification, which a change of step or owner does not touch (and another process may have made it).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The (possibly cached) record.
+ * @param {object} t - The transaction.
+ * @returns {Promise<object|null>} The record for the permission check, or null when it no longer exists.
+ */
+const withFreshStepAndOwner = async (state: BatchState, record: any, t: any): Promise<any | null> => {
+  const { msg, deps } = state
+  const fresh = await deps.fetchRecordStepAndOwner({ msg, recordUuid: msg.recordUuid, t })
+  if (!fresh) return null
+  return { ...record, [Record.keys.step]: fresh.step, [Record.keys.ownerUuid]: fresh.ownerUuid }
+}
+
+/**
  * Checks and persists one edit.
  * @param {object} params - The parameters.
  * @param {BatchState} params.state - The batch state.
@@ -273,7 +294,9 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
   let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
   if (!record) return edits.map(({ index }) => conflictResult(index))
   state.qualifierFilters = await deps.fetchQualifierFilters({ msg, survey, t })
-  if (!isRecordEditAllowed(state, record)) return failedResults(edits, NodesBatchMessageKeys.forbidden)
+  const recordToCheck = await withFreshStepAndOwner(state, record, t)
+  if (!recordToCheck) return edits.map(({ index }) => conflictResult(index))
+  if (!isRecordEditAllowed(state, recordToCheck)) return failedResults(edits, NodesBatchMessageKeys.forbidden)
 
   for (const edit of edits) {
     assertBeforeDeadline(state)

@@ -4,12 +4,14 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
+import * as RecordStep from '@core/record/recordStep'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryApi from '@server/modules/category/api/categoryApi'
 import * as RecordApi from '@server/modules/record/api/recordApi'
 import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
@@ -229,6 +231,34 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
 
       expect(results[0]).toMatchObject({ index: 0, status: 'failed', messageKey: notEditableKey })
       expect(Node.getValue(nodeOf(await fetchRecord(record), 'root/plot/plot_num'))).toBe(3)
+    })
+  })
+
+  describe('the permission under the record lock', () => {
+    test('a promotion to analysis after the thread cached the record is seen: the step is read from the database', async () => {
+      const record = await insertRecord({ key: 'lock-step' })
+      // the first edit makes the thread cache the record
+      expect(await update([editOf(record, 'root/num', 1, 2)])).toEqual([{ index: 0, status: 'applied' }])
+      // the step change does not touch the date the cache is checked with
+      await RecordRepository.updateRecordStep(surveyId, Record.getUuid(record), RecordStep.analysisCode)
+      // the request check is skipped on purpose (the race): the thread check is the only guard
+      const staleRecord = await fetchRecord(record)
+      const staleDeps = { ...deps(), fetchRecord: async () => ({ ...staleRecord, step: '1' }) }
+
+      const results = await updateNodesBatch(
+        {
+          user,
+          surveyId,
+          cycle: Survey.cycleOneKey,
+          edits: [editOf(record, 'root/num', 2, 3)] as any,
+          timezoneOffset: 0,
+          lang: 'en',
+        },
+        staleDeps
+      )
+
+      expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:forbidden' }])
+      expect(Node.getValue(nodeOf(await fetchRecord(record), 'root/num'))).toBe(2)
     })
   })
 
