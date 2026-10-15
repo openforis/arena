@@ -45,7 +45,7 @@ const ConnectStep = ({ dialog }: { dialog: ProviderDialogApi }) => {
         <b>{t(`userAiSettings:types.${spec.value}`)}</b>
       </div>
       {spec.kind === 'local' ? <LocalProviderFields dialog={dialog} /> : <AccountProviderFields dialog={dialog} />}
-      <FormItem label="userAiSettings:dialog.name">
+      <FormItem label="userAiSettings:dialog.name" htmlFor={TestId.ai.providerName}>
         <Input
           id={TestId.ai.providerName}
           value={draft.name}

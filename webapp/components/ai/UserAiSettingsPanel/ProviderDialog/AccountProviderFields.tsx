@@ -28,7 +28,7 @@ const BaseUrlField = ({ dialog }: Props) => {
   const { t, draft, spec, context } = dialog
   const isOrgServer = spec.value === 'orgServer'
   return (
-    <FormItem label="userAiSettings:baseUrl">
+    <FormItem label="userAiSettings:baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
       <div className="provider-dialog__field">
         <Input
           id={TestId.ai.providerBaseUrl}
@@ -84,7 +84,7 @@ const ApiKeyField = ({ dialog }: Props) => {
     keyCleared,
   })
   return (
-    <FormItem label="userAiSettings:apiKey">
+    <FormItem label="userAiSettings:apiKey" htmlFor={TestId.ai.providerApiKey}>
       <div className="provider-dialog__field">
         {/* new-password: a browser must not fill in the Arena login password, which Test would send to the URL */}
         <PasswordInput
@@ -127,14 +127,14 @@ const ModelField = ({ dialog }: Props) => {
   const { t, draft, spec, models } = dialog
   const useSelect = models.length > 0 && !draft.modelFreeText
   return (
-    <FormItem label="userAiSettings:model">
+    <FormItem label="userAiSettings:model" htmlFor={TestId.ai.providerModel}>
       <div className="provider-dialog__field">
         <div className="provider-dialog__row">
           <div className="provider-dialog__grow">
             {useSelect ? (
               <select
+                id={TestId.ai.providerModel}
                 className="provider-dialog__select"
-                aria-label={t('userAiSettings:model')}
                 value={draft.model}
                 onChange={(event) => dialog.selectModel(event.target.value)}
                 data-testid={TestId.ai.providerModel}
