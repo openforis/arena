@@ -55,6 +55,8 @@ export const TestId = {
   aiAssistant: {
     aiSettingsBtn: 'ai-assistant-ai-settings-btn',
     applyBtn: 'ai-assistant-apply-btn',
+    applyConfirm: 'ai-assistant-apply-confirm',
+    applyConfirmBtn: 'ai-assistant-apply-confirm-btn',
     categoryLabelGroup: (categoryName) => `ai-assistant-category-label-group-${categoryName}`,
     categoryLabelRow: (categoryUuid, ref, lang) => `ai-assistant-category-label-row-${categoryUuid}-${ref}-${lang}`,
     changeSetCard: 'ai-assistant-change-set-card',

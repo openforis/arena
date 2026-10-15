@@ -1,6 +1,6 @@
 import './RecordEditCard.scss'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
@@ -16,6 +16,9 @@ import { Button } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
+
+import { useExclusiveRun } from '../useExclusiveRun'
+import { useOperationSelection } from '../useOperationSelection'
 
 type Props = {
   changeSet: ChangeSet
@@ -102,38 +105,29 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
   const operations = useMemo(() => changeSet.operations.filter(isRecordEditOperation), [changeSet])
   const groups = useMemo(() => groupOperationsByRecord(operations), [operations])
   const selectableIds = useMemo(() => getSelectableOperationIds(operations, results), [operations, results])
-  const [deselectedIds, setDeselectedIds] = useState<string[]>([])
+  const { selectedIds, toggle } = useOperationSelection({ selectableIds })
+  const { running, run } = useExclusiveRun()
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
-  // set before the re-render, so two quick clicks can't both start an Apply
-  const applyingRef = useRef(false)
   const resultById = useMemo(() => new Map(results.map((result) => [result.id, result])), [results])
   const counts = countOperationResults(results)
 
-  const onToggle = useCallback((id: string) => {
-    setDeselectedIds((previous) => (previous.includes(id) ? previous.filter((item) => item !== id) : [...previous, id]))
-  }, [])
-
   const apply = useCallback(
-    async (operationIds: string[]) => {
-      if (applyingRef.current) return
-      applyingRef.current = true
-      // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
-      const selected = operations.filter((operation) => operationIds.includes(operation.id))
-      setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
-      try {
-        await onApply(operationIds, (done, total) => setProgress({ done, total }))
-      } finally {
-        applyingRef.current = false
-        setProgress(null)
-      }
-    },
-    [onApply, operations]
+    (operationIds: string[]) =>
+      run(async () => {
+        // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
+        const selected = operations.filter((operation) => operationIds.includes(operation.id))
+        setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
+        try {
+          await onApply(operationIds, (done, total) => setProgress({ done, total }))
+        } finally {
+          setProgress(null)
+        }
+      }),
+    [onApply, operations, run]
   )
 
-  const applicableSelectedIds = selectableIds.filter((id) => !deselectedIds.includes(id))
   const retryIds = getRetryOperationIds(results)
-  const applying = progress !== null
-  const locked = applying || busy
+  const locked = running || busy
 
   return (
     <div className="ai-cleaning-card" data-testid={TestId.aiCleaning.card}>
@@ -156,15 +150,15 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
                 key={operation.id}
                 operation={operation}
                 result={resultById.get(operation.id)}
-                selected={selectableIds.includes(operation.id) && !deselectedIds.includes(operation.id)}
+                selected={selectedIds.includes(operation.id)}
                 selectable={!locked && selectableIds.includes(operation.id)}
-                onToggle={onToggle}
+                onToggle={toggle}
               />
             ))}
           </ul>
         </section>
       ))}
-      {applying && (
+      {progress && (
         <div className="ai-cleaning-card__progress" data-testid={TestId.aiCleaning.progress}>
           {i18n.t('aiCleaning.card.applying', progress)}
         </div>
@@ -173,10 +167,10 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
       <div className="ai-cleaning-card__actions">
         <Button
           primary
-          disabled={locked || applicableSelectedIds.length === 0}
+          disabled={locked || selectedIds.length === 0}
           label="aiCleaning.card.applySelected"
-          labelParams={{ count: applicableSelectedIds.length }}
-          onClick={() => apply(applicableSelectedIds)}
+          labelParams={{ count: selectedIds.length }}
+          onClick={() => apply(selectedIds)}
           testId={TestId.aiCleaning.applyBtn}
         />
         {retryIds.length > 0 && (

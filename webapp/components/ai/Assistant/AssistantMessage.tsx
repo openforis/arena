@@ -1,6 +1,5 @@
 import React from 'react'
 
-import { assistantAreaFeatures } from '@webapp/ai/agent/runAssistantTurn'
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import { isRecordEditChangeSet } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
@@ -18,12 +17,10 @@ import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import type { AssistantArea } from './assistantAreas'
 import { AssistantMarkdown } from './AssistantMarkdown'
 import { canOpenProviderChooser } from './providerChip/providerChipModel'
 import { getProposedChangeSetId, getToolRowLabel, isHiddenToolPart } from './assistantPanelModel'
 import { getProposedQueryId } from './analysis/analysisArea'
-import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { QueryCard } from './analysis/QueryCard'
 import { RecordEditCard } from './cleaning/RecordEditCard'
 import { ChangeSetCard } from './ChangeSetCard'
@@ -110,25 +107,28 @@ const AnswerPart = ({
   return (
     <>
       <ToolRow interrupted={part.state === 'running' && !streaming} part={part} />
-      {cardState &&
-        (isRecordEditChangeSet(cardState.changeSet) ? (
-          <RecordEditCard
-            busy={api.busy || api.applying}
-            changeSet={cardState.changeSet}
-            onApply={(operationIds, onProgress) =>
-              api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)
-            }
-            results={cardState.results}
-          />
-        ) : (
-          <ChangeSetCard
-            busy={api.busy}
-            cardState={cardState}
-            onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
-            onDiscard={() => api.discard(cardState.changeSet.id)}
-          />
-        ))}
-      {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
+      {/* the cards are controls, not text: they stay out of what the screen reader reads aloud as the answer streams */}
+      <div aria-live="off" className="ai-assistant-message__cards">
+        {cardState &&
+          (isRecordEditChangeSet(cardState.changeSet) ? (
+            <RecordEditCard
+              busy={api.busy || api.applying}
+              changeSet={cardState.changeSet}
+              onApply={(operationIds, onProgress) =>
+                api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)
+              }
+              results={cardState.results}
+            />
+          ) : (
+            <ChangeSetCard
+              busy={api.busy || api.applying}
+              cardState={cardState}
+              onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
+              onDiscard={() => api.discard(cardState.changeSet.id)}
+            />
+          ))}
+        {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
+      </div>
     </>
   )
 }
@@ -138,24 +138,23 @@ const AnswerPart = ({
  * @param {object} props - Props.
  * @param {AssistantMessage} props.message - Answer.
  * @param {boolean} props.isLast - Last message.
- * @param {AssistantArea} props.area - Current area (its feature decides the record-data notice).
+ * @param {boolean} props.recordDataNotice - The record-data notice replaces the composer (computed once by the chat).
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement|null} The footer.
  */
 const AnswerFooter = ({
   message,
   isLast,
-  area,
+  recordDataNotice,
   api,
 }: {
   message: AssistantMessage
   isLast: boolean
-  area: AssistantArea
+  recordDataNotice: boolean
   api: AssistantConversationApi
 }) => {
   const t = useI18nT({ unescapeHtml: true })
-  // the record-data notice replaces the composer: the conversation can't continue, so no Retry
-  const recordDataNotice = useRecordDataNotice(api.conversation, assistantAreaFeatures[area], api.providerId)
+  // with the record-data notice the conversation can't continue, so no Retry
   const capabilities = useAiCapabilities()
   if (message.status === 'stopped') return <p className="ai-assistant-message__stopped">{t('aiAssistant.stopped')}</p>
   if (message.status !== 'error') return null
@@ -199,8 +198,8 @@ const AnswerFooter = ({
  * @param {ConversationMessage} props.message - Message.
  * @param {object} props.changeSets - Cards of the conversation.
  * @param {object} props.queries - Queries of the conversation.
- * @param {boolean} props.isLast - Last message (Retry).
- * @param {AssistantArea} props.area - Current area.
+ * @param {boolean} props.isLast - Last message: Retry, and the one announced to screen readers.
+ * @param {boolean} props.recordDataNotice - The record-data notice replaces the composer (computed once by the chat).
  * @param {AssistantConversationApi} props.api - Conversation state and actions.
  * @returns {React.ReactElement|null} The message.
  */
@@ -209,14 +208,14 @@ export const AssistantMessageView = ({
   changeSets,
   queries,
   isLast,
-  area,
+  recordDataNotice,
   api,
 }: {
   message: ConversationMessage
   changeSets: ChangeSets
   queries: Queries
   isLast: boolean
-  area: AssistantArea
+  recordDataNotice: boolean
   api: AssistantConversationApi
 }) => {
   if (message.role === 'applyNote') return null
@@ -229,6 +228,9 @@ export const AssistantMessageView = ({
   }
   return (
     <div
+      // only the newest answer is announced, once it is complete (aria-busy), not with every token
+      aria-busy={message.status === 'streaming'}
+      aria-live={isLast ? 'polite' : undefined}
       className="ai-assistant-message ai-assistant-message--assistant"
       data-status={message.status}
       data-testid={TestId.aiAssistant.message('assistant')}
@@ -245,7 +247,7 @@ export const AssistantMessageView = ({
         />
       ))}
       {message.status === 'streaming' && <span aria-hidden="true" className="ai-assistant-message__typing" />}
-      <AnswerFooter api={api} area={area} isLast={isLast} message={message} />
+      <AnswerFooter api={api} isLast={isLast} message={message} recordDataNotice={recordDataNotice} />
     </div>
   )
 }

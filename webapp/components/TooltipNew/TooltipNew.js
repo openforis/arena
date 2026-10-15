@@ -16,11 +16,13 @@ export const TooltipNew = (props) => {
     children,
     className,
     closeOnClick = false,
+    disableFocusListener = false,
     isTitleMarkdown,
     markdownClassName,
     maxWidth,
     title: titleProp,
     renderTitle,
+    suppressed = false,
   } = props
 
   const t = useI18nT()
@@ -76,11 +78,11 @@ export const TooltipNew = (props) => {
     <Tooltip
       arrow
       classes={tooltipClass}
-      disableFocusListener={openSuppressed}
-      disableHoverListener={openSuppressed}
+      disableFocusListener={openSuppressed || disableFocusListener}
+      disableHoverListener={openSuppressed || suppressed}
       onClose={onClose}
       onOpen={onOpen}
-      open={open}
+      open={open && !suppressed}
       slotProps={{
         tooltip: {
           sx: {
@@ -101,9 +103,12 @@ TooltipNew.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   closeOnClick: PropTypes.bool,
+  disableFocusListener: PropTypes.bool,
   isTitleMarkdown: PropTypes.bool,
   markdownClassName: PropTypes.string,
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderTitle: PropTypes.func,
+  // another element shows the same content: no tooltip meanwhile
+  suppressed: PropTypes.bool,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }

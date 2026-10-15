@@ -1,8 +1,12 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 
 import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
+import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
+import { useExclusiveRun } from './useExclusiveRun'
+import { useOperationSelection } from './useOperationSelection'
 
 export type ChangeSetSelection = {
   pendingIds: string[]
@@ -10,18 +14,22 @@ export type ChangeSetSelection = {
   // pending without conflict
   selectableIds: string[]
   selectedIds: string[]
+  // expression and property changes that are not selected (they start unselected on a long change set)
+  unselectedBehaviourIds: string[]
   applying: boolean
   toggle: (id: string) => void
   setSelected: (ids: string[], selected: boolean) => void
   apply: () => Promise<void>
-  discard: () => Promise<void>
+  // asks first: a discarded proposal can't be brought back
+  discard: () => void
 }
 
 /**
  * Selection, Apply and Discard of a change set, shared by its card and its review dialog. Every pending operation
- * without conflict starts selected.
+ * without conflict starts selected, except the expression and property changes of a compact card.
  * @param {object} params - Parameters.
  * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {boolean} params.compact - The card is compact: its changes are reviewed in the dialog.
  * @param {object} params.survey - Current survey (conflicts).
  * @param {Function} params.onApply - Applies the selected operations.
  * @param {Function} params.onDiscard - Discards the card.
@@ -29,62 +37,55 @@ export type ChangeSetSelection = {
  */
 export const useChangeSetSelection = ({
   cardState,
+  compact,
   survey,
   onApply,
   onDiscard,
 }: {
   cardState: ChangeSetCardState
+  compact: boolean
   survey: any
   onApply: (operationIds: string[]) => Promise<void>
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
-  const [deselected, setDeselected] = useState<string[]>([])
-  const [applying, setApplying] = useState(false)
-  // set before the re-render, so two quick clicks can't both start an Apply
-  const applyingRef = useRef(false)
-
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
   const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
   const selectableIds = useMemo(() => pendingIds.filter((id) => !conflictIds.includes(id)), [conflictIds, pendingIds])
-  const selectedIds = useMemo(() => selectableIds.filter((id) => !deselected.includes(id)), [deselected, selectableIds])
+  const { selectedIds, toggle, setSelected } = useOperationSelection({
+    selectableIds,
+    getInitialDeselectedIds: () => getInitialDeselectedIds({ changeSet: cardState.changeSet, compact }),
+  })
+  const { running: applying, run } = useExclusiveRun()
+  const confirm = useConfirm()
+  const notifyError = useNotifyError()
 
-  const toggle = useCallback(
-    (id: string) => setDeselected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id])),
-    []
+  const unselectedBehaviourIds = useMemo(
+    () =>
+      getBehaviourOperationIds(cardState.changeSet).filter(
+        (id) => selectableIds.includes(id) && !selectedIds.includes(id)
+      ),
+    [cardState.changeSet, selectableIds, selectedIds]
   )
-
-  const setSelected = useCallback(
-    (ids: string[], selected: boolean) =>
-      setDeselected((prev) => (selected ? prev.filter((id) => !ids.includes(id)) : [...new Set([...prev, ...ids])])),
-    []
-  )
-
-  /**
-   * Runs an Apply or Discard unless one is already running.
-   * @param {Function} action - The action to run.
-   * @returns {Promise<void>} Resolves when the action ends.
-   */
-  const runExclusive = async (action: () => Promise<void> | void): Promise<void> => {
-    if (applyingRef.current) return
-    applyingRef.current = true
-    setApplying(true)
-    try {
-      await action()
-    } finally {
-      applyingRef.current = false
-      setApplying(false)
-    }
-  }
 
   return {
     pendingIds,
     conflictIds,
     selectableIds,
     selectedIds,
+    unselectedBehaviourIds,
     applying,
     toggle,
     setSelected,
-    apply: () => runExclusive(() => onApply(selectedIds)),
-    discard: () => runExclusive(onDiscard),
+    // a rejection (designer or store error) is shown, not left unhandled
+    apply: () =>
+      run(async () => {
+        try {
+          await onApply(selectedIds)
+        } catch (error) {
+          notifyError({ key: 'aiAssistant.card.applyFailed', params: { message: (error as Error)?.message ?? '' } })
+        }
+      }),
+    // onCancel is required by useConfirm's inferred (untyped) parameter
+    discard: () => confirm({ key: 'aiAssistant.discardConfirm', onOk: () => void run(onDiscard), onCancel: undefined }),
   }
 }

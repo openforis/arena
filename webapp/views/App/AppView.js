@@ -11,7 +11,7 @@ import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin }
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
-import { AssistantPanelHost } from '@webapp/components/ai/Assistant'
+import { AssistantAreasProvider, AssistantPanelHost } from '@webapp/components/ai/Assistant'
 import { LocalServerConsentHost } from '@webapp/components/ai/LocalServerConsentHost'
 import { WhatsNewDialog } from '@webapp/components/WhatsNew'
 
@@ -82,7 +82,7 @@ const AppView = () => {
   }, [canAnalyzeRecords, canViewDashboard, isSystemAdmin])
 
   return (
-    <>
+    <AssistantAreasProvider>
       <Header />
 
       <div className="app__container">
@@ -98,7 +98,7 @@ const AppView = () => {
       <LocalServerConsentHost />
       <AssistantPanelHost />
       <WhatsNewDialog />
-    </>
+    </AssistantAreasProvider>
   )
 }
 

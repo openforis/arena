@@ -7,7 +7,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { ButtonIconAdd, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
@@ -92,6 +92,7 @@ const AssistantTabs = ({
 const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
   const navigate = useNavigate()
   const confirm = useConfirm()
+  const notifyError = useNotifyError()
   return (
     <ButtonMenu
       className="btn-s"
@@ -115,7 +116,8 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
           onClick: () =>
             confirm({
               key: 'aiAssistant.deleteAllConfirm',
-              onOk: () => void api.clearConversations(),
+              onOk: () =>
+                void api.clearConversations().catch(() => notifyError({ key: 'aiAssistant.deleteAllFailed' })),
               onCancel: undefined,
             }),
           testId: TestId.aiAssistant.deleteAllBtn,

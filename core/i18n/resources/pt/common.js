@@ -1644,6 +1644,10 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     searchConversations: 'Pesquisar conversas',
     historyNoMatch: 'Nenhuma conversa corresponde.',
     deleteConversation: 'Excluir conversa',
+    deleteConversationConfirm: 'Excluir esta conversa? Não é possível desfazer.',
+    discardConfirm: 'Descartar estas alterações propostas? Elas não serão aplicadas.',
+    deleteConversationFailed: 'Não foi possível excluir a conversa.',
+    deleteAllFailed: 'Não foi possível excluir as conversas.',
     day: {
       today: 'Hoje',
       yesterday: 'Ontem',
@@ -1723,6 +1727,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       applySelected: 'Aplicar selecionadas',
       discard: 'Descartar',
       discarded: 'Descartado.',
+      applyFailed: 'Não foi possível aplicar as alterações: {{message}}',
       saveCurrentEditFirst: 'Primeiro salve ou cancele sua edição atual.',
       selectOperation: 'Aplicar esta alteração',
       empty: '(vazio)',
@@ -1739,6 +1744,14 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       reviewAll: 'Rever tudo ({{count}})',
       applyAll: 'Aplicar tudo',
       applySelectedCount: 'Aplicar selecionados ({{count}})',
+      confirm: {
+        title: 'Confirmar Aplicar tudo',
+        text: 'Não abriu a revisão. Alterações a aplicar: {{count}}',
+        review: 'Rever primeiro',
+        apply: 'Aplicar ({{count}})',
+        cancel: 'Cancelar',
+      },
+      behaviourUnselected: 'As alterações de expressões ou propriedades não são selecionadas até as rever: {{count}}',
       review: {
         title: 'Rever as alterações propostas',
         search: 'Pesquisar alterações',

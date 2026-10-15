@@ -198,8 +198,12 @@
       flex: none;
     }
 
+    // the "no provider" chip keeps its text (the other chips are an icon), cut with an ellipsis when it doesn't fit
+    > .ai-provider-chip--none {
+      flex: 0 1 auto;
+    }
+
     @container (max-width: 340px) {
-      .ai-provider-chip__text,
       .ai-assistant-panel__context-text,
       .ai-assistant-panel__sent-data-text {
         display: none;
@@ -451,6 +455,11 @@
   color: var(--red);
 }
 
+// groups the cards of a tool call without a box of its own
+.ai-assistant-message__cards {
+  display: contents;
+}
+
 .ai-assistant-message {
   max-width: 100%;
 
@@ -476,17 +485,6 @@
     align-items: center;
     gap: 0.5rem;
     color: var(--red);
-  }
-}
-
-// links in answers (e.g. manual sections) must stand out from the text
-.ai-assistant-markdown a {
-  color: var(--blue);
-  text-decoration: underline;
-
-  &:hover,
-  &:visited {
-    color: var(--blueDark);
   }
 }
 
@@ -521,176 +519,6 @@
   &__interrupted {
     margin-left: 0.5rem;
     font-style: italic;
-  }
-}
-
-.ai-assistant-card {
-  margin: 0.5rem 0;
-  padding: 0.5rem;
-  border: 1px solid var(--greyBorder);
-  border-radius: 0.5rem;
-
-  &__header {
-    display: flex;
-    flex-direction: column;
-  }
-
-  &__stale {
-    margin: 0.5rem 0;
-    padding: 0.25rem 0.5rem;
-    background-color: var(--orangeLight);
-  }
-
-  &__rows {
-    list-style: none;
-    padding: 0;
-  }
-
-  &__category-name {
-    margin-top: 0.5rem;
-    font-family: monospace;
-    font-weight: 600;
-  }
-
-  &__row {
-    display: flex;
-    gap: 0.5rem;
-    padding: 0.25rem 0;
-    border-bottom: 1px solid var(--colorGrey200);
-  }
-
-  &__row-title {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  &__name {
-    padding: 0;
-    border: none;
-    background: none;
-    color: var(--blueDark);
-    font-family: monospace;
-    cursor: pointer;
-
-    &:disabled {
-      color: var(--black);
-      cursor: default;
-    }
-  }
-
-  &__diff {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-  }
-
-  &__from {
-    color: var(--colorGrey600);
-    text-decoration: line-through;
-  }
-
-  // long labels without spaces must not widen the card
-  &__from,
-  &__to {
-    overflow-wrap: anywhere;
-  }
-
-  &__expressions {
-    margin: 0;
-    padding-left: 1rem;
-  }
-
-  &__status {
-    font-weight: 600;
-
-    &--applied {
-      color: var(--green);
-    }
-
-    &--conflict,
-    &--failed {
-      color: var(--red);
-    }
-
-    &--skipped {
-      color: var(--orange);
-    }
-  }
-
-  &__footer {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  &__hint {
-    width: 100%;
-    margin: 0;
-    color: var(--colorGrey600);
-  }
-
-  // long change sets: counts and a preview; the changes are reviewed in a dialog
-  &__title-row {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.5rem;
-  }
-
-  &__count {
-    color: var(--colorGrey600);
-    white-space: nowrap;
-  }
-
-  &__chips {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
-    margin: 0.5rem 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  &__chip {
-    padding: 0.1rem 0.5rem;
-    border: 1px solid var(--greyBorder);
-    border-radius: 1rem;
-    font-size: 0.8rem;
-
-    &--applied {
-      color: var(--green);
-    }
-
-    &--conflict,
-    &--failed {
-      color: var(--red);
-    }
-
-    &--skipped {
-      color: var(--orange);
-    }
-  }
-
-  &__preview {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-
-    li {
-      display: flex;
-      gap: 0.5rem;
-      padding: 0.15rem 0;
-      border-bottom: 1px solid var(--colorGrey200);
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    span {
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
 }
 

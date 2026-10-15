@@ -4,6 +4,7 @@ import { AiLimits } from '@common/ai/limits'
 
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { Button, ButtonIconDelete } from '@webapp/components/buttons'
+import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -20,7 +21,7 @@ type RowProps = {
   time: string
   busy: boolean
   onOpen: (id: string) => void
-  onDelete: (id: string) => Promise<void>
+  onDelete: (id: string) => void
 }
 
 /**
@@ -45,8 +46,7 @@ const HistoryRow = ({ item, title, current, time, busy, onOpen, onDelete }: RowP
       className="ai-assistant-panel__history-delete"
       disabled={busy}
       label="aiAssistant.deleteConversation"
-      // a failed delete (store error) leaves the row in place: nothing else to show
-      onClick={() => onDelete(item.id).catch(() => undefined)}
+      onClick={() => onDelete(item.id)}
       testId={TestId.aiAssistant.historyDeleteBtn}
     />
   </li>
@@ -64,6 +64,22 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
   const { conversationId } = useAssistantPanel()
   const { history, loadHistory, openConversation, deleteConversation, busy } = api
   const [query, setQuery] = useState('')
+  const confirm = useConfirm()
+  const notifyError = useNotifyError()
+
+  /**
+   * Deletes a conversation once the user confirms (it can't be restored).
+   * @param {string} id - Conversation id.
+   * @returns {void} Nothing.
+   */
+  const onDelete = (id: string) =>
+    confirm({
+      key: 'aiAssistant.deleteConversationConfirm',
+      // a failed delete (store error) leaves the row in place
+      onOk: () => void deleteConversation(id).catch(() => notifyError({ key: 'aiAssistant.deleteConversationFailed' })),
+      // onCancel is required by useConfirm's inferred (untyped) parameter
+      onCancel: undefined,
+    })
 
   useEffect(() => {
     void loadHistory()
@@ -112,7 +128,7 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
                   current={item.id === conversationId}
                   item={item}
                   key={item.id}
-                  onDelete={deleteConversation}
+                  onDelete={onDelete}
                   onOpen={openConversation}
                   title={item.title || t('aiAssistant.newConversationTitle')}
                   time={formatConversationTime({ updatedAt: item.updatedAt, now, lang })}

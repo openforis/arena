@@ -40,7 +40,7 @@ export const AssistantStartScreen = ({
   const lang: string = useLang()
   const { history, loadHistory, openConversation } = api
 
-  // runs again when the area (or the store) changes: loadHistory depends on them
+  // runs again when the area changes (loadHistory is bound to it); it waits for the store to open
   useEffect(() => {
     void loadHistory()
   }, [loadHistory])

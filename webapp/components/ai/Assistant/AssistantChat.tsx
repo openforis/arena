@@ -18,7 +18,8 @@ import { assistantPanelStore } from './assistantPanelStore'
 import { RecordDataNotice } from './analysis/RecordDataNotice'
 import { useRecordDataNotice } from './analysis/useAnalysisArea'
 import { AssistantComposerFooter } from './AssistantComposerFooter'
-import { AssistantContextNotice } from './AssistantContextMeter'
+import { AssistantContextNotice, useContextMeter } from './AssistantContextMeter'
+import { isNearBottom } from './chatScrollModel'
 import { AssistantConversationBar } from './AssistantConversationBar'
 import { AssistantMessageView } from './AssistantMessage'
 import { shouldShowProviderRemoved } from './providerChip/providerChipModel'
@@ -51,7 +52,12 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
   const barTitle = conversation?.title ?? (conversationId ? null : '')
   const messages = conversation?.messages ?? []
   const lastId = messages.at(-1)?.id
+  // computed once here and passed down (one per message otherwise)
   const recordDataNotice = useRecordDataNotice(conversation, assistantAreaFeatures[area], api.providerId)
+  const contextMeter = useContextMeter(conversation)
+  // the list follows a streaming answer only while the user is at its end (a read-up position is kept)
+  const stickToBottomRef = useRef(true)
+  const shownId = conversation?.id
   // Do it on a card of this area: sent here once the conversation hook is ready
   usePendingSuggestionRequest({ api, area })
 
@@ -64,10 +70,24 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
     if (draft !== null) assistantPanelStore.clearDraft()
   }, [draft])
 
+  // another conversation starts at its end
+  useEffect(() => {
+    stickToBottomRef.current = true
+  }, [shownId])
+
   useEffect(() => {
     const list = listRef.current
-    if (list) list.scrollTop = list.scrollHeight
-  }, [conversation])
+    if (list && stickToBottomRef.current) list.scrollTop = list.scrollHeight
+  }, [conversation, shownId])
+
+  /**
+   * Remembers whether the user is reading the end of the list.
+   * @param {React.UIEvent<HTMLDivElement>} event - Scroll event.
+   * @returns {void} Nothing.
+   */
+  const onScroll = (event: React.UIEvent<HTMLDivElement>) => {
+    stickToBottomRef.current = isNearBottom(event.currentTarget)
+  }
 
   /**
    * Sends the typed message.
@@ -77,7 +97,12 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
     const text = input.trim()
     if (!text || busy || applying) return
     setInput('')
-    void api.send(text)
+    // the user's own message is shown at the end
+    stickToBottomRef.current = true
+    // nothing was sent (not ready): the text comes back instead of being lost
+    void api.send(text).then((id) => {
+      if (id === null) setInput((current) => current || text)
+    })
   }
 
   /**
@@ -99,16 +124,16 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
         </div>
       )}
       <AssistantConversationBar busy={busy} title={barTitle} />
-      <div aria-live="polite" className="ai-assistant-panel__messages" ref={listRef}>
+      <div className="ai-assistant-panel__messages" onScroll={onScroll} ref={listRef}>
         {messages.map((message) => (
           <AssistantMessageView
             api={api}
-            area={area}
             changeSets={conversation?.changeSets ?? {}}
             isLast={message.id === lastId}
             key={message.id}
             message={message}
             queries={conversation?.queries ?? {}}
+            recordDataNotice={recordDataNotice}
           />
         ))}
       </div>
@@ -117,7 +142,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
           {t('aiAssistant.providerChip.removedNotice')}
         </div>
       )}
-      <AssistantContextNotice busy={busy} conversation={conversation} onNewConversation={api.newConversation} />
+      <AssistantContextNotice busy={busy} meter={contextMeter} onNewConversation={api.newConversation} />
       <div className="ai-assistant-panel__composer">
         {recordDataNotice ? (
           <RecordDataNotice onNewConversation={api.newConversation} />
@@ -133,7 +158,7 @@ export const AssistantChat = ({ area, api }: { area: AssistantArea; api: Assista
             value={input}
           />
         )}
-        <AssistantComposerFooter api={api} area={area}>
+        <AssistantComposerFooter api={api} area={area} contextMeter={contextMeter}>
           {!recordDataNotice && busy && (
             <Button
               label="aiAssistant.stop"

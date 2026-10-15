@@ -1,3 +1,5 @@
+import './ChangeItem.scss'
+
 import React from 'react'
 
 import { useI18nT } from '@webapp/store/system'
@@ -16,7 +18,7 @@ export const CardValueView = ({ value }: { value: CardValue }) => {
   if (value.kind === 'text') return <span>{value.text || t('aiAssistant.card.empty')}</span>
   if (value.items.length === 0) return <span>{t('aiAssistant.card.empty')}</span>
   return (
-    <ul className="ai-assistant-card__expressions">
+    <ul className="ai-change-item__expressions">
       {value.items.map((item, index) => (
         <li key={`${index}-${item.expression}`}>
           <code>{item.expression}</code>

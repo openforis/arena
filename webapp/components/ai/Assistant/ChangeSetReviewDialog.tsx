@@ -1,6 +1,6 @@
 import './ChangeSetReviewDialog.scss'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button, ButtonIconClose } from '@webapp/components/buttons'
@@ -10,6 +10,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
+import { ChangeItemName, ChangeItemStatus } from './ChangeItem'
 import {
   filterReviewItems,
   getReviewLabelText,
@@ -23,7 +24,7 @@ import {
   type SelectionState,
 } from './changeSetReviewModel'
 import type { ChangeSetSelection } from './useChangeSetSelection'
-import { useShowNodeDef } from './useShowNodeDef'
+import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
 
 /**
  * A checkbox for a group of changes: checked, unchecked or mixed.
@@ -67,16 +68,19 @@ const GroupCheckbox = ({
  * @param {object} props - Props.
  * @param {ReviewItem} props.item - Change.
  * @param {ChangeSetSelection} props.selection - Selection.
+ * @param {boolean} props.exists - The node definition of the change exists in the survey.
  * @param {Function} props.onNameClick - Shows the item in the form designer.
  * @returns {React.ReactElement} The row.
  */
 const ReviewRow = ({
   item,
   selection,
+  exists,
   onNameClick,
 }: {
   item: ReviewItem
   selection: ChangeSetSelection
+  exists: boolean
   onNameClick: (nodeDefUuid: string) => void
 }) => {
   const t = useI18nT({ unescapeHtml: true })
@@ -102,9 +106,7 @@ const ReviewRow = ({
       </td>
       <td className="ai-change-review__item">
         {nodeDefUuid ? (
-          <button className="ai-assistant-card__name" onClick={() => onNameClick(nodeDefUuid)} type="button">
-            {item.name}
-          </button>
+          <ChangeItemName exists={exists} name={item.name} onClick={() => onNameClick(nodeDefUuid)} />
         ) : (
           <code>{item.name}</code>
         )}
@@ -118,16 +120,7 @@ const ReviewRow = ({
       <td className="ai-change-review__to">
         <CardValueView value={item.to} />
       </td>
-      <td>
-        {result && (
-          <span
-            className={`ai-assistant-card__status ai-assistant-card__status--${result.status}`}
-            title={result.message}
-          >
-            {t(`aiAssistant.card.status.${result.status}`)}
-          </span>
-        )}
-      </td>
+      <td>{result && <ChangeItemStatus result={result} />}</td>
     </tr>
   )
 }
@@ -137,16 +130,19 @@ const ReviewRow = ({
  * @param {object} props - Props.
  * @param {ReviewGroup} props.group - Group.
  * @param {ChangeSetSelection} props.selection - Selection.
+ * @param {Function} props.nodeDefExists - Tells whether a node definition exists in the survey.
  * @param {Function} props.onNameClick - Shows an item in the form designer.
  * @returns {React.ReactElement} The rows.
  */
 const ReviewGroupRows = ({
   group,
   selection,
+  nodeDefExists,
   onNameClick,
 }: {
   group: ReviewGroup
   selection: ChangeSetSelection
+  nodeDefExists: (nodeDefUuid: string) => boolean
   onNameClick: (nodeDefUuid: string) => void
 }) => {
   const t = useI18nT({ unescapeHtml: true })
@@ -175,7 +171,13 @@ const ReviewGroupRows = ({
         </td>
       </tr>
       {group.items.map((item) => (
-        <ReviewRow item={item} key={item.id} onNameClick={onNameClick} selection={selection} />
+        <ReviewRow
+          exists={item.nodeDefUuid !== null && nodeDefExists(item.nodeDefUuid)}
+          item={item}
+          key={item.id}
+          onNameClick={onNameClick}
+          selection={selection}
+        />
       ))}
     </>
   )
@@ -240,13 +242,21 @@ export const ChangeSetReviewDialog = ({
   onClose: () => void
 }) => {
   const t = useI18nT({ unescapeHtml: true })
+  const titleId = useId()
+  // a callback ref (state): the dialog takes the focus when it opens, so its name is announced
+  const [dialog, setDialog] = useState<HTMLDivElement | null>(null)
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
+  const nodeDefExists = useNodeDefExists()
   const [groupBy, setGroupBy] = useState<ReviewGroupBy>('entity')
   const [filter, setFilter] = useState<ReviewFilter>('all')
   const [search, setSearch] = useState('')
   const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null)
   const { pendingIds, conflictIds, selectableIds, selectedIds, applying } = selection
+
+  useEffect(() => {
+    dialog?.focus()
+  }, [dialog])
 
   const allGroups = useMemo(() => groupReviewItems(items, groupBy), [groupBy, items])
   const shownItems = useMemo(
@@ -285,14 +295,23 @@ export const ChangeSetReviewDialog = ({
 
   return (
     <Modal className="ai-change-review" onClose={onClose}>
-      <div className="ai-change-review__content" data-testid={TestId.aiAssistant.reviewDialog}>
+      {/* the shared Modal forwards no role: the dialog and its name are set here */}
+      <div
+        aria-labelledby={titleId}
+        aria-modal="true"
+        className="ai-change-review__content"
+        data-testid={TestId.aiAssistant.reviewDialog}
+        ref={setDialog}
+        role="dialog"
+        tabIndex={-1}
+      >
         <div className="ai-change-review__header">
-          <h2>{t('aiAssistant.card.review.title')}</h2>
+          <h2 id={titleId}>{t('aiAssistant.card.review.title')}</h2>
           <span className="ai-change-review__summary">{cardState.changeSet.summary}</span>
           <ButtonIconClose onClick={onClose} testId={TestId.aiAssistant.reviewCloseBtn} />
         </div>
         {conflictIds.length > 0 && (
-          <div className="ai-assistant-card__stale" role="status">
+          <div className="ai-change-item__stale" role="status">
             {t('aiAssistant.card.stale')}
           </div>
         )}
@@ -365,7 +384,13 @@ export const ChangeSetReviewDialog = ({
               </thead>
               <tbody>
                 {shownGroups.map((group) => (
-                  <ReviewGroupRows group={group} key={group.key} onNameClick={onNameClick} selection={selection} />
+                  <ReviewGroupRows
+                    group={group}
+                    key={group.key}
+                    nodeDefExists={nodeDefExists}
+                    onNameClick={onNameClick}
+                    selection={selection}
+                  />
                 ))}
               </tbody>
             </table>

@@ -1,8 +1,6 @@
 .local-server-consent {
   .modal-content {
     max-width: 32rem;
-    // the shared modal's 20vw side margins pin a narrow dialog to the left: center it instead
-    margin: 10vh auto auto;
   }
 
   &__model {
