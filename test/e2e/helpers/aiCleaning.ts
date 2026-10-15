@@ -4,7 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { sampleRecords, SampleRecord } from '../fixtures/seed/sampleSurveyModel'
 import type { ArenaApi } from '../fixtures/arenaApi'
-import { setLocalProvider } from './aiAnalysis'
+import { reloadApp, setLocalProvider } from './aiAnalysis'
 import { sendAssistantMessage } from './assistantPanel'
 import { Urls } from './urls'
 
@@ -66,14 +66,7 @@ export const useLocalServer = async (
   stub: { baseUrl: string; modelId: string }
 ): Promise<void> => {
   await setLocalProvider(page, api, { enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
-  // wait for the app to boot: refresh tokens rotate, so a navigation that aborts the boot's refresh logs the user out
-  await Promise.all([
-    page.waitForResponse(
-      (response) =>
-        response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()
-    ),
-    page.reload(),
-  ])
+  await reloadApp(page)
 }
 
 /**

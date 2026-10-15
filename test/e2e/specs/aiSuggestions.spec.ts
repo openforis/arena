@@ -11,20 +11,12 @@ import {
   selectAssistantArea,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
+import { readSuggestionState } from '../helpers/aiStorage'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
-
-/**
- * Reads the stored suggestions of a user in the page.
- * @param {Page} page - Page.
- * @param {string} userUuid - User.
- * @returns {Promise<any>} The stored state (null when nothing was written).
- */
-const readStoredSuggestions = async (page: Page, userUuid: string): Promise<any> =>
-  JSON.parse((await page.evaluate((key) => localStorage.getItem(key), `arena.ai.suggestions.${userUuid}`)) ?? 'null')
 
 test.describe('Profile menu over the assistant panel (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
@@ -108,9 +100,7 @@ test.describe('Module introduction (mock provider)', () => {
     // accepted: removed (not in progress) and the module is seen
     await expect(card).toHaveCount(0)
     await expect(helpTabDot(page)).toHaveCount(0)
-    await expect
-      .poll(async () => (await readStoredSuggestions(page, userUuid))?.seenModules ?? [])
-      .toContain('designer')
+    await expect.poll(async () => (await readSuggestionState(page, userUuid))?.seenModules ?? []).toContain('designer')
 
     // a later visit offers nothing
     await page.reload()
@@ -142,6 +132,6 @@ test.describe('Module introduction (mock provider)', () => {
     await expect(page.getByTestId(TestId.aiAssistant.suggestionsDot)).toHaveCount(0)
     await expect(page.getByTestId(TestId.aiAssistant.openBtn)).toHaveAttribute('aria-label', 'AI assistant')
     // the checks did not run either: nothing was stored for Help
-    expect((await readStoredSuggestions(page, userUuid))?.pending?.help ?? []).toEqual([])
+    expect((await readSuggestionState(page, userUuid))?.pending?.help ?? []).toEqual([])
   })
 })

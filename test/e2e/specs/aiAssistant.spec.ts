@@ -4,7 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
 import type { TestUser } from '../fixtures/testUsers'
-import { acceptConsentAndWait, setLocalProvider } from '../helpers/aiAnalysis'
+import { acceptConsentAndWait, reloadApp, setLocalProvider } from '../helpers/aiAnalysis'
 import {
   assistantPanel,
   closeAssistantPanel,
@@ -488,7 +488,8 @@ test.describe('AI assistant context meter (stub local server)', () => {
       modelId: stub!.modelId,
       name: LONG_LOCAL_NAME,
     })
-    await designer.goto()
+    await reloadApp(page)
+    await designer.waitReady()
     await openAssistantPanel(page)
     // all footer items shown: the ring needs a finished answer
     await sendAssistantMessage(page, LABEL_REQUEST)
@@ -518,7 +519,8 @@ test.describe('AI assistant context meter (stub local server)', () => {
     const designer = new FormDesigner(page)
     await designer.goto()
     await setLocalProvider(page, api, { enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
-    await designer.goto()
+    await reloadApp(page)
+    await designer.waitReady()
     await openAssistantPanel(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.contextMeter)).toHaveCount(0)
 
@@ -538,7 +540,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
 
     // a reload shows the stored usage again: the meter needs no new answer (the status probes of the server are fine)
     const chatRequestsBefore = countChatRequests(stub!)
-    await page.reload()
+    await reloadApp(page)
     await openAssistantPanel(page)
     await expect(meter).toHaveAttribute('aria-valuetext', tokensText)
     await expect(meter).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
@@ -556,7 +558,8 @@ test.describe('AI assistant context meter (stub local server)', () => {
     const designer = new FormDesigner(page)
     await designer.goto()
     await setLocalProvider(page, api, { enabled: true, baseUrl: stub!.baseUrl, modelId: stub!.modelId })
-    await designer.goto()
+    await reloadApp(page)
+    await designer.waitReady()
     await openAssistantPanel(page)
     // the first-use consent is asked once per user, survey and feature: take it with a quick turn, then start over
     await sendAssistantMessage(page, LABEL_REQUEST)
