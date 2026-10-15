@@ -145,7 +145,8 @@ Essayez de rafraîchir la page.`,
   aiProviderChanged:
     "Ce fournisseur d'IA a été modifié ou supprimé pendant sa vérification. Rechargez les paramètres d'IA et réessayez.",
   aiProviderFieldTooLong:
-    'Une valeur du fournisseur est trop longue : {{field}} peut avoir {{max}} caractères au plus.',
+    'Une valeur du fournisseur est trop longue : $t(appErrors:aiProviderFieldNames.{{field}}) peut avoir {{max}} caractères au plus.',
+  aiProviderFieldNames: { model: 'Modèle', baseUrl: 'URL de base', apiKey: 'Clé API' },
   aiProviderLimitReached:
     "Vous pouvez enregistrer au plus {{max}} fournisseurs d'IA. Supprimez-en un pour en ajouter un autre.",
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",

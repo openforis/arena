@@ -115,7 +115,9 @@ export default {
     'APIキーを保存できません：サーバーに暗号化シークレットがありません。管理者にAI_USER_KEY_ENCRYPTION_SECRETの設定を依頼してください。',
   aiProviderChanged:
     'このAIプロバイダーは確認中に変更または削除されました。AI設定を再読み込みして、もう一度お試しください。',
-  aiProviderFieldTooLong: 'プロバイダーの値が長すぎます：{{field}} は最大{{max}}文字までです。',
+  aiProviderFieldTooLong:
+    'プロバイダーの値が長すぎます：$t(appErrors:aiProviderFieldNames.{{field}}) は最大{{max}}文字までです。',
+  aiProviderFieldNames: { model: 'モデル', baseUrl: 'ベースURL', apiKey: 'APIキー' },
   aiProviderLimitReached: '保存できるAIプロバイダーは最大{{max}}件です。追加するには、いずれかを削除してください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',

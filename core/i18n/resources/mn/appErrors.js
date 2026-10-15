@@ -136,7 +136,8 @@ export default {
   aiProviderChanged:
     'Энэ AI үйлчилгээ үзүүлэгчийг шалгаж байх үед өөрчилсөн эсвэл устгасан байна. AI тохиргоогоо дахин ачаалаад, дахин оролдоно уу.',
   aiProviderFieldTooLong:
-    'Үйлчилгээ үзүүлэгчийн утга хэт урт байна: {{field}} хамгийн ихдээ {{max}} тэмдэгттэй байж болно.',
+    'Үйлчилгээ үзүүлэгчийн утга хэт урт байна: $t(appErrors:aiProviderFieldNames.{{field}}) хамгийн ихдээ {{max}} тэмдэгттэй байж болно.',
+  aiProviderFieldNames: { model: 'Загвар', baseUrl: 'Үндсэн URL', apiKey: 'API түлхүүр' },
   aiProviderLimitReached:
     'Та хамгийн ихдээ {{max}} AI үйлчилгээ үзүүлэгч хадгалж болно. Нэмэхийн тулд нэгийг нь устгана уу.',
   aiExpressionDescriptionMissing: 'Хүссэн илэрхийллээ энгийн үгээр тайлбарлана уу.',

@@ -136,7 +136,9 @@ export default {
     'Ключи API нельзя сохранить: на сервере нет секрета шифрования. Попросите администратора задать AI_USER_KEY_ENCRYPTION_SECRET.',
   aiProviderChanged:
     'Этот провайдер ИИ был изменён или удалён во время проверки. Перезагрузите настройки ИИ и повторите попытку.',
-  aiProviderFieldTooLong: 'Значение провайдера слишком длинное: {{field}} может содержать не более {{max}} символов.',
+  aiProviderFieldTooLong:
+    'Значение провайдера слишком длинное: $t(appErrors:aiProviderFieldNames.{{field}}) может содержать не более {{max}} символов.',
+  aiProviderFieldNames: { model: 'Модель', baseUrl: 'Базовый URL', apiKey: 'Ключ API' },
   aiProviderLimitReached: 'Можно сохранить не более {{max}} провайдеров ИИ. Удалите один, чтобы добавить другой.',
   aiExpressionDescriptionMissing: 'Опишите нужное выражение простыми словами.',
   aiExpressionTypeInvalid: 'Неизвестный тип выражения: {{expressionType}}.',
