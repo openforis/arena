@@ -170,6 +170,13 @@ export const TestId = {
     module: (module) => `sidebar-module-${module}`,
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,
   },
+  surveyCompare: {
+    applyBtn: 'survey-compare-apply-btn',
+    fingerprint: (type) => `survey-compare-fingerprint-${type}`,
+    sourceFingerprint: (type) => `survey-compare-source-fingerprint-${type}`,
+    sourceSurveyDropdown: 'survey-compare-source-survey',
+    summary: 'survey-compare-summary',
+  },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,
     optionIncludeDataCheckbox: 'survey-create-option-include-data',

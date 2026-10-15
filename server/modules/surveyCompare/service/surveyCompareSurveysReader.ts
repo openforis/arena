@@ -133,8 +133,9 @@ export const readSurveyFromFile = async ({ filePath }: { filePath: string }): Pr
 }
 
 // vernacular names are fetched with draft props: their published flag is fetched separately
-const fetchTaxa = async ({ surveyId, taxonomyUuid }, client: any) => {
-  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft: true }, client)
+const fetchTaxa = async ({ surveyId, taxonomyUuid, draft }, client: any) => {
+  const taxa = await TaxonomyRepository.fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, draft }, client)
+  if (!draft) return taxa
   const publishedVernacularNameUuids = new Set(
     await TaxonomyRepository.fetchPublishedVernacularNameUuids({ surveyId, taxonomyUuid }, client)
   )
@@ -154,15 +155,19 @@ const fetchTaxa = async ({ surveyId, taxonomyUuid }, client: any) => {
 }
 
 /**
- * Fetches the survey (draft) to update and the items of its categories.
+ * Fetches a survey with the items of its categories and its taxa.
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey id.
+ * @param {boolean} [params.draft] - Whether to fetch the draft (default) or the published version.
  * @param {any} [client] - Database client.
  * @returns {Promise<{survey: any, itemsByCategoryUuid: CategoryItemsByCategoryUuid, taxaByTaxonomyUuid: TaxaByTaxonomyUuid, usedNodeDefUuids: string[]}>} - The survey, the items, the taxa and all the node def uuids (deleted ones included).
  */
-export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, client: any = db) => {
+export const fetchSurveyFromDb = async (
+  { surveyId, draft = true }: { surveyId: number; draft?: boolean },
+  client: any = db
+) => {
   const surveyWithDeleted = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, draft: true, advanced: true, includeDeleted: true },
+    { surveyId, draft, advanced: true, includeDeleted: true },
     client
   )
   const usedNodeDefUuids = Object.keys(Survey.getNodeDefs(surveyWithDeleted))
@@ -174,7 +179,7 @@ export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, clie
   const itemsArrays = await DbUtils.runQueries(
     client,
     categoryUuids.map(
-      (categoryUuid) => () => CategoryService.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, client)
+      (categoryUuid) => () => CategoryService.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft }, client)
     )
   )
   const itemsByCategoryUuid: CategoryItemsByCategoryUuid = Object.fromEntries(
@@ -183,7 +188,7 @@ export const fetchTargetSurvey = async ({ surveyId }: { surveyId: number }, clie
   const taxonomyUuids = Survey.getTaxonomiesArray(survey).map((taxonomy: any) => taxonomy.uuid)
   const taxaArrays = await DbUtils.runQueries(
     client,
-    taxonomyUuids.map((taxonomyUuid) => () => fetchTaxa({ surveyId, taxonomyUuid }, client))
+    taxonomyUuids.map((taxonomyUuid) => () => fetchTaxa({ surveyId, taxonomyUuid, draft }, client))
   )
   const taxaByTaxonomyUuid: TaxaByTaxonomyUuid = Object.fromEntries(
     taxonomyUuids.map((taxonomyUuid, index) => [taxonomyUuid, taxaArrays[index]])

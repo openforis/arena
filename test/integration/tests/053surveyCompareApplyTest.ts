@@ -24,6 +24,7 @@ import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/aren
 import SurveyCompareJob from '@server/modules/surveyCompare/service/surveyCompareJob'
 import SurveyCompareApplyJob from '@server/modules/surveyCompare/service/surveyCompareApplyJob'
 import * as SurveyCompareService from '@server/modules/surveyCompare/service/surveyCompareService'
+import * as SurveyFingerprintService from '@server/modules/surveyCompare/service/surveyFingerprintService'
 
 import * as SB from '../../utils/surveyBuilder'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -41,13 +42,19 @@ const exportSurvey = async ({ user, surveyId }) => {
 const fetchSurvey = async (surveyId: number) =>
   SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true })
 
-const runCompare = async ({ user, surveyId, filePath = undefined, sourceFileName = undefined }) => {
-  const job = new SurveyCompareJob({ user, surveyId, filePath, sourceFileName })
+const runCompare = async ({
+  user,
+  surveyId,
+  filePath = undefined,
+  sourceFileId = undefined,
+  sourceSurveyId = undefined,
+}) => {
+  const job = new SurveyCompareJob({ user, surveyId, filePath, sourceFileId, sourceSurveyId })
   await job.start()
   expect(job.isSucceeded()).toBe(true)
-  const { resultFileName, sourceFileName: sourceFileNameResult } = job.result as any
-  const result = await SurveyCompareService.readSurveyCompareResult({ resultFileName })
-  return { result, sourceFileName: sourceFileNameResult }
+  const { resultFileId, sourceFileId: sourceFileIdResult } = job.result as any
+  const result = await SurveyCompareService.readSurveyCompareResult({ resultFileId })
+  return { result, sourceFileId: sourceFileIdResult }
 }
 
 describe('Survey compare: apply changes made in another environment', () => {
@@ -133,7 +140,7 @@ describe('Survey compare: apply changes made in another environment', () => {
     const user = getContextUser()
     const devExportFilePath = await exportSurvey({ user, surveyId: devSurveyId })
 
-    const { result, sourceFileName } = await runCompare({ user, surveyId: qaSurveyId, filePath: devExportFilePath })
+    const { result, sourceFileId } = await runCompare({ user, surveyId: qaSurveyId, filePath: devExportFilePath })
     expect(result.identical).toBe(false)
     expect(result.counts.nodeDefs).toEqual({ added: 1, changed: 2, removed: 0 })
     expect(result.counts.categories.changed).toBe(1)
@@ -143,7 +150,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       .map((diff) => diff.id)
 
     // the API passes numeric survey ids
-    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileName, selectedIds })
+    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileId, selectedIds })
     await applyJob.start()
     expect(applyJob.isSucceeded()).toBe(true)
     expect((applyJob.result as any).skippedIds).toEqual([])
@@ -173,7 +180,7 @@ describe('Survey compare: apply changes made in another environment', () => {
     expect(qaItems.map(CategoryItem.getCode).sort()).toEqual(['1', '2', '3'])
 
     // comparing again with the same file: no differences left
-    const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceFileName })
+    const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceFileId })
     expect(resultAfter.nodeDefs.filter((diff) => diff.status !== SurveyCompareStatus.identical)).toEqual([])
     expect(resultAfter.categories.filter((diff) => diff.status !== SurveyCompareStatus.identical)).toEqual([])
 
@@ -230,7 +237,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       }),
     })
 
-    const { result, sourceFileName } = await runCompare({
+    const { result, sourceFileId } = await runCompare({
       user,
       surveyId: qaSurveyId,
       filePath: await exportSurvey({ user, surveyId: devSurveyId }),
@@ -246,7 +253,7 @@ describe('Survey compare: apply changes made in another environment', () => {
       .filter((diff) => diff.status !== SurveyCompareStatus.identical)
       .map((diff) => diff.id)
     // the API passes numeric survey ids
-    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileName, selectedIds })
+    const applyJob = new SurveyCompareApplyJob({ user, surveyId: Number(qaSurveyId), sourceFileId, selectedIds })
     await applyJob.start()
     expect(applyJob.isSucceeded()).toBe(true)
 
@@ -265,9 +272,70 @@ describe('Survey compare: apply changes made in another environment', () => {
     expect(NodeDef.getTaxonomyUuid(Survey.getNodeDefByName('tree_taxon')(qa))).toBe(Taxonomy.getUuid(taxonomy))
 
     // comparing again with the same file: no differences left
-    const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceFileName })
+    const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceFileId })
     expect(getAllChanges(resultAfter).filter((diff) => diff.status !== SurveyCompareStatus.identical)).toEqual([])
 
     await SurveyUtils.publishSurvey(user, qaSurveyId)
+  }, 60000)
+
+  test('another survey on the same server is used as source', async () => {
+    const user = getContextUser()
+    const dev = await fetchSurvey(devSurveyId)
+    await NodeDefService.insertNodeDef({
+      user,
+      surveyId: devSurveyId,
+      cycle,
+      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.text, [cycle], {
+        name: 'notes',
+      }),
+    })
+    const { result, sourceFileId } = await runCompare({ user, surveyId: qaSurveyId, sourceSurveyId: devSurveyId })
+    expect(sourceFileId).toBeUndefined()
+    const addedNodeDefs = result.nodeDefs.filter((diff) => diff.status === SurveyCompareStatus.added)
+    expect(addedNodeDefs.map((diff) => diff.name)).toEqual(['notes'])
+
+    const selectedIds = getAllChanges(result)
+      .filter((diff) => diff.status !== SurveyCompareStatus.identical)
+      .map((diff) => diff.id)
+    const applyJob = new SurveyCompareApplyJob({
+      user,
+      surveyId: Number(qaSurveyId),
+      sourceSurveyId: devSurveyId,
+      selectedIds,
+    })
+    await applyJob.start()
+    expect(applyJob.isSucceeded()).toBe(true)
+    expect(Survey.getNodeDefByName('notes')(await fetchSurvey(qaSurveyId))).toBeTruthy()
+
+    const { result: resultAfter } = await runCompare({ user, surveyId: qaSurveyId, sourceSurveyId: devSurveyId })
+    expect(getAllChanges(resultAfter).filter((diff) => diff.status !== SurveyCompareStatus.identical)).toEqual([])
+
+    // surveys in sync: same definition fingerprints
+    const devFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    const qaFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(qaSurveyId) })
+    expect(qaFingerprint).toEqual(devFingerprint)
+  }, 60000)
+
+  test('the fingerprint changes when the definition changes', async () => {
+    const user = getContextUser()
+    const fingerprintBefore = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    const dev = await fetchSurvey(devSurveyId)
+    await NodeDefService.insertNodeDef({
+      user,
+      surveyId: devSurveyId,
+      cycle,
+      nodeDef: NodeDef.newNodeDef(Survey.getNodeDefByName('tree')(dev), NodeDef.nodeDefType.text, [cycle], {
+        name: 'remarks',
+      }),
+    })
+    const fingerprintAfter = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: devSurveyId })
+    expect(fingerprintAfter.strict).not.toBe(fingerprintBefore.strict)
+    expect(fingerprintAfter.structural).not.toBe(fingerprintBefore.structural)
+    // the published version can be fingerprinted too
+    const publishedFingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({
+      surveyId: devSurveyId,
+      draft: false,
+    })
+    expect(publishedFingerprint.strict).toMatch(/^[0-9a-f]{64}$/)
   }, 60000)
 })

@@ -26,7 +26,7 @@ export const updatableTaxonomyProps: string[] = [
   Taxonomy.keysProps.extraPropsDefs,
 ]
 
-const normalizeTaxonomy = (taxonomy: any) =>
+export const normalizeTaxonomy = (taxonomy: any) =>
   normalizeValue({
     name: Taxonomy.getName(taxonomy),
     descriptions: Taxonomy.getDescriptions(taxonomy),
@@ -50,7 +50,7 @@ const normalizeVernacularNames = (taxon: any) => {
   return result
 }
 
-const normalizeTaxon = (taxon: any) =>
+export const normalizeTaxon = (taxon: any) =>
   normalizeValue({
     family: Taxon.getFamily(taxon),
     genus: Taxon.getGenus(taxon),

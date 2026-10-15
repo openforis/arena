@@ -68,14 +68,14 @@ export const matchCategories = ({ sourceSurvey, targetSurvey }): CategoryMatch[]
   return matches
 }
 
-const normalizeCategory = (category: any) => ({
+export const normalizeCategory = (category: any) => ({
   name: Category.getName(category),
   levels: Category.getLevelsArray(category).map(CategoryLevel.getName),
   itemExtraDef: normalizeValue(Category.getItemExtraDef(category)),
   reportingData: Category.isReportingData(category) || undefined,
 })
 
-const normalizeItem = (item: any) =>
+export const normalizeItem = (item: any) =>
   normalizeValue({
     labels: CategoryItem.getLabels(item),
     descriptions: CategoryItem.getDescriptions(item),

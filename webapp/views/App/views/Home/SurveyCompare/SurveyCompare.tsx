@@ -9,7 +9,9 @@ import * as Survey from '@core/survey/survey'
 import { SurveyCompareMaxFileSizeMB, SurveyCompareResult } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import * as API from '@webapp/service/api'
+import type { SurveyCompareSourceRef } from '@webapp/service/api/surveyCompare'
 import { Dropzone } from '@webapp/components'
+import { SurveyDropdown } from '@webapp/components/survey/SurveyDropdown'
 import { Button } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { Tabs } from '@webapp/components/Tabs'
@@ -19,12 +21,14 @@ import { SurveyActions, useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { NotificationActions } from '@webapp/store/ui'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { TestId } from '@webapp/utils/testId'
 
 import { getDefaultSelectedIds, getSelectedDeletions, updateSelection } from './surveyCompareSelection'
 import { getPropLabel } from './surveyCompareValueFormatter'
 import { SurveyCompareNodeDefs } from './SurveyCompareNodeDefs'
 import { SurveyCompareCategories } from './SurveyCompareCategories'
 import { SurveyCompareTaxonomies } from './SurveyCompareTaxonomies'
+import { SurveyCompareFingerprints, SurveyFingerprint } from './SurveyCompareFingerprints'
 import { SurveyCompareChangesList } from './SurveyCompareChangesList'
 
 const hasDifferences = ({ added, changed, removed }: { added: number; changed: number; removed: number }) =>
@@ -40,11 +44,15 @@ const maxDeletionsListed = 10
 
 const introStepKeys = ['exportFile', 'selectFile', 'applyChanges', 'publish']
 
-type CompareResultWithSource = SurveyCompareResult & { source?: { name?: string } }
+type CompareResultWithSource = SurveyCompareResult & {
+  source?: { name?: string; fingerprint?: SurveyFingerprint }
+  target?: { fingerprint?: SurveyFingerprint }
+}
 
 interface CompareState {
   result: CompareResultWithSource | null
-  sourceFileName: string | null
+  /** Source of the comparison: uploaded file kept on the server or another survey on this server. */
+  sourceRef: SurveyCompareSourceRef | null
   selectedIds: Set<string>
   selectedItemId: string | null
   /** Node defs matched by the user (renames): target uuid by source uuid. */
@@ -53,7 +61,7 @@ interface CompareState {
 
 const initialState: CompareState = {
   result: null,
-  sourceFileName: null,
+  sourceRef: null,
   selectedIds: new Set(),
   selectedItemId: null,
   manualMatches: {},
@@ -65,14 +73,17 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
   const i18n = useI18n()
   if (result.identical) {
     return (
-      <div className="survey-compare__summary survey-compare__summary--identical">
+      <div
+        className="survey-compare__summary survey-compare__summary--identical"
+        data-testid={TestId.surveyCompare.summary}
+      >
         {i18n.t('surveyCompareView:identical')}
       </div>
     )
   }
   const { counts } = result
   return (
-    <div className="survey-compare__summary">
+    <div className="survey-compare__summary" data-testid={TestId.surveyCompare.summary}>
       {summaryKeys
         .filter((key) => hasDifferences(counts[key]))
         .map((key) => (
@@ -97,17 +108,26 @@ export const SurveyCompare = () => {
 
   const [state, setState] = useState<CompareState>(initialState)
   const [file, setFile] = useState<File | null>(null)
+  const [sourceSurveyId, setSourceSurveyId] = useState<number | null>(null)
   const [onlyDifferences, setOnlyDifferences] = useState(true)
   const [hideLayoutOnly, setHideLayoutOnly] = useState(false)
   const [tabKey, setTabKey] = useState<string | null>(null)
-  const { result, sourceFileName, selectedIds, selectedItemId, manualMatches } = state
+  const { result, sourceRef, selectedIds, selectedItemId, manualMatches } = state
 
   const startCompare = useCallback(
-    async ({ file = undefined, sourceFileName: sourceFileNameParam = undefined, manualMatches: matches = {} }) => {
+    async ({
+      file = undefined,
+      sourceRef: sourceRefParam = undefined,
+      manualMatches: matches = {},
+    }: {
+      file?: File
+      sourceRef?: SurveyCompareSourceRef | null
+      manualMatches?: Record<string, string>
+    }) => {
       const { job } = await API.startSurveyCompareJob({
         surveyId,
         file,
-        sourceFileName: sourceFileNameParam,
+        sourceRef: sourceRefParam ?? undefined,
         manualMatches: matches,
       })
       dispatch(
@@ -115,11 +135,11 @@ export const SurveyCompare = () => {
           job,
           autoHide: true,
           onComplete: async (jobCompleted: any) => {
-            const { resultFileName, sourceFileName: sourceFileNameResult } = JobSerialized.getResult(jobCompleted)
-            const resultFetched = await API.fetchSurveyCompareResult({ surveyId, resultFileName })
+            const { resultFileId, sourceFileId, sourceSurveyId } = JobSerialized.getResult(jobCompleted)
+            const resultFetched = await API.fetchSurveyCompareResult({ surveyId, resultFileId })
             setState((statePrev) => ({
               result: resultFetched,
-              sourceFileName: sourceFileNameResult,
+              sourceRef: sourceSurveyId ? { sourceSurveyId } : { sourceFileId },
               selectedIds: getDefaultSelectedIds(resultFetched),
               selectedItemId: statePrev.selectedItemId,
               manualMatches: matches,
@@ -146,10 +166,22 @@ export const SurveyCompare = () => {
         return
       }
       setFile(fileSelected)
+      setSourceSurveyId(null)
       setState(initialState)
       startCompare({ file: fileSelected })
     },
     [dispatch, startCompare]
+  )
+
+  const onSourceSurveySelected = useCallback(
+    (option: { value: number } | null) => {
+      if (!option) return
+      setFile(null)
+      setSourceSurveyId(option.value)
+      setState(initialState)
+      startCompare({ sourceRef: { sourceSurveyId: option.value } })
+    },
+    [startCompare]
   )
 
   const onToggle = useCallback(
@@ -164,6 +196,7 @@ export const SurveyCompare = () => {
   // the comparison is discarded: a new file can be selected
   const onReset = useCallback(() => {
     setFile(null)
+    setSourceSurveyId(null)
     setTabKey(null)
     setState(initialState)
   }, [])
@@ -173,23 +206,23 @@ export const SurveyCompare = () => {
   // a confirmed (or undone) rename changes the matching: the comparison is computed again
   const onMatch = useCallback(
     ({ sourceUuid, targetUuid }: { sourceUuid: string; targetUuid: string }) =>
-      startCompare({ sourceFileName, manualMatches: { ...manualMatches, [sourceUuid]: targetUuid } }),
-    [manualMatches, sourceFileName, startCompare]
+      startCompare({ sourceRef, manualMatches: { ...manualMatches, [sourceUuid]: targetUuid } }),
+    [manualMatches, sourceRef, startCompare]
   )
 
   const onUnmatch = useCallback(
     ({ sourceUuid }: { sourceUuid: string }) => {
       const matches = { ...manualMatches }
       delete matches[sourceUuid]
-      startCompare({ sourceFileName, manualMatches: matches })
+      startCompare({ sourceRef, manualMatches: matches })
     },
-    [manualMatches, sourceFileName, startCompare]
+    [manualMatches, sourceRef, startCompare]
   )
 
   const startApply = useCallback(async () => {
     const { job } = await API.startSurveyCompareApplyJob({
       surveyId,
-      sourceFileName,
+      sourceRef,
       selectedIds: [...selectedIds],
       manualMatches,
     })
@@ -207,11 +240,11 @@ export const SurveyCompare = () => {
             }) as any
           )
           dispatch(SurveyActions.refreshSurveyDefs({ navigate }) as any)
-          await startCompare({ sourceFileName, manualMatches })
+          await startCompare({ sourceRef, manualMatches })
         },
       }) as any
     )
-  }, [dispatch, manualMatches, navigate, selectedIds, sourceFileName, startCompare, surveyId])
+  }, [dispatch, manualMatches, navigate, selectedIds, sourceRef, startCompare, surveyId])
 
   // deletions need a strong confirmation: the survey name must be typed
   const onApply = useCallback(() => {
@@ -319,29 +352,40 @@ export const SurveyCompare = () => {
         </ol>
       )}
       {!result && (
-        <Dropzone
-          accept={acceptedFiles}
-          droppedFiles={file ? [file] : []}
-          maxSize={maxFileSizeInDropzoneUnits}
-          onDrop={onFileSelected}
-        />
+        <>
+          <Dropzone
+            accept={acceptedFiles}
+            droppedFiles={file ? [file] : []}
+            maxSize={maxFileSizeInDropzoneUnits}
+            onDrop={onFileSelected}
+          />
+          <div className="survey-compare__source-survey">
+            <span>{i18n.t('surveyCompareView:compareWithSurvey')}</span>
+            <SurveyDropdown
+              excludedSurveyIds={[surveyId]}
+              onChange={onSourceSurveySelected}
+              selection={sourceSurveyId}
+              testId={TestId.surveyCompare.sourceSurveyDropdown}
+            />
+          </div>
+        </>
       )}
       <div className="survey-compare__header">
         {result && (
           <Button
             iconClassName="icon-upload2 icon-12px"
-            label="surveyCompareView:selectNewFile"
-            title="surveyCompareView:selectNewFileInfo"
+            label="surveyCompareView:selectNewSource"
+            title="surveyCompareView:selectNewSourceInfo"
             onClick={onReset}
             variant="outlined"
           />
         )}
-        {sourceFileName && (
+        {sourceRef && (
           <Button
             iconClassName="icon-loop2 icon-12px"
             label="surveyCompareView:refreshComparison"
             title="surveyCompareView:refreshComparisonInfo"
-            onClick={() => startCompare({ sourceFileName, manualMatches })}
+            onClick={() => startCompare({ sourceRef, manualMatches })}
             variant="outlined"
           />
         )}
@@ -352,6 +396,11 @@ export const SurveyCompare = () => {
           </span>
         )}
       </div>
+      <SurveyCompareFingerprints
+        surveyId={surveyId}
+        targetFingerprint={result?.target?.fingerprint}
+        sourceFingerprint={result?.source?.fingerprint}
+      />
 
       {result && (
         <>
@@ -377,6 +426,7 @@ export const SurveyCompare = () => {
                     labelParams={{ count: selectedIds.size }}
                     onClick={onApply}
                     primary
+                    testId={TestId.surveyCompare.applyBtn}
                   />
                 )}
               </div>

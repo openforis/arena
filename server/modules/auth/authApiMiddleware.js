@@ -103,6 +103,26 @@ export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
   }
 }
 
+// survey compare: the survey used as source must be visible to the user (published templates included)
+export const requireSurveyCompareSourceViewPermission = async (req, res, next) => {
+  try {
+    const { sourceSurveyId } = Request.getParams(req)
+    if (!sourceSurveyId) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: Number(sourceSurveyId) })
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // Survey
 export const requireSurveyCreatePermission = async (req, res, next) => {
   const user = Request.getUser(req)

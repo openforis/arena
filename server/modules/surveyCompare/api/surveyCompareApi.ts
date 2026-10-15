@@ -9,6 +9,7 @@ import * as Response from '@server/utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as SurveyCompareService from '../service/surveyCompareService'
+import * as SurveyFingerprintService from '../service/surveyFingerprintService'
 
 const maxFileSizeBytes = SurveyCompareMaxFileSizeMB * 1024 * 1024
 
@@ -30,9 +31,10 @@ const checkUploadedFileSize = async (filePath?: string) => {
   }
 }
 
-const getSourceFileParams = async (req: any) => {
-  const { sourceFileName } = Request.getParams(req)
-  if (sourceFileName) return { sourceFileName }
+const getSourceParams = async (req: any) => {
+  const { sourceFileId, sourceSurveyId } = Request.getParams(req)
+  if (sourceSurveyId) return { sourceSurveyId: Number(sourceSurveyId) }
+  if (sourceFileId) return { sourceFileId }
   checkDeclaredFileSize(req)
   const fileParams = await processChunkedFileForBackgroundMerge({ req })
   await checkUploadedFileSize(fileParams?.filePath)
@@ -40,36 +42,42 @@ const getSourceFileParams = async (req: any) => {
 }
 
 export const init = (app: any) => {
-  // starts the comparison with an uploaded survey file (or with the one uploaded before: sourceFileName)
-  app.post('/survey/:surveyId/compare', AuthMiddleware.requireSurveyEditPermission, async (req: any, res: any) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId } = Request.getParams(req)
-      const fileParams = await getSourceFileParams(req)
-      if (fileParams) {
-        const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
-        const job = SurveyCompareService.startSurveyCompareJob({
-          user,
-          surveyId: Number(surveyId),
-          manualMatches,
-          ...fileParams,
-        })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } else {
-        res.json({ chunkProcessing: true })
+  // starts the comparison with an uploaded survey file (or with the one uploaded before: sourceFileId)
+  // or with another survey on this server (sourceSurveyId)
+  app.post(
+    '/survey/:surveyId/compare',
+    AuthMiddleware.requireSurveyEditPermission,
+    AuthMiddleware.requireSurveyCompareSourceViewPermission,
+    async (req: any, res: any) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const sourceParams = await getSourceParams(req)
+        if (sourceParams) {
+          const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
+          const job = SurveyCompareService.startSurveyCompareJob({
+            user,
+            surveyId: Number(surveyId),
+            manualMatches,
+            ...sourceParams,
+          })
+          res.json({ job: JobUtils.jobToJSON(job) })
+        } else {
+          res.json({ chunkProcessing: true })
+        }
+      } catch (error) {
+        Response.sendErr(res, error)
       }
-    } catch (error) {
-      Response.sendErr(res, error)
     }
-  })
+  )
 
   app.get(
     '/survey/:surveyId/compare/result',
     AuthMiddleware.requireSurveyEditPermission,
     async (req: any, res: any) => {
       try {
-        const { resultFileName } = Request.getParams(req)
-        const result = await SurveyCompareService.readSurveyCompareResult({ resultFileName })
+        const { resultFileId } = Request.getParams(req)
+        const result = await SurveyCompareService.readSurveyCompareResult({ resultFileId })
         res.json(result)
       } catch (error) {
         Response.sendErr(res, error)
@@ -77,20 +85,37 @@ export const init = (app: any) => {
     }
   )
 
-  app.post('/survey/:surveyId/compare/apply', AuthMiddleware.requireSurveyEditPermission, (req: any, res: any) => {
+  app.post(
+    '/survey/:surveyId/compare/apply',
+    AuthMiddleware.requireSurveyEditPermission,
+    AuthMiddleware.requireSurveyCompareSourceViewPermission,
+    (req: any, res: any) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, sourceFileId, sourceSurveyId } = Request.getParams(req)
+        const selectedIds = Request.getJsonParam(req, 'selectedIds', [])
+        const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
+        const job = SurveyCompareService.startSurveyCompareApplyJob({
+          user,
+          surveyId: Number(surveyId),
+          sourceFileId,
+          sourceSurveyId: sourceSurveyId ? Number(sourceSurveyId) : undefined,
+          selectedIds,
+          manualMatches,
+        })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        Response.sendErr(res, error)
+      }
+    }
+  )
+
+  // fingerprints of the survey definition: they tell whether two surveys have the same definition
+  app.get('/survey/:surveyId/fingerprint', AuthMiddleware.requireSurveyViewPermission, async (req: any, res: any) => {
     try {
-      const user = Request.getUser(req)
-      const { surveyId, sourceFileName } = Request.getParams(req)
-      const selectedIds = Request.getJsonParam(req, 'selectedIds', [])
-      const manualMatches = Request.getJsonParam(req, 'manualMatches', {})
-      const job = SurveyCompareService.startSurveyCompareApplyJob({
-        user,
-        surveyId: Number(surveyId),
-        sourceFileName,
-        selectedIds,
-        manualMatches,
-      })
-      res.json({ job: JobUtils.jobToJSON(job) })
+      const { surveyId, draft } = Request.getParams(req)
+      const fingerprint = await SurveyFingerprintService.fetchSurveyFingerprint({ surveyId: Number(surveyId), draft })
+      res.json(fingerprint)
     } catch (error) {
       Response.sendErr(res, error)
     }

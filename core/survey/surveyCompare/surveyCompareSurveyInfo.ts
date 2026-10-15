@@ -44,7 +44,7 @@ const withoutBrandingImages = (branding: Record<string, any> = {}) =>
 
 const getInfoProps = (survey: any): Record<string, any> => ObjectUtils.getProps(Survey.getSurveyInfo(survey)) ?? {}
 
-const normalizeSurveyInfoProp = ({ key, value }: { key: string; value: any }) => {
+export const normalizeSurveyInfoProp = ({ key, value }: { key: string; value: any }) => {
   if (key === infoKeys.srs) {
     return normalizeValue((value ?? []).map((srs: any) => srs.code).sort((a: string, b: string) => a.localeCompare(b)))
   }

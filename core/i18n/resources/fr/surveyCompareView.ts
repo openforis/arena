@@ -10,15 +10,28 @@ export default {
   },
   fileTooLarge:
     'Le fichier sélectionné est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
-  selectNewFile: 'Sélectionner un nouveau fichier',
-  selectNewFileInfo: 'Abandonner cette comparaison et charger un autre fichier de formulaire',
+  selectNewSource: 'Sélectionner une nouvelle source',
+  selectNewSourceInfo:
+    'Abandonner cette comparaison et sélectionner un autre fichier de formulaire ou un autre formulaire',
   refreshComparison: 'Actualiser la comparaison',
   refreshComparisonInfo:
     "Comparer à nouveau le même fichier avec la version actuelle de ce formulaire (par ex. après l'avoir modifié)",
-  sourceSurvey: 'Formulaire chargé : {{name}}',
+  sourceSurvey: 'Formulaire comparé : {{name}}',
+  compareWithSurvey: 'Ou comparez avec un autre formulaire de ce serveur :',
+  fingerprint: {
+    thisSurvey: 'Ce formulaire',
+    comparedSurvey: 'Formulaire comparé',
+    equal: 'Identique à ce formulaire',
+    different: 'Différente de ce formulaire',
+    label: 'Empreinte',
+    structural: 'structurelle',
+    info: "Empreintes de la définition du formulaire (brouillon). Des empreintes égales signifient des définitions égales. La première inclut les identifiants internes : elle est égale uniquement pour des copies du même formulaire (par ex. exporté et importé sur un autre serveur). La structurelle utilise les noms et les codes : elle est égale aussi pour des formulaires créés séparément avec la même structure. Les noms, libellés, identifiants, dates et l'état de publication n'en font pas partie.",
+    copy: "Copier l'empreinte complète : {{value}}",
+    copied: 'Empreinte copiée dans le presse-papiers',
+  },
   identical: 'Les formulaires sont identiques',
   counts:
-    '{{added}} uniquement dans le formulaire chargé, {{changed}} modifiés, {{removed}} uniquement dans ce formulaire',
+    '{{added}} uniquement dans le formulaire comparé, {{changed}} modifiés, {{removed}} uniquement dans ce formulaire',
   surveyInfoChanged:
     "Les informations du formulaire (langues, cycles, libellés) sont différentes : voir l'onglet « Informations du formulaire »",
   onlyDifferences: 'Afficher uniquement les différences',
@@ -32,7 +45,7 @@ Les modifications sont enregistrées en brouillon : elles n'atteindront les enre
   removedItemInfo: 'Uniquement dans ce formulaire : appliquer cette modification le supprime de ce formulaire.',
   applyConfirmWithDeletionsHeader: 'Confirmer les suppressions',
   applyConfirmWithDeletions:
-    "Appliquer {{count}} modifications sélectionnées à ce formulaire ?\n\n**{{deletionsCount}} d'entre elles suppriment des éléments de ce formulaire** (éléments absents du formulaire chargé) :\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)",
+    "Appliquer {{count}} modifications sélectionnées à ce formulaire ?\n\n**{{deletionsCount}} d'entre elles suppriment des éléments de ce formulaire** (éléments absents du formulaire comparé) :\n\n{{- deletions}}\n\n$t(common.cantUndoWarning)",
   applyWithDeletions: 'Appliquer et supprimer',
   confirmSurveyName: 'Saisissez le nom de ce formulaire pour confirmer :',
   deletionOfItemsOf: 'éléments uniquement dans ce formulaire de **{{name}}**',
@@ -47,7 +60,7 @@ Les modifications sont enregistrées en brouillon : elles n'atteindront les enre
     surveyFiles: 'Fichiers',
   },
   status: {
-    added: 'Uniquement dans le formulaire chargé',
+    added: 'Uniquement dans le formulaire comparé',
     changed: 'Modifié',
     removed: 'Uniquement dans ce formulaire',
   },
@@ -106,7 +119,7 @@ Les modifications sont enregistrées en brouillon : elles n'atteindront les enre
   },
   cycle: 'cycle {{cycle}}',
   property: 'Propriété',
-  sourceValue: 'Formulaire chargé',
+  sourceValue: 'Formulaire comparé',
   targetValue: 'Ce formulaire',
   emptyValue: '(vide)',
   layoutOnly: 'mise en page uniquement',

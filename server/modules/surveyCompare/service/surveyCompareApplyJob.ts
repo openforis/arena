@@ -14,9 +14,6 @@ import {
 } from '@core/survey/surveyCompare'
 
 import Job from '@server/job/job'
-import * as FileUtils from '@server/utils/file/fileUtils'
-import FileZip from '@server/utils/file/fileZip'
-import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
@@ -27,7 +24,8 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as DbUtils from '@server/db/dbUtils'
 
-import { SurveyCompareSourceSurvey, fetchTargetSurvey, readSurveyFromFile } from './surveyCompareSurveysReader'
+import { SurveyCompareSource, withSource } from './surveyCompareSource'
+import { fetchSurveyFromDb } from './surveyCompareSurveysReader'
 
 /**
  * Applies the selected changes of a survey comparison to the survey with the specified id.
@@ -43,7 +41,8 @@ export default class SurveyCompareApplyJob extends Job {
    * @param {object} params - The parameters.
    * @param {object} params.user - The user running the job.
    * @param {number} params.surveyId - Id of the survey to update.
-   * @param {string} params.sourceFileName - Temp file name of the uploaded survey file.
+   * @param {string} [params.sourceFileId] - Id of the uploaded survey file, kept in the temp storage (source).
+   * @param {number} [params.sourceSurveyId] - Id of another survey on this server (source).
    * @param {string[]} params.selectedIds - Ids of the changes to apply.
    * @param {Record<string, string>} [params.manualMatches] - Node defs matched by the user (target uuid by source uuid).
    */
@@ -52,13 +51,15 @@ export default class SurveyCompareApplyJob extends Job {
   }
 
   async execute() {
-    const { surveyId, sourceFileName, selectedIds = [] }: any = this.context
-    FileUtils.checkIsValidTempFileName(sourceFileName)
+    const { sourceFileId, sourceSurveyId }: any = this.context
+    await withSource({ sourceFileId, sourceSurveyId }, (source) => this.applyChanges(source), this.tx)
+  }
 
-    const source = await readSurveyFromFile({ filePath: FileUtils.tempFilePath(sourceFileName) })
+  async applyChanges(source: SurveyCompareSource) {
+    const { surveyId, selectedIds = [] }: any = this.context
     // the comparison is computed again: the survey could have been changed in the meantime
     let params = await this.fetchCompareParams(source)
-    const surveyInfoAppliedIds = await this.applySurveyInfoChanges({ params, selectedIds })
+    const surveyInfoAppliedIds = await this.applySurveyInfoChanges({ params, selectedIds, source })
     if (surveyInfoAppliedIds.length > 0) {
       // node defs depending on the survey info (e.g. new cycles) can be applied only now
       params = await this.fetchCompareParams(source)
@@ -89,11 +90,9 @@ export default class SurveyCompareApplyJob extends Job {
     this.setContext({ appliedIds, skippedIds })
   }
 
-  async fetchCompareParams(
-    source: SurveyCompareSourceSurvey
-  ): Promise<SurveyCompareParams & { usedNodeDefUuids: string[] }> {
+  async fetchCompareParams(source: SurveyCompareSource): Promise<SurveyCompareParams & { usedNodeDefUuids: string[] }> {
     const { surveyId, manualMatches = {} }: any = this.context
-    const target = await fetchTargetSurvey({ surveyId }, this.tx)
+    const target = await fetchSurveyFromDb({ surveyId }, this.tx)
     return {
       sourceSurvey: source.survey,
       targetSurvey: target.survey,
@@ -106,8 +105,8 @@ export default class SurveyCompareApplyJob extends Job {
     }
   }
 
-  async applySurveyInfoChanges({ params, selectedIds }): Promise<string[]> {
-    const { user, surveyId, sourceFileName }: any = this.context
+  async applySurveyInfoChanges({ params, selectedIds, source }): Promise<string[]> {
+    const { user, surveyId }: any = this.context
     const result = compareSurveys(params)
     const { appliedIds } = expandSelection({ result, selectedIds })
     const plan = buildSurveyInfoApplyPlan({
@@ -119,10 +118,7 @@ export default class SurveyCompareApplyJob extends Job {
     })
     if (Object.keys(plan.surveyProps).length === 0) return []
 
-    await this.insertSurveyFiles({
-      files: plan.surveyFilesToInsert,
-      sourceFilePath: FileUtils.tempFilePath(sourceFileName),
-    })
+    await this.insertSurveyFiles({ files: plan.surveyFilesToInsert, source })
     const targetProps = ObjectUtils.getProps(Survey.getSurveyInfo(params.targetSurvey))
     // the id of the fetched survey is used: the survey name uniqueness check compares ids strictly
     const targetSurveyId = Survey.getId(Survey.getSurveyInfo(params.targetSurvey))
@@ -148,26 +144,19 @@ export default class SurveyCompareApplyJob extends Job {
 
   async insertSurveyFiles({
     files,
-    sourceFilePath,
+    source,
   }: {
     files: { sourceUuid: string; file: any }[]
-    sourceFilePath: string
+    source: SurveyCompareSource
   }) {
-    if (files.length === 0) return
     const { surveyId }: any = this.context
-    const zipFile = new FileZip(sourceFilePath)
-    await zipFile.init()
-    try {
-      for (const { sourceUuid, file } of files) {
-        const content = await ArenaSurveyFileZip.getSurveyFile(zipFile, sourceUuid) // NOSONAR
-        if (!content) {
-          throw new Error(`Missing content for survey file ${SurveyFile.getName(file)}`)
-        }
-        const fileWithContent = SurveyFile.assocSize(Buffer.byteLength(content))(SurveyFile.assocContent(content)(file))
-        await SurveyFileService.insertFile(surveyId, fileWithContent, this.tx) // NOSONAR
+    for (const { sourceUuid, file } of files) {
+      const content = await source.readSurveyFileContent(sourceUuid) // NOSONAR
+      if (!content) {
+        throw new Error(`Missing content for survey file ${SurveyFile.getName(file)}`)
       }
-    } finally {
-      zipFile.close()
+      const fileWithContent = SurveyFile.assocSize(Buffer.byteLength(content))(SurveyFile.assocContent(content)(file))
+      await SurveyFileService.insertFile(surveyId, fileWithContent, this.tx) // NOSONAR
     }
   }
 
