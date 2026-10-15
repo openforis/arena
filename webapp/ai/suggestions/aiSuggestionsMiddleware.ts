@@ -45,6 +45,8 @@ const getEvents = (action: any): SuggestionEvent[] => {
       return getJobEvents(action.job)
     case surveyInfoUpdate:
       // a new language can leave category item labels missing (suggestion 6)
+      // SurveyConfigurationEditor dispatches surveyInfoUpdate too, so it also triggers surveyInfoSaved:
+      // harmless, the event is throttled and the detector only reads the survey
       return [{ type: 'surveyInfoSaved' }]
     case surveyCategoryDelete:
       return [{ type: 'categoriesChanged' }]
