@@ -1,8 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Authorizer from '@core/auth/authorizer'
+import { findNodeEditRefusal, NodeEditRefusal } from '@core/record/nodeEditRefusal'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
 
 export type EditRefusal = { code: string; message: string }
@@ -72,8 +72,14 @@ export const checkAttributeEditable = ({
   return null
 }
 
+const nodeEditRefusalMessages: Record<NodeEditRefusal, (attributeName: string) => string> = {
+  readOnly: (name) => `\`${name}\` is read-only for this record (its "editable if" condition is false).`,
+  notApplicable: (name) => `\`${name}\` is not applicable in this record.`,
+}
+
 /**
- * Checks that the node is editable and applicable in its parent entity ("editable if" / "applicable if" of the survey).
+ * Checks that the node is editable and applicable in all its ancestor entities ("editable if" / "applicable if" of the
+ * survey), as the form enforces.
  * @param {object} params - Parameters.
  * @param {object} params.record - The record.
  * @param {object} params.node - The attribute node.
@@ -89,20 +95,7 @@ export const checkNodeEditable = ({
   node: any
   nodeDef: any
 }): EditRefusal | null => {
-  const parentNode = Record.getParentNode(node)(record)
-  if (!parentNode) return null
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  if (!Node.isChildEditable(nodeDefUuid)(parentNode)) {
-    return {
-      code: 'attributeNotEditable',
-      message: `\`${NodeDef.getName(nodeDef)}\` is read-only for this record (its "editable if" condition is false).`,
-    }
-  }
-  if (!Node.isChildApplicable(nodeDefUuid)(parentNode)) {
-    return {
-      code: 'attributeNotEditable',
-      message: `\`${NodeDef.getName(nodeDef)}\` is not applicable in this record.`,
-    }
-  }
-  return null
+  const refusal = findNodeEditRefusal({ record, node })
+  if (!refusal) return null
+  return { code: 'attributeNotEditable', message: nodeEditRefusalMessages[refusal](NodeDef.getName(nodeDef)) }
 }
