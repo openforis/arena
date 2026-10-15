@@ -12,10 +12,16 @@ import { refreshAuthToken } from '@webapp/app/appErrorsMiddleware'
 import { createAuthorizedFetch } from './authorizedFetch'
 import { createGatewayModel } from './gatewayModel'
 
+/**
+ * Refreshes the auth token of the gateway fetch through the app's single-flight refresh (shared with axios).
+ * @returns {Promise<string|null>} The new token, or null when the refresh failed.
+ */
+export const refreshGatewayAuthToken = async (): Promise<string | null> => (await refreshAuthToken()).authToken ?? null
+
 const authorizedFetch = createAuthorizedFetch({
   fetchImpl: (url, init) => fetch(url, init),
   getAuthToken: ApiConstants.getAuthToken,
-  refreshAuthToken: async () => (await refreshAuthToken()).authToken ?? null,
+  refreshAuthToken: refreshGatewayAuthToken,
 })
 
 /**
