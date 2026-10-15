@@ -3,7 +3,7 @@ import type { AddressInfo } from 'node:net'
 
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
-import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
+import { buildModel, buildUserModel } from '@server/modules/ai/service/providerRegistry'
 import { assertBaseUrlAllowed, isAllowlisted, isBlockedAddress } from '@server/modules/ai/service/baseUrlGuard'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
@@ -166,6 +166,54 @@ describe('buildUserModel redirects', () => {
       }
     }
     expect(reached).toEqual(['redirector /v1/chat/completions'])
+  })
+})
+
+describe('buildUserModel guards the address when the call connects', () => {
+  const prompt = [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }]
+
+  /**
+   * Builds a DNS lookup that answers a public address for the pre-check and a loopback one afterwards (rebinding).
+   * @returns {Function} The lookup, with the number of calls on `calls`.
+   */
+  const rebindingLookup = () => {
+    const lookup: any = async () => {
+      lookup.calls += 1
+      return [{ address: lookup.calls === 1 ? '93.184.216.34' : '127.0.0.1', family: 4 }]
+    }
+    lookup.calls = 0
+    return lookup as ((...args: unknown[]) => Promise<{ address: string; family: number }[]>) & { calls: number }
+  }
+
+  test.each(['openai-compatible', 'vercel-ai-sdk'])(
+    'a %s model call to a name that resolves to loopback after the pre-check is refused',
+    async (provider) => {
+      const lookup = rebindingLookup()
+      // the connect-time check is the only thing between the model call and 127.0.0.1: a plain fetch fails the test
+      const model: any = await buildUserModel(
+        { provider, model: 'm', baseUrl: 'http://rebind.attacker.example:9/v1', apiKey: 'k' },
+        { allowlist: [], lookup }
+      )
+      expect(lookup.calls).toBe(1)
+      await expectSystemErrorKey(model.doGenerate({ prompt, maxRetries: 0 }), 'aiBaseUrlNotAllowed')
+      expect(lookup.calls).toBe(2)
+    }
+  )
+
+  test('buildModel takes the fetch of the calls, and uses it for both kinds of user endpoint', async () => {
+    const urls: string[] = []
+    const fetchImpl = async (input: any) => {
+      urls.push(String(input))
+      throw new Error('stop')
+    }
+    for (const provider of ['openai-compatible', 'vercel-ai-sdk']) {
+      const model: any = buildModel(
+        { provider, model: 'm', baseUrl: 'https://llm.example.org/v1', apiKey: 'k' },
+        { fetchImpl }
+      )
+      await model.doGenerate({ prompt, maxRetries: 0 }).catch(() => undefined)
+    }
+    expect(urls).toHaveLength(2)
   })
 })
 
