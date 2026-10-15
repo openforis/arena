@@ -1,3 +1,4 @@
+import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
 import { createValidationErrorsDetector } from '@webapp/ai/suggestions/detectors/validationErrors'
 import type { SuggestionGeneration } from '@webapp/ai/suggestions/generation'
 import {
@@ -83,5 +84,15 @@ describe('suggestions ask the server for nothing when AI is off (429)', () => {
 
   test('with the setting on and the Cleaning area available the count is requested once', async () => {
     expect(await countRequestsWhenReportOpens({})).toBe(1)
+  })
+
+  test('the report tells the suggestions it opened only when the Cleaning area is available and a cycle is open', () => {
+    const notify = jest.fn()
+    // AI off (the area is not available): nothing is sent, so nothing can reach the server
+    notifyValidationReportOpened({ cycle: '0', askAssistantAvailable: false, notify })
+    notifyValidationReportOpened({ cycle: null, askAssistantAvailable: true, notify })
+    expect(notify).not.toHaveBeenCalled()
+    notifyValidationReportOpened({ cycle: '0', askAssistantAvailable: true, notify })
+    expect(notify).toHaveBeenCalledWith({ type: 'validationReportOpened', cycle: '0' })
   })
 })
