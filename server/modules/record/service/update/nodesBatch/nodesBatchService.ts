@@ -228,6 +228,31 @@ type NodesBatchParams = {
 }
 
 /**
+ * Checks the edits of a record, sends the accepted ones and waits for the reply. A failure fails only this record.
+ * @param {RequestContext} context - The request context.
+ * @param {string} recordUuid - The record uuid.
+ * @param {NodesBatchRecordEdit[]} recordEdits - The edits of the record.
+ * @returns {Promise<NodesBatchEditResult[]>} The results of the edits of the record.
+ */
+const processRecordEdits = async (
+  context: RequestContext,
+  recordUuid: string,
+  recordEdits: NodesBatchRecordEdit[]
+): Promise<NodesBatchEditResult[]> => {
+  // the request was reported as timed out: do not start more work
+  if (Date.now() >= context.deadline) return failedResults(recordEdits, NodesBatchMessageKeys.applyTimeout)
+  try {
+    const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
+    if (accepted.length === 0) return refused
+    return [...refused, ...(await sendRecordEditsSafely(context, recordUuid, accepted))]
+  } catch (error) {
+    // one record's failure must not hide the results of the others
+    context.deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
+    return failedResults(recordEdits, NodesBatchMessageKeys.unexpected)
+  }
+}
+
+/**
  * Checks the edits record by record, sends the accepted ones to the records update thread and collects the results.
  * @param {NodesBatchParams} params - The request.
  * @param {NodesBatchServiceDeps} deps - The dependencies.
@@ -252,22 +277,10 @@ const runNodesBatch = async (
     deps,
   }
   const results: NodesBatchEditResult[] = []
-  const pendingReplies: Promise<NodesBatchEditResult[]>[] = []
+  // one record at a time: the thread has one queue, so the messages of a batch would delay the form edits of all
+  // the users behind them
   for (const [recordUuid, recordEdits] of groupEditsByRecord(edits)) {
-    try {
-      const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
-      results.push(...refused)
-      if (accepted.length > 0) {
-        pendingReplies.push(sendRecordEditsSafely(context, recordUuid, accepted))
-      }
-    } catch (error) {
-      // one record's failure must not hide the results of the others
-      deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
-      results.push(...failedResults(recordEdits, NodesBatchMessageKeys.unexpected))
-    }
-  }
-  for (const replyResults of await Promise.all(pendingReplies)) {
-    results.push(...replyResults)
+    results.push(...(await processRecordEdits(context, recordUuid, recordEdits)))
   }
   return results.sort((resultA, resultB) => resultA.index - resultB.index)
 }
