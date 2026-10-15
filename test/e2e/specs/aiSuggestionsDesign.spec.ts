@@ -146,7 +146,9 @@ test.describe('AI assistant Design suggestions (mock provider)', () => {
     // many changes: the compact card previews the first ones and counts the results
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetCard)).toContainText('Cluster id (fr)')
 
+    // the changes were not reviewed: Apply all asks to confirm
     await panel.getByTestId(TestId.aiAssistant.applyBtn).click()
+    await panel.getByTestId(TestId.aiAssistant.applyConfirmBtn).click()
     await expect(panel.getByTestId(TestId.aiAssistant.changeSetCard)).toContainText('Applied: 19')
     // settle moves the applied targets to the dismissed ones; they leave only when the state detector runs (1 s after
     // the survey changes) and finds nothing left to translate
