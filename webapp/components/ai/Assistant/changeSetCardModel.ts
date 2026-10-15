@@ -29,6 +29,9 @@ export type CardValue =
   | { kind: 'boolean'; value: boolean }
   | { kind: 'expressions'; items: CardExpressionItem[] }
 
+// one more thing a new node definition sets (a key flag, a label in another language...), shown under its row
+export type CardDetail = { titleKey: string; titleParams: Record<string, string>; value: CardValue }
+
 export type CardRow = {
   id: string
   nodeDefUuid: string
@@ -39,6 +42,8 @@ export type CardRow = {
   // null for a new node definition
   from: CardValue | null
   to: CardValue
+  // a new node definition: every non-default prop besides its type, name and one label
+  details?: CardDetail[]
   result: OperationResult | null
 }
 
@@ -106,6 +111,44 @@ const toExpressionsValue = (expressions: any[]): CardValue => ({
   })),
 })
 
+const textDetail = (titleKey: string, lang: string, text: string): CardDetail => ({
+  titleKey,
+  titleParams: { lang },
+  value: { kind: 'text', text },
+})
+
+const flagDetail = (prop: string, value: boolean): CardDetail => ({
+  titleKey: `aiAssistant.card.props.${prop}`,
+  titleParams: {},
+  value: { kind: 'boolean', value },
+})
+
+/**
+ * Returns what a new node definition sets besides its type, name and the label shown on the row: the key, multiple
+ * (when not the type's default) and read only flags, the labels in the other languages and every description.
+ * @param {object} nodeDef - The node definition to create.
+ * @param {string|null} shownLang - Language of the label shown on the row.
+ * @returns {CardDetail[]} The details, flags first.
+ */
+const toCreateDetails = (nodeDef: any, shownLang: string | null): CardDetail[] => {
+  const labels: Record<string, string> = NodeDef.getLabels(nodeDef)
+  const descriptions: Record<string, string> = NodeDef.getDescriptions(nodeDef)
+  const details: CardDetail[] = []
+  if (NodeDef.isKey(nodeDef)) details.push(flagDetail('key', true))
+  // entities are multiple unless said otherwise, attributes single
+  if (NodeDef.isMultiple(nodeDef) !== NodeDef.isEntity(nodeDef)) {
+    details.push(flagDetail('multiple', NodeDef.isMultiple(nodeDef)))
+  }
+  if (NodeDef.isReadOnly(nodeDef)) details.push(flagDetail('readOnly', true))
+  for (const [lang, text] of Object.entries(labels)) {
+    if (lang !== shownLang) details.push(textDetail('aiAssistant.card.label', lang, text))
+  }
+  for (const [lang, text] of Object.entries(descriptions)) {
+    details.push(textDetail('aiAssistant.card.description', lang, text))
+  }
+  return details
+}
+
 /**
  * Returns the row fields of a create operation.
  * @param {ChangeOperation} op - Create operation.
@@ -114,13 +157,16 @@ const toExpressionsValue = (expressions: any[]): CardValue => ({
  */
 const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, lang: string) => {
   const labels: Record<string, string> = NodeDef.getLabels(op.nodeDef)
+  // the label of the preferred language, else the first one
+  const shownLang = lang in labels ? lang : (Object.keys(labels)[0] ?? null)
   return {
     nodeDefUuid: NodeDef.getUuid(op.nodeDef),
     nodeDefName: NodeDef.getName(op.nodeDef),
     titleKey: 'aiAssistant.card.newItem',
     titleParams: { type: NodeDef.getType(op.nodeDef) },
     from: null,
-    to: { kind: 'text', text: labels[lang] ?? Object.values(labels)[0] ?? null } as CardValue,
+    to: { kind: 'text', text: shownLang ? labels[shownLang] : null } as CardValue,
+    details: toCreateDetails(op.nodeDef, shownLang),
   }
 }
 
