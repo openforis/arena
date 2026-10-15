@@ -39,25 +39,18 @@ export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
 // ==== hierarchy
 // ancestors
 
-export const visitAncestorsAndSelf =
-  ({ node, visitor }) =>
-  (record) =>
-    // the visitor return value is ignored: the visit never stops early
-    Records.visitAncestorsAndSelf(node, (visitedNode) => {
-      visitor(visitedNode)
-    })(record)
+export const visitAncestorsAndSelf = (node, visitor) => (record) =>
+  // the visitor return value is ignored: the visit never stops early
+  Records.visitAncestorsAndSelf(node, (visitedNode) => {
+    visitor(visitedNode)
+  })(record)
 
 /**
  * Returns the list of ancestors from the given node to the root entity.
- * @param node
+ * @param {object} node - The node to start from.
+ * @returns {Function} - Function taking the record and returning the node and its ancestors.
  */
-export const getAncestorsAndSelf = (node) => (record) => {
-  const ancestors = []
-  visitAncestorsAndSelf(node, (currentNode) => {
-    ancestors.push(currentNode)
-  })(record)
-  return ancestors
-}
+export const getAncestorsAndSelf = (node) => (record) => Records.getAncestorsAndSelf(node)(record)
 
 export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
   A.pipe(

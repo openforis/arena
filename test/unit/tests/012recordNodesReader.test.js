@@ -50,6 +50,22 @@ describe('RecordReader Test', () => {
     record = DataTest.createTestRecord({ user, survey })
   }, 10000)
 
+  it('Test ancestors visit', () => {
+    const cluster = getNode('cluster')
+    const plot = getNode('cluster/plot[1]')
+    const plotId = getNode('cluster/plot[1]/plot_id')
+
+    expect(Record.getAncestorsAndSelf(plotId)(record)).toStrictEqual([plotId, plot, cluster])
+
+    // the visitor return value is ignored: all the ancestors are visited
+    const visited = []
+    Record.visitAncestorsAndSelf(plotId, (node) => visited.push(node))(record)
+    expect(visited).toStrictEqual([plotId, plot, cluster])
+
+    const plotDef = getNodeDef('cluster/plot')
+    expect(Record.getAncestorByNodeDefUuid(plotId, plotDef.uuid)(record)).toStrictEqual(plot)
+  })
+
   it('Test find child node by key values', () => {
     const plotIdDef = getNodeDef('cluster/plot/plot_id')
 
