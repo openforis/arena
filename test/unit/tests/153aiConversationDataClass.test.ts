@@ -66,17 +66,25 @@ describe('turn data class and engine', () => {
     expect(getTurnDataClass({ conversationDataClass: 'data', tools: [] })).toBe('data')
   })
 
+  const policy = { schema: 'onDevice', data: 'onDevice' } as const
+  // the part of the resolver that matters here: the engine selected for the request's class, then the declaration
   const newResolver = (hostingClassByDataClass: Record<string, string | null>) => {
     const calls: any[] = []
     const resolve = async (params: any) => {
       calls.push(params)
-      const hostingClass = hostingClassByDataClass[params.dataClass]
-      if (!hostingClass) {
-        const error: any = new Error('no engine')
-        error.key = 'aiNoEngineAvailable'
-        throw error
+      const select = (dataClass: string) => {
+        const hostingClass = hostingClassByDataClass[dataClass]
+        if (!hostingClass) {
+          const error: any = new Error('no engine')
+          error.key = 'aiNoEngineAvailable'
+          throw error
+        }
+        return { id: hostingClass, hostingClass } as any
       }
-      return { model: { modelId: `m-${hostingClass}` }, engine: { id: hostingClass, hostingClass } as any }
+      const first = select(params.dataClass)
+      const declared = params.declareDataClass({ engine: first, policy })
+      const dataClass = declared === 'data' ? 'data' : params.dataClass
+      return { model: {}, engine: select(dataClass), policy, dataClass }
     }
     return { resolve, calls }
   }
@@ -84,17 +92,19 @@ describe('turn data class and engine', () => {
     hostingClass === 'onDevice' ? [schemaTool, dataTool] : [schemaTool]
   const params = (dataClass: 'schema' | 'data') => ({ feature: 'assistantAnalysis' as const, surveyId: 1, dataClass })
 
-  test('cloud engine, schema conversation: one resolution, schema declared', async () => {
+  test('cloud engine, schema conversation: schema declared', async () => {
     const { resolve, calls } = newResolver({ schema: 'cloud', data: null })
     const result = await resolveAssistantTurnModel({ params: params('schema'), getToolsForHosting, resolve })
-    expect(calls).toEqual([{ feature: 'assistantAnalysis', surveyId: 1, dataClass: 'schema' }])
+    expect(calls).toHaveLength(1)
+    expect(result.dataClass).toBe('schema')
     expect(result.engine.hostingClass).toBe('cloud')
   })
 
-  test('local engine, schema conversation: re-resolved with data, same engine', async () => {
+  test('local engine, schema conversation: data declared in the same call, same engine', async () => {
     const { resolve, calls } = newResolver({ schema: 'onDevice', data: 'onDevice' })
     const result = await resolveAssistantTurnModel({ params: params('schema'), getToolsForHosting, resolve })
-    expect(calls.map((call) => call.dataClass)).toEqual(['schema', 'data'])
+    expect(calls).toHaveLength(1)
+    expect(result.dataClass).toBe('data')
     expect(result.engine.hostingClass).toBe('onDevice')
   })
 
@@ -112,6 +122,22 @@ describe('turn data class and engine', () => {
       'aiNoEngineAvailable'
     )
     expect(calls.map((call) => call.dataClass)).toEqual(['data'])
+  })
+
+  test('the tools are asked for under the policy the resolver passes', async () => {
+    const seen: unknown[] = []
+    await resolveAssistantTurnModel({
+      params: params('schema'),
+      getToolsForHosting: (hostingClass, toolsPolicy) => {
+        seen.push([hostingClass, toolsPolicy])
+        return []
+      },
+      resolve: async (resolveParams) => {
+        resolveParams.declareDataClass!({ engine: { hostingClass: 'onDevice' } as any, policy })
+        return {}
+      },
+    })
+    expect(seen).toEqual([['onDevice', policy]])
   })
 })
 

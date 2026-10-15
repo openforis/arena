@@ -237,8 +237,9 @@ export const runAssistantTurn = async ({
       resolve: (params) =>
         resolveAssistantTurnModel({
           params,
-          getToolsForHosting: (hostingClass) =>
-            getTools({ area, ctx: turnCtx, effective: access.effective, hostingClass, tools }),
+          // the policy the engine is selected with: the same one the final tool list is made from
+          getToolsForHosting: (hostingClass, effective) =>
+            getTools({ area, ctx: turnCtx, effective, hostingClass, tools }),
           resolve,
         }),
     })

@@ -57,7 +57,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends object>({
   dataClass: AiDataClass
   providerId?: string
   signal?: AbortSignal
-  resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine; policy?: AiPolicy }>
+  resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine; policy: AiPolicy }>
 }): Promise<AssistantEngine<TModel, TAccess>> => {
   if (model) return { model, limits: limits ?? defaultLimits, access: access as TAccess & Access, engine: null }
   const resolved = await resolve({ feature, surveyId, dataClass, providerId, signal })
@@ -68,7 +68,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends object>({
     access: {
       ...access,
       hostingClass: resolved.engine.hostingClass,
-      ...(resolved.policy ? { effective: resolved.policy } : {}),
+      effective: resolved.policy,
     },
     engine: resolved.engine,
   }
