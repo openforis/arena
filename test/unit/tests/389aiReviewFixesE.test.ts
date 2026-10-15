@@ -1,21 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import en from '@core/i18n/resources/en/common'
-import es from '@core/i18n/resources/es/common'
-import fr from '@core/i18n/resources/fr/common'
-import ja from '@core/i18n/resources/ja/common'
-import mn from '@core/i18n/resources/mn/common'
-import pt from '@core/i18n/resources/pt/common'
-import ru from '@core/i18n/resources/ru/common'
-import enErrors from '@core/i18n/resources/en/appErrors'
-import esErrors from '@core/i18n/resources/es/appErrors'
-import frErrors from '@core/i18n/resources/fr/appErrors'
-import jaErrors from '@core/i18n/resources/ja/appErrors'
-import mnErrors from '@core/i18n/resources/mn/appErrors'
-import ptErrors from '@core/i18n/resources/pt/appErrors'
-import ruErrors from '@core/i18n/resources/ru/appErrors'
-
 import { applyChangeSet, type ApplierDeps } from '@webapp/ai/changeSets/applyChangeSet'
 import { findStructuralConflicts, findValidationConflicts } from '@webapp/ai/changeSets/designerRuleConflicts'
 import { isI18nKeyReason } from '@webapp/ai/changeSets/types'
@@ -27,17 +12,11 @@ import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefPropose
 import { runTool } from '@webapp/ai/tools/registry'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
+import { namespaceByLanguage } from '../utils/i18nParity'
 
-const commonByLang: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-const errorsByLang: Record<string, any> = {
-  en: enErrors,
-  es: esErrors,
-  fr: frErrors,
-  ja: jaErrors,
-  mn: mnErrors,
-  pt: ptErrors,
-  ru: ruErrors,
-}
+const commonByLang = namespaceByLanguage('common')
+const errorsByLang = namespaceByLanguage('appErrors')
+const en = commonByLang.en
 
 describe('a tool call never reads another survey than the turn was authorised for (389)', () => {
   test('a different survey id is a surveyChanged failure and the tool does not run', async () => {
@@ -67,7 +46,7 @@ describe('a tool call never reads another survey than the turn was authorised fo
     expect(same.error).toBeUndefined()
   })
 
-  test('the message is translated in the 7 languages', () => {
+  test('the message is translated in every language', () => {
     for (const [lang, errors] of Object.entries(errorsByLang)) {
       expect(typeof errors.aiSurveyChanged).toBe('string')
       expect(errors.aiSurveyChanged.length).toBeGreaterThan(10)
@@ -111,7 +90,7 @@ describe('designer-rule conflicts carry an i18n key and its params (389)', () =>
     }
   })
 
-  test('every aiAssistant.issues key and the new keys exist in the 7 languages', () => {
+  test('every aiAssistant.issues key and the new keys exist in every language', () => {
     const keys = Object.keys(en.aiAssistant.issues)
     expect(keys).toEqual(expect.arrayContaining(['refEditDisabled', 'nodeDefInvalid', 'expressionInvalid']))
     for (const [lang, common] of Object.entries(commonByLang)) {

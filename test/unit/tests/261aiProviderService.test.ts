@@ -1,15 +1,9 @@
-import en from '@core/i18n/resources/en/appErrors'
-import es from '@core/i18n/resources/es/appErrors'
-import fr from '@core/i18n/resources/fr/appErrors'
-import ja from '@core/i18n/resources/ja/appErrors'
-import mn from '@core/i18n/resources/mn/appErrors'
-import pt from '@core/i18n/resources/pt/appErrors'
-import ru from '@core/i18n/resources/ru/appErrors'
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 const SECRET = 'd'.repeat(64)
 const USER_UUID = 'u1'
@@ -488,13 +482,14 @@ describe('AI provider service (261)', () => {
       'aiEncryptionMissing',
       'aiProviderChanged',
     ]
-    for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
+    const errorsByLang = namespaceByLanguage('appErrors')
+    for (const lang of LANGUAGES) {
       for (const key of keys) {
-        expect([lang, key, typeof (resources as Record<string, unknown>)[key]]).toEqual([lang, key, 'string'])
+        expect([lang, key, typeof errorsByLang[lang][key]]).toEqual([lang, key, 'string'])
       }
     }
-    for (const resources of [mn, ru]) {
-      for (const key of keys) expect((resources as unknown as Record<string, string>)[key]).toMatch(/[Ѐ-ӿ]/)
+    for (const lang of CYRILLIC_LANGUAGES) {
+      for (const key of keys) expect(errorsByLang[lang][key]).toMatch(CYRILLIC)
     }
   })
 })

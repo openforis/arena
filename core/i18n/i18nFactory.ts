@@ -12,7 +12,8 @@ import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
 import ruTranslation from './resources/ru'
 
-const resources = {
+// every language of the app (the unit tests derive the languages they check from it)
+export const resources = {
   en: enTranslation,
   es: esTranslation,
   fr: frTranslation,

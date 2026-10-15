@@ -5,6 +5,7 @@ import {
   getPolicyLevelOptions,
   getPolicySaveErrorMessage,
 } from '@webapp/views/App/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
+import { fakeT as t } from '../utils/fakeT'
 
 const getPath = (obj: any, path: string) => path.split('.').reduce((acc, part) => acc?.[part], obj)
 const disabledKeys = (options: { key: string; disabled: boolean }[]) =>
@@ -48,8 +49,6 @@ describe('policy level options', () => {
 })
 
 describe('getPolicySaveErrorMessage', () => {
-  const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
-
   test('server error key with params', () => {
     const error = {
       response: {

@@ -1,90 +1,41 @@
 import { AiFeatureCategory } from '@common/ai/features'
 
-import en from '@core/i18n/resources/en/common'
-import es from '@core/i18n/resources/es/common'
-import fr from '@core/i18n/resources/fr/common'
-import ja from '@core/i18n/resources/ja/common'
-import mn from '@core/i18n/resources/mn/common'
-import pt from '@core/i18n/resources/pt/common'
-import ru from '@core/i18n/resources/ru/common'
-import enSettings from '@core/i18n/resources/en/userAiSettings'
-import esSettings from '@core/i18n/resources/es/userAiSettings'
-import frSettings from '@core/i18n/resources/fr/userAiSettings'
-import jaSettings from '@core/i18n/resources/ja/userAiSettings'
-import mnSettings from '@core/i18n/resources/mn/userAiSettings'
-import ptSettings from '@core/i18n/resources/pt/userAiSettings'
-import ruSettings from '@core/i18n/resources/ru/userAiSettings'
+import {
+  baseKeysOf,
+  CYRILLIC,
+  CYRILLIC_LANGUAGES,
+  flattenTexts as flatten,
+  generalForm,
+  getPluralMismatches,
+  LANGUAGES,
+  namespaceByLanguage,
+  placeholdersOf as placeholders,
+} from '../utils/i18nParity'
 
-const commonByLang: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-const settingsByLang: Record<string, any> = {
-  en: enSettings,
-  es: esSettings,
-  fr: frSettings,
-  ja: jaSettings,
-  mn: mnSettings,
-  pt: ptSettings,
-  ru: ruSettings,
-}
-const CYRILLIC = /[Ѐ-ӿ]/
-
-const flatten = (obj: Record<string, any>, prefix = ''): Record<string, string> => {
-  const result: Record<string, string> = {}
-  for (const [key, value] of Object.entries(obj)) {
-    const path = prefix ? `${prefix}.${key}` : key
-    if (typeof value === 'string') result[path] = value
-    else Object.assign(result, flatten(value, path))
-  }
-  return result
-}
-
-const placeholders = (text: string): string[] => (text.match(/\{\{\w+\}\}/g) ?? []).sort()
-
-// a plural text has one key per form (seeAll_one, seeAll_few, ...) and each language has its own forms
-const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
-const baseKeyOf = (key: string): string => key.replace(PLURAL_SUFFIX, '')
-const baseKeysOf = (flat: Record<string, string>): string[] => [...new Set(Object.keys(flat).map(baseKeyOf))].sort()
-// the general form of a text: the "other" form of a plural, else the text itself
-const generalForm = (flat: Record<string, string>, baseKey: string): string =>
-  flat[`${baseKey}_other`] ?? flat[baseKey] ?? ''
+const commonByLang = namespaceByLanguage('common')
+const settingsByLang = namespaceByLanguage('userAiSettings')
+const en = commonByLang.en
+const enSettings = settingsByLang.en
 
 const enKeys = flatten(en.aiAssistant)
 
 describe('aiAssistant i18n', () => {
-  test.each(Object.keys(commonByLang))('%s has the same keys as en', (lang) => {
+  test.each(LANGUAGES)('%s has the same keys as en', (lang) => {
     expect(baseKeysOf(flatten(commonByLang[lang].aiAssistant))).toEqual(baseKeysOf(enKeys))
   })
 
-  test.each(Object.keys(commonByLang))('%s keeps the placeholders of en', (lang) => {
+  test.each(LANGUAGES)('%s keeps the placeholders of en', (lang) => {
     const translated = flatten(commonByLang[lang].aiAssistant)
     for (const key of baseKeysOf(enKeys)) {
       expect([key, placeholders(generalForm(translated, key))]).toEqual([key, placeholders(generalForm(enKeys, key))])
     }
   })
 
-  // i18next shows the raw key for a category without a text (ru few / many, es fr pt many for millions)
-  const pluralFormsOf = (flat: Record<string, string>): Record<string, string[]> => {
-    const forms: Record<string, string[]> = {}
-    for (const key of Object.keys(flat)) {
-      const match = PLURAL_SUFFIX.exec(key)
-      if (match) (forms[baseKeyOf(key)] ??= []).push(match[1])
-    }
-    return forms
-  }
-
-  // the plural texts whose forms differ from the categories of the language
-  const getPluralMismatches = (lang: string, flat: Record<string, string>) => {
-    const { pluralCategories } = new Intl.PluralRules(lang).resolvedOptions()
-    const expected = [...pluralCategories].sort()
-    return Object.entries(pluralFormsOf(flat))
-      .map(([baseKey, present]) => ({ baseKey, forms: [...present].sort() }))
-      .filter(({ forms }) => forms.join() !== expected.join())
-  }
-
-  test.each(Object.keys(commonByLang))('%s has every plural form of its language in aiAssistant', (lang) => {
+  test.each(LANGUAGES)('%s has every plural form of its language in aiAssistant', (lang) => {
     expect(getPluralMismatches(lang, flatten(commonByLang[lang].aiAssistant))).toEqual([])
   })
 
-  test.each(['ru', 'mn'])('%s is written in Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s is written in Cyrillic', (lang) => {
     for (const [key, text] of Object.entries(flatten(commonByLang[lang].aiAssistant))) {
       expect([key, CYRILLIC.test(text)]).toEqual([key, true])
     }
@@ -103,15 +54,15 @@ describe('aiAssistant i18n', () => {
     'features.',
   ]
 
-  test.each(Object.keys(settingsByLang))('%s has every plural form of its language in userAiSettings', (lang) => {
+  test.each(LANGUAGES)('%s has every plural form of its language in userAiSettings', (lang) => {
     expect(getPluralMismatches(lang, flatten(settingsByLang[lang]))).toEqual([])
   })
 
-  test.each(Object.keys(settingsByLang))('%s userAiSettings has the same keys as en', (lang) => {
+  test.each(LANGUAGES)('%s userAiSettings has the same keys as en', (lang) => {
     expect(baseKeysOf(flatten(settingsByLang[lang]))).toEqual(baseKeysOf(enSettingsKeys))
   })
 
-  test.each(Object.keys(settingsByLang))('%s userAiSettings keeps the placeholders of en', (lang) => {
+  test.each(LANGUAGES)('%s userAiSettings keeps the placeholders of en', (lang) => {
     const translated = flatten(settingsByLang[lang])
     for (const key of baseKeysOf(enSettingsKeys)) {
       expect([key, placeholders(generalForm(translated, key))]).toEqual([
@@ -121,14 +72,14 @@ describe('aiAssistant i18n', () => {
     }
   })
 
-  test.each(['ru', 'mn'])('%s panel texts are written in Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s panel texts are written in Cyrillic', (lang) => {
     for (const [key, text] of Object.entries(flatten(settingsByLang[lang]))) {
       if (!PANEL_PREFIXES.some((prefix) => key.startsWith(prefix))) continue
       expect([key, CYRILLIC.test(text)]).toEqual([key, true])
     }
   })
 
-  test.each(Object.keys(settingsByLang))('%s has a switch label and a "Sends:" text per category', (lang) => {
+  test.each(LANGUAGES)('%s has a switch label and a "Sends:" text per category', (lang) => {
     const { categories, features } = settingsByLang[lang]
     expect(categories).toBeUndefined()
     for (const category of Object.values(AiFeatureCategory)) {

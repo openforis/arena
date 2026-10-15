@@ -9,6 +9,7 @@ import {
   getProviderWhereKey,
   isDefaultProviderMissing,
 } from '@webapp/components/ai/UserAiSettingsPanel/providerList'
+import { fakeT as t } from '../utils/fakeT'
 
 const account: AiProviderEntry = {
   id: 'acct:a1',
@@ -100,8 +101,7 @@ describe('provider list (268)', () => {
     ])
     expect(rows[1].pill).toEqual({ tone: 'bad', key: 'userAiSettings:status.notAvailable' })
     expect(rows[2].actions).toEqual(['makeDefault'])
-    const t = (key: string) => `t:${key}`
-    expect(getProviderDisplayName({ entry: arena, t })).toBe('t:userAiSettings:list.arenaDefault')
+    expect(getProviderDisplayName({ entry: arena, t })).toBe('userAiSettings:list.arenaDefault')
     expect(getProviderDisplayName({ entry: account, t })).toBe('Claude')
   })
 

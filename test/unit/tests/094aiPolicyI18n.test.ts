@@ -1,29 +1,16 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
+import {
+  CYRILLIC,
+  CYRILLIC_LANGUAGES,
+  getPath,
+  LANGUAGES as languages,
+  leafPaths,
+  RESOURCES as resources,
+} from '../utils/i18nParity'
 
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-const languages = Object.keys(resources)
-
-const getPath = (obj: any, path: string): any => path.split('.').reduce((acc, part) => acc?.[part], obj)
-
-// flattened "a.b.c" paths of every string leaf
-const leafPaths = (obj: any, prefix = ''): string[] => {
-  const paths: string[] = []
-  for (const [key, value] of Object.entries(obj ?? {})) {
-    const path = prefix ? `${prefix}.${key}` : key
-    if (typeof value === 'string') paths.push(path)
-    else paths.push(...leafPaths(value, path))
-  }
-  return paths.sort()
-}
+const en = resources.en
 
 const groups = ['common.aiPolicy', 'common.aiDataLocation', 'homeView.surveyInfo.aiPolicy']
 const errorKeys = ['aiPolicyRefused', 'aiPolicyInvalid', 'aiPolicyAboveCeiling', 'aiPolicyDataAboveSchema']
@@ -38,9 +25,9 @@ describe('AI policy i18n', () => {
     }
   })
 
-  test.each(['ru', 'mn'])('%s texts are in Cyrillic', (lang) => {
-    expect(resources[lang].homeView.surveyInfo.aiPolicy.title).toMatch(/[Ѐ-ӿ]/)
-    expect(resources[lang].common.aiPolicy.level.cloud).toMatch(/[Ѐ-ӿ]/)
+  test.each(CYRILLIC_LANGUAGES)('%s texts are in Cyrillic', (lang) => {
+    expect(resources[lang].homeView.surveyInfo.aiPolicy.title).toMatch(CYRILLIC)
+    expect(resources[lang].common.aiPolicy.level.cloud).toMatch(CYRILLIC)
   })
 
   test.each(['en', 'fr', 'ja'])('%s has the activity log message', (lang) => {

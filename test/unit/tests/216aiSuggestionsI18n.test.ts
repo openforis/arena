@@ -2,6 +2,7 @@ import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import {
   CYRILLIC,
+  CYRILLIC_LANGUAGES,
   LANGUAGES,
   PLURAL_FORMS,
   PLURAL_SUFFIX,
@@ -53,7 +54,7 @@ describe('aiSuggestions i18n (216)', () => {
     }
   })
 
-  test.each(['ru', 'mn'])('%s texts are written in Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s texts are written in Cyrillic', (lang) => {
     for (const [key, text] of Object.entries(flatten(getResource(lang)))) {
       expect([key, CYRILLIC.test(text)]).toEqual([key, true])
     }

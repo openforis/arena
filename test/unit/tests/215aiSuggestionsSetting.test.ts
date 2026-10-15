@@ -5,14 +5,6 @@ import {
   isAiCategoryOnByDefault,
 } from '@common/ai/features'
 
-import enSettings from '@core/i18n/resources/en/userAiSettings'
-import esSettings from '@core/i18n/resources/es/userAiSettings'
-import frSettings from '@core/i18n/resources/fr/userAiSettings'
-import jaSettings from '@core/i18n/resources/ja/userAiSettings'
-import mnSettings from '@core/i18n/resources/mn/userAiSettings'
-import ptSettings from '@core/i18n/resources/pt/userAiSettings'
-import ruSettings from '@core/i18n/resources/ru/userAiSettings'
-
 import {
   defaultFeatureToggles as serverDefaults,
   isCategoryEnabledForUser,
@@ -21,6 +13,7 @@ import {
 import { isAiCategoryEnabledInSettings } from '@webapp/ai/engines/featureSwitches'
 import { createEmptyForm, settingsToForm } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
 import { FEATURE_GROUPS } from '@webapp/components/ai/UserAiSettingsPanel/featureGroups'
+import { LANGUAGES, namespaceByLanguage, OTHER_LANGUAGES } from '../utils/i18nParity'
 
 const { assistantSuggestions, chat } = AiFeatureCategory
 
@@ -29,15 +22,8 @@ const userWith = (featureToggles: unknown, featuresEnabled = true): any => ({
   prefs: { ai: { featuresEnabled, featureToggles } },
 })
 
-const settingsByLang: Record<string, any> = {
-  en: enSettings,
-  es: esSettings,
-  fr: frSettings,
-  ja: jaSettings,
-  mn: mnSettings,
-  pt: ptSettings,
-  ru: ruSettings,
-}
+const settingsByLang = namespaceByLanguage('userAiSettings')
+const enSettings = settingsByLang.en
 
 describe('proactive suggestions setting (215)', () => {
   test('a category with a feature that never calls a model (no gateway, no tools)', () => {
@@ -103,14 +89,14 @@ describe('proactive suggestions setting (215)', () => {
     expect(group?.categories).toEqual([chat, assistantSuggestions])
   })
 
-  test.each(Object.keys(settingsByLang))('%s has a label and a "Sends:" text, and no runs line', (lang) => {
+  test.each(LANGUAGES)('%s has a label and a "Sends:" text, and no runs line', (lang) => {
     const texts = settingsByLang[lang].features.assistantSuggestions
     expect(typeof texts.label).toBe('string')
     expect(typeof texts.sends).toBe('string')
     expect(texts.runs).toBeUndefined()
   })
 
-  test.each(Object.keys(settingsByLang).filter((lang) => lang !== 'en'))('%s translates the label', (lang) => {
+  test.each(OTHER_LANGUAGES)('%s translates the label', (lang) => {
     expect(settingsByLang[lang].features.assistantSuggestions.label).not.toBe(
       enSettings.features.assistantSuggestions.label
     )
