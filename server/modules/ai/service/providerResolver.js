@@ -59,7 +59,8 @@ const resolveAccountConfig = ({ user, providerId, decrypt }) => {
  * Resolves the provider config of a call.
  * @param {object} params - Parameters.
  * @param {object} params.user - Arena user.
- * @param {string} params.providerId - Requested provider id (the format is validated by parseGatewayRequest).
+ * @param {string} [params.providerId] - Requested provider id (format validated by parseGatewayRequest); the call is
+ *   refused without one.
  * @param {object|null} [params.adminConfig] - Admin default config (injectable for tests).
  * @param {boolean} [params.decrypt] - Decrypt the key of an account provider (default true).
  * @returns {{cfg: object, source: string, providerId: string}} The config, its source and the provider id.
@@ -114,7 +115,7 @@ export const describeAdminDefault = (adminConfig = adminDefaultConfig(), allowli
  * Resolves the model handle of a call.
  * @param {object} args - Resolver inputs.
  * @param {object} args.user - The Arena user object.
- * @param {string} args.providerId - Requested provider id.
+ * @param {string} [args.providerId] - Requested provider id; the call is refused without one.
  * @returns {Promise<{model: object, meta: {source: string, provider: string, model: string, hostingClass: string}}>}
  *   The AI SDK model handle plus telemetry metadata.
  */

@@ -41,6 +41,13 @@ const endlessBody = (chunk: string) => {
   return { body, state }
 }
 
+/**
+ * Returns what a call fails with.
+ * @param {PromiseLike<unknown>} call - The call.
+ * @returns {Promise<any>} The error.
+ */
+const rejectionOf = (call: PromiseLike<unknown>): Promise<any> => Promise.resolve(call).catch((error) => error)
+
 const delta = (text: string) => `data: {"type":"text-delta","delta":"${text}"}\n\n`
 
 describe('SSE parser: caps per frame and per response (323)', () => {
@@ -214,7 +221,7 @@ describe('response limits: the vercel-ai-sdk provider (323)', () => {
       fetchImpl: async () => new Response(body, { status: 500 }),
       limits: { maxErrorBodyBytes: 3000 },
     })
-    const error: any = await model.doGenerate(callOptions).catch((caught) => caught)
+    const error = await rejectionOf(model.doGenerate(callOptions))
     expect(error.message).toMatch(/^AI SDK upstream HTTP 500: z+$/)
     expect(error.message.length).toBeLessThanOrEqual('AI SDK upstream HTTP 500: '.length + 500)
     expect(state.pulls).toBeLessThan(10)
@@ -232,9 +239,7 @@ describe('response limits: user-chosen OpenAI-compatible endpoints (323)', () =>
   test('generate: an endless answer is cut at the response cap', async () => {
     const { body, state } = endlessBody(`{"choices":[{"message":{"content":"${'a'.repeat(1000000)}`)
     jest.spyOn(global, 'fetch').mockResolvedValue(new Response(body, { status: 200 }))
-    const error = await model()
-      .doGenerate(callOptions)
-      .catch((caught) => caught)
+    const error = await rejectionOf(model().doGenerate(callOptions))
     expect(toAiSystemError(error).key).toBe(TOO_LARGE)
     expect(state.cancelled).toBe(true)
     expect(state.pulls).toBeLessThanOrEqual(Math.ceil(AiLimits.providerResponseMaxBytes / 1000000) + 2)
