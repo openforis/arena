@@ -243,6 +243,8 @@ export const ChangeSetReviewDialog = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   const titleId = useId()
+  // a callback ref (state): the dialog takes the focus when it opens, so its name is announced
+  const [dialog, setDialog] = useState<HTMLDivElement | null>(null)
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
@@ -251,6 +253,10 @@ export const ChangeSetReviewDialog = ({
   const [search, setSearch] = useState('')
   const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null)
   const { pendingIds, conflictIds, selectableIds, selectedIds, applying } = selection
+
+  useEffect(() => {
+    dialog?.focus()
+  }, [dialog])
 
   const allGroups = useMemo(() => groupReviewItems(items, groupBy), [groupBy, items])
   const shownItems = useMemo(
@@ -295,7 +301,9 @@ export const ChangeSetReviewDialog = ({
         aria-modal="true"
         className="ai-change-review__content"
         data-testid={TestId.aiAssistant.reviewDialog}
+        ref={setDialog}
         role="dialog"
+        tabIndex={-1}
       >
         <div className="ai-change-review__header">
           <h2 id={titleId}>{t('aiAssistant.card.review.title')}</h2>
