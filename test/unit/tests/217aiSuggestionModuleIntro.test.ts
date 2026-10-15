@@ -185,13 +185,19 @@ describe('module introduction and suggestion actions (217)', () => {
         throw new Error('bad target')
       },
     }
+    const log = jest.fn()
     expect(
       buildSuggestionRequest({
         ...params,
         suggestion: visible,
         definitions: { ...SUGGESTION_DEFINITIONS, missingTranslations: failing },
+        log,
       })
     ).toBeNull()
+    expect(log).toHaveBeenCalledWith(
+      'The request of the missingTranslations suggestion could not be built',
+      expect.any(Error)
+    )
     expect(buildSuggestionRequest({ ...params, suggestion: { ...visible, targets: [] } })).toBeNull()
   })
 

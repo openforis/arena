@@ -86,7 +86,9 @@ describe('suggestion display (218)', () => {
       'New to the form designer? Ask me how it works.'
     )
     // a hand-edited module: its definition throws, the card is skipped instead of breaking the panel
-    expect(getSuggestionCardText({ ...params, suggestion: { ...intro, targets: [{ key: 'users' }] } })).toBeNull()
+    const log = jest.fn()
+    expect(getSuggestionCardText({ ...params, log, suggestion: { ...intro, targets: [{ key: 'users' }] } })).toBeNull()
+    expect(log).toHaveBeenCalledTimes(1)
   })
 
   test('the next expiry: the nearest future one, 0 once past, none without expiry or with an invalid date', () => {

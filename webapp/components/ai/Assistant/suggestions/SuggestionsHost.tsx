@@ -10,6 +10,7 @@ import * as User from '@core/user/user'
 import { AiFeatureCategory } from '@common/ai/features'
 
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
+import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { reconcileInProgress } from '@webapp/ai/suggestions/reconcileInProgress'
 import { notifySuggestionEvent, subscribeSuggestionEvents } from '@webapp/ai/suggestions/suggestionEvents'
 import { createSuggestionHostController } from '@webapp/ai/suggestions/suggestionHostController'
@@ -81,7 +82,9 @@ export const SuggestionsHost = ({ statuses, module }: { statuses: AssistantAreaS
     if (!userUuid) return undefined
     let cancelled = false
     // without a conversation store (blocked IndexedDB) there is nothing to settle
-    reconcileUser(userUuid, () => cancelled).catch(() => null)
+    reconcileUser(userUuid, () => cancelled).catch((error: unknown) =>
+      logAiWarning('Could not settle the suggestions left in progress', error)
+    )
     return () => {
       cancelled = true
     }

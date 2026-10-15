@@ -4,6 +4,8 @@
  */
 import { AiLimits } from '@common/ai/limits'
 
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
+
 import { toSurveyKey } from './conversationModel'
 import type { Conversation } from './types'
 
@@ -207,22 +209,26 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
  * @param {IDBFactory|null} params.indexedDB - IndexedDB factory (null: memory store).
  * @param {number} [params.keep] - Conversations kept per user and survey.
  * @param {Function} [params.onClosed] - Called when the connection is closed because another tab upgraded the database.
+ * @param {AiLog} [params.log] - Reports why the memory store is used.
  * @returns {Promise<ConversationStore>} The store.
  */
 export const openConversationStore = async ({
   indexedDB,
   keep = AiLimits.assistantConversationsKept,
   onClosed,
+  log = logAiWarning,
 }: {
   indexedDB: IDBFactory | null
   keep?: number
   onClosed?: () => void
+  log?: AiLog
 }): Promise<ConversationStore> => {
   if (!indexedDB) return createMemoryConversationStore({ keep })
   try {
     return createIndexedDbStore(await openDatabase(indexedDB, onClosed), keep)
-  } catch {
+  } catch (error) {
     // private windows and blocked storage: keep working, the panel says it
+    log('IndexedDB could not be opened; the conversations are kept in memory until the page reloads', error)
     return createMemoryConversationStore({ keep })
   }
 }

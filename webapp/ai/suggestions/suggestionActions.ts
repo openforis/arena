@@ -4,6 +4,7 @@
  */
 import { uuidv4 } from '@core/uuid'
 
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
 import type { SuggestionDefinition, SuggestionDefinitions, SuggestionDescribeContext } from './definitions'
@@ -67,6 +68,7 @@ export const getSuggestionRequestText = ({
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language of the prompt.
  * @param {SuggestionDefinitions} [params.definitions] - Definitions.
  * @param {Function} [params.newId] - Request id factory.
+ * @param {AiLog} [params.log] - Reports a prompt that could not be built.
  * @returns {SuggestionRequest|null} The request; null without a target or a prompt.
  */
 export const buildSuggestionRequest = ({
@@ -77,6 +79,7 @@ export const buildSuggestionRequest = ({
   describeContext,
   definitions = SUGGESTION_DEFINITIONS,
   newId = () => uuidv4(),
+  log = logAiWarning,
 }: {
   suggestion: AssistantSuggestion
   userUuid: string
@@ -85,6 +88,7 @@ export const buildSuggestionRequest = ({
   describeContext: SuggestionDescribeContext
   definitions?: SuggestionDefinitions
   newId?: () => string
+  log?: AiLog
 }): SuggestionRequest | null => {
   const definition = definitions[suggestion.kind]
   if (suggestion.targets.length === 0) return null
@@ -93,8 +97,9 @@ export const buildSuggestionRequest = ({
   try {
     prompt = definition.prompt(suggestion, describeContext)
     displayText = getSuggestionRequestText({ definition, suggestion, describeContext })
-  } catch {
+  } catch (error) {
     // a target that no longer describes (e.g. a node def deleted meanwhile): nothing is sent
+    log(`The request of the ${suggestion.kind} suggestion could not be built`, error)
     return null
   }
   return {

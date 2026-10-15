@@ -59,8 +59,10 @@ describe('AI session reset (421)', () => {
 describe('auth session (421)', () => {
   const createDeps = (requestLogout: () => Promise<unknown>) => {
     const calls: string[] = []
+    const log = jest.fn()
     return {
       calls,
+      log,
       session: createAuthSession({
         requestLogout: async () => {
           calls.push('POST /auth/logout')
@@ -68,6 +70,7 @@ describe('auth session (421)', () => {
         },
         setAuthToken: (token) => void calls.push(`token ${token}`),
         resetAiSession: async () => void calls.push('reset AI'),
+        log,
       }),
     }
   }
@@ -85,11 +88,12 @@ describe('auth session (421)', () => {
   })
 
   test('logout drops the token and resets the AI state even when POST /auth/logout fails', async () => {
-    const { calls, session } = createDeps(async () => {
+    const { calls, log, session } = createDeps(async () => {
       throw new Error('Network Error')
     })
     await expect(session.end()).resolves.toBeUndefined()
     expect(calls).toEqual(['POST /auth/logout', 'token null', 'reset AI'])
+    expect(log).toHaveBeenCalledTimes(1)
   })
 })
 

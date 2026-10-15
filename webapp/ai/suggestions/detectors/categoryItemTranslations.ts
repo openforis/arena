@@ -11,6 +11,7 @@ import {
   fetchMissingLabelsCounts,
   type FetchMissingLabelsCounts,
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 
 import type { AssistantSuggestion, SuggestionTarget } from '../types'
 import { getDesignDetectorScope, newDesignSuggestion } from './designTargets'
@@ -91,12 +92,14 @@ const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): st
  * @param {object} [deps] - Dependencies.
  * @param {FetchMissingLabelsCounts} [deps.fetchCounts] - Counts fetcher.
  * @param {number} [deps.throttleMs] - Throttle of the frequent triggers.
+ * @param {AiLog} [deps.log] - Reports a failed fetch (not an aborted one).
  * @returns {EventDetector} The detector.
  */
 export const createCategoryItemTranslationsDetector = ({
   fetchCounts = fetchMissingLabelsCounts,
   throttleMs = CATEGORY_COUNTS_THROTTLE_MS,
-}: { fetchCounts?: FetchMissingLabelsCounts; throttleMs?: number } = {}): EventDetector => {
+  log = logAiWarning,
+}: { fetchCounts?: FetchMissingLabelsCounts; throttleMs?: number; log?: AiLog } = {}): EventDetector => {
   const lastFetchAt = new Map<string, { time: number; request: number }>()
   // only the latest request may land (an older answer would overwrite a newer one)
   let latestRequest = 0
@@ -149,8 +152,10 @@ export const createCategoryItemTranslationsDetector = ({
         }
         const suggestions = detectCategoryItemTranslations(counts, survey, { surveyId, now: ctx.now() })
         ctx.store.setKind({ userUuid: ctx.userUuid, surveyId, kind: CATEGORY_ITEM_TRANSLATIONS_KIND, suggestions })
-      } catch {
-        // offline or aborted: the next trigger tries again
+      } catch (error) {
+        // offline or aborted: the next trigger tries again (an abort is expected, the rest is reported)
+        if (!generation.signal.aborted)
+          log('The category item label counts could not be fetched for the suggestion', error)
         release()
       } finally {
         // settled: a later abort of the generation must not free the throttle of a successful request
