@@ -112,6 +112,8 @@ Tente atualizar a página.`,
   aiFeatureUnknown: 'Funcionalidade de IA desconhecida "{{feature}}".',
   aiCallInvalid: 'O pedido de IA não é válido ({{reason}}).',
   aiRateLimited: 'Demasiados pedidos de IA. Aguarde um minuto e tente novamente.',
+  aiDailyBudgetExceeded:
+    'Atingiu o limite de hoje do provedor de IA padrão do Arena. Ele é reposto à meia-noite UTC. Pode continuar a trabalhar com o seu próprio provedor nas Configurações de IA.',
   aiRequestTimeout: 'A IA demorou demasiado a responder. Tente novamente.',
   aiToolNotOffered:
     'A IA pediu uma ferramenta que não tinha permissão para usar, por isso a resposta foi descartada. Tente novamente.',

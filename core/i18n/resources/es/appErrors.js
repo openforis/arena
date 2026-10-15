@@ -117,6 +117,8 @@ export default {
   aiFeatureUnknown: 'Función de IA desconocida "{{feature}}".',
   aiCallInvalid: 'La solicitud de IA no es válida ({{reason}}).',
   aiRateLimited: 'Demasiadas solicitudes de IA. Espere un minuto y vuelva a intentarlo.',
+  aiDailyBudgetExceeded:
+    'Ha alcanzado el límite de hoy del proveedor de IA predeterminado de Arena. Se restablece a medianoche UTC. Puede seguir trabajando con su propio proveedor en la Configuración de IA.',
   aiRequestTimeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
   aiToolNotOffered:
     'La IA pidió una herramienta que no tenía permitido usar, por lo que se descartó su respuesta. Inténtelo de nuevo.',

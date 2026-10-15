@@ -118,6 +118,8 @@ Essayez de rafraîchir la page.`,
   aiFeatureUnknown: 'Fonction IA inconnue « {{feature}} ».',
   aiCallInvalid: "La requête IA n'est pas valide ({{reason}}).",
   aiRateLimited: 'Trop de requêtes IA. Patientez une minute puis réessayez.',
+  aiDailyBudgetExceeded:
+    "Vous avez atteint la limite du jour du fournisseur IA par défaut d'Arena. Elle est réinitialisée à minuit UTC. Vous pouvez continuer avec votre propre fournisseur dans les paramètres IA.",
   aiRequestTimeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
   aiToolNotOffered:
     "L'IA a demandé un outil qu'elle n'avait pas le droit d'utiliser ; sa réponse a été écartée. Veuillez réessayer.",

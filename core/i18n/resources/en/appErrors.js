@@ -87,6 +87,8 @@ Try to refresh the page.`,
   aiFeatureUnknown: 'Unknown AI feature "{{feature}}".',
   aiCallInvalid: 'The AI request is not valid ({{reason}}).',
   aiRateLimited: 'Too many AI requests. Please wait a minute and try again.',
+  aiDailyBudgetExceeded:
+    "You have reached today's limit for the Arena default AI provider. It resets at midnight UTC. You can keep working with your own provider in AI Settings.",
   aiRequestTimeout: 'The AI took too long to answer. Please try again.',
   aiToolNotOffered: 'The AI asked for a tool it was not allowed to use, so its answer was discarded. Please try again.',
   aiProviderAuth:

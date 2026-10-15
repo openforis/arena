@@ -156,6 +156,15 @@ const messageSize = (message: any): number =>
     ? message.content.length
     : message.content.reduce((total: number, part: any) => total + partSize(part), 0)
 
+/**
+ * Returns the size of a sanitized call in characters (messages plus tool definitions): what the prompt limit and
+ * the daily budget count.
+ * @param {AiGatewayCall} call - The sanitized call.
+ * @returns {number} The size.
+ */
+export const getCallSize = (call: AiGatewayCall): number =>
+  call.prompt.reduce((total, message) => total + messageSize(message), call.tools ? jsonSize(call.tools) : 0)
+
 const sanitizePrompt = (
   prompt: unknown,
   { maxPromptChars, allowTools, extraSize }: { maxPromptChars: number; allowTools: boolean; extraSize: number }

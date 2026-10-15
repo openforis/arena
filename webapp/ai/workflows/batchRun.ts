@@ -28,6 +28,7 @@ export type AiBatchGuardDeps = {
 export const RUN_STOPPING_ERROR_KEYS: readonly string[] = [
   'aiApiKeyMissing',
   'aiApiKeyUnreadable',
+  'aiDailyBudgetExceeded',
   'aiFeatureDisabled',
   'aiFeaturesDisabled',
   'aiLocalServerModelMissing',
