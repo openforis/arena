@@ -4,13 +4,13 @@ import React, { useCallback } from 'react'
 
 import { AI_PROVIDER_NAME_MAX_CHARS } from '@common/ai/providerIds'
 
+import { getProviderNameText } from '@webapp/ai/providers/providerNames'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { TestId } from '@webapp/utils/testId'
 
-import { getProviderNameText } from '../providerNames'
 import { useT } from '../useT'
 import { AccountProviderFields } from './AccountProviderFields'
 import { LocalProviderFields } from './LocalProviderFields'
