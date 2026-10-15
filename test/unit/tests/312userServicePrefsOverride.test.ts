@@ -3,7 +3,7 @@ import { createUserServiceWithPrefsUpdate } from '@server/modules/user/service/u
 describe('User service with a working updateUserPrefs (312)', () => {
   const base = {
     get: jest.fn(),
-    updateUserPrefs: () => {
+    updateUserPrefs: (_options: { userToUpdate: unknown }): Promise<unknown> => {
       throw new Error('TODO')
     },
   }
