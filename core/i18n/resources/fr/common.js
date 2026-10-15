@@ -1602,6 +1602,14 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     dataDictionaryTitle: 'IA : Descriptions des champs',
     preparing: 'Préparation…',
     progress: '{{done}} requêtes IA terminées sur {{total}}',
+    stop: 'Arrêter',
+    stopping: 'Arrêt en cours…',
+    confirmStop: "Arrêter l'exécution de l'IA ? Les résultats obtenus jusqu'ici sont conservés.",
+    keepRunning: 'Continuer',
+    stoppedCancelled:
+      "Arrêté après {{done}} requêtes IA sur {{total}}. Les résultats obtenus jusqu'ici sont conservés.",
+    stoppedError:
+      "Arrêté après {{done}} requêtes IA sur {{total}} ({{message}}). Les résultats obtenus jusqu'ici sont conservés.",
   },
 
   aiTranslation: {

@@ -1580,6 +1580,13 @@ $t(common.cantUndoWarning)`,
     dataDictionaryTitle: 'AI: Талбарын тайлбар',
     preparing: 'Бэлтгэж байна…',
     progress: '{{total}} AI хүсэлтээс {{done}} нь дууссан',
+    stop: 'Зогсоох',
+    stopping: 'Зогсоож байна…',
+    confirmStop: 'AI ажиллагааг зогсоох уу? Одоогоор гарсан үр дүн хадгалагдана.',
+    keepRunning: 'Үргэлжлүүлэх',
+    stoppedCancelled: '{{total}} AI хүсэлтээс {{done}}-ийн дараа зогслоо. Одоогоор гарсан үр дүн хадгалагдсан.',
+    stoppedError:
+      '{{total}} AI хүсэлтээс {{done}}-ийн дараа зогслоо ({{message}}). Одоогоор гарсан үр дүн хадгалагдсан.',
   },
 
   aiTranslation: {

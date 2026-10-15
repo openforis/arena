@@ -1593,6 +1593,13 @@ $t(common.cantUndoWarning)`,
     dataDictionaryTitle: 'ИИ: Описания полей',
     preparing: 'Подготовка…',
     progress: 'Выполнено запросов к ИИ: {{done}} из {{total}}',
+    stop: 'Остановить',
+    stopping: 'Остановка…',
+    confirmStop: 'Остановить выполнение ИИ? Полученные результаты сохранятся.',
+    keepRunning: 'Продолжить',
+    stoppedCancelled: 'Остановлено после {{done}} из {{total}} запросов к ИИ. Полученные результаты сохранены.',
+    stoppedError:
+      'Остановлено после {{done}} из {{total}} запросов к ИИ ({{message}}). Полученные результаты сохранены.',
   },
 
   aiTranslation: {

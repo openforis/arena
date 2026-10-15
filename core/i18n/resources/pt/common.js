@@ -1591,6 +1591,14 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     dataDictionaryTitle: 'IA: Descrições dos campos',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} pedidos à IA concluídos',
+    stop: 'Parar',
+    stopping: 'Parando…',
+    confirmStop: 'Parar a execução da IA? Os resultados obtidos até agora são mantidos.',
+    keepRunning: 'Continuar',
+    stoppedCancelled:
+      'Interrompido após {{done}} de {{total}} pedidos à IA. Os resultados obtidos até agora são mantidos.',
+    stoppedError:
+      'Interrompido após {{done}} de {{total}} pedidos à IA ({{message}}). Os resultados obtidos até agora são mantidos.',
   },
 
   aiTranslation: {

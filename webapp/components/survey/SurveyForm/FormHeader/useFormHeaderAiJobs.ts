@@ -33,7 +33,7 @@ export const useFormHeaderAiJobs = () => {
    */
   const startTranslation = useCallback(
     () =>
-      start({
+      start<NodeDefsTranslationResult>({
         titleKey: 'aiBatch.translateTitle',
         run: ({ signal, onProgress }) => AiWorkflows.translateAllLabels({ survey, surveyId, signal, onProgress }),
         onDone: setTranslationResult,
@@ -50,28 +50,28 @@ export const useFormHeaderAiJobs = () => {
     (fileFormat: string) =>
       start({
         titleKey: 'aiBatch.dataDictionaryTitle',
-        run: async ({ signal, onProgress }) => {
-          const { aiDescriptions, failedCount } = await AiWorkflows.generateDataDictionary({
+        run: async ({ signal, abandonSignal, onProgress }) => {
+          const { aiDescriptions, failedCount, stop } = await AiWorkflows.generateDataDictionary({
             surveyId,
             cycle,
             signal,
             onProgress,
           })
-          // cancelled after the last call: no export
-          if (signal.aborted) throw createAbortError()
+          // a Stop keeps the descriptions made so far and exports them; only abandoning the run cancels the export
+          if (abandonSignal.aborted) throw createAbortError()
           const { job } = await API.startSchemaSummaryExportJob({
             surveyId,
             cycle,
             fileFormat,
             aiDescriptions,
             aiDescriptionsFailedCount: failedCount,
-            signal,
+            signal: abandonSignal,
           })
-          // cancelled while the export was being requested: no job monitor
-          if (signal.aborted) throw createAbortError()
-          return job
+          // abandoned while the export was being requested: no job monitor
+          if (abandonSignal.aborted) throw createAbortError()
+          return { job, stop }
         },
-        onDone: (job) =>
+        onDone: ({ job }) =>
           // JobActions is untyped JS: its thunk does not match the typed dispatch
           dispatch(
             JobActions.showJobMonitor({

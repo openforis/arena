@@ -1,7 +1,8 @@
 /**
  * Runs the many AI calls of a browser batch (label translation, data dictionary): the AI switch and the survey
  * policy are checked again before each call, progress is reported, the run can be cancelled, and a failed call is
- * counted instead of failing the run (unless the error will fail every call).
+ * counted instead of failing the run. A run that cannot go on (cancelled, a guard or an error that will fail every
+ * call) keeps the results it already has.
  */
 import { assertHostingAllowed, type AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
@@ -11,6 +12,15 @@ import { aborted as createAbortError, OFF_POLICY } from '../engines/resolveModel
 import { getAiErrorKey, isAiAbortError } from '../runtime/runtimeErrors'
 
 export type AiBatchProgress = { done: number; total: number }
+
+// why a run ended before its last call, and how many calls it had finished
+export type AiBatchStop = { cause: 'cancelled' | 'error'; error?: unknown } & AiBatchProgress
+
+export type AiBatchRunResult = {
+  // the summed size of the failed calls and of the calls not run
+  failedCount: number
+  stop: AiBatchStop | null
+}
 
 // size: what a failure of the call leaves untranslated / undescribed (counted in the result)
 export type AiBatchCall<T> = { size: number; run: (signal?: AbortSignal) => Promise<T> }
@@ -106,16 +116,64 @@ export const createAiBatchGuard =
     assertHostingAllowed({ effective: effective ?? OFF_POLICY, dataClass, hostingClass })
   }
 
+type StopCause = Pick<AiBatchStop, 'cause' | 'error'>
+
+type CallOutcome = 'succeeded' | 'failed' | StopCause
+
+/**
+ * Runs one call: the guard first, then the call.
+ * @param {object} params - Parameters.
+ * @param {AiBatchCall} params.call - The call.
+ * @param {number} params.index - Index of the call.
+ * @param {AiBatchGuard} params.guard - Check run before the call.
+ * @param {Function} params.onResult - Called with the result of a successful call.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @returns {Promise<CallOutcome>} succeeded, failed (counted, the run goes on) or the cause that stops the run.
+ */
+const runCall = async <T>({
+  call,
+  index,
+  guard,
+  onResult,
+  signal,
+}: {
+  call: AiBatchCall<T>
+  index: number
+  guard: AiBatchGuard
+  onResult: (result: T, index: number) => void
+  signal?: AbortSignal
+}): Promise<CallOutcome> => {
+  const cancelled: StopCause = { cause: 'cancelled' }
+  if (signal?.aborted) return cancelled
+  try {
+    // a switch or policy change during the run stops it before the next call
+    await guard()
+  } catch (error) {
+    return signal?.aborted ? cancelled : { cause: 'error', error }
+  }
+  if (signal?.aborted) return cancelled
+  try {
+    onResult(await call.run(signal), index)
+    return 'succeeded'
+  } catch (error) {
+    // what the HTTP client throws when its request is aborted is not always an AbortError
+    if (signal?.aborted || isAiAbortError(error)) return cancelled
+    return isRunStoppingError(error) ? { cause: 'error', error } : 'failed'
+  }
+}
+
 /**
  * Runs the calls one after the other. Before each call the run stops if it was cancelled or the guard rejects;
  * a call that fails with an error not in RUN_STOPPING_ERROR_KEYS is counted by its size and the run goes on.
+ * A run that stops after at least one result returns what it has, with the stop; the calls not run count as failed.
+ * A run that stops with no result throws (the abort error of a cancel, else the error).
  * @param {object} params - Parameters.
  * @param {AiBatchCall[]} params.calls - The calls.
  * @param {AiBatchGuard} params.guard - Check run before each call.
  * @param {Function} params.onResult - Called with the result and the index of each successful call.
  * @param {Function} [params.onProgress] - Called with { done, total } at the start and after each call.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
- * @returns {Promise<{failedCount: number}>} The summed size of the failed calls.
+ * @returns {Promise<AiBatchRunResult>} The summed size of the failed calls and of the calls not run, and the stop.
  */
 export const runAiBatchCalls = async <T>({
   calls,
@@ -129,23 +187,21 @@ export const runAiBatchCalls = async <T>({
   onResult: (result: T, index: number) => void
   onProgress?: (progress: AiBatchProgress) => void
   signal?: AbortSignal
-}): Promise<{ failedCount: number }> => {
+}): Promise<AiBatchRunResult> => {
   const total = calls.length
   let failedCount = 0
+  let succeededCount = 0
   onProgress?.({ done: 0, total })
   for (const [index, call] of calls.entries()) {
-    if (signal?.aborted) throw createAbortError()
-    // a switch or policy change during the run stops it before the next call (outside the try: never counted)
-    await guard()
-    if (signal?.aborted) throw createAbortError()
-    try {
-      onResult(await call.run(signal), index)
-    } catch (error) {
-      if (signal?.aborted) throw createAbortError()
-      if (isAiAbortError(error) || isRunStoppingError(error)) throw error
-      failedCount += call.size
+    const outcome = await runCall({ call, index, guard, onResult, signal })
+    if (typeof outcome === 'object') {
+      if (succeededCount === 0) throw outcome.cause === 'error' ? outcome.error : createAbortError()
+      const notRunSize = calls.slice(index).reduce((sum, notRun) => sum + notRun.size, 0)
+      return { failedCount: failedCount + notRunSize, stop: { ...outcome, done: index, total } }
     }
+    if (outcome === 'succeeded') succeededCount += 1
+    else failedCount += call.size
     onProgress?.({ done: index + 1, total })
   }
-  return { failedCount }
+  return { failedCount, stop: null }
 }

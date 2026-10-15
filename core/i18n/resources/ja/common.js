@@ -1572,6 +1572,13 @@ $t(common.cantUndoWarning)`,
     dataDictionaryTitle: 'AI：フィールドの説明',
     preparing: '準備中…',
     progress: 'AIリクエスト {{done}} / {{total}} 件完了',
+    stop: '停止',
+    stopping: '停止しています…',
+    confirmStop: 'AIの実行を停止しますか？ ここまでの結果は保持されます。',
+    keepRunning: '続行',
+    stoppedCancelled: 'AIリクエスト {{done}} / {{total}} 件の後で停止しました。ここまでの結果は保持されます。',
+    stoppedError:
+      'AIリクエスト {{done}} / {{total}} 件の後で停止しました（{{message}}）。ここまでの結果は保持されます。',
   },
 
   aiTranslation: {

@@ -1580,6 +1580,12 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     dataDictionaryTitle: 'AI: Field descriptions',
     preparing: 'Preparing…',
     progress: '{{done}} of {{total}} AI requests done',
+    stop: 'Stop',
+    stopping: 'Stopping…',
+    confirmStop: 'Stop the AI run? The results so far are kept.',
+    keepRunning: 'Keep running',
+    stoppedCancelled: 'Stopped after {{done}} of {{total}} AI requests. The results so far are kept.',
+    stoppedError: 'Stopped after {{done}} of {{total}} AI requests ({{message}}). The results so far are kept.',
   },
 
   aiTranslation: {
