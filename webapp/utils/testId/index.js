@@ -39,6 +39,8 @@ export const TestId = {
     providerMenuItem: (action) => `ai-provider-menu-item-${action}`,
     providerModel: 'ai-provider-model',
     providerName: 'ai-provider-name',
+    providerKeepKey: 'ai-provider-keep-key',
+    providerRemoveKey: 'ai-provider-remove-key',
     providerRow: (id) => `ai-provider-row-${id}`,
     providerSave: 'ai-provider-save',
     providerSaveError: 'ai-provider-save-error',

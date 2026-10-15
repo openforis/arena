@@ -23,8 +23,8 @@ import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/componen
 import { useI18n } from '@webapp/store/system'
 
 import { type AiSettings, getApiErrorMessage, type TFunction, toT } from './aiSettingsForm'
-import { type SavedProvider, toSavedProvider } from './ProviderDialog/providerDraft'
-import type { ProviderDialogContext } from './ProviderDialog/useProviderDialog'
+import type { ProviderDialogContext } from './ProviderDialog/providerDialogState'
+import { type SavedProvider, toSavedProvider } from './ProviderDialog/providerTypes'
 import {
   buildLocalProviderRemoval,
   buildProviderRows,
@@ -150,11 +150,11 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
     async (entry: AiProviderEntry) => {
       const ok = entry.kind === 'local' ? await testLocalProvider(entry.id) : await testAccountProvider(entry.id)
       if (entry.kind !== 'local') await refreshAll()
-      const params = { name: entry.name }
+      const params = { name: getProviderDisplayName({ entry, t }) }
       if (ok) notifyInfo({ key: 'userAiSettings:list.testOk', params })
       else notifyError({ key: 'userAiSettings:list.testFailed', params })
     },
-    [notifyError, notifyInfo, refreshAll]
+    [notifyError, notifyInfo, refreshAll, t]
   )
 
   /**

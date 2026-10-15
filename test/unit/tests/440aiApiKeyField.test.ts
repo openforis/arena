@@ -1,10 +1,8 @@
 import { getInputTitle } from '@webapp/components/form/Input/inputTitle'
 import { translatePlaceholder } from '@webapp/components/form/translatePlaceholder'
 import { getApiKeyFieldState } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/apiKeyField'
-import type {
-  ProviderDraft,
-  SavedProvider,
-} from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
+import type { ProviderDraft } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
+import type { SavedProvider } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerTypes'
 
 import en from '@core/i18n/resources/en/userAiSettings'
 import es from '@core/i18n/resources/es/userAiSettings'
@@ -23,6 +21,7 @@ const draft = (apiKey = ''): ProviderDraft => ({
   model: '',
   modelFreeText: false,
   apiKey,
+  apiKeyRemoved: false,
   apiKeyVersion: 0,
 })
 

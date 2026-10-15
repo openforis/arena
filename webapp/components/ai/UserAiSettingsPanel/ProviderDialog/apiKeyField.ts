@@ -1,11 +1,15 @@
 /**
  * What the API key field shows for a draft: the placeholder and which hint applies. Pure.
  */
-import { isApiKeyTyped, type ProviderDraft, type SavedProvider } from './providerDraft'
+import type { ProviderDraft } from './providerDraft'
+import { isApiKeyTyped } from './providerKey'
+import type { SavedProvider } from './providerTypes'
 
 export type ApiKeyFieldState = {
   // a saved key stays when the field is left blank
   keyKept: boolean
+  // the saved key is removed when saving
+  keyRemoved: boolean
   // i18n key of the placeholder (text: bullets say nothing to a screen reader)
   placeholderKey: string
   showClearedHint: boolean
@@ -30,12 +34,14 @@ export const getApiKeyFieldState = ({
   keyCleared: boolean
 }): ApiKeyFieldState => {
   const typed = isApiKeyTyped(draft)
+  const keyRemoved = draft.apiKeyRemoved && !typed
   const unreadable = !!saved?.hasApiKey && !saved.apiKeyReadable
-  const keyKept = !!saved?.hasApiKey && !keyCleared && !unreadable && !typed
+  const keyKept = !!saved?.hasApiKey && !keyCleared && !unreadable && !typed && !keyRemoved
   return {
     keyKept,
+    keyRemoved,
     placeholderKey: keyKept ? 'userAiSettings:apiKeySaved' : 'userAiSettings:apiKeyPlaceholder',
-    showClearedHint: keyCleared && !typed,
-    showUnreadableHint: unreadable && !keyCleared && !typed,
+    showClearedHint: keyCleared && !typed && !keyRemoved,
+    showUnreadableHint: unreadable && !keyCleared && !typed && !keyRemoved,
   }
 }
