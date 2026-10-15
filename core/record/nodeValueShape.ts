@@ -65,11 +65,13 @@ const isInteger = (value: Value): boolean => {
 }
 
 /**
- * Returns true for a valid uuid string.
+ * Returns true for a valid lower-case uuid string. Upper case is refused: uuids are compared as text, so an upper-case
+ * copy would point at no item while looking valid.
  * @param {unknown} value - The value.
- * @returns {boolean} Whether the value is a uuid.
+ * @returns {boolean} Whether the value is a lower-case uuid.
  */
-const isUuidString = (value: Value): boolean => typeof value === 'string' && isUuid(value)
+const isUuidString = (value: Value): boolean =>
+  typeof value === 'string' && value === value.toLowerCase() && isUuid(value)
 
 /**
  * Returns true when a value is an ISO date (YYYY-MM-DD) that exists in the calendar.
