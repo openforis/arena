@@ -41,13 +41,13 @@ describe('normalizeAiPolicy', () => {
 
   test('a missing class gets its default', () => {
     expect(normalizeAiPolicy({ data: 'cloud' })).toEqual({ schema: 'cloud', data: 'cloud' })
-    expect(normalizeAiPolicy({ schema: 'off' })).toEqual({ schema: 'off', data: 'onDevice' })
+    expect(normalizeAiPolicy({ schema: 'orgHosted' })).toEqual({ schema: 'orgHosted', data: 'onDevice' })
     expect(normalizeAiPolicy({ schema: null, data: undefined })).toEqual(defaultAiPolicy)
   })
 
   test('invalid values become off (fail closed)', () => {
     expect(normalizeAiPolicy({ schema: 'everywhere', data: 3 })).toEqual({ schema: 'off', data: 'off' })
-    expect(normalizeAiPolicy({ schema: 'Cloud', data: 'cloud' })).toEqual({ schema: 'off', data: 'cloud' })
+    expect(normalizeAiPolicy({ schema: 'cloud', data: 'Cloud' })).toEqual({ schema: 'cloud', data: 'off' })
   })
 
   test('a value that is not an object turns everything off', () => {
@@ -119,7 +119,8 @@ describe('isHostingAllowed: full matrix', () => {
   )
 
   test.each(cases)('effective %s, hosting %s, class %s', (level, hostingClass, dataClass) => {
-    const effective = { schema: 'off', data: 'off', [dataClass]: level } as any
+    // the schema level is not the limit here (the data/schema invariant has its own tests)
+    const effective = { schema: 'cloud', data: 'off', [dataClass]: level } as any
     const expected = level !== 'off' && getPolicyLevelIndex(hostingClass) <= getPolicyLevelIndex(level)
     expect(isHostingAllowed({ effective, dataClass, hostingClass })).toBe(expected)
   })

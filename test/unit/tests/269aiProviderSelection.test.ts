@@ -65,7 +65,6 @@ const ARENA_NOT_SET_UP: AiProviderEntry = {
 }
 
 const PROBE: AiLocalServerCapability = {
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass: 'onDevice',
@@ -104,7 +103,7 @@ const setupResolver = (caps: AiCapabilities, answers: LocalServerConsentAnswer[]
     isInstanceEnabled: () => true,
     getSettings: () => ON_SETTINGS,
     loadCapabilities: async () => caps,
-    getEffectivePolicy: async () => CLOUD,
+    getEffectivePolicyFor: async () => CLOUD,
     storage: memoryStorage(),
     requestConsent: async (request) => {
       state.requests.push(request)

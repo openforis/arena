@@ -1628,7 +1628,10 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       notAvailable: 'O provedor de IA escolhido não está disponível no momento.',
       missingOnThisBrowser: 'Seu provedor padrão está em outro computador.',
       notSetUp: 'Nenhum provedor de IA está configurado. Adicione um nas configurações de IA.',
+      invalidAddress:
+        'O endereço do seu servidor de IA local não é válido (sem usuário, senha, ? ou #). Corrija-o nas suas configurações de IA.',
     },
+    localAddressInvalid: 'O endereço não pode conter usuário, senha, ? ou #.',
     action: {
       retry: 'Tentar novamente',
       changePolicy: 'Alterar a política de IA da pesquisa',
@@ -1641,6 +1644,10 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
       chooseOther: 'Escolher outro provedor',
+      sends: 'Isso enviará {{what}}.',
+      revokeHint: 'Você permitiu que o Arena envie solicitações a este servidor.',
+      revoke: 'Revogar permissão',
+      revoked: 'Permissão revogada. O Arena perguntará novamente antes da próxima solicitação.',
     },
   },
 

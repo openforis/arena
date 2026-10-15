@@ -5,6 +5,7 @@ const request = (surveyId?: number, baseUrl = 'http://localhost:1234/v1') => ({
   baseUrl,
   modelId: 'local-model',
   hostingClass: 'onDevice' as const,
+  dataClass: 'schema' as const,
 })
 
 describe('consent request queue', () => {

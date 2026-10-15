@@ -17,6 +17,8 @@ export const PROBE_TIMEOUT_MS = 3000
 // also the ratio of the assistant's context estimate when a provider reports no usage
 export const CHARS_PER_TOKEN = 3
 const PROMPT_SHARE = 0.75 // a quarter of the context is kept for the answer
+// the gateway's default output cap (AI_MAX_OUTPUT_TOKENS): a local model gets the same ceiling
+export const LOCAL_SERVER_MAX_OUTPUT_TOKENS = 4096
 
 export type LocalServerProbeResult = {
   reachable: boolean
@@ -34,6 +36,18 @@ export const getLocalServerLimits = (contextTokens: number | null): AiEngineLimi
   maxPromptChars: Math.floor((contextTokens ?? DEFAULT_LOCAL_CONTEXT_TOKENS) * CHARS_PER_TOKEN * PROMPT_SHARE),
   maxSteps: LOCAL_SERVER_MAX_STEPS,
 })
+
+/**
+ * Returns the most tokens a local model may write for an answer: the quarter of its context kept for it, at most the
+ * gateway's cap. Without it a model that does not stop writes until its context is full.
+ * @param {number|null} contextTokens - Context size, or null when unknown (8,192 is used).
+ * @returns {number} The cap, in tokens.
+ */
+export const getLocalServerMaxOutputTokens = (contextTokens: number | null): number =>
+  Math.min(
+    LOCAL_SERVER_MAX_OUTPUT_TOKENS,
+    Math.floor((contextTokens && contextTokens > 0 ? contextTokens : DEFAULT_LOCAL_CONTEXT_TOKENS) * (1 - PROMPT_SHARE))
+  )
 
 /**
  * Returns the context window of the local server's model.

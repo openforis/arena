@@ -101,7 +101,8 @@ const toLocalEntry = (provider: LocalProvider, capability: AiLocalServerCapabili
   model: provider.modelId,
   baseUrl: provider.baseUrl,
   hostingClass: capability?.hostingClass ?? null,
-  status: getLocalProviderStatus(capability),
+  status: provider.addressInvalid ? 'notSetUp' : getLocalProviderStatus(capability),
+  ...(provider.addressInvalid ? { addressInvalid: true } : {}),
 })
 
 /**

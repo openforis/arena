@@ -3,13 +3,14 @@
  * offered for. Pure (resolveModel is injected); runAssistantTurn and the panel use it.
  */
 import type { AiDataClass, AiFeatureKey } from '@common/ai/features'
-import type { AiHostingClass } from '@common/ai/policy'
+import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 
 import type { ResolveModelParams } from './resolveModel'
 import type { AiEngineLimits, AiSelectedEngine } from './types'
 
-// the hosting class is set from the selected engine; only a caller that passes its own model (tests) can give it
-type Access = { hostingClass?: AiHostingClass | null }
+// the hosting class and the policy are set from the resolver (the ones the engine was selected with); only a caller
+// that passes its own model (tests) can give them
+type Access = { hostingClass?: AiHostingClass | null; effective?: AiPolicy | null }
 
 export type AssistantEngine<TModel, TAccess extends object> = {
   model: TModel
@@ -21,7 +22,7 @@ export type AssistantEngine<TModel, TAccess extends object> = {
 
 /**
  * Returns the model, limits and access of a turn: the caller's model as is, else the engine resolveModel selects
- * for the conversation's provider and data class (its limits; its hosting class for the tools).
+ * for the conversation's provider and data class (its limits; its hosting class and policy for the tools).
  * @param {object} params - Parameters.
  * @param {object} [params.model] - Model given by the caller (tests): used as is.
  * @param {AiEngineLimits} [params.limits] - Limits given by the caller (win over the engine's).
@@ -56,14 +57,19 @@ export const resolveAssistantEngine = async <TModel, TAccess extends object>({
   dataClass: AiDataClass
   providerId?: string
   signal?: AbortSignal
-  resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine }>
+  resolve: (params: ResolveModelParams) => Promise<{ model: TModel; engine: AiSelectedEngine; policy: AiPolicy }>
 }): Promise<AssistantEngine<TModel, TAccess>> => {
   if (model) return { model, limits: limits ?? defaultLimits, access: access as TAccess & Access, engine: null }
   const resolved = await resolve({ feature, surveyId, dataClass, providerId, signal })
   return {
     model: resolved.model,
     limits: limits ?? resolved.engine.limits,
-    access: { ...access, hostingClass: resolved.engine.hostingClass },
+    // the tools are offered by the policy the engine was selected with, not by one read earlier
+    access: {
+      ...access,
+      hostingClass: resolved.engine.hostingClass,
+      effective: resolved.policy,
+    },
     engine: resolved.engine,
   }
 }

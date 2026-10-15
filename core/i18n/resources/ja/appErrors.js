@@ -79,6 +79,8 @@ export default {
     'AIが設定されていません。AI設定で個人用プロバイダーを設定するか、管理者にデフォルトの設定を依頼してください。',
   aiPolicyRefused:
     'この調査のAIポリシーでは、$t(common:aiPolicy.dataClass.{{dataClass}})を$t(common:aiPolicy.hostingClass.{{hostingClass}})に送信することは許可されていません。',
+  aiPolicyDataAboveSchema:
+    'レコードデータには、調査の設計より緩いレベルは設定できません（設計: 「$t(common:aiPolicy.level.{{schema}})」、レコードデータ: 「$t(common:aiPolicy.level.{{data}})」）。',
   aiPolicyInvalid: 'AIポリシーが無効です。調査の設計とレコードデータのそれぞれにレベルを選択してください。',
   aiPolicyAboveCeiling:
     'このArenaインスタンスでは、$t(common:aiPolicy.dataClass.{{dataClass}})に「$t(common:aiPolicy.level.{{level}})」は許可されていません（上限: 「$t(common:aiPolicy.level.{{ceiling}})」）。',

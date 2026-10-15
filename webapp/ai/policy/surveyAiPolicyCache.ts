@@ -1,6 +1,7 @@
 /**
  * Per-survey cache of the survey AI policy: 30 s TTL, one shared request per survey, and a generation counter so
- * a response started before an update or an invalidation never overwrites the newer value. Pure (no app imports).
+ * a response started before an update, an invalidation or a reset never overwrites the newer value.
+ * Pure (no app imports).
  */
 import type { AiPolicy } from '@common/ai/policy'
 
@@ -14,10 +15,12 @@ export type SurveyAiPolicyCacheDeps = {
 }
 
 export type SurveyAiPolicyCache = {
-  get: (surveyId: number) => Promise<SurveyAiPolicyClientState>
+  // fresh: never from the cache (and never from a request that started before the call)
+  get: (surveyId: number, options?: { fresh?: boolean }) => Promise<SurveyAiPolicyClientState>
   peek: (surveyId: number) => SurveyAiPolicyClientState | null
   update: (surveyId: number, policy: AiPolicy) => Promise<SurveyAiPolicyClientState>
-  invalidate: (surveyId: number) => void
+  invalidate: (surveyId: number) => Promise<SurveyAiPolicyClientState>
+  reset: () => void
   subscribe: (listener: (surveyId: number) => void) => () => void
 }
 
@@ -26,10 +29,33 @@ type Entry = {
   fetchedAt: number
   fresh: boolean
   generation: number
-  inflight: Promise<SurveyAiPolicyClientState> | null
+  inflight: Promise<Fetched> | null
 }
 
+// a server answer, and whether a newer generation started before it came (then it was not stored)
+type Fetched = { value: SurveyAiPolicyClientState; superseded: boolean }
+
 export const surveyAiPolicyTtlMs = 30_000
+
+let appCache: SurveyAiPolicyCache | null = null
+
+/**
+ * Registers the cache of the app, the one `resetSurveyAiPolicyCache` empties.
+ * @param {SurveyAiPolicyCache} cache - The app cache.
+ * @returns {void}
+ */
+export const registerAppSurveyAiPolicyCache = (cache: SurveyAiPolicyCache): void => {
+  appCache = cache
+}
+
+/**
+ * Empties the app cache (login and logout): another user must not see policies, or answers in flight, of the
+ * previous one. Does nothing when the app cache was never created.
+ * @returns {void}
+ */
+export const resetSurveyAiPolicyCache = (): void => {
+  appCache?.reset()
+}
 
 /**
  * Creates the cache.
@@ -104,16 +130,16 @@ export const createSurveyAiPolicyCache = ({
    * Starts the shared request of a survey.
    * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
-   * @returns {Promise<SurveyAiPolicyClientState>} The request.
+   * @returns {Promise<Fetched>} The server answer; stored only when no newer generation started meanwhile.
    */
-  const startFetch = (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
+  const startFetch = (surveyId: number, entry: Entry): Promise<Fetched> => {
     const { generation } = entry
     const request = (async () => {
       try {
         const value = await fetchPolicy(surveyId)
-        if (entry.generation !== generation) return entry.value ?? value
-        store(surveyId, entry, value)
-        return value
+        const superseded = entry.generation !== generation
+        if (!superseded) store(surveyId, entry, value)
+        return { value, superseded }
       } finally {
         if (entry.generation === generation) entry.inflight = null
       }
@@ -122,11 +148,36 @@ export const createSurveyAiPolicyCache = ({
     return request
   }
 
+  /**
+   * Returns the answer to a caller that accepts the cache: a request that was superseded gives the newer cached value.
+   * @param {Entry} entry - The survey entry.
+   * @param {Promise<Fetched>} request - The shared request.
+   * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
+   */
+  const toCachedAnswer = async (entry: Entry, request: Promise<Fetched>): Promise<SurveyAiPolicyClientState> => {
+    const { value, superseded } = await request
+    return superseded ? (entry.value ?? value) : value
+  }
+
+  /**
+   * Drops the cached value and the request in flight, and starts a new request. Its caller gets the server's own
+   * answer, never the cached value.
+   * @param {number} surveyId - Survey id.
+   * @param {Entry} entry - The survey entry.
+   * @returns {Promise<SurveyAiPolicyClientState>} The new request.
+   */
+  const refetch = async (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
+    nextGeneration(entry)
+    entry.fresh = false
+    return (await startFetch(surveyId, entry)).value
+  }
+
   return {
-    get: async (surveyId) => {
+    get: async (surveyId, { fresh = false } = {}) => {
       const entry = getEntry(surveyId)
+      if (fresh) return refetch(surveyId, entry)
       if (isFresh(entry)) return entry.value as SurveyAiPolicyClientState
-      return entry.inflight ?? startFetch(surveyId, entry)
+      return toCachedAnswer(entry, entry.inflight ?? startFetch(surveyId, entry))
     },
     peek: (surveyId) => entries.get(surveyId)?.value ?? null,
     update: async (surveyId, policy) => {
@@ -144,10 +195,17 @@ export const createSurveyAiPolicyCache = ({
       }
     },
     invalidate: (surveyId) => {
-      const entry = getEntry(surveyId)
-      nextGeneration(entry)
-      entry.fresh = false
+      const request = refetch(surveyId, getEntry(surveyId))
+      // callers that only want the refresh ignore the result: a failed refetch must not be an unhandled rejection
+      request.catch(() => {})
       notify(surveyId)
+      return request
+    },
+    reset: () => {
+      const surveyIds = [...entries.keys()]
+      for (const entry of entries.values()) nextGeneration(entry)
+      entries.clear()
+      for (const surveyId of surveyIds) notify(surveyId)
     },
     subscribe: (listener) => {
       listeners.add(listener)

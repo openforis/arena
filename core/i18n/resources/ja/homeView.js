@@ -182,9 +182,12 @@ export default {
         cloud: 'クラウドのAIプロバイダーが処理する場合があります。',
       },
       notAllowedOnInstance: 'このArenaインスタンスでは許可されていません: {{levels}}',
+      dataLimitedBySchema: 'レコードデータは、調査の設計より緩いレベルにはできません。選択できません: {{levels}}',
       onDeviceNote: 'このデバイス上: ユーザーにはローカル AI サーバー (例: LM Studio) が必要です。',
       readOnly: 'AIポリシーを変更できるのは調査の管理者のみです。',
       saved: 'AIポリシーを保存しました',
+      savedDataLowered:
+        'AIポリシーを保存しました。レコードデータのレベルも下げました。調査の設計より緩いレベルにはできません。',
       saveError: 'AIポリシーを保存できませんでした: {{message}}',
       loadError: 'AIポリシーを読み込めませんでした',
     },

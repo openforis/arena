@@ -4,7 +4,7 @@
  * Pure (no AI SDK import): the UI uses it for the availability and the badge, resolveModel for the request.
  */
 import type { AiDataClass } from '@common/ai/features'
-import { type AiPolicy, isHostingAllowed } from '@common/ai/policy'
+import { type AiPolicy, getAllowedLevel, isHostingAllowed } from '@common/ai/policy'
 import { isLocalProviderId } from '@common/ai/providerIds'
 
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from './engineInfo'
@@ -55,8 +55,8 @@ const unavailable = (reason: AiUnavailableReason): AiEngineSelection => ({ unava
 const selectLocal = (entry: AiProviderEntry, capabilities: AiCapabilities): AiEngineSelection => {
   const capability = capabilities.local[entry.id] ?? null
   if (!capability || getLocalProviderStatus(capability) !== 'ready') return unavailable('notAvailable')
-  const info = getLocalServerEngineInfo(capability, entry.name)
-  return info ? { engine: { ...info, providerId: entry.id } } : unavailable('notAvailable')
+  const engine = getLocalServerEngineInfo({ entry, capability })
+  return engine ? { engine } : unavailable('notAvailable')
 }
 
 /**
@@ -68,14 +68,8 @@ const selectLocal = (entry: AiProviderEntry, capabilities: AiCapabilities): AiEn
 const selectGateway = (entry: AiProviderEntry, capabilities: AiCapabilities): AiEngineSelection => {
   // a provider whose last test failed (or whose key is unreadable) fails every call; not tested yet is still tried
   if (entry.status === 'notAvailable' || !entry.hostingClass) return unavailable('notAvailable')
-  const info = getGatewayEngineInfo({
-    hostingClass: entry.hostingClass,
-    // Arena default is shown by its admin provider type ("OpenAI"), an account provider by the user's name for it
-    provider: entry.kind === 'arenaDefault' ? entry.type : entry.name,
-    model: entry.model,
-    maxPromptChars: capabilities.instance.maxPromptChars,
-  })
-  return info ? { engine: { ...info, providerId: entry.id } } : unavailable('notAvailable')
+  const engine = getGatewayEngineInfo({ entry, maxPromptChars: capabilities.instance.maxPromptChars })
+  return engine ? { engine } : unavailable('notAvailable')
 }
 
 /**
@@ -98,7 +92,8 @@ export const selectEngine = ({
   capabilities: AiCapabilities
   providerId?: string | null
 }): AiEngineSelection => {
-  if (!effective || effective[dataClass] === 'off') return unavailable('policyForbids')
+  // a data request is also limited by the design level (it carries design content): getAllowedLevel is the stricter
+  if (getAllowedLevel(effective, dataClass) === 'off') return unavailable('policyForbids')
   const id = getEffectiveProviderId({ capabilities, providerId })
   const entry = capabilities.providers.find((candidate) => candidate.id === id)
   // a local default saved on another computer: never replaced by another provider
@@ -107,6 +102,7 @@ export const selectEngine = ({
   if (entry.hostingClass && !isHostingAllowed({ effective, dataClass, hostingClass: entry.hostingClass })) {
     return unavailable('policyForbids')
   }
+  if (entry.addressInvalid) return unavailable('invalidAddress')
   if (entry.status === 'notSetUp') return unavailable('notSetUp')
   return entry.kind === 'local' ? selectLocal(entry, capabilities) : selectGateway(entry, capabilities)
 }

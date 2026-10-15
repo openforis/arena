@@ -106,6 +106,8 @@ export default {
     'La IA no está configurada. Configure un proveedor personal en la Configuración de IA o pida a su administrador que configure uno predeterminado.',
   aiPolicyRefused:
     'La política de IA de esta encuesta no permite enviar $t(common:aiPolicy.dataClass.{{dataClass}}) a $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyDataAboveSchema:
+    'Los datos de los registros no pueden ser más permisivos que el diseño de la encuesta (diseño: «$t(common:aiPolicy.level.{{schema}})», datos: «$t(common:aiPolicy.level.{{data}})»).',
   aiPolicyInvalid:
     'La política de IA no es válida: elija un nivel para el diseño de la encuesta y otro para los datos de los registros.',
   aiPolicyAboveCeiling:

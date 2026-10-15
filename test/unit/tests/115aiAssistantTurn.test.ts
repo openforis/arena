@@ -321,7 +321,7 @@ describe('runAssistantTurn', () => {
       /** Resolves the local engine and records the call. */
       const resolve = async (params: unknown) => {
         calls.push(params)
-        return { model, engine: localEngine }
+        return { model, engine: localEngine, policy: { schema: 'onDevice', data: 'onDevice' } as const }
       }
       const result = await run({ tools: [echo], extra: { resolve } })
       expect(calls).toHaveLength(1)
@@ -330,17 +330,37 @@ describe('runAssistantTurn', () => {
       expect(answerOf(result).status).toBe('done')
     })
 
-    test('a data tool makes the turn re-resolve with data, and the model receives the tool', async () => {
+    test('a data tool makes the turn declare data in the one resolution, and the model receives the tool', async () => {
       const dataTool: AiTool = { ...makeTool('test_data', async () => ({ ok: true })), dataClass: 'data' }
       const model = scriptedModel(() => textStream('ok'))
       const calls: any[] = []
+      const declared: unknown[] = []
+      const policy = { schema: 'onDevice', data: 'onDevice' } as const
       const resolve = async (params: any) => {
         calls.push(params)
-        return { model, engine: localEngine }
+        declared.push(params.declareDataClass({ engine: localEngine, policy }))
+        return { model, engine: localEngine, policy }
       }
-      const access: any = { effective: { schema: 'onDevice', data: 'onDevice' }, hostingClass: 'onDevice' }
+      const access: any = { effective: policy, hostingClass: 'onDevice' }
       await run({ tools: [dataTool], access, extra: { resolve } })
-      expect(calls.map((call) => call.dataClass)).toEqual(['schema', 'data'])
+      expect(calls.map((call) => call.dataClass)).toEqual(['schema'])
+      expect(declared).toEqual(['data'])
+      expect(model.doStreamCalls[0].tools?.map((tool: any) => tool.name)).toEqual(['test_data'])
+    })
+
+    test('the data decision and the tool list use the policy of the resolver, not the one read before the turn', async () => {
+      const dataTool: AiTool = { ...makeTool('test_data', async () => ({ ok: true })), dataClass: 'data' }
+      const model = scriptedModel(() => textStream('ok'))
+      const fresh = { schema: 'onDevice', data: 'onDevice' } as const
+      const declared: unknown[] = []
+      const resolve = async (params: any) => {
+        declared.push(params.declareDataClass({ engine: localEngine, policy: fresh }))
+        return { model, engine: localEngine, policy: fresh }
+      }
+      // the policy read before the turn does not let record data leave the device
+      const access: any = { effective: { schema: 'onDevice', data: 'off' }, hostingClass: 'onDevice' }
+      await run({ tools: [dataTool], access, extra: { resolve } })
+      expect(declared).toEqual(['data'])
       expect(model.doStreamCalls[0].tools?.map((tool: any) => tool.name)).toEqual(['test_data'])
     })
   })

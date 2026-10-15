@@ -1,56 +1,65 @@
 /**
- * Engine descriptions (label, model, limits) built from the capabilities. No AI SDK import.
+ * Engine descriptions (label, model, limits) built from the provider entries and the capabilities. No AI SDK import.
  */
+import { AiLimits } from '@common/ai/limits'
+
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
-import type { AiGatewayEngineSource, AiLocalServerCapability, AiSelectedEngine } from './types'
+import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from './types'
 
-export const LOCAL_SERVER_LABEL = 'Local server'
-export const GATEWAY_MAX_STEPS = 10
-export const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = 200000 // A's AI_MAX_PROMPT_CHARS default
-
-const hostOf = (baseUrl: string): string => {
-  try {
-    return new URL(baseUrl).host
-  } catch {
-    return baseUrl
-  }
-}
+// the browser doesn't know the server's AI_MAX_PROMPT_CHARS (its default is the assistant's budget): limits.ts is the
+// one copy of these values
+const GATEWAY_MAX_STEPS = AiLimits.assistantMaxSteps
+const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = AiLimits.assistantDefaultMaxPromptChars
 
 /**
- * Returns the local server engine description, or null when no URL or hosting class is known.
- * @param {AiLocalServerCapability} localServer - Local server capability.
- * @param {string} [label] - Name of the local provider (default: "Local server", or the host of an organisation server).
+ * Returns the engine description of a local provider, or null when its URL or hosting class is not known.
+ * @param {object} params - Parameters.
+ * @param {AiProviderEntry} params.entry - The local provider (its id and the name the UI shows).
+ * @param {AiLocalServerCapability} params.capability - Its probe (URL, chosen model, context size).
  * @returns {AiSelectedEngine|null} The description.
  */
-export const getLocalServerEngineInfo = (
-  localServer: AiLocalServerCapability,
-  label?: string
-): AiSelectedEngine | null => {
-  const { baseUrl, hostingClass } = localServer
+export const getLocalServerEngineInfo = ({
+  entry,
+  capability,
+}: {
+  entry: Pick<AiProviderEntry, 'id' | 'name'>
+  capability: AiLocalServerCapability
+}): AiSelectedEngine | null => {
+  const { baseUrl, hostingClass } = capability
   if (!baseUrl || !hostingClass) return null
-  const defaultLabel = hostingClass === 'onDevice' ? LOCAL_SERVER_LABEL : hostOf(baseUrl)
   return {
     id: 'localServer',
     hostingClass,
-    label: label ?? defaultLabel,
-    model: localServer.modelId,
-    limits: getLocalServerLimits(localServer.contextTokens),
-    contextWindow: getLocalServerContextWindow(localServer.contextTokens),
+    label: entry.name,
+    model: capability.modelId,
+    limits: getLocalServerLimits(capability.contextTokens),
+    contextWindow: getLocalServerContextWindow(capability.contextTokens),
+    providerId: entry.id,
   }
 }
 
 /**
- * Returns the gateway engine description, or null when its hosting class is unknown.
- * @param {AiGatewayEngineSource} gateway - The provider (account provider or Arena default) and the instance prompt cap.
+ * Returns the engine description of a gateway provider, or null when its hosting class is not known.
+ * @param {object} params - Parameters.
+ * @param {AiProviderEntry} params.entry - The provider (an account provider or Arena default).
+ * @param {number|null} params.maxPromptChars - The gateway prompt cap of the instance, null when unknown.
  * @returns {AiSelectedEngine|null} The description.
  */
-export const getGatewayEngineInfo = (gateway: AiGatewayEngineSource): AiSelectedEngine | null => {
-  if (!gateway.hostingClass) return null
+export const getGatewayEngineInfo = ({
+  entry,
+  maxPromptChars,
+}: {
+  entry: AiProviderEntry
+  maxPromptChars: number | null
+}): AiSelectedEngine | null => {
+  if (!entry.hostingClass) return null
   return {
     id: 'gateway',
-    hostingClass: gateway.hostingClass,
-    label: gateway.provider ?? '',
-    model: gateway.model,
-    limits: { maxPromptChars: gateway.maxPromptChars ?? DEFAULT_GATEWAY_MAX_PROMPT_CHARS, maxSteps: GATEWAY_MAX_STEPS },
+    hostingClass: entry.hostingClass,
+    // Arena default is shown by its admin provider type ("OpenAI"), an account provider by the user's name for it
+    label: entry.kind === 'arenaDefault' ? entry.type : entry.name,
+    model: entry.model,
+    limits: { maxPromptChars: maxPromptChars ?? DEFAULT_GATEWAY_MAX_PROMPT_CHARS, maxSteps: GATEWAY_MAX_STEPS },
+    providerId: entry.id,
   }
 }

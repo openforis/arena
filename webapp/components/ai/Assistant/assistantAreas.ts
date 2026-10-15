@@ -43,6 +43,7 @@ const SWITCHABLE_REASONS: AiEngineFeatureAvailability['reasons'] = [
   'missingOnThisBrowser',
   'notAvailable',
   'policyForbids',
+  'invalidAddress',
 ]
 
 /**

@@ -72,7 +72,7 @@ describe('local providers storage (265)', () => {
     expect(normalizeLocalProviderBaseUrl(42)).toBeNull()
   })
 
-  test('normalize keeps valid entries, names them, drops invalid ids and URLs and duplicate ids', () => {
+  test('normalize keeps valid entries, names them, drops invalid ids and duplicate ids, keeps an invalid address flagged', () => {
     expect(
       normalizeLocalProviders([
         { id: 'local:a', name: '  My   LM Studio ', baseUrl: 'http://localhost:1234/v1/', modelId: ' m ' },
@@ -87,6 +87,7 @@ describe('local providers storage (265)', () => {
     ).toEqual([
       { id: 'local:a', name: 'My LM Studio', baseUrl: 'http://localhost:1234/v1', modelId: 'm' },
       { id: 'local:b', name: 'Local server', baseUrl: 'http://10.0.0.5:8000/v1', modelId: null },
+      { id: 'local:d', name: 'bad url', baseUrl: 'javascript:alert(1)', modelId: 'x', addressInvalid: true },
     ])
     expect(normalizeLocalProviders({ id: 'local:a' })).toEqual([])
   })

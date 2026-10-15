@@ -77,6 +77,8 @@ Try to refresh the page.`,
     'AI is not configured. Set a personal provider in AI Settings or ask your administrator to configure a default.',
   aiPolicyRefused:
     "This survey's AI policy doesn't allow sending $t(common:aiPolicy.dataClass.{{dataClass}}) to $t(common:aiPolicy.hostingClass.{{hostingClass}}).",
+  aiPolicyDataAboveSchema:
+    "Record data can't be more permissive than the survey design (design: '$t(common:aiPolicy.level.{{schema}})', record data: '$t(common:aiPolicy.level.{{data}})').",
   aiPolicyInvalid: 'The AI policy is not valid: choose a level for the survey design and one for record data.',
   aiPolicyAboveCeiling:
     "'$t(common:aiPolicy.level.{{level}})' is not allowed for $t(common:aiPolicy.dataClass.{{dataClass}}) on this Arena instance (maximum: '$t(common:aiPolicy.level.{{ceiling}})').",

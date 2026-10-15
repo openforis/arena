@@ -59,6 +59,13 @@ describe('getSurveyAiPolicy', () => {
     })
   })
 
+  test('a stored policy with data above schema is returned clamped', async () => {
+    const { deps } = createDeps({ stored: { schema: 'off', data: 'cloud' } })
+    const result = await getSurveyAiPolicy(3, deps)
+    expect(result.policy).toEqual({ schema: 'off', data: 'off' })
+    expect(result.effective).toEqual({ schema: 'off', data: 'off' })
+  })
+
   test('the effective policy is clamped to the ceilings', async () => {
     const { deps } = createDeps({
       stored: { schema: 'cloud', data: 'cloud' },
@@ -91,8 +98,8 @@ describe('updateSurveyAiPolicy', () => {
   })
 
   test('no activity entry when nothing changes', async () => {
-    const { deps, state } = createDeps({ stored: { schema: 'off', data: 'onDevice' } })
-    await updateSurveyAiPolicy({ user, surveyId: 3, policy: { schema: 'off', data: 'onDevice' } }, deps)
+    const { deps, state } = createDeps({ stored: { schema: 'onDevice', data: 'onDevice' } })
+    await updateSurveyAiPolicy({ user, surveyId: 3, policy: { schema: 'onDevice', data: 'onDevice' } }, deps)
     expect(state.activities).toEqual([])
   })
 
@@ -138,6 +145,18 @@ describe('updateSurveyAiPolicy', () => {
     )
     expect(error.statusCode).toBe(400)
     expect(state.stores).toEqual([])
+  })
+
+  test('data above schema is rejected with aiPolicyDataAboveSchema (400) and nothing is stored', async () => {
+    const { deps, state } = createDeps({ stored: { schema: 'cloud', data: 'onDevice' } })
+    const error: any = await expectSystemErrorKey(
+      updateSurveyAiPolicy({ user, surveyId: 3, policy: { schema: 'off', data: 'cloud' } }, deps),
+      'aiPolicyDataAboveSchema'
+    )
+    expect(error.statusCode).toBe(400)
+    expect(error.params).toEqual({ schema: 'off', data: 'cloud' })
+    expect(state.stores).toEqual([])
+    expect(state.clients).toEqual([])
   })
 
   test('an invalid body is rejected before anything is read', async () => {

@@ -1465,7 +1465,10 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       notAvailable: 'El proveedor de IA elegido no está disponible ahora.',
       missingOnThisBrowser: 'Su proveedor predeterminado está en otro equipo.',
       notSetUp: 'No hay ningún proveedor de IA configurado. Añada uno en la configuración de IA.',
+      invalidAddress:
+        'La dirección de su servidor de IA local no es válida (sin usuario, contraseña, ? ni #). Corríjala en sus ajustes de IA.',
     },
+    localAddressInvalid: 'La dirección no puede contener usuario, contraseña, ? ni #.',
     action: {
       retry: 'Reintentar',
       changePolicy: 'Cambiar la política de IA de la encuesta',
@@ -1478,6 +1481,10 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
       chooseOther: 'Elegir otro proveedor',
+      sends: 'Esto enviará {{what}}.',
+      revokeHint: 'Usted permitió que Arena envíe solicitudes a este servidor.',
+      revoke: 'Revocar permiso',
+      revoked: 'Permiso revocado. Arena preguntará de nuevo antes de la siguiente solicitud.',
     },
   },
 

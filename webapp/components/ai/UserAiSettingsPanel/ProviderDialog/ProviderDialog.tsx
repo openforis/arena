@@ -15,6 +15,7 @@ import { useT } from '../useT'
 import { AccountProviderFields } from './AccountProviderFields'
 import { LocalProviderFields } from './LocalProviderFields'
 import type { ProviderDialogContext } from './providerDialogState'
+import { isLocalDraftUrlInvalid } from './providerDraft'
 import { ProviderTypeStep } from './ProviderTypeStep'
 import { getProviderTypeSpec, type ProviderTypeSpec, type SavedProvider } from './providerTypes'
 import { type ProviderDialogApi, useProviderDialog } from './useProviderDialog'
@@ -92,6 +93,8 @@ const ConnectStep = ({
           test={view.test?.local ?? null}
           testing={state.testing}
           canTest={view.canTest}
+          urlInvalid={isLocalDraftUrlInvalid(draft)}
+          savedBaseUrl={saved?.baseUrl ?? null}
           onBaseUrlChange={actions.setBaseUrl}
           onModelChange={actions.setModel}
           onTest={actions.runTest}

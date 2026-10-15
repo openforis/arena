@@ -119,6 +119,23 @@ export const isPrivateHost = (hostname: string): boolean => {
   return !!ipv6 && isPrivateIpv6(ipv6)
 }
 
+// user:password@ in the authority (an empty user or password counts too)
+const USERINFO = /^[a-z][a-z\d+.-]*:\/\/[^/?#]*@/i
+
+/**
+ * Returns true when the address is a plain http(s) base URL of a server: no credentials (user:pass@), no query and
+ * no fragment. Those would be sent with every request (fetch refuses a URL with credentials), break the paths
+ * appended to the base URL, and end up in the consent record and the logs of the server.
+ * @param {string} url - Base URL with a scheme.
+ * @returns {boolean} True for a plain http(s) URL.
+ */
+export const isPlainHttpBaseUrl = (url: string): boolean => {
+  const parsed = parseHttpUrl(url)
+  if (!parsed) return false
+  // `?` and `#` are tested on the text: the parsed query and fragment of "http://h/v1?" are empty
+  return !USERINFO.test(url) && !parsed.username && !parsed.password && !url.includes('?') && !url.includes('#')
+}
+
 /**
  * Returns the hosting class of a local AI server URL.
  * @param {string} url - Server base URL typed by the user.

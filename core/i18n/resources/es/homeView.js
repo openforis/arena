@@ -171,9 +171,13 @@ export default {
         cloud: 'Puede procesarlo un proveedor de IA en la nube.',
       },
       notAllowedOnInstance: 'No permitido en esta instancia de Arena: {{levels}}',
+      dataLimitedBySchema:
+        'Los datos de los registros no pueden ser más permisivos que el diseño de la encuesta. No disponible: {{levels}}',
       onDeviceNote: 'En este dispositivo: los usuarios necesitan un servidor de IA local (por ejemplo, LM Studio).',
       readOnly: 'Solo los administradores de la encuesta pueden cambiar la política de IA.',
       saved: 'Política de IA guardada',
+      savedDataLowered:
+        'Política de IA guardada. Los datos de los registros también se redujeron: no pueden ser más permisivos que el diseño de la encuesta.',
       saveError: 'No se pudo guardar la política de IA: {{message}}',
       loadError: 'No se pudo cargar la política de IA',
     },

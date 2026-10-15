@@ -101,6 +101,8 @@ Tente atualizar a página.`,
     'A IA não está configurada. Defina um provedor pessoal nas Configurações de IA ou peça ao seu administrador para configurar um padrão.',
   aiPolicyRefused:
     'A política de IA deste inventário não permite enviar $t(common:aiPolicy.dataClass.{{dataClass}}) para $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyDataAboveSchema:
+    'Os dados dos registros não podem ser mais permissivos do que a estrutura do inventário (estrutura: "$t(common:aiPolicy.level.{{schema}})", dados: "$t(common:aiPolicy.level.{{data}})").',
   aiPolicyInvalid:
     'A política de IA não é válida: escolha um nível para a estrutura do inventário e outro para os dados dos registros.',
   aiPolicyAboveCeiling:
