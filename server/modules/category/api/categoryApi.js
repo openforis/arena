@@ -1,5 +1,6 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -194,7 +195,7 @@ export const init = (app) => {
         res.json(await CategoryService.countItemsMissingLabels({ surveyId }))
       } catch (error) {
         // Response.sendErr (not next(error)): see convertToSamplingPointData, the error key would be lost
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category items missing labels count' })
       }
     }
   )
@@ -207,7 +208,7 @@ export const init = (app) => {
         const { surveyId, categoryUuid, lang, cursor, limit } = Request.getParams(req)
         res.json(await CategoryService.fetchItemsMissingLabels({ surveyId, categoryUuid, lang, cursor, limit }))
       } catch (error) {
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category items missing labels page' })
       }
     }
   )
@@ -483,7 +484,7 @@ export const init = (app) => {
       const { items } = Request.getBody(req) ?? {}
       res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
     } catch (error) {
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'category item labels update' })
     }
   })
 
@@ -647,7 +648,7 @@ export const init = (app) => {
         // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
         // before these routes in the Express stack, so next(error) never reaches it and the specific
         // error key/params would be lost (the client would get a generic HTML error page instead).
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category conversion to sampling point data' })
       }
     }
   )

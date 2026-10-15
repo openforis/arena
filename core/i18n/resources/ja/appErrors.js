@@ -38,6 +38,7 @@ export default {
     '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
   generic: '予期しないエラー：{{text}}',
+  unexpectedServerError: 'サーバーで予期しないエラーが発生しました。',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
   importingDataIntoWrongCollectSurvey: '誤った調査へのデータインポートです。期待されるURI：{{collectSurveyUri}}',
   invalidParams: 'リクエストパラメータが無効です。',

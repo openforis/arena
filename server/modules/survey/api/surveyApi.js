@@ -17,6 +17,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '../../../job/jobUtils'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
+import { sendRouteError } from '../../../utils/sendRouteError'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
@@ -352,7 +353,7 @@ export const init = (app) => {
       res.json(await SchemaSummary.fetchSchemaSummaryAiItems({ surveyId, cycle }))
     } catch (error) {
       // not next(error): the browser reads the error key from the JSON, the error middleware would answer with HTML
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'schema summary AI items' })
     }
   })
 
@@ -376,7 +377,7 @@ export const init = (app) => {
       const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'schema summary export' })
     }
   })
 
@@ -420,7 +421,7 @@ export const init = (app) => {
       contentStream.pipe(res)
     } catch (error) {
       // sendErr preserves the "file not found" status code and key (next(error) would not)
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'survey file download' })
     }
   })
 

@@ -59,6 +59,7 @@ export default {
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
+  unexpectedServerError: 'Серверт гэнэтийн алдаа гарлаа.',
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',

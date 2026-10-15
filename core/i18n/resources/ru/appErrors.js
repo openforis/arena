@@ -62,6 +62,7 @@ export default {
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
+  unexpectedServerError: 'На сервере произошла непредвиденная ошибка.',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidParams: 'Неверные параметры запроса.',

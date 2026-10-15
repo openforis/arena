@@ -1,5 +1,6 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
 import { ENV } from '@core/processUtils'
+import { uuidv4 } from '@core/uuid'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
@@ -423,4 +424,68 @@ describe('The AI write routes are off when the AI is off (059)', () => {
       expect(res.body.key).not.toMatch(/^aiFeature/)
     }
   )
+})
+
+describe('Routes do not send the text of an unexpected error (059)', () => {
+  // a survey that does not exist: the first query fails with a database error, not an application error
+  const missingSurveyId = '99999999'
+  const aiUser = {
+    uuid: uuidv4(),
+    prefs: {
+      ai: { accessLevel: 3, featureToggles: { assistantCleaning: true, assistantDesign: true, dataDictionary: true } },
+    },
+  }
+
+  const expectNoErrorText = (res: any, key: string) => {
+    expect(res.statusCode).toBe(500)
+    expect(res.body).toMatchObject({ status: 'error', key })
+    const text = JSON.stringify(res.body)
+    expect(text).not.toContain('Could not serve')
+    expect(text).not.toMatch(/does not exist|relation|schema/i)
+  }
+
+  const callWithMissingSurvey = async ({ init, method, path, body = {} }: any) => {
+    const aiOn = jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
+    try {
+      const route = collectRoutes(init).find((r) => r.method === method && r.path === path)
+      const res = createFakeResponse()
+      await route!.handlers.at(-1)(
+        { params: { surveyId: missingSurveyId }, query: { cycle: '0' }, body, user: aiUser },
+        res,
+        jest.fn()
+      )
+      return res
+    } finally {
+      aiOn.restore()
+    }
+  }
+
+  test('the batch record edit answers with nodesBatchUnexpected', async () => {
+    const res = await callWithMissingSurvey({
+      init: RecordApi.init,
+      method: 'post',
+      path: '/survey/:surveyId/records/nodes/update',
+      body: { cycle: '0', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), from: 1, to: 2 }] },
+    })
+    expectNoErrorText(res, 'appErrors:record.nodesBatchUnexpected')
+  })
+
+  test('the schema summary AI items answer with the generic unexpected key', async () => {
+    const res = await callWithMissingSurvey({
+      init: SurveyApi.init,
+      method: 'get',
+      path: '/survey/:surveyId/schema-summary/ai-items',
+    })
+    expectNoErrorText(res, 'appErrors:unexpectedServerError')
+  })
+
+  test('the category item labels update answers with the generic unexpected key', async () => {
+    const res = await callWithMissingSurvey({
+      init: CategoryApi.init,
+      method: 'put',
+      path: '/survey/:surveyId/categories/items/labels',
+      body: { items: [{ uuid: uuidv4(), labels: { en: 'x' } }] },
+    })
+    expectNoErrorText(res, 'appErrors:unexpectedServerError')
+  })
 })
