@@ -96,6 +96,9 @@ type ResolvedCallConfig = { cfg: AiProviderCallConfig; saved: StoredAiProvider |
 const logger = Log.getLogger('AiProviders')
 
 // the providers that refuse a call without an API key
+// the answer to "say ok" is tiny: a connection test reads at most this much, whatever the endpoint sends
+const TEST_MAX_BODY_BYTES = 1024 * 1024
+
 const KEY_REQUIRED_TYPES = new Set<string>([AiProvider.openai, AiProvider.anthropic, AiProvider.google])
 
 /**
@@ -138,7 +141,7 @@ const runConnectionTest = async ({ user, cfg }: { user: User; cfg: AiProviderCal
   // an endpoint that never answers must not hold the request (and a socket) open
   const abortSignal = AbortSignal.timeout(ENV.aiRequestTimeoutMs)
   try {
-    const model = await ProviderRegistry.buildUserModel(cfg)
+    const model = await ProviderRegistry.buildUserModel(cfg, { maxBodyBytes: TEST_MAX_BODY_BYTES })
     const ctx = {
       feature: 'testConnection',
       source: 'user',
