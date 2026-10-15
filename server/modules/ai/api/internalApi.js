@@ -1,8 +1,6 @@
 /**
  * Internal/debug routes for the AI gateway. Not exposed in the docs and
- * gated to admins only — intended for smoke-testing the wiring during
- * Phase 0 verification ("Phase 0 done when ... POST /api/ai/_internal/ping
- * succeeds").
+ * gated to admins only — intended for smoke-testing the wiring (POST /api/ai/_internal/ping).
  */
 import { z } from 'zod'
 

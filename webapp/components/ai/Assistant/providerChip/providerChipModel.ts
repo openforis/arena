@@ -1,5 +1,5 @@
 /**
- * Provider chip of the assistant composer (spec section 5): the conversation's provider, the rows of the
+ * Provider chip of the assistant composer: the conversation's provider, the rows of the
  * "Answer with" popover and the chip text. Pure.
  */
 import type { AiDataClass } from '@common/ai/features'

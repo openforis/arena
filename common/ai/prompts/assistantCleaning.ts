@@ -36,7 +36,7 @@ const rules = `Rules:
  * @param {string} params.cycle - Current cycle key.
  * @param {string} params.lang - Survey language used for the labels.
  * @param {string} params.uiLang - Language of the user's interface (answer language).
- * @param {string|null} [params.viewDescription] - Current view, as D1 describes it.
+ * @param {string|null} [params.viewDescription] - Current view, as the view description gives it.
  * @returns {string} The system prompt.
  */
 export const buildAssistantCleaningPrompt = ({

@@ -1,6 +1,6 @@
 /**
- * Redux middleware that derives suggestion events from the actions the store already sees: a succeeded job (suggestion
- * 8, and a category import for suggestion 6), the survey info saved, a category deleted. It reads only the action.
+ * Redux middleware that derives suggestion events from the actions the store already sees: a succeeded job (records
+ * imported, and a category import for the category item labels), the survey info saved, a category deleted. It reads only the action.
  */
 import type { Middleware } from 'redux'
 
@@ -44,7 +44,7 @@ const getEvents = (action: any): SuggestionEvent[] => {
     case JOB_UPDATE:
       return getJobEvents(action.job)
     case surveyInfoUpdate:
-      // a new language can leave category item labels missing (suggestion 6)
+      // a new language can leave category item labels missing
       // SurveyConfigurationEditor dispatches surveyInfoUpdate too, so it also triggers surveyInfoSaved:
       // harmless, the event is throttled and the detector only reads the survey
       return [{ type: 'surveyInfoSaved' }]

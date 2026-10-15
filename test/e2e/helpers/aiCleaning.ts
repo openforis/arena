@@ -54,10 +54,10 @@ export const expectReportRowCount = async (page: Page, count: number): Promise<v
 }
 
 /**
- * Makes C's stub server the default local provider of the logged-in user and reloads the page.
+ * Makes the stub server the default local provider of the logged-in user and reloads the page.
  * @param {Page} page - The page (already on an app URL).
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
- * @param {{ baseUrl: string, modelId: string }} stub - C's stub server.
+ * @param {{ baseUrl: string, modelId: string }} stub - The stub server.
  * @returns {Promise<void>} Resolves after the reload.
  */
 export const useLocalServer = async (
@@ -84,7 +84,7 @@ export const useLocalServer = async (
 export const askAssistantAboutFirstRow = async (page: Page): Promise<void> => {
   await reportRows(page).first().getByTestId(TestId.validationReport.askAssistantBtn).click()
   const composer = page.getByTestId(TestId.aiAssistant.input)
-  // deviation 10: the row context is pre-filled, never sent by itself
+  // the row context is pre-filled, never sent by itself
   await expect(composer).toHaveValue(/\[cleaning-row-context\]/)
   await expect(page.getByTestId(TestId.aiCleaning.card)).toHaveCount(0)
   // nothing was sent yet

@@ -1,5 +1,5 @@
 /**
- * Scripted turns of the mock provider (and of C's stub local server) for the Cleaning area,
+ * Scripted turns of the mock provider (and of the stub local server) for the Cleaning area,
  * used by test/e2e/specs/aiCleaning.spec.ts.
  */
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
@@ -43,7 +43,7 @@ export const formatMockProposalAnswer = (lastToolOutput: unknown): string => {
 }
 
 /**
- * Builds the scripted answer from the output of validation_summarize (suggestion 7 e2e).
+ * Builds the scripted answer from the output of validation_summarize (validation errors suggestion, e2e).
  * @param {unknown} lastToolOutput - Output of the last tool call.
  * @returns {string} The answer.
  */
@@ -64,7 +64,7 @@ export const assistantCleaningMockScripts: MockScript[] = [
     ],
   },
   {
-    // the prompt of suggestion 7 (webapp/ai/suggestions/prompts/validationErrors.ts, pinned by test 241)
+    // the prompt of the validation errors suggestion (webapp/ai/suggestions/prompts/validationErrors.ts, pinned by test 241)
     promptMarker: assistantMarkers.cleaning,
     pattern: /^Summarise the validation errors and warnings/i,
     steps: [

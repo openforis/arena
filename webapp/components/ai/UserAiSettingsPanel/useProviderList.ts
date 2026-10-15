@@ -92,7 +92,7 @@ const removeLocalProvider = async ({ id, defaultProviderId }: { id: string; defa
     defaultProviderId,
   })
   if (!saveLocalProviders({ storage, userUuid, providers })) return false
-  // the server cannot see local providers: the browser resets the default itself (spec section 9)
+  // the server cannot see local providers: the browser resets the default itself
   if (resetDefault) await API.aiProviders.setDefaultProvider({ providerId: ARENA_DEFAULT_PROVIDER_ID })
   return true
 }

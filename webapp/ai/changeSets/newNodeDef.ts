@@ -1,5 +1,5 @@
 /**
- * New node definitions proposed by the assistant, with the form designer's default props (deviation 6: duplicated
+ * New node definitions proposed by the assistant, with the form designer's default props (duplicated
  * from NodeDefUIProps, whose module loads React components).
  */
 import * as NodeDef from '@core/survey/nodeDef'

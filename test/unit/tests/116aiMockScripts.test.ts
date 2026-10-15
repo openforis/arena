@@ -19,7 +19,7 @@ const toolResult = (id: string): any => ({
 const designSystem = system(`${assistantMarkers.design}\nYou are the design assistant.`)
 
 describe('getScriptedStep', () => {
-  test("no assistant marker: null, A's canned answers apply", async () => {
+  test('no assistant marker: null, the canned answers apply', async () => {
     expect(getScriptedStep([system('Generate an <expression>'), user('label')])).toBeNull()
     const result: any = await createMockModel().doGenerate({ prompt: [system('Reply with <expression>')] } as any)
     expect(result.content[0].text).toMatch(/^<expression>/)
@@ -41,7 +41,7 @@ describe('getScriptedStep', () => {
     expect(getScriptedStep(prompt)).toMatchObject({ toolCall: { toolName: 'nodeDef_get' } })
   })
 
-  test("a marked prompt without a script never gets A's canned answers", () => {
+  test('a marked prompt without a script never gets the canned answers', () => {
     const helpSystem = system(`${assistantMarkers.help}\nManual outline:\n7 Data Explorer`)
     expect(getScriptedStep([helpSystem, user('What is a cycle?')])).toEqual({ text: 'MOCK answer.' })
   })
@@ -93,7 +93,7 @@ describe('createMockModel with scripts', () => {
 })
 
 describe('MOCK_SCRIPTS', () => {
-  test('every scripted tool call is a valid input of its D1 tool', () => {
+  test('every scripted tool call is a valid input of its tool', () => {
     for (const script of MOCK_SCRIPTS) {
       for (const step of script.steps) {
         if (!('toolCall' in step)) continue

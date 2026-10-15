@@ -22,7 +22,7 @@ export const expressionPropContexts: Record<
   editableIf: { isContextParent: true, selfReferenceAllowed: false },
 }
 
-// the designer edits these with a single expression box (deviation 7)
+// the designer edits these with a single expression box
 export const singleExpressionProps: readonly NodeDefExpressionProp[] = ['applicable', 'visibleIf', 'editableIf']
 
 /**

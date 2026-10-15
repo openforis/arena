@@ -1,5 +1,5 @@
 /**
- * Suggestion 7: many validation messages in the current cycle (Cleaning area), counted when the report opens.
+ * Validation errors suggestion: many validation messages in the current cycle (Cleaning area), counted when the report opens.
  */
 import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { CleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
@@ -98,7 +98,7 @@ const countCycleMessages = async ({
 }
 
 /**
- * Creates the detector of suggestion 7.
+ * Creates the detector of the validation errors suggestion.
  * @param {object} deps - Dependencies.
  * @param {CountValidationReportRows} deps.countRows - Counts the validation report rows (Arena's server).
  * @param {AiLog} [deps.log] - Reports a failed count.
@@ -133,7 +133,7 @@ export const createValidationErrorsDetector = ({
       ctx.store.removeTargets({ userUuid, surveyId, id, targetKeys: [VALIDATION_ERRORS_TARGET_KEY] })
       return
     }
-    // replaced on every open: a fresh count, createdAt and expiry (deviation 1)
+    // replaced on every open: a fresh count, createdAt and expiry
     ctx.store.remove({ userUuid, surveyId, id })
     ctx.store.add({
       userUuid,

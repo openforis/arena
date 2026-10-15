@@ -44,7 +44,7 @@ export const isExplorerQueryRequest = (request: Request) => /\/api\/surveyRdb\/\
 export const E2E_LOCAL_PROVIDER_ID = 'local:e2e'
 
 /**
- * Makes C's stub server the only local provider of this browser and the default provider, or removes it and makes
+ * Makes the stub server the only local provider of this browser and the default provider, or removes it and makes
  * Arena default the default again. The page must be on an app URL; reload it afterwards (the capabilities are read
  * when the app loads).
  * @param {Page} page - The page.
@@ -88,7 +88,7 @@ export const askAnalysis = async (page: Page, message: string): Promise<void> =>
 }
 
 /**
- * Accepts C's first-use consent (shown once per user and survey), then waits for the end of the turn.
+ * Accepts the first-use consent (shown once per user and survey), then waits for the end of the turn.
  * @param {Page} page - The page.
  * @returns {Promise<void>} Resolves when the turn has ended.
  */

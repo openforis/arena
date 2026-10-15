@@ -1,5 +1,5 @@
 /**
- * Suggestion 8: records were imported into the active survey (Analysis area), from a succeeded import job.
+ * Data imported suggestion: records were imported into the active survey (Analysis area), from a succeeded import job.
  */
 import * as JobSerialized from '@common/job/jobSerialized'
 

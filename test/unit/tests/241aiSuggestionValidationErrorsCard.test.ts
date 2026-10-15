@@ -52,7 +52,7 @@ describe('validation errors suggestion card and prompt (241)', () => {
     expect(validationErrorsDefinition.card(suggestionOf(1200), describeCtx('en')).params).toEqual({ count: '1,200' })
   })
 
-  test('prompt: the spec text, without any record data', () => {
+  test('prompt: the fixed text, without any record data', () => {
     expect(VALIDATION_ERRORS_PROMPT).toBe(
       'Summarise the validation errors and warnings of this survey in the current cycle. Use validation_summarize. ' +
         'Group them by field and by kind, say which fields have the most, and what to check first.'

@@ -56,7 +56,7 @@ describe('AI feature registry', () => {
     expect(getAiFeature('schemaSummary')).toBeNull()
   })
 
-  test('survey-scoped permissions match the spec', () => {
+  test('survey-scoped permissions are as expected', () => {
     expect(AiFeatures.expressionGenerate.permission).toBe(AiFeaturePermission.surveyEdit)
     expect(AiFeatures.expressionExplain.permission).toBe(AiFeaturePermission.surveyEdit)
     expect(AiFeatures.translation.permission).toBe(AiFeaturePermission.surveyEdit)

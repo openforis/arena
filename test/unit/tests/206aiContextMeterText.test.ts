@@ -32,7 +32,7 @@ const base: AssistantMessageUsage = {
 }
 
 describe('context meter text (206)', () => {
-  test('the texts of the spec, in English', () => {
+  test('the texts, in English', () => {
     expect(textOf(base)).toBe('12.4K / 120K tokens')
     expect(textOf({ ...base, windowTokens: null })).toBe('12.4K tokens')
     expect(textOf({ ...base, windowTokens: null, contextTokens: 1520, estimated: true })).toBe('≈ 1.5K tokens')
