@@ -112,7 +112,11 @@ Tente atualizar a página.`,
   aiFeatureUnknown: 'Funcionalidade de IA desconhecida "{{feature}}".',
   aiCallInvalid: 'O pedido de IA não é válido ({{reason}}).',
   aiRateLimited: 'Demasiados pedidos de IA. Aguarde um minuto e tente novamente.',
+  aiDailyBudgetExceeded:
+    'Atingiu o limite de hoje do provedor de IA padrão do Arena. Ele é reposto à meia-noite UTC. Pode continuar a trabalhar com o seu próprio provedor nas Configurações de IA.',
   aiRequestTimeout: 'A IA demorou demasiado a responder. Tente novamente.',
+  aiToolNotOffered:
+    'A IA pediu uma ferramenta que não tinha permissão para usar, por isso a resposta foi descartada. Tente novamente.',
   aiProviderAuth:
     'O provedor de IA rejeitou as credenciais. Verifique a chave de API nas Definições de IA ou contacte o administrador.',
   aiProviderRateLimited: 'O provedor de IA está a limitar os pedidos. Tente novamente dentro de momentos.',
@@ -128,6 +132,8 @@ Tente atualizar a página.`,
   aiBaseUrlNotAllowed:
     'Esta URL base aponta para um endereço interno, que o servidor do Arena não chama. Para um modelo no seu computador, use o Servidor de IA local. Para um servidor da sua organização, peça ao administrador que a adicione aos servidores de modelos da organização.',
   aiProviderUnavailable: 'Não foi possível contactar o provedor de IA. Tente novamente mais tarde.',
+  aiProviderResponseTooLarge:
+    'O provedor de IA enviou uma resposta demasiado grande, que foi interrompida. Tente novamente ou escolha outro provedor.',
   aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
   aiProviderTestFailed: 'O teste do provedor falhou: {{message}}',
   aiProviderNotFound: 'Este provedor de IA não existe ou não é seu. Escolha outro provedor.',

@@ -130,6 +130,9 @@ jobs:
           AI_MOCK_PROVIDER_ENABLED: true
           AI_DEFAULT_PROVIDER: mock
           AI_DEFAULT_MODEL: mock
+          # no daily budget for the mock provider: the specs make many calls with the same users
+          AI_DEFAULT_DAILY_CALL_LIMIT: 0
+          AI_DEFAULT_DAILY_CHAR_LIMIT: 0
         run: |
           ln -s dist/server.js .
           exec pm2-runtime server.js &

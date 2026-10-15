@@ -134,6 +134,9 @@ export const ENV = {
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
   // Requests per user per minute on the gateway endpoint; 0 or negative = unlimited
   aiRateLimitPerMinute: getNumberOrDefault(process.env.AI_RATE_LIMIT_PER_MINUTE, 30),
+  // Daily budget per user of the Arena default provider (UTC day); 0 or negative = unlimited
+  aiDefaultDailyCallLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CALL_LIMIT, 200),
+  aiDefaultDailyCharLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CHAR_LIMIT, 2000000),
   // User-configured base URLs allowed even if they resolve to a private address (org-hosted models)
   aiOrgHostedBaseUrls: getList(process.env.AI_ORG_HOSTED_BASE_URLS),
   // Test servers only: enables the canned "mock" provider (AI_DEFAULT_PROVIDER=mock)

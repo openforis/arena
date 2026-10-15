@@ -21,6 +21,7 @@ import SystemError from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
 import { createMockModel, MOCK_PROVIDER } from './mockProvider'
+import { createResponseLimitedFetch, getProviderResponseLimits } from './responseLimits'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
 export const providers = AiProvider
@@ -46,6 +47,14 @@ export const isSupported = (provider) => validProviders.has(provider)
  * @returns {Promise<Response>} The response.
  */
 const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'error' })
+
+/**
+ * Builds the fetch of a provider: the endpoint of a user must not fill the memory with an endless answer, and the cap
+ * follows the output tokens the server allows, so a legitimate long answer is not cut.
+ * @returns {typeof fetch} The guarded fetch.
+ */
+const createGuardedFetch = () =>
+  createResponseLimitedFetch(noRedirectFetch, getProviderResponseLimits(ENV.aiMaxOutputTokens).maxResponseBytes)
 
 /**
  * Builds a Vercel AI SDK `LanguageModel` instance for the given config.
@@ -90,7 +99,7 @@ export const buildModel = (cfg) => {
       // apiKey is optional for some local servers (e.g. Ollama with no auth)
       // Use .chat() explicitly — the default call now routes to the OpenAI Responses API
       // (/v1/responses), which most OpenAI-compatible providers don't implement.
-      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: noRedirectFetch }).chat(model)
+      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: createGuardedFetch() }).chat(model)
     }
     case providers.vercelAiSdk: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })

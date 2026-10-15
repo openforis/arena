@@ -117,7 +117,11 @@ export default {
   aiFeatureUnknown: 'Función de IA desconocida "{{feature}}".',
   aiCallInvalid: 'La solicitud de IA no es válida ({{reason}}).',
   aiRateLimited: 'Demasiadas solicitudes de IA. Espere un minuto y vuelva a intentarlo.',
+  aiDailyBudgetExceeded:
+    'Ha alcanzado el límite de hoy del proveedor de IA predeterminado de Arena. Se restablece a medianoche UTC. Puede seguir trabajando con su propio proveedor en la Configuración de IA.',
   aiRequestTimeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
+  aiToolNotOffered:
+    'La IA pidió una herramienta que no tenía permitido usar, por lo que se descartó su respuesta. Inténtelo de nuevo.',
   aiProviderAuth:
     'El proveedor de IA rechazó las credenciales. Compruebe la clave API en Ajustes de IA o consulte a su administrador.',
   aiProviderRateLimited: 'El proveedor de IA está limitando las solicitudes. Inténtelo de nuevo en un momento.',
@@ -133,6 +137,8 @@ export default {
   aiBaseUrlNotAllowed:
     'Esta URL base apunta a una dirección interna, a la que el servidor de Arena no llama. Para un modelo en su equipo, use el Servidor de IA local. Para un servidor de su organización, pida a su administrador que la añada a los servidores de modelos de la organización.',
   aiProviderUnavailable: 'No se pudo contactar con el proveedor de IA. Inténtelo de nuevo más tarde.',
+  aiProviderResponseTooLarge:
+    'El proveedor de IA envió una respuesta demasiado grande y se interrumpió. Inténtelo de nuevo o elija otro proveedor.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
   aiProviderTestFailed: 'La prueba del proveedor falló: {{message}}',
   aiProviderNotFound: 'Este proveedor de IA no existe o no es suyo. Elija otro proveedor.',

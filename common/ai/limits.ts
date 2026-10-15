@@ -27,4 +27,12 @@ export const AiLimits = {
   dataDictionaryMaxDescriptions: 200,
   // longest AI description accepted with a schema summary export (the browser truncates to it)
   dataDictionaryMaxDescriptionChars: 1000,
+  // what the server reads from a provider answer: an endpoint chosen by a user must not fill the memory
+  providerResponseMaxBytes: 8 * 1024 * 1024,
+  providerFrameMaxChars: 1024 * 1024,
+  // the two above are floors: the server raises them with AI_MAX_OUTPUT_TOKENS (getProviderResponseLimits), at these
+  // rates per output token. A streamed token is a frame of 100 to 400 bytes, so 2 KiB is a generous allowance
+  providerBytesPerOutputToken: 2048,
+  providerFrameCharsPerOutputToken: 16,
+  providerErrorBodyMaxBytes: 8 * 1024,
 } as const

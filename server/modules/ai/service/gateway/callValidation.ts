@@ -5,7 +5,15 @@
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import { isAiProviderId } from '@common/ai/providerIds'
-import { AiFeaturePermission, getAiFeature, isDeclaredDataClassAllowed, isGatewayFeature } from '@common/ai/features'
+import {
+  AiFeaturePermission,
+  getAiFeature,
+  getMaxAiDataClass,
+  isDeclaredDataClassAllowed,
+  isGatewayFeature,
+  type AiDataClass,
+} from '@common/ai/features'
+import { isSchemaTool } from '@common/ai/schemaTools'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
 
 const PAYLOAD_TOO_LARGE = 413
@@ -18,11 +26,15 @@ const invalid = (reason: string) => new SystemError('aiCallInvalid', { reason },
 const isObject = (value: unknown): value is Record<string, any> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
+// A survey id is required by the features that check a survey permission and refused by the login-only ones: no
+// permission was checked for it, so its AI policy must not be read (the refusal would reveal it).
 const parseSurveyId = (value: unknown, required: boolean): number | undefined => {
-  if (value === undefined || value === null) {
+  const absent = value === undefined || value === null
+  if (absent) {
     if (required) throw invalid('surveyId')
     return undefined
   }
+  if (!required) throw invalid('surveyId')
   const surveyId = Number(value)
   if (!Number.isInteger(surveyId) || surveyId <= 0 || String(value) !== String(surveyId)) throw invalid('surveyId')
   return surveyId
@@ -65,7 +77,13 @@ const MAX_TOOLS = 32
 const MAX_TOOL_DESCRIPTION_CHARS = 4000
 const TOOL_CHOICE_TYPES = new Set(['auto', 'none', 'required'])
 
-export type SanitizeLimits = { maxPromptChars: number; maxOutputTokens: number; allowTools?: boolean }
+export type SanitizeLimits = {
+  maxPromptChars: number
+  maxOutputTokens: number
+  allowTools?: boolean
+  // the tool names that may be offered (absent: any valid name)
+  allowedToolNames?: readonly string[]
+}
 
 type GatewayTool = { type: 'function'; name: string; description?: string; inputSchema: Record<string, any> }
 
@@ -84,6 +102,14 @@ const isToolPartOf = (part: unknown, type: string): part is Record<string, any> 
   typeof part.toolName === 'string' &&
   TOOL_NAME_PATTERN.test(part.toolName)
 
+// What the prompt may contain: tool calls and results only for tool features, and only of the allowed tool names
+type PromptRules = { allowTools: boolean; allowedToolNames?: readonly string[] }
+
+// A request cannot carry the calls or results of a tool the feature does not offer.
+const assertToolNameAllowed = (toolName: string, { allowedToolNames }: PromptRules): void => {
+  if (allowedToolNames && !allowedToolNames.includes(toolName)) throw invalid('prompt.toolName')
+}
+
 // Rebuilds a tool result output from the known keys of its type; null when the output is not supported.
 const rebuildToolOutput = (output: unknown): Record<string, any> | null => {
   if (!isObject(output)) return null
@@ -96,34 +122,36 @@ const rebuildToolOutput = (output: unknown): Record<string, any> | null => {
 
 // Rebuilds each part from the known keys of its type (providerOptions and any other key are dropped);
 // null when the part is not allowed in a message of this role.
-const rebuildPart = (part: unknown, role: string, allowTools: boolean): Record<string, any> | null => {
+const rebuildPart = (part: unknown, role: string, rules: PromptRules): Record<string, any> | null => {
   if (isTextPart(part)) return role === 'tool' ? null : { type: 'text', text: part.text }
-  if (!allowTools || role === 'user') return null
+  if (!rules.allowTools || role === 'user') return null
   if (role === 'assistant') {
     if (isReasoningPart(part)) return { type: 'reasoning', text: part.text }
     if (isToolPartOf(part, 'tool-call')) {
+      assertToolNameAllowed(part.toolName, rules)
       return { type: 'tool-call', toolCallId: part.toolCallId, toolName: part.toolName, input: part.input }
     }
     return null
   }
   if (!isToolPartOf(part, 'tool-result')) return null
+  assertToolNameAllowed(part.toolName, rules)
   const output = rebuildToolOutput(part.output)
   return output && { type: 'tool-result', toolCallId: part.toolCallId, toolName: part.toolName, output }
 }
 
 // Rebuilds the message from { role, content } so that extra keys, e.g. providerOptions, are dropped.
 // System content is a string; user content text parts; assistant and tool content depend on allowTools.
-const rebuildMessage = (message: unknown, allowTools: boolean): any => {
+const rebuildMessage = (message: unknown, rules: PromptRules): any => {
   if (!isObject(message)) throw invalid('prompt')
   const { role, content } = message
   if (role === 'system') {
     if (typeof content !== 'string') throw invalid('prompt.system')
     return { role, content }
   }
-  const roleAllowed = role === 'user' || role === 'assistant' || (role === 'tool' && allowTools)
+  const roleAllowed = role === 'user' || role === 'assistant' || (role === 'tool' && rules.allowTools)
   if (!roleAllowed) throw invalid('prompt.role')
   if (!Array.isArray(content)) throw invalid('prompt.content')
-  const parts = content.map((part) => rebuildPart(part, role, allowTools))
+  const parts = content.map((part) => rebuildPart(part, role, rules))
   if (!parts.every(Boolean)) throw invalid('prompt.content')
   return { role, content: parts }
 }
@@ -139,12 +167,21 @@ const messageSize = (message: any): number =>
     ? message.content.length
     : message.content.reduce((total: number, part: any) => total + partSize(part), 0)
 
+/**
+ * Returns the size of a sanitized call in characters (messages plus tool definitions): what the prompt limit and
+ * the daily budget count.
+ * @param {AiGatewayCall} call - The sanitized call.
+ * @returns {number} The size.
+ */
+export const getCallSize = (call: AiGatewayCall): number =>
+  call.prompt.reduce((total, message) => total + messageSize(message), call.tools ? jsonSize(call.tools) : 0)
+
 const sanitizePrompt = (
   prompt: unknown,
-  { maxPromptChars, allowTools, extraSize }: { maxPromptChars: number; allowTools: boolean; extraSize: number }
+  { maxPromptChars, extraSize, ...rules }: PromptRules & { maxPromptChars: number; extraSize: number }
 ): AiGatewayCall['prompt'] => {
   if (!Array.isArray(prompt) || prompt.length === 0) throw invalid('prompt')
-  const rebuilt = prompt.map((message) => rebuildMessage(message, allowTools))
+  const rebuilt = prompt.map((message) => rebuildMessage(message, rules))
   const size = rebuilt.reduce((total, message) => total + messageSize(message), extraSize)
   if (size > maxPromptChars) {
     throw new SystemError('aiPromptTooLarge', { size, limit: maxPromptChars }, PAYLOAD_TOO_LARGE)
@@ -165,11 +202,15 @@ const checkTool = (tool: unknown): GatewayTool => {
     : { type: 'function', name, description, inputSchema }
 }
 
-const pickTools = (value: unknown, allowTools: boolean): GatewayTool[] | undefined => {
+const pickTools = (
+  value: unknown,
+  { allowTools, allowedToolNames }: Pick<SanitizeLimits, 'allowTools' | 'allowedToolNames'>
+): GatewayTool[] | undefined => {
   if (value === undefined) return undefined
   if (!allowTools || !Array.isArray(value) || value.length > MAX_TOOLS) throw invalid('tools')
   const tools = value.map(checkTool)
   if (new Set(tools.map((tool) => tool.name)).size !== tools.length) throw invalid('tools.name')
+  if (allowedToolNames && !tools.every((tool) => allowedToolNames.includes(tool.name))) throw invalid('tools.name')
   return tools.length > 0 ? tools : undefined
 }
 
@@ -219,18 +260,24 @@ const capOutputTokens = (value: unknown, maxOutputTokens: number): number => {
 /**
  * Validates and reduces the model call to the forwarded options.
  * @param {unknown} call - The call sent by the browser.
- * @param {SanitizeLimits} limits - Limits; `allowTools` only for features flagged `tools`.
+ * @param {SanitizeLimits} limits - Limits; `allowTools` only for features flagged `tools`, `allowedToolNames` when the
+ *   feature has a fixed tool list.
  * @returns {AiGatewayCall} The call to forward.
  */
 export const sanitizeCall = (
   call: unknown,
-  { maxPromptChars, maxOutputTokens, allowTools = false }: SanitizeLimits
+  { maxPromptChars, maxOutputTokens, allowTools = false, allowedToolNames }: SanitizeLimits
 ): AiGatewayCall => {
   if (!isObject(call)) throw invalid('call')
-  const tools = pickTools(call.tools, allowTools)
+  const tools = pickTools(call.tools, { allowTools, allowedToolNames })
   const toolChoice = pickToolChoice(call.toolChoice, tools)
   const sanitized: AiGatewayCall = {
-    prompt: sanitizePrompt(call.prompt, { maxPromptChars, allowTools, extraSize: tools ? jsonSize(tools) : 0 }),
+    prompt: sanitizePrompt(call.prompt, {
+      maxPromptChars,
+      allowTools,
+      allowedToolNames,
+      extraSize: tools ? jsonSize(tools) : 0,
+    }),
     ...pickNumericOptions(call),
     maxOutputTokens: capOutputTokens(call.maxOutputTokens, maxOutputTokens),
   }
@@ -241,4 +288,35 @@ export const sanitizeCall = (
   if (tools) sanitized.tools = tools as AiGatewayCall['tools']
   if (toolChoice) sanitized.toolChoice = toolChoice
   return sanitized
+}
+
+// true when a tool result of the prompt may hold record data: it comes from a tool that is not known as schema-class
+const hasDataToolResult = (call: AiGatewayCall): boolean =>
+  call.prompt.some(
+    (message) =>
+      message.role === 'tool' &&
+      message.content.some((part) => part.type === 'tool-result' && !isSchemaTool(part.toolName))
+  )
+
+/**
+ * Returns the data class the survey AI policy must be checked against. The results of tools that are not known to be
+ * schema-class may contain whatever they read, which the declared class cannot vouch for: such a request counts as
+ * the feature maximum. Results of schema tools (survey structure) keep the declared class.
+ * @param {object} params - Parameters.
+ * @param {string} params.feature - Gateway feature key.
+ * @param {AiDataClass} params.dataClass - The class declared by the request.
+ * @param {AiGatewayCall} params.call - The sanitized call.
+ * @returns {AiDataClass} The class to enforce.
+ */
+export const getEnforcedDataClass = ({
+  feature,
+  dataClass,
+  call,
+}: {
+  feature: string
+  dataClass: AiDataClass
+  call: AiGatewayCall
+}): AiDataClass => {
+  const featureDef = getAiFeature(feature)
+  return featureDef && hasDataToolResult(call) ? getMaxAiDataClass(dataClass, featureDef.dataClass) : dataClass
 }

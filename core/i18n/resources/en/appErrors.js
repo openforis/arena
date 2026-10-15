@@ -87,7 +87,10 @@ Try to refresh the page.`,
   aiFeatureUnknown: 'Unknown AI feature "{{feature}}".',
   aiCallInvalid: 'The AI request is not valid ({{reason}}).',
   aiRateLimited: 'Too many AI requests. Please wait a minute and try again.',
+  aiDailyBudgetExceeded:
+    "You have reached today's limit for the Arena default AI provider. It resets at midnight UTC. You can keep working with your own provider in AI Settings.",
   aiRequestTimeout: 'The AI took too long to answer. Please try again.',
+  aiToolNotOffered: 'The AI asked for a tool it was not allowed to use, so its answer was discarded. Please try again.',
   aiProviderAuth:
     'The AI provider rejected the credentials. Check the API key in AI Settings or ask your administrator.',
   aiProviderRateLimited: 'The AI provider is rate limiting requests. Please try again in a moment.',
@@ -103,6 +106,8 @@ Try to refresh the page.`,
   aiBaseUrlNotAllowed:
     "This base URL points to an internal address, which the Arena server doesn't call. For a model on your computer, use the Local AI server. For a server of your organisation, ask your administrator to add it to the organisation model servers.",
   aiProviderUnavailable: 'The AI provider could not be reached. Please try again later.',
+  aiProviderResponseTooLarge:
+    'The AI provider sent an answer that was too large, so it was cut off. Please try again or choose another provider.',
   aiModelListFailed: 'Could not list models from the provider: {{message}}',
   aiProviderTestFailed: 'The provider test failed: {{message}}',
   aiProviderNotFound: 'This AI provider does not exist or is not yours. Choose another provider.',

@@ -118,7 +118,11 @@ Essayez de rafraîchir la page.`,
   aiFeatureUnknown: 'Fonction IA inconnue « {{feature}} ».',
   aiCallInvalid: "La requête IA n'est pas valide ({{reason}}).",
   aiRateLimited: 'Trop de requêtes IA. Patientez une minute puis réessayez.',
+  aiDailyBudgetExceeded:
+    "Vous avez atteint la limite du jour du fournisseur IA par défaut d'Arena. Elle est réinitialisée à minuit UTC. Vous pouvez continuer avec votre propre fournisseur dans les paramètres IA.",
   aiRequestTimeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
+  aiToolNotOffered:
+    "L'IA a demandé un outil qu'elle n'avait pas le droit d'utiliser ; sa réponse a été écartée. Veuillez réessayer.",
   aiProviderAuth:
     "Le fournisseur d'IA a refusé les identifiants. Vérifiez la clé API dans les paramètres IA ou contactez votre administrateur.",
   aiProviderRateLimited: "Le fournisseur d'IA limite les requêtes. Réessayez dans un instant.",
@@ -134,6 +138,8 @@ Essayez de rafraîchir la page.`,
   aiBaseUrlNotAllowed:
     "Cette URL de base pointe vers une adresse interne, que le serveur Arena n'appelle pas. Pour un modèle sur votre ordinateur, utilisez le Serveur d'IA local. Pour un serveur de votre organisation, demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
   aiProviderUnavailable: "Le fournisseur d'IA est injoignable. Veuillez réessayer plus tard.",
+  aiProviderResponseTooLarge:
+    'Le fournisseur IA a envoyé une réponse trop volumineuse, qui a été interrompue. Veuillez réessayer ou choisir un autre fournisseur.',
   aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
   aiProviderTestFailed: 'Le test du fournisseur a échoué : {{message}}',
   aiProviderNotFound: "Ce fournisseur d'IA n'existe pas ou ne vous appartient pas. Choisissez un autre fournisseur.",
