@@ -2,12 +2,6 @@
  * Types, limits and result helpers of the batch record edit (POST /api/survey/:surveyId/records/nodes/update).
  */
 
-export const NodesBatchLimits = {
-  maxEdits: 200,
-  maxRecords: 50,
-  replyTimeoutMs: 60_000,
-} as const
-
 export const NodesBatchEditStatus = {
   applied: 'applied',
   conflict: 'conflict',
