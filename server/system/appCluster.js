@@ -9,6 +9,7 @@ import * as ProcessUtils from '@core/processUtils'
 import * as JobManager from '@server/job/jobManager'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import { stripServerOnlyPrefsFromLoginResponse } from '@server/modules/auth/authResponseMiddleware'
 import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -50,7 +51,8 @@ export const run = async () => {
   const httpRequestLogger = createHttpRequestLogger()
   const arenaApp = await ArenaServer.init({
     skipSurveySchemaDbMigrations: true,
-    initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
+    // the login routes belong to arena-server: strip the server-only prefs from what they send
+    initialMiddlewares: [...(httpRequestLogger ? [httpRequestLogger] : []), stripServerOnlyPrefsFromLoginResponse],
   })
   const { express: app, serviceRegistry } = arenaApp
 

@@ -62,7 +62,7 @@ const resolveAccountConfig = ({ user, providerId, decrypt }) => {
     provider: stored.type,
     model: stored.model,
     baseUrl: stored.baseUrl,
-    apiKey: decrypt ? decryptStoredKey(stored, SecretBox.decrypt) : null,
+    apiKey: decrypt ? decryptStoredKey(stored, user.uuid, SecretBox.decrypt) : null,
   }
   return { cfg, source: sources.user, providerId }
 }

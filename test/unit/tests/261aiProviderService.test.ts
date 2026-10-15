@@ -5,30 +5,34 @@ import ja from '@core/i18n/resources/ja/appErrors'
 import mn from '@core/i18n/resources/mn/appErrors'
 import pt from '@core/i18n/resources/pt/appErrors'
 import ru from '@core/i18n/resources/ru/appErrors'
+import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
+import * as SecretBox from '@server/utils/crypto/secretBox'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
-const savedOpenAi = {
-  id: 'acct:own',
-  type: 'openai',
-  name: 'Work',
-  model: 'gpt-x',
-  baseUrl: null,
-  apiKeyEncrypted: 'enc:sk-saved',
-  lastTestOk: true,
-  lastTestAt: '2026-10-01T00:00:00.000Z',
-}
-const savedCompatible = {
-  id: 'acct:org',
-  type: 'openai-compatible',
-  name: 'Org',
-  model: 'llama',
-  baseUrl: 'https://llm.example.org/v1',
-  apiKeyEncrypted: 'enc:sk-org',
-  lastTestOk: null,
-  lastTestAt: null,
-}
+const SECRET = 'd'.repeat(64)
+const USER_UUID = 'u1'
 const NOW = '2026-10-14T10:00:00.000Z'
+
+/**
+ * Encrypts a key the way the service stores it: bound to the user, the provider id, its type and its endpoint.
+ * @param {object} provider - The provider (id, type, baseUrl).
+ * @param {string} plain - The key.
+ * @returns {string} The stored ciphertext.
+ */
+const sealed = (provider: { id: string; type: string; baseUrl: string | null }, plain: string): string =>
+  SecretBox.encrypt(plain, buildKeyAad({ userUuid: USER_UUID, provider }))
+
+/**
+ * Opens the stored key of a provider.
+ * @param {object} provider - The stored provider.
+ * @returns {string} The key.
+ */
+const opened = (provider: any): string =>
+  SecretBox.decrypt(provider.apiKeyEncrypted, buildKeyAad({ userUuid: USER_UUID, provider }))
+
+let savedOpenAi: any
+let savedCompatible: any
 
 /**
  * Builds a user with the AI prefs.
@@ -36,7 +40,7 @@ const NOW = '2026-10-14T10:00:00.000Z'
  * @returns {any} The user.
  */
 const userWith = (ai: Record<string, unknown>): any => ({
-  uuid: 'u1',
+  uuid: USER_UUID,
   prefs: { ai: { accessLevel: 1, featuresEnabled: true, ...ai } },
 })
 /**
@@ -75,11 +79,9 @@ const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> 
       listed.push(cfg)
       return [{ id: 'm1' }]
     },
-    encrypt: (plain) => `enc:${plain}`,
-    decrypt: (envelope) => {
-      if (!envelope.startsWith('enc:')) throw new Error('unsupported state or unable to authenticate data')
-      return envelope.slice(4)
-    },
+    encrypt: SecretBox.encrypt,
+    decrypt: SecretBox.decrypt,
+    isLegacyEnvelope: SecretBox.isLegacyEnvelope,
     isEncryptionConfigured: () => true,
     hasAdminDefault: () => true,
     isMockEnabled: () => false,
@@ -92,6 +94,36 @@ const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> 
 }
 
 describe('AI provider service (261)', () => {
+  let originalSecret: string | undefined
+
+  beforeAll(() => {
+    originalSecret = process.env.AI_USER_KEY_ENCRYPTION_SECRET
+    process.env.AI_USER_KEY_ENCRYPTION_SECRET = SECRET
+    const own = { id: 'acct:own', type: 'openai', baseUrl: null }
+    const org = { id: 'acct:org', type: 'openai-compatible', baseUrl: 'https://llm.example.org/v1' }
+    savedOpenAi = {
+      ...own,
+      name: 'Work',
+      model: 'gpt-x',
+      apiKeyEncrypted: sealed(own, 'sk-saved'),
+      lastTestOk: true,
+      lastTestAt: '2026-10-01T00:00:00.000Z',
+    }
+    savedCompatible = {
+      ...org,
+      name: 'Org',
+      model: 'llama',
+      apiKeyEncrypted: sealed(org, 'sk-org'),
+      lastTestOk: null,
+      lastTestAt: null,
+    }
+  })
+
+  afterAll(() => {
+    if (originalSecret === undefined) delete process.env.AI_USER_KEY_ENCRYPTION_SECRET
+    else process.env.AI_USER_KEY_ENCRYPTION_SECRET = originalSecret
+  })
+
   test('a draft never uses a saved key', async () => {
     const { deps, tests, listed } = createDeps()
     const user = userWithProviders()
@@ -220,7 +252,7 @@ describe('AI provider service (261)', () => {
       lastTestAt: NOW,
     })
     expect(tests).toEqual([{ provider: 'anthropic', model: 'claude-x', baseUrl: null, apiKey: 'sk-new' }])
-    expect(saved[0].providers[0].apiKeyEncrypted).toBe('enc:sk-new')
+    expect(opened(saved[0].providers[0])).toBe('sk-new')
     // no admin default and the default was Arena default: the first provider becomes the default
     expect(saved[0]).toMatchObject({ defaultProviderId: 'acct:id-1', defaultProviderOrigin: 'user' })
     expect((user.prefs as any).ai.providers).toHaveLength(1)
@@ -292,10 +324,18 @@ describe('AI provider service (261)', () => {
     const user = userWithProviders()
     await AiProviderService.updateProvider({ user, id: 'acct:own', input: { name: 'Renamed' }, deps })
     expect(tests).toEqual([])
-    expect(saved[0].providers[0]).toMatchObject({ name: 'Renamed', apiKeyEncrypted: 'enc:sk-saved', lastTestOk: true })
+    expect(saved[0].providers[0]).toMatchObject({
+      name: 'Renamed',
+      apiKeyEncrypted: savedOpenAi.apiKeyEncrypted,
+      lastTestOk: true,
+    })
     await AiProviderService.updateProvider({ user, id: 'acct:own', input: { model: 'gpt-y' }, deps })
     expect(tests[0]).toEqual({ provider: 'openai', model: 'gpt-y', baseUrl: null, apiKey: 'sk-saved' })
-    expect(saved[1].providers[0]).toMatchObject({ model: 'gpt-y', apiKeyEncrypted: 'enc:sk-saved', lastTestAt: NOW })
+    expect(saved[1].providers[0]).toMatchObject({
+      model: 'gpt-y',
+      apiKeyEncrypted: savedOpenAi.apiKeyEncrypted,
+      lastTestAt: NOW,
+    })
     await AiProviderService.updateProvider({ user, id: 'acct:org', input: { apiKey: '' }, deps })
     expect(saved[2].providers[1].apiKeyEncrypted).toBeNull()
     // the type of a saved provider never changes
@@ -410,7 +450,7 @@ describe('AI provider service (261)', () => {
     expect(tests.map((cfg) => cfg.apiKey)).toEqual(['sk-org', 'sk-org'])
     await AiProviderService.updateProvider({ user, id: 'acct:org', input: { model: 'llama-2', apiKey: null }, deps })
     expect(tests[2].apiKey).toBe('sk-org')
-    expect(saved.at(-1).providers[1].apiKeyEncrypted).toBe('enc:sk-org')
+    expect(saved.at(-1).providers[1].apiKeyEncrypted).toBe(savedCompatible.apiKeyEncrypted)
     // a changed endpoint never gets the stored key, for model lists either
     await AiProviderService.listProviderModels({
       user,

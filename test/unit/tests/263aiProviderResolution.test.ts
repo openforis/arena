@@ -3,10 +3,12 @@ import { MockLanguageModelV4 } from 'ai/test'
 import { parseGatewayRequest } from '@server/modules/ai/service/gateway/callValidation'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
+import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { legacyEnvelope } from '@test/unit/utils/secretBoxTestUtils'
 
 const SECRET = 'c'.repeat(64)
 const adminConfig = {
@@ -52,7 +54,10 @@ describe('provider resolution by id (263)', () => {
       name: 'Work',
       model: 'gpt-x',
       baseUrl: null,
-      apiKeyEncrypted: SecretBox.encrypt('sk-own'),
+      apiKeyEncrypted: SecretBox.encrypt(
+        'sk-own',
+        buildKeyAad({ userUuid: 'u1', provider: { id: 'acct:own', type: 'openai', baseUrl: null } })
+      ),
     }
   })
 
@@ -104,12 +109,12 @@ describe('provider resolution by id (263)', () => {
     const localDefault = userWith({ defaultProviderId: 'local:abc', providers: [ownProvider] })
     expect(ProviderResolver.getDefaultGatewayProviderId(localDefault)).toBe('arena-default')
     expect(ProviderResolver.resolveProviderConfig({ user: localDefault, adminConfig }).source).toBe('admin-default')
-    // an old slot that was enabled is the converted default
+    // an old slot (its key is an old envelope, without AAD) that was enabled is the converted default
     const oldSlot = userWith({
       provider: 'openai',
       model: 'gpt-x',
       enabled: true,
-      apiKeyEncrypted: ownProvider.apiKeyEncrypted,
+      apiKeyEncrypted: legacyEnvelope('sk-own'),
     })
     expect(ProviderResolver.resolveProviderConfig({ user: oldSlot, adminConfig })).toMatchObject({
       providerId: 'acct:legacy',

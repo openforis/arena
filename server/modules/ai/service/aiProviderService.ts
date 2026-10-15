@@ -23,10 +23,12 @@ import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import {
   decryptStoredKey,
+  encryptProviderKey,
   type AiProviderPrefs,
   findStoredProvider,
   getProviderPrefs,
   isSameEndpoint,
+  type KeyCipher,
   type PublicAiProvider,
   providerTypeUsesBaseUrl,
   type StoredAiProvider,
@@ -72,8 +74,9 @@ export type AiProviderServiceDeps = {
   savePrefs: (user: User, aiPrefs: Record<string, any>) => Promise<User>
   runTest: (args: { user: User; cfg: AiProviderCallConfig }) => Promise<AiProviderTestResult>
   listModels: (cfg: AiProviderCallConfig) => Promise<AiProviderModel[]>
-  encrypt: (plain: string) => string
-  decrypt: (envelope: string) => string
+  encrypt: KeyCipher['encrypt']
+  decrypt: KeyCipher['decrypt']
+  isLegacyEnvelope: KeyCipher['isLegacy']
   isEncryptionConfigured: () => boolean
   hasAdminDefault: () => boolean
   isMockEnabled: () => boolean
@@ -173,6 +176,7 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
     ModelDiscovery.listForProvider({ provider: cfg.provider, baseUrl: cfg.baseUrl, apiKey: cfg.apiKey }),
   encrypt: SecretBox.encrypt,
   decrypt: SecretBox.decrypt,
+  isLegacyEnvelope: SecretBox.isLegacyEnvelope,
   isEncryptionConfigured: SecretBox.isConfigured,
   /**
    * Returns true when the admin has configured the Arena default provider.
@@ -276,21 +280,24 @@ const resolveCallConfig = ({
  * @param {object} params - Parameters.
  * @param {ResolvedCallConfig} params.resolved - Resolved call config.
  * @param {AiProviderInput} params.input - Request input.
+ * @param {User} params.user - The user (the stored key is bound to them).
  * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {ResolvedCallConfig} The config with the key.
  */
 const withStoredKey = ({
   resolved,
   input,
+  user,
   deps,
 }: {
   resolved: ResolvedCallConfig
   input: AiProviderInput
+  user: User
   deps: AiProviderServiceDeps
 }): ResolvedCallConfig => {
   const { saved, sameEndpoint, cfg } = resolved
   if (!saved || !sameEndpoint || input.apiKey !== undefined) return resolved
-  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, deps.decrypt) } }
+  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, user.uuid, deps.decrypt) } }
 }
 
 /**
@@ -363,15 +370,28 @@ const saveProviderPrefs = ({
 }) => deps.savePrefs(user, withProviderPrefs(getAiPrefs(user), prefs))
 
 /**
- * Encrypts a key to store; throws aiEncryptionMissing when the server has no secret.
- * @param {string|null} apiKey - Plain key.
- * @param {AiProviderServiceDeps} deps - Dependencies.
+ * Encrypts a key to store, bound to the user and the provider; throws aiEncryptionMissing when the server has no secret.
+ * @param {object} params - Parameters.
+ * @param {string|null} params.apiKey - Plain key.
+ * @param {User} params.user - The user that owns the provider.
+ * @param {object} params.provider - The provider as it will be stored (id, type and base URL).
+ * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {string|null} The encrypted key, or null when there is no key.
  */
-const encryptKey = (apiKey: string | null, deps: AiProviderServiceDeps): string | null => {
+const encryptKey = ({
+  apiKey,
+  user,
+  provider,
+  deps,
+}: {
+  apiKey: string | null
+  user: User
+  provider: Pick<StoredAiProvider, 'id' | 'type' | 'baseUrl'>
+  deps: AiProviderServiceDeps
+}): string | null => {
   if (!apiKey) return null
   if (!deps.isEncryptionConfigured()) throw new SystemError('aiEncryptionMissing', {}, StatusCodes.CONFLICT)
-  return deps.encrypt(apiKey)
+  return encryptProviderKey({ apiKey, userUuid: user.uuid, provider, cipher: deps })
 }
 
 /**
@@ -402,13 +422,14 @@ const assertTestPasses = async ({
 /**
  * Returns true when the stored key can be decrypted.
  * @param {StoredAiProvider} provider - Stored provider.
+ * @param {string} userUuid - The user that owns the provider.
  * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {boolean} Whether the key is readable (false when there is none).
  */
-const isKeyReadable = (provider: StoredAiProvider, deps: AiProviderServiceDeps): boolean => {
+const isKeyReadable = (provider: StoredAiProvider, userUuid: string, deps: AiProviderServiceDeps): boolean => {
   if (!provider.apiKeyEncrypted) return false
   try {
-    decryptStoredKey(provider, deps.decrypt)
+    decryptStoredKey(provider, userUuid, deps.decrypt)
     return true
   } catch {
     return false
@@ -418,10 +439,11 @@ const isKeyReadable = (provider: StoredAiProvider, deps: AiProviderServiceDeps):
 /**
  * Returns the public entry of a stored provider.
  * @param {StoredAiProvider} provider - Stored provider.
+ * @param {string} userUuid - The user that owns the provider.
  * @param {AiProviderServiceDeps} deps - Dependencies.
  * @returns {PublicAiProvider} The entry.
  */
-const toPublic = (provider: StoredAiProvider, deps: AiProviderServiceDeps): PublicAiProvider =>
+const toPublic = (provider: StoredAiProvider, userUuid: string, deps: AiProviderServiceDeps): PublicAiProvider =>
   toPublicProvider({
     provider,
     hostingClass: getProviderHostingClass({
@@ -429,7 +451,7 @@ const toPublic = (provider: StoredAiProvider, deps: AiProviderServiceDeps): Publ
       baseUrl: provider.baseUrl,
       allowlist: deps.allowlist,
     }),
-    apiKeyReadable: isKeyReadable(provider, deps),
+    apiKeyReadable: isKeyReadable(provider, userUuid, deps),
   })
 
 /**
@@ -441,7 +463,8 @@ const toPublic = (provider: StoredAiProvider, deps: AiProviderServiceDeps): Publ
 export const getPublicProviders = (
   user: User,
   deps: AiProviderServiceDeps = createDefaultAiProviderServiceDeps()
-): PublicAiProvider[] => getProviderPrefs(getAiPrefs(user)).providers.map((provider) => toPublic(provider, deps))
+): PublicAiProvider[] =>
+  getProviderPrefs(getAiPrefs(user)).providers.map((provider) => toPublic(provider, user.uuid, deps))
 
 /**
  * Returns the input with a single meaning of "key sent": a string (an empty one clears the key); anything else, such
@@ -474,7 +497,7 @@ export const testProvider = async ({
 }): Promise<AiProviderTestResult> => {
   const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
-  const resolved = withStoredKey({ resolved: resolveCallConfig({ prefs, input, deps }), input, deps })
+  const resolved = withStoredKey({ resolved: resolveCallConfig({ prefs, input, deps }), input, user, deps })
   try {
     validateConfig(resolved.cfg)
   } catch (error) {
@@ -509,6 +532,7 @@ export const listProviderModels = async ({
   const { cfg } = withStoredKey({
     resolved: resolveCallConfig({ prefs: getProviderPrefs(getAiPrefs(user)), input, deps }),
     input,
+    user,
     deps,
   })
   // the mock provider has one model and no endpoint to ask
@@ -542,13 +566,20 @@ export const addProvider = async ({
   const { cfg } = withStoredKey({
     resolved: resolveCallConfig({ prefs, input: draftInput, deps }),
     input: draftInput,
+    user,
     deps,
   })
   validateConfig(cfg)
-  const apiKeyEncrypted = encryptKey(cfg.apiKey, deps)
+  const id = createAccountProviderId(deps.newId())
+  const apiKeyEncrypted = encryptKey({
+    apiKey: cfg.apiKey,
+    user,
+    provider: { id, type: cfg.provider, baseUrl: cfg.baseUrl },
+    deps,
+  })
   await assertTestPasses({ user, cfg, deps })
   const provider: StoredAiProvider = {
-    id: createAccountProviderId(deps.newId()),
+    id,
     type: cfg.provider,
     name: normalizeProviderName(input.name, cfg.provider),
     model: cfg.model,
@@ -564,7 +595,7 @@ export const addProvider = async ({
     ...(becomesDefault ? { defaultProviderId: provider.id, defaultProviderOrigin: 'user' as const } : {}),
   }
   const userUpdated = await saveProviderPrefs({ user, prefs: next, deps })
-  return { user: userUpdated, provider: toPublic(provider, deps) }
+  return { user: userUpdated, provider: toPublic(provider, user.uuid, deps) }
 }
 
 /**
@@ -574,6 +605,7 @@ export const addProvider = async ({
  * @param {AiProviderInput} params.input - Request input.
  * @param {ResolvedCallConfig} params.resolved - Resolved call config.
  * @param {StoredAiProvider} params.saved - Saved provider.
+ * @param {User} params.user - The user that owns the provider.
  * @param {AiProviderServiceDeps} params.deps - Dependencies.
  * @returns {string|null} The encrypted key.
  */
@@ -581,14 +613,19 @@ const keyToStore = ({
   input,
   resolved,
   saved,
+  user,
   deps,
 }: {
   input: AiProviderInput
   resolved: ResolvedCallConfig
   saved: StoredAiProvider
+  user: User
   deps: AiProviderServiceDeps
 }): string | null => {
-  if (input.apiKey !== undefined) return encryptKey(resolved.cfg.apiKey, deps)
+  if (input.apiKey !== undefined) {
+    const provider = { id: saved.id, type: saved.type, baseUrl: resolved.cfg.baseUrl }
+    return encryptKey({ apiKey: resolved.cfg.apiKey, user, provider, deps })
+  }
   return resolved.sameEndpoint ? saved.apiKeyEncrypted : null
 }
 
@@ -621,9 +658,9 @@ export const updateProvider = async ({
   const name = input.name === undefined ? saved.name : normalizeProviderName(input.name, saved.type)
   let updated: StoredAiProvider = { ...saved, name }
   if (!usesSavedValues(unkeyed, input)) {
-    const resolved = withStoredKey({ resolved: unkeyed, input, deps })
+    const resolved = withStoredKey({ resolved: unkeyed, input, user, deps })
     validateConfig(resolved.cfg)
-    const apiKeyEncrypted = keyToStore({ input, resolved, saved, deps })
+    const apiKeyEncrypted = keyToStore({ input, resolved, saved, user, deps })
     await assertTestPasses({ user, cfg: resolved.cfg, deps })
     updated = {
       ...updated,
@@ -635,7 +672,7 @@ export const updateProvider = async ({
     }
   }
   const userUpdated = await saveProviderPrefs({ user, prefs: replaceProvider(prefs, updated), deps })
-  return { user: userUpdated, provider: toPublic(updated, deps) }
+  return { user: userUpdated, provider: toPublic(updated, user.uuid, deps) }
 }
 
 /**
