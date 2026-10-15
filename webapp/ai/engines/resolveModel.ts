@@ -26,11 +26,13 @@ import type {
 
 export { OFF_POLICY }
 
+// dataClass: what the request sends; the user consents per class (record data covers the survey design too)
 export type LocalServerConsentRequest = {
   surveyId?: number
   baseUrl: string
   modelId: string | null
   hostingClass: AiHostingClass
+  dataClass: AiDataClass
 }
 
 // chooseOther: the user wants another provider; the request fails so the UI can offer the switcher or the settings
@@ -138,13 +140,14 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * Returns the consent storage parameters of the request (the local provider's normalized base URL).
    * @param {Context} context - Request context.
    * @param {AiLocalServerCapability} capability - The local provider's capability.
-   * @returns {object} Storage, user, survey and base URL.
+   * @returns {object} Storage, user, survey, base URL and data class.
    */
   const consentParams = (context: Context, capability: AiLocalServerCapability) => ({
     storage: deps.storage,
     userUuid: context.userUuid,
     surveyId: context.options.surveyId,
     baseUrl: capability.baseUrl ?? '',
+    dataClass: context.options.dataClass,
   })
 
   /**
@@ -196,6 +199,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
         baseUrl: consentParams(context, capability).baseUrl,
         modelId: engine.model,
         hostingClass: engine.hostingClass,
+        dataClass: context.options.dataClass,
       },
       context.signal
     )
@@ -243,8 +247,8 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   }
 
   /**
-   * Creates the model of a local provider: asks first when this survey has no consent for its URL, then checks the
-   * policy again (a local request is never checked by the server).
+   * Creates the model of a local provider: asks first when this survey has no consent for its URL and the data class
+   * of the request, then checks the policy again (a local request is never checked by the server).
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @returns {Promise<ResolvedModel>} The model and the engine.

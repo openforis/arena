@@ -199,10 +199,12 @@ describe('createModelResolver', () => {
     expect(first.model).toBe(localModel)
     expect(first.engine.providerId).toBe('local:l1')
     expect(state.requests).toEqual([
-      { surveyId: 1, baseUrl: BASE_URL, modelId: 'local-model', hostingClass: 'onDevice' },
+      { surveyId: 1, baseUrl: BASE_URL, modelId: 'local-model', hostingClass: 'onDevice', dataClass: 'data' },
     ])
     expect(state.consentChanges).toBe(1)
-    expect(loadLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: BASE_URL })).toBe('accepted')
+    expect(loadLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: BASE_URL, dataClass: 'data' })).toBe(
+      'accepted'
+    )
 
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
     expect(state.requests.length).toBe(1)

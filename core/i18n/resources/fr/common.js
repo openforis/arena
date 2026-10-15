@@ -1532,6 +1532,10 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       model: 'Modèle : {{modelId}}',
       continue: 'Continuer',
       chooseOther: 'Choisir un autre fournisseur',
+      sends: 'Cela enverra {{what}}.',
+      revokeHint: 'Vous avez autorisé Arena à envoyer des requêtes à ce serveur.',
+      revoke: "Révoquer l'autorisation",
+      revoked: 'Autorisation révoquée. Arena demandera de nouveau avant la prochaine requête.',
     },
   },
 

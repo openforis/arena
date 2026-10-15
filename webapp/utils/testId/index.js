@@ -18,6 +18,7 @@ export const TestId = {
     consentChooseOther: 'ai-local-server-consent-choose-other',
     consentContinue: 'ai-local-server-consent-continue',
     consentDialog: 'ai-local-server-consent',
+    consentRevoke: 'ai-local-server-consent-revoke',
     dataLocationBadge: 'ai-data-location-badge',
     engineErrorOpenSettings: 'ai-engine-error-open-settings',
     engineErrorRetry: 'ai-engine-error-retry',
