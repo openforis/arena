@@ -188,11 +188,11 @@ const reduceDraftEdit = (draft: ProviderDraft, action: ProviderDialogAction): Pr
     case 'apiKeyKept':
       return withKeyEdit(draft, { apiKeyRemoved: false })
     case 'modelSet':
-      return { ...draft, model: action.model }
+      return { ...draft, model: action.model, modelTouched: true }
     case 'modelSelected':
       return action.value === OTHER_MODEL_VALUE
         ? { ...draft, modelFreeText: true }
-        : { ...draft, model: action.value, modelFreeText: false }
+        : { ...draft, model: action.value, modelFreeText: false, modelTouched: true }
     default:
       return null
   }
