@@ -91,6 +91,34 @@ describe('AI batch partial results (441)', () => {
       expect(stop).toEqual({ cause: 'cancelled', done: 1, total: 3 })
     })
 
+    test('a stop does not wait for a guard that hangs', async () => {
+      const controller = new AbortController()
+      const results: number[] = []
+      let guards = 0
+      // the second guard never answers
+      const guard = () => {
+        guards += 1
+        return guards === 2 ? new Promise<void>(() => {}) : Promise.resolve()
+      }
+      const run = runAiBatchCalls({
+        calls: [call(1, async () => 1), call(1, async () => 2)],
+        guard,
+        onResult: (result) => {
+          results.push(result)
+        },
+        signal: controller.signal,
+      })
+      // let the first call finish and the second guard start
+      await new Promise((resolve) => {
+        setTimeout(resolve, 20)
+      })
+      controller.abort()
+      const { failedCount, stop } = await run
+      expect(results).toEqual([1])
+      expect(failedCount).toBe(1)
+      expect(stop).toEqual({ cause: 'cancelled', done: 1, total: 2 })
+    })
+
     test('nothing to keep: the first error is thrown, a cancel is an abort error', async () => {
       const error = authError()
       await expect(

@@ -121,6 +121,23 @@ type StopCause = Pick<AiBatchStop, 'cause' | 'error'>
 type CallOutcome = 'succeeded' | 'failed' | StopCause
 
 /**
+ * Waits for the guard, but not longer than the signal: a stop must not wait for a slow check.
+ * @param {AiBatchGuard} guard - The guard.
+ * @param {AbortSignal} [signal] - Cancellation signal.
+ * @returns {Promise<void>} Settles with the guard, or when the signal aborts (the caller then sees the abort).
+ */
+const guardUnlessAborted = (guard: AiBatchGuard, signal?: AbortSignal): Promise<void> => {
+  if (!signal) return guard()
+  return new Promise<void>((resolve, reject) => {
+    const onAbort = () => resolve()
+    signal.addEventListener('abort', onAbort, { once: true })
+    guard()
+      .then(resolve, reject)
+      .finally(() => signal.removeEventListener('abort', onAbort))
+  })
+}
+
+/**
  * Runs one call: the guard first, then the call.
  * @param {object} params - Parameters.
  * @param {AiBatchCall} params.call - The call.
@@ -147,7 +164,7 @@ const runCall = async <T>({
   if (signal?.aborted) return cancelled
   try {
     // a switch or policy change during the run stops it before the next call
-    await guard()
+    await guardUnlessAborted(guard, signal)
   } catch (error) {
     return signal?.aborted ? cancelled : { cause: 'error', error }
   }
