@@ -7,7 +7,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
-import { getCategoryUuid, getItemLang, getResultTitle, isCategoryItem } from './changeItemModel'
+import { getCategoryUuid, getItemDetailLines, getItemLang, getResultTitle, isCategoryItem } from './changeItemModel'
 import type { ReviewItem } from './changeSetReviewModel'
 
 /**
@@ -38,10 +38,35 @@ export const ChangeItemStatus = ({ result, testId }: { result: OperationResult; 
     <span
       className={`ai-change-item__status ai-change-item__status--${result.status}`}
       data-testid={testId}
-      title={getResultTitle(result)}
+      title={getResultTitle(result, t)}
     >
       {t(`aiAssistant.card.status.${result.status}`)}
     </span>
+  )
+}
+
+/**
+ * What a new node definition sets besides its type, name and label (key, multiple, read only, the labels in other
+ * languages, descriptions); nothing for other changes.
+ * @param {object} props - Props.
+ * @param {ReviewItem} props.item - Change.
+ * @returns {React.ReactElement|null} The list.
+ */
+export const ChangeItemDetails = ({ item }: { item: ReviewItem }) => {
+  const t = useI18nT({ unescapeHtml: true })
+  const lines = getItemDetailLines(item, t)
+  if (lines.length === 0) return null
+  return (
+    <dl className="ai-change-item__details">
+      {lines.map((line) => (
+        <div className="ai-change-item__detail" key={line.key}>
+          <dt>{line.title}</dt>
+          <dd>
+            <CardValueView value={line.value} />
+          </dd>
+        </div>
+      ))}
+    </dl>
   )
 }
 
@@ -123,6 +148,7 @@ export const ChangeItemRow = ({
             <CardValueView value={item.to} />
           </span>
         </div>
+        <ChangeItemDetails item={item} />
       </div>
     </li>
   )

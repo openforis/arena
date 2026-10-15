@@ -2,9 +2,12 @@
  * What every row of a change set shares, whatever it shows it in (pure): the kind of item, and the items of a card
  * split into node definition changes and category label groups.
  */
-import type { OperationResult } from '@webapp/ai/changeSets/types'
+import { isI18nKeyReason, type OperationResult } from '@webapp/ai/changeSets/types'
 
+import type { CardDetail } from './changeSetCardModel'
 import type { ReviewItem } from './changeSetReviewModel'
+
+type TFunction = (key: string, params?: Record<string, unknown>) => string
 
 const CATEGORY_GROUP_PREFIX = 'category:'
 
@@ -55,12 +58,35 @@ export const splitReviewItems = (
 }
 
 /**
- * Returns the tooltip of a result: its message, and the text found when a label had changed since the proposal.
+ * Returns the extra lines of a new node definition (key, multiple, read only, other labels, descriptions), each with
+ * its translated title.
+ * @param {ReviewItem} item - Item.
+ * @param {TFunction} t - Translation function.
+ * @returns {{key: string, title: string, value: CardDetail['value']}[]} The lines; empty for other changes.
+ */
+export const getItemDetailLines = (
+  item: ReviewItem,
+  t: TFunction
+): { key: string; title: string; value: CardDetail['value'] }[] =>
+  (item.details ?? []).map((detail, index) => ({
+    key: `${index}-${detail.titleKey}-${detail.titleParams.lang ?? ''}`,
+    title: t(detail.titleKey, detail.titleParams),
+    value: detail.value,
+  }))
+
+/**
+ * Returns the tooltip of a result: its message, and the text found when a label had changed since the proposal. A
+ * conflict whose message is an i18n key (the designer's rules refused the change) is translated with its params; a
+ * plain reason (nodeDefMissing, valueChanged, ...) is shown as it is.
  * @param {OperationResult|null} result - Result of an Apply.
+ * @param {TFunction} t - Translation function.
  * @returns {string|undefined} The title.
  */
-export const getResultTitle = (result: OperationResult | null): string | undefined => {
+export const getResultTitle = (result: OperationResult | null, t: TFunction): string | undefined => {
   if (!result) return undefined
+  if (result.status === 'conflict' && result.message && isI18nKeyReason(result.message)) {
+    return t(result.message, result.params)
+  }
   const currentText = result.status === 'conflict' ? result.params?.currentText : null
   const parts = [result.message, typeof currentText === 'string' ? currentText : null]
   return parts.filter(Boolean).join(': ') || undefined

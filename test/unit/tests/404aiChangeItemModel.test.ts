@@ -1,6 +1,7 @@
 import type { ReviewItem } from '@webapp/components/ai/Assistant/changeSetReviewModel'
 import {
   getCategoryUuid,
+  getItemDetailLines,
   getItemLang,
   getResultTitle,
   isCategoryItem,
@@ -66,14 +67,66 @@ describe('change item model (404)', () => {
     expect(splitReviewItems([])).toEqual({ nodeDefItems: [], categoryGroups: [] })
   })
 
+  // a fake t: the key and its params, so the test sees what is translated
+  const t = (key: string, params?: Record<string, unknown>) => `${key}${params ? JSON.stringify(params) : ''}`
+
   test('the title of a result is its message, plus the text found when a label changed meanwhile', () => {
-    expect(getResultTitle(null)).toBeUndefined()
-    expect(getResultTitle({ id: 'a', status: 'applied' })).toBeUndefined()
-    expect(getResultTitle({ id: 'a', status: 'failed', message: 'boom' })).toBe('boom')
-    expect(getResultTitle({ id: 'a', status: 'conflict', message: 'changed', params: { currentText: 'now' } })).toBe(
+    expect(getResultTitle(null, t)).toBeUndefined()
+    expect(getResultTitle({ id: 'a', status: 'applied' }, t)).toBeUndefined()
+    expect(getResultTitle({ id: 'a', status: 'failed', message: 'boom' }, t)).toBe('boom')
+    expect(getResultTitle({ id: 'a', status: 'conflict', message: 'changed', params: { currentText: 'now' } }, t)).toBe(
       'changed: now'
     )
     // the text found only explains a conflict
-    expect(getResultTitle({ id: 'a', status: 'applied', params: { currentText: 'now' } })).toBeUndefined()
+    expect(getResultTitle({ id: 'a', status: 'applied', params: { currentText: 'now' } }, t)).toBeUndefined()
+  })
+
+  test('a plain conflict reason is shown as it is', () => {
+    for (const reason of [
+      'nodeDefMissing',
+      'valueChanged',
+      'parentMissing',
+      'nameTaken',
+      'alreadyExists',
+      'refMissing',
+      'itemMissing',
+    ]) {
+      expect(getResultTitle({ id: 'a', status: 'conflict', message: reason }, t)).toBe(reason)
+    }
+  })
+
+  test('a conflict whose message is an i18n key is translated with its params', () => {
+    expect(
+      getResultTitle(
+        { id: 'a', status: 'conflict', message: 'aiAssistant.issues.refEditDisabled', params: { name: 'tree' } },
+        t
+      )
+    ).toBe('aiAssistant.issues.refEditDisabled{"name":"tree"}')
+    expect(
+      getResultTitle({ id: 'a', status: 'conflict', message: 'validationErrors:nodeDefEdit.nameInvalid' }, t)
+    ).toBe('validationErrors:nodeDefEdit.nameInvalid')
+  })
+
+  test('the details of a new node definition are listed with their translated titles', () => {
+    const item: ReviewItem = {
+      ...nodeDefItem('tree_height'),
+      details: [
+        { titleKey: 'aiAssistant.card.props.key', titleParams: {}, value: { kind: 'boolean', value: true } },
+        { titleKey: 'aiAssistant.card.label', titleParams: { lang: 'fr' }, value: { kind: 'text', text: 'Hauteur' } },
+      ],
+    }
+    expect(getItemDetailLines(item, t)).toEqual([
+      {
+        key: '0-aiAssistant.card.props.key-',
+        title: 'aiAssistant.card.props.key{}',
+        value: { kind: 'boolean', value: true },
+      },
+      {
+        key: '1-aiAssistant.card.label-fr',
+        title: 'aiAssistant.card.label{"lang":"fr"}',
+        value: { kind: 'text', text: 'Hauteur' },
+      },
+    ])
+    expect(getItemDetailLines(nodeDefItem('plain'), t)).toEqual([])
   })
 })

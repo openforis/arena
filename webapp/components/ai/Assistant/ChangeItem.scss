@@ -37,6 +37,30 @@
     background-color: var(--orangeLight);
   }
 
+  &__details {
+    display: grid;
+    gap: 0.125rem;
+    margin: 0.25rem 0 0;
+  }
+
+  &__detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+
+    dt {
+      color: var(--colorGrey700);
+
+      &::after {
+        content: ':';
+      }
+    }
+
+    dd {
+      margin: 0;
+    }
+  }
+
   &__expressions {
     margin: 0;
     padding-left: 1rem;
