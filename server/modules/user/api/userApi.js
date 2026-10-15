@@ -20,6 +20,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+import { buildCurrentUserGroupBody } from './currentUserGroupBody'
 import { UserExportService } from '../service/userExportService'
 import { UsersBackupService } from '../service/usersBackup/usersBackupService'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -173,7 +174,7 @@ export const init = (app) => {
         const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
         const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
         const userGroup = userGroups[0]
-        res.json({ user, userGroup })
+        res.json(buildCurrentUserGroupBody({ user, userGroup }))
       } catch (error) {
         next(error)
       }

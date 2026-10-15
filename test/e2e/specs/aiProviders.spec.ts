@@ -121,6 +121,7 @@ test.describe('AI account providers API (mock provider)', () => {
       (await api.requestRaw('get', '/auth/user')).body.user,
       (await api.requestRaw('get', `/api/survey/${survey.id}/users`)).body,
       (await api.requestRaw('get', `/api/survey/${survey.id}/user/${userUuid}`)).body,
+      (await api.requestRaw('get', `/api/survey/${survey.id}/current-user-group`)).body,
     ]
     for (const response of responses) {
       expectNoKey(response, secret)
@@ -129,6 +130,7 @@ test.describe('AI account providers API (mock provider)', () => {
     // the users are real users, not empty answers
     expect(responses[0]).toMatchObject({ uuid: userUuid })
     expect(responses[3].list.map((listed: any) => listed.uuid)).toContain(userUuid)
+    expect(responses[5]).toMatchObject({ user: { uuid: userUuid } })
   })
 
   test('prefs.ai and prefs.aiUsage cannot be written through POST /api/user/:uuid/prefs', async ({ api }) => {
