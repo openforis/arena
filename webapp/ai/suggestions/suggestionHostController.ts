@@ -77,7 +77,8 @@ const runSafely = (work: () => unknown): void => {
 }
 
 /**
- * Removes the targets of a kind that the resolver finds fixed.
+ * Removes the targets of a kind that the resolver finds fixed: pending, in progress and dismissed ones (a suggestion
+ * dismissed as a whole is no longer pending, and its dismissal must not hide the issue when it occurs again).
  * @param {TargetResolver} resolver - Resolver.
  * @param {DetectorContext} ctx - Context (with a generation).
  * @param {SuggestionGeneration} generation - Generation.
@@ -86,11 +87,10 @@ const runSafely = (work: () => unknown): void => {
 const resolveKind = (resolver: TargetResolver, ctx: DetectorContext, generation: SuggestionGeneration): void => {
   const { userUuid, store, survey } = ctx
   const { surveyId } = generation
-  for (const suggestion of store.getPending({ userUuid, surveyId })) {
-    if (suggestion.kind !== resolver.kind) continue
-    const resolved = suggestion.targets.filter((target) => resolver.isResolved(target.key, survey))
-    if (resolved.length === 0) continue
-    store.removeTargets({ userUuid, surveyId, id: suggestion.id, targetKeys: resolved.map((target) => target.key) })
+  for (const { id, kind, targetKeys } of store.getTracked({ userUuid, surveyId })) {
+    if (kind !== resolver.kind) continue
+    const resolved = targetKeys.filter((key) => resolver.isResolved(key, survey))
+    if (resolved.length > 0) store.removeTargets({ userUuid, surveyId, id, targetKeys: resolved })
   }
 }
 

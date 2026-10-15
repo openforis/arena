@@ -103,7 +103,7 @@ export const createResilientStorage = ({
         return current
       } catch (error) {
         if (!isQuotaExceededError(error)) throw error
-        current = shrink ? shrink(level + 1) : null
+        current = shrink && level < MAX_SHRINK_LEVELS ? shrink(level + 1) : null
       }
     }
     log(`The browser storage is full: ${key} stays in memory for this session`)

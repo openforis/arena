@@ -198,11 +198,16 @@ describe('suggestion store (211)', () => {
     expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toEqual([])
   })
 
-  test('an expired suggestion is hidden at the injected time', () => {
-    const { tab } = createBrowser()
-    const store = tab(1)
-    store.add({ userUuid: 'u1', suggestion: suggestion({ expiresAt: '2026-10-11T12:00:00.000Z' }) })
+  test('an expired suggestion is hidden at the injected time, and is removed by the next write', () => {
+    const { storage } = createBrowser()
+    let clock = NOW
+    const store = createSuggestionStore({ access: memoryAccess(() => storage), now: () => clock, log: noLog })
+    store.add({ userUuid: 'u1', suggestion: suggestion({ expiresAt: '2026-10-11T13:00:00.000Z' }) })
+    expect(visible(store)).toHaveLength(1)
+    clock = new Date('2026-10-11T14:00:00.000Z')
     expect(visible(store)).toEqual([])
     expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toHaveLength(1)
+    store.markModuleSeen({ userUuid: 'u1', module: 'designer' })
+    expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toEqual([])
   })
 })
