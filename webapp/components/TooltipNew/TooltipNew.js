@@ -22,6 +22,7 @@ export const TooltipNew = (props) => {
     maxWidth,
     title: titleProp,
     renderTitle,
+    suppressed = false,
   } = props
 
   const t = useI18nT()
@@ -78,10 +79,10 @@ export const TooltipNew = (props) => {
       arrow
       classes={tooltipClass}
       disableFocusListener={openSuppressed || disableFocusListener}
-      disableHoverListener={openSuppressed}
+      disableHoverListener={openSuppressed || suppressed}
       onClose={onClose}
       onOpen={onOpen}
-      open={open}
+      open={open && !suppressed}
       slotProps={{
         tooltip: {
           sx: {
@@ -107,5 +108,7 @@ TooltipNew.propTypes = {
   markdownClassName: PropTypes.string,
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   renderTitle: PropTypes.func,
+  // another element shows the same content: no tooltip meanwhile
+  suppressed: PropTypes.bool,
   title: PropTypes.oneOfType([PropTypes.string, PropTypes.node]),
 }
