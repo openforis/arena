@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { isDeepEqual } from './deepEqual'
+import { findValidationConflicts } from './designerRuleConflicts'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
@@ -170,7 +171,15 @@ export const applyChangeSet = async ({
     results.set(id, { id, status: 'conflict', message: reason })
   }
   const toApply = selected.filter((op) => !results.has(op.id))
-  await applyGroups(groupByNodeDef(toApply.filter((op) => !isCategoryItemLabelOperation(op))), changeSet, deps, results)
+  // the designer's validation of what would be saved, on the survey as it is now
+  const invalid = await findValidationConflicts({
+    changeSet,
+    survey: deps.getSurvey(),
+    operationIds: toApply.filter((op) => !isCategoryItemLabelOperation(op)).map((op) => op.id),
+  })
+  for (const { id, reason } of invalid) results.set(id, { id, status: 'conflict', message: reason })
+  const nodeDefOperations = toApply.filter((op) => !isCategoryItemLabelOperation(op) && !results.has(op.id))
+  await applyGroups(groupByNodeDef(nodeDefOperations), changeSet, deps, results)
   await applyCategoryItemLabels({
     changeSet,
     operations: toApply.filter((op) => isCategoryItemLabelOperation(op)),

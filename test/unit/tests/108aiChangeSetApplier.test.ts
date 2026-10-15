@@ -73,7 +73,7 @@ const buildOperations = () => {
       from: [],
       to: [NodeDefExpression.createExpression({ expression: 'cluster_notes != "x"' })],
     },
-    { id: 'o5', type: 'nodeDef.update', nodeDefUuid: notesUuid, prop: 'readOnly', from: false, to: true },
+    { id: 'o5', type: 'nodeDef.update', nodeDefUuid: notesUuid, prop: 'key', from: false, to: true },
   ]
   return operations
 }
@@ -121,7 +121,7 @@ describe('applyChangeSet', () => {
       props: { labels: { en: 'Cluster id', fr: 'Identifiant' } },
       propsAdvanced: {},
     })
-    expect(Object.keys(puts[1].props)).toEqual(['readOnly'])
+    expect(Object.keys(puts[1].props)).toEqual(['key'])
     expect(Object.keys(puts[1].propsAdvanced)).toEqual(['validations'])
     expect(puts[1].propsAdvanced.validations.expressions[0].expression).toBe('cluster_notes != "x"')
   })
