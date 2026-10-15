@@ -122,6 +122,8 @@ export type ConflictReason =
   | 'alreadyExists'
   | 'refMissing'
   | 'itemMissing'
+  // the designer's rules no longer allow it: the key of the rule, e.g. "designerRule:refEditDisabled"
+  | `designerRule:${string}`
 
 export type OperationConflict = { id: string; reason: ConflictReason }
 

@@ -68,6 +68,7 @@ Try to refresh the page.`,
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
     dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
     fileNotFound: 'File not found',
+    nodeDefRefLocked: '{{name}} cannot get another category or taxonomy: it is published.',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors

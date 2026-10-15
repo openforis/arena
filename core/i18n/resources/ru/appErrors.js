@@ -93,6 +93,7 @@ export default {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
     dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
     fileNotFound: 'Файл не найден',
+    nodeDefRefLocked: '{{name}} опубликован, поэтому его категорию или таксономию изменить нельзя.',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   aiSessionExpired: 'Сеанс истёк. Войдите снова.',

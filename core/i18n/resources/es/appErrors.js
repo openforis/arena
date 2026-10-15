@@ -98,6 +98,7 @@ export default {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
     dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
     fileNotFound: 'Archivo no encontrado',
+    nodeDefRefLocked: '{{name}} no puede cambiar de categoría ni de taxonomía: ya está publicado.',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   aiSessionExpired: 'Su sesión ha caducado. Vuelva a iniciar sesión.',

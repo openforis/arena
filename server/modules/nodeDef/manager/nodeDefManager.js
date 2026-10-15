@@ -7,6 +7,8 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
+import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -183,6 +185,18 @@ const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, node
   return null
 }
 
+// the category or taxonomy of a published attribute cannot change (the designer disables the selectors)
+const _assertRefPropsCanChange = ({ survey, nodeDef, props }) => {
+  const [propKey] = getLockedRefPropsChanged({ survey, nodeDef, props })
+  if (propKey) {
+    throw new SystemError(
+      'appErrors:survey.nodeDefRefLocked',
+      { name: NodeDef.getName(nodeDef), prop: propKey },
+      StatusCodes.CONFLICT
+    )
+  }
+}
+
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db
@@ -191,6 +205,8 @@ export const updateNodeDefProps = async (
     const surveyId = Survey.getId(survey)
 
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+
+    _assertRefPropsCanChange({ survey, nodeDef: nodeDefPrev, props })
 
     const nodeDefsUpdated = {}
     let surveyUpdated = survey

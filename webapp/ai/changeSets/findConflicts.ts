@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import { isDeepEqual } from './deepEqual'
+import { findStructuralConflicts } from './designerRuleConflicts'
 import { findNodeDefRef, getOperationCurrentValue } from './operations'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from './recordEdits/types'
 import { isCategoryItemLabelOperation, type CategoryItemLabelSetOperation } from './categoryItemLabels/types'
@@ -46,7 +47,8 @@ const checkChange = (
 }
 
 /**
- * Returns the conflicts of a change set with the survey.
+ * Returns the conflicts of a change set with the survey: a value that changed, a missing node definition, list or
+ * parent, and an operation that the form designer's rules no longer allow (published since the proposal, for example).
  * @param {ChangeSet} changeSet - Change set.
  * @param {object} survey - Current draft survey.
  * @param {object} [options] - Options.
@@ -60,13 +62,17 @@ export const findConflicts = (
 ): OperationConflict[] => {
   const createdUuids = new Set<string>()
   const conflicts: OperationConflict[] = []
+  const ruleReasons = new Map(
+    findStructuralConflicts({ changeSet, survey, operationIds }).map(({ id, reason }) => [id, reason])
+  )
   for (const op of changeSet.operations) {
     // record edits and category labels are checked by the server at Apply
     if (isRecordEditOperation(op) || isCategoryItemLabelOperation(op)) continue
     const reason =
       op.type === 'nodeDef.create' ? checkCreate(op, survey, createdUuids) : checkChange(op, survey, createdUuids)
     if (op.type === 'nodeDef.create' && reason === null) createdUuids.add(NodeDef.getUuid(op.nodeDef))
-    if (reason && (!operationIds || operationIds.includes(op.id))) conflicts.push({ id: op.id, reason })
+    const conflict = reason ?? ruleReasons.get(op.id) ?? null
+    if (conflict && (!operationIds || operationIds.includes(op.id))) conflicts.push({ id: op.id, reason: conflict })
   }
   return conflicts
 }

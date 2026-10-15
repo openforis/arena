@@ -92,6 +92,7 @@ export default {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
     dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
     fileNotFound: 'Файл олдсонгүй',
+    nodeDefRefLocked: '{{name}} нийтлэгдсэн тул ангилал эсвэл таксономийг өөрчлөх боломжгүй.',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   aiSessionExpired: 'Таны сешн дууссан байна. Дахин нэвтэрнэ үү.',
