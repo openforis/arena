@@ -455,6 +455,11 @@
   color: var(--red);
 }
 
+// groups the cards of a tool call without a box of its own
+.ai-assistant-message__cards {
+  display: contents;
+}
+
 .ai-assistant-message {
   max-width: 100%;
 
