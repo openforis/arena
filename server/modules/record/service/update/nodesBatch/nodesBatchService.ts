@@ -20,6 +20,7 @@ import * as Log from '@server/log/log'
 import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
+import { withSurveyUuid } from './nodesBatchRecordPermission'
 import { groupEditsByRecord } from './nodesBatchRequest'
 import { NodesBatchProcessSlots, NodesBatchSlots } from './nodesBatchSlots'
 import {
@@ -85,17 +86,6 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
   slots: NodesBatchProcessSlots,
   logError: (message) => Logger.error(message),
 })
-
-/**
- * Returns the record with its survey uuid (needed by the Authorizer), taken from the survey when missing.
- * @param {object} record - The record.
- * @param {object} survey - The survey.
- * @returns {object} The record.
- */
-const withSurveyUuid = (record: any, survey: any) =>
-  Record.getSurveyUuid(record)
-    ? record
-    : { ...record, [Record.keys.surveyUuid]: Survey.getUuid(Survey.getSurveyInfo(survey)) }
 
 /**
  * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
