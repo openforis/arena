@@ -142,7 +142,11 @@ describe('nodeValueParser: parseNodeValueInput (the assistant layer)', () => {
   })
 
   test('a coordinate edit keeps the additional fields of the current value (swapped x and y)', async () => {
-    const nodeDef = Survey.getNodeDefByName('cluster_location')(survey)
+    const locationDef = Survey.getNodeDefByName('cluster_location')(survey)
+    const nodeDef = {
+      ...locationDef,
+      props: { ...locationDef.props, includeAccuracy: true, includeAltitude: true, includeAltitudeAccuracy: true },
+    }
     const currentValue = { x: 41.9, y: 12.5, srs: '4326', accuracy: 3, altitude: 120, altitudeAccuracy: 5 }
     const { value } = await parseNodeValueInput({
       survey,

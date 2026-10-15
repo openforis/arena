@@ -591,9 +591,10 @@ const parseCoordinateInput: InputParser = async ({ survey, nodeDef, input, curre
     })
   }
   // x, y and srs are replaced; the other collected fields (accuracy, altitude...) belong to the same position fix, so
-  // they are kept rather than silently erased
+  // they are kept rather than silently erased. Only the fields the attribute collects: nothing else is copied over.
+  const additionalFields = NodeDef.getCoordinateAdditionalFields(nodeDef) as string[]
   const additionalValuesByField = Object.fromEntries(
-    Object.entries(currentValue ?? {}).filter(([field]) => !['x', 'y', 'srs'].includes(field))
+    Object.entries(currentValue ?? {}).filter(([field]) => additionalFields.includes(field))
   )
   return { value: { ...additionalValuesByField, ...Node.newNodeValueCoordinate({ x, y, srsId }) }, refData: null }
 }
