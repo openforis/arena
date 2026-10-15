@@ -1,3 +1,4 @@
+import { createContext, useContext } from 'react'
 import { useSelector } from 'react-redux'
 import { useLocation } from 'react-router-dom'
 
@@ -17,11 +18,16 @@ import { getDesignAreaStatus, getHelpAreaStatus, parseAppPath, type AssistantAre
 
 export type AssistantAreasInfo = { statuses: AssistantAreaStatus[]; module: string | null; subModule: string | null }
 
+const AssistantAreasContext = createContext<AssistantAreasInfo | null>(null)
+
+export const AssistantAreasContextProvider = AssistantAreasContext.Provider
+
 /**
- * Returns the status of every area (tab order) and the current app module.
+ * Computes the status of every area (tab order) and the current app module: the provider of the context calls it once
+ * for the header button, the panel host and the panel.
  * @returns {AssistantAreasInfo} Statuses and module.
  */
-export const useAssistantAreas = (): AssistantAreasInfo => {
+export const useComputeAssistantAreas = (): AssistantAreasInfo => {
   const { pathname } = useLocation()
   const design = useAssistantFeatureAvailability('assistantDesign')
   const help = useAssistantFeatureAvailability('chatbot')
@@ -52,4 +58,14 @@ export const useAssistantAreas = (): AssistantAreasInfo => {
     }),
   ]
   return { statuses, ...parseAppPath(pathname) }
+}
+
+/**
+ * Returns the status of every area (tab order) and the current app module, computed once by AssistantAreasProvider.
+ * @returns {AssistantAreasInfo} Statuses and module.
+ */
+export const useAssistantAreas = (): AssistantAreasInfo => {
+  const areas = useContext(AssistantAreasContext)
+  if (!areas) throw new Error('useAssistantAreas needs an AssistantAreasProvider above it')
+  return areas
 }
