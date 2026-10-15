@@ -44,7 +44,12 @@ export const LocalServerConsentHost = () => {
   const destinationKey = request.surveyId ? 'aiEngine.consent.destination' : 'aiEngine.consent.destinationNoSurvey'
 
   return (
-    <Modal className="local-server-consent" onClose={onCancel} showCloseButton title="aiEngine.consent.title">
+    <Modal
+      className="local-server-consent modal--centered"
+      onClose={onCancel}
+      showCloseButton
+      title="aiEngine.consent.title"
+    >
       <ModalBody>
         <div data-testid={TestId.ai.consentDialog}>
           <p>{t(destinationKey, { baseUrl: request.baseUrl, location })}</p>
