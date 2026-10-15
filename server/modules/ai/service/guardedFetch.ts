@@ -35,6 +35,9 @@ type LookupCallback = (
 // the most a response may bring: far above a model answer, far below what exhausts the memory of the server
 export const DEFAULT_MAX_BODY_BYTES = 32 * 1024 * 1024
 
+// the most the body of an error answer may bring: an error message is short, so this is read whole and nothing more
+export const MAX_ERROR_BODY_BYTES = 64 * 1024
+
 // statuses a Response cannot have a body for
 const NULL_BODY_STATUSES = new Set([204, 205, 304])
 
@@ -115,16 +118,19 @@ const assertLiteralAddressAllowed = (url: URL, allowlist: string[]): void => {
 }
 
 /**
- * Fails the body of a response (and closes the connection) when it brings more than the cap.
+ * Fails the body of a response (and closes the connection) when it brings more than the cap: the given one for a
+ * success, and at most 64 KiB for an error.
  * @param {http.IncomingMessage} incoming - The response.
  * @param {number} maxBodyBytes - The most the body may bring.
  * @returns {void}
  */
 const capBody = (incoming: http.IncomingMessage, maxBodyBytes: number): void => {
+  const status = incoming.statusCode ?? 0
+  const cap = status >= 200 && status < 300 ? maxBodyBytes : Math.min(maxBodyBytes, MAX_ERROR_BODY_BYTES)
   let received = 0
   incoming.on('data', (chunk: Buffer) => {
     received += chunk.length
-    if (received > maxBodyBytes) incoming.destroy(new TypeError('response body too large'))
+    if (received > cap) incoming.destroy(new TypeError('response body too large'))
   })
 }
 
@@ -206,6 +212,7 @@ const send = ({
  * @param {string[]} [options.allowlist] - Org-hosted base URLs, which may be on an internal address (default: AI_ORG_HOSTED_BASE_URLS).
  * @param {LookupFn} [options.lookup] - DNS lookup (injectable for tests).
  * @param {number} [options.maxBodyBytes] - The most a response body may bring (default 32 MiB).
+ * @param {number} [options.timeoutMs] - Time a call with no signal of its own may take (default: AI_REQUEST_TIMEOUT_MS).
  * @returns {GuardedFetch} A fetch that refuses internal addresses at connect time and redirects, and cuts a response
  *   that is too large.
  */
@@ -213,12 +220,15 @@ export const createGuardedFetch = ({
   allowlist = ENV.aiOrgHostedBaseUrls ?? [],
   lookup = defaultLookup,
   maxBodyBytes = DEFAULT_MAX_BODY_BYTES,
-}: GuardOptions & { maxBodyBytes?: number } = {}): GuardedFetch => {
+  timeoutMs = ENV.aiRequestTimeoutMs,
+}: GuardOptions & { maxBodyBytes?: number; timeoutMs?: number } = {}): GuardedFetch => {
   return async (input, init = {}) => {
     const url = new URL(String(input))
     if (url.protocol !== 'http:' && url.protocol !== 'https:') throw notAllowed(String(input))
     assertLiteralAddressAllowed(url, allowlist)
     const connectLookup = isAllowlisted(url, allowlist) ? undefined : createConnectLookup(url.href, lookup)
-    return send({ url, init, lookup: connectLookup, maxBodyBytes })
+    // a caller that passes no signal (model discovery, the connection test) still cannot hang on a silent server
+    const signal = init.signal ?? AbortSignal.timeout(timeoutMs)
+    return send({ url, init: { ...init, signal }, lookup: connectLookup, maxBodyBytes })
   }
 }
