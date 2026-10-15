@@ -22,7 +22,7 @@ const invalidRequest = (reason: string, params: Record<string, unknown> = {}): S
 const isId = (value: unknown): value is string => typeof value === 'string' && isUuid(value)
 
 /**
- * Validates one edit (ids and value size) and fills the missing from/to with null.
+ * Validates one edit (ids and size of the new value) and fills the missing from/to with null.
  * @param {unknown} edit - The edit from the body.
  * @returns {NodesBatchEdit} The edit.
  */
@@ -30,8 +30,9 @@ const parseEdit = (edit: unknown): NodesBatchEdit => {
   if (!edit || typeof edit !== 'object') throw invalidRequest('edit')
   const { recordUuid, nodeUuid, from = null, to = null } = edit as Record<string, unknown>
   if (!isId(recordUuid) || !isId(nodeUuid)) throw invalidRequest('edit')
-  // the shape of `to` depends on the attribute type: it is checked with the node, see checkBatchEdit
-  if (!isNodeValueSizeValid(from) || !isNodeValueSizeValid(to)) throw invalidRequest('valueTooLarge')
+  // the shape of `to` depends on the attribute type: it is checked with the node, see checkBatchEdit; `from` is only
+  // compared with the stored value (a long stored text is a conflict at most), so it has no size limit
+  if (!isNodeValueSizeValid(to)) throw invalidRequest('valueTooLarge')
   // the database returns lower-case uuids: another case would miss the node and take another lock key
   return { recordUuid: recordUuid.toLowerCase(), nodeUuid: nodeUuid.toLowerCase(), from, to }
 }
