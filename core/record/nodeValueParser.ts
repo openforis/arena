@@ -133,7 +133,7 @@ const extractDateOrTime = ({
 }
 
 /**
- * Finds the uuid of a vernacular name of a taxon, written as "Name" or "Name (lang)".
+ * Finds the uuid of a vernacular name of a taxon, written as "Name" or "Name (lang)" (the whole text when it is neither).
  * @param {object} params - The parameters.
  * @param {object} params.taxon - The taxon.
  * @param {string} params.vernacularName - The vernacular name.
@@ -144,8 +144,9 @@ const extractVernacularNameUuid = ({ taxon, vernacularName }: { taxon: any; vern
 
   const regExp = /^([^(]+)(\s\(([^)]+)\))?$/
   const vernacularNameParts = regExp.exec(vernacularName)
-  const vernacularNameText = vernacularNameParts[1]
-  const vernacularNameLang = vernacularNameParts[3]
+  // not "Name" or "Name (lang)": look for the whole text as a name
+  const vernacularNameText = vernacularNameParts ? vernacularNameParts[1] : vernacularName
+  const vernacularNameLang = vernacularNameParts?.[3]
   const vernacularNames = vernacularNameLang
     ? Taxon.getVernacularNamesByLang(vernacularNameLang)(taxon)
     : Taxon.getVernacularNamesArray(taxon)
