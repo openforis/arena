@@ -59,7 +59,6 @@ export const surveyGetOverviewTool: AiTool<Record<string, never>> = {
   inputSchema: z.object({}).strict(),
   area: ['design', 'analysis', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => buildSurveyOverview({ survey: requireSurvey(ctx), cycle: ctx.cycle, lang: ctx.lang }),
 }

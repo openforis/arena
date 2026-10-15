@@ -7,7 +7,11 @@ import { z } from 'zod'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
-import { CATEGORY_ITEM_LABEL_TEXT_MAX, type MissingLabelsItem } from '@common/ai/categoryItemLabels'
+import {
+  CATEGORY_ITEM_LABEL_TEXT_MAX,
+  type MissingLabelsItem,
+  type MissingLabelsPage,
+} from '@common/ai/categoryItemLabels'
 
 import {
   fetchMissingLabelsPage,
@@ -26,7 +30,15 @@ export const LIST_MISSING_LABELS_SERVER_PAGE = 100
 export const LIST_MISSING_LABELS_MAX_REQUESTS = 5
 export const LIST_MISSING_LABELS_DEFAULT_LIMIT = 50
 
-export type ListMissingLabelsInput = { categoryName: string; lang: string; cursor?: string; limit?: number }
+const inputSchema = z.object({
+  categoryName: z.string().min(1).max(100),
+  lang: z.string().min(2).max(10).describe('The survey language whose labels are missing'),
+  // an item uuid the server gave: it refuses another text with a 400 (it restarts only on a uuid it does not know)
+  cursor: z.string().min(1).max(64).optional().describe('nextCursor of the previous call, unchanged'),
+  limit: z.number().int().min(1).max(50).optional(),
+})
+
+export type ListMissingLabelsInput = z.infer<typeof inputSchema>
 
 export type ListedCategoryItem = {
   // code path, e.g. "2.14": what the model passes back to categoryItemLabels_proposeSet
@@ -190,6 +202,37 @@ const buildNote = (nextCursor: string | null, pendingCount: number): string => {
 }
 
 /**
+ * Returns the failure for a cursor the server refuses (it answers 400 to a text that is not an item uuid).
+ * @param {any} error - Request error.
+ * @param {string|null} cursor - Cursor of the request.
+ * @returns {AiToolFailure|null} The failure, null when the error is not about the cursor.
+ */
+const toCursorFailure = (error: any, cursor: string | null): AiToolFailure | null =>
+  cursor !== null && error?.response?.status === 400
+    ? new AiToolFailure(
+        'invalidCursor',
+        'The cursor is not one this tool returned. Pass nextCursor exactly as received, or call again without cursor to start from the first item.'
+      )
+    : null
+
+/**
+ * Fetches a server page; a cursor the server refuses becomes a failure the model can act on.
+ * @param {FetchMissingLabelsPage} fetchPage - Page fetcher.
+ * @param {Parameters<FetchMissingLabelsPage>[0]} params - Request parameters.
+ * @returns {Promise<MissingLabelsPage>} The page.
+ */
+const fetchServerPage = async (
+  fetchPage: FetchMissingLabelsPage,
+  params: Parameters<FetchMissingLabelsPage>[0]
+): Promise<MissingLabelsPage> => {
+  try {
+    return await fetchPage(params)
+  } catch (error) {
+    throw toCursorFailure(error, params.cursor) ?? error
+  }
+}
+
+/**
  * Creates the tool (the fetcher is injected in tests).
  * @param {object} [deps] - Dependencies.
  * @param {FetchMissingLabelsPage} [deps.fetchPage] - Missing-labels page fetcher.
@@ -203,16 +246,9 @@ export const createCategoryItemsListMissingLabelsTool = ({
     'Lists the items of a category whose label is missing in a survey language, with the text to translate ' +
     '(sourceText, in sourceLang). Pass nextCursor as cursor to get the next items. Items already in pending cards ' +
     'are skipped. Propose the translations with categoryItemLabels_proposeSet, using the ref of each item.',
-  inputSchema: z.object({
-    categoryName: z.string().min(1).max(100),
-    lang: z.string().min(2).max(10).describe('The survey language whose labels are missing'),
-    // an item uuid; not checked as a uuid (an unknown cursor restarts the list on the server)
-    cursor: z.string().min(1).max(64).optional().describe('nextCursor of the previous call'),
-    limit: z.number().int().min(1).max(50).optional(),
-  }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canEditCurrentSurvey,
   execute: async ({ categoryName, lang, cursor, limit = LIST_MISSING_LABELS_DEFAULT_LIMIT }, ctx) => {
     const survey = requireSurvey(ctx)
@@ -235,7 +271,7 @@ export const createCategoryItemsListMissingLabelsTool = ({
     let serverCursor: string | null = cursor ?? null
     let serverTotal = 0
     for (let request = 0; request < LIST_MISSING_LABELS_MAX_REQUESTS && !state.full; request += 1) {
-      const page = await fetchPage({
+      const page = await fetchServerPage(fetchPage, {
         surveyId,
         categoryUuid,
         lang,

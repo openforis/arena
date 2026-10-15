@@ -86,10 +86,9 @@ const toCountFailure = (error: any) => toRequestFailure(error, 'The count took t
  * @returns {AiTool[]} The two tools.
  */
 export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<any, unknown>[] => {
-  const common: Pick<AiTool<any>, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+  const common: Pick<AiTool<any>, 'area' | 'dataClass' | 'requires'> = {
     area: ['analysis'],
     dataClass: 'data',
-    effect: 'read',
     requires: canViewCurrentSurvey,
   }
 

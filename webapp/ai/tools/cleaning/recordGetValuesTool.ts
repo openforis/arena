@@ -35,10 +35,9 @@ type Input = z.infer<typeof inputSchema>
 
 const TIMEOUT_HINT = 'The record is too slow to load. Retry, or ask for fewer attributes.'
 
-const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   area: ['cleaning'],
   dataClass: 'data',
-  effect: 'read',
   requires: canCleanseCurrentSurvey,
 }
 

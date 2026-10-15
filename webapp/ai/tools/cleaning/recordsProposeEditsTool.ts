@@ -64,10 +64,9 @@ const RECORDS_PER_PROPOSAL_MAX = 50
 
 const TIMEOUT_HINT = 'Loading the records is too slow. Retry with fewer edits.'
 
-const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   area: ['cleaning'],
   dataClass: 'data',
-  effect: 'propose',
   requires: canCleanseCurrentSurvey,
 }
 

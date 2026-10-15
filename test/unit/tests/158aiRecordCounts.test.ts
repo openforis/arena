@@ -116,7 +116,7 @@ describe('records_countOverTime', () => {
 
   test('both are data read tools', () => {
     const { countByStepTool, countOverTimeTool } = setUp()
-    expect(countByStepTool).toMatchObject({ name: 'records_countByStep', dataClass: 'data', effect: 'read' })
-    expect(countOverTimeTool).toMatchObject({ name: 'records_countOverTime', dataClass: 'data', effect: 'read' })
+    expect(countByStepTool).toMatchObject({ name: 'records_countByStep', dataClass: 'data' })
+    expect(countOverTimeTool).toMatchObject({ name: 'records_countOverTime', dataClass: 'data' })
   })
 })

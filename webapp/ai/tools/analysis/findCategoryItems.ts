@@ -110,7 +110,6 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
     inputSchema,
     area: ['analysis'],
     dataClass: 'schema',
-    effect: 'read',
     requires: canViewCurrentSurvey,
     execute,
   }

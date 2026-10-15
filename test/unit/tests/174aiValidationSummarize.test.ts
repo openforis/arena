@@ -113,7 +113,7 @@ describe('validation_summarize tool', () => {
   test('is a data read tool of the cleaning area for users who can cleanse records', () => {
     const { api } = newFakeCleaningApi()
     const tool = getTool(api)
-    expect(tool).toMatchObject({ dataClass: 'data', effect: 'read', area: ['cleaning'] })
+    expect(tool).toMatchObject({ dataClass: 'data', area: ['cleaning'] })
     expect(tool.requires(newCleaningToolContext({ survey }))).toBe(true)
     const dataEditor = newCleaningSurveyUser({ survey, groupName: 'dataEditor' })
     expect(tool.requires(newCleaningToolContext({ survey, user: dataEditor }))).toBe(false)

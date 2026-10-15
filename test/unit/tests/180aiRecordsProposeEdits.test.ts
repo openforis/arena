@@ -39,7 +39,6 @@ describe('records_proposeEdits', () => {
     expect(tool).toMatchObject({
       name: 'records_proposeEdits',
       dataClass: 'data',
-      effect: 'propose',
       area: ['cleaning'],
     })
     const dataEditor = newCleaningSurveyUser({ survey, groupName: 'dataEditor' })

@@ -192,7 +192,7 @@ describe('survey_listMissingTexts (221)', () => {
       hostingClass: 'cloud',
     }).map((tool) => tool.name)
     expect(names).toContain('survey_listMissingTexts')
-    expect(surveyListMissingTextsTool).toMatchObject({ effect: 'read', dataClass: 'schema', area: ['design'] })
+    expect(surveyListMissingTextsTool).toMatchObject({ dataClass: 'schema', area: ['design'] })
     const prompt = buildAssistantDesignPrompt({
       uiLang: 'en',
       surveyName: 'demo',

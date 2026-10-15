@@ -104,16 +104,17 @@ export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Transl
   return { ...description, expressions, expressionMessagesOmitted: true }
 }
 
-export const nodeDefGetTool: AiTool<{ name: string }> = {
+const inputSchema = z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') })
+
+export const nodeDefGetTool: AiTool<z.infer<typeof inputSchema>> = {
   name: 'nodeDef_get',
   description:
     'Returns one node definition by name: labels and descriptions per language, key / multiple / readOnly flags, ' +
     'its expressions (defaultValues, applicable, validations.expressions, visibleIf, editableIf), its parent path, ' +
     'for entities the child names, and the design errors and warnings (issues) the designer shows. Call it before proposing a change to that node definition.',
-  inputSchema: z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') }),
+  inputSchema,
   area: ['design', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)

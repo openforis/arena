@@ -42,7 +42,6 @@ const makeTool = (name: string, execute: AiTool['execute']): AiTool => ({
   inputSchema: z.object({ summary: z.string() }),
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: () => true,
   execute,
 })

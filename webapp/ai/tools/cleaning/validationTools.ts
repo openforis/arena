@@ -42,10 +42,9 @@ type Deps = { api: CleaningApi; getI18n: () => CleaningI18n }
 
 const TIMEOUT_HINT = 'The report is too large. Filter by record, attribute or category and retry.'
 
-const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   area: ['cleaning'],
   dataClass: 'data',
-  effect: 'read',
   requires: canCleanseCurrentSurvey,
 }
 

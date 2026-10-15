@@ -13,7 +13,6 @@ export const viewGetCurrentTool: AiTool<Record<string, never>> = {
   inputSchema: z.object({}).strict(),
   area: ['design', 'help', 'analysis'],
   dataClass: 'schema',
-  effect: 'read',
   requires: () => true,
   execute: async (_input, ctx) => {
     const { module, subModule, selectedNodeDefUuid } = ctx.getCurrentView()

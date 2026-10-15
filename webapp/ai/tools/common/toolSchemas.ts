@@ -21,3 +21,8 @@ export const VALUE_TEXT_MAX_CHARS = 2000
 export const VALUE_PART_MAX_CHARS = 200
 
 export const attributeNamesSchema = (max: number) => z.array(z.string().max(NAME_MAX_CHARS)).max(max)
+
+// an Arena expression and its apply-if condition, trimmed the same way by expression_check and expressions_proposeSet
+export const EXPRESSION_MAX_CHARS = 4000
+export const expressionTextSchema = z.string().trim().min(1).max(EXPRESSION_MAX_CHARS)
+export const applyIfTextSchema = z.string().trim().max(EXPRESSION_MAX_CHARS)
