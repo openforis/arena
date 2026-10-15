@@ -1,6 +1,6 @@
 import './ChangeSetCard.scss'
 
-import React, { useState } from 'react'
+import React, { useEffect, useId, useState } from 'react'
 
 import type { ChangeSetCardState, OperationStatus } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'
@@ -10,6 +10,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { getReviewLabelText, getValuePreview, groupReviewItems, type ReviewItem } from './changeSetReviewModel'
 import { summarizeSelection } from './changeSetSelectionModel'
+import { createConfirmationFocus, type ConfirmationFocus } from './confirmationFocus'
 import type { ChangeSetSelection } from './useChangeSetSelection'
 
 // preview rows and kinds of change shown before "+ N more"
@@ -35,6 +36,7 @@ const countResults = (items: ReviewItem[]): [OperationStatus, number][] =>
  * @param {Function} props.onApply - Applies the selection.
  * @param {Function} props.onReview - Opens the review dialog.
  * @param {Function} props.onCancel - Closes the confirmation.
+ * @param {ConfirmationFocus} props.focus - Moves the focus into the confirmation when it opens.
  * @returns {React.ReactElement} The confirmation.
  */
 const ApplyConfirmation = ({
@@ -44,6 +46,7 @@ const ApplyConfirmation = ({
   onApply,
   onReview,
   onCancel,
+  focus,
 }: {
   items: ReviewItem[]
   selectedIds: string[]
@@ -51,17 +54,42 @@ const ApplyConfirmation = ({
   onApply: () => void
   onReview: () => void
   onCancel: () => void
+  focus: ConfirmationFocus
 }) => {
   const t = useI18nT({ unescapeHtml: true })
+  const titleId = useId()
+  const textId = useId()
+  // a callback ref (state): the focus moves once the confirmation is in the page
+  const [root, setRoot] = useState<HTMLDivElement | null>(null)
   const kinds = summarizeSelection(items, selectedIds)
+
+  useEffect(() => {
+    if (root) focus.enter(root)
+  }, [focus, root])
+
+  /**
+   * Escape cancels the confirmation, not the assistant panel behind it.
+   * @param {React.KeyboardEvent} event - Key event.
+   * @returns {void} Nothing.
+   */
+  const onKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key !== 'Escape') return
+    event.stopPropagation()
+    onCancel()
+  }
+
   return (
     <div
-      aria-label={t('aiAssistant.card.confirm.title')}
+      aria-describedby={textId}
+      aria-labelledby={titleId}
       className="ai-assistant-card__confirm"
       data-testid={TestId.aiAssistant.applyConfirm}
-      role="group"
+      onKeyDown={onKeyDown}
+      ref={setRoot}
+      role="alertdialog"
     >
-      <p>{t('aiAssistant.card.confirm.text', { count: selectedIds.length })}</p>
+      <strong id={titleId}>{t('aiAssistant.card.confirm.title')}</strong>
+      <p id={textId}>{t('aiAssistant.card.confirm.text', { count: selectedIds.length })}</p>
       <ul className="ai-assistant-card__chips">
         {kinds.map(({ label, count }) => (
           <li className="ai-assistant-card__chip" key={JSON.stringify(label)}>
@@ -116,6 +144,9 @@ export const ChangeSetCompactCard = ({
   const t = useI18nT({ unescapeHtml: true })
   const dirty = useIsSurveyDirty()
   const [confirming, setConfirming] = useState(false)
+  // Apply all keeps the focus unless the confirmation opens; it gets it back when the confirmation is cancelled
+  const [focus] = useState(createConfirmationFocus)
+  const [applyButton, setApplyButton] = useState<HTMLButtonElement | null>(null)
   const { pendingIds, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds, applying } = selection
   const kinds = groupReviewItems(items, 'field')
   const results = countResults(items)
@@ -123,16 +154,26 @@ export const ChangeSetCompactCard = ({
   const showConfirmation = confirming && selectedIds.length > 0
 
   const onApplyClick = () => {
-    if (reviewed) void selection.apply()
-    else setConfirming(true)
+    if (reviewed) {
+      void selection.apply()
+      return
+    }
+    focus.remember(applyButton)
+    setConfirming(true)
   }
   const onConfirmedApply = () => {
+    focus.close()
     setConfirming(false)
     void selection.apply()
   }
   const onReviewFirst = () => {
+    focus.close()
     setConfirming(false)
     onReview()
+  }
+  const onCancelConfirmation = () => {
+    focus.cancel()
+    setConfirming(false)
   }
 
   return (
@@ -194,9 +235,10 @@ export const ChangeSetCompactCard = ({
       {showConfirmation && (
         <ApplyConfirmation
           disabled={busy || applying || dirty}
+          focus={focus}
           items={items}
           onApply={onConfirmedApply}
-          onCancel={() => setConfirming(false)}
+          onCancel={onCancelConfirmation}
           onReview={onReviewFirst}
           selectedIds={selectedIds}
         />
@@ -215,10 +257,12 @@ export const ChangeSetCompactCard = ({
         {pendingIds.length > 0 && (
           <>
             <Button
-              disabled={busy || applying || dirty || selectedIds.length === 0 || showConfirmation}
+              aria-expanded={showConfirmation}
+              disabled={busy || applying || dirty || selectedIds.length === 0}
               label={allSelected ? 'aiAssistant.card.applyAll' : 'aiAssistant.card.applySelectedCount'}
               labelParams={{ count: selectedIds.length }}
               onClick={onApplyClick}
+              ref={setApplyButton}
               testId={TestId.aiAssistant.applyBtn}
             />
             <Button
