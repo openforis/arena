@@ -20,6 +20,7 @@ import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocation
 
 import Label from './Label'
 import ButtonToggle from './ButtonToggle'
+import { mergeTranslatedLabels } from './mergeTranslatedLabels'
 
 const MAX_PREVIEW_LANGUAGES = 1
 
@@ -67,6 +68,11 @@ const LabelsEditor = (props) => {
     () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
     [languagesFromProps, surveyLanguages]
   )
+  // the translation merges into the labels and the handler as they are when the answer arrives, not at click time
+  const latestRef = useRef({ labels, onChange })
+  useEffect(() => {
+    latestRef.current = { labels, onChange }
+  })
   const preferredLanguage = useSurveyPreferredLang()
   const languagesSorted = sortLanguages({ languages, preferredLanguage })
 
@@ -104,13 +110,15 @@ const LabelsEditor = (props) => {
         signal: controller.signal,
       })
       if (controller.signal.aborted) return
-      const byLang = result.translations?.[0]?.byLang ?? {}
-      const merged = { ...labels }
-      for (const [lang, text] of Object.entries(byLang)) {
-        if (emptyLangs.includes(lang) && typeof text === 'string') merged[lang] = text
-      }
-      onChange(merged)
-      notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
+      const current = latestRef.current
+      const { labels: merged, applied } = mergeTranslatedLabels({
+        labels: current.labels,
+        targetLangs: emptyLangs,
+        byLang: result.translations?.[0]?.byLang ?? {},
+      })
+      if (applied.length === 0) return
+      current.onChange(merged)
+      notifyInfo({ key: 'aiTranslation.success', params: { count: applied.length } })
     } catch (error) {
       if (!controller.signal.aborted && !isAiAbortError(error)) {
         notifyError({ key: 'aiTranslation.failed', params: { message: getAiErrorMessage({ error, i18n }) } })
@@ -118,18 +126,7 @@ const LabelsEditor = (props) => {
     } finally {
       if (!controller.signal.aborted) setTranslating(false)
     }
-  }, [
-    aiTranslation,
-    canTranslate,
-    emptyLangs,
-    i18n,
-    labels,
-    notifyError,
-    notifyInfo,
-    onChange,
-    populatedLang,
-    surveyId,
-  ])
+  }, [aiTranslation, canTranslate, emptyLangs, i18n, labels, notifyError, notifyInfo, populatedLang, surveyId])
 
   return (
     <div className={classNames('labels-editor', { 'with-label': showFormLabel })}>
