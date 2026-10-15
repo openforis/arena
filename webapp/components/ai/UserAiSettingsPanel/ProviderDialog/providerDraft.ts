@@ -347,7 +347,7 @@ export const getDraftModel = ({ spec, draft }: { spec: ProviderTypeSpec; draft: 
 /**
  * Returns the URL of a local draft as it is stored (http:// added when typed without a scheme).
  * @param {ProviderDraft} draft - Draft.
- * @returns {string|null} The URL, or null when it is not an http(s) URL.
+ * @returns {string|null} The URL, or null when it is not a plain http(s) URL (no credentials, query or fragment).
  */
 export const getLocalDraftUrl = (draft: ProviderDraft): string | null =>
   draft.baseUrl.trim() ? normalizeLocalProviderBaseUrl(withDefaultHttpScheme(draft.baseUrl)) : null

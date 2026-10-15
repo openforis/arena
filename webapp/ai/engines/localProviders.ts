@@ -11,7 +11,7 @@ import {
   normalizeProviderName,
 } from '@common/ai/providerIds'
 
-import { withDefaultHttpScheme } from '@common/ai/localServerAddress'
+import { isPlainHttpBaseUrl, withDefaultHttpScheme } from '@common/ai/localServerAddress'
 
 import {
   getLocalServerSettingsKey,
@@ -36,20 +36,16 @@ export type LocalConversionResult = { status: 'none' | 'converted' | 'failed'; d
 export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.localProviders.${userUuid}`
 
 /**
- * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, at most 2048 chars.
+ * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, without credentials, query or
+ * fragment, at most 2048 chars.
  * @param {unknown} value - Raw value.
- * @returns {string|null} The URL, or null when it is not a valid http(s) URL.
+ * @returns {string|null} The URL, or null when it is not a plain http(s) URL.
  */
 export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = stripTrailingSlashes(value.trim())
   if (!trimmed || trimmed.length > MAX_BASE_URL_LENGTH) return null
-  try {
-    const { protocol } = new URL(trimmed)
-    return protocol === 'http:' || protocol === 'https:' ? trimmed : null
-  } catch {
-    return null
-  }
+  return isPlainHttpBaseUrl(trimmed) ? trimmed : null
 }
 
 /**
