@@ -1,6 +1,14 @@
 /**
  * Admission control of the batch record edits: one records update thread serves every survey of a process, so a few
  * batches in flight are enough to stall data entry for everyone. A batch needs a slot for its whole duration.
+ *
+ * The slots are per process (per dyno) on purpose. What a batch stalls is the records update thread of the process
+ * that runs it, and each process has its own, so the limits count what that thread has to serve. A shared counter
+ * would need a store that all dynos agree on, and the slots of a crashed dyno would leak until a timeout. What must be
+ * serialized across dynos is the writing of one record, and the thread already does that with a per-record advisory
+ * lock (a transaction waits up to its lock timeout for a record that another dyno holds, then fails with
+ * record.lockTimeout). So with N dynos the server accepts up to N times these limits, while two batches on the same
+ * record still run one after the other, whichever dynos they reach.
  */
 
 export type NodesBatchSlotLimits = {
