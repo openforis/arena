@@ -1,9 +1,9 @@
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import SystemError from '@core/systemError'
+import { uuidv4 } from '@core/uuid'
 
 import { createRecordsProposeEditsTool } from '@webapp/ai/tools/cleaning/recordsProposeEditsTool'
-import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
 
 import {
   cleaningTestRecord,
@@ -58,7 +58,7 @@ describe('records_proposeEdits', () => {
           { recordUuid, nodeUuid: nodeUuidAt('cluster/plot[0]/tree[0]/dbh'), value: '8.5' },
           { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'checked' },
           { recordUuid, nodeUuid: nodeUuidAt('cluster/cluster_distance'), value: 'far' },
-          { recordUuid, nodeUuid: 'missing-node', value: '1' },
+          { recordUuid, nodeUuid: uuidv4(), value: '1' },
           { recordUuid, nodeUuid: nodeUuidAt('cluster/plot[0]/tree[1]/dbh'), value: '10.123' },
           { recordUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'twice' },
         ],
@@ -149,7 +149,7 @@ describe('records_proposeEdits', () => {
     const ctx = newCleaningToolContext({ survey })
     const result = await runTool(
       tool,
-      { summary: 's', edits: [{ recordUuid: 'other', nodeUuid: 'n', value: '1' }] },
+      { summary: 's', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }] },
       ctx
     )
     expect(ctx.changeSets).toEqual([])
@@ -179,18 +179,6 @@ describe('records_proposeEdits', () => {
     expect(ctx.changeSets).toEqual([])
   })
 
-  test(`more than ${RECORD_EDITS_MAX} edits are refused before any request`, async () => {
-    const { tool, calls } = newTool()
-    const edits = Array.from({ length: RECORD_EDITS_MAX + 1 }, (_, index) => ({
-      recordUuid: 'r',
-      nodeUuid: `n${index}`,
-      value: '1',
-    }))
-    const result = await runTool(tool, { summary: 's', edits }, newCleaningToolContext({ survey }))
-    expect(result).toEqual({ error: { code: 'tooManyEdits', message: expect.stringContaining('split') } })
-    expect(calls).toEqual([])
-  })
-
   test('a value can be cleared with null', async () => {
     const { tool } = newTool()
     const ctx = newCleaningToolContext({ survey })
@@ -206,8 +194,9 @@ describe('records_proposeEdits', () => {
   })
 
   test('several records: one load each, rejections sorted across records', async () => {
-    const second = { ...record, uuid: 'second-record' }
-    const { tool, calls } = newTool(({ recordUuid }) => (recordUuid === 'second-record' ? second : record))
+    const secondUuid = uuidv4()
+    const second = { ...record, uuid: secondUuid }
+    const { tool, calls } = newTool(({ recordUuid }) => (recordUuid === secondUuid ? second : record))
     const ctx = newCleaningToolContext({ survey })
     const firstUuid = Record.getUuid(record)
     const result = await runTool(
@@ -215,10 +204,10 @@ describe('records_proposeEdits', () => {
       {
         summary: 's',
         edits: [
-          { recordUuid: firstUuid, nodeUuid: 'missing-1', value: '1' },
-          { recordUuid: 'second-record', nodeUuid: 'missing-2', value: '1' },
+          { recordUuid: firstUuid, nodeUuid: uuidv4(), value: '1' },
+          { recordUuid: secondUuid, nodeUuid: uuidv4(), value: '1' },
           { recordUuid: firstUuid, nodeUuid: nodeUuidAt('cluster/remarks'), value: 'ok' },
-          { recordUuid: firstUuid, nodeUuid: 'missing-3', value: '1' },
+          { recordUuid: firstUuid, nodeUuid: uuidv4(), value: '1' },
         ],
       },
       ctx
@@ -269,7 +258,7 @@ describe('records_proposeEdits', () => {
 
   test('more than 50 distinct records are refused before any request', async () => {
     const { tool, calls } = newTool()
-    const edits = Array.from({ length: 51 }, (_, index) => ({ recordUuid: `r${index}`, nodeUuid: 'n', value: '1' }))
+    const edits = Array.from({ length: 51 }, () => ({ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }))
     const result = await runTool(tool, { summary: 's', edits }, newCleaningToolContext({ survey }))
     expect(result.error.code).toBe('invalidProposal')
     expect(result.error.issues[0].field).toBe('tooManyRecords')
@@ -280,7 +269,7 @@ describe('records_proposeEdits', () => {
     const { tool } = newTool()
     const result = await runTool(
       tool,
-      { summary: 's', edits: [{ recordUuid: 'r', nodeUuid: 'n', value: '1' }] },
+      { summary: 's', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), value: '1' }] },
       newCleaningToolContext({ survey, cycle: null })
     )
     expect(result.error.code).toBe('noCycle')

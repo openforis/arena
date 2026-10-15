@@ -1,6 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 
 import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
 import { findRecordUuidByKeys } from '@webapp/ai/tools/cleaning/recordLookup'
@@ -146,10 +147,10 @@ describe('record_getValues tool', () => {
     const tool = createRecordGetValuesTool({ api, getI18n: () => fakeI18n })
     const ctx = newCleaningToolContext({ survey })
     expect(await runTool(tool, { attributes: ['dbh'] }, ctx)).toMatchObject({ error: { code: 'recordRequired' } })
-    expect(await runTool(tool, { recordUuid: 'r', attributes: ['nope'] }, ctx)).toMatchObject({
+    expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['nope'] }, ctx)).toMatchObject({
       error: { code: 'unknownAttribute' },
     })
-    expect(await runTool(tool, { recordUuid: 'r', attributes: ['dbh'] }, ctx)).toMatchObject({
+    expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['dbh'] }, ctx)).toMatchObject({
       error: { code: 'recordNotAvailable' },
     })
   })

@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 
 import { collectValidationResults, getMessageCategoryId } from '@webapp/ai/tools/cleaning/validationRows'
 import { summarizeValidationRows } from '@webapp/ai/tools/cleaning/validationSummary'
@@ -17,6 +18,8 @@ import {
 } from '@test/unit/utils/aiCleaningTestUtils'
 
 import * as RecordUtils from '../../utils/recordUtils'
+
+const RECORD_UUID = uuidv4()
 
 let survey: any
 let record: any
@@ -122,13 +125,13 @@ describe('validation_summarize tool', () => {
       fetchValidationReportRows: () => rows,
       countValidationReportRows: () => 1200,
     })
-    const result = await runTool(getTool(api), { recordUuid: 'r-1' }, newCleaningToolContext({ survey }))
+    const result = await runTool(getTool(api), { recordUuid: RECORD_UUID }, newCleaningToolContext({ survey }))
     expect(calls.map((call) => call.name).sort()).toEqual(['countValidationReportRows', 'fetchValidationReportRows'])
     const fetchCall = calls.find((call) => call.name === 'fetchValidationReportRows')
     expect(fetchCall?.params).toMatchObject({
       surveyId: 1,
       cycle: Survey.cycleOneKey,
-      recordUuid: 'r-1',
+      recordUuid: RECORD_UUID,
       offset: 0,
       limit: 1000,
     })
