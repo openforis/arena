@@ -9,7 +9,7 @@ import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workf
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
-import Markdown from '@webapp/components/markdown'
+import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 
@@ -74,7 +74,7 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
 
   const bodyContent = useMemo(() => {
     if (text) {
-      return <Markdown source={text} />
+      return <AssistantMarkdown text={text} />
     } else if (!done) {
       return i18n.t('aiActivityLog.thinking')
     }

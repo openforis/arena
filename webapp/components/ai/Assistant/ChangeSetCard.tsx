@@ -1,6 +1,6 @@
-import React, { useMemo, useState } from 'react'
+import './ChangeSetCard.scss'
 
-import * as Survey from '@core/survey/survey'
+import React, { useMemo, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'
@@ -8,118 +8,64 @@ import { useIsSurveyDirty, useSurvey, useSurveyPreferredLang } from '@webapp/sto
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { CardValueView } from './CardValueView'
-import { buildCategoryLabelGroups } from './categoryLabelCardModel'
-import { CategoryLabelGroups } from './CategoryLabelGroups'
+import { ChangeItemRow } from './ChangeItem'
 import { ChangeSetCompactCard } from './ChangeSetCompactCard'
 import { ChangeSetReviewDialog } from './ChangeSetReviewDialog'
-import { buildCardRows, type CardRow } from './changeSetCardModel'
-import { buildReviewItems, isCompactCard } from './changeSetReviewModel'
+import { splitReviewItems } from './changeItemModel'
+import { buildReviewItems, isCompactCard, type ReviewItem } from './changeSetReviewModel'
 import { useChangeSetSelection, type ChangeSetSelection } from './useChangeSetSelection'
-import { useShowNodeDef } from './useShowNodeDef'
+import { useNodeDefExists, useShowNodeDef } from './useShowNodeDef'
 
 /**
- * One row of the card: checkbox, item name, title, status and the change.
- * @param {object} props - Props.
- * @param {CardRow} props.row - Row.
- * @param {boolean} props.pending - Row can still be applied.
- * @param {boolean} props.selected - Row is selected.
- * @param {boolean} props.conflict - The survey changed since the proposal: the row cannot be selected.
- * @param {boolean} props.exists - Item exists in the survey.
- * @param {Function} props.onToggle - Toggles the selection.
- * @param {Function} props.onNameClick - Shows the item in the form designer.
- * @returns {React.ReactElement} The row.
- */
-const CardRowView = ({
-  row,
-  pending,
-  selected,
-  conflict,
-  exists,
-  onToggle,
-  onNameClick,
-}: {
-  row: CardRow
-  pending: boolean
-  selected: boolean
-  conflict: boolean
-  exists: boolean
-  onToggle: () => void
-  onNameClick: () => void
-}) => {
-  const t = useI18nT({ unescapeHtml: true })
-  const { result } = row
-  return (
-    <li className="ai-assistant-card__row" data-testid={TestId.aiAssistant.changeSetRow(row.nodeDefName)}>
-      {pending && (
-        <input
-          aria-label={`${row.nodeDefName}: ${t(row.titleKey, row.titleParams)}`}
-          checked={selected && !conflict}
-          disabled={conflict}
-          onChange={onToggle}
-          type="checkbox"
-        />
-      )}
-      <div className="ai-assistant-card__row-body">
-        <div className="ai-assistant-card__row-title">
-          <button className="ai-assistant-card__name" disabled={!exists} onClick={onNameClick} type="button">
-            {row.nodeDefName}
-          </button>
-          <span>{t(row.titleKey, row.titleParams)}</span>
-          {result && (
-            <span
-              className={`ai-assistant-card__status ai-assistant-card__status--${result.status}`}
-              data-testid={TestId.aiAssistant.changeSetRowStatus}
-              title={result.message}
-            >
-              {t(`aiAssistant.card.status.${result.status}`)}
-            </span>
-          )}
-        </div>
-        <div className="ai-assistant-card__diff">
-          {row.from && (
-            <>
-              <span className="ai-assistant-card__from">
-                <CardValueView value={row.from} />
-              </span>
-              <span aria-hidden="true">→</span>
-            </>
-          )}
-          <span className="ai-assistant-card__to">
-            <CardValueView value={row.to} />
-          </span>
-        </div>
-      </div>
-    </li>
-  )
-}
-
-/**
- * The card with every change listed (short change sets).
+ * The card with every change listed (short change sets): the node definition changes, then the category labels
+ * grouped by category.
  * @param {object} props - Props.
  * @param {ChangeSetCardState} props.cardState - Card state.
+ * @param {ReviewItem[]} props.items - Changes of the card.
  * @param {ChangeSetSelection} props.selection - Selection and actions.
  * @param {boolean} props.busy - An answer is running (Apply waits for it).
  * @returns {React.ReactElement} The card.
  */
 const ChangeSetFullCard = ({
   cardState,
+  items,
   selection,
   busy,
 }: {
   cardState: ChangeSetCardState
+  items: ReviewItem[]
   selection: ChangeSetSelection
   busy: boolean
 }) => {
   const t = useI18nT({ unescapeHtml: true })
-  const survey = useSurvey()
-  const lang = useSurveyPreferredLang()
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
+  const nodeDefExists = useNodeDefExists()
   const { pendingIds, conflictIds, selectedIds, applying, toggle } = selection
+  const { nodeDefItems, categoryGroups } = useMemo(() => splitReviewItems(items), [items])
 
-  const rows = useMemo(() => buildCardRows({ cardState, survey, lang }), [cardState, lang, survey])
-  const categoryGroups = useMemo(() => buildCategoryLabelGroups({ cardState, survey }), [cardState, survey])
+  /**
+   * Renders one change of the card.
+   * @param {ReviewItem} item - Change.
+   * @returns {React.ReactElement} The row.
+   */
+  const renderRow = (item: ReviewItem) => {
+    const { nodeDefUuid } = item
+    return (
+      <ChangeItemRow
+        conflict={conflictIds.includes(item.id)}
+        exists={nodeDefUuid !== null && nodeDefExists(nodeDefUuid)}
+        item={item}
+        key={item.id}
+        onNameClick={() => {
+          if (nodeDefUuid !== null) showNodeDef(nodeDefUuid)
+        }}
+        onToggle={() => toggle(item.id)}
+        pending={pendingIds.includes(item.id)}
+        selected={selectedIds.includes(item.id)}
+      />
+    )
+  }
 
   return (
     <section
@@ -133,30 +79,21 @@ const ChangeSetFullCard = ({
         <span>{cardState.changeSet.summary}</span>
       </div>
       {conflictIds.length > 0 && (
-        <div className="ai-assistant-card__stale" data-testid={TestId.aiAssistant.stale} role="status">
+        <div className="ai-change-item__stale" data-testid={TestId.aiAssistant.stale} role="status">
           {t('aiAssistant.card.stale')}
         </div>
       )}
-      <ul className="ai-assistant-card__rows">
-        {rows.map((row) => (
-          <CardRowView
-            exists={Boolean(Survey.getNodeDefByUuid(row.nodeDefUuid)(survey))}
-            conflict={conflictIds.includes(row.id)}
-            key={row.id}
-            onNameClick={() => showNodeDef(row.nodeDefUuid)}
-            onToggle={() => toggle(row.id)}
-            pending={pendingIds.includes(row.id)}
-            row={row}
-            selected={selectedIds.includes(row.id)}
-          />
-        ))}
-      </ul>
-      <CategoryLabelGroups
-        groups={categoryGroups}
-        onToggle={toggle}
-        pendingIds={pendingIds}
-        selectedIds={selectedIds}
-      />
+      <ul className="ai-assistant-card__rows">{nodeDefItems.map(renderRow)}</ul>
+      {categoryGroups.map((group) => (
+        <div
+          className="ai-assistant-card__category"
+          data-testid={TestId.aiAssistant.categoryLabelGroup(group.categoryName)}
+          key={group.categoryUuid}
+        >
+          <div className="ai-assistant-card__category-name">{group.categoryName}</div>
+          <ul className="ai-assistant-card__rows">{group.items.map(renderRow)}</ul>
+        </div>
+      ))}
       {cardState.discarded && <p className="ai-assistant-card__hint">{t('aiAssistant.card.discarded')}</p>}
       {pendingIds.length > 0 && (
         <div className="ai-assistant-card__footer">
@@ -183,10 +120,10 @@ const ChangeSetFullCard = ({
 
 /**
  * Change set card: up to COMPACT_CARD_MAX_INLINE changes listed with checkboxes, Apply selected and Discard; above
- * that, a compact card whose changes are reviewed in a dialog. Both share one selection.
+ * that, a compact card whose changes are reviewed in a dialog. Both share one selection and one list of changes.
  * @param {object} props - Props.
  * @param {ChangeSetCardState} props.cardState - Card state.
- * @param {boolean} props.busy - An answer is running (Apply waits for it).
+ * @param {boolean} props.busy - An answer is running, or another card is applying (Apply waits for it).
  * @param {Function} props.onApply - Applies the selected operations.
  * @param {Function} props.onDiscard - Discards the card.
  * @returns {React.ReactElement} The card.
@@ -204,11 +141,14 @@ export const ChangeSetCard = ({
 }) => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const selection = useChangeSetSelection({ cardState, survey, onApply, onDiscard })
-  const [reviewOpen, setReviewOpen] = useState(false)
   const items = useMemo(() => buildReviewItems({ cardState, survey, lang }), [cardState, lang, survey])
+  const compact = isCompactCard(items.length)
+  const selection = useChangeSetSelection({ cardState, compact, survey, onApply, onDiscard })
+  const [reviewOpen, setReviewOpen] = useState(false)
+  // Apply all of a compact card asks to confirm until the dialog was opened
+  const [reviewed, setReviewed] = useState(false)
 
-  if (!isCompactCard(items.length)) return <ChangeSetFullCard busy={busy} cardState={cardState} selection={selection} />
+  if (!compact) return <ChangeSetFullCard busy={busy} cardState={cardState} items={items} selection={selection} />
 
   return (
     <>
@@ -216,7 +156,11 @@ export const ChangeSetCard = ({
         busy={busy}
         cardState={cardState}
         items={items}
-        onReview={() => setReviewOpen(true)}
+        onReview={() => {
+          setReviewed(true)
+          setReviewOpen(true)
+        }}
+        reviewed={reviewed}
         selection={selection}
       />
       {reviewOpen && (

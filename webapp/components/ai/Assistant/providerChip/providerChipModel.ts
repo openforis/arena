@@ -212,3 +212,24 @@ export const getProviderChipLabel = ({ entry, t }: { entry: AiProviderEntry; t: 
   const name = getProviderDisplayName({ entry, t })
   return entry.model ? `${name} · ${entry.model}` : name
 }
+
+/**
+ * Returns the accessible name and the tooltip of the chip: the provider, where it runs and, when it cannot answer now,
+ * that too (the red tone is never the only sign).
+ * @param {object} params - Parameters.
+ * @param {ProviderChipView} params.view - What the chip shows.
+ * @param {TFunction} params.t - Translation function.
+ * @returns {string} The text.
+ */
+export const getProviderChipFullLabel = ({ view, t }: { view: ProviderChipView; t: TFunction }): string => {
+  if (view.kind === 'none') return t('aiAssistant.providerChip.none')
+  if (view.kind === 'missing') return t('aiAssistant.providerChip.missing')
+  const whereKey = getProviderWhereKey(view.entry)
+  return [
+    getProviderChipLabel({ entry: view.entry, t }),
+    whereKey ? t(`userAiSettings:where.${whereKey}`) : null,
+    view.tone === 'bad' ? t('userAiSettings:status.notAvailable') : null,
+  ]
+    .filter(Boolean)
+    .join(' · ')
+}

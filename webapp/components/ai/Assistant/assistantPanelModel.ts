@@ -191,6 +191,24 @@ export const normalizeLoadedConversation = (conversation: Conversation, running 
   }
 }
 
+/**
+ * Marks as failed the answers still streaming when a turn threw outside the model call (Retry is offered instead of a
+ * spinner that never ends).
+ * @param {Conversation} conversation - Conversation of the failed turn.
+ * @returns {Conversation} The conversation (the same object when no answer was streaming).
+ */
+export const withStreamingFailed = (conversation: Conversation): Conversation => {
+  if (!conversation.messages.some((m) => m.role === 'assistant' && m.status === 'streaming')) return conversation
+  return {
+    ...conversation,
+    messages: conversation.messages.map((message) =>
+      message.role === 'assistant' && message.status === 'streaming'
+        ? { ...message, status: 'error' as const }
+        : message
+    ),
+  }
+}
+
 export type LoadedConversationDecision = 'show' | 'keep' | 'forget'
 
 /**

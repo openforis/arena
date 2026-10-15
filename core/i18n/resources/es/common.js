@@ -1589,6 +1589,10 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     searchConversations: 'Buscar conversaciones',
     historyNoMatch: 'Ninguna conversación coincide.',
     deleteConversation: 'Eliminar conversación',
+    deleteConversationConfirm: '¿Eliminar esta conversación? No se puede deshacer.',
+    discardConfirm: '¿Descartar estos cambios propuestos? No se aplicarán.',
+    deleteConversationFailed: 'No se pudo eliminar la conversación.',
+    deleteAllFailed: 'No se pudieron eliminar las conversaciones.',
     day: {
       today: 'Hoy',
       yesterday: 'Ayer',
@@ -1668,6 +1672,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       applySelected: 'Aplicar selección',
       discard: 'Descartar',
       discarded: 'Descartado.',
+      applyFailed: 'No se pudieron aplicar los cambios: {{message}}',
       saveCurrentEditFirst: 'Primero guarde o cancele su edición actual.',
       selectOperation: 'Aplicar este cambio',
       empty: '(vacío)',
@@ -1684,6 +1689,14 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       reviewAll: 'Revisar todo ({{count}})',
       applyAll: 'Aplicar todo',
       applySelectedCount: 'Aplicar seleccionados ({{count}})',
+      confirm: {
+        title: 'Confirmar Aplicar todo',
+        text: 'No ha abierto la revisión. Cambios a aplicar: {{count}}',
+        review: 'Revisar primero',
+        apply: 'Aplicar ({{count}})',
+        cancel: 'Cancelar',
+      },
+      behaviourUnselected: 'Los cambios en expresiones o propiedades no se seleccionan hasta que los revise: {{count}}',
       review: {
         title: 'Revisar los cambios propuestos',
         search: 'Buscar cambios',

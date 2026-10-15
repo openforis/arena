@@ -39,3 +39,13 @@ export const useShowNodeDef = (): ((nodeDefUuid: string) => void) => {
     [cycle, dispatch, navigate, pathname, survey, viewMode]
   )
 }
+
+/**
+ * Returns a function that tells whether a node definition exists in the survey now (a proposed one doesn't yet, and
+ * a deleted one is gone): only those can be shown in the form designer.
+ * @returns {Function} Takes the item uuid.
+ */
+export const useNodeDefExists = (): ((nodeDefUuid: string) => boolean) => {
+  const survey = useSurvey()
+  return useCallback((nodeDefUuid: string) => Boolean(Survey.getNodeDefByUuid(nodeDefUuid)(survey)), [survey])
+}

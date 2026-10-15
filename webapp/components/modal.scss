@@ -18,6 +18,11 @@ $borderRadius: 2px;
   box-shadow: $shadow3;
 }
 
+// fixed-width dialogs: the default 20vw side margins pin them to the left, so center them instead
+.modal--centered .modal-content {
+  margin: 10vh auto auto;
+}
+
 .modal-header {
   border-top-left-radius: $borderRadius;
   border-top-right-radius: $borderRadius;

@@ -7,7 +7,7 @@ import { AiWorkflows, getAiErrorKey, getAiErrorMessage, isAiAbortError } from '@
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
-import Markdown from '@webapp/components/markdown'
+import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
@@ -82,7 +82,7 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
         <div className="ai-explain-panel__expression">{expression}</div>
 
         <div className={`ai-explain-panel__body${done ? '' : ' ai-explain-panel__cursor'}`}>
-          {text && <Markdown source={text} />}
+          {text && <AssistantMarkdown text={text} />}
           {!text && !done && i18n.t('aiExpression.explain.thinking')}
         </div>
 
