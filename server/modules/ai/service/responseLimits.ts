@@ -3,10 +3,27 @@
  * it could fill the memory of the server with one endless body.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
+import { AiLimits } from '@common/ai/limits'
 
 type FetchLike = (input: any, init?: any) => Promise<Response>
 
 const tooLarge = () => new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
+
+/**
+ * Returns the caps on a provider answer for a configured limit of output tokens: AiLimits.provider* are the floors,
+ * and a bigger limit raises them, so a legitimate answer of the longest size the server allows is never cut.
+ * @param {number} maxOutputTokens - The AI_MAX_OUTPUT_TOKENS of the server.
+ * @returns {{maxResponseBytes: number, maxFrameChars: number}} The caps on the whole answer and on one SSE frame.
+ */
+export const getProviderResponseLimits = (
+  maxOutputTokens: number
+): { maxResponseBytes: number; maxFrameChars: number } => {
+  const tokens = Number.isFinite(maxOutputTokens) && maxOutputTokens > 0 ? maxOutputTokens : 0
+  return {
+    maxResponseBytes: Math.max(AiLimits.providerResponseMaxBytes, tokens * AiLimits.providerBytesPerOutputToken),
+    maxFrameChars: Math.max(AiLimits.providerFrameMaxChars, tokens * AiLimits.providerFrameCharsPerOutputToken),
+  }
+}
 
 /**
  * Wraps a response so that reading its body fails once more than `maxBytes` came through (the upstream is cancelled).
