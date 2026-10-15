@@ -5,7 +5,8 @@ import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { AiProviderEntry, AiProviderStatus } from '@webapp/ai/engines/types'
 
 import type { AiSettings, TFunction } from './aiSettingsForm'
-import type { ProviderDialogContext } from './ProviderDialog/useProviderDialog'
+import { getProviderNameText } from './providerNames'
+import type { ProviderDialogContext } from './ProviderDialog/providerDialogState'
 import type { StatusPillTone } from './StatusPill'
 
 export type ProviderWhereKey = 'onDevice' | 'orgHosted' | 'cloudOwnKey' | 'cloud'
@@ -63,9 +64,10 @@ export const getProviderMonogramType = (entry: Pick<AiProviderEntry, 'kind' | 't
   entry.kind === 'arenaDefault' ? ARENA_DEFAULT_MONOGRAM : entry.type
 
 /**
- * Returns the name shown for a provider (Arena default is translated; the others are the user's names).
+ * Returns the name shown for a provider (Arena default and the default names of the types are translated; the others
+ * are the user's names).
  * @param {object} params - Parameters.
- * @param {Pick<AiProviderEntry, 'kind'|'name'>} params.entry - Provider entry.
+ * @param {Pick<AiProviderEntry, 'kind'|'name'|'type'>} params.entry - Provider entry.
  * @param {TFunction} params.t - Translation function.
  * @returns {string} The name.
  */
@@ -73,9 +75,12 @@ export const getProviderDisplayName = ({
   entry,
   t,
 }: {
-  entry: Pick<AiProviderEntry, 'kind' | 'name'>
+  entry: Pick<AiProviderEntry, 'kind' | 'name' | 'type'>
   t: TFunction
-}): string => (entry.kind === 'arenaDefault' ? t('userAiSettings:list.arenaDefault') : entry.name)
+}): string =>
+  entry.kind === 'arenaDefault'
+    ? t('userAiSettings:list.arenaDefault')
+    : getProviderNameText({ name: entry.name, providerType: entry.type, t })
 
 /**
  * Returns the ⋯ menu actions of a row.

@@ -4,32 +4,23 @@ import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSet
 import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
-import { Button as ButtonJS } from '@webapp/components/buttons'
-import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
+import { Button } from '@webapp/components/buttons'
+import { FormItem, Input } from '@webapp/components/form/Input'
 import { Spinner } from '@webapp/components/Spinner'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
-import type { ProviderDialogApi } from './useProviderDialog'
-
-// forwardRef components lose their prop types in TS (same cast as the panel)
-const Input = InputJS as React.ComponentType<any>
-const Button = ButtonJS as React.ComponentType<any>
-
-type Props = {
-  dialog: ProviderDialogApi
-}
+import { useT } from '../useT'
 
 /**
  * "Answered" pill with the data location, the context size and the no-model warning.
  * @param {object} props - Props.
  * @param {LocalServerTestView} props.view - A reachable result.
- * @param {ProviderDialogApi} props.dialog - Dialog API.
  * @returns {React.ReactElement} The lines.
  */
-const LocalAnswered = ({ view, dialog }: { view: LocalServerTestView; dialog: ProviderDialogApi }) => {
-  const { t } = dialog
+const LocalAnswered = ({ view }: { view: LocalServerTestView }) => {
+  const t = useT()
   const location = getAiDataLocationText({
     location: { hostingClass: view.hostingClass, provider: null, model: null, engine: null },
     t,
@@ -54,18 +45,18 @@ const LocalAnswered = ({ view, dialog }: { view: LocalServerTestView; dialog: Pr
 
 /**
  * Result of the local test (or of the app's last probe of the saved server).
- * @param {Props} props - Props.
+ * @param {object} props - Props.
+ * @param {LocalServerTestView|null} props.view - The result, null before a test.
  * @returns {React.ReactElement|null} The result.
  */
-const LocalTestResult = ({ dialog }: Props) => {
+const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
   const i18n = useI18n()
-  const view = dialog.test?.local
+  const t = useT()
   if (!view) return null
-  const { t } = dialog
   return (
     <div className="provider-dialog__result">
       {view.reachable ? (
-        <LocalAnswered view={view} dialog={dialog} />
+        <LocalAnswered view={view} />
       ) : (
         <StatusPill
           tone="bad"
@@ -83,28 +74,51 @@ const LocalTestResult = ({ dialog }: Props) => {
   )
 }
 
+type Props = {
+  baseUrl: string
+  model: string
+  // the models of the server's answer, with the chosen one first when it is not listed
+  models: string[]
+  test: LocalServerTestView | null
+  testing: boolean
+  canTest: boolean
+  onBaseUrlChange: (baseUrl: string) => void
+  onModelChange: (model: string) => void
+  onTest: () => void
+}
+
 /**
  * Step 2 for a Local server: URL with Test, the result, the Model select and the setup help.
  * @param {Props} props - Props.
  * @returns {React.ReactElement} The fields.
  */
-export const LocalProviderFields = ({ dialog }: Props) => {
-  const { t, draft, testing } = dialog
+export const LocalProviderFields = ({
+  baseUrl,
+  model,
+  models,
+  test,
+  testing,
+  canTest,
+  onBaseUrlChange,
+  onModelChange,
+  onTest,
+}: Props) => {
+  const t = useT()
   return (
     <>
       <FormItem label="userAiSettings:localServer.baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
         <div className="provider-dialog__row">
           <Input
-            value={draft.baseUrl}
+            value={baseUrl}
             id={TestId.ai.providerBaseUrl}
-            onChange={dialog.setBaseUrl}
+            onChange={onBaseUrlChange}
             placeholder={DEFAULT_LOCAL_SERVER_BASE_URL}
           />
           <Button
             variant="outlined"
             label="userAiSettings:dialog.test"
-            onClick={dialog.runTest}
-            disabled={!dialog.canTest}
+            onClick={onTest}
+            disabled={!canTest}
             icon={testing ? <Spinner size={16} /> : null}
             testId={TestId.ai.providerTest}
           />
@@ -112,18 +126,18 @@ export const LocalProviderFields = ({ dialog }: Props) => {
       </FormItem>
       {/* always rendered, so a screen reader announces the result when it appears */}
       <div role="status" className="provider-dialog__live">
-        <LocalTestResult dialog={dialog} />
+        <LocalTestResult view={test} />
       </div>
       <FormItem label="userAiSettings:localServer.model" htmlFor={TestId.ai.providerModel}>
         <select
           id={TestId.ai.providerModel}
           className="provider-dialog__select"
-          value={draft.model}
-          onChange={(event) => dialog.setModel(event.target.value)}
+          value={model}
+          onChange={(event) => onModelChange(event.target.value)}
           data-testid={TestId.ai.providerModel}
         >
           <option value="">{t('userAiSettings:localServer.modelPlaceholder')}</option>
-          {dialog.localModels.map((modelId) => (
+          {models.map((modelId) => (
             <option key={modelId} value={modelId}>
               {modelId}
             </option>
