@@ -18,18 +18,24 @@ export type PurgeSurveyAiDataDeps = {
 /**
  * Creates the purge of a deleted survey's AI data.
  * @param {PurgeSurveyAiDataDeps} deps - The stores and the log.
- * @returns {Function} The purge: it never rejects (the deletion of the survey does not depend on it).
+ * @returns {Function} The purge: it never rejects (the deletion of the survey does not depend on it), and a step that
+ * fails does not stop the others.
  */
 export const createPurgeSurveyAiData =
   ({ getConversationStore: openStore, openConversations, suggestions, log }: PurgeSurveyAiDataDeps) =>
   async (surveyId: number): Promise<void> => {
     // the ids first: one left behind would point to a deleted conversation
-    openConversations.clearSurvey(surveyId)
-    suggestions.removeSurvey(surveyId)
-    try {
-      await (await openStore()).removeSurvey(surveyId)
-    } catch (error) {
-      log(`The conversations of survey ${surveyId} could not be deleted from this browser`, error)
+    const steps: [what: string, run: () => unknown][] = [
+      ['open conversations', () => openConversations.clearSurvey(surveyId)],
+      ['suggestions', () => suggestions.removeSurvey(surveyId)],
+      ['conversations', async () => (await openStore()).removeSurvey(surveyId)],
+    ]
+    for (const [what, run] of steps) {
+      try {
+        await run()
+      } catch (error) {
+        log(`The ${what} of survey ${surveyId} could not be deleted from this browser`, error)
+      }
     }
   }
 
