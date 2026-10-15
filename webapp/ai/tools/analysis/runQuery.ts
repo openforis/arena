@@ -1,16 +1,13 @@
 import { z } from 'zod'
 
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
 import { getQueryResultColumns, toResultRows } from './queryResult'
-import {
-  canViewCurrentSurvey,
-  fitListToBudget,
-  getAnalysisContext,
-  toolError,
-  toRequestErrorResult,
-} from './toolResults'
+import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const aggregateRowsMax = 200
 export const rawRowsMax = 50
@@ -22,20 +19,23 @@ const inputSchema = z.object({
 type Input = z.infer<typeof inputSchema>
 
 /**
- * Returns the error for a query id that was not proposed in this conversation.
+ * Returns the failure for a query id that was not proposed in this conversation.
  * @param {string} queryId - The id.
- * @returns {object} The error result.
+ * @returns {AiToolFailure} The failure to throw.
  */
 const unknownQuery = (queryId: string) =>
-  toolError('unknownQuery', `Unknown query "${queryId}": propose it with query_propose and use the returned queryId`)
+  new AiToolFailure(
+    'unknownQuery',
+    `Unknown query "${queryId}": propose it with query_propose and use the returned queryId`
+  )
 
 /**
- * Turns an expected request failure into a result the model can act on; other errors are re-thrown.
+ * Turns an expected request failure into a failure the model can act on.
  * @param {any} error - The error.
- * @returns {object} The error result.
+ * @returns {Error} The error to throw.
  */
-const handleQueryError = (error: any) =>
-  toRequestErrorResult(error, 'The query took too long. Aggregate the data or add a filter, then propose a new query.')
+const toQueryFailure = (error: any) =>
+  toRequestFailure(error, 'The query took too long. Aggregate the data or add a filter, then propose a new query.')
 
 /**
  * Returns the request parameters of a stored query.
@@ -70,11 +70,10 @@ const fetchCappedRows = async ({ api, requestParams, max }: { api: AnalysisApi; 
  * @returns {AiTool[]} The two tools.
  */
 export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input, unknown>[] => {
-  const common: Pick<AiTool<Input>, 'inputSchema' | 'area' | 'dataClass' | 'effect' | 'requires'> = {
+  const common: Pick<AiTool<Input>, 'inputSchema' | 'area' | 'dataClass' | 'requires'> = {
     inputSchema,
     area: ['analysis', 'cleaning'],
     dataClass: 'data',
-    effect: 'read',
     requires: canViewCurrentSurvey,
   }
 
@@ -90,12 +89,12 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
      */
     execute: async ({ queryId }, ctx) => {
       const entry = ctx.analysisQueries?.get(queryId)
-      if (!entry) return unknownQuery(queryId)
+      if (!entry) throw unknownQuery(queryId)
       try {
         const total = await api.fetchQueryCount(getRequestParams(ctx, entry))
         return { queryId, mode: entry.mode, total }
       } catch (error) {
-        return handleQueryError(error)
+        throw toQueryFailure(error)
       }
     },
   }
@@ -114,7 +113,7 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
      */
     execute: async ({ queryId }, ctx) => {
       const entry = ctx.analysisQueries?.get(queryId)
-      if (!entry) return unknownQuery(queryId)
+      if (!entry) throw unknownQuery(queryId)
       const max = entry.mode === 'aggregate' ? aggregateRowsMax : rawRowsMax
       try {
         const { rows, total, truncated } = await fetchCappedRows({
@@ -133,7 +132,7 @@ export const createRunQueryTools = ({ api }: { api: AnalysisApi }): AiTool<Input
         }
         return fitListToBudget(result, 'rows')
       } catch (error) {
-        return handleQueryError(error)
+        throw toQueryFailure(error)
       }
     },
   }

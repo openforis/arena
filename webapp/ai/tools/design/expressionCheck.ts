@@ -5,15 +5,19 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { checkNodeDefExpression } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
+import { applyIfTextSchema, expressionTextSchema } from '../common/toolSchemas'
 import type { AiTool } from '../types'
-import { canViewSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
-type ExpressionCheckInput = {
-  nodeDefName: string
-  prop: (typeof nodeDefExpressionProps)[number]
-  expression: string
-  applyIf?: string
-}
+const inputSchema = z.object({
+  nodeDefName: z.string().min(1).max(100).describe('Node definition the expression belongs to'),
+  prop: z.enum(nodeDefExpressionProps).describe('Expression property'),
+  expression: expressionTextSchema,
+  applyIf: applyIfTextSchema.optional().describe('Optional condition: the expression applies only when true'),
+})
+
+type ExpressionCheckInput = z.infer<typeof inputSchema>
 
 export const expressionCheckTool: AiTool<ExpressionCheckInput> = {
   name: 'expression_check',
@@ -21,16 +25,10 @@ export const expressionCheckTool: AiTool<ExpressionCheckInput> = {
     'Checks an Arena expression (JavaScript-like syntax; refer to node definitions by name) as the expression ' +
     'editor does, in the context of a node definition property. Returns { ok: true } or { ok: false, errors }. ' +
     'Check every expression before proposing it.',
-  inputSchema: z.object({
-    nodeDefName: z.string().min(1).max(100).describe('Node definition the expression belongs to'),
-    prop: z.enum(nodeDefExpressionProps).describe('Expression property'),
-    expression: z.string().min(1).max(4000),
-    applyIf: z.string().max(4000).optional().describe('Optional condition: the expression applies only when true'),
-  }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ nodeDefName, prop, expression, applyIf }, ctx) => {
     const survey = requireSurvey(ctx)
     const nodeDef = requireNodeDefByName(survey, nodeDefName)

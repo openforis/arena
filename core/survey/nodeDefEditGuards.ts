@@ -7,6 +7,43 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 /**
+ * Tells whether a node definition is locked by publication: it was published and the survey is not a template.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey.
+ * @param {object} params.nodeDef - Node definition.
+ * @returns {boolean} True when published and not in a template.
+ */
+export const isLockedByPublication = ({ survey, nodeDef }: { survey: any; nodeDef: any }): boolean =>
+  NodeDef.isPublished(nodeDef) && !Survey.isTemplate(Survey.getSurveyInfo(survey))
+
+/**
+ * Returns the reference props of a props update (category of a code attribute, taxonomy of a taxon attribute) that
+ * the designer would not let change: a published attribute keeps its category and taxonomy (except in a template),
+ * because its records already hold values of them. A value equal to the current one is not a change.
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey.
+ * @param {object} params.nodeDef - Node definition before the update.
+ * @param {object} params.props - Props about to be saved.
+ * @returns {string[]} The locked props that change, in `categoryUuid`, `taxonomyUuid` order.
+ */
+export const getLockedRefPropsChanged = ({
+  survey,
+  nodeDef,
+  props,
+}: {
+  survey: any
+  nodeDef: any
+  props: Record<string, unknown>
+}): string[] => {
+  if (!nodeDef || !isLockedByPublication({ survey, nodeDef })) return []
+  const current: Record<string, unknown> = {
+    [NodeDef.propKeys.categoryUuid]: NodeDef.getCategoryUuid(nodeDef) ?? null,
+    [NodeDef.propKeys.taxonomyUuid]: NodeDef.getTaxonomyUuid(nodeDef) ?? null,
+  }
+  return Object.keys(current).filter((key) => key in props && (props[key] ?? null) !== current[key])
+}
+
+/**
  * Tells whether the designer disables the "multiple" control of a node definition.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey.
@@ -24,7 +61,7 @@ export const isMultipleEditDisabled = ({
   cycle: string
 }): boolean =>
   !nodeDef ||
-  (NodeDef.isPublished(nodeDef) && !Survey.isTemplate(Survey.getSurveyInfo(survey))) ||
+  isLockedByPublication({ survey, nodeDef }) ||
   NodeDef.isKey(nodeDef) ||
   NodeDefLayout.isRenderTable(cycle)(nodeDef) ||
   Survey.isNodeDefParentCode(nodeDef)(survey) ||

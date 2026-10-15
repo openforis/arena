@@ -102,7 +102,6 @@ describe('categoryItems_listMissingLabels (233)', () => {
     })
     expect(categoryItemsListMissingLabelsTool).toMatchObject({
       name: 'categoryItems_listMissingLabels',
-      effect: 'read',
       dataClass: 'schema',
       area: ['design'],
     })

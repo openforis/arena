@@ -1,11 +1,11 @@
 /**
- * Node definition lookup for the design tools. The model refers to node definitions by name; names are resolved by
- * scanning the array (the name index of a draft survey may be stale after a rename).
+ * Node definition helpers of the design tools (the lookup by name is shared: ../common/nodeDefLookup).
  */
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
+import { findNodeDefByName, getCurrentNodeDefs, isCurrentNodeDef } from '../common/nodeDefLookup'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
 
@@ -14,18 +14,14 @@ import type { AiToolContext } from '../types'
  * @param {object} nodeDef - Node definition.
  * @returns {boolean} True when it is a design node definition.
  */
-export const isDesignNodeDef = (nodeDef: any): boolean =>
-  !NodeDef.isAnalysis(nodeDef) &&
-  !NodeDef.isVirtual(nodeDef) &&
-  !NodeDef.isLayoutElement(nodeDef) &&
-  !NodeDef.isDeleted(nodeDef)
+export const isDesignNodeDef = (nodeDef: any): boolean => isCurrentNodeDef(nodeDef)
 
 /**
  * Returns the design node definitions of the survey.
  * @param {object} survey - Survey.
  * @returns {object[]} The node definitions.
  */
-export const getDesignNodeDefs = (survey: any): any[] => Survey.getNodeDefsArray(survey).filter(isDesignNodeDef)
+export const getDesignNodeDefs = (survey: any): any[] => getCurrentNodeDefs(survey)
 
 /**
  * Groups node definitions by parent uuid (null for the root).
@@ -63,15 +59,6 @@ const depthFirst = (childrenByParent: Map<string | null, any[]>): any[] => {
  * @returns {object[]} The node definitions.
  */
 export const getDesignNodeDefsDepthFirst = (survey: any): any[] => depthFirst(groupByParent(getDesignNodeDefs(survey)))
-
-/**
- * Returns the node definition with the given name, or null.
- * @param {object} survey - Survey.
- * @param {string} name - Name.
- * @returns {object|null} The node definition.
- */
-export const findNodeDefByName = (survey: any, name: string): any | null =>
-  getDesignNodeDefs(survey).find((nodeDef) => NodeDef.getName(nodeDef) === name) ?? null
 
 /**
  * Returns the edit distance between two strings.
@@ -189,17 +176,3 @@ export const toExpressionView = (expression: any) => {
     ...(Object.keys(messages).length > 0 ? { messages } : {}),
   }
 }
-
-/**
- * Returns true when a survey is open and the user may view it.
- * @param {AiToolContext} ctx - Tool context.
- * @returns {boolean} True when allowed.
- */
-export const canViewSurveyTool = (ctx: AiToolContext): boolean => ctx.survey !== null && ctx.canViewSurvey
-
-/**
- * Returns true when a survey is open and the user may edit it.
- * @param {AiToolContext} ctx - Tool context.
- * @returns {boolean} True when allowed.
- */
-export const canEditSurveyTool = (ctx: AiToolContext): boolean => ctx.survey !== null && ctx.canEditSurvey

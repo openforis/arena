@@ -10,14 +10,13 @@ const makeTool = (name: string, overrides: Partial<AiTool> = {}): AiTool => ({
   inputSchema: z.object({ text: z.string().describe('Text to look for') }),
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: () => true,
   execute: async () => ({ ok: true }),
   ...overrides,
 })
 
 const readTool = makeTool('design_read')
-const editTool = makeTool('design_propose', { effect: 'propose', requires: (ctx) => ctx.canEditSurvey })
+const editTool = makeTool('design_propose', { requires: (ctx) => ctx.canEditSurvey })
 const helpTool = makeTool('help_read', { area: ['help', 'design'] })
 const dataTool = makeTool('data_read', { area: ['design'], dataClass: 'data' })
 const tools = [readTool, editTool, helpTool, dataTool]

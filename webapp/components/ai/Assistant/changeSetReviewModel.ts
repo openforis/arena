@@ -8,7 +8,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import type { ChangeOperation, ChangeSetCardState, OperationResult } from '@webapp/ai/changeSets/types'
 
 import { buildCategoryLabelGroups } from './categoryLabelCardModel'
-import { buildCardRows, findNodeDefName, type CardValue } from './changeSetCardModel'
+import { buildCardRows, findNodeDefName, type CardDetail, type CardValue } from './changeSetCardModel'
 
 // up to this many changes the card lists them in the chat
 export const COMPACT_CARD_MAX_INLINE = 5
@@ -27,6 +27,8 @@ export type ReviewItem = {
   field: { key: string; params: Record<string, string> }
   from: CardValue | null
   to: CardValue
+  // what a new node definition sets besides its type, name and label
+  details?: CardDetail[]
   result: OperationResult | null
   // entity:<uuid> or category:<uuid>
   groupKey: string
@@ -101,6 +103,7 @@ export const buildReviewItems = ({
       field: { key: row.titleKey, params: row.titleParams },
       from: row.from,
       to: row.to,
+      details: row.details,
       result: row.result,
       groupKey: `entity:${entityUuid}`,
       groupName: findNodeDefName(entityUuid, changeSet, survey),

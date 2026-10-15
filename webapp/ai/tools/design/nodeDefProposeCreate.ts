@@ -5,9 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { assistantNodeDefTypes, createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool, AiToolContext } from '../types'
 import { proposeChangeSet, summarySchema, textItemSchema, toTextMap } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 const newNodeDefSchema = z.object({
   parentName: z
@@ -28,9 +29,11 @@ const newNodeDefSchema = z.object({
   readOnly: z.boolean().optional(),
 })
 
+const inputSchema = z.object({ summary: summarySchema, nodeDefs: z.array(newNodeDefSchema).min(1).max(20) })
+
 type NewNodeDefInput = z.infer<typeof newNodeDefSchema>
 
-type CreateInput = { summary: string; nodeDefs: NewNodeDefInput[] }
+type CreateInput = z.infer<typeof inputSchema>
 
 /**
  * Converts the model's node definitions to create operations; a parent may be created earlier in the list.
@@ -47,7 +50,6 @@ const toCreateDrafts = (nodeDefs: NewNodeDefInput[], ctx: AiToolContext): Change
     const nodeDef = createProposedNodeDef({
       parent,
       type: item.type,
-      cycle: ctx.cycle ?? '0',
       name: item.name,
       labels: toTextMap(item.labels),
       descriptions: toTextMap(item.descriptions),
@@ -67,11 +69,10 @@ export const nodeDefProposeCreateTool: AiTool<CreateInput> = {
     'Proposes new node definitions (entities or attributes of type text, integer, decimal, boolean, date, time, ' +
     'coordinate). The proposal is validated like the form designer does and shown to the user as a card; nothing ' +
     'is saved until the user applies it. On invalidProposal, fix the listed issues and call again.',
-  inputSchema: z.object({ summary: summarySchema, nodeDefs: z.array(newNodeDefSchema).min(1).max(20) }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, nodeDefs }, ctx) =>
     proposeChangeSet({ ctx, drafts: toCreateDrafts(nodeDefs, ctx), summary }),
 }

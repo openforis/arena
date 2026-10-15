@@ -1,6 +1,7 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
+import { uuidv4 } from '@core/uuid'
 
 import { createRecordGetValuesTool } from '@webapp/ai/tools/cleaning/recordGetValuesTool'
 import { findRecordUuidByKeys } from '@webapp/ai/tools/cleaning/recordLookup'
@@ -76,8 +77,8 @@ describe('findRecordUuidByKeys', () => {
   })
 
   test('refuses names that are not the record keys', async () => {
-    expect(await lookup({ plot_id: '1' }).result).toMatchObject({ error: { code: 'recordKeysInvalid' } })
-    expect(await lookup({}).result).toMatchObject({ error: { code: 'recordKeysInvalid' } })
+    await expect(lookup({ plot_id: '1' }).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })
+    await expect(lookup({}).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })
   })
 
   describe('paging', () => {
@@ -95,28 +96,24 @@ describe('findRecordUuidByKeys', () => {
 
     test('a duplicate on the second page is ambiguous', async () => {
       const { api } = pagedApi([[summaries[0], ...fullPage('a').slice(1)], [{ ...summaries[0], uuid: 'dup' }]])
-      expect(await findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })).toMatchObject(
-        {
-          error: { code: 'recordAmbiguous' },
-        }
-      )
+      await expect(
+        findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })
+      ).rejects.toMatchObject({ code: 'recordAmbiguous' })
     })
 
     test('stops at the page cap with recordSearchTooBroad', async () => {
       const { api, calls } = pagedApi([1, 2, 3, 4, 5, 6].map((n) => fullPage(`p${n}`)))
-      expect(await findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })).toMatchObject(
-        {
-          error: { code: 'recordSearchTooBroad' },
-        }
-      )
+      await expect(
+        findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })
+      ).rejects.toMatchObject({ code: 'recordSearchTooBroad' })
       expect(calls).toHaveLength(5)
     })
   })
 
   test('not found and ambiguous', async () => {
-    expect(await lookup({ cluster_id: '7' }).result).toMatchObject({ error: { code: 'recordNotFound' } })
+    await expect(lookup({ cluster_id: '7' }).result).rejects.toMatchObject({ code: 'recordNotFound' })
     const duplicates = [summaries[0], { ...summaries[0], uuid: 'r-12-bis' }]
-    expect(await lookup({ cluster_id: '12' }, duplicates).result).toMatchObject({ error: { code: 'recordAmbiguous' } })
+    await expect(lookup({ cluster_id: '12' }, duplicates).result).rejects.toMatchObject({ code: 'recordAmbiguous' })
   })
 })
 
@@ -127,7 +124,7 @@ describe('record_getValues tool', () => {
       fetchRecordAndNodes: () => record,
     })
     const tool = createRecordGetValuesTool({ api, getI18n: () => fakeI18n })
-    expect(tool).toMatchObject({ name: 'record_getValues', dataClass: 'data', effect: 'read', area: ['cleaning'] })
+    expect(tool).toMatchObject({ name: 'record_getValues', dataClass: 'data', area: ['cleaning'] })
     const result = await runTool(
       tool,
       { recordKeys: { cluster_id: '12' }, attributes: ['dbh'] },
@@ -146,10 +143,10 @@ describe('record_getValues tool', () => {
     const tool = createRecordGetValuesTool({ api, getI18n: () => fakeI18n })
     const ctx = newCleaningToolContext({ survey })
     expect(await runTool(tool, { attributes: ['dbh'] }, ctx)).toMatchObject({ error: { code: 'recordRequired' } })
-    expect(await runTool(tool, { recordUuid: 'r', attributes: ['nope'] }, ctx)).toMatchObject({
+    expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['nope'] }, ctx)).toMatchObject({
       error: { code: 'unknownAttribute' },
     })
-    expect(await runTool(tool, { recordUuid: 'r', attributes: ['dbh'] }, ctx)).toMatchObject({
+    expect(await runTool(tool, { recordUuid: uuidv4(), attributes: ['dbh'] }, ctx)).toMatchObject({
       error: { code: 'recordNotAvailable' },
     })
   })

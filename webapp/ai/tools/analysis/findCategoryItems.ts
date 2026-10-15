@@ -7,16 +7,14 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Authorizer from '@core/auth/authorizer'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
+import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import {
-  canViewCurrentSurvey,
-  fitListToBudget,
-  getAnalysisContext,
-  toolError,
-  toRequestErrorResult,
-} from './toolResults'
+import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const categoryItemsMax = 20
 
@@ -71,10 +69,10 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
    * @returns {Promise<object>} The items or an error.
    */
   const execute = async ({ attribute, search }: Input, ctx: any) => {
-    const { survey, lang } = getAnalysisContext(ctx)
-    const nodeDef = Survey.findNodeDefByName(attribute)(survey)
+    const { survey, lang, includeAnalysis } = getAnalysisContext(ctx)
+    const nodeDef = findNodeDefByName(survey, attribute, { includeAnalysis })
     if (!nodeDef || !NodeDef.isCode(nodeDef)) {
-      return toolError('notCodeAttribute', `"${attribute}" is not a code attribute`)
+      throw new AiToolFailure('notCodeAttribute', `"${attribute}" is not a code attribute`)
     }
     const category = Survey.getCategoryByUuid(NodeDef.getCategoryUuid(nodeDef))(survey)
     const text = (search ?? '').trim().toLowerCase()
@@ -82,10 +80,10 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
     try {
       items = await fetchItems({ ctx, nodeDef, category, search: text })
     } catch (error) {
-      return toRequestErrorResult(error, 'The search took too long. Use a more specific search text.')
+      throw toRequestFailure(error, 'The search took too long. Use a more specific search text.')
     }
     if (!items) {
-      return toolError(
+      throw new AiToolFailure(
         'largeCategoryLevel',
         `The category of "${attribute}" is too large to search below its first level; filter on a parent code attribute instead`
       )
@@ -112,7 +110,6 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
     inputSchema,
     area: ['analysis'],
     dataClass: 'schema',
-    effect: 'read',
     requires: canViewCurrentSurvey,
     execute,
   }

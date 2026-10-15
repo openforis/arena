@@ -151,7 +151,6 @@ describe('getHistoryBudget', () => {
       inputSchema: z.object({ text: z.string() }),
       area: ['design'],
       dataClass: 'schema',
-      effect: 'read',
       requires: () => true,
       execute: async () => null,
     }

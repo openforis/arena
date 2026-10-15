@@ -1,16 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Authorizer from '@core/auth/authorizer'
 
+import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
 import type { AiToolContext } from '@webapp/ai/tools/types'
-
-/**
- * Returns true when a survey is open and the user can cleanse its records (the cleaning area's permission).
- * @param {AiToolContext} ctx - Tool context.
- * @returns {boolean} Whether the cleaning tools can run.
- */
-export const canCleanseCurrentSurvey = (ctx: AiToolContext): boolean =>
-  !!ctx.survey && Authorizer.canCleanseRecords(ctx.user, Survey.getSurveyInfo(ctx.survey))
 
 /**
  * Returns the values every cleaning tool needs.
@@ -24,7 +16,7 @@ export const getCleaningContext = (ctx: AiToolContext) => {
 }
 
 /**
- * Finds the attribute definitions with the given names.
+ * Finds the (current, not analysis) attribute definitions with the given names.
  * @param {object} params - Parameters.
  * @param {object} params.survey - The survey.
  * @param {string[]} params.names - Attribute names.
@@ -34,8 +26,7 @@ export const resolveAttributeDefs = ({ survey, names }: { survey: any; names: st
   const nodeDefs: any[] = []
   const unknownNames: string[] = []
   for (const name of names) {
-    // getNodeDefByName throws for an unknown name
-    const nodeDef = Survey.getNodeDefsArray(survey).find((def: any) => NodeDef.getName(def) === name)
+    const nodeDef = findNodeDefByName(survey, name)
     if (nodeDef && NodeDef.isAttribute(nodeDef)) nodeDefs.push(nodeDef)
     else unknownNames.push(name)
   }

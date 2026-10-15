@@ -5,17 +5,13 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { getBasicPropValue, getUpdatePropValue } from '@webapp/ai/changeSets/operations'
-import {
-  nodeDefBasicProps,
-  type ChangeOperationDraft,
-  type NodeDefBasicProp,
-  type NodeDefRefProp,
-} from '@webapp/ai/changeSets/types'
+import { nodeDefBasicProps, type ChangeOperationDraft, type NodeDefRefProp } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 // the model names categories and taxonomies; operations keep uuids
 const refInputProps = ['categoryName', 'taxonomyName'] as const
@@ -24,9 +20,23 @@ type RefInputProp = (typeof refInputProps)[number]
 
 const updateInputProps = [...nodeDefBasicProps, ...refInputProps] as const
 
-type UpdateChange = { nodeDefName: string; prop: NodeDefBasicProp | RefInputProp; value?: string | boolean }
+const inputSchema = z.object({
+  summary: summarySchema,
+  changes: z
+    .array(
+      z.object({
+        nodeDefName: z.string().min(1).max(100),
+        prop: z.enum(updateInputProps),
+        value: z.union([z.string().min(1).max(100), z.boolean()]),
+      })
+    )
+    .min(1)
+    .max(50),
+})
 
-type UpdateInput = { summary: string; changes: UpdateChange[] }
+type UpdateInput = z.infer<typeof inputSchema>
+
+type UpdateChange = UpdateInput['changes'][number]
 
 type RefTarget = {
   prop: NodeDefRefProp
@@ -142,23 +152,10 @@ export const nodeDefProposeUpdateTool: AiTool<UpdateInput> = {
     'category of a code attribute, from categories_list) and taxonomyName (string: the taxonomy of a taxon ' +
     'attribute, from taxonomies_list). Shown to the user as a card; nothing is saved until the user applies it. ' +
     'Use the current names.',
-  inputSchema: z.object({
-    summary: summarySchema,
-    changes: z
-      .array(
-        z.object({
-          nodeDefName: z.string().min(1).max(100),
-          prop: z.enum(updateInputProps),
-          value: z.union([z.string().min(1).max(100), z.boolean()]),
-        })
-      )
-      .min(1)
-      .max(50),
-  }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, changes }, ctx) =>
     proposeChangeSet({ ctx, drafts: toUpdateDrafts(changes, ctx), summary }),
 }
