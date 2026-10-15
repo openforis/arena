@@ -25,13 +25,6 @@ export const toRequestFailure = (error: any, timeoutHint: string): Error => {
 }
 
 /**
- * Returns true when a survey is open and the user can view it (the Explorer's server permission).
- * @param {AiToolContext} ctx - Tool context.
- * @returns {boolean} Whether the analysis tools can run.
- */
-export const canViewCurrentSurvey = (ctx: AiToolContext): boolean => ctx.survey !== null && ctx.canViewSurvey
-
-/**
  * Returns the values every analysis tool needs.
  * @param {AiToolContext} ctx - Tool context.
  * @returns {object} Survey, survey id and info, cycle, query language and whether analysis attributes are included.

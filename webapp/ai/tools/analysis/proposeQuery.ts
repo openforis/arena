@@ -2,10 +2,11 @@ import { z } from 'zod'
 
 import { toQuery } from '@common/ai/tasks/dataQuery'
 
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 import { getQueryChartType } from '@webapp/store/dataExplorer/explorerQuery'
 
-import { canViewCurrentSurvey, getAnalysisContext } from './toolResults'
+import { getAnalysisContext } from './toolResults'
 
 const MAX_ISSUES = 10
 const MAX_ISSUE_CHARS = 300

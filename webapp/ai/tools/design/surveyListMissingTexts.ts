@@ -9,6 +9,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool } from '../types'
@@ -20,7 +21,7 @@ import {
   getTextNodeDefs,
   toTextTargetKey,
 } from './missingTexts'
-import { canViewSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
 export const MISSING_TEXTS_PAGE_MAX = 50
 // the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
@@ -250,7 +251,7 @@ export const surveyListMissingTextsTool: AiTool<MissingTextsInput, MissingTextsP
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async (input, ctx) =>
     listMissingTexts({
       survey: requireSurvey(ctx),

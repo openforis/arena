@@ -12,10 +12,11 @@ import {
   type NodeDefRefProp,
 } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 // the model names categories and taxonomies; operations keep uuids
 const refInputProps = ['categoryName', 'taxonomyName'] as const
@@ -158,7 +159,7 @@ export const nodeDefProposeUpdateTool: AiTool<UpdateInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, changes }, ctx) =>
     proposeChangeSet({ ctx, drafts: toUpdateDrafts(changes, ctx), summary }),
 }

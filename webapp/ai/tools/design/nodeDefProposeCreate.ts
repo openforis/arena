@@ -5,9 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { assistantNodeDefTypes, createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool, AiToolContext } from '../types'
 import { proposeChangeSet, summarySchema, textItemSchema, toTextMap } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 const newNodeDefSchema = z.object({
   parentName: z
@@ -70,7 +71,7 @@ export const nodeDefProposeCreateTool: AiTool<CreateInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, nodeDefs }, ctx) =>
     proposeChangeSet({ ctx, drafts: toCreateDrafts(nodeDefs, ctx), summary }),
 }

@@ -7,12 +7,14 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Authorizer from '@core/auth/authorizer'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
+import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
 import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import { canViewCurrentSurvey, getAnalysisContext, toRequestFailure } from './toolResults'
+import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const categoryItemsMax = 20
 
@@ -67,8 +69,8 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
    * @returns {Promise<object>} The items or an error.
    */
   const execute = async ({ attribute, search }: Input, ctx: any) => {
-    const { survey, lang } = getAnalysisContext(ctx)
-    const nodeDef = Survey.findNodeDefByName(attribute)(survey)
+    const { survey, lang, includeAnalysis } = getAnalysisContext(ctx)
+    const nodeDef = findNodeDefByName(survey, attribute, { includeAnalysis })
     if (!nodeDef || !NodeDef.isCode(nodeDef)) {
       throw new AiToolFailure('notCodeAttribute', `"${attribute}" is not a code attribute`)
     }

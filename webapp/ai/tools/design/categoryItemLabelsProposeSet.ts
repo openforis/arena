@@ -12,11 +12,12 @@ import { CATEGORY_ITEM_LABEL_TEXT_MAX } from '@common/ai/categoryItemLabels'
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { checkScope, requireCategory } from './categoryItemsListMissingLabels'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
-import { canEditSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
 type CategoryLabelItem = { categoryName: string; ref: string; lang: string; text: string }
 
@@ -88,7 +89,7 @@ export const categoryItemLabelsProposeSetTool: AiTool<CategoryLabelsInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, items }, ctx) => {
     const survey = requireSurvey(ctx)
     const drafts = items.map((item) => toDraft(item, survey, ctx))

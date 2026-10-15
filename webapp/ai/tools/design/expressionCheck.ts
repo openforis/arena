@@ -5,8 +5,9 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { checkNodeDefExpression } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool } from '../types'
-import { canViewSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 type ExpressionCheckInput = {
   nodeDefName: string
@@ -30,7 +31,7 @@ export const expressionCheckTool: AiTool<ExpressionCheckInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ nodeDefName, prop, expression, applyIf }, ctx) => {
     const survey = requireSurvey(ctx)
     const nodeDef = requireNodeDefByName(survey, nodeDefName)

@@ -3,6 +3,7 @@ import { Dates } from '@openforis/arena-core'
 
 import type { AiTool } from '@webapp/ai/tools/types'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
@@ -15,7 +16,7 @@ import {
 } from '@webapp/ai/tools/common/toolSchemas'
 
 import type { CleaningApi } from './cleaningApi'
-import { canCleanseCurrentSurvey, getCleaningContext } from './cleaningContext'
+import { getCleaningContext } from './cleaningContext'
 import { buildRecordEditProposal } from './recordEditProposal'
 import type { CleaningI18n } from './validationRows'
 

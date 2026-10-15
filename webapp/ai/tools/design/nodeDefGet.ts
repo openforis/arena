@@ -6,10 +6,10 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import type { AiTool } from '../types'
 import {
-  canViewSurveyTool,
   getDesignNodeDefs,
   getNodeDefPathNames,
   requireNodeDefByName,
@@ -114,7 +114,7 @@ export const nodeDefGetTool: AiTool<{ name: string }> = {
   area: ['design', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
     return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name), ctx.t)

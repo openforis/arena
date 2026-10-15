@@ -2,11 +2,12 @@ import { z } from 'zod'
 
 import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
 import { getQueryResultColumns, toResultRows } from './queryResult'
-import { canViewCurrentSurvey, getAnalysisContext, toRequestFailure } from './toolResults'
+import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const aggregateRowsMax = 200
 export const rawRowsMax = 50
