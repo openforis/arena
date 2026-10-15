@@ -88,11 +88,12 @@ const isSuggestionGone = async (page: Page, userUuid: string, id: string): Promi
       // no stored state yet: not gone, keep waiting
       if (!state) return false
       const pending: { id: string }[][] = Object.values(state.pending ?? {})
-      const dismissed: Record<string, Record<string, unknown>>[] = Object.values(state.dismissed ?? {})
+      // a dismissed entry is { kind, targets: { <target key>: <count or true> } }
+      const dismissed: Record<string, { targets?: Record<string, unknown> }>[] = Object.values(state.dismissed ?? {})
       const inProgress: Record<string, unknown>[] = Object.values(state.inProgress ?? {})
       return (
         !pending.some((bucket) => bucket.some((suggestion) => suggestion.id === suggestionId)) &&
-        !dismissed.some((bucket) => Object.keys(bucket[suggestionId] ?? {}).length > 0) &&
+        !dismissed.some((bucket) => Object.keys(bucket[suggestionId]?.targets ?? {}).length > 0) &&
         !inProgress.some((bucket) => suggestionId in bucket)
       )
     },

@@ -114,7 +114,8 @@ const readStoredSuggestion = (
         return {
           pending: (state.pending?.[bucket] ?? []).some((suggestion: { id: string }) => suggestion.id === suggestionId),
           inProgress: suggestionId in (state.inProgress?.[bucket] ?? {}),
-          dismissed: state.dismissed?.[bucket]?.[suggestionId] ?? {},
+          // a dismissed entry is { kind, targets: { <target key>: ... } }: the keys of `targets` are what was dismissed
+          dismissed: state.dismissed?.[bucket]?.[suggestionId]?.targets ?? {},
         }
       } catch {
         return null
