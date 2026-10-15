@@ -1,11 +1,10 @@
 /**
- * App wiring of the model resolver: current user, survey AI policy (B's cache), capabilities, consent dialog,
- * gateway model (A) and the lazily loaded local server engine.
+ * App wiring of the model resolver: current user, effective policy, capabilities, consent dialog,
+ * gateway model and the lazily loaded local server engine.
  */
 import { isConfigAiFeaturesEnabled } from '@webapp/store/system/info/state'
 import { store as reduxStore } from '@webapp/store/store'
-import { isSurveyScopedFeature } from '@webapp/ai/policy/aiFeatureAvailability'
-import { fetchSurveyAiPolicy } from '@webapp/ai/policy/surveyAiPolicyClient'
+import { getEffectivePolicyFor } from '@webapp/ai/policy/policyContext'
 import { getGatewayModel } from '@webapp/ai/runtime/getModel'
 
 import {
@@ -16,18 +15,14 @@ import {
 } from './capabilitiesStore'
 import { requestLocalServerConsent } from './consentRequests'
 import { getBrowserStorage } from './localServerSettings'
-import { type ModelResolverDeps, OFF_POLICY } from './resolveModel'
+import type { ModelResolverDeps } from './resolveModel'
 
 export const appModelResolverDeps: ModelResolverDeps = {
   getUserUuid: getCurrentUserUuid,
   isInstanceEnabled: () => isConfigAiFeaturesEnabled(reduxStore.getState()),
   getSettings: () => getAiCapabilitiesStore().getSettings(),
   loadCapabilities: loadAiCapabilities,
-  // like B: survey features use the survey's effective policy, the others (Help) the instance ceilings
-  getEffectivePolicy: async ({ surveyId, capabilities, feature, fresh }) => {
-    if (!isSurveyScopedFeature(feature)) return capabilities.instance.policyCeilings ?? OFF_POLICY
-    return surveyId ? (await fetchSurveyAiPolicy(surveyId, { fresh })).effective : OFF_POLICY
-  },
+  getEffectivePolicyFor,
   storage: getBrowserStorage(),
   requestConsent: requestLocalServerConsent,
   onConsentChange: notifyAiCapabilities,

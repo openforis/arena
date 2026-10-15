@@ -8,6 +8,8 @@ import { type AiDataClass, type AiFeatureKey, getAiFeatureMinDataClass, getMaxAi
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import { OFF_POLICY } from '@webapp/ai/policy/effectivePolicy'
+
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'
 import { createGatewayEngine, type GatewayModelFactory } from './gatewayEngine'
 import { loadLocalServerConsent, saveLocalServerConsent } from './localServerConsent'
@@ -22,8 +24,7 @@ import type {
   StorageLike,
 } from './types'
 
-// nothing known (no survey for a survey feature, settings not loaded): nothing is allowed
-export const OFF_POLICY: AiPolicy = { schema: 'off', data: 'off' }
+export { OFF_POLICY }
 
 export type LocalServerConsentRequest = {
   surveyId?: number
@@ -45,7 +46,9 @@ export type ResolveModelParams = {
   signal?: AbortSignal
 }
 
-export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine }
+// policy: the effective policy the engine was selected with (the turn offers its tools by the same one); always set
+// by the resolver, optional so that a caller's own resolver (tests) need not give one
+export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine; policy?: AiPolicy }
 
 export type ModelResolverDeps = {
   getUserUuid: () => string | null
@@ -54,12 +57,11 @@ export type ModelResolverDeps = {
   // the AI settings of the loaded capabilities (null: not loaded or failed to load)
   getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
-  // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed.
-  // fresh: read from the server now, not from the cache
-  getEffectivePolicy: (params: {
-    surveyId: number | undefined
-    capabilities: AiCapabilities
+  // getEffectivePolicyFor: survey policy within the ceilings (the ceilings alone for features without a survey);
+  // null fails closed. fresh: read from the server now, not from the cache
+  getEffectivePolicyFor: (params: {
     feature: AiFeatureKey
+    surveyId: number | undefined
     fresh?: boolean
   }) => Promise<AiPolicy | null>
   storage: StorageLike | null
@@ -149,11 +151,12 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * Creates the model with the gateway engine of the provider.
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected gateway engine.
-   * @returns {ResolvedModel} The model and the engine.
+   * @param {AiPolicy} policy - The effective policy the engine was selected with.
+   * @returns {ResolvedModel} The model, the engine and the policy.
    */
-  const createWithGateway = (context: Context, engine: AiSelectedEngine): ResolvedModel => {
+  const createWithGateway = (context: Context, engine: AiSelectedEngine, policy: AiPolicy): ResolvedModel => {
     const gatewayEngine = createGatewayEngine({ engine, createGatewayModel: deps.createGatewayModel })
-    return { model: gatewayEngine.createModel(context.options), engine }
+    return { model: gatewayEngine.createModel(context.options), engine, policy }
   }
 
   /**
@@ -161,15 +164,17 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @param {AiLocalServerCapability} capability - Its capability.
-   * @returns {Promise<ResolvedModel>} The model and the engine.
+   * @param {AiPolicy} policy - The effective policy the engine was selected with.
+   * @returns {Promise<ResolvedModel>} The model, the engine and the policy.
    */
   const createWithLocal = async (
     context: Context,
     engine: AiSelectedEngine,
-    capability: AiLocalServerCapability
+    capability: AiLocalServerCapability,
+    policy: AiPolicy
   ): Promise<ResolvedModel> => {
     const localEngine = await deps.createLocalEngine(capability)
-    return { model: localEngine.createModel(context.options), engine }
+    return { model: localEngine.createModel(context.options), engine, policy }
   }
 
   /**
@@ -208,17 +213,16 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The local engine the request (and the consent) is about.
    * @param {AiLocalServerCapability} capability - Its capability when it was selected.
-   * @returns {Promise<{engine: AiSelectedEngine, capability: AiLocalServerCapability, policy: AiPolicy|null}>} What to create the model from.
+   * @returns {Promise<{engine: AiSelectedEngine, capability: AiLocalServerCapability, policy: AiPolicy}>} What to create the model from.
    * @throws {SystemError} aiNoEngineAvailable when the policy or the provider no longer allows it,
    * aiLocalServerConsentCancelled when the provider is no longer the one that was confirmed.
    */
   const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
     const { options } = context
     const capabilities = await deps.loadCapabilities()
-    const policy = await deps.getEffectivePolicy({
-      surveyId: options.surveyId,
-      capabilities,
+    const policy = await deps.getEffectivePolicyFor({
       feature: options.feature,
+      surveyId: options.surveyId,
       fresh: true,
     })
     if (context.signal?.aborted) throw aborted()
@@ -234,7 +238,8 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
       selected.hostingClass === engine.hostingClass &&
       current?.baseUrl === capability.baseUrl
     if (!same || !current) throw consentCancelled()
-    return { engine: selected, capability: current, policy }
+    // selectEngine selected an engine, so the policy is not null
+    return { engine: selected, capability: current, policy: policy ?? OFF_POLICY }
   }
 
   /**
@@ -254,7 +259,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
       saveLocalServerConsent({ ...consentParams(context, checked.capability), decision: 'accepted' })
       deps.onConsentChange()
     }
-    return createWithLocal(context, checked.engine, checked.capability)
+    return createWithLocal(context, checked.engine, checked.capability, checked.policy)
   }
 
   /**
@@ -287,12 +292,14 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     }
     const capabilities = await deps.loadCapabilities()
     assertFeatureEnabled(feature)
-    const effective = await deps.getEffectivePolicy({ surveyId, capabilities, feature })
+    const effective = await deps.getEffectivePolicyFor({ feature, surveyId })
     if (signal?.aborted) throw aborted()
     const context: Context = { userUuid, signal, options, capabilities }
     const selection = selectEngine({ effective, dataClass: options.dataClass, capabilities, providerId })
     const engine = assertSelected(selection, options.dataClass)
-    return engine.id === 'gateway' ? createWithGateway(context, engine) : resolveLocal(context, engine)
+    return engine.id === 'gateway'
+      ? createWithGateway(context, engine, effective ?? OFF_POLICY)
+      : resolveLocal(context, engine)
   }
 }
 

@@ -83,7 +83,7 @@ describe('choose another provider (270)', () => {
       isInstanceEnabled: () => true,
       getSettings: () => ON_SETTINGS,
       loadCapabilities: async () => CAPABILITIES,
-      getEffectivePolicy: async () => CLOUD,
+      getEffectivePolicyFor: async () => CLOUD,
       storage,
       requestConsent: async () => answers.shift() ?? 'cancel',
       onConsentChange: () => {

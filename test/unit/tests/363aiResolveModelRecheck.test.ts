@@ -90,7 +90,7 @@ const setup = ({
     isInstanceEnabled: () => true,
     getSettings: () => SETTINGS,
     loadCapabilities: async () => ({ ...capabilities(baseUrl()), ...(defaultProviderId ? { defaultProviderId } : {}) }),
-    getEffectivePolicy: async ({ surveyId, fresh }) => {
+    getEffectivePolicyFor: async ({ surveyId, fresh }) => {
       state.policyCalls.push({ surveyId, fresh: fresh === true })
       return policy(fresh === true)
     },
@@ -185,6 +185,23 @@ describe('resolveModel: the last policy check before a local engine is created (
     const { resolve, state } = setup({ defaultProviderId: 'acct:a1' })
     await resolve({ feature: 'expressionExplain', surveyId: 1 })
     expect(state.policyCalls).toEqual([{ surveyId: 1, fresh: false }])
+  })
+})
+
+describe('resolveModel: the policy of the turn is the one the engine was selected with (364)', () => {
+  test('a gateway engine returns the policy it was selected with', async () => {
+    const { resolve } = setup({ defaultProviderId: 'acct:a1', policy: () => ({ schema: 'cloud', data: 'orgHosted' }) })
+    const { policy } = await resolve({ feature: 'expressionExplain', surveyId: 1 })
+    expect(policy).toEqual({ schema: 'cloud', data: 'orgHosted' })
+  })
+
+  test('a local engine returns the fresh policy of the re-check, not the cached one', async () => {
+    const { resolve } = setup({
+      answers: ['continue'],
+      policy: (fresh) => (fresh ? { schema: 'onDevice', data: 'onDevice' } : { schema: 'cloud', data: 'onDevice' }),
+    })
+    const { policy } = await resolve({ feature: 'activityLogSummary', surveyId: 1 })
+    expect(policy).toEqual({ schema: 'onDevice', data: 'onDevice' })
   })
 })
 
