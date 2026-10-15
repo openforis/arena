@@ -26,7 +26,7 @@ L'analyse s'exécute en arrière-plan et les résultats sont enregistrés dans u
     },
     dashboardUpgrade: {
       title: 'Un nouveau tableau de bord',
-      description: `Le **Tableau de bord** fait peau neuve : enregistrements, contributeurs et stockage en un coup d'œil, une carte des données collectées et l'évolution des enregistrements ajoutés dans le temps.`,
+      description: `Le **Tableau de bord** fait peau neuve : enregistrements et contributeurs en un coup d'œil, une carte des données collectées et l'évolution des enregistrements ajoutés dans le temps.`,
     },
     clearNonApplicableValues: {
       title: 'Les valeurs non pertinentes sont effacées',

@@ -26,7 +26,7 @@ A análise é executada em segundo plano e os resultados são salvos em uma nova
     },
     dashboardUpgrade: {
       title: 'Um novo painel',
-      description: `O **Painel** tem um novo visual: registros, colaboradores e armazenamento num relance, um mapa dos dados coletados e a tendência dos registros adicionados ao longo do tempo.`,
+      description: `O **Painel** tem um novo visual: registros e colaboradores num relance, um mapa dos dados coletados e a tendência dos registros adicionados ao longo do tempo.`,
     },
     clearNonApplicableValues: {
       title: 'Valores não relevantes são apagados',

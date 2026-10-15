@@ -5,6 +5,7 @@
 
 export const whatsNewAudiences = {
   all: 'all',
+  dataCleanser: 'dataCleanser',
   surveyAdmin: 'surveyAdmin',
   systemAdmin: 'systemAdmin',
 } as const
@@ -46,7 +47,7 @@ export const whatsNewItems: WhatsNewItem[] = [
   {
     id: 'dashboardUpgrade',
     version: '2.9.7',
-    audience: whatsNewAudiences.surveyAdmin,
+    audience: whatsNewAudiences.dataCleanser,
     image: '/img/whats-new/dashboardUpgrade.png',
   },
   {

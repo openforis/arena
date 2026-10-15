@@ -19,9 +19,11 @@ const userWithGroup = (groupName: string) => ({ authGroups: [{ name: groupName, 
 const systemAdmin = { authGroups: [{ name: AuthGroup.groupNames.systemAdmin }] }
 const surveyAdmin = userWithGroup(AuthGroup.groupNames.surveyAdmin)
 const dataEditor = userWithGroup(AuthGroup.groupNames.dataEditor)
+const dataCleanser = userWithGroup(AuthGroup.groupNames.dataCleanser)
 
 const items: WhatsNew.WhatsNewItem[] = [
   { id: 'forAll', version: '1.0.2', audience: whatsNewAudiences.all },
+  { id: 'forDataCleansers', version: '1.0.1', audience: whatsNewAudiences.dataCleanser },
   { id: 'forSurveyAdmins', version: '1.0.1', audience: whatsNewAudiences.surveyAdmin },
   { id: 'forSystemAdmins', version: '1.0.1', audience: whatsNewAudiences.systemAdmin },
   { id: 'experimentalForAll', version: '1.0.0', audience: whatsNewAudiences.all, experimental: true },
@@ -64,13 +66,22 @@ describe('WhatsNew.getVisibleItems', () => {
     expect(ids(WhatsNew.getVisibleItems({ user: dataEditor, items }))).toEqual(['forAll'])
   })
 
-  test('survey admin sees survey designer items too', () => {
-    expect(ids(WhatsNew.getVisibleItems({ user: surveyAdmin, items }))).toEqual(['forAll', 'forSurveyAdmins'])
+  test('data cleanser sees data cleanser items too', () => {
+    expect(ids(WhatsNew.getVisibleItems({ user: dataCleanser, items }))).toEqual(['forAll', 'forDataCleansers'])
+  })
+
+  test('survey admin sees data cleanser and survey designer items too', () => {
+    expect(ids(WhatsNew.getVisibleItems({ user: surveyAdmin, items }))).toEqual([
+      'forAll',
+      'forDataCleansers',
+      'forSurveyAdmins',
+    ])
   })
 
   test('system admin sees all non-experimental items', () => {
     expect(ids(WhatsNew.getVisibleItems({ user: systemAdmin, items }))).toEqual([
       'forAll',
+      'forDataCleansers',
       'forSurveyAdmins',
       'forSystemAdmins',
     ])
@@ -86,11 +97,15 @@ describe('WhatsNew.getVisibleItems', () => {
 
 describe('WhatsNew.getUnseenItems', () => {
   test('new user sees all visible items', () => {
-    expect(ids(WhatsNew.getUnseenItems({ user: surveyAdmin, items }))).toEqual(['forAll', 'forSurveyAdmins'])
+    expect(ids(WhatsNew.getUnseenItems({ user: surveyAdmin, items }))).toEqual([
+      'forAll',
+      'forDataCleansers',
+      'forSurveyAdmins',
+    ])
   })
 
   test('dismissed items are not shown again, new items are', () => {
-    const userDismissed = WhatsNew.assocItemsSeen({ user: surveyAdmin, itemsSeen: items.slice(0, 2), items })
+    const userDismissed = WhatsNew.assocItemsSeen({ user: surveyAdmin, itemsSeen: items.slice(0, 3), items })
     expect(WhatsNew.getUnseenItems({ user: userDismissed, items })).toEqual([])
 
     const newItem: WhatsNew.WhatsNewItem = { id: 'newOne', version: '1.1.0', audience: whatsNewAudiences.all }

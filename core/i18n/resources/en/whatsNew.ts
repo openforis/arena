@@ -26,7 +26,7 @@ The analysis runs in the background and the results are saved in a new category.
     },
     dashboardUpgrade: {
       title: 'A new dashboard',
-      description: `The **Dashboard** has a new look: records, contributors and storage at a glance, a map of the collected data and the trend of the records added over time.`,
+      description: `The **Dashboard** has a new look: records and contributors at a glance, a map of the collected data and the trend of the records added over time.`,
     },
     clearNonApplicableValues: {
       title: 'Non-relevant values are cleared',

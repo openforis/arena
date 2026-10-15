@@ -26,7 +26,7 @@ El análisis se ejecuta en segundo plano y los resultados se guardan en una nuev
     },
     dashboardUpgrade: {
       title: 'Un nuevo panel de control',
-      description: `El **Panel de control** tiene un nuevo aspecto: registros, colaboradores y almacenamiento de un vistazo, un mapa de los datos recogidos y la tendencia de los registros añadidos en el tiempo.`,
+      description: `El **Panel de control** tiene un nuevo aspecto: registros y colaboradores de un vistazo, un mapa de los datos recogidos y la tendencia de los registros añadidos en el tiempo.`,
     },
     clearNonApplicableValues: {
       title: 'Se borran los valores no relevantes',
