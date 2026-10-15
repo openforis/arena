@@ -50,6 +50,7 @@ const IPV6_BLOCKED: [string, number][] = [
   ['::ffff:0:0:0', 96], // IPv4-translated (SIIT)
   ['fc00::', 7], // unique local
   ['fe80::', 10], // link-local
+  ['fec0::', 10], // deprecated site-local
   ['ff00::', 8], // multicast
 ]
 
