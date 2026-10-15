@@ -123,8 +123,8 @@ const getHelpModule = (user) =>
 
 export const getModulesHierarchy = (user, surveyInfo) => [
   getModule({ module: appModules.home }),
-  // the dashboard is available only to users who can edit the survey (survey admins)
-  getModule({ module: appModules.dashboard, hidden: !Authorizer.canEditSurvey(user, surveyInfo) }),
+  // the dashboard is not available to data editors and survey guests
+  getModule({ module: appModules.dashboard, hidden: !Authorizer.canCleanseRecords(user, surveyInfo) }),
   getDesignerModule(user, surveyInfo),
   getDataModule(user, surveyInfo),
   getAnalysisModule(user, surveyInfo),

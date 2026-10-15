@@ -8,7 +8,7 @@ import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
 import {
-  useAuthCanEditSurvey,
+  useAuthCanCleanseRecords,
   useAuthCanUseAnalysis,
   useAuthCanUseMessages,
   useUserIsSystemAdmin,
@@ -41,7 +41,7 @@ const AppView = () => {
   }, [])
 
   const isSideBarOpen = useIsSidebarOpened()
-  const canEditSurvey = useAuthCanEditSurvey()
+  const canViewDashboard = useAuthCanCleanseRecords()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const canUseMessages = useAuthCanUseMessages()
   const isSystemAdmin = useUserIsSystemAdmin()
@@ -61,7 +61,7 @@ const AppView = () => {
         path: `${appModules.data.path}/*`,
       },
     ]
-    if (canEditSurvey) {
+    if (canViewDashboard) {
       result.push({
         component: Dashboard,
         path: `${appModules.dashboard.path}/*`,
@@ -88,7 +88,7 @@ const AppView = () => {
       path: `${appModules.help.path}/*`,
     })
     return result
-  }, [canAnalyzeRecords, canEditSurvey, canUseMessages, isSystemAdmin])
+  }, [canAnalyzeRecords, canUseMessages, canViewDashboard, isSystemAdmin])
 
   return (
     <>

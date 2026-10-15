@@ -14,11 +14,14 @@ const isDashboardVisible = (user: any): boolean => {
 }
 
 describe('SideBar: dashboard module', () => {
-  test.each(['systemAdmin', 'surveyManager', 'surveyAdmin', 'surveyEditor'])('visible to %s', (groupName) => {
-    expect(isDashboardVisible(userWithGroup(groupName))).toBe(true)
-  })
+  test.each(['systemAdmin', 'surveyManager', 'surveyAdmin', 'surveyEditor', 'dataAnalyst', 'dataCleanser'])(
+    'visible to %s',
+    (groupName) => {
+      expect(isDashboardVisible(userWithGroup(groupName))).toBe(true)
+    }
+  )
 
-  test.each(['dataAnalyst', 'dataCleanser', 'dataEditor', 'surveyGuest'])('hidden to %s', (groupName) => {
+  test.each(['dataEditor', 'surveyGuest'])('hidden to %s', (groupName) => {
     expect(isDashboardVisible(userWithGroup(groupName))).toBe(false)
   })
 })
