@@ -9,12 +9,9 @@ import {
   buildSchemaSummaryItems,
   generateSchemaSummaryItems,
 } from '@server/modules/survey/service/schemaSummary/schemaSummary'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import * as SB from '../../utils/surveyBuilder'
-
-jest.mock('@server/modules/survey/manager/surveyManager', () => ({ fetchSurveyAndNodeDefsBySurveyId: jest.fn() }))
 
 const user = { uuid: 'test-schema-summary-export-user' }
 const cycle = Survey.cycleOneKey
@@ -30,7 +27,9 @@ const uuidOf = (survey: any, name: string): string =>
 
 describe('schema summary export (349)', () => {
   describe('the draft survey is loaded once per export', () => {
-    const fetchSurvey = SurveyManager.fetchSurveyAndNodeDefsBySurveyId as jest.Mock
+    // the survey manager is a dependency of the export: the unit tests give it a fake survey
+    const fetchSurvey = jest.fn()
+    const deps = { fetchSurvey }
     let survey: any
 
     beforeEach(async () => {
@@ -42,7 +41,7 @@ describe('schema summary export (349)', () => {
     test('the rows and the check of the AI descriptions use the same load', async () => {
       const aiDescriptions = { [uuidOf(survey, 'cluster_id')]: 'The cluster number.' }
 
-      const items = await generateSchemaSummaryItems({ surveyId: 1, cycle, aiDescriptions })
+      const items = await generateSchemaSummaryItems({ surveyId: 1, cycle, aiDescriptions }, deps)
 
       expect(fetchSurvey).toHaveBeenCalledTimes(1)
       expect(items.find((item: any) => item.name === 'cluster_id').aiDescription).toBe('The cluster number.')
@@ -50,14 +49,14 @@ describe('schema summary export (349)', () => {
 
     test('an unknown uuid is still refused, with the same error as before', async () => {
       await expectSystemErrorKey(
-        () => generateSchemaSummaryItems({ surveyId: 1, cycle, aiDescriptions: { 'not-a-node-def': 'D.' } }),
+        () => generateSchemaSummaryItems({ surveyId: 1, cycle, aiDescriptions: { 'not-a-node-def': 'D.' } }, deps),
         'aiDescriptionsInvalid'
       )
       expect(fetchSurvey).toHaveBeenCalledTimes(1)
     })
 
     test('an export without AI descriptions needs no check', async () => {
-      const items = await generateSchemaSummaryItems({ surveyId: 1, cycle })
+      const items = await generateSchemaSummaryItems({ surveyId: 1, cycle }, deps)
       expect(items.some((item: any) => 'aiDescription' in item)).toBe(false)
       expect(fetchSurvey).toHaveBeenCalledTimes(1)
     })
