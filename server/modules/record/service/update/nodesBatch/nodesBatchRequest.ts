@@ -1,13 +1,8 @@
 import SystemError, { StatusCodes } from '@core/systemError'
 import { isUuid } from '@core/uuid'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
-import {
-  NodesBatchEdit,
-  NodesBatchLimits,
-  NodesBatchMessageKeys,
-  NodesBatchRecordEdit,
-  NodesBatchRequest,
-} from './nodesBatchTypes'
+import { NodesBatchEdit, NodesBatchMessageKeys, NodesBatchRecordEdit, NodesBatchRequest } from './nodesBatchTypes'
 
 /**
  * Builds the 400 error of an invalid request.

@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { uuidv4 } from '@core/uuid'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
@@ -21,7 +22,6 @@ import { groupEditsByRecord } from './nodesBatchRequest'
 import {
   NodesBatchEdit,
   NodesBatchEditResult,
-  NodesBatchLimits,
   NodesBatchMessageKeys,
   NodesBatchPersistMessage,
   NodesBatchRecordEdit,
