@@ -1,6 +1,7 @@
 import type { MissingLabelsCounts } from '@common/ai/categoryItemLabels'
 
-import { EVENT_DETECTORS, type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   categoryItemTranslationsDetector,
   createCategoryItemTranslationsDetector,
@@ -88,7 +89,7 @@ describe('category labels counts (237)', () => {
     expect(EVENT_DETECTORS).toContain(categoryItemTranslationsDetector)
   })
 
-  test('generationStarted and surveyInfoSaved are throttled per user, survey and languages; other events and a new language are not', async () => {
+  test('generationStarted, surveyInfoSaved and categoryEditorLeft are throttled per user, survey and languages; the events that change categories and a new language are not', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn(async () => counts)
     const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
@@ -97,21 +98,25 @@ describe('category labels counts (237)', () => {
 
     await detector.handle(event('generationStarted'), at(t0))
     await detector.handle(event('surveyInfoSaved'), at(t0 + 1000))
+    // leaving the category editor, again and again, does not fetch again within the window
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 2000))
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 2500))
     expect(fetchCounts).toHaveBeenCalledTimes(1)
 
-    await detector.handle(event('categoriesChanged'), at(t0 + 2000))
-    await detector.handle(event('categoryLabelsApplied'), at(t0 + 3000))
-    await detector.handle(event('categoryEditorLeft'), at(t0 + 4000))
-    expect(fetchCounts).toHaveBeenCalledTimes(4)
+    await detector.handle(event('categoriesChanged'), at(t0 + 3000))
+    await detector.handle(event('categoryLabelsApplied'), at(t0 + 4000))
+    expect(fetchCounts).toHaveBeenCalledTimes(3)
 
     // a survey info save that adds a language
     const withPortuguese = await buildCategoryLabelsSurvey({ languages: ['en', 'fr', 'es', 'pt'] })
     await detector.handle(event('surveyInfoSaved'), at(t0 + 5000, withPortuguese))
-    expect(fetchCounts).toHaveBeenCalledTimes(5)
+    expect(fetchCounts).toHaveBeenCalledTimes(4)
 
     // 30 s after the last fetch of the same key (any event's fetch counts)
-    await detector.handle(event('generationStarted'), at(t0 + 34000))
-    expect(fetchCounts).toHaveBeenCalledTimes(6)
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 33000))
+    expect(fetchCounts).toHaveBeenCalledTimes(4)
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 34000))
+    expect(fetchCounts).toHaveBeenCalledTimes(5)
   })
 
   test('a count that resolves after its generation ended lands nothing', async () => {
@@ -159,6 +164,73 @@ describe('category labels counts (237)', () => {
     await first
   })
 
+  describe('a throttled trigger is not lost: one fetch follows at the end of the window', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    test('leaving the category editor inside the window fetches once more when the window ends', async () => {
+      const { store, setKind } = createSetKindRecorder()
+      const fetchCounts = jest.fn(async () => counts)
+      const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      const t0 = TEST_NOW.getTime()
+      await detector.handle(event('generationStarted'), contextWith({ survey, store, time: t0 }))
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 20000 }))
+      // another visit in the same window does not schedule a second fetch
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 25000 }))
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(4999)
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+      await jest.advanceTimersByTimeAsync(1)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+      expect(setKind).toHaveBeenCalledTimes(2)
+
+      // nothing more is pending
+      await jest.advanceTimersByTimeAsync(120000)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+    })
+
+    test('the trailing fetch is cancelled when the generation ends, and an event that fetches at once replaces it', async () => {
+      const { store } = createSetKindRecorder()
+      const fetchCounts = jest.fn(async () => counts)
+      const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      const t0 = TEST_NOW.getTime()
+      const controller = new AbortController()
+      await detector.handle(event('generationStarted'), contextWith({ survey, store, controller, time: t0 }))
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, controller, time: t0 + 1000 }))
+      controller.abort()
+      await jest.advanceTimersByTimeAsync(60000)
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+
+      // a category change fetches at once and the window starts again: no stale trailing fetch follows
+      const other = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      fetchCounts.mockClear()
+      await other.handle(event('generationStarted'), contextWith({ survey, store, time: t0 }))
+      await other.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 1000 }))
+      await other.handle(event('categoriesChanged'), contextWith({ survey, store, time: t0 + 2000 }))
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+      await jest.advanceTimersByTimeAsync(60000)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+    })
+  })
+
+  test('a request that fails because the generation was aborted is not logged', async () => {
+    const { store } = createSetKindRecorder()
+    const controller = new AbortController()
+    const fetchCounts = jest.fn(async () => {
+      controller.abort()
+      throw new Error('aborted')
+    })
+    const log = jest.fn()
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts, log })
+    await detector.handle(event('generationStarted'), contextWith({ survey, store, controller }))
+    expect(log).not.toHaveBeenCalled()
+  })
+
   test('a generation abort after a successful request keeps its throttle', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn(async () => counts)
@@ -174,10 +246,12 @@ describe('category labels counts (237)', () => {
   test('a failed request is not throttled; nothing is fetched without draft defs the user can edit', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(counts)
-    const detector = createCategoryItemTranslationsDetector({ fetchCounts })
+    const log = jest.fn()
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts, log })
     await detector.handle(event('generationStarted'), contextWith({ survey, store }))
     await detector.handle(event('generationStarted'), contextWith({ survey, store }))
     expect(fetchCounts).toHaveBeenCalledTimes(2)
+    expect(log).toHaveBeenCalledTimes(1)
 
     const idle = jest.fn(async () => counts)
     const guarded = createCategoryItemTranslationsDetector({ fetchCounts: idle })

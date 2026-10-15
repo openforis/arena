@@ -3,9 +3,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { attributeWithoutRefDefinition } from '@webapp/ai/suggestions/definitions/attributeWithoutRef'
-import { STATE_DETECTORS } from '@webapp/ai/suggestions/detectors'
+import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   attributeWithoutRefDetector,
   detectAttributeWithoutRef,

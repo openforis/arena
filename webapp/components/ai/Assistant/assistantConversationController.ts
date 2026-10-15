@@ -11,6 +11,7 @@ import type { RunAssistantTurnParams } from '@webapp/ai/agent/runAssistantTurn'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope, SettleOutcome } from '@webapp/ai/suggestions/types'
 import type { AiToolContext } from '@webapp/ai/tools/types'
+import { logAiWarning } from '@webapp/ai/log/aiLog'
 
 import type { AssistantArea } from './assistantAreas'
 import {
@@ -252,7 +253,8 @@ export const createAssistantConversationController = (
     { scope, conversationId }: { scope: AssistantConversationScope; conversationId: string }
   ): Promise<{ loaded: Conversation | null; decision: LoadedConversationDecision }> => {
     try {
-      const loaded = await store.get(conversationId)
+      // null for a conversation of another user (a shared browser)
+      const loaded = await store.get(conversationId, scope.userUuid)
       const decision = decideLoadedConversation({
         loaded,
         conversationId,
@@ -260,8 +262,9 @@ export const createAssistantConversationController = (
         scope,
       })
       return { loaded, decision }
-    } catch {
+    } catch (error) {
       // a conversation that can't be read is left: it stays in the list, the chat starts blank
+      logAiWarning('The stored conversation could not be read', error)
       return { loaded: null, decision: 'forget' }
     }
   }
@@ -392,8 +395,10 @@ export const createAssistantConversationController = (
 
   // tracked as a whole: logout waits for the final save of an aborted turn too
   const runTurn = (env: AssistantConversationEnv, base: Conversation, text: string, displayText?: string) => {
-    // never rejects: the failure is shown on the answer, and nobody awaits the turn
-    const turn = executeTurn(env, base, text, displayText).catch(() => undefined)
+    // never rejects: the failure is shown on the answer and logged, and nobody awaits the turn
+    const turn = executeTurn(env, base, text, displayText).catch((error: unknown) =>
+      logAiWarning('The assistant turn failed', error)
+    )
     if (base.suggestionScope) suggestions.holdTurnLock({ conversationId: base.id, done: turn })
     return registry.track(turn)
   }
@@ -510,7 +515,7 @@ export const createAssistantConversationController = (
   const deleteConversation = async ({ userUuid }: AssistantConversationScope, id: string) => {
     if (!conversationStore) return
     // a failure leaves the list as it was and reaches the caller, who tells the user
-    await conversationStore.remove(id)
+    await conversationStore.remove(id, userUuid)
     // a deleted Do it conversation can never settle: its suggestion targets show again
     suggestions.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
     set({ history: state.history.filter((item) => item.id !== id) })
@@ -544,12 +549,16 @@ export const createAssistantConversationController = (
   }
 
   /**
-   * Reads a conversation by id: the one in memory, or the stored one.
+   * Reads a conversation by id: the one in memory, or the stored one of the user of the panel.
    * @param {string} id - Conversation id.
    * @returns {Promise<Conversation|null>} The conversation.
    */
-  const readConversation = async (id: string): Promise<Conversation | null> =>
-    state.conversation?.id === id ? state.conversation : ((await conversationStore?.get(id)) ?? null)
+  const readConversation = async (id: string): Promise<Conversation | null> => {
+    if (state.conversation?.id === id) return state.conversation
+    const userUuid = selection?.scope.userUuid
+    if (!conversationStore || !userUuid) return null
+    return (await conversationStore.get(id, userUuid)) ?? null
+  }
 
   /**
    * Runs an Apply or Discard of a card unless another one runs (also blocks new turns meanwhile). It is tracked, so

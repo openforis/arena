@@ -3,19 +3,12 @@
  * and 1 s after the last survey change, and hands events to the event detectors. A failing detector never stops the
  * others. No detector calls an AI engine.
  */
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
-import {
-  EVENT_DETECTORS,
-  STATE_DETECTORS,
-  TARGET_RESOLVERS,
-  type DetectorContext,
-  type EventDetector,
-  type StateDetector,
-  type SuggestionEvent,
-  type TargetResolver,
-} from './detectors'
+import type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, TargetResolver } from './detectors'
 import type { SuggestionGeneration } from './generation'
+import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from './registry'
 import type { SuggestionStore } from './suggestionStore'
 
 export const SUGGESTION_DEBOUNCE_MS = 1000
@@ -71,21 +64,25 @@ const canRun = (detector: { area: AssistantArea; needsDraft: boolean }, ctx: Det
   (!detector.needsDraft || (!!ctx.generation?.draft && ctx.generation.canEditSurvey))
 
 /**
- * Runs a detector, swallowing its errors (sync throws and rejected promises): one failing check never stops the others.
+ * Runs a detector, logging its errors (sync throws and rejected promises) instead of throwing: one failing check never
+ * stops the others.
+ * @param {AiLog} log - Reports the error.
+ * @param {string} what - What runs, for the log.
  * @param {Function} work - Detector work.
  * @returns {void}
  */
-const runSafely = (work: () => unknown): void => {
+const runSafely = (log: AiLog, what: string, work: () => unknown): void => {
   try {
     const result = work()
-    if (result instanceof Promise) result.catch(() => undefined)
-  } catch {
-    // suggestions are optional
+    if (result instanceof Promise) result.catch((error: unknown) => log(`The ${what} failed`, error))
+  } catch (error) {
+    log(`The ${what} failed`, error)
   }
 }
 
 /**
- * Removes the targets of a kind that the resolver finds fixed.
+ * Removes the targets of a kind that the resolver finds fixed: pending, in progress and dismissed ones (a suggestion
+ * dismissed as a whole is no longer pending, and its dismissal must not hide the issue when it occurs again).
  * @param {TargetResolver} resolver - Resolver.
  * @param {DetectorContext} ctx - Context (with a generation).
  * @param {SuggestionGeneration} generation - Generation.
@@ -94,11 +91,10 @@ const runSafely = (work: () => unknown): void => {
 const resolveKind = (resolver: TargetResolver, ctx: DetectorContext, generation: SuggestionGeneration): void => {
   const { userUuid, store, survey } = ctx
   const { surveyId } = generation
-  for (const suggestion of store.getPending({ userUuid, surveyId })) {
-    if (suggestion.kind !== resolver.kind) continue
-    const resolved = suggestion.targets.filter((target) => resolver.isResolved(target.key, survey))
-    if (resolved.length === 0) continue
-    store.removeTargets({ userUuid, surveyId, id: suggestion.id, targetKeys: resolved.map((target) => target.key) })
+  for (const { id, kind, targetKeys } of store.getTracked({ userUuid, surveyId })) {
+    if (kind !== resolver.kind) continue
+    const resolved = targetKeys.filter((key) => resolver.isResolved(key, survey))
+    if (resolved.length > 0) store.removeTargets({ userUuid, surveyId, id, targetKeys: resolved })
   }
 }
 
@@ -121,6 +117,7 @@ const belongsTo = (queued: QueuedEvent, input: SuggestionHostInput): boolean =>
  * @param {EventDetector[]} [params.eventDetectors] - Event detectors (default: the registry).
  * @param {TargetResolver[]} [params.resolvers] - Resolvers (default: the registry).
  * @param {number} [params.debounceMs] - Delay after the last survey change.
+ * @param {AiLog} [params.log] - Reports a detector that failed.
  * @returns {SuggestionHostController} The controller.
  */
 export const createSuggestionHostController = ({
@@ -130,6 +127,7 @@ export const createSuggestionHostController = ({
   eventDetectors = EVENT_DETECTORS,
   resolvers = TARGET_RESOLVERS,
   debounceMs = SUGGESTION_DEBOUNCE_MS,
+  log = logAiWarning,
 }: {
   store: SuggestionStore
   now?: () => Date
@@ -137,6 +135,7 @@ export const createSuggestionHostController = ({
   eventDetectors?: EventDetector[]
   resolvers?: TargetResolver[]
   debounceMs?: number
+  log?: AiLog
 }): SuggestionHostController => {
   let input: SuggestionHostInput | null = null
   // what the last run saw: a new generation runs at once, a change of survey or areas after the debounce
@@ -220,7 +219,7 @@ export const createSuggestionHostController = ({
     ranAreas = ctx.availableAreas.join(',')
     for (const detector of stateDetectors) {
       if (!canRun(detector, ctx)) continue
-      runSafely(() =>
+      runSafely(log, `${detector.kind} detector`, () =>
         store.setKind({
           userUuid: ctx.userUuid,
           surveyId: generation.surveyId,
@@ -230,7 +229,9 @@ export const createSuggestionHostController = ({
       )
     }
     if (!generation.draft) return
-    for (const resolver of resolvers) runSafely(() => resolveKind(resolver, ctx, generation))
+    for (const resolver of resolvers) {
+      runSafely(log, `${resolver.kind} resolver`, () => resolveKind(resolver, ctx, generation))
+    }
   }
 
   /**
@@ -242,7 +243,9 @@ export const createSuggestionHostController = ({
   const dispatch = (event: SuggestionEvent, ctx: DetectorContext): void => {
     for (const detector of eventDetectors) {
       if (!detector.on.includes(event.type) || !canRun(detector, ctx)) continue
-      runSafely(() => detector.handle(event, contextForArea(ctx, detector.area)))
+      runSafely(log, `${detector.kind} detector on ${event.type}`, () =>
+        detector.handle(event, contextForArea(ctx, detector.area))
+      )
     }
   }
 

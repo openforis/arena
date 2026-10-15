@@ -1,6 +1,7 @@
 /**
  * Suggestion 7: many validation messages in the current cycle (Cleaning area), counted when the report opens.
  */
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { CleaningApi } from '@webapp/ai/tools/cleaning/cleaningApi'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
@@ -72,22 +73,26 @@ const isReportOfGeneration = (
  * @param {object} params - Parameters.
  * @param {CountValidationReportRows} params.countRows - The count request.
  * @param {SuggestionGeneration} params.generation - The current generation (survey, cycle, abort signal).
+ * @param {AiLog} params.log - Reports a failed request (not an aborted one).
  * @returns {Promise<number|null>} The count; null when the request failed or the generation ended.
  */
 const countCycleMessages = async ({
   countRows,
   generation,
+  log,
 }: {
   countRows: CountValidationReportRows
   generation: SuggestionGeneration
+  log: AiLog
 }): Promise<number | null> => {
   const { surveyId, cycle, signal } = generation
   try {
     const count = await countRows({ surveyId, cycle, signal })
     // a late answer of an ended generation is dropped
     return signal.aborted || !Number.isFinite(count) ? null : count
-  } catch {
-    // aborted, timed out or refused: no suggestion this time
+  } catch (error) {
+    // aborted, timed out or refused: no suggestion this time (an abort is expected, the rest is reported)
+    if (!signal.aborted) log('The validation messages could not be counted for the suggestion', error)
     return null
   }
 }
@@ -96,12 +101,15 @@ const countCycleMessages = async ({
  * Creates the detector of suggestion 7.
  * @param {object} deps - Dependencies.
  * @param {CountValidationReportRows} deps.countRows - Counts the validation report rows (Arena's server).
+ * @param {AiLog} [deps.log] - Reports a failed count.
  * @returns {EventDetector} The detector.
  */
 export const createValidationErrorsDetector = ({
   countRows,
+  log = logAiWarning,
 }: {
   countRows: CountValidationReportRows
+  log?: AiLog
 }): EventDetector => ({
   kind: 'validationErrors',
   area: 'cleaning',
@@ -116,12 +124,17 @@ export const createValidationErrorsDetector = ({
   handle: async (event, ctx) => {
     const { generation } = ctx
     if (!generation || !isReportOfGeneration(event, generation, ctx.availableAreas)) return
-    const count = await countCycleMessages({ countRows, generation })
+    const count = await countCycleMessages({ countRows, generation, log })
     if (count === null) return
     const { userUuid, surveyId, cycle } = generation
+    const id = getValidationErrorsSuggestionId(cycle)
+    if (count < VALIDATION_MESSAGES_THRESHOLD) {
+      // the issue is gone: a later count must not be compared with a dismissal made for an older, larger one
+      ctx.store.removeTargets({ userUuid, surveyId, id, targetKeys: [VALIDATION_ERRORS_TARGET_KEY] })
+      return
+    }
     // replaced on every open: a fresh count, createdAt and expiry (deviation 1)
-    ctx.store.remove({ userUuid, surveyId, id: getValidationErrorsSuggestionId(cycle) })
-    if (count < VALIDATION_MESSAGES_THRESHOLD) return
+    ctx.store.remove({ userUuid, surveyId, id })
     ctx.store.add({
       userUuid,
       suggestion: buildValidationErrorsSuggestion({ surveyId, cycle, count, createdAt: ctx.now() }),

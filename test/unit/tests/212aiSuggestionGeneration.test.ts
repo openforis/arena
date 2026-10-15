@@ -1,8 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
-import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import { nextDesignerVisit, type DesignerVisit } from '@webapp/ai/suggestions/designerVisit'
 import {
   createGenerationTracker,
@@ -50,11 +50,15 @@ describe('suggestion events, registries, generation and designer visit (212)', (
       throw new Error('detector bug')
     })
     const unsubscribe = subscribeSuggestionEvents((event) => received.push(event.type))
-    notifySuggestionEvent({ type: 'publishClicked' })
+    const log = jest.fn()
+    notifySuggestionEvent({ type: 'publishClicked' }, log)
     unsubscribe()
     failing()
-    notifySuggestionEvent({ type: 'surveyInfoSaved' })
+    notifySuggestionEvent({ type: 'surveyInfoSaved' }, log)
     expect(received).toEqual(['publishClicked'])
+    // the failure is reported, not swallowed
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log).toHaveBeenCalledWith('A suggestion listener failed on publishClicked', expect.any(Error))
   })
 
   test('registries: one detector per kind and array, and a definition for every detected kind', () => {

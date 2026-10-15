@@ -86,13 +86,13 @@ describe.each([
   test('get returns a copy of what was saved; save replaces', async () => {
     const item = conversation({ seconds: 1 })
     await store.save(item)
-    const loaded = await store.get(item.id)
+    const loaded = await store.get(item.id, 'user-1')
     expect(loaded).toEqual(item)
     loaded!.title = 'changed in memory'
-    expect((await store.get(item.id))!.title).toBe(item.title)
+    expect((await store.get(item.id, 'user-1'))!.title).toBe(item.title)
     await store.save({ ...item, title: 'renamed' })
-    expect((await store.get(item.id))!.title).toBe('renamed')
-    expect(await store.get('missing')).toBeNull()
+    expect((await store.get(item.id, 'user-1'))!.title).toBe('renamed')
+    expect(await store.get('missing', 'user-1')).toBeNull()
   })
 
   test('retention keeps the newest conversations per user and survey', async () => {
@@ -100,8 +100,8 @@ describe.each([
     const other = conversation({ seconds: 0, surveyId: 8 })
     for (const item of [other, ...saved]) await store.save(item)
     expect(ids(await store.list({ userUuid: 'user-1', surveyId: 7 }))).toEqual([saved[3].id, saved[2].id, saved[1].id])
-    expect(await store.get(saved[0].id)).toBeNull()
-    expect(await store.get(other.id)).not.toBeNull()
+    expect(await store.get(saved[0].id, 'user-1')).toBeNull()
+    expect(await store.get(other.id, 'user-1')).not.toBeNull()
   })
 
   test('remove and clearUser', async () => {
@@ -109,11 +109,11 @@ describe.each([
     const mineNoSurvey = conversation({ seconds: 2, surveyId: null })
     const theirs = conversation({ seconds: 3, userUuid: 'user-2' })
     for (const item of [mine, mineNoSurvey, theirs]) await store.save(item)
-    await store.remove(mine.id)
-    expect(await store.get(mine.id)).toBeNull()
+    await store.remove(mine.id, 'user-1')
+    expect(await store.get(mine.id, 'user-1')).toBeNull()
     await store.clearUser('user-1')
-    expect(await store.get(mineNoSurvey.id)).toBeNull()
-    expect(await store.get(theirs.id)).not.toBeNull()
+    expect(await store.get(mineNoSurvey.id, 'user-1')).toBeNull()
+    expect(await store.get(theirs.id, 'user-2')).not.toBeNull()
   })
 })
 
@@ -124,17 +124,19 @@ describe('openConversationStore', () => {
         throw new Error('SecurityError')
       },
     } as unknown as IDBFactory
-    const store = await openConversationStore({ indexedDB: broken })
+    const log = jest.fn()
+    const store = await openConversationStore({ indexedDB: broken, log })
     expect(store.persistent).toBe(false)
+    expect(log).toHaveBeenCalledTimes(1)
     const item = conversation({ seconds: 1 })
     await store.save(item)
-    expect(await store.get(item.id)).toEqual(item)
+    expect(await store.get(item.id, 'user-1')).toEqual(item)
   })
 
   test('IndexedDB keeps the conversations when the store is opened again', async () => {
     const factory = new IDBFactory() as unknown as IDBFactory
     const item = conversation({ seconds: 1 })
     await (await openConversationStore({ indexedDB: factory })).save(item)
-    expect(await (await openConversationStore({ indexedDB: factory })).get(item.id)).toEqual(item)
+    expect(await (await openConversationStore({ indexedDB: factory })).get(item.id, 'user-1')).toEqual(item)
   })
 })

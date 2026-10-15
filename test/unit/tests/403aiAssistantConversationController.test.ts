@@ -62,14 +62,19 @@ const createFakeStore = (initial: Conversation[]) => {
   const store = {
     persistent: true,
     list: jest.fn(async () => [...data.values()]),
-    get: jest.fn(async (id: string) => data.get(id) ?? null),
+    // like the real store: a conversation of another user is neither read nor removed
+    get: jest.fn(async (id: string, userUuid: string) => {
+      const found = data.get(id)
+      return found?.userUuid === userUuid ? found : null
+    }),
     save: jest.fn(async (conversation: Conversation) => {
       data.set(conversation.id, conversation)
     }),
-    remove: jest.fn(async (id: string) => {
-      data.delete(id)
+    remove: jest.fn(async (id: string, userUuid: string) => {
+      if (data.get(id)?.userUuid === userUuid) data.delete(id)
     }),
     clearUser: jest.fn(async () => data.clear()),
+    removeSurvey: jest.fn(async () => undefined),
   }
   return store satisfies ConversationStore
 }
@@ -626,7 +631,7 @@ describe('assistant conversation controller (403)', () => {
       await controller.loadHistory(scope)
       panel.setConversationId('c1')
       await controller.deleteConversation(scope, 'c1')
-      expect(store.remove).toHaveBeenCalledWith('c1')
+      expect(store.remove).toHaveBeenCalledWith('c1', scope.userUuid)
       expect(controller.getState().history.map(({ id }) => id)).toEqual(['c2'])
       expect(suggestions.onConversationSettled).toHaveBeenCalledWith(
         expect.objectContaining({ conversationId: 'c1', outcome: 'failed' })

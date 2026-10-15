@@ -27,3 +27,6 @@ export type SuggestionDefinition = {
   // after Do it or Dismiss, with the targets handled (the module introduction records the module as seen)
   onHandled?: (params: { userUuid: string; targetKeys: string[]; store: SuggestionStore }) => void
 }
+
+// complete: every kind has its card
+export type SuggestionDefinitions = Record<SuggestionKind, SuggestionDefinition>

@@ -67,6 +67,8 @@ export default {
     emailSentConfirmation: `{{email}}宛にメールを送信しました。
 
     迷惑メールフォルダも確認するよう、相手に伝えてください。`,
+    logoutServerNotReached:
+      'サーバーに接続できなかったため、サーバー上のセッションが有効なままの可能性があります。共有のコンピューターでは、ブラウザーを閉じてください。',
     emailSentToSelfConfirmation: `{{email}}宛にメールが届いているはずです。
 
 迷惑メールフォルダもご確認ください。`,
@@ -1498,6 +1500,7 @@ $t(common.cantUndoWarning)`,
     success: '翻訳しました。確認して保存してください。',
 
     failed: '翻訳に失敗しました：{{message}}',
+    sourceChanged: '翻訳中にテキストが変更されたため、翻訳は適用されませんでした。',
   },
   aiActivityLog: {
     title: 'アクティビティログの要約',

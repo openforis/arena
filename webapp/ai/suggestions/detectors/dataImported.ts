@@ -68,6 +68,32 @@ const isPendingJob = (store: SuggestionStore, generation: SuggestionGeneration, 
     )
 
 /**
+ * Removes what the state holds of the older imports (their dismissals would pile up, one per import, for good).
+ * @param {object} params - Parameters.
+ * @param {SuggestionStore} params.store - Suggestion store.
+ * @param {SuggestionGeneration} params.generation - The current generation.
+ * @param {string} params.jobUuid - Uuid of the new import job, which keeps its own entry.
+ * @returns {void}
+ */
+const forgetOlderImports = ({
+  store,
+  generation,
+  jobUuid,
+}: {
+  store: SuggestionStore
+  generation: SuggestionGeneration
+  jobUuid: string
+}): void => {
+  const { userUuid, surveyId } = generation
+  const targetKeys = store
+    .getTracked({ userUuid, surveyId })
+    .filter((tracked) => tracked.id === DATA_IMPORTED_SUGGESTION_ID)
+    .flatMap((tracked) => tracked.targetKeys)
+    .filter((key) => key !== jobUuid)
+  if (targetKeys.length > 0) store.removeTargets({ userUuid, surveyId, id: DATA_IMPORTED_SUGGESTION_ID, targetKeys })
+}
+
+/**
  * Builds the data imported suggestion.
  * @param {object} params - Parameters.
  * @param {number} params.surveyId - Survey id.
@@ -117,6 +143,7 @@ export const dataImportedDetector: EventDetector = {
     const jobUuid = JobSerialized.getUuid(job)
     if (isPendingJob(ctx.store, generation, jobUuid)) return
     const { userUuid, surveyId } = generation
+    forgetOlderImports({ store: ctx.store, generation, jobUuid })
     ctx.store.remove({ userUuid, surveyId, id: DATA_IMPORTED_SUGGESTION_ID })
     ctx.store.add({
       userUuid,
