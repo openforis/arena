@@ -43,9 +43,11 @@ export type AssistantConversationApi = {
   retry: () => void
   newConversation: () => void
   openConversation: (id: string) => void
+  // waits for the store to open
   loadHistory: () => Promise<void>
+  // rejects when the store fails: nothing was cleared
   clearConversations: () => Promise<void>
-  // deletes one conversation of the list; the open one leaves the chat on the start screen
+  // deletes one conversation of the list (rejects when the store fails); the open one leaves the chat on the start screen
   deleteConversation: (id: string) => Promise<void>
   apply: (changeSetId: string, operationIds: string[]) => Promise<void>
   // record-edit card: sends the edits to the batch endpoint (onProgress: chunks done, chunks total) and stores the results

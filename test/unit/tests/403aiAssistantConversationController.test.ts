@@ -106,6 +106,7 @@ const instantTurn = jest.fn(async (params: RunAssistantTurnParams) => {
 const setup = async ({
   conversations = [] as Conversation[],
   runTurn = instantTurn as AssistantConversationDeps['runTurn'],
+  open = true,
 } = {}) => {
   instantTurn.mockClear()
   const openConversations = createOpenConversations({ getStorage: () => null })
@@ -136,7 +137,7 @@ const setup = async ({
   })
   panel.setScope({ userUuid: scope.userUuid, surveyId: scope.surveyId })
   panel.setArea('design')
-  await controller.init()
+  if (open) await controller.init()
   return { controller, panel, registry, store, suggestions, cards, clearUserData, runTurn }
 }
 
@@ -265,6 +266,22 @@ describe('assistant conversation controller (403)', () => {
       expect(conversation.id).toBe('c1')
       expect(conversation.messages).toHaveLength(remembered.messages.length)
       expect(panel.getState().conversationId).toBe('c1')
+    })
+
+    test('a message that waited for the load is not sent into another area or survey', async () => {
+      const remembered = withTurn(storedConversation('c1'), 'first', 'done')
+      const { controller, panel, store, runTurn } = await setup({ conversations: [remembered] })
+      controller.setScope(scope)
+      const read = deferred<Conversation | null>()
+      store.get.mockImplementationOnce(() => read.promise)
+      panel.setConversationId('c1')
+      controller.select(scope, 'c1')
+      const sent = controller.send(env, 'second')
+      await flush()
+      controller.setScope({ ...scope, area: 'analysis' })
+      read.resolve(remembered)
+      await expect(sent).resolves.toBeNull()
+      expect(runTurn).not.toHaveBeenCalled()
     })
 
     test('when the remembered conversation is not usable, the message starts a new one', async () => {
@@ -585,6 +602,15 @@ describe('assistant conversation controller (403)', () => {
       expect(controller.getState().history).toEqual([])
     })
 
+    test('a list asked before the store opened is read when it opens (the panel asks before the host opens it)', async () => {
+      const { controller, store } = await setup({ conversations: [storedConversation('c1')], open: false })
+      expect(controller.getState().ready).toBe(false)
+      await controller.loadHistory(scope)
+      expect(store.list).toHaveBeenCalledTimes(1)
+      expect(controller.getState().history.map(({ id }) => id)).toEqual(['c1'])
+      expect(controller.getState().ready).toBe(true)
+    })
+
     test('a list that cannot be read leaves the previous one', async () => {
       const { controller, store } = await setup({ conversations: [storedConversation('d1')] })
       await controller.loadHistory(scope)
@@ -608,11 +634,11 @@ describe('assistant conversation controller (403)', () => {
       expect(panel.getState()).toMatchObject({ conversationId: null, view: 'history' })
     })
 
-    test('a failed delete is caught and the list stays', async () => {
+    test('a failed delete leaves the list as it was and reports the failure to the caller', async () => {
       const { controller, store } = await setup({ conversations: [storedConversation('c1')] })
       await controller.loadHistory(scope)
       store.remove.mockRejectedValueOnce(new Error('idb'))
-      await expect(controller.deleteConversation(scope, 'c1')).resolves.toBeUndefined()
+      await expect(controller.deleteConversation(scope, 'c1')).rejects.toThrow('idb')
       expect(controller.getState().history).toHaveLength(1)
     })
 
@@ -626,12 +652,12 @@ describe('assistant conversation controller (403)', () => {
       expect(panel.getState().conversationId).toBeNull()
     })
 
-    test('a failed clear is caught and nothing changes', async () => {
+    test('a failed clear changes nothing and reports the failure to the caller', async () => {
       const { controller, panel, clearUserData } = await setup({ conversations: [storedConversation('c1')] })
       await controller.loadHistory(scope)
       panel.setConversationId('c1')
       clearUserData.mockRejectedValueOnce(new Error('idb'))
-      await expect(controller.clearConversations(scope)).resolves.toBeUndefined()
+      await expect(controller.clearConversations(scope)).rejects.toThrow('idb')
       expect(controller.getState().history).toHaveLength(1)
       expect(panel.getState().conversationId).toBe('c1')
     })

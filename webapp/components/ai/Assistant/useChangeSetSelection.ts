@@ -1,7 +1,7 @@
 import { useMemo } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 
 import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
 import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
@@ -57,6 +57,7 @@ export const useChangeSetSelection = ({
   })
   const { running: applying, run } = useExclusiveRun()
   const confirm = useConfirm()
+  const notifyError = useNotifyError()
 
   const unselectedBehaviourIds = useMemo(
     () =>
@@ -75,7 +76,15 @@ export const useChangeSetSelection = ({
     applying,
     toggle,
     setSelected,
-    apply: () => run(() => onApply(selectedIds)),
+    // a rejection (designer or store error) is shown, not left unhandled
+    apply: () =>
+      run(async () => {
+        try {
+          await onApply(selectedIds)
+        } catch (error) {
+          notifyError({ key: 'aiAssistant.card.applyFailed', params: { message: (error as Error)?.message ?? '' } })
+        }
+      }),
     // onCancel is required by useConfirm's inferred (untyped) parameter
     discard: () => confirm({ key: 'aiAssistant.discardConfirm', onOk: () => void run(onDiscard), onCancel: undefined }),
   }

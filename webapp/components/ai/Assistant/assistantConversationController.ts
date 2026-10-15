@@ -433,7 +433,13 @@ export const createAssistantConversationController = (
   const send = (env: AssistantConversationEnv, text: string, options: AssistantSendOptions = {}) => {
     if (!conversationStore) return Promise.resolve(null)
     // the remembered conversation is loading: the message goes into it once it is there
-    if (loading) return whenLoaded().then(() => startSend(env, text, options))
+    if (loading) {
+      return whenLoaded().then(() => {
+        // the area, survey or user changed while waiting: the message belongs to the context it was typed in
+        if (scopeKey !== null && scopeKey !== toScopeKey(env)) return null
+        return startSend(env, text, options)
+      })
+    }
     return Promise.resolve(startSend(env, text, options))
   }
 
@@ -474,9 +480,11 @@ export const createAssistantConversationController = (
   }
 
   const loadHistory = async (scope: AssistantConversationScope) => {
-    if (!conversationStore) return
     // the render that asks knows the newest scope: its children's effects run before the panel host's
     setScope(scope)
+    // and before the host opened the store: wait for it (a store that can't open leaves the list as it is)
+    await init()
+    if (!conversationStore) return
     historyRequest += 1
     const request = historyRequest
     const key = toScopeKey(scope)
@@ -492,24 +500,17 @@ export const createAssistantConversationController = (
 
   const clearConversations = async ({ userUuid }: AssistantConversationScope) => {
     if (!conversationStore) return
-    try {
-      // all the conversations of the user, whatever the area and the survey
-      await deps.clearUserData({ conversationStore, userUuid })
-    } catch {
-      // nothing was cleared as far as the panel knows: its list and chat stay
-      return
-    }
+    // all the conversations of the user, whatever the area and the survey; a failure leaves the list and the chat as
+    // they were and reaches the caller, who tells the user
+    await deps.clearUserData({ conversationStore, userUuid })
     set({ history: [], conversation: null })
     panel.setConversationId(null)
   }
 
   const deleteConversation = async ({ userUuid }: AssistantConversationScope, id: string) => {
     if (!conversationStore) return
-    try {
-      await conversationStore.remove(id)
-    } catch {
-      return
-    }
+    // a failure leaves the list as it was and reaches the caller, who tells the user
+    await conversationStore.remove(id)
     // a deleted Do it conversation can never settle: its suggestion targets show again
     suggestions.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
     set({ history: state.history.filter((item) => item.id !== id) })

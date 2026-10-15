@@ -1501,6 +1501,8 @@ $t(common.appNameFull)
     deleteConversation: 'Eliminar conversación',
     deleteConversationConfirm: '¿Eliminar esta conversación? No se puede deshacer.',
     discardConfirm: '¿Descartar estos cambios propuestos? No se aplicarán.',
+    deleteConversationFailed: 'No se pudo eliminar la conversación.',
+    deleteAllFailed: 'No se pudieron eliminar las conversaciones.',
     day: {
       today: 'Hoy',
       yesterday: 'Ayer',
@@ -1580,6 +1582,7 @@ $t(common.appNameFull)
       applySelected: 'Aplicar selección',
       discard: 'Descartar',
       discarded: 'Descartado.',
+      applyFailed: 'No se pudieron aplicar los cambios: {{message}}',
       saveCurrentEditFirst: 'Primero guarde o cancele su edición actual.',
       selectOperation: 'Aplicar este cambio',
       empty: '(vacío)',
