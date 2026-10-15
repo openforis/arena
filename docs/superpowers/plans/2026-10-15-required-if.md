@@ -52,24 +52,45 @@ Scope: like the current checkbox, only **single, non-key attributes** (multiple 
 min count, which already supports expressions; key attributes are always required). Entities are excluded because
 `required` is not enforced for entities by the record validator.
 
-### Evaluation: at validation time (not stored in node meta)
+### Decisions (agreed)
 
-`editableIf`/`visibleIf` store their result on the parent node meta (`cEdit`/`cVis`) via the
-`recordNodeDependents*Updater`s. For `requiredIf` we instead evaluate the condition **inside the attribute validator**,
-because:
+- **Three exclusive options**: not required / always required / required when condition is met.
+- **Always an error** when a required value is missing (same severity as today's `required`, no severity selector).
+- **The data entry form marks the attribute as required** (web and mobile) when it is always required, or when its
+  condition is met in that entity. Today no required marker is shown at all, so the marker is new for both cases.
 
-- "required" only affects validation; no form behaviour depends on it;
-- stored meta would be missing/stale for records created before the condition was defined. The
-  `RecordsValidationJob` (arena `server/modules/record/service/recordsValidationJob.js`) only re-validates, it does
-  not recompute node meta, so it would produce wrong results for existing records. Evaluating in the validator makes
-  that job (and record import/upload validation) correct out of the box;
-- no new meta key → no record format change, nothing for older clients to misread.
+### Evaluation: stored flag on the parent node, like `editableIf` / `visibleIf`
+
+The form marker needs a synchronous, per-node answer ("is this attribute required _here, now_?"). The web form does
+not run the record updater on the client (updates come from the server), so the answer must travel with the nodes.
+We therefore follow the `editableIf` (`cEdit`) / `visibleIf` (`cVis`) pattern:
+
+- new parent node meta `cReq?: { [childDefUuid]: boolean }`, computed by a new
+  `recordNodeDependentsRequiredUpdater` (dependency type `required`) whenever a referenced node changes or an entity
+  is created;
+- only stored for child defs with `requiredIf` (explicit `true`/`false`); **absent = not computed**;
+- `Records.isNodeRequired(node)(record)` (sync): `isKey || required || (requiredIf && parent.meta.cReq[defUuid] === true)`;
+  used by the validator, the form marker, completion stats and the record tree status.
+
+Existing records (created before the condition was defined or changed) must not get a stale or missing flag:
+
+- **Validator fallback**: if the def has `requiredIf` and the flag is absent, the validator evaluates the condition
+  itself. Validation is therefore always correct, including the "Validate records" job and records uploaded by old
+  mobile versions (which do not compute `cReq`).
+- **On publish** (`RecordCheckJob`), node defs whose `requiredIf` changed are put in a dedicated bucket: only their
+  `cReq` flags are recomputed (via a new arena-core helper), then the nodes are re-validated. They are **not** added
+  to the "value affecting" bucket, so default values/code attributes are not touched (see the comment on
+  `_classifyNodeDefs` about dependent code values being wiped).
+
+Note: today `editableIf`/`visibleIf` flags are not refreshed on publish for existing records either; out of scope
+here, but the new helper could be generalised later.
 
 Expression context: the **parent entity** (same as `applicable` / `editableIf`), self reference **not allowed**
 (a "required if" that depends on the attribute's own value is meaningless).
 
-Re-validation when a referenced attribute changes: a new `SurveyDependencyType.required` is added to the
-dependency graph and to the dependency types used to collect the nodes to re-validate after an update.
+Re-validation when a referenced attribute changes: `SurveyDependencyType.required` is added to the dependency graph
+and to the dependency types used to collect the nodes to re-validate after an update (the flag updater runs first,
+inside `updateNodesDependents`, so validation sees the updated flag).
 
 ---
 
@@ -83,8 +104,8 @@ PR title must start with `feat:` (minor bump, see CLAUDE.md). No `BREAKING CHANG
 - `src/nodeDef/nodeDefs.ts`:
   - `getRequiredIf(nodeDef): NodeDefExpression[]` → `getValidations(nodeDef)?.requiredIf ?? []`
   - `isRequiredIfDefined(nodeDef): boolean` (non-empty `requiredIf`)
-  - `isRequiredOrConditionallyRequired(nodeDef)` (`isRequired || isRequiredIfDefined`) for callers that need a
-    static "may be required" answer (completion stats, tree status).
+  - `isRequiredOrConditionallyRequired(nodeDef)` (`isRequired || isRequiredIfDefined`) for static, def-level
+    answers (designer, schema summary, page "has completable attributes" check).
   - Keep `isRequired` semantics unchanged ("always required").
 - `src/tests/builder/surveyBuilder/nodeDefBuilder.ts`: `requiredIf(...expressions: (string | NodeDefExpression)[])`,
   mirroring `editableIf(...)`.
@@ -99,29 +120,42 @@ PR title must start with `feat:` (minor bump, see CLAUDE.md). No `BREAKING CHANG
   graph built by an older version simply lacks the `required` key: getters must default to `{}`; it is rebuilt on
   survey load anyway).
 
-### 1.3 Record validation
+### 1.3 Node meta, getters and updater
+
+- `src/node/node.ts`: `NodeMeta.cReq?: { [uuid: string]: boolean }` (doc comment like `cEdit`).
+- `src/node/nodes.ts`: `getChildRequired(node, nodeDefUuid): boolean | undefined`, `assocChildRequired(...)`
+  (options object, `MutationOptions`), `dissocChildRequired(...)`.
+- `src/record/_records/recordGetters.ts`: `isNodeRequired(node)(record)` (positional, allocation-free, see CLAUDE.md
+  "Record getters"); exported through `Records`.
+- `src/record/recordNodesUpdater/recordNodeDependentsBooleanUpdater.ts`: today, with no expressions, it returns
+  `true` (the editable/visible default). Add a `defaultValue` param (default `true`, unchanged for existing callers)
+  and skip pointers whose def has no expressions when `defaultValue` is `false`, so `cReq` is never written for defs
+  without `requiredIf` (new entities create pointers for all child defs).
+- New `recordNodeDependentsRequiredUpdater.ts` (`dependencyType: required`, `getExpressions: getRequiredIf`,
+  `getValuePrev: getChildRequired`, `assocValue: assocChildRequired`, `defaultValue: false`), registered in
+  `dependentsUpdaters` (`recordNodesUpdater.ts`) after `updateSelfAndDependentsEditable`.
+- New helper for the publish job: `RecordUpdater.updateRequiredFlags({ user, survey, record, nodeDefUuids, sideEffect })`:
+  for every parent entity of the nodes of those defs, recompute (or dissoc, if `requiredIf` was removed) the `cReq`
+  entry; returns a `RecordUpdateResult` with the updated parent nodes.
+
+### 1.4 Record validation
 
 - `src/record/recordValidator/attributeValidator.ts`, `_validateRequired`:
   - becomes async and receives `{ user, survey, record, nodeDef }`;
+  - a non-blank value is valid (short-circuit, no evaluation);
   - `isKey || isRequired` → as today;
-  - else if `requiredIf` defined → evaluate with
+  - `requiredIf` defined → use the parent flag `cReq`; if absent, evaluate with
     `expressionEvaluator.evalApplicableExpression({ user, survey, record, nodeCtx: parentNode, expressions })`;
-    required when the result value is truthy;
-  - only evaluate when the value is blank (cheap short-circuit: a non-blank value is valid regardless);
-  - same error key `record.attribute.valueRequired` → no new i18n key needed in clients.
-- `src/record/recordUpdater.ts`: add `SurveyDependencyType.required` to `validationDependencyTypes`, so changing an
-  attribute referenced by a `requiredIf` re-validates the dependent attributes.
-- `src/record/recordValidator/attributeValidator.ts`, `findSortedNodesToValidate`: also collect dependents of type
-  `required` (today only `validations`).
+  - always severity `error`, same key `record.attribute.valueRequired` → no new i18n key in clients.
+- `src/record/recordUpdater.ts`: add `SurveyDependencyType.required` to `validationDependencyTypes`.
+- `findSortedNodesToValidate` (same file): also collect dependents of type `required` (today only `validations`).
 
-### 1.4 Completion / pages validation
+### 1.4b Completion / pages validation
 
-- `src/record/_records/recordCompletion.ts` (`getAttributeCompletionStats`) is synchronous, so it cannot evaluate
-  expressions. For an attribute with `requiredIf`, read the node validation in `record.validation`
-  (`RecordValidations.getValidationNode`): a `record.attribute.valueRequired` error → `{ total: 1, filled: 0 }`,
-  otherwise `emptyStats()` (filling it removes it from the total, so the percentage still reaches 100%).
-  Behaviour for `required`/key attributes unchanged.
-- `recordPagesValidation`: verify it already relies on record validation (no change expected).
+- `src/record/_records/recordCompletion.ts` (`getAttributeCompletionStats`): replace
+  `!NodeDefs.isRequired(nodeDef) && !NodeDefs.isKey(nodeDef)` with "not required for this node": for single
+  attributes use `Records.isNodeRequired(node)(record)` (attribute with condition not met → not counted).
+- `recordPagesValidation`: relies on record validation (no change expected; add a test).
 
 ### 1.5 Tests (Jest, using `SurveyBuilder`/`RecordBuilder`)
 
@@ -134,6 +168,10 @@ PR title must start with `feat:` (minor bump, see CLAUDE.md). No `BREAKING CHANG
   `requiredIf` ignored for key attributes (always required).
 - `dependencies` test: `requiredIf` adds `required` dependency; self reference rejected.
 - `nodeDefs` getters tests.
+- `recordNodesUpdater.requiredIf.test.ts`: `cReq` set/updated when the referenced attribute changes and on entity
+  creation; never written for defs without `requiredIf`; editable/visible behaviour unchanged (existing tests).
+- Validator fallback: record without `cReq` (simulating an old record) still validated correctly.
+- `updateRequiredFlags` helper: computes, updates and removes flags.
 
 ## Part 2 — arena
 
@@ -175,11 +213,34 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 - i18n keys in `nodeDefEdit.validationsProps` (`notRequired`, `alwaysRequired`, `requiredWhenConditionIsMet`)
   for all languages in `core/i18n/resources/*/` (English text as fallback where no translation is available);
 - `TestId.nodeDefDetails.requiredIf` for e2e.
+- `store/actions/useSetProp.js` (`_onUpdateMultiple`): when an attribute becomes multiple, also dissoc `requiredIf`
+  (today only `required` is removed); same when it becomes a key attribute.
+
+### 2.2b Required marker in the data entry form (web)
+
+- `webapp/components/survey/SurveyForm/nodeDefs/components/NodeDefFormItem/NodeDefFormItemLabel.js`: add a required
+  marker (asterisk after the label, `survey-form__node-def-required-marker`, title "Required") when
+  `Records.isNodeRequired` is true for the node (single attributes; `parentNode` is already passed to the label),
+  or, in designer/preview edit mode without a node, when the def is always required or has `requiredIf`.
+- Key attributes keep the key icon (no asterisk, they are implicitly required).
+- Table layout (multiple entities, `nodeDefTableCellHeader.js`): the header shows the asterisk for always-required
+  attributes only (the condition can differ per row); conditionally required cells get the marker in the cell when
+  the row flag is true (e.g. a small asterisk badge or a CSS class on the cell).
+- The marker updates live: node updates pushed by the server carry the parent entity with the new `cReq` meta, and
+  the web record state already replaces updated nodes.
+- `core/record/_node/nodeMeta.js`: add `childRequired: 'cReq'` key for consistency with `cEdit`.
 
 ### 2.3 Other server/webapp usages of `isRequired`
 
-- `webapp/store/ui/record/hooks/useRecordTreeItemStatus.ts` (`pageHasOwnCompletableAttributes`): use
-  "required or conditionally required".
+- `webapp/store/ui/record/hooks/useRecordTreeItemStatus.ts` (`pageHasOwnCompletableAttributes`): def-level check,
+  use "required or conditionally required" (actual per-record completion comes from arena-core).
+- `server/modules/survey/service/recordCheckJob.js` (publish):
+  - `_classifyNodeDefs`: new bucket `nodeDefRequiredIfUpdatedUuids` for published defs whose draft changes
+    `validations.requiredIf` (compare draft vs published `requiredIf`; the `draftAdvancedValidations` flag alone also
+    fires for message-only changes). Keep them out of `nodeDefUpdatedUuids` (value-affecting).
+  - also include new (added) defs with `requiredIf` and existing defs whose `requiredIf` was removed;
+  - for each record: `RecordUpdater.updateRequiredFlags({ nodeDefUuids })`, persist the updated parent nodes
+    (meta only) with the existing `nodesBatchUpdater`, then validate those defs' nodes (`_validateNodes`).
 - `server/modules/survey/service/schemaSummary/schemaSummary.js`: keep `required` column, add `requiredIf` column
   (expressions joined like the validations column).
 - Imports:
@@ -198,17 +259,27 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 - Unit (`test/unit`): `NodeDefValidations` helpers, `nodeDefValidator` / expressions validator for `requiredIf`.
 - Integration: record update via `RecordManager` with a `requiredIf` attribute; `RecordsValidationJob` on an
   existing record after adding a `requiredIf` to a published survey.
-- E2E (`test/e2e/specs/`): designer sets "Required when condition is met", publishes; data entry shows/clears the
-  "value required" error when the referenced attribute changes.
+- Integration: publish a survey adding/changing/removing a `requiredIf` on a def with existing records →
+  `cReq` meta recomputed, validation updated, dependent code attribute values untouched.
+- E2E (`test/e2e/specs/`): designer sets "Required when condition is met", publishes; in data entry the asterisk and
+  the "value required" error appear/disappear when the referenced attribute changes; always-required attribute
+  shows the asterisk.
 
 ## Part 3 — arena-mobile
 
 - Bump `@openforis/arena-core`. Validation comes from arena-core, so required-if errors appear automatically in the
   record editor and in the validation report.
-- `NodeCoordinateComponent/useNodeCoordinateComponent.ts:355` uses `NodeDefs.isRequired`: decide whether
-  "conditionally required" should behave as required there (probably use the record validation of the node).
-- Older app versions: lenient fallback described above (no false errors); the server flags missing values on
-  upload. Optionally: if surveys carry a minimum app version, bump it when `requiredIf` is used.
+- Mobile runs the arena-core record updater locally, so `cReq` is computed on the device for new and edited records.
+- Required marker: `src/screens/RecordEditor/NodeDefFormItem/NodeDefFormItemHeader.tsx` shows an asterisk after
+  the label when `Records.isNodeRequired(node)(record)` (it already receives `parentNodeUuid`; add a selector in
+  `state/dataEntry/selectors.ts` next to the editable one, line ~194). Same for the multiple entity list/table
+  headers (always-required only) and the nodes carousel.
+- `NodeCoordinateComponent/useNodeCoordinateComponent.ts:355` uses `NodeDefs.isRequired`: switch to the node-level
+  `Records.isNodeRequired`.
+- Records downloaded from the server already carry `cReq`; records created on older app versions lack it → the
+  validator fallback evaluates the condition, and editing any referenced attribute computes the flag.
+- Older app versions: lenient fallback described above (no false errors, no marker); the server flags missing
+  values on upload. Optionally: if surveys carry a minimum app version, bump it when `requiredIf` is used.
 
 ## Backwards compatibility checklist
 
@@ -218,7 +289,11 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 - [ ] Old arena-core consumers ignore `requiredIf` → field becomes "not required" there (never stricter).
 - [ ] Survey backup export/import, clone, publish/unpublish round-trip `requiredIf` (covered by `propsAdvanced`;
       add an assertion in an existing integration test).
-- [ ] Records created before the condition was added are correctly validated by `RecordsValidationJob`.
+- [ ] Records created before the condition was added: `cReq` computed on publish (`RecordCheckJob`), and the
+      validator falls back to evaluating the condition when `cReq` is absent (e.g. `RecordsValidationJob`,
+      uploads from old mobile versions).
+- [ ] `cReq` is a new, optional node meta key: old clients ignore it; nothing written for defs without `requiredIf`.
+- [ ] Boolean updater change keeps `editableIf`/`visibleIf` behaviour identical (default `defaultValue: true`).
 - [ ] Same error key (`record.attribute.valueRequired`) → validation report, exports and mobile show it without
       new translations.
 
@@ -231,8 +306,6 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 
 ## Open questions
 
-- Should "Always required" + condition be allowed (e.g. `applyIf` per cycle)? `NodeDefExpression.applyIf` already
-  covers it within the conditional mode, so the plan keeps the three modes exclusive.
-- Should the data entry form show a "required" marker (asterisk) for conditionally required attributes when the
-  condition is met? Not shown today for always-required ones either; if wanted, it can read the node validation.
-- Severity: keep "error" like `required`, or allow choosing warning (as validation expressions do)?
+- Table layout marker for conditionally required cells: confirm the visual (asterisk badge in the cell vs. header
+  asterisk with a "conditional" hint).
+- Should the asterisk also be shown on key attributes (currently they only show the key icon)?
