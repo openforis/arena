@@ -2,7 +2,8 @@ import {
   groupEditsByRecord,
   parseNodesBatchRequest,
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchRequest'
-import { NodesBatchLimits, failedResults } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+import { failedResults } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
 
 const uuidOf = (prefix: string, n: number) => `${prefix}-0000-4000-8000-${String(n).padStart(12, '0')}`
 const rec = (n: number) => uuidOf('00000001', n)
@@ -43,6 +44,19 @@ describe('nodes batch request', () => {
     expectInvalid({ cycle: '0', edits: [edit('r1', node(1))] }, 'edit')
     expectInvalid({ cycle: '0', edits: [edit(rec(1), 'n1')] }, 'edit')
     expectInvalid({ cycle: '0', edits: [edit(rec(1), `${node(1)}x`)] }, 'edit')
+  })
+
+  test('uuids are lower-cased like the database ones, so a node in two cases is a duplicate', () => {
+    const recordUuid = 'abcdef01-0000-4000-8000-0000000000ab'
+    const nodeUuid = 'abcdef02-0000-4000-8000-0000000000cd'
+    const upper = (uuid: string) => uuid.toUpperCase()
+    const request = parseNodesBatchRequest({ cycle: '0', edits: [edit(upper(recordUuid), upper(nodeUuid))] })
+    expect(request.edits).toEqual([{ recordUuid, nodeUuid, from: 1, to: 2 }])
+    expect.assertions(3)
+    expectInvalid(
+      { cycle: '0', edits: [edit(recordUuid, nodeUuid), edit(recordUuid, upper(nodeUuid))] },
+      'duplicateNode'
+    )
   })
 
   test('exactly 200 edits are accepted', () => {

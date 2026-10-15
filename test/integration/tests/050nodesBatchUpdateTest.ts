@@ -1,5 +1,6 @@
 import { db } from '@server/db/db'
 
+import * as ProcessUtils from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
@@ -280,12 +281,24 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
     expect(route).toBeDefined()
     expect(route.handlers.slice(0, 2)).toEqual([requireSurveyViewPermission, requireRecordCleansePermission])
 
+    // the route is part of the assistant: it needs the AI features on, for the server and for the user
+    const aiOn = jest.replaceProperty(ProcessUtils.ENV, 'aiFeaturesEnabled', true)
+    const aiUser = { ...user, prefs: { ai: { accessLevel: 3, featureToggles: { assistantCleaning: true } } } }
     const handler = route.handlers[route.handlers.length - 1]
     const res = createFakeResponse()
-    await handler(
-      { user, params: { surveyId: String(surveyId) }, query: {}, body: { cycle: Survey.cycleOneKey, edits: [{}] } },
-      res
-    )
+    try {
+      await handler(
+        {
+          user: aiUser,
+          params: { surveyId: String(surveyId) },
+          query: {},
+          body: { cycle: Survey.cycleOneKey, edits: [{}] },
+        },
+        res
+      )
+    } finally {
+      aiOn.restore()
+    }
 
     expect(res.statusCode).toBe(400)
     expect(res.body).toMatchObject({ key: 'appErrors:record.nodesBatchInvalid' })

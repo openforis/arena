@@ -15,7 +15,8 @@ import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 
-const user = { uuid: 'user-uuid' }
+const user = { uuid: 'user-uuid', authGroups: [{ name: 'systemAdmin' }] }
+const nobody = { uuid: 'nobody-uuid', authGroups: [] }
 
 describe('processNodesBatch', () => {
   let survey: any
@@ -69,19 +70,26 @@ describe('processNodesBatch', () => {
     recordInDb = record,
     nodeRecordUuids = {},
     now = 1000,
+    persistNow,
+    matchesQualifiers = () => true,
+    stepAndOwnerInDb = undefined,
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
     lockError?: Error | null
     recordInDb?: any
     nodeRecordUuids?: Record<string, string>
-    now?: number
+    now?: number | (() => number)
+    persistNow?: () => void
+    matchesQualifiers?: (params: { pendingNode: any }) => boolean
+    // step and owner as they are in the database, when they differ from the (cached) record
+    stepAndOwnerInDb?: { step: string; ownerUuid: string } | null
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
     const calls = { cacheRecord: 0, clearCachedRecord: 0, persistNode: 0, insideLock: false, postedInsideLock: 0 }
     const deps: NodesBatchProcessorDeps = {
-      now: () => now,
+      now: typeof now === 'function' ? now : () => now,
       getSurvey: async () => survey,
       runWithRecordLock: async (_recordUuid, fn) => {
         if (lockError) throw lockError
@@ -93,6 +101,12 @@ describe('processNodesBatch', () => {
         }
       },
       getOrFetchRecord: async () => recordInDb,
+      fetchRecordStepAndOwner: async () =>
+        stepAndOwnerInDb === undefined
+          ? recordInDb && { step: Record.getStep(recordInDb), ownerUuid: Record.getOwnerUuid(recordInDb) }
+          : stepAndOwnerInDb,
+      fetchQualifierFilters: async () => [{ nodeDef: 'qualifier' }],
+      recordMatchesQualifierFilters: ({ pendingNode }) => matchesQualifiers({ pendingNode }),
       findNodeRecordUuid: async ({ nodeUuid, t }) => {
         expect(t).toBe('tx')
         return nodeRecordUuids[nodeUuid] ?? null
@@ -106,6 +120,7 @@ describe('processNodesBatch', () => {
       ) => {
         expect(t).toBe('tx')
         calls.persistNode += 1
+        persistNow?.()
         if (Node.getUuid(node) === failOnNodeUuid) throw new Error('boom')
         nodesUpdateListener({ [Node.getUuid(node)]: node })
         nodesValidationListener(validationFor(node))
@@ -193,16 +208,155 @@ describe('processNodesBatch', () => {
       deps,
     })
     expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
+      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
       { index: 1, status: 'conflict' },
-      { index: 2, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
-      { index: 3, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
+      { index: 2, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
+      { index: 3, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
     ])
     expect(posted).toEqual([])
     expect(calls.cacheRecord).toBe(0)
     expect(calls.clearCachedRecord).toBe(1)
     expect(errors).toHaveLength(1)
     expect(errors[0]).toContain('boom')
+  })
+
+  test('the text of an unexpected error stays in the server log and is never sent to the client', async () => {
+    const secret = 'connect ECONNREFUSED 10.0.0.5:5432 password=hunter2'
+    const { deps, errors } = createDeps()
+    deps.persistNode = async () => {
+      throw new Error(secret)
+    }
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' }])
+    expect(JSON.stringify(results)).not.toContain('hunter2')
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain(secret)
+  })
+
+  test('a deadline passed between two edits rolls the record back: no edit commits after the timeout was reported', async () => {
+    let clock = 1000
+    const { deps, posted, calls } = createDeps({
+      now: () => clock,
+      persistNow: () => {
+        clock = 10_001 // the first edit used up the time
+      },
+    })
+    const results = await processNodesBatch({
+      msg: msgOf([
+        { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+        { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        { index: 2, nodeUuid: cUuid, from: 3, to: 30 },
+      ]),
+      deps,
+    })
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+      { index: 1, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+      { index: 2, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+    ])
+    // the transaction is aborted by an error: nothing is cached, no events are sent
+    expect(calls.persistNode).toBe(1)
+    expect(calls.cacheRecord).toBe(0)
+    expect(calls.clearCachedRecord).toBe(1)
+    expect(posted).toEqual([])
+  })
+
+  test('a deadline passed during the last edit also rolls the record back, before the commit', async () => {
+    let clock = 1000
+    const { deps, posted, calls, errors } = createDeps({
+      now: () => clock,
+      persistNow: () => {
+        clock = 10_001
+      },
+    })
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' }])
+    expect(calls.cacheRecord).toBe(0)
+    expect(posted).toEqual([])
+    // an expected outcome, not an error to investigate
+    expect(errors).toEqual([])
+  })
+
+  describe('permission inside the lock', () => {
+    const forbidden = (index: number) => ({ index, status: 'failed', messageKey: 'appErrors:forbidden' })
+
+    test('a record moved to the analysis step after the request was checked is refused, nothing is written', async () => {
+      const { deps, calls, posted } = createDeps({ recordInDb: { ...record, step: '3' } })
+      const results = await processNodesBatch({
+        msg: msgOf([
+          { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+          { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        ]),
+        deps,
+      })
+      expect(results).toEqual([forbidden(0), forbidden(1)])
+      expect(calls.persistNode).toBe(0)
+      expect(posted).toEqual([])
+    })
+
+    test('a promotion to analysis that the cached record does not know is refused: the step is read under the lock', async () => {
+      // the thread cache can be stale: updating the step does not change the date the cache is checked with
+      const { deps, calls } = createDeps({ stepAndOwnerInDb: { step: '3', ownerUuid: Record.getOwnerUuid(record) } })
+      const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+      expect(results).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    describe('a user who edits their own records only', () => {
+      const surveyUuidOfSurvey = () => Record.getSurveyUuid(record) ?? 'survey-uuid'
+      const ownerUser = () => ({
+        uuid: 'owner-uuid',
+        authGroups: [{ surveyUuid: surveyUuidOfSurvey(), name: 'dataEditor', recordSteps: { '1': 'own', '2': 'own' } }],
+      })
+      const ownedRecord = () => ({ ...record, surveyUuid: surveyUuidOfSurvey(), ownerUuid: 'owner-uuid' })
+
+      test('edits the record they own', async () => {
+        const { deps, calls } = createDeps({ recordInDb: ownedRecord() })
+        const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: ownerUser() }
+        expect(await processNodesBatch({ msg: message, deps })).toEqual([{ index: 0, status: 'applied' }])
+        expect(calls.persistNode).toBe(1)
+      })
+
+      test('is refused when the owner changed in the database and the cached record does not know it', async () => {
+        const { deps, calls } = createDeps({
+          recordInDb: ownedRecord(),
+          stepAndOwnerInDb: { step: '1', ownerUuid: 'someone-else' },
+        })
+        const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: ownerUser() }
+        expect(await processNodesBatch({ msg: message, deps })).toEqual([forbidden(0)])
+        expect(calls.persistNode).toBe(0)
+      })
+    })
+
+    test('a user who may not edit the record is refused', async () => {
+      const { deps, calls } = createDeps()
+      const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: nobody }
+      expect(await processNodesBatch({ msg: message, deps })).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    test('a record outside the group qualifiers of the user (as it is now) is refused', async () => {
+      const { deps, calls } = createDeps({ matchesQualifiers: () => false })
+      const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+      expect(results).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    test('a new value that takes the record out of the qualifiers is refused, the other edit is applied', async () => {
+      const { deps, calls } = createDeps({
+        // the record matches; the pending node of the edit of a (value 10) does not
+        matchesQualifiers: ({ pendingNode }) => !pendingNode || Node.getValue(pendingNode) !== 10,
+      })
+      const results = await processNodesBatch({
+        msg: msgOf([
+          { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+          { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        ]),
+        deps,
+      })
+      expect(results).toEqual([forbidden(0), { index: 1, status: 'applied' }])
+      expect(calls.persistNode).toBe(1)
+    })
   })
 
   test('a lock timeout fails every edit with appErrors:record.lockTimeout', async () => {

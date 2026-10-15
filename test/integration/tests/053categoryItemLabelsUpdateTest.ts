@@ -202,13 +202,21 @@ describe('Category item labels update (053)', () => {
     expect(route?.handlers[0]).toBe(AuthMiddleware.requireSurveyEditPermission)
     await expectEditPermissionOnly({ routes: [route], admin: user, surveyId })
 
+    // the route is part of the assistant: it needs the AI features on, for the server and for the user
+    const aiOn = jest.replaceProperty(ProcessUtils.ENV, 'aiFeaturesEnabled', true)
+    const aiUser = { ...user, prefs: { ai: { accessLevel: 2, featureToggles: { assistantDesign: true } } } }
     const res = createFakeResponse()
-    const items = [{ itemUuid: white, lang: 'fr', text: 'Blanc', expectedText: null }]
-    await route?.handlers[1]({ params: { surveyId: String(surveyId) }, query: {}, body: { items }, user }, res)
+    const badRes = createFakeResponse()
+    try {
+      const items = [{ itemUuid: white, lang: 'fr', text: 'Blanc', expectedText: null }]
+      const params = { surveyId: String(surveyId) }
+      await route?.handlers[1]({ params, query: {}, body: { items }, user: aiUser }, res)
+      await route?.handlers[1]({ params, query: {}, body: { items: [] }, user: aiUser }, badRes)
+    } finally {
+      aiOn.restore()
+    }
     expect(res.body.applied).toEqual([{ itemUuid: white, lang: 'fr' }])
 
-    const badRes = createFakeResponse()
-    await route?.handlers[1]({ params: { surveyId: String(surveyId) }, query: {}, body: { items: [] }, user }, badRes)
     expect(badRes.statusCode).toBe(400)
     expect(badRes.body).toEqual({
       status: 'error',

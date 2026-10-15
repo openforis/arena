@@ -7,8 +7,7 @@ import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import * as Log from '@server/log/log'
-import SystemError from '@core/systemError'
+import { sendRouteError } from '@server/utils/sendRouteError'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -23,8 +22,9 @@ import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import { minMobileAppVersionRecordsDownload } from '@common/mobile'
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as RecordService from '../service/recordService'
 
 import {
@@ -45,14 +45,13 @@ import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMid
 import {
   requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
-  requireRecordReadableByUserGroup,
+  requireRecordMatchesUserGroupQualifiersRead,
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
 import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
 import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
-
-const Logger = Log.getLogger('RecordApi')
+import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -156,6 +155,8 @@ export const init = (app) => {
     async (req, res) => {
       try {
         const user = Request.getUser(req)
+        // the edits come from the assistant: the AI switches (server and user) apply, as for the gateway
+        assertFeatureEnabled('assistantCleaning', user)
         const { surveyId, timezoneOffset = null, lang = null } = Request.getParams(req)
         const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req))
 
@@ -171,8 +172,13 @@ export const init = (app) => {
       } catch (error) {
         // sendErr (not next(error)): the error middleware runs before these routes, so next(error) would
         // lose the key of the parser's 400 SystemError
-        if (!(error instanceof SystemError)) Logger.error(`batch record edit failed: ${error?.stack ?? error}`)
-        Response.sendErr(res, error)
+        sendRouteError({
+          res,
+          error,
+          unexpectedKey: NodesBatchMessageKeys.unexpected,
+          context: 'batch record edit',
+          retryAfterSeconds: NodesBatchLimits.busyRetryAfterSeconds,
+        })
       }
     }
   )
@@ -238,8 +244,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -401,8 +406,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireNodeUuidBelongsToRecord,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
@@ -419,8 +424,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireNodeUuidBelongsToRecord,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       let tempFilePath
       try {
@@ -538,8 +543,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/docx',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
@@ -569,8 +573,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/pdf',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)

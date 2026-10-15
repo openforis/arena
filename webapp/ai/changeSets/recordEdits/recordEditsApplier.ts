@@ -1,14 +1,13 @@
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { isTimeoutError } from '@webapp/ai/tools/analysis/analysisApi'
 
 import { postRecordEdits, type PostRecordEdits } from './recordEditsClient'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation, type RecordEditResult } from './types'
 
-// the endpoint accepts at most 50 records per request
-export const RECORDS_PER_REQUEST = 50
-
-// ... and at most 200 edits
-export const EDITS_PER_REQUEST = 200
+// the limits of the endpoint, shared with the server
+export const RECORDS_PER_REQUEST = NodesBatchLimits.maxRecords
+export const EDITS_PER_REQUEST = NodesBatchLimits.maxEdits
 
 /**
  * Splits edits into chunks of at most `maxRecords` records and `maxEdits` edits; all the edits of a record go to

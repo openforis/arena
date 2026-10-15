@@ -27,7 +27,7 @@ const parseNonNegativeInt = (value: unknown, name: string): number | null => {
 }
 
 /**
- * Validates the activity log fetch parameters (ids are interpolated in the SQL, so only digits pass).
+ * Validates the activity log fetch parameters (a bad id is a 400, not a database cast error).
  * @param {object} params - Request params.
  * @returns {{idGreaterThan: ?number, idLessThan: ?number, limit: number}} The parsed params.
  */

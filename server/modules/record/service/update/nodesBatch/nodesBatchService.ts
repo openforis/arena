@@ -6,7 +6,10 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
@@ -17,11 +20,12 @@ import * as Log from '@server/log/log'
 import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
+import { withSurveyUuid } from './nodesBatchRecordPermission'
 import { groupEditsByRecord } from './nodesBatchRequest'
+import { NodesBatchProcessSlots, NodesBatchSlots } from './nodesBatchSlots'
 import {
   NodesBatchEdit,
   NodesBatchEditResult,
-  NodesBatchLimits,
   NodesBatchMessageKeys,
   NodesBatchPersistMessage,
   NodesBatchRecordEdit,
@@ -31,6 +35,14 @@ import {
 } from './nodesBatchTypes'
 
 const Logger = Log.getLogger('NodesBatchService')
+
+const TOO_MANY_REQUESTS = 429
+const GATEWAY_TIMEOUT = 504
+
+// the thread stops before the caller stops waiting, so a commit never lands after the timeout was reported
+const COMMIT_MARGIN_MS = 2000
+// a batch stuck before posting (a database call that never answers) gives its slot back after the deadline plus this
+const SLOT_RELEASE_GRACE_MS = 5000
 
 export type NodesBatchServiceDeps = {
   fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<any>
@@ -46,6 +58,7 @@ export type NodesBatchServiceDeps = {
   }) => boolean
   postBatchMessage: (msg: NodesBatchPersistMessage) => void
   replies: NodesBatchReplyRegistry
+  slots: NodesBatchSlots
   logError: (message: string) => void
 }
 
@@ -76,19 +89,9 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
   recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
   postBatchMessage: (msg) => RecordsUpdateThreadService.getOrCreatedThread().postMessage(msg),
   replies: NodesBatchReplies,
+  slots: NodesBatchProcessSlots,
   logError: (message) => Logger.error(message),
 })
-
-/**
- * Returns the record with its survey uuid (needed by the Authorizer), taken from the survey when missing.
- * @param {object} record - The record.
- * @param {object} survey - The survey.
- * @returns {object} The record.
- */
-const withSurveyUuid = (record: any, survey: any) =>
-  Record.getSurveyUuid(record)
-    ? record
-    : { ...record, [Record.keys.surveyUuid]: Survey.getUuid(Survey.getSurveyInfo(survey)) }
 
 /**
  * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
@@ -177,52 +180,93 @@ const sendRecordEdits = async (
   const requestId = uuidv4()
   // registered before posting, so the reply can't be missed
   const reply = deps.replies.waitFor(requestId, Math.max(0, deadline - Date.now()))
-  deps.postBatchMessage({
-    type: RecordsUpdateThreadMessageTypes.nodesBatchPersist,
-    requestId,
-    user,
-    surveyId,
-    cycle,
-    draft: false,
-    recordUuid,
-    edits,
-    timezoneOffset,
-    lang,
-    deadline,
-  })
+  try {
+    deps.postBatchMessage({
+      type: RecordsUpdateThreadMessageTypes.nodesBatchPersist,
+      requestId,
+      user,
+      surveyId,
+      cycle,
+      draft: false,
+      recordUuid,
+      edits,
+      timezoneOffset,
+      lang,
+      deadline: deadline - COMMIT_MARGIN_MS,
+    })
+  } catch (error) {
+    // nothing was sent: drop the waiting reply (its timer would keep the entry until the deadline)
+    deps.replies.resolveReply({ requestId, results: failedResults(edits, NodesBatchMessageKeys.unexpected) })
+    throw error
+  }
   const results = await reply
   return results ?? failedResults(edits, NodesBatchMessageKeys.applyTimeout)
 }
 
 /**
- * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
- * @param {object} params - The parameters.
- * @param {object} params.user - The user.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.cycle - The survey cycle of the records.
- * @param {NodesBatchEdit[]} params.edits - The edits.
- * @param {number|null} [params.timezoneOffset] - The client timezone offset (for expressions using the current time).
- * @param {string|null} [params.lang] - The client language.
- * @param {NodesBatchServiceDeps} [deps] - The dependencies (tests).
+ * Sends the edits of a record; a failure to send fails only the edits of this record. The returned promise never
+ * rejects, so it can wait for the others without an unhandled rejection.
+ * @param {RequestContext} context - The request context.
+ * @param {string} recordUuid - The record uuid.
+ * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
+ * @returns {Promise<NodesBatchEditResult[]>} The results.
+ */
+const sendRecordEditsSafely = async (
+  context: RequestContext,
+  recordUuid: string,
+  edits: NodesBatchRecordEdit[]
+): Promise<NodesBatchEditResult[]> => {
+  try {
+    return await sendRecordEdits(context, recordUuid, edits)
+  } catch (error) {
+    context.deps.logError(`error sending the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
+    return failedResults(edits, NodesBatchMessageKeys.unexpected)
+  }
+}
+
+type NodesBatchParams = {
+  user: any
+  surveyId: number
+  cycle: string
+  edits: NodesBatchEdit[]
+  timezoneOffset?: number | null
+  lang?: string | null
+}
+
+/**
+ * Checks the edits of a record, sends the accepted ones and waits for the reply. A failure fails only this record.
+ * @param {RequestContext} context - The request context.
+ * @param {string} recordUuid - The record uuid.
+ * @param {NodesBatchRecordEdit[]} recordEdits - The edits of the record.
+ * @returns {Promise<NodesBatchEditResult[]>} The results of the edits of the record.
+ */
+const processRecordEdits = async (
+  context: RequestContext,
+  recordUuid: string,
+  recordEdits: NodesBatchRecordEdit[]
+): Promise<NodesBatchEditResult[]> => {
+  // the request was reported as timed out: do not start more work
+  if (Date.now() >= context.deadline) return failedResults(recordEdits, NodesBatchMessageKeys.applyTimeout)
+  try {
+    const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
+    if (accepted.length === 0) return refused
+    return [...refused, ...(await sendRecordEditsSafely(context, recordUuid, accepted))]
+  } catch (error) {
+    // one record's failure must not hide the results of the others
+    context.deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
+    return failedResults(recordEdits, NodesBatchMessageKeys.unexpected)
+  }
+}
+
+/**
+ * Checks the edits record by record, sends the accepted ones to the records update thread and collects the results.
+ * @param {NodesBatchParams} params - The request.
+ * @param {NodesBatchServiceDeps} deps - The dependencies.
  * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
  */
-export const updateNodesBatch = async (
-  {
-    user,
-    surveyId,
-    cycle,
-    edits,
-    timezoneOffset = null,
-    lang = null,
-  }: {
-    user: any
-    surveyId: number
-    cycle: string
-    edits: NodesBatchEdit[]
-    timezoneOffset?: number | null
-    lang?: string | null
-  },
-  deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
+const runNodesBatch = async (
+  { user, surveyId, cycle, edits, timezoneOffset = null, lang = null }: NodesBatchParams,
+  deps: NodesBatchServiceDeps
 ): Promise<NodesBatchEditResult[]> => {
   const deadline = Date.now() + NodesBatchLimits.replyTimeoutMs
   const survey = await deps.fetchSurvey({ surveyId, cycle })
@@ -239,22 +283,60 @@ export const updateNodesBatch = async (
     deps,
   }
   const results: NodesBatchEditResult[] = []
-  const pendingReplies: Promise<NodesBatchEditResult[]>[] = []
+  // one record at a time: the thread has one queue, so the messages of a batch would delay the form edits of all
+  // the users behind them
   for (const [recordUuid, recordEdits] of groupEditsByRecord(edits)) {
-    try {
-      const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
-      results.push(...refused)
-      if (accepted.length > 0) {
-        pendingReplies.push(sendRecordEdits(context, recordUuid, accepted))
-      }
-    } catch (error) {
-      // one record's failure must not hide the results of the others
-      deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
-      results.push(...failedResults(recordEdits, NodesBatchMessageKeys.generic))
-    }
-  }
-  for (const replyResults of await Promise.all(pendingReplies)) {
-    results.push(...replyResults)
+    results.push(...(await processRecordEdits(context, recordUuid, recordEdits)))
   }
   return results.sort((resultA, resultB) => resultA.index - resultB.index)
+}
+
+/**
+ * Waits for a batch, but not for ever: past the request deadline plus a grace time the caller gets a timeout error
+ * (the work still running in the background stops by itself, as the deadline has passed).
+ * @param {Promise<NodesBatchEditResult[]>} batch - The batch run.
+ * @returns {Promise<NodesBatchEditResult[]>} The results of the batch.
+ * @throws {SystemError} aiApplyTimeout (504) when the batch did not end in time.
+ */
+const runUntilHung = async (batch: Promise<NodesBatchEditResult[]>): Promise<NodesBatchEditResult[]> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const hung = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(new SystemError(NodesBatchMessageKeys.applyTimeout, {}, GATEWAY_TIMEOUT)),
+      NodesBatchLimits.replyTimeoutMs + SLOT_RELEASE_GRACE_MS
+    )
+  })
+  // the batch may still fail after the timeout: nobody waits for it any more
+  batch.catch(() => undefined)
+  try {
+    return await Promise.race([batch, hung])
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
+ * A user has one batch at a time, and a survey and the process a few: the others get a 429.
+ * @param {NodesBatchParams} params - The request.
+ * @param {object} params.user - The user.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.cycle - The survey cycle of the records.
+ * @param {NodesBatchEdit[]} params.edits - The edits.
+ * @param {number|null} [params.timezoneOffset] - The client timezone offset (for expressions using the current time).
+ * @param {string|null} [params.lang] - The client language.
+ * @param {NodesBatchServiceDeps} [deps] - The dependencies (tests).
+ * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
+ */
+export const updateNodesBatch = async (
+  params: NodesBatchParams,
+  deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
+): Promise<NodesBatchEditResult[]> => {
+  const slot = deps.slots.tryAcquire({ userUuid: User.getUuid(params.user), surveyId: params.surveyId })
+  if (slot.ok === false) throw new SystemError(NodesBatchMessageKeys.busy, { scope: slot.scope }, TOO_MANY_REQUESTS)
+  try {
+    return await runUntilHung(runNodesBatch(params, deps))
+  } finally {
+    slot.release()
+  }
 }

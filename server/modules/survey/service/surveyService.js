@@ -7,7 +7,6 @@ import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
-import * as Validation from '@core/validation/validation'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -319,8 +318,26 @@ export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
+/**
+ * Tells if a file belongs to a record: it is read through the record routes, which check the record permissions.
+ * @param {object} summary - The file summary.
+ * @returns {boolean} True for a record attachment.
+ */
+const isRecordFile = (summary) =>
+  Boolean(SurveyFile.getRecordUuid(summary)) ||
+  SurveyFile.getProps(summary)[SurveyFile.propKeys.type] === SurveyFile.SurveyFileType.recordAttachment
+
+/**
+ * Fetches a survey file (map layer, doc image, logo...) with its content; record attachments are not survey files.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.fileUuid - The file uuid.
+ * @returns {Promise<{summary: object, contentStream: object}>} The file summary and its content stream.
+ * @throws {SystemError} 404 fileNotFound when the file does not exist or is a record attachment.
+ */
 export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
-  const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
+  const summary = fileSummary && !isRecordFile(fileSummary) ? fileSummary : null
   const contentStream = summary
     ? await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
     : null
