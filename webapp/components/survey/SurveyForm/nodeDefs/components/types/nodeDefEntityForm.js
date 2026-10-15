@@ -67,7 +67,7 @@ const mapStateToProps = (state, props) => {
 
     const selectedNodeUuid = SurveyFormState.getFormPageNodeUuid(nodeDef)(state)
 
-    const selectedNode = selectedNodeUuid ? Record.getNodeByUuid({ uuid: selectedNodeUuid })(record) : null
+    const selectedNode = selectedNodeUuid ? Record.getNodeByUuid(selectedNodeUuid)(record) : null
 
     return {
       entryMultiple,

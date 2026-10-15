@@ -47,11 +47,8 @@ export default class RecordsValidationJob extends Job {
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid })
 
     const nodesArray = []
-    Records.visitDescendantsAndSelf({
-      node: Records.getRoot(record),
-      visitor: (node) => {
-        nodesArray.push(node)
-      },
+    Records.visitDescendantsAndSelf(Records.getRoot(record), (node) => {
+      nodesArray.push(node)
     })(record)
     await RecordManager.validateSortedNodesAndPersistValidation(
       {

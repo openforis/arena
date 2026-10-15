@@ -397,7 +397,7 @@ export default class RecordCheckJob extends Job {
     for (const nodeDefUuid of nodeDefUuids) {
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
       const parentNodeDefUuid = NodeDef.getParentUuid(nodeDef)
-      const parentNodes = Record.getNodesByDefUuid({ nodeDefUuid: parentNodeDefUuid })(recordUpdated)
+      const parentNodes = Record.getNodesByDefUuid(parentNodeDefUuid)(recordUpdated)
       for (const parentNode of parentNodes) {
         const { record: recordUpdatedNodeInsert, nodes } = /* NOSONAR */ await _insertMissingSingleNode({
           survey,
@@ -457,7 +457,7 @@ const _applyDefaultValuesAndApplicability = async (survey, nodeDefUpdatedUuids, 
 
   // Include nodes associated to updated node defs
   for (const nodeDefUpdatedUuid of nodeDefUpdatedUuids) {
-    const nodesToUpdatePartial = Record.getNodesByDefUuid({ nodeDefUuid: nodeDefUpdatedUuid })(record)
+    const nodesToUpdatePartial = Record.getNodesByDefUuid(nodeDefUpdatedUuid)(record)
     for (const nodeUpdated of nodesToUpdatePartial) {
       nodesToUpdate[Node.getUuid(nodeUpdated)] = nodeUpdated
     }
@@ -489,7 +489,7 @@ const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx)
   // Include parent nodes of new/updated node defs (needed for min/max count validation)
   for (const nodeDefUuid of nodeDefUuids) {
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-    const parentNodes = Record.getNodesByDefUuid({ nodeDefUuid: NodeDef.getParentUuid(def) })(record)
+    const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {
       nodesToValidate[Node.getUuid(parentNode)] = parentNode
     }

@@ -15,7 +15,7 @@ export const useRecord = () => useSelector(RecordState.getRecord)
 
 export const useRecordNode = ({ nodeUuid }) => {
   const record = useSelector(RecordState.getRecord)
-  return nodeUuid && record ? Record.getNodeByUuid({ uuid: nodeUuid })(record) : null
+  return nodeUuid && record ? Record.getNodeByUuid(nodeUuid)(record) : null
 }
 
 /**
@@ -93,7 +93,7 @@ const useNodesCount = ({ parentNodeUuid, nodeDefUuid, countType }) =>
       // count is an array of expressions
       const record = RecordState.getRecord(state)
       if (!record) return undefined
-      const parentNode = Records.getNodeByUuid({ uuid: parentNodeUuid })(record)
+      const parentNode = Records.getNodeByUuid(parentNodeUuid)(record)
       return Nodes.getChildrenMinOrMaxCount({ parentNode, nodeDef, countType })
     }
     // count is constant value (backward compatibility)

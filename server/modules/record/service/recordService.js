@@ -572,39 +572,36 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
   const fileNameParts = []
-  Record.visitAncestorsAndSelf({
-    node,
-    visitor: (ancestorNode) => {
-      const ancestorDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestorNode))(survey)
-      if (ancestorNode === node) {
-        fileNameParts.push(NodeDef.getName(ancestorDef))
-        if (NodeDef.isMultiple(ancestorDef)) {
-          // add node position to the end
-          const index = Record.getNodeChildIndex(ancestorNode)(record)
-          const position = String(index + 1)
-          fileNameParts.push(position)
-        }
-      } else {
-        const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
-
-        if (ancestorKeyDefs.length > 0) {
-          const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
-          const keyValuesFormatted = ancestorKeyDefs
-            .map((keyDef, index) => {
-              const keyNode = ancestorKeyNodes[index]
-              const keyValueFormatted = NodeValueFormatter.format({
-                survey,
-                nodeDef: keyDef,
-                node: keyNode,
-                value: Node.getValue(keyNode),
-              })
-              return encodeURIComponent(keyValueFormatted)
-            })
-            .filter((part) => Objects.isNotEmpty(part))
-          fileNameParts.unshift(keyValuesFormatted.join('_'))
-        }
+  Record.visitAncestorsAndSelf(node, (ancestorNode) => {
+    const ancestorDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestorNode))(survey)
+    if (ancestorNode === node) {
+      fileNameParts.push(NodeDef.getName(ancestorDef))
+      if (NodeDef.isMultiple(ancestorDef)) {
+        // add node position to the end
+        const index = Record.getNodeChildIndex(ancestorNode)(record)
+        const position = String(index + 1)
+        fileNameParts.push(position)
       }
-    },
+    } else {
+      const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
+
+      if (ancestorKeyDefs.length > 0) {
+        const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
+        const keyValuesFormatted = ancestorKeyDefs
+          .map((keyDef, index) => {
+            const keyNode = ancestorKeyNodes[index]
+            const keyValueFormatted = NodeValueFormatter.format({
+              survey,
+              nodeDef: keyDef,
+              node: keyNode,
+              value: Node.getValue(keyNode),
+            })
+            return encodeURIComponent(keyValueFormatted)
+          })
+          .filter((part) => Objects.isNotEmpty(part))
+        fileNameParts.unshift(keyValuesFormatted.join('_'))
+      }
+    }
   })(record)
 
   const fileName = SurveyFile.getName(file)
@@ -708,7 +705,7 @@ const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid
     throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
   }
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-  const entityNode = Record.getNodeByUuid({ uuid: entityNodeUuid })(record)
+  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
   if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
     throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
   }

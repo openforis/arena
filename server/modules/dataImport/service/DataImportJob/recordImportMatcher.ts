@@ -16,7 +16,7 @@ import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 export const getRecordFormattedKeyValues = ({ survey, record }: { survey: any; record: any }): any[] => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
-  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({ survey, entity: recordRootEntity })(record)
+  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid(survey, recordRootEntity)(record)
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const cycle = Record.getCycle(record)
   return keyDefs.map((keyDef: any) => {
@@ -38,7 +38,7 @@ export const getRecordFormattedKeyValuesByDefUuid = ({
 }): { [nodeDefUuid: string]: any } => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
-  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid({ survey, entity: recordRootEntity })(record)
+  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid(survey, recordRootEntity)(record)
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const cycle = Record.getCycle(record)
   return keyDefs.reduce((acc: { [nodeDefUuid: string]: any }, keyDef: any) => {

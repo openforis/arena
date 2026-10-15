@@ -23,7 +23,7 @@ export const getNodePath = (node) => (survey, record) => {
   const nodeDefUuid = Node.getNodeDefUuid(node)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  const parentNode = Record.getParentNode({ node })(record)
+  const parentNode = Record.getParentNode(node)(record)
   if (parentNode) {
     const parentNodePath = getNodePath(parentNode)(survey, record)
 
