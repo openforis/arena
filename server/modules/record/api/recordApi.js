@@ -24,7 +24,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
-import { minMobileAppVersionRecordsDownload } from '@common/mobile'
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as RecordService from '../service/recordService'
 
 import {
@@ -156,6 +156,8 @@ export const init = (app) => {
     async (req, res) => {
       try {
         const user = Request.getUser(req)
+        // the edits come from the assistant: the AI switches (server and user) apply, as for the gateway
+        assertFeatureEnabled('assistantCleaning', user)
         const { surveyId, timezoneOffset = null, lang = null } = Request.getParams(req)
         const { cycle, edits } = parseNodesBatchRequest(Request.getBody(req))
 
