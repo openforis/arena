@@ -24,6 +24,8 @@ import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import { formatErrorForLog, toAiSystemError } from './gateway/errorMapping'
 import {
+  assertFieldLengths,
+  assertProviderCountBelowLimit,
   decryptStoredKey,
   encryptProviderKey,
   type AiProviderPrefs,
@@ -547,8 +549,10 @@ export const getPublicProviders = (
  * as null or whitespace only, is "not sent" and keeps the stored key.
  * @param {AiProviderInput} input - Request input (untrusted).
  * @returns {AiProviderInput} The input with a normalised `apiKey`.
+ * @throws {SystemError} aiProviderFieldTooLong when the model, base URL or key is over its limit.
  */
 const normalizeInput = (input: AiProviderInput): AiProviderInput => {
+  assertFieldLengths(input)
   const { apiKey } = input
   const sent = typeof apiKey === 'string' && (apiKey === '' || apiKey.trim() !== '')
   return { ...input, apiKey: sent ? apiKey : undefined }
@@ -624,6 +628,7 @@ export const listProviderModels = async ({
  * @param {AiProviderInput} params.input - `type`, `name`, `model`, `baseUrl`, `apiKey` (an `id` is ignored).
  * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
  * @returns {Promise<{user: User, provider: PublicAiProvider}>} The updated user and the new entry.
+ * @throws {SystemError} aiProviderLimitReached (409) when the user has the most providers that can be saved.
  */
 export const addProvider = async ({
   user,
@@ -636,6 +641,8 @@ export const addProvider = async ({
 }): Promise<{ user: User; provider: PublicAiProvider }> => {
   const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
+  // refused before the provider is tested; the latest providers are checked again when it is saved
+  assertProviderCountBelowLimit(prefs.providers)
   // an added provider is always a draft: it never takes the key of a saved one
   const draftInput = { ...input, id: undefined }
   const { cfg } = withStoredKey({
@@ -667,6 +674,7 @@ export const addProvider = async ({
     user,
     deps,
     change: (latest) => {
+      assertProviderCountBelowLimit(latest.providers)
       const becomesDefault = latest.defaultProviderId === ARENA_DEFAULT_PROVIDER_ID && !deps.hasAdminDefault()
       return {
         ...latest,

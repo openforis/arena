@@ -1,6 +1,6 @@
 /**
  * The account providers stored in `user.prefs.ai` (pure: no database, no secret read), and the read-time conversion
- * of the single provider slot saved before the list existed (spec section 1.3).
+ * of the single provider slot saved before the list existed.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
@@ -13,6 +13,7 @@ import {
   LEGACY_ACCOUNT_PROVIDER_ID,
   normalizeProviderName,
 } from '@common/ai/providerIds'
+import { AI_MAX_ACCOUNT_PROVIDERS, AI_PROVIDER_FIELD_MAX_CHARS } from '@common/ai/providerLimits'
 
 import { MOCK_PROVIDER } from './mockProvider'
 
@@ -79,6 +80,33 @@ export const trimmedOrNull = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = value.trim()
   return trimmed.length > 0 ? trimmed : null
+}
+
+/**
+ * Throws when a value typed for a provider is longer than the limit of its field.
+ * @param {object} input - The values typed (untrusted).
+ * @returns {void}
+ * @throws {SystemError} aiProviderFieldTooLong (400) with the field and its limit.
+ */
+export const assertFieldLengths = (input: Record<string, unknown>): void => {
+  for (const [field, max] of Object.entries(AI_PROVIDER_FIELD_MAX_CHARS)) {
+    const value = input[field]
+    if (typeof value === 'string' && value.length > max) {
+      throw new SystemError('aiProviderFieldTooLong', { field, max }, StatusCodes.BAD_REQUEST)
+    }
+  }
+}
+
+/**
+ * Throws when the user already has the most providers that can be saved.
+ * @param {readonly unknown[]} providers - The providers stored.
+ * @returns {void}
+ * @throws {SystemError} aiProviderLimitReached (409) with the limit.
+ */
+export const assertProviderCountBelowLimit = (providers: readonly unknown[]): void => {
+  if (providers.length >= AI_MAX_ACCOUNT_PROVIDERS) {
+    throw new SystemError('aiProviderLimitReached', { max: AI_MAX_ACCOUNT_PROVIDERS }, StatusCodes.CONFLICT)
+  }
 }
 
 /**
