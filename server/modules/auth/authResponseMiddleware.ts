@@ -7,8 +7,8 @@ import type { NextFunction, Request, Response } from 'express'
 
 import { omitServerOnlyPrefsFromUser } from '@server/modules/user/serverOnlyPrefs'
 
-// /auth/login and /auth/login/temp, with or without a trailing slash
-const LOGIN_PATH_PATTERN = /^\/auth\/login(\/temp)?\/?$/
+// /auth/login and /auth/login/temp, with or without a trailing slash; Express routes ignore the case
+const LOGIN_PATH_PATTERN = /^\/auth\/login(\/temp)?\/?$/i
 
 /**
  * Returns the response body of a login with the user's server-only prefs removed.
