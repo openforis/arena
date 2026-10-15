@@ -1,6 +1,6 @@
 import './AiPolicyBlockedTooltip.scss'
 
-import React, { useCallback, useId, useMemo, useState } from 'react'
+import React, { useCallback, useId, useMemo, useReducer, useState } from 'react'
 import { Paper, Popper } from '@mui/material'
 import { useNavigate } from 'react-router'
 
@@ -12,6 +12,8 @@ import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurveyAiPolicy } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
+
+import { initialReasonsState, isReasonsPopupOpen, reduceReasons } from './reasonsPopupModel'
 
 const visuallyHidden: React.CSSProperties = {
   position: 'absolute',
@@ -54,9 +56,10 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   const canEditPolicy = useAuthCanEditSurveyAiPolicy()
   // the control the reasons open under (state: the popper reads it while rendering)
   const [target, setTarget] = useState<HTMLSpanElement | null>(null)
+  const [popup, setPopup] = useState<HTMLElement | null>(null)
   // keyboard users: the reasons and their actions open below the control (a tooltip can't be tabbed into)
-  const [keyboardFocus, setKeyboardFocus] = useState(false)
-  const [dismissed, setDismissed] = useState(false)
+  const [reasons, dispatchReasons] = useReducer(reduceReasons, initialReasonsState)
+  const popupOpen = isReasonsPopupOpen(reasons)
 
   const reasonKeys = useMemo(() => availability.reasonKeys ?? [], [availability.reasonKeys])
   // the chat is blocked by the instance ceilings: the survey tab cannot change that
@@ -91,55 +94,68 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   }, [availability, i18n, openPolicyTab, reasonKeys, showPolicyLink])
 
   const onFocus = useCallback((event: React.FocusEvent) => {
-    if (hasKeyboardFocus(event.target)) setKeyboardFocus(true)
+    dispatchReasons({ type: 'focus', keyboard: hasKeyboardFocus(event.target) })
   }, [])
 
-  const onBlur = useCallback((event: React.FocusEvent<HTMLElement>) => {
-    // the focus moves between the control and the actions below it
-    if (event.currentTarget.contains(event.relatedTarget)) return
-    setKeyboardFocus(false)
-    setDismissed(false)
-  }, [])
+  const onBlur = useCallback(
+    (event: React.FocusEvent) => {
+      // the focus moves between the control and the actions below it
+      const next = event.relatedTarget as Node | null
+      const toInside = next !== null && (Boolean(target?.contains(next)) || Boolean(popup?.contains(next)))
+      dispatchReasons({ type: 'blur', toInside })
+    },
+    [popup, target]
+  )
 
   const onKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
-      if (event.key !== 'Escape') return
+      if (event.key !== 'Escape' || !popupOpen) return
       // closes the reasons, not the assistant panel behind
       event.stopPropagation()
-      setDismissed(true)
+      dispatchReasons({ type: 'escape' })
       target?.focus()
     },
-    [target]
+    [popupOpen, target]
   )
 
   if (availability.status !== 'policyBlocked' && availability.status !== 'noEngine') return <>{children}</>
 
   return (
-    <TooltipNew disableFocusListener renderTitle={renderTitle}>
-      {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself */}
-      <span
-        aria-describedby={reasonId}
-        className="ai-policy-blocked"
-        data-testid={TestId.ai.policyBlocked}
-        onBlur={onBlur}
-        onFocus={onFocus}
-        onKeyDown={onKeyDown}
-        ref={setTarget}
-        tabIndex={0}
-      >
-        {children}
-        <span id={reasonId} style={visuallyHidden}>
-          {reasonKeys.map((key) => i18n.t(key)).join(' ')}
+    <>
+      {/* the hover tooltip and the keyboard reasons never show together */}
+      <TooltipNew disableFocusListener renderTitle={renderTitle} suppressed={popupOpen}>
+        {/* hover target: a disabled button (MUI or native, e.g. the chat FAB) does not reliably receive hover itself */}
+        <span
+          aria-describedby={reasonId}
+          className="ai-policy-blocked"
+          data-testid={TestId.ai.policyBlocked}
+          onBlur={onBlur}
+          onFocus={onFocus}
+          onKeyDown={onKeyDown}
+          ref={setTarget}
+          tabIndex={0}
+        >
+          {children}
+          <span id={reasonId} style={visuallyHidden}>
+            {reasonKeys.map((key) => i18n.t(key)).join(' ')}
+          </span>
         </span>
-        {keyboardFocus && !dismissed && (
-          // rendered in place (no portal), so Tab goes from the control to the actions
-          <Popper anchorEl={target} disablePortal open placement="bottom-start" sx={{ zIndex: 'tooltip' }}>
-            <Paper className="ai-policy-blocked__reasons" elevation={4}>
-              {renderTitle()}
-            </Paper>
-          </Popper>
-        )}
-      </span>
-    </TooltipNew>
+      </TooltipNew>
+      {popupOpen && (
+        // rendered in place (no portal), after the control, so Tab goes from the control to the actions; a sibling,
+        // because the reasons are block content and the control is an inline span
+        <Popper anchorEl={target} disablePortal open placement="bottom-start" sx={{ zIndex: 'tooltip' }}>
+          <Paper
+            className="ai-policy-blocked__reasons"
+            elevation={4}
+            onBlur={onBlur}
+            onKeyDown={onKeyDown}
+            ref={setPopup}
+          >
+            {renderTitle()}
+          </Paper>
+        </Popper>
+      )}
+    </>
   )
 }
