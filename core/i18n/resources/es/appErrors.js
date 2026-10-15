@@ -118,6 +118,8 @@ export default {
   aiCallInvalid: 'La solicitud de IA no es válida ({{reason}}).',
   aiRateLimited: 'Demasiadas solicitudes de IA. Espere un minuto y vuelva a intentarlo.',
   aiRequestTimeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
+  aiToolNotOffered:
+    'La IA pidió una herramienta que no tenía permitido usar, por lo que se descartó su respuesta. Inténtelo de nuevo.',
   aiProviderAuth:
     'El proveedor de IA rechazó las credenciales. Compruebe la clave API en Ajustes de IA o consulte a su administrador.',
   aiProviderRateLimited: 'El proveedor de IA está limitando las solicitudes. Inténtelo de nuevo en un momento.',

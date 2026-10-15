@@ -88,6 +88,7 @@ Try to refresh the page.`,
   aiCallInvalid: 'The AI request is not valid ({{reason}}).',
   aiRateLimited: 'Too many AI requests. Please wait a minute and try again.',
   aiRequestTimeout: 'The AI took too long to answer. Please try again.',
+  aiToolNotOffered: 'The AI asked for a tool it was not allowed to use, so its answer was discarded. Please try again.',
   aiProviderAuth:
     'The AI provider rejected the credentials. Check the API key in AI Settings or ask your administrator.',
   aiProviderRateLimited: 'The AI provider is rate limiting requests. Please try again in a moment.',

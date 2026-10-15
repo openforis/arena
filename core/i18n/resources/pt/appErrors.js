@@ -113,6 +113,8 @@ Tente atualizar a página.`,
   aiCallInvalid: 'O pedido de IA não é válido ({{reason}}).',
   aiRateLimited: 'Demasiados pedidos de IA. Aguarde um minuto e tente novamente.',
   aiRequestTimeout: 'A IA demorou demasiado a responder. Tente novamente.',
+  aiToolNotOffered:
+    'A IA pediu uma ferramenta que não tinha permissão para usar, por isso a resposta foi descartada. Tente novamente.',
   aiProviderAuth:
     'O provedor de IA rejeitou as credenciais. Verifique a chave de API nas Definições de IA ou contacte o administrador.',
   aiProviderRateLimited: 'O provedor de IA está a limitar os pedidos. Tente novamente dentro de momentos.',

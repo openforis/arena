@@ -90,6 +90,7 @@ export default {
   aiCallInvalid: 'AIリクエストが無効です（{{reason}}）。',
   aiRateLimited: 'AIリクエストが多すぎます。1分ほど待ってから再度お試しください。',
   aiRequestTimeout: 'AIの応答に時間がかかりすぎました。もう一度お試しください。',
+  aiToolNotOffered: 'AIが使用を許可されていないツールを要求したため、回答を破棄しました。もう一度お試しください。',
   aiProviderAuth: 'AIプロバイダーが認証情報を拒否しました。AI設定のAPIキーを確認するか、管理者にお問い合わせください。',
   aiProviderRateLimited: 'AIプロバイダーがリクエストを制限しています。しばらくしてから再度お試しください。',
   aiProviderRejected: 'AIプロバイダーがリクエストを拒否しました（AI設定のモデル名を確認してください）。',

@@ -65,6 +65,8 @@ export type AiFeatureDef = {
   gateway: boolean
   // true when the browser may send tool definitions and tool calls through the gateway (assistant areas)
   tools?: boolean
+  // the only tool names the browser may offer (absent: any valid name); for areas that need no other tool
+  toolNames?: readonly string[]
 }
 
 const {
@@ -119,8 +121,17 @@ export const AiFeatures: Record<AiFeatureKey, AiFeatureDef> = {
     permission: recordListView,
     gateway: true,
   },
-  // Help area of the assistant: no survey content, only the handbook tools
-  chatbot: { key: 'chatbot', category: chat, dataClass: schema, permission: loggedIn, gateway: true, tools: true },
+  // Help area of the assistant: no survey content, only the handbook tools (the tools of the Help area, see
+  // webapp/ai/tools): without a survey nothing checks the caller's rights, so the tool names are fixed here
+  chatbot: {
+    key: 'chatbot',
+    category: chat,
+    dataClass: schema,
+    permission: loggedIn,
+    gateway: true,
+    tools: true,
+    toolNames: ['conversation_setTitle', 'docs_search', 'view_getCurrent'],
+  },
   // Design area of the assistant: reads the draft survey, proposes change sets
   assistantDesign: {
     key: 'assistantDesign',

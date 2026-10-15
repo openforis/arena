@@ -5,7 +5,14 @@
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import { isAiProviderId } from '@common/ai/providerIds'
-import { AiFeaturePermission, getAiFeature, isDeclaredDataClassAllowed, isGatewayFeature } from '@common/ai/features'
+import {
+  AiFeaturePermission,
+  getAiFeature,
+  getMaxAiDataClass,
+  isDeclaredDataClassAllowed,
+  isGatewayFeature,
+  type AiDataClass,
+} from '@common/ai/features'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
 
 const PAYLOAD_TOO_LARGE = 413
@@ -18,11 +25,15 @@ const invalid = (reason: string) => new SystemError('aiCallInvalid', { reason },
 const isObject = (value: unknown): value is Record<string, any> =>
   !!value && typeof value === 'object' && !Array.isArray(value)
 
+// A survey id is required by the features that check a survey permission and refused by the login-only ones: no
+// permission was checked for it, so its AI policy must not be read (the refusal would reveal it).
 const parseSurveyId = (value: unknown, required: boolean): number | undefined => {
-  if (value === undefined || value === null) {
+  const absent = value === undefined || value === null
+  if (absent) {
     if (required) throw invalid('surveyId')
     return undefined
   }
+  if (!required) throw invalid('surveyId')
   const surveyId = Number(value)
   if (!Number.isInteger(surveyId) || surveyId <= 0 || String(value) !== String(surveyId)) throw invalid('surveyId')
   return surveyId
@@ -65,7 +76,13 @@ const MAX_TOOLS = 32
 const MAX_TOOL_DESCRIPTION_CHARS = 4000
 const TOOL_CHOICE_TYPES = new Set(['auto', 'none', 'required'])
 
-export type SanitizeLimits = { maxPromptChars: number; maxOutputTokens: number; allowTools?: boolean }
+export type SanitizeLimits = {
+  maxPromptChars: number
+  maxOutputTokens: number
+  allowTools?: boolean
+  // the tool names that may be offered (absent: any valid name)
+  allowedToolNames?: readonly string[]
+}
 
 type GatewayTool = { type: 'function'; name: string; description?: string; inputSchema: Record<string, any> }
 
@@ -165,11 +182,15 @@ const checkTool = (tool: unknown): GatewayTool => {
     : { type: 'function', name, description, inputSchema }
 }
 
-const pickTools = (value: unknown, allowTools: boolean): GatewayTool[] | undefined => {
+const pickTools = (
+  value: unknown,
+  { allowTools, allowedToolNames }: Pick<SanitizeLimits, 'allowTools' | 'allowedToolNames'>
+): GatewayTool[] | undefined => {
   if (value === undefined) return undefined
   if (!allowTools || !Array.isArray(value) || value.length > MAX_TOOLS) throw invalid('tools')
   const tools = value.map(checkTool)
   if (new Set(tools.map((tool) => tool.name)).size !== tools.length) throw invalid('tools.name')
+  if (allowedToolNames && !tools.every((tool) => allowedToolNames.includes(tool.name))) throw invalid('tools.name')
   return tools.length > 0 ? tools : undefined
 }
 
@@ -219,15 +240,16 @@ const capOutputTokens = (value: unknown, maxOutputTokens: number): number => {
 /**
  * Validates and reduces the model call to the forwarded options.
  * @param {unknown} call - The call sent by the browser.
- * @param {SanitizeLimits} limits - Limits; `allowTools` only for features flagged `tools`.
+ * @param {SanitizeLimits} limits - Limits; `allowTools` only for features flagged `tools`, `allowedToolNames` when the
+ *   feature has a fixed tool list.
  * @returns {AiGatewayCall} The call to forward.
  */
 export const sanitizeCall = (
   call: unknown,
-  { maxPromptChars, maxOutputTokens, allowTools = false }: SanitizeLimits
+  { maxPromptChars, maxOutputTokens, allowTools = false, allowedToolNames }: SanitizeLimits
 ): AiGatewayCall => {
   if (!isObject(call)) throw invalid('call')
-  const tools = pickTools(call.tools, allowTools)
+  const tools = pickTools(call.tools, { allowTools, allowedToolNames })
   const toolChoice = pickToolChoice(call.toolChoice, tools)
   const sanitized: AiGatewayCall = {
     prompt: sanitizePrompt(call.prompt, { maxPromptChars, allowTools, extraSize: tools ? jsonSize(tools) : 0 }),
@@ -241,4 +263,27 @@ export const sanitizeCall = (
   if (tools) sanitized.tools = tools as AiGatewayCall['tools']
   if (toolChoice) sanitized.toolChoice = toolChoice
   return sanitized
+}
+
+/**
+ * Returns the data class the survey AI policy must be checked against. A request that carries tool results may
+ * contain whatever the tools returned, which the declared class cannot vouch for: it counts as the feature maximum.
+ * @param {object} params - Parameters.
+ * @param {string} params.feature - Gateway feature key.
+ * @param {AiDataClass} params.dataClass - The class declared by the request.
+ * @param {AiGatewayCall} params.call - The sanitized call.
+ * @returns {AiDataClass} The class to enforce.
+ */
+export const getEnforcedDataClass = ({
+  feature,
+  dataClass,
+  call,
+}: {
+  feature: string
+  dataClass: AiDataClass
+  call: AiGatewayCall
+}): AiDataClass => {
+  const featureDef = getAiFeature(feature)
+  const hasToolResults = call.prompt.some((message) => message.role === 'tool')
+  return hasToolResults && featureDef ? getMaxAiDataClass(dataClass, featureDef.dataClass) : dataClass
 }

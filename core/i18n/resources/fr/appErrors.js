@@ -119,6 +119,8 @@ Essayez de rafraîchir la page.`,
   aiCallInvalid: "La requête IA n'est pas valide ({{reason}}).",
   aiRateLimited: 'Trop de requêtes IA. Patientez une minute puis réessayez.',
   aiRequestTimeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
+  aiToolNotOffered:
+    "L'IA a demandé un outil qu'elle n'avait pas le droit d'utiliser ; sa réponse a été écartée. Veuillez réessayer.",
   aiProviderAuth:
     "Le fournisseur d'IA a refusé les identifiants. Vérifiez la clé API dans les paramètres IA ou contactez votre administrateur.",
   aiProviderRateLimited: "Le fournisseur d'IA limite les requêtes. Réessayez dans un instant.",
