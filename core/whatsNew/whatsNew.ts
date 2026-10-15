@@ -1,4 +1,5 @@
 import { Authorizer } from '@openforis/arena-core'
+import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
 
 import { WhatsNewAudience, WhatsNewItem, whatsNewAudiences, whatsNewItems } from './whatsNewItems'
@@ -9,8 +10,16 @@ export type { WhatsNewAudience, WhatsNewItem }
 // maximum number of items shown automatically (e.g. to a new user who has never seen any item)
 export const maxAutoShownItems = 8
 
+// true if the user can cleanse the records of at least one survey (data cleanser or higher role)
+const canCleanseSomeSurveyRecords = (user: any): boolean =>
+  User.isSystemAdmin(user) ||
+  User.getAuthGroups(user).some((group: any) =>
+    Authorizer.canCleanseRecords(user, { uuid: AuthGroup.getSurveyUuid(group) } as any)
+  )
+
 const isVisibleToAudienceByAudience: Record<WhatsNewAudience, (user: any) => boolean> = {
   [whatsNewAudiences.all]: () => true,
+  [whatsNewAudiences.dataCleanser]: canCleanseSomeSurveyRecords,
   [whatsNewAudiences.surveyAdmin]: (user) => Authorizer.canEditSomeSurvey(user),
   [whatsNewAudiences.systemAdmin]: (user) => User.isSystemAdmin(user),
 }

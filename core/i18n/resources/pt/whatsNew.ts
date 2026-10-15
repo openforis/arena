@@ -6,6 +6,38 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    surveyCompare: {
+      title: 'Comparar e atualizar inventários',
+      description: `No **Painel**, use **Funções avançadas > Comparar / atualizar a partir de arquivo** para comparar este inventário com um exportado de outro servidor Arena (p. ex. um servidor de testes) ou com outro inventário deste servidor.
+
+Revise as diferenças e aplique apenas as alterações selecionadas: elas ficam salvas como rascunho até a publicação do inventário.`,
+    },
+    usersBackup: {
+      title: 'Backup e restauração de usuários',
+      description: `Em **Usuários**, use **Backup / Restaurar** para exportar todos os usuários, com seus papéis nos inventários e grupos de usuários, e restaurá-los em outro servidor Arena.
+
+Antes de restaurar, você pode escolher o que fazer com cada usuário.`,
+    },
+    samplingPointDataWhisp: {
+      title: 'Análise Whisp dos pontos amostrais',
+      description: `Na categoria de **Dados de Ponto Amostral**, use **Gerar análise Whisp** para analisar todas as localizações dos pontos amostrais com o **Open Foris Whisp**.
+
+A análise é executada em segundo plano e os resultados são salvos em uma nova categoria.`,
+    },
+    dashboardUpgrade: {
+      title: 'Um novo painel',
+      description: `O **Painel** tem um novo visual: registros e colaboradores num relance, um mapa dos dados coletados e a tendência dos registros adicionados ao longo do tempo.`,
+    },
+    clearNonApplicableValues: {
+      title: 'Valores não relevantes são apagados',
+      description: `Durante a entrada de dados, quando uma alteração torna outros campos não relevantes, seus valores são apagados, após a sua confirmação.
+
+Os administradores do inventário podem manter o comportamento anterior com **Manter os valores dos atributos não relevantes** (**Informações do inventário > Segurança**).`,
+    },
+    systemLogs: {
+      title: 'Registos do sistema',
+      description: `Em **Administração do sistema > Registos do sistema**, acompanhe em tempo real os registos do servidor, com filtros por texto e nível.`,
+    },
     dataQueryAiGenerate: {
       title: 'Crie consultas do Explorador de dados com IA',
       description: `No **Explorador de dados**, descreva em linguagem simples os dados que procura (p. ex. *"número de árvores por espécie em cada província"*) e deixe a IA construir a consulta por si.

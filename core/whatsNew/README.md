@@ -9,7 +9,8 @@ dismissed yet, and it is always available in Help > What's new.
 1. Add an entry at the top of `whatsNewItems` in [whatsNewItems.ts](./whatsNewItems.ts):
    - `id`: stable identifier (camelCase), never reused;
    - `version`: the release version, as listed in CHANGELOG.md (checked by a unit test);
-   - `audience`: `all`, `surveyAdmin` (survey designer features) or `systemAdmin`;
+   - `audience`: `all`, `dataCleanser` (data cleansers, data analysts and survey designers), `surveyAdmin` (survey designer
+     features) or `systemAdmin`;
    - `experimental: true` if the feature is visible only with `EXPERIMENTAL_FEATURES=true`;
    - `image` (optional): e.g. `/img/whats-new/<id>.png`, stored in `web-resources/img/whats-new/`.
 2. Add `items.<id>.title` and `items.<id>.description` (markdown) to `core/i18n/resources/en/whatsNew.js`
