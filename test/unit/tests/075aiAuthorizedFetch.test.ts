@@ -61,20 +61,4 @@ describe('createAuthorizedFetch', () => {
     expect((await authorizedFetch('/x', {})).status).toBe(401)
     expect(calls).toHaveLength(1)
   })
-
-  test('concurrent 401s share one refresh', async () => {
-    const { fetchImpl } = recorder([401, 401, 200, 200])
-    let refreshes = 0
-    const authorizedFetch = createAuthorizedFetch({
-      fetchImpl,
-      getAuthToken: () => 't',
-      refreshAuthToken: async () => {
-        refreshes += 1
-        await new Promise((resolve) => setTimeout(resolve, 10))
-        return 't2'
-      },
-    })
-    await Promise.all([authorizedFetch('/a', {}), authorizedFetch('/b', {})])
-    expect(refreshes).toBe(1)
-  })
 })

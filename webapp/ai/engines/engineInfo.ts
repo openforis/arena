@@ -1,11 +1,15 @@
 /**
  * Engine descriptions (label, model, limits) built from the provider entries and the capabilities. No AI SDK import.
  */
+import { AiLimits } from '@common/ai/limits'
+
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
 import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from './types'
 
-export const GATEWAY_MAX_STEPS = 10
-export const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = 200000 // A's AI_MAX_PROMPT_CHARS default
+// the browser doesn't know the server's AI_MAX_PROMPT_CHARS (its default is the assistant's budget): limits.ts is the
+// one copy of these values
+const GATEWAY_MAX_STEPS = AiLimits.assistantMaxSteps
+const DEFAULT_GATEWAY_MAX_PROMPT_CHARS = AiLimits.assistantDefaultMaxPromptChars
 
 /**
  * Returns the engine description of a local provider, or null when its URL or hosting class is not known.
