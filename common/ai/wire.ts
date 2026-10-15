@@ -113,18 +113,40 @@ export const serializeStreamPart = (
   }
 }
 
+// JSON from the wire: an object, nothing else is known about it until it is checked
+type WireObject = Record<string, unknown>
+
+/**
+ * Returns whether the parsed JSON is an object.
+ * @param {unknown} json - Parsed JSON.
+ * @returns {boolean} True for an object that is not null or an array.
+ */
+const isWireObject = (json: unknown): json is WireObject =>
+  typeof json === 'object' && json !== null && !Array.isArray(json)
+
+/**
+ * Builds the error of a payload that is not what the gateway sends.
+ * @returns {SystemError} aiProviderUnavailable (bad gateway).
+ */
+const malformedWirePayload = () => new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
+
 /**
  * Converts a wire part back to a stream part (browser side).
- * @param {object} json - Parsed wire part.
+ * @param {unknown} json - Parsed wire part.
  * @returns {LanguageModelV4StreamPart} The stream part; error parts carry a SystemError.
+ * @throws {SystemError} aiProviderUnavailable when the payload is not an object with a type.
  */
-export const deserializeStreamPart = (json: any): LanguageModelV4StreamPart => {
-  if (json?.type === 'response-metadata') return reviveTimestamp(json)
-  if (json?.type === 'error') {
-    const { key = 'aiProviderUnavailable', params } = json.error ?? {}
+export const deserializeStreamPart = (json: unknown): LanguageModelV4StreamPart => {
+  if (!isWireObject(json) || typeof json.type !== 'string') throw malformedWirePayload()
+  if (json.type === 'response-metadata') return reviveTimestamp(json) as LanguageModelV4StreamPart
+  if (json.type === 'error') {
+    const { key = 'aiProviderUnavailable', params } = (isWireObject(json.error) ? json.error : {}) as {
+      key?: string
+      params?: Record<string, unknown>
+    }
     return { type: 'error', error: new SystemError(key, params, StatusCodes.BAD_GATEWAY) }
   }
-  return json
+  return json as LanguageModelV4StreamPart
 }
 
 /**
@@ -144,10 +166,12 @@ export const serializeGenerateResult = (result: LanguageModelV4GenerateResult): 
 
 /**
  * Converts a wire result back to a generate result (browser side).
- * @param {object} json - Parsed wire result.
+ * @param {unknown} json - Parsed wire result.
  * @returns {LanguageModelV4GenerateResult} The generate result.
+ * @throws {SystemError} aiProviderUnavailable when the payload is not an object.
  */
-export const deserializeGenerateResult = (json: any): LanguageModelV4GenerateResult => ({
-  ...json,
-  response: json?.response ? reviveTimestamp(json.response) : undefined,
-})
+export const deserializeGenerateResult = (json: unknown): LanguageModelV4GenerateResult => {
+  if (!isWireObject(json)) throw malformedWirePayload()
+  const response = isWireObject(json.response) ? reviveTimestamp(json.response) : undefined
+  return { ...json, response } as unknown as LanguageModelV4GenerateResult
+}

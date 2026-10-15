@@ -1,7 +1,7 @@
 /**
  * One assistant turn: system prompt, history, tools, then the AI SDK tool loop streamed into the conversation.
  */
-import { stepCountIs, streamText, type LanguageModel } from 'ai'
+import { stepCountIs, streamText, type LanguageModel, type TextStreamPart, type ToolSet } from 'ai'
 
 import * as Survey from '@core/survey/survey'
 
@@ -96,14 +96,17 @@ type StreamOutcome = {
   sent: TurnUsageInputs | null
 }
 
+// a part of the full stream of the turn's tool loop
+type TurnStreamPart = TextStreamPart<ToolSet>
+
 /**
  * Applies one stream part to the turn state.
- * @param {any} part - Full-stream part.
+ * @param {TurnStreamPart} part - Full-stream part.
  * @param {TurnState} state - Turn state.
  * @param {StreamOutcome} outcome - Abort / error seen so far (updated).
  * @returns {void}
  */
-const handleStreamPart = (part: any, state: TurnState, outcome: StreamOutcome): void => {
+const handleStreamPart = (part: TurnStreamPart, state: TurnState, outcome: StreamOutcome): void => {
   switch (part.type) {
     case 'text-delta':
       state.appendText(part.text)
@@ -138,12 +141,20 @@ const handleStreamPart = (part: any, state: TurnState, outcome: StreamOutcome): 
 /**
  * Escalates the conversation's data class when a tool result carries data.
  * @param {object} params - Parameters.
- * @param {any} params.part - Stream part.
+ * @param {TurnStreamPart} params.part - Stream part.
  * @param {AiTool[]} params.toolList - Tools offered in the turn.
  * @param {TurnState} params.state - Turn state.
  * @returns {void}
  */
-const escalateOnDataResult = ({ part, toolList, state }: { part: any; toolList: AiTool[]; state: TurnState }): void => {
+const escalateOnDataResult = ({
+  part,
+  toolList,
+  state,
+}: {
+  part: TurnStreamPart
+  toolList: AiTool[]
+  state: TurnState
+}): void => {
   if (part.type !== 'tool-result') return
   const tool = toolList.find((candidate) => candidate.name === part.toolName)
   // saved with the tool result: a turn stopped after a data result keeps the class
