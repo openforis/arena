@@ -9,6 +9,7 @@ export default {
   baseUrl: 'Base URL',
   apiKey: 'API key',
   apiKeyPlaceholder: 'Paste your provider API key',
+  apiKeySaved: 'Key saved',
   apiKeyKept: 'Leave blank to keep the existing key.',
   apiKeyUnreadable:
     'The saved API key can no longer be read (the server encryption secret changed). Enter the key again.',

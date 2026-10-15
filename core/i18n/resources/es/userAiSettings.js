@@ -9,6 +9,7 @@ export default {
   baseUrl: 'URL base',
   apiKey: 'Clave API',
   apiKeyPlaceholder: 'Pegue la clave API de su proveedor',
+  apiKeySaved: 'Clave guardada',
   apiKeyKept: 'Deje en blanco para mantener la clave existente.',
   apiKeyUnreadable:
     'La clave API guardada ya no se puede leer (cambió el secreto de cifrado del servidor). Introduzca la clave de nuevo.',

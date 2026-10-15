@@ -2,11 +2,13 @@ import React from 'react'
 
 import { Button as ButtonJS } from '@webapp/components/buttons'
 import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
+import { PasswordInput } from '@webapp/components/form/PasswordInput'
 import { Spinner } from '@webapp/components/Spinner'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
 import { BASE_URL_PLACEHOLDERS, getAccountTestMessage, MODEL_PLACEHOLDERS, OTHER_MODEL_VALUE } from './providerDraft'
+import { getApiKeyFieldState } from './apiKeyField'
 import type { ProviderDialogApi } from './useProviderDialog'
 
 // forwardRef components lose their prop types in TS (same cast as the panel)
@@ -76,19 +78,23 @@ const BaseUrlField = ({ dialog }: Props) => {
  */
 const ApiKeyField = ({ dialog }: Props) => {
   const { t, draft, saved, context, keyCleared } = dialog
-  const typed = draft.apiKey.trim().length > 0
-  const unreadable = !!saved?.hasApiKey && !saved.apiKeyReadable
-  const keyKept = !!saved?.hasApiKey && !keyCleared && !unreadable && !typed
+  const { keyKept, placeholderKey, showClearedHint, showUnreadableHint } = getApiKeyFieldState({
+    draft,
+    saved,
+    keyCleared,
+  })
   return (
     <FormItem label="userAiSettings:apiKey">
       <div className="provider-dialog__field">
-        <Input
-          type="password"
+        {/* new-password: a browser must not fill in the Arena login password, which Test would send to the URL */}
+        <PasswordInput
+          autoComplete="new-password"
           id={TestId.ai.providerApiKey}
+          testId={TestId.ai.providerApiKey}
           value={draft.apiKey}
           onChange={dialog.setApiKey}
           onBlur={dialog.commitApiKey}
-          placeholder={keyKept ? '•'.repeat(16) : t('userAiSettings:apiKeyPlaceholder')}
+          placeholder={placeholderKey}
           disabled={!context.encryptionConfigured}
         />
         {!context.encryptionConfigured && (
@@ -97,12 +103,12 @@ const ApiKeyField = ({ dialog }: Props) => {
           </div>
         )}
         {keyKept && <div className="provider-dialog__hint">{t('userAiSettings:apiKeyKept')}</div>}
-        {keyCleared && !typed && (
+        {showClearedHint && (
           <div className="provider-dialog__hint provider-dialog__hint--warning" role="alert">
             {t('userAiSettings:dialog.apiKeyCleared')}
           </div>
         )}
-        {unreadable && !keyCleared && !typed && (
+        {showUnreadableHint && (
           <div className="provider-dialog__hint provider-dialog__hint--warning" role="alert">
             {t('userAiSettings:apiKeyUnreadable')}
           </div>

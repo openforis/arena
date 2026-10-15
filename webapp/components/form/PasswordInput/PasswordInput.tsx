@@ -4,14 +4,21 @@ import React, { useState } from 'react'
 import classNames from 'classnames'
 
 import { Button } from '../../buttons'
-import { SimpleTextInput } from '../SimpleTextInput'
+import { SimpleTextInput, type SimpleTextInputProps } from '../SimpleTextInput'
 
-export const PasswordInput = (props) => {
+export type PasswordInputProps = Omit<SimpleTextInputProps, 'type' | 'endAdornment'>
+
+/**
+ * Text input of a password, with a button that shows or hides it.
+ * @param {PasswordInputProps} props - The props of SimpleTextInput, except the type and the end adornment.
+ * @returns {React.ReactElement} The input.
+ */
+export const PasswordInput = (props: PasswordInputProps) => {
   const { className } = props
 
   const [passwordShown, setPasswordShown] = useState(false)
 
-  const onMouseDownPasswordVisibility = (event) => {
+  const onMouseDownPasswordVisibility = (event: React.MouseEvent) => {
     event.preventDefault()
   }
 
@@ -31,10 +38,6 @@ export const PasswordInput = (props) => {
       }
     />
   )
-}
-
-PasswordInput.propTypes = {
-  ...SimpleTextInput.propTypes,
 }
 
 export default PasswordInput

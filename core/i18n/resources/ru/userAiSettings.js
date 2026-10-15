@@ -9,6 +9,7 @@ export default {
   baseUrl: 'Базовый URL',
   apiKey: 'Ключ API',
   apiKeyPlaceholder: 'Вставьте ключ API вашего поставщика',
+  apiKeySaved: 'Ключ сохранён',
   apiKeyKept: 'Оставьте пустым, чтобы сохранить текущий ключ.',
   apiKeyUnreadable:
     'Сохранённый ключ API больше не читается (изменился секрет шифрования сервера). Введите ключ снова.',
