@@ -1,5 +1,5 @@
 /**
- * Scripted turns of the mock provider (and of C's stub local server) for the Analysis area,
+ * Scripted turns of the mock provider (and of the stub local server) for the Analysis area,
  * used by test/e2e/specs/aiAnalysis.spec.ts. Names match the e2e sample survey.
  */
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'

@@ -23,7 +23,7 @@ describe('getEngineSettingsFields', () => {
       aiMaxPromptChars: 10,
     })
     expect(fields.policyCeilings.schema).toBe('off')
-    // B's rule: an unset ceiling is cloud
+    // an unset ceiling is cloud
     expect(fields.policyCeilings.data).toBe('cloud')
   })
 

@@ -1,9 +1,9 @@
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import {
   assistantSuggestionMockScripts,
   formatMockDescriptionsAnswer,
-} from '@server/modules/ai/service/mockScriptsSuggestions'
+} from '@server/modules/ai/service/mock/mockScriptsSuggestions'
 import {
   buildMissingTranslationsPrompt,
   buildNewEntriesDescriptionsPrompt,

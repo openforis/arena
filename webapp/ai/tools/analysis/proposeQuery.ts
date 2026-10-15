@@ -14,7 +14,7 @@ const MAX_ISSUE_CHARS = 300
 const name = z.string().max(100)
 const nameList = z.array(name).max(50).nullish()
 
-// A's data-query JSON, without transforms (z.toJSONSchema cannot convert them)
+// the data-query JSON, without transforms (z.toJSONSchema cannot convert them)
 export const proposeQueryInputSchema = z.object({
   entity: name.describe('Entity the query targets (one row per entity instance)'),
   mode: z.enum(['raw', 'aggregate']),
@@ -37,7 +37,7 @@ export const proposeQueryInputSchema = z.object({
 export type ProposeQueryInput = z.infer<typeof proposeQueryInputSchema>
 
 /**
- * Converts the tool input into the shape A's toQuery expects (lists never null).
+ * Converts the tool input into the shape toQuery expects (lists never null).
  * @param {ProposeQueryInput} input - Tool input.
  * @returns {object} The data-query result.
  */

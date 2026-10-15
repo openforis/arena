@@ -22,7 +22,7 @@ import mnSettings from '@core/i18n/resources/mn/userAiSettings'
 import ptSettings from '@core/i18n/resources/pt/userAiSettings'
 import ruSettings from '@core/i18n/resources/ru/userAiSettings'
 
-import { getDefaultNameKey, getProviderNameText } from '@webapp/components/ai/UserAiSettingsPanel/providerNames'
+import { getDefaultNameKey, getProviderNameText } from '@webapp/ai/providers/providerNames'
 
 const LANGS = ['en', 'es', 'fr', 'ja', 'mn', 'pt', 'ru']
 const common: Record<string, any> = { en, es, fr, ja, mn, pt, ru }

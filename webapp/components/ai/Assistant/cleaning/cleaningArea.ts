@@ -41,7 +41,7 @@ export const isCleaningRoute = ({
  * @param {boolean} params.canCleanseRecords - Whether the user can cleanse records.
  * @param {Availability} params.availability - Feature availability for the data class.
  * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
- * @returns {AssistantAreaStatus} The tab state, in D1's shape (with the engine availability behind the reasons).
+ * @returns {AssistantAreaStatus} The tab state, (with the engine availability behind the reasons).
  */
 export const getCleaningAreaStatus = ({
   surveyOpen,

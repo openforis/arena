@@ -1,5 +1,5 @@
 /**
- * Category item label operations (suggestion 6): one label of one item in one language. They take their own path
+ * Category item label operations: one label of one item in one language. They take their own path
  * through preview, card, conflicts and Apply (one atomic server request), apart from node definition operations.
  */
 

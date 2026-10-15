@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 7 (many validation messages, Cleaning area).
+ * Card and prompt of the validation errors suggestion (many validation messages, Cleaning area).
  */
 import { VALIDATION_ERRORS_PROMPT } from '../prompts/validationErrors'
 import type { AssistantSuggestion } from '../types'

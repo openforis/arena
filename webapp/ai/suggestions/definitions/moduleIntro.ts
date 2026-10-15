@@ -1,5 +1,5 @@
 /**
- * Module introduction (suggestion 9): card and prompt. Do it removes the card (no change set to wait for), and Do it or
+ * Module introduction: card and prompt. Do it removes the card (no change set to wait for), and Do it or
  * Dismiss records the module as seen: it never comes back.
  */
 import { buildModuleIntroPrompt, isIntroModule, type IntroModule } from '../prompts/moduleIntro'

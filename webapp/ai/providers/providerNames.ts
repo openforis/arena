@@ -4,8 +4,10 @@
  */
 import { getDefaultProviderName } from '@common/ai/providerIds'
 
-import type { TFunction } from './aiSettingsForm'
-import { ORG_SERVER_NAME } from './ProviderDialog/providerTypes'
+type TFunction = (key: string, params?: Record<string, unknown>) => string
+
+// the name an Organisation server gets when none is typed
+export const ORG_SERVER_NAME = 'Organisation server'
 
 // stored types that have a translated default name
 const TRANSLATED_TYPES = new Set([

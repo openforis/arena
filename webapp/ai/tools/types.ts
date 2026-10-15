@@ -43,7 +43,7 @@ export type AiToolContext = {
   onChangeSet: (changeSet: ChangeSet) => void
   // first message of a conversation only: the model's title for it (conversation_setTitle)
   setConversationTitle?: (title: string) => void
-  // analysis area: queries proposed in the current conversation (D2)
+  // analysis area: queries proposed in the current conversation
   analysisQueries?: AnalysisQueryStore
   // set by the turn when the conversation was started by Do it (kept for the whole conversation)
   suggestionScope?: SuggestionScope | null

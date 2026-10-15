@@ -1,5 +1,5 @@
 /**
- * Module introduction (suggestion 9): the modules it introduces and the English prompt of Do it.
+ * Module introduction: the modules it introduces and the English prompt of Do it.
  */
 export type IntroModule = 'designer' | 'data' | 'analysis'
 

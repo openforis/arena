@@ -4,11 +4,11 @@
 import { pq } from '@common/ai/prompts/promptSafety'
 import { getLanguageLabel } from '@core/app/languages'
 
-// §3.6: a turn stops after a few steps; the user asks for the rest
+// a turn stops after a few steps; the user asks for the rest
 export const CONTINUE_TAIL = 'If some remain, end with "Say *continue* for the next batches."'
 
 /**
- * Builds the prompt of suggestion 1.
+ * Builds the prompt of the missing translations suggestion.
  * @param {object} params - Parameters.
  * @param {string} params.lang - Missing language code (a survey language).
  * @param {string} params.langLabel - Its English name.
@@ -28,7 +28,7 @@ export const formatPromptLanguages = (languages: string[]): string =>
   languages.map((lang) => `${lang} (${getLanguageLabel(lang) || lang})`).join(', ')
 
 /**
- * Builds the prompt of suggestion 2.
+ * Builds the prompt of the new entries descriptions suggestion.
  * @param {object} params - Parameters.
  * @param {string[]} params.languages - Survey languages.
  * @returns {string} The prompt.
@@ -65,7 +65,7 @@ export const formatPromptList = (items: string[]): string => {
 export const formatPromptNames = (names: string[]): string => formatPromptList(names.map((name) => pq(name, 100)))
 
 /**
- * Builds the prompt of suggestion 4.
+ * Builds the prompt of the entity without a key suggestion.
  * @param {object} params - Parameters.
  * @param {string[]} params.names - Entity names.
  * @returns {string} The prompt.
@@ -76,7 +76,7 @@ export const buildEntityWithoutKeyPrompt = ({ names }: { names: string[] }): str
   'nodeDef_proposeUpdate (prop key). If none fits, propose a new attribute with nodeDef_proposeCreate.'
 
 /**
- * Builds the prompt of suggestion 5.
+ * Builds the prompt of the attribute without a category or taxonomy suggestion.
  * @param {object} params - Parameters.
  * @param {object[]} params.entries - Attribute names and types.
  * @returns {string} The prompt.
@@ -89,7 +89,7 @@ export const buildAttributeWithoutRefPrompt = ({ entries }: { entries: { name: s
   'creating one in the category or taxonomy editor.'
 
 /**
- * Builds the prompt of suggestion 3.
+ * Builds the prompt of the publish errors suggestion.
  * @param {object} params - Parameters.
  * @param {string[]} params.names - Names of the entries with errors.
  * @returns {string} The prompt.

@@ -13,6 +13,8 @@
  *
  * The routes that connect to the endpoint of a provider (test, models, add, edit) are rate limited per user.
  */
+import type { User } from '@openforis/arena-core'
+
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SecretBox from '@server/utils/crypto/secretBox'
@@ -31,7 +33,7 @@ import { limitProviderCalls } from './providerRateLimit'
  * @param {object} user - Arena user.
  * @returns {object} The settings body.
  */
-export const buildResponseBody = (user) => ({
+export const buildResponseBody = (user: SettingsUser) => ({
   ...AiSettingsService.getPublicSettings(user),
   // the instance default (no key), for the "Arena default" row
   adminDefault: ProviderResolver.describeAdminDefault(),
@@ -43,6 +45,11 @@ export const buildResponseBody = (user) => ({
   ...getEngineSettingsFields(),
 })
 
+type ArenaUser = User
+type SettingsUser = { uuid: string; prefs?: Record<string, any> }
+type RouteHandler = (args: { user: ArenaUser; body: any; params: Record<string, string> }) => unknown
+type ExpressRequest = { params: Record<string, string>; [key: string]: any }
+
 const guards = [AuthMiddleware.requireLoggedInUser, requireAiFeaturesEnabled]
 
 // the routes that connect to the endpoint of a provider, which the user chooses, are rate limited per user
@@ -51,23 +58,29 @@ const providerCallGuards = [...guards, limitProviderCalls]
 /**
  * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
  * errors to Express.
- * @param {(args: object) => object|Promise<object>} handler - Receives `{ user, body, params }`.
+ * @param {RouteHandler} handler - Receives `{ user, body, params }`.
  * @returns {(req: object, res: object, next: (error?: unknown) => void) => Promise<void>} The Express handler.
  */
-const jsonRoute = (handler) => async (req, res, next) => {
-  try {
-    res.json(await handler({ user: Request.getUser(req), body: Request.getBody(req) || {}, params: req.params }))
-  } catch (error) {
-    next(error)
+const jsonRoute =
+  (handler: RouteHandler) =>
+  async (
+    req: ExpressRequest,
+    res: { json: (body: unknown) => void },
+    next: (error?: unknown) => void
+  ): Promise<void> => {
+    try {
+      res.json(await handler({ user: Request.getUser(req), body: Request.getBody(req) || {}, params: req.params }))
+    } catch (error) {
+      next(error)
+    }
   }
-}
 
 /**
  * Registers the AI settings and provider routes.
  * @param {object} app - Express router.
  * @returns {void}
  */
-export const init = (app) => {
+export const init = (app): void => {
   app.get(
     '/ai/settings',
     ...guards,

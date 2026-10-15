@@ -1,5 +1,5 @@
 /**
- * AI provider ids, typed by prefix so any id says what kind of provider it names (spec section 1):
+ * AI provider ids, typed by prefix so any id says what kind of provider it names:
  * `arena-default` (the admin default), `acct:<id>` (stored on the account, called through the server gateway) and
  * `local:<id>` (stored in one browser, called from it).
  */

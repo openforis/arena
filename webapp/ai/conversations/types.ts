@@ -62,10 +62,10 @@ export type Conversation = {
   id: string
   userUuid: string
   surveyId: number | null
-  // surveyId ?? 0: IndexedDB can't index null (deviation 13)
+  // surveyId ?? 0: IndexedDB can't index null
   surveyKey: number
   area: AiToolArea
-  // the most sensitive class a tool result of this conversation exposed (D2 escalates it)
+  // the most sensitive class a tool result of this conversation exposed (a tool result can raise it)
   dataClass: AiDataClass
   title: string
   messages: ConversationMessage[]

@@ -13,7 +13,7 @@ import { assistantSuggestionMockScripts } from './mockScriptsSuggestions'
 
 export type MockScriptParams = { lastUserMessage: string; lastToolOutput: unknown }
 
-// a text may be computed from the last tool output (D2); D3 lets a tool call input be computed too
+// a text may be computed from the last tool output, and so may a tool call input
 export type MockScriptStep =
   | { toolCall: { toolName: string; input: unknown | ((params: MockScriptParams) => unknown) } }
   | { text: string | ((params: MockScriptParams) => string) }
@@ -23,10 +23,10 @@ export type PlayedMockScriptStep = { toolCall: { toolName: string; input: unknow
 
 export type MockScript = { promptMarker: string; pattern: RegExp; steps: MockScriptStep[] }
 
-// default answer of a marked prompt without a matching script (never A's canned answers, deviation 8)
+// default answer of a marked prompt without a matching script (never the canned answers of unmarked prompts)
 export const MOCK_SCRIPT_DEFAULT_TEXT = 'MOCK answer.'
 
-// D2 / D3 append their scripts here
+// the scripts of every assistant area
 export const MOCK_SCRIPTS: MockScript[] = [
   // first: the suggestion prompts name labels_proposeSet, which the /label/i script would catch
   ...assistantSuggestionMockScripts,
@@ -169,7 +169,7 @@ const getLastToolOutput = (prompt: LanguageModelV4Prompt, fromIndex: number): un
 const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScriptStep => {
   if ('text' in step) return { text: typeof step.text === 'function' ? step.text(params) : step.text }
   const { toolName, input } = step.toolCall
-  // a function input is built from the user message (D3: the row context's UUIDs)
+  // a function input is built from the user message (e.g. the UUIDs of the row context)
   return { toolCall: { toolName, input: typeof input === 'function' ? input(params) : input } }
 }
 
@@ -177,7 +177,7 @@ const playStep = (step: MockScriptStep, params: MockScriptParams): PlayedMockScr
  * Returns the scripted step to play for a prompt.
  * @param {LanguageModelV4Prompt} prompt - The prompt.
  * @param {MockScript[]} [scripts] - Scripts.
- * @returns {PlayedMockScriptStep|null} The step; null when the prompt has no assistant marker (A's canned answers apply).
+ * @returns {PlayedMockScriptStep|null} The step; null when the prompt has no assistant marker (the canned answers apply).
  */
 export const getScriptedStep = (
   prompt: LanguageModelV4Prompt,

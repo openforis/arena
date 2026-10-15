@@ -91,7 +91,7 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
     testUser,
     sampleSurvey: _,
   }) => {
-    // spec e2e 2: a separate browser context (its own session and socket), same user
+    // a separate browser context (its own session and socket), same user
     const viewerContext = await browser.newContext({ baseURL })
     try {
       const login = await viewerContext.request.post('/auth/login', {

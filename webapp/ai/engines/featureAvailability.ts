@@ -14,7 +14,7 @@ import {
 import { isPolicyReason, selectEngine } from './selectEngine'
 import type { AiCapabilities, AiSelectedEngine, AiUnavailableReason } from './types'
 
-// B's availability plus the reason codes (for the actions) and the selected engine
+// the availability plus the reason codes (for the actions) and the selected engine
 export type AiEngineFeatureAvailability = AiFeatureAvailability & {
   reasons: AiUnavailableReason[]
   engine: AiSelectedEngine | null
@@ -56,7 +56,7 @@ export const getAiUnavailableReasonKey = (reason: AiUnavailableReason): string =
 export const getAiUnavailableReasonActions = (reason: AiUnavailableReason): AiUnavailableAction[] => ACTIONS[reason]
 
 /**
- * Returns where the data goes with the engine (the props of B's AiDataLocationBadge).
+ * Returns where the data goes with the engine (the props of AiDataLocationBadge).
  * @param {AiSelectedEngine} engine - Engine.
  * @returns {AiDataLocation} The location.
  */
@@ -139,7 +139,7 @@ export const getAiEngineFeatureAvailability = ({
   }
   const reasons = selection.unavailable
   if (reasons.every(isPolicyReason)) {
-    // only a policy change helps: B's message says what the policy allows
+    // only a policy change helps: the message says what the policy allows
     const reasonKeys = getPolicyBlockedReasonKeys({
       dataClass,
       allowed: getAllowedLevel(effective, dataClass),
