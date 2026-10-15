@@ -1,7 +1,7 @@
 /**
  * Renders the model's Markdown to safe HTML. Unlike the shared markdown utils, it loads nothing remote: a survey
  * label could prompt-inject an image URL that carries survey data out of the browser as soon as the answer renders.
- * Links can't hide their destination either: a link to another site shows its host and loses its query string.
+ * Links can't hide their destination either: a link to another site shows its host and the start of its path, and loses its query string.
  */
 import DOMPurify from 'isomorphic-dompurify'
 import { Marked } from 'marked'
@@ -74,8 +74,33 @@ const isTrustedLink = (url: URL, { trustedOrigins = [], trustedPages = [] }: Ass
     return pageUrl !== null && isSamePageOrChild(url, pageUrl)
   })
 
-// the part of the link a person checks before clicking: the host, or the address of a mailto link
-const getDestination = (url: URL): string => (url.protocol === 'mailto:' ? decodeURIComponent(url.pathname) : url.host)
+// the address of a mailto link; a malformed percent sequence (model output) keeps the raw text instead of throwing
+const getMailAddress = (url: URL): string => {
+  try {
+    return decodeURIComponent(url.pathname)
+  } catch {
+    return url.pathname
+  }
+}
+
+const MAX_SHOWN_PATH_SEGMENTS = 2
+const MAX_SHOWN_SEGMENT_CHARS = 24
+
+// the first segments of the path, cut short, so data hidden in the path of a link is visible before clicking
+const getTrimmedPath = (url: URL): string => {
+  const segments = url.pathname.split('/').filter(Boolean)
+  const shown = segments
+    .slice(0, MAX_SHOWN_PATH_SEGMENTS)
+    .map((segment) =>
+      segment.length > MAX_SHOWN_SEGMENT_CHARS ? `${segment.slice(0, MAX_SHOWN_SEGMENT_CHARS)}…` : segment
+    )
+  if (segments.length > MAX_SHOWN_PATH_SEGMENTS) shown.push('…')
+  return shown.map((segment) => `/${segment}`).join('')
+}
+
+// the part of the link a person checks before clicking: the host and the start of the path, or the mailto address
+const getDestination = (url: URL): string =>
+  url.protocol === 'mailto:' ? getMailAddress(url) : `${url.host}${getTrimmedPath(url)}`
 
 const URL_TEXT = /^(?:https?:\/\/|mailto:)/i
 
