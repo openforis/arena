@@ -27,6 +27,8 @@ export const readSseParts = (response: Response): ReadableStream<LanguageModelV4
         parser.end()
         controller.close()
       } catch (error) {
+        // a part that cannot be read ends the call: the gateway keeps streaming (and being charged) until cancelled
+        reader.cancel(error).catch(() => undefined)
         controller.error(error)
       }
     },
