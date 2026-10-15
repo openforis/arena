@@ -1,14 +1,14 @@
 /**
- * Account AI providers of a user (`user.prefs.ai.providers`, spec section 2): test, list models, add, edit, remove
- * and choose the default. A saved API key only ever goes back to the endpoint it was saved with: a draft (no id)
- * never uses one, and a saved provider uses its key only while its type and base URL are unchanged.
+ * Account AI providers of a user (`user.prefs.ai.providers`): test, list models, add, edit, remove and choose the
+ * default. A saved API key only ever goes back to the endpoint it was saved with: a draft (no id) never uses one, and
+ * a saved provider uses its key only while its type and base URL are unchanged. Every write is a change of the latest
+ * stored provider prefs (see aiPrefsWriter), never a save of the copy read when the request began.
  */
 import { generateText } from 'ai'
 import type { User } from '@openforis/arena-core'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import * as UserUtils from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
 import { AiProvider } from '@common/ai/aiProvider'
 import {
@@ -18,7 +18,8 @@ import {
   isAiProviderId,
   normalizeProviderName,
 } from '@common/ai/providerIds'
-import * as UserManager from '@server/modules/user/manager/userManager'
+import * as Log from '@server/log/log'
+import type { AiPrefsUpdate, StoredAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import {
@@ -35,7 +36,9 @@ import {
   toPublicProvider,
   trimmedOrNull,
   withProviderPrefs,
+  hasLegacyKeys,
 } from './aiProviderPrefs'
+import { type AiPrefsWriterDeps, changeAiPrefs, createDefaultAiPrefsWriterDeps } from './aiPrefsWriter'
 import * as AiTelemetry from './aiTelemetry'
 import { getAiPrefs } from './aiUserPrefs'
 import { getProviderHostingClass } from './hostingClass'
@@ -71,7 +74,7 @@ export type AiProviderInput = {
 }
 
 export type AiProviderServiceDeps = {
-  savePrefs: (user: User, aiPrefs: Record<string, any>) => Promise<User>
+  updateAiPrefs: (userUuid: string, update: AiPrefsUpdate) => Promise<StoredAiPrefs | null>
   runTest: (args: { user: User; cfg: AiProviderCallConfig }) => Promise<AiProviderTestResult>
   listModels: (cfg: AiProviderCallConfig) => Promise<AiProviderModel[]>
   encrypt: KeyCipher['encrypt']
@@ -85,7 +88,11 @@ export type AiProviderServiceDeps = {
   allowlist: string[]
 }
 
+type ProviderPrefsChange = (latest: AiProviderPrefs) => AiProviderPrefs | null
+
 type ResolvedCallConfig = { cfg: AiProviderCallConfig; saved: StoredAiProvider | null; sameEndpoint: boolean }
+
+const logger = Log.getLogger('AiProviders')
 
 // the providers that refuse a call without an API key
 const KEY_REQUIRED_TYPES = new Set<string>([AiProvider.openai, AiProvider.anthropic, AiProvider.google])
@@ -155,17 +162,7 @@ const runConnectionTest = async ({ user, cfg }: { user: User; cfg: AiProviderCal
  * @returns {AiProviderServiceDeps} The dependencies.
  */
 export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => ({
-  /**
-   * Stores the AI prefs of the user.
-   * @param {User} user - The user.
-   * @param {object} aiPrefs - AI prefs to store.
-   * @returns {Promise<User>} The updated user.
-   */
-  savePrefs: async (user, aiPrefs) => {
-    const userUpdated = { ...user, prefs: { ...(UserUtils.getPrefs(user) || {}), ai: aiPrefs } } as User
-    await UserManager.updateUserPrefs(userUpdated)
-    return userUpdated
-  },
+  updateAiPrefs: createDefaultAiPrefsWriterDeps().updateAiPrefs,
   runTest: runConnectionTest,
   /**
    * Lists the models of a provider through the guarded discovery.
@@ -352,22 +349,101 @@ const replaceProvider = (prefs: AiProviderPrefs, provider: StoredAiProvider): Ai
 })
 
 /**
- * Writes the provider prefs into the user's AI prefs (the old slot keys are dropped).
+ * Returns the secret box of the dependencies.
+ * @param {AiProviderServiceDeps} deps - Dependencies.
+ * @returns {KeyCipher} The secret box.
+ */
+const cipherOf = (deps: AiProviderServiceDeps): KeyCipher => ({
+  encrypt: deps.encrypt,
+  decrypt: deps.decrypt,
+  isLegacy: deps.isLegacyEnvelope,
+})
+
+/**
+ * Returns the dependencies of the AI prefs writer.
+ * @param {AiProviderServiceDeps} deps - Dependencies.
+ * @returns {AiPrefsWriterDeps} The writer dependencies.
+ */
+const writerDepsOf = (deps: AiProviderServiceDeps): AiPrefsWriterDeps => ({
+  updateAiPrefs: deps.updateAiPrefs,
+  cipher: cipherOf(deps),
+  isEncryptionConfigured: deps.isEncryptionConfigured,
+})
+
+/**
+ * Changes the latest stored provider prefs of the user (the old slot keys are dropped). The change runs while the
+ * user row is locked: it must not wait for the network and may throw to refuse the write.
  * @param {object} params - Parameters.
  * @param {User} params.user - The user.
- * @param {AiProviderPrefs} params.prefs - Provider prefs to store.
+ * @param {ProviderPrefsChange} params.change - Receives the latest provider prefs, returns the ones to store (or null).
  * @param {AiProviderServiceDeps} params.deps - Dependencies.
- * @returns {Promise<User>} The updated user.
+ * @returns {Promise<{user: User, prefs: AiProviderPrefs}>} The user and the provider prefs as stored.
  */
-const saveProviderPrefs = ({
+const commitProviderPrefs = async ({
   user,
-  prefs,
+  change,
   deps,
 }: {
   user: User
-  prefs: AiProviderPrefs
+  change: ProviderPrefsChange
   deps: AiProviderServiceDeps
-}) => deps.savePrefs(user, withProviderPrefs(getAiPrefs(user), prefs))
+}): Promise<{ user: User; prefs: AiProviderPrefs }> => {
+  const updated = await changeAiPrefs({
+    user,
+    deps: writerDepsOf(deps),
+    change: (latest) => {
+      const next = change(getProviderPrefs(latest))
+      return next ? withProviderPrefs(latest, next) : null
+    },
+  })
+  return { user: updated, prefs: getProviderPrefs(getAiPrefs(updated)) }
+}
+
+/**
+ * Returns true when two stored providers have the values a test is about: type, model, endpoint and key.
+ * @param {StoredAiProvider} current - The stored provider.
+ * @param {StoredAiProvider} tested - The provider as it was when the test began.
+ * @param {boolean} [ignoreKey] - True when the request replaces the key, so the stored one is not compared.
+ * @returns {boolean} Whether the test is still about what is stored.
+ */
+const isSameTestedProvider = (current: StoredAiProvider, tested: StoredAiProvider, ignoreKey = false): boolean =>
+  current.type === tested.type &&
+  current.model === tested.model &&
+  isSameEndpoint(current.baseUrl, tested.baseUrl) &&
+  (ignoreKey || current.apiKeyEncrypted === tested.apiKeyEncrypted)
+
+/**
+ * Stamps the result of a test on the stored provider, unless it was removed or edited while the test ran (the
+ * result is then about something that is no longer stored).
+ * @param {object} params - Parameters.
+ * @param {User} params.user - The user.
+ * @param {StoredAiProvider} params.tested - The provider as it was when the test began.
+ * @param {boolean} params.ok - Whether the test passed.
+ * @param {AiProviderServiceDeps} params.deps - Dependencies.
+ * @returns {Promise<void>} Resolves when done.
+ */
+const stampTestResult = async ({
+  user,
+  tested,
+  ok,
+  deps,
+}: {
+  user: User
+  tested: StoredAiProvider
+  ok: boolean
+  deps: AiProviderServiceDeps
+}): Promise<void> => {
+  const lastTestAt = deps.now()
+  await commitProviderPrefs({
+    user,
+    deps,
+    change: (latest) => {
+      const current = findStoredProvider(latest, tested.id)
+      if (!current || !isSameTestedProvider(current, tested)) return null
+      return replaceProvider(latest, { ...current, lastTestOk: ok, lastTestAt })
+    },
+  })
+}
 
 /**
  * Encrypts a key to store, bound to the user and the provider; throws aiEncryptionMissing when the server has no secret.
@@ -505,8 +581,7 @@ export const testProvider = async ({
   }
   const result = await deps.runTest({ user, cfg: resolved.cfg })
   if (resolved.saved && usesSavedValues(resolved, input)) {
-    const stamped = { ...resolved.saved, lastTestOk: result.ok, lastTestAt: deps.now() }
-    await saveProviderPrefs({ user, prefs: replaceProvider(prefs, stamped), deps })
+    await stampTestResult({ user, tested: resolved.saved, ok: result.ok, deps })
   }
   return result
 }
@@ -588,13 +663,18 @@ export const addProvider = async ({
     lastTestOk: true,
     lastTestAt: deps.now(),
   }
-  const becomesDefault = prefs.defaultProviderId === ARENA_DEFAULT_PROVIDER_ID && !deps.hasAdminDefault()
-  const next: AiProviderPrefs = {
-    ...prefs,
-    providers: [...prefs.providers, provider],
-    ...(becomesDefault ? { defaultProviderId: provider.id, defaultProviderOrigin: 'user' as const } : {}),
-  }
-  const userUpdated = await saveProviderPrefs({ user, prefs: next, deps })
+  const { user: userUpdated } = await commitProviderPrefs({
+    user,
+    deps,
+    change: (latest) => {
+      const becomesDefault = latest.defaultProviderId === ARENA_DEFAULT_PROVIDER_ID && !deps.hasAdminDefault()
+      return {
+        ...latest,
+        providers: [...latest.providers, provider],
+        ...(becomesDefault ? { defaultProviderId: provider.id, defaultProviderOrigin: 'user' as const } : {}),
+      }
+    },
+  })
   return { user: userUpdated, provider: toPublic(provider, user.uuid, deps) }
 }
 
@@ -630,8 +710,70 @@ const keyToStore = ({
 }
 
 /**
+ * Throws a 409 when the stored provider is no longer the one the edit was tested against (changed by another request
+ * while the test ran): saving the tested values would undo that change.
+ * @param {object} params - Parameters.
+ * @param {StoredAiProvider} params.current - The stored provider.
+ * @param {StoredAiProvider} params.tested - The provider as it was when the test began.
+ * @param {boolean} params.keyTyped - Whether the request replaces the key.
+ * @returns {void}
+ */
+const assertUnchangedSinceTest = ({
+  current,
+  tested,
+  keyTyped,
+}: {
+  current: StoredAiProvider
+  tested: StoredAiProvider
+  keyTyped: boolean
+}): void => {
+  if (!isSameTestedProvider(current, tested, keyTyped)) {
+    throw new SystemError('aiProviderChanged', { providerId: tested.id }, StatusCodes.CONFLICT)
+  }
+}
+
+/**
+ * Tests the values of an edit that changes the model, the endpoint or the key: they are saved only when the test
+ * passes. Returns null for an edit that keeps the saved values (a rename), which needs no test.
+ * @param {object} params - Parameters.
+ * @param {User} params.user - The user.
+ * @param {AiProviderInput} params.input - Request input.
+ * @param {ResolvedCallConfig} params.unkeyed - Resolved config of the edit, without the stored key.
+ * @param {StoredAiProvider} params.saved - The provider as stored when the request began.
+ * @param {AiProviderServiceDeps} params.deps - Dependencies.
+ * @returns {Promise<Partial<StoredAiProvider>|null>} The tested values to store, or null when nothing was tested.
+ */
+const testEditedValues = async ({
+  user,
+  input,
+  unkeyed,
+  saved,
+  deps,
+}: {
+  user: User
+  input: AiProviderInput
+  unkeyed: ResolvedCallConfig
+  saved: StoredAiProvider
+  deps: AiProviderServiceDeps
+}): Promise<Partial<StoredAiProvider> | null> => {
+  if (usesSavedValues(unkeyed, input)) return null
+  const resolved = withStoredKey({ resolved: unkeyed, input, user, deps })
+  validateConfig(resolved.cfg)
+  const apiKeyEncrypted = keyToStore({ input, resolved, saved, user, deps })
+  await assertTestPasses({ user, cfg: resolved.cfg, deps })
+  return {
+    model: resolved.cfg.model,
+    baseUrl: resolved.cfg.baseUrl,
+    apiKeyEncrypted,
+    lastTestOk: true,
+    lastTestAt: deps.now(),
+  }
+}
+
+/**
  * Edits a provider: a name-only change saves at once; a changed model, base URL or key needs a passing test.
- * The type never changes (another type is another provider).
+ * The type never changes (another type is another provider). The edit is applied to the stored provider: a provider
+ * removed or changed by another request while the test ran is a 404 or a 409, never a silent overwrite.
  * @param {object} params - Parameters.
  * @param {User} params.user - The user.
  * @param {string} params.id - Provider id (route parameter, untrusted).
@@ -653,26 +795,19 @@ export const updateProvider = async ({
   const input = normalizeInput(rawInput)
   const prefs = getProviderPrefs(getAiPrefs(user))
   const saved = findOwnProvider(prefs, id)
-  const savedInput = { ...input, id: saved.id, type: saved.type }
-  const unkeyed = resolveCallConfig({ prefs, input: savedInput, deps })
-  const name = input.name === undefined ? saved.name : normalizeProviderName(input.name, saved.type)
-  let updated: StoredAiProvider = { ...saved, name }
-  if (!usesSavedValues(unkeyed, input)) {
-    const resolved = withStoredKey({ resolved: unkeyed, input, user, deps })
-    validateConfig(resolved.cfg)
-    const apiKeyEncrypted = keyToStore({ input, resolved, saved, user, deps })
-    await assertTestPasses({ user, cfg: resolved.cfg, deps })
-    updated = {
-      ...updated,
-      model: resolved.cfg.model,
-      baseUrl: resolved.cfg.baseUrl,
-      apiKeyEncrypted,
-      lastTestOk: true,
-      lastTestAt: deps.now(),
-    }
-  }
-  const userUpdated = await saveProviderPrefs({ user, prefs: replaceProvider(prefs, updated), deps })
-  return { user: userUpdated, provider: toPublic(updated, user.uuid, deps) }
+  const unkeyed = resolveCallConfig({ prefs, input: { ...input, id: saved.id, type: saved.type }, deps })
+  const tested = await testEditedValues({ user, input, unkeyed, saved, deps })
+  const { user: userUpdated, prefs: committed } = await commitProviderPrefs({
+    user,
+    deps,
+    change: (latest) => {
+      const current = findOwnProvider(latest, saved.id)
+      if (tested) assertUnchangedSinceTest({ current, tested: saved, keyTyped: input.apiKey !== undefined })
+      const name = input.name === undefined ? current.name : normalizeProviderName(input.name, current.type)
+      return replaceProvider(latest, { ...current, ...tested, name })
+    },
+  })
+  return { user: userUpdated, provider: toPublic(findOwnProvider(committed, saved.id), user.uuid, deps) }
 }
 
 /**
@@ -692,15 +827,22 @@ export const removeProvider = async ({
   id: unknown
   deps?: AiProviderServiceDeps
 }): Promise<{ user: User }> => {
-  const prefs = getProviderPrefs(getAiPrefs(user))
-  const saved = findOwnProvider(prefs, id)
-  const wasDefault = prefs.defaultProviderId === saved.id
-  const next: AiProviderPrefs = {
-    ...prefs,
-    providers: prefs.providers.filter((provider) => provider.id !== saved.id),
-    ...(wasDefault ? { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, defaultProviderOrigin: 'user' as const } : {}),
-  }
-  return { user: await saveProviderPrefs({ user, prefs: next, deps }) }
+  // refused before the database when the id is not even in the copy of the user read for this request
+  findOwnProvider(getProviderPrefs(getAiPrefs(user)), id)
+  const { user: userUpdated } = await commitProviderPrefs({
+    user,
+    deps,
+    change: (latest) => {
+      const saved = findOwnProvider(latest, id)
+      const wasDefault = latest.defaultProviderId === saved.id
+      return {
+        ...latest,
+        providers: latest.providers.filter((provider) => provider.id !== saved.id),
+        ...(wasDefault ? { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, defaultProviderOrigin: 'user' as const } : {}),
+      }
+    },
+  })
+  return { user: userUpdated }
 }
 
 /**
@@ -726,13 +868,45 @@ export const setDefaultProvider = async ({
   deps?: AiProviderServiceDeps
 }): Promise<{ user: User; applied: boolean }> => {
   if (!isAiProviderId(providerId)) throw notFound(providerId)
-  const prefs = getProviderPrefs(getAiPrefs(user))
-  if (isAccountProviderId(providerId)) findOwnProvider(prefs, providerId)
-  if (origin === 'converted' && prefs.defaultProviderOrigin !== 'converted') return { user, applied: false }
-  const next: AiProviderPrefs = {
-    ...prefs,
-    defaultProviderId: providerId,
-    defaultProviderOrigin: origin === 'converted' ? 'converted' : 'user',
+  let applied = false
+  const { user: userUpdated } = await commitProviderPrefs({
+    user,
+    deps,
+    change: (latest) => {
+      if (isAccountProviderId(providerId)) findOwnProvider(latest, providerId)
+      applied = origin !== 'converted' || latest.defaultProviderOrigin === 'converted'
+      if (!applied) return null
+      return {
+        ...latest,
+        defaultProviderId: providerId,
+        defaultProviderOrigin: origin === 'converted' ? 'converted' : 'user',
+      }
+    },
+  })
+  return { user: userUpdated, applied }
+}
+
+/**
+ * Encrypts again, with their AAD, the keys of the user's providers that were saved without one. Best effort: a
+ * failure is logged and the user is returned as it was, so a settings read never fails because of it.
+ * @param {object} params - Parameters.
+ * @param {User} params.user - The user (as loaded for this request).
+ * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
+ * @returns {Promise<User>} The user with the stored AI prefs (the same user when there was nothing to do).
+ */
+export const upgradeLegacyProviderKeys = async ({
+  user,
+  deps = createDefaultAiProviderServiceDeps(),
+}: {
+  user: User
+  deps?: AiProviderServiceDeps
+}): Promise<User> => {
+  const hasOldKeys = hasLegacyKeys(getProviderPrefs(getAiPrefs(user)), deps.isLegacyEnvelope)
+  if (!hasOldKeys || !deps.isEncryptionConfigured()) return user
+  try {
+    return (await commitProviderPrefs({ user, deps, change: () => null })).user
+  } catch (error) {
+    logger.warn(`Could not encrypt the old provider keys of a user again: ${(error as Error).message}`)
+    return user
   }
-  return { user: await saveProviderPrefs({ user, prefs: next, deps }), applied: true }
 }

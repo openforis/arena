@@ -372,3 +372,25 @@ export const upgradeLegacyKeys = ({
   const providers = prefs.providers.map((provider) => upgradeLegacyKey({ provider, userUuid, cipher }))
   return providers.some((provider, index) => provider !== prefs.providers[index]) ? { ...prefs, providers } : prefs
 }
+
+/**
+ * Returns the AI prefs with every old key (no AAD) of the account providers encrypted again with its AAD.
+ * @param {object} params - Parameters.
+ * @param {object|null} params.aiPrefs - Stored `user.prefs.ai`.
+ * @param {string} params.userUuid - The user.
+ * @param {KeyCipher} params.cipher - The secret box.
+ * @returns {object|null} The AI prefs; the same object when no key changed.
+ */
+export const upgradeLegacyKeysInAiPrefs = ({
+  aiPrefs,
+  userUuid,
+  cipher,
+}: {
+  aiPrefs: Record<string, any> | null
+  userUuid: string
+  cipher: KeyCipher
+}): Record<string, any> | null => {
+  const prefs = getProviderPrefs(aiPrefs)
+  const upgraded = upgradeLegacyKeys({ prefs, userUuid, cipher })
+  return upgraded === prefs ? aiPrefs : withProviderPrefs(aiPrefs, upgraded)
+}

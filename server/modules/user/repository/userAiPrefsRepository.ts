@@ -12,7 +12,8 @@ export type StoredAiPrefs = Record<string, any>
 // the database or a transaction
 type Queryable = Pick<typeof db, 'oneOrNone' | 'none'>
 
-export type AiPrefsUpdate = (current: StoredAiPrefs | null) => StoredAiPrefs | Promise<StoredAiPrefs>
+// returns the AI prefs to store, or null to leave the stored ones as they are
+export type AiPrefsUpdate = (current: StoredAiPrefs | null) => StoredAiPrefs | null | Promise<StoredAiPrefs | null>
 
 /**
  * Reads the stored AI prefs of a user.
@@ -57,17 +58,19 @@ export const writeAiPrefs = async (
  * and stores the result in one transaction. The change must not wait for the network: the row stays locked meanwhile.
  * @param {object} params - Parameters.
  * @param {string} params.userUuid - User uuid.
- * @param {Function} params.update - Receives the stored AI prefs (null when none) and returns the ones to store.
+ * @param {Function} params.update - Receives the stored AI prefs (null when none) and returns the ones to store, or
+ *   null to keep the stored ones (nothing is written then).
  * @param {object} [client] - Database client.
- * @returns {Promise<object>} The stored AI prefs.
+ * @returns {Promise<object|null>} The AI prefs as stored after the update (null when the user has none).
  */
 export const updateAiPrefs = async (
   { userUuid, update }: { userUuid: string; update: AiPrefsUpdate },
   client: Pick<typeof db, 'tx'> = db
-): Promise<StoredAiPrefs> =>
+): Promise<StoredAiPrefs | null> =>
   client.tx(async (tx) => {
     const current = await readAiPrefs({ userUuid, forUpdate: true }, tx)
     const aiPrefs = await update(current)
+    if (!aiPrefs) return current
     await writeAiPrefs({ userUuid, aiPrefs }, tx)
     return aiPrefs
   })

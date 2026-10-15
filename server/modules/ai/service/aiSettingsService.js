@@ -15,28 +15,17 @@
  *   }
  *
  * The providers and the default are edited by aiProviderService.ts; this module saves the access level and toggles.
+ * Both write through aiPrefsWriter, which changes the latest stored value, so neither undoes the other's change.
  */
-import * as User from '@core/user/user'
-import { AiFeatureCategory } from '@common/ai/features'
-
-import * as UserManager from '@server/modules/user/manager/userManager'
-
+import { changeAiPrefs, createDefaultAiPrefsWriterDeps } from './aiPrefsWriter'
 import { getProviderPrefs, withProviderPrefs } from './aiProviderPrefs'
 import * as AiProviderService from './aiProviderService'
 import {
-  areFeaturesEnabledForUser,
   getAccessLevelForUser,
   getAiPrefs as getRawPrefs,
-  isCategoryEnabledForUser,
   resolveSavedAccess,
   sanitiseFeatureToggles,
 } from './aiUserPrefs'
-
-export { areFeaturesEnabledForUser, isCategoryEnabledForUser }
-
-export const featureCategories = AiFeatureCategory
-
-const PREFS_KEY = 'ai'
 
 /**
  * Returns the user-facing settings (no secrets) for the AI settings panel.
@@ -58,19 +47,6 @@ export const getPublicSettings = (user) => {
 }
 
 /**
- * Stores the AI prefs of the user.
- * @param {object} user - Arena user.
- * @param {object} aiPrefs - AI prefs to store.
- * @returns {Promise<object>} The updated user.
- */
-const writeAiPrefs = async (user, aiPrefs) => {
-  const prefs = User.getPrefs(user) || {}
-  const userUpdated = { ...user, prefs: { ...prefs, [PREFS_KEY]: aiPrefs } }
-  await UserManager.updateUserPrefs(userUpdated)
-  return userUpdated
-}
-
-/**
  * Returns the AI prefs to store after a profile save: the access level and toggles of the request; the providers and
  * the default as stored. Any other field of the request (the old single-provider fields included) is ignored. An old
  * single-provider slot is written as `acct:legacy`, so a user who never opened the provider list keeps it.
@@ -83,11 +59,12 @@ export const buildSavedAiPrefs = ({ existing, update }) =>
   withProviderPrefs({ ...existing, ...resolveSavedAccess(update) }, getProviderPrefs(existing))
 
 /**
- * Saves the profile part of the AI settings (access level and toggles).
+ * Saves the profile part of the AI settings (access level and toggles) on the latest stored AI prefs.
  * @param {object} args - Update args.
  * @param {object} args.user - The user.
  * @param {object} args.update - Request body (untrusted).
- * @returns {Promise<object>} The updated user.
+ * @param {object} [args.deps] - Writer dependencies (see aiPrefsWriter).
+ * @returns {Promise<object>} The user with the AI prefs as stored.
  */
-export const saveSettings = async ({ user, update }) =>
-  writeAiPrefs(user, buildSavedAiPrefs({ existing: getRawPrefs(user), update }))
+export const saveSettings = async ({ user, update, deps = createDefaultAiPrefsWriterDeps() }) =>
+  changeAiPrefs({ user, deps, change: (existing) => buildSavedAiPrefs({ existing, update }) })

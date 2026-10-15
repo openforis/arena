@@ -8,6 +8,7 @@ import ru from '@core/i18n/resources/ru/appErrors'
 import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as SecretBox from '@server/utils/crypto/secretBox'
+import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
 const SECRET = 'd'.repeat(64)
@@ -57,20 +58,18 @@ const userWithProviders = (extra: Record<string, unknown> = {}) =>
   })
 
 /**
- * Builds recording dependencies.
+ * Builds recording dependencies over an in-memory store of the AI prefs of the user.
  * @param {object} [overrides] - Dependencies to replace.
- * @returns {object} The dependencies and what they recorded.
+ * @param {any} [user] - The user whose AI prefs are stored at the start.
+ * @returns {object} The dependencies, what they recorded (`saved` is every stored AI prefs value) and the store.
  */
-const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> = {}) => {
-  const saved: any[] = []
+const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> = {}, user: any = null) => {
+  const store = createAiPrefsStore(user?.prefs?.ai ?? null)
   const tests: any[] = []
   const listed: any[] = []
   let ids = 0
   const deps: AiProviderService.AiProviderServiceDeps = {
-    savePrefs: async (user, aiPrefs) => {
-      saved.push(aiPrefs)
-      return { ...user, prefs: { ...user.prefs, ai: aiPrefs } }
-    },
+    updateAiPrefs: store.updateAiPrefs,
     runTest: async ({ cfg }) => {
       tests.push(cfg)
       return { ok: true, latencyMs: 1 }
@@ -90,7 +89,7 @@ const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> 
     allowlist: ['https://llm.example.org/v1'],
     ...overrides,
   }
-  return { deps, saved, tests, listed }
+  return { deps, saved: store.writes, tests, listed, store }
 }
 
 describe('AI provider service (261)', () => {
@@ -163,8 +162,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a saved key stays on its endpoint', async () => {
-    const { deps, tests } = createDeps()
     const user = userWithProviders()
+    const { deps, tests } = createDeps({}, user)
     await AiProviderService.testProvider({ user, input: { id: 'acct:org' }, deps })
     // a trailing slash is the same endpoint
     await AiProviderService.testProvider({
@@ -189,8 +188,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a changed base URL needs the key again', async () => {
-    const { deps, saved, tests } = createDeps()
     const user = userWithProviders()
+    const { deps, saved, tests, store } = createDeps({}, user)
     const moved = await AiProviderService.updateProvider({
       user,
       id: 'acct:org',
@@ -205,15 +204,16 @@ describe('AI provider service (261)', () => {
     })
     expect(moved.provider).toMatchObject({ baseUrl: 'https://other.example.org/v1', hasApiKey: false })
     expect(saved[0].providers[1].apiKeyEncrypted).toBeNull()
-    // same endpoint, model changed: the key stays
+    // same endpoint, model changed: the key stays (from the saved provider again)
+    store.set(user.prefs.ai)
     const kept = await AiProviderService.updateProvider({ user, id: 'acct:org', input: { model: 'llama-2' }, deps })
     expect(tests[1].apiKey).toBe('sk-org')
     expect(kept.provider).toMatchObject({ model: 'llama-2', hasApiKey: true })
   })
 
   test("ids that are not the user's are refused, with nothing written or called", async () => {
-    const { deps, tests, saved, listed } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved, listed } = createDeps({}, user)
     const calls = [
       () => AiProviderService.testProvider({ user, input: { id: 'acct:someone-else' }, deps }),
       () => AiProviderService.listProviderModels({ user, input: { id: 'acct:someone-else' }, deps }),
@@ -320,8 +320,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('edit: a name change saves without a test, an omitted key is kept, an empty key clears it', async () => {
-    const { deps, tests, saved } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved } = createDeps({}, user)
     await AiProviderService.updateProvider({ user, id: 'acct:own', input: { name: 'Renamed' }, deps })
     expect(tests).toEqual([])
     expect(saved[0].providers[0]).toMatchObject({
@@ -344,11 +344,12 @@ describe('AI provider service (261)', () => {
   })
 
   test('remove resets a removed default; the default can be any own, local or Arena id', async () => {
-    const { deps, saved } = createDeps()
     const user = userWithProviders()
+    const { deps, saved, store } = createDeps({}, user)
     await AiProviderService.removeProvider({ user, id: 'acct:own', deps })
     expect(saved[0]).toMatchObject({ defaultProviderId: 'arena-default', defaultProviderOrigin: 'user' })
     expect(saved[0].providers.map((provider: any) => provider.id)).toEqual(['acct:org'])
+    store.set(user.prefs.ai)
     await AiProviderService.removeProvider({ user, id: 'acct:org', deps })
     expect(saved[1].defaultProviderId).toBe('acct:own')
     const local = await AiProviderService.setDefaultProvider({ user, providerId: 'local:abc', deps })
@@ -359,17 +360,20 @@ describe('AI provider service (261)', () => {
   })
 
   test('the conversion call sets the default only while the origin is still converted', async () => {
-    const { deps, saved } = createDeps()
+    const chosen = userWithProviders()
+    const { deps, saved, store } = createDeps({}, chosen)
     const skipped = await AiProviderService.setDefaultProvider({
-      user: userWithProviders(),
+      user: chosen,
       providerId: 'local:legacy',
       origin: 'converted',
       deps,
     })
     expect(skipped.applied).toBe(false)
     expect(saved).toEqual([])
+    const oldSlot = userWith({ provider: 'openai', model: 'gpt-x', enabled: true, apiKeyEncrypted: 'enc:k' })
+    store.set(oldSlot.prefs.ai)
     const converted = await AiProviderService.setDefaultProvider({
-      user: userWith({ provider: 'openai', model: 'gpt-x', enabled: true, apiKeyEncrypted: 'enc:k' }),
+      user: oldSlot,
       providerId: 'local:legacy',
       origin: 'converted',
       deps,
@@ -384,10 +388,11 @@ describe('AI provider service (261)', () => {
   })
 
   test('a test stamps only a saved provider tested with its saved values', async () => {
-    const { deps, saved } = createDeps({
-      runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }),
-    })
     const user = userWithProviders()
+    const { deps, saved } = createDeps(
+      { runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }) },
+      user
+    )
     await AiProviderService.testProvider({ user, input: { id: 'acct:own' }, deps })
     expect(saved[0].providers[0]).toMatchObject({ lastTestOk: false, lastTestAt: NOW })
     await AiProviderService.testProvider({ user, input: { id: 'acct:own', model: 'other' }, deps })
@@ -424,8 +429,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a rename never reads the key, so an unreadable key does not block it', async () => {
-    const { deps, tests, saved } = createDeps()
     const user = userWithProviders({ providers: [{ ...savedOpenAi, apiKeyEncrypted: 'v1:rotated' }] })
+    const { deps, tests, saved } = createDeps({}, user)
     const { provider } = await AiProviderService.updateProvider({
       user,
       id: 'acct:own',
@@ -443,8 +448,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a null or blank key is "not sent": the stored key is used and kept', async () => {
-    const { deps, tests, saved, listed } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved, listed } = createDeps({}, user)
     await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: null }, deps })
     await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: '   ' }, deps })
     expect(tests.map((cfg) => cfg.apiKey)).toEqual(['sk-org', 'sk-org'])
@@ -470,6 +475,7 @@ describe('AI provider service (261)', () => {
       'aiProviderNotGateway',
       'aiApiKeyUnreadable',
       'aiEncryptionMissing',
+      'aiProviderChanged',
       'aiProviderTestFailed',
     ]
     for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
