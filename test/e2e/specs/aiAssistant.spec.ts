@@ -425,7 +425,9 @@ test.describe('AI assistant (mock provider)', () => {
     // the composer (and its footer) is in the chat, not on the home page
     await panel.getByTestId(TestId.aiAssistant.homeNewConversationBtn).click()
     const footer = panel.getByTestId(TestId.aiAssistant.composerFooter)
-    await expect(footer.getByTestId(TestId.aiAssistant.providerChip)).toContainText('Arena default')
+    const chip = footer.getByTestId(TestId.aiAssistant.providerChip)
+    await expect(chip).toHaveAttribute('title', /^Arena default/)
+    await expect(chip.locator('.icon-cloud')).toBeVisible()
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute('data-level', 'schema')
     await expect(footer.getByTestId(TestId.aiAssistant.sentDataChip)).toHaveAttribute(
       'aria-label',
@@ -441,7 +443,7 @@ test.describe('AI assistant (mock provider)', () => {
     // and Send stays inside the footer
     const box = (await footer.boundingBox())!
     const middle = box.y + box.height / 2
-    for (const item of [ring, footer.getByTestId(TestId.aiAssistant.sentDataChip)]) {
+    for (const item of [chip, ring, footer.getByTestId(TestId.aiAssistant.sentDataChip)]) {
       const itemBox = (await item.boundingBox())!
       expect(Math.abs(itemBox.y + itemBox.height / 2 - middle)).toBeLessThan(2)
     }
@@ -472,7 +474,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await api.disableAiFeatures()
   })
 
-  test('with a local provider the footer keeps Send inside and truncates a long provider name', async ({
+  test('with a local provider the chip shows the laptop icon, the name in its tooltip, and Send stays inside', async ({
     page,
     api,
     sampleSurvey: _,
@@ -492,11 +494,12 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await acceptConsentAndWait(page)
 
     const footer = assistantPanel(page).getByTestId(TestId.aiAssistant.composerFooter)
-    const text = footer.locator('.ai-provider-chip__text')
+    const chip = footer.getByTestId(TestId.aiAssistant.providerChip)
     await expect(footer.getByTestId(TestId.aiAssistant.contextMeter)).toBeVisible()
-    await expect(text).toHaveText(`${LONG_LOCAL_NAME} · ${stub!.modelId}`)
-    // the chip text is the only item that shrinks; Send keeps its place inside the footer
-    await expect.poll(async () => await text.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true)
+    // the chip shows where the provider runs as an icon; the name is only in the tooltip
+    await expect(chip.locator('.icon-laptop')).toBeVisible()
+    await expect(chip).toHaveAttribute('title', new RegExp(`^${LONG_LOCAL_NAME} · ${stub!.modelId}`))
+    await expect(chip).not.toContainText(LONG_LOCAL_NAME)
     await expect
       .poll(async () => {
         const box = (await footer.boundingBox())!

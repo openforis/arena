@@ -172,12 +172,12 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
   }) => {
     const { provider } = await api.addAiAccountProvider({ type: 'mock', name: 'Mock account', model: 'mock' })
     await openNewDesignConversation(page)
-    await expect(providerChip(page)).toContainText('Arena default · mock')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
 
     const chosenBodies = collectRequestBodies(page, isGatewayRequest)
     await providerChip(page).click()
     await page.getByTestId(TestId.aiAssistant.providerChoice(provider.id)).click()
-    await expect(providerChip(page)).toContainText('Mock account · mock')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Mock account · mock/)
 
     await sendAssistantMessage(page, LABEL_REQUEST)
     await waitForAssistantTurn(page)
@@ -191,7 +191,7 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await openAssistantPanel(page)
     await reopenLastConversation(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.providerRemovedNotice)).toBeVisible()
-    await expect(providerChip(page)).toContainText('Arena default · mock')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
 
     const defaultBodies = collectRequestBodies(page, isGatewayRequest)
     await sendAssistantMessage(page, LABEL_REQUEST)
@@ -209,13 +209,13 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await api.setAiDefaultProvider('local:elsewhere')
     const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
     await openNewDesignConversation(page)
-    await expect(providerChip(page)).toContainText('Default provider not on this computer')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Default provider not on this computer/)
 
     await providerChip(page).click()
     await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
     expect(gatewayBodies).toEqual([])
     await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
-    await expect(providerChip(page)).toContainText('Arena default · mock')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
 
     await sendAssistantMessage(page, LABEL_REQUEST)
     await waitForAssistantTurn(page)
@@ -248,12 +248,12 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
     await openNewDesignConversation(page)
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible()
-    await expect(providerChip(page)).toContainText('Local server')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Local server/)
 
     await providerChip(page).click()
     expect(gatewayBodies).toEqual([])
     await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
-    await expect(providerChip(page)).toContainText('Arena default · mock')
+    await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)
 
     await sendAssistantMessage(page, LABEL_REQUEST)
     await waitForAssistantTurn(page)

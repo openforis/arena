@@ -2,6 +2,8 @@
   .modal-content {
     width: 420px;
     max-width: 90vw;
+    // the shared modal's 20vw side margins pin a narrow dialog to the left: center it instead
+    margin: 10vh auto auto;
   }
 
   &__status {

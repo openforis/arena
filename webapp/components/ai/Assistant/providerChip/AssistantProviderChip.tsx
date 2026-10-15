@@ -33,6 +33,14 @@ import {
   type ProviderChoice,
 } from './providerChipModel'
 
+// icon of where the provider runs (same icons as the old data-location badge)
+const iconByWhereKey: Record<string, string> = {
+  onDevice: 'icon-laptop',
+  orgHosted: 'icon-office',
+  cloud: 'icon-cloud',
+  cloudOwnKey: 'icon-cloud',
+}
+
 type Props = {
   area: AssistantArea
   conversation: Conversation | null
@@ -201,6 +209,8 @@ export const AssistantProviderChip = (props: Props) => {
   const whereKey = view.kind === 'provider' ? getProviderWhereKey(view.entry) : null
   const fullLabel = whereKey ? `${label} · ${t(`userAiSettings:where.${whereKey}`)}` : label
   const tone = view.kind === 'provider' ? view.tone : 'bad'
+  // a default missing on this browser is a local provider of another computer
+  const iconClass = whereKey ? iconByWhereKey[whereKey] : 'icon-laptop'
 
   return (
     <>
@@ -216,8 +226,7 @@ export const AssistantProviderChip = (props: Props) => {
         title={fullLabel}
         type="button"
       >
-        <span aria-hidden="true" className="ai-provider-chip__dot" />
-        <span className="ai-provider-chip__text">{label}</span>
+        <span aria-hidden="true" className={`ai-provider-chip__icon icon ${iconClass} icon-14px`} />
         <span aria-hidden="true" className="ai-provider-chip__caret">
           ▾
         </span>
