@@ -94,13 +94,35 @@ describe('the category labels cursor (388)', () => {
     return runTool(tool, { categoryName: 'species', lang: 'fr', ...input }, ctx) as Promise<any>
   }
 
+  const cursorRefusal = () =>
+    Object.assign(new Error('Request failed with status code 400'), {
+      response: {
+        status: 400,
+        data: { status: 'error', key: 'appErrors:categoryItemLabelsInvalid', params: { reason: 'cursor' } },
+      },
+    })
+
   test('a cursor the server refuses (it answers 400, it does not restart) tells the model to start over', async () => {
     const fetchPage = jest.fn(async () => {
-      throw Object.assign(new Error('Request failed with status code 400'), { response: { status: 400 } })
+      throw cursorRefusal()
     })
     const result = await listWithServer(fetchPage, { cursor: 'page-2' })
     expect(result.error.code).toBe('invalidCursor')
     expect(result.error.message).toContain('without cursor')
+  })
+
+  test('another 400 with a cursor (other reason, no body) is not a cursor problem', async () => {
+    for (const data of [
+      { key: 'appErrors:categoryItemLabelsInvalid', params: { reason: 'limit' } },
+      { key: 'appErrors:generic', params: { reason: 'cursor' } },
+      undefined,
+    ]) {
+      const fetchPage = jest.fn(async () => {
+        throw Object.assign(new Error('Request failed with status code 400'), { response: { status: 400, data } })
+      })
+      const result = await listWithServer(fetchPage, { cursor: 'page-2' })
+      expect(result.error.code).toBe('toolFailed')
+    }
   })
 
   test('a 400 on the first page is not a cursor problem', async () => {

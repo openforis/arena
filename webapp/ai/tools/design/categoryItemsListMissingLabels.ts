@@ -201,6 +201,12 @@ const buildNote = (nextCursor: string | null, pendingCount: number): string => {
   return parts.join(' ')
 }
 
+// the server's answer to a bad cursor: 400, key `appErrors:categoryItemLabelsInvalid`, params.reason `cursor`
+const isCursorRefusal = (error: any): boolean =>
+  error?.response?.status === 400 &&
+  error.response.data?.key === 'appErrors:categoryItemLabelsInvalid' &&
+  error.response.data?.params?.reason === 'cursor'
+
 /**
  * Returns the failure for a cursor the server refuses (it answers 400 to a text that is not an item uuid).
  * @param {any} error - Request error.
@@ -208,7 +214,7 @@ const buildNote = (nextCursor: string | null, pendingCount: number): string => {
  * @returns {AiToolFailure|null} The failure, null when the error is not about the cursor.
  */
 const toCursorFailure = (error: any, cursor: string | null): AiToolFailure | null =>
-  cursor !== null && error?.response?.status === 400
+  cursor !== null && isCursorRefusal(error)
     ? new AiToolFailure(
         'invalidCursor',
         'The cursor is not one this tool returned. Pass nextCursor exactly as received, or call again without cursor to start from the first item.'
