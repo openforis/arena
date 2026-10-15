@@ -411,7 +411,9 @@ export const useAssistantConversation = ({
    */
   const readConversation = useCallback(
     async (id: string): Promise<Conversation | null> =>
-      conversationRef.current?.id === id ? conversationRef.current : ((await conversationStore?.get(id, userUuid)) ?? null),
+      conversationRef.current?.id === id
+        ? conversationRef.current
+        : ((await conversationStore?.get(id, userUuid)) ?? null),
     [conversationStore, userUuid]
   )
 
