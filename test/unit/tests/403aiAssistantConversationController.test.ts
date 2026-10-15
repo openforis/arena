@@ -418,6 +418,56 @@ describe('assistant conversation controller (403)', () => {
       expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'error' })
     })
 
+    test('a turn that ends while another area is shown: coming back shows the final answer, not the streaming one', async () => {
+      const turn = createTurnControl({ endOnAbort: false })
+      const { controller, panel, registry, store } = await setup({ runTurn: turn.run })
+      const id = (await controller.send(env, 'hello')) as string
+      await flush()
+      turn.params[0].onUpdate(withTurn(turn.params[0].conversation, 'hello', 'streaming'))
+      // another area: it has no open conversation
+      const other = { ...scope, area: 'analysis' as const }
+      panel.setArea('analysis')
+      panel.setConversationId(null)
+      controller.setScope(other)
+      controller.select(other, null)
+      turn.release(0, 'done')
+      await registry.settle()
+      // back to the design area, where the turn ran
+      panel.setArea('design')
+      panel.setConversationId(id)
+      controller.setScope(scope)
+      controller.select(scope, id)
+      await flush()
+      expect(controller.getState().busy).toBe(false)
+      expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'done' })
+      expect(lastSaved(store, id)?.messages.at(-1)).toMatchObject({ status: 'done' })
+    })
+
+    test('a turn that fails while another area is shown: coming back shows the error, not a spinner', async () => {
+      const gate = deferred<void>()
+      const run = jest.fn(async (params: RunAssistantTurnParams) => {
+        params.onUpdate(withTurn(params.conversation, params.userMessage, 'streaming'))
+        await gate.promise
+        throw new Error('boom')
+      })
+      const { controller, panel, registry } = await setup({ runTurn: run })
+      const id = (await controller.send(env, 'hello')) as string
+      await flush()
+      const other = { ...scope, area: 'analysis' as const }
+      panel.setArea('analysis')
+      panel.setConversationId(null)
+      controller.setScope(other)
+      controller.select(other, null)
+      gate.resolve()
+      await registry.settle()
+      panel.setArea('design')
+      panel.setConversationId(id)
+      controller.setScope(scope)
+      controller.select(scope, id)
+      await flush()
+      expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'error' })
+    })
+
     test('a Do it request starts a new conversation with the suggestion scope and holds the turn lock', async () => {
       const remembered = storedConversation('c1')
       const { controller, panel, registry, suggestions } = await setup({ conversations: [remembered] })
