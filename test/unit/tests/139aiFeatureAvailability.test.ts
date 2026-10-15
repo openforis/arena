@@ -111,7 +111,13 @@ describe('isCapabilitiesLoadedForUser', () => {
   })
 })
 
-const REASONS: AiUnavailableReason[] = ['policyForbids', 'notAvailable', 'missingOnThisBrowser', 'notSetUp']
+const REASONS: AiUnavailableReason[] = [
+  'policyForbids',
+  'notAvailable',
+  'missingOnThisBrowser',
+  'notSetUp',
+  'invalidAddress',
+]
 
 describe('getAiEngineFeatureAvailability', () => {
   test('disabled when the feature is off, or while the policy is loading', () => {
@@ -186,6 +192,7 @@ describe('helpers', () => {
     expect(REASONS.map(getAiUnavailableReasonActions)).toEqual([
       ['changePolicy'],
       ['retry', 'openSettings'],
+      ['openSettings'],
       ['openSettings'],
       ['openSettings'],
     ])

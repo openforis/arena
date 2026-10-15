@@ -38,6 +38,7 @@ const ACTIONS: Record<AiUnavailableReason, AiUnavailableAction[]> = {
   notAvailable: ['retry', 'openSettings'],
   missingOnThisBrowser: ['openSettings'],
   notSetUp: ['openSettings'],
+  invalidAddress: ['openSettings'],
 }
 
 /**

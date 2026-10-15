@@ -102,6 +102,7 @@ export const selectEngine = ({
   if (entry.hostingClass && !isHostingAllowed({ effective, dataClass, hostingClass: entry.hostingClass })) {
     return unavailable('policyForbids')
   }
+  if (entry.addressInvalid) return unavailable('invalidAddress')
   if (entry.status === 'notSetUp') return unavailable('notSetUp')
   return entry.kind === 'local' ? selectLocal(entry, capabilities) : selectGateway(entry, capabilities)
 }

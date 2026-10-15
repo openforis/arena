@@ -64,6 +64,8 @@ export type AiProviderEntry = {
   baseUrl: string | null
   hostingClass: AiHostingClass | null
   status: AiProviderStatus
+  // a local provider whose stored address is not a plain http(s) URL: never called, and says why
+  addressInvalid?: boolean
 }
 
 export type AiCapabilities = {
@@ -76,7 +78,8 @@ export type AiCapabilities = {
 }
 
 // why the one provider of a request cannot be used (no fallback: there is never a second candidate)
-export type AiUnavailableReason = 'policyForbids' | 'notAvailable' | 'missingOnThisBrowser' | 'notSetUp'
+export type AiUnavailableReason =
+  'policyForbids' | 'notAvailable' | 'missingOnThisBrowser' | 'notSetUp' | 'invalidAddress'
 
 export type AiEngineSelection = { engine: AiSelectedEngine } | { unavailable: AiUnavailableReason[] }
 
