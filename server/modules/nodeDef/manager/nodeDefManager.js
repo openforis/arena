@@ -199,6 +199,20 @@ const _assertRefPropsCanChange = ({ survey, nodeDef, props }) => {
   }
 }
 
+/**
+ * Refuses a batch of props updates that changes the category or taxonomy of a published attribute (same rule as
+ * updateNodeDefProps, for the batch route).
+ * @param {object} params - Parameters.
+ * @param {object} params.survey - Survey (draft).
+ * @param {object[]} params.nodeDefs - Updates: { nodeDefUuid, props }.
+ * @throws {SystemError} 409 `appErrors:survey.nodeDefRefLocked` on the first locked change.
+ */
+export const assertNodeDefsRefPropsCanChange = ({ survey, nodeDefs }) => {
+  nodeDefs.forEach(({ nodeDefUuid, props = {} }) => {
+    _assertRefPropsCanChange({ survey, nodeDef: Survey.getNodeDefByUuid(nodeDefUuid)(survey), props })
+  })
+}
+
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
   client = db

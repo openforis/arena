@@ -230,3 +230,58 @@ describe('Apply does not count on a create it will not apply (389)', () => {
     expect(posts).toHaveLength(1)
   })
 })
+
+describe('the batch props route refuses a category change on a published attribute (389)', () => {
+  // the guard runs before any query: a client that only opens the transaction is enough
+  const fakeClient: any = { tx: async (fn: (t: unknown) => unknown) => fn({}) }
+  let survey: any
+  let published: any
+  beforeAll(async () => {
+    survey = await buildRefSurvey()
+    published = Survey.getNodeDefsArray(survey).reduce(
+      (acc: any, nodeDef: any) => Survey.assocNodeDef({ nodeDef: { ...nodeDef, published: true } })(acc),
+      survey
+    )
+  })
+
+  test('the service throws the same 409 as the single update', async () => {
+    const { updateNodeDefsProps } = await import('@server/modules/nodeDef/service/nodeDefService')
+    const country = NodeDef.getUuid(getDefByName(published, 'country'))
+    await expect(
+      updateNodeDefsProps(
+        {
+          surveyId: 1,
+          cycle: '0',
+          survey: published,
+          nodeDefs: [{ nodeDefUuid: country, props: { categoryUuid: 'x' } }],
+        },
+        fakeClient
+      )
+    ).rejects.toMatchObject({
+      key: 'appErrors:survey.nodeDefRefLocked',
+      params: { name: 'country', prop: 'categoryUuid' },
+      statusCode: 409,
+    })
+  })
+
+  test('the guard passes other props, the same value and an unpublished attribute', async () => {
+    const { assertNodeDefsRefPropsCanChange } = await import('@server/modules/nodeDef/manager/nodeDefManager')
+    const country = getDefByName(published, 'country')
+    const uuid = NodeDef.getUuid(country)
+    expect(() =>
+      assertNodeDefsRefPropsCanChange({
+        survey: published,
+        nodeDefs: [
+          { nodeDefUuid: uuid, props: { layout: {} } },
+          { nodeDefUuid: uuid, props: { categoryUuid: NodeDef.getCategoryUuid(country) } },
+        ],
+      })
+    ).not.toThrow()
+    expect(() =>
+      assertNodeDefsRefPropsCanChange({
+        survey,
+        nodeDefs: [{ nodeDefUuid: uuid, props: { categoryUuid: 'another-category' } }],
+      })
+    ).not.toThrow()
+  })
+})
