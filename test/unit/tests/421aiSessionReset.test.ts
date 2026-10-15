@@ -4,7 +4,8 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { openConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { createOpenConversations, type OpenConversationsStorage } from '@webapp/ai/conversations/openConversations'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
-import { createResetAiSession } from '@webapp/ai/session/resetAiSession'
+import { APP_AI_SESSION_RESETS, createResetAiSession } from '@webapp/ai/session/resetAiSession'
+import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion, SuggestionRequest } from '@webapp/ai/suggestions/types'
 import { createAssistantLogout } from '@webapp/components/ai/Assistant/assistantLogout'
@@ -53,6 +54,17 @@ describe('AI session reset (421)', () => {
     await expect(reset()).resolves.toBeUndefined()
     expect(calls).toEqual(['fine'])
     expect(log).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('the app reset list (421)', () => {
+  test('it clears the category item refs the model listed for each conversation', async () => {
+    const before = categoryItemRefsRegistry.forConversation('c1')
+    expect(categoryItemRefsRegistry.forConversation('c1')).toBe(before)
+    const entry = APP_AI_SESSION_RESETS.find((reset) => reset.name === 'category item refs')
+    expect(entry).toBeDefined()
+    await entry?.run()
+    expect(categoryItemRefsRegistry.forConversation('c1')).not.toBe(before)
   })
 })
 

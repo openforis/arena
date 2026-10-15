@@ -5,6 +5,7 @@
  */
 import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { cancelAllConsentRequests } from '@webapp/ai/engines/consentRequests'
+import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import { resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'
 
 export type AiSessionReset = { name: string; run: () => void | Promise<void> }
@@ -29,6 +30,8 @@ export const APP_AI_SESSION_RESETS: AiSessionReset[] = [
     run: async () => (await import('@webapp/ai/engines/capabilitiesStore')).resetAiCapabilities(),
   },
   { name: 'local server consent requests', run: () => cancelAllConsentRequests() },
+  // the category items listed to the model, by conversation: the model lists them again when needed
+  { name: 'category item refs', run: () => categoryItemRefsRegistry.clearAll() },
 ]
 
 /**
