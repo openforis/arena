@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+import IconButton from '@mui/material/IconButton'
+import Tooltip from '@mui/material/Tooltip'
 
 import * as API from '@webapp/service/api'
+import { ButtonIconInfo } from '@webapp/components/buttons'
+import { useNotifyInfo } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
-import { NotificationActions } from '@webapp/store/ui'
 import { copyToClipboard } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
 
@@ -36,6 +38,26 @@ const useCurrentSurveyFingerprint = ({ surveyId, skip }: { surveyId: number; ski
   return fingerprint
 }
 
+const FingerprintCopyButton = ({ value }: { value: string }) => {
+  const i18n = useI18n()
+  const notifyInfo = useNotifyInfo()
+  const title = i18n.t('surveyCompareView:fingerprint.copy', { value })
+
+  const onCopy = useCallback(async () => {
+    if (await copyToClipboard(value)) {
+      notifyInfo({ key: 'surveyCompareView:fingerprint.copied' })
+    }
+  }, [notifyInfo, value])
+
+  return (
+    <Tooltip title={title}>
+      <IconButton aria-label={title} color="inherit" onClick={onCopy} size="small">
+        <span className="icon icon-copy icon-12px" />
+      </IconButton>
+    </Tooltip>
+  )
+}
+
 const FingerprintRow = ({
   label,
   fingerprint,
@@ -47,23 +69,7 @@ const FingerprintRow = ({
   reference?: SurveyFingerprint | null
   getTestId: (type: FingerprintType) => string
 }) => {
-  const dispatch = useDispatch()
   const i18n = useI18n()
-
-  const onCopy = useCallback(
-    async (value: string) => {
-      if (await copyToClipboard(value)) {
-        dispatch(
-          NotificationActions.notifyInfo({
-            key: 'surveyCompareView:fingerprint.copied',
-            params: undefined,
-            text: undefined,
-          }) as any
-        )
-      }
-    },
-    [dispatch]
-  )
 
   return (
     <div className="survey-compare__fingerprint-row">
@@ -74,15 +80,10 @@ const FingerprintRow = ({
         return (
           <span key={type} className="survey-compare__fingerprint-item">
             {type === 'structural' && <span>{i18n.t('surveyCompareView:fingerprint.structural')}:</span>}
-            <button
-              className="survey-compare__fingerprint-value"
-              data-testid={getTestId(type)}
-              onClick={() => onCopy(value)}
-              title={i18n.t('surveyCompareView:fingerprint.copy', { value })}
-              type="button"
-            >
+            <span className="survey-compare__fingerprint-value" data-testid={getTestId(type)}>
               {value.substring(0, shortLength)}
-            </button>
+            </span>
+            <FingerprintCopyButton value={value} />
             {equal !== null && (
               <span
                 className={`icon icon-12px ${equal ? 'icon-checkmark survey-compare__fingerprint--equal' : 'icon-cross survey-compare__fingerprint--different'}`}
@@ -98,7 +99,7 @@ const FingerprintRow = ({
 
 /**
  * Fingerprints of the survey definitions: of this survey and, once compared, of the compared survey.
- * Identical fingerprints mean identical definitions; values are copied on click.
+ * Identical fingerprints mean identical definitions; the full values can be copied.
  * @param {object} props - The props.
  * @param {number} props.surveyId - Id of the current survey.
  * @param {SurveyFingerprint} [props.targetFingerprint] - Fingerprint of this survey computed by the comparison.
@@ -123,6 +124,7 @@ export const SurveyCompareFingerprints = ({
     <div className="survey-compare__fingerprints">
       <span className="icon icon-key icon-12px" />
       <span>{i18n.t('surveyCompareView:fingerprint.label')}</span>
+      <ButtonIconInfo title="surveyCompareView:fingerprint.info" titleMaxWidth={500} />
       <div className="survey-compare__fingerprint-grid">
         <FingerprintRow
           label="surveyCompareView:fingerprint.thisSurvey"
@@ -138,9 +140,6 @@ export const SurveyCompareFingerprints = ({
           />
         )}
       </div>
-      <span className="survey-compare__fingerprint-info" title={i18n.t('surveyCompareView:fingerprint.info')}>
-        {i18n.t('surveyCompareView:fingerprint.whatIsIt')}
-      </span>
     </div>
   )
 }

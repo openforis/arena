@@ -265,8 +265,8 @@ taxaByTaxonomyUuid, type })` → canonical JSON, built with the same normalizers
   different values, so a Prod survey with unpublished edits is visible as such.
 - UI: in the compare view only (not on the dashboard). Before comparing, the fingerprints of this survey (fetched
   from the endpoint); after comparing, those of this survey and of the compared survey (computed by the compare job
-  and stored in the result), with a mark telling whether they are equal. First 12 chars shown, click to copy the full
-  value.
+  and stored in the result), with a mark telling whether they are equal. First 12 chars shown, the full value is copied with
+  the copy icon button; the info icon button explains the two fingerprints.
 
 ## Implementation (phase 1)
 
