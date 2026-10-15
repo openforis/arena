@@ -12,6 +12,7 @@ import {
   findLevelsAboveCeiling,
   getEffectiveAiPolicy,
   isAiPolicyLevel,
+  isDataAboveSchema,
   normalizeAiPolicy,
   type AiPolicy,
 } from '@common/ai/policy'
@@ -68,7 +69,8 @@ const toState = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy })
 const isSamePolicy = (a: AiPolicy, b: AiPolicy): boolean => a.schema === b.schema && a.data === b.data
 
 /**
- * Validates a policy sent by the client: both classes with a valid level.
+ * Validates a policy sent by the client: both classes with a valid level, and record data not more permissive than
+ * the survey design (`aiPolicyDataAboveSchema`).
  * @param {unknown} body - Request body.
  * @returns {AiPolicy} The policy.
  */
@@ -80,7 +82,9 @@ export const parseAiPolicyBody = (body: unknown): AiPolicy => {
     aiPolicyDataClasses.every((dataClass) => isAiPolicyLevel((body as Record<string, unknown>)[dataClass]))
   if (!valid) throw new SystemError('aiPolicyInvalid', {}, StatusCodes.BAD_REQUEST)
   const { schema, data } = body as AiPolicy
-  return { schema, data }
+  const policy = { schema, data }
+  if (isDataAboveSchema(policy)) throw new SystemError('aiPolicyDataAboveSchema', policy, StatusCodes.BAD_REQUEST)
+  return policy
 }
 
 /**

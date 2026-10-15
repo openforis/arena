@@ -100,6 +100,8 @@ export default {
     'AI тохируулагдаагүй байна. AI тохиргоонд хувийн үйлчилгээ үзүүлэгчийг тохируулах эсвэл администратороос анхдагч тохиргоо хийлгэнэ үү.',
   aiPolicyRefused:
     'Энэ судалгааны AI бодлого $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}) илгээхийг зөвшөөрөхгүй байна.',
+  aiPolicyDataAboveSchema:
+    'Бичлэгийн өгөгдөл судалгааны бүтцээс илүү зөвшөөрөмтгий байж болохгүй (бүтэц: «$t(common:aiPolicy.level.{{schema}})», бичлэгийн өгөгдөл: «$t(common:aiPolicy.level.{{data}})»).',
   aiPolicyInvalid: 'AI бодлого буруу байна: судалгааны бүтэц болон бичлэгийн өгөгдөл тус бүрд түвшин сонгоно уу.',
   aiPolicyAboveCeiling:
     '«$t(common:aiPolicy.level.{{level}})» түвшинг энэ Arena суулгац зөвшөөрөхгүй (дээд хязгаар: «$t(common:aiPolicy.level.{{ceiling}})»).',

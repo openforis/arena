@@ -6,6 +6,7 @@ import { aiPolicyDataClasses, type AiPolicy, type AiPolicyLevel } from '@common/
 
 import {
   fetchSurveyAiPolicy,
+  invalidateSurveyAiPolicy,
   updateSurveyAiPolicy,
   type SurveyAiPolicyClientState,
 } from '@webapp/ai/policy/surveyAiPolicyClient'
@@ -16,7 +17,12 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { getLevelsAboveCeiling, getPolicyLevelOptions, getPolicySaveErrorMessage } from './policyLevelOptions'
+import {
+  applyPolicyChoice,
+  getLevelsAbove,
+  getPolicyLevelOptions,
+  getPolicySaveErrorMessage,
+} from './policyLevelOptions'
 
 type DataClass = keyof AiPolicy
 
@@ -28,7 +34,8 @@ type ClassEditorProps = {
 }
 
 /**
- * Segmented control of one data class, with the explanation of the chosen level and the ceiling note.
+ * Segmented control of one data class, with the explanation of the chosen level and the notes on the levels that
+ * cannot be chosen (instance ceiling; for record data, also the survey design level).
  * @param {ClassEditorProps} props - Props.
  * @returns {React.ReactElement} The control.
  */
@@ -37,7 +44,10 @@ const PolicyClassEditor = (props: ClassEditorProps) => {
   const i18n = useI18n()
   const level = state.policy[dataClass]
   const ceiling = state.ceilings[dataClass]
-  const lockedLevels = getLevelsAboveCeiling(ceiling)
+  const lockedLevels = getLevelsAbove(ceiling)
+  // record data cannot be more permissive than the survey design
+  const limit = dataClass === 'data' ? state.policy.schema : undefined
+  const limitedLevels = limit ? getLevelsAbove(limit).filter((locked) => !lockedLevels.includes(locked)) : []
 
   return (
     <FormItem label={`homeView:surveyInfo.aiPolicy.${dataClass}Label`}>
@@ -45,7 +55,7 @@ const PolicyClassEditor = (props: ClassEditorProps) => {
         <span className="survey-ai-policy__hint">{i18n.t(`homeView:surveyInfo.aiPolicy.${dataClass}Hint`)}</span>
         <ButtonGroup
           groupName={TestId.surveyInfo.aiPolicy.levelGroup(dataClass)}
-          items={getPolicyLevelOptions({ ceiling, readOnly: disabled })}
+          items={getPolicyLevelOptions({ ceiling, readOnly: disabled, limit })}
           selectedItemKey={level}
           // ButtonGroup (JS) types its onChange as a no-argument function
           onChange={((levelNext: AiPolicyLevel | null) => onChange(dataClass, levelNext)) as () => void}
@@ -60,6 +70,13 @@ const PolicyClassEditor = (props: ClassEditorProps) => {
           >
             {i18n.t('homeView:surveyInfo.aiPolicy.notAllowedOnInstance', {
               levels: lockedLevels.map((locked) => i18n.t(`aiPolicy.level.${locked}`)).join(', '),
+            })}
+          </span>
+        )}
+        {limitedLevels.length > 0 && (
+          <span className="survey-ai-policy__ceiling-note">
+            {i18n.t('homeView:surveyInfo.aiPolicy.dataLimitedBySchema', {
+              levels: limitedLevels.map((locked) => i18n.t(`aiPolicy.level.${locked}`)).join(', '),
             })}
           </span>
         )}
@@ -101,15 +118,19 @@ export const SurveyAiPolicyEditor = () => {
     async (dataClass: DataClass, level: AiPolicyLevel | null) => {
       if (!state || !level || level === state.policy[dataClass]) return
       const previous = state
-      const policy = { ...state.policy, [dataClass]: level }
+      // lowering the design below the record data lowers the data with it (the server refuses data above design)
+      const { policy, dataLowered } = applyPolicyChoice({ policy: state.policy, dataClass, level })
       // show the choice at once; reverted below when the save fails
       setState({ ...state, policy })
       setSaving(true)
       try {
         setState(await updateSurveyAiPolicy(surveyId, policy))
-        notifyInfo({ key: 'homeView:surveyInfo.aiPolicy.saved' })
+        notifyInfo({
+          key: dataLowered ? 'homeView:surveyInfo.aiPolicy.savedDataLowered' : 'homeView:surveyInfo.aiPolicy.saved',
+        })
       } catch (error) {
-        setState(previous)
+        // show what the server holds now (the failure may come from a changed role or ceiling), else the previous value
+        setState(await invalidateSurveyAiPolicy(surveyId).catch(() => previous))
         const message = getPolicySaveErrorMessage({
           error,
           t: (key, params) => i18n.t(key, params as Record<string, unknown>),
@@ -150,7 +171,6 @@ export const SurveyAiPolicyEditor = () => {
           onChange={onChange}
         />
       ))}
-      {/* removed by C (local engines) */}
       <p className="survey-ai-policy__note">{i18n.t('homeView:surveyInfo.aiPolicy.onDeviceNote')}</p>
     </div>
   )

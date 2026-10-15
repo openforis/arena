@@ -1,7 +1,7 @@
 import en from '@core/i18n/resources/en'
 
 import {
-  getLevelsAboveCeiling,
+  getLevelsAbove,
   getPolicyLevelOptions,
   getPolicySaveErrorMessage,
 } from '@webapp/views/App/views/Home/SurveyInfo/SurveyAiPolicyEditor/policyLevelOptions'
@@ -19,7 +19,7 @@ describe('policy level options', () => {
 
   test('orgHosted ceiling: cloud is locked', () => {
     expect(disabledKeys(getPolicyLevelOptions({ ceiling: 'orgHosted', readOnly: false }))).toEqual(['cloud'])
-    expect(getLevelsAboveCeiling('orgHosted')).toEqual(['cloud'])
+    expect(getLevelsAbove('orgHosted')).toEqual(['cloud'])
   })
 
   test('off ceiling: only off', () => {

@@ -105,16 +105,24 @@ describe('PUT /survey/:surveyId/ai-policy', () => {
     ['system admin', users.systemAdmin],
   ])('%s updates the policy', async (_label, user) => {
     const { routes, store } = createRoutes()
-    const res = await runChain(routes.put, { user, body: { schema: 'orgHosted', data: 'cloud' } })
+    const res = await runChain(routes.put, { user, body: { schema: 'cloud', data: 'orgHosted' } })
     expect(res.statusCode).toBe(200)
     expect(res.body).toEqual({
-      policy: { schema: 'orgHosted', data: 'cloud' },
+      policy: { schema: 'cloud', data: 'orgHosted' },
       ceilings: { schema: 'cloud', data: 'cloud' },
-      effective: { schema: 'orgHosted', data: 'cloud' },
+      effective: { schema: 'cloud', data: 'orgHosted' },
       canEdit: true,
     })
-    expect(store.raw).toEqual({ schema: 'orgHosted', data: 'cloud' })
+    expect(store.raw).toEqual({ schema: 'cloud', data: 'orgHosted' })
     expect(store.activities).toHaveLength(1)
+  })
+
+  test('data above schema → 400 aiPolicyDataAboveSchema, nothing stored', async () => {
+    const { routes, store } = createRoutes()
+    const res = await runChain(routes.put, { user: users.surveyAdmin, body: { schema: 'off', data: 'cloud' } })
+    expect(res.statusCode).toBe(400)
+    expect(res.body.key).toBe('aiPolicyDataAboveSchema')
+    expect(store.raw).toBeNull()
   })
 
   test('an invalid body → 400 aiPolicyInvalid', async () => {

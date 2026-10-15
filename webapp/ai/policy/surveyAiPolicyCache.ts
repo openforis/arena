@@ -1,6 +1,7 @@
 /**
  * Per-survey cache of the survey AI policy: 30 s TTL, one shared request per survey, and a generation counter so
- * a response started before an update or an invalidation never overwrites the newer value. Pure (no app imports).
+ * a response started before an update, an invalidation or a reset never overwrites the newer value.
+ * Pure (no app imports).
  */
 import type { AiPolicy } from '@common/ai/policy'
 
@@ -17,7 +18,8 @@ export type SurveyAiPolicyCache = {
   get: (surveyId: number) => Promise<SurveyAiPolicyClientState>
   peek: (surveyId: number) => SurveyAiPolicyClientState | null
   update: (surveyId: number, policy: AiPolicy) => Promise<SurveyAiPolicyClientState>
-  invalidate: (surveyId: number) => void
+  invalidate: (surveyId: number) => Promise<SurveyAiPolicyClientState>
+  reset: () => void
   subscribe: (listener: (surveyId: number) => void) => () => void
 }
 
@@ -30,6 +32,26 @@ type Entry = {
 }
 
 export const surveyAiPolicyTtlMs = 30_000
+
+let appCache: SurveyAiPolicyCache | null = null
+
+/**
+ * Registers the cache of the app, the one `resetSurveyAiPolicyCache` empties.
+ * @param {SurveyAiPolicyCache} cache - The app cache.
+ * @returns {void}
+ */
+export const registerAppSurveyAiPolicyCache = (cache: SurveyAiPolicyCache): void => {
+  appCache = cache
+}
+
+/**
+ * Empties the app cache (login and logout): another user must not see policies, or answers in flight, of the
+ * previous one. Does nothing when the app cache was never created.
+ * @returns {void}
+ */
+export const resetSurveyAiPolicyCache = (): void => {
+  appCache?.reset()
+}
 
 /**
  * Creates the cache.
@@ -147,7 +169,17 @@ export const createSurveyAiPolicyCache = ({
       const entry = getEntry(surveyId)
       nextGeneration(entry)
       entry.fresh = false
+      const request = startFetch(surveyId, entry)
+      // callers that only want the refresh ignore the result: a failed refetch must not be an unhandled rejection
+      request.catch(() => {})
       notify(surveyId)
+      return request
+    },
+    reset: () => {
+      const surveyIds = [...entries.keys()]
+      for (const entry of entries.values()) nextGeneration(entry)
+      entries.clear()
+      for (const surveyId of surveyIds) notify(surveyId)
     },
     subscribe: (listener) => {
       listeners.add(listener)

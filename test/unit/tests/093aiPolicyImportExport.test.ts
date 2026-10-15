@@ -44,11 +44,20 @@ describe('writeImportedSurveyAiPolicy', () => {
   test('the policy is carried over', async () => {
     const { deps, stored } = createDeps()
     const policy = await writeImportedSurveyAiPolicy(
+      { surveyId: 21, surveyInfo: { aiPolicy: { schema: 'cloud', data: 'orgHosted' } } },
+      deps
+    )
+    expect(policy).toEqual({ schema: 'cloud', data: 'orgHosted' })
+    expect(stored).toEqual([{ surveyId: 21, policy: { schema: 'cloud', data: 'orgHosted' } }])
+  })
+
+  test('data above schema in the file is lowered to the schema level', async () => {
+    const { deps, stored } = createDeps()
+    await writeImportedSurveyAiPolicy(
       { surveyId: 21, surveyInfo: { aiPolicy: { schema: 'off', data: 'cloud' } } },
       deps
     )
-    expect(policy).toEqual({ schema: 'off', data: 'cloud' })
-    expect(stored).toEqual([{ surveyId: 21, policy: { schema: 'off', data: 'cloud' } }])
+    expect(stored[0].policy).toEqual({ schema: 'off', data: 'off' })
   })
 
   test('clamps to the ceilings of this instance', async () => {
@@ -63,7 +72,7 @@ describe('writeImportedSurveyAiPolicy', () => {
   test('a corrupt class fails closed', async () => {
     const { deps, stored } = createDeps()
     await writeImportedSurveyAiPolicy({ surveyId: 21, surveyInfo: { aiPolicy: { schema: 'everywhere' } } }, deps)
-    expect(stored[0].policy).toEqual({ schema: 'off', data: 'onDevice' })
+    expect(stored[0].policy).toEqual({ schema: 'off', data: 'off' })
   })
 
   test('an absent policy gives the defaults (nothing stored)', async () => {

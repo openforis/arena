@@ -101,6 +101,8 @@ export default {
     'ИИ не настроен. Укажите личного провайдера в настройках ИИ или попросите администратора настроить провайдера по умолчанию.',
   aiPolicyRefused:
     'Политика ИИ этого опроса не разрешает отправлять $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
+  aiPolicyDataAboveSchema:
+    'Данные записей не могут быть менее строгими, чем структура опроса (структура: «$t(common:aiPolicy.level.{{schema}})», данные записей: «$t(common:aiPolicy.level.{{data}})»).',
   aiPolicyInvalid: 'Недопустимая политика ИИ: выберите уровень для структуры опроса и для данных записей.',
   aiPolicyAboveCeiling:
     'Уровень «$t(common:aiPolicy.level.{{level}})» не разрешён на этом экземпляре Arena (максимум: «$t(common:aiPolicy.level.{{ceiling}})»).',

@@ -39,12 +39,32 @@ describe('createPolicyEnforcer', () => {
   })
 
   test('the stored policy is applied', async () => {
-    const { enforce } = enforcerWith({ stored: { schema: 'off', data: 'cloud' } })
+    const { enforce } = enforcerWith({ stored: { schema: 'cloud', data: 'cloud' } })
     await expect(enforce({ surveyId: 7, dataClass: 'data', hostingClass: 'cloud' })).resolves.toBeUndefined()
+    const { enforce: enforceOrg } = enforcerWith({ stored: { schema: 'orgHosted', data: 'onDevice' } })
     await expectSystemErrorKey(
-      enforce({ surveyId: 7, dataClass: 'schema', hostingClass: 'orgHosted' }),
+      enforceOrg({ surveyId: 7, dataClass: 'schema', hostingClass: 'cloud' }),
       'aiPolicyRefused'
     )
+  })
+
+  test('a stored policy with data above schema is clamped: a data request cannot reach a place the design cannot', async () => {
+    const { enforce } = enforcerWith({ stored: { schema: 'off', data: 'cloud' } })
+    for (const dataClass of ['schema', 'data'] as const) {
+      await expectSystemErrorKey(enforce({ surveyId: 7, dataClass, hostingClass: 'cloud' }), 'aiPolicyRefused')
+    }
+    const { enforce: enforceOrg } = enforcerWith({ stored: { schema: 'orgHosted', data: 'cloud' } })
+    await expect(enforceOrg({ surveyId: 7, dataClass: 'data', hostingClass: 'orgHosted' })).resolves.toBeUndefined()
+    const error: any = await expectSystemErrorKey(
+      enforceOrg({ surveyId: 7, dataClass: 'data', hostingClass: 'cloud' }),
+      'aiPolicyRefused'
+    )
+    expect(error.params.allowed).toBe('orgHosted')
+  })
+
+  test('ceilings alone (no survey) also limit a data request by the schema ceiling', async () => {
+    const { enforce } = enforcerWith({ ceilings: { schema: 'off', data: 'cloud' } })
+    await expectSystemErrorKey(enforce({ surveyId: null, dataClass: 'data', hostingClass: 'cloud' }), 'aiPolicyRefused')
   })
 
   test('the ceiling wins over a more permissive survey policy', async () => {

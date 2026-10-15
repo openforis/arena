@@ -3,7 +3,7 @@
  * or why its provider cannot be used. Same selectEngine inputs as resolveModel, so the badge names the engine used.
  */
 import type { AiDataClass } from '@common/ai/features'
-import type { AiPolicy } from '@common/ai/policy'
+import { type AiPolicy, getAllowedLevel } from '@common/ai/policy'
 
 import {
   type AiDataLocation,
@@ -127,7 +127,11 @@ export const getAiEngineFeatureAvailability = ({
   const reasons = selection.unavailable
   if (reasons.every(isPolicyReason)) {
     // only a policy change helps: B's message says what the policy allows
-    const reasonKeys = getPolicyBlockedReasonKeys({ dataClass, allowed: effective[dataClass], surveyScoped })
+    const reasonKeys = getPolicyBlockedReasonKeys({
+      dataClass,
+      allowed: getAllowedLevel(effective, dataClass),
+      surveyScoped,
+    })
     return notAvailable({ status: 'policyBlocked', reasons, reasonKeys, surveyScoped })
   }
   return notAvailable({ status: 'noEngine', reasons, reasonKeys: reasons.map(getAiUnavailableReasonKey), surveyScoped })
