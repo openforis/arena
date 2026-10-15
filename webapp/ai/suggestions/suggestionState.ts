@@ -3,19 +3,12 @@
  * functions: dismissal by target, growth steps, in progress, visibility, pruning and bounds. The code is split by
  * concern in ./state; the store wraps these functions with localStorage.
  */
-export {
-  MAX_DISMISSED_PER_SUGGESTION,
-  MAX_SEEN_MODULES,
-  MAX_SURVEY_BUCKETS,
-  MAX_TARGETS_PER_ENTRY,
-  normalizeSuggestionState,
-  shrinkSuggestionState,
-} from './state/bounds'
+export { MAX_SEEN_MODULES, MAX_SURVEY_BUCKETS, normalizeSuggestionState, shrinkSuggestionState } from './state/bounds'
 export { withDismissed } from './state/dismissed'
 export { withModuleSeen } from './state/modules'
 export { parseSuggestionState } from './state/parse'
 export { getPendingOf, withAdded, withoutSuggestion } from './state/pending'
-export { getInProgressConversationIds, withProgress, withSettled } from './state/progress'
+export { getBucketOfConversation, getInProgressConversationIds, withProgress, withSettled } from './state/progress'
 export { getTrackedOf, withKind, withoutBucket, withoutTargets } from './state/prune'
 export {
   HELP_BUCKET,
