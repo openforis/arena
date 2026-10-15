@@ -1,3 +1,5 @@
+import { AiFeatures } from '@common/ai/features'
+
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 
@@ -7,6 +9,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
 import * as SB from '@test/utils/surveyBuilder'
 import {
   accessGrantedTo,
@@ -18,24 +21,7 @@ import {
   systemAdminKey,
 } from '@test/utils/routePermissionTestUtils'
 
-type Route = { method: string; path: string; handlers: any[] }
-
-// collects the routes registered by an API module
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+type Route = CollectedRoute
 
 const { groupNames } = AuthGroup
 
@@ -60,6 +46,7 @@ const cleansers = [
 const surveyAdmins = [groupNames.surveyAdmin, systemAdminKey]
 
 // who passes the permission of each gateway feature (the mapping itself is locked by the unit test 074)
+// (the features themselves come from the registry: a new gateway feature fails here until it has its row)
 const allowedByFeature: Record<string, string[]> = {
   expressionGenerate: editors,
   expressionExplain: editors,
@@ -74,6 +61,11 @@ const allowedByFeature: Record<string, string[]> = {
   // login only: also a user who belongs to no survey
   chatbot: [...viewers, outsiderKey],
 }
+
+// the features the browser may call through POST /ai/model
+const gatewayFeatureKeys: string[] = Object.values(AiFeatures)
+  .filter(({ gateway }) => gateway)
+  .map(({ key }) => key)
 
 describe('AI routes: permissions with real users (056)', () => {
   let admin: any
@@ -123,7 +115,12 @@ describe('AI routes: permissions with real users (056)', () => {
     // handler 0 is the AI switch, handler 1 the permission of the feature (the survey comes from the body)
     const modelRoute = () => route('post', '/ai/model')
 
-    test.each(Object.keys(allowedByFeature))('%s', async (feature) => {
+    test('the matrix covers every gateway feature of the registry, and only those', () => {
+      expect(Object.keys(allowedByFeature).sort()).toEqual([...gatewayFeatureKeys].sort())
+    })
+
+    test.each(gatewayFeatureKeys)('%s', async (feature) => {
+      expect(allowedByFeature[feature]).toBeDefined()
       const access = await accessOf({ route: modelRoute(), body: { feature, surveyId }, handlerIndex: 1 })
       expect(access).toEqual(accessGrantedTo(members, allowedByFeature[feature]))
     })
