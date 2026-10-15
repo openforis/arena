@@ -484,9 +484,9 @@ const runSize = async ({ context, size }: { context: Context; size: Size }) => {
       }
     }
     const compare = (a: string, b: string) => a.localeCompare(b)
-    const lines = [...Object.keys(valuesByName)]
-      .sort(compare)
-      .map((name) => `${name}: ${[...valuesByName[name]].sort(compare).join(' ')}`)
+    const names = Object.keys(valuesByName)
+    names.sort(compare)
+    const lines = names.map((name) => `${name}: ${[...valuesByName[name]].sort(compare).join(' ')}`)
     fs.writeFileSync(`${process.env.PERF_DUMP_FILE}.${size.name}`, lines.join('\n'))
   }
 
