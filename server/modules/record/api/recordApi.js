@@ -401,8 +401,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireNodeUuidBelongsToRecord,
+    requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
@@ -419,8 +419,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireNodeUuidBelongsToRecord,
+    requireRecordMatchesUserGroupQualifiers,
     async (req, res, next) => {
       let tempFilePath
       try {
