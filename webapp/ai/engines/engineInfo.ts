@@ -4,7 +4,7 @@
 import { AiLimits } from '@common/ai/limits'
 import { LOCAL_PROVIDER_TYPE } from '@common/ai/providerIds'
 
-import { getDefaultNameKey } from '@webapp/components/ai/UserAiSettingsPanel/providerNames'
+import { getDefaultNameKey } from '@webapp/ai/providers/providerNames'
 
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
 import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from './types'

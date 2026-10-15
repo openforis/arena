@@ -71,7 +71,7 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
 
   const renderTitle = useCallback(() => {
     if (availability.status === 'noEngine') {
-      // C's reasons and actions (the availability hook returns AiEngineFeatureAvailability)
+      // the reasons and actions (the availability hook returns AiEngineFeatureAvailability)
       return <AiNotAvailable availability={availability as AiEngineFeatureAvailability} />
     }
     return (

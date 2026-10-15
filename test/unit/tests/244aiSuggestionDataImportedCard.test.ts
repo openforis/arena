@@ -67,7 +67,7 @@ describe('data imported suggestion card and prompt (244)', () => {
     })
   })
 
-  test('prompt: the spec text', () => {
+  test('prompt: the fixed text', () => {
     expect(DATA_IMPORTED_PROMPT).toBe(
       'Records were just imported into this survey. Give a quick overview of the collected data: records per step ' +
         'and over time (records_countByStep, records_countOverTime), and anything that looks unusual.'

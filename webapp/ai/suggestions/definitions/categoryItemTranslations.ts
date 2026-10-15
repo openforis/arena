@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 6 (category item labels missing in a survey language).
+ * Card and prompt of the category item translations suggestion (category item labels missing in a survey language).
  */
 import { getLanguageLabel } from '@core/app/languages'
 import * as Survey from '@core/survey/survey'

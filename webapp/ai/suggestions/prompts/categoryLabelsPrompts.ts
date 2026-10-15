@@ -1,5 +1,5 @@
 /**
- * English prompt of suggestion 6, sent on Do it.
+ * English prompt of the category item labels suggestion, sent on Do it.
  */
 import { pq } from '@common/ai/prompts/promptSafety'
 

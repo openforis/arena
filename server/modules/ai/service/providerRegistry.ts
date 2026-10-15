@@ -14,12 +14,13 @@
 import { createAnthropic } from '@ai-sdk/anthropic'
 import { createGoogleGenerativeAI } from '@ai-sdk/google'
 import { createOpenAI } from '@ai-sdk/openai'
+import type { LanguageModelV4 } from '@ai-sdk/provider'
 
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
-import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
+import { assertProviderBaseUrlAllowed, type GuardOptions } from './baseUrlGuard'
 import { createGuardedFetch, DEFAULT_MAX_BODY_BYTES } from './guardedFetch'
 import { createMockModel, MOCK_PROVIDER } from './mockProvider'
 import { createResponseLimitedFetch, getProviderResponseLimits } from './responseLimits'
@@ -27,19 +28,31 @@ import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
 export const providers = AiProvider
 
+/**
+ * Resolved provider configuration: what the registry needs to build a model handle.
+ */
+export type ProviderConfig = {
+  provider: string
+  model?: string | null
+  apiKey?: string | null
+  baseUrl?: string | null
+}
+
+type FetchLike = (input: any, init?: any) => Promise<Response>
+
 // Providers whose endpoint is a fixed agent rather than a generic LLM
 // API. They have no concept of a user-chosen model, so the registry skips
 // the usual model-required validation.
-const FIXED_ENDPOINT_PROVIDERS = new Set([AiProvider.vercelAiSdk])
+const FIXED_ENDPOINT_PROVIDERS = new Set<string>([AiProvider.vercelAiSdk])
 
-const validProviders = new Set(Object.values(providers))
+const validProviders = new Set<string>(Object.values(providers))
 
 /**
  * Returns true when `provider` is a recognised gateway provider key.
  * @param {string} provider - Provider identifier from config or env.
  * @returns {boolean} True when supported.
  */
-export const isSupported = (provider) => validProviders.has(provider)
+export const isSupported = (provider: string): boolean => validProviders.has(provider)
 
 /**
  * Fetch that rejects redirects: the base URL guard checks the host once, so a 3xx to an internal address would bypass it.
@@ -47,7 +60,7 @@ export const isSupported = (provider) => validProviders.has(provider)
  * @param {RequestInit} [init] - Fetch options.
  * @returns {Promise<Response>} The response.
  */
-const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'error' })
+const noRedirectFetch: FetchLike = (input, init) => fetch(input, { ...init, redirect: 'error' })
 
 /**
  * Returns the cap of a provider answer: it follows the output tokens the server allows, so a legitimate long answer is
@@ -59,16 +72,17 @@ const getMaxResponseBytes = () => getProviderResponseLimits(ENV.aiMaxOutputToken
 /**
  * Caps the answers of a custom endpoint: the endpoint of a user must not fill the memory with an endless answer. It
  * sits on top of the fetch it wraps (the connect-time guard of a user endpoint, see {@link buildUserModel}).
- * @param {Function} fetchImpl - The fetch to wrap.
- * @returns {Function} The capped fetch.
+ * @param {FetchLike} fetchImpl - The fetch to wrap.
+ * @returns {FetchLike} The capped fetch.
  */
-const withResponseLimit = (fetchImpl) => createResponseLimitedFetch(fetchImpl, getMaxResponseBytes())
+const withResponseLimit = (fetchImpl: FetchLike): FetchLike =>
+  createResponseLimitedFetch(fetchImpl, getMaxResponseBytes())
 
 /**
- * Builds a Vercel AI SDK `LanguageModel` instance for the given config.
+ * Builds a Vercel AI SDK `LanguageModelV4` instance for the given config.
  * Throws a `SystemError` with key `aiProviderInvalid` for unknown providers
  * or `aiApiKeyMissing` when a required API key is absent.
- * @param {object} cfg - Resolved provider configuration.
+ * @param {ProviderConfig} cfg - Resolved provider configuration.
  * @param {string} cfg.provider - One of {@link providers}.
  * @param {string} cfg.model - Model identifier (e.g. "gpt-4o-mini").
  * @param {string} [cfg.apiKey] - API key (required for cloud providers; optional for
@@ -76,13 +90,13 @@ const withResponseLimit = (fetchImpl) => createResponseLimitedFetch(fetchImpl, g
  * @param {string} [cfg.baseUrl] - Custom base URL (only meaningful for
  *   {@link providers.openaiCompatible}).
  * @param {object} [options] - Options.
- * @param {Function} [options.fetchImpl] - Fetch of the calls to a custom base URL (default: the global one without
+ * @param {FetchLike} [options.fetchImpl] - Fetch of the calls to a custom base URL (default: the global one without
  *   redirects; the endpoint of a user is called with a guarded fetch, see {@link buildUserModel}). Its answers are
  *   capped by the output token limit of the server.
- * @returns {object} A Vercel AI SDK language model handle ready to pass to
+ * @returns {LanguageModelV4} A Vercel AI SDK language model handle ready to pass to
  *   `generateText` / `generateObject` / `streamText`.
  */
-export const buildModel = (cfg, { fetchImpl } = {}) => {
+export const buildModel = (cfg: ProviderConfig, { fetchImpl }: { fetchImpl?: FetchLike } = {}): LanguageModelV4 => {
   const { provider, model, apiKey, baseUrl } = cfg
   // test servers only: canned answers, no network (e2e)
   if (provider === MOCK_PROVIDER && ENV.aiMockProviderEnabled) return createMockModel()
@@ -129,11 +143,14 @@ export const buildModel = (cfg, { fetchImpl } = {}) => {
 /**
  * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses: before the call,
  * and again when the call connects (the guarded fetch).
- * @param {object} cfg - User provider config (see buildModel).
- * @param {object} [guardOptions] - Options for the base URL guard (tests).
- * @returns {Promise<object>} The model handle.
+ * @param {ProviderConfig} cfg - User provider config (see buildModel).
+ * @param {GuardOptions} [guardOptions] - Options for the base URL guard (tests).
+ * @returns {Promise<LanguageModelV4>} The model handle.
  */
-export const buildUserModel = async (cfg, guardOptions) => {
+export const buildUserModel = async (
+  cfg: ProviderConfig,
+  guardOptions?: GuardOptions & { maxBodyBytes?: number }
+): Promise<LanguageModelV4> => {
   await assertProviderBaseUrlAllowed(cfg, guardOptions)
   // the guard's own body cap is only a backstop: it never cuts below the per-model cap that buildModel puts on top
   const maxBodyBytes = Math.max(DEFAULT_MAX_BODY_BYTES, getMaxResponseBytes())

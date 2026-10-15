@@ -1,6 +1,6 @@
 /**
  * Scripted turns of the mock provider for the Design suggestions (test/e2e/specs/aiSuggestionsDesign.spec.ts):
- * the prompts of suggestions 1 (missing translations) and 2 (descriptions for new entries).
+ * the prompts of the missing translations and the new entries descriptions suggestions.
  */
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 

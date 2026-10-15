@@ -46,7 +46,7 @@ describe('missing translations detector (220)', () => {
       createdAt: TEST_NOW.toISOString(),
       expiresAt: null,
     })
-    // tree has no label in any language: that is not a translation (suggestion 2 covers new entries)
+    // tree has no label in any language: that is not a translation (the new entries suggestion covers them)
     expect(keysOf(suggestions[0])).toEqual(
       labelKeys(['cluster', 'cluster_id', 'cluster_notes', 'plot', 'plot_id', 'tree_dec_1'])
     )
@@ -99,7 +99,7 @@ describe('missing translations card and prompt (220)', () => {
     )
   })
 
-  test('the prompt is the English text of the spec, with the continue rule', () => {
+  test('the prompt is the fixed English text, with the continue rule', () => {
     expect(missingTranslationsDefinition.prompt(suggestion, describeContext(survey, 'es'))).toBe(
       'Translate the survey texts that are missing in French (fr). Get them with survey_listMissingTexts and ' +
         'propose each batch with labels_proposeSet, at most 4 batches. Keep the meaning, the tone and any terms ' +

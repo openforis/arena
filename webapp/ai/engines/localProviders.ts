@@ -1,7 +1,7 @@
 /**
  * Local AI providers: OpenAI-compatible servers called from this browser (on this computer or the network), stored per
- * user in localStorage and never sent to the Arena server (spec section 1.2). Also the one-time conversion of the old
- * single local server settings (spec section 1.3).
+ * user in localStorage and never sent to the Arena server. Also the one-time conversion of the old
+ * single local server settings.
  */
 import {
   type AiDefaultProviderOrigin,
@@ -220,7 +220,7 @@ const addLegacyProvider = ({
 }
 
 /**
- * Converts the old single local server settings into the provider list (spec section 1.3): an old server that was on
+ * Converts the old single local server settings into the provider list: an old server that was on
  * becomes `local:legacy`; it becomes the default only when the old settings preferred it and the account's default
  * was never picked by the user. The old key is removed only after every step succeeded, so a failure is retried on
  * the next load.

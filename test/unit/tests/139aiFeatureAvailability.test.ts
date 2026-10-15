@@ -178,7 +178,7 @@ describe('getAiEngineFeatureAvailability', () => {
     expect(result.location).toEqual(NO_DATA_LOCATION)
   })
 
-  test("policyBlocked when only the policy blocks, with B's policy message", () => {
+  test('policyBlocked when only the policy blocks, with the policy message', () => {
     const off: AiPolicy = { schema: 'off', data: 'off' }
     const result = availability({ effective: off })
     expect(result.status).toBe('policyBlocked')
@@ -213,7 +213,7 @@ describe('helpers', () => {
     })
   })
 
-  test("B's location text names the organisation server's host", () => {
+  test("the location text names the organisation server's host", () => {
     /** Test translation function: the key and its params. */
     const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
     const location = { hostingClass: 'orgHosted', provider: null, model: null } as const

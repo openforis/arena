@@ -1,5 +1,5 @@
 /**
- * Suggestion 1: texts missing in a survey language (state detector, recomputed on every survey change).
+ * Missing translations suggestion: texts missing in a survey language (state detector, recomputed on every survey change).
  */
 import * as NodeDef from '@core/survey/nodeDef'
 

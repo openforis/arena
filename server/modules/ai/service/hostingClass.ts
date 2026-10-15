@@ -1,6 +1,6 @@
 /**
  * Where the gateway sends the data: an organisation server (base URL on AI_ORG_HOSTED_BASE_URLS) or the cloud.
- * Used by the survey AI policy (step B). Local engines (on this device) are classified in the browser (step C).
+ * Used by the survey AI policy. Local engines (on this device) are classified in the browser.
  */
 import { ENV } from '@core/processUtils'
 import { AiProvider } from '@common/ai/aiProvider'

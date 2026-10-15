@@ -1,5 +1,5 @@
 /**
- * Suggestion 5: code attributes without a category and taxon attributes without a taxonomy (imported surveys, older
+ * Attribute without a reference suggestion: code attributes without a category and taxon attributes without a taxonomy (imported surveys, older
  * data). A state detector over the whole survey; only attributes whose list the designer lets change.
  */
 import * as NodeDef from '@core/survey/nodeDef'

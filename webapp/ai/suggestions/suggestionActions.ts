@@ -29,7 +29,7 @@ export type SuggestionSend = (
 ) => Promise<string | null>
 
 /**
- * Returns the store bucket of the suggestion of a request: Help suggestions belong to no survey (deviation 3).
+ * Returns the store bucket of the suggestion of a request: Help suggestions belong to no survey.
  * @param {SuggestionRequest} request - Request.
  * @returns {number|null} The survey id of the bucket.
  */

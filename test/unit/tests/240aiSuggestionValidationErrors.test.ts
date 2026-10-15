@@ -98,7 +98,7 @@ const openWithCount = async (ctx: DetectorContext, count: number, event: Suggest
 }
 
 describe('validation errors suggestion detector (240)', () => {
-  test('constants of the spec', () => {
+  test('constants', () => {
     expect(VALIDATION_MESSAGES_THRESHOLD).toBe(20)
     expect(SUGGESTION_EXPIRY_DAYS).toBe(7)
     expect(getValidationErrorsSuggestionId('2')).toBe('validationErrors:2')

@@ -6,9 +6,14 @@ import type { LanguageModelV4, LanguageModelV4Prompt, LanguageModelV4StreamPart 
 
 import { stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
-import { getScriptedStep, toScriptedContent, toScriptedStream } from '@server/modules/ai/service/mockScripts'
-
 export const MOCK_PROVIDER = 'mock'
+
+/**
+ * Loads the scripted turns of the assistant. They are used by e2e servers only (AI_MOCK_PROVIDER_ENABLED), so they are a
+ * separate chunk that a production server never loads.
+ * @returns {Promise<typeof import('./mock/mockScripts')>} The scripts module.
+ */
+const loadMockScripts = () => import('./mock/mockScripts')
 
 const promptText = (prompt: LanguageModelV4Prompt): string =>
   prompt
@@ -103,9 +108,10 @@ export const createMockModel = ({ text }: { text?: string } = {}): LanguageModel
   supportedUrls: {},
   async doGenerate(options) {
     // a fixed text wins; then the assistant scripts; then the canned answers
-    const step = text === undefined ? getScriptedStep(options.prompt) : null
-    if (step) {
-      const { content, finishReason } = toScriptedContent(step, options.prompt)
+    const scripts = text === undefined ? await loadMockScripts() : null
+    const step = scripts?.getScriptedStep(options.prompt) ?? null
+    if (scripts && step) {
+      const { content, finishReason } = scripts.toScriptedContent(step, options.prompt)
       return { content, finishReason, usage: unknownUsageV4(), warnings: [] }
     }
     return {
@@ -116,8 +122,9 @@ export const createMockModel = ({ text }: { text?: string } = {}): LanguageModel
     }
   },
   async doStream(options) {
-    const step = text === undefined ? getScriptedStep(options.prompt) : null
-    if (step) return { stream: toScriptedStream(step, options.prompt) }
+    const scripts = text === undefined ? await loadMockScripts() : null
+    const step = scripts?.getScriptedStep(options.prompt) ?? null
+    if (scripts && step) return { stream: scripts.toScriptedStream(step, options.prompt) }
     return { stream: streamOf(text ?? mockAnswerFor(options.prompt)) }
   },
 })

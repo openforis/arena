@@ -25,7 +25,7 @@ const TEXTS_MISSING = /texts? (is|are) missing in French/
 const TRANSLATIONS_CARD = '19 texts are missing in French. Translate them?'
 
 /**
- * Marks the module introductions as seen before the app loads, so only this spec's cards show (spec §4.9).
+ * Marks the module introductions as seen before the app loads, so only this spec's cards show.
  * @param {Page} page - The page.
  * @param {ArenaApi} api - API of the worker user.
  * @returns {Promise<void>} Resolves when the init script is registered.

@@ -1,5 +1,5 @@
 /**
- * Module introduction (suggestion 9): the first visit to an introduced module adds its card to Help, unless the user
+ * Module introduction: the first visit to an introduced module adds its card to Help, unless the user
  * already accepted or dismissed it (seenModules).
  */
 import { isIntroModule, type IntroModule } from '../prompts/moduleIntro'

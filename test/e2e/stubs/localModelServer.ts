@@ -1,6 +1,6 @@
 /**
  * OpenAI-compatible stub of a local AI server (LM Studio) for the e2e specs: CORS on, the LM Studio model list,
- * and chat completions answered by the mock provider (A's canned answers and the D1/D2 scripted turns).
+ * and chat completions answered by the mock provider (the canned answers and the scripted turns).
  * It records every request so a spec can check what reached it.
  */
 import http, { type IncomingMessage, type ServerResponse } from 'http'

@@ -1,7 +1,7 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-import { getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { type SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { formatSuggestionCount } from '@webapp/ai/suggestions/definitions/formatSuggestionCount'
@@ -52,7 +52,7 @@ describe('validation errors suggestion card and prompt (241)', () => {
     expect(validationErrorsDefinition.card(suggestionOf(1200), describeCtx('en')).params).toEqual({ count: '1,200' })
   })
 
-  test('prompt: the spec text, without any record data', () => {
+  test('prompt: the fixed text, without any record data', () => {
     expect(VALIDATION_ERRORS_PROMPT).toBe(
       'Summarise the validation errors and warnings of this survey in the current cycle. Use validation_summarize. ' +
         'Group them by field and by kind, say which fields have the most, and what to check first.'

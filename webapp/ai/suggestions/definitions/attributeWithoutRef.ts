@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 5 (code or taxon attribute without a category or taxonomy).
+ * Card and prompt of the attribute without a reference suggestion (code or taxon attribute without a category or taxonomy).
  */
 import * as NodeDef from '@core/survey/nodeDef'
 

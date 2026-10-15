@@ -1,5 +1,5 @@
 /**
- * Lists the items of a category whose label is missing in a survey language, page by page (suggestion 6). The
+ * Lists the items of a category whose label is missing in a survey language, page by page. The
  * items come from the server: the browser does not hold the items of large categories.
  */
 import { z } from 'zod'

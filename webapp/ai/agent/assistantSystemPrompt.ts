@@ -67,7 +67,7 @@ const buildAreaPrompt = ({
       return buildAssistantHelpPrompt({
         uiLang: ctx.uiLang,
         outline,
-        // no survey: the module names only (deviation 9)
+        // no survey: the module names only
         viewDescription: describeView(ctx.getCurrentView(), null),
       })
     case 'analysis':

@@ -72,7 +72,7 @@ describe('analysis system prompt', () => {
     }
   })
 
-  test("A's query generation prompt keeps its text", () => {
+  test('the query generation prompt keeps its text', () => {
     const { system } = buildDataQueryGeneratePrompt({ survey, cycle, lang: 'en', description: 'trees by type' })
     expect(
       system.startsWith('You are an assistant that builds data queries for the Data Explorer of Open Foris Arena,')

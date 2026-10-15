@@ -1,5 +1,5 @@
 /**
- * The validation report tells the suggestions it was opened (suggestion 7 counts the cycle's messages then). With AI
+ * The validation report tells the suggestions it was opened (the validation errors suggestion counts the cycle's messages then). With AI
  * off the Cleaning area is not available, and the report does not even say it opened.
  */
 import { notifySuggestionEvent } from './suggestionEvents'

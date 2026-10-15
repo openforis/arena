@@ -270,7 +270,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     const current = ++sequence
     const nextSettings = await safely(() => deps.loadSettings({ force, userUuid }), null)
     // loadLocalProviders catches its own storage errors; this fallback is reached only when localStorage is unreadable,
-    // which the spec treats like "not on this browser"
+    // which counts as "not on this browser"
     const localProviders = await safely(() => deps.loadLocalProviders(userUuid), [] as LocalProvider[])
     // every server is probed at the same time: one slow server does not delay the others; with AI off (or settings
     // that could not be read) none is probed: the next load with settings does
