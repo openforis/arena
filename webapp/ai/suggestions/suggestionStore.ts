@@ -13,8 +13,11 @@ import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAre
 import {
   getInProgressConversationIds,
   getPendingOf,
+  getTrackedOf,
+  normalizeSuggestionState,
   parseSuggestionState,
   selectVisible,
+  shrinkSuggestionState,
   toBucket,
   withAdded,
   withDismissed,
@@ -26,6 +29,7 @@ import {
   withProgress,
   withSettled,
   type SuggestionUserState,
+  type TrackedSuggestion,
 } from './suggestionState'
 import type { AssistantSuggestion, SettleOutcome, SuggestionKind } from './types'
 
@@ -55,6 +59,9 @@ export type SuggestionStore = {
   }) => void
   onConversationSettled: (p: { userUuid: string; conversationId: string; outcome: SettleOutcome }) => void
   getPending: (p: { userUuid: string; surveyId: number | null }) => AssistantSuggestion[] // raw, for resolvers
+  // every suggestion the state holds something of (pending, dismissed or in progress), so resolvers also reach the
+  // dismissed targets of a suggestion that is no longer pending
+  getTracked: (p: { userUuid: string; surveyId: number | null }) => TrackedSuggestion[]
   getVisible: (p: {
     userUuid: string
     surveyId: number | null
@@ -142,18 +149,28 @@ export const createSuggestionStore = ({
     parseSuggestionState(storage.read(getSuggestionsKey(userUuid)))
 
   /**
-   * Re-reads, changes and writes the state of a user; notifies only when it changed.
+   * Re-reads, changes and writes the state of a user; notifies only when it changed. The state is kept within its
+   * bounds (expired suggestions go); a full storage gets a smaller state, level by level, and the wrapper logs it.
    * @param {string} userUuid - User UUID.
    * @param {Function} change - Returns the new state.
+   * @param {number|null} [surveyId] - The survey being changed: its bucket is never dropped to stay within the bounds.
    * @returns {void}
    */
-  const update = (userUuid: string, change: (state: SuggestionUserState) => SuggestionUserState): void => {
+  const update = (
+    userUuid: string,
+    change: (state: SuggestionUserState) => SuggestionUserState,
+    surveyId: number | null = null
+  ): void => {
     const key = getSuggestionsKey(userUuid)
     const current = parseSuggestionState(storage.read(key))
-    const next = change(current)
+    const options = { keepBucket: surveyId === null ? null : toBucket(surveyId) }
+    const next = normalizeSuggestionState(change(current), now(), options)
     const json = JSON.stringify(next)
     if (json === JSON.stringify(current)) return
-    storage.write(key, json)
+    storage.write(key, json, (level) => {
+      const smaller = shrinkSuggestionState(next, level, now(), options)
+      return smaller && JSON.stringify(smaller)
+    })
     notify()
   }
 
@@ -164,19 +181,24 @@ export const createSuggestionStore = ({
 
   return {
     setKind: ({ userUuid, surveyId, kind, suggestions }) =>
-      update(userUuid, (state) => withKind(state, { bucket: toBucket(surveyId), kind, suggestions })),
-    add: ({ userUuid, suggestion }) => update(userUuid, (state) => withAdded(state, suggestion)),
+      update(userUuid, (state) => withKind(state, { bucket: toBucket(surveyId), kind, suggestions }), surveyId),
+    add: ({ userUuid, suggestion }) => update(userUuid, (state) => withAdded(state, suggestion), suggestion.surveyId),
     removeTargets: ({ userUuid, surveyId, id, targetKeys }) =>
-      update(userUuid, (state) => withoutTargets(state, { bucket: toBucket(surveyId), id, targetKeys })),
+      update(userUuid, (state) => withoutTargets(state, { bucket: toBucket(surveyId), id, targetKeys }), surveyId),
     remove: ({ userUuid, surveyId, id }) =>
-      update(userUuid, (state) => withoutSuggestion(state, { bucket: toBucket(surveyId), id })),
+      update(userUuid, (state) => withoutSuggestion(state, { bucket: toBucket(surveyId), id }), surveyId),
     dismiss: ({ userUuid, surveyId, id }) =>
-      update(userUuid, (state) => withDismissed(state, { bucket: toBucket(surveyId), id })),
+      update(userUuid, (state) => withDismissed(state, { bucket: toBucket(surveyId), id }), surveyId),
     startProgress: ({ userUuid, surveyId, id, conversationId, targetKeys }) =>
-      update(userUuid, (state) => withProgress(state, { bucket: toBucket(surveyId), id, conversationId, targetKeys })),
+      update(
+        userUuid,
+        (state) => withProgress(state, { bucket: toBucket(surveyId), id, conversationId, targetKeys }),
+        surveyId
+      ),
     onConversationSettled: ({ userUuid, conversationId, outcome }) =>
       update(userUuid, (state) => withSettled(state, { conversationId, outcome })),
     getPending: ({ userUuid, surveyId }) => getPendingOf(read(userUuid), toBucket(surveyId)),
+    getTracked: ({ userUuid, surveyId }) => getTrackedOf(read(userUuid), toBucket(surveyId)),
     getVisible: ({ userUuid, surveyId, cycle, availableAreas, enabled }) =>
       selectVisible(read(userUuid), { surveyId, cycle, availableAreas, enabled, now: now() }),
     isModuleSeen: ({ userUuid, module }) => read(userUuid).seenModules.includes(module),

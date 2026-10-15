@@ -119,9 +119,14 @@ export const createValidationErrorsDetector = ({
     const count = await countCycleMessages({ countRows, generation })
     if (count === null) return
     const { userUuid, surveyId, cycle } = generation
+    const id = getValidationErrorsSuggestionId(cycle)
+    if (count < VALIDATION_MESSAGES_THRESHOLD) {
+      // the issue is gone: a later count must not be compared with a dismissal made for an older, larger one
+      ctx.store.removeTargets({ userUuid, surveyId, id, targetKeys: [VALIDATION_ERRORS_TARGET_KEY] })
+      return
+    }
     // replaced on every open: a fresh count, createdAt and expiry (deviation 1)
-    ctx.store.remove({ userUuid, surveyId, id: getValidationErrorsSuggestionId(cycle) })
-    if (count < VALIDATION_MESSAGES_THRESHOLD) return
+    ctx.store.remove({ userUuid, surveyId, id })
     ctx.store.add({
       userUuid,
       suggestion: buildValidationErrorsSuggestion({ surveyId, cycle, count, createdAt: ctx.now() }),
