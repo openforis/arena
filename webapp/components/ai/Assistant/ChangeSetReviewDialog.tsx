@@ -10,7 +10,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
-import { ChangeItemName, ChangeItemStatus } from './ChangeItem'
+import { ChangeItemDetails, ChangeItemName, ChangeItemStatus } from './ChangeItem'
 import {
   filterReviewItems,
   getReviewLabelText,
@@ -119,6 +119,7 @@ const ReviewRow = ({
       <td className="ai-change-review__from">{item.from ? <CardValueView value={item.from} /> : null}</td>
       <td className="ai-change-review__to">
         <CardValueView value={item.to} />
+        <ChangeItemDetails item={item} />
       </td>
       <td>{result && <ChangeItemStatus result={result} />}</td>
     </tr>
