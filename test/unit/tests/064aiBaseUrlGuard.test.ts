@@ -1,3 +1,6 @@
+import http from 'node:http'
+import type { AddressInfo } from 'node:net'
+
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
 import * as ModelDiscovery from '@server/modules/ai/service/modelDiscovery'
 import { buildUserModel } from '@server/modules/ai/service/providerRegistry'
@@ -132,23 +135,37 @@ describe('assertBaseUrlAllowed', () => {
 
 describe('buildUserModel redirects', () => {
   test('openai-compatible model calls refuse redirects', async () => {
-    const calls: any[] = []
-    const originalFetch = globalThis.fetch
-    globalThis.fetch = (async (_input: any, init: any) => {
-      calls.push(init)
-      throw new Error('stop')
-    }) as any
+    const reached: string[] = []
+    // the second server is allowlisted too: it is only not reached because the redirect is not followed
+    const target = http.createServer((request, response) => {
+      reached.push(`target ${request.url}`)
+      response.end('{}')
+    })
+    const redirector = http.createServer((request, response) => {
+      reached.push(`redirector ${request.url}`)
+      response.writeHead(307, {
+        location: `http://127.0.0.1:${(target.address() as AddressInfo).port}/v1/chat/completions`,
+      })
+      response.end()
+    })
+    for (const server of [target, redirector])
+      await new Promise<void>((resolve) => server.listen(0, '127.0.0.1', resolve))
+    const origins = [target, redirector].map((server) => `http://127.0.0.1:${(server.address() as AddressInfo).port}`)
     try {
       const model: any = await buildUserModel(
-        { provider: 'openai-compatible', model: 'm', baseUrl: 'http://10.0.0.5:8000/v1' },
-        { allowlist: ['http://10.0.0.5:8000/v1'], lookup: neverCalledLookup }
+        { provider: 'openai-compatible', model: 'm', baseUrl: `${origins[1]}/v1` },
+        { allowlist: origins, lookup: neverCalledLookup }
       )
-      await model.doGenerate({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }] }).catch(() => {})
+      await expect(
+        model.doGenerate({ prompt: [{ role: 'user', content: [{ type: 'text', text: 'hi' }] }], maxRetries: 0 })
+      ).rejects.toBeDefined()
     } finally {
-      globalThis.fetch = originalFetch
+      for (const server of [target, redirector]) {
+        server.closeAllConnections()
+        await new Promise((resolve) => server.close(resolve))
+      }
     }
-    expect(calls.length).toBeGreaterThan(0)
-    expect(calls[0].redirect).toBe('error')
+    expect(reached).toEqual(['redirector /v1/chat/completions'])
   })
 })
 
