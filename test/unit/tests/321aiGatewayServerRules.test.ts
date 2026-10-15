@@ -1,12 +1,14 @@
 import { MockLanguageModelV4, convertArrayToReadableStream } from 'ai/test'
 
 import { AiFeatures, getAiFeature } from '@common/ai/features'
+import { SCHEMA_TOOL_NAMES, isSchemaTool } from '@common/ai/schemaTools'
 import {
   getEnforcedDataClass,
   parseGatewayRequest,
   sanitizeCall,
 } from '@server/modules/ai/service/gateway/callValidation'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
+import { createPolicyEnforcer } from '@server/modules/ai/service/gateway/policy'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 
@@ -14,15 +16,25 @@ import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import { createFakeRequest, createFakeResponse, parseSseWrites } from '@test/unit/utils/fakeExpress'
 
 const prompt = [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }]
-const toolResultTurn = [
+const toolResultTurn = (...toolNames: string[]) => [
   ...prompt,
   {
     role: 'assistant',
-    content: [{ type: 'tool-call', toolCallId: 'c1', toolName: 'query_run', input: {} }],
+    content: toolNames.map((toolName, index) => ({
+      type: 'tool-call',
+      toolCallId: `c${index}`,
+      toolName,
+      input: {},
+    })),
   },
   {
     role: 'tool',
-    content: [{ type: 'tool-result', toolCallId: 'c1', toolName: 'query_run', output: { type: 'json', value: [] } }],
+    content: toolNames.map((toolName, index) => ({
+      type: 'tool-result',
+      toolCallId: `c${index}`,
+      toolName,
+      output: { type: 'json', value: [] },
+    })),
   },
 ]
 const tool = (name: string) => ({ type: 'function', name, description: 'x', inputSchema: { type: 'object' } })
@@ -59,7 +71,10 @@ describe('gateway server rules: surveyId on login-only features (321)', () => {
 
 describe('gateway server rules: the data class follows the tool results (321)', () => {
   test('a request with tool results is checked as the feature maximum, whatever it declares', () => {
-    const call = sanitizeCall({ prompt: toolResultTurn, tools: [tool('query_run')] }, { ...limits, allowTools: true })
+    const call = sanitizeCall(
+      { prompt: toolResultTurn('query_run'), tools: [tool('query_run')] },
+      { ...limits, allowTools: true }
+    )
     expect(getEnforcedDataClass({ feature: 'assistantAnalysis', dataClass: 'schema', call })).toBe('data')
   })
 
@@ -70,8 +85,88 @@ describe('gateway server rules: the data class follows the tool results (321)', 
   })
 
   test('a feature whose maximum is schema stays schema', () => {
-    const call = sanitizeCall({ prompt: toolResultTurn }, { ...limits, allowTools: true })
+    const call = sanitizeCall({ prompt: toolResultTurn('query_run') }, { ...limits, allowTools: true })
     expect(getEnforcedDataClass({ feature: 'assistantDesign', dataClass: 'schema', call })).toBe('schema')
+  })
+
+  test('results of schema tools do not raise the class: they carry no record data', () => {
+    const options = { ...limits, allowTools: true }
+    for (const names of [['conversation_setTitle'], ['nodeDef_search', 'survey_getOverview', 'docs_search']]) {
+      const call = sanitizeCall({ prompt: toolResultTurn(...names) }, options)
+      expect(getEnforcedDataClass({ feature: 'assistantAnalysis', dataClass: 'schema', call })).toBe('schema')
+    }
+  })
+
+  test('one data tool result among schema ones raises the class', () => {
+    const call = sanitizeCall(
+      { prompt: toolResultTurn('conversation_setTitle', 'query_run') },
+      { ...limits, allowTools: true }
+    )
+    expect(getEnforcedDataClass({ feature: 'assistantAnalysis', dataClass: 'schema', call })).toBe('data')
+  })
+
+  test('a tool the server does not know counts as data', () => {
+    const call = sanitizeCall({ prompt: toolResultTurn('brand_new_tool') }, { ...limits, allowTools: true })
+    expect(getEnforcedDataClass({ feature: 'assistantAnalysis', dataClass: 'schema', call })).toBe('data')
+  })
+
+  test('the calls of a data tool without its result do not raise the class', () => {
+    const turn = toolResultTurn('query_run').slice(0, -1)
+    const call = sanitizeCall({ prompt: turn }, { ...limits, allowTools: true })
+    expect(getEnforcedDataClass({ feature: 'assistantAnalysis', dataClass: 'schema', call })).toBe('schema')
+  })
+
+  test('the schema tool list of the server is the list of schema tools of the browser', () => {
+    const browserSchemaTools = ALL_TOOLS.filter((candidate) => candidate.dataClass === 'schema').map(
+      (candidate) => candidate.name
+    )
+    expect([...SCHEMA_TOOL_NAMES].sort()).toEqual(browserSchemaTools.sort())
+    for (const candidate of ALL_TOOLS)
+      expect([candidate.name, isSchemaTool(candidate.name)]).toEqual([candidate.name, candidate.dataClass === 'schema'])
+  })
+
+  describe('under the default survey policy (schema: cloud, data: onDevice) with a cloud provider', () => {
+    const enforceDefaultPolicy = createPolicyEnforcer({
+      fetchRawPolicy: async () => null,
+      getCeilings: () => ({ schema: 'cloud', data: 'cloud' }),
+    })
+    const cloudModel = (model: any) => async () => ({
+      model,
+      meta: { source: 'user', provider: 'openai', model: 'm', hostingClass: 'cloud' },
+    })
+    const analysisBody = (...toolNames: string[]) => ({
+      surveyId: 1,
+      feature: 'assistantAnalysis',
+      dataClass: 'schema',
+      stream: false,
+      call: { prompt: toolResultTurn(...toolNames), tools: [tool('conversation_setTitle'), tool('query_run')] },
+    })
+
+    test('step 2 of an Analysis turn with a schema tool result is allowed', async () => {
+      const model = generateModel()
+      const { deps } = createDeps(model, {
+        assertPolicyAllows: enforceDefaultPolicy,
+        resolveModel: cloudModel(model),
+      })
+      const res = await run(analysisBody('conversation_setTitle'), deps)
+      expect(res.statusCode).toBe(200)
+      expect(model.doGenerateCalls).toHaveLength(1)
+    })
+
+    test('a data tool result is checked as data: refused, and the provider is not called', async () => {
+      const model = generateModel()
+      const { deps } = createDeps(model, {
+        assertPolicyAllows: enforceDefaultPolicy,
+        resolveModel: cloudModel(model),
+      })
+      const res = await run(analysisBody('query_run'), deps)
+      expect(res.statusCode).toBe(403)
+      expect(res.body).toMatchObject({
+        key: 'aiPolicyRefused',
+        params: { dataClass: 'data', hostingClass: 'cloud', allowed: 'onDevice' },
+      })
+      expect(model.doGenerateCalls).toHaveLength(0)
+    })
   })
 
   test('the policy check of the gateway gets the raised class', async () => {
@@ -87,7 +182,7 @@ describe('gateway server rules: the data class follows the tool results (321)', 
         feature: 'assistantAnalysis',
         dataClass: 'schema',
         stream: false,
-        call: { prompt: toolResultTurn, tools: [tool('query_run')] },
+        call: { prompt: toolResultTurn('query_run'), tools: [tool('query_run')] },
       },
       deps
     )
