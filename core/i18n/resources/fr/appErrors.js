@@ -33,6 +33,8 @@ export default {
   cannotOverridePublishedTaxa: "Impossible d'écraser les taxons publiés",
   cantUpdateStep: `Impossible de mettre à jour l'étape`,
   categoryItemLabelsInvalid: 'Requête de libellés de catégories invalide ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Cette catégorie est trop grande pour vérifier les libellés manquants ; réessayez plus tard ou utilisez une catégorie plus petite.',
   chainCannotBeSaved: 'La chaîne est invalide et ne peut pas être sauvegardée',
   csv: {
     emptyHeaderFound: 'En-tête vide trouvé à la colonne {{columnPosition}}',
@@ -64,6 +66,7 @@ export default {
   functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
+  unexpectedServerError: "Une erreur inattendue s'est produite sur le serveur.",
   geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
@@ -86,6 +89,9 @@ export default {
     lockTimeout: "L'enregistrement est occupé ; réessayez dans quelques secondes.",
     nodeNotInRecord: "Le nœud n'appartient pas à l'enregistrement {{recordUuid}}.",
     nodesBatchInvalid: 'Requête de modification groupée invalide ({{reason}}).',
+    nodesBatchBusy: 'Une autre modification groupée est en cours ; réessayez dans quelques secondes.',
+    nodesBatchInvalidValue: "La nouvelle valeur de « {{attributeName}} » n'est pas valide pour cet attribut.",
+    nodesBatchUnexpected: "La modification n'a pas pu être appliquée à cause d'une erreur inattendue du serveur.",
   },
   recordPrintableExport: {
     missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",

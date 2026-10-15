@@ -25,17 +25,18 @@ const isPlainObject = (value: unknown): value is Record<string, unknown> =>
  * Validates the map of AI descriptions by node def uuid.
  * @param {object} params - Parameters.
  * @param {unknown} params.raw - The aiDescriptions of the request.
- * @param {string[]} params.knownUuids - Uuids of the node defs of the export.
+ * @param {string[]|null} [params.knownUuids] - Uuids of the node defs of the export; null checks the shape only (the
+ * uuids are then checked where the survey is loaded for the export, so it is loaded once).
  * @returns {Record<string, string>} The descriptions.
  * @throws {SystemError} aiDescriptionsInvalid (400) for anything else than a map of known uuids to short strings.
  */
-export const parseAiDescriptions = ({ raw, knownUuids }: { raw: unknown; knownUuids: string[] }) => {
+export const parseAiDescriptions = ({ raw, knownUuids = null }: { raw: unknown; knownUuids?: string[] | null }) => {
   if (!isPlainObject(raw)) throw invalid('notAnObject')
   const entries = Object.entries(raw)
   if (entries.length > AiLimits.dataDictionaryMaxDescriptions) throw invalid('tooMany')
-  const known = new Set(knownUuids)
+  const known = knownUuids ? new Set(knownUuids) : null
   for (const [uuid, description] of entries) {
-    if (!known.has(uuid)) throw invalid('unknownUuid')
+    if (known && !known.has(uuid)) throw invalid('unknownUuid')
     if (typeof description !== 'string' || description.length > AiLimits.dataDictionaryMaxDescriptionChars) {
       throw invalid('description')
     }
@@ -69,3 +70,14 @@ export const assertNoLegacyIncludeAiDescriptions = (body: Record<string, unknown
     throw new SystemError('aiIncludeAiDescriptionsRemoved', {}, StatusCodes.BAD_REQUEST)
   }
 }
+
+// a cell that starts with one of these is read as a formula by spreadsheet programs
+const formulaStartPattern = /^[=+\-@\t\r]/
+
+/**
+ * Neutralises a text that a spreadsheet program would run as a formula (CSV injection), by prefixing a quote.
+ * @param {string} text - The cell text.
+ * @returns {string} The text, safe to write in a cell.
+ */
+export const neutraliseSpreadsheetFormula = (text: string): string =>
+  formulaStartPattern.test(text) ? `'${text}` : text

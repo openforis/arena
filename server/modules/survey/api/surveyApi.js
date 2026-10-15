@@ -17,6 +17,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as JobUtils from '../../../job/jobUtils'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
+import { sendRouteError } from '../../../utils/sendRouteError'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
@@ -30,21 +31,19 @@ import {
 import * as SurveyService from '../service/surveyService'
 
 /**
- * Validates the AI descriptions of a schema summary export (generated in the browser).
+ * Validates the AI descriptions of a schema summary export (generated in the browser). Their uuids are checked by the
+ * export job, which loads the survey anyway.
  * @param {object} params - Parameters.
  * @param {object} params.user - Acting user.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {unknown} params.aiDescriptions - Descriptions by uuid from the request.
  * @param {unknown} params.aiDescriptionsFailedCount - Failed count from the request.
- * @returns {Promise<{aiDescriptions: object, aiDescriptionsFailedCount: number}>} The validated values.
+ * @returns {{aiDescriptions: object, aiDescriptionsFailedCount: number}} The validated values.
  */
-const parseExportAiDescriptions = async ({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount }) => {
+const parseExportAiDescriptions = ({ user, aiDescriptions, aiDescriptionsFailedCount }) => {
   // the descriptions come from the user's AI: their data dictionary switch still applies
   assertFeatureEnabled('dataDictionary', user)
-  const knownUuids = await SchemaSummary.fetchSchemaSummaryNodeDefUuids({ surveyId, cycle })
   return {
-    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions, knownUuids }),
+    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions }),
     aiDescriptionsFailedCount: parseAiDescriptionsFailedCount(aiDescriptionsFailedCount),
   }
 }
@@ -347,47 +346,42 @@ export const init = (app) => {
 
   // schema summary: the node defs that need an AI description (described in the browser, see
   // webapp/ai/workflows/dataDictionary.ts); names, types and paths only
-  app.get(
-    '/survey/:surveyId/schema-summary/ai-items',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle } = Request.getParams(req)
-        assertFeatureEnabled('dataDictionary', Request.getUser(req))
-        res.json(await SchemaSummary.fetchSchemaSummaryAiItems({ surveyId, cycle }))
-      } catch (error) {
-        next(error)
-      }
+  app.get('/survey/:surveyId/schema-summary/ai-items', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    try {
+      const { surveyId, cycle } = Request.getParams(req)
+      assertFeatureEnabled('dataDictionary', Request.getUser(req))
+      res.json(await SchemaSummary.fetchSchemaSummaryAiItems({ surveyId, cycle }))
+    } catch (error) {
+      // not next(error): the browser reads the error key from the JSON, the error middleware would answer with HTML
+      sendRouteError({ res, error, context: 'schema summary AI items' })
     }
-  )
+  })
 
-  // schema summary export (start job); aiDescriptions: AI descriptions generated in the browser
-  app.post(
-    '/survey/:surveyId/schema-summary/export',
-    AuthMiddleware.requireSurveyViewPermission,
-    async (req, res, next) => {
-      try {
-        const params = Request.getParams(req)
-        assertNoLegacyIncludeAiDescriptions(params)
-        const {
-          surveyId,
-          cycle,
-          fileFormat = FileFormats.xlsx,
-          aiDescriptions = null,
-          aiDescriptionsFailedCount = 0,
-        } = params
-        const user = Request.getUser(req)
-        const ai =
-          aiDescriptions === null
-            ? {}
-            : await parseExportAiDescriptions({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount })
-        const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
+  // schema summary export (start job); aiDescriptions: AI descriptions generated in the browser. The request only
+  // checks their shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid,
+  // reported in its status), not this request, which answers 200 with the started job.
+  app.post('/survey/:surveyId/schema-summary/export', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
+    try {
+      const params = Request.getParams(req)
+      assertNoLegacyIncludeAiDescriptions(params)
+      const {
+        surveyId,
+        cycle,
+        fileFormat = FileFormats.xlsx,
+        aiDescriptions = null,
+        aiDescriptionsFailedCount = 0,
+      } = params
+      const user = Request.getUser(req)
+      const ai =
+        aiDescriptions === null
+          ? {}
+          : await parseExportAiDescriptions({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount })
+      const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      sendRouteError({ res, error, context: 'schema summary export' })
     }
-  )
+  })
 
   // schema summary export (download generated file)
   app.get(
@@ -429,7 +423,7 @@ export const init = (app) => {
       contentStream.pipe(res)
     } catch (error) {
       // sendErr preserves the "file not found" status code and key (next(error) would not)
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'survey file download' })
     }
   })
 

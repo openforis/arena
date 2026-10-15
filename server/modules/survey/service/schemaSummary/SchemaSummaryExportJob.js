@@ -18,6 +18,7 @@ export default class SchemaSummaryExportJob extends Job {
       surveyId,
       cycle,
       aiDescriptions,
+      fileFormat,
       onProgress: ({ total, processed }) => {
         this.total = total
         this.processed = processed

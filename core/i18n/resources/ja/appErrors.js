@@ -5,6 +5,8 @@ export default {
   cannotOverridePublishedTaxa: '公開済みの分類群を上書きできません',
   cantUpdateStep: `ステップを更新できません`,
   categoryItemLabelsInvalid: 'カテゴリのラベルのリクエストが無効です ({{reason}})。',
+  categoryItemLabelsTooLarge:
+    'このカテゴリは大きすぎるため、不足しているラベルを確認できません。後でもう一度お試しください。',
   chainCannotBeSaved: '処理チェーンが無効なため保存できません',
   csv: {
     emptyHeaderFound: '列{{columnPosition}}に空のヘッダーが見つかりました',
@@ -36,6 +38,7 @@ export default {
     '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
   generic: '予期しないエラー：{{text}}',
+  unexpectedServerError: 'サーバーで予期しないエラーが発生しました。',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
   importingDataIntoWrongCollectSurvey: '誤った調査へのデータインポートです。期待されるURI：{{collectSurveyUri}}',
   invalidParams: 'リクエストパラメータが無効です。',
@@ -57,6 +60,9 @@ export default {
     lockTimeout: 'レコードは使用中です。数秒後にもう一度お試しください。',
     nodeNotInRecord: 'このノードはレコード {{recordUuid}} に属していません。',
     nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
+    nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
+    nodesBatchInvalidValue: '「{{attributeName}}」の新しい値はこの属性には無効です。',
+    nodesBatchUnexpected: 'サーバーで予期しないエラーが発生したため、編集を適用できませんでした。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',

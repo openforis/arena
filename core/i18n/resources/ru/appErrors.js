@@ -29,6 +29,8 @@ export default {
   cannotOverridePublishedTaxa: 'Невозможно перезаписать опубликованные таксоны',
   cantUpdateStep: 'Не удается обновить шаг',
   categoryItemLabelsInvalid: 'Недопустимый запрос меток категорий ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Эта категория слишком велика для проверки отсутствующих подписей; повторите попытку позже.',
   chainCannotBeSaved: 'Цепочка недействительна и не может быть сохранена',
   csv: {
     emptyHeaderFound: 'Обнаружен пустой заголовок в столбце {{columnPosition}}',
@@ -60,6 +62,7 @@ export default {
   functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} (получено {{numArgs}})',
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
+  unexpectedServerError: 'На сервере произошла непредвиденная ошибка.',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidParams: 'Неверные параметры запроса.',
@@ -81,6 +84,9 @@ export default {
     lockTimeout: 'Запись занята; повторите попытку через несколько секунд.',
     nodeNotInRecord: 'Узел не принадлежит записи {{recordUuid}}.',
     nodesBatchInvalid: 'Недопустимый запрос пакетного редактирования ({{reason}}).',
+    nodesBatchBusy: 'Другое пакетное редактирование ещё выполняется; повторите попытку через несколько секунд.',
+    nodesBatchInvalidValue: 'Новое значение "{{attributeName}}" недопустимо для этого атрибута.',
+    nodesBatchUnexpected: 'Не удалось применить правку из-за непредвиденной ошибки на сервере.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',

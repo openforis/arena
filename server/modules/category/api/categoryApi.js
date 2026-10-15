@@ -1,5 +1,6 @@
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
+import { sendRouteError } from '@server/utils/sendRouteError'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -9,6 +10,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -193,7 +195,7 @@ export const init = (app) => {
         res.json(await CategoryService.countItemsMissingLabels({ surveyId }))
       } catch (error) {
         // Response.sendErr (not next(error)): see convertToSamplingPointData, the error key would be lost
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category items missing labels count' })
       }
     }
   )
@@ -206,7 +208,7 @@ export const init = (app) => {
         const { surveyId, categoryUuid, lang, cursor, limit } = Request.getParams(req)
         res.json(await CategoryService.fetchItemsMissingLabels({ surveyId, categoryUuid, lang, cursor, limit }))
       } catch (error) {
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category items missing labels page' })
       }
     }
   )
@@ -475,12 +477,14 @@ export const init = (app) => {
   // assistant suggestion 6: compare-and-set of category item labels, one language per item
   app.put('/survey/:surveyId/categories/items/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
-      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
+      // the labels come from the assistant: the AI switches (server and user) apply, as for the gateway
+      assertFeatureEnabled('assistantDesign', user)
+      const { surveyId } = Request.getParams(req)
       const { items } = Request.getBody(req) ?? {}
       res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
     } catch (error) {
-      Response.sendErr(res, error)
+      sendRouteError({ res, error, context: 'category item labels update' })
     }
   })
 
@@ -644,7 +648,7 @@ export const init = (app) => {
         // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
         // before these routes in the Express stack, so next(error) never reaches it and the specific
         // error key/params would be lost (the client would get a generic HTML error page instead).
-        Response.sendErr(res, error)
+        sendRouteError({ res, error, context: 'category conversion to sampling point data' })
       }
     }
   )

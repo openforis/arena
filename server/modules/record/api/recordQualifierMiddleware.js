@@ -58,38 +58,72 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
 }
 
 /**
- * Rejects requests targeting a single record that doesn't belong to the current user's group
+ * Parses the node carried by the body of a write request (a JSON string in multipart bodies).
+ * @param {object} req - Express request.
+ * @returns {object|null} The node, or null when the body has none.
+ */
+const _getPendingNodeFromBody = (req) => {
+  const node = req.body?.node
+  if (node && typeof node === 'string') return JSON.parse(node)
+  return node && typeof node === 'object' ? node : null
+}
+
+/**
+ * Creates the middleware that rejects requests targeting a single record that doesn't belong to the current user's
+ * group (see the exported variants).
+ * @param {object} params - The parameters.
+ * @param {boolean} params.readsPendingNode - Whether the node of the request body is applied to the record.
+ * @returns {Function} The middleware.
+ */
+const _createRecordQualifiersMiddleware =
+  ({ readsPendingNode }) =>
+  async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const pendingNode = readsPendingNode ? _getPendingNodeFromBody(req) : null
+
+      const surveysByCycle = new Map()
+      const matches = await _recordMatchesUserGroupQualifiers({
+        user,
+        surveyId,
+        recordUuid,
+        pendingNode,
+        fetchSurveyByCycle: _fetchSurveyByCycleCached({ surveyId, surveysByCycle }),
+      })
+      if (matches) {
+        next()
+        return
+      }
+      sendForbiddenError(req, res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+/**
+ * Rejects write requests targeting a single record that doesn't belong to the current user's group
  * (based on the record's qualifier attribute values), when the user belongs to a UserGroup with qualifiers.
- * If the request carries a node to be created/updated (e.g. a node edit request), the node's value is
+ * If the request body carries a node to be created/updated (e.g. a node edit request), the node's value is
  * applied to the record before checking, so an edit setting a qualifier attribute to a value outside the
- * user's group qualifiers is rejected too.
+ * user's group qualifiers is rejected too. The node is read from the body only: the query string is chosen by the
+ * client, so it could fake the qualifier value of a record.
  * @param {object} req - Express request.
  * @param {object} res - Express response.
  * @param {Function} next - Express next middleware.
  */
-export const requireRecordMatchesUserGroupQualifiers = async (req, res, next) => {
-  try {
-    const { surveyId, recordUuid } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const pendingNode = Request.getJsonParam(req, 'node')
+export const requireRecordMatchesUserGroupQualifiers = _createRecordQualifiersMiddleware({ readsPendingNode: true })
 
-    const surveysByCycle = new Map()
-    const matches = await _recordMatchesUserGroupQualifiers({
-      user,
-      surveyId,
-      recordUuid,
-      pendingNode,
-      fetchSurveyByCycle: _fetchSurveyByCycleCached({ surveyId, surveysByCycle }),
-    })
-    if (matches) {
-      next()
-      return
-    }
-    sendForbiddenError(req, res)
-  } catch (error) {
-    next(error)
-  }
-}
+/**
+ * Read-only variant of requireRecordMatchesUserGroupQualifiers, for GET routes: it never reads a node from the
+ * request, so a client cannot replace the stored qualifier value with its own.
+ * @param {object} req - Express request.
+ * @param {object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ */
+export const requireRecordMatchesUserGroupQualifiersRead = _createRecordQualifiersMiddleware({
+  readsPendingNode: false,
+})
 
 /**
  * Plural variant of requireRecordMatchesUserGroupQualifiers, for batch endpoints:

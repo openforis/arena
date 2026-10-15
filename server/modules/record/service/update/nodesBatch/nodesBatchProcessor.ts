@@ -1,15 +1,17 @@
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import { Objects } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
+import * as Authorizer from '@core/auth/authorizer'
+import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
-import * as Validation from '@core/validation/validation'
 
+import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
 import { checkBatchEdit, findUniquenessErrorKey } from './nodesBatchEditCheck'
+import { withSurveyUuid } from './nodesBatchRecordPermission'
 import {
   NodesBatchEditResult,
   NodesBatchMessageKeys,
@@ -24,7 +26,6 @@ import {
 
 // thrown by acquireRecordLockAndRun (records update thread) when the record stays locked for too long
 const lockTimeoutErrorKey = 'record.lockTimeout'
-const maxErrorTextLength = 200
 
 type ThreadMessage = { type: string; content: unknown }
 
@@ -32,6 +33,21 @@ export type NodesBatchProcessorDeps = {
   getSurvey: (msg: NodesBatchPersistMessage) => Promise<any>
   runWithRecordLock: <T>(recordUuid: string, fn: (t: any) => Promise<T>) => Promise<T>
   getOrFetchRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string; t: any }) => Promise<any | null>
+  // step and owner as they are in the database: the thread cache does not see their changes
+  fetchRecordStepAndOwner: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    t: any
+  }) => Promise<{ step: string; ownerUuid: string } | null>
+  // the group qualifier filters of the user (the same rule as the request check, see the batch service)
+  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: any; t: any }) => Promise<any>
+  recordMatchesQualifierFilters: (params: {
+    survey: any
+    record: any
+    qualifierFilters: any
+    pendingNode: any
+    canEditQualifierValue: boolean
+  }) => boolean
   // uuid of the record owning the node, or null when the node does not exist (in any record)
   findNodeRecordUuid: (params: { msg: NodesBatchPersistMessage; nodeUuid: string; t: any }) => Promise<string | null>
   persistNode: (params: Record<string, unknown>, t: any) => Promise<any>
@@ -47,6 +63,8 @@ type BatchState = {
   msg: NodesBatchPersistMessage
   deps: NodesBatchProcessorDeps
   survey: any
+  // loaded inside the lock, with the record
+  qualifierFilters: any
   // results of the edits refused by the check (conflicts, not editable): kept when the record rolls back
   refusedResults: NodesBatchEditResult[]
   appliedEdits: NodesBatchRecordEdit[]
@@ -72,10 +90,8 @@ const toMessageParams = (params: unknown): Record<string, unknown> | undefined =
  */
 const toFailureMessage = (error: any): { messageKey: string; params?: Record<string, unknown> } => {
   const key = error?.key
-  if (typeof key !== 'string') {
-    const text = String(error?.message ?? error).slice(0, maxErrorTextLength)
-    return { messageKey: NodesBatchMessageKeys.generic, params: { text } }
-  }
+  // the message of a non-application error may hold database details: it is logged, not sent
+  if (typeof key !== 'string') return { messageKey: NodesBatchMessageKeys.unexpected }
   if (key === lockTimeoutErrorKey) {
     return { messageKey: NodesBatchMessageKeys.lockTimeout, params: toMessageParams(error.params) }
   }
@@ -83,32 +99,6 @@ const toFailureMessage = (error: any): { messageKey: string; params?: Record<str
   const messageKey = key.includes(':') ? key : `appErrors:${key}`
   return { messageKey, params: toMessageParams(error.params) }
 }
-
-/**
- * Builds the nodesUpdate socket event (same content as RecordsUpdateThread.handleNodesUpdated).
- * @param {string} recordUuid - The record uuid.
- * @param {object} updatedNodes - The updated nodes by uuid.
- * @returns {ThreadMessage} The event.
- */
-const nodesUpdateEvent = (recordUuid: string, updatedNodes: unknown): ThreadMessage => ({
-  type: WebSocketEvent.nodesUpdate,
-  content: { recordUuid, updatedNodes },
-})
-
-/**
- * Builds the nodeValidationsUpdate socket event (same content as RecordsUpdateThread.handleNodesValidationUpdated).
- * @param {object} record - The record before the update.
- * @param {object} validations - The node validations.
- * @returns {ThreadMessage} The event.
- */
-const validationsUpdateEvent = (record: any, validations: any): ThreadMessage => ({
-  type: WebSocketEvent.nodeValidationsUpdate,
-  content: {
-    recordUuid: Record.getUuid(record),
-    recordValid: Validation.isObjValid(Record.mergeNodeValidations(validations)(record)),
-    validations,
-  },
-})
 
 /**
  * Persists one checked edit; throws when the new value duplicates a record key or a unique attribute of another record.
@@ -145,11 +135,12 @@ const persistEdit = async ({
       timezoneOffset: msg.timezoneOffset,
       lang: msg.lang,
       nodesUpdateListener: (updatedNodes: unknown) => {
-        if (!Objects.isEmpty(updatedNodes)) events.push(nodesUpdateEvent(recordUuid, updatedNodes))
+        const event = buildNodesUpdateEvent({ recordUuid, updatedNodes })
+        if (event) events.push(event)
       },
       nodesValidationListener: (validations: unknown) => {
         uniquenessErrorKey ??= findUniquenessErrorKey({ validation: validations, nodeUuid: edit.nodeUuid })
-        events.push(validationsUpdateEvent(record, validations))
+        events.push(buildNodeValidationsUpdateEvent({ record, validations }))
       },
     },
     t
@@ -200,6 +191,96 @@ const refineMissingNodeResult = async ({
 const isPastDeadline = (state: BatchState): boolean => state.deps.now() > state.msg.deadline
 
 /**
+ * Aborts the transaction when the caller stopped waiting: it reported the edits as timed out, so none may commit.
+ * @param {BatchState} state - The batch state.
+ * @returns {void}
+ * @throws {SystemError} applyTimeout when the deadline has passed.
+ */
+const assertBeforeDeadline = (state: BatchState): void => {
+  if (isPastDeadline(state)) throw new SystemError(NodesBatchMessageKeys.applyTimeout)
+}
+
+/**
+ * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The record.
+ * @param {object|null} pendingNode - The node with its new value, or null.
+ * @returns {boolean} Whether the record matches.
+ */
+const matchesQualifiers = (state: BatchState, record: any, pendingNode: any): boolean => {
+  const { msg, deps, survey, qualifierFilters } = state
+  return deps.recordMatchesQualifierFilters({
+    survey,
+    record,
+    qualifierFilters,
+    pendingNode,
+    canEditQualifierValue: Authorizer.canEditQualifierAttributeValue(msg.user, Survey.getSurveyInfo(survey)),
+  })
+}
+
+/**
+ * Checks, with the record as it is under the lock, that the user may edit it (step, ownership, group qualifiers): it
+ * may have changed since the request was checked.
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The record.
+ * @returns {boolean} Whether the user may edit the record.
+ */
+const isRecordEditAllowed = (state: BatchState, record: any): boolean =>
+  Authorizer.canEditRecord(state.msg.user, withSurveyUuid(record, state.survey)) &&
+  matchesQualifiers(state, record, null)
+
+/**
+ * Returns the record with the step and owner stored in the database. The thread cache is checked with the date of
+ * the last modification, which a change of step or owner does not touch (and another process may have made it).
+ * @param {BatchState} state - The batch state.
+ * @param {object} record - The (possibly cached) record.
+ * @param {object} t - The transaction.
+ * @returns {Promise<object|null>} The record for the permission check, or null when it no longer exists.
+ */
+const withFreshStepAndOwner = async (state: BatchState, record: any, t: any): Promise<any | null> => {
+  const { msg, deps } = state
+  const fresh = await deps.fetchRecordStepAndOwner({ msg, recordUuid: msg.recordUuid, t })
+  if (!fresh) return null
+  return { ...record, [Record.keys.step]: fresh.step, [Record.keys.ownerUuid]: fresh.ownerUuid }
+}
+
+/**
+ * Checks and persists one edit.
+ * @param {object} params - The parameters.
+ * @param {BatchState} params.state - The batch state.
+ * @param {object} params.record - The current record.
+ * @param {NodesBatchRecordEdit} params.edit - The edit.
+ * @param {object} params.t - The transaction.
+ * @returns {Promise<object>} The record after the edit (the same record when the edit is refused).
+ */
+const applyEdit = async ({
+  state,
+  record,
+  edit,
+  t,
+}: {
+  state: BatchState
+  record: any
+  edit: NodesBatchRecordEdit
+  t: any
+}): Promise<any> => {
+  const { msg, survey, refusedResults, appliedEdits } = state
+  const check = checkBatchEdit({ survey, record, recordUuid: msg.recordUuid, edit })
+  if (check.ok === false) {
+    refusedResults.push(await refineMissingNodeResult({ state, record, edit, result: check.result, t }))
+    return record
+  }
+  // the new value must not take the record out of the group qualifiers of the user
+  if (!matchesQualifiers(state, record, Node.assocValue(edit.to)(check.node))) {
+    refusedResults.push(failedResult(edit.index, NodesBatchMessageKeys.forbidden))
+    return record
+  }
+  const recordUpdated = await persistEdit({ state, record, node: check.node, edit, t })
+  appliedEdits.push(edit)
+  return recordUpdated
+}
+
+/**
  * Checks and persists the edits of the record, inside the record lock.
  * @param {BatchState} state - The batch state.
  * @param {object} t - The transaction.
@@ -212,16 +293,17 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
   if (isPastDeadline(state)) return failedResults(edits, NodesBatchMessageKeys.applyTimeout)
   let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
   if (!record) return edits.map(({ index }) => conflictResult(index))
+  state.qualifierFilters = await deps.fetchQualifierFilters({ msg, survey, t })
+  const recordToCheck = await withFreshStepAndOwner(state, record, t)
+  if (!recordToCheck) return edits.map(({ index }) => conflictResult(index))
+  if (!isRecordEditAllowed(state, recordToCheck)) return failedResults(edits, NodesBatchMessageKeys.forbidden)
 
   for (const edit of edits) {
-    const check = checkBatchEdit({ survey, record, recordUuid, edit })
-    if (check.ok === false) {
-      refusedResults.push(await refineMissingNodeResult({ state, record, edit, result: check.result, t }))
-    } else {
-      record = await persistEdit({ state, record, node: check.node, edit, t })
-      appliedEdits.push(edit)
-    }
+    assertBeforeDeadline(state)
+    record = await applyEdit({ state, record, edit, t })
   }
+  // the transaction commits when this function returns
+  assertBeforeDeadline(state)
   if (appliedEdits.length > 0) {
     await deps.cacheRecord({ msg, recordUuid, record, t })
   }
@@ -276,7 +358,15 @@ export const processNodesBatch = async ({
   msg: NodesBatchPersistMessage
   deps: NodesBatchProcessorDeps
 }): Promise<NodesBatchEditResult[]> => {
-  const state: BatchState = { msg, deps, survey: null, refusedResults: [], appliedEdits: [], events: [] }
+  const state: BatchState = {
+    msg,
+    deps,
+    survey: null,
+    qualifierFilters: [],
+    refusedResults: [],
+    appliedEdits: [],
+    events: [],
+  }
   try {
     // late message (queued behind others): the caller reported a timeout, so nothing is written
     if (isPastDeadline(state)) return failedResults(msg.edits, NodesBatchMessageKeys.applyTimeout)

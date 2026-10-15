@@ -585,6 +585,15 @@ export const fetchRecordDateModified = async ({ surveyId, recordUuid }, client =
   return row?.date_modified ? Dates.parseISO(row.date_modified) : null
 }
 
+export const fetchRecordStepAndOwner = async ({ surveyId, recordUuid }, client = db) =>
+  client.oneOrNone(
+    `SELECT step, owner_uuid
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid],
+    (row) => (row ? { step: row.step, ownerUuid: row.owner_uuid } : null)
+  )
+
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   client.one(
     `UPDATE ${getSchemaSurvey(surveyId)}.record 

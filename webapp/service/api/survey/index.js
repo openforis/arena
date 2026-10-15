@@ -124,7 +124,8 @@ export const getSurveyListExportedFileDownloadUrl = ({ tempFileName }) =>
  * @param {number} params.surveyId - Survey id.
  * @param {string} params.cycle - Cycle key.
  * @param {string} params.fileFormat - csv or xlsx.
- * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid.
+ * @param {Record<string, string>} params.aiDescriptions - AI descriptions by node def uuid. The request checks their
+ * shape and size; a uuid that is not a node def of the export fails the job (aiDescriptionsInvalid), not the request.
  * @param {number} [params.aiDescriptionsFailedCount] - Node defs left without a description.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
  * @returns {Promise<{job: object}>} The started job.

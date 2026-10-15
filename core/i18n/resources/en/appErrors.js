@@ -5,6 +5,8 @@ export default {
   cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
   cantUpdateStep: `Can't update step`,
   categoryItemLabelsInvalid: 'Invalid category labels request ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'This category is too large to check the missing labels; try again later or use a smaller category.',
   chainCannotBeSaved: 'Chain is invalid and cannot be saved',
   csv: {
     emptyHeaderFound: 'Empty header found at column {{columnPosition}}',
@@ -34,6 +36,7 @@ export default {
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
+  unexpectedServerError: 'An unexpected error occurred on the server.',
   geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidParams: 'Invalid request parameters.',
@@ -55,6 +58,9 @@ export default {
     lockTimeout: 'The record is busy; try again in a few seconds.',
     nodeNotInRecord: 'The node does not belong to record {{recordUuid}}.',
     nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
+    nodesBatchBusy: 'Another batch edit is still running; try again in a few seconds.',
+    nodesBatchInvalidValue: 'The new value of "{{attributeName}}" is not valid for this attribute.',
+    nodesBatchUnexpected: 'The edit could not be applied because of an unexpected error on the server.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',

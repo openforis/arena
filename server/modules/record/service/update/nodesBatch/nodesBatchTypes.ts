@@ -2,12 +2,6 @@
  * Types, limits and result helpers of the batch record edit (POST /api/survey/:surveyId/records/nodes/update).
  */
 
-export const NodesBatchLimits = {
-  maxEdits: 200,
-  maxRecords: 50,
-  replyTimeoutMs: 60_000,
-} as const
-
 export const NodesBatchEditStatus = {
   applied: 'applied',
   conflict: 'conflict',
@@ -21,8 +15,11 @@ export const NodesBatchMessageKeys = {
   lockTimeout: 'appErrors:record.lockTimeout',
   nodeNotInRecord: 'appErrors:record.nodeNotInRecord',
   invalidRequest: 'appErrors:record.nodesBatchInvalid',
+  invalidValue: 'appErrors:record.nodesBatchInvalidValue',
   applyTimeout: 'appErrors:aiApplyTimeout',
-  generic: 'appErrors:generic',
+  busy: 'appErrors:record.nodesBatchBusy',
+  // the text of an unexpected error is logged on the server, never sent to the client
+  unexpected: 'appErrors:record.nodesBatchUnexpected',
 } as const
 
 export type NodesBatchEdit = { recordUuid: string; nodeUuid: string; from: unknown; to: unknown }

@@ -28,6 +28,7 @@ export default {
   cannotOverridePublishedTaxa: 'Нийтлэгдсэн таксоныг дарж бичих боломжгүй',
   cantUpdateStep: 'Алхам шинэчлэх боломжгүй',
   categoryItemLabelsInvalid: 'Ангиллын шошгын хүсэлт буруу байна ({{reason}}).',
+  categoryItemLabelsTooLarge: 'Энэ ангилал хэт том тул дутуу шошгыг шалгаж чадсангүй; дараа дахин оролдоно уу.',
   chainCannotBeSaved: 'Сүлжээ буруу тул хадгалах боломжгүй',
   csv: {
     emptyHeaderFound: '{{columnPosition}} баганад хоосон гарчиг олдсон',
@@ -58,6 +59,7 @@ export default {
   functionHasTooFewArguments: 'Функц {{fnName}} нь дор хаяж {{minArity}} шаарддаг ({{numArgs}} авсан)',
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
+  unexpectedServerError: 'Серверт гэнэтийн алдаа гарлаа.',
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
@@ -80,6 +82,9 @@ export default {
     lockTimeout: 'Бүртгэл завгүй байна; хэдэн секундын дараа дахин оролдоно уу.',
     nodeNotInRecord: 'Зангилаа {{recordUuid}} бүртгэлд хамаарахгүй.',
     nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
+    nodesBatchBusy: 'Өөр багц засвар хийгдэж байна; хэдэн секундын дараа дахин оролдоно уу.',
+    nodesBatchInvalidValue: '"{{attributeName}}" шинэ утга энэ атрибутад буруу байна.',
+    nodesBatchUnexpected: 'Серверт гэнэтийн алдаа гарсны улмаас засварыг хэрэгжүүлж чадсангүй.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',

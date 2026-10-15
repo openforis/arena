@@ -2,7 +2,9 @@
  * Reply channel of the records update thread: the thread messages are fire-and-forget, so a batch request
  * waits here for the reply posted back with the same requestId.
  */
-import { NodesBatchEditResult, NodesBatchLimits } from './nodesBatchTypes'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+
+import { NodesBatchEditResult } from './nodesBatchTypes'
 
 type Timer = ReturnType<typeof setTimeout>
 

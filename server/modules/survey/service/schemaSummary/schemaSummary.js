@@ -3,6 +3,7 @@ import { Objects, Surveys } from '@openforis/arena-core'
 import { AiLimits } from '@common/ai/limits'
 import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 
+import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
@@ -16,6 +17,8 @@ import * as ValidationResult from '@core/validation/validationResult'
 
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+
+import { neutraliseSpreadsheetFormula, parseAiDescriptions } from './aiDescriptions'
 
 const getParentPath = (nodeDef, survey) => {
   const parts = []
@@ -160,9 +163,10 @@ const extractSchemaSummaryNodeDefs = (survey, cycle) => {
  * @param {string[]} params.languages - Survey languages.
  * @param {string} params.cycle - Cycle key.
  * @param {Record<string, string>|null} params.aiDescriptions - AI descriptions by uuid (null: no aiDescription column).
+ * @param {string} params.fileFormat - csv or xlsx (formulas are neutralised for csv only).
  * @returns {object} The row.
  */
-const buildNodeDefItem = ({ survey, nodeDef, languages, cycle, aiDescriptions }) => {
+const buildNodeDefItem = ({ survey, nodeDef, languages, cycle, aiDescriptions, fileFormat }) => {
   const { uuid, type } = nodeDef
   const name = NodeDef.getName(nodeDef)
   const enumerator = Surveys.isNodeDefEnumerator({ survey, nodeDef }) ? 'true' : ''
@@ -181,7 +185,12 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, cycle, aiDescriptions })
     (acc, lang) => ({ ...acc, [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }) }),
     {}
   )
-  const aiFields = aiDescriptions ? { aiDescription: aiDescriptions[uuid] ?? '' } : {}
+  // the descriptions are generated text. A csv cell is read as a formula by spreadsheet programs, so it is neutralised;
+  // an xlsx cell is written as a string, where the added quote would show up in the text
+  const aiDescription = aiDescriptions?.[uuid] ?? ''
+  const aiFields = aiDescriptions
+    ? { aiDescription: fileFormat === FileFormats.csv ? neutraliseSpreadsheetFormula(aiDescription) : aiDescription }
+    : {}
 
   return {
     uuid,
@@ -273,16 +282,6 @@ export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle }) =>
   getSchemaSummaryAiItems({ survey: await fetchSurvey(surveyId), cycle })
 
 /**
- * Returns the uuids of the node defs of the schema summary (the uuids an export may have AI descriptions for).
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
- * @returns {Promise<string[]>} The uuids.
- */
-export const fetchSchemaSummaryNodeDefUuids = async ({ surveyId, cycle }) =>
-  extractSchemaSummaryNodeDefs(await fetchSurvey(surveyId), cycle).map(NodeDef.getUuid)
-
-/**
  * Builds the schema summary rows of a survey.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs.
@@ -290,12 +289,15 @@ export const fetchSchemaSummaryNodeDefUuids = async ({ surveyId, cycle }) =>
  * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {string} [params.fileFormat] - csv or xlsx: the file the rows are written to (csv when not given, which is the
+ * format that needs the formulas of the AI descriptions neutralised).
  * @returns {object[]} The rows.
  */
 export const buildSchemaSummaryItems = ({
   survey,
   cycle,
   aiDescriptions = null,
+  fileFormat = FileFormats.csv,
   onProgress = null,
   stopIfFunction = null,
 }) => {
@@ -305,30 +307,37 @@ export const buildSchemaSummaryItems = ({
   const items = []
   for (const nodeDef of nodeDefs) {
     if (stopIfFunction?.()) break
-    items.push(buildNodeDefItem({ survey, nodeDef, languages, cycle, aiDescriptions }))
+    items.push(buildNodeDefItem({ survey, nodeDef, languages, cycle, aiDescriptions, fileFormat }))
     onProgress?.({ total, processed: items.length })
   }
   return items
 }
 
 /**
- * Fetches the survey and builds its schema summary rows (see buildSchemaSummaryItems).
+ * Fetches the survey (once) and builds its schema summary rows (see buildSchemaSummaryItems). The AI descriptions are
+ * checked against the node defs of this survey.
  * @param {object} params - Parameters.
  * @param {number|string} params.surveyId - Survey id.
  * @param {string} params.cycle - Cycle key.
  * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {string} [params.fileFormat] - csv or xlsx: the file the rows are written to.
+ * @param {{fetchSurvey: (surveyId: number|string) => Promise<object>}} [deps] - The dependencies (tests).
  * @returns {Promise<object[]>} The rows.
+ * @throws {SystemError} aiDescriptionsInvalid (400) when a description is for a node def that is not in the export.
  */
-export const generateSchemaSummaryItems = async ({
-  surveyId,
-  cycle,
-  aiDescriptions = null,
-  onProgress = null,
-  stopIfFunction = null,
-}) =>
-  buildSchemaSummaryItems({ survey: await fetchSurvey(surveyId), cycle, aiDescriptions, onProgress, stopIfFunction })
+export const generateSchemaSummaryItems = async (
+  { surveyId, cycle, aiDescriptions = null, onProgress = null, stopIfFunction = null, fileFormat = FileFormats.csv },
+  deps = { fetchSurvey }
+) => {
+  const survey = await deps.fetchSurvey(surveyId)
+  if (aiDescriptions) {
+    const knownUuids = extractSchemaSummaryNodeDefs(survey, cycle).map(NodeDef.getUuid)
+    parseAiDescriptions({ raw: aiDescriptions, knownUuids })
+  }
+  return buildSchemaSummaryItems({ survey, cycle, aiDescriptions, onProgress, stopIfFunction, fileFormat })
+}
 
 /**
  * Writes the schema summary (without AI descriptions) to the output stream (used by the R scripts' route).

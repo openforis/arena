@@ -11,13 +11,13 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import { isUuid } from '@core/uuid'
-import * as Validation from '@core/validation/validation'
 
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
 import * as RecordManager from '../../../manager/recordManager'
 import * as NodeRepository from '../../../repository/nodeRepository'
 import { RecordsUpdateThreadMessageTypes } from './recordsThreadMessageTypes'
 import { processNodesBatch } from '../nodesBatch/nodesBatchProcessor'
+import { buildNodesUpdateEvent, buildNodeValidationsUpdateEvent } from '../recordSocketEvents'
 
 const Logger = Log.getLogger('RecordsUpdateThread')
 
@@ -78,29 +78,14 @@ export class RecordsUpdateThread extends Thread {
   }
 
   async handleNodesUpdated({ record, updatedNodes }) {
-    if (!Objects.isEmpty(updatedNodes)) {
-      const recordUuid = Record.getUuid(record)
-      this.postMessage({
-        type: WebSocketEvent.nodesUpdate,
-        content: {
-          recordUuid,
-          updatedNodes,
-        },
-      })
+    const event = buildNodesUpdateEvent({ recordUuid: Record.getUuid(record), updatedNodes })
+    if (event) {
+      this.postMessage(event)
     }
   }
 
   async handleNodesValidationUpdated({ record, validations }) {
-    const recordUpdated = Record.mergeNodeValidations(validations)(record)
-
-    this.postMessage({
-      type: WebSocketEvent.nodeValidationsUpdate,
-      content: {
-        recordUuid: Record.getUuid(record),
-        recordValid: Validation.isObjValid(recordUpdated),
-        validations,
-      },
-    })
+    this.postMessage(buildNodeValidationsUpdateEvent({ record, validations }))
   }
 
   async onMessage(msg) {
@@ -306,6 +291,11 @@ export class RecordsUpdateThread extends Thread {
       getSurvey: async (msg) => (await this.getOrFetchSurveyData(msg)).survey,
       runWithRecordLock: (recordUuid, fn) => acquireRecordLockAndRun({ recordUuid, fn }),
       getOrFetchRecord: (params) => this.getOrFetchRecord(params),
+      fetchRecordStepAndOwner: ({ msg, recordUuid, t }) =>
+        RecordManager.fetchRecordStepAndOwner({ surveyId: msg.surveyId, recordUuid }, t),
+      fetchQualifierFilters: ({ msg, survey, t }) =>
+        SurveyManager.fetchUserQualifierFilters({ user: msg.user, survey }, t),
+      recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
       findNodeRecordUuid: async ({ msg, nodeUuid, t }) =>
         // a malformed uuid would make the query fail and abort the record transaction
         isUuid(nodeUuid) ? NodeRepository.fetchNodeRecordUuid(msg.surveyId, nodeUuid, t) : null,

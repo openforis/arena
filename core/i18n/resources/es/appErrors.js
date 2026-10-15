@@ -33,6 +33,8 @@ export default {
   cannotOverridePublishedTaxa: 'No se pueden sobrescribir taxones publicados',
   cantUpdateStep: 'No se puede actualizar el paso',
   categoryItemLabelsInvalid: 'Solicitud de etiquetas de categorías no válida ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Esta categoría es demasiado grande para comprobar las etiquetas que faltan; inténtelo más tarde o use una categoría más pequeña.',
   chainCannotBeSaved: 'La cadena no es válida y no se puede guardar',
   csv: {
     emptyHeaderFound: 'Encabezado vacío encontrado en la columna {{columnPosition}}',
@@ -64,6 +66,7 @@ export default {
   functionHasTooFewArguments: 'La función {{fnName}} requiere al menos {{minArity}} (obtenido {{numArgs}})',
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
+  unexpectedServerError: 'Se produjo un error inesperado en el servidor.',
   geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
   importingDataIntoWrongCollectSurvey:
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
@@ -86,6 +89,9 @@ export default {
     lockTimeout: 'El registro está ocupado; inténtelo de nuevo en unos segundos.',
     nodeNotInRecord: 'El nodo no pertenece al registro {{recordUuid}}.',
     nodesBatchInvalid: 'Solicitud de edición por lotes no válida ({{reason}}).',
+    nodesBatchBusy: 'Otra edición por lotes sigue en curso; inténtelo de nuevo en unos segundos.',
+    nodesBatchInvalidValue: 'El nuevo valor de "{{attributeName}}" no es válido para este atributo.',
+    nodesBatchUnexpected: 'No se pudo aplicar la edición por un error inesperado en el servidor.',
   },
   recordPrintableExport: {
     missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
