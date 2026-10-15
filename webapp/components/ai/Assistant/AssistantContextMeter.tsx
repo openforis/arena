@@ -16,11 +16,11 @@ import {
 } from './contextMeterModel'
 
 /**
- * Returns the meter of the shown conversation.
+ * Returns the meter of the shown conversation (the chat computes it once and passes it to the ring and the notice).
  * @param {Conversation|null} conversation - Shown conversation.
  * @returns {ContextMeter|null} The meter; null before the first answer with a usage.
  */
-const useContextMeter = (conversation: Conversation | null): ContextMeter | null => {
+export const useContextMeter = (conversation: Conversation | null): ContextMeter | null => {
   const lang: string = useLang()
   return buildContextMeter({ messages: conversation?.messages ?? [], lang })
 }
@@ -30,12 +30,11 @@ const useContextMeter = (conversation: Conversation | null): ContextMeter | null
  * model's window when it is known (local server); dashed and empty when the window is unknown (cloud). The tokens are
  * in its tooltip. Hidden before the first answer.
  * @param {object} props - Props.
- * @param {Conversation|null} props.conversation - Shown conversation.
+ * @param {ContextMeter|null} props.meter - Meter of the shown conversation.
  * @returns {React.ReactElement|null} The ring.
  */
-export const AssistantContextRing = ({ conversation }: { conversation: Conversation | null }) => {
+export const AssistantContextRing = ({ meter }: { meter: ContextMeter | null }) => {
   const t = useI18nT({ unescapeHtml: true })
-  const meter = useContextMeter(conversation)
   if (!meter) return null
   const text = getContextMeterText({ meter, t })
   const dashArray = getContextRingDashArray(meter.ratio)
@@ -88,22 +87,21 @@ export const AssistantContextRing = ({ conversation }: { conversation: Conversat
  * What the ring can't say, above the composer: near the window's limit (with New conversation) and the older messages
  * no longer sent. Hidden when neither applies.
  * @param {object} props - Props.
- * @param {Conversation|null} props.conversation - Shown conversation.
+ * @param {ContextMeter|null} props.meter - Meter of the shown conversation.
  * @param {Function} props.onNewConversation - Starts a new conversation in the area.
  * @param {boolean} [props.busy] - An answer is running (New conversation is disabled, as in the menu).
  * @returns {React.ReactElement|null} The notice.
  */
 export const AssistantContextNotice = ({
-  conversation,
+  meter,
   onNewConversation,
   busy = false,
 }: {
-  conversation: Conversation | null
+  meter: ContextMeter | null
   onNewConversation: () => void
   busy?: boolean
 }) => {
   const t = useI18nT({ unescapeHtml: true })
-  const meter = useContextMeter(conversation)
   if (!meter || (meter.level === 'normal' && !meter.historyTrimmed)) return null
   return (
     <div
@@ -134,15 +132,14 @@ export const AssistantContextNotice = ({
 /**
  * Context ring of the composer footer with its short text ("12K / 128K"). Hidden before the first answer.
  * @param {object} props - Props.
- * @param {Conversation|null} props.conversation - Shown conversation.
+ * @param {ContextMeter|null} props.meter - Meter of the shown conversation.
  * @returns {React.ReactElement|null} The ring and its text.
  */
-export const AssistantContextUsage = ({ conversation }: { conversation: Conversation | null }) => {
-  const meter = useContextMeter(conversation)
+export const AssistantContextUsage = ({ meter }: { meter: ContextMeter | null }) => {
   if (!meter) return null
   return (
     <span className="ai-assistant-panel__context-usage">
-      <AssistantContextRing conversation={conversation} />
+      <AssistantContextRing meter={meter} />
       {/* the ring's label and tooltip carry the full text */}
       <span aria-hidden="true" className="ai-assistant-panel__context-text">
         {getContextMeterShortText(meter)}
