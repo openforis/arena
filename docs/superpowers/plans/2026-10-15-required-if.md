@@ -58,6 +58,8 @@ min count, which already supports expressions; key attributes are always require
 - **Always an error** when a required value is missing (same severity as today's `required`, no severity selector).
 - **Table layouts (multiple entities)**: no asterisk in the cells; conditionally required cells just show the
   existing validation feedback. Headers show the asterisk only for always-required attributes.
+- **No asterisk on key attributes** (web and mobile): the key icon is enough. The marker condition is
+  `!isKey && Records.isNodeRequired(...)` (`isNodeRequired` itself stays true for keys, for validation/completion).
 - **The data entry form marks the attribute as required** (web and mobile) when it is always required, or when its
   condition is met in that entity. Today no required marker is shown at all, so the marker is new for both cases.
 
@@ -277,6 +279,7 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
   `state/dataEntry/selectors.ts` next to the editable one, line ~194). Same for the nodes carousel; multiple entity
   list/table headers show it for always-required attributes only, with no marker in the cells (existing validation
   feedback only).
+- Key attributes: no asterisk, the existing key icon is enough.
 - `NodeCoordinateComponent/useNodeCoordinateComponent.ts:355` uses `NodeDefs.isRequired`: switch to the node-level
   `Records.isNodeRequired`.
 - Records downloaded from the server already carry `cReq`; records created on older app versions lack it → the
@@ -306,7 +309,3 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 2. arena PR (bump core + UI + validators), then arena-server bump if it pins arena-core.
 3. arena-mobile dependency bump in the next app release.
 4. Follow-up: Collect/ODK import of conditional required.
-
-## Open questions
-
-- Should the asterisk also be shown on key attributes (currently they only show the key icon)?
