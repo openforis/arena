@@ -1,4 +1,4 @@
-import { ArenaServer, UnauthorizedError } from '@openforis/arena-server'
+import { ArenaServer, Responses, ServerError, UnauthorizedError } from '@openforis/arena-server'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -9,8 +9,9 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserRepository from '@server/modules/user/repository/userRepository'
+import * as Response from '@server/utils/response'
 
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
+import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
 
 /**
  * Builds a user that belongs to no group (cannot edit any survey).
@@ -264,4 +265,48 @@ export const expectEditPermissionOnly = async ({
   } finally {
     await deleteUsers(members)
   }
+}
+
+/**
+ * Runs the whole handler chain of a route the way Express does (each handler runs when the one before calls next), on
+ * a fake request and response. An error passed to next is answered as the API error handler does.
+ * @param {object} params - Parameters.
+ * @param {object} params.route - Route with its handlers.
+ * @param {object} [params.user] - Requesting user (undefined: not logged in).
+ * @param {object} [params.params] - Route params (a route without `:surveyId` has none).
+ * @param {object} [params.body] - Request body.
+ * @returns {Promise<any>} The fake response (statusCode, body, writes).
+ */
+export const runRouteChain = async ({
+  route,
+  user,
+  params = {},
+  body = {},
+}: {
+  route: { handlers: any[] } | undefined
+  user?: any
+  params?: Record<string, string>
+  body?: object
+}): Promise<any> => {
+  if (!route) throw new Error('Route not found: it is not registered, so it cannot be run')
+  const req = createFakeRequest(body)
+  req.params = params
+  req.user = user
+  const res = createFakeResponse()
+  for (const handler of route.handlers) {
+    let nextCalled = false
+    let error: any
+    await handler(req, res, (nextError?: any) => {
+      nextCalled = true
+      error = nextError
+    })
+    if (error !== undefined) {
+      // an UnauthorizedError of the permission middlewares is answered by the error handler of arena-server
+      if (error instanceof ServerError) Responses.sendError(res, error)
+      else Response.sendErr(res, error)
+      break
+    }
+    if (!nextCalled) break
+  }
+  return res
 }
