@@ -4,7 +4,7 @@ import { createPolicyContextLoader } from '@webapp/ai/policy/policyContextLoader
 const surveyState = (effective: any) => ({ policy: effective, ceilings: effective, effective, canEdit: false })
 
 describe('createPolicyContextLoader', () => {
-  const settings = { policyCeilings: { schema: 'orgHosted', data: 'cloud' } }
+  const settings = { policyCeilings: { schema: 'cloud', data: 'orgHosted' } }
 
   test('a survey feature uses the survey effective policy; the hosting class is left to the engine', async () => {
     const load = createPolicyContextLoader({
@@ -27,9 +27,17 @@ describe('createPolicyContextLoader', () => {
       },
     })
     expect(await load({ surveyId: null })).toEqual({
-      effective: { schema: 'orgHosted', data: 'cloud' },
+      effective: { schema: 'cloud', data: 'orgHosted' },
     })
     expect(surveyCalls).toEqual([])
+  })
+
+  test('ceilings that allow more for the data than for the design are clamped to the design level', async () => {
+    const load = createPolicyContextLoader({
+      fetchSettings: async () => ({ policyCeilings: { schema: 'onDevice', data: 'cloud' } }),
+      fetchSurveyPolicy: async () => surveyState({ schema: 'off', data: 'off' }) as any,
+    })
+    expect(await load({ surveyId: null })).toEqual({ effective: { schema: 'onDevice', data: 'onDevice' } })
   })
 
   test('settings without ceilings fail closed', async () => {

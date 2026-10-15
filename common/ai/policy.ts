@@ -1,6 +1,10 @@
 /**
  * Survey AI policy: where a survey's content may be processed, per data class. Pure functions shared by the
- * server (gateway, jobs, API), the browser (model check, availability) and later the engine selection (step C).
+ * server (gateway, jobs, API), the browser (model check, availability) and the engine selection.
+ *
+ * Invariant: record data is never more permissive than the survey design (`data` <= `schema`), because a request on
+ * record data also carries design content (survey name, labels). `normalizeAiPolicy` and `getEffectiveAiPolicy`
+ * clamp to it and `getAllowedLevel` applies it to a policy that was not clamped.
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 
@@ -48,17 +52,6 @@ const normalizeLevel = (raw: Record<string, unknown>, dataClass: AiDataClass): A
   return isAiPolicyLevel(value) ? value : OFF
 }
 
-/**
- * Turns a stored (untrusted) policy into a complete one: missing → defaults, invalid → off.
- * @param {unknown} raw - The stored value (survey.config.aiPolicy).
- * @returns {AiPolicy} The normalized policy (a new object).
- */
-export const normalizeAiPolicy = (raw: unknown): AiPolicy => {
-  if (raw === undefined || raw === null) return { ...defaultAiPolicy }
-  if (!isPlainObject(raw)) return { schema: OFF, data: OFF }
-  return { schema: normalizeLevel(raw, 'schema'), data: normalizeLevel(raw, 'data') }
-}
-
 const toLevelOrOff = (value: unknown): AiPolicyLevel => (isAiPolicyLevel(value) ? value : OFF)
 
 const stricterLevel = (a: unknown, b: unknown): AiPolicyLevel => {
@@ -68,16 +61,61 @@ const stricterLevel = (a: unknown, b: unknown): AiPolicyLevel => {
 }
 
 /**
- * Returns the policy actually applied: for each data class, the stricter of the survey setting and the ceiling.
+ * Returns true when record data is more permissive than the survey design (a policy the editor and the server refuse).
+ * @param {AiPolicy} policy - The policy.
+ * @returns {boolean} True when `data` is above `schema`.
+ */
+export const isDataAboveSchema = (policy: AiPolicy): boolean =>
+  getPolicyLevelIndex(policy?.data) > getPolicyLevelIndex(policy?.schema)
+
+/**
+ * Lowers the data level to the schema level when it is above it (the invariant `data` <= `schema`).
+ * @param {AiPolicy} policy - The policy.
+ * @returns {AiPolicy} The clamped policy (a new object).
+ */
+export const clampDataToSchema = (policy: AiPolicy): AiPolicy => ({
+  schema: toLevelOrOff(policy?.schema),
+  data: stricterLevel(policy?.data, policy?.schema),
+})
+
+/**
+ * Returns the level that applies to a data class. Record data is limited by the survey design level too, so a request
+ * on record data cannot carry design content (names, labels) to a place the design level forbids.
+ * @param {AiPolicy|null|undefined} effective - The policy (clamped or not).
+ * @param {string} dataClass - The data class of the request.
+ * @returns {AiPolicyLevel} The allowed level; off for a missing policy, an unknown class or an invalid level.
+ */
+export const getAllowedLevel = (effective: AiPolicy | null | undefined, dataClass: string): AiPolicyLevel => {
+  if (!effective) return OFF
+  if (dataClass === 'schema') return toLevelOrOff(effective.schema)
+  if (dataClass === 'data') return stricterLevel(effective.data, effective.schema)
+  return OFF
+}
+
+/**
+ * Turns a stored (untrusted) policy into a complete one: missing → defaults, invalid → off, data clamped to schema.
+ * @param {unknown} raw - The stored value (survey.config.aiPolicy).
+ * @returns {AiPolicy} The normalized policy (a new object).
+ */
+export const normalizeAiPolicy = (raw: unknown): AiPolicy => {
+  if (raw === undefined || raw === null) return { ...defaultAiPolicy }
+  if (!isPlainObject(raw)) return { schema: OFF, data: OFF }
+  return clampDataToSchema({ schema: normalizeLevel(raw, 'schema'), data: normalizeLevel(raw, 'data') })
+}
+
+/**
+ * Returns the policy actually applied: for each data class, the stricter of the survey setting and the ceiling,
+ * with record data not above the survey design.
  * @param {object} params - Parameters.
  * @param {AiPolicy} params.policy - Survey policy (normalized).
  * @param {AiPolicy} params.ceilings - Instance ceilings.
  * @returns {AiPolicy} The effective policy.
  */
-export const getEffectiveAiPolicy = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): AiPolicy => ({
-  schema: stricterLevel(policy?.schema, ceilings?.schema),
-  data: stricterLevel(policy?.data, ceilings?.data),
-})
+export const getEffectiveAiPolicy = ({ policy, ceilings }: { policy: AiPolicy; ceilings: AiPolicy }): AiPolicy =>
+  clampDataToSchema({
+    schema: stricterLevel(policy?.schema, ceilings?.schema),
+    data: stricterLevel(policy?.data, ceilings?.data),
+  })
 
 /**
  * Clamps a policy to the ceilings (used when a policy comes from another instance, e.g. survey import).
@@ -99,8 +137,7 @@ type HostingCheck = { effective: AiPolicy; dataClass: string; hostingClass: stri
 export const isHostingAllowed = ({ effective, dataClass, hostingClass }: HostingCheck): boolean => {
   if (!(aiHostingClasses as readonly string[]).includes(hostingClass ?? '')) return false
   if (!(aiPolicyDataClasses as readonly string[]).includes(dataClass)) return false
-  const allowed = effective?.[dataClass as AiDataClass]
-  if (!isAiPolicyLevel(allowed)) return false
+  const allowed = getAllowedLevel(effective, dataClass)
   return getPolicyLevelIndex(hostingClass) <= getPolicyLevelIndex(allowed)
 }
 
@@ -112,7 +149,7 @@ export const isHostingAllowed = ({ effective, dataClass, hostingClass }: Hosting
 export const assertHostingAllowed = (check: HostingCheck): void => {
   if (isHostingAllowed(check)) return
   const { effective, dataClass, hostingClass } = check
-  const allowed = toLevelOrOff(effective?.[dataClass as AiDataClass])
+  const allowed = getAllowedLevel(effective, dataClass)
   throw new SystemError(
     'aiPolicyRefused',
     { dataClass, hostingClass: hostingClass ?? 'unknown', allowed },

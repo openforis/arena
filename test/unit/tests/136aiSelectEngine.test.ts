@@ -144,7 +144,11 @@ const capabilitiesFor = (state: ProviderState): AiCapabilities => {
 
 // plain oracle, written independently of selectEngine
 const oracle = (policy: AiPolicy, dataClass: AiDataClass, state: ProviderState): string => {
-  const allowed = RANK[policy[dataClass] as Level]
+  // a data request also carries design content, so the design level limits it too
+  const allowed =
+    dataClass === 'data'
+      ? Math.min(RANK[policy.data as Level], RANK[policy.schema as Level])
+      : RANK[policy.schema as Level]
   if (allowed === 0) return 'policyForbids'
   if (!state.entry) return state.id.startsWith('local:') ? 'missingOnThisBrowser' : 'notAvailable'
   if (state.hostingClass && RANK[state.hostingClass] > allowed) return 'policyForbids'
@@ -233,6 +237,23 @@ describe('selectEngine: examples', () => {
       providerId: 'arena-default',
     })
     expect('engine' in selection && selection.engine.providerId).toBe('arena-default')
+  })
+
+  test('a data request is checked against the stricter of the data and the schema level', () => {
+    // schema off, data cloud: the data request would carry design content to the cloud
+    expect(run({ effective: { schema: 'off', data: 'cloud' }, capabilities: capabilitiesFor(STATES[0]) })).toEqual({
+      unavailable: ['policyForbids'],
+    })
+    const orgOnly = run({
+      effective: { schema: 'orgHosted', data: 'cloud' },
+      capabilities: capabilitiesFor(STATES[0]),
+    })
+    expect(orgOnly).toEqual({ unavailable: ['policyForbids'] })
+    const orgProvider = run({
+      effective: { schema: 'orgHosted', data: 'cloud' },
+      capabilities: capabilitiesFor(STATES[1]),
+    })
+    expect('engine' in orgProvider && orgProvider.engine.providerId).toBe('acct:b')
   })
 
   test('isPolicyReason', () => {

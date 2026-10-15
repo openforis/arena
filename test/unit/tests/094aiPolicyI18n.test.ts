@@ -26,7 +26,7 @@ const leafPaths = (obj: any, prefix = ''): string[] => {
 }
 
 const groups = ['common.aiPolicy', 'common.aiDataLocation', 'homeView.surveyInfo.aiPolicy']
-const errorKeys = ['aiPolicyRefused', 'aiPolicyInvalid', 'aiPolicyAboveCeiling']
+const errorKeys = ['aiPolicyRefused', 'aiPolicyInvalid', 'aiPolicyAboveCeiling', 'aiPolicyDataAboveSchema']
 
 describe('AI policy i18n', () => {
   test.each(languages)('%s has every AI policy key of en', (lang) => {
@@ -62,6 +62,7 @@ describe('AI policy i18n', () => {
     const messages = [
       t('appErrors:aiPolicyRefused', { dataClass: 'data', hostingClass: 'orgHosted', allowed: 'onDevice' }),
       t('appErrors:aiPolicyAboveCeiling', { dataClass: 'schema', level: 'cloud', ceiling: 'orgHosted' }),
+      t('appErrors:aiPolicyDataAboveSchema', { schema: 'onDevice', data: 'cloud' }),
     ]
     for (const message of messages) {
       expect(message).not.toMatch(/\$t\(|\{\{|aiPolicy\.|common:/)
