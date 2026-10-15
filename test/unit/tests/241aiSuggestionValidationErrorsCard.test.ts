@@ -1,7 +1,7 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-import { getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { type SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { formatSuggestionCount } from '@webapp/ai/suggestions/definitions/formatSuggestionCount'

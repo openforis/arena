@@ -2,8 +2,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { toQuery } from '@common/ai/tasks/dataQuery'
 
-import { assistantAnalysisMockScripts, formatMockQueryAnswer } from '@server/modules/ai/service/mockScriptsAnalysis'
-import { getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import {
+  assistantAnalysisMockScripts,
+  formatMockQueryAnswer,
+} from '@server/modules/ai/service/mock/mockScriptsAnalysis'
+import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { proposeQueryInputSchema, toDataQueryAiResult } from '@webapp/ai/tools/analysis/proposeQuery'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 
