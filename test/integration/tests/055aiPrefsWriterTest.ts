@@ -94,7 +94,7 @@ describe('AI prefs writer (055)', () => {
   })
 
   beforeEach(async () => {
-    await db.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = ANY($1)`, [
+    await db.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = ANY($1::uuid[])`, [
       [uuid(), User.getUuid(other)],
     ])
   })
@@ -239,7 +239,11 @@ describe('AI prefs writer (055)', () => {
   })
 
   describe('a key saved without an AAD that is stored for another user too', () => {
-    const copiedKey = legacyEnvelope('sk-victim')
+    let copiedKey: string
+    // made once the encryption secret is set (by the beforeAll of the suite)
+    beforeAll(() => {
+      copiedKey = legacyEnvelope('sk-victim')
+    })
     const providerWith = (apiKeyEncrypted: string) => ({
       ...keyless('acct:old'),
       type: 'openai',
