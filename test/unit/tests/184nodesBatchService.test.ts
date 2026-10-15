@@ -242,4 +242,84 @@ describe('updateNodesBatch', () => {
     expect(posted.map((msg) => msg.deadline)).toEqual([1_060_000, 1_060_000])
     expect(waits).toEqual([60_000 - 10_000, 60_000 - 20_000])
   })
+
+  describe('one message at a time', () => {
+    const buildRecords = (count: number) =>
+      Array.from({ length: count }, (_value, index) => {
+        const rec = RB.record(
+          admin,
+          survey,
+          RB.entity('root', RB.attribute('root_key', `r${index}`), RB.attribute('a', 1), RB.attribute('b', 2))
+        ).build()
+        const nodeUuid = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, rec))
+        return { rec, recordUuid: Record.getUuid(rec), nodeUuid }
+      })
+
+    test('a batch never has more than one message in flight: it waits for the reply before sending the next', async () => {
+      const items = buildRecords(4)
+      const byUuid = new Map(items.map((item) => [item.recordUuid, item.rec]))
+      const { deps, posted } = buildDeps({ fetchRecord: async ({ recordUuid: uuid }) => byUuid.get(uuid) ?? null })
+      let inFlight = 0
+      let maxInFlight = 0
+      deps.postBatchMessage = (msg) => {
+        posted.push(msg)
+        inFlight += 1
+        maxInFlight = Math.max(maxInFlight, inFlight)
+        // the thread answers later, as it does with a queue
+        setTimeout(() => {
+          inFlight -= 1
+          deps.replies.resolveReply({
+            requestId: msg.requestId,
+            results: msg.edits.map(({ index }) => ({ index, status: 'applied' as const })),
+          })
+        }, 5)
+      }
+
+      const results = await run(
+        admin,
+        items.map(({ recordUuid: uuid, nodeUuid }) => ({ recordUuid: uuid, nodeUuid, from: 1, to: 5 })),
+        deps
+      )
+
+      expect(results.map((result) => result.status)).toEqual(['applied', 'applied', 'applied', 'applied'])
+      expect(posted).toHaveLength(4)
+      expect(maxInFlight).toBe(1)
+    })
+
+    test('the records not yet sent when the deadline passes get aiApplyTimeout and are not posted', async () => {
+      const items = buildRecords(3)
+      const byUuid = new Map(items.map((item) => [item.recordUuid, item.rec]))
+      const { deps, posted } = buildDeps({ fetchRecord: async ({ recordUuid: uuid }) => byUuid.get(uuid) ?? null })
+      let now = 1_000_000
+      const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
+      deps.postBatchMessage = (msg) => {
+        posted.push(msg)
+        // the first record takes the whole time of the request
+        now += 61_000
+        deps.replies.resolveReply({
+          requestId: msg.requestId,
+          results: msg.edits.map(({ index }) => ({ index, status: 'applied' as const })),
+        })
+      }
+
+      let results: any[]
+      try {
+        results = await run(
+          admin,
+          items.map(({ recordUuid: uuid, nodeUuid }) => ({ recordUuid: uuid, nodeUuid, from: 1, to: 5 })),
+          deps
+        )
+      } finally {
+        nowSpy.mockRestore()
+      }
+
+      expect(results).toEqual([
+        { index: 0, status: 'applied' },
+        { index: 1, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+        { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout },
+      ])
+      expect(posted).toHaveLength(1)
+      expect(deps.replies.size()).toBe(0)
+    })
+  })
 })
