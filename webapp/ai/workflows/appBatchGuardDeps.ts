@@ -4,7 +4,8 @@
  */
 import axios from 'axios'
 
-import { getUrl, localErrors } from '../policy/surveyAiPolicyClient'
+import { getEffectivePolicyFor } from '../policy/policyContext'
+import { localErrors } from '../policy/surveyAiPolicyClient'
 import type { AiBatchGuardDeps } from './batchRun'
 
 /**
@@ -18,10 +19,10 @@ export const appBatchGuardDeps: AiBatchGuardDeps = {
    */
   fetchSettings: async () => (await axios.get('/api/ai/settings', localErrors)).data ?? null,
   /**
-   * Reads the survey's effective AI policy from the route, not from fetchSurveyAiPolicy: its 30 s cache would hide
-   * a change made by an administrator during the run.
+   * Reads the survey's effective AI policy from the server (fresh: the 30 s cache would hide a change made by an
+   * administrator during the run), by the same rule as the engine selection.
    * @param {number} surveyId - Survey id.
-   * @returns {Promise<object|null>} The effective policy.
+   * @returns {Promise<object>} The effective policy.
    */
-  fetchEffectivePolicy: async (surveyId) => (await axios.get(getUrl(surveyId), localErrors)).data?.effective ?? null,
+  fetchEffectivePolicy: (surveyId) => getEffectivePolicyFor({ surveyId, fresh: true }),
 }

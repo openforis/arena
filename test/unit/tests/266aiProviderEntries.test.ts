@@ -37,7 +37,6 @@ const reachable = (models: string[]): LocalServerProbeResult => ({
 
 /** Returns a ready local capability with the overrides applied. */
 const localCapability = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['m1'],
   hostingClass: 'onDevice',
@@ -127,7 +126,6 @@ describe('provider entries (266)', () => {
     expect(
       buildLocalProviderCapability({ provider: lan, probe: reachable(['m2']), allowlist: ['http://10.0.0.5:8000/v1'] })
     ).toEqual({
-      enabled: true,
       reachable: true,
       models: ['m2'],
       hostingClass: 'orgHosted',
@@ -158,7 +156,12 @@ describe('capabilities store with providers (266)', () => {
     const pending = [deferred<LocalServerProbeResult>(), deferred<LocalServerProbeResult>()]
     const probed: string[] = []
     const store = createCapabilitiesStore({
-      loadSettings: async () => ({ providers: [account], defaultProviderId: 'local:l2', adminDefault: null }),
+      loadSettings: async () => ({
+        featuresEnabled: true,
+        providers: [account],
+        defaultProviderId: 'local:l2',
+        adminDefault: null,
+      }),
       loadLocalProviders: () => [laptop, lan],
       // records the URL and answers when the test resolves that probe
       probe: ({ baseUrl }) => {
@@ -185,7 +188,8 @@ describe('capabilities store with providers (266)', () => {
 
   test('a failing provider loader or probe gives no local providers or a not tested one', async () => {
     const store = createCapabilitiesStore({
-      loadSettings: async () => null,
+      // AI is on: the probes run
+      loadSettings: async () => ({ featuresEnabled: true }),
       loadLocalProviders: () => {
         throw new Error('blocked')
       },
@@ -196,7 +200,8 @@ describe('capabilities store with providers (266)', () => {
     expect(capabilities.defaultProviderId).toBe('arena-default')
 
     const failingProbe = createCapabilitiesStore({
-      loadSettings: async () => null,
+      // AI is on: the probes run
+      loadSettings: async () => ({ featuresEnabled: true }),
       loadLocalProviders: () => [laptop],
       probe: async () => {
         throw new Error('boom')
@@ -210,7 +215,8 @@ describe('capabilities store with providers (266)', () => {
 
   test('one failing probe does not cost the other provider its capability', async () => {
     const store = createCapabilitiesStore({
-      loadSettings: async () => null,
+      // AI is on: the probes run
+      loadSettings: async () => ({ featuresEnabled: true }),
       loadLocalProviders: () => [laptop, lan],
       probe: async ({ baseUrl }) => {
         if (baseUrl === laptop.baseUrl) throw new Error('boom')

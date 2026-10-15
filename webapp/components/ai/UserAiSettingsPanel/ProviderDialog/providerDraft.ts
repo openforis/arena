@@ -97,10 +97,18 @@ export const getDraftModel = ({ spec, draft }: { spec: ProviderTypeSpec; draft: 
 /**
  * Returns the URL of a local draft as it is stored (http:// added when typed without a scheme).
  * @param {ProviderDraft} draft - Draft.
- * @returns {string|null} The URL, or null when it is not an http(s) URL.
+ * @returns {string|null} The URL, or null when it is not a plain http(s) URL (no credentials, query or fragment).
  */
 export const getLocalDraftUrl = (draft: ProviderDraft): string | null =>
   draft.baseUrl.trim() ? normalizeLocalProviderBaseUrl(withDefaultHttpScheme(draft.baseUrl)) : null
+
+/**
+ * Returns true when a local address was typed but is not a plain http(s) URL (the dialog then says why).
+ * @param {ProviderDraft} draft - Draft.
+ * @returns {boolean} True for a typed address that is refused.
+ */
+export const isLocalDraftUrlInvalid = (draft: ProviderDraft): boolean =>
+  draft.baseUrl.trim() !== '' && getLocalDraftUrl(draft) === null
 
 /**
  * Returns true when the user changed something: a name, the address, the key or the model. A model filled in from

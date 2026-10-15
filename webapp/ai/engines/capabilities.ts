@@ -3,11 +3,13 @@
  * probed in this browser, Arena default) and the instance limits. Pure store factory: the app instance is in
  * capabilitiesStore.ts.
  */
+import { resolveAiAccessLevel } from '@common/ai/accessLevel'
 import { getLocalServerHostingClass } from '@common/ai/localServerAddress'
 import type { AiPolicy } from '@common/ai/policy'
 import { normalizeAiPolicy } from '@common/ai/policy'
 import type { AiDefaultProviderOrigin } from '@common/ai/providerIds'
 
+import type { AiFeatureSwitches } from './featureSwitches'
 import type { LocalProvider } from './localProviders'
 import type { LocalServerProbeResult } from './localServerProbe'
 import {
@@ -18,9 +20,8 @@ import {
 } from './providerEntries'
 import type { AiCapabilities, AiInstanceCapability, AiLocalServerCapability } from './types'
 
-// the fields of GET /api/ai/settings used here
-export type AiSettingsSnapshot = {
-  featuresEnabled?: boolean
+// the fields of GET /api/ai/settings used here (the access level and switches: AiFeatureSwitches)
+export type AiSettingsSnapshot = AiFeatureSwitches & {
   orgHostedBaseUrls?: string[]
   policyCeilings?: AiPolicy
   maxPromptChars?: number
@@ -84,10 +85,9 @@ export const buildLocalProviderCapability = ({
   probe: LocalServerProbeResult | null
   allowlist: string[]
 }): AiLocalServerCapability => ({
-  enabled: true,
   reachable: probe ? probe.reachable : null,
   models: probe ? probe.models : [],
-  hostingClass: getLocalServerHostingClass(provider.baseUrl, allowlist),
+  hostingClass: provider.addressInvalid ? null : getLocalServerHostingClass(provider.baseUrl, allowlist),
   contextTokens: probe ? probe.contextTokens : null,
   baseUrl: provider.baseUrl,
   modelId: provider.modelId,
@@ -139,6 +139,20 @@ export const emptyCapabilities = (): AiCapabilities =>
 const emptySnapshot = emptyCapabilities()
 
 /**
+ * Returns true when the user's AI access is off (level 0): nothing of AI runs, so nothing is probed. A probe of a
+ * local server can raise the browser's local network permission prompt for a user who does not use AI.
+ * @param {AiSettingsSnapshot|null} settings - AI settings (null: not loaded, which is not known to be on).
+ * @returns {boolean} True when AI is off or unknown.
+ */
+const isAiOff = (settings: AiSettingsSnapshot | null): boolean =>
+  !settings ||
+  resolveAiAccessLevel({
+    accessLevel: settings.accessLevel,
+    featuresEnabled: !!settings.featuresEnabled,
+    featureToggles: settings.featureToggles,
+  }) === 0
+
+/**
  * Returns the capabilities for the logged-in user: data that belongs to another user (or to nobody) is never
  * returned, a stable empty object is.
  * @param {AiCapabilitiesStore} store - The store.
@@ -172,6 +186,9 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
   let capabilities = emptyCapabilities()
   let settings: AiSettingsSnapshot | null = null
   let loadedFor: string | null | undefined = undefined
+  // false after a load whose settings could not be read: the next load() tries again instead of keeping the empty
+  // capabilities for the whole session
+  let complete = false
   let inflight: { promise: Promise<AiCapabilities>; userUuid: string | null; force: boolean } | null = null
   let sequence = 0
   const listeners = new Set<() => void>()
@@ -208,6 +225,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     capabilities = emptyCapabilities()
     settings = null
     loadedFor = undefined
+    complete = false
     emit()
   }
 
@@ -254,13 +272,22 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     // loadLocalProviders catches its own storage errors; this fallback is reached only when localStorage is unreadable,
     // which the spec treats like "not on this browser"
     const localProviders = await safely(() => deps.loadLocalProviders(userUuid), [] as LocalProvider[])
-    // every server is probed at the same time: one slow server does not delay the others
-    const probes = await Promise.all(localProviders.map((provider) => probeSafely(provider.baseUrl, provider.modelId)))
+    // every server is probed at the same time: one slow server does not delay the others; with AI off (or settings
+    // that could not be read) none is probed: the next load with settings does
+    const probes = isAiOff(nextSettings)
+      ? localProviders.map(() => null)
+      : await Promise.all(
+          localProviders.map((provider) =>
+            // an invalid address is never called
+            provider.addressInvalid ? null : probeSafely(provider.baseUrl, provider.modelId)
+          )
+        )
     // a newer run started meanwhile: wait for its result; after a reset or a user change nothing is returned
     if (current !== sequence) return newerRun(userUuid)
     settings = nextSettings
     capabilities = buildCapabilities({ settings: nextSettings, localProviders, probes })
     loadedFor = userUuid
+    complete = nextSettings !== null
     emit()
     return capabilities
   }
@@ -287,7 +314,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     getLoadedFor: () => loadedFor,
     load: ({ userUuid }) => {
       resetIfOtherUser(userUuid)
-      if (loadedFor === userUuid) return Promise.resolve(capabilities)
+      if (loadedFor === userUuid && complete) return Promise.resolve(capabilities)
       if (inflight && inflight.userUuid === userUuid) return inflight.promise
       return run({ userUuid, force: false })
     },

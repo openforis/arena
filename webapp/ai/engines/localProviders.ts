@@ -11,7 +11,7 @@ import {
   normalizeProviderName,
 } from '@common/ai/providerIds'
 
-import { withDefaultHttpScheme } from '@common/ai/localServerAddress'
+import { isPlainHttpBaseUrl, withDefaultHttpScheme } from '@common/ai/localServerAddress'
 
 import {
   getLocalServerSettingsKey,
@@ -23,7 +23,15 @@ import {
 } from './localServerSettings'
 import type { RemovableStorage, StorageLike } from './types'
 
-export type LocalProvider = { id: string; name: string; baseUrl: string; modelId: string | null }
+// addressInvalid: the stored address is not a plain http(s) URL (credentials, query or fragment): the entry is kept as
+// typed so the user sees it and fixes it, but it is never called
+export type LocalProvider = {
+  id: string
+  name: string
+  baseUrl: string
+  modelId: string | null
+  addressInvalid?: true
+}
 
 // none: nothing to convert (or only an old entry that was off, removed); failed: the old key stays, retried next load
 export type LocalConversionResult = { status: 'none' | 'converted' | 'failed'; defaultApplied: boolean }
@@ -36,37 +44,37 @@ export type LocalConversionResult = { status: 'none' | 'converted' | 'failed'; d
 export const getLocalProvidersKey = (userUuid: string): string => `arena.ai.localProviders.${userUuid}`
 
 /**
- * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, at most 2048 chars.
+ * Returns the base URL to store: trimmed, without trailing slashes, http(s) only, without credentials, query or
+ * fragment, at most 2048 chars.
  * @param {unknown} value - Raw value.
- * @returns {string|null} The URL, or null when it is not a valid http(s) URL.
+ * @returns {string|null} The URL, or null when it is not a plain http(s) URL.
  */
 export const normalizeLocalProviderBaseUrl = (value: unknown): string | null => {
   if (typeof value !== 'string') return null
   const trimmed = stripTrailingSlashes(value.trim())
   if (!trimmed || trimmed.length > MAX_BASE_URL_LENGTH) return null
-  try {
-    const { protocol } = new URL(trimmed)
-    return protocol === 'http:' || protocol === 'https:' ? trimmed : null
-  } catch {
-    return null
-  }
+  return isPlainHttpBaseUrl(trimmed) ? trimmed : null
 }
 
 /**
- * Returns the provider when the stored entry is valid.
+ * Returns the provider when the stored entry is valid. An entry whose address is text but not a plain http(s) URL is
+ * kept, flagged addressInvalid; an entry without an address text is dropped.
  * @param {unknown} input - Raw entry.
  * @returns {LocalProvider|null} The provider, or null.
  */
 const normalizeLocalProvider = (input: unknown): LocalProvider | null => {
   if (!input || typeof input !== 'object') return null
   const raw = input as Record<string, unknown>
+  if (!isLocalProviderId(raw.id)) return null
   const baseUrl = normalizeLocalProviderBaseUrl(raw.baseUrl)
-  if (!isLocalProviderId(raw.id) || !baseUrl) return null
+  const asTyped = typeof raw.baseUrl === 'string' ? stripTrailingSlashes(raw.baseUrl.trim()) : ''
+  if (!baseUrl && (!asTyped || asTyped.length > MAX_BASE_URL_LENGTH)) return null
   return {
     id: raw.id,
     name: normalizeProviderName(raw.name, LOCAL_PROVIDER_TYPE),
-    baseUrl,
+    baseUrl: baseUrl ?? asTyped,
     modelId: trimmedString(raw.modelId, MAX_MODEL_ID_LENGTH),
+    ...(baseUrl ? {} : { addressInvalid: true as const }),
   }
 }
 

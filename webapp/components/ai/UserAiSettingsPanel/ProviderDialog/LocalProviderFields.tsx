@@ -12,6 +12,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
 import { useT } from '../useT'
+import { LocalConsentRevoke } from './LocalConsentRevoke'
 
 /**
  * "Answered" pill with the data location, the context size and the no-model warning.
@@ -82,6 +83,10 @@ type Props = {
   test: LocalServerTestView | null
   testing: boolean
   canTest: boolean
+  // a typed address that is refused (credentials, query or fragment)
+  urlInvalid: boolean
+  // the saved address of the provider being edited (its local consent can be revoked); null when adding one
+  savedBaseUrl: string | null
   onBaseUrlChange: (baseUrl: string) => void
   onModelChange: (model: string) => void
   onTest: () => void
@@ -99,6 +104,8 @@ export const LocalProviderFields = ({
   test,
   testing,
   canTest,
+  urlInvalid,
+  savedBaseUrl,
   onBaseUrlChange,
   onModelChange,
   onTest,
@@ -124,6 +131,11 @@ export const LocalProviderFields = ({
           />
         </div>
       </FormItem>
+      {urlInvalid && (
+        <div className="provider-dialog__hint provider-dialog__hint--error" role="alert">
+          {t('aiEngine.localAddressInvalid')}
+        </div>
+      )}
       {/* always rendered, so a screen reader announces the result when it appears */}
       <div role="status" className="provider-dialog__live">
         <LocalTestResult view={test} />
@@ -145,6 +157,7 @@ export const LocalProviderFields = ({
         </select>
       </FormItem>
       <div className="provider-dialog__hint">{t('userAiSettings:localServer.help')}</div>
+      <LocalConsentRevoke baseUrl={savedBaseUrl} />
     </>
   )
 }

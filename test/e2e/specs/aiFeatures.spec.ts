@@ -132,7 +132,7 @@ test.describe('Survey AI policy (mock provider)', () => {
 
     test('survey design Off disables the expression AI', async ({ page, api, sampleSurvey }) => {
       // the survey is deleted at the end of the test: no need to restore the policy
-      await api.putSurveyAiPolicy(sampleSurvey.id, { schema: 'off', data: 'onDevice' })
+      await api.putSurveyAiPolicy(sampleSurvey.id, { schema: 'off', data: 'off' })
       const { validations } = TestId.nodeDefDetails
       const designer = new FormDesigner(page)
       await designer.goto()
@@ -174,12 +174,12 @@ test.describe('Survey AI policy (mock provider)', () => {
 // API only: runs without the mock provider too (the policy API works whether or not AI is enabled)
 test.describe('Survey AI policy (API)', () => {
   test('the policy survives a survey clone', async ({ api, survey }, testInfo) => {
-    await api.putSurveyAiPolicy(survey.id, { schema: 'off', data: 'cloud' })
+    await api.putSurveyAiPolicy(survey.id, { schema: 'cloud', data: 'cloud' })
     const name = generateSurveyName(testInfo.parallelIndex)
     const cloneId = await api.cloneSurvey({ cloneFrom: survey.id, name, label: `Clone ${name}` })
     try {
       const { policy } = await api.getSurveyAiPolicy(cloneId)
-      expect(policy).toEqual({ schema: 'off', data: 'cloud' })
+      expect(policy).toEqual({ schema: 'cloud', data: 'cloud' })
     } finally {
       await api.deleteSurveyIfExists(cloneId)
     }

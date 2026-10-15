@@ -1,6 +1,7 @@
 /**
  * fetch with the Arena bearer token (the AI gateway streams, so it can't go through axios), refreshing an
- * expired token once like the axios interceptor in appErrorsMiddleware does.
+ * expired token once like the axios interceptor in appErrorsMiddleware does. Concurrent refreshes are shared by
+ * the injected refreshAuthToken (the app's is single-flight, like the one the axios interceptor uses).
  */
 export type FetchLike = (url: string, init: RequestInit) => Promise<Response>
 
@@ -18,7 +19,7 @@ const withAuth = (init: RequestInit, token: string | null): RequestInit => {
  * @param {object} deps - Dependencies.
  * @param {FetchLike} deps.fetchImpl - Underlying fetch.
  * @param {Function} deps.getAuthToken - Returns the current token (or null).
- * @param {Function} deps.refreshAuthToken - Refreshes the token; resolves to the new token or null.
+ * @param {Function} deps.refreshAuthToken - Refreshes the token (sharing a refresh already in flight); resolves to the new token or null.
  * @returns {FetchLike} The authorized fetch.
  */
 export const createAuthorizedFetch = ({
@@ -30,23 +31,14 @@ export const createAuthorizedFetch = ({
   getAuthToken: () => string | null
   refreshAuthToken: () => Promise<string | null>
 }): FetchLike => {
-  let refreshing: Promise<string | null> | null = null
-
-  /** Starts a token refresh, or joins the one in flight. */
-  const refreshOnce = (): Promise<string | null> => {
-    refreshing ??= refreshAuthToken()
-      .catch(() => null)
-      .finally(() => {
-        refreshing = null
-      })
-    return refreshing
-  }
-
   return async (url, init) => {
     const response = await fetchImpl(url, withAuth(init, getAuthToken()))
     if (response.status !== UNAUTHORIZED) return response
-    const token = await refreshOnce()
+    const token = await refreshAuthToken().catch(() => null)
+    // the 401 is the answer when the token could not be refreshed: its body is for the caller
     if (!token) return response
+    // the retry replaces this response: release its body, an unread one keeps the connection busy
+    await response.body?.cancel().catch(() => undefined)
     return fetchImpl(url, withAuth(init, token))
   }
 }

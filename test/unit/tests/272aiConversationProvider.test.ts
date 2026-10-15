@@ -19,7 +19,7 @@ const createResolve = () => {
   /** Records the call and returns the engine's model. */
   const resolve = async (params: unknown) => {
     calls.push(params)
-    return { model: 'model', engine }
+    return { model: 'model', engine, policy: { schema: 'cloud', data: 'cloud' } as const }
   }
   return { calls, resolve }
 }
@@ -47,16 +47,14 @@ describe('conversation provider (272)', () => {
     expect(calls).toEqual([{ feature: 'assistantAnalysis', surveyId: 1, dataClass: 'data', providerId: 'acct:a1' }])
   })
 
-  test('a turn that offers data tools asks again with the same provider', async () => {
+  test('a turn that offers data tools declares data in the same call, for the same provider', async () => {
     const { calls, resolve } = createResolve()
     await resolveAssistantTurnModel({
       params: { feature: 'assistantAnalysis', surveyId: 1, dataClass: 'schema', providerId: 'local:l1' },
       getToolsForHosting: () => [{ dataClass: 'data' }],
       resolve,
     })
-    expect(calls.map((call) => [call.dataClass, call.providerId])).toEqual([
-      ['schema', 'local:l1'],
-      ['data', 'local:l1'],
-    ])
+    expect(calls.map((call) => [call.dataClass, call.providerId])).toEqual([['schema', 'local:l1']])
+    expect(calls[0].declareDataClass({ engine, policy: null })).toBe('data')
   })
 })

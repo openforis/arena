@@ -39,7 +39,6 @@ const localEntry = (id: string, name: string, baseUrl: string, hostingClass: AiH
 
 /** Builds a local server probe result. */
 const probe = (baseUrl: string, hostingClass: AiHostingClass): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass,
@@ -112,7 +111,13 @@ describe('isCapabilitiesLoadedForUser', () => {
   })
 })
 
-const REASONS: AiUnavailableReason[] = ['policyForbids', 'notAvailable', 'missingOnThisBrowser', 'notSetUp']
+const REASONS: AiUnavailableReason[] = [
+  'policyForbids',
+  'notAvailable',
+  'missingOnThisBrowser',
+  'notSetUp',
+  'invalidAddress',
+]
 
 describe('getAiEngineFeatureAvailability', () => {
   test('disabled when the feature is off, or while the policy is loading', () => {
@@ -187,6 +192,7 @@ describe('helpers', () => {
     expect(REASONS.map(getAiUnavailableReasonActions)).toEqual([
       ['changePolicy'],
       ['retry', 'openSettings'],
+      ['openSettings'],
       ['openSettings'],
       ['openSettings'],
     ])

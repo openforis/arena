@@ -52,7 +52,6 @@ const CAPABILITIES: AiCapabilities = {
   defaultProviderId: 'local:l1',
   local: {
     'local:l1': {
-      enabled: true,
       reachable: true,
       models: ['local-model'],
       hostingClass: 'onDevice',
@@ -83,7 +82,7 @@ describe('choose another provider (270)', () => {
       isInstanceEnabled: () => true,
       getSettings: () => ON_SETTINGS,
       loadCapabilities: async () => CAPABILITIES,
-      getEffectivePolicy: async () => CLOUD,
+      getEffectivePolicyFor: async () => CLOUD,
       storage,
       requestConsent: async () => answers.shift() ?? 'cancel',
       onConsentChange: () => {
@@ -108,7 +107,13 @@ describe('choose another provider (270)', () => {
 
   test('requests of one survey and server share one card, which has no "other engine" flag', async () => {
     const queue = createConsentRequestQueue()
-    const request = { surveyId: 1, baseUrl: LOCAL_URL, modelId: 'local-model', hostingClass: 'onDevice' as const }
+    const request = {
+      surveyId: 1,
+      baseUrl: LOCAL_URL,
+      modelId: 'local-model',
+      hostingClass: 'onDevice' as const,
+      dataClass: 'schema' as const,
+    }
     const first = queue.request(request)
     const second = queue.request({ ...request, modelId: 'another-model' })
     expect(queue.getPending()).toEqual({ id: 1, ...request })

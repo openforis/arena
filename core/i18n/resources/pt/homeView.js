@@ -198,9 +198,13 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
         cloud: 'Pode ser processado por um provedor de IA na nuvem.',
       },
       notAllowedOnInstance: 'Não permitido nesta instância do Arena: {{levels}}',
+      dataLimitedBySchema:
+        'Os dados dos registros não podem ser mais permissivos do que a estrutura do inventário. Indisponível: {{levels}}',
       onDeviceNote: 'Neste dispositivo: os usuários precisam de um servidor de IA local (por exemplo, LM Studio).',
       readOnly: 'Apenas os administradores do inventário podem alterar a política de IA.',
       saved: 'Política de IA salva',
+      savedDataLowered:
+        'Política de IA salva. Os dados dos registros também foram reduzidos: não podem ser mais permissivos do que a estrutura do inventário.',
       saveError: 'Não foi possível salvar a política de IA: {{message}}',
       loadError: 'Não foi possível carregar a política de IA',
     },

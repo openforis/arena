@@ -7,10 +7,9 @@ import {
   DEFAULT_LOCAL_CONTEXT_TOKENS,
   getLocalServerContextWindow,
 } from '@webapp/ai/engines/localServerProbe'
-import type { AiLocalServerCapability } from '@webapp/ai/engines/types'
+import type { AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass: 'onDevice',
@@ -18,6 +17,18 @@ const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalS
   baseUrl: 'http://localhost:1234/v1',
   modelId: 'local-model',
   error: null,
+  ...overrides,
+})
+
+const entry = (overrides: Partial<AiProviderEntry> = {}): AiProviderEntry => ({
+  id: 'local:l1',
+  kind: 'local',
+  type: 'local',
+  name: 'Local server',
+  model: 'local-model',
+  baseUrl: 'http://localhost:1234/v1',
+  hostingClass: 'onDevice',
+  status: 'ready',
   ...overrides,
 })
 
@@ -43,8 +54,13 @@ describe('local engine usage and context window (203)', () => {
     expect(getLocalServerContextWindow(32768)).toEqual({ tokens: 32768, assumed: false })
     expect(getLocalServerContextWindow(null)).toEqual({ tokens: 8192, assumed: true })
     expect(getLocalServerContextWindow(0)).toEqual({ tokens: 8192, assumed: true })
-    expect(getLocalServerEngineInfo(localServer())?.contextWindow).toEqual({ tokens: 4096, assumed: false })
-    expect(getLocalServerEngineInfo(localServer({ contextTokens: null }))?.contextWindow).toEqual({
+    expect(getLocalServerEngineInfo({ entry: entry(), capability: localServer() })?.contextWindow).toEqual({
+      tokens: 4096,
+      assumed: false,
+    })
+    expect(
+      getLocalServerEngineInfo({ entry: entry(), capability: localServer({ contextTokens: null }) })?.contextWindow
+    ).toEqual({
       tokens: 8192,
       assumed: true,
     })
@@ -52,9 +68,7 @@ describe('local engine usage and context window (203)', () => {
 
   test('the gateway has no known window', () => {
     const gateway = getGatewayEngineInfo({
-      hostingClass: 'cloud',
-      provider: 'openai',
-      model: 'gateway-model',
+      entry: entry({ id: 'acct:a1', kind: 'account', type: 'openai', name: 'My OpenAI', hostingClass: 'cloud' }),
       maxPromptChars: 100000,
     })
     expect(gateway).not.toBeNull()

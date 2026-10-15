@@ -1,3 +1,4 @@
+import type { AiPolicy } from '@common/ai/policy'
 import { resolveAssistantEngine } from '@webapp/ai/engines/assistantEngine'
 import type { AiSelectedEngine } from '@webapp/ai/engines/types'
 
@@ -25,7 +26,7 @@ const createResolve = (engine: AiSelectedEngine) => {
   /** Records the call and returns the engine's model. */
   const resolve = async (params: unknown) => {
     calls.push(params)
-    return { model: `model of ${engine.id}`, engine }
+    return { model: `model of ${engine.id}`, engine, policy: access.effective as AiPolicy }
   }
   return { calls, resolve }
 }

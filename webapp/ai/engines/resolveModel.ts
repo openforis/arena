@@ -4,9 +4,17 @@
  */
 import type { LanguageModel } from 'ai'
 
-import { type AiDataClass, type AiFeatureKey, getAiFeatureMinDataClass } from '@common/ai/features'
+import {
+  type AiDataClass,
+  type AiFeatureKey,
+  getAiDataClassLevel,
+  getAiFeatureMinDataClass,
+  getMaxAiDataClass,
+} from '@common/ai/features'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
+
+import { OFF_POLICY } from '@webapp/ai/policy/effectivePolicy'
 
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'
 import { createGatewayEngine, type GatewayModelFactory } from './gatewayEngine'
@@ -22,14 +30,15 @@ import type {
   StorageLike,
 } from './types'
 
-// nothing known (no survey for a survey feature, settings not loaded): nothing is allowed
-export const OFF_POLICY: AiPolicy = { schema: 'off', data: 'off' }
+export { OFF_POLICY }
 
+// dataClass: what the request sends; the user consents per class (record data covers the survey design too)
 export type LocalServerConsentRequest = {
   surveyId?: number
   baseUrl: string
   modelId: string | null
   hostingClass: AiHostingClass
+  dataClass: AiDataClass
 }
 
 // chooseOther: the user wants another provider; the request fails so the UI can offer the switcher or the settings
@@ -43,9 +52,13 @@ export type ResolveModelParams = {
   providerId?: string
   // aborting closes a pending consent dialog and rejects with an AbortError
   signal?: AbortSignal
+  // the class the turn needs once an engine is selected (a turn offered data tools declares data), given the engine
+  // and the policy it was selected with. Asked before any consent, so the user is asked once, for the final class.
+  declareDataClass?: (selected: { engine: AiSelectedEngine; policy: AiPolicy | null }) => AiDataClass
 }
 
-export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine }
+// policy: the effective policy the engine was selected with (the turn offers its tools by the same one)
+export type ResolvedModel = { model: LanguageModel; engine: AiSelectedEngine; policy: AiPolicy }
 
 export type ModelResolverDeps = {
   getUserUuid: () => string | null
@@ -54,12 +67,13 @@ export type ModelResolverDeps = {
   // the AI settings of the loaded capabilities (null: not loaded or failed to load)
   getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
-  // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed
-  getEffectivePolicy: (
-    surveyId: number | undefined,
-    capabilities: AiCapabilities,
+  // getEffectivePolicyFor: survey policy within the ceilings (the ceilings alone for features without a survey);
+  // null fails closed. fresh: read from the server now, not from the cache
+  getEffectivePolicyFor: (params: {
     feature: AiFeatureKey
-  ) => Promise<AiPolicy | null>
+    surveyId: number | undefined
+    fresh?: boolean
+  }) => Promise<AiPolicy | null>
   storage: StorageLike | null
   requestConsent: (request: LocalServerConsentRequest, signal?: AbortSignal) => Promise<LocalServerConsentAnswer>
   onConsentChange: () => void
@@ -72,7 +86,10 @@ type Context = {
   signal?: AbortSignal
   options: AiEngineModelOptions
   capabilities: AiCapabilities
+  declareDataClass?: ResolveModelParams['declareDataClass']
 }
+
+type SelectedForTurn = { engine: AiSelectedEngine; dataClass: AiDataClass }
 
 /**
  * Builds the error for a closed or unusable consent card.
@@ -113,6 +130,38 @@ const assertSelected = (selection: AiEngineSelection, dataClass: AiDataClass): A
 }
 
 /**
+ * Selects the engine for the request's class, then again for the class the turn declares for that engine (data when it
+ * is offered data tools). Nothing is asked or created here.
+ * @param {object} params - Parameters.
+ * @param {AiPolicy|null} params.effective - Effective policy.
+ * @param {AiCapabilities} params.capabilities - Capabilities.
+ * @param {string} [params.providerId] - Requested provider.
+ * @param {AiDataClass} params.dataClass - Class of the request.
+ * @param {Function} [params.declare] - The turn's declaration.
+ * @returns {SelectedForTurn} The engine and the final class.
+ * @throws {SystemError} aiNoEngineAvailable when no engine may receive the class.
+ */
+const selectForTurn = ({
+  effective,
+  capabilities,
+  providerId,
+  dataClass,
+  declare,
+}: {
+  effective: AiPolicy | null
+  capabilities: AiCapabilities
+  providerId?: string
+  dataClass: AiDataClass
+  declare?: ResolveModelParams['declareDataClass']
+}): SelectedForTurn => {
+  const select = (candidate: AiDataClass) =>
+    assertSelected(selectEngine({ effective, dataClass: candidate, capabilities, providerId }), candidate)
+  const first = select(dataClass)
+  const declared = declare ? getMaxAiDataClass(dataClass, declare({ engine: first, policy: effective })) : dataClass
+  return declared === dataClass ? { engine: first, dataClass } : { engine: select(declared), dataClass: declared }
+}
+
+/**
  * Returns the probe-based capability of the selected local provider.
  * @param {Context} context - Request context.
  * @param {AiSelectedEngine} engine - The selected local engine.
@@ -134,24 +183,26 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * Returns the consent storage parameters of the request (the local provider's normalized base URL).
    * @param {Context} context - Request context.
    * @param {AiLocalServerCapability} capability - The local provider's capability.
-   * @returns {object} Storage, user, survey and base URL.
+   * @returns {object} Storage, user, survey, base URL and data class.
    */
   const consentParams = (context: Context, capability: AiLocalServerCapability) => ({
     storage: deps.storage,
     userUuid: context.userUuid,
     surveyId: context.options.surveyId,
     baseUrl: capability.baseUrl ?? '',
+    dataClass: context.options.dataClass,
   })
 
   /**
    * Creates the model with the gateway engine of the provider.
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected gateway engine.
-   * @returns {ResolvedModel} The model and the engine.
+   * @param {AiPolicy} policy - The effective policy the engine was selected with.
+   * @returns {ResolvedModel} The model, the engine and the policy.
    */
-  const createWithGateway = (context: Context, engine: AiSelectedEngine): ResolvedModel => {
+  const createWithGateway = (context: Context, engine: AiSelectedEngine, policy: AiPolicy): ResolvedModel => {
     const gatewayEngine = createGatewayEngine({ engine, createGatewayModel: deps.createGatewayModel })
-    return { model: gatewayEngine.createModel(context.options), engine }
+    return { model: gatewayEngine.createModel(context.options), engine, policy }
   }
 
   /**
@@ -159,15 +210,17 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @param {AiLocalServerCapability} capability - Its capability.
-   * @returns {Promise<ResolvedModel>} The model and the engine.
+   * @param {AiPolicy} policy - The effective policy the engine was selected with.
+   * @returns {Promise<ResolvedModel>} The model, the engine and the policy.
    */
   const createWithLocal = async (
     context: Context,
     engine: AiSelectedEngine,
-    capability: AiLocalServerCapability
+    capability: AiLocalServerCapability,
+    policy: AiPolicy
   ): Promise<ResolvedModel> => {
     const localEngine = await deps.createLocalEngine(capability)
-    return { model: localEngine.createModel(context.options), engine }
+    return { model: localEngine.createModel(context.options), engine, policy }
   }
 
   /**
@@ -175,20 +228,21 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @param {AiLocalServerCapability} capability - Its capability.
-   * @returns {Promise<ResolvedModel>} The model and the engine.
+   * @returns {Promise<void>} Resolves on Continue.
    * @throws {SystemError} aiProviderChooseAnother for "Choose another provider", aiLocalServerConsentCancelled otherwise.
    */
   const askConsent = async (
     context: Context,
     engine: AiSelectedEngine,
     capability: AiLocalServerCapability
-  ): Promise<ResolvedModel> => {
+  ): Promise<void> => {
     const answer = await deps.requestConsent(
       {
         surveyId: context.options.surveyId,
         baseUrl: consentParams(context, capability).baseUrl,
         modelId: engine.model,
         hostingClass: engine.hostingClass,
+        dataClass: context.options.dataClass,
       },
       context.signal
     )
@@ -197,24 +251,70 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
     if (answer === 'chooseOther') throw chooseAnother()
     if (answer !== 'continue') throw consentCancelled()
-    saveLocalServerConsent({ ...consentParams(context, capability), decision: 'accepted' })
-    deps.onConsentChange()
-    return createWithLocal(context, engine, capability)
   }
 
   /**
-   * Creates the model of a local provider, asking first when this survey has no consent for its URL.
+   * Selects the engine again from fresh inputs, before the consent is asked and again right before a local model is
+   * created: the server never sees a local request, so this is the last policy check. The dialog may have been open
+   * for a long time, and the policy, the provider settings or the user may have changed meanwhile. The turn's class
+   * is declared from this fresh policy.
+   * @param {Context} context - Request context (the request's own class, before the turn declared any).
+   * @param {AiSelectedEngine} engine - The local engine the request (and the consent) is about.
+   * @param {AiLocalServerCapability} capability - Its capability when it was selected.
+   * @returns {Promise<{engine: AiSelectedEngine, capability: AiLocalServerCapability, policy: AiPolicy, dataClass: AiDataClass}>} What to create the model from.
+   * @throws {SystemError} aiNoEngineAvailable when the policy or the provider no longer allows it,
+   * aiLocalServerConsentCancelled when the provider is no longer the one that was confirmed.
+   */
+  const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
+    const { options } = context
+    const capabilities = await deps.loadCapabilities()
+    const policy = await deps.getEffectivePolicyFor({
+      feature: options.feature,
+      surveyId: options.surveyId,
+      fresh: true,
+    })
+    if (context.signal?.aborted) throw aborted()
+    if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
+    const selected = selectForTurn({
+      effective: policy,
+      capabilities,
+      providerId: engine.providerId,
+      dataClass: options.dataClass,
+      declare: context.declareDataClass,
+    })
+    const current = selected.engine.providerId ? capabilities.local[selected.engine.providerId] : undefined
+    const same =
+      selected.engine.id === 'localServer' &&
+      selected.engine.providerId === engine.providerId &&
+      selected.engine.hostingClass === engine.hostingClass &&
+      current?.baseUrl === capability.baseUrl
+    if (!same || !current) throw consentCancelled()
+    // selectEngine selected an engine, so the policy is not null
+    return { ...selected, capability: current, policy: policy ?? OFF_POLICY }
+  }
+
+  /**
+   * Creates the model of a local provider: checks the policy and declares the turn's class, asks when this survey has
+   * no consent for its URL at that class, then checks again (a local request is never checked by the server).
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
-   * @returns {Promise<ResolvedModel>} The model and the engine.
+   * @returns {Promise<ResolvedModel>} The model, the engine and the policy.
    */
-  const resolveLocal = (context: Context, engine: AiSelectedEngine): Promise<ResolvedModel> => {
+  const resolveLocal = async (context: Context, engine: AiSelectedEngine): Promise<ResolvedModel> => {
     const capability = getLocalCapability(context, engine)
+    let checked = await recheckLocal(context, engine, capability)
+    const turn: Context = { ...context, options: { ...context.options, dataClass: checked.dataClass } }
     // a decline stored by the older dialog counts as not asked: there is no other provider to fall back to
-    const consent = loadLocalServerConsent(consentParams(context, capability))
-    return consent === 'accepted'
-      ? createWithLocal(context, engine, capability)
-      : askConsent(context, engine, capability)
+    const consented = loadLocalServerConsent(consentParams(turn, checked.capability)) === 'accepted'
+    if (!consented) {
+      await askConsent(turn, checked.engine, checked.capability)
+      checked = await recheckLocal(context, checked.engine, checked.capability)
+      // the policy now asks for more than the user agreed to
+      if (getAiDataClassLevel(checked.dataClass) > getAiDataClassLevel(turn.options.dataClass)) throw consentCancelled()
+      saveLocalServerConsent({ ...consentParams(turn, checked.capability), decision: 'accepted' })
+      deps.onConsentChange()
+    }
+    return createWithLocal(turn, checked.engine, checked.capability, checked.policy)
   }
 
   /**
@@ -235,22 +335,43 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {ResolveModelParams} params - Feature, survey, optional data class, provider and abort signal.
    * @returns {Promise<ResolvedModel>} The model and the engine.
    */
-  return async ({ feature, surveyId, dataClass, providerId, signal }: ResolveModelParams): Promise<ResolvedModel> => {
+  return async ({
+    feature,
+    surveyId,
+    dataClass,
+    providerId,
+    signal,
+    declareDataClass,
+  }: ResolveModelParams): Promise<ResolvedModel> => {
     const userUuid = deps.getUserUuid()
-    // an unknown feature is treated as the most sensitive class (getAiFeatureMinDataClass)
+    // a caller can raise the class, never lower it below what the feature needs (an unknown feature needs the most
+    // sensitive class)
+    const minDataClass = getAiFeatureMinDataClass(feature)
     const options: AiEngineModelOptions = {
       feature,
-      dataClass: dataClass ?? getAiFeatureMinDataClass(feature),
+      dataClass: getMaxAiDataClass(minDataClass, dataClass ?? minDataClass),
       surveyId,
     }
     const capabilities = await deps.loadCapabilities()
     assertFeatureEnabled(feature)
-    const effective = await deps.getEffectivePolicy(surveyId, capabilities, feature)
+    const effective = await deps.getEffectivePolicyFor({ feature, surveyId })
     if (signal?.aborted) throw aborted()
-    const context: Context = { userUuid, signal, options, capabilities }
-    const selection = selectEngine({ effective, dataClass: options.dataClass, capabilities, providerId })
-    const engine = assertSelected(selection, options.dataClass)
-    return engine.id === 'gateway' ? createWithGateway(context, engine) : resolveLocal(context, engine)
+    const selected = selectForTurn({
+      effective,
+      capabilities,
+      providerId,
+      dataClass: options.dataClass,
+      declare: declareDataClass,
+    })
+    // the context keeps the request's own class: a local engine declares the turn's class again from a fresh policy
+    const context: Context = { userUuid, signal, options, capabilities, declareDataClass }
+    return selected.engine.id === 'gateway'
+      ? createWithGateway(
+          { ...context, options: { ...options, dataClass: selected.dataClass } },
+          selected.engine,
+          effective ?? OFF_POLICY
+        )
+      : resolveLocal(context, selected.engine)
   }
 }
 

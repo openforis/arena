@@ -208,7 +208,9 @@ describe('turn usage (204)', () => {
       limits: { maxPromptChars: 5000, maxSteps: 2 },
       contextWindow: { tokens: 8192, assumed: true },
     }
-    const result = await run({ extra: { resolve: async () => ({ model, engine }) } })
+    const result = await run({
+      extra: { resolve: async () => ({ model, engine, policy: { schema: 'onDevice', data: 'onDevice' } as const }) },
+    })
     expect(answerOf(result).usage).toEqual({
       contextTokens: 1024,
       windowTokens: 8192,
