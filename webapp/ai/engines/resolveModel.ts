@@ -4,7 +4,7 @@
  */
 import type { LanguageModel } from 'ai'
 
-import { type AiDataClass, type AiFeatureKey, getAiFeatureMinDataClass } from '@common/ai/features'
+import { type AiDataClass, type AiFeatureKey, getAiFeatureMinDataClass, getMaxAiDataClass } from '@common/ai/features'
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
 import SystemError, { StatusCodes } from '@core/systemError'
 
@@ -54,12 +54,14 @@ export type ModelResolverDeps = {
   // the AI settings of the loaded capabilities (null: not loaded or failed to load)
   getSettings: () => AiFeatureSwitches | null
   loadCapabilities: () => Promise<AiCapabilities>
-  // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed
-  getEffectivePolicy: (
-    surveyId: number | undefined,
-    capabilities: AiCapabilities,
+  // survey policy within the ceilings (the ceilings alone for features without a survey); null fails closed.
+  // fresh: read from the server now, not from the cache
+  getEffectivePolicy: (params: {
+    surveyId: number | undefined
+    capabilities: AiCapabilities
     feature: AiFeatureKey
-  ) => Promise<AiPolicy | null>
+    fresh?: boolean
+  }) => Promise<AiPolicy | null>
   storage: StorageLike | null
   requestConsent: (request: LocalServerConsentRequest, signal?: AbortSignal) => Promise<LocalServerConsentAnswer>
   onConsentChange: () => void
@@ -175,14 +177,14 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @param {AiLocalServerCapability} capability - Its capability.
-   * @returns {Promise<ResolvedModel>} The model and the engine.
+   * @returns {Promise<void>} Resolves on Continue.
    * @throws {SystemError} aiProviderChooseAnother for "Choose another provider", aiLocalServerConsentCancelled otherwise.
    */
   const askConsent = async (
     context: Context,
     engine: AiSelectedEngine,
     capability: AiLocalServerCapability
-  ): Promise<ResolvedModel> => {
+  ): Promise<void> => {
     const answer = await deps.requestConsent(
       {
         surveyId: context.options.surveyId,
@@ -197,24 +199,62 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
     if (answer === 'chooseOther') throw chooseAnother()
     if (answer !== 'continue') throw consentCancelled()
-    saveLocalServerConsent({ ...consentParams(context, capability), decision: 'accepted' })
-    deps.onConsentChange()
-    return createWithLocal(context, engine, capability)
   }
 
   /**
-   * Creates the model of a local provider, asking first when this survey has no consent for its URL.
+   * Selects the engine again from fresh inputs, right before a local model is created: the server never sees a
+   * local request, so this is the last policy check. The dialog may have been open for a long time, and the policy,
+   * the provider settings or the user may have changed meanwhile.
+   * @param {Context} context - Request context.
+   * @param {AiSelectedEngine} engine - The local engine the request (and the consent) is about.
+   * @param {AiLocalServerCapability} capability - Its capability when it was selected.
+   * @returns {Promise<{engine: AiSelectedEngine, capability: AiLocalServerCapability, policy: AiPolicy|null}>} What to create the model from.
+   * @throws {SystemError} aiNoEngineAvailable when the policy or the provider no longer allows it,
+   * aiLocalServerConsentCancelled when the provider is no longer the one that was confirmed.
+   */
+  const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
+    const { options } = context
+    const capabilities = await deps.loadCapabilities()
+    const policy = await deps.getEffectivePolicy({
+      surveyId: options.surveyId,
+      capabilities,
+      feature: options.feature,
+      fresh: true,
+    })
+    if (context.signal?.aborted) throw aborted()
+    if (deps.getUserUuid() !== context.userUuid) throw consentCancelled()
+    const selected = assertSelected(
+      selectEngine({ effective: policy, dataClass: options.dataClass, capabilities, providerId: engine.providerId }),
+      options.dataClass
+    )
+    const current = selected.providerId ? capabilities.local[selected.providerId] : undefined
+    const same =
+      selected.id === 'localServer' &&
+      selected.providerId === engine.providerId &&
+      selected.hostingClass === engine.hostingClass &&
+      current?.baseUrl === capability.baseUrl
+    if (!same || !current) throw consentCancelled()
+    return { engine: selected, capability: current, policy }
+  }
+
+  /**
+   * Creates the model of a local provider: asks first when this survey has no consent for its URL, then checks the
+   * policy again (a local request is never checked by the server).
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected local engine.
    * @returns {Promise<ResolvedModel>} The model and the engine.
    */
-  const resolveLocal = (context: Context, engine: AiSelectedEngine): Promise<ResolvedModel> => {
+  const resolveLocal = async (context: Context, engine: AiSelectedEngine): Promise<ResolvedModel> => {
     const capability = getLocalCapability(context, engine)
     // a decline stored by the older dialog counts as not asked: there is no other provider to fall back to
-    const consent = loadLocalServerConsent(consentParams(context, capability))
-    return consent === 'accepted'
-      ? createWithLocal(context, engine, capability)
-      : askConsent(context, engine, capability)
+    const consented = loadLocalServerConsent(consentParams(context, capability)) === 'accepted'
+    if (!consented) await askConsent(context, engine, capability)
+    const checked = await recheckLocal(context, engine, capability)
+    if (!consented) {
+      saveLocalServerConsent({ ...consentParams(context, checked.capability), decision: 'accepted' })
+      deps.onConsentChange()
+    }
+    return createWithLocal(context, checked.engine, checked.capability)
   }
 
   /**
@@ -237,15 +277,17 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
    */
   return async ({ feature, surveyId, dataClass, providerId, signal }: ResolveModelParams): Promise<ResolvedModel> => {
     const userUuid = deps.getUserUuid()
-    // an unknown feature is treated as the most sensitive class (getAiFeatureMinDataClass)
+    // a caller can raise the class, never lower it below what the feature needs (an unknown feature needs the most
+    // sensitive class)
+    const minDataClass = getAiFeatureMinDataClass(feature)
     const options: AiEngineModelOptions = {
       feature,
-      dataClass: dataClass ?? getAiFeatureMinDataClass(feature),
+      dataClass: getMaxAiDataClass(minDataClass, dataClass ?? minDataClass),
       surveyId,
     }
     const capabilities = await deps.loadCapabilities()
     assertFeatureEnabled(feature)
-    const effective = await deps.getEffectivePolicy(surveyId, capabilities, feature)
+    const effective = await deps.getEffectivePolicy({ surveyId, capabilities, feature })
     if (signal?.aborted) throw aborted()
     const context: Context = { userUuid, signal, options, capabilities }
     const selection = selectEngine({ effective, dataClass: options.dataClass, capabilities, providerId })

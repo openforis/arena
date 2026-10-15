@@ -114,8 +114,9 @@ const setup = ({
     isInstanceEnabled: () => instanceEnabled,
     getSettings: () => settings,
     loadCapabilities: async () => capabilities({ defaultProviderId, baseUrl: state.baseUrl, localUp }),
-    getEffectivePolicy: async (surveyId) => {
-      state.policyCalls.push(surveyId)
+    getEffectivePolicy: async ({ surveyId, fresh }) => {
+      // the first read may come from the cache; the one before a local model is created never does
+      if (!fresh) state.policyCalls.push(surveyId)
       return state.policy
     },
     storage: withStorage ? storage : null,

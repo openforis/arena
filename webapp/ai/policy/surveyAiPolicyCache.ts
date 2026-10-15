@@ -15,7 +15,8 @@ export type SurveyAiPolicyCacheDeps = {
 }
 
 export type SurveyAiPolicyCache = {
-  get: (surveyId: number) => Promise<SurveyAiPolicyClientState>
+  // fresh: never from the cache (and never from a request that started before the call)
+  get: (surveyId: number, options?: { fresh?: boolean }) => Promise<SurveyAiPolicyClientState>
   peek: (surveyId: number) => SurveyAiPolicyClientState | null
   update: (surveyId: number, policy: AiPolicy) => Promise<SurveyAiPolicyClientState>
   invalidate: (surveyId: number) => Promise<SurveyAiPolicyClientState>
@@ -144,9 +145,22 @@ export const createSurveyAiPolicyCache = ({
     return request
   }
 
+  /**
+   * Drops the cached value and the request in flight, and starts a new request.
+   * @param {number} surveyId - Survey id.
+   * @param {Entry} entry - The survey entry.
+   * @returns {Promise<SurveyAiPolicyClientState>} The new request.
+   */
+  const refetch = (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
+    nextGeneration(entry)
+    entry.fresh = false
+    return startFetch(surveyId, entry)
+  }
+
   return {
-    get: async (surveyId) => {
+    get: async (surveyId, { fresh = false } = {}) => {
       const entry = getEntry(surveyId)
+      if (fresh) return refetch(surveyId, entry)
       if (isFresh(entry)) return entry.value as SurveyAiPolicyClientState
       return entry.inflight ?? startFetch(surveyId, entry)
     },
@@ -166,10 +180,7 @@ export const createSurveyAiPolicyCache = ({
       }
     },
     invalidate: (surveyId) => {
-      const entry = getEntry(surveyId)
-      nextGeneration(entry)
-      entry.fresh = false
-      const request = startFetch(surveyId, entry)
+      const request = refetch(surveyId, getEntry(surveyId))
       // callers that only want the refresh ignore the result: a failed refetch must not be an unhandled rejection
       request.catch(() => {})
       notify(surveyId)

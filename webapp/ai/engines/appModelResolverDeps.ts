@@ -24,9 +24,9 @@ export const appModelResolverDeps: ModelResolverDeps = {
   getSettings: () => getAiCapabilitiesStore().getSettings(),
   loadCapabilities: loadAiCapabilities,
   // like B: survey features use the survey's effective policy, the others (Help) the instance ceilings
-  getEffectivePolicy: async (surveyId, capabilities, feature) => {
+  getEffectivePolicy: async ({ surveyId, capabilities, feature, fresh }) => {
     if (!isSurveyScopedFeature(feature)) return capabilities.instance.policyCeilings ?? OFF_POLICY
-    return surveyId ? (await fetchSurveyAiPolicy(surveyId)).effective : OFF_POLICY
+    return surveyId ? (await fetchSurveyAiPolicy(surveyId, { fresh })).effective : OFF_POLICY
   },
   storage: getBrowserStorage(),
   requestConsent: requestLocalServerConsent,
