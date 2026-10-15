@@ -8,6 +8,7 @@ import { getDefaultProviderName, LOCAL_PROVIDER_TYPE } from '@common/ai/provider
 
 import type { AiPublicProvider } from '@webapp/ai/engines/providerEntries'
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
+import { ORG_SERVER_NAME } from '@webapp/ai/providers/providerNames'
 
 // placeholders by stored provider type
 export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
@@ -50,8 +51,6 @@ export type SavedProvider = {
   hasApiKey: boolean
   apiKeyReadable: boolean
 }
-
-export const ORG_SERVER_NAME = 'Organisation server'
 
 /**
  * Returns a type spec.
@@ -214,7 +213,7 @@ export const toSavedProvider = ({
 
 /**
  * Returns the name a provider of the type gets when none is typed: this is what is stored (English), and a name equal
- * to it is shown translated (see providerNames).
+ * to it is shown translated (see webapp/ai/providers/providerNames).
  * @param {ProviderTypeSpec} spec - Type spec.
  * @returns {string} The default name.
  */

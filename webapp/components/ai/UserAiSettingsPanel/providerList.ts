@@ -3,9 +3,9 @@
  */
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { AiProviderEntry, AiProviderStatus } from '@webapp/ai/engines/types'
+import { getProviderNameText } from '@webapp/ai/providers/providerNames'
 
 import type { AiSettings, TFunction } from './aiSettingsForm'
-import { getProviderNameText } from './providerNames'
 import type { ProviderDialogContext } from './ProviderDialog/providerDialogState'
 import type { StatusPillTone } from './StatusPill'
 
