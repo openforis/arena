@@ -102,6 +102,14 @@ const isToolPartOf = (part: unknown, type: string): part is Record<string, any> 
   typeof part.toolName === 'string' &&
   TOOL_NAME_PATTERN.test(part.toolName)
 
+// What the prompt may contain: tool calls and results only for tool features, and only of the allowed tool names
+type PromptRules = { allowTools: boolean; allowedToolNames?: readonly string[] }
+
+// A request cannot carry the calls or results of a tool the feature does not offer.
+const assertToolNameAllowed = (toolName: string, { allowedToolNames }: PromptRules): void => {
+  if (allowedToolNames && !allowedToolNames.includes(toolName)) throw invalid('prompt.toolName')
+}
+
 // Rebuilds a tool result output from the known keys of its type; null when the output is not supported.
 const rebuildToolOutput = (output: unknown): Record<string, any> | null => {
   if (!isObject(output)) return null
@@ -114,34 +122,36 @@ const rebuildToolOutput = (output: unknown): Record<string, any> | null => {
 
 // Rebuilds each part from the known keys of its type (providerOptions and any other key are dropped);
 // null when the part is not allowed in a message of this role.
-const rebuildPart = (part: unknown, role: string, allowTools: boolean): Record<string, any> | null => {
+const rebuildPart = (part: unknown, role: string, rules: PromptRules): Record<string, any> | null => {
   if (isTextPart(part)) return role === 'tool' ? null : { type: 'text', text: part.text }
-  if (!allowTools || role === 'user') return null
+  if (!rules.allowTools || role === 'user') return null
   if (role === 'assistant') {
     if (isReasoningPart(part)) return { type: 'reasoning', text: part.text }
     if (isToolPartOf(part, 'tool-call')) {
+      assertToolNameAllowed(part.toolName, rules)
       return { type: 'tool-call', toolCallId: part.toolCallId, toolName: part.toolName, input: part.input }
     }
     return null
   }
   if (!isToolPartOf(part, 'tool-result')) return null
+  assertToolNameAllowed(part.toolName, rules)
   const output = rebuildToolOutput(part.output)
   return output && { type: 'tool-result', toolCallId: part.toolCallId, toolName: part.toolName, output }
 }
 
 // Rebuilds the message from { role, content } so that extra keys, e.g. providerOptions, are dropped.
 // System content is a string; user content text parts; assistant and tool content depend on allowTools.
-const rebuildMessage = (message: unknown, allowTools: boolean): any => {
+const rebuildMessage = (message: unknown, rules: PromptRules): any => {
   if (!isObject(message)) throw invalid('prompt')
   const { role, content } = message
   if (role === 'system') {
     if (typeof content !== 'string') throw invalid('prompt.system')
     return { role, content }
   }
-  const roleAllowed = role === 'user' || role === 'assistant' || (role === 'tool' && allowTools)
+  const roleAllowed = role === 'user' || role === 'assistant' || (role === 'tool' && rules.allowTools)
   if (!roleAllowed) throw invalid('prompt.role')
   if (!Array.isArray(content)) throw invalid('prompt.content')
-  const parts = content.map((part) => rebuildPart(part, role, allowTools))
+  const parts = content.map((part) => rebuildPart(part, role, rules))
   if (!parts.every(Boolean)) throw invalid('prompt.content')
   return { role, content: parts }
 }
@@ -168,10 +178,10 @@ export const getCallSize = (call: AiGatewayCall): number =>
 
 const sanitizePrompt = (
   prompt: unknown,
-  { maxPromptChars, allowTools, extraSize }: { maxPromptChars: number; allowTools: boolean; extraSize: number }
+  { maxPromptChars, extraSize, ...rules }: PromptRules & { maxPromptChars: number; extraSize: number }
 ): AiGatewayCall['prompt'] => {
   if (!Array.isArray(prompt) || prompt.length === 0) throw invalid('prompt')
-  const rebuilt = prompt.map((message) => rebuildMessage(message, allowTools))
+  const rebuilt = prompt.map((message) => rebuildMessage(message, rules))
   const size = rebuilt.reduce((total, message) => total + messageSize(message), extraSize)
   if (size > maxPromptChars) {
     throw new SystemError('aiPromptTooLarge', { size, limit: maxPromptChars }, PAYLOAD_TOO_LARGE)
@@ -262,7 +272,12 @@ export const sanitizeCall = (
   const tools = pickTools(call.tools, { allowTools, allowedToolNames })
   const toolChoice = pickToolChoice(call.toolChoice, tools)
   const sanitized: AiGatewayCall = {
-    prompt: sanitizePrompt(call.prompt, { maxPromptChars, allowTools, extraSize: tools ? jsonSize(tools) : 0 }),
+    prompt: sanitizePrompt(call.prompt, {
+      maxPromptChars,
+      allowTools,
+      allowedToolNames,
+      extraSize: tools ? jsonSize(tools) : 0,
+    }),
     ...pickNumericOptions(call),
     maxOutputTokens: capOutputTokens(call.maxOutputTokens, maxOutputTokens),
   }

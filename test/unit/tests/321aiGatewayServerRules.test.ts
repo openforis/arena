@@ -210,6 +210,44 @@ describe('gateway server rules: tool allowlist (321)', () => {
     expect(error.params).toEqual({ reason: 'tools.name' })
   })
 
+  test('the allowlist also covers the tool calls and results already in the prompt', async () => {
+    const options = { ...limits, allowTools: true, allowedToolNames: ['docs_search'] }
+    expect(
+      sanitizeCall({ prompt: toolResultTurn('docs_search'), tools: [tool('docs_search')] }, options).prompt
+    ).toHaveLength(3)
+    const error = await expectSystemErrorKey(
+      () => sanitizeCall({ prompt: toolResultTurn('records_getValues'), tools: [tool('docs_search')] }, options),
+      'aiCallInvalid'
+    )
+    expect(error.params).toEqual({ reason: 'prompt.toolName' })
+    // a result alone, as well as a call alone
+    await expectSystemErrorKey(
+      () => sanitizeCall({ prompt: toolResultTurn('records_getValues').slice(0, 2) }, options),
+      'aiCallInvalid'
+    )
+    await expectSystemErrorKey(
+      () => sanitizeCall({ prompt: [toolResultTurn('records_getValues')[2]].concat(prompt as any) }, options),
+      'aiCallInvalid'
+    )
+  })
+
+  test('the gateway refuses a Help request that carries the result of a tool outside the allowlist', async () => {
+    const model = generateModel()
+    const { deps } = createDeps(model)
+    const res = await run(
+      {
+        feature: 'chatbot',
+        dataClass: 'schema',
+        stream: false,
+        call: { prompt: toolResultTurn('records_getValues'), tools: [tool('docs_search')] },
+      },
+      deps
+    )
+    expect(res.statusCode).toBe(400)
+    expect(res.body).toMatchObject({ key: 'aiCallInvalid', params: { reason: 'prompt.toolName' } })
+    expect(model.doGenerateCalls).toHaveLength(0)
+  })
+
   test('without an allowlist any valid tool name passes (assistant areas)', () => {
     const options = { ...limits, allowTools: true }
     expect(sanitizeCall({ prompt, tools: [tool('anything_goes')] }, options).tools).toHaveLength(1)
