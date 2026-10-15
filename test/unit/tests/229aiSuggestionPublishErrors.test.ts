@@ -5,9 +5,9 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { ValidationSeverity } from '@openforis/arena-core'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { publishErrorsDefinition } from '@webapp/ai/suggestions/definitions/publishErrors'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import {
   hasPublishErrors,
   publishErrorsDetector,

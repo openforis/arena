@@ -1,6 +1,6 @@
 /**
- * The visible suggestions (index contract): the open survey's and Help's, in available areas, with a definition; none
- * while the setting is off. Re-read on every store change (this tab or another) and when one expires.
+ * The visible suggestions (index contract): the open survey's and Help's, in available areas; none while the setting
+ * is off. Re-read on every store change (this tab or another) and when one expires.
  */
 import { useEffect, useMemo, useState } from 'react'
 
@@ -8,7 +8,6 @@ import * as User from '@core/user/user'
 
 import { AiFeatureCategory } from '@common/ai/features'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
 import { suggestionStore } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
@@ -21,7 +20,6 @@ import {
   getAvailableAreas,
   getNextExpiryDelay,
   groupSuggestionsByArea,
-  withDefinitions,
   type SuggestionsByArea,
 } from './suggestionsModel'
 
@@ -48,8 +46,7 @@ export const useVisibleSuggestions = (): { all: AssistantSuggestion[]; byArea: S
      * @returns {void}
      */
     const refresh = (): void => {
-      const visible = userUuid ? suggestionStore.getVisible({ userUuid, surveyId, cycle, availableAreas, enabled }) : []
-      const next = withDefinitions(visible, SUGGESTION_DEFINITIONS)
+      const next = userUuid ? suggestionStore.getVisible({ userUuid, surveyId, cycle, availableAreas, enabled }) : []
       setAll((prev) => (JSON.stringify(prev) === JSON.stringify(next) ? prev : next))
       if (timer) clearTimeout(timer)
       const delay = getNextExpiryDelay(next, new Date())

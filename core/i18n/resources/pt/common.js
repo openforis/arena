@@ -63,6 +63,8 @@ Deseja ignorá-las?`,
     emailSentConfirmation: `Um email para {{email}} foi enviado.
 
     Informe a pessoa para verificar também a pasta de Spam/Lixo eletrônico.`,
+    logoutServerNotReached:
+      'Não foi possível conectar ao servidor, então sua sessão no servidor pode continuar ativa. Em um computador compartilhado, feche o navegador.',
     emailSentToSelfConfirmation: `Você deve ter recebido um email em {{email}}.
 
   Verifique também a pasta de Spam/Lixo eletrônico.`,
@@ -1612,6 +1614,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     success_other: 'Traduzido para {{count}} idiomas. Revise e salve.',
     success: 'Traduzido. Revise e salve.',
     failed: 'Falha na tradução: {{message}}',
+    sourceChanged: 'O texto mudou durante a tradução, então a tradução não foi aplicada.',
   },
 
   aiActivityLog: {

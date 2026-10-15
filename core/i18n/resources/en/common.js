@@ -63,6 +63,8 @@ Do you want to ignore them?`,
     emailSentConfirmation: `An email to {{email}} has been sent.
 
     Please inform the person to check also the Spam/Junk mail folder.`,
+    logoutServerNotReached:
+      'The server could not be reached, so your session on the server may still be active. If this is a shared computer, close the browser.',
     emailSentToSelfConfirmation: `You should have received an email to {{email}}.
 
 Please check also the Spam/Junk mail folder.`,
@@ -1601,6 +1603,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     success: 'Translated. Review and save.',
 
     failed: 'Translation failed: {{message}}',
+    sourceChanged: 'The text changed while it was being translated, so the translation was not applied.',
   },
 
   aiActivityLog: {

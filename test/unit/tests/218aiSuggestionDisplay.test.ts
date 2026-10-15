@@ -1,8 +1,8 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import type { SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
-import { moduleIntroDefinition } from '@webapp/ai/suggestions/definitions/moduleIntro'
 import { buildModuleIntroSuggestion } from '@webapp/ai/suggestions/detectors/moduleIntro'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import type { AssistantAreaStatus } from '@webapp/components/ai/Assistant/assistantAreas'
 import {
@@ -12,7 +12,6 @@ import {
   getNextExpiryDelay,
   getSuggestionCardText,
   groupSuggestionsByArea,
-  withDefinitions,
 } from '@webapp/components/ai/Assistant/suggestions/suggestionsModel'
 import { TestId } from '@webapp/utils/testId'
 
@@ -40,9 +39,6 @@ const suggestionOf = (
   ...overrides,
 })
 
-// a test-local registry: "a kind without a definition" must not depend on the real registry growing
-const DEFINITIONS = { moduleIntro: moduleIntroDefinition }
-
 const intro = buildModuleIntroSuggestion('designer', NOW)
 
 describe('suggestion display (218)', () => {
@@ -56,10 +52,8 @@ describe('suggestion display (218)', () => {
     expect(getAvailableAreas(statuses)).toEqual(['analysis', 'help'])
   })
 
-  test('cards of a kind without a definition are not shown; the others are grouped by area, in order', () => {
+  test('suggestions are grouped by area, in order', () => {
     const design = suggestionOf('missingTranslations:x', 'design')
-    const visible = withDefinitions([design, intro], DEFINITIONS)
-    expect(visible).toEqual([intro])
     const second = { ...intro, id: 'moduleIntro:data', targets: [{ key: 'data' }] }
     expect(groupSuggestionsByArea([design, intro, second])).toEqual({ design: [design], help: [intro, second] })
     expect(groupSuggestionsByArea([])).toEqual({})
@@ -80,20 +74,21 @@ describe('suggestion display (218)', () => {
     expect(getAssistantButtonLabel({ count: 3, t })).toBe('AI assistant: 3 suggestions')
   })
 
-  test('card text: the definition key under aiSuggestions with its params; null when it cannot be described', async () => {
+  test('card text: the definition key under aiSuggestions with its params; null when its card throws', async () => {
     const i18n = await createI18nAsync('en')
     const describeContext: SuggestionDescribeContext = {
       survey: null,
       t: i18n.t.bind(i18n) as SuggestionDescribeContext['t'],
       lang: 'en',
     }
-    const params = { describeContext, definitions: DEFINITIONS }
+    const params = { describeContext, definitions: SUGGESTION_DEFINITIONS }
     expect(getSuggestionCardText({ ...params, suggestion: intro })).toBe(
       'New to the form designer? Ask me how it works.'
     )
-    expect(getSuggestionCardText({ ...params, suggestion: suggestionOf('missingTranslations:x', 'design') })).toBeNull()
     // a hand-edited module: its definition throws, the card is skipped instead of breaking the panel
-    expect(getSuggestionCardText({ ...params, suggestion: { ...intro, targets: [{ key: 'users' }] } })).toBeNull()
+    const log = jest.fn()
+    expect(getSuggestionCardText({ ...params, log, suggestion: { ...intro, targets: [{ key: 'users' }] } })).toBeNull()
+    expect(log).toHaveBeenCalledTimes(1)
   })
 
   test('the next expiry: the nearest future one, 0 once past, none without expiry or with an invalid date', () => {

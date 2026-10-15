@@ -2,6 +2,7 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
+import { purgeSurveyAiData } from '@webapp/ai/conversations/purgeSurveyAiData'
 
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
@@ -19,6 +20,10 @@ export const deleteSurvey = (navigate) => async (dispatch, getState) => {
   await axios.delete(`/api/survey/${surveyId}`)
 
   await dispatch({ type: surveyDelete, surveyInfo })
+
+  // the AI conversations and suggestions of a survey live in this browser only: they go with the survey. After the
+  // dispatch, the survey is closed and what ran on it (detectors, counts) has ended
+  await purgeSurveyAiData(surveyId)
 
   // Navigate to survey/template list
   const moduleDestination = Survey.isTemplate(surveyInfo) ? homeModules.templateList : homeModules.surveyList

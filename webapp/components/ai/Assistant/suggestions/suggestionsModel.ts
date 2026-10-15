@@ -1,6 +1,7 @@
 /**
- * Display rules of the suggestions: which areas count, which cards show, the assistant button label, the card text.
+ * Display rules of the suggestions: which areas count, how cards group, the assistant button label, the card text.
  */
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import type { SuggestionDefinitions } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
@@ -32,17 +33,6 @@ export const getStartScreenSuggestions = <T>(items: T[]): { shown: T[]; total: n
  */
 export const getAvailableAreas = (statuses: AssistantAreaStatus[]): AssistantArea[] =>
   statuses.filter((status) => status.status === 'available').map((status) => status.area)
-
-/**
- * Keeps the suggestions whose kind has a definition (the others have no card).
- * @param {AssistantSuggestion[]} suggestions - Visible suggestions.
- * @param {SuggestionDefinitions} definitions - Definitions.
- * @returns {AssistantSuggestion[]} The suggestions shown.
- */
-export const withDefinitions = (
-  suggestions: AssistantSuggestion[],
-  definitions: SuggestionDefinitions
-): AssistantSuggestion[] => suggestions.filter((suggestion) => definitions[suggestion.kind] !== undefined)
 
 /**
  * Groups suggestions by area, keeping their order.
@@ -77,29 +67,31 @@ export const getAssistantButtonLabel = ({ count, t }: { count: number; t: Sugges
   count > 0 ? t('aiSuggestions:buttonLabel', { count }) : t('aiAssistant.open')
 
 /**
- * Returns the text of a card, or null when the suggestion cannot be described (no definition, or its card throws).
+ * Returns the text of a card, or null when the suggestion cannot be described (its card throws).
  * @param {object} params - Parameters.
  * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
  * @param {SuggestionDefinitions} params.definitions - Definitions.
+ * @param {AiLog} [params.log] - Reports a card that could not be described.
  * @returns {string|null} The text.
  */
 export const getSuggestionCardText = ({
   suggestion,
   describeContext,
   definitions,
+  log = logAiWarning,
 }: {
   suggestion: AssistantSuggestion
   describeContext: SuggestionDescribeContext
   definitions: SuggestionDefinitions
+  log?: AiLog
 }): string | null => {
-  const definition = definitions[suggestion.kind]
-  if (!definition) return null
   try {
-    const { key, params } = definition.card(suggestion, describeContext)
+    const { key, params } = definitions[suggestion.kind].card(suggestion, describeContext)
     return describeContext.t(`aiSuggestions:${key}`, params)
-  } catch {
+  } catch (error) {
     // a broken suggestion never breaks the panel
+    log(`The card of the ${suggestion.kind} suggestion could not be described`, error)
     return null
   }
 }

@@ -59,14 +59,21 @@ describe('suggestion state rules (210)', () => {
       JSON.stringify({
         pending: { 1: [suggestion(), { id: 3 }], 2: 'x', 3: [] },
         dismissed: { 1: { 'missingTranslations:fr': { 'a:labels': true, 'b:labels': 'no' } }, 2: {} },
-        inProgress: { 1: { x: { conversationId: 'c1', targets: [{ key: 'a' }, { nokey: 1 }] }, y: { targets: [] } } },
+        inProgress: {
+          1: {
+            'missingTranslations:fr': { conversationId: 'c1', targets: [{ key: 'a' }, { nokey: 1 }] },
+            'missingTranslations:es': { targets: [] },
+          },
+        },
         seenModules: ['designer', 4, 'designer'],
       })
     )
     expect(parsed).toEqual({
       pending: { 1: [suggestion()] },
-      dismissed: { 1: { 'missingTranslations:fr': { 'a:labels': true } } },
-      inProgress: { 1: { x: { conversationId: 'c1', targets: [{ key: 'a' }] } } },
+      dismissed: { 1: { 'missingTranslations:fr': { kind: 'missingTranslations', targets: { 'a:labels': true } } } },
+      inProgress: {
+        1: { 'missingTranslations:fr': { kind: 'missingTranslations', conversationId: 'c1', targets: [{ key: 'a' }] } },
+      },
       seenModules: ['designer'],
     })
   })
@@ -120,7 +127,10 @@ describe('suggestion state rules (210)', () => {
       ],
     })
     expect(state.inProgress['1']['missingTranslations:fr'].targets).toEqual([{ key: 'b:labels' }])
-    expect(state.dismissed['1']['missingTranslations:es']).toEqual({ y: true })
+    expect(state.dismissed['1']['missingTranslations:es']).toEqual({
+      kind: 'missingTranslations',
+      targets: { y: true },
+    })
     state = withKind(state, { bucket: '1', kind: 'missingTranslations', suggestions: [] })
     expect(state).toEqual(emptySuggestionState())
   })
@@ -155,7 +165,7 @@ describe('suggestion state rules (210)', () => {
   test('a dismissed counted target shows again only when it grew by the step (validation errors: 20)', () => {
     let state = withPending(counted(30))
     state = withDismissed(state, { bucket: '1', id: 'validationErrors:0' })
-    expect(state.dismissed['1']['validationErrors:0']).toEqual({ 0: 30 })
+    expect(state.dismissed['1']['validationErrors:0']).toEqual({ kind: 'validationErrors', targets: { 0: 30 } })
     expect(keysOf(withAdded(state, counted(29)))).toEqual([])
     expect(keysOf(withAdded(state, counted(49)))).toEqual([])
     expect(keysOf(withAdded(state, counted(50)))).toEqual([['validationErrors:0', ['0']]])
@@ -199,7 +209,10 @@ describe('suggestion state rules (210)', () => {
     const fixed = withoutTargets(state, { bucket: '1', id: 'missingTranslations:fr', targetKeys: ['a:labels'] })
     const settled = withSettled(fixed, { conversationId: 'c1', outcome: 'settled' })
     expect(settled.inProgress).toEqual({})
-    expect(settled.dismissed['1']['missingTranslations:fr']).toEqual({ 'b:labels': true })
+    expect(settled.dismissed['1']['missingTranslations:fr']).toEqual({
+      kind: 'missingTranslations',
+      targets: { 'b:labels': true },
+    })
     expect(keysOf(withAdded(settled, suggestion()))).toEqual([['missingTranslations:fr', ['a:labels']]])
     expect(withSettled(state, { conversationId: 'other', outcome: 'settled' })).toEqual(state)
   })
@@ -211,6 +224,7 @@ describe('suggestion state rules (210)', () => {
     state = withAdded(state, suggestion({ targets: [{ key: 'b' }] }))
     state = withProgress(state, { bucket: '1', id: 'missingTranslations:fr', conversationId: 'c2' })
     expect(state.inProgress['1']['missingTranslations:fr']).toEqual({
+      kind: 'missingTranslations',
       conversationId: 'c2',
       targets: [{ key: 'a' }, { key: 'b' }],
     })

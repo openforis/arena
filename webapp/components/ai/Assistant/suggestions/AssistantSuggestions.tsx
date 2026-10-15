@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 
 import * as User from '@core/user/user'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { buildSuggestionRequest, dismissSuggestion } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 import { Button } from '@webapp/components/buttons'

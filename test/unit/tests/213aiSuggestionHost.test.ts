@@ -217,14 +217,17 @@ describe('suggestions host controller (213)', () => {
     }
     const { detector, seen } = recordingDetector()
     const resolver: TargetResolver = { kind: 'entityWithoutKey', isResolved: (key) => key === 'gone' }
+    const log = jest.fn()
     const controller = createSuggestionHostController({
       store,
       stateDetectors: [throwing, detector],
       eventDetectors: [],
       resolvers: [resolver],
+      log,
     })
     controller.update(inputOf())
     expect(seen).toEqual(['A'])
+    expect(log).toHaveBeenCalledWith('The attributeWithoutRef detector failed', expect.any(Error))
     const pending = store.getPending({ userUuid: 'u1', surveyId: 7 })
     expect(pending.find((item) => item.kind === 'entityWithoutKey')?.targets).toEqual([{ key: 'kept' }])
   })
@@ -263,11 +266,13 @@ describe('suggestions host controller (213)', () => {
         handled.push(event.type)
       },
     }
+    const log = jest.fn()
     const controller = createSuggestionHostController({
       store: newStore(),
       stateDetectors: [],
       eventDetectors: [rejecting, listening],
       resolvers: [],
+      log,
     })
     controller.update(inputOf())
     controller.event({ type: 'publishClicked' })
@@ -275,6 +280,7 @@ describe('suggestions host controller (213)', () => {
     controller.event({ type: 'designerLeft', newNodeDefUuids: ['x'] })
     controller.event({ type: 'surveyInfoSaved' })
     expect(handled).toEqual(['publishClicked', 'designerLeft'])
+    expect(log).toHaveBeenCalledWith('The publishErrors detector on publishClicked failed', expect.any(Error))
   })
 
   test('without a generation only the module event is handled at once (Help), and only when Help is available', () => {

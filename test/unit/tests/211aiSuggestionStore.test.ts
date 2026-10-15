@@ -6,6 +6,7 @@ import {
 } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
+const noLog = () => undefined
 const NOW = new Date('2026-10-11T12:00:00.000Z')
 const AREAS = ['design', 'analysis', 'cleaning', 'help'] as const
 
@@ -57,7 +58,7 @@ const createBrowser = () => {
         return () => listeners.splice(listeners.indexOf(entry), 1)
       },
     }
-    return createSuggestionStore({ access, now: () => NOW })
+    return createSuggestionStore({ access, now: () => NOW, log: noLog })
   }
   return { data, storage, tab }
 }
@@ -116,6 +117,7 @@ describe('suggestion store (211)', () => {
         throw new Error('SecurityError')
       }),
       now: () => NOW,
+      log: noLog,
     })
     store.add({ userUuid: 'u1', suggestion: suggestion() })
     expect(visible(store)).toHaveLength(1)
@@ -134,7 +136,7 @@ describe('suggestion store (211)', () => {
       },
       removeItem: (key: string) => data.delete(key),
     } as unknown as Storage
-    const store = createSuggestionStore({ access: memoryAccess(() => full), now: () => NOW })
+    const store = createSuggestionStore({ access: memoryAccess(() => full), now: () => NOW, log: noLog })
     store.add({ userUuid: 'u1', suggestion: suggestion() })
     store.dismiss({ userUuid: 'u1', surveyId: 1, id: 'missingTranslations:fr' })
     store.add({ userUuid: 'u1', suggestion: suggestion({ targets: [{ key: 'c:labels' }] }) })
@@ -154,7 +156,7 @@ describe('suggestion store (211)', () => {
       },
       removeItem: (k: string) => data.delete(k),
     } as unknown as Storage
-    const store = createSuggestionStore({ access: memoryAccess(() => full), now: () => NOW })
+    const store = createSuggestionStore({ access: memoryAccess(() => full), now: () => NOW, log: noLog })
     store.add({ userUuid: 'u1', suggestion: suggestion() })
     expect(data.has(key)).toBe(true)
     store.clearUser('u1')
@@ -163,7 +165,7 @@ describe('suggestion store (211)', () => {
   })
 
   test('no storage at all (getStorage returns null): memory', () => {
-    const store = createSuggestionStore({ access: memoryAccess(() => null), now: () => NOW })
+    const store = createSuggestionStore({ access: memoryAccess(() => null), now: () => NOW, log: noLog })
     store.add({ userUuid: 'u1', suggestion: suggestion() })
     expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toHaveLength(1)
   })
@@ -196,11 +198,16 @@ describe('suggestion store (211)', () => {
     expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toEqual([])
   })
 
-  test('an expired suggestion is hidden at the injected time', () => {
-    const { tab } = createBrowser()
-    const store = tab(1)
-    store.add({ userUuid: 'u1', suggestion: suggestion({ expiresAt: '2026-10-11T12:00:00.000Z' }) })
+  test('an expired suggestion is hidden at the injected time, and is removed by the next write', () => {
+    const { storage } = createBrowser()
+    let clock = NOW
+    const store = createSuggestionStore({ access: memoryAccess(() => storage), now: () => clock, log: noLog })
+    store.add({ userUuid: 'u1', suggestion: suggestion({ expiresAt: '2026-10-11T13:00:00.000Z' }) })
+    expect(visible(store)).toHaveLength(1)
+    clock = new Date('2026-10-11T14:00:00.000Z')
     expect(visible(store)).toEqual([])
     expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toHaveLength(1)
+    store.markModuleSeen({ userUuid: 'u1', module: 'designer' })
+    expect(store.getPending({ userUuid: 'u1', surveyId: 1 })).toEqual([])
   })
 })

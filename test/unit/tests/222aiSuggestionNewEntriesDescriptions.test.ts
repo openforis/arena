@@ -1,8 +1,8 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { newEntriesDescriptionsDefinition } from '@webapp/ai/suggestions/definitions/newEntriesDescriptions'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import {
   newEntriesDescriptionsDetector,
   newEntriesDescriptionsResolver,

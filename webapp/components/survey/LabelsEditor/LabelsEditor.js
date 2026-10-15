@@ -8,7 +8,7 @@ import classNames from 'classnames'
 import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyLangs, useSurveyPreferredLang, useSurveyId } from '@webapp/store/survey'
-import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
+import { useNotifyInfo, useNotifyError, useNotifyWarning } from '@webapp/components/hooks'
 
 import { Button } from '@webapp/components/buttons'
 import { Spinner } from '@webapp/components/Spinner'
@@ -20,6 +20,7 @@ import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocation
 
 import Label from './Label'
 import ButtonToggle from './ButtonToggle'
+import { mergeTranslatedLabels } from './mergeTranslatedLabels'
 
 const MAX_PREVIEW_LANGUAGES = 1
 
@@ -52,6 +53,7 @@ const LabelsEditor = (props) => {
   const surveyId = useSurveyId()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
+  const notifyWarning = useNotifyWarning()
   const [editingLabels, setEditingLabels] = useState(false)
   const [translating, setTranslating] = useState(false)
   // aborts an in-flight translation when the editor unmounts (its result would be applied to a closed editor)
@@ -67,6 +69,11 @@ const LabelsEditor = (props) => {
     () => (A.isEmpty(languagesFromProps) ? surveyLanguages : languagesFromProps),
     [languagesFromProps, surveyLanguages]
   )
+  // the translation merges into the labels and the handler as they are when the answer arrives, not at click time
+  const latestRef = useRef({ labels, onChange })
+  useEffect(() => {
+    latestRef.current = { labels, onChange }
+  })
   const preferredLanguage = useSurveyPreferredLang()
   const languagesSorted = sortLanguages({ languages, preferredLanguage })
 
@@ -94,23 +101,36 @@ const LabelsEditor = (props) => {
     if (!canTranslate || !isAiFeatureUsable(aiTranslation)) return
     const controller = new AbortController()
     translationAbortRef.current = controller
+    const sourceText = labels[populatedLang]
     setTranslating(true)
     try {
       const result = await AiWorkflows.translateLabels({
         surveyId,
         sourceLang: populatedLang,
         targetLangs: emptyLangs,
-        items: [{ id: 'label', text: labels[populatedLang], kind: 'nodeDefLabel' }],
+        items: [{ id: 'label', text: sourceText, kind: 'nodeDefLabel' }],
         signal: controller.signal,
       })
       if (controller.signal.aborted) return
-      const byLang = result.translations?.[0]?.byLang ?? {}
-      const merged = { ...labels }
-      for (const [lang, text] of Object.entries(byLang)) {
-        if (emptyLangs.includes(lang) && typeof text === 'string') merged[lang] = text
+      const current = latestRef.current
+      const {
+        labels: merged,
+        applied,
+        sourceChanged,
+      } = mergeTranslatedLabels({
+        labels: current.labels,
+        source: { lang: populatedLang, text: sourceText },
+        targetLangs: emptyLangs,
+        byLang: result.translations?.[0]?.byLang ?? {},
+      })
+      if (sourceChanged) {
+        // the translation is of a text that is no longer there
+        notifyWarning({ key: 'aiTranslation.sourceChanged' })
+        return
       }
-      onChange(merged)
-      notifyInfo({ key: 'aiTranslation.success', params: { count: Object.keys(byLang).length } })
+      if (applied.length === 0) return
+      current.onChange(merged)
+      notifyInfo({ key: 'aiTranslation.success', params: { count: applied.length } })
     } catch (error) {
       if (!controller.signal.aborted && !isAiAbortError(error)) {
         notifyError({ key: 'aiTranslation.failed', params: { message: getAiErrorMessage({ error, i18n }) } })
@@ -126,7 +146,7 @@ const LabelsEditor = (props) => {
     labels,
     notifyError,
     notifyInfo,
-    onChange,
+    notifyWarning,
     populatedLang,
     surveyId,
   ])

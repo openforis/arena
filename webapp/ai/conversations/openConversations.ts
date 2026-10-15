@@ -3,7 +3,13 @@
  * switches, reloads and logout. When the storage is blocked or full, the values live in memory for the session.
  * Stored as `{ "<surveyId|help>": { "<area>": "<conversationId>" } }` under `arena.ai.openConversations.<userUuid>`.
  */
-export type OpenConversationsStorage = Pick<Storage, 'getItem' | 'setItem' | 'removeItem'>
+import {
+  createResilientStorage,
+  getBrowserLocalStorage,
+  type ResilientStorageBackend,
+} from '@webapp/ai/storage/resilientStorage'
+
+export type OpenConversationsStorage = ResilientStorageBackend
 
 export type OpenConversationKey = { userUuid: string; surveyId: number | null; area: string }
 
@@ -12,6 +18,8 @@ export type OpenConversations = {
   // null removes the area's entry
   set: (params: OpenConversationKey & { conversationId: string | null }) => void
   clear: (userUuid: string) => void
+  // forgets the survey's entries of every user of this browser (the survey was deleted)
+  clearSurvey: (surveyId: number) => void
 }
 
 type OpenConversationsMap = Record<string, Record<string, string>>
@@ -105,91 +113,55 @@ const withEntry = (
  * Creates the open conversations store.
  * @param {object} params - Parameters.
  * @param {Function} params.getStorage - Returns the storage, or null when there is none (may throw when blocked).
+ * @param {Function} [params.log] - Reports what the storage wrapper recovered from.
  * @returns {OpenConversations} The store.
  */
 export const createOpenConversations = ({
   getStorage,
+  log,
 }: {
   getStorage: () => OpenConversationsStorage | null
+  log?: (message: string, error?: unknown) => void
 }): OpenConversations => {
-  const memory = new Map<string, string>()
-  // after a failed access the memory copy is the truth: the storage may still hold an older value
-  let blocked = false
+  const storage = createResilientStorage({ getStorage, log })
 
   /**
-   * Reads the raw value of a user.
+   * Writes the map of a user; an emptied map removes the key.
    * @param {string} key - Storage key.
-   * @returns {string|null} The JSON, or null.
-   */
-  const readRaw = (key: string): string | null => {
-    if (!blocked) {
-      try {
-        const storage = getStorage()
-        if (storage) return storage.getItem(key)
-      } catch {
-        blocked = true
-      }
-    }
-    return memory.get(key) ?? null
-  }
-
-  /**
-   * Writes the raw value of a user (memory always, the storage while it works).
-   * @param {string} key - Storage key.
-   * @param {string} value - JSON.
+   * @param {OpenConversationsMap} map - New map.
    * @returns {void}
    */
-  const writeRaw = (key: string, value: string): void => {
-    memory.set(key, value)
-    if (blocked) return
-    try {
-      const storage = getStorage()
-      if (storage) storage.setItem(key, value)
-      else blocked = true
-    } catch {
-      blocked = true
-    }
+  const writeMap = (key: string, map: OpenConversationsMap): void => {
+    if (Object.keys(map).length === 0) storage.remove(key)
+    else storage.write(key, JSON.stringify(map))
   }
 
   return {
     get: ({ userUuid, surveyId, area }) =>
-      parseOpenConversations(readRaw(getOpenConversationsKey(userUuid)))[toSurveyEntry(surveyId)]?.[area] ?? null,
+      parseOpenConversations(storage.read(getOpenConversationsKey(userUuid)))[toSurveyEntry(surveyId)]?.[area] ?? null,
     set: ({ userUuid, surveyId, area, conversationId }) => {
       const key = getOpenConversationsKey(userUuid)
-      const next = withEntry(parseOpenConversations(readRaw(key)), {
+      const next = withEntry(parseOpenConversations(storage.read(key)), {
         surveyEntry: toSurveyEntry(surveyId),
         area,
         conversationId,
       })
-      writeRaw(key, JSON.stringify(next))
+      storage.write(key, JSON.stringify(next))
     },
-    clear: (userUuid) => {
-      const key = getOpenConversationsKey(userUuid)
-      memory.delete(key)
-      if (blocked) return
-      try {
-        getStorage()?.removeItem(key)
-      } catch {
-        blocked = true
+    clear: (userUuid) => storage.remove(getOpenConversationsKey(userUuid)),
+    clearSurvey: (surveyId) => {
+      const surveyEntry = toSurveyEntry(surveyId)
+      for (const key of storage.keys(KEY_PREFIX)) {
+        const map = parseOpenConversations(storage.read(key))
+        if (map[surveyEntry]) writeMap(key, without(map, surveyEntry))
       }
     },
   }
 }
 
-/**
- * Returns the browser's localStorage, or null when it is not accessible.
- * @returns {OpenConversationsStorage|null} The storage.
- */
-const getLocalStorage = (): OpenConversationsStorage | null => {
-  try {
-    return globalThis.localStorage ?? null
-  } catch {
-    // accessing the property throws when storage is blocked
-    return null
-  }
-}
-
-export const browserOpenConversations: OpenConversations = createOpenConversations({ getStorage: getLocalStorage })
+export const browserOpenConversations: OpenConversations = createOpenConversations({
+  getStorage: getBrowserLocalStorage,
+})
 
 /**
  * Returns the open conversation of an area (browser storage).
@@ -205,10 +177,3 @@ export const getOpenConversationId = (key: OpenConversationKey): string | null =
  */
 export const setOpenConversationId = (params: OpenConversationKey & { conversationId: string | null }): void =>
   browserOpenConversations.set(params)
-
-/**
- * Forgets every open conversation of a user (browser storage).
- * @param {string} userUuid - User UUID.
- * @returns {void}
- */
-export const clearOpenConversations = (userUuid: string): void => browserOpenConversations.clear(userUuid)

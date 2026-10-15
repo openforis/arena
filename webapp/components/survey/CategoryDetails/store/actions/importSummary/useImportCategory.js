@@ -3,7 +3,6 @@ import { useDispatch } from 'react-redux'
 import axios from 'axios'
 
 import * as Category from '@core/survey/category'
-import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 
 import { JobActions } from '@webapp/store/app'
 import { SurveyActions, useSurveyId } from '@webapp/store/survey'
@@ -36,7 +35,6 @@ export const useImportCategory = ({ setState }) => {
             const categoryUpdated = jobCompleted.result.category
             refreshCategory({ category: categoryUpdated })
             dispatch(SurveyActions.surveyCategoryUpdated(categoryUpdated))
-            notifySuggestionEvent({ type: 'categoriesChanged' })
             dispatch(FileUploadDialogActions.close())
           },
         })

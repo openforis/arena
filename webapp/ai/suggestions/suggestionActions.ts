@@ -4,13 +4,15 @@
  */
 import { uuidv4 } from '@core/uuid'
 
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
-import { SUGGESTION_DEFINITIONS, type SuggestionDefinition, type SuggestionDescribeContext } from './definitions'
+import type { SuggestionDefinition, SuggestionDefinitions, SuggestionDescribeContext } from './definitions'
+import { SUGGESTION_DEFINITIONS } from './registry'
 import { suggestionStore, type SuggestionStore } from './suggestionStore'
-import type { AssistantSuggestion, SuggestionKind, SuggestionRequest, SuggestionScope } from './types'
+import type { AssistantSuggestion, SuggestionRequest, SuggestionScope } from './types'
 
-export type SuggestionDefinitions = Partial<Record<SuggestionKind, SuggestionDefinition>>
+export type { SuggestionDefinitions }
 
 // where a request may be sent: the chat's user, survey, cycle and area
 export type SuggestionRequestScope = {
@@ -66,7 +68,8 @@ export const getSuggestionRequestText = ({
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language of the prompt.
  * @param {SuggestionDefinitions} [params.definitions] - Definitions.
  * @param {Function} [params.newId] - Request id factory.
- * @returns {SuggestionRequest|null} The request; null without a definition, a target or a prompt.
+ * @param {AiLog} [params.log] - Reports a prompt that could not be built.
+ * @returns {SuggestionRequest|null} The request; null without a target or a prompt.
  */
 export const buildSuggestionRequest = ({
   suggestion,
@@ -76,6 +79,7 @@ export const buildSuggestionRequest = ({
   describeContext,
   definitions = SUGGESTION_DEFINITIONS,
   newId = () => uuidv4(),
+  log = logAiWarning,
 }: {
   suggestion: AssistantSuggestion
   userUuid: string
@@ -84,16 +88,18 @@ export const buildSuggestionRequest = ({
   describeContext: SuggestionDescribeContext
   definitions?: SuggestionDefinitions
   newId?: () => string
+  log?: AiLog
 }): SuggestionRequest | null => {
   const definition = definitions[suggestion.kind]
-  if (!definition || suggestion.targets.length === 0) return null
+  if (suggestion.targets.length === 0) return null
   let prompt: string
   let displayText: string
   try {
     prompt = definition.prompt(suggestion, describeContext)
     displayText = getSuggestionRequestText({ definition, suggestion, describeContext })
-  } catch {
+  } catch (error) {
     // a target that no longer describes (e.g. a node def deleted meanwhile): nothing is sent
+    log(`The request of the ${suggestion.kind} suggestion could not be built`, error)
     return null
   }
   return {
@@ -170,9 +176,9 @@ export const acceptSuggestion = async ({
   if (!conversationId) return null
   const surveyId = getRequestBucketSurveyId(request)
   const definition = definitions[scope.kind]
-  if (definition?.acceptMode === 'remove') store.remove({ userUuid, surveyId, id })
+  if (definition.acceptMode === 'remove') store.remove({ userUuid, surveyId, id })
   else store.startProgress({ userUuid, surveyId, id, conversationId, targetKeys: scope.targetKeys })
-  definition?.onHandled?.({ userUuid, targetKeys: scope.targetKeys, store })
+  definition.onHandled?.({ userUuid, targetKeys: scope.targetKeys, store })
   return conversationId
 }
 
@@ -198,5 +204,5 @@ export const dismissSuggestion = ({
 }): void => {
   store.dismiss({ userUuid, surveyId: getRequestBucketSurveyId(suggestion), id: suggestion.id })
   const targetKeys = suggestion.targets.map((target) => target.key)
-  definitions[suggestion.kind]?.onHandled?.({ userUuid, targetKeys, store })
+  definitions[suggestion.kind].onHandled?.({ userUuid, targetKeys, store })
 }

@@ -61,6 +61,8 @@ export default {
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
       'Se ha enviado un correo electrónico a {{email}}. \nPor favor, informe a la persona que revise también la carpeta de correo no deseado/spam.',
+    logoutServerNotReached:
+      'No se pudo contactar con el servidor, por lo que su sesión en el servidor podría seguir activa. Si es un ordenador compartido, cierre el navegador.',
     emailSentToSelfConfirmation:
       'Debería haber recibido un correo electrónico a {{email}}. \nPor favor, revise también la carpeta de correo no deseado/spam.',
     empty: 'Vacío',
@@ -1449,6 +1451,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
     success: 'Traducido. Revise y guarde.',
     failed: 'La traducción falló: {{message}}',
+    sourceChanged: 'El texto cambió mientras se traducía, por lo que la traducción no se aplicó.',
   },
 
   aiActivityLog: {

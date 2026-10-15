@@ -4,8 +4,9 @@
  */
 import { isChangeSetPending } from '@webapp/ai/conversations/pendingChangeSets'
 import type { AssistantMessage, Conversation } from '@webapp/ai/conversations/types'
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 
-import { SUGGESTION_DEFINITIONS } from './definitions'
+import { SUGGESTION_DEFINITIONS } from './registry'
 import { suggestionStore, type SuggestionStore } from './suggestionStore'
 import type { SettleOutcome, SuggestionScope } from './types'
 
@@ -95,41 +96,48 @@ const getLockManager = (): LockManager | null => (typeof navigator !== 'undefine
 
 /**
  * Holds the suggestion turn lock of a conversation until its turn ends (other tabs then know it is running). The
- * turn itself is not wrapped: it starts as it always did. No-op without Web Locks; a lock error is swallowed.
+ * turn itself is not wrapped: it starts as it always did. No-op without Web Locks; a lock error is logged.
  * @param {object} params - Parameters.
  * @param {string} params.conversationId - Conversation of the turn.
  * @param {Promise<unknown>} params.done - The turn; settles when it ends.
  * @param {LockManager|null} [params.locks] - Web Locks manager (the browser's by default).
+ * @param {AiLog} [params.log] - Reports a lock that could not be taken.
  * @returns {void}
  */
 export const holdSuggestionTurnLock = ({
   conversationId,
   done,
   locks = getLockManager(),
+  log = logAiWarning,
 }: {
   conversationId: string
   done: Promise<unknown>
   locks?: Pick<LockManager, 'request'> | null
+  log?: AiLog
 }): void => {
   if (!locks) return
+  // no lock: other tabs may settle this turn's entry early
+  const onError = (error: unknown): void => log('The lock of a suggestion turn could not be taken', error)
   try {
-    locks.request(getSuggestionTurnLockName(conversationId), () => done.then(noop, noop)).catch(noop)
-  } catch {
-    // no lock: other tabs may settle this turn's entry early
+    locks.request(getSuggestionTurnLockName(conversationId), () => done.then(noop, noop)).catch(onError)
+  } catch (error) {
+    onError(error)
   }
 }
 
 /**
- * Returns the names of the Web Locks held now (empty without the API).
+ * Returns the names of the Web Locks held now (empty without the API, or when the query fails).
+ * @param {AiLog} [log] - Reports a failed query.
  * @returns {Promise<string[]>} The names.
  */
-export const getHeldLockNames = async (): Promise<string[]> => {
+export const getHeldLockNames = async (log: AiLog = logAiWarning): Promise<string[]> => {
   const locks = getLockManager()
   if (!locks) return []
   try {
     const { held } = await locks.query()
     return (held ?? []).map((lock) => lock.name ?? '')
-  } catch {
+  } catch (error) {
+    log('The locks held by other tabs could not be listed', error)
     return []
   }
 }
