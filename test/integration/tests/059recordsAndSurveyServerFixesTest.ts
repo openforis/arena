@@ -1,10 +1,14 @@
 import * as ActivityLog from '@common/activityLog/activityLog'
+import { ENV } from '@core/processUtils'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as CategoryApi from '@server/modules/category/api/categoryApi'
+import * as RecordApi from '@server/modules/record/api/recordApi'
+import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
@@ -16,6 +20,8 @@ import {
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
 
 import { getContextUser } from '../config/context'
+
+import { createFakeResponse } from '../../unit/utils/fakeExpress'
 
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
@@ -36,10 +42,63 @@ class TestRecordsUpdateThread extends RecordsUpdateThread {
   }
 }
 
+type Route = { method: string; path: string; handlers: any[] }
+
+/**
+ * Collects the routes registered by an API module.
+ * @param {Function} init - The init function of the API module.
+ * @returns {Route[]} The routes.
+ */
+const collectRoutes = (init: (app: any) => void): Route[] => {
+  const routes: Route[] = []
+  const app = new Proxy(
+    {},
+    {
+      get:
+        (_target, method: string) =>
+        (path: string, ...handlers: any[]) => {
+          routes.push({ method, path, handlers })
+        },
+    }
+  )
+  init(app)
+  return routes
+}
+
+/**
+ * Calls the route handler (the last one of its chain, after the permission middlewares).
+ * @param {object} params - The parameters.
+ * @param {Function} params.init - The init function of the API module.
+ * @param {string} params.method - The http method.
+ * @param {string} params.path - The route path.
+ * @param {object} [params.body] - The request body.
+ * @param {object} [params.user] - The user of the request.
+ * @returns {Promise<{res: any, next: jest.Mock}>} The fake response and the next callback.
+ */
+const callRoute = async ({
+  init,
+  method,
+  path,
+  body = {},
+  user = { uuid: 'u1' },
+}: {
+  init: (app: any) => void
+  method: string
+  path: string
+  body?: object
+  user?: object
+}) => {
+  const route = collectRoutes(init).find((r) => r.method === method && r.path === path)
+  const res = createFakeResponse()
+  const next = jest.fn()
+  await route!.handlers.at(-1)({ params: { surveyId: '1' }, query: { cycle: '0' }, body, user }, res, next)
+  return { res, next }
+}
+
 const invalidValueKey = 'appErrors:record.nodesBatchInvalidValue'
 const notEditableKey = 'validationErrors:nodeValueParser.attributeNotEditable'
 
-describe('Batch record edit: value shape and applicability (059)', () => {
+describe('Batch record edit: value shape, applicability and activity log bounds (059)', () => {
   let user: any
   let survey: any
   let surveyId: number
@@ -203,4 +262,135 @@ describe('Batch record edit: value shape and applicability (059)', () => {
       expect(after.length).toBeGreaterThan(0)
     })
   })
+})
+
+describe('Schema summary routes send their errors as JSON with the error key (059)', () => {
+  const aiItems = { init: SurveyApi.init, method: 'get', path: '/survey/:surveyId/schema-summary/ai-items' }
+  const exportRoute = { init: SurveyApi.init, method: 'post', path: '/survey/:surveyId/schema-summary/export' }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  test('the legacy includeAiDescriptions flag is refused with aiIncludeAiDescriptionsRemoved (400)', async () => {
+    const { res, next } = await callRoute({ ...exportRoute, body: { includeAiDescriptions: true } })
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(400)
+    expect(res.body).toMatchObject({ status: 'error', key: 'aiIncludeAiDescriptionsRemoved' })
+  })
+
+  test('the AI items of a server with the AI features off are refused with aiFeaturesDisabled (404)', async () => {
+    jest.replaceProperty(ENV, 'aiFeaturesEnabled', false)
+
+    const { res, next } = await callRoute(aiItems)
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(404)
+    expect(res.body).toMatchObject({
+      status: 'error',
+      key: 'aiFeaturesDisabled',
+      params: { feature: 'dataDictionary' },
+    })
+  })
+
+  test('the AI items of a feature turned off by the server flags are refused with aiFeatureDisabled (403)', async () => {
+    jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
+    jest.replaceProperty(ENV, 'aiFeatureFlags', { dataDictionary: false })
+
+    const { res, next } = await callRoute(aiItems)
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(403)
+    expect(res.body).toMatchObject({ status: 'error', key: 'aiFeatureDisabled' })
+  })
+
+  test('the export with AI descriptions is refused with the same key when the feature is off', async () => {
+    jest.replaceProperty(ENV, 'aiFeaturesEnabled', false)
+
+    const { res, next } = await callRoute({ ...exportRoute, body: { aiDescriptions: {} } })
+
+    expect(next).not.toHaveBeenCalled()
+    expect(res.statusCode).toBe(404)
+    expect(res.body).toMatchObject({ status: 'error', key: 'aiFeaturesDisabled' })
+  })
+})
+
+describe('The AI write routes are off when the AI is off (059)', () => {
+  // every AI category on, as saved by the AI settings
+  const aiUser = {
+    uuid: 'u1',
+    prefs: { ai: { accessLevel: 3, featureToggles: { assistantCleaning: true, assistantDesign: true } } },
+  }
+  const aiOffUser = { uuid: 'u2', prefs: { ai: { accessLevel: 0 } } }
+
+  const writeRoutes = [
+    {
+      name: 'the batch record edit',
+      init: RecordApi.init,
+      method: 'post',
+      path: '/survey/:surveyId/records/nodes/update',
+      feature: 'assistantCleaning',
+    },
+    {
+      name: 'the category item labels update',
+      init: CategoryApi.init,
+      method: 'put',
+      path: '/survey/:surveyId/categories/items/labels',
+      feature: 'assistantDesign',
+    },
+  ]
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  test.each(writeRoutes)(
+    '$name answers 404 aiFeaturesDisabled when the server has the AI features off',
+    async (route) => {
+      jest.replaceProperty(ENV, 'aiFeaturesEnabled', false)
+
+      const { res, next } = await callRoute({ ...route, user: aiUser })
+
+      expect(next).not.toHaveBeenCalled()
+      expect(res.statusCode).toBe(404)
+      expect(res.body).toMatchObject({ status: 'error', key: 'aiFeaturesDisabled', params: { feature: route.feature } })
+    }
+  )
+
+  test.each(writeRoutes)(
+    '$name answers 403 aiFeatureDisabled when the server flags turn its feature off',
+    async (route) => {
+      jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
+      jest.replaceProperty(ENV, 'aiFeatureFlags', { [route.feature]: false })
+
+      const { res } = await callRoute({ ...route, user: aiUser })
+
+      expect(res.statusCode).toBe(403)
+      expect(res.body).toMatchObject({ status: 'error', key: 'aiFeatureDisabled', params: { feature: route.feature } })
+    }
+  )
+
+  test.each(writeRoutes)('$name answers 403 aiFeaturesDisabled to a user who turned the AI off', async (route) => {
+    jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
+    jest.replaceProperty(ENV, 'aiFeatureFlags', null)
+
+    const { res } = await callRoute({ ...route, user: aiOffUser })
+
+    expect(res.statusCode).toBe(403)
+    expect(res.body).toMatchObject({ status: 'error', key: 'aiFeaturesDisabled' })
+  })
+
+  test.each(writeRoutes)(
+    '$name keeps its own answer when the feature is on (an empty body is refused)',
+    async (route) => {
+      jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
+      jest.replaceProperty(ENV, 'aiFeatureFlags', null)
+
+      const { res } = await callRoute({ ...route, user: aiUser })
+
+      expect(res.body).toMatchObject({ status: 'error' })
+      expect(res.body.key).not.toMatch(/^aiFeature/)
+    }
+  )
 })
