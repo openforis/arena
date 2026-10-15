@@ -53,6 +53,7 @@ export default {
   functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} (got {{numArgs}})',
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
+  unexpectedServerError: 'An unexpected error occurred on the server.',
   geoWhispApiError: 'The Whisp service is temporarily unavailable.',
   geoWhispSamplingPointDataCategoryMissing: 'Sampling point data category not found.',
   geoWhispSamplingPointDataLocationsMissing: 'No sampling point data item with a valid location found.',

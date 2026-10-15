@@ -79,6 +79,7 @@ export default {
   functionHasTooFewArguments: 'A função {{fnName}} requer no mínimo {{minArity}} (recebido {{numArgs}})',
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
+  unexpectedServerError: 'Ocorreu um erro inesperado no servidor.',
   geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
   geoWhispSamplingPointDataCategoryMissing: 'Categoria de dados de ponto amostral não encontrada.',
   geoWhispSamplingPointDataLocationsMissing:

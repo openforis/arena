@@ -55,6 +55,7 @@ export default {
     '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
   functionHasTooManyArguments: '関数{{fnName}}が受け付ける引数は最大{{maxArity}}個です（{{numArgs}}個指定されました）',
   generic: '予期しないエラー：{{text}}',
+  unexpectedServerError: 'サーバーで予期しないエラーが発生しました。',
   geoWhispApiError: 'Whispサービスは現在一時的に利用できません。',
   geoWhispSamplingPointDataCategoryMissing: '抽出地点データのカテゴリが見つかりません。',
   geoWhispSamplingPointDataLocationsMissing: '有効な位置情報を持つ抽出地点データの項目が見つかりません。',
