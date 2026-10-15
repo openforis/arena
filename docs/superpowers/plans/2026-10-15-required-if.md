@@ -232,7 +232,8 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
   show the existing validation feedback (`valueRequired` error) as today.
 - The marker updates live: node updates pushed by the server carry the parent entity with the new `cReq` meta, and
   the web record state already replaces updated nodes.
-- `core/record/_node/nodeMeta.js`: add `childRequired: 'cReq'` key for consistency with `cEdit`.
+- `core/record/_node/nodeMeta.js`: add `childRequired: 'cReq'` key, also in `metaKeysOmittedWhenEmpty` (an empty `cReq` is not
+  stored and removes the stored one, like `cEdit`/`cVis`) — done.
 
 ### 2.3 Other server/webapp usages of `isRequired`
 
