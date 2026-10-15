@@ -26,11 +26,11 @@ export interface NodeDefValidations {
 
 The designer offers three mutually exclusive modes, stored as follows:
 
-| Mode                           | `required`        | `requiredIf`         |
-| ------------------------------ | ----------------- | -------------------- |
-| Not required (default)         | absent / `false`  | absent / empty       |
-| Always required (today's flag) | `true`            | absent / empty       |
-| Required when condition is met | absent / `false`  | non-empty array      |
+| Mode                           | `required`       | `requiredIf`    |
+| ------------------------------ | ---------------- | --------------- |
+| Not required (default)         | absent / `false` | absent / empty  |
+| Always required (today's flag) | `true`           | absent / empty  |
+| Required when condition is met | absent / `false` | non-empty array |
 
 Why this shape:
 
