@@ -92,7 +92,7 @@ export const LocalProviderFields = ({ dialog }: Props) => {
   const { t, draft, testing } = dialog
   return (
     <>
-      <FormItem label="userAiSettings:localServer.baseUrl">
+      <FormItem label="userAiSettings:localServer.baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
         <div className="provider-dialog__row">
           <Input
             value={draft.baseUrl}
@@ -114,10 +114,10 @@ export const LocalProviderFields = ({ dialog }: Props) => {
       <div role="status" className="provider-dialog__live">
         <LocalTestResult dialog={dialog} />
       </div>
-      <FormItem label="userAiSettings:localServer.model">
+      <FormItem label="userAiSettings:localServer.model" htmlFor={TestId.ai.providerModel}>
         <select
+          id={TestId.ai.providerModel}
           className="provider-dialog__select"
-          aria-label={t('userAiSettings:localServer.model')}
           value={draft.model}
           onChange={(event) => dialog.setModel(event.target.value)}
           data-testid={TestId.ai.providerModel}

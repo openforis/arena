@@ -26,6 +26,7 @@ export const FormItem = (props) => {
     infoTitleClassName = undefined,
     infoTitleMarkdownClassName = undefined,
     infoTitleMaxWidth = undefined,
+    htmlFor = undefined,
     isInfoMarkdown = false,
     label: labelProp,
     labelParams,
@@ -37,10 +38,13 @@ export const FormItem = (props) => {
   const label = getLabel({ appendColonToLabel, labelProp, labelParams, i18n })
   const isMobile = useIsMobile()
 
+  // with htmlFor (the id of the input) the label names the input for assistive technology and a click focuses it
+  const LabelWrapper = htmlFor ? 'label' : 'div'
+
   const labelComponent =
     !isMobile || !hideLabelInMobile ? (
       <div className="form-label">
-        <div className="form-label-wrapper">
+        <LabelWrapper className="form-label-wrapper" htmlFor={htmlFor}>
           {label}
           {required ? ' *' : ''}
           {info && (
@@ -53,7 +57,7 @@ export const FormItem = (props) => {
               titleMaxWidth={infoTitleMaxWidth}
             />
           )}
-        </div>
+        </LabelWrapper>
       </div>
     ) : null
 
@@ -70,6 +74,8 @@ FormItem.propTypes = {
   className: PropTypes.string,
   children: PropTypes.oneOfType([PropTypes.string, PropTypes.element, PropTypes.arrayOf(PropTypes.element)]).isRequired,
   hideLabelInMobile: PropTypes.bool,
+  // id of the labelled input
+  htmlFor: PropTypes.string,
   info: PropTypes.string,
   isInfoMarkdown: PropTypes.bool,
   infoTitleClassName: PropTypes.string,
