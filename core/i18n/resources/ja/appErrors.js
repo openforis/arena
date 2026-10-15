@@ -59,6 +59,7 @@ export default {
     nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
     nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
     nodesBatchInvalidValue: '「{{attributeName}}」の新しい値はこの属性には無効です。',
+    nodesBatchUnexpected: 'サーバーで予期しないエラーが発生したため、編集を適用できませんでした。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',

@@ -57,6 +57,7 @@ export default {
     nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
     nodesBatchBusy: 'Another batch edit is still running; try again in a few seconds.',
     nodesBatchInvalidValue: 'The new value of "{{attributeName}}" is not valid for this attribute.',
+    nodesBatchUnexpected: 'The edit could not be applied because of an unexpected error on the server.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',

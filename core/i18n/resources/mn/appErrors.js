@@ -82,6 +82,7 @@ export default {
     nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
     nodesBatchBusy: 'Өөр багц засвар хийгдэж байна; хэдэн секундын дараа дахин оролдоно уу.',
     nodesBatchInvalidValue: '"{{attributeName}}" шинэ утга энэ атрибутад буруу байна.',
+    nodesBatchUnexpected: 'Серверт гэнэтийн алдаа гарсны улмаас засварыг хэрэгжүүлж чадсангүй.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',

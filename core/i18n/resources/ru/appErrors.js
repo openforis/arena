@@ -83,6 +83,7 @@ export default {
     nodesBatchInvalid: 'Недопустимый запрос пакетного редактирования ({{reason}}).',
     nodesBatchBusy: 'Другое пакетное редактирование ещё выполняется; повторите попытку через несколько секунд.',
     nodesBatchInvalidValue: 'Новое значение "{{attributeName}}" недопустимо для этого атрибута.',
+    nodesBatchUnexpected: 'Не удалось применить правку из-за непредвиденной ошибки на сервере.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',

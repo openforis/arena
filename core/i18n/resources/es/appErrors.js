@@ -88,6 +88,7 @@ export default {
     nodesBatchInvalid: 'Solicitud de edición por lotes no válida ({{reason}}).',
     nodesBatchBusy: 'Otra edición por lotes sigue en curso; inténtelo de nuevo en unos segundos.',
     nodesBatchInvalidValue: 'El nuevo valor de "{{attributeName}}" no es válido para este atributo.',
+    nodesBatchUnexpected: 'No se pudo aplicar la edición por un error inesperado en el servidor.',
   },
   recordPrintableExport: {
     missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
