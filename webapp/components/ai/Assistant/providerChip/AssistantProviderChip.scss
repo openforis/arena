@@ -23,16 +23,15 @@
     outline-offset: 2px;
   }
 
-  &__dot {
+  &__icon {
     flex: none;
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background-color: var(--green);
   }
 
-  &--bad &__dot {
-    background-color: var(--red);
+  // not usable now (unreachable, blocked or on another computer)
+  &--bad {
+    border-color: var(--red);
+    background-color: transparent;
+    color: var(--red);
   }
 
   &__text {

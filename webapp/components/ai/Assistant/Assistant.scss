@@ -198,11 +198,6 @@
       flex: none;
     }
 
-    // the only item that shrinks: its text ends with an ellipsis
-    > .ai-provider-chip {
-      flex: 0 1 auto;
-    }
-
     @container (max-width: 340px) {
       .ai-provider-chip__text,
       .ai-assistant-panel__context-text,
