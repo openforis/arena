@@ -9,6 +9,7 @@ import ProgressBar from '@webapp/components/progressBar'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import { getDismissAction } from './batchDismiss'
 import type { AiBatchRunState } from './useAiBatchRun'
 
 type Props = { run: AiBatchRunState; onClose: () => void }
@@ -43,6 +44,8 @@ const ProgressStatus = ({ progress, stopping }: { progress: AiBatchProgress | nu
   )
 }
 
+const CONFIRM_TEXT_ID = 'ai-batch-confirm-stop-text'
+
 /**
  * Asks to confirm a stop that a backdrop click or Escape started.
  * @param {object} props - Props.
@@ -53,10 +56,12 @@ const ProgressStatus = ({ progress, stopping }: { progress: AiBatchProgress | nu
 const ConfirmStop = ({ onStop, onKeepRunning }: { onStop: () => void; onKeepRunning: () => void }) => {
   const i18n = useI18n()
   return (
-    <div className="ai-batch-progress-dialog__confirm" role="alertdialog" aria-label={i18n.t('aiBatch.confirmStop')}>
-      <span>{i18n.t('aiBatch.confirmStop')}</span>
+    <div className="ai-batch-progress-dialog__confirm" role="alertdialog" aria-labelledby={CONFIRM_TEXT_ID}>
+      <span id={CONFIRM_TEXT_ID}>{i18n.t('aiBatch.confirmStop')}</span>
       <div className="ai-batch-progress-dialog__confirm-buttons">
         <Button
+          // the safe answer has the focus, so the question is read and Enter does not stop the run
+          autoFocus
           label="aiBatch.keepRunning"
           onClick={onKeepRunning}
           testId={TestId.ai.batchKeepRunning}
@@ -78,17 +83,21 @@ export const AiBatchProgressDialog = ({ run, onClose }: Props) => {
   const { titleKey, progress, error, stopping } = run
   const [confirming, setConfirming] = useState(false)
 
+  const asking = confirming && !error && !stopping
+  const onKeepRunning = useCallback(() => setConfirming(false), [])
+
+  // Escape or the backdrop while the question is shown answers it with the safe choice
   const onDismiss = useCallback(() => {
-    if (error) onClose()
-    else if (!stopping) setConfirming(true)
-  }, [error, onClose, stopping])
+    const action = getDismissAction({ error: !!error, asking, stopping })
+    if (action === 'close') onClose()
+    else if (action === 'keepRunning') onKeepRunning()
+    else if (action === 'ask') setConfirming(true)
+  }, [asking, error, onClose, onKeepRunning, stopping])
 
   const onStop = useCallback(() => {
     setConfirming(false)
     onClose()
   }, [onClose])
-
-  const onKeepRunning = useCallback(() => setConfirming(false), [])
 
   return (
     <Modal className="ai-batch-progress-dialog" onDismiss={onDismiss} title={titleKey}>
@@ -100,7 +109,7 @@ export const AiBatchProgressDialog = ({ run, onClose }: Props) => {
         ) : (
           <ProgressStatus progress={progress} stopping={stopping} />
         )}
-        {confirming && !error && !stopping && <ConfirmStop onStop={onStop} onKeepRunning={onKeepRunning} />}
+        {asking && <ConfirmStop onStop={onStop} onKeepRunning={onKeepRunning} />}
       </ModalBody>
       <ModalFooter>
         {error ? (
