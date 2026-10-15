@@ -379,7 +379,7 @@ export const useAssistantConversation = ({
   const deleteConversation = useCallback(
     async (id: string) => {
       if (!conversationStore) return
-      await conversationStore.remove(id)
+      await conversationStore.remove(id, userUuid)
       // a deleted Do it conversation can never settle: its suggestion targets show again
       suggestionStore.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
       setHistory((items) => items.filter((item) => item.id !== id))

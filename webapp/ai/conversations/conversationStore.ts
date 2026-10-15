@@ -18,7 +18,8 @@ export type ConversationStore = {
   // null for an unknown id and for a conversation of another user (a shared browser)
   get: (id: string, userUuid: string) => Promise<Conversation | null>
   save: (conversation: Conversation) => Promise<void>
-  remove: (id: string) => Promise<void>
+  // a conversation of another user is left alone (like get)
+  remove: (id: string, userUuid: string) => Promise<void>
   clearUser: (userUuid: string) => Promise<void>
   // the conversations of a deleted survey, of every user of this browser
   removeSurvey: (surveyId: number) => Promise<void>
@@ -198,7 +199,17 @@ const createIndexedDbStore = (
       const all = await list(conversation)
       await removeAll(all.slice(keep).map((item) => item.id))
     },
-    remove: (id) => removeAll([id]),
+    remove: (id, userUuid) =>
+      withDb(async (db) => {
+        const transaction = db.transaction(STORE, 'readwrite')
+        const objects = transaction.objectStore(STORE)
+        const request = objects.get(id)
+        // inside the request callback, so the transaction is still active
+        request.onsuccess = () => {
+          if ((request.result as Conversation | undefined)?.userUuid === userUuid) objects.delete(id)
+        }
+        await transactionDone(transaction)
+      }),
     clearUser: async (userUuid) => {
       const ids = await withDb(
         async (db) =>
@@ -245,8 +256,8 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
       byId.set(conversation.id, structuredClone(withSurveyKey(conversation)))
       for (const old of (await list(conversation)).slice(keep)) byId.delete(old.id)
     },
-    remove: async (id) => {
-      byId.delete(id)
+    remove: async (id, userUuid) => {
+      if (byId.get(id)?.userUuid === userUuid) byId.delete(id)
     },
     clearUser: async (userUuid) => {
       for (const item of [...byId.values()]) {

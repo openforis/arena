@@ -109,7 +109,7 @@ describe.each([
     const mineNoSurvey = conversation({ seconds: 2, surveyId: null })
     const theirs = conversation({ seconds: 3, userUuid: 'user-2' })
     for (const item of [mine, mineNoSurvey, theirs]) await store.save(item)
-    await store.remove(mine.id)
+    await store.remove(mine.id, 'user-1')
     expect(await store.get(mine.id, 'user-1')).toBeNull()
     await store.clearUser('user-1')
     expect(await store.get(mineNoSurvey.id, 'user-1')).toBeNull()
