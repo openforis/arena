@@ -100,7 +100,7 @@ export const AiBatchProgressDialog = ({ run, onClose }: Props) => {
   }, [onClose])
 
   return (
-    <Modal className="ai-batch-progress-dialog" onDismiss={onDismiss} title={titleKey}>
+    <Modal className="ai-batch-progress-dialog modal--centered" onDismiss={onDismiss} title={titleKey}>
       <ModalBody>
         {error ? (
           <div className="ai-batch-progress-dialog__error" data-testid={TestId.ai.batchError} role="alert">
