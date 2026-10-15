@@ -78,21 +78,33 @@ describe('auth session (421)', () => {
   test('login sets the token and resets the AI state of the previous session', async () => {
     const { calls, session } = createDeps(async () => undefined)
     await session.begin('abc')
-    expect(calls).toEqual(['token abc', 'reset AI'])
+    // the previous session's work is stopped before the new token can be used by anything still settling
+    expect(calls).toEqual(['reset AI', 'token abc'])
   })
 
   test('logout asks the server, then drops the token and resets the AI state', async () => {
     const { calls, session } = createDeps(async () => undefined)
-    await session.end()
+    await expect(session.end()).resolves.toEqual({ serverSessionEnded: true })
     expect(calls).toEqual(['POST /auth/logout', 'token null', 'reset AI'])
   })
 
-  test('logout drops the token and resets the AI state even when POST /auth/logout fails', async () => {
+  test('a logout request that fails once is retried once, and the session is then ended on the server', async () => {
+    let attempts = 0
+    const { calls, log, session } = createDeps(async () => {
+      attempts += 1
+      if (attempts === 1) throw new Error('Network Error')
+    })
+    await expect(session.end()).resolves.toEqual({ serverSessionEnded: true })
+    expect(calls).toEqual(['POST /auth/logout', 'POST /auth/logout', 'token null', 'reset AI'])
+    expect(log).not.toHaveBeenCalled()
+  })
+
+  test('logout drops the token and resets the AI state even when POST /auth/logout fails twice, and says the server session may live', async () => {
     const { calls, log, session } = createDeps(async () => {
       throw new Error('Network Error')
     })
-    await expect(session.end()).resolves.toBeUndefined()
-    expect(calls).toEqual(['POST /auth/logout', 'token null', 'reset AI'])
+    await expect(session.end()).resolves.toEqual({ serverSessionEnded: false })
+    expect(calls).toEqual(['POST /auth/logout', 'POST /auth/logout', 'token null', 'reset AI'])
     expect(log).toHaveBeenCalledTimes(1)
   })
 })

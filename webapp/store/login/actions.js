@@ -56,9 +56,13 @@ export const logout =
     dispatch(LoaderActions.showLoader())
 
     // the conversations stay in this browser until the user clears them
-    await authSession.end()
+    const { serverSessionEnded } = await authSession.end()
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())
+    // the server session (a cookie) may still be active: on a shared computer the browser must be closed
+    if (!serverSessionEnded) {
+      dispatch(NotificationActions.notifyWarning({ key: 'common.logoutServerNotReached', autoHide: false }))
+    }
 
     // navigate to home page
     navigate(appModuleUri(appModules.home))
