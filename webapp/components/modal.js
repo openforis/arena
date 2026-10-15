@@ -39,8 +39,10 @@ export const Modal = (props) => {
   const {
     children,
     className = '',
+    closeOnBackdropClick = true,
     closeOnEsc = true,
     onClose: onCloseProp,
+    onDismiss,
     showCloseButton = false,
     title,
     titleParams,
@@ -55,12 +57,21 @@ export const Modal = (props) => {
     [onCloseProp]
   )
 
+  // a click on the backdrop or the Escape key: onDismiss(reason) when given, else onClose (unless the backdrop is off)
+  const onBackdropOrEscape = useCallback(
+    (event, reason) => {
+      if (onDismiss) onDismiss(reason)
+      else if (reason !== 'backdropClick' || closeOnBackdropClick) onClose(event)
+    },
+    [closeOnBackdropClick, onClose, onDismiss]
+  )
+
   return (
     <MuiModal
       className={`modal ${className}`}
       data-testid={TestId.modal.modal}
       disableEscapeKeyDown={!closeOnEsc}
-      onClose={onClose}
+      onClose={onBackdropOrEscape}
       open
     >
       <Fade in timeout={500}>
@@ -81,8 +92,11 @@ export const Modal = (props) => {
 Modal.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  closeOnBackdropClick: PropTypes.bool,
   closeOnEsc: PropTypes.bool,
   onClose: PropTypes.func,
+  // called with 'backdropClick' or 'escapeKeyDown' instead of onClose (to ask before closing)
+  onDismiss: PropTypes.func,
   title: PropTypes.string,
   titleParams: PropTypes.object,
   showCloseButton: PropTypes.bool,

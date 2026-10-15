@@ -1361,6 +1361,14 @@ $t(common.appNameFull)
     dataDictionaryTitle: 'IA: Descripciones de campos',
     preparing: 'Preparando…',
     progress: '{{done}} de {{total}} solicitudes a la IA completadas',
+    stop: 'Detener',
+    stopping: 'Deteniendo…',
+    confirmStop: '¿Detener la ejecución de IA? Se conservan los resultados obtenidos hasta ahora.',
+    keepRunning: 'Seguir ejecutando',
+    stoppedCancelled:
+      'Detenido tras {{done}} de {{total}} solicitudes a la IA. Se conservan los resultados obtenidos hasta ahora.',
+    stoppedError:
+      'Detenido tras {{done}} de {{total}} solicitudes a la IA ({{message}}). Se conservan los resultados obtenidos hasta ahora.',
   },
 
   aiTranslation: {

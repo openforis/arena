@@ -13,6 +13,8 @@ export const TestId = {
     accessLevel: (level) => `ai-access-level-${level}`,
     batchCancel: 'ai-batch-cancel',
     batchClose: 'ai-batch-close',
+    batchKeepRunning: 'ai-batch-keep-running',
+    batchStopConfirm: 'ai-batch-stop-confirm',
     batchError: 'ai-batch-error',
     batchProgress: 'ai-batch-progress',
     consentChooseOther: 'ai-local-server-consent-choose-other',
