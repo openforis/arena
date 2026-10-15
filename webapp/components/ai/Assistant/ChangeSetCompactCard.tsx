@@ -1,3 +1,5 @@
+import './ChangeSetCard.scss'
+
 import React, { useState } from 'react'
 
 import type { ChangeSetCardState, OperationStatus } from '@webapp/ai/changeSets/types'

@@ -1,0 +1,44 @@
+// what the card and the review dialog share: the item name, the result of an Apply and the stale notice
+.ai-change-item {
+  &__name {
+    padding: 0;
+    border: none;
+    background: none;
+    color: var(--blueDark);
+    font-family: monospace;
+    cursor: pointer;
+
+    &:disabled {
+      color: var(--black);
+      cursor: default;
+    }
+  }
+
+  &__status {
+    font-weight: 600;
+
+    &--applied {
+      color: var(--green);
+    }
+
+    &--conflict,
+    &--failed {
+      color: var(--red);
+    }
+
+    &--skipped {
+      color: var(--orange);
+    }
+  }
+
+  &__stale {
+    margin: 0.5rem 0;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--orangeLight);
+  }
+
+  &__expressions {
+    margin: 0;
+    padding-left: 1rem;
+  }
+}
