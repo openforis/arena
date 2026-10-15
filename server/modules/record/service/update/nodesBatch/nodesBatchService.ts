@@ -37,6 +37,12 @@ import {
 const Logger = Log.getLogger('NodesBatchService')
 
 const TOO_MANY_REQUESTS = 429
+const GATEWAY_TIMEOUT = 504
+
+// the thread stops before the caller stops waiting, so a commit never lands after the timeout was reported
+const COMMIT_MARGIN_MS = 2000
+// a batch stuck before posting (a database call that never answers) gives its slot back after the deadline plus this
+const SLOT_RELEASE_GRACE_MS = 5000
 
 export type NodesBatchServiceDeps = {
   fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<any>
@@ -186,7 +192,7 @@ const sendRecordEdits = async (
       edits,
       timezoneOffset,
       lang,
-      deadline,
+      deadline: deadline - COMMIT_MARGIN_MS,
     })
   } catch (error) {
     // nothing was sent: drop the waiting reply (its timer would keep the entry until the deadline)
@@ -286,6 +292,30 @@ const runNodesBatch = async (
 }
 
 /**
+ * Waits for a batch, but not for ever: past the request deadline plus a grace time the caller gets a timeout error
+ * (the work still running in the background stops by itself, as the deadline has passed).
+ * @param {Promise<NodesBatchEditResult[]>} batch - The batch run.
+ * @returns {Promise<NodesBatchEditResult[]>} The results of the batch.
+ * @throws {SystemError} aiApplyTimeout (504) when the batch did not end in time.
+ */
+const runUntilHung = async (batch: Promise<NodesBatchEditResult[]>): Promise<NodesBatchEditResult[]> => {
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const hung = new Promise<never>((_resolve, reject) => {
+    timer = setTimeout(
+      () => reject(new SystemError(NodesBatchMessageKeys.applyTimeout, {}, GATEWAY_TIMEOUT)),
+      NodesBatchLimits.replyTimeoutMs + SLOT_RELEASE_GRACE_MS
+    )
+  })
+  // the batch may still fail after the timeout: nobody waits for it any more
+  batch.catch(() => undefined)
+  try {
+    return await Promise.race([batch, hung])
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
  * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
  * A user has one batch at a time, and a survey and the process a few: the others get a 429.
  * @param {NodesBatchParams} params - The request.
@@ -305,7 +335,7 @@ export const updateNodesBatch = async (
   const slot = deps.slots.tryAcquire({ userUuid: User.getUuid(params.user), surveyId: params.surveyId })
   if (slot.ok === false) throw new SystemError(NodesBatchMessageKeys.busy, { scope: slot.scope }, TOO_MANY_REQUESTS)
   try {
-    return await runNodesBatch(params, deps)
+    return await runUntilHung(runNodesBatch(params, deps))
   } finally {
     slot.release()
   }
