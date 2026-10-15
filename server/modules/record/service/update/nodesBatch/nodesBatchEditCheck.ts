@@ -4,6 +4,7 @@ import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
+import { findNodeEditRefusal } from '@core/record/nodeEditRefusal'
 import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
 import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
@@ -30,21 +31,6 @@ export type BatchEditCheck = { ok: true; node: any; nodeDef: any } | { ok: false
  */
 export const isNodeDefBatchEditable = (nodeDef: any): boolean =>
   isNodeDefValueEditable(nodeDef) && !NodeDef.isFile(nodeDef)
-
-/**
- * Returns false when the node is read-only ("editable if") or not applicable ("applicable if") for its parent, as the
- * form enforces.
- * @param {object} params - The parameters.
- * @param {object} params.record - The record.
- * @param {object} params.node - The attribute node.
- * @returns {boolean} Whether the node may be edited.
- */
-export const isNodeEditableInRecord = ({ record, node }: { record: any; node: any }): boolean => {
-  const parentNode = Record.getParentNode(node)(record)
-  if (!parentNode) return true
-  const nodeDefUuid = Node.getNodeDefUuid(node)
-  return Node.isChildEditable(nodeDefUuid)(parentNode) && Node.isChildApplicable(nodeDefUuid)(parentNode)
-}
 
 /**
  * Checks an edit against the record reloaded inside the record lock.
@@ -82,7 +68,7 @@ export const checkBatchEdit = ({
       }),
     }
   }
-  if (!isNodeEditableInRecord({ record, node })) {
+  if (findNodeEditRefusal({ record, node })) {
     return {
       ok: false,
       result: failedResult(index, 'validationErrors:nodeValueParser.attributeNotEditable', {
