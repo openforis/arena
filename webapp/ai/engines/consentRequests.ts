@@ -1,6 +1,6 @@
 /**
  * Pending first-use consent requests for the local AI server, shown one at a time by LocalServerConsentHost.
- * Concurrent requests for the same survey and server share one dialog and one answer.
+ * Concurrent requests for the same survey, server and data class share one dialog and one answer.
  */
 import type { LocalServerConsentAnswer, LocalServerConsentRequest } from './resolveModel'
 
@@ -16,9 +16,10 @@ type Entry = {
 /**
  * Returns the key two requests share when they must show one dialog.
  * @param {LocalServerConsentRequest} request - The request.
- * @returns {string} The key (survey and server URL: the consent is stored per survey and URL).
+ * @returns {string} The key (survey, server URL and data class: the consent is stored per all three).
  */
-const keyOf = ({ surveyId, baseUrl }: LocalServerConsentRequest): string => `${surveyId ?? 'none'}|${baseUrl}`
+const keyOf = ({ surveyId, baseUrl, dataClass }: LocalServerConsentRequest): string =>
+  `${surveyId ?? 'none'}|${baseUrl}|${dataClass}`
 
 /**
  * Creates a consent request queue.

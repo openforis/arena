@@ -1467,6 +1467,10 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
       chooseOther: 'Elegir otro proveedor',
+      sends: 'Esto enviará {{what}}.',
+      revokeHint: 'Usted permitió que Arena envíe solicitudes a este servidor.',
+      revoke: 'Revocar permiso',
+      revoked: 'Permiso revocado. Arena preguntará de nuevo antes de la siguiente solicitud.',
     },
   },
 

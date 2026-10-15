@@ -11,6 +11,7 @@ import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
+import { LocalConsentRevoke } from './LocalConsentRevoke'
 import type { ProviderDialogApi } from './useProviderDialog'
 
 // forwardRef components lose their prop types in TS (same cast as the panel)
@@ -131,6 +132,7 @@ export const LocalProviderFields = ({ dialog }: Props) => {
         </select>
       </FormItem>
       <div className="provider-dialog__hint">{t('userAiSettings:localServer.help')}</div>
+      <LocalConsentRevoke baseUrl={dialog.saved?.baseUrl ?? null} />
     </>
   )
 }

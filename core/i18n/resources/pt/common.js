@@ -1630,6 +1630,10 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       model: 'Modelo: {{modelId}}',
       continue: 'Continuar',
       chooseOther: 'Escolher outro provedor',
+      sends: 'Isso enviará {{what}}.',
+      revokeHint: 'Você permitiu que o Arena envie solicitações a este servidor.',
+      revoke: 'Revogar permissão',
+      revoked: 'Permissão revogada. O Arena perguntará novamente antes da próxima solicitação.',
     },
   },
 
