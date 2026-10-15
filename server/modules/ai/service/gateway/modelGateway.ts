@@ -19,6 +19,7 @@ import {
   createSseEventWriter,
   isSseClosed,
   openSseStream,
+  waitForDrain,
 } from '@server/modules/ai/api/serverSentEvents'
 
 import * as AiTelemetry from '../aiTelemetry'
@@ -196,7 +197,8 @@ const pumpStream = async ({
       if (part.type === 'finish') outcome.usage = part.usage
       if (part.type === 'error') outcome.error = part.error
       const wirePart = serializeStreamPart(part, toAiWireError, offeredTools)
-      if (wirePart) writeEvent(wirePart)
+      // a client that reads slowly must not make the server buffer the whole answer
+      if (wirePart && !writeEvent(wirePart)) await waitForDrain(res, control.signal)
     }
   } catch (error) {
     outcome.error = error

@@ -35,6 +35,8 @@ export const toAiSystemError = (error: unknown, { timedOut = false }: { timedOut
   if (error instanceof SystemError) return error
   const unwrapped = unwrapRetry(error)
   if (unwrapped instanceof SystemError) return unwrapped
+  // the AI SDK wraps what fails while it reads an answer (e.g. one over the size cap) in an APICallError
+  if (unwrapped?.cause instanceof SystemError) return unwrapped.cause
   if (APICallError.isInstance(unwrapped)) return fromUpstreamStatus(unwrapped.statusCode)
   return aiError('aiProviderUnavailable', StatusCodes.BAD_GATEWAY)
 }

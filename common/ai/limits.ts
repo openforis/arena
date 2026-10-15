@@ -27,4 +27,8 @@ export const AiLimits = {
   dataDictionaryMaxDescriptions: 200,
   // longest AI description accepted with a schema summary export (the browser truncates to it)
   dataDictionaryMaxDescriptionChars: 1000,
+  // what the server reads from a provider answer: an endpoint chosen by a user must not fill the memory
+  providerResponseMaxBytes: 8 * 1024 * 1024,
+  providerFrameMaxChars: 1024 * 1024,
+  providerErrorBodyMaxBytes: 8 * 1024,
 } as const

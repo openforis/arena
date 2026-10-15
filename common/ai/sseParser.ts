@@ -4,11 +4,18 @@
  */
 import type { LanguageModelV4FinishReason, LanguageModelV4Usage } from '@ai-sdk/provider'
 
+import SystemError, { StatusCodes } from '@core/systemError'
+
 const FRAME_DELIMITER = '\n\n'
 const DATA_PREFIX = 'data:'
 const DONE_TOKEN = '[DONE]'
 
 export type SseParser = { push: (text: string) => void; end: () => void }
+
+// no cap when absent; a frame is the text up to the next blank line
+export type SseLimits = { maxFrameChars?: number; maxTotalChars?: number }
+
+const tooLarge = () => new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
 
 const parseJson = (payload: string): { ok: boolean; value?: unknown } => {
   try {
@@ -23,16 +30,22 @@ const parseJson = (payload: string): { ok: boolean; value?: unknown } => {
  * @param {object} params - Parameters.
  * @param {Function} params.onEvent - Called with each JSON payload; errors it throws propagate to the caller.
  * @param {Function} [params.onDone] - Called once, on `[DONE]` (argument true) or at `end()` (false).
+ * @param {SseLimits} [params.limits] - Caps on one frame and on the whole text; `push` throws
+ *   aiProviderResponseTooLarge (502) when one is exceeded.
  * @returns {SseParser} The parser.
  */
 export const createSseParser = ({
   onEvent,
   onDone,
+  limits = {},
 }: {
   onEvent: (event: unknown) => void
   onDone?: (receivedDoneToken: boolean) => void
+  limits?: SseLimits
 }): SseParser => {
+  const { maxFrameChars = Infinity, maxTotalChars = Infinity } = limits
   let buffer = ''
+  let total = 0
   let terminated = false
 
   const terminate = (receivedDoneToken: boolean) => {
@@ -60,14 +73,19 @@ export const createSseParser = ({
     while (!terminated && index >= 0) {
       const frame = buffer.slice(0, index)
       buffer = buffer.slice(index + FRAME_DELIMITER.length)
+      if (frame.length > maxFrameChars) throw tooLarge()
       handleFrame(frame)
       index = buffer.indexOf(FRAME_DELIMITER)
     }
+    // what is left is the start of a frame that has not ended yet
+    if (buffer.length > maxFrameChars) throw tooLarge()
   }
 
   return {
     push: (text: string) => {
       if (terminated || !text) return
+      total += text.length
+      if (total > maxTotalChars) throw tooLarge()
       buffer += text
       drain()
     },
