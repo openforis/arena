@@ -5,6 +5,7 @@ import { uuidv4 } from '@core/uuid'
 
 import { CONVERSATION_TITLE_TOOL_NAME } from '@common/ai/prompts/assistantConversationTitle'
 
+import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 import type { OperationResult } from '@webapp/ai/changeSets/types'
 import type { ApplyNoteMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import type { AiTranslate } from '@webapp/ai/tools/types'
@@ -81,17 +82,8 @@ export const getRetryBase = (
   }
 }
 
-/**
- * Merges the results of a new Apply into the previous ones (an operation keeps its latest result).
- * @param {OperationResult[]} [previous] - Earlier results.
- * @param {OperationResult[]} next - New results.
- * @returns {OperationResult[]} The merged results.
- */
-export const mergeOperationResults = (previous: OperationResult[] = [], next: OperationResult[]): OperationResult[] => {
-  const byId = new Map(previous.map((result) => [result.id, result]))
-  for (const result of next) byId.set(result.id, result)
-  return [...byId.values()]
-}
+// the merge lives with the change sets (the record edit card model uses it too)
+export { mergeOperationResults }
 
 /**
  * Builds an apply note message.

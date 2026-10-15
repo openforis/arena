@@ -60,8 +60,8 @@ export const getSelectableOperationIds = (
     .map((operation) => operation.id)
 }
 
-// D1's merge (an operation keeps its latest result, new ones appended): one rule for both cards
-export { mergeOperationResults } from '@webapp/components/ai/Assistant/assistantPanelModel'
+// one merge of results for both cards
+export { mergeOperationResults } from '../operationResults'
 
 // failures that may succeed when sent again; the others (duplicate key, node not in the record, not editable...) are
 // deterministic, so resending them would only fail again
