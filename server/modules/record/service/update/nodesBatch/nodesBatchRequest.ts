@@ -32,7 +32,8 @@ const parseEdit = (edit: unknown): NodesBatchEdit => {
   if (!isId(recordUuid) || !isId(nodeUuid)) throw invalidRequest('edit')
   // the shape of `to` depends on the attribute type: it is checked with the node, see checkBatchEdit
   if (!isNodeValueSizeValid(from) || !isNodeValueSizeValid(to)) throw invalidRequest('valueTooLarge')
-  return { recordUuid, nodeUuid, from, to }
+  // the database returns lower-case uuids: another case would miss the node and take another lock key
+  return { recordUuid: recordUuid.toLowerCase(), nodeUuid: nodeUuid.toLowerCase(), from, to }
 }
 
 /**
