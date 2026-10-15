@@ -145,6 +145,25 @@ describe('the logged body of a failed provider call is short (324)', () => {
     expect(text).not.toContain('session=abc')
   })
 
+  test('the message, the cause message and the url of the error are cut too', () => {
+    const cause = new Error('c'.repeat(5000))
+    const error = Object.assign(new Error('m'.repeat(5000)), { url: `https://x.example/${'u'.repeat(5000)}`, cause })
+    const text = formatErrorForLog('chatbot', error)
+    expect(text).toContain('m'.repeat(300))
+    expect(text).toContain('c'.repeat(300))
+    for (const letter of ['m', 'c', 'u']) expect(text).not.toContain(letter.repeat(301))
+  })
+
+  test('the stack is logged as frames only: the message of the error is not repeated in it', () => {
+    const text = formatErrorForLog('chatbot', new Error('secret echo '.repeat(100)))
+    expect(text).toMatch(/\n\s+at /)
+    expect(text.split('secret echo ').length - 1).toBeLessThanOrEqual(26)
+  })
+
+  test('an error that is not an Error is cut as well', () => {
+    expect(formatErrorForLog('chatbot', 'z'.repeat(5000)).length).toBeLessThan(400)
+  })
+
   test('a short body is logged whole, and a missing one adds no line', () => {
     expect(formatErrorForLog('chatbot', Object.assign(new Error('x'), { responseBody: '{"error":"nope"}' }))).toContain(
       '  responseBody: {"error":"nope"}'

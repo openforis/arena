@@ -9,8 +9,8 @@ import type { AiWireError } from '@common/ai/wire'
 
 const TOO_MANY_REQUESTS = 429
 
-// a provider can echo parts of the request in its error body: only the start of it is logged
-const LOGGED_BODY_CHARS = 300
+// a provider can echo parts of the request in its error (body, message): only the start of each is logged
+const LOGGED_TEXT_CHARS = 300
 
 const PROVIDER_REJECTED_STATUSES = new Set([400, 404, 413, 422])
 
@@ -54,19 +54,29 @@ export const toAiWireError = (error: unknown): AiWireError => {
   return { key: systemError.key, params: systemError.params ?? {} }
 }
 
+const clip = (value: unknown): string => String(value).slice(0, LOGGED_TEXT_CHARS)
+
+// the frames of a stack, without its first lines, which repeat the message of the error
+const stackFrames = (stack: unknown): string[] =>
+  String(stack)
+    .split('\n')
+    .filter((line) => /^\s+at /.test(line))
+    .map(clip)
+
 /**
- * Builds a detailed log message (class, message, upstream status/body/url, cause, stack).
+ * Builds a detailed log message (class, message, upstream status/body/url, cause, stack frames). Every text that
+ * can come from the provider is cut to a few hundred characters.
  * @param {string} feature - Feature key, for context.
  * @param {unknown} error - The error.
  * @returns {string} Multi-line log text.
  */
 export const formatErrorForLog = (feature: string, error: unknown): string => {
   const err: any = unwrapRetry(error)
-  const lines = [`${feature} model call failed: ${err?.constructor?.name || 'Error'}: ${err?.message || err}`]
-  if (err?.responseBody) lines.push(`  responseBody: ${String(err.responseBody).slice(0, LOGGED_BODY_CHARS)}`)
+  const lines = [`${feature} model call failed: ${err?.constructor?.name || 'Error'}: ${clip(err?.message || err)}`]
+  if (err?.responseBody) lines.push(`  responseBody: ${clip(err.responseBody)}`)
   if (err?.statusCode) lines.push(`  statusCode: ${err.statusCode}`)
-  if (err?.url) lines.push(`  url: ${err.url}`)
-  if (err?.cause) lines.push(`  cause: ${err.cause?.constructor?.name || ''} ${err.cause?.message || err.cause}`)
-  if (err?.stack) lines.push(err.stack)
+  if (err?.url) lines.push(`  url: ${clip(err.url)}`)
+  if (err?.cause) lines.push(`  cause: ${err.cause?.constructor?.name || ''} ${clip(err.cause?.message || err.cause)}`)
+  if (err?.stack) lines.push(...stackFrames(err.stack))
   return lines.join('\n')
 }
