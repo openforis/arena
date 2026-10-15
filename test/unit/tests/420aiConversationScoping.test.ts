@@ -138,4 +138,24 @@ describe('purge of a deleted survey (420)', () => {
     await expect(purge(7)).resolves.toBeUndefined()
     expect(log).toHaveBeenCalledTimes(1)
   })
+
+  test('a synchronous step that throws is logged and the other steps still run', async () => {
+    const log = jest.fn()
+    const removeSurvey = jest.fn(async () => undefined)
+    const suggestionsRemove = jest.fn()
+    const purge = createPurgeSurveyAiData({
+      getConversationStore: async () => ({ removeSurvey }),
+      openConversations: {
+        clearSurvey: () => {
+          throw new Error('storage blocked')
+        },
+      },
+      suggestions: { removeSurvey: suggestionsRemove },
+      log,
+    })
+    await expect(purge(7)).resolves.toBeUndefined()
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(suggestionsRemove).toHaveBeenCalledWith(7)
+    expect(removeSurvey).toHaveBeenCalledWith(7)
+  })
 })

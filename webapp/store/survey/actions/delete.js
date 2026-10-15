@@ -19,10 +19,11 @@ export const deleteSurvey = (navigate) => async (dispatch, getState) => {
 
   await axios.delete(`/api/survey/${surveyId}`)
 
-  // the AI conversations and suggestions of a survey live in this browser only: they go with the survey
-  await purgeSurveyAiData(surveyId)
-
   await dispatch({ type: surveyDelete, surveyInfo })
+
+  // the AI conversations and suggestions of a survey live in this browser only: they go with the survey. After the
+  // dispatch, the survey is closed and what ran on it (detectors, counts) has ended
+  await purgeSurveyAiData(surveyId)
 
   // Navigate to survey/template list
   const moduleDestination = Survey.isTemplate(surveyInfo) ? homeModules.templateList : homeModules.surveyList
