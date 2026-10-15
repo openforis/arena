@@ -65,7 +65,8 @@ export const init = (app) => {
   app.get(
     '/ai/settings',
     ...guards,
-    jsonRoute(({ user }) => buildResponseBody(user))
+    // the keys saved before they were bound to their owner are encrypted again the first time the settings are read
+    jsonRoute(async ({ user }) => buildResponseBody(await AiProviderService.upgradeLegacyProviderKeys({ user })))
   )
 
   app.put(

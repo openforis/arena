@@ -74,7 +74,7 @@ describe('model discovery SSRF guard (262)', () => {
        * Fails the test when prefs are written.
        * @returns {Promise<never>} Never resolves.
        */
-      savePrefs: async () => {
+      updateAiPrefs: async () => {
         throw new Error('listing models never writes')
       },
     }

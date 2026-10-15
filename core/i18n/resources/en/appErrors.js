@@ -111,6 +111,8 @@ Try to refresh the page.`,
     'The saved API key of this provider can no longer be read (the server encryption secret changed). Edit the provider in your AI settings and enter the key again.',
   aiEncryptionMissing:
     'API keys cannot be saved: the server has no encryption secret. Ask your administrator to set AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'This AI provider was changed or removed while it was being checked. Reload the AI settings and try again.',
   aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',
   aiExpressionTypeInvalid: 'Unknown expression kind: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Cannot generate an expression without a target field.',

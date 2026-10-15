@@ -137,6 +137,8 @@ Tente atualizar a página.`,
     'A chave de API salva deste provedor já não pode ser lida (o segredo de criptografia do servidor mudou). Edite o provedor nas suas configurações de IA e insira a chave novamente.',
   aiEncryptionMissing:
     'Não é possível salvar chaves de API: o servidor não tem um segredo de criptografia. Peça ao seu administrador para definir AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'Este provedor de IA foi alterado ou removido durante a verificação. Recarregue as configurações de IA e tente novamente.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',

@@ -142,6 +142,8 @@ export default {
     'La clave de API guardada de este proveedor ya no se puede leer (cambió el secreto de cifrado del servidor). Edite el proveedor en su configuración de IA e introduzca la clave de nuevo.',
   aiEncryptionMissing:
     'No se pueden guardar claves de API: el servidor no tiene un secreto de cifrado. Pida a su administrador que configure AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'Este proveedor de IA se modificó o se eliminó mientras se comprobaba. Recargue los ajustes de IA e inténtelo de nuevo.',
   aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
   aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',

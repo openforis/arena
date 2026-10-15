@@ -143,6 +143,8 @@ Essayez de rafraîchir la page.`,
     'La clé API enregistrée de ce fournisseur ne peut plus être lue (le secret de chiffrement du serveur a changé). Modifiez le fournisseur dans vos paramètres IA et saisissez de nouveau la clé.',
   aiEncryptionMissing:
     "Les clés API ne peuvent pas être enregistrées : le serveur n'a pas de secret de chiffrement. Demandez à votre administrateur de définir AI_USER_KEY_ENCRYPTION_SECRET.",
+  aiProviderChanged:
+    "Ce fournisseur d'IA a été modifié ou supprimé pendant sa vérification. Rechargez les paramètres d'IA et réessayez.",
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
   aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
   aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',

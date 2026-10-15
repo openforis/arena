@@ -114,6 +114,8 @@ export default {
     'このプロバイダーの保存済みAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。AI設定でプロバイダーを編集し、キーをもう一度入力してください。',
   aiEncryptionMissing:
     'APIキーを保存できません：サーバーに暗号化シークレットがありません。管理者にAI_USER_KEY_ENCRYPTION_SECRETの設定を依頼してください。',
+  aiProviderChanged:
+    'このAIプロバイダーは確認中に変更または削除されました。AI設定を再読み込みして、もう一度お試しください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',
   aiExpressionNodeDefMissing: '対象フィールドが指定されていないため式を生成できません。',
