@@ -46,7 +46,7 @@ export const whatsNewItems: WhatsNewItem[] = [
   {
     id: 'dashboardUpgrade',
     version: '2.9.7',
-    audience: whatsNewAudiences.all,
+    audience: whatsNewAudiences.surveyAdmin,
     image: '/img/whats-new/dashboardUpgrade.png',
   },
   {
