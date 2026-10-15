@@ -77,6 +77,7 @@ const createDeps = (user: any = null) => {
     newId: () => 'new-id',
     now: () => '2026-10-15T00:00:00.000Z',
     allowlist: [],
+    findCopiedEnvelopes: store.findCopiedEnvelopes,
   }
   return { deps, tests, listed, saved: store.writes, store }
 }
@@ -212,7 +213,8 @@ describe('Provider keys are bound to their owner (302)', () => {
   })
 
   test('a key saved before the AAD existed still works for its owner', async () => {
-    const legacy = storedProvider({ apiKeyEncrypted: legacyEnvelope('sk-old') })
+    // an endpoint fixed by the server: the key can only go where the server sends it
+    const legacy = storedProvider({ type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-old') })
     const { deps, tests } = createDeps()
     await AiProviderService.testProvider({ user: userWith('u1', [legacy]), input: { id: 'acct:p1' }, deps })
     expect(tests[0].apiKey).toBe('sk-old')

@@ -61,6 +61,7 @@ const createDeps = (aiPrefs: any) => {
     })(),
     now: () => '2026-10-15T00:00:00.000Z',
     allowlist: [],
+    findCopiedEnvelopes: store.findCopiedEnvelopes,
   }
   return { deps, tests, store }
 }

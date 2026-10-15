@@ -10,10 +10,13 @@ import { db } from '@server/db/db'
 export type StoredAiPrefs = Record<string, any>
 
 // the database or a transaction
-type Queryable = Pick<typeof db, 'oneOrNone' | 'none'>
+export type Queryable = Pick<typeof db, 'oneOrNone' | 'none' | 'manyOrNone'>
 
-// returns the AI prefs to store, or null to leave the stored ones as they are
-export type AiPrefsUpdate = (current: StoredAiPrefs | null) => StoredAiPrefs | null | Promise<StoredAiPrefs | null>
+// returns the AI prefs to store, or null to leave the stored ones as they are; `client` is the transaction
+export type AiPrefsUpdate = (
+  current: StoredAiPrefs | null,
+  client: Queryable
+) => StoredAiPrefs | null | Promise<StoredAiPrefs | null>
 
 /**
  * Reads the stored AI prefs of a user.
@@ -54,6 +57,33 @@ export const writeAiPrefs = async (
 }
 
 /**
+ * Returns the envelopes that also appear in the AI prefs of another user. Envelopes have a random IV, so one that is
+ * stored twice was copied from one record to the other.
+ * @param {object} params - Parameters.
+ * @param {string} params.userUuid - The user whose own records are left out.
+ * @param {string[]} params.envelopes - Envelopes to look for.
+ * @param {object} [client] - Database client.
+ * @returns {Promise<string[]>} The envelopes found in the record of another user.
+ */
+export const findEnvelopesOfOtherUsers = async (
+  { userUuid, envelopes }: { userUuid: string; envelopes: string[] },
+  client: Queryable = db
+): Promise<string[]> => {
+  if (envelopes.length === 0) return []
+  // strpos, not LIKE: an envelope is stored data and could hold wildcards
+  const rows: { envelope: string }[] = await client.manyOrNone(
+    `SELECT e.envelope
+     FROM unnest($2::text[]) AS e(envelope)
+     WHERE EXISTS (
+       SELECT 1 FROM "user" u
+       WHERE u.uuid <> $1 AND u.prefs -> 'ai' IS NOT NULL AND strpos((u.prefs -> 'ai')::text, e.envelope) > 0
+     )`,
+    [userUuid, envelopes]
+  )
+  return rows.map((row) => row.envelope)
+}
+
+/**
  * Changes the AI prefs of a user from their latest stored value: reads them with the row locked, applies the change
  * and stores the result in one transaction. The change must not wait for the network: the row stays locked meanwhile.
  * @param {object} params - Parameters.
@@ -69,7 +99,7 @@ export const updateAiPrefs = async (
 ): Promise<StoredAiPrefs | null> =>
   client.tx(async (tx) => {
     const current = await readAiPrefs({ userUuid, forUpdate: true }, tx)
-    const aiPrefs = await update(current)
+    const aiPrefs = await update(current, tx)
     if (!aiPrefs) return current
     await writeAiPrefs({ userUuid, aiPrefs }, tx)
     return aiPrefs

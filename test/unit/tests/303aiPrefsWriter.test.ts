@@ -73,6 +73,7 @@ const createDeps = (user: any, whileTesting: () => Promise<unknown> = async () =
     })(),
     now: () => '2026-10-15T00:00:00.000Z',
     allowlist: [],
+    findCopiedEnvelopes: store.findCopiedEnvelopes,
   }
   return { deps, store }
 }
@@ -203,7 +204,13 @@ describe('AI prefs are changed on their latest stored value (303)', () => {
     const saved = await AiSettingsService.saveSettings({
       user: snapshot,
       update: { accessLevel: 3 },
-      deps: { updateAiPrefs: store.updateAiPrefs, cipher: cipherOf(), isEncryptionConfigured: () => true },
+      deps: {
+        updateAiPrefs: store.updateAiPrefs,
+        cipher: cipherOf(),
+        isEncryptionConfigured: () => true,
+        allowlist: [],
+        findCopiedEnvelopes: store.findCopiedEnvelopes,
+      },
     })
     expect(idsOf(store.get())).toEqual(['acct:a'])
     expect(store.get()?.accessLevel).toBe(3)
@@ -211,7 +218,8 @@ describe('AI prefs are changed on their latest stored value (303)', () => {
   })
 
   describe('keys saved without an AAD', () => {
-    const legacyProvider = () => keyless('acct:old', { apiKeyEncrypted: legacyEnvelope('sk-old') })
+    const legacyProvider = () =>
+      keyless('acct:old', { type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-old') })
     const aadOf = (provider: any) => buildKeyAad({ userUuid: USER_UUID, provider })
 
     test('every write encrypts them again for their owner and provider', async () => {
@@ -265,7 +273,13 @@ describe('AI prefs are changed on their latest stored value (303)', () => {
     const user = await changeAiPrefs({
       user: snapshot,
       change: () => null,
-      deps: { updateAiPrefs: store.updateAiPrefs, cipher: cipherOf(), isEncryptionConfigured: () => true },
+      deps: {
+        updateAiPrefs: store.updateAiPrefs,
+        cipher: cipherOf(),
+        isEncryptionConfigured: () => true,
+        allowlist: [],
+        findCopiedEnvelopes: store.findCopiedEnvelopes,
+      },
     })
     expect(store.writes).toEqual([])
     expect((user.prefs as any).ai).toBe(snapshot.prefs.ai)

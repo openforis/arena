@@ -8,7 +8,12 @@ import * as AiProviderService from '@server/modules/ai/service/aiProviderService
 import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
-import { readAiPrefs, updateAiPrefs, writeAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
+import {
+  findEnvelopesOfOtherUsers,
+  readAiPrefs,
+  updateAiPrefs,
+  writeAiPrefs,
+} from '@server/modules/user/repository/userAiPrefsRepository'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
 import { getContextUser } from '@test/integration/config/context'
@@ -52,6 +57,7 @@ const idsOf = (aiPrefs: any): string[] => (aiPrefs?.providers ?? []).map((provid
 describe('AI prefs writer (055)', () => {
   let admin: any
   let member: any
+  let other: any
   let surveyId: number
   let originalSecret: string | undefined
 
@@ -84,16 +90,19 @@ describe('AI prefs writer (055)', () => {
     const survey = await SB.survey(admin, SB.entity('root', SB.attribute('root_key').key())).buildAndStore()
     surveyId = Survey.getId(survey)
     member = await createSurveyMember({ admin, surveyId, groupName: AuthGroup.groupNames.surveyEditor })
+    other = await createSurveyMember({ admin, surveyId, groupName: AuthGroup.groupNames.surveyEditor })
   })
 
   beforeEach(async () => {
-    await db.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = $1`, [uuid()])
+    await db.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = ANY($1)`, [
+      [uuid(), User.getUuid(other)],
+    ])
   })
 
   afterAll(async () => {
     if (originalSecret === undefined) delete process.env.AI_USER_KEY_ENCRYPTION_SECRET
     else process.env.AI_USER_KEY_ENCRYPTION_SECRET = originalSecret
-    await deleteUsers([member])
+    await deleteUsers([member, other])
     await SurveyManager.deleteSurvey(surveyId, {})
   })
 
@@ -215,7 +224,8 @@ describe('AI prefs writer (055)', () => {
   })
 
   test('a key saved without an AAD is encrypted again for its owner and provider when the settings are read', async () => {
-    const old = { ...keyless('acct:old'), apiKeyEncrypted: legacyEnvelope('sk-old') }
+    // a provider whose endpoint the server fixes: an old key is accepted there
+    const old = { ...keyless('acct:old'), type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-old') }
     await writeAiPrefs({ userUuid: uuid(), aiPrefs: { accessLevel: 1, providers: [old] } })
     await AiProviderService.upgradeLegacyProviderKeys({ user: await loadRequestUser() })
     const [stored] = (await readAiPrefs({ userUuid: uuid() }))?.providers
@@ -226,5 +236,40 @@ describe('AI prefs writer (055)', () => {
     expect(() =>
       SecretBox.decrypt(stored.apiKeyEncrypted, buildKeyAad({ userUuid: 'someone-else', provider: stored }))
     ).toThrow()
+  })
+
+  describe('a key saved without an AAD that is stored for another user too', () => {
+    const copiedKey = legacyEnvelope('sk-victim')
+    const providerWith = (apiKeyEncrypted: string) => ({
+      ...keyless('acct:old'),
+      type: 'openai',
+      baseUrl: null,
+      apiKeyEncrypted,
+    })
+
+    test('the search finds the envelopes of the records of other users only', async () => {
+      const unique = legacyEnvelope('sk-unique')
+      await writeAiPrefs({ userUuid: User.getUuid(other), aiPrefs: { providers: [providerWith(copiedKey)] } })
+      await writeAiPrefs({ userUuid: uuid(), aiPrefs: { providers: [providerWith(copiedKey), providerWith(unique)] } })
+      expect(await findEnvelopesOfOtherUsers({ userUuid: uuid(), envelopes: [copiedKey, unique] })).toEqual([copiedKey])
+      expect(await findEnvelopesOfOtherUsers({ userUuid: User.getUuid(other), envelopes: [unique] })).toEqual([unique])
+      expect(await findEnvelopesOfOtherUsers({ userUuid: uuid(), envelopes: [] })).toEqual([])
+      // text with wildcards is looked for as it is
+      expect(await findEnvelopesOfOtherUsers({ userUuid: uuid(), envelopes: ['%', '_'] })).toEqual([])
+    })
+
+    test('it is removed on the upgrade, not encrypted again; the key that is not shared is encrypted again', async () => {
+      const unique = legacyEnvelope('sk-unique')
+      await writeAiPrefs({ userUuid: User.getUuid(other), aiPrefs: { providers: [providerWith(copiedKey)] } })
+      await writeAiPrefs({
+        userUuid: uuid(),
+        aiPrefs: { accessLevel: 1, providers: [providerWith(copiedKey), { ...providerWith(unique), id: 'acct:own' }] },
+      })
+      await AiProviderService.upgradeLegacyProviderKeys({ user: await loadRequestUser() })
+      const [shared, own] = (await readAiPrefs({ userUuid: uuid() }))?.providers
+      expect(shared.apiKeyEncrypted).toBeNull()
+      expect(SecretBox.isLegacyEnvelope(own.apiKeyEncrypted)).toBe(false)
+      expect(SecretBox.decrypt(own.apiKeyEncrypted, buildKeyAad({ userUuid: uuid(), provider: own }))).toBe('sk-unique')
+    })
   })
 })

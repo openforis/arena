@@ -89,6 +89,7 @@ export type AiProviderServiceDeps = {
   newId: () => string
   now: () => string
   allowlist: string[]
+  findCopiedEnvelopes: AiPrefsWriterDeps['findCopiedEnvelopes']
 }
 
 type ProviderPrefsChange = (latest: AiProviderPrefs) => AiProviderPrefs | null
@@ -197,6 +198,7 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
    */
   now: () => new Date().toISOString(),
   allowlist: ENV.aiOrgHostedBaseUrls ?? [],
+  findCopiedEnvelopes: createDefaultAiPrefsWriterDeps().findCopiedEnvelopes,
 })
 
 /**
@@ -299,7 +301,7 @@ const withStoredKey = ({
 }): ResolvedCallConfig => {
   const { saved, sameEndpoint, cfg } = resolved
   if (!saved || !sameEndpoint || input.apiKey !== undefined) return resolved
-  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, user.uuid, deps.decrypt) } }
+  return { ...resolved, cfg: { ...cfg, apiKey: decryptStoredKey(saved, user.uuid, deps.decrypt, deps.allowlist) } }
 }
 
 /**
@@ -373,6 +375,8 @@ const writerDepsOf = (deps: AiProviderServiceDeps): AiPrefsWriterDeps => ({
   updateAiPrefs: deps.updateAiPrefs,
   cipher: cipherOf(deps),
   isEncryptionConfigured: deps.isEncryptionConfigured,
+  allowlist: deps.allowlist,
+  findCopiedEnvelopes: deps.findCopiedEnvelopes,
 })
 
 /**
@@ -507,7 +511,7 @@ const assertTestPasses = async ({
 const isKeyReadable = (provider: StoredAiProvider, userUuid: string, deps: AiProviderServiceDeps): boolean => {
   if (!provider.apiKeyEncrypted) return false
   try {
-    decryptStoredKey(provider, userUuid, deps.decrypt)
+    decryptStoredKey(provider, userUuid, deps.decrypt, deps.allowlist)
     return true
   } catch {
     return false
@@ -909,7 +913,7 @@ export const upgradeLegacyProviderKeys = async ({
   user: User
   deps?: AiProviderServiceDeps
 }): Promise<User> => {
-  const hasOldKeys = hasLegacyKeys(getProviderPrefs(getAiPrefs(user)), deps.isLegacyEnvelope)
+  const hasOldKeys = hasLegacyKeys(getProviderPrefs(getAiPrefs(user)), deps.isLegacyEnvelope, deps.allowlist)
   if (!hasOldKeys || !deps.isEncryptionConfigured()) return user
   try {
     return (await commitProviderPrefs({ user, deps, change: () => null })).user
