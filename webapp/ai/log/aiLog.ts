@@ -3,6 +3,9 @@
  * they are not swallowed silently. The only place of the AI code that touches the console.
  */
 
+// what the code that recovers from an error calls, so a test can capture it
+export type AiLog = (message: string, error?: unknown) => void
+
 /**
  * Logs a problem the app recovered from.
  * @param {string} message - What failed and what the app did instead.

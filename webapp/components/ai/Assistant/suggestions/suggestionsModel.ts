@@ -1,6 +1,7 @@
 /**
  * Display rules of the suggestions: which areas count, how cards group, the assistant button label, the card text.
  */
+import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import type { SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
 import type { SuggestionDefinitions } from '@webapp/ai/suggestions/suggestionActions'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
@@ -71,22 +72,26 @@ export const getAssistantButtonLabel = ({ count, t }: { count: number; t: Sugges
  * @param {AssistantSuggestion} params.suggestion - Visible suggestion.
  * @param {SuggestionDescribeContext} params.describeContext - Survey, translation and language.
  * @param {SuggestionDefinitions} params.definitions - Definitions.
+ * @param {AiLog} [params.log] - Reports a card that could not be described.
  * @returns {string|null} The text.
  */
 export const getSuggestionCardText = ({
   suggestion,
   describeContext,
   definitions,
+  log = logAiWarning,
 }: {
   suggestion: AssistantSuggestion
   describeContext: SuggestionDescribeContext
   definitions: SuggestionDefinitions
+  log?: AiLog
 }): string | null => {
   try {
     const { key, params } = definitions[suggestion.kind].card(suggestion, describeContext)
     return describeContext.t(`aiSuggestions:${key}`, params)
-  } catch {
+  } catch (error) {
     // a broken suggestion never breaks the panel
+    log(`The card of the ${suggestion.kind} suggestion could not be described`, error)
     return null
   }
 }

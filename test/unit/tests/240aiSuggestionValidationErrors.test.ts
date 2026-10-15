@@ -216,23 +216,38 @@ describe('validation errors suggestion detector (240)', () => {
     const rejecting = jest.fn(async (_params: unknown): Promise<number> => {
       throw new Error('Request failed with status code 500')
     })
+    const log = jest.fn()
     await expect(
-      createValidationErrorsDetector({ countRows: rejecting }).handle(opened(), failed.ctx)
+      createValidationErrorsDetector({ countRows: rejecting, log }).handle(opened(), failed.ctx)
     ).resolves.toBeUndefined()
     expect(failed.pending()).toEqual([])
+    expect(log).toHaveBeenCalledTimes(1)
 
     const late = setup()
     let answer: (count: number) => void = () => {}
     const deferred = jest.fn((_params: unknown) => new Promise<number>((resolve) => (answer = resolve)))
-    const handling = createValidationErrorsDetector({ countRows: deferred }).handle(opened(), late.ctx)
+    const handling = createValidationErrorsDetector({ countRows: deferred, log }).handle(opened(), late.ctx)
     late.controller.abort() // the user switched survey or cycle
     answer(500)
     await handling
     expect(late.pending()).toEqual([])
+    // an answer that arrives after the abort is not an error
+    expect(log).toHaveBeenCalledTimes(1)
 
     const invalid = setup()
     await openWithCount(invalid.ctx, Number.NaN)
     expect(invalid.pending()).toEqual([])
+  })
+
+  test('a count that fails because the generation was aborted is not logged', async () => {
+    const aborted = setup()
+    const log = jest.fn()
+    const countRows = jest.fn(async (_params: unknown): Promise<number> => {
+      aborted.controller.abort()
+      throw new Error('aborted')
+    })
+    await createValidationErrorsDetector({ countRows, log }).handle(opened(), aborted.ctx)
+    expect(log).not.toHaveBeenCalled()
   })
 
   test('registered among the event detectors', () => {

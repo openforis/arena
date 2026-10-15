@@ -237,9 +237,12 @@ describe('Do it plumbing (214)', () => {
       if (id === 'unreadable') throw new Error('IndexedDB error')
       return stored[id] ?? null
     }
-    await reconcileInProgress({ store, userUuid: 'u1', load })
+    const log = jest.fn()
+    await reconcileInProgress({ store, userUuid: 'u1', load, log })
     expect(store.getInProgressConversationIds('u1')).toEqual(['pendingCard'])
     expect(visibleCount(store)).toBe(3)
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log.mock.calls[0][0]).toMatch(/could not be read/)
   })
 
   test('reconcile at mount leaves alone a conversation whose turn lock is held by another tab', async () => {

@@ -164,6 +164,19 @@ describe('category labels counts (237)', () => {
     await first
   })
 
+  test('a request that fails because the generation was aborted is not logged', async () => {
+    const { store } = createSetKindRecorder()
+    const controller = new AbortController()
+    const fetchCounts = jest.fn(async () => {
+      controller.abort()
+      throw new Error('aborted')
+    })
+    const log = jest.fn()
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts, log })
+    await detector.handle(event('generationStarted'), contextWith({ survey, store, controller }))
+    expect(log).not.toHaveBeenCalled()
+  })
+
   test('a generation abort after a successful request keeps its throttle', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn(async () => counts)
@@ -179,10 +192,12 @@ describe('category labels counts (237)', () => {
   test('a failed request is not throttled; nothing is fetched without draft defs the user can edit', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(counts)
-    const detector = createCategoryItemTranslationsDetector({ fetchCounts })
+    const log = jest.fn()
+    const detector = createCategoryItemTranslationsDetector({ fetchCounts, log })
     await detector.handle(event('generationStarted'), contextWith({ survey, store }))
     await detector.handle(event('generationStarted'), contextWith({ survey, store }))
     expect(fetchCounts).toHaveBeenCalledTimes(2)
+    expect(log).toHaveBeenCalledTimes(1)
 
     const idle = jest.fn(async () => counts)
     const guarded = createCategoryItemTranslationsDetector({ fetchCounts: idle })

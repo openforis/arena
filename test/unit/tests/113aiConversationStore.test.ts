@@ -124,8 +124,10 @@ describe('openConversationStore', () => {
         throw new Error('SecurityError')
       },
     } as unknown as IDBFactory
-    const store = await openConversationStore({ indexedDB: broken })
+    const log = jest.fn()
+    const store = await openConversationStore({ indexedDB: broken, log })
     expect(store.persistent).toBe(false)
+    expect(log).toHaveBeenCalledTimes(1)
     const item = conversation({ seconds: 1 })
     await store.save(item)
     expect(await store.get(item.id, 'user-1')).toEqual(item)

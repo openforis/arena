@@ -50,11 +50,15 @@ describe('suggestion events, registries, generation and designer visit (212)', (
       throw new Error('detector bug')
     })
     const unsubscribe = subscribeSuggestionEvents((event) => received.push(event.type))
-    notifySuggestionEvent({ type: 'publishClicked' })
+    const log = jest.fn()
+    notifySuggestionEvent({ type: 'publishClicked' }, log)
     unsubscribe()
     failing()
-    notifySuggestionEvent({ type: 'surveyInfoSaved' })
+    notifySuggestionEvent({ type: 'surveyInfoSaved' }, log)
     expect(received).toEqual(['publishClicked'])
+    // the failure is reported, not swallowed
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log).toHaveBeenCalledWith('A suggestion listener failed on publishClicked', expect.any(Error))
   })
 
   test('registries: one detector per kind and array, and a definition for every detected kind', () => {
