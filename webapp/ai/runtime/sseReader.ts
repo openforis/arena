@@ -1,5 +1,6 @@
 import type { LanguageModelV4StreamPart } from '@ai-sdk/provider'
 
+import SystemError, { StatusCodes } from '@core/systemError'
 import { createSseParser } from '@common/ai/sseParser'
 import { deserializeStreamPart } from '@common/ai/wire'
 
@@ -8,8 +9,10 @@ import { deserializeStreamPart } from '@common/ai/wire'
  * (which aborts the request).
  * @param {Response} response - Gateway response (status 200, text/event-stream).
  * @returns {ReadableStream<LanguageModelV4StreamPart>} The parts.
+ * @throws {SystemError} aiProviderUnavailable when the response has no body (nothing to read).
  */
 export const readSseParts = (response: Response): ReadableStream<LanguageModelV4StreamPart> => {
+  if (!response.body) throw new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   return new ReadableStream<LanguageModelV4StreamPart>({
