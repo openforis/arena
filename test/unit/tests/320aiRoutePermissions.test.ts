@@ -2,28 +2,9 @@ import * as AiApi from '@server/modules/ai/api/aiApi'
 import { requireAiFeaturePermission, requireAiFeaturesEnabled } from '@server/modules/ai/api/aiMiddleware'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
-type Route = { method: string; path: string; handlers: any[] }
+import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
 
-/**
- * Collects the routes registered by an API module (method, path and the whole handler chain).
- * @param {(app: object) => void} init - The module `init`.
- * @returns {Route[]} The routes.
- */
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+type Route = CollectedRoute
 
 /**
  * Finds a route, failing the test when it is missing.

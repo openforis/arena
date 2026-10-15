@@ -75,8 +75,18 @@ const runChain = async (
   return res
 }
 
+// the global registry is restored after the tests: the survey service registered here is a fake
+let previousSurveyService: unknown
 beforeAll(() => {
-  ServiceRegistry.getInstance().registerService(ServiceType.survey, { get: async () => surveyInfo } as any)
+  const registry = ServiceRegistry.getInstance()
+  previousSurveyService = (registry as any).services[ServiceType.survey]
+  registry.registerService(ServiceType.survey, { get: async () => surveyInfo } as any)
+})
+
+afterAll(() => {
+  const registry = ServiceRegistry.getInstance()
+  if (previousSurveyService) registry.registerService(ServiceType.survey, previousSurveyService as any)
+  else delete (registry as any).services[ServiceType.survey]
 })
 
 describe('GET /survey/:surveyId/ai-policy', () => {

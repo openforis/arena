@@ -85,9 +85,10 @@ export const runRoutePermission = async ({
   user: any
   surveyId: number
 }): Promise<any> => {
+  if (!route) throw new Error('Route not found: it is not registered, so its permission cannot be checked')
   let error: any
   const req = { params: { surveyId: String(surveyId) }, query: {}, body: {}, user }
-  await route?.handlers[0](req, {}, (nextError?: any) => {
+  await route.handlers[0](req, {}, (nextError?: any) => {
     error = nextError
   })
   return error
@@ -107,7 +108,8 @@ export type RouteAccess = 'granted' | 'refused'
  * @param {number} params.surveyId - Survey id (route param).
  * @param {object} [params.body] - Request body (the survey of a body-driven route, the feature of the gateway).
  * @param {number} [params.handlerIndex] - Index of the middleware in the route chain.
- * @returns {Promise<RouteAccess>} Granted or refused; any other outcome (an unexpected error) fails the test.
+ * @returns {Promise<RouteAccess>} Granted or refused; any other outcome (an unexpected error, or a route that is
+ *   not registered) fails the test.
  */
 export const checkRouteAccess = async ({
   route,
@@ -122,11 +124,12 @@ export const checkRouteAccess = async ({
   body?: object
   handlerIndex?: number
 }): Promise<RouteAccess> => {
+  if (!route) throw new Error('Route not found: it is not registered, so its access cannot be checked')
   const res = createFakeResponse()
   let nextCalled = false
   let error: any
   const req = { params: { surveyId: String(surveyId) }, query: {}, body, user }
-  await route?.handlers[handlerIndex](req, res, (nextError?: any) => {
+  await route.handlers[handlerIndex](req, res, (nextError?: any) => {
     nextCalled = true
     error = nextError
   })
