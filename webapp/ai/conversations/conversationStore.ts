@@ -22,7 +22,7 @@ export type ConversationStore = {
   removeSurvey: (surveyId: number) => Promise<void>
 }
 
-const DB_NAME = 'arena-ai'
+export const CONVERSATIONS_DB_NAME = 'arena-ai'
 const DB_VERSION = 1
 const STORE = 'conversations'
 
@@ -41,16 +41,49 @@ const transactionDone = (transaction: IDBTransaction): Promise<void> =>
     transaction.onabort = () => reject(transaction.error ?? new Error('Transaction aborted'))
   })
 
-const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
+const INDEXES: [name: string, keyPath: string | string[]][] = [
+  ['userSurvey', ['userUuid', 'surveyKey']],
+  ['userUuid', 'userUuid'],
+  ['updatedAt', 'updatedAt'],
+]
+
+/**
+ * Creates what is missing in the database: the store and its indexes. Creating a store that exists throws and aborts
+ * the upgrade, so a version bump must find what an older version left.
+ * @param {IDBDatabase} db - Database being upgraded.
+ * @param {IDBTransaction} transaction - The version change transaction.
+ * @returns {void}
+ */
+export const ensureConversationsSchema = (db: IDBDatabase, transaction: IDBTransaction): void => {
+  const store = db.objectStoreNames.contains(STORE)
+    ? transaction.objectStore(STORE)
+    : db.createObjectStore(STORE, { keyPath: 'id' })
+  for (const [name, keyPath] of INDEXES) {
+    if (!store.indexNames.contains(name)) store.createIndex(name, keyPath)
+  }
+}
+
+/**
+ * Opens the database. When another tab (a newer build) asks for a new version, this connection is closed so that tab
+ * is not blocked; the store is then reopened on the next use.
+ * @param {IDBFactory} indexedDB - IndexedDB factory.
+ * @param {Function} [onClosed] - Called when the connection was closed because another tab upgraded the database.
+ * @returns {Promise<IDBDatabase>} The database.
+ */
+const openDatabase = (indexedDB: IDBFactory, onClosed?: () => void): Promise<IDBDatabase> =>
   new Promise((resolve, reject) => {
-    const request = indexedDB.open(DB_NAME, DB_VERSION)
+    const request = indexedDB.open(CONVERSATIONS_DB_NAME, DB_VERSION)
     request.onupgradeneeded = () => {
-      const store = request.result.createObjectStore(STORE, { keyPath: 'id' })
-      store.createIndex('userSurvey', ['userUuid', 'surveyKey'])
-      store.createIndex('userUuid', 'userUuid')
-      store.createIndex('updatedAt', 'updatedAt')
+      ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
     }
-    request.onsuccess = () => resolve(request.result)
+    request.onsuccess = () => {
+      const db = request.result
+      db.onversionchange = () => {
+        db.close()
+        onClosed?.()
+      }
+      resolve(db)
+    }
     request.onerror = () => reject(request.error)
     request.onblocked = () => reject(new Error('The arena-ai database is blocked by another tab'))
   })
@@ -173,18 +206,21 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
  * @param {object} params - Parameters.
  * @param {IDBFactory|null} params.indexedDB - IndexedDB factory (null: memory store).
  * @param {number} [params.keep] - Conversations kept per user and survey.
+ * @param {Function} [params.onClosed] - Called when the connection is closed because another tab upgraded the database.
  * @returns {Promise<ConversationStore>} The store.
  */
 export const openConversationStore = async ({
   indexedDB,
   keep = AiLimits.assistantConversationsKept,
+  onClosed,
 }: {
   indexedDB: IDBFactory | null
   keep?: number
+  onClosed?: () => void
 }): Promise<ConversationStore> => {
   if (!indexedDB) return createMemoryConversationStore({ keep })
   try {
-    return createIndexedDbStore(await openDatabase(indexedDB), keep)
+    return createIndexedDbStore(await openDatabase(indexedDB, onClosed), keep)
   } catch {
     // private windows and blocked storage: keep working, the panel says it
     return createMemoryConversationStore({ keep })
@@ -198,6 +234,12 @@ let appStorePromise: Promise<ConversationStore> | null = null
  * @returns {Promise<ConversationStore>} The store.
  */
 export const getConversationStore = (): Promise<ConversationStore> => {
-  appStorePromise ??= openConversationStore({ indexedDB: globalThis.indexedDB ?? null })
+  appStorePromise ??= openConversationStore({
+    indexedDB: globalThis.indexedDB ?? null,
+    // the next use opens a fresh connection (the closed one is useless)
+    onClosed: () => {
+      appStorePromise = null
+    },
+  })
   return appStorePromise
 }
