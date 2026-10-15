@@ -72,7 +72,6 @@ const capabilities = ({
   defaultProviderId,
   local: {
     'local:l1': {
-      enabled: true,
       reachable: localUp,
       models: ['local-model'],
       hostingClass: 'onDevice',

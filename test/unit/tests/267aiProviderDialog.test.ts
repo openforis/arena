@@ -382,7 +382,6 @@ describe('provider dialog draft (267)', () => {
 
   test('a saved local provider: the last probe of the same server counts as its test', () => {
     const capability: AiLocalServerCapability = {
-      enabled: true,
       reachable: true,
       models: ['x'],
       hostingClass: 'onDevice',

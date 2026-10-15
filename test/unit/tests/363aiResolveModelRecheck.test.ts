@@ -50,7 +50,6 @@ const capabilities = (baseUrl: string): AiCapabilities => ({
   defaultProviderId: 'local:l1',
   local: {
     'local:l1': {
-      enabled: true,
       reachable: true,
       models: ['local-model'],
       hostingClass: 'onDevice',

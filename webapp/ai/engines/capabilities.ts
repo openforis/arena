@@ -84,7 +84,6 @@ export const buildLocalProviderCapability = ({
   probe: LocalServerProbeResult | null
   allowlist: string[]
 }): AiLocalServerCapability => ({
-  enabled: true,
   reachable: probe ? probe.reachable : null,
   models: probe ? probe.models : [],
   hostingClass: getLocalServerHostingClass(provider.baseUrl, allowlist),

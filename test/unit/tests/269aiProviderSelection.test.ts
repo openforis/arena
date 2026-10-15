@@ -65,7 +65,6 @@ const ARENA_NOT_SET_UP: AiProviderEntry = {
 }
 
 const PROBE: AiLocalServerCapability = {
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass: 'onDevice',
