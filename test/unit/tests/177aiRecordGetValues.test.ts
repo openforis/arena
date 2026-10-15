@@ -77,8 +77,8 @@ describe('findRecordUuidByKeys', () => {
   })
 
   test('refuses names that are not the record keys', async () => {
-    expect(await lookup({ plot_id: '1' }).result).toMatchObject({ error: { code: 'recordKeysInvalid' } })
-    expect(await lookup({}).result).toMatchObject({ error: { code: 'recordKeysInvalid' } })
+    await expect(lookup({ plot_id: '1' }).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })
+    await expect(lookup({}).result).rejects.toMatchObject({ code: 'recordKeysInvalid' })
   })
 
   describe('paging', () => {
@@ -96,28 +96,24 @@ describe('findRecordUuidByKeys', () => {
 
     test('a duplicate on the second page is ambiguous', async () => {
       const { api } = pagedApi([[summaries[0], ...fullPage('a').slice(1)], [{ ...summaries[0], uuid: 'dup' }]])
-      expect(await findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })).toMatchObject(
-        {
-          error: { code: 'recordAmbiguous' },
-        }
-      )
+      await expect(
+        findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })
+      ).rejects.toMatchObject({ code: 'recordAmbiguous' })
     })
 
     test('stops at the page cap with recordSearchTooBroad', async () => {
       const { api, calls } = pagedApi([1, 2, 3, 4, 5, 6].map((n) => fullPage(`p${n}`)))
-      expect(await findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })).toMatchObject(
-        {
-          error: { code: 'recordSearchTooBroad' },
-        }
-      )
+      await expect(
+        findRecordUuidByKeys({ api, survey, surveyId: 1, cycle, keys: { cluster_id: '12' } })
+      ).rejects.toMatchObject({ code: 'recordSearchTooBroad' })
       expect(calls).toHaveLength(5)
     })
   })
 
   test('not found and ambiguous', async () => {
-    expect(await lookup({ cluster_id: '7' }).result).toMatchObject({ error: { code: 'recordNotFound' } })
+    await expect(lookup({ cluster_id: '7' }).result).rejects.toMatchObject({ code: 'recordNotFound' })
     const duplicates = [summaries[0], { ...summaries[0], uuid: 'r-12-bis' }]
-    expect(await lookup({ cluster_id: '12' }, duplicates).result).toMatchObject({ error: { code: 'recordAmbiguous' } })
+    await expect(lookup({ cluster_id: '12' }, duplicates).result).rejects.toMatchObject({ code: 'recordAmbiguous' })
   })
 })
 

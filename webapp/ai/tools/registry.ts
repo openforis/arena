@@ -5,12 +5,12 @@
 import { jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 
-import { AiLimits } from '@common/ai/limits'
 import { isHostingAllowed, type AiPolicy } from '@common/ai/policy'
 
 import { ALL_TOOLS } from './allTools'
+import { limitToolResult, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
-import type { AiTool, AiToolArea, AiToolContext, AiToolErrorResult } from './types'
+import type { AiTool, AiToolArea, AiToolContext } from './types'
 
 export const AI_TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/
 
@@ -45,32 +45,6 @@ export const getTools = ({
       isHostingAllowed({ effective, dataClass: tool.dataClass, hostingClass }) &&
       tool.requires(ctx)
   )
-}
-
-/**
- * Limits the JSON size of a tool result: the model gets the first characters and `truncated: true`.
- * @param {unknown} output - Tool output.
- * @param {number} [maxChars] - Maximum JSON length.
- * @returns {unknown} The output (undefined → null) or `{ truncated: true, json }`.
- */
-export const limitToolResult = (output: unknown, maxChars: number = AiLimits.assistantToolResultMaxChars): unknown => {
-  const value = output === undefined ? null : output
-  const json = JSON.stringify(value)
-  if (json.length <= maxChars) return value
-  return { truncated: true, json: json.slice(0, maxChars) }
-}
-
-/**
- * Builds the structured error result; when it exceeds the result budget the details are dropped.
- * @param {string} code - Error code.
- * @param {string} message - Message for the model.
- * @param {object} [details] - Extra fields.
- * @returns {AiToolErrorResult} The error result, always within the budget.
- */
-const toolError = (code: string, message: string, details: Record<string, unknown> = {}): AiToolErrorResult => {
-  const result = { error: { code, message, ...details } }
-  if (JSON.stringify(result).length <= AiLimits.assistantToolResultMaxChars) return result
-  return { error: { code, message: message.slice(0, 1000), detailsDropped: true } }
 }
 
 const isAbortError = (error: unknown): boolean => (error as { name?: string })?.name === 'AbortError'

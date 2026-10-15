@@ -9,13 +9,11 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { AiLimits } from '@common/ai/limits'
-
+import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import { canViewSurveyTool, requireSurvey } from './surveyLookup'
 
 // the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
-export const REF_LIST_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 type CategoryEntry = { name: string; levels: string[]; itemsCount: number | null }
 type TaxonomyEntry = { name: string; taxaCount: number | null }
@@ -42,16 +40,8 @@ const byName = (a: { name: string }, b: { name: string }): number => a.name.loca
  * @param {object} emptyResult - The result without entries.
  * @returns {object[]} The first entries that fit.
  */
-const fitEntries = <T>(entries: T[], emptyResult: object): T[] => {
-  const fitted: T[] = []
-  let size = JSON.stringify(emptyResult).length
-  for (const entry of entries) {
-    size += JSON.stringify(entry).length + 1
-    if (size > REF_LIST_MAX_JSON_CHARS) break
-    fitted.push(entry)
-  }
-  return fitted
-}
+const fitEntries = <T>(entries: T[], emptyResult: object): T[] =>
+  takeWithinBudget(entries, { baseChars: JSON.stringify(emptyResult).length })
 
 /**
  * Lists the categories by name.

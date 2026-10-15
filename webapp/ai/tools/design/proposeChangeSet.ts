@@ -6,14 +6,13 @@ import { z } from 'zod'
 
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 
-import { AiLimits } from '@common/ai/limits'
-
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
 
+import { takeWithinBudget } from '../common/toolResult'
 import { summaryTextSchema } from '../common/toolSchemas'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
@@ -65,23 +64,12 @@ const changesNothing = (draft: ChangeOperationDraft): boolean => {
   return isDeepEqual(draft.from, draft.to)
 }
 
-const ISSUES_BUDGET = AiLimits.assistantToolResultMaxChars - 500
-
 /**
  * Keeps the first issues whose JSON fits the result budget.
  * @param {ChangeSetIssue[]} issues - All issues.
  * @returns {ChangeSetIssue[]} The leading issues that fit.
  */
-const capIssues = (issues: ChangeSetIssue[]): ChangeSetIssue[] => {
-  const kept: ChangeSetIssue[] = []
-  let size = 2
-  for (const issue of issues) {
-    size += JSON.stringify(issue).length + 1
-    if (size > ISSUES_BUDGET) break
-    kept.push(issue)
-  }
-  return kept
-}
+const capIssues = (issues: ChangeSetIssue[]): ChangeSetIssue[] => takeWithinBudget(issues, { baseChars: 2 })
 
 /**
  * Validates the proposed operations and hands the change set to the conversation.

@@ -5,8 +5,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { collectNodeDefIssues, type NodeDefIssue } from '@webapp/ai/changeSets/validationIssues'
 
-import { AiLimits } from '@common/ai/limits'
-
+import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import {
   canViewSurveyTool,
@@ -19,7 +18,6 @@ import {
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
 export const VALIDATION_MAX_NODE_DEFS = 50
-const RESULT_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 const keepKey = (key: string): string => key
 
@@ -74,16 +72,12 @@ export const buildSurveyValidation = ({
   maxNodeDefs?: number
 }) => {
   const withIssues = getNodeDefsWithIssues(survey)
-  const result = { total: withIssues.length, truncated: false, nodeDefs: [] as object[] }
-  let size = JSON.stringify(result).length + 'true'.length
-  for (const nodeDef of withIssues.slice(0, maxNodeDefs)) {
-    const entry = describeIssues(survey, nodeDef, t)
-    size += JSON.stringify(entry).length + 1
-    if (size > RESULT_MAX_JSON_CHARS) break
-    result.nodeDefs.push(entry)
-  }
-  result.truncated = result.nodeDefs.length < withIssues.length
-  return result
+  const withoutEntries = { total: withIssues.length, truncated: false, nodeDefs: [] }
+  const nodeDefs = takeWithinBudget(withIssues.slice(0, maxNodeDefs), {
+    baseChars: JSON.stringify(withoutEntries).length + 'true'.length,
+    toEntry: (nodeDef) => describeIssues(survey, nodeDef, t),
+  })
+  return { ...withoutEntries, truncated: nodeDefs.length < withIssues.length, nodeDefs }
 }
 
 export const surveyGetValidationTool: AiTool<{ name?: string }> = {

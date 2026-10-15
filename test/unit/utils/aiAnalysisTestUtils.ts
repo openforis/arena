@@ -3,6 +3,8 @@ import * as Authorizer from '@core/auth/authorizer'
 
 import type { AnalysisApi } from '@webapp/ai/tools/analysis/analysisApi'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
+import { toolError } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import { fakeT } from './assistantTestUtils'
 
@@ -84,10 +86,19 @@ export const newFakeAnalysisApi = (overrides: Partial<Record<keyof AnalysisApi, 
 }
 
 /**
- * Validates the input with the tool's schema (as the AI SDK does), then runs the tool.
+ * Validates the input with the tool's schema (as the AI SDK does), then runs the tool; a failure the tool throws
+ * becomes the error result the registry gives the model.
  * @param {object} tool - The tool.
  * @param {object} input - The raw input.
  * @param {object} ctx - The tool context.
  * @returns {Promise<any>} The tool output.
  */
-export const runTool = async (tool: any, input: unknown, ctx: any) => tool.execute(tool.inputSchema.parse(input), ctx)
+export const runTool = async (tool: any, input: unknown, ctx: any) => {
+  const parsed = tool.inputSchema.parse(input)
+  try {
+    return await tool.execute(parsed, ctx)
+  } catch (error) {
+    if (error instanceof AiToolFailure) return toolError(error.code, error.message, error.details)
+    throw error
+  }
+}

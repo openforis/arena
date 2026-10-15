@@ -2,8 +2,8 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 
-import { AiLimits } from '@common/ai/limits'
-import { REF_LIST_MAX_JSON_CHARS, categoriesListTool, taxonomiesListTool } from '@webapp/ai/tools/design/refLists'
+import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
+import { categoriesListTool, taxonomiesListTool } from '@webapp/ai/tools/design/refLists'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
 import { createToolContext } from '@test/unit/utils/assistantTestUtils'
 import { buildRefSurvey } from '@test/unit/utils/designSuggestionTestUtils'
@@ -53,8 +53,7 @@ describe('categories_list and taxonomies_list (224)', () => {
       many[Category.getUuid(category)] = category
     }
     const result = await run(categoriesListTool, Survey.assocCategories(many)(survey))
-    expect(REF_LIST_MAX_JSON_CHARS).toBe(AiLimits.assistantToolResultMaxChars - 500)
-    expect(JSON.stringify(result).length).toBeLessThanOrEqual(REF_LIST_MAX_JSON_CHARS)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
     expect(result.total).toBe(400)
     expect(result.truncated).toBe(true)
     expect(result.categories[0].name).toBe('category_000')

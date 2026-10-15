@@ -8,7 +8,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import type { AiTool } from '@webapp/ai/tools/types'
 import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
-import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
 import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
@@ -75,7 +77,7 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
         api.countValidationReportRows(filter),
       ])
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const summary = summarizeValidationRows({ survey, rows, total, i18n: getI18n(), cycle })
     return fitListToBudget(summary, 'groups')
@@ -105,7 +107,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
     const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: attributes ?? [] })
     if (unknownNames.length > 0) {
-      return toolError('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
     }
     const filter = {
       surveyId,
@@ -123,7 +125,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
         ? await api.countValidationReportRows(filter)
         : offset + fetched.length
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const { rows: pageRows, hasMore } = pageValidationRows(fetched)
     const rows = toValidationListItems({ survey, rows: pageRows, user: ctx.user, i18n: getI18n(), lang })
