@@ -4,6 +4,7 @@ import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { openConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { createOpenConversations, type OpenConversationsStorage } from '@webapp/ai/conversations/openConversations'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
+import { createSurveyAiPolicyCache, registerAppSurveyAiPolicyCache } from '@webapp/ai/policy/surveyAiPolicyCache'
 import { APP_AI_SESSION_RESETS, createResetAiSession } from '@webapp/ai/session/resetAiSession'
 import { categoryItemRefsRegistry } from '@webapp/ai/tools/design/categoryItemRefs'
 import { createSuggestionStore } from '@webapp/ai/suggestions/suggestionStore'
@@ -65,6 +66,23 @@ describe('the app reset list (421)', () => {
     expect(entry).toBeDefined()
     await entry?.run()
     expect(categoryItemRefsRegistry.forConversation('c1')).not.toBe(before)
+  })
+
+  test('it empties the survey AI policy cache, so the next user does not see the policies of the previous one', async () => {
+    const state: any = {
+      policy: { schema: 'cloud', data: 'cloud' },
+      ceilings: { schema: 'cloud', data: 'cloud' },
+      effective: { schema: 'cloud', data: 'cloud' },
+      canEdit: true,
+    }
+    const cache = createSurveyAiPolicyCache({ fetchPolicy: async () => state, putPolicy: async () => state })
+    registerAppSurveyAiPolicyCache(cache)
+    await cache.get(1)
+    expect(cache.peek(1)).toEqual(state)
+    const entry = APP_AI_SESSION_RESETS.find((reset) => reset.name === 'survey AI policies')
+    expect(entry).toBeDefined()
+    await entry?.run()
+    expect(cache.peek(1)).toBeNull()
   })
 })
 
