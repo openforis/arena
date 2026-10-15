@@ -24,11 +24,21 @@ const logger = Log.getLogger('AiModelDiscovery')
 // a model list is awaited by a dropdown: shorter than the timeout of a model call
 const LIST_TIMEOUT_MS = 10000
 
+// the largest model list read (the biggest catalogues are a few hundred KB)
+const MAX_LIST_BYTES = 2 * 1024 * 1024
+
 // the upstream answered, but not with a list
 class UpstreamStatusError extends Error {
   constructor(status) {
     super(`HTTP ${status}`)
     this.status = status
+  }
+}
+
+// the upstream sent more than a model list can be
+class ResponseTooLargeError extends Error {
+  constructor(limit) {
+    super(`response over ${limit} bytes`)
   }
 }
 
@@ -39,13 +49,37 @@ class UpstreamStatusError extends Error {
 const getListTimeoutMs = () => Math.min(ENV.aiRequestTimeoutMs, LIST_TIMEOUT_MS)
 
 /**
- * Reads a JSON list from an URL. The timeout covers the connection, the headers and the body.
+ * Reads the body of a response as JSON, and stops reading (closing the connection) when it is over the cap.
+ * @param {Response} response - The response.
+ * @param {number} maxBytes - The largest body accepted.
+ * @returns {Promise<unknown>} The parsed body.
+ * @throws {ResponseTooLargeError} When the body, or its declared size, is over the cap.
+ */
+const readJsonCapped = async (response, maxBytes) => {
+  if (Number(response.headers.get('content-length')) > maxBytes) {
+    await response.body?.cancel().catch(() => undefined)
+    throw new ResponseTooLargeError(maxBytes)
+  }
+  const chunks = []
+  let received = 0
+  // leaving the loop cancels the stream
+  for await (const chunk of response.body ?? []) {
+    received += chunk.byteLength
+    if (received > maxBytes) throw new ResponseTooLargeError(maxBytes)
+    chunks.push(chunk)
+  }
+  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
+}
+
+/**
+ * Reads a JSON list from an URL. The timeout covers the connection, the headers and the body, and the body is capped.
  * @param {string} url - The URL.
  * @param {object} [options] - Options.
  * @param {object} [options.headers] - Request headers.
  * @param {Function} [options.fetchImpl] - The fetch to use.
  * @returns {Promise<unknown>} The parsed body.
  * @throws {UpstreamStatusError} When the upstream does not answer with a 2xx status.
+ * @throws {ResponseTooLargeError} When the body is over the cap.
  */
 const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
   const signal = AbortSignal.timeout(getListTimeoutMs())
@@ -55,7 +89,7 @@ const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
     await response.body?.cancel().catch(() => undefined)
     throw new UpstreamStatusError(response.status)
   }
-  return response.json()
+  return readJsonCapped(response, MAX_LIST_BYTES)
 }
 
 const stripTrailingSlash = (s) => {

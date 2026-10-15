@@ -2,8 +2,9 @@
  * `fetch` for the endpoint of a user (openai-compatible and AI SDK base URLs): the address the connection is made to
  * is checked when the socket connects, with the rules of the base URL guard, so a name that resolves to a public
  * address for the pre-check and to an internal one for the request (DNS rebinding) is refused. Redirects are refused
- * too. Built on node:http(s) and its `lookup` option, so it needs no dependency (undici is not one of ours, and the
- * global fetch takes no address check).
+ * too, and a response body over a cap is cut (a stream that never ends would fill the memory). Built on node:http(s)
+ * and its `lookup` option, so it needs no dependency (undici is not one of ours, and the global fetch takes no
+ * address check).
  */
 import http from 'node:http'
 import https from 'node:https'
@@ -30,6 +31,9 @@ type LookupCallback = (
   address?: string | { address: string; family: number }[],
   family?: number
 ) => void
+
+// the most a response may bring: far above a model answer, far below what exhausts the memory of the server
+export const DEFAULT_MAX_BODY_BYTES = 32 * 1024 * 1024
 
 // statuses a Response cannot have a body for
 const NULL_BODY_STATUSES = new Set([204, 205, 304])
@@ -111,21 +115,38 @@ const assertLiteralAddressAllowed = (url: URL, allowlist: string[]): void => {
 }
 
 /**
+ * Fails the body of a response (and closes the connection) when it brings more than the cap.
+ * @param {http.IncomingMessage} incoming - The response.
+ * @param {number} maxBodyBytes - The most the body may bring.
+ * @returns {void}
+ */
+const capBody = (incoming: http.IncomingMessage, maxBodyBytes: number): void => {
+  let received = 0
+  incoming.on('data', (chunk: Buffer) => {
+    received += chunk.length
+    if (received > maxBodyBytes) incoming.destroy(new TypeError('response body too large'))
+  })
+}
+
+/**
  * Sends the request and resolves with its response as soon as the headers arrive (the body streams).
  * @param {object} params - Parameters.
  * @param {URL} params.url - The URL.
  * @param {RequestInit} params.init - Fetch options.
  * @param {Function|undefined} params.lookup - Socket lookup, undefined for an allowlisted host.
+ * @param {number} params.maxBodyBytes - The most the body of the response may bring.
  * @returns {Promise<Response>} The response.
  */
 const send = ({
   url,
   init,
   lookup,
+  maxBodyBytes,
 }: {
   url: URL
   init: RequestInit
   lookup: ReturnType<typeof createConnectLookup> | undefined
+  maxBodyBytes: number
 }): Promise<Response> =>
   new Promise<Response>((resolve, reject) => {
     const { signal } = init
@@ -164,6 +185,7 @@ const send = ({
         return
       }
       incoming.on('close', () => signal?.removeEventListener('abort', onAbort))
+      capBody(incoming, maxBodyBytes)
       const hasBody = !NULL_BODY_STATUSES.has(status)
       if (!hasBody) incoming.resume()
       resolve(
@@ -183,17 +205,20 @@ const send = ({
  * @param {object} [options] - Guard options (see baseUrlGuard).
  * @param {string[]} [options.allowlist] - Org-hosted base URLs, which may be on an internal address (default: AI_ORG_HOSTED_BASE_URLS).
  * @param {LookupFn} [options.lookup] - DNS lookup (injectable for tests).
- * @returns {GuardedFetch} A fetch that refuses internal addresses at connect time and redirects.
+ * @param {number} [options.maxBodyBytes] - The most a response body may bring (default 32 MiB).
+ * @returns {GuardedFetch} A fetch that refuses internal addresses at connect time and redirects, and cuts a response
+ *   that is too large.
  */
 export const createGuardedFetch = ({
   allowlist = ENV.aiOrgHostedBaseUrls ?? [],
   lookup = defaultLookup,
-}: GuardOptions = {}): GuardedFetch => {
+  maxBodyBytes = DEFAULT_MAX_BODY_BYTES,
+}: GuardOptions & { maxBodyBytes?: number } = {}): GuardedFetch => {
   return async (input, init = {}) => {
     const url = new URL(String(input))
     if (url.protocol !== 'http:' && url.protocol !== 'https:') throw notAllowed(String(input))
     assertLiteralAddressAllowed(url, allowlist)
     const connectLookup = isAllowlisted(url, allowlist) ? undefined : createConnectLookup(url.href, lookup)
-    return send({ url, init, lookup: connectLookup })
+    return send({ url, init, lookup: connectLookup, maxBodyBytes })
   }
 }
