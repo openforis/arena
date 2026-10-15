@@ -17,6 +17,8 @@ type Props = {
   provider?: string | null
   model?: string | null
   engine?: string | null
+  // i18n key of a default provider name (shown translated)
+  nameKey?: string | null
   // icon only, the text in the tooltip (next to small buttons)
   compact?: boolean
   className?: string
@@ -28,11 +30,19 @@ type Props = {
  * @returns {React.ReactElement|null} The badge, or null when no provider is configured.
  */
 export const AiDataLocationBadge = (props: Props) => {
-  const { hostingClass, provider = null, model = null, engine = null, compact = false, className } = props
+  const {
+    hostingClass,
+    provider = null,
+    model = null,
+    engine = null,
+    nameKey = null,
+    compact = false,
+    className,
+  } = props
   const i18n = useI18n()
   const t = (key: string, params?: object): string => i18n.t(key, (params ?? {}) as Record<string, unknown>)
 
-  const text = getAiDataLocationText({ location: { hostingClass, provider, model, engine }, t })
+  const text = getAiDataLocationText({ location: { hostingClass, provider, model, engine, nameKey }, t })
   if (!hostingClass || !text) return null
 
   const title = model ? t('aiDataLocation.modelTitle', { location: text, model }) : text

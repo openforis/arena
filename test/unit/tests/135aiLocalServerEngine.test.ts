@@ -86,6 +86,8 @@ describe('engine info', () => {
       id: 'localServer',
       hostingClass: 'onDevice',
       label: 'Local server',
+      // the default name of the type: shown translated
+      labelKey: 'userAiSettings:defaultName.local',
       model: 'local-model',
       limits: { maxPromptChars: 9216, maxSteps: 6 },
       contextWindow: { tokens: 4096, assumed: false },
@@ -112,6 +114,7 @@ describe('engine info', () => {
       id: 'gateway',
       hostingClass: 'cloud',
       label: 'My OpenAI',
+      labelKey: null,
       model: 'gateway-model',
       limits: { maxPromptChars: 100000, maxSteps: 10 },
       providerId: 'acct:a1',

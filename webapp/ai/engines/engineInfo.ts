@@ -2,6 +2,9 @@
  * Engine descriptions (label, model, limits) built from the provider entries and the capabilities. No AI SDK import.
  */
 import { AiLimits } from '@common/ai/limits'
+import { LOCAL_PROVIDER_TYPE } from '@common/ai/providerIds'
+
+import { getDefaultNameKey } from '@webapp/components/ai/UserAiSettingsPanel/providerNames'
 
 import { getLocalServerContextWindow, getLocalServerLimits } from './localServerProbe'
 import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from './types'
@@ -31,6 +34,7 @@ export const getLocalServerEngineInfo = ({
     id: 'localServer',
     hostingClass,
     label: entry.name,
+    labelKey: getDefaultNameKey({ name: entry.name, providerType: LOCAL_PROVIDER_TYPE }),
     model: capability.modelId,
     limits: getLocalServerLimits(capability.contextTokens),
     contextWindow: getLocalServerContextWindow(capability.contextTokens),
@@ -58,6 +62,7 @@ export const getGatewayEngineInfo = ({
     hostingClass: entry.hostingClass,
     // Arena default is shown by its admin provider type ("OpenAI"), an account provider by the user's name for it
     label: entry.kind === 'arenaDefault' ? entry.type : entry.name,
+    labelKey: entry.kind === 'arenaDefault' ? null : getDefaultNameKey({ name: entry.name, providerType: entry.type }),
     model: entry.model,
     limits: { maxPromptChars: maxPromptChars ?? DEFAULT_GATEWAY_MAX_PROMPT_CHARS, maxSteps: GATEWAY_MAX_STEPS },
     providerId: entry.id,
