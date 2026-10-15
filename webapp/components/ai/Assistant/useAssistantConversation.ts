@@ -180,7 +180,7 @@ export const useAssistantConversation = ({
     }
     if (conversationRef.current?.id === conversationId) return undefined
     let active = true
-    conversationStore.get(conversationId).then((loaded) => {
+    conversationStore.get(conversationId, userUuid).then((loaded) => {
       if (!active) return
       const decision = decideLoadedConversation({
         loaded,
@@ -411,8 +411,8 @@ export const useAssistantConversation = ({
    */
   const readConversation = useCallback(
     async (id: string): Promise<Conversation | null> =>
-      conversationRef.current?.id === id ? conversationRef.current : ((await conversationStore?.get(id)) ?? null),
-    [conversationStore]
+      conversationRef.current?.id === id ? conversationRef.current : ((await conversationStore?.get(id, userUuid)) ?? null),
+    [conversationStore, userUuid]
   )
 
   /**

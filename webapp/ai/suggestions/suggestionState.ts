@@ -588,6 +588,19 @@ export const withSettled = (
 }
 
 /**
+ * Removes everything stored for a bucket (a deleted survey): pending, dismissed and in-progress entries.
+ * @param {SuggestionUserState} state - State.
+ * @param {string} bucket - Bucket.
+ * @returns {SuggestionUserState} The new state.
+ */
+export const withoutBucket = (state: SuggestionUserState, bucket: string): SuggestionUserState => ({
+  ...state,
+  pending: setEntry(state.pending, bucket, null),
+  dismissed: setEntry(state.dismissed, bucket, null),
+  inProgress: setEntry(state.inProgress, bucket, null),
+})
+
+/**
  * Records a module as seen (module introduction).
  * @param {SuggestionUserState} state - State.
  * @param {string} module - Module.

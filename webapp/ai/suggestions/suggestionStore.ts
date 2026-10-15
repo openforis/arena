@@ -3,6 +3,11 @@
  * key, applies the change and writes it back in one synchronous step; the `storage` event of the other tabs notifies
  * the subscribers. When the storage is blocked or full, the values live in memory for the session.
  */
+import {
+  createResilientStorage,
+  getBrowserLocalStorage,
+  type ResilientStorageBackend,
+} from '@webapp/ai/storage/resilientStorage'
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
 import {
@@ -15,6 +20,7 @@ import {
   withDismissed,
   withKind,
   withModuleSeen,
+  withoutBucket,
   withoutSuggestion,
   withoutTargets,
   withProgress,
@@ -24,7 +30,7 @@ import {
 import type { AssistantSuggestion, SettleOutcome, SuggestionKind } from './types'
 
 export type SuggestionStorageAccess = {
-  getStorage: () => Storage | null // null: blocked → memory fallback
+  getStorage: () => ResilientStorageBackend | null // null: blocked → memory fallback
   addStorageListener: (listener: (key: string | null) => void) => () => void // the window 'storage' event
 }
 
@@ -60,6 +66,8 @@ export type SuggestionStore = {
   markModuleSeen: (p: { userUuid: string; module: string }) => void
   subscribe: (listener: () => void) => () => void
   clearUser: (userUuid: string) => void
+  // forgets the survey's suggestions of every user of this browser (the survey was deleted)
+  removeSurvey: (surveyId: number) => void
   // conversations accepting a suggestion (reconciled at mount: a reload during a turn)
   getInProgressConversationIds: (userUuid: string) => string[]
 }
@@ -81,19 +89,6 @@ export const getSuggestionsKey = (userUuid: string): string => `${KEY_PREFIX}${u
 export const isSuggestionsKey = (key: string | null): boolean => key === null || key.startsWith(KEY_PREFIX)
 
 /**
- * Returns the browser's localStorage, or null when it is not accessible.
- * @returns {Storage|null} The storage.
- */
-const getLocalStorage = (): Storage | null => {
-  try {
-    return globalThis.localStorage ?? null
-  } catch {
-    // accessing the property throws when storage is blocked
-    return null
-  }
-}
-
-/**
  * Listens to the window's storage event (writes of the other tabs).
  * @param {Function} listener - Receives the changed key.
  * @returns {Function} Removes the listener.
@@ -106,7 +101,7 @@ const addWindowStorageListener = (listener: (key: string | null) => void): (() =
 }
 
 export const browserSuggestionStorageAccess: SuggestionStorageAccess = {
-  getStorage: getLocalStorage,
+  getStorage: getBrowserLocalStorage,
   addStorageListener: addWindowStorageListener,
 }
 
@@ -115,15 +110,19 @@ export const browserSuggestionStorageAccess: SuggestionStorageAccess = {
  * @param {object} [params] - Parameters.
  * @param {SuggestionStorageAccess} [params.access] - Storage access (default: the browser's).
  * @param {Function} [params.now] - Clock (expiry).
+ * @param {Function} [params.log] - Reports what the storage wrapper recovered from.
  * @returns {SuggestionStore} The store.
  */
 export const createSuggestionStore = ({
   access = browserSuggestionStorageAccess,
   now = () => new Date(),
-}: { access?: SuggestionStorageAccess; now?: () => Date } = {}): SuggestionStore => {
-  const memory = new Map<string, string>()
-  // after a failed access the memory copy is the truth: the storage may still hold an older value
-  let blocked = false
+  log,
+}: {
+  access?: SuggestionStorageAccess
+  now?: () => Date
+  log?: (message: string, error?: unknown) => void
+} = {}): SuggestionStore => {
+  const storage = createResilientStorage({ getStorage: () => access.getStorage(), log })
   const listeners = new Set<() => void>()
 
   /**
@@ -135,46 +134,12 @@ export const createSuggestionStore = ({
   }
 
   /**
-   * Reads the raw value of a key.
-   * @param {string} key - Storage key.
-   * @returns {string|null} The JSON, or null.
-   */
-  const readRaw = (key: string): string | null => {
-    if (!blocked) {
-      try {
-        const storage = access.getStorage()
-        if (storage) return storage.getItem(key)
-      } catch {
-        blocked = true
-      }
-    }
-    return memory.get(key) ?? null
-  }
-
-  /**
-   * Writes the raw value of a key (memory always, the storage while it works).
-   * @param {string} key - Storage key.
-   * @param {string} value - JSON.
-   * @returns {void}
-   */
-  const writeRaw = (key: string, value: string): void => {
-    memory.set(key, value)
-    if (blocked) return
-    try {
-      const storage = access.getStorage()
-      if (storage) storage.setItem(key, value)
-      else blocked = true
-    } catch {
-      blocked = true
-    }
-  }
-
-  /**
    * Reads the state of a user.
    * @param {string} userUuid - User UUID.
    * @returns {SuggestionUserState} The state.
    */
-  const read = (userUuid: string): SuggestionUserState => parseSuggestionState(readRaw(getSuggestionsKey(userUuid)))
+  const read = (userUuid: string): SuggestionUserState =>
+    parseSuggestionState(storage.read(getSuggestionsKey(userUuid)))
 
   /**
    * Re-reads, changes and writes the state of a user; notifies only when it changed.
@@ -184,11 +149,11 @@ export const createSuggestionStore = ({
    */
   const update = (userUuid: string, change: (state: SuggestionUserState) => SuggestionUserState): void => {
     const key = getSuggestionsKey(userUuid)
-    const current = parseSuggestionState(readRaw(key))
+    const current = parseSuggestionState(storage.read(key))
     const next = change(current)
     const json = JSON.stringify(next)
     if (json === JSON.stringify(current)) return
-    writeRaw(key, json)
+    storage.write(key, json)
     notify()
   }
 
@@ -223,13 +188,14 @@ export const createSuggestionStore = ({
       }
     },
     clearUser: (userUuid) => {
-      const key = getSuggestionsKey(userUuid)
-      memory.delete(key)
-      // also after a fallback to memory: an older value may still be in the storage and would come back on reload
-      try {
-        access.getStorage()?.removeItem(key)
-      } catch {
-        blocked = true
+      storage.remove(getSuggestionsKey(userUuid))
+      notify()
+    },
+    removeSurvey: (surveyId) => {
+      for (const key of storage.keys(KEY_PREFIX)) {
+        const current = parseSuggestionState(storage.read(key))
+        const next = withoutBucket(current, toBucket(surveyId))
+        if (JSON.stringify(next) !== JSON.stringify(current)) storage.write(key, JSON.stringify(next))
       }
       notify()
     },
