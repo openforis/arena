@@ -4,13 +4,9 @@ import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 
 import { SystemActions } from '@webapp/store/system'
 import { appModules, appModuleUri } from '@webapp/app/appModules'
-import { ApiConstants } from '@webapp/service/api/utils/apiConstants'
 import { AppInfo } from '@core/app/appInfo'
 
-import { resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'
-import { cancelAllConsentRequests } from '@webapp/ai/engines/consentRequests'
-import { resetAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
-
+import { authSession } from './authSession'
 import { ViewState } from './state'
 
 export const loginEmailUpdate = 'login/email/update'
@@ -38,21 +34,13 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
   }
 }
 
-// dynamic import: capabilitiesStore imports the redux store, which imports this module (no static cycle)
-const resetAiCapabilitiesLazily = () => {
-  import('@webapp/ai/engines/capabilitiesStore').then((m) => m.resetAiCapabilities()).catch(() => undefined)
-}
-
 export const login = (email, password, twoFactorToken) =>
   _createAction(async (dispatch) => {
     const {
       data: { message, user, twoFactorRequired, authToken },
     } = await axios.post('/auth/login', { email, password, twoFactorToken, appInfo: AppInfo.currentAppInfo })
     if (user) {
-      ApiConstants.setAuthToken(authToken)
-      resetAiSettingsCache()
-      resetAiCapabilitiesLazily()
-      cancelAllConsentRequests()
+      await authSession.begin(authToken)
       dispatch(resetState)
       dispatch(SystemActions.initSystem())
     } else if (twoFactorRequired) {
@@ -67,16 +55,8 @@ export const logout =
   async (dispatch) => {
     dispatch(LoaderActions.showLoader())
 
-    try {
-      await axios.post('/auth/logout')
-      ApiConstants.setAuthToken(null)
-    } finally {
-      // also when the logout request fails (network error, expired session); the conversations stay in this browser
-      resetAiSettingsCache()
-      resetAiCapabilitiesLazily()
-      cancelAllConsentRequests()
-      await resetAssistantOnLogout()
-    }
+    // the conversations stay in this browser until the user clears them
+    await authSession.end()
     dispatch(SystemActions.resetSystem())
     dispatch(LoaderActions.hideLoader())
 
