@@ -14,7 +14,7 @@ import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
 import { requireSurvey } from './surveyLookup'
 
-// the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
+// the wrapper cuts a longer result at the end of its largest list (valid values, truncated: true): stay under the limit with some margin
 
 type CategoryEntry = { name: string; levels: string[]; itemsCount: number | null }
 type TaxonomyEntry = { name: string; taxaCount: number | null }

@@ -8,7 +8,7 @@ import type { AiTool } from '../types'
 import { describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
 
 export const OVERVIEW_MAX_NODE_DEFS = 300
-// the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
+// the wrapper cuts a longer result at the end of its largest list (valid values, truncated: true): stay under the limit with some margin
 
 /**
  * Builds the survey overview: name, languages, cycles and the node definitions depth-first.

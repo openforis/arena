@@ -24,7 +24,7 @@ import {
 import { requireSurvey } from './surveyLookup'
 
 export const MISSING_TEXTS_PAGE_MAX = 50
-// the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
+// the wrapper cuts a longer result at the end of its largest list (valid values, truncated: true): stay under the limit with some margin
 // the longest text labels_proposeSet accepts
 export const SOURCE_TEXT_MAX = 2000
 
