@@ -290,7 +290,7 @@ export const updateNodesBatch = async (
   deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
 ): Promise<NodesBatchEditResult[]> => {
   const slot = deps.slots.tryAcquire({ userUuid: User.getUuid(params.user), surveyId: params.surveyId })
-  if (!slot.ok) throw new SystemError(NodesBatchMessageKeys.busy, { scope: slot.scope }, TOO_MANY_REQUESTS)
+  if (slot.ok === false) throw new SystemError(NodesBatchMessageKeys.busy, { scope: slot.scope }, TOO_MANY_REQUESTS)
   try {
     return await runNodesBatch(params, deps)
   } finally {

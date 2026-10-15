@@ -24,7 +24,9 @@ describe('record socket events shared by the records update thread and the batch
   })
 
   test('the validation event carries the record uuid, the validity of the merged record and the validations', () => {
-    const validations = Validation.newInstance(false, { n1: Validation.newInstance(false, {}, [{ key: 'error' }]) })
+    const validations = Validation.newInstance(false, {
+      n1: Validation.newInstance(false, {}, [{ key: 'error', valid: false }]),
+    })
     const event = buildNodeValidationsUpdateEvent({ record, validations })
     expect(event.type).toBe(WebSocketEvent.nodeValidationsUpdate)
     expect(event.content).toEqual({
