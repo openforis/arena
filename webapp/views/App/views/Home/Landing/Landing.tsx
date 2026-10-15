@@ -35,6 +35,7 @@ const LandingContent = () => {
   const surveyInfo = useSurveyInfo()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
+  const canEditSurvey = useAuthCanEditSurvey()
 
   const title = Survey.getLabel(surveyInfo, lang)
   const description = Survey.getDescription(lang, '')(surveyInfo)
@@ -76,7 +77,12 @@ const LandingContent = () => {
             label="common:appModules.records"
             onClick={() => navigate(appModuleUri(dataModules.records))}
           />
-          <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(appModules.dashboard))} />
+          {canEditSurvey && (
+            <Button
+              label="homeView:landing.openDashboard"
+              onClick={() => navigate(appModuleUri(appModules.dashboard))}
+            />
+          )}
         </div>
       </div>
     </div>

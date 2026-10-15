@@ -7,7 +7,12 @@ import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
-import { useAuthCanUseAnalysis, useAuthCanUseMessages, useUserIsSystemAdmin } from '@webapp/store/user'
+import {
+  useAuthCanEditSurvey,
+  useAuthCanUseAnalysis,
+  useAuthCanUseMessages,
+  useUserIsSystemAdmin,
+} from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
@@ -36,6 +41,7 @@ const AppView = () => {
   }, [])
 
   const isSideBarOpen = useIsSidebarOpened()
+  const canEditSurvey = useAuthCanEditSurvey()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
   const canUseMessages = useAuthCanUseMessages()
   const isSystemAdmin = useUserIsSystemAdmin()
@@ -47,10 +53,6 @@ const AppView = () => {
         path: `${appModules.home.path}/*`,
       },
       {
-        component: Dashboard,
-        path: `${appModules.dashboard.path}/*`,
-      },
-      {
         component: Designer,
         path: `${appModules.designer.path}/*`,
       },
@@ -59,6 +61,12 @@ const AppView = () => {
         path: `${appModules.data.path}/*`,
       },
     ]
+    if (canEditSurvey) {
+      result.push({
+        component: Dashboard,
+        path: `${appModules.dashboard.path}/*`,
+      })
+    }
     if (canAnalyzeRecords) {
       result.push({
         component: Analysis,
@@ -80,7 +88,7 @@ const AppView = () => {
       path: `${appModules.help.path}/*`,
     })
     return result
-  }, [canAnalyzeRecords, canUseMessages, isSystemAdmin])
+  }, [canAnalyzeRecords, canEditSurvey, canUseMessages, isSystemAdmin])
 
   return (
     <>
