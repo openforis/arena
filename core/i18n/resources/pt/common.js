@@ -1730,6 +1730,8 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     searchConversations: 'Pesquisar conversas',
     historyNoMatch: 'Nenhuma conversa corresponde.',
     deleteConversation: 'Excluir conversa',
+    deleteConversationConfirm: 'Excluir esta conversa? Não é possível desfazer.',
+    discardConfirm: 'Descartar estas alterações propostas? Elas não serão aplicadas.',
     day: {
       today: 'Hoje',
       yesterday: 'Ontem',

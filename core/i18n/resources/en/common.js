@@ -1718,6 +1718,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     searchConversations: 'Search conversations',
     historyNoMatch: 'No conversation matches.',
     deleteConversation: 'Delete conversation',
+    deleteConversationConfirm: 'Delete this conversation? This cannot be undone.',
+    discardConfirm: 'Discard these proposed changes? They will not be applied.',
     day: {
       today: 'Today',
       yesterday: 'Yesterday',

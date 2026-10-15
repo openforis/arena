@@ -1567,6 +1567,8 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     searchConversations: 'Buscar conversaciones',
     historyNoMatch: 'Ninguna conversación coincide.',
     deleteConversation: 'Eliminar conversación',
+    deleteConversationConfirm: '¿Eliminar esta conversación? No se puede deshacer.',
+    discardConfirm: '¿Descartar estos cambios propuestos? No se aplicarán.',
     day: {
       today: 'Hoy',
       yesterday: 'Ayer',

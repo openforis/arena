@@ -1711,6 +1711,8 @@ $t(common.cantUndoWarning)`,
     searchConversations: '会話を検索',
     historyNoMatch: '一致する会話はありません。',
     deleteConversation: '会話を削除',
+    deleteConversationConfirm: 'この会話を削除しますか？元に戻すことはできません。',
+    discardConfirm: '提案された変更を破棄しますか？変更は適用されません。',
     day: {
       today: '今日',
       yesterday: '昨日',

@@ -1734,6 +1734,8 @@ $t(common.cantUndoWarning)`,
     searchConversations: 'Поиск диалогов',
     historyNoMatch: 'Нет подходящих диалогов.',
     deleteConversation: 'Удалить диалог',
+    deleteConversationConfirm: 'Удалить этот диалог? Это действие нельзя отменить.',
+    discardConfirm: 'Отклонить предложенные изменения? Они не будут применены.',
     day: {
       today: 'Сегодня',
       yesterday: 'Вчера',

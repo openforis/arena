@@ -1718,6 +1718,8 @@ $t(common.cantUndoWarning)`,
     searchConversations: 'Харилцан яриа хайх',
     historyNoMatch: 'Тохирох харилцан яриа алга.',
     deleteConversation: 'Харилцан яриаг устгах',
+    deleteConversationConfirm: 'Энэ харилцан яриаг устгах уу? Үүнийг буцаах боломжгүй.',
+    discardConfirm: 'Санал болгосон өөрчлөлтөөс татгалзах уу? Тэдгээр хэрэгжихгүй.',
     day: {
       today: 'Өнөөдөр',
       yesterday: 'Өчигдөр',

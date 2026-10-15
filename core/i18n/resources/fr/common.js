@@ -1741,6 +1741,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     searchConversations: 'Rechercher des conversations',
     historyNoMatch: 'Aucune conversation ne correspond.',
     deleteConversation: 'Supprimer la conversation',
+    deleteConversationConfirm: 'Supprimer cette conversation ? Cette action est irréversible.',
+    discardConfirm: 'Ignorer ces modifications proposées ? Elles ne seront pas appliquées.',
     day: {
       today: "Aujourd'hui",
       yesterday: 'Hier',
