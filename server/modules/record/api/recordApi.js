@@ -45,7 +45,7 @@ import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMid
 import {
   requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
-  requireRecordReadableByUserGroup,
+  requireRecordMatchesUserGroupQualifiersRead,
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
@@ -240,8 +240,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -404,7 +403,7 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
@@ -422,7 +421,7 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       let tempFilePath
       try {
@@ -540,8 +539,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/docx',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
@@ -571,8 +569,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/pdf',
     requireRecordViewPermission,
-    requireNotOwnedRecordViewAllowed,
-    requireRecordReadableByUserGroup,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
