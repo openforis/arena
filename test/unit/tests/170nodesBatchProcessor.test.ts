@@ -15,7 +15,8 @@ import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 
-const user = { uuid: 'user-uuid' }
+const user = { uuid: 'user-uuid', authGroups: [{ name: 'systemAdmin' }] }
+const nobody = { uuid: 'nobody-uuid', authGroups: [] }
 
 describe('processNodesBatch', () => {
   let survey: any
@@ -70,6 +71,7 @@ describe('processNodesBatch', () => {
     nodeRecordUuids = {},
     now = 1000,
     persistNow,
+    matchesQualifiers = () => true,
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
@@ -78,6 +80,7 @@ describe('processNodesBatch', () => {
     nodeRecordUuids?: Record<string, string>
     now?: number | (() => number)
     persistNow?: () => void
+    matchesQualifiers?: (params: { pendingNode: any }) => boolean
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
@@ -95,6 +98,8 @@ describe('processNodesBatch', () => {
         }
       },
       getOrFetchRecord: async () => recordInDb,
+      fetchQualifierFilters: async () => [{ nodeDef: 'qualifier' }],
+      recordMatchesQualifierFilters: ({ pendingNode }) => matchesQualifiers({ pendingNode }),
       findNodeRecordUuid: async ({ nodeUuid, t }) => {
         expect(t).toBe('tx')
         return nodeRecordUuids[nodeUuid] ?? null
@@ -263,6 +268,54 @@ describe('processNodesBatch', () => {
     expect(posted).toEqual([])
     // an expected outcome, not an error to investigate
     expect(errors).toEqual([])
+  })
+
+  describe('permission inside the lock', () => {
+    const forbidden = (index: number) => ({ index, status: 'failed', messageKey: 'appErrors:forbidden' })
+
+    test('a record moved to the analysis step after the request was checked is refused, nothing is written', async () => {
+      const { deps, calls, posted } = createDeps({ recordInDb: { ...record, step: '3' } })
+      const results = await processNodesBatch({
+        msg: msgOf([
+          { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+          { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        ]),
+        deps,
+      })
+      expect(results).toEqual([forbidden(0), forbidden(1)])
+      expect(calls.persistNode).toBe(0)
+      expect(posted).toEqual([])
+    })
+
+    test('a user who may not edit the record is refused', async () => {
+      const { deps, calls } = createDeps()
+      const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: nobody }
+      expect(await processNodesBatch({ msg: message, deps })).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    test('a record outside the group qualifiers of the user (as it is now) is refused', async () => {
+      const { deps, calls } = createDeps({ matchesQualifiers: () => false })
+      const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+      expect(results).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    test('a new value that takes the record out of the qualifiers is refused, the other edit is applied', async () => {
+      const { deps, calls } = createDeps({
+        // the record matches; the pending node of the edit of a (value 10) does not
+        matchesQualifiers: ({ pendingNode }) => !pendingNode || Node.getValue(pendingNode) !== 10,
+      })
+      const results = await processNodesBatch({
+        msg: msgOf([
+          { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+          { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        ]),
+        deps,
+      })
+      expect(results).toEqual([forbidden(0), { index: 1, status: 'applied' }])
+      expect(calls.persistNode).toBe(1)
+    })
   })
 
   test('a lock timeout fails every edit with appErrors:record.lockTimeout', async () => {
