@@ -1,5 +1,6 @@
 import { MockLanguageModelV4 } from 'ai/test'
 
+import { ENV } from '@core/processUtils'
 import { AiLimits } from '@common/ai/limits'
 import { createSseParser } from '@common/ai/sseParser'
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
@@ -7,6 +8,7 @@ import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimite
 import * as ProviderRegistry from '@server/modules/ai/service/providerRegistry'
 import {
   createResponseLimitedFetch,
+  getProviderResponseLimits,
   limitResponseBytes,
   readTextCapped,
 } from '@server/modules/ai/service/responseLimits'
@@ -403,5 +405,80 @@ describe('response limits: the gateway waits for the client to drain (323)', () 
       'd5',
       '[DONE]',
     ])
+  })
+})
+
+describe('response limits: the cap follows the configured output tokens (323)', () => {
+  const MIB = 1024 * 1024
+  const originalMaxOutputTokens = ENV.aiMaxOutputTokens
+  const callOptions = { prompt: [{ role: 'user', content: [{ type: 'text', text: 'Hi' }] }] } as any
+
+  afterEach(() => {
+    ENV.aiMaxOutputTokens = originalMaxOutputTokens
+    jest.restoreAllMocks()
+  })
+
+  test('8 MiB and 1 MiB frames are the floor: the default output tokens keep them', () => {
+    expect(getProviderResponseLimits(4096)).toEqual({ maxResponseBytes: 8 * MIB, maxFrameChars: MIB })
+    expect(getProviderResponseLimits(100)).toEqual({ maxResponseBytes: 8 * MIB, maxFrameChars: MIB })
+  })
+
+  test('a bigger output token limit raises the caps', () => {
+    const limits = getProviderResponseLimits(100000)
+    expect(limits.maxResponseBytes).toBe(100000 * AiLimits.providerBytesPerOutputToken)
+    expect(limits.maxResponseBytes).toBeGreaterThan(8 * MIB)
+    expect(limits.maxFrameChars).toBe(100000 * AiLimits.providerFrameCharsPerOutputToken)
+    expect(limits.maxFrameChars).toBeGreaterThan(MIB)
+  })
+
+  test.each([0, -5, Number.NaN, Number.POSITIVE_INFINITY])('a nonsense token limit (%s) gives the floor', (tokens) => {
+    expect(getProviderResponseLimits(tokens)).toEqual({ maxResponseBytes: 8 * MIB, maxFrameChars: MIB })
+  })
+
+  // about 9 MiB of text in frames of 1000 characters
+  const longAnswerFrames = (makeFrame: (text: string) => string) =>
+    Array.from({ length: 9500 }, () => makeFrame('a'.repeat(1000)))
+
+  test('vercel-ai-sdk: a long legitimate answer passes when the output token limit allows it, else it is cut', async () => {
+    const body = [...longAnswerFrames(delta), 'data: [DONE]\n\n'].join('')
+    const buildModel = () =>
+      createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', fetchImpl: async () => new Response(body) })
+    ENV.aiMaxOutputTokens = 4096
+    await expectSystemErrorKey(() => buildModel().doGenerate(callOptions), TOO_LARGE)
+    ENV.aiMaxOutputTokens = 10000
+    const result = await buildModel().doGenerate(callOptions)
+    expect((result.content[0] as any).text).toHaveLength(9500 * 1000)
+  })
+
+  test('openai-compatible: the same, for a streamed answer', async () => {
+    const frame = (text: string) => `data: {"choices":[{"index":0,"delta":{"content":"${text}"}}]}\n\n`
+    const body = [...longAnswerFrames(frame), 'data: [DONE]\n\n'].join('')
+    const readAll = async () => {
+      jest.spyOn(global, 'fetch').mockResolvedValue(new Response(body, { status: 200 }))
+      const model = ProviderRegistry.buildModel({
+        provider: 'openai-compatible',
+        model: 'm',
+        baseUrl: 'https://llm.example/v1',
+      })
+      let text = ''
+      let failure: unknown
+      try {
+        const { stream } = await model.doStream(callOptions)
+        const reader = stream.getReader()
+        for (let result = await reader.read(); !result.done; result = await reader.read()) {
+          if (result.value.type === 'text-delta') text += result.value.delta
+          if (result.value.type === 'error') failure = result.value.error
+        }
+      } catch (error) {
+        failure = error
+      }
+      return { text, failure }
+    }
+    ENV.aiMaxOutputTokens = 4096
+    expect(toAiSystemError((await readAll()).failure).key).toBe(TOO_LARGE)
+    ENV.aiMaxOutputTokens = 10000
+    const { text, failure } = await readAll()
+    expect(failure).toBeUndefined()
+    expect(text).toHaveLength(9500 * 1000)
   })
 })

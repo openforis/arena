@@ -12,12 +12,13 @@ import type {
   LanguageModelV4StreamPart,
 } from '@ai-sdk/provider'
 
+import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import { AiLimits } from '@common/ai/limits'
 import { createSseParser, stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
-import { readTextCapped } from './responseLimits'
+import { getProviderResponseLimits, readTextCapped } from './responseLimits'
 
 const DEFAULT_TIMEOUT_MS = 60000
 const ERROR_BODY_MESSAGE_CHARS = 500
@@ -30,8 +31,7 @@ export type VercelAiSdkLimits = { maxResponseBytes?: number; maxFrameChars?: num
 type ResolvedLimits = Required<VercelAiSdkLimits>
 
 const resolveLimits = (limits: VercelAiSdkLimits): ResolvedLimits => ({
-  maxResponseBytes: AiLimits.providerResponseMaxBytes,
-  maxFrameChars: AiLimits.providerFrameMaxChars,
+  ...getProviderResponseLimits(ENV.aiMaxOutputTokens),
   maxErrorBodyBytes: AiLimits.providerErrorBodyMaxBytes,
   ...limits,
 })
@@ -278,7 +278,7 @@ const createPartsStream = ({
  * @param {string} cfg.baseUrl - Chat endpoint URL.
  * @param {number} [cfg.timeoutMs] - Per-call timeout (default 60s).
  * @param {FetchImpl} [cfg.fetchImpl] - Fetch implementation (tests).
- * @param {VercelAiSdkLimits} [cfg.limits] - Caps on the answer (default: AiLimits.provider*).
+ * @param {VercelAiSdkLimits} [cfg.limits] - Caps on the answer (default: AiLimits.provider*, raised by AI_MAX_OUTPUT_TOKENS).
  * @returns {LanguageModelV4} The model.
  */
 export const createVercelAiSdkModel = ({
