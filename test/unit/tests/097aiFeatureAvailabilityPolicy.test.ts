@@ -11,6 +11,7 @@ import {
   isSurveyScopedFeature,
   resolveEffectivePolicy,
 } from '@webapp/ai/policy/aiFeatureAvailability'
+import { fakeT as t } from '../utils/fakeT'
 
 const cloud = { hostingClass: 'cloud' as const, provider: 'openai', model: 'm' }
 const orgHosted = { hostingClass: 'orgHosted' as const, provider: 'openai-compatible', model: 'm' }
@@ -40,8 +41,6 @@ describe('policy blocked reason keys', () => {
 })
 
 describe('getAiDataLocationText', () => {
-  const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
-
   test.each([
     [cloud, 'aiDataLocation.cloudWithProvider{"provider":"OpenAI"}'],
     [{ hostingClass: 'cloud', provider: 'mock', model: null }, 'aiDataLocation.cloudWithProvider{"provider":"mock"}'],

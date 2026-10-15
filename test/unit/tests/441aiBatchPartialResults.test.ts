@@ -7,17 +7,11 @@ import { createBatchRunControl, settleBatchRun } from '@webapp/ai/workflows/batc
 import { runDataDictionaryDescriptions } from '@webapp/ai/workflows/dataDictionary'
 import { runTranslateAllLabels } from '@webapp/ai/workflows/translateAllLabels'
 
-import en from '@core/i18n/resources/en/common'
-import es from '@core/i18n/resources/es/common'
-import fr from '@core/i18n/resources/fr/common'
-import ja from '@core/i18n/resources/ja/common'
-import mn from '@core/i18n/resources/mn/common'
-import pt from '@core/i18n/resources/pt/common'
-import ru from '@core/i18n/resources/ru/common'
-
 import * as SB from '../../utils/surveyBuilder'
+import { LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
-const commonByLang: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const commonByLang = namespaceByLanguage('common')
+const en = commonByLang.en
 
 const noGuard = async () => {}
 const generateText = async () => ''
@@ -294,7 +288,7 @@ describe('AI batch partial results (441)', () => {
   describe('texts', () => {
     const placeholders = (text: string): string[] => (text.match(/\{\{\w+\}\}/g) ?? []).sort()
 
-    test.each(Object.keys(commonByLang))('%s tells that the run stopped and what is kept', (lang) => {
+    test.each(LANGUAGES)('%s tells that the run stopped and what is kept', (lang) => {
       const texts = commonByLang[lang].aiBatch
       for (const key of ['stop', 'stopping', 'confirmStop', 'keepRunning', 'stoppedCancelled', 'stoppedError']) {
         expect([key, typeof texts[key]]).toEqual([key, 'string'])

@@ -6,18 +6,11 @@ import { translatePlaceholder } from '@webapp/components/form/translatePlacehold
 import { getApiKeyFieldState } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/apiKeyField'
 import type { ProviderDraft } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
 import type { SavedProvider } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerTypes'
-
-import en from '@core/i18n/resources/en/userAiSettings'
-import es from '@core/i18n/resources/es/userAiSettings'
-import fr from '@core/i18n/resources/fr/userAiSettings'
-import ja from '@core/i18n/resources/ja/userAiSettings'
-import mn from '@core/i18n/resources/mn/userAiSettings'
-import pt from '@core/i18n/resources/pt/userAiSettings'
-import ru from '@core/i18n/resources/ru/userAiSettings'
+import { LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 const readSource = (file: string): string => fs.readFileSync(path.join(__dirname, '../../../webapp', file), 'utf8')
 
-const settingsByLang: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const settingsByLang = namespaceByLanguage('userAiSettings')
 
 const draft = (apiKey = ''): ProviderDraft => ({
   type: 'openai',
@@ -117,7 +110,7 @@ describe('API key field (440)', () => {
   })
 
   describe('texts', () => {
-    test.each(Object.keys(settingsByLang))('%s has the saved-key placeholder as plain text', (lang) => {
+    test.each(LANGUAGES)('%s has the saved-key placeholder as plain text', (lang) => {
       const text = settingsByLang[lang].apiKeySaved
       expect(typeof text).toBe('string')
       expect(text.trim().length).toBeGreaterThan(0)

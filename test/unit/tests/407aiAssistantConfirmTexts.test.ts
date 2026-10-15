@@ -1,12 +1,6 @@
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
+import { CYRILLIC, CYRILLIC_LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const resources = RESOURCES
 
 // texts of the confirmations of Delete conversation and Discard, and of the failures shown to the user
 const KEYS = ['deleteConversationConfirm', 'discardConfirm', 'deleteConversationFailed', 'deleteAllFailed']
@@ -30,17 +24,17 @@ describe('assistant confirmation texts (407)', () => {
     }
   })
 
-  test('the Russian and Mongolian texts are in Cyrillic', () => {
-    for (const lang of ['ru', 'mn']) {
+  test('the texts of the Cyrillic languages are in Cyrillic', () => {
+    for (const lang of CYRILLIC_LANGUAGES) {
       for (const key of KEYS) {
-        expect([lang, key, /[Ѐ-ӿ]/.test(resources[lang].common.aiAssistant[key])]).toEqual([lang, key, true])
+        expect([lang, key, CYRILLIC.test(resources[lang].common.aiAssistant[key])]).toEqual([lang, key, true])
       }
     }
   })
 
   test('there are no plural variants of these keys (the languages share the same keys)', () => {
     for (const key of KEYS) {
-      expect(Object.keys(en.common.aiAssistant).filter((name) => name.startsWith(`${key}_`))).toEqual([])
+      expect(Object.keys(resources.en.common.aiAssistant).filter((name) => name.startsWith(`${key}_`))).toEqual([])
     }
   })
 })

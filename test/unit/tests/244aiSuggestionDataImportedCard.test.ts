@@ -1,10 +1,3 @@
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 
 import { type SuggestionDescribeContext } from '@webapp/ai/suggestions/definitions'
@@ -16,16 +9,7 @@ import {
 } from '@webapp/ai/suggestions/definitions/dataImported'
 import { buildDataImportedSuggestion } from '@webapp/ai/suggestions/detectors/dataImported'
 import { DATA_IMPORTED_PROMPT } from '@webapp/ai/suggestions/prompts/dataImported'
-
-const languages: [string, any][] = [
-  ['en', en],
-  ['es', es],
-  ['fr', fr],
-  ['ja', ja],
-  ['mn', mn],
-  ['pt', pt],
-  ['ru', ru],
-]
+import { CYRILLIC, LANGUAGES, RESOURCES, usesCyrillic } from '../utils/i18nParity'
 
 /**
  * Returns a describe context in a UI language.
@@ -79,16 +63,15 @@ describe('data imported suggestion card and prompt (244)', () => {
     expect(SUGGESTION_DEFINITIONS.dataImported).toBe(dataImportedDefinition)
   })
 
-  test('the card texts exist in the 7 languages', () => {
-    for (const [lang, resources] of languages) {
-      const { card, cardOne } = resources.aiSuggestions?.dataImported ?? {}
+  test('the card texts exist in every language', () => {
+    for (const lang of LANGUAGES) {
+      const { card, cardOne } = RESOURCES[lang].aiSuggestions?.dataImported ?? {}
       expect(typeof card).toBe('string')
       expect(typeof cardOne).toBe('string')
       expect(placeholders(card)).toEqual(['{{count}}'])
       expect(placeholders(cardOne)).toEqual([])
-      const cyrillic = lang === 'ru' || lang === 'mn'
-      expect(/[Ѐ-ӿ]/.test(card)).toBe(cyrillic)
-      expect(/[Ѐ-ӿ]/.test(cardOne)).toBe(cyrillic)
+      expect(CYRILLIC.test(card)).toBe(usesCyrillic(lang))
+      expect(CYRILLIC.test(cardOne)).toBe(usesCyrillic(lang))
     }
   })
 

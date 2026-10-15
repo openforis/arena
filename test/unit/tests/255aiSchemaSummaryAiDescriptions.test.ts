@@ -3,14 +3,6 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import { AiLimits } from '@common/ai/limits'
 
-import enErrors from '@core/i18n/resources/en/appErrors'
-import esErrors from '@core/i18n/resources/es/appErrors'
-import frErrors from '@core/i18n/resources/fr/appErrors'
-import jaErrors from '@core/i18n/resources/ja/appErrors'
-import mnErrors from '@core/i18n/resources/mn/appErrors'
-import ptErrors from '@core/i18n/resources/pt/appErrors'
-import ruErrors from '@core/i18n/resources/ru/appErrors'
-
 import {
   assertNoLegacyIncludeAiDescriptions,
   parseAiDescriptions,
@@ -23,19 +15,12 @@ import {
 
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 import * as SB from '../../utils/surveyBuilder'
+import { CYRILLIC, LANGUAGES, namespaceByLanguage, usesCyrillic } from '../utils/i18nParity'
 
 const user = { uuid: 'test-schema-summary-ai-user' }
 const { decimal } = NodeDef.nodeDefType
 const cycle = Survey.cycleOneKey
-const errorsByLang: Record<string, any> = {
-  en: enErrors,
-  es: esErrors,
-  fr: frErrors,
-  ja: jaErrors,
-  mn: mnErrors,
-  pt: ptErrors,
-  ru: ruErrors,
-}
+const errorsByLang = namespaceByLanguage('appErrors')
 
 /**
  * Builds cluster (root) → cluster_id, notes (described), plot (multiple) → plot_dbh.
@@ -140,18 +125,16 @@ describe('schema summary AI descriptions on the server (255)', () => {
     expect(() => assertNoLegacyIncludeAiDescriptions({ surveyId: 1, aiDescriptions: {} })).not.toThrow()
   })
 
-  test.each(Object.keys(errorsByLang))('%s has the aiIncludeAiDescriptionsRemoved message', (lang) => {
+  test.each(LANGUAGES)('%s has the aiIncludeAiDescriptionsRemoved message', (lang) => {
     const text = errorsByLang[lang].aiIncludeAiDescriptionsRemoved
     expect(typeof text).toBe('string')
-    const cyrillic = lang === 'ru' || lang === 'mn'
-    expect(/[Ѐ-ӿ]/.test(text) || !cyrillic).toBe(true)
+    expect(CYRILLIC.test(text) || !usesCyrillic(lang)).toBe(true)
   })
 
-  test.each(Object.keys(errorsByLang))('%s has the aiDescriptionsInvalid message', (lang) => {
+  test.each(LANGUAGES)('%s has the aiDescriptionsInvalid message', (lang) => {
     const text = errorsByLang[lang].aiDescriptionsInvalid
     expect(typeof text).toBe('string')
     expect(text.length).toBeGreaterThan(0)
-    const cyrillic = lang === 'ru' || lang === 'mn'
-    expect(/[Ѐ-ӿ]/.test(text) || !cyrillic).toBe(true)
+    expect(CYRILLIC.test(text) || !usesCyrillic(lang)).toBe(true)
   })
 })
