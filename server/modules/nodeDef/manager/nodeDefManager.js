@@ -94,7 +94,12 @@ export const insertNodeDef = async (
     const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
     // the parent lists the new node def in each of its cycles (the designer creates it in one: `cycle`)
-    const cyclesAdded = NodeDef.getCycles(nodeDef).length > 0 ? NodeDef.getCycles(nodeDef) : [cycle]
+    // and only in the cycles the parent exists in (analysis node defs are created with every survey cycle)
+    const cyclesNodeDef = NodeDef.getCycles(nodeDef).length > 0 ? NodeDef.getCycles(nodeDef) : [cycle]
+    const nodeDefParent = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
+    const cyclesAdded = nodeDefParent
+      ? cyclesNodeDef.filter((cycleKey) => NodeDef.getCycles(nodeDefParent).includes(cycleKey))
+      : cyclesNodeDef
     const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded })
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)

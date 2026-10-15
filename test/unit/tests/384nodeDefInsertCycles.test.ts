@@ -11,9 +11,9 @@ beforeAll(async () => {
 })
 
 describe('NodeDefManager.insertNodeDef lists the new node definition in the parent layout of every cycle (384)', () => {
-  const insert = async (cycles: string[], cycle?: string) => {
+  const insert = async (cycles: string[], cycle?: string, parentCycles = ['0', '1']) => {
     const { insertNodeDef } = await import('@server/modules/nodeDef/manager/nodeDefManager')
-    const parent = NodeDef.assocCycles(['0', '1'])(getDefByName(survey, 'cluster'))
+    const parent = NodeDef.assocCycles(parentCycles)(getDefByName(survey, 'cluster'))
     const target = withNodeDef(survey, 'cluster', () => parent)
     const nodeDef = createProposedNodeDef({ parent, type: 'text', name: 'notes', cycles })
     // the queries are faked (the unit tests are bundled: jest.mock does not reach the repositories)
@@ -44,5 +44,12 @@ describe('NodeDefManager.insertNodeDef lists the new node definition in the pare
     const { params, parentLayout } = await insert(['1'], '1')
     expect(params.props.layout['0']).toEqual(parentLayout['0'])
     expect(params.props.layout['1']).toBeDefined()
+  })
+
+  test('a cycle the parent does not exist in is not added to its layout (analysis node defs have every cycle)', async () => {
+    const { params, parentLayout } = await insert(['0', '1'], '0', ['0'])
+    expect(Object.keys(params.props.layout)).toEqual(['0'])
+    expect(params.props.layout['1']).toBeUndefined()
+    expect(parentLayout).toBeDefined()
   })
 })
