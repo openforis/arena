@@ -17,6 +17,8 @@ import * as ValidationResult from '@core/validation/validationResult'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+import { neutraliseSpreadsheetFormula, parseAiDescriptions } from './aiDescriptions'
+
 const getParentPath = (nodeDef, survey) => {
   const parts = []
   let cur = Survey.getNodeDefParent(nodeDef)(survey)
@@ -181,7 +183,8 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, cycle, aiDescriptions })
     (acc, lang) => ({ ...acc, [`validation_message_${lang}`]: getValidationMessages({ nodeDef, lang }) }),
     {}
   )
-  const aiFields = aiDescriptions ? { aiDescription: aiDescriptions[uuid] ?? '' } : {}
+  // the descriptions are generated text opened in spreadsheet programs: no formulas
+  const aiFields = aiDescriptions ? { aiDescription: neutraliseSpreadsheetFormula(aiDescriptions[uuid] ?? '') } : {}
 
   return {
     uuid,
@@ -273,16 +276,6 @@ export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle }) =>
   getSchemaSummaryAiItems({ survey: await fetchSurvey(surveyId), cycle })
 
 /**
- * Returns the uuids of the node defs of the schema summary (the uuids an export may have AI descriptions for).
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
- * @returns {Promise<string[]>} The uuids.
- */
-export const fetchSchemaSummaryNodeDefUuids = async ({ surveyId, cycle }) =>
-  extractSchemaSummaryNodeDefs(await fetchSurvey(surveyId), cycle).map(NodeDef.getUuid)
-
-/**
  * Builds the schema summary rows of a survey.
  * @param {object} params - Parameters.
  * @param {object} params.survey - Survey with its node defs.
@@ -312,7 +305,8 @@ export const buildSchemaSummaryItems = ({
 }
 
 /**
- * Fetches the survey and builds its schema summary rows (see buildSchemaSummaryItems).
+ * Fetches the survey (once) and builds its schema summary rows (see buildSchemaSummaryItems). The AI descriptions are
+ * checked against the node defs of this survey.
  * @param {object} params - Parameters.
  * @param {number|string} params.surveyId - Survey id.
  * @param {string} params.cycle - Cycle key.
@@ -320,6 +314,7 @@ export const buildSchemaSummaryItems = ({
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
  * @returns {Promise<object[]>} The rows.
+ * @throws {SystemError} aiDescriptionsInvalid (400) when a description is for a node def that is not in the export.
  */
 export const generateSchemaSummaryItems = async ({
   surveyId,
@@ -327,8 +322,14 @@ export const generateSchemaSummaryItems = async ({
   aiDescriptions = null,
   onProgress = null,
   stopIfFunction = null,
-}) =>
-  buildSchemaSummaryItems({ survey: await fetchSurvey(surveyId), cycle, aiDescriptions, onProgress, stopIfFunction })
+}) => {
+  const survey = await fetchSurvey(surveyId)
+  if (aiDescriptions) {
+    const knownUuids = extractSchemaSummaryNodeDefs(survey, cycle).map(NodeDef.getUuid)
+    parseAiDescriptions({ raw: aiDescriptions, knownUuids })
+  }
+  return buildSchemaSummaryItems({ survey, cycle, aiDescriptions, onProgress, stopIfFunction })
+}
 
 /**
  * Writes the schema summary (without AI descriptions) to the output stream (used by the R scripts' route).
