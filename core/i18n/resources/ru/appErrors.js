@@ -108,6 +108,7 @@ export default {
     lockTimeout: 'Запись занята; повторите попытку через несколько секунд.',
     nodeNotInRecord: 'Узел не принадлежит записи {{recordUuid}}.',
     nodesBatchInvalid: 'Недопустимый запрос пакетного редактирования ({{reason}}).',
+    nodesBatchBusy: 'Другое пакетное редактирование ещё выполняется; повторите попытку через несколько секунд.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',

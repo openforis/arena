@@ -9,6 +9,7 @@ import {
   NodesBatchServiceDeps,
   updateNodesBatch,
 } from '@server/modules/record/service/update/nodesBatch/nodesBatchService'
+import { createNodesBatchSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
 import { NodesBatchMessageKeys } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
 
 import * as SB from '../../utils/surveyBuilder'
@@ -65,6 +66,7 @@ describe('updateNodesBatch', () => {
         })
       },
       replies,
+      slots: createNodesBatchSlots(),
       logError: (message) => {
         errors.push(message)
       },

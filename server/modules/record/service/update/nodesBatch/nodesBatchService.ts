@@ -6,6 +6,8 @@ import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
@@ -19,6 +21,7 @@ import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
 import { groupEditsByRecord } from './nodesBatchRequest'
+import { NodesBatchProcessSlots, NodesBatchSlots } from './nodesBatchSlots'
 import {
   NodesBatchEdit,
   NodesBatchEditResult,
@@ -31,6 +34,8 @@ import {
 } from './nodesBatchTypes'
 
 const Logger = Log.getLogger('NodesBatchService')
+
+const TOO_MANY_REQUESTS = 429
 
 export type NodesBatchServiceDeps = {
   fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<any>
@@ -46,6 +51,7 @@ export type NodesBatchServiceDeps = {
   }) => boolean
   postBatchMessage: (msg: NodesBatchPersistMessage) => void
   replies: NodesBatchReplyRegistry
+  slots: NodesBatchSlots
   logError: (message: string) => void
 }
 
@@ -76,6 +82,7 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
   recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
   postBatchMessage: (msg) => RecordsUpdateThreadService.getOrCreatedThread().postMessage(msg),
   replies: NodesBatchReplies,
+  slots: NodesBatchProcessSlots,
   logError: (message) => Logger.error(message),
 })
 
@@ -194,35 +201,24 @@ const sendRecordEdits = async (
   return results ?? failedResults(edits, NodesBatchMessageKeys.applyTimeout)
 }
 
+type NodesBatchParams = {
+  user: any
+  surveyId: number
+  cycle: string
+  edits: NodesBatchEdit[]
+  timezoneOffset?: number | null
+  lang?: string | null
+}
+
 /**
- * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
- * @param {object} params - The parameters.
- * @param {object} params.user - The user.
- * @param {number} params.surveyId - The survey id.
- * @param {string} params.cycle - The survey cycle of the records.
- * @param {NodesBatchEdit[]} params.edits - The edits.
- * @param {number|null} [params.timezoneOffset] - The client timezone offset (for expressions using the current time).
- * @param {string|null} [params.lang] - The client language.
- * @param {NodesBatchServiceDeps} [deps] - The dependencies (tests).
+ * Checks the edits record by record, sends the accepted ones to the records update thread and collects the results.
+ * @param {NodesBatchParams} params - The request.
+ * @param {NodesBatchServiceDeps} deps - The dependencies.
  * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
  */
-export const updateNodesBatch = async (
-  {
-    user,
-    surveyId,
-    cycle,
-    edits,
-    timezoneOffset = null,
-    lang = null,
-  }: {
-    user: any
-    surveyId: number
-    cycle: string
-    edits: NodesBatchEdit[]
-    timezoneOffset?: number | null
-    lang?: string | null
-  },
-  deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
+const runNodesBatch = async (
+  { user, surveyId, cycle, edits, timezoneOffset = null, lang = null }: NodesBatchParams,
+  deps: NodesBatchServiceDeps
 ): Promise<NodesBatchEditResult[]> => {
   const deadline = Date.now() + NodesBatchLimits.replyTimeoutMs
   const survey = await deps.fetchSurvey({ surveyId, cycle })
@@ -257,4 +253,30 @@ export const updateNodesBatch = async (
     results.push(...replyResults)
   }
   return results.sort((resultA, resultB) => resultA.index - resultB.index)
+}
+
+/**
+ * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
+ * A user has one batch at a time, and a survey and the process a few: the others get a 429.
+ * @param {NodesBatchParams} params - The request.
+ * @param {object} params.user - The user.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.cycle - The survey cycle of the records.
+ * @param {NodesBatchEdit[]} params.edits - The edits.
+ * @param {number|null} [params.timezoneOffset] - The client timezone offset (for expressions using the current time).
+ * @param {string|null} [params.lang] - The client language.
+ * @param {NodesBatchServiceDeps} [deps] - The dependencies (tests).
+ * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
+ */
+export const updateNodesBatch = async (
+  params: NodesBatchParams,
+  deps: NodesBatchServiceDeps = createDefaultNodesBatchServiceDeps()
+): Promise<NodesBatchEditResult[]> => {
+  const slot = deps.slots.tryAcquire({ userUuid: User.getUuid(params.user), surveyId: params.surveyId })
+  if (!slot.ok) throw new SystemError(NodesBatchMessageKeys.busy, { scope: slot.scope }, TOO_MANY_REQUESTS)
+  try {
+    return await runNodesBatch(params, deps)
+  } finally {
+    slot.release()
+  }
 }
