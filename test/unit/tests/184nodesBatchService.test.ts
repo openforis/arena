@@ -214,7 +214,7 @@ describe('updateNodesBatch', () => {
     expect(deps.replies.size()).toBe(0)
   })
 
-  test('every record message carries the deadline of the request start, and the reply wait is shortened', async () => {
+  test('every record message carries the deadline of the request start minus a commit margin, and the reply wait is shortened', async () => {
     const waits: (number | undefined)[] = []
     const { deps, posted } = buildDeps()
     const registry = deps.replies
@@ -239,7 +239,8 @@ describe('updateNodesBatch', () => {
       nowSpy.mockRestore()
     }
     expect(posted).toHaveLength(2)
-    expect(posted.map((msg) => msg.deadline)).toEqual([1_060_000, 1_060_000])
+    // the thread stops 2 s before the reply wait ends, so no commit lands after the timeout was reported
+    expect(posted.map((msg) => msg.deadline)).toEqual([1_058_000, 1_058_000])
     expect(waits).toEqual([60_000 - 10_000, 60_000 - 20_000])
   })
 
@@ -320,6 +321,33 @@ describe('updateNodesBatch', () => {
       ])
       expect(posted).toHaveLength(1)
       expect(deps.replies.size()).toBe(0)
+    })
+  })
+
+  describe('a batch that hangs before posting', () => {
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    test.each([
+      ['the survey fetch', { fetchSurvey: () => new Promise<any>(() => undefined) }],
+      ['the qualifier filters', { fetchQualifierFilters: () => new Promise<any>(() => undefined) }],
+      ['the record fetch', { fetchRecord: () => new Promise<any>(() => undefined) }],
+    ])('does not keep its slot after the deadline (hung in %s)', async (_description, overrides) => {
+      jest.useFakeTimers()
+      const { deps, posted } = buildDeps(overrides)
+      const outcome = run(admin, [edit(aUuid, 5)], deps).then(
+        () => null,
+        (error) => error
+      )
+      expect(deps.slots.size()).toBe(1)
+
+      await jest.advanceTimersByTimeAsync(70_000)
+
+      const error = await outcome
+      expect(error).toMatchObject({ key: NodesBatchMessageKeys.applyTimeout })
+      expect(deps.slots.size()).toBe(0)
+      expect(posted).toHaveLength(0)
     })
   })
 })
