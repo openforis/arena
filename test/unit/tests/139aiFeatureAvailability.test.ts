@@ -1,12 +1,6 @@
 import type { AiHostingClass, AiPolicy } from '@common/ai/policy'
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
 
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, leafPaths, RESOURCES } from '../utils/i18nParity'
 import { createCapabilitiesStore, isCapabilitiesLoadedForUser } from '@webapp/ai/engines/capabilities'
 import {
   getAiEngineFeatureAvailability,
@@ -22,6 +16,7 @@ import type {
   AiUnavailableReason,
 } from '@webapp/ai/engines/types'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
+import { fakeT as t } from '../utils/fakeT'
 
 const DEFAULT_POLICY: AiPolicy = { schema: 'cloud', data: 'onDevice' }
 
@@ -214,8 +209,6 @@ describe('helpers', () => {
   })
 
   test("the location text names the organisation server's host", () => {
-    /** Test translation function: the key and its params. */
-    const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
     const location = { hostingClass: 'orgHosted', provider: null, model: null } as const
     expect(getAiDataLocationText({ location: { ...location, engine: '10.0.0.5:8000' }, t })).toBe(
       'aiDataLocation.orgHostedWithEngine{"engine":"10.0.0.5:8000"}'
@@ -224,28 +217,17 @@ describe('helpers', () => {
   })
 })
 
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-
-// flattened "a.b.c" paths of every string leaf
-const leafPaths = (obj: any, prefix = ''): string[] => {
-  const paths: string[] = []
-  for (const [key, value] of Object.entries(obj ?? {})) {
-    const path = prefix ? `${prefix}.${key}` : key
-    if (typeof value === 'string') paths.push(path)
-    else paths.push(...leafPaths(value, path))
-  }
-  return paths.sort()
-}
+const resources = RESOURCES
 
 describe('engine strings', () => {
-  test.each(Object.keys(resources))('%s has every aiEngine key of en, and orgHostedWithEngine', (lang) => {
+  test.each(LANGUAGES)('%s has every aiEngine key of en, and orgHostedWithEngine', (lang) => {
     const { common } = resources[lang]
     expect(leafPaths(common.aiEngine)).toEqual(leafPaths(resources.en.common.aiEngine))
     expect(common.aiDataLocation.orgHostedWithEngine).toContain('{{engine}}')
   })
 
-  test.each(['ru', 'mn'])('%s texts are in Cyrillic', (lang) => {
-    expect(resources[lang].common.aiEngine.unavailable.missingOnThisBrowser).toMatch(/[Ѐ-ӿ]/)
+  test.each(CYRILLIC_LANGUAGES)('%s texts are in Cyrillic', (lang) => {
+    expect(resources[lang].common.aiEngine.unavailable.missingOnThisBrowser).toMatch(CYRILLIC)
   })
 
   test('every reason and action has an English text', () => {

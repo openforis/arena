@@ -21,6 +21,14 @@ export class FormDesigner {
 
   async goto(): Promise<void> {
     await this.page.goto(Urls.formDesigner)
+    await this.waitReady()
+  }
+
+  /**
+   * Waits until the designer is shown and its route loader is gone (use it after a reload too).
+   * @returns {Promise<void>} Resolves when ready.
+   */
+  async waitReady(): Promise<void> {
     await expect(this.surveyForm).toBeVisible()
     // wait for the route loader overlay to go away (it would intercept the mouse)
     await expect(this.page.locator('.loader__boxes')).toHaveCount(0)

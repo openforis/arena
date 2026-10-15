@@ -1,11 +1,4 @@
 import type { AiPolicy } from '@common/ai/policy'
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
 
 import { fromAvailability } from '@webapp/components/ai/Assistant/assistantAreas'
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
@@ -21,6 +14,8 @@ import {
   hasPickableProvider,
   shouldShowProviderRemoved,
 } from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
+import { CYRILLIC, CYRILLIC_LANGUAGES, RESOURCES } from '../utils/i18nParity'
+import { fakeT as t } from '../utils/fakeT'
 
 const ACCOUNT: AiProviderEntry = {
   id: 'acct:a1',
@@ -75,13 +70,12 @@ const capabilities = ({
 })
 
 /** Test translation function: prefixes the key. */
-const t = (key: string) => `t:${key}`
 
 /** Summarizes each row as [id, disabled, reason, selected, default]. */
 const summarize = (choices: ReturnType<typeof buildProviderChoices>) =>
   choices.map((choice) => [choice.entry.id, choice.disabled, choice.reasonKey, choice.selected, choice.isDefault])
 
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const resources = RESOURCES
 
 describe('provider chip (271)', () => {
   test('a removed provider falls back to the default with a notice', () => {
@@ -169,7 +163,7 @@ describe('provider chip (271)', () => {
       tone: 'bad',
     })
     expect(getProviderChipLabel({ entry: ACCOUNT, t })).toBe('My OpenAI · gpt-x')
-    expect(getProviderChipLabel({ entry: ARENA, t })).toBe('t:userAiSettings:list.arenaDefault · admin-model')
+    expect(getProviderChipLabel({ entry: ARENA, t })).toBe('userAiSettings:list.arenaDefault · admin-model')
     expect(getProviderChipLabel({ entry: { ...LOCAL, model: null }, t })).toBe('Desk server')
   })
 
@@ -264,7 +258,7 @@ describe('provider chip (271)', () => {
   })
 
   test('every language has the chip texts, and no "Now using" text', () => {
-    const keys = Object.keys(en.common.aiAssistant.providerChip).sort()
+    const keys = Object.keys(resources.en.common.aiAssistant.providerChip).sort()
     expect(keys).toEqual([
       'answerWith',
       'chooseAnother',
@@ -282,8 +276,8 @@ describe('provider chip (271)', () => {
       expect([lang, Object.keys(chip).sort()]).toEqual([lang, keys])
       expect([lang, resource.common.aiEngine.nowUsing]).toEqual([lang, undefined])
     }
-    for (const lang of ['ru', 'mn']) {
-      expect(resources[lang].common.aiAssistant.providerChip.removedNotice).toMatch(/[Ѐ-ӿ]/)
+    for (const lang of CYRILLIC_LANGUAGES) {
+      expect(resources[lang].common.aiAssistant.providerChip.removedNotice).toMatch(CYRILLIC)
     }
   })
 })

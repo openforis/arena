@@ -1,12 +1,5 @@
 import type { AiPolicy } from '@common/ai/policy'
 import SystemError from '@core/systemError'
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
 
 import { createConsentRequestQueue } from '@webapp/ai/engines/consentRequests'
 import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'
@@ -16,6 +9,7 @@ import { createModelResolver, type LocalServerConsentAnswer } from '@webapp/ai/e
 import type { AiCapabilities, AiEngine, StorageLike } from '@webapp/ai/engines/types'
 import { isRunStoppingError } from '@webapp/ai/workflows/batchRun'
 import { isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
+import { LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 const LOCAL_URL = 'http://localhost:1234/v1'
 const CLOUD: AiPolicy = { schema: 'cloud', data: 'cloud' }
@@ -70,7 +64,7 @@ const memoryStorage = (): StorageLike => {
 }
 
 const PROVIDER_ERROR_KEYS = ['aiProviderChooseAnother', 'aiProviderNotFound', 'aiApiKeyUnreadable']
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const resources = RESOURCES
 
 describe('choose another provider (270)', () => {
   test('"Choose another provider" fails the request without trying another provider', async () => {
@@ -135,7 +129,7 @@ describe('choose another provider (270)', () => {
     }
   })
 
-  test.each(Object.keys(resources))('%s has the texts', (lang) => {
+  test.each(LANGUAGES)('%s has the texts', (lang) => {
     const { appErrors, common } = resources[lang]
     expect(typeof appErrors.aiProviderChooseAnother).toBe('string')
     expect(typeof common.aiEngine.consent.chooseOther).toBe('string')

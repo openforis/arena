@@ -21,6 +21,7 @@ import {
   getProviderTypeSpec,
   type SavedProvider,
 } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerTypes'
+import { fakeT as t } from '../utils/fakeT'
 
 const allowlist = ['http://gpu.org.example:8000/v1']
 
@@ -346,7 +347,6 @@ describe('provider dialog state machine (444)', () => {
 
   describe('error text', () => {
     // a stand-in for i18next: the key and its params
-    const t = (key: string, params?: Record<string, unknown>) => `${key}${params ? JSON.stringify(params) : ''}`
 
     test('a server key is translated without HTML escaping, the prefix is optional', () => {
       const params = { url: 'https://x.example/a&b' }

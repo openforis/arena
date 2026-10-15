@@ -8,8 +8,9 @@ import { createRateLimiter, type RateLimiter } from '../service/gateway/rateLimi
 
 const TOO_MANY_REQUESTS = 429
 
-// calls of one user that may be connecting to endpoints at the same time (each one holds a socket and a timer)
-export const MAX_IN_FLIGHT_PER_USER = 3
+// calls of one user that may be connecting to endpoints at the same time (each one holds a socket and a timer);
+// AI_PROVIDER_MAX_IN_FLIGHT_PER_USER overrides it (0 = unlimited)
+export const MAX_IN_FLIGHT_PER_USER = ENV.aiProviderMaxInFlightPerUser
 
 type Middleware = (req: any, res: any, next: (error?: unknown) => void) => void
 
@@ -18,7 +19,7 @@ type Middleware = (req: any, res: any, next: (error?: unknown) => void) => void
  * and the save of a provider, which tests it again): each one opens a connection to a server of the user's choice.
  * @param {object} params - Parameters.
  * @param {RateLimiter} params.limiter - Limiter, counting per user per minute.
- * @param {number} [params.maxInFlight] - Calls of a user that may run at the same time (default 3).
+ * @param {number} [params.maxInFlight] - Calls of a user that may run at the same time (default 3, 0 = unlimited).
  * @returns {Middleware} The middleware (429 `aiRateLimited` over the limit or over the calls in flight).
  */
 export const createProviderRateLimit = ({
@@ -43,7 +44,7 @@ export const createProviderRateLimit = ({
 
   return (req, res, next) => {
     const userUuid = Request.getUser(req).uuid
-    if ((inFlight.get(userUuid) ?? 0) >= maxInFlight || !limiter.take(userUuid)) {
+    if ((maxInFlight > 0 && (inFlight.get(userUuid) ?? 0) >= maxInFlight) || !limiter.take(userUuid)) {
       Response.sendErr(res, new SystemError('aiRateLimited', {}, TOO_MANY_REQUESTS))
       return
     }

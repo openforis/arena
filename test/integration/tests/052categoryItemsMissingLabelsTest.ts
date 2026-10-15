@@ -12,25 +12,7 @@ import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import * as SB from '@test/utils/surveyBuilder'
 import { expectEditPermissionOnly } from '@test/utils/routePermissionTestUtils'
-
-type Route = { method: string; path: string; handlers: any[] }
-
-// collects the routes registered by an API module
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+import { collectRoutes } from '@test/utils/routeUtils'
 
 /**
  * Returns the uuid of every item of a built category by code path ("1.2").

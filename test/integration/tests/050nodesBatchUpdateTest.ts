@@ -31,6 +31,7 @@ import { requireRecordCleansePermission, requireSurveyViewPermission } from '@se
 
 import { createFakeResponse } from '../../unit/utils/fakeExpress'
 
+import { collectRoutes } from '../../utils/routeUtils'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
@@ -53,8 +54,6 @@ class TestRecordsUpdateThread extends RecordsUpdateThread {
     }
   }
 }
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 describe('Batch record edit (POST /records/nodes/update)', () => {
   let user: any
@@ -247,14 +246,29 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
     const recordUuid = Record.getUuid(record)
     const numNode = nodeOf(record, 'root/num')
 
+    // the holder keeps the lock until the update has failed (no timer to outlast the lock timeout of the thread)
+    let lockTaken!: () => void
+    const waitLockTaken = new Promise<void>((resolve) => {
+      lockTaken = resolve
+    })
+    let release!: () => void
+    const waitRelease = new Promise<void>((resolve) => {
+      release = resolve
+    })
     const holder = db.tx(async (t) => {
       await t.any('SELECT pg_advisory_xact_lock(hashtext($1))', [recordUuid])
-      await sleep(11_000)
+      lockTaken()
+      await waitRelease
     })
-    await sleep(100) // let the holder take the lock first
+    await waitLockTaken
 
-    const results = await update([{ recordUuid, nodeUuid: Node.getUuid(numNode), from: 1, to: 5 }])
-    await holder
+    let results: any[]
+    try {
+      results = await update([{ recordUuid, nodeUuid: Node.getUuid(numNode), from: 1, to: 5 }])
+    } finally {
+      release()
+      await holder
+    }
 
     expect(results).toEqual([
       { index: 0, status: 'failed', messageKey: 'appErrors:record.lockTimeout', params: { recordUuid } },
@@ -263,19 +277,7 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
   }, 30_000)
 
   test('the route is registered with the view and cleanse permissions, and a bad request is a 400 with its key', async () => {
-    const routes: any[] = []
-    const app = new Proxy(
-      {},
-      {
-        get:
-          (_target, method: string) =>
-          (path: string, ...handlers: any[]) => {
-            routes.push({ method, path, handlers })
-          },
-      }
-    )
-    RecordApi.init(app)
-    const route = routes.find(
+    const route: any = collectRoutes(RecordApi.init).find(
       ({ method, path }) => method === 'post' && path === '/survey/:surveyId/records/nodes/update'
     )
     expect(route).toBeDefined()

@@ -1,6 +1,7 @@
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
 import { getHostingIconClass, NEUTRAL_HOSTING_ICON } from '@webapp/components/ai/hostingIcons'
 import { getProviderChipFullLabel } from '@webapp/components/ai/Assistant/providerChip/providerChipModel'
+import { fakeT as t } from '../utils/fakeT'
 
 const ACCOUNT: AiProviderEntry = {
   id: 'acct:a1',
@@ -14,7 +15,6 @@ const ACCOUNT: AiProviderEntry = {
 }
 
 /** Test translation function: prefixes the key. */
-const t = (key: string) => `t:${key}`
 
 describe('provider chip labels and icons (406)', () => {
   test('each hosting class has its icon, and an unknown location gets a neutral one', () => {
@@ -29,13 +29,13 @@ describe('provider chip labels and icons (406)', () => {
 
   test('a provider that can answer is named with where it runs', () => {
     expect(getProviderChipFullLabel({ view: { kind: 'provider', entry: ACCOUNT, tone: 'ok' }, t })).toBe(
-      'My OpenAI · gpt-x · t:userAiSettings:where.cloudOwnKey'
+      'My OpenAI · gpt-x · userAiSettings:where.cloudOwnKey'
     )
   })
 
   test('a provider that cannot answer says so in words, not only in colour', () => {
     expect(getProviderChipFullLabel({ view: { kind: 'provider', entry: ACCOUNT, tone: 'bad' }, t })).toBe(
-      'My OpenAI · gpt-x · t:userAiSettings:where.cloudOwnKey · t:userAiSettings:status.notAvailable'
+      'My OpenAI · gpt-x · userAiSettings:where.cloudOwnKey · userAiSettings:status.notAvailable'
     )
   })
 
@@ -45,7 +45,7 @@ describe('provider chip labels and icons (406)', () => {
   })
 
   test('the missing default and the empty chip have their own text', () => {
-    expect(getProviderChipFullLabel({ view: { kind: 'missing' }, t })).toBe('t:aiAssistant.providerChip.missing')
-    expect(getProviderChipFullLabel({ view: { kind: 'none' }, t })).toBe('t:aiAssistant.providerChip.none')
+    expect(getProviderChipFullLabel({ view: { kind: 'missing' }, t })).toBe('aiAssistant.providerChip.missing')
+    expect(getProviderChipFullLabel({ view: { kind: 'none' }, t })).toBe('aiAssistant.providerChip.none')
   })
 })

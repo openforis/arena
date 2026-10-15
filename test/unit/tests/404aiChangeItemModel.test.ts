@@ -7,6 +7,7 @@ import {
   isCategoryItem,
   splitReviewItems,
 } from '@webapp/components/ai/Assistant/changeItemModel'
+import { fakeT as t } from '../utils/fakeT'
 
 const nodeDefItem = (id: string, nodeDefUuid = `uuid-${id}`): ReviewItem => ({
   id,
@@ -68,7 +69,6 @@ describe('change item model (404)', () => {
   })
 
   // a fake t: the key and its params, so the test sees what is translated
-  const t = (key: string, params?: Record<string, unknown>) => `${key}${params ? JSON.stringify(params) : ''}`
 
   test('the title of a result is its message, plus the text found when a label changed meanwhile', () => {
     expect(getResultTitle(null, t)).toBeUndefined()

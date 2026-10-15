@@ -26,25 +26,9 @@ import * as RB from '@test/utils/recordBuilder'
 import * as RecordUtils from '@test/utils/recordUtils'
 import { createSurveyMember, deleteUsers } from '@test/utils/routePermissionTestUtils'
 import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
+import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
 
-type Route = { method: string; path: string; handlers: any[] }
-
-// collects the routes registered by an API module
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+type Route = CollectedRoute
 
 const filePath = '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file'
 const fileExifPath = '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif'

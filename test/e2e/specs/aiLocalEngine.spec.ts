@@ -5,6 +5,7 @@ import { TestId } from '@webapp/utils/testId'
 import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
 import { E2E_LOCAL_PROVIDER_ID } from '../helpers/aiAnalysis'
+import { seedLocalProviders } from '../helpers/aiStorage'
 import { Urls } from '../helpers/urls'
 import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'
 
@@ -22,16 +23,7 @@ const aiMock = process.env.E2E_AI_MOCK === 'true'
 const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServerStub): Promise<void> => {
   const userUuid = await api.getCurrentUserUuid()
   const providers = [{ id: E2E_LOCAL_PROVIDER_ID, name: 'Local server', baseUrl: stub.baseUrl, modelId: stub.modelId }]
-  await page.addInitScript(
-    ({ key, value }) => {
-      try {
-        localStorage.setItem(key, value)
-      } catch {
-        // about:blank and other origins without storage
-      }
-    },
-    { key: `arena.ai.localProviders.${userUuid}`, value: JSON.stringify(providers) }
-  )
+  await seedLocalProviders(page, userUuid, providers)
   await api.setAiDefaultProvider(E2E_LOCAL_PROVIDER_ID)
 }
 

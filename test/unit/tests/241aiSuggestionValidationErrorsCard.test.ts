@@ -12,7 +12,7 @@ import {
 import { buildValidationErrorsSuggestion } from '@webapp/ai/suggestions/detectors/validationErrors'
 import { VALIDATION_ERRORS_PROMPT } from '@webapp/ai/suggestions/prompts/validationErrors'
 
-import { CYRILLIC, LANGUAGES, getText, placeholders } from '../utils/aiSuggestionsI18n'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, getText, placeholders } from '../utils/aiSuggestionsI18n'
 
 /**
  * Returns a describe context in a UI language.
@@ -70,7 +70,7 @@ describe('validation errors suggestion card and prompt (241)', () => {
       expect(typeof text).toBe('string')
       expect(placeholders(text as string)).toEqual(['count'])
     }
-    for (const lang of ['ru', 'mn']) {
+    for (const lang of CYRILLIC_LANGUAGES) {
       expect(getText(lang, 'validationErrors.card')).toMatch(CYRILLIC)
     }
   })

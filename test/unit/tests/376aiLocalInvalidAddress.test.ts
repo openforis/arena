@@ -6,13 +6,7 @@ import {
   isLocalDraftUrlInvalid,
   type ProviderDraft,
 } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/providerDraft'
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
+import { LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 const GOOD = { id: 'local:a', name: 'Good', baseUrl: 'http://localhost:1234/v1', modelId: 'm' }
 const BAD = { id: 'local:b', name: 'Credentials', baseUrl: 'http://u:p@localhost:1234/v1', modelId: 'm' }
@@ -114,10 +108,10 @@ describe('the provider dialog explains an address it refuses (376)', () => {
   })
 })
 
-const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
+const resources = RESOURCES
 
 describe('the texts exist in every language (376)', () => {
-  test.each(Object.keys(resources))('%s', (lang) => {
+  test.each(LANGUAGES)('%s', (lang) => {
     const { aiEngine } = resources[lang].common
     expect(typeof aiEngine.unavailable.invalidAddress).toBe('string')
     expect(typeof aiEngine.localAddressInvalid).toBe('string')

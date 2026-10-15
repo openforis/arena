@@ -1,11 +1,5 @@
 import { isLocalOrPrivateUrl, isOrgHostedUrl, withDefaultHttpScheme } from '@common/ai/localServerAddress'
-import en from '@core/i18n/resources/en/appErrors'
-import es from '@core/i18n/resources/es/appErrors'
-import fr from '@core/i18n/resources/fr/appErrors'
-import ja from '@core/i18n/resources/ja/appErrors'
-import mn from '@core/i18n/resources/mn/appErrors'
-import pt from '@core/i18n/resources/pt/appErrors'
-import ru from '@core/i18n/resources/ru/appErrors'
+import { LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
 
 describe('isLocalOrPrivateUrl', () => {
   test.each([
@@ -78,18 +72,22 @@ describe('isOrgHostedUrl', () => {
 })
 
 describe('aiBaseUrlNotAllowed points to the local AI server', () => {
-  const localServerNames: Record<string, [Record<string, unknown>, string]> = {
-    en: [en, 'Local AI server'],
-    es: [es, 'Servidor de IA local'],
-    fr: [fr, "Serveur d'IA local"],
-    ja: [ja, 'ローカル AI サーバー'],
-    mn: [mn, 'Дотоод AI сервер'],
-    pt: [pt, 'Servidor de IA local'],
-    ru: [ru, 'Локальный сервер ИИ'],
+  const errorsByLang = namespaceByLanguage('appErrors')
+  const localServerNames: Record<string, string> = {
+    en: 'Local AI server',
+    es: 'Servidor de IA local',
+    fr: "Serveur d'IA local",
+    ja: 'ローカル AI サーバー',
+    mn: 'Дотоод AI сервер',
+    pt: 'Servidor de IA local',
+    ru: 'Локальный сервер ИИ',
   }
 
-  test.each(Object.keys(localServerNames))('%s', (lang) => {
-    const [errors, name] = localServerNames[lang]
-    expect(errors.aiBaseUrlNotAllowed).toContain(name)
+  test('every language of the app has its expected name (a new language needs one here)', () => {
+    expect(Object.keys(localServerNames).sort()).toEqual([...LANGUAGES].sort())
+  })
+
+  test.each(LANGUAGES)('%s', (lang) => {
+    expect(errorsByLang[lang].aiBaseUrlNotAllowed).toContain(localServerNames[lang])
   })
 })
