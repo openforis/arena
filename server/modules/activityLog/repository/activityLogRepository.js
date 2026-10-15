@@ -88,8 +88,10 @@ export const fetch = async ({
   const published = Survey.isPublished(surveyInfo)
   const schema = getSurveyDBSchema(surveyId)
 
-  const limitedById = idGreaterThan || idLessThan
-  const conditionLimitedById = idGreaterThan ? ` id > ${idGreaterThan}` : ` id < ${idLessThan}`
+  // the bound is a query parameter ($4), never part of the SQL text
+  const idBound = idGreaterThan || idLessThan
+  const limitedById = Boolean(idBound)
+  const conditionLimitedById = idGreaterThan ? ' id > $4::bigint' : ' id < $4::bigint'
 
   return client.map(
     `
@@ -249,7 +251,7 @@ export const fetch = async ({
 
     ORDER BY
       l.id ${orderBy}`,
-    [surveyUuid, activityTypes, limit],
+    [surveyUuid, activityTypes, limit, idBound],
     camelize
   )
 }
