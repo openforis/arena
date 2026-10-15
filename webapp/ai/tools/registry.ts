@@ -5,12 +5,14 @@
 import { jsonSchema, type ToolSet } from 'ai'
 import { z } from 'zod'
 
-import { AiLimits } from '@common/ai/limits'
 import { isHostingAllowed, type AiPolicy } from '@common/ai/policy'
 
+import * as Survey from '@core/survey/survey'
+
 import { ALL_TOOLS } from './allTools'
+import { limitToolResult, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
-import type { AiTool, AiToolArea, AiToolContext, AiToolErrorResult } from './types'
+import type { AiTool, AiToolArea, AiToolContext } from './types'
 
 export const AI_TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/
 
@@ -47,33 +49,28 @@ export const getTools = ({
   )
 }
 
-/**
- * Limits the JSON size of a tool result: the model gets the first characters and `truncated: true`.
- * @param {unknown} output - Tool output.
- * @param {number} [maxChars] - Maximum JSON length.
- * @returns {unknown} The output (undefined → null) or `{ truncated: true, json }`.
- */
-export const limitToolResult = (output: unknown, maxChars: number = AiLimits.assistantToolResultMaxChars): unknown => {
-  const value = output === undefined ? null : output
-  const json = JSON.stringify(value)
-  if (json.length <= maxChars) return value
-  return { truncated: true, json: json.slice(0, maxChars) }
-}
-
-/**
- * Builds the structured error result; when it exceeds the result budget the details are dropped.
- * @param {string} code - Error code.
- * @param {string} message - Message for the model.
- * @param {object} [details] - Extra fields.
- * @returns {AiToolErrorResult} The error result, always within the budget.
- */
-const toolError = (code: string, message: string, details: Record<string, unknown> = {}): AiToolErrorResult => {
-  const result = { error: { code, message, ...details } }
-  if (JSON.stringify(result).length <= AiLimits.assistantToolResultMaxChars) return result
-  return { error: { code, message: message.slice(0, 1000), detailsDropped: true } }
-}
-
 const isAbortError = (error: unknown): boolean => (error as { name?: string })?.name === 'AbortError'
+
+/**
+ * Returns the context of one tool call: the survey is read again, so a call after the user applied a card or edited
+ * the survey does not work on the survey of the start of the turn. Another survey is refused: the turn's policy and
+ * engine were resolved for the first one, and the abort of the turn comes after React commits.
+ * @param {AiToolContext} ctx - Turn context.
+ * @returns {AiToolContext} The context of the call.
+ */
+const toCallContext = (ctx: AiToolContext): AiToolContext => {
+  if (!ctx.getSurvey) return ctx
+  const survey = ctx.getSurvey()
+  const surveyId = (value: unknown) => (value ? Survey.getId(value) : null)
+  if (surveyId(survey) !== surveyId(ctx.survey)) {
+    throw new AiToolFailure(
+      'surveyChanged',
+      'The user switched to another survey while you were working. Do not retry: tell the user to ask again.',
+      { messageKey: 'appErrors:aiSurveyChanged' }
+    )
+  }
+  return { ...ctx, survey }
+}
 
 /**
  * Runs a tool safely: checks the input, turns errors into structured results the model can recover from, limits the
@@ -88,7 +85,7 @@ export const runTool = async (tool: AiTool, input: unknown, ctx: AiToolContext):
   const parsed = tool.inputSchema.safeParse(input)
   if (!parsed.success) return toolError('invalidInput', z.prettifyError(parsed.error))
   try {
-    const output = await tool.execute(parsed.data, ctx)
+    const output = await tool.execute(parsed.data, toCallContext(ctx))
     ctx.signal.throwIfAborted()
     return limitToolResult(output)
   } catch (error) {

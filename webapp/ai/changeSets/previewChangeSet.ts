@@ -88,8 +88,9 @@ const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): Fi
   if (!parent) return issue(t, 'parentUuid', 'parentNotFound', { name: parentUuid })
   const name = NodeDef.getName(parent)
   if (!NodeDef.isEntity(parent)) return issue(t, 'parentUuid', 'parentNotEntity', { name })
-  const cycle = NodeDef.getCycles(nodeDef)[0]
-  if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderTable(cycle)(parent)) {
+  // the new entity is in every cycle of its parent: one cycle where the parent is a table is enough
+  const isParentTableInACycle = NodeDef.getCycles(nodeDef).some((cycle) => NodeDefLayout.isRenderTable(cycle)(parent))
+  if (NodeDef.isEntity(nodeDef) && isParentTableInACycle) {
     return issue(t, 'parentUuid', 'entityUnderTable', { name })
   }
   return [...checkTextLanguages(survey, nodeDef, t), ...checkCreateMultipleAndKey({ survey, nodeDef, t })]
@@ -176,8 +177,15 @@ const checkDuplicate = (op: NodeDefOperation, seenKeys: Set<string>, survey: any
   return issue(t, field, 'duplicateOperation', { name: nodeDef ? NodeDef.getName(nodeDef) : '' })
 }
 
-// applies the operations in order, skipping (and reporting) those with structural issues
-const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate) => {
+/**
+ * Applies the operations in order to a copy of the survey, skipping (and reporting) those with structural issues.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey (not modified).
+ * @param {Translate} t - Translator for the issue messages.
+ * @returns {object} The draft survey, the issues (operation = index in the change set) and, per node definition
+ * uuid, the index of its first applied operation.
+ */
+export const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate) => {
   const issues: ChangeSetIssue[] = []
   const firstOperationByUuid = new Map<string, number>()
   const seenKeys = new Set<string>()
@@ -197,7 +205,7 @@ const applyOperations = (changeSet: ChangeSet, survey: any, t: Translate) => {
   return { draft, issues, firstOperationByUuid }
 }
 
-const validateTouchedNodeDefs = async (
+export const validateTouchedNodeDefs = async (
   draft: any,
   firstOperationByUuid: Map<string, number>,
   t: Translate
@@ -212,7 +220,11 @@ const validateTouchedNodeDefs = async (
   return issues
 }
 
-const checkOtherExpressions = async (changeSet: ChangeSet, draft: any, t: Translate): Promise<ChangeSetIssue[]> => {
+export const checkOtherExpressions = async (
+  changeSet: ChangeSet,
+  draft: any,
+  t: Translate
+): Promise<ChangeSetIssue[]> => {
   const issues: ChangeSetIssue[] = []
   for (const [index, op] of changeSet.operations.entries()) {
     if (isRecordEditOperation(op) || op.type !== 'expression.set' || PROPS_CHECKED_BY_VALIDATOR.has(op.prop)) continue

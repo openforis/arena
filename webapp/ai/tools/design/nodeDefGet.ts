@@ -6,11 +6,10 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
-import { AiLimits } from '@common/ai/limits'
-
+import { canViewCurrentSurvey } from '../common/toolPermissions'
+import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import type { AiTool } from '../types'
 import {
-  canViewSurveyTool,
   getDesignNodeDefs,
   getNodeDefPathNames,
   requireNodeDefByName,
@@ -22,7 +21,6 @@ import { getNodeDefIssues } from './surveyGetValidation'
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
 export const CHILDREN_MAX = 50
-const RESULT_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 /**
  * Returns the expressions of every expression property, as the model needs them.
@@ -98,7 +96,7 @@ export const describeNodeDef = (survey: any, nodeDef: any, t: Translate) => {
  */
 export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate) => {
   const description: any = describeNodeDef(survey, nodeDef, t)
-  if (JSON.stringify(description).length <= RESULT_MAX_JSON_CHARS) return description
+  if (JSON.stringify(description).length <= TOOL_RESULT_BUDGET_CHARS) return description
   const expressions: Record<string, object[]> = {}
   for (const [prop, views] of Object.entries(description.expressions as Record<string, any[]>)) {
     expressions[prop] = views.map(({ messages: _messages, ...rest }) => rest)
@@ -106,17 +104,18 @@ export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Transl
   return { ...description, expressions, expressionMessagesOmitted: true }
 }
 
-export const nodeDefGetTool: AiTool<{ name: string }> = {
+const inputSchema = z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') })
+
+export const nodeDefGetTool: AiTool<z.infer<typeof inputSchema>> = {
   name: 'nodeDef_get',
   description:
     'Returns one node definition by name: labels and descriptions per language, key / multiple / readOnly flags, ' +
     'its expressions (defaultValues, applicable, validations.expressions, visibleIf, editableIf), its parent path, ' +
     'for entities the child names, and the design errors and warnings (issues) the designer shows. Call it before proposing a change to that node definition.',
-  inputSchema: z.object({ name: z.string().min(1).max(100).describe('Node definition name, e.g. "tree_height"') }),
+  inputSchema,
   area: ['design', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
     return describeNodeDefWithinBudget(survey, requireNodeDefByName(survey, name), ctx.t)

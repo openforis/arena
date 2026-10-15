@@ -12,15 +12,31 @@ import { CATEGORY_ITEM_LABEL_TEXT_MAX } from '@common/ai/categoryItemLabels'
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { checkScope, requireCategory } from './categoryItemsListMissingLabels'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
-import { canEditSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
-type CategoryLabelItem = { categoryName: string; ref: string; lang: string; text: string }
+const inputSchema = z.object({
+  summary: summarySchema,
+  items: z
+    .array(
+      z.object({
+        categoryName: z.string().min(1).max(100),
+        ref: z.string().trim().min(1).max(500).describe('The ref of a listed item, e.g. "2.14"'),
+        lang: z.string().min(2).max(10).describe('A language of the survey'),
+        text: z.string().trim().min(1).max(CATEGORY_ITEM_LABEL_TEXT_MAX),
+      })
+    )
+    .min(1)
+    .max(200),
+})
 
-type CategoryLabelsInput = { summary: string; items: CategoryLabelItem[] }
+type CategoryLabelsInput = z.infer<typeof inputSchema>
+
+type CategoryLabelItem = CategoryLabelsInput['items'][number]
 
 /**
  * Converts one proposed item to an operation draft.
@@ -71,24 +87,10 @@ export const categoryItemLabelsProposeSetTool: AiTool<CategoryLabelsInput> = {
     'Proposes labels of category items in a survey language (translate category items), up to 200 at once. Use ' +
     'the refs given by categoryItems_listMissingLabels. Shown to the user as a card; nothing is saved until the ' +
     'user applies it.',
-  inputSchema: z.object({
-    summary: summarySchema,
-    items: z
-      .array(
-        z.object({
-          categoryName: z.string().min(1).max(100),
-          ref: z.string().trim().min(1).max(500).describe('The ref of a listed item, e.g. "2.14"'),
-          lang: z.string().min(2).max(10).describe('A language of the survey'),
-          text: z.string().trim().min(1).max(CATEGORY_ITEM_LABEL_TEXT_MAX),
-        })
-      )
-      .min(1)
-      .max(200),
-  }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, items }, ctx) => {
     const survey = requireSurvey(ctx)
     const drafts = items.map((item) => toDraft(item, survey, ctx))

@@ -37,12 +37,14 @@ export const useAssistantToolContext = (): ((area: AssistantArea) => AiToolConte
       const state = getState()
       const user = UserState.getUser(state)
       const surveyInfo = SurveyState.getSurveyInfo(state)
+      // the Help area sends no survey content to the model; a tool call reads the survey again with this
+      const getSurvey = () => (area === 'help' ? null : SurveyState.getSurvey(getState()))
       return {
         getState,
         dispatch,
         user,
-        // the Help area sends no survey content (deviation 9)
-        survey: area === 'help' ? null : SurveyState.getSurvey(state),
+        survey: getSurvey(),
+        getSurvey,
         cycle: SurveyState.getSurveyCycleKey(state) ?? null,
         lang: SurveyState.getSurveyPreferredLang(state) ?? uiLang,
         uiLang,

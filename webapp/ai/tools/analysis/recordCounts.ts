@@ -2,16 +2,13 @@ import { z } from 'zod'
 
 import * as RecordStep from '@core/record/recordStep'
 
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
 import type { AnalysisApi } from './analysisApi'
-import {
-  canViewCurrentSurvey,
-  fitListToBudget,
-  getAnalysisContext,
-  toolError,
-  toRequestErrorResult,
-} from './toolResults'
+import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const dayRangeMaxDays = 366
 export const monthRangeMaxDays = 3660
@@ -43,19 +40,20 @@ const parseIsoDay = (value: string): number => {
 /**
  * Checks the requested range.
  * @param {CountOverTimeInput} input - Tool input.
- * @returns {object|null} The error result, or null when the range is valid.
+ * @returns {void} Nothing; throws a failure when the range is invalid.
  */
-const checkRange = ({ from, to, groupBy }: CountOverTimeInput) => {
+const checkRange = ({ from, to, groupBy }: CountOverTimeInput): void => {
   const days = (parseIsoDay(to) - parseIsoDay(from)) / dayMs
-  if (Number.isNaN(days) || days < 0) return toolError('invalidRange', '"from" and "to" must be valid days, from <= to')
+  if (Number.isNaN(days) || days < 0) {
+    throw new AiToolFailure('invalidRange', '"from" and "to" must be valid days, from <= to')
+  }
   const maxDays = groupBy === 'day' ? dayRangeMaxDays : monthRangeMaxDays
   if (days > maxDays) {
-    return toolError(
+    throw new AiToolFailure(
       'rangeTooLong',
       `At most ${maxDays} days with groupBy=${groupBy}; shorten the range or group by month`
     )
   }
-  return null
 }
 
 /**
@@ -75,12 +73,11 @@ const sumByMonth = (days: PeriodCount[]): PeriodCount[] => {
 }
 
 /**
- * Turns an expected request failure into a result the model can act on; other errors are re-thrown.
+ * Turns an expected request failure into a failure the model can act on.
  * @param {any} error - The error.
- * @returns {object} The error result.
+ * @returns {Error} The error to throw.
  */
-const handleCountError = (error: any) =>
-  toRequestErrorResult(error, 'The count took too long. Try a shorter date range.')
+const toCountFailure = (error: any) => toRequestFailure(error, 'The count took too long. Try a shorter date range.')
 
 /**
  * Creates records_countByStep and records_countOverTime.
@@ -89,10 +86,9 @@ const handleCountError = (error: any) =>
  * @returns {AiTool[]} The two tools.
  */
 export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<any, unknown>[] => {
-  const common: Pick<AiTool<any>, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+  const common: Pick<AiTool<any>, 'area' | 'dataClass' | 'requires'> = {
     area: ['analysis'],
     dataClass: 'data',
-    effect: 'read',
     requires: canViewCurrentSurvey,
   }
 
@@ -114,7 +110,7 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
         const steps = RecordStep.steps.map(({ id, name }) => ({ step: name, count: Number(counts[id] ?? 0) }))
         return { cycle, steps, total: steps.reduce((sum, { count }) => sum + count, 0) }
       } catch (error) {
-        return handleCountError(error)
+        throw toCountFailure(error)
       }
     },
   }
@@ -131,8 +127,7 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
      * @returns {Promise<object>} The counts, or an error result.
      */
     execute: async (input, ctx) => {
-      const rangeError = checkRange(input)
-      if (rangeError) return rangeError
+      checkRange(input)
       const { surveyId, cycle } = getAnalysisContext(ctx)
       const { from, to, groupBy } = input
       try {
@@ -142,7 +137,7 @@ export const createRecordCountTools = ({ api }: { api: AnalysisApi }): AiTool<an
         const total = days.reduce((sum, { count }) => sum + count, 0)
         return fitListToBudget({ from, to, groupBy, counts, total }, 'counts')
       } catch (error) {
-        return handleCountError(error)
+        throw toCountFailure(error)
       }
     },
   }

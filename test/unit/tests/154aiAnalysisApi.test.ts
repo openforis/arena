@@ -2,7 +2,7 @@ import { Query } from '@common/model/query'
 
 import { createAnalysisApi } from '@webapp/ai/tools/analysis/analysisApi'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'
-import { fitListToBudget, toolError } from '@webapp/ai/tools/analysis/toolResults'
+import { fitListToBudget, toolError } from '@webapp/ai/tools/common/toolResult'
 
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 

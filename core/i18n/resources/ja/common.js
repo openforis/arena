@@ -1891,6 +1891,8 @@ $t(common.cantUndoWarning)`,
         '{{name}}のカテゴリまたは分類体系は変更できません（公開済みか、別のコード属性がこれに依存しています）。',
       refHasParentCode:
         '{{name}}は親のコード属性に依存しているため、ここではカテゴリを変更できません。デザイナーで変更してください。',
+      nodeDefInvalid: '{{name}}はこれらの変更で無効になるため、その変更はすべて適用されません。',
+      expressionInvalid: '無効な式：{{text}}',
     },
   },
 

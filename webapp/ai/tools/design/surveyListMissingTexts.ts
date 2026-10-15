@@ -6,10 +6,11 @@ import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { AiLimits } from '@common/ai/limits'
 import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope } from '@webapp/ai/suggestions/types'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
+import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool } from '../types'
 import {
@@ -20,11 +21,10 @@ import {
   getTextNodeDefs,
   toTextTargetKey,
 } from './missingTexts'
-import { canViewSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
 export const MISSING_TEXTS_PAGE_MAX = 50
-// the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
-export const MISSING_TEXTS_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
+// the wrapper cuts a longer result at the end of its largest list (valid values, truncated: true): stay under the limit with some margin
 // the longest text labels_proposeSet accepts
 export const SOURCE_TEXT_MAX = 2000
 
@@ -230,7 +230,7 @@ export const listMissingTexts = ({
     const item = lang === null ? toEmptyItem(slot) : toSourceItem(slot, lang, languages)
     size += JSON.stringify(item).length + 1
     // a page is cut only when it has items, so an oversized text still makes progress
-    if (page.items.length > 0 && (page.items.length >= limit || size > MISSING_TEXTS_MAX_JSON_CHARS)) {
+    if (page.items.length > 0 && (page.items.length >= limit || size > TOOL_RESULT_BUDGET_CHARS)) {
       page.nextCursor = String(slot.index)
       break
     }
@@ -250,8 +250,7 @@ export const surveyListMissingTextsTool: AiTool<MissingTextsInput, MissingTextsP
   inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async (input, ctx) =>
     listMissingTexts({
       survey: requireSurvey(ctx),

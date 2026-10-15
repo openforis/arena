@@ -15,8 +15,6 @@ import type { CategoryItemRefs } from './design/categoryItemRefs'
 
 export type AiToolArea = 'design' | 'help' | 'analysis' | 'cleaning'
 
-export type AiToolEffect = 'read' | 'propose'
-
 export type AiCurrentView = { module: string | null; subModule: string | null; selectedNodeDefUuid: string | null }
 
 export type AiTranslate = (key: string, params?: Record<string, unknown>) => string
@@ -27,6 +25,8 @@ export type AiToolContext = {
   user: ArenaUser
   // the draft survey in Redux; null in the Help area (no survey content leaves the browser there)
   survey: ArenaSurvey | null
+  // reads the survey from the store: each tool call gets the survey as it is then, not as it was when the turn began
+  getSurvey?: () => ArenaSurvey | null
   cycle: string | null
   // survey preferred language
   lang: string
@@ -61,7 +61,6 @@ export type AiTool<I = any, O = unknown> = {
   area: AiToolArea[]
   // what the result may expose (checked against the survey AI policy)
   dataClass: AiDataClass
-  effect: AiToolEffect
   requires: (ctx: AiToolContext) => boolean
   execute: (input: I, ctx: AiToolContext) => Promise<O>
 }

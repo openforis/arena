@@ -1,31 +1,43 @@
 import { z } from 'zod'
 
 import type { AiTool } from '@webapp/ai/tools/types'
-import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
+import {
+  attributeNamesSchema,
+  NAME_MAX_CHARS,
+  uuidSchema,
+  VALUE_PART_MAX_CHARS,
+} from '@webapp/ai/tools/common/toolSchemas'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
-import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { getCleaningContext, resolveAttributeDefs } from './cleaningContext'
 import { findRecordUuidByKeys } from './recordLookup'
 import { getRecordValues } from './recordValues'
 import type { CleaningI18n } from './validationRows'
 
+// an Arena survey has few key attributes per record: more is a model mistake
+const RECORD_KEYS_MAX = 10
+
 const inputSchema = z.object({
-  recordUuid: z.string().nullish().describe('UUID of the record.'),
+  recordUuid: uuidSchema.nullish().describe('UUID of the record.'),
   recordKeys: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string().max(NAME_MAX_CHARS), z.union([z.string().max(VALUE_PART_MAX_CHARS), z.number()]))
+    .refine((keys) => Object.keys(keys).length <= RECORD_KEYS_MAX, `At most ${RECORD_KEYS_MAX} key attributes.`)
     .nullish()
     .describe('Values of the record key attributes, e.g. {"cluster_id": "12"}, when the UUID is unknown.'),
-  attributes: z.array(z.string()).min(1).max(20).describe('Attribute names to read.'),
+  attributes: attributeNamesSchema(20).min(1).describe('Attribute names to read.'),
 })
 
 type Input = z.infer<typeof inputSchema>
 
 const TIMEOUT_HINT = 'The record is too slow to load. Retry, or ask for fewer attributes.'
 
-const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   area: ['cleaning'],
   dataClass: 'data',
-  effect: 'read',
   requires: canCleanseCurrentSurvey,
 }
 
@@ -57,22 +69,21 @@ export const createRecordGetValuesTool = ({
    */
   execute: async ({ recordUuid, recordKeys, attributes }, ctx) => {
     const { survey, surveyId, cycle } = getCleaningContext(ctx)
-    if (!recordUuid && !recordKeys) return toolError('recordRequired', 'Give recordUuid or recordKeys.')
+    if (!recordUuid && !recordKeys) throw new AiToolFailure('recordRequired', 'Give recordUuid or recordKeys.')
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: [...new Set(attributes)] })
     if (unknownNames.length > 0) {
-      return toolError('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
     }
     const { signal } = ctx
     try {
       const lookup = recordUuid
         ? { recordUuid }
         : await findRecordUuidByKeys({ api, survey, surveyId, cycle, keys: recordKeys ?? {}, signal })
-      if (!('recordUuid' in lookup)) return lookup
       const record = await api.fetchRecordAndNodes({ surveyId, recordUuid: lookup.recordUuid, signal })
-      if (!record) return toolError('recordNotAvailable', 'The record does not exist or you may not see it.')
+      if (!record) throw new AiToolFailure('recordNotAvailable', 'The record does not exist or you may not see it.')
       return fitListToBudget(getRecordValues({ survey, cycle, record, nodeDefs, i18n: getI18n() }), 'nodes')
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
   },
 })

@@ -3,7 +3,7 @@ import * as Survey from '@core/survey/survey'
 
 import { proposeQueryTool } from '@webapp/ai/tools/analysis/proposeQuery'
 import { createRunQueryTools } from '@webapp/ai/tools/analysis/runQuery'
-import { RESULT_MAX_CHARS } from '@webapp/ai/tools/analysis/toolResults'
+import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
 
 import { newAnalysisToolContext, newFakeAnalysisApi, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
 
@@ -88,7 +88,7 @@ describe('query_run', () => {
     expect(result.rows).toHaveLength(200)
     expect(result.rows[3]).toEqual(['T3', 'Type 3', 3.5])
     expect(result).toMatchObject({ queryId: 'q1', mode: 'aggregate', total: 250, truncated: true })
-    expect(JSON.stringify(result).length).toBeLessThanOrEqual(RESULT_MAX_CHARS)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
   })
 
   test('aggregate: few groups, no count request', async () => {
@@ -119,7 +119,7 @@ describe('query_run', () => {
     const rows = Array.from({ length: 40 }, (_, idx) => rawRow(idx, 'y'.repeat(400)))
     const { runQueryTool, ctx } = await setUp({ input: rawInput, rows })
     const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
-    expect(JSON.stringify(result).length).toBeLessThanOrEqual(RESULT_MAX_CHARS)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
     expect(result.rows.length).toBeLessThan(40)
     expect(result).toMatchObject({ total: 40, truncated: true })
   })
@@ -173,7 +173,7 @@ describe('query_count', () => {
   test('both tools are data read tools of the analysis and cleaning areas', async () => {
     const { countTool, runQueryTool } = await setUp()
     for (const tool of [countTool, runQueryTool]) {
-      expect(tool).toMatchObject({ dataClass: 'data', effect: 'read', area: ['analysis', 'cleaning'] })
+      expect(tool).toMatchObject({ dataClass: 'data', area: ['analysis', 'cleaning'] })
     }
     expect([countTool.name, runQueryTool.name]).toEqual(['query_count', 'query_run'])
   })

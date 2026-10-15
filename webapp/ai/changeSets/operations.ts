@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
+import { isLockedByPublication } from '@core/survey/nodeDefEditGuards'
 
 import { getExpressionProp, setExpressionProp } from './expressionProps'
 import { isRecordEditOperation } from './recordEdits/types'
@@ -73,7 +74,7 @@ export const canUpdateNodeDefRef = (survey: any, nodeDef: any, prop: NodeDefRefP
   prop === 'categoryUuid'
     ? // a child code attribute keeps its parent: the designer resets it on a category change, the assistant does not
       Survey.canUpdateCategory(nodeDef)(survey) && !NodeDef.getParentCodeDefUuid(nodeDef)
-    : !NodeDef.isPublished(nodeDef) || Survey.isTemplate(Survey.getSurveyInfo(survey))
+    : !isLockedByPublication({ survey, nodeDef })
 
 /**
  * Returns the category or taxonomy a reference points to.

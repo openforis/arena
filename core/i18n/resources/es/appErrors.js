@@ -98,6 +98,7 @@ export default {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
     dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
     fileNotFound: 'Archivo no encontrado',
+    nodeDefRefLocked: '{{name}} no puede cambiar de categoría ni de taxonomía: ya está publicado.',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   aiSessionExpired: 'Su sesión ha caducado. Vuelva a iniciar sesión.',
@@ -141,6 +142,8 @@ export default {
   aiProviderUnavailable: 'No se pudo contactar con el proveedor de IA. Inténtelo de nuevo más tarde.',
   aiProviderResponseTooLarge:
     'El proveedor de IA envió una respuesta demasiado grande y se interrumpió. Inténtelo de nuevo o elija otro proveedor.',
+  aiSurveyChanged:
+    'La encuesta cambió mientras el asistente trabajaba. Vuelva a preguntar para usar la encuesta actual.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
   aiProviderTestFailed: 'La prueba del proveedor falló: {{message}}',
   aiProviderNotFound: 'Este proveedor de IA no existe o no es suyo. Elija otro proveedor.',

@@ -4,9 +4,12 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { QueryNodeDefs } from '@common/model/query'
 
+import { TOOL_RESULT_BUDGET_CHARS, fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
-import { RESULT_MAX_CHARS, canViewCurrentSurvey, fitListToBudget, getAnalysisContext, toolError } from './toolResults'
+import { getAnalysisContext } from './toolResults'
 
 const inputSchema = z.object({
   entity: z
@@ -58,17 +61,20 @@ const execute = async (input: Input, ctx: any) => {
   if (input.entity) {
     const entityDef = entityDefs.find((nodeDef: any) => NodeDef.getName(nodeDef) === input.entity)
     if (!entityDef) {
-      return toolError('unknownEntity', `Unknown entity; valid entities: ${entityDefs.map(NodeDef.getName).join(', ')}`)
+      throw new AiToolFailure(
+        'unknownEntity',
+        `Unknown entity; valid entities: ${entityDefs.map(NodeDef.getName).join(', ')}`
+      )
     }
     const item = toItem(entityDef)
     // the wrapper of the single entity counts in the budget
     const wrapperLength = JSON.stringify({ entities: [], truncated: true }).length
-    const fitted = fitListToBudget(item, 'attributes', RESULT_MAX_CHARS - wrapperLength)
+    const fitted = fitListToBudget(item, 'attributes', TOOL_RESULT_BUDGET_CHARS - wrapperLength)
     return { entities: [fitted], truncated: fitted.truncated ?? false }
   }
 
   const result = { entities: entityDefs.map(toItem) }
-  if (JSON.stringify(result).length <= RESULT_MAX_CHARS) return result
+  if (JSON.stringify(result).length <= TOOL_RESULT_BUDGET_CHARS) return result
   return {
     entities: result.entities.map(({ name, label, parentEntity }) => ({ name, label, parentEntity })),
     attributesOmitted: true,
@@ -84,7 +90,6 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   inputSchema,
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute,
 }

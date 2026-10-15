@@ -116,7 +116,6 @@ describe('query_listEntities', () => {
     expect(listEntitiesTool).toMatchObject({
       name: 'query_listEntities',
       dataClass: 'schema',
-      effect: 'read',
       area: ['analysis', 'cleaning'],
     })
   })

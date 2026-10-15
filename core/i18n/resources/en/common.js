@@ -1900,6 +1900,8 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
         '{{name}} cannot get another category or taxonomy (it is published, or another code attribute depends on it).',
       refHasParentCode:
         '{{name}} depends on a parent code attribute, so its category cannot be changed here. Change it in the designer.',
+      nodeDefInvalid: '{{name}} would not be valid after these changes, so none of its changes is applied.',
+      expressionInvalid: 'Invalid expression: {{text}}',
     },
   },
 

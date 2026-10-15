@@ -30,22 +30,23 @@ export const isAssistantNodeDefType = (type: string): type is AssistantNodeDefTy
  * Returns the designer's default props: a multiple entity is a table, a single entity a form in the parent page.
  * @param {object} params - Parameters.
  * @param {string} params.type - Type.
- * @param {string} params.cycle - Cycle.
+ * @param {string[]} params.cycles - Cycles of the node definition.
  * @param {boolean} params.multiple - Multiple entity.
  * @returns {object} The props.
  */
 export const getDefaultPropsByType = ({
   type,
-  cycle,
+  cycles,
   multiple,
 }: {
   type: string
-  cycle: string
+  cycles: string[]
   multiple: boolean
 }) => {
   if (type !== 'entity') return {}
   const renderType = multiple ? NodeDefLayout.renderType.table : NodeDefLayout.renderType.form
-  return { [NodeDef.propKeys.layout]: NodeDefLayout.newLayout(cycle, renderType) }
+  const layout = Object.assign({}, ...cycles.map((cycle) => NodeDefLayout.newLayout(cycle, renderType)))
+  return { [NodeDef.propKeys.layout]: layout }
 }
 
 const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object.keys(texts).length > 0 ? texts : null)
@@ -55,7 +56,9 @@ const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object
  * @param {object} params - Parameters.
  * @param {object} params.parent - Parent entity.
  * @param {string} params.type - Type.
- * @param {string} params.cycle - Current cycle (the designer creates in the current cycle).
+ * @param {string[]} [params.cycles] - Cycles (default: those of the parent, so the node definition exists wherever its
+ * parent does).
+ * @param {string} [params.cycle] - A single cycle, instead of `cycles` (what the designer does: the current cycle).
  * @param {string} params.name - Name.
  * @param {object} [params.labels] - Labels by language.
  * @param {object} [params.descriptions] - Descriptions by language.
@@ -68,6 +71,7 @@ export const createProposedNodeDef = ({
   parent,
   type,
   cycle,
+  cycles = cycle ? [cycle] : NodeDef.getCycles(parent),
   name,
   labels,
   descriptions,
@@ -77,7 +81,8 @@ export const createProposedNodeDef = ({
 }: {
   parent: any
   type: string
-  cycle: string
+  cycle?: string
+  cycles?: string[]
   name: string
   labels?: Record<string, string>
   descriptions?: Record<string, string>
@@ -95,7 +100,7 @@ export const createProposedNodeDef = ({
     ...(key ? { [propKeys.key]: true } : {}),
     ...(multiple ? { [propKeys.multiple]: true } : {}),
     ...(readOnly ? { [propKeys.readOnly]: true } : {}),
-    ...getDefaultPropsByType({ type, cycle, multiple }),
+    ...getDefaultPropsByType({ type, cycles, multiple }),
   }
-  return NodeDef.dissocTemporary(NodeDef.newNodeDef(parent, type, [cycle], props))
+  return NodeDef.dissocTemporary(NodeDef.newNodeDef(parent, type, cycles, props))
 }

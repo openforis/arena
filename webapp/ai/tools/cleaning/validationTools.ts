@@ -7,38 +7,44 @@ import {
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { AiTool } from '@webapp/ai/tools/types'
-import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
+import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
-import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { getCleaningContext, resolveAttributeDefs } from './cleaningContext'
 import type { CleaningI18n } from './validationRows'
 import { summarizeValidationRows } from './validationSummary'
 import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './validationList'
 
 const SUMMARY_ROWS_MAX = 1000
 
+// far beyond any report a model can page through
+const OFFSET_MAX = 1_000_000
+
 const summarizeInputSchema = z.object({
-  recordUuid: z.string().nullish().describe('Only this record (UUID); omit for the whole cycle.'),
+  recordUuid: uuidSchema.nullish().describe('Only this record (UUID); omit for the whole cycle.'),
 })
 
 const listInputSchema = z.object({
-  attributes: z.array(z.string()).max(50).optional().describe('Attribute names; omit for all attributes.'),
+  attributes: attributeNamesSchema(50).optional().describe('Attribute names; omit for all attributes.'),
   categories: z
     .array(z.enum(MessageTypeFilterCategoryIds as [string, ...string[]]))
     .optional()
     .describe('Message categories; omit for all.'),
-  recordUuid: z.string().nullish().describe('Only this record (UUID).'),
-  offset: z.number().int().min(0).optional().describe('Rows to skip (paging).'),
+  recordUuid: uuidSchema.nullish().describe('Only this record (UUID).'),
+  offset: z.number().int().min(0).max(OFFSET_MAX).optional().describe('Rows to skip (paging).'),
 })
 
 type Deps = { api: CleaningApi; getI18n: () => CleaningI18n }
 
 const TIMEOUT_HINT = 'The report is too large. Filter by record, attribute or category and retry.'
 
-const common: Pick<AiTool, 'area' | 'dataClass' | 'effect' | 'requires'> = {
+const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
   area: ['cleaning'],
   dataClass: 'data',
-  effect: 'read',
   requires: canCleanseCurrentSurvey,
 }
 
@@ -71,7 +77,7 @@ const createSummarizeTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof summ
         api.countValidationReportRows(filter),
       ])
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const summary = summarizeValidationRows({ survey, rows, total, i18n: getI18n(), cycle })
     return fitListToBudget(summary, 'groups')
@@ -101,7 +107,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
     const { survey, surveyId, cycle, lang } = getCleaningContext(ctx)
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: attributes ?? [] })
     if (unknownNames.length > 0) {
-      return toolError('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
     }
     const filter = {
       surveyId,
@@ -119,7 +125,7 @@ const createListTool = ({ api, getI18n }: Deps): AiTool<z.infer<typeof listInput
         ? await api.countValidationReportRows(filter)
         : offset + fetched.length
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
     const { rows: pageRows, hasMore } = pageValidationRows(fetched)
     const rows = toValidationListItems({ survey, rows: pageRows, user: ctx.user, i18n: getI18n(), lang })

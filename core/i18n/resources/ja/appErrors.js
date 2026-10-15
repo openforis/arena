@@ -70,6 +70,7 @@ export default {
     nodeDefNameNotFound: 'ノード定義が見つかりません：{{name}}',
     dataMigrationInProgress: 'この調査はアップグレード中です。しばらくしてから再度お試しください。',
     fileNotFound: 'ファイルが見つかりません',
+    nodeDefRefLocked: '{{name}} は公開済みのため、カテゴリーまたは分類を変更できません。',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors
@@ -111,6 +112,7 @@ export default {
   aiProviderUnavailable: 'AIプロバイダーに接続できませんでした。しばらくしてから再度お試しください。',
   aiProviderResponseTooLarge:
     'AIプロバイダーの応答が大きすぎたため、途中で打ち切りました。もう一度お試しいただくか、別のプロバイダーを選択してください。',
+  aiSurveyChanged: 'アシスタントの作業中に調査が変更されました。現在の調査を使うには、もう一度質問してください。',
   aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
   aiProviderTestFailed: 'プロバイダーのテストに失敗しました：{{message}}',
   aiProviderNotFound:

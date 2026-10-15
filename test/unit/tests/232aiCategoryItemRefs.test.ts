@@ -57,7 +57,6 @@ const runWithTool = (conversation: Conversation, withCtx: (ctx: AiToolContext) =
     inputSchema: z.object({ summary: z.string() }),
     area: ['design'],
     dataClass: 'schema',
-    effect: 'read',
     requires: () => true,
     execute: async (_input, ctx) => {
       withCtx(ctx)
