@@ -1,12 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { AiLimits } from '@common/ai/limits'
 import { buildAssistantDesignPrompt } from '@common/ai/prompts/assistantDesign'
 import type { ChangeSet, LabelKind } from '@webapp/ai/changeSets/types'
-import {
-  MISSING_TEXTS_MAX_JSON_CHARS,
-  surveyListMissingTextsTool,
-} from '@webapp/ai/tools/design/surveyListMissingTexts'
+import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
+import { surveyListMissingTextsTool } from '@webapp/ai/tools/design/surveyListMissingTexts'
 import { getTools, runTool } from '@webapp/ai/tools/registry'
 import { buildAssistantSurvey, createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { withNodeDef, withSavedNodeDefs, withTexts } from '@test/unit/utils/designSuggestionTestUtils'
@@ -154,11 +151,10 @@ describe('survey_listMissingTexts (221)', () => {
     let cursor: string | null = null
     do {
       const page: any = await list(cursor === null ? { lang: 'fr' } : { lang: 'fr', cursor }, { survey: big })
-      expect(JSON.stringify(page).length).toBeLessThanOrEqual(MISSING_TEXTS_MAX_JSON_CHARS)
+      expect(JSON.stringify(page).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
       pages.push(page)
       cursor = page.nextCursor
     } while (cursor !== null && pages.length < 10)
-    expect(MISSING_TEXTS_MAX_JSON_CHARS).toBe(AiLimits.assistantToolResultMaxChars - 500)
     expect(pages.length).toBeGreaterThan(1)
     const items = pages.flatMap((page) => page.items)
     expect(items.map((item) => `${item.nodeDefName}:${item.kind}`)).toEqual([

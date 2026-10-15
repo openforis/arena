@@ -7,7 +7,6 @@ import { z } from 'zod'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 
-import { AiLimits } from '@common/ai/limits'
 import { CATEGORY_ITEM_LABEL_TEXT_MAX, type MissingLabelsItem } from '@common/ai/categoryItemLabels'
 
 import {
@@ -16,6 +15,7 @@ import {
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 
+import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { createCategoryItemRefs, type CategoryItemRefs } from './categoryItemRefs'
@@ -24,7 +24,6 @@ import { canEditSurveyTool, requireSurvey } from './surveyLookup'
 export const LIST_MISSING_LABELS_SERVER_PAGE = 100
 export const LIST_MISSING_LABELS_MAX_REQUESTS = 5
 export const LIST_MISSING_LABELS_DEFAULT_LIMIT = 50
-const RESULT_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 export type ListMissingLabelsInput = { categoryName: string; lang: string; cursor?: string; limit?: number }
 
@@ -162,7 +161,7 @@ const collectItems = (items: MissingLabelsItem[], state: PageState, params: Page
     if (
       listed &&
       state.items.length > 0 &&
-      (state.items.length >= limit || state.size + itemSize > RESULT_MAX_JSON_CHARS)
+      (state.items.length >= limit || state.size + itemSize > TOOL_RESULT_BUDGET_CHARS)
     ) {
       state.full = true
       return

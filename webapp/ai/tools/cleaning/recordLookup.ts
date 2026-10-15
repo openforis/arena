@@ -2,7 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
-import { toolError } from '@webapp/ai/tools/analysis/toolResults'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
 
@@ -62,7 +62,7 @@ const collectMatches = async ({
  * @param {string} params.cycle - Cycle key.
  * @param {object} params.keys - Key values by key attribute name.
  * @param {AbortSignal} [params.signal] - Abort signal.
- * @returns {Promise<object>} { recordUuid } or a tool error.
+ * @returns {Promise<object>} { recordUuid }; throws an AiToolFailure when no single record has these keys.
  */
 export const findRecordUuidByKeys = async ({
   api,
@@ -87,18 +87,25 @@ export const findRecordUuidByKeys = async ({
     givenNames.length !== keyNames.length ||
     !keyNames.every((name: string) => givenNames.includes(name))
   ) {
-    return toolError('recordKeysInvalid', `Give exactly the record key attributes: ${keyNames.join(', ')}.`)
+    throw new AiToolFailure('recordKeysInvalid', `Give exactly the record key attributes: ${keyNames.join(', ')}.`)
   }
   const { matching, complete } = await collectMatches({
     api,
     search: { surveyId, cycle, search: String(keys[keyNames[0]]), signal },
     isMatch: (item) => matchesKeys({ item, keyDefs, keys }),
   })
-  if (matching.length > 1)
-    return toolError('recordAmbiguous', 'Several records have these keys: use validation_list to get their UUIDs.')
-  if (!complete) {
-    return toolError('recordSearchTooBroad', 'Too many records match the first key. Give the values of all the keys.')
+  if (matching.length > 1) {
+    throw new AiToolFailure(
+      'recordAmbiguous',
+      'Several records have these keys: use validation_list to get their UUIDs.'
+    )
   }
-  if (matching.length === 0) return toolError('recordNotFound', 'No record of the current cycle has these keys.')
+  if (!complete) {
+    throw new AiToolFailure(
+      'recordSearchTooBroad',
+      'Too many records match the first key. Give the values of all the keys.'
+    )
+  }
+  if (matching.length === 0) throw new AiToolFailure('recordNotFound', 'No record of the current cycle has these keys.')
   return { recordUuid: matching[0].uuid as string }
 }

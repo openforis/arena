@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
-import { limitToolResult, runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
+import { limitToolResult } from '@webapp/ai/tools/common/toolResult'
+import { runTool, toAiSdkTools } from '@webapp/ai/tools/registry'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import type { AiTool } from '@webapp/ai/tools/types'
 import { createToolContext } from '@test/unit/utils/assistantTestUtils'
@@ -79,7 +80,8 @@ describe('runTool', () => {
     const tool = makeTool(async () => ({ text: 'x'.repeat(9000) }))
     const result: any = await runTool(tool, { name: 'x' }, createToolContext())
     expect(result.truncated).toBe(true)
-    expect(result.json).toHaveLength(8000)
+    expect(JSON.stringify(result).length).toBeLessThanOrEqual(8000)
+    expect(result.text.startsWith('xxx')).toBe(true)
   })
 })
 
@@ -87,7 +89,7 @@ describe('limitToolResult', () => {
   test('keeps short results and undefined becomes null', () => {
     expect(limitToolResult({ a: 1 })).toEqual({ a: 1 })
     expect(limitToolResult(undefined)).toBeNull()
-    expect(limitToolResult({ a: 'x'.repeat(20) }, 10)).toEqual({ truncated: true, json: '{"a":"xxxx' })
+    expect(limitToolResult({ a: 'x'.repeat(20) }, 10)).toEqual({ truncated: true })
   })
 })
 

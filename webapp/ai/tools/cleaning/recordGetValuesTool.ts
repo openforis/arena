@@ -7,7 +7,9 @@ import {
   uuidSchema,
   VALUE_PART_MAX_CHARS,
 } from '@webapp/ai/tools/common/toolSchemas'
-import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
+import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
+import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
 import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
@@ -67,22 +69,21 @@ export const createRecordGetValuesTool = ({
    */
   execute: async ({ recordUuid, recordKeys, attributes }, ctx) => {
     const { survey, surveyId, cycle } = getCleaningContext(ctx)
-    if (!recordUuid && !recordKeys) return toolError('recordRequired', 'Give recordUuid or recordKeys.')
+    if (!recordUuid && !recordKeys) throw new AiToolFailure('recordRequired', 'Give recordUuid or recordKeys.')
     const { nodeDefs, unknownNames } = resolveAttributeDefs({ survey, names: [...new Set(attributes)] })
     if (unknownNames.length > 0) {
-      return toolError('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
+      throw new AiToolFailure('unknownAttribute', `Unknown attributes: ${unknownNames.join(', ')}. Use nodeDef_search.`)
     }
     const { signal } = ctx
     try {
       const lookup = recordUuid
         ? { recordUuid }
         : await findRecordUuidByKeys({ api, survey, surveyId, cycle, keys: recordKeys ?? {}, signal })
-      if (!('recordUuid' in lookup)) return lookup
       const record = await api.fetchRecordAndNodes({ surveyId, recordUuid: lookup.recordUuid, signal })
-      if (!record) return toolError('recordNotAvailable', 'The record does not exist or you may not see it.')
+      if (!record) throw new AiToolFailure('recordNotAvailable', 'The record does not exist or you may not see it.')
       return fitListToBudget(getRecordValues({ survey, cycle, record, nodeDefs, i18n: getI18n() }), 'nodes')
     } catch (error) {
-      return toRequestErrorResult(error, TIMEOUT_HINT)
+      throw toRequestFailure(error, TIMEOUT_HINT)
     }
   },
 })

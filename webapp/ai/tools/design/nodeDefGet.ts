@@ -6,8 +6,7 @@ import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps } from '@webapp/ai/changeSets/types'
 
-import { AiLimits } from '@common/ai/limits'
-
+import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import type { AiTool } from '../types'
 import {
   canViewSurveyTool,
@@ -22,7 +21,6 @@ import { getNodeDefIssues } from './surveyGetValidation'
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
 export const CHILDREN_MAX = 50
-const RESULT_MAX_JSON_CHARS = AiLimits.assistantToolResultMaxChars - 500
 
 /**
  * Returns the expressions of every expression property, as the model needs them.
@@ -98,7 +96,7 @@ export const describeNodeDef = (survey: any, nodeDef: any, t: Translate) => {
  */
 export const describeNodeDefWithinBudget = (survey: any, nodeDef: any, t: Translate) => {
   const description: any = describeNodeDef(survey, nodeDef, t)
-  if (JSON.stringify(description).length <= RESULT_MAX_JSON_CHARS) return description
+  if (JSON.stringify(description).length <= TOOL_RESULT_BUDGET_CHARS) return description
   const expressions: Record<string, object[]> = {}
   for (const [prop, views] of Object.entries(description.expressions as Record<string, any[]>)) {
     expressions[prop] = views.map(({ messages: _messages, ...rest }) => rest)
