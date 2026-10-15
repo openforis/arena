@@ -8,6 +8,7 @@ import { generateObject } from 'ai'
 import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 import { getAiFeature } from '@common/ai/features'
+import { ARENA_DEFAULT_PROVIDER_ID } from '@common/ai/providerIds'
 
 import * as Log from '@server/log/log'
 
@@ -58,11 +59,13 @@ const callModel = async ({ ctx, signal, call }) => {
 }
 
 /**
- * Production dependencies; tests pass their own.
+ * Production dependencies; tests pass their own. The server's own calls use Arena default: the resolver refuses a call
+ * without a provider id.
  * @returns {{resolveModel: Function, assertPolicyAllows: Function, gateEnv: object|undefined}} The dependencies.
  */
 export const createDefaultModelClientDeps = () => ({
-  resolveModel: ProviderResolver.resolveModelForUser,
+  resolveModel: ({ user, feature }) =>
+    ProviderResolver.resolveModelForUser({ user, feature, providerId: ARENA_DEFAULT_PROVIDER_ID }),
   assertPolicyAllows,
   gateEnv: undefined, // featureGate defaults to ENV
 })
