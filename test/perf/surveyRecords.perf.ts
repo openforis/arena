@@ -150,25 +150,26 @@ const createProviders = (loaded: Loaded) => {
       (i) => i.categoryUuid === categoryUuid && (i.parentUuid ?? null) === (parentUuid ?? null)
     )
   const categoryItemProvider = {
-    getItemByUuid: async ({ itemUuid }: any) => itemsByUuid[itemUuid],
-    getItems: async ({ categoryUuid, parentItemUuid = null }: any) => childItems(categoryUuid, parentItemUuid),
-    getItemByCode: async ({ categoryUuid, parentItemUuid = null, code }: any) =>
-      childItems(categoryUuid, parentItemUuid).find((i) => i.props.code === code),
-    getItemByCodePaths: async ({ categoryUuid, codePaths }: any) => {
+    getItemByUuid: ({ itemUuid }: any) => Promise.resolve(itemsByUuid[itemUuid]),
+    getItems: ({ categoryUuid, parentItemUuid = null }: any) =>
+      Promise.resolve(childItems(categoryUuid, parentItemUuid)),
+    getItemByCode: ({ categoryUuid, parentItemUuid = null, code }: any) =>
+      Promise.resolve(childItems(categoryUuid, parentItemUuid).find((i) => i.props.code === code)),
+    getItemByCodePaths: ({ categoryUuid, codePaths }: any) => {
       let parentUuid: string | null = null
       let item: any
       for (const code of codePaths) {
         item = childItems(categoryUuid, parentUuid).find((i) => i.props.code === code)
-        if (!item) return undefined
+        if (!item) return Promise.resolve(undefined)
         parentUuid = item.uuid
       }
       return item
     },
   }
   const taxonProvider = {
-    getTaxonByUuid: async ({ taxonUuid }: any) => taxaIndexRefData.find((t) => t.uuid === taxonUuid),
-    getTaxonByCode: async ({ taxonomyUuid, taxonCode }: any) =>
-      taxaIndexRefData.find((t) => t.taxonomyUuid === taxonomyUuid && t.props.code === taxonCode),
+    getTaxonByUuid: ({ taxonUuid }: any) => Promise.resolve(taxaIndexRefData.find((t) => t.uuid === taxonUuid)),
+    getTaxonByCode: ({ taxonomyUuid, taxonCode }: any) =>
+      Promise.resolve(taxaIndexRefData.find((t) => t.taxonomyUuid === taxonomyUuid && t.props.code === taxonCode)),
   }
   return { categoryItemProvider, taxonProvider, timezoneOffset: 0 }
 }
@@ -181,10 +182,14 @@ const createContext = async () => {
   const itemsByCategoryAndParent: { [key: string]: any[] } = {}
   for (const item of categoryItemsRefData) {
     const key = `${item.categoryUuid}|${item.parentUuid ?? ''}`
-    ;(itemsByCategoryAndParent[key] ??= []).push(item)
+    itemsByCategoryAndParent[key] ??= []
+    itemsByCategoryAndParent[key].push(item)
   }
   const taxaByTaxonomy: { [uuid: string]: any[] } = {}
-  for (const taxon of taxaIndexRefData) (taxaByTaxonomy[taxon.taxonomyUuid] ??= []).push(taxon)
+  for (const taxon of taxaIndexRefData) {
+    taxaByTaxonomy[taxon.taxonomyUuid] ??= []
+    taxaByTaxonomy[taxon.taxonomyUuid].push(taxon)
+  }
   return { ...loaded, providers, defByName, itemsByCategoryAndParent, taxaByTaxonomy }
 }
 
@@ -333,8 +338,7 @@ const fillEntity = async ({
       const childChosenItems = { ...chosenItems }
       const keyValues = generateKeyValues({ context, entityDef: childDef, index, chosenItems: childChosenItems })
       if (!keyValues) break
-      const start = now()
-      record = await fillEntity({
+      const fillParams = {
         context,
         record,
         entityDef: childDef,
@@ -343,8 +347,12 @@ const fillEntity = async ({
         counts,
         random,
         stats,
-      })
-      ;(stats[NodeDef.getName(childDef)] ??= []).push(now() - start)
+      }
+      const start = now()
+      record = await fillEntity(fillParams) // NOSONAR: entities filled one by one, using the previous record
+      const childDefName = NodeDef.getName(childDef)
+      stats[childDefName] ??= []
+      stats[childDefName].push(now() - start)
     }
   }
   return record
@@ -412,16 +420,11 @@ const measureAttributeUpdate = async ({ context, record, entityName, attributeNa
   for (let i = 0; i < updateIterations; i++) {
     const attribute = Record.getNodeChildByDefUuid(entity, attrDefUuid)(current)
     const attributeUpdated = Node.assocValue(valueGenerator(i, attrDefUuid, attribute))(attribute)
+    const nodes = { [Node.getUuid(attributeUpdated)]: attributeUpdated }
     const start = now()
     const recordWithNode = Record.assocNode(attributeUpdated)(current)
-    const { record: recordUpdated } = await Record.afterNodesUpdate({
-      user,
-      survey: context.survey,
-      record: recordWithNode,
-      nodes: { [Node.getUuid(attributeUpdated)]: attributeUpdated },
-      ...context.providers,
-      sideEffect: false,
-    })
+    const updateParams = { user, survey: context.survey, record: recordWithNode, nodes, ...context.providers }
+    const { record: recordUpdated } = await Record.afterNodesUpdate(updateParams) // NOSONAR: updates timed one by one
     times.push(now() - start)
     current = recordUpdated
   }
@@ -443,7 +446,7 @@ const recordFingerprint = ({ context, record }: any) => {
   let checksum = 0
   const hash = (text: string) => {
     let h = 0
-    for (let i = 0; i < text.length; i++) h = Math.imul(31, h) + text.charCodeAt(i)
+    for (let i = 0; i < text.length; i++) h = Math.imul(31, h) + (text.codePointAt(i) ?? 0)
     return h >>> 0
   }
   for (const node of Object.values<any>(Record.getNodes(record))) {
@@ -474,12 +477,16 @@ const runSize = async ({ context, size }: { context: Context; size: Size }) => {
     const valuesByName: { [name: string]: string[] } = {}
     for (const node of Object.values<any>(Record.getNodes(record))) {
       const def = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(context.survey)
-      if (!NodeDef.isEntity(def))
-        (valuesByName[NodeDef.getName(def)] ??= []).push(JSON.stringify(Node.getValue(node) ?? null))
+      if (!NodeDef.isEntity(def)) {
+        const name = NodeDef.getName(def)
+        valuesByName[name] ??= []
+        valuesByName[name].push(JSON.stringify(Node.getValue(node) ?? null))
+      }
     }
-    const lines = Object.keys(valuesByName)
-      .sort()
-      .map((name) => `${name}: ${valuesByName[name].sort().join(' ')}`)
+    const compare = (a: string, b: string) => a.localeCompare(b)
+    const lines = [...Object.keys(valuesByName)]
+      .sort(compare)
+      .map((name) => `${name}: ${[...valuesByName[name]].sort(compare).join(' ')}`)
     fs.writeFileSync(`${process.env.PERF_DUMP_FILE}.${size.name}`, lines.join('\n'))
   }
 
@@ -513,7 +520,7 @@ const runSize = async ({ context, size }: { context: Context; size: Size }) => {
     ['updatePlotLuseSubclass', 'plot_center', 'luse_subclass', alternateCodeGenerator(context)],
   ] as const
   for (const [label, entityName, attributeName, valueGenerator] of updates) {
-    const res = await measureAttributeUpdate({ context, record, entityName, attributeName, valueGenerator })
+    const res = await measureAttributeUpdate({ context, record, entityName, attributeName, valueGenerator }) // NOSONAR: sequential
     record = res.record
     results[`${label}MedianMs`] = res.median
   }
@@ -529,14 +536,10 @@ const runSize = async ({ context, size }: { context: Context; size: Size }) => {
   const addTimes: number[] = []
   for (let i = 0; i < updateIterations; i++) {
     const values = generateEntityValues({ context, entityDef: stemsDef, chosenItems: {}, random })
+    const valuesByDefUuid = { ...plotKeys, [stemIdDefUuid]: existingStems + i + 1, ...values }
+    const addParams = { context, record, entityDefUuid: NodeDef.getUuid(stemsDef), valuesByDefUuid, sideEffect: false }
     const start = now()
-    record = await updateWithValues({
-      context,
-      record,
-      entityDefUuid: NodeDef.getUuid(stemsDef),
-      valuesByDefUuid: { ...plotKeys, [stemIdDefUuid]: existingStems + i + 1, ...values },
-      sideEffect: false,
-    })
+    record = await updateWithValues(addParams) // NOSONAR: stems added and timed one by one
     addTimes.push(now() - start)
   }
   results.addStemMedianMs = median(addTimes)
