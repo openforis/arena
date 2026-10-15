@@ -313,17 +313,15 @@ export const buildSchemaSummaryItems = ({
  * @param {Record<string, string>|null} [params.aiDescriptions] - AI descriptions by uuid (null: no aiDescription column).
  * @param {(progress: {total: number, processed: number}) => void} [params.onProgress] - Called with { total, processed }.
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
+ * @param {{fetchSurvey: (surveyId: number|string) => Promise<object>}} [deps] - The dependencies (tests).
  * @returns {Promise<object[]>} The rows.
  * @throws {SystemError} aiDescriptionsInvalid (400) when a description is for a node def that is not in the export.
  */
-export const generateSchemaSummaryItems = async ({
-  surveyId,
-  cycle,
-  aiDescriptions = null,
-  onProgress = null,
-  stopIfFunction = null,
-}) => {
-  const survey = await fetchSurvey(surveyId)
+export const generateSchemaSummaryItems = async (
+  { surveyId, cycle, aiDescriptions = null, onProgress = null, stopIfFunction = null },
+  deps = { fetchSurvey }
+) => {
+  const survey = await deps.fetchSurvey(surveyId)
   if (aiDescriptions) {
     const knownUuids = extractSchemaSummaryNodeDefs(survey, cycle).map(NodeDef.getUuid)
     parseAiDescriptions({ raw: aiDescriptions, knownUuids })
