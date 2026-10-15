@@ -2,8 +2,9 @@ import { z } from 'zod'
 
 import * as NodeDef from '@core/survey/nodeDef'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool } from '../types'
-import { canViewSurveyTool, describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
+import { describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
 
 export const SEARCH_MAX_RESULTS = 20
 
@@ -27,7 +28,7 @@ export const nodeDefSearchTool: AiTool<{ text: string }> = {
   area: ['design', 'analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ text }, ctx) => {
     const survey = requireSurvey(ctx)
     const lowerText = text.toLowerCase()

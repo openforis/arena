@@ -5,15 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import { collectNodeDefIssues, type NodeDefIssue } from '@webapp/ai/changeSets/validationIssues'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
-import {
-  canViewSurveyTool,
-  getDesignNodeDefsDepthFirst,
-  getNodeDefPathNames,
-  requireNodeDefByName,
-  requireSurvey,
-} from './surveyLookup'
+import { getDesignNodeDefsDepthFirst, getNodeDefPathNames, requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 type Translate = (key: string, params?: Record<string, unknown>) => string
 
@@ -92,7 +87,7 @@ export const surveyGetValidationTool: AiTool<{ name?: string }> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)
     if (!name) return buildSurveyValidation({ survey, t: ctx.t })

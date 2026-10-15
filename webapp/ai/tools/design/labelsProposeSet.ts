@@ -5,9 +5,10 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { getLabelValue } from '@webapp/ai/changeSets/operations'
 import type { ChangeOperationDraft, LabelKind } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool, AiToolContext } from '../types'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 type LabelItem = { nodeDefName: string; kind: LabelKind; lang: string; text: string }
 
@@ -56,6 +57,6 @@ export const labelsProposeSetTool: AiTool<LabelsInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, items }, ctx) => proposeChangeSet({ ctx, drafts: toLabelDrafts(items, ctx), summary }),
 }

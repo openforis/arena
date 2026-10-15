@@ -6,9 +6,10 @@ import { QueryNodeDefs } from '@common/model/query'
 
 import { TOOL_RESULT_BUDGET_CHARS, fitListToBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
+import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
-import { canViewCurrentSurvey, getAnalysisContext } from './toolResults'
+import { getAnalysisContext } from './toolResults'
 
 const inputSchema = z.object({
   entity: z

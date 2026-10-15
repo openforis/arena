@@ -8,11 +8,12 @@ import {
   VALUE_PART_MAX_CHARS,
 } from '@webapp/ai/tools/common/toolSchemas'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
+import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import { fitListToBudget } from '@webapp/ai/tools/common/toolResult'
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 
 import type { CleaningApi } from './cleaningApi'
-import { canCleanseCurrentSurvey, getCleaningContext, resolveAttributeDefs } from './cleaningContext'
+import { getCleaningContext, resolveAttributeDefs } from './cleaningContext'
 import { findRecordUuidByKeys } from './recordLookup'
 import { getRecordValues } from './recordValues'
 import type { CleaningI18n } from './validationRows'

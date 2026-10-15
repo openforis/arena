@@ -6,9 +6,10 @@ import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import { getExpressionProp } from '@webapp/ai/changeSets/expressionProps'
 import { nodeDefExpressionProps, type NodeDefExpressionProp } from '@webapp/ai/changeSets/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import type { AiTool } from '../types'
 import { proposeChangeSet, summarySchema, textItemSchema, toTextMap } from './proposeChangeSet'
-import { canEditSurveyTool, requireNodeDefByName, requireSurvey } from './surveyLookup'
+import { requireNodeDefByName, requireSurvey } from './surveyLookup'
 
 type ExpressionItem = {
   expression: string
@@ -64,7 +65,7 @@ export const expressionsProposeSetTool: AiTool<ExpressionsInput> = {
   area: ['design'],
   dataClass: 'schema',
   effect: 'propose',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ summary, nodeDefName, prop, expressions }, ctx) => {
     const nodeDef = requireNodeDefByName(requireSurvey(ctx), nodeDefName)
     const draft = {

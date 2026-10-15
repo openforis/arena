@@ -2,9 +2,10 @@ import { z } from 'zod'
 
 import * as Survey from '@core/survey/survey'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
-import { canViewSurveyTool, describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
+import { describeNodeDefBrief, getDesignNodeDefsDepthFirst, requireSurvey } from './surveyLookup'
 
 export const OVERVIEW_MAX_NODE_DEFS = 300
 // the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
@@ -59,6 +60,6 @@ export const surveyGetOverviewTool: AiTool<Record<string, never>> = {
   area: ['design', 'analysis', 'cleaning'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => buildSurveyOverview({ survey: requireSurvey(ctx), cycle: ctx.cycle, lang: ctx.lang }),
 }

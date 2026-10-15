@@ -15,11 +15,12 @@ import {
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 
+import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { createCategoryItemRefs, type CategoryItemRefs } from './categoryItemRefs'
-import { canEditSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
 export const LIST_MISSING_LABELS_SERVER_PAGE = 100
 export const LIST_MISSING_LABELS_MAX_REQUESTS = 5
@@ -212,7 +213,7 @@ export const createCategoryItemsListMissingLabelsTool = ({
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canEditSurveyTool,
+  requires: canEditCurrentSurvey,
   execute: async ({ categoryName, lang, cursor, limit = LIST_MISSING_LABELS_DEFAULT_LIMIT }, ctx) => {
     const survey = requireSurvey(ctx)
     const category = requireCategory(survey, categoryName)

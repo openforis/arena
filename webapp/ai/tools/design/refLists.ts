@@ -9,9 +9,10 @@ import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as Taxonomy from '@core/survey/taxonomy'
 
+import { canViewCurrentSurvey } from '../common/toolPermissions'
 import { takeWithinBudget } from '../common/toolResult'
 import type { AiTool } from '../types'
-import { canViewSurveyTool, requireSurvey } from './surveyLookup'
+import { requireSurvey } from './surveyLookup'
 
 // the wrapper cuts longer results into a non-JSON string: stay under the limit with some margin
 
@@ -82,7 +83,7 @@ export const categoriesListTool: AiTool<Record<string, never>, CategoriesList> =
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => listCategories(requireSurvey(ctx)),
 }
 
@@ -95,6 +96,6 @@ export const taxonomiesListTool: AiTool<Record<string, never>, TaxonomiesList> =
   area: ['design'],
   dataClass: 'schema',
   effect: 'read',
-  requires: canViewSurveyTool,
+  requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => listTaxonomies(requireSurvey(ctx)),
 }
