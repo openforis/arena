@@ -57,6 +57,7 @@ export default {
     lockTimeout: 'レコードは使用中です。数秒後にもう一度お試しください。',
     nodeNotInRecord: 'このノードはレコード {{recordUuid}} に属していません。',
     nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
+    nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',

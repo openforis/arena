@@ -86,6 +86,7 @@ export default {
     lockTimeout: 'El registro está ocupado; inténtelo de nuevo en unos segundos.',
     nodeNotInRecord: 'El nodo no pertenece al registro {{recordUuid}}.',
     nodesBatchInvalid: 'Solicitud de edición por lotes no válida ({{reason}}).',
+    nodesBatchBusy: 'Otra edición por lotes sigue en curso; inténtelo de nuevo en unos segundos.',
   },
   recordPrintableExport: {
     missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',

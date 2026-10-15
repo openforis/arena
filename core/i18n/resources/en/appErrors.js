@@ -55,6 +55,7 @@ export default {
     lockTimeout: 'The record is busy; try again in a few seconds.',
     nodeNotInRecord: 'The node does not belong to record {{recordUuid}}.',
     nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
+    nodesBatchBusy: 'Another batch edit is still running; try again in a few seconds.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',

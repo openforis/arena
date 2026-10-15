@@ -80,6 +80,7 @@ export default {
     lockTimeout: 'Бүртгэл завгүй байна; хэдэн секундын дараа дахин оролдоно уу.',
     nodeNotInRecord: 'Зангилаа {{recordUuid}} бүртгэлд хамаарахгүй.',
     nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
+    nodesBatchBusy: 'Өөр багц засвар хийгдэж байна; хэдэн секундын дараа дахин оролдоно уу.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
