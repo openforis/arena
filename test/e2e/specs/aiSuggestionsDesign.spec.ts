@@ -4,6 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
 import type { ArenaApi } from '../fixtures/arenaApi'
+import { buildSeenIntrosSuggestionState, readSuggestionState, seedSuggestionState } from '../helpers/aiStorage'
 import {
   assistantPanel,
   closeAssistantPanel,
@@ -31,13 +32,7 @@ const TRANSLATIONS_CARD = '19 texts are missing in French. Translate them?'
  * @returns {Promise<void>} Resolves when the init script is registered.
  */
 const skipModuleIntros = async (page: Page, api: ArenaApi): Promise<void> => {
-  const key = `arena.ai.suggestions.${await api.getCurrentUserUuid()}`
-  await page.addInitScript((storageKey) => {
-    if (window.localStorage.getItem(storageKey) === null) {
-      const state = { pending: {}, dismissed: {}, inProgress: {}, seenModules: ['designer', 'data', 'analysis'] }
-      window.localStorage.setItem(storageKey, JSON.stringify(state))
-    }
-  }, key)
+  await seedSuggestionState(page, await api.getCurrentUserUuid(), buildSeenIntrosSuggestionState())
 }
 
 /**
@@ -81,24 +76,17 @@ const navigateInApp = async (page: Page, uri: string): Promise<void> => {
  * @param {string} id - Suggestion id.
  * @returns {Promise<boolean>} True when the state exists and holds nothing of the suggestion.
  */
-const isSuggestionGone = async (page: Page, userUuid: string, id: string): Promise<boolean> =>
-  page.evaluate(
-    ([key, suggestionId]) => {
-      const state = JSON.parse(window.localStorage.getItem(key) ?? 'null')
-      // no stored state yet: not gone, keep waiting
-      if (!state) return false
-      const pending: { id: string }[][] = Object.values(state.pending ?? {})
-      // a dismissed entry is { kind, targets: { <target key>: <count or true> } }
-      const dismissed: Record<string, { targets?: Record<string, unknown> }>[] = Object.values(state.dismissed ?? {})
-      const inProgress: Record<string, unknown>[] = Object.values(state.inProgress ?? {})
-      return (
-        !pending.some((bucket) => bucket.some((suggestion) => suggestion.id === suggestionId)) &&
-        !dismissed.some((bucket) => Object.keys(bucket[suggestionId]?.targets ?? {}).length > 0) &&
-        !inProgress.some((bucket) => suggestionId in bucket)
-      )
-    },
-    [`arena.ai.suggestions.${userUuid}`, id]
+const isSuggestionGone = async (page: Page, userUuid: string, id: string): Promise<boolean> => {
+  const state = await readSuggestionState(page, userUuid)
+  // no stored state yet: not gone, keep waiting
+  if (!state) return false
+  const hasPending = Object.values(state.pending).some((bucket) => bucket.some((suggestion) => suggestion.id === id))
+  const hasDismissed = Object.values(state.dismissed).some(
+    (bucket) => Object.keys(bucket[id]?.targets ?? {}).length > 0
   )
+  const hasInProgress = Object.values(state.inProgress).some((bucket) => id in bucket)
+  return !hasPending && !hasDismissed && !hasInProgress
+}
 
 const suggestionCards = (page: Page, text: string | RegExp) =>
   assistantPanel(page).getByTestId(TestId.aiAssistant.suggestionCard).filter({ hasText: text })

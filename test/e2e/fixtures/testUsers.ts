@@ -3,6 +3,8 @@ import { DB } from '@openforis/arena-server'
 import * as User from '@core/user/user'
 import * as WhatsNew from '@core/whatsNew/whatsNew'
 
+import type { ServerOnlyPrefsKey } from '@server/modules/user/serverOnlyPrefs'
+
 import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 
 export type TestUser = {
@@ -66,6 +68,23 @@ export const insertTestUserIfMissing = async (user: TestUser): Promise<void> =>
       { [User.keysProps.title]: User.titleKeys.preferNotToSay },
     ])
   })
+
+// the prefs key of the AI settings and providers (typed against the server's list of server-only keys)
+const aiPrefsKey: ServerOnlyPrefsKey = 'ai'
+
+/**
+ * Removes the AI settings and providers (`prefs.ai`) of the user, so a test does not inherit the AI access level,
+ * toggles, providers or default provider that the previous test left on the shared worker user. The usage counters
+ * (`prefs.aiUsage`) are kept.
+ * @param {TestUser} user - The user.
+ * @returns {Promise<void>} - Resolves when the prefs are reset.
+ */
+export const resetTestUserAiPrefs = async (user: TestUser): Promise<void> => {
+  await DB.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - $2::text WHERE email = $1`, [
+    user.email,
+    aiPrefsKey,
+  ])
+}
 
 /**
  * Returns the survey editor (not survey administrator) used by the worker with the specified parallel index.

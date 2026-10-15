@@ -4,6 +4,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import type { ArenaApi } from '../fixtures/arenaApi'
 
+import { writeLocalProviders } from './aiStorage'
 import {
   assistantPanel,
   openAssistantPanel,
@@ -45,8 +46,8 @@ export const E2E_LOCAL_PROVIDER_ID = 'local:e2e'
 
 /**
  * Makes C's stub server the only local provider of this browser and the default provider, or removes it and makes
- * Arena default the default again. The page must be on an app URL; reload it afterwards (the capabilities are read
- * when the app loads).
+ * Arena default the default again. The page must be on an app URL; reload it afterwards with `reloadApp` (the
+ * capabilities are read when the app loads).
  * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
  * @param {object} params - Parameters.
@@ -68,11 +69,25 @@ export const setLocalProvider = async (
 ): Promise<void> => {
   const userUuid = await api.getCurrentUserUuid()
   const providers = enabled ? [{ id: E2E_LOCAL_PROVIDER_ID, name, baseUrl, modelId }] : []
-  await page.evaluate(
-    ([key, value]) => localStorage.setItem(key, value),
-    [`arena.ai.localProviders.${userUuid}`, JSON.stringify(providers)]
-  )
+  await writeLocalProviders(page, userUuid, providers)
   await api.setAiDefaultProvider(enabled ? E2E_LOCAL_PROVIDER_ID : 'arena-default')
+}
+
+/**
+ * Reloads the app and waits until it has booted (the AI settings are loaded). Refresh tokens rotate, so a navigation
+ * that aborts the boot's refresh logs the user out: use this after `setLocalProvider` and for any other reload in the
+ * AI specs, never a bare `page.reload()` or a second `goto`.
+ * @param {Page} page - The page.
+ * @returns {Promise<void>} Resolves when the app has booted.
+ */
+export const reloadApp = async (page: Page): Promise<void> => {
+  await Promise.all([
+    page.waitForResponse(
+      (response) =>
+        response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()
+    ),
+    page.reload(),
+  ])
 }
 
 /**
