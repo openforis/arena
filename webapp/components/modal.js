@@ -39,7 +39,6 @@ export const Modal = (props) => {
   const {
     children,
     className = '',
-    closeOnBackdropClick = true,
     closeOnEsc = true,
     onClose: onCloseProp,
     onDismiss,
@@ -57,13 +56,13 @@ export const Modal = (props) => {
     [onCloseProp]
   )
 
-  // a click on the backdrop or the Escape key: onDismiss(reason) when given, else onClose (unless the backdrop is off)
+  // a click on the backdrop or the Escape key: onDismiss(reason) when given, else onClose
   const onBackdropOrEscape = useCallback(
     (event, reason) => {
       if (onDismiss) onDismiss(reason)
-      else if (reason !== 'backdropClick' || closeOnBackdropClick) onClose(event)
+      else onClose(event)
     },
-    [closeOnBackdropClick, onClose, onDismiss]
+    [onClose, onDismiss]
   )
 
   return (
@@ -92,7 +91,6 @@ export const Modal = (props) => {
 Modal.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
-  closeOnBackdropClick: PropTypes.bool,
   closeOnEsc: PropTypes.bool,
   onClose: PropTypes.func,
   // called with 'backdropClick' or 'escapeKeyDown' instead of onClose (to ask before closing)

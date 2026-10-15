@@ -32,6 +32,12 @@
     display: flex;
     align-items: center;
 
+    // with htmlFor the wrapper is a <label>: it must not take the global label rules (formBase)
+    letter-spacing: inherit;
+    line-height: inherit;
+    font-size: inherit;
+    color: inherit;
+
     .btn-info {
       padding: 0 0 0 0.4rem;
     }
