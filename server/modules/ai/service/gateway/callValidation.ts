@@ -13,6 +13,7 @@ import {
   isGatewayFeature,
   type AiDataClass,
 } from '@common/ai/features'
+import { isSchemaTool } from '@common/ai/schemaTools'
 import type { AiGatewayCall, AiGatewayRequest } from '@common/ai/wire'
 
 const PAYLOAD_TOO_LARGE = 413
@@ -274,9 +275,18 @@ export const sanitizeCall = (
   return sanitized
 }
 
+// true when a tool result of the prompt may hold record data: it comes from a tool that is not known as schema-class
+const hasDataToolResult = (call: AiGatewayCall): boolean =>
+  call.prompt.some(
+    (message) =>
+      message.role === 'tool' &&
+      message.content.some((part) => part.type === 'tool-result' && !isSchemaTool(part.toolName))
+  )
+
 /**
- * Returns the data class the survey AI policy must be checked against. A request that carries tool results may
- * contain whatever the tools returned, which the declared class cannot vouch for: it counts as the feature maximum.
+ * Returns the data class the survey AI policy must be checked against. The results of tools that are not known to be
+ * schema-class may contain whatever they read, which the declared class cannot vouch for: such a request counts as
+ * the feature maximum. Results of schema tools (survey structure) keep the declared class.
  * @param {object} params - Parameters.
  * @param {string} params.feature - Gateway feature key.
  * @param {AiDataClass} params.dataClass - The class declared by the request.
@@ -293,6 +303,5 @@ export const getEnforcedDataClass = ({
   call: AiGatewayCall
 }): AiDataClass => {
   const featureDef = getAiFeature(feature)
-  const hasToolResults = call.prompt.some((message) => message.role === 'tool')
-  return hasToolResults && featureDef ? getMaxAiDataClass(dataClass, featureDef.dataClass) : dataClass
+  return featureDef && hasDataToolResult(call) ? getMaxAiDataClass(dataClass, featureDef.dataClass) : dataClass
 }
