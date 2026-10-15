@@ -6,6 +6,38 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    surveyCompare: {
+      title: 'Compare and update surveys',
+      description: `In the **Dashboard**, use **Advanced functions > Compare / update from file** to compare this survey with one exported from another Arena server (e.g. a test server) or with another survey on this server.
+
+Review the differences and apply only the changes you select: they are saved as draft until you publish the survey.`,
+    },
+    usersBackup: {
+      title: 'Backup and restore users',
+      description: `In **Users**, use **Backup / Restore** to export all users, with their survey roles and user groups, and restore them into another Arena server.
+
+Before restoring, you can choose what to do with every user.`,
+    },
+    samplingPointDataWhisp: {
+      title: 'Whisp analysis of sampling points',
+      description: `In the **sampling point data** category, use **Generate Whisp analysis** to analyze all the sampling point locations with **Open Foris Whisp**.
+
+The analysis runs in the background and the results are saved in a new category.`,
+    },
+    dashboardUpgrade: {
+      title: 'A new dashboard',
+      description: `The **Dashboard** has a new look: records, contributors and storage at a glance, a map of the collected data and the trend of the records added over time.`,
+    },
+    clearNonApplicableValues: {
+      title: 'Non-relevant values are cleared',
+      description: `During data entry, when a change makes other fields no longer relevant, their values are cleared, after asking you to confirm.
+
+Survey admins can keep the old behavior with **Keep values of non-relevant attributes** (**Survey Info > Security**).`,
+    },
+    systemLogs: {
+      title: 'System logs',
+      description: `In **System Administration > System Logs**, follow the server logs live, with text and level filters.`,
+    },
     dataQueryAiGenerate: {
       title: 'Create Data Explorer queries with AI',
       description: `In **Data Explorer**, describe the data you are looking for in plain language (e.g. *"number of trees by species in each province"*) and let AI build the query for you.

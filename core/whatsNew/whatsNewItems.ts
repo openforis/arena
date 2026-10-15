@@ -25,6 +25,12 @@ export type WhatsNewItem = {
 
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
+  { id: 'surveyCompare', version: '2.10.0', audience: whatsNewAudiences.surveyAdmin },
+  { id: 'usersBackup', version: '2.10.0', audience: whatsNewAudiences.systemAdmin },
+  { id: 'samplingPointDataWhisp', version: '2.10.0', audience: whatsNewAudiences.surveyAdmin },
+  { id: 'dashboardUpgrade', version: '2.9.7', audience: whatsNewAudiences.all },
+  { id: 'clearNonApplicableValues', version: '2.9.7', audience: whatsNewAudiences.all },
+  { id: 'systemLogs', version: '2.9.5', audience: whatsNewAudiences.systemAdmin },
   {
     id: 'dataQueryAiGenerate',
     version: '2.9.4',

@@ -6,6 +6,38 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    surveyCompare: {
+      title: 'Comparer et mettre à jour les formulaires',
+      description: `Dans le **Tableau de bord**, utilisez **Fonctions avancées > Comparer / mettre à jour depuis un fichier** pour comparer ce formulaire avec un formulaire exporté depuis un autre serveur Arena (par ex. un serveur de test) ou avec un autre formulaire de ce serveur.
+
+Examinez les différences et appliquez uniquement les modifications sélectionnées : elles restent en brouillon jusqu'à la publication du formulaire.`,
+    },
+    usersBackup: {
+      title: 'Sauvegarder et restaurer les utilisateurs',
+      description: `Dans **Utilisateurs**, utilisez **Sauvegarde / Restauration** pour exporter tous les utilisateurs, avec leurs rôles dans les formulaires et leurs groupes d'utilisateurs, et les restaurer dans un autre serveur Arena.
+
+Avant la restauration, vous pouvez choisir quoi faire pour chaque utilisateur.`,
+    },
+    samplingPointDataWhisp: {
+      title: "Analyse Whisp des points d'échantillonnage",
+      description: `Dans la catégorie **données de points d'échantillonnage**, utilisez **Générer l'analyse Whisp** pour analyser toutes les positions des points d'échantillonnage avec **Open Foris Whisp**.
+
+L'analyse s'exécute en arrière-plan et les résultats sont enregistrés dans une nouvelle catégorie.`,
+    },
+    dashboardUpgrade: {
+      title: 'Un nouveau tableau de bord',
+      description: `Le **Tableau de bord** fait peau neuve : enregistrements, contributeurs et stockage en un coup d'œil, une carte des données collectées et l'évolution des enregistrements ajoutés dans le temps.`,
+    },
+    clearNonApplicableValues: {
+      title: 'Les valeurs non pertinentes sont effacées',
+      description: `Lors de la saisie, quand une modification rend d'autres champs non pertinents, leurs valeurs sont effacées, après votre confirmation.
+
+Les administrateurs du formulaire peuvent conserver l'ancien comportement avec **Conserver les valeurs des attributs non pertinents** (**Infos du formulaire > Sécurité**).`,
+    },
+    systemLogs: {
+      title: 'Journaux système',
+      description: `Dans **Administration du système > Journaux système**, suivez en direct les journaux du serveur, avec des filtres par texte et par niveau.`,
+    },
     dataQueryAiGenerate: {
       title: `Créez des requêtes de l'Explorateur de données avec l'IA`,
       description: `Dans l'**Explorateur de données**, décrivez en langage courant les données recherchées (par ex. *« nombre d'arbres par espèce dans chaque province »*) et laissez l'IA construire la requête pour vous.
