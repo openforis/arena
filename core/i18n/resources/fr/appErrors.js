@@ -87,6 +87,7 @@ export default {
     nodeNotInRecord: "Le nœud n'appartient pas à l'enregistrement {{recordUuid}}.",
     nodesBatchInvalid: 'Requête de modification groupée invalide ({{reason}}).',
     nodesBatchBusy: 'Une autre modification groupée est en cours ; réessayez dans quelques secondes.',
+    nodesBatchInvalidValue: "La nouvelle valeur de « {{attributeName}} » n'est pas valide pour cet attribut.",
   },
   recordPrintableExport: {
     missingEntityParams: "L'export de la page actuelle nécessite entityDefUuid et entityNodeUuid",

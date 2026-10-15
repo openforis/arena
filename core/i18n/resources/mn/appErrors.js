@@ -81,6 +81,7 @@ export default {
     nodeNotInRecord: 'Зангилаа {{recordUuid}} бүртгэлд хамаарахгүй.',
     nodesBatchInvalid: 'Багц засварын хүсэлт буруу байна ({{reason}}).',
     nodesBatchBusy: 'Өөр багц засвар хийгдэж байна; хэдэн секундын дараа дахин оролдоно уу.',
+    nodesBatchInvalidValue: '"{{attributeName}}" шинэ утга энэ атрибутад буруу байна.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',

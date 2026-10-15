@@ -56,6 +56,7 @@ export default {
     nodeNotInRecord: 'The node does not belong to record {{recordUuid}}.',
     nodesBatchInvalid: 'Invalid batch edit request ({{reason}}).',
     nodesBatchBusy: 'Another batch edit is still running; try again in a few seconds.',
+    nodesBatchInvalidValue: 'The new value of "{{attributeName}}" is not valid for this attribute.',
   },
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',

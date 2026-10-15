@@ -58,6 +58,7 @@ export default {
     nodeNotInRecord: 'このノードはレコード {{recordUuid}} に属していません。',
     nodesBatchInvalid: '一括編集リクエストが無効です ({{reason}})。',
     nodesBatchBusy: '別の一括編集が実行中です。数秒後にもう一度お試しください。',
+    nodesBatchInvalidValue: '「{{attributeName}}」の新しい値はこの属性には無効です。',
   },
   recordPrintableExport: {
     missingEntityParams: '現在のページのエクスポートにはentityDefUuidとentityNodeUuidが必要です',

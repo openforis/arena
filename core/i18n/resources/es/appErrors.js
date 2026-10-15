@@ -87,6 +87,7 @@ export default {
     nodeNotInRecord: 'El nodo no pertenece al registro {{recordUuid}}.',
     nodesBatchInvalid: 'Solicitud de edición por lotes no válida ({{reason}}).',
     nodesBatchBusy: 'Otra edición por lotes sigue en curso; inténtelo de nuevo en unos segundos.',
+    nodesBatchInvalidValue: 'El nuevo valor de "{{attributeName}}" no es válido para este atributo.',
   },
   recordPrintableExport: {
     missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',

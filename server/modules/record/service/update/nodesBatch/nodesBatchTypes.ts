@@ -15,6 +15,7 @@ export const NodesBatchMessageKeys = {
   lockTimeout: 'appErrors:record.lockTimeout',
   nodeNotInRecord: 'appErrors:record.nodeNotInRecord',
   invalidRequest: 'appErrors:record.nodesBatchInvalid',
+  invalidValue: 'appErrors:record.nodesBatchInvalidValue',
   applyTimeout: 'appErrors:aiApplyTimeout',
   busy: 'appErrors:record.nodesBatchBusy',
   generic: 'appErrors:generic',
