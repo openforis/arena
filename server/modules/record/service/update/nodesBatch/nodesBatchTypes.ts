@@ -18,7 +18,8 @@ export const NodesBatchMessageKeys = {
   invalidValue: 'appErrors:record.nodesBatchInvalidValue',
   applyTimeout: 'appErrors:aiApplyTimeout',
   busy: 'appErrors:record.nodesBatchBusy',
-  generic: 'appErrors:generic',
+  // the text of an unexpected error is logged on the server, never sent to the client
+  unexpected: 'appErrors:record.nodesBatchUnexpected',
 } as const
 
 export type NodesBatchEdit = { recordUuid: string; nodeUuid: string; from: unknown; to: unknown }

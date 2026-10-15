@@ -184,21 +184,48 @@ const sendRecordEdits = async (
   const requestId = uuidv4()
   // registered before posting, so the reply can't be missed
   const reply = deps.replies.waitFor(requestId, Math.max(0, deadline - Date.now()))
-  deps.postBatchMessage({
-    type: RecordsUpdateThreadMessageTypes.nodesBatchPersist,
-    requestId,
-    user,
-    surveyId,
-    cycle,
-    draft: false,
-    recordUuid,
-    edits,
-    timezoneOffset,
-    lang,
-    deadline,
-  })
+  try {
+    deps.postBatchMessage({
+      type: RecordsUpdateThreadMessageTypes.nodesBatchPersist,
+      requestId,
+      user,
+      surveyId,
+      cycle,
+      draft: false,
+      recordUuid,
+      edits,
+      timezoneOffset,
+      lang,
+      deadline,
+    })
+  } catch (error) {
+    // nothing was sent: drop the waiting reply (its timer would keep the entry until the deadline)
+    deps.replies.resolveReply({ requestId, results: failedResults(edits, NodesBatchMessageKeys.unexpected) })
+    throw error
+  }
   const results = await reply
   return results ?? failedResults(edits, NodesBatchMessageKeys.applyTimeout)
+}
+
+/**
+ * Sends the edits of a record; a failure to send fails only the edits of this record. The returned promise never
+ * rejects, so it can wait for the others without an unhandled rejection.
+ * @param {RequestContext} context - The request context.
+ * @param {string} recordUuid - The record uuid.
+ * @param {NodesBatchRecordEdit[]} edits - The edits to apply.
+ * @returns {Promise<NodesBatchEditResult[]>} The results.
+ */
+const sendRecordEditsSafely = async (
+  context: RequestContext,
+  recordUuid: string,
+  edits: NodesBatchRecordEdit[]
+): Promise<NodesBatchEditResult[]> => {
+  try {
+    return await sendRecordEdits(context, recordUuid, edits)
+  } catch (error) {
+    context.deps.logError(`error sending the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
+    return failedResults(edits, NodesBatchMessageKeys.unexpected)
+  }
 }
 
 type NodesBatchParams = {
@@ -241,12 +268,12 @@ const runNodesBatch = async (
       const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
       results.push(...refused)
       if (accepted.length > 0) {
-        pendingReplies.push(sendRecordEdits(context, recordUuid, accepted))
+        pendingReplies.push(sendRecordEditsSafely(context, recordUuid, accepted))
       }
     } catch (error) {
       // one record's failure must not hide the results of the others
       deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
-      results.push(...failedResults(recordEdits, NodesBatchMessageKeys.generic))
+      results.push(...failedResults(recordEdits, NodesBatchMessageKeys.unexpected))
     }
   }
   for (const replyResults of await Promise.all(pendingReplies)) {

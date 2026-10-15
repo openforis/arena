@@ -174,12 +174,44 @@ describe('updateNodesBatch', () => {
       deps
     )
     expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.generic },
+      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
       { index: 1, status: 'applied' },
-      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.generic },
+      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
     ])
     expect(errors).toHaveLength(1)
     expect(errors[0]).toContain('db down')
+  })
+
+  test('a failure to send the edits of one record fails only that record: the batch is not a 500', async () => {
+    const otherRecord = RB.record(
+      admin,
+      survey,
+      RB.entity('root', RB.attribute('root_key', '2'), RB.attribute('a', 1), RB.attribute('b', 2))
+    ).build()
+    const otherUuid = Record.getUuid(otherRecord)
+    const otherNode = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, otherRecord))
+    const { deps, errors } = buildDeps({
+      fetchRecord: async ({ recordUuid: uuid }) => (uuid === recordUuid ? record : otherRecord),
+    })
+    const postBatchMessage = deps.postBatchMessage
+    deps.postBatchMessage = (msg) => {
+      if (msg.recordUuid === recordUuid) throw new Error('the thread is gone')
+      postBatchMessage(msg)
+    }
+    const results = await run(
+      admin,
+      [edit(aUuid, 5), { recordUuid: otherUuid, nodeUuid: otherNode, from: 1, to: 5 }, edit(bUuid, 6)],
+      deps
+    )
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
+      { index: 1, status: 'applied' },
+      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
+    ])
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain('the thread is gone')
+    // the reply that was waiting for the failed record does not stay in the registry
+    expect(deps.replies.size()).toBe(0)
   })
 
   test('every record message carries the deadline of the request start, and the reply wait is shortened', async () => {

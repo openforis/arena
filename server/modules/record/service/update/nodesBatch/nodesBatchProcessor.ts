@@ -24,7 +24,6 @@ import {
 
 // thrown by acquireRecordLockAndRun (records update thread) when the record stays locked for too long
 const lockTimeoutErrorKey = 'record.lockTimeout'
-const maxErrorTextLength = 200
 
 type ThreadMessage = { type: string; content: unknown }
 
@@ -72,10 +71,8 @@ const toMessageParams = (params: unknown): Record<string, unknown> | undefined =
  */
 const toFailureMessage = (error: any): { messageKey: string; params?: Record<string, unknown> } => {
   const key = error?.key
-  if (typeof key !== 'string') {
-    const text = String(error?.message ?? error).slice(0, maxErrorTextLength)
-    return { messageKey: NodesBatchMessageKeys.generic, params: { text } }
-  }
+  // the message of a non-application error may hold database details: it is logged, not sent
+  if (typeof key !== 'string') return { messageKey: NodesBatchMessageKeys.unexpected }
   if (key === lockTimeoutErrorKey) {
     return { messageKey: NodesBatchMessageKeys.lockTimeout, params: toMessageParams(error.params) }
   }
@@ -200,6 +197,16 @@ const refineMissingNodeResult = async ({
 const isPastDeadline = (state: BatchState): boolean => state.deps.now() > state.msg.deadline
 
 /**
+ * Aborts the transaction when the caller stopped waiting: it reported the edits as timed out, so none may commit.
+ * @param {BatchState} state - The batch state.
+ * @returns {void}
+ * @throws {SystemError} applyTimeout when the deadline has passed.
+ */
+const assertBeforeDeadline = (state: BatchState): void => {
+  if (isPastDeadline(state)) throw new SystemError(NodesBatchMessageKeys.applyTimeout)
+}
+
+/**
  * Checks and persists the edits of the record, inside the record lock.
  * @param {BatchState} state - The batch state.
  * @param {object} t - The transaction.
@@ -214,6 +221,7 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
   if (!record) return edits.map(({ index }) => conflictResult(index))
 
   for (const edit of edits) {
+    assertBeforeDeadline(state)
     const check = checkBatchEdit({ survey, record, recordUuid, edit })
     if (check.ok === false) {
       refusedResults.push(await refineMissingNodeResult({ state, record, edit, result: check.result, t }))
@@ -222,6 +230,8 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
       appliedEdits.push(edit)
     }
   }
+  // the transaction commits when this function returns
+  assertBeforeDeadline(state)
   if (appliedEdits.length > 0) {
     await deps.cacheRecord({ msg, recordUuid, record, t })
   }

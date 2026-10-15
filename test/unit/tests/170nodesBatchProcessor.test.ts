@@ -69,19 +69,21 @@ describe('processNodesBatch', () => {
     recordInDb = record,
     nodeRecordUuids = {},
     now = 1000,
+    persistNow,
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
     lockError?: Error | null
     recordInDb?: any
     nodeRecordUuids?: Record<string, string>
-    now?: number
+    now?: number | (() => number)
+    persistNow?: () => void
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
     const calls = { cacheRecord: 0, clearCachedRecord: 0, persistNode: 0, insideLock: false, postedInsideLock: 0 }
     const deps: NodesBatchProcessorDeps = {
-      now: () => now,
+      now: typeof now === 'function' ? now : () => now,
       getSurvey: async () => survey,
       runWithRecordLock: async (_recordUuid, fn) => {
         if (lockError) throw lockError
@@ -106,6 +108,7 @@ describe('processNodesBatch', () => {
       ) => {
         expect(t).toBe('tx')
         calls.persistNode += 1
+        persistNow?.()
         if (Node.getUuid(node) === failOnNodeUuid) throw new Error('boom')
         nodesUpdateListener({ [Node.getUuid(node)]: node })
         nodesValidationListener(validationFor(node))
@@ -193,16 +196,73 @@ describe('processNodesBatch', () => {
       deps,
     })
     expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
+      { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
       { index: 1, status: 'conflict' },
-      { index: 2, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
-      { index: 3, status: 'failed', messageKey: 'appErrors:generic', params: { text: 'boom' } },
+      { index: 2, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
+      { index: 3, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' },
     ])
     expect(posted).toEqual([])
     expect(calls.cacheRecord).toBe(0)
     expect(calls.clearCachedRecord).toBe(1)
     expect(errors).toHaveLength(1)
     expect(errors[0]).toContain('boom')
+  })
+
+  test('the text of an unexpected error stays in the server log and is never sent to the client', async () => {
+    const secret = 'connect ECONNREFUSED 10.0.0.5:5432 password=hunter2'
+    const { deps, errors } = createDeps()
+    deps.persistNode = async () => {
+      throw new Error(secret)
+    }
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchUnexpected' }])
+    expect(JSON.stringify(results)).not.toContain('hunter2')
+    expect(errors).toHaveLength(1)
+    expect(errors[0]).toContain(secret)
+  })
+
+  test('a deadline passed between two edits rolls the record back: no edit commits after the timeout was reported', async () => {
+    let clock = 1000
+    const { deps, posted, calls } = createDeps({
+      now: () => clock,
+      persistNow: () => {
+        clock = 10_001 // the first edit used up the time
+      },
+    })
+    const results = await processNodesBatch({
+      msg: msgOf([
+        { index: 0, nodeUuid: aUuid, from: 1, to: 10 },
+        { index: 1, nodeUuid: bUuid, from: 2, to: 20 },
+        { index: 2, nodeUuid: cUuid, from: 3, to: 30 },
+      ]),
+      deps,
+    })
+    expect(results).toEqual([
+      { index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+      { index: 1, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+      { index: 2, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' },
+    ])
+    // the transaction is aborted by an error: nothing is cached, no events are sent
+    expect(calls.persistNode).toBe(1)
+    expect(calls.cacheRecord).toBe(0)
+    expect(calls.clearCachedRecord).toBe(1)
+    expect(posted).toEqual([])
+  })
+
+  test('a deadline passed during the last edit also rolls the record back, before the commit', async () => {
+    let clock = 1000
+    const { deps, posted, calls, errors } = createDeps({
+      now: () => clock,
+      persistNow: () => {
+        clock = 10_001
+      },
+    })
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:aiApplyTimeout' }])
+    expect(calls.cacheRecord).toBe(0)
+    expect(posted).toEqual([])
+    // an expected outcome, not an error to investigate
+    expect(errors).toEqual([])
   })
 
   test('a lock timeout fails every edit with appErrors:record.lockTimeout', async () => {
