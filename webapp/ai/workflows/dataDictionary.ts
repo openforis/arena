@@ -8,11 +8,16 @@ import type { AiGenerateText } from '@common/ai/llm'
 import { type AiDataDictionaryNodeDef, generateDataDictionaryDescriptions } from '@common/ai/tasks/dataDictionary'
 
 import { resolveBatchModel } from './batchModel'
-import { type AiBatchGuard, type AiBatchProgress, chunkArray, runAiBatchCalls } from './batchRun'
+import { type AiBatchGuard, type AiBatchProgress, type AiBatchStop, chunkArray, runAiBatchCalls } from './batchRun'
 
 export type SchemaSummaryAiItems = { surveyName: string; nodeDefs: AiDataDictionaryNodeDef[] }
 
-export type DataDictionaryResult = { aiDescriptions: Record<string, string>; failedCount: number }
+export type DataDictionaryResult = {
+  aiDescriptions: Record<string, string>
+  failedCount: number
+  // present when the run stopped before its last call: the descriptions are those made until then
+  stop?: AiBatchStop
+}
 
 type FetchAiItems = (params: { surveyId: number; cycle: string; signal?: AbortSignal }) => Promise<SchemaSummaryAiItems>
 
@@ -53,7 +58,8 @@ export const cleanAiDescription = (
  * @param {Function} [params.onProgress] - Progress listener ({ done, total } calls).
  * @param {Function} [params.describe] - The data dictionary task (tests).
  * @param {number} [params.batchSize] - Node defs per call.
- * @returns {Promise<DataDictionaryResult>} Descriptions by uuid, and the node defs left without one.
+ * @returns {Promise<DataDictionaryResult>} Descriptions by uuid, and the node defs left without one (the ones a
+ * stopped run did not reach included).
  */
 export const runDataDictionaryDescriptions = async ({
   items,
@@ -75,7 +81,7 @@ export const runDataDictionaryDescriptions = async ({
   const nodeDefs = items.nodeDefs.slice(0, AiLimits.dataDictionaryMaxDescriptions)
   const batches = chunkArray(nodeDefs, batchSize)
   const aiDescriptions: Record<string, string> = {}
-  await runAiBatchCalls({
+  const { stop } = await runAiBatchCalls({
     calls: batches.map((batch) => ({
       size: batch.length,
       run: (callSignal?: AbortSignal) =>
@@ -94,7 +100,8 @@ export const runDataDictionaryDescriptions = async ({
     },
   })
   // failed batches and node defs the model skipped are both left empty in the export
-  return { aiDescriptions, failedCount: nodeDefs.length - Object.keys(aiDescriptions).length }
+  const failedCount = nodeDefs.length - Object.keys(aiDescriptions).length
+  return stop ? { aiDescriptions, failedCount, stop } : { aiDescriptions, failedCount }
 }
 
 /**

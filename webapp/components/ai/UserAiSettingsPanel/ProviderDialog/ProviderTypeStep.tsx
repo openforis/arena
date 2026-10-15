@@ -3,8 +3,8 @@ import React from 'react'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { TestId } from '@webapp/utils/testId'
 
-import type { TFunction } from '../aiSettingsForm'
-import type { ProviderDialogType, ProviderTypeGroup } from './providerDraft'
+import { useT } from '../useT'
+import type { ProviderDialogType, ProviderTypeGroup } from './providerTypes'
 
 // the small line under a type name; the cloud types without one are well known
 const HINT_KEYS: Partial<Record<ProviderDialogType, string>> = {
@@ -22,7 +22,6 @@ const GROUP_LABELS: Record<ProviderTypeGroup['key'], string> = {
 type Props = {
   groups: ProviderTypeGroup[]
   onChoose: (type: ProviderDialogType) => void
-  t: TFunction
 }
 
 /**
@@ -30,33 +29,41 @@ type Props = {
  * @param {Props} props - Props.
  * @returns {React.ReactElement} The step.
  */
-export const ProviderTypeStep = ({ groups, onChoose, t }: Props) => (
-  <div className="provider-dialog__types">
-    {groups.map((group) => (
-      <div key={group.key} className="provider-dialog__type-group" role="group" aria-label={t(GROUP_LABELS[group.key])}>
-        <span className="provider-dialog__group-label">{t(GROUP_LABELS[group.key])}</span>
-        <div className="provider-dialog__type-grid">
-          {group.options.map(({ spec, disabled }) => {
-            const hintKey = HINT_KEYS[spec.value]
-            return (
-              <button
-                key={spec.value}
-                type="button"
-                className="provider-dialog__type"
-                disabled={disabled}
-                onClick={() => onChoose(spec.value)}
-                data-testid={TestId.ai.providerType(spec.value)}
-              >
-                <ProviderMonogram type={spec.value} />
-                <span className="provider-dialog__type-text">
-                  <span className="provider-dialog__type-name">{t(`userAiSettings:types.${spec.value}`)}</span>
-                  {hintKey && <small>{t(hintKey)}</small>}
-                </span>
-              </button>
-            )
-          })}
+export const ProviderTypeStep = ({ groups, onChoose }: Props) => {
+  const t = useT()
+  return (
+    <div className="provider-dialog__types">
+      {groups.map((group) => (
+        <div
+          key={group.key}
+          className="provider-dialog__type-group"
+          role="group"
+          aria-label={t(GROUP_LABELS[group.key])}
+        >
+          <span className="provider-dialog__group-label">{t(GROUP_LABELS[group.key])}</span>
+          <div className="provider-dialog__type-grid">
+            {group.options.map(({ spec, disabled }) => {
+              const hintKey = HINT_KEYS[spec.value]
+              return (
+                <button
+                  key={spec.value}
+                  type="button"
+                  className="provider-dialog__type"
+                  disabled={disabled}
+                  onClick={() => onChoose(spec.value)}
+                  data-testid={TestId.ai.providerType(spec.value)}
+                >
+                  <ProviderMonogram type={spec.value} />
+                  <span className="provider-dialog__type-text">
+                    <span className="provider-dialog__type-name">{t(`userAiSettings:types.${spec.value}`)}</span>
+                    {hintKey && <small>{t(hintKey)}</small>}
+                  </span>
+                </button>
+              )
+            })}
+          </div>
         </div>
-      </div>
-    ))}
-  </div>
-)
+      ))}
+    </div>
+  )
+}

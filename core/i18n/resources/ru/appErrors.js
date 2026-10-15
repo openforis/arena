@@ -103,7 +103,7 @@ export default {
     'Политика ИИ этого опроса не разрешает отправлять $t(common:aiPolicy.dataClass.{{dataClass}}) $t(common:aiPolicy.hostingClass.{{hostingClass}}).',
   aiPolicyInvalid: 'Недопустимая политика ИИ: выберите уровень для структуры опроса и для данных записей.',
   aiPolicyAboveCeiling:
-    'Уровень «$t(common:aiPolicy.level.{{level}})» не разрешён на этом экземпляре Arena (максимум: «$t(common:aiPolicy.level.{{ceiling}})»).',
+    'Уровень «$t(common:aiPolicy.level.{{level}})» не разрешён на этом экземпляре Arena: нельзя передавать ИИ $t(common:aiPolicy.dataClass.{{dataClass}}) (максимум: «$t(common:aiPolicy.level.{{ceiling}})»).',
   aiFeaturesDisabled: 'Функции ИИ отключены в этом развертывании.',
   aiFeatureDisabled: 'Функция ИИ "{{feature}}" отключена.',
   aiPromptTooLarge: 'Запрос к ИИ слишком большой ({{size}} символов; лимит {{limit}}).',
