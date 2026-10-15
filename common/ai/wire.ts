@@ -31,7 +31,8 @@ export type AiGatewayCall = Pick<
 
 export type AiGatewayRequest = {
   surveyId?: number
-  // provider to call (common/ai/providerIds.ts); absent only from clients loaded before the provider list existed
+  // provider to call (common/ai/providerIds.ts); optional in the type only: the server refuses a request
+  // without it (400 aiCallInvalid, reason 'providerId')
   providerId?: string
   feature: string
   dataClass: 'schema' | 'data'
@@ -71,6 +72,19 @@ const toWireToolCall = ({ toolCallId, toolName, input }: ToolCallLike) => ({
   input,
 })
 
+// the model may only call the tools the request offered; anything else never reaches the browser
+const assertToolOffered = (toolName: string, offeredToolNames: ReadonlySet<string> | undefined): void => {
+  if (offeredToolNames && !offeredToolNames.has(toolName)) {
+    throw new SystemError('aiToolNotOffered', {}, StatusCodes.BAD_GATEWAY)
+  }
+}
+
+// a client tool call as sent to the browser
+const toCheckedWireToolCall = (part: ToolCallLike, offeredToolNames: ReadonlySet<string> | undefined) => {
+  assertToolOffered(part.toolName, offeredToolNames)
+  return toWireToolCall(part)
+}
+
 const withoutProviderMetadata = <T extends object>(value: T): T => {
   const copy = { ...value } as T & { providerMetadata?: unknown }
   delete copy.providerMetadata
@@ -90,11 +104,14 @@ const reviveTimestamp = <T extends { timestamp?: unknown }>(value: T): T =>
  * Converts a stream part to its JSON wire form.
  * @param {LanguageModelV4StreamPart} part - Part from the provider.
  * @param {Function} mapError - Maps an error to its wire form (key + params, no upstream details).
+ * @param {ReadonlySet<string>} [offeredToolNames] - The tools the request offered; a tool call for any other tool
+ *   throws aiToolNotOffered (all tool calls pass when absent).
  * @returns {object|null} The wire part, or null when the part is not forwarded.
  */
 export const serializeStreamPart = (
   part: LanguageModelV4StreamPart,
-  mapError: (error: unknown) => AiWireError
+  mapError: (error: unknown) => AiWireError,
+  offeredToolNames?: ReadonlySet<string>
 ): object | null => {
   if (FORWARDED_TEXT_PARTS.has(part.type)) return withoutProviderMetadata(part)
   switch (part.type) {
@@ -107,7 +124,7 @@ export const serializeStreamPart = (
     case 'error':
       return { type: 'error', error: mapError(part.error) }
     case 'tool-call':
-      return isClientToolCall(part) ? toWireToolCall(part as ToolCallLike) : null
+      return isClientToolCall(part) ? toCheckedWireToolCall(part as ToolCallLike, offeredToolNames) : null
     default:
       return null
   }
@@ -130,12 +147,21 @@ export const deserializeStreamPart = (json: any): LanguageModelV4StreamPart => {
 /**
  * Converts a generate result to its JSON wire form.
  * @param {LanguageModelV4GenerateResult} result - Result from the provider.
+ * @param {ReadonlySet<string>} [offeredToolNames] - The tools the request offered; a tool call for any other tool
+ *   throws aiToolNotOffered (all tool calls pass when absent).
  * @returns {object} The wire result.
  */
-export const serializeGenerateResult = (result: LanguageModelV4GenerateResult): object => ({
+export const serializeGenerateResult = (
+  result: LanguageModelV4GenerateResult,
+  offeredToolNames?: ReadonlySet<string>
+): object => ({
   content: result.content
     .filter((part) => FORWARDED_CONTENT_TYPES.has(part.type) && (part.type !== 'tool-call' || isClientToolCall(part)))
-    .map((part) => (part.type === 'tool-call' ? toWireToolCall(part as ToolCallLike) : withoutProviderMetadata(part))),
+    .map((part) =>
+      part.type === 'tool-call'
+        ? toCheckedWireToolCall(part as ToolCallLike, offeredToolNames)
+        : withoutProviderMetadata(part)
+    ),
   finishReason: result.finishReason,
   usage: result.usage,
   warnings: result.warnings ?? [],

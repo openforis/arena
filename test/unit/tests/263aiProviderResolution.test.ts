@@ -98,20 +98,16 @@ describe('provider resolution by id (263)', () => {
     expect(local.statusCode).toBe(400)
   })
 
-  test('without a providerId: the default when it is an account provider, else the admin default', () => {
-    const accountDefault = userWith({ defaultProviderId: 'acct:own', providers: [ownProvider] })
-    expect(ProviderResolver.resolveProviderConfig({ user: accountDefault, adminConfig }).providerId).toBe('acct:own')
-    const localDefault = userWith({ defaultProviderId: 'local:abc', providers: [ownProvider] })
-    expect(ProviderResolver.getDefaultGatewayProviderId(localDefault)).toBe('arena-default')
-    expect(ProviderResolver.resolveProviderConfig({ user: localDefault, adminConfig }).source).toBe('admin-default')
-    // an old slot that was enabled is the converted default
+  test('a saved key of the old single-provider slot is the account provider acct:legacy', () => {
     const oldSlot = userWith({
       provider: 'openai',
       model: 'gpt-x',
       enabled: true,
       apiKeyEncrypted: ownProvider.apiKeyEncrypted,
     })
-    expect(ProviderResolver.resolveProviderConfig({ user: oldSlot, adminConfig })).toMatchObject({
+    expect(
+      ProviderResolver.resolveProviderConfig({ user: oldSlot, providerId: 'acct:legacy', adminConfig })
+    ).toMatchObject({
       providerId: 'acct:legacy',
       cfg: { apiKey: 'sk-own' },
     })
@@ -123,12 +119,15 @@ describe('provider resolution by id (263)', () => {
       providers: [{ ...ownProvider, apiKeyEncrypted: 'v1:AAAA' }],
     })
     const error: any = await expectSystemErrorKey(
-      () => ProviderResolver.resolveProviderConfig({ user, adminConfig }),
+      () => ProviderResolver.resolveProviderConfig({ user, providerId: 'acct:own', adminConfig }),
       'aiApiKeyUnreadable'
     )
     expect(error.statusCode).toBe(409)
     // the description (settings panel) still names the provider the calls use
-    expect(await ProviderResolver.describeEffectiveSource(user)).toMatchObject({ source: 'user', provider: 'openai' })
+    expect(ProviderResolver.describeProvider({ user, providerId: 'acct:own' })).toMatchObject({
+      source: 'user',
+      provider: 'openai',
+    })
   })
 
   test('the gateway request keeps a valid providerId and refuses a malformed one', async () => {

@@ -12,15 +12,29 @@ import type {
   LanguageModelV4StreamPart,
 } from '@ai-sdk/provider'
 
+import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
+import { AiLimits } from '@common/ai/limits'
 import { createSseParser, stopFinishReason, unknownUsageV4 } from '@common/ai/sseParser'
 
+import { getProviderResponseLimits, readTextCapped } from './responseLimits'
+
 const DEFAULT_TIMEOUT_MS = 60000
+const ERROR_BODY_MESSAGE_CHARS = 500
 const TEXT_ID = 'vercel-ai-sdk-text'
 
 type ChatMessage = { role: 'user' | 'assistant'; parts: { type: 'text'; text: string }[] }
 type FetchImpl = (url: string, init: RequestInit) => Promise<Response>
+
+export type VercelAiSdkLimits = { maxResponseBytes?: number; maxFrameChars?: number; maxErrorBodyBytes?: number }
+type ResolvedLimits = Required<VercelAiSdkLimits>
+
+const resolveLimits = (limits: VercelAiSdkLimits): ResolvedLimits => ({
+  ...getProviderResponseLimits(ENV.aiMaxOutputTokens),
+  maxErrorBodyBytes: AiLimits.providerErrorBodyMaxBytes,
+  ...limits,
+})
 
 const flattenContent = (content: unknown): string => {
   if (typeof content === 'string') return content
@@ -99,11 +113,13 @@ const postChat = async ({
   endpoint,
   options,
   signal,
+  maxErrorBodyBytes,
 }: {
   fetchImpl: FetchImpl
   endpoint: string
   options: LanguageModelV4CallOptions
   signal: AbortSignal
+  maxErrorBodyBytes: number
 }): Promise<Response> => {
   const response = await fetchImpl(endpoint, {
     method: 'POST',
@@ -113,15 +129,27 @@ const postChat = async ({
     redirect: 'error', // a redirect would bypass the base URL guard
   })
   if (!response.ok || !response.body) {
-    const bodyText = response.ok ? '' : await response.text().catch(() => '')
-    throw new Error(`AI SDK upstream HTTP ${response.status}${bodyText ? `: ${bodyText.slice(0, 500)}` : ''}`)
+    const bodyText = response.ok ? '' : await readTextCapped(response, maxErrorBodyBytes).catch(() => '')
+    const detail = bodyText ? `: ${bodyText.slice(0, ERROR_BODY_MESSAGE_CHARS)}` : ''
+    throw new Error(`AI SDK upstream HTTP ${response.status}${detail}`)
   }
   return response
 }
 
-const readAll = async (response: Response, onText: (text: string) => void, signal: AbortSignal): Promise<void> => {
+const readAll = async ({
+  response,
+  onText,
+  signal,
+  maxBytes,
+}: {
+  response: Response
+  onText: (text: string) => void
+  signal: AbortSignal
+  maxBytes: number
+}): Promise<void> => {
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
+  let received = 0
   // cancelling the reader unblocks a pending read when the call is aborted
   const onAbort = () => reader.cancel(signal.reason).catch(() => undefined)
   signal.addEventListener('abort', onAbort, { once: true })
@@ -129,10 +157,16 @@ const readAll = async (response: Response, onText: (text: string) => void, signa
     while (!signal.aborted) {
       const { value, done } = await reader.read()
       if (done) break
+      received += value.byteLength
+      if (received > maxBytes) throw new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
       onText(decoder.decode(value, { stream: true }))
     }
     // an abort (timeout, caller) must not look like a complete answer
     if (signal.aborted) throw signal.reason
+  } catch (error) {
+    // the endpoint must not keep sending to a call that failed here
+    await reader.cancel(error).catch(() => undefined)
+    throw error
   } finally {
     signal.removeEventListener('abort', onAbort)
     reader.releaseLock()
@@ -141,7 +175,15 @@ const readAll = async (response: Response, onText: (text: string) => void, signa
 
 const incompleteStreamError = () => new SystemError('aiProviderUnavailable', {}, StatusCodes.BAD_GATEWAY)
 
-const generateFullText = async (response: Response, signal: AbortSignal): Promise<string> => {
+const generateFullText = async ({
+  response,
+  signal,
+  limits,
+}: {
+  response: Response
+  signal: AbortSignal
+  limits: ResolvedLimits
+}): Promise<string> => {
   let text = ''
   let completed = false
   const parser = createSseParser({
@@ -153,8 +195,9 @@ const generateFullText = async (response: Response, signal: AbortSignal): Promis
     onDone: (receivedDoneToken) => {
       if (receivedDoneToken) completed = true
     },
+    limits: { maxFrameChars: limits.maxFrameChars },
   })
-  await readAll(response, parser.push, signal)
+  await readAll({ response, onText: parser.push, signal, maxBytes: limits.maxResponseBytes })
   parser.end()
   // upstream closing without [DONE] / finish means a truncated answer
   if (!completed) throw incompleteStreamError()
@@ -164,9 +207,11 @@ const generateFullText = async (response: Response, signal: AbortSignal): Promis
 const createPartsStream = ({
   response,
   call,
+  limits,
 }: {
   response: Response
   call: ReturnType<typeof createCallAbort>
+  limits: ResolvedLimits
 }): ReadableStream<LanguageModelV4StreamPart> => {
   let closed = false
   return new ReadableStream<LanguageModelV4StreamPart>({
@@ -199,10 +244,11 @@ const createPartsStream = ({
         onDone: (receivedDoneToken) => {
           if (receivedDoneToken) completed = true
         },
+        limits: { maxFrameChars: limits.maxFrameChars },
       })
       enqueue({ type: 'stream-start', warnings: [] })
       try {
-        await readAll(response, parser.push, call.signal)
+        await readAll({ response, onText: parser.push, signal: call.signal, maxBytes: limits.maxResponseBytes })
         parser.end()
         if (completed && !failed) {
           if (textStarted) enqueue({ type: 'text-end', id: TEXT_ID })
@@ -232,49 +278,67 @@ const createPartsStream = ({
  * @param {string} cfg.baseUrl - Chat endpoint URL.
  * @param {number} [cfg.timeoutMs] - Per-call timeout (default 60s).
  * @param {FetchImpl} [cfg.fetchImpl] - Fetch implementation (tests).
+ * @param {VercelAiSdkLimits} [cfg.limits] - Caps on the answer (default: AiLimits.provider*, raised by AI_MAX_OUTPUT_TOKENS).
  * @returns {LanguageModelV4} The model.
  */
 export const createVercelAiSdkModel = ({
   baseUrl,
   timeoutMs = DEFAULT_TIMEOUT_MS,
   fetchImpl = (url, init) => fetch(url, init),
+  limits: limitsOverride = {},
 }: {
   baseUrl: string
   timeoutMs?: number
   fetchImpl?: FetchImpl
-}): LanguageModelV4 => ({
-  specificationVersion: 'v4',
-  provider: AiProvider.vercelAiSdk,
-  modelId: AiProvider.vercelAiSdk,
-  supportedUrls: {},
+  limits?: VercelAiSdkLimits
+}): LanguageModelV4 => {
+  const limits = resolveLimits(limitsOverride)
+  return {
+    specificationVersion: 'v4',
+    provider: AiProvider.vercelAiSdk,
+    modelId: AiProvider.vercelAiSdk,
+    supportedUrls: {},
 
-  async doGenerate(options) {
-    const call = createCallAbort(options.abortSignal, timeoutMs)
-    try {
-      const response = await postChat({ fetchImpl, endpoint: baseUrl, options, signal: call.signal })
-      const text = await generateFullText(response, call.signal)
-      return {
-        content: [{ type: 'text', text }],
-        finishReason: stopFinishReason(),
-        usage: unknownUsageV4(),
-        warnings: [],
+    async doGenerate(options) {
+      const call = createCallAbort(options.abortSignal, timeoutMs)
+      try {
+        const response = await postChat({
+          fetchImpl,
+          endpoint: baseUrl,
+          options,
+          signal: call.signal,
+          maxErrorBodyBytes: limits.maxErrorBodyBytes,
+        })
+        const text = await generateFullText({ response, signal: call.signal, limits })
+        return {
+          content: [{ type: 'text', text }],
+          finishReason: stopFinishReason(),
+          usage: unknownUsageV4(),
+          warnings: [],
+        }
+      } catch (error) {
+        call.abort(error) // closes the upstream connection on any failure
+        throw error
+      } finally {
+        call.cleanup()
       }
-    } catch (error) {
-      call.abort(error) // closes the upstream connection on any failure
-      throw error
-    } finally {
-      call.cleanup()
-    }
-  },
+    },
 
-  async doStream(options) {
-    const call = createCallAbort(options.abortSignal, timeoutMs)
-    try {
-      const response = await postChat({ fetchImpl, endpoint: baseUrl, options, signal: call.signal })
-      return { stream: createPartsStream({ response, call }) }
-    } catch (error) {
-      call.cleanup()
-      throw error
-    }
-  },
-})
+    async doStream(options) {
+      const call = createCallAbort(options.abortSignal, timeoutMs)
+      try {
+        const response = await postChat({
+          fetchImpl,
+          endpoint: baseUrl,
+          options,
+          signal: call.signal,
+          maxErrorBodyBytes: limits.maxErrorBodyBytes,
+        })
+        return { stream: createPartsStream({ response, call, limits }) }
+      } catch (error) {
+        call.cleanup()
+        throw error
+      }
+    },
+  }
+}

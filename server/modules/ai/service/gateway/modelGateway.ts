@@ -19,12 +19,14 @@ import {
   createSseEventWriter,
   isSseClosed,
   openSseStream,
+  waitForDrain,
 } from '@server/modules/ai/api/serverSentEvents'
 
 import * as AiTelemetry from '../aiTelemetry'
 import { assertFeatureEnabled } from '../featureGate'
 import * as ProviderResolver from '../providerResolver'
-import { parseGatewayRequest, sanitizeCall } from './callValidation'
+import { getCallSize, getEnforcedDataClass, parseGatewayRequest, sanitizeCall } from './callValidation'
+import { createDailyBudgetCharger, type DailyBudgetCharger } from './dailyBudget'
 import { assertPolicyAllows, type AiPolicyCheck } from './policy'
 import { formatErrorForLog, toAiSystemError, toAiWireError } from './errorMapping'
 import { createRateLimiter, type RateLimiter } from './rateLimiter'
@@ -40,6 +42,8 @@ export type ModelGatewayDeps = {
     providerId?: string
   }) => Promise<{ model: LanguageModelV4; meta: any }>
   assertPolicyAllows: (check: AiPolicyCheck) => Promise<void>
+  // charges a call with the Arena default provider to the daily budget of the user (absent: no budget)
+  chargeDailyBudget?: DailyBudgetCharger
   rateLimiter: RateLimiter
   recordTelemetry: (ctx: TelemetryContext, outcome: { latencyMs: number; usage?: unknown; error?: unknown }) => void
   logError: (message: string) => void
@@ -56,6 +60,7 @@ const logger = Log.getLogger('AiGateway')
 export const createDefaultModelGatewayDeps = (): ModelGatewayDeps => ({
   resolveModel: ProviderResolver.resolveModelForUser,
   assertPolicyAllows,
+  chargeDailyBudget: createDailyBudgetCharger(),
   rateLimiter: createRateLimiter({ limitPerMinute: ENV.aiRateLimitPerMinute }),
   recordTelemetry: AiTelemetry.record,
   logError: (message) => logger.error(message),
@@ -136,14 +141,22 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
   if (!deps.rateLimiter.take(user.uuid)) {
     throw new SystemError('aiRateLimited', {}, TOO_MANY_REQUESTS)
   }
-  const allowTools = getAiFeature(request.feature)?.tools === true
-  const call = sanitizeCall(request.call, { ...deps.limits, allowTools })
+  const featureDef = getAiFeature(request.feature)
+  const call = sanitizeCall(request.call, {
+    ...deps.limits,
+    allowTools: featureDef?.tools === true,
+    allowedToolNames: featureDef?.toolNames,
+  })
   const { model, meta } = await deps.resolveModel({ user, feature: request.feature, providerId: request.providerId })
   await deps.assertPolicyAllows({
     surveyId: request.surveyId ?? null,
-    dataClass: request.dataClass,
+    dataClass: getEnforcedDataClass({ feature: request.feature, dataClass: request.dataClass, call }),
     hostingClass: meta.hostingClass ?? null,
   })
+  // only the instance key is budgeted, and only a call that passed every check uses it up
+  if (meta.source === ProviderResolver.sources.adminDefault) {
+    await deps.chargeDailyBudget?.({ userUuid: user.uuid, chars: getCallSize(call) })
+  }
   const ctx: TelemetryContext = {
     feature: request.feature,
     source: meta.source,
@@ -151,7 +164,7 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
     model: meta.model,
     userUuid: user.uuid,
   }
-  return { request, call, model, ctx }
+  return { request, call, model, ctx, offeredTools: new Set((call.tools ?? []).map((tool) => tool.name)) }
 }
 
 /**
@@ -164,11 +177,13 @@ const pumpStream = async ({
   res,
   control,
   record,
+  offeredTools,
 }: {
   stream: ReadableStream<LanguageModelV4StreamPart>
   res: any
   control: ReturnType<typeof createCallControl>
   record: ReturnType<typeof createTelemetryRecorder>
+  offeredTools: ReadonlySet<string>
 }): Promise<{ usage?: unknown; error?: unknown }> => {
   const writeEvent = createSseEventWriter(res)
   const reader = stream.getReader()
@@ -181,12 +196,15 @@ const pumpStream = async ({
       if (done || isSseClosed(res)) break
       if (part.type === 'finish') outcome.usage = part.usage
       if (part.type === 'error') outcome.error = part.error
-      const wirePart = serializeStreamPart(part, toAiWireError)
-      if (wirePart) writeEvent(wirePart)
+      const wirePart = serializeStreamPart(part, toAiWireError, offeredTools)
+      // a client that reads slowly must not make the server buffer the whole answer
+      if (wirePart && !writeEvent(wirePart)) await waitForDrain(res, control.signal)
     }
   } catch (error) {
     outcome.error = error
     if (!isSseClosed(res)) writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(error, control.state)) })
+    // the provider must not keep producing for a call that failed here
+    await reader.cancel(error).catch(() => {})
   } finally {
     reader.releaseLock()
   }
@@ -209,6 +227,7 @@ type RunParams = {
   record: ReturnType<typeof createTelemetryRecorder>
   feature: string
   deps: ModelGatewayDeps
+  offeredTools: ReadonlySet<string>
 }
 
 /**
@@ -216,10 +235,12 @@ type RunParams = {
  * @param {RunParams} params - Parameters.
  * @returns {Promise<void>} Resolves when answered.
  */
-const runGenerate = async ({ model, call, res, control, record }: RunParams): Promise<void> => {
+const runGenerate = async ({ model, call, res, control, record, offeredTools }: RunParams): Promise<void> => {
   const result = await model.doGenerate({ ...call, abortSignal: control.signal })
+  // serialized first: a tool call for a tool that was not offered fails the call
+  const wireResult = serializeGenerateResult(result, offeredTools)
   record({ usage: result.usage })
-  if (!isSseClosed(res)) res.json(serializeGenerateResult(result))
+  if (!isSseClosed(res)) res.json(wireResult)
 }
 
 /**
@@ -227,11 +248,20 @@ const runGenerate = async ({ model, call, res, control, record }: RunParams): Pr
  * @param {RunParams} params - Parameters.
  * @returns {Promise<void>} Resolves when the stream is closed.
  */
-const runStream = async ({ model, call, res, control, record, feature, deps }: RunParams): Promise<void> => {
+const runStream = async ({
+  model,
+  call,
+  res,
+  control,
+  record,
+  feature,
+  deps,
+  offeredTools,
+}: RunParams): Promise<void> => {
   // errors until here (provider refused the call) are answered as plain JSON errors by the caller
   const { stream } = await model.doStream({ ...call, abortSignal: control.signal })
   openSseStream(res)
-  const outcome = await pumpStream({ stream, res, control, record })
+  const outcome = await pumpStream({ stream, res, control, record, offeredTools })
   if (outcome.error && !control.state.clientGone) deps.logError(formatErrorForLog(feature, outcome.error))
   if (!isSseClosed(res)) closeSseStream(res)
 }
@@ -265,12 +295,12 @@ export const handleModelRequest = async ({
     sendJsonError(res, toAiSystemError(error))
     return
   }
-  const { request, call, model, ctx } = prepared
+  const { request, call, model, ctx, offeredTools } = prepared
   const control = createCallControl({ res, timeoutMs: deps.limits.timeoutMs })
   const record = createTelemetryRecorder(deps, ctx)
   try {
     const run = request.stream ? runStream : runGenerate
-    await run({ model, call, res, control, record, feature: request.feature, deps })
+    await run({ model, call, res, control, record, feature: request.feature, deps, offeredTools })
   } catch (error) {
     record({ error })
     if (!control.state.clientGone) deps.logError(formatErrorForLog(request.feature, error))
