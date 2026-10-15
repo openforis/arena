@@ -204,11 +204,14 @@ export const ChangeSetCard = ({
 }) => {
   const survey = useSurvey()
   const lang = useSurveyPreferredLang()
-  const selection = useChangeSetSelection({ cardState, survey, onApply, onDiscard })
-  const [reviewOpen, setReviewOpen] = useState(false)
   const items = useMemo(() => buildReviewItems({ cardState, survey, lang }), [cardState, lang, survey])
+  const compact = isCompactCard(items.length)
+  const selection = useChangeSetSelection({ cardState, compact, survey, onApply, onDiscard })
+  const [reviewOpen, setReviewOpen] = useState(false)
+  // Apply all of a compact card asks to confirm until the dialog was opened
+  const [reviewed, setReviewed] = useState(false)
 
-  if (!isCompactCard(items.length)) return <ChangeSetFullCard busy={busy} cardState={cardState} selection={selection} />
+  if (!compact) return <ChangeSetFullCard busy={busy} cardState={cardState} selection={selection} />
 
   return (
     <>
@@ -216,7 +219,11 @@ export const ChangeSetCard = ({
         busy={busy}
         cardState={cardState}
         items={items}
-        onReview={() => setReviewOpen(true)}
+        onReview={() => {
+          setReviewed(true)
+          setReviewOpen(true)
+        }}
+        reviewed={reviewed}
         selection={selection}
       />
       {reviewOpen && (

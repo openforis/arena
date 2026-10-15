@@ -1823,6 +1823,14 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       reviewAll: 'Rever tudo ({{count}})',
       applyAll: 'Aplicar tudo',
       applySelectedCount: 'Aplicar selecionados ({{count}})',
+      confirm: {
+        title: 'Confirmar Aplicar tudo',
+        text: 'Não abriu a revisão. Alterações a aplicar: {{count}}',
+        review: 'Rever primeiro',
+        apply: 'Aplicar ({{count}})',
+        cancel: 'Cancelar',
+      },
+      behaviourUnselected: 'As alterações de expressões ou propriedades não são selecionadas até as rever: {{count}}',
       review: {
         title: 'Rever as alterações propostas',
         search: 'Pesquisar alterações',

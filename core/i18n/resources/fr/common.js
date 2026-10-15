@@ -1836,6 +1836,15 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       reviewAll: 'Tout examiner ({{count}})',
       applyAll: 'Tout appliquer',
       applySelectedCount: 'Appliquer la sélection ({{count}})',
+      confirm: {
+        title: 'Confirmer Tout appliquer',
+        text: "Vous n'avez pas ouvert l'examen. Modifications à appliquer : {{count}}",
+        review: "Examiner d'abord",
+        apply: 'Appliquer ({{count}})',
+        cancel: 'Annuler',
+      },
+      behaviourUnselected:
+        "Les modifications d'expressions ou de propriétés ne sont pas sélectionnées tant que vous ne les avez pas examinées : {{count}}",
       review: {
         title: 'Examiner les modifications proposées',
         search: 'Rechercher',

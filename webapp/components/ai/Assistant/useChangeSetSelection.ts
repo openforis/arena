@@ -3,6 +3,12 @@ import { useCallback, useMemo, useRef, useState } from 'react'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 
 import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
+import {
+  getBehaviourOperationIds,
+  getInitialDeselectedIds,
+  setDeselected,
+  toggleDeselected,
+} from './changeSetSelectionModel'
 
 export type ChangeSetSelection = {
   pendingIds: string[]
@@ -10,6 +16,8 @@ export type ChangeSetSelection = {
   // pending without conflict
   selectableIds: string[]
   selectedIds: string[]
+  // expression and property changes that are not selected (they start unselected on a long change set)
+  unselectedBehaviourIds: string[]
   applying: boolean
   toggle: (id: string) => void
   setSelected: (ids: string[], selected: boolean) => void
@@ -19,9 +27,10 @@ export type ChangeSetSelection = {
 
 /**
  * Selection, Apply and Discard of a change set, shared by its card and its review dialog. Every pending operation
- * without conflict starts selected.
+ * without conflict starts selected, except the expression and property changes of a compact card.
  * @param {object} params - Parameters.
  * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {boolean} params.compact - The card is compact: its changes are reviewed in the dialog.
  * @param {object} params.survey - Current survey (conflicts).
  * @param {Function} params.onApply - Applies the selected operations.
  * @param {Function} params.onDiscard - Discards the card.
@@ -29,16 +38,20 @@ export type ChangeSetSelection = {
  */
 export const useChangeSetSelection = ({
   cardState,
+  compact,
   survey,
   onApply,
   onDiscard,
 }: {
   cardState: ChangeSetCardState
+  compact: boolean
   survey: any
   onApply: (operationIds: string[]) => Promise<void>
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
-  const [deselected, setDeselected] = useState<string[]>([])
+  const [deselected, setDeselectedIds] = useState<string[]>(() =>
+    getInitialDeselectedIds({ changeSet: cardState.changeSet, compact })
+  )
   const [applying, setApplying] = useState(false)
   // set before the re-render, so two quick clicks can't both start an Apply
   const applyingRef = useRef(false)
@@ -48,14 +61,18 @@ export const useChangeSetSelection = ({
   const selectableIds = useMemo(() => pendingIds.filter((id) => !conflictIds.includes(id)), [conflictIds, pendingIds])
   const selectedIds = useMemo(() => selectableIds.filter((id) => !deselected.includes(id)), [deselected, selectableIds])
 
-  const toggle = useCallback(
-    (id: string) => setDeselected((prev) => (prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id])),
-    []
+  const unselectedBehaviourIds = useMemo(
+    () =>
+      getBehaviourOperationIds(cardState.changeSet).filter(
+        (id) => selectableIds.includes(id) && !selectedIds.includes(id)
+      ),
+    [cardState.changeSet, selectableIds, selectedIds]
   )
 
+  const toggle = useCallback((id: string) => setDeselectedIds((prev) => toggleDeselected(prev, id)), [])
+
   const setSelected = useCallback(
-    (ids: string[], selected: boolean) =>
-      setDeselected((prev) => (selected ? prev.filter((id) => !ids.includes(id)) : [...new Set([...prev, ...ids])])),
+    (ids: string[], selected: boolean) => setDeselectedIds((prev) => setDeselected(prev, ids, selected)),
     []
   )
 
@@ -81,6 +98,7 @@ export const useChangeSetSelection = ({
     conflictIds,
     selectableIds,
     selectedIds,
+    unselectedBehaviourIds,
     applying,
     toggle,
     setSelected,
