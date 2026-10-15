@@ -9,6 +9,7 @@ export default {
   baseUrl: 'ベースURL',
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',
+  apiKeySaved: 'キーは保存済み',
   apiKeyKept: '既存のキーを維持する場合は空欄のままにしてください。',
   apiKeyUnreadable:
     '保存されたAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。キーを再入力してください。',

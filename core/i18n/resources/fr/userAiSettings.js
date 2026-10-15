@@ -9,6 +9,7 @@ export default {
   baseUrl: 'URL de base',
   apiKey: 'Clé API',
   apiKeyPlaceholder: 'Collez la clé API de votre fournisseur',
+  apiKeySaved: 'Clé enregistrée',
   apiKeyKept: 'Laissez vide pour conserver la clé existante.',
   apiKeyUnreadable:
     'La clé API enregistrée ne peut plus être lue (le secret de chiffrement du serveur a changé). Saisissez à nouveau la clé.',

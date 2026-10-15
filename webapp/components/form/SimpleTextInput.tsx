@@ -4,7 +4,9 @@ import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-type Props = {
+import { translatePlaceholder } from './translatePlaceholder'
+
+export type SimpleTextInputProps = {
   autoComplete?: string
   autoFocus?: boolean
   className?: string
@@ -29,7 +31,7 @@ type Props = {
   value?: string | number
 }
 
-export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) => {
+export const SimpleTextInput = forwardRef<HTMLDivElement, SimpleTextInputProps>((props, ref) => {
   const {
     autoComplete = 'off',
     autoFocus,
@@ -70,7 +72,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
   )
 
   const label = labelProp ? i18n.t(labelProp) : labelProp
-  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
+  const placeholder = translatePlaceholder(i18n, placeholderProp)
   const multiline = rows !== undefined && rows > 1
 
   return (
