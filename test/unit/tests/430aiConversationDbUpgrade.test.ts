@@ -45,10 +45,9 @@ describe('conversation database upgrades (430)', () => {
     second.close()
   })
 
-  test('the open connection is closed when another tab upgrades the database, so the upgrade is not blocked', async () => {
+  test('the connection is closed when another tab upgrades the database, so the upgrade is not blocked', async () => {
     const factory = new IDBFactory()
-    const closed = jest.fn()
-    const store = await openConversationStore({ indexedDB: factory, onClosed: closed })
+    const store = await openConversationStore({ indexedDB: factory })
     expect(store.persistent).toBe(true)
     await store.save(createConversation({ userUuid: 'u1', surveyId: 1, area: 'design', idFactory: () => 'c1' }))
 
@@ -63,6 +62,23 @@ describe('conversation database upgrades (430)', () => {
       }),
     ])
     expect(upgraded).toBe(true)
-    expect(closed).toHaveBeenCalledTimes(1)
+  })
+
+  test('the store that callers hold keeps working after the connection was closed: it reopens by itself', async () => {
+    const factory = new IDBFactory()
+    const store = await openConversationStore({ indexedDB: factory })
+    await store.save(createConversation({ userUuid: 'u1', surveyId: 1, area: 'design', idFactory: () => 'c1' }))
+
+    // two upgrades by other tabs, each closing our connection
+    for (const version of [2, 3]) {
+      const other = await openRaw(factory, version, () => undefined)
+      other.close()
+      // the data is still there, and new saves go through, with the same store object
+      expect((await store.get('c1', 'u1'))?.id).toBe('c1')
+      await store.save(
+        createConversation({ userUuid: 'u1', surveyId: 1, area: 'design', idFactory: () => `c${version}` })
+      )
+      expect((await store.list({ userUuid: 'u1', surveyId: 1 })).map((item) => item.id).sort()).toContain(`c${version}`)
+    }
   })
 })

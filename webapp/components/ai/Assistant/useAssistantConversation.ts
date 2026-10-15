@@ -22,6 +22,7 @@ import { getConversationStore, type ConversationStore } from '@webapp/ai/convers
 import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
 import type { Conversation } from '@webapp/ai/conversations/types'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
+import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import {
   reportSuggestionSettle,
@@ -46,6 +47,8 @@ import { assistantPanelStore } from './assistantPanelStore'
 import { assistantTurnRegistry } from './assistantTurnRegistry'
 import { startsAsDataConversation } from './cleaning/cleaningArea'
 import { useAssistantToolContext } from './useAssistantToolContext'
+
+const logUnhandled = (message: string) => (error: unknown) => logAiWarning(message, error)
 
 // Do it: a new conversation that keeps the suggestion's scope for its tools; displayText: what the chat shows instead
 // of the text (the model still gets the text)
@@ -190,7 +193,7 @@ export const useAssistantConversation = ({
       })
       if (decision === 'show' && loaded) show(normalizeLoadedConversation(loaded, runningIdRef.current === loaded.id))
       else if (decision === 'forget') assistantPanelStore.setConversationId(null)
-    })
+    }, logUnhandled('The stored conversation could not be read'))
     return () => {
       active = false
     }
@@ -285,7 +288,7 @@ export const useAssistantConversation = ({
       // the pick belongs to the conversation it created: later new chats start from the default
       setPendingProviderId(undefined)
       // the turn shows and selects its conversation synchronously, before its first await
-      void runTurn(base, text, displayText)
+      runTurn(base, text, displayText).catch(logUnhandled('The assistant turn failed'))
       return Promise.resolve(base.id)
     },
     [area, busy, conversationId, conversationStore, pendingProviderId, runTurn, surveyId, userUuid]
@@ -293,7 +296,9 @@ export const useAssistantConversation = ({
 
   const retry = useCallback(() => {
     const retryBase = conversationRef.current ? getRetryBase(conversationRef.current) : null
-    if (retryBase && !busy && !applyingRef.current) void runTurn(retryBase.base, retryBase.text, retryBase.displayText)
+    if (retryBase && !busy && !applyingRef.current) {
+      runTurn(retryBase.base, retryBase.text, retryBase.displayText).catch(logUnhandled('The assistant turn failed'))
+    }
   }, [busy, runTurn])
 
   const stop = useCallback(() => controllerRef.current?.abort(), [])
