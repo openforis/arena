@@ -20,6 +20,7 @@ import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
 import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
+import { createGuardedFetch } from './guardedFetch'
 import { createMockModel, MOCK_PROVIDER } from './mockProvider'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
 
@@ -58,10 +59,13 @@ const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'erro
  *   keyless local OpenAI-compatible servers like a default Ollama).
  * @param {string} [cfg.baseUrl] - Custom base URL (only meaningful for
  *   {@link providers.openaiCompatible}).
+ * @param {object} [options] - Options.
+ * @param {Function} [options.fetchImpl] - Fetch of the calls to a custom base URL (default: the global one without
+ *   redirects; the endpoint of a user is called with a guarded fetch, see {@link buildUserModel}).
  * @returns {object} A Vercel AI SDK language model handle ready to pass to
  *   `generateText` / `generateObject` / `streamText`.
  */
-export const buildModel = (cfg) => {
+export const buildModel = (cfg, { fetchImpl } = {}) => {
   const { provider, model, apiKey, baseUrl } = cfg
   // test servers only: canned answers, no network (e2e)
   if (provider === MOCK_PROVIDER && ENV.aiMockProviderEnabled) return createMockModel()
@@ -90,11 +94,13 @@ export const buildModel = (cfg) => {
       // apiKey is optional for some local servers (e.g. Ollama with no auth)
       // Use .chat() explicitly — the default call now routes to the OpenAI Responses API
       // (/v1/responses), which most OpenAI-compatible providers don't implement.
-      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: noRedirectFetch }).chat(model)
+      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: fetchImpl ?? noRedirectFetch }).chat(
+        model
+      )
     }
     case providers.vercelAiSdk: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
-      return createVercelAiSdkModel({ baseUrl })
+      return createVercelAiSdkModel({ baseUrl, fetchImpl })
     }
     default:
       throw new SystemError('aiProviderInvalid', { provider })
@@ -102,12 +108,13 @@ export const buildModel = (cfg) => {
 }
 
 /**
- * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses.
+ * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses: before the call,
+ * and again when the call connects (the guarded fetch).
  * @param {object} cfg - User provider config (see buildModel).
  * @param {object} [guardOptions] - Options for the base URL guard (tests).
  * @returns {Promise<object>} The model handle.
  */
 export const buildUserModel = async (cfg, guardOptions) => {
   await assertProviderBaseUrlAllowed(cfg, guardOptions)
-  return buildModel(cfg)
+  return buildModel(cfg, { fetchImpl: createGuardedFetch(guardOptions) })
 }

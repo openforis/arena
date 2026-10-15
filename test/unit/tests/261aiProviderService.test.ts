@@ -273,19 +273,29 @@ describe('AI provider service (261)', () => {
     expect(org.provider).toMatchObject({ hostingClass: 'orgHosted', hasApiKey: false, name: 'OpenAI-compatible' })
   })
 
-  test('an upstream failure that is not a SystemError keeps its message, truncated', async () => {
-    const long = 'x'.repeat(300)
-    const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorMessage: long }) })
+  test('a failed test sends an error key only, never what the provider or the network said', async () => {
+    const secret = 'internal host db.corp.local refused the connection'
+    const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }) })
     const error: any = await expectSystemErrorKey(
       AiProviderService.addProvider({
         user: userWith({}),
         input: { type: 'openai', model: 'm', apiKey: 'sk' },
         deps: failing.deps,
       }),
-      'aiProviderTestFailed'
+      'aiProviderAuth'
     )
-    expect(error.params.message).toBe('x'.repeat(200))
     expect(failing.saved).toEqual([])
+    // a result without a key is "unavailable", whatever else it carries
+    const keyless = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorMessage: secret }) as any })
+    const unavailable: any = await expectSystemErrorKey(
+      AiProviderService.addProvider({
+        user: userWith({}),
+        input: { type: 'openai', model: 'm', apiKey: 'sk' },
+        deps: keyless.deps,
+      }),
+      'aiProviderUnavailable'
+    )
+    expect(JSON.stringify([error.params, unavailable.params, unavailable.message])).not.toContain('db.corp.local')
   })
 
   test('a failed test or a missing secret saves nothing', async () => {
@@ -476,7 +486,6 @@ describe('AI provider service (261)', () => {
       'aiApiKeyUnreadable',
       'aiEncryptionMissing',
       'aiProviderChanged',
-      'aiProviderTestFailed',
     ]
     for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
       for (const key of keys) {

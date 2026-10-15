@@ -134,8 +134,7 @@ Essayez de rafraîchir la page.`,
   aiBaseUrlNotAllowed:
     "Cette URL de base pointe vers une adresse interne, que le serveur Arena n'appelle pas. Pour un modèle sur votre ordinateur, utilisez le Serveur d'IA local. Pour un serveur de votre organisation, demandez à votre administrateur de l'ajouter aux serveurs de modèles de l'organisation.",
   aiProviderUnavailable: "Le fournisseur d'IA est injoignable. Veuillez réessayer plus tard.",
-  aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
-  aiProviderTestFailed: 'Le test du fournisseur a échoué : {{message}}',
+  aiModelListFailed: 'Impossible de lister les modèles du fournisseur.',
   aiProviderNotFound: "Ce fournisseur d'IA n'existe pas ou ne vous appartient pas. Choisissez un autre fournisseur.",
   aiProviderNotGateway:
     'Un fournisseur enregistré dans ce navigateur est appelé depuis le navigateur, jamais via le serveur Arena.',

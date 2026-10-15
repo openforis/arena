@@ -22,6 +22,7 @@ import * as Log from '@server/log/log'
 import type { AiPrefsUpdate, StoredAiPrefs } from '@server/modules/user/repository/userAiPrefsRepository'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
+import { formatErrorForLog, toAiSystemError } from './gateway/errorMapping'
 import {
   decryptStoredKey,
   encryptProviderKey,
@@ -54,10 +55,10 @@ export type AiProviderCallConfig = {
   apiKey: string | null
 }
 
+// a failed test carries an error key and params only: nothing the provider or the network said is sent on
 export type AiProviderTestResult = {
   ok: boolean
   latencyMs: number
-  errorMessage?: string
   errorKey?: string
   errorParams?: Record<string, unknown>
 }
@@ -117,17 +118,11 @@ const badRequest = (key: string, params: Record<string, unknown> = {}): SystemEr
 /**
  * Returns the result of a test that failed with the error.
  * @param {unknown} error - The error.
- * @returns {AiProviderTestResult} The failed result (key and params of a SystemError).
+ * @returns {AiProviderTestResult} The failed result: the key and params of the error as the gateway maps it.
  */
 const toFailedResult = (error: unknown): AiProviderTestResult => {
-  const systemError = error instanceof SystemError ? error : null
-  return {
-    ok: false,
-    latencyMs: 0,
-    errorMessage: error instanceof Error ? error.message : String(error),
-    errorKey: systemError?.key,
-    errorParams: systemError?.params,
-  }
+  const systemError = toAiSystemError(error)
+  return { ok: false, latencyMs: 0, errorKey: systemError.key, errorParams: systemError.params }
 }
 
 /**
@@ -153,6 +148,8 @@ const runConnectionTest = async ({ user, cfg }: { user: User; cfg: AiProviderCal
     )
     return { ok: true, latencyMs: Date.now() - start }
   } catch (error) {
+    // the details stay in the server log
+    if (!(error instanceof SystemError)) logger.warn(formatErrorForLog('testConnection', error))
     return { ...toFailedResult(error), latencyMs: Date.now() - start }
   }
 }
@@ -489,10 +486,7 @@ const assertTestPasses = async ({
 }) => {
   const result = await deps.runTest({ user, cfg })
   if (result.ok) return
-  // an upstream failure that is not a SystemError keeps its message (truncated), not a generic "unavailable"
-  if (!result.errorKey)
-    throw badRequest('aiProviderTestFailed', { message: String(result.errorMessage ?? '').slice(0, 200) })
-  throw badRequest(result.errorKey, result.errorParams ?? {})
+  throw badRequest(result.errorKey ?? 'aiProviderUnavailable', result.errorParams ?? {})
 }
 
 /**
