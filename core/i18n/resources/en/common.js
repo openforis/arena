@@ -1485,6 +1485,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     success: 'Translated. Review and save.',
 
     failed: 'Translation failed: {{message}}',
+    sourceChanged: 'The text changed while it was being translated, so the translation was not applied.',
   },
   aiActivityLog: {
     title: 'Activity log summary',

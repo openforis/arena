@@ -1373,6 +1373,7 @@ $t(common.appNameFull)
     success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
     success: 'Traducido. Revise y guarde.',
     failed: 'La traducción falló: {{message}}',
+    sourceChanged: 'El texto cambió mientras se traducía, por lo que la traducción no se aplicó.',
   },
   aiActivityLog: {
     title: 'Resumen del registro de actividad',

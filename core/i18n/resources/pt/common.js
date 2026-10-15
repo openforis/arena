@@ -1496,6 +1496,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     success_other: 'Traduzido para {{count}} idiomas. Revise e salve.',
     success: 'Traduzido. Revise e salve.',
     failed: 'Falha na tradução: {{message}}',
+    sourceChanged: 'O texto mudou durante a tradução, então a tradução não foi aplicada.',
   },
   aiActivityLog: {
     title: 'Resumo do log de atividades',
