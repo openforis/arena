@@ -48,5 +48,12 @@ export const requireAiFeaturePermission: Middleware = (req, res, next) => {
     )
     return undefined
   }
+  // the permission is checked on the survey of the body: without one there is no survey to check (and the permission
+  // middleware would fail with a database error); the gateway refuses it the same way
+  const needsSurvey = getAiFeature(feature).permission !== AiFeaturePermission.loggedIn
+  if (needsSurvey && (req.body?.surveyId === undefined || req.body?.surveyId === null)) {
+    Response.sendErr(res, new SystemError('aiCallInvalid', { reason: 'surveyId' }, StatusCodes.BAD_REQUEST))
+    return undefined
+  }
   return middleware(req, res, next)
 }
