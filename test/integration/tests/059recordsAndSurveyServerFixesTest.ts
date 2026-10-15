@@ -17,6 +17,8 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { RecordsUpdateThread } from '@server/modules/record/service/update/thread/recordsUpdateThread'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
 import { createNodesBatchReplyRegistry } from '@server/modules/record/service/update/nodesBatch/nodesBatchReplies'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+import { NodesBatchProcessSlots } from '@server/modules/record/service/update/nodesBatch/nodesBatchSlots'
 import {
   createDefaultNodesBatchServiceDeps,
   updateNodesBatch,
@@ -487,5 +489,24 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
       body: { items: [{ uuid: uuidv4(), labels: { en: 'x' } }] },
     })
     expectNoErrorText(res, 'appErrors:unexpectedServerError')
+  })
+
+  test('a batch refused for lack of a slot is a 429 with a Retry-After header', async () => {
+    // the user already has a batch in flight (one at a time per user)
+    const slot = NodesBatchProcessSlots.tryAcquire({ userUuid: aiUser.uuid, surveyId: Number(missingSurveyId) })
+    expect(slot.ok).toBe(true)
+    try {
+      const res = await callWithMissingSurvey({
+        init: RecordApi.init,
+        method: 'post',
+        path: '/survey/:surveyId/records/nodes/update',
+        body: { cycle: '0', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), from: 1, to: 2 }] },
+      })
+      expect(res.statusCode).toBe(429)
+      expect(res.body).toMatchObject({ status: 'error', key: 'appErrors:record.nodesBatchBusy' })
+      expect(res.headers['retry-after']).toBe(String(NodesBatchLimits.busyRetryAfterSeconds))
+    } finally {
+      if (slot.ok) slot.release()
+    }
   })
 })

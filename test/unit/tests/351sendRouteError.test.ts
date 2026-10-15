@@ -58,4 +58,32 @@ describe('sendRouteError (351)', () => {
     expect(res.statusCode).toBe(400)
     expect(res.body.key).toBe(unexpectedKey)
   })
+
+  describe('Retry-After', () => {
+    test('a 429 carries the Retry-After header when the route gives a delay', () => {
+      const res = createFakeResponse()
+      sendRouteError({
+        res,
+        error: new SystemError('appErrors:test.busy', {}, 429),
+        unexpectedKey,
+        retryAfterSeconds: 5,
+      })
+      expect(res.statusCode).toBe(429)
+      expect(res.headers['retry-after']).toBe('5')
+    })
+
+    test('other statuses and routes without a delay have no Retry-After', () => {
+      const conflict = createFakeResponse()
+      sendRouteError({
+        res: conflict,
+        error: new SystemError('appErrors:test.known', {}, 409),
+        unexpectedKey,
+        retryAfterSeconds: 5,
+      })
+      expect(conflict.headers['retry-after']).toBeUndefined()
+      const noDelay = createFakeResponse()
+      sendRouteError({ res: noDelay, error: new SystemError('appErrors:test.busy', {}, 429), unexpectedKey })
+      expect(noDelay.headers['retry-after']).toBeUndefined()
+    })
+  })
 })
