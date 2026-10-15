@@ -123,6 +123,11 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     display: none;
   }
 
+  // a live region that stays in the layout, so the text added to it is announced; empty, it takes no space
+  &__status:empty {
+    margin-top: -0.25rem;
+  }
+
   &__hint {
     font-size: 0.8rem;
     color: var(--colorGrey700);
