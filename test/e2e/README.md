@@ -23,9 +23,14 @@ skipped unless `E2E_AI_MOCK=true`:
 
 ```bash
 AI_FEATURES_ENABLED=true AI_MOCK_PROVIDER_ENABLED=true AI_DEFAULT_PROVIDER=mock AI_DEFAULT_MODEL=mock \
+  AI_DEFAULT_DAILY_CALL_LIMIT=0 AI_DEFAULT_DAILY_CHAR_LIMIT=0 \
   PGDATABASE=arena_e2e node dist/server.js                                        # in another terminal
 E2E_AI_MOCK=true PGDATABASE=arena_e2e yarn test:e2e specs/aiFeatures.spec.ts
 ```
+
+The mock provider is the instance default, so its calls count against the daily budget of each user (200 calls and
+2 million characters by default). The test users persist between runs, so keep the two `AI_DEFAULT_DAILY_*` variables
+at `0` (unlimited) or the specs fail with `aiDailyBudgetExceeded` after a number of runs.
 
 `specs/aiLocalEngine.spec.ts` starts its own stub local AI server (`test/e2e/stubs/localModelServer.ts`) on a free `127.0.0.1` port; nothing else to start.
 
