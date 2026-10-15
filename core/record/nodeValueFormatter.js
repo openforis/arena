@@ -11,7 +11,7 @@ const format = ({ survey, cycle, nodeDef, value, node = null, showLabel = false,
 
 const getFormattedRecordKeys = ({ survey, cycle, record, lang = null, showLabel = false }) => {
   const root = Records.getRoot(record)
-  const keyNodes = Records.getEntityKeyNodes({ survey, entity: root })(record)
+  const keyNodes = Records.getEntityKeyNodes(survey, root)(record)
   const formattedKeyValues = keyNodes.map((node) => {
     const keyNodeDef = Surveys.findNodeDefByUuid({ survey, uuid: Node.getNodeDefUuid(node) })
     return keyNodeDef

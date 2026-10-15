@@ -34,7 +34,7 @@ const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpre
     if (!parentNodeDef) continue // root node def has no parent to store meta on
 
     const nodeDefUuid = NodeDef.getUuid(nodeDef)
-    const parentNodes = RecordReader.getNodesByDefUuid({ nodeDefUuid: NodeDef.getUuid(parentNodeDef) })(recordUpdated)
+    const parentNodes = RecordReader.getNodesByDefUuid(NodeDef.getUuid(parentNodeDef))(recordUpdated)
 
     for (const parentNode of parentNodes) {
       const exprEval = /* NOSONAR */ await evaluator.evalApplicableExpression({
@@ -68,7 +68,7 @@ const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
   if (A.isEmpty(nodeDefsToRecompute)) return record
 
   const nodesToRecompute = nodeDefsToRecompute.reduce((acc, nodeDef) => {
-    RecordReader.getNodesByDefUuid({ nodeDefUuid: NodeDef.getUuid(nodeDef) })(record).forEach((node) => {
+    RecordReader.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record).forEach((node) => {
       acc[Node.getUuid(node)] = node
     })
     return acc

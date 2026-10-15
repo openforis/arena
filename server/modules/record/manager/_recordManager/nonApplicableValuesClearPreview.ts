@@ -39,7 +39,7 @@ const _findNodeDefUuidsToClear = async ({
 }
 
 const _prepareNodeToPersist = ({ record, node }: { record: any; node: any }): any => {
-  const nodeExisting = Record.getNodeByUuid({ uuid: Node.getUuid(node) })(record)
+  const nodeExisting = Record.getNodeByUuid(Node.getUuid(node))(record)
   if (!nodeExisting) {
     return Node.assocCreated(true)(node)
   }
@@ -93,7 +93,7 @@ export const findNodeDefUuidsToClearOnNodeDelete = async (
   params: PreviewParams & { nodeUuid: string }
 ): Promise<string[]> => {
   const { record, nodeUuid } = params
-  const node = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+  const node = Record.getNodeByUuid(nodeUuid)(record)
   if (!node) return []
   const nodeDeleted = Node.assocDeleted(true)(node)
   const recordUpdated = Record.assocNode(nodeDeleted)(record)

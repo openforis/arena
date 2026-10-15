@@ -155,7 +155,7 @@ describe('RecordReader Test (entity keys index cache)', () => {
     const recordUpdated = updateResult.record
 
     expect(findPlot({ plotId: 99, entityKeysIndexCache, recordToSearch: recordUpdated })).toStrictEqual(
-      Record.getNodeByUuid({ uuid: Node.getUuid(plotCreated) })(recordUpdated)
+      Record.getNodeByUuid(Node.getUuid(plotCreated))(recordUpdated)
     )
     const { entity: plotFound } = await getOrCreatePlot({
       plotId: 99,

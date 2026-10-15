@@ -66,7 +66,7 @@ const extractCodeValueAndMeta =
     if (Objects.isEmpty(code)) {
       return null
     }
-    const parentNode = Record.getParentNode({ node })(record)
+    const parentNode = Record.getParentNode(node)(record)
     const { itemUuid, hierarchyCode } = await findCategoryItemUuidAndCodeHierarchy({
       survey,
       categoryItemProvider,

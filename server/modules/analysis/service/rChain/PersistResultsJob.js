@@ -78,7 +78,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
     }
     const { record_uuid: recordUuid, parent_uuid: entityUuid } = row
     const record = await this.recordsProvider.getOrFetch(recordUuid)
-    const entity = Record.getNodeByUuid({ uuid: entityUuid })(record)
+    const entity = Record.getNodeByUuid(entityUuid)(record)
     const { nodes: nodesUpdated, record: recordUpdated } = await Record.updateAttributesInEntityWithValues({
       survey,
       entity,

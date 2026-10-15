@@ -25,13 +25,13 @@ const getPageNode = ({ record, pagesUuidMap, nodeDefUuid, survey }) => {
   if (!record || !nodeDefUuid) return null
   const nodeUuid = pagesUuidMap[nodeDefUuid]
   if (nodeUuid) {
-    const mapped = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+    const mapped = Record.getNodeByUuid(nodeUuid)(record)
     if (mapped) return mapped
   }
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   // Do not guess an instance for multiple entities.
   if (!nodeDef || NodeDef.isMultiple(nodeDef)) return null
-  return Record.getNodesByDefUuid({ nodeDefUuid })(record)?.[0] ?? null
+  return Record.getNodesByDefUuid(nodeDefUuid)(record)?.[0] ?? null
 }
 
 const isPageVisible = ({ cycle, record, pageNodeDef, parentNode }) => {

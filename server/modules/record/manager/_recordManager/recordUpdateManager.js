@@ -262,7 +262,7 @@ export const persistNode = async (
       nodesUpdateFn: async (user, survey, record, node, t) => {
         const nodeUuid = Node.getUuid(node)
 
-        const existingNode = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+        const existingNode = Record.getNodeByUuid(nodeUuid)(record)
 
         if (existingNode) {
           return NodeUpdateManager.updateNode({ user, survey, record, node, system }, t)
@@ -299,7 +299,7 @@ export const deleteNode = async (
       user,
       survey,
       record,
-      node: Record.getNodeByUuid({ uuid: nodeUuid })(record),
+      node: Record.getNodeByUuid(nodeUuid)(record),
       timezoneOffset,
       lang,
       clearNonApplicableValues,
@@ -403,9 +403,7 @@ const validationDependencyTypes = [
 const _getDependentNodesToValidate = ({ survey, record, nodes }) => {
   const dependentNodePointersToValidate = Object.values(nodes).reduce((acc, node) => {
     validationDependencyTypes.forEach((dependencyType) => {
-      const dependentPointers = Records.getDependentNodePointers({ survey, node, dependencyType, includeSelf: true })(
-        record
-      )
+      const dependentPointers = Records.getDependentNodePointers(survey, node, dependencyType, true)(record)
       acc.push(...dependentPointers)
     })
     return acc

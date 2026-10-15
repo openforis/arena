@@ -17,7 +17,7 @@ const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = fal
   }
   const recordUpdated = Objects.isEmpty(nodes) ? record : Record.mergeNodes(nodes, { sideEffect })(record)
 
-  const parentNode = Record.getParentNode({ node })(recordUpdated)
+  const parentNode = Record.getParentNode(node)(recordUpdated)
 
   return {
     record: recordUpdated,
@@ -80,7 +80,7 @@ export const insertNode = async (
 
   // If it's a code, don't insert if it has been inserted already (by another user)
   if (NodeDef.isCode(nodeDef)) {
-    const parentNode = Record.getParentNode({ node })(record)
+    const parentNode = Record.getParentNode(node)(record)
     const siblings = Record.getNodeChildrenByDefUuid(parentNode, Node.getNodeDefUuid(node))(record)
     if (siblings.some((sibling) => Objects.isEqual(Node.getValue(sibling), Node.getValue(node)))) {
       return _createUpdateResult({ record, sideEffect })

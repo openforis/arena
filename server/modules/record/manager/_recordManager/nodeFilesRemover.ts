@@ -16,7 +16,7 @@ const _isFileAttribute = ({ survey, node }: { survey: any; node: any }): boolean
 
 // the value of a node deleted because it became not applicable is cleared before the deletion: use the stored one
 const _getFileUuidToRemove = ({ record, node }: { record: any; node: any }): string | null => {
-  const nodeStored = Record.getNodeByUuid({ uuid: Node.getUuid(node) })(record)
+  const nodeStored = Record.getNodeByUuid(Node.getUuid(node))(record)
   const fileUuidStored = nodeStored ? Node.getFileUuid(nodeStored) : null
   const fileUuid = Node.getFileUuid(node)
   if (Node.isDeleted(node)) return fileUuidStored ?? fileUuid ?? null

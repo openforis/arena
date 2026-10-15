@@ -27,7 +27,7 @@ const isClearNonApplicableValuesConfirmationNeeded = ({ msg, survey }) =>
   isClearNonApplicableValuesEnabled(survey) && !msg.clearNonApplicableValuesConfirmed && Boolean(msg.socketId)
 
 const getNodeAndDescendants = ({ record, nodeUuid }) => {
-  const node = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+  const node = Record.getNodeByUuid(nodeUuid)(record)
   if (!node) return []
   return Record.getNodesArray(record).filter((n) => Node.getUuid(n) === nodeUuid || Node.isDescendantOf(node)(n))
 }
@@ -309,7 +309,7 @@ export class RecordsUpdateThread extends Thread {
           })
           if (nodeDefUuidsToClear.length > 0) {
             const nodeUuid = Node.getUuid(node)
-            const nodeStored = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+            const nodeStored = Record.getNodeByUuid(nodeUuid)(record)
             this.postClearNonApplicableValuesConfirm({
               msg,
               recordUuid,

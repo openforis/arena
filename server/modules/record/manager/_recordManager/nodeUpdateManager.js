@@ -38,7 +38,7 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
   }
   let recordUpdated = A.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
 
-  const parentNode = Record.getParentNode({ node })(recordUpdated)
+  const parentNode = Record.getParentNode(node)(recordUpdated)
 
   recordUpdated = Record.assocDateModified(new Date())(recordUpdated)
   return {
@@ -264,7 +264,7 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
     // Find sibling entities with same key values
     const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
     if (!A.isEmpty(nodeDeletedKeyValues)) {
-      const nodeParent = Record.getParentNode({ node })(record)
+      const nodeParent = Record.getParentNode(node)(record)
       const nodeSiblings = A.pipe(
         Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
         A.reject(ObjectUtils.isEqual(node))
@@ -296,7 +296,7 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
     // so the subtree can be found in memory instead of querying the DB - gather and hard-delete
     // files of any file-type nodes in this subtree BEFORE the cascading DELETE removes descendant
     // node rows silently
-    const rootNode = Record.getNodeByUuid({ uuid: nodeUuid })(record)
+    const rootNode = Record.getNodeByUuid(nodeUuid)(record)
     const files = Record.getNodesArray(record)
       .filter((n) => rootNode && (Node.getUuid(n) === nodeUuid || Node.isDescendantOf(rootNode)(n)))
       .filter((n) => _isFileValueNode(survey, n))
@@ -331,7 +331,7 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   // mark deleted dependent attributes
   nodeDependentUniqueAttributes = Object.values(nodeDependentUniqueAttributes).reduce((nodesAcc, nodeDependent) => {
     const nodeDependentUuid = Node.getUuid(nodeDependent)
-    const deleted = !Record.getNodeByUuid({ uuid: nodeDependentUuid })(recordUpdated)
+    const deleted = !Record.getNodeByUuid(nodeDependentUuid)(recordUpdated)
     const nodeDependentUpdated =
       Node.isDeleted(nodeDependent) !== deleted ? Node.assocDeleted(deleted)(nodeDependent) : nodeDependent
     return { ...nodesAcc, [nodeDependentUuid]: nodeDependentUpdated }
