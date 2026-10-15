@@ -31,6 +31,7 @@ import { createFakeResponse } from '../../unit/utils/fakeExpress'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
+import { collectRoutes } from '@test/utils/routeUtils'
 
 const replies = createNodesBatchReplyRegistry()
 
@@ -45,29 +46,6 @@ class TestRecordsUpdateThread extends RecordsUpdateThread {
       replies.resolveReply(msg.content)
     }
   }
-}
-
-type Route = { method: string; path: string; handlers: any[] }
-
-/**
- * Collects the routes registered by an API module.
- * @param {Function} init - The init function of the API module.
- * @returns {Route[]} The routes.
- */
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
 }
 
 /**
