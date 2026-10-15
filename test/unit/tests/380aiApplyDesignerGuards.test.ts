@@ -75,13 +75,22 @@ describe('Apply re-runs the designer guards (380)', () => {
 
     const published = publish(survey)
     expect(findConflicts(changeSet!, published)).toEqual([
-      { id: changeSet!.operations[0].id, reason: 'designerRule:refEditDisabled' },
+      {
+        id: changeSet!.operations[0].id,
+        reason: 'aiAssistant.issues.refEditDisabled',
+        params: { name: 'region' },
+      },
     ])
     expect(isCardStale({ cardState: { changeSet: changeSet! }, survey: published })).toBe(true)
 
     const { results, puts } = await applyWithFakeDeps(published, changeSet!)
     expect(results).toEqual([
-      { id: changeSet!.operations[0].id, status: 'conflict', message: 'designerRule:refEditDisabled' },
+      {
+        id: changeSet!.operations[0].id,
+        status: 'conflict',
+        message: 'aiAssistant.issues.refEditDisabled',
+        params: { name: 'region' },
+      },
     ])
     expect(puts).toEqual([])
   })
@@ -93,7 +102,11 @@ describe('Apply re-runs the designer guards (380)', () => {
     })
     const published = publish(survey)
     const { results, puts } = await applyWithFakeDeps(published, changeSet!)
-    expect(results[0]).toMatchObject({ status: 'conflict', message: 'designerRule:refEditDisabled' })
+    expect(results[0]).toMatchObject({
+      status: 'conflict',
+      message: 'aiAssistant.issues.refEditDisabled',
+      params: { name: 'species' },
+    })
     expect(puts).toEqual([])
 
     const template = { ...published, template: true }
@@ -110,7 +123,11 @@ describe('Apply re-runs the designer guards (380)', () => {
     expect(result.error).toBeUndefined()
     expect(changeSet).toBeDefined()
     const { results, puts } = await applyWithFakeDeps(publish(survey), changeSet!)
-    expect(results[0]).toMatchObject({ status: 'conflict', message: 'designerRule:multipleEditDisabled' })
+    expect(results[0]).toMatchObject({
+      status: 'conflict',
+      message: 'aiAssistant.issues.multipleEditDisabled',
+      params: { name: 'country' },
+    })
     expect(puts).toEqual([])
   })
 
@@ -129,7 +146,7 @@ describe('Apply re-runs the designer guards (380)', () => {
     const [refOp, multipleOp, taxonOp] = changeSet!.operations
     const { results, puts } = await applyWithFakeDeps(partlyPublished, changeSet!)
     expect(results).toEqual([
-      { id: refOp.id, status: 'conflict', message: 'designerRule:refEditDisabled' },
+      { id: refOp.id, status: 'conflict', message: 'aiAssistant.issues.refEditDisabled', params: { name: 'region' } },
       { id: multipleOp.id, status: 'applied' },
       { id: taxonOp.id, status: 'applied' },
     ])
@@ -146,7 +163,11 @@ describe('Apply re-runs the designer guards (380)', () => {
       NodeDef.assocLayout(NodeDefLayout.newLayout('0', NodeDefLayout.renderType.table))(nodeDef)
     )
     const { results, posts } = await applyWithFakeDeps(asTable, changeSet!)
-    expect(results[0]).toMatchObject({ status: 'conflict', message: 'designerRule:entityUnderTable' })
+    expect(results[0]).toMatchObject({
+      status: 'conflict',
+      message: 'aiAssistant.issues.entityUnderTable',
+      params: { name: 'cluster' },
+    })
     expect(posts).toEqual([])
   })
 
@@ -162,7 +183,15 @@ describe('Apply re-runs the designer guards (380)', () => {
     // the sync stale check does not run the validator; Apply does
     const { results, puts } = await applyWithFakeDeps(withoutRegion, changeSet!)
     expect(results[0].status).toBe('conflict')
-    expect(results[0].message).toBe('designerRule:validationErrors:nodeDefEdit.defaultValuesInvalid')
+    expect(results[0].message).toBe('aiAssistant.issues.nodeDefInvalid')
+    expect(results[0].params).toMatchObject({
+      name: 'country',
+      count: 2,
+      issues: [
+        { key: 'validationErrors:nodeDefEdit.defaultValuesInvalid' },
+        { key: 'expression.identifierNotFound', params: { name: 'region' } },
+      ],
+    })
     expect(puts).toEqual([])
   })
 

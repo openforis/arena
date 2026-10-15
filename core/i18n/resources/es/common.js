@@ -1665,6 +1665,9 @@ $t(common.appNameFull)
         '{{name}} no puede cambiar de categoría o taxonomía (está publicado, u otro atributo código depende de él).',
       refHasParentCode:
         '{{name}} depende de un atributo código padre, por lo que su categoría no se puede cambiar aquí. Cámbiala en el diseñador.',
+      nodeDefInvalid:
+        '{{name}} dejaría de ser válido con estos cambios, por lo que no se aplica ninguno de sus cambios.',
+      expressionInvalid: 'Expresión no válida: {{text}}',
     },
   },
 

@@ -114,7 +114,7 @@ export type OperationResult = {
 export type ChangeSetIssue = { operation: number; field: string; message: string }
 
 // prettier-ignore
-export type ConflictReason =
+export type PlainConflictReason =
   | 'nodeDefMissing'
   | 'valueChanged'
   | 'parentMissing'
@@ -122,10 +122,23 @@ export type ConflictReason =
   | 'alreadyExists'
   | 'refMissing'
   | 'itemMissing'
-  // the designer's rules no longer allow it: the key of the rule, e.g. "designerRule:refEditDisabled"
-  | `designerRule:${string}`
 
-export type OperationConflict = { id: string; reason: ConflictReason }
+// a full i18n key (e.g. "aiAssistant.issues.refEditDisabled", "validationErrors:nodeDefEdit.defaultValuesInvalid"):
+// the designer's rules no longer allow the operation; its interpolation values are in `params`
+export type I18nKeyConflictReason = `${string}.${string}` | `${string}:${string}`
+
+export type ConflictReason = PlainConflictReason | I18nKeyConflictReason
+
+/**
+ * Tells whether a conflict reason or result message is an i18n key to translate with its params. The plain reasons
+ * are single camelCase words; a key always has a "." or a ":".
+ * @param {string} reason - Conflict reason or result message.
+ * @returns {boolean} True for an i18n key.
+ */
+export const isI18nKeyReason = (reason: string): reason is I18nKeyConflictReason => /[.:]/.test(reason)
+
+// params: the interpolation values of an i18n key reason
+export type OperationConflict = { id: string; reason: ConflictReason; params?: Record<string, unknown> }
 
 export type ChangeSetPreview = { survey: any; validation: { valid: boolean; issues: ChangeSetIssue[] } }
 

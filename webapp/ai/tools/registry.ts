@@ -7,6 +7,8 @@ import { z } from 'zod'
 
 import { isHostingAllowed, type AiPolicy } from '@common/ai/policy'
 
+import * as Survey from '@core/survey/survey'
+
 import { ALL_TOOLS } from './allTools'
 import { limitToolResult, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
@@ -51,11 +53,24 @@ const isAbortError = (error: unknown): boolean => (error as { name?: string })?.
 
 /**
  * Returns the context of one tool call: the survey is read again, so a call after the user applied a card or edited
- * the survey does not work on the survey of the start of the turn.
+ * the survey does not work on the survey of the start of the turn. Another survey is refused: the turn's policy and
+ * engine were resolved for the first one, and the abort of the turn comes after React commits.
  * @param {AiToolContext} ctx - Turn context.
  * @returns {AiToolContext} The context of the call.
  */
-const toCallContext = (ctx: AiToolContext): AiToolContext => (ctx.getSurvey ? { ...ctx, survey: ctx.getSurvey() } : ctx)
+const toCallContext = (ctx: AiToolContext): AiToolContext => {
+  if (!ctx.getSurvey) return ctx
+  const survey = ctx.getSurvey()
+  const surveyId = (value: unknown) => (value ? Survey.getId(value) : null)
+  if (surveyId(survey) !== surveyId(ctx.survey)) {
+    throw new AiToolFailure(
+      'surveyChanged',
+      'The user switched to another survey while you were working. Do not retry: tell the user to ask again.',
+      { messageKey: 'appErrors:aiSurveyChanged' }
+    )
+  }
+  return { ...ctx, survey }
+}
 
 /**
  * Runs a tool safely: checks the input, turns errors into structured results the model can recover from, limits the

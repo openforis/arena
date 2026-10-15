@@ -63,7 +63,7 @@ export const findConflicts = (
   const createdUuids = new Set<string>()
   const conflicts: OperationConflict[] = []
   const ruleReasons = new Map(
-    findStructuralConflicts({ changeSet, survey, operationIds }).map(({ id, reason }) => [id, reason])
+    findStructuralConflicts({ changeSet, survey, operationIds }).map((conflict) => [conflict.id, conflict])
   )
   for (const op of changeSet.operations) {
     // record edits and category labels are checked by the server at Apply
@@ -71,8 +71,8 @@ export const findConflicts = (
     const reason =
       op.type === 'nodeDef.create' ? checkCreate(op, survey, createdUuids) : checkChange(op, survey, createdUuids)
     if (op.type === 'nodeDef.create' && reason === null) createdUuids.add(NodeDef.getUuid(op.nodeDef))
-    const conflict = reason ?? ruleReasons.get(op.id) ?? null
-    if (conflict && (!operationIds || operationIds.includes(op.id))) conflicts.push({ id: op.id, reason: conflict })
+    const conflict: OperationConflict | null = reason ? { id: op.id, reason } : (ruleReasons.get(op.id) ?? null)
+    if (conflict && (!operationIds || operationIds.includes(op.id))) conflicts.push(conflict)
   }
   return conflicts
 }
