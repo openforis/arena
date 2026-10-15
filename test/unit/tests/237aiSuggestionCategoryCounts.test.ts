@@ -1,6 +1,7 @@
 import type { MissingLabelsCounts } from '@common/ai/categoryItemLabels'
 
-import { EVENT_DETECTORS, type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   categoryItemTranslationsDetector,
   createCategoryItemTranslationsDetector,

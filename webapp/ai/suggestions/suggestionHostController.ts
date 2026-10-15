@@ -5,17 +5,9 @@
  */
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
-import {
-  EVENT_DETECTORS,
-  STATE_DETECTORS,
-  TARGET_RESOLVERS,
-  type DetectorContext,
-  type EventDetector,
-  type StateDetector,
-  type SuggestionEvent,
-  type TargetResolver,
-} from './detectors'
+import type { DetectorContext, EventDetector, StateDetector, SuggestionEvent, TargetResolver } from './detectors'
 import type { SuggestionGeneration } from './generation'
+import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from './registry'
 import type { SuggestionStore } from './suggestionStore'
 
 export const SUGGESTION_DEBOUNCE_MS = 1000

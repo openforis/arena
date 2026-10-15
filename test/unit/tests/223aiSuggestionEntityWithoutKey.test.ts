@@ -1,9 +1,9 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { getTargetNodeDefNames } from '@webapp/ai/suggestions/definitions/designTargetNames'
 import { entityWithoutKeyDefinition } from '@webapp/ai/suggestions/definitions/entityWithoutKey'
-import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import {
   entityWithoutKeyDetector,
   entityWithoutKeyResolver,

@@ -1,10 +1,10 @@
 import { getLanguageLabel } from '@core/app/languages'
 import * as Survey from '@core/survey/survey'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { categoryItemTranslationsDefinition } from '@webapp/ai/suggestions/definitions/categoryItemTranslations'
 import { getLanguageDisplayName } from '@webapp/ai/suggestions/definitions/missingTranslations'
-import { TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import {
   categoryItemTranslationsResolver,
   detectCategoryItemTranslations,

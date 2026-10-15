@@ -1,8 +1,8 @@
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { missingTranslationsDefinition } from '@webapp/ai/suggestions/definitions/missingTranslations'
-import { STATE_DETECTORS } from '@webapp/ai/suggestions/detectors'
+import { STATE_DETECTORS } from '@webapp/ai/suggestions/registry'
 import {
   detectMissingTranslations,
   missingTranslationsDetector,

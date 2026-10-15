@@ -1,8 +1,10 @@
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { getScriptedStep } from '@server/modules/ai/service/mockScripts'
-import { SUGGESTION_DEFINITIONS, type SuggestionDefinition } from '@webapp/ai/suggestions/definitions'
+import { type SuggestionDefinition } from '@webapp/ai/suggestions/definitions'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { moduleIntroDefinition } from '@webapp/ai/suggestions/definitions/moduleIntro'
-import { EVENT_DETECTORS, type DetectorContext } from '@webapp/ai/suggestions/detectors'
+import { type DetectorContext } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { buildModuleIntroSuggestion, moduleIntroDetector } from '@webapp/ai/suggestions/detectors/moduleIntro'
 import { buildModuleIntroPrompt } from '@webapp/ai/suggestions/prompts/moduleIntro'
 import {
@@ -163,7 +165,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(() => moduleIntroDefinition.card(intro('users'), describeContext)).toThrow()
   })
 
-  test('Do it builds a request from the visible targets, shown as the request text of its card; no request without a definition or when the prompt fails', () => {
+  test('Do it builds a request from the visible targets, shown as the request text of its card; no request without a target or when the prompt fails', () => {
     const visible = { ...designSuggestion, targets: [{ key: 'b:labels' }] }
     const params = { userUuid: 'u1', surveyId: 7, cycle: '0', describeContext, definitions, newId: () => 'r9' }
     expect(buildSuggestionRequest({ ...params, suggestion: visible })).toEqual({
@@ -177,7 +179,6 @@ describe('module introduction and suggestion actions (217)', () => {
       prompt: 'Translate b:labels',
       displayText: 'aiSuggestions:missingTranslations.request',
     })
-    expect(buildSuggestionRequest({ ...params, suggestion: visible, definitions: {} })).toBeNull()
     const failing = {
       ...designDefinition,
       prompt: () => {
@@ -185,8 +186,13 @@ describe('module introduction and suggestion actions (217)', () => {
       },
     }
     expect(
-      buildSuggestionRequest({ ...params, suggestion: visible, definitions: { missingTranslations: failing } })
+      buildSuggestionRequest({
+        ...params,
+        suggestion: visible,
+        definitions: { ...SUGGESTION_DEFINITIONS, missingTranslations: failing },
+      })
     ).toBeNull()
+    expect(buildSuggestionRequest({ ...params, suggestion: { ...visible, targets: [] } })).toBeNull()
   })
 
   test('the claim drops a request of another user, survey, cycle or area: claimed, so it is never sent', () => {

@@ -1,4 +1,5 @@
-import { EVENT_DETECTORS, type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { type DetectorContext, type SuggestionEvent } from '@webapp/ai/suggestions/detectors'
+import { EVENT_DETECTORS } from '@webapp/ai/suggestions/registry'
 import { getSuggestionExpiresAt, SUGGESTION_EXPIRY_DAYS } from '@webapp/ai/suggestions/detectors/suggestionExpiry'
 import {
   VALIDATION_MESSAGES_THRESHOLD,

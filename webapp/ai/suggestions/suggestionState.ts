@@ -302,7 +302,7 @@ const replacePending = (
  */
 const hasGrown = (kind: SuggestionKind, target: SuggestionTarget, seen: number | true): boolean => {
   const step = SUGGESTION_GROWTH_STEPS[kind]
-  return typeof seen === 'number' && step !== undefined && target.count !== undefined && target.count >= seen + step
+  return typeof seen === 'number' && step !== null && target.count !== undefined && target.count >= seen + step
 }
 
 /**

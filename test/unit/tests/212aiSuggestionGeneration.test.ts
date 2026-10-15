@@ -1,8 +1,8 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
-import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/definitions'
-import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/detectors'
+import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
+import { EVENT_DETECTORS, STATE_DETECTORS, TARGET_RESOLVERS } from '@webapp/ai/suggestions/registry'
 import { nextDesignerVisit, type DesignerVisit } from '@webapp/ai/suggestions/designerVisit'
 import {
   createGenerationTracker,
