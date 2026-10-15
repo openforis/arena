@@ -123,6 +123,12 @@ jobs:
         with:
           name: dist
           path: dist
+      - name: Generate the AI key encryption secret
+        # random per run: the e2e specs save provider API keys, which the server encrypts with this secret
+        run: |
+          secret="$(openssl rand -hex 32)"
+          echo "::add-mask::$secret"
+          echo "AI_USER_KEY_ENCRYPTION_SECRET=$secret" >> "$GITHUB_ENV"
       - name: Run server
         # the mock AI provider lets the e2e specs exercise the AI features without a real provider
         env:
@@ -133,6 +139,9 @@ jobs:
           # no daily budget for the mock provider: the specs make many calls with the same users
           AI_DEFAULT_DAILY_CALL_LIMIT: 0
           AI_DEFAULT_DAILY_CHAR_LIMIT: 0
+          # the specs make many calls with the same users: no per-minute limit, no cap of provider calls in flight
+          AI_RATE_LIMIT_PER_MINUTE: 0
+          AI_PROVIDER_MAX_IN_FLIGHT_PER_USER: 0
         run: |
           ln -s dist/server.js .
           exec pm2-runtime server.js &

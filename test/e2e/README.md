@@ -24,6 +24,8 @@ skipped unless `E2E_AI_MOCK=true`:
 ```bash
 AI_FEATURES_ENABLED=true AI_MOCK_PROVIDER_ENABLED=true AI_DEFAULT_PROVIDER=mock AI_DEFAULT_MODEL=mock \
   AI_DEFAULT_DAILY_CALL_LIMIT=0 AI_DEFAULT_DAILY_CHAR_LIMIT=0 \
+  AI_RATE_LIMIT_PER_MINUTE=0 AI_PROVIDER_MAX_IN_FLIGHT_PER_USER=0 \
+  AI_USER_KEY_ENCRYPTION_SECRET=$(openssl rand -hex 32) \
   PGDATABASE=arena_e2e node dist/server.js                                        # in another terminal
 E2E_AI_MOCK=true PGDATABASE=arena_e2e yarn test:e2e specs/aiFeatures.spec.ts
 ```
@@ -31,6 +33,16 @@ E2E_AI_MOCK=true PGDATABASE=arena_e2e yarn test:e2e specs/aiFeatures.spec.ts
 The mock provider is the instance default, so its calls count against the daily budget of each user (200 calls and
 2 million characters by default). The test users persist between runs, so keep the two `AI_DEFAULT_DAILY_*` variables
 at `0` (unlimited) or the specs fail with `aiDailyBudgetExceeded` after a number of runs.
+
+The other settings the AI specs need on the server:
+
+- `AI_USER_KEY_ENCRYPTION_SECRET`: any random 32-byte hex string (`openssl rand -hex 32`). Without it the server refuses
+  to save a provider API key (`aiEncryptionMissing`) and `specs/aiProviders.spec.ts` fails. CI generates a new one on
+  every run. Keys saved with another secret cannot be read, so use a fresh e2e DB or remove the providers of the test
+  users when you change it.
+- `AI_RATE_LIMIT_PER_MINUTE=0` and `AI_PROVIDER_MAX_IN_FLIGHT_PER_USER=0`: no per-minute limit and no cap of provider
+  calls in flight. The defaults (30 a minute, 3 in flight per user) would make the specs, which share one user per
+  worker, fail with `aiRateLimited`.
 
 `specs/aiLocalEngine.spec.ts` starts its own stub local AI server (`test/e2e/stubs/localModelServer.ts`) on a free `127.0.0.1` port; nothing else to start.
 
