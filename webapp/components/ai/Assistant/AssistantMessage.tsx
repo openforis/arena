@@ -107,25 +107,28 @@ const AnswerPart = ({
   return (
     <>
       <ToolRow interrupted={part.state === 'running' && !streaming} part={part} />
-      {cardState &&
-        (isRecordEditChangeSet(cardState.changeSet) ? (
-          <RecordEditCard
-            busy={api.busy || api.applying}
-            changeSet={cardState.changeSet}
-            onApply={(operationIds, onProgress) =>
-              api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)
-            }
-            results={cardState.results}
-          />
-        ) : (
-          <ChangeSetCard
-            busy={api.busy || api.applying}
-            cardState={cardState}
-            onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
-            onDiscard={() => api.discard(cardState.changeSet.id)}
-          />
-        ))}
-      {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
+      {/* the cards are controls, not text: they stay out of what the screen reader reads aloud as the answer streams */}
+      <div aria-live="off" className="ai-assistant-message__cards">
+        {cardState &&
+          (isRecordEditChangeSet(cardState.changeSet) ? (
+            <RecordEditCard
+              busy={api.busy || api.applying}
+              changeSet={cardState.changeSet}
+              onApply={(operationIds, onProgress) =>
+                api.applyRecordEdits(cardState.changeSet.id, operationIds, onProgress)
+              }
+              results={cardState.results}
+            />
+          ) : (
+            <ChangeSetCard
+              busy={api.busy || api.applying}
+              cardState={cardState}
+              onApply={(operationIds) => api.apply(cardState.changeSet.id, operationIds)}
+              onDiscard={() => api.discard(cardState.changeSet.id)}
+            />
+          ))}
+        {queryEntry !== undefined && <QueryCard entry={queryEntry} />}
+      </div>
     </>
   )
 }
@@ -225,7 +228,8 @@ export const AssistantMessageView = ({
   }
   return (
     <div
-      // only the newest answer is announced, not the whole history again with every token
+      // only the newest answer is announced, once it is complete (aria-busy), not with every token
+      aria-busy={message.status === 'streaming'}
       aria-live={isLast ? 'polite' : undefined}
       className="ai-assistant-message ai-assistant-message--assistant"
       data-status={message.status}
