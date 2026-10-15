@@ -104,6 +104,7 @@ Try to refresh the page.`,
   aiBaseUrlNotAllowed:
     "This base URL points to an internal address, which the Arena server doesn't call. For a model on your computer, use the Local AI server. For a server of your organisation, ask your administrator to add it to the organisation model servers.",
   aiProviderUnavailable: 'The AI provider could not be reached. Please try again later.',
+  aiSurveyChanged: 'The survey changed while the assistant was working. Ask again to use the current survey.',
   aiModelListFailed: 'Could not list models from the provider: {{message}}',
   aiProviderTestFailed: 'The provider test failed: {{message}}',
   aiProviderNotFound: 'This AI provider does not exist or is not yours. Choose another provider.',

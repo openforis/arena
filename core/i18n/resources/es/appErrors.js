@@ -134,6 +134,8 @@ export default {
   aiBaseUrlNotAllowed:
     'Esta URL base apunta a una dirección interna, a la que el servidor de Arena no llama. Para un modelo en su equipo, use el Servidor de IA local. Para un servidor de su organización, pida a su administrador que la añada a los servidores de modelos de la organización.',
   aiProviderUnavailable: 'No se pudo contactar con el proveedor de IA. Inténtelo de nuevo más tarde.',
+  aiSurveyChanged:
+    'La encuesta cambió mientras el asistente trabajaba. Vuelva a preguntar para usar la encuesta actual.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
   aiProviderTestFailed: 'La prueba del proveedor falló: {{message}}',
   aiProviderNotFound: 'Este proveedor de IA no existe o no es suyo. Elija otro proveedor.',

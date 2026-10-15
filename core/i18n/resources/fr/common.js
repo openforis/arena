@@ -1909,6 +1909,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
         '{{name}} ne peut pas changer de catégorie ou de taxonomie (il est publié, ou un autre attribut code en dépend).',
       refHasParentCode:
         "{{name}} dépend d'un attribut code parent : sa catégorie ne peut pas être changée ici. Changez-la dans le concepteur.",
+      nodeDefInvalid: "{{name}} ne serait plus valide avec ces changements : aucun de ses changements n'est appliqué.",
+      expressionInvalid: 'Expression invalide : {{text}}',
     },
   },
 

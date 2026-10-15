@@ -12,7 +12,7 @@ import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
 import { isRecordEditOperation } from './recordEdits/types'
 import { applyCategoryItemLabels, type CategoryLabelsApplierDeps } from './categoryItemLabels/applyCategoryItemLabels'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
-import type { ChangeSet, NodeDefOperation, OperationResult } from './types'
+import type { ChangeSet, NodeDefOperation, OperationConflict, OperationResult } from './types'
 
 export type ApplierDeps = {
   getSurvey: () => any
@@ -31,6 +31,14 @@ export type ApplierDeps = {
   // category item labels (suggestion 6); without them, category operations are skipped (notSupported)
   categoryLabels?: CategoryLabelsApplierDeps
 }
+
+// message: the reason (an i18n key when it has a "." or ":", see isI18nKeyReason); params: its interpolation values
+const toConflictResult = ({ id, reason, params }: OperationConflict): OperationResult => ({
+  id,
+  status: 'conflict',
+  message: reason,
+  ...(params ? { params } : {}),
+})
 
 type Group = { uuid: string; operations: NodeDefOperation[] }
 
@@ -167,8 +175,8 @@ export const applyChangeSet = async ({
   if (deps.isSurveyDirty()) return selected.map((op) => ({ id: op.id, status: 'skipped', message: 'surveyDirty' }))
 
   const results = new Map<string, OperationResult>()
-  for (const { id, reason } of findConflicts(changeSet, deps.getSurvey(), { operationIds })) {
-    results.set(id, { id, status: 'conflict', message: reason })
+  for (const conflict of findConflicts(changeSet, deps.getSurvey(), { operationIds })) {
+    results.set(conflict.id, toConflictResult(conflict))
   }
   const toApply = selected.filter((op) => !results.has(op.id))
   // the designer's validation of what would be saved, on the survey as it is now
@@ -177,7 +185,7 @@ export const applyChangeSet = async ({
     survey: deps.getSurvey(),
     operationIds: toApply.filter((op) => !isCategoryItemLabelOperation(op)).map((op) => op.id),
   })
-  for (const { id, reason } of invalid) results.set(id, { id, status: 'conflict', message: reason })
+  for (const conflict of invalid) results.set(conflict.id, toConflictResult(conflict))
   // two filters: the first narrows the type to the node definition operations
   const nodeDefOperations = toApply
     .filter((op) => !isCategoryItemLabelOperation(op))
