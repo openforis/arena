@@ -184,6 +184,7 @@ describe('single-provider compatibility removed (273)', () => {
         id: 'gateway',
         hostingClass: 'cloud',
         label: 'Mine',
+        labelKey: null,
         model: 'gpt-x',
         limits: { maxPromptChars: 1234, maxSteps: 10 },
         providerId: 'acct:a1',

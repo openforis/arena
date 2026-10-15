@@ -22,6 +22,8 @@ export type AiSelectedEngine = {
   id: AiEngineId
   hostingClass: AiHostingClass
   label: string
+  // i18n key of the label when it is the default name of its type (stored in English): the UI shows it translated
+  labelKey?: string | null
   model: string | null
   limits: AiEngineLimits
   contextWindow?: AiContextWindow

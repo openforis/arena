@@ -12,6 +12,8 @@ export type AiDataLocation = {
   provider: string | null
   model: string | null
   engine?: string | null
+  // i18n key of the provider or engine name when it is the default name of its type (stored in English)
+  nameKey?: string | null
 }
 
 export type AiFeatureAvailability = {
@@ -111,7 +113,10 @@ export const getAiDataLocationText = ({
   location: AiDataLocation
   t: (key: string, params?: object) => string
 }): string | null => {
-  const { hostingClass, provider, engine } = location
+  const { hostingClass, nameKey } = location
+  // a default name is shown in the language of the user
+  const provider = location.provider && nameKey ? t(nameKey) : location.provider
+  const engine = location.engine && nameKey ? t(nameKey) : location.engine
   if (hostingClass === 'cloud') {
     const providerName = provider ? (providerDisplayNames[provider] ?? provider) : null
     return providerName ? t('aiDataLocation.cloudWithProvider', { provider: providerName }) : t('aiDataLocation.cloud')

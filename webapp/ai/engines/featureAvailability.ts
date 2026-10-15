@@ -62,8 +62,20 @@ export const getAiUnavailableReasonActions = (reason: AiUnavailableReason): AiUn
  */
 export const toDataLocation = (engine: AiSelectedEngine): AiDataLocation =>
   engine.id === 'gateway'
-    ? { hostingClass: engine.hostingClass, provider: engine.label || null, model: engine.model, engine: null }
-    : { hostingClass: engine.hostingClass, provider: null, model: engine.model, engine: engine.label }
+    ? {
+        hostingClass: engine.hostingClass,
+        provider: engine.label || null,
+        model: engine.model,
+        engine: null,
+        nameKey: engine.labelKey ?? null,
+      }
+    : {
+        hostingClass: engine.hostingClass,
+        provider: null,
+        model: engine.model,
+        engine: engine.label,
+        nameKey: engine.labelKey ?? null,
+      }
 
 /**
  * Returns an availability without an engine.

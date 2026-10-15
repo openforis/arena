@@ -133,6 +133,7 @@ describe('getAiEngineFeatureAvailability', () => {
       provider: 'My OpenAI',
       model: 'gateway-model',
       engine: null,
+      nameKey: null,
     })
     expect(result.engine?.providerId).toBe('acct:a1')
   })
@@ -145,6 +146,8 @@ describe('getAiEngineFeatureAvailability', () => {
       provider: null,
       model: 'local-model',
       engine: 'Local server',
+      // the default name is shown translated
+      nameKey: 'userAiSettings:defaultName.local',
     })
   })
 
@@ -158,6 +161,7 @@ describe('getAiEngineFeatureAvailability', () => {
       provider: null,
       model: 'local-model',
       engine: 'Lab server',
+      nameKey: null,
     })
   })
 
@@ -205,6 +209,7 @@ describe('helpers', () => {
       provider: 'openai-compatible',
       model: 'm',
       engine: null,
+      nameKey: null,
     })
   })
 

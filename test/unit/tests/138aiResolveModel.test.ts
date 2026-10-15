@@ -149,6 +149,7 @@ describe('createModelResolver', () => {
       id: 'gateway',
       hostingClass: 'cloud',
       label: 'My OpenAI',
+      labelKey: null,
       model: 'gateway-model',
       limits: { maxPromptChars: 1000, maxSteps: 10 },
       providerId: 'acct:a1',
