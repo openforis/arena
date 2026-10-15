@@ -16,6 +16,7 @@ export const TooltipNew = (props) => {
     children,
     className,
     closeOnClick = false,
+    disableFocusListener = false,
     isTitleMarkdown,
     markdownClassName,
     maxWidth,
@@ -76,7 +77,7 @@ export const TooltipNew = (props) => {
     <Tooltip
       arrow
       classes={tooltipClass}
-      disableFocusListener={openSuppressed}
+      disableFocusListener={openSuppressed || disableFocusListener}
       disableHoverListener={openSuppressed}
       onClose={onClose}
       onOpen={onOpen}
@@ -101,6 +102,7 @@ TooltipNew.propTypes = {
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
   closeOnClick: PropTypes.bool,
+  disableFocusListener: PropTypes.bool,
   isTitleMarkdown: PropTypes.bool,
   markdownClassName: PropTypes.string,
   maxWidth: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),

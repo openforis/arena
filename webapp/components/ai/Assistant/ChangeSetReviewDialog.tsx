@@ -1,6 +1,6 @@
 import './ChangeSetReviewDialog.scss'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button, ButtonIconClose } from '@webapp/components/buttons'
@@ -242,6 +242,7 @@ export const ChangeSetReviewDialog = ({
   onClose: () => void
 }) => {
   const t = useI18nT({ unescapeHtml: true })
+  const titleId = useId()
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
@@ -288,9 +289,16 @@ export const ChangeSetReviewDialog = ({
 
   return (
     <Modal className="ai-change-review" onClose={onClose}>
-      <div className="ai-change-review__content" data-testid={TestId.aiAssistant.reviewDialog}>
+      {/* the shared Modal forwards no role: the dialog and its name are set here */}
+      <div
+        aria-labelledby={titleId}
+        aria-modal="true"
+        className="ai-change-review__content"
+        data-testid={TestId.aiAssistant.reviewDialog}
+        role="dialog"
+      >
         <div className="ai-change-review__header">
-          <h2>{t('aiAssistant.card.review.title')}</h2>
+          <h2 id={titleId}>{t('aiAssistant.card.review.title')}</h2>
           <span className="ai-change-review__summary">{cardState.changeSet.summary}</span>
           <ButtonIconClose onClick={onClose} testId={TestId.aiAssistant.reviewCloseBtn} />
         </div>
