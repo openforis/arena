@@ -7,6 +7,8 @@ import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import { getLocalConsentRevokeState } from './localConsentRevokeState'
+
 type Props = {
   // the saved URL of the provider being edited; null when adding one
   baseUrl: string | null
@@ -20,21 +22,22 @@ type Props = {
  */
 export const LocalConsentRevoke = ({ baseUrl }: Props) => {
   const t = useI18nT({ unescapeHtml: true })
-  const [revoked, setRevoked] = useState(false)
-  const [allowed, setAllowed] = useState(() =>
-    baseUrl ? hasLocalServerConsent({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), baseUrl }) : false
-  )
+  const [revokedBaseUrl, setRevokedBaseUrl] = useState<string | null>(null)
+  const state = getLocalConsentRevokeState({
+    baseUrl,
+    revokedBaseUrl,
+    hasConsent: (url) =>
+      hasLocalServerConsent({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), baseUrl: url }),
+  })
 
   const onRevoke = useCallback(() => {
     if (!baseUrl) return
     const done = revokeLocalServerConsent({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), baseUrl })
-    if (!done) return
-    setAllowed(false)
-    setRevoked(true)
+    if (done) setRevokedBaseUrl(baseUrl)
   }, [baseUrl])
 
-  if (revoked) return <div className="provider-dialog__hint">{t('aiEngine.consent.revoked')}</div>
-  if (!allowed) return null
+  if (state === 'revoked') return <div className="provider-dialog__hint">{t('aiEngine.consent.revoked')}</div>
+  if (state === 'none') return null
   return (
     <div className="provider-dialog__row">
       <span className="provider-dialog__hint">{t('aiEngine.consent.revokeHint')}</span>
