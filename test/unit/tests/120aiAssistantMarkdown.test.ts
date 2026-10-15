@@ -42,8 +42,8 @@ describe('renderAssistantMarkdown', () => {
 
   test('a Markdown image loads nothing: it becomes a link', () => {
     expect(outputs[0]).not.toMatch(/<img/i)
-    expect(outputs[0]).toContain('<a href="https://evil/?q=schema"')
-    expect(outputs[0]).toContain('>x</a>')
+    expect(outputs[0]).toContain('<a href="https://evil/"')
+    expect(outputs[0]).toContain('>x (evil)</a>')
   })
 
   test('raw remote-loading elements and attributes are dropped', () => {
@@ -53,7 +53,8 @@ describe('renderAssistantMarkdown', () => {
   })
 
   test('links open in a new tab with noopener noreferrer; scripts and javascript: urls are removed', () => {
-    expect(outputs[2]).toContain('<a href="https://example.org" target="_blank" rel="noopener noreferrer">a</a>')
+    expect(outputs[2]).toContain('<a href="https://example.org/" target="_blank" rel="noopener noreferrer"')
+    expect(outputs[2]).toContain('>a (example.org)</a>')
     expect(outputs[2]).not.toMatch(/javascript:|<script/i)
   })
 
