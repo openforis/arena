@@ -31,7 +31,8 @@ export type AiGatewayCall = Pick<
 
 export type AiGatewayRequest = {
   surveyId?: number
-  // provider to call (common/ai/providerIds.ts); absent only from clients loaded before the provider list existed
+  // provider to call (common/ai/providerIds.ts); optional in the type only: the server refuses a request
+  // without it (400 aiCallInvalid, reason 'providerId')
   providerId?: string
   feature: string
   dataClass: 'schema' | 'data'
