@@ -114,6 +114,11 @@ const ApiKeyField = (props: ApiKeyFieldProps) => {
           onBlur={props.onBlur}
           placeholder={placeholderKey}
           disabled={!encryptionConfigured}
+          // the key is not a login: keep password managers from offering to save or generate it
+          data-1p-ignore="true"
+          data-lpignore="true"
+          data-bwignore="true"
+          data-form-type="other"
         />
         {!encryptionConfigured && (
           <div className="provider-dialog__hint provider-dialog__hint--warning">
@@ -131,27 +136,23 @@ const ApiKeyField = (props: ApiKeyFieldProps) => {
             {t('userAiSettings:apiKeyUnreadable')}
           </div>
         )}
-        {keyRemoved && (
-          <div className="provider-dialog__hint provider-dialog__hint--warning" role="status">
-            {t('userAiSettings:dialog.apiKeyRemoved')}
-          </div>
-        )}
-        {canRemoveKey && (
+        {/* always rendered, so a screen reader announces the text when it appears */}
+        <div role="status" className="provider-dialog__status">
+          {keyRemoved && (
+            <div className="provider-dialog__hint provider-dialog__hint--warning">
+              {t('userAiSettings:dialog.apiKeyRemoved')}
+            </div>
+          )}
+        </div>
+        {/* one button for both states, so it keeps the focus */}
+        {(canRemoveKey || keyRemoved) && (
           <Button
             variant="text"
             size="small"
-            label="userAiSettings:dialog.removeKey"
-            onClick={props.onRemoveKey}
-            testId={TestId.ai.providerRemoveKey}
-          />
-        )}
-        {keyRemoved && (
-          <Button
-            variant="text"
-            size="small"
-            label="userAiSettings:dialog.keepKey"
-            onClick={props.onKeepKey}
-            testId={TestId.ai.providerKeepKey}
+            label={keyRemoved ? 'userAiSettings:dialog.keepKey' : 'userAiSettings:dialog.removeKey'}
+            aria-pressed={keyRemoved}
+            onClick={keyRemoved ? props.onKeepKey : props.onRemoveKey}
+            testId={keyRemoved ? TestId.ai.providerKeepKey : TestId.ai.providerRemoveKey}
           />
         )}
       </div>

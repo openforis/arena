@@ -3,10 +3,25 @@ import './PasswordInput.scss'
 import React, { useState } from 'react'
 import classNames from 'classnames'
 
+import { useI18n } from '@webapp/store/system'
+
 import { Button } from '../../buttons'
 import { SimpleTextInput, type SimpleTextInputProps } from '../SimpleTextInput'
 
-export type PasswordInputProps = Omit<SimpleTextInputProps, 'type' | 'endAdornment'>
+export type PasswordInputProps = Omit<SimpleTextInputProps, 'type' | 'endAdornment' | 'inputAttributes'> & {
+  // data-* attributes go to the <input> (for example the hints that keep password managers away)
+  [attribute: `data-${string}`]: string | undefined
+}
+
+/**
+ * Returns the data-* attributes of the props.
+ * @param {PasswordInputProps} props - The props.
+ * @returns {Record<string, string>} The attributes with a value.
+ */
+const getDataAttributes = (props: PasswordInputProps): Record<string, string> =>
+  Object.fromEntries(
+    Object.entries(props).filter(([key, value]) => key.startsWith('data-') && typeof value === 'string')
+  ) as Record<string, string>
 
 /**
  * Text input of a password, with a button that shows or hides it.
@@ -15,6 +30,7 @@ export type PasswordInputProps = Omit<SimpleTextInputProps, 'type' | 'endAdornme
  */
 export const PasswordInput = (props: PasswordInputProps) => {
   const { className } = props
+  const i18n = useI18n()
 
   const [passwordShown, setPasswordShown] = useState(false)
 
@@ -29,10 +45,17 @@ export const PasswordInput = (props: PasswordInputProps) => {
   return (
     <SimpleTextInput
       {...props}
+      inputAttributes={getDataAttributes(props)}
       className={classNames('input-password', className)}
       type={passwordShown ? 'text' : 'password'}
       endAdornment={
-        <Button onClick={onClickPasswordVisibility} onMouseDown={onMouseDownPasswordVisibility} variant="text">
+        <Button
+          aria-label={i18n.t(passwordShown ? 'common.hideValue' : 'common.showValue')}
+          aria-pressed={passwordShown}
+          onClick={onClickPasswordVisibility}
+          onMouseDown={onMouseDownPasswordVisibility}
+          variant="text"
+        >
           <span className={classNames('icon', iconClassName)} />
         </Button>
       }

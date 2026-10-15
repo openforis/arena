@@ -14,6 +14,8 @@ export type SimpleTextInputProps = {
   disabled?: boolean
   endAdornment?: React.ReactNode
   id?: string
+  // attributes of the <input> element, such as data-* hints for password managers
+  inputAttributes?: Record<string, string>
   label?: string
   maxLength?: number
   name?: string
@@ -40,6 +42,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, SimpleTextInputProps>(
     disabled,
     endAdornment,
     id,
+    inputAttributes,
     label: labelProp,
     maxLength,
     name,
@@ -84,7 +87,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, SimpleTextInputProps>(
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      slotProps={{ input: { startAdornment, endAdornment }, htmlInput: { 'data-testid': testId } }}
+      slotProps={{ input: { startAdornment, endAdornment }, htmlInput: { ...inputAttributes, 'data-testid': testId } }}
       inputRef={ref}
       margin="none"
       multiline={multiline}

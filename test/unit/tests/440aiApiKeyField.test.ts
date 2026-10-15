@@ -1,3 +1,6 @@
+import fs from 'fs'
+import path from 'path'
+
 import { getInputTitle } from '@webapp/components/form/Input/inputTitle'
 import { translatePlaceholder } from '@webapp/components/form/translatePlaceholder'
 import { getApiKeyFieldState } from '@webapp/components/ai/UserAiSettingsPanel/ProviderDialog/apiKeyField'
@@ -11,6 +14,8 @@ import ja from '@core/i18n/resources/ja/userAiSettings'
 import mn from '@core/i18n/resources/mn/userAiSettings'
 import pt from '@core/i18n/resources/pt/userAiSettings'
 import ru from '@core/i18n/resources/ru/userAiSettings'
+
+const readSource = (file: string): string => fs.readFileSync(path.join(__dirname, '../../../webapp', file), 'utf8')
 
 const settingsByLang: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
 
@@ -118,6 +123,35 @@ describe('API key field (440)', () => {
       expect(text).not.toMatch(/[•*]/)
       // the placeholder goes through i18n.t, which reads ":" and "." as separators of a key
       expect(text).not.toMatch(/[:.]/)
+    })
+  })
+
+  describe('the key field markup (static scan: there is no React renderer in the unit tests)', () => {
+    const fields = readSource('components/ai/UserAiSettingsPanel/ProviderDialog/AccountProviderFields.tsx')
+    const passwordInput = readSource('components/form/PasswordInput/PasswordInput.tsx')
+
+    test('is a PasswordInput that browsers and password managers leave alone', () => {
+      const field = fields.slice(
+        fields.indexOf('<PasswordInput'),
+        fields.indexOf('/>', fields.indexOf('<PasswordInput'))
+      )
+      expect(field).toContain('autoComplete="new-password"')
+      for (const hint of ['data-1p-ignore', 'data-lpignore="true"', 'data-bwignore', 'data-form-type="other"']) {
+        expect(field).toContain(hint)
+      }
+    })
+
+    test('the PasswordInput passes data-* to the input and names its show / hide button', () => {
+      expect(passwordInput).toContain('inputAttributes={getDataAttributes(props)}')
+      expect(passwordInput).toMatch(/aria-pressed=\{passwordShown\}/)
+      expect(passwordInput).toContain("'common.hideValue'")
+      expect(passwordInput).toContain("'common.showValue'")
+    })
+
+    test('Remove key and Keep key are one toggle button, and the removed hint sits in an always rendered status', () => {
+      expect(fields.match(/userAiSettings:dialog\.removeKey/g)).toHaveLength(1)
+      expect(fields).toMatch(/aria-pressed=\{keyRemoved\}/)
+      expect(fields).toMatch(/<div role="status" className="provider-dialog__status">\s*\{keyRemoved/)
     })
   })
 })

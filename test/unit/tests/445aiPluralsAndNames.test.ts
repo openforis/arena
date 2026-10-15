@@ -97,6 +97,17 @@ describe('texts added by the review fixes (445)', () => {
     expect(common[lang].common.fetchError).toContain('{{message}}')
   })
 
+  test.each(LANGS)('%s names the show / hide button of the password input', (lang) => {
+    expect(typeof common[lang].common.showValue).toBe('string')
+    expect(typeof common[lang].common.hideValue).toBe('string')
+    expect(common[lang].common.showValue).not.toBe(common[lang].common.hideValue)
+  })
+
+  test.each(['ru', 'mn'])('%s show / hide texts are Cyrillic', (lang) => {
+    expect(common[lang].common.showValue).toMatch(CYRILLIC)
+    expect(common[lang].common.hideValue).toMatch(CYRILLIC)
+  })
+
   test.each(LANGS)('%s has the new settings texts', (lang) => {
     const s = settings[lang]
     for (const text of [s.unknownError, s.dialog.removeKey, s.dialog.keepKey, s.dialog.apiKeyRemoved]) {
