@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 8 (records imported, Analysis area).
+ * Card and prompt of the data imported suggestion (records imported, Analysis area).
  */
 import { DATA_IMPORTED_PROMPT } from '../prompts/dataImported'
 import type { AssistantSuggestion } from '../types'

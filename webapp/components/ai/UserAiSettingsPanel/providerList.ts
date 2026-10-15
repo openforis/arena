@@ -1,5 +1,5 @@
 /**
- * Rows of the provider list (spec section 4): where tag, status pill, Default marker and ⋯ menu actions. Pure.
+ * Rows of the provider list: where tag, status pill, Default marker and ⋯ menu actions. Pure.
  */
 import type { LocalProvider } from '@webapp/ai/engines/localProviders'
 import type { AiProviderEntry, AiProviderStatus } from '@webapp/ai/engines/types'
@@ -97,7 +97,7 @@ export const getProviderMenuActions = ({
   isDefault: boolean
 }): ProviderMenuAction[] => {
   const makeDefault: ProviderMenuAction[] = isDefault ? [] : ['makeDefault']
-  // Arena default cannot be tested, edited or removed (spec section 1)
+  // Arena default cannot be tested, edited or removed
   if (entry.kind === 'arenaDefault') return makeDefault
   return [...makeDefault, 'test', 'edit', 'remove']
 }
@@ -129,7 +129,7 @@ export const buildProviderRows = ({
   })
 
 /**
- * Returns true when the default has no row: a local provider saved in another browser (spec section 9).
+ * Returns true when the default has no row: a local provider saved in another browser.
  * @param {object} params - Parameters.
  * @param {AiProviderEntry[]} params.providers - Provider entries (empty before the capabilities are loaded).
  * @param {string} params.defaultProviderId - Default provider id.

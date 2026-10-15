@@ -92,7 +92,7 @@ const openArea = async (page: Page, label: string): Promise<void> => {
 }
 
 /**
- * Reads what the suggestion store holds for one suggestion of a survey (spec §3.2).
+ * Reads what the suggestion store holds for one suggestion of a survey.
  * @param {Page} page - The page.
  * @param {string} userUuid - User uuid.
  * @param {number} surveyId - Survey id.

@@ -1,5 +1,5 @@
 /**
- * Proposes category item labels (suggestion 6). The model refers to items by the refs categoryItems_listMissingLabels
+ * Proposes category item labels. The model refers to items by the refs categoryItems_listMissingLabels
  * gave it in this conversation; the label read then is the expected text the server checks on Apply.
  */
 import { z } from 'zod'

@@ -56,7 +56,7 @@ export type AiInstanceCapability = {
 
 export type AiProviderStatus = 'ready' | 'notTested' | 'notAvailable' | 'notSetUp'
 
-// one provider the user can pick (spec section 1); hostingClass null: not known (not set up, invalid URL)
+// one provider the user can pick; hostingClass null: not known (not set up, invalid URL)
 export type AiProviderEntry = {
   id: string
   kind: AiProviderKind

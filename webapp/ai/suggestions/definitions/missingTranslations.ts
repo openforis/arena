@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 1 (missing translations).
+ * Card and prompt of the missing translations suggestion (missing translations).
  */
 import { getLanguageLabel } from '@core/app/languages'
 

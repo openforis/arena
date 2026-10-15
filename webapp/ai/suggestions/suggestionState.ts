@@ -1,5 +1,5 @@
 /**
- * Suggestions of one user as stored under `arena.ai.suggestions.<userUuid>`, and the rules of the spec (§3.2) as pure
+ * Suggestions of one user as stored under `arena.ai.suggestions.<userUuid>`, and the rules of the suggestions as pure
  * functions: dismissal by target, growth steps, in progress, visibility, pruning and bounds. The code is split by
  * concern in ./state; the store wraps these functions with localStorage.
  */

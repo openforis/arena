@@ -1,5 +1,5 @@
 /**
- * survey_listMissingTexts: the work list of spec §3.6. Fixed hierarchy order, cursor = slot index (so texts that
+ * survey_listMissingTexts: the work list of the missing texts. Fixed hierarchy order, cursor = slot index (so texts that
  * become pending between two calls never shift the next page), pages cut at 50 items or at the JSON budget.
  */
 import { z } from 'zod'

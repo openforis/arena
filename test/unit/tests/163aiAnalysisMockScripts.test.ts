@@ -115,7 +115,7 @@ describe('analysis mock scripts', () => {
     expect(last.text).toMatch(/Open in Explorer/)
   })
 
-  test("D1's runner plays the scripts and answers from the last tool output", () => {
+  test('the runner plays the scripts and answers from the last tool output', () => {
     const systemMessage = { role: 'system', content: `${assistantMarkers.analysis}\nRules.` }
     const userMessage = { role: 'user', content: [{ type: 'text', text: e2eMessages.run }] }
     const call = (id: string, toolName: string) => ({

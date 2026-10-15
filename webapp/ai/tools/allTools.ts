@@ -1,6 +1,5 @@
 /**
  * Every assistant tool. getTools filters this list by area, permission and policy.
- * D2 / D3 append their own lists here.
  */
 import { analysisTools } from './analysis'
 import { cleaningTools } from './cleaning'

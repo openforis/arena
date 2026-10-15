@@ -1,5 +1,5 @@
 /**
- * Shapes shared by the category item labels endpoints and the assistant (suggestion 6).
+ * Shapes shared by the category item labels endpoints and the assistant (category item labels).
  */
 
 // the most items one page request may ask for

@@ -147,7 +147,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(moduleIntroDefinition.acceptMode).toBe('remove')
   })
 
-  test('card key and English prompt of each module (spec texts); an unknown module has no card', () => {
+  test('card key and English prompt of each module; an unknown module has no card', () => {
     const intro = (module: string) => ({ ...buildModuleIntroSuggestion('designer', NOW), targets: [{ key: module }] })
     expect(moduleIntroDefinition.card(intro('designer'), describeContext)).toEqual({
       key: 'moduleIntro.card.designer',

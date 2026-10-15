@@ -12,11 +12,11 @@ import { type LocalModelServerStub, startLocalModelServer } from '../stubs/local
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 /**
- * Writes C's stub server as the only local provider before any page script runs (on every navigation of this page),
+ * Writes the stub server as the only local provider before any page script runs (on every navigation of this page),
  * and makes it the default provider.
  * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
- * @param {LocalModelServerStub} stub - C's stub server.
+ * @param {LocalModelServerStub} stub - The stub server.
  * @returns {Promise<void>} Resolves when registered and saved.
  */
 const seedLocalProvider = async (page: Page, api: ArenaApi, stub: LocalModelServerStub): Promise<void> => {

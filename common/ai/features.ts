@@ -20,7 +20,7 @@ export const AiFeatureCategory = {
 
 export type AiFeatureCategory = (typeof AiFeatureCategory)[keyof typeof AiFeatureCategory]
 
-// What the prompt contains: survey structure only, or collected data / user activity (enforced from step B).
+// What the prompt contains: survey structure only, or collected data / user activity (enforced by the survey AI policy).
 export const AiDataClass = {
   schema: 'schema',
   data: 'data',

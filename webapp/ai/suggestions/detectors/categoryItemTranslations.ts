@@ -1,6 +1,6 @@
 /**
- * Suggestion 6 (category item labels missing in a survey language). The counts come from Arena's server; Task 10's
- * event detector fetches them, this file turns them into suggestions.
+ * Category item labels missing in a survey language. The counts come from Arena's server; the event
+ * detector fetches them, this file turns them into suggestions.
  */
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -63,7 +63,7 @@ export const detectCategoryItemTranslations = (
   })
 }
 
-// a deleted category drops its target; the counts are refreshed by the events of Task 10
+// a deleted category drops its target; the counts are refreshed by the category events
 export const categoryItemTranslationsResolver: TargetResolver = {
   kind: CATEGORY_ITEM_TRANSLATIONS_KIND,
   isResolved: (targetKey, survey) => !Survey.getCategoryByUuid(targetKey)(survey),
@@ -88,7 +88,7 @@ const getThrottleKey = (ctx: DetectorContext, surveyId: number, survey: any): st
 }
 
 /**
- * Creates the event detector of suggestion 6 (the fetcher and the throttle are injected in tests).
+ * Creates the event detector of the category item translations suggestion (the fetcher and the throttle are injected in tests).
  * @param {object} [deps] - Dependencies.
  * @param {FetchMissingLabelsCounts} [deps.fetchCounts] - Counts fetcher.
  * @param {number} [deps.throttleMs] - Throttle of the frequent triggers.

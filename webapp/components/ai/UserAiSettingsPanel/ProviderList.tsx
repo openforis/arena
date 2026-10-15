@@ -99,7 +99,7 @@ type Props = {
 }
 
 /**
- * Providers block of the panel (spec section 4): "Add provider", one row per provider (Arena default last), the
+ * Providers block of the panel: "Add provider", one row per provider (Arena default last), the
  * footer hint, and the add / edit dialog.
  * @param {Props} props - Props.
  * @returns {React.ReactElement} The block.

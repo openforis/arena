@@ -28,7 +28,7 @@ export const isAnalysisRoute = (pathname: string): boolean => {
  * @param {boolean} params.canUseExplorer - Whether the user can use the Explorer.
  * @param {Availability} params.availability - Feature availability for the schema class.
  * @param {boolean} [params.canSwitchProvider] - A provider row can be picked in the chat.
- * @returns {AssistantAreaStatus} The tab state, in D1's shape (with the engine availability behind the reasons).
+ * @returns {AssistantAreaStatus} The tab state, (with the engine availability behind the reasons).
  */
 export const getAnalysisAreaStatus = ({
   surveyOpen,

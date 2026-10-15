@@ -170,7 +170,7 @@ export class ArenaApi {
   }
 
   /**
-   * Returns the uuid of the logged-in test user (the key of C's localStorage settings).
+   * Returns the uuid of the logged-in test user (the key of the localStorage settings).
    * @returns {Promise<string>} - The user uuid.
    */
   async getCurrentUserUuid(): Promise<string> {

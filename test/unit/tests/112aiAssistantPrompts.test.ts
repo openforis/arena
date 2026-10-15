@@ -67,7 +67,7 @@ describe('assistant prompts', () => {
     expect(buildAssistantHelpPrompt({ uiLang: 'en', outline: null, viewDescription: null })).not.toContain('outline (')
   })
 
-  test("A's canned mock answers never match the assistant prompts", () => {
+  test('the canned mock answers never match the assistant prompts', () => {
     expect(mockAnswerFor(asPrompt(buildAssistantDesignPrompt(designParams)))).toBe('MOCK answer.')
     expect(
       mockAnswerFor(asPrompt(buildAssistantHelpPrompt({ uiLang: 'en', outline: null, viewDescription: null })))

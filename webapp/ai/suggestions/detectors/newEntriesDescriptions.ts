@@ -1,5 +1,5 @@
 /**
- * Suggestion 2: entries added during a designer visit that have no description in any language.
+ * New entries descriptions suggestion: entries added during a designer visit that have no description in any language.
  */
 import * as NodeDef from '@core/survey/nodeDef'
 

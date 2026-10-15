@@ -1,5 +1,5 @@
 /**
- * Suggestion 3: on Publish, the entries whose validation has errors (publishing would fail). Warnings do not block
+ * Publish errors suggestion: on Publish, the entries whose validation has errors (publishing would fail). Warnings do not block
  * publishing and are left out.
  */
 import * as NodeDef from '@core/survey/nodeDef'

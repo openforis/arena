@@ -187,7 +187,7 @@ describe('cleaning prompt', () => {
     }
     expect(prompt).toContain('200')
     expect(prompt).toContain('"fr"')
-    // phrases the mock provider's canned answers match must not appear (D1 dev. 8)
+    // phrases the mock provider's canned answers match must not appear
     for (const phrase of ['Data Explorer', '<expression>', 'translate survey labels', 'activity log']) {
       expect(prompt).not.toContain(phrase)
     }
@@ -215,7 +215,7 @@ describe('cleaning tools', () => {
     }
   })
 
-  test('the shared D1 and D2 tools are offered in the cleaning area too', () => {
+  test('the shared design and analysis tools are offered in the cleaning area too', () => {
     const shared = [
       'survey_getOverview',
       'nodeDef_get',
@@ -226,7 +226,7 @@ describe('cleaning tools', () => {
       'query_count',
       'query_run',
     ]
-    // ALL_TOOLS already contains D2's analysisTools (D2 Task 10); the spread is harmless
+    // ALL_TOOLS already contains the analysisTools; the spread is harmless
     const allTools = [...ALL_TOOLS, ...analysisTools]
     for (const name of shared) {
       const tool = allTools.find((candidate) => candidate.name === name)

@@ -28,7 +28,7 @@ export type ApplierDeps = {
   onNodeDefCreated: (nodeDef: any) => void
   onNodeDefUpdated: (nodeDef: any, prevNodeDef: any) => void
   onNodeDefSaved: (params: { nodeDef: any; nodeDefParent: any }) => void
-  // category item labels (suggestion 6); without them, category operations are skipped (notSupported)
+  // category item labels (category item labels); without them, category operations are skipped (notSupported)
   categoryLabels?: CategoryLabelsApplierDeps
 }
 

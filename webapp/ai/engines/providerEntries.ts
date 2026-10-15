@@ -1,5 +1,5 @@
 /**
- * The providers a user can pick, one entry each (spec section 1): account providers (GET /api/ai/settings), local
+ * The providers a user can pick, one entry each: account providers (GET /api/ai/settings), local
  * providers (this browser, with their probe) and Arena default (the admin default), each with a status.
  * Pure, no AI SDK import.
  */

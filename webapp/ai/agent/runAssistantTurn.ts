@@ -219,7 +219,7 @@ export const runAssistantTurn = async ({
   const outcome: StreamOutcome = { aborted: false, error: null, stepTokens: null, sent: null }
   try {
     const feature = assistantAreaFeatures[area]
-    // Help sends no survey content and no surveyId (deviation 9)
+    // Help sends no survey content and no surveyId
     const surveyId = area !== 'help' && ctx.survey ? Survey.getId(ctx.survey) : undefined
     const turn = await resolveAssistantEngine({
       model,
@@ -233,7 +233,7 @@ export const runAssistantTurn = async ({
       // the provider picked in the chat (the default when absent or removed)
       providerId: conversation.providerId,
       signal,
-      // D2: declare data when the selected engine is offered a data tool (wraps the injected resolver)
+      // declare data when the selected engine is offered a data tool (wraps the injected resolver)
       resolve: (params) =>
         resolveAssistantTurnModel({
           params,

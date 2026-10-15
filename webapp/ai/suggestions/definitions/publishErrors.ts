@@ -1,5 +1,5 @@
 /**
- * Card and prompt of suggestion 3 (errors before publishing).
+ * Card and prompt of the publish errors suggestion (errors before publishing).
  */
 import { buildPublishErrorsPrompt } from '../prompts/designPrompts'
 import { getTargetNodeDefNames } from './designTargetNames'
