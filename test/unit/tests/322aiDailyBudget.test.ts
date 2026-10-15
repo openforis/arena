@@ -2,7 +2,7 @@ import { MockLanguageModelV4 } from 'ai/test'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import { getCallSize, sanitizeCall } from '@server/modules/ai/service/gateway/callValidation'
-import { createDailyBudgetCharger, getUtcDay } from '@server/modules/ai/service/gateway/dailyBudget'
+import { createDailyBudgetCharger } from '@server/modules/ai/service/gateway/dailyBudget'
 import { createDefaultModelGatewayDeps, handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import { isRunStoppingError } from '@webapp/ai/workflows/batchRun'
@@ -24,7 +24,6 @@ describe('daily budget of the Arena default provider: the charger (322)', () => 
   const createCharger = ({
     limits = { calls: 200, chars: 2000000 },
     answer = { day: '2026-10-15', calls: 1, chars: 11 } as unknown,
-    now = new Date('2026-10-15T10:00:00Z'),
   } = {}) => {
     const charges: any[] = []
     const charge = createDailyBudgetCharger({
@@ -35,21 +34,14 @@ describe('daily budget of the Arena default provider: the charger (322)', () => 
           return answer as any
         },
       },
-      now: () => now,
     })
     return { charge, charges }
   }
 
-  test('the day is the UTC day, so it changes at midnight UTC whatever the server time zone', () => {
-    expect(getUtcDay(new Date('2026-10-15T23:59:59.999Z'))).toBe('2026-10-15')
-    expect(getUtcDay(new Date('2026-10-16T00:00:00.000Z'))).toBe('2026-10-16')
-    expect(getUtcDay(new Date('2026-10-16T01:30:00+05:00'))).toBe('2026-10-15')
-  })
-
-  test('a call is charged to the user, for the UTC day, with the limits', async () => {
-    const { charge, charges } = createCharger({ now: new Date('2026-10-15T23:59:59Z') })
+  test('a call is charged to the user with the limits; the day is left to the database clock', async () => {
+    const { charge, charges } = createCharger()
     await charge({ userUuid, chars: 11 })
-    expect(charges).toEqual([{ userUuid, day: '2026-10-15', chars: 11, callLimit: 200, charLimit: 2000000 }])
+    expect(charges).toEqual([{ userUuid, chars: 11, callLimit: 200, charLimit: 2000000 }])
   })
 
   test('a call over the budget (no row updated) is refused with a 429 aiDailyBudgetExceeded', async () => {
