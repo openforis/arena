@@ -1,8 +1,14 @@
+import { ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { UnauthorizedError } from '@openforis/arena-server'
+
 import * as AuthGroup from '@core/auth/authGroup'
 
 import { createSurveyAiPolicyRoutes } from '@server/modules/ai/api/surveyAiPolicyApi'
 import { getSurveyAiPolicy, updateSurveyAiPolicy } from '@server/modules/ai/service/surveyAiPolicyService'
-import { createRequireSurveyAiPolicyEditPermission } from '@server/modules/auth/authApiMiddleware'
+import {
+  createRequireSurveyAiPolicyEditPermission,
+  requireSurveyViewPermission,
+} from '@server/modules/auth/authApiMiddleware'
 import * as Response from '@server/utils/response'
 
 import { createFakeRequest, createFakeResponse } from '@test/unit/utils/fakeExpress'
@@ -11,6 +17,7 @@ const surveyUuid = 'survey-1'
 const surveyInfo = { uuid: surveyUuid }
 const groupUser = (name: string) => ({ uuid: `u-${name}`, name, authGroups: [{ name, surveyUuid }] }) as any
 const users = {
+  outsider: { uuid: 'u-outsider', name: 'outsider', authGroups: [] } as any,
   viewer: groupUser(AuthGroup.groupNames.dataEditor),
   editor: groupUser(AuthGroup.groupNames.surveyEditor),
   surveyAdmin: groupUser(AuthGroup.groupNames.surveyAdmin),
@@ -32,8 +39,8 @@ const createRoutes = ({ ceilings = { schema: 'cloud', data: 'cloud' } as any } =
   }
   const fetchSurveyInfo = async () => surveyInfo
   const routes = createSurveyAiPolicyRoutes({
-    // survey view permission belongs to arena-server: every user below may view the survey
-    requireView: (_req: any, _res: any, next: any) => next(),
+    // the real view permission: it reads the survey through the registered survey service
+    requireView: requireSurveyViewPermission,
     requireEdit: createRequireSurveyAiPolicyEditPermission({ fetchSurveyInfo }),
     getPolicy: (surveyId: number) => getSurveyAiPolicy(surveyId, serviceDeps),
     updatePolicy: (params: any) => updateSurveyAiPolicy(params, serviceDeps),
@@ -58,7 +65,9 @@ const runChain = async (
       outcome.error = error
     })
     if (outcome.error) {
-      Response.sendErr(res, outcome.error)
+      // the API error handler of arena-server answers its UnauthorizedError with 403
+      if (outcome.error instanceof UnauthorizedError) res.status(403).json({ key: 'userNotAuthorized' })
+      else Response.sendErr(res, outcome.error)
       break
     }
     if (!outcome.called) break
@@ -66,7 +75,18 @@ const runChain = async (
   return res
 }
 
+beforeAll(() => {
+  ServiceRegistry.getInstance().registerService(ServiceType.survey, { get: async () => surveyInfo } as any)
+})
+
 describe('GET /survey/:surveyId/ai-policy', () => {
+  test('a user without a group of the survey gets 403 and the policy is not read', async () => {
+    const { routes } = createRoutes()
+    const res = await runChain(routes.get, { user: users.outsider })
+    expect(res.statusCode).toBe(403)
+    expect(res.body).not.toHaveProperty('policy')
+  })
+
   test.each([
     ['viewer', users.viewer, false],
     ['survey editor', users.editor, false],
