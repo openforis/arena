@@ -30,6 +30,8 @@ export default {
   cannotOverridePublishedTaxa: 'Não é possível sobrescrever táxons publicados',
   cantUpdateStep: `Não foi possível atualizar a etapa`,
   categoryItemLabelsInvalid: 'Pedido de rótulos de categorias inválido ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Esta categoria é grande demais para verificar os rótulos em falta; tente novamente mais tarde.',
   chainCannotBeSaved: 'A cadeia é inválida e não pode ser salva',
   csv: {
     emptyHeaderFound: 'Cabeçalho vazio encontrado na coluna {{columnPosition}}',

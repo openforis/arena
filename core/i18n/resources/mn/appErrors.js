@@ -28,6 +28,7 @@ export default {
   cannotOverridePublishedTaxa: 'Нийтлэгдсэн таксоныг дарж бичих боломжгүй',
   cantUpdateStep: 'Алхам шинэчлэх боломжгүй',
   categoryItemLabelsInvalid: 'Ангиллын шошгын хүсэлт буруу байна ({{reason}}).',
+  categoryItemLabelsTooLarge: 'Энэ ангилал хэт том тул дутуу шошгыг шалгаж чадсангүй; дараа дахин оролдоно уу.',
   chainCannotBeSaved: 'Сүлжээ буруу тул хадгалах боломжгүй',
   csv: {
     emptyHeaderFound: '{{columnPosition}} баганад хоосон гарчиг олдсон',

@@ -33,6 +33,8 @@ export default {
   cannotOverridePublishedTaxa: "Impossible d'écraser les taxons publiés",
   cantUpdateStep: `Impossible de mettre à jour l'étape`,
   categoryItemLabelsInvalid: 'Requête de libellés de catégories invalide ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Cette catégorie est trop grande pour vérifier les libellés manquants ; réessayez plus tard ou utilisez une catégorie plus petite.',
   chainCannotBeSaved: 'La chaîne est invalide et ne peut pas être sauvegardée',
   csv: {
     emptyHeaderFound: 'En-tête vide trouvé à la colonne {{columnPosition}}',

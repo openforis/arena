@@ -5,6 +5,8 @@ export default {
   cannotOverridePublishedTaxa: 'Cannot overwrite published taxa',
   cantUpdateStep: `Can't update step`,
   categoryItemLabelsInvalid: 'Invalid category labels request ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'This category is too large to check the missing labels; try again later or use a smaller category.',
   chainCannotBeSaved: 'Chain is invalid and cannot be saved',
   csv: {
     emptyHeaderFound: 'Empty header found at column {{columnPosition}}',

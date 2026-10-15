@@ -33,6 +33,8 @@ export default {
   cannotOverridePublishedTaxa: 'No se pueden sobrescribir taxones publicados',
   cantUpdateStep: 'No se puede actualizar el paso',
   categoryItemLabelsInvalid: 'Solicitud de etiquetas de categorías no válida ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Esta categoría es demasiado grande para comprobar las etiquetas que faltan; inténtelo más tarde o use una categoría más pequeña.',
   chainCannotBeSaved: 'La cadena no es válida y no se puede guardar',
   csv: {
     emptyHeaderFound: 'Encabezado vacío encontrado en la columna {{columnPosition}}',

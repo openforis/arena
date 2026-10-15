@@ -29,6 +29,8 @@ export default {
   cannotOverridePublishedTaxa: 'Невозможно перезаписать опубликованные таксоны',
   cantUpdateStep: 'Не удается обновить шаг',
   categoryItemLabelsInvalid: 'Недопустимый запрос меток категорий ({{reason}}).',
+  categoryItemLabelsTooLarge:
+    'Эта категория слишком велика для проверки отсутствующих подписей; повторите попытку позже.',
   chainCannotBeSaved: 'Цепочка недействительна и не может быть сохранена',
   csv: {
     emptyHeaderFound: 'Обнаружен пустой заголовок в столбце {{columnPosition}}',

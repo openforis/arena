@@ -5,6 +5,8 @@ export default {
   cannotOverridePublishedTaxa: '公開済みの分類群を上書きできません',
   cantUpdateStep: `ステップを更新できません`,
   categoryItemLabelsInvalid: 'カテゴリのラベルのリクエストが無効です ({{reason}})。',
+  categoryItemLabelsTooLarge:
+    'このカテゴリは大きすぎるため、不足しているラベルを確認できません。後でもう一度お試しください。',
   chainCannotBeSaved: '処理チェーンが無効なため保存できません',
   csv: {
     emptyHeaderFound: '列{{columnPosition}}に空のヘッダーが見つかりました',
