@@ -43,6 +43,7 @@ import {
 } from '../../auth/authApiMiddleware'
 import {
   requireRecordMatchesUserGroupQualifiers,
+  requireRecordMatchesUserGroupQualifiersRead,
   requireRecordsMatchUserGroupQualifiers,
 } from './recordQualifierMiddleware'
 import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
@@ -211,7 +212,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -362,7 +363,7 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       try {
         const { surveyId, nodeUuid } = Request.getParams(req)
@@ -380,7 +381,7 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordMatchesUserGroupQualifiersRead,
     async (req, res, next) => {
       let tempFilePath
       try {
@@ -491,55 +492,65 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
-        Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/docx',
+    requireRecordViewPermission,
+    requireRecordMatchesUserGroupQualifiersRead,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordDocx({
-        user,
-        surveyId,
-        recordUuid,
-        lang,
-        exportScope,
-        entityDefUuid,
-        entityNodeUuid,
-        orientation,
-        includeQrCode: includeQrCode === true,
-        serverUrl,
-        outputStream: res,
-      })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordDocx({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
-        Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/pdf',
+    requireRecordViewPermission,
+    requireRecordMatchesUserGroupQualifiersRead,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordPdf({
-        user,
-        surveyId,
-        recordUuid,
-        lang,
-        exportScope,
-        entityDefUuid,
-        entityNodeUuid,
-        orientation,
-        includeQrCode: includeQrCode === true,
-        serverUrl,
-        outputStream: res,
-      })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordPdf({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   // ==== UPDATE
 
