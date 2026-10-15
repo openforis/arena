@@ -5,7 +5,7 @@ const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 /**
  * Builds the body of a non-streaming chatbot call to the gateway.
- * @param {string} [providerId] - Provider id to call (omitted: the user's default).
+ * @param {string} [providerId] - Provider id to call (omitted: the call is refused).
  * @returns {object} The request body.
  */
 const chatCall = (providerId?: string) => ({
@@ -53,10 +53,15 @@ test.describe('AI account providers API (mock provider)', () => {
     await api.setAiDefaultProvider(provider.id)
     expect(await api.getAiSettings()).toMatchObject({ defaultProviderId: provider.id, defaultProviderOrigin: 'user' })
 
-    for (const providerId of [provider.id, 'arena-default', undefined]) {
+    for (const providerId of [provider.id, 'arena-default']) {
       const { status } = await api.requestRaw('post', '/api/ai/model', chatCall(providerId))
       expect([providerId, status]).toEqual([providerId, 200])
     }
+    // no fallback: a call that names no provider is refused, even with a default of the user
+    expect(await api.requestRaw('post', '/api/ai/model', chatCall())).toMatchObject({
+      status: 400,
+      body: { key: 'aiCallInvalid', params: { reason: 'providerId' } },
+    })
 
     await api.removeAiAccountProvider(provider.id)
     expect(await api.getAiSettings()).toMatchObject({ defaultProviderId: 'arena-default', providers: [] })
@@ -119,7 +124,8 @@ test.describe('AI account providers API (mock provider)', () => {
       (await login.json()).user,
       (await loginWithSurvey.json()).user,
       (await api.requestRaw('get', '/auth/user')).body.user,
-      (await api.requestRaw('get', `/api/survey/${survey.id}/users`)).body,
+      // system administrators (the test user) are listed only on request
+      (await api.requestRaw('get', `/api/survey/${survey.id}/users?includeSystemAdmins=true`)).body,
       (await api.requestRaw('get', `/api/survey/${survey.id}/user/${userUuid}`)).body,
       (await api.requestRaw('get', `/api/survey/${survey.id}/current-user-group`)).body,
     ]
