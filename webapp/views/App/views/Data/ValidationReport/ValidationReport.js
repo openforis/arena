@@ -1,6 +1,6 @@
 import './ValidationReport.scss'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
@@ -14,7 +14,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
-import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
+import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
 import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
 import Table from '@webapp/components/Table'
 import { ButtonBack } from '@webapp/components/buttons'
@@ -33,7 +33,6 @@ const ValidationReport = () => {
   const askAssistantAvailable = useCleaningAreaStatus().status === 'available'
   const rowProps = useMemo(() => ({ askAssistantAvailable }), [askAssistantAvailable])
   const [query, setQuery] = useState(null)
-  const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState([])
   const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
 
   const allAttributeDefUuids = useMemo(() => {
@@ -45,16 +44,19 @@ const ValidationReport = () => {
       .map(NodeDef.getUuid)
   }, [survey, surveyCycleKey])
 
-  useEffect(() => {
-    setSelectedAttributeDefUuids(allAttributeDefUuids)
-  }, [allAttributeDefUuids])
+  // the selection starts as all attributes and goes back to all when the attributes change (the selection remembers
+  // the list it was made on, so no effect has to reset it)
+  const [selection, setSelection] = useState({ basis: null, uuids: [] })
+  const selectedAttributeDefUuids = selection.basis === allAttributeDefUuids ? selection.uuids : allAttributeDefUuids
+  const setSelectedAttributeDefUuids = useCallback(
+    (uuids) => setSelection({ basis: allAttributeDefUuids, uuids }),
+    [allAttributeDefUuids]
+  )
 
   // the assistant counts the messages of the whole cycle itself (suggestion 7): only the cycle is passed, and only when
   // the Cleaning area is available (with AI off the report does not even tell the suggestions it opened)
   useEffect(() => {
-    if (surveyCycleKey && askAssistantAvailable) {
-      notifySuggestionEvent({ type: 'validationReportOpened', cycle: surveyCycleKey })
-    }
+    notifyValidationReportOpened({ cycle: surveyCycleKey, askAssistantAvailable })
   }, [surveyCycleKey, askAssistantAvailable])
 
   const allAttributesSelected = useMemo(() => {
