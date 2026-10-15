@@ -2,7 +2,6 @@ import axios from 'axios'
 
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
-import { notifySuggestionEvent } from '@webapp/ai/suggestions/suggestionEvents'
 import { LoaderActions } from '@webapp/store/ui/loader'
 import { NotificationActions } from '@webapp/store/ui/notification'
 
@@ -24,8 +23,6 @@ export const updateSurveyInfoProps = (props) => async (dispatch, getState) => {
     dispatch(NotificationActions.notifyInfo({ key: 'common.saved' }))
     dispatch({ type: surveyInfoUpdate, surveyInfo })
     dispatch(resetSurveyDefs())
-    // a new language can leave category item labels missing (suggestion 6)
-    notifySuggestionEvent({ type: 'surveyInfoSaved' })
   } else {
     dispatch(NotificationActions.notifyError({ key: 'common.formContainsErrors' }))
     dispatch({

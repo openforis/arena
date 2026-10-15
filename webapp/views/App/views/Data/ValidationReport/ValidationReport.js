@@ -49,12 +49,13 @@ const ValidationReport = () => {
     setSelectedAttributeDefUuids(allAttributeDefUuids)
   }, [allAttributeDefUuids])
 
-  // the assistant counts the messages of the whole cycle itself (suggestion 7): only the cycle is passed
+  // the assistant counts the messages of the whole cycle itself (suggestion 7): only the cycle is passed, and only when
+  // the Cleaning area is available (with AI off the report does not even tell the suggestions it opened)
   useEffect(() => {
-    if (surveyCycleKey) {
+    if (surveyCycleKey && askAssistantAvailable) {
       notifySuggestionEvent({ type: 'validationReportOpened', cycle: surveyCycleKey })
     }
-  }, [surveyCycleKey])
+  }, [surveyCycleKey, askAssistantAvailable])
 
   const allAttributesSelected = useMemo(() => {
     if (allAttributeDefUuids.length === 0) return true

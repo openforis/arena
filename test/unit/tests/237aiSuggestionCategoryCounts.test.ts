@@ -89,7 +89,7 @@ describe('category labels counts (237)', () => {
     expect(EVENT_DETECTORS).toContain(categoryItemTranslationsDetector)
   })
 
-  test('generationStarted and surveyInfoSaved are throttled per user, survey and languages; other events and a new language are not', async () => {
+  test('generationStarted, surveyInfoSaved and categoryEditorLeft are throttled per user, survey and languages; the events that change categories and a new language are not', async () => {
     const { store } = createSetKindRecorder()
     const fetchCounts = jest.fn(async () => counts)
     const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
@@ -98,21 +98,25 @@ describe('category labels counts (237)', () => {
 
     await detector.handle(event('generationStarted'), at(t0))
     await detector.handle(event('surveyInfoSaved'), at(t0 + 1000))
+    // leaving the category editor, again and again, does not fetch again within the window
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 2000))
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 2500))
     expect(fetchCounts).toHaveBeenCalledTimes(1)
 
-    await detector.handle(event('categoriesChanged'), at(t0 + 2000))
-    await detector.handle(event('categoryLabelsApplied'), at(t0 + 3000))
-    await detector.handle(event('categoryEditorLeft'), at(t0 + 4000))
-    expect(fetchCounts).toHaveBeenCalledTimes(4)
+    await detector.handle(event('categoriesChanged'), at(t0 + 3000))
+    await detector.handle(event('categoryLabelsApplied'), at(t0 + 4000))
+    expect(fetchCounts).toHaveBeenCalledTimes(3)
 
     // a survey info save that adds a language
     const withPortuguese = await buildCategoryLabelsSurvey({ languages: ['en', 'fr', 'es', 'pt'] })
     await detector.handle(event('surveyInfoSaved'), at(t0 + 5000, withPortuguese))
-    expect(fetchCounts).toHaveBeenCalledTimes(5)
+    expect(fetchCounts).toHaveBeenCalledTimes(4)
 
     // 30 s after the last fetch of the same key (any event's fetch counts)
-    await detector.handle(event('generationStarted'), at(t0 + 34000))
-    expect(fetchCounts).toHaveBeenCalledTimes(6)
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 33000))
+    expect(fetchCounts).toHaveBeenCalledTimes(4)
+    await detector.handle(event('categoryEditorLeft'), at(t0 + 34000))
+    expect(fetchCounts).toHaveBeenCalledTimes(5)
   })
 
   test('a count that resolves after its generation ended lands nothing', async () => {

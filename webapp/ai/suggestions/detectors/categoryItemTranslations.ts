@@ -70,8 +70,9 @@ export const categoryItemTranslationsResolver: TargetResolver = {
 
 export const CATEGORY_COUNTS_THROTTLE_MS = 30000
 
-// frequent triggers: a generation per cycle switch or defs reload, a survey info save
-const THROTTLED_EVENTS: SuggestionEvent['type'][] = ['generationStarted', 'surveyInfoSaved']
+// frequent triggers: a generation per cycle switch or defs reload, a survey info save, every visit to a category editor
+// (the counts of a card may lag by one window after labels typed in the editor)
+const THROTTLED_EVENTS: SuggestionEvent['type'][] = ['generationStarted', 'surveyInfoSaved', 'categoryEditorLeft']
 
 /**
  * Returns the throttle key: user, survey and languages (a save that adds a language is never throttled).
