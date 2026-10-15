@@ -25,6 +25,7 @@ import {
 import * as AiTelemetry from '../aiTelemetry'
 import { assertFeatureEnabled } from '../featureGate'
 import * as ProviderResolver from '../providerResolver'
+import type { ProviderMeta } from '../providerResolver'
 import { getCallSize, getEnforcedDataClass, parseGatewayRequest, sanitizeCall } from './callValidation'
 import { createDailyBudgetCharger, type DailyBudgetCharger } from './dailyBudget'
 import { assertPolicyAllows, type AiPolicyCheck } from './policy'
@@ -40,7 +41,7 @@ export type ModelGatewayDeps = {
     user: User
     feature: string
     providerId?: string
-  }) => Promise<{ model: LanguageModelV4; meta: any }>
+  }) => Promise<{ model: LanguageModelV4; meta: ProviderMeta }>
   assertPolicyAllows: (check: AiPolicyCheck) => Promise<void>
   // charges a call with the Arena default provider to the daily budget of the user (absent: no budget)
   chargeDailyBudget?: DailyBudgetCharger
