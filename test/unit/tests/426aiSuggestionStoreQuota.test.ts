@@ -138,4 +138,68 @@ describe('suggestion store: quota, expiry and the stored shape (426)', () => {
       '1': { 'publishErrors:p': { kind: 'publishErrors', targets: { 'a:labels': true } } },
     })
   })
+
+  test('a Dismiss that hits the quota stays dismissed; the dismissals of other surveys are what goes', () => {
+    const { data, storage, setLimit } = limitedStorage(1_000_000)
+    const state = {
+      pending: Object.fromEntries(
+        [1, 2, 3, 4, 5, 6].map((surveyId) => [
+          String(surveyId),
+          [suggestion({ surveyId, targets: targetsOf(surveyId === 6 ? 5 : 1) })],
+        ])
+      ),
+      dismissed: Object.fromEntries(
+        [1, 2, 3, 4, 5].map((surveyId) => [
+          String(surveyId),
+          { 'missingTranslations:fr': { kind: 'missingTranslations', targets: { old: 1, older: 1, oldest: 1 } } },
+        ])
+      ),
+      inProgress: {},
+      seenModules: [],
+    }
+    data.set(KEY, JSON.stringify(state))
+    // the state with the new dismissal is about 1700 characters: it fits only once the dismissals of the other
+    // surveys go (shrink level 2)
+    setLimit(KEY.length + 1500)
+    const { store, log } = newStore({ storage })
+    store.dismiss({ userUuid, surveyId: 6, id: 'missingTranslations:fr' })
+    expect(log).toHaveBeenCalledWith(expect.stringMatching(/storage is full.*pruned/))
+    expect(Object.keys(JSON.parse(data.get(KEY) as string).dismissed)).toEqual(['6'])
+    const visible = store.getVisible({ userUuid, surveyId: 6, cycle: null, availableAreas: [...AREAS], enabled: true })
+    expect(visible).toEqual([])
+  })
+
+  test('settling a conversation keeps the survey it settles, even when it is the oldest of more than 20', () => {
+    const { data, storage } = limitedStorage(1_000_000)
+    const surveyIds = Array.from({ length: 22 }, (_, index) => index + 1)
+    data.set(
+      KEY,
+      JSON.stringify({
+        pending: Object.fromEntries(
+          surveyIds.map((surveyId) => [
+            String(surveyId),
+            [suggestion({ surveyId, targets: [{ key: 'a:labels' }, { key: 'b:labels' }] })],
+          ])
+        ),
+        dismissed: {},
+        inProgress: {
+          '1': {
+            'missingTranslations:fr': {
+              kind: 'missingTranslations',
+              conversationId: 'c1',
+              targets: [{ key: 'a:labels' }],
+            },
+          },
+        },
+        seenModules: [],
+      })
+    )
+    const { store } = newStore({ storage })
+    store.onConversationSettled({ userUuid, conversationId: 'c1', outcome: 'settled' })
+    const stored = JSON.parse(data.get(KEY) ?? 'null')
+    expect(Object.keys(stored.pending)).toHaveLength(20)
+    // the target not sent to the model stays pending in the survey of the conversation
+    expect(stored.pending['1'][0].targets).toEqual([{ key: 'b:labels' }])
+    expect(stored.dismissed['1']['missingTranslations:fr'].targets).toEqual({ 'a:labels': expect.anything() })
+  })
 })

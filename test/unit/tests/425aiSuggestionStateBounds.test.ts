@@ -1,13 +1,12 @@
 import {
-  MAX_DISMISSED_PER_SUGGESTION,
   MAX_SEEN_MODULES,
   MAX_SURVEY_BUCKETS,
-  MAX_TARGETS_PER_ENTRY,
   emptySuggestionState,
   normalizeSuggestionState,
   shrinkSuggestionState,
   type SuggestionUserState,
 } from '@webapp/ai/suggestions/suggestionState'
+import { createSuggestionStore, getSuggestionsKey } from '@webapp/ai/suggestions/suggestionStore'
 import type { AssistantSuggestion } from '@webapp/ai/suggestions/types'
 
 const NOW = new Date('2026-10-11T12:00:00.000Z')
@@ -96,37 +95,56 @@ describe('suggestion state bounds (425)', () => {
     expect(surveyBuckets).not.toContain('2')
   })
 
-  test('targets are capped per pending suggestion, per in-progress entry and per dismissed suggestion', () => {
+  test('targets are not capped in normal operation: they mirror the survey, and the bucket cap is the bound', () => {
+    const targets = targetsOf(300)
     const state: SuggestionUserState = {
-      pending: { '1': [suggestion({ targets: targetsOf(MAX_TARGETS_PER_ENTRY + 50) })] },
+      pending: { '1': [suggestion({ targets })] },
       dismissed: {
         '1': {
           'publishErrors:p': {
             kind: 'publishErrors',
-            targets: Object.fromEntries(
-              targetsOf(MAX_DISMISSED_PER_SUGGESTION + 30).map((target) => [target.key, true])
-            ),
+            targets: Object.fromEntries(targetsOf(300).map((target) => [target.key, true])),
           },
         },
       },
       inProgress: {
-        '1': {
-          'missingTranslations:fr': {
-            kind: 'missingTranslations',
-            conversationId: 'c1',
-            targets: targetsOf(MAX_TARGETS_PER_ENTRY + 1),
-          },
-        },
+        '1': { 'missingTranslations:fr': { kind: 'missingTranslations', conversationId: 'c1', targets } },
       },
       seenModules: [],
     }
-    const normalized = normalizeSuggestionState(state, NOW)
-    expect(normalized.pending['1'][0].targets).toHaveLength(MAX_TARGETS_PER_ENTRY)
-    const dismissedKeys = Object.keys(normalized.dismissed['1']['publishErrors:p'].targets)
-    expect(dismissedKeys).toHaveLength(MAX_DISMISSED_PER_SUGGESTION)
-    // the most recent dismissals are kept
-    expect(dismissedKeys.at(-1)).toBe(`t${MAX_DISMISSED_PER_SUGGESTION + 29}`)
-    expect(normalized.inProgress['1']['missingTranslations:fr'].targets).toHaveLength(MAX_TARGETS_PER_ENTRY)
+    expect(normalizeSuggestionState(state, NOW)).toBe(state)
+  })
+
+  test('under pressure, dismissed targets that are still pending are kept; only the others are cut, oldest first', () => {
+    const pendingTargets = targetsOf(80)
+    const state: SuggestionUserState = {
+      pending: { '1': [suggestion({ targets: pendingTargets })] },
+      dismissed: {
+        '1': {
+          'missingTranslations:fr': {
+            kind: 'missingTranslations',
+            // 80 are still pending, and 100 more are gone from the survey
+            targets: Object.fromEntries(
+              [...targetsOf(80), ...targetsOf(100).map(({ key }) => ({ key: `gone-${key}` }))].map(({ key }) => [
+                key,
+                true,
+              ])
+            ),
+          },
+        },
+      },
+      inProgress: {},
+      seenModules: [],
+    }
+    const level1 = shrinkSuggestionState(state, 1, NOW, { keepBucket: '1' })!
+    const kept = Object.keys(level1.dismissed['1']['missingTranslations:fr'].targets)
+    expect(pendingTargets.every(({ key }) => kept.includes(key))).toBe(true)
+    // the others are cut to the tight cap, keeping the latest
+    expect(kept.filter((key) => key.startsWith('gone-'))).toHaveLength(50)
+    expect(kept).toContain('gone-t99')
+    expect(kept).not.toContain('gone-t0')
+    // the survey in use keeps all its pending targets
+    expect(level1.pending['1'][0].targets).toHaveLength(80)
   })
 
   test('seen modules are capped to the latest ones', () => {
@@ -153,8 +171,111 @@ describe('suggestion state bounds (425)', () => {
     const level2 = shrinkSuggestionState(state, 2, NOW)
     expect(level2!.dismissed).toEqual({})
     expect(Object.keys(level2!.pending).length).toBeGreaterThan(0)
+    // the survey in use keeps its dismissals: a Dismiss that hit the quota must not undo itself
+    const inUse = shrinkSuggestionState(state, 2, NOW, { keepBucket: '3' })!
+    expect(Object.keys(inUse.dismissed)).toEqual(['3'])
     const level3 = shrinkSuggestionState(state, 3, NOW)
     expect(level3).toEqual({ ...emptySuggestionState(), inProgress: state.inProgress, seenModules: ['designer'] })
     expect(shrinkSuggestionState(state, 4, NOW)).toBeNull()
+  })
+})
+
+describe('large surveys keep every live target and every dismissal (425)', () => {
+  const userUuid = 'u1'
+  const VISIBLE = { userUuid, surveyId: 1, cycle: null, availableAreas: ['design' as const], enabled: true }
+
+  const fakeLocalStorage = () => {
+    const data = new Map<string, string>()
+    return {
+      data,
+      storage: {
+        getItem: (key: string) => data.get(key) ?? null,
+        setItem: (key: string, value: string) => void data.set(key, value),
+        removeItem: (key: string) => void data.delete(key),
+      },
+    }
+  }
+
+  const newStore = () => {
+    const local = fakeLocalStorage()
+    const store = createSuggestionStore({
+      access: { getStorage: () => local.storage, addStorageListener: () => () => undefined },
+      now: () => NOW,
+      log: () => undefined,
+    })
+    return { ...local, store }
+  }
+
+  const visibleKeys = (store: ReturnType<typeof newStore>['store']) =>
+    store.getVisible(VISIBLE).flatMap((item) => item.targets.map((target) => target.key))
+
+  test('300 targets are all stored and counted; a text added past position 200 shows after Dismiss, and nothing old returns', () => {
+    const { store } = newStore()
+    const base = suggestion({ targets: targetsOf(300) })
+    store.setKind({ userUuid, surveyId: 1, kind: 'missingTranslations', suggestions: [base] })
+    expect(visibleKeys(store)).toHaveLength(300)
+
+    store.dismiss({ userUuid, surveyId: 1, id: base.id })
+    expect(visibleKeys(store)).toEqual([])
+
+    // a new text in hierarchy order, after the position 200
+    const withNew = [...targetsOf(300).slice(0, 250), { key: 'new-text' }, ...targetsOf(300).slice(250)]
+    store.setKind({
+      userUuid,
+      surveyId: 1,
+      kind: 'missingTranslations',
+      suggestions: [{ ...base, targets: withNew }],
+    })
+    expect(visibleKeys(store)).toEqual(['new-text'])
+
+    // dismissing it again does not bring an old dismissal back
+    store.dismiss({ userUuid, surveyId: 1, id: base.id })
+    store.setKind({
+      userUuid,
+      surveyId: 1,
+      kind: 'missingTranslations',
+      suggestions: [{ ...base, targets: withNew }],
+    })
+    expect(visibleKeys(store)).toEqual([])
+  })
+
+  test('a stored state with 300 dismissals keeps all of them through an unrelated write', () => {
+    const { store, data } = newStore()
+    const targets = targetsOf(300)
+    const legacy: SuggestionUserState = {
+      pending: { '1': [suggestion({ targets })] },
+      dismissed: {
+        '1': {
+          'missingTranslations:fr': {
+            kind: 'missingTranslations',
+            targets: Object.fromEntries(targets.map((target) => [target.key, 5])),
+          },
+        },
+      },
+      inProgress: {},
+      seenModules: [],
+    }
+    data.set(getSuggestionsKey(userUuid), JSON.stringify(legacy))
+    store.markModuleSeen({ userUuid, module: 'designer' })
+    const stored = JSON.parse(data.get(getSuggestionsKey(userUuid)) as string)
+    expect(Object.keys(stored.dismissed['1']['missingTranslations:fr'].targets)).toHaveLength(300)
+    expect(visibleKeys(store)).toEqual([])
+  })
+
+  test('a suggestion that accumulates targets keeps the newest ones', () => {
+    const { store } = newStore()
+    for (let index = 0; index < 250; index += 1) {
+      store.add({
+        userUuid,
+        suggestion: suggestion({
+          id: 'newEntriesDescriptions:designer',
+          kind: 'newEntriesDescriptions',
+          targets: [{ key: `entry-${index}` }],
+        }),
+      })
+    }
+    const keys = store.getPending({ userUuid, surveyId: 1 })[0].targets.map((target) => target.key)
+    expect(keys).toHaveLength(250)
+    expect(keys).toContain('entry-249')
   })
 })

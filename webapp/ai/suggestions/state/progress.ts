@@ -101,3 +101,16 @@ export const getInProgressConversationIds = (state: SuggestionUserState): string
   }
   return [...ids]
 }
+
+/**
+ * Returns the bucket that has targets in progress for a conversation.
+ * @param {SuggestionUserState} state - State.
+ * @param {string} conversationId - Conversation.
+ * @returns {string|null} The bucket; null when the conversation has nothing in progress.
+ */
+export const getBucketOfConversation = (state: SuggestionUserState, conversationId: string): string | null => {
+  for (const [bucket, entries] of Object.entries(state.inProgress)) {
+    if (Object.values(entries).some((entry) => entry.conversationId === conversationId)) return bucket
+  }
+  return null
+}

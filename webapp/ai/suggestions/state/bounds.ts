@@ -1,7 +1,9 @@
 /**
- * How big the stored state may get: expired suggestions go, and buckets, targets and seen modules are capped, so the
- * localStorage entry of a user stays small however long the browser is used. When the storage is full anyway, the store
- * asks for a smaller state (shrink levels).
+ * How big the stored state may get: expired suggestions go, and survey buckets and seen modules are capped, so the
+ * localStorage entry of a user stays small however long the browser is used. Targets are not capped in normal
+ * operation: they mirror the survey and the resolvers prune them, and a cap would hide live targets or bring back
+ * dismissed ones. When the storage is full, the store asks for a smaller state (shrink levels), which also caps the
+ * targets of the surveys not in use and the dismissals of targets that are gone.
  */
 import type { AssistantSuggestion } from '../types'
 import {
@@ -14,18 +16,14 @@ import {
 
 // surveys with stored suggestions (Help does not count); the survey being written is never dropped
 export const MAX_SURVEY_BUCKETS = 20
-// targets of one pending suggestion or one in-progress entry (a card never asks the model for more than this)
-export const MAX_TARGETS_PER_ENTRY = 200
-// dismissed targets of one suggestion (the latest dismissals)
-export const MAX_DISMISSED_PER_SUGGESTION = 200
 export const MAX_SEEN_MODULES = 50
 
 type Limits = { buckets: number; targets: number; dismissed: number; modules: number }
 
 const NORMAL_LIMITS: Limits = {
   buckets: MAX_SURVEY_BUCKETS,
-  targets: MAX_TARGETS_PER_ENTRY,
-  dismissed: MAX_DISMISSED_PER_SUGGESTION,
+  targets: Infinity,
+  dismissed: Infinity,
   modules: MAX_SEEN_MODULES,
 }
 
@@ -68,7 +66,7 @@ const capBuckets = <T>(record: Record<string, T>, max: number, keepBucket: strin
 }
 
 /**
- * Keeps the first targets of a suggestion or an in-progress entry.
+ * Keeps the first targets of a suggestion or an in-progress entry (only when the storage is full).
  * @param {object} entry - Suggestion or in-progress entry.
  * @param {number} max - Targets to keep.
  * @returns {object} The entry (the same one when within the cap).
@@ -77,16 +75,28 @@ const capTargets = <T extends { targets: { key: string }[] }>(entry: T, max: num
   entry.targets.length <= max ? entry : { ...entry, targets: entry.targets.slice(0, max) }
 
 /**
- * Keeps the latest dismissed targets of a suggestion (they are recorded in order).
+ * Keeps the latest dismissed targets that are no longer pending (they are recorded in order). A dismissed target that
+ * is still pending is never cut: it would show again.
  * @param {DismissedEntry} entry - Entry.
- * @param {number} max - Targets to keep.
+ * @param {number} max - Targets to keep, besides those still pending.
+ * @param {Set<string>} stillPending - Keys of the targets the suggestion still has.
  * @returns {DismissedEntry} The entry (the same one when within the cap).
  */
-const capDismissed = (entry: DismissedEntry, max: number): DismissedEntry => {
-  const keys = Object.keys(entry.targets)
-  if (keys.length <= max) return entry
-  return { ...entry, targets: Object.fromEntries(Object.entries(entry.targets).slice(-max)) }
+const capDismissed = (entry: DismissedEntry, max: number, stillPending: Set<string>): DismissedEntry => {
+  const gone = Object.keys(entry.targets).filter((key) => !stillPending.has(key))
+  if (gone.length <= max) return entry
+  const cut = new Set(gone.slice(0, gone.length - max))
+  return { ...entry, targets: Object.fromEntries(Object.entries(entry.targets).filter(([key]) => !cut.has(key))) }
 }
+
+/**
+ * Returns the keys of the targets a bucket has pending for a suggestion id.
+ * @param {AssistantSuggestion[]|undefined} suggestions - Pending suggestions of the bucket.
+ * @param {string} id - Suggestion id.
+ * @returns {Set<string>} The keys.
+ */
+const pendingKeysOf = (suggestions: AssistantSuggestion[] | undefined, id: string): Set<string> =>
+  new Set(suggestions?.find((item) => item.id === id)?.targets.map((target) => target.key))
 
 /**
  * Removes the pending suggestions that expired (a re-detected one then starts afresh, with a new expiry).
@@ -125,22 +135,26 @@ const applyLimits = (
   limits: Limits,
   keepBucket: string | null
 ): SuggestionUserState => {
+  // the survey in use keeps all its targets: they are the user's current work
+  const targetsOf = (bucket: string): number => (bucket === keepBucket ? Infinity : limits.targets)
   const pending = capBuckets(
-    mapEntries(state.pending, (items) => {
+    mapEntries(state.pending, (items, bucket) => {
       const alive = withoutExpired(items, now)
-      return alive && capPendingTargets(alive, limits.targets)
+      return alive && capPendingTargets(alive, targetsOf(bucket))
     }),
     limits.buckets,
     keepBucket
   )
   const dismissed = capBuckets(
-    mapEntries(state.dismissed, (ids) => mapEntries(ids, (entry) => capDismissed(entry, limits.dismissed))),
+    mapEntries(state.dismissed, (ids, bucket) =>
+      mapEntries(ids, (entry, id) => capDismissed(entry, limits.dismissed, pendingKeysOf(state.pending[bucket], id)))
+    ),
     limits.buckets,
     keepBucket
   )
   const inProgress = capBuckets(
-    mapEntries(state.inProgress, (ids) =>
-      mapEntries<InProgressEntry>(ids, (entry) => capTargets(entry, limits.targets))
+    mapEntries(state.inProgress, (ids, bucket) =>
+      mapEntries<InProgressEntry>(ids, (entry) => capTargets(entry, targetsOf(bucket)))
     ),
     limits.buckets,
     keepBucket
@@ -170,7 +184,7 @@ export const normalizeSuggestionState = (
 ): SuggestionUserState => applyLimits(state, now, NORMAL_LIMITS, keepBucket)
 
 /**
- * Returns a smaller state for a full storage: level 1 tightens the caps, level 2 also forgets the dismissed targets,
+ * Returns a smaller state for a full storage: level 1 tightens the caps, level 2 also forgets the dismissed targets (those of the survey in use stay),
  * level 3 keeps only what is running (in progress) and the modules seen.
  * @param {SuggestionUserState} state - State.
  * @param {number} level - Shrink level, from 1.
@@ -188,6 +202,10 @@ export const shrinkSuggestionState = (
   if (level > LAST_SHRINK_LEVEL) return null
   const tight = applyLimits(state, now, TIGHT_LIMITS, keepBucket)
   if (level === 1) return tight
-  if (level === 2) return { ...tight, dismissed: {} }
+  // the survey in use keeps its dismissals: a Dismiss that hit the quota must not undo itself
+  if (level === 2) {
+    const kept = keepBucket === null ? undefined : tight.dismissed[keepBucket]
+    return { ...tight, dismissed: kept ? { [keepBucket as string]: kept } : {} }
+  }
   return { ...emptySuggestionState(), inProgress: tight.inProgress, seenModules: tight.seenModules }
 }

@@ -11,6 +11,8 @@ import {
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
 import {
+  HELP_BUCKET,
+  getBucketOfConversation,
   getInProgressConversationIds,
   getPendingOf,
   getTrackedOf,
@@ -153,17 +155,17 @@ export const createSuggestionStore = ({
    * bounds (expired suggestions go); a full storage gets a smaller state, level by level, and the wrapper logs it.
    * @param {string} userUuid - User UUID.
    * @param {Function} change - Returns the new state.
-   * @param {number|null} [surveyId] - The survey being changed: its bucket is never dropped to stay within the bounds.
+   * @param {string|null} [keepBucket] - The bucket being changed: it is never dropped to stay within the bounds.
    * @returns {void}
    */
   const update = (
     userUuid: string,
     change: (state: SuggestionUserState) => SuggestionUserState,
-    surveyId: number | null = null
+    keepBucket: string | null = null
   ): void => {
     const key = getSuggestionsKey(userUuid)
     const current = parseSuggestionState(storage.read(key))
-    const options = { keepBucket: surveyId === null ? null : toBucket(surveyId) }
+    const options = { keepBucket }
     const next = normalizeSuggestionState(change(current), now(), options)
     const json = JSON.stringify(next)
     if (json === JSON.stringify(current)) return
@@ -181,28 +183,42 @@ export const createSuggestionStore = ({
 
   return {
     setKind: ({ userUuid, surveyId, kind, suggestions }) =>
-      update(userUuid, (state) => withKind(state, { bucket: toBucket(surveyId), kind, suggestions }), surveyId),
-    add: ({ userUuid, suggestion }) => update(userUuid, (state) => withAdded(state, suggestion), suggestion.surveyId),
+      update(
+        userUuid,
+        (state) => withKind(state, { bucket: toBucket(surveyId), kind, suggestions }),
+        toBucket(surveyId)
+      ),
+    add: ({ userUuid, suggestion }) =>
+      update(userUuid, (state) => withAdded(state, suggestion), toBucket(suggestion.surveyId)),
     removeTargets: ({ userUuid, surveyId, id, targetKeys }) =>
-      update(userUuid, (state) => withoutTargets(state, { bucket: toBucket(surveyId), id, targetKeys }), surveyId),
+      update(
+        userUuid,
+        (state) => withoutTargets(state, { bucket: toBucket(surveyId), id, targetKeys }),
+        toBucket(surveyId)
+      ),
     remove: ({ userUuid, surveyId, id }) =>
-      update(userUuid, (state) => withoutSuggestion(state, { bucket: toBucket(surveyId), id }), surveyId),
+      update(userUuid, (state) => withoutSuggestion(state, { bucket: toBucket(surveyId), id }), toBucket(surveyId)),
     dismiss: ({ userUuid, surveyId, id }) =>
-      update(userUuid, (state) => withDismissed(state, { bucket: toBucket(surveyId), id }), surveyId),
+      update(userUuid, (state) => withDismissed(state, { bucket: toBucket(surveyId), id }), toBucket(surveyId)),
     startProgress: ({ userUuid, surveyId, id, conversationId, targetKeys }) =>
       update(
         userUuid,
         (state) => withProgress(state, { bucket: toBucket(surveyId), id, conversationId, targetKeys }),
-        surveyId
+        toBucket(surveyId)
       ),
     onConversationSettled: ({ userUuid, conversationId, outcome }) =>
-      update(userUuid, (state) => withSettled(state, { conversationId, outcome })),
+      update(
+        userUuid,
+        (state) => withSettled(state, { conversationId, outcome }),
+        // the survey the conversation was for must survive the write that settles it
+        getBucketOfConversation(read(userUuid), conversationId)
+      ),
     getPending: ({ userUuid, surveyId }) => getPendingOf(read(userUuid), toBucket(surveyId)),
     getTracked: ({ userUuid, surveyId }) => getTrackedOf(read(userUuid), toBucket(surveyId)),
     getVisible: ({ userUuid, surveyId, cycle, availableAreas, enabled }) =>
       selectVisible(read(userUuid), { surveyId, cycle, availableAreas, enabled, now: now() }),
     isModuleSeen: ({ userUuid, module }) => read(userUuid).seenModules.includes(module),
-    markModuleSeen: ({ userUuid, module }) => update(userUuid, (state) => withModuleSeen(state, module)),
+    markModuleSeen: ({ userUuid, module }) => update(userUuid, (state) => withModuleSeen(state, module), HELP_BUCKET),
     subscribe: (listener) => {
       listeners.add(listener)
       return () => {
