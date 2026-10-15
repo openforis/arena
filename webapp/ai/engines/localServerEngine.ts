@@ -3,12 +3,32 @@
  * Loaded only through dynamic import: it pulls @ai-sdk/openai-compatible into the lazy AI bundle.
  */
 import { createOpenAICompatible } from '@ai-sdk/openai-compatible'
-import { extractReasoningMiddleware, wrapLanguageModel, type LanguageModel } from 'ai'
+import { extractReasoningMiddleware, type LanguageModelMiddleware, wrapLanguageModel, type LanguageModel } from 'ai'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import { createDeltaCoalescer } from './coalesceDeltas'
 import { createLocalServerFetch, type LocalServerFetchImpl } from './localServerErrors'
+import { getLocalServerMaxOutputTokens } from './localServerProbe'
 import type { AiEngine, AiLocalServerCapability } from './types'
+
+/**
+ * Returns the middleware of the limits of a local model: an output cap (a caller may ask for less, not more) and
+ * one stream part per few tens of milliseconds instead of one per token.
+ * @param {number} maxOutputTokens - Most tokens an answer may have.
+ * @returns {LanguageModelMiddleware} The middleware.
+ */
+const createLimitsMiddleware = (maxOutputTokens: number): LanguageModelMiddleware => ({
+  specificationVersion: 'v4',
+  transformParams: async ({ params }) => ({
+    ...params,
+    maxOutputTokens: Math.min(params.maxOutputTokens ?? maxOutputTokens, maxOutputTokens),
+  }),
+  wrapStream: async ({ doStream }) => {
+    const { stream, ...rest } = await doStream()
+    return { stream: stream.pipeThrough(createDeltaCoalescer()), ...rest }
+  },
+})
 
 /**
  * Creates the local server engine.
@@ -39,5 +59,9 @@ export const createLocalServerEngine = ({
   })
   // models whose server doesn't split the thinking out write it inline in <think> tags: move it to reasoning parts
   const reasoning = extractReasoningMiddleware({ tagName: 'think' })
-  return { createModel: (): LanguageModel => wrapLanguageModel({ model: provider(modelId), middleware: reasoning }) }
+  const limits = createLimitsMiddleware(getLocalServerMaxOutputTokens(localServer.contextTokens))
+  return {
+    // the reasoning is moved out first, so the limits middleware merges its parts too
+    createModel: (): LanguageModel => wrapLanguageModel({ model: provider(modelId), middleware: [limits, reasoning] }),
+  }
 }
