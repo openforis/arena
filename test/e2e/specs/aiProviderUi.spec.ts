@@ -3,6 +3,8 @@ import type { Page } from '@playwright/test'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
+import type { LocalProvider } from '@webapp/ai/engines/localProviders'
+
 import type { ArenaApi } from '../fixtures/arenaApi'
 import {
   collectRequestBodies,
@@ -17,6 +19,7 @@ import {
   sendAssistantMessage,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
+import { readLocalProviders as readStoredLocalProviders, seedLocalProviders } from '../helpers/aiStorage'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 import { type LocalModelServerStub, startLocalModelServer } from '../stubs/localModelServer'
@@ -31,12 +34,10 @@ const LABEL_REQUEST = 'Change the label of cluster_id to Cluster identifier'
  * Reads the local providers this browser stores for the logged-in user.
  * @param {Page} page - The page.
  * @param {ArenaApi} api - The ArenaApi fixture of the same user.
- * @returns {Promise<Array<Record<string, string>>>} The stored providers ([] when none).
+ * @returns {Promise<LocalProvider[]>} The stored providers ([] when none).
  */
-const readLocalProviders = async (page: Page, api: ArenaApi): Promise<Array<Record<string, string>>> => {
-  const key = `arena.ai.localProviders.${await api.getCurrentUserUuid()}`
-  return JSON.parse((await page.evaluate((storageKey) => localStorage.getItem(storageKey), key)) ?? '[]')
-}
+const readLocalProviders = async (page: Page, api: ArenaApi): Promise<LocalProvider[]> =>
+  readStoredLocalProviders(page, await api.getCurrentUserUuid())
 
 /**
  * Runs an action of a provider row's ⋯ menu.
@@ -234,16 +235,7 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     const providers = [
       { id: E2E_LOCAL_PROVIDER_ID, name: 'Local server', baseUrl: 'http://127.0.0.1:9/v1', modelId: 'm' },
     ]
-    await page.addInitScript(
-      ({ key, value }) => {
-        try {
-          localStorage.setItem(key, value)
-        } catch {
-          // about:blank and other origins without storage
-        }
-      },
-      { key: `arena.ai.localProviders.${userUuid}`, value: JSON.stringify(providers) }
-    )
+    await seedLocalProviders(page, userUuid, providers)
     await api.setAiDefaultProvider(E2E_LOCAL_PROVIDER_ID)
     const gatewayBodies = collectRequestBodies(page, isGatewayRequest)
     await openNewDesignConversation(page)
@@ -251,6 +243,7 @@ test.describe('AI provider chip in the assistant (mock provider)', () => {
     await expect(providerChip(page)).toHaveAttribute('title', /^Local server/)
 
     await providerChip(page).click()
+    await expect(page.getByTestId(TestId.aiAssistant.providerChooser)).toBeVisible()
     expect(gatewayBodies).toEqual([])
     await page.getByTestId(TestId.aiAssistant.providerChoice('arena-default')).click()
     await expect(providerChip(page)).toHaveAttribute('title', /^Arena default · mock/)

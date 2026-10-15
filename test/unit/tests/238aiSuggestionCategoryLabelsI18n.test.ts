@@ -1,5 +1,6 @@
 import {
   CYRILLIC,
+  CYRILLIC_LANGUAGES,
   LANGUAGES,
   enTextOf,
   expectedTexts,
@@ -40,7 +41,7 @@ describe('texts of the category labels suggestion (238)', () => {
     }
   })
 
-  test.each(['ru', 'mn'])('%s texts are written in Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s texts are written in Cyrillic', (lang) => {
     for (const { path, text } of textsOf(lang)) {
       expect({ path, text }).toEqual({ path, text: expect.stringMatching(CYRILLIC) })
     }

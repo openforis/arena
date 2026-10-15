@@ -1,8 +1,9 @@
 import SystemError from '@core/systemError'
 import { getAiErrorKey, getAiErrorMessage, isAiAbortError } from '@webapp/ai/runtime/runtimeErrors'
 import { runStreamWithCallbacks } from '@webapp/ai/runtime/streamCallbacks'
+import { fakeT } from '../utils/fakeT'
 
-const i18n = { t: (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}` }
+const i18n = { t: fakeT }
 
 describe('runtime errors', () => {
   test('reads the key directly or through SDK wrappers', () => {

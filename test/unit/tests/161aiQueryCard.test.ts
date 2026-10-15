@@ -3,13 +3,7 @@ import { toQuery } from '@common/ai/tasks/dataQuery'
 
 import { buildQueryCardModel } from '@webapp/components/ai/Assistant/analysis/queryCardModel'
 
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
+import { CYRILLIC, CYRILLIC_LANGUAGES, leafPaths, OTHER_LANGUAGES, RESOURCES } from '../utils/i18nParity'
 
 import * as DataTest from '../../utils/dataTest'
 import { getContextUser } from '../../integration/config/context'
@@ -27,16 +21,6 @@ const newEntry = (aiResult: object) => {
   expect(errors).toEqual([])
   return { id: 'q1', query, explanation: 'Explained', entityName: 'tree', mode: 'aggregate', createdAt: 'T' }
 }
-
-/**
- * Returns the sorted key paths of an object.
- */
-const keyPaths = (obj: object, prefix = ''): string[] =>
-  Object.entries(obj)
-    .flatMap(([key, value]) =>
-      value && typeof value === 'object' ? keyPaths(value, `${prefix}${key}.`) : [`${prefix}${key}`]
-    )
-    .sort()
 
 beforeAll(async () => {
   survey = await DataTest.createTestSurvey({ user: getContextUser() })
@@ -86,7 +70,7 @@ describe('query card model', () => {
 
 describe('translations', () => {
   test('every language has the same aiAnalysis keys, all non-empty', () => {
-    const enKeys = keyPaths(en.common.aiAnalysis)
+    const enKeys = leafPaths(RESOURCES.en.common.aiAnalysis)
     expect(enKeys).toEqual(
       [
         'area',
@@ -101,9 +85,9 @@ describe('translations', () => {
         'recordDataNotice.newConversation',
       ].sort()
     )
-    for (const resources of [es, fr, ja, mn, pt, ru]) {
-      const section = resources.common.aiAnalysis
-      expect(keyPaths(section)).toEqual(enKeys)
+    for (const lang of OTHER_LANGUAGES) {
+      const section = RESOURCES[lang].common.aiAnalysis
+      expect(leafPaths(section)).toEqual(enKeys)
       for (const path of enKeys) {
         const value = path.split('.').reduce((acc, key) => acc[key], section)
         expect(String(value).trim().length).toBeGreaterThan(0)
@@ -111,9 +95,10 @@ describe('translations', () => {
     }
   })
 
-  test('ru and mn are written in Cyrillic', () => {
-    for (const resources of [ru, mn]) {
-      expect(resources.common.aiAnalysis.recordDataNotice.message).toMatch(/[Ѐ-ӿ]/)
+  test('the Cyrillic languages are written in Cyrillic', () => {
+    expect(CYRILLIC_LANGUAGES.length).toBeGreaterThan(0)
+    for (const lang of CYRILLIC_LANGUAGES) {
+      expect(RESOURCES[lang].common.aiAnalysis.recordDataNotice.message).toMatch(CYRILLIC)
     }
   })
 })

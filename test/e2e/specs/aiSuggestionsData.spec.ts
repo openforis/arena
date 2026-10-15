@@ -1,11 +1,19 @@
-import type { Page, Response } from '@playwright/test'
+import type { Page } from '@playwright/test'
 
+import { toBucket, type DismissedTargets } from '@webapp/ai/suggestions/state/types'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, test } from '../fixtures'
 import { sampleRecords, type SampleRecord } from '../fixtures/seed/sampleSurveyModel'
-import { acceptConsentAndWait, analysisAreaLabel, collectRequestBodies, isGatewayRequest } from '../helpers/aiAnalysis'
+import {
+  acceptConsentAndWait,
+  analysisAreaLabel,
+  collectRequestBodies,
+  isGatewayRequest,
+  reloadApp,
+} from '../helpers/aiAnalysis'
 import { cleaningAreaLabel, useLocalServer } from '../helpers/aiCleaning'
+import { readSuggestionState } from '../helpers/aiStorage'
 import {
   assistantPanel,
   lastAssistantAnswer,
@@ -62,22 +70,6 @@ const countChatRequests = (stub: LocalModelServerStub): number =>
   stub.requests.filter((request) => request.path === '/v1/chat/completions').length
 
 /**
- * Reloads the page and waits for the GET of the AI settings, the last request of the boot (refresh tokens rotate:
- * an aborted boot logs the user out).
- * @param {Page} page - The page.
- * @returns {Promise<void>} Resolves after the boot.
- */
-const reloadAndWaitForAiSettings = async (page: Page): Promise<void> => {
-  await Promise.all([
-    page.waitForResponse(
-      (response: Response) =>
-        response.url().includes('/api/ai/settings') && response.request().method() === 'GET' && response.ok()
-    ),
-    page.reload(),
-  ])
-}
-
-/**
  * Opens the panel on an area and waits until the area is available (its home page shows only then).
  * @param {Page} page - The page.
  * @param {string} label - Area tab label.
@@ -97,32 +89,25 @@ const openArea = async (page: Page, label: string): Promise<void> => {
  * @param {string} userUuid - User uuid.
  * @param {number} surveyId - Survey id.
  * @param {string} id - Suggestion id.
- * @returns {Promise<{ pending: boolean, inProgress: boolean, dismissed: Record<string, unknown> } | null>} The
- * stored parts, or null while the user has no stored state yet.
+ * @returns {Promise<{ pending: boolean, inProgress: boolean, dismissed: DismissedTargets } | null>} The stored
+ * parts, or null while the user has no stored state yet.
  */
-const readStoredSuggestion = (
+const readStoredSuggestion = async (
   page: Page,
   userUuid: string,
   surveyId: number,
   id: string
-): Promise<{ pending: boolean; inProgress: boolean; dismissed: Record<string, unknown> } | null> =>
-  page.evaluate(
-    ([key, bucket, suggestionId]) => {
-      try {
-        const state = JSON.parse(localStorage.getItem(key) ?? 'null')
-        if (!state) return null
-        return {
-          pending: (state.pending?.[bucket] ?? []).some((suggestion: { id: string }) => suggestion.id === suggestionId),
-          inProgress: suggestionId in (state.inProgress?.[bucket] ?? {}),
-          // a dismissed entry is { kind, targets: { <target key>: ... } }: the keys of `targets` are what was dismissed
-          dismissed: state.dismissed?.[bucket]?.[suggestionId]?.targets ?? {},
-        }
-      } catch {
-        return null
-      }
-    },
-    [`arena.ai.suggestions.${userUuid}`, String(surveyId), id]
-  )
+): Promise<{ pending: boolean; inProgress: boolean; dismissed: DismissedTargets } | null> => {
+  const state = await readSuggestionState(page, userUuid)
+  if (!state) return null
+  const bucket = toBucket(surveyId)
+  return {
+    pending: (state.pending[bucket] ?? []).some((suggestion) => suggestion.id === id),
+    inProgress: id in (state.inProgress[bucket] ?? {}),
+    // a dismissed entry is { kind, targets: { <target key>: ... } }: the keys of `targets` are what was dismissed
+    dismissed: state.dismissed[bucket]?.[id]?.targets ?? {},
+  }
+}
 
 /**
  * Waits until the store holds a suggestion as pending and not in progress (an absent state keeps waiting).
@@ -263,7 +248,7 @@ test.describe('AI suggestion: data imported (mock provider)', () => {
     }
 
     // the pushed job updates opened the job monitor: continue on a fresh page (the suggestion is stored)
-    await reloadAndWaitForAiSettings(page)
+    await reloadApp(page)
     await openArea(page, analysisAreaLabel)
     const panel = assistantPanel(page)
     await expect(panel.getByText(importCardText, { exact: true })).toBeVisible()
@@ -277,11 +262,16 @@ test.describe('AI suggestion: data imported (mock provider)', () => {
 
     // a fresh boot: the job resync and the stored state must not bring the card back
     const socketReopened = page.waitForEvent('websocket', (socket) => socket.url().includes('/socket.io/'))
-    await reloadAndWaitForAiSettings(page)
-    await socketReopened
+    // the boot resyncs the active job (the import that succeeded): the card must stay away after that, so wait for it
+    // before checking (a check before the resync would pass whatever the app does)
+    const jobResynced = page.waitForResponse(
+      (response) => response.url().includes('/api/jobs/active') && response.request().method() === 'GET'
+    )
+    await reloadApp(page)
+    await Promise.all([socketReopened, jobResynced])
     await openArea(page, analysisAreaLabel)
     await expectDismissedInStore()
-    await expect.poll(() => importCard.count(), { intervals: [250], timeout: 3000 }).toBe(0)
+    await expect(importCard).toHaveCount(0)
     expect(gatewayBodies).toEqual([])
   })
 })

@@ -16,6 +16,7 @@ import {
   isGatewayRequest,
   queryCard,
   reopenLastConversation,
+  reloadApp,
   setLocalProvider,
 } from '../helpers/aiAnalysis'
 import { assistantPanel, openAssistantPanel, waitForAssistantTurn } from '../helpers/assistantPanel'
@@ -95,7 +96,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
     const runAverageLocally = async (page: Page, api: ArenaApi): Promise<void> => {
       await page.goto(Urls.dataExplorer)
       await setLocalProvider(page, api, { enabled: true, baseUrl: stub.baseUrl, modelId: stub.modelId })
-      await page.reload()
+      await reloadApp(page)
 
       await askAnalysis(page, analysisMessages.run)
       await acceptConsentAndWait(page)
@@ -131,7 +132,7 @@ test.describe('AI analysis assistant (mock provider)', () => {
 
       // the local provider is removed: Arena default (cloud) is the default again
       await setLocalProvider(page, api, { enabled: false, baseUrl: stub.baseUrl, modelId: stub.modelId })
-      await page.reload()
+      await reloadApp(page)
       await openAssistantPanel(page)
       // the Explorer selects the Analysis area (schema still allowed on the gateway); the panel starts empty
       await reopenLastConversation(page)

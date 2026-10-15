@@ -2,29 +2,7 @@ import * as SettingsApi from '@server/modules/ai/api/settingsApi'
 import { createProviderRateLimit, limitProviderCalls } from '@server/modules/ai/api/providerRateLimit'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
-
-type Route = { method: string; path: string; handlers: any[] }
-
-/**
- * Collects the routes an API module registers.
- * @param {Function} init - The `init(app)` of the module.
- * @returns {Route[]} The routes, with the handlers in the order they run.
- */
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+import { collectRoutes } from '@test/utils/routeUtils'
 
 describe('Rate limit of the calls to the endpoints of the providers (307)', () => {
   test('a user over the limit is refused with 429 "aiRateLimited" and the request goes no further', () => {

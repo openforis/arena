@@ -1,29 +1,23 @@
 /**
  * Helpers shared by the i18n tests of the AI assistant suggestion card texts (namespace aiSuggestions).
  */
-import en from '@core/i18n/resources/en'
-import es from '@core/i18n/resources/es'
-import fr from '@core/i18n/resources/fr'
-import ja from '@core/i18n/resources/ja'
-import mn from '@core/i18n/resources/mn'
-import pt from '@core/i18n/resources/pt'
-import ru from '@core/i18n/resources/ru'
+import {
+  CYRILLIC,
+  CYRILLIC_LANGUAGES,
+  flattenTexts,
+  LANGUAGES,
+  PLURAL_SUFFIX,
+  placeholdersOf,
+  pluralFormsOf,
+  RESOURCES,
+} from './i18nParity'
 
-export const RESOURCES: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-export const LANGUAGES = Object.keys(RESOURCES)
+export { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, PLURAL_SUFFIX, RESOURCES }
 
-// plural forms each language must have (i18next 26, Intl.PluralRules)
-export const PLURAL_FORMS: Record<string, string[]> = {
-  en: ['one', 'other'],
-  es: ['one', 'other'],
-  fr: ['one', 'other'],
-  ja: ['other'],
-  mn: ['one', 'other'],
-  pt: ['one', 'other'],
-  ru: ['one', 'few', 'many', 'other'],
-}
-export const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
-export const CYRILLIC = /[Ѐ-ӿ]/
+// plural forms each language must have (derived from the language, not listed)
+export const PLURAL_FORMS: Record<string, string[]> = Object.fromEntries(
+  LANGUAGES.map((lang) => [lang, pluralFormsOf(lang)])
+)
 
 /**
  * Returns the aiSuggestions resource of a language.
@@ -32,21 +26,7 @@ export const CYRILLIC = /[Ѐ-ӿ]/
  */
 export const getResource = (lang: string): Record<string, unknown> => RESOURCES[lang].aiSuggestions
 
-/**
- * Flattens a resource: "a.b.c" paths to the string leaves.
- * @param {object} obj - Resource.
- * @param {string} [prefix] - Path prefix.
- * @returns {Record<string, string>} The texts by path.
- */
-export const flatten = (obj: Record<string, unknown>, prefix = ''): Record<string, string> => {
-  const result: Record<string, string> = {}
-  for (const [key, value] of Object.entries(obj)) {
-    const path = prefix ? `${prefix}.${key}` : key
-    if (typeof value === 'string') result[path] = value
-    else Object.assign(result, flatten(value as Record<string, unknown>, path))
-  }
-  return result
-}
+export const flatten = flattenTexts
 
 /**
  * Returns the sorted keys of a language, plural suffixes stripped.
@@ -56,13 +36,7 @@ export const flatten = (obj: Record<string, unknown>, prefix = ''): Record<strin
 export const baseKeys = (lang: string): string[] =>
   [...new Set(Object.keys(flatten(getResource(lang))).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort()
 
-/**
- * Returns the sorted placeholder names of a text.
- * @param {string} text - Text.
- * @returns {string[]} The names.
- */
-export const placeholders = (text: string): string[] =>
-  [...text.matchAll(/{{\s*(\w+)\s*}}/g)].map((match) => match[1]).sort()
+export const placeholders = placeholdersOf
 
 /**
  * Returns the English text of a base key (the _other form of a plural).

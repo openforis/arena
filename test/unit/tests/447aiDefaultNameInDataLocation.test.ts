@@ -2,9 +2,9 @@ import { getGatewayEngineInfo, getLocalServerEngineInfo } from '@webapp/ai/engin
 import { toDataLocation } from '@webapp/ai/engines/featureAvailability'
 import type { AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
+import { fakeT as t } from '../utils/fakeT'
 
 // a fake t: translated texts are marked, so the test sees what went through it
-const t = (key: string, params?: object) => `${key}${params ? JSON.stringify(params) : ''}`
 
 const capability: AiLocalServerCapability = {
   reachable: true,

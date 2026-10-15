@@ -134,6 +134,9 @@ export const ENV = {
   aiRequestTimeoutMs: Number(process.env.AI_REQUEST_TIMEOUT_MS) || 60000,
   // Requests per user per minute on the gateway endpoint; 0 or negative = unlimited
   aiRateLimitPerMinute: getNumberOrDefault(process.env.AI_RATE_LIMIT_PER_MINUTE, 30),
+  // Calls of one user to the endpoints of their providers (test, model list, save) that may run at the same time;
+  // 0 or negative = unlimited
+  aiProviderMaxInFlightPerUser: getNumberOrDefault(process.env.AI_PROVIDER_MAX_IN_FLIGHT_PER_USER, 3),
   // Daily budget per user of the Arena default provider (UTC day); 0 or negative = unlimited
   aiDefaultDailyCallLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CALL_LIMIT, 200),
   aiDefaultDailyCharLimit: getNumberOrDefault(process.env.AI_DEFAULT_DAILY_CHAR_LIMIT, 2000000),

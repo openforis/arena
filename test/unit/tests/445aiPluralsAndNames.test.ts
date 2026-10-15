@@ -1,50 +1,12 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 
-import en from '@core/i18n/resources/en/common'
-import es from '@core/i18n/resources/es/common'
-import fr from '@core/i18n/resources/fr/common'
-import ja from '@core/i18n/resources/ja/common'
-import mn from '@core/i18n/resources/mn/common'
-import pt from '@core/i18n/resources/pt/common'
-import ru from '@core/i18n/resources/ru/common'
-import enErrors from '@core/i18n/resources/en/appErrors'
-import esErrors from '@core/i18n/resources/es/appErrors'
-import frErrors from '@core/i18n/resources/fr/appErrors'
-import jaErrors from '@core/i18n/resources/ja/appErrors'
-import mnErrors from '@core/i18n/resources/mn/appErrors'
-import ptErrors from '@core/i18n/resources/pt/appErrors'
-import ruErrors from '@core/i18n/resources/ru/appErrors'
-import enSettings from '@core/i18n/resources/en/userAiSettings'
-import esSettings from '@core/i18n/resources/es/userAiSettings'
-import frSettings from '@core/i18n/resources/fr/userAiSettings'
-import jaSettings from '@core/i18n/resources/ja/userAiSettings'
-import mnSettings from '@core/i18n/resources/mn/userAiSettings'
-import ptSettings from '@core/i18n/resources/pt/userAiSettings'
-import ruSettings from '@core/i18n/resources/ru/userAiSettings'
-
 import { getDefaultNameKey, getProviderNameText } from '@webapp/ai/providers/providerNames'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage } from '../utils/i18nParity'
+import { fakeT as t } from '../utils/fakeT'
 
-const LANGS = ['en', 'es', 'fr', 'ja', 'mn', 'pt', 'ru']
-const common: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
-const errors: Record<string, any> = {
-  en: enErrors,
-  es: esErrors,
-  fr: frErrors,
-  ja: jaErrors,
-  mn: mnErrors,
-  pt: ptErrors,
-  ru: ruErrors,
-}
-const settings: Record<string, any> = {
-  en: enSettings,
-  es: esSettings,
-  fr: frSettings,
-  ja: jaSettings,
-  mn: mnSettings,
-  pt: ptSettings,
-  ru: ruSettings,
-}
-const CYRILLIC = /[Ѐ-ӿ]/
+const common = namespaceByLanguage('common')
+const errors = namespaceByLanguage('appErrors')
+const settings = namespaceByLanguage('userAiSettings')
 
 // the {{count}} texts the redesign added whose number can be 1 (or ends in 1 in Russian)
 const PLURALS: { name: string; get: (lang: string) => Record<string, string>; base: string }[] = [
@@ -56,7 +18,7 @@ const PLURALS: { name: string; get: (lang: string) => Record<string, string>; ba
 
 describe('plural forms of the AI texts (445)', () => {
   describe.each(PLURALS)('$name', ({ get, base }) => {
-    test.each(LANGS)('%s has every plural form of its language and keeps {{count}}', (lang) => {
+    test.each(LANGUAGES)('%s has every plural form of its language and keeps {{count}}', (lang) => {
       // i18next shows the raw key for a category without a text (ru: few and many, es/fr/pt: many for millions)
       const { pluralCategories } = new Intl.PluralRules(lang).resolvedOptions()
       const texts = get(lang)
@@ -67,7 +29,7 @@ describe('plural forms of the AI texts (445)', () => {
       }
     })
 
-    test.each(['ru', 'mn'])('%s forms are Cyrillic', (lang) => {
+    test.each(CYRILLIC_LANGUAGES)('%s forms are Cyrillic', (lang) => {
       const forms = Object.entries(get(lang)).filter(([key]) => key.startsWith(`${base}_`))
       for (const [key, text] of forms) {
         expect([key, CYRILLIC.test(text)]).toEqual([key, true])
@@ -93,22 +55,22 @@ describe('plural forms of the AI texts (445)', () => {
 })
 
 describe('texts added by the review fixes (445)', () => {
-  test.each(LANGS)('%s has common.fetchError with its message', (lang) => {
+  test.each(LANGUAGES)('%s has common.fetchError with its message', (lang) => {
     expect(common[lang].common.fetchError).toContain('{{message}}')
   })
 
-  test.each(LANGS)('%s names the show / hide button of the password input', (lang) => {
+  test.each(LANGUAGES)('%s names the show / hide button of the password input', (lang) => {
     expect(typeof common[lang].common.showValue).toBe('string')
     expect(typeof common[lang].common.hideValue).toBe('string')
     expect(common[lang].common.showValue).not.toBe(common[lang].common.hideValue)
   })
 
-  test.each(['ru', 'mn'])('%s show / hide texts are Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s show / hide texts are Cyrillic', (lang) => {
     expect(common[lang].common.showValue).toMatch(CYRILLIC)
     expect(common[lang].common.hideValue).toMatch(CYRILLIC)
   })
 
-  test.each(LANGS)('%s has the new settings texts', (lang) => {
+  test.each(LANGUAGES)('%s has the new settings texts', (lang) => {
     const s = settings[lang]
     for (const text of [s.unknownError, s.dialog.removeKey, s.dialog.keepKey, s.dialog.apiKeyRemoved]) {
       expect(typeof text).toBe('string')
@@ -127,7 +89,7 @@ describe('texts added by the review fixes (445)', () => {
     }
   })
 
-  test.each(['ru', 'mn'])('%s new settings texts are Cyrillic', (lang) => {
+  test.each(CYRILLIC_LANGUAGES)('%s new settings texts are Cyrillic', (lang) => {
     const s = settings[lang]
     for (const text of [s.unknownError, s.dialog.removeKey, s.dialog.keepKey, s.dialog.apiKeyRemoved]) {
       expect(text).toMatch(CYRILLIC)
@@ -136,7 +98,7 @@ describe('texts added by the review fixes (445)', () => {
     expect(s.defaultName.orgServer).toMatch(CYRILLIC)
   })
 
-  test.each(LANGS)('%s aiPolicyAboveCeiling names the data class', async (lang) => {
+  test.each(LANGUAGES)('%s aiPolicyAboveCeiling names the data class', async (lang) => {
     expect(errors[lang].aiPolicyAboveCeiling).toContain('{{dataClass}}')
     const t = (await createI18nAsync(lang)).t as any
     const params = { dataClass: 'data', level: 'cloud', ceiling: 'orgHosted' }
@@ -147,8 +109,6 @@ describe('texts added by the review fixes (445)', () => {
 })
 
 describe('default provider names (445)', () => {
-  const t = (key: string) => `T(${key})`
-
   test('the English default of a type maps to its translated name', () => {
     expect(getDefaultNameKey({ name: 'Local server', providerType: 'local' })).toBe('userAiSettings:defaultName.local')
     expect(getDefaultNameKey({ name: 'OpenAI', providerType: 'openai' })).toBe('userAiSettings:defaultName.openai')
@@ -170,11 +130,11 @@ describe('default provider names (445)', () => {
     expect(getProviderNameText({ name: 'Desk GPU', providerType: 'local', t })).toBe('Desk GPU')
     expect(getProviderNameText({ name: 'OpenAI', providerType: 'anthropic', t })).toBe('OpenAI')
     expect(getProviderNameText({ name: 'Local server', providerType: 'local', t })).toBe(
-      'T(userAiSettings:defaultName.local)'
+      'userAiSettings:defaultName.local'
     )
   })
 
-  test.each(LANGS)('%s translates every default name key', async (lang) => {
+  test.each(LANGUAGES)('%s translates every default name key', async (lang) => {
     const translate = (await createI18nAsync(lang)).t as any
     for (const type of [
       'local',

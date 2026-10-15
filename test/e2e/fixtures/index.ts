@@ -2,7 +2,7 @@ import { test as base, expect } from '@playwright/test'
 
 import { ArenaApi } from './arenaApi'
 import { insertSampleSurvey, SampleSurveyOptions } from './seed/sampleSurvey'
-import { getWorkerTestUser, insertTestUserIfMissing, TestUser } from './testUsers'
+import { getWorkerTestUser, insertTestUserIfMissing, resetTestUserAiPrefs, TestUser } from './testUsers'
 
 export type TestSurvey = {
   id: number
@@ -19,6 +19,11 @@ type TestFixtures = {
    * When true (default), the browser context is logged in as the worker test user before the test starts.
    */
   authenticated: boolean
+  /**
+   * Automatic: clears the AI prefs of the worker test user before every test, so no test depends on the AI state
+   * (access level, toggles, providers, default provider) that another one left.
+   */
+  aiPrefsReset: void
   api: ArenaApi
   /**
    * A new, empty survey, created before the test and set as current survey of the test user.
@@ -62,6 +67,14 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
   ],
 
   authenticated: [true, { option: true }],
+
+  aiPrefsReset: [
+    async ({ testUser }, use) => {
+      await resetTestUserAiPrefs(testUser)
+      await use()
+    },
+    { auto: true },
+  ],
 
   context: async ({ context, authenticated, testUser, baseURL }, use) => {
     // do not send analytics from the tests
