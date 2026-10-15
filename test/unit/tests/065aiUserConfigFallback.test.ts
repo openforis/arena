@@ -1,3 +1,4 @@
+import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
@@ -20,6 +21,12 @@ const userWithKey = (apiKeyEncrypted: string) =>
     },
   }) as any
 
+// the old single slot is the provider acct:legacy of the user
+const legacySlotAad = buildKeyAad({
+  userUuid: 'user-1',
+  provider: { id: 'acct:legacy', type: 'openai', baseUrl: null },
+})
+
 const adminConfig = { provider: 'openai-compatible', model: 'admin-model', baseUrl: 'http://admin', apiKey: null }
 
 describe('saved API key encrypted with a rotated secret', () => {
@@ -29,7 +36,7 @@ describe('saved API key encrypted with a rotated secret', () => {
   beforeAll(() => {
     originalKey = process.env.AI_USER_KEY_ENCRYPTION_SECRET
     process.env.AI_USER_KEY_ENCRYPTION_SECRET = KEY_A
-    encrypted = SecretBox.encrypt('sk-user')
+    encrypted = SecretBox.encrypt('sk-user', legacySlotAad)
     process.env.AI_USER_KEY_ENCRYPTION_SECRET = KEY_B // rotation
   })
 
@@ -52,7 +59,7 @@ describe('saved API key encrypted with a rotated secret', () => {
   })
 
   test('a readable key is used', () => {
-    const readable = SecretBox.encrypt('sk-new')
+    const readable = SecretBox.encrypt('sk-new', legacySlotAad)
     expect(AiSettingsService.getPublicSettings(userWithKey(readable)).providers[0].apiKeyReadable).toBe(true)
     expect(ProviderResolver.resolveProviderConfig({ user: userWithKey(readable), adminConfig })).toMatchObject({
       source: ProviderResolver.sources.user,

@@ -33,6 +33,13 @@ export type AiProviderPrefs = {
   providers: StoredAiProvider[]
 }
 
+// the secret box as the provider prefs use it: the key of a provider is bound to its owner, id, type and endpoint
+export type KeyCipher = {
+  encrypt: (plain: string, aad: string) => string
+  decrypt: (envelope: string, aad: string, options?: { allowLegacy?: boolean }) => string
+  isLegacy: (envelope: string) => boolean
+}
+
 export type PublicAiProvider = {
   id: string
   type: string
@@ -240,18 +247,128 @@ export const toPublicProvider = ({
 })
 
 /**
- * Decrypts the stored key of a provider.
- * @param {StoredAiProvider} stored - Stored provider.
- * @param {(encrypted: string) => string} decrypt - Decrypt function.
- * @returns {string|null} The key, or null when none is stored.
- * @throws {SystemError} aiApiKeyUnreadable (409) when the key cannot be decrypted (secret rotated).
+ * Returns the AAD that binds the encrypted key of a provider to its owner, id, type and endpoint (trailing slashes
+ * ignored, like {@link isSameEndpoint}), so a ciphertext copied to another user, provider or endpoint cannot be read.
+ * @param {object} params - Parameters.
+ * @param {string} params.userUuid - The user that owns the provider.
+ * @param {object} params.provider - The provider (id, type and base URL are used).
+ * @returns {string} The AAD.
  */
-export const decryptStoredKey = (stored: StoredAiProvider, decrypt: (encrypted: string) => string): string | null => {
+export const buildKeyAad = ({
+  userUuid,
+  provider,
+}: {
+  userUuid: string
+  provider: Pick<StoredAiProvider, 'id' | 'type' | 'baseUrl'>
+}): string => {
+  if (typeof userUuid !== 'string' || userUuid.length === 0) throw new TypeError('buildKeyAad: userUuid is required')
+  // ids and types have no "|", and the base URL is last, so two different providers never share an AAD
+  return [userUuid, provider.id, provider.type, stripTrailingSlashes(provider.baseUrl)].join('|')
+}
+
+/**
+ * Encrypts the key of a provider, bound to its owner and endpoint.
+ * @param {object} params - Parameters.
+ * @param {string} params.apiKey - Plain key.
+ * @param {string} params.userUuid - The user that owns the provider.
+ * @param {object} params.provider - The provider the key is for (id, type and base URL as they will be stored).
+ * @param {KeyCipher} params.cipher - The secret box.
+ * @returns {string} The encrypted key.
+ */
+export const encryptProviderKey = ({
+  apiKey,
+  userUuid,
+  provider,
+  cipher,
+}: {
+  apiKey: string
+  userUuid: string
+  provider: Pick<StoredAiProvider, 'id' | 'type' | 'baseUrl'>
+  cipher: Pick<KeyCipher, 'encrypt'>
+}): string => cipher.encrypt(apiKey, buildKeyAad({ userUuid, provider }))
+
+/**
+ * Decrypts the stored key of one of the user's own providers (an old key without AAD is accepted: it was read from
+ * the owner's own record).
+ * @param {StoredAiProvider} stored - Stored provider of the user.
+ * @param {string} userUuid - The user that owns the provider.
+ * @param {KeyCipher['decrypt']} decrypt - Decrypt function.
+ * @returns {string|null} The key, or null when none is stored.
+ * @throws {SystemError} aiApiKeyUnreadable (409) when the key cannot be decrypted (secret rotated, key bound to
+ *   another user, provider or endpoint).
+ */
+export const decryptStoredKey = (
+  stored: StoredAiProvider,
+  userUuid: string,
+  decrypt: KeyCipher['decrypt']
+): string | null => {
   if (!stored.apiKeyEncrypted) return null
   try {
-    return decrypt(stored.apiKeyEncrypted)
+    return decrypt(stored.apiKeyEncrypted, buildKeyAad({ userUuid, provider: stored }), { allowLegacy: true })
   } catch {
-    // no silent switch to another provider: the user enters the key again (spec section 9)
+    // no silent switch to another provider: the user enters the key again
     throw new SystemError('aiApiKeyUnreadable', { providerId: stored.id }, StatusCodes.CONFLICT)
   }
+}
+
+/**
+ * Returns the provider with its old key (no AAD) encrypted again with the AAD; the provider as it is when its key is
+ * not an old one or cannot be read.
+ * @param {object} params - Parameters.
+ * @param {StoredAiProvider} params.provider - Stored provider.
+ * @param {string} params.userUuid - The user that owns the provider.
+ * @param {KeyCipher} params.cipher - The secret box.
+ * @returns {StoredAiProvider} The provider.
+ */
+const upgradeLegacyKey = ({
+  provider,
+  userUuid,
+  cipher,
+}: {
+  provider: StoredAiProvider
+  userUuid: string
+  cipher: KeyCipher
+}): StoredAiProvider => {
+  const { apiKeyEncrypted } = provider
+  if (!apiKeyEncrypted || !cipher.isLegacy(apiKeyEncrypted)) return provider
+  try {
+    const apiKey = decryptStoredKey(provider, userUuid, cipher.decrypt)
+    return apiKey
+      ? { ...provider, apiKeyEncrypted: encryptProviderKey({ apiKey, userUuid, provider, cipher }) }
+      : provider
+  } catch {
+    // an unreadable key stays as it is: the user is asked for it again where it is needed
+    return provider
+  }
+}
+
+/**
+ * Returns true when a provider has a key stored without AAD.
+ * @param {AiProviderPrefs} prefs - Provider prefs.
+ * @param {KeyCipher['isLegacy']} isLegacy - Tells an old envelope from a new one.
+ * @returns {boolean} Whether a key needs to be encrypted again.
+ */
+export const hasLegacyKeys = (prefs: AiProviderPrefs, isLegacy: KeyCipher['isLegacy']): boolean =>
+  prefs.providers.some((provider) => !!provider.apiKeyEncrypted && isLegacy(provider.apiKeyEncrypted))
+
+/**
+ * Returns the provider prefs with every old key (no AAD) encrypted again with its AAD.
+ * @param {object} params - Parameters.
+ * @param {AiProviderPrefs} params.prefs - Provider prefs of the user.
+ * @param {string} params.userUuid - The user.
+ * @param {KeyCipher} params.cipher - The secret box.
+ * @returns {AiProviderPrefs} The prefs; the same object when no key changed.
+ */
+export const upgradeLegacyKeys = ({
+  prefs,
+  userUuid,
+  cipher,
+}: {
+  prefs: AiProviderPrefs
+  userUuid: string
+  cipher: KeyCipher
+}): AiProviderPrefs => {
+  if (!hasLegacyKeys(prefs, cipher.isLegacy)) return prefs
+  const providers = prefs.providers.map((provider) => upgradeLegacyKey({ provider, userUuid, cipher }))
+  return providers.some((provider, index) => provider !== prefs.providers[index]) ? { ...prefs, providers } : prefs
 }
