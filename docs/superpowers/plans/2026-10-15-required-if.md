@@ -56,6 +56,8 @@ min count, which already supports expressions; key attributes are always require
 
 - **Three exclusive options**: not required / always required / required when condition is met.
 - **Always an error** when a required value is missing (same severity as today's `required`, no severity selector).
+- **Table layouts (multiple entities)**: no asterisk in the cells; conditionally required cells just show the
+  existing validation feedback. Headers show the asterisk only for always-required attributes.
 - **The data entry form marks the attribute as required** (web and mobile) when it is always required, or when its
   condition is met in that entity. Today no required marker is shown at all, so the marker is new for both cases.
 
@@ -224,8 +226,8 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
   or, in designer/preview edit mode without a node, when the def is always required or has `requiredIf`.
 - Key attributes keep the key icon (no asterisk, they are implicitly required).
 - Table layout (multiple entities, `nodeDefTableCellHeader.js`): the header shows the asterisk for always-required
-  attributes only (the condition can differ per row); conditionally required cells get the marker in the cell when
-  the row flag is true (e.g. a small asterisk badge or a CSS class on the cell).
+  attributes only (the condition can differ per row). **No marker in the cells**: conditionally required cells only
+  show the existing validation feedback (`valueRequired` error) as today.
 - The marker updates live: node updates pushed by the server carry the parent entity with the new `cReq` meta, and
   the web record state already replaces updated nodes.
 - `core/record/_node/nodeMeta.js`: add `childRequired: 'cReq'` key for consistency with `cEdit`.
@@ -272,8 +274,9 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 - Mobile runs the arena-core record updater locally, so `cReq` is computed on the device for new and edited records.
 - Required marker: `src/screens/RecordEditor/NodeDefFormItem/NodeDefFormItemHeader.tsx` shows an asterisk after
   the label when `Records.isNodeRequired(node)(record)` (it already receives `parentNodeUuid`; add a selector in
-  `state/dataEntry/selectors.ts` next to the editable one, line ~194). Same for the multiple entity list/table
-  headers (always-required only) and the nodes carousel.
+  `state/dataEntry/selectors.ts` next to the editable one, line ~194). Same for the nodes carousel; multiple entity
+  list/table headers show it for always-required attributes only, with no marker in the cells (existing validation
+  feedback only).
 - `NodeCoordinateComponent/useNodeCoordinateComponent.ts:355` uses `NodeDefs.isRequired`: switch to the node-level
   `Records.isNodeRequired`.
 - Records downloaded from the server already carry `cReq`; records created on older app versions lack it → the
@@ -306,6 +309,4 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 
 ## Open questions
 
-- Table layout marker for conditionally required cells: confirm the visual (asterisk badge in the cell vs. header
-  asterisk with a "conditional" hint).
 - Should the asterisk also be shown on key attributes (currently they only show the key icon)?
