@@ -19,55 +19,22 @@ import * as API from '@webapp/service/api'
 import { useSystemConfigAiFeaturesEnabled } from '@webapp/store/system'
 import { useUser } from '@webapp/store/user'
 
-let cache = null
-let inflight = null
-// bumped by every reset/invalidate: a fetch that started before cannot write its result
-let generation = 0
-const listeners = new Set()
+import { createAiSettingsCache } from './aiSettingsCache'
 
-const notify = () => listeners.forEach((cb) => cb())
-
-const fetchOnce = () => {
-  if (cache) return Promise.resolve(cache)
-  if (inflight) return inflight
-  const startedAt = generation
-  const isCurrent = () => startedAt === generation
-  inflight = (async () => {
-    let result = null
-    try {
-      result = await API.aiSettings.fetchSettings()
-    } catch (error) {
-      const data = error?.response?.data
-      const code = data?.key ?? data?.error
-      const status = error?.response?.status
-      if (code === 'aiFeaturesDisabled' || status === 404 || status === 403) {
-        result = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [] }
-      } else {
-        // Network or other error: leave cache as the safest fallback so
-        // we hide AI buttons rather than flashing them in.
-        result = { featuresEnabled: false, featureToggles: {}, disabledFeatures: [], _fetchError: true }
-      }
-    }
-    if (!isCurrent()) return result
-    cache = result
-    inflight = null
-    notify()
-    return cache
-  })()
-  return inflight
-}
+const settingsCache = createAiSettingsCache({ fetchSettings: () => API.aiSettings.fetchSettings() })
 
 /**
  * Returns the AI settings of the user (fetched once per session, shared with the hooks).
- * @returns {Promise<object>} The settings response (a "force off" object when the fetch failed).
+ * @returns {Promise<object>} The settings response (a "force off" object when the fetch failed; when it failed for a
+ * reason that may pass it is marked `_fetchError` and not kept, so the next call asks again).
  */
-export const fetchAiSettingsOnce = () => fetchOnce()
+export const fetchAiSettingsOnce = () => settingsCache.fetchOnce()
 
 /**
  * Returns the cached AI settings without fetching.
  * @returns {object|null} The settings, or null while not loaded.
  */
-export const getAiSettingsSnapshot = () => cache
+export const getAiSettingsSnapshot = () => settingsCache.getSnapshot()
 
 /**
  * Drops the cached AI settings and triggers a re-fetch. Call this from the
@@ -75,24 +42,14 @@ export const getAiSettingsSnapshot = () => cache
  * new toggles immediately.
  * @returns {void}
  */
-export const invalidateAiSettingsCache = () => {
-  generation += 1
-  cache = null
-  inflight = null
-  fetchOnce()
-}
+export const invalidateAiSettingsCache = () => settingsCache.invalidate()
 
 /**
  * Drops the cached AI settings and the fetch in flight without fetching again (login, logout): the next
  * consumer fetches the settings of the then logged-in user.
  * @returns {void}
  */
-export const resetAiSettingsCache = () => {
-  generation += 1
-  cache = null
-  inflight = null
-  notify()
-}
+export const resetAiSettingsCache = () => settingsCache.reset()
 
 /**
  * Returns true when the master toggle is on AND the given category toggle
@@ -110,18 +67,14 @@ export const useAiFeatureEnabled = (category) => {
   const [, forceRender] = useReducer((count) => count + 1, 0)
 
   useEffect(() => {
-    const onChange = () => forceRender()
-    listeners.add(onChange)
-
-    if (aiFeaturesEnabledInSystemConfig && userUuid && !cache && !inflight) {
-      fetchOnce()
-    }
-    return () => {
-      listeners.delete(onChange)
-    }
+    const unsubscribe = settingsCache.subscribe(() => forceRender())
+    // after a fetch that failed for a reason that may pass, the next consumer that mounts asks again
+    if (aiFeaturesEnabledInSystemConfig && userUuid) settingsCache.fetchOnce()
+    return unsubscribe
   }, [aiFeaturesEnabledInSystemConfig, userUuid])
 
+  const settings = settingsCache.getSnapshot()
   if (!aiFeaturesEnabledInSystemConfig) return false
-  if (!cache) return false
-  return isAiCategoryEnabledInSettings(cache, category)
+  if (!settings) return false
+  return isAiCategoryEnabledInSettings(settings, category)
 }
