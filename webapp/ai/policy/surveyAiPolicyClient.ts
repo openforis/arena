@@ -15,7 +15,7 @@ import {
 // read by appErrorsMiddleware: the caller shows the error
 export const localErrors: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
 
-export const getUrl = (surveyId: number): string => `/api/survey/${surveyId}/ai-policy`
+const getUrl = (surveyId: number): string => `/api/survey/${surveyId}/ai-policy`
 
 const cache = createSurveyAiPolicyCache({
   fetchPolicy: async (surveyId) => (await axios.get(getUrl(surveyId), localErrors)).data,

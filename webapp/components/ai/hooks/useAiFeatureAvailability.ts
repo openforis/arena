@@ -13,7 +13,7 @@ import {
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from '@webapp/ai/engines/featureSwitches'
 import type { AiCapabilities } from '@webapp/ai/engines/types'
 import { isSurveyScopedFeature, resolveEffectivePolicy } from '@webapp/ai/policy/aiFeatureAvailability'
-import { getCeilingsFromSettings } from '@webapp/ai/policy/policyContextLoader'
+import { getCeilingsFromSettings } from '@webapp/ai/policy/effectivePolicy'
 import { useSurveyAiPolicy } from '@webapp/ai/policy/useSurveyAiPolicy'
 import { useUser } from '@webapp/store/user'
 
