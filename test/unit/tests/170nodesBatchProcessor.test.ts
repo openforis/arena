@@ -72,6 +72,7 @@ describe('processNodesBatch', () => {
     now = 1000,
     persistNow,
     matchesQualifiers = () => true,
+    stepAndOwnerInDb = undefined,
   }: {
     failOnNodeUuid?: string | null
     validationFor?: (node: any) => any
@@ -81,6 +82,8 @@ describe('processNodesBatch', () => {
     now?: number | (() => number)
     persistNow?: () => void
     matchesQualifiers?: (params: { pendingNode: any }) => boolean
+    // step and owner as they are in the database, when they differ from the (cached) record
+    stepAndOwnerInDb?: { step: string; ownerUuid: string } | null
   } = {}) => {
     const posted: any[] = []
     const errors: string[] = []
@@ -98,6 +101,10 @@ describe('processNodesBatch', () => {
         }
       },
       getOrFetchRecord: async () => recordInDb,
+      fetchRecordStepAndOwner: async () =>
+        stepAndOwnerInDb === undefined
+          ? recordInDb && { step: Record.getStep(recordInDb), ownerUuid: Record.getOwnerUuid(recordInDb) }
+          : stepAndOwnerInDb,
       fetchQualifierFilters: async () => [{ nodeDef: 'qualifier' }],
       recordMatchesQualifierFilters: ({ pendingNode }) => matchesQualifiers({ pendingNode }),
       findNodeRecordUuid: async ({ nodeUuid, t }) => {
@@ -285,6 +292,40 @@ describe('processNodesBatch', () => {
       expect(results).toEqual([forbidden(0), forbidden(1)])
       expect(calls.persistNode).toBe(0)
       expect(posted).toEqual([])
+    })
+
+    test('a promotion to analysis that the cached record does not know is refused: the step is read under the lock', async () => {
+      // the thread cache can be stale: updating the step does not change the date the cache is checked with
+      const { deps, calls } = createDeps({ stepAndOwnerInDb: { step: '3', ownerUuid: Record.getOwnerUuid(record) } })
+      const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), deps })
+      expect(results).toEqual([forbidden(0)])
+      expect(calls.persistNode).toBe(0)
+    })
+
+    describe('a user who edits their own records only', () => {
+      const surveyUuidOfSurvey = () => Record.getSurveyUuid(record) ?? 'survey-uuid'
+      const ownerUser = () => ({
+        uuid: 'owner-uuid',
+        authGroups: [{ surveyUuid: surveyUuidOfSurvey(), name: 'dataEditor', recordSteps: { '1': 'own', '2': 'own' } }],
+      })
+      const ownedRecord = () => ({ ...record, surveyUuid: surveyUuidOfSurvey(), ownerUuid: 'owner-uuid' })
+
+      test('edits the record they own', async () => {
+        const { deps, calls } = createDeps({ recordInDb: ownedRecord() })
+        const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: ownerUser() }
+        expect(await processNodesBatch({ msg: message, deps })).toEqual([{ index: 0, status: 'applied' }])
+        expect(calls.persistNode).toBe(1)
+      })
+
+      test('is refused when the owner changed in the database and the cached record does not know it', async () => {
+        const { deps, calls } = createDeps({
+          recordInDb: ownedRecord(),
+          stepAndOwnerInDb: { step: '1', ownerUuid: 'someone-else' },
+        })
+        const message = { ...msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 10 }]), user: ownerUser() }
+        expect(await processNodesBatch({ msg: message, deps })).toEqual([forbidden(0)])
+        expect(calls.persistNode).toBe(0)
+      })
     })
 
     test('a user who may not edit the record is refused', async () => {

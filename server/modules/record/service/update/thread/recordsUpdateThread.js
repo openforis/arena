@@ -291,6 +291,8 @@ export class RecordsUpdateThread extends Thread {
       getSurvey: async (msg) => (await this.getOrFetchSurveyData(msg)).survey,
       runWithRecordLock: (recordUuid, fn) => acquireRecordLockAndRun({ recordUuid, fn }),
       getOrFetchRecord: (params) => this.getOrFetchRecord(params),
+      fetchRecordStepAndOwner: ({ msg, recordUuid, t }) =>
+        RecordManager.fetchRecordStepAndOwner({ surveyId: msg.surveyId, recordUuid }, t),
       fetchQualifierFilters: ({ msg, survey, t }) =>
         SurveyManager.fetchUserQualifierFilters({ user: msg.user, survey }, t),
       recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
