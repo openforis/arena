@@ -24,7 +24,8 @@ import {
 import * as AiTelemetry from '../aiTelemetry'
 import { assertFeatureEnabled } from '../featureGate'
 import * as ProviderResolver from '../providerResolver'
-import { getEnforcedDataClass, parseGatewayRequest, sanitizeCall } from './callValidation'
+import { getCallSize, getEnforcedDataClass, parseGatewayRequest, sanitizeCall } from './callValidation'
+import { createDailyBudgetCharger, type DailyBudgetCharger } from './dailyBudget'
 import { assertPolicyAllows, type AiPolicyCheck } from './policy'
 import { formatErrorForLog, toAiSystemError, toAiWireError } from './errorMapping'
 import { createRateLimiter, type RateLimiter } from './rateLimiter'
@@ -40,6 +41,8 @@ export type ModelGatewayDeps = {
     providerId?: string
   }) => Promise<{ model: LanguageModelV4; meta: any }>
   assertPolicyAllows: (check: AiPolicyCheck) => Promise<void>
+  // charges a call with the Arena default provider to the daily budget of the user (absent: no budget)
+  chargeDailyBudget?: DailyBudgetCharger
   rateLimiter: RateLimiter
   recordTelemetry: (ctx: TelemetryContext, outcome: { latencyMs: number; usage?: unknown; error?: unknown }) => void
   logError: (message: string) => void
@@ -56,6 +59,7 @@ const logger = Log.getLogger('AiGateway')
 export const createDefaultModelGatewayDeps = (): ModelGatewayDeps => ({
   resolveModel: ProviderResolver.resolveModelForUser,
   assertPolicyAllows,
+  chargeDailyBudget: createDailyBudgetCharger(),
   rateLimiter: createRateLimiter({ limitPerMinute: ENV.aiRateLimitPerMinute }),
   recordTelemetry: AiTelemetry.record,
   logError: (message) => logger.error(message),
@@ -148,6 +152,10 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
     dataClass: getEnforcedDataClass({ feature: request.feature, dataClass: request.dataClass, call }),
     hostingClass: meta.hostingClass ?? null,
   })
+  // only the instance key is budgeted, and only a call that passed every check uses it up
+  if (meta.source === ProviderResolver.sources.adminDefault) {
+    await deps.chargeDailyBudget?.({ userUuid: user.uuid, chars: getCallSize(call) })
+  }
   const ctx: TelemetryContext = {
     feature: request.feature,
     source: meta.source,
