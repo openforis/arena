@@ -88,8 +88,9 @@ const checkCreate = ({ survey, op, t }: CheckParams<NodeDefCreateOperation>): Fi
   if (!parent) return issue(t, 'parentUuid', 'parentNotFound', { name: parentUuid })
   const name = NodeDef.getName(parent)
   if (!NodeDef.isEntity(parent)) return issue(t, 'parentUuid', 'parentNotEntity', { name })
-  const cycle = NodeDef.getCycles(nodeDef)[0]
-  if (NodeDef.isEntity(nodeDef) && NodeDefLayout.isRenderTable(cycle)(parent)) {
+  // the new entity is in every cycle of its parent: one cycle where the parent is a table is enough
+  const isParentTableInACycle = NodeDef.getCycles(nodeDef).some((cycle) => NodeDefLayout.isRenderTable(cycle)(parent))
+  if (NodeDef.isEntity(nodeDef) && isParentTableInACycle) {
     return issue(t, 'parentUuid', 'entityUnderTable', { name })
   }
   return [...checkTextLanguages(survey, nodeDef, t), ...checkCreateMultipleAndKey({ survey, nodeDef, t })]

@@ -47,7 +47,6 @@ const toCreateDrafts = (nodeDefs: NewNodeDefInput[], ctx: AiToolContext): Change
     const nodeDef = createProposedNodeDef({
       parent,
       type: item.type,
-      cycle: ctx.cycle ?? '0',
       name: item.name,
       labels: toTextMap(item.labels),
       descriptions: toTextMap(item.descriptions),

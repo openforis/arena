@@ -93,7 +93,9 @@ export const insertNodeDef = async (
 
     const nodeDef = await NodeDefRepository.insertNodeDef(surveyId, nodeDefParam, t)
 
-    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded: [cycle] })
+    // the parent lists the new node def in each of its cycles (the designer creates it in one: `cycle`)
+    const cyclesAdded = NodeDef.getCycles(nodeDef).length > 0 ? NodeDef.getCycles(nodeDef) : [cycle]
+    const nodeDefParentUpdated = NodeDefLayoutUpdater.updateParentLayout({ survey, nodeDef, cyclesAdded })
     if (nodeDefParentUpdated) {
       await _persistNodeDefLayout({ surveyId, nodeDef: nodeDefParentUpdated }, t)
     }
