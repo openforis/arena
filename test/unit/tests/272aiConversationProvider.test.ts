@@ -30,7 +30,7 @@ describe('conversation provider (272)', () => {
     const created = createConversation({ userUuid: 'u1', surveyId: 1, area: 'analysis', idFactory: () => 'c1' })
     expect('providerId' in created).toBe(false)
     await store.save(withConversationProvider({ conversation: created, providerId: 'local:l1' }))
-    expect((await store.get('c1'))?.providerId).toBe('local:l1')
+    expect((await store.get('c1', 'u1'))?.providerId).toBe('local:l1')
   })
 
   test("the turn resolves the conversation's provider", async () => {

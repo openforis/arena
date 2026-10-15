@@ -64,7 +64,7 @@ describe('assistant logout and clear conversations (202)', () => {
 
     await resetAssistantOnLogout()
 
-    expect(await store.get(conversation.id)).not.toBeNull()
+    expect(await store.get(conversation.id, 'user-202')).not.toBeNull()
     expect(getOpenConversationId(key)).toBe(conversation.id)
     expect(assistantPanelStore.getState()).toEqual(initialAssistantPanelState)
   })
@@ -81,9 +81,9 @@ describe('assistant logout and clear conversations (202)', () => {
 
     await clearUserConversations({ conversationStore, openConversations, userUuid: 'u1' })
 
-    expect(await conversationStore.get(mine.id)).toBeNull()
+    expect(await conversationStore.get(mine.id, 'u1')).toBeNull()
     expect(openConversations.get({ userUuid: 'u1', surveyId: 7, area: 'design' })).toBeNull()
-    expect(await conversationStore.get(theirs.id)).not.toBeNull()
+    expect(await conversationStore.get(theirs.id, 'u2')).not.toBeNull()
     expect(openConversations.get({ userUuid: 'u2', surveyId: 7, area: 'design' })).toBe(theirs.id)
   })
 })

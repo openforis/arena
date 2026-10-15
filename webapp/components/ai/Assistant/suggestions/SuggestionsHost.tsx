@@ -35,7 +35,7 @@ const reconcileUser = async (userUuid: string, isCancelled: () => boolean): Prom
   if (suggestionStore.getInProgressConversationIds(userUuid).length === 0) return
   const conversations = await getConversationStore()
   if (isCancelled()) return
-  await reconcileInProgress({ store: suggestionStore, userUuid, load: (id) => conversations.get(id) })
+  await reconcileInProgress({ store: suggestionStore, userUuid, load: (id) => conversations.get(id, userUuid) })
 }
 
 /**

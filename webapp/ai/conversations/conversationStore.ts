@@ -13,10 +13,13 @@ export type ConversationStore = {
   // false: the memory store (the panel says conversations are lost on reload)
   persistent: boolean
   list: (params: { userUuid: string; surveyId: number | null }) => Promise<Conversation[]>
-  get: (id: string) => Promise<Conversation | null>
+  // null for an unknown id and for a conversation of another user (a shared browser)
+  get: (id: string, userUuid: string) => Promise<Conversation | null>
   save: (conversation: Conversation) => Promise<void>
   remove: (id: string) => Promise<void>
   clearUser: (userUuid: string) => Promise<void>
+  // the conversations of a deleted survey, of every user of this browser
+  removeSurvey: (surveyId: number) => Promise<void>
 }
 
 const DB_NAME = 'arena-ai'
@@ -52,6 +55,28 @@ const openDatabase = (indexedDB: IDBFactory): Promise<IDBDatabase> =>
     request.onblocked = () => reject(new Error('The arena-ai database is blocked by another tab'))
   })
 
+/**
+ * Returns the ids of the conversations of a survey, whoever owns them (a key cursor: no conversation is loaded).
+ * @param {IDBIndex} index - The userSurvey index (its keys are [userUuid, surveyKey]).
+ * @param {number} surveyKey - Survey key.
+ * @returns {Promise<string[]>} The conversation ids.
+ */
+const getPrimaryKeysOfSurvey = (index: IDBIndex, surveyKey: number): Promise<string[]> =>
+  new Promise((resolve, reject) => {
+    const ids: string[] = []
+    const request = index.openKeyCursor()
+    request.onsuccess = () => {
+      const cursor = request.result
+      if (!cursor) {
+        resolve(ids)
+        return
+      }
+      if ((cursor.key as [string, number])[1] === surveyKey) ids.push(cursor.primaryKey as string)
+      cursor.continue()
+    }
+    request.onerror = () => reject(request.error)
+  })
+
 const withSurveyKey = (conversation: Conversation): Conversation => ({
   ...conversation,
   surveyKey: toSurveyKey(conversation.surveyId),
@@ -79,9 +104,10 @@ const createIndexedDbStore = (db: IDBDatabase, keep: number): ConversationStore 
   return {
     persistent: true,
     list,
-    get: async (id) => {
-      const found = await requestResult(db.transaction(STORE, 'readonly').objectStore(STORE).get(id))
-      return (found as Conversation | undefined) ?? null
+    get: async (id, userUuid) => {
+      const found = (await requestResult(db.transaction(STORE, 'readonly').objectStore(STORE).get(id))) as
+        Conversation | undefined
+      return found?.userUuid === userUuid ? found : null
     },
     save: async (conversation) => {
       const transaction = db.transaction(STORE, 'readwrite')
@@ -94,6 +120,10 @@ const createIndexedDbStore = (db: IDBDatabase, keep: number): ConversationStore 
     clearUser: async (userUuid) => {
       const index = db.transaction(STORE, 'readonly').objectStore(STORE).index('userUuid')
       await removeAll((await requestResult(index.getAllKeys(userUuid))) as string[])
+    },
+    removeSurvey: async (surveyId) => {
+      const index = db.transaction(STORE, 'readonly').objectStore(STORE).index('userSurvey')
+      await removeAll(await getPrimaryKeysOfSurvey(index, toSurveyKey(surveyId)))
     },
   }
 }
@@ -114,9 +144,9 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
   return {
     persistent: false,
     list,
-    get: async (id) => {
+    get: async (id, userUuid) => {
       const found = byId.get(id)
-      return found ? structuredClone(found) : null
+      return found?.userUuid === userUuid ? structuredClone(found) : null
     },
     save: async (conversation) => {
       byId.set(conversation.id, structuredClone(withSurveyKey(conversation)))
@@ -128,6 +158,11 @@ export const createMemoryConversationStore = ({ keep }: { keep: number }): Conve
     clearUser: async (userUuid) => {
       for (const item of [...byId.values()]) {
         if (item.userUuid === userUuid) byId.delete(item.id)
+      }
+    },
+    removeSurvey: async (surveyId) => {
+      for (const item of [...byId.values()]) {
+        if (item.surveyKey === toSurveyKey(surveyId)) byId.delete(item.id)
       }
     },
   }
