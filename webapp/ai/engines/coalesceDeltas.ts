@@ -14,6 +14,11 @@ type Timers = {
   clearTimer: (timer: unknown) => void
 }
 
+// the transformer `cancel` hook (in the stream spec and in Node and browsers) is not in the TypeScript DOM typings yet
+type CancellableTransformer = Transformer<LanguageModelV4StreamPart, LanguageModelV4StreamPart> & {
+  cancel?: (reason?: unknown) => void
+}
+
 /**
  * Returns true for the parts that are merged.
  * @param {LanguageModelV4StreamPart} part - A stream part.
@@ -61,7 +66,7 @@ export const createDeltaCoalescer = ({
     }
   }
 
-  return new TransformStream({
+  const transformer: CancellableTransformer = {
     transform(part, controller) {
       if (!isMergeable(part)) {
         flush(controller)
@@ -80,5 +85,13 @@ export const createDeltaCoalescer = ({
     flush(controller) {
       flush(controller)
     },
-  })
+    // Stop (the reader cancelled) or an upstream failure: nobody is left to read the waiting text, so it is dropped
+    // with its timer instead of being sent
+    cancel() {
+      if (timer !== null) timers.clearTimer(timer)
+      timer = null
+      pending = null
+    },
+  }
+  return new TransformStream(transformer)
 }
