@@ -25,12 +25,42 @@ export type WhatsNewItem = {
 
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
-  { id: 'surveyCompare', version: '2.10.0', audience: whatsNewAudiences.surveyAdmin },
-  { id: 'usersBackup', version: '2.10.0', audience: whatsNewAudiences.systemAdmin },
-  { id: 'samplingPointDataWhisp', version: '2.10.0', audience: whatsNewAudiences.surveyAdmin },
-  { id: 'dashboardUpgrade', version: '2.9.7', audience: whatsNewAudiences.all },
-  { id: 'clearNonApplicableValues', version: '2.9.7', audience: whatsNewAudiences.all },
-  { id: 'systemLogs', version: '2.9.5', audience: whatsNewAudiences.systemAdmin },
+  {
+    id: 'surveyCompare',
+    version: '2.10.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    image: '/img/whats-new/surveyCompare.png',
+  },
+  {
+    id: 'usersBackup',
+    version: '2.10.0',
+    audience: whatsNewAudiences.systemAdmin,
+    image: '/img/whats-new/usersBackup.png',
+  },
+  {
+    id: 'samplingPointDataWhisp',
+    version: '2.10.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    image: '/img/whats-new/samplingPointDataWhisp.png',
+  },
+  {
+    id: 'dashboardUpgrade',
+    version: '2.9.7',
+    audience: whatsNewAudiences.all,
+    image: '/img/whats-new/dashboardUpgrade.png',
+  },
+  {
+    id: 'clearNonApplicableValues',
+    version: '2.9.7',
+    audience: whatsNewAudiences.all,
+    image: '/img/whats-new/clearNonApplicableValues.png',
+  },
+  {
+    id: 'systemLogs',
+    version: '2.9.5',
+    audience: whatsNewAudiences.systemAdmin,
+    image: '/img/whats-new/systemLogs.png',
+  },
   {
     id: 'dataQueryAiGenerate',
     version: '2.9.4',
