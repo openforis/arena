@@ -94,9 +94,10 @@ describe('AI prefs writer (055)', () => {
   })
 
   beforeEach(async () => {
-    await db.none(`UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = ANY($1::uuid[])`, [
-      [uuid(), User.getUuid(other)],
-    ])
+    await db.none(
+      `UPDATE "user" SET prefs = COALESCE(prefs, '{}'::jsonb) - 'ai' - 'aiUsage' WHERE uuid = ANY($1::uuid[])`,
+      [[uuid(), User.getUuid(other)]]
+    )
   })
 
   afterAll(async () => {
