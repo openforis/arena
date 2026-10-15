@@ -9,6 +9,9 @@ import type { AiWireError } from '@common/ai/wire'
 
 const TOO_MANY_REQUESTS = 429
 
+// a provider can echo parts of the request in its error body: only the start of it is logged
+const LOGGED_BODY_CHARS = 300
+
 const PROVIDER_REJECTED_STATUSES = new Set([400, 404, 413, 422])
 
 const aiError = (key: string, statusCode: number) => new SystemError(key, {}, statusCode)
@@ -60,7 +63,7 @@ export const toAiWireError = (error: unknown): AiWireError => {
 export const formatErrorForLog = (feature: string, error: unknown): string => {
   const err: any = unwrapRetry(error)
   const lines = [`${feature} model call failed: ${err?.constructor?.name || 'Error'}: ${err?.message || err}`]
-  if (err?.responseBody) lines.push(`  responseBody: ${String(err.responseBody).slice(0, 2000)}`)
+  if (err?.responseBody) lines.push(`  responseBody: ${String(err.responseBody).slice(0, LOGGED_BODY_CHARS)}`)
   if (err?.statusCode) lines.push(`  statusCode: ${err.statusCode}`)
   if (err?.url) lines.push(`  url: ${err.url}`)
   if (err?.cause) lines.push(`  cause: ${err.cause?.constructor?.name || ''} ${err.cause?.message || err.cause}`)

@@ -3,8 +3,7 @@
  *   - `acct:<id>`: that account provider of the user (404 aiProviderNotFound when it is not theirs);
  *   - `arena-default`: the admin default (env AI_DEFAULT_*; 503 aiNotConfigured when none);
  *   - `local:<id>`: 400 aiProviderNotGateway (local providers are called from the browser);
- *   - no id (clients loaded before the deploy, the admin ping): the user's default when it is an account provider,
- *     else the admin default.
+ *   - no id: 400 aiCallInvalid (the caller always says which provider; there is no default to fall back on).
  * There is no fallback between providers: an unreadable saved key fails with aiApiKeyUnreadable.
  */
 import { ENV } from '@core/processUtils'
@@ -37,17 +36,6 @@ const adminDefaultConfig = () =>
     : null
 
 /**
- * Returns the provider id a call without `providerId` uses: the user's default when it is an account provider, else
- * Arena default (a local default is called from the browser, never through the server).
- * @param {object} user - Arena user.
- * @returns {string} The provider id.
- */
-export const getDefaultGatewayProviderId = (user) => {
-  const { defaultProviderId } = getProviderPrefs(getAiPrefs(user))
-  return isAccountProviderId(defaultProviderId) ? defaultProviderId : ARENA_DEFAULT_PROVIDER_ID
-}
-
-/**
  * Resolves an account provider of the user.
  * @param {object} params - Parameters.
  * @param {object} params.user - Arena user.
@@ -71,24 +59,20 @@ const resolveAccountConfig = ({ user, providerId, decrypt }) => {
  * Resolves the provider config of a call.
  * @param {object} params - Parameters.
  * @param {object} params.user - Arena user.
- * @param {string} [params.providerId] - Requested provider id (validated by parseGatewayRequest); absent = default.
+ * @param {string} params.providerId - Requested provider id (the format is validated by parseGatewayRequest).
  * @param {object|null} [params.adminConfig] - Admin default config (injectable for tests).
  * @param {boolean} [params.decrypt] - Decrypt the key of an account provider (default true).
  * @returns {{cfg: object, source: string, providerId: string}} The config, its source and the provider id.
- * @throws {SystemError} aiProviderNotGateway (400), aiProviderNotFound (404), aiApiKeyUnreadable (409),
- *   aiNotConfigured (503).
+ * @throws {SystemError} aiCallInvalid (400) without a provider id, aiProviderNotGateway (400),
+ *   aiProviderNotFound (404), aiApiKeyUnreadable (409), aiNotConfigured (503).
  */
-export const resolveProviderConfig = ({
-  user,
-  providerId = undefined,
-  adminConfig = adminDefaultConfig(),
-  decrypt = true,
-}) => {
-  const id = providerId ?? getDefaultGatewayProviderId(user)
-  if (isLocalProviderId(id)) throw new SystemError('aiProviderNotGateway', { providerId: id }, StatusCodes.BAD_REQUEST)
-  if (isAccountProviderId(id)) return resolveAccountConfig({ user, providerId: id, decrypt })
-  if (id !== ARENA_DEFAULT_PROVIDER_ID) {
-    throw new SystemError('aiProviderNotFound', { providerId: String(id).slice(0, 80) }, StatusCodes.NOT_FOUND)
+export const resolveProviderConfig = ({ user, providerId, adminConfig = adminDefaultConfig(), decrypt = true }) => {
+  if (!providerId) throw new SystemError('aiCallInvalid', { reason: 'providerId' }, StatusCodes.BAD_REQUEST)
+  if (isLocalProviderId(providerId))
+    throw new SystemError('aiProviderNotGateway', { providerId }, StatusCodes.BAD_REQUEST)
+  if (isAccountProviderId(providerId)) return resolveAccountConfig({ user, providerId, decrypt })
+  if (providerId !== ARENA_DEFAULT_PROVIDER_ID) {
+    throw new SystemError('aiProviderNotFound', { providerId: String(providerId).slice(0, 80) }, StatusCodes.NOT_FOUND)
   }
   if (!adminConfig) throw new SystemError('aiNotConfigured', {}, StatusCodes.SERVICE_UNAVAILABLE)
   return { cfg: adminConfig, source: sources.adminDefault, providerId: ARENA_DEFAULT_PROVIDER_ID }
@@ -130,11 +114,11 @@ export const describeAdminDefault = (adminConfig = adminDefaultConfig(), allowli
  * Resolves the model handle of a call.
  * @param {object} args - Resolver inputs.
  * @param {object} args.user - The Arena user object.
- * @param {string} [args.providerId] - Requested provider id; absent = the user's account default, else Arena default.
+ * @param {string} args.providerId - Requested provider id.
  * @returns {Promise<{model: object, meta: {source: string, provider: string, model: string, hostingClass: string}}>}
  *   The AI SDK model handle plus telemetry metadata.
  */
-export const resolveModelForUser = async ({ user, providerId = undefined }) => {
+export const resolveModelForUser = async ({ user, providerId }) => {
   const resolved = resolveProviderConfig({ user, providerId })
   const { cfg, source } = resolved
   // user-supplied config goes through the guarded builder (SSRF checks)
@@ -143,14 +127,18 @@ export const resolveModelForUser = async ({ user, providerId = undefined }) => {
 }
 
 /**
- * Describes the provider a call without `providerId` would use (GET /api/ai/settings, admin ping). Does not decrypt,
- * so an unreadable key still names its provider (the call then fails with aiApiKeyUnreadable).
- * @param {object} user - The Arena user object.
- * @returns {Promise<{source: ?string, provider: ?string, model: ?string, hostingClass: ?string}>} Provenance info.
+ * Describes a provider of a user without decrypting its key, so that an unreadable key still names its provider (the
+ * call then fails with aiApiKeyUnreadable).
+ * @param {object} params - Parameters.
+ * @param {object} params.user - The Arena user object.
+ * @param {string} params.providerId - Provider id.
+ * @param {object|null} [params.adminConfig] - Admin default config (injectable for tests).
+ * @returns {{source: ?string, provider: ?string, model: ?string, hostingClass: ?string}} Provenance info (empty when
+ *   the provider cannot be resolved).
  */
-export const describeEffectiveSource = async (user) => {
+export const describeProvider = ({ user, providerId, adminConfig = adminDefaultConfig() }) => {
   try {
-    return describeResolvedConfig(resolveProviderConfig({ user, decrypt: false }))
+    return describeResolvedConfig(resolveProviderConfig({ user, providerId, adminConfig, decrypt: false }))
   } catch {
     return describeResolvedConfig(null)
   }
