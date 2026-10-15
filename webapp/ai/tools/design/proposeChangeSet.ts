@@ -14,6 +14,7 @@ import { isDeepEqual } from '@webapp/ai/changeSets/deepEqual'
 import { previewChangeSet } from '@webapp/ai/changeSets/previewChangeSet'
 import type { ChangeOperationDraft, ChangeSetIssue } from '@webapp/ai/changeSets/types'
 
+import { summaryTextSchema } from '../common/toolSchemas'
 import { AiToolFailure } from '../toolFailure'
 import type { AiToolContext } from '../types'
 import { requireSurvey } from './surveyLookup'
@@ -23,12 +24,7 @@ export const textItemSchema = z.object({
   text: z.string().trim().min(1).max(2000),
 })
 
-export const summarySchema = z
-  .string()
-  .trim()
-  .min(1)
-  .max(500)
-  .describe('One sentence for the user: what the proposal changes and why')
+export const summarySchema = summaryTextSchema.describe('One sentence for the user: what the proposal changes and why')
 
 export type ProposeResult = { changeSetId: string; operations: number; status: 'shownToUser'; note: string }
 

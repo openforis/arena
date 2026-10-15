@@ -1,4 +1,5 @@
 import SystemError from '@core/systemError'
+import { uuidv4 } from '@core/uuid'
 
 import { pageValidationRows, toValidationListItems } from '@webapp/ai/tools/cleaning/validationList'
 import { createValidationTools } from '@webapp/ai/tools/cleaning/validationTools'
@@ -16,6 +17,8 @@ import {
 } from '@test/unit/utils/aiCleaningTestUtils'
 
 import * as RecordUtils from '../../utils/recordUtils'
+
+const RECORD_UUID = uuidv4()
 
 let survey: any
 
@@ -95,13 +98,13 @@ describe('validation_list tool', () => {
     })
     const result = await runTool(
       getListTool(api),
-      { attributes: ['dbh'], categories: ['valueRequired', 'uniqueDuplicate'], recordUuid: 'r-1' },
+      { attributes: ['dbh'], categories: ['valueRequired', 'uniqueDuplicate'], recordUuid: RECORD_UUID },
       newCleaningToolContext({ survey })
     )
     const fetchCall = calls.find((call) => call.name === 'fetchValidationReportRows')
     const dbhDefUuid = rows[0].nodeDefUuid
     expect(fetchCall?.params).toMatchObject({
-      recordUuid: 'r-1',
+      recordUuid: RECORD_UUID,
       attributeDefUuids: [dbhDefUuid],
       messageTypeKeys: [
         'record.attribute.valueRequired',

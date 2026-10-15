@@ -5,30 +5,53 @@ import type { AiTool } from '@webapp/ai/tools/types'
 import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
 import { buildChangeSet } from '@webapp/ai/changeSets/buildChangeSet'
 import { RECORD_EDITS_MAX } from '@webapp/ai/changeSets/recordEdits/types'
+import {
+  summaryTextSchema,
+  uuidSchema,
+  VALUE_PART_MAX_CHARS,
+  VALUE_TEXT_MAX_CHARS,
+} from '@webapp/ai/tools/common/toolSchemas'
 
 import type { CleaningApi } from './cleaningApi'
 import { canCleanseCurrentSurvey, getCleaningContext } from './cleaningContext'
 import { buildRecordEditProposal } from './recordEditProposal'
 import type { CleaningI18n } from './validationRows'
 
+const partSchema = z.union([z.string().max(VALUE_PART_MAX_CHARS), z.number()])
+
+// the parts of a coordinate and of a taxon the value parser reads: nothing nested, nothing else
+const structuredValueSchema = z.strictObject({
+  x: partSchema.optional(),
+  y: partSchema.optional(),
+  srs: partSchema.optional(),
+  srsId: partSchema.optional(),
+  accuracy: partSchema.optional(),
+  altitude: partSchema.optional(),
+  altitudeAccuracy: partSchema.optional(),
+  code: partSchema.optional(),
+  scientificName: partSchema.optional(),
+  vernacularName: partSchema.optional(),
+})
+
 const valueSchema = z
-  .union([z.string(), z.number(), z.boolean(), z.record(z.string(), z.unknown()), z.null()])
+  .union([z.string().max(VALUE_TEXT_MAX_CHARS), z.number(), z.boolean(), structuredValueSchema, z.null()])
   .describe(
     'New value as the user would type it: "12.5", "yes", a category code ("B", the parent code is taken from the ' +
       'record), a taxon code or scientific name, "x y srs" for coordinates, "2024-05-31", "14:30"; null clears it.'
   )
 
 const inputSchema = z.object({
-  summary: z.string().min(1).describe('One sentence for the user: the pattern this change set fixes.'),
+  summary: summaryTextSchema.describe('One sentence for the user: the pattern this change set fixes.'),
   edits: z
     .array(
       z.object({
-        recordUuid: z.string().describe('Record UUID (from validation_list, record_getValues or query_run).'),
-        nodeUuid: z.string().describe('Node UUID of the attribute (from validation_list or record_getValues).'),
+        recordUuid: uuidSchema.describe('Record UUID (from validation_list, record_getValues or query_run).'),
+        nodeUuid: uuidSchema.describe('Node UUID of the attribute (from validation_list or record_getValues).'),
         value: valueSchema,
       })
     )
-    .min(1),
+    .min(1)
+    .max(RECORD_EDITS_MAX, `At most ${RECORD_EDITS_MAX} edits per change set: split into smaller change sets.`),
 })
 
 type Input = z.infer<typeof inputSchema>
@@ -79,12 +102,6 @@ export const createRecordsProposeEditsTool = ({
    * @returns {Promise<object>} The proposal result, or a tool error.
    */
   execute: async ({ summary, edits }, ctx) => {
-    if (edits.length > RECORD_EDITS_MAX) {
-      return toolError(
-        'tooManyEdits',
-        `At most ${RECORD_EDITS_MAX} edits per change set: split into smaller change sets.`
-      )
-    }
     if (new Set(edits.map((edit) => edit.recordUuid)).size > RECORDS_PER_PROPOSAL_MAX) {
       return invalidProposal('Too many records in one change set.', [
         {

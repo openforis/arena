@@ -1,6 +1,12 @@
 import { z } from 'zod'
 
 import type { AiTool } from '@webapp/ai/tools/types'
+import {
+  attributeNamesSchema,
+  NAME_MAX_CHARS,
+  uuidSchema,
+  VALUE_PART_MAX_CHARS,
+} from '@webapp/ai/tools/common/toolSchemas'
 import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
 
 import type { CleaningApi } from './cleaningApi'
@@ -9,13 +15,17 @@ import { findRecordUuidByKeys } from './recordLookup'
 import { getRecordValues } from './recordValues'
 import type { CleaningI18n } from './validationRows'
 
+// an Arena survey has few key attributes per record: more is a model mistake
+const RECORD_KEYS_MAX = 10
+
 const inputSchema = z.object({
-  recordUuid: z.string().nullish().describe('UUID of the record.'),
+  recordUuid: uuidSchema.nullish().describe('UUID of the record.'),
   recordKeys: z
-    .record(z.string(), z.union([z.string(), z.number()]))
+    .record(z.string().max(NAME_MAX_CHARS), z.union([z.string().max(VALUE_PART_MAX_CHARS), z.number()]))
+    .refine((keys) => Object.keys(keys).length <= RECORD_KEYS_MAX, `At most ${RECORD_KEYS_MAX} key attributes.`)
     .nullish()
     .describe('Values of the record key attributes, e.g. {"cluster_id": "12"}, when the UUID is unknown.'),
-  attributes: z.array(z.string()).min(1).max(20).describe('Attribute names to read.'),
+  attributes: attributeNamesSchema(20).min(1).describe('Attribute names to read.'),
 })
 
 type Input = z.infer<typeof inputSchema>

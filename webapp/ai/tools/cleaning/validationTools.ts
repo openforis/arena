@@ -7,6 +7,7 @@ import {
 import * as NodeDef from '@core/survey/nodeDef'
 
 import type { AiTool } from '@webapp/ai/tools/types'
+import { attributeNamesSchema, uuidSchema } from '@webapp/ai/tools/common/toolSchemas'
 import { fitListToBudget, toolError, toRequestErrorResult } from '@webapp/ai/tools/analysis/toolResults'
 
 import type { CleaningApi } from './cleaningApi'
@@ -17,18 +18,21 @@ import { LIST_ROWS_MAX, pageValidationRows, toValidationListItems } from './vali
 
 const SUMMARY_ROWS_MAX = 1000
 
+// far beyond any report a model can page through
+const OFFSET_MAX = 1_000_000
+
 const summarizeInputSchema = z.object({
-  recordUuid: z.string().nullish().describe('Only this record (UUID); omit for the whole cycle.'),
+  recordUuid: uuidSchema.nullish().describe('Only this record (UUID); omit for the whole cycle.'),
 })
 
 const listInputSchema = z.object({
-  attributes: z.array(z.string()).max(50).optional().describe('Attribute names; omit for all attributes.'),
+  attributes: attributeNamesSchema(50).optional().describe('Attribute names; omit for all attributes.'),
   categories: z
     .array(z.enum(MessageTypeFilterCategoryIds as [string, ...string[]]))
     .optional()
     .describe('Message categories; omit for all.'),
-  recordUuid: z.string().nullish().describe('Only this record (UUID).'),
-  offset: z.number().int().min(0).optional().describe('Rows to skip (paging).'),
+  recordUuid: uuidSchema.nullish().describe('Only this record (UUID).'),
+  offset: z.number().int().min(0).max(OFFSET_MAX).optional().describe('Rows to skip (paging).'),
 })
 
 type Deps = { api: CleaningApi; getI18n: () => CleaningI18n }
