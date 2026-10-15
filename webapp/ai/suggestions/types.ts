@@ -3,16 +3,29 @@
  */
 import type { AssistantArea } from '@webapp/components/ai/Assistant/assistantAreas'
 
-export type SuggestionKind =
-  | 'missingTranslations'
-  | 'newEntriesDescriptions'
-  | 'publishErrors'
-  | 'entityWithoutKey'
-  | 'attributeWithoutRef'
-  | 'categoryItemTranslations'
-  | 'validationErrors'
-  | 'dataImported'
-  | 'moduleIntro'
+// the list of kinds, each with the step its counted targets must grow by to show again after a dismissal (null: the
+// targets are not counted). A new kind is added here, then in ./registry (a kind without an entry does not compile).
+export const SUGGESTION_GROWTH_STEPS = {
+  missingTranslations: null,
+  newEntriesDescriptions: null,
+  publishErrors: null,
+  entityWithoutKey: null,
+  attributeWithoutRef: null,
+  categoryItemTranslations: 10,
+  validationErrors: 20,
+  dataImported: null,
+  moduleIntro: null,
+} as const satisfies Record<string, number | null>
+
+export type SuggestionKind = keyof typeof SUGGESTION_GROWTH_STEPS
+
+/**
+ * Tells whether a value is one of the kinds (stored data may hold one that this version does not know).
+ * @param {unknown} value - Value.
+ * @returns {boolean} True for a kind.
+ */
+export const isSuggestionKind = (value: unknown): value is SuggestionKind =>
+  typeof value === 'string' && Object.hasOwn(SUGGESTION_GROWTH_STEPS, value)
 
 export type SuggestionTarget = { key: string; count?: number }
 
@@ -25,12 +38,6 @@ export type AssistantSuggestion = {
   targets: SuggestionTarget[]
   createdAt: string // ISO
   expiresAt: string | null // ISO
-}
-
-// counted targets come back after a dismissal when the count grows by at least this step
-export const SUGGESTION_GROWTH_STEPS: Partial<Record<SuggestionKind, number>> = {
-  categoryItemTranslations: 10,
-  validationErrors: 20,
 }
 
 // what the turn's tools may list for an accepted suggestion
