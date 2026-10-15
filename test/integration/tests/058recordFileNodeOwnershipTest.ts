@@ -290,7 +290,7 @@ describe('Record read routes: user group qualifiers (058)', () => {
     fileNodeUuidSouth = await insertFile({ record: recordSouth, fileUuid: fileUuidSouth })
 
     southViewer = await createSurveyMember({ admin: user, surveyId, groupName: AuthGroup.groupNames.dataEditor })
-    const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+    const userGroupService: any = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
     const group = await userGroupService.insert({
       surveyUuid: Survey.getUuid(Survey.getSurveyInfo(survey)),
       item: { props: { name: 'south', qualifiers: [{ name: 'team', value: 'south' }] } as any },
@@ -300,7 +300,7 @@ describe('Record read routes: user group qualifiers (058)', () => {
   })
 
   afterAll(async () => {
-    await ServiceRegistry.getInstance().getService(ServerServiceType.userGroup).deleteItem({ uuid: groupUuid })
+    await (ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as any).deleteItem({ uuid: groupUuid })
     await deleteUsers([southViewer])
     await SurveyManager.deleteSurvey(surveyId, {})
   })

@@ -41,7 +41,7 @@ export const sendRouteError = ({
   logError?: (message: string) => void
 }): void => {
   if (error instanceof UnauthorizedError || error instanceof SystemError || error instanceof CoreSystemError) {
-    if (retryAfterSeconds !== undefined && error.statusCode === TOO_MANY_REQUESTS) {
+    if (retryAfterSeconds !== undefined && (error as { statusCode?: number }).statusCode === TOO_MANY_REQUESTS) {
       res.setHeader('Retry-After', String(retryAfterSeconds))
     }
     Response.sendErr(res, error)
