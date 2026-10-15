@@ -41,14 +41,19 @@ describe('local provider URLs are plain (366)', () => {
     expect(normalizeLocalProviderBaseUrl('http://10.0.0.5:8000/v1#top')).toBeNull()
   })
 
-  test('a stored provider with such an address is not loaded', () => {
+  test('a stored provider with such an address is kept, flagged, and never taken as valid', () => {
     const stored = [
       { id: 'local:a', name: 'Good', baseUrl: 'http://localhost:1234/v1', modelId: null },
       { id: 'local:b', name: 'Credentials', baseUrl: 'http://u:p@localhost:1234/v1', modelId: null },
       { id: 'local:c', name: 'Query', baseUrl: 'http://localhost:1234/v1?x=1', modelId: null },
     ]
     const storage = { getItem: () => JSON.stringify(stored), setItem: () => undefined }
-    expect(loadLocalProviders({ storage, userUuid: 'u1' }).map((provider) => provider.id)).toEqual(['local:a'])
+    const providers = loadLocalProviders({ storage, userUuid: 'u1' })
+    expect(providers.map((provider) => [provider.id, provider.addressInvalid === true])).toEqual([
+      ['local:a', false],
+      ['local:b', true],
+      ['local:c', true],
+    ])
   })
 
   test('the dialog draft of such an address is not usable', () => {

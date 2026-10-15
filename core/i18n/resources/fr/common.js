@@ -1628,7 +1628,10 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       notAvailable: "Le fournisseur d'IA choisi n'est pas disponible pour le moment.",
       missingOnThisBrowser: 'Votre fournisseur par défaut est sur un autre ordinateur.',
       notSetUp: "Aucun fournisseur d'IA n'est configuré. Ajoutez-en un dans les paramètres d'IA.",
+      invalidAddress:
+        "L'adresse de votre serveur d'IA local n'est pas valide (sans nom d'utilisateur, mot de passe, ? ni #). Corrigez-la dans vos paramètres d'IA.",
     },
+    localAddressInvalid: "L'adresse ne peut pas contenir de nom d'utilisateur, de mot de passe, de ? ni de #.",
     action: {
       retry: 'Réessayer',
       changePolicy: "Modifier la politique d'IA de l'enquête",

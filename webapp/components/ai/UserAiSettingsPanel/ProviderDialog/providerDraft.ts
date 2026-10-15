@@ -461,6 +461,14 @@ export const canListModels = ({ spec, draft, saved, allowlist }: KeyParams & { a
   !isApiKeyMissing({ spec, draft, saved })
 
 /**
+ * Returns true when a local address was typed but is not a plain http(s) URL (the dialog then says why).
+ * @param {ProviderDraft} draft - Draft.
+ * @returns {boolean} True for a typed address that is refused.
+ */
+export const isLocalDraftUrlInvalid = (draft: ProviderDraft): boolean =>
+  draft.baseUrl.trim() !== '' && getLocalDraftUrl(draft) === null
+
+/**
  * Returns true when Test can run on the draft.
  * @param {object} params - Parameters.
  * @param {ProviderTypeSpec} params.spec - Type spec.

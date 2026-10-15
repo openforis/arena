@@ -1600,7 +1600,10 @@ $t(common.cantUndoWarning)`,
       notAvailable: '選択した AI プロバイダーは現在利用できません。',
       missingOnThisBrowser: 'デフォルトのプロバイダーは別のコンピューターにあります。',
       notSetUp: 'AI プロバイダーが設定されていません。AI 設定で追加してください。',
+      invalidAddress:
+        'ローカル AI サーバーのアドレスが無効です（ユーザー名、パスワード、? や # は使えません）。AI 設定で修正してください。',
     },
+    localAddressInvalid: 'アドレスにユーザー名、パスワード、? や # は含められません。',
     action: {
       retry: '再試行',
       changePolicy: '調査の AI ポリシーを変更',

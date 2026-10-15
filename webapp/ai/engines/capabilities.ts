@@ -87,7 +87,7 @@ export const buildLocalProviderCapability = ({
 }): AiLocalServerCapability => ({
   reachable: probe ? probe.reachable : null,
   models: probe ? probe.models : [],
-  hostingClass: getLocalServerHostingClass(provider.baseUrl, allowlist),
+  hostingClass: provider.addressInvalid ? null : getLocalServerHostingClass(provider.baseUrl, allowlist),
   contextTokens: probe ? probe.contextTokens : null,
   baseUrl: provider.baseUrl,
   modelId: provider.modelId,
@@ -276,7 +276,12 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     // that could not be read) none is probed: the next load with settings does
     const probes = isAiOff(nextSettings)
       ? localProviders.map(() => null)
-      : await Promise.all(localProviders.map((provider) => probeSafely(provider.baseUrl, provider.modelId)))
+      : await Promise.all(
+          localProviders.map((provider) =>
+            // an invalid address is never called
+            provider.addressInvalid ? null : probeSafely(provider.baseUrl, provider.modelId)
+          )
+        )
     // a newer run started meanwhile: wait for its result; after a reset or a user change nothing is returned
     if (current !== sequence) return newerRun(userUuid)
     settings = nextSettings

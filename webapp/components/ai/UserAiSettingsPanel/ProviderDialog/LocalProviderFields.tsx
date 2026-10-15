@@ -12,6 +12,7 @@ import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
 import { LocalConsentRevoke } from './LocalConsentRevoke'
+import { isLocalDraftUrlInvalid } from './providerDraft'
 import type { ProviderDialogApi } from './useProviderDialog'
 
 // forwardRef components lose their prop types in TS (same cast as the panel)
@@ -111,6 +112,11 @@ export const LocalProviderFields = ({ dialog }: Props) => {
           />
         </div>
       </FormItem>
+      {isLocalDraftUrlInvalid(draft) && (
+        <div className="provider-dialog__hint provider-dialog__hint--error" role="alert">
+          {t('aiEngine.localAddressInvalid')}
+        </div>
+      )}
       {/* always rendered, so a screen reader announces the result when it appears */}
       <div role="status" className="provider-dialog__live">
         <LocalTestResult dialog={dialog} />

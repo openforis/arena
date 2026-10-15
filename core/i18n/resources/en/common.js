@@ -1608,7 +1608,10 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       notAvailable: 'The selected AI provider is not available right now.',
       missingOnThisBrowser: 'Your default provider is on another computer.',
       notSetUp: 'No AI provider is set up. Add one in your AI settings.',
+      invalidAddress:
+        'The address of your local AI server is not valid (no user name, password, ? or #). Fix it in your AI settings.',
     },
+    localAddressInvalid: 'The address cannot contain a user name, a password, ? or #.',
     action: {
       retry: 'Retry',
       changePolicy: 'Change the survey AI policy',
