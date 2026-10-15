@@ -45,7 +45,12 @@ describe('saved API key encrypted with a rotated secret', () => {
 
   test('the resolver refuses the provider instead of switching to the admin default', async () => {
     const error: any = await expectSystemErrorKey(
-      () => ProviderResolver.resolveProviderConfig({ user: userWithKey(encrypted), adminConfig }),
+      () =>
+        ProviderResolver.resolveProviderConfig({
+          user: userWithKey(encrypted),
+          providerId: 'acct:legacy',
+          adminConfig,
+        }),
       'aiApiKeyUnreadable'
     )
     expect(error.statusCode).toBe(409)
@@ -54,7 +59,9 @@ describe('saved API key encrypted with a rotated secret', () => {
   test('a readable key is used', () => {
     const readable = SecretBox.encrypt('sk-new')
     expect(AiSettingsService.getPublicSettings(userWithKey(readable)).providers[0].apiKeyReadable).toBe(true)
-    expect(ProviderResolver.resolveProviderConfig({ user: userWithKey(readable), adminConfig })).toMatchObject({
+    expect(
+      ProviderResolver.resolveProviderConfig({ user: userWithKey(readable), providerId: 'acct:legacy', adminConfig })
+    ).toMatchObject({
       source: ProviderResolver.sources.user,
       providerId: 'acct:legacy',
       cfg: { apiKey: 'sk-new' },
@@ -63,7 +70,12 @@ describe('saved API key encrypted with a rotated secret', () => {
 
   test('no config at all is aiNotConfigured', async () => {
     await expectSystemErrorKey(
-      () => ProviderResolver.resolveProviderConfig({ user: { uuid: 'u', prefs: {} } as any, adminConfig: null }),
+      () =>
+        ProviderResolver.resolveProviderConfig({
+          user: { uuid: 'u', prefs: {} } as any,
+          providerId: 'arena-default',
+          adminConfig: null,
+        }),
       'aiNotConfigured'
     )
   })
