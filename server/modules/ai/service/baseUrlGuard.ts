@@ -2,9 +2,10 @@
  * SSRF guard for base URLs typed by users (openai-compatible / vercel-ai-sdk providers): the server must not
  * become a proxy towards internal addresses. Org-hosted model servers are allowed via AI_ORG_HOSTED_BASE_URLS.
  *
- * Known limits (documented, accepted for step A): the name is resolved here and again by fetch, so a DNS server
- * answering differently the second time (DNS rebinding) is not caught. Redirects are refused by the callers
- * (redirect: 'error'), so they cannot bypass the check. Deployments that need more should route egress through a proxy.
+ * The check here runs before a request, to refuse a base URL with a clear error. It is not what protects the
+ * server: the name is resolved again when the request connects, and a DNS server can answer differently the second
+ * time (DNS rebinding). The requests to a user's endpoint are made by `guardedFetch`, which applies the same address
+ * rules (`areAddressesAllowed`) on the addresses it connects to, and refuses redirects.
  */
 import { lookup as dnsLookup } from 'node:dns/promises'
 import { BlockList, isIP, isIPv4 } from 'node:net'
@@ -21,7 +22,10 @@ export type LookupFn = (
   options: { all: true; verbatim: true }
 ) => Promise<{ address: string; family: number }[]>
 
-type GuardOptions = { allowlist?: string[]; lookup?: LookupFn }
+export type GuardOptions = { allowlist?: string[]; lookup?: LookupFn }
+
+// the system resolver, which answers with every address of a name
+export const defaultLookup = dnsLookup as unknown as LookupFn
 
 const IPV4_BLOCKED: [string, number][] = [
   ['0.0.0.0', 8], // "this" network
@@ -55,7 +59,7 @@ for (const [network, prefix] of IPV6_BLOCKED) blockList.addSubnet(network, prefi
 
 const PROVIDERS_WITH_USER_BASE_URL = new Set<string>([AiProvider.openaiCompatible, AiProvider.vercelAiSdk])
 
-const notAllowed = (baseUrl: string) =>
+export const notAllowed = (baseUrl: string) =>
   new SystemError('aiBaseUrlNotAllowed', { baseUrl: String(baseUrl).slice(0, 200) }, StatusCodes.BAD_REQUEST)
 
 // ::ffff:a.b.c.d and its hex form ::ffff:xxxx:yyyy (what the URL parser produces)
@@ -92,6 +96,14 @@ const parseUrl = (value: string): URL | null => {
   }
 }
 
+/**
+ * Returns true when every address may be called (and there is at least one).
+ * @param {string[]} addresses - Resolved IPv4 / IPv6 addresses.
+ * @returns {boolean} Whether the server may connect to them.
+ */
+export const areAddressesAllowed = (addresses: string[]): boolean =>
+  addresses.length > 0 && !addresses.some(isBlockedAddress)
+
 const resolveAddresses = async (hostname: string, lookup: LookupFn): Promise<string[]> => {
   try {
     const results = await lookup(hostname, { all: true, verbatim: true })
@@ -111,7 +123,7 @@ const resolveAddresses = async (hostname: string, lookup: LookupFn): Promise<str
  */
 export const assertBaseUrlAllowed = async (
   baseUrl: string,
-  { allowlist = ENV.aiOrgHostedBaseUrls, lookup = dnsLookup as unknown as LookupFn }: GuardOptions = {}
+  { allowlist = ENV.aiOrgHostedBaseUrls, lookup = defaultLookup }: GuardOptions = {}
 ): Promise<void> => {
   const url = parseUrl(baseUrl)
   if (!url || (url.protocol !== 'http:' && url.protocol !== 'https:')) throw notAllowed(baseUrl)
@@ -119,7 +131,7 @@ export const assertBaseUrlAllowed = async (
 
   const hostname = url.hostname.replace(/^\[|\]$/g, '')
   const addresses = isIP(hostname) ? [hostname] : await resolveAddresses(hostname, lookup)
-  if (addresses.length === 0 || addresses.some(isBlockedAddress)) throw notAllowed(baseUrl)
+  if (!areAddressesAllowed(addresses)) throw notAllowed(baseUrl)
 }
 
 /**
