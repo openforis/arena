@@ -1743,6 +1743,8 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     deleteConversation: 'Supprimer la conversation',
     deleteConversationConfirm: 'Supprimer cette conversation ? Cette action est irréversible.',
     discardConfirm: 'Ignorer ces modifications proposées ? Elles ne seront pas appliquées.',
+    deleteConversationFailed: "La conversation n'a pas pu être supprimée.",
+    deleteAllFailed: "Les conversations n'ont pas pu être supprimées.",
     day: {
       today: "Aujourd'hui",
       yesterday: 'Hier',
@@ -1824,6 +1826,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       applySelected: 'Appliquer la sélection',
       discard: 'Ignorer',
       discarded: 'Ignoré.',
+      applyFailed: "Les modifications n'ont pas pu être appliquées : {{message}}",
       saveCurrentEditFirst: "Enregistrez ou annulez d'abord votre modification en cours.",
       selectOperation: 'Appliquer cette modification',
       empty: '(vide)',

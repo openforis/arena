@@ -4,7 +4,7 @@ import { AiLimits } from '@common/ai/limits'
 
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { Button, ButtonIconDelete } from '@webapp/components/buttons'
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 import { useI18nT, useLang } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
@@ -65,6 +65,7 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
   const { history, loadHistory, openConversation, deleteConversation, busy } = api
   const [query, setQuery] = useState('')
   const confirm = useConfirm()
+  const notifyError = useNotifyError()
 
   /**
    * Deletes a conversation once the user confirms (it can't be restored).
@@ -74,8 +75,8 @@ export const AssistantHistory = ({ api }: { api: AssistantConversationApi }) => 
   const onDelete = (id: string) =>
     confirm({
       key: 'aiAssistant.deleteConversationConfirm',
-      // a failed delete (store error) leaves the row in place: nothing else to show
-      onOk: () => void deleteConversation(id).catch(() => undefined),
+      // a failed delete (store error) leaves the row in place
+      onOk: () => void deleteConversation(id).catch(() => notifyError({ key: 'aiAssistant.deleteConversationFailed' })),
       // onCancel is required by useConfirm's inferred (untyped) parameter
       onCancel: undefined,
     })

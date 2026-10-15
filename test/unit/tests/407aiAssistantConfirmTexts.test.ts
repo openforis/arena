@@ -8,8 +8,8 @@ import ru from '@core/i18n/resources/ru'
 
 const resources: Record<string, any> = { en, es, fr, ja, mn, pt, ru }
 
-// texts of the confirmations of Delete conversation and Discard
-const KEYS = ['deleteConversationConfirm', 'discardConfirm']
+// texts of the confirmations of Delete conversation and Discard, and of the failures shown to the user
+const KEYS = ['deleteConversationConfirm', 'discardConfirm', 'deleteConversationFailed', 'deleteAllFailed']
 
 describe('assistant confirmation texts (407)', () => {
   test('every language asks before deleting a conversation and before discarding a proposal', () => {
@@ -18,6 +18,15 @@ describe('assistant confirmation texts (407)', () => {
         const text = resource.common.aiAssistant[key]
         expect([lang, key, typeof text, text?.length > 0]).toEqual([lang, key, 'string', true])
       }
+    }
+  })
+
+  test('a failed Apply is told with its message in every language', () => {
+    for (const [lang, resource] of Object.entries(resources)) {
+      expect([lang, resource.common.aiAssistant.card.applyFailed]).toEqual([
+        lang,
+        expect.stringContaining('{{message}}'),
+      ])
     }
   })
 
