@@ -10,4 +10,6 @@ export const NodesBatchLimits = {
   maxValueChars: 10_000,
   // how long a request waits for the records update thread
   replyTimeoutMs: 60_000,
+  // the Retry-After of a refused batch (429): the time a batch of the same user usually takes to end
+  busyRetryAfterSeconds: 5,
 } as const

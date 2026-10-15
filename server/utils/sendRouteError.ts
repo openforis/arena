@@ -9,6 +9,8 @@ import UnauthorizedError from './unauthorizedError'
 
 const Logger = Log.getLogger('Routes')
 
+const TOO_MANY_REQUESTS = 429
+
 const defaultUnexpectedKey = 'appErrors:unexpectedServerError'
 
 /**
@@ -19,6 +21,7 @@ const defaultUnexpectedKey = 'appErrors:unexpectedServerError'
  * @param {unknown} params.error - The error.
  * @param {string} [params.unexpectedKey] - The key sent for an unexpected error.
  * @param {string} [params.context] - What the route was doing (for the log).
+ * @param {number} [params.retryAfterSeconds] - Sent as Retry-After when the error is a 429 (too many requests).
  * @param {(message: string) => void} [params.logError] - The logger (tests).
  * @returns {void}
  */
@@ -27,15 +30,20 @@ export const sendRouteError = ({
   error,
   unexpectedKey = defaultUnexpectedKey,
   context = 'route',
+  retryAfterSeconds,
   logError = (message: string) => Logger.error(message),
 }: {
   res: any
   error: any
   unexpectedKey?: string
   context?: string
+  retryAfterSeconds?: number
   logError?: (message: string) => void
 }): void => {
   if (error instanceof UnauthorizedError || error instanceof SystemError || error instanceof CoreSystemError) {
+    if (retryAfterSeconds !== undefined && error.statusCode === TOO_MANY_REQUESTS) {
+      res.setHeader('Retry-After', String(retryAfterSeconds))
+    }
     Response.sendErr(res, error)
     return
   }

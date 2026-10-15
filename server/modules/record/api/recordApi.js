@@ -22,6 +22,7 @@ import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as RecordService from '../service/recordService'
@@ -156,6 +157,7 @@ export const init = (app) => {
           error,
           unexpectedKey: NodesBatchMessageKeys.unexpected,
           context: 'batch record edit',
+          retryAfterSeconds: NodesBatchLimits.busyRetryAfterSeconds,
         })
       }
     }
