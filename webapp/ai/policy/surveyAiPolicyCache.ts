@@ -29,8 +29,11 @@ type Entry = {
   fetchedAt: number
   fresh: boolean
   generation: number
-  inflight: Promise<SurveyAiPolicyClientState> | null
+  inflight: Promise<Fetched> | null
 }
+
+// a server answer, and whether a newer generation started before it came (then it was not stored)
+type Fetched = { value: SurveyAiPolicyClientState; superseded: boolean }
 
 export const surveyAiPolicyTtlMs = 30_000
 
@@ -127,16 +130,16 @@ export const createSurveyAiPolicyCache = ({
    * Starts the shared request of a survey.
    * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
-   * @returns {Promise<SurveyAiPolicyClientState>} The request.
+   * @returns {Promise<Fetched>} The server answer; stored only when no newer generation started meanwhile.
    */
-  const startFetch = (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
+  const startFetch = (surveyId: number, entry: Entry): Promise<Fetched> => {
     const { generation } = entry
     const request = (async () => {
       try {
         const value = await fetchPolicy(surveyId)
-        if (entry.generation !== generation) return entry.value ?? value
-        store(surveyId, entry, value)
-        return value
+        const superseded = entry.generation !== generation
+        if (!superseded) store(surveyId, entry, value)
+        return { value, superseded }
       } finally {
         if (entry.generation === generation) entry.inflight = null
       }
@@ -146,15 +149,27 @@ export const createSurveyAiPolicyCache = ({
   }
 
   /**
-   * Drops the cached value and the request in flight, and starts a new request.
+   * Returns the answer to a caller that accepts the cache: a request that was superseded gives the newer cached value.
+   * @param {Entry} entry - The survey entry.
+   * @param {Promise<Fetched>} request - The shared request.
+   * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
+   */
+  const toCachedAnswer = async (entry: Entry, request: Promise<Fetched>): Promise<SurveyAiPolicyClientState> => {
+    const { value, superseded } = await request
+    return superseded ? (entry.value ?? value) : value
+  }
+
+  /**
+   * Drops the cached value and the request in flight, and starts a new request. Its caller gets the server's own
+   * answer, never the cached value.
    * @param {number} surveyId - Survey id.
    * @param {Entry} entry - The survey entry.
    * @returns {Promise<SurveyAiPolicyClientState>} The new request.
    */
-  const refetch = (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
+  const refetch = async (surveyId: number, entry: Entry): Promise<SurveyAiPolicyClientState> => {
     nextGeneration(entry)
     entry.fresh = false
-    return startFetch(surveyId, entry)
+    return (await startFetch(surveyId, entry)).value
   }
 
   return {
@@ -162,7 +177,7 @@ export const createSurveyAiPolicyCache = ({
       const entry = getEntry(surveyId)
       if (fresh) return refetch(surveyId, entry)
       if (isFresh(entry)) return entry.value as SurveyAiPolicyClientState
-      return entry.inflight ?? startFetch(surveyId, entry)
+      return toCachedAnswer(entry, entry.inflight ?? startFetch(surveyId, entry))
     },
     peek: (surveyId) => entries.get(surveyId)?.value ?? null,
     update: async (surveyId, policy) => {
