@@ -178,7 +178,10 @@ export const applyChangeSet = async ({
     operationIds: toApply.filter((op) => !isCategoryItemLabelOperation(op)).map((op) => op.id),
   })
   for (const { id, reason } of invalid) results.set(id, { id, status: 'conflict', message: reason })
-  const nodeDefOperations = toApply.filter((op) => !isCategoryItemLabelOperation(op) && !results.has(op.id))
+  // two filters: the first narrows the type to the node definition operations
+  const nodeDefOperations = toApply
+    .filter((op) => !isCategoryItemLabelOperation(op))
+    .filter((op) => !results.has(op.id))
   await applyGroups(groupByNodeDef(nodeDefOperations), changeSet, deps, results)
   await applyCategoryItemLabels({
     changeSet,
