@@ -3,11 +3,13 @@
  * pick, history and Apply / Discard of the cards, all saved in the conversation store. The hook only subscribes to its
  * state and passes the scope (user, survey, area) of each render to the actions, so nothing is mirrored in refs.
  */
+import type { AiFeatureKey } from '@common/ai/features'
+
 import { createConversation, withConversationProvider } from '@webapp/ai/conversations/conversationModel'
 import type { ConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
 import type { Conversation } from '@webapp/ai/conversations/types'
-import type { RunAssistantTurnParams } from '@webapp/ai/agent/runAssistantTurn'
+import { assistantAreaFeatures, type RunAssistantTurnParams } from '@webapp/ai/agent/runAssistantTurn'
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import type { SuggestionScope, SettleOutcome } from '@webapp/ai/suggestions/types'
 import type { AiToolContext } from '@webapp/ai/tools/types'
@@ -90,7 +92,8 @@ export type AssistantConversationDeps = {
   panel: Pick<AssistantPanelStore, 'getState' | 'setConversationId' | 'startNewConversation' | 'showHistory'>
   registry: AssistantTurnRegistry
   runTurn: (params: RunAssistantTurnParams) => Promise<Conversation>
-  loadAccess: (params: { surveyId: number | null }) => Promise<RunAssistantTurnParams['access']>
+  // the policy of the area's feature (getEffectivePolicyFor: the Help chat is checked against the instance ceilings)
+  loadAccess: (params: { feature: AiFeatureKey; surveyId: number | null }) => Promise<RunAssistantTurnParams['access']>
   // deletes every conversation of the user and what points to them
   clearUserData: (params: { conversationStore: ConversationStore; userUuid: string }) => Promise<void>
   suggestions: AssistantSuggestionHooks
@@ -360,7 +363,7 @@ export const createAssistantConversationController = (
     let saved = false
     try {
       const access = await deps
-        .loadAccess({ surveyId: env.area === 'help' ? null : env.surveyId })
+        .loadAccess({ feature: assistantAreaFeatures[env.area], surveyId: env.area === 'help' ? null : env.surveyId })
         .catch(() => NO_ACCESS)
       const final = await deps.runTurn({
         conversation: base,

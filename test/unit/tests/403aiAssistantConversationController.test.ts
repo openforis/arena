@@ -143,7 +143,7 @@ const setup = async ({
   panel.setScope({ userUuid: scope.userUuid, surveyId: scope.surveyId })
   panel.setArea('design')
   if (open) await controller.init()
-  return { controller, panel, registry, store, suggestions, cards, clearUserData, runTurn }
+  return { controller, panel, registry, store, suggestions, cards, clearUserData, runTurn, loadAccess }
 }
 
 const lastSaved = (store: ReturnType<typeof createFakeStore>, id: string): Conversation | undefined =>
@@ -391,6 +391,20 @@ describe('assistant conversation controller (403)', () => {
   })
 
   describe('turns', () => {
+    test("the policy read before a turn is the one of the area's feature (the Help chat: no survey)", async () => {
+      const { controller, registry, loadAccess, panel } = await setup()
+      await controller.send(env, 'hello')
+      await registry.settle()
+      expect(loadAccess).toHaveBeenLastCalledWith({ feature: 'assistantDesign', surveyId: env.surveyId })
+      panel.setArea('help')
+      const helpEnv = { ...env, area: 'help' as const }
+      controller.setScope(helpEnv)
+      controller.newConversation()
+      await controller.send(helpEnv, 'how?')
+      await registry.settle()
+      expect(loadAccess).toHaveBeenLastCalledWith({ feature: 'chatbot', surveyId: null })
+    })
+
     test('Stop aborts the running turn and busy ends with it', async () => {
       const turn = createTurnControl()
       const { controller, registry } = await setup({ runTurn: turn.run })
