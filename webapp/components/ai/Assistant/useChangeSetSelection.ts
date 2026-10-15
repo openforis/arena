@@ -1,14 +1,11 @@
-import { useCallback, useMemo, useRef, useState } from 'react'
+import { useMemo } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 
 import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
-import {
-  getBehaviourOperationIds,
-  getInitialDeselectedIds,
-  setDeselected,
-  toggleDeselected,
-} from './changeSetSelectionModel'
+import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
+import { useExclusiveRun } from './useExclusiveRun'
+import { useOperationSelection } from './useOperationSelection'
 
 export type ChangeSetSelection = {
   pendingIds: string[]
@@ -49,17 +46,14 @@ export const useChangeSetSelection = ({
   onApply: (operationIds: string[]) => Promise<void>
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
-  const [deselected, setDeselectedIds] = useState<string[]>(() =>
-    getInitialDeselectedIds({ changeSet: cardState.changeSet, compact })
-  )
-  const [applying, setApplying] = useState(false)
-  // set before the re-render, so two quick clicks can't both start an Apply
-  const applyingRef = useRef(false)
-
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
   const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
   const selectableIds = useMemo(() => pendingIds.filter((id) => !conflictIds.includes(id)), [conflictIds, pendingIds])
-  const selectedIds = useMemo(() => selectableIds.filter((id) => !deselected.includes(id)), [deselected, selectableIds])
+  const { selectedIds, toggle, setSelected } = useOperationSelection({
+    selectableIds,
+    getInitialDeselectedIds: () => getInitialDeselectedIds({ changeSet: cardState.changeSet, compact }),
+  })
+  const { running: applying, run } = useExclusiveRun()
 
   const unselectedBehaviourIds = useMemo(
     () =>
@@ -68,30 +62,6 @@ export const useChangeSetSelection = ({
       ),
     [cardState.changeSet, selectableIds, selectedIds]
   )
-
-  const toggle = useCallback((id: string) => setDeselectedIds((prev) => toggleDeselected(prev, id)), [])
-
-  const setSelected = useCallback(
-    (ids: string[], selected: boolean) => setDeselectedIds((prev) => setDeselected(prev, ids, selected)),
-    []
-  )
-
-  /**
-   * Runs an Apply or Discard unless one is already running.
-   * @param {Function} action - The action to run.
-   * @returns {Promise<void>} Resolves when the action ends.
-   */
-  const runExclusive = async (action: () => Promise<void> | void): Promise<void> => {
-    if (applyingRef.current) return
-    applyingRef.current = true
-    setApplying(true)
-    try {
-      await action()
-    } finally {
-      applyingRef.current = false
-      setApplying(false)
-    }
-  }
 
   return {
     pendingIds,
@@ -102,7 +72,7 @@ export const useChangeSetSelection = ({
     applying,
     toggle,
     setSelected,
-    apply: () => runExclusive(() => onApply(selectedIds)),
-    discard: () => runExclusive(onDiscard),
+    apply: () => run(() => onApply(selectedIds)),
+    discard: () => run(onDiscard),
   }
 }
