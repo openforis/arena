@@ -13,7 +13,7 @@ import { Button } from '@webapp/components'
 import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import { useSurveyId, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
-import { useAuthCanEditSurvey } from '@webapp/store/user'
+import { useAuthCanCleanseRecords, useAuthCanEditSurvey } from '@webapp/store/user'
 
 type LandingLogoProps = {
   surveyId: number | string | null
@@ -35,6 +35,7 @@ const LandingContent = () => {
   const surveyInfo = useSurveyInfo()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
+  const canViewDashboard = useAuthCanCleanseRecords()
 
   const title = Survey.getLabel(surveyInfo, lang)
   const description = Survey.getDescription(lang, '')(surveyInfo)
@@ -76,7 +77,12 @@ const LandingContent = () => {
             label="common:appModules.records"
             onClick={() => navigate(appModuleUri(dataModules.records))}
           />
-          <Button label="homeView:landing.openDashboard" onClick={() => navigate(appModuleUri(appModules.dashboard))} />
+          {canViewDashboard && (
+            <Button
+              label="homeView:landing.openDashboard"
+              onClick={() => navigate(appModuleUri(appModules.dashboard))}
+            />
+          )}
         </div>
       </div>
     </div>
