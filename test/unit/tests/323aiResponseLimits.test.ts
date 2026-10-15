@@ -92,6 +92,35 @@ describe('SSE parser: caps per frame and per response (323)', () => {
     expect(events).toEqual([{ a: 1 }])
   })
 
+  test('a frame delivered in many tiny chunks is parsed in linear time', () => {
+    // scanning the pending text again on every chunk takes tens of seconds for this input
+    const { parser, events } = create({ maxFrameChars: 1000000 })
+    const frame = `data: {"text":"${'x'.repeat(300000)}"}`
+    const start = Date.now()
+    for (const char of frame) parser.push(char)
+    parser.push('\n\n')
+    expect(Date.now() - start).toBeLessThan(2000)
+    expect(events).toEqual([{ text: 'x'.repeat(300000) }])
+  })
+
+  test('a delimiter split between two chunks, in any place, ends the frame', () => {
+    const wire = 'data: {"a":1}\n\ndata: {"b":2}\n\n\ndata: {"c":3}\n\n'
+    for (let cut = 0; cut <= wire.length; cut += 1) {
+      const { parser, events } = create({})
+      parser.push(wire.slice(0, cut))
+      parser.push(wire.slice(cut))
+      expect(events).toEqual([{ a: 1 }, { b: 2 }, { c: 3 }])
+    }
+  })
+
+  test('a trailing frame without delimiter is flushed at the end', () => {
+    const { parser, events } = create({})
+    parser.push('data: {"a":1}\n\ndata: {"b":')
+    parser.push('2}')
+    parser.end()
+    expect(events).toEqual([{ a: 1 }, { b: 2 }])
+  })
+
   test('without limits nothing is capped', () => {
     const events: unknown[] = []
     const parser = createSseParser({ onEvent: (event) => events.push(event) })
