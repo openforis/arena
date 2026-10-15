@@ -39,18 +39,49 @@ const flatten = (obj: Record<string, any>, prefix = ''): Record<string, string> 
 
 const placeholders = (text: string): string[] => (text.match(/\{\{\w+\}\}/g) ?? []).sort()
 
+// a plural text has one key per form (seeAll_one, seeAll_few, ...) and each language has its own forms
+const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
+const baseKeyOf = (key: string): string => key.replace(PLURAL_SUFFIX, '')
+const baseKeysOf = (flat: Record<string, string>): string[] => [...new Set(Object.keys(flat).map(baseKeyOf))].sort()
+// the general form of a text: the "other" form of a plural, else the text itself
+const generalForm = (flat: Record<string, string>, baseKey: string): string =>
+  flat[`${baseKey}_other`] ?? flat[baseKey] ?? ''
+
 const enKeys = flatten(en.aiAssistant)
 
 describe('aiAssistant i18n', () => {
   test.each(Object.keys(commonByLang))('%s has the same keys as en', (lang) => {
-    expect(Object.keys(flatten(commonByLang[lang].aiAssistant)).sort()).toEqual(Object.keys(enKeys).sort())
+    expect(baseKeysOf(flatten(commonByLang[lang].aiAssistant))).toEqual(baseKeysOf(enKeys))
   })
 
   test.each(Object.keys(commonByLang))('%s keeps the placeholders of en', (lang) => {
     const translated = flatten(commonByLang[lang].aiAssistant)
-    for (const [key, text] of Object.entries(enKeys)) {
-      expect([key, placeholders(translated[key])]).toEqual([key, placeholders(text)])
+    for (const key of baseKeysOf(enKeys)) {
+      expect([key, placeholders(generalForm(translated, key))]).toEqual([key, placeholders(generalForm(enKeys, key))])
     }
+  })
+
+  // i18next shows the raw key for a category without a text (ru few / many, es fr pt many for millions)
+  const pluralFormsOf = (flat: Record<string, string>): Record<string, string[]> => {
+    const forms: Record<string, string[]> = {}
+    for (const key of Object.keys(flat)) {
+      const match = PLURAL_SUFFIX.exec(key)
+      if (match) (forms[baseKeyOf(key)] ??= []).push(match[1])
+    }
+    return forms
+  }
+
+  // the plural texts whose forms differ from the categories of the language
+  const getPluralMismatches = (lang: string, flat: Record<string, string>) => {
+    const { pluralCategories } = new Intl.PluralRules(lang).resolvedOptions()
+    const expected = [...pluralCategories].sort()
+    return Object.entries(pluralFormsOf(flat))
+      .map(([baseKey, present]) => ({ baseKey, forms: [...present].sort() }))
+      .filter(({ forms }) => forms.join() !== expected.join())
+  }
+
+  test.each(Object.keys(commonByLang))('%s has every plural form of its language in aiAssistant', (lang) => {
+    expect(getPluralMismatches(lang, flatten(commonByLang[lang].aiAssistant))).toEqual([])
   })
 
   test.each(['ru', 'mn'])('%s is written in Cyrillic', (lang) => {
@@ -72,14 +103,21 @@ describe('aiAssistant i18n', () => {
     'features.',
   ]
 
+  test.each(Object.keys(settingsByLang))('%s has every plural form of its language in userAiSettings', (lang) => {
+    expect(getPluralMismatches(lang, flatten(settingsByLang[lang]))).toEqual([])
+  })
+
   test.each(Object.keys(settingsByLang))('%s userAiSettings has the same keys as en', (lang) => {
-    expect(Object.keys(flatten(settingsByLang[lang])).sort()).toEqual(Object.keys(enSettingsKeys).sort())
+    expect(baseKeysOf(flatten(settingsByLang[lang]))).toEqual(baseKeysOf(enSettingsKeys))
   })
 
   test.each(Object.keys(settingsByLang))('%s userAiSettings keeps the placeholders of en', (lang) => {
     const translated = flatten(settingsByLang[lang])
-    for (const [key, text] of Object.entries(enSettingsKeys)) {
-      expect([key, placeholders(translated[key] ?? '')]).toEqual([key, placeholders(text)])
+    for (const key of baseKeysOf(enSettingsKeys)) {
+      expect([key, placeholders(generalForm(translated, key))]).toEqual([
+        key,
+        placeholders(generalForm(enSettingsKeys, key)),
+      ])
     }
   })
 

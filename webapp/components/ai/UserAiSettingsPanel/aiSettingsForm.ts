@@ -147,6 +147,33 @@ export const countAccessLevelFeatures = ({
 }
 
 /**
+ * Returns the text of an error the settings UI shows (a failed API call, a failed provider test): the appErrors text of
+ * its key, else its message, else "Unknown error". The one place that turns such an error into text.
+ * @param {object} params - Parameters.
+ * @param {*} [params.key] - Error key of the response (with or without the `appErrors:` prefix).
+ * @param {Record<string, unknown>} [params.params] - Parameters of the key.
+ * @param {string} [params.message] - Message to show when there is no key.
+ * @param {TFunction} params.t - Translation function.
+ * @returns {string} The text.
+ */
+export const getErrorText = ({
+  key,
+  params,
+  message,
+  t,
+}: {
+  key?: unknown
+  params?: Record<string, unknown>
+  message?: string
+  t: TFunction
+}): string => {
+  const errorKey = typeof key === 'string' ? key.replace(/^appErrors:/, '') : ''
+  // the params hold URLs and model ids: no HTML escaping
+  if (errorKey) return t(`appErrors:${errorKey}`, { ...params, interpolation: { escapeValue: false } })
+  return message || t('userAiSettings:unknownError')
+}
+
+/**
  * Returns the text of a failed API call.
  * @param {object} params - Parameters.
  * @param {*} params.error - Axios error.
@@ -155,7 +182,5 @@ export const countAccessLevelFeatures = ({
  */
 export const getApiErrorMessage = ({ error, t }: { error: any; t: TFunction }): string => {
   const data = error?.response?.data
-  const errorKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
-  if (errorKey) return t(`appErrors:${errorKey}`, { ...data.params, interpolation: { escapeValue: false } })
-  return data?.error || error?.message || 'unknown'
+  return getErrorText({ key: data?.key, params: data?.params, message: data?.error || error?.message, t })
 }

@@ -4,7 +4,9 @@ import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
 
-type Props = {
+import { translatePlaceholder } from './translatePlaceholder'
+
+export type SimpleTextInputProps = {
   autoComplete?: string
   autoFocus?: boolean
   className?: string
@@ -12,6 +14,8 @@ type Props = {
   disabled?: boolean
   endAdornment?: React.ReactNode
   id?: string
+  // attributes of the <input> element, such as data-* hints for password managers
+  inputAttributes?: Record<string, string>
   label?: string
   maxLength?: number
   name?: string
@@ -29,7 +33,7 @@ type Props = {
   value?: string | number
 }
 
-export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) => {
+export const SimpleTextInput = forwardRef<HTMLDivElement, SimpleTextInputProps>((props, ref) => {
   const {
     autoComplete = 'off',
     autoFocus,
@@ -38,6 +42,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
     disabled,
     endAdornment,
     id,
+    inputAttributes,
     label: labelProp,
     maxLength,
     name,
@@ -70,7 +75,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
   )
 
   const label = labelProp ? i18n.t(labelProp) : labelProp
-  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
+  const placeholder = translatePlaceholder(i18n, placeholderProp)
   const multiline = rows !== undefined && rows > 1
 
   return (
@@ -82,7 +87,7 @@ export const SimpleTextInput = forwardRef<HTMLDivElement, Props>((props, ref) =>
       disabled={disabled || readOnly}
       label={label}
       id={id}
-      slotProps={{ input: { startAdornment, endAdornment }, htmlInput: { 'data-testid': testId } }}
+      slotProps={{ input: { startAdornment, endAdornment }, htmlInput: { ...inputAttributes, 'data-testid': testId } }}
       inputRef={ref}
       margin="none"
       multiline={multiline}

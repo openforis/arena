@@ -14,6 +14,8 @@ import { ButtonIconCancel } from '@webapp/components/buttons'
 import { useOnUpdate } from '../../hooks'
 import ValidationTooltip from '../../validationTooltip'
 import { SimpleTextInput } from '../SimpleTextInput'
+import { translatePlaceholder } from '../translatePlaceholder'
+import { getInputTitle } from './inputTitle'
 
 type NumberFormatProps = {
   decimalScale?: number
@@ -25,6 +27,8 @@ type NumberFormatProps = {
 
 type Props = {
   allowClear?: boolean
+  // default: off, and new-password for a password (so a browser does not fill in the login password)
+  autoComplete?: string
   autoFocus?: boolean
   className?: string
   disabled?: boolean
@@ -50,6 +54,7 @@ type Props = {
 export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const {
     allowClear = false,
+    autoComplete: autoCompleteProp = undefined,
     autoFocus,
     className: classNameProp = null,
     disabled = false,
@@ -83,7 +88,8 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const selectionRef = useRef<number[]>(selectionInitial)
   const valueTextOrUndefined = Objects.isEmpty(value) ? undefined : String(value)
   const valueText = valueTextOrUndefined ?? ''
-  const title = titleProp ?? valueTextOrUndefined
+  const title = getInputTitle({ title: titleProp, value, type })
+  const autoComplete = autoCompleteProp ?? (type === 'password' ? 'new-password' : 'off')
 
   const handleValueChange = useCallback(
     (newValue: string) => {
@@ -119,7 +125,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
 
   const className = classNames('form-input', classNameProp)
   const rows = inputType === 'textarea' ? textAreaRows : undefined
-  const placeholder = placeholderProp ? i18n.t(placeholderProp) : placeholderProp
+  const placeholder = translatePlaceholder(i18n, placeholderProp)
 
   const clearButtonVisible = allowClear && !disabled && !readOnly && Objects.isNotEmpty(value)
   const endAdornment = clearButtonVisible ? (
@@ -130,7 +136,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
         <NumericFormat
-          autoComplete="off"
+          autoComplete={autoComplete}
           autoFocus={autoFocus}
           disabled={disabled || readOnly}
           className={className}
@@ -152,7 +158,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
         />
       ) : (
         <SimpleTextInput
-          autoComplete="off"
+          autoComplete={autoComplete}
           autoFocus={autoFocus}
           className={className}
           disabled={disabled}

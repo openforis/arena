@@ -11,7 +11,14 @@ import type { AiGenerateText } from '@common/ai/llm'
 import { type AiTranslationItem, type AiTranslationResult, translateItems } from '@common/ai/tasks/translation'
 
 import { resolveBatchModel } from './batchModel'
-import { type AiBatchCall, type AiBatchGuard, type AiBatchProgress, chunkArray, runAiBatchCalls } from './batchRun'
+import {
+  type AiBatchCall,
+  type AiBatchGuard,
+  type AiBatchProgress,
+  type AiBatchStop,
+  chunkArray,
+  runAiBatchCalls,
+} from './batchRun'
 
 // Items per AI call: 20, not AiLimits.translationMaxItems, because each item goes to up to 20 languages and small
 // local models truncate bigger answers
@@ -39,8 +46,10 @@ export type NodeDefsTranslationResult = {
   languages: string[]
   otherLangs: string[]
   items: NodeDefsTranslationItem[]
-  // label or description translations (text × language) the AI did not produce
+  // label or description translations (text × language) the AI did not produce, those of a stopped run included
   failedCount: number
+  // present when the run stopped before its last call: the items hold what was translated until then
+  stop?: AiBatchStop
 }
 
 // what applyTranslations needs to know about the call a translation list answers
@@ -246,7 +255,7 @@ const buildNodeDefsTranslationResult = ({
  * @param {Function} [params.translate] - The translation task (tests).
  * @param {number} [params.batchSize] - Items per call.
  * @param {number} [params.maxTargetLangs] - Target languages per call.
- * @returns {Promise<NodeDefsTranslationResult>} The review data.
+ * @returns {Promise<NodeDefsTranslationResult>} The review data; after a stop, what was translated until then.
  */
 export const runTranslateAllLabels = async ({
   survey,
@@ -291,7 +300,7 @@ export const runTranslateAllLabels = async ({
   })
   // translations the model silently dropped in calls that succeeded
   let missingCount = 0
-  const { failedCount } = await runAiBatchCalls({
+  const { failedCount, stop } = await runAiBatchCalls({
     calls,
     guard,
     signal,
@@ -302,10 +311,11 @@ export const runTranslateAllLabels = async ({
     },
   })
   // a text too long for the task is never sent: it counts as failed in every language
-  return buildNodeDefsTranslationResult({
+  const result = buildNodeDefsTranslationResult({
     ...resultParams,
     failedCount: failedCount + missingCount + skippedCount * otherLangs.length,
   })
+  return stop ? { ...result, stop } : result
 }
 
 /**

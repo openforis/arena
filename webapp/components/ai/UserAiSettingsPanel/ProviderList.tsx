@@ -2,18 +2,15 @@ import React from 'react'
 import classNames from 'classnames'
 
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
-import { Button as ButtonJS, ButtonMenu } from '@webapp/components/buttons'
+import { Button, ButtonMenu } from '@webapp/components/buttons'
 import { Fieldset } from '@webapp/components/Fieldset'
 import { TestId } from '@webapp/utils/testId'
 
-import type { AiSettings } from './aiSettingsForm'
+import type { AiSettings, TFunction } from './aiSettingsForm'
 import { ProviderDialog } from './ProviderDialog/ProviderDialog'
 import { getProviderDisplayName, type ProviderMenuAction, type ProviderRow } from './providerList'
 import { StatusPill } from './StatusPill'
 import { type ProviderListApi, useProviderList } from './useProviderList'
-
-// forwardRef components lose their prop types in TS (same cast as the dialog)
-const Button = ButtonJS as React.ComponentType<any>
 
 const MENU_LABELS: Record<ProviderMenuAction, string> = {
   makeDefault: 'userAiSettings:list.makeDefault',
@@ -24,7 +21,10 @@ const MENU_LABELS: Record<ProviderMenuAction, string> = {
 
 type RowProps = {
   row: ProviderRow
-  list: ProviderListApi
+  t: TFunction
+  // an action of a provider is running
+  busy: boolean
+  onAction: ProviderListApi['runAction']
 }
 
 /**
@@ -32,7 +32,7 @@ type RowProps = {
  * @param {RowProps} props - Props.
  * @returns {React.ReactElement} The menu.
  */
-const RowMenu = ({ row, list }: RowProps) => {
+const RowMenu = ({ row, t, busy, onAction }: RowProps) => {
   const { entry, actions } = row
   if (actions.length === 0) return <span className="user-ai-settings-panel__provider-menu" aria-hidden="true" />
   return (
@@ -41,17 +41,17 @@ const RowMenu = ({ row, list }: RowProps) => {
       icon={<span aria-hidden="true">⋯</span>}
       // the title is the accessible name of the icon button
       title="userAiSettings:list.menu"
-      titleParams={{ name: getProviderDisplayName({ entry, t: list.t }) }}
+      titleParams={{ name: getProviderDisplayName({ entry, t }) }}
       showCaret={false}
       variant="text"
-      disabled={list.busyId !== null}
+      disabled={busy}
       testId={TestId.ai.providerMenu(entry.id)}
       items={actions.map((action) => ({
         key: action,
         label: MENU_LABELS[action],
         testId: TestId.ai.providerMenuItem(action),
         onClick: () => {
-          list.runAction(row, action)
+          onAction(row, action)
         },
       }))}
     />
@@ -63,8 +63,7 @@ const RowMenu = ({ row, list }: RowProps) => {
  * @param {RowProps} props - Props.
  * @returns {React.ReactElement} The row.
  */
-const ProviderRowView = ({ row, list }: RowProps) => {
-  const { t } = list
+const ProviderRowView = ({ row, t, busy, onAction }: RowProps) => {
   const { entry, isDefault, whereKey, pill } = row
   return (
     <li
@@ -88,7 +87,7 @@ const ProviderRowView = ({ row, list }: RowProps) => {
           </span>
         )}
         <StatusPill tone={pill.tone} text={t(pill.key)} />
-        <RowMenu row={row} list={list} />
+        <RowMenu row={row} t={t} busy={busy} onAction={onAction} />
       </span>
     </li>
   )
@@ -129,7 +128,7 @@ export const ProviderList = ({ settings, reloadSettings }: Props) => {
       )}
       <ul className="user-ai-settings-panel__providers">
         {list.rows.map((row) => (
-          <ProviderRowView key={row.entry.id} row={row} list={list} />
+          <ProviderRowView key={row.entry.id} row={row} t={t} busy={list.busyId !== null} onAction={list.runAction} />
         ))}
       </ul>
       <div className="user-ai-settings-panel__footer-hint">{t('userAiSettings:list.footerHint')}</div>

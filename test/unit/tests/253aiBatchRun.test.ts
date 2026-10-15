@@ -84,7 +84,7 @@ describe('AI batch runner (253)', () => {
     expect(ran).toBe(1)
   })
 
-  test('a policy change during the run stops it before the next call', async () => {
+  test('a policy change during the run stops it before the next call and keeps the results so far', async () => {
     let policyReads = 0
     let ran = 0
     const guard = cloudGuard({
@@ -96,13 +96,34 @@ describe('AI batch runner (253)', () => {
     })
     const run = async () => {
       ran += 1
+      return ran
     }
+    const results: number[] = []
+    const { stop, failedCount } = await runAiBatchCalls({
+      calls: [call(1, run), call(2, run)],
+      guard,
+      onResult: (result) => {
+        results.push(result)
+      },
+    })
+    expect(results).toEqual([1])
+    expect(ran).toBe(1)
+    expect(failedCount).toBe(2)
+    expect(stop).toMatchObject({ cause: 'error', done: 1, total: 2 })
+    const error: any = stop?.error
+    expect([error.key, error.statusCode]).toEqual(['aiPolicyRefused', 403])
+  })
+
+  test('a policy that refuses the first call stops the run with nothing to keep', async () => {
+    const guard = cloudGuard({
+      fetchSettings: async () => settingsOn,
+      fetchEffectivePolicy: async () => onDevicePolicy,
+    })
     const error: any = await expectSystemErrorKey(
-      runAiBatchCalls({ calls: [call(1, run), call(1, run)], guard, onResult: () => {} }),
+      runAiBatchCalls({ calls: [call(1, async () => 1)], guard, onResult: () => {} }),
       'aiPolicyRefused'
     )
     expect(error.statusCode).toBe(403)
-    expect(ran).toBe(1)
   })
 
   test('cancel during a call rejects with an abort error and runs nothing more', async () => {
