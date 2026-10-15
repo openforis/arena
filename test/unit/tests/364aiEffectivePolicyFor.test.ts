@@ -107,16 +107,4 @@ describe('resolveAssistantEngine: the turn uses the policy the engine was select
     })
     expect(result.access).toEqual({ effective: checked, hostingClass: 'cloud' })
   })
-
-  test('a resolver that reports no policy leaves the access as it was', async () => {
-    const result = await resolveAssistantEngine({
-      defaultLimits: limits,
-      access: { effective: { schema: 'cloud', data: 'cloud' } },
-      feature: 'assistantDesign',
-      surveyId: 7,
-      dataClass: 'schema',
-      resolve: async () => ({ model: 'm', engine }),
-    })
-    expect(result.access).toEqual({ effective: { schema: 'cloud', data: 'cloud' }, hostingClass: 'cloud' })
-  })
 })

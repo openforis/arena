@@ -118,8 +118,10 @@ describe('resolveModel: the last policy check before a local engine is created (
     const { resolve, state, storage } = setup({ answers: ['continue'] })
     await resolve({ feature: 'activityLogSummary', surveyId: 1 }).catch(() => undefined)
     // activityLogSummary needs record data: onDevice is allowed by the default policy
+    // the cached read, the fresh one before the dialog, and the one after it
     expect(state.policyCalls).toEqual([
       { surveyId: 1, fresh: false },
+      { surveyId: 1, fresh: true },
       { surveyId: 1, fresh: true },
     ])
     expect(state.localEngines).toEqual([URL_A])
