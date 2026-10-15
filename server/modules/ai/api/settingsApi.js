@@ -10,6 +10,8 @@
  *   POST   /api/ai/providers         — add an account provider (tested again here)
  *   PUT    /api/ai/providers/:id     — edit an account provider (`apiKey` omitted = keep)
  *   DELETE /api/ai/providers/:id     — remove an account provider
+ *
+ * The routes that connect to the endpoint of a provider (test, models, add, edit) are rate limited per user.
  */
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
@@ -22,6 +24,7 @@ import * as ProviderResolver from '../service/providerResolver'
 import { getDisabledFeatureKeys } from '../service/featureGate'
 import { getEngineSettingsFields } from '../service/engineSettings'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
+import { limitProviderCalls } from './providerRateLimit'
 
 /**
  * Returns the body of GET /api/ai/settings (spec section 3): the settings, the providers and the instance fields.
@@ -41,6 +44,9 @@ export const buildResponseBody = (user) => ({
 })
 
 const guards = [AuthMiddleware.requireLoggedInUser, requireAiFeaturesEnabled]
+
+// the routes that connect to the endpoint of a provider, which the user chooses, are rate limited per user
+const providerCallGuards = [...guards, limitProviderCalls]
 
 /**
  * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
@@ -90,19 +96,19 @@ export const init = (app) => {
 
   app.post(
     '/ai/providers/test',
-    ...guards,
+    ...providerCallGuards,
     jsonRoute(({ user, body }) => AiProviderService.testProvider({ user, input: body }))
   )
 
   app.post(
     '/ai/providers/models',
-    ...guards,
+    ...providerCallGuards,
     jsonRoute(({ user, body }) => AiProviderService.listProviderModels({ user, input: body }))
   )
 
   app.post(
     '/ai/providers',
-    ...guards,
+    ...providerCallGuards,
     jsonRoute(async ({ user, body }) => {
       const { user: updated, provider } = await AiProviderService.addProvider({ user, input: body })
       return { provider, settings: buildResponseBody(updated) }
@@ -111,7 +117,7 @@ export const init = (app) => {
 
   app.put(
     '/ai/providers/:id',
-    ...guards,
+    ...providerCallGuards,
     jsonRoute(async ({ user, body, params }) => {
       const { user: updated, provider } = await AiProviderService.updateProvider({ user, id: params.id, input: body })
       return { provider, settings: buildResponseBody(updated) }

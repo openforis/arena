@@ -10,6 +10,7 @@
  * On any failure (network, auth, parse) we surface an error key with a status code: nothing the provider or the
  * network said is sent on (the details go to the server log) — the panel falls back to free-text input.
  */
+import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as Log from '@server/log/log'
@@ -20,7 +21,8 @@ import * as ProviderRegistry from './providerRegistry'
 
 const logger = Log.getLogger('AiModelDiscovery')
 
-const DEFAULT_TIMEOUT_MS = 10000
+// a model list is awaited by a dropdown: shorter than the timeout of a model call
+const LIST_TIMEOUT_MS = 10000
 
 // the upstream answered, but not with a list
 class UpstreamStatusError extends Error {
@@ -30,20 +32,30 @@ class UpstreamStatusError extends Error {
   }
 }
 
-const fetchWithTimeout = async (url, { headers, timeoutMs = DEFAULT_TIMEOUT_MS, fetchImpl = fetch } = {}) => {
-  const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(), timeoutMs)
-  try {
-    const response = await fetchImpl(url, { method: 'GET', headers, signal: controller.signal, redirect: 'error' })
-    if (!response.ok) {
-      // the error body is never read: it is not shown, and a provider could make it large
-      await response.body?.cancel().catch(() => undefined)
-      throw new UpstreamStatusError(response.status)
-    }
-    return response.json()
-  } finally {
-    clearTimeout(timer)
+/**
+ * Returns the time a list may take: the timeout of a model call, and at most the time a dropdown is worth waiting.
+ * @returns {number} The timeout in milliseconds.
+ */
+const getListTimeoutMs = () => Math.min(ENV.aiRequestTimeoutMs, LIST_TIMEOUT_MS)
+
+/**
+ * Reads a JSON list from an URL. The timeout covers the connection, the headers and the body.
+ * @param {string} url - The URL.
+ * @param {object} [options] - Options.
+ * @param {object} [options.headers] - Request headers.
+ * @param {Function} [options.fetchImpl] - The fetch to use.
+ * @returns {Promise<unknown>} The parsed body.
+ * @throws {UpstreamStatusError} When the upstream does not answer with a 2xx status.
+ */
+const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
+  const signal = AbortSignal.timeout(getListTimeoutMs())
+  const response = await fetchImpl(url, { method: 'GET', headers, signal, redirect: 'error' })
+  if (!response.ok) {
+    // the error body is never read: it is not shown, and a provider could make it large
+    await response.body?.cancel().catch(() => undefined)
+    throw new UpstreamStatusError(response.status)
   }
+  return response.json()
 }
 
 const stripTrailingSlash = (s) => {
@@ -79,7 +91,7 @@ const listOpenAiCompatible = async ({ baseUrl, apiKey, fetchImpl }) => {
   const base = normaliseOpenAiBase(baseUrl)
   const headers = { Accept: 'application/json' }
   if (apiKey) headers.Authorization = `Bearer ${apiKey}`
-  const json = await fetchWithTimeout(`${base}/models`, { headers, fetchImpl })
+  const json = await fetchJson(`${base}/models`, { headers, fetchImpl })
   const data = Array.isArray(json?.data) ? json.data : []
   return data.map((entry) => (entry && typeof entry.id === 'string' ? { id: entry.id } : null)).filter(Boolean)
 }
@@ -92,7 +104,7 @@ const listOpenAi = async ({ apiKey }) => {
 
 const listAnthropic = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.anthropic })
-  const json = await fetchWithTimeout('https://api.anthropic.com/v1/models', {
+  const json = await fetchJson('https://api.anthropic.com/v1/models', {
     headers: {
       Accept: 'application/json',
       'x-api-key': apiKey,
@@ -111,7 +123,7 @@ const listAnthropic = async ({ apiKey }) => {
 
 const listGoogle = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
-  const json = await fetchWithTimeout(
+  const json = await fetchJson(
     `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
     { headers: { Accept: 'application/json' } }
   )

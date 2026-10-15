@@ -118,10 +118,11 @@ const badRequest = (key: string, params: Record<string, unknown> = {}): SystemEr
 /**
  * Returns the result of a test that failed with the error.
  * @param {unknown} error - The error.
+ * @param {boolean} [timedOut] - True when the timeout aborted the test.
  * @returns {AiProviderTestResult} The failed result: the key and params of the error as the gateway maps it.
  */
-const toFailedResult = (error: unknown): AiProviderTestResult => {
-  const systemError = toAiSystemError(error)
+const toFailedResult = (error: unknown, timedOut = false): AiProviderTestResult => {
+  const systemError = toAiSystemError(error, { timedOut })
   return { ok: false, latencyMs: 0, errorKey: systemError.key, errorParams: systemError.params }
 }
 
@@ -134,6 +135,8 @@ const toFailedResult = (error: unknown): AiProviderTestResult => {
  */
 const runConnectionTest = async ({ user, cfg }: { user: User; cfg: AiProviderCallConfig }) => {
   const start = Date.now()
+  // an endpoint that never answers must not hold the request (and a socket) open
+  const abortSignal = AbortSignal.timeout(ENV.aiRequestTimeoutMs)
   try {
     const model = await ProviderRegistry.buildUserModel(cfg)
     const ctx = {
@@ -144,13 +147,13 @@ const runConnectionTest = async ({ user, cfg }: { user: User; cfg: AiProviderCal
       userUuid: user.uuid,
     }
     await AiTelemetry.track(ctx, () =>
-      generateText({ model, prompt: 'Reply with the single word: ok', maxOutputTokens: 16, maxRetries: 0 })
+      generateText({ model, prompt: 'Reply with the single word: ok', maxOutputTokens: 16, maxRetries: 0, abortSignal })
     )
     return { ok: true, latencyMs: Date.now() - start }
   } catch (error) {
     // the details stay in the server log
     if (!(error instanceof SystemError)) logger.warn(formatErrorForLog('testConnection', error))
-    return { ...toFailedResult(error), latencyMs: Date.now() - start }
+    return { ...toFailedResult(error, abortSignal.aborted), latencyMs: Date.now() - start }
   }
 }
 
