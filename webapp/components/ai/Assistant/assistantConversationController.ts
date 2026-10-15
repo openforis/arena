@@ -346,6 +346,10 @@ export const createAssistantConversationController = (
         selectedId: panel.getState().conversationId,
         id: base.id,
       })
+    // the copy in memory of a turn that ends while another area is shown must not stay a streaming snapshot: the
+    // panel keeps showing it when the area is selected again, without reading the store
+    const holdsCopy = () =>
+      running === turn && registry.getGeneration() === generation && state.conversation?.id === base.id
     // always saved, even after a reset: the stored conversation keeps its own user and the last state of the answer
     const persist = (next: Conversation) => registry.track(store.save(next))
     set({ busy: true, conversation: base })
@@ -371,12 +375,14 @@ export const createAssistantConversationController = (
           }
         },
       })
-      if (isCurrent()) set({ conversation: final })
+      if (isCurrent() || holdsCopy()) set({ conversation: final })
       suggestions.reportSettle({ conversation: final, running: false })
       await persist(final)
     } catch (error) {
       // an unexpected failure (not the model's: runAssistantTurn reports those in the answer): no spinner is left
-      if (isCurrent() && state.conversation) set({ conversation: withStreamingFailed(state.conversation) })
+      if ((isCurrent() || holdsCopy()) && state.conversation) {
+        set({ conversation: withStreamingFailed(state.conversation) })
+      }
       throw error
     } finally {
       registry.unregister(controller)
