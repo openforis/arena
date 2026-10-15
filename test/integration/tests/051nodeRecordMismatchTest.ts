@@ -17,25 +17,7 @@ import { getContextUser } from '../config/context'
 import * as SB from '../../utils/surveyBuilder'
 import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
-
-type Route = { method: string; path: string; handlers: any[] }
-
-// collects the routes registered by an API module
-const collectRoutes = (init: (app: any) => void): Route[] => {
-  const routes: Route[] = []
-  const app = new Proxy(
-    {},
-    {
-      get:
-        (_target, method: string) =>
-        (path: string, ...handlers: any[]) => {
-          routes.push({ method, path, handlers })
-        },
-    }
-  )
-  init(app)
-  return routes
-}
+import { collectRoutes } from '@test/utils/routeUtils'
 
 describe('Per-node endpoint: node of another record', () => {
   let survey: any

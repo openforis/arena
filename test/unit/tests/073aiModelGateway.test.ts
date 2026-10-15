@@ -57,6 +57,18 @@ const hangingModel = () => {
   return { model, state }
 }
 
+/**
+ * Waits, turn by turn of the event loop, until a condition holds (no fixed delay).
+ * @param {Function} condition - What to wait for.
+ * @returns {Promise<void>} Resolves when it holds; fails the test if it never does.
+ */
+const waitUntil = async (condition: () => boolean): Promise<void> => {
+  for (let turn = 0; turn < 1000 && !condition(); turn += 1) {
+    await new Promise((resolve) => setImmediate(resolve))
+  }
+  expect(condition()).toBe(true)
+}
+
 const createDeps = (model: any, overrides: any = {}) => {
   const telemetry: any[] = []
   const logged: string[] = []
@@ -305,11 +317,15 @@ describe('handleModelRequest: stream', () => {
     process.on('unhandledRejection', onUnhandled)
     try {
       const done = handleModelRequest({ req, res, user, deps })
-      await new Promise((resolve) => setTimeout(resolve, 20))
+      // the stream is open when the first part reached the client
+      await waitUntil(() => res.writes.some((chunk: string) => chunk.includes('partial')) && !!state.signal)
       const writesBefore = res.writes.length
       res.disconnect()
       await done
-      await new Promise((resolve) => setTimeout(resolve, 20))
+      // the abort is the positive signal; two more turns let a stray rejection or late write show up
+      expect(state.signal.aborted).toBe(true)
+      await new Promise((resolve) => setImmediate(resolve))
+      await new Promise((resolve) => setImmediate(resolve))
 
       expect(state.signal.aborted).toBe(true)
       expect(res.writes.length).toBe(writesBefore)
