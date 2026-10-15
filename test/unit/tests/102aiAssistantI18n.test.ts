@@ -41,8 +41,8 @@ const placeholders = (text: string): string[] => (text.match(/\{\{\w+\}\}/g) ?? 
 
 // a plural text has one key per form (seeAll_one, seeAll_few, ...) and each language has its own forms
 const PLURAL_SUFFIX = /_(zero|one|two|few|many|other)$/
-const baseKeysOf = (flat: Record<string, string>): string[] =>
-  [...new Set(Object.keys(flat).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort()
+const baseKeyOf = (key: string): string => key.replace(PLURAL_SUFFIX, '')
+const baseKeysOf = (flat: Record<string, string>): string[] => [...new Set(Object.keys(flat).map(baseKeyOf))].sort()
 // the general form of a text: the "other" form of a plural, else the text itself
 const generalForm = (flat: Record<string, string>, baseKey: string): string =>
   flat[`${baseKey}_other`] ?? flat[baseKey] ?? ''
@@ -59,6 +59,29 @@ describe('aiAssistant i18n', () => {
     for (const key of baseKeysOf(enKeys)) {
       expect([key, placeholders(generalForm(translated, key))]).toEqual([key, placeholders(generalForm(enKeys, key))])
     }
+  })
+
+  // i18next shows the raw key for a category without a text (ru few / many, es fr pt many for millions)
+  const pluralFormsOf = (flat: Record<string, string>): Record<string, string[]> => {
+    const forms: Record<string, string[]> = {}
+    for (const key of Object.keys(flat)) {
+      const match = PLURAL_SUFFIX.exec(key)
+      if (match) (forms[baseKeyOf(key)] ??= []).push(match[1])
+    }
+    return forms
+  }
+
+  // the plural texts whose forms differ from the categories of the language
+  const getPluralMismatches = (lang: string, flat: Record<string, string>) => {
+    const { pluralCategories } = new Intl.PluralRules(lang).resolvedOptions()
+    const expected = [...pluralCategories].sort()
+    return Object.entries(pluralFormsOf(flat))
+      .map(([baseKey, present]) => ({ baseKey, forms: [...present].sort() }))
+      .filter(({ forms }) => forms.join() !== expected.join())
+  }
+
+  test.each(Object.keys(commonByLang))('%s has every plural form of its language in aiAssistant', (lang) => {
+    expect(getPluralMismatches(lang, flatten(commonByLang[lang].aiAssistant))).toEqual([])
   })
 
   test.each(['ru', 'mn'])('%s is written in Cyrillic', (lang) => {
@@ -79,6 +102,10 @@ describe('aiAssistant i18n', () => {
     'access.',
     'features.',
   ]
+
+  test.each(Object.keys(settingsByLang))('%s has every plural form of its language in userAiSettings', (lang) => {
+    expect(getPluralMismatches(lang, flatten(settingsByLang[lang]))).toEqual([])
+  })
 
   test.each(Object.keys(settingsByLang))('%s userAiSettings has the same keys as en', (lang) => {
     expect(baseKeysOf(flatten(settingsByLang[lang]))).toEqual(baseKeysOf(enSettingsKeys))
