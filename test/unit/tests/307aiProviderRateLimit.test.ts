@@ -48,6 +48,31 @@ describe('Rate limit of the calls to the endpoints of the providers (307)', () =
     expect(next).toHaveBeenCalledTimes(3)
   })
 
+  test('a user with 3 calls in flight is refused a 4th, and a finished call frees its place', () => {
+    const middleware = createProviderRateLimit({ limiter: createRateLimiter({ limitPerMinute: 100 }) })
+    const next = jest.fn()
+    const call = (uuid: string) => {
+      const res = createFakeResponse()
+      middleware({ user: { uuid } }, res, next)
+      return res
+    }
+    const running = [call('u1'), call('u1'), call('u1')]
+    expect(next).toHaveBeenCalledTimes(3)
+    const refused = call('u1')
+    expect(refused.statusCode).toBe(429)
+    expect(JSON.stringify(refused.body)).toContain('aiRateLimited')
+    expect(next).toHaveBeenCalledTimes(3)
+    // the cap is per user
+    call('u2')
+    expect(next).toHaveBeenCalledTimes(4)
+    running[0].emit('close')
+    call('u1')
+    expect(next).toHaveBeenCalledTimes(5)
+    // a call counts once, however many times the response closes
+    running[0].emit('close')
+    expect(call('u1').statusCode).toBe(429)
+  })
+
   test('the routes that connect to a provider endpoint are limited, the others are not', () => {
     const routes = collectRoutes(SettingsApi.init)
     const limited = routes
