@@ -4,24 +4,11 @@ import { createProposedNodeDef } from '@webapp/ai/changeSets/newNodeDef'
 import { getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
-const mockUpdateNodeDefProps = jest.fn()
-
-jest.mock('@server/modules/nodeDef/repository/nodeDefRepository', () => ({
-  insertNodeDef: async (_surveyId: number, nodeDef: unknown) => nodeDef,
-  updateNodeDefProps: (params: unknown) => mockUpdateNodeDefProps(params),
-}))
-jest.mock('@server/modules/activityLog/repository/activityLogRepository', () => ({ insert: async () => undefined }))
-jest.mock('@server/modules/survey/repository/surveySchemaRepositoryUtils', () => ({
-  markSurveyDraft: async () => undefined,
-}))
-
 let survey: any
 
 beforeAll(async () => {
   survey = await buildRefSurvey()
 })
-
-beforeEach(() => mockUpdateNodeDefProps.mockClear())
 
 describe('NodeDefManager.insertNodeDef lists the new node definition in the parent layout of every cycle (384)', () => {
   const insert = async (cycles: string[], cycle?: string) => {
@@ -29,10 +16,23 @@ describe('NodeDefManager.insertNodeDef lists the new node definition in the pare
     const parent = NodeDef.assocCycles(['0', '1'])(getDefByName(survey, 'cluster'))
     const target = withNodeDef(survey, 'cluster', () => parent)
     const nodeDef = createProposedNodeDef({ parent, type: 'text', name: 'notes', cycles })
-    const client: any = { tx: async (fn: (t: unknown) => unknown) => fn({}) }
-    await insertNodeDef({ user: { uuid: 'u' }, survey: target, nodeDef, ...(cycle ? { cycle } : {}) }, client)
-    const [params] = mockUpdateNodeDefProps.mock.calls.map(([call]) => call)
-    return { params, parentLayout: NodeDef.getLayout(parent) }
+    // the queries are faked (the unit tests are bundled: jest.mock does not reach the repositories)
+    const updates: { props: any }[] = []
+    const tx: any = {
+      one: async (sql: string, params: any[]) => {
+        if (sql.includes('INSERT INTO')) return nodeDef
+        updates.push({ props: params[0] })
+        return {}
+      },
+      query: async () => undefined,
+      none: async () => undefined,
+    }
+    const client: any = { tx: async (fn: (t: unknown) => unknown) => fn(tx) }
+    await insertNodeDef(
+      { user: { uuid: 'u' }, survey: target, nodeDef, addLogs: false, ...(cycle ? { cycle } : {}) },
+      client
+    )
+    return { params: updates[0], parentLayout: NodeDef.getLayout(parent) }
   }
 
   test('a node definition in two cycles is added to the parent layout of both', async () => {
