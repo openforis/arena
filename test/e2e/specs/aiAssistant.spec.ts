@@ -381,6 +381,7 @@ test.describe('AI assistant (mock provider)', () => {
     })
     await notesRow.hover()
     await notesRow.getByTestId(TestId.aiAssistant.historyDeleteBtn).click()
+    await page.getByTestId(TestId.modal.modal).getByRole('button', { name: 'Ok' }).click()
     await expect(rows).toHaveCount(1)
     await expect(rows).toContainText(LABEL_REQUEST)
     await expect(panel.getByTestId(TestId.aiAssistant.history)).toBeVisible()

@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import { useConfirm } from '@webapp/components/hooks'
 
 import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
 import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
@@ -19,7 +20,8 @@ export type ChangeSetSelection = {
   toggle: (id: string) => void
   setSelected: (ids: string[], selected: boolean) => void
   apply: () => Promise<void>
-  discard: () => Promise<void>
+  // asks first: a discarded proposal can't be brought back
+  discard: () => void
 }
 
 /**
@@ -54,6 +56,7 @@ export const useChangeSetSelection = ({
     getInitialDeselectedIds: () => getInitialDeselectedIds({ changeSet: cardState.changeSet, compact }),
   })
   const { running: applying, run } = useExclusiveRun()
+  const confirm = useConfirm()
 
   const unselectedBehaviourIds = useMemo(
     () =>
@@ -73,6 +76,7 @@ export const useChangeSetSelection = ({
     toggle,
     setSelected,
     apply: () => run(() => onApply(selectedIds)),
-    discard: () => run(onDiscard),
+    // onCancel is required by useConfirm's inferred (untyped) parameter
+    discard: () => confirm({ key: 'aiAssistant.discardConfirm', onOk: () => void run(onDiscard), onCancel: undefined }),
   }
 }
