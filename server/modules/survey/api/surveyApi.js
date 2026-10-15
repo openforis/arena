@@ -30,21 +30,19 @@ import {
 import * as SurveyService from '../service/surveyService'
 
 /**
- * Validates the AI descriptions of a schema summary export (generated in the browser).
+ * Validates the AI descriptions of a schema summary export (generated in the browser). Their uuids are checked by the
+ * export job, which loads the survey anyway.
  * @param {object} params - Parameters.
  * @param {object} params.user - Acting user.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.cycle - Cycle key.
  * @param {unknown} params.aiDescriptions - Descriptions by uuid from the request.
  * @param {unknown} params.aiDescriptionsFailedCount - Failed count from the request.
- * @returns {Promise<{aiDescriptions: object, aiDescriptionsFailedCount: number}>} The validated values.
+ * @returns {{aiDescriptions: object, aiDescriptionsFailedCount: number}} The validated values.
  */
-const parseExportAiDescriptions = async ({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount }) => {
+const parseExportAiDescriptions = ({ user, aiDescriptions, aiDescriptionsFailedCount }) => {
   // the descriptions come from the user's AI: their data dictionary switch still applies
   assertFeatureEnabled('dataDictionary', user)
-  const knownUuids = await SchemaSummary.fetchSchemaSummaryNodeDefUuids({ surveyId, cycle })
   return {
-    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions, knownUuids }),
+    aiDescriptions: parseAiDescriptions({ raw: aiDescriptions }),
     aiDescriptionsFailedCount: parseAiDescriptionsFailedCount(aiDescriptionsFailedCount),
   }
 }
