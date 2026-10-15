@@ -46,6 +46,19 @@ describe('nodes batch request', () => {
     expectInvalid({ cycle: '0', edits: [edit(rec(1), `${node(1)}x`)] }, 'edit')
   })
 
+  test('uuids are lower-cased like the database ones, so a node in two cases is a duplicate', () => {
+    const recordUuid = 'abcdef01-0000-4000-8000-0000000000ab'
+    const nodeUuid = 'abcdef02-0000-4000-8000-0000000000cd'
+    const upper = (uuid: string) => uuid.toUpperCase()
+    const request = parseNodesBatchRequest({ cycle: '0', edits: [edit(upper(recordUuid), upper(nodeUuid))] })
+    expect(request.edits).toEqual([{ recordUuid, nodeUuid, from: 1, to: 2 }])
+    expect.assertions(3)
+    expectInvalid(
+      { cycle: '0', edits: [edit(recordUuid, nodeUuid), edit(recordUuid, upper(nodeUuid))] },
+      'duplicateNode'
+    )
+  })
+
   test('exactly 200 edits are accepted', () => {
     const edits = Array.from({ length: NodesBatchLimits.maxEdits }, (_, i) => edit(rec(1), node(i)))
     expect(parseNodesBatchRequest({ cycle: '0', edits }).edits).toHaveLength(NodesBatchLimits.maxEdits)
