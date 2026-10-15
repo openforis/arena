@@ -24,7 +24,7 @@ import { type LocalModelServerStub, startLocalModelServer } from '../stubs/local
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
-// matches the design script /label/i of server/modules/ai/service/mockScripts.ts
+// matches the design script /label/i of server/modules/ai/service/mock/mockScripts.ts
 const LABEL_REQUEST = 'Change the label of cluster_id to Cluster identifier'
 
 /**

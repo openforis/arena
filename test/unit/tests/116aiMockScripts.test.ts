@@ -2,7 +2,7 @@ import { jsonSchema, stepCountIs, streamText } from 'ai'
 
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
-import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import { MOCK_SCRIPTS, getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { ALL_TOOLS } from '@webapp/ai/tools/allTools'
 
 const system = (text: string): any => ({ role: 'system', content: text })

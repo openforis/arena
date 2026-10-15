@@ -22,7 +22,7 @@ import {
   formatMockProposalAnswer,
   MOCK_FIXED_VALUE,
   proposeRowFixInput,
-} from '@server/modules/ai/service/mockScriptsCleaning'
+} from '@server/modules/ai/service/mock/mockScriptsCleaning'
 import { createMockModel } from '@server/modules/ai/service/mockProvider'
 
 import { cleaningTestSurvey, fakeI18n, newFakeCleaningApi } from '@test/unit/utils/aiCleaningTestUtils'

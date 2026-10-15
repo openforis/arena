@@ -1,5 +1,5 @@
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
-import { getScriptedStep } from '@server/modules/ai/service/mockScripts'
+import { getScriptedStep } from '@server/modules/ai/service/mock/mockScripts'
 import { type SuggestionDefinition } from '@webapp/ai/suggestions/definitions'
 import { SUGGESTION_DEFINITIONS } from '@webapp/ai/suggestions/registry'
 import { moduleIntroDefinition } from '@webapp/ai/suggestions/definitions/moduleIntro'
