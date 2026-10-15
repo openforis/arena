@@ -17,7 +17,7 @@ const runFetch = async (params: Record<string, unknown>) => {
       return []
     },
   }
-  await ActivityLogRepository.fetch({ surveyInfo, client, ...params })
+  await ActivityLogRepository.fetch({ surveyInfo, client: client as any, ...params })
   return calls[0]
 }
 
