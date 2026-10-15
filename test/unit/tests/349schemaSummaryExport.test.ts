@@ -1,5 +1,6 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
+import { FileFormats } from '@core/fileFormats'
 
 import {
   neutraliseSpreadsheetFormula,
@@ -67,7 +68,7 @@ describe('schema summary export (349)', () => {
     expect(() => parseAiDescriptions({ raw: { anyUuid: 3 } })).toThrow()
   })
 
-  describe('spreadsheet formulas in the AI descriptions are neutralised', () => {
+  describe('spreadsheet formulas in the AI descriptions are neutralised (csv only)', () => {
     test.each(['=1+1', '+SUM(A1:A9)', '-2+3', '@SUM(A1)', '\t=1', '\r=1'])('%j starts with a quote', (text) => {
       expect(neutraliseSpreadsheetFormula(text)).toBe(`'${text}`)
     })
@@ -76,16 +77,32 @@ describe('schema summary export (349)', () => {
       expect(neutraliseSpreadsheetFormula(text)).toBe(text)
     })
 
-    test('the aiDescription column holds the neutralised text; the other columns are untouched', async () => {
+    const hostile = '=HYPERLINK("http://evil.example","x")'
+    const buildWith = async (fileFormat?: string) => {
       const survey = await buildSurvey()
       const items = buildSchemaSummaryItems({
         survey,
         cycle,
-        aiDescriptions: { [uuidOf(survey, 'cluster_id')]: '=HYPERLINK("http://evil.example","x")' },
+        aiDescriptions: { [uuidOf(survey, 'cluster_id')]: hostile },
+        ...(fileFormat ? { fileFormat } : {}),
       })
-      const byName = Object.fromEntries(items.map((item: any) => [item.name, item]))
-      expect(byName.cluster_id.aiDescription).toBe(`'=HYPERLINK("http://evil.example","x")`)
+      return Object.fromEntries(items.map((item: any) => [item.name, item]))
+    }
+
+    test('csv: the aiDescription column holds the neutralised text; the other columns are untouched', async () => {
+      const byName = await buildWith(FileFormats.csv)
+      expect(byName.cluster_id.aiDescription).toBe(`'${hostile}`)
       expect(byName.notes.aiDescription).toBe('')
+    })
+
+    test('xlsx: the text is written as it is (a cell is a string, the quote would show up)', async () => {
+      const byName = await buildWith(FileFormats.xlsx)
+      expect(byName.cluster_id.aiDescription).toBe(hostile)
+    })
+
+    test('without a format the text is neutralised (the safe default)', async () => {
+      const byName = await buildWith()
+      expect(byName.cluster_id.aiDescription).toBe(`'${hostile}`)
     })
   })
 })
