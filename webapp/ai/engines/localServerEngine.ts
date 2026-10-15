@@ -7,7 +7,6 @@ import { extractReasoningMiddleware, wrapLanguageModel, type LanguageModel } fro
 
 import SystemError, { StatusCodes } from '@core/systemError'
 
-import { getLocalServerEngineInfo } from './engineInfo'
 import { createLocalServerFetch, type LocalServerFetchImpl } from './localServerErrors'
 import type { AiEngine, AiLocalServerCapability } from './types'
 
@@ -25,9 +24,9 @@ export const createLocalServerEngine = ({
   localServer: AiLocalServerCapability
   fetchImpl: LocalServerFetchImpl
 }): AiEngine => {
-  const info = getLocalServerEngineInfo(localServer)
-  const { baseUrl, modelId } = localServer
-  if (!info || !baseUrl || !modelId) {
+  const { baseUrl, modelId, hostingClass } = localServer
+  // selectEngine only selects a server with a known URL and hosting class; a model must be chosen
+  if (!baseUrl || !modelId || !hostingClass) {
     throw new SystemError('aiNoEngineAvailable', { reasons: ['notAvailable'] }, StatusCodes.CONFLICT)
   }
   const provider = createOpenAICompatible({
@@ -40,8 +39,5 @@ export const createLocalServerEngine = ({
   })
   // models whose server doesn't split the thinking out write it inline in <think> tags: move it to reasoning parts
   const reasoning = extractReasoningMiddleware({ tagName: 'think' })
-  return {
-    ...info,
-    createModel: (): LanguageModel => wrapLanguageModel({ model: provider(modelId), middleware: reasoning }),
-  }
+  return { createModel: (): LanguageModel => wrapLanguageModel({ model: provider(modelId), middleware: reasoning }) }
 }

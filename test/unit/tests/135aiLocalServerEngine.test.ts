@@ -3,11 +3,10 @@ import { generateText, streamText } from 'ai'
 import { createGatewayEngine } from '@webapp/ai/engines/gatewayEngine'
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from '@webapp/ai/engines/engineInfo'
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import type { AiGatewayEngineSource, AiLocalServerCapability, AiSelectedEngine } from '@webapp/ai/engines/types'
+import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from '@webapp/ai/engines/types'
 import { getAiErrorKey } from '@webapp/ai/runtime/runtimeErrors'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass: 'onDevice',
@@ -18,13 +17,35 @@ const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalS
   ...overrides,
 })
 
-const gateway = (overrides: Partial<AiGatewayEngineSource> = {}): AiGatewayEngineSource => ({
-  hostingClass: 'cloud',
-  provider: 'openai',
-  model: 'gateway-model',
-  maxPromptChars: 100000,
+const localEntry = (overrides: Partial<AiProviderEntry> = {}): AiProviderEntry => ({
+  id: 'local:l1',
+  kind: 'local',
+  type: 'local',
+  name: 'Local server',
+  model: 'local-model',
+  baseUrl: 'http://localhost:1234/v1',
+  hostingClass: 'onDevice',
+  status: 'ready',
   ...overrides,
 })
+
+const gatewayEntry = (overrides: Partial<AiProviderEntry> = {}): AiProviderEntry => ({
+  id: 'acct:a1',
+  kind: 'account',
+  type: 'openai',
+  name: 'My OpenAI',
+  model: 'gateway-model',
+  baseUrl: null,
+  hostingClass: 'cloud',
+  status: 'ready',
+  ...overrides,
+})
+
+const localInfo = (capability: AiLocalServerCapability = localServer(), entry: AiProviderEntry = localEntry()) =>
+  getLocalServerEngineInfo({ entry, capability })
+
+const gatewayInfo = (entry: AiProviderEntry = gatewayEntry(), maxPromptChars: number | null = 100000) =>
+  getGatewayEngineInfo({ entry, maxPromptChars })
 
 const completion = (content: string) =>
   new Response(
@@ -60,44 +81,48 @@ const recorder = (respond: () => Promise<Response>) => {
 const modelOptions = { feature: 'expressionExplain', dataClass: 'schema' } as const
 
 describe('engine info', () => {
-  test('local server on this device: Local server label, limits from the context', () => {
-    expect(getLocalServerEngineInfo(localServer())).toEqual({
+  test('local server: the provider name as label, its id, limits from the context', () => {
+    expect(localInfo()).toEqual({
       id: 'localServer',
       hostingClass: 'onDevice',
       label: 'Local server',
       model: 'local-model',
       limits: { maxPromptChars: 9216, maxSteps: 6 },
       contextWindow: { tokens: 4096, assumed: false },
+      providerId: 'local:l1',
     })
   })
 
-  test('organisation server: the host as label, 8,192 tokens when the context is unknown', () => {
-    const info = getLocalServerEngineInfo(
-      localServer({ hostingClass: 'orgHosted', baseUrl: 'http://10.0.0.5:8000/v1', contextTokens: null })
+  test("a local provider's own name is the label; 8,192 tokens when the context is unknown", () => {
+    const info = localInfo(
+      localServer({ hostingClass: 'orgHosted', baseUrl: 'http://10.0.0.5:8000/v1', contextTokens: null }),
+      localEntry({ name: 'Desk server' })
     )
-    expect(info?.label).toBe('10.0.0.5:8000')
+    expect(info?.label).toBe('Desk server')
     expect(info?.limits).toEqual({ maxPromptChars: 18432, maxSteps: 6 })
   })
 
   test('no URL or class: no engine', () => {
-    expect(getLocalServerEngineInfo(localServer({ baseUrl: null }))).toBeNull()
-    expect(getLocalServerEngineInfo(localServer({ hostingClass: null }))).toBeNull()
+    expect(localInfo(localServer({ baseUrl: null }))).toBeNull()
+    expect(localInfo(localServer({ hostingClass: null }))).toBeNull()
   })
 
-  test("a local provider's name as label", () => {
-    expect(getLocalServerEngineInfo(localServer(), 'Desk server')?.label).toBe('Desk server')
-  })
-
-  test('gateway: provider label, 10 steps, the instance prompt cap', () => {
-    expect(getGatewayEngineInfo(gateway())).toEqual({
+  test('gateway: the provider name as label, 10 steps, the instance prompt cap', () => {
+    expect(gatewayInfo()).toEqual({
       id: 'gateway',
       hostingClass: 'cloud',
-      label: 'openai',
+      label: 'My OpenAI',
       model: 'gateway-model',
       limits: { maxPromptChars: 100000, maxSteps: 10 },
+      providerId: 'acct:a1',
     })
-    expect(getGatewayEngineInfo(gateway({ maxPromptChars: null }))?.limits.maxPromptChars).toBe(200000)
-    expect(getGatewayEngineInfo(gateway({ hostingClass: null }))).toBeNull()
+    expect(gatewayInfo(gatewayEntry(), null)?.limits.maxPromptChars).toBe(200000)
+    expect(gatewayInfo(gatewayEntry({ hostingClass: null }))).toBeNull()
+  })
+
+  test('Arena default is labelled by its admin provider type', () => {
+    const entry = gatewayEntry({ id: 'arena-default', kind: 'arenaDefault', type: 'OpenAI', name: 'Arena default' })
+    expect(gatewayInfo(entry)?.label).toBe('OpenAI')
   })
 })
 
@@ -110,7 +135,6 @@ describe('createLocalServerEngine', () => {
     expect(calls[0].url).toBe('http://localhost:1234/v1/chat/completions')
     expect(JSON.parse(String(calls[0].init?.body)).model).toBe('local-model')
     expect((calls[0].init as any).targetAddressSpace).toBeUndefined()
-    expect(engine.limits).toEqual({ maxPromptChars: 9216, maxSteps: 6 })
   })
 
   test('streams, and asks for local network access on a LAN server', async () => {
@@ -154,6 +178,13 @@ describe('createLocalServerEngine', () => {
     expect(getAiErrorKey(downError)).toBe('aiLocalServerUnreachable')
   })
 
+  test('refuses a server without a known hosting class', () => {
+    const { fetchImpl } = recorder(async () => completion('x'))
+    expect(() => createLocalServerEngine({ localServer: localServer({ hostingClass: null }), fetchImpl })).toThrow(
+      'aiNoEngineAvailable'
+    )
+  })
+
   test('refuses a server without a chosen model', () => {
     const { fetchImpl } = recorder(async () => completion('x'))
     expect(() => createLocalServerEngine({ localServer: localServer({ modelId: null }), fetchImpl })).toThrow(
@@ -163,7 +194,7 @@ describe('createLocalServerEngine', () => {
 })
 
 describe('createGatewayEngine', () => {
-  const engine = { ...getGatewayEngineInfo(gateway()), providerId: 'acct:a1' } as AiSelectedEngine
+  const engine = gatewayInfo() as AiSelectedEngine
 
   test('passes the request options and the provider to the gateway model factory', () => {
     const received: unknown[] = []
@@ -177,7 +208,6 @@ describe('createGatewayEngine', () => {
     })
     expect(gatewayEngine.createModel({ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7 })).toBe(fakeModel)
     expect(received).toEqual([{ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7, providerId: 'acct:a1' }])
-    expect(gatewayEngine.id).toBe('gateway')
   })
 
   test('refuses an engine without a provider', () => {

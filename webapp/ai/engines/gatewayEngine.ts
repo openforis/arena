@@ -1,5 +1,5 @@
 /**
- * Gateway engine: A's gateway model (POST /api/ai/model) for one provider (an account provider or Arena default).
+ * Gateway engine: the gateway model (POST /api/ai/model) for one provider (an account provider or Arena default).
  */
 import type { LanguageModel } from 'ai'
 
@@ -29,5 +29,5 @@ export const createGatewayEngine = ({
   if (engine.id !== 'gateway' || !providerId) {
     throw new SystemError('aiNoEngineAvailable', { reasons: ['notAvailable'] }, StatusCodes.CONFLICT)
   }
-  return { ...engine, createModel: (options) => createGatewayModel({ ...options, providerId }) }
+  return { createModel: (options) => createGatewayModel({ ...options, providerId }) }
 }

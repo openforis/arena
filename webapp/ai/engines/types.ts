@@ -12,14 +12,17 @@ export type AiEngineId = 'gateway' | 'localServer' // 'builtIn' | 'webLlm' later
 
 export type AiEngineLimits = { maxPromptChars: number; maxSteps: number }
 
-export type AiEngineInfo = { id: AiEngineId; hostingClass: AiHostingClass; label: string; model: string | null }
-
 // context size of the engine's model, in tokens; assumed: the default size, the server didn't report it
 export type AiContextWindow = { tokens: number; assumed: boolean }
 
-// the engine chosen by selectEngine, with the limits the caller must respect (contextWindow: local server only);
-// providerId: the provider it calls (every gateway request names it)
-export type AiSelectedEngine = AiEngineInfo & {
+// the one description of an engine: what selectEngine chooses for a request (and the UI shows), with the limits the
+// caller must respect (contextWindow: local server only); providerId: the provider it calls (every gateway request
+// names it)
+export type AiSelectedEngine = {
+  id: AiEngineId
+  hostingClass: AiHostingClass
+  label: string
+  model: string | null
   limits: AiEngineLimits
   contextWindow?: AiContextWindow
   providerId?: string
@@ -27,12 +30,12 @@ export type AiSelectedEngine = AiEngineInfo & {
 
 export type AiEngineModelOptions = { feature: AiFeatureKey; dataClass: AiDataClass; surveyId?: number }
 
-export type AiEngine = AiSelectedEngine & { createModel: (options: AiEngineModelOptions) => LanguageModel }
+// what creates the model of a selected engine; it describes nothing (AiSelectedEngine does)
+export type AiEngine = { createModel: (options: AiEngineModelOptions) => LanguageModel }
 
 export type AiEngineErrorInfo = { key: string; params: Record<string, unknown> }
 
 export type AiLocalServerCapability = {
-  enabled: boolean
   reachable: boolean | null // null: not probed yet
   models: string[]
   hostingClass: AiHostingClass | null
@@ -40,15 +43,6 @@ export type AiLocalServerCapability = {
   baseUrl: string | null
   modelId: string | null
   error: AiEngineErrorInfo | null // why the last probe failed
-}
-
-// what a gateway engine description is built from: the provider (account provider or Arena default) and the
-// instance prompt cap
-export type AiGatewayEngineSource = {
-  hostingClass: AiHostingClass | null
-  provider: string | null
-  model: string | null
-  maxPromptChars: number | null
 }
 
 // maxPromptChars: the gateway prompt cap of the instance (AI_MAX_PROMPT_CHARS), null when unknown

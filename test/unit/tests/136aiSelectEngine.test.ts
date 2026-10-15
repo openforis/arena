@@ -15,7 +15,6 @@ const RANK: Record<Level, number> = { off: 0, onDevice: 1, orgHosted: 2, cloud: 
 
 /** Builds a local server probe result. */
 const probe = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass: 'onDevice',

@@ -39,7 +39,6 @@ const localEntry = (id: string, name: string, baseUrl: string, hostingClass: AiH
 
 /** Builds a local server probe result. */
 const probe = (baseUrl: string, hostingClass: AiHostingClass): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['local-model'],
   hostingClass,

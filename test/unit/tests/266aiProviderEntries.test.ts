@@ -37,7 +37,6 @@ const reachable = (models: string[]): LocalServerProbeResult => ({
 
 /** Returns a ready local capability with the overrides applied. */
 const localCapability = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
-  enabled: true,
   reachable: true,
   models: ['m1'],
   hostingClass: 'onDevice',
@@ -127,7 +126,6 @@ describe('provider entries (266)', () => {
     expect(
       buildLocalProviderCapability({ provider: lan, probe: reachable(['m2']), allowlist: ['http://10.0.0.5:8000/v1'] })
     ).toEqual({
-      enabled: true,
       reachable: true,
       models: ['m2'],
       hostingClass: 'orgHosted',
