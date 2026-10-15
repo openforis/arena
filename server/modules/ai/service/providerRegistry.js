@@ -20,6 +20,7 @@ import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
 import { assertProviderBaseUrlAllowed } from './baseUrlGuard'
+import { createGuardedFetch, DEFAULT_MAX_BODY_BYTES } from './guardedFetch'
 import { createMockModel, MOCK_PROVIDER } from './mockProvider'
 import { createResponseLimitedFetch, getProviderResponseLimits } from './responseLimits'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
@@ -49,12 +50,19 @@ export const isSupported = (provider) => validProviders.has(provider)
 const noRedirectFetch = (input, init) => fetch(input, { ...init, redirect: 'error' })
 
 /**
- * Builds the fetch of a provider: the endpoint of a user must not fill the memory with an endless answer, and the cap
- * follows the output tokens the server allows, so a legitimate long answer is not cut.
- * @returns {typeof fetch} The guarded fetch.
+ * Returns the cap of a provider answer: it follows the output tokens the server allows, so a legitimate long answer is
+ * not cut.
+ * @returns {number} The cap, in bytes.
  */
-const createGuardedFetch = () =>
-  createResponseLimitedFetch(noRedirectFetch, getProviderResponseLimits(ENV.aiMaxOutputTokens).maxResponseBytes)
+const getMaxResponseBytes = () => getProviderResponseLimits(ENV.aiMaxOutputTokens).maxResponseBytes
+
+/**
+ * Caps the answers of a custom endpoint: the endpoint of a user must not fill the memory with an endless answer. It
+ * sits on top of the fetch it wraps (the connect-time guard of a user endpoint, see {@link buildUserModel}).
+ * @param {Function} fetchImpl - The fetch to wrap.
+ * @returns {Function} The capped fetch.
+ */
+const withResponseLimit = (fetchImpl) => createResponseLimitedFetch(fetchImpl, getMaxResponseBytes())
 
 /**
  * Builds a Vercel AI SDK `LanguageModel` instance for the given config.
@@ -67,10 +75,14 @@ const createGuardedFetch = () =>
  *   keyless local OpenAI-compatible servers like a default Ollama).
  * @param {string} [cfg.baseUrl] - Custom base URL (only meaningful for
  *   {@link providers.openaiCompatible}).
+ * @param {object} [options] - Options.
+ * @param {Function} [options.fetchImpl] - Fetch of the calls to a custom base URL (default: the global one without
+ *   redirects; the endpoint of a user is called with a guarded fetch, see {@link buildUserModel}). Its answers are
+ *   capped by the output token limit of the server.
  * @returns {object} A Vercel AI SDK language model handle ready to pass to
  *   `generateText` / `generateObject` / `streamText`.
  */
-export const buildModel = (cfg) => {
+export const buildModel = (cfg, { fetchImpl } = {}) => {
   const { provider, model, apiKey, baseUrl } = cfg
   // test servers only: canned answers, no network (e2e)
   if (provider === MOCK_PROVIDER && ENV.aiMockProviderEnabled) return createMockModel()
@@ -99,11 +111,15 @@ export const buildModel = (cfg) => {
       // apiKey is optional for some local servers (e.g. Ollama with no auth)
       // Use .chat() explicitly — the default call now routes to the OpenAI Responses API
       // (/v1/responses), which most OpenAI-compatible providers don't implement.
-      return createOpenAI({ apiKey: apiKey || 'not-used', baseURL: baseUrl, fetch: createGuardedFetch() }).chat(model)
+      return createOpenAI({
+        apiKey: apiKey || 'not-used',
+        baseURL: baseUrl,
+        fetch: withResponseLimit(fetchImpl ?? noRedirectFetch),
+      }).chat(model)
     }
     case providers.vercelAiSdk: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
-      return createVercelAiSdkModel({ baseUrl })
+      return createVercelAiSdkModel({ baseUrl, fetchImpl: withResponseLimit(fetchImpl ?? noRedirectFetch) })
     }
     default:
       throw new SystemError('aiProviderInvalid', { provider })
@@ -111,12 +127,15 @@ export const buildModel = (cfg) => {
 }
 
 /**
- * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses.
+ * Builds the model for a user-supplied config, refusing base URLs that point to internal addresses: before the call,
+ * and again when the call connects (the guarded fetch).
  * @param {object} cfg - User provider config (see buildModel).
  * @param {object} [guardOptions] - Options for the base URL guard (tests).
  * @returns {Promise<object>} The model handle.
  */
 export const buildUserModel = async (cfg, guardOptions) => {
   await assertProviderBaseUrlAllowed(cfg, guardOptions)
-  return buildModel(cfg)
+  // the guard's own body cap is only a backstop: it never cuts below the per-model cap that buildModel puts on top
+  const maxBodyBytes = Math.max(DEFAULT_MAX_BODY_BYTES, getMaxResponseBytes())
+  return buildModel(cfg, { fetchImpl: createGuardedFetch({ maxBodyBytes, ...guardOptions }) })
 }

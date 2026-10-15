@@ -119,8 +119,7 @@ export default {
   aiProviderResponseTooLarge:
     'AIプロバイダーの応答が大きすぎたため、途中で打ち切りました。もう一度お試しいただくか、別のプロバイダーを選択してください。',
   aiSurveyChanged: 'アシスタントの作業中に調査が変更されました。現在の調査を使うには、もう一度質問してください。',
-  aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
-  aiProviderTestFailed: 'プロバイダーのテストに失敗しました：{{message}}',
+  aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした。',
   aiProviderNotFound:
     'このAIプロバイダーは存在しないか、あなたのものではありません。別のプロバイダーを選んでください。',
   aiProviderNotGateway:
@@ -129,6 +128,12 @@ export default {
     'このプロバイダーの保存済みAPIキーを読み取れなくなりました（サーバーの暗号化シークレットが変更されました）。AI設定でプロバイダーを編集し、キーをもう一度入力してください。',
   aiEncryptionMissing:
     'APIキーを保存できません：サーバーに暗号化シークレットがありません。管理者にAI_USER_KEY_ENCRYPTION_SECRETの設定を依頼してください。',
+  aiProviderChanged:
+    'このAIプロバイダーは確認中に変更または削除されました。AI設定を再読み込みして、もう一度お試しください。',
+  aiProviderFieldTooLong:
+    'プロバイダーの値が長すぎます：$t(appErrors:aiProviderFieldNames.{{field}}) は最大{{max}}文字までです。',
+  aiProviderFieldNames: { model: 'モデル', baseUrl: 'ベースURL', apiKey: 'APIキー' },
+  aiProviderLimitReached: '保存できるAIプロバイダーは最大{{max}}件です。追加するには、いずれかを削除してください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',
   aiExpressionNodeDefMissing: '対象フィールドが指定されていないため式を生成できません。',

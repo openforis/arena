@@ -118,14 +118,19 @@ Try to refresh the page.`,
   aiProviderResponseTooLarge:
     'The AI provider sent an answer that was too large, so it was cut off. Please try again or choose another provider.',
   aiSurveyChanged: 'The survey changed while the assistant was working. Ask again to use the current survey.',
-  aiModelListFailed: 'Could not list models from the provider: {{message}}',
-  aiProviderTestFailed: 'The provider test failed: {{message}}',
+  aiModelListFailed: 'Could not list models from the provider.',
   aiProviderNotFound: 'This AI provider does not exist or is not yours. Choose another provider.',
   aiProviderNotGateway: 'A provider saved in this browser is called from the browser, never through the Arena server.',
   aiApiKeyUnreadable:
     'The saved API key of this provider can no longer be read (the server encryption secret changed). Edit the provider in your AI settings and enter the key again.',
   aiEncryptionMissing:
     'API keys cannot be saved: the server has no encryption secret. Ask your administrator to set AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'This AI provider was changed or removed while it was being checked. Reload the AI settings and try again.',
+  aiProviderFieldTooLong:
+    'A provider value is too long: $t(appErrors:aiProviderFieldNames.{{field}}) can have at most {{max}} characters.',
+  aiProviderFieldNames: { model: 'Model', baseUrl: 'Base URL', apiKey: 'API key' },
+  aiProviderLimitReached: 'You can save at most {{max}} AI providers. Remove one to add another.',
   aiExpressionDescriptionMissing: 'Please describe the expression you want in plain language.',
   aiExpressionTypeInvalid: 'Unknown expression kind: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Cannot generate an expression without a target field.',

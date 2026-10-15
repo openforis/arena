@@ -57,14 +57,27 @@ describe('model discovery SSRF guard (262)', () => {
   })
 
   test('an allowlisted organisation server is listed, and redirects are refused', async () => {
+    const guardedCalls: { url: string; init: any }[] = []
+    /**
+     * Records the call of the guarded fetch and answers a model list.
+     * @param {any} input - Request URL.
+     * @param {any} init - Request init.
+     * @returns {Promise<Response>} The response.
+     */
+    const fetchImpl = async (input: any, init: any) => {
+      guardedCalls.push({ url: String(input), init })
+      return new Response(JSON.stringify({ data: [{ id: 'm1' }] }), { status: 200 })
+    }
     const models = await ModelDiscovery.listForProvider(
       { provider: 'openai-compatible', baseUrl: 'http://10.0.0.5:8000/v1/', apiKey: 'k' },
-      { allowlist: ['http://10.0.0.5:8000/v1'], lookup: neverCalledLookup }
+      { allowlist: ['http://10.0.0.5:8000/v1'], lookup: neverCalledLookup, fetchImpl }
     )
     expect(models).toEqual([{ id: 'm1' }])
-    expect(fetchCalls.map((call) => [call.url, call.init.redirect])).toEqual([
+    expect(guardedCalls.map((call) => [call.url, call.init.redirect])).toEqual([
       ['http://10.0.0.5:8000/v1/models', 'error'],
     ])
+    // the endpoint of a user is never fetched with the global fetch
+    expect(fetchCalls).toEqual([])
   })
 
   test('the provider service lists drafts and saved providers through the guard', async () => {
@@ -74,7 +87,7 @@ describe('model discovery SSRF guard (262)', () => {
        * Fails the test when prefs are written.
        * @returns {Promise<never>} Never resolves.
        */
-      savePrefs: async () => {
+      updateAiPrefs: async () => {
         throw new Error('listing models never writes')
       },
     }

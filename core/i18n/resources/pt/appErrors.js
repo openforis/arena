@@ -144,8 +144,7 @@ Tente atualizar a página.`,
   aiProviderResponseTooLarge:
     'O provedor de IA enviou uma resposta demasiado grande, que foi interrompida. Tente novamente ou escolha outro provedor.',
   aiSurveyChanged: 'A pesquisa mudou enquanto o assistente trabalhava. Pergunte novamente para usar a pesquisa atual.',
-  aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
-  aiProviderTestFailed: 'O teste do provedor falhou: {{message}}',
+  aiModelListFailed: 'Não foi possível listar os modelos do provedor.',
   aiProviderNotFound: 'Este provedor de IA não existe ou não é seu. Escolha outro provedor.',
   aiProviderNotGateway:
     'Um provedor salvo neste navegador é chamado a partir do navegador, nunca através do servidor do Arena.',
@@ -153,6 +152,12 @@ Tente atualizar a página.`,
     'A chave de API salva deste provedor já não pode ser lida (o segredo de criptografia do servidor mudou). Edite o provedor nas suas configurações de IA e insira a chave novamente.',
   aiEncryptionMissing:
     'Não é possível salvar chaves de API: o servidor não tem um segredo de criptografia. Peça ao seu administrador para definir AI_USER_KEY_ENCRYPTION_SECRET.',
+  aiProviderChanged:
+    'Este provedor de IA foi alterado ou removido durante a verificação. Recarregue as configurações de IA e tente novamente.',
+  aiProviderFieldTooLong:
+    'Um valor do provedor é demasiado longo: $t(appErrors:aiProviderFieldNames.{{field}}) pode ter no máximo {{max}} caracteres.',
+  aiProviderFieldNames: { model: 'Modelo', baseUrl: 'URL base', apiKey: 'Chave de API' },
+  aiProviderLimitReached: 'Pode guardar no máximo {{max}} provedores de IA. Remova um para adicionar outro.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',

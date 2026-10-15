@@ -16,6 +16,19 @@ const chatCall = (providerId?: string) => ({
   ...(providerId ? { providerId } : {}),
 })
 
+/**
+ * Checks that a response carries neither the key, nor a ciphertext, nor a stored provider.
+ * @param {unknown} response - Parsed response body.
+ * @param {string} secret - The plain key.
+ * @returns {void}
+ */
+const expectNoKey = (response: unknown, secret: string): void => {
+  const json = JSON.stringify(response)
+  expect(json).not.toContain('apiKeyEncrypted')
+  expect(json).not.toContain(secret)
+  expect(json).not.toMatch(/"apiKey"\s*:/)
+}
+
 test.describe('AI account providers API (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
 
@@ -84,12 +97,56 @@ test.describe('AI account providers API (mock provider)', () => {
       await api.requestRaw('post', '/api/ai/providers/models', { id: provider.id }),
     ]
     const responses = [provider, settings, edit.body, await api.getAiSettings(), ...probes.map((probe) => probe.body)]
-    for (const response of responses) {
-      const json = JSON.stringify(response)
-      expect(json).not.toContain('apiKeyEncrypted')
-      expect(json).not.toContain(secret)
-      expect(json).not.toMatch(/"apiKey"\s*:/)
-    }
+    for (const response of responses) expectNoKey(response, secret)
     expect((await api.getAiSettings()).providers[0]).toMatchObject({ id: provider.id, hasApiKey: true })
+  })
+
+  test('no user response carries prefs.ai: login, /auth/user, the survey users and the user itself', async ({
+    api,
+    request,
+    testUser,
+    survey,
+  }) => {
+    const secret = 'sk-e2e-user-secret'
+    await api.addAiAccountProvider({ type: 'mock', model: 'mock', apiKey: secret })
+    const userUuid = await api.getCurrentUserUuid()
+
+    const login = await request.post('/auth/login', { data: { email: testUser.email, password: testUser.password } })
+    const loginWithSurvey = await request.post('/auth/login?includeSurvey=true', {
+      data: { email: testUser.email, password: testUser.password },
+    })
+    const responses = [
+      (await login.json()).user,
+      (await loginWithSurvey.json()).user,
+      (await api.requestRaw('get', '/auth/user')).body.user,
+      (await api.requestRaw('get', `/api/survey/${survey.id}/users`)).body,
+      (await api.requestRaw('get', `/api/survey/${survey.id}/user/${userUuid}`)).body,
+      (await api.requestRaw('get', `/api/survey/${survey.id}/current-user-group`)).body,
+    ]
+    for (const response of responses) {
+      expectNoKey(response, secret)
+      expect(JSON.stringify(response)).not.toMatch(/"ai(Usage)?"\s*:/)
+    }
+    // the users are real users, not empty answers
+    expect(responses[0]).toMatchObject({ uuid: userUuid })
+    expect(responses[3].list.map((listed: any) => listed.uuid)).toContain(userUuid)
+    expect(responses[5]).toMatchObject({ user: { uuid: userUuid } })
+  })
+
+  test('prefs.ai and prefs.aiUsage cannot be written through POST /api/user/:uuid/prefs', async ({ api }) => {
+    const { provider } = await api.addAiAccountProvider({ type: 'mock', model: 'mock', apiKey: 'sk-e2e-kept' })
+    const { user } = (await api.requestRaw('get', '/auth/user')).body
+    const forgedProvider = { id: 'acct:forged', type: 'mock', name: 'Forged', model: 'mock', apiKeyEncrypted: 'v2:x' }
+    // the profile page posts the whole user: here with an AI section the browser never had
+    const forged = { ...user, prefs: { ...user.prefs, ai: { providers: [forgedProvider] }, aiUsage: { calls: 0 } } }
+    const response = await api.requestRaw('post', `/api/user/${user.uuid}/prefs`, forged)
+    expect(response.status).toBe(200)
+
+    const settings = await api.getAiSettings()
+    expect(settings.providers.map((listed: any) => listed.id)).toEqual([provider.id])
+    expect(settings.providers[0]).toMatchObject({ hasApiKey: true, apiKeyReadable: true })
+    // the key still works: a test with the saved key succeeds
+    const probe = await api.requestRaw('post', '/api/ai/providers/test', { id: provider.id })
+    expect(probe).toMatchObject({ status: 200, body: { ok: true } })
   })
 })

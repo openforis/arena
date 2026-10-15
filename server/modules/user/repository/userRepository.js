@@ -12,9 +12,18 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
+import { sqlPrefsParamWithoutServerOnlyKeys, sqlPrefsWithoutServerOnlyKeys } from '@server/modules/user/serverOnlyPrefs'
 
-const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
-const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
+// the AI prefs (providers with their encrypted keys, usage) are never selected: only the AI services read them
+const selectFields = [
+  'u.uuid',
+  'u.name',
+  'u.email',
+  `${sqlPrefsWithoutServerOnlyKeys('u.prefs')} AS prefs`,
+  'u.props',
+  'u.status',
+]
+const columnsCommaSeparated = selectFields.join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -429,7 +438,7 @@ export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
     UPDATE "user" u
-    SET prefs = prefs || $1::jsonb
+    SET prefs = prefs || ${sqlPrefsParamWithoutServerOnlyKeys('$1')}
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,
     [User.getPrefs(user), User.getUuid(user)],

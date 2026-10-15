@@ -40,43 +40,52 @@ const createDeps = ({ model, refuse = false }: { model: any; refuse?: boolean })
   return { deps, checks }
 }
 
+const schema = z.object({ ok: z.boolean() })
+
 describe('ModelClient and the survey AI policy', () => {
-  test('refuses before generateText when the policy forbids schema', async () => {
-    const model = textModel('hello')
+  test('refuses before generateObject when the policy forbids schema', async () => {
+    const model = textModel('{"ok":true}')
     const { deps, checks } = createDeps({ model, refuse: true })
     await expectSystemErrorKey(
-      ModelClient.generate({ user, feature: 'translation', surveyId: 4, prompt: 'p' }, deps),
+      ModelClient.generateStructured({ user, feature: 'translation', surveyId: 4, prompt: 'p', schema }, deps),
       'aiPolicyRefused'
     )
     expect(checks).toEqual([{ surveyId: 4, dataClass: 'schema', hostingClass: 'cloud' }])
     expect(model.doGenerateCalls).toHaveLength(0)
   })
 
-  test('an allowed call returns the text', async () => {
-    const { deps } = createDeps({ model: textModel('hello') })
-    const result = await ModelClient.generate({ user, feature: 'dataDictionary', surveyId: 4, prompt: 'p' }, deps)
-    expect(result.text).toBe('hello')
+  test('an allowed call returns the object', async () => {
+    const { deps } = createDeps({ model: textModel('{"ok":true}') })
+    const result = await ModelClient.generateStructured(
+      { user, feature: 'dataDictionary', surveyId: 4, prompt: 'p', schema },
+      deps
+    )
+    expect(result.object).toEqual({ ok: true })
   })
 
-  test('generateStructured is checked too', async () => {
+  test('without a survey the enforcer checks the ceilings only', async () => {
     const model = textModel('{"ok":true}')
     const { deps, checks } = createDeps({ model, refuse: true })
     await expectSystemErrorKey(
-      ModelClient.generateStructured(
-        { user, feature: 'internalPing', surveyId: null, prompt: 'p', schema: z.object({ ok: z.boolean() }) },
-        deps
-      ),
+      ModelClient.generateStructured({ user, feature: 'internalPing', surveyId: null, prompt: 'p', schema }, deps),
       'aiPolicyRefused'
     )
-    // no survey: the enforcer checks the ceilings only
     expect(checks).toEqual([{ surveyId: null, dataClass: 'schema', hostingClass: 'cloud' }])
     expect(model.doGenerateCalls).toHaveLength(0)
   })
 
   test('a caller that does not pass surveyId fails loudly', async () => {
-    const { deps } = createDeps({ model: textModel('x') })
-    await expect(ModelClient.generate({ user, feature: 'translation', prompt: 'p' } as any, deps)).rejects.toThrow(
-      'surveyId is required'
+    const { deps } = createDeps({ model: textModel('{"ok":true}') })
+    await expect(
+      ModelClient.generateStructured({ user, feature: 'translation', prompt: 'p', schema } as any, deps)
+    ).rejects.toThrow('surveyId is required')
+  })
+
+  test('a call without a schema is refused', async () => {
+    const { deps } = createDeps({ model: textModel('{"ok":true}') })
+    await expectSystemErrorKey(
+      ModelClient.generateStructured({ user, feature: 'translation', surveyId: 4, prompt: 'p' } as any, deps),
+      'aiSchemaMissing'
     )
   })
 })

@@ -5,30 +5,35 @@ import ja from '@core/i18n/resources/ja/appErrors'
 import mn from '@core/i18n/resources/mn/appErrors'
 import pt from '@core/i18n/resources/pt/appErrors'
 import ru from '@core/i18n/resources/ru/appErrors'
+import { buildKeyAad } from '@server/modules/ai/service/aiProviderPrefs'
 import * as AiProviderService from '@server/modules/ai/service/aiProviderService'
+import * as SecretBox from '@server/utils/crypto/secretBox'
+import { createAiPrefsStore } from '@test/unit/utils/aiPrefsStoreTestUtils'
 import { expectSystemErrorKey } from '@test/unit/utils/aiTestUtils'
 
-const savedOpenAi = {
-  id: 'acct:own',
-  type: 'openai',
-  name: 'Work',
-  model: 'gpt-x',
-  baseUrl: null,
-  apiKeyEncrypted: 'enc:sk-saved',
-  lastTestOk: true,
-  lastTestAt: '2026-10-01T00:00:00.000Z',
-}
-const savedCompatible = {
-  id: 'acct:org',
-  type: 'openai-compatible',
-  name: 'Org',
-  model: 'llama',
-  baseUrl: 'https://llm.example.org/v1',
-  apiKeyEncrypted: 'enc:sk-org',
-  lastTestOk: null,
-  lastTestAt: null,
-}
+const SECRET = 'd'.repeat(64)
+const USER_UUID = 'u1'
 const NOW = '2026-10-14T10:00:00.000Z'
+
+/**
+ * Encrypts a key the way the service stores it: bound to the user, the provider id, its type and its endpoint.
+ * @param {object} provider - The provider (id, type, baseUrl).
+ * @param {string} plain - The key.
+ * @returns {string} The stored ciphertext.
+ */
+const sealed = (provider: { id: string; type: string; baseUrl: string | null }, plain: string): string =>
+  SecretBox.encrypt(plain, buildKeyAad({ userUuid: USER_UUID, provider }))
+
+/**
+ * Opens the stored key of a provider.
+ * @param {object} provider - The stored provider.
+ * @returns {string} The key.
+ */
+const opened = (provider: any): string =>
+  SecretBox.decrypt(provider.apiKeyEncrypted, buildKeyAad({ userUuid: USER_UUID, provider }))
+
+let savedOpenAi: any
+let savedCompatible: any
 
 /**
  * Builds a user with the AI prefs.
@@ -36,7 +41,7 @@ const NOW = '2026-10-14T10:00:00.000Z'
  * @returns {any} The user.
  */
 const userWith = (ai: Record<string, unknown>): any => ({
-  uuid: 'u1',
+  uuid: USER_UUID,
   prefs: { ai: { accessLevel: 1, featuresEnabled: true, ...ai } },
 })
 /**
@@ -53,20 +58,18 @@ const userWithProviders = (extra: Record<string, unknown> = {}) =>
   })
 
 /**
- * Builds recording dependencies.
+ * Builds recording dependencies over an in-memory store of the AI prefs of the user.
  * @param {object} [overrides] - Dependencies to replace.
- * @returns {object} The dependencies and what they recorded.
+ * @param {any} [user] - The user whose AI prefs are stored at the start.
+ * @returns {object} The dependencies, what they recorded (`saved` is every stored AI prefs value) and the store.
  */
-const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> = {}) => {
-  const saved: any[] = []
+const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> = {}, user: any = null) => {
+  const store = createAiPrefsStore(user?.prefs?.ai ?? null)
   const tests: any[] = []
   const listed: any[] = []
   let ids = 0
   const deps: AiProviderService.AiProviderServiceDeps = {
-    savePrefs: async (user, aiPrefs) => {
-      saved.push(aiPrefs)
-      return { ...user, prefs: { ...user.prefs, ai: aiPrefs } }
-    },
+    updateAiPrefs: store.updateAiPrefs,
     runTest: async ({ cfg }) => {
       tests.push(cfg)
       return { ok: true, latencyMs: 1 }
@@ -75,23 +78,52 @@ const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> 
       listed.push(cfg)
       return [{ id: 'm1' }]
     },
-    encrypt: (plain) => `enc:${plain}`,
-    decrypt: (envelope) => {
-      if (!envelope.startsWith('enc:')) throw new Error('unsupported state or unable to authenticate data')
-      return envelope.slice(4)
-    },
+    encrypt: SecretBox.encrypt,
+    decrypt: SecretBox.decrypt,
+    isLegacyEnvelope: SecretBox.isLegacyEnvelope,
     isEncryptionConfigured: () => true,
     hasAdminDefault: () => true,
     isMockEnabled: () => false,
     newId: () => `id-${++ids}`,
     now: () => NOW,
     allowlist: ['https://llm.example.org/v1'],
+    findCopiedEnvelopes: store.findCopiedEnvelopes,
     ...overrides,
   }
-  return { deps, saved, tests, listed }
+  return { deps, saved: store.writes, tests, listed, store }
 }
 
 describe('AI provider service (261)', () => {
+  let originalSecret: string | undefined
+
+  beforeAll(() => {
+    originalSecret = process.env.AI_USER_KEY_ENCRYPTION_SECRET
+    process.env.AI_USER_KEY_ENCRYPTION_SECRET = SECRET
+    const own = { id: 'acct:own', type: 'openai', baseUrl: null }
+    const org = { id: 'acct:org', type: 'openai-compatible', baseUrl: 'https://llm.example.org/v1' }
+    savedOpenAi = {
+      ...own,
+      name: 'Work',
+      model: 'gpt-x',
+      apiKeyEncrypted: sealed(own, 'sk-saved'),
+      lastTestOk: true,
+      lastTestAt: '2026-10-01T00:00:00.000Z',
+    }
+    savedCompatible = {
+      ...org,
+      name: 'Org',
+      model: 'llama',
+      apiKeyEncrypted: sealed(org, 'sk-org'),
+      lastTestOk: null,
+      lastTestAt: null,
+    }
+  })
+
+  afterAll(() => {
+    if (originalSecret === undefined) delete process.env.AI_USER_KEY_ENCRYPTION_SECRET
+    else process.env.AI_USER_KEY_ENCRYPTION_SECRET = originalSecret
+  })
+
   test('a draft never uses a saved key', async () => {
     const { deps, tests, listed } = createDeps()
     const user = userWithProviders()
@@ -131,8 +163,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a saved key stays on its endpoint', async () => {
-    const { deps, tests } = createDeps()
     const user = userWithProviders()
+    const { deps, tests } = createDeps({}, user)
     await AiProviderService.testProvider({ user, input: { id: 'acct:org' }, deps })
     // a trailing slash is the same endpoint
     await AiProviderService.testProvider({
@@ -157,8 +189,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a changed base URL needs the key again', async () => {
-    const { deps, saved, tests } = createDeps()
     const user = userWithProviders()
+    const { deps, saved, tests, store } = createDeps({}, user)
     const moved = await AiProviderService.updateProvider({
       user,
       id: 'acct:org',
@@ -173,15 +205,16 @@ describe('AI provider service (261)', () => {
     })
     expect(moved.provider).toMatchObject({ baseUrl: 'https://other.example.org/v1', hasApiKey: false })
     expect(saved[0].providers[1].apiKeyEncrypted).toBeNull()
-    // same endpoint, model changed: the key stays
+    // same endpoint, model changed: the key stays (from the saved provider again)
+    store.set(user.prefs.ai)
     const kept = await AiProviderService.updateProvider({ user, id: 'acct:org', input: { model: 'llama-2' }, deps })
     expect(tests[1].apiKey).toBe('sk-org')
     expect(kept.provider).toMatchObject({ model: 'llama-2', hasApiKey: true })
   })
 
   test("ids that are not the user's are refused, with nothing written or called", async () => {
-    const { deps, tests, saved, listed } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved, listed } = createDeps({}, user)
     const calls = [
       () => AiProviderService.testProvider({ user, input: { id: 'acct:someone-else' }, deps }),
       () => AiProviderService.listProviderModels({ user, input: { id: 'acct:someone-else' }, deps }),
@@ -220,7 +253,7 @@ describe('AI provider service (261)', () => {
       lastTestAt: NOW,
     })
     expect(tests).toEqual([{ provider: 'anthropic', model: 'claude-x', baseUrl: null, apiKey: 'sk-new' }])
-    expect(saved[0].providers[0].apiKeyEncrypted).toBe('enc:sk-new')
+    expect(opened(saved[0].providers[0])).toBe('sk-new')
     // no admin default and the default was Arena default: the first provider becomes the default
     expect(saved[0]).toMatchObject({ defaultProviderId: 'acct:id-1', defaultProviderOrigin: 'user' })
     expect((user.prefs as any).ai.providers).toHaveLength(1)
@@ -241,19 +274,29 @@ describe('AI provider service (261)', () => {
     expect(org.provider).toMatchObject({ hostingClass: 'orgHosted', hasApiKey: false, name: 'OpenAI-compatible' })
   })
 
-  test('an upstream failure that is not a SystemError keeps its message, truncated', async () => {
-    const long = 'x'.repeat(300)
-    const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorMessage: long }) })
+  test('a failed test sends an error key only, never what the provider or the network said', async () => {
+    const secret = 'internal host db.corp.local refused the connection'
+    const failing = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }) })
     const error: any = await expectSystemErrorKey(
       AiProviderService.addProvider({
         user: userWith({}),
         input: { type: 'openai', model: 'm', apiKey: 'sk' },
         deps: failing.deps,
       }),
-      'aiProviderTestFailed'
+      'aiProviderAuth'
     )
-    expect(error.params.message).toBe('x'.repeat(200))
     expect(failing.saved).toEqual([])
+    // a result without a key is "unavailable", whatever else it carries
+    const keyless = createDeps({ runTest: async () => ({ ok: false, latencyMs: 1, errorMessage: secret }) as any })
+    const unavailable: any = await expectSystemErrorKey(
+      AiProviderService.addProvider({
+        user: userWith({}),
+        input: { type: 'openai', model: 'm', apiKey: 'sk' },
+        deps: keyless.deps,
+      }),
+      'aiProviderUnavailable'
+    )
+    expect(JSON.stringify([error.params, unavailable.params, unavailable.message])).not.toContain('db.corp.local')
   })
 
   test('a failed test or a missing secret saves nothing', async () => {
@@ -288,14 +331,22 @@ describe('AI provider service (261)', () => {
   })
 
   test('edit: a name change saves without a test, an omitted key is kept, an empty key clears it', async () => {
-    const { deps, tests, saved } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved } = createDeps({}, user)
     await AiProviderService.updateProvider({ user, id: 'acct:own', input: { name: 'Renamed' }, deps })
     expect(tests).toEqual([])
-    expect(saved[0].providers[0]).toMatchObject({ name: 'Renamed', apiKeyEncrypted: 'enc:sk-saved', lastTestOk: true })
+    expect(saved[0].providers[0]).toMatchObject({
+      name: 'Renamed',
+      apiKeyEncrypted: savedOpenAi.apiKeyEncrypted,
+      lastTestOk: true,
+    })
     await AiProviderService.updateProvider({ user, id: 'acct:own', input: { model: 'gpt-y' }, deps })
     expect(tests[0]).toEqual({ provider: 'openai', model: 'gpt-y', baseUrl: null, apiKey: 'sk-saved' })
-    expect(saved[1].providers[0]).toMatchObject({ model: 'gpt-y', apiKeyEncrypted: 'enc:sk-saved', lastTestAt: NOW })
+    expect(saved[1].providers[0]).toMatchObject({
+      model: 'gpt-y',
+      apiKeyEncrypted: savedOpenAi.apiKeyEncrypted,
+      lastTestAt: NOW,
+    })
     await AiProviderService.updateProvider({ user, id: 'acct:org', input: { apiKey: '' }, deps })
     expect(saved[2].providers[1].apiKeyEncrypted).toBeNull()
     // the type of a saved provider never changes
@@ -304,11 +355,12 @@ describe('AI provider service (261)', () => {
   })
 
   test('remove resets a removed default; the default can be any own, local or Arena id', async () => {
-    const { deps, saved } = createDeps()
     const user = userWithProviders()
+    const { deps, saved, store } = createDeps({}, user)
     await AiProviderService.removeProvider({ user, id: 'acct:own', deps })
     expect(saved[0]).toMatchObject({ defaultProviderId: 'arena-default', defaultProviderOrigin: 'user' })
     expect(saved[0].providers.map((provider: any) => provider.id)).toEqual(['acct:org'])
+    store.set(user.prefs.ai)
     await AiProviderService.removeProvider({ user, id: 'acct:org', deps })
     expect(saved[1].defaultProviderId).toBe('acct:own')
     const local = await AiProviderService.setDefaultProvider({ user, providerId: 'local:abc', deps })
@@ -319,17 +371,20 @@ describe('AI provider service (261)', () => {
   })
 
   test('the conversion call sets the default only while the origin is still converted', async () => {
-    const { deps, saved } = createDeps()
+    const chosen = userWithProviders()
+    const { deps, saved, store } = createDeps({}, chosen)
     const skipped = await AiProviderService.setDefaultProvider({
-      user: userWithProviders(),
+      user: chosen,
       providerId: 'local:legacy',
       origin: 'converted',
       deps,
     })
     expect(skipped.applied).toBe(false)
     expect(saved).toEqual([])
+    const oldSlot = userWith({ provider: 'openai', model: 'gpt-x', enabled: true, apiKeyEncrypted: 'enc:k' })
+    store.set(oldSlot.prefs.ai)
     const converted = await AiProviderService.setDefaultProvider({
-      user: userWith({ provider: 'openai', model: 'gpt-x', enabled: true, apiKeyEncrypted: 'enc:k' }),
+      user: oldSlot,
       providerId: 'local:legacy',
       origin: 'converted',
       deps,
@@ -344,10 +399,11 @@ describe('AI provider service (261)', () => {
   })
 
   test('a test stamps only a saved provider tested with its saved values', async () => {
-    const { deps, saved } = createDeps({
-      runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }),
-    })
     const user = userWithProviders()
+    const { deps, saved } = createDeps(
+      { runTest: async () => ({ ok: false, latencyMs: 1, errorKey: 'aiProviderAuth' }) },
+      user
+    )
     await AiProviderService.testProvider({ user, input: { id: 'acct:own' }, deps })
     expect(saved[0].providers[0]).toMatchObject({ lastTestOk: false, lastTestAt: NOW })
     await AiProviderService.testProvider({ user, input: { id: 'acct:own', model: 'other' }, deps })
@@ -384,8 +440,8 @@ describe('AI provider service (261)', () => {
   })
 
   test('a rename never reads the key, so an unreadable key does not block it', async () => {
-    const { deps, tests, saved } = createDeps()
     const user = userWithProviders({ providers: [{ ...savedOpenAi, apiKeyEncrypted: 'v1:rotated' }] })
+    const { deps, tests, saved } = createDeps({}, user)
     const { provider } = await AiProviderService.updateProvider({
       user,
       id: 'acct:own',
@@ -403,14 +459,14 @@ describe('AI provider service (261)', () => {
   })
 
   test('a null or blank key is "not sent": the stored key is used and kept', async () => {
-    const { deps, tests, saved, listed } = createDeps()
     const user = userWithProviders()
+    const { deps, tests, saved, listed } = createDeps({}, user)
     await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: null }, deps })
     await AiProviderService.testProvider({ user, input: { id: 'acct:org', apiKey: '   ' }, deps })
     expect(tests.map((cfg) => cfg.apiKey)).toEqual(['sk-org', 'sk-org'])
     await AiProviderService.updateProvider({ user, id: 'acct:org', input: { model: 'llama-2', apiKey: null }, deps })
     expect(tests[2].apiKey).toBe('sk-org')
-    expect(saved.at(-1).providers[1].apiKeyEncrypted).toBe('enc:sk-org')
+    expect(saved.at(-1).providers[1].apiKeyEncrypted).toBe(savedCompatible.apiKeyEncrypted)
     // a changed endpoint never gets the stored key, for model lists either
     await AiProviderService.listProviderModels({
       user,
@@ -430,7 +486,7 @@ describe('AI provider service (261)', () => {
       'aiProviderNotGateway',
       'aiApiKeyUnreadable',
       'aiEncryptionMissing',
-      'aiProviderTestFailed',
+      'aiProviderChanged',
     ]
     for (const [lang, resources] of Object.entries({ en, es, fr, ja, mn, pt, ru })) {
       for (const key of keys) {

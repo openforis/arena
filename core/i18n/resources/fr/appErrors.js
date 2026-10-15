@@ -151,8 +151,7 @@ Essayez de rafraîchir la page.`,
     'Le fournisseur IA a envoyé une réponse trop volumineuse, qui a été interrompue. Veuillez réessayer ou choisir un autre fournisseur.',
   aiSurveyChanged:
     "L'enquête a changé pendant que l'assistant travaillait. Posez à nouveau votre question pour utiliser l'enquête actuelle.",
-  aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
-  aiProviderTestFailed: 'Le test du fournisseur a échoué : {{message}}',
+  aiModelListFailed: 'Impossible de lister les modèles du fournisseur.',
   aiProviderNotFound: "Ce fournisseur d'IA n'existe pas ou ne vous appartient pas. Choisissez un autre fournisseur.",
   aiProviderNotGateway:
     'Un fournisseur enregistré dans ce navigateur est appelé depuis le navigateur, jamais via le serveur Arena.',
@@ -160,6 +159,13 @@ Essayez de rafraîchir la page.`,
     'La clé API enregistrée de ce fournisseur ne peut plus être lue (le secret de chiffrement du serveur a changé). Modifiez le fournisseur dans vos paramètres IA et saisissez de nouveau la clé.',
   aiEncryptionMissing:
     "Les clés API ne peuvent pas être enregistrées : le serveur n'a pas de secret de chiffrement. Demandez à votre administrateur de définir AI_USER_KEY_ENCRYPTION_SECRET.",
+  aiProviderChanged:
+    "Ce fournisseur d'IA a été modifié ou supprimé pendant sa vérification. Rechargez les paramètres d'IA et réessayez.",
+  aiProviderFieldTooLong:
+    'Une valeur du fournisseur est trop longue : $t(appErrors:aiProviderFieldNames.{{field}}) peut avoir {{max}} caractères au plus.',
+  aiProviderFieldNames: { model: 'Modèle', baseUrl: 'URL de base', apiKey: 'Clé API' },
+  aiProviderLimitReached:
+    "Vous pouvez enregistrer au plus {{max}} fournisseurs d'IA. Supprimez-en un pour en ajouter un autre.",
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
   aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
   aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',

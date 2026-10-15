@@ -12,6 +12,7 @@ import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import { omitServerOnlyPrefsFromUser } from '@server/modules/user/serverOnlyPrefs'
 import * as SurveyService from '../../survey/service/surveyService'
 import * as UserService from '../../user/service/userService'
 import * as RecordService from '../../record/service/recordService'
@@ -66,7 +67,8 @@ export const init = (app) => {
 
   app.get('/auth/user', async (req, res, next) => {
     try {
-      const user = Request.getUser(req)
+      // the request user is loaded with every pref: the server-only ones never go back to the browser
+      const user = omitServerOnlyPrefsFromUser(Request.getUser(req))
       const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
       const userWithCounts = { ...user, ...surveysCount }
       const surveyId = User.getPrefSurveyCurrent(user)
