@@ -9,6 +9,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
+import { assertFeatureEnabled } from '../../ai/service/featureGate'
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
@@ -475,8 +476,10 @@ export const init = (app) => {
   // assistant suggestion 6: compare-and-set of category item labels, one language per item
   app.put('/survey/:surveyId/categories/items/labels', AuthMiddleware.requireSurveyEditPermission, async (req, res) => {
     try {
-      const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
+      // the labels come from the assistant: the AI switches (server and user) apply, as for the gateway
+      assertFeatureEnabled('assistantDesign', user)
+      const { surveyId } = Request.getParams(req)
       const { items } = Request.getBody(req) ?? {}
       res.json(await CategoryService.updateItemsLabels({ user, surveyId, items }))
     } catch (error) {
