@@ -16,7 +16,22 @@ export type AuthSessionDeps = {
 
 export type AuthSession = {
   begin: (authToken: string) => Promise<void>
-  end: () => Promise<void>
+  // serverSessionEnded: false when the server could not be reached, so its session (refresh token cookie) may live on
+  end: () => Promise<{ serverSessionEnded: boolean }>
+}
+
+/**
+ * Sends the logout request.
+ * @param {Function} requestLogout - The request.
+ * @returns {Promise<{ error: unknown }|null>} The failure; null when the request succeeded.
+ */
+const tryLogout = async (requestLogout: () => Promise<unknown>): Promise<{ error: unknown } | null> => {
+  try {
+    await requestLogout()
+    return null
+  } catch (error) {
+    return { error }
+  }
 }
 
 /**
@@ -31,16 +46,18 @@ export const createAuthSession = ({
   log = logAiWarning,
 }: AuthSessionDeps): AuthSession => ({
   begin: async (authToken) => {
-    setAuthToken(authToken)
-    // the previous session may have ended without a logout (expired): none of its AI state is kept for this user
+    // the previous session may have ended without a logout (expired): none of its AI state is kept for this user, and
+    // what is still settling must be stopped before the new token exists
     await resetAi()
+    setAuthToken(authToken)
   },
   end: async () => {
     try {
-      await requestLogout()
-    } catch (error) {
-      // network error or expired session: this browser is logged out all the same
-      log('The logout request failed; the session of this browser was ended anyway', error)
+      // one retry: a failed request leaves the refresh token cookie, which would log this user in again on reload
+      let failure = await tryLogout(requestLogout)
+      if (failure) failure = await tryLogout(requestLogout)
+      if (failure) log('The logout request failed twice; this browser was logged out anyway', failure.error)
+      return { serverSessionEnded: !failure }
     } finally {
       setAuthToken(null)
       await resetAi()

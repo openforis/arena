@@ -63,6 +63,8 @@ Deseja ignorá-las?`,
     emailSentConfirmation: `Um email para {{email}} foi enviado.
 
     Informe a pessoa para verificar também a pasta de Spam/Lixo eletrônico.`,
+    logoutServerNotReached:
+      'Não foi possível conectar ao servidor, então sua sessão no servidor pode continuar ativa. Em um computador compartilhado, feche o navegador.',
     emailSentToSelfConfirmation: `Você deve ter recebido um email em {{email}}.
 
   Verifique também a pasta de Spam/Lixo eletrônico.`,

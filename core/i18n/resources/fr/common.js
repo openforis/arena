@@ -63,6 +63,8 @@ Voulez-vous les ignorer ?`,
     emailSentConfirmation: `Un e-mail a été envoyé à {{email}}.
 
     Veuillez informer la personne de vérifier également le dossier Spam/Courrier indésirable.`,
+    logoutServerNotReached:
+      'Le serveur est injoignable : votre session sur le serveur est peut-être encore active. Sur un ordinateur partagé, fermez le navigateur.',
     emailSentToSelfConfirmation: `Vous devriez avoir reçu un e-mail à {{email}}.
 
 Veuillez également vérifier le dossier Spam/Courrier indésirable.`,
