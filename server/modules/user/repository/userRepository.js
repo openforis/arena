@@ -13,13 +13,18 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
+import { sqlPrefsParamWithoutServerOnlyKeys, sqlPrefsWithoutServerOnlyKeys } from '@server/modules/user/serverOnlyPrefs'
 
-// the custom map layers (they may hold URL tokens) are served only by the custom layers API: never select them,
-// otherwise the users list would send them to the other members of a survey
-const prefsField = `u.prefs - '${User.keysPrefs.mapCustomLayers}' AS prefs`
-const hasProfilePictureField = 'u.profile_picture IS NOT NULL AS has_profile_picture'
-const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status', hasProfilePictureField]
-const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
+// the AI prefs (providers with their encrypted keys, usage) are never selected: only the AI services read them
+const selectFields = [
+  'u.uuid',
+  'u.name',
+  'u.email',
+  `${sqlPrefsWithoutServerOnlyKeys('u.prefs')} AS prefs`,
+  'u.props',
+  'u.status',
+]
+const columnsCommaSeparated = selectFields.join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -439,7 +444,7 @@ export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
     UPDATE "user" u
-    SET prefs = prefs || $1::jsonb
+    SET prefs = prefs || ${sqlPrefsParamWithoutServerOnlyKeys('$1')}
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,
     [A.omit([User.keysPrefs.mapCustomLayers], User.getPrefs(user)), User.getUuid(user)],
