@@ -87,6 +87,7 @@ const createDeps = (overrides: Partial<AiProviderService.AiProviderServiceDeps> 
     newId: () => `id-${++ids}`,
     now: () => NOW,
     allowlist: ['https://llm.example.org/v1'],
+    findCopiedEnvelopes: store.findCopiedEnvelopes,
     ...overrides,
   }
   return { deps, saved: store.writes, tests, listed, store }
