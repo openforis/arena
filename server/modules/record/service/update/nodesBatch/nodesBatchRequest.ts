@@ -1,4 +1,5 @@
 import SystemError, { StatusCodes } from '@core/systemError'
+import { isNodeValueSizeValid } from '@core/record/nodeValueShape'
 import { isUuid } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
@@ -21,7 +22,7 @@ const invalidRequest = (reason: string, params: Record<string, unknown> = {}): S
 const isId = (value: unknown): value is string => typeof value === 'string' && isUuid(value)
 
 /**
- * Validates one edit and fills the missing from/to with null.
+ * Validates one edit (ids and value size) and fills the missing from/to with null.
  * @param {unknown} edit - The edit from the body.
  * @returns {NodesBatchEdit} The edit.
  */
@@ -29,6 +30,8 @@ const parseEdit = (edit: unknown): NodesBatchEdit => {
   if (!edit || typeof edit !== 'object') throw invalidRequest('edit')
   const { recordUuid, nodeUuid, from = null, to = null } = edit as Record<string, unknown>
   if (!isId(recordUuid) || !isId(nodeUuid)) throw invalidRequest('edit')
+  // the shape of `to` depends on the attribute type: it is checked with the node, see checkBatchEdit
+  if (!isNodeValueSizeValid(from) || !isNodeValueSizeValid(to)) throw invalidRequest('valueTooLarge')
   return { recordUuid, nodeUuid, from, to }
 }
 

@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { areNodeValuesEqual } from '@core/record/nodeValueEquality'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
+import { isNodeValueShapeValid } from '@core/record/nodeValueShape'
 
 import {
   NodesBatchEditResult,
@@ -87,6 +88,13 @@ export const checkBatchEdit = ({
       result: failedResult(index, 'validationErrors:nodeValueParser.attributeNotEditable', {
         attributeName: NodeDef.getName(nodeDef),
       }),
+    }
+  }
+  // before the conflict check: a malformed value is a failure, whatever the current value is
+  if (!isNodeValueShapeValid({ nodeDef, value: edit.to })) {
+    return {
+      ok: false,
+      result: failedResult(index, NodesBatchMessageKeys.invalidValue, { attributeName: NodeDef.getName(nodeDef) }),
     }
   }
   if (!areNodeValuesEqual(Node.getValue(node, null), from)) {
