@@ -1440,6 +1440,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
     success: 'Traducido. Revise y guarde.',
     failed: 'La traducción falló: {{message}}',
+    sourceChanged: 'El texto cambió mientras se traducía, por lo que la traducción no se aplicó.',
   },
 
   aiActivityLog: {

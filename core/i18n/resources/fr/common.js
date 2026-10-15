@@ -1614,6 +1614,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     success_other: 'Traduit dans {{count}} langues. Vérifiez et enregistrez.',
     success: 'Traduit. Vérifiez et enregistrez.',
     failed: 'Échec de la traduction : {{message}}',
+    sourceChanged: "Le texte a changé pendant sa traduction, la traduction n'a donc pas été appliquée.",
   },
 
   aiActivityLog: {

@@ -1592,6 +1592,7 @@ $t(common.cantUndoWarning)`,
     success_other: '{{count}} хэл рүү орчууллаа. Хянаад хадгална уу.',
     success: 'Орчууллаа. Хянаад хадгална уу.',
     failed: 'Орчуулга амжилтгүй боллоо: {{message}}',
+    sourceChanged: 'Орчуулж байх үед текст өөрчлөгдсөн тул орчуулгыг хэрэглээгүй.',
   },
 
   aiActivityLog: {

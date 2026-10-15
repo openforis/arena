@@ -1586,6 +1586,7 @@ $t(common.cantUndoWarning)`,
     success: '翻訳しました。確認して保存してください。',
 
     failed: '翻訳に失敗しました：{{message}}',
+    sourceChanged: '翻訳中にテキストが変更されたため、翻訳は適用されませんでした。',
   },
 
   aiActivityLog: {
