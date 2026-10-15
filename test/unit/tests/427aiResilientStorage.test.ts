@@ -122,13 +122,15 @@ describe('resilient storage (427)', () => {
     expect(log).toHaveBeenCalledWith(expect.stringMatching(/cannot be written/), expect.any(Error))
   })
 
-  test('no storage at all keeps everything in memory without logging', () => {
+  test('no storage at all keeps everything in memory and says so once', () => {
     const log = jest.fn()
     const wrapper = createResilientStorage({ getStorage: () => null, log })
     wrapper.write('k', 'v')
+    wrapper.write('k2', 'v2')
     expect(wrapper.read('k')).toBe('v')
-    expect(wrapper.keys('')).toEqual(['k'])
-    expect(log).not.toHaveBeenCalled()
+    expect(wrapper.keys('')).toEqual(['k', 'k2'])
+    expect(log).toHaveBeenCalledTimes(1)
+    expect(log).toHaveBeenCalledWith(expect.stringMatching(/storage is not available/), undefined)
   })
 
   test('remove reaches the storage even after a fall back to memory', () => {

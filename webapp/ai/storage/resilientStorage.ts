@@ -128,7 +128,7 @@ export const createResilientStorage = ({
       try {
         const storage = getStorage()
         if (!storage) {
-          blocked = true
+          block('The browser storage is not available')
           return
         }
         const stored = store(storage, key, value, shrink)
