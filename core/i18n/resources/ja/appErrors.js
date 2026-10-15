@@ -107,6 +107,8 @@ export default {
   aiBaseUrlNotAllowed:
     'このベースURLは内部アドレスを指しており、Arena サーバーからは呼び出しません。お使いのコンピューター上のモデルには、ローカル AI サーバーを使用してください。組織のサーバーの場合は、組織のモデルサーバーへの追加を管理者に依頼してください。',
   aiProviderUnavailable: 'AIプロバイダーに接続できませんでした。しばらくしてから再度お試しください。',
+  aiProviderResponseTooLarge:
+    'AIプロバイダーの応答が大きすぎたため、途中で打ち切りました。もう一度お試しいただくか、別のプロバイダーを選択してください。',
   aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
   aiProviderTestFailed: 'プロバイダーのテストに失敗しました：{{message}}',
   aiProviderNotFound:
