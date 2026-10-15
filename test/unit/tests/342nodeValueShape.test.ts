@@ -155,12 +155,13 @@ describe('Batch edit values: size at parse, shape at check (342)', () => {
     expect(() =>
       parseNodesBatchRequest({ cycle: '0', edits: [{ ...edit, to: long(NodesBatchLimits.maxValueChars + 2000) }] })
     ).toThrow(expect.objectContaining({ key: NodesBatchMessageKeys.invalidRequest, statusCode: 400 }))
-    expect(() =>
+    // `from` is only compared with the current value: a long stored text must not fail the whole request
+    expect(
       parseNodesBatchRequest({
         cycle: '0',
         edits: [{ ...edit, from: long(NodesBatchLimits.maxValueChars + 2000), to: 1 }],
-      })
-    ).toThrow(expect.objectContaining({ params: { reason: 'valueTooLarge' } }))
+      }).edits
+    ).toHaveLength(1)
     expect(
       parseNodesBatchRequest({ cycle: '0', edits: [{ ...edit, to: long(NodesBatchLimits.maxValueChars) }] }).edits
     ).toHaveLength(1)
