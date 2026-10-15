@@ -14,6 +14,7 @@ import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigra
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
+import { createUserServiceWithPrefsUpdate } from '@server/modules/user/service/userServicePrefsOverride'
 import { getAiPolicyCeilingErrors } from '@server/modules/ai/service/policyCeilings'
 
 import * as apiRouter from './apiRouter'
@@ -55,6 +56,15 @@ export const run = async () => {
     initialMiddlewares: [...(httpRequestLogger ? [httpRequestLogger] : []), stripServerOnlyPrefsFromLoginResponse],
   })
   const { express: app, serviceRegistry } = arenaApp
+  // arena-server's user service cannot update the prefs (it throws), which its login uses when the current survey of
+  // the user cannot be loaded
+  serviceRegistry.registerService(
+    ServiceType.user,
+    createUserServiceWithPrefsUpdate(
+      serviceRegistry.getService(ServiceType.user),
+      UserManager.updateUserPrefsAndFetchGroups
+    )
+  )
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
   // (crash or restart): must run before this process enqueues any job of its own, since a
