@@ -24,6 +24,8 @@ export type ProviderDraft = {
   // the model id (local providers: the model of the server)
   model: string
   modelFreeText: boolean
+  // the user typed or picked the model (it was not filled in from the model list)
+  modelTouched: boolean
   apiKey: string
   // the saved key is to be removed when saving (the key field stays empty)
   apiKeyRemoved: boolean
@@ -66,6 +68,7 @@ export const createDraft = ({
   baseUrl: saved?.baseUrl ?? (type === 'local' ? DEFAULT_LOCAL_SERVER_BASE_URL : ''),
   model: saved?.model ?? '',
   modelFreeText: false,
+  modelTouched: false,
   apiKey: '',
   apiKeyRemoved: false,
   apiKeyVersion: 0,
@@ -100,8 +103,8 @@ export const getLocalDraftUrl = (draft: ProviderDraft): string | null =>
   draft.baseUrl.trim() ? normalizeLocalProviderBaseUrl(withDefaultHttpScheme(draft.baseUrl)) : null
 
 /**
- * Returns true when the user changed something: a name, the address or the key. The model is not counted: it can be
- * filled in from the model list.
+ * Returns true when the user changed something: a name, the address, the key or the model. A model filled in from
+ * the model list is not counted.
  * @param {object} params - Parameters.
  * @param {ProviderDraft} params.draft - Draft now.
  * @param {SavedProvider|null} params.saved - Saved provider (edit), null to add.
@@ -113,6 +116,7 @@ export const isDraftDirty = ({ draft, saved }: { draft: ProviderDraft; saved: Sa
     draft.name !== initial.name ||
     !isSameBaseUrl(draft.baseUrl, initial.baseUrl) ||
     draft.apiKey.trim().length > 0 ||
-    draft.apiKeyRemoved
+    draft.apiKeyRemoved ||
+    (draft.modelTouched && draft.model.trim() !== initial.model.trim())
   )
 }

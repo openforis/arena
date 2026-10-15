@@ -310,12 +310,30 @@ describe('provider dialog state machine (444)', () => {
   })
 
   describe('closing', () => {
-    test('typed values make the dialog dirty; the model filled in from the list does not', () => {
+    test('a model the user typed or picked makes the dialog dirty, one filled in from the list does not', () => {
+      const open = run(added(), { type: 'typeChosen', dialogType: 'openai-compatible' })
+      const requested = run(open, { type: 'modelsRequested', inputsKey: 'a' })
+      const filled = run(requested, {
+        type: 'modelsLoaded',
+        requestId: requested.models.requestId,
+        models: [{ id: 'x' }, { id: 'y' }],
+      })
+      expect(filled.draft.model).toBe('x')
+      expect(view(filled, null).dirty).toBe(false)
+      expect(view(run(filled, { type: 'modelSelected', value: 'y' }), null).dirty).toBe(true)
+      expect(view(run(open, { type: 'modelSet', model: 'my-deployment' }), null).dirty).toBe(true)
+      // typing the model that was there already changes nothing
+      const saved = edited(savedCompatible)
+      expect(view(run(saved, { type: 'modelSet', model: 'm1' }), savedCompatible).dirty).toBe(false)
+      expect(view(run(saved, { type: 'modelSet', model: 'm2' }), savedCompatible).dirty).toBe(true)
+    })
+
+    test('typed values make the dialog dirty', () => {
       const state = run(added(), { type: 'typeChosen', dialogType: 'openai' })
       expect(view(state, null).dirty).toBe(false)
       expect(view(run(state, { type: 'nameSet', name: 'x' }), null).dirty).toBe(true)
       expect(view(run(state, { type: 'apiKeySet', apiKey: 'sk-1' }), null).dirty).toBe(true)
-      expect(view(run(state, { type: 'modelSet', model: 'gpt' }), null).dirty).toBe(false)
+      expect(view(run(state, { type: 'modelSet', model: 'gpt' }), null).dirty).toBe(true)
     })
 
     test('an opened saved provider is clean; changing its address or removing its key makes it dirty', () => {

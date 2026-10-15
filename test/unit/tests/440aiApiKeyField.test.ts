@@ -27,6 +27,7 @@ const draft = (apiKey = ''): ProviderDraft => ({
   modelFreeText: false,
   apiKey,
   apiKeyRemoved: false,
+  modelTouched: false,
   apiKeyVersion: 0,
 })
 
