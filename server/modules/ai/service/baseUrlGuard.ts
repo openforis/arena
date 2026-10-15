@@ -8,12 +8,13 @@
  * rules (`areAddressesAllowed`) on the addresses it connects to, and refuses redirects.
  */
 import { lookup as dnsLookup } from 'node:dns/promises'
-import { BlockList, isIP, isIPv4 } from 'node:net'
+import { isIP } from 'node:net'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
 import { isAllowlisted } from '@common/ai/allowlist'
+import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 
 export { isAllowlisted }
 
@@ -27,67 +28,18 @@ export type GuardOptions = { allowlist?: string[]; lookup?: LookupFn }
 // the system resolver, which answers with every address of a name
 export const defaultLookup = dnsLookup as unknown as LookupFn
 
-const IPV4_BLOCKED: [string, number][] = [
-  ['0.0.0.0', 8], // "this" network
-  ['10.0.0.0', 8], // private
-  ['100.64.0.0', 10], // carrier-grade NAT
-  ['127.0.0.0', 8], // loopback
-  ['169.254.0.0', 16], // link-local (cloud metadata)
-  ['172.16.0.0', 12], // private
-  ['192.0.0.0', 24], // IETF protocol assignments
-  ['192.168.0.0', 16], // private
-  ['198.18.0.0', 15], // benchmarking
-  ['224.0.0.0', 4], // multicast
-  ['240.0.0.0', 4], // reserved + broadcast
-]
-
-const IPV6_BLOCKED: [string, number][] = [
-  ['::', 96], // unspecified, loopback, IPv4-compatible
-  ['64:ff9b::', 96], // NAT64 (can reach internal IPv4)
-  ['64:ff9b:1::', 48], // local-use NAT64
-  ['2002::', 16], // 6to4 (embeds an IPv4)
-  ['2001::', 32], // Teredo (embeds an IPv4)
-  ['::ffff:0:0:0', 96], // IPv4-translated (SIIT)
-  ['fc00::', 7], // unique local
-  ['fe80::', 10], // link-local
-  ['fec0::', 10], // deprecated site-local
-  ['ff00::', 8], // multicast
-]
-
-const blockList = new BlockList()
-for (const [network, prefix] of IPV4_BLOCKED) blockList.addSubnet(network, prefix, 'ipv4')
-for (const [network, prefix] of IPV6_BLOCKED) blockList.addSubnet(network, prefix, 'ipv6')
-
 const PROVIDERS_WITH_USER_BASE_URL = new Set<string>([AiProvider.openaiCompatible, AiProvider.vercelAiSdk])
 
 export const notAllowed = (baseUrl: string) =>
   new SystemError('aiBaseUrlNotAllowed', { baseUrl: String(baseUrl).slice(0, 200) }, StatusCodes.BAD_REQUEST)
 
-// ::ffff:a.b.c.d and its hex form ::ffff:xxxx:yyyy (what the URL parser produces)
-const toMappedIpv4 = (address: string): string | null => {
-  const lower = address.toLowerCase()
-  if (!lower.startsWith('::ffff:')) return null
-  const rest = lower.slice('::ffff:'.length)
-  if (isIPv4(rest)) return rest
-  const match = /^([0-9a-f]{1,4}):([0-9a-f]{1,4})$/.exec(rest)
-  if (!match) return null
-  const high = Number.parseInt(match[1], 16)
-  const low = Number.parseInt(match[2], 16)
-  return [high >> 8, high & 255, low >> 8, low & 255].join('.')
-}
-
 /**
- * Returns true when the address must not be called (internal, reserved, or not an IP at all).
+ * Returns true when the address must not be called (internal, reserved, or not an IP at all). The ranges are the ones
+ * the browser uses to tell the local network from the internet (common/ai/ipAddress).
  * @param {string} address - IPv4 or IPv6 address.
  * @returns {boolean} True when blocked.
  */
-export const isBlockedAddress = (address: string): boolean => {
-  const mapped = toMappedIpv4(address)
-  if (mapped) return blockList.check(mapped, 'ipv4')
-  const family = isIP(address)
-  if (family === 0) return true
-  return blockList.check(address, family === 4 ? 'ipv4' : 'ipv6')
-}
+export const isBlockedAddress = (address: string): boolean => isNonPublicIpAddress(address)
 
 const parseUrl = (value: string): URL | null => {
   try {
