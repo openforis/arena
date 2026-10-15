@@ -250,7 +250,6 @@ export const surveyListMissingTextsTool: AiTool<MissingTextsInput, MissingTextsP
   inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async (input, ctx) =>
     listMissingTexts({

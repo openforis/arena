@@ -203,7 +203,7 @@ describe('propose tools in the registry', () => {
     const effective = { schema: 'cloud', data: 'off' } as const
     const proposeNames = (ctx: any) =>
       getTools({ area: 'design', ctx, effective, hostingClass: 'cloud' })
-        .filter((tool) => tool.effect === 'propose')
+        .filter((tool) => tool.name.includes('_propose'))
         .map((tool) => tool.name)
     expect(proposeNames(ctxWithSurvey())).toEqual([
       'nodeDef_proposeCreate',

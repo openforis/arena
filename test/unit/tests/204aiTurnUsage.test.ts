@@ -55,7 +55,6 @@ const echo: AiTool = {
   inputSchema: z.object({ summary: z.string() }),
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: () => true,
   execute: async () => ({ ok: true }),
 }

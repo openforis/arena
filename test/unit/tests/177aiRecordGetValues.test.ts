@@ -124,7 +124,7 @@ describe('record_getValues tool', () => {
       fetchRecordAndNodes: () => record,
     })
     const tool = createRecordGetValuesTool({ api, getI18n: () => fakeI18n })
-    expect(tool).toMatchObject({ name: 'record_getValues', dataClass: 'data', effect: 'read', area: ['cleaning'] })
+    expect(tool).toMatchObject({ name: 'record_getValues', dataClass: 'data', area: ['cleaning'] })
     const result = await runTool(
       tool,
       { recordKeys: { cluster_id: '12' }, attributes: ['dbh'] },

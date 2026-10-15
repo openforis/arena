@@ -70,7 +70,7 @@ describe('categories_list and taxonomies_list (224)', () => {
     }).map((tool) => tool.name)
     expect(names).toEqual(expect.arrayContaining(['categories_list', 'taxonomies_list']))
     for (const tool of [categoriesListTool, taxonomiesListTool]) {
-      expect(tool).toMatchObject({ effect: 'read', dataClass: 'schema', area: ['design'] })
+      expect(tool).toMatchObject({ dataClass: 'schema', area: ['design'] })
     }
   })
 })

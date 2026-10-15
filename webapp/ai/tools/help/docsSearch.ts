@@ -5,7 +5,11 @@ import { loadHandbook } from '@webapp/ai/help/loadHandbook'
 
 import type { AiTool } from '../types'
 
-type DocsSearchInput = { query: string }
+const inputSchema = z.object({
+  query: z.string().trim().min(1).max(200).describe('English keywords, e.g. "publish survey"'),
+})
+
+type DocsSearchInput = z.infer<typeof inputSchema>
 
 /**
  * Creates the docs_search tool (the index loader is injectable for tests).
@@ -22,12 +26,9 @@ export const createDocsSearchTool = ({
   description:
     'Searches the Open Foris Arena user manual (English) and returns the 3 best sections { id, title, path, text }. ' +
     'Search with English keywords. Answer from these texts only and cite the sections you used as "§<id> <title>".',
-  inputSchema: z.object({
-    query: z.string().trim().min(1).max(200).describe('English keywords, e.g. "publish survey"'),
-  }),
+  inputSchema,
   area: ['help', 'design', 'analysis', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
   requires: () => true,
   execute: async ({ query }) => {
     // the anchors are for the links the app adds, not for the model

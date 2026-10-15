@@ -100,7 +100,6 @@ describe('query_propose', () => {
     expect(proposeQueryTool).toMatchObject({
       name: 'query_propose',
       dataClass: 'schema',
-      effect: 'propose',
       area: ['analysis', 'cleaning'],
     })
   })

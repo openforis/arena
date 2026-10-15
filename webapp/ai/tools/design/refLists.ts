@@ -82,7 +82,6 @@ export const categoriesListTool: AiTool<Record<string, never>, CategoriesList> =
   inputSchema: z.object({}).strict(),
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => listCategories(requireSurvey(ctx)),
 }
@@ -95,7 +94,6 @@ export const taxonomiesListTool: AiTool<Record<string, never>, TaxonomiesList> =
   inputSchema: z.object({}).strict(),
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async (_input, ctx) => listTaxonomies(requireSurvey(ctx)),
 }

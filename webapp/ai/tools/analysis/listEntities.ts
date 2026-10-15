@@ -90,7 +90,6 @@ export const listEntitiesTool: AiTool<Input, unknown> = {
   inputSchema,
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute,
 }

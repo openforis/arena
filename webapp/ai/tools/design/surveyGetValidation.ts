@@ -75,18 +75,19 @@ export const buildSurveyValidation = ({
   return { ...withoutEntries, truncated: nodeDefs.length < withIssues.length, nodeDefs }
 }
 
-export const surveyGetValidationTool: AiTool<{ name?: string }> = {
+const inputSchema = z.object({
+  name: z.string().min(1).max(100).optional().describe('Node definition name, e.g. "tree"; omit for all'),
+})
+
+export const surveyGetValidationTool: AiTool<z.infer<typeof inputSchema>> = {
   name: 'survey_getValidation',
   description:
     'Returns the design errors and warnings the user sees in the form designer (warning icons and red messages), ' +
     'per node definition: name, type, parent path and issues (field, severity, message). Without a name it lists ' +
     'every node definition with issues. Call it when the user asks about an error or warning on screen.',
-  inputSchema: z.object({
-    name: z.string().min(1).max(100).optional().describe('Node definition name, e.g. "tree"; omit for all'),
-  }),
+  inputSchema,
   area: ['design'],
   dataClass: 'schema',
-  effect: 'read',
   requires: canViewCurrentSurvey,
   execute: async ({ name }, ctx) => {
     const survey = requireSurvey(ctx)

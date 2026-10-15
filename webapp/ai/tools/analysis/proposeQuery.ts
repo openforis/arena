@@ -90,7 +90,6 @@ export const proposeQueryTool: AiTool<ProposeQueryInput, unknown> = {
   inputSchema: proposeQueryInputSchema,
   area: ['analysis', 'cleaning'],
   dataClass: 'schema',
-  effect: 'propose',
   requires: canViewCurrentSurvey,
   execute,
 }

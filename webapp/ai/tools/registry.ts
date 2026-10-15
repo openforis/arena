@@ -50,6 +50,14 @@ export const getTools = ({
 const isAbortError = (error: unknown): boolean => (error as { name?: string })?.name === 'AbortError'
 
 /**
+ * Returns the context of one tool call: the survey is read again, so a call after the user applied a card or edited
+ * the survey does not work on the survey of the start of the turn.
+ * @param {AiToolContext} ctx - Turn context.
+ * @returns {AiToolContext} The context of the call.
+ */
+const toCallContext = (ctx: AiToolContext): AiToolContext => (ctx.getSurvey ? { ...ctx, survey: ctx.getSurvey() } : ctx)
+
+/**
  * Runs a tool safely: checks the input, turns errors into structured results the model can recover from, limits the
  * result size and honours the abort signal (an abort is re-thrown, so the turn stops).
  * @param {AiTool} tool - The tool.
@@ -62,7 +70,7 @@ export const runTool = async (tool: AiTool, input: unknown, ctx: AiToolContext):
   const parsed = tool.inputSchema.safeParse(input)
   if (!parsed.success) return toolError('invalidInput', z.prettifyError(parsed.error))
   try {
-    const output = await tool.execute(parsed.data, ctx)
+    const output = await tool.execute(parsed.data, toCallContext(ctx))
     ctx.signal.throwIfAborted()
     return limitToolResult(output)
   } catch (error) {
