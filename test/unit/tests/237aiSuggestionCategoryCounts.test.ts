@@ -164,6 +164,60 @@ describe('category labels counts (237)', () => {
     await first
   })
 
+  describe('a throttled trigger is not lost: one fetch follows at the end of the window', () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    test('leaving the category editor inside the window fetches once more when the window ends', async () => {
+      const { store, setKind } = createSetKindRecorder()
+      const fetchCounts = jest.fn(async () => counts)
+      const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      const t0 = TEST_NOW.getTime()
+      await detector.handle(event('generationStarted'), contextWith({ survey, store, time: t0 }))
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 20000 }))
+      // another visit in the same window does not schedule a second fetch
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 25000 }))
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+
+      await jest.advanceTimersByTimeAsync(4999)
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+      await jest.advanceTimersByTimeAsync(1)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+      expect(setKind).toHaveBeenCalledTimes(2)
+
+      // nothing more is pending
+      await jest.advanceTimersByTimeAsync(120000)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+    })
+
+    test('the trailing fetch is cancelled when the generation ends, and an event that fetches at once replaces it', async () => {
+      const { store } = createSetKindRecorder()
+      const fetchCounts = jest.fn(async () => counts)
+      const detector = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      const t0 = TEST_NOW.getTime()
+      const controller = new AbortController()
+      await detector.handle(event('generationStarted'), contextWith({ survey, store, controller, time: t0 }))
+      await detector.handle(event('categoryEditorLeft'), contextWith({ survey, store, controller, time: t0 + 1000 }))
+      controller.abort()
+      await jest.advanceTimersByTimeAsync(60000)
+      expect(fetchCounts).toHaveBeenCalledTimes(1)
+
+      // a category change fetches at once and the window starts again: no stale trailing fetch follows
+      const other = createCategoryItemTranslationsDetector({ fetchCounts, throttleMs: 30000 })
+      fetchCounts.mockClear()
+      await other.handle(event('generationStarted'), contextWith({ survey, store, time: t0 }))
+      await other.handle(event('categoryEditorLeft'), contextWith({ survey, store, time: t0 + 1000 }))
+      await other.handle(event('categoriesChanged'), contextWith({ survey, store, time: t0 + 2000 }))
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+      await jest.advanceTimersByTimeAsync(60000)
+      expect(fetchCounts).toHaveBeenCalledTimes(2)
+    })
+  })
+
   test('a request that fails because the generation was aborted is not logged', async () => {
     const { store } = createSetKindRecorder()
     const controller = new AbortController()
