@@ -198,8 +198,12 @@
       flex: none;
     }
 
+    // the "no provider" chip keeps its text (the other chips are an icon), cut with an ellipsis when it doesn't fit
+    > .ai-provider-chip--none {
+      flex: 0 1 auto;
+    }
+
     @container (max-width: 340px) {
-      .ai-provider-chip__text,
       .ai-assistant-panel__context-text,
       .ai-assistant-panel__sent-data-text {
         display: none;

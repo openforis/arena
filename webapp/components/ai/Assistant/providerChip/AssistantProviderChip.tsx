@@ -12,13 +12,10 @@ import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvaila
 import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
 import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
-import {
-  getProviderDisplayName,
-  getProviderMonogramType,
-  getProviderWhereKey,
-} from '@webapp/components/ai/UserAiSettingsPanel/providerList'
+import { getProviderDisplayName, getProviderMonogramType } from '@webapp/components/ai/UserAiSettingsPanel/providerList'
 import { useNotifyError } from '@webapp/components/hooks'
 import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { useI18nT } from '@webapp/store/system'
@@ -28,18 +25,10 @@ import type { AssistantArea } from '../assistantAreas'
 import {
   buildProviderChoices,
   getConversationProvider,
-  getProviderChipLabel,
+  getProviderChipFullLabel,
   getProviderChipView,
   type ProviderChoice,
 } from './providerChipModel'
-
-// icon of where the provider runs (same icons as the old data-location badge)
-const iconByWhereKey: Record<string, string> = {
-  onDevice: 'icon-laptop',
-  orgHosted: 'icon-office',
-  cloud: 'icon-cloud',
-  cloudOwnKey: 'icon-cloud',
-}
 
 type Props = {
   area: AssistantArea
@@ -107,6 +96,68 @@ const ProviderChoiceRow = ({
 }
 
 /**
+ * Content of the "Answer with" popover: the rows, and the "Make it my default" choice. The popover unmounts it when
+ * it closes, so the choice never carries over to the next time.
+ * @param {object} props - Props.
+ * @param {ProviderChoice[]} props.choices - Rows.
+ * @param {Function} props.onChoose - Called with the provider id and whether to make it the default.
+ * @param {Function} props.onManage - Opens the provider settings.
+ * @param {TFunction} props.t - Translation function.
+ * @returns {React.ReactElement} The content.
+ */
+const ProviderChooser = ({
+  choices,
+  onChoose,
+  onManage,
+  t,
+}: {
+  choices: ProviderChoice[]
+  onChoose: (providerId: string, makeDefault: boolean) => void
+  onManage: () => void
+  t: TFunction
+}) => {
+  const [makeDefault, setMakeDefault] = useState(false)
+  return (
+    <div
+      aria-label={t('aiAssistant.providerChip.answerWith')}
+      className="ai-provider-chooser"
+      data-testid={TestId.aiAssistant.providerChooser}
+      role="dialog"
+    >
+      <span className="ai-provider-chooser__title">{t('aiAssistant.providerChip.answerWith')}</span>
+      <div
+        aria-label={t('aiAssistant.providerChip.answerWith')}
+        className="ai-provider-chooser__rows"
+        role="radiogroup"
+      >
+        {choices.map((choice) => (
+          <ProviderChoiceRow choice={choice} key={choice.entry.id} onChoose={(id) => onChoose(id, makeDefault)} t={t} />
+        ))}
+      </div>
+      <div className="ai-provider-chooser__footer">
+        <label className="ai-provider-chooser__default">
+          <input
+            checked={makeDefault}
+            data-testid={TestId.aiAssistant.providerMakeDefault}
+            onChange={(event) => setMakeDefault(event.target.checked)}
+            type="checkbox"
+          />
+          {t('aiAssistant.providerChip.makeDefault')}
+        </label>
+        <button
+          className="ai-provider-chooser__manage"
+          data-testid={TestId.aiAssistant.providerManage}
+          onClick={onManage}
+          type="button"
+        >
+          {t('aiAssistant.providerChip.manage')}
+        </button>
+      </div>
+    </div>
+  )
+}
+
+/**
  * Provider chip of the composer: the provider of the conversation, and the "Answer with" popover to pick another one.
  * @param {Props} props - Props.
  * @returns {React.ReactElement|null} The chip, or null while the area's feature is off or loading.
@@ -118,7 +169,6 @@ export const AssistantProviderChip = (props: Props) => {
   const runAction = useAiEngineActions()
   // a callback ref (state): the popover is anchored once the chip is mounted
   const [anchor, setAnchor] = useState<HTMLButtonElement | null>(null)
-  const [makeDefault, setMakeDefault] = useState(false)
   const { enabled, effective, surveyScoped, capabilities, requestDataClass } = useAiFeaturePolicy(
     assistantAreaFeatures[area],
     { dataClass: area === 'analysis' ? getConversationDataClass(conversation) : undefined }
@@ -157,10 +207,11 @@ export const AssistantProviderChip = (props: Props) => {
   /**
    * Picks a provider for the conversation, and saves it as the default when asked.
    * @param {string} id - Provider id.
+   * @param {boolean} makeDefault - Also make it the user's default provider.
    * @returns {Promise<void>} Resolves when done.
    */
   const choose = useCallback(
-    async (id: string) => {
+    async (id: string, makeDefault: boolean) => {
       onChoose(id)
       close()
       if (!makeDefault) return
@@ -176,7 +227,7 @@ export const AssistantProviderChip = (props: Props) => {
         })
       }
     },
-    [close, makeDefault, notifyError, onChoose, t]
+    [close, notifyError, onChoose, t]
   )
 
   /**
@@ -197,20 +248,18 @@ export const AssistantProviderChip = (props: Props) => {
         className="ai-provider-chip ai-provider-chip--none"
         data-testid={TestId.aiAssistant.providerChip}
         onClick={manage}
+        title={getProviderChipFullLabel({ view, t })}
         type="button"
       >
         <span className="ai-provider-chip__text">{t('aiAssistant.providerChip.none')}</span>
       </button>
     )
   }
-  const label =
-    view.kind === 'provider' ? getProviderChipLabel({ entry: view.entry, t }) : t('aiAssistant.providerChip.missing')
-  // where the provider runs is part of the accessible name and the tooltip, not of the visible text
-  const whereKey = view.kind === 'provider' ? getProviderWhereKey(view.entry) : null
-  const fullLabel = whereKey ? `${label} · ${t(`userAiSettings:where.${whereKey}`)}` : label
+  // where the provider runs, and that it can't answer now, are in the accessible name and the tooltip (not in colour)
+  const fullLabel = getProviderChipFullLabel({ view, t })
   const tone = view.kind === 'provider' ? view.tone : 'bad'
-  // a default missing on this browser is a local provider of another computer
-  const iconClass = whereKey ? iconByWhereKey[whereKey] : 'icon-laptop'
+  // a default missing on this browser is a local provider of another computer: no location to show
+  const iconClass = getHostingIconClass(view.kind === 'provider' ? view.entry.hostingClass : null)
 
   return (
     <>
@@ -238,42 +287,7 @@ export const AssistantProviderChip = (props: Props) => {
         open={open && anchor !== null}
         transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
-        <div
-          aria-label={t('aiAssistant.providerChip.answerWith')}
-          className="ai-provider-chooser"
-          data-testid={TestId.aiAssistant.providerChooser}
-          role="dialog"
-        >
-          <span className="ai-provider-chooser__title">{t('aiAssistant.providerChip.answerWith')}</span>
-          <div
-            aria-label={t('aiAssistant.providerChip.answerWith')}
-            className="ai-provider-chooser__rows"
-            role="radiogroup"
-          >
-            {choices.map((choice) => (
-              <ProviderChoiceRow choice={choice} key={choice.entry.id} onChoose={choose} t={t} />
-            ))}
-          </div>
-          <div className="ai-provider-chooser__footer">
-            <label className="ai-provider-chooser__default">
-              <input
-                checked={makeDefault}
-                data-testid={TestId.aiAssistant.providerMakeDefault}
-                onChange={(event) => setMakeDefault(event.target.checked)}
-                type="checkbox"
-              />
-              {t('aiAssistant.providerChip.makeDefault')}
-            </label>
-            <button
-              className="ai-provider-chooser__manage"
-              data-testid={TestId.aiAssistant.providerManage}
-              onClick={manage}
-              type="button"
-            >
-              {t('aiAssistant.providerChip.manage')}
-            </button>
-          </div>
-        </div>
+        <ProviderChooser choices={choices} onChoose={choose} onManage={manage} t={t} />
       </Popover>
     </>
   )

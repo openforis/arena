@@ -8,14 +8,9 @@ import type { AiHostingClass } from '@common/ai/policy'
 
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'
 import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
+import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-
-const iconByHostingClass: Record<AiHostingClass, string> = {
-  cloud: 'icon-cloud',
-  orgHosted: 'icon-office',
-  onDevice: 'icon-laptop',
-}
 
 type Props = {
   hostingClass: AiHostingClass | null
@@ -55,7 +50,7 @@ export const AiDataLocationBadge = (props: Props) => {
       title={title}
       data-testid={TestId.ai.dataLocationBadge}
     >
-      <span className={`icon ${iconByHostingClass[hostingClass]} icon-12px`} aria-hidden="true" />
+      <span className={`icon ${getHostingIconClass(hostingClass)} icon-12px`} aria-hidden="true" />
       {!compact && <span className="ai-data-location-badge__text">{text}</span>}
     </span>
   )
