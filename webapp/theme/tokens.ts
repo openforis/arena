@@ -1,6 +1,6 @@
 /**
  * Arena design tokens.
- * Color names follow the Material Design 3 / React Native Paper conventions; values mirror `webapp/style/themes.scss`.
+ * Color names follow the Material Design 3 conventions; values mirror `webapp/style/themes.scss`.
  */
 export const themeModes = {
   light: 'light',
