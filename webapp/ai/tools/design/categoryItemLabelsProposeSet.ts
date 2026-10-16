@@ -10,6 +10,7 @@ import * as Category from '@core/survey/category'
 import { CATEGORY_ITEM_LABEL_TEXT_MAX } from '@common/ai/categoryItemLabels'
 
 import { CATEGORY_ITEM_LABEL_SET } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeOperationDraft } from '@webapp/ai/changeSets/types'
 
 import { canEditCurrentSurvey } from '../common/toolPermissions'
@@ -37,6 +38,10 @@ const inputSchema = z.object({
 type CategoryLabelsInput = z.infer<typeof inputSchema>
 
 type CategoryLabelItem = CategoryLabelsInput['items'][number]
+
+// core/survey is untyped JS: getLanguages returns the codes array, default first
+const getSurveyLanguages = (survey: any): string[] =>
+  Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
 
 /**
  * Converts one proposed item to an operation draft.
@@ -78,6 +83,7 @@ const toDraft = (
     lang,
     text,
     expectedText: entry.labels[lang] ?? null,
+    source: findTranslationSource({ texts: entry.labels, lang, languages: getSurveyLanguages(survey) }),
   }
 }
 

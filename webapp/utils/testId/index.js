@@ -63,6 +63,7 @@ export const TestId = {
     changeSetRow: (nodeDefName) => `ai-assistant-change-set-row-${nodeDefName}`,
     changeSetRowStatus: 'ai-assistant-change-set-row-status',
     conflictReason: 'ai-assistant-conflict-reason',
+    translationSource: 'ai-assistant-translation-source',
     chooseProviderBtn: 'ai-assistant-choose-provider-btn',
     closeBtn: 'ai-assistant-close-btn',
     composerFooter: 'ai-assistant-composer-footer',

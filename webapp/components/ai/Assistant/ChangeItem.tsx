@@ -6,13 +6,16 @@ import type { OperationConflict, OperationResult } from '@webapp/ai/changeSets/t
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import type { CardValue } from './changeSetCardModel'
 import { CardValueView } from './CardValueView'
 import {
   getCategoryUuid,
   getConflictReasonText,
   getItemDetailLines,
   getItemLang,
+  getItemKind,
   getResultTitle,
+  hasCardValue,
   isCategoryItem,
 } from './changeItemModel'
 import type { ReviewItem } from './changeSetReviewModel'
@@ -69,6 +72,74 @@ export const ChangeItemConflict = ({ conflict }: { conflict: OperationConflict }
 }
 
 /**
+ * A language code, next to a text in that language.
+ * @param {object} props - Props.
+ * @param {string} props.lang - Language code.
+ * @returns {React.ReactElement} The tag.
+ */
+export const LangTag = ({ lang }: { lang: string }) => <code className="ai-change-item__lang">{lang}</code>
+
+/**
+ * The text a proposed translation overwrites, under the proposal; nothing when there was none.
+ * @param {object} props - Props.
+ * @param {CardValue|null} props.value - Current value.
+ * @returns {React.ReactElement|null} The line.
+ */
+export const ChangeItemReplaces = ({ value }: { value: CardValue | null }) => {
+  const t = useI18nT({ unescapeHtml: true })
+  if (!value || !hasCardValue(value)) return null
+  return (
+    <span className="ai-change-item__replaces">
+      {t('aiAssistant.card.replaces')}:{' '}
+      <s>
+        <CardValueView value={value} />
+      </s>
+    </span>
+  )
+}
+
+/**
+ * A translation on two lines: the original text, then the proposal (and the text it overwrites), each with its
+ * language.
+ * @param {object} props - Props.
+ * @param {ReviewItem} props.item - Translation (an item with a source).
+ * @returns {React.ReactElement|null} The pair.
+ */
+export const ChangeItemTranslationPair = ({ item }: { item: ReviewItem }) => {
+  const { source } = item
+  if (!source) return null
+  return (
+    <dl className="ai-change-item__pair">
+      <dt>
+        <LangTag lang={source.lang} />
+      </dt>
+      <dd className="ai-change-item__original" data-testid={TestId.aiAssistant.translationSource} lang={source.lang}>
+        {source.text}
+      </dd>
+      <dt>
+        <LangTag lang={getItemLang(item)} />
+      </dt>
+      <dd>
+        <CardValueView value={item.to} />
+        <ChangeItemReplaces value={item.from} />
+      </dd>
+    </dl>
+  )
+}
+
+/**
+ * What a change is about, next to its item: "Label", "Description", "Read only"...
+ * @param {object} props - Props.
+ * @param {ReviewItem} props.item - Node definition change.
+ * @returns {React.ReactElement} The tag.
+ */
+export const ChangeItemKind = ({ item }: { item: ReviewItem }) => {
+  const t = useI18nT({ unescapeHtml: true })
+  const kind = getItemKind(item)
+  return <span className="ai-change-item__kind">{t(kind.key, kind.params)}</span>
+}
+
+/**
  * What a new node definition sets besides its type, name and label (key, multiple, read only, the labels in other
  * languages, descriptions); nothing for other changes.
  * @param {object} props - Props.
@@ -94,8 +165,38 @@ export const ChangeItemDetails = ({ item }: { item: ReviewItem }) => {
 }
 
 /**
+ * What a card row changes: a translation shows the original text over the proposal; any other change its current
+ * value, an arrow and the proposed value.
+ * @param {object} props - Props.
+ * @param {ReviewItem} props.item - Change.
+ * @returns {React.ReactElement} The change.
+ */
+const CardRowChange = ({ item }: { item: ReviewItem }) => {
+  if (item.source) return <ChangeItemTranslationPair item={item} />
+  return (
+    <>
+      <div className="ai-assistant-card__diff">
+        {item.from && (
+          <>
+            <span className="ai-assistant-card__from">
+              <CardValueView value={item.from} />
+            </span>
+            <span aria-hidden="true">→</span>
+          </>
+        )}
+        <span className="ai-assistant-card__to">
+          <CardValueView value={item.to} />
+        </span>
+      </div>
+      <ChangeItemDetails item={item} />
+    </>
+  )
+}
+
+/**
  * One change of a card: checkbox (pending only), item, what changes, status and the change. A node definition change
- * shows the node definition's name; a category label shows the item and its language.
+ * shows the node definition's name; a category label shows the item. A translation shows what it is ("Label") and
+ * its languages on the original and proposed texts; other label changes show their language in the title.
  * @param {object} props - Props.
  * @param {ReviewItem} props.item - Change.
  * @param {boolean} props.pending - It can still be applied.
@@ -126,6 +227,7 @@ export const ChangeItemRow = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   const category = isCategoryItem(item)
+  const translation = Boolean(item.source)
   const lang = getItemLang(item)
   const title = category
     ? t('aiAssistant.card.categoryItem', { ref: item.name, level: item.detail ?? '' })
@@ -146,34 +248,14 @@ export const ChangeItemRow = ({
       )}
       <div className="ai-assistant-card__row-body">
         <div className="ai-assistant-card__row-title">
-          {category ? (
-            <>
-              <span>{title}</span>
-              <code>{lang}</code>
-            </>
-          ) : (
-            <>
-              <ChangeItemName exists={exists} name={item.name} onClick={onNameClick} />
-              <span>{title}</span>
-            </>
-          )}
+          {category && <span>{title}</span>}
+          {category && !translation && <code>{lang}</code>}
+          {!category && <ChangeItemName exists={exists} name={item.name} onClick={onNameClick} />}
+          {!category && (translation ? <ChangeItemKind item={item} /> : <span>{title}</span>)}
           {item.result && <ChangeItemStatus result={item.result} testId={TestId.aiAssistant.changeSetRowStatus} />}
         </div>
-        <div className="ai-assistant-card__diff">
-          {item.from && (
-            <>
-              <span className="ai-assistant-card__from">
-                <CardValueView value={item.from} />
-              </span>
-              <span aria-hidden="true">→</span>
-            </>
-          )}
-          <span className="ai-assistant-card__to">
-            <CardValueView value={item.to} />
-          </span>
-        </div>
+        <CardRowChange item={item} />
         {conflict && <ChangeItemConflict conflict={conflict} />}
-        <ChangeItemDetails item={item} />
       </div>
     </li>
   )
