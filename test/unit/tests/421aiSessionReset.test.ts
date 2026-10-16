@@ -101,6 +101,7 @@ describe('auth session (421)', () => {
         setAuthToken: (token) => void calls.push(`token ${token}`),
         resetAiSession: async () => void calls.push('reset AI'),
         log,
+        wait: async () => undefined,
       }),
     }
   }
