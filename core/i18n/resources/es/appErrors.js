@@ -212,6 +212,7 @@ export default {
     'El archivo de la encuesta es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
+  userPrefsInvalid: 'Las preferencias del usuario no son válidas',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
   userNotFound: 'Usuario no encontrado: {{userUuid}}',
   userNotInvitedToSurvey: 'El usuario no tiene ninguna invitación pendiente a esta encuesta',

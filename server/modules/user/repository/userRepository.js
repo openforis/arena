@@ -13,7 +13,11 @@ import * as AuthGroup from '@core/auth/authGroup'
 
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
-import { sqlPrefsParamWithoutServerOnlyKeys, sqlPrefsWithoutServerOnlyKeys } from '@server/modules/user/serverOnlyPrefs'
+import {
+  sqlPrefsParamIsObject,
+  sqlPrefsParamWithoutServerOnlyKeys,
+  sqlPrefsWithoutServerOnlyKeys,
+} from '@server/modules/user/serverOnlyPrefs'
 
 // the AI prefs (providers with their encrypted keys, usage) are never selected: only the AI services read them
 const selectFields = [
@@ -439,15 +443,24 @@ export const updatePassword = async ({ userUuid, password }, client = db) =>
 
 // ==== PREFS
 
-// mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it
+/**
+ * Merges the prefs of the user into the stored ones, without the server-only keys. Prefs that are not a JSON object
+ * (an array, a scalar) are not applied, since they would turn the stored prefs into one for good.
+ * @param {object} user - User with the prefs to merge.
+ * @param {object} [client] - Database client.
+ * @returns {Promise<object>} The user.
+ */
 export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
     UPDATE "user" u
-    SET prefs = prefs || ${sqlPrefsParamWithoutServerOnlyKeys('$1')}
+    SET prefs = CASE WHEN ${sqlPrefsParamIsObject('$1')}
+      THEN prefs || ${sqlPrefsParamWithoutServerOnlyKeys('$1')}
+      ELSE prefs END
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,
-    [A.omit([User.keysPrefs.mapCustomLayers], User.getPrefs(user)), User.getUuid(user)],
+    // sent as JSON text, so that the database decides whether it is an object (an array would be sent as an SQL array)
+    [JSON.stringify(User.getPrefs(user)), User.getUuid(user)],
     camelize
   )
 
