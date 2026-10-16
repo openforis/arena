@@ -6,7 +6,13 @@ import { surveyDefsReset } from '@webapp/store/survey/actions/actionTypes'
 import { updateSurveyInfoProps } from '@webapp/store/survey/surveyInfo/actions'
 
 describe('category labels suggestion events (239)', () => {
+  // the invalid save raises a notification whose auto-hide timer (10 s) would keep the jest worker alive
+  beforeEach(() => {
+    jest.useFakeTimers({ doNotFake: ['queueMicrotask', 'nextTick', 'setImmediate'] })
+  })
+
   afterEach(() => {
+    jest.useRealTimers()
     jest.restoreAllMocks()
   })
 
