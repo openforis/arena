@@ -364,6 +364,10 @@ export default class NodeDefsImportJob extends Job {
             [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
           }),
     }
+    const requiredIf = await this.parseRequiredIf({ nodeDef, type, multiple, collectNodeDef })
+    if (requiredIf) {
+      validations[NodeDefValidations.keys.requiredIf] = requiredIf
+    }
 
     if (type !== NodeDef.nodeDefType.entity) {
       const { validationRules, unique } = await this.parseValidationRules({ nodeDef, collectNodeDef })
@@ -406,6 +410,36 @@ export default class NodeDefsImportJob extends Job {
       }
     }
     return propsAdvanced
+  }
+
+  // Collect "requiredIf" (attribute required when a condition is met) -> Arena "required if" (single non-key attributes
+  // not always required only)
+  async parseRequiredIf({ nodeDef, type, multiple, collectNodeDef }) {
+    const requiredIfExpr = CollectSurvey.getAttribute('requiredIf')(collectNodeDef)
+    if (
+      StringUtils.isBlank(requiredIfExpr) ||
+      type === NodeDef.nodeDefType.entity ||
+      multiple ||
+      NodeDef.isKey(nodeDef) ||
+      CollectSurvey.getAttributeBoolean('required')(collectNodeDef)
+    ) {
+      return null
+    }
+    const requiredIfExprConverted = await CollectExpressionConverter.convert({
+      survey: this.survey,
+      nodeDefCurrent: nodeDef,
+      expression: requiredIfExpr,
+    })
+    const success = requiredIfExprConverted !== null
+    this.importIssues.push(
+      CollectImportReportItem.newReportItem({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        expressionType: CollectImportReportItem.exprTypes.requiredIf,
+        expression: requiredIfExpr,
+        resolved: success,
+      })
+    )
+    return success ? [NodeDefExpression.createExpression({ expression: requiredIfExprConverted })] : null
   }
 
   extractNodeDefSpecificProps(type, collectNodeDef) {

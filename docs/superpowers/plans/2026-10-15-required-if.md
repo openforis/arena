@@ -323,8 +323,9 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
   - Designer: the three exclusive options are shown for single non-key attributes; single entities keep the
     "Required" checkbox.
   - Required marker: in the survey designer (no record) only always-required attributes are marked.
-  - Publish (`RecordCheckJob`): node defs whose `requiredIf` changed get their `cReq` flags recomputed and their
-    attributes re-validated explicitly. Note: attributes of node defs with other validation-only changes are not
-    re-validated on publish (only their parent entities are); pre-existing behaviour, out of scope here.
-  - Collect/ODK import of conditional required: follow-up.
+  - Publish (`RecordCheckJob`): node defs whose `requiredIf` changed get their `cReq` flags recomputed. The attributes of
+    added/updated node defs and of node defs with changed validations are now re-validated (before only their parent
+    entities were, so existing values were not checked against new validation rules).
+  - Imports: Collect `requiredIf` and ODK `required` XPath expressions are converted into `requiredIf` (single non-key
+    attributes not always required; otherwise ignored or reported as unresolved).
 - **arena-mobile**: to do.

@@ -202,6 +202,7 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
       applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
       codeParent: 'Código padre',
       defaultValue: 'Valor predeterminado',
+      requiredIf: 'Obligatorio si',
       validationRule: 'Regla de validación',
     },
     title: 'Informe de importación de Collect',
