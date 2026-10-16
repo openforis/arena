@@ -310,3 +310,21 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 2. arena PR (bump core + UI + validators), then arena-server bump if it pins arena-core.
 3. arena-mobile dependency bump in the next app release.
 4. Follow-up: Collect/ODK import of conditional required.
+
+## Implementation status and changes from the plan
+
+- **arena-core** ([#476](https://github.com/openforis/arena-core/pull/476), released in 2.7.0):
+  - `cReq` follows the `cEdit`/`cVis` pattern: `Nodes.isChildRequired` (default `false`), only `true` values stored,
+    an emptied dictionary kept as `{}` (omitted when saved, see `metaKeysOmittedWhenEmpty`).
+  - The validator always evaluates the condition itself (no fallback logic): `cReq` is used only for display (required
+    marker, completion stats).
+  - `RecordNodesUpdater.updateRequiredFlags` used by the publish job.
+- **arena** (this branch):
+  - Designer: the three exclusive options are shown for single non-key attributes; single entities keep the
+    "Required" checkbox.
+  - Required marker: in the survey designer (no record) only always-required attributes are marked.
+  - Publish (`RecordCheckJob`): node defs whose `requiredIf` changed get their `cReq` flags recomputed and their
+    attributes re-validated explicitly. Note: attributes of node defs with other validation-only changes are not
+    re-validated on publish (only their parent entities are); pre-existing behaviour, out of scope here.
+  - Collect/ODK import of conditional required: follow-up.
+- **arena-mobile**: to do.
