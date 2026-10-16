@@ -3,6 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { ButtonIconInfo } from '@webapp/components/buttons'
 import { Checkbox } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import { State, useNodeDefEditReadOnly } from './store'
 
@@ -18,10 +19,12 @@ type GeoPropsProps = {
 const GeoProps = (props: GeoPropsProps) => {
   const { state, Actions } = props
   const readOnly = useNodeDefEditReadOnly()
+  // position tracking is experimental: shown only when EXPERIMENTAL_FEATURES is enabled
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
   const nodeDef = State.getNodeDef(state)
 
-  if (!NodeDef.canBePositionTracking(nodeDef)) return null
+  if (!experimentalFeatures || !NodeDef.canBePositionTracking(nodeDef)) return null
 
   return (
     <FormItem label="nodeDefEdit.geoProps.positionTracking">
