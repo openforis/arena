@@ -3,6 +3,7 @@ import {
   MAX_SURVEY_BUCKETS,
   emptySuggestionState,
   normalizeSuggestionState,
+  parseSuggestionState,
   shrinkSuggestionState,
   type SuggestionUserState,
 } from '@webapp/ai/suggestions/suggestionState'
@@ -79,7 +80,7 @@ describe('suggestion state bounds (425)', () => {
     const normalized = normalizeSuggestionState(withHelp, NOW)
     const surveyBuckets = Object.keys(normalized.pending).filter((bucket) => bucket !== 'help')
     expect(surveyBuckets).toHaveLength(MAX_SURVEY_BUCKETS)
-    // bucket keys are survey ids, kept in ascending order: the lowest ids (the oldest surveys) go
+    // buckets without a write time (stored by an older version) count as the oldest: the lowest ids go first
     expect(surveyBuckets.at(-1)).toBe(String(MAX_SURVEY_BUCKETS + 5))
     expect(surveyBuckets).not.toContain('1')
     expect(normalized.pending.help).toHaveLength(1)
@@ -93,6 +94,36 @@ describe('suggestion state bounds (425)', () => {
     expect(surveyBuckets).toHaveLength(MAX_SURVEY_BUCKETS)
     expect(surveyBuckets).toContain('1')
     expect(surveyBuckets).not.toContain('2')
+  })
+
+  test('past the cap the least recently written bucket goes, not the lowest survey id', () => {
+    const state = manyBuckets(MAX_SURVEY_BUCKETS + 1)
+    // every bucket was written later than the previous one, except survey 1: the one used last
+    const touchedAt = Object.fromEntries(
+      bucketKeys(MAX_SURVEY_BUCKETS + 1).map((bucket) => [bucket, 1000 + Number(bucket)])
+    )
+    touchedAt['1'] = 9000
+    const normalized = normalizeSuggestionState({ ...state, touchedAt }, NOW)
+    const surveyBuckets = Object.keys(normalized.pending)
+    expect(surveyBuckets).toContain('1')
+    expect(surveyBuckets).not.toContain('2')
+    expect(Object.keys(normalized.dismissed)).not.toContain('2')
+    expect(Object.keys(normalized.touchedAt ?? {})).not.toContain('2')
+  })
+
+  test('a bucket without a write time is older than any bucket that has one', () => {
+    const state = manyBuckets(MAX_SURVEY_BUCKETS + 1)
+    const normalized = normalizeSuggestionState({ ...state, touchedAt: { '1': 5, '2': 6 } }, NOW)
+    // survey 3 has no time: it goes before 1 and 2
+    expect(Object.keys(normalized.pending)).not.toContain('3')
+    expect(Object.keys(normalized.pending)).toContain('1')
+  })
+
+  test('the times are read from the stored state; a state stored without them still parses', () => {
+    const base = { pending: {}, dismissed: {}, inProgress: {}, seenModules: [] }
+    expect(parseSuggestionState(JSON.stringify(base))).toEqual(emptySuggestionState())
+    const parsed = parseSuggestionState(JSON.stringify({ ...base, touchedAt: { '1': 5, '2': 'x', '3': null } }))
+    expect(parsed.touchedAt).toEqual({ '1': 5 })
   })
 
   test('targets are not capped in normal operation: they mirror the survey, and the bucket cap is the bound', () => {
@@ -277,5 +308,52 @@ describe('large surveys keep every live target and every dismissal (425)', () =>
     const keys = store.getPending({ userUuid, surveyId: 1 })[0].targets.map((target) => target.key)
     expect(keys).toHaveLength(250)
     expect(keys).toContain('entry-249')
+  })
+})
+
+describe('the bucket cap keeps the surveys in use (425)', () => {
+  const userUuid = 'u1'
+  const data = new Map<string, string>()
+  const makeStore = (clock: { time: number }) =>
+    createSuggestionStore({
+      access: {
+        getStorage: () => ({
+          getItem: (key: string) => data.get(key) ?? null,
+          setItem: (key: string, value: string) => void data.set(key, value),
+          removeItem: (key: string) => void data.delete(key),
+        }),
+        addStorageListener: () => () => undefined,
+      },
+      now: () => new Date(clock.time),
+      log: () => undefined,
+    })
+
+  beforeEach(() => data.clear())
+
+  test('the oldest survey goes even when its id is the highest, and the one written again stays', () => {
+    const clock = { time: NOW.getTime() }
+    const store = makeStore(clock)
+    // survey ids 100 down to 81, written one hour apart: 100 is the oldest
+    for (let index = 0; index < MAX_SURVEY_BUCKETS; index += 1) {
+      store.add({ userUuid, suggestion: suggestion({ surveyId: 100 - index }) })
+      clock.time += 2 * 60 * 60 * 1000
+    }
+    // survey 100 is used again, then a new survey arrives
+    store.add({ userUuid, suggestion: suggestion({ id: 'dataImported:latest', kind: 'dataImported', surveyId: 100 }) })
+    clock.time += 2 * 60 * 60 * 1000
+    store.add({ userUuid, suggestion: suggestion({ surveyId: 1 }) })
+    expect(store.getPending({ userUuid, surveyId: 100 }).length).toBeGreaterThan(0)
+    expect(store.getPending({ userUuid, surveyId: 99 })).toEqual([])
+    expect(store.getPending({ userUuid, surveyId: 1 }).length).toBeGreaterThan(0)
+  })
+
+  test('a write that changes nothing does not write again within the hour', () => {
+    const clock = { time: NOW.getTime() }
+    const store = makeStore(clock)
+    store.add({ userUuid, suggestion: suggestion() })
+    const before = data.get(getSuggestionsKey(userUuid))
+    clock.time += 60 * 1000
+    store.add({ userUuid, suggestion: suggestion() })
+    expect(data.get(getSuggestionsKey(userUuid))).toBe(before)
   })
 })

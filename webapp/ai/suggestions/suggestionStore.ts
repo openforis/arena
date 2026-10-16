@@ -21,6 +21,7 @@ import {
   parseSuggestionState,
   selectVisible,
   shrinkSuggestionState,
+  withBucketTouched,
   toBucket,
   withAdded,
   withDismissed,
@@ -180,7 +181,7 @@ export const createSuggestionStore = ({
     const key = getSuggestionsKey(userUuid)
     const current = parse(storage.read(key))
     const options = { keepBucket }
-    const next = normalizeSuggestionState(change(current), now(), options)
+    const next = normalizeSuggestionState(withBucketTouched(change(current), keepBucket, now()), now(), options)
     const json = JSON.stringify(next)
     if (json === JSON.stringify(current)) return
     storage.write(key, json, (level) => {

@@ -14,9 +14,11 @@ import {
   type SuggestionUserState,
 } from './types'
 
-// surveys with stored suggestions (Help does not count); the survey being written is never dropped
+// surveys with stored suggestions (Help does not count); the survey being written is never dropped, the least
+// recently written one goes
 export const MAX_SURVEY_BUCKETS = 20
 export const MAX_SEEN_MODULES = 50
+const TOUCH_PRECISION_MS = 60 * 60 * 1000
 
 type Limits = { buckets: number; targets: number; dismissed: number; modules: number }
 
@@ -50,18 +52,27 @@ const mapEntries = <T>(record: Record<string, T>, change: (value: T, key: string
 }
 
 /**
- * Keeps the last `max` survey buckets of a record. Bucket keys are survey ids, which a JS object keeps in ascending
- * order, so the dropped ones are the lowest ids (the oldest surveys), except the Help bucket and the bucket in use.
+ * Keeps the `max` most recently written survey buckets of a record, except that the Help bucket and the bucket in use
+ * are never dropped. A bucket without a time (stored by an older version) counts as the oldest; among equals the
+ * lowest survey id goes first.
  * @param {Record<string, T>} record - Record by bucket.
  * @param {number} max - Survey buckets to keep.
  * @param {string|null} keepBucket - A bucket that is never dropped.
+ * @param {Record<string, number>|undefined} touchedAt - When each bucket was last written.
  * @returns {Record<string, T>} The record.
  */
-const capBuckets = <T>(record: Record<string, T>, max: number, keepBucket: string | null): Record<string, T> => {
+const capBuckets = <T>(
+  record: Record<string, T>,
+  max: number,
+  keepBucket: string | null,
+  touchedAt: Record<string, number> | undefined
+): Record<string, T> => {
   const surveyBuckets = Object.keys(record).filter((bucket) => bucket !== HELP_BUCKET)
   const excess = surveyBuckets.length - max
   if (excess <= 0) return record
-  const dropped = new Set(surveyBuckets.filter((bucket) => bucket !== keepBucket).slice(0, excess))
+  const timeOf = (bucket: string): number => touchedAt?.[bucket] ?? 0
+  const oldestFirst = surveyBuckets.filter((bucket) => bucket !== keepBucket).sort((a, b) => timeOf(a) - timeOf(b))
+  const dropped = new Set(oldestFirst.slice(0, excess))
   return Object.fromEntries(Object.entries(record).filter(([bucket]) => !dropped.has(bucket)))
 }
 
@@ -122,6 +133,22 @@ const capPendingTargets = (suggestions: AssistantSuggestion[], max: number): Ass
 }
 
 /**
+ * Drops the times of the buckets the state no longer holds.
+ * @param {Record<string, number>|undefined} touchedAt - Times by bucket.
+ * @param {Record<string, unknown>[]} records - The records by bucket the state holds.
+ * @returns {Record<string, number>|undefined} The times (the same record when all are kept; undefined when none is).
+ */
+const pruneTouchedAt = (
+  touchedAt: Record<string, number> | undefined,
+  records: Record<string, unknown>[]
+): Record<string, number> | undefined => {
+  if (!touchedAt) return touchedAt
+  const kept = Object.entries(touchedAt).filter(([bucket]) => records.some((record) => bucket in record))
+  if (kept.length === Object.keys(touchedAt).length) return touchedAt
+  return kept.length > 0 ? Object.fromEntries(kept) : undefined
+}
+
+/**
  * Applies limits to a state (the same object when it already fits).
  * @param {SuggestionUserState} state - State.
  * @param {Date} now - Now (expiry).
@@ -143,30 +170,35 @@ const applyLimits = (
       return alive && capPendingTargets(alive, targetsOf(bucket))
     }),
     limits.buckets,
-    keepBucket
+    keepBucket,
+    state.touchedAt
   )
   const dismissed = capBuckets(
     mapEntries(state.dismissed, (ids, bucket) =>
       mapEntries(ids, (entry, id) => capDismissed(entry, limits.dismissed, pendingKeysOf(state.pending[bucket], id)))
     ),
     limits.buckets,
-    keepBucket
+    keepBucket,
+    state.touchedAt
   )
   const inProgress = capBuckets(
     mapEntries(state.inProgress, (ids, bucket) =>
       mapEntries<InProgressEntry>(ids, (entry) => capTargets(entry, targetsOf(bucket)))
     ),
     limits.buckets,
-    keepBucket
+    keepBucket,
+    state.touchedAt
   )
   const seenModules =
     state.seenModules.length > limits.modules ? state.seenModules.slice(-limits.modules) : state.seenModules
+  const touchedAt = pruneTouchedAt(state.touchedAt, [pending, dismissed, inProgress])
   const unchanged =
     pending === state.pending &&
     dismissed === state.dismissed &&
     inProgress === state.inProgress &&
-    seenModules === state.seenModules
-  return unchanged ? state : { pending, dismissed, inProgress, seenModules }
+    seenModules === state.seenModules &&
+    touchedAt === state.touchedAt
+  return unchanged ? state : { pending, dismissed, inProgress, seenModules, ...(touchedAt ? { touchedAt } : {}) }
 }
 
 /**
@@ -207,5 +239,29 @@ export const shrinkSuggestionState = (
     const kept = keepBucket === null ? undefined : tight.dismissed[keepBucket]
     return { ...tight, dismissed: kept ? { [keepBucket as string]: kept } : {} }
   }
-  return { ...emptySuggestionState(), inProgress: tight.inProgress, seenModules: tight.seenModules }
+  return {
+    ...emptySuggestionState(),
+    inProgress: tight.inProgress,
+    seenModules: tight.seenModules,
+    ...(tight.touchedAt ? { touchedAt: tight.touchedAt } : {}),
+  }
+}
+
+/**
+ * Records that a bucket was just written, at hour precision: a write that keeps the time of the last hour leaves the
+ * state as it is, so an update that changes nothing stays a no-op.
+ * @param {SuggestionUserState} state - State.
+ * @param {string|null} bucket - The bucket written (null: none).
+ * @param {Date} now - Now.
+ * @returns {SuggestionUserState} The state (the same object when the time is recent enough).
+ */
+export const withBucketTouched = (
+  state: SuggestionUserState,
+  bucket: string | null,
+  now: Date
+): SuggestionUserState => {
+  if (bucket === null || bucket === HELP_BUCKET) return state
+  const last = state.touchedAt?.[bucket]
+  if (last !== undefined && now.getTime() - last < TOUCH_PRECISION_MS) return state
+  return { ...state, touchedAt: { ...state.touchedAt, [bucket]: now.getTime() } }
 }
