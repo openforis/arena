@@ -1,5 +1,3 @@
-@use '~@webapp/style/vars' as *;
-
 @import 'leaflet/dist/leaflet.css';
 @import 'maplibre-gl/dist/maplibre-gl.css';
 
@@ -128,7 +126,7 @@
     .leaflet-control-layers-group-label {
       font-size: 0.68rem;
       font-weight: 700;
-      color: $colorOnSurfaceVariant;
+      color: var(--color-on-surface-variant);
       padding: 5px 0 2px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -136,7 +134,7 @@
       &:not(:first-child) {
         margin-top: 4px;
         padding-top: 6px;
-        border-top: 1px solid $colorOutline;
+        border-top: 1px solid var(--color-outline);
       }
     }
 

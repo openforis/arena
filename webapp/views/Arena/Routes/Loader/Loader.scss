@@ -6,7 +6,7 @@
   height: 100vh;
   left: 0;
   top: 0;
-  background-color: with-alpha($colorScrim, 0.1);
+  background-color: $colorScrim;
   z-index: $zIndex190AppLoader;
 }
 

@@ -23,13 +23,13 @@ type UseThemeModeResult = {
  * @returns {UseThemeModeResult} Theme preference, mode and setter.
  */
 export const useThemeMode = (): UseThemeModeResult => {
-  const [preference, setPreferenceState] = useState<ThemePreference>(getThemePreference)
+  const [preference, setPreference] = useState<ThemePreference>(getThemePreference)
   const [mode, setMode] = useState<ThemeMode>(() => resolveThemeMode(preference))
 
   useEffect(() => {
     const onThemeChange = () => {
       const preferenceNext = getThemePreference()
-      setPreferenceState(preferenceNext)
+      setPreference(preferenceNext)
       setMode(resolveThemeMode(preferenceNext))
     }
     window.addEventListener(themeChangeEventType, onThemeChange)
@@ -41,7 +41,7 @@ export const useThemeMode = (): UseThemeModeResult => {
     return onSystemThemeModeChange(() => setMode(resolveThemeMode(preference)))
   }, [preference])
 
-  const setPreference = useCallback((preferenceNext: ThemePreference) => storeThemePreference(preferenceNext), [])
+  const updatePreference = useCallback((preferenceNext: ThemePreference) => storeThemePreference(preferenceNext), [])
 
-  return { mode, preference, setPreference }
+  return { mode, preference, setPreference: updatePreference }
 }
