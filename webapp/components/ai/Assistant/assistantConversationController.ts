@@ -290,6 +290,8 @@ export const createAssistantConversationController = (
     const token = loadToken
     const load = readSelected(conversationStore, { scope, conversationId }).then(({ loaded, decision }) => {
       if (token !== loadToken || panel.getState().conversationId !== conversationId) return
+      // a turn that started or ended meanwhile already set this conversation: the stored copy read earlier is older
+      if (state.conversation?.id === conversationId) return
       if (decision === 'show' && loaded) {
         set({ conversation: normalizeLoadedConversation(loaded, running?.conversationId === loaded.id) })
       } else if (decision === 'forget') {
@@ -501,8 +503,9 @@ export const createAssistantConversationController = (
       // dropped when a newer request started, or the scope changed meanwhile
       if (request === historyRequest && key === scopeKey)
         set({ history: all.filter((item) => item.area === scope.area) })
-    } catch {
+    } catch (error) {
       // the list stays as it was
+      logAiWarning('The conversation list could not be read', error)
     }
   }
 
@@ -519,9 +522,14 @@ export const createAssistantConversationController = (
     if (!conversationStore) return
     // a failure leaves the list as it was and reaches the caller, who tells the user
     await conversationStore.remove(id, userUuid)
-    // a deleted Do it conversation can never settle: its suggestion targets show again
-    suggestions.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
     set({ history: state.history.filter((item) => item.id !== id) })
+    try {
+      // a deleted Do it conversation can never settle: its suggestion targets show again
+      suggestions.onConversationSettled({ userUuid, conversationId: id, outcome: 'failed' })
+    } catch (error) {
+      // the conversation is deleted: the caller must not be told it failed
+      logAiWarning('The suggestions of a deleted conversation could not be updated', error)
+    }
     if (panel.getState().conversationId !== id) return
     // forgets it as the area's open conversation (home page), then back to the list
     panel.setConversationId(null)
