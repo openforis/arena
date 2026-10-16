@@ -21,6 +21,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import { ThemeButtonMenu } from '@webapp/components/ThemeButtonMenu'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useHasMessageNotifications } from '@webapp/store/ui'
 
@@ -28,7 +29,6 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
-import { ThemeButtonMenu } from './ThemeButtonMenu'
 import UserPopupMenu from './UserPopupMenu'
 
 const Header = () => {
