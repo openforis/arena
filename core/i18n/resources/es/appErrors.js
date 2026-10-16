@@ -181,6 +181,7 @@ export default {
   userInvalid: 'Usuario inválido',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
+  userPrefsInvalid: 'Las preferencias del usuario no son válidas',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
   userNotFound: 'Usuario no encontrado: {{userUuid}}',
 }

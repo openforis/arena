@@ -13,9 +13,10 @@ import * as User from '@core/user/user'
 import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
+import { isValidPrefsUpdate } from '../serverOnlyPrefs'
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { buildCurrentUserGroupBody } from './currentUserGroupBody'
@@ -411,6 +412,10 @@ export const init = (app) => {
 
       if (!User.isEqual(userToUpdate)(user)) {
         throw new SystemError('userNotAllowedToChangePref')
+      }
+      // an array or a scalar would replace the stored prefs object for good
+      if (!isValidPrefsUpdate(User.getPrefs(userToUpdate))) {
+        throw new SystemError('userPrefsInvalid', {}, StatusCodes.BAD_REQUEST)
       }
 
       await UserService.updateUserPrefs(userToUpdate)

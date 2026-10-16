@@ -1,3 +1,5 @@
+import type { Node } from '@openforis/arena-core'
+
 import {
   getNodeRecordMismatchError,
   requireNodeBelongsToRecord,
@@ -6,7 +8,7 @@ import {
 
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 
-const nodeOf = (recordUuid: string | undefined) => ({ uuid: 'node-1', recordUuid, value: 5 })
+const nodeOf = (recordUuid: string | undefined) => ({ uuid: 'node-1', recordUuid, value: 5 }) as unknown as Node
 
 const run = (urlRecordUuid: string, node: unknown) => {
   const req: any = {

@@ -2,6 +2,8 @@
  * Types, limits and result helpers of the batch record edit (POST /api/survey/:surveyId/records/nodes/update).
  */
 
+import type { User } from '@openforis/arena-core'
+
 export const NodesBatchEditStatus = {
   applied: 'applied',
   conflict: 'conflict',
@@ -39,7 +41,7 @@ export type NodesBatchRequest = { cycle: string; edits: NodesBatchEdit[] }
 export type NodesBatchPersistMessage = {
   type: string
   requestId: string
-  user: any
+  user: User
   surveyId: number
   cycle: string
   draft: false

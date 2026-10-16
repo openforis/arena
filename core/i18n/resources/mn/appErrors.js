@@ -171,6 +171,7 @@ export default {
   userInvalid: 'Хэрэглэгч буруу байна',
   userIsAdmin: 'Өгөгдсөн хэрэглэгч аль хэдийн системийн администратор байна',
   userNotAllowedToChangePref: 'Хэрэглэгч тохиргоог өөрчлөх боломжгүй',
+  userPrefsInvalid: 'Хэрэглэгчийн тохиргоо буруу байна',
   userNotAuthorized: 'Хэрэглэгч {{userName}} эрхгүй байна',
   userNotFound: 'Хэрэглэгч олдсонгүй: {{userUuid}}',
 }

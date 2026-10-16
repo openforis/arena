@@ -1,6 +1,7 @@
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
+import type { Node as ArenaNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import * as Authorizer from '@core/auth/authorizer'
@@ -30,9 +31,13 @@ const lockTimeoutErrorKey = 'record.lockTimeout'
 type ThreadMessage = { type: string; content: unknown }
 
 export type NodesBatchProcessorDeps = {
-  getSurvey: (msg: NodesBatchPersistMessage) => Promise<any>
+  getSurvey: (msg: NodesBatchPersistMessage) => Promise<ArenaSurvey>
   runWithRecordLock: <T>(recordUuid: string, fn: (t: any) => Promise<T>) => Promise<T>
-  getOrFetchRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string; t: any }) => Promise<any | null>
+  getOrFetchRecord: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    t: any
+  }) => Promise<ArenaRecord | null>
   // step and owner as they are in the database: the thread cache does not see their changes
   fetchRecordStepAndOwner: (params: {
     msg: NodesBatchPersistMessage
@@ -40,18 +45,23 @@ export type NodesBatchProcessorDeps = {
     t: any
   }) => Promise<{ step: string; ownerUuid: string } | null>
   // the group qualifier filters of the user (the same rule as the request check, see the batch service)
-  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: any; t: any }) => Promise<any>
+  fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: any }) => Promise<any>
   recordMatchesQualifierFilters: (params: {
-    survey: any
-    record: any
+    survey: ArenaSurvey
+    record: ArenaRecord
     qualifierFilters: any
-    pendingNode: any
+    pendingNode: ArenaNode | null
     canEditQualifierValue: boolean
   }) => boolean
   // uuid of the record owning the node, or null when the node does not exist (in any record)
   findNodeRecordUuid: (params: { msg: NodesBatchPersistMessage; nodeUuid: string; t: any }) => Promise<string | null>
   persistNode: (params: Record<string, unknown>, t: any) => Promise<any>
-  cacheRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string; record: any; t: any }) => Promise<void>
+  cacheRecord: (params: {
+    msg: NodesBatchPersistMessage
+    recordUuid: string
+    record: ArenaRecord
+    t: any
+  }) => Promise<void>
   clearCachedRecord: (params: { msg: NodesBatchPersistMessage; recordUuid: string }) => Promise<void>
   postMessage: (message: ThreadMessage) => void
   logError: (message: string) => void
@@ -62,7 +72,7 @@ export type NodesBatchProcessorDeps = {
 type BatchState = {
   msg: NodesBatchPersistMessage
   deps: NodesBatchProcessorDeps
-  survey: any
+  survey: ArenaSurvey
   // loaded inside the lock, with the record
   qualifierFilters: any
   // results of the edits refused by the check (conflicts, not editable): kept when the record rolls back
@@ -118,8 +128,8 @@ const persistEdit = async ({
   t,
 }: {
   state: BatchState
-  record: any
-  node: any
+  record: ArenaRecord
+  node: ArenaNode
   edit: NodesBatchRecordEdit
   t: any
 }) => {
@@ -169,7 +179,7 @@ const refineMissingNodeResult = async ({
   t,
 }: {
   state: BatchState
-  record: any
+  record: ArenaRecord
   edit: NodesBatchRecordEdit
   result: NodesBatchEditResult
   t: any
@@ -207,7 +217,7 @@ const assertBeforeDeadline = (state: BatchState): void => {
  * @param {object|null} pendingNode - The node with its new value, or null.
  * @returns {boolean} Whether the record matches.
  */
-const matchesQualifiers = (state: BatchState, record: any, pendingNode: any): boolean => {
+const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: ArenaNode | null): boolean => {
   const { msg, deps, survey, qualifierFilters } = state
   return deps.recordMatchesQualifierFilters({
     survey,
@@ -225,7 +235,7 @@ const matchesQualifiers = (state: BatchState, record: any, pendingNode: any): bo
  * @param {object} record - The record.
  * @returns {boolean} Whether the user may edit the record.
  */
-const isRecordEditAllowed = (state: BatchState, record: any): boolean =>
+const isRecordEditAllowed = (state: BatchState, record: ArenaRecord): boolean =>
   Authorizer.canEditRecord(state.msg.user, withSurveyUuid(record, state.survey)) &&
   matchesQualifiers(state, record, null)
 
@@ -237,7 +247,7 @@ const isRecordEditAllowed = (state: BatchState, record: any): boolean =>
  * @param {object} t - The transaction.
  * @returns {Promise<object|null>} The record for the permission check, or null when it no longer exists.
  */
-const withFreshStepAndOwner = async (state: BatchState, record: any, t: any): Promise<any | null> => {
+const withFreshStepAndOwner = async (state: BatchState, record: ArenaRecord, t: any): Promise<ArenaRecord | null> => {
   const { msg, deps } = state
   const fresh = await deps.fetchRecordStepAndOwner({ msg, recordUuid: msg.recordUuid, t })
   if (!fresh) return null
@@ -260,10 +270,10 @@ const applyEdit = async ({
   t,
 }: {
   state: BatchState
-  record: any
+  record: ArenaRecord
   edit: NodesBatchRecordEdit
   t: any
-}): Promise<any> => {
+}): Promise<ArenaRecord> => {
   const { msg, survey, refusedResults, appliedEdits } = state
   const check = checkBatchEdit({ survey, record, recordUuid: msg.recordUuid, edit })
   if (check.ok === false) {

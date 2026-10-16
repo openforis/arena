@@ -170,6 +170,7 @@ Try to refresh the page.`,
   userInvalid: 'Invalid user',
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
+  userPrefsInvalid: 'The user preferences are not valid',
   userNotAuthorized: 'User {{userName}} is not authorized',
   userNotFound: 'User not found: {{userUuid}}',
 }

@@ -174,6 +174,7 @@ export default {
   userInvalid: '無効なユーザーです',
   userIsAdmin: 'このユーザーは既にシステム管理者です',
   userNotAllowedToChangePref: 'このユーザーは設定を変更する権限がありません',
+  userPrefsInvalid: 'ユーザー設定が無効です',
   userNotAuthorized: 'ユーザー{{userName}}には権限がありません',
   userNotFound: 'ユーザーが見つかりません：{{userUuid}}',
 }

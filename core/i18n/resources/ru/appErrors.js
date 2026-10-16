@@ -173,6 +173,7 @@ export default {
   userInvalid: 'Неверный пользователь',
   userIsAdmin: 'Данный пользователь уже является системным администратором',
   userNotAllowedToChangePref: 'Пользователю не разрешено изменять настройки',
+  userPrefsInvalid: 'Настройки пользователя недопустимы',
   userNotAuthorized: 'Пользователь {{userName}} не авторизован',
   userNotFound: 'Пользователь не найден: {{userUuid}}',
 }
