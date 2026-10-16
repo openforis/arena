@@ -1,10 +1,10 @@
 @use '~@webapp/style/vars' as *;
 
 .guest-errors {
-  background-color: $red;
+  background-color: $colorError;
   font-size: 0.9rem;
   font-weight: 600;
-  color: white;
+  color: $colorOnPrimary;
   padding: 0.5rem;
   position: fixed;
   width: 30vw;

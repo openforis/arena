@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .survey-compare {
   display: flex;
   flex-direction: column;
@@ -31,7 +33,7 @@
     flex-wrap: wrap;
     gap: 0.5rem;
     font-size: 0.75rem;
-    color: #666;
+    color: $colorOnSurfaceVariant;
   }
 
   // rows share the grid columns, so the values are aligned
@@ -60,11 +62,11 @@
   }
 
   &__fingerprint--equal {
-    color: #2e7d32;
+    color: $colorSuccess;
   }
 
   &__fingerprint--different {
-    color: #c62828;
+    color: $colorError;
   }
 
   &__apply-btn {
@@ -75,7 +77,7 @@
   &__row-type,
   &__row-note,
   &__details-info {
-    color: #666;
+    color: $colorOnSurfaceVariant;
     font-size: 0.85rem;
   }
 
@@ -150,15 +152,15 @@
     }
 
     &--added {
-      border-left-color: #4caf50;
+      border-left-color: $colorSuccess;
     }
 
     &--changed {
-      border-left-color: #ff9800;
+      border-left-color: $colorWarning;
     }
 
     &--removed {
-      border-left-color: #f44336;
+      border-left-color: $colorError;
     }
 
     &--layout-only {
@@ -194,18 +196,18 @@
     padding: 0 0.4rem;
     border-radius: 0.75rem;
     font-size: 0.75rem;
-    color: #fff;
+    color: $colorOnPrimary;
 
     &--added {
-      background-color: #4caf50;
+      background-color: $colorSuccess;
     }
 
     &--changed {
-      background-color: #ff9800;
+      background-color: $colorWarning;
     }
 
     &--removed {
-      background-color: #f44336;
+      background-color: $colorError;
     }
   }
 
@@ -223,7 +225,7 @@
 
   &__details-empty {
     padding: 1rem;
-    color: #666;
+    color: $colorOnSurfaceVariant;
   }
 
   &__reasons {
@@ -231,11 +233,11 @@
     padding-left: 1.25rem;
 
     &--error {
-      color: #c62828;
+      color: $colorError;
     }
 
     &--warning {
-      color: #ef6c00;
+      color: $colorWarning;
     }
   }
 
@@ -260,7 +262,7 @@
   &__prop-group {
     margin-left: 0.4rem;
     font-size: 0.75rem;
-    color: #666;
+    color: $colorOnSurfaceVariant;
   }
 
   &__value {
@@ -273,7 +275,7 @@
   }
 
   &__value-label {
-    color: #666;
+    color: $colorOnSurfaceVariant;
   }
 
   &__value-code {
@@ -288,7 +290,7 @@
 
   &__value-empty {
     font-style: italic;
-    color: #666;
+    color: $colorOnSurfaceVariant;
   }
 
   &__source {
@@ -322,14 +324,14 @@
 .survey-compare__deletion-note {
   padding: 0 0.4rem;
   border-radius: 4px;
-  background-color: #d32f2f;
-  color: #fff;
+  background-color: $colorError;
+  color: $colorOnPrimary;
   font-size: 0.75rem;
   font-weight: 600;
 }
 
 .survey-compare__deletion-info {
   margin: 0.5rem 0;
-  color: #d32f2f;
+  color: $colorError;
   font-size: 0.9rem;
 }

@@ -18,7 +18,7 @@ $tableFooterHeight: 30px;
   .table__content {
     position: relative;
     padding: 10px;
-    background-color: $white;
+    background-color: $colorSurface;
     height: calc(100% - #{$tableHeaderHeight});
     border: $tableRowBorder;
   }
@@ -68,7 +68,7 @@ $tableFooterHeight: 30px;
       font-size: 0.7rem;
 
       &.active {
-        background-color: $orangeLight;
+        background-color: $colorWarningContainer;
       }
     }
   }
@@ -82,19 +82,19 @@ $tableFooterHeight: 30px;
     }
 
     &:hover {
-      background-color: rgba($blueLight, 0.3);
+      background-color: with-alpha($colorPrimaryContainer, 0.3);
 
       .icon-action {
-        color: $orange;
+        color: $colorWarning;
       }
     }
   }
 
   .table__row.active {
-    background-color: $yellowHighlight;
+    background-color: $colorHighlightContainer;
 
     .icon-action {
-      color: $orange;
+      color: $colorWarning;
     }
   }
 
@@ -105,8 +105,8 @@ $tableFooterHeight: 30px;
   .table__row-header {
     @extend .table__row;
     border-bottom: none;
-    background-color: $black;
-    color: white;
+    background-color: $colorInverseSurface;
+    color: $colorInverseOnSurface;
     font-weight: 600;
     overflow: hidden;
     padding-right: 16px;
@@ -145,7 +145,7 @@ $tableFooterHeight: 30px;
       min-width: 100px;
       text-align: center;
       font-weight: 600;
-      color: rgba($black, 0.8);
+      color: with-alpha($colorOnSurface, 0.8);
     }
   }
 

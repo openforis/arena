@@ -26,7 +26,7 @@
     max-width: 100%;
     object-fit: contain;
     align-self: center;
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
     border-radius: 4px;
   }
 
@@ -39,13 +39,13 @@
   .whats-new-slide__title {
     font-size: 1.2rem;
     font-weight: 600;
-    color: $colorTextPrimary;
+    color: $colorOnPrimaryContainer;
   }
 
   .whats-new-slide__experimental-badge {
     padding: 0.1rem 0.5rem;
     border-radius: 1rem;
-    background-color: $orangeLight;
+    background-color: $colorWarningContainer;
     font-size: 0.75rem;
     text-transform: uppercase;
   }
@@ -56,6 +56,6 @@
 
   .whats-new-slide__version {
     font-size: 0.8rem;
-    color: color-mix(in srgb, $black 60%, transparent);
+    color: color-mix(in srgb, $colorOnSurface 60%, transparent);
   }
 }

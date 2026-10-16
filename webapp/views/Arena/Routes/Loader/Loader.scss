@@ -6,7 +6,7 @@
   height: 100vh;
   left: 0;
   top: 0;
-  background-color: rgba($black, 0.1);
+  background-color: $colorScrim;
   z-index: $zIndex190AppLoader;
 }
 
@@ -57,7 +57,7 @@
     margin: 0;
     width: 80px;
     height: 80px;
-    background-color: $green;
+    background-color: $colorSuccess;
     border-radius: 100%;
     -webkit-animation: ball-scale-multiple 1s 0s linear infinite;
     animation: ball-scale-multiple 1s 0s linear infinite;

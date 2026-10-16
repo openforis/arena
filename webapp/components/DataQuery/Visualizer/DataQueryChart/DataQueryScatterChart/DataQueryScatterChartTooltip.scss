@@ -1,8 +1,10 @@
+@use '~@webapp/style/vars' as *;
+
 .data-query-chart-custom-tooltip {
   display: flex;
   flex-direction: column;
   border: 1px solid lightgrey;
-  background-color: white;
+  background-color: $colorSurface;
 
   .tooltip-form-item {
     display: flex;

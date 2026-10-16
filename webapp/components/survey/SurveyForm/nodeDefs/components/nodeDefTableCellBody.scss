@@ -46,7 +46,7 @@
   }
 
   .survey-form__node-def-table-cell-lock-btn {
-    background-color: rgba($white, 0.75);
+    background-color: with-alpha($colorSurface, 0.75);
   }
 }
 
@@ -68,7 +68,7 @@
     border: none;
 
     &:hover {
-      color: $orange;
+      color: $colorWarning;
     }
   }
 }

@@ -1,14 +1,13 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .expansion-panel {
   .btn-toggle {
-    color: $black;
+    color: $colorOnSurface;
     padding: 1px 0.3rem 0;
     transform: rotate(90deg);
 
     &:hover {
-      color: color.adjust($black, $lightness: 25%);
+      color: $colorOnSurfaceVariant;
     }
   }
 }

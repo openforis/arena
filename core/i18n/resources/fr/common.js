@@ -309,6 +309,12 @@ Réessayer ?`,
   },
 
   header: {
+    theme: {
+      label: 'Thème',
+      light: 'Clair',
+      dark: 'Sombre',
+      system: 'Par défaut du système',
+    },
     myProfile: 'Mon profil',
     qrCodeLoginDialog: {
       title: 'Connexion à Arena Mobile via QR code',

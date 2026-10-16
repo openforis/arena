@@ -303,6 +303,12 @@ export default {
   },
 
   header: {
+    theme: {
+      label: 'テーマ',
+      light: 'ライト',
+      dark: 'ダーク',
+      system: 'システム設定',
+    },
     myProfile: 'マイプロフィール',
     qrCodeLoginDialog: {
       title: 'QRコードでArena Mobileにログイン',

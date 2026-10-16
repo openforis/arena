@@ -43,7 +43,7 @@ $rowHeaderHeight: 45px;
     }
 
     .btn-aggregates {
-      color: white;
+      color: $colorOnPrimary;
       margin: 0 0.5rem 0 0.5rem;
       padding: 0;
     }
@@ -60,16 +60,16 @@ $rowHeaderHeight: 45px;
 
   .table__row {
     .btn-transparent {
-      color: $black;
+      color: $colorOnSurface;
       font-weight: 400;
 
       &:hover {
-        color: $orange;
+        color: $colorWarning;
       }
     }
 
     .table__cell {
-      border-left: 1px solid $greyBorder;
+      border-left: 1px solid $colorOutline;
       display: grid;
       height: 100%;
       align-items: center;
@@ -88,12 +88,12 @@ $rowHeaderHeight: 45px;
 
     .error-badge {
       position: relative;
-      background-color: rgba($red, 0.4);
+      background-color: with-alpha($colorError, 0.4);
       padding: 0;
       font-weight: normal;
 
       .form-input:focus {
-        background-color: rgba($red, 0.3);
+        background-color: with-alpha($colorError, 0.3);
       }
     }
   }
@@ -114,7 +114,7 @@ $rowHeaderHeight: 45px;
 
 .data-query__container.edit {
   .table__content {
-    border: 1px dashed $greyBorder;
+    border: 1px dashed $colorOutline;
   }
 
   input {
@@ -133,7 +133,7 @@ $rowHeaderHeight: 45px;
   }
 
   .table__cell.readonly {
-    background-color: rgba($greyBorder, 0.5);
+    background-color: with-alpha($colorOutline, 0.5);
   }
 
   .table__row {

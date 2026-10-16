@@ -308,6 +308,12 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
   },
 
   header: {
+    theme: {
+      label: 'Tema',
+      light: 'Claro',
+      dark: 'Escuro',
+      system: 'Padrão do sistema',
+    },
     myProfile: 'Meu perfil',
     qrCodeLoginDialog: {
       title: 'Faça login no Arena Mobile usando o código QR',

@@ -1,10 +1,10 @@
 @use '~@webapp/style/vars' as *;
 
-$borderColor: $greyBorder;
+$borderColor: $colorOutline;
 
 .category__item {
   position: relative;
-  background-color: $white;
+  background-color: $colorSurface;
   // accordion: items are contiguous and share their borders
   border: 1px solid $borderColor;
   border-top-width: 0;
@@ -43,11 +43,11 @@ $borderColor: $greyBorder;
     cursor: pointer;
 
     &:hover {
-      background-color: rgba($greenLight, 0.6);
+      background-color: with-alpha($colorSuccessContainer, 0.6);
     }
 
     &:focus-visible {
-      outline: 2px solid $blue;
+      outline: 2px solid $colorPrimary;
       outline-offset: -2px;
     }
   }
@@ -57,8 +57,8 @@ $borderColor: $greyBorder;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: $grey;
-    color: $colorTextPrimary;
+    background-color: $colorSurfaceVariant;
+    color: $colorOnPrimaryContainer;
     font-size: 0.75rem;
     font-weight: 600;
   }
@@ -68,7 +68,7 @@ $borderColor: $greyBorder;
   }
 
   .empty {
-    color: $red;
+    color: $colorError;
     font-style: italic;
     font-weight: normal;
   }
@@ -78,7 +78,7 @@ $borderColor: $greyBorder;
     align-items: center;
     justify-content: center;
     padding: 4px;
-    color: $colorTextPrimary;
+    color: $colorOnPrimaryContainer;
 
     .category__item-toggle-icon {
       font-size: 20px;
@@ -89,7 +89,7 @@ $borderColor: $greyBorder;
   &.not-valid {
     .category__item-header {
       grid-template-columns: 16px 4rem 80px 1fr 2rem;
-      box-shadow: inset 4px 0 0 $red;
+      box-shadow: inset 4px 0 0 $colorError;
     }
 
     .badge {
@@ -106,38 +106,38 @@ $borderColor: $greyBorder;
     // explicit color and fill: don't rely on the badge or header text color
     .category__item-error-icon {
       font-size: 16px;
-      color: $red;
+      color: $colorError;
       fill: currentColor;
 
       &.warning {
-        color: $orange;
+        color: $colorWarning;
       }
     }
   }
 
   &.active {
     .category__item-header {
-      background-color: $blue;
-      color: $white;
+      background-color: $colorPrimary;
+      color: $colorOnPrimary;
 
       .category__item-index {
-        background-color: $blueDark;
-        color: $white;
+        background-color: $colorOnPrimaryContainer;
+        color: $colorOnPrimary;
       }
 
       .empty {
-        color: $white;
+        color: $colorOnPrimary;
       }
 
       // white ring around the icon to keep it visible on the blue background
       .category__item-error-icon {
         border-radius: 50%;
-        background-color: $white;
-        box-shadow: 0 0 0 1.5px $white;
+        background-color: $colorOnPrimary;
+        box-shadow: 0 0 0 1.5px $colorOnPrimary;
       }
 
       .category__item-toggle-btn {
-        color: $white;
+        color: $colorOnPrimary;
       }
 
       .category__item-toggle-icon {
@@ -151,7 +151,7 @@ $borderColor: $greyBorder;
     grid-template-columns: 1fr;
     grid-row-gap: 0.2rem;
     padding: 0.8rem 1rem 1rem;
-    background-color: $greyAppBg;
+    background-color: $colorBackground;
     border-top: 1px solid $borderColor;
   }
 

@@ -58,8 +58,8 @@
 
   .users-backup-import-users-table__container {
     max-height: 40vh;
-    background-color: white;
-    border: 1px solid $greyBorder;
+    background-color: $colorSurface;
+    border: 1px solid $colorOutline;
     border-radius: 4px;
 
     th {
@@ -94,12 +94,12 @@
 .users-backup-user-status {
   padding: 0.1rem 0.5rem;
   border-radius: 1rem;
-  background-color: $grey;
+  background-color: $colorSurfaceVariant;
   white-space: nowrap;
 
   &.users-backup-user-status--new {
-    background-color: $green;
-    color: white;
+    background-color: $colorSuccess;
+    color: $colorOnPrimary;
   }
 }
 

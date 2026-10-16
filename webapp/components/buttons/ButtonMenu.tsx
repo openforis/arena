@@ -84,6 +84,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
             {item.content ?? (
               <Button
                 className={classNames(item.className)}
+                icon={item.icon}
                 iconClassName={item.iconClassName}
                 label={item.label}
                 labelIsI18nKey={item.labelIsI18nKey}

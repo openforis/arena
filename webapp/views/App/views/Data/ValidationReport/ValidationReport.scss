@@ -25,7 +25,7 @@
   width: 100%;
 
   button.highlight {
-    background-color: $yellowHighlight;
+    background-color: $colorHighlightContainer;
   }
 
   .btn-csv-export {
@@ -48,10 +48,10 @@
   width: 420px;
   max-height: 480px;
   overflow: auto;
-  background-color: $white;
+  background-color: $colorSurface;
   border: $tableRowBorder;
   border-radius: 4px;
-  box-shadow: 0 6px 14px rgba($black, 0.2);
+  box-shadow: 0 6px 14px with-alpha($colorShadow, 0.2);
   padding: 0.75rem;
 
 
@@ -82,10 +82,10 @@
   z-index: 5;
   min-width: 260px;
   width: max-content;
-  background-color: $white;
+  background-color: $colorSurface;
   border: $tableRowBorder;
   border-radius: 4px;
-  box-shadow: 0 6px 14px rgba($black, 0.2);
+  box-shadow: 0 6px 14px with-alpha($colorShadow, 0.2);
   padding: 0.75rem;
   display: flex;
   flex-direction: column;
@@ -125,6 +125,6 @@
 
 .validation-report__message {
   .validation-field_message {
-    color: $black;
+    color: $colorOnSurface;
   }
 }

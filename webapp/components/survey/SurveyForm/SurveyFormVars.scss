@@ -1,7 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
-$formBorder: 1px solid $greyBorder;
-$formBorderEdit: 1px dashed $greyBorder;
-$formBgColorGrey: rgba($grey, 0.15);
+$formBorder: 1px solid $colorOutline;
+$formBorderEdit: 1px dashed $colorOutline;
+$formBgColorGrey: with-alpha($colorSurfaceVariant, 0.15);
 $formHeaderHeight: 40px;
 $formTableRowHeaderHeight: 40px;

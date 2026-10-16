@@ -13,8 +13,12 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
 import { SurveyThemeBridge } from '@webapp/theme/SurveyThemeBridge'
+import { applyThemeMode, getThemePreference, resolveThemeMode } from '@webapp/theme/themeMode'
 
 import i18nInstance from '@core/i18n/i18nFactory'
+
+// apply the theme before the first render to avoid a flash of the light theme
+applyThemeMode(resolveThemeMode(getThemePreference()))
 
 // remove preloader
 document.getElementById('preloader-wrapper').remove()
