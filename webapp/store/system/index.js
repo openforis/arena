@@ -20,7 +20,7 @@ export { SystemErrorActions, useSystemError } from './systemError'
 export { ServiceErrorActions, useServiceErrors } from './serviceError'
 
 // ====== i18n
-export { I18nState, useI18n, useI18nT, useLang } from './i18n'
+export { detectUILanguage, I18nState, useI18n, useI18nT, useLang } from './i18n'
 
 // ====== status
 export { SystemStatusState, useSystemStatusReady } from './status'

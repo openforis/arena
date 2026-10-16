@@ -1,5 +1,7 @@
 import './Guest.scss'
 
+import { useTranslation } from 'react-i18next'
+
 import * as ProcessUtils from '@core/processUtils'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
@@ -8,6 +10,8 @@ import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
 import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
 import AccessRequest from '@webapp/views/Guest/views/AccessRequest'
 import Login from '@webapp/views/Guest/views/Login'
+
+import { GuestToolbar } from './GuestToolbar'
 
 const OfArenaLogo = () => (
   <a
@@ -40,10 +44,14 @@ const OfArenaBanner = () => (
 )
 
 const Guest = () => {
+  // re-render the guest views when the UI language changes
+  useTranslation()
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
   return (
     <div className="guest__wrapper">
       <div className="guest__bg" />
+
+      <GuestToolbar />
 
       <OfArenaLogo />
 

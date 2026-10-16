@@ -2,12 +2,11 @@ import React, { useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { getLanguageLabel } from '@core/app/languages'
-import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
+import { supportedLanguages } from '@core/i18n/i18nFactory'
 import * as User from '@core/user/user'
 
 import { ButtonMenu } from '@webapp/components'
-import { useBrowserLanguageCode } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { detectUILanguage, useI18n } from '@webapp/store/system'
 import { UserActions, useUser } from '@webapp/store/user'
 
 const autoLanguageKey = '__auto__'
@@ -17,12 +16,7 @@ export const PreferredUILanguageButtonMenu = () => {
   const i18n = useI18n()
   const user = useUser()
   const preferredLanguageCode = User.getPrefLanguage(user)
-  const browserLanguageCode = useBrowserLanguageCode()
-
-  const detectedLanguageCode = useMemo(
-    () => (supportedLanguages.includes(browserLanguageCode) ? browserLanguageCode : defaultLanguage),
-    [browserLanguageCode]
-  )
+  const detectedLanguageCode = useMemo(() => detectUILanguage(), [])
 
   const onItemClick = useCallback(
     (item) => {
