@@ -104,6 +104,9 @@ export const propKeys = {
   includeAltitudeAccuracy: 'includeAltitudeAccuracy',
   mapMarkerColor: 'mapMarkerColor',
 
+  // Geo
+  positionTracking: 'positionTracking',
+
   // layout elements
   headerColor: 'headerColor',
 
@@ -311,6 +314,8 @@ export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
+// geo
+export const isPositionTracking = ObjectUtils.isPropTrue(propKeys.positionTracking)
 // time
 export const isSecondsIncluded = ObjectUtils.isPropTrue(propKeys.includeSeconds)
 // taxon
@@ -913,6 +918,9 @@ export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
 
 export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
 
+// Arena Mobile records the track only in single geo attributes
+export const canBePositionTracking = (nodeDef) => isGeo(nodeDef) && isSingle(nodeDef)
+
 export const canBeHiddenInReport = (nodeDef) =>
   [NodeDefType.boolean, NodeDefType.code, NodeDefType.taxon].includes(getType(nodeDef))
 
@@ -960,6 +968,9 @@ export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   }
   if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
     nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
+  }
+  if (!canBePositionTracking(nodeDefUpdated) && isPositionTracking(nodeDefUpdated)) {
+    nodeDefUpdated = ObjectUtils.setProp(propKeys.positionTracking, false)(nodeDefUpdated)
   }
   if (!canBeHiddenInReport(nodeDefUpdated) && isHiddenInReport(nodeDefUpdated)) {
     nodeDefUpdated = assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false })(nodeDefUpdated)

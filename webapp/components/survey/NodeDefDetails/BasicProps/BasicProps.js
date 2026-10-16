@@ -29,6 +29,7 @@ import CodeProps from '../CodeProps'
 import CoordinateProps from '../CoordinateProps'
 import DecimalProps from '../DecimalProps'
 import FileProps from '../FileProps'
+import GeoProps from '../GeoProps'
 import FormHeaderProps from '../FormHeaderProps'
 import IntegerProps from '../IntegerProps'
 import TaxonProps from '../TaxonProps'
@@ -42,6 +43,7 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.coordinate]: CoordinateProps,
   [NodeDef.nodeDefType.decimal]: DecimalProps,
   [NodeDef.nodeDefType.file]: FileProps,
+  [NodeDef.nodeDefType.geo]: GeoProps,
   [NodeDef.nodeDefType.formHeader]: FormHeaderProps,
   [NodeDef.nodeDefType.integer]: IntegerProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,

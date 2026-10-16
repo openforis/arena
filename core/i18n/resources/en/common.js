@@ -1188,6 +1188,10 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     timeProps: {
       includeSeconds: 'Include seconds',
     },
+    geoProps: {
+      positionTracking: 'Position tracking',
+      positionTrackingInfo: `It applies only to Arena Mobile: if checked, the value is the path walked by the user while filling in the record (recorded by tracking the device position) and it cannot be edited manually`,
+    },
     formHeaderProps: {
       headerColorLabel: 'Header color',
       headerColor: {
