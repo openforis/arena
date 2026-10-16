@@ -225,7 +225,7 @@ describe('applyChangeSet', () => {
     })
     const results = await applyChangeSet({ changeSet: changeSetOf(operations), operationIds: ['o1', 'o2', 'o3'], deps })
     expect(results).toEqual([
-      { id: 'o1', status: 'failed', message: 'Server error' },
+      { id: 'o1', status: 'failed', message: 'aiAssistant.card.applyFailed', params: { message: 'Server error' } },
       { id: 'o2', status: 'skipped', message: 'dependencyNotApplied' },
       { id: 'o3', status: 'applied' },
     ])

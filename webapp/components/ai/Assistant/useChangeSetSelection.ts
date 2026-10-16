@@ -1,15 +1,18 @@
 import { useMemo } from 'react'
 
-import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import type { ChangeSetCardState, OperationConflict } from '@webapp/ai/changeSets/types'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 
-import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
+import { getOperationConflicts, getPendingOperationIds } from './changeSetCardModel'
 import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
 import { useExclusiveRun } from './useExclusiveRun'
+import { runWithFailureNotice } from './runWithFailureNotice'
 import { useOperationSelection } from './useOperationSelection'
 
 export type ChangeSetSelection = {
   pendingIds: string[]
+  // pending operations that conflict with the survey, with their reasons
+  conflicts: OperationConflict[]
   conflictIds: string[]
   // pending without conflict
   selectableIds: string[]
@@ -49,7 +52,8 @@ export const useChangeSetSelection = ({
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
-  const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
+  const conflicts = useMemo(() => getOperationConflicts({ cardState, survey }), [cardState, survey])
+  const conflictIds = useMemo(() => conflicts.map((conflict) => conflict.id), [conflicts])
   const selectableIds = useMemo(() => pendingIds.filter((id) => !conflictIds.includes(id)), [conflictIds, pendingIds])
   const { selectedIds, toggle, setSelected } = useOperationSelection({
     selectableIds,
@@ -69,6 +73,7 @@ export const useChangeSetSelection = ({
 
   return {
     pendingIds,
+    conflicts,
     conflictIds,
     selectableIds,
     selectedIds,
@@ -79,13 +84,21 @@ export const useChangeSetSelection = ({
     // a rejection (designer or store error) is shown, not left unhandled
     apply: () =>
       run(async () => {
-        try {
-          await onApply(selectedIds)
-        } catch (error) {
-          notifyError({ key: 'aiAssistant.card.applyFailed', params: { message: (error as Error)?.message ?? '' } })
-        }
+        await runWithFailureNotice({
+          action: () => onApply(selectedIds),
+          notifyError,
+          key: 'aiAssistant.card.applyFailed',
+        })
       }),
     // onCancel is required by useConfirm's inferred (untyped) parameter
-    discard: () => confirm({ key: 'aiAssistant.discardConfirm', onOk: () => void run(onDiscard), onCancel: undefined }),
+    discard: () =>
+      confirm({
+        key: 'aiAssistant.discardConfirm',
+        onOk: () =>
+          void run(async () => {
+            await runWithFailureNotice({ action: onDiscard, notifyError, key: 'aiAssistant.card.discardFailed' })
+          }),
+        onCancel: undefined,
+      }),
   }
 }

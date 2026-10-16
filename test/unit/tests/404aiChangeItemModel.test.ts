@@ -81,7 +81,7 @@ describe('change item model (404)', () => {
     expect(getResultTitle({ id: 'a', status: 'applied', params: { currentText: 'now' } }, t)).toBeUndefined()
   })
 
-  test('a plain conflict reason is shown as it is', () => {
+  test('a plain conflict reason is translated to its sentence', () => {
     for (const reason of [
       'nodeDefMissing',
       'valueChanged',
@@ -90,8 +90,13 @@ describe('change item model (404)', () => {
       'alreadyExists',
       'refMissing',
       'itemMissing',
+      'surveyDirty',
+      'surveyChanged',
+      'dependencyNotApplied',
     ]) {
-      expect(getResultTitle({ id: 'a', status: 'conflict', message: reason }, t)).toBe(reason)
+      expect(getResultTitle({ id: 'a', status: 'conflict', message: reason }, t)).toBe(
+        `aiAssistant.card.reason.${reason}`
+      )
     }
   })
 

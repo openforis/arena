@@ -119,6 +119,24 @@
     }
   }
 
+  &__conflicts {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: baseline;
+      padding: 0.15rem 0;
+    }
+
+    p {
+      margin: 0;
+    }
+  }
+
   &__preview {
     margin: 0;
     padding: 0;

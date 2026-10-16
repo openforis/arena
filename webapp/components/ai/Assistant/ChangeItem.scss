@@ -37,6 +37,11 @@
     background-color: var(--orangeLight);
   }
 
+  &__conflict {
+    margin: 0.25rem 0 0;
+    color: var(--red);
+  }
+
   &__details {
     display: grid;
     gap: 0.125rem;
