@@ -30,8 +30,8 @@ export type AiBatchGuard = () => Promise<void>
 export type AiBatchGuardDeps = {
   // GET /api/ai/settings, uncached
   fetchSettings: () => Promise<AiFeatureSwitches | null>
-  // the survey's effective policy, uncached
-  fetchEffectivePolicy: (surveyId: number) => Promise<AiPolicy | null>
+  // the survey's effective policy for the batch's feature, uncached
+  fetchEffectivePolicy: (surveyId: number, feature: string) => Promise<AiPolicy | null>
 }
 
 // errors that will fail every following call too: the run stops at once with this message
@@ -113,7 +113,7 @@ export const createAiBatchGuard =
     if (!isAiFeatureEnabledInSettings(settings, feature)) {
       throw new SystemError('aiFeatureDisabled', { feature }, StatusCodes.FORBIDDEN)
     }
-    const effective = await deps.fetchEffectivePolicy(surveyId)
+    const effective = await deps.fetchEffectivePolicy(surveyId, feature)
     assertHostingAllowed({ effective: effective ?? OFF_POLICY, dataClass, hostingClass })
   }
 

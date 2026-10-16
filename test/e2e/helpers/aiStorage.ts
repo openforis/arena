@@ -36,6 +36,22 @@ export const seedSuggestionState = async (page: Page, userUuid: string, state: S
   )
 }
 
+// longer than the debounce of the suggestions host (1 s after the last survey change, events run at once)
+const SUGGESTION_DETECTORS_SETTLE_MS = 2_500
+
+/**
+ * Gives the suggestion detectors their chance to run. A check that something does NOT show is worth nothing right
+ * after the page is ready, because the detectors react asynchronously: wait past their debounce first, and use this
+ * only next to a check that the same setup does show the card elsewhere.
+ * @param {Page} page - The page.
+ * @returns {Promise<void>} Resolves when the detectors have had their chance.
+ */
+export const waitForSuggestionDetectors = async (page: Page): Promise<void> => {
+  // nothing observable marks a detector that ran and found nothing to suggest
+  // eslint-disable-next-line playwright/no-wait-for-timeout
+  await page.waitForTimeout(SUGGESTION_DETECTORS_SETTLE_MS)
+}
+
 /**
  * Reads the stored suggestion state of a user in the page.
  * @param {Page} page - The page.
