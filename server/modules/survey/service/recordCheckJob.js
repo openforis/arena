@@ -373,7 +373,7 @@ export default class RecordCheckJob extends Job {
       this.logDebugOptional('default values applied')
     }
 
-    // 4b. recompute the "required if" flags of node defs whose condition changed (new node defs are handled in step 4)
+    // 4a. recompute the "required if" flags of node defs whose condition changed (new node defs are handled in step 4)
     const nodeDefRequiredIfToUpdateUuids = forceFullCheck
       ? _getRequiredIfNodeDefUuids({ survey, nodeDefUuids: allNotDeletedNodeDefUuids })
       : nodeDefRequiredIfUpdatedUuids
@@ -391,7 +391,7 @@ export default class RecordCheckJob extends Job {
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedRequired)
     }
 
-    // 4a. Persist nodes
+    // 4b. Persist nodes
     this.logDebugOptional(`persisting ${Object.keys(allUpdatedNodesByUuid).length} nodes`)
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
     for (const node of allUpdatedNodesArray) {

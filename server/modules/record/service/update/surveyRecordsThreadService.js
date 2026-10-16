@@ -65,7 +65,8 @@ const _createThread = () => {
         thread.terminate()
       }
     } else {
-      notifyThreadMessage({ eventType: type, content })
+      // errors are already logged by the notifier
+      void notifyThreadMessage({ eventType: type, content })
     }
   }
 
