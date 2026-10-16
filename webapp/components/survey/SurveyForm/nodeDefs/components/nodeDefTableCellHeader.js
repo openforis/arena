@@ -12,7 +12,6 @@ import { useI18n } from '@webapp/store/system'
 import * as NodeDefUiProps from '../nodeDefUIProps'
 import NodeDefIconKey from './NodeDefIconKey'
 import { NodeDefInfoIcon } from './NodeDefInfoIcon'
-import { NodeDefRequiredMarker } from './NodeDefRequiredMarker'
 
 const NodeDefTableCellHeader = (props) => {
   const { label, lang, nodeDef, onSortBy, sortCriteria = [] } = props
@@ -53,7 +52,6 @@ const NodeDefTableCellHeader = (props) => {
         <LabelWithTooltip label={label} style={{ gridColumn: `1 / span ${fields.length}` }}>
           <NodeDefIconKey nodeDef={nodeDef} />
         </LabelWithTooltip>
-        <NodeDefRequiredMarker nodeDef={nodeDef} />
         <NodeDefInfoIcon lang={lang} nodeDef={nodeDef} />
       </div>
 

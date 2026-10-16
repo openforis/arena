@@ -38,28 +38,28 @@ test.describe('Required if', () => {
 
     // data entry
     const form = new RecordForm(page)
-    const requiredMarker = form.nodeDefWrapper(c.cluster_decimal.name).locator('.survey-form__node-def-required-marker')
 
     await page.goto(Urls.records)
     await page.getByTestId(TestId.records.addBtn).click()
     await expect(page.getByTestId(TestId.surveyForm.surveyForm)).toBeVisible()
 
     // condition not met (cluster_id empty)
-    await expect(requiredMarker).toHaveCount(0)
     await expect(form.errorBadge(c.cluster_decimal.name)).toHaveCount(0)
 
-    // condition met: required marker and "Required value" error
+    // condition met: "Required value" error
     await form.enter(c.cluster_id, '11')
-    await expect(requiredMarker).toBeVisible()
     await form.expectError(c.cluster_decimal.name, 'Required value')
 
-    // value entered: no error, still required
+    // value entered: no error
     await form.enter(c.cluster_decimal, '12.5')
     await expect(form.errorBadge(c.cluster_decimal.name)).toHaveCount(0)
-    await expect(requiredMarker).toBeVisible()
 
-    // condition not met anymore
+    // value cleared: error again
+    await form.enter(c.cluster_decimal, '')
+    await form.expectError(c.cluster_decimal.name, 'Required value')
+
+    // condition not met anymore: no error
     await form.enter(c.cluster_id, '5')
-    await expect(requiredMarker).toHaveCount(0)
+    await expect(form.errorBadge(c.cluster_decimal.name)).toHaveCount(0)
   })
 })

@@ -56,12 +56,9 @@ min count, which already supports expressions; key attributes are always require
 
 - **Three exclusive options**: not required / always required / required when condition is met.
 - **Always an error** when a required value is missing (same severity as today's `required`, no severity selector).
-- **Table layouts (multiple entities)**: no asterisk in the cells; conditionally required cells just show the
-  existing validation feedback. Headers show the asterisk only for always-required attributes.
-- **No asterisk on key attributes** (web and mobile): the key icon is enough. The marker condition is
-  `!isKey && Records.isNodeRequired(...)` (`isNodeRequired` itself stays true for keys, for validation/completion).
-- **The data entry form marks the attribute as required** (web and mobile) when it is always required, or when its
-  condition is met in that entity. Today no required marker is shown at all, so the marker is new for both cases.
+- **No required marker (asterisk) in the data entry form** (web and mobile): the "Required value" validation
+  feedback is enough, and an asterisk still shown once a value is entered would be misleading. Sections 2.2b and the
+  mobile marker below were implemented first and then dropped.
 
 ### Evaluation: stored flag on the parent node, like `editableIf` / `visibleIf`
 
@@ -316,13 +313,13 @@ Required:  ( ) Not required   ( ) Always required   ( ) Required when condition 
 - **arena-core** ([#476](https://github.com/openforis/arena-core/pull/476), released in 2.7.0):
   - `cReq` follows the `cEdit`/`cVis` pattern: `Nodes.isChildRequired` (default `false`), only `true` values stored,
     an emptied dictionary kept as `{}` (omitted when saved, see `metaKeysOmittedWhenEmpty`).
-  - The validator always evaluates the condition itself (no fallback logic): `cReq` is used only for display (required
-    marker, completion stats).
+  - The validator always evaluates the condition itself (no fallback logic): `cReq` is used only for completion stats
+    and the record tree status.
   - `RecordNodesUpdater.updateRequiredFlags` used by the publish job.
 - **arena** (this branch):
   - Designer: the three exclusive options are shown for single non-key attributes; single entities keep the
     "Required" checkbox.
-  - Required marker: in the survey designer (no record) only always-required attributes are marked.
+  - Required marker (asterisk): implemented, then dropped (see Decisions); the validation feedback is enough.
   - Publish (`RecordCheckJob`): node defs whose `requiredIf` changed get their `cReq` flags recomputed. The attributes of
     added/updated node defs and of node defs with changed validations are now re-validated (before only their parent
     entities were, so existing values were not checked against new validation rules).
