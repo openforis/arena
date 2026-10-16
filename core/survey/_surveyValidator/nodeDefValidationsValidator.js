@@ -19,6 +19,21 @@ const validateCountProp =
       : Validator.validatePositiveOrZeroNumber(errorKey)(propName, item)
   }
 
+// "required if" is allowed only for single non-key attributes, as an alternative to "always required"
+const canHaveRequiredIf = (nodeDef) =>
+  NodeDef.isAttribute(nodeDef) &&
+  NodeDef.isSingle(nodeDef) &&
+  !NodeDef.isKey(nodeDef) &&
+  !NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
+
+const validateRequiredIf = async (survey, nodeDef) => {
+  if (!NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(nodeDef))) return null
+  if (!canHaveRequiredIf(nodeDef)) {
+    return Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.requiredIfNotAllowed }])
+  }
+  return NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.required)
+}
+
 export const validate = async (survey, nodeDef) => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
   const validation = NodeDef.isMultiple(nodeDef)
@@ -47,6 +62,7 @@ export const validate = async (survey, nodeDef) => {
       keys.expressions,
       await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
     ),
+    Validation.assocFieldValidation(keys.requiredIf, await validateRequiredIf(survey, nodeDef)),
     A.unless(Validation.isValid, Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]))
   )(validation)
 }

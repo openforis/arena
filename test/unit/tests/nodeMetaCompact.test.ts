@@ -8,6 +8,7 @@ describe('Node.compactMeta', () => {
       childApplicability: {},
       cEdit: {},
       cVis: {},
+      cReq: {},
       childrenMaxCount: {},
       childrenMinCount: {},
       defaultValueApplied: false,
@@ -27,6 +28,7 @@ describe('Node.compactMeta', () => {
       childApplicability: { 'def-1': false },
       cEdit: { 'def-2': false },
       cVis: { 'def-3': false },
+      cReq: { 'def-5': false },
       childrenMaxCount: { 'def-4': 3 },
       childrenMinCount: { 'def-4': 0 },
       defaultValueApplied: true,
@@ -44,6 +46,10 @@ describe('Node.getMetaKeysWithDefaultValue', () => {
   it('returns only the keys of the items having the default value', () => {
     const meta = { h: [], hCode: [], cVis: { 'def-1': false }, defaultValueApplied: false, qualifierValueApplied: true }
     expect(Node.getMetaKeysWithDefaultValue(meta)).toEqual(['hCode', 'defaultValueApplied'])
+  })
+
+  it('returns the key of an emptied child flags dictionary (to remove it from the stored meta)', () => {
+    expect(Node.getMetaKeysWithDefaultValue({ h: [], cReq: {} })).toEqual(['cReq'])
   })
 
   it('returns an empty array when the meta is missing', () => {

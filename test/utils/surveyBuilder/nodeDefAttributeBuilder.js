@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
+import * as NodeDefExpression from '../../../core/survey/nodeDefExpression'
 
 import NodeDefBuilder from './nodeDefBuilder'
 
@@ -28,6 +29,19 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
       A.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
+      true
+    )
+  }
+
+  requiredIf(...expressions) {
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.validations,
+      A.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.assocRequiredIf(
+          expressions.map((expression) => NodeDefExpression.createExpression({ expression }))
+        )
+      )(this),
       true
     )
   }

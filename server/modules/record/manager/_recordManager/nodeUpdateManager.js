@@ -1,3 +1,5 @@
+import { RecordNodesUpdater } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -202,6 +204,28 @@ const _persistNodes = async ({ survey, record, nodesArray, isPreview = false }, 
   }
   await removeFiles({ surveyId, files, isPreview }, tx)
 }
+
+/**
+ * Recomputes the "required if" flags (parent nodes meta) of the specified node defs in the whole record (nodes not persisted).
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the update.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!string[]} params.nodeDefUuids - UUIDs of the node defs whose "required if" condition has changed.
+ * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
+ * @returns {Promise<object>} - The update result (updated record and nodes).
+ */
+export const updateRequiredFlags = async ({ user, survey, record, nodeDefUuids, sideEffect = false }) =>
+  RecordNodesUpdater.updateRequiredFlags({
+    user,
+    survey,
+    record,
+    nodeDefUuids,
+    categoryItemProvider,
+    taxonProvider,
+    lang: Survey.getDefaultLanguage(survey),
+    sideEffect,
+  })
 
 export const updateNodesDependents = async (
   {

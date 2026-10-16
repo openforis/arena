@@ -106,6 +106,11 @@ const getValidationsSummary = ({ nodeDef }) => {
   return getExpressionsSummary({ expressions, includeSeverity: true })
 }
 
+const getRequiredIfSummary = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
+}
+
 const getValidationCountSummary = ({ nodeDef, countType }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const count = NodeDefValidations.getCountProp(countType)(validations)
@@ -247,6 +252,7 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
     defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
     defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
     required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+    requiredIf: getRequiredIfSummary({ nodeDef }),
     unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
     minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
     maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),

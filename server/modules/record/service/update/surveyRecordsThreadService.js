@@ -52,6 +52,7 @@ ClusterBus.onEvent(handleClusterEvent)
 const _createThread = () => {
   const threadData = {}
   const threadKey = getThreadKey()
+  const notifyThreadMessage = createSequentialThreadMessagesNotifier()
 
   const handleMessageFromThread = (msg) => {
     const { type, content } = msg
@@ -64,9 +65,8 @@ const _createThread = () => {
         thread.terminate()
       }
     } else {
-      notifyThreadMessageToSockets({ eventType: type, content }).catch((error) =>
-        Logger.error(`error notifying record update to sockets: ${error}`)
-      )
+      // errors are already logged by the notifier
+      void notifyThreadMessage({ eventType: type, content })
     }
   }
 
@@ -174,6 +174,19 @@ const notifyThreadMessageToSockets = async ({ eventType, content }) => {
     await notifyRecordUpdateToSocket({ socketId: content.socketId, eventType, content })
   } else {
     await notifyRecordUpdateToSockets({ eventType, content })
+  }
+}
+
+// Notifying a message is async (sockets lookup): without chaining, a message could reach the sockets before the
+// previous one (e.g. stale nodes sent first by the thread overwriting the updated ones in the client).
+// Returns a function notifying the messages in the order it receives them.
+export const createSequentialThreadMessagesNotifier = () => {
+  let lastNotification = Promise.resolve()
+  return ({ eventType, content }) => {
+    lastNotification = lastNotification
+      .then(() => notifyThreadMessageToSockets({ eventType, content }))
+      .catch((error) => Logger.error(`error notifying record update to sockets: ${error}`))
+    return lastNotification
   }
 }
 

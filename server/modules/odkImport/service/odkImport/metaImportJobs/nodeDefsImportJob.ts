@@ -466,9 +466,7 @@ export default class NodeDefsImportJob extends Job {
       if (converted) apply(converted)
     }
 
-    if (this._resolveRequiredValidation({ requiredRaw: bind.required, nodeDefUuid })) {
-      validations[NodeDefValidations.keys.required] = true
-    }
+    await this._applyRequiredValidation({ nodeDef, requiredRaw: bind.required, validations, convertAndReport })
 
     if (Object.keys(validations).length > 0) {
       propsAdvanced[NodeDef.keysPropsAdvanced.validations] = validations
@@ -494,29 +492,42 @@ export default class NodeDefsImportJob extends Job {
     return updatedNodeDef
   }
 
-  // Arena's `required` flag is a plain boolean (unlike relevant/constraint/calculate, it has no
-  // expression slot to convert into) - a non-trivial `required` expression is flagged for manual
-  // review rather than guessed at. Split out of _applyExpressions to keep that function's branching
-  // flat (cognitive complexity).
-  _resolveRequiredValidation({
+  // ODK's `required` is either a literal (-> Arena "required" flag) or an XPath expression (-> Arena "required if"
+  // condition, allowed only for single non-key attributes; otherwise flagged for manual review). Split out of
+  // _applyExpressions to keep that function's branching flat (cognitive complexity).
+  async _applyRequiredValidation({
+    nodeDef,
     requiredRaw,
-    nodeDefUuid,
+    validations,
+    convertAndReport,
   }: {
+    nodeDef: any
     requiredRaw: string | null | undefined
-    nodeDefUuid: string
-  }): boolean {
-    if (!requiredRaw) return false
+    validations: Record<string, any>
+    convertAndReport: (params: { itemType: string; expression: string }) => Promise<string | null>
+  }): Promise<void> {
+    if (!requiredRaw) return
     const trimmed = requiredRaw.trim()
-    if (literalTrueValues.has(trimmed)) return true
-    if (!literalFalseValues.has(trimmed)) {
+    if (literalTrueValues.has(trimmed)) {
+      validations[NodeDefValidations.keys.required] = true
+      return
+    }
+    if (literalFalseValues.has(trimmed)) return
+
+    const itemType = OdkImportReportItem.itemTypes.requiredExpr
+    if (!NodeDef.isAttribute(nodeDef) || NodeDef.isMultiple(nodeDef) || NodeDef.isKey(nodeDef)) {
       this._pushReportItem({
-        nodeDefUuid,
-        itemType: OdkImportReportItem.itemTypes.requiredExpr,
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        itemType,
         expression: requiredRaw,
         resolved: false,
       })
+      return
     }
-    return false
+    const converted = await convertAndReport({ itemType, expression: requiredRaw })
+    if (converted) {
+      validations[NodeDefValidations.keys.requiredIf] = [NodeDefExpression.createExpression({ expression: converted })]
+    }
   }
 
   _pushReportItem({

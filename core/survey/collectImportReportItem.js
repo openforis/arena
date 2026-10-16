@@ -20,6 +20,7 @@ export const exprTypes = {
   applicable: 'applicable',
   codeParent: 'codeParent',
   defaultValue: 'defaultValue',
+  requiredIf: 'requiredIf',
   validationRuleError: 'validationRuleError',
   validationRuleWarning: 'validationRuleWarning',
 }
