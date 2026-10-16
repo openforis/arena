@@ -74,20 +74,79 @@ export const getItemDetailLines = (
     value: detail.value,
   }))
 
+// the plain reasons of a conflict, a skipped or a failed operation that have a sentence (aiAssistant.card.reason.*)
+const PLAIN_REASONS: ReadonlySet<string> = new Set([
+  'nodeDefMissing',
+  'valueChanged',
+  'parentMissing',
+  'nameTaken',
+  'alreadyExists',
+  'refMissing',
+  'itemMissing',
+  'surveyDirty',
+  'surveyChanged',
+  'dependencyNotApplied',
+  'notSupported',
+  'missingResult',
+])
+
+const ISSUES_SEPARATOR = '; '
+
 /**
- * Returns the tooltip of a result: its message, and the text found when a label had changed since the proposal. A
- * conflict whose message is an i18n key (the designer's rules refused the change) is translated with its params; a
- * plain reason (nodeDefMissing, valueChanged, ...) is shown as it is.
+ * Returns the sentence of one reason, without the issues behind it.
+ * @param {TFunction} t - Translation function.
+ * @param {string} reason - Conflict reason, or message of a result.
+ * @param {Record<string, unknown>} [params] - Interpolation values of an i18n key reason.
+ * @returns {string} The text.
+ */
+const getReasonSentence = (t: TFunction, reason: string, params?: Record<string, unknown>): string => {
+  if (isI18nKeyReason(reason)) return t(reason, params)
+  return PLAIN_REASONS.has(reason) ? t(`aiAssistant.card.reason.${reason}`) : reason
+}
+
+/**
+ * Returns the translated issues listed in the params of a reason (the node definition that would be invalid: each
+ * issue has an i18n key and its own params).
+ * @param {TFunction} t - Translation function.
+ * @param {Record<string, unknown>} [params] - Params of the reason.
+ * @returns {string} The issues, joined (blank when there is none).
+ */
+const getIssuesText = (t: TFunction, params?: Record<string, unknown>): string => {
+  const issues = params?.issues
+  if (!Array.isArray(issues)) return ''
+  const texts: string[] = []
+  for (const issue of issues) {
+    if (typeof issue?.key === 'string') texts.push(getReasonSentence(t, issue.key, issue.params))
+  }
+  return texts.join(ISSUES_SEPARATOR)
+}
+
+/**
+ * Returns the sentence of a reason: an i18n key (the designer's rules or the server refused the change) is translated
+ * with its params, the issues behind it listed after it; a plain reason (nodeDefMissing, valueChanged...) has its
+ * `aiAssistant.card.reason.*` sentence; any other text (a message of the server) is returned as it is.
+ * @param {TFunction} t - Translation function.
+ * @param {string} reason - Conflict reason, or message of a result.
+ * @param {Record<string, unknown>} [params] - Interpolation values of an i18n key reason.
+ * @returns {string} The text.
+ */
+export const getConflictReasonText = (t: TFunction, reason: string, params?: Record<string, unknown>): string => {
+  const sentence = getReasonSentence(t, reason, params)
+  const issuesText = isI18nKeyReason(reason) ? getIssuesText(t, params) : ''
+  return issuesText ? `${sentence} ${issuesText}` : sentence
+}
+
+/**
+ * Returns the tooltip of a result: the sentence of its message (see getConflictReasonText), and the text found when a
+ * label had changed since the proposal.
  * @param {OperationResult|null} result - Result of an Apply.
  * @param {TFunction} t - Translation function.
  * @returns {string|undefined} The title.
  */
 export const getResultTitle = (result: OperationResult | null, t: TFunction): string | undefined => {
   if (!result) return undefined
-  if (result.status === 'conflict' && result.message && isI18nKeyReason(result.message)) {
-    return t(result.message, result.params)
-  }
   const currentText = result.status === 'conflict' ? result.params?.currentText : null
-  const parts = [result.message, typeof currentText === 'string' ? currentText : null]
+  const message = result.message ? getConflictReasonText(t, result.message, result.params) : null
+  const parts = [message, typeof currentText === 'string' ? currentText : null]
   return parts.filter(Boolean).join(': ') || undefined
 }

@@ -18,6 +18,7 @@ import type {
   ChangeSetCardState,
   NodeDefExpressionProp,
   NodeDefOperation,
+  OperationConflict,
   OperationResult,
 } from '@webapp/ai/changeSets/types'
 import { TreeSelectViewMode } from '@webapp/model'
@@ -264,6 +265,26 @@ export const isCardStale = ({ cardState, survey }: { cardState: ChangeSetCardSta
 }
 
 /**
+ * Returns the pending operations that conflict with the current survey, each with its reason (a plain reason such as
+ * valueChanged, or an i18n key with its params when the designer's rules refuse it).
+ * @param {object} params - Parameters.
+ * @param {ChangeSetCardState} params.cardState - Card state.
+ * @param {object} params.survey - Current survey.
+ * @returns {OperationConflict[]} The conflicts, in operation order.
+ */
+export const getOperationConflicts = ({
+  cardState,
+  survey,
+}: {
+  cardState: ChangeSetCardState
+  survey: any
+}): OperationConflict[] => {
+  const operationIds = getPendingOperationIds(cardState)
+  if (operationIds.length === 0) return []
+  return findConflicts(cardState.changeSet, survey, { operationIds })
+}
+
+/**
  * Returns the pending operations that conflict with the current survey (they stay unchecked and cannot be selected).
  * @param {object} params - Parameters.
  * @param {ChangeSetCardState} params.cardState - Card state.
@@ -276,11 +297,7 @@ export const getConflictingOperationIds = ({
 }: {
   cardState: ChangeSetCardState
   survey: any
-}): string[] => {
-  const operationIds = getPendingOperationIds(cardState)
-  if (operationIds.length === 0) return []
-  return findConflicts(cardState.changeSet, survey, { operationIds }).map((conflict) => conflict.id)
-}
+}): string[] => getOperationConflicts({ cardState, survey }).map((conflict) => conflict.id)
 
 /**
  * Returns the nearest page node definition containing a node definition.

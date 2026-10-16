@@ -41,7 +41,7 @@ const ChangeSetFullCard = ({
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
-  const { pendingIds, conflictIds, selectedIds, applying, toggle } = selection
+  const { pendingIds, conflicts, conflictIds, selectedIds, applying, toggle } = selection
   const { nodeDefItems, categoryGroups } = useMemo(() => splitReviewItems(items), [items])
 
   /**
@@ -53,7 +53,7 @@ const ChangeSetFullCard = ({
     const { nodeDefUuid } = item
     return (
       <ChangeItemRow
-        conflict={conflictIds.includes(item.id)}
+        conflict={conflicts.find((conflict) => conflict.id === item.id)}
         exists={nodeDefUuid !== null && nodeDefExists(nodeDefUuid)}
         item={item}
         key={item.id}
