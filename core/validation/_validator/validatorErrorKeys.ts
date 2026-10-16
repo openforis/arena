@@ -111,6 +111,8 @@ export const ValidatorErrorKeys = {
     qualifierCannotHaveEditabilityRule: 'validationErrors:nodeDefEdit.qualifierCannotHaveEditabilityRule',
     qualifierCannotHaveValidations: 'validationErrors:nodeDefEdit.qualifierCannotHaveValidations',
     readOnlyCannotHaveEditableIf: 'validationErrors:nodeDefEdit.readOnlyCannotHaveEditableIf',
+    requiredIfInvalid: 'validationErrors:nodeDefEdit.requiredIfInvalid',
+    requiredIfNotAllowed: 'validationErrors:nodeDefEdit.requiredIfNotAllowed',
     taxonomyRequired: 'validationErrors:nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors:nodeDefEdit.validationsInvalid',
   },

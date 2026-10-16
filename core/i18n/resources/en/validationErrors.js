@@ -135,6 +135,8 @@ export default {
     countMaxInvalid: 'Invalid "Max count"',
     countMinInvalid: 'Invalid "Min count"',
     readOnlyCannotHaveEditableIf: 'Read-only node cannot have "Editable if" condition',
+    requiredIfInvalid: 'Invalid "Required if" condition',
+    requiredIfNotAllowed: '"Required if" condition allowed only for single, non-key attributes not always required',
     qualifierCannotHaveApplicableExpression:
       'Qualifier attribute cannot have "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
     qualifierCannotHaveEditabilityRule: 'Qualifier attribute cannot have editability rules defined',

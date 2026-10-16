@@ -1130,6 +1130,9 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       expressions: 'Expresiones de validación',
       attributeAlwaysValid: 'Atributo siempre válido',
       attributeValidWhenConditionIsMet: 'Atributo válido cuando se cumple la condición',
+      notRequired: 'No obligatorio',
+      alwaysRequired: 'Siempre obligatorio',
+      requiredWhenConditionIsMet: 'Obligatorio cuando se cumple la condición',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nodo no se puede convertir a múltiple porque tiene valores predeterminados.',

@@ -134,6 +134,9 @@ export default {
     countMaxInvalid: 'Recuento máximo no válido',
     countMinInvalid: 'Recuento mínimo no válido',
     readOnlyCannotHaveEditableIf: 'Un nodo de solo lectura no puede tener la condición "Editable si"',
+    requiredIfInvalid: 'Condición "Obligatorio si" no válida',
+    requiredIfNotAllowed:
+      'La condición "Obligatorio si" solo se permite en atributos simples, no clave y no siempre obligatorios',
     qualifierCannotHaveApplicableExpression:
       'El atributo calificador no puede tener la condición "$t(nodeDefEdit.advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'El atributo calificador no puede tener reglas de editabilidad definidas',

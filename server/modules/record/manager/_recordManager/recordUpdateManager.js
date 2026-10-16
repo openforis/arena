@@ -279,6 +279,7 @@ export const persistNode = async (
   )
 
 export const updateNodesDependents = NodeUpdateManager.updateNodesDependents
+export const updateRequiredFlags = NodeUpdateManager.updateRequiredFlags
 
 export const deleteNode = async (
   {

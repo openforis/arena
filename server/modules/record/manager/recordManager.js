@@ -337,6 +337,7 @@ export {
   persistNode,
   updateNode,
   updateNodesDependents,
+  updateRequiredFlags,
 } from './_recordManager/recordUpdateManager'
 
 export {

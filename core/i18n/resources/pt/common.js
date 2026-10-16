@@ -1258,6 +1258,9 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
       expressions: 'Expressões de validação',
       attributeAlwaysValid: 'Atributo sempre válido',
       attributeValidWhenConditionIsMet: 'Atributo válido quando a condição é atendida',
+      notRequired: 'Não obrigatório',
+      alwaysRequired: 'Sempre obrigatório',
+      requiredWhenConditionIsMet: 'Obrigatório quando a condição é atendida',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Este nó não pode ser convertido para múltiplo porque possui valores padrão.',

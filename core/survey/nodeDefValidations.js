@@ -6,6 +6,7 @@ export const keys = {
   max: 'max',
   min: 'min',
   required: 'required',
+  requiredIf: 'requiredIf',
   unique: 'unique',
 }
 
@@ -32,6 +33,13 @@ export const assocMaxCount = assocCountProp(keys.max)
 export const isRequired = A.propOr(false, keys.required)
 export const assocRequired = (required) => A.assoc(keys.required, required)
 export const dissocRequired = A.dissoc(keys.required)
+
+// REQUIRED IF (alternative to required: required only when a condition is met)
+export const getRequiredIf = A.propOr([], keys.requiredIf)
+export const isRequiredIfDefined = (validations) => !A.isEmpty(getRequiredIf(validations))
+export const dissocRequiredIf = A.dissoc(keys.requiredIf)
+export const assocRequiredIf = (expressions) =>
+  A.isEmpty(expressions) ? dissocRequiredIf : A.assoc(keys.requiredIf, expressions)
 
 // UNIQUE
 export const isUnique = A.propOr(false, keys.unique)

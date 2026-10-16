@@ -133,6 +133,8 @@ export default {
     countMaxInvalid: '「最大数」が無効です',
     countMinInvalid: '「最小数」が無効です',
     readOnlyCannotHaveEditableIf: '読み取り専用ノードには「編集可能条件」を設定できません',
+    requiredIfInvalid: '「必須条件」が無効です',
+    requiredIfNotAllowed: '「必須条件」は、キーではなく常に必須でもない単一の属性にのみ設定できます',
     qualifierCannotHaveApplicableExpression:
       'グループ識別属性には「$t(nodeDefEdit.advancedProps.relevantIf)」条件を設定できません',
     qualifierCannotHaveEditabilityRule: 'グループ識別属性には編集可能ルールを設定できません',

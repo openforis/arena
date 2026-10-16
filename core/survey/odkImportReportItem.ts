@@ -22,7 +22,7 @@ export const itemTypes = {
   relevant: 'relevant', // -> Arena applicable expression
   constraint: 'constraint', // -> Arena validation rule expression
   calculate: 'calculate', // -> Arena default value expression
-  requiredExpr: 'requiredExpr', // ODK's `required` can itself be an XPath expression, not just true/false
+  requiredExpr: 'requiredExpr', // ODK's `required` XPath expression (not just true/false) -> Arena "required if" condition
   unmappedType: 'unmappedType', // xformTypeMapping.ts flagged this ODK bind type as having no clean Arena equivalent
   lossyGeoConversion: 'lossyGeoConversion', // geotrace/geoshape -> geo (GeoJSON) is a genuine but lossy mapping
   skippedNote: 'skippedNote', // a readonly, body-control-less ODK "note" - no NodeDef was created for it
