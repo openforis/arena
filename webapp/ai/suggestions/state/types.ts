@@ -21,6 +21,9 @@ export type SuggestionUserState = {
   // bucket → suggestion id → targets accepted with Do it, and the conversation working on them
   inProgress: Record<string, Record<string, InProgressEntry>>
   seenModules: string[]
+  // bucket → when the bucket was last written (epoch ms), to drop the least recently used one past the cap; a bucket
+  // without it (stored by an older version) counts as the oldest
+  touchedAt?: Record<string, number>
 }
 
 export type VisibilityParams = {

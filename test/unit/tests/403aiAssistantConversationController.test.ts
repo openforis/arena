@@ -519,6 +519,44 @@ describe('assistant conversation controller (403)', () => {
       expect(suggestions.holdTurnLock).toHaveBeenCalledWith(expect.objectContaining({ conversationId: id }))
       expect(suggestions.reportSettle).toHaveBeenCalledWith(expect.objectContaining({ running: false }))
     })
+
+    test('a stored snapshot read late does not overwrite the final answer of the turn that is running again', async () => {
+      const turn = createTurnControl({ endOnAbort: false })
+      const other = storedConversation('d1', { area: 'analysis' })
+      const { controller, panel, store } = await setup({ runTurn: turn.run, conversations: [other] })
+      const id = (await controller.send(env, 'hello')) as string
+      await flush()
+      turn.params[0].onUpdate(withTurn(turn.params[0].conversation, 'hello', 'streaming'))
+      await flush()
+      // another area, with its own open conversation
+      const otherScope = { ...scope, area: 'analysis' as const }
+      panel.setArea('analysis')
+      panel.setConversationId('d1')
+      controller.setScope(otherScope)
+      controller.select(otherScope, 'd1')
+      await flush()
+      expect(controller.getState().conversation?.id).toBe('d1')
+      // back to design while the turn still runs: the read of the stored snapshot is slow
+      const gate = deferred<void>()
+      const realGet = store.get.getMockImplementation()!
+      store.get.mockImplementationOnce(async (cid: string, userUuid: string) => {
+        const value = await realGet(cid, userUuid)
+        await gate.promise
+        return value
+      })
+      panel.setArea('design')
+      panel.setConversationId(id)
+      controller.setScope(scope)
+      controller.select(scope, id)
+      // the turn ends before the read returns
+      turn.release(0, 'done')
+      await flush()
+      expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'done' })
+      gate.resolve()
+      await flush()
+      await flush()
+      expect(controller.getState().conversation?.messages.at(-1)).toMatchObject({ status: 'done' })
+    })
   })
 
   describe('provider pick', () => {
@@ -659,6 +697,39 @@ describe('assistant conversation controller (403)', () => {
       store.remove.mockRejectedValueOnce(new Error('idb'))
       await expect(controller.deleteConversation(scope, 'c1')).rejects.toThrow('idb')
       expect(controller.getState().history).toHaveLength(1)
+    })
+
+    test('a list that cannot be read is logged', async () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+      try {
+        const { controller, store } = await setup()
+        store.list.mockRejectedValueOnce(new Error('idb'))
+        await controller.loadHistory(scope)
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('conversation list'), expect.any(Error))
+      } finally {
+        warn.mockRestore()
+      }
+    })
+
+    test('a suggestion settle that throws after the remove does not make the delete fail', async () => {
+      const warn = jest.spyOn(console, 'warn').mockImplementation(() => undefined)
+      try {
+        const { controller, panel, store, suggestions } = await setup({
+          conversations: [storedConversation('c1'), storedConversation('c2')],
+        })
+        await controller.loadHistory(scope)
+        panel.setConversationId('c1')
+        suggestions.onConversationSettled.mockImplementationOnce(() => {
+          throw new Error('quota')
+        })
+        await expect(controller.deleteConversation(scope, 'c1')).resolves.toBeUndefined()
+        expect(store.remove).toHaveBeenCalledWith('c1', scope.userUuid)
+        expect(controller.getState().history.map(({ id }) => id)).toEqual(['c2'])
+        expect(panel.getState()).toMatchObject({ conversationId: null, view: 'history' })
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('deleted conversation'), expect.any(Error))
+      } finally {
+        warn.mockRestore()
+      }
     })
 
     test('Delete every conversation clears the list and the chat', async () => {

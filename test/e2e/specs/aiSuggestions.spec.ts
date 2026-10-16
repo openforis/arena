@@ -11,7 +11,7 @@ import {
   selectAssistantArea,
   waitForAssistantTurn,
 } from '../helpers/assistantPanel'
-import { readSuggestionState } from '../helpers/aiStorage'
+import { readSuggestionState, waitForSuggestionDetectors } from '../helpers/aiStorage'
 import { FormDesigner } from '../helpers/formDesigner'
 import { Urls } from '../helpers/urls'
 
@@ -128,6 +128,9 @@ test.describe('Module introduction (mock provider)', () => {
     await openAssistantPanel(page)
     await selectAssistantArea(page, 'Help')
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.startScreen)).toBeVisible()
+    // the same visit with the setting on shows the introduction card (see the test above): give the detectors their
+    // chance to run before checking that nothing shows
+    await waitForSuggestionDetectors(page)
     await expect(cards(page)).toHaveCount(0)
     await expect(page.getByTestId(TestId.aiAssistant.suggestionsDot)).toHaveCount(0)
     await expect(page.getByTestId(TestId.aiAssistant.openBtn)).toHaveAttribute('aria-label', 'AI assistant')

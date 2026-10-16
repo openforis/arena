@@ -114,6 +114,14 @@ const parseInProgressEntry = (value: unknown, id: string): InProgressEntry | nul
 }
 
 /**
+ * Parses the last-written times of the buckets: finite numbers only.
+ * @param {unknown} value - Raw value.
+ * @returns {Record<string, number>|null} The times, or null when none is valid.
+ */
+const parseTouchedAt = (value: unknown): Record<string, number> | null =>
+  parseRecord(value, (time) => (typeof time === 'number' && Number.isFinite(time) ? time : null))
+
+/**
  * Parses a stored value.
  * @param {string|null} raw - Stored JSON.
  * @param {Function} [onCorrupt] - Called when the value is not a state: it is dropped, and so are its dismissals.
@@ -135,7 +143,8 @@ export const parseSuggestionState = (
     onCorrupt?.()
     return emptySuggestionState()
   }
-  const { pending, dismissed, inProgress, seenModules } = parsed
+  const { pending, dismissed, inProgress, seenModules, touchedAt } = parsed
+  const touched = parseTouchedAt(touchedAt)
   return {
     pending: parseRecord(pending, parsePendingBucket) ?? {},
     dismissed: parseRecord(dismissed, (bucket) => parseRecord(bucket, parseDismissedEntry)) ?? {},
@@ -143,5 +152,6 @@ export const parseSuggestionState = (
     seenModules: Array.isArray(seenModules)
       ? [...new Set(seenModules.filter((item): item is string => typeof item === 'string'))]
       : [],
+    ...(touched ? { touchedAt: touched } : {}),
   }
 }
