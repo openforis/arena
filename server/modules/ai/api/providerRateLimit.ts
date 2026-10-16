@@ -14,6 +14,20 @@ export const MAX_IN_FLIGHT_PER_USER = ENV.aiProviderMaxInFlightPerUser
 
 type Middleware = (req: any, res: any, next: (error?: unknown) => void) => void
 
+// the function that frees the slot of the call that a response belongs to
+const releases = new WeakMap<object, () => void>()
+
+/**
+ * Frees the in-flight slot that the rate limit middleware took for the response (once; nothing when it took none).
+ * The route calls it when its handler settles.
+ * @param {object} res - Express response of the call.
+ * @returns {void}
+ */
+export const releaseProviderCall = (res: object): void => {
+  releases.get(res)?.()
+  releases.delete(res)
+}
+
 /**
  * Creates the middleware that limits the calls of a user to the endpoints of their providers (a test, a model list,
  * and the save of a provider, which tests it again): each one opens a connection to a server of the user's choice.
@@ -32,14 +46,19 @@ export const createProviderRateLimit = ({
   const inFlight = new Map<string, number>()
 
   /**
-   * Counts a call of the user as finished.
+   * Creates the function that counts a call of the user as finished; it counts it once, however often it is called.
    * @param {string} userUuid - User.
-   * @returns {void}
+   * @returns {() => void} The release function.
    */
-  const release = (userUuid: string): void => {
-    const remaining = (inFlight.get(userUuid) ?? 1) - 1
-    if (remaining > 0) inFlight.set(userUuid, remaining)
-    else inFlight.delete(userUuid)
+  const createRelease = (userUuid: string): (() => void) => {
+    let released = false
+    return () => {
+      if (released) return
+      released = true
+      const remaining = (inFlight.get(userUuid) ?? 1) - 1
+      if (remaining > 0) inFlight.set(userUuid, remaining)
+      else inFlight.delete(userUuid)
+    }
   }
 
   return (req, res, next) => {
@@ -49,8 +68,9 @@ export const createProviderRateLimit = ({
       return
     }
     inFlight.set(userUuid, (inFlight.get(userUuid) ?? 0) + 1)
-    // 'close' comes once the response is sent or the client is gone, whatever the handler did
-    res.once('close', () => release(userUuid))
+    // the slot is kept until the handler settles (see releaseProviderCall): a client that goes away does not stop the
+    // call to the provider, so it must not free the slot either
+    releases.set(res, createRelease(userUuid))
     next()
   }
 }

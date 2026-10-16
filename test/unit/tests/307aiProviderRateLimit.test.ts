@@ -1,5 +1,9 @@
 import * as SettingsApi from '@server/modules/ai/api/settingsApi'
-import { createProviderRateLimit, limitProviderCalls } from '@server/modules/ai/api/providerRateLimit'
+import {
+  createProviderRateLimit,
+  limitProviderCalls,
+  releaseProviderCall,
+} from '@server/modules/ai/api/providerRateLimit'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { collectRoutes } from '@test/utils/routeUtils'
@@ -43,11 +47,11 @@ describe('Rate limit of the calls to the endpoints of the providers (307)', () =
     // the cap is per user
     call('u2')
     expect(next).toHaveBeenCalledTimes(4)
-    running[0].emit('close')
+    releaseProviderCall(running[0])
     call('u1')
     expect(next).toHaveBeenCalledTimes(5)
-    // a call counts once, however many times the response closes
-    running[0].emit('close')
+    // a call counts once, however many times it is released
+    releaseProviderCall(running[0])
     expect(call('u1').statusCode).toBe(429)
   })
 

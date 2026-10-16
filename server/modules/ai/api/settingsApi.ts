@@ -26,7 +26,7 @@ import * as ProviderResolver from '../service/providerResolver'
 import { getDisabledFeatureKeys } from '../service/featureGate'
 import { getEngineSettingsFields } from '../service/engineSettings'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
-import { limitProviderCalls } from './providerRateLimit'
+import { limitProviderCalls, releaseProviderCall } from './providerRateLimit'
 
 /**
  * Returns the body of GET /api/ai/settings: the settings, the providers and the instance fields.
@@ -57,7 +57,7 @@ const providerCallGuards = [...guards, limitProviderCalls]
 
 /**
  * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
- * errors to Express.
+ * errors to Express. The in-flight slot of a provider call is freed when the handler settles.
  * @param {RouteHandler} handler - Receives `{ user, body, params }`.
  * @returns {(req: object, res: object, next: (error?: unknown) => void) => Promise<void>} The Express handler.
  */
@@ -72,6 +72,8 @@ const jsonRoute =
       res.json(await handler({ user: Request.getUser(req), body: Request.getBody(req) || {}, params: req.params }))
     } catch (error) {
       next(error)
+    } finally {
+      releaseProviderCall(res)
     }
   }
 
