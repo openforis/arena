@@ -1,6 +1,6 @@
 @use '~@webapp/style/vars' as *;
 
-$borderColor: $greyBorder;
+$borderColor: $colorOutline;
 
 .app__container .app-module>.category {
   overflow: hidden; // scrollbars managed in .category__levels
@@ -71,7 +71,7 @@ $borderColor: $greyBorder;
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    color: $orange;
+    color: $colorWarning;
     font-weight: 600;
   }
 

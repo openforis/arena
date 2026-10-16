@@ -284,6 +284,12 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     logout: 'Cerrar sesión',
   },
   header: {
+    theme: {
+      label: 'Tema',
+      light: 'Claro',
+      dark: 'Oscuro',
+      system: 'Predeterminado del sistema',
+    },
     myProfile: 'Mi perfil',
     qrCodeLoginDialog: {
       title: 'Iniciar sesión en Arena Mobile usando código QR',

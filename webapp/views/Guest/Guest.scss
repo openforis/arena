@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 @use '~@webapp/style/layoutMixins' as *;
 
@@ -54,9 +53,9 @@
     width: 60px;
     right: 5vw;
     top: 0;
-    border-left: 2px solid $green;
-    border-bottom: 2px solid $green;
-    border-right: 2px solid $green;
+    border-left: 2px solid $colorSuccess;
+    border-bottom: 2px solid $colorSuccess;
+    border-right: 2px solid $colorSuccess;
     padding: 10px;
     display: grid;
     grid-row-gap: 10px;
@@ -66,12 +65,12 @@
       padding: 10px 0;
       text-align: center;
       font-size: 1.25rem;
-      color: white;
+      color: $colorOnPrimary;
       text-transform: uppercase;
     }
 
     .openforis {
-      background-color: rgba($green, 0.9);
+      background-color: with-alpha($colorSuccess, 0.9);
 
       .separator {
         font-size: 0.3rem;
@@ -79,7 +78,7 @@
     }
 
     .arena {
-      background-color: rgba($red, 0.8);
+      background-color: with-alpha($colorError, 0.8);
     }
   }
 
@@ -109,8 +108,8 @@
 
 .guest__form input {
   text-align: center;
-  color: $black;
-  background-color: white;
+  color: $colorOnSurface;
+  background-color: $colorOnPrimary;
   font-size: 1rem;
 
   &:focus,
@@ -118,11 +117,11 @@
   &:-webkit-autofill,
   &:-webkit-autofill:hover,
   &:-webkit-autofill:focus {
-    background-color: color.adjust($greenLight, $lightness: 10%);
-    color: $black;
-    -webkit-text-fill-color: $black;
-    box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
-    -webkit-box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
+    background-color: tint($colorSuccessContainer, 70%);
+    color: $colorOnSurface;
+    -webkit-text-fill-color: $colorOnSurface;
+    box-shadow: 0 0 0px 1000px tint($colorSuccessContainer, 70%) inset;
+    -webkit-box-shadow: 0 0 0px 1000px tint($colorSuccessContainer, 70%) inset;
     font-family: $fontFamily;
     font-size: 1rem;
   }
@@ -137,13 +136,13 @@
 
   button[type='submit'] {
     border: none;
-    background-color: rgba($green, 0.5);
+    background-color: with-alpha($colorSuccess, 0.5);
     padding: 1rem;
     text-transform: uppercase;
     font-weight: 600;
 
     &:hover {
-      background-color: rgba($green, 0.8);
+      background-color: with-alpha($colorSuccess, 0.8);
     }
   }
 }

@@ -212,6 +212,13 @@ Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `S
 **Cognitive complexity:**
 Keep the cognitive complexity of every function at 15 or below (SonarCloud rule). Split complex logic into small helper functions, use early returns, and avoid deeply nested conditions/loops.
 
+**Colors and themes:**
+Never hard-code colors. Use the semantic theme tokens (Material Design 3 / React Native Paper naming: `primary`, `onPrimary`, `primaryContainer`, `secondary`, `background`, `surface`, `onSurface`, `outline`, `error`, ...):
+
+- SCSS: `$colorPrimary`, `$colorOnSurface`, ... from `webapp/style/_vars.scss`; for transparency or lighter/darker variants use `with-alpha()`, `tint()`, `shade()` (not `rgba()` / `color.adjust()`, which don't work with CSS variables).
+- JS/TS (inline styles, `sx`, charts): `themeColors` from `@webapp/theme/tokens`.
+- Token values per theme (light/dark) are defined in `webapp/style/themes.scss` and mirrored in `webapp/theme/tokens.ts` (used by the MUI theme): keep them in sync.
+
 **Loops:**
 Prefer `for...of` loops over `Array.prototype.forEach`.
 

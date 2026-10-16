@@ -28,6 +28,7 @@ import { Breadcrumbs } from './Breadcrumbs'
 import { MessageNotificationPanel } from './MessageNotificationsPanel'
 import { PreferredUILanguageButtonMenu } from './PreferredUILanguageButtonMenu'
 import { QRCodeLoginDialog } from './QRCodeLoginDialog'
+import { ThemeButtonMenu } from './ThemeButtonMenu'
 import UserPopupMenu from './UserPopupMenu'
 
 const Header = () => {
@@ -122,6 +123,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
+        <ThemeButtonMenu />
         <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"

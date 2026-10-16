@@ -27,21 +27,21 @@
   &__status {
     padding: 0.1rem 0.6rem;
     border-radius: 1rem;
-    color: white;
-    background-color: $orange;
+    color: $colorOnPrimary;
+    background-color: $colorWarning;
 
     &.connected {
-      background-color: $green;
+      background-color: $colorSuccess;
     }
 
     &.disconnected {
-      background-color: $red;
+      background-color: $colorError;
     }
   }
 
   &__error,
   &__info {
-    color: $red;
+    color: $colorError;
   }
 
   &__toolbar {

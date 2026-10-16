@@ -1,48 +1,35 @@
-import { defaultTokens, type ArenaTokens } from './tokens'
-
-export { defaultTokens }
+const primaryColorVarName = '--color-primary'
 
 type BuildCssVarMapParams = {
-  tokens?: ArenaTokens
   primaryColor?: string | null
 }
 
 /**
- * Builds CSS custom property map for :root.
- * When primaryColor is set, maps it onto the blue brand family used by SCSS.
+ * Builds the CSS custom properties to set inline on :root.
+ * Only the survey primary color is overridden: the other tokens (and the ones derived from the primary color)
+ * come from the active theme defined in `themes.scss`.
+ *
+ * @param {BuildCssVarMapParams} params - The parameters.
+ * @param {string|null} [params.primaryColor] - Survey branding primary color; null to use the theme one.
+ * @returns {Record<string, string|null>} Map of CSS variable name to value (null means "remove the override").
  */
-export const buildCssVarMap = ({ tokens = defaultTokens, primaryColor = null }: BuildCssVarMapParams = {}): Record<
-  string,
-  string
-> => {
-  const c = tokens.colors
-  const blue = primaryColor || c.blue
-  return {
-    '--fontFamily': tokens.typography.fontFamily,
-    '--blue': blue,
-    '--blueLight': c.blueLight,
-    '--blueLightFocus': c.blueLightFocus,
-    '--blueLightActive': c.blueLightActive,
-    '--blueDark': primaryColor || c.blueDark,
-    '--colorTextPrimary': primaryColor || c.colorTextPrimary,
-    '--borderColorFocussed': primaryColor || c.colorTextPrimary,
-    '--red': c.red,
-    '--green': c.green,
-    '--grey': c.grey,
-    '--greyAppBg': c.greyAppBg,
-    '--greyBorder': c.greyBorder,
-    '--orange': c.orange,
-    '--black': c.black,
-    '--white': c.white,
-  }
-}
+export const buildCssVarMap = ({ primaryColor = null }: BuildCssVarMapParams = {}): Record<string, string | null> => ({
+  [primaryColorVarName]: primaryColor || null,
+})
 
 /**
- * Applies CSS variables on documentElement.
+ * Applies (or removes, when the value is null) CSS variables on documentElement.
+ *
+ * @param {Record<string, string|null>} varMap - Map of CSS variable name to value.
+ * @returns {void}
  */
-export const applyCssVars = (varMap: Record<string, string>): void => {
-  const root = document.documentElement
-  Object.entries(varMap).forEach(([key, value]) => {
-    root.style.setProperty(key, value)
-  })
+export const applyCssVars = (varMap: Record<string, string | null>): void => {
+  const { style } = document.documentElement
+  for (const [key, value] of Object.entries(varMap)) {
+    if (value) {
+      style.setProperty(key, value)
+    } else {
+      style.removeProperty(key)
+    }
+  }
 }

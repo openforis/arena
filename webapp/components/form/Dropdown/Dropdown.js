@@ -6,8 +6,32 @@ import classNames from 'classnames'
 
 import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
+import { themeColors } from '@webapp/theme/tokens'
 import { LabelWithTooltip } from '../LabelWithTooltip'
 import { useDropdown } from './useDropdown'
+
+// react-select colors mapped to the theme tokens (CSS variables), so the dropdowns follow the active theme
+const dropdownThemeColors = {
+  primary: themeColors.primary,
+  primary75: themeColors.primaryContainerHigh,
+  primary50: themeColors.primaryContainer,
+  primary25: themeColors.primaryContainerLow,
+  danger: themeColors.error,
+  dangerLight: themeColors.errorContainer,
+  neutral0: themeColors.surface,
+  neutral5: themeColors.background,
+  neutral10: themeColors.surfaceVariant,
+  neutral20: themeColors.outline,
+  neutral30: `color-mix(in srgb, ${themeColors.outline}, ${themeColors.onSurface} 30%)`,
+  neutral40: themeColors.onSurfaceVariant,
+  neutral50: themeColors.onSurfaceVariant,
+  neutral60: themeColors.onSurfaceVariant,
+  neutral70: themeColors.onSurface,
+  neutral80: themeColors.onSurface,
+  neutral90: themeColors.onSurface,
+}
+
+const dropdownTheme = (theme) => ({ ...theme, colors: { ...theme.colors, ...dropdownThemeColors } })
 
 const OptionComponent =
   ({ renderOptionLabel }) =>
@@ -128,6 +152,7 @@ const Dropdown = (props) => {
         options={options}
         placeholder={placeholder}
         ref={selectRef}
+        theme={dropdownTheme}
         value={value}
       />
     </ValidationTooltip>
