@@ -7,6 +7,7 @@ import * as Survey from '@core/survey/survey'
 import type { CategoryItemLabelsUpdateAnswer, CategoryItemLabelUpdate } from '@common/ai/categoryItemLabels'
 
 import type { ChangeSet, OperationResult, OperationStatus } from '../types'
+import { getRequestFailure } from '../requestFailure'
 import type { PutCategoryItemLabels } from './categoryItemLabelsApi'
 import { getCategoryItemLabelKey, type CategoryItemLabelSetOperation } from './types'
 
@@ -48,17 +49,6 @@ const toUpdate = ({ itemUuid, lang, text, expectedText }: CategoryItemLabelSetOp
   text,
   expectedText,
 })
-
-/**
- * Returns the message of a failed request: the server's message key and params, or the error message.
- * @param {unknown} error - The request error.
- * @returns {{message: string, params?: object}} The message.
- */
-const getRequestError = (error: any): { message: string; params?: Record<string, unknown> } => {
-  const data = error?.response?.data
-  if (data?.key) return { message: data.key, params: data.params ?? {} }
-  return { message: error instanceof Error ? error.message : String(error) }
-}
 
 /**
  * Sets the results of the answer: written labels, conflicts, and failed for those it does not mention.
@@ -129,7 +119,7 @@ export const applyCategoryItemLabels = async ({
   try {
     answer = await deps.putCategoryItemLabels({ surveyId: changeSet.surveyId, items: operations.map(toUpdate) })
   } catch (error) {
-    const { message, params } = getRequestError(error)
+    const { message, params } = getRequestFailure(error)
     setAll(results, operations, 'failed', message, params)
     return
   }
