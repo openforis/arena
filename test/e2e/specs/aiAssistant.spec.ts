@@ -90,6 +90,12 @@ test.describe('AI assistant (mock provider)', () => {
     await api.disableAiFeatures()
   })
 
+  // the panel picks its area from what is available when it opens: open it only once the designer has loaded
+  const reloadDesigner = async (page: Page): Promise<void> => {
+    await page.reload()
+    await new FormDesigner(page).waitReady()
+  }
+
   // Design must be selected on its own: no tab is clicked
   const expectDesignSelected = async (page: Page): Promise<void> => {
     await expect(assistantPanel(page).getByRole('tab', { name: 'Design', exact: true })).toHaveAttribute(
@@ -237,7 +243,7 @@ test.describe('AI assistant (mock provider)', () => {
       }
       new MutationObserver(check).observe(document, { childList: true, subtree: true })
     })
-    await page.reload()
+    await reloadDesigner(page)
     await openAssistantPanel(page)
     await expectDesignSelected(page)
     await expect(panel.getByTestId(TestId.aiAssistant.conversationBar)).toContainText(LABEL_REQUEST)
@@ -270,7 +276,7 @@ test.describe('AI assistant (mock provider)', () => {
     await expect(userMessages(page)).toHaveCount(1)
     await expect(lastAssistantAnswer(page)).toContainText('MOCK: I proposed a new label for')
 
-    await page.reload()
+    await reloadDesigner(page)
     await openAssistantPanel(page)
     await expectDesignSelected(page)
     await expect(userMessages(page)).toHaveCount(1)
@@ -541,6 +547,7 @@ test.describe('AI assistant context meter (stub local server)', () => {
     // a reload shows the stored usage again: the meter needs no new answer (the status probes of the server are fine)
     const chatRequestsBefore = countChatRequests(stub!)
     await reloadApp(page)
+    await designer.waitReady()
     await openAssistantPanel(page)
     await expect(meter).toHaveAttribute('aria-valuetext', tokensText)
     await expect(meter).toHaveAttribute('aria-valuenow', String(STUB_CONTEXT_USED_TOKENS))
