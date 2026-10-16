@@ -6,6 +6,16 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    requiredIf: {
+      title: 'Atributos obrigatórios por condição',
+      description: `No designer de formulários, na aba **Validações** de um atributo, escolha **Obrigatório quando a condição é atendida** e escreva a condição: o atributo será obrigatório somente quando a condição for verdadeira.
+
+Durante a entrada de dados, o erro "Valor obrigatório" é exibido somente quando a condição é atendida.`,
+    },
+    themeSelector: {
+      title: 'Tema claro e escuro',
+      description: `Use o menu **Tema** no cabeçalho (também na página de login) para alternar entre o tema **Claro** e **Escuro**, ou seguir o **Padrão do sistema**.`,
+    },
     surveyCompare: {
       title: 'Comparar e atualizar inventários',
       description: `No **Painel**, use **Funções avançadas > Comparar / atualizar a partir de arquivo** para comparar este inventário com um exportado de outro servidor Arena (p. ex. um servidor de testes) ou com outro inventário deste servidor.

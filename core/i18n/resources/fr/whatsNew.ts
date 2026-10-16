@@ -6,6 +6,16 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    requiredIf: {
+      title: 'Attributs obligatoires sous condition',
+      description: `Dans le concepteur de formulaires, dans l'onglet **Validations** d'un attribut, choisissez **Obligatoire lorsque la condition est remplie** et saisissez la condition : l'attribut n'est obligatoire que lorsque la condition est vraie.
+
+Lors de la saisie des données, l'erreur « Valeur requise » n'est affichée que lorsque la condition est remplie.`,
+    },
+    themeSelector: {
+      title: 'Thème clair et sombre',
+      description: `Utilisez le menu **Thème** de l'en-tête (également sur la page de connexion) pour passer du thème **Clair** au thème **Sombre**, ou suivre le thème **Par défaut du système**.`,
+    },
     surveyCompare: {
       title: 'Comparer et mettre à jour les formulaires',
       description: `Dans le **Tableau de bord**, utilisez **Fonctions avancées > Comparer / mettre à jour depuis un fichier** pour comparer ce formulaire avec un formulaire exporté depuis un autre serveur Arena (par ex. un serveur de test) ou avec un autre formulaire de ce serveur.
