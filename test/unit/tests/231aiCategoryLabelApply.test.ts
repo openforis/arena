@@ -168,7 +168,7 @@ describe('Apply of category item labels (231)', () => {
     expect(categoryLabels.onCategoryLabelsApplied).not.toHaveBeenCalled()
 
     expect(await apply(changeSet, ['c1'], createCategoryDeps(new Error('Network Error')))).toEqual([
-      { id: 'c1', status: 'failed', message: 'Network Error' },
+      { id: 'c1', status: 'failed', message: 'aiAssistant.card.applyFailed', params: { message: 'Network Error' } },
     ])
   })
 

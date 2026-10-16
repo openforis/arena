@@ -9,6 +9,7 @@ import { isDeepEqual } from './deepEqual'
 import { findValidationConflicts } from './designerRuleConflicts'
 import { findConflicts } from './findConflicts'
 import { applyOperationToNodeDef, getOperationNodeDefUuid } from './operations'
+import { getRequestFailure } from './requestFailure'
 import { isRecordEditOperation } from './recordEdits/types'
 import { applyCategoryItemLabels, type CategoryLabelsApplierDeps } from './categoryItemLabels/applyCategoryItemLabels'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
@@ -32,7 +33,7 @@ export type ApplierDeps = {
   categoryLabels?: CategoryLabelsApplierDeps
 }
 
-// message: the reason (an i18n key when it has a "." or ":", see isI18nKeyReason); params: its interpolation values
+// message: the reason (an i18n key or a plain reason, see isI18nKeyReason); params: its interpolation values
 const toConflictResult = ({ id, reason, params }: OperationConflict): OperationResult => ({
   id,
   status: 'conflict',
@@ -76,10 +77,12 @@ const setGroupStatus = (
   results: Map<string, OperationResult>,
   group: Group,
   status: OperationResult['status'],
-  message?: string
+  message?: string,
+  params?: Record<string, unknown>
 ) => {
-  for (const op of group.operations)
-    results.set(op.id, message ? { id: op.id, status, message } : { id: op.id, status })
+  for (const op of group.operations) {
+    results.set(op.id, message ? { id: op.id, status, message, ...(params ? { params } : {}) } : { id: op.id, status })
+  }
 }
 
 // a group depends on a create of the change set (its own definition or its parent) that did not run
@@ -147,7 +150,8 @@ const applyGroups = async (
       if (group.operations[0].type === 'nodeDef.create') appliedCreates.add(group.uuid)
       setGroupStatus(results, group, 'applied')
     } catch (error) {
-      setGroupStatus(results, group, 'failed', error instanceof Error ? error.message : String(error))
+      const { message, params } = getRequestFailure(error)
+      setGroupStatus(results, group, 'failed', message, params)
     }
   }
 }
