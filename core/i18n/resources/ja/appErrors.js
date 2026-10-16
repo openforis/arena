@@ -203,6 +203,7 @@ export default {
     '調査ファイルが大きすぎます（最大 {{maxSize}} MB）：データなしで調査をエクスポートしてください。調査の比較にレコードとそのファイルは不要です',
   userIsAdmin: 'このユーザーは既にシステム管理者です',
   userNotAllowedToChangePref: 'このユーザーは設定を変更する権限がありません',
+  userPrefsInvalid: 'ユーザー設定が無効です',
   userNotAuthorized: 'ユーザー{{userName}}には権限がありません',
   userNotFound: 'ユーザーが見つかりません：{{userUuid}}',
   userNotInvitedToSurvey: 'このユーザーにはこの調査への保留中の招待がありません',

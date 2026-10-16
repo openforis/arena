@@ -5,7 +5,7 @@
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiLimits } from '@common/ai/limits'
 
-type FetchLike = (input: any, init?: any) => Promise<Response>
+type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
 const tooLarge = () => new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
 

@@ -38,7 +38,7 @@ export type ProviderConfig = {
   baseUrl?: string | null
 }
 
-type FetchLike = (input: any, init?: any) => Promise<Response>
+type FetchLike = (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
 
 // Providers whose endpoint is a fixed agent rather than a generic LLM
 // API. They have no concept of a user-chosen model, so the registry skips
