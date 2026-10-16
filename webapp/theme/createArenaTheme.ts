@@ -35,5 +35,19 @@ export const createArenaTheme = ({
       background: { default: palette.background, paper: palette.surface },
       divider: palette.outline,
     },
+    components: {
+      MuiPaper: {
+        styleOverrides: {
+          // no dark mode elevation overlay: it lightens menus/popovers and lowers the contrast of their content
+          root: { backgroundImage: 'none' },
+        },
+      },
+      MuiPopover: {
+        styleOverrides: {
+          // shadows are barely visible on dark backgrounds: outline popups (menus, popovers) instead
+          paper: mode === themeModes.dark ? { border: `1px solid ${palette.outline}` } : {},
+        },
+      },
+    },
   })
 }
