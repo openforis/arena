@@ -121,6 +121,7 @@ export const {
   isChildApplicable,
   isChildEditable,
   isChildVisible,
+  isChildRequired,
   isDefaultValueApplied,
   isQualifierValueApplied,
   getHierarchy,

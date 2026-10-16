@@ -14,7 +14,7 @@ const metaKeys = {
   qualifierValueApplied: 'qualifierValueApplied', // True if the value has been auto-filled from the user group qualifier
   childEditability: 'cEdit', // Editability by child def uuid
   childVisibility: 'cVis', // Visibility by child def uuid
-  childRequired: 'cReq', // Evaluated "required if" condition by child def uuid
+  childRequired: 'cReq', // Child defs whose "required if" condition is met (only true values stored)
   childrenMaxCount: 'childrenMaxCount', // Max count by child def uuid
   childrenMinCount: 'childrenMinCount', // Min count by child def uuid
 }
@@ -45,6 +45,8 @@ const getHierarchy = A.pathOr([], [keys.meta, metaKeys.hierarchy])
 const isChildEditable = (childDefUuid) => (node) => Nodes.isChildEditable(node, childDefUuid)
 
 const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, childDefUuid)
+
+const isChildRequired = (childDefUuid) => (node) => Nodes.isChildRequired(node, childDefUuid)
 
 // Code metadata
 const getHierarchyCode = A.pathOr([], [keys.meta, metaKeys.hierarchyCode])
@@ -141,6 +143,7 @@ export const NodeMeta = {
   getHierarchyCode,
   isChildEditable,
   isChildVisible,
+  isChildRequired,
   getMetaKeysWithDefaultValue,
   compactMeta,
 

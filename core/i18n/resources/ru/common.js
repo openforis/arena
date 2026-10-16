@@ -1249,6 +1249,9 @@ $t(common.appNameFull)
       expressions: 'Выражения валидации',
       attributeAlwaysValid: 'Атрибут всегда корректен',
       attributeValidWhenConditionIsMet: 'Атрибут корректен при выполнении условия',
+      notRequired: 'Не обязательно',
+      alwaysRequired: 'Всегда обязательно',
+      requiredWhenConditionIsMet: 'Обязательно при выполнении условия',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Этот узел не может быть преобразован в множественный, потому что у него есть значения по умолчанию.',

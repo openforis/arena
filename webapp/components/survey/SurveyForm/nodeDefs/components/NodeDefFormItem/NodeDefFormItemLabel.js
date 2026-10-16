@@ -7,6 +7,7 @@ import { TestId } from '@webapp/utils/testId'
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
 import NodeDefIconKey from '../NodeDefIconKey'
 import { NodeDefInfoIcon } from '../NodeDefInfoIcon'
+import { NodeDefRequiredMarker } from '../NodeDefRequiredMarker'
 import NodeDefAttributeLockToggle from '../NodeDefAttributeLockToggle'
 
 const NodeDefFormItemLabel = (props) => {
@@ -29,6 +30,7 @@ const NodeDefFormItemLabel = (props) => {
     <NodeDefErrorBadge nodeDef={nodeDef} edit={edit} parentNode={parentNode} nodes={nodes}>
       <NodeDefIconKey nodeDef={nodeDef} />
       <span>{label}</span>
+      <NodeDefRequiredMarker nodeDef={nodeDef} parentNode={parentNode} />
       {keyFieldLockVisible && (
         <NodeDefAttributeLockToggle
           className="survey-form__node-def-attribute-lock-btn"

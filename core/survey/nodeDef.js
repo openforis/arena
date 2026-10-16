@@ -441,6 +441,14 @@ export const hasAdvancedPropsItemsFilterDraft = (nodeDef) =>
 // Node defs whose value (or, for auto-enumerated entities, their enumerated child nodes) can be
 // recalculated on publish - see RecordCheckJob. Requires the node def to have been fetched with
 // backup: true (see the two functions above).
+// True if the "required if" condition in the draft advanced props differs from the published one.
+// Like the checks below, it works only if the node def was fetched with backup: true.
+export const hasRequiredIfDraftChanged = (nodeDef) => {
+  if (!hasAdvancedPropsValidationsDraft(nodeDef)) return false
+  const requiredIfPath = `${keysPropsAdvanced.validations}.${NodeDefValidations.keys.requiredIf}`
+  return !A.equals(getPropAdvancedDraft(requiredIfPath, [])(nodeDef), getPropAdvanced(requiredIfPath, [])(nodeDef))
+}
+
 export const hasValueAffectingAdvancedPropsDraft = (nodeDef) =>
   hasAdvancedPropsApplicableDraft(nodeDef) ||
   hasAdvancedPropsDefaultValuesDraft(nodeDef) ||
@@ -464,6 +472,7 @@ export const hasValidationsDefined = (nodeDef) => {
   const validations = getValidations(nodeDef)
   return (
     NodeDefValidations.isRequired(validations) ||
+    NodeDefValidations.isRequiredIfDefined(validations) ||
     NodeDefValidations.isUnique(validations) ||
     !A.isEmpty(NodeDefValidations.getMinCount(validations)) ||
     !A.isEmpty(NodeDefValidations.getMaxCount(validations)) ||
@@ -868,7 +877,9 @@ export const canNameBeEdited = (nodeDef) => !isSampling(nodeDef)
 export const canBeHidden = (nodeDef) => isReadOnly(nodeDef)
 export const canBeShownAsHyperlinkOrMarkdown = (nodeDef) => isText(nodeDef) && isReadOnly(nodeDef)
 export const canBeHiddenInMobile = (nodeDef) =>
-  !isKey(nodeDef) && !NodeDefValidations.isRequired(getValidations(nodeDef))
+  !isKey(nodeDef) &&
+  !NodeDefValidations.isRequired(getValidations(nodeDef)) &&
+  !NodeDefValidations.isRequiredIfDefined(getValidations(nodeDef))
 
 export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   isAttribute(nodeDef) &&

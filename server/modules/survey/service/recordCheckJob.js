@@ -4,6 +4,7 @@ import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
@@ -123,8 +124,13 @@ export default class RecordCheckJob extends Job {
     )
 
     // 2. determine new, updated or deleted node defs
-    const { nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefValidationUpdatedUuids, nodeDefDeletedUuids } =
-      this._classifyNodeDefs(Survey.getNodeDefsArray(survey))
+    const {
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+    } = this._classifyNodeDefs(Survey.getNodeDefsArray(survey))
 
     // 2b. determine node defs affected by a category/taxonomy extra prop change (definition or
     // item/taxon value) - these don't have their own advanced props draft flag set (their own props
@@ -158,7 +164,8 @@ export default class RecordCheckJob extends Job {
       nodeDefAddedUuids.length +
         nodeDefUpdatedUuids.length +
         nodeDefValidationUpdatedUuids.length +
-        nodeDefDeletedUuids.length >
+        nodeDefDeletedUuids.length +
+        nodeDefRequiredIfUpdatedUuids.length >
         0
 
     const result = {
@@ -167,6 +174,7 @@ export default class RecordCheckJob extends Job {
       nodeDefUpdatedUuids,
       nodeDefValidationUpdatedUuids,
       nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
       requiresCheck,
       forceFullCheck,
       nodesForDeletedNodeDefsDeleted: false,
@@ -193,6 +201,8 @@ export default class RecordCheckJob extends Job {
     const nodeDefUpdatedUuids = []
     const nodeDefValidationUpdatedUuids = []
     const nodeDefDeletedUuids = []
+    // published node defs whose "required if" condition changed: their "required if" flags must be recomputed
+    const nodeDefRequiredIfUpdatedUuids = []
 
     for (const def of nodeDefs) {
       const nodeDefUuid = NodeDef.getUuid(def)
@@ -209,9 +219,18 @@ export default class RecordCheckJob extends Job {
         // Already existing node def but only validations have been updated
         nodeDefValidationUpdatedUuids.push(nodeDefUuid)
       }
+      if (!NodeDef.isDeleted(def) && NodeDef.isPublished(def) && NodeDef.hasRequiredIfDraftChanged(def)) {
+        nodeDefRequiredIfUpdatedUuids.push(nodeDefUuid)
+      }
     }
 
-    return { nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefValidationUpdatedUuids, nodeDefDeletedUuids }
+    return {
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+    }
   }
 
   // Folds category/taxonomy-extra-prop-affected node defs into the buckets from _classifyNodeDefs, in
@@ -297,6 +316,7 @@ export default class RecordCheckJob extends Job {
       nodeDefUpdatedUuids,
       nodeDefValidationUpdatedUuids,
       nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
       allNotDeletedNodeDefUuids,
       forceFullCheck,
     } = surveyAndNodeDefs
@@ -353,6 +373,31 @@ export default class RecordCheckJob extends Job {
       this.logDebugOptional('default values applied')
     }
 
+    // 4b. recompute the "required if" flags of node defs whose condition changed (new node defs are handled in step 4)
+    const nodeDefRequiredIfToUpdateUuids = forceFullCheck
+      ? _getRequiredIfNodeDefUuids({ survey, nodeDefUuids: allNotDeletedNodeDefUuids })
+      : nodeDefRequiredIfUpdatedUuids
+    const requiredIfAttributesByUuid = {}
+    if (nodeDefRequiredIfToUpdateUuids.length > 0) {
+      this.logDebugOptional('updating "required if" flags')
+      const { record: recordUpdateRequired, nodes: nodesUpdatedRequired = {} } =
+        await RecordManager.updateRequiredFlags({
+          user,
+          survey,
+          record,
+          nodeDefUuids: nodeDefRequiredIfToUpdateUuids,
+          sideEffect: true,
+        })
+      record = recordUpdateRequired || record
+      Object.assign(allUpdatedNodesByUuid, nodesUpdatedRequired)
+      // the attributes must be re-validated (only parent nodes of node defs with changed validations are validated)
+      for (const nodeDefUuid of nodeDefRequiredIfToUpdateUuids) {
+        for (const attribute of Record.getNodesByDefUuid(nodeDefUuid)(record)) {
+          requiredIfAttributesByUuid[Node.getUuid(attribute)] = attribute
+        }
+      }
+    }
+
     // 4a. Persist nodes
     this.logDebugOptional(`persisting ${Object.keys(allUpdatedNodesByUuid).length} nodes`)
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
@@ -375,14 +420,21 @@ export default class RecordCheckJob extends Job {
       forceFullCheck ||
       !A.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
       !A.isEmpty(nodeDefDeletedUuids) ||
-      !A.isEmpty(allUpdatedNodesByUuid)
+      !A.isEmpty(allUpdatedNodesByUuid) ||
+      !A.isEmpty(requiredIfAttributesByUuid)
     ) {
       const nodeDefUuidsToValidate = forceFullCheck
         ? allNotDeletedNodeDefUuids
         : nodeDefAddedOrUpdatedOrValidationUpdatedUuids
       this.logDebugOptional(`validating record ${recordUuid} (${nodeDefUuidsToValidate.length} node defs)`)
       await _validateNodes(
-        { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
+        {
+          user,
+          survey,
+          nodeDefUuids: nodeDefUuidsToValidate,
+          record,
+          nodes: { ...allUpdatedNodesByUuid, ...requiredIfAttributesByUuid },
+        },
         this.tx
       )
     }
@@ -482,6 +534,11 @@ const _clearRecordKeysValidation = (record) => {
   }
   return record
 }
+
+const _getRequiredIfNodeDefUuids = ({ survey, nodeDefUuids }) =>
+  nodeDefUuids.filter((nodeDefUuid) =>
+    NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(Survey.getNodeDefByUuid(nodeDefUuid)(survey)))
+  )
 
 const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
   const nodesToValidate = { ...nodes }

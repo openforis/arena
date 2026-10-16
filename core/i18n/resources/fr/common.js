@@ -1257,6 +1257,9 @@ Ex. this.region = nom_attribut_region
       expressions: 'Expressions de validation',
       attributeAlwaysValid: 'Attribut toujours valide',
       attributeValidWhenConditionIsMet: 'Attribut valide lorsque la condition est remplie',
+      notRequired: 'Non obligatoire',
+      alwaysRequired: 'Toujours obligatoire',
+      requiredWhenConditionIsMet: 'Obligatoire lorsque la condition est remplie',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Ce nœud ne peut pas être converti en multiple car il a des valeurs par défaut.',

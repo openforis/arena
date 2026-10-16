@@ -1244,6 +1244,9 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
       expressions: 'Validation expressions',
       attributeAlwaysValid: 'Attribute always valid',
       attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
+      notRequired: 'Not required',
+      alwaysRequired: 'Always required',
+      requiredWhenConditionIsMet: 'Required when condition is met',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',

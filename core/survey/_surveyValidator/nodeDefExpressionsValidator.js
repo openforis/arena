@@ -19,6 +19,7 @@ const expressionsByDependencyTypeFns = {
   [dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
   [dependencyTypes.maxCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount),
   [dependencyTypes.minCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMinCount),
+  [dependencyTypes.required]: A.pipe(NodeDef.getValidations, NodeDefValidations.getRequiredIf),
 }
 
 const applyIfUniquenessByDependencyType = {
@@ -28,6 +29,7 @@ const applyIfUniquenessByDependencyType = {
   [dependencyTypes.formula]: false,
   [dependencyTypes.maxCount]: true,
   [dependencyTypes.minCount]: true,
+  [dependencyTypes.required]: false,
 }
 
 const errorKeyByDependencyType = {
@@ -37,6 +39,7 @@ const errorKeyByDependencyType = {
   [dependencyTypes.formula]: Validation.messageKeys.nodeDefEdit.formulaInvalid,
   [dependencyTypes.maxCount]: Validation.messageKeys.nodeDefEdit.countMaxInvalid,
   [dependencyTypes.minCount]: Validation.messageKeys.nodeDefEdit.countMinInvalid,
+  [dependencyTypes.required]: Validation.messageKeys.nodeDefEdit.requiredIfInvalid,
 }
 
 const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
