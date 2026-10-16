@@ -26,14 +26,17 @@ export type SurveyAiPolicyCache = {
 
 type Entry = {
   value: SurveyAiPolicyClientState | null
+  // generation that was current when `value` was stored
+  valueGeneration: number
   fetchedAt: number
   fresh: boolean
   generation: number
   inflight: Promise<Fetched> | null
 }
 
-// a server answer, and whether a newer generation started before it came (then it was not stored)
-type Fetched = { value: SurveyAiPolicyClientState; superseded: boolean }
+// a server answer, the generation of its request, and whether a newer generation started before it came (then it
+// was not stored)
+type Fetched = { value: SurveyAiPolicyClientState; superseded: boolean; generation: number }
 
 export const surveyAiPolicyTtlMs = 30_000
 
@@ -79,7 +82,7 @@ export const createSurveyAiPolicyCache = ({
   const getEntry = (surveyId: number): Entry => {
     let entry = entries.get(surveyId)
     if (!entry) {
-      entry = { value: null, fetchedAt: 0, fresh: false, generation: 0, inflight: null }
+      entry = { value: null, valueGeneration: 0, fetchedAt: 0, fresh: false, generation: 0, inflight: null }
       entries.set(surveyId, entry)
     }
     return entry
@@ -103,6 +106,7 @@ export const createSurveyAiPolicyCache = ({
    */
   const store = (surveyId: number, entry: Entry, value: SurveyAiPolicyClientState): void => {
     entry.value = value
+    entry.valueGeneration = entry.generation
     entry.fetchedAt = now()
     entry.fresh = true
     notify(surveyId)
@@ -139,7 +143,7 @@ export const createSurveyAiPolicyCache = ({
         const value = await fetchPolicy(surveyId)
         const superseded = entry.generation !== generation
         if (!superseded) store(surveyId, entry, value)
-        return { value, superseded }
+        return { value, superseded, generation }
       } finally {
         if (entry.generation === generation) entry.inflight = null
       }
@@ -149,14 +153,16 @@ export const createSurveyAiPolicyCache = ({
   }
 
   /**
-   * Returns the answer to a caller that accepts the cache: a request that was superseded gives the newer cached value.
+   * Returns the answer to a caller that accepts the cache: a request that was superseded gives the cached value only
+   * when a later generation stored it, otherwise its own (newer than the cached one) server answer.
    * @param {Entry} entry - The survey entry.
    * @param {Promise<Fetched>} request - The shared request.
    * @returns {Promise<SurveyAiPolicyClientState>} The policy state.
    */
   const toCachedAnswer = async (entry: Entry, request: Promise<Fetched>): Promise<SurveyAiPolicyClientState> => {
-    const { value, superseded } = await request
-    return superseded ? (entry.value ?? value) : value
+    const { value, superseded, generation } = await request
+    const storedByLater = entry.value !== null && entry.valueGeneration > generation
+    return superseded && storedByLater ? (entry.value as SurveyAiPolicyClientState) : value
   }
 
   /**
