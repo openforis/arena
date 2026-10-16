@@ -95,6 +95,10 @@ export const TestId = {
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },
+  guest: {
+    languageBtn: 'guest-language-btn',
+    languageItem: (lang) => `guest-language-item-${lang}`,
+  },
   header: {
     surveyTitle: 'header-survey-title',
     surveyCreateBtn: 'survey-create-btn',
