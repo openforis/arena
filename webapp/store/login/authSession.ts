@@ -1,7 +1,7 @@
 /**
  * What the browser does when a session starts or ends, apart from the Redux state: the auth token and the AI state.
  */
-import axios from 'axios'
+import axios, { type AxiosRequestConfig } from 'axios'
 
 import { logAiWarning, type AiLog } from '@webapp/ai/log/aiLog'
 import { resetAiSession } from '@webapp/ai/session/resetAiSession'
@@ -26,7 +26,7 @@ export type AuthSession = {
 export const LOGOUT_RETRY_DELAY_MS = 500
 
 // read by appErrorsMiddleware: no error toast for the logout request, the warning of the logout says what happened
-export const logoutRequestConfig = { errorHandledLocally: true }
+export const logoutRequestConfig: AxiosRequestConfig & { errorHandledLocally: boolean } = { errorHandledLocally: true }
 
 /**
  * Waits.
