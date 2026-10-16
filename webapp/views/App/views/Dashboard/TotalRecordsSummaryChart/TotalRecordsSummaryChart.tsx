@@ -5,9 +5,10 @@ import { convertDateFromISOToDisplay } from '@core/dateUtils'
 
 import { ChartWrapper, RotatedCustomAxisTick } from '@webapp/charts/common'
 import { useI18n } from '@webapp/store/system'
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 
 import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
+import { withAlpha } from '../theme/dashboardAccents'
 
 type RecordsCountRow = { date?: string; count?: string | number }
 
@@ -22,10 +23,10 @@ const margin = {
   left: 0,
 }
 
-const LINE_COLOR = defaultTokens.colors.blue
-const AREA_FILL = `${defaultTokens.colors.blue}33`
-const GRID_STROKE = defaultTokens.colors.greyBorder
-const AXIS_STROKE = defaultTokens.colors.blueDark
+const LINE_COLOR = themeColors.primary
+const AREA_FILL = withAlpha(themeColors.primary, 0.2)
+const GRID_STROKE = themeColors.outline
+const AXIS_STROKE = themeColors.onPrimaryContainer
 
 /**
  * Line/area trend of records added over the selected period.

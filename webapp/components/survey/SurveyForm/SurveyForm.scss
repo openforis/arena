@@ -13,13 +13,13 @@
   height: calc(100% - #{$formHeaderHeight});
 
   &.form-preview {
-    border: $orange 8px solid;
+    border: $colorWarning 8px solid;
     position: relative;
 
     .preview-label {
       position: absolute;
-      background: $orange;
-      color: white;
+      background: $colorWarning;
+      color: $colorOnPrimary;
       top: calc(-8px - 32px);
       padding: 8px;
       left: 50%;
@@ -65,7 +65,7 @@
     .nodedef-tree-select {
       flex: 1;
       border: $formBorder;
-      background-color: $white;
+      background-color: $colorSurface;
     }
 
     .sidebar-bottom-bar {
@@ -83,8 +83,8 @@
         display: block;
 
         &::after {
-          border-right: 2px solid $greyBorder;
-          border-bottom: 2px solid $greyBorder;
+          border-right: 2px solid $colorOutline;
+          border-bottom: 2px solid $colorOutline;
         }
       }
     }
@@ -98,7 +98,7 @@
 .survey-form.entry {
   .survey-form__internal-container-wrapper {
     box-sizing: border-box;
-    background-color: $greyAppBg;
+    background-color: $colorBackground;
     // Margin on the page (not padding here) so height:100% children cannot
     // paint over the grey gutter.
     overflow: auto;
@@ -109,12 +109,12 @@
     margin: 12px;
     height: calc(100% - 24px) !important;
     width: calc(100% - 24px) !important;
-    background-color: $white;
+    background-color: $colorSurface;
     border-radius: 4px;
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
   }
 
   .survey-form__node-def-entity-wrapper {
-    background-color: $white;
+    background-color: $colorSurface;
   }
 }

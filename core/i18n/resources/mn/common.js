@@ -308,6 +308,12 @@ export default {
   },
 
   header: {
+    theme: {
+      label: 'Загвар',
+      light: 'Цайвар',
+      dark: 'Бараан',
+      system: 'Системийн тохиргоо',
+    },
     myProfile: 'Миний профайл',
     qrCodeLoginDialog: {
       title: 'Arena Mobile-д QR код ашиглан нэвтрэх',

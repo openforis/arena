@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 $appNotificationWidth: 500px;
@@ -33,19 +32,19 @@ $appNotificationWidthSmallScreens: 90vw;
 }
 
 .notification.info {
-  background-color: color.adjust($blueLightActive, $lightness: 18%);
-  border-color: color.adjust($blueLightActive, $lightness: 5%);
+  background-color: tint($colorPrimaryContainerHigh, 75%);
+  border-color: tint($colorPrimaryContainerHigh, 20%);
 }
 
 .notification.warning {
-  background-color: color.adjust($orangeLight, $lightness: 8%);
-  border-color: $orange;
+  background-color: tint($colorWarningContainer, 40%);
+  border-color: $colorWarning;
 }
 
 .notification.error {
-  color: $white;
-  background-color: color.adjust($red, $lightness: 10%);
-  border-color: $red;
+  color: $colorOnError;
+  background-color: tint($colorError, 20%);
+  border-color: $colorError;
 }
 
 .notification.enter-active {

@@ -6,7 +6,7 @@
   gap: 2rem;
 
   .query {
-    background-color: rgba($blueLight, 0.15);
+    background-color: with-alpha($colorPrimaryContainer, 0.15);
   }
 }
 
@@ -14,12 +14,12 @@
   font-size: 0.9rem;
 
   kbd {
-    border: 1px solid #aaa;
+    border: 1px solid shade($colorOutline, 30%);
     border-radius: 0.2em;
     box-shadow: 0.1em 0.1em 0.2em rgba(0, 0, 0, 0.1);
-    background-color: #f9f9f9;
-    background-image: linear-gradient(to bottom, #eee, #f9f9f9, #eee);
-    color: #000;
+    background-color: $colorBackground;
+    background-image: linear-gradient(to bottom, $colorSurfaceVariant, $colorBackground, $colorSurfaceVariant);
+    color: $colorOnSurface;
     padding: 0.1em 0.3em;
     font-family: inherit;
   }
@@ -55,7 +55,7 @@
 
   // These must match, for the autocomplete to work properly.
   textarea {
-    border: 1px solid black;
+    border: 1px solid $colorOnSurface;
     margin-bottom: 15px;
   }
 
@@ -153,7 +153,7 @@
     display: grid;
     grid-template-columns: 1.5rem 1fr;
     padding: 0.5rem;
-    border: 2px dotted $greyBorder;
+    border: 2px dotted $colorOutline;
 
     .footer {
       display: flex;

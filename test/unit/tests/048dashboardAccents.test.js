@@ -1,26 +1,27 @@
-import { defaultTokens } from '@webapp/theme/tokens'
-import {
-  getDashboardAccent,
-  withAlpha,
-} from '@webapp/views/App/views/Dashboard/theme/dashboardAccents'
+import { themeColors } from '@webapp/theme/tokens'
+import { getDashboardAccent, withAlpha } from '@webapp/views/App/views/Dashboard/theme/dashboardAccents'
 
 describe('withAlpha', () => {
-  it('appends AA from alpha 0–1 on a 7-char hex', () => {
-    expect(withAlpha('#3885ca', 0.12)).toBe('#3885ca1f')
+  it('mixes the color with transparent using alpha 0–1', () => {
+    expect(withAlpha('#3885ca', 0.12)).toBe('color-mix(in srgb, #3885ca 12%, transparent)')
+  })
+
+  it('supports CSS variables and clamps alpha', () => {
+    expect(withAlpha('var(--color-primary)', 2)).toBe('color-mix(in srgb, var(--color-primary) 100%, transparent)')
   })
 })
 
 describe('getDashboardAccent', () => {
-  it('maps records to blue', () => {
-    expect(getDashboardAccent('records').color).toBe(defaultTokens.colors.blue)
+  it('maps records to primary', () => {
+    expect(getDashboardAccent('records').color).toBe(themeColors.primary)
   })
 
-  it('maps contributors to green', () => {
-    expect(getDashboardAccent('contributors').color).toBe(defaultTokens.colors.green)
+  it('maps contributors to success', () => {
+    expect(getDashboardAccent('contributors').color).toBe(themeColors.success)
   })
 
-  it('maps storage to orange', () => {
-    expect(getDashboardAccent('storage').color).toBe(defaultTokens.colors.orange)
+  it('maps storage to warning', () => {
+    expect(getDashboardAccent('storage').color).toBe(themeColors.warning)
   })
 
   it('exposes an Icon component for each kind', () => {

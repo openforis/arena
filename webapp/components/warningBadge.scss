@@ -1,7 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
 .warning-badge {
-  background-color: $orange;
-  color: white;
+  background-color: $colorWarning;
+  color: $colorOnPrimary;
   text-transform: uppercase;
 }

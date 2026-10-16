@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
+import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'
 
 const OptionComponent =
@@ -128,6 +129,7 @@ const Dropdown = (props) => {
         options={options}
         placeholder={placeholder}
         ref={selectRef}
+        theme={dropdownTheme}
         value={value}
       />
     </ValidationTooltip>

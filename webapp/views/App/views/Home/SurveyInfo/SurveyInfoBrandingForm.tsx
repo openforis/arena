@@ -40,7 +40,7 @@ const BACKGROUND_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,.png,.jpg,
 
 const LANDING_BACKGROUND_MAX_SIZE_MB = SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES / (1024 * 1024)
 const LOGO_MAX_SIZE_MB = SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES / (1024 * 1024)
-const DEFAULT_PREVIEW_BUTTON_COLOR = defaultTokens.colors.blue
+const DEFAULT_PREVIEW_BUTTON_COLOR = defaultTokens.colors.primary
 
 type BrandingImageKey = SurveyLogoKey | typeof brandingKeys.landingBackground
 

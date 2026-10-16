@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .data-query__sortable-items-form-item {
@@ -21,11 +20,11 @@
 }
 
 .data-query__sortable-item-chip.MuiChip-root {
-  background-color: white;
+  background-color: $colorSurface;
 
   &.draggable-mirror {
-    background-color: color.adjust($orangeLight, $lightness: 10%);
-    border: 1px dashed $blue;
+    background-color: tint($colorWarningContainer, 45%);
+    border: 1px dashed $colorPrimary;
   }
 
   &.draggable-source--is-dragging {

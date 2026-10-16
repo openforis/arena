@@ -2,7 +2,7 @@ import React from 'react'
 import Box from '@mui/material/Box'
 
 import { TestId } from '@webapp/utils/testId'
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 
 import { DashboardSection } from '../components/DashboardSection'
 import { useRecordsSummaryContext } from '../RecordsSummaryContext'
@@ -29,7 +29,7 @@ const RecordTrendSection = () => {
                 '& .no-records-added': {
                   padding: '2rem 0',
                   textAlign: 'center',
-                  color: defaultTokens.colors.blueDark,
+                  color: themeColors.onPrimaryContainer,
                 },
               }),
         }}

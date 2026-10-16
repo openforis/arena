@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .chain-clone-from-survey-dialog {
   &__entity-check-list {
     .icon {
@@ -6,11 +8,11 @@
   }
 
   &__entity-icon--found {
-    color: #4caf50;
+    color: $colorSuccess;
   }
 
   &__entity-icon--missing {
-    color: #e53935;
+    color: $colorError;
   }
 
   &__skip-missing-checkbox-wrapper {

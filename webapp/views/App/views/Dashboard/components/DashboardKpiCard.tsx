@@ -6,7 +6,7 @@ import MuiCardContent from '@mui/material/CardContent'
 import MuiCollapse from '@mui/material/Collapse'
 
 import { useI18n } from '@webapp/store/system'
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 
 import { getDashboardAccent, withAlpha, type DashboardAccentKind } from '../theme/dashboardAccents'
 import { dashboardSurfaces } from '../theme/dashboardSurfaces'
@@ -85,17 +85,14 @@ const KpiHeader = (props: KpiHeaderProps) => {
           sx={{
             fontSize: '0.85rem',
             textTransform: 'none',
-            color: defaultTokens.colors.blueDark,
+            color: themeColors.onPrimaryContainer,
             fontWeight: 500,
           }}
         >
           {title}
         </Box>
       </Box>
-      <Box
-        component="span"
-        sx={{ fontSize: '2rem', fontWeight: 600, color: defaultTokens.colors.black, lineHeight: 1.2 }}
-      >
+      <Box component="span" sx={{ fontSize: '2rem', fontWeight: 600, color: themeColors.onSurface, lineHeight: 1.2 }}>
         {value}
       </Box>
       {expandable && (

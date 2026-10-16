@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .ai-explain-panel {
   .modal-body {
     display: flex;
@@ -6,7 +8,7 @@
   }
 
   &__expression {
-    background: var(--colorGrey300);
+    background: $colorSurfaceVariant;
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
     font-family: monospace;
@@ -28,7 +30,7 @@
   }
 
   &__error {
-    color: #c62828;
+    color: $colorError;
     font-size: 0.9rem;
   }
 

@@ -106,6 +106,8 @@ export const TestId = {
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',
+    themeBtn: 'theme-btn',
+    themeItem: (theme) => `theme-item-${theme}`,
   },
   modal: {
     close: 'text="Close"',

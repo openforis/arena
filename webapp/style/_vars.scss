@@ -1,5 +1,3 @@
-@use 'sass:color';
-
 $fontFamily: 'Noto Sans', sans-serif;
 
 // sidebar
@@ -12,38 +10,76 @@ $headerHeight: 45px;
 // table footer
 $footerHeight: 45px;
 
-// colors
-$red: #ed5b46;
-$pink: #f7dfe3;
-$green: #84ac67;
-$greenLight: #f0f2e7;
-$yellow: #fee997;
+// colors: theme tokens defined as CSS custom properties in `themes.scss` (resolved at runtime, so they follow the
+// selected theme). Use the helper functions below instead of Sass color functions (rgba, color.adjust), which only
+// work with compile-time colors.
+$colorPrimary: var(--color-primary);
+$colorOnPrimary: var(--color-on-primary);
+$colorPrimaryContainer: var(--color-primary-container);
+$colorPrimaryContainerLow: var(--color-primary-container-low);
+$colorPrimaryContainerHigh: var(--color-primary-container-high);
+$colorOnPrimaryContainer: var(--color-on-primary-container);
 
-$grey: #e7e9ee;
-$greyAppBg: color.adjust($grey, $lightness: 5%);
-$greyBorder: #d1d1dd;
-$blue: #3885ca;
-$blueLight: color.adjust($blue, $lightness: 35%);
-$blueLightFocus: color.adjust($blue, $lightness: 45%);
-$blueLightActive: color.adjust($blue, $lightness: 25%);
-$blueDark: color.adjust($blue, $lightness: -20%);
-$orange: #eba444;
-$orangeLight: #f9ccb2;
-$black: #2f3138;
-$yellowHighlight: #f8f6cc;
-$white: #ffffff;
+$colorSecondary: var(--color-secondary);
+$colorOnSecondary: var(--color-on-secondary);
+$colorSecondaryContainer: var(--color-secondary-container);
+$colorOnSecondaryContainer: var(--color-on-secondary-container);
 
-$colorError: $red;
+$colorBackground: var(--color-background);
+$colorOnBackground: var(--color-on-background);
 
-$colorTextPrimary: color.adjust($blue, $lightness: -20%);
-$borderColorFocussed: color.adjust($blue, $lightness: -20%);
-$backgroundColorSecondary: $white;
-$inputBackgroundColor: $white;
+$colorSurface: var(--color-surface);
+$colorOnSurface: var(--color-on-surface);
+$colorSurfaceVariant: var(--color-surface-variant);
+$colorOnSurfaceVariant: var(--color-on-surface-variant);
+$colorSurfaceDisabled: var(--color-surface-disabled);
 
-$tooltipBg: $grey;
+$colorInverseSurface: var(--color-inverse-surface);
+$colorInverseOnSurface: var(--color-inverse-on-surface);
 
-$dragAcceptColor: $green;
-$dragRejectColor: $red;
+$colorOutline: var(--color-outline);
+
+$colorError: var(--color-error);
+$colorOnError: var(--color-on-error);
+$colorErrorContainer: var(--color-error-container);
+
+$colorSuccess: var(--color-success);
+$colorOnSuccess: var(--color-on-success);
+$colorSuccessContainer: var(--color-success-container);
+
+$colorWarning: var(--color-warning);
+$colorOnWarning: var(--color-on-warning);
+$colorWarningContainer: var(--color-warning-container);
+
+$colorHighlight: var(--color-highlight);
+$colorHighlightContainer: var(--color-highlight-container);
+
+$colorShadow: var(--color-shadow);
+$colorScrim: var(--color-scrim);
+
+/// Returns the color with the given opacity (runtime equivalent of `rgba($color, $opacity)`).
+/// @param {Color} $color - Color (or CSS variable).
+/// @param {Number} $opacity - Opacity between 0 and 1.
+/// @return {String} The CSS color expression.
+@function with-alpha($color, $opacity) {
+  @return color-mix(in srgb, #{$color} #{$opacity * 100%}, transparent);
+}
+
+/// Mixes the color with the theme surface (lighter in the light theme, darker in the dark one).
+/// @param {Color} $color - Color (or CSS variable).
+/// @param {Number} $amount - Percentage of surface color to mix in.
+/// @return {String} The CSS color expression.
+@function tint($color, $amount) {
+  @return color-mix(in srgb, #{$color}, #{$colorSurface} #{$amount});
+}
+
+/// Mixes the color with the theme text color (darker in the light theme, lighter in the dark one).
+/// @param {Color} $color - Color (or CSS variable).
+/// @param {Number} $amount - Percentage of text color to mix in.
+/// @return {String} The CSS color expression.
+@function shade($color, $amount) {
+  @return color-mix(in srgb, #{$color}, #{$colorOnSurface} #{$amount});
+}
 
 //z-indexes
 
@@ -62,15 +98,15 @@ $zIndex90AppError: 90;
 /* Policy: everything is below app loader to stop user action */
 $zIndex190AppLoader: 190;
 
-$shadow1: 0 0 4px rgba($black, 0.2);
-$shadow2: 0 0 8px rgba($black, 0.2);
+$shadow1: 0 0 4px with-alpha($colorShadow, 0.2);
+$shadow2: 0 0 8px with-alpha($colorShadow, 0.2);
 $shadow3:
-  0 0 8px 1px rgba($black, 0.2),
-  0 0 0 1px rgba($black, 0.1);
+  0 0 8px 1px with-alpha($colorShadow, 0.2),
+  0 0 0 1px with-alpha($colorShadow, 0.1);
 
 // table
 $tableRowHeight: 35px;
-$tableRowBorder: 1px solid $greyBorder;
+$tableRowBorder: 1px solid $colorOutline;
 
 // profile picture
-$profilePictureBorder: 2px solid color.adjust($greyBorder, $lightness: 10%);
+$profilePictureBorder: 2px solid tint($colorOutline, 50%);

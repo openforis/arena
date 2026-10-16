@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .ai-chatbot-fab {
   position: fixed;
   bottom: 1.5rem;
@@ -6,8 +8,8 @@
   height: 3rem;
   border-radius: 50%;
   border: none;
-  background: var(--colorPrimary, #1565c0);
-  color: #fff;
+  background: $colorPrimary;
+  color: $colorOnPrimary;
   font-size: 1.4rem;
   cursor: pointer;
   box-shadow: 0 4px 14px rgba(0, 0, 0, 0.2);
@@ -38,8 +40,8 @@
   max-width: calc(100vw - 2rem);
   height: 80vh;
   max-height: 80vh;
-  background: #fff;
-  border: 1px solid var(--colorGrey500);
+  background: $colorSurface;
+  border: 1px solid shade($colorOutline, 30%);
   border-radius: 6px;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
   z-index: 100;
@@ -76,19 +78,19 @@
     flex-direction: column;
     gap: 0.5rem;
     padding: 0.25rem;
-    background: var(--colorGrey200, #f5f5f5);
+    background: $colorBackground;
     border-radius: 4px;
   }
 
   &__empty {
-    color: var(--colorGrey600, #757575);
+    color: $colorOnSurfaceVariant;
     font-size: 0.9rem;
     padding: 1rem;
     text-align: center;
   }
 
   &__error {
-    color: #c62828;
+    color: $colorError;
     font-size: 0.85rem;
     padding: 0.5rem;
   }
@@ -104,7 +106,7 @@
       max-height: 8rem;
       resize: vertical;
       padding: 0.4rem 0.6rem;
-      border: 1px solid var(--greyBorder, #d1d1dd);
+      border: 1px solid $colorOutline;
       border-radius: 4px;
       font-family: inherit;
       font-size: 0.9rem;
@@ -163,14 +165,14 @@
   }
 
   &--user &__bubble {
-    background: var(--colorPrimary, #1565c0);
-    color: #fff;
+    background: $colorPrimary;
+    color: $colorOnPrimary;
     white-space: pre-wrap;
   }
 
   &--assistant &__bubble {
-    background: #fff;
-    border: 1px solid var(--colorGrey400, #e0e0e0);
+    background: $colorSurface;
+    border: 1px solid $colorOutline;
 
     // Tame the rendered markdown so it fits inside a narrow bubble.
     p,
@@ -208,14 +210,14 @@
     }
 
     code {
-      background: var(--colorGrey300, #eee);
+      background: $colorSurfaceVariant;
       padding: 0.05rem 0.25rem;
       border-radius: 3px;
       font-size: 0.85em;
     }
 
     pre {
-      background: var(--colorGrey300, #eee);
+      background: $colorSurfaceVariant;
       padding: 0.5rem;
       border-radius: 4px;
       max-width: 100%;
@@ -242,25 +244,25 @@
 
       th,
       td {
-        border: 1px solid var(--colorGrey400, #e0e0e0);
+        border: 1px solid $colorOutline;
         padding: 0.2rem 0.4rem;
         text-align: left;
       }
 
       th {
-        background: var(--colorGrey200, #f5f5f5);
+        background: $colorBackground;
         font-weight: 600;
       }
     }
 
     hr {
       border: 0;
-      border-top: 1px solid var(--colorGrey400, #e0e0e0);
+      border-top: 1px solid $colorOutline;
       margin: 0.5rem 0;
     }
 
     a {
-      color: var(--colorPrimary, #1565c0);
+      color: $colorPrimary;
       text-decoration: underline;
     }
   }
@@ -274,7 +276,7 @@
   &__reasoning {
     max-width: 90%;
     font-size: 0.8rem;
-    color: var(--colorGrey700, #616161);
+    color: $colorOnSurfaceVariant;
 
     summary {
       cursor: pointer;
@@ -284,7 +286,7 @@
     &-content {
       margin-top: 0.25rem;
       padding: 0.4rem 0.6rem;
-      background: var(--colorGrey300, #eee);
+      background: $colorSurfaceVariant;
       border-radius: 4px;
       white-space: pre-wrap;
     }
