@@ -1,15 +1,17 @@
 import { useMemo } from 'react'
 
-import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
+import type { ChangeSetCardState, OperationConflict } from '@webapp/ai/changeSets/types'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 
-import { getConflictingOperationIds, getPendingOperationIds } from './changeSetCardModel'
+import { getOperationConflicts, getPendingOperationIds } from './changeSetCardModel'
 import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
 import { useExclusiveRun } from './useExclusiveRun'
 import { useOperationSelection } from './useOperationSelection'
 
 export type ChangeSetSelection = {
   pendingIds: string[]
+  // pending operations that conflict with the survey, with their reasons
+  conflicts: OperationConflict[]
   conflictIds: string[]
   // pending without conflict
   selectableIds: string[]
@@ -49,7 +51,8 @@ export const useChangeSetSelection = ({
   onDiscard: () => Promise<void> | void
 }): ChangeSetSelection => {
   const pendingIds = useMemo(() => getPendingOperationIds(cardState), [cardState])
-  const conflictIds = useMemo(() => getConflictingOperationIds({ cardState, survey }), [cardState, survey])
+  const conflicts = useMemo(() => getOperationConflicts({ cardState, survey }), [cardState, survey])
+  const conflictIds = useMemo(() => conflicts.map((conflict) => conflict.id), [conflicts])
   const selectableIds = useMemo(() => pendingIds.filter((id) => !conflictIds.includes(id)), [conflictIds, pendingIds])
   const { selectedIds, toggle, setSelected } = useOperationSelection({
     selectableIds,
@@ -69,6 +72,7 @@ export const useChangeSetSelection = ({
 
   return {
     pendingIds,
+    conflicts,
     conflictIds,
     selectableIds,
     selectedIds,

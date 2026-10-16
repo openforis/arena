@@ -129,13 +129,18 @@ export type I18nKeyConflictReason = `${string}.${string}` | `${string}:${string}
 
 export type ConflictReason = PlainConflictReason | I18nKeyConflictReason
 
+// the namespaces of the keys that conflicts and results carry: the assistant's own sentences, the designer's
+// validation messages and the server's errors
+const I18N_KEY_REASON_PATTERN = /^(aiAssistant\.|validationErrors:|appErrors:)/
+
 /**
  * Tells whether a conflict reason or result message is an i18n key to translate with its params. The plain reasons
- * are single camelCase words; a key always has a "." or a ":".
+ * are single camelCase words; a key starts with one of the namespaces that conflicts and results use, so a free text
+ * with a "." or a ":" is never taken for a key.
  * @param {string} reason - Conflict reason or result message.
  * @returns {boolean} True for an i18n key.
  */
-export const isI18nKeyReason = (reason: string): reason is I18nKeyConflictReason => /[.:]/.test(reason)
+export const isI18nKeyReason = (reason: string): reason is I18nKeyConflictReason => I18N_KEY_REASON_PATTERN.test(reason)
 
 // params: the interpolation values of an i18n key reason
 export type OperationConflict = { id: string; reason: ConflictReason; params?: Record<string, unknown> }
