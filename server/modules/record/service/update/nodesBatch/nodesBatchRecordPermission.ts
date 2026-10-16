@@ -1,3 +1,5 @@
+import type { Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 
@@ -7,7 +9,7 @@ import * as Record from '@core/record/record'
  * @param {object} survey - The survey.
  * @returns {object} The record.
  */
-export const withSurveyUuid = (record: any, survey: any) =>
+export const withSurveyUuid = (record: ArenaRecord, survey: ArenaSurvey) =>
   Record.getSurveyUuid(record)
     ? record
     : { ...record, [Record.keys.surveyUuid]: Survey.getUuid(Survey.getSurveyInfo(survey)) }
