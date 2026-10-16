@@ -22,7 +22,8 @@ export const appBatchGuardDeps: AiBatchGuardDeps = {
    * Reads the survey's effective AI policy from the server (fresh: the 30 s cache would hide a change made by an
    * administrator during the run), by the same rule as the engine selection.
    * @param {number} surveyId - Survey id.
+   * @param {string} feature - Feature key of the batch.
    * @returns {Promise<object>} The effective policy.
    */
-  fetchEffectivePolicy: (surveyId) => getEffectivePolicyFor({ surveyId, fresh: true }),
+  fetchEffectivePolicy: (surveyId, feature) => getEffectivePolicyFor({ feature, surveyId, fresh: true }),
 }
