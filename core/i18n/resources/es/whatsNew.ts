@@ -6,6 +6,16 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    requiredIf: {
+      title: 'Atributos obligatorios según una condición',
+      description: `En el diseñador de formularios, en la pestaña **Validaciones** de un atributo, elige **Obligatorio cuando se cumple la condición** y escribe la condición: el atributo será obligatorio solo cuando la condición sea verdadera.
+
+Durante la entrada de datos, el error "Valor requerido" se muestra solo cuando se cumple la condición.`,
+    },
+    themeSelector: {
+      title: 'Tema claro y oscuro',
+      description: `Usa el menú **Tema** del encabezado (también en la página de inicio de sesión) para cambiar entre el tema **Claro** y **Oscuro**, o seguir el **Predeterminado del sistema**.`,
+    },
     surveyCompare: {
       title: 'Comparar y actualizar encuestas',
       description: `En el **Panel de control**, usa **Funciones avanzadas > Comparar / actualizar desde archivo** para comparar esta encuesta con una exportada desde otro servidor Arena (p. ej. un servidor de pruebas) o con otra encuesta de este servidor.

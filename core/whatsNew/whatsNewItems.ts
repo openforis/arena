@@ -27,6 +27,18 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
+    id: 'requiredIf',
+    version: '2.11.0',
+    audience: whatsNewAudiences.surveyAdmin,
+    image: '/img/whats-new/requiredIf.png',
+  },
+  {
+    id: 'themeSelector',
+    version: '2.11.0',
+    audience: whatsNewAudiences.all,
+    image: '/img/whats-new/themeSelector.png',
+  },
+  {
     id: 'surveyCompare',
     version: '2.10.0',
     audience: whatsNewAudiences.surveyAdmin,

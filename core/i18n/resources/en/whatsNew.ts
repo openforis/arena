@@ -6,6 +6,16 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    requiredIf: {
+      title: 'Conditionally required attributes',
+      description: `In the form designer, in the **Validations** tab of an attribute, choose **Required when condition is met** and write the condition: the attribute is required only when the condition is true.
+
+During data entry, the "Required value" error is shown only when the condition is met.`,
+    },
+    themeSelector: {
+      title: 'Light and dark theme',
+      description: `Use the **Theme** menu in the header (also in the login page) to switch between the **Light** and **Dark** theme, or follow your **System default**.`,
+    },
     surveyCompare: {
       title: 'Compare and update surveys',
       description: `In the **Dashboard**, use **Advanced functions > Compare / update from file** to compare this survey with one exported from another Arena server (e.g. a test server) or with another survey on this server.
