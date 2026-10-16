@@ -6,7 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 import { FileUtils } from '@webapp/utils/fileUtils'
 
 import { StorageUsageMeter } from './StorageUsageMeter'
@@ -80,7 +80,7 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
           m: 0,
           fontSize: '0.95rem',
           fontWeight: 600,
-          color: defaultTokens.colors.blueDark,
+          color: themeColors.onPrimaryContainer,
         }}
       >
         {title}
@@ -89,14 +89,16 @@ const StorageSummaryItem = (props: StorageSummaryItemProps) => {
         component="div"
         sx={{
           fontSize: '0.85rem',
-          color: defaultTokens.colors.black,
+          color: themeColors.onSurface,
         }}
       >
-        {i18n.t('homeView:dashboard.storageSummary.usedSpaceOutOf', {
-          percent: Math.floor(usePercent),
-          used: FileUtils.toHumanReadableFileSize(usedSpace),
-          total: FileUtils.toHumanReadableFileSize(totalSpace),
-        }) as string}
+        {
+          i18n.t('homeView:dashboard.storageSummary.usedSpaceOutOf', {
+            percent: Math.floor(usePercent),
+            used: FileUtils.toHumanReadableFileSize(usedSpace),
+            total: FileUtils.toHumanReadableFileSize(totalSpace),
+          }) as string
+        }
       </Typography>
       <StorageUsageMeter ariaLabel={title} percent={usePercent} />
     </Box>

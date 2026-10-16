@@ -36,11 +36,11 @@
   position: absolute;
   right: 0;
   text-transform: uppercase;
-  background-color: rgba($blue, 0.1);
+  background-color: with-alpha($colorPrimary, 0.1);
   font-size: 0.5rem;
 
   &:hover {
-    background-color: rgba($blue, 0.5);
+    background-color: with-alpha($colorPrimary, 0.5);
     font-size: 0.7rem;
   }
 }

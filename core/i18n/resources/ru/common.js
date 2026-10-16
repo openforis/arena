@@ -307,6 +307,12 @@ export default {
   },
 
   header: {
+    theme: {
+      label: 'Тема',
+      light: 'Светлая',
+      dark: 'Тёмная',
+      system: 'Системная',
+    },
     myProfile: 'Мой профиль',
     qrCodeLoginDialog: {
       title: 'Вход в Arena Mobile с помощью QR-кода',

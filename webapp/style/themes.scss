@@ -1,0 +1,103 @@
+// Theme color tokens (Material Design 3 naming).
+// Each theme defines the same set of CSS custom properties; SCSS code references them through `_vars.scss`.
+// Primary-related tokens are derived from `--color-primary` so a survey branding color (set inline on :root) applies
+// to every theme.
+
+@mixin primary-derived-tokens($surface, $text) {
+  --color-primary-container: color-mix(in srgb, var(--color-primary) 30%, #{$surface});
+  --color-primary-container-low: color-mix(in srgb, var(--color-primary) 9%, #{$surface});
+  --color-primary-container-high: color-mix(in srgb, var(--color-primary) 50%, #{$surface});
+  --color-on-primary-container: color-mix(in srgb, var(--color-primary) 60%, #{$text});
+}
+
+:root,
+:root[data-theme='light'] {
+  color-scheme: light;
+
+  --color-primary: #3885ca;
+  --color-on-primary: #ffffff;
+  @include primary-derived-tokens(#ffffff, #000000);
+
+  --color-secondary: #5b6b7d;
+  --color-on-secondary: #ffffff;
+  --color-secondary-container: #e7e9ee;
+  --color-on-secondary-container: #2f3138;
+
+  --color-background: #f6f7f9;
+  --color-on-background: #2f3138;
+
+  --color-surface: #ffffff;
+  --color-on-surface: #2f3138;
+  --color-surface-variant: #e7e9ee;
+  --color-on-surface-variant: #62666f;
+  --color-surface-disabled: #c3c7d0;
+
+  --color-inverse-surface: #2f3138;
+  --color-inverse-on-surface: #ffffff;
+
+  --color-outline: #d1d1dd;
+
+  --color-error: #ed5b46;
+  --color-on-error: #ffffff;
+  --color-error-container: #f7dfe3;
+
+  --color-success: #84ac67;
+  --color-on-success: #ffffff;
+  --color-success-container: #f0f2e7;
+
+  --color-warning: #eba444;
+  --color-on-warning: #ffffff;
+  --color-warning-container: #f9ccb2;
+
+  --color-highlight: #fee997;
+  --color-highlight-container: #f8f6cc;
+
+  --color-shadow: #2f3138;
+  --color-scrim: rgb(0 0 0 / 10%);
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-primary: #4a94d6;
+  --color-on-primary: #ffffff;
+  @include primary-derived-tokens(#1f2228, #ffffff);
+
+  --color-secondary: #9aa8b8;
+  --color-on-secondary: #16181d;
+  --color-secondary-container: #2d3139;
+  --color-on-secondary-container: #e3e5ea;
+
+  --color-background: #16181d;
+  --color-on-background: #e3e5ea;
+
+  --color-surface: #1f2228;
+  --color-on-surface: #e3e5ea;
+  --color-surface-variant: #2d3139;
+  --color-on-surface-variant: #a9aeb9;
+  --color-surface-disabled: #4a4f5a;
+
+  // kept dark (instead of MD3 light inverse) so table/panel headers stay readable and not glaring
+  --color-inverse-surface: #3a3f49;
+  --color-inverse-on-surface: #f2f3f5;
+
+  --color-outline: #3e434d;
+
+  --color-error: #f07462;
+  --color-on-error: #ffffff;
+  --color-error-container: #4d2a2a;
+
+  --color-success: #93bb76;
+  --color-on-success: #16181d;
+  --color-success-container: #2b3526;
+
+  --color-warning: #f0b25e;
+  --color-on-warning: #16181d;
+  --color-warning-container: #4d3826;
+
+  --color-highlight: #6b5d22;
+  --color-highlight-container: #3d3a22;
+
+  --color-shadow: #000000;
+  --color-scrim: rgb(0 0 0 / 40%);
+}

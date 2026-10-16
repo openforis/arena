@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .ai-generate-query-popup {
   .modal-body {
     display: flex;
@@ -7,11 +9,11 @@
 
   &__hint {
     font-size: 0.85rem;
-    color: var(--colorGrey700);
+    color: $colorOnSurfaceVariant;
   }
 
   &__error {
-    color: #c62828;
+    color: $colorError;
     font-size: 0.9rem;
   }
 }

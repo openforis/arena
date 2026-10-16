@@ -16,18 +16,18 @@
 
   .job-timing {
     font-size: 0.8rem;
-    color: rgba($black, 0.55);
+    color: $colorOnSurfaceVariant;
   }
 
   .job-long-running-message {
     font-size: 0.8rem;
-    color: $orange;
+    color: $colorWarning;
     margin-top: 0.25rem;
   }
 
   .job-monitor__canceled-by-admin-message {
     font-size: 0.8rem;
-    color: $red;
+    color: $colorError;
     margin-bottom: 0.5rem;
   }
 }
@@ -45,7 +45,7 @@
   }
 
   .data-grid {
-    background-color: white;
+    background-color: $colorSurface;
   }
 }
 
@@ -55,7 +55,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1rem 0.5rem 0 0.5rem;
-    background-color: white;
+    background-color: $colorSurface;
 
     .expansion-panel__content {
       padding: 0;
@@ -75,11 +75,11 @@
           text-align: center;
 
           &.icon-checkbox-checked {
-            color: $green;
+            color: $colorSuccess;
           }
 
           &.icon-cross {
-            color: $red;
+            color: $colorError;
           }
 
           &.icon-spinner {

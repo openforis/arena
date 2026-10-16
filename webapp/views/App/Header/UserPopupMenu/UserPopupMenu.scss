@@ -4,10 +4,10 @@
   position: fixed;
   right: 0;
   top: $headerHeight - 1px;
-  border-bottom: 1px solid $greyBorder;
-  border-left: 1px solid $greyBorder;
+  border-bottom: 1px solid $colorOutline;
+  border-left: 1px solid $colorOutline;
   z-index: $zIndex15UserMenu;
-  background-color: white;
+  background-color: $colorSurface;
   display: grid;
   padding: 20px 10px 10px;
   justify-items: center;
@@ -28,7 +28,7 @@
     width: 100px;
     height: 100px;
     padding: 5px;
-    border: 2px solid $greyBorder;
+    border: 2px solid $colorOutline;
   }
 
   .user-details {
@@ -50,7 +50,7 @@
 }
 
 .user-popup-menu__sep {
-  background-color: $greyBorder;
+  background-color: $colorOutline;
   height: 1px;
   width: 80%;
 }

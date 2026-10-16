@@ -95,6 +95,10 @@ export const TestId = {
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
   },
+  guest: {
+    languageBtn: 'guest-language-btn',
+    languageItem: (lang) => `guest-language-item-${lang}`,
+  },
   header: {
     surveyTitle: 'header-survey-title',
     surveyCreateBtn: 'survey-create-btn',
@@ -106,6 +110,8 @@ export const TestId = {
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',
+    themeBtn: 'theme-btn',
+    themeItem: (theme) => `theme-item-${theme}`,
   },
   modal: {
     close: 'text="Close"',

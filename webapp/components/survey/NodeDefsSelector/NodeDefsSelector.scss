@@ -15,10 +15,10 @@
     width: 30px;
     top: 0;
     left: 0;
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
 
     &.highlight {
-      background-color: $yellowHighlight;
+      background-color: $colorHighlightContainer;
     }
   }
 
@@ -40,7 +40,7 @@
     margin-bottom: 0.3rem;
     font-weight: 600;
     font-size: 0.8rem;
-    background-color: $greyBorder;
+    background-color: $colorOutline;
     width: 100%;
     text-align: center;
     padding: 0.3rem 0;
@@ -54,7 +54,7 @@
 }
 
 .node-defs-selector__settings {
-  background-color: rgba($greyBorder, 0.8);
+  background-color: with-alpha($colorOutline, 0.8);
   padding: 1rem;
   margin-top: -0.3rem;
   display: grid;
@@ -81,7 +81,7 @@
 }
 
 .node-defs-selector__chains {
-  background-color: rgba($greyBorder, 0.8);
+  background-color: with-alpha($colorOutline, 0.8);
   padding: 1rem;
   margin-top: -0.3rem;
 

@@ -5,7 +5,7 @@
 .survey-form__node-def-page {
   position: relative;
   overflow-y: auto;
-  background-color: $white;
+  background-color: $colorSurface;
   border-top: $formBorder;
   border-right: $formBorder;
   border-bottom: $formBorder;
@@ -44,7 +44,7 @@
 .survey-form__node-def-page,
 .survey-form__node-def-page-item {
   &.not-applicable {
-    background-color: rgba($greyBorder, 0.7);
+    background-color: with-alpha($colorOutline, 0.7);
     opacity: 0.6;
 
     &.hidden {
@@ -57,7 +57,7 @@
     input,
     .survey-form__node-def-code,
     .dropdown__control {
-      background-color: rgba($greyBorder, 0.2);
+      background-color: with-alpha($colorOutline, 0.2);
     }
   }
   // === page / page item - key field locked
@@ -66,7 +66,7 @@
     input,
     .survey-form__node-def-code,
     .dropdown__control {
-      background-color: $white;
+      background-color: $colorSurface;
     }
   }
 }

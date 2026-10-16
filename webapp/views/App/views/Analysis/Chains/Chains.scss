@@ -1,10 +1,9 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .chains {
   .column-draft {
     .icon {
-      color: color.adjust($black, $lightness: 30%);
+      color: $colorOnSurfaceVariant;
     }
   }
 
@@ -14,16 +13,16 @@
 
     .icon {
       padding: 5px;
-      color: $white;
+      color: $colorOnPrimary;
       border-radius: 100%;
     }
 
     &.success .icon {
-      background-color: $green;
+      background-color: $colorSuccess;
     }
 
     &.error .icon {
-      color: $red;
+      color: $colorError;
     }
   }
 

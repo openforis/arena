@@ -9,20 +9,20 @@
   justify-content: center;
   grid-template-columns: 0.75fr;
   padding-top: 3rem;
-  border-top: 1px dashed $greyBorder;
-  border-right: 1px dashed $greyBorder;
-  border-bottom: 1px dashed $greyBorder;
-  background-color: $white;
+  border-top: 1px dashed $colorOutline;
+  border-right: 1px dashed $colorOutline;
+  border-bottom: 1px dashed $colorOutline;
+  background-color: $colorSurface;
   width: 200px;
 
   .btn-add-node-def {
-    background-color: rgba($green, 0.3);
+    background-color: with-alpha($colorSuccess, 0.3);
     display: flex;
     justify-content: space-between;
     font-weight: 600;
 
     &:hover {
-      background-color: rgba($green, 0.85);
+      background-color: with-alpha($colorSuccess, 0.85);
     }
 
     &.entity,

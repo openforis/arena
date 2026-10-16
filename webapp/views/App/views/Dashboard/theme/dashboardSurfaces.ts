@@ -1,12 +1,12 @@
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 
 const RADIUS_PX = 8
 
 export const dashboardSurfaces = {
   card: {
     borderRadius: `${RADIUS_PX}px`,
-    border: `1px solid ${defaultTokens.colors.greyBorder}`,
-    backgroundColor: defaultTokens.colors.white,
+    border: `1px solid ${themeColors.outline}`,
+    backgroundColor: themeColors.surface,
     boxShadow: 'none',
     minWidth: 220,
     flex: 1,
@@ -17,14 +17,14 @@ export const dashboardSurfaces = {
     flexDirection: 'column',
     gap: '0.5rem',
     borderRadius: `${RADIUS_PX}px`,
-    border: `1px solid ${defaultTokens.colors.greyBorder}`,
-    backgroundColor: defaultTokens.colors.white,
+    border: `1px solid ${themeColors.outline}`,
+    backgroundColor: themeColors.surface,
     padding: '1rem',
   },
   sectionTitle: {
     margin: 0,
     textTransform: 'none',
-    color: defaultTokens.colors.blueDark,
+    color: themeColors.onPrimaryContainer,
     fontWeight: 600,
     fontSize: '1rem',
   },
@@ -43,7 +43,7 @@ export const dashboardSurfaces = {
     fontWeight: 'inherit',
     fontSize: 'inherit',
     '&:focus-visible': {
-      outline: `2px solid ${defaultTokens.colors.blueDark}`,
+      outline: `2px solid ${themeColors.onPrimaryContainer}`,
       outlineOffset: '2px',
     },
   },
@@ -56,10 +56,10 @@ export const dashboardSurfaces = {
   kpiActionHover: {
     transition: 'background-color 160ms ease',
     '&:hover': {
-      backgroundColor: defaultTokens.colors.blueLightFocus,
+      backgroundColor: themeColors.primaryContainerLow,
     },
   },
   detailDivider: {
-    borderTop: `1px solid ${defaultTokens.colors.greyBorder}`,
+    borderTop: `1px solid ${themeColors.outline}`,
   },
 } as const

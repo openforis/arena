@@ -8,7 +8,7 @@
       justify-content: center;
       pointer-events: all;
       margin-left: 1rem;
-      background-color: $white;
+      background-color: $colorSurface;
       overflow: hidden;
       position: absolute;
       top: 70px;
@@ -57,11 +57,11 @@
         width: 200px;
         height: 50px;
         border-radius: 25px;
-        background: rgba($blue, 1);
+        background: with-alpha($colorPrimary, 1);
         box-shadow: 0 4px 7px rgba(0, 0, 0, 0.4);
         align-items: center;
         justify-content: center;
-        color: #fff;
+        color: $colorOnPrimary;
         font-weight: bold;
         cursor: pointer;
         transition: transform 0.2s ease-out;
@@ -72,7 +72,7 @@
         bottom: -35px;
         left: 10px;
         font-size: 0.85rem;
-        color: #555;
+        color: $colorOnSurfaceVariant;
       }
 
       input:hover + label,
@@ -82,7 +82,7 @@
 
       /* Adding an outline to the label on focus */
       input:focus + label {
-        outline: 1px solid #000;
+        outline: 1px solid $colorOnSurface;
         outline: -webkit-focus-ring-color auto 2px;
       }
     }

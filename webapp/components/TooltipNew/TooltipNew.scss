@@ -11,12 +11,12 @@
 
   .MuiTooltip-tooltip {
     font-size: medium;
-    color: $colorTextPrimary;
-    background-color: $tooltipBg;
-    border: 1px solid $tooltipBg;
+    color: $colorOnPrimaryContainer;
+    background-color: $colorSurfaceVariant;
+    border: 1px solid $colorSurfaceVariant;
 
     .MuiTooltip-arrow {
-      color: $tooltipBg;
+      color: $colorSurfaceVariant;
     }
   }
 }

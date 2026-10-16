@@ -305,6 +305,12 @@ Try again?`,
   },
 
   header: {
+    theme: {
+      label: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System default',
+    },
     myProfile: 'My profile',
     qrCodeLoginDialog: {
       title: 'Login to Arena Mobile using QR code',

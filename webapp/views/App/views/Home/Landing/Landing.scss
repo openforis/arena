@@ -17,7 +17,7 @@
     content: '';
     position: absolute;
     inset: 0;
-    background: rgba($white, 0.88);
+    background: with-alpha($colorSurface, 0.88);
     pointer-events: none;
   }
 
@@ -55,7 +55,7 @@
   &__description {
     margin: 0;
     line-height: 1.6;
-    color: var(--colorGrey700, #616161);
+    color: $colorOnSurfaceVariant;
     max-width: 40rem;
     white-space: pre-wrap;
   }

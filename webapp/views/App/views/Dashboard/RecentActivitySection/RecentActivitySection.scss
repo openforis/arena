@@ -11,7 +11,7 @@
     gap: 0.5rem;
     margin-bottom: 0.5rem;
     font-size: 0.85rem;
-    color: $blueDark;
+    color: $colorOnPrimaryContainer;
   }
 
   // anchors the absolutely positioned loading bar inside the card
@@ -22,13 +22,13 @@
 
   &__error {
     margin: 0;
-    color: $red;
+    color: $colorError;
     font-size: 0.85rem;
   }
 
   &__empty {
     margin: 0;
-    color: $blueDark;
+    color: $colorOnPrimaryContainer;
     font-size: 0.85rem;
   }
 
@@ -46,12 +46,12 @@
     align-items: baseline;
     gap: 0.75rem;
     padding: 0.45rem 0.25rem;
-    border-bottom: 1px solid $greyBorder;
+    border-bottom: 1px solid $colorOutline;
     font-size: 0.8rem;
     transition: background-color 160ms ease;
 
     &:hover {
-      background-color: $blueLightFocus;
+      background-color: $colorPrimaryContainerLow;
     }
 
     &--deleted {
@@ -65,7 +65,7 @@
   }
 
   &__date {
-    color: $blueDark;
+    color: $colorOnPrimaryContainer;
   }
 
   &__user {

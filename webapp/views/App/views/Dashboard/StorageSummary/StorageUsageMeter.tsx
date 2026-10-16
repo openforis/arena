@@ -1,7 +1,7 @@
 import React from 'react'
 import Box from '@mui/material/Box'
 
-import { defaultTokens } from '@webapp/theme/tokens'
+import { themeColors } from '@webapp/theme/tokens'
 
 type StorageUsageMeterProps = {
   percent: number
@@ -18,9 +18,9 @@ const CRITICAL_THRESHOLD = 85
  * @returns {string} Arena token color.
  */
 export const getStorageUsageFillColor = (percent: number): string => {
-  if (percent >= CRITICAL_THRESHOLD) return defaultTokens.colors.red
-  if (percent >= WARN_THRESHOLD) return defaultTokens.colors.orange
-  return defaultTokens.colors.green
+  if (percent >= CRITICAL_THRESHOLD) return themeColors.error
+  if (percent >= WARN_THRESHOLD) return themeColors.warning
+  return themeColors.success
 }
 
 /**
@@ -47,7 +47,7 @@ export const StorageUsageMeter = (props: StorageUsageMeterProps) => {
         sx={{
           height: 10,
           borderRadius: '999px',
-          bgcolor: defaultTokens.colors.grey,
+          bgcolor: themeColors.surfaceVariant,
           overflow: 'hidden',
         }}
       >
