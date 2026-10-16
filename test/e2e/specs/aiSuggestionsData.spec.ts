@@ -13,7 +13,7 @@ import {
   reloadApp,
 } from '../helpers/aiAnalysis'
 import { cleaningAreaLabel, useLocalServer } from '../helpers/aiCleaning'
-import { readSuggestionState } from '../helpers/aiStorage'
+import { readSuggestionState, waitForSuggestionDetectors } from '../helpers/aiStorage'
 import {
   assistantPanel,
   lastAssistantAnswer,
@@ -271,6 +271,9 @@ test.describe('AI suggestion: data imported (mock provider)', () => {
     await Promise.all([socketReopened, jobResynced])
     await openArea(page, analysisAreaLabel)
     await expectDismissedInStore()
+    // the resynced job reaches the detector asynchronously and leaves no trace when it rightly refuses: let it run
+    // before checking that the card did not come back (the card of this very job did show before the dismissal)
+    await waitForSuggestionDetectors(page)
     await expect(importCard).toHaveCount(0)
     expect(gatewayBodies).toEqual([])
   })
