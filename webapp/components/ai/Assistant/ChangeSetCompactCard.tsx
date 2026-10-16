@@ -2,12 +2,13 @@ import './ChangeSetCard.scss'
 
 import React, { useEffect, useId, useState } from 'react'
 
-import type { ChangeSetCardState, OperationStatus } from '@webapp/ai/changeSets/types'
+import type { ChangeSetCardState, OperationConflict, OperationStatus } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'
 import { useIsSurveyDirty } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import { ChangeItemConflict } from './ChangeItem'
 import { getReviewLabelText, getValuePreview, groupReviewItems, type ReviewItem } from './changeSetReviewModel'
 import { summarizeSelection } from './changeSetSelectionModel'
 import { createConfirmationFocus, type ConfirmationFocus } from './confirmationFocus'
@@ -147,9 +148,12 @@ export const ChangeSetCompactCard = ({
   // Apply all keeps the focus unless the confirmation opens; it gets it back when the confirmation is cancelled
   const [focus] = useState(createConfirmationFocus)
   const [applyButton, setApplyButton] = useState<HTMLButtonElement | null>(null)
-  const { pendingIds, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds, applying } = selection
+  // the line of statuses and results: where the focus goes when the confirmation closes after Apply
+  const [statusLine, setStatusLine] = useState<HTMLUListElement | null>(null)
+  const { pendingIds, conflicts, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds, applying } = selection
   const kinds = groupReviewItems(items, 'field')
   const results = countResults(items)
+  const conflictItems = items.filter((item) => conflictIds.includes(item.id))
   const allSelected = selectedIds.length === selectableIds.length
   const showConfirmation = confirming && selectedIds.length > 0
 
@@ -162,7 +166,7 @@ export const ChangeSetCompactCard = ({
     setConfirming(true)
   }
   const onConfirmedApply = () => {
-    focus.close()
+    focus.close(statusLine)
     setConfirming(false)
     void selection.apply()
   }
@@ -190,7 +194,7 @@ export const ChangeSetCompactCard = ({
         </div>
         <span>{cardState.changeSet.summary}</span>
       </div>
-      <ul className="ai-assistant-card__chips">
+      <ul className="ai-assistant-card__chips" ref={setStatusLine} tabIndex={-1}>
         {kinds.slice(0, MAX_KIND_CHIPS).map((kind) => (
           <li className="ai-assistant-card__chip" key={kind.key}>
             {`${getReviewLabelText(kind.label, t)}: ${kind.items.length}`}
@@ -226,6 +230,23 @@ export const ChangeSetCompactCard = ({
       <span className="ai-assistant-card__hint">
         {t('aiAssistant.card.more', { count: items.length - PREVIEW_ROWS })}
       </span>
+      {conflictItems.length > 0 && (
+        <ul className="ai-assistant-card__conflicts">
+          {conflictItems.slice(0, PREVIEW_ROWS).map((item) => (
+            <li key={item.id}>
+              <code>{item.name}</code>
+              <ChangeItemConflict
+                conflict={conflicts.find((conflict) => conflict.id === item.id) as OperationConflict}
+              />
+            </li>
+          ))}
+          {conflictItems.length > PREVIEW_ROWS && (
+            <li className="ai-assistant-card__hint">
+              {t('aiAssistant.card.more', { count: conflictItems.length - PREVIEW_ROWS })}
+            </li>
+          )}
+        </ul>
+      )}
       {cardState.discarded && <p className="ai-assistant-card__hint">{t('aiAssistant.card.discarded')}</p>}
       {unselectedBehaviourIds.length > 0 && (
         <p className="ai-assistant-card__hint">

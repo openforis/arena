@@ -740,6 +740,16 @@ describe('assistant conversation controller (403)', () => {
       expect(saved?.messages.at(-1)).toMatchObject({ role: 'applyNote' })
     })
 
+    test('a failed save of Discard rejects and leaves the shown card as it was', async () => {
+      const { controller, store } = await openCard()
+      store.save.mockRejectedValueOnce(new Error('idb'))
+      await expect(controller.discard('cs1')).rejects.toThrow('idb')
+      expect(controller.getState().conversation?.changeSets.cs1.discarded).toBeFalsy()
+      expect(controller.getState().applying).toBe(false)
+      await controller.discard('cs1')
+      expect(controller.getState().conversation?.changeSets.cs1.discarded).toBe(true)
+    })
+
     test('record edits get the cycle, the language and the progress callback, and their results are saved', async () => {
       const { controller, cards, store } = await openCard()
       const onProgress = jest.fn()

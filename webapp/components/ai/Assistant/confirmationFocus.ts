@@ -13,8 +13,9 @@ export type ConfirmationFocus = {
   enter: (root: FocusRoot | null) => void
   // cancelled: the focus goes back to the control that opened it
   cancel: () => void
-  // applied or sent to the review: the focus goes where that action sends it
-  close: () => void
+  // applied or sent to the review: the focus goes to `next` (the result line of the card after Apply), or where the
+  // action sends it when there is none (the review dialog takes it)
+  close: (next?: Focusable | null) => void
 }
 
 /**
@@ -34,8 +35,9 @@ export const createConfirmationFocus = (): ConfirmationFocus => {
       opener?.focus()
       opener = null
     },
-    close: () => {
+    close: (next) => {
       opener = null
+      next?.focus()
     },
   }
 }

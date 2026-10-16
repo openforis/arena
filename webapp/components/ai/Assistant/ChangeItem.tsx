@@ -2,12 +2,19 @@ import './ChangeItem.scss'
 
 import React from 'react'
 
-import type { OperationResult } from '@webapp/ai/changeSets/types'
+import type { OperationConflict, OperationResult } from '@webapp/ai/changeSets/types'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
-import { getCategoryUuid, getItemDetailLines, getItemLang, getResultTitle, isCategoryItem } from './changeItemModel'
+import {
+  getCategoryUuid,
+  getConflictReasonText,
+  getItemDetailLines,
+  getItemLang,
+  getResultTitle,
+  isCategoryItem,
+} from './changeItemModel'
 import type { ReviewItem } from './changeSetReviewModel'
 
 /**
@@ -46,6 +53,22 @@ export const ChangeItemStatus = ({ result, testId }: { result: OperationResult; 
 }
 
 /**
+ * Why an operation can't be applied, as a line under its row (visible, not only a tooltip): the survey changed since
+ * the proposal, or the designer's rules refuse the change.
+ * @param {object} props - Props.
+ * @param {OperationConflict} props.conflict - The conflict of the operation.
+ * @returns {React.ReactElement} The reason.
+ */
+export const ChangeItemConflict = ({ conflict }: { conflict: OperationConflict }) => {
+  const t = useI18nT({ unescapeHtml: true })
+  return (
+    <p className="ai-change-item__conflict" data-testid={TestId.aiAssistant.conflictReason}>
+      {getConflictReasonText(t, conflict.reason, conflict.params)}
+    </p>
+  )
+}
+
+/**
  * What a new node definition sets besides its type, name and label (key, multiple, read only, the labels in other
  * languages, descriptions); nothing for other changes.
  * @param {object} props - Props.
@@ -77,7 +100,8 @@ export const ChangeItemDetails = ({ item }: { item: ReviewItem }) => {
  * @param {ReviewItem} props.item - Change.
  * @param {boolean} props.pending - It can still be applied.
  * @param {boolean} props.selected - It is selected.
- * @param {boolean} props.conflict - The survey changed since the proposal: it can't be selected.
+ * @param {OperationConflict} [props.conflict] - The survey changed since the proposal, or the designer's rules refuse
+ *   the change: it can't be selected, and the row says why.
  * @param {boolean} props.exists - The node definition exists in the survey.
  * @param {Function} props.onToggle - Toggles the selection.
  * @param {Function} props.onNameClick - Shows the node definition in the form designer.
@@ -95,7 +119,7 @@ export const ChangeItemRow = ({
   item: ReviewItem
   pending: boolean
   selected: boolean
-  conflict: boolean
+  conflict?: OperationConflict
   exists: boolean
   onToggle: () => void
   onNameClick: () => void
@@ -115,7 +139,7 @@ export const ChangeItemRow = ({
         <input
           aria-label={category ? `${title} (${lang})` : `${item.name}: ${title}`}
           checked={selected && !conflict}
-          disabled={conflict}
+          disabled={conflict !== undefined}
           onChange={onToggle}
           type="checkbox"
         />
@@ -148,6 +172,7 @@ export const ChangeItemRow = ({
             <CardValueView value={item.to} />
           </span>
         </div>
+        {conflict && <ChangeItemConflict conflict={conflict} />}
         <ChangeItemDetails item={item} />
       </div>
     </li>

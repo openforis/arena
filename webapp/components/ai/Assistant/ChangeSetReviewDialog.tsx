@@ -10,7 +10,7 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
-import { ChangeItemDetails, ChangeItemName, ChangeItemStatus } from './ChangeItem'
+import { ChangeItemConflict, ChangeItemDetails, ChangeItemName, ChangeItemStatus } from './ChangeItem'
 import {
   filterReviewItems,
   getReviewLabelText,
@@ -85,7 +85,7 @@ const ReviewRow = ({
 }) => {
   const t = useI18nT({ unescapeHtml: true })
   const pending = selection.pendingIds.includes(item.id)
-  const conflict = selection.conflictIds.includes(item.id)
+  const conflict = selection.conflicts.find((other) => other.id === item.id)
   const fieldText = t(item.field.key, item.field.params)
   const { nodeDefUuid, result } = item
   return (
@@ -98,7 +98,7 @@ const ReviewRow = ({
           <input
             aria-label={`${item.name}: ${fieldText}`}
             checked={selection.selectedIds.includes(item.id)}
-            disabled={conflict}
+            disabled={conflict !== undefined}
             onChange={() => selection.toggle(item.id)}
             type="checkbox"
           />
@@ -115,6 +115,7 @@ const ReviewRow = ({
       <td>
         {fieldText}
         {conflict && <span className="ai-change-review__badge">{t('aiAssistant.card.status.conflict')}</span>}
+        {conflict && <ChangeItemConflict conflict={conflict} />}
       </td>
       <td className="ai-change-review__from">{item.from ? <CardValueView value={item.from} /> : null}</td>
       <td className="ai-change-review__to">

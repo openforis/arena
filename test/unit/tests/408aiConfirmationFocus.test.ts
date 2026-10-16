@@ -35,6 +35,16 @@ describe('confirmation focus (408)', () => {
     expect(log).toEqual(['review'])
   })
 
+  test('applying moves the focus to the result line of the card, not back to Apply all', () => {
+    const log: string[] = []
+    const handoff = createConfirmationFocus()
+    handoff.remember(focusable('applyAll', log))
+    handoff.enter(rootWith(focusable('review', log)))
+    handoff.close(focusable('resultLine', log))
+    handoff.cancel()
+    expect(log).toEqual(['review', 'resultLine'])
+  })
+
   test('a confirmation without buttons or an opener does not fail', () => {
     const handoff = createConfirmationFocus()
     expect(() => {
