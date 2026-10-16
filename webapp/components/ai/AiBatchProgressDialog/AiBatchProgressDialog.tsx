@@ -9,6 +9,8 @@ import ProgressBar from '@webapp/components/progressBar'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
+import { createConfirmationFocus } from '@webapp/components/ai/Assistant/confirmationFocus'
+
 import { getDismissAction } from './batchDismiss'
 import type { AiBatchRunState } from './useAiBatchRun'
 
@@ -82,22 +84,32 @@ const ConfirmStop = ({ onStop, onKeepRunning }: { onStop: () => void; onKeepRunn
 export const AiBatchProgressDialog = ({ run, onClose }: Props) => {
   const { titleKey, progress, error, stopping } = run
   const [confirming, setConfirming] = useState(false)
+  // the question takes the focus; "Keep running" gives it back to Stop, which the question was asked from
+  const [focus] = useState(createConfirmationFocus)
+  const [stopButton, setStopButton] = useState<HTMLButtonElement | null>(null)
 
   const asking = confirming && !error && !stopping
-  const onKeepRunning = useCallback(() => setConfirming(false), [])
+  const onKeepRunning = useCallback(() => {
+    focus.cancel()
+    setConfirming(false)
+  }, [focus])
 
   // Escape or the backdrop while the question is shown answers it with the safe choice
   const onDismiss = useCallback(() => {
     const action = getDismissAction({ error: !!error, asking, stopping })
     if (action === 'close') onClose()
     else if (action === 'keepRunning') onKeepRunning()
-    else if (action === 'ask') setConfirming(true)
-  }, [asking, error, onClose, onKeepRunning, stopping])
+    else if (action === 'ask') {
+      focus.remember(stopButton)
+      setConfirming(true)
+    }
+  }, [asking, error, focus, onClose, onKeepRunning, stopButton, stopping])
 
   const onStop = useCallback(() => {
+    focus.close()
     setConfirming(false)
     onClose()
-  }, [onClose])
+  }, [focus, onClose])
 
   return (
     <Modal className="ai-batch-progress-dialog modal--centered" onDismiss={onDismiss} title={titleKey}>
@@ -118,6 +130,7 @@ export const AiBatchProgressDialog = ({ run, onClose }: Props) => {
           <Button
             label="aiBatch.stop"
             onClick={onClose}
+            ref={setStopButton}
             disabled={stopping}
             testId={TestId.ai.batchCancel}
             variant="outlined"
