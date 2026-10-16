@@ -47,13 +47,25 @@ export const buildResponseBody = (user: SettingsUser) => ({
 
 type ArenaUser = User
 type SettingsUser = { uuid: string; prefs?: Record<string, any> }
-type RouteHandler = (args: { user: ArenaUser; body: any; params: Record<string, string> }) => unknown
-type ExpressRequest = { params: Record<string, string>; [key: string]: any }
+type RouteHandler = (args: {
+  user: ArenaUser
+  body: Record<string, unknown>
+  params: Record<string, string>
+}) => unknown
+type ExpressRequest = { params: Record<string, string>; [key: string]: unknown }
 
 const guards = [AuthMiddleware.requireLoggedInUser, requireAiFeaturesEnabled]
 
 // the routes that connect to the endpoint of a provider, which the user chooses, are rate limited per user
 const providerCallGuards = [...guards, limitProviderCalls]
+
+/**
+ * Returns the body of a request as an object: anything else (nothing, a list, a scalar) is an empty one.
+ * @param {unknown} body - The parsed body.
+ * @returns {Record<string, unknown>} The body.
+ */
+const toBodyObject = (body: unknown): Record<string, unknown> =>
+  body !== null && typeof body === 'object' && !Array.isArray(body) ? (body as Record<string, unknown>) : {}
 
 /**
  * Wraps a handler: passes the logged-in user, the body and the route params, sends its result as JSON and forwards
@@ -69,7 +81,9 @@ const jsonRoute =
     next: (error?: unknown) => void
   ): Promise<void> => {
     try {
-      res.json(await handler({ user: Request.getUser(req), body: Request.getBody(req) || {}, params: req.params }))
+      res.json(
+        await handler({ user: Request.getUser(req), body: toBodyObject(Request.getBody(req)), params: req.params })
+      )
     } catch (error) {
       next(error)
     } finally {

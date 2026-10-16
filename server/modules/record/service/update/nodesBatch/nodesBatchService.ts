@@ -2,6 +2,13 @@
  * Batch record edit (assistant record-edit change sets): permission checks per record, then one
  * nodesBatchPersist message per record to the records update thread, waiting for the replies.
  */
+import type {
+  Node as ArenaNode,
+  Record as ArenaRecord,
+  Survey as ArenaSurvey,
+  User as ArenaUser,
+} from '@openforis/arena-core'
+
 import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -45,15 +52,15 @@ const COMMIT_MARGIN_MS = 2000
 const SLOT_RELEASE_GRACE_MS = 5000
 
 export type NodesBatchServiceDeps = {
-  fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<any>
-  fetchQualifierFilters: (params: { user: any; survey: any }) => Promise<any>
-  fetchRecord: (params: { surveyId: number; recordUuid: string }) => Promise<any | null>
+  fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<ArenaSurvey>
+  fetchQualifierFilters: (params: { user: ArenaUser; survey: ArenaSurvey }) => Promise<any>
+  fetchRecord: (params: { surveyId: number; recordUuid: string }) => Promise<ArenaRecord | null>
   fetchNodeRecordUuid: (params: { surveyId: number; nodeUuid: string }) => Promise<string | null>
   recordMatchesQualifierFilters: (params: {
-    survey: any
-    record: any
+    survey: ArenaSurvey
+    record: ArenaRecord
     qualifierFilters: any
-    pendingNode: any
+    pendingNode: ArenaNode | null
     canEditQualifierValue: boolean
   }) => boolean
   postBatchMessage: (msg: NodesBatchPersistMessage) => void
@@ -63,12 +70,12 @@ export type NodesBatchServiceDeps = {
 }
 
 type RequestContext = {
-  user: any
+  user: ArenaUser
   surveyId: number
   cycle: string
   timezoneOffset: number | null
   lang: string | null
-  survey: any
+  survey: ArenaSurvey
   qualifierFilters: any
   canEditQualifierValue: boolean
   // one deadline for the whole request: the records are checked one after the other
@@ -100,7 +107,7 @@ export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => (
  * @param {object|null} pendingNode - The node with its new value, or null.
  * @returns {boolean} Whether the record matches.
  */
-const matchesQualifiers = (context: RequestContext, record: any, pendingNode: any): boolean =>
+const matchesQualifiers = (context: RequestContext, record: ArenaRecord, pendingNode: ArenaNode | null): boolean =>
   context.deps.recordMatchesQualifierFilters({
     survey: context.survey,
     record,
@@ -118,7 +125,7 @@ const matchesQualifiers = (context: RequestContext, record: any, pendingNode: an
  */
 const checkEditBeforeSend = async (
   context: RequestContext,
-  record: any,
+  record: ArenaRecord,
   edit: NodesBatchRecordEdit
 ): Promise<NodesBatchEditResult | null> => {
   const node = Record.getNodeByUuid(edit.nodeUuid)(record)
@@ -225,7 +232,7 @@ const sendRecordEditsSafely = async (
 }
 
 type NodesBatchParams = {
-  user: any
+  user: ArenaUser
   surveyId: number
   cycle: string
   edits: NodesBatchEdit[]
