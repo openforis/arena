@@ -21,8 +21,8 @@ export const deleteSurvey = (navigate) => async (dispatch, getState) => {
 
   await dispatch({ type: surveyDelete, surveyInfo })
 
-  // the AI conversations and suggestions of a survey live in this browser only: they go with the survey. After the
-  // dispatch, the survey is closed and what ran on it (detectors, counts) has ended
+  // the AI conversations and suggestions of a survey live in this browser only: they go with the survey. The purge
+  // first stops the running answers and waits (bounded) for their last saves, so none writes the survey back
   await purgeSurveyAiData(surveyId)
 
   // Navigate to survey/template list
