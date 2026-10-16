@@ -377,7 +377,6 @@ export default class RecordCheckJob extends Job {
     const nodeDefRequiredIfToUpdateUuids = forceFullCheck
       ? _getRequiredIfNodeDefUuids({ survey, nodeDefUuids: allNotDeletedNodeDefUuids })
       : nodeDefRequiredIfUpdatedUuids
-    const requiredIfAttributesByUuid = {}
     if (nodeDefRequiredIfToUpdateUuids.length > 0) {
       this.logDebugOptional('updating "required if" flags')
       const { record: recordUpdateRequired, nodes: nodesUpdatedRequired = {} } =
@@ -390,12 +389,6 @@ export default class RecordCheckJob extends Job {
         })
       record = recordUpdateRequired || record
       Object.assign(allUpdatedNodesByUuid, nodesUpdatedRequired)
-      // the attributes must be re-validated (only parent nodes of node defs with changed validations are validated)
-      for (const nodeDefUuid of nodeDefRequiredIfToUpdateUuids) {
-        for (const attribute of Record.getNodesByDefUuid(nodeDefUuid)(record)) {
-          requiredIfAttributesByUuid[Node.getUuid(attribute)] = attribute
-        }
-      }
     }
 
     // 4a. Persist nodes
@@ -414,14 +407,17 @@ export default class RecordCheckJob extends Job {
 
     // 6. validate nodes (also re-validate node defs whose validations alone changed, even though their
     // values were not recomputed above)
-    const nodeDefToValidateUuidsUnique = new Set(A.concat(nodeDefAddedOrUpdatedUuids, nodeDefValidationUpdatedUuids))
+    const nodeDefToValidateUuidsUnique = new Set([
+      ...nodeDefAddedOrUpdatedUuids,
+      ...nodeDefValidationUpdatedUuids,
+      ...nodeDefRequiredIfToUpdateUuids,
+    ])
     const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
       forceFullCheck ||
       !A.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
       !A.isEmpty(nodeDefDeletedUuids) ||
-      !A.isEmpty(allUpdatedNodesByUuid) ||
-      !A.isEmpty(requiredIfAttributesByUuid)
+      !A.isEmpty(allUpdatedNodesByUuid)
     ) {
       const nodeDefUuidsToValidate = forceFullCheck
         ? allNotDeletedNodeDefUuids
@@ -433,7 +429,7 @@ export default class RecordCheckJob extends Job {
           survey,
           nodeDefUuids: nodeDefUuidsToValidate,
           record,
-          nodes: { ...allUpdatedNodesByUuid, ...requiredIfAttributesByUuid },
+          nodes: allUpdatedNodesByUuid,
         },
         this.tx
       )
@@ -543,8 +539,12 @@ const _getRequiredIfNodeDefUuids = ({ survey, nodeDefUuids }) =>
 const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
   const nodesToValidate = { ...nodes }
 
-  // Include parent nodes of new/updated node defs (needed for min/max count validation)
   for (const nodeDefUuid of nodeDefUuids) {
+    // nodes of new/updated node defs (their validation rules may have changed, e.g. a new validation expression)
+    for (const node of Record.getNodesByDefUuid(nodeDefUuid)(record)) {
+      nodesToValidate[Node.getUuid(node)] = node
+    }
+    // parent nodes (needed for min/max count validation)
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {

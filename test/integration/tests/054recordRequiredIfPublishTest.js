@@ -53,23 +53,28 @@ const _fetchPublishedSurveyAndRecord = async () => {
   return { surveyPublished, recordReloaded }
 }
 
-const _updateRemarksRequiredIfAndPublish = async (requiredIf) => {
+const _updateValidationsAndPublish = async ({ nodeDefName, validationsUpdater }) => {
   const user = getContextUser()
   const surveyId = Survey.getId(survey)
   const surveyDraft = await _fetchDraftSurvey(surveyId)
-  const remarksDef = Survey.getNodeDefByName(remarksDefName)(surveyDraft)
-  const validationsUpdated = NodeDefValidations.assocRequiredIf(requiredIf)(NodeDef.getValidations(remarksDef))
+  const nodeDef = Survey.getNodeDefByName(nodeDefName)(surveyDraft)
 
   await NodeDefManager.updateNodeDefProps({
     user,
     survey: surveyDraft,
-    nodeDefUuid: NodeDef.getUuid(remarksDef),
-    parentUuid: NodeDef.getParentUuid(remarksDef),
-    propsAdvanced: { [NodeDef.keysPropsAdvanced.validations]: validationsUpdated },
+    nodeDefUuid: NodeDef.getUuid(nodeDef),
+    parentUuid: NodeDef.getParentUuid(nodeDef),
+    propsAdvanced: { [NodeDef.keysPropsAdvanced.validations]: validationsUpdater(NodeDef.getValidations(nodeDef)) },
   })
   await SurveyUtils.publishSurvey(user, surveyId)
   return _fetchPublishedSurveyAndRecord()
 }
+
+const _updateRemarksRequiredIfAndPublish = async (requiredIf) =>
+  _updateValidationsAndPublish({
+    nodeDefName: remarksDefName,
+    validationsUpdater: NodeDefValidations.assocRequiredIf(requiredIf),
+  })
 
 const _getRemarksState = ({ surveyPublished, recordReloaded }) => {
   const remarksDef = Survey.getNodeDefByName(remarksDefName)(surveyPublished)
@@ -84,6 +89,11 @@ const _getRemarksState = ({ surveyPublished, recordReloaded }) => {
     required: Node.isChildRequired(NodeDef.getUuid(remarksDef))(plotNode),
     valid: Validation.isValid(remarksValidation),
   }
+}
+
+const _isNodeValid = ({ surveyPublished, recordReloaded, nodeDefName }) => {
+  const node = RecordUtils.findNodeByPath(`${entityName}/${nodeDefName}`)(surveyPublished, recordReloaded)
+  return Validation.isValid(Validation.getFieldValidation(Node.getUuid(node))(Record.getValidation(recordReloaded)))
 }
 
 describe('Required if - survey publish', () => {
@@ -130,5 +140,21 @@ describe('Required if - survey publish', () => {
     expect(state.required).toBe(false)
     expect(state.plotMeta[Node.metaKeys.childRequired]).toBeUndefined()
     expect(state.valid).toBe(true)
+  })
+
+  test('Changing only the validation expressions re-validates the existing attributes', async () => {
+    const validationsUpdater = (expression) =>
+      NodeDefValidations.assocExpressions([NodeDefExpression.createExpression({ expression })])
+    let result = await _updateValidationsAndPublish({
+      nodeDefName: 'land_use',
+      validationsUpdater: validationsUpdater('land_use > 5'),
+    })
+    expect(_isNodeValid({ ...result, nodeDefName: 'land_use' })).toBe(false)
+
+    result = await _updateValidationsAndPublish({
+      nodeDefName: 'land_use',
+      validationsUpdater: validationsUpdater('land_use > 0'),
+    })
+    expect(_isNodeValid({ ...result, nodeDefName: 'land_use' })).toBe(true)
   })
 })
