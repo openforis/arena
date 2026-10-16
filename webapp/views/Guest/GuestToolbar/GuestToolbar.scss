@@ -1,0 +1,18 @@
+@use '~@webapp/style/vars' as *;
+
+.guest__toolbar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+  z-index: $zIndex10TopOfApp;
+}
+
+@media only screen and (min-width: 768px) {
+  .guest__toolbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+}
