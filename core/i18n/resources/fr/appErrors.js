@@ -182,6 +182,7 @@ Essayez de rafraîchir la page.`,
   userInvalid: 'Utilisateur invalide',
   userIsAdmin: "L'utilisateur est déjà administrateur système",
   userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
+  userPrefsInvalid: "Les préférences de l'utilisateur ne sont pas valides",
   userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
   userNotFound: 'Utilisateur introuvable : {{userUuid}}',
 }

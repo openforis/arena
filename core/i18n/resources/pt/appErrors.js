@@ -174,6 +174,7 @@ Tente atualizar a página.`,
   userInvalid: 'Usuário inválido',
   userIsAdmin: 'O usuário informado já é administrador do sistema',
   userNotAllowedToChangePref: 'Usuário sem permissão para alterar preferências',
+  userPrefsInvalid: 'As preferências do usuário não são válidas',
   userNotAuthorized: 'Usuário {{userName}} não está autorizado',
   userNotFound: 'Usuário não encontrado: {{userUuid}}',
 }

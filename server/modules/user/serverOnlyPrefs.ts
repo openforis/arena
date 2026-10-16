@@ -39,10 +39,34 @@ export const sqlPrefsWithoutServerOnlyKeys = (column: string): string =>
   [column, ...SERVER_ONLY_PREFS_KEYS.map((key) => `'${key}'`)].join(' - ')
 
 /**
+ * Returns the SQL expression that reads a prefs parameter as JSON (a missing one as an empty object).
+ * @param {string} param - The parameter placeholder, e.g. `$1`.
+ * @returns {string} The expression.
+ */
+const sqlPrefsParam = (param: string): string => `COALESCE(${param}::jsonb, '{}'::jsonb)`
+
+/**
  * Returns the SQL expression that filters a prefs parameter (a JSON object sent by a browser) so that it cannot write
  * a server-only key. A missing object is an empty one, so it never turns the stored prefs into NULL.
  * @param {string} param - The parameter placeholder, e.g. `$1`.
  * @returns {string} The expression, e.g. `COALESCE($1::jsonb, '{}'::jsonb) - 'ai' - 'aiUsage'`.
  */
 export const sqlPrefsParamWithoutServerOnlyKeys = (param: string): string =>
-  sqlPrefsWithoutServerOnlyKeys(`COALESCE(${param}::jsonb, '{}'::jsonb)`)
+  sqlPrefsWithoutServerOnlyKeys(sqlPrefsParam(param))
+
+/**
+ * Returns the SQL expression that is true when a prefs parameter can be merged into the stored prefs: a JSON object (a
+ * missing one counts as an empty object). Anything else (an array, a scalar) would turn the stored prefs into one.
+ * @param {string} param - The parameter placeholder, e.g. `$1`.
+ * @returns {string} The expression, e.g. `jsonb_typeof(COALESCE($1::jsonb, '{}'::jsonb)) = 'object'`.
+ */
+export const sqlPrefsParamIsObject = (param: string): string => `jsonb_typeof(${sqlPrefsParam(param)}) = 'object'`
+
+/**
+ * Returns true when the prefs of a user update can be written: absent (nothing to write) or a plain JSON object. An
+ * array or a scalar would replace the stored object for good, and the server-only keys could no longer be stripped.
+ * @param {unknown} prefs - The `prefs` of the user sent to an update.
+ * @returns {boolean} True when they are absent or a plain object.
+ */
+export const isValidPrefsUpdate = (prefs: unknown): boolean =>
+  prefs === undefined || prefs === null || (typeof prefs === 'object' && !Array.isArray(prefs))
