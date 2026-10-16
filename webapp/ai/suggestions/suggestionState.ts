@@ -3,7 +3,13 @@
  * functions: dismissal by target, growth steps, in progress, visibility, pruning and bounds. The code is split by
  * concern in ./state; the store wraps these functions with localStorage.
  */
-export { MAX_SEEN_MODULES, MAX_SURVEY_BUCKETS, normalizeSuggestionState, shrinkSuggestionState } from './state/bounds'
+export {
+  MAX_SEEN_MODULES,
+  MAX_SURVEY_BUCKETS,
+  normalizeSuggestionState,
+  shrinkSuggestionState,
+  withBucketTouched,
+} from './state/bounds'
 export { withDismissed } from './state/dismissed'
 export { withModuleSeen } from './state/modules'
 export { parseSuggestionState } from './state/parse'
