@@ -11,11 +11,13 @@ import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@web
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
 import { findConflicts } from '@webapp/ai/changeSets/findConflicts'
 import { getNodeDefRefName } from '@webapp/ai/changeSets/operations'
+import { findTranslationSource, type TranslationSource } from '@webapp/ai/changeSets/translationSource'
 import { isNodeDefRefProp } from '@webapp/ai/changeSets/types'
 import type {
   ChangeOperation,
   ChangeSet,
   ChangeSetCardState,
+  LabelSetOperation,
   NodeDefExpressionProp,
   NodeDefOperation,
   OperationConflict,
@@ -45,6 +47,8 @@ export type CardRow = {
   to: CardValue
   // a new node definition: every non-default prop besides its type, name and one label
   details?: CardDetail[]
+  // a label or description: the text in another language it translates
+  source?: TranslationSource | null
   result: OperationResult | null
 }
 
@@ -60,6 +64,22 @@ const expressionPropTitleKeys: Record<NodeDefExpressionProp, string> = {
 }
 
 /**
+ * Returns a node definition, existing or created by the change set.
+ * @param {string} uuid - Node definition uuid.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {object|null} The node definition; null when unknown.
+ */
+const findNodeDef = (uuid: string, changeSet: ChangeSet, survey: any): any => {
+  const existing = Survey.getNodeDefByUuid(uuid)(survey)
+  if (existing) return existing
+  const create = changeSet.operations.find(
+    (op) => op.type === 'nodeDef.create' && NodeDef.getUuid(op.nodeDef) === uuid
+  ) as { nodeDef: any } | undefined
+  return create?.nodeDef ?? null
+}
+
+/**
  * Returns the name of a node definition, existing or created by the change set.
  * @param {string} uuid - Node definition uuid.
  * @param {ChangeSet} changeSet - Change set.
@@ -67,12 +87,26 @@ const expressionPropTitleKeys: Record<NodeDefExpressionProp, string> = {
  * @returns {string} The name (the uuid when unknown).
  */
 export const findNodeDefName = (uuid: string, changeSet: ChangeSet, survey: any): string => {
-  const existing = Survey.getNodeDefByUuid(uuid)(survey)
-  if (existing) return NodeDef.getName(existing)
-  const create = changeSet.operations.find(
-    (op) => op.type === 'nodeDef.create' && NodeDef.getUuid(op.nodeDef) === uuid
-  ) as { nodeDef: any } | undefined
-  return create ? NodeDef.getName(create.nodeDef) : uuid
+  const nodeDef = findNodeDef(uuid, changeSet, survey)
+  return nodeDef ? NodeDef.getName(nodeDef) : uuid
+}
+
+/**
+ * Returns the text a proposed label or description translates: the same text in another survey language.
+ * @param {LabelSetOperation} op - Label operation.
+ * @param {ChangeSet} changeSet - Change set.
+ * @param {object} survey - Survey.
+ * @returns {TranslationSource|null} The source; null when no other language has the text.
+ */
+const findLabelSource = (op: LabelSetOperation, changeSet: ChangeSet, survey: any): TranslationSource | null => {
+  const nodeDef = findNodeDef(op.nodeDefUuid, changeSet, survey)
+  if (!nodeDef) return null
+  // core/survey is untyped JS: getLanguages returns the codes array, default first
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
+  // rewriting the default language text is not a translation
+  if (op.lang === languages[0] && op.from?.trim()) return null
+  const texts = op.kind === 'labels' ? NodeDef.getLabels(nodeDef) : NodeDef.getDescriptions(nodeDef)
+  return findTranslationSource({ texts, lang: op.lang, languages })
 }
 
 /**
@@ -174,11 +208,13 @@ const toCreateRow = (op: Extract<ChangeOperation, { type: 'nodeDef.create' }>, l
 /**
  * Returns the row fields of a change operation.
  * @param {ChangeOperation} op - Operation other than create.
- * @param {object} survey - Survey (category and taxonomy names).
+ * @param {ChangeSet} changeSet - Its change set (node definitions it creates).
+ * @param {object} survey - Survey (category and taxonomy names, labels in other languages).
  * @returns {object} The row fields.
  */
 const toChangeRow = (
   op: Exclude<NodeDefOperation, { type: 'nodeDef.create' } | RecordAttributeUpdateOperation>,
+  changeSet: ChangeSet,
   survey: any
 ) => {
   if (op.type === 'label.set') {
@@ -187,6 +223,7 @@ const toChangeRow = (
       titleParams: { lang: op.lang },
       from: toBasicValue(op.from),
       to: toBasicValue(op.to),
+      source: findLabelSource(op, changeSet, survey),
     }
   }
   if (op.type === 'nodeDef.update') {
@@ -234,7 +271,7 @@ export const buildCardRows = ({
         result,
         nodeDefUuid: op.nodeDefUuid,
         nodeDefName: findNodeDefName(op.nodeDefUuid, changeSet, survey),
-        ...toChangeRow(op, survey),
+        ...toChangeRow(op, changeSet, survey),
       }
     })
 }

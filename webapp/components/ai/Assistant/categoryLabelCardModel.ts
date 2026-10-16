@@ -8,6 +8,7 @@ import {
   isCategoryItemLabelOperation,
   type CategoryItemLabelSetOperation,
 } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import type { TranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeSetCardState, OperationResult } from '@webapp/ai/changeSets/types'
 
 export type CategoryLabelRow = {
@@ -18,6 +19,8 @@ export type CategoryLabelRow = {
   // the label when the item was listed (null: blank)
   from: string | null
   to: string
+  // the label in another language the text translates
+  source: TranslationSource | null
   result: OperationResult | null
   // the label found at Apply when it had changed meanwhile (conflict)
   currentText: string | null
@@ -51,6 +54,7 @@ const toRow = (op: CategoryItemLabelSetOperation, result: OperationResult | null
     lang: op.lang,
     from: op.expectedText?.trim() ? op.expectedText : null,
     to: op.text,
+    source: op.source ?? null,
     result,
     currentText,
   }

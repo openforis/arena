@@ -2,6 +2,7 @@
  * Category item label operations: one label of one item in one language. They take their own path
  * through preview, card, conflicts and Apply (one atomic server request), apart from node definition operations.
  */
+import type { TranslationSource } from '../translationSource'
 
 export const CATEGORY_ITEM_LABEL_SET = 'categoryItemLabel.set'
 
@@ -17,6 +18,8 @@ export type CategoryItemLabelSetOperation = {
   text: string
   // the label in lang when the item was listed (null: blank); Apply writes only if it is still the same
   expectedText: string | null
+  // the label in another language the text translates, when the item was listed (absent on older proposals)
+  source?: TranslationSource | null
 }
 
 /**

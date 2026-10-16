@@ -158,6 +158,10 @@
       background: var(--white);
       border-bottom: 1px solid var(--greyBorder);
       text-align: left;
+
+      .ai-change-item__lang {
+        margin: 0 0 0 0.375rem;
+      }
     }
 
     td {
@@ -186,6 +190,11 @@
     background: var(--orangeLight);
   }
 
+  &__item,
+  &__kind {
+    width: 1%;
+  }
+
   &__item {
     white-space: nowrap;
   }
@@ -194,6 +203,18 @@
     margin-left: 0.5rem;
     color: var(--colorGrey600);
   }
+
+  // what a change is about, and why it can't be applied (wraps to the column width)
+  &__kind {
+    color: var(--colorGrey700);
+    white-space: nowrap;
+
+    .ai-change-item__conflict {
+      min-width: 16rem;
+      white-space: normal;
+    }
+  }
+
 
   &__badge {
     margin-left: 0.5rem;

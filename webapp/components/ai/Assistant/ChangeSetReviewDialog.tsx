@@ -10,7 +10,15 @@ import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { CardValueView } from './CardValueView'
-import { ChangeItemConflict, ChangeItemDetails, ChangeItemName, ChangeItemStatus } from './ChangeItem'
+import {
+  ChangeItemConflict,
+  ChangeItemDetails,
+  ChangeItemName,
+  ChangeItemReplaces,
+  ChangeItemStatus,
+  LangTag,
+} from './ChangeItem'
+import { getItemKind, getItemLang, getReviewColumns, isSameItemAsPrevious, type ReviewColumns } from './changeItemModel'
 import {
   filterReviewItems,
   getReviewLabelText,
@@ -64,9 +72,12 @@ const GroupCheckbox = ({
 }
 
 /**
- * One change: checkbox (pending only), item, kind of change, current and proposed value, status.
+ * One change: checkbox (pending only), item, what it changes, the original text of a translation, the current value
+ * (only in the columns shown), the proposal and status.
  * @param {object} props - Props.
  * @param {ReviewItem} props.item - Change.
+ * @param {boolean} props.repeated - The change before it is about the same item (its name is not repeated).
+ * @param {ReviewColumns} props.columns - Columns of the table.
  * @param {ChangeSetSelection} props.selection - Selection.
  * @param {boolean} props.exists - The node definition of the change exists in the survey.
  * @param {Function} props.onNameClick - Shows the item in the form designer.
@@ -74,11 +85,15 @@ const GroupCheckbox = ({
  */
 const ReviewRow = ({
   item,
+  repeated,
+  columns,
   selection,
   exists,
   onNameClick,
 }: {
   item: ReviewItem
+  repeated: boolean
+  columns: ReviewColumns
   selection: ChangeSetSelection
   exists: boolean
   onNameClick: (nodeDefUuid: string) => void
@@ -87,7 +102,9 @@ const ReviewRow = ({
   const pending = selection.pendingIds.includes(item.id)
   const conflict = selection.conflicts.find((other) => other.id === item.id)
   const fieldText = t(item.field.key, item.field.params)
-  const { nodeDefUuid, result } = item
+  const { nodeDefUuid, result, source } = item
+  const lang = getItemLang(item)
+  const kind = getItemKind(item)
   return (
     <tr
       className={conflict ? 'ai-change-review__row--conflict' : undefined}
@@ -105,21 +122,41 @@ const ReviewRow = ({
         )}
       </td>
       <td className="ai-change-review__item">
-        {nodeDefUuid ? (
+        {!repeated && nodeDefUuid && (
           <ChangeItemName exists={exists} name={item.name} onClick={() => onNameClick(nodeDefUuid)} />
-        ) : (
-          <code>{item.name}</code>
         )}
-        {item.detail && <span className="ai-change-review__detail">{item.detail}</span>}
+        {!repeated && !nodeDefUuid && (
+          <>
+            <code>{item.name}</code>
+            {item.detail && <span className="ai-change-review__detail">{item.detail}</span>}
+          </>
+        )}
       </td>
-      <td>
-        {fieldText}
+      <td className="ai-change-review__kind">
+        {t(kind.key, kind.params)}
         {conflict && <span className="ai-change-review__badge">{t('aiAssistant.card.status.conflict')}</span>}
         {conflict && <ChangeItemConflict conflict={conflict} />}
       </td>
-      <td className="ai-change-review__from">{item.from ? <CardValueView value={item.from} /> : null}</td>
+      {columns.original && (
+        <td
+          className="ai-change-item__original"
+          data-testid={source ? TestId.aiAssistant.translationSource : undefined}
+        >
+          {source && (
+            <span lang={source.lang}>
+              {!columns.original.lang && <LangTag lang={source.lang} />}
+              {source.text}
+            </span>
+          )}
+        </td>
+      )}
+      {columns.current && (
+        <td className="ai-change-review__from">{!source && item.from ? <CardValueView value={item.from} /> : null}</td>
+      )}
       <td className="ai-change-review__to">
+        {!columns.proposedLang && lang && source && <LangTag lang={lang} />}
         <CardValueView value={item.to} />
+        {source && <ChangeItemReplaces value={item.from} />}
         <ChangeItemDetails item={item} />
       </td>
       <td>{result && <ChangeItemStatus result={result} />}</td>
@@ -128,9 +165,18 @@ const ReviewRow = ({
 }
 
 /**
+ * Returns the number of columns of the table: check, item, change, the optional original and current, proposed,
+ * status.
+ * @param {ReviewColumns} columns - Columns of the table.
+ * @returns {number} The count.
+ */
+const getColumnCount = (columns: ReviewColumns): number => 5 + (columns.original ? 1 : 0) + (columns.current ? 1 : 0)
+
+/**
  * The changes of one group: a header row with its checkbox, then one row per change.
  * @param {object} props - Props.
  * @param {ReviewGroup} props.group - Group.
+ * @param {ReviewColumns} props.columns - Columns of the table.
  * @param {ChangeSetSelection} props.selection - Selection.
  * @param {Function} props.nodeDefExists - Tells whether a node definition exists in the survey.
  * @param {Function} props.onNameClick - Shows an item in the form designer.
@@ -138,11 +184,13 @@ const ReviewRow = ({
  */
 const ReviewGroupRows = ({
   group,
+  columns,
   selection,
   nodeDefExists,
   onNameClick,
 }: {
   group: ReviewGroup
+  columns: ReviewColumns
   selection: ChangeSetSelection
   nodeDefExists: (nodeDefUuid: string) => boolean
   onNameClick: (nodeDefUuid: string) => void
@@ -168,12 +216,14 @@ const ReviewGroupRows = ({
             />
           )}
         </td>
-        <td colSpan={5}>
+        <td colSpan={getColumnCount(columns) - 1}>
           {name} <span className="ai-change-review__group-count">{group.items.length}</span>
         </td>
       </tr>
-      {group.items.map((item) => (
+      {group.items.map((item, index) => (
         <ReviewRow
+          columns={columns}
+          repeated={isSameItemAsPrevious(group.items, index)}
           exists={item.nodeDefUuid !== null && nodeDefExists(item.nodeDefUuid)}
           item={item}
           key={item.id}
@@ -255,6 +305,7 @@ export const ChangeSetReviewDialog = ({
   const [search, setSearch] = useState('')
   const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null)
   const { pendingIds, conflictIds, selectableIds, selectedIds, applying } = selection
+  const columns = useMemo(() => getReviewColumns(items), [items])
 
   useEffect(() => {
     dialog?.focus()
@@ -377,8 +428,17 @@ export const ChangeSetReviewDialog = ({
                   </th>
                   <th>{t('aiAssistant.card.review.item')}</th>
                   <th>{t('aiAssistant.card.review.change')}</th>
-                  <th>{t('aiAssistant.card.review.current')}</th>
-                  <th>{t('aiAssistant.card.review.proposed')}</th>
+                  {columns.original && (
+                    <th>
+                      {t('aiAssistant.card.review.original')}
+                      {columns.original.lang && <LangTag lang={columns.original.lang} />}
+                    </th>
+                  )}
+                  {columns.current && <th>{t('aiAssistant.card.review.current')}</th>}
+                  <th>
+                    {t('aiAssistant.card.review.proposed')}
+                    {columns.proposedLang && <LangTag lang={columns.proposedLang} />}
+                  </th>
                   <th>
                     <span className="ai-change-review__sr-only">{t('aiAssistant.card.review.status')}</span>
                   </th>
@@ -387,6 +447,7 @@ export const ChangeSetReviewDialog = ({
               <tbody>
                 {shownGroups.map((group) => (
                   <ReviewGroupRows
+                    columns={columns}
                     group={group}
                     key={group.key}
                     nodeDefExists={nodeDefExists}

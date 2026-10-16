@@ -37,6 +37,59 @@
     background-color: var(--orangeLight);
   }
 
+  // what a change is about, next to its item ("Label", "Read only"), or the level of a category item
+  &__kind {
+    margin-left: 0.375rem;
+    padding: 0 0.375rem;
+    border-radius: 0.2rem;
+    background: var(--colorGrey200);
+    color: var(--colorGrey700);
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  &__lang {
+    margin-right: 0.375rem;
+    padding: 0 0.3rem;
+    border-radius: 0.2rem;
+    background: var(--colorGrey200);
+    color: var(--colorGrey700);
+    font-size: 0.75rem;
+  }
+
+  // the text a translation is made from
+  &__original {
+    color: var(--colorGrey700);
+    overflow-wrap: anywhere;
+  }
+
+  &__replaces {
+    display: block;
+    color: var(--orange);
+    font-size: 0.85rem;
+
+    s {
+      color: var(--colorGrey600);
+    }
+  }
+
+  // a translation on two lines: language, then text
+  &__pair {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: 0.125rem 0;
+    margin: 0;
+
+    dt {
+      line-height: 1.5;
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+
   &__conflict {
     margin: 0.25rem 0 0;
     color: var(--red);

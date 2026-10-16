@@ -5,6 +5,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
+import type { TranslationSource } from '@webapp/ai/changeSets/translationSource'
 import type { ChangeOperation, ChangeSetCardState, OperationResult } from '@webapp/ai/changeSets/types'
 
 import { buildCategoryLabelGroups } from './categoryLabelCardModel'
@@ -29,6 +30,8 @@ export type ReviewItem = {
   to: CardValue
   // what a new node definition sets besides its type, name and label
   details?: CardDetail[]
+  // a label: the text in another language it translates
+  source?: TranslationSource | null
   result: OperationResult | null
   // entity:<uuid> or category:<uuid>
   groupKey: string
@@ -104,6 +107,7 @@ export const buildReviewItems = ({
       from: row.from,
       to: row.to,
       details: row.details,
+      source: row.source,
       result: row.result,
       groupKey: `entity:${entityUuid}`,
       groupName: findNodeDefName(entityUuid, changeSet, survey),
@@ -118,6 +122,7 @@ export const buildReviewItems = ({
       field: { key: 'aiAssistant.card.label', params: { lang: row.lang } },
       from: { kind: 'text', text: row.from },
       to: { kind: 'text', text: row.to },
+      source: row.source,
       result: row.result,
       groupKey: `category:${group.categoryUuid}`,
       groupName: group.categoryName,
@@ -171,15 +176,20 @@ const valueTexts = (value: CardValue | null): string[] => {
 }
 
 /**
- * Tells whether an item matches a search text (name, level, group and values).
+ * Tells whether an item matches a search text (name, level, group, original text and values).
  * @param {ReviewItem} item - Item.
  * @param {string} search - Lower case search text.
  * @returns {boolean} True when one of its texts contains it.
  */
 const matchesSearch = (item: ReviewItem, search: string): boolean =>
-  [item.name, item.detail ?? '', item.groupName, ...valueTexts(item.from), ...valueTexts(item.to)].some((text) =>
-    text.toLowerCase().includes(search)
-  )
+  [
+    item.name,
+    item.detail ?? '',
+    item.groupName,
+    item.source?.text ?? '',
+    ...valueTexts(item.from),
+    ...valueTexts(item.to),
+  ].some((text) => text.toLowerCase().includes(search))
 
 /**
  * Filters items by selection, conflicts and a search text.

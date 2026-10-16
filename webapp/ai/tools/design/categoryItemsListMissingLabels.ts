@@ -18,6 +18,7 @@ import {
   type FetchMissingLabelsPage,
 } from '@webapp/ai/changeSets/categoryItemLabels/categoryItemLabelsApi'
 import { isCategoryItemLabelOperation } from '@webapp/ai/changeSets/categoryItemLabels/types'
+import { findTranslationSource } from '@webapp/ai/changeSets/translationSource'
 
 import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { TOOL_RESULT_BUDGET_CHARS } from '../common/toolResult'
@@ -143,9 +144,9 @@ const getPendingItemUuids = (ctx: AiToolContext, categoryUuid: string, lang: str
  * @returns {ListedCategoryItem} The item.
  */
 const toListedItem = (item: MissingLabelsItem, lang: string, languages: string[]): ListedCategoryItem => {
-  const candidates = [...languages, ...Object.keys(item.labels)]
-  const sourceLang = candidates.find((other) => other !== lang && (item.labels[other] ?? '').trim() !== '') ?? null
-  const fullText = sourceLang ? item.labels[sourceLang] : ''
+  const source = findTranslationSource({ texts: item.labels, lang, languages })
+  const sourceLang = source?.lang ?? null
+  const fullText = source?.text ?? ''
   const truncated = fullText.length > CATEGORY_ITEM_LABEL_TEXT_MAX
   return {
     ref: item.codePath.join('.'),
