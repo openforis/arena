@@ -532,21 +532,28 @@ export const createAssistantConversationController = (
    * Saves a conversation (tracked, so logout can wait for it) and shows it when it is the selected one.
    * @param {Conversation} next - Conversation.
    * @param {number} generation - Registry generation when the work started (after a reset it is saved, not shown).
+   * @param {object} [options] - Options.
+   * @param {boolean} [options.showAfterSave] - Show it only once it is saved: a failed save leaves what is shown
+   * as it was (Discard; an Apply shows its results at once, as the changes are already made).
    * @returns {Promise<void>} Resolves when saved.
    */
-  const saveShown = async (next: Conversation, generation: number) => {
-    const selectedId = panel.getState().conversationId
-    if (
-      canShowAfterSave({
-        startedGeneration: generation,
-        currentGeneration: registry.getGeneration(),
-        selectedId,
-        id: next.id,
-      })
-    ) {
-      set({ conversation: next })
+  const saveShown = async (next: Conversation, generation: number, { showAfterSave = false } = {}) => {
+    const showNext = () => {
+      const selectedId = panel.getState().conversationId
+      if (
+        canShowAfterSave({
+          startedGeneration: generation,
+          currentGeneration: registry.getGeneration(),
+          selectedId,
+          id: next.id,
+        })
+      ) {
+        set({ conversation: next })
+      }
     }
+    if (!showAfterSave) showNext()
     await registry.track(conversationStore?.save(next) ?? Promise.resolve())
+    if (showAfterSave) showNext()
     // an Apply or Discard may settle the last pending card of a Do it conversation
     suggestions.reportSettle({ conversation: next })
   }
@@ -639,7 +646,9 @@ export const createAssistantConversationController = (
   const discard = (changeSetId: string) =>
     runCardAction(async (id, generation) => {
       const current = await readConversation(id)
-      if (current) await saveShown(withDiscarded({ conversation: current, changeSetId }), generation)
+      if (current) {
+        await saveShown(withDiscarded({ conversation: current, changeSetId }), generation, { showAfterSave: true })
+      }
     })
 
   return {
