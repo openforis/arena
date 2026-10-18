@@ -32,7 +32,7 @@ preview faithful with no duplicated UI code.
 ```
 Arena Designer (webapp)                         Arena Mobile web build (iframe)
 ┌───────────────────────────────┐               ┌──────────────────────────────┐
-│ MobilePreviewPanel            │  postMessage  │ PreviewApp (?preview=1)      │
+│ MobilePreviewPanel            │  postMessage  │ PreviewInitializer           │
 │  - fetch draft survey         │ ────────────▶ │  - no DB, no login           │
 │    GET /api/mobile/survey/:id │   survey,     │  - survey in Redux           │
 │        ?draft=true            │   lang, cycle │  - in-memory record          │
@@ -69,9 +69,9 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
 
 ### Phase 2 – arena-mobile: preview mode
 
-1. Entry point switch: when running on web with `?preview=1`, render `PreviewApp` instead of the full `AppInitializer`
+1. Entry point switch: when running on web with `?preview=1`, render `PreviewInitializer` instead of the full `AppInitializer`
    flow (skip device info, settings persistence, DB, migrations, demo survey, auto-login).
-2. `PreviewApp` listens for `arenaMobilePreview/survey`, stores the survey with the existing `SurveyActions`
+2. `PreviewInitializer` listens for `arenaMobilePreview/survey`, stores the survey with the existing `SurveyActions`
    (without persisting it), creates an in-memory record with `RecordUpdater.createRootEntity` (as
    `DataEntryActions.createNewRecord` does, minus persistence) and navigates to `RecordEditor`.
 3. Record persistence (`RecordService.insert/update`) is bypassed in preview mode: updates stay in Redux only.
@@ -101,6 +101,20 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
 2. arena Docker build: download the bundle for the configured arena-mobile version and serve it under
    `/mobile-preview/` (same origin, no CORS / CSP changes), or point `MOBILE_PREVIEW_URL` to the hosted copy.
 3. CSP: allow the preview origin in `frame-src` when hosted elsewhere.
+
+## Status
+
+- **Phase 1 – done** (arena-mobile, branch `ccr-788f8b97-zxfmuz`): `yarn build:web` exports the app to `dist-web/`.
+  `metro.config.js` replaces native-only modules on web with shims in `src/web/shims/` (`react-native-pager-view`,
+  `react-native-maps`, `@lodev09/react-native-exify`), registers `wasm` assets (expo-sqlite web) and resolves `tslib`
+  to its ES module build (its `import`/`node` export condition breaks the default import interop on web).
+- **Phase 2 – done**: `?preview=1` (optionally `&parentOrigin=<Arena origin>`) uses `PreviewInitializer` instead of
+  `AppInitializer` and starts in the record editor; `?preview=demo` previews the bundled demo survey. Record updates
+  stay in Redux (`PreviewMode.isActive` guards in `DataEntryActions`: no DB write, no file storage, no duplicate key
+  check). Checked in Chromium (Playwright): survey sent from a cross-origin parent page, text and code attributes,
+  page navigation, no runtime errors.
+- **Phase 3 – next**: `@react-native-community/datetimepicker` is not supported on web (date/time picker buttons do
+  nothing; the typed value still works).
 
 ## Risks and open questions
 
