@@ -19,13 +19,13 @@ preview faithful with no duplicated UI code.
 
 ### Scope of the preview
 
-| In scope                                                   | Out of scope (stubbed or hidden on web)                    |
-| ---------------------------------------------------------- | ---------------------------------------------------------- |
-| Form layout, pages, field order, labels per language       | Local database (SQLite), file system, backups, sync        |
-| Relevance, default values, validation messages, counts     | Maps (`react-native-maps`), offline maps, PDF maps         |
-| Single/multiple entities, entity tables, page tree         | External GPS (Bluetooth), EXIF, zip archives               |
-| Code, taxon, text, number, date, time, boolean attributes  | Camera / native pickers (replaced by browser equivalents)  |
-| Light/dark theme, tablet vs phone layout                   | Login, remote connection, records list, settings           |
+| In scope                                                  | Out of scope (stubbed or hidden on web)                   |
+| --------------------------------------------------------- | --------------------------------------------------------- |
+| Form layout, pages, field order, labels per language      | Local database (SQLite), file system, backups, sync       |
+| Relevance, default values, validation messages, counts    | Maps (`react-native-maps`), offline maps, PDF maps        |
+| Single/multiple entities, entity tables, page tree        | External GPS (Bluetooth), EXIF, zip archives              |
+| Code, taxon, text, number, date, time, boolean attributes | Camera / native pickers (replaced by browser equivalents) |
+| Light/dark theme, tablet vs phone layout                  | Login, remote connection, records list, settings          |
 
 ### Architecture
 
