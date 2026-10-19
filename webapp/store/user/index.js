@@ -15,7 +15,6 @@ export {
   useAuthCanEditQualifierAttributeValue,
   useAuthCanViewOtherUsersEmail,
   useAuthCanUseAnalysis,
-  useAuthCanUseMessages,
   useUserIsSystemAdmin,
   useProfilePicture,
 } from './hooks'

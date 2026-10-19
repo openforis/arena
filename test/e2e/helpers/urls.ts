@@ -10,4 +10,5 @@ export const Urls = {
   records: '/app/data/records/',
   dataExport: '/app/data/export/',
   validationReport: '/app/data/validationReport/',
+  messages: '/app/systemAdmin/messages/',
 }

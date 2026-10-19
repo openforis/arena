@@ -14,7 +14,6 @@ import {
   homeModules,
   userModules,
   helpModules,
-  messageModules,
   systemAdminModules,
 } from '@webapp/app/appModules'
 
@@ -94,16 +93,13 @@ const getSystemAdminModules = (user) => {
     ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)
   return [
     getModule({
-      module: appModules.messages,
-      children: [messageModules.messages],
-    }),
-    getModule({
       module: appModules.systemAdmin,
       children: [
         ...(canViewUsersAccessRequests ? [userModules.usersAccessRequest] : []),
         ...(Authorizer.canViewAllUsers(user) ? [userModules.users] : []),
         systemAdminModules.jobMonitor,
         systemAdminModules.systemLogs,
+        systemAdminModules.messages,
       ],
     }),
   ]

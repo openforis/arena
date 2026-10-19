@@ -64,11 +64,6 @@ export const appModules = {
     path: 'analysis',
     icon: 'stats-dots',
   },
-  messages: {
-    key: 'message_plural',
-    path: 'messages',
-    icon: 'envelop',
-  },
   systemAdmin: {
     key: 'systemAdmin',
     path: 'systemAdmin',
@@ -281,17 +276,6 @@ export const user2FADeviceModules = {
   },
 }
 
-export const messageModules = {
-  messages: {
-    key: 'message_plural',
-    path: 'messages',
-  },
-  message: {
-    key: 'message',
-    path: 'message',
-  },
-}
-
 export const systemAdminModules = {
   jobMonitor: {
     key: 'jobMonitor',
@@ -300,6 +284,14 @@ export const systemAdminModules = {
   systemLogs: {
     key: 'systemLogs',
     path: 'systemLogs',
+  },
+  messages: {
+    key: 'message_plural',
+    path: 'messages',
+  },
+  message: {
+    key: 'message',
+    path: 'message',
   },
 }
 
@@ -335,7 +327,6 @@ const allAppModuleGroups = [
   userModules,
   analysisModules,
   user2FADeviceModules,
-  messageModules,
   systemAdminModules,
   helpModules,
 ]
@@ -352,7 +343,6 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
-  if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
   if (Object.values(user2FADeviceModules).includes(module)) return _getModulePathParts(userModules.user2FADevices)
   if (Object.values(systemAdminModules).includes(module)) return _getModulePathParts(appModules.systemAdmin)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
