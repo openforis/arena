@@ -125,6 +125,8 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
   reload and on cycle change, not on every designer change (each fetch loads the whole survey with reference data).
   Checked end to end with a local Arena server: draft survey created via API, preview in the designer, typing, device
   switch, label changed and reloaded.
+- **Experimental**: the Mobile preview button is shown only when `EXPERIMENTAL_FEATURES` is enabled (runtime server
+  setting, `useSystemConfigExperimentalFeatures`).
 - **Phase 5 – done**: served by Arena (same origin). arena-mobile CI (`web-preview-release.yml`) builds the web preview
   with the `/mobile-preview` base URL (`WEB_BASE_URL` → Expo `experiments.baseUrl`) on every published release and
   attaches it as `arena-mobile-web-preview.zip`. Arena pins the version in `package.json` (`arenaMobileWebPreview`);

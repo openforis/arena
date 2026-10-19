@@ -115,7 +115,7 @@ USE_HTTPS=false
 # RSTUDIO_POOL_SERVER_URL=
 # RSTUDIO_POOL_SERVICE_KEY=
 
-# Arena Mobile web preview in the survey designer: downloaded by the build (yarn mobile-preview:download,
+# Arena Mobile web preview in the survey designer (experimental, needs EXPERIMENTAL_FEATURES=true): downloaded by the build (yarn mobile-preview:download,
 # version in package.json arenaMobileWebPreview) and served under /mobile-preview/; overrides (not mandatory):
 # MOBILE_PREVIEW_URL=
 # ARENA_MOBILE_WEB_PREVIEW_VERSION=
