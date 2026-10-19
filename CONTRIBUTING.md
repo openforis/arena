@@ -1,5 +1,7 @@
 # Contributing to Open Foris Arena
 
+By participating in this project you agree to abide by its [Code of Conduct](./CODE_OF_CONDUCT.md).
+
 ## Prerequisites
 
 First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
