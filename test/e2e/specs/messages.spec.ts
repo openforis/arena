@@ -62,6 +62,7 @@ test.describe('Messages', () => {
     const link = notificationBody.getByRole('link', { name: 'register' })
     await expect(link).toHaveAttribute('href', 'https://example.org/register')
     await expect(link).toHaveCSS('text-decoration-line', 'underline')
+    await expect(link).toHaveAttribute('target', '_blank')
 
     // the message is listed as sent
     await page.goto(Urls.messages)
