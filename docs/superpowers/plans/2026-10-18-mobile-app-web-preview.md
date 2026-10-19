@@ -44,8 +44,8 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
 - **Transport: `postMessage`**, not a direct API call from the iframe, so the preview bundle needs no auth and can be
   hosted anywhere (same origin, CDN). Both sides check `event.origin`. Messages are namespaced:
   - iframe → parent: `{ type: "arenaMobilePreview/ready" }`, `{ type: "arenaMobilePreview/error", message }`
-  - parent → iframe: `{ type: "arenaMobilePreview/survey", survey, lang, cycle }` (re-sent on survey changes, the
-    preview resets the record)
+  - parent → iframe: `{ type: "arenaMobilePreview/survey", survey, lang, cycle }` (re-sent on reload, the preview
+    resets the record), `{ type: "arenaMobilePreview/lang", lang }` (language change, the record is kept)
 - **Survey payload:** the same JSON the app downloads today (`GET /api/mobile/survey/:surveyId`,
   `fetchSurveyAndNodeDefsAndRefDataBySurveyId` with `advanced: true`), so the preview loads exactly what a device
   would. A `draft` param is added to preview unpublished changes.
@@ -89,10 +89,10 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
 
 ### Phase 4 – arena: draft survey and Designer panel
 
-1. `GET /api/mobile/survey/:surveyId?draft=true` (survey edit permission required for the draft).
+1. `GET /api/mobile/survey/:surveyId?draft=true`.
 2. `MobilePreviewPanel` (TypeScript) in the Designer form view: device selector (phone / tablet, portrait /
    landscape), language and cycle taken from the Designer, "reload" button, iframe in a device frame.
-3. Re-send the survey on node def changes (debounced).
+3. Re-send the survey on reload and cycle change.
 4. Feature flag / env var `MOBILE_PREVIEW_URL` (URL of the hosted bundle); the button is hidden when not set.
 
 ### Phase 5 – build and hosting
@@ -113,8 +113,19 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
   stay in Redux (`PreviewMode.isActive` guards in `DataEntryActions`: no DB write, no file storage, no duplicate key
   check). Checked in Chromium (Playwright): survey sent from a cross-origin parent page, text and code attributes,
   page navigation, no runtime errors.
-- **Phase 3 – next**: `@react-native-community/datetimepicker` is not supported on web (date/time picker buttons do
-  nothing; the typed value still works).
+- **Phase 3 – done**: date/time pickers (`react-native-modal-datetime-picker` shim: dialog with an HTML date/time
+  input); file attributes (image, video, audio, other) kept in memory (`RecordFileMemoryRepository`, blob/data URIs of
+  the picked files: select, show, rotate, replace); GPS through browser geolocation; maps replaced by a placeholder;
+  progress bar layout fixed on web (Paper wraps it in a `height: 100%` container). Checked every attribute type of the
+  demo survey in Chromium.
+- **Phase 4 – done** (arena): "Mobile preview" button in the form designer header, shown when `MOBILE_PREVIEW_URL` is
+  set (build-time env var, like the other client settings), opening `MobilePreviewPanel` (`PanelRight`, device frame,
+  phone/tablet, portrait/landscape, reload). `GET /api/mobile/survey/:surveyId` accepts `draft` with the same survey
+  view permission as `GET /api/survey/:surveyId/full?draft=true`. The survey is fetched when the preview is ready, on
+  reload and on cycle change, not on every designer change (each fetch loads the whole survey with reference data).
+  Checked end to end with a local Arena server: draft survey created via API, preview in the designer, typing, device
+  switch, label changed and reloaded.
+- **Phase 5 – to do**: hosting of the preview bundle (decision needed, see open questions).
 
 ## Risks and open questions
 
