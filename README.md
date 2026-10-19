@@ -181,3 +181,7 @@ Kustomize manifests and instructions are in [infra/k8s](./infra/k8s/README.md).
 # License
 
 Arena is [MIT licensed](./LICENSE).
+
+# Code of Conduct
+
+This project follows the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md).
