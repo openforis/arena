@@ -131,6 +131,8 @@ typings/
 # Nuxt.js build / generate output
 .nuxt
 dist
+# Arena Mobile web preview (yarn mobile-preview:download)
+mobile-preview/
 
 # Gatsby files
 .cache/

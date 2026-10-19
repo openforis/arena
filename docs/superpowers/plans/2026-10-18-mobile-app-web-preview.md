@@ -125,7 +125,13 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
   reload and on cycle change, not on every designer change (each fetch loads the whole survey with reference data).
   Checked end to end with a local Arena server: draft survey created via API, preview in the designer, typing, device
   switch, label changed and reloaded.
-- **Phase 5 – to do**: hosting of the preview bundle (decision needed, see open questions).
+- **Phase 5 – done**: served by Arena (same origin). arena-mobile CI (`web-preview-release.yml`) builds the web preview
+  with the `/mobile-preview` base URL (`WEB_BASE_URL` → Expo `experiments.baseUrl`) on every published release and
+  attaches it as `arena-mobile-web-preview.zip`. Arena pins the version in `package.json` (`arenaMobileWebPreview`);
+  `yarn build` runs `yarn mobile-preview:download` (non-fatal: without the bundle the button is hidden), the server
+  serves `mobile-preview/` under `/mobile-preview/` and the client build defaults `MOBILE_PREVIEW_URL` to it when the
+  bundle is there. The pinned version must be released with the asset first (the release workflow can also be run
+  manually for an existing tag).
 
 ## Risks and open questions
 
@@ -134,4 +140,5 @@ Arena Designer (webapp)                         Arena Mobile web build (iframe)
 - **Big categories/taxonomies** make the survey payload large; acceptable for a preview, could later be limited.
 - **Fidelity:** native pickers, keyboard behavior and performance differ from real devices; the panel should state
   that it is an approximation.
-- **Hosting choice** (same origin vs. separate host) to be decided before Phase 5.
+- **Version alignment:** each Arena release pins one Arena Mobile version: bump `arenaMobileWebPreview.version` when the
+  survey format or the preview protocol changes.

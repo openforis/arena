@@ -74,7 +74,8 @@ export const ENV = {
   rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
   rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
   rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
-  // Arena Mobile web build used for the mobile preview in the survey designer (preview hidden when not set)
+  // Arena Mobile web build used for the mobile preview in the survey designer (preview hidden when not set):
+  // /mobile-preview/ when downloaded by the build (yarn mobile-preview:download)
   mobilePreviewUrl: process.env.MOBILE_PREVIEW_URL,
   // ReCaptcha
   reCaptchaEnabled: isTrue(process.env.RECAPTCHA_ENABLED),
