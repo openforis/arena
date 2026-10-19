@@ -55,7 +55,14 @@ Continue?`,
       tablet: 'Tablet',
     },
     error: 'Error loading the mobile preview: {{error}}',
-    note: 'Arena Mobile running in the browser with the draft version of the survey: native pickers, maps, camera and GPS precision differ from a real device. Data entered here is not saved.',
+    differences: `**Differences from Arena Mobile on a real device**
+- **Date and time**: typed in a text field (DD/MM/YYYY, HH:mm) instead of the device date/time pickers
+- **Maps**: not available (map buttons show a placeholder, no offline or PDF maps)
+- **Location**: taken from the browser (usually less precise than the device GPS); no external GPS receivers
+- **Photos and files**: selected from the computer; camera capture and photo location (EXIF) not available
+- **Keyboard and gestures**: physical keyboard and mouse instead of the on-screen keyboard and swipes
+- **Data**: kept in memory only, lost when reloading; no records list, sync or export`,
+    note: 'Approximation of Arena Mobile running in the browser with the draft survey: see the info icon for the differences from a real device.',
     orientation: {
       landscape: 'Landscape',
       portrait: 'Portrait',

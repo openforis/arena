@@ -4,7 +4,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ENV } from '@core/processUtils'
 
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonIconInfo } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import PanelRight from '@webapp/components/PanelRight'
 import * as API from '@webapp/service/api'
@@ -96,7 +96,7 @@ export const MobilePreviewPanel = (props: Props) => {
         if (!cancelled) setLoading(false)
       }
     }
-    fetchAndSendSurvey()
+    void fetchAndSendSurvey()
     return () => {
       cancelled = true
     }
@@ -143,12 +143,13 @@ export const MobilePreviewPanel = (props: Props) => {
           size="small"
           variant="outlined"
         />
+        <ButtonIconInfo isTitleMarkdown title="surveyForm:mobilePreview.differences" />
       </div>
+      <div className="mobile-preview-panel__note">{t('surveyForm:mobilePreview.note')}</div>
       {error && <div className="mobile-preview-panel__error">{t('surveyForm:mobilePreview.error', { error })}</div>}
       <div className="mobile-preview-panel__device" style={frameSize}>
         <iframe ref={iframeRef} src={previewSrc} title={t('surveyForm:mobilePreview.title')} />
       </div>
-      <div className="mobile-preview-panel__note">{t('surveyForm:mobilePreview.note')}</div>
     </PanelRight>
   )
 }
