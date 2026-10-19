@@ -46,8 +46,10 @@ Continuar?`,
   movePageUp: 'Mover página para cima',
   movePageDown: 'Mover página para baixo',
   formEditActions: {
-    mobilePreview: 'Visualização móvel',
     preview: 'Visualizar',
+    previewDesktop: 'Visualizar (computador)',
+    previewMobile: 'Visualizar (móvel)',
+    previewOptions: 'Opções de visualização',
   },
   mobilePreview: {
     device: {

@@ -46,8 +46,10 @@ export default {
   movePageUp: 'ページを上に移動',
   movePageDown: 'ページを下に移動',
   formEditActions: {
-    mobilePreview: 'モバイルプレビュー',
     preview: 'プレビュー',
+    previewDesktop: 'プレビュー (デスクトップ)',
+    previewMobile: 'プレビュー (モバイル)',
+    previewOptions: 'プレビューのオプション',
   },
   mobilePreview: {
     device: {

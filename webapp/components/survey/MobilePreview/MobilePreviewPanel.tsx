@@ -7,6 +7,7 @@ import { ENV } from '@core/processUtils'
 
 import { Button, ButtonIconInfo } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
+import { useOnResize } from '@webapp/components/hooks'
 import PanelRight from '@webapp/components/PanelRight'
 import * as API from '@webapp/service/api'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -26,8 +27,10 @@ const devices: Device[] = ['phone', 'tablet']
 const deviceIconClassName: Record<Device, string> = { phone: 'icon-mobile', tablet: 'icon-tablet' }
 const orientations: Orientation[] = ['portrait', 'landscape']
 
-// panel padding and device frame border
-const panelExtraWidth = 80
+// panel padding (and some margin) around the device frame
+const panelExtraWidth = 60
+// device frame border width (see MobilePreviewPanel.scss)
+const frameBorderWidth = 10
 
 const getFrameSize = ({ device, orientation }: { device: Device; orientation: Orientation }) => {
   const { width, height } = deviceSizes[device]
@@ -112,12 +115,27 @@ export const MobilePreviewPanel = (props: Props) => {
 
   const frameSize = getFrameSize({ device, orientation })
 
+  // the device is scaled down to fit the panel (no scrolling); the iframe keeps the real device size (same layout)
+  const stageRef = useRef<HTMLDivElement>(null)
+  const [stageSize, setStageSize] = useState<{ width: number; height: number } | null>(null)
+  const onStageResize = useCallback(() => {
+    const stage = stageRef.current
+    if (stage) setStageSize({ width: stage.clientWidth, height: stage.clientHeight })
+  }, [])
+  useOnResize(onStageResize, stageRef)
+
+  const outerWidth = frameSize.width + 2 * frameBorderWidth
+  const outerHeight = frameSize.height + 2 * frameBorderWidth
+  // the stage height doesn't depend on the panel width: the panel is sized to the device scaled to fit the height
+  const heightScale = stageSize ? Math.min(1, stageSize.height / outerHeight) : 1
+  const scale = stageSize ? Math.min(heightScale, stageSize.width / outerWidth) : 1
+
   return (
     <PanelRight
       className="mobile-preview-panel"
       header="surveyForm:mobilePreview.title"
       onClose={onClose}
-      width={`${frameSize.width + panelExtraWidth}px`}
+      width={`${Math.ceil(outerWidth * heightScale) + panelExtraWidth}px`}
     >
       <div className="mobile-preview-panel__toolbar">
         <ButtonGroup
@@ -157,8 +175,12 @@ export const MobilePreviewPanel = (props: Props) => {
         />
       </div>
       {error && <div className="mobile-preview-panel__error">{t('surveyForm:mobilePreview.error', { error })}</div>}
-      <div className="mobile-preview-panel__device" style={frameSize}>
-        <iframe ref={iframeRef} src={previewSrc} title={t('surveyForm:mobilePreview.title')} />
+      <div className="mobile-preview-panel__stage" ref={stageRef}>
+        <div style={{ width: outerWidth * scale, height: outerHeight * scale }}>
+          <div className="mobile-preview-panel__device" style={{ ...frameSize, transform: `scale(${scale})` }}>
+            <iframe ref={iframeRef} src={previewSrc} title={t('surveyForm:mobilePreview.title')} />
+          </div>
+        </div>
       </div>
     </PanelRight>
   )

@@ -46,8 +46,10 @@ eliminando los valores existentes insertados en ellas (si los hay).
   movePageUp: 'Mover página hacia arriba',
   movePageDown: 'Mover página hacia abajo',
   formEditActions: {
-    mobilePreview: 'Vista previa móvil',
     preview: 'Vista previa',
+    previewDesktop: 'Vista previa (escritorio)',
+    previewMobile: 'Vista previa (móvil)',
+    previewOptions: 'Opciones de vista previa',
   },
   mobilePreview: {
     device: {

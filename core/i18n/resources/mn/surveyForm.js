@@ -47,8 +47,10 @@ export default {
   movePageUp: 'Хуудсыг дээш зөөх',
   movePageDown: 'Хуудсыг доош зөөх',
   formEditActions: {
-    mobilePreview: 'Гар утасны урьдчилсан харагдац',
     preview: 'Урьдчилан харах',
+    previewDesktop: 'Урьдчилан харах (компьютер)',
+    previewMobile: 'Урьдчилан харах (гар утас)',
+    previewOptions: 'Урьдчилан харах сонголтууд',
   },
   mobilePreview: {
     device: {

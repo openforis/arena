@@ -46,8 +46,10 @@ Continue?`,
   movePageUp: 'Move page up',
   movePageDown: 'Move page down',
   formEditActions: {
-    mobilePreview: 'Mobile preview',
     preview: 'Preview',
+    previewDesktop: 'Preview (desktop)',
+    previewMobile: 'Preview (mobile)',
+    previewOptions: 'Preview options',
   },
   mobilePreview: {
     device: {

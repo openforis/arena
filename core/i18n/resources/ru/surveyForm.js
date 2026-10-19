@@ -44,8 +44,10 @@ export default {
   movePageUp: 'Переместить страницу вверх',
   movePageDown: 'Переместить страницу вниз',
   formEditActions: {
-    mobilePreview: 'Мобильный предпросмотр',
     preview: 'Предварительный просмотр',
+    previewDesktop: 'Предварительный просмотр (компьютер)',
+    previewMobile: 'Предварительный просмотр (мобильный)',
+    previewOptions: 'Параметры предварительного просмотра',
   },
   mobilePreview: {
     device: {
