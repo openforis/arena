@@ -106,6 +106,13 @@ const getValidationsSummary = ({ nodeDef }) => {
   return getExpressionsSummary({ expressions, includeSeverity: true })
 }
 
+// mirrors the 3 "Required" options in the node def editor: not required, always required, required if
+const getRequiredSummary = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  if (NodeDefValidations.isRequiredIfDefined(validations)) return 'conditional'
+  return String(NodeDefValidations.isRequired(validations))
+}
+
 const getRequiredIfSummary = ({ nodeDef }) => {
   const validations = NodeDef.getValidations(nodeDef)
   return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
@@ -251,7 +258,7 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
     defaultValue: getDefaultValuesSummary({ nodeDef }),
     defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
     defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
-    required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+    required: getRequiredSummary({ nodeDef }),
     requiredIf: getRequiredIfSummary({ nodeDef }),
     unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
     minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
