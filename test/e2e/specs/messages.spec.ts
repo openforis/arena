@@ -30,7 +30,9 @@ test.describe('Messages', () => {
     await subjectInput.fill(subject)
     await page
       .locator('.message-body-editor textarea:not([aria-hidden])')
-      .fill('Dear user,\n\nPlease join the **Arena user meeting**.')
+      .fill(
+        'Dear {{userTitleAndName}},\n\nPlease join the **Arena user meeting**: [register](https://example.org/register)'
+      )
     await expect(page.locator('.message-body-preview strong')).toHaveText('Arena user meeting')
 
     // in app notification only (no emails), sent only to the test user (other workers must not see it)
@@ -54,7 +56,12 @@ test.describe('Messages', () => {
     await page.reload()
     await page.locator('.app-header__user-controls button:has(.icon-bell)').click()
     await expect(page.locator('.panel-right').getByText(subject)).toBeVisible()
-    await expect(page.locator('.message-notification__body strong')).toHaveText('Arena user meeting')
+    const notificationBody = page.locator('.message-notification__body')
+    await expect(notificationBody).toContainText(`Dear ${testUser.name},`)
+    await expect(notificationBody.locator('strong')).toHaveText('Arena user meeting')
+    const link = notificationBody.getByRole('link', { name: 'register' })
+    await expect(link).toHaveAttribute('href', 'https://example.org/register')
+    await expect(link).toHaveCSS('text-decoration-line', 'underline')
 
     // the message is listed as sent
     await page.goto(Urls.messages)

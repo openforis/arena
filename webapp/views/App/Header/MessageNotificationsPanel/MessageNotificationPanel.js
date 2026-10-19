@@ -1,3 +1,5 @@
+import './MessageNotificationPanel.scss'
+
 import PropTypes from 'prop-types'
 
 import { Messages } from '@openforis/arena-core'

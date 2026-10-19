@@ -1,0 +1,8 @@
+@use '~@webapp/style/vars' as *;
+
+.message-notification__body a {
+  // the global link style looks like plain (and smaller) text
+  color: $colorPrimary;
+  font-size: inherit;
+  text-decoration: underline;
+}
