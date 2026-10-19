@@ -62,7 +62,7 @@ Continuar?`,
 - **Fotos e ficheiros**: selecionados a partir do computador; sem captura com câmara nem localização da foto (EXIF)
 - **Teclado e gestos**: teclado físico e rato em vez do teclado no ecrã e dos deslizes
 - **Dados**: mantidos apenas em memória, perdidos ao recarregar; sem lista de registos, sincronização ou exportação`,
-    note: 'Aproximação do Arena Mobile a correr no navegador com a pesquisa em rascunho: veja o ícone de informação para as diferenças em relação a um dispositivo real.',
+    note: 'Aproximação do Arena Mobile a correr no navegador com a pesquisa em rascunho.',
     orientation: {
       landscape: 'Paisagem',
       portrait: 'Retrato',

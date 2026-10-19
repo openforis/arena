@@ -62,7 +62,7 @@ Continue?`,
 - **Photos and files**: selected from the computer; camera capture and photo location (EXIF) not available
 - **Keyboard and gestures**: physical keyboard and mouse instead of the on-screen keyboard and swipes
 - **Data**: kept in memory only, lost when reloading; no records list, sync or export`,
-    note: 'Approximation of Arena Mobile running in the browser with the draft survey: see the info icon for the differences from a real device.',
+    note: 'Approximation of Arena Mobile running in the browser with the draft survey.',
     orientation: {
       landscape: 'Landscape',
       portrait: 'Portrait',

@@ -1,6 +1,7 @@
 import './MobilePreviewPanel.scss'
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import classNames from 'classnames'
 
 import { ENV } from '@core/processUtils'
 
@@ -22,6 +23,7 @@ type Device = keyof typeof deviceSizes
 type Orientation = 'portrait' | 'landscape'
 
 const devices: Device[] = ['phone', 'tablet']
+const deviceIconClassName: Record<Device, string> = { phone: 'icon-mobile', tablet: 'icon-tablet' }
 const orientations: Orientation[] = ['portrait', 'landscape']
 
 // panel padding and device frame border
@@ -122,8 +124,8 @@ export const MobilePreviewPanel = (props: Props) => {
           groupName="mobilePreviewDevice"
           items={devices.map((key) => ({
             key,
-            iconClassName: key === 'phone' ? 'icon-mobile' : 'icon-tablet',
-            label: `surveyForm:mobilePreview.device.${key}`,
+            iconClassName: deviceIconClassName[key],
+            title: `surveyForm:mobilePreview.device.${key}`,
           }))}
           // ButtonGroup (JS) passes the selected item key to onChange, but its inferred type has no params
           onChange={setDevice as () => void}
@@ -131,21 +133,29 @@ export const MobilePreviewPanel = (props: Props) => {
         />
         <ButtonGroup
           groupName="mobilePreviewOrientation"
-          items={orientations.map((key) => ({ key, label: `surveyForm:mobilePreview.orientation.${key}` }))}
+          items={orientations.map((key) => ({
+            key,
+            // no landscape icon: the device icon rotated
+            iconClassName: classNames(deviceIconClassName[device], { 'icon-rotate-90': key === 'landscape' }),
+            title: `surveyForm:mobilePreview.orientation.${key}`,
+          }))}
           onChange={setOrientation as () => void}
           selectedItemKey={orientation}
         />
         <Button
           disabled={loading || readyCount === 0}
           iconClassName="icon-loop2 icon-12px"
-          label="surveyForm:mobilePreview.reload"
           onClick={() => setReloadCount((count) => count + 1)}
           size="small"
+          title="surveyForm:mobilePreview.reload"
           variant="outlined"
         />
-        <ButtonIconInfo isTitleMarkdown title="surveyForm:mobilePreview.differences" />
+        <ButtonIconInfo
+          isTitleMarkdown
+          title={`${t('surveyForm:mobilePreview.note')}\n\n${t('surveyForm:mobilePreview.differences')}`}
+          titleIsI18nKey={false}
+        />
       </div>
-      <div className="mobile-preview-panel__note">{t('surveyForm:mobilePreview.note')}</div>
       {error && <div className="mobile-preview-panel__error">{t('surveyForm:mobilePreview.error', { error })}</div>}
       <div className="mobile-preview-panel__device" style={frameSize}>
         <iframe ref={iframeRef} src={previewSrc} title={t('surveyForm:mobilePreview.title')} />

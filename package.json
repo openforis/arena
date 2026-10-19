@@ -15,7 +15,7 @@
     "client:dev-server": "NODE_ENV=development webpack serve",
     "build": "run-s clean mobile-preview:download build:server:prod build-prod",
     "clean": "rimraf dist ./node_modules/.cache/",
-    "mobile-preview:download": "node scripts/download-mobile-preview.ts",
+    "mobile-preview:download": "node --experimental-strip-types scripts/download-mobile-preview.ts",
     "dev:server": "npm run build:server:dev && npm-run-all --parallel dev:server:nodemon watch:server",
     "dev:server:nodemon": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
     "build:test:integration": "webpack --config test/integration/config/webpack.config.js",

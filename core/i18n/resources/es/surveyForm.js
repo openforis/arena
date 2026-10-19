@@ -62,7 +62,7 @@ eliminando los valores existentes insertados en ellas (si los hay).
 - **Fotos y archivos**: seleccionados desde el ordenador; sin captura con cámara ni ubicación de la foto (EXIF)
 - **Teclado y gestos**: teclado físico y ratón en lugar del teclado en pantalla y los deslizamientos
 - **Datos**: solo en memoria, se pierden al recargar; sin lista de registros, sincronización ni exportación`,
-    note: 'Aproximación de Arena Mobile ejecutándose en el navegador con la encuesta en borrador: vea el icono de información para las diferencias con un dispositivo real.',
+    note: 'Aproximación de Arena Mobile ejecutándose en el navegador con la encuesta en borrador.',
     orientation: {
       landscape: 'Horizontal',
       portrait: 'Vertical',

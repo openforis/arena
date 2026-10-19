@@ -62,7 +62,7 @@ Continuer ?`,
 - **Photos et fichiers** : sélectionnés depuis l'ordinateur ; pas de prise de vue avec l'appareil photo ni de position de la photo (EXIF)
 - **Clavier et gestes** : clavier physique et souris au lieu du clavier à l'écran et des balayages
 - **Données** : conservées uniquement en mémoire, perdues au rechargement ; pas de liste des enregistrements, de synchronisation ni d'export`,
-    note: "Approximation d'Arena Mobile exécuté dans le navigateur avec l'enquête en brouillon : voir l'icône d'information pour les différences avec un appareil réel.",
+    note: "Approximation d'Arena Mobile exécuté dans le navigateur avec l'enquête en brouillon.",
     orientation: {
       landscape: 'Paysage',
       portrait: 'Portrait',
