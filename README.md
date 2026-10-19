@@ -115,6 +115,9 @@ USE_HTTPS=false
 # RSTUDIO_POOL_SERVER_URL=
 # RSTUDIO_POOL_SERVICE_KEY=
 
+# Arena Mobile web preview in the survey designer (not mandatory, baked into the client bundle)
+# MOBILE_PREVIEW_URL=
+
 # WHISP (geo data integration, not mandatory)
 # WHISP_API_KEY=
 

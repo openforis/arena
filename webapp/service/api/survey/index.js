@@ -41,6 +41,14 @@ export const fetchSurveyFull = async ({
   return survey
 }
 
+// same survey data downloaded by Arena Mobile (with reference data)
+export const fetchSurveyForMobile = async ({ surveyId, cycle, draft = true }) => {
+  const {
+    data: { survey },
+  } = await axios.get(`/api/mobile/survey/${surveyId}`, { params: { cycle, draft } })
+  return survey
+}
+
 export const fetchSurveyTemplatesPublished = async () => {
   const {
     data: { list: surveys },

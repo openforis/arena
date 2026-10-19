@@ -46,7 +46,22 @@ Continue?`,
   movePageUp: 'Move page up',
   movePageDown: 'Move page down',
   formEditActions: {
+    mobilePreview: 'Mobile preview',
     preview: 'Preview',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Phone',
+      tablet: 'Tablet',
+    },
+    error: 'Error loading the mobile preview: {{error}}',
+    note: 'Arena Mobile running in the browser with the draft version of the survey: native pickers, maps, camera and GPS precision differ from a real device. Data entered here is not saved.',
+    orientation: {
+      landscape: 'Landscape',
+      portrait: 'Portrait',
+    },
+    reload: 'Reload',
+    title: 'Mobile preview',
   },
   formEntryActions: {
     confirmDemote: 'Are sure you want to demote this record to {{name}}?',
