@@ -37,8 +37,8 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 
     &.popup-menu-opened {
       .sidebar__module.over {
-        // Soft brand tint; --blue is set by SurveyThemeBridge
-        background: color-mix(in srgb, $colorPrimary 18%, white);
+        // soft brand tint on the theme surface (readable in the dark theme too)
+        background: tint($colorPrimary, 82%);
       }
     }
   }
@@ -128,7 +128,7 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
   position: fixed;
   z-index: $zIndex10TopOfApp;
   left: $sidebarWidthClosed - 1px;
-  background-color: color-mix(in srgb, $colorPrimary 18%, white);
+  background-color: tint($colorPrimary, 82%);
   border-top: 1px solid $colorOutline;
   border-right: 1px solid $colorOutline;
   border-bottom: 1px solid $colorOutline;
