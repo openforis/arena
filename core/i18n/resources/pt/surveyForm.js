@@ -46,7 +46,29 @@ Continuar?`,
   movePageUp: 'Mover página para cima',
   movePageDown: 'Mover página para baixo',
   formEditActions: {
+    mobilePreview: 'Visualização móvel',
     preview: 'Visualizar',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Telefone',
+      tablet: 'Tablet',
+    },
+    error: 'Erro ao carregar a visualização móvel: {{error}}',
+    differences: `**Diferenças em relação ao Arena Mobile num dispositivo real**
+- **Data e hora**: digitadas num campo de texto (DD/MM/YYYY, HH:mm) em vez dos seletores de data/hora do dispositivo
+- **Mapas**: não disponíveis (os botões de mapa mostram um espaço reservado; sem mapas offline nem PDF)
+- **Localização**: obtida do navegador (geralmente menos precisa que o GPS do dispositivo); sem recetores GPS externos
+- **Fotos e ficheiros**: selecionados a partir do computador; sem captura com câmara nem localização da foto (EXIF)
+- **Teclado e gestos**: teclado físico e rato em vez do teclado no ecrã e dos deslizes
+- **Dados**: mantidos apenas em memória, perdidos ao recarregar; sem lista de registos, sincronização ou exportação`,
+    note: 'Aproximação do Arena Mobile a correr no navegador com a pesquisa em rascunho: veja o ícone de informação para as diferenças em relação a um dispositivo real.',
+    orientation: {
+      landscape: 'Paisagem',
+      portrait: 'Retrato',
+    },
+    reload: 'Recarregar',
+    title: 'Visualização móvel (experimental)',
   },
   formEntryActions: {
     confirmDemote: 'Tem certeza de que deseja rebaixar este registro para {{name}}?',

@@ -46,7 +46,29 @@ eliminando los valores existentes insertados en ellas (si los hay).
   movePageUp: 'Mover página hacia arriba',
   movePageDown: 'Mover página hacia abajo',
   formEditActions: {
+    mobilePreview: 'Vista previa móvil',
     preview: 'Vista previa',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Teléfono',
+      tablet: 'Tableta',
+    },
+    error: 'Error al cargar la vista previa móvil: {{error}}',
+    differences: `**Diferencias con Arena Mobile en un dispositivo real**
+- **Fecha y hora**: se escriben en un campo de texto (DD/MM/YYYY, HH:mm) en lugar de los selectores de fecha/hora del dispositivo
+- **Mapas**: no disponibles (los botones de mapa muestran un marcador de posición; sin mapas sin conexión ni PDF)
+- **Ubicación**: obtenida del navegador (generalmente menos precisa que el GPS del dispositivo); sin receptores GPS externos
+- **Fotos y archivos**: seleccionados desde el ordenador; sin captura con cámara ni ubicación de la foto (EXIF)
+- **Teclado y gestos**: teclado físico y ratón en lugar del teclado en pantalla y los deslizamientos
+- **Datos**: solo en memoria, se pierden al recargar; sin lista de registros, sincronización ni exportación`,
+    note: 'Aproximación de Arena Mobile ejecutándose en el navegador con la encuesta en borrador: vea el icono de información para las diferencias con un dispositivo real.',
+    orientation: {
+      landscape: 'Horizontal',
+      portrait: 'Vertical',
+    },
+    reload: 'Recargar',
+    title: 'Vista previa móvil (experimental)',
   },
   formEntryActions: {
     confirmDemote: '¿Está seguro de que desea degradar este registro a {{name}}?',
