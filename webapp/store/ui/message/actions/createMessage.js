@@ -3,7 +3,7 @@ import axios from 'axios'
 import { MessageNotificationType, MessagePropsKey, MessageStatus, MessageTargetUserType } from '@openforis/arena-core'
 
 import * as User from '@core/user/user'
-import { appModuleUri, messageModules } from '@webapp/app/appModules'
+import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
 import { UserState } from '@webapp/store/user'
 
 const defaultMessageBody = `Dear {{userTitleAndName}},  
@@ -32,5 +32,5 @@ export const createMessage =
 
     const { data: message } = await axios.post(`/api/message`, messageParam)
 
-    navigate(`${appModuleUri(messageModules.message)}/${message.uuid}/`)
+    navigate(`${appModuleUri(systemAdminModules.message)}/${message.uuid}/`)
   }

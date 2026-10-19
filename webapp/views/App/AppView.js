@@ -7,12 +7,7 @@ import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
-import {
-  useAuthCanCleanseRecords,
-  useAuthCanUseAnalysis,
-  useAuthCanUseMessages,
-  useUserIsSystemAdmin,
-} from '@webapp/store/user'
+import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
@@ -31,7 +26,6 @@ const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))
 const Dashboard = React.lazy(() => import('./views/Dashboard'))
 const Users = React.lazy(() => import('./views/Users'))
-const Message = React.lazy(() => import('./views/Message'))
 const SystemAdmin = React.lazy(() => import('./views/SystemAdmin'))
 const Help = React.lazy(() => import('./views/Help'))
 
@@ -43,7 +37,6 @@ const AppView = () => {
   const isSideBarOpen = useIsSidebarOpened()
   const canViewDashboard = useAuthCanCleanseRecords()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
-  const canUseMessages = useAuthCanUseMessages()
   const isSystemAdmin = useUserIsSystemAdmin()
 
   const modules = useMemo(() => {
@@ -77,9 +70,6 @@ const AppView = () => {
       component: Users,
       path: `${appModules.users.path}/*`,
     })
-    if (canUseMessages) {
-      result.push({ component: Message, path: `${appModules.messages.path}/*` })
-    }
     if (isSystemAdmin) {
       result.push({ component: SystemAdmin, path: `${appModules.systemAdmin.path}/*` })
     }
@@ -88,7 +78,7 @@ const AppView = () => {
       path: `${appModules.help.path}/*`,
     })
     return result
-  }, [canAnalyzeRecords, canUseMessages, canViewDashboard, isSystemAdmin])
+  }, [canAnalyzeRecords, canViewDashboard, isSystemAdmin])
 
   return (
     <>

@@ -1,17 +1,21 @@
-import React, { useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { parseMarkdown } from '@core/markdownUtils'
 
 const Markdown = (props) => {
-  const { container: Container = 'div', className = undefined, source, sanitize = true } = props
+  const {
+    container: Container = 'div',
+    className = undefined,
+    source,
+    sanitize = true,
+    openLinksInNewTab = false,
+  } = props
 
-  const [output, setOutput] = useState('')
-
-  useEffect(() => {
-    const parsedSource = parseMarkdown(source, sanitize)
-    setOutput(parsedSource)
-  }, [source, sanitize])
+  const output = useMemo(
+    () => parseMarkdown(source, sanitize, { openLinksInNewTab }),
+    [source, sanitize, openLinksInNewTab]
+  )
 
   return <Container className={className} dangerouslySetInnerHTML={{ __html: output }} />
 }
@@ -21,6 +25,7 @@ Markdown.propTypes = {
   container: PropTypes.string, // The container element to use
   className: PropTypes.string, // The class name to apply to the container element
   sanitize: PropTypes.bool, // Whether to sanitize the HTML output
+  openLinksInNewTab: PropTypes.bool, // Whether links open in a new browser tab
 }
 
 export default Markdown

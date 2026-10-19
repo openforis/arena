@@ -128,4 +128,13 @@ export class ArenaApi {
   async deleteSurveyIfExists(surveyId: number): Promise<void> {
     await this.requestContext.delete(`/api/survey/${surveyId}`, { headers: this.headers })
   }
+
+  /**
+   * Deletes the message with the specified UUID; it does nothing if the message does not exist anymore.
+   * @param {string} messageUuid - UUID of the message to delete.
+   * @returns {Promise<void>} - Resolves when the message has been deleted.
+   */
+  async deleteMessageIfExists(messageUuid: string): Promise<void> {
+    await this.requestContext.delete(`/api/message/${messageUuid}`, { headers: this.headers })
+  }
 }
