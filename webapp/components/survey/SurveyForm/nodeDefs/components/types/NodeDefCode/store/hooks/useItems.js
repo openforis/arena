@@ -84,7 +84,7 @@ export const useItems = ({ nodeDef, parentNode, draft, edit, entryDataQuery, ite
 
   useEffect(() => {
     if (itemsNeeded) {
-      calculateItems(itemsGetParams).then((_items) => {
+      void calculateItems(itemsGetParams).then((_items) => {
         setItems(() => _items) // use a callback to prevent invoking items callback (when it's a function)
       })
     }

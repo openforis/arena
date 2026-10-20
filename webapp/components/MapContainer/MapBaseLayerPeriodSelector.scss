@@ -15,11 +15,11 @@
     align-items: center;
     column-gap: 0.5rem;
     padding: 0.2rem;
-    background-color: rgba($white, 0.4);
+    background-color: with-alpha($colorSurface, 0.4);
   }
 
   .slider-wrapper {
-    background-color: rgba($white, 0.4);
+    background-color: with-alpha($colorSurface, 0.4);
     width: 100%;
 
     input {

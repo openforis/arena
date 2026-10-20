@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import * as DateUtils from '@core/dateUtils'
@@ -18,11 +18,11 @@ export const newCycle = () => ({
 })
 
 // ====== READ
-export const getDateStart = R.propOr(null, keys.dateStart)
-export const getDateEnd = R.propOr(null, keys.dateEnd)
-export const getDescriptions = R.propOr({}, keys.descriptions)
-export const getLabels = R.propOr({}, keys.labels)
+export const getDateStart = A.propOr(null, keys.dateStart)
+export const getDateEnd = A.propOr(null, keys.dateEnd)
+export const getDescriptions = A.propOr({}, keys.descriptions)
+export const getLabels = A.propOr({}, keys.labels)
 
 // ====== UPDATE
-export const setDateStart = R.assoc(keys.dateStart)
-export const setDateEnd = R.assoc(keys.dateEnd)
+export const setDateStart = A.assoc(keys.dateStart)
+export const setDateEnd = A.assoc(keys.dateEnd)

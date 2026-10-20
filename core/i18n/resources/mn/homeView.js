@@ -6,17 +6,8 @@ export default {
     activityLog: {
       title: 'Үйл ажиллагааны бүртгэл',
       size: '$t(homeView:dashboard.activityLog.title) хэмжээ: {{size}}',
-    },
-    deleteActivityLog: 'Үйлдлийн түүхийг цэвэрлэх',
-    deleteActivityLogConfirm: {
-      headerText: 'Энэхүү судалгааны үйлдлийн түүхийн БҮХ өгөгдлийг цэвэрлэх үү?',
-      message: `
-  - **{{surveyName}}** судалгааны үйлдлийн түүхийн БҮХ өгөгдөл устгагдана;\n\n
-  - судалгааны Мэдээллийн санд (DB) эзэлж буй зай багасна;\n\n
-  - энэ нь судалгааны оруулсан өгөгдөлд нөлөөлөхгүй;\n\n
-  
-  $t(common.cantUndoWarning)`,
-      confirmName: 'Баталгаажуулахын тулд энэхүү судалгааны нэрийг оруулна уу:',
+      loadError: 'Үйл ажиллагааг ачаалж чадсангүй.',
+      empty: 'Одоогоор үйл ажиллагаа байхгүй.',
     },
     exportWithData: 'Экспорт + өгөгдөл (Нөөц)',
     exportWithDataNoActivityLog: 'Экспорт + өгөгдөл (ҮЙЛ АЖИЛЛАГААНЫ БҮРТГЭЛГҮЙ)',
@@ -58,6 +49,24 @@ export default {
       totalItems: 'Нийт элемент: {{totalItems}}',
       remainingItems: 'Үлдсэн элемент',
     },
+    kpi: {
+      records: 'Бичлэг',
+      contributors: 'Оролцогчид',
+      storage: 'Хадгалалт',
+      expandDetails: 'Дэлгэрэнгүй харуулах',
+      collapseDetails: 'Дэлгэрэнгүйг нуух',
+    },
+    recordsCard: {
+      total: 'Сонгосон хугацаанд нэмэгдсэн бичлэг',
+      byStep: 'Ажлын урсгалын шатаар (бүх хугацаа)',
+    },
+    contributorsCard: {
+      active: 'Сонгосон хугацааны идэвхтэй оролцогчид: {{count}}',
+    },
+    map: {
+      title: 'Газрын зураг',
+      allOwners: 'Бүх эзэмшигчид',
+    },
     step: {
       entry: 'Өгөгдөл оруулах',
       cleansing: 'Өгөгдөл цэвэрлэх',
@@ -80,24 +89,27 @@ export default {
     branding: {
       title: 'Брэнд',
       primaryColor: 'Үндсэн өнгө',
-      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
-      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      titleFontSize: 'Гарчгийн фонтын хэмжээ',
+      descriptionFontSize: 'Тайлбарын фонтын хэмжээ',
       fontSizePreset: {
-        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
-        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
-        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+        small: 'Жижиг',
+        default: 'Өгөгдмөл',
+        large: 'Том',
       },
-      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
-      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
-      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
-      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      surveyLogo1: 'Судалгааны лого 1',
+      surveyLogo2: 'Судалгааны лого 2',
+      surveyLogo3: 'Судалгааны лого 3',
+      landingBackground: 'Нүүр хуудасны дэвсгэр зураг',
       uploadLogo: 'Лого байршуулах',
-      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
-      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      logoFileFormatHint: 'PNG, JPEG, WebP эсвэл SVG (дээд тал нь {{maxMb}} MB)',
+      logoFileTooLarge: 'Логоны зураг {{maxMb}} MB буюу түүнээс бага байх ёстой',
       preview: 'Урьдчилан харах',
-      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      backgroundFileTooLarge: 'Дэвсгэр зураг {{maxMb}} MB буюу түүнээс бага байх ёстой',
       invalidPrimaryColor: 'Зөв #RRGGBB өнгө оруулна уу эсвэл хоосон үлдээнэ үү',
-      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+      invalidSaveBlocked: 'Судалгааны мэдээллийг хадгалахын өмнө брэндийн хүчингүй талбаруудыг засна уу',
+      imageLoadError: '"{{name}}" зургийг ачаалж чадсангүй. Үүнийг устгаад шинээр байршуулна уу.',
+      imageLoadErrorReadOnly: '"{{name}}" зургийг ачаалж чадсангүй',
+      downloadImage: 'Зургийг татахын тулд дарна уу',
     },
     configuration: {
       title: 'Тохиргоо',
@@ -107,6 +119,20 @@ export default {
     confirmDeleteCycle: `Та мөчлөг {{cycle}}-г устгахдаа итгэлтэй байна уу?\n\n$t(common.cantUndoWarning)\n\n
 Хэрэв энэ мөчлөгтэй холбоотой бичлэгүүд байвал тэдгээр нь устгагдана.`,
     cycleForArenaMobile: 'Арена Мобайл-д зориулсан мөчлөг',
+    keepNonApplicableValues: `Хамааралгүй шинж чанаруудын утгыг хадгалах`,
+    keepNonApplicableValuesInfo: `Сонгоогүй үед (анхдагч), өгөгдөл оруулах явцад хамааралгүй болсон шинж чанаруудын утгыг (хэрэглэгч баталгаажуулсны дараа) устгана.
+Сонгосон үед шинж чанарууд хамааралгүй болсон ч эдгээр утгыг бичлэгт хадгална.`,
+    deleteActivityLog: 'Үйлдлийн түүхийг цэвэрлэх',
+    deleteActivityLogConfirm: {
+      headerText: 'Энэхүү судалгааны үйлдлийн түүхийн БҮХ өгөгдлийг цэвэрлэх үү?',
+      message: `
+  - **{{surveyName}}** судалгааны үйлдлийн түүхийн БҮХ өгөгдөл устгагдана;\n\n
+  - судалгааны Мэдээллийн санд (DB) эзэлж буй зай багасна;\n\n
+  - энэ нь судалгааны оруулсан өгөгдөлд нөлөөлөхгүй;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Баталгаажуулахын тулд энэхүү судалгааны нэрийг оруулна уу:',
+    },
     fieldManualLink: 'Талбайн гарын авлагын холбоос',
     map: 'Газрын зураг',
     editInfo: 'Мэдээллийг засах',
@@ -153,6 +179,10 @@ export default {
       visibleInMobile: 'Арена Мобайл-д харагдана',
       allowRecordsDownloadInMobile: 'Серверээс Арена Мобайл руу бичлэг татахыг зөвшөөрөх',
       allowRecordsUploadFromMobile: 'Арена Мобайл-аас сервер руу бичлэг байршуулахыг зөвшөөрөх',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Баталгаажуулалтын алдаатай бичлэгийг Арена Мобайл-аас сервер руу байршуулахыг зөвшөөрөх',
+      allowRecordsMergeWithSameKeys:
+        'Ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөх (жишээ нь, өөр өөр Арена Мобайл төхөөрөмж дээр үүсгэсэн бичлэгүүд)',
     },
     srsPlaceholder: 'Код эсвэл шошго бичих',
     unpublish: 'Нийтлэлээ болих ба өгөгдлийг устгах',

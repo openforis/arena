@@ -30,7 +30,8 @@ export const isExprValid = ({ expr, canBeConstant = false, canBeCall = false }) 
   try {
     const exprToValidate = normalize({ expr, canBeConstant, canBeCall })
     return Expression.isValid(exprToValidate)
-  } catch (error) {
+  } catch {
+    // expression cannot be parsed
     return false
   }
 }
@@ -38,22 +39,21 @@ export const isExprValid = ({ expr, canBeConstant = false, canBeCall = false }) 
 export const getLiteralSearchParams = (survey, nodeDef, preferredLang) => {
   const surveyId = Survey.getId(survey)
 
-  const literalSearchParams =
-    nodeDef && NodeDef.isCode(nodeDef)
-      ? {
-          surveyId,
-          type: NodeDef.nodeDefType.code,
-          categoryUuid: NodeDef.getCategoryUuid(nodeDef),
-          categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
-          lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
-        }
-      : nodeDef && NodeDef.isTaxon(nodeDef)
-        ? {
-            surveyId,
-            type: NodeDef.nodeDefType.taxon,
-            taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
-          }
-        : null
-
-  return literalSearchParams
+  if (nodeDef && NodeDef.isCode(nodeDef)) {
+    return {
+      surveyId,
+      type: NodeDef.nodeDefType.code,
+      categoryUuid: NodeDef.getCategoryUuid(nodeDef),
+      categoryLevelIndex: Survey.getNodeDefCategoryLevelIndex(nodeDef)(survey),
+      lang: Survey.getLanguage(preferredLang)(Survey.getSurveyInfo(survey)),
+    }
+  }
+  if (nodeDef && NodeDef.isTaxon(nodeDef)) {
+    return {
+      surveyId,
+      type: NodeDef.nodeDefType.taxon,
+      taxonomyUuid: NodeDef.getTaxonomyUuid(nodeDef),
+    }
+  }
+  return null
 }

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -20,6 +20,7 @@ export const exprTypes = {
   applicable: 'applicable',
   codeParent: 'codeParent',
   defaultValue: 'defaultValue',
+  requiredIf: 'requiredIf',
   validationRuleError: 'validationRuleError',
   validationRuleWarning: 'validationRuleWarning',
 }
@@ -43,9 +44,9 @@ export const newReportItem = ({
 })
 
 export const { getId } = ObjectUtils
-export const isResolved = R.propOr(false, keys.resolved)
-export const getNodeDefUuid = R.prop(keys.nodeDefUuid)
-export const getProps = R.prop(keys.props)
+export const isResolved = A.propOr(false, keys.resolved)
+export const getNodeDefUuid = A.prop(keys.nodeDefUuid)
+export const getProps = A.prop(keys.props)
 
 export const getExpressionType = ObjectUtils.getProp(propKeys.expressionType)
 export const getExpression = ObjectUtils.getProp(propKeys.expression, '')

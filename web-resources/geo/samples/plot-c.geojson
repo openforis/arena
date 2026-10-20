@@ -1,0 +1,16 @@
+{
+  "type": "Feature",
+  "properties": { "name": "Sample plot C" },
+  "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+      [
+        [12.492, 41.89],
+        [12.5, 41.89],
+        [12.5, 41.896],
+        [12.492, 41.896],
+        [12.492, 41.89]
+      ]
+    ]
+  }
+}

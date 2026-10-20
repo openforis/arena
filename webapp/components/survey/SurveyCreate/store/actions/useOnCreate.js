@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 
 import { SurveyActions } from '@webapp/store/survey'

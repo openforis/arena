@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import toSnakeCase from 'to-snake-case'
 
 import { NodeDefs, NodeValues } from '@openforis/arena-core'
@@ -150,7 +150,7 @@ ColumnNodeDef.getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileNa
 ColumnNodeDef.getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
 
 ColumnNodeDef.getColumnNames = getColumnNames
-ColumnNodeDef.getColumnName = R.pipe(ColumnNodeDef.getColumnNames, R.head)
+ColumnNodeDef.getColumnName = A.pipe(ColumnNodeDef.getColumnNames, A.head)
 
 ColumnNodeDef.getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }) => {
   const columnName = ColumnNodeDef.getColumnName(nodeDef)

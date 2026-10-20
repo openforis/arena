@@ -1,8 +1,7 @@
-import { Dates } from '@openforis/arena-core'
+import { Authorizer, Dates } from '@openforis/arena-core'
 
 import { RecordImportAction } from '@common/dataImport'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -18,7 +17,11 @@ import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
-import { getRecordFormattedKeyValues, findExistingRecordSummary, determineRecordAction } from './recordImportMatcher'
+import {
+  getRecordFormattedKeyValues,
+  findExistingRecordSummary,
+  determineRecordAction,
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
@@ -78,11 +81,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
         continue
       }
 
-      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
       this.currentRecord = record
-      await this.cleanupCurrentRecord()
+      await this.cleanupCurrentRecord() // NOSONAR
 
-      await this.insertOrSkipRecord()
+      await this.insertOrSkipRecord() // NOSONAR
 
       this.incrementProcessedItems()
     }
@@ -124,7 +127,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
+      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef }) // NOSONAR
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid
@@ -163,6 +166,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
       conflictResolutionStrategy,
     })
     const { action, existingRecordUuid } = determineRecordAction({
+      survey,
       record,
       existingRecordSummary,
       conflictResolutionStrategy,

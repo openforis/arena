@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { Dates } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
@@ -7,6 +5,7 @@ import { Schemata } from '@common/model/db'
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import { RecordNodesCompactor } from '@core/record/_record/recordNodesCompactor'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
@@ -38,19 +37,33 @@ const tableColumnsSelect = ['id', ...tableColumnsInsert]
 // cache of camelized keys
 const nodeKeyByColumnName = {}
 
-const dbTransformCallback = (node) => {
+const _toISOString = (date) => (date instanceof Date ? date.toISOString() : date)
+
+const dbTransformCallback = (row) => {
   // use a cache of camelized keys; "camelize" is too slow when running on thousands of objects
-  // (do not camelize meta properties)
-  for (const [columnName, value] of Object.entries(node)) {
-    const nodeKey = nodeKeyByColumnName[columnName] ?? A.camelize(columnName)
-    if (nodeKey !== columnName) {
-      node[nodeKey] = value
-      delete node[columnName]
+  // (do not camelize meta properties);
+  // build a new object instead of deleting the row keys: "delete" would switch it to the (much bigger) V8 dictionary mode
+  const node = {}
+  for (const [columnName, value] of Object.entries(row)) {
+    let nodeKey = nodeKeyByColumnName[columnName]
+    if (!nodeKey) {
+      nodeKey = A.camelize(columnName)
+      nodeKeyByColumnName[columnName] = nodeKey
     }
+    node[nodeKey] = value
   }
   // cast id to Number
   node.id = Number(node.id)
+  // ISO strings (as in arena-core nodes) take much less memory than Date objects
+  node.dateCreated = _toISOString(node.dateCreated)
+  node.dateModified = _toISOString(node.dateModified)
   return node
+}
+
+// shares identical uuid strings and ref data objects among the fetched nodes (see RecordNodesCompactor)
+const createDbTransformCallbackCompacting = () => {
+  const compact = RecordNodesCompactor.createCompactor()
+  return (row) => compact(dbTransformCallback(row))
 }
 
 const _toValueQueryParam = (value) => (value === null || A.isEmpty(value) ? null : JSON.stringify(value))
@@ -85,7 +98,7 @@ export const getNodeSelectQuery = ({
 }) => {
   const schema = getSurveyDBSchema(surveyId)
 
-  const selectFields = (includeRecordUuid ? tableColumnsSelect : R.without(['record_uuid'], tableColumnsSelect)).map(
+  const selectFields = (includeRecordUuid ? tableColumnsSelect : A.without(['record_uuid'], tableColumnsSelect)).map(
     (field) => `n.${field}`
   )
 
@@ -152,7 +165,8 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
   const whereConditions = [
     `n.node_def_uuid IN ($/nodeDefFileUuids:csv/)`,
     `n.value IS NOT NULL`,
-    `(n.value->>'${Node.valuePropsFile.fileUuid}')::uuid NOT IN (SELECT uuid FROM ${schema}.file)`,
+    `n.value->>'${Node.valuePropsFile.fileUuid}' IS NOT NULL`,
+    `NOT EXISTS (SELECT 1 FROM ${schema}.file f WHERE f.uuid = (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid)`,
   ]
   if (recordUuid) {
     whereConditions.push(`n.record_uuid = $/recordUuid/`)
@@ -211,10 +225,10 @@ export const fetchFileValueNodesByNodeDefUuids = async ({ surveyId, nodeDefUuids
 // ============== CREATE
 
 export const insertNode = async (surveyId, node, draft, client = db) => {
+  // items with default values (e.g. empty child applicability) are not stored to save space
   const meta = {
-    ...Node.getMeta(node),
+    ...Node.compactMeta(Node.getMeta(node)),
     [Node.metaKeys.hierarchy]: Node.getHierarchy(node),
-    [Node.metaKeys.childApplicability]: {},
   }
 
   await client.query(
@@ -257,11 +271,15 @@ export const insertNodesInBatch = async ({ surveyId, nodes = [] }, client = db) 
       parent_uuid: Node.getParentUuid(node),
       node_def_uuid: Node.getNodeDefUuid(node),
       value: _toValueQueryParam(Node.getValue(node)),
-      meta: Node.getMeta(node),
+      meta: Node.compactMeta(Node.getMeta(node)),
     }))
   )
-  // assign generated ids to nodes (side effect)
-  await client.map(query + ' RETURNING id', [], (row, index) => (nodes[index].id = row.id))
+  // Passing no parameters (rather than []) tells pg-promise to send the query as-is: `query` was
+  // already built with every value embedded as a literal (see DbUtils.insertAllQueryBatch above),
+  // so re-running it through pg-promise's own $N parameter substitution - which scans the raw SQL
+  // text for "$" followed by digits, even inside string/JSON literals - would misinterpret a node
+  // value like "It costs $90" as a placeholder reference and throw "Variable $90 out of range".
+  await client.map(query + ' RETURNING id', undefined, (row, index) => (nodes[index].id = row.id))
   return nodes
 }
 
@@ -276,7 +294,7 @@ export const fetchNodesByRecordUuid = async (
     WHERE n.record_uuid = $/recordUuid/
     ORDER BY n.date_created`,
     { surveyId, recordUuid },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 export const fetchNodeByUuid = async (surveyId, uuid, client = db) =>
@@ -295,7 +313,7 @@ export const fetchNodesWithRefDataByUuids = async ({ surveyId, nodeUuids, draft 
     WHERE n.uuid IN ($/nodeUuids:list/)
   `,
     { surveyId, nodeUuids },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 export const fetchNodeWithRefDataByUuid = async ({ surveyId, nodeUuid, draft }, client = db) =>
@@ -309,7 +327,7 @@ export const fetchChildNodesByNodeDefUuids = async (surveyId, recordUuid, nodeUu
       AND n.parent_uuid ${nodeUuid ? '= $/nodeUuid/' : 'is null'}
       AND n.node_def_uuid IN ($/childDefUuids:csv/)`,
     { surveyId, recordUuid, nodeUuid, childDefUuids },
-    dbTransformCallback
+    createDbTransformCallbackCompacting()
   )
 
 // ============== UPDATE
@@ -317,15 +335,16 @@ export const updateNode = async (
   { surveyId, nodeUuid, value = null, meta = {}, draft, reloadNode = true },
   client = db
 ) => {
+  // meta is merged into the stored one: items with default values are deleted instead of stored, to save space
   await client.query(
     `
     UPDATE ${getSurveyDBSchema(surveyId)}.node
     SET value = $1::jsonb,
-    meta = meta || $2::jsonb, 
+    meta = (meta - $4::text[]) || $2::jsonb, 
     date_modified = ${DbUtils.now}
     WHERE uuid = $3
     `,
-    [_toValueQueryParam(value), meta || {}, nodeUuid]
+    [_toValueQueryParam(value), Node.compactMeta(meta), nodeUuid, Node.getMetaKeysWithDefaultValue(meta)]
   )
   if (!reloadNode) return null
 
@@ -339,7 +358,8 @@ export const updateNodes = async ({ surveyId, nodes }, client = db) => {
   const values = nodes.map((node) => [
     Node.getId(node),
     _toValueQueryParam(Node.getValue(node)),
-    Node.getMeta(node),
+    // meta is replaced as a whole: items with default values are not stored to save space
+    Node.compactMeta(Node.getMeta(node)),
     Dates.formatForStorage(Node.getDateModified(node)),
   ])
   await client.none(
@@ -387,7 +407,7 @@ export const deleteNodesByNodeDefUuids = async (surveyId, nodeDefUuids, client =
     WHERE node_def_uuid IN ($1:csv)
     `,
     [nodeDefUuids],
-    R.prop('rowCount')
+    A.prop('rowCount')
   )
 
 export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
@@ -398,3 +418,16 @@ export const deleteNodesByUuids = async (surveyId, nodeUuids, client = db) =>
     [nodeUuids],
     dbTransformCallback
   )
+
+// ============== MAINTENANCE
+
+/**
+ * Rewrites the node table of the specified survey reclaiming the space of dead rows (it locks the table while running).
+ * It cannot be run inside a transaction.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey ID.
+ * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @returns {Promise<null>} - The query result.
+ */
+export const vacuumFullNodeTable = async ({ surveyId }, client = db) =>
+  DbUtils.vacuumTable({ schema: getSurveyDBSchema(surveyId), table: 'node', full: true, analyze: true }, client)

@@ -5,18 +5,16 @@ export const useActions = ({ setData, setCount }) => {
   const { fetchData, resetData } = useFetchData({ setData })
   const { fetchCount, resetCount } = useFetchCount({ setCount })
 
-  const fetch = ({ offset, limit, randomize, query, includesCount = true }) => {
-    fetchData({ offset, limit, randomize, query })
-    if (includesCount) fetchCount({ query })
-  }
-
   const reset = () => {
     resetData()
     resetCount()
   }
 
   return {
-    fetch,
+    fetchData,
+    fetchCount,
     reset,
+    resetData,
+    resetCount,
   }
 }

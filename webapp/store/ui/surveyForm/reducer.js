@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { exportReducer } from '@webapp/utils/reduxUtils'
 
@@ -34,7 +34,7 @@ const actionHandlers = {
     SurveyFormState.assocNodeDefAddChildTo(nodeDef)(state),
 
   [SurveyFormActions.formActivePageNodeDefUpdate]: (state, { nodeDef, showAddChildTo = false }) =>
-    R.pipe(
+    A.pipe(
       SurveyFormState.assocFormActivePage(nodeDef),
       SurveyFormState.assocNodeDefAddChildTo(showAddChildTo ? nodeDef : null)
     )(state),
@@ -73,7 +73,7 @@ const actionHandlers = {
 
   // Record
   [RecordActions.recordLoad]: (state, { nodeDefActivePage, formPageNodeUuidByNodeDefUuid }) =>
-    R.pipe(
+    A.pipe(
       SurveyFormState.assocNodeDefAddChildTo(null),
       SurveyFormState.assocFormPageNodes(formPageNodeUuidByNodeDefUuid),
       SurveyFormState.assocFormActivePage(nodeDefActivePage)

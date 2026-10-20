@@ -21,7 +21,7 @@ const page = ({ type = false, properties = {} }) => {
 
 const identify = ({ userId, properties = {} }) => {
   const _traits = {
-    ...(window?.analytics?._user?.traits() || {}),
+    ...window?.analytics?._user?.traits(),
     ...properties,
   }
   window?.analytics?.identify(userId, _traits)

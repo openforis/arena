@@ -1,9 +1,14 @@
-const isTrue = (val: unknown): boolean => String(val).toLocaleLowerCase() === 'true' || String(val) === '1'
+// values can be missing or (when injected by webpack DefinePlugin) not strings
+const isTrue = (val: unknown): boolean => {
+  if (val === null || val === undefined) return false
+  if (typeof val === 'string') return ['true', '1'].includes(val.trim().toLocaleLowerCase())
+  return val === true || val === 1
+}
 
-const getJson = (val: unknown): unknown => {
+const getJson = (val: string | undefined): unknown => {
   if (!val) return undefined
   try {
-    return JSON.parse(String(val))
+    return JSON.parse(val)
   } catch {
     return undefined
   }
@@ -15,7 +20,7 @@ const environments = {
 } as const
 
 const dbUrl = process.env.DATABASE_URL
-const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w-.\d]+):(\d+)\/(\w+)/
+const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w.-]+):(\d+)\/(\w+)/
 const dbUrlMatch = dbUrl ? dbUrl.match(regExDbUrl) : null
 
 const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch
@@ -59,16 +64,19 @@ export const ENV = {
   emailAmazonSESPort: Number(process.env.EMAIL_AMAZON_SES_PORT) || 465,
   // ANALYSIS
   analysisOutputDir: process.env.ANALYSIS_OUTPUT_DIR,
-  // SESSION
-  sessionIdCookieSecret: process.env.SESSION_ID_COOKIE_SECRET,
   // SERVER
   useHttps: isTrue(process.env.USE_HTTPS),
+  // Public origin baked into QR codes / emails when set (no trailing slash). Falls back to request Host.
+  arenaPublicUrl: process.env.ARENA_PUBLIC_URL || '',
   fileUploadLimit: Number(process.env.FILE_UPLOAD_LIMIT) || 1024 ** 3, // 1GB
   // RStudio Server
   rStudioDownloadServerUrl: process.env.RSTUDIO_DOWNLOAD_SERVER_URL,
   rStudioServerUrl: process.env.RSTUDIO_SERVER_URL,
   rStudioPoolServerURL: process.env.RSTUDIO_POOL_SERVER_URL,
   rStudioPoolServiceKey: process.env.RSTUDIO_POOL_SERVICE_KEY,
+  // Arena Mobile web build used for the mobile preview in the survey designer (preview hidden when not set):
+  // /mobile-preview/ when downloaded by the build (yarn mobile-preview:download)
+  mobilePreviewUrl: process.env.MOBILE_PREVIEW_URL,
   // ReCaptcha
   reCaptchaEnabled: isTrue(process.env.RECAPTCHA_ENABLED),
   reCaptchaSiteKey: process.env.RECAPTCHA_SITE_KEY,
@@ -95,6 +103,8 @@ export const ENV = {
   whispApiKey: process.env.WHISP_API_KEY,
   // Activity log
   activityLogDisabled: isTrue(process.env.ACTIVITY_LOG_DISABLED),
+  // HTTP requests log (always enabled in development)
+  logHttpRequests: isTrue(process.env.LOG_HTTP_REQUESTS),
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
   // ===== AI =====

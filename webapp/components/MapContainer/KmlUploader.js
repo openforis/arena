@@ -42,13 +42,9 @@ export const KmlUploader = () => {
   )
 
   const processKMLFile = useCallback(
-    (file) => {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const text = e.target.result
-        addKMLLayers([text])
-      }
-      reader.readAsText(file)
+    async (file) => {
+      const text = await file.text()
+      addKMLLayers([text])
     },
     [addKMLLayers]
   )
@@ -74,36 +70,28 @@ export const KmlUploader = () => {
   )
 
   const processGeoJson = useCallback(
-    (file) => {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const text = e.target.result
-        const geo = JSON.parse(text)
-        const geojson = L.geoJSON(geo).addTo(map)
-        setLayers((old) => [...old, geojson])
-      }
-      reader.readAsText(file)
+    async (file) => {
+      const text = await file.text()
+      const geo = JSON.parse(text)
+      const geojson = L.geoJSON(geo).addTo(map)
+      setLayers((old) => [...old, geojson])
     },
     [map]
   )
 
   const processShapeFile = useCallback(
-    (file) => {
-      const reader = new FileReader()
-      reader.onload = async (e) => {
-        const text = e.target.result
+    async (file) => {
+      const buffer = await file.arrayBuffer()
 
-        const geo = L.geoJson(
-          { features: [] },
-          {
-            onEachFeature: generatePopupContent,
-          }
-        ).addTo(map)
-        const data = await shp(text)
-        geo.addData(data)
-        setLayers((old) => [...old, geo])
-      }
-      reader.readAsArrayBuffer(file)
+      const geo = L.geoJson(
+        { features: [] },
+        {
+          onEachFeature: generatePopupContent,
+        }
+      ).addTo(map)
+      const data = await shp(buffer)
+      geo.addData(data)
+      setLayers((old) => [...old, geo])
     },
     [map]
   )
@@ -115,17 +103,17 @@ export const KmlUploader = () => {
     const extension = FileUtils.getExtension(selectedFile)?.toLowerCase()
     switch (extension) {
       case 'kmz':
-        processKMZFile(selectedFile)
+        void processKMZFile(selectedFile)
         break
       case 'kml':
-        processKMLFile(selectedFile)
+        void processKMLFile(selectedFile)
         break
       case 'zip':
-        processShapeFile(selectedFile)
+        void processShapeFile(selectedFile)
         break
       case 'json':
       case 'geojson':
-        processGeoJson(selectedFile)
+        void processGeoJson(selectedFile)
         break
       default:
         break

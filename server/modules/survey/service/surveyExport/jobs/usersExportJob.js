@@ -20,9 +20,9 @@ export default class UsersExportJob extends Job {
 
     for (const _user of users) {
       const userUuid = User.getUuid(_user)
-      const userData = await UserService.fetchUserByUuidWithPassword(userUuid)
+      const userData = await UserService.fetchUserByUuidWithPassword(userUuid) // NOSONAR
       if (User.hasProfilePicture(userData)) {
-        const userProfilePicture = await UserService.fetchUserProfilePicture(userUuid)
+        const userProfilePicture = await UserService.fetchUserProfilePicture(userUuid) // NOSONAR
         archive.append(userProfilePicture, {
           name: ExportFile.userProfilePicture({ userUuid }), // the file is stored in binary
         })

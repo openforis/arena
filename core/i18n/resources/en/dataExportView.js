@@ -20,6 +20,7 @@ export default {
     includeFileAttributeDefs: 'Include file attribute columns',
     includeInternalUuids: 'Include internal UUIDs',
     recordsModifiedAfter: 'Records modified after',
+    recordsModifiedBefore: 'Records modified before',
   },
   optionsInfo: {
     expandCategoryItems:
@@ -36,6 +37,7 @@ export default {
     includeFileAttributeDefs: `adds file attributes' columns: file internal identifier (file_uuid) and name (file_name)`,
     includeInternalUuids: 'includes the internal identifiers (UUIDs) in columns ending with the suffix "_uuid"',
     recordsModifiedAfter: 'exports only data from records modified after the specified date',
+    recordsModifiedBefore: 'exports only data from records modified before the specified date',
   },
   startExport: 'Start export',
 }

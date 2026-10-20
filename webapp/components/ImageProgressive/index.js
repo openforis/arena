@@ -77,7 +77,7 @@ const ImageProgressive = (props) => {
       }
     }
 
-    loadImages()
+    void loadImages()
 
     // Cleanup function to revoke blob URLs
     return () => {

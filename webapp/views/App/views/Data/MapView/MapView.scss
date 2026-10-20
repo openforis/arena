@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .panel-right.record-panel {
   z-index: 1000;
 }
@@ -23,7 +25,7 @@
     height: 100%;
     flex-shrink: 0;
     cursor: ew-resize;
-    background-color: #d1d1dd;
+    background-color: $colorOutline;
     position: relative;
     transition: background-color 0.15s;
 
@@ -41,7 +43,7 @@
     }
 
     &:hover {
-      background-color: #b8cfe8;
+      background-color: $colorPrimaryContainer;
 
       &::after {
         background-image: radial-gradient(circle, rgba(56, 133, 202, 0.9) 1.5px, transparent 1.5px);
@@ -49,7 +51,7 @@
     }
 
     &:active {
-      background-color: #3885ca;
+      background-color: $colorPrimary;
 
       &::after {
         background-image: radial-gradient(circle, rgba(255, 255, 255, 0.9) 1.5px, transparent 1.5px);
@@ -61,7 +63,7 @@
     }
 
     &:focus-visible {
-      outline: 2px solid #3885ca;
+      outline: 2px solid $colorPrimary;
       outline-offset: -2px;
     }
   }
@@ -90,8 +92,14 @@
         li {
           line-height: 1.5rem;
 
-          a {
+          .cluster-marker__clustered-point-btn {
             max-width: 100%;
+            border: none;
+            background: none;
+            padding: 0;
+            text-align: left;
+            line-height: inherit;
+            color: #0078a8; // same as leaflet links
           }
         }
       }

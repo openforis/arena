@@ -1,9 +1,10 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
 import * as Node from '@core/record/node'
@@ -14,6 +15,7 @@ import BatchPersister from '@server/db/batchPersister'
 import Job from '@server/job/job'
 import * as SurveyManager from '../manager/surveyManager'
 import * as RecordManager from '../../record/manager/recordManager'
+import { findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges } from './publish/nodeDefExtraPropDependencyUtils'
 
 // Per-record/per-step tracing is too noisy to leave on for routine runs, but invaluable when a
 // publish is slow or looks stuck. Flip to true to re-enable it.
@@ -43,22 +45,35 @@ export default class RecordCheckJob extends Job {
     // shm-size (see DbUtils.disableParallelQueryForTransaction for why).
     await DbUtils.disableParallelQueryForTransaction(this.tx)
 
-    this.logDebugOptional('fetching records uuids and cycles...')
-    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle({ surveyId: this.surveyId }, this.tx)
+    const { recordUuids } = this.context
+    if (Array.isArray(recordUuids) && recordUuids.length === 0) {
+      // recordUuids explicitly scopes the check to zero records (e.g. a Collect import that inserted
+      // no records) - nothing to check. Without this, an empty array would be treated as "no
+      // restriction" below (see Objects.isEmpty in fetchRecordsUuidAndCycle) and check every record.
+      return
+    }
 
-    this.total = R.length(recordsUuidAndCycle)
+    this.logDebugOptional('fetching records uuids and cycles...')
+    const recordsUuidAndCycle = await RecordManager.fetchRecordsUuidAndCycle(
+      { surveyId: this.surveyId, recordUuidsIncluded: recordUuids },
+      this.tx
+    )
+
+    this.total = A.length(recordsUuidAndCycle)
     this.logDebugOptional(`${this.total} records to check`)
 
     let index = 0
     for (const { uuid: recordUuid, cycle } of recordsUuidAndCycle) {
       const startTime = Date.now()
 
-      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle)
+      const surveyAndNodeDefs = await this._getOrFetchSurveyAndNodeDefsByCycle(cycle) // NOSONAR
+
+      await this._deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs) // NOSONAR
 
       const { requiresCheck } = surveyAndNodeDefs
 
       if (requiresCheck) {
-        await this._checkRecord({ surveyAndNodeDefs, recordUuid })
+        await this._checkRecord({ surveyAndNodeDefs, recordUuid }) // NOSONAR
       }
 
       this.logDebugOptional(
@@ -80,104 +95,237 @@ export default class RecordCheckJob extends Job {
   }
 
   async _getOrFetchSurveyAndNodeDefsByCycle(cycle) {
-    const { context, surveyId, tx } = this
-    const { cleanupRecords } = context
     this._cleanSurveysCache(cycle)
     let result = this.surveyAndNodeDefsByCycle[cycle]
     if (!result) {
-      // 1. fetch survey
-      this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
-      let survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
-        { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
-        tx
-      )
-
-      // 2. determine new, updated or deleted node defs
-      const nodeDefAddedUuids = []
-      const nodeDefUpdatedUuids = []
-      const nodeDefDeletedUuids = []
-
-      const nodeDefs = Survey.getNodeDefsArray(survey)
-      for (const def of nodeDefs) {
-        const nodeDefUuid = NodeDef.getUuid(def)
-        if (NodeDef.isDeleted(def)) {
-          nodeDefDeletedUuids.push(nodeDefUuid)
-        } else if (!NodeDef.isPublished(def)) {
-          // New node def
-          nodeDefAddedUuids.push(nodeDefUuid)
-        } else if (
-          NodeDef.hasAdvancedPropsDraft(def) &&
-          (NodeDef.hasAdvancedPropsApplicableDraft(def) ||
-            NodeDef.hasAdvancedPropsDefaultValuesDraft(def) ||
-            NodeDef.hasAdvancedPropsFileNameExpressionDraft(def) ||
-            NodeDef.hasAdvancedPropsValidationsDraft(def))
-        ) {
-          // Already existing node def but applicable or default values or validations have been updated
-          nodeDefUpdatedUuids.push(nodeDefUuid)
-        }
-      }
-
-      const requiresCheck =
-        cleanupRecords || nodeDefAddedUuids.length + nodeDefUpdatedUuids.length + nodeDefDeletedUuids.length > 0
-
-      // Delete nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not
-      // scoped to a single record - see RecordManager.deleteNodesByNodeDefUuids), so running it again
-      // for every one of potentially thousands of records would repeat the same full-table delete over
-      // and over for no additional effect. Each record's own check below reflects this locally, from
-      // its own already-loaded nodes, rather than from anything returned here (on a large survey this
-      // delete can match millions of rows - see RecordManager.deleteNodesByNodeDefUuids for why we
-      // don't pull those back into memory).
-      // One node def at a time (rather than a single IN (...) delete for all of them) so a failure or
-      // a memory spike can be pinned to the specific node def responsible, from the logs.
-      for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
-        this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
-        const deletedCount = await RecordManager.deleteNodesByNodeDefUuids(
-          { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
-          tx
-        )
-        this.logDebugOptional(`${deletedCount} nodes deleted for node def ${nodeDefDeletedUuid}`)
-      }
-
-      result = {
-        survey,
-        nodeDefAddedUuids,
-        nodeDefUpdatedUuids,
-        nodeDefDeletedUuids,
-        requiresCheck,
-      }
-
-      if (requiresCheck) {
-        this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
-        // fetch survey reference data (used later for record validation)
-        survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-          { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
-          tx
-        )
-        result.survey = survey
-
-        // get all not deleted node defs uuids (used for cleanupRecords)
-        const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
-        const allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
-        result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefUuids
-        this.logDebugOptional('survey with ref data fetched')
-      }
+      result = await this._fetchSurveyAndNodeDefsByCycle(cycle)
       this.surveyAndNodeDefsByCycle[cycle] = result
+    }
+    return result
+  }
+
+  async _fetchSurveyAndNodeDefsByCycle(cycle) {
+    const { context, surveyId, tx } = this
+    const { cleanupRecords, skipDataUpdate, recordUuids } = context
+    // recordUuids scopes the check to a specific set of records (e.g. just imported from Collect) and,
+    // like cleanupRecords, forces every node def to be checked for those records rather than just the
+    // ones added since last publish - a Collect-imported record can be missing nodes for node defs
+    // that are already published (they just have no counterpart in the Collect survey/data).
+    const forceFullCheck = cleanupRecords || Array.isArray(recordUuids)
+
+    // 1. fetch survey
+    // backup: true keeps propsAdvancedDraft separate from propsAdvanced (rather than merging and
+    // discarding it), which _classifyNodeDefs needs to detect an enumeratingItemsExpression/
+    // itemsFilter change - see NodeDef.hasValueAffectingAdvancedPropsDraft.
+    this.logDebugOptional(`fetching survey for cycle ${cycle}...`)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, cycle, draft: true, advanced: true, backup: true, includeDeleted: true },
+      tx
+    )
+
+    // 2. determine new, updated or deleted node defs
+    const {
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+    } = this._classifyNodeDefs(Survey.getNodeDefsArray(survey))
+
+    // 2b. determine node defs affected by a category/taxonomy extra prop change (definition or
+    // item/taxon value) - these don't have their own advanced props draft flag set (their own props
+    // didn't change), so they can't be caught by _classifyNodeDefs; found separately via a
+    // survey-wide category/taxonomy diff instead. See NodeDef.referencesCategoryExtraProp/
+    // referencesTaxonomyExtraProp and findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges.
+    const { valueAffectedNodeDefUuids, validationAffectedNodeDefUuids } =
+      await findNodeDefUuidsAffectedByCategoryOrTaxonomyExtraPropChanges({ surveyId, survey }, tx)
+
+    this._mergeCategoryOrTaxonomyAffectedNodeDefs({
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      valueAffectedNodeDefUuids,
+      validationAffectedNodeDefUuids,
+    })
+
+    // skipDataUpdate: the user explicitly chose to publish without recalculating values already
+    // stored in existing records (this is exactly the risk surfaced by
+    // checkPublishRecordValuesUpdateWarning/nodeDefUpdatedUuids) - clear that bucket so
+    // _checkRecord leaves those values untouched. Added/deleted/validation-only-changed node defs
+    // are unaffected: inserting missing nodes, deleting nodes for removed defs and re-validating
+    // aren't a "data update", they're required for the record to stay consistent with the schema.
+    if (skipDataUpdate) {
+      nodeDefUpdatedUuids.length = 0
+    }
+
+    const requiresCheck =
+      forceFullCheck ||
+      nodeDefAddedUuids.length +
+        nodeDefUpdatedUuids.length +
+        nodeDefValidationUpdatedUuids.length +
+        nodeDefDeletedUuids.length +
+        nodeDefRequiredIfUpdatedUuids.length >
+        0
+
+    const result = {
+      survey,
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+      requiresCheck,
+      forceFullCheck,
+      nodesForDeletedNodeDefsDeleted: false,
+    }
+
+    if (requiresCheck) {
+      await this._fetchSurveyRefDataInto({ result, cycle })
     }
 
     return result
   }
 
+  // Classifies each node def into exactly one of: added (new draft def), updated (existing def with a
+  // value-affecting advanced prop change) or validationUpdated (existing def with only a validations
+  // change), or collects it as deleted - leaving it out of all four buckets if nothing about it
+  // changed. Validations-only changes are kept out of "updated" on purpose: only applicable/default
+  // values/file name/enumerating items/items filter changes can affect a stored node value (and, for
+  // code attributes, cascade into clearing dependent code attribute values) - folding a
+  // validations-only change (e.g. just editing a validation message) into that same bucket was wiping
+  // dependent code attribute values on every publish, even though the parent attribute's value never
+  // changed.
+  _classifyNodeDefs(nodeDefs) {
+    const nodeDefAddedUuids = []
+    const nodeDefUpdatedUuids = []
+    const nodeDefValidationUpdatedUuids = []
+    const nodeDefDeletedUuids = []
+    // published node defs whose "required if" condition changed: their "required if" flags must be recomputed
+    const nodeDefRequiredIfUpdatedUuids = []
+
+    for (const def of nodeDefs) {
+      const nodeDefUuid = NodeDef.getUuid(def)
+      if (NodeDef.isDeleted(def)) {
+        nodeDefDeletedUuids.push(nodeDefUuid)
+      } else if (!NodeDef.isPublished(def)) {
+        // New node def
+        nodeDefAddedUuids.push(nodeDefUuid)
+      } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasValueAffectingAdvancedPropsDraft(def)) {
+        // Already existing node def but applicable, default values, file name expression,
+        // enumerating items expression or items filter have been updated
+        nodeDefUpdatedUuids.push(nodeDefUuid)
+      } else if (NodeDef.hasAdvancedPropsDraft(def) && NodeDef.hasAdvancedPropsValidationsDraft(def)) {
+        // Already existing node def but only validations have been updated
+        nodeDefValidationUpdatedUuids.push(nodeDefUuid)
+      }
+      if (!NodeDef.isDeleted(def) && NodeDef.isPublished(def) && NodeDef.hasRequiredIfDraftChanged(def)) {
+        nodeDefRequiredIfUpdatedUuids.push(nodeDefUuid)
+      }
+    }
+
+    return {
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+    }
+  }
+
+  // Folds category/taxonomy-extra-prop-affected node defs into the buckets from _classifyNodeDefs, in
+  // place, skipping any uuid already accounted for there: one already added/updated/deleted for its
+  // own reasons doesn't need a second, redundant "updated" entry, and one already flagged
+  // validation-updated doesn't need a duplicate either.
+  _mergeCategoryOrTaxonomyAffectedNodeDefs({
+    nodeDefAddedUuids,
+    nodeDefUpdatedUuids,
+    nodeDefValidationUpdatedUuids,
+    nodeDefDeletedUuids,
+    valueAffectedNodeDefUuids,
+    validationAffectedNodeDefUuids,
+  }) {
+    const nodeDefUpdatedOrAddedOrDeletedUuids = new Set([
+      ...nodeDefUpdatedUuids,
+      ...nodeDefAddedUuids,
+      ...nodeDefDeletedUuids,
+    ])
+    for (const nodeDefUuid of valueAffectedNodeDefUuids) {
+      if (!nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid)) {
+        nodeDefUpdatedUuids.push(nodeDefUuid)
+        nodeDefUpdatedOrAddedOrDeletedUuids.add(nodeDefUuid)
+      }
+    }
+
+    const nodeDefValidationUpdatedUuidsSet = new Set(nodeDefValidationUpdatedUuids)
+    for (const nodeDefUuid of validationAffectedNodeDefUuids) {
+      if (!nodeDefUpdatedOrAddedOrDeletedUuids.has(nodeDefUuid) && !nodeDefValidationUpdatedUuidsSet.has(nodeDefUuid)) {
+        nodeDefValidationUpdatedUuids.push(nodeDefUuid)
+      }
+    }
+  }
+
+  // Refetches the survey together with reference data (needed later for record validation) and
+  // computes the full non-deleted node def uuid list (needed for cleanupRecords), writing both onto
+  // `result` in place.
+  async _fetchSurveyRefDataInto({ result, cycle }) {
+    const { surveyId, tx } = this
+    this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
+      tx
+    )
+    result.survey = survey
+
+    const allNotDeletedNodeDefs = Survey.getNodeDefsArray(survey).filter((def) => !NodeDef.isDeleted(def))
+    result.allNotDeletedNodeDefUuids = allNotDeletedNodeDefs.map(NodeDef.getUuid)
+    this.logDebugOptional('survey with ref data fetched')
+  }
+
+  // Deletes nodes belonging to deleted node defs once per cycle: the delete is survey-wide (not
+  // scoped to a single record - see RecordManager.deleteNodesByNodeDefUuids), so running it again
+  // for every one of potentially thousands of records would repeat the same full-table delete over
+  // and over for no additional effect. The `nodesForDeletedNodeDefsDeleted` flag on the cached
+  // surveyAndNodeDefs (shared across all records of the same cycle) guards that. Each record's own
+  // check reflects this locally, from its own already-loaded nodes, rather than from anything
+  // returned here (on a large survey this delete can match millions of rows - see
+  // RecordManager.deleteNodesByNodeDefUuids for why we don't pull those back into memory).
+  // One node def at a time (rather than a single IN (...) delete for all of them) so a failure or
+  // a memory spike can be pinned to the specific node def responsible, from the logs.
+  async _deleteNodesForDeletedNodeDefsOnce(surveyAndNodeDefs) {
+    const { nodeDefDeletedUuids, nodesForDeletedNodeDefsDeleted } = surveyAndNodeDefs
+    if (nodesForDeletedNodeDefsDeleted) return
+
+    const { surveyId, tx } = this
+    for (const nodeDefDeletedUuid of nodeDefDeletedUuids) {
+      this.logDebugOptional(`deleting nodes for removed node def ${nodeDefDeletedUuid}...`)
+      const deletedCount = /* NOSONAR */ await RecordManager.deleteNodesByNodeDefUuids(
+        { user: this.user, surveyId, nodeDefUuids: [nodeDefDeletedUuid] },
+        tx
+      )
+      this.logDebugOptional(`${deletedCount} nodes deleted for node def ${nodeDefDeletedUuid}`)
+    }
+    surveyAndNodeDefs.nodesForDeletedNodeDefsDeleted = true
+  }
+
   async _checkRecord({ surveyAndNodeDefs, recordUuid }) {
-    const { context, surveyId, user, tx } = this
-    const { survey, nodeDefAddedUuids, nodeDefUpdatedUuids, nodeDefDeletedUuids, allNotDeletedNodeDefUuids } =
-      surveyAndNodeDefs
-    const { cleanupRecords } = context
+    const { surveyId, user, tx } = this
+    const {
+      survey,
+      nodeDefAddedUuids,
+      nodeDefUpdatedUuids,
+      nodeDefValidationUpdatedUuids,
+      nodeDefDeletedUuids,
+      nodeDefRequiredIfUpdatedUuids,
+      allNotDeletedNodeDefUuids,
+      forceFullCheck,
+    } = surveyAndNodeDefs
 
     this.logDebugOptional(`checking record ${recordUuid}`)
 
     // 1. fetch record and nodes. Nodes belonging to deleted node defs are already gone at this point:
     // the survey-wide delete for this cycle ran earlier in the same transaction (see
-    // _getOrFetchSurveyAndNodeDefsByCycle), and this fetch sees that transaction's own writes, so
+    // _deleteNodesForDeletedNodeDefsOnce), and this fetch sees that transaction's own writes, so
     // there's nothing left here to additionally remove for nodeDefDeletedUuids.
     let record = await RecordManager.fetchRecordAndNodesByUuid(
       { surveyId, recordUuid, includeSurveyUuid: false, includeRecordUuid: false },
@@ -190,7 +338,7 @@ export default class RecordCheckJob extends Job {
     const allUpdatedNodesByUuid = {}
 
     // 3. insert missing nodes
-    const nodeDefToCheckForMissingNodesUuids = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
+    const nodeDefToCheckForMissingNodesUuids = forceFullCheck ? allNotDeletedNodeDefUuids : nodeDefAddedUuids
     if (nodeDefToCheckForMissingNodesUuids.length > 0) {
       this.logDebugOptional(`inserting missing nodes with node def uuids ${nodeDefToCheckForMissingNodesUuids}`)
       const { record: recordUpdateInsert, nodes: nodesUpdatedMissing = {} } = await this._insertMissingSingleNodes({
@@ -206,7 +354,7 @@ export default class RecordCheckJob extends Job {
     }
 
     // 4. apply default values and recalculate applicability
-    const nodeDefAddedOrUpdatedUuidsUnique = new Set(R.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
+    const nodeDefAddedOrUpdatedUuidsUnique = new Set(A.concat(nodeDefAddedUuids, nodeDefUpdatedUuids))
     for (const nodeInserted of Object.values(nodesInsertedByUuid)) {
       nodeDefAddedOrUpdatedUuidsUnique.add(Node.getNodeDefUuid(nodeInserted))
     }
@@ -225,31 +373,64 @@ export default class RecordCheckJob extends Job {
       this.logDebugOptional('default values applied')
     }
 
-    // 4a. Persist nodes
+    // 4a. recompute the "required if" flags of node defs whose condition changed (new node defs are handled in step 4)
+    const nodeDefRequiredIfToUpdateUuids = forceFullCheck
+      ? _getRequiredIfNodeDefUuids({ survey, nodeDefUuids: allNotDeletedNodeDefUuids })
+      : nodeDefRequiredIfUpdatedUuids
+    if (nodeDefRequiredIfToUpdateUuids.length > 0) {
+      this.logDebugOptional('updating "required if" flags')
+      const { record: recordUpdateRequired, nodes: nodesUpdatedRequired = {} } =
+        await RecordManager.updateRequiredFlags({
+          user,
+          survey,
+          record,
+          nodeDefUuids: nodeDefRequiredIfToUpdateUuids,
+          sideEffect: true,
+        })
+      record = recordUpdateRequired || record
+      Object.assign(allUpdatedNodesByUuid, nodesUpdatedRequired)
+    }
+
+    // 4b. Persist nodes
     this.logDebugOptional(`persisting ${Object.keys(allUpdatedNodesByUuid).length} nodes`)
     const allUpdatedNodesArray = Object.values(allUpdatedNodesByUuid)
     for (const node of allUpdatedNodesArray) {
       if (Node.isCreated(node)) {
-        await this.nodesBatchInserter.addItem(node, tx)
+        await this.nodesBatchInserter.addItem(node, tx) // NOSONAR
       } else if (Node.isUpdated(node)) {
-        await this.nodesBatchUpdater.addItem(node, tx)
+        await this.nodesBatchUpdater.addItem(node, tx) // NOSONAR
       }
     }
 
     // 5. clear record keys validation (record keys validation performed after RDB generation)
     record = _clearRecordKeysValidation(record)
 
-    // 6. validate nodes
+    // 6. validate nodes (also re-validate node defs whose validations alone changed, even though their
+    // values were not recomputed above)
+    const nodeDefToValidateUuidsUnique = new Set([
+      ...nodeDefAddedOrUpdatedUuids,
+      ...nodeDefValidationUpdatedUuids,
+      ...nodeDefRequiredIfToUpdateUuids,
+    ])
+    const nodeDefAddedOrUpdatedOrValidationUpdatedUuids = Array.from(nodeDefToValidateUuidsUnique)
     if (
-      cleanupRecords ||
-      !R.isEmpty(nodeDefAddedOrUpdatedUuids) ||
-      !R.isEmpty(nodeDefDeletedUuids) ||
-      !R.isEmpty(allUpdatedNodesByUuid)
+      forceFullCheck ||
+      !A.isEmpty(nodeDefAddedOrUpdatedOrValidationUpdatedUuids) ||
+      !A.isEmpty(nodeDefDeletedUuids) ||
+      !A.isEmpty(allUpdatedNodesByUuid)
     ) {
-      const nodeDefUuidsToValidate = cleanupRecords ? allNotDeletedNodeDefUuids : nodeDefAddedOrUpdatedUuids
+      const nodeDefUuidsToValidate = forceFullCheck
+        ? allNotDeletedNodeDefUuids
+        : nodeDefAddedOrUpdatedOrValidationUpdatedUuids
       this.logDebugOptional(`validating record ${recordUuid} (${nodeDefUuidsToValidate.length} node defs)`)
       await _validateNodes(
-        { user, survey, nodeDefUuids: nodeDefUuidsToValidate, record, nodes: allUpdatedNodesByUuid },
+        {
+          user,
+          survey,
+          nodeDefUuids: nodeDefUuidsToValidate,
+          record,
+          nodes: allUpdatedNodesByUuid,
+        },
         this.tx
       )
     }
@@ -266,7 +447,7 @@ export default class RecordCheckJob extends Job {
       const parentNodeDefUuid = NodeDef.getParentUuid(nodeDef)
       const parentNodes = Record.getNodesByDefUuid(parentNodeDefUuid)(recordUpdated)
       for (const parentNode of parentNodes) {
-        const { record: recordUpdatedNodeInsert, nodes } = await _insertMissingSingleNode({
+        const { record: recordUpdatedNodeInsert, nodes } = /* NOSONAR */ await _insertMissingSingleNode({
           survey,
           childDef: nodeDef,
           record: recordUpdated,
@@ -307,7 +488,7 @@ const _insertMissingSingleNode = async ({ survey, childDef, record, parentNode, 
     return {}
   }
   const children = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(childDef))(record)
-  if (!R.isEmpty(children)) {
+  if (!A.isEmpty(children)) {
     // single node already inserted
     return {}
   }
@@ -350,11 +531,20 @@ const _clearRecordKeysValidation = (record) => {
   return record
 }
 
+const _getRequiredIfNodeDefUuids = ({ survey, nodeDefUuids }) =>
+  nodeDefUuids.filter((nodeDefUuid) =>
+    NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(Survey.getNodeDefByUuid(nodeDefUuid)(survey)))
+  )
+
 const _validateNodes = async ({ user, survey, nodeDefUuids, record, nodes }, tx) => {
   const nodesToValidate = { ...nodes }
 
-  // Include parent nodes of new/updated node defs (needed for min/max count validation)
   for (const nodeDefUuid of nodeDefUuids) {
+    // nodes of new/updated node defs (their validation rules may have changed, e.g. a new validation expression)
+    for (const node of Record.getNodesByDefUuid(nodeDefUuid)(record)) {
+      nodesToValidate[Node.getUuid(node)] = node
+    }
+    // parent nodes (needed for min/max count validation)
     const def = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const parentNodes = Record.getNodesByDefUuid(NodeDef.getParentUuid(def))(record)
     for (const parentNode of parentNodes) {

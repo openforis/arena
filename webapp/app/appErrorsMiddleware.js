@@ -115,7 +115,8 @@ const createAxiosMiddleware =
       if (error.response?.status === 401 && !isAuthorizationIgnoredUrl(url) && !originalRequest._retry) {
         return handleAuthorizationError({ originalRequest })
       }
-      if (!axios.isCancel(error) && url && !isErrorIgnoredUrlIgnored(url)) {
+      const errorIgnored = originalRequest.errorHandledLocally || isErrorIgnoredUrlIgnored(url)
+      if (!axios.isCancel(error) && url && !errorIgnored) {
         dispatch(ServiceErrorActions.createServiceError({ error }))
       }
       throw error

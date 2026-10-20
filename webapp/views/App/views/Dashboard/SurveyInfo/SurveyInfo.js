@@ -8,10 +8,9 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Objects } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
-import * as ProcessUtils from '@core/processUtils'
 
 import { appModuleUri, homeModules } from '@webapp/app/appModules'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useSystemConfigActivityLogDisabled } from '@webapp/store/system'
 import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
@@ -35,6 +34,7 @@ const SurveyInfo = (props) => {
   const canExportSurvey = useAuthCanExportSurvey()
   const chains = useChains()
   const hasChains = chains?.length > 0
+  const activityLogDisabled = useSystemConfigActivityLogDisabled()
 
   const surveyName = Survey.getName(surveyInfo)
   const surveyLabel = Survey.getLabel(surveyInfo, lang, false)
@@ -81,8 +81,23 @@ const SurveyInfo = (props) => {
     })
   }, [confirm, dispatch, surveyName])
 
+  const navigateToSurveyCompare = useCallback(() => navigate(appModuleUri(homeModules.surveyCompare)), [navigate])
+
   const advancedFunctionsItems = useMemo(() => {
-    const items = []
+    const items = [
+      {
+        key: 'survey-compare',
+        content: (
+          <Button
+            iconClassName="icon-loop2 icon-12px icon-left"
+            label="appModules.surveyCompare"
+            onClick={navigateToSurveyCompare}
+            variant="text"
+            testId={TestId.dashboard.surveyCompareBtn}
+          />
+        ),
+      },
+    ]
     if (Survey.isPublished(surveyInfo)) {
       items.push({
         key: 'survey-info-unpublish',
@@ -98,7 +113,7 @@ const SurveyInfo = (props) => {
         ),
       })
     }
-    if (!ProcessUtils.ENV.activityLogDisabled) {
+    if (!activityLogDisabled) {
       items.push({
         key: 'survey-delete-activity-log',
         content: (
@@ -118,7 +133,14 @@ const SurveyInfo = (props) => {
       content: <ButtonDelete onClick={onDeleteClick} testId={TestId.dashboard.surveyDeleteBtn} variant="text" />,
     })
     return items
-  }, [onDeleteActivityLogDataClick, onDeleteClick, onUnpublishClick, surveyInfo])
+  }, [
+    activityLogDisabled,
+    navigateToSurveyCompare,
+    onDeleteActivityLogDataClick,
+    onDeleteClick,
+    onUnpublishClick,
+    surveyInfo,
+  ])
 
   const exportMenuItems = useMemo(() => {
     const items = [
@@ -136,7 +158,7 @@ const SurveyInfo = (props) => {
         onClick: () => dispatch(SurveyActions.exportSurvey({ includeData: true })),
         testId: TestId.dashboard.surveyExportWithDataBtn,
       })
-      if (!ProcessUtils.ENV.activityLogDisabled) {
+      if (!activityLogDisabled) {
         items.push({
           key: 'survey-export-with-data-no-activity-log',
           label: 'homeView:dashboard.exportWithDataNoActivityLog',
@@ -161,77 +183,75 @@ const SurveyInfo = (props) => {
       }
     }
     return items
-  }, [dispatch, hasChains, surveyInfo])
+  }, [activityLogDisabled, dispatch, hasChains, surveyInfo])
 
   return (
-    <>
-      <div className="home-dashboard__survey-info">
-        <header>
-          <div className="row">
-            <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
-              <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
-                <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
-              </h2>
-            </Button>
+    <div className="home-dashboard__survey-info">
+      <header>
+        <div className="row">
+          <Button onClick={navigateToSurveyInfo} testId={TestId.dashboard.surveyInfoBtnHeader} variant="text">
+            <h2 data-testid={TestId.dashboard.surveyLabelOrName}>
+              <LabelWithTooltip label={hasLabel ? surveyLabel : surveyName} />
+            </h2>
+          </Button>
 
-            <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
-              ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
-            </div>
+          <div className="survey-status" data-testid={TestId.dashboard.surveyStatus}>
+            ({i18n.t(`surveysView.status.${Survey.getStatus(surveyInfo)}`)})
           </div>
-          {hasLabel && (
-            <div className="row">
-              <Button onClick={navigateToSurveyInfo} variant="text">
-                <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
-              </Button>
-            </div>
-          )}
-        </header>
-
-        <div>
-          <Button
-            iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
-            label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
-            onClick={navigateToSurveyInfo}
-            size="small"
-            testId={TestId.dashboard.surveyInfoBtn}
-            variant="text"
-          />
-
-          {!firstTime && canEditSurvey && <ButtonPublishSurvey disabled={!Survey.isDraft(surveyInfo)} variant="text" />}
-
-          {!firstTime && canExportSurvey && (
-            <ButtonMenu
-              className="btn-menu-export"
-              items={exportMenuItems}
-              iconClassName="icon-download2 icon-14px"
-              label="common.export"
-              size="small"
-              testId={TestId.dashboard.surveyExportBtn}
-            />
-          )}
-          {canEditSurvey && (
-            <ButtonMenu
-              className="btn-menu-advanced"
-              iconClassName="icon-cog icon-14px"
-              items={advancedFunctionsItems}
-              label="common.advancedFunctions"
-              size="small"
-              testId={TestId.dashboard.advancedFunctionsBtn}
-            />
-          )}
-          {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
-            <Link
-              data-testid={TestId.dashboard.collectReportBtn}
-              to={appModuleUri(homeModules.collectImportReport)}
-              className="btn-s btn-transparent"
-            >
-              <span className="icon icon-clipboard icon-12px icon-left" />
-              {i18n.t('appModules.collectImportReport')}
-            </Link>
-          )}
         </div>
+        {hasLabel && (
+          <div className="row">
+            <Button onClick={navigateToSurveyInfo} variant="text">
+              <h3 data-testid={TestId.dashboard.surveyName}>{surveyName}</h3>
+            </Button>
+          </div>
+        )}
+      </header>
+
+      <div>
+        <Button
+          iconClassName={`icon icon-${canEditSurvey ? 'pencil2' : 'eye'} icon-12px icon-left`}
+          label={canEditSurvey ? 'homeView:surveyInfo.editInfo' : 'homeView:surveyInfo.viewInfo'}
+          onClick={navigateToSurveyInfo}
+          size="small"
+          testId={TestId.dashboard.surveyInfoBtn}
+          variant="text"
+        />
+
+        {!firstTime && canEditSurvey && <ButtonPublishSurvey disabled={!Survey.isDraft(surveyInfo)} variant="text" />}
+
+        {!firstTime && canExportSurvey && (
+          <ButtonMenu
+            className="btn-menu-export"
+            items={exportMenuItems}
+            iconClassName="icon-download2 icon-14px"
+            label="common.export"
+            size="small"
+            testId={TestId.dashboard.surveyExportBtn}
+          />
+        )}
+        {canEditSurvey && (
+          <ButtonMenu
+            className="btn-menu-advanced"
+            iconClassName="icon-cog icon-14px"
+            items={advancedFunctionsItems}
+            label="common.advancedFunctions"
+            size="small"
+            testId={TestId.dashboard.advancedFunctionsBtn}
+          />
+        )}
+        {canEditSurvey && Survey.isFromCollect(surveyInfo) && Survey.hasCollectReportIssues(surveyInfo) && (
+          <Link
+            data-testid={TestId.dashboard.collectReportBtn}
+            to={appModuleUri(homeModules.collectImportReport)}
+            className="btn-s btn-transparent"
+          >
+            <span className="icon icon-clipboard icon-12px icon-left" />
+            {i18n.t('appModules.collectImportReport')}
+          </Link>
+        )}
       </div>
-    </>
+    </div>
   )
 }
 

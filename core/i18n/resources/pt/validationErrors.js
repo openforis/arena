@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nome da categoria não especificado',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Já existe uma categoria de Dados de Ponto Amostral neste inventário; só pode haver uma.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Não é possível excluir itens de categoria publicados. Itens ausentes no arquivo importado: {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Número inválido na coluna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código inválido na coluna {{headers}}: {{value}}',
     invalidTime:
-      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm. Ex.: 09:45 ou 16:30',
+      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm ou HH:mm:ss. Ex.: 09:45, 16:30 ou 09:45:30',
     missingRequiredHeaders: 'Colunas obrigatórias ausentes: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erro ao atualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Vários registros encontrados com as chaves "{{keyValues}}"',
@@ -130,6 +135,9 @@ export default {
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
     readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
+    requiredIfInvalid: 'Condição "Obrigatório se" inválida',
+    requiredIfNotAllowed:
+      'A condição "Obrigatório se" só é permitida para atributos simples, não chave e não sempre obrigatórios',
     qualifierCannotHaveApplicableExpression:
       'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
@@ -243,6 +251,7 @@ export default {
     invalidRequest: 'Solicitação de acesso de usuário inválida',
     userAlreadyExisting: 'Usuário com email {{email}} já existe',
     requestAlreadySent: `Solicitação de acesso para o usuário com email {{email}} já enviada`,
+    emailNotReachable: 'O email de confirmação não pôde ser entregue a {{email}}; verifique se o endereço está correto',
     invalidReCaptcha: 'ReCaptcha inválido',
   },
 
@@ -253,6 +262,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Papel obrigatório',
     surveyNameRequired: 'Nome do inventário obrigatório',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Já existe um grupo com o mesmo nome: {{name}}',
+    qualifiersInvalid: 'Um ou mais qualificadores têm uma chave inválida ou duplicada',
+    qualifierNameDuplicate: 'Já existe um qualificador com o mesmo nome neste grupo: {{name}}',
+    qualifierNameInvalid: 'Nome de qualificador inválido',
+    qualifierNameRequired: 'O nome do qualificador é obrigatório',
   },
 
   userPasswordChange: {

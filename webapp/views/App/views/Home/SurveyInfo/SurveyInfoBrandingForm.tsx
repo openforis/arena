@@ -20,7 +20,7 @@ import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
 import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { useConfirmAsync } from '@webapp/components/hooks'
-import { useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
+import { useBrandingLogo, useBrandingLogoSrc } from '@webapp/components/survey/useBrandingLogoSrc'
 import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
@@ -40,7 +40,7 @@ const BACKGROUND_FILE_INPUT_ACCEPT = 'image/png,image/jpeg,image/webp,.png,.jpg,
 
 const LANDING_BACKGROUND_MAX_SIZE_MB = SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES / (1024 * 1024)
 const LOGO_MAX_SIZE_MB = SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES / (1024 * 1024)
-const DEFAULT_PREVIEW_BUTTON_COLOR = defaultTokens.colors.blue
+const DEFAULT_PREVIEW_BUTTON_COLOR = defaultTokens.colors.primary
 
 type BrandingImageKey = SurveyLogoKey | typeof brandingKeys.landingBackground
 
@@ -91,7 +91,6 @@ const isAcceptedBackgroundFile = (file: File): boolean =>
   isAcceptedFile(file, ACCEPTED_BACKGROUND_TYPES, ACCEPTED_BACKGROUND_EXTENSIONS)
 
 type BrandingImageSectionProps = {
-  imageKey: BrandingImageKey
   labelKey: string
   image?: BrandingImageDescriptor
   localObjectUrl?: string | null
@@ -121,9 +120,11 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
   } = props
 
   const i18n = useI18n()
-  const imageSrc = useBrandingLogoSrc({ surveyId, logo: image, localObjectUrl })
+  const { src: imageSrc, loadError } = useBrandingLogo({ surveyId, logo: image, localObjectUrl })
   const hasImage = Boolean(imageSrc || image?.[brandingKeys.fileUuid])
   const showLogoFormatHint = previewVariant === 'logo'
+  const canRemove = !readOnly && Boolean(onRemove)
+  const downloadTitle = i18n.t('homeView:surveyInfo.branding.downloadImage')
 
   return (
     <fieldset
@@ -161,9 +162,27 @@ const BrandingImageSection = (props: BrandingImageSectionProps) => {
           <div
             className={`survey-info-branding-form__image-preview survey-info-branding-form__image-preview--${previewVariant}`}
           >
-            <img alt="" src={imageSrc} />
+            <a
+              className="survey-info-branding-form__image-download"
+              download={image?.[brandingKeys.name] || true}
+              href={imageSrc}
+              title={downloadTitle}
+            >
+              <img alt={downloadTitle} src={imageSrc} />
+            </a>
           </div>
-          {!readOnly && onRemove && <ButtonIconDelete onClick={onRemove} />}
+          {canRemove && <ButtonIconDelete onClick={onRemove} />}
+        </div>
+      )}
+      {loadError && (
+        <div className="survey-info-branding-form__image-preview-row">
+          <div className="survey-info-branding-form__image-error" role="alert">
+            <span className="icon icon-warning icon-12px icon-left" />
+            {i18n.t(`homeView:surveyInfo.branding.${canRemove ? 'imageLoadError' : 'imageLoadErrorReadOnly'}`, {
+              name: image?.[brandingKeys.name] ?? '',
+            })}
+          </div>
+          {canRemove && <ButtonIconDelete onClick={onRemove} />}
         </div>
       )}
     </fieldset>
@@ -484,7 +503,6 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
           return (
             <BrandingImageSection
               key={imageKey}
-              imageKey={imageKey}
               labelKey={labelKey}
               image={logo}
               localObjectUrl={localObjectUrls[imageKey] ?? null}
@@ -501,7 +519,6 @@ export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
       </div>
 
       <BrandingImageSection
-        imageKey={brandingKeys.landingBackground}
         labelKey="homeView:surveyInfo.branding.landingBackground"
         image={landingBackground}
         localObjectUrl={localObjectUrls[brandingKeys.landingBackground] ?? null}

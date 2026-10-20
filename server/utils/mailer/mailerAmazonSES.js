@@ -41,12 +41,13 @@ export const validateEnv = ({ from }) => {
 
 export const logTransportOptionsType = () => (ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default')
 
-export const sendEmail = async ({ to, from, subject, html, text = null }) => {
+export const sendEmail = async ({ to = null, bcc = null, from, subject, html, text = null }) => {
   const transporter = nodemailer.createTransport(getTransportOptions())
 
   const info = await transporter.sendMail({
     from,
     to,
+    bcc,
     subject,
     html,
     text,

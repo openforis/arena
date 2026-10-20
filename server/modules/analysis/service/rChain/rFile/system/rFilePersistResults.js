@@ -15,12 +15,12 @@ const getSendResultsToServerScripts = ({ rChain, entity, dfResults }) => {
 
   // csv file
   const fileResults = `${dirResults}/${dfSourceName}.csv`
-  scripts.push(writeCsv(dfResultName, fileResults))
   // zip file
   const fileZip = `${dirResults}/${dfSourceName}.zip`
-  scripts.push(zipr(fileZip, fileResults))
-  // put request
   scripts.push(
+    writeCsv(dfResultName, fileResults),
+    zipr(fileZip, fileResults),
+    // put request
     setVar(
       persistScriptJobVar,
       arenaPutFile(
@@ -44,9 +44,9 @@ export default class RFilePersistResults extends RFilePersistScriptsGeneric {
     for (const entity of entitiesWithActiveQuantitativeVariables) {
       const dfResults = new DfResults(this.rChain, entity)
 
-      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`)
-      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults }))
-      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`)
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} started'`) // NOSONAR
+      await this.appendContent(...getSendResultsToServerScripts({ rChain: this.rChain, entity, dfResults })) // NOSONAR
+      await this.logInfo(`'Uploading results for entity ${dfResults.dfSourceName} completed'`) // NOSONAR
     }
   }
 }

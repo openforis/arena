@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 
@@ -26,24 +26,24 @@ export const stepCodes = {
 
 export const steps = Object.keys(stepNames).map((name) => ({ id: stepCodes[name], name }))
 
-export const getStepId = R.prop(keys.id)
+export const getStepId = A.prop(keys.id)
 
-export const getDefaultStep = () => R.pipe(R.head, getStepId)(steps)
+export const getDefaultStep = () => A.pipe(A.head, getStepId)(steps)
 
-export const getStep = (stepId) => R.find(R.propEq(keys.id, stepId), steps)
+export const getStep = (stepId) => A.find(A.propEq(keys.id, stepId), steps)
 
 export const getStepIdByName = (stepName) => {
-  const step = R.find(R.propEq(keys.name, stepName), steps)
+  const step = A.find(A.propEq(keys.name, stepName), steps)
   return getStepId(step)
 }
 
-const getStepIndex = (stepId) => R.findIndex(R.propEq(keys.id, stepId))
+const getStepIndex = (stepId) => A.findIndex(A.propEq(keys.id, stepId))
 
 const getStepIncrement = (stepId, increment) =>
-  R.pipe(
+  A.pipe(
     getStepIndex(stepId),
-    (idx) => R.add(idx, increment),
-    (idx) => (idx >= 0 ? R.nth(idx, steps) : null)
+    (idx) => A.add(idx, increment),
+    (idx) => (idx >= 0 ? A.nth(idx, steps) : null)
   )(steps)
 
 export const getNextStep = (stepId) => getStepIncrement(stepId, +1)
@@ -51,7 +51,7 @@ export const getNextStep = (stepId) => getStepIncrement(stepId, +1)
 export const getPreviousStep = (stepId) => getStepIncrement(stepId, -1)
 
 export const { getId } = ObjectUtils
-export const getName = R.prop(keys.name)
+export const getName = A.prop(keys.name)
 
 export const areAdjacent = (step1, step2) => {
   if (!(step1 || step2)) {

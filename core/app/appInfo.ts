@@ -1,15 +1,15 @@
 import * as A from '@core/arena'
 import { ENV } from '@core/processUtils'
 
-const arenaAppId = 'arena'
-const arenaMobileId = 'arena-mobile'
-const arenaMobileExperimentsId = 'mam'
-const arenaMobile2Id = 'am'
+const arenaAppId = 'arena' // desktop app
+const arenaMobileId = 'arena-mobile' // old mobile app version 1, deprecated
+const arenaMobileExperimentsId = 'mam' // experimental mobile app
+const arenaMobile2Id = 'am' // official mobile app
 
 const appNameById: Record<string, string> = {
   [arenaAppId]: 'Arena',
   [arenaMobileId]: 'Arena Mobile',
-  [arenaMobile2Id]: 'Arena Mobile 2',
+  [arenaMobile2Id]: 'Arena Mobile',
   [arenaMobileExperimentsId]: 'Arena Mobile Experiments',
 }
 

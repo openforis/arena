@@ -20,9 +20,9 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
     for (const recordSummary of recordsSummary) {
       const recordUuid = Record.getUuid(recordSummary)
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx) // NOSONAR
       this.currentRecord = record
-      await this.deleteNotUpdatedEntities()
+      await this.deleteNotUpdatedEntities() // NOSONAR
       this.incrementProcessedItems()
     }
   }

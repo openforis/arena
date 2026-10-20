@@ -1,0 +1,58 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: arena-rstudio
+  labels:
+    app.kubernetes.io/name: arena-rstudio
+spec:
+  replicas: 1
+  # The home volume is ReadWriteOnce: the old pod must release it first.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: arena-rstudio
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: arena-rstudio
+    spec:
+      automountServiceAccountToken: false
+      securityContext:
+        # Makes the home volume writable by the rstudio user (gid 1000).
+        fsGroup: 1000
+      containers:
+        - name: rstudio
+          image: rocker/rstudio:4.6.1
+          ports:
+            - name: http
+              containerPort: 8787
+          env:
+            # Authentication is done by the ingress (basic auth).
+            - name: DISABLE_AUTH
+              value: 'true'
+          readinessProbe:
+            tcpSocket:
+              port: http
+            periodSeconds: 10
+          # Starting values: tune them to the analyses to run.
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1Gi
+            limits:
+              memory: 4Gi
+          volumeMounts:
+            - name: home
+              mountPath: /home/rstudio
+            # With DISABLE_AUTH the image copies this file over rserver.conf at startup.
+            - name: config
+              mountPath: /etc/rstudio/disable_auth_rserver.conf
+              subPath: disable_auth_rserver.conf
+      volumes:
+        - name: home
+          persistentVolumeClaim:
+            claimName: arena-rstudio-home
+        - name: config
+          configMap:
+            name: arena-rstudio-config

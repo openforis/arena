@@ -32,7 +32,7 @@ export default class FilesImportJob extends FileImportBaseJob {
         // load file content from a separate file
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
-        const fileContent = await this.fetchFileContent({ fileName, fileUuid })
+        const fileContent = await this.fetchFileContent({ fileName, fileUuid }) // NOSONAR
         const recordUuid = SurveyFile.getRecordUuid(fileSummary)
         if (fileContent) {
           file = SurveyFile.assocContent(fileContent)(file)
@@ -40,7 +40,7 @@ export default class FilesImportJob extends FileImportBaseJob {
           // update file size with actual file content length
           file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
-          await this.persistFile(file)
+          await this.persistFile(file) // NOSONAR
         } else {
           const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
           if (skipMissingFiles) {
@@ -79,7 +79,8 @@ export default class FilesImportJob extends FileImportBaseJob {
   }
 
   async checkFileUuidsAreValid(filesSummaries) {
-    const { recordsFileUuids, skipMissingFiles } = this.context
+    const { recordsFileUuids, skipMissingFiles, surveyId } = this.context
+    const { tx } = this
 
     if (Objects.isEmpty(recordsFileUuids)) {
       this.logDebug('no files to restore in the records')
@@ -96,15 +97,23 @@ export default class FilesImportJob extends FileImportBaseJob {
     const missingRecordFileUuidsInFiles = recordsFileUuids.filter(
       (recordFileUuid) => !filesUuids.includes(recordFileUuid)
     )
-    if (missingRecordFileUuidsInFiles.length > 0) {
-      throw new Error(`missing files with UUIDs ${missingRecordFileUuidsInFiles}`)
-    }
 
-    // TODO check if it's necessary to check that all files are in the updated records data
-    // const missingFileUuids = filesUuids.filter((fileUuid) => !recordsFileUuids.includes(fileUuid))
-    // if (missingFileUuids.length > 0) {
-    //   throw new Error(`files with UUIDs ${missingFileUuids} not found in records`)
-    // }
+    // A referenced file missing from this archive isn't necessarily missing content: a mobile
+    // client can deliberately omit a file it knows the server already has, to save upload
+    // bandwidth (see RecordsExportFileGenerationJob on the mobile side). Only files that are
+    // neither in the archive nor already stored (or soft-deleted) count as actually missing.
+    const existingNonDeletedFileUuids = new Set(
+      await SurveyFileService.fetchExistingNonDeletedFileUuids(
+        { surveyId, fileUuids: missingRecordFileUuidsInFiles },
+        tx
+      )
+    )
+    const actuallyMissingFileUuids = missingRecordFileUuidsInFiles.filter(
+      (fileUuid) => !existingNonDeletedFileUuids.has(fileUuid)
+    )
+    if (actuallyMissingFileUuids.length > 0) {
+      throw new Error(`missing files with UUIDs ${actuallyMissingFileUuids}`)
+    }
   }
 
   async deleteOrphanFiles() {
@@ -118,7 +127,7 @@ export default class FilesImportJob extends FileImportBaseJob {
       const fileUuid = SurveyFile.getUuid(file)
       if (!updatedFilesByUuid[fileUuid]) {
         if (!dryRun) {
-          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx)
+          await SurveyFileService.deleteFileByUuid({ surveyId, fileUuid }, tx) // NOSONAR
         }
         this.deletedFileUuids.push(fileUuid)
       }

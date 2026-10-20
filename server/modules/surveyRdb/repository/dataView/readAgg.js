@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import pgPromise from 'pg-promise'
 
 import { db } from '../../../../db/db'
@@ -50,7 +50,7 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
   // ORDER BY clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
+  if (!A.isEmpty(sortParams)) {
     queryBuilder.orderBy(sortClause)
     queryBuilder.addParams(sortParams)
   }
@@ -61,14 +61,12 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
  * Counts the number of rows of a data view associated to an entity node definition,
  * aggregated by the given measures aggregate functions, grouped by the given dimensions and
  * filtered by the given filter.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = async (params, client = db) => {
@@ -90,17 +88,15 @@ export const countViewDataAgg = async (params, client = db) => {
 /**
  * Runs a select query on a data view associated to an entity node definition,
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
- * @param {string} [params.recordOwnerUuid=null] - The record owner UUID used to filter records. If null, all records will be considered.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID used to filter records. If null, all records will be considered.
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
@@ -108,8 +104,8 @@ export const fetchViewDataAgg = async (params, client = db) => {
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
 
   const selectWithLimit = `${select}     
-    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`
+    ${A.isNil(limit) ? '' : 'LIMIT $/limit/'}
+    ${A.isNil(offset) ? '' : 'OFFSET $/offset/'}`
 
   const queryParamsWithLimit = {
     ...queryParams,

@@ -5,6 +5,7 @@ import * as Log from '@server/log/log'
 import * as CategoryService from '@server/modules/category/service/categoryService'
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
+import * as RecordService from '@server/modules/record/service/recordService'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as Request from '@server/utils/request'
@@ -14,10 +15,11 @@ import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 const Logger = Log.getLogger('Mobile API')
 
-const fetchSurvey = async ({ surveyId, cycle }) =>
+const fetchSurvey = async ({ surveyId, cycle, draft = false }) =>
   SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
+    draft,
     advanced: true,
     includeBigCategories: true,
     includeBigTaxonomies: true,
@@ -29,7 +31,8 @@ export const init = (app) => {
     try {
       Logger.info('fetching survey data')
 
-      const { surveyId, cycle } = Request.getParams(req)
+      // draft: used by the mobile app web preview in the survey designer
+      const { surveyId, cycle, draft = false } = Request.getParams(req)
 
       const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
       Logger.info('total category items', totalCategoryItems)
@@ -40,7 +43,7 @@ export const init = (app) => {
       Logger.info('constrained memory', process.constrainedMemory())
       Logger.info('memory usage before', process.memoryUsage())
 
-      const survey = await fetchSurvey({ surveyId, cycle })
+      const survey = await fetchSurvey({ surveyId, cycle, draft })
 
       Logger.info('memory usage after', process.memoryUsage())
 
@@ -123,6 +126,22 @@ export const init = (app) => {
         const { fileId } = Request.getParams(req)
         await TempFileManager.deletePendingImportFileIfAny({ fileId })
         res.json({})
+      } catch (e) {
+        next(e)
+      }
+    }
+  )
+
+  // ====== FILE UUIDS - for the given records, returns the UUIDs of the files already stored
+  // on the server, so a mobile client can skip re-uploading file content that hasn't changed.
+  app.post(
+    '/mobile/survey/:surveyId/records/file-uuids',
+    AuthMiddleware.requireRecordListViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, recordUuids = [] } = Request.getParams(req)
+        const fileUuidsByRecordUuid = await RecordService.fetchFileUuidsByRecordUuid({ surveyId, recordUuids })
+        res.json({ fileUuidsByRecordUuid })
       } catch (e) {
         next(e)
       }

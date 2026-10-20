@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react'
 
-export default (effect, { root = null, rootMargin, threshold = 0 } = {}) => {
+const useOnIntersect = (effect, { root = null, rootMargin, threshold = 0 } = {}) => {
   const [target, setTarget] = useState(null)
   const observer = useRef(null)
 
   // Call the specified effect every time the IntersectionObserver detects an interception with the target element(s)
-  const callback = entries => entries.forEach(entry => entry.isIntersecting && effect(entry))
+  const callback = (entries) => entries.forEach((entry) => entry.isIntersecting && effect(entry))
 
   useEffect(() => {
     // Stop listening to current node intersections
@@ -24,3 +24,5 @@ export default (effect, { root = null, rootMargin, threshold = 0 } = {}) => {
 
   return [setTarget]
 }
+
+export default useOnIntersect

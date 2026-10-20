@@ -162,8 +162,8 @@ const MultipleFileInput = (props) => {
 
   return (
     <div>
-      {nodes.map((n, i) => (
-        <FileInput key={i} {...props} node={n} />
+      {nodes.map((n) => (
+        <FileInput key={Node.getUuid(n)} {...props} node={n} />
       ))}
     </div>
   )

@@ -13,7 +13,7 @@ import * as API from '@webapp/service/api'
  * Basemaps is a list of all available layers.
  *
  * TileMatrixSets is a list of ALL available TileMatrixSets. Some layers may not have support all TileMatrixSets.
- * TileMatrixSet is basically the projection. TODO is to find a way to find the projection that leaflet uses (EPSG:3857).
+ * TileMatrixSet is basically the projection: the one used by leaflet is EPSG:3857.
  * (The problem is that no all providers use the same name in the TileMatrixSet list. For some it is with the EPSG code, for some it is custom name...).
  *
  * CurrentTileMatrixSet is the TileMatrixSet that is used currently...
@@ -22,8 +22,6 @@ import * as API from '@webapp/service/api'
 export const WmtsComponent = () => {
   const apiKey = ''
   const [baseMaps, setBaseMaps] = useState([])
-  const [tileMatrixSets, setTileMatrixSets] = useState([])
-  const [currentTileMatrixSet, setCurrentTileMatrixSet] = useState('')
 
   const surveyId = useSurveyId()
 
@@ -66,12 +64,10 @@ export const WmtsComponent = () => {
   useEffect(() => {
     if (componentDisabled) return
     let isMounted = true
-    API.fetchMapWmtsCapabilities({ surveyId, url }).then((capabilities) => {
+    void API.fetchMapWmtsCapabilities({ surveyId, url }).then((capabilities) => {
       const newTileMatrixSets = getTileMatrixSets(capabilities.Capabilities.Contents.TileMatrixSet)
       const base = makeBaseMaps(capabilities.Capabilities.Contents.Layer, newTileMatrixSets[0])
       if (isMounted) {
-        setTileMatrixSets(newTileMatrixSets)
-        setCurrentTileMatrixSet(newTileMatrixSets[0])
         setBaseMaps(base)
       }
     })

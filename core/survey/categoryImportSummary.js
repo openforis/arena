@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   items: 'items',
@@ -33,15 +33,15 @@ export const newSummary = ({ items, itemsCount = 0, filePath = null }) => ({
   [keys.itemsCount]: itemsCount,
 })
 
-export const getItems = R.propOr([], keys.items)
+export const getItems = A.propOr([], keys.items)
 
-export const getItemColumns = R.propOr({}, keysItem.columns)
+export const getItemColumns = A.propOr({}, keysItem.columns)
 
-export const getItemsCount = R.propOr(0, keys.itemsCount)
+export const getItemsCount = A.propOr(0, keys.itemsCount)
 
-export const getFilePath = R.prop(keys.filePath)
+export const getFilePath = A.prop(keys.filePath)
 
-export const getFileFormat = R.prop(keys.fileFormat)
+export const getFileFormat = A.prop(keys.fileFormat)
 
 // ===== ITEM
 
@@ -65,21 +65,21 @@ export const newItem = ({
   [keysItem.dataTypeReadOnly]: dataTypeReadOnly,
 })
 
-export const getItemKey = R.prop(keysItem.key)
+export const getItemKey = A.prop(keysItem.key)
 
-export const getItemType = R.prop(keysItem.type)
+export const getItemType = A.prop(keysItem.type)
 
-export const getItemLevelName = R.prop(keysItem.levelName)
+export const getItemLevelName = A.prop(keysItem.levelName)
 
-export const getItemLevelIndex = R.prop(keysItem.levelIndex)
+export const getItemLevelIndex = A.prop(keysItem.levelIndex)
 
-export const getItemLang = R.prop(keysItem.lang)
+export const getItemLang = A.prop(keysItem.lang)
 
-export const getItemDataType = R.prop(keysItem.dataType)
+export const getItemDataType = A.prop(keysItem.dataType)
 
-export const isItemDataTypeReadOnly = R.propEq(keysItem.dataTypeReadOnly, true)
+export const isItemDataTypeReadOnly = A.propEq(keysItem.dataTypeReadOnly, true)
 
-const isItemType = (type) => R.pipe(getItemType, R.equals(type))
+const isItemType = (type) => A.pipe(getItemType, A.equals(type))
 
 export const isItemCode = isItemType(itemTypes.code)
 export const isItemExtra = isItemType(itemTypes.extra)
@@ -90,12 +90,12 @@ export const hasItemLang = (column) => isItemLabel(column) || isItemDescription(
 
 // ===== UTILS
 
-export const getLevelNames = R.pipe(getItems, R.filter(isItemCode), R.map(getItemLevelName))
+export const getLevelNames = A.pipe(getItems, A.filter(isItemCode), A.map(getItemLevelName))
 
 export const getColumnName = (type, levelIndex) =>
-  R.pipe(
+  A.pipe(
     getItems,
-    R.find((item) => getItemType(item) === type && getItemLevelIndex(item) === levelIndex),
+    A.find((item) => getItemType(item) === type && getItemLevelIndex(item) === levelIndex),
     (item) => (item ? getItemColumns(item)[0] : null)
   )
 
@@ -104,8 +104,8 @@ export const assocItemDataType = (key, dataType) => (summary) => {
   const items = getItems(summary)
   const itemIdx = items.findIndex((item) => getItemKey(item) === key)
   const item = items[itemIdx]
-  const itemUpdated = R.assoc(keysItem.dataType, dataType)(item)
-  return R.assocPath([keys.items, itemIdx], itemUpdated)(summary)
+  const itemUpdated = A.assoc(keysItem.dataType, dataType)(item)
+  return A.assocPath([keys.items, itemIdx], itemUpdated)(summary)
 }
 
-export const assocFileFormat = R.assoc(keys.fileFormat)
+export const assocFileFormat = A.assoc(keys.fileFormat)

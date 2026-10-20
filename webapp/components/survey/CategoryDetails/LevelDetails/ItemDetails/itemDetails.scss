@@ -1,46 +1,158 @@
 @use '~@webapp/style/vars' as *;
 
-$borderColor: $greyBorder;
+$borderColor: $colorOutline;
 
 .category__item {
   position: relative;
-  border-bottom: 1px dotted $borderColor;
-  display: grid;
-  align-content: center;
-  grid-template-columns: 80px auto 1fr;
-  column-gap: 10px;
-  min-height: 35px;
-  grid-row-gap: 0.2rem;
+  background-color: $colorSurface;
+  // accordion: items are contiguous and share their borders
+  border: 1px solid $borderColor;
+  border-top-width: 0;
   font-size: 0.9rem;
 
+  &:first-child {
+    border-top-width: 1px;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+  }
+
+  &:last-child {
+    border-bottom-left-radius: 6px;
+    border-bottom-right-radius: 6px;
+  }
+
+  .category__item-header {
+    // reset the default button style
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    border-radius: 0;
+    background-color: transparent;
+    font: inherit;
+    letter-spacing: inherit;
+    line-height: inherit;
+    color: inherit;
+    text-align: left;
+    // height = rowHeight of the virtualized list (34px) - bottom border
+    min-height: 33px;
+    display: grid;
+    grid-template-columns: 4rem 80px 1fr 2rem;
+    align-items: center;
+    column-gap: 10px;
+    cursor: pointer;
+
+    &:hover {
+      background-color: with-alpha($colorSuccessContainer, 0.6);
+    }
+
+    &:focus-visible {
+      outline: 2px solid $colorPrimary;
+      outline-offset: -2px;
+    }
+  }
+
+  .category__item-index {
+    align-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: $colorSurfaceVariant;
+    color: $colorOnPrimaryContainer;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .category__item-code {
+    font-weight: 600;
+  }
+
+  .empty {
+    color: $colorError;
+    font-style: italic;
+    font-weight: normal;
+  }
+
+  .category__item-toggle-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px;
+    color: $colorOnPrimaryContainer;
+
+    .category__item-toggle-icon {
+      font-size: 20px;
+      transition: transform 0.2s;
+    }
+  }
+
   &.not-valid {
-    grid-template-columns: 26px 44px auto 1fr;
+    .category__item-header {
+      grid-template-columns: 16px 4rem 80px 1fr 2rem;
+      box-shadow: inset 4px 0 0 $colorError;
+    }
 
     .badge {
       position: relative;
+      // keep the icon clear of the red left border
+      margin-left: 6px;
+      padding: 0;
+    }
+
+    .badge__content {
+      display: flex;
+    }
+
+    // explicit color and fill: don't rely on the badge or header text color
+    .category__item-error-icon {
+      font-size: 16px;
+      color: $colorError;
+      fill: currentColor;
+
+      &.warning {
+        color: $colorWarning;
+      }
     }
   }
 
   &.active {
-    grid-template-columns: 1fr;
-    border: 2px dashed $borderColor;
-    background-color: rgba($grey, 0.4);
-    padding: 1.5rem 0;
+    .category__item-header {
+      background-color: $colorPrimary;
+      color: $colorOnPrimary;
 
-    .badge {
-      position: absolute;
+      .category__item-index {
+        background-color: $colorOnPrimaryContainer;
+        color: $colorOnPrimary;
+      }
+
+      .empty {
+        color: $colorOnPrimary;
+      }
+
+      // white ring around the icon to keep it visible on the blue background
+      .category__item-error-icon {
+        border-radius: 50%;
+        background-color: $colorOnPrimary;
+        box-shadow: 0 0 0 1.5px $colorOnPrimary;
+      }
+
+      .category__item-toggle-btn {
+        color: $colorOnPrimary;
+      }
+
+      .category__item-toggle-icon {
+        transform: rotate(180deg);
+      }
     }
   }
 
-  &:not(.active):hover {
-    background-color: rgba($greenLight, 0.6);
-    cursor: pointer;
-  }
-
-  .btn-close {
-    position: absolute;
-    right: 0;
-    top: 0;
+  .category__item-body {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-row-gap: 0.2rem;
+    padding: 0.8rem 1rem 1rem;
+    background-color: $colorBackground;
+    border-top: 1px solid $borderColor;
   }
 
   .btn-delete {

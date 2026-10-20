@@ -18,7 +18,7 @@ const deleteEmptyLevelError =
     const levelValidation = Validation.getFieldValidation(levelIndex)(levelsValidation)
     const levelValidationUpdated = Validation.dissocFieldValidation(keys.items)(levelValidation)
     let levelsValidationUpdated = Validation.assocFieldValidation(levelIndex, levelValidationUpdated)(levelsValidation)
-    if (Object.values(Validation.getFieldValidations(levelsValidation)).every(Validation.isValid)) {
+    if (Object.values(Validation.getFieldValidations(levelsValidation)).every((validation) => Validation.isValid(validation))) {
       levelsValidationUpdated = Validation.setErrors([])(levelsValidationUpdated)
     }
     const validationUpdated = Validation.cleanup(

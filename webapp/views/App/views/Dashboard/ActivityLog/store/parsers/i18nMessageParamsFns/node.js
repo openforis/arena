@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -10,13 +10,13 @@ const _getParams = (survey, i18n) => (activityLog) => {
   const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-  const parentPath = R.pipe(
+  const parentPath = A.pipe(
     ActivityLog.getKeysHierarchy,
     NodeKeys.getKeysHierarchyPath({ survey, lang: i18n.language })
   )(activityLog)
 
   // Get record keys from parent path first item (root)
-  const recordKeys = R.pipe(ActivityLog.getKeysHierarchy, R.head, R.prop(NodeKeys.keys.keys), R.values)(activityLog)
+  const recordKeys = A.pipe(ActivityLog.getKeysHierarchy, A.head, A.prop(NodeKeys.keys.keys), A.values)(activityLog)
 
   return {
     name: NodeDef.getLabel(nodeDef, i18n.language),

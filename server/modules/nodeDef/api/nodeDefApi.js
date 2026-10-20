@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
 
@@ -52,7 +52,7 @@ export const init = (app) => {
         cycle: surveyCycleKey,
         nodeDef,
       })
-      res.json({ nodeDefsUpdated: R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
+      res.json({ nodeDefsUpdated: A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
     } catch (error) {
       next(error)
     }
@@ -81,7 +81,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, draft, validate, includeAnalysis } = Request.getParams(req)
-      const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
+      const advanced = true // always fetch advanced props: some of them (e.g. min/max count) are needed in data entry
       const sendNodeDefs = true
 
       await sendRespNodeDefsAndValidation({

@@ -38,21 +38,26 @@ export const writeFileContent = async ({ surveyId, fileUuid, content, recordUuid
 export const getFileContentAsStream = ({ surveyId, fileUuid, recordUuid = null }) => {
   const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
   if (!FileUtils.exists(filePath)) {
-    throw new Error(`File not found: ${filePath}`)
+    // the file is registered but its content is missing from storage: let the caller handle it
+    // (matches the DB and S3 storage backends, which also return null instead of throwing)
+    return null
   }
   return FileUtils.createReadStream(filePath)
 }
 
-export const deleteFiles = async ({ surveyId, files }) => {
-  for (const { fileUuid, recordUuid } of files) {
-    const filePath = getFilePath({ surveyId, fileUuid, recordUuid })
-    try {
-      await FileUtils.deleteFileAsync(filePath)
-    } catch (error) {
-      if (error.code !== 'ENOENT') throw error
-    }
+const deleteFileIfExists = async (filePath) => {
+  try {
+    await FileUtils.deleteFileAsync(filePath)
+  } catch (error) {
+    if (error.code !== 'ENOENT') throw error
   }
 }
+
+// files are independent from each other: delete them in parallel
+export const deleteFiles = async ({ surveyId, files }) =>
+  Promise.all(
+    files.map(({ fileUuid, recordUuid }) => deleteFileIfExists(getFilePath({ surveyId, fileUuid, recordUuid })))
+  )
 
 export const migrateFileToNewPath = async ({ surveyId, fileUuid, recordUuid }) => {
   const legacyPath = getLegacyFilePath({ surveyId, fileUuid })

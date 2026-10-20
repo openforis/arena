@@ -29,7 +29,7 @@ export default class CategoriesExportJob extends Job {
       const extension = getExtensionByFileFormat(fileFormat)
       const categoryTempFilePath = FileUtils.join(categoriesDir, `${Category.getName(category)}.${extension}`)
       const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
-      await CategoryManager.exportCategoryToStream({ survey, categoryUuid, outputStream, fileFormat }, this.tx)
+      await CategoryManager.exportCategoryToStream({ survey, categoryUuid, outputStream, fileFormat }, this.tx) // NOSONAR
       this.incrementProcessedItems()
     }
   }

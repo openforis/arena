@@ -53,7 +53,7 @@ export const useCancelEdits = ({ setState }) => {
             })
           )
         } else {
-          _cancel()
+          void _cancel()
         }
       }),
     [editingNodeDefInFullScreen]

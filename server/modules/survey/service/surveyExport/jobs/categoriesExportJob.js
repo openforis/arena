@@ -41,7 +41,7 @@ export default class CategoriesExportJob extends Job {
 
       for (const pageIndex of pageIndexes) {
         const offset = pageIndex * itemsBatchSize
-        const itemsData = await CategoryService.fetchItemsByCategoryUuid(
+        const itemsData = /* NOSONAR */ await CategoryService.fetchItemsByCategoryUuid(
           { surveyId, categoryUuid, backup, draft, offset, limit: itemsBatchSize },
           this.tx
         )

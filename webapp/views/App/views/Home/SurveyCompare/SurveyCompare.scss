@@ -1,0 +1,337 @@
+@use '~@webapp/style/vars' as *;
+
+.survey-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  height: 100%;
+  padding: 1rem;
+  overflow: hidden;
+
+  &__header,
+  &__toolbar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  &__source-survey {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+
+    .survey-dropdown {
+      min-width: 20rem;
+    }
+  }
+
+  &__fingerprints {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+    color: $colorOnSurfaceVariant;
+  }
+
+  // rows share the grid columns, so the values are aligned
+  &__fingerprint-grid {
+    display: grid;
+    grid-template-columns: repeat(3, max-content);
+    column-gap: 0.75rem;
+    line-height: 1.6;
+  }
+
+  &__fingerprint-row {
+    display: contents;
+  }
+
+  &__fingerprint-item {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  &__fingerprint-value {
+    padding: 0 0.25rem;
+    border-radius: 3px;
+    background-color: rgba(0, 0, 0, 0.05);
+    font-family: monospace;
+  }
+
+  &__fingerprint--equal {
+    color: $colorSuccess;
+  }
+
+  &__fingerprint--different {
+    color: $colorError;
+  }
+
+  &__apply-btn {
+    margin-left: auto;
+  }
+
+  &__source-name,
+  &__row-type,
+  &__row-note,
+  &__details-info {
+    color: $colorOnSurfaceVariant;
+    font-size: 0.85rem;
+  }
+
+  // the dropzone must not grow to fill the view
+  .dropzone {
+    flex: none;
+  }
+
+  &__intro {
+    margin: 0;
+    padding-left: 1.5rem;
+    line-height: 1.8;
+  }
+
+  &__summary {
+    padding: 0.5rem 0.75rem;
+    border-radius: 4px;
+    background-color: rgba(255, 193, 7, 0.15);
+
+    &--identical {
+      background-color: rgba(76, 175, 80, 0.15);
+      font-weight: 600;
+    }
+  }
+
+  .tabs-wrapper {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+
+    .tab-content {
+      flex: 1;
+      min-height: 0;
+      overflow: auto;
+    }
+  }
+
+  &__split {
+    display: grid;
+    grid-template-columns: minmax(18rem, 2fr) 3fr;
+    gap: 1rem;
+    height: 100%;
+    min-height: 0;
+
+    @media (max-width: 800px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__tree,
+  &__details {
+    overflow: auto;
+    min-height: 0;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding-right: 0.5rem;
+    border-left: 3px solid transparent;
+    cursor: pointer;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+    }
+
+    &--active {
+      background-color: rgba(33, 150, 243, 0.12);
+    }
+
+    &--added {
+      border-left-color: $colorSuccess;
+    }
+
+    &--changed {
+      border-left-color: $colorWarning;
+    }
+
+    &--removed {
+      border-left-color: $colorError;
+    }
+
+    &--layout-only {
+      border-left-style: dashed;
+    }
+  }
+
+  &__row-button {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 2rem;
+    padding: 0;
+    border: none;
+    background: none;
+    font: inherit;
+    color: inherit;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  &__row-name {
+    font-weight: 600;
+  }
+
+  &__checkbox-placeholder {
+    display: inline-block;
+    width: 2rem;
+  }
+
+  &__badge {
+    padding: 0 0.4rem;
+    border-radius: 0.75rem;
+    font-size: 0.75rem;
+    color: $colorOnPrimary;
+
+    &--added {
+      background-color: $colorSuccess;
+    }
+
+    &--changed {
+      background-color: $colorWarning;
+    }
+
+    &--removed {
+      background-color: $colorError;
+    }
+  }
+
+  &__details-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  &__details-path {
+    font-family: monospace;
+    font-weight: 600;
+  }
+
+  &__details-empty {
+    padding: 1rem;
+    color: $colorOnSurfaceVariant;
+  }
+
+  &__reasons {
+    margin: 0.5rem 0;
+    padding-left: 1.25rem;
+
+    &--error {
+      color: $colorError;
+    }
+
+    &--warning {
+      color: $colorWarning;
+    }
+  }
+
+  &__prop-diffs {
+    width: 100%;
+    margin: 0.5rem 0;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 0.25rem 0.5rem;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+      text-align: left;
+      vertical-align: top;
+    }
+  }
+
+  &__prop-key {
+    font-weight: 600;
+  }
+
+  &__prop-group {
+    margin-left: 0.4rem;
+    font-size: 0.75rem;
+    color: $colorOnSurfaceVariant;
+  }
+
+  &__value {
+    font-size: 0.85rem;
+    overflow-wrap: anywhere;
+  }
+
+  &__value-line {
+    white-space: pre-wrap;
+  }
+
+  &__value-label {
+    color: $colorOnSurfaceVariant;
+  }
+
+  &__value-code {
+    font-family: monospace;
+  }
+
+  &__value-separator {
+    margin: 0.25rem 0;
+    border: none;
+    border-top: 1px dashed rgba(0, 0, 0, 0.15);
+  }
+
+  &__value-empty {
+    font-style: italic;
+    color: $colorOnSurfaceVariant;
+  }
+
+  &__source {
+    background-color: rgba(76, 175, 80, 0.06);
+  }
+
+  &__target {
+    background-color: rgba(244, 67, 54, 0.04);
+  }
+
+  &__simple-item {
+    margin-bottom: 0.75rem;
+  }
+}
+
+.survey-compare__removal {
+  margin: 0.5rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(244, 67, 54, 0.4);
+  border-radius: 4px;
+  background-color: rgba(244, 67, 54, 0.05);
+}
+
+.survey-compare__removal-header,
+.survey-compare__rename {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.survey-compare__deletion-note {
+  padding: 0 0.4rem;
+  border-radius: 4px;
+  background-color: $colorError;
+  color: $colorOnPrimary;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.survey-compare__deletion-info {
+  margin: 0.5rem 0;
+  color: $colorError;
+  font-size: 0.9rem;
+}

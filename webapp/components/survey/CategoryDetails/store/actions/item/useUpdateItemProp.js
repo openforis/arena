@@ -32,7 +32,9 @@ export const useUpdateItemProp = ({ setState }) => {
     dispatch(
       debounceAction(
         _putPropAction({ surveyId, categoryUuid, itemUuid, key, value, setState }),
-        `category_item_update_${itemUuid}`
+        // one debounce per item prop: otherwise editing another prop of the same item (e.g. code and then label)
+        // before the previous change has been saved would discard it
+        `category_item_update_${itemUuid}_${key}`
       )
     )
   }, [])

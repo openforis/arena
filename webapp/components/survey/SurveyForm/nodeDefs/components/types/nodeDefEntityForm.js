@@ -2,7 +2,7 @@ import './nodeDefEntityForm.scss'
 
 import React, { useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -32,8 +32,8 @@ const NodeDefEntityForm = (props) => {
 
   // when there is no entity selected, select the first one
   useEffect(() => {
-    if (entry && !selectedNode && !R.isEmpty(nodes)) {
-      const nodeUuid = R.pipe(R.head, Node.getUuid)(nodes)
+    if (entry && !selectedNode && !A.isEmpty(nodes)) {
+      const nodeUuid = A.pipe(A.head, Node.getUuid)(nodes)
       if (nodeUuid) {
         dispatch(SurveyFormActions.setFormPageNode(nodeDef, nodeUuid))
       }

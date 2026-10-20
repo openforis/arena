@@ -36,7 +36,7 @@ export const initSystem = () => async (dispatch) => {
         i18n.changeLanguage(userPreferredLanguage)
       }
 
-      dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n }))
+      dispatch(MessageNotificationActions.fetchMessagesNotifiedToUser({ i18n, user }))
     }
     dispatch({ type: SystemActionTypes.SYSTEM_INIT, ...systemInitPayload })
   } catch (error) {

@@ -39,7 +39,7 @@ export default class RecordsCloneJob extends Job {
     this.total = recordsToClone.length
 
     for (const recordSummary of recordsToClone) {
-      await this.cloneRecord({ recordSummary })
+      await this.cloneRecord({ recordSummary }) // NOSONAR
     }
   }
 
@@ -103,7 +103,7 @@ export default class RecordsCloneJob extends Job {
     for (const node of nodesArray) {
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
-        await this.nodesInsertBatchPersister.addItem(node)
+        await this.nodesInsertBatchPersister.addItem(node) // NOSONAR
       }
     }
 
@@ -120,9 +120,9 @@ export default class RecordsCloneJob extends Job {
     const { surveyId } = context
 
     for (const [fileUuid, newFileUuid] of Object.entries(newFileUuidsByOldUuid)) {
-      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx)
+      const fileSummary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid, tx) // NOSONAR
       if (fileSummary) {
-        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx)
+        const content = await SurveyFileService.fetchFileContentAsBuffer({ surveyId, fileSummary }, tx) // NOSONAR
         const oldNodeUuid = SurveyFile.getNodeUuid(fileSummary)
         const newNodeUuid = oldNodeUuid ? newNodeUuidsByOldUuid[oldNodeUuid] : null
         const newFile = SurveyFile.createFile({
@@ -134,7 +134,7 @@ export default class RecordsCloneJob extends Job {
           type: SurveyFile.SurveyFileType.recordAttachment,
           uuid: newFileUuid,
         })
-        await SurveyFileService.insertFile(surveyId, newFile, tx)
+        await SurveyFileService.insertFile(surveyId, newFile, tx) // NOSONAR
       }
     }
   }

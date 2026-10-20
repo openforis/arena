@@ -44,8 +44,10 @@ export const CoordinateAttributePolygon = (props) => {
   const pointDistanceLat = latitudeDeg / numberOfPointsNorth
   const startLat = bounds.getSouthWest().lat + latitudeDeg / numberOfPointsEast / 2 - pointSizeLat / 2
 
-  const [colors, setColors] = useState([...Array(numberOfPointsEast)].map(() => Array(numberOfPointsNorth).fill(0))) // this generates zero matrix
-  const [circleColors, setCircleColors] = useState(Array(numberOfPointsCircle).fill(0))
+  const [colors, setColors] = useState(
+    Array.from({ length: numberOfPointsEast }, () => new Array(numberOfPointsNorth).fill(0))
+  ) // this generates zero matrix
+  const [circleColors, setCircleColors] = useState(new Array(numberOfPointsCircle).fill(0))
   let circleControlPointIndex = 0
 
   const onClickControlPoint = (j, i) => {

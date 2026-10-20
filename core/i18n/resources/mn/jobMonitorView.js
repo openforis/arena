@@ -8,8 +8,6 @@ export default {
     survey: 'Судалгаа',
     user: 'Хэрэглэгч',
     progress: 'Явц',
-    elapsed: 'Өнгөрсөн хугацаа',
-    remaining: 'Үлдсэн хугацаа (тооцоолсон)',
     startedAt: 'Эхэлсэн огноо',
   },
   status: {

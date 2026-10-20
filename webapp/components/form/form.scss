@@ -45,7 +45,7 @@
 
 .form-input {
   &[readonly] {
-    border-bottom: 1px solid rgba($greyBorder, 0.5);
+    border-bottom: 1px solid with-alpha($colorOutline, 0.5);
   }
 }
 
@@ -56,12 +56,12 @@
 
 .input-text {
   .MuiInputBase-root.Mui-disabled {
-    background-color: #f5f5f5;
+    background-color: $colorBackground;
   }
 }
 
 .sampling-polygon-editor {
-  border: solid black;
+  border: solid $colorOnSurface;
   border-radius: 50px;
   border-width: 2px;
   padding: 10px;

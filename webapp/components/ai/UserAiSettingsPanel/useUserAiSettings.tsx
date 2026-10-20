@@ -8,7 +8,7 @@ import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useI18n } from '@webapp/store/system'
 
-export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity'
+export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
 
 export const FEATURE_CATEGORIES: FeatureCategory[] = [
   'chat',
@@ -16,6 +16,7 @@ export const FEATURE_CATEGORIES: FeatureCategory[] = [
   'translation',
   'dataDictionary',
   'userActivity',
+  'dataQuery',
 ]
 
 type FeatureToggles = Record<FeatureCategory, boolean>
@@ -26,6 +27,7 @@ const defaultFeatureToggles = (): FeatureToggles => ({
   translation: false,
   dataDictionary: false,
   userActivity: false,
+  dataQuery: false,
 })
 
 export const OTHER_MODEL_VALUE = '__other__'
@@ -237,6 +239,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   }, [notifyError])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch settings on mount
     fetchSettings()
   }, [fetchSettings])
 

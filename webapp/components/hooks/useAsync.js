@@ -15,24 +15,21 @@ const actionHandlersByType = {
   [ACTION_TYPES.error]: (error) => ({ error, loading: false, loaded: false }),
 }
 
-export default ({ method, url, data, params, ...rest }) => {
+const useAsync = ({ method, url, data, params, ...rest }) => {
   const [state, _dispatch] = useReducer((_state, { type, payload }) => actionHandlersByType[type](payload), {
     loading: false,
     loaded: false,
-    source: null,
+    abortController: null,
   })
   const isMountedRef = useIsMountedRef()
 
   const dispatch = () => {
-    const { source: sourcePrev } = state
-    if (sourcePrev) {
-      sourcePrev.cancel()
-    }
-    const source = axios.CancelToken.source()
+    state.abortController?.abort()
+    const abortController = new AbortController()
 
-    _dispatch({ type: ACTION_TYPES.loading, payload: { ...state, source } })
+    _dispatch({ type: ACTION_TYPES.loading, payload: { ...state, abortController } })
 
-    axios({ ...rest, method, url, data, params, cancelToken: source.token })
+    axios({ ...rest, method, url, data, params, signal: abortController.signal })
       .then((result) => {
         if (isMountedRef.current) {
           _dispatch({ type: ACTION_TYPES.loaded, payload: result })
@@ -55,3 +52,5 @@ export default ({ method, url, data, params, ...rest }) => {
     setState,
   }
 }
+
+export default useAsync

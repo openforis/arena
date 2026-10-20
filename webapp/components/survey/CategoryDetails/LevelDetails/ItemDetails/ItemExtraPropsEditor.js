@@ -12,7 +12,7 @@ import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useI18n } from '@webapp/store/system'
 import { useSurveySrsIndex } from '@webapp/store/survey'
 
-const pointNumericFields = ['x', 'y']
+const pointNumericFields = new Set(['x', 'y'])
 
 const parsePoint = ({ value, srsIndex }) => {
   const srssArray = Object.values(srsIndex)
@@ -35,7 +35,7 @@ const GeometryPointExtraPropEditor = (props) => {
   const { x, y, srs } = point
 
   const onFieldChange = (field) => (value) => {
-    let pointUpdated = { ...point, [field]: pointNumericFields.includes(field) ? Numbers.toNumber(value) : value }
+    let pointUpdated = { ...point, [field]: pointNumericFields.has(field) ? Numbers.toNumber(value) : value }
     if (Objects.isEmpty(pointUpdated.x) && Objects.isEmpty(pointUpdated.y)) {
       pointUpdated = null
     }

@@ -12,7 +12,7 @@ const initialize = async () => {
   await appCluster.run()
 }
 
-initialize()
+void initialize()
 
 // SERVER CLUSTERING DISABLED FOR NOW
 // if (cluster.isMaster) {

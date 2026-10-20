@@ -41,6 +41,61 @@ const _rowToObject = ({ headers, row }) => {
   return result
 }
 
+/**
+ * Reads the rows of a flat data stream one at a time (CSV rows are not kept in memory).
+ * @param {object} params - The parameters.
+ * @param {object} params.stream - The readable stream.
+ * @param {string} [params.fileFormat] - Format of the data (csv or xlsx).
+ * @param {(headers: string[]) => void | Promise<void>} [params.onHeaders] - Called (and awaited) with the headers, before the first row is yielded.
+ * @param {(total: number) => void} [params.onTotalChange] - Called when the total number of rows changes.
+ * @yields {object} The rows, as objects indexed by header.
+ */
+export async function* generateRowsFromStream({
+  stream,
+  fileFormat = FileFormats.csv,
+  onHeaders = null,
+  onTotalChange = null,
+}) {
+  const csv = fileFormat === FileFormats.csv
+  const rows = csv
+    ? stream.pipe(parse({ ignoreEmpty: true }))
+    : await ExcelReader.extractRowsFromExcelStream({ stream })
+  if (onTotalChange && !csv) {
+    onTotalChange(rows.length)
+  }
+  let headers = null
+  let total = 0
+  for await (const row of rows) {
+    // Skip first row (headers)
+    if (onTotalChange && csv && total++ > 0) {
+      onTotalChange(total)
+    }
+    if (headers) {
+      yield _rowToObject({ headers, row })
+    } else {
+      headers = _extractValidHeaders(row)
+      if (onHeaders) await onHeaders(headers)
+    }
+  }
+}
+
+/**
+ * Reads the rows of a flat data file one at a time (CSV rows are not kept in memory).
+ * @param {object} params - The parameters.
+ * @param {string} params.filePath - Path of the file.
+ * @param {string} [params.fileFormat] - Format of the file (csv or xlsx).
+ * @param {(headers: string[]) => void | Promise<void>} [params.onHeaders] - Called (and awaited) with the headers, before the first row is yielded.
+ * @yields {object} The rows, as objects indexed by header.
+ */
+export async function* generateRowsFromFile({ filePath, fileFormat = FileFormats.csv, onHeaders = null }) {
+  const stream = FileUtils.createReadStream(filePath)
+  try {
+    yield* generateRowsFromStream({ stream, fileFormat, onHeaders })
+  } finally {
+    stream.destroy()
+  }
+}
+
 export const createReaderFromStream = ({
   stream,
   fileFormat = FileFormats.csv,
@@ -50,54 +105,24 @@ export const createReaderFromStream = ({
 }) => {
   const readerStatus = { canceled: false }
 
-  const _tryOrCancel = async (fnPromise) => {
+  const cancel = () => {
+    readerStatus.canceled = true
+    stream?.destroy()
+  }
+
+  const start = async () => {
+    // a destroyed stream would never end
+    if (readerStatus.canceled) return
+
     try {
-      await fnPromise
+      for await (const row of generateRowsFromStream({ stream, fileFormat, onHeaders, onTotalChange })) {
+        if (readerStatus.canceled) break
+        if (onRow) await onRow(row)
+      }
     } catch (error) {
       cancel()
       throw error
     }
-  }
-
-  const parser = fileFormat === FileFormats.csv ? stream.pipe(parse({ ignoreEmpty: true })) : null
-
-  const start = async () => {
-    let headers = null
-    let total = 0
-
-    const _processRow = async (row) => {
-      // Skip first row (headers)
-      if (onTotalChange && fileFormat === FileFormats.csv && total++ > 0) {
-        onTotalChange(total)
-      }
-      if (headers) {
-        // Headers have been read, process row
-        if (onRow) await _tryOrCancel(onRow(_rowToObject({ headers, row })))
-      } else {
-        // Process headers
-        headers = _extractValidHeaders(row)
-        if (onHeaders) await _tryOrCancel(onHeaders(headers))
-      }
-    }
-
-    const parserOrRows =
-      fileFormat === FileFormats.csv ? parser : await ExcelReader.extractRowsFromExcelStream({ stream })
-
-    if (onTotalChange && fileFormat === FileFormats.xlsx) {
-      onTotalChange(parserOrRows.length)
-    }
-    for await (const row of parserOrRows) {
-      if (readerStatus.canceled) {
-        break
-      } else {
-        await _processRow(row)
-      }
-    }
-  }
-
-  const cancel = () => {
-    readerStatus.canceled = true
-    stream?.destroy()
   }
 
   return { start, cancel }

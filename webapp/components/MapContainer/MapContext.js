@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -25,19 +25,26 @@ const MapContextProvider = ({ children }) => {
   const sampleBasedImageInterpretationEnabled = Survey.isSampleBasedImageInterpretationEnabled(survey)
   const [contextObject, setContextObject] = useState(createInitialState({ sampleBasedImageInterpretationEnabled }))
 
-  const onOptionUpdate = ({ option, value }) =>
-    setContextObject((contextPrev) => {
-      const optionsPrev = contextPrev.options
-      const optionsNext = MapOptions.assocOption({ option, value })(optionsPrev)
-      return { ...contextPrev, options: optionsNext }
-    })
+  const onOptionUpdate = useCallback(
+    ({ option, value }) =>
+      setContextObject((contextPrev) => {
+        const optionsPrev = contextPrev.options
+        const optionsNext = MapOptions.assocOption({ option, value })(optionsPrev)
+        return { ...contextPrev, options: optionsNext }
+      }),
+    []
+  )
+
+  const onBaseLayerUpdate = useCallback(
+    (baseLayer) => setContextObject((contextPrev) => ({ ...contextPrev, baseLayer })),
+    []
+  )
 
   // Context values passed to consumer
-  const value = {
-    contextObject,
-    onOptionUpdate,
-    onBaseLayerUpdate: (baseLayer) => setContextObject((contextPrev) => ({ ...contextPrev, baseLayer })),
-  }
+  const value = useMemo(
+    () => ({ contextObject, onOptionUpdate, onBaseLayerUpdate }),
+    [contextObject, onBaseLayerUpdate, onOptionUpdate]
+  )
 
   return <MapContext.Provider value={value}>{children}</MapContext.Provider>
 }

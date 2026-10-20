@@ -5,6 +5,12 @@ export class TaxonomyBuilder {
   constructor(name) {
     this.name = name
     this._extraProps = {}
+    this._descriptions = {}
+  }
+
+  description(description, lang = 'en') {
+    this._descriptions[lang] = description
+    return this
   }
 
   extraProps(extraPropsDefs) {
@@ -25,6 +31,7 @@ export class TaxonomyBuilder {
     const taxonomy = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: this.name,
       [Taxonomy.keysProps.extraPropsDefs]: this._extraProps,
+      [Taxonomy.keysProps.descriptions]: this._descriptions,
     })
 
     const taxa = this.taxonBuilders.map((taxonBuilder) => taxonBuilder.build(taxonomy))

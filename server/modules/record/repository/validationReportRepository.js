@@ -1,4 +1,4 @@
-import { Transform } from 'stream'
+import { Transform } from 'node:stream'
 
 import * as A from '@core/arena'
 import * as RecordValidation from '@core/record/recordValidation'

@@ -10,6 +10,9 @@ const actionHandlers = {
 
   [DialogConfirmActions.DIALOG_CONFIRM_TEXT_CHANGE]: (state, { text }) =>
     DialogConfirmState.setStrongConfirmText(text)(state),
+
+  [DialogConfirmActions.DIALOG_CONFIRM_CHECKBOX_CHANGE]: (state, { checked }) =>
+    DialogConfirmState.setCheckboxChecked(checked)(state),
 }
 
 export default exportReducer(actionHandlers)

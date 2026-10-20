@@ -17,16 +17,20 @@
     row-gap: 1rem;
 
     .highlight {
-      background-color: $yellow;
-      color: black;
+      background-color: $colorHighlight;
+      color: $colorOnSurface;
       line-height: 2rem;
       text-align: center;
     }
 
     .dialog-confirm__input-text {
-      background-color: white;
+      background-color: $colorSurface;
       padding: 1rem;
       text-align: center;
+    }
+
+    .btn-checkbox {
+      align-self: center;
     }
 
     ul {
@@ -37,5 +41,10 @@
         line-height: 2rem;
       }
     }
+  }
+
+  &.dialog-confirm--list-not-scrollable .modal-body ul {
+    max-height: none;
+    overflow-y: visible;
   }
 }

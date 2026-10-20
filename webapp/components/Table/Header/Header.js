@@ -6,8 +6,12 @@ import { VisibleColumnsMenu } from './VisibleColumnsMenu'
 const Header = (props) => {
   const {
     columns,
+    count,
     headerLeftComponent,
     headerProps = {},
+    limit,
+    list,
+    offset,
     onVisibleColumnsChange,
     totalCount,
     visibleColumnsSelectionEnabled = false,
@@ -16,7 +20,7 @@ const Header = (props) => {
 
   return (
     <div className="table__header">
-      {React.createElement(headerLeftComponent, { ...props, ...headerProps })}
+      {React.createElement(headerLeftComponent, { ...props, count, limit, list, offset, ...headerProps })}
       {visibleColumnsSelectionEnabled && totalCount > 0 && (
         <VisibleColumnsMenu
           columns={columns}

@@ -29,15 +29,18 @@ const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
 }
 
 const _onUpdateMultiple = ({ survey, surveyCycleKey, nodeDef, value: multiple }) => {
-  // Reset validations required or count
+  // Reset validations required (or required if) or count
   const validations = NodeDef.getValidations(nodeDef)
   const validationsUpdated = multiple
-    ? NodeDefValidations.dissocRequired(validations)
+    ? A.pipe(NodeDefValidations.dissocRequired, NodeDefValidations.dissocRequiredIf)(validations)
     : NodeDefValidations.dissocCount(validations)
   let nodeDefUpdated = NodeDef.assocValidations(validationsUpdated)(nodeDef)
 
   if (NodeDef.isEntity(nodeDefUpdated) && !multiple) {
     nodeDefUpdated = NodeDef.dissocEnumerate(nodeDefUpdated)
+    nodeDefUpdated = NodeDef.mergePropsAdvanced({
+      [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null,
+    })(nodeDefUpdated)
 
     if (NodeDefLayout.isRenderTable(surveyCycleKey)(nodeDefUpdated)) {
       const nodeDefsUpdated = Survey.updateLayoutProp({
@@ -90,9 +93,24 @@ const _onUpdateAutoIncrementalKey = ({ survey, nodeDef, value }) => {
   )(nodeDef)
 }
 
+// key attributes are always required: "required if" doesn't apply to them
+const _onUpdateKey = ({ nodeDef, value: key }) => {
+  if (!key) return nodeDef
+  const validations = NodeDef.getValidations(nodeDef)
+  return NodeDef.assocValidations(NodeDefValidations.dissocRequiredIf(validations))(nodeDef)
+}
+
+const _onUpdateEnumerate = ({ nodeDef, value }) => {
+  if (value) return nodeDef
+
+  return NodeDef.mergePropsAdvanced({ [NodeDef.keysPropsAdvanced.enumeratingItemsExpression]: null })(nodeDef)
+}
+
 const updateFunctionByProp = {
   [NodeDef.propKeys.categoryUuid]: _onUpdateCategoryUuid,
   [NodeDef.propKeys.multiple]: _onUpdateMultiple,
+  [NodeDef.propKeys.key]: _onUpdateKey,
+  [NodeDef.propKeys.enumerate]: _onUpdateEnumerate,
   [NodeDef.propKeys.name]: _onUpdateName,
   [NodeDef.propKeys.autoIncrementalKey]: _onUpdateAutoIncrementalKey,
 }

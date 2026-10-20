@@ -23,7 +23,7 @@ export default class TaxonomiesExportJob extends Job {
 
     // for each taxonomy create a  `${taxonomy}.json` file with the taxa
     for (const taxonomy of taxonomies) {
-      await this.exportTaxonomy({ taxonomy })
+      await this.exportTaxonomy({ taxonomy }) // NOSONAR
     }
   }
 
@@ -37,7 +37,7 @@ export default class TaxonomiesExportJob extends Job {
 
     for (const pageIndex of pageIndexes) {
       const offset = pageIndex * taxaBatchSize
-      const taxaData = await TaxonomyService.fetchTaxaWithVernacularNames(
+      const taxaData = /* NOSONAR */ await TaxonomyService.fetchTaxaWithVernacularNames(
         { surveyId, taxonomyUuid, backup, draft, offset, limit: taxaBatchSize },
         this.tx
       )

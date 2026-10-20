@@ -35,7 +35,7 @@ export default class FilesExportJob extends Job {
       for (const fileUuid of fileUuids) {
         const exportedFileName = fileNamesByFileUuid[fileUuid]
         if (Objects.isNotEmpty(exportedFileName)) {
-          await this.writeFile({ fileUuid, cycle })
+          await this.writeFile({ fileUuid, cycle }) // NOSONAR
         }
         this.incrementProcessedItems()
       }

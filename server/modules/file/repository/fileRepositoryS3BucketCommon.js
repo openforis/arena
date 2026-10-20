@@ -99,12 +99,22 @@ export const createS3BucketRepository = ({ getFileKey }) => {
 
   const deleteFile = async (params) => {
     const command = new DeleteObjectCommand(createCommandParams({ getFileKey, params }))
-    return _sendCommand(command)
+    try {
+      return await _sendCommand(command)
+    } catch (error) {
+      // ignore error if the object is already missing from the bucket (nothing left to delete);
+      // check the specific error name rather than the (ambiguous) 404 status alone, so that e.g. a
+      // missing/misconfigured bucket (NoSuchBucket) still fails loudly instead of being swallowed
+      if (error.name === 'NoSuchKey') {
+        return null
+      }
+      throw error
+    }
   }
 
   const deleteFiles = async ({ fileUuids, ...params }) => {
     for (const fileUuid of fileUuids) {
-      await deleteFile({ ...params, fileUuid })
+      await deleteFile({ ...params, fileUuid }) // NOSONAR
     }
   }
 
@@ -120,7 +130,7 @@ export const createS3BucketRepository = ({ getFileKey }) => {
         Prefix: prefix,
         ...(continuationToken ? { ContinuationToken: continuationToken } : {}),
       })
-      const response = await _sendCommand(command)
+      const response = await _sendCommand(command) // NOSONAR
       results.push(...(response.Contents ?? []))
       continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
     } while (continuationToken)

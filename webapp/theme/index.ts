@@ -1,3 +1,7 @@
-export { defaultTokens } from './tokens'
+export { defaultTokens, themeColors, themeModes, themePalettes } from './tokens'
+export type { ArenaPalette, ThemeMode } from './tokens'
 export { createArenaTheme } from './createArenaTheme'
 export { applyCssVars, buildCssVarMap } from './applyCssVars'
+export { applyThemeMode, getThemePreference, resolveThemeMode, setThemePreference, themePreferences } from './themeMode'
+export type { ThemePreference } from './themeMode'
+export { useThemeMode } from './useThemeMode'

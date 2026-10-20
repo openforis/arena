@@ -36,8 +36,11 @@ export default class DelayedDeleteCache extends ItemsCache {
   _resetDeleteTimeout(key) {
     this._clearDeleteTimeout(key)
 
-    this._deleteTimeoutIdByKey[key] = setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       super.delete(key)
     }, this.options.deleteDelaySeconds * 1000)
+    // delete timer must not keep the process alive (e.g. at the end of the tests)
+    timeoutId.unref?.()
+    this._deleteTimeoutIdByKey[key] = timeoutId
   }
 }

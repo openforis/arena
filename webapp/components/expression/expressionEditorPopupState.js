@@ -16,7 +16,8 @@ const initialState = {
   exprDraftValid: true,
 }
 
-const ADVANCED_EXPRESSION_SUFFIX = '\n'
+// Newlines can only appear in a textarea, so a trailing newline denotes an advanced mode expression.
+export const ADVANCED_EXPRESSION_SUFFIX = '\n'
 
 const getExpressionOrParseQuery = ({ expr, query, mode, canBeConstant }) => {
   try {
@@ -47,9 +48,7 @@ export const useExpressionEditorPopupState = (props) => {
   const lang = useSurveyPreferredLang()
   const editorType = type.length === 1 ? type[0] : null
 
-  // An encoding trick. Newlines can only appear in a textarea,
-  // so denote advanced mode expressions as anything that contains a newline.
-  // The editing component ensures that all intermediate values will contain one.
+  // The editing component ensures that all intermediate values will contain a newline.
   const initialAdvanced =
     editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
 
@@ -61,8 +60,8 @@ export const useExpressionEditorPopupState = (props) => {
     return {
       ...initialState,
       advanced: initialAdvanced,
-      query: initialAdvanced ? query.trimRight() : queryDraft,
-      queryDraft: initialAdvanced ? query.trimRight() : queryDraft,
+      query: initialAdvanced ? query.trimEnd() : queryDraft,
+      queryDraft: initialAdvanced ? query.trimEnd() : queryDraft,
       queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
@@ -137,7 +136,7 @@ export const useExpressionEditorPopupState = (props) => {
   const [variables, setVariables] = useState([])
   useEffect(() => {
     const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-    ExpressionVariables.getVariables({
+    void ExpressionVariables.getVariables({
       survey,
       cycle,
       nodeDefContext,

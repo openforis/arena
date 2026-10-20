@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .ai-expression-popup {
   .modal-body {
     display: flex;
@@ -7,22 +9,12 @@
 
   &__hint {
     font-size: 0.85rem;
-    color: var(--colorGrey700);
-  }
-
-  &__textarea {
-    width: 100%;
-    min-height: 5rem;
-    resize: vertical;
-    font: inherit;
-    padding: 0.5rem;
-    border: 1px solid var(--colorGrey500);
-    border-radius: 4px;
+    color: $colorOnSurfaceVariant;
   }
 
   &__result {
-    background: var(--colorGrey300);
-    border-left: 3px solid #2e7d32;
+    background: $colorSurfaceVariant;
+    border-left: 3px solid $colorSuccess;
     padding: 0.5rem 0.75rem;
     border-radius: 4px;
     font-family: monospace;
@@ -31,18 +23,17 @@
   }
 
   &__result--invalid {
-    border-left-color: #c62828;
-    background: #ffebee;
+    border-left-color: $colorError;
+    background: $colorErrorContainer;
   }
 
   &__explanation {
     font-size: 0.9rem;
-    color: var(--colorGrey700);
+    color: $colorOnSurfaceVariant;
   }
 
   &__error {
-    color: #c62828;
+    color: $colorError;
     font-size: 0.9rem;
   }
-
 }

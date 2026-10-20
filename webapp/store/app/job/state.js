@@ -1,11 +1,11 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as AppState from '../state'
 
 export const stateKey = 'job'
 
 const initialState = {}
-const getState = R.pipe(AppState.getState, R.propOr(initialState, stateKey))
+const getState = A.pipe(AppState.getState, A.propOr(initialState, stateKey))
 
 export const keys = {
   closeButton: 'closeButton',
@@ -20,19 +20,19 @@ export const keys = {
 // ====== READ
 export const getJob = getState
 
-export const getCloseButton = R.pipe(getJob, R.propOr(null, keys.closeButton))
+export const getCloseButton = A.pipe(getJob, A.propOr(null, keys.closeButton))
 
-export const getCloseButtonProps = R.pipe(getJob, R.propOr(null, keys.closeButtonProps))
+export const getCloseButtonProps = A.pipe(getJob, A.propOr(null, keys.closeButtonProps))
 
-export const getOnComplete = R.pipe(getJob, R.propOr(null, keys.onComplete))
+export const getOnComplete = A.pipe(getJob, A.propOr(null, keys.onComplete))
 
-export const isAutoHide = R.pipe(getJob, R.propOr(false, keys.autoHide))
+export const isAutoHide = A.pipe(getJob, A.propOr(false, keys.autoHide))
 
-export const getErrorKeyHeaderName = R.pipe(getJob, R.prop(keys.errorKeyHeaderName))
+export const getErrorKeyHeaderName = A.pipe(getJob, A.prop(keys.errorKeyHeaderName))
 
-export const getErrorsExportFileName = R.pipe(getJob, R.prop(keys.errorsExportFileName))
+export const getErrorsExportFileName = A.pipe(getJob, A.prop(keys.errorsExportFileName))
 
-export const getLongRunningMessageKey = R.pipe(getJob, R.prop(keys.longRunningMessageKey))
+export const getLongRunningMessageKey = A.pipe(getJob, A.prop(keys.longRunningMessageKey))
 
 export const hasJob = (state) => Object.keys(getJob(state)).length > 0
 

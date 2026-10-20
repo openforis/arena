@@ -19,6 +19,7 @@ export type RecordPrintableExportUrlParams = {
   entityDefUuid?: string
   entityNodeUuid?: string
   orientation?: PrintOrientation
+  includeQrCode?: boolean
 }
 
 export const getRecordPrintableExportUrl = ({
@@ -30,11 +31,15 @@ export const getRecordPrintableExportUrl = ({
   entityDefUuid,
   entityNodeUuid,
   orientation = PrintOrientations.portrait,
+  includeQrCode = false,
 }: RecordPrintableExportUrlParams): string => {
   const query = new URLSearchParams({ lang, exportScope, orientation })
   if (exportScope === PrintableExportScopes.currentPage) {
     if (entityDefUuid) query.set('entityDefUuid', entityDefUuid)
     if (entityNodeUuid) query.set('entityNodeUuid', entityNodeUuid)
+  }
+  if (includeQrCode) {
+    query.set('includeQrCode', 'true')
   }
   return `/api/survey/${surveyId}/record/${recordUuid}/export/${format}?${query}`
 }

@@ -3,13 +3,16 @@ import PropTypes from 'prop-types'
 
 import { Button, ButtonDownload } from '@webapp/components'
 import { TextInput } from '@webapp/components/form'
-import { useAuthCanCreateUsers } from '@webapp/store/user'
+import { useAuthCanCreateUsers, useUserIsSystemAdmin } from '@webapp/store/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 
+import { UsersBackupButtons } from './UsersBackup'
+
 export const TableHeaderLeft = (props) => {
-  const { search, handleSearch } = props
+  const { search, handleSearch, onUsersRestored } = props
 
   const canCreateUsers = useAuthCanCreateUsers()
+  const isSystemAdmin = useUserIsSystemAdmin()
   const navigate = useNavigate()
 
   return (
@@ -21,6 +24,7 @@ export const TableHeaderLeft = (props) => {
         onChange={handleSearch}
       />
       <ButtonDownload label="common.exportToExcel" href="/api/users/export" />
+      {isSystemAdmin && <UsersBackupButtons onUsersRestored={onUsersRestored} />}
       {canCreateUsers && (
         <Button label="appModules.userNew" onClick={() => navigate(appModuleUri(userModules.userNew))} />
       )}
@@ -32,4 +36,5 @@ export const TableHeaderLeft = (props) => {
 TableHeaderLeft.propTypes = {
   search: PropTypes.string,
   handleSearch: PropTypes.func.isRequired,
+  onUsersRestored: PropTypes.func,
 }

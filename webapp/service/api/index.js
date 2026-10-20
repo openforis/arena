@@ -1,5 +1,5 @@
 export { fetchLoggedInUserAndSurvey } from './fetchUserAndSurvey'
-export { downloadFileUrl, fetchVersion } from './generic'
+export { downloadFileUrl, fetchChangelog, fetchVersion } from './generic'
 export { fetchInfo } from './info'
 
 export {
@@ -16,7 +16,10 @@ export {
   deleteCategory,
   cleanupCategory,
   convertToReportingDataCategory,
+  convertToSamplingPointDataCategory,
+  convertToGeoPackageCategory,
   startExportAllCategoriesJob,
+  startExportCategoryToGeoPackageJob,
   startCategoriesBatchImportJob,
   updateCategoryProp,
   updateCategoryItemExtraDefItem,
@@ -28,8 +31,12 @@ export {
   fetchChainsForCloneFromSurvey,
   fetchChainSourceEntityNames,
   getChainSummaryExportUrl,
+  fetchChainMauFileSummary,
+  getChainMauFileDownloadUrl,
+  uploadChainMauFile,
   cloneChainFromSurvey,
   deleteChain,
+  deleteChainMauFile,
 } from './analysis'
 
 export {
@@ -58,6 +65,7 @@ export {
   fetchRecordsNodeFileExifInfo,
   createRecordFromSamplingPointDataItem,
   startCollectRecordsImportJob,
+  startOdkDataImportJob,
   startDataImportFromArenaJob,
   startArenaImportSummaryJob,
   cancelArenaImportSummary,
@@ -97,11 +105,13 @@ export {
   testMapApiKey,
   fetchMapWmtsCapabilities,
   startGeoAttributeJsonDataExport,
+  startSamplingPointDataWhispJob,
   getGeoJsonDataDownloadUrl,
   getEarthMapJsonDownloadUrl,
   getEarthMapPolygonUrl,
 } from './map'
 export { fetchNotifiedMessages } from './messageNotification'
+export { streamSystemLog } from './systemLog'
 export {
   fetchSurveyFull,
   fetchSurveys,
@@ -120,6 +130,7 @@ export {
   getSurveyFileDownloadUrl,
   getSurveyPdfExportUrl,
   startSchemaSummaryExportJob,
+  fetchSurveyForMobile,
 } from './survey'
 export {
   cloneNodeDefFromSurvey,
@@ -153,8 +164,31 @@ export {
   createTempAuthToken,
 } from './user'
 
+export {
+  startUsersBackupExport,
+  getUsersBackupDownloadUrl,
+  readUsersBackupImportPreview,
+  startUsersBackupImport,
+  cancelUsersBackupImport,
+} from './usersBackup'
+
 export { getDevices, getDevice, addDevice, verifyDevice, regenerateBackupCodes, removeDevice } from './user2FA'
+
+export {
+  startSurveyCompareJob,
+  fetchSurveyCompareResult,
+  startSurveyCompareApplyJob,
+  fetchSurveyFingerprint,
+} from './surveyCompare'
 
 export { contentTypes, objectToFormData } from './utils/apiUtils'
 
-export { aiSettings, aiExpression, aiTranslation, aiActivityLog, aiChatbot, streamSse as aiStreamSse } from './ai'
+export {
+  aiSettings,
+  aiExpression,
+  aiTranslation,
+  aiActivityLog,
+  aiChatbot,
+  aiDataQuery,
+  streamSse as aiStreamSse,
+} from './ai'

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
@@ -19,7 +19,7 @@ const keysExtra = {
 }
 
 const keysItem = {
-  location: 'location',
+  location: Category.locationItemExtraDefName,
 }
 
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
@@ -29,7 +29,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
     super(
       {
         ...params,
-        [CategoryImportJobParams.keys.categoryName]: Survey.samplingPointDataCategoryName,
+        [CategoryImportJobParams.keys.categoryName]: Category.samplingPointDataCategoryName,
       },
       'SamplingPointDataImportInternalJob'
     )
@@ -102,7 +102,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
     const point = PointFactory.createInstance({ srs, x, y })
 
     const extraUpdated = {
-      ...R.omit(R.keys(keysExtra))(extra),
+      ...A.omit(A.keys(keysExtra))(extra),
       [keysItem.location]: Points.toString(point),
     }
 

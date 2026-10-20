@@ -1,0 +1,17 @@
+name: Setup Node.js and install dependencies
+description: >
+  Sets up Node.js with the yarn cache and runs `yarn install --immutable`.
+  Requires the repository to already be checked out (actions/checkout must
+  run as a separate, preceding step in the calling job).
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      with:
+        node-version: '24.22.0'
+        cache: 'yarn'
+    - name: Yarn
+      shell: bash
+      run: yarn install --immutable
+      env:
+        YARN_ENABLE_SCRIPTS: false

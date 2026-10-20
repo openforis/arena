@@ -48,8 +48,8 @@ const useNodeDefPath = ({ item, survey }) => {
   return nodeDefPathParts.join(' > ')
 }
 
-export const useCollectImportReportItem = ({ row, rowNo }) => {
-  const [rowItem, setRowItem] = useState({ rowNo, ...row })
+export const useCollectImportReportItem = ({ item, itemPosition: rowNo }) => {
+  const [rowItem, setRowItem] = useState({ rowNo, ...item })
 
   const survey = useSurvey()
   const languages = useSurveyLangs()
@@ -61,8 +61,8 @@ export const useCollectImportReportItem = ({ row, rowNo }) => {
   const nodeDef = useNodeDef({ item: rowItem, survey })
 
   useOnUpdate(() => {
-    setRowItem({ rowNo, ...row })
-  }, [row])
+    setRowItem({ rowNo, ...item })
+  }, [item])
 
   return {
     rowNo,

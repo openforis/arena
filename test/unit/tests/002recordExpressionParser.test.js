@@ -198,7 +198,7 @@ describe('RecordExpressionParser Test', () => {
     { q: 'visit_date.week', e: new SystemError('expression.invalidAttributeValuePropertyName') },
     { q: 'visit_time.hour', r: 10 },
     { q: 'visit_time.minute', r: 30 },
-    { q: 'visit_time.seconds', e: new SystemError('expression.invalidAttributeValuePropertyName') },
+    { q: 'visit_time.seconds', r: 0 },
     // this
     { q: 'this', n: 'cluster/cluster_id', r: 12 },
     {
@@ -208,5 +208,13 @@ describe('RecordExpressionParser Test', () => {
     },
   ]
 
-  NodeDefExpressionUtils.testRecordExpressions({ surveyFn: () => survey, recordFn: () => record, queries })
+  const expressionEvaluator = NodeDefExpressionUtils.recordExpressionEvaluator({
+    surveyFn: () => survey,
+    recordFn: () => record,
+  })
+
+  test.each(NodeDefExpressionUtils.toTestCases(queries))('%s', async (_title, query) => {
+    const { actual, expected } = await NodeDefExpressionUtils.evaluateQuery({ query, expressionEvaluator })
+    expect(actual).toEqual(expected)
+  })
 })

@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Имя категории не указано',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Категория данных точек выборки уже существует в этом опросе; может быть только одна.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Невозможно удалить опубликованные элементы категории. Элементы, отсутствующие в импортированном файле: {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Неверное число в столбце {{headers}}: {{value}}',
     invalidTaxonCode: 'Неверный код в столбце {{headers}}: {{value}}',
     invalidTime:
-      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm. Например, 09:45 или 16:30',
+      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm или HH:mm:ss. Например, 09:45, 16:30 или 09:45:30',
     missingRequiredHeaders: 'Отсутствуют обязательные столбцы: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Ошибка обновления значений: {{details}}',
     multipleRecordsMatchingKeys: 'Найдено несколько записей, соответствующих ключам "{{keyValues}}"',
@@ -131,6 +136,9 @@ export default {
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
     readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
+    requiredIfInvalid: 'Неверное условие "Обязательно, если"',
+    requiredIfNotAllowed:
+      'Условие "Обязательно, если" допускается только для одиночных, неключевых и не всегда обязательных атрибутов',
     qualifierCannotHaveApplicableExpression:
       'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
@@ -214,6 +222,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Пользователь с таким адресом электронной почты уже существует',
     emailRequired: 'Электронная почта обязательна',
     emailInvalid: 'Неверный адрес электронной почты',
     emailNotFound: 'Адрес электронной почты не найден',
@@ -228,6 +237,7 @@ export default {
     userNotFound: 'Пользователь не найден. Убедитесь, что email и пароль верны',
     passwordChangeRequired: 'Требуется смена пароля',
     passwordResetNotAllowedWithPendingInvitation: `Сброс пароля не разрешен: пользователь был приглашен в опрос, но приглашение еще не принято`,
+    twoFactorTokenRequired: 'Код подтверждения обязателен',
   },
 
   userAccessRequest: {
@@ -241,6 +251,7 @@ export default {
     invalidRequest: 'Неверный запрос на доступ пользователя',
     userAlreadyExisting: 'Пользователь с адресом электронной почты {{email}} уже существует',
     requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
+    emailNotReachable: 'Не удалось доставить письмо с подтверждением на адрес {{email}}; проверьте правильность адреса',
     invalidReCaptcha: 'Неверная ReCaptcha',
   },
 
@@ -251,6 +262,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Роль обязательна',
     surveyNameRequired: 'Название опроса обязательно',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Группа с таким именем уже существует: {{name}}',
+    qualifiersInvalid: 'Один или несколько квалификаторов имеют недопустимый или повторяющийся ключ',
+    qualifierNameDuplicate: 'Квалификатор с таким именем уже существует в этой группе: {{name}}',
+    qualifierNameInvalid: 'Недопустимое имя квалификатора',
+    qualifierNameRequired: 'Имя квалификатора обязательно',
   },
 
   userPasswordChange: {

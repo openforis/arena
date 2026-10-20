@@ -1,4 +1,16 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
+  aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
+  aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
+  aiDataQueryNoEntities: 'Энэ судалгаанд хүсэлт гаргах боломжтой объект байхгүй байна.',
+  aiDataQuerySummaryInvalid: 'AI энэ хүсэлтийн нэр, тайлбарыг санал болгож чадсангүй. Дахин оролдоно уу.',
+  userCannotDeleteHasMessages:
+    'Энэ хэрэглэгчийг устгах боломжгүй: {{count}} мессежийн зохиогч байна; эхлээд тэдгээрийг устгах эсвэл өөр хэрэглэгчид шилжүүлнэ үү',
+  userCannotDeleteLastSystemAdmin: 'Энэ хэрэглэгчийг устгах боломжгүй: системийн сүүлчийн администратор байна',
+  userCannotDeleteOwnsSurveys:
+    'Энэ хэрэглэгчийг устгах боломжгүй: {{count}} судалгааны эзэмшигч байна; эхлээд эзэмшлийг шилжүүлнэ үү',
+  userCannotDeleteSelf: 'Та өөрийн хэрэглэгчийн бүртгэлийг устгах боломжгүй',
+  userEmailInvalid: 'Урилгын имэйлийг {{email}} хаяг руу хүргэж чадсангүй; хаяг зөв эсэхийг шалгана уу',
   cannotGetChild: "Атрибут {{name}}-с '{{childName}}' хүүг авч чадахгүй байна",
   cannotImportFilesExceedingQuota: 'Бичлэгийн файлуудыг импортлох боломжгүй: файл хадгалах квот хэтэрсэн',
   cannotInsertFileExceedingQuota: 'Файл оруулах боломжгүй: файл хадгалах квот хэтэрсэн',
@@ -21,6 +33,8 @@ export default {
     noRecordsFound: 'Импортын файлд бичлэг олдсонгүй эсвэл буруу файлын формат',
     pendingImportFileNotFoundOrExpired:
       'Өмнө оруулсан файл олдсонгүй; хугацаа нь дууссан байж магадгүй. Дахин оруулна уу.',
+    recordMergeWithSameKeysNotAllowed:
+      '"{{recordKeyValues}}" бичлэгийг импортлох боломжгүй: ижил түлхүүртэй өөр бичлэг аль хэдийн байгаа бөгөөд энэ судалгаанд ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөөгүй',
     recordOwnedByAnotherUser: '"{{recordKeyValues}}" бичлэг өөр хэрэглэгчид харьяалагддаг тул шинэчлэх боломжгүй',
   },
   entryDataNotFound: 'Оролтын өгөгдөл олдсонгүй: {{entryName}}',
@@ -50,18 +64,58 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Бичлэг шинэчлэхэд алдаа гарлаа; {{nodeDefName}} зангилааны илэрхийллийг үнэлэхэд алдаа гарлаа: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Одоогийн хуудсыг экспортлоход entityDefUuid болон entityNodeUuid шаардлагатай',
+    entityNotFound: 'Заасан экспортын нэгж олдсонгүй',
+    missingServerUrl: 'QR кодтой экспорт хийхэд нийтийн серверийн URL шаардлагатай',
+    qrTokenMismatch: 'QR кодтой экспортыг дуусгаж чадсангүй; дахин оролдоно уу',
+  },
   sessionExpiredRefreshPage: 'Сесс дууссан байж магадгүй.\nХуудсыг сэргээж үзнэ үү.',
   survey: {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
     dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
+    fileNotFound: 'Файл олдсонгүй',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
+  aiNotConfigured:
+    'AI тохируулагдаагүй байна. AI тохиргоонд хувийн үйлчилгээ үзүүлэгчийг тохируулах эсвэл администратороос анхдагч тохиргоо хийлгэнэ үү.',
+  aiFeaturesDisabled: 'Энэ суулгацад AI функцууд идэвхгүй байна.',
+  aiFeatureDisabled: 'AI функц "{{feature}}" идэвхгүй байна.',
+  aiPromptTooLarge: 'AI хүсэлт хэт том байна ({{size}} тэмдэгт; хязгаар {{limit}}).',
+  aiInputTooLong: 'AI оролтын талбар "{{field}}" нь {{limit}} тэмдэгтийн хязгаараас хэтэрсэн байна.',
+  aiSchemaMissing: '"{{feature}}" функцийн AI бүтэцлэгдсэн гаралтын схем байхгүй байна.',
+  aiProviderInvalid: 'Дэмжигдээгүй AI үйлчилгээ үзүүлэгч: {{provider}}.',
+  aiModelMissing: 'AI загварын танигч шаардлагатай.',
+  aiApiKeyMissing: '{{provider}} үйлчилгээ үзүүлэгчид API түлхүүр шаардлагатай.',
+  aiBaseUrlMissing: 'OpenAI-тай нийцтэй үйлчилгээ үзүүлэгчид суурь URL шаардлагатай.',
+  aiModelListFailed: 'Үйлчилгээ үзүүлэгчээс загваруудын жагсаалтыг авч чадсангүй: {{message}}',
+  aiExpressionDescriptionMissing: 'Хүссэн илэрхийллээ энгийн үгээр тайлбарлана уу.',
+  aiExpressionTypeInvalid: 'Тодорхойгүй илэрхийллийн төрөл: {{expressionType}}.',
+  aiExpressionNodeDefMissing: 'Зорилтот талбаргүйгээр илэрхийлэл үүсгэх боломжгүй.',
+  aiExpressionNodeDefNotFound: 'Зорилтот талбар олдсонгүй (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: 'Хоосон илэрхийллийг тайлбарлах боломжгүй.',
+  aiTranslationSocketMissing: 'WebSocket холбогдоогүй байна. Түр хүлээгээд дахин оролдоно уу.',
+  aiTranslationSourceLangMissing: 'Орчуулгад эх хэл шаардлагатай.',
+  aiTranslationTargetLangsMissing: 'Орчуулгад дор хаяж нэг зорилтот хэл шаардлагатай.',
+  aiTranslationItemsMissing: 'Орчуулах зүйл алга.',
+  aiTranslationTooManyItems: 'Нэг багцад хэт олон элемент байна ({{count}}); хязгаар нь {{limit}}.',
+  aiActivityLogSurveyMissing: 'Үйл ажиллагааны бүртгэлийг хураангуйлахад судалгаа шаардлагатай.',
+  aiChatbotDisabled: 'Энэ суулгацад баримт бичгийн чатбот идэвхгүй байна.',
+  aiChatbotUpstreamError:
+    'Баримт бичгийн чатбот түр хугацаанд ашиглах боломжгүй байна. Хэсэг хугацааны дараа дахин оролдоно уу.',
+  aiChatbotPayloadTooLarge: 'Таны харилцан яриа хэт том байна. Чатыг цэвэрлээд богино асуулт асууж үзнэ үү.',
   userHasPendingInvitation:
     "'{{email}}' имэйлтэй хэрэглэгчид хүлээгдэж буй урилга аль хэдийн байна; үүнийг хүлээн авах хүртэл түүнийг энэ судалгаанд урих боломжгүй",
   userHasRole: 'Өгөгдсөн хэрэглэгч энэ судалгаанд аль хэдийн үүрэгтэй байна',
   userHasRole_other: 'Өгөгдсөн хэрэглэгчид энэ судалгаанд аль хэдийн үүрэгтэй байна',
   userInvalid: 'Хэрэглэгч буруу байна',
+  surveyCompareFileTooLarge:
+    'Судалгааны файл хэт том байна (дээд тал нь {{maxSize}} MB): судалгааг өгөгдөлгүйгээр экспортлоно уу, судалгааг харьцуулахад бүртгэлүүд болон тэдгээрийн файлууд шаардлагагүй',
   userIsAdmin: 'Өгөгдсөн хэрэглэгч аль хэдийн системийн администратор байна',
   userNotAllowedToChangePref: 'Хэрэглэгч тохиргоог өөрчлөх боломжгүй',
   userNotAuthorized: 'Хэрэглэгч {{userName}} эрхгүй байна',
+  userNotFound: 'Хэрэглэгч олдсонгүй: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'Файл нь хүчинтэй Arena хэрэглэгчийн нөөц биш байна',
+  },
 }

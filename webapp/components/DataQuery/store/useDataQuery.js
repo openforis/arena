@@ -35,16 +35,21 @@ export const useDataQuery = ({ query, limitData = true }) => {
   const filter = Query.getFilter(query)
   const filterRecordUuid = Query.getFilterRecordUuid(query)
   const sort = Query.getSort(query)
+  const modeAggregate = Query.isModeAggregate(query)
+  // rows count depends only on entity, filter and (in aggregate mode) dimensions:
+  // it doesn't need to be fetched again when changing page, sort order or selected attributes
+  const countDimensions = modeAggregate ? dimensions : null
   const Actions = useActions({ setData, setCount })
 
   // on entity def uuid or filter update: reset data
   useOnUpdate(Actions.reset, [entityDefUuid, filter])
 
-  // on mount or on update offset, attributeDefUuids, dimensions, measures: fetch or reset
+  // on mount or on update entityDefUuid, offset, attributeDefUuids, dimensions, measures, sort or filter: fetch or reset data
   useEffect(() => {
-    if (hasSelection) Actions.fetch({ offset, limit, randomize, query })
-    else Actions.reset()
+    if (hasSelection) Actions.fetchData({ offset, limit, randomize, query })
+    else Actions.resetData()
   }, [
+    entityDefUuid,
     limit,
     offset,
     randomize,
@@ -55,16 +60,19 @@ export const useDataQuery = ({ query, limitData = true }) => {
     measuresAggregateFnsSize,
     mode,
     sort,
+    filter,
+    filterRecordUuid,
   ])
 
-  // on filter update: fetch data and count
-  useOnUpdate(() => {
-    if (hasSelection) Actions.fetch({ offset, limit, randomize, query, includesCount: true })
-  }, [filter, filterRecordUuid])
+  // on mount or on update of entity def uuid, filter or aggregate dimensions: fetch or reset count
+  useEffect(() => {
+    if (hasSelection) Actions.fetchCount({ query })
+    else Actions.resetCount()
+  }, [entityDefUuid, hasSelection, modeAggregate, countDimensions, filter, filterRecordUuid])
 
   return {
-    count: count && count.data,
-    data: data && data.data,
+    count: count?.data,
+    data: data?.data,
     dataEmpty,
     dataLoaded,
     dataLoading,

@@ -1,4 +1,4 @@
-import { Readable } from 'stream'
+import { Readable } from 'node:stream'
 
 import { Schemata } from '@common/model/db'
 
@@ -56,6 +56,21 @@ export const fetchFilesByRecordUuids = async ({ surveyId, recordUuids }, client 
     (row) => row
   )
 
+// Like fetchFilesByRecordUuids, but excludes soft-deleted files: used to tell a mobile client
+// which files it can skip re-uploading (a deleted file must still be re-sent if referenced again).
+export const fetchNonDeletedFileUuidsByRecordUuids = async ({ surveyId, recordUuids }, client = db) => {
+  if (recordUuids.length === 0) return []
+  return client.map(
+    `
+    SELECT uuid AS "fileUuid", props ->> '${SurveyFile.propKeys.recordUuid}' AS "recordUuid"
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+    WHERE ${NOT_DELETED_CONDITION}
+      AND props ->> '${SurveyFile.propKeys.recordUuid}' IN ($1:csv)`,
+    [recordUuids],
+    (row) => row
+  )
+}
+
 export const fetchFileUuidsBySurveyId = async ({ surveyId }, client = db) =>
   client.map(
     `
@@ -72,6 +87,18 @@ export const fetchFileSummariesByUuids = async ({ surveyId, fileUuids }, client 
     FROM ${Schemata.getSchemaSurvey(surveyId)}.file
     WHERE uuid IN ($1:csv)`,
     [fileUuids]
+  )
+}
+
+export const fetchExistingNonDeletedFileUuids = async ({ surveyId, fileUuids }, client = db) => {
+  if (fileUuids.length === 0) return []
+  return client.map(
+    `SELECT uuid
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.file
+    WHERE uuid IN ($1:csv)
+      AND ${NOT_DELETED_CONDITION}`,
+    [fileUuids],
+    (row) => row.uuid
   )
 }
 
@@ -133,7 +160,7 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
 
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
-  client.one(
+  client.oneOrNone(
     `
     UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
     SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
@@ -141,6 +168,18 @@ export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
     RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
     [uuid]
   )
+
+export const markFilesAsDeleted = async (surveyId, uuids, client = db) =>
+  uuids.length === 0
+    ? []
+    : client.manyOrNone(
+        `
+    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.file
+    SET props = jsonb_set(props, '{${SurveyFile.propKeys.deleted}}', 'true')
+    WHERE uuid IN ($1:csv)
+    RETURNING ${SUMMARY_FIELDS_COMMA_SEPARATED}`,
+        [uuids]
+      )
 
 export const markRecordFilesAsDeleted = async (surveyId, recordUuid, client = db) =>
   client.manyOrNone(
@@ -197,7 +236,10 @@ export const cleanupSurveyFilesProps = async ({ surveyId }, client = db) =>
     )
     const count = fileSummariesToClean?.length ?? 0
     if (count > 0) {
-      await t.batch(fileSummariesToClean.map((fileSummary) => cleanupFileProps({ surveyId, fileSummary }, t)))
+      await DbUtils.runQueries(
+        t,
+        fileSummariesToClean.map((fileSummary) => () => cleanupFileProps({ surveyId, fileSummary }, t))
+      )
     }
     return count
   })

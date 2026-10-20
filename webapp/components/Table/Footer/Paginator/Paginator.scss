@@ -10,3 +10,25 @@
     width: 6rem;
   }
 }
+
+.table__paginator-page {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin: 0;
+
+  .label {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .table__paginator-page-input {
+    width: 4rem;
+
+    input {
+      padding: 0.3rem 0.4rem;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+  }
+}

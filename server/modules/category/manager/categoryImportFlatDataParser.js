@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
 
@@ -14,7 +14,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 const _checkSrs = ({ survey, srs, columnName }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveySrss = Survey.getSRS(surveyInfo)
-  if (!surveySrss.find((surveySrs) => Srs.getCode(surveySrs) === srs)) {
+  if (!surveySrss.some((surveySrs) => Srs.getCode(surveySrs) === srs)) {
     throw new SystemError(Validation.messageKeys.categoryImport.srsNotDefined, { columnName, srs })
   }
 }
@@ -94,7 +94,7 @@ export const createRowsReaderFromStream = async ({ stream, survey, summary, onRo
         })
 
         // Determine level
-        const levelIndex = R.findLastIndex(StringUtils.isNotBlank)(codes)
+        const levelIndex = A.findLastIndex(StringUtils.isNotBlank)(codes)
 
         await onRowItem({
           levelIndex,

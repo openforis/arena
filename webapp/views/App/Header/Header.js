@@ -21,6 +21,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import { ThemeButtonMenu } from '@webapp/components/ThemeButtonMenu'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useHasMessageNotifications } from '@webapp/store/ui'
 
@@ -122,6 +123,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
+        <ThemeButtonMenu />
         <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"

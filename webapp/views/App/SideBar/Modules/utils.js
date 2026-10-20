@@ -1,8 +1,9 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
+import * as ProcessUtils from '@core/processUtils'
 
 import {
   analysisModules,
@@ -13,7 +14,7 @@ import {
   homeModules,
   userModules,
   helpModules,
-  messageModules,
+  systemAdminModules,
 } from '@webapp/app/appModules'
 
 const keys = {
@@ -37,89 +38,109 @@ const getModule = ({ module, children = null, root = true, hidden = false }) => 
   [keys.external]: module.external,
 })
 
-export const getModulesHierarchy = (user, surveyInfo) => {
+const getDesignerModule = (user, surveyInfo) => {
   const canEditSurvey = Authorizer.canEditSurvey(user, surveyInfo)
-  const canAnalyzeRecords = Authorizer.canAnalyzeRecords(user, surveyInfo)
-  const canExportRecords = Authorizer.canExportRecords(user, surveyInfo)
-  const canImportRecords = Authorizer.canImportRecords(user, surveyInfo)
+  return getModule({
+    module: appModules.designer,
+    children: [
+      ...(canEditSurvey ? [designerModules.formDesigner] : []),
+      designerModules.surveyHierarchy,
+      ...(canEditSurvey ? [designerModules.surveyDependencyTree] : []),
+      designerModules.categories,
+      designerModules.taxonomies,
+    ],
+  })
+}
 
+const getDataModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.data,
+    children: [
+      dataModules.records,
+      ...(Authorizer.canUseExplorer(user, surveyInfo) ? [dataModules.explorer] : []),
+      ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
+      ...(Authorizer.canExportRecords(user, surveyInfo) ? [dataModules.export] : []),
+      ...(Authorizer.canImportRecords(user, surveyInfo) ? [dataModules.import] : []),
+      ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
+    ],
+    hidden: Survey.isTemplate(surveyInfo),
+  })
+
+const getAnalysisModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.analysis,
+    children: [
+      analysisModules.chains,
+      ...(Survey.isPublished(surveyInfo) ? [analysisModules.instances] : []),
+      // , analysisModules.entities
+    ],
+    hidden: !Authorizer.canAnalyzeRecords(user, surveyInfo),
+  })
+
+const getUsersModule = (user, surveyInfo) =>
+  getModule({
+    module: appModules.users,
+    children: [
+      userModules.usersSurvey,
+      ...(Authorizer.canManageUserGroups(user, surveyInfo) ? [userModules.userGroups] : []),
+    ],
+    hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
+  })
+
+const getSystemAdminModules = (user) => {
+  if (!User.isSystemAdmin(user)) return []
+  const canViewUsersAccessRequests =
+    ProcessUtils.ENV.allowUserAccessRequest && Authorizer.canViewUsersAccessRequests(user)
   return [
-    // home
-    getModule({ module: appModules.home }),
-    getModule({ module: appModules.dashboard }),
-    // designer
     getModule({
-      module: appModules.designer,
+      module: appModules.systemAdmin,
       children: [
-        ...(canEditSurvey ? [designerModules.formDesigner] : []),
-        designerModules.surveyHierarchy,
-        ...(canEditSurvey ? [designerModules.surveyDependencyTree] : []),
-        designerModules.categories,
-        designerModules.taxonomies,
+        ...(canViewUsersAccessRequests ? [userModules.usersAccessRequest] : []),
+        ...(Authorizer.canViewAllUsers(user) ? [userModules.users] : []),
+        systemAdminModules.jobMonitor,
+        systemAdminModules.systemLogs,
+        systemAdminModules.messages,
       ],
-    }),
-    // data
-    getModule({
-      module: appModules.data,
-      children: [
-        dataModules.records,
-        ...(Authorizer.canUseExplorer(user, surveyInfo) ? [dataModules.explorer] : []),
-        ...(Authorizer.canUseMap(user, surveyInfo) ? [dataModules.map] : []),
-        ...(canExportRecords ? [dataModules.export] : []),
-        ...(canImportRecords ? [dataModules.import] : []),
-        ...(Authorizer.canCleanseRecords(user, surveyInfo) ? [dataModules.validationReport] : []),
-      ],
-      hidden: Survey.isTemplate(surveyInfo),
-    }),
-    // analysis
-    getModule({
-      module: appModules.analysis,
-      children: [
-        analysisModules.chains,
-        ...(Survey.isPublished(surveyInfo) ? [analysisModules.instances] : []),
-        // , analysisModules.entities
-      ],
-      hidden: !canAnalyzeRecords,
-    }),
-    // users
-    getModule({
-      module: appModules.users,
-      children: [
-        userModules.usersSurvey,
-        ...(Authorizer.canManageUserGroups(user, surveyInfo) ? [userModules.userGroups] : []),
-      ],
-      hidden: !Authorizer.canViewSurveyUsers(user, surveyInfo) || Survey.isTemplate(surveyInfo),
-    }),
-    // message
-    ...(User.isSystemAdmin(user)
-      ? [
-          getModule({
-            module: appModules.messages,
-            children: [messageModules.messages],
-          }),
-        ]
-      : []),
-    // job monitor
-    ...(User.isSystemAdmin(user) ? [getModule({ module: appModules.jobs })] : []),
-    getModule({
-      module: appModules.help,
-      children: [helpModules.userManual, helpModules.about, helpModules.disclaimer],
     }),
   ]
 }
 
-export const getKey = R.prop(keys.key)
-export const getUri = R.prop(keys.uri)
-export const getIcon = R.prop(keys.icon)
-export const getChildren = R.prop(keys.children)
+const getHelpModule = (user) =>
+  getModule({
+    module: appModules.help,
+    children: [
+      helpModules.userManual,
+      helpModules.about,
+      helpModules.whatsNew,
+      ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
+      helpModules.disclaimer,
+    ],
+  })
 
-export const isRoot = R.propEq(keys.root, true)
-export const isHidden = R.propEq(keys.hidden, true)
-export const isExternal = R.propEq(keys.external, true)
+export const getModulesHierarchy = (user, surveyInfo) => [
+  getModule({ module: appModules.home }),
+  // the dashboard is not available to data editors and survey guests
+  getModule({ module: appModules.dashboard, hidden: !Authorizer.canCleanseRecords(user, surveyInfo) }),
+  getDesignerModule(user, surveyInfo),
+  getDataModule(user, surveyInfo),
+  getAnalysisModule(user, surveyInfo),
+  getUsersModule(user, surveyInfo),
+  getHelpModule(user),
+  ...getSystemAdminModules(user),
+]
+
+export const getKey = A.prop(keys.key)
+export const getUri = A.prop(keys.uri)
+export const getIcon = A.prop(keys.icon)
+export const getChildren = A.prop(keys.children)
+
+export const isRoot = A.propEq(keys.root, true)
+export const isHidden = A.propEq(keys.hidden, true)
+export const isExternal = A.propEq(keys.external, true)
 export const isHome = (module) => getKey(module) === appModules.home.key
 export const isSurveySelectionRequired = (module) =>
-  ![appModules.home.key, appModules.help.key, appModules.jobs.key].includes(getKey(module))
+  ![appModules.home.key, appModules.help.key, appModules.systemAdmin.key].includes(getKey(module))
 export const isActive = (pathname) => (module) => {
   // Module home is active when page is on landing
-  return isHome(module) ? pathname === appModuleUri(homeModules.landing) : R.startsWith(module.uri, pathname)
+  return isHome(module) ? pathname === appModuleUri(homeModules.landing) : A.startsWith(module.uri, pathname)
 }

@@ -1,7 +1,7 @@
 import { DEFAULT_SRS, Numbers } from '@openforis/arena-core'
 
 const generateSummary = ({ i18n, point, elevation }) => {
-  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : NaN
+  const coordinateNumericFieldPrecision = point.srs === DEFAULT_SRS.code ? 6 : Number.NaN
   const xFormatted = Numbers.roundToPrecision(point.x, coordinateNumericFieldPrecision)
   const yFormatted = Numbers.roundToPrecision(point.y, coordinateNumericFieldPrecision)
 

@@ -14,8 +14,8 @@
   width: 16rem;
   display: flex;
   flex-direction: column;
-  background-color: $greyAppBg;
-  border: 1px solid $greyBorder;
+  background-color: $colorBackground;
+  border: 1px solid $colorOutline;
   border-radius: 4px;
   min-height: 0;
 
@@ -24,7 +24,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid $greyBorder;
+    border-bottom: 1px solid $colorOutline;
     font-weight: 600;
   }
 
@@ -39,8 +39,8 @@
     margin-left: 0.5rem;
     padding: 0 0.4rem;
     border-radius: 1rem;
-    background-color: $white;
-    color: $colorTextPrimary;
+    background-color: $colorSurface;
+    color: $colorOnPrimaryContainer;
     font-size: 0.75rem;
     line-height: 1.4rem;
   }
@@ -54,13 +54,13 @@
     list-style: none;
 
     &.draggable-container--over {
-      background-color: $blueLightFocus;
+      background-color: $colorPrimaryContainerLow;
     }
   }
 
   &__empty {
     padding: 0.5rem;
-    color: $colorTextPrimary;
+    color: $colorOnPrimaryContainer;
     font-size: 0.85rem;
     font-style: italic;
   }
@@ -72,8 +72,8 @@
   gap: 0.5rem;
   margin-bottom: 0.5rem;
   padding: 0.4rem;
-  background-color: $white;
-  border: 1px solid $greyBorder;
+  background-color: $colorSurface;
+  border: 1px solid $colorOutline;
   border-radius: 4px;
   box-shadow: $shadow1;
 
@@ -106,7 +106,7 @@
   }
 
   &__email {
-    color: $colorTextPrimary;
+    color: $colorOnPrimaryContainer;
     font-size: 0.8rem;
     overflow: hidden;
     text-overflow: ellipsis;

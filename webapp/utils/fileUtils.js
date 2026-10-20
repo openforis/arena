@@ -48,22 +48,14 @@ const acceptByExtension = {
   zip: { 'application/zip': ['.zip'] },
 }
 
-const readAsText = async (file, ignoreErrors = true) =>
-  new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const text = e.target.result
-      resolve(text)
-    }
-    reader.onerror = (error) => {
-      if (ignoreErrors) {
-        resolve(null)
-      } else {
-        reject(error)
-      }
-    }
-    reader.readAsText(file)
-  })
+const readText = async (file, ignoreErrors = true) => {
+  try {
+    return await file.text()
+  } catch (error) {
+    if (ignoreErrors) return null
+    throw error
+  }
+}
 
 /**
  * Checks that a previously selected file can still actually be read from disk.
@@ -93,7 +85,7 @@ export const FileUtils = {
   getExtension,
   toHumanReadableFileSize,
   acceptByExtension,
-  readAsText,
+  readText,
   checkFileIsReadable,
   determineFileFormatFromFileName,
 }

@@ -1,34 +1,10 @@
 @use './vars' as *;
 
+// Non-color design variables exposed as CSS custom properties (color tokens are defined in `themes.scss`).
 :root {
   --fontFamily: #{$fontFamily};
 
   --headerHeight: #{$headerHeight};
-
-  /* Colors */
-  --red: #{$red};
-  --pink: #{$pink};
-  --green: #{$green};
-  --greenLight: #{$greenLight};
-  --yellow: #{$yellow};
-
-  --grey: #{$grey};
-  --greyAppBg: #{$greyAppBg};
-  --greyBorder: #{$greyBorder};
-  --blue: #{$blue};
-  --blueLight: #{$blueLight};
-  --blueLightFocus: #{$blueLightFocus};
-  --blueLightActive: #{$blueLightActive};
-  --blueDark: #{$blueDark};
-  --orange: #{$orange};
-  --orangeLight: #{$orangeLight};
-  --black: #{$black};
-  --yellowHighlight: #{$yellowHighlight};
-  --white: #{$white};
-
-  --colorTextPrimary: #{$colorTextPrimary};
-  --borderColorFocussed: #{borderColorFocussed};
-  --backgroundColorSecondary: #{backgroundColorSecondary};
 
   //z-indexes
 

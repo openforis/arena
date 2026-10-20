@@ -1,8 +1,8 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _isNodeDeleted = R.pipe(ActivityLog.getNodeDefUuid, R.isNil)
+const _isNodeDeleted = A.pipe(ActivityLog.getNodeDefUuid, A.isNil)
 
 export default {
   [ActivityLog.type.nodeCreate]: () => _isNodeDeleted,
@@ -12,6 +12,6 @@ export default {
   [ActivityLog.type.nodeDelete]: () => (activityLog) => {
     const keysHierarchy = ActivityLog.getKeysHierarchy(activityLog)
     // NodeDefUuid in parent path elements will be null if the corresponding node has been deleted
-    return R.any(({ nodeDefUuid }) => R.isNil(nodeDefUuid))(keysHierarchy)
+    return A.any(({ nodeDefUuid }) => A.isNil(nodeDefUuid))(keysHierarchy)
   },
 }

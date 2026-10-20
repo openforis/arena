@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { FormHeaderColor } from '@openforis/arena-core'
 
@@ -149,9 +149,9 @@ const propsUI = {
 const getPropByType =
   (prop, defaultValue = null) =>
   (nodeDefType) =>
-    R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+    A.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
+const getProp = (prop, defaultValue = null) => A.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 

@@ -16,6 +16,7 @@ import ValidationTooltip from '../validationTooltip'
 
 const Checkbox = (props) => {
   const {
+    alignWithLabelledControls = false,
     allowClickEventBubbling = false,
     className,
     checked = false,
@@ -69,7 +70,10 @@ const Checkbox = (props) => {
     />
   )
   return (
-    <div className={classNames('btn-checkbox', className)} style={{ justifySelf: 'start' }}>
+    <div
+      className={classNames('btn-checkbox', { 'align-with-labelled-controls': alignWithLabelledControls }, className)}
+      style={{ justifySelf: 'start' }}
+    >
       <ValidationTooltip validation={validation}>
         {Objects.isEmpty(label) ? (
           control
@@ -83,6 +87,8 @@ const Checkbox = (props) => {
 }
 
 Checkbox.propTypes = {
+  // when displayed without label, aligns the checkbox with labelled checkboxes or radio buttons in the same column
+  alignWithLabelledControls: PropTypes.bool,
   allowClickEventBubbling: PropTypes.bool,
   className: PropTypes.string,
   id: PropTypes.string,

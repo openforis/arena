@@ -16,7 +16,6 @@ export const getSurveyDBSchema = Schemata.getSchemaSurvey
 
 // ====== UPDATE
 
-// eslint-disable-next-line
 /**
  * @deprecated - Implement it in survey repository.
  */

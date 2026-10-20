@@ -25,6 +25,11 @@ export default {
   },
   clone: `Clone '{{nodeDefLabel}}'`,
   compressFormItems: `Compress form items for '{{nodeDefLabel}}'`,
+  confirmClearNonApplicableValues: `The following fields will no longer be relevant and their values will be cleared:
+
+{{nodeDefLabels}}
+
+Continue?`,
   confirmUpdateDependentEnumeratedEntities: `If you continue, some enumerated entities ({{entityDefs}}) will be re-enumerated,  
 deleting the existing values inserted into them (if any).  
 Continue?`,
@@ -42,6 +47,30 @@ Continue?`,
   movePageDown: 'Move page down',
   formEditActions: {
     preview: 'Preview',
+    previewDesktop: 'Preview (desktop)',
+    previewMobile: 'Preview (mobile)',
+    previewOptions: 'Preview options',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Phone',
+      tablet: 'Tablet',
+    },
+    error: 'Error loading the mobile preview: {{error}}',
+    differences: `**Differences from Arena Mobile on a real device**
+- **Date and time**: typed in a text field (DD/MM/YYYY, HH:mm) instead of the device date/time pickers
+- **Maps**: not available (map buttons show a placeholder, no offline or PDF maps)
+- **Location**: taken from the browser (usually less precise than the device GPS); no external GPS receivers
+- **Photos and files**: selected from the computer; camera capture and photo location (EXIF) not available
+- **Keyboard and gestures**: physical keyboard and mouse instead of the on-screen keyboard and swipes
+- **Data**: kept in memory only, lost when reloading; no records list, sync or export`,
+    note: 'Approximation of Arena Mobile running in the browser with the draft survey.',
+    orientation: {
+      landscape: 'Landscape',
+      portrait: 'Portrait',
+    },
+    reload: 'Reload',
+    title: 'Mobile preview (experimental)',
   },
   formEntryActions: {
     confirmDemote: 'Are sure you want to demote this record to {{name}}?',
@@ -155,11 +184,13 @@ In Arena Mobile:
     scope: 'Content',
     scopes: {
       full: 'Full survey',
-      currentPage: 'Current page only',
+      currentPage: 'Current page only ({{entityLabel}})',
     },
-    currentPageHint: 'Current page: {{entityLabel}}',
     currentPageUnavailable:
       'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
+    includeQrCode: 'Include QR code',
+    includeQrCodeInfo:
+      'Adds a QR code on the first page linking to a read-only copy of this page’s entity PDF (valid for 1 year).',
     orientation: 'Page orientation',
     orientations: {
       portrait: 'Portrait',

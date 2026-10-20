@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -9,6 +15,8 @@ export default {
     apply: 'Применить',
     aggregateFunction: 'Агрегатная функция',
     aggregateFunction_other: 'Агрегатные функции',
+    attribute: 'Атрибут',
+    attribute_other: 'Атрибуты',
     avg: 'Среднее',
     ascending: 'По возрастанию',
     areaBased: 'по площади',
@@ -53,6 +61,7 @@ export default {
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
@@ -119,11 +128,15 @@ export default {
     measurePrevSteps: 'Измерения предыдущих шагов',
     measurePrevSteps_plural: 'Измерения предыдущих шагов',
     min: 'Минимум',
+    moveUp: 'Переместить вверх',
+    moveDown: 'Переместить вниз',
     name: 'Имя',
     new: 'Новый',
     next: 'Далее',
     no: 'Нет',
     noItems: `$t(common.no) $t(common.item_plural)`,
+    notification: 'Уведомление',
+    notification_other: 'Уведомления',
     notSpecified: '---Не указано---',
     orderBy: 'Сортировать по',
     of: 'из',
@@ -153,9 +166,34 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+{{reasons}}
+
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -218,9 +256,11 @@ export default {
     },
     paginator: {
       firstPage: 'Первая страница',
+      goToPage: 'Перейти на страницу',
       itemsPerPage: 'Элементов на страницу',
       lastPage: 'Последняя страница',
       nextPage: 'Следующая страница',
+      page: 'Страница',
       previousPage: 'Предыдущая страница',
     },
     table: {
@@ -267,6 +307,12 @@ export default {
   },
 
   header: {
+    theme: {
+      label: 'Тема',
+      light: 'Светлая',
+      dark: 'Тёмная',
+      system: 'Системная',
+    },
     myProfile: 'Мой профиль',
     qrCodeLoginDialog: {
       title: 'Вход в Arena Mobile с помощью QR-кода',
@@ -313,6 +359,7 @@ export default {
     formDesigner: 'Дизайнер форм',
     surveyHierarchy: 'Иерархия',
     surveyDependencyTree: 'Дерево зависимостей',
+    surveyCompare: 'Сравнить / обновить из файла',
     category: 'Категория',
     categories: 'Категории',
     nodeDef: 'Определение узла',
@@ -352,11 +399,17 @@ export default {
     entities: 'Виртуальные сущности',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Экземпляры',
+    message: 'Сообщение',
+    message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'Администрирование системы',
     jobMonitor: 'Монитор заданий',
+    systemLogs: 'Системные журналы',
 
     help: 'Помощь',
     about: 'О программе',
+    changelog: 'Журнал изменений',
+    whatsNew: 'Что нового',
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },
@@ -409,13 +462,18 @@ $t(common.raiseTicketInSupportForum)
 **После отправки запроса, пожалуйста, дождитесь приглашения по электронной почте для доступа к Arena.**`,
     reCaptchaNotAnswered: 'ReCaptcha не отвечена',
     requestSent: 'Запрос на доступ успешно отправлен',
-    requestSentMessage: `Пожалуйста, дайте нам пару дней для обработки вашего запроса.
-Мы скоро отправим письмо на адрес **{{email}}** с инструкциями по доступу к $t(common.appName).
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Пожалуйста, дайте нам пару дней для обработки вашего запроса.
+Как только он будет одобрен, мы отправим еще одно письмо на адрес **{{email}}** с инструкциями по доступу к $t(common.appName).
 Спасибо и наслаждайтесь **$t(common.appNameFull)**!`,
     sendRequest: 'Отправить запрос',
     sendRequestConfirm: 'Запросить доступ к $t(common.appNameFull)?',
     templateNotSelected: 'Не выбрано (начать с нуля)',
     title: 'Запрос доступа к $t(common.appNameFull)',
+    whitelistSenderSuggestion:
+      'Если вы найдете его в папке «Спам», добавьте **{{senderEmail}}** в свои контакты (адресную книгу) или отметьте письмо как безопасное/не спам, чтобы наши следующие письма попадали прямо во входящие.',
   },
 
   resetPasswordView: {
@@ -501,6 +559,10 @@ $t(common.raiseTicketInSupportForum)
       showPlotReferencePoint: `Точка привязки участка`,
       showUtmGrid: 'Показать сетку UTM',
     },
+    rulerTooltip: `Нажмите кнопку, чтобы начать измерение расстояний.
+- щелкните несколько раз, чтобы измерить путь
+- дважды щелкните или нажмите клавишу ESC, чтобы завершить измерение
+- нажмите кнопку еще раз, чтобы скрыть измерения`,
     samplingPointDataLayerName: 'Данные точки выборки - уровень {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (загрузка...)',
     samplingPointItemPopup: {
@@ -584,6 +646,7 @@ $t(common.raiseTicketInSupportForum)
     rotate: 'Повернуть',
     dragAndDrop: 'Перетащите изображение сюда или',
     upload: 'нажмите здесь, чтобы загрузить',
+    remove: 'Удалить фото профиля?',
     sendNewInvitation: 'Отправить новое приглашение',
     removeFromSurvey: 'Удалить из опроса',
     confirmRemove: 'Вы уверены, что хотите лишить пользователя {{user}} доступа к опросу {{survey}}?',
@@ -592,6 +655,12 @@ $t(common.raiseTicketInSupportForum)
     preferredUILanguage: {
       label: 'Предпочитаемый язык интерфейса',
       auto: 'Автоматически определено ({{detectedLanguage}})',
+    },
+    newPassword: 'Пароль',
+    confirmPassword: 'Подтвердите пароль',
+    manageTwoFactorDevices: {
+      label: 'Управление 2FA',
+      title: 'Управление устройствами двухфакторной аутентификации',
     },
   },
 
@@ -612,6 +681,14 @@ $t(common.raiseTicketInSupportForum)
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      'Адрес электронной почты {{emails}} недоступен и, возможно, не существует. Он оставлен в списке ниже: исправьте или удалите его и повторите приглашение.',
+    invalidEmailsWarning_few:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
+    invalidEmailsWarning_many:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
+    invalidEmailsWarning_other:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
     groupPermissions: {
       label: 'Разрешения',
       systemAdmin: `
@@ -715,16 +792,34 @@ $t(common.raiseTicketInSupportForum)
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
-    firstPhaseCategory: 'Категория 1-й фазы',
-    firstPhaseCategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
-    firstPhaseCategoryExtraProp: {
-      label: 'Атрибут страты 1-й фазы',
-      info: 'Выберите переменную, используемую для разделения исходной совокупности на широкие страты для начальной фазы выборки.',
+    mauFile: {
+      upload: 'Загрузить MAU.zip',
+      download: 'Скачать MAU.zip',
+      delete: 'Удалить MAU.zip',
+      confirmCycleAssociation: 'Файл MAU.zip будет связан с текущим циклом ({{cycle}}). Продолжить?',
+      confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
+      uploadComplete: 'Файл MAU.zip успешно загружен',
+      deleteComplete: 'Файл MAU.zip удалён',
+      invalidFileExtension: 'Пожалуйста, выберите файл .zip',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Общий атрибут',
-      info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
-(это должен быть кодовый атрибут с тем же именем, что и дополнительное свойство, определенное для категории 1-й фазы)`,
+    phase1Category: 'Категория 1-й фазы',
+    phase1CategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
+    phase2JoinEntity: {
+      label: 'Объект соединения (2-я фаза)',
+      info: 'Объект, используемый для соединения базовой единицы с категорией 1-й фазы: сама базовая единица или одна из её родительских сущностей.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Соединять с использованием связи Sampling Point Data',
+      info: 'Ключ(и) объекта 2-й фазы считываются из таблицы Sampling Point Data, той же таблицы, что используется для 1-й фазы.',
+    },
+    phase1JoinAttribute: {
+      label: 'Атрибут соединения (1-я фаза)',
+      info: 'Выберите столбец таблицы $t(chainView.phase1Category) (дополнительное свойство или "code"), используемый для соединения с объектом соединения 2-й фазы.',
+    },
+    phase2JoinAttribute: {
+      label: 'Атрибут соединения (2-я фаза)',
+      info: 'Выберите атрибут (объекта 2-й фазы) для соединения с таблицей 1-й фазы; его значение сопоставляется с предыдущим атрибутом соединения 1-й фазы.',
     },
     formLabel: 'Метка цепочки обработки',
     basic: 'Основное',
@@ -769,8 +864,7 @@ $t(common.raiseTicketInSupportForum)
     },
     stratumAttribute: 'Атрибут страты',
     stratumAttributeInfo: 'Выберите переменную, используемую для стратификации выборки.',
-    stratumAttribute2ndPhase: 'Атрибут страты 2-й фазы',
-    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки.`,
+    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки. Показываются только те атрибуты, имя которых также присутствует как столбец категории 1-й фазы.`,
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
@@ -885,6 +979,9 @@ $t(common.appNameFull)
  * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
@@ -952,6 +1049,7 @@ $t(common.appNameFull)
       taxonProp: 'Возвращает значение указанного $t(extraProp.label) таксона с указанным кодом',
       taxonVernacularName:
         'Возвращает (первое) народное (или местное) название на указанном языке таксона с указанным кодом',
+      unique: 'Возвращает уникальные значения множественного атрибута или сущности',
       userEmail: 'Возвращает email вошедшего в систему пользователя',
       userIsRecordOwner:
         'Возвращает логическое значение "true", если пользователь, редактирующий запись, также является ее владельцем, "false" в противном случае',
@@ -983,6 +1081,10 @@ $t(common.appNameFull)
         label: 'Перечислить',
         info: `Строки будут автоматически генерироваться с использованием элементов категории, связанных с атрибутом кода, помеченным как Ключ, определенный внутри сущности; строки нельзя добавлять или удалять, а атрибут кода ключа не будет редактируемым`,
       },
+      enumeratingItemsExpression: {
+        label: 'Выражение для перечисляемых элементов',
+        info: 'Необязательное выражение, которое определяет, какие элементы категории перечисляются (например, unique(table_source.source_type)). Если оно пустое, используются все элементы категории.',
+      },
       enumerator: {
         label: 'Перечислитель',
         info: 'Элементы в категории будут использоваться для генерации строк родительской сущности',
@@ -990,6 +1092,10 @@ $t(common.appNameFull)
       form: 'Форма',
       formula: 'Формула',
       includedInClonedData: 'Включено в клонированные данные',
+      includedInMultipleEntitySummary: {
+        label: 'Включить в сводку множественной сущности',
+        info: `Если отмечено, значение атрибута будет отображаться в списке выбора сущности и в представлении сводки сущности`,
+      },
       includedInRecordsList: {
         label: 'Включить в список записей',
         info: `Если отмечено, атрибут будет виден в списке записей`,
@@ -1057,10 +1163,6 @@ $t(common.appNameFull)
         label: 'Скрыто в Arena Mobile',
         info: `Если отмечено, атрибут не будет виден в AM`,
       },
-      includedInMultipleEntitySummary: {
-        label: 'Включить в сводку множественной сущности',
-        info: `Если отмечено, атрибут будет виден в представлении сводки сущности`,
-      },
       includedInPreviousCycleLink: {
         label: 'Включить в ссылку на предыдущий цикл',
         info: `Если отмечено, значение из предыдущего цикла будет отображаться в форме ввода данных (когда ссылка на предыдущий цикл активна в мобильном приложении)"`,
@@ -1087,6 +1189,9 @@ $t(common.appNameFull)
     },
     mobileProps: {
       title: 'Мобильное приложение',
+    },
+    timeProps: {
+      includeSeconds: 'Включить секунды',
     },
     formHeaderProps: {
       headerColorLabel: 'Цвет заголовка',
@@ -1150,6 +1255,9 @@ $t(common.appNameFull)
       expressions: 'Выражения валидации',
       attributeAlwaysValid: 'Атрибут всегда корректен',
       attributeValidWhenConditionIsMet: 'Атрибут корректен при выполнении условия',
+      notRequired: 'Не обязательно',
+      alwaysRequired: 'Всегда обязательно',
+      requiredWhenConditionIsMet: 'Обязательно при выполнении условия',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'Этот узел не может быть преобразован в множественный, потому что у него есть значения по умолчанию.',
@@ -1182,6 +1290,7 @@ $t(common.appNameFull)
 
 Например, в структуре *кластер -> участок -> дерево*, если у вас есть атрибут *tree_species*, помеченный как **Уникальный**, вы можете иметь только одно дерево каждого вида внутри одного и того же *участка*.`,
     },
+    nodeDefClonedSuccessfully: 'Определение узла "{{nodeDefName}}" успешно клонировано в "{{targetParentNodeDefName}}"',
     categoriesClonedFromSurvey: 'Следующие категории также были клонированы из исходного опроса: {{names}}',
     taxonomiesClonedFromSurvey: 'Следующие таксономии также были клонированы из исходного опроса: {{names}}',
   },
@@ -1236,10 +1345,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
 
@@ -1267,6 +1379,56 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Эта категория имеет геопространственные возможности',
+    geoPackageCategoryInfo: `У этой категории есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    samplingPointDataCategoryTypeInfo: `Это предопределенная категория для данных точек выборки. У неё есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `Дополнительное свойство '${locationItemExtraDefName}' отсутствует`,
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      description:
+        'Предопределенная категория для данных точек выборки, включающая поле местоположения для каждого элемента.',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория с геопространственными возможностями',
+      description:
+        'Добавляет элементам поле местоположения, чтобы категорию можно было экспортировать в виде файла GeoPackage.',
+      message: `Создать новую категорию с геопространственными возможностями?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
     deleteItem: 'Удалить элемент',
     level: {
       title: 'Уровень {{levelPosition}}',
@@ -1290,6 +1452,17 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Сгенерировать анализ Whisp',
+      confirmMessage: `Сгенерировать анализ Whisp для всех точек выборки?
+
+- каждая точка выборки с местоположением будет отправлена в Open Foris Whisp для анализа
+- результаты будут объединены с данными точек выборки и сохранены в категории '${samplingPointDataWhispCategoryName}'
+- если категория '${samplingPointDataWhispCategoryName}' уже существует, её содержимое будет заменено
+- анализ выполняется в фоновом режиме и может занять несколько минут в зависимости от количества точек выборки`,
+    },
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },
@@ -1396,5 +1569,80 @@ $t(common.cantUndoWarning)`,
       constant: 'Константа',
       expression: 'Выражение',
     },
+  },
+
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Сгенерировать выражение по описанию',
+    hint: 'Опишите простыми словами, что должно делать выражение. ИИ переведет его в синтаксис Arena. Нажмите Ctrl+Enter для генерации.',
+    placeholder: 'например: высота дерева должна быть больше 0 и меньше 200',
+    generate: 'Сгенерировать',
+    generating: 'Генерация…',
+    use: 'Использовать это выражение',
+    useAnyway: 'Все равно использовать',
+    tryAgain: 'Попробовать другое описание',
+    parseError:
+      'Сгенерированное выражение не удалось корректно разобрать: {{message}}. Вы все равно можете применить его и отредактировать вручную или попробовать переформулировать описание.',
+    explain: {
+      title: 'Объяснить это выражение',
+      thinking: 'Запрашиваем у ИИ объяснение этого выражения…',
+      error: 'Не удалось получить объяснение: {{message}}',
+      timeout: 'ИИ слишком долго не отвечает. Повторите попытку.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Перевести на {{count}} другой язык',
+    translateButton_few: 'Перевести на {{count}} других языка',
+    translateButton_many: 'Перевести на {{count}} других языков',
+    translateButton_other: 'Перевести на {{count}} другого языка',
+    translateButton: 'Перевести на другие языки',
+    success_one: 'Переведено на {{count}} язык. Проверьте и сохраните.',
+    success_few: 'Переведено на {{count}} языка. Проверьте и сохраните.',
+    success_many: 'Переведено на {{count}} языков. Проверьте и сохраните.',
+    success_other: 'Переведено на {{count}} языка. Проверьте и сохраните.',
+    success: 'Переведено. Проверьте и сохраните.',
+    failed: 'Не удалось выполнить перевод: {{message}}',
+    timeout: 'Время ожидания перевода истекло. Повторите попытку.',
+  },
+
+  aiActivityLog: {
+    title: 'Сводка журнала активности',
+    summarizeButton: 'Составить сводку',
+    thinking: 'Собираем события и запрашиваем у ИИ сводку…',
+    error: 'Не удалось получить сводку: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Справка и документация',
+    title: 'Справка и документация',
+    empty: 'Задайте мне любой вопрос об Open Foris Arena.',
+    placeholder: 'Введите ваш вопрос…',
+    send: 'Отправить',
+    stop: 'Остановить',
+    clear: 'Очистить',
+    showReasoning: 'Показать рассуждения',
+    error: 'Ошибка чат-бота: {{message}}',
+    language: 'Язык ответа',
   },
 }

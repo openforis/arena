@@ -2,7 +2,7 @@ import './CyclesEditor.scss'
 
 import React, { useCallback } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as SurveyCycle from '@core/survey/surveyCycle'
@@ -55,7 +55,7 @@ const CyclesEditor = (props) => {
             cycle={cycle}
             readOnly={readOnly}
             validation={Validation.getFieldValidation(cycleKey)(validation)}
-            onChange={(cycleUpdate) => setCycles(R.assoc(cycleKey, cycleUpdate)(cycles))}
+            onChange={(cycleUpdate) => setCycles(A.assoc(cycleKey, cycleUpdate)(cycles))}
             canDelete={canDeleteCycle({ cycleKey, index })}
             onDelete={onDelete}
           />
@@ -65,7 +65,7 @@ const CyclesEditor = (props) => {
           <ButtonAdd
             showLabel={false}
             size="small"
-            onClick={() => setCycles(R.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles))}
+            onClick={() => setCycles(A.assoc(cycleEntries.length, SurveyCycle.newCycle())(cycles))}
           />
         )}
       </div>

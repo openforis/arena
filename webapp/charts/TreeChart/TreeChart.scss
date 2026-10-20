@@ -19,9 +19,9 @@
     .node-grid {
       display: flex;
       align-items: center;
-      border: 1px solid $greyBorder;
+      border: 1px solid $colorOutline;
       transition: background-color 1s ease;
-      background-color: white;
+      background-color: $colorSurface;
       height: auto;
       padding: 6px;
 
@@ -37,11 +37,11 @@
       }
 
       &.node-virtual {
-        background-color: $grey;
+        background-color: $colorSurfaceVariant;
       }
 
       &.highlight {
-        background-color: $blueLightActive;
+        background-color: $colorPrimaryContainerHigh;
       }
 
       .node-label {
@@ -58,7 +58,7 @@
 
   .link {
     fill: none;
-    stroke: $blueLightActive;
+    stroke: $colorPrimaryContainerHigh;
     stroke-width: 1px;
   }
 }

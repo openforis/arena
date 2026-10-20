@@ -3,7 +3,7 @@ import './UserInvite.scss'
 import React, { useCallback } from 'react'
 
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as UserInvite from '@core/user/userGroupInvitation'
 import * as Validation from '@core/validation/validation'

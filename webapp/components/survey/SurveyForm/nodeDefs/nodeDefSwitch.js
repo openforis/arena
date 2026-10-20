@@ -2,7 +2,7 @@ import './nodeDefs.scss'
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -39,13 +39,10 @@ const _hasSiblingWithoutKeys = ({ survey, nodeDef, record, parentNode }) => {
   if (Objects.isEmpty(keyDefs)) return false
 
   const siblings = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-  return (
-    siblings.length > 0 &&
-    siblings.some((sibling) => {
-      const keyValues = Record.getEntityKeyValues(survey, sibling)(record)
-      return keyValues.every((keyValue) => Objects.isEmpty(keyValue))
-    })
-  )
+  return siblings.some((sibling) => {
+    const keyValues = Record.getEntityKeyValues(survey, sibling)(record)
+    return keyValues.every((keyValue) => Objects.isEmpty(keyValue))
+  })
 }
 
 const _isNodesCountAboveMin = ({ parentNode, nodeDef, nodes }) => {
@@ -66,11 +63,12 @@ const useEntryProps = ({ canEditRecord, entry, nodeDef, parentNode, editable }) 
 
     const survey = SurveyState.getSurvey(state)
 
-    const nodes = NodeDef.isRoot(nodeDef)
-      ? [rootNode]
-      : parentNode
-        ? Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
-        : []
+    let nodes = []
+    if (NodeDef.isRoot(nodeDef)) {
+      nodes = [rootNode]
+    } else if (parentNode) {
+      nodes = Record.getNodeChildrenByDefUuid(parentNode, NodeDef.getUuid(nodeDef))(record)
+    }
 
     const canAddOrDeleteNodeCommon =
       editable && canEditRecord && parentNode && NodeDef.isMultiple(nodeDef) && !NodeDef.isEnumerate(nodeDef)
@@ -208,6 +206,18 @@ const getClassName = ({
   })
 }
 
+const NodeDefBody = ({ renderType, nestedComponentsProps }) =>
+  renderType === NodeDefLayout.renderType.tableBody ? (
+    <NodeDefTableCellBody {...nestedComponentsProps} />
+  ) : (
+    <NodeDefFormItem {...nestedComponentsProps} />
+  )
+
+NodeDefBody.propTypes = {
+  nestedComponentsProps: PropTypes.object.isRequired,
+  renderType: PropTypes.string.isRequired,
+}
+
 const NodeDefSwitch = (props) => {
   const {
     canEditDef,
@@ -218,6 +228,7 @@ const NodeDefSwitch = (props) => {
     nodeDef,
     onSortBy,
     parentNode,
+    preview,
     readOnly: readOnlyProp,
     renderType,
     sortCriteria = [],
@@ -297,7 +308,7 @@ const NodeDefSwitch = (props) => {
   })
 
   const checkNodePlaceholder = useCallback(() => {
-    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && R.none(Node.isPlaceholder, nodes)) {
+    if (canAddNode && NodeDef.isAttribute(nodeDef) && !NodeDef.isCode(nodeDef) && A.none(Node.isPlaceholder, nodes)) {
       createNodePlaceholder(nodeDef, parentNode, NodeDefUiProps.getDefaultValue(nodeDef))
     }
   }, [canAddNode, createNodePlaceholder, nodeDef, nodes, parentNode])
@@ -317,13 +328,19 @@ const NodeDefSwitch = (props) => {
     }
   }, [nodeDefUuid])
 
+  // the nodes of the attributes of a new entity are created server side: until they arrive, there is no node to update
+  const attributeNodeMissing =
+    entry && NodeDef.isAttribute(nodeDef) && NodeDef.isSingle(nodeDef) && A.isEmpty(nodes ?? [])
+
   const nestedComponentsProps = {
     ...props,
     ...entryProps,
+    preview,
     surveyInfo,
     readOnly:
       readOnlyProp ||
       readOnly ||
+      attributeNodeMissing ||
       keyFieldLocked ||
       !editable ||
       qualifierFieldLocked ||
@@ -365,10 +382,8 @@ const NodeDefSwitch = (props) => {
           sortCriteria={sortCriteria}
           onSortBy={onSortBy}
         />
-      ) : renderType === NodeDefLayout.renderType.tableBody ? (
-        <NodeDefTableCellBody {...nestedComponentsProps} />
       ) : (
-        <NodeDefFormItem {...nestedComponentsProps} />
+        <NodeDefBody renderType={renderType} nestedComponentsProps={nestedComponentsProps} />
       )}
     </div>
   )

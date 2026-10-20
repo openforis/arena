@@ -85,7 +85,7 @@ describe('Survey files export/import - branding and doc-layout images', () => {
 
   afterAll(async () => {
     for (const surveyId of createdSurveyIds) {
-      await SurveyManager.deleteSurvey(surveyId)
+      await SurveyManager.deleteSurvey(surveyId) // NOSONAR
     }
     if (sourceSurveyId) await SurveyManager.deleteSurvey(sourceSurveyId)
   })
@@ -108,13 +108,13 @@ describe('Survey files export/import - branding and doc-layout images', () => {
 
     const importedLogoContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: importedSurveyId,
-      fileUuid: logoFileUuid,
+      fileSummary: { uuid: logoFileUuid },
     })
     expect(Buffer.compare(importedLogoContent, logoContent)).toBe(0)
 
     const importedHeaderContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: importedSurveyId,
-      fileUuid: headerFileUuid,
+      fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(importedHeaderContent, headerContent)).toBe(0)
   })
@@ -131,13 +131,13 @@ describe('Survey files export/import - branding and doc-layout images', () => {
 
     const clonedLogoContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: clonedSurveyId,
-      fileUuid: logoFileUuid,
+      fileSummary: { uuid: logoFileUuid },
     })
     expect(Buffer.compare(clonedLogoContent, logoContent)).toBe(0)
 
     const clonedHeaderContent = await SurveyFileService.fetchFileContentAsBuffer({
       surveyId: clonedSurveyId,
-      fileUuid: headerFileUuid,
+      fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
   })

@@ -65,7 +65,7 @@ const NodeDefGeo = (props) => {
   const onFilesChange = useCallback(
     async (files) => {
       const file = files[0]
-      const text = await FileUtils.readAsText(file)
+      const text = await FileUtils.readText(file)
       const geoJson = GeoJsonUtils.parse(text)
       if (geoJson) {
         dispatch(NotificationActions.hideNotification())

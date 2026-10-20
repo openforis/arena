@@ -25,6 +25,7 @@ const DataQueriesPanel = (props) => {
     draft,
     editedQuerySummary,
     isTableRowActive,
+    onAiSuggestSummary,
     onNew,
     onSave,
     onDelete,
@@ -32,6 +33,7 @@ const DataQueriesPanel = (props) => {
     query,
     queriesRequestedAt,
     setEditedQuerySummary,
+    summarizing,
     validating,
   } = useDataQueriesPanel()
 
@@ -67,11 +69,13 @@ const DataQueriesPanel = (props) => {
       {Query.hasSelection(query) && (
         <DataQueryEditForm
           draft={draft}
+          onAiSuggestSummary={onAiSuggestSummary}
           onDelete={onDelete}
           onNew={onNew}
           onSave={onSave}
           querySummary={editedQuerySummary}
           setQuerySummary={setEditedQuerySummary}
+          summarizing={summarizing}
           validating={validating}
         />
       )}

@@ -1,4 +1,9 @@
 export default {
+  completion: '{{percent}}% completado',
+  pagesValidationProgress: '{{valid}}/{{total}} páginas válidas ({{percent}}%)',
+  pageComplete: 'Completa',
+  copyPath: 'Copiar ruta',
+  pathCopiedToClipboard: 'Ruta copiada al portapapeles',
   subPage: 'Subpágina',
   addChildTo: 'Agregar a {{nodeDefLabel}}',
   addChildToTitle: 'Agregar nuevo nodo a {{nodeDefLabel}}',
@@ -20,6 +25,11 @@ export default {
   },
   clone: `Clonar '{{nodeDefLabel}}'`,
   compressFormItems: `Comprimir elementos de formulario para '{{nodeDefLabel}}'`,
+  confirmClearNonApplicableValues: `Los siguientes campos ya no serán relevantes y sus valores se borrarán:
+
+{{nodeDefLabels}}
+
+¿Continuar?`,
   confirmUpdateDependentEnumeratedEntities: `Si continúa, algunas entidades enumeradas ({{entityDefs}}) se volverán a enumerar, 
 eliminando los valores existentes insertados en ellas (si los hay). 
 ¿Continuar?`,
@@ -37,6 +47,30 @@ eliminando los valores existentes insertados en ellas (si los hay).
   movePageDown: 'Mover página hacia abajo',
   formEditActions: {
     preview: 'Vista previa',
+    previewDesktop: 'Vista previa (escritorio)',
+    previewMobile: 'Vista previa (móvil)',
+    previewOptions: 'Opciones de vista previa',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Teléfono',
+      tablet: 'Tableta',
+    },
+    error: 'Error al cargar la vista previa móvil: {{error}}',
+    differences: `**Diferencias con Arena Mobile en un dispositivo real**
+- **Fecha y hora**: se escriben en un campo de texto (DD/MM/YYYY, HH:mm) en lugar de los selectores de fecha/hora del dispositivo
+- **Mapas**: no disponibles (los botones de mapa muestran un marcador de posición; sin mapas sin conexión ni PDF)
+- **Ubicación**: obtenida del navegador (generalmente menos precisa que el GPS del dispositivo); sin receptores GPS externos
+- **Fotos y archivos**: seleccionados desde el ordenador; sin captura con cámara ni ubicación de la foto (EXIF)
+- **Teclado y gestos**: teclado físico y ratón en lugar del teclado en pantalla y los deslizamientos
+- **Datos**: solo en memoria, se pierden al recargar; sin lista de registros, sincronización ni exportación`,
+    note: 'Aproximación de Arena Mobile ejecutándose en el navegador con la encuesta en borrador.',
+    orientation: {
+      landscape: 'Horizontal',
+      portrait: 'Vertical',
+    },
+    reload: 'Recargar',
+    title: 'Vista previa móvil (experimental)',
   },
   formEntryActions: {
     confirmDemote: '¿Está seguro de que desea degradar este registro a {{name}}?',
@@ -150,11 +184,13 @@ En Arena Mobile:
     scope: 'Contenido',
     scopes: {
       full: 'Encuesta completa',
-      currentPage: 'Solo página actual',
+      currentPage: 'Solo página actual ({{entityLabel}})',
     },
-    currentPageHint: 'Página actual: {{entityLabel}}',
     currentPageUnavailable:
       'No se puede determinar la instancia de la página actual. Navegue a una página específica o exporte la encuesta completa.',
+    includeQrCode: 'Incluir código QR',
+    includeQrCodeInfo:
+      'Añade un código QR en la primera página que enlaza a una copia de solo lectura del PDF de esta entidad (válido 1 año).',
     orientation: 'Orientación de página',
     orientations: {
       portrait: 'Vertical',

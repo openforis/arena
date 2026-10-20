@@ -59,15 +59,13 @@ export const User2FADeviceDetails = () => {
     } else {
       // new device
       API.getDevices()
-        .then((list) => {
+        .then(async (list) => {
+          if (!isMounted) return
+          setExistingDevices(list)
+          const newDeviceObj = {}
+          const nextValidation = await User2FADeviceValidator.validateDevice(list)(newDeviceObj)
           if (isMounted) {
-            setExistingDevices(list)
-            const newDeviceObj = {}
-            User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
-              if (isMounted) {
-                setDevice(Validation.assocValidation(nextValidation))
-              }
-            })
+            setDevice(Validation.assocValidation(nextValidation))
           }
         })
         .catch((error) => {
@@ -150,7 +148,7 @@ export const User2FADeviceDetails = () => {
     (value) => {
       setDevice((prevDevice) => {
         const nextDevice = { ...prevDevice, [User2FADevice.keys.deviceName]: value }
-        User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
+        void User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
           const nextDeviceWithValidation = Validation.assocValidation(nextValidation)(nextDevice)
           setDevice(nextDeviceWithValidation)
         })

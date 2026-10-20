@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as AuthGroup from '@core/auth/authGroup'
@@ -8,12 +8,12 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 export default {
   [ActivityLog.type.userInvite]: (survey, i18n) => (activityLog) => {
     const groupUuid = ActivityLog.getContentGroupUuid(activityLog)
-    const groupName = R.pipe(
+    const groupName = A.pipe(
       Survey.getSurveyInfo,
       Survey.getAuthGroups,
-      R.find((authGroup) => AuthGroup.getUuid(authGroup) === groupUuid),
+      A.find((authGroup) => AuthGroup.getUuid(authGroup) === groupUuid),
       AuthGroup.getName,
-      R.defaultTo(AuthGroup.groupNames.systemAdmin)
+      A.defaultTo(AuthGroup.groupNames.systemAdmin)
     )(survey)
 
     return {

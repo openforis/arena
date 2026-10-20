@@ -52,7 +52,7 @@ export const UserExtraPropEditor = (props) => {
 
   useEffect(() => {
     if (!editing) return
-    validateExtraProp(editedItem, items).then((val) => {
+    void validateExtraProp(editedItem, items).then((val) => {
       setState((statePrev) => ({ ...statePrev, validation: val }))
     })
   }, [editedItem, editing, items])

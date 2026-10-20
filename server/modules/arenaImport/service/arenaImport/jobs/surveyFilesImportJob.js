@@ -17,8 +17,10 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
     const preloadedMapLayerFiles = Survey.getPreloadedMapLayers(surveyInfo)
     const surveyDocImageFiles = Survey.getSurveyDocImages(surveyInfo)
     const brandingFiles = SurveyBranding.getBrandingFileSummaries(SurveyBranding.getBranding(surveyInfo))
+    // chain MAU files metadata is not part of the survey definition: read it from its own manifest file
+    const chainMauFiles = await ArenaSurveyFileZip.getChainMauFilesSummaries(arenaSurveyFileZip)
 
-    const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles]
+    const fileSummaries = [...preloadedMapLayerFiles, ...surveyDocImageFiles, ...brandingFiles, ...chainMauFiles]
 
     this.total = fileSummaries.length
 
@@ -34,7 +36,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
         // load file content
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
-        const fileContent = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid)
+        const fileContent = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid) // NOSONAR
 
         if (!fileContent && !skipMissingFiles) {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
@@ -45,7 +47,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
           // update file size with actual file content length
           file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
-          await this.persistFile(file)
+          await this.persistFile(file) // NOSONAR
         } else {
           this.logWarn(`Survey ${surveyId}: missing content for survey file ${fileUuid} (${fileName})`)
         }

@@ -1,5 +1,3 @@
-import * as SystemStatusState from './state'
-import SystemStatusReducer from './reducer'
-import { useSystemStatusReady } from './hooks'
-
-export { SystemStatusState, SystemStatusReducer, useSystemStatusReady }
+export * as SystemStatusState from './state'
+export { default as SystemStatusReducer } from './reducer'
+export { useSystemStatusReady } from './hooks'

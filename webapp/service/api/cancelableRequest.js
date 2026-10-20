@@ -1,15 +1,15 @@
 import axios from 'axios'
 
 const cancelableRequest = ({ method, url, config = {} }) => {
-  const source = axios.CancelToken.source()
+  const abortController = new AbortController()
   const request = axios({
     ...config,
     method,
     url,
-    cancelToken: source.token,
+    signal: abortController.signal,
   })
 
-  return { request, cancel: source.cancel }
+  return { request, cancel: () => abortController.abort() }
 }
 
 export const cancelableGetRequest = ({ url, data = {} }) =>

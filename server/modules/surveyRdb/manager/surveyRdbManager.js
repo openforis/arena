@@ -40,7 +40,7 @@ export {
 } from '../repository/schemaRdbRepository'
 
 // Data tables and views
-export const { createDataTable } = DataTableRepository
+export const { createDataTable, createDataTableIndexes } = DataTableRepository
 export const { createDataView, countViewData, countViewDataAgg } = DataViewRepository
 
 // Node key views
@@ -190,14 +190,28 @@ export const fetchViewDataAgg = async (params, client = db) => {
   return result
 }
 
-const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter, recordUuids, search, user }) => {
+const _determineRecordUuidsFilter = async ({
+  survey,
+  cycle,
+  recordsModifiedAfter,
+  recordsModifiedBefore,
+  recordUuids,
+  search,
+  user,
+}) => {
   // recordUuids explicitly selected by the user are already checked against qualifiers by
   // requireRecordsMatchUserGroupQualifiers, at the API layer
   if (recordUuids) return recordUuids
 
   const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }) : []
 
-  if (Objects.isEmpty(search) && !recordsModifiedAfter && qualifierNodeDefFilters.length === 0) return null
+  if (
+    Objects.isEmpty(search) &&
+    !recordsModifiedAfter &&
+    !recordsModifiedBefore &&
+    qualifierNodeDefFilters.length === 0
+  )
+    return null
 
   const surveyId = Survey.getId(survey)
   const nodeDefRoot = Survey.getNodeDefRoot(survey)
@@ -213,6 +227,11 @@ const _determineRecordUuidsFilter = async ({ survey, cycle, recordsModifiedAfter
   if (recordsModifiedAfter) {
     recordsSummaries = recordsSummaries.filter((recordSummary) =>
       Dates.isAfter(Record.getDateModified(recordSummary), recordsModifiedAfter)
+    )
+  }
+  if (recordsModifiedBefore) {
+    recordsSummaries = recordsSummaries.filter((recordSummary) =>
+      Dates.isBefore(Record.getDateModified(recordSummary), recordsModifiedBefore)
     )
   }
   return recordsSummaries.map(Record.getUuid)
@@ -332,7 +351,7 @@ const checkCanExportEntitiesData = async ({ fileFormat, nodeDefs, fetchParamsByN
   if (fileFormat === FileFormats.xlsx) {
     for (const nodeDefContext of nodeDefs) {
       const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
-      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client)
+      const { selectFields, count } = await DataViewRepository.countViewData(fetchViewDataParams, client) // NOSONAR
       const estimatedCellsCount = selectFields.length * count
       if (estimatedCellsCount > StreamUtils.defaultMaxCellsLimit) {
         throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, {
@@ -358,7 +377,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   },
   client = db
 ) => {
-  const { recordsModifiedAfter, fileFormat } = options
+  const { recordsModifiedAfter, recordsModifiedBefore, fileFormat } = options
 
   const nodeDefs = getEntityDefsToExport({ survey, cycle, options })
 
@@ -366,6 +385,7 @@ export const fetchEntitiesDataToCsvFiles = async (
     survey,
     cycle,
     recordsModifiedAfter,
+    recordsModifiedBefore,
     recordUuids: recordUuidsParam,
     search,
     user,
@@ -401,7 +421,7 @@ export const fetchEntitiesDataToCsvFiles = async (
   for (const nodeDefContext of nodeDefs) {
     callback?.({ step: idx + 1, total: nodeDefs.length, currentEntity: NodeDef.getName(nodeDefContext) })
     const fetchViewDataParams = fetchParamsByNodeDefUuid[NodeDef.getUuid(nodeDefContext)]
-    await fetchViewData(fetchViewDataParams, client)
+    await fetchViewData(fetchViewDataParams, client) // NOSONAR
     idx++
   }
   return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
@@ -436,7 +456,7 @@ export const fetchEntitiesFileUuidsByCycle = async (
       filterRecordUuids,
     })
 
-    const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client)
+    const entityData = await fetchViewData({ survey, cycle, recordOwnerUuid, query, addCycle: true }, client) // NOSONAR
     const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDefContext)
 
     for (const entityRow of entityData) {
@@ -496,8 +516,11 @@ export const fetchTableRowsCountByEntityDefUuid = async (
           .map(NodeDef.getUuid)
 
   const countsArray = await client.tx(async (tx) =>
-    Promise.all(
-      entityDefUuids.map((entityDefUuid) => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }, tx))
+    DbUtils.runQueries(
+      tx,
+      entityDefUuids.map(
+        (entityDefUuid) => () => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }, tx)
+      )
     )
   )
   return entityDefUuids.reduce((acc, entityDefUuid, index) => ({ ...acc, [entityDefUuid]: countsArray[index] }), {})

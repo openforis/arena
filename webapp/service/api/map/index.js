@@ -80,7 +80,8 @@ export const testMapApiKey = async ({ provider, apiKey }) => {
   try {
     const mosaics = await fetchAvailableMapPeriods({ provider, apiKey })
     return mosaics.length > 0
-  } catch (_e) {
+  } catch {
+    // invalid API key or provider not reachable
     return false
   }
 }
@@ -100,6 +101,11 @@ export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
 export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUuid }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
   return data
+}
+
+export const startSamplingPointDataWhispJob = async ({ surveyId }) => {
+  const { data: job } = await axios.post(`/api/survey/${surveyId}/geo/whisp/sampling-point-data/start`)
+  return job
 }
 
 export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>

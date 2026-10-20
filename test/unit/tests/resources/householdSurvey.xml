@@ -1,0 +1,276 @@
+<?xml version="1.0"?>
+<h:html xmlns="http://www.w3.org/2002/xforms" xmlns:h="http://www.w3.org/1999/xhtml" xmlns:ev="http://www.w3.org/2001/xml-events" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:jr="http://openrosa.org/javarosa">
+	<h:head>
+		<h:title>Household Survey</h:title>
+		<model>
+			<itext>
+				<translation lang="English">
+					<text id="GroupLabel">
+						<value>Surveyor Information</value>
+					</text>
+					<text id="EnterNameLabel">
+						<value>Enter your name.</value>
+					</text>
+					<text id="EnterNameHint">
+						<value>Use Menu button to Change Language.</value>
+					</text>
+					<text id="Yes">
+						<value>Yes</value>
+					</text>
+					<text id="No">
+						<value>No</value>
+					</text>
+				</translation>
+				<translation lang="Spanish">
+					<text id="GroupLabel">
+						<value>Agrimensor Información</value>
+					</text>
+					<text id="EnterNameLabel">
+						<value>Escriba su nombre.</value>
+					</text>
+					<text id="EnterNameHint">
+						<value>Nombre y apellido, por favor.</value>
+					</text>
+					<text id="Yes">
+						<value>Sí</value>
+					</text>
+					<text id="No">
+						<value>No</value>
+					</text>
+				</translation>
+				<translation lang="French">
+					<text id="GroupLabel">
+						<value>Arpenteur de l'information</value>
+					</text>
+					<text id="EnterNameLabel">
+						<value>Entrez votre nom.</value>
+					</text>
+					<text id="EnterNameHint">
+						<value>Nom et prénom, s'il vous plaît.</value>
+					</text>
+					<text id="Yes">
+						<value>Oui</value>
+					</text>
+					<text id="No">
+						<value>Non</value>
+					</text>
+				</translation>
+				<translation lang="Swahili">
+					<text id="GroupLabel">
+						<value>Mfanyakazi habari</value>
+					</text>
+					<text id="EnterNameLabel">
+						<value>Andika jina lako.</value>
+					</text>
+					<text id="EnterNameHint">
+						<value>Kwanza na wa mwisho jina, tafadhali.</value>
+					</text>
+					<text id="Yes">
+						<value>Ndyio</value>
+					</text>
+					<text id="No">
+						<value>Hapana</value>
+					</text>
+				</translation>
+				<translation lang="Chinese">
+					<text id="GroupLabel">
+						<value>验船师信息</value>
+					</text>
+					<text id="EnterNameLabel">
+						<value>输入你的名字。</value>
+					</text>
+					<text id="EnterNameHint">
+						<value>姓和名，请。</value>
+					</text>
+					<text id="Yes">
+						<value>是</value>
+					</text>
+					<text id="No">
+						<value>否</value>
+					</text>
+				</translation>
+			</itext>
+			<instance>
+				<HouseholdSurvey id="HouseholdSurvey1">
+					<StartTime/>
+					<EndTime/>
+					<DeviceID/>
+					<SubscriberID/>
+					<SurveyorName/>
+					<SurveyorID/>
+					<SurveyorCode/>
+					<HouseholdLocation/>
+					<HouseholdImage/>
+					<HouseholdAudio/>
+					<HouseholdVideo/>
+					<HeadOfHouseholdName/>
+					<HeadOfHouseholdAge/>
+					<HeadOfHouseholdGender>m</HeadOfHouseholdGender>
+					<HeadOfHouseholdGenderText/>
+					<HeadOfHouseholdConfirmation/>
+					<ChildrenOfHousehold jr:template="">
+						<ChildName/>
+						<ChildBirthdate/>
+						<ChildColors/>
+						<ChildInSchool/>
+					</ChildrenOfHousehold>
+					<SurveyorNotes/>
+				</HouseholdSurvey>
+			</instance>
+			<bind nodeset="/HouseholdSurvey/StartTime" type="dateTime" jr:preload="timestamp" jr:preloadParams="start"/>
+			<bind nodeset="/HouseholdSurvey/EndTime" type="dateTime" jr:preload="timestamp" jr:preloadParams="end"/>
+			<bind nodeset="/HouseholdSurvey/DeviceID" type="string" jr:preload="property" jr:preloadParams="deviceid"/>
+			<bind nodeset="/HouseholdSurvey/SubscriberID" type="string" jr:preload="property" jr:preloadParams="subscriberid"/>
+			<bind nodeset="/HouseholdSurvey/SurveyorName" type="string"/>
+			<bind nodeset="/HouseholdSurvey/SurveyorCode" type="string" constraint="regex(., '[A-Za-z]{2}[0-9]{2}')" jr:constraintMsg="This isn't a valid key."/>
+			<bind nodeset="/HouseholdSurvey/SurveyorID" type="barcode" required="true()" relevant="selected(/HouseholdSurvey/SurveyorCode, '')"/>
+			<bind nodeset="/HouseholdSurvey/HouseholdLocation" type="geopoint"/>
+			<bind nodeset="/HouseholdSurvey/HouseholdImage" type="binary"/>
+			<bind nodeset="/HouseholdSurvey/HouseholdAudio" type="binary"/>
+			<bind nodeset="/HouseholdSurvey/HouseholdVideo" type="binary"/>
+			<bind nodeset="/HouseholdSurvey/HeadOfHouseholdName" required="true()" type="string"/>
+			<bind nodeset="/HouseholdSurvey/HeadOfHouseholdAge" required="true()" type="int" constraint=". &gt;= 0 and . &lt; 120" jr:constraintMsg="Age must be between 0 and 120."/>
+			<bind nodeset="/HouseholdSurvey/HeadOfHouseholdGender" type="string"/>
+			<bind nodeset="/HouseholdSurvey/HeadOfHouseholdGenderText" calculate="if(../HeadOfHouseholdGender = 'm', 'a man', 'a woman')" type="string"/>
+			<bind nodeset="/HouseholdSurvey/HeadOfHouseholdConfirmation" type="string" required="true()" constraint=". != 'no'" jr:constraintMsg="Acknowledge before continuing."/>
+			<bind nodeset="/HouseholdSurvey/ChildrenOfHousehold"/>
+			<bind nodeset="/HouseholdSurvey/ChildrenOfHousehold/ChildName" type="string"/>
+			<bind nodeset="/HouseholdSurvey/ChildrenOfHousehold/ChildBirthdate" type="date" constraint=". &lt;= today()" jr:constraintMsg="Only dates in the past are allowed."/>
+			<bind nodeset="/HouseholdSurvey/ChildrenOfHousehold/ChildColors" type="string" constraint="count-selected(.) = 2" jr:constraintMsg="Only two colors allowed."/>
+			<bind nodeset="/HouseholdSurvey/ChildrenOfHousehold/ChildInSchool" type="string"/>
+
+			<bind nodeset="/HouseholdSurvey/SurveyorNotes" type="string"/>
+		</model>
+	</h:head>
+	<h:body>
+		<group>
+			<label ref="jr:itext('GroupLabel')"/>
+			<input ref="/HouseholdSurvey/SurveyorName">
+				<label ref="jr:itext('EnterNameLabel')"/>
+				<hint ref="jr:itext('EnterNameHint')"/>
+			</input>
+			<input ref="/HouseholdSurvey/SurveyorCode">
+				<label>Enter your secret code.</label>
+				<hint>Leave empty if you have no secret code.</hint>
+			</input>
+			<input ref="/HouseholdSurvey/SurveyorID">
+				<label>No code entered. Please scan your ID instead.</label>
+				<hint>A barcode is required to continue, but you can go back and enter a secret code. Try two letters followed by two numbers.</hint>
+			</input>
+		</group>
+		<group>
+			<label>Household Info</label>
+			<input ref="/HouseholdSurvey/HouseholdLocation">
+				<label>Take GPS coordinates at the entrance of the house.</label>
+				<hint>Make sure you have a view of the sky.</hint>
+			</input>
+			<upload ref="/HouseholdSurvey/HouseholdImage" mediatype="image/*">
+				<label>Take a well focused picture of the front of the house.</label>
+			</upload>
+			<upload ref="/HouseholdSurvey/HouseholdVideo" mediatype="video/*">
+				<label>While walking around the house, record what you see.</label>
+			</upload>
+		</group>
+		<group>
+			<label>Household Members</label>
+			<group>
+				<label>Head of Household</label>
+				<input ref="/HouseholdSurvey/HeadOfHouseholdName">
+					<label>What is the full name of the head of household?</label>
+				</input>
+				<input ref="/HouseholdSurvey/HeadOfHouseholdAge">
+					<label>How old is the head of household?</label>
+					<hint>Age should between 0 and 120 years.</hint>
+				</input>
+				<select1 ref="/HouseholdSurvey/HeadOfHouseholdGender">
+					<label>What is the gender of the head of household?</label>
+					<hint>Male is selected by default.</hint>
+					<item>
+						<label>Male</label>
+						<value>m</value>
+					</item>
+					<item>
+						<label>Female</label>
+						<value>f</value>
+					</item>
+				</select1>
+				<trigger ref="/HouseholdSurvey/HeadOfHouseholdConfirmation">
+					<label>Acknowledge that '<output value="/HouseholdSurvey/HeadOfHouseholdName"/>' is <output value="/HouseholdSurvey/HeadOfHouseholdAge"/> years old and is <output value="/HouseholdSurvey/HeadOfHouseholdGenderText"/>?</label>
+				</trigger>
+			</group>
+			<group>
+				<label>Child in Household</label>
+				<repeat nodeset="/HouseholdSurvey/ChildrenOfHousehold">
+					<input ref="/HouseholdSurvey/ChildrenOfHousehold/ChildName">
+						<label>What is the child's full name?</label>
+					</input>
+					<input ref="/HouseholdSurvey/ChildrenOfHousehold/ChildBirthdate">
+						<label>What is the child's birthdate.</label>
+						<hint>No birthdays in future, please.</hint>
+					</input>
+					<select ref="/HouseholdSurvey/ChildrenOfHousehold/ChildColors">
+						<label>What are the child's favorite two colors.</label>
+						<item>
+							<label>Red</label>
+							<value>red</value>
+						</item>
+						<item>
+							<label>Orange</label>
+							<value>ora</value>
+						</item>
+						<item>
+							<label>Yellow</label>
+							<value>yel</value>
+						</item>
+						<item>
+							<label>Green</label>
+							<value>gre</value>
+						</item>
+						<item>
+							<label>Blue</label>
+							<value>blu</value>
+						</item>
+						<item>
+							<label>Purple</label>
+							<value>pur</value>
+						</item>
+						<item>
+							<label>Pink</label>
+							<value>pin</value>
+						</item>
+						<item>
+							<label>Brown</label>
+							<value>bro</value>
+						</item>
+						<item>
+							<label>Black</label>
+							<value>bla</value>
+						</item>
+						<item>
+							<label>White</label>
+							<value>whi</value>
+						</item>
+					</select>
+					<select1 ref="/HouseholdSurvey/ChildrenOfHousehold/ChildInSchool">
+						<label>Is the child attending school?</label>
+						<hint>Try using Menu button to Change Languages. 'Yes' and 'No' have been translated.</hint>
+						<item>
+							<label ref="jr:itext('Yes')"/>
+							<value>y</value>
+						</item>
+						<item>
+							<label ref="jr:itext('No')"/>
+							<value>n</value>
+						</item>
+					</select1>
+				</repeat>
+			</group>
+		</group>
+		<group>
+			<label>Household Notes</label>
+			<input ref="/HouseholdSurvey/SurveyorNotes">
+				<label>Survey is almost done. Any other relevant information?</label>
+			</input>
+		</group>
+	</h:body>
+</h:html>

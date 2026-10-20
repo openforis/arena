@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Surveys } from '@openforis/arena-core'
 
@@ -48,7 +48,7 @@ export const useBasicProps = (props) => {
   const ancestorMultipleEntityIsRoot = NodeDef.isEqual(rootDef)(ancestorMultipleEntity)
 
   // Survey cycles
-  const cyclesKeysSurvey = R.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
+  const cyclesKeysSurvey = A.pipe(Survey.getSurveyInfo, Survey.getCycleKeys)(survey)
   const cyclesKeysParent = NodeDef.isRoot(nodeDef) ? cyclesKeysSurvey : NodeDef.getCycles(nodeDefParent)
 
   // Analysis
@@ -67,7 +67,7 @@ export const useBasicProps = (props) => {
     (NodeDef.canHaveAutoIncrementalKey({ nodeDef, nodeDefParent }) &&
       ancestorMultipleEntityDef &&
       !NodeDef.isRoot(ancestorMultipleEntityDef))
-  const canAutoCreateMinCountItems = NodeDef.isMultipleEntity(nodeDef)
+  const canAutoCreateMinCountItems = NodeDef.canHaveAutoCreateMinCountItems(nodeDef)
   const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
   const canBeQualifier = Survey.canNodeDefBeQualifier(nodeDef)(survey)
   const hasUserGroups = useHasSurveyUserGroups({ enabled: canBeQualifier })

@@ -1,9 +1,9 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as Survey from '@core/survey/survey'
 
-const _isChainDeleted = () => R.pipe(ActivityLog.getChainUuid, R.isNil)
+const _isChainDeleted = () => A.pipe(ActivityLog.getChainUuid, A.isNil)
 
 const _isAnalysisNodeDefDeleted = (survey) => (activityLog) => {
   const nodeDefUuid = ActivityLog.getContentNodeDefUuid(activityLog)

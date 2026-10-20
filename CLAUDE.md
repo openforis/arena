@@ -8,7 +8,7 @@ Open Foris Arena is a cloud-based platform for storing and processing data colle
 
 **Key technologies:**
 
-- Node.js 24.11.1
+- Node.js 24.22.0
 - React 18 (frontend)
 - Express (backend)
 - PostgreSQL with PostGIS
@@ -121,20 +121,21 @@ yarn build:server:dev
 ### Testing
 
 ```bash
-# Run all tests (unit + e2e)
+# Run all tests (unit + e2e + integration)
 yarn test
 
 # Run unit tests only
 yarn test:unit
 
-# Run e2e tests only
+# Run e2e tests only (Playwright Test; needs a running server, see test/e2e/README.md)
 yarn test:e2e
 
 # Run integration tests
 yarn test:integration
 
-# Run e2e tests in watch/debug mode
-yarn test:e2e:watch
+# Run e2e tests in UI mode / debug mode
+yarn test:e2e:ui
+yarn test:e2e:debug
 
 # Generate e2e test code with Playwright codegen
 yarn test:e2e:codegen
@@ -173,7 +174,7 @@ yarn test:docker
 For e2e tests:
 
 ```bash
-jest --config=test/e2e/jest.config.js test/e2e/tests/yourTest.js
+yarn test:e2e specs/yourTest.spec.ts
 ```
 
 For unit tests (after building):
@@ -196,6 +197,44 @@ When adding a new node definition type or modifying the survey schema:
 ### Working with Database Migrations
 
 Database migrations are in `server/db/` directory. The server automatically runs migrations on startup unless `MIGRATE_ONLY=true` is set.
+
+## Coding Conventions
+
+**TypeScript for new code:**
+New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When substantially rewriting an existing `.js` file, prefer converting it to TypeScript. Run `yarn typecheck` to verify types.
+
+**Types from `@openforis/arena-core`:**
+Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
+
+**Single `@openforis/arena-core` version:**
+`@openforis/arena-core` is a direct dependency and a dependency of `@openforis/arena-server`: both must resolve to the same version (one copy), otherwise the services registered by arena-server in the `ServiceRegistry` singleton are not visible to arena. When updating either package, align the arena-core version range with the one required by arena-server and run `yarn dedupe @openforis/arena-core`; the CI `build` job fails if `yarn.lock` resolves more than one arena-core version.
+
+**Cognitive complexity:**
+Keep the cognitive complexity of every function at 15 or below (SonarCloud rule). Split complex logic into small helper functions, use early returns, and avoid deeply nested conditions/loops.
+
+**Colors and themes:**
+Never hard-code colors. Use the semantic theme tokens (Material Design 3 naming: `primary`, `onPrimary`, `primaryContainer`, `secondary`, `background`, `surface`, `onSurface`, `outline`, `error`, ...):
+
+- SCSS: `$colorPrimary`, `$colorOnSurface`, ... from `webapp/style/_vars.scss`; for transparency or lighter/darker variants use `with-alpha()`, `tint()`, `shade()` (not `rgba()` / `color.adjust()`, which don't work with CSS variables).
+- JS/TS (inline styles, `sx`, charts): `themeColors` from `@webapp/theme/tokens`.
+- Token values per theme (light/dark) are defined in `webapp/style/themes.scss` and mirrored in `webapp/theme/tokens.ts` (used by the MUI theme): keep them in sync.
+
+**Loops:**
+Prefer `for...of` loops over `Array.prototype.forEach`.
+
+**Comments:**
+Keep comments short and to the point (JSDoc descriptions included): one line when possible, explaining the "why" rather than restating the code. The same applies to replies on GitHub PR findings.
+
+## Pull Requests
+
+**Branch names:**
+Give new branches a meaningful, possibly short name describing the change (e.g. `dashboard-activity-log-env-visibility`).
+
+After creating a PR, wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
+
+- Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the checks status).
+- Fix every finding that can reasonably be solved, and push the fixes to the PR branch.
+- Reply to each finding on GitHub: explain how it was fixed (referencing the commit), or why it was not fixed (false positive, out of scope, etc.).
 
 ## Important Notes
 
@@ -236,10 +275,10 @@ Long-running operations use the job system in `server/job/`. Jobs are persisted 
 
 **E2E Tests:**
 
-- Use Playwright with jest-playwright-preset
-- Tests are in `test/e2e/tests/`
-- Authentication state is saved in `test/e2e/resources/auth.json`
-- Test utilities in `test/e2e/tests/utils/`
+- Playwright Test (`@playwright/test`), written in TypeScript: specs in `test/e2e/specs/`, see `test/e2e/README.md`
+- Every spec is isolated: it prepares its data with the fixtures in `test/e2e/fixtures/` (per-worker test user,
+  logged-in browser context, REST API client, sample survey inserted in the DB with the `test/utils` builders)
+- Shared UI helpers in `test/e2e/helpers/`
 
 **Integration Tests:**
 

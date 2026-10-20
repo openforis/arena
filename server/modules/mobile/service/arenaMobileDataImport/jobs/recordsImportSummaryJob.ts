@@ -9,7 +9,7 @@ import {
   getRecordFormattedKeyValuesByDefUuid,
   findExistingRecordSummary,
   determineRecordAction,
-} from './recordImportMatcher'
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 /**
  * Reads every record contained in an Arena format zip and, for each one, determines whether it's new,
@@ -57,7 +57,7 @@ export default class RecordsImportSummaryJob extends Job {
 
     for (const recordSummary of recordSummaries) {
       const recordUuid = Record.getUuid(recordSummary)
-      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
 
       const existingRecordSummary = findExistingRecordSummary({
         survey,
@@ -65,7 +65,12 @@ export default class RecordsImportSummaryJob extends Job {
         existingRecordsSummary,
         conflictResolutionStrategy,
       })
-      const { action } = determineRecordAction({ record, existingRecordSummary, conflictResolutionStrategy })
+      const { action } = determineRecordAction({
+        survey,
+        record,
+        existingRecordSummary,
+        conflictResolutionStrategy,
+      })
       const keyValues = getRecordFormattedKeyValuesByDefUuid({ survey, record })
 
       this.items.push({

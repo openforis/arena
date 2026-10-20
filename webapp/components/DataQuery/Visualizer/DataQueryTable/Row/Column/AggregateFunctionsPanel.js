@@ -43,7 +43,7 @@ export const AggregateFunctionsPanel = (props) => {
         {Object.keys(Query.DEFAULT_AGGREGATE_FUNCTIONS).map((aggregateFn) => (
           <Button
             key={aggregateFn}
-            active={aggregateFunctions.indexOf(aggregateFn) >= 0}
+            active={aggregateFunctions.includes(aggregateFn)}
             className="btn-aggregate-fn deselectable"
             label={`common.${aggregateFn}`}
             onClick={() => onChangeQuery(Query.toggleMeasureAggregateFunction({ nodeDefUuid, aggregateFn })(query))}

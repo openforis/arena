@@ -1,7 +1,7 @@
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { appModules, dataModules } from '@webapp/app/appModules'
 
@@ -25,7 +25,8 @@ const Data = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
-  const draftDefs = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const draftDefs =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   return (
     <SurveyDefsLoader

@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Nom de catégorie non spécifié',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      "Une catégorie de Données de points d'échantillonnage existe déjà dans ce formulaire ; il ne peut y en avoir qu'une seule.",
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Impossible de supprimer les éléments de catégorie publiés. Éléments manquants dans le fichier importé : {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Nombre invalide dans la colonne {{headers}} : {{value}}',
     invalidTaxonCode: 'Code invalide dans la colonne {{headers}} : {{value}}',
     invalidTime:
-      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm. Ex. 09:45 ou 16:30",
+      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm ou HH:mm:ss. Ex. 09:45, 16:30 ou 09:45:30",
     missingRequiredHeaders: 'Colonnes requises manquantes : {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erreur lors de la mise à jour des valeurs : {{details}}',
     multipleRecordsMatchingKeys: 'Plusieurs enregistrements trouvés correspondant aux clés "{{keyValues}}"',
@@ -131,6 +136,9 @@ export default {
     countMaxInvalid: '"Nombre maximum" invalide',
     countMinInvalid: '"Nombre minimum" invalide',
     readOnlyCannotHaveEditableIf: 'Un noeud en lecture seule ne peut pas avoir de condition "Editable if"',
+    requiredIfInvalid: 'Condition "Obligatoire si" invalide',
+    requiredIfNotAllowed:
+      'La condition "Obligatoire si" n\'est autorisée que pour les attributs simples, non clés et pas toujours obligatoires',
     qualifierCannotHaveApplicableExpression:
       'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit.advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
@@ -246,6 +254,8 @@ export default {
     invalidRequest: "Demande d'accès utilisateur invalide",
     userAlreadyExisting: "Un utilisateur avec l'e-mail {{email}} existe déjà",
     requestAlreadySent: `La demande d'accès pour l'utilisateur avec l'e-mail {{email}} a déjà été envoyée`,
+    emailNotReachable:
+      "L'e-mail de confirmation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
     invalidReCaptcha: 'ReCaptcha invalide',
   },
 
@@ -256,6 +266,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Le rôle est requis',
     surveyNameRequired: 'Le nom du formulaire est requis',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Un groupe avec le même nom existe déjà : {{name}}',
+    qualifiersInvalid: 'Un ou plusieurs qualificatifs ont une clé invalide ou en double',
+    qualifierNameDuplicate: 'Un qualificatif avec le même nom existe déjà dans ce groupe : {{name}}',
+    qualifierNameInvalid: 'Nom de qualificatif invalide',
+    qualifierNameRequired: 'Le nom du qualificatif est requis',
   },
 
   userPasswordChange: {

@@ -49,6 +49,7 @@ export const PrintProps = (props: PrintPropsProps) => {
         info="nodeDefEdit.printProps.printOrientation.info"
       >
         <Dropdown
+          className="node-def-print-orientation-dropdown"
           disabled={readOnly}
           clearable={false}
           items={items}

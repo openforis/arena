@@ -23,6 +23,15 @@ import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
 import { SwaggerInitializer } from './swaggerInitializer'
+import { systemErrorMiddleware } from './systemErrorMiddleware'
+
+const createHttpRequestLogger = () => {
+  if (!ProcessUtils.isEnvDevelopment && !ProcessUtils.ENV.logHttpRequests) return null
+  // written through log4js (not to stdout directly), so requests end up in the log file too
+  const httpLogger = Log.getLogger('HttpRequest')
+  const stream = { write: (message) => httpLogger.debug(message.trimEnd()) }
+  return morgan(':method :url :status :response-time ms - :res[content-length]', { stream })
+}
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
@@ -32,7 +41,12 @@ export const run = async () => {
   // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
   // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
   // itself, together with that survey's data migration, so the two no longer need to run twice.
-  const arenaApp = await ArenaServer.init({ skipSurveySchemaDbMigrations: true })
+  // registered by arena-server before its own middlewares, so rejected requests (e.g. 401) are logged too
+  const httpRequestLogger = createHttpRequestLogger()
+  const arenaApp = await ArenaServer.init({
+    skipSurveySchemaDbMigrations: true,
+    initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
+  })
   const { express: app, serviceRegistry } = arenaApp
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
@@ -43,10 +57,6 @@ export const run = async () => {
   const orphanedJobsCount = await JobRepository.failOrphanedByInstanceId(ProcessEnv.instanceId)
   if (orphanedJobsCount > 0) {
     logger.warn(`marked ${orphanedJobsCount} orphaned job(s) as failed (instanceId: ${ProcessEnv.instanceId})`)
-  }
-
-  if (ProcessUtils.isEnvDevelopment) {
-    app.use(morgan('dev'))
   }
 
   // ====== app initializations
@@ -60,6 +70,10 @@ export const run = async () => {
   app.use('/guest{/*path}', express.static(dist))
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/img', express.static(imgDir))
+  const geoDir = `${arenaRoot}/web-resources/geo`
+  app.use('/geo', express.static(geoDir))
+  // Arena Mobile web preview (yarn mobile-preview:download)
+  app.use('/mobile-preview', express.static(`${arenaRoot}/mobile-preview`))
   app.use('/noHeader{/*path}', express.static(dist))
 
   // ====== APIs
@@ -67,6 +81,9 @@ export const run = async () => {
   app.use('/api', apiRouter.router)
 
   SwaggerInitializer.init(app)
+
+  // registered after the routes: the arena-server error middleware is registered before them and never reached
+  app.use(systemErrorMiddleware)
 
   // ====== System Admin user creation
   await runWithClusterLock({

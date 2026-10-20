@@ -77,13 +77,13 @@ const _initializeSurveyCategoryItemsIndexesInternal = async ({ surveyId, categor
   for (const level of levels) {
     const levelIndex = CategoryLevel.getIndex(level)
 
-    const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, client)
+    const items = await CategoryRepository.fetchItemsByLevelIndex({ surveyId, categoryUuid, levelIndex, draft }, client) // NOSONAR
     const { shouldIndexesBeInitialized, itemsByParentUuid } = groupItemsByParentUuid(items)
     if (shouldIndexesBeInitialized) {
       const indexByItemUuid = calculateIndexesByItemUuid({ itemsByParentUuid, draft })
 
       if (Objects.isNotEmpty(indexByItemUuid)) {
-        await CategoryRepository.updateItemsIndexes({ surveyId, indexByItemUuid, draftProps: draft }, client)
+        await CategoryRepository.updateItemsIndexes({ surveyId, indexByItemUuid, draftProps: draft }, client) // NOSONAR
       }
     }
   }
@@ -108,7 +108,7 @@ export const initializeCategoryItemIndexesForSurvey = async ({ surveyId }, clien
     const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
 
     for (const category of Object.values(categoriesByUuid)) {
-      await initializeSurveyCategoryItemsIndexes({ surveyId, category }, t)
+      await initializeSurveyCategoryItemsIndexes({ surveyId, category }, t) // NOSONAR
     }
   })
 }

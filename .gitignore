@@ -131,6 +131,8 @@ typings/
 # Nuxt.js build / generate output
 .nuxt
 dist
+# Arena Mobile web preview (yarn mobile-preview:download)
+mobile-preview/
 
 # Gatsby files
 .cache/
@@ -299,3 +301,12 @@ modules.xml
 
 # Default output path for test/load/buildSampleSurveyZip.ts
 sample-survey.zip
+
+# Playwright Test (test/e2e) outputs
+test/e2e/test-results/
+test/e2e/playwright-report/
+
+# Kubernetes deployment: local secrets
+infra/k8s/overlays/*/secrets.env
+infra/k8s/overlays/*/db.env
+infra/k8s/overlays/*/rstudio.htpasswd

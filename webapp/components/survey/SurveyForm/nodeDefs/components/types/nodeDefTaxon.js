@@ -2,7 +2,7 @@ import './nodeDefTaxon.scss'
 
 import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { connect } from 'react-redux'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import PropTypes from 'prop-types'
 
 import { FormItem } from '@webapp/components/form/Input'
@@ -55,7 +55,7 @@ const NodeDefTaxon = (props) => {
       ? {
           [code]: Taxon.getCode(taxonRefData),
           [scientificName]: unkOrUnl ? Node.getScientificName(node) : Taxon.getScientificName(taxonRefData),
-          [vernacularName]: unkOrUnl ? Node.getVernacularName(node) : R.defaultTo('', taxonRefData[vernacularName]),
+          [vernacularName]: unkOrUnl ? Node.getVernacularName(node) : A.defaultTo('', taxonRefData[vernacularName]),
         }
       : selectionDefault
 
@@ -122,6 +122,7 @@ const NodeDefTaxon = (props) => {
 
   useEffect(() => {
     if (!edit) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- keeps the selection in sync with the node
       updateSelectionFromNode()
     }
   }, [
@@ -140,6 +141,7 @@ const NodeDefTaxon = (props) => {
 
   return (
     <div className={className} ref={elementRef}>
+      {/* eslint-disable-next-line react-hooks/refs -- refs are read while rendering the fields (pre-existing) */}
       {visibleFields.map((field) => {
         const inputField = (
           <NodeDefTaxonInputField

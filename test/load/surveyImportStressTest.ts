@@ -71,7 +71,7 @@ export const pollJobUntilTerminal = async ({
   for (;;) {
     let job: Job | null = null
     try {
-      job = await getJobStatus({ baseUrl, authToken, jobUuid, fetchImpl })
+      job = await getJobStatus({ baseUrl, authToken, jobUuid, fetchImpl }) // NOSONAR
       consecutivePollErrors = 0
     } catch (error: any) {
       consecutivePollErrors += 1
@@ -109,7 +109,7 @@ export const pollJobUntilTerminal = async ({
         result: lastKnownResult,
       }
     }
-    await sleep(pollIntervalMs)
+    await sleep(pollIntervalMs) // NOSONAR
   }
 }
 
@@ -288,7 +288,7 @@ export const cleanupSurveys = async ({
   let deletedCount = 0
   for (const surveyId of surveyIds) {
     try {
-      await deleteSurvey({ baseUrl, authToken, surveyId, fetchImpl })
+      await deleteSurvey({ baseUrl, authToken, surveyId, fetchImpl }) // NOSONAR
       deletedCount += 1
     } catch (error: any) {
       console.error(`Failed to delete survey ${surveyId}: ${error.message}`)
@@ -323,7 +323,7 @@ export const cleanupUsers = async ({
   let deletedCount = 0
   for (const userUuid of userUuids) {
     try {
-      await deleteUser({ baseUrl, authToken, userUuid, fetchImpl })
+      await deleteUser({ baseUrl, authToken, userUuid, fetchImpl }) // NOSONAR
       deletedCount += 1
     } catch (error: any) {
       console.error(`Failed to delete user ${userUuid}: ${error.message}`)

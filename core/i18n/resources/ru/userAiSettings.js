@@ -15,6 +15,8 @@ export default {
     dataDictionaryHint: 'Chernoviki slovarja dannyh, podgotovlennye II.',
     userActivity: 'Aktivnost polzovatelej',
     userActivityHint: 'Svodki zhurnala aktivnosti, podgotovlennye II.',
+    dataQuery: 'Запросы к данным',
+    dataQueryHint: 'Формирование запросов в Проводнике данных по описанию на обычном языке.',
   },
   providerSection: 'Provajder II',
   currentlyUsing: 'Sejchas ispolzuetsja: {{source}} - {{provider}} / {{model}}',

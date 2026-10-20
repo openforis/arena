@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
 
@@ -50,7 +50,7 @@ export const newSurvey = ({
     [SurveyInfo.keys.name]: name,
     [SurveyInfo.keys.languages]: languages,
     [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
-    [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [R.omit([Srs.keys.wkt], Srs.latLonSrs)],
+    [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [A.omit([Srs.keys.wkt], Srs.latLonSrs)],
     [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
     ...rest,
   },
@@ -71,11 +71,11 @@ export const { getDefaultAuthGroups } = SurveyDefaults
 
 // READ
 export const getSurveyInfo = SurveyInfo.getInfo
-export const getId = R.pipe(getSurveyInfo, SurveyInfo.getId)
+export const getId = A.pipe(getSurveyInfo, SurveyInfo.getId)
 export const getIdSurveyInfo = SurveyInfo.getId
 export const canHaveData = (survey) => {
   const surveyInfo = getSurveyInfo(survey)
-  return isPublished(surveyInfo) || isFromCollect(surveyInfo)
+  return isPublished(surveyInfo) || isFromCollect(surveyInfo) || isFromOdk(surveyInfo)
 }
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
@@ -108,6 +108,7 @@ export const {
   getDescription,
   getDescriptions,
   getFieldManualLinks,
+  isKeepNonApplicableValues,
   getUserExtraPropDefs,
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
@@ -132,11 +133,14 @@ export const {
   isPublished,
   isDraft,
   isFromCollect,
+  isFromOdk,
   isRdbInitialized,
   getCollectUri,
   getCollectReport,
   getCollectNodeDefsInfoByPath,
   hasCollectReportIssues,
+  getOdkFormId,
+  getOdkNodeDefsInfoByPath,
   getOwnerName,
   getOwnerUuid,
   getAppVersion,
@@ -308,7 +312,6 @@ export const {
   getNodeDefCodeCandidateParents,
 } = SurveyNodeDefs
 
-// TODO check where used
 export const { canUpdateCategory, isNodeDefParentCode } = SurveyNodeDefs
 
 // ====== Categories

@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
 import * as StringUtils from '@core/stringUtils'
@@ -31,6 +31,53 @@ const arenaFileTypeByCollectFileType = {
   DOCUMENT: NodeDef.fileTypeValues.other,
   IMAGE: NodeDef.fileTypeValues.image,
   VIDEO: NodeDef.fileTypeValues.video,
+}
+
+// coordinate specific props: allowOnlyDeviceCoordinate, accuracy and altitude
+const _extractCoordinateProps = (collectNodeDef) => {
+  const props = {}
+  for (const [uiAttributeName, propKey] of [
+    ['allowOnlyDeviceCoordinate', NodeDef.propKeys.allowOnlyDeviceCoordinate],
+    ['includeAccuracy', NodeDef.propKeys.includeAccuracy],
+    ['includeAltitude', NodeDef.propKeys.includeAltitude],
+  ]) {
+    if (CollectSurvey.getUiAttribute(uiAttributeName, false)(collectNodeDef)) {
+      props[propKey] = true
+    }
+  }
+  return props
+}
+
+// text input type (short/memo => singleLine/multiLine)
+const _extractTextProps = (collectNodeDef) =>
+  CollectSurvey.getAttribute('type', 'short')(collectNodeDef) === 'memo'
+    ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
+    : {}
+
+const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
+  const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
+  if (hiddenWhenNotRelevant) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
+  }
+  const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
+  const hiddenInMobile =
+    StringUtils.isNotBlank(relevantExpr) &&
+    ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
+  if (hiddenInMobile) {
+    updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
+  }
+}
+
+const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath, nodeDefUuid, field }) => {
+  let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
+  if (!nodeDefsInfo) {
+    nodeDefsInfo = []
+    nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
+  }
+  nodeDefsInfo.push({
+    uuid: nodeDefUuid,
+    ...(field ? { field } : {}),
+  })
 }
 
 export default class NodeDefsImportJob extends Job {
@@ -82,38 +129,11 @@ export default class NodeDefsImportJob extends Job {
     })
   }
 
-  /**
-   * Inserts a node definition and all its descendants (if any).
-   *
-   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
-   * (used to import Collect composite attribute definitions like Range).
-   *
-   * @param {NodeDef} parentNodeDef - Parent node def definition.
-   * @param {!string} parentPath - Parent node path.
-   * @param {!object} collectNodeDef - Collect node definition.
-   * @param {!string} type - Node definition type.
-   * @param {string} field - Node sub-field.
-   * @returns {Promise<object>} - Inserted node definitions.
-   */
-  async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
+  _buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout }) {
     const { defaultLanguage } = this.context
-
-    const nodeDefsUpdated = {}
-    const nodeDefsInserted = {}
-
-    // 1. determine basic props
     const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
-    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     const calculated = CollectSurvey.getAttributeBoolean('calculated')(collectNodeDef)
     const key = CollectSurvey.getAttributeBoolean('key')(collectNodeDef)
-
-    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
-
-    const tableLayout =
-      multiple &&
-      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) ===
-        CollectSurvey.layoutTypes.table
-
     const nodeDefNameSuffix = field ? `_${field}` : ''
 
     const props = {
@@ -144,6 +164,38 @@ export default class NodeDefsImportJob extends Job {
       }
     }
 
+    return props
+  }
+
+  /**
+   * Inserts a node definition and all its descendants (if any).
+   *
+   * If field is specified, creates an attribute definition with `_${field}` as suffix for name and label
+   * (used to import Collect composite attribute definitions like Range).
+   * @param {NodeDef} parentNodeDef - Parent node def definition.
+   * @param {!string} parentPath - Parent node path.
+   * @param {!object} collectNodeDef - Collect node definition.
+   * @param {!string} type - Node definition type.
+   * @param {string} field - Node sub-field.
+   * @returns {Promise<object>} - Inserted node definitions.
+   */
+  async insertNodeDef(parentNodeDef, parentPath, collectNodeDef, type, field = null) {
+    const nodeDefsUpdated = {}
+    const nodeDefsInserted = {}
+
+    // 1. determine basic props
+    const collectNodeDefName = CollectSurvey.getAttribute('name')(collectNodeDef)
+    const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
+
+    const collectNodeDefPath = `${parentPath}/${collectNodeDefName}`
+
+    const tableLayout =
+      multiple &&
+      CollectSurvey.getUiAttribute('layout', CollectSurvey.layoutTypes.table)(collectNodeDef) ===
+        CollectSurvey.layoutTypes.table
+
+    const props = this._buildNodeDefProps({ parentNodeDef, collectNodeDef, type, field, multiple, tableLayout })
+
     // 2. insert node def into db
     const nodeDefParam = _createNodeDef(parentNodeDef, type, props)
     const nodeDefUuid = NodeDef.getUuid(nodeDefParam)
@@ -167,7 +219,7 @@ export default class NodeDefsImportJob extends Job {
 
     const _updateLayoutProp = ({ propName, value }) => {
       const layout = propsUpdated[NodeDefLayout.keys.layout] || NodeDef.getLayout(nodeDef)
-      const layoutUpdated = R.assocPath([Survey.cycleOneKey, propName], value)(layout)
+      const layoutUpdated = A.assocPath([Survey.cycleOneKey, propName], value)(layout)
       propsUpdated[NodeDefLayout.keys.layout] = layoutUpdated
     }
 
@@ -202,43 +254,13 @@ export default class NodeDefsImportJob extends Job {
       Object.assign(nodeDefsUpdated, qualifierNodeDefsUpdated)
       Object.assign(nodeDefsInserted, qualifierNodeDefsInserted)
     } else if (type === NodeDef.nodeDefType.coordinate) {
-      // 3e. allowOnlyDeviceCoordinate
-      const allowOnlyDeviceCoordinate = CollectSurvey.getUiAttribute('allowOnlyDeviceCoordinate', false)(collectNodeDef)
-      if (allowOnlyDeviceCoordinate) {
-        propsUpdated[NodeDef.propKeys.allowOnlyDeviceCoordinate] = true
-      }
-      // 3f. accuracy
-      const includeAccuracy = CollectSurvey.getUiAttribute('includeAccuracy', false)(collectNodeDef)
-      if (includeAccuracy) {
-        propsUpdated[NodeDef.propKeys.includeAccuracy] = true
-      }
-      // 3g. altitude
-      const includeAltitude = CollectSurvey.getUiAttribute('includeAltitude', false)(collectNodeDef)
-      if (includeAltitude) {
-        propsUpdated[NodeDef.propKeys.includeAltitude] = true
-      }
+      Object.assign(propsUpdated, _extractCoordinateProps(collectNodeDef))
     } else if (type === NodeDef.nodeDefType.text) {
-      // 3f. text input type (short/memo => singleLine/multiLine)
-      const collectTextInputType = CollectSurvey.getAttribute('type', 'short')(collectNodeDef)
-      if (collectTextInputType === 'memo') {
-        propsUpdated[NodeDef.propKeys.textInputType] = NodeDef.textInputTypes.multiLine
-      }
+      Object.assign(propsUpdated, _extractTextProps(collectNodeDef))
     }
 
-    // 4a. update hidden when not relevant layout prop
-    const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
-    if (hiddenWhenNotRelevant) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
-    }
-
-    // 4b. update hiddenInMobile layout prop
-    const relevantExpr = CollectSurvey.getAttribute('relevant')(collectNodeDef)
-    const hiddenInMobile =
-      StringUtils.isNotBlank(relevantExpr) &&
-      ['env:desktop()', 'not(env:mobile())'].includes(relevantExpr.replaceAll(/\s/g, ''))
-    if (hiddenInMobile) {
-      _updateLayoutProp({ propName: NodeDefLayout.keys.hiddenInMobile, value: true })
-    }
+    // 4. update visibility layout props
+    _updateVisibilityLayoutProps({ collectNodeDef, updateLayoutProp: _updateLayoutProp })
 
     Object.assign(this.nodeDefs, nodeDefsInserted, nodeDefsUpdated)
 
@@ -263,15 +285,11 @@ export default class NodeDefsImportJob extends Job {
     nodeDef = nodeDefsUpdated[nodeDefUuid]
 
     // 6. store nodeDef in cache
-    let nodeDefsInfo = this.nodeDefsInfoByCollectPath[collectNodeDefPath]
-    if (!nodeDefsInfo) {
-      nodeDefsInfo = []
-      this.nodeDefsInfoByCollectPath[collectNodeDefPath] = nodeDefsInfo
-    }
-
-    nodeDefsInfo.push({
-      uuid: nodeDefUuid,
-      ...(field ? { field } : {}),
+    _addNodeDefInfoToCache({
+      nodeDefsInfoByCollectPath: this.nodeDefsInfoByCollectPath,
+      collectNodeDefPath,
+      nodeDefUuid,
+      field,
     })
 
     nodeDefsInserted[nodeDefUuid] = nodeDef
@@ -292,9 +310,9 @@ export default class NodeDefsImportJob extends Job {
         for (const childDefField of childDefFields) {
           const { type: childType, field = null } = childDefField
 
-          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field)
+          const nodeDefsInserted = await this.insertNodeDef(nodeDef, collectNodeDefPath, collectChild, childType, field) // NOSONAR
           // sort inserted node defs by id
-          const insertedUuids = R.pipe(R.values, R.sortBy(NodeDef.getId), R.map(NodeDef.getUuid))(nodeDefsInserted)
+          const insertedUuids = A.pipe(A.values, A.sortBy(NodeDef.getId), A.map(NodeDef.getUuid))(nodeDefsInserted)
           if (tableLayout) {
             childrenUuids.push(...insertedUuids)
           }
@@ -329,7 +347,7 @@ export default class NodeDefsImportJob extends Job {
     // 1. default values
     const defaultValues = await this.parseDefaultValues({ nodeDef, collectNodeDef })
 
-    if (!R.isEmpty(defaultValues)) {
+    if (!A.isEmpty(defaultValues)) {
       propsAdvanced[NodeDef.keysPropsAdvanced.defaultValues] = defaultValues
     }
 
@@ -345,6 +363,10 @@ export default class NodeDefsImportJob extends Job {
         : {
             [NodeDefValidations.keys.required]: CollectSurvey.getAttribute('required')(collectNodeDef),
           }),
+    }
+    const requiredIf = await this.parseRequiredIf({ nodeDef, type, multiple, collectNodeDef })
+    if (requiredIf) {
+      validations[NodeDefValidations.keys.requiredIf] = requiredIf
     }
 
     if (type !== NodeDef.nodeDefType.entity) {
@@ -390,12 +412,42 @@ export default class NodeDefsImportJob extends Job {
     return propsAdvanced
   }
 
+  // Collect "requiredIf" (attribute required when a condition is met) -> Arena "required if" (single non-key attributes
+  // not always required only)
+  async parseRequiredIf({ nodeDef, type, multiple, collectNodeDef }) {
+    const requiredIfExpr = CollectSurvey.getAttribute('requiredIf')(collectNodeDef)
+    if (
+      StringUtils.isBlank(requiredIfExpr) ||
+      type === NodeDef.nodeDefType.entity ||
+      multiple ||
+      NodeDef.isKey(nodeDef) ||
+      CollectSurvey.getAttributeBoolean('required')(collectNodeDef)
+    ) {
+      return null
+    }
+    const requiredIfExprConverted = await CollectExpressionConverter.convert({
+      survey: this.survey,
+      nodeDefCurrent: nodeDef,
+      expression: requiredIfExpr,
+    })
+    const success = requiredIfExprConverted !== null
+    this.importIssues.push(
+      CollectImportReportItem.newReportItem({
+        nodeDefUuid: NodeDef.getUuid(nodeDef),
+        expressionType: CollectImportReportItem.exprTypes.requiredIf,
+        expression: requiredIfExpr,
+        resolved: success,
+      })
+    )
+    return success ? [NodeDefExpression.createExpression({ expression: requiredIfExprConverted })] : null
+  }
+
   extractNodeDefSpecificProps(type, collectNodeDef) {
     switch (type) {
       case NodeDef.nodeDefType.code: {
         const listName = CollectSurvey.getAttribute('list')(collectNodeDef)
-        const categoryName = R.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
-          ? Survey.samplingPointDataCategoryName
+        const categoryName = A.includes(listName, CollectSurvey.samplingPointDataCodeListNames)
+          ? Category.samplingPointDataCategoryName
           : listName
         const category = Survey.getCategoryByName(categoryName)(this.survey)
 
@@ -483,7 +535,7 @@ export default class NodeDefsImportJob extends Job {
     const levelIndex = Survey.getNodeDefCategoryLevelIndex(nodeDef)(this.survey)
 
     const qualifiableItemCodesByCategoryAndLevel = this.getContextProp('qualifiableItemCodesByCategoryAndLevel', {})
-    const qualifiableItemCodes = R.pathOr(
+    const qualifiableItemCodes = A.pathOr(
       [],
       [categoryName, String(levelIndex)],
       qualifiableItemCodesByCategoryAndLevel
@@ -499,9 +551,9 @@ export default class NodeDefsImportJob extends Job {
           parentNodeDefName: NodeDef.getName(parentNodeDef),
           nodeDefName: `${nodeDefName}${specifyAttributeNameSuffix}`,
         }),
-        [NodeDef.propKeys.labels]: R.pipe(
+        [NodeDef.propKeys.labels]: A.pipe(
           NodeDef.getLabels,
-          R.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
+          A.mapObjIndexed((label) => `${label}${specifyAttributeLabelSuffix}`)
         )(nodeDef),
         // hidden when not relevant
         [NodeDef.propKeys.layout]: {
@@ -520,7 +572,7 @@ export default class NodeDefsImportJob extends Job {
         [NodeDef.keysPropsAdvanced.applicable]: [NodeDefExpression.createExpression({ expression: applicableIfExpr })],
       }
       const qualifierNodeDefParam = _createNodeDef(parentNodeDef, NodeDef.nodeDefType.text, props, propsAdvanced)
-      const qualifierNodeDefAndOthersUpdated = await NodeDefManager.insertNodeDef(
+      const qualifierNodeDefAndOthersUpdated = /* NOSONAR */ await NodeDefManager.insertNodeDef(
         {
           user: this.user,
           survey: this.survey,
@@ -532,7 +584,7 @@ export default class NodeDefsImportJob extends Job {
 
       const qualifierNodeDefUuid = NodeDef.getUuid(qualifierNodeDefParam)
       nodeDefsInserted[qualifierNodeDefUuid] = qualifierNodeDefAndOthersUpdated[qualifierNodeDefUuid]
-      Object.assign(nodeDefsUpdated, R.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
+      Object.assign(nodeDefsUpdated, A.omit(qualifierNodeDefUuid, qualifierNodeDefAndOthersUpdated))
     }
     return { nodeDefsInserted, nodeDefsUpdated }
   }
@@ -602,7 +654,7 @@ export default class NodeDefsImportJob extends Job {
         })
       )
 
-      return success ? R.propOr(null, 'uuid', R.head(nodeDefsInfo)) : null
+      return success ? A.propOr(null, 'uuid', A.head(nodeDefsInfo)) : null
     }
 
     return null

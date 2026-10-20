@@ -81,4 +81,65 @@ $t(common.pressRefreshToReloadPage)`,
   updateUserConfirmation: "L'utilisateur {{name}} a été mis à jour",
   userNotInvitedToAnySurvey: `Utilisateur non invité à aucun formulaire`,
   userSurveys: "Formulaires de l'utilisateur",
+  usersBackup: {
+    menu: 'Sauvegarde / Restauration',
+    backup: 'Sauvegarder les utilisateurs',
+    backupTitle: 'Sauvegarder les utilisateurs',
+    backupInfo:
+      "Tous les utilisateurs seront exportés avec leurs rôles dans les formulaires et leurs groupes d'utilisateurs, afin de pouvoir les restaurer sur un autre serveur Arena. Les appareils 2FA ne sont pas exportés.",
+    includePasswords: 'Inclure les mots de passe',
+    passwordsWarning:
+      'Le fichier de sauvegarde contiendra les hachages des mots de passe : conservez-le en lieu sûr et supprimez-le après utilisation.',
+    restore: 'Restaurer les utilisateurs',
+    restoreTitle: 'Restaurer les utilisateurs depuis une sauvegarde',
+    restoreInfo: `- Les utilisateurs sont identifiés par leur adresse e-mail
+- Les rôles dans les formulaires et les groupes d'utilisateurs sont identifiés par le nom du formulaire et le nom du groupe
+- Les rôles et groupes d'utilisateurs des formulaires inexistants sur ce serveur sont ignorés
+- Après avoir cliqué sur « Restaurer les utilisateurs », vous pourrez choisir quoi faire pour chaque utilisateur`,
+    backupFileInfo: 'Sauvegarde générée par {{email}} le {{date}} (serveur : {{serverUrl}})',
+    passwordsNotIncluded:
+      'Les mots de passe ne sont pas inclus dans cette sauvegarde : les nouveaux utilisateurs devront réinitialiser leur mot de passe',
+    allNewUsers: 'Tous les nouveaux utilisateurs ({{count}})',
+    allExistingUsers: 'Tous les utilisateurs existants ({{count}})',
+    userStatus: 'Statut',
+    userActionHeader: 'Action',
+    userNew: 'Nouveau',
+    userExisting: 'Existant',
+    userAction: {
+      insert: 'Ajouter',
+      skip: 'Ignorer',
+      updateRoles: 'Mettre à jour les rôles dans les formulaires',
+      updateAll: 'Mettre à jour les rôles dans les formulaires et les informations',
+    },
+    sysAdmin: 'Admin. sys.',
+    restorePassword: 'Mot de passe',
+    restorePasswordInfo:
+      "Restaurer le mot de passe enregistré dans la sauvegarde (uniquement lors de l'ajout de l'utilisateur ou de la mise à jour de ses informations)",
+    userActionShort: {
+      insert: 'Ajouter',
+      skip: 'Ignorer',
+      updateRoles: 'Rôles',
+      updateAll: 'Rôles + infos',
+    },
+    details: {
+      survey: 'Formulaire',
+      roleInBackup: 'Rôle dans la sauvegarde',
+      currentRole: 'Rôle actuel',
+      notFoundInThisServer: '(introuvable sur ce serveur)',
+      userGroup: "Groupe d'utilisateurs",
+      inBackup: 'Dans la sauvegarde',
+      currentMember: 'Membre actuel',
+    },
+    summaryImported: 'Utilisateurs restaurés',
+    summary: {
+      usersTotal: 'Utilisateurs dans la sauvegarde : {{count}}',
+      usersInserted: 'Nouveaux utilisateurs : {{count}}',
+      usersUpdated: 'Utilisateurs mis à jour : {{count}}',
+      usersSkipped: 'Utilisateurs ignorés : {{count}}',
+      authGroupsAdded: 'Rôles dans les formulaires ajoutés : {{count}}',
+      userGroupsAdded: "Appartenances aux groupes d'utilisateurs ajoutées : {{count}}",
+    },
+    surveysNotFound: 'Formulaires introuvables (rôles ignorés) : {{names}}',
+    userGroupsNotFound: "Groupes d'utilisateurs introuvables (appartenances ignorées) : {{names}}",
+  },
 }

@@ -1,10 +1,10 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as UiState from '../state'
 
 export const stateKey = 'notification'
 
-const getState = R.pipe(UiState.getState, R.propOr({}, stateKey))
+const getState = A.pipe(UiState.getState, A.propOr({}, stateKey))
 
 const keys = {
   messageKey: 'messageKey',
@@ -31,11 +31,11 @@ export const newNotification = ({ key, params, text, severity }) => ({
 })
 
 // ====== READ
-export const getMessageKey = R.pipe(getState, R.propOr(null, keys.messageKey))
-export const getMessageParams = R.pipe(getState, R.propOr({}, keys.messageParams))
-export const getMessageText = R.pipe(getState, R.propOr(null, keys.messageText))
-export const getSeverity = R.pipe(getState, R.propOr(severityType.info, keys.severity))
-export const isVisible = R.pipe(getState, R.propEq(keys.visible, true))
+export const getMessageKey = A.pipe(getState, A.propOr(null, keys.messageKey))
+export const getMessageParams = A.pipe(getState, A.propOr({}, keys.messageParams))
+export const getMessageText = A.pipe(getState, A.propOr(null, keys.messageText))
+export const getSeverity = A.pipe(getState, A.propOr(severityType.info, keys.severity))
+export const isVisible = A.pipe(getState, A.propEq(keys.visible, true))
 
 export const show = (notification) => ({
   ...notification,

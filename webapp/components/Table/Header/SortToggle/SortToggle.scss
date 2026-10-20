@@ -1,5 +1,7 @@
+@use '~@webapp/style/vars' as *;
+
 .btn-sort-toggle {
-  color: white;
+  color: $colorInverseOnSurface;
   position: relative;
 
   .arrow-toggle {

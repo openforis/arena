@@ -35,12 +35,12 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
       return acc
     }
     const sourceAndDependentUuids = [nodeDefUuid, ...dependentNodeDefUuids]
-    const nodeDefUuids =
-      !selectedNodeDefUuid || nodeDefUuid === selectedNodeDefUuid
-        ? sourceAndDependentUuids
-        : dependentNodeDefUuids.includes(selectedNodeDefUuid)
-          ? [nodeDefUuid, selectedNodeDefUuid]
-          : []
+    let nodeDefUuids = []
+    if (!selectedNodeDefUuid || nodeDefUuid === selectedNodeDefUuid) {
+      nodeDefUuids = sourceAndDependentUuids
+    } else if (dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
+      nodeDefUuids = [nodeDefUuid, selectedNodeDefUuid]
+    }
 
     nodeDefUuids.forEach((uuid) => {
       if (!acc[uuid]) {

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect, useCallback } from 'react'
 import PropTypes from 'prop-types'
 
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import LoadingBar from '@webapp/components/LoadingBar'
 
@@ -11,10 +11,13 @@ import { ContentRowCells } from './ContentRowCells'
 import { ContentHeaders } from './ContentHeaders'
 import { ContentRow } from './ContentRow'
 
+// placeholder rows have no identity: give them positional ids
+const getLoadingRowIds = (rows) => Array.from({ length: rows }, (_item, index) => `loading-row-${index}`)
+
 const LoadingRows = ({ rows }) => (
   <div className="table__rows">
-    {new Array(rows).fill(0).map((_item, index) => (
-      <div className="table__row" key={String(index)}>
+    {getLoadingRowIds(rows).map((rowId) => (
+      <div className="table__row" key={rowId}>
         <LoadingBar />
       </div>
     ))}
@@ -24,6 +27,9 @@ const LoadingRows = ({ rows }) => (
 LoadingRows.propTypes = {
   rows: PropTypes.number.isRequired,
 }
+
+const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
+  [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
 
 const Content = (props) => {
   const {
@@ -71,7 +77,7 @@ const Content = (props) => {
     }
   }, [offset, tableRef])
 
-  if (!loading && R.isEmpty(list)) {
+  if (!loading && A.isEmpty(list)) {
     return (
       <div className="table__empty-rows" data-testid={TestId.table.noItems}>
         {Number(totalCount) <= 0 ? i18n.t(noItemsLabelKey) : i18n.t(noItemsLabelForSearchKey)}
@@ -101,14 +107,13 @@ const Content = (props) => {
     : rowHeaderComponentParam
 
   const gridTemplateColumns = hasColumns
-    ? [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+    ? getGridTemplateColumnsFromColumns({ columns, expandableRows })
     : gridTemplateColumnsParam
 
   return (
     <div className="table__content">
       <div className="table__row-header" ref={headerRef} style={{ gridTemplateColumns }}>
-        {/* TODO check why props is passed in this way*/}
-        {React.createElement(rowHeaderComponent, { props, sort, handleSortBy, ...rowProps })}
+        {React.createElement(rowHeaderComponent, { sort, handleSortBy, ...rowProps })}
       </div>
 
       {loading ? (
@@ -121,7 +126,6 @@ const Content = (props) => {
               ...props,
               ...rowProps,
               key,
-              row: item, // TODO do not pass "row" but "item" instead
               index,
               item,
               rowComponent,
@@ -129,7 +133,7 @@ const Content = (props) => {
               gridTemplateColumns,
               onRowClick,
               onRowDoubleClick,
-              selected: Boolean(selectedItems.find((_item) => keyExtractor({ item: _item }) === key)),
+              selected: selectedItems.some((_item) => keyExtractor({ item: _item }) === key),
             })
           })}
         </div>

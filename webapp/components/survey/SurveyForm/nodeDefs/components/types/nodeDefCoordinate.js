@@ -14,8 +14,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { NumberFormats } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'

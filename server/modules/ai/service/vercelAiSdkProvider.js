@@ -170,7 +170,8 @@ const postChatEndpoint = async ({ endpoint, messages, signal }) => {
   })
   if (!response.ok || !response.body) {
     const bodyText = response.ok ? '' : await response.text().catch(() => '')
-    throw new Error(`AI SDK upstream HTTP ${response.status}${bodyText ? `: ${bodyText.slice(0, 500)}` : ''}`)
+    const bodySuffix = bodyText ? `: ${bodyText.slice(0, 500)}` : ''
+    throw new Error(`AI SDK upstream HTTP ${response.status}${bodySuffix}`)
   }
   return response
 }

@@ -20,7 +20,7 @@ import { DataQueryScatterChartTooltip } from './DataQueryScatterChartTooltip'
 
 const maxItems = 5000
 
-const categoricalAttributeDefTypes = [NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]
+const categoricalAttributeDefTypes = new Set([NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon])
 
 const getCategoricalVariableColumnName = ({ categoricalAttributeDef, nodeDefLabelType }) => {
   if (!categoricalAttributeDef) return null
@@ -76,7 +76,7 @@ export const DataQueryScatterChart = (props) => {
   )
 
   const categoricalAttributeDef = attributeDefs.find((nodeDef) =>
-    categoricalAttributeDefTypes.includes(NodeDef.getType(nodeDef))
+    categoricalAttributeDefTypes.has(NodeDef.getType(nodeDef))
   )
   const categoricalAttributeDefColumnName = getCategoricalVariableColumnName({
     categoricalAttributeDef,

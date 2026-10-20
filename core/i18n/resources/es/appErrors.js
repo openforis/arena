@@ -1,4 +1,18 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
+  aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
+  aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
+  aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
+  aiDataQuerySummaryInvalid:
+    'La IA no pudo sugerir un nombre y una descripción para esta consulta. Inténtelo de nuevo.',
+  userCannotDeleteHasMessages:
+    'Este usuario no se puede eliminar: es autor de {{count}} mensaje(s); elimínelos o reasígnelos primero',
+  userCannotDeleteLastSystemAdmin: 'Este usuario no se puede eliminar: es el último administrador del sistema',
+  userCannotDeleteOwnsSurveys:
+    'Este usuario no se puede eliminar: es propietario de {{count}} encuesta(s); transfiera la propiedad primero',
+  userCannotDeleteSelf: 'No puede eliminar su propia cuenta de usuario',
+  userEmailInvalid:
+    'El correo electrónico de invitación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
   cannotGetChild: "No se puede obtener el hijo '{{childName}}' del atributo {{name}}",
   cannotImportFilesExceedingQuota:
     'No se pueden importar archivos de registro: se excedería la cuota de almacenamiento de archivos',
@@ -23,6 +37,8 @@ export default {
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
     pendingImportFileNotFoundOrExpired:
       'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
+    recordMergeWithSameKeysNotAllowed:
+      'No se puede importar el registro "{{recordKeyValues}}": ya existe otro registro con las mismas claves y la fusión de registros con las mismas claves no está permitida en esta encuesta',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
@@ -53,18 +69,58 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
+    entityNotFound: 'Entidad no encontrada para la exportación especificada',
+    missingServerUrl: 'Se requiere la URL pública del servidor al exportar con un código QR',
+    qrTokenMismatch: 'No se pudo finalizar la exportación con código QR; inténtelo de nuevo',
+  },
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
     dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
+    fileNotFound: 'Archivo no encontrado',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
+  aiNotConfigured:
+    'La IA no está configurada. Configure un proveedor personal en la Configuración de IA o pida a su administrador que configure uno predeterminado.',
+  aiFeaturesDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
+  aiFeatureDisabled: 'La función de IA "{{feature}}" está deshabilitada.',
+  aiPromptTooLarge: 'El prompt de IA es demasiado grande ({{size}} caracteres; límite {{limit}}).',
+  aiInputTooLong: 'El campo de entrada de IA "{{field}}" supera el límite de {{limit}} caracteres.',
+  aiSchemaMissing: 'Falta el esquema de salida estructurada de IA para la función "{{feature}}".',
+  aiProviderInvalid: 'Proveedor de IA no compatible: {{provider}}.',
+  aiModelMissing: 'El identificador del modelo de IA es obligatorio.',
+  aiApiKeyMissing: 'La clave de API es obligatoria para el proveedor {{provider}}.',
+  aiBaseUrlMissing: 'Se requiere una URL base para el proveedor compatible con OpenAI.',
+  aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
+  aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
+  aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
+  aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',
+  aiExpressionNodeDefNotFound: 'No se pudo encontrar el campo de destino (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: 'No se puede explicar una expresión vacía.',
+  aiTranslationSocketMissing: 'WebSocket no conectado. Espere un momento e inténtelo de nuevo.',
+  aiTranslationSourceLangMissing: 'El idioma de origen es obligatorio para la traducción.',
+  aiTranslationTargetLangsMissing: 'Se requiere al menos un idioma de destino para la traducción.',
+  aiTranslationItemsMissing: 'Nada que traducir.',
+  aiTranslationTooManyItems: 'Demasiados elementos en un solo lote ({{count}}); el límite es {{limit}}.',
+  aiActivityLogSurveyMissing: 'Se requiere una encuesta para resumir el registro de actividad.',
+  aiChatbotDisabled: 'El chatbot de documentación está deshabilitado en este despliegue.',
+  aiChatbotUpstreamError:
+    'El chatbot de documentación no está disponible temporalmente. Inténtelo de nuevo en un momento.',
+  aiChatbotPayloadTooLarge: 'Su conversación es demasiado grande. Borre el chat e intente con una pregunta más corta.',
   userHasPendingInvitation:
     "Ya hay una invitación pendiente para el usuario con el correo electrónico '{{email}}'; no se le puede invitar a esta encuesta hasta que sea aceptada",
   userHasRole: 'El usuario dado ya tiene un rol en esta encuesta',
   userHasRole_other: 'Los usuarios dados ya tienen un rol en esta encuesta',
   userInvalid: 'Usuario inválido',
+  surveyCompareFileTooLarge:
+    'El archivo de la encuesta es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
+  userNotFound: 'Usuario no encontrado: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'El archivo no es una copia de seguridad de usuarios de Arena válida',
+  },
 }

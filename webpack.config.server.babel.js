@@ -1,4 +1,4 @@
-import * as path from 'path'
+import * as path from 'node:path'
 import * as webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
 import mainConfig from './webpack.config.babel'

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'
 import { useNodeDefByUuid, useSurveyPreferredLang } from '@webapp/store/survey'
 
 const Row = (props) => {
-  const { row: entity } = props
+  const { item: entity } = props
   const parentDef = useNodeDefByUuid(entity?.parentUuid)
   const lang = useSurveyPreferredLang()
 
@@ -18,7 +18,7 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
-  row: PropTypes.object.isRequired,
+  item: PropTypes.object.isRequired,
 }
 
 export default Row

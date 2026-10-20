@@ -5,8 +5,14 @@ import { useOnSave } from './useOnSave'
 import { useOnRemove } from './useOnRemove'
 import { useOnInviteRepeat } from './useOnInviteRepeat'
 
-export const useActions = ({ userToUpdate, setUserToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }) => ({
-  onGetUser: useGetUser({ setUserToUpdate, setUserToUpdateOriginal }),
+export const useActions = ({
+  userUuid,
+  userToUpdate,
+  setUserToUpdate,
+  userToUpdateOriginal,
+  setUserToUpdateOriginal,
+}) => ({
+  onGetUser: useGetUser({ userUuid, setUserToUpdate, setUserToUpdateOriginal }),
   onUpdate: useOnUpdate({ userToUpdate, setUserToUpdate }),
   onUpdateProfilePicture: useOnUpdateProfilePicture({ userToUpdate, setUserToUpdate }),
   onSave: useOnSave({ userToUpdate, setUserToUpdate, userToUpdateOriginal, setUserToUpdateOriginal }),

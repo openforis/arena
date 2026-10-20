@@ -9,13 +9,22 @@ import * as AuthGroupRepository from '@server/modules/auth/repository/authGroupR
 import * as UserInvitationsRepository from '@server/modules/user/repository/userInvitationRepository'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
+import * as DbUtils from '@server/db/dbUtils'
 
 const _associateToGroup = async ({ userUuid, groupName }, client) => {
   const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
   await AuthGroupRepository.insertUserGroup({ groupUuid: AuthGroup.getUuid(group), userUuid }, client)
 }
 
-const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userAlreadyExisting }, client) => {
+const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userUuid }, client) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyUuid = Survey.getUuid(surveyInfo)
+
+  // the user could be already associated to a group of the new survey
+  // (e.g. the user performing the import is added to the survey admins when the survey is created)
+  const userGroups = await AuthGroupRepository.fetchUserGroups(userUuid, client)
+  if (userGroups.some((group) => AuthGroup.getSurveyUuid(group) === surveyUuid)) return
+
   const arenaSurveyUuid = Survey.getUuid(Survey.getSurveyInfo(arenaSurvey))
 
   const userGroupInImportedSurvey = User.getAuthGroupBySurveyUuid({
@@ -23,18 +32,13 @@ const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userAlreadyE
     defaultToMainGroup: true,
   })(user)
 
-  const groupToAssociateToUser = Survey.getAuthGroupByName(AuthGroup.getName(userGroupInImportedSurvey))(
-    Survey.getSurveyInfo(survey)
-  )
-  const userGroupInExistingUser = User.getAuthGroupBySurveyUuid({
-    surveyUuid: arenaSurveyUuid,
-    defaultToMainGroup: true,
-  })(userAlreadyExisting)
+  const groupToAssociateToUser = Survey.getAuthGroupByName(AuthGroup.getName(userGroupInImportedSurvey))(surveyInfo)
 
-  if (groupToAssociateToUser && !AuthGroup.isEqual(groupToAssociateToUser)(userGroupInExistingUser)) {
-    const surveyGroupUuid = AuthGroup.getUuid(groupToAssociateToUser)
-    const userUuid = userAlreadyExisting ? User.getUuid(userAlreadyExisting) : User.getUuid(user)
-    await AuthGroupRepository.insertUserGroup({ groupUuid: surveyGroupUuid, userUuid }, client)
+  if (groupToAssociateToUser) {
+    await AuthGroupRepository.insertUserGroup(
+      { groupUuid: AuthGroup.getUuid(groupToAssociateToUser), userUuid },
+      client
+    )
   }
 }
 
@@ -89,7 +93,7 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
       await _associateToGroup({ userUuid, groupName: AuthGroup.groupNames.surveyManager }, client)
     }
     // associate to survey auth group
-    await _associateToSurveyGroup({ survey, arenaSurvey, user, userAlreadyExisting }, client)
+    await _associateToSurveyGroup({ survey, arenaSurvey, user, userUuid }, client)
   }
   return userAlreadyExisting || user
 }
@@ -127,8 +131,9 @@ export default class UsersImportJob extends Job {
       users.push(this.user)
     }
 
-    const insertedUsers = await Promise.all(
-      users.map(async (user) => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
+    const insertedUsers = await DbUtils.runQueries(
+      this.tx,
+      users.map((user) => async () => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
     )
     // map of user uuids in the db by user uuid in the zip file being imported (users could be already inserted in the db with a different uuid)
     const newUserUuidByOldUuid = users.reduce(

@@ -89,7 +89,7 @@ export const fetch = async ({
   const schema = getSurveyDBSchema(surveyId)
 
   const limitedById = idGreaterThan || idLessThan
-  const conditionLimitedById = ` id ${idGreaterThan ? `> ${idGreaterThan}` : `< ${idLessThan}`}`
+  const conditionLimitedById = idGreaterThan ? ` id > ${idGreaterThan}` : ` id < ${idLessThan}`
 
   return client.map(
     `

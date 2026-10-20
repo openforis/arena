@@ -13,7 +13,7 @@ const GROUP_LABEL_CLASS = 'leaflet-control-layers-group-label'
  * @param {Array<{label: string, count: number}>} [props.overlayGroups] - Overlay groups in display order.
  * @returns {null} Renders nothing.
  */
-export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups }) => {
+export const MapLayersGroupsInjector = ({ baseLayersLabel, overlayGroups = [] }) => {
   const map = useMap()
 
   const groupsKey = JSON.stringify(overlayGroups)
@@ -70,8 +70,4 @@ MapLayersGroupsInjector.propTypes = {
       count: PropTypes.number.isRequired,
     })
   ),
-}
-
-MapLayersGroupsInjector.defaultProps = {
-  overlayGroups: [],
 }

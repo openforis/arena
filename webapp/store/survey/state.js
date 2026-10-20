@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,17 +10,17 @@ const survey = 'survey'
 export const stateKey = survey
 
 // ====== READ
-export const getSurvey = R.prop(survey)
+export const getSurvey = A.prop(survey)
 
-export const getSurveyInfo = R.pipe(getSurvey, Survey.getSurveyInfo)
+export const getSurveyInfo = A.pipe(getSurvey, Survey.getSurveyInfo)
 
-export const getSurveyDefaultLang = R.pipe(getSurveyInfo, Survey.getDefaultLanguage)
+export const getSurveyDefaultLang = A.pipe(getSurveyInfo, Survey.getDefaultLanguage)
 
-export const getSurveyId = R.pipe(getSurvey, Survey.getId)
+export const getSurveyId = A.pipe(getSurvey, Survey.getId)
 
-export const getSurveyName = R.pipe(getSurveyInfo, Survey.getName)
+export const getSurveyName = A.pipe(getSurveyInfo, Survey.getName)
 
-export const getSurveyUuid = R.pipe(getSurveyInfo, Survey.getUuid)
+export const getSurveyUuid = A.pipe(getSurveyInfo, Survey.getUuid)
 
 export const getSurveyCycleKey = (state) => {
   const surveyId = getSurveyId(state)
@@ -28,7 +28,7 @@ export const getSurveyCycleKey = (state) => {
   return User.getPrefSurveyCycle(surveyId)(user)
 }
 
-export const getSurveyCyclesKeys = R.pipe(getSurvey, Survey.getSurveyInfo, Survey.getCycleKeys)
+export const getSurveyCyclesKeys = A.pipe(getSurvey, Survey.getSurveyInfo, Survey.getCycleKeys)
 
 export const getSurveyPreferredLang = (state) => {
   const surveyInfo = getSurveyInfo(state)

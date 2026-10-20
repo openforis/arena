@@ -6,6 +6,7 @@ import ArenaMobileDataImportJob from '@server/modules/mobile/service/arenaMobile
 import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/arenaMobileDataImport/arenaMobileDataImportSummaryJob'
 import CategoriesExportJob from '@server/modules/category/service/CategoriesExportJob'
 import CategoriesBatchImportJob from '@server/modules/category/service/CategoriesBatchImportJob'
+import CategoryGeoPackageExportJob from '@server/modules/category/service/CategoryGeoPackageExportJob'
 import CategoryImportJob from '@server/modules/category/service/categoryImportJob'
 import CollectImportJob from '@server/modules/collectImport/service/collectImport/collectImportJob'
 import CollectDataImportJob from '@server/modules/collectImport/service/collectImport/collectDataImportJob'
@@ -16,15 +17,20 @@ import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummary
 import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import MessageSendJob from '@server/modules/message/service/MessageSendJob'
 import NodeDefsTranslationJob from '@server/modules/survey/service/NodeDefsTranslationJob'
+import OdkImportJob from '@server/modules/odkImport/service/odkImport/odkImportJob'
+import OdkDataImportJob from '@server/modules/odkImport/service/odkImport/odkDataImportJob'
 import PersistOlapDataJob from '@server/modules/analysis/service/olap/PersistOlapDataJob'
 import PersistResultsJob from '@server/modules/analysis/service/rChain/PersistResultsJob'
 import RecordsCloneJob from '@server/modules/record/service/recordsCloneJob'
 import RecordsValidationJob from '@server/modules/record/service/recordsValidationJob'
+import SamplingPointDataWhispJob from '@server/modules/geo/service/whispSamplingPointData/SamplingPointDataWhispJob'
 import SelectedRecordsExportJob from '@server/modules/record/service/selectedRecordsExportJob'
 import SurveyCloneJob from '@server/modules/survey/service/clone/surveyCloneJob'
 import SurveyActivityLogClearJob from '@server/modules/survey/service/surveyActivityLogClearJob'
 import SurveyCreatorJob from '@server/modules/survey/service/surveyCreateJob'
 import SurveyExportJob from '@server/modules/survey/service/surveyExport/surveyExportJob'
+import SurveyCompareJob from '@server/modules/surveyCompare/service/surveyCompareJob'
+import SurveyCompareApplyJob from '@server/modules/surveyCompare/service/surveyCompareApplyJob'
 import SurveyLabelsImportJob from '@server/modules/survey/service/surveyLabelsImportJob'
 import SurveyPublishJob from '@server/modules/survey/service/publish/surveyPublishJob'
 import SchemaSummaryExportJob from '@server/modules/survey/service/schemaSummary/SchemaSummaryExportJob'
@@ -32,6 +38,8 @@ import SurveysListExportJob from '@server/modules/survey/service/SurveysListExpo
 import SurveysRdbRefreshJob from '@server/modules/surveyRdb/service/SurveysRdbRefreshJob'
 import SurveyUnpublishJob from '@server/modules/survey/service/unpublish/surveyUnpublishJob'
 import TaxonomyImportJob from '@server/modules/taxonomy/service/taxonomyImportJob'
+import UsersBackupExportJob from '@server/modules/user/service/usersBackup/UsersBackupExportJob'
+import UsersBackupImportJob from '@server/modules/user/service/usersBackup/UsersBackupImportJob'
 import VaidationReportGenerationJob from '@server/modules/record/service/validationReportGenerationJob'
 
 const jobClasses = [
@@ -41,6 +49,7 @@ const jobClasses = [
   ArenaMobileDataImportSummaryJob,
   CategoriesExportJob,
   CategoriesBatchImportJob,
+  CategoryGeoPackageExportJob,
   CategoryImportJob,
   CollectImportJob,
   CollectDataImportJob,
@@ -51,12 +60,17 @@ const jobClasses = [
   GeoJsonDataExportJob,
   MessageSendJob,
   NodeDefsTranslationJob,
+  OdkImportJob,
+  OdkDataImportJob,
   PersistOlapDataJob,
   PersistResultsJob,
   RecordsCloneJob,
   RecordsValidationJob,
+  SamplingPointDataWhispJob,
   SelectedRecordsExportJob,
   SurveyCloneJob,
+  SurveyCompareJob,
+  SurveyCompareApplyJob,
   SurveyActivityLogClearJob,
   SurveyCreatorJob,
   SurveyExportJob,
@@ -67,6 +81,8 @@ const jobClasses = [
   SurveysRdbRefreshJob,
   SurveyUnpublishJob,
   TaxonomyImportJob,
+  UsersBackupExportJob,
+  UsersBackupImportJob,
   VaidationReportGenerationJob,
 ]
 

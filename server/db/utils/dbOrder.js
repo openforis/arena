@@ -1,5 +1,6 @@
-const asc = 'asc'
-const desc = 'desc'
+import { SortOrder } from '@core/sortOrder'
+
+const { asc, desc } = SortOrder
 
 const isAsc = (order) => order?.toLowerCase() === asc
 const isDesc = (order) => order?.toLowerCase() === desc

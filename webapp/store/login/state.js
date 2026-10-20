@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const stateKey = 'login'
 
@@ -16,14 +16,14 @@ export const ViewState = {
 
 const viewStates2FA = new Set([ViewState.ask2FAToken, ViewState.ask2FABackupCode])
 
-const getStateProp = (key, defaultValue = null) => R.pathOr(defaultValue, [stateKey, key])
+const getStateProp = (key, defaultValue = null) => A.pathOr(defaultValue, [stateKey, key])
 
 export const getError = getStateProp(keys.error)
-export const assocError = R.assoc(keys.error)
+export const assocError = A.assoc(keys.error)
 
 export const getViewState = getStateProp(keys.viewState, ViewState.askUsernameAndPassword)
 export const is2FAViewState = (state) => viewStates2FA.has(getViewState(state))
-export const assocViewState = R.assoc(keys.viewState)
+export const assocViewState = A.assoc(keys.viewState)
 
 export const getEmail = getStateProp(keys.email, '')
-export const assocEmail = (email) => R.pipe(R.assoc(keys.email, email), assocError(null))
+export const assocEmail = (email) => A.pipe(A.assoc(keys.email, email), assocError(null))

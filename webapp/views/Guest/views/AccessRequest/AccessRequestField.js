@@ -93,7 +93,7 @@ const componentsByFieldName = {
 }
 
 export const AccessRequestField = (props) => {
-  const { field, request, validation = null } = props
+  const { field, onChange, request, validation = null } = props
 
   const { name, required } = field
 
@@ -102,7 +102,7 @@ export const AccessRequestField = (props) => {
     value = ''
   }
 
-  const fieldComponent = React.createElement(componentsByFieldName[name] || TextField, { ...props, value })
+  const fieldComponent = React.createElement(componentsByFieldName[name] || TextField, { ...props, onChange, value })
 
   const validationFieldName = name.startsWith('props.') ? name.substring(6) : name
   const fieldValidation = Validation.getFieldValidation(validationFieldName)(validation)

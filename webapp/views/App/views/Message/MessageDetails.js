@@ -36,6 +36,7 @@ const notificationTypeItems = [MessageNotificationType.Email, MessageNotificatio
 const targetUserTypeItems = [
   MessageTargetUserType.All,
   MessageTargetUserType.SystemAdmins,
+  MessageTargetUserType.SurveyAdmins,
   MessageTargetUserType.SurveyManagers,
   MessageTargetUserType.DataAnalysts,
   MessageTargetUserType.DataCleaners,
@@ -195,7 +196,7 @@ const MessageDetails = () => {
             validation={Validation.getFieldValidation(MessagePropsKey.body)(validation)}
           />
           <Switch label="messageView:preview" checked={showPreview} onChange={onShowPreviewChange} />
-          {showPreview && <Markdown source={messageBody} className="message-body-preview" />}
+          {showPreview && <Markdown className="message-body-preview" openLinksInNewTab source={messageBody} />}
         </div>
       </FormItem>
       <FormItem label="messageView:notificationType.label">

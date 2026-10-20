@@ -6,7 +6,7 @@ import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
@@ -100,8 +100,6 @@ export const useAuthCanValidateAllRecords = useUserIsSystemAdmin
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
 
-export const useAuthCanUseMessages = useUserIsSystemAdmin
-
 // ====== Auth / Users
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
@@ -154,7 +152,7 @@ export const useUserName = ({ userUuid, active = true }) => {
 
   useEffect(() => {
     if (canViewUsersName && userUuid && active) {
-      API.fetchUserName({ userUuid, surveyId }).then((name) => {
+      void API.fetchUserName({ userUuid, surveyId }).then((name) => {
         setUserName(name)
       })
     }

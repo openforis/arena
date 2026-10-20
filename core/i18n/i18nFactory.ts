@@ -7,6 +7,7 @@ import * as ProcessUtils from '@core/processUtils'
 import enTranslation from './resources/en'
 import esTranslation from './resources/es'
 import frTranslation from './resources/fr'
+import jaTranslation from './resources/ja'
 import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
 import ruTranslation from './resources/ru'
@@ -15,6 +16,7 @@ const resources = {
   en: enTranslation,
   es: esTranslation,
   fr: frTranslation,
+  ja: jaTranslation,
   mn: mnTranslation,
   pt: ptTranslation,
   ru: ruTranslation,

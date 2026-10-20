@@ -1,6 +1,14 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
+import { randomBytes } from 'node:crypto'
 
-import { NodeValues, Objects, RecordExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@openforis/arena-core'
+import {
+  Authorizer,
+  NodeValues,
+  Objects,
+  RecordExpressionEvaluator,
+  SurveyDocImages,
+  SurveyDocPlace,
+} from '@openforis/arena-core'
 import { SurveyDocxGenerator, SurveyPdfGenerator } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
@@ -13,7 +21,6 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
-import * as Authorizer from '@core/auth/authorizer'
 import * as DateUtils from '@core/dateUtils'
 import * as Node from '@core/record/node'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
@@ -39,6 +46,7 @@ import * as Response from '@server/utils/response'
 import * as SurveyManager from '../../survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
 import * as RecordFileManager from '../manager/recordFileManager'
+import * as ShareRepository from '../repository/recordPrintableExportShareRepository'
 import { findSurveyDocImageApplicable } from '../../survey/service/surveyDocImageUtils'
 
 import { NodesDeleteBatchPersister } from '../manager/NodesDeleteBatchPersister'
@@ -46,6 +54,8 @@ import { NodesInsertBatchPersister } from '../manager/NodesInsertBatchPersister'
 import { NodesUpdateBatchPersister } from '../manager/NodesUpdateBatchPersister'
 import RecordsCloneJob from './recordsCloneJob'
 import RecordsValidationJob from './recordsValidationJob'
+import { toQrPngBuffer } from './qrCodePng'
+import { upsertShareWithPdf } from './recordPrintableExportShareService'
 import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
@@ -96,6 +106,26 @@ export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cy
   })
 }
 
+/**
+ * Fetches, for each of the given record UUIDs, the UUIDs of the files already stored on the
+ * server for it. Used by mobile clients to skip re-uploading file content that hasn't changed.
+ * @param {object} params - The function parameters.
+ * @param {number} params.surveyId - The survey ID.
+ * @param {Array<string>} params.recordUuids - The record UUIDs to fetch files for.
+ * @returns {Promise<{[recordUuid: string]: Array<string>}>} File UUIDs grouped by record UUID.
+ */
+export const fetchFileUuidsByRecordUuid = async ({ surveyId, recordUuids }) => {
+  const files = await RecordFileManager.fetchNonDeletedFileUuidsByRecordUuids({ surveyId, recordUuids })
+  const fileUuidsByRecordUuid = {}
+  for (const { fileUuid, recordUuid } of files) {
+    if (!fileUuidsByRecordUuid[recordUuid]) {
+      fileUuidsByRecordUuid[recordUuid] = []
+    }
+    fileUuidsByRecordUuid[recordUuid].push(fileUuid)
+  }
+  return fileUuidsByRecordUuid
+}
+
 export const {
   countRecordsBySurveyIdGroupedByStep,
   fetchRecordsUuidAndCycle,
@@ -112,6 +142,25 @@ export const {
   updateRecordOwner,
 } = RecordManager
 
+// keepTimeZone: false avoids convertDate's default parseZone-based parsing, which treats a
+// timezone-less "HH:mm:ss" string as UTC and shifts it by the local UTC offset on format (e.g.
+// "14:30:45" -> "16:30:45" on a UTC+2 host). Time values have no timezone component, so they
+// must be parsed and formatted consistently in the local zone.
+/**
+ * Formats a time value for display in the records summary, applying the node definition's time format.
+ * @param {object} params - The function parameters.
+ * @param {string} params.value - The stored time value (HH:mm:ss).
+ * @param {object} params.nodeDef - The time node definition the value belongs to.
+ * @returns {string} The formatted time value.
+ */
+export const formatTimeSummaryValue = ({ value, nodeDef }) =>
+  DateUtils.convertDate({
+    dateStr: value,
+    formatFrom: 'HH:mm:ss',
+    formatTo: DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef)),
+    keepTimeZone: false,
+  })
+
 export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
@@ -127,8 +176,7 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
         formatFrom: DateUtils.formats.datetimeISO,
         formatTo: DateUtils.formats.dateDefault,
       }),
-    [NodeDef.nodeDefType.time]: ({ value }) =>
-      DateUtils.convertDate({ dateStr: value, formatFrom: 'HH:mm:ss', formatTo: DateUtils.formats.timeStorage }),
+    [NodeDef.nodeDefType.time]: formatTimeSummaryValue,
   }
 
   const objectTransformer = (recordSummary) => {
@@ -140,7 +188,7 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
         nodeDefKeyColumnNames.forEach((nodeDefKeyColumnName) => {
           const value = recordSummary[A.camelize(nodeDefKeyColumnName)]
           const formatter = valueFormattersByType[NodeDef.getType(nodeDefKey)]
-          const valueFormatted = formatter ? formatter({ value }) : value
+          const valueFormatted = formatter ? formatter({ value, nodeDef: nodeDefKey }) : value
           keysAcc[nodeDefKeyColumnName] = valueFormatted
         })
         return keysAcc
@@ -180,8 +228,8 @@ export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, u
 }
 
 // Records export job
-export const startRecordsExportJob = ({ user, surveyId, recordUuids }) => {
-  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids })
+export const startRecordsExportJob = ({ user, surveyId, recordUuids, excludedFileUuids = [] }) => {
+  const job = new SelectedRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
   JobManager.enqueueJob(job)
   return job
 }
@@ -207,7 +255,7 @@ export const deleteRecords = async ({ socketId, user, surveyId, recordUuids }) =
   Logger.debug('deleting records - surveyId:', surveyId, 'recordUuids:', recordUuids)
 
   for (const recordUuid of recordUuids) {
-    await deleteRecord({ socketId, user, surveyId, recordUuid })
+    await deleteRecord({ socketId, user, surveyId, recordUuid }) // NOSONAR
   }
 
   Logger.debug('records deleted - surveyId:', surveyId, 'recordUuids:', recordUuids)
@@ -217,13 +265,13 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   const surveyIds = await SurveyManager.fetchAllSurveyIds()
   let count = 0
   for (const surveyId of surveyIds) {
-    const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours)
+    const deletedRecordsCount = await RecordManager.deleteRecordsPreview(surveyId, olderThan24Hours) // NOSONAR
     count += deletedRecordsCount
   }
   return count
 }
 
-export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset }) => {
+export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset, lang }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
   // Passing `user` re-evaluates user-dependent applicability/relevance (e.g. userProp) for
@@ -250,6 +298,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
         draft,
         recordUuid,
         timezoneOffset,
+        lang,
       })
     }
   }
@@ -423,6 +472,8 @@ export const persistNode = async ({
   node,
   file = null,
   timezoneOffset = null,
+  lang = null,
+  clearNonApplicableValuesConfirmed = false,
 }) => {
   const recordUuid = Node.getRecordUuid(node)
 
@@ -448,11 +499,33 @@ export const persistNode = async ({
     socketId,
     user,
     recordUuid,
-    msg: { type: RecordsUpdateThreadMessageTypes.nodePersist, surveyId, cycle, draft, node, user, timezoneOffset },
+    msg: {
+      type: RecordsUpdateThreadMessageTypes.nodePersist,
+      surveyId,
+      cycle,
+      draft,
+      node,
+      user,
+      timezoneOffset,
+      lang,
+      socketId,
+      clearNonApplicableValuesConfirmed,
+    },
   })
 }
 
-export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset }) =>
+export const deleteNode = ({
+  socketId,
+  user,
+  surveyId,
+  cycle,
+  draft,
+  recordUuid,
+  nodeUuid,
+  timezoneOffset,
+  lang,
+  clearNonApplicableValuesConfirmed = false,
+}) =>
   _sendNodeUpdateMessage({
     socketId,
     user,
@@ -466,6 +539,9 @@ export const deleteNode = ({ socketId, user, surveyId, cycle, draft, recordUuid,
       nodeUuid,
       user,
       timezoneOffset,
+      lang,
+      socketId,
+      clearNonApplicableValuesConfirmed,
     },
   })
 
@@ -496,39 +572,36 @@ export const generateNodeFileNameForDownload = async ({ surveyId, nodeUuid, file
   const surveyName = Survey.getName(Survey.getSurveyInfo(survey))
 
   const fileNameParts = []
-  Record.visitAncestorsAndSelf({
-    node,
-    visitor: (ancestorNode) => {
-      const ancestorDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestorNode))(survey)
-      if (ancestorNode === node) {
-        fileNameParts.push(NodeDef.getName(ancestorDef))
-        if (NodeDef.isMultiple(ancestorDef)) {
-          // add node position to the end
-          const index = Record.getNodeChildIndex(ancestorNode)(record)
-          const position = String(index + 1)
-          fileNameParts.push(position)
-        }
-      } else {
-        const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
-
-        if (ancestorKeyDefs.length > 0) {
-          const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
-          const keyValuesFormatted = ancestorKeyDefs
-            .map((keyDef, index) => {
-              const keyNode = ancestorKeyNodes[index]
-              const keyValueFormatted = NodeValueFormatter.format({
-                survey,
-                nodeDef: keyDef,
-                node: keyNode,
-                value: Node.getValue(keyNode),
-              })
-              return encodeURIComponent(keyValueFormatted)
-            })
-            .filter(Objects.isNotEmpty)
-          fileNameParts.unshift(keyValuesFormatted.join('_'))
-        }
+  Record.visitAncestorsAndSelf(node, (ancestorNode) => {
+    const ancestorDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(ancestorNode))(survey)
+    if (ancestorNode === node) {
+      fileNameParts.push(NodeDef.getName(ancestorDef))
+      if (NodeDef.isMultiple(ancestorDef)) {
+        // add node position to the end
+        const index = Record.getNodeChildIndex(ancestorNode)(record)
+        const position = String(index + 1)
+        fileNameParts.push(position)
       }
-    },
+    } else {
+      const ancestorKeyDefs = Survey.getNodeDefKeys(ancestorDef)(survey)
+
+      if (ancestorKeyDefs.length > 0) {
+        const ancestorKeyNodes = Record.getEntityKeyNodes(survey, ancestorNode)(record)
+        const keyValuesFormatted = ancestorKeyDefs
+          .map((keyDef, index) => {
+            const keyNode = ancestorKeyNodes[index]
+            const keyValueFormatted = NodeValueFormatter.format({
+              survey,
+              nodeDef: keyDef,
+              node: keyNode,
+              value: Node.getValue(keyNode),
+            })
+            return encodeURIComponent(keyValueFormatted)
+          })
+          .filter((part) => Objects.isNotEmpty(part))
+        fileNameParts.unshift(keyValuesFormatted.join('_'))
+      }
+    }
   })(record)
 
   const fileName = SurveyFile.getName(file)
@@ -554,7 +627,7 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
 
   for (const node of nodesArray) {
     if (Node.isDeleted(node)) {
-      await nodesDeleteBatchPersister.addItem(node)
+      await nodesDeleteBatchPersister.addItem(node) // NOSONAR
       if (isPreview) {
         const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
         if (NodeDef.isFile(nodeDef) && Node.getFileUuid(node)) {
@@ -562,9 +635,9 @@ const persistRecordNodes = async ({ user, survey, record, nodesArray }, tx) => {
         }
       }
     } else if (Node.isCreated(node)) {
-      await nodesInsertBatchPersister.addItem(node)
+      await nodesInsertBatchPersister.addItem(node) // NOSONAR
     } else if (Node.isUpdated(node)) {
-      await nodesUpdateBatchPersister.addItem(node)
+      await nodesUpdateBatchPersister.addItem(node) // NOSONAR
     }
   }
   await nodesDeleteBatchPersister.flush()
@@ -622,10 +695,67 @@ export const mergeRecords = async (
     }
     return {
       record: recordTargetUpdated,
-      nodesCreated: nodesArray.filter(Node.isCreated).length,
-      nodesUpdated: nodesArray.filter(Node.isUpdated).length,
+      nodesCreated: nodesArray.filter((node) => Node.isCreated(node)).length,
+      nodesUpdated: nodesArray.filter((node) => Node.isUpdated(node)).length,
     }
   })
+
+const assertCurrentPageEntity = ({ survey, record, entityDefUuid, entityNodeUuid }) => {
+  if (!entityDefUuid || !entityNodeUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
+  if (!entityDef || !NodeDef.isEntity(entityDef) || !entityNode || Node.getNodeDefUuid(entityNode) !== entityDefUuid) {
+    throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
+  }
+  return entityDef
+}
+
+const generateDocumentWithQrCode = async ({
+  surveyId,
+  recordUuid,
+  entityDefUuid,
+  entityNodeUuid,
+  serverUrl,
+  generatorOptions,
+  generator,
+  extension,
+}) => {
+  if (!serverUrl) {
+    throw new SystemError('appErrors:recordPrintableExport.missingServerUrl', {}, StatusCodes.BAD_REQUEST)
+  }
+
+  const existingShare = await ShareRepository.fetchBySurveyRecordEntityNode({
+    surveyId,
+    recordUuid,
+    entityNodeUuid,
+  })
+  let accessToken = existingShare?.access_token ?? randomBytes(32).toString('base64url')
+  let qrCodeImage
+  let pdfResult
+
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const publicUrl = `${serverUrl}/api/public/record-export/${accessToken}`
+    qrCodeImage = await toQrPngBuffer(publicUrl) // NOSONAR
+    pdfResult = await SurveyPdfGenerator.generateSurveyPdf({ ...generatorOptions, qrCodeImage }) // NOSONAR
+
+    const share = /* NOSONAR */ await upsertShareWithPdf({
+      surveyId,
+      recordUuid,
+      entityDefUuid,
+      entityNodeUuid,
+      pdfBuffer: pdfResult.buffer,
+      accessToken,
+    })
+    if (share.accessToken === accessToken) {
+      return extension === 'pdf' ? pdfResult : await generator({ ...generatorOptions, qrCodeImage }) // NOSONAR
+    }
+    accessToken = share.accessToken
+  }
+
+  throw new SystemError('appErrors:recordPrintableExport.qrTokenMismatch', {}, StatusCodes.CONFLICT)
+}
 
 const exportRecordDocument = async ({
   user,
@@ -640,7 +770,13 @@ const exportRecordDocument = async ({
   entityDefUuid,
   entityNodeUuid,
   orientation = PrintOrientations.portrait,
+  includeQrCode = false,
+  serverUrl = null,
 }) => {
+  if (includeQrCode && (exportScope !== PrintableExportScopes.currentPage || !entityDefUuid || !entityNodeUuid)) {
+    throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
+  }
+
   const record = await fetchRecordAndNodesByUuid({ surveyId, recordUuid, includeRefData: true, user })
   const cycle = Record.getCycle(record)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -653,19 +789,7 @@ const exportRecordDocument = async ({
 
   let entityDef = null
   if (exportScope === PrintableExportScopes.currentPage) {
-    if (!entityDefUuid || !entityNodeUuid) {
-      throw new SystemError('appErrors:recordPrintableExport.missingEntityParams', {}, StatusCodes.BAD_REQUEST)
-    }
-    entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
-    const entityNode = Record.getNodeByUuid(entityNodeUuid)(record)
-    if (
-      !entityDef ||
-      !NodeDef.isEntity(entityDef) ||
-      !entityNode ||
-      Node.getNodeDefUuid(entityNode) !== entityDefUuid
-    ) {
-      throw new SystemError('appErrors:recordPrintableExport.entityNotFound', {}, StatusCodes.NOT_FOUND)
-    }
+    entityDef = assertCurrentPageEntity({ survey, record, entityDefUuid, entityNodeUuid })
   }
 
   const rootNode = Record.getRootNode(record)
@@ -701,7 +825,7 @@ const exportRecordDocument = async ({
   const pageNumbering = Survey.isDocPageNumberingEnabled(survey)
 
   const i18n = await i18nFactory.createI18nAsync(langToUse)
-  const { buffer, surveyName } = await generator({
+  const generatorOptions = {
     survey,
     cycle,
     record,
@@ -720,17 +844,33 @@ const exportRecordDocument = async ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
-  })
+  }
+
+  const documentResult = includeQrCode
+    ? await generateDocumentWithQrCode({
+        surveyId,
+        recordUuid,
+        entityDefUuid,
+        entityNodeUuid,
+        serverUrl,
+        generatorOptions,
+        generator,
+        extension,
+      })
+    : await generator(generatorOptions)
+
+  const { buffer, surveyName } = documentResult
+  // Shorter printable names: omit redundant RecordForm suffix; item labels are sanitized
+  // (no URL-encoding / % sequences) by ExportFileNameGenerator.
   const fileName =
     exportScope === PrintableExportScopes.currentPage
       ? ExportFileNameGenerator.generate({
           surveyName,
           cycle,
           itemName: NodeDef.getLabel(entityDef, langToUse) || NodeDef.getName(entityDef),
-          fileType: 'RecordForm',
           extension,
         })
-      : ExportFileNameGenerator.generate({ surveyName, cycle, fileType: 'RecordForm', extension })
+      : ExportFileNameGenerator.generate({ surveyName, cycle, extension })
   Response.sendFileContent({
     res: outputStream,
     fileName,
@@ -750,6 +890,8 @@ export const exportRecordDocx = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -761,6 +903,8 @@ export const exportRecordDocx = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyDocxGenerator.generateSurveyDocx,
     extension: 'docx',
     contentType: Response.contentTypes.docx,
@@ -776,6 +920,8 @@ export const exportRecordPdf = ({
   entityDefUuid,
   entityNodeUuid,
   orientation,
+  includeQrCode,
+  serverUrl,
 }) =>
   exportRecordDocument({
     user,
@@ -787,6 +933,8 @@ export const exportRecordPdf = ({
     entityDefUuid,
     entityNodeUuid,
     orientation,
+    includeQrCode,
+    serverUrl,
     generator: SurveyPdfGenerator.generateSurveyPdf,
     extension: 'pdf',
     contentType: Response.contentTypes.pdf,

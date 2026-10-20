@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Authorizer } from '@openforis/arena-core'
 
@@ -181,7 +181,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, draft, validate } = Request.getParams(req)
-      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const [survey] = await Promise.all([
         SurveyService.fetchSurveyById({ surveyId, draft, validate }),
@@ -205,7 +205,7 @@ export const init = (app) => {
         validate,
         updateUserPrefs = false,
       } = Request.getParams(req)
-      const user = R.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
+      const user = A.pipe(Request.getUser, User.assocPrefSurveyCurrent(surveyId))(req)
 
       const promises = [
         SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
@@ -372,7 +372,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/file/:fileUuid', AuthMiddleware.requireSurveyViewPermission, async (req, res) => {
     try {
       const { surveyId, fileUuid } = Request.getParams(req)
       const { summary, contentStream } = await SurveyService.fetchSurveyFile({ surveyId, fileUuid })
@@ -381,7 +381,8 @@ export const init = (app) => {
       Response.setContentTypeFile({ res, fileName, fileSize })
       contentStream.pipe(res)
     } catch (error) {
-      next(error)
+      // sendErr preserves the "file not found" status code and key (next(error) would not)
+      Response.sendErr(res, error)
     }
   })
 
@@ -402,13 +403,28 @@ export const init = (app) => {
     }
   })
 
-  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {
-    const { surveyId, cleanupRecords = false } = Request.getParams(req)
-    const user = Request.getUser(req)
+  app.put('/survey/:surveyId/publish', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
+    try {
+      const {
+        surveyId,
+        cleanupRecords = false,
+        updateRecordValues = false,
+        skipDataUpdate = false,
+      } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-    const job = SurveyService.startPublishJob({ user, surveyId, cleanupRecords })
+      const { job, recordValuesUpdateWarning } = await SurveyService.startPublishJob({
+        user,
+        surveyId,
+        cleanupRecords,
+        updateRecordValues,
+        skipDataUpdate,
+      })
 
-    res.json({ job: JobUtils.jobToJSON(job) })
+      res.json(recordValuesUpdateWarning ? { recordValuesUpdateWarning } : { job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
   })
 
   app.put('/survey/:surveyId/unpublish', AuthMiddleware.requireSurveyEditPermission, (req, res) => {

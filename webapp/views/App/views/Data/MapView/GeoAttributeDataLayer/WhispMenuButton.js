@@ -1,3 +1,5 @@
+import './WhispMenuButton.scss'
+
 import React, { useCallback, useMemo, useState } from 'react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
@@ -30,7 +32,8 @@ export const WhispMenuButton = (props) => {
       const csvDownloadUrl = getWhispDataDownloadUrl(token)
       setWhispDataLoading(false)
       window.open(csvDownloadUrl, labels.whisp)
-    } catch (_error) {
+    } catch {
+      // the error is notified by the global axios interceptor
       setWhispDataLoading(false)
     }
   }, [geoJsonGenerator, surveyId])
@@ -63,9 +66,10 @@ export const WhispMenuButton = (props) => {
           <Button
             disabled={whispDataLoading}
             label={label}
-            iconHeight={25}
+            labelIsI18nKey={false}
+            iconHeight={20}
             iconSrc="/img/of_whisp_icon.png"
-            iconWidth={25}
+            iconWidth={20}
             onClick={onClick}
             size="small"
             variant="text"
@@ -84,6 +88,7 @@ export const WhispMenuButton = (props) => {
       iconHeight={25}
       iconSrc="/img/of_whisp_icon.png"
       items={buttons}
+      menuClassName="whisp-menu"
       variant="outlined"
     />
   )

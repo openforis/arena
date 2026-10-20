@@ -7,7 +7,6 @@ import { Link } from 'react-router-dom'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
-import * as ProcessUtils from '@core/processUtils'
 
 import { clickedOutside } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
@@ -23,8 +22,6 @@ import {
   useAuthCanCreateSurvey,
   useAuthCanCreateTemplate,
   useAuthCanEditTemplates,
-  useAuthCanViewAllUsers,
-  useAuthCanViewUsersAccessRequests,
   useOnNewSurveyClick,
 } from '@webapp/store/user/hooks'
 
@@ -60,8 +57,6 @@ const UserPopupMenu = (props) => {
   const canCreateSurvey = useAuthCanCreateSurvey()
   const canCreateTemplate = useAuthCanCreateTemplate()
   const canEditTemplates = useAuthCanEditTemplates()
-  const canViewUsersAccessRequests = useAuthCanViewUsersAccessRequests() && ProcessUtils.ENV.allowUserAccessRequest
-  const canViewAllUsers = useAuthCanViewAllUsers()
   const onNewSurveyClick = useOnNewSurveyClick({ onAfterClick: onClose })
 
   useEffect(() => {
@@ -89,7 +84,7 @@ const UserPopupMenu = (props) => {
             <Link
               className="btn-s btn-transparent"
               data-testid={TestId.header.userProfileBtn}
-              to={`${appModuleUri(userModules.user)}${User.getUuid(user)}/`}
+              to={appModuleUri(userModules.user)}
               onClick={onClose}
             >
               <span className="icon icon-user icon-12px icon-left" />
@@ -148,36 +143,6 @@ const UserPopupMenu = (props) => {
               {i18n.t('surveyCreate:newTemplate')}
             </Link>
           )}
-        </>
-      )}
-
-      {canViewUsersAccessRequests && (
-        <>
-          <Separator />
-          <Link
-            data-testid={TestId.header.usersAccessRequstsBtn}
-            to={appModuleUri(userModules.usersAccessRequest)}
-            onClick={onClose}
-            className="btn-s btn-transparent"
-          >
-            <span className="icon icon-paragraph-justify icon-12px icon-left" />
-            {i18n.t('appModules.usersAccessRequest')}
-          </Link>
-        </>
-      )}
-
-      {canViewAllUsers && (
-        <>
-          <Separator />
-          <Link
-            data-testid={TestId.header.usersListBtn}
-            to={appModuleUri(userModules.users)}
-            onClick={onClose}
-            className="btn-s btn-transparent"
-          >
-            <span className="icon icon-paragraph-justify icon-12px icon-left" />
-            {i18n.t('appModules.usersList')}
-          </Link>
         </>
       )}
 

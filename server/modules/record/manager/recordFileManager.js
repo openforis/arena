@@ -78,6 +78,8 @@ export const deleteFilesByNodeDefUuids = async ({ surveyId, nodeDefUuids }, clie
 }
 
 export const {
+  // READ
+  fetchNonDeletedFileUuidsByRecordUuids,
   // UPDATE
   markRecordFilesAsDeleted,
 } = FileRepository

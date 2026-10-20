@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Nodes } from '@openforis/arena-core'
 
@@ -12,28 +12,70 @@ const metaKeys = {
   defaultValue: 'defaultValueApplied', // True if default value has been applied, false if the value is user defined
   hierarchyCode: 'hCode', // Hierarchy of code attribute ancestors (according to the parent code defs specified)
   qualifierValueApplied: 'qualifierValueApplied', // True if the value has been auto-filled from the user group qualifier
+  childEditability: 'cEdit', // Editability by child def uuid
+  childVisibility: 'cVis', // Visibility by child def uuid
+  childRequired: 'cReq', // Child defs whose "required if" condition is met (only true values stored)
+  childrenMaxCount: 'childrenMaxCount', // Max count by child def uuid
+  childrenMinCount: 'childrenMinCount', // Min count by child def uuid
 }
+
+// meta keys omitted when empty (a missing value is read as an empty one)
+const metaKeysOmittedWhenEmpty = new Set([
+  metaKeys.childApplicability,
+  metaKeys.childEditability,
+  metaKeys.childVisibility,
+  metaKeys.childRequired,
+  metaKeys.childrenMaxCount,
+  metaKeys.childrenMinCount,
+  metaKeys.hierarchyCode,
+])
+// meta keys omitted when falsy (a missing value is read as false)
+const metaKeysOmittedWhenFalsy = new Set([metaKeys.defaultValue, metaKeys.qualifierValueApplied])
 
 // READ
 
-const getMeta = R.propOr({}, keys.meta)
+const getMeta = A.propOr({}, keys.meta)
 
-const isChildApplicable = (childDefUuid) => R.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
-const isDefaultValueApplied = R.pathOr(false, [keys.meta, metaKeys.defaultValue])
-const isQualifierValueApplied = R.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
+const isChildApplicable = (childDefUuid) => A.pathOr(true, [keys.meta, metaKeys.childApplicability, childDefUuid])
+const isDefaultValueApplied = A.pathOr(false, [keys.meta, metaKeys.defaultValue])
+const isQualifierValueApplied = A.pathOr(false, [keys.meta, metaKeys.qualifierValueApplied])
 
-const getHierarchy = R.pathOr([], [keys.meta, metaKeys.hierarchy])
+const getHierarchy = A.pathOr([], [keys.meta, metaKeys.hierarchy])
 
 const isChildEditable = (childDefUuid) => (node) => Nodes.isChildEditable(node, childDefUuid)
 
 const isChildVisible = (childDefUuid) => (node) => Nodes.isChildVisible(node, childDefUuid)
 
+const isChildRequired = (childDefUuid) => (node) => Nodes.isChildRequired(node, childDefUuid)
+
 // Code metadata
-const getHierarchyCode = R.pathOr([], [keys.meta, metaKeys.hierarchyCode])
+const getHierarchyCode = A.pathOr([], [keys.meta, metaKeys.hierarchyCode])
+
+const _isMetaValueDefault = ([key, value]) =>
+  (metaKeysOmittedWhenEmpty.has(key) && A.isEmpty(value)) || (metaKeysOmittedWhenFalsy.has(key) && !value)
+
+/**
+ * Returns the keys of the node meta items having the default value (a missing item is read back in the same way).
+ * @param {object} [meta] - The node meta.
+ * @returns {string[]} - The keys of the items having the default value.
+ */
+const getMetaKeysWithDefaultValue = (meta) =>
+  Object.entries(meta ?? {})
+    .filter(_isMetaValueDefault)
+    .map(([key]) => key)
+
+/**
+ * Removes from the node meta the items having the default value (they are read back in the same way), to save space.
+ * When the meta is merged into the stored one, the removed keys must be deleted from the stored meta too.
+ * @param {object} [meta] - The node meta.
+ * @returns {object} - The node meta without the items having the default value.
+ */
+const compactMeta = (meta) =>
+  Object.fromEntries(Object.entries(meta ?? {}).filter((entry) => !_isMetaValueDefault(entry)))
 
 // UPDATE
 
-const assocMeta = R.assoc(keys.meta)
+const assocMeta = A.assoc(keys.meta)
 
 const _updateMeta = (updateFn) => (node) => {
   const metaOld = getMeta(node)
@@ -41,7 +83,7 @@ const _updateMeta = (updateFn) => (node) => {
   return assocMeta(metaUpdated)(node)
 }
 
-const mergeMeta = (meta) => _updateMeta((metaOld) => R.mergeLeft(meta)(metaOld))
+const mergeMeta = (meta) => _updateMeta((metaOld) => A.mergeLeft(meta)(metaOld))
 
 const assocIsDefaultValueApplied = (value) =>
   _updateMeta((metaOld) => {
@@ -81,7 +123,7 @@ const assocChildApplicability = ({ nodeDefUuid, applicable }) =>
       childApplicabilityUpdated[nodeDefUuid] = false
     }
     const metaUpdated = { ...metaOld }
-    if (R.isEmpty(childApplicabilityUpdated)) {
+    if (A.isEmpty(childApplicabilityUpdated)) {
       delete metaUpdated[metaKey]
     } else {
       metaUpdated[metaKey] = childApplicabilityUpdated
@@ -101,6 +143,9 @@ export const NodeMeta = {
   getHierarchyCode,
   isChildEditable,
   isChildVisible,
+  isChildRequired,
+  getMetaKeysWithDefaultValue,
+  compactMeta,
 
   assocMeta,
   mergeMeta,

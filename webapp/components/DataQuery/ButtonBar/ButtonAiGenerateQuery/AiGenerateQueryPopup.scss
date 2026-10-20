@@ -1,0 +1,19 @@
+@use '~@webapp/style/vars' as *;
+
+.ai-generate-query-popup {
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  &__hint {
+    font-size: 0.85rem;
+    color: $colorOnSurfaceVariant;
+  }
+
+  &__error {
+    color: $colorError;
+    font-size: 0.9rem;
+  }
+}

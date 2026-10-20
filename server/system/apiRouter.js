@@ -9,18 +9,23 @@ import * as taxonomyApi from '@server/modules/taxonomy/api/taxonomyApi'
 import * as geoApi from '@server/modules/geo/api/geoApi'
 import * as collectImportApi from '@server/modules/collectImport/api/collectImportApi'
 import * as arenaImportApi from '@server/modules/arenaImport/api/arenaImportApi'
+import * as odkImportApi from '@server/modules/odkImport/api/odkImportApi'
+import * as odkDataImportApi from '@server/modules/odkImport/api/odkDataImportApi'
 import * as recordApi from '@server/modules/record/api/recordApi'
+import * as recordPrintableExportPublicApi from '@server/modules/record/api/recordPrintableExportPublicApi'
 import * as dataExportApi from '@server/modules/dataExport/api/dataExportApi'
 import * as dataImportApi from '@server/modules/dataImport/api/dataImportApi'
 import * as surveyRdbApi from '@server/modules/surveyRdb/api/surveyRdbApi'
 import * as analysisApi from '@server/modules/analysis/api'
 import * as jobApi from '@server/job/jobApi'
+import * as systemLogApi from '@server/modules/systemLog/api/systemLogApi'
 import * as expressionApi from '@server/modules/expression/api/expressionApi'
 import * as rstudioApi from '@server/modules/rstudio/api/rstudioApi'
 import * as mobileApi from '@server/modules/mobile/api/mobileApi'
 import * as messageApi from '@server/modules/message/api'
 import * as fileDownloadApi from '@server/modules/fileDownload/api/fileDownloadApi'
 import * as aiApi from '@server/modules/ai/api/aiApi'
+import * as surveyCompareApi from '@server/modules/surveyCompare/api/surveyCompareApi'
 
 export const router = expressRouter()
 
@@ -37,8 +42,11 @@ geoApi.init(router)
 
 collectImportApi.init(router)
 arenaImportApi.init(router)
+odkImportApi.init(router)
+odkDataImportApi.init(router)
 
 recordApi.init(router)
+recordPrintableExportPublicApi.init(router)
 dataExportApi.init(router)
 dataImportApi.init(router)
 
@@ -47,6 +55,7 @@ surveyRdbApi.init(router)
 analysisApi.init(router)
 
 jobApi.init(router)
+systemLogApi.init(router)
 
 expressionApi.init(router)
 
@@ -58,3 +67,5 @@ messageApi.init(router)
 fileDownloadApi.init(router)
 
 aiApi.init(router)
+
+surveyCompareApi.init(router)

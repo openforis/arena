@@ -42,7 +42,9 @@ export default class Job extends JobBase {
 
   getErrorInfo(error) {
     if (error instanceof SystemError) {
-      return { key: `appErrors:${error.key}`, params: error.params }
+      // some errors (e.g. Whisp API ones) are thrown with an already namespaced key
+      const key = error.key.startsWith('appErrors:') ? error.key : `appErrors:${error.key}`
+      return { key, params: error.params }
     }
     return super.getErrorInfo(error)
   }

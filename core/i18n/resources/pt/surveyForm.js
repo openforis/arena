@@ -1,4 +1,9 @@
 export default {
+  completion: '{{percent}}% concluído',
+  pagesValidationProgress: '{{valid}}/{{total}} páginas válidas ({{percent}}%)',
+  pageComplete: 'Concluída',
+  copyPath: 'Copiar caminho',
+  pathCopiedToClipboard: 'Caminho copiado para a área de transferência',
   subPage: 'Subpágina',
   addChildTo: 'Adicionar a {{nodeDefLabel}}',
   addChildToTitle: 'Adicionar novo nó a {{nodeDefLabel}}',
@@ -20,6 +25,11 @@ export default {
   },
   clone: `Clonar '{{nodeDefLabel}}'`,
   compressFormItems: `Comprimir itens do formulário para '{{nodeDefLabel}}'`,
+  confirmClearNonApplicableValues: `Os seguintes campos deixarão de ser relevantes e seus valores serão apagados:
+
+{{nodeDefLabels}}
+
+Continuar?`,
   confirmUpdateDependentEnumeratedEntities: `Se você continuar, algumas entidades enumeradas ({{entityDefs}}) serão reenumeradas,  
 apagando os valores existentes inseridos nelas (se houver).  
 Continuar?`,
@@ -37,6 +47,30 @@ Continuar?`,
   movePageDown: 'Mover página para baixo',
   formEditActions: {
     preview: 'Visualizar',
+    previewDesktop: 'Visualizar (computador)',
+    previewMobile: 'Visualizar (móvel)',
+    previewOptions: 'Opções de visualização',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Telefone',
+      tablet: 'Tablet',
+    },
+    error: 'Erro ao carregar a visualização móvel: {{error}}',
+    differences: `**Diferenças em relação ao Arena Mobile num dispositivo real**
+- **Data e hora**: digitadas num campo de texto (DD/MM/YYYY, HH:mm) em vez dos seletores de data/hora do dispositivo
+- **Mapas**: não disponíveis (os botões de mapa mostram um espaço reservado; sem mapas offline nem PDF)
+- **Localização**: obtida do navegador (geralmente menos precisa que o GPS do dispositivo); sem recetores GPS externos
+- **Fotos e ficheiros**: selecionados a partir do computador; sem captura com câmara nem localização da foto (EXIF)
+- **Teclado e gestos**: teclado físico e rato em vez do teclado no ecrã e dos deslizes
+- **Dados**: mantidos apenas em memória, perdidos ao recarregar; sem lista de registos, sincronização ou exportação`,
+    note: 'Aproximação do Arena Mobile a correr no navegador com a pesquisa em rascunho.',
+    orientation: {
+      landscape: 'Paisagem',
+      portrait: 'Retrato',
+    },
+    reload: 'Recarregar',
+    title: 'Visualização móvel (experimental)',
   },
   formEntryActions: {
     confirmDemote: 'Tem certeza de que deseja rebaixar este registro para {{name}}?',
@@ -150,11 +184,13 @@ No Arena Mobile:
     scope: 'Conteúdo',
     scopes: {
       full: 'Pesquisa completa',
-      currentPage: 'Somente página atual',
+      currentPage: 'Somente página atual ({{entityLabel}})',
     },
-    currentPageHint: 'Página atual: {{entityLabel}}',
     currentPageUnavailable:
       'Não foi possível determinar a instância da página atual. Navegue até uma página específica ou exporte a pesquisa completa.',
+    includeQrCode: 'Incluir código QR',
+    includeQrCodeInfo:
+      'Adiciona um código QR na primeira página com link para uma cópia somente leitura do PDF desta entidade (válido por 1 ano).',
     orientation: 'Orientação da página',
     orientations: {
       portrait: 'Retrato',

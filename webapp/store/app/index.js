@@ -1,8 +1,6 @@
 // ====== app
-import * as AppState from './state'
-import AppReducer from './reducer'
-
-export { AppReducer, AppState }
+export * as AppState from './state'
+export { default as AppReducer } from './reducer'
 
 // ====== job
 export { JobActions, useJob } from './job'

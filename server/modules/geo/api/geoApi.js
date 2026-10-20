@@ -56,7 +56,8 @@ export const init = (app) => {
         const url = getMapTileForwardUrl(req)
         const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
         dataStream.pipe(res)
-      } catch (error) {
+      } catch {
+        // remote service not reachable: return an empty result
         res.json({})
       }
     }
@@ -121,6 +122,21 @@ export const init = (app) => {
       Response.sendErr(res, error)
     }
   })
+
+  app.post(
+    `${uriPrefix}whisp/sampling-point-data/start`,
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const job = GeoService.startSamplingPointDataWhispJob({ user, surveyId })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,

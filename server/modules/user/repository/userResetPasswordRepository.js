@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
 
@@ -12,7 +12,7 @@ export const insertOrUpdateResetPassword = async (userUuid, client = db) =>
       ON CONFLICT (user_uuid) DO UPDATE SET date_created = NOW(), uuid = DEFAULT
       RETURNING uuid`,
     [userUuid],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const findResetPasswordUserUuidByUuid = async (uuid, client = db) =>
@@ -21,7 +21,7 @@ export const findResetPasswordUserUuidByUuid = async (uuid, client = db) =>
      FROM user_reset_password
      WHERE uuid = $1 AND NOT ${expiredCondition}`,
     [uuid],
-    R.prop('user_uuid')
+    A.prop('user_uuid')
   )
 
 export const fetchResetPasswordUuidByUserUuid = async (userUuid, client = db) =>
@@ -30,7 +30,7 @@ export const fetchResetPasswordUuidByUserUuid = async (userUuid, client = db) =>
      FROM user_reset_password
      WHERE user_uuid = $1 AND NOT ${expiredCondition}`,
     [userUuid],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const existsResetPasswordValidByUserUuid = async (userUuid, client = db) =>
@@ -39,7 +39,7 @@ export const existsResetPasswordValidByUserUuid = async (userUuid, client = db) 
     FROM user_reset_password
     WHERE user_uuid = $1 AND NOT ${expiredCondition}`,
     [userUuid],
-    R.prop('result')
+    A.prop('result')
   )
 
 export const existResetPasswordValidByUserUuids = async (userUuids, client = db) => {
@@ -60,5 +60,5 @@ export const deleteUserResetPasswordExpired = async (client = db) =>
     `DELETE FROM user_reset_password
     WHERE ${expiredCondition}`,
     [],
-    R.prop('rowCount')
+    A.prop('rowCount')
   )

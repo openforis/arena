@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 import * as JobSerialized from '@common/job/jobSerialized'
 
 export const jobStatus = {
@@ -46,7 +48,7 @@ const calculateJobProgress = (job) => {
 }
 
 const calculatedElapsedMillis = (job) =>
-  job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
+  job.startTime ? (job.endTime ?? new Date()).getTime() - job.startTime.getTime() : 0
 
 export const jobToJSON = (job) => ({
   [JobSerialized.keys.uuid]: job.uuid,
@@ -74,7 +76,8 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.elapsedMillis]: calculatedElapsedMillis(job),
 
   // Output
-  [JobSerialized.keys.errors]: job.status === jobStatus.failed ? job.errors : null,
+  // errors sent even if the job succeeded (e.g. data import validation completed with errors)
+  [JobSerialized.keys.errors]: A.isEmpty(job.errors) ? null : job.errors,
   [JobSerialized.keys.result]: job.status === jobStatus.succeeded ? job.result : null,
 })
 

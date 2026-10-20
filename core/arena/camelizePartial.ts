@@ -1,5 +1,3 @@
-import { _camelizePartial } from './internal/_camelizePartial'
-
 /**
  * Recursively transform the keys of the specified object to camel-case.
  *
@@ -9,4 +7,4 @@ import { _camelizePartial } from './internal/_camelizePartial'
  * @param {boolean} [params.sideEffect=false] - Whether to do side-effect on the specified object.
  * @returns {any} - The object with keys in camel case or the value in camel case.
  */
-export const camelizePartial = _camelizePartial
+export { _camelizePartial as camelizePartial } from './internal/_camelizePartial'

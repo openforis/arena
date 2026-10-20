@@ -1,4 +1,3 @@
-import * as R from 'ramda'
 import * as A from '@core/arena'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -142,7 +141,8 @@ const _getFetchCategoriesAndLevelsQuery = ({
               'propsDraft', ${tableAlias}.props_draft`
     }
     // combine props and props_draft column into one
-    return `'props', ${tableAlias}.props${draft ? ` || ${tableAlias}.props_draft` : ''},
+    const propsDraftConcat = draft ? ` || ${tableAlias}.props_draft` : ''
+    return `'props', ${tableAlias}.props${propsDraftConcat},
             'published', ${tableAlias}.props::text <> '{}',
             'draft', ${tableAlias}.props_draft::text <> '{}'`
   }
@@ -204,16 +204,16 @@ const _getFetchCategoriesAndLevelsQuery = ({
       levels l
     ON
       c.uuid = l.category_uuid
-    ${backup || draft ? '' : `WHERE c.published`}`
+    ${backup || draft ? '' : 'WHERE c.published'}`
 }
 
 export const countCategories = async ({ surveyId, draft = false }, client = db) =>
   client.one(
     `SELECT COUNT(*) 
      FROM ${getSurveyDBSchema(surveyId)}.category
-     ${draft ? '' : `WHERE props::text <> '{}'::text`}`,
+     ${draft ? '' : "WHERE props::text <> '{}'::text"}`,
     [],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const fetchCategoriesBySurveyId = async (
@@ -269,7 +269,7 @@ export const fetchCategoryAndLevelsByUuid = async (
     ${backup || draft ? 'WHERE' : 'AND'} c.uuid = $1`,
     [categoryUuid]
   )
-  return A.pipe(R.values, R.head)(categories)
+  return A.pipe(A.values, A.head)(categories)
 }
 
 export const fetchItemsByCategoryUuid = async (
@@ -293,7 +293,7 @@ export const fetchItemsByCategoryUuid = async (
     (def) => DB.transformCallback(def, draft, true, backup)
   )
 
-  return backup || draft ? items : R.filter((item) => item.published)(items)
+  return backup || draft ? items : A.filter((item) => item.published)(items)
 }
 
 const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
@@ -335,7 +335,7 @@ export const fetchItemsByLevelParentAndCode = async (
     itemDBTransformCallback({ draft })
   )
 
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {
@@ -371,7 +371,7 @@ export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $1`,
     [categoryUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db) =>
@@ -380,7 +380,7 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
     WHERE i.level_uuid = $1`,
     [levelUuid],
-    (r) => parseInt(r.count, 10)
+    (r) => Number.parseInt(r.count, 10)
   )
 
 const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
@@ -394,9 +394,9 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
 }
 
 const _getSearchQueryParam = ({ searchValue }) =>
-  `${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
+  `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = NaN }) => {
+const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = Number.NaN }) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -421,13 +421,21 @@ export const countItemsByParentUuid = async (
 }
 
 export const fetchItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null, limit = NaN },
+  {
+    surveyId,
+    categoryUuid,
+    parentUuid = null,
+    draft = false,
+    search: searchValue = null,
+    lang = null,
+    limit = Number.NaN,
+  },
   client = db
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
   const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
-  return draft ? items : R.filter((item) => item.published)(items)
+  return draft ? items : A.filter((item) => item.published)(items)
 }
 
 export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
@@ -470,8 +478,9 @@ export const fetchItemsByLevelIndex = async (
     ],
     []
   )
+  const selectFields = [`i${levelIndex}.*`, ...codesSelectFields].join(', ')
   return client.map(
-    `SELECT i${levelIndex}.* ${codesSelectFields.length > 0 ? `, ${codesSelectFields.join(', ')}` : ''}
+    `SELECT ${selectFields}
      FROM ${schema}.category_item i${levelIndex}
        JOIN ${schema}.category_level l 
          ON l.uuid = i${levelIndex}.level_uuid
@@ -652,6 +661,24 @@ export const updateItemsProps = async ({ surveyId, items, draftProps = true }, c
   )
 }
 
+// Finds category items whose "extra" prop data has a pending draft change (i.e. props_draft has an
+// "extra" key whose value differs from the published one) - used to detect categories whose extra
+// prop values (not just their extraDef schema) changed, so that node defs reading them via
+// categoryItemProp can be flagged for value recalculation on publish (see
+// server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
+// so surveys with no pending item extra-value edits (the common case) never pull item data into
+// memory.
+export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT cl.category_uuid AS "categoryUuid",
+            ci.props->'extra' AS "extraPublished",
+            ci.props_draft->'extra' AS "extraDraft"
+     FROM ${getSurveyDBSchema(surveyId)}.category_item ci
+     JOIN ${getSurveyDBSchema(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
+     WHERE ci.props_draft ? 'extra'
+       AND (ci.props_draft -> 'extra') IS DISTINCT FROM (ci.props -> 'extra')`
+  )
+
 // ============== DELETE
 
 export const deleteCategory = async (surveyId, categoryUuid, client = db) =>
@@ -683,7 +710,7 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
       RETURNING l.uuid
     `,
     [categoryUuid],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteItem = async (surveyId, itemUuid, client = db) =>

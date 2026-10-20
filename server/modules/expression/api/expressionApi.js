@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as CategoryItem from '@core/survey/categoryItem'
@@ -12,18 +12,13 @@ import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
 const toItem =
   (type, lang = null) =>
-  (item) =>
-    item
-      ? type === NodeDef.nodeDefType.code
-        ? {
-            value: CategoryItem.getCode(item),
-            label: CategoryItem.getLabel(lang)(item),
-          }
-        : {
-            value: Taxon.getCode(item),
-            label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}`,
-          }
-      : null
+  (item) => {
+    if (!item) return null
+    if (type === NodeDef.nodeDefType.code) {
+      return { value: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) }
+    }
+    return { value: Taxon.getCode(item), label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}` }
+  }
 
 export const init = (app) => {
   // ==== READ
@@ -41,8 +36,8 @@ export const init = (app) => {
           draft: true,
         })
 
-        const item = R.pipe(
-          R.find((_item) => CategoryItem.getCode(_item) === value),
+        const item = A.pipe(
+          A.find((_item) => CategoryItem.getCode(_item) === value),
           toItem(type, lang)
         )(itemsDb)
 
@@ -75,19 +70,19 @@ export const init = (app) => {
           draft: true,
         })
 
-        const items = R.pipe(
-          R.ifElse(
-            R.always(isBlank(value)),
-            R.identity,
-            R.filter((item) => {
+        const items = A.pipe(
+          A.ifElse(
+            A.always(isBlank(value)),
+            A.identity,
+            A.filter((item) => {
               const code = CategoryItem.getCode(item)
               const label = CategoryItem.getLabel(lang)(item)
               return contains(value, code) || contains(value, label)
             })
           ),
-          R.sort((a, b) => Number(a.id) - Number(b.id)),
-          R.take(25),
-          R.map(toItem(type, lang))
+          A.sort((a, b) => Number(a.id) - Number(b.id)),
+          A.take(25),
+          A.map(toItem(type, lang))
         )(itemsDb)
 
         res.json({ items })

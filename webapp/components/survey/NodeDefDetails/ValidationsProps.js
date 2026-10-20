@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -23,13 +23,26 @@ import { State, useNodeDefEditReadOnly } from './store'
 
 const countTypes = [NodeDefValidations.keys.min, NodeDefValidations.keys.max]
 
+const requiredRadioModes = {
+  none: 'none',
+  always: 'always',
+  defined: 'defined',
+}
+
+const determineRequiredRadioMode = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  if (NodeDefValidations.isRequiredIfDefined(validations)) return requiredRadioModes.defined
+  if (NodeDefValidations.isRequired(validations)) return requiredRadioModes.always
+  return requiredRadioModes.none
+}
+
 const countPropNumberFormat = NumberFormats.integer({ allowNegative: false })
 
 const CountProp = (props) => {
   const { Actions, countType, nodeDef, nodeDefUuidContext, readOnly, state } = props
 
   const countPropExtractor = (countType) => (nodeDef) => {
-    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    const count = A.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
     if (Objects.isEmpty(count)) return []
     if (Array.isArray(count)) return count
     return [NodeDefExpression.createExpression({ expression: count })]
@@ -47,7 +60,7 @@ const CountProp = (props) => {
   }
 
   const determineValueType = useCallback(() => {
-    const count = R.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
+    const count = A.pipe(NodeDef.getValidations, NodeDefValidations.getCountProp(countType))(nodeDef)
     return Objects.isEmpty(count) || !Array.isArray(count) ? ValueType.constant : ValueType.expression
   }, [countType, nodeDef])
 
@@ -79,6 +92,67 @@ CountProp.propTypes = {
   countType: PropTypes.string.isRequired,
   nodeDef: PropTypes.object.isRequired,
   nodeDefUuidContext: PropTypes.string.isRequired,
+  readOnly: PropTypes.bool,
+  state: PropTypes.object.isRequired,
+}
+
+const RequiredProp = (props) => {
+  const { nodeDefUuidContext, nodeDefValidations, onValidationsUpdate, readOnly, state, Actions } = props
+
+  const onRadioModeChange = useCallback(
+    (mode) => {
+      // the three modes are exclusive: "required if" expressions are added through the expressions editor
+      const validationsWithoutRequiredIf = NodeDefValidations.dissocRequiredIf(nodeDefValidations)
+      onValidationsUpdate(
+        mode === requiredRadioModes.always
+          ? NodeDefValidations.assocRequired(true)(validationsWithoutRequiredIf)
+          : NodeDefValidations.dissocRequired(validationsWithoutRequiredIf)
+      )
+    },
+    [nodeDefValidations, onValidationsUpdate]
+  )
+
+  const onRequiredIfUpdate = useCallback(
+    (expressions) =>
+      onValidationsUpdate(
+        NodeDefValidations.assocRequiredIf(expressions)(NodeDefValidations.dissocRequired(nodeDefValidations))
+      ),
+    [nodeDefValidations, onValidationsUpdate]
+  )
+
+  return (
+    <NodeDefExpressionsProp
+      Actions={Actions}
+      determineRadioMode={determineRequiredRadioMode}
+      excludeCurrentNodeDef
+      isContextParent
+      isRadioModeDisabled={() => readOnly}
+      label="common.required"
+      nodeDefUuidContext={nodeDefUuidContext}
+      onChange={onRequiredIfUpdate}
+      onRadioModeChange={onRadioModeChange}
+      propExtractor={() => NodeDefValidations.getRequiredIf(nodeDefValidations)}
+      propName={`${NodeDef.keysPropsAdvanced.validations}.${NodeDefValidations.keys.requiredIf}`}
+      qualifier={TestId.nodeDefDetails.requiredIf}
+      radioLabels={{
+        [requiredRadioModes.none]: 'nodeDefEdit.validationsProps.notRequired',
+        [requiredRadioModes.always]: 'nodeDefEdit.validationsProps.alwaysRequired',
+        [requiredRadioModes.defined]: 'nodeDefEdit.validationsProps.requiredWhenConditionIsMet',
+      }}
+      radioMode
+      radioModeDefined={requiredRadioModes.defined}
+      radioModes={Object.values(requiredRadioModes)}
+      readOnly={readOnly}
+      state={state}
+    />
+  )
+}
+
+RequiredProp.propTypes = {
+  Actions: PropTypes.object.isRequired,
+  nodeDefUuidContext: PropTypes.string.isRequired,
+  nodeDefValidations: PropTypes.object,
+  onValidationsUpdate: PropTypes.func.isRequired,
   readOnly: PropTypes.bool,
   state: PropTypes.object.isRequired,
 }
@@ -130,7 +204,17 @@ const ValidationsProps = (props) => {
             ))}
           </>
         )}
-        {NodeDef.isSingle(nodeDef) && !NodeDef.isKey(nodeDef) && (
+        {NodeDef.isSingle(nodeDef) && NodeDef.isAttribute(nodeDef) && !NodeDef.isKey(nodeDef) && (
+          <RequiredProp
+            Actions={Actions}
+            nodeDefUuidContext={nodeDefUuidContext}
+            nodeDefValidations={nodeDefValidations}
+            onValidationsUpdate={onValidationsUpdate}
+            readOnly={readOnly}
+            state={state}
+          />
+        )}
+        {NodeDef.isSingle(nodeDef) && NodeDef.isEntity(nodeDef) && (
           <FormItem label="common.required">
             <Checkbox
               checked={NodeDefValidations.isRequired(nodeDefValidations)}

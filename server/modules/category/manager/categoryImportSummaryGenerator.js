@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as R from 'ramda'
+import * as fs from 'node:fs'
+import * as A from '@core/arena'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
@@ -19,8 +19,6 @@ const columnProps = {
 }
 
 const locationColumnsSuffixes = ['_x', '_y', '_srs']
-
-// TODO remove code from here if needed // categories export
 
 const columnPatternsDefault = Object.entries(columnProps).reduce((columnPatterns, [columnType, columnProp]) => {
   // columns will be like code (or level_name_code in case of hierarchical categories), label, label_en, description, description_en
@@ -47,8 +45,7 @@ const _getGeometryPointTypeItemName = ({ columnName }) => {
 const _getGeometryPointTypeColumnNames = ({ itemName }) => locationColumnsSuffixes.map((suffix) => itemName + suffix)
 
 const _isGeometryPointType = ({ columnName, columnNames }) => {
-  const locationColSuffix = locationColumnsSuffixes.find((suffix) => columnName.endsWith(suffix))
-  if (!locationColSuffix) {
+  if (!locationColumnsSuffixes.some((suffix) => columnName.endsWith(suffix))) {
     return false
   }
   const itemName = _getGeometryPointTypeItemName({ columnName })
@@ -100,7 +97,7 @@ export const createImportSummaryFromColumnNames = ({
   codeColumnPattern = null,
   ignoreLabelsAndDescriptions = false,
 }) => {
-  if (R.find(StringUtils.isBlank)(columnNames)) {
+  if (A.find(StringUtils.isBlank)(columnNames)) {
     throw new SystemError(Validation.messageKeys.categoryImport.emptyHeaderFound)
   }
 
@@ -150,7 +147,7 @@ export const createImportSummaryFromColumnNames = ({
       isGeometryPointType ? _getGeometryPointTypeItemName({ columnName }) : columnName
     )
 
-    if (acc.find((itm) => CategoryImportSummary.getItemKey(itm) === key)) {
+    if (acc.some((itm) => CategoryImportSummary.getItemKey(itm) === key)) {
       // item already generated (e.g. geometry point)
       return acc
     }

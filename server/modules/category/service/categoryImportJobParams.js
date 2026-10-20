@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   categoryUuid: 'categoryUuid', // If category already exists
@@ -6,6 +6,6 @@ export const keys = {
   summary: 'summary',
 }
 
-export const getCategoryUuid = R.prop(keys.categoryUuid)
-export const getCategoryName = R.prop(keys.categoryName)
-export const getSummary = R.propOr({}, keys.summary)
+export const getCategoryUuid = A.prop(keys.categoryUuid)
+export const getCategoryName = A.prop(keys.categoryName)
+export const getSummary = A.propOr({}, keys.summary)

@@ -61,7 +61,7 @@ export default class RecordsImportJob extends Job {
       this.logDebug(`importing record ${recordUuid}`)
 
       // insert activity log
-      await ActivityLogManager.insert(
+      /* NOSONAR */ await ActivityLogManager.insert(
         this.user,
         surveyId,
         ActivityLog.type.recordImport,
@@ -71,7 +71,7 @@ export default class RecordsImportJob extends Job {
       )
 
       // insert record
-      let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      let record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
 
       let ownerUuid = null
       if (includingUsers) {
@@ -85,7 +85,7 @@ export default class RecordsImportJob extends Job {
       }
       record = Record.assocOwnerUuid(ownerUuid)(record)
 
-      await this.insertOrSkipRecord({ record, nodesBatchPersister })
+      await this.insertOrSkipRecord({ record, nodesBatchPersister }) // NOSONAR
 
       this.incrementProcessedItems()
     }
@@ -109,7 +109,7 @@ export default class RecordsImportJob extends Job {
       }
       // check that the node definition associated to the node has not been deleted from the survey
       if (Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)) {
-        await nodesBatchPersister.addItem(node)
+        await nodesBatchPersister.addItem(node) // NOSONAR
       }
     }
   }

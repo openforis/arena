@@ -20,6 +20,8 @@ const actionHandlers = {
 
   [TablesActions.tableMaxRowsUpdate]: (state, { module, maxRows }) =>
     TablesState.assocMaxRows({ module, maxRows })(state),
+
+  [TablesActions.tableSortUpdate]: (state, { module, sort }) => TablesState.assocSort({ module, sort })(state),
 }
 
 export default exportReducer(actionHandlers)

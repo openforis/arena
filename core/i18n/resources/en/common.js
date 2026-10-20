@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -55,6 +61,7 @@ Do you want to ignore them?`,
     download: 'Download',
     draft: 'Draft',
     edit: 'Edit',
+    elapsed: 'Elapsed',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
@@ -159,9 +166,31 @@ Do you want to proceed?`,
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
+    publishRecordValuesUpdateConfirm: `#### Publishing {{survey}} will update data already recorded ####
+
+{{reasons}}
+
+This operation can permanently change or clear data already entered.
+
+To publish without updating the existing data instead, check "Skip data update" below (not recommended).`,
+    publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
+    publishRecordValuesUpdateConfirmOk: 'Publish and update data',
+    publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'The following attributes will be modified, and their values in existing records will be automatically recalculated: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Skip data update',
+    publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
+    publishSkipDataUpdateImplications: 'Skipping the data update means:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Existing records may no longer match with the new survey definition',
+    publishSkipDataUpdateImplicationStaleValues: "Affected values won't be recalculated until re-entered manually",
+    publishSkipDataUpdateImplicationChains: 'Processing chains using these attributes may produce outdated results',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',
+    remaining: 'Remaining',
     remote: 'Remote',
     required: 'Required',
     requiredField: 'required field',
@@ -225,9 +254,11 @@ Try again?`,
     },
     paginator: {
       firstPage: 'First page',
+      goToPage: 'Go to page',
       itemsPerPage: 'Items per page',
       lastPage: 'Last page',
       nextPage: 'Next page',
+      page: 'Page',
       previousPage: 'Previous page',
     },
     table: {
@@ -274,6 +305,12 @@ Try again?`,
   },
 
   header: {
+    theme: {
+      label: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System default',
+    },
     myProfile: 'My profile',
     qrCodeLoginDialog: {
       title: 'Login to Arena Mobile using QR code',
@@ -320,6 +357,7 @@ Try again?`,
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',
     surveyDependencyTree: 'Dependency tree',
+    surveyCompare: 'Compare / update from file',
     category: 'Category',
     categories: 'Categories',
     nodeDef: 'Node Definition',
@@ -363,10 +401,14 @@ Try again?`,
     message: 'Message',
     message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'System Administration',
     jobMonitor: 'Job Monitor',
+    systemLogs: 'System Logs',
 
     help: 'Help',
     about: 'About',
+    changelog: 'Changelog',
+    whatsNew: "What's new",
     disclaimer: 'Disclaimer',
     userManual: 'User Manual',
   },
@@ -741,16 +783,35 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
-    firstPhaseCategory: '1st phase category',
-    firstPhaseCategoryInfo: 'Select the category that contains the first-phase samples.',
-    firstPhaseCategoryExtraProp: {
-      label: '1st phase stratum attribute',
-      info: 'Select the extra property of the $t(chainView.firstPhaseCategory) (column of the category table) used to divide the original population into broad strata for the initial sampling phase.',
+    mauFile: {
+      upload: 'Upload MAU.zip',
+      download: 'Download MAU.zip',
+      delete: 'Delete MAU.zip',
+      confirmCycleAssociation:
+        'The MAU.zip file will be associated to the current cycle ({{cycle}}). Do you want to continue?',
+      confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
+      confirmDelete: 'Delete the MAU.zip file uploaded for this chain?',
+      uploadComplete: 'MAU.zip file uploaded successfully',
+      deleteComplete: 'MAU.zip file deleted',
+      invalidFileExtension: 'Please select a .zip file',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table 
-(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+    phase1Category: '1st phase category',
+    phase1CategoryInfo: 'Select the category that contains the first-phase samples.',
+    phase2JoinEntity: {
+      label: 'Join entity (2nd phase)',
+      info: 'Entity used to join the base unit with the 1st phase category: the base unit entity itself, or one of its parent entities.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Join by using Sampling Point Data linkage',
+      info: 'The second-phase entity key(s) are read from the Sampling Point Data table, which is the same table used for the first phase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Join attribute (1st phase)',
+      info: 'Select the column of the $t(chainView.phase1Category) table (an extra property, or "code") used to join it with the 2nd phase join entity.',
+    },
+    phase2JoinAttribute: {
+      label: 'Join attribute (2nd phase)',
+      info: `Select the attribute (of 2nd phase entity) to join with 1st phase table; its value is matched against the previous 1st phase join attribute.`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -795,9 +856,8 @@ This might be a slow process.`,
     },
     stratumAttribute: 'Stratum attribute',
     stratumAttributeInfo: 'Select the variable used to stratify the sample.',
-    stratumAttribute2ndPhase: '2nd phase stratum attribute',
     stratumAttribute2ndPhaseInfo:
-      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample.',
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
@@ -903,7 +963,7 @@ About
 
 $t(common.appNameFull)
 --------
- 
+
  * Developed by: $t(links.openforis)
  * Version: {{version}}
  * Website: $t(links.openforisArenaWebsite)
@@ -913,6 +973,9 @@ $t(common.appNameFull)
  * Arena in GitHub: $t(links.arenaInGitHub)
  * Arena R Scripts in GitHub: $t(links.arenaRScriptsInGitHub)
 `,
+    },
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
   },
 
@@ -983,6 +1046,7 @@ $t(common.appNameFull)
       taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
       taxonVernacularName:
         'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
+      unique: 'Returns the unique values of a multiple attribute or entity',
       userEmail: 'Returns the email of the logged in user',
       userIsRecordOwner:
         'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
@@ -1014,6 +1078,10 @@ $t(common.appNameFull)
         label: 'Enumerate',
         info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
       },
+      enumeratingItemsExpression: {
+        label: 'Enumerating items expression',
+        info: 'Optional expression that filters which category items are enumerated (e.g. unique(table_source.source_type)). When empty, all category items are used.',
+      },
       enumerator: {
         label: 'Enumerator',
         info: 'The items in the category will be used to generate the rows of the parent entity',
@@ -1021,6 +1089,10 @@ $t(common.appNameFull)
       form: 'Form',
       formula: 'Formula',
       includedInClonedData: 'Included in cloned data',
+      includedInMultipleEntitySummary: {
+        label: 'Include in multiple entity summary',
+        info: `If marked, the attribute value will be visible in the entity selector (in Arena) and in the entity summary view (in Arena Mobile)`,
+      },
       includedInRecordsList: {
         label: 'Include in records list',
         info: `If marked, the attribute will be visible in records list`,
@@ -1086,10 +1158,6 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
         label: 'Hidden in Arena Mobile',
         info: `If marked, the attribute won't be visible in AM`,
       },
-      includedInMultipleEntitySummary: {
-        label: 'Include in multiple entity summary',
-        info: `If marked, the attribute will be visible in the entity summary view (in Arena Mobile)`,
-      },
       includedInPreviousCycleLink: {
         label: 'Include in previous cycle link',
         info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
@@ -1116,6 +1184,13 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     },
     mobileProps: {
       title: 'Mobile App',
+    },
+    timeProps: {
+      includeSeconds: 'Include seconds',
+    },
+    geoProps: {
+      positionTracking: 'Position tracking',
+      positionTrackingInfo: `It applies only to Arena Mobile: if checked, the value is the path walked by the user while filling in the record (recorded by tracking the device position) and it cannot be edited manually`,
     },
     formHeaderProps: {
       headerColorLabel: 'Header color',
@@ -1179,6 +1254,9 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
       expressions: 'Validation expressions',
       attributeAlwaysValid: 'Attribute always valid',
       attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
+      notRequired: 'Not required',
+      alwaysRequired: 'Always required',
+      requiredWhenConditionIsMet: 'Required when condition is met',
     },
     cannotChangeIntoMultipleWithDefaultValues:
       'This node cannot be converted to multiple because it has default values.',
@@ -1266,10 +1344,13 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       noCategoriesAvailable: 'No categories available in the selected survey',
     },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
 
@@ -1297,6 +1378,54 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    geoPackageCategory: 'This category has geo capabilities',
+    geoPackageCategoryInfo: `This category has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    samplingPointDataCategoryTypeInfo: `This is a predefined category for sampling point data. It has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
+    samplingPointDataCategoryLocationMissing: `The '${locationItemExtraDefName}' extra property is missing`,
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+      otherTypes: 'More category types',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      description: 'Predefined category for sampling point data, including a location field for each item.',
+      message: `Create a new Sampling Point Data category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Category with geo capabilities',
+      description: 'Adds a location field to items, so the category can be exported as a GeoPackage file.',
+      message: `Create a new category with geo capabilities?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',
@@ -1320,6 +1449,17 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
+    exportToGeoPackage: 'Export to GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Generate Whisp analysis',
+      confirmMessage: `Generate the Whisp analysis for all the sampling points?
+
+- every sampling point with a location will be sent to Open Foris Whisp for the analysis
+- the results will be combined with the sampling point data and stored in the category '${samplingPointDataWhispCategoryName}'
+- if the category '${samplingPointDataWhispCategoryName}' already exists, its content will be replaced
+- the analysis runs in the background and it can take several minutes, depending on the number of sampling points`,
+    },
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },

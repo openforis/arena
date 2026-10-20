@@ -11,11 +11,11 @@
   align-content: start;
   grid-row-gap: 1rem;
   overflow-y: auto;
-  color: white;
+  color: $colorOnPrimary;
 }
 
 .service-errors__error {
-  background-color: $red;
+  background-color: $colorError;
   margin: 0 0.5rem;
   min-height: 100px;
   padding: 1rem;
@@ -26,10 +26,10 @@
     left: 0;
     top: 0;
     border: none !important;
-    background-color: $red;
+    background-color: $colorError;
 
     .icon {
-      color: white;
+      color: $colorOnPrimary;
     }
   }
 

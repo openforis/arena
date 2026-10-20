@@ -20,6 +20,8 @@ export default {
     noRecordsFound: 'No records found in the import file or wrong file format',
     pendingImportFileNotFoundOrExpired:
       'The previously uploaded file cannot be found anymore; it may have expired. Please upload it again.',
+    recordMergeWithSameKeysNotAllowed:
+      'Cannot import record "{{recordKeyValues}}": another record with the same keys already exists and merging records with same keys is not allowed in this survey',
     recordOwnedByAnotherUser: 'Cannot update record "{{recordKeyValues}}" as it is owned by another user',
   },
   entryDataNotFound: 'Entry data not found: {{entryName}}',
@@ -31,6 +33,8 @@ export default {
   functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} (got {{numArgs}})',
   generic: 'Unexpected error: {{text}}',
   geoWhispApiError: 'The Whisp service is temporarily unavailable.',
+  geoWhispSamplingPointDataCategoryMissing: 'Sampling point data category not found.',
+  geoWhispSamplingPointDataLocationsMissing: 'No sampling point data item with a valid location found.',
   importingDataIntoWrongCollectSurvey: 'Importing data into wrong survey. Expected URI: {{collectSurveyUri}}',
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
@@ -51,12 +55,15 @@ export default {
   recordPrintableExport: {
     missingEntityParams: 'Current page export requires entityDefUuid and entityNodeUuid',
     entityNotFound: 'Entity not found for the specified export',
+    missingServerUrl: 'Public server URL is required when exporting with a QR code',
+    qrTokenMismatch: 'Could not finalize QR code export; please retry',
   },
   sessionExpiredRefreshPage: `Session could have expired.
 Try to refresh the page.`,
   survey: {
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
     dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
+    fileNotFound: 'File not found',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors
@@ -86,6 +93,11 @@ Try to refresh the page.`,
   aiChatbotDisabled: 'The documentation chatbot is disabled on this deployment.',
   aiChatbotUpstreamError: 'The documentation chatbot is temporarily unavailable. Please try again in a moment.',
   aiChatbotPayloadTooLarge: 'Your conversation is too large. Clear the chat and try a shorter question.',
+  aiDataQueryDescriptionMissing: 'Please describe the data you want to see in plain language.',
+  aiDataQueryNoEntities: 'This survey has no entities that can be queried.',
+  aiDataQueryInvalid: 'The AI could not generate a valid query for this request: {{errors}}',
+  aiDataQueryEmpty: 'Select an entity and some attributes (or dimensions and measures) first.',
+  aiDataQuerySummaryInvalid: 'The AI could not suggest a name and description for this query. Please try again.',
   userCannotDeleteHasMessages:
     'This user cannot be deleted: they authored {{count}} message(s); delete or reassign them first',
   userCannotDeleteLastSystemAdmin: 'This user cannot be deleted: they are the last system administrator',
@@ -97,8 +109,13 @@ Try to refresh the page.`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',
   userInvalid: 'Invalid user',
+  surveyCompareFileTooLarge:
+    'The survey file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',
   userNotFound: 'User not found: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'The file is not a valid Arena users backup',
+  },
 }

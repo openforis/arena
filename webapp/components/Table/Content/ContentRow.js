@@ -23,7 +23,7 @@ export const ContentRow = (props) => {
 
   const [rowExpanded, setRowExpanded] = useState(false)
 
-  const active = isRowActive && isRowActive(item)
+  const active = isRowActive?.(item)
   const className = classNames('table__row', { hoverable: Boolean(onRowClick), active, expanded: rowExpanded })
 
   const onRowExpandToggle = () => setRowExpanded((oldExpanded) => !oldExpanded)
@@ -60,8 +60,6 @@ export const ContentRow = (props) => {
         offset,
         item,
         itemPosition,
-        row: item, // TODO remove it and pass only item
-        rowNo: itemPosition, // TODO remove it and pass only itemPosition
         onRowExpandToggle,
         expandableRows,
         isRowExpandable,

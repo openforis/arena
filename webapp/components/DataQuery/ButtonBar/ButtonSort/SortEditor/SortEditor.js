@@ -18,7 +18,7 @@ const SortEditor = (props) => {
       <div className="sort-editor">
         {sortDraft.map((sortCriteria, idx) => (
           <SortCriteriaEditor
-            key={String(idx)}
+            key={SortCriteria.getVariable(sortCriteria)}
             onChange={(sortCriteriaUpdated) =>
               setSortDraft(Sort.updateSortCriteria(idx, sortCriteriaUpdated)(sortDraft))
             }

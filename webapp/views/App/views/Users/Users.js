@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react'
 
-import { Objects } from '@openforis/arena-core'
+import { Authorizer, Objects } from '@openforis/arena-core'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as ProcessUtils from '@core/processUtils'
 
@@ -79,6 +78,11 @@ const Users = () => {
       })
     }
     _modules.push(
+      {
+        component: UserEdit,
+        path: userModules.user.path,
+        props: { ownProfile: true },
+      },
       {
         component: UserEdit,
         path: `${userModules.user.path}/:userUuid`,

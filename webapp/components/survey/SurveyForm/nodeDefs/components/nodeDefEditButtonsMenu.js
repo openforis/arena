@@ -12,7 +12,6 @@ import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 import { NodeDefConversionDialog } from './nodeDefConversionDialog'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 
@@ -40,8 +39,7 @@ const isEntitySelectableByAction = {
 }
 
 const availabilityByAction = {
-  [actionsWithEntitySelection.clone]: ({ nodeDef, experimentalFeatures }) =>
-    experimentalFeatures || NodeDef.isAttribute(nodeDef),
+  [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
   [actionsWithEntitySelection.move]: ({ survey, cycle, nodeDef }) => {
     // published node defs cannot be moved
     if (NodeDef.isPublished(nodeDef)) return false
@@ -73,7 +71,6 @@ export const NodeDefEditButtonsMenu = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
@@ -136,7 +133,7 @@ export const NodeDefEditButtonsMenu = (props) => {
     const _menuItems = []
     // items with entity selection (clone or move actions)
     const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
-      availabilityByAction[action]({ survey, cycle, nodeDef, experimentalFeatures })
+      availabilityByAction[action]({ survey, cycle, nodeDef })
     )
     _menuItems.push(
       ...availableActions.map((action) => ({
@@ -187,16 +184,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       })
     }
     return _menuItems
-  }, [
-    cycle,
-    dispatch,
-    experimentalFeatures,
-    nodeDef,
-    nodeDefLabel,
-    openConvertIntoDialog,
-    openEntitySelectDialog,
-    survey,
-  ])
+  }, [cycle, dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog, survey])
 
   if (menuItems.length === 0) return null
 

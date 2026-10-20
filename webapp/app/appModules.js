@@ -64,14 +64,9 @@ export const appModules = {
     path: 'analysis',
     icon: 'stats-dots',
   },
-  messages: {
-    key: 'message_plural',
-    path: 'messages',
-    icon: 'envelop',
-  },
-  jobs: {
-    key: 'jobMonitor',
-    path: 'jobMonitor',
+  systemAdmin: {
+    key: 'systemAdmin',
+    path: 'systemAdmin',
     icon: 'cogs',
   },
   help: {
@@ -115,6 +110,10 @@ export const homeModules = {
   collectImportReport: {
     key: 'collectImportReport',
     path: 'collectImportReport',
+  },
+  surveyCompare: {
+    key: 'surveyCompare',
+    path: 'surveyCompare',
   },
 }
 
@@ -277,7 +276,15 @@ export const user2FADeviceModules = {
   },
 }
 
-export const messageModules = {
+export const systemAdminModules = {
+  jobMonitor: {
+    key: 'jobMonitor',
+    path: 'jobMonitor',
+  },
+  systemLogs: {
+    key: 'systemLogs',
+    path: 'systemLogs',
+  },
   messages: {
     key: 'message_plural',
     path: 'messages',
@@ -293,9 +300,17 @@ export const helpModules = {
     key: 'about',
     path: 'about',
   },
+  changelog: {
+    key: 'changelog',
+    path: 'changelog',
+  },
+  whatsNew: {
+    key: 'whatsNew',
+    path: 'whats-new',
+  },
   disclaimer: {
     key: 'disclaimer',
-    uri: 'https://openforis.org/legal-disclaimer/',
+    uri: 'https://openforis.org/arena-legal-disclaimer/',
     external: true,
   },
   userManual: {
@@ -312,7 +327,7 @@ const allAppModuleGroups = [
   userModules,
   analysisModules,
   user2FADeviceModules,
-  messageModules,
+  systemAdminModules,
   helpModules,
 ]
 
@@ -328,8 +343,8 @@ const _getModuleParentPathParts = (module) => {
   if (Object.values(dataModules).includes(module)) return _getModulePathParts(appModules.data)
   if (Object.values(userModules).includes(module)) return _getModulePathParts(appModules.users)
   if (Object.values(analysisModules).includes(module)) return _getModulePathParts(appModules.analysis)
-  if (Object.values(messageModules).includes(module)) return _getModulePathParts(appModules.messages)
   if (Object.values(user2FADeviceModules).includes(module)) return _getModulePathParts(userModules.user2FADevices)
+  if (Object.values(systemAdminModules).includes(module)) return _getModulePathParts(appModules.systemAdmin)
   if (Object.values(helpModules).includes(module)) return _getModulePathParts(appModules.help)
 
   throw new Error(`Parent path not found for module ${module?.path}`)
@@ -353,4 +368,9 @@ export const getModuleByPathPart = ({ levelIndex, pathPart }) => {
   return foundModule
 }
 
+/**
+ * Builds the route of the specified app module.
+ * @param {{ key: string, path: string, icon?: string }} [module] - The app module.
+ * @returns {string} The module route.
+ */
 export const appModuleUri = (module = appModules.home) => `/${_getModulePathParts(module).join('/')}/`

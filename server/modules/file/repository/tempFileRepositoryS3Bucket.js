@@ -42,7 +42,7 @@ const calculateTotalChunksSize = async ({ totalChunks, fileId }) => {
   let totalContentLength = 0
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     const chunkFileName = getChunkFileName({ fileId, chunk })
-    const chunkSize = await getFileSize({ fileUuid: chunkFileName })
+    const chunkSize = await getFileSize({ fileUuid: chunkFileName }) // NOSONAR
     if (!Number.isFinite(chunkSize)) {
       throw new TypeError(`Cannot determine size of temp chunk ${chunkFileName}`)
     }
@@ -66,10 +66,10 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
     for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
       // extract temporary chunk content
       const chunkFileName = getChunkFileName({ fileId, chunk })
-      const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
-      await writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream })
+      const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName }) // NOSONAR
+      await writeReadableToWritable({ readStream: chunkFileStream, writeStream: uploadStream }) // NOSONAR
       // delete temporary chunk
-      await deleteFile({ fileNameOrPath: chunkFileName })
+      await deleteFile({ fileNameOrPath: chunkFileName }) // NOSONAR
     }
 
     uploadStream.end()
@@ -93,11 +93,11 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
     for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
       // extract temporary chunk content
       const chunkFileName = getChunkFileName({ fileId, chunk })
-      const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName })
-      await writeReadableToWritable({ readStream: chunkFileStream, writeStream })
+      const chunkFileStream = await getFileContentAsStream({ fileUuid: chunkFileName }) // NOSONAR
+      await writeReadableToWritable({ readStream: chunkFileStream, writeStream }) // NOSONAR
       // delete temporary chunk
-      await deleteFile({ fileNameOrPath: chunkFileName })
-      await onChunkMerged?.({ chunk, totalChunks })
+      await deleteFile({ fileNameOrPath: chunkFileName }) // NOSONAR
+      await onChunkMerged?.({ chunk, totalChunks }) // NOSONAR
     }
     await endWriteStream(writeStream)
     return finalFilePath
@@ -117,7 +117,7 @@ export const deleteOldTempFiles = async ({ olderThanHours }) => {
   })
   for (const file of oldFiles) {
     const fileUuid = file.Key.slice(tempPrefix.length)
-    await deleteFileCommon({ fileUuid })
+    await deleteFileCommon({ fileUuid }) // NOSONAR
   }
   return oldFiles.length
 }

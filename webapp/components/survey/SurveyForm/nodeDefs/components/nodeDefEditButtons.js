@@ -12,9 +12,8 @@ import { elementOffset } from '@webapp/utils/domUtils'
 import { TestId } from '@webapp/utils/testId'
 import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import { useI18n } from '@webapp/store/system'
-import { NodeDefsActions } from '@webapp/store/survey'
+import { NodeDefsActions, useSurveyPreferredLang } from '@webapp/store/survey'
 import { SurveyFormActions, SurveyFormState } from '@webapp/store/ui/surveyForm'
-import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { Button } from '@webapp/components'
 
 import { NodeDefEditButtonsMenu } from './nodeDefEditButtonsMenu'
@@ -47,13 +46,7 @@ const NodeDefEditButtons = (props) => {
   }, [hasNodeDefAddChildTo])
 
   return (
-    <div
-      className="survey-form__node-def-edit-buttons"
-      ref={elementRef}
-      style={style}
-      draggable={false}
-      onMouseDown={(e) => e.stopPropagation()}
-    >
+    <div className="survey-form__node-def-edit-buttons" ref={elementRef} style={style} draggable={false}>
       {NodeDefLayout.hasPage(surveyCycleKey)(nodeDef) && (
         <div className="survey-form__node-def-edit-page-props">
           {i18n.t('surveyForm:nodeDefEditFormActions.columns')}

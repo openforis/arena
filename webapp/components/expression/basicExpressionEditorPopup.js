@@ -1,6 +1,6 @@
 import './expressionEditorPopup.scss'
 
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -24,7 +24,7 @@ const BasicExpressionEditorPopup = (props) => {
     <>
       <div className="expression-editor__query-container">
         <div className={classNames('query', { invalid: !exprDraftValid })}>
-          {R.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
+          {A.isEmpty(queryDraft) ? <span className="placeholder">- {i18n.t('common.empty')} -</span> : queryDraft}
         </div>
       </div>
 

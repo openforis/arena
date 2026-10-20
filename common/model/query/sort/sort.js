@@ -7,7 +7,7 @@ export const create = () => []
 // ====== READ
 export const { isEmpty } = A
 export const containsVariable = (variable) => (sort) =>
-  Boolean(sort.find((sortCriteria) => SortCriteria.getVariable(sortCriteria) === variable))
+  sort.some((sortCriteria) => SortCriteria.getVariable(sortCriteria) === variable)
 
 // ====== UPDATE
 export const updateSortCriteria = (idx, sortCriteria) => (sort) => {

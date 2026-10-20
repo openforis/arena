@@ -152,7 +152,7 @@ export const useChains = ({ surveyCycleKey } = {}) => {
           setChains(_chains)
         }
       }
-      fetchChains()
+      void fetchChains()
     } else {
       setChains(null)
     }

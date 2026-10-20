@@ -1,3 +1,5 @@
 import useAsync from './useAsync'
 
-export default (url, config = {}) => useAsync({ method: 'get', url, ...config })
+const useAsyncGetRequest = (url, config = {}) => useAsync({ method: 'get', url, ...config })
+
+export default useAsyncGetRequest

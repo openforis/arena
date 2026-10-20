@@ -10,7 +10,7 @@ const TabBarButtons = ({ tabs, selection, onClick }) => (
   <div className="flex-center tab-bar__header">
     {tabs.map((tab, i) => (
       <Button
-        key={String(i)}
+        key={tab.id ?? tab.label}
         active={i === selection}
         disabled={Boolean(tab.disabled)}
         iconClassName={tab.icon ? `${tab.icon} icon-12px` : undefined}

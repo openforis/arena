@@ -1,4 +1,4 @@
-module.exports = function (api) {
+module.exports = function babelConfig(api) {
   // Cache the returned value forever and don't call this function again.
   //   api.cache(true);
 

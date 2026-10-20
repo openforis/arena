@@ -1,4 +1,9 @@
 export default {
+  completion: '{{percent}} % complété',
+  pagesValidationProgress: '{{valid}}/{{total}} pages valides ({{percent}} %)',
+  pageComplete: 'Complète',
+  copyPath: 'Copier le chemin',
+  pathCopiedToClipboard: 'Chemin copié dans le presse-papiers',
   subPage: 'Sous-page',
   addChildTo: 'Ajouter à {{nodeDefLabel}}',
   addChildToTitle: 'Ajouter un nouveau nœud à {{nodeDefLabel}}',
@@ -20,6 +25,11 @@ export default {
   },
   clone: `Cloner '{{nodeDefLabel}}'`,
   compressFormItems: `Compresser les éléments du formulaire pour '{{nodeDefLabel}}'`,
+  confirmClearNonApplicableValues: `Les champs suivants ne seront plus pertinents et leurs valeurs seront effacées :
+
+{{nodeDefLabels}}
+
+Continuer ?`,
   confirmUpdateDependentEnumeratedEntities: `Si vous continuez, certaines entités énumérées ({{entityDefs}}) seront ré-énumérées,  
 supprimant les valeurs existantes insérées dans celles-ci (le cas échéant).  
 Continuer ?`,
@@ -37,6 +47,30 @@ Continuer ?`,
   movePageDown: 'Descendre la page',
   formEditActions: {
     preview: 'Aperçu',
+    previewDesktop: 'Aperçu (ordinateur)',
+    previewMobile: 'Aperçu (mobile)',
+    previewOptions: "Options d'aperçu",
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Téléphone',
+      tablet: 'Tablette',
+    },
+    error: "Erreur lors du chargement de l'aperçu mobile : {{error}}",
+    differences: `**Différences avec Arena Mobile sur un appareil réel**
+- **Date et heure** : saisies dans un champ texte (DD/MM/YYYY, HH:mm) au lieu des sélecteurs de date/heure de l'appareil
+- **Cartes** : non disponibles (les boutons de carte affichent un espace réservé ; pas de cartes hors ligne ni PDF)
+- **Position** : fournie par le navigateur (généralement moins précise que le GPS de l'appareil) ; pas de récepteurs GPS externes
+- **Photos et fichiers** : sélectionnés depuis l'ordinateur ; pas de prise de vue avec l'appareil photo ni de position de la photo (EXIF)
+- **Clavier et gestes** : clavier physique et souris au lieu du clavier à l'écran et des balayages
+- **Données** : conservées uniquement en mémoire, perdues au rechargement ; pas de liste des enregistrements, de synchronisation ni d'export`,
+    note: "Approximation d'Arena Mobile exécuté dans le navigateur avec l'enquête en brouillon.",
+    orientation: {
+      landscape: 'Paysage',
+      portrait: 'Portrait',
+    },
+    reload: 'Recharger',
+    title: 'Aperçu mobile (expérimental)',
   },
   formEntryActions: {
     confirmDemote: 'Êtes-vous sûr(e) de vouloir rétrograder cet enregistrement vers {{name}} ?',
@@ -150,11 +184,13 @@ Dans Arena Mobile :
     scope: 'Contenu',
     scopes: {
       full: 'Formulaire complet',
-      currentPage: 'Page actuelle uniquement',
+      currentPage: 'Page actuelle uniquement ({{entityLabel}})',
     },
-    currentPageHint: 'Page actuelle : {{entityLabel}}',
     currentPageUnavailable:
       "Impossible de déterminer l'instance de la page actuelle. Naviguez vers une page spécifique ou exportez le formulaire complet.",
+    includeQrCode: 'Inclure un code QR',
+    includeQrCodeInfo:
+      'Ajoute un code QR sur la première page menant à une copie en lecture seule du PDF de cette entité (valable 1 an).',
     orientation: 'Orientation de la page',
     orientations: {
       portrait: 'Portrait',

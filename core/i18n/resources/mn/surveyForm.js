@@ -1,5 +1,10 @@
 // mn.js
 export default {
+  completion: '{{percent}}% бөглөсөн',
+  pagesValidationProgress: '{{valid}}/{{total}} хуудас хүчинтэй ({{percent}}%)',
+  pageComplete: 'Бөглөсөн',
+  copyPath: 'Замыг хуулах',
+  pathCopiedToClipboard: 'Замыг түр санах ойд хууллаа',
   subPage: 'Дэд хуудас',
   addChildTo: '{{nodeDefLabel}}-д нэмэх',
   addChildToTitle: '{{nodeDefLabel}}-д шинэ зангилаа нэмэх',
@@ -21,6 +26,11 @@ export default {
   },
   clone: `'{{nodeDefLabel}}' хуулах`,
   compressFormItems: `'{{nodeDefLabel}}'-н маягтын зүйлсийг шахах`,
+  confirmClearNonApplicableValues: `Дараах талбарууд хамааралгүй болж, тэдгээрийн утгыг устгана:
+
+{{nodeDefLabels}}
+
+Үргэлжлүүлэх үү?`,
   confirmUpdateDependentEnumeratedEntities: `Хэрэв та үргэлжлүүлбэл, зарим тоологдсон объектууд ({{entityDefs}}) дахин тоологдох болно, 
 тэдгээрт оруулсан одоо байгаа утгуудыг (хэрэв байгаа бол) устгана. 
 Үргэлжлүүлэх үү?`,
@@ -38,6 +48,30 @@ export default {
   movePageDown: 'Хуудсыг доош зөөх',
   formEditActions: {
     preview: 'Урьдчилан харах',
+    previewDesktop: 'Урьдчилан харах (компьютер)',
+    previewMobile: 'Урьдчилан харах (гар утас)',
+    previewOptions: 'Урьдчилан харах сонголтууд',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Утас',
+      tablet: 'Таблет',
+    },
+    error: 'Гар утасны урьдчилсан харагдацыг ачаалахад алдаа гарлаа: {{error}}',
+    differences: `**Бодит төхөөрөмж дээрх Arena Mobile-оос ялгаатай зүйлс**
+- **Огноо ба цаг**: төхөөрөмжийн огноо/цаг сонгогчийн оронд текст талбарт бичнэ (DD/MM/YYYY, HH:mm)
+- **Газрын зураг**: боломжгүй (газрын зургийн товч орлуулагч харуулна; офлайн болон PDF газрын зураг байхгүй)
+- **Байршил**: хөтчөөс авна (ихэвчлэн төхөөрөмжийн GPS-ээс нарийвчлал багатай); гадаад GPS хүлээн авагч байхгүй
+- **Зураг ба файл**: компьютерээс сонгоно; камераар авах болон зургийн байршил (EXIF) боломжгүй
+- **Гар ба хөдөлгөөн**: дэлгэцийн гар болон шударга хөдөлгөөний оронд физик гар болон хулгана
+- **Өгөгдөл**: зөвхөн санах ойд хадгалагдаж, дахин ачаалахад устна; бичлэгийн жагсаалт, синхрончлол, экспорт байхгүй`,
+    note: 'Ноорог судалгаатай хөтөч дээр ажиллаж буй Arena Mobile-ийн ойролцоо харагдац.',
+    orientation: {
+      landscape: 'Хэвтээ',
+      portrait: 'Босоо',
+    },
+    reload: 'Дахин ачаалах',
+    title: 'Гар утасны урьдчилсан харагдац (туршилтын)',
   },
   formEntryActions: {
     confirmDemote: 'Та энэ бичлэгийг {{name}}-д буулгахыг хүсч байгаадаа итгэлтэй байна уу?',
@@ -141,27 +175,28 @@ Arena Mobile дээр:
   downloadPrintableDocument: 'Хэвлэх баримт бичиг татах (Word)',
   downloadPrintableDocumentPdf: 'Хэвлэх баримт бичиг татах (PDF)',
   printableExport: {
-    title: 'Export printable document',
-    exportDocument: 'Export Document',
-    format: 'Format',
+    title: 'Хэвлэх боломжтой баримт бичиг экспортлох',
+    exportDocument: 'Баримт бичиг экспортлох',
+    format: 'Формат',
     formats: {
       pdf: 'PDF',
       docx: 'Word',
     },
-    scope: 'Content',
+    scope: 'Агуулга',
     scopes: {
-      full: 'Full survey',
-      currentPage: 'Current page only',
+      full: 'Судалгааг бүтнээр',
+      currentPage: 'Зөвхөн одоогийн хуудас ({{entityLabel}})',
     },
-    currentPageHint: 'Current page: {{entityLabel}}',
     currentPageUnavailable:
-      'Unable to determine the current page instance. Navigate to a specific page or export the full survey.',
-    orientation: 'Page orientation',
+      'Одоогийн хуудсыг тодорхойлох боломжгүй байна. Тодорхой хуудас руу шилжих эсвэл судалгааг бүтнээр нь экспортолно уу.',
+    includeQrCode: 'QR код оруулах',
+    includeQrCodeInfo: 'Энэ нэгжийн зөвхөн унших PDF руу холбосон QR кодыг эхний хуудсанд нэмнэ (1 жилийн хугацаатай).',
+    orientation: 'Хуудасны чиглэл',
     orientations: {
-      portrait: 'Portrait',
-      landscape: 'Landscape',
+      portrait: 'Босоо',
+      landscape: 'Хэвтээ',
     },
-    download: 'Download',
+    download: 'Татах',
   },
   exportLabels_csv: 'Шошгыг экспортлох (CSV)',
   exportLabels_xlsx: 'Шошгыг экспортлох (Excel)',

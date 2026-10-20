@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import { db } from '@server/db/db'
 
 import { NodeDefsFixer, Objects } from '@openforis/arena-core'
@@ -16,6 +16,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const logger = Log.getLogger('NodeDefManager')
 
@@ -44,8 +45,8 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyCycleKeys = Survey.getCycleKeys(surveyInfo)
 
-  const cyclesAdded = R.difference(cycles, cyclesPrev)
-  const cyclesDeleted = R.difference(cyclesPrev, cycles)
+  const cyclesAdded = A.difference(cycles, cyclesPrev)
+  const cyclesDeleted = A.difference(cyclesPrev, cycles)
 
   const batchUpdates = []
   Survey.getNodeDefsArray(survey)
@@ -64,7 +65,7 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
       const { uuid: descendantUuid, parentUuid } = nodeDefDescendantUpdated
 
       // add db update to batch
-      batchUpdates.push(
+      batchUpdates.push(() =>
         NodeDefRepository.updateNodeDefProps(
           { surveyId, nodeDefUuid: descendantUuid, parentUuid, props: { [NodeDef.propKeys.cycles]: cyclesUpdated } },
           client
@@ -74,7 +75,7 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
     })
 
   // perform updates in batch
-  await client.batch(batchUpdates)
+  await DbUtils.runQueries(client, batchUpdates)
 
   return nodeDefsUpdated
 }
@@ -155,11 +156,32 @@ export const fetchNodeDefsBySurveyId = async (
 
 const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
   NodeDef.isCoordinate(nodeDef) &&
-  R.intersection(Object.keys(props))([
+  A.intersection(Object.keys(props))([
     NodeDef.propKeys.includeAccuracy,
     NodeDef.propKeys.includeAltitude,
     NodeDef.propKeys.includeAltitudeAccuracy,
   ]).length > 0
+
+const _isNameOrLabelOrActiveChanged = ({ nodeDefPrev, nodeDef, props, propsAdvanced }) =>
+  (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
+  (NodeDef.propKeys.labels in props && !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef))) ||
+  (NodeDef.keysPropsAdvanced.active in propsAdvanced && NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef))
+
+// Returns the area based estimate node def inserted, deleted or updated (if any).
+const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, nodeDef, props, propsAdvanced }, t) => {
+  const hasAreaBasedEstimateChanged =
+    NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
+    NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
+
+  if (hasAreaBasedEstimateChanged) {
+    return NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+  }
+  // node def name, label or active state changed => update node def area based estimate accordingly
+  if (_isNameOrLabelOrActiveChanged({ nodeDefPrev, nodeDef, props, propsAdvanced })) {
+    return NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
+  }
+  return null
+}
 
 export const updateNodeDefProps = async (
   { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
@@ -235,46 +257,23 @@ export const updateNodeDefProps = async (
     }
 
     if (NodeDef.isAnalysis(nodeDef)) {
-      const hasAreaBasedEstimateChanged =
-        NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
-        NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
-
-      if (hasAreaBasedEstimateChanged) {
-        const nodeDefAreaBasedEstimateUpdated =
-          await NodeDefAreaBasedEstimateManager.insertOrDeleteNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
-        _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
-      } else {
-        // node def name, label or active state changed => update node def area based estimate accordingly
-        const nameOrLabelChanged =
-          (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
-          (NodeDef.propKeys.labels in props &&
-            !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef)))
-        const activeChanged =
-          NodeDef.keysPropsAdvanced.active in propsAdvanced &&
-          NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef)
-
-        if (nameOrLabelChanged || activeChanged) {
-          const nodeDefAreaBasedEstimateUpdated = await NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate(
-            { survey, nodeDef },
-            t
-          )
-          _addNodeDefUpdatedToSurvey(nodeDefAreaBasedEstimateUpdated)
-        }
-      }
+      _addNodeDefUpdatedToSurvey(
+        await _updateAreaBasedEstimateOnPropsUpdate({ survey, nodeDefPrev, nodeDef, props, propsAdvanced }, t)
+      )
     }
     const logContent = {
       uuid: nodeDefUuid,
-      ...(R.isEmpty(props) ? {} : { props }),
-      ...(R.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
+      ...(A.isEmpty(props) ? {} : { props }),
+      ...(A.isEmpty(propsAdvanced) ? {} : { propsAdvanced }),
     }
 
     // persist changes in db
-    await t.batch([
-      ...Object.values(nodeDefsUpdated).map((nodeDefToUpdate) =>
-        _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
+    await DbUtils.runQueries(t, [
+      ...Object.values(nodeDefsUpdated).map(
+        (nodeDefToUpdate) => () => _persistNodeDefLayout({ surveyId, nodeDef: nodeDefToUpdate }, t)
       ),
-      ...(markSurveyAsDraft ? [markSurveyDraft(surveyId, t)] : []),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
+      ...(markSurveyAsDraft ? [() => markSurveyDraft(surveyId, t)] : []),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefUpdate, logContent, system, t),
     ])
 
     return nodeDefsUpdated
@@ -321,7 +320,7 @@ const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, 
 
     const descendantUuid = NodeDef.getUuid(nodeDefDescendant)
 
-    batchUpdates.push(
+    batchUpdates.push(() =>
       NodeDefRepository.updateNodeDefProps(
         {
           surveyId,
@@ -337,7 +336,7 @@ const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, 
 
   // Perform all descendant updates in batch
   if (batchUpdates.length > 0) {
-    await t.batch(batchUpdates)
+    await DbUtils.runQueries(t, batchUpdates)
   }
   return nodeDefsUpdatedByUuid
 }
@@ -453,11 +452,17 @@ export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, clie
 export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
-  if (!R.isEmpty(langsDeleted)) {
+  if (!A.isEmpty(langsDeleted)) {
     // delete labels
-    await Promise.all(langsDeleted.map((lang) => NodeDefRepository.deleteNodeDefsLabels(surveyId, lang, client)))
+    await DbUtils.runQueries(
+      client,
+      langsDeleted.map((lang) => () => NodeDefRepository.deleteNodeDefsLabels(surveyId, lang, client))
+    )
     // delete descriptions
-    await Promise.all(langsDeleted.map((lang) => NodeDefRepository.deleteNodeDefsDescriptions(surveyId, lang, client)))
+    await DbUtils.runQueries(
+      client,
+      langsDeleted.map((lang) => () => NodeDefRepository.deleteNodeDefsDescriptions(surveyId, lang, client))
+    )
     // delete validation messages
     await NodeDefRepository.deleteNodeDefsValidationMessageLabels(surveyId, langsDeleted, client)
   }

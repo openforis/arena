@@ -116,13 +116,14 @@ export default class DfResults {
         this.scripts.push(setVar(categoryValuesTempVar, sqldf(query)))
 
         const dfColumnPrefix = `${this.name}$${nodeVarName}`
-        this.scripts.push(setVar(`${dfColumnPrefix}_code`, `${categoryValuesTempVar}$${nodeVarName}`))
-        this.scripts.push(setVar(`${dfColumnPrefix}_label`, `${categoryValuesTempVar}$${computedCategoryLabelCol}`))
-        this.scripts.push(setVar(`${dfColumnPrefix}_uuid`, `${categoryValuesTempVar}$${computedCategoryUuidCol}`))
-
-        // remove temp category variable
-        this.scripts.push(rm(categoryTempVar))
-        this.scripts.push(rm(categoryValuesTempVar))
+        this.scripts.push(
+          setVar(`${dfColumnPrefix}_code`, `${categoryValuesTempVar}$${nodeVarName}`),
+          setVar(`${dfColumnPrefix}_label`, `${categoryValuesTempVar}$${computedCategoryLabelCol}`),
+          setVar(`${dfColumnPrefix}_uuid`, `${categoryValuesTempVar}$${computedCategoryUuidCol}`),
+          // remove temp category variable
+          rm(categoryTempVar),
+          rm(categoryValuesTempVar)
+        )
       }
     })
   }

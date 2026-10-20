@@ -57,7 +57,10 @@ export const asCharacter = (value) => `as.character(${value})`
 
 export const asLogical = (value) => `as.logical(${value})`
 
-export const asNumeric = (value, units = null) => `as.numeric(${value}${units ? `, units='${units}'` : ''})`
+export const asNumeric = (value, units = null) => {
+  const unitsArg = units ? `, units='${units}'` : ''
+  return `as.numeric(${value}${unitsArg})`
+}
 
 // == strings
 

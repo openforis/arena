@@ -23,10 +23,10 @@ export default class ChainsSamplingNodeDefsCheckJob extends Job {
     for (const chain of chains) {
       const { nodeDefsToCreate, nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({ survey, chain })
       for (const nodeDefToDelete of nodeDefsToDelete) {
-        await NodeDefManager.markNodeDefDeleted({ user, survey, nodeDefUuid: nodeDefToDelete.uuid }, tx)
+        await NodeDefManager.markNodeDefDeleted({ user, survey, nodeDefUuid: nodeDefToDelete.uuid }, tx) // NOSONAR
       }
       if (!Objects.isEmpty(nodeDefsToCreate)) {
-        await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: nodeDefsToCreate }, tx)
+        await NodeDefManager.insertNodeDefsBatch({ surveyId, nodeDefs: nodeDefsToCreate }, tx) // NOSONAR
       }
     }
   }

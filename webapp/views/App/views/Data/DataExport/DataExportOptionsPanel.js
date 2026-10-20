@@ -87,6 +87,16 @@ export const DataExportOptionsPanel = (props) => {
           valueFormat={DateFormats.dateStorage}
         />
       </FormItem>
+      <FormItem
+        info={`dataExportView:optionsInfo.${options.recordsModifiedBefore}`}
+        label={`dataExportView:options.${options.recordsModifiedBefore}`}
+      >
+        <DateInput
+          onChange={onOptionChange(options.recordsModifiedBefore)}
+          value={selectedOptionsByKey[options.recordsModifiedBefore]}
+          valueFormat={DateFormats.dateStorage}
+        />
+      </FormItem>
       {availableOptions.some((optionKey) => dataImportNonCompatibilityByOption[optionKey]) && (
         <span className="not-compatible-with-data-import-message">
           *{i18n.t('dataExportView:optionNotCompatibleWithDataImport')}

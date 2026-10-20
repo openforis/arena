@@ -3,6 +3,7 @@ import { Navigate } from 'react-router'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import { appModuleUri, appModules, homeModules } from '@webapp/app/appModules'
+import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { useAuthCanCreateSurvey, useAuthCanCreateTemplate } from '@webapp/store/user/hooks'
 
 import CollectImportReport from './CollectImportReport'
@@ -10,6 +11,7 @@ import Landing from './Landing'
 import SurveyList from './SurveyList'
 import SurveyCreate from './SurveyCreate'
 import SurveyInfo from './SurveyInfo'
+import { SurveyCompare } from './SurveyCompare'
 import TemplateList from './TemplateList'
 import TemplateCreate from './TemplateCreate'
 
@@ -18,6 +20,7 @@ const HomeDashboardRedirect = () => <Navigate to={appModuleUri(appModules.dashbo
 const Home = () => {
   const canCreateSurvey = useAuthCanCreateSurvey()
   const canCreateTemplate = useAuthCanCreateTemplate()
+  const canEditSurvey = useAuthCanEditSurvey()
 
   return (
     <ModuleSwitch
@@ -64,6 +67,14 @@ const Home = () => {
           component: CollectImportReport,
           path: homeModules.collectImportReport.path,
         },
+        ...(canEditSurvey
+          ? [
+              {
+                component: SurveyCompare,
+                path: homeModules.surveyCompare.path,
+              },
+            ]
+          : []),
       ]}
     />
   )

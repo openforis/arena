@@ -5,10 +5,13 @@ import PropTypes from 'prop-types'
 import * as User from '@core/user/user'
 import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import { baseLayers } from './baseLayers'
+import { baseLayers, baseLayerTypes } from './baseLayers'
+import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
+import { MAP_MIN_ZOOM } from './mapZoom'
 import { WmtsComponent } from './WmtsComponent'
 
 export const MapLayersControl = (props) => {
@@ -16,6 +19,7 @@ export const MapLayersControl = (props) => {
 
   const user = useUser()
   const surveyId = useSurveyId()
+  const experimentalFeaturesEnabled = useSystemConfigExperimentalFeatures()
   const { contextObject, onBaseLayerUpdate } = useMapContext()
   const { baseLayer: contextBaseLayer } = contextObject
 
@@ -41,27 +45,46 @@ export const MapLayersControl = (props) => {
     [surveyId]
   )
 
+  // Equal Earth is experimental: hidden from the switcher unless EXPERIMENTAL_FEATURES is
+  // enabled, and never pre-selected as the default base layer even when visible.
+  const defaultBaseLayer = useMemo(
+    () => baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0],
+    []
+  )
+
   const baseLayersControls = useMemo(() => {
     const result = []
-    for (let index = 0; index < baseLayers.length; index++) {
-      const baseLayer = baseLayers[index]
-      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, url } = baseLayer
+    for (const baseLayer of baseLayers) {
+      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
+
+      if (type === baseLayerTypes.maplibre && !experimentalFeaturesEnabled) {
+        continue
+      }
+
+      const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
+
+      if (type === baseLayerTypes.maplibre) {
+        result.push(
+          <LayersControl.BaseLayer key={key} name={name} checked={checked}>
+            <EqualEarthBaseLayer style={style} attribution={attribution} />
+          </LayersControl.BaseLayer>
+        )
+        continue
+      }
 
       const tileUrl = getTileUrl({ url, apiKeyRequired, provider, user })
       if (!tileUrl) {
         continue
       }
 
-      const checked = (!contextBaseLayer && index === 0) || contextBaseLayer?.name === name
-
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={3} />
+          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={MAP_MIN_ZOOM} />
         </LayersControl.BaseLayer>
       )
     }
     return result
-  }, [contextBaseLayer, getTileUrl, user])
+  }, [contextBaseLayer, defaultBaseLayer, experimentalFeaturesEnabled, getTileUrl, user])
 
   const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
 

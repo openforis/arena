@@ -17,6 +17,7 @@ import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import CyclesSelector from '@webapp/components/survey/CyclesSelector'
 import { NodeDefExpressionsProp } from '../ExpressionsProp'
+import { NodeDefSingleExpressionProp } from '../ExpressionsProp/NodeDefSingleExpressionProp'
 import { useNodeDefEditReadOnly } from '../store'
 
 import { useBasicProps } from './store'
@@ -28,10 +29,12 @@ import CodeProps from '../CodeProps'
 import CoordinateProps from '../CoordinateProps'
 import DecimalProps from '../DecimalProps'
 import FileProps from '../FileProps'
+import GeoProps from '../GeoProps'
 import FormHeaderProps from '../FormHeaderProps'
 import IntegerProps from '../IntegerProps'
 import TaxonProps from '../TaxonProps'
 import TextProps from '../TextProps'
+import TimeProps from '../TimeProps'
 import AnalysisProps from '../AnalysisProps'
 
 const basicPropsComponentByType = {
@@ -40,10 +43,12 @@ const basicPropsComponentByType = {
   [NodeDef.nodeDefType.coordinate]: CoordinateProps,
   [NodeDef.nodeDefType.decimal]: DecimalProps,
   [NodeDef.nodeDefType.file]: FileProps,
+  [NodeDef.nodeDefType.geo]: GeoProps,
   [NodeDef.nodeDefType.formHeader]: FormHeaderProps,
   [NodeDef.nodeDefType.integer]: IntegerProps,
   [NodeDef.nodeDefType.taxon]: TaxonProps,
   [NodeDef.nodeDefType.text]: TextProps,
+  [NodeDef.nodeDefType.time]: TimeProps,
 }
 
 const BasicProps = (props) => {
@@ -145,39 +150,58 @@ const BasicProps = (props) => {
                 disabled={readOnly || multipleEditDisabled}
                 onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.multiple, value })}
               />
-              {NodeDef.isMultipleEntity(nodeDef) && (
-                <>
-                  <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
-                    <div>
-                      <Checkbox
-                        id={TestId.nodeDefDetails.nodeDefEnumerate}
-                        checked={NodeDef.isEnumerate(nodeDef)}
-                        disabled={readOnly}
-                        onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
-                      />
-                    </div>
-                  </FormItem>
-                  {canAutoCreateMinCountItems && (
-                    <FormItem
-                      info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
-                      label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
-                    >
-                      <div>
-                        <Checkbox
-                          id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
-                          checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
-                          disabled={readOnly}
-                          onChange={(value) =>
-                            Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
-                          }
-                        />
-                      </div>
-                    </FormItem>
-                  )}
-                </>
+              {canAutoCreateMinCountItems && (
+                <FormItem
+                  info="nodeDefEdit.basicProps.autoCreateMinCountItems.info"
+                  label="nodeDefEdit.basicProps.autoCreateMinCountItems.label"
+                >
+                  <div>
+                    <Checkbox
+                      id={TestId.nodeDefDetails.nodeDefAutoCreateMinCountItems}
+                      checked={NodeDef.isAutoCreateMinCountItems(nodeDef)}
+                      disabled={readOnly}
+                      onChange={(value) =>
+                        Actions.setProp({ state, key: NodeDef.propKeys.autoCreateMinCountItems, value })
+                      }
+                    />
+                  </div>
+                </FormItem>
               )}
             </div>
           </FormItem>
+
+          {NodeDef.isMultipleEntity(nodeDef) && (
+            <FormItem info="nodeDefEdit.basicProps.enumerate.info" label="nodeDefEdit.basicProps.enumerate.label">
+              <div className="form-item_body">
+                <Checkbox
+                  id={TestId.nodeDefDetails.nodeDefEnumerate}
+                  checked={NodeDef.isEnumerate(nodeDef)}
+                  disabled={readOnly || !!NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                  onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.enumerate, value })}
+                />
+                {NodeDef.isEnumerate(nodeDef) && (
+                  <FormItem
+                    info="nodeDefEdit.basicProps.enumeratingItemsExpression.info"
+                    label="nodeDefEdit.basicProps.enumeratingItemsExpression.label"
+                  >
+                    <NodeDefSingleExpressionProp
+                      excludeCurrentNodeDef
+                      isBoolean={false}
+                      nodeDef={nodeDef}
+                      onChange={({ query: value }) =>
+                        Actions.setProp({ state, key: NodeDef.keysPropsAdvanced.enumeratingItemsExpression, value })
+                      }
+                      qualifier="enumeratingItemsExpression"
+                      query={NodeDef.getEnumeratingItemsExpression(nodeDef)}
+                      validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.enumeratingItemsExpression)(
+                        validation
+                      )}
+                    />
+                  </FormItem>
+                )}
+              </div>
+            </FormItem>
+          )}
         </>
       )}
 
@@ -250,6 +274,20 @@ const BasicProps = (props) => {
             checked={includeInMultipleEntitySummary}
             disabled={readOnly}
             info="nodeDefEdit.basicProps.includedInRecordsList.info"
+            validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
+            onChange={(value) =>
+              Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })
+            }
+          />
+        </FormItem>
+      )}
+
+      {canIncludeInMultipleEntitySummary && !ancestorMultipleEntityIsRoot && (
+        <FormItem label="nodeDefEdit.basicProps.includedInMultipleEntitySummary.label">
+          <Checkbox
+            checked={includeInMultipleEntitySummary}
+            disabled={readOnly}
+            info="nodeDefEdit.basicProps.includedInMultipleEntitySummary.info"
             validation={Validation.getFieldValidation(NodeDefLayout.keys.includedInMultipleEntitySummary)(validation)}
             onChange={(value) =>
               Actions.setLayoutProp({ state, key: NodeDefLayout.keys.includedInMultipleEntitySummary, value })

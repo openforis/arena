@@ -85,10 +85,7 @@ export default class CategoriesBatchImportJob extends Job {
       return false
     }
     const categoryNames = fileEntryNames.map(extractCategoryNameFromZipEntryName)
-    if (!(await this.validateCategoryNames(categoryNames))) {
-      return false
-    }
-    return true
+    return this.validateCategoryNames(categoryNames)
   }
 
   async validateCategoryNames(categoryNames) {

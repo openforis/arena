@@ -5,6 +5,11 @@ import { useI18n } from '@webapp/store/system'
 
 import { TableColumnPropType } from '../tablePropTypes'
 
+const getHeaderText = ({ header, headerIsTranslationKey, i18n }) => {
+  if (!header) return ''
+  return headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header
+}
+
 export const ContentHeader = (props) => {
   const {
     column,
@@ -24,7 +29,7 @@ export const ContentHeader = (props) => {
     <div key={key}>
       {sortable && <SortToggle sort={sort} handleSortBy={handleSortBy} field={sortField || key} />}
       {renderHeader?.({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, visibleItemsCount })}
-      {header ? (headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header) : ''}
+      {getHeaderText({ header, headerIsTranslationKey, i18n })}
     </div>
   )
 }

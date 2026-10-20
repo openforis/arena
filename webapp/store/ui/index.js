@@ -1,8 +1,6 @@
 // ====== Ui
-import * as UiState from './state'
-import UiReducer from './reducer'
-
-export { UiReducer, UiState }
+export * as UiState from './state'
+export { default as UiReducer } from './reducer'
 
 // ====== Notification
 export { NotificationActions, NotificationState, useNotification } from './notification'

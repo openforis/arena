@@ -5,7 +5,7 @@ export const getSelector = (id, tag = '') => `${tag}[data-testid="${id}"]`
 const _withLang =
   (key) =>
   (lang = defaults.lang) =>
-    `${key}${lang && lang.length > 0 ? `-${lang}` : ''}`
+    lang?.length > 0 ? `${key}-${lang}` : key
 
 export const TestId = {
   categoryDetails: {
@@ -35,6 +35,7 @@ export const TestId = {
     advancedFunctionsBtn: 'survey-advanced-functions',
     collectReportBtn: 'collect-report-btn',
     surveyDeleteBtn: 'survey-delete-btn',
+    surveyCompareBtn: 'survey-compare-btn',
     surveyExportBtn: 'survey-export-btn',
     surveyExportOnlySurveyBtn: 'survey-export-only-survey-btn',
     surveyExportWithDataBtn: 'survey-export-with-data-btn',
@@ -45,6 +46,17 @@ export const TestId = {
     surveyLabelOrName: 'survey-label-or-name',
     surveyName: 'survey-name',
     surveyStatus: 'survey-status',
+    kpiRecords: 'dashboard-kpi-records',
+    kpiContributors: 'dashboard-kpi-contributors',
+    kpiStorage: 'dashboard-kpi-storage',
+    periodSelector: 'dashboard-period-selector',
+    mapSection: 'dashboard-map-section',
+    activitySection: 'dashboard-activity-section',
+    activityToggle: 'dashboard-activity-toggle',
+    activityError: 'dashboard-activity-error',
+    activityEmpty: 'dashboard-activity-empty',
+    trendSection: 'dashboard-trend-section',
+    samplingSection: 'dashboard-sampling-section',
   },
   dataExport: {
     fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
@@ -54,9 +66,11 @@ export const TestId = {
   dataImport: {
     importFromCollectTab: 'importFromCollectTab',
     importFromCsvTab: 'importFromCsvTab',
+    importFromOdkTab: 'importFromOdkTab',
   },
   dialogConfirm: {
     strongConfirmInput: 'dialog-confirm__strong-confirm-input',
+    checkbox: 'dialog-confirm__checkbox',
   },
   dropdown: {
     dropDownItem: (key) => `dropdown-item-${key}`,
@@ -71,6 +85,8 @@ export const TestId = {
     },
   },
   expressionEditor: {
+    aiGenerateBtn: (qualifier) => `${qualifier}-ai-generate-btn`,
+    aiPopupBtn: 'expression-ai-popup-btn',
     applyBtn: 'expression-apply-btn',
     editBtn: (qualifier, index) => `${qualifier}-edit-btn-${index}`,
     literalDropdown: 'expression-literal-dropdown',
@@ -78,6 +94,10 @@ export const TestId = {
     newBtn: (qualifier) => `${qualifier}-new-btn`,
     query: (id) => `${id}-query`,
     toggleModeBtn: 'expression-mode-btn',
+  },
+  guest: {
+    languageBtn: 'guest-language-btn',
+    languageItem: (lang) => `guest-language-item-${lang}`,
   },
   header: {
     surveyTitle: 'header-survey-title',
@@ -90,8 +110,8 @@ export const TestId = {
     userBtn: 'user-btn',
     userProfileBtn: 'user-profile-btn',
     userLogoutBtn: 'user-logout-btn',
-    usersAccessRequstsBtn: 'users-access-requests-btn',
-    usersListBtn: 'users-list-btn',
+    themeBtn: 'theme-btn',
+    themeItem: (theme) => `theme-item-${theme}`,
   },
   modal: {
     close: 'text="Close"',
@@ -127,6 +147,7 @@ export const TestId = {
     nodeDefUnique: 'node-def-unique',
     previousBtn: 'node-def-previous-btn',
     relevantIf: 'relevant-if',
+    requiredIf: 'required-if',
     saveBtn: 'node-def-save-btn',
     saveAndBackBtn: 'node-def-save-and-back-btn',
     taxonomySelector: 'taxonomy-selector',
@@ -155,6 +176,13 @@ export const TestId = {
   sidebar: {
     module: (module) => `sidebar-module-${module}`,
     moduleBtn: (module) => `sidebar-modulebtn-${module}`,
+  },
+  surveyCompare: {
+    applyBtn: 'survey-compare-apply-btn',
+    fingerprint: (type) => `survey-compare-fingerprint-${type}`,
+    sourceFingerprint: (type) => `survey-compare-source-fingerprint-${type}`,
+    sourceSurveyDropdown: 'survey-compare-source-survey',
+    summary: 'survey-compare-summary',
   },
   surveyCreate: {
     createTypeBtn: ({ prefix, type }) => `${prefix}_${type}`,

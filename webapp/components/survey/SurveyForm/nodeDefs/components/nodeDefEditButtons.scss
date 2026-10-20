@@ -4,7 +4,7 @@
   position: absolute;
   top: 0;
   right: 0;
-  background-color: rgba($grey, 0.9);
+  background-color: with-alpha($colorSurfaceVariant, 0.9);
   padding: 0.3rem;
   z-index: $zIndex6Tooltip;
 
@@ -23,7 +23,7 @@
   padding: 0.2rem;
 
   input {
-    border-bottom: 1px dashed $greyBorder;
+    border-bottom: 1px dashed $colorOutline;
     font-size: 1em;
     text-align: center;
   }

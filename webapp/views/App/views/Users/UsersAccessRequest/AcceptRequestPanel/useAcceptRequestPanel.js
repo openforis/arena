@@ -45,7 +45,7 @@ export const useAcceptRequestPanel = (props) => {
       setTemplateLabel(Survey.getDefaultLabel(template))
     }
     if (templateUuid) {
-      loadTemplateLabel()
+      void loadTemplateLabel()
     } else {
       setTemplateLabel(i18n.t('accessRequestView.templateNotSelected'))
     }

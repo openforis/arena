@@ -2,7 +2,7 @@ import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
@@ -92,11 +92,32 @@ export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
     }
     const user = Request.getUser(req)
     const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
-    if (Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
+    // published templates can be cloned by any user allowed to create surveys
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
       next()
       return
     }
-    sendUnauthorizedError({ req, res })
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// survey compare: the survey used as source must be visible to the user (published templates included)
+export const requireSurveyCompareSourceViewPermission = async (req, res, next) => {
+  try {
+    const { sourceSurveyId } = Request.getParams(req)
+    if (!sourceSurveyId) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: Number(sourceSurveyId) })
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
   } catch (error) {
     next(error)
   }

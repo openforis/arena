@@ -56,7 +56,7 @@ const _walk = ({
  */
 export const _camelizePartial = _curry2(
   ({ skip = [], limitToLevel = null, sideEffect = false }: CamelizeOptions = {}, object: any): any => {
-    if (typeof object === 'string' || object instanceof String) {
+    if (Object.prototype.toString.call(object) === '[object String]') {
       return _camelCase(String(object))
     }
     return _walk({ object, skip, limitToLevel, sideEffect })

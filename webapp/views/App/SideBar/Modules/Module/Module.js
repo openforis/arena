@@ -1,6 +1,6 @@
 import React, { forwardRef } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { TestId } from '@webapp/utils/testId'
 
@@ -17,7 +17,7 @@ const Module = forwardRef((props, ref) => {
 
   const active = SideBarModule.isActive(pathname)(module)
   // All modules except home require the survey
-  const disabledRequiredSurvey = isSurveySelectionRequired && (R.isEmpty(surveyInfo) || R.isNil(surveyInfo))
+  const disabledRequiredSurvey = isSurveySelectionRequired && (A.isEmpty(surveyInfo) || A.isNil(surveyInfo))
   // Module home is disabled when page is on landing, other modules are disabled when there's no active survey
   const disabledModule = disabled || (isModuleHome ? active : disabledRequiredSurvey)
   // Home link disabled when already on landing; root modules with children navigate via children/popup;

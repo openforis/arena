@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Идэвхтэй',
@@ -9,6 +15,8 @@ export default {
     apply: 'Хэрэгжүүлэх',
     aggregateFunction: 'Нэгдсэн функц',
     aggregateFunction_other: 'Нэгдсэн функцууд',
+    attribute: 'Шинж чанар',
+    attribute_other: 'Шинж чанарууд',
     avg: 'Дундаж',
     ascending: 'Өсөх',
     areaBased: 'талбай дээр суурилсан',
@@ -53,6 +61,7 @@ export default {
     download: 'Татах',
     draft: 'Ноорог',
     edit: 'Засах',
+    elapsed: 'Өнгөрсөн хугацаа',
     email: 'Имэйл',
     email_other: 'Имэйлүүд',
     emailSentConfirmation: `{{email}} руу имэйл илгээсэн.
@@ -119,11 +128,15 @@ export default {
     measurePrevSteps: 'Өмнөх алхмуудыг хэмжих',
     measurePrevSteps_plural: 'Өмнөх алхмуудыг хэмжих',
     min: 'Хамгийн бага',
+    moveUp: 'Дээш зөөх',
+    moveDown: 'Доош зөөх',
     name: 'Нэр',
     new: 'Шинэ',
     next: 'Дараах',
     no: 'Үгүй',
     noItems: `$t(common.no) $t(common.item_plural)`,
+    notification: 'Мэдэгдэл',
+    notification_other: 'Мэдэгдлүүд',
     notSpecified: '---Заагаагүй---',
     orderBy: 'Эрэмбэлэх',
     of: '-ийн',
@@ -153,9 +166,34 @@ export default {
 - Таксонуудыг устгах боломжгүй.
 
 **Үргэлжлүүлэхдээ итгэлтэй байна уу?**`,
+    publishRecordValuesUpdateConfirm: `#### {{survey}}-г нийтлэх нь бүртгэгдсэн өгөгдлийг шинэчлэх болно ####
+
+{{reasons}}
+
+Энэ үйлдэл нь оруулсан өгөгдлийг бүрмөсөн өөрчлөх эсвэл устгах магадлалтай.
+
+Одоо байгаа өгөгдлийг шинэчлэхгүйгээр нийтлэхийн тулд доорх "Өгөгдлийн шинэчлэлтийг алгасах" гэснийг сонгоно уу (зөвлөдөггүй).`,
+    publishRecordValuesUpdateConfirmHeader: 'Одоо байгаа бичлэгийн өгөгдөл шинэчлэгдэнэ',
+    publishRecordValuesUpdateConfirmOk: 'Нийтлэх ба өгөгдлийг шинэчлэх',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Баталгаажуулахын тулд судалгааны нэр "{{strongConfirmRequiredText}}"-г бичнэ үү',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Дараах атрибутууд өөрчлөгдөх бөгөөд одоо байгаа бичлэгүүдэд тэдгээрийн утга автоматаар дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Дараах атрибутууд нь өөрчлөгдсөн ангилал эсвэл таксономийн нэмэлт шинж чанарыг ашигладаг тул одоо байгаа бичлэгүүдэд утга нь дахин тооцоологдоно: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Өгөгдлийн шинэчлэлтийг алгасах',
+    publishSkipDataUpdateConfirmOk: 'Өгөгдлийн шинэчлэлтийг алгасаад нийтлэх',
+    publishSkipDataUpdateImplications: 'Өгөгдлийн шинэчлэлтийг алгасах нь дараахыг илэрхийлнэ:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Одоо байгаа бичлэгүүд шинэ судалгааны тодорхойлолттой нийцэхгүй болж болно',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Нөлөөлөлд өртсөн утгууд гараар дахин оруулах хүртэл дахин тооцоологдохгүй',
+    publishSkipDataUpdateImplicationChains:
+      'Эдгээр атрибутыг ашигладаг боловсруулалтын дараалал (chain) хуучирсан үр дүн гаргаж болзошгүй',
     raiseTicketInSupportForum: `Асуудал гарвал манай <b>Дэмжлэгийн Форум</b>: $t(links.supportForum) руу 'arena' шошготой тасалбар үүсгэнэ үү.`,
     record: 'Бичлэг',
     record_other: 'Бичлэгүүд',
+    remaining: 'Үлдсэн хугацаа',
     remote: 'Алсын',
     required: 'Шаардлагатай',
     requiredField: 'шаардлагатай талбар',
@@ -218,9 +256,11 @@ export default {
     },
     paginator: {
       firstPage: 'Эхний хуудас',
+      goToPage: 'Хуудас руу очих',
       itemsPerPage: 'Нэг хуудсанд ногдох элемент',
       lastPage: 'Сүүлийн хуудас',
       nextPage: 'Дараагийн хуудас',
+      page: 'Хуудас',
       previousPage: 'Өмнөх хуудас',
     },
     table: {
@@ -268,6 +308,12 @@ export default {
   },
 
   header: {
+    theme: {
+      label: 'Загвар',
+      light: 'Цайвар',
+      dark: 'Бараан',
+      system: 'Системийн тохиргоо',
+    },
     myProfile: 'Миний профайл',
     qrCodeLoginDialog: {
       title: 'Arena Mobile-д QR код ашиглан нэвтрэх',
@@ -314,6 +360,7 @@ export default {
     formDesigner: 'Маягтын дизайнер',
     surveyHierarchy: 'Иерархи',
     surveyDependencyTree: 'Хамаарлын мод',
+    surveyCompare: 'Харьцуулах / файлаас шинэчлэх',
     category: 'Ангилал',
     categories: 'Ангилалууд',
     nodeDef: 'Зангилааны тодорхойлолт',
@@ -353,11 +400,17 @@ export default {
     entities: 'Виртуал объектууд',
     virtualEntity_plural: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
+    message: 'Мессеж',
+    message_plural: '$t(common.message_plural)',
 
+    systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',
+    systemLogs: 'Системийн бүртгэл',
 
     help: 'Тусламж',
     about: 'Тухай',
+    changelog: 'Өөрчлөлтийн түүх',
+    whatsNew: 'Шинэ боломжууд',
     disclaimer: 'Хариуцлагаас татгалзах',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
@@ -410,13 +463,18 @@ $t(common.raiseTicketInSupportForum)
 **Хүсэлтээ илгээсний дараа Арена руу нэвтрэх урилгын имэйлийг хүлээгээрэй.**`,
     reCaptchaNotAnswered: 'ReCaptcha хариулагдаагүй',
     requestSent: 'Хандалтын хүсэлт амжилттай илгээгдсэн',
-    requestSentMessage: `Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
-Бид удахгүй **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий имэйл илгээх болно.
+    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
+$t(accessRequestView.whitelistSenderSuggestion)
+
+Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
+Хүсэлт зөвшөөрөгдсөний дараа бид **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий өөр нэг имэйл илгээх болно.
 Баярлалаа, **$t(common.appNameFull)**-г ашиглаарай!`,
     sendRequest: 'Хүсэлт илгээх',
     sendRequestConfirm: '$t(common.appNameFull) руу хандах хүсэлт илгээх үү?',
     templateNotSelected: 'Сонгогдоогүй (эхнээс нь эхлэх)',
     title: '$t(common.appNameFull) руу хандах хүсэлт гаргах',
+    whitelistSenderSuggestion:
+      'Хэрэв та үүнийг Спам/Хэрэггүй имэйлийн хавтаснаас олсон бол **{{senderEmail}}** хаягийг харилцагчдын жагсаалтдаа (хаягийн дэвтэр) нэмэх эсвэл аюулгүй/спам биш гэж тэмдэглэнэ үү. Ингэснээр бидний дараагийн имэйлүүд таны ирсэн имэйлийн хайрцагт шууд очих болно.',
   },
 
   resetPasswordView: {
@@ -501,6 +559,10 @@ $t(common.raiseTicketInSupportForum)
       showPlotReferencePoint: `Газрын зургийн лавлах цэг`,
       showUtmGrid: 'UTM торыг харуулах',
     },
+    rulerTooltip: `Зай хэмжиж эхлэхийн тулд товчийг дарна уу.
+- замыг хэмжихийн тулд олон удаа дарна уу
+- хэмжилтийг дуусгахын тулд давхар дарах эсвэл ESC товчийг дарна уу
+- хэмжилтийг нуухын тулд товчийг дахин дарна уу`,
     samplingPointDataLayerName: 'Түүвэрлэх цэгийн өгөгдөл - түвшин {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (ачаалж байна...)',
     samplingPointItemPopup: {
@@ -584,6 +646,7 @@ $t(common.raiseTicketInSupportForum)
     rotate: 'Эргүүлэх',
     dragAndDrop: 'Зургийг дээр нь чирж оруулах эсвэл',
     upload: 'байршуулахын тулд энд дарна уу',
+    remove: 'Профайл зургийг устгах уу?',
     sendNewInvitation: 'Шинэ урилга илгээх',
     removeFromSurvey: 'Судалгаанаас хасах',
     confirmRemove: 'Та {{user}}-г {{survey}} судалгаанаас хасахдаа итгэлтэй байна уу?',
@@ -592,6 +655,12 @@ $t(common.raiseTicketInSupportForum)
     preferredUILanguage: {
       label: 'Хэрэглэгчийн интерфэйсийн хүссэн хэл',
       auto: 'Автоматаар илрүүлсэн ({{detectedLanguage}})',
+    },
+    newPassword: 'Нууц үг',
+    confirmPassword: 'Нууц үгээ баталгаажуулах',
+    manageTwoFactorDevices: {
+      label: '2FA удирдах',
+      title: 'Хоёр хүчин зүйлийн баталгаажуулалтын төхөөрөмжүүдийг удирдах',
     },
   },
 
@@ -612,6 +681,10 @@ $t(common.raiseTicketInSupportForum)
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} хаяг алгассан (тэдгээр нь энэ судалгаанд өмнө нь уригдсан байсан): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      '{{emails}} имэйл хаягт хүрч чадсангүй, энэ хаяг байхгүй байж магадгүй. Үүнийг доорх жагсаалтад үлдээсэн: засах эсвэл устгаад дахин урьж үзнэ үү.',
+    invalidEmailsWarning_other:
+      '{{emails}} имэйл хаягуудад хүрч чадсангүй, эдгээр хаяг байхгүй байж магадгүй. Тэдгээрийг доорх жагсаалтад үлдээсэн: засах эсвэл устгаад дахин урьж үзнэ үү.',
     groupPermissions: {
       label: 'Эрхүүд',
       systemAdmin: `
@@ -716,16 +789,34 @@ $t(common.raiseTicketInSupportForum)
         'Суурь нэгжийг устгаснаар та бүх "талбай дээр суурилсан хувьсагч" сонголтуудыг болино. Үргэлжлүүлэх үү?',
     },
     downloadSummaryJSON: 'Хураангуй татах (JSON)',
-    firstPhaseCategory: '1-р үе шатны ангилал',
-    firstPhaseCategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
-    firstPhaseCategoryExtraProp: {
-      label: '1-р үе шатны давхаргын шинж чанар',
-      info: 'Анхны популяцийг эхний түүврийн шатанд өргөн давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
+    mauFile: {
+      upload: 'MAU.zip байршуулах',
+      download: 'MAU.zip татах',
+      delete: 'MAU.zip устгах',
+      confirmCycleAssociation: 'MAU.zip файл нь одоогийн мөчлөгтэй ({{cycle}}) холбогдоно. Үргэлжлүүлэх үү?',
+      confirmReplace: 'Энэ хэлхээнд MAU.zip файл аль хэдийн байршуулагдсан байна. Үүнийг солих уу?',
+      confirmDelete: 'Энэ хэлхээнд байршуулсан MAU.zip файлыг устгах уу?',
+      uploadComplete: 'MAU.zip файл амжилттай байршуулагдлаа',
+      deleteComplete: 'MAU.zip файл устгагдлаа',
+      invalidFileExtension: '.zip файл сонгоно уу',
     },
-    firstPhaseCommonAttribute: {
-      label: 'Нийтлэг шинж чанар',
-      info: `Суурь нэгж ба 1-р үе шатны хүснэгтийн хоорондох нийтлэг шинж чанар
-(энэ нь 1-р үе шатны ангилалд тодорхойлогдсон нэмэлт шинж чанарын ижил нэртэй кодын шинж чанар байх ёстой)`,
+    phase1Category: '1-р үе шатны ангилал',
+    phase1CategoryInfo: '1-р үе шатны түүврийг агуулсан ангиллыг сонгоно уу.',
+    phase2JoinEntity: {
+      label: 'Холболтын объект (2-р үе шат)',
+      info: 'Суурь нэгжийг 1-р үе шатны ангилалтай холбоход ашиглах объект: суурь нэгж өөрөө, эсвэл түүний эцэг объектуудын аль нэг.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Sampling Point Data холбоосыг ашиглан холбох',
+      info: '2-р үе шатны объектын түлхүүр(үүд) нь 1-р үе шатанд ашигласантай ижил Sampling Point Data хүснэгтээс уншигдана.',
+    },
+    phase1JoinAttribute: {
+      label: 'Холболтын шинж чанар (1-р үе шат)',
+      info: '$t(chainView.phase1Category) хүснэгтийн баганыг (нэмэлт шинж чанар эсвэл "code") 2-р үе шатны холболтын объекттой холбоход ашиглана.',
+    },
+    phase2JoinAttribute: {
+      label: 'Холболтын шинж чанар (2-р үе шат)',
+      info: '1-р үе шатны хүснэгттэй холбохын тулд 2-р үе шатны объектын шинж чанарыг сонгоно уу; түүний утгыг өмнөх 1-р үе шатны холболтын шинж чанартай харьцуулна.',
     },
     formLabel: 'Боловсруулах гинжийн шошго',
     basic: 'Үндсэн',
@@ -770,8 +861,7 @@ $t(common.raiseTicketInSupportForum)
     },
     stratumAttribute: 'Үеийн шинж чанар',
     stratumAttributeInfo: 'Түүврийг давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.',
-    stratumAttribute2ndPhase: '2-р үе шатны давхаргын шинж чанар',
-    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу.`,
+    stratumAttribute2ndPhaseInfo: `Эцсийн, дэлгэрэнгүй дэд түүврийг гаргаж авахаас өмнө 1-р үе шатны түүврийг дэд давхаргад хуваахад ашиглах хувьсагчийг сонгоно уу. Зөвхөн 1-р үе шатны ангиллын багана болж мөн орсон нэртэй атрибутууд харагдана.`,
     postStratificationAttribute: 'Дараах үечилсэн шинж чанар',
     areaWeightingMethod: 'Талбайн жинлэх арга',
     clusteringEntity: 'Бүлэглэх объект',
@@ -879,6 +969,9 @@ $t(common.appNameFull)
  * Arena R Скриптүүд GitHub-д: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
@@ -945,6 +1038,7 @@ $t(common.appNameFull)
       rowIndex: 'Одоогийн хүснэгтийн мөрний (эсвэл маягтын) индексыг буцаана',
       taxonProp: 'Заасан кодтой таксоны заасан $t(extraProp.label)-ийн утгыг буцаана',
       taxonVernacularName: 'Заасан кодтой таксоны заасан хэлээрх (эхний) нутгийн нэрийг буцаана',
+      unique: 'Олон шинж чанар эсвэл объектын өвөрмөц утгуудыг буцаана',
       userEmail: 'Нэвтэрсэн хэрэглэгчийн имэйлийг буцаана',
       userIsRecordOwner:
         'Бичлэгийг засаж буй хэрэглэгч нь мөн түүний эзэмшигч бол "үнэн", үгүй бол "худал" гэсэн боол утгыг буцаана',
@@ -976,6 +1070,10 @@ $t(common.appNameFull)
         label: 'Тоолох',
         info: `Мөрүүд нь объектын дотор тодорхойлогдсон Түлхүүр гэж тэмдэглэгдсэн кодын шинж чанартай холбоотой ангиллын элементүүдийг ашиглан автоматаар үүсгэгдэнэ; мөр нэмэх эсвэл устгах боломжгүй бөгөөд түлхүүр кодын шинж чанарыг засах боломжгүй`,
       },
+      enumeratingItemsExpression: {
+        label: 'Тоочих элементүүдийн илэрхийлэл',
+        info: 'Ангиллын аль элементүүдийг тоочихыг шүүх нэмэлт илэрхийлэл (жишээ нь unique(table_source.source_type)). Хоосон үед ангиллын бүх элементийг ашиглана.',
+      },
       enumerator: {
         label: 'Тоологч',
         info: 'Ангиллын элементүүд эцэг объектын мөрүүдийг үүсгэхэд ашиглагдана',
@@ -983,6 +1081,10 @@ $t(common.appNameFull)
       form: 'Маягт',
       formula: 'Томьёо',
       includedInClonedData: 'Хувилах өгөгдөлд оруулсан',
+      includedInMultipleEntitySummary: {
+        label: 'Олон объектын хураангуйд оруулах',
+        info: `Хэрэв тэмдэглэгдсэн бол шинж чанарын утга объект сонгогч болон объектын хураангуй харагдацад харагдана`,
+      },
       includedInRecordsList: {
         label: 'Бүртгэлийн жагсаалтад оруулах',
         info: `Хэрэв тэмдэглэсэн бол уг шинж чанар нь бүртгэлийн жагсаалтад харагдах болно`,
@@ -1050,10 +1152,6 @@ $t(common.appNameFull)
         label: 'Арена Мобайл-д нуугдсан',
         info: `Хэрэв тэмдэглэгдсэн бол шинж чанар AM-д харагдахгүй`,
       },
-      includedInMultipleEntitySummary: {
-        label: 'Олон объектын хураангуйд оруулах',
-        info: `Хэрэв тэмдэглэгдсэн бол шинж чанар объектын хураангуй харагдацад харагдана`,
-      },
       includedInPreviousCycleLink: {
         label: 'Өмнөх мөчлөгийн холбоосонд оруулах',
         info: `Хэрэв тэмдэглэгдсэн бол өмнөх мөчлөгийн утга өгөгдөл оруулах маягт дээр харагдана (мобайл апп-д өмнөх мөчлөгт холбоос идэвхтэй үед)"`,
@@ -1080,6 +1178,9 @@ $t(common.appNameFull)
     },
     mobileProps: {
       title: 'Мобайл апп',
+    },
+    timeProps: {
+      includeSeconds: 'Секунд оруулах',
     },
     formHeaderProps: {
       headerColorLabel: 'Толгой хэсгийн өнгө',
@@ -1173,6 +1274,8 @@ $t(common.appNameFull)
 
 Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
     },
+    nodeDefClonedSuccessfully:
+      'Зангилааны тодорхойлолт "{{nodeDefName}}"-г "{{targetParentNodeDefName}}" руу амжилттай хувиллаа',
     categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
     taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
   },
@@ -1227,10 +1330,13 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'Сонгосон судалгаанд ангилал алга байна',
     },
     itemsCount: 'Элементүүдийн тоо',
+    structure: 'Бүтэц',
     types: {
       flat: 'Хавтгай',
       hierarchical: 'Иерархи',
       reportingData: 'Тайлагнах өгөгдөл',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
 
@@ -1258,6 +1364,55 @@ $t(common.cantUndoWarning)`,
     convertToSimpleCategory: {
       confirmMessage: `Энэ Тайлагнах өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдөл рүү хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг Дээж цэгийн өгөгдлийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэр '${samplingPointDataCategoryName}' болж өөрчлөгдөж, элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'GeoPackage ангилал руу хөрвүүлэх',
+      confirmMessage: `Энэ ангиллыг GeoPackage ангилал болгон хөрвүүлэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ GeoPackage ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+'${locationItemExtraDefName}' нэмэлт талбарын цоожийг тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Энгийн ангилал болгон хөрвүүлэх',
+      confirmMessage: `Энэ Дээж цэгийн өгөгдлийн ангиллыг энгийн ангилал болгон хөрвүүлэх үү?
+
+Ангиллын нэрийг цэвэрлэх бөгөөд (шинэ нэр өгөх шаардлагатай болно), '${locationItemExtraDefName}' нэмэлт талбарын цоожийг мөн тайлах бөгөөд түүнийг бусад нэмэлт талбар шиг нэрийг нь өөрчлөх, төрлийг нь солих эсвэл устгах боломжтой болно. Өгөгдөлд нөлөөлөхгүй.`,
+    },
+    geoPackageCategory: 'Энэ ангилал нь гео чадвартай',
+    geoPackageCategoryInfo: `Энэ ангилалд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
+    samplingPointDataCategoryType: 'Энэ бол Дээж цэгийн өгөгдлийн ангилал юм',
+    samplingPointDataCategoryTypeInfo: `Энэ бол дээж цэгийн өгөгдлийн урьдчилан тодорхойлсон ангилал юм. Үүнд GeoPackage файл болгон экспортлох боломжийг олгодог '${locationItemExtraDefName}' нэртэй нэмэлт талбар байдаг.`,
+    samplingPointDataCategoryLocationMissing: `'${locationItemExtraDefName}' нэртэй нэмэлт талбар алга байна`,
+    createCategory: {
+      menuLabel: 'Ангилал нэмэх',
+      simple: 'Энгийн ангилал',
+      otherTypes: 'Ангиллын бусад төрлүүд',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Дээж цэгийн өгөгдлийн ангилал',
+      description:
+        'Дээж цэгийн өгөгдлийн урьдчилан тодорхойлсон ангилал бөгөөд элемент бүрт байршлын талбарыг агуулна.',
+      message: `Шинэ Дээж цэгийн өгөгдлийн ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Гео чадвартай ангилал',
+      description: 'Элементүүдэд байршлын талбар нэмж, ангиллыг GeoPackage файл болгон экспортлох боломжтой болгоно.',
+      message: `Шинэ гео чадвартай ангилал үүсгэх үү?
+
+Элементүүдэд '${locationItemExtraDefName}' нэмэлт талбар нэмэгдэнэ.`,
+    },
     deleteItem: 'Элемент устгах',
     level: {
       title: 'Түвшин {{levelPosition}}',
@@ -1281,6 +1436,17 @@ $t(common.cantUndoWarning)`,
       title: 'Ангиллын импортын хураангуй',
     },
     reportingData: 'Тайлагнах өгөгдөл',
+    exportToGeoPackage: 'GeoPackage рүү экспортлох',
+    exportToGeoPackageSkippedItems: 'Хүчинтэй байршилгүй {{count}} элементийг алгаслаа.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Whisp шинжилгээ үүсгэх',
+      confirmMessage: `Бүх түүвэрлэлтийн цэгт Whisp шинжилгээ үүсгэх үү?
+
+- байршилтай түүвэрлэлтийн цэг бүрийг шинжилгээнд зориулж Open Foris Whisp руу илгээнэ
+- үр дүнг түүвэрлэлтийн цэгийн өгөгдөлтэй нэгтгэж '${samplingPointDataWhispCategoryName}' ангилалд хадгална
+- хэрэв '${samplingPointDataWhispCategoryName}' ангилал аль хэдийн байгаа бол түүний агуулгыг солино
+- шинжилгээ арын горимд ажиллах бөгөөд түүвэрлэлтийн цэгийн тооноос хамааран хэдэн минут үргэлжилж болно`,
+    },
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },
@@ -1387,5 +1553,76 @@ $t(common.cantUndoWarning)`,
       constant: 'Тогтмол',
       expression: 'Илэрхийлэл',
     },
+  },
+
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+
+  aiExpression: {
+    title: 'Тайлбараас илэрхийлэл үүсгэх',
+    hint: 'Илэрхийлэл юу хийх ёстойг энгийн үгээр тайлбарлана уу. AI үүнийг Arena-ийн синтакс руу хөрвүүлнэ. Үүсгэхийн тулд Ctrl+Enter дарна уу.',
+    placeholder: 'жишээ нь: модны өндөр 0-ээс их, 200-аас бага байх ёстой',
+    generate: 'Үүсгэх',
+    generating: 'Үүсгэж байна…',
+    use: 'Энэ илэрхийллийг ашиглах',
+    useAnyway: 'Ямар ч байсан ашиглах',
+    tryAgain: 'Өөр тайлбар оруулж үзэх',
+    parseError:
+      'Үүсгэсэн илэрхийллийг зөв задлан шинжилж чадсангүй: {{message}}. Та үүнийг хэрэглээд гараар засах эсвэл тайлбараа өөрөөр бичиж үзэх боломжтой.',
+    explain: {
+      title: 'Энэ илэрхийллийг тайлбарлах',
+      thinking: 'AI-аас энэ илэрхийллийг тайлбарлахыг хүсэж байна…',
+      error: 'Тайлбарыг авч чадсангүй: {{message}}',
+      timeout: 'AI хариу өгөхөд хэт удлаа. Дахин оролдоно уу.',
+    },
+  },
+
+  aiTranslation: {
+    translateButton_one: 'Өөр {{count}} хэл рүү орчуулах',
+    translateButton_other: 'Өөр {{count}} хэл рүү орчуулах',
+    translateButton: 'Бусад хэл рүү орчуулах',
+    success_one: '{{count}} хэл рүү орчууллаа. Хянаад хадгална уу.',
+    success_other: '{{count}} хэл рүү орчууллаа. Хянаад хадгална уу.',
+    success: 'Орчууллаа. Хянаад хадгална уу.',
+    failed: 'Орчуулга амжилтгүй боллоо: {{message}}',
+    timeout: 'Орчуулгын хүсэлтийн хугацаа дууслаа. Дахин оролдоно уу.',
+  },
+
+  aiActivityLog: {
+    title: 'Үйл ажиллагааны бүртгэлийн хураангуй',
+    summarizeButton: 'Хураангуйлах',
+    thinking: 'Үйл явдлуудыг нэгтгэж, AI-аас хураангуй хүсэж байна…',
+    error: 'Хураангуйг авч чадсангүй: {{message}}',
+  },
+
+  aiChatbot: {
+    open: 'Тусламж ба баримт бичиг',
+    title: 'Тусламж ба баримт бичиг',
+    empty: 'Open Foris Arena-ийн талаар юу ч асуугаарай.',
+    placeholder: 'Асуултаа бичнэ үү…',
+    send: 'Илгээх',
+    stop: 'Зогсоох',
+    clear: 'Цэвэрлэх',
+    showReasoning: 'Үндэслэлийг харуулах',
+    error: 'Чатботын алдаа: {{message}}',
+    language: 'Хариултын хэл',
   },
 }

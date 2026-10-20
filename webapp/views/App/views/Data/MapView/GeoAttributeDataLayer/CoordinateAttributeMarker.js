@@ -26,6 +26,7 @@ export const CoordinateAttributeMarker = (props) => {
     onPopupOpen,
     onRecordEditClick,
     popupOpen,
+    renderPopup = null,
     setMarkerByKey,
   } = props
 
@@ -48,13 +49,17 @@ export const CoordinateAttributeMarker = (props) => {
       <>
         {showMarkersLabels && <MarkerTooltip color={markersColor}>{ancestorsKeys.join(' - ')}</MarkerTooltip>}
 
-        <CoordinateAttributePopUp
-          attributeDef={attributeDef}
-          flyToNextPoint={flyToNextPoint}
-          flyToPreviousPoint={flyToPreviousPoint}
-          onRecordEditClick={onRecordEditClick}
-          pointFeature={data}
-        />
+        {renderPopup ? (
+          renderPopup({ attributeDef, pointFeature: data, flyToNextPoint, flyToPreviousPoint })
+        ) : (
+          <CoordinateAttributePopUp
+            attributeDef={attributeDef}
+            flyToNextPoint={flyToNextPoint}
+            flyToPreviousPoint={flyToPreviousPoint}
+            onRecordEditClick={onRecordEditClick}
+            pointFeature={data}
+          />
+        )}
       </>
     ),
     [
@@ -65,6 +70,7 @@ export const CoordinateAttributeMarker = (props) => {
       flyToPreviousPoint,
       markersColor,
       onRecordEditClick,
+      renderPopup,
       showMarkersLabels,
     ]
   )
@@ -78,7 +84,8 @@ export const CoordinateAttributeMarker = (props) => {
   )
 
   const eventHandlers = useMemo(
-    () => ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose, popupopen: handlePopupOpen }),
+    () =>
+      ObjectUtils.keepNonEmptyProps({ dblclick: onDoubleClick, popupclose: onPopupClose, popupopen: handlePopupOpen }),
     [handlePopupOpen, onDoubleClick, onPopupClose]
   )
 
@@ -126,5 +133,6 @@ CoordinateAttributeMarker.propTypes = {
   onPopupOpen: PropTypes.func,
   onRecordEditClick: PropTypes.any,
   popupOpen: PropTypes.bool,
+  renderPopup: PropTypes.func,
   setMarkerByKey: PropTypes.func,
 }

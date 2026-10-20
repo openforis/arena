@@ -1,7 +1,9 @@
 import { ClusterBus, WebSocketServer, WebSocketEvent, RecordSocketAssociationRepository } from '@openforis/arena-server'
+import { WebSocketEvents } from '../../../common/webSocket/webSocketEvents'
 import {
   RecordsUpdateThreadService,
   _handleClusterEventForTest as handleClusterEvent,
+  createSequentialThreadMessagesNotifier,
 } from '../../../server/modules/record/service/update/surveyRecordsThreadService'
 import { SurveyRecordsThreadMap } from '../../../server/modules/record/service/update/surveyRecordsThreadMap'
 import { RecordsUpdateThreadMessageTypes } from '../../../server/modules/record/service/update/thread/recordsThreadMessageTypes'
@@ -51,6 +53,31 @@ describe('RecordsUpdateThreadService notify functions', () => {
     expect(dissocSocketsByRecordUuidSpy).toHaveBeenCalledWith('record-1')
   })
 
+  test('thread messages are notified in the order they are received, even if the socket lookup is slower for the first one', async () => {
+    const lookupDelays = [30, 0]
+    getSocketIdsByRecordUuidSpy.mockImplementation(
+      () => new Promise((resolve) => setTimeout(() => resolve(['socket-1']), lookupDelays.shift()))
+    )
+    isSocketConnectedSpy.mockResolvedValue(true)
+
+    const notify = createSequentialThreadMessagesNotifier()
+    notify({ eventType: WebSocketEvent.nodesUpdate, content: { recordUuid: 'record-1', order: 1 } })
+    await notify({ eventType: WebSocketEvent.nodesUpdate, content: { recordUuid: 'record-1', order: 2 } })
+
+    expect(notifySocketSpy.mock.calls.map(([, , content]) => content.order)).toEqual([1, 2])
+  })
+
+  test('a failing thread message notification does not block the following ones', async () => {
+    getSocketIdsByRecordUuidSpy.mockRejectedValueOnce(new Error('lookup failed')).mockResolvedValue(['socket-1'])
+    isSocketConnectedSpy.mockResolvedValue(true)
+
+    const notify = createSequentialThreadMessagesNotifier()
+    notify({ eventType: WebSocketEvent.nodesUpdate, content: { recordUuid: 'record-1', order: 1 } })
+    await notify({ eventType: WebSocketEvent.nodesUpdate, content: { recordUuid: 'record-1', order: 2 } })
+
+    expect(notifySocketSpy.mock.calls.map(([, , content]) => content.order)).toEqual([2])
+  })
+
   test('notifyRecordUpdateToSockets notifies a socket that is still connected', async () => {
     getSocketIdsByRecordUuidSpy.mockResolvedValue(['socket-1'])
     isSocketConnectedSpy.mockResolvedValue(true)
@@ -78,6 +105,30 @@ describe('RecordsUpdateThreadService notify functions', () => {
     expect(isSocketConnectedSpy).toHaveBeenCalledWith('socket-stale')
     expect(dissocSocketSpy).toHaveBeenCalledWith({ recordUuid: 'record-1', socketId: 'socket-stale' })
     expect(notifySocketSpy).not.toHaveBeenCalled()
+  })
+
+  test('notifyThreadMessageToSockets sends the clear non-applicable values confirmation only to the requesting socket', async () => {
+    getSocketIdsByRecordUuidSpy.mockResolvedValue(['socket-1', 'socket-2'])
+    isSocketConnectedSpy.mockResolvedValue(true)
+    const eventType = WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm
+    const content = { recordUuid: 'record-1', socketId: 'socket-2' }
+
+    await RecordsUpdateThreadService.notifyThreadMessageToSockets({ eventType, content })
+
+    expect(notifySocketSpy).toHaveBeenCalledTimes(1)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-2', eventType, content)
+  })
+
+  test('notifyThreadMessageToSockets sends other record updates to every socket of the record', async () => {
+    getSocketIdsByRecordUuidSpy.mockResolvedValue(['socket-1', 'socket-2'])
+    isSocketConnectedSpy.mockResolvedValue(true)
+    const content = { recordUuid: 'record-1' }
+
+    await RecordsUpdateThreadService.notifyThreadMessageToSockets({ eventType: WebSocketEvent.nodesUpdate, content })
+
+    expect(notifySocketSpy).toHaveBeenCalledTimes(2)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-1', WebSocketEvent.nodesUpdate, content)
+    expect(notifySocketSpy).toHaveBeenCalledWith('socket-2', WebSocketEvent.nodesUpdate, content)
   })
 })
 

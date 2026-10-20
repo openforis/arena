@@ -1,6 +1,6 @@
 import './VirtualizedList.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { forwardRef, useCallback, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -9,7 +9,7 @@ import { uuidv4 } from '@core/uuid'
 
 import { LoadingBar } from '@webapp/components'
 
-export const VirtualizedList = (props) => {
+export const VirtualizedList = forwardRef((props, ref) => {
   const {
     className = null,
     id,
@@ -105,6 +105,18 @@ export const VirtualizedList = (props) => {
     renderItems({ forceRendering: true })
   }, [externalContainerRef, overscanRowCount, rowCount, rowHeight, rowRenderer])
 
+  useImperativeHandle(
+    ref,
+    () => ({
+      // scrolling triggers onScroll, so rows near the target index get rendered too
+      scrollToIndex: (index) => {
+        const container = externalContainerRef.current
+        if (container) container.scrollTop = index * rowHeight
+      },
+    }),
+    [rowHeight]
+  )
+
   const onScroll = useCallback(
     (e) => {
       if (!virtualizationEnabled) return // do not render items
@@ -133,7 +145,9 @@ export const VirtualizedList = (props) => {
       )}
     </div>
   )
-}
+})
+
+VirtualizedList.displayName = 'VirtualizedList'
 
 VirtualizedList.propTypes = {
   className: PropTypes.string,

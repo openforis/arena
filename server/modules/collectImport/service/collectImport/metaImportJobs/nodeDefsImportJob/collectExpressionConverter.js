@@ -1,11 +1,11 @@
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
+import * as Category from '@core/survey/category'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 
 /**
  * Converts a Collect XPath expression into a valid JS expression.
- *
  * @param {object} params - Parameters object.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!NodeDef} [params.nodeDefCurrent] - The current node definition being evaluated.
@@ -21,8 +21,8 @@ const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionE
     { pattern: ' and ', replace: ' && ', ignoreCase: true },
     { pattern: ' or ', replace: ' || ', ignoreCase: true },
     // predefined variables
-    { pattern: '\\$this', replace: Expression.thisVariable },
-    { pattern: '\\$context', replace: Expression.contextVariable },
+    { pattern: String.raw`\$this`, replace: Expression.thisVariable },
+    { pattern: String.raw`\$context`, replace: Expression.contextVariable },
     // not function
     { pattern: /not\(/, replace: '!(' },
     // parent function
@@ -94,13 +94,14 @@ const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionE
       pattern: /idm:samplingPointCoordinate\(([^)]+)\)/,
       // change the function name but keep the same arguments.
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'location', cluster_id, plot_id)
-      replace: (_, fnArs) => `categoryItemProp('${Survey.samplingPointDataCategoryName}', 'location', ${fnArs})`,
+      replace: (_, fnArs) =>
+        `categoryItemProp('${Category.samplingPointDataCategoryName}', '${Category.locationItemExtraDefName}', ${fnArs})`,
     },
     {
       pattern: /idm:samplingPointData\(([^)]+)\)/,
       // change the function name but keep the same arguments.
       // E.g. idm:samplingPointCoordinate(cluster_id, plot_id) becomes categoryItemProp('sampling_point_data', 'propertyName', cluster_id, plot_id)
-      replace: (_, fnArs) => `categoryItemProp('${Survey.samplingPointDataCategoryName}', ${fnArs})`,
+      replace: (_, fnArs) => `categoryItemProp('${Category.samplingPointDataCategoryName}', ${fnArs})`,
     },
     {
       pattern: /idm:speciesListData\(([^)]+)\)/,

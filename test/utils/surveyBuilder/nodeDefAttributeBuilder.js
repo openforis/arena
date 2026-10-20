@@ -1,8 +1,9 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../core/survey/survey'
 import * as NodeDef from '../../../core/survey/nodeDef'
 import * as NodeDefValidations from '../../../core/survey/nodeDefValidations'
+import * as NodeDefExpression from '../../../core/survey/nodeDefExpression'
 
 import NodeDefBuilder from './nodeDefBuilder'
 
@@ -27,7 +28,20 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
   required(required = true) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocRequired(required))(this),
+      true
+    )
+  }
+
+  requiredIf(...expressions) {
+    return this._setProp(
+      NodeDef.keysPropsAdvanced.validations,
+      A.pipe(
+        NodeDef.getValidations,
+        NodeDefValidations.assocRequiredIf(
+          expressions.map((expression) => NodeDefExpression.createExpression({ expression }))
+        )
+      )(this),
       true
     )
   }
@@ -35,7 +49,7 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
   unique(unique = true) {
     return this._setProp(
       NodeDef.keysPropsAdvanced.validations,
-      R.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
+      A.pipe(NodeDef.getValidations, NodeDefValidations.assocUnique(unique))(this),
       true
     )
   }
@@ -52,6 +66,17 @@ export default class NodeDefAttributeBuilder extends NodeDefBuilder {
 
   taxonomy(taxonomyName) {
     this._taxonomyName = taxonomyName
+    return this
+  }
+
+  /**
+   * Sets the parent code attribute of a code attribute; it must be a sibling of this attribute
+   * (it's resolved by the parent entity builder, once all the children have been built).
+   * @param {string} parentCodeDefName - Name of the parent code attribute.
+   * @returns {NodeDefAttributeBuilder} - This builder.
+   */
+  parentCode(parentCodeDefName) {
+    this.parentCodeDefName = parentCodeDefName
     return this
   }
 

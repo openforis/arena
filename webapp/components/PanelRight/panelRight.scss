@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .panel-right {
@@ -9,7 +8,7 @@
   height: 100vh;
   display: grid;
   grid-template-rows: $headerHeight 1fr;
-  box-shadow: -3px 0 5px $greyBorder;
+  box-shadow: -3px 0 5px $colorOutline;
   animation: panel-enter 0.2s cubic-bezier(0, 0, 0, 1);
 
   > * {
@@ -30,26 +29,33 @@
 
 .panel-right__header {
   position: relative;
-  background-color: $black;
-  color: $white;
-  border-bottom: 1px solid $blue;
+  background-color: $colorInverseSurface;
+  color: $colorInverseOnSurface;
+  border-bottom: 1px solid $colorPrimary;
+
+  .btn-close-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 5px;
+    display: flex;
+    align-items: center;
+  }
 
   .btn-close {
-    position: absolute;
-    right: 5px;
-    color: $white;
+    color: $colorInverseOnSurface;
   }
 
   .btn-resize {
     position: absolute;
     right: 5px;
-    color: $white;
+    color: $colorInverseOnSurface;
   }
 }
 
 .panel-right__content,
 .panel-right__footer {
-  background-color: color.adjust($greyAppBg, $lightness: -1%);
+  background-color: shade($colorBackground, 2%);
 }
 
 .panel-right__content {

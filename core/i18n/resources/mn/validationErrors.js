@@ -35,6 +35,11 @@ export default {
     nameNotSpecified: 'Ангиллын нэр заагаагүй',
   },
 
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Энэ судалгаанд Дээж цэгийн өгөгдлийн ангилал аль хэдийн байна; зөвхөн нэг л байж болно.',
+  },
+
   categoryImport: {
     cannotDeleteItemsOfPublishedCategory:
       'Нийтлэгдсэн ангиллын элементүүдийг устгах боломжгүй. Импортлогдсон файлд дутуу элементүүд: {{deletedItemCodes}}',
@@ -66,7 +71,7 @@ export default {
     invalidNumber: 'Багана {{headers}}-д хүчингүй тоо: {{value}}',
     invalidTaxonCode: 'Багана {{headers}}-д хүчингүй таксоны код: {{value}}',
     invalidTime:
-      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ форматаар байх ёстой. Жишээ нь: 09:45 эсвэл 16:30',
+      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ эсвэл ЦАГ:МИНУТ:СЕКУНД форматаар байх ёстой. Жишээ нь: 09:45, 16:30 эсвэл 09:45:30',
     missingRequiredHeaders: 'Шаардлагатай баганууд дутуу: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Утгуудыг шинэчлэхэд алдаа гарлаа: {{details}}',
     multipleRecordsMatchingKeys: 'Түлхүүр "{{keyValues}}"-д тохирох олон бичлэг олдов',
@@ -214,6 +219,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Ижил имэйлтэй хэрэглэгч аль хэдийн байна',
     emailRequired: 'Имэйл шаардлагатай',
     emailInvalid: 'Имэйл хүчингүй',
     emailNotFound: 'Имэйл олдсонгүй',
@@ -228,6 +234,7 @@ export default {
     userNotFound: 'Хэрэглэгч олдсонгүй. Имэйл болон нууц үг зөв эсэхийг шалгана уу',
     passwordChangeRequired: 'Нууц үг солих шаардлагатай',
     passwordResetNotAllowedWithPendingInvitation: `Нууц үг сэргээхийг зөвшөөрөхгүй: хэрэглэгч судалгаанд уригдсан боловч урилгыг хараахан хүлээн аваагүй байна`,
+    twoFactorTokenRequired: 'Баталгаажуулах код шаардлагатай',
   },
 
   userAccessRequest: {
@@ -241,6 +248,7 @@ export default {
     invalidRequest: 'Хүчингүй хэрэглэгчийн хандалтын хүсэлт',
     userAlreadyExisting: 'Имэйл {{email}}-тэй хэрэглэгч аль хэдийн байна',
     requestAlreadySent: `Имэйл {{email}}-тэй хэрэглэгчийн хандалтын хүсэлт аль хэдийн илгээгдсэн`,
+    emailNotReachable: 'Баталгаажуулах имэйлийг {{email}} хаяг руу хүргэж чадсангүй; хаяг зөв эсэхийг шалгана уу',
     invalidReCaptcha: 'Хүчингүй ReCaptcha',
   },
 
@@ -251,6 +259,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Үүрэг шаардлагатай',
     surveyNameRequired: 'Судалгааны нэр шаардлагатай',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Ижил нэртэй бүлэг аль хэдийн байна: {{name}}',
+    qualifiersInvalid: 'Нэг буюу хэд хэдэн тодотгол хүчингүй эсвэл давхардсан түлхүүртэй байна',
+    qualifierNameDuplicate: 'Энэ бүлэгт ижил нэртэй тодотгол аль хэдийн байна: {{name}}',
+    qualifierNameInvalid: 'Тодотголын нэр хүчингүй',
+    qualifierNameRequired: 'Тодотголын нэр шаардлагатай',
   },
 
   userPasswordChange: {

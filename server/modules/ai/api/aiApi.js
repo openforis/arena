@@ -9,6 +9,7 @@ import * as Log from '@server/log/log'
 
 import * as ActivityLogApi from './activityLogApi'
 import * as ChatbotApi from './chatbotApi'
+import * as DataQueryApi from './dataQueryApi'
 import * as ExpressionApi from './expressionApi'
 import * as InternalApi from './internalApi'
 import * as SettingsApi from './settingsApi'
@@ -23,8 +24,9 @@ export const init = (app) => {
   TranslationApi.init(app)
   ActivityLogApi.init(app)
   ChatbotApi.init(app)
+  DataQueryApi.init(app)
 
   logger.info(
-    'AI module initialised (settings, internal, expression, translation, activityLog, chatbot routes registered)'
+    'AI module initialised (settings, internal, expression, translation, activityLog, chatbot, dataQuery routes registered)'
   )
 }

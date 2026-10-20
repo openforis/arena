@@ -1,9 +1,10 @@
 import * as Record from '@core/record/record'
+import * as Node from '@core/record/node'
 
 import * as DataTest from '../../utils/dataTest'
 import * as RB from '../../utils/recordBuilder'
 import { TestUtils } from '../../utils/testUtils'
-import { shiftDateModifiedIntoTheFuture } from '../../utils/recordUtils'
+import { findNodeByPath, shiftDateModifiedIntoTheFuture } from '../../utils/recordUtils'
 
 import { getContextUser } from '../../integration/config/context'
 
@@ -170,5 +171,61 @@ describe('Records merge Test', () => {
       'cluster.plot[2].plot_multiple_number[2]': 300,
     }
     expectValuesToBe({ expectedValuesByPath, record: recordUpdated })
+  })
+
+  it('Nodes added from a different record get new uuids', async () => {
+    const { record: recordUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource: record2,
+    })(record1)
+
+    const plotSource = findNodeByPath('cluster.plot[3]')(survey, record2)
+    const plotMerged = findNodeByPath('cluster.plot[3]')(survey, recordUpdated)
+    expect(Node.getUuid(plotMerged)).not.toBe(Node.getUuid(plotSource))
+  })
+
+  it('Nodes added from another version of the same record keep their uuids', async () => {
+    // e.g. the copy of record1 edited in a mobile device, sent back to be merged with the server version
+    const recordSource = { ...record2, uuid: Record.getUuid(record1) }
+
+    const { record: recordUpdated } = await Record.mergeRecords({
+      survey,
+      recordSource,
+    })(record1)
+
+    const paths = ['cluster.plot[3]', 'cluster.plot[3].plot_multiple_number[1]', 'cluster.plot[3].tree[2]']
+    paths.forEach((path) => {
+      const nodeSource = findNodeByPath(path)(survey, recordSource)
+      const nodeMerged = findNodeByPath(path)(survey, recordUpdated)
+      expect(Node.getUuid(nodeMerged)).toBe(Node.getUuid(nodeSource))
+      expect(Node.getRecordUuid(nodeMerged)).toBe(Record.getUuid(record1))
+    })
+    // multiple attribute value added to an existing entity
+    const multipleAttrSource = findNodeByPath('cluster.plot[1].plot_multiple_number[0]')(survey, recordSource)
+    const multipleAttrMerged = findNodeByPath('cluster.plot[1].plot_multiple_number[0]')(survey, recordUpdated)
+    expect(Node.getUuid(multipleAttrMerged)).toBe(Node.getUuid(multipleAttrSource))
+  })
+
+  it('Merging the same version of a record twice does not duplicate nodes', async () => {
+    const recordSource = { ...record2, uuid: Record.getUuid(record1) }
+
+    const { record: recordMergedOnce } = await Record.mergeRecords({ survey, recordSource })(record1)
+    const { record: recordMergedTwice } = await Record.mergeRecords({ survey, recordSource })(recordMergedOnce)
+
+    expect(Record.getNodesArray(recordMergedTwice).length).toBe(Record.getNodesArray(recordMergedOnce).length)
+    expectChildrenLengthToBe({
+      survey,
+      record: recordMergedTwice,
+      path: 'cluster',
+      childName: 'plot',
+      expectedLength: 4,
+    })
+    expectChildrenLengthToBe({
+      survey,
+      record: recordMergedTwice,
+      path: 'cluster.plot[0]',
+      childName: 'tree',
+      expectedLength: 4,
+    })
   })
 })

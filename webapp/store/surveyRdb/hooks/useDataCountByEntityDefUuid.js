@@ -10,7 +10,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
-  const [dataCountByEntityDefUuid, setDataCountsByEntityDefUuid] = useState({})
+  const [dataCountByEntityDefUuid, setDataCountByEntityDefUuid] = useState({})
 
   const entityDefUuids = useMemo(() => {
     const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, nodeDef) => {
@@ -29,7 +29,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const updateCounts = useCallback(async () => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
-      setDataCountsByEntityDefUuid(
+      setDataCountByEntityDefUuid(
         await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
           surveyId: Survey.getId(survey),
           cycle,

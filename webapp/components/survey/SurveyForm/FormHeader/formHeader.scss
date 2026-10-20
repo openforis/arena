@@ -45,6 +45,16 @@
     margin: 0 1rem;
   }
 
+  // preview menu arrow next to the preview button (split button)
+  > .preview-btn-with-menu {
+    margin-right: 0;
+  }
+
+  .button-menu__button {
+    min-width: 0;
+    padding: 0 0.25rem;
+  }
+
   .error-badge {
     position: relative;
   }
@@ -62,7 +72,7 @@
 }
 
 .survey-form-header__record-actions-steps {
-  border: 1px solid $greyBorder;
+  border: 1px solid $colorOutline;
 
   > * {
     margin: 0 0.5rem;

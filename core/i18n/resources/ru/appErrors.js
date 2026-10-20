@@ -1,4 +1,16 @@
 export default {
+  aiDataQueryDescriptionMissing: 'Опишите обычным языком данные, которые вы хотите увидеть.',
+  aiDataQueryEmpty: 'Сначала выберите сущность и атрибуты (или измерения и меры).',
+  aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
+  aiDataQueryNoEntities: 'В этом опросе нет сущностей, по которым можно выполнить запрос.',
+  aiDataQuerySummaryInvalid: 'ИИ не удалось предложить название и описание для этого запроса. Попробуйте ещё раз.',
+  userCannotDeleteHasMessages:
+    'Этого пользователя нельзя удалить: он является автором сообщений ({{count}}); сначала удалите или переназначьте их',
+  userCannotDeleteLastSystemAdmin: 'Этого пользователя нельзя удалить: он последний системный администратор',
+  userCannotDeleteOwnsSurveys:
+    'Этого пользователя нельзя удалить: он является владельцем опросов ({{count}}); сначала передайте права владения',
+  userCannotDeleteSelf: 'Вы не можете удалить собственную учетную запись',
+  userEmailInvalid: 'Не удалось доставить письмо с приглашением на адрес {{email}}; проверьте правильность адреса',
   cannotGetChild: "Не удается получить дочерний элемент '{{childName}}' из атрибута {{name}}",
   cannotImportFilesExceedingQuota: 'Невозможно импортировать файлы записей: будет превышена квота хранения файлов',
   cannotInsertFileExceedingQuota: 'Невозможно вставить файл: будет превышена квота хранения файлов',
@@ -21,6 +33,8 @@ export default {
     noRecordsFound: 'В файле импорта не найдено записей или неверный формат файла',
     pendingImportFileNotFoundOrExpired:
       'Ранее загруженный файл не найден; возможно, срок его действия истек. Пожалуйста, загрузите его снова.',
+    recordMergeWithSameKeysNotAllowed:
+      'Невозможно импортировать запись "{{recordKeyValues}}": другая запись с такими же ключами уже существует, а объединение записей с одинаковыми ключами в этом опросе не разрешено',
     recordOwnedByAnotherUser:
       'Невозможно обновить запись "{{recordKeyValues}}", так как она принадлежит другому пользователю',
   },
@@ -50,18 +64,57 @@ export default {
     updateSelfAndDependentsDefaultValues:
       'Ошибка обновления записи; ошибка при оценке выражения в узле {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'Для экспорта текущей страницы требуются entityDefUuid и entityNodeUuid',
+    entityNotFound: 'Сущность не найдена для указанного экспорта',
+    missingServerUrl: 'Для экспорта с QR-кодом требуется публичный URL сервера',
+    qrTokenMismatch: 'Не удалось завершить экспорт с QR-кодом; повторите попытку',
+  },
   sessionExpiredRefreshPage: 'Срок действия сеанса мог истечь.\nПопробуйте обновить страницу.',
   survey: {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
     dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
+    fileNotFound: 'Файл не найден',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
+  aiNotConfigured:
+    'ИИ не настроен. Укажите личного провайдера в настройках ИИ или попросите администратора настроить провайдера по умолчанию.',
+  aiFeaturesDisabled: 'Функции ИИ отключены в этом развертывании.',
+  aiFeatureDisabled: 'Функция ИИ "{{feature}}" отключена.',
+  aiPromptTooLarge: 'Запрос к ИИ слишком большой ({{size}} символов; лимит {{limit}}).',
+  aiInputTooLong: 'Поле ввода ИИ "{{field}}" превышает лимит в {{limit}} символов.',
+  aiSchemaMissing: 'Отсутствует схема структурированного вывода ИИ для функции "{{feature}}".',
+  aiProviderInvalid: 'Неподдерживаемый провайдер ИИ: {{provider}}.',
+  aiModelMissing: 'Требуется идентификатор модели ИИ.',
+  aiApiKeyMissing: 'Для провайдера {{provider}} требуется ключ API.',
+  aiBaseUrlMissing: 'Для провайдера, совместимого с OpenAI, требуется базовый URL.',
+  aiModelListFailed: 'Не удалось получить список моделей от провайдера: {{message}}',
+  aiExpressionDescriptionMissing: 'Опишите нужное выражение простыми словами.',
+  aiExpressionTypeInvalid: 'Неизвестный тип выражения: {{expressionType}}.',
+  aiExpressionNodeDefMissing: 'Невозможно сгенерировать выражение без целевого поля.',
+  aiExpressionNodeDefNotFound: 'Не удалось найти целевое поле (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: 'Невозможно объяснить пустое выражение.',
+  aiTranslationSocketMissing: 'WebSocket не подключен. Подождите немного и повторите попытку.',
+  aiTranslationSourceLangMissing: 'Для перевода требуется исходный язык.',
+  aiTranslationTargetLangsMissing: 'Для перевода требуется хотя бы один целевой язык.',
+  aiTranslationItemsMissing: 'Нечего переводить.',
+  aiTranslationTooManyItems: 'Слишком много элементов в одном пакете ({{count}}); лимит — {{limit}}.',
+  aiActivityLogSurveyMissing: 'Для составления сводки журнала активности требуется опрос.',
+  aiChatbotDisabled: 'Чат-бот документации отключен в этом развертывании.',
+  aiChatbotUpstreamError: 'Чат-бот документации временно недоступен. Повторите попытку чуть позже.',
+  aiChatbotPayloadTooLarge: 'Ваш диалог слишком большой. Очистите чат и попробуйте задать более короткий вопрос.',
   userHasPendingInvitation:
     "У пользователя с адресом электронной почты '{{email}}' уже есть ожидающее приглашение; его/ее нельзя пригласить в этот опрос, пока оно не будет принято",
   userHasRole: 'Данный пользователь уже имеет роль в этом опросе',
   userHasRole_other: 'Данные пользователи уже имеют роль в этом опросе',
   userInvalid: 'Неверный пользователь',
+  surveyCompareFileTooLarge:
+    'Файл опроса слишком большой (макс. {{maxSize}} МБ): экспортируйте опрос без данных, записи и их файлы не нужны для сравнения опросов',
   userIsAdmin: 'Данный пользователь уже является системным администратором',
   userNotAllowedToChangePref: 'Пользователю не разрешено изменять настройки',
   userNotAuthorized: 'Пользователь {{userName}} не авторизован',
+  userNotFound: 'Пользователь не найден: {{userUuid}}',
+  usersBackupImport: {
+    invalidFile: 'Файл не является корректной резервной копией пользователей Arena',
+  },
 }

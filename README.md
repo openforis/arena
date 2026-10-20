@@ -91,10 +91,6 @@ SENDGRID_API_KEY= # get it from https://sendgrid.com/
 ANALYSIS_OUTPUT_DIR=/home/your_user/openforis/arena/analysis
 
 # Server
-## HTTP Session
-## Secret used to sign the session ID cookie
-SESSION_ID_COOKIE_SECRET=my-cookie-secret-key
-
 ## Set to true if http requests must be forwarded to https
 USE_HTTPS=false
 
@@ -118,6 +114,11 @@ USE_HTTPS=false
 # RSTUDIO_SERVER_URL=
 # RSTUDIO_POOL_SERVER_URL=
 # RSTUDIO_POOL_SERVICE_KEY=
+
+# Arena Mobile web preview in the survey designer (experimental, needs EXPERIMENTAL_FEATURES=true): downloaded by the build (yarn mobile-preview:download,
+# version in package.json arenaMobileWebPreview) and served under /mobile-preview/; overrides (not mandatory):
+# MOBILE_PREVIEW_URL=
+# ARENA_MOBILE_WEB_PREVIEW_VERSION=
 
 # WHISP (geo data integration, not mandatory)
 # WHISP_API_KEY=
@@ -178,6 +179,14 @@ $ docker container restart arena-rstudio
 
 Visit http://localhost:8787 in your browser to access the rStudio server instance.
 
+## Deploy on Kubernetes
+
+Kustomize manifests and instructions are in [infra/k8s](./infra/k8s/README.md).
+
 # License
 
 Arena is [MIT licensed](./LICENSE).
+
+# Code of Conduct
+
+This project follows the [Contributor Covenant Code of Conduct](./CODE_OF_CONDUCT.md).

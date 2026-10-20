@@ -28,11 +28,11 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
     // extract temporary chunk content
     const chunkFileName = getChunkFileName({ fileId, chunk })
     const chunkFilePath = FileUtils.tempFilePath(chunkFileName)
-    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath)
-    await writeStreamAndWaitForEnd({ writeStream, chunkFileContent })
+    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath) // NOSONAR
+    await writeStreamAndWaitForEnd({ writeStream, chunkFileContent }) // NOSONAR
     // delete temporary chunk
-    await FileUtils.deleteFileAsync(chunkFilePath)
-    await onChunkMerged?.({ chunk, totalChunks })
+    await FileUtils.deleteFileAsync(chunkFilePath) // NOSONAR
+    await onChunkMerged?.({ chunk, totalChunks }) // NOSONAR
   }
   await endWriteStream(writeStream)
   return finalFilePath

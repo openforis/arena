@@ -1,5 +1,3 @@
-import * as R from 'ramda'
-
 import { useState } from 'react'
 
 import * as A from '@core/arena'
@@ -16,7 +14,7 @@ import * as ActivityLogMessageParser from '../parsers'
 
 const POLL_INTERVAL = 5000
 
-export const useFetchMessages = ({ messages, setMessages }) => {
+export const useFetchMessages = ({ messages, setMessages, onError = null, onLoaded = null }) => {
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyId = useSurveyId()
@@ -29,21 +27,24 @@ export const useFetchMessages = ({ messages, setMessages }) => {
     const initialized = messages.length > 0
     const { activityLogs } = fetchedData
     if (A.isEmpty(activityLogs)) {
+      onLoaded?.()
       return null
     }
     const highlighted = newest && initialized
 
-    const messagesNew = R.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
-    const messagesOld = R.map(ActivityLogMessage.dissocHighlighted, messages)
-    const newMessages = newest ? R.concat(messagesNew, messagesOld) : R.concat(messagesOld, messagesNew)
+    const messagesNew = A.map(ActivityLogMessageParser.toMessage(i18n, survey, highlighted))(activityLogs)
+    const messagesOld = A.map(ActivityLogMessage.dissocHighlighted, messages)
+    const newMessages = newest ? A.concat(messagesNew, messagesOld) : A.concat(messagesOld, messagesNew)
     if (newMessages) {
       setMessages(newMessages)
     }
+    onLoaded?.()
     return newMessages
   }
 
-  const handleError = () => {
+  const handleError = (error) => {
     setHasError(true)
+    onError?.(error)
   }
 
   useRequest({
@@ -62,9 +63,9 @@ export const useFetchMessages = ({ messages, setMessages }) => {
 
     if (initialized) {
       if (_newest) {
-        _params.idGreaterThan = R.pipe(R.head, ActivityLogMessage.getId)(messages)
+        _params.idGreaterThan = A.pipe(A.head, ActivityLogMessage.getId)(messages)
       } else {
-        _params.idLessThan = R.pipe(R.last, ActivityLogMessage.getId)(messages)
+        _params.idLessThan = A.pipe(A.last, ActivityLogMessage.getId)(messages)
       }
     }
 
@@ -76,19 +77,19 @@ export const useFetchMessages = ({ messages, setMessages }) => {
   }
 }
 
-export const useGetActivityLogMessages = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages })
+export const useGetActivityLogMessages = ({ messages, setMessages, onError = null, onLoaded = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError, onLoaded })
 
   useInterval(() => messages.length > 0 && fetchMessages({ newest: true }), POLL_INTERVAL)
 
   return () => {
-    ;(async () => fetchMessages({ newest: true }))()
+    fetchMessages({ newest: true })
   }
 }
 
-export const useGetActivityLogMessagesNext = ({ messages, setMessages }) => {
-  const fetchMessages = useFetchMessages({ messages, setMessages })
+export const useGetActivityLogMessagesNext = ({ messages, setMessages, onError = null, onLoaded = null }) => {
+  const fetchMessages = useFetchMessages({ messages, setMessages, onError, onLoaded })
   return () => {
-    ;(async () => fetchMessages({ newest: false }))()
+    fetchMessages({ newest: false })
   }
 }

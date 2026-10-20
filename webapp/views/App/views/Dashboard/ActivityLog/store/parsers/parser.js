@@ -16,7 +16,7 @@ export const toMessage =
     const message = i18n.t(`activityLog:messages.${type}`, i18nMessageParams)
 
     const isItemDeletedFn = isItemDeletedFns[type]
-    const itemDeleted = isItemDeletedFn && isItemDeletedFn(survey)(activityLog)
+    const itemDeleted = isItemDeletedFn?.(survey)(activityLog)
 
     return ActivityLogMessage.newMessage(activityLog, message, itemDeleted, highlighted)
   }

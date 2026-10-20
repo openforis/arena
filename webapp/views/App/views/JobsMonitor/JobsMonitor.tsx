@@ -22,7 +22,7 @@ const JobsMonitor = (): React.ReactElement => {
   const onCancelJob = async (row: JobMonitorSummary) => {
     if (!(await confirm({ key: 'jobMonitorView:confirmCancelJob' }))) return
     await API.cancelJob(row.uuid)
-    refresh()
+    void refresh()
   }
 
   const columns = useJobsMonitorColumns({ onCancelJob })

@@ -76,7 +76,7 @@ const getPageEntity = (pageNodeDefUuid: string, state: unknown) => {
  *
  * @param pageNodeDefUuid - Page entity node def UUID
  * @param state - Redux state
- * @returns True when the page has own key/required attributes
+ * @returns True when the page has own key/required (or conditionally required) attributes
  */
 const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown): boolean => {
   const survey = SurveyState.getSurvey(state)
@@ -85,7 +85,12 @@ const pageHasOwnCompletableAttributes = (pageNodeDefUuid: string, state: unknown
   const childDefs = Survey.getNodeDefChildren({ nodeDef: pageNodeDef })(survey)
   return childDefs.some((childDef) => {
     if (NodeDef.isEntity(childDef)) return false
-    return NodeDef.isKey(childDef) || NodeDefValidations.isRequired(NodeDef.getValidations(childDef))
+    const validations = NodeDef.getValidations(childDef)
+    return (
+      NodeDef.isKey(childDef) ||
+      NodeDefValidations.isRequired(validations) ||
+      NodeDefValidations.isRequiredIfDefined(validations)
+    )
   })
 }
 

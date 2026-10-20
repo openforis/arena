@@ -5,7 +5,7 @@
   display: flex;
   padding: 0.5rem;
   background-color: $formBgColorGrey;
-  border-bottom: 4px solid $blue;
+  border-bottom: 4px solid $colorPrimary;
 
   .node-select-form-item {
     min-width: 30rem;
@@ -22,6 +22,10 @@
       &::after {
         display: none;
       }
+
+      border: 1px solid $colorOutline;
+      border-radius: 0.25rem;
+      padding: 0.25rem 0.5rem;
 
       .MuiSelect-select {
         display: flex;

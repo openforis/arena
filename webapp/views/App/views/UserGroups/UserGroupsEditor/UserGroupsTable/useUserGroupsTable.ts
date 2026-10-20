@@ -154,7 +154,7 @@ export const useUserGroupsTable = (): UseUserGroupsTableResult => {
   useEffect(() => {
     let ignore = false
 
-    fetchUserGroupsTableRows({ surveyId, surveyUuid, preferredLang }).then((data) => {
+    void fetchUserGroupsTableRows({ surveyId, surveyUuid, preferredLang }).then((data) => {
       if (!ignore) {
         setRows(data)
         setLoading(false)

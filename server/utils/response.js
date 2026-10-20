@@ -1,5 +1,5 @@
-import path from 'path'
-import Archiver from 'archiver'
+import path from 'node:path'
+import { ZipArchive } from 'archiver'
 
 import { SystemError as CoreSystemError } from '@openforis/arena-core'
 
@@ -18,6 +18,7 @@ const status = {
 export const contentTypes = {
   csv: 'text/csv',
   docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  gpkg: 'application/geopackage+sqlite3',
   json: 'application/json',
   pdf: 'application/pdf',
   xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
@@ -26,6 +27,7 @@ export const contentTypes = {
 
 const contentTypeByFileFormat = {
   [FileFormats.csv]: contentTypes.csv,
+  [FileFormats.gpkg]: contentTypes.gpkg,
   [FileFormats.xlsx]: contentTypes.xlsx,
   [FileFormats.zip]: contentTypes.zip,
 }
@@ -55,8 +57,19 @@ export const sendErr = (res, err) => {
   }
 }
 
+// Unquoted file names with commas make Chromium reject the response (multiple Content-Disposition headers)
+const getContentDispositionAttachment = (fileName) => {
+  const name = String(fileName)
+  const fallbackName = name.replaceAll(/[^\x20-\x7e]|["\\%]/g, '_')
+  const encodedName = encodeURIComponent(name).replaceAll(
+    /['()*]/g,
+    (char) => `%${char.codePointAt(0).toString(16).toUpperCase()}`
+  )
+  return `attachment; filename="${fallbackName}"; filename*=UTF-8''${encodedName}`
+}
+
 export const setContentTypeFile = ({ res, fileName, fileSize = null, contentType = null, fileFormat = null }) => {
-  res.setHeader('Content-Disposition', `attachment; filename=${fileName}`)
+  res.setHeader('Content-Disposition', getContentDispositionAttachment(fileName))
   if (fileSize) {
     res.setHeader('Content-Length', fileSize)
   }
@@ -93,7 +106,7 @@ export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
   // zip dir into a new temporary file to get the final size
   const tempFilePath = FileUtils.newTempFilePath()
   const output = FileUtils.createWriteStream(tempFilePath)
-  const zip = Archiver('zip')
+  const zip = new ZipArchive()
   zip.pipe(output)
   zip.directory(dir, false)
   zip.finalize()
@@ -117,7 +130,7 @@ export const sendDirAsZip = ({ res, dir, name, deleteDirOnFinish = false }) => {
 
 export const sendFilesAsZip = (res, fileName, files) => {
   setContentTypeFile({ res, fileName, contentType: contentTypes.zip })
-  const zip = Archiver('zip')
+  const zip = new ZipArchive()
   zip.pipe(res)
   files.forEach(({ data, name }) => {
     zip.append(data, { name })

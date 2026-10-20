@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -29,6 +29,7 @@ import * as FileRepository from '../repository/fileRepository'
 import * as NodeRepository from '../repository/nodeRepository'
 import * as RecordUpdateManager from './_recordManager/recordUpdateManager'
 import { NodeRdbManager } from './_recordManager/nodeRDBManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 // ==== CREATE
 
@@ -43,10 +44,10 @@ export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
-    offset,
-    limit,
-    sortBy,
-    sortOrder,
+    offset = 0,
+    limit = undefined,
+    sortBy = undefined,
+    sortOrder = undefined,
     cycle: cycleParam = null,
     search = null,
     step = null,
@@ -60,7 +61,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = includeRootKeyValues
     ? await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
@@ -115,13 +117,13 @@ export const fetchRecordsSummaryBySurveyId = async (
   const listWithCounts = []
   for (const recordSummary of list) {
     const recordUuid = Record.getUuid(recordSummary)
-    const { count: filesCount, total: filesSize } = await FileRepository.fetchCountAndTotalFilesSize(
+    const { count: filesCount, total: filesSize } = /* NOSONAR */ await FileRepository.fetchCountAndTotalFilesSize(
       { surveyId, recordUuid },
       client
     )
-    const filesMissing = R.isEmpty(nodeDefFileUuids)
+    const filesMissing = A.isEmpty(nodeDefFileUuids)
       ? 0
-      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client)
+      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client) // NOSONAR
 
     listWithCounts.push({
       ...recordSummary,
@@ -152,7 +154,8 @@ export const countRecordsBySurveyId = async (
   client = db
 ) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId, draft: true }, client)
-  const nodeDefsDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+  const nodeDefsDraft =
+    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
   const nodeDefRoot = await NodeDefRepository.fetchRootNodeDef(surveyId, nodeDefsDraft, client)
   const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
@@ -166,6 +169,12 @@ export const countRecordsBySurveyId = async (
     client
   )
 }
+
+// Cheap existence/count check across all cycles, without the survey/root-node-def/summary-defs
+// lookups the search-aware countRecordsBySurveyId above needs - used where only "does this survey
+// have any records at all" matters (e.g. the publish record-values-update warning check).
+export const countAllRecordsBySurveyId = async ({ surveyId }, client = db) =>
+  RecordRepository.countRecordsBySurveyId({ surveyId }, client)
 
 export {
   countRecordsBySurveyIdGroupedByStep,
@@ -251,7 +260,7 @@ export const fetchRecordAndNodesByUuid = async (
 
   // Preview records are always initialized from scratch with the requesting user's context,
   // so their applicability is already up to date and doesn't need recomputing here.
-  if (user && !R.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
+  if (user && !A.isEmpty(indexedNodes) && !Record.isPreview(recordWithNodes)) {
     recordWithNodes = await _recomputeUserDependentNodeState({ user, surveyId, draft, record: recordWithNodes }, client)
   }
 
@@ -290,25 +299,30 @@ const fetchNodeRefData = async ({ survey, node, isCode }, client) => {
   }
 }
 
+const isRefDataSourceBig = ({ survey, nodeDef, isCode }) => {
+  if (isCode) {
+    const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+    const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
+    return Category.isBigCategory(category)
+  }
+  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
+  const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
+  return Taxonomy.isBigTaxonomy(taxonomy)
+}
+
 export const assocRefDataToNodes = async ({ survey, nodes, onlyForBigCategoriesTaxonomies = true }, client = db) => {
   for (const node of nodes) {
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const isCode = NodeDef.isCode(nodeDef)
     const isTaxon = NodeDef.isTaxon(nodeDef)
-    if ((isCode || isTaxon) && !Node.isValueBlank(node)) {
-      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const category = categoryUuid ? Survey.getCategoryByUuid(categoryUuid)(survey) : null
-      const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-      const taxonomy = taxonomyUuid ? Survey.getTaxonomyByUuid(taxonomyUuid)(survey) : null
-      if (
-        !onlyForBigCategoriesTaxonomies ||
-        (isCode && Category.isBigCategory(category)) ||
-        (isTaxon && Taxonomy.isBigTaxonomy(taxonomy))
-      ) {
-        const refData = await fetchNodeRefData({ survey, node, isCode }, client)
-        if (refData) {
-          node[NodeRefData.keys.refData] = refData
-        }
+    if (
+      (isCode || isTaxon) &&
+      !Node.isValueBlank(node) &&
+      (!onlyForBigCategoriesTaxonomies || isRefDataSourceBig({ survey, nodeDef, isCode }))
+    ) {
+      const refData = await fetchNodeRefData({ survey, node, isCode }, client) // NOSONAR
+      if (refData) {
+        node[NodeRefData.keys.refData] = refData
       }
     }
   }
@@ -323,7 +337,13 @@ export {
   persistNode,
   updateNode,
   updateNodesDependents,
+  updateRequiredFlags,
 } from './_recordManager/recordUpdateManager'
+
+export {
+  findNodeDefUuidsToClearOnNodeDelete,
+  findNodeDefUuidsToClearOnNodePersist,
+} from './_recordManager/nonApplicableValuesClearPreview'
 
 export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepTo, recordUuids }, client = db) =>
   client.tx(async (t) => {
@@ -336,9 +356,10 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
       },
       client
     )
-    await Promise.all(
-      recordsSummaryToMove.map((record) =>
-        RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
+    await DbUtils.runQueries(
+      t,
+      recordsSummaryToMove.map(
+        (record) => () => RecordUpdateManager.updateRecordStep({ user, surveyId, record, stepId: stepTo }, t)
       )
     )
     return { count: recordsSummaryToMove.length }
@@ -347,7 +368,7 @@ export const updateRecordsStep = async ({ user, surveyId, cycle, stepFrom, stepT
 export const updateNodes = async ({ user, surveyId, nodes }, client = db) =>
   client.tx(async (t) => {
     const activities = nodes.map((node) => {
-      const logContent = R.pick([
+      const logContent = A.pick([
         Node.keys.uuid,
         Node.keys.recordUuid,
         Node.keys.parentUuid,

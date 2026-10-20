@@ -1,5 +1,5 @@
-import * as fs from 'fs'
-import * as R from 'ramda'
+import * as fs from 'node:fs'
+import * as A from '@core/arena'
 
 import { Objects, Points } from '@openforis/arena-core'
 
@@ -91,16 +91,14 @@ export class CategoryImportInternalJob extends Job {
       // Errors found in csv rows
       this.logDebug(`${Object.keys(this.errors).length} errors found`)
       await this.setStatusFailed()
+    } else if (await this.itemsUpdater.flush()) {
+      // 6. no errors found, remaining items inserted
+      this.incrementProcessedItems()
+      this.logDebug(`${this.totalItemsInserted} items inserted`)
+      // 7. initialize category item indexes etc.
+      await this.afterCategoryImport()
     } else {
-      // 6. no errors found, insert remaining items
-      if (await this.itemsUpdater.flush()) {
-        this.incrementProcessedItems()
-        this.logDebug(`${this.totalItemsInserted} items inserted`)
-        // 7. initialize category item indexes etc.
-        await this.afterCategoryImport()
-      } else {
-        this.setStatusFailed()
-      }
+      await this.setStatusFailed()
     }
   }
 
@@ -240,7 +238,7 @@ export class CategoryImportInternalJob extends Job {
         .filter((oldLevelName) => !levelNames.includes(oldLevelName))
         .flat()
       this._addError(Validation.messageKeys.categoryImport.cannotDeleteLevelsOfPublishedCategory, { deletedLevelNames })
-      this.setStatusFailed()
+      await this.setStatusFailed()
       return
     }
 
@@ -250,14 +248,14 @@ export class CategoryImportInternalJob extends Job {
       if (!levelOld) {
         // insert new level
         const level = Category.newLevel(category, { [CategoryLevel.keysProps.name]: levelName }, index)
-        const { category: categoryUpdated } = await CategoryManager.insertLevel(
+        const { category: categoryUpdated } = /* NOSONAR */ await CategoryManager.insertLevel(
           { user, surveyId, level, system: true },
           tx
         )
         this.category = categoryUpdated
       } else if (CategoryLevel.getName(levelOld) !== levelName) {
         // update level name
-        const { category: categoryUpdated } = await CategoryManager.updateLevelProp(
+        const { category: categoryUpdated } = /* NOSONAR */ await CategoryManager.updateLevelProp(
           user,
           surveyId,
           Category.getUuid(category),
@@ -275,7 +273,7 @@ export class CategoryImportInternalJob extends Job {
       const levelsToDelete = levelsExisting.slice(levelNames.length).reverse()
 
       for (const levelToDelete of levelsToDelete) {
-        this.category = await CategoryManager.deleteLevel(
+        this.category = /* NOSONAR */ await CategoryManager.deleteLevel(
           user,
           surveyId,
           Category.getUuid(category),
@@ -291,7 +289,7 @@ export class CategoryImportInternalJob extends Job {
 
     const itemExtraDef = this.extractItemExtraDef()
 
-    if (!R.isEmpty(itemExtraDef)) {
+    if (!A.isEmpty(itemExtraDef)) {
       await CategoryManager.updateCategoryProp(
         {
           user: this.user,

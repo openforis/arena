@@ -7,6 +7,7 @@ const keysPanels = {
   sort: 'sort',
   queries: 'queries',
   export: 'export',
+  ai: 'ai',
 }
 
 // ====== CREATE
@@ -16,6 +17,7 @@ export const create = () => ({
     [keysPanels.sort]: false,
     [keysPanels.queries]: false,
     [keysPanels.export]: false,
+    [keysPanels.ai]: false,
   },
 })
 
@@ -25,6 +27,7 @@ export const isPanelFilterShown = isPanelShown(keysPanels.filter)
 export const isPanelSortShow = isPanelShown(keysPanels.sort)
 export const isPanelQueriesShown = isPanelShown(keysPanels.queries)
 export const isPanelExportShown = isPanelShown(keysPanels.export)
+export const isPanelAiShown = isPanelShown(keysPanels.ai)
 
 // ====== UPDATE
 const togglePanel = (panel) => (state) => ({
@@ -37,3 +40,4 @@ export const togglePanelFilter = togglePanel(keysPanels.filter)
 export const togglePanelSort = togglePanel(keysPanels.sort)
 export const togglePanelQueries = togglePanel(keysPanels.queries)
 export const togglePanelExport = togglePanel(keysPanels.export)
+export const togglePanelAi = togglePanel(keysPanels.ai)

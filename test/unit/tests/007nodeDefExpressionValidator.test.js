@@ -84,8 +84,13 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'visit_date.hour', r: false },
     { q: 'visit_time.hour', r: true },
     { q: 'visit_time.minute', r: true },
-    { q: 'visit_time.seconds', r: false },
+    { q: 'visit_time.seconds', r: true },
   ]
 
-  NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })
+  const expressionEvaluator = NodeDefExpressionUtils.nodeDefExpressionEvaluator({ surveyFn: () => survey })
+
+  test.each(NodeDefExpressionUtils.toTestCases(queries))('%s', async (_title, query) => {
+    const { actual, expected } = await NodeDefExpressionUtils.evaluateQuery({ query, expressionEvaluator })
+    expect(actual).toEqual(expected)
+  })
 })

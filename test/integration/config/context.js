@@ -47,7 +47,9 @@ export const initTestContext = async () => {
 export const setContextSurvey = (s) => {
   global.survey = s
   survey = s
-  setContextUser(User.assocPrefSurveyCurrent(Survey.getId(getContextSurvey()))(getContextUser()))
+  if (s) {
+    setContextUser(User.assocPrefSurveyCurrent(Survey.getId(s))(getContextUser()))
+  }
 }
 
 export const destroyTestContext = async () => {

@@ -109,6 +109,19 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     (row) => Number(row.count)
   )
 
+// Lightweight alternative to fetchNodeDefsBySurveyId when only the uuids of file node defs are needed
+// (e.g. to check for missing files), avoiding fetching and transforming full node def rows.
+export const fetchFileNodeDefUuidsBySurveyId = async ({ surveyId }, client = DB) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSchemaSurvey(surveyId)}.node_def
+    WHERE type = $/type/
+    AND NOT deleted`,
+    { type: NodeDef.nodeDefType.file },
+    (row) => row.uuid
+  )
+
 // Cheap survey-level check for whether any node def expression references a function whose
 // result depends on the currently logged in user (e.g. userProp).
 // By default, only published (props_advanced) expressions are checked; pass draft = true to
@@ -209,8 +222,9 @@ export const updateNodeDefProps = async (
 export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
   client.tx(async (tx) => {
     const schema = getSchemaSurvey(surveyId)
-    const nodeDefsUpdated = await tx.batch(
-      nodeDefs.map(async (nodeDef) => {
+    const nodeDefsUpdated = await DbUtils.runQueries(
+      tx,
+      nodeDefs.map((nodeDef) => async () => {
         const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
         return tx.one(
           `
@@ -354,15 +368,17 @@ export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => 
   )
 
   const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)
-  await Promise.all(
-    childNodeDefs.map(async (childNodeDef) => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client))
+  await DbUtils.runQueries(
+    client,
+    childNodeDefs.map((childNodeDef) => async () => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client))
   )
 
   const relatedNodeDefsToDelete = await fetchAreaBasedEstimateNodeDefsOf(surveyId, nodeDefUuid, true, client)
 
-  await Promise.all(
-    relatedNodeDefsToDelete.map(async (childNodeDef) =>
-      markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
+  await DbUtils.runQueries(
+    client,
+    relatedNodeDefsToDelete.map(
+      (childNodeDef) => async () => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
     )
   )
 

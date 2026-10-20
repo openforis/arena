@@ -12,6 +12,7 @@ import { debounceAction } from '@webapp/utils/reduxUtils'
 import { objectToFormData } from '@webapp/service/api'
 
 import { AppSavingActions } from '@webapp/store/app'
+import { I18nState } from '@webapp/store/system'
 import { SurveyState } from '@webapp/store/survey'
 
 import { appModules, appModuleUri } from '@webapp/app/appModules'
@@ -19,37 +20,57 @@ import { appModules, appModuleUri } from '@webapp/app/appModules'
 import * as RecordState from '../state'
 import * as ActionTypes from './actionTypes'
 import { checkAndConfirmUpdateNode, recordNodesUpdate } from './common'
+import { enqueueNodeRequest } from './nodeRequestsQueue'
+
+const _sendNodePersistRequest = async ({
+  dispatch,
+  getState,
+  node,
+  file = null,
+  clearNonApplicableValuesConfirmed,
+}) => {
+  dispatch(AppSavingActions.showAppSaving())
+
+  const state = getState()
+  const cycle = SurveyState.getSurveyCycleKey(state)
+
+  const record = RecordState.getRecord(state)
+  const draft = record && Record.isPreview(record)
+
+  const formData = objectToFormData({
+    cycle,
+    draft,
+    node: JSON.stringify(node),
+    timezoneOffset: Dates.getTimezoneOffset(),
+    lang: I18nState.getLang(),
+    ...(file ? { file } : {}),
+    ...(clearNonApplicableValuesConfirmed ? { clearNonApplicableValuesConfirmed } : {}),
+  })
+
+  const recordUuid = Node.getRecordUuid(node)
+
+  const surveyId = SurveyState.getSurveyId(state)
+  await enqueueNodeRequest(() => axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData))
+}
 
 const _updateNodeDebounced = (node, file, delay) => {
-  const action = async (dispatch, getState) => {
-    dispatch(AppSavingActions.showAppSaving())
-
-    const state = getState()
-    const cycle = SurveyState.getSurveyCycleKey(state)
-
-    const record = RecordState.getRecord(state)
-    const draft = record && Record.isPreview(record)
-
-    const formData = objectToFormData({
-      cycle,
-      draft,
-      node: JSON.stringify(node),
-      timezoneOffset: Dates.getTimezoneOffset(),
-      ...(file ? { file } : {}),
-    })
-
-    const recordUuid = Node.getRecordUuid(node)
-
-    const surveyId = SurveyState.getSurveyId(state)
-    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/node`, formData)
-  }
+  const action = async (dispatch, getState) => _sendNodePersistRequest({ dispatch, getState, node, file })
 
   return debounceAction(action, `node_update_${Node.getUuid(node)}`, delay)
 }
 
+// sends again a node update, confirming that the values of attributes becoming non-applicable can be cleared
+export const persistNodeClearNonApplicableValuesConfirmed = (node) => async (dispatch, getState) =>
+  _sendNodePersistRequest({ dispatch, getState, node, clearNonApplicableValuesConfirmed: true })
+
 export const updateNode =
   (nodeDef, node, value, file = null, meta = {}, refData = null) =>
   async (dispatch, getState) => {
+    if (!Node.getUuid(node)) {
+      // the node doesn't exist yet (e.g. attribute of an entity just added, not yet created server side):
+      // nothing to update (the attribute is read only until its node is available)
+      return
+    }
     const onOk = async () => {
       const nodeToUpdate = A.pipe(
         A.dissoc(Node.keys.placeholder),

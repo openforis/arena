@@ -19,7 +19,7 @@ import JobTiming from './JobTiming'
 
 const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
-  if (closeButton instanceof Function) return React.createElement(closeButton, { job, ...closeButtonProps })
+  if (typeof closeButton === 'function') return React.createElement(closeButton, { job, ...closeButtonProps })
   if (closeButton instanceof Object) return closeButton
   return null
 }

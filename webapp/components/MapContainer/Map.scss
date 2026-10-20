@@ -1,4 +1,5 @@
 @import 'leaflet/dist/leaflet.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 .panel-right {
   &.map-panel > * {
@@ -125,7 +126,7 @@
     .leaflet-control-layers-group-label {
       font-size: 0.68rem;
       font-weight: 700;
-      color: #888;
+      color: var(--color-on-surface-variant);
       padding: 5px 0 2px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
@@ -133,7 +134,7 @@
       &:not(:first-child) {
         margin-top: 4px;
         padding-top: 6px;
-        border-top: 1px solid #ddd;
+        border-top: 1px solid var(--color-outline);
       }
     }
 

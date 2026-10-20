@@ -32,7 +32,7 @@ const JobErrors = ({
 
   if (errorsCount === 0) return null
 
-  const exportFileName = exportFileNameProp ? exportFileNameProp : `arena_${job.type}_errors`
+  const exportFileName = exportFileNameProp || `arena_${job.type}_errors`
 
   return (
     <ExpansionPanel buttonLabel="common.error_plural" className="app-job-monitor__job-errors" startClosed={!openPanel}>

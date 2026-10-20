@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Input } from '@webapp/components/form/Input'
 
@@ -24,8 +24,8 @@ const Label = ({
     <Input
       autoFocus={autoFocus}
       id={inputFieldIdPrefix ? `${inputFieldIdPrefix}-${lang}` : null}
-      value={R.propOr('', lang, labels)}
-      onChange={(value) => onChange(R.ifElse(R.always(R.isEmpty(value)), R.dissoc(lang), R.assoc(lang, value))(labels))}
+      value={A.propOr('', lang, labels)}
+      onChange={(value) => onChange(A.ifElse(A.always(A.isEmpty(value)), A.dissoc(lang), A.assoc(lang, value))(labels))}
       placeholder={placeholder}
       readOnly={readOnly}
       inputType={inputType}

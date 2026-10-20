@@ -1,5 +1,7 @@
 import './Guest.scss'
 
+import { useTranslation } from 'react-i18next'
+
 import * as ProcessUtils from '@core/processUtils'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
@@ -8,6 +10,8 @@ import ResetPassword from '@webapp/views/Guest/views/ResetPassword'
 import ForgotPassword from '@webapp/views/Guest/views/ForgotPassword'
 import AccessRequest from '@webapp/views/Guest/views/AccessRequest'
 import Login from '@webapp/views/Guest/views/Login'
+
+import { GuestToolbar } from './GuestToolbar'
 
 const OfArenaLogo = () => (
   <a
@@ -20,7 +24,11 @@ const OfArenaLogo = () => (
   </a>
 )
 
-const WordSplitter = ({ word }) => word.split('').map((letter, i) => <div key={String(i)}>{letter}</div>)
+// letters can repeat, so they are keyed by their position in the word
+const WordSplitter = ({ word }) =>
+  Array.from(word, (letter, index) => ({ letter, letterId: `${word}_${index}` })).map(({ letter, letterId }) => (
+    <div key={letterId}>{letter}</div>
+  ))
 
 const OfArenaBanner = () => (
   <div className="guest__openforis">
@@ -36,10 +44,14 @@ const OfArenaBanner = () => (
 )
 
 const Guest = () => {
+  // re-render the guest views when the UI language changes
+  useTranslation()
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
   return (
     <div className="guest__wrapper">
       <div className="guest__bg" />
+
+      <GuestToolbar />
 
       <OfArenaLogo />
 

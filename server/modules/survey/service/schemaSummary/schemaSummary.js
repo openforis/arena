@@ -106,6 +106,18 @@ const getValidationsSummary = ({ nodeDef }) => {
   return getExpressionsSummary({ expressions, includeSeverity: true })
 }
 
+// mirrors the 3 "Required" options in the node def editor: not required, always required, required if
+const getRequiredSummary = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  if (NodeDefValidations.isRequiredIfDefined(validations)) return 'conditional'
+  return String(NodeDefValidations.isRequired(validations))
+}
+
+const getRequiredIfSummary = ({ nodeDef }) => {
+  const validations = NodeDef.getValidations(nodeDef)
+  return getExpressionsSummary({ expressions: NodeDefValidations.getRequiredIf(validations) })
+}
+
 const getValidationCountSummary = ({ nodeDef, countType }) => {
   const validations = NodeDef.getValidations(nodeDef)
   const count = NodeDefValidations.getCountProp(countType)(validations)
@@ -231,7 +243,7 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
     categoryLevel: getCodeAttributeCategoryLevel(survey, nodeDef),
     enumerator,
     taxonomyName: getTaxonomyName(survey, nodeDef),
-    multiple: String(NodeDef.isMultiple(nodeDef)),
+    multiple: String(NodeDef.isMultiple(nodeDef) || NodeDef.isRoot(nodeDef)),
     readOnly: String(NodeDef.isReadOnly(nodeDef)),
     fileType: NodeDef.isFile(nodeDef) ? NodeDef.getFileType(nodeDef) : '',
     maxFileSize: NodeDef.isFile(nodeDef) ? String(NodeDef.getMaxFileSize(nodeDef)) : '',
@@ -246,7 +258,8 @@ const buildNodeDefItem = ({ survey, nodeDef, languages, defaultLang, cycle, incl
     defaultValue: getDefaultValuesSummary({ nodeDef }),
     defaultValueApplyIf: getDefaultValueApplyIf({ nodeDef }),
     defaultValueEvaluateOnce: String(NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)),
-    required: String(NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))),
+    required: getRequiredSummary({ nodeDef }),
+    requiredIf: getRequiredIfSummary({ nodeDef }),
     unique: String(NodeDefValidations.isUnique(NodeDef.getValidations(nodeDef))),
     minCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.min }),
     maxCount: getValidationCountSummary({ nodeDef, countType: NodeDefValidations.keys.max }),
@@ -275,7 +288,7 @@ const addAiDescriptions = async ({ user, surveyName, items, processed, total, on
     const batch = capped.slice(i, i + AI_DESCRIPTION_BATCH_SIZE)
     const batchIndex = Math.floor(i / AI_DESCRIPTION_BATCH_SIZE)
     try {
-      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex })
+      const result = await runAiDescriptionBatchWithRetry({ user, surveyName, batch, batchIndex }) // NOSONAR
       for (const { uuid, description } of result.descriptions) {
         if (itemByUuid[uuid]) itemByUuid[uuid].aiDescription = description
       }

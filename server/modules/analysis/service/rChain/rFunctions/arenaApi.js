@@ -12,7 +12,7 @@ const arenaFunction = (funcName, ...args) => {
 
 export const arenaGet = (url, params = {}) => arenaFunction('arena.get', quote(url), toQueryArg(params))
 
-export const arenaGetToFile = (url, params = {}, file) =>
+export const arenaGetToFile = (url, file, params = {}) =>
   arenaFunction('arena.getToFile', quote(url), toQueryArg(params), `file = ${file}`)
 
 export const arenaGetCSV = (url, params = {}) => arenaFunction('arena.getCSV', quote(url), toQueryArg(params))

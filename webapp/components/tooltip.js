@@ -93,7 +93,7 @@ const Tooltip = (props) => {
           ...statePrev,
           messageElement: (
             <div className={messageElementClassName} style={style}>
-              {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
+              {messageComponent || messages.map((msg) => <div key={msg}>{msg}</div>)}
             </div>
           ),
         }))
