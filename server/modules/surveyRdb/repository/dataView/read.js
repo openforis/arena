@@ -250,7 +250,7 @@ const _getSampleOutlierExpressions = ({ values }) => {
  * @param {!string} params.baseSelect - The select query (without sort, offset and limit) to sample.
  * @param {!ViewDataNodeDef} params.viewDataNodeDef - The data view of the queried entity.
  * @param {!Array} params.nodeDefCols - The selected attribute definitions.
- * @returns {string} - The sampling select query (it uses the "limit" parameter).
+ * @returns {string} - The sampling select query (it uses the "limit" parameter), flagging the outlier rows.
  */
 const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefCols }) => {
   const columns = _getSampleNumericColumns({ viewDataNodeDef, nodeDefCols })
@@ -277,7 +277,7 @@ const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefC
 
   const { condition, score } = _getSampleOutlierExpressions({ values })
   return `WITH ${ctes.join(', ')}
-    SELECT sample_base.*
+    SELECT sample_base.*, ${condition} AS ${DbUtils.asName(ViewDataNodeDef.columnSet.sampleOutlier)}
     FROM ${joins.join(' CROSS JOIN ')}
     ORDER BY CASE WHEN ${condition} THEN ${score} END DESC NULLS LAST, random()
     LIMIT $/limit/`

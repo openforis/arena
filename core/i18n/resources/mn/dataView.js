@@ -8,8 +8,11 @@ export default {
 хамгийн ихдээ {{maxItems}} элемент хүлээж байна.
 Элементүүдийн тоог багасгахын тулд хүсэлтээ сайжруулна уу (жишээ нь шүүлтүүр нэмэх).
 `,
-      showingRandomSample:
-        '{{totalCount}} элементээс {{sampleSize}} санамсаргүй түүврийг харуулж байна (хэт хазайсан утгууд үргэлж орно).',
+      sampleRandomOnly:
+        '{{totalCount}} элементээс {{sampleSize}} санамсаргүй түүврийг харуулж байна (хэт хазайсан утга олдсонгүй).',
+      sampleWithOutliers:
+        '{{totalCount}} элементээс {{sampleSize}}-г харуулж байна: {{outliersCount}} хэт хазайсан утга, бусад элементээс {{randomCount}} санамсаргүй түүвэр.',
+      sampleOutliersOnly: '{{totalCount}} элементээс хамгийн их хазайсан {{sampleSize}} утгыг харуулж байна.',
     },
     type: {
       area: 'Талбайн график',
