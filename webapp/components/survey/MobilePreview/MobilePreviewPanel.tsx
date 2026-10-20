@@ -174,7 +174,12 @@ export const MobilePreviewPanel = (props: Props) => {
           titleIsI18nKey={false}
         />
       </div>
-      {error && <div className="mobile-preview-panel__error">{t('surveyForm:mobilePreview.error', { error })}</div>}
+      {error && (
+        // React already escapes the text
+        <div className="mobile-preview-panel__error">
+          {t('surveyForm:mobilePreview.error', { error, interpolation: { escapeValue: false } })}
+        </div>
+      )}
       <div className="mobile-preview-panel__stage" ref={stageRef}>
         <div style={{ width: outerWidth * scale, height: outerHeight * scale }}>
           <div className="mobile-preview-panel__device" style={{ ...frameSize, transform: `scale(${scale})` }}>
