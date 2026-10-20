@@ -187,6 +187,14 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
 
+  // index groups by user uuid: filtering all groups for every user is quadratic (slow with thousands of users)
+  const authGroupsByUserUuid = {}
+  for (const group of authGroups) {
+    const { userUuid } = group
+    authGroupsByUserUuid[userUuid] ??= []
+    authGroupsByUserUuid[userUuid].push(group)
+  }
+
   return DbUtils.runQueries(
     t,
     users.map(
@@ -194,7 +202,7 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
         _attachAuthGroupsAndInvitationToUser({
           user,
           invitationsByUserUuid,
-          userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
+          userGroups: authGroupsByUserUuid[User.getUuid(user)] ?? [],
           t,
         })
     )
