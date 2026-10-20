@@ -130,6 +130,7 @@ export {
   getSurveyFileDownloadUrl,
   getSurveyPdfExportUrl,
   startSchemaSummaryExportJob,
+  fetchSurveyForMobile,
 } from './survey'
 export {
   cloneNodeDefFromSurvey,

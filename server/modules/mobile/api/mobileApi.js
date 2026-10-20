@@ -15,10 +15,11 @@ import * as ArenaMobileImportService from '../service/arenaMobileImportService'
 
 const Logger = Log.getLogger('Mobile API')
 
-const fetchSurvey = async ({ surveyId, cycle }) =>
+const fetchSurvey = async ({ surveyId, cycle, draft = false }) =>
   SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
+    draft,
     advanced: true,
     includeBigCategories: true,
     includeBigTaxonomies: true,
@@ -30,7 +31,8 @@ export const init = (app) => {
     try {
       Logger.info('fetching survey data')
 
-      const { surveyId, cycle } = Request.getParams(req)
+      // draft: used by the mobile app web preview in the survey designer
+      const { surveyId, cycle, draft = false } = Request.getParams(req)
 
       const totalCategoryItems = await CategoryService.countItemsBySurveyId({ surveyId })
       Logger.info('total category items', totalCategoryItems)
@@ -41,7 +43,7 @@ export const init = (app) => {
       Logger.info('constrained memory', process.constrainedMemory())
       Logger.info('memory usage before', process.memoryUsage())
 
-      const survey = await fetchSurvey({ surveyId, cycle })
+      const survey = await fetchSurvey({ surveyId, cycle, draft })
 
       Logger.info('memory usage after', process.memoryUsage())
 

@@ -1,25 +1,61 @@
+import { useState } from 'react'
 import { useDispatch } from 'react-redux'
+
+import { ENV } from '@core/processUtils'
 
 import { RecordActions } from '@webapp/store/ui/record'
 import { useIsSurveyDirty } from '@webapp/store/survey'
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
-import { Button } from '@webapp/components/buttons'
+import { Button, ButtonMenu } from '@webapp/components/buttons'
+import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'
 
 const FormEditActions = () => {
   const dispatch = useDispatch()
   const surveyIsDirty = useIsSurveyDirty()
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+  const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
+
+  // mobile preview is experimental: shown only when EXPERIMENTAL_FEATURES is enabled
+  const mobilePreviewAvailable = experimentalFeatures && !!ENV.mobilePreviewUrl
+
+  const openDesktopPreview = () => dispatch(RecordActions.createRecord({ preview: true }))
 
   return (
     <div className="survey-form-header__actions">
       <Button
+        className={mobilePreviewAvailable ? 'preview-btn-with-menu' : undefined}
         disabled={surveyIsDirty}
         iconClassName="icon-eye icon-12px"
         label="surveyForm:formEditActions.preview"
-        onClick={() => dispatch(RecordActions.createRecord({ preview: true }))}
+        onClick={openDesktopPreview}
         size="small"
         testId={TestId.surveyForm.previewOpenBtn}
         variant="text"
       />
+      {mobilePreviewAvailable && (
+        // the main button opens the desktop preview, the menu lets choose the kind of preview
+        <ButtonMenu
+          items={[
+            {
+              key: 'desktop',
+              disabled: surveyIsDirty,
+              iconClassName: 'icon-display icon-12px',
+              label: 'surveyForm:formEditActions.previewDesktop',
+              onClick: openDesktopPreview,
+            },
+            {
+              key: 'mobile',
+              iconClassName: 'icon-mobile icon-12px',
+              label: 'surveyForm:formEditActions.previewMobile',
+              onClick: () => setMobilePreviewOpen(true),
+            },
+          ]}
+          size="small"
+          title="surveyForm:formEditActions.previewOptions"
+        />
+      )}
+      {mobilePreviewOpen && <MobilePreviewPanel onClose={() => setMobilePreviewOpen(false)} />}
     </div>
   )
 }

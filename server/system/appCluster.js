@@ -72,6 +72,8 @@ export const run = async () => {
   app.use('/img', express.static(imgDir))
   const geoDir = `${arenaRoot}/web-resources/geo`
   app.use('/geo', express.static(geoDir))
+  // Arena Mobile web preview (yarn mobile-preview:download)
+  app.use('/mobile-preview', express.static(`${arenaRoot}/mobile-preview`))
   app.use('/noHeader{/*path}', express.static(dist))
 
   // ====== APIs

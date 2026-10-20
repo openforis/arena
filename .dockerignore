@@ -1,5 +1,7 @@
 .git
 node_modules
+# downloaded again by the build (yarn mobile-preview:download)
+mobile-preview
 # local Python virtualenvs (e.g. a scratch venv for prototyping a translation
 # helper) have no relation to this Node.js project, but were still getting
 # copied into the image via `COPY . /app/` when present on the build machine
