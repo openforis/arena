@@ -25,6 +25,7 @@ import {
 const DataQuery = () => {
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
+  const chartType = DataExplorerSelectors.useChartType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const recordEditModalProps = DataExplorerSelectors.useRecordEditModalProps()
@@ -40,9 +41,13 @@ const DataQuery = () => {
     offset,
     setLimit,
     setOffset,
-    setRandomize,
     setData,
-  } = useDataQuery({ query })
+  } = useDataQuery({
+    query,
+    // scatter chart (available only in raw mode) is used to find outliers: fetch a random sample including them
+    randomize:
+      displayType === DataExplorerState.displayTypes.chart && chartType === DataExplorerState.chartTypes.scatter,
+  })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
@@ -65,7 +70,6 @@ const DataQuery = () => {
             onNodeDefLabelTypeChange={toggleLabelFunction}
             setQueryLimit={setLimit}
             setQueryOffset={setOffset}
-            setQueryRandomize={setRandomize}
           />
         </div>
 

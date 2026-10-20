@@ -61,7 +61,6 @@ const ButtonBar = (props) => {
     onNodeDefLabelTypeChange,
     setQueryLimit,
     setQueryOffset,
-    setQueryRandomize,
   } = props
 
   const dispatch = useDispatch()
@@ -133,11 +132,7 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      <ButtonGroupDisplayType
-        setQueryLimit={setQueryLimit}
-        setQueryOffset={setQueryOffset}
-        setQueryRandomize={setQueryRandomize}
-      />
+      <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
     </div>
   )
 }
@@ -150,7 +145,6 @@ ButtonBar.propTypes = {
   onNodeDefLabelTypeChange: PropTypes.func.isRequired,
   setQueryLimit: PropTypes.func.isRequired,
   setQueryOffset: PropTypes.func.isRequired,
-  setQueryRandomize: PropTypes.func.isRequired,
 }
 
 export default ButtonBar

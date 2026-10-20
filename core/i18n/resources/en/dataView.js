@@ -8,7 +8,8 @@ export default {
 expecting maximum {{maxItems}} items.
 Please refine your query (e.g. adding a filter) to reduce the number of items.
 `,
-      showingRandomSample: 'Showing a random sample of {{sampleSize}} out of {{totalCount}} items.',
+      showingRandomSample:
+        'Showing a random sample of {{sampleSize}} out of {{totalCount}} items (outliers are always included).',
     },
     type: {
       area: 'Area chart',

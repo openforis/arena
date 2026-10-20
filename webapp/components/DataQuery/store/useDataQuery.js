@@ -11,14 +11,13 @@ const defaults = {
   [Query.displayTypes.table]: { limit: 15, offset: 0 },
 }
 
-export const useDataQuery = ({ query, limitData = true }) => {
+export const useDataQuery = ({ query, limitData = true, randomize = false }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
   const initialLimit = limitData ? defaultValues.limit : null
   const [data, setData] = useState(null)
   const [count, setCount] = useState(null)
   const [limit, setLimit] = useState(initialLimit)
   const [offset, setOffset] = useState(defaultValues.offset)
-  const [randomize, setRandomize] = useState(false)
 
   const hasSelection = Query.hasSelection(query)
   const mode = Query.getMode(query)
@@ -79,10 +78,8 @@ export const useDataQuery = ({ query, limitData = true }) => {
     dataLoadingError,
     limit,
     offset,
-    randomize,
     setLimit,
     setOffset,
-    setRandomize,
     setData: (dataUpdated) => setData({ ...data, data: dataUpdated }),
   }
 }

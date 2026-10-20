@@ -8,6 +8,8 @@ export default {
 最大{{maxItems}}項目までです。
 フィルターの追加など、クエリを絞り込んで項目数を減らしてください。
 `,
+      showingRandomSample:
+        '全{{totalCount}}項目のうち、{{sampleSize}}項目のランダムサンプルを表示しています（外れ値は常に含まれます）。',
     },
     type: {
       area: '面グラフ',

@@ -206,6 +206,83 @@ const _dbTransformCallbackSelect =
     return rowUpdated
   }
 
+// values farther than this many interquartile ranges from the quartiles are outliers (Tukey's fences)
+const outlierIqrFactor = 1.5
+
+const _isNumericNodeDef = (nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
+
+const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }) =>
+  nodeDefCols
+    .filter(_isNumericNodeDef)
+    // same X and Y axes used by the scatter chart: first 2 numeric attributes
+    .slice(0, 2)
+    .map((nodeDefCol) => {
+      const { name } = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+      return `sample_base.${DbUtils.asName(name)}::double precision`
+    })
+
+const _getSampleOutlierExpressions = ({ values }) => {
+  const conditions = []
+  const scores = []
+  for (const [idx, value] of values.entries()) {
+    const q1 = `q1_${idx}`
+    const q3 = `q3_${idx}`
+    const iqr = `(${q3} - ${q1})`
+    conditions.push(
+      `${value} < ${q1} - ${outlierIqrFactor} * ${iqr}`,
+      `${value} > ${q3} + ${outlierIqrFactor} * ${iqr}`
+    )
+    // distance from the nearest quartile, in interquartile ranges
+    scores.push(`GREATEST(${q1} - ${value}, ${value} - ${q3}) / NULLIF(${iqr}, 0)`)
+  }
+  return {
+    condition: `COALESCE(${conditions.join(' OR ')}, FALSE)`,
+    score: `COALESCE(GREATEST(${scores.join(', ')}), 0)`,
+  }
+}
+
+/**
+ * Wraps the specified select into a query returning a random sample of rows (up to the limit), always including
+ * (first, most extreme first) the outliers of the first 2 numeric attributes, so they can be spotted in the scatter chart.
+ * Outliers are values outside the Tukey's fences of X, Y or of the residuals of the X/Y linear regression
+ * (points far from the trend line, even if X and Y are in range).
+ * @param {!object} params - The parameters.
+ * @param {!string} params.baseSelect - The select query (without sort, offset and limit) to sample.
+ * @param {!ViewDataNodeDef} params.viewDataNodeDef - The data view of the queried entity.
+ * @param {!Array} params.nodeDefCols - The selected attribute definitions.
+ * @returns {string} - The sampling select query (it uses the "limit" parameter).
+ */
+const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefCols }) => {
+  const columns = _getSampleNumericColumns({ viewDataNodeDef, nodeDefCols })
+  if (columns.length === 0) {
+    return `SELECT * FROM (${baseSelect}) AS sample_base ORDER BY random() LIMIT $/limit/`
+  }
+  const values = [...columns]
+  const ctes = [`sample_base AS (${baseSelect})`]
+  const joins = ['sample_base']
+  if (columns.length === 2) {
+    const [x, y] = columns
+    ctes.push(
+      `sample_regr AS (SELECT regr_slope(${y}, ${x}) AS slope, regr_intercept(${y}, ${x}) AS intercept FROM sample_base)`
+    )
+    joins.push('sample_regr')
+    values.push(`(${y} - (intercept + slope * ${x}))`)
+  }
+  const statsFields = values.flatMap((value, idx) => [
+    `percentile_cont(0.25) WITHIN GROUP (ORDER BY ${value}) AS q1_${idx}`,
+    `percentile_cont(0.75) WITHIN GROUP (ORDER BY ${value}) AS q3_${idx}`,
+  ])
+  ctes.push(`sample_stats AS (SELECT ${statsFields.join(', ')} FROM ${joins.join(' CROSS JOIN ')})`)
+  joins.push('sample_stats')
+
+  const { condition, score } = _getSampleOutlierExpressions({ values })
+  return `WITH ${ctes.join(', ')}
+    SELECT sample_base.*
+    FROM ${joins.join(' CROSS JOIN ')}
+    ORDER BY CASE WHEN ${condition} THEN ${score} END DESC NULLS LAST, random()
+    LIMIT $/limit/`
+}
+
 const _createViewDataQuery = (params) => {
   const {
     survey,
@@ -277,17 +354,18 @@ const _createViewDataQuery = (params) => {
     queryBuilder.addParams(filterParams)
   }
 
+  if (randomize && !A.isNil(limit)) {
+    // random sampling: the requested sort and offset are ignored
+    const select = _createSampleWithOutliersSelect({ baseSelect: queryBuilder.build(), viewDataNodeDef, nodeDefCols })
+    return { select, selectFields: queryBuilder.selectFields, queryParams: { ...queryBuilder.params, limit } }
+  }
+
   // SORT clause
-  if (randomize) {
-    // random sampling: ignore the requested sort, order randomly so a LIMIT below returns a representative sample
-    queryBuilder.orderBy('random()')
-  } else {
-    const sort = Query.getSort(query)
-    const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-    if (!A.isEmpty(sortParams)) {
-      queryBuilder.orderBy(sortClause)
-      queryBuilder.addParams(sortParams)
-    }
+  const sort = Query.getSort(query)
+  const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
+  if (!A.isEmpty(sortParams)) {
+    queryBuilder.orderBy(sortClause)
+    queryBuilder.addParams(sortParams)
   }
   if (!A.isNil(limit)) {
     queryBuilder.limit('$/limit/')
@@ -317,7 +395,7 @@ const _createViewDataQuery = (params) => {
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
- * @param {boolean} [params.randomize] - Whether to order rows randomly instead of by the query sort, so that a limited result is a representative sample rather than the first N rows. Ignored when no limit is specified.
+ * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes. Ignored when no limit is specified.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
