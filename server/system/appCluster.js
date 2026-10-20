@@ -94,12 +94,9 @@ export const run = async () => {
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
 
-  // Migrate surveys data in the background, without blocking server startup;
-  // enqueued after checkFilesStorage (above) completes, so the two do not concurrently move the same survey files
+  // system admin user needed to run the surveys data migration job (enqueued below)
   const adminUser = await UserManager.fetchUserByEmail(ProcessUtils.ENV.adminEmail)
-  if (adminUser) {
-    JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
-  } else {
+  if (!adminUser) {
     const message = `cannot start surveys data migration job: system admin user not found for ADMIN_EMAIL "${ProcessUtils.ENV.adminEmail}"; check that ADMIN_EMAIL is correctly configured and that a matching system admin user exists`
     logger.error(message)
     throw new Error(message)
@@ -113,12 +110,19 @@ export const run = async () => {
   await ArenaServer.start(arenaApp)
 
   // ====== Schedulers
+  // initialized first: their startup run deletes surveys (temporary ones and the untouched ones of users with expired
+  // invitation) that the surveys data migration job would otherwise migrate needlessly (or while they are being deleted)
+  await TemporarySurveysCleanup.init()
+  await ExpiredUserInvitationsCleanup.init()
+
+  // Migrate surveys data in the background, without blocking server startup;
+  // enqueued after checkFilesStorage (above) completes, so the two do not concurrently move the same survey files
+  JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
+
   await TempFilesCleanup.init()
   await UserResetPasswordCleanup.init()
-  await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
-  await ExpiredUserInvitationsCleanup.init()
   await UserTempAuthTokensCleanup.init()
   await StaleJobsCleanup.init()
 
