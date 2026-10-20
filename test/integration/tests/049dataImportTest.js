@@ -20,4 +20,6 @@ describe.each(fileFormats)('Data import (%s)', (fileFormat) => {
     DataImportTest.dataImportRecordNotFoundTest(params()))
 
   test('Dry run does not persist any change', async () => DataImportTest.dataImportDryRunTest(params()))
+
+  test('Dry run reports missing key columns', async () => DataImportTest.dataImportDryRunMissingKeyColumnTest(params()))
 })

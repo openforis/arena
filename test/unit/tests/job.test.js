@@ -1,5 +1,6 @@
 import { db } from '@server/db/db'
 import Job from '@server/job/job'
+import { jobToJSON } from '@server/job/jobUtils'
 
 class TestJob extends Job {
   async execute() {
@@ -125,5 +126,30 @@ describe('Job execute default', () => {
     await job.start()
 
     expect(job.isSucceeded()).toBe(true)
+  })
+})
+
+// a job can succeed with errors (e.g. data import validation): they must reach the client
+describe('jobToJSON errors', () => {
+  test('includes the errors of a succeeded job', async () => {
+    class JobWithErrors extends Job {
+      async execute() {
+        this.addError({ error: { valid: false, errors: [{ key: 'some.error' }] } })
+      }
+    }
+    const job = new JobWithErrors('JobWithErrors')
+
+    await job.start()
+
+    expect(job.isSucceeded()).toBe(true)
+    expect(jobToJSON(job).errors).toEqual(job.errors)
+  })
+
+  test('errors are null when there are none', async () => {
+    const job = new TestJob('TestJob')
+
+    await job.start()
+
+    expect(jobToJSON(job).errors).toBeNull()
   })
 })

@@ -288,3 +288,22 @@ export const dataImportDryRunTest = async ({ user, fileFormat }) => {
   // validation only: nothing has been persisted
   expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({})
 }
+
+export const dataImportDryRunMissingKeyColumnTest = async ({ user, fileFormat }) => {
+  const survey = await _buildSurvey({ user })
+
+  // cluster_id (root entity key) column is missing
+  const job = await _runImport({
+    user,
+    survey,
+    fileFormat,
+    entityName: clusterName,
+    rows: [[plotsCountName], [1]],
+    insertNewRecords: true,
+    dryRun: true,
+    JobClass: DataImportValidationJob,
+  })
+  const errors = Object.values(job.errors)
+  expect(errors.length).toBeGreaterThan(0)
+  expect(JSON.stringify(errors)).toContain('validationErrors:dataImport.missingRequiredHeaders')
+}
