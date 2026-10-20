@@ -78,6 +78,7 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including outliers (used by the scatter chart). Applied only in raw mode.
  * @param {Stream.Writable} [params.outputStream] - The output to be used to stream the data (if specified).
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
@@ -89,6 +90,7 @@ export const fetchViewData = async (params) => {
     query,
     offset = 0,
     limit = null,
+    randomize = false,
     columnNodeDefs = false,
     outputStream = null,
     addCycle = false,
@@ -123,6 +125,8 @@ export const fetchViewData = async (params) => {
         recordOwnerUuid,
         offset,
         limit,
+        // sampling is meant only for the scatter chart (raw mode)
+        randomize: randomize && Query.isModeRaw(parsedQuery),
         outputStream,
         addCycle,
         ...options,

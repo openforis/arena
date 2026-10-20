@@ -13,6 +13,8 @@ const columnSet = {
   recordCycle: TableDataNodeDef.columnSet.recordCycle,
   recordOwnerUuid: TableDataNodeDef.columnSet.recordOwnerUuid,
   keys: '_keys',
+  // computed only when sampling rows: whether the row is an outlier
+  sampleOutlier: '_sample_outlier',
 }
 
 /**

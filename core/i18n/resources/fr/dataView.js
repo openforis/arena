@@ -8,6 +8,12 @@ export default {
 maximum {{maxItems}} éléments attendus.
 Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le nombre d'éléments.
 `,
+      sampleRandomOnly:
+        "Affichage d'un échantillon aléatoire de {{sampleSize}} éléments sur {{totalCount}} (aucune valeur aberrante trouvée).",
+      sampleWithOutliers:
+        'Affichage de {{sampleSize}} éléments sur {{totalCount}} : {{outliersCount}} valeurs aberrantes et un échantillon aléatoire de {{randomCount}} des autres éléments.',
+      sampleOutliersOnly:
+        'Affichage des {{sampleSize}} valeurs aberrantes les plus extrêmes sur {{totalCount}} éléments.',
     },
     type: {
       area: 'Graphique en aires',

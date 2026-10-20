@@ -42,13 +42,17 @@ export const useFetchData = ({ setData }) => {
 
   return {
     fetchData: useCallback(
-      async ({ offset, limit, query }) => {
+      async ({ offset, limit, randomize, query }) => {
         // abort previous (now outdated) request, if any
         const abortController = startRequest()
         const { signal } = abortController
         setData((dataPrev) => ({ ...dataPrev, loading: true, loaded: false, error: false }))
         try {
-          const { data } = await axios.post(getUrl({ surveyId, query }), { cycle, query, limit, offset }, { signal })
+          const { data } = await axios.post(
+            getUrl({ surveyId, query }),
+            { cycle, query, limit, offset, randomize },
+            { signal }
+          )
           if (!signal.aborted) setData({ data, loading: false, loaded: true })
         } catch (e) {
           if (!signal.aborted && !axios.isCancel(e)) setData({ data: null, loading: false, loaded: true, error: true })

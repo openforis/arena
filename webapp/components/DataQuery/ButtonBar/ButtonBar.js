@@ -54,7 +54,6 @@ const uiModeByQueryMode = {
 
 const ButtonBar = (props) => {
   const {
-    dataCount,
     dataEmpty,
     dataLoaded,
     dataLoading,
@@ -133,13 +132,12 @@ const ButtonBar = (props) => {
 
       <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
 
-      <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
     </div>
   )
 }
 
 ButtonBar.propTypes = {
-  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,

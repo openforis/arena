@@ -11,7 +11,7 @@ const defaults = {
   [Query.displayTypes.table]: { limit: 15, offset: 0 },
 }
 
-export const useDataQuery = ({ query, limitData = true }) => {
+export const useDataQuery = ({ query, limitData = true, randomize = false }) => {
   const defaultValues = defaults[Query.getDisplayType(query)]
   const initialLimit = limitData ? defaultValues.limit : null
   const [data, setData] = useState(null)
@@ -45,12 +45,13 @@ export const useDataQuery = ({ query, limitData = true }) => {
 
   // on mount or on update entityDefUuid, offset, attributeDefUuids, dimensions, measures, sort or filter: fetch or reset data
   useEffect(() => {
-    if (hasSelection) Actions.fetchData({ offset, limit, query })
+    if (hasSelection) Actions.fetchData({ offset, limit, randomize, query })
     else Actions.resetData()
   }, [
     entityDefUuid,
     limit,
     offset,
+    randomize,
     attributeDefUuids,
     dimensions,
     hasSelection,

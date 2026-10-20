@@ -28,10 +28,10 @@ export const init = (app) => {
 
   app.post('/surveyRdb/:surveyId/:nodeDefUuidTable/query', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, cycle, query, offset, limit } = Request.getParams(req)
+      const { surveyId, cycle, query, offset, limit, randomize } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      const rows = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, offset, limit })
+      const rows = await SurveyRdbService.fetchViewData({ user, surveyId, cycle, query, offset, limit, randomize })
 
       res.json(rows)
     } catch (error) {

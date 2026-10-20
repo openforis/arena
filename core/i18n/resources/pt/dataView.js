@@ -7,6 +7,11 @@ export default {
       tooManyItemsToShowChart: `Muitos itens para mostrar o gráfico;
 esperando o máximo de itens {{maxItems}}.
 Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número de itens.`,
+      sampleRandomOnly:
+        'Exibindo uma amostra aleatória de {{sampleSize}} de {{totalCount}} itens (nenhum valor atípico encontrado).',
+      sampleWithOutliers:
+        'Exibindo {{sampleSize}} de {{totalCount}} itens: {{outliersCount}} valores atípicos e uma amostra aleatória de {{randomCount}} dos demais itens.',
+      sampleOutliersOnly: 'Exibindo os {{sampleSize}} valores atípicos mais extremos de {{totalCount}} itens.',
     },
     type: {
       area: 'Gráfico de área',

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -6,7 +6,6 @@ import { Query } from '@common/model/query'
 
 import { ButtonGroup } from '@webapp/components/form'
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
-import { NotificationActions } from '@webapp/store/ui'
 
 const { displayTypes, chartTypes, isChartTypeAvailable } = DataExplorerState
 
@@ -36,9 +35,17 @@ const getChartTypeItemByKey = (chartType) => ({
 })
 
 const chartMaxItems = 5000
+const tableDefaultLimit = 15
+
+const getQueryLimit = ({ displayType, chartType }) => {
+  if (displayType !== displayTypes.chart) return tableDefaultLimit
+  // scatter chart (raw mode) fetches a bounded random sample of rows (outliers always included);
+  // aggregate charts fetch all the aggregated rows
+  return chartType === chartTypes.scatter ? chartMaxItems : null
+}
 
 export const ButtonGroupDisplayType = (props) => {
-  const { dataCount, setQueryLimit, setQueryOffset } = props
+  const { setQueryLimit, setQueryOffset } = props
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
   const chartType = DataExplorerSelectors.useChartType()
@@ -50,26 +57,25 @@ export const ButtonGroupDisplayType = (props) => {
     return availableTypes.map(getChartTypeItemByKey)
   }, [queryMode])
 
+  // display or chart type can change also when changing the query mode or resetting the entity
+  useEffect(() => {
+    setQueryLimit(getQueryLimit({ displayType, chartType }))
+  }, [chartType, displayType, setQueryLimit])
+
+  const onDisplayTypeChange = useCallback(
+    (type) => {
+      dispatch(DataExplorerActions.setDisplayType(type))
+      setQueryOffset(0)
+    },
+    [dispatch, setQueryOffset]
+  )
+
   return (
     <div className="display-type-button-group-wrapper">
       <ButtonGroup
         groupName="displayType"
         selectedItemKey={displayType}
-        onChange={(type) => {
-          if (type === displayTypes.chart && dataCount > chartMaxItems) {
-            dispatch(
-              NotificationActions.showNotification({
-                key: 'dataView:charts.warning.tooManyItemsToShowChart',
-                params: { maxItems: chartMaxItems },
-              })
-            )
-            return
-          }
-          dispatch(DataExplorerActions.setDisplayType(type))
-          setQueryOffset(0)
-          const limitUpdated = type === displayTypes.chart ? null : 15
-          setQueryLimit(limitUpdated)
-        }}
+        onChange={onDisplayTypeChange}
         items={displayTypeItems}
       />
       {displayType === displayTypes.chart && (
@@ -85,7 +91,6 @@ export const ButtonGroupDisplayType = (props) => {
 }
 
 ButtonGroupDisplayType.propTypes = {
-  dataCount: PropTypes.number,
   setQueryLimit: PropTypes.func.isRequired,
   setQueryOffset: PropTypes.func.isRequired,
 }

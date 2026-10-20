@@ -4,6 +4,7 @@ import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
 
+import { ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -43,8 +44,17 @@ const countDistinctValues = ({ data, columnName }) => {
   return Object.keys(valuesFound).length
 }
 
+const getSampleNoticeMessage = ({ i18n, data, dataCount }) => {
+  const sampleSize = data.length
+  const outliersCount = data.filter((item) => item[ViewDataNodeDef.columnSet.sampleOutlier]).length
+  const params = { sampleSize, totalCount: dataCount, outliersCount, randomCount: sampleSize - outliersCount }
+  if (outliersCount === 0) return i18n.t('dataView:charts.warning.sampleRandomOnly', params)
+  if (outliersCount >= sampleSize) return i18n.t('dataView:charts.warning.sampleOutliersOnly', params)
+  return i18n.t('dataView:charts.warning.sampleWithOutliers', params)
+}
+
 export const DataQueryScatterChart = (props) => {
-  const { data, nodeDefLabelType } = props
+  const { data, dataCount, nodeDefLabelType } = props
 
   const dispatch = useDispatch()
   const i18n = useI18n()
@@ -129,26 +139,32 @@ export const DataQueryScatterChart = (props) => {
   const dataSet = Object.entries(chartDataGrouped).map(([name, data], index) => ({ name, data, fill: colors[index] }))
 
   return (
-    <ScatterChart
-      dataSet={dataSet}
-      onClick={onClick}
-      renderTooltip={
-        <DataQueryScatterChartTooltip
-          categoricalAttributeDefField={categoricalAttributeDefColumnName}
-          categoricalAttributeDefName={categoricalAttributeDefLabel}
-          xAxisDataKey={xAxisDataKey}
-          xAxisName={xAxisName}
-          yAxisDataKey={yAxisDataKey}
-          yAxisName={yAxisName}
-        />
-      }
-      xAxisProps={{ name: xAxisName, dataKey: xAxisDataKey }}
-      yAxisProps={{ name: yAxisName, dataKey: yAxisDataKey }}
-    />
+    <>
+      {typeof dataCount === 'number' && dataCount > data.length && (
+        <div className="data-query-chart-sample-notice">{getSampleNoticeMessage({ i18n, data, dataCount })}</div>
+      )}
+      <ScatterChart
+        dataSet={dataSet}
+        onClick={onClick}
+        renderTooltip={
+          <DataQueryScatterChartTooltip
+            categoricalAttributeDefField={categoricalAttributeDefColumnName}
+            categoricalAttributeDefName={categoricalAttributeDefLabel}
+            xAxisDataKey={xAxisDataKey}
+            xAxisName={xAxisName}
+            yAxisDataKey={yAxisDataKey}
+            yAxisName={yAxisName}
+          />
+        }
+        xAxisProps={{ name: xAxisName, dataKey: xAxisDataKey }}
+        yAxisProps={{ name: yAxisName, dataKey: yAxisDataKey }}
+      />
+    </>
   )
 }
 
 DataQueryScatterChart.propTypes = {
   data: PropTypes.array.isRequired,
+  dataCount: PropTypes.number,
   nodeDefLabelType: PropTypes.string,
 }

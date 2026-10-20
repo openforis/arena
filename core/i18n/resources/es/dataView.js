@@ -6,6 +6,11 @@ export default {
       selectAtLeast2NumericAttributes: 'Por favor, seleccione 2 atributos numéricos para mostrar el gráfico',
       tooManyItemsToShowChart:
         'Demasiados elementos para mostrar el gráfico;\nse esperan un máximo de {{maxItems}} elementos.\nPor favor, refine su consulta (por ejemplo, añadiendo un filtro) para reducir el número de elementos.\n',
+      sampleRandomOnly:
+        'Mostrando una muestra aleatoria de {{sampleSize}} de {{totalCount}} elementos (no se encontraron valores atípicos).',
+      sampleWithOutliers:
+        'Mostrando {{sampleSize}} de {{totalCount}} elementos: {{outliersCount}} valores atípicos y una muestra aleatoria de {{randomCount}} de los demás elementos.',
+      sampleOutliersOnly: 'Mostrando los {{sampleSize}} valores atípicos más extremos de {{totalCount}} elementos.',
     },
     type: {
       area: 'Gráfico de área',
