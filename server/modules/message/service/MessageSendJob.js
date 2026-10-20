@@ -18,6 +18,17 @@ const getMessageService = () => {
 export default class MessageSendJob extends Job {
   constructor(params) {
     super(MessageSendJob.type, params)
+    this.canceling = false
+  }
+
+  async cancel(options) {
+    // cancel requested flag in JobBase is private: track it here to stop sending emails
+    this.canceling = true
+    return super.cancel(options)
+  }
+
+  isCancelingOrNotRunning() {
+    return this.canceling || !this.isRunning()
   }
 
   async execute() {
@@ -38,7 +49,7 @@ export default class MessageSendJob extends Job {
     if (notificationTypes.includes(MessageNotificationType.Email)) {
       await this.notifyUsersByEmail()
     }
-    if (this.isCancelRequestedOrNotRunning()) {
+    if (this.isCancelingOrNotRunning()) {
       this.logDebug(`job canceled: message ${messageUuid} status not updated`)
       return
     }
@@ -63,7 +74,7 @@ export default class MessageSendJob extends Job {
 
     this.total = usersFiltered.length
     // notify the total right away (otherwise it's notified only when the first email has been sent)
-    this.notifyProgress()
+    this.incrementProcessedItems(0)
 
     const subject = Messages.getSubject(message)
     this.logDebug(`sending ${this.total} emails (out of ${users.length} accepted users) for message ${subject}`)
@@ -72,7 +83,7 @@ export default class MessageSendJob extends Job {
     const messageWithBodyHtml = Messages.assocBody(bodyHtml)(message)
 
     for (const user of usersFiltered) {
-      if (this.isCancelRequestedOrNotRunning()) {
+      if (this.isCancelingOrNotRunning()) {
         this.logDebug(`job canceled after sending ${this.processed} of ${this.total} emails`)
         return
       }
