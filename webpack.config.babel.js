@@ -1,5 +1,6 @@
 import 'dotenv/config'
 import path from 'node:path'
+import fs from 'node:fs'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -38,6 +39,11 @@ class CleanUpStatsPlugin {
   }
 }
 
+// served by the server when downloaded (yarn mobile-preview:download)
+const mobilePreviewUrlDefault = fs.existsSync(path.resolve(__dirname, 'mobile-preview', 'index.html'))
+  ? '/mobile-preview/'
+  : undefined
+
 // ==== init plugins
 const environment = process.env.NODE_ENV ?? 'development'
 
@@ -62,6 +68,7 @@ const plugins = [
         RECAPTCHA_ENABLED: JSON.stringify(process.env.RECAPTCHA_ENABLED),
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
+        MOBILE_PREVIEW_URL: JSON.stringify(process.env.MOBILE_PREVIEW_URL ?? mobilePreviewUrlDefault),
         EMAIL_FROM_RESOLVED: JSON.stringify(
           process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || process.env.EMAIL_AUTH_USER
         ),
@@ -136,7 +143,7 @@ const webPackConfig = {
     proxy: [
       {
         // Proxy all server-served routes:
-        context: ['/img', '/geo', '/api', '/auth', '/socket.io'],
+        context: ['/img', '/geo', '/mobile-preview', '/api', '/auth', '/socket.io'],
         target: 'http://localhost:9090',
       },
       {

@@ -47,6 +47,30 @@ Continue?`,
   movePageDown: 'Move page down',
   formEditActions: {
     preview: 'Preview',
+    previewDesktop: 'Preview (desktop)',
+    previewMobile: 'Preview (mobile)',
+    previewOptions: 'Preview options',
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Phone',
+      tablet: 'Tablet',
+    },
+    error: 'Error loading the mobile preview: {{error}}',
+    differences: `**Differences from Arena Mobile on a real device**
+- **Date and time**: typed in a text field (DD/MM/YYYY, HH:mm) instead of the device date/time pickers
+- **Maps**: not available (map buttons show a placeholder, no offline or PDF maps)
+- **Location**: taken from the browser (usually less precise than the device GPS); no external GPS receivers
+- **Photos and files**: selected from the computer; camera capture and photo location (EXIF) not available
+- **Keyboard and gestures**: physical keyboard and mouse instead of the on-screen keyboard and swipes
+- **Data**: kept in memory only, lost when reloading; no records list, sync or export`,
+    note: 'Approximation of Arena Mobile running in the browser with the draft survey.',
+    orientation: {
+      landscape: 'Landscape',
+      portrait: 'Portrait',
+    },
+    reload: 'Reload',
+    title: 'Mobile preview (experimental)',
   },
   formEntryActions: {
     confirmDemote: 'Are sure you want to demote this record to {{name}}?',
