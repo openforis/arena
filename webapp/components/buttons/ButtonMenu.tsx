@@ -11,6 +11,7 @@ export type ButtonMenuItem = {
   key: string
   className?: string
   content?: React.ReactNode
+  disabled?: boolean
   icon?: React.ReactNode
   iconClassName?: string
   label?: string
@@ -78,6 +79,7 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
           <MenuItem
             key={item.key}
             className="button-menu__item"
+            disabled={item.disabled}
             onClick={onItemClick(item)}
             selected={item.key === selectedItemKey}
           >

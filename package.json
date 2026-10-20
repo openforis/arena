@@ -13,8 +13,9 @@
     "build:server:prod": "cross-env NODE_ENV=production webpack  --config webpack.config.server.babel.js",
     "build:watch": "npm run build-dev --watch",
     "client:dev-server": "NODE_ENV=development webpack serve",
-    "build": "run-s clean build:server:prod build-prod",
+    "build": "run-s clean mobile-preview:download build:server:prod build-prod",
     "clean": "rimraf dist ./node_modules/.cache/",
+    "mobile-preview:download": "node --experimental-strip-types scripts/download-mobile-preview.ts",
     "dev:server": "npm run build:server:dev && npm-run-all --parallel dev:server:nodemon watch:server",
     "dev:server:nodemon": "cross-env NODE_ENV=development node-dev --no-notify --inspect -- dist/server.js",
     "build:test:integration": "webpack --config test/integration/config/webpack.config.js",
@@ -269,5 +270,8 @@
   "lint-staged": {
     "{common,core,server,test,webapp}/**/*.{js,jsx,ts,tsx}": "eslint --cache --fix"
   },
-  "packageManager": "yarn@4.18.1"
+  "packageManager": "yarn@4.18.1",
+  "arenaMobileWebPreview": {
+    "version": "v2.10.0"
+  }
 }

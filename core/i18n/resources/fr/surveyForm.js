@@ -47,6 +47,30 @@ Continuer ?`,
   movePageDown: 'Descendre la page',
   formEditActions: {
     preview: 'Aperçu',
+    previewDesktop: 'Aperçu (ordinateur)',
+    previewMobile: 'Aperçu (mobile)',
+    previewOptions: "Options d'aperçu",
+  },
+  mobilePreview: {
+    device: {
+      phone: 'Téléphone',
+      tablet: 'Tablette',
+    },
+    error: "Erreur lors du chargement de l'aperçu mobile : {{error}}",
+    differences: `**Différences avec Arena Mobile sur un appareil réel**
+- **Date et heure** : saisies dans un champ texte (DD/MM/YYYY, HH:mm) au lieu des sélecteurs de date/heure de l'appareil
+- **Cartes** : non disponibles (les boutons de carte affichent un espace réservé ; pas de cartes hors ligne ni PDF)
+- **Position** : fournie par le navigateur (généralement moins précise que le GPS de l'appareil) ; pas de récepteurs GPS externes
+- **Photos et fichiers** : sélectionnés depuis l'ordinateur ; pas de prise de vue avec l'appareil photo ni de position de la photo (EXIF)
+- **Clavier et gestes** : clavier physique et souris au lieu du clavier à l'écran et des balayages
+- **Données** : conservées uniquement en mémoire, perdues au rechargement ; pas de liste des enregistrements, de synchronisation ni d'export`,
+    note: "Approximation d'Arena Mobile exécuté dans le navigateur avec l'enquête en brouillon.",
+    orientation: {
+      landscape: 'Paysage',
+      portrait: 'Portrait',
+    },
+    reload: 'Recharger',
+    title: 'Aperçu mobile (expérimental)',
   },
   formEntryActions: {
     confirmDemote: 'Êtes-vous sûr(e) de vouloir rétrograder cet enregistrement vers {{name}} ?',
