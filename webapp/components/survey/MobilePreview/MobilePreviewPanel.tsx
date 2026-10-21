@@ -9,6 +9,7 @@ import { Button, ButtonIconInfo } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { useOnResize } from '@webapp/components/hooks'
 import PanelRight from '@webapp/components/PanelRight'
+import { Spinner } from '@webapp/components/Spinner'
 import * as API from '@webapp/service/api'
 import { useSurveyCycleKey, useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
@@ -113,6 +114,9 @@ export const MobilePreviewPanel = (props: Props) => {
     postToPreview({ type: MobilePreviewMessageType.lang, lang })
   }, [lang, postToPreview])
 
+  // the preview app is still loading in the iframe or the survey is being fetched
+  const preparing = !error && (readyCount === 0 || loading)
+
   const frameSize = getFrameSize({ device, orientation })
 
   // the device is scaled down to fit the panel (no scrolling); the iframe keeps the real device size (same layout)
@@ -181,10 +185,19 @@ export const MobilePreviewPanel = (props: Props) => {
         </div>
       )}
       <div className="mobile-preview-panel__stage" ref={stageRef}>
-        <div style={{ width: outerWidth * scale, height: outerHeight * scale }}>
+        <div
+          className="mobile-preview-panel__device-wrapper"
+          style={{ width: outerWidth * scale, height: outerHeight * scale }}
+        >
           <div className="mobile-preview-panel__device" style={{ ...frameSize, transform: `scale(${scale})` }}>
             <iframe ref={iframeRef} src={previewSrc} title={t('surveyForm:mobilePreview.title')} />
           </div>
+          {preparing && (
+            // outside the scaled device: the spinner keeps its size
+            <div className="mobile-preview-panel__loader">
+              <Spinner />
+            </div>
+          )}
         </div>
       </div>
     </PanelRight>

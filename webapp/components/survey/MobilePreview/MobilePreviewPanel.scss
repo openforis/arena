@@ -30,6 +30,18 @@
   justify-content: center;
 }
 
+.mobile-preview-panel__device-wrapper {
+  position: relative;
+}
+
+.mobile-preview-panel__loader {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
 .mobile-preview-panel__device {
   transform-origin: top left;
   box-sizing: content-box;
