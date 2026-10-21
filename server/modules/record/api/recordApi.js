@@ -21,6 +21,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { minMobileAppVersionRecordsDownload } from '@common/mobile'
 import * as RecordService from '../service/recordService'
 
 import {
@@ -35,6 +36,7 @@ import {
   requireRecordsEditPermission,
   requireRecordsExportPermission,
 } from '../../auth/authApiMiddleware'
+import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
   requireRecordMatchesUserGroupQualifiers,
   requireRecordsMatchUserGroupQualifiers,
@@ -289,10 +291,11 @@ export const init = (app) => {
     }
   })
 
-  // records export (only specified uuids)
+  // records export (only specified uuids), used by Arena Mobile to download records
   app.post(
     '/survey/:surveyId/records/export',
     requireRecordsExportPermission,
+    requireMobileAppMinVersion(minMobileAppVersionRecordsDownload),
     requireRecordsMatchUserGroupQualifiers,
     async (req, res, next) => {
       try {

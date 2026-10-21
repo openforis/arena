@@ -39,6 +39,8 @@ export default {
   invalidType: 'Invalid type {{type}}',
   jobCanceledOrErrorsFound: 'Job canceled or errors found; rollback transaction',
   jobOrphanedOnRestart: 'The job was interrupted by a server restart. Please try again.',
+  mobileAppVersionNotSupported:
+    'This version of Arena Mobile is not supported by the server: update it to version {{minVersion}} or later',
   paramIsRequired: 'Param {{param}} is required',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',

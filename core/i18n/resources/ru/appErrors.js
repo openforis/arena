@@ -51,6 +51,8 @@ export default {
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
   jobOrphanedOnRestart: 'Задача была прервана из-за перезапуска сервера. Повторите попытку.',
+  mobileAppVersionNotSupported:
+    'Эта версия Arena Mobile не поддерживается сервером: обновите её до версии {{minVersion}} или более поздней',
   paramIsRequired: 'Параметр {{param}} обязателен',
   unableToFindParent: 'Не удается найти родителя {{name}}',
   unableToFindNode: 'Не удается найти узел с именем {{name}}',

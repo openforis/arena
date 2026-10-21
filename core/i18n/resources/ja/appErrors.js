@@ -39,6 +39,8 @@ export default {
   invalidType: '無効な型です：{{type}}',
   jobCanceledOrErrorsFound: 'ジョブがキャンセルされたか、エラーが発生しました。トランザクションをロールバックします',
   jobOrphanedOnRestart: 'サーバーの再起動によりジョブが中断されました。もう一度お試しください。',
+  mobileAppVersionNotSupported:
+    'このバージョンのArena Mobileはサーバーでサポートされていません：バージョン{{minVersion}}以降に更新してください',
   paramIsRequired: 'パラメータ{{param}}は必須です',
   unableToFindParent: '{{name}}の親要素が見つかりません',
   unableToFindNode: '名前が{{name}}のノードが見つかりません',

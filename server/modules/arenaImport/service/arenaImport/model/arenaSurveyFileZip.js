@@ -13,6 +13,9 @@ const _getPartsCount = (zipFile, partFileNameGetter) => {
   return count
 }
 
+// Info
+export const getInfo = async (zipFile) => _getJson(zipFile, ExportFile.info)
+
 // Survey
 export const getSurvey = async (zipFile) => _getJson(zipFile, ExportFile.survey)
 

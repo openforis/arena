@@ -56,6 +56,8 @@ export default {
   invalidType: 'Type invalide {{type}}',
   jobCanceledOrErrorsFound: 'Tâche annulée ou erreurs trouvées ; annulation de la transaction',
   jobOrphanedOnRestart: 'La tâche a été interrompue par un redémarrage du serveur. Veuillez réessayer.',
+  mobileAppVersionNotSupported:
+    "Cette version d'Arena Mobile n'est pas prise en charge par le serveur : mettez-la à jour vers la version {{minVersion}} ou ultérieure",
   paramIsRequired: 'Le paramètre {{param}} est requis',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
