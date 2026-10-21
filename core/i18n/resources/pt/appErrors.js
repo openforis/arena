@@ -50,6 +50,8 @@ export default {
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',
   jobOrphanedOnRestart: 'O job foi interrompido por uma reinicialização do servidor. Tente novamente.',
+  mobileAppVersionNotSupported:
+    'Esta versão do Arena Mobile não é suportada pelo servidor: atualize-a para a versão {{minVersion}} ou posterior',
   paramIsRequired: 'O parâmetro {{param}} é obrigatório',
   unableToFindParent: 'Não foi possível encontrar o pai de {{name}}',
   unableToFindNode: 'Não foi possível encontrar nó com nome {{name}}',

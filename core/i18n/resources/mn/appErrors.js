@@ -51,6 +51,8 @@ export default {
   invalidType: 'Буруу төрөл {{type}}',
   jobCanceledOrErrorsFound: 'Ажил цуцлагдсан эсвэл алдаа олдсон; гүйлгээг буцаах',
   jobOrphanedOnRestart: 'Сервер дахин эхэлсний улмаас ажил тасалдлаа. Дахин оролдоно уу.',
+  mobileAppVersionNotSupported:
+    'Arena Mobile-ийн энэ хувилбарыг сервер дэмжихгүй байна: {{minVersion}} эсвэл түүнээс хойшхи хувилбар руу шинэчилнэ үү',
   paramIsRequired: 'Парам {{param}} шаардлагатай',
   unableToFindParent: '{{name}}-н эцгийг олж чадахгүй байна',
   unableToFindNode: '{{name}} нэртэй зангилааг олж чадахгүй байна',

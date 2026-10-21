@@ -1,5 +1,7 @@
 import { ApiEndpoint } from '@openforis/arena-server'
 
+import { minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload } from '@common/mobile'
+
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 import * as FileUtils from '@server/utils/file/fileUtils'
@@ -49,7 +51,7 @@ export const init = (app) => {
     try {
       const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
       const { version } = packageJson
-      res.json({ version })
+      res.json({ version, minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload })
     } catch (error) {
       next(error)
     }
