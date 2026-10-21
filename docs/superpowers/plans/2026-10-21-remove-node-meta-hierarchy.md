@@ -82,11 +82,10 @@ The whole record is in memory wherever the in-memory readers run, so ancestors c
 `parentUuid` (`Records.getParent`, `getAncestor`, `visitAncestorsAndSelf`, already allocation-free).
 The depth of a node equals the length of its node def `meta.h`, which can be used wherever the survey is available.
 
-### arena-core (major release)
+### arena-core (minor release, `feat:` PR title)
 
-arena-core, arena, arena-server and arena-mobile are migrated together, so nothing is deprecated: what is no longer
-used is deleted in the same change. The removals are breaking, so the PR title must trigger a major version bump
-(`BREAKING CHANGE`, see arena-core `CLAUDE.md`).
+arena-core, arena, arena-server and arena-mobile are migrated together and arena-core has no other consumers,
+so nothing is deprecated: what is no longer used is deleted in the same change, released as a minor version.
 
 1. Change / add record-aware getters (curried, record last, allocation-free where possible):
    - `Records.isDescendantOf(node, ancestor)(record)`: walks up from `node` via `parentUuid` (signature changes:
@@ -155,7 +154,7 @@ Code (after bumping arena-core; keep arena-core deduped with arena-server):
 
 ### arena-mobile
 
-1. Bump arena-core to the new major release.
+1. Bump arena-core to the new release.
 2. `useTreeData.ts:28`: use `Records.getAncestorsAndSelf(currentEntity)(record)` (or `visitAncestorsAndSelf`).
 3. `demoSurvey.test.ts:512`: remove `meta.h` from the fixture.
 4. Records already stored in SQLite keep `h`: harmless once nothing reads it. Optionally strip it in
@@ -178,41 +177,51 @@ Current state:
 
 Proposed mechanism (a generic one, reusable for future breaking changes):
 
-1. **arena** `common/`: constant `minMobileAppVersion` (e.g. `common/mobile/mobileAppCompatibility.ts`);
-   bumped to the arena-mobile release that ships the new arena-core.
+1. **arena** `common/` (e.g. `common/mobile/mobileAppCompatibility.ts`), two constants:
+   - `minMobileAppVersionRecordsDownload`: records download (and survey download for mobile);
+   - `minMobileAppVersionRecordsUpload`: mobile records import.
+
+   Both start at `0.0.0` (no app blocked). This change raises only the download one; the upload one stays
+   unused for now (old apps uploading records with `h` are fine, the server strips it) and is there for future changes.
 2. **arena-mobile**: send `X-Arena-Mobile-App-Version` (and platform) on every request (`RemoteService` /
    `apiAxios`, next to the auth headers).
-3. **arena** server: middleware on the mobile endpoints (records download/export, mobile records import,
-   survey download for mobile): if the header is missing or lower than `minMobileAppVersion`, respond
-   `426 Upgrade Required` with a `SystemError` key `appVersionNotSupported` and params `{ minVersion }`.
-   Records upload from old versions could be left allowed (the server strips `h`), so field data is never stuck
-   on a device; downloads must be blocked.
-4. **arena** server: extend `GET /api/version` with `minMobileAppVersion`, so the app can check proactively.
+3. **arena** server: middleware on the mobile endpoints, configured with the constant of the endpoint
+   (download: records export + export download, survey download for mobile; upload: `POST /mobile/survey/:surveyId`):
+   if the header version (missing header = `0.0.0`, i.e. an app older than this mechanism) is lower than the minimum,
+   respond `426 Upgrade Required` with a `SystemError` key `appVersionNotSupported` and params `{ minVersion }`.
+4. **arena** server: extend `GET /api/version` with both minimum versions, so the app can check proactively.
 5. **arena-mobile**:
-   - after login / on connection and before sync, records download or survey update: call `api/version`;
-     if the app version is lower than `minMobileAppVersion`, show a blocking dialog
+   - after login / on connection, and before records download, sync, upload or survey update: call `api/version`;
+     if the app version is lower than the minimum of the operation, show a blocking dialog
      ("This version of Arena Mobile is not compatible with the server, please update it") with an
      **Update** button opening the store url (reuse `checkVersion()` / `updateUrl` from `VersionNumberInfoButton`);
    - map the `426` / `appVersionNotSupported` response to the same dialog (fallback for any request);
    - localize the messages (all supported languages).
-6. Versions released before this mechanism send no header: they get the `426` on records download,
-   shown as a generic error, not as the update dialog. To limit this, **ship the compatibility check
-   (steps 1-5, with `minMobileAppVersion` still at the current version) in an earlier release**, well before
-   the `meta.h` removal, so most devices already have it when the minimum version is raised. Optionally the
-   `426` response body can carry an English `message` in case the old app displays the server message.
+6. Versions released before this mechanism send no header: once the minimum is raised they get the `426`,
+   shown as a generic error, not as the update dialog. Hence the compatibility check ships **first, in its own PRs
+   and releases** (minimums at `0.0.0`), well before the `meta.h` removal, so most devices already have it when
+   the minimum is raised. Optionally the `426` response body carries an English `message`, in case the old app
+   displays the server message.
 
-## Rollout
+## Work split / rollout
 
-1. Release the compatibility check (arena + arena-mobile) ahead of time.
-2. Release together: arena-core major, arena-server migration, arena (with `minMobileAppVersion` raised to the
-   new arena-mobile version), arena-mobile.
-3. On server deploy: DB migration (`meta - 'h'`), VACUUM FULL and RDB views regeneration run per survey.
+Two separate pieces of work, each with one PR per involved repository:
+
+1. **Mobile app compatibility check** (arena + arena-mobile): steps 1-6 above, minimums at `0.0.0`.
+   Released and published to the stores first.
+2. **Node meta hierarchy removal** (arena-core, arena-server, arena, arena-mobile), released together:
+   - arena-core minor release;
+   - arena-server survey schema migration;
+   - arena: code changes, `minMobileAppVersionRecordsDownload` raised to the arena-mobile version shipping the
+     new arena-core;
+   - arena-mobile: arena-core bump and code changes.
+
+   On server deploy: DB migration (`meta - 'h'`), VACUUM FULL and RDB views regeneration run per survey.
 
 ## Open questions
 
 - Acceptable performance of the recursive CTE for node keys hierarchy (validation report, activity log) on the largest
   surveys: to be measured; fallback is computing the keys hierarchy in JS from the loaded record nodes.
-- Whether to block or allow records upload from outdated app versions.
 - How an outdated app (before the compatibility check) displays the `426` error: verify on a current build.
 - Whether to also strip `h` from records already stored on devices (step 4 in arena-mobile), or leave them.
 
