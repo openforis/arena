@@ -22,6 +22,7 @@ import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
+import { mobilePreviewMiddleware } from './mobilePreviewMiddleware'
 import { SwaggerInitializer } from './swaggerInitializer'
 import { systemErrorMiddleware } from './systemErrorMiddleware'
 
@@ -73,7 +74,7 @@ export const run = async () => {
   const geoDir = `${arenaRoot}/web-resources/geo`
   app.use('/geo', express.static(geoDir))
   // Arena Mobile web preview (yarn mobile-preview:download)
-  app.use('/mobile-preview', express.static(`${arenaRoot}/mobile-preview`))
+  app.use('/mobile-preview', mobilePreviewMiddleware, express.static(`${arenaRoot}/mobile-preview`))
   app.use('/noHeader{/*path}', express.static(dist))
 
   // ====== APIs
