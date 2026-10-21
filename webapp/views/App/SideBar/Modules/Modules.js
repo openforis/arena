@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as SideBarModule from './utils'
@@ -10,18 +10,14 @@ const Modules = (props) => {
   const { pathname = '', sideBarOpened = false, surveyInfo = null, surveyIsDirty = false, user = null } = props
 
   const [overSidebar, setOverSidebar] = useState(false)
-  const moduleElementsByKeyRef = useRef({})
 
-  // Popup menu module
-  const [modulePopupMenu, setModulePopupMenu] = useState(null)
+  // Popup menu module and the element it is anchored to
+  const [popupMenu, setPopupMenu] = useState(null)
+  const modulePopupMenu = popupMenu?.module ?? null
 
   const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
     (module) => !SideBarModule.isHidden(module)
   )
-
-  const setModuleElementRef = ({ key, ref }) => {
-    moduleElementsByKeyRef.current[key] = ref
-  }
 
   const onMouseEnter = useCallback(() => {
     if (!sideBarOpened) {
@@ -34,8 +30,6 @@ const Modules = (props) => {
       setOverSidebar(false)
     }
   }, [sideBarOpened])
-
-  const moduleElement = modulePopupMenu ? moduleElementsByKeyRef.current[SideBarModule.getKey(modulePopupMenu)] : null
 
   return (
     <div
@@ -54,10 +48,11 @@ const Modules = (props) => {
             pathname={pathname}
             sideBarOpened={sideBarOpened}
             isOver={modulePopupMenu && key === SideBarModule.getKey(modulePopupMenu)}
-            onMouseEnter={() => {
-              setModulePopupMenu(module)
+            onMouseEnter={(event) => {
+              // modules without submenu (e.g. Home, Dashboard) close the popup menu of other modules
+              const hasPopupMenu = !SideBarModule.isHome(module) && SideBarModule.getChildren(module).length > 0
+              setPopupMenu(hasPopupMenu ? { module, element: event.currentTarget } : null)
             }}
-            ref={(ref) => setModuleElementRef({ key, ref })}
           />
         )
       })}
@@ -65,11 +60,11 @@ const Modules = (props) => {
       {modulePopupMenu && (
         <PopupMenu
           module={modulePopupMenu}
-          moduleElement={moduleElement}
+          moduleElement={popupMenu.element}
           pathname={pathname}
           overSidebar={overSidebar}
           onClose={() => {
-            setModulePopupMenu(null)
+            setPopupMenu(null)
           }}
         />
       )}
