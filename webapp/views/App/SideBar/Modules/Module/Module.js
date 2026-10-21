@@ -29,7 +29,7 @@ const Module = forwardRef((props, ref) => {
       className={`sidebar__module${active ? ' active' : ''}${isOver ? ' over' : ''}`}
       data-testid={TestId.sidebar.module(SideBarModule.getKey(module))}
       ref={ref}
-      onMouseEnter={isModuleHome || sideBarOpened || !hasChildren ? null : () => onMouseEnter(module)}
+      onMouseEnter={sideBarOpened ? null : onMouseEnter}
       aria-disabled={disabledModule}
     >
       <ModuleLink
