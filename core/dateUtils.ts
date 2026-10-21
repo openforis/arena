@@ -149,11 +149,15 @@ export const convertDateFromISOToDisplay = (dateStr: string): unknown =>
     formatTo: formats.dateDefault,
   })
 
+/**
+ * Formats an ISO (UTC) timestamp for display in the local time zone of the browser.
+ */
 export const convertDateTimeFromISOToDisplay = (dateStr: string): unknown =>
   convertDate({
     dateStr,
     formatFrom: formats.datetimeISO,
     formatTo: formats.datetimeDisplay,
+    keepTimeZone: false,
   })
 
 export const nowFormatDefault = (): string => format(Date.now(), formats.datetimeDefault)
