@@ -1,0 +1,23 @@
+@use '~@webapp/style/vars' as *;
+
+.button-split {
+  border: 1px solid $colorOutline;
+  border-radius: 4px;
+
+  .MuiButton-root.btn {
+    border: none;
+    border-radius: 0;
+  }
+
+  .MuiButton-root.btn.button-split__menu-button {
+    min-width: 0;
+    padding-left: 0.3rem;
+    padding-right: 0.3rem;
+    border-left: 1px solid $colorOutline;
+  }
+
+  .button-split__menu-button-icon {
+    display: inline-block;
+    transform: rotate(180deg);
+  }
+}
