@@ -15,7 +15,7 @@ the ancestors from `parent_uuid` / `parentUuid` instead.
 Out of scope: node **def** `meta.h` (stays), node `meta.hCode` (stays).
 
 Repositories involved: **arena-core** (most of the readers), **arena**, **arena-mobile**, **arena-server**
-(only for the survey schema DB migration).
+(only for the survey schema DB migration). They are migrated and released together.
 
 ## Current usages
 
@@ -82,43 +82,46 @@ The whole record is in memory wherever the in-memory readers run, so ancestors c
 `parentUuid` (`Records.getParent`, `getAncestor`, `visitAncestorsAndSelf`, already allocation-free).
 The depth of a node equals the length of its node def `meta.h`, which can be used wherever the survey is available.
 
-### arena-core (minor release, `feat:`)
+### arena-core (major release)
 
-1. Add record-aware helpers (curried, record last, allocation-free where possible):
-   - `Records.getNodeDepth(node)(record)` (counting `parentUuid` hops);
-   - `Records.isDescendantOfNode(node, ancestor)(record)` (walks up from `node`; stops at `ancestor` or at the root).
+arena-core, arena, arena-server and arena-mobile are migrated together, so nothing is deprecated: what is no longer
+used is deleted in the same change. The removals are breaking, so the PR title must trigger a major version bump
+(`BREAKING CHANGE`, see arena-core `CLAUDE.md`).
+
+1. Change / add record-aware getters (curried, record last, allocation-free where possible):
+   - `Records.isDescendantOf(node, ancestor)(record)`: walks up from `node` via `parentUuid` (signature changes:
+     the record is now needed);
+   - `Records.getNodeDepth(node)(record)`: number of `parentUuid` hops.
 2. Replace the readers:
    - `nodesFinder`: ancestor = `Records.getAncestor(nodeContext, nodeDefReferenced.parentUuid)` (context entity included
      when it is an entity, as now); common ancestor = `getAncestor` with the last common node def of the two node defs `meta.h`
      (already done in `recordGetters.ts:330` for dependents).
-   - `recordPagesValidation`: `visitAncestorsAndSelf` / `isDescendantOfNode`.
+   - `recordPagesValidation`: `visitAncestorsAndSelf` / `isDescendantOf`.
    - `recordNodesIndexUpdater.addNodes`: sort by depth computed once per call (`Map<uuid, depth>` memoized over
      `parentUuid`, using both the nodes being added and the record nodes), or a parents-first traversal; no per-comparison walk.
    - `RecordCloner`: same depth sort; remove the `h` remapping (keep `parentUuid` remapping).
    - `RecordPrettyPrinter`: `getNodeDepth`.
-3. Deprecate `Nodes.getHierarchy`, `NodeMetaKeys.h`, `NodeMeta.h` and `Records.isDescendantOf`
-   (keep them working on legacy data). `NodeFactory` **still writes `h`** in this release (see rollout).
-4. Tests: run the record updater / expression evaluator / pages validation / cloner suites on records built
-   **without** `meta.h` (add a `RecordBuilder` option, or strip `h` in a helper) to prove no reader is left.
-5. Next release (after the rollout step 4 below): `NodeFactory` stops writing `h`.
-6. Next major: remove `Nodes.getHierarchy`, `NodeMetaKeys.h`, `NodeMeta.h`, `Records.isDescendantOf`.
+3. `NodeFactory` no longer sets `meta.h`.
+4. Delete `Nodes.getHierarchy`, `NodeMetaKeys` (`h` is its only key), `NodeMeta.h` and their exports.
+5. Tests: build records without `meta.h` (update `RecordBuilder` / fixtures) and run the record updater,
+   expression evaluator, pages validation and cloner suites on them.
 
 ### arena
 
 Code (after bumping arena-core; keep arena-core deduped with arena-server):
 
 1. `core/record`:
-   - `Node.isDescendantOf` → record-aware version (or arena-core `Records.isDescendantOfNode`); update
-     `nodeUpdateManager.js:325`, `recordsUpdateThread.js:32`.
-   - `newNode` / `newNodePlaceholder`: stop setting `h` (rollout step 4).
+   - `Node.isDescendantOf` → arena-core `Records.isDescendantOf(node, ancestor)(record)`; update
+     `nodeUpdateManager.js:325`, `recordsUpdateThread.js:32`; delete `Node.isDescendantOf`.
+   - `newNode` / `newNodePlaceholder`: stop setting `h`.
    - `recordsCombiner`: keep `parentUuid` fix-up, drop `h` recalculation.
-   - `recordNodesCompactor`: drop `h` interning; `nodeMeta`: remove `hierarchy` key / `getHierarchy` (deprecate first).
+   - `recordNodesCompactor`: drop `h` interning; `nodeMeta`: delete `metaKeys.hierarchy` and `getHierarchy`.
 2. Server sorts by depth (`recordCreationManager`, `dataTableUpdateRepository`, mobile `recordsImportJob`): sort by
    `NodeDef.getMetaHierarchy(nodeDef).length` (survey available, O(1)).
 3. `recordNodeChecks`: replace the `h` check with a parent check: parent node exists in the record and its node def
    is `NodeDef.getParentUuid(nodeDef)` (stricter and independent of `h`).
-4. Writes: `insertNode`, `insertNodesInBatch`, `updateNode(s)` strip `h` from meta (incoming data from old mobile
-   versions and old backups still carries it); `nodeDelete` activity log content without `h`.
+4. Writes: `insertNode`, `insertNodesInBatch`, `updateNode(s)` strip `h` from meta (old backups and records uploaded
+   by old mobile versions still carry it); `nodeDelete` activity log content without `h`.
 5. SQL:
    - **`_getAncestorUuidSelectField` (RDB population)**: the depth difference between a node and `ancestorDef` is known
      per node def but `c` selects nodes of several defs/depths. Build a bounded parent chain:
@@ -152,33 +155,65 @@ Code (after bumping arena-core; keep arena-core deduped with arena-server):
 
 ### arena-mobile
 
-1. Bump arena-core to the release without `h` readers.
+1. Bump arena-core to the new major release.
 2. `useTreeData.ts:28`: use `Records.getAncestorsAndSelf(currentEntity)(record)` (or `visitAncestorsAndSelf`).
 3. `demoSurvey.test.ts:512`: remove `meta.h` from the fixture.
 4. Records already stored in SQLite keep `h`: harmless once nothing reads it. Optionally strip it in
    `DataMigrationService` (rewrite `record.content`, with a new `PRAGMA user_version` bump) to save space;
    the server strips it on import anyway.
 
-## Rollout (compatibility)
+## Mobile app / server compatibility check
 
-Mobile app versions already installed read `h` (old arena-core: expressions, index sort, cloning) on records
-downloaded from the server, and there is no app version info in the record export request to gate on.
+Installed app versions read `h` through their arena-core (expressions, index sort, cloning): with records downloaded
+from a server that no longer sends `h`, data entry breaks silently. When downloading records the app is online,
+so the user can update it: the server must tell the app that it is too old, and the app must say so.
 
-1. arena-core: readers no longer need `h`; `NodeFactory` still writes it.
-2. arena + arena-mobile release on that arena-core (no reads of `h` anywhere; writes still on).
-3. Transition: the server keeps sending `h` in the records export used by mobile (`recordsExportJob`), computed on the fly
-   from `parentUuid` (helper `Records.populateNodesHierarchy`/server util), so old app versions keep working.
-   Arena backups can use the same path (older Arena versions importing a new backup).
-4. Stop writing `h` (arena-core `NodeFactory`, `Node.newNode`), strip on insert, run the DB migration + VACUUM FULL.
-5. When old mobile versions are no longer supported (e.g. app store minimum version, or after N months):
-   remove the on-the-fly `h` in the export; arena-core major release removing the deprecated API.
+Current state:
+
+- the app already checks the store version (`react-native-check-version` in `VersionNumberInfoButton.tsx`,
+  `UpdateStatus.notUpToDate` + store `url`), but only to show an icon next to the version number;
+- the server exposes `GET /api/version` (Arena version), not used by the app;
+- the app sends its `appInfo` only inside the uploaded zip (`info.json`), the server ignores it;
+- `POST /api/survey/:surveyId/records/export` (records download) is used only by the app.
+
+Proposed mechanism (a generic one, reusable for future breaking changes):
+
+1. **arena** `common/`: constant `minMobileAppVersion` (e.g. `common/mobile/mobileAppCompatibility.ts`);
+   bumped to the arena-mobile release that ships the new arena-core.
+2. **arena-mobile**: send `X-Arena-Mobile-App-Version` (and platform) on every request (`RemoteService` /
+   `apiAxios`, next to the auth headers).
+3. **arena** server: middleware on the mobile endpoints (records download/export, mobile records import,
+   survey download for mobile): if the header is missing or lower than `minMobileAppVersion`, respond
+   `426 Upgrade Required` with a `SystemError` key `appVersionNotSupported` and params `{ minVersion }`.
+   Records upload from old versions could be left allowed (the server strips `h`), so field data is never stuck
+   on a device; downloads must be blocked.
+4. **arena** server: extend `GET /api/version` with `minMobileAppVersion`, so the app can check proactively.
+5. **arena-mobile**:
+   - after login / on connection and before sync, records download or survey update: call `api/version`;
+     if the app version is lower than `minMobileAppVersion`, show a blocking dialog
+     ("This version of Arena Mobile is not compatible with the server, please update it") with an
+     **Update** button opening the store url (reuse `checkVersion()` / `updateUrl` from `VersionNumberInfoButton`);
+   - map the `426` / `appVersionNotSupported` response to the same dialog (fallback for any request);
+   - localize the messages (all supported languages).
+6. Versions released before this mechanism send no header: they get the `426` on records download,
+   shown as a generic error, not as the update dialog. To limit this, **ship the compatibility check
+   (steps 1-5, with `minMobileAppVersion` still at the current version) in an earlier release**, well before
+   the `meta.h` removal, so most devices already have it when the minimum version is raised. Optionally the
+   `426` response body can carry an English `message` in case the old app displays the server message.
+
+## Rollout
+
+1. Release the compatibility check (arena + arena-mobile) ahead of time.
+2. Release together: arena-core major, arena-server migration, arena (with `minMobileAppVersion` raised to the
+   new arena-mobile version), arena-mobile.
+3. On server deploy: DB migration (`meta - 'h'`), VACUUM FULL and RDB views regeneration run per survey.
 
 ## Open questions
 
 - Acceptable performance of the recursive CTE for node keys hierarchy (validation report, activity log) on the largest
   surveys: to be measured; fallback is computing the keys hierarchy in JS from the loaded record nodes.
-- How long to keep the `h` compatibility in the mobile export; whether to add the app version to the mobile requests
-  so that it can be gated.
+- Whether to block or allow records upload from outdated app versions.
+- How an outdated app (before the compatibility check) displays the `426` error: verify on a current build.
 - Whether to also strip `h` from records already stored on devices (step 4 in arena-mobile), or leave them.
 
 ## Verification
@@ -187,4 +222,5 @@ downloaded from the server, and there is no app version info in the record expor
 - arena: `yarn test:unit`, `yarn test:integration`, e2e record editing / data explorer / validation report;
   query plans and timings for RDB population and node keys hierarchy on a large survey.
 - arena-mobile: `yarn test:types`, `yarn test`, Maestro suite; manual sync round-trip with server
-  (download → edit → upload, merge) using both an old app build and the new one.
+  (download → edit → upload, merge); an outdated build must show the update dialog (or the error, for builds
+  older than the compatibility check) and not download records.
