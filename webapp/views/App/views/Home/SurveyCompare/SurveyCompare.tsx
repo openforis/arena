@@ -2,7 +2,6 @@ import './SurveyCompare.scss'
 
 import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router'
 
 import * as JobSerialized from '@common/job/jobSerialized'
 import * as Survey from '@core/survey/survey'
@@ -99,7 +98,6 @@ const Summary = ({ result }: { result: CompareResultWithSource }) => {
 
 export const SurveyCompare = () => {
   const dispatch = useDispatch()
-  const navigate = useNavigate()
   const i18n = useI18n()
   const confirm = useConfirm()
   const surveyId = useSurveyId()
@@ -239,12 +237,15 @@ export const SurveyCompare = () => {
               text: undefined,
             }) as any
           )
-          dispatch(SurveyActions.refreshSurveyDefs({ navigate }) as any)
+          if (appliedIds.length > 0) {
+            // reload the survey info too: the survey is now draft (Publish enabled) and its props could have changed
+            await dispatch(SurveyActions.setActiveSurvey(surveyId, true) as any)
+          }
           await startCompare({ sourceRef, manualMatches })
         },
       }) as any
     )
-  }, [dispatch, manualMatches, navigate, selectedIds, sourceRef, startCompare, surveyId])
+  }, [dispatch, manualMatches, selectedIds, sourceRef, startCompare, surveyId])
 
   // deletions need a strong confirmation: the survey name must be typed
   const onApply = useCallback(() => {
