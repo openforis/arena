@@ -198,6 +198,14 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
               onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
             />
           )}
+          {canExportRecordsData && selectedItemsCount > 0 && (
+            <ButtonDownload
+              label="dataView:records.exportForArenaMobile"
+              onClick={() =>
+                dispatch(RecordListActions.startRecordsExportForMobile({ recordUuids: selectedRecordsUuids }))
+              }
+            />
+          )}
           {canValidateAllRecords && (
             <ButtonDownload label="dataView:records.validateAll" onClick={onValidateAllRecordsClick} />
           )}
