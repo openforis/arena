@@ -70,7 +70,7 @@ Continuar?`,
       portrait: 'Retrato',
     },
     reload: 'Recarregar',
-    title: 'Visualização móvel (experimental)',
+    title: 'Visualização móvel',
   },
   formEntryActions: {
     confirmDemote: 'Tem certeza de que deseja rebaixar este registro para {{name}}?',

@@ -7,7 +7,7 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import { Button, ButtonProps } from './Button'
 import { ButtonMenuItem, ButtonMenuPopup } from './ButtonMenu'
 
-type ButtonSplitProps = Omit<ButtonProps, 'variant'> & {
+type ButtonSplitProps = ButtonProps & {
   closeMenuOnItemClick?: boolean
   items: ButtonMenuItem[]
   menuButtonTestId?: string
@@ -33,6 +33,7 @@ export const ButtonSplit = (props: ButtonSplitProps) => {
     onItemClick,
     selectedItemKey,
     size,
+    variant = 'text',
     ...mainButtonProps
   } = props
 
@@ -41,15 +42,19 @@ export const ButtonSplit = (props: ButtonSplitProps) => {
 
   return (
     <>
-      <ButtonGroup ref={groupRef} className={classNames('button-split', className)} variant="text">
-        <Button {...mainButtonProps} className="button-split__main-button" size={size} variant="text" />
+      <ButtonGroup
+        ref={groupRef}
+        className={classNames('button-split', `button-split--${variant}`, className)}
+        variant={variant}
+      >
+        <Button {...mainButtonProps} className="button-split__main-button" size={size} variant={variant} />
         <Button
           className="button-split__menu-button"
           onClick={() => setAnchorEl(groupRef.current)}
           size={size}
           testId={menuButtonTestId}
           title={menuButtonTitle}
-          variant="text"
+          variant={variant}
         >
           <span className="icon icon-ctrl button-split__menu-button-icon" />
         </Button>

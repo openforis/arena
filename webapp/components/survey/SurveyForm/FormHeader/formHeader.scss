@@ -40,6 +40,7 @@
 .survey-form-header__actions {
   display: flex;
   align-items: center;
+  padding-right: 0.5rem;
 
   > *:not(:last-child) {
     margin: 0 1rem;

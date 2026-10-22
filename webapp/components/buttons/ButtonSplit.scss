@@ -16,8 +16,28 @@
     border-left: 1px solid $colorOutline;
   }
 
+  // tooltip wrapper of the menu button: let the button fill the group height
+  > span {
+    display: flex;
+  }
+
   .button-split__menu-button-icon {
     display: inline-block;
     transform: rotate(180deg);
+  }
+}
+
+.button-split.button-split--contained {
+  border: none;
+  overflow: hidden;
+  box-shadow: none;
+
+  .MuiButton-root.btn {
+    border: none;
+    box-shadow: none;
+  }
+
+  .MuiButton-root.btn.button-split__menu-button {
+    border-left: 1px solid with-alpha($colorOnPrimary, 0.4);
   }
 }

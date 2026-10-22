@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    mobilePreview: {
+      title: 'Visualização do inquérito no Arena Mobile',
+      description: `No designer de formulários, abra o menu ao lado do botão **Visualizar** e escolha **Visualizar (móvel)** para experimentar o inquérito em rascunho tal como aparece no **Arena Mobile**, num telefone ou tablet, na orientação retrato ou paisagem.
+
+A visualização é executada no navegador: algumas funcionalidades de um dispositivo real (p. ex. mapas e câmara) não estão disponíveis.`,
+    },
     requiredIf: {
       title: 'Atributos obrigatórios por condição',
       description: `No designer de formulários, na aba **Validações** de um atributo, escolha **Obrigatório quando a condição é atendida** e escreva a condição: o atributo será obrigatório somente quando a condição for verdadeira.

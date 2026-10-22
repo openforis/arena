@@ -272,6 +272,6 @@
   },
   "packageManager": "yarn@4.18.1",
   "arenaMobileWebPreview": {
-    "version": "v2.10.2"
+    "version": "v2.10.3"
   }
 }

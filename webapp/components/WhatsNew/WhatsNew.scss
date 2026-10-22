@@ -33,10 +33,12 @@
   .whats-new-slide__header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
   }
 
   .whats-new-slide__title {
+    text-align: center;
     font-size: 1.2rem;
     font-weight: 600;
     color: $colorOnPrimaryContainer;
