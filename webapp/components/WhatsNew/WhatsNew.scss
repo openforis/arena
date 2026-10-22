@@ -18,13 +18,10 @@
 .whats-new-slide {
   display: flex;
   flex-direction: column;
-  align-items: center;
   gap: 1rem;
-  text-align: center;
 
   // screenshot on a tinted band, like a cover image of the slide
   .whats-new-slide__image-container {
-    align-self: stretch;
     display: flex;
     justify-content: center;
     padding: 1.5rem 1rem;
@@ -50,6 +47,7 @@
   }
 
   .whats-new-slide__title {
+    text-align: center;
     font-size: 1.3rem;
     font-weight: 600;
     color: $colorOnPrimaryContainer;
@@ -64,7 +62,6 @@
   }
 
   .whats-new-slide__description {
-    max-width: 85ch;
     line-height: 1.5;
 
     p + p {
