@@ -20,12 +20,20 @@
   flex-direction: column;
   gap: 1rem;
 
+  // screenshot on a tinted band, like a cover image of the slide
+  .whats-new-slide__image-container {
+    display: flex;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    border-radius: 8px;
+    background: linear-gradient(135deg, $colorPrimaryContainer, $colorSecondaryContainer);
+  }
+
   .whats-new-slide__image {
     // same height for every slide, so the dialog does not change size while navigating
     height: min(32vh, 280px);
     max-width: 100%;
     object-fit: contain;
-    align-self: center;
     border: 1px solid $colorOutline;
     border-radius: 4px;
   }
@@ -33,11 +41,14 @@
   .whats-new-slide__header {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 1rem;
+    margin-top: 0.5rem;
   }
 
   .whats-new-slide__title {
-    font-size: 1.2rem;
+    text-align: center;
+    font-size: 1.3rem;
     font-weight: 600;
     color: $colorOnPrimaryContainer;
   }
@@ -52,6 +63,11 @@
 
   .whats-new-slide__description {
     line-height: 1.5;
+    text-align: justify;
+
+    p + p {
+      margin-top: 0.5rem;
+    }
   }
 
   .whats-new-slide__version {

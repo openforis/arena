@@ -70,7 +70,7 @@ eliminando los valores existentes insertados en ellas (si los hay).
       portrait: 'Vertical',
     },
     reload: 'Recargar',
-    title: 'Vista previa móvil (experimental)',
+    title: 'Vista previa móvil',
   },
   formEntryActions: {
     confirmDemote: '¿Está seguro de que desea degradar este registro a {{name}}?',

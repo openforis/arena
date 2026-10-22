@@ -70,7 +70,7 @@ Continue?`,
       portrait: 'Portrait',
     },
     reload: 'Reload',
-    title: 'Mobile preview (experimental)',
+    title: 'Mobile preview',
   },
   formEntryActions: {
     confirmDemote: 'Are sure you want to demote this record to {{name}}?',

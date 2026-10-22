@@ -27,6 +27,12 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
+    id: 'mobilePreview',
+    version: '2.10.3',
+    audience: whatsNewAudiences.surveyAdmin,
+    image: '/img/whats-new/mobilePreview.png',
+  },
+  {
     id: 'requiredIf',
     version: '2.10.0',
     audience: whatsNewAudiences.surveyAdmin,

@@ -17,7 +17,11 @@ export const WhatsNewSlide = (props: WhatsNewSlideProps) => {
 
   return (
     <div className="whats-new-slide">
-      {item.image && <img alt={title} className="whats-new-slide__image" src={item.image} />}
+      {item.image && (
+        <div className="whats-new-slide__image-container">
+          <img alt={title} className="whats-new-slide__image" src={item.image} />
+        </div>
+      )}
       <div className="whats-new-slide__header">
         <span className="whats-new-slide__title">{title}</span>
         {item.experimental && (

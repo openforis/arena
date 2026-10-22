@@ -70,7 +70,7 @@ export default {
       portrait: '縦向き',
     },
     reload: '再読み込み',
-    title: 'モバイルプレビュー (実験的)',
+    title: 'モバイルプレビュー',
   },
   formEntryActions: {
     confirmDemote: 'この記録を{{name}}に差し戻しますか？',

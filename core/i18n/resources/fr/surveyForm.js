@@ -70,7 +70,7 @@ Continuer ?`,
       portrait: 'Portrait',
     },
     reload: 'Recharger',
-    title: 'Aperçu mobile (expérimental)',
+    title: 'Aperçu mobile',
   },
   formEntryActions: {
     confirmDemote: 'Êtes-vous sûr(e) de vouloir rétrograder cet enregistrement vers {{name}} ?',

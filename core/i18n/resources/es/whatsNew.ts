@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    mobilePreview: {
+      title: 'Vista previa de la encuesta en Arena Mobile',
+      description: `En el diseñador de formularios, abre el menú junto al botón **Vista previa** y elige **Vista previa (móvil)** para probar la encuesta en borrador tal como se ve en **Arena Mobile**, en un teléfono o una tableta, en orientación vertical u horizontal.
+
+La vista previa se ejecuta en el navegador: algunas funciones de un dispositivo real (p. ej. mapas y cámara) no están disponibles.`,
+    },
     requiredIf: {
       title: 'Atributos obligatorios según una condición',
       description: `En el diseñador de formularios, en la pestaña **Validaciones** de un atributo, elige **Obligatorio cuando se cumple la condición** y escribe la condición: el atributo será obligatorio solo cuando la condición sea verdadera.

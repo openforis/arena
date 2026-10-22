@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    mobilePreview: {
+      title: 'Preview the survey in Arena Mobile',
+      description: `In the form designer, open the menu next to the **Preview** button and choose **Preview (mobile)** to try the draft survey as it looks in **Arena Mobile**, on a phone or a tablet, in portrait or landscape orientation.
+
+The preview runs in the browser: some features of a real device (e.g. maps and camera) are not available.`,
+    },
     requiredIf: {
       title: 'Conditionally required attributes',
       description: `In the form designer, in the **Validations** tab of an attribute, choose **Required when condition is met** and write the condition: the attribute is required only when the condition is true.

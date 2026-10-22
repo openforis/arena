@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    mobilePreview: {
+      title: "Aperçu de l'enquête dans Arena Mobile",
+      description: `Dans le concepteur de formulaires, ouvrez le menu à côté du bouton **Aperçu** et choisissez **Aperçu (mobile)** pour essayer l'enquête en brouillon telle qu'elle apparaît dans **Arena Mobile**, sur un téléphone ou une tablette, en orientation portrait ou paysage.
+
+L'aperçu s'exécute dans le navigateur : certaines fonctionnalités d'un appareil réel (par ex. cartes et appareil photo) ne sont pas disponibles.`,
+    },
     requiredIf: {
       title: 'Attributs obligatoires sous condition',
       description: `Dans le concepteur de formulaires, dans l'onglet **Validations** d'un attribut, choisissez **Obligatoire lorsque la condition est remplie** et saisissez la condition : l'attribut n'est obligatoire que lorsque la condition est vraie.

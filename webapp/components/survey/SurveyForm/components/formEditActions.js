@@ -5,7 +5,6 @@ import { ENV } from '@core/processUtils'
 
 import { RecordActions } from '@webapp/store/ui/record'
 import { useIsSurveyDirty } from '@webapp/store/survey'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 import { Button, ButtonSplit } from '@webapp/components/buttons'
 import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'
@@ -13,11 +12,9 @@ import { MobilePreviewPanel } from '@webapp/components/survey/MobilePreview'
 const FormEditActions = () => {
   const dispatch = useDispatch()
   const surveyIsDirty = useIsSurveyDirty()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false)
 
-  // mobile preview is experimental: shown only when EXPERIMENTAL_FEATURES is enabled
-  const mobilePreviewAvailable = experimentalFeatures && !!ENV.mobilePreviewUrl
+  const mobilePreviewAvailable = !!ENV.mobilePreviewUrl
 
   const openDesktopPreview = () => dispatch(RecordActions.createRecord({ preview: true }))
 
@@ -28,6 +25,7 @@ const FormEditActions = () => {
     onClick: openDesktopPreview,
     size: 'small',
     testId: TestId.surveyForm.previewOpenBtn,
+    variant: 'contained',
   }
 
   return (
@@ -54,7 +52,7 @@ const FormEditActions = () => {
           menuButtonTitle="surveyForm:formEditActions.previewOptions"
         />
       ) : (
-        <Button {...previewButtonProps} variant="text" />
+        <Button {...previewButtonProps} />
       )}
       {mobilePreviewOpen && <MobilePreviewPanel onClose={() => setMobilePreviewOpen(false)} />}
     </div>
