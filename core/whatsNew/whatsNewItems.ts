@@ -28,7 +28,7 @@ export type WhatsNewItem = {
 export const whatsNewItems: WhatsNewItem[] = [
   {
     id: 'mobilePreview',
-    version: '2.10.3',
+    version: '2.10.4',
     audience: whatsNewAudiences.surveyAdmin,
     image: '/img/whats-new/mobilePreview.png',
   },
