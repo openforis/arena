@@ -326,11 +326,6 @@ export const startSelectedRecordsExportJob = async ({ surveyId, recordUuids }) =
   return job
 }
 
-export const getSelectedRecordsExportDownloadUrl = ({ surveyId, surveyName, fileName }) => {
-  const params = new URLSearchParams({ surveyName, fileName })
-  return `/api/survey/${surveyId}/records/export/download?${params.toString()}`
-}
-
 // RECORDS VALIDAATION
 export const startRecordsValidationJob = async ({ surveyId }) => {
   const {
