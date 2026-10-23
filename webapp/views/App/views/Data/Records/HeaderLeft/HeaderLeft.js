@@ -1,5 +1,5 @@
 import './HeaderLeft.scss'
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -14,7 +14,7 @@ import { RecordActions, useRecord } from '@webapp/store/ui/record'
 
 import { TestId } from '@webapp/utils/testId'
 
-import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit, ButtonIconView } from '@webapp/components'
+import { Button, ButtonDelete, ButtonDownload, ButtonIconEdit, ButtonIconView, ButtonMenu } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import {
   useAuthCanDeleteRecords,
@@ -155,6 +155,73 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     )
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
+  const exportMenuItems = useMemo(() => {
+    const items = []
+    if (canExportRecordsSummary) {
+      items.push({
+        key: 'exportList',
+        content: (
+          <ButtonDownload
+            testId={TestId.records.exportBtn}
+            href={`/api/survey/${surveyId}/records/summary/export`}
+            requestParams={{ cycle }}
+            label="dataView:records.exportList"
+            variant="text"
+          />
+        ),
+      })
+    }
+    if (canExportRecordsData) {
+      items.push({
+        key: 'exportData',
+        content: (
+          <ButtonDownload
+            label="dataView:records.exportData"
+            onClick={toggleRecordsDataExportModalOpen}
+            variant="text"
+          />
+        ),
+      })
+    }
+    if (canAnalyzeRecords) {
+      items.push({
+        key: 'exportDataSummary',
+        content: (
+          <ButtonDownload
+            label="dataView:records.exportDataSummary"
+            onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
+            variant="text"
+          />
+        ),
+      })
+    }
+    if (canExportRecordsData && selectedItemsCount > 0) {
+      items.push({
+        key: 'exportSelectedRecordsArenaFormat',
+        content: (
+          <ButtonDownload
+            label="dataView:records.exportSelectedRecordsArenaFormat"
+            onClick={() =>
+              dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))
+            }
+            variant="text"
+          />
+        ),
+      })
+    }
+    return items
+  }, [
+    canAnalyzeRecords,
+    canExportRecordsData,
+    canExportRecordsSummary,
+    cycle,
+    dispatch,
+    selectedItemsCount,
+    selectedRecordsUuids,
+    surveyId,
+    toggleRecordsDataExportModalOpen,
+  ])
+
   const onValidateAllRecordsClick = useCallback(async () => {
     if (await confirm({ key: 'dataView:records.confirmValidateAllRecords' })) {
       dispatch(RecordListActions.startRecordsValidation({ onRecordsUpdate }))
@@ -181,29 +248,12 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
       )}
       {totalCount > 0 && (
         <>
-          {canExportRecordsSummary && (
-            <ButtonDownload
-              testId={TestId.records.exportBtn}
-              href={`/api/survey/${surveyId}/records/summary/export`}
-              requestParams={{ cycle }}
-              label="dataView:records.exportList"
-            />
-          )}
-          {canExportRecordsData && (
-            <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} />
-          )}
-          {canAnalyzeRecords && (
-            <ButtonDownload
-              label="dataView:records.exportDataSummary"
-              onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
-            />
-          )}
-          {canExportRecordsData && selectedItemsCount > 0 && (
-            <ButtonDownload
-              label="dataView:records.exportRecordsArenaFormat"
-              onClick={() =>
-                dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))
-              }
+          {exportMenuItems.length > 0 && (
+            <ButtonMenu
+              iconClassName="icon-download2 icon-14px"
+              items={exportMenuItems}
+              label="common.export"
+              variant="outlined"
             />
           )}
           {canValidateAllRecords && (
