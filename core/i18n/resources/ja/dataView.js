@@ -101,6 +101,7 @@ export default {
     exportList: '一覧をエクスポート',
     exportData: 'データをエクスポート',
     exportDataSummary: 'データ概要をエクスポート',
+    exportSelectedRecordsArenaFormat: '選択した記録をエクスポート（Arena形式）',
     exportRecordDocx: '記録をエクスポート（Word）',
     filterPlaceholder: 'キーまたは所有者で絞り込み',
     merge: {
