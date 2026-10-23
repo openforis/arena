@@ -1,5 +1,5 @@
 import './HeaderLeft.scss'
-import React, { useCallback, useMemo, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -45,6 +45,79 @@ const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }
   })
   const [sourceRecord, targetRecord] = sortedRecords
   return { sourceRecord, targetRecord }
+}
+
+/**
+ * Builds the items of the Export button menu, according to the user permissions and the selected records.
+ * @param {object} params - The parameters.
+ * @param {boolean} params.canAnalyzeRecords - Whether the user can export the data summary.
+ * @param {boolean} params.canExportRecordsData - Whether the user can export the records data.
+ * @param {boolean} params.canExportRecordsSummary - Whether the user can export the records list.
+ * @param {string} params.cycle - The current survey cycle.
+ * @param {(action: object) => void} params.dispatch - The Redux dispatch function.
+ * @param {string[]} params.selectedRecordsUuids - The uuids of the selected records.
+ * @param {number} params.surveyId - The current survey id.
+ * @param {() => void} params.toggleRecordsDataExportModalOpen - Opens the records data export modal.
+ * @returns {Array} - The menu items.
+ */
+const buildExportMenuItems = ({
+  canAnalyzeRecords,
+  canExportRecordsData,
+  canExportRecordsSummary,
+  cycle,
+  dispatch,
+  selectedRecordsUuids,
+  surveyId,
+  toggleRecordsDataExportModalOpen,
+}) => {
+  const exportMenuItems = []
+  if (canExportRecordsSummary) {
+    exportMenuItems.push({
+      key: 'exportList',
+      content: (
+        <ButtonDownload
+          testId={TestId.records.exportBtn}
+          href={`/api/survey/${surveyId}/records/summary/export`}
+          requestParams={{ cycle }}
+          label="dataView:records.exportList"
+          variant="text"
+        />
+      ),
+    })
+  }
+  if (canExportRecordsData) {
+    exportMenuItems.push({
+      key: 'exportData',
+      content: (
+        <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} variant="text" />
+      ),
+    })
+  }
+  if (canAnalyzeRecords) {
+    exportMenuItems.push({
+      key: 'exportDataSummary',
+      content: (
+        <ButtonDownload
+          label="dataView:records.exportDataSummary"
+          onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
+          variant="text"
+        />
+      ),
+    })
+  }
+  if (canExportRecordsData && selectedRecordsUuids.length > 0) {
+    exportMenuItems.push({
+      key: 'exportSelectedRecordsArenaFormat',
+      content: (
+        <ButtonDownload
+          label="dataView:records.exportSelectedRecordsArenaFormat"
+          onClick={() => dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))}
+          variant="text"
+        />
+      ),
+    })
+  }
+  return exportMenuItems
 }
 
 const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, selectedItems, totalCount }) => {
@@ -155,72 +228,16 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     )
   }, [closeMergePreviewModal, dispatch, onRecordsUpdate, selectedItems])
 
-  const exportMenuItems = useMemo(() => {
-    const items = []
-    if (canExportRecordsSummary) {
-      items.push({
-        key: 'exportList',
-        content: (
-          <ButtonDownload
-            testId={TestId.records.exportBtn}
-            href={`/api/survey/${surveyId}/records/summary/export`}
-            requestParams={{ cycle }}
-            label="dataView:records.exportList"
-            variant="text"
-          />
-        ),
-      })
-    }
-    if (canExportRecordsData) {
-      items.push({
-        key: 'exportData',
-        content: (
-          <ButtonDownload
-            label="dataView:records.exportData"
-            onClick={toggleRecordsDataExportModalOpen}
-            variant="text"
-          />
-        ),
-      })
-    }
-    if (canAnalyzeRecords) {
-      items.push({
-        key: 'exportDataSummary',
-        content: (
-          <ButtonDownload
-            label="dataView:records.exportDataSummary"
-            onClick={() => dispatch(RecordListActions.startDataSummaryExport())}
-            variant="text"
-          />
-        ),
-      })
-    }
-    if (canExportRecordsData && selectedItemsCount > 0) {
-      items.push({
-        key: 'exportSelectedRecordsArenaFormat',
-        content: (
-          <ButtonDownload
-            label="dataView:records.exportSelectedRecordsArenaFormat"
-            onClick={() =>
-              dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))
-            }
-            variant="text"
-          />
-        ),
-      })
-    }
-    return items
-  }, [
+  const exportMenuItems = buildExportMenuItems({
     canAnalyzeRecords,
     canExportRecordsData,
     canExportRecordsSummary,
     cycle,
     dispatch,
-    selectedItemsCount,
     selectedRecordsUuids,
     surveyId,
     toggleRecordsDataExportModalOpen,
-  ])
+  })
 
   const onValidateAllRecordsClick = useCallback(async () => {
     if (await confirm({ key: 'dataView:records.confirmValidateAllRecords' })) {
