@@ -5,7 +5,7 @@ import { JobActions } from '@webapp/store/app'
 
 import { DataExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataExportDownloadButton'
 import { DataSummaryExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataSummaryExportDownloadButton'
-import { RecordsExportForMobileDownloadButton } from '@webapp/views/App/views/Data/Records/HeaderLeft/RecordsExportForMobileDownloadButton'
+import { SelectedRecordsExportDownloadButton } from '@webapp/views/App/views/Data/Records/HeaderLeft/SelectedRecordsExportDownloadButton'
 
 export const startCSVExport =
   ({ recordUuids, search, options }) =>
@@ -32,14 +32,14 @@ export const startDataSummaryExport =
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataSummaryExportDownloadButton }))
   }
 
-export const startRecordsExportForMobile =
+export const startSelectedRecordsExport =
   ({ recordUuids }) =>
   async (dispatch, getState) => {
     const surveyId = SurveyState.getSurveyId(getState())
 
-    const job = await API.startRecordsExportForMobileJob({ surveyId, recordUuids })
+    const job = await API.startSelectedRecordsExportJob({ surveyId, recordUuids })
 
-    dispatch(JobActions.showJobMonitor({ job, closeButton: RecordsExportForMobileDownloadButton }))
+    dispatch(JobActions.showJobMonitor({ job, closeButton: SelectedRecordsExportDownloadButton }))
   }
 
 export const startRecordsValidation =

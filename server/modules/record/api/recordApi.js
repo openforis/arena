@@ -291,7 +291,7 @@ export const init = (app) => {
     }
   })
 
-  // records export (only specified uuids) in the format imported by Arena Mobile
+  // export of the specified records in Arena format (zip file that can be imported into Arena and Arena Mobile)
   const startSelectedRecordsExport = async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
@@ -320,9 +320,9 @@ export const init = (app) => {
     startSelectedRecordsExport
   )
 
-  // used by Arena web to export records to a file to be imported into Arena Mobile
+  // used by Arena web: no mobile app version check
   app.post(
-    '/survey/:surveyId/records/export-for-mobile',
+    '/survey/:surveyId/records/export-selected',
     requireRecordsExportPermission,
     requireRecordsMatchUserGroupQualifiers,
     startSelectedRecordsExport

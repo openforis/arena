@@ -12,7 +12,7 @@ type Props = {
   job: any
 }
 
-export const RecordsExportForMobileDownloadButton = (props: Props) => {
+export const SelectedRecordsExportDownloadButton = (props: Props) => {
   const { job } = props
 
   const dispatch = useDispatch()
@@ -27,7 +27,7 @@ export const RecordsExportForMobileDownloadButton = (props: Props) => {
 
   return (
     <ButtonDownload
-      href={API.getRecordsExportForMobileDownloadUrl({ surveyId, surveyName, fileName })}
+      href={API.getSelectedRecordsExportDownloadUrl({ surveyId, surveyName, fileName })}
       onClick={onClick}
       variant="contained"
     />

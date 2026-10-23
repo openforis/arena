@@ -200,9 +200,9 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           )}
           {canExportRecordsData && selectedItemsCount > 0 && (
             <ButtonDownload
-              label="dataView:records.exportForArenaMobile"
+              label="dataView:records.exportRecordsArenaFormat"
               onClick={() =>
-                dispatch(RecordListActions.startRecordsExportForMobile({ recordUuids: selectedRecordsUuids }))
+                dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))
               }
             />
           )}

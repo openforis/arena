@@ -318,15 +318,15 @@ export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recor
   return job
 }
 
-// RECORDS EXPORT FOR ARENA MOBILE
-export const startRecordsExportForMobileJob = async ({ surveyId, recordUuids }) => {
+// SELECTED RECORDS EXPORT (ARENA FORMAT)
+export const startSelectedRecordsExportJob = async ({ surveyId, recordUuids }) => {
   const {
     data: { job },
-  } = await axios.post(`/api/survey/${surveyId}/records/export-for-mobile`, { recordUuids })
+  } = await axios.post(`/api/survey/${surveyId}/records/export-selected`, { recordUuids })
   return job
 }
 
-export const getRecordsExportForMobileDownloadUrl = ({ surveyId, surveyName, fileName }) => {
+export const getSelectedRecordsExportDownloadUrl = ({ surveyId, surveyName, fileName }) => {
   const params = new URLSearchParams({ surveyName, fileName })
   return `/api/survey/${surveyId}/records/export/download?${params.toString()}`
 }
