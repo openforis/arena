@@ -101,6 +101,7 @@ export default {
     exportList: 'Экспортировать список',
     exportData: 'Экспортировать данные',
     exportDataSummary: 'Экспортировать сводку данных',
+    exportSelectedRecordsArenaFormat: 'Экспортировать выбранные записи (формат Arena)',
     exportRecordDocx: 'Экспорт записи (Word)',
     filterPlaceholder: 'Фильтровать по ключам или владельцу',
     merge: {

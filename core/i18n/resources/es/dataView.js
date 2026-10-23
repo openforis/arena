@@ -93,6 +93,7 @@ export default {
     exportList: 'Exportar lista',
     exportData: 'Exportar datos',
     exportDataSummary: 'Exportar resumen de datos',
+    exportSelectedRecordsArenaFormat: 'Exportar registros seleccionados (formato Arena)',
     exportRecordDocx: 'Exportar registro (Word)',
     filterPlaceholder: 'Filtrar por claves o propietario',
     merge: {
