@@ -8,7 +8,7 @@ Open Foris Arena is a cloud-based platform for storing and processing data colle
 
 **Key technologies:**
 
-- Node.js 24.22.0
+- Node.js 24.22.1
 - React 18 (frontend)
 - Express (backend)
 - PostgreSQL with PostGIS
