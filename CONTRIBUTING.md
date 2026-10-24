@@ -6,7 +6,7 @@ By participating in this project you agree to abide by its [Code of Conduct](./C
 
 First, [install Yarn](https://yarnpkg.com/en/docs/install) (a modern npm replacement).
 
-Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using version 24.22.0).
+Then, install [Node.js](https://nodejs.org/en/download/) (currently we are using version 24.22.1).
 
 ## Development
 
