@@ -156,7 +156,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@aws-sdk/client-s3@npm:^3.1152.0, @aws-sdk/client-s3@npm:^3.1156.0":
+"@aws-sdk/client-s3@npm:^3.1156.0":
   version: 3.1156.0
   resolution: "@aws-sdk/client-s3@npm:3.1156.0"
   dependencies:
@@ -3976,7 +3976,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.11.1, @openforis/arena-core@npm:^2.9.0":
+"@openforis/arena-core@npm:^2.11.1":
   version: 2.11.1
   resolution: "@openforis/arena-core@npm:2.11.1"
   dependencies:
@@ -3999,19 +3999,19 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "@openforis/arena-server@npm:2.7.0"
+"@openforis/arena-server@npm:^2.7.1":
+  version: 2.7.1
+  resolution: "@openforis/arena-server@npm:2.7.1"
   dependencies:
-    "@aws-sdk/client-s3": "npm:^3.1152.0"
+    "@aws-sdk/client-s3": "npm:^3.1156.0"
     "@godaddy/terminus": "npm:^4.12.1"
-    "@openforis/arena-core": "npm:^2.9.0"
+    "@openforis/arena-core": "npm:^2.11.1"
     bcryptjs: "npm:^3.0.3"
     compression: "npm:^1.8.2"
     cookie-parser: "npm:^1.4.7"
     db-migrate: "npm:^1.8.1"
     db-migrate-pg: "npm:^1.7.1"
-    docx: "npm:^9.11.0"
+    docx: "npm:^9.14.0"
     express: "npm:^5.3.0"
     express-fileupload: "npm:^1.5.2"
     express-rate-limit: "npm:^8.7.1"
@@ -4027,7 +4027,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/bf733459118e84b5dfc103f2499565a46c460fd836f92154af7b087197f2994e86224c1a5170b0e53ebac1955bb627ef5dac2f54195550701526d94ca3c396b6
+  checksum: 10c0/3da1d52442d558af7d7fd840a271b45aae76d619599893f66abda1efb164930ade6e46d8878d50d8ad0b3ce6d93f9accdd3ecb59beb5559a2470a51b2961846b
   languageName: node
   linkType: hard
 
@@ -8763,7 +8763,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"docx@npm:^9.11.0":
+"docx@npm:^9.14.0":
   version: 9.14.0
   resolution: "docx@npm:9.14.0"
   dependencies:
@@ -14225,7 +14225,7 @@ __metadata:
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
     "@openforis/arena-core": "npm:^2.11.1"
-    "@openforis/arena-server": "npm:^2.7.0"
+    "@openforis/arena-server": "npm:^2.7.1"
     "@playwright/test": "npm:1.64.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.13.0"
