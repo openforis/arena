@@ -86,6 +86,7 @@ export {
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,
+  startSelectedRecordsExportJob,
   startRecordsValidationJob,
   mergeRecords,
   startValidationReportGeneration,

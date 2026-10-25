@@ -318,6 +318,14 @@ export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recor
   return job
 }
 
+// SELECTED RECORDS EXPORT (ARENA FORMAT)
+export const startSelectedRecordsExportJob = async ({ surveyId, recordUuids }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/records/export-selected`, { recordUuids })
+  return job
+}
+
 // RECORDS VALIDAATION
 export const startRecordsValidationJob = async ({ surveyId }) => {
   const {

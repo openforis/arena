@@ -291,30 +291,41 @@ export const init = (app) => {
     }
   })
 
-  // records export (only specified uuids), used by Arena Mobile to download records
+  // export of the specified records in Arena format (zip file that can be imported into Arena and Arena Mobile)
+  const startSelectedRecordsExport = async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const recordUuids = Request.getJsonParam(req, 'recordUuids')
+      // uuids of the files the client already has: their content is left out of the exported file
+      const excludedFileUuids = Request.getJsonParam(req, 'excludedFileUuids', [])
+      const user = Request.getUser(req)
+
+      if (Objects.isEmpty(recordUuids)) {
+        throw new Error('record uuids not specified')
+      }
+
+      const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  // used by Arena Mobile to download records
   app.post(
     '/survey/:surveyId/records/export',
     requireRecordsExportPermission,
     requireMobileAppMinVersion(minMobileAppVersionRecordsDownload),
     requireRecordsMatchUserGroupQualifiers,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const recordUuids = Request.getJsonParam(req, 'recordUuids')
-        // uuids of the files the client already has: their content is left out of the exported file
-        const excludedFileUuids = Request.getJsonParam(req, 'excludedFileUuids', [])
-        const user = Request.getUser(req)
+    startSelectedRecordsExport
+  )
 
-        if (Objects.isEmpty(recordUuids)) {
-          throw new Error('record uuids not specified')
-        }
-
-        const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
-    }
+  // used by Arena web: no mobile app version check
+  app.post(
+    '/survey/:surveyId/records/export-selected',
+    requireRecordsExportPermission,
+    requireRecordsMatchUserGroupQualifiers,
+    startSelectedRecordsExport
   )
 
   // download generated record export file
