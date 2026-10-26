@@ -1,0 +1,30 @@
+export default {
+  cloneFromType: {
+    survey: 'Istraživanje',
+    template: 'Šablon',
+  },
+  createSurvey: 'Kreiraj istraživanje',
+  createTemplate: 'Kreiraj šablon',
+  newSurvey: 'Novo istraživanje',
+  newSurveyFromScratch: 'Novo istraživanje od početka',
+  newTemplate: 'Novi šablon',
+  newTemplateFromScratch: 'Novi šablon od početka',
+  source: {
+    label: 'Izvor',
+    arena: 'Arena (.zip)',
+    collect: 'Collect (.collect, .collect-backup, .collect-data)',
+    odk: 'ODK (.xml)',
+  },
+  startImport: 'Pokreni uvoz',
+  survey: 'Istraživanje',
+  survey_few: 'Istraživanja',
+  survey_other: 'Istraživanja',
+  template: 'Šablon',
+  template_few: 'Šabloni',
+  template_other: 'Šabloni',
+  error: 'Greška pri kreiranju novog istraživanja',
+  errorMaxSurveysCountExceeded: `Greška pri kreiranju istraživanja; dostigli ste maksimalan broj istraživanja koja možete kreirati ({{maxSurveysCount}}).`,
+  options: {
+    includeData: 'Uključi podatke',
+  },
+}
