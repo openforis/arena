@@ -20,7 +20,7 @@ export const ExtraPropDefsEditorPanel = (props) => {
   return (
     <PanelRight
       className="extra-prop-defs-editor-panel"
-      header={i18n.t('extraProp.label_plural')}
+      header={i18n.t('extraProp.label_other')}
       width="52rem"
       onClose={toggleEditExtraPropsPanel}
     >

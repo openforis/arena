@@ -98,7 +98,7 @@ export const ItemExtraPropsEditor = (props) => {
 
   return (
     <fieldset className="extra-props">
-      <legend>{i18n.t('extraProp.label_plural')}</legend>
+      <legend>{i18n.t('extraProp.label_other')}</legend>
       {itemExtraDefsArray.map(({ dataType, name: key }) =>
         dataType === ExtraPropDef.dataTypes.geometryPoint ? (
           <GeometryPointExtraPropEditor

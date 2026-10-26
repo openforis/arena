@@ -35,7 +35,7 @@ const JobErrors = ({
   const exportFileName = exportFileNameProp || `arena_${job.type}_errors`
 
   return (
-    <ExpansionPanel buttonLabel="common.error_plural" className="app-job-monitor__job-errors" startClosed={!openPanel}>
+    <ExpansionPanel buttonLabel="common.error_other" className="app-job-monitor__job-errors" startClosed={!openPanel}>
       <DataGrid
         allowExportToCsv
         autoRowHeight

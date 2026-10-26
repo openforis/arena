@@ -137,13 +137,13 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: 'errors',
-        header: 'common.error_plural',
+        header: 'common.error_other',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getErrorsCount)(record),
         width: '6rem',
       },
       {
         key: 'warnings',
-        header: 'common.warning_plural',
+        header: 'common.warning_other',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getWarningsCount)(record),
         width: '6rem',
       },

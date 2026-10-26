@@ -37,7 +37,7 @@ export const SurveyTemplateSelect = (props) => {
         const languages = Survey.getLanguages(item)
           .map((lang) => Languages.getLanguageLabel(lang))
           .join(', ')
-        return [description, `${i18n.t('common.language_plural')}: ${languages}`].filter(Boolean).join('\n\n')
+        return [description, `${i18n.t('common.language_other')}: ${languages}`].filter(Boolean).join('\n\n')
       }}
       itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
       itemValue={Survey.getUuid}

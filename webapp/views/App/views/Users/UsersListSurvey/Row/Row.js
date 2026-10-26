@@ -47,7 +47,7 @@ const Row = (props) => {
         </div>
       )}
       <div data-testid={TestId.userList.authGroup} data-value={authGroupName}>
-        <LabelWithTooltip label={i18n.t(`auth:authGroups.${authGroupName}.label_plural`)} />
+        <LabelWithTooltip label={i18n.t(`auth:authGroups.${authGroupName}.label_other`)} />
       </div>
       <div data-testid={TestId.userList.invitedBy} data-value={invitedBy}>
         <LabelWithTooltip label={invitedBy} />

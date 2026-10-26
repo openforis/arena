@@ -70,7 +70,7 @@ const CategoryList = (props) => {
     // Extra props
     {
       key: 'extraProps',
-      header: 'extraProp.label_plural',
+      header: 'extraProp.label_other',
       renderItem: ({ item: category }) =>
         Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
       width: '8rem',

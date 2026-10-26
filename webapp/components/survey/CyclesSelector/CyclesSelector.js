@@ -17,7 +17,7 @@ const CyclesSelector = (props) => {
     return null
   }
   return (
-    <FormItem label="common.cycle_plural">
+    <FormItem label="common.cycle_other">
       <div className="form-item_body">
         <ButtonGroup
           multiple

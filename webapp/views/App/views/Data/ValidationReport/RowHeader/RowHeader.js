@@ -15,7 +15,7 @@ const RowHeader = ({ handleSortBy, sort }) => {
       </div>
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field="message" />
-        {i18n.t('common.message_plural')}
+        {i18n.t('common.message_other')}
       </div>
       <div>
         <SortToggle sort={sort} handleSortBy={handleSortBy} field="owner" />
