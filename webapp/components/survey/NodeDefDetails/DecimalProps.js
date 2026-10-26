@@ -19,7 +19,7 @@ const DecimalProps = (props) => {
   return (
     <>
       <NodeDefUnitFormItem state={state} Actions={Actions} />
-      <FormItem label="nodeDefEdit.decimalProps.maxNumberDecimalDigits">
+      <FormItem label="nodeDefEdit:decimalProps.maxNumberDecimalDigits">
         <Input
           className="node-def-decimal-digits-input"
           value={decimalDigitsString}

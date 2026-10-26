@@ -17,9 +17,9 @@ test.describe('Messages', () => {
 
     // messages are in the System Administration section
     await page.goto(Urls.home)
-    await expect(page.getByTestId(TestId.sidebar.module('message_plural'))).toHaveCount(0)
+    await expect(page.getByTestId(TestId.sidebar.module('message_other'))).toHaveCount(0)
     await page.getByTestId(TestId.sidebar.module('systemAdmin')).hover()
-    await page.getByTestId(TestId.sidebar.moduleBtn('message_plural')).click()
+    await page.getByTestId(TestId.sidebar.moduleBtn('message_other')).click()
     await expect(page).toHaveURL(Urls.messages)
 
     await page.getByRole('button', { name: 'New' }).click()

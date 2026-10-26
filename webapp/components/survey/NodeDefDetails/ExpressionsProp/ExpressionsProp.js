@@ -129,7 +129,7 @@ const ExpressionsProp = (props) => {
         if (!Objects.isEmpty(constantValue)) {
           onChange(constantValue)
           setValueType(valueTypeNext)
-        } else if (await confirm({ key: 'nodeDefEdit.expressionsProp.confirmDelete' })) {
+        } else if (await confirm({ key: 'nodeDefEdit:expressionsProp.confirmDelete' })) {
           // expression cannot be converted into constant: clear it
           onChange(null)
           setValueType(valueTypeNext)
@@ -176,7 +176,7 @@ const ExpressionsProp = (props) => {
       }
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'nodeDefEdit.expressionsProp.confirmDelete',
+          key: 'nodeDefEdit:expressionsProp.confirmDelete',
           onOk: () => {
             removeExpression({ expression, callback })
           },

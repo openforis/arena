@@ -32,8 +32,8 @@ export const MobileAppProps = (props) => {
       <Checkbox
         checked={NodeDefLayout.getPropLayout(cycle, prop)(nodeDef)}
         disabled={readOnly}
-        info={`nodeDefEdit.mobileAppProps.${prop}.info`}
-        label={`nodeDefEdit.mobileAppProps.${prop}.label`}
+        info={`nodeDefEdit:mobileAppProps.${prop}.info`}
+        label={`nodeDefEdit:mobileAppProps.${prop}.label`}
         validation={Validation.getFieldValidation(prop)(validation)}
         onChange={(value) => Actions.setLayoutProp({ state, key: prop, value })}
       />

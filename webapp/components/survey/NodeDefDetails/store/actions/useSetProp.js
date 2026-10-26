@@ -19,7 +19,7 @@ const _checkCanChangeProp = ({ dispatch, nodeDef, key, value }) => {
     // NodeDef has default values, cannot change into multiple
     dispatch(
       NotificationActions.notifyWarning({
-        key: 'nodeDefEdit.cannotChangeIntoMultipleWithDefaultValues',
+        key: 'nodeDefEdit:cannotChangeIntoMultipleWithDefaultValues',
       })
     )
     return false

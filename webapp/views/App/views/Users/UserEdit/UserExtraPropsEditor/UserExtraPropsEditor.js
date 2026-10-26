@@ -67,7 +67,7 @@ export const UserExtraPropsEditor = (props) => {
   }, [])
 
   return (
-    <ExpansionPanel buttonLabel="extraProp.label_plural" className="extra-props" startClosed={items.length === 0}>
+    <ExpansionPanel buttonLabel="extraProp.label_other" className="extra-props" startClosed={items.length === 0}>
       <div className="form">
         {items.map(({ name, newItem, uuid, value }, index) => (
           <UserExtraPropEditor

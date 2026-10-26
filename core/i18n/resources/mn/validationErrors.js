@@ -109,8 +109,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Объект шаардлагатай',
-    applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөл давхцсан',
-    applyIfInvalid: 'Хүчингүй "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөл',
+    applyIfDuplicate: '"$t(nodeDefEdit:expressionsProp.applyIf)" нөхцөл давхцсан',
+    applyIfInvalid: 'Хүчингүй "$t(nodeDefEdit:advancedProps.relevantIf)" нөхцөл',
     columnWidthCannotBeGreaterThan: 'Баганын өргөн {{max}}-аас их байх боломжгүй',
     columnWidthCannotBeLessThan: 'Баганын өргөн {{min}}-ээс бага байх боломжгүй',
     countMaxMustBePositiveNumber: 'Хамгийн их тоо эерэг бүхэл тоо байх ёстой',
@@ -121,7 +121,7 @@ export default {
     defaultValuesNotSpecified: 'Үндсэн утга заагаагүй',
     entitySourceRequired: 'Объектын эх үүсвэр шаардлагатай',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Зөвхөн сүүлийн илэрхийлэл нь хоосон "$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөлтэй байж болно',
+      'Зөвхөн сүүлийн илэрхийлэл нь хоосон "$t(nodeDefEdit:expressionsProp.applyIf)" нөхцөлтэй байж болно',
     expressionDuplicate: 'Илэрхийлэл давхцсан',
     expressionRequired: 'Илэрхийлэл шаардлагатай',
     formulaInvalid: 'Томьёо хүчингүй байна',
@@ -136,7 +136,7 @@ export default {
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
     qualifierCannotHaveApplicableExpression:
-      'Квалификатор шинж чанар "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
+      'Квалификатор шинж чанар "$t(nodeDefEdit:advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
     qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
     qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
     qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',

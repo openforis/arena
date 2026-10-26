@@ -214,7 +214,7 @@ $t(common.cantUndoWarning)`,
     expression: 'Expression',
     resolved: 'Resolved',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Parent code',
       defaultValue: 'Default value',
       requiredIf: 'Required if',

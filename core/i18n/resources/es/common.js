@@ -27,7 +27,7 @@ export default {
     cantUndoWarning: 'Esta operación no se puede deshacer',
     cantBeDeletedUsedItem: 'Este {{item}} es utilizado por algunas definiciones de nodo y no puede ser eliminado',
     chain: 'Cadena',
-    chain_plural: 'Cadenas',
+    chain_other: 'Cadenas',
     childrenEmpty: 'Defina al menos un elemento hijo',
     clear: 'Limpiar',
     clone: 'Clonar',
@@ -42,14 +42,14 @@ export default {
     createdWith: 'Creado con',
     createdWithApp: '$t(common.createdWith) {{app}}',
     cycle: 'Ciclo',
-    cycle_plural: 'Ciclos',
+    cycle_other: 'Ciclos',
     dateCreated: 'Fecha de creación',
     dateLastModified: 'Fecha de última modificación',
     delete: 'Eliminar',
     deleted: '¡Eliminado!',
     descending: 'Descendente',
     description: 'Descripción',
-    description_plural: 'Descripciones',
+    description_other: 'Descripciones',
     designerNotes: 'Notas del diseñador',
     designerNotesInfo:
       'Las notas del diseñador solo serán visibles en el diseñador del formulario de la encuesta y no serán visibles en el formulario de entrada de datos.',
@@ -70,11 +70,11 @@ export default {
     empty: 'Vacío',
     entity: 'Entidad',
     error: 'Error',
-    error_plural: 'Errores',
+    error_other: 'Errores',
     errorFound: '1 error encontrado',
     errorFound_other: '{{count}} errores encontrados',
     errorMessage: 'Mensaje de error',
-    errorMessage_plural: 'Mensajes de error',
+    errorMessage_other: 'Mensajes de error',
     expand: 'Expandir',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Exportar',
@@ -85,7 +85,7 @@ export default {
     expression: 'Expresión',
     false: 'Falso',
     file: 'Archivo',
-    file_plural: 'Archivos',
+    file_other: 'Archivos',
     formContainsErrors: 'El formulario contiene errores',
     formContainsErrorsCannotContinue: 'El formulario contiene errores. Por favor, corríjalos antes de continuar.',
     formContainsErrorsCannotSave: 'El formulario contiene errores. Por favor, corríjalos antes de guardar.',
@@ -102,12 +102,12 @@ export default {
     info: 'Información',
     invalid: 'INVÁLIDO',
     item: 'Artículo',
-    item_plural: 'Artículos',
+    item_other: 'Artículos',
     itemAlreadyAdded: 'Artículo ya añadido',
     label: 'Etiqueta',
-    label_plural: 'Etiquetas',
+    label_other: 'Etiquetas',
     language: 'Idioma',
-    language_plural: 'Idiomas',
+    language_other: 'Idiomas',
     leavePageConfirmMessage:
       'Hay cambios sin guardar en el formulario. \nAl confirmar, todos los cambios se perderán. \n¿Desea continuar?',
     local: 'Local',
@@ -117,11 +117,11 @@ export default {
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
-    message_plural: 'Mensajes',
+    message_other: 'Mensajes',
     measure: 'Medida',
     measure_other: 'Medidas',
     measurePrevSteps: 'Medir pasos previos',
-    measurePrevSteps_plural: 'Medidas pasos previos',
+    measurePrevSteps_other: 'Medidas pasos previos',
     min: 'Mínimo',
     moveUp: 'Mover arriba',
     moveDown: 'Mover abajo',
@@ -129,7 +129,7 @@ export default {
     new: 'Nuevo',
     next: 'Siguiente',
     no: 'No',
-    noItems: '$t(common.no) $t(common.item_plural)',
+    noItems: '$t(common.no) $t(common.item_other)',
     notification: 'Notificación',
     notification_other: 'Notificaciones',
     notSpecified: '---No especificado---',
@@ -224,7 +224,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     value: 'Valor',
     view: 'Ver',
     warning: 'Advertencia',
-    warning_plural: 'Advertencias',
+    warning_other: 'Advertencias',
     yes: 'Sí',
     date: {
       aMomentAgo: 'Hace un momento',
@@ -354,22 +354,22 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
     userGroup: 'Grupo de usuarios',
-    userGroup_plural: 'Grupos de usuarios',
+    userGroup_other: 'Grupos de usuarios',
     userGroupNew: 'Nuevo grupo de usuarios',
     usersList: 'Lista de usuarios (todos)',
     user2FADevice: 'Dispositivo 2FA',
-    user2FADevice_plural: 'Dispositivos 2FA',
+    user2FADevice_other: 'Dispositivos 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
     analysis: 'Análisis',
     chain: 'Cadena',
-    chain_plural: 'Cadenas',
+    chain_other: 'Cadenas',
     virtualEntity: 'Entidad virtual',
     entities: 'Entidades virtuales',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Instancias',
     message: 'Mensaje',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
 
     systemAdmin: 'Administración del sistema',
     jobMonitor: 'Monitor de trabajos',
@@ -384,74 +384,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
   },
   surveyDefsLoader: {
     requireSurveyPublish: 'Esta sección solo está disponible cuando la encuesta está publicada',
-  },
-  loginView: {
-    yourName: 'Su nombre',
-    yourEmail: 'Su correo electrónico',
-    yourPassword: 'Su contraseña',
-    yourNewPassword: 'Su nueva contraseña',
-    repeatYourPassword: 'Repita su contraseña',
-    repeatYourNewPassword: 'Repita su nueva contraseña',
-    requestAccess: '¿Nuevo en $t(common.appNameFull)? Solicitar acceso',
-    resetPassword: 'Restablecer contraseña',
-    login: 'Iniciar sesión',
-    loginUsingBackupCode: 'Iniciar sesion con codigo de respaldo 2FA',
-    forgotPassword: '¿Olvidó su contraseña?',
-    sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
-    twoFactorBackupCode: 'Codigo de respaldo 2FA',
-    twoFactorToken: 'Código de verificación',
-    twoFactorTokenDescription: `Para mantener su cuenta segura, verificamos su identidad.
-
-  Ingrese el código generado por su aplicación de autenticación.`,
-  },
-  accessRequestView: {
-    error: 'Error al solicitar acceso: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Nombre',
-        lastName: 'Apellido',
-        institution: 'Institución',
-        country: 'País',
-        purpose: '¿Para qué lo necesita?',
-        surveyName: 'Proponer un nombre de encuesta',
-        templateUuid: '¿Empezar desde una plantilla?',
-      },
-    },
-    introduction:
-      'Nuestros recursos son limitados, por lo que debe solicitar acceso a la plataforma. También nos interesa saber qué desea hacer con ella, ¡así que háganoslo saber! Tiene la posibilidad de empezar desde una **nueva encuesta en blanco** o clonar una **plantilla** existente y tendrá que sugerir un nombre para la nueva encuesta creada. Se le asignará el rol de ***Administrador de encuestas*** para esa encuesta: podrá editarla e invitar a nuevos usuarios a unirse a su encuesta y contribuir a ella. También será un ***Gerente de encuestas*** y podrá **crear nuevas encuestas** (hasta 5) si es necesario. Para obtener más información, visite nuestro sitio web: $t(links.openforisArenaWebsite) $t(common.raiseTicketInSupportForum) **Una vez que envíe la solicitud, espere un correo electrónico de invitación para acceder a Arena.**',
-    reCaptchaNotAnswered: 'ReCaptcha no respondido',
-    requestSent: 'Solicitud de acceso enviada correctamente',
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-Por favor, concédanos un par de días para procesar su solicitud.
-Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las instrucciones sobre cómo acceder a $t(common.appName).
-¡Gracias y disfrute de **$t(common.appNameFull)**!`,
-    sendRequest: 'Enviar solicitud',
-    sendRequestConfirm: '¿Solicitar acceso a $t(common.appNameFull)?',
-    templateNotSelected: 'No seleccionado (empezar desde cero)',
-    title: 'Solicitando acceso a $t(common.appNameFull)',
-    whitelistSenderSuggestion:
-      'Si lo encuentra en la carpeta de Spam/Correo no deseado, añada **{{senderEmail}}** a sus contactos (libreta de direcciones) o márquelo como seguro/no es spam, para que nuestros próximos correos lleguen directamente a su bandeja de entrada.',
-  },
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Complete su registro en Arena',
-      setYourNewPassword: 'Establezca su nueva contraseña',
-    },
-    setNewPassword: 'Establecer nueva contraseña',
-    forgotPasswordLinkInvalid: 'La página a la que ha intentado acceder no existe o ya no es válida',
-    passwordSuccessfullyReset: 'Su contraseña ha sido restablecida correctamente',
-    passwordStrengthChecksTitle: 'Verificaciones de seguridad de la contraseña',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Sin espacios en blanco',
-      atLeast8CharactersLong: 'Al menos 8 caracteres',
-      containsLowerCaseLetters: 'Contiene letras minúsculas',
-      containsUpperCaseLetters: 'Contiene letras mayúsculas',
-      containsNumbers: 'Contiene números',
-    },
-    completeRegistration: 'Completar registro',
   },
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Tipos de dependencia',
@@ -860,313 +792,6 @@ $t(common.appNameFull)
       title: '$t(appModules.changelog)',
     },
   },
-  nodeDefEdit: {
-    additionalFields: 'Campos adicionales',
-    basic: 'Básico',
-    advanced: 'Avanzado',
-    mobileApp: 'Aplicación móvil',
-    print: 'Impresión',
-    printProps: {
-      printOrientation: {
-        label: 'Orientación de página',
-        info: 'Orientación usada cuando esta entidad inicia su propia sección imprimible. Por defecto se hereda la orientación del documento elegida en la exportación.',
-      },
-      orientations: {
-        default: 'Predeterminada (documento)',
-        portrait: 'Vertical',
-        landscape: 'Horizontal',
-      },
-    },
-    validations: 'Validaciones',
-    function: 'Función',
-    editingFunction: 'Editando función {{functionName}}',
-    editorHelp: {
-      json: 'Las expresiones válidas son un subconjunto de Javascript.',
-      sql: 'Solo se permiten expresiones SQL válidas.',
-    },
-    editorCompletionHelp: '- Mostrar las variables y funciones disponibles que se pueden usar',
-    functionDescriptions: {
-      categoryItemProp:
-        'Devuelve el valor de la $t(extraProp.label) especificada de un elemento de categoría que tiene el código especificado',
-      dateTimeDiff: 'Devuelve la diferencia (en minutos) de 2 pares de fecha-hora',
-      distance: 'Devuelve la distancia (en metros) entre las coordenadas especificadas',
-      geoCoordinateAtDistance:
-        'Devuelve las coordenadas a una distancia y rumbo especificados desde las coordenadas especificadas',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      first: 'Devuelve el primer valor o nodo del atributo o entidad múltiple especificado',
-      geoPolygon: 'Genera un polígono en GeoJSON a partir de una lista de coordenadas',
-      includes: 'Devuelve verdadero si el atributo múltiple especificado incluye el valor especificado.',
-      index: 'Devuelve el índice del nodo especificado entre sus hermanos',
-      isEmpty: 'Devuelve verdadero si el argumento no tiene ningún valor especificado',
-      isNotEmpty: 'Devuelve verdadero si el argumento tiene algún valor especificado',
-      last: 'Devuelve el último valor o nodo del atributo o entidad múltiple especificado',
-      ln: 'Devuelve el logaritmo natural de X',
-      log10: 'Devuelve el logaritmo en base 10 de X',
-      max: 'Devuelve el máximo de los argumentos',
-      min: 'Devuelve el mínimo de los argumentos',
-      now: 'Devuelve la fecha u hora actual',
-      parent: 'Devuelve la entidad padre del nodo especificado',
-      pow: 'Devuelve el valor de una base elevada a una potencia',
-      prevCycleNote:
-        'Funciona solo en Arena Mobile cuando se definen múltiples ciclos y el enlace al ciclo anterior está habilitado',
-      prevCycleValue:
-        'Devuelve el valor del mismo atributo en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Devuelve los valores de los mismos atributos en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Devuelve el ciclo del registro actual',
-      recordDateCreated:
-        'Devuelve la fecha y hora de creación del registro actual como un valor de fecha y hora. Se puede usar en un atributo de texto, fecha u hora',
-      recordDateLastModified:
-        'Devuelve la fecha y hora de la última modificación del registro actual como un valor de fecha y hora. Se puede usar en un atributo de texto, fecha u hora',
-      recordOwnerEmail: 'Devuelve el correo electrónico del usuario propietario del registro',
-      recordOwnerName: 'Devuelve el nombre del usuario propietario del registro',
-      recordOwnerRole: 'Devuelve el rol (en la encuesta actual) del usuario propietario del registro',
-      rowIndex: 'Devuelve el índice de la fila (o formulario) actual de la tabla',
-      taxonProp:
-        'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
-      taxonVernacularName:
-        'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
-      unique: 'Devuelve los valores únicos de un atributo o entidad múltiple',
-      userEmail: 'Devuelve el correo electrónico del usuario que ha iniciado sesión',
-      userIsRecordOwner:
-        'Devuelve un valor booleano "verdadero" si el usuario que edita el registro también es su propietario, "falso" en caso contrario',
-      userName: 'Devuelve el nombre del usuario que ha iniciado sesión',
-      userProp: 'Devuelve el valor de la $t(extraProp.label) especificada del usuario que ha iniciado sesión',
-      uuid: 'Genera un UUID (identificador universalmente único) que se puede usar como identificador (por ejemplo, como atributo clave de una entidad)',
-      avg: 'Devuelve el valor promedio de una variable numérica',
-      count: 'Devuelve el número de filas que coinciden con un criterio especificado',
-      sum: 'Devuelve la suma total de una variable numérica',
-    },
-    functionName: {
-      rowIndex: 'Índice de fila',
-    },
-    basicProps: {
-      analysis: 'Análisis',
-      autoIncrementalKey: {
-        label: 'Clave auto incremental',
-        info: 'El valor se generará automáticamente',
-      },
-      autoCreateMinCountItems: {
-        label: 'Crear mínimo de elementos automáticamente',
-        info: 'Cuando la entidad se vuelve relevante o se crea su entidad padre, se generará automáticamente un número de entidades igual al mínimo requerido.',
-      },
-      displayAs: 'Mostrar como',
-      displayIn: 'Mostrar en',
-      entitySource: 'Fuente de la entidad',
-      enumerate: {
-        label: 'Enumerar',
-        info: 'Las filas se generarán automáticamente utilizando los elementos de categoría asociados a un atributo de código marcado como Clave definido dentro de la entidad; las filas no se pueden añadir ni eliminar y el atributo de código clave no será editable',
-      },
-      enumeratingItemsExpression: {
-        label: 'Expresión de elementos de enumeración',
-        info: 'Expresión opcional que filtra qué elementos de la categoría se enumeran (p. ej. unique(table_source.source_type)). Si está vacía, se usan todos los elementos de la categoría.',
-      },
-      enumerator: {
-        label: 'Enumerador',
-        info: 'Los elementos de la categoría se utilizarán para generar las filas de la entidad padre',
-      },
-      form: 'Formulario',
-      formula: 'Fórmula',
-      includedInClonedData: 'Incluido en los datos clonados',
-      includedInMultipleEntitySummary: {
-        label: 'Incluir en el resumen de entidades múltiples',
-        info: `Si está marcado, el valor del atributo será visible en el selector de entidades y en la vista de resumen de la entidad`,
-      },
-      includedInRecordsList: {
-        label: 'Incluir en la lista de registros',
-        info: `Si está marcado, el atributo será visible en la lista de registros`,
-      },
-      key: 'Clave',
-      maxKeysCountReached: 'Número máximo de claves alcanzado ({{maxKeysCount}})',
-      multiple: 'Múltiple',
-      ownPage: 'Su propia página',
-      parentPage: 'Página padre ({{parentPage}})',
-      qualifier: {
-        label: 'Calificador',
-        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno.`,
-      },
-      table: 'Tabla',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Valores predeterminados no especificados',
-      defaultValuesSpecified: 'Valores predeterminados especificados',
-      editableAlways: 'Siempre editable',
-      editableIfConditionIsMet: 'Editable cuando se cumple la condición',
-      relevantIfRadioNone: 'Siempre relevante',
-      relevantIfRadioDefined: 'Relevante cuando se cumple la condición',
-      visibleAlways: 'Siempre visible',
-      visibleIfConditionIsMet: 'Visible cuando se cumple la condición',
-      areaBasedEstimate: 'Estimación basada en el área',
-      defaultValues: 'Valores predeterminados',
-      defaultValuesInfo: `Esto permite completar automáticamente una respuesta según reglas específicas.
-    Si configura varias reglas, el sistema las comprobará en orden, de arriba hacia abajo.
-    Aplicará la primera regla que cumpla las condiciones y usará ese resultado como respuesta.`,
-      defaultValueEvaluatedOneTime: 'Valor predeterminado evaluado solo una vez',
-      defaultValueEvaluatedOneTimeInfo: `El valor predeterminado se evaluará solo una vez, cuando se cree el atributo.
-    Si no está marcado, el valor predeterminado se volverá a evaluar cada vez que se actualice el registro.
-    Debe marcarse al usar expresiones como now() o uuid(), que deben evaluarse solo una vez, cuando el valor del atributo se genera por primera vez.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Valores predeterminados no editables porque la clave auto incremental está configurada',
-      editableIf: 'Editable si',
-      editableIfInfo: `Por defecto, un usuario siempre puede acceder a un campo relevante.
-Aquí se puede definir una regla para indicar si el usuario puede escribir o modificar este campo.
-Esto decide si un usuario puede escribir o cambiar este campo.
-Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será de solo lectura (bloqueado).`,
-      hidden: 'Siempre oculto',
-      hiddenInReport: 'Ocultar en el Panel Analítico',
-      hiddenInReportInfo: `Si está marcado, el atributo no será visible en el Panel Analítico`,
-      hiddenWhenNotRelevant: 'Oculto cuando no es relevante',
-      itemsFilter: 'Filtro de elementos',
-      itemsFilterInfo:
-        'Expresión utilizada para filtrar elementos seleccionables. En la expresión, la palabra "this" se referirá al elemento en sí. Ej.: this.region = region_attribute_name (donde "region" es el nombre de una propiedad extra definida para el elemento y region_attribute_name es el nombre de un atributo en la encuesta)',
-      readOnly: 'Solo lectura',
-      relevantIf: 'Relevante si',
-      relevantIfInfo: `Por defecto, todos los campos están activos.
-    Si define una regla de relevancia y no se cumple, el campo se mostrará en gris o se ocultará por completo,
-    y las respuestas automáticas se ignorarán.
-    Úselo para mostrar u ocultar partes de la encuesta de forma dinámica; por ejemplo, mostrar "Especifique" solo cuando el usuario elige "Otro".`,
-      script: 'Script',
-      visibleIf: 'Visible si',
-      visibleIfInfo: `Por defecto, un campo siempre es visible.
-    Si define una regla, solo será visible cuando esa regla se cumpla; en caso contrario, quedará oculto.
-    Nota: a diferencia de ocultar un campo "no relevante", un campo oculto puede seguir guardando una respuesta automática.
-    Esto es útil para ocultar secciones completas de la encuesta según quién haya iniciado sesión (por ejemplo, por rol).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Oculto en Arena Mobile',
-        info: 'Si está marcado, el atributo no será visible en AM',
-      },
-      includedInPreviousCycleLink: {
-        label: 'Incluir en el enlace del ciclo anterior',
-        info: 'Si está marcado, el valor del ciclo anterior se mostrará en el formulario de entrada de datos (cuando el enlace al ciclo anterior esté activo en la aplicación móvil)',
-      },
-    },
-    numericProps: {
-      unit: 'Unidad',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Número máximo de dígitos decimales',
-    },
-    fileProps: {
-      fileNameExpression: 'Expresión de nombre de archivo',
-      fileType: 'Tipo de archivo',
-      fileTypes: {
-        image: 'Imagen',
-        video: 'Video',
-        audio: 'Audio',
-        other: 'Otro',
-      },
-      maxFileSize: 'Tamaño máximo de archivo (Mb)',
-      numberOfFiles: 'Vaya a Validaciones para cambiar el número mínimo y máximo de archivos.',
-      showGeotagInformation: 'Mostrar información de geoetiqueta',
-    },
-    mobileProps: {
-      title: 'Aplicación móvil',
-    },
-    timeProps: {
-      includeSeconds: 'Incluir segundos',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Color de encabezado',
-      headerColor: {
-        blue: 'Azul',
-        green: 'Verde',
-        orange: 'Naranja',
-        red: 'Rojo',
-        yellow: 'Amarillo',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Hipervínculo',
-        markdown: 'Markdown',
-        text: 'Texto',
-      },
-      textInputType: 'Tipo de entrada de texto',
-      textInputTypes: {
-        singleLine: 'Una sola línea',
-        multiLine: 'Varias líneas',
-      },
-      textTransform: 'Transformación de texto',
-      textTransformTypes: {
-        none: 'ninguno',
-        capitalize: 'capitalizar',
-        uppercase: 'mayúsculas',
-        lowercase: 'minúsculas',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Valor de la etiqueta',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Categoría',
-      codeShown: 'Mostrar código',
-      displayAsTypes: {
-        checkbox: 'Casilla de verificación',
-        dropdown: 'Desplegable',
-      },
-      parentCode: 'Código padre',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Permitir solo coordenadas del dispositivo',
-      allowOnlyDeviceCoordinateInfo:
-        'Solo se aplica a Arena Mobile: si está marcado, el usuario no podrá modificar los valores X/Y, solo se podrá usar el GPS del dispositivo para obtenerlos',
-      mapMarkerColor: 'Color del marcador en el mapa',
-    },
-    expressionsProp: {
-      expression: 'Expresión',
-      applyIf: 'Aplicar si',
-      confirmDelete: '¿Eliminar esta expresión?',
-      severity: 'Severidad',
-    },
-    validationsProps: {
-      minCount: 'Conteo mínimo',
-      maxCount: 'Conteo máximo',
-      expressions: 'Expresiones de validación',
-      attributeAlwaysValid: 'Atributo siempre válido',
-      attributeValidWhenConditionIsMet: 'Atributo válido cuando se cumple la condición',
-      notRequired: 'No obligatorio',
-      alwaysRequired: 'Siempre obligatorio',
-      requiredWhenConditionIsMet: 'Obligatorio cuando se cumple la condición',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Este nodo no se puede convertir a múltiple porque tiene valores predeterminados.',
-    cannotDeleteNodeDefReferenced:
-      'No se puede eliminar "{{nodeDef}}": está referenciado por estas definiciones de nodo: {{nodeDefDependents}}',
-    cloneDialog: {
-      confirmButtonLabel: 'Clonar',
-      title: 'Clonando definición de nodo "{{nodeDefName}}"',
-      entitySelectLabel: 'Entidad en la que clonar:',
-    },
-    conversion: {
-      dialogTitle: 'Convertir {{nodeDefName}} a otro tipo',
-      fromType: 'De tipo',
-      toType: 'A tipo',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Mover',
-      title: 'Moviendo la definición del nodo "{{nodeDefName}}" desde "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Entidad a la que mover:',
-    },
-    movedNodeDefinitionHasErrors:
-      'La definición de nodo "{{nodeDefName}}" que ha movido tiene errores; por favor, corríjalos.',
-    nodeDefintionsHaveErrors: 'Estas definiciones de nodo tienen errores: {{nodeDefNames}}. Por favor, corríjalos.',
-    filterVariable: 'Variable para filtrar elementos',
-    filterVariableForLevel: 'Variable para {{levelName}}',
-    unique: {
-      label: 'Único',
-      info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
-    },
-    nodeDefClonedSuccessfully:
-      'Definición de nodo "{{nodeDefName}}" clonada correctamente en "{{targetParentNodeDefName}}"',
-    categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
-    taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
-  },
   languagesEditor: {
     languages: 'Idioma(s)',
   },
@@ -1319,7 +944,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
   },
   extraProp: {
     label: 'Propiedad extra',
-    label_plural: 'Propiedades extra',
+    label_other: 'Propiedades extra',
     addExtraProp: 'Añadir propiedad extra',
     dataTypes: {
       geometryPoint: 'Punto de geometría',
@@ -1327,7 +952,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       text: 'Texto',
     },
     editor: {
-      title: 'Editar $t(extraProp.label_plural)',
+      title: 'Editar $t(extraProp.label_other)',
       confirmDelete: '¿Eliminar la propiedad extra "{{name}}"?',
       confirmSave:
         '¿Guardar los cambios en las definiciones de propiedades extra?\n\n**Advertencias**:\n\n{{warnings}}',
@@ -1405,13 +1030,11 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       expression: 'Expresión',
     },
   },
-
   urls: {
     openforisWebsite: 'https://www.openforis.org',
     openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
     supportForum: 'https://openforis.support',
   },
-
   links: {
     openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
     openforisArenaWebsite:
@@ -1426,7 +1049,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     arenaRScriptsInGitHub:
       '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
   },
-
   aiExpression: {
     title: 'Generar expresión a partir de una descripción',
     hint: 'Describa en lenguaje sencillo lo que debe hacer la expresión. La IA la traducirá a la sintaxis de Arena. Presione Ctrl+Enter para generar.',
@@ -1445,7 +1067,6 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       timeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
     },
   },
-
   aiTranslation: {
     translateButton_one: 'Traducir a {{count}} otro idioma',
     translateButton_other: 'Traducir a {{count}} otros idiomas',
@@ -1456,14 +1077,12 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     failed: 'La traducción falló: {{message}}',
     timeout: 'La solicitud de traducción ha caducado. Inténtelo de nuevo.',
   },
-
   aiActivityLog: {
     title: 'Resumen del registro de actividad',
     summarizeButton: 'Resumir',
     thinking: 'Agregando eventos y pidiendo a la IA que los resuma…',
     error: 'Error al obtener el resumen: {{message}}',
   },
-
   aiChatbot: {
     open: 'Ayuda y documentación',
     title: 'Ayuda y documentación',

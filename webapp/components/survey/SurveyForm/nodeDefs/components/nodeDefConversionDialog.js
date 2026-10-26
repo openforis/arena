@@ -42,12 +42,12 @@ export const NodeDefConversionDialog = (props) => {
       className="survey-form__node-def-conversion-dialog"
       onClose={onClose}
       showCloseButton
-      title="nodeDefEdit.conversion.dialogTitle"
+      title="nodeDefEdit:conversion.dialogTitle"
       titleParams={{ nodeDefName }}
     >
       <ModalBody>
-        <FormItem label="nodeDefEdit.conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
-        <FormItem label="nodeDefEdit.conversion.toType">
+        <FormItem label="nodeDefEdit:conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
+        <FormItem label="nodeDefEdit:conversion.toType">
           <Dropdown
             className="to-type-dropdown"
             items={availableToTypes}

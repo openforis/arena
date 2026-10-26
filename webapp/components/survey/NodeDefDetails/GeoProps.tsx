@@ -27,9 +27,9 @@ const GeoProps = (props: GeoPropsProps) => {
   if (!experimentalFeatures || !NodeDef.canBePositionTracking(nodeDef)) return null
 
   return (
-    <FormItem label="nodeDefEdit.geoProps.positionTracking">
+    <FormItem label="nodeDefEdit:geoProps.positionTracking">
       <div className="form-item_body checkbox-with-info">
-        <ButtonIconInfo title="nodeDefEdit.geoProps.positionTrackingInfo" />
+        <ButtonIconInfo title="nodeDefEdit:geoProps.positionTrackingInfo" />
         <Checkbox
           checked={NodeDef.isPositionTracking(nodeDef)}
           disabled={readOnly}

@@ -71,7 +71,7 @@ const CountProp = (props) => {
         state={state}
         Actions={Actions}
         isBoolean={false}
-        label={`nodeDefEdit.validationsProps.${countType}Count`}
+        label={`nodeDefEdit:validationsProps.${countType}Count`}
         onChange={onChange}
         readOnly={readOnly}
         propName={`validations.${countType}`}
@@ -135,9 +135,9 @@ const RequiredProp = (props) => {
       propName={`${NodeDef.keysPropsAdvanced.validations}.${NodeDefValidations.keys.requiredIf}`}
       qualifier={TestId.nodeDefDetails.requiredIf}
       radioLabels={{
-        [requiredRadioModes.none]: 'nodeDefEdit.validationsProps.notRequired',
-        [requiredRadioModes.always]: 'nodeDefEdit.validationsProps.alwaysRequired',
-        [requiredRadioModes.defined]: 'nodeDefEdit.validationsProps.requiredWhenConditionIsMet',
+        [requiredRadioModes.none]: 'nodeDefEdit:validationsProps.notRequired',
+        [requiredRadioModes.always]: 'nodeDefEdit:validationsProps.alwaysRequired',
+        [requiredRadioModes.defined]: 'nodeDefEdit:validationsProps.requiredWhenConditionIsMet',
       }}
       radioMode
       radioModeDefined={requiredRadioModes.defined}
@@ -226,7 +226,7 @@ const ValidationsProps = (props) => {
         {NodeDef.isAttribute(nodeDef) &&
           !NodeDef.isKey(nodeDef) &&
           (NodeDef.isRoot(nodeDefParent) || NodeDef.isMultiple(nodeDefParent) || NodeDef.isMultiple(nodeDef)) && (
-            <FormItem isInfoMarkdown info="nodeDefEdit.unique.info" label="nodeDefEdit.unique.label">
+            <FormItem isInfoMarkdown info="nodeDefEdit:unique.info" label="nodeDefEdit:unique.label">
               <Checkbox
                 id={TestId.nodeDefDetails.nodeDefUnique}
                 checked={NodeDefValidations.isUnique(nodeDefValidations)}
@@ -240,15 +240,15 @@ const ValidationsProps = (props) => {
             Actions={Actions}
             excludeCurrentNodeDef={false}
             isBoolean={false}
-            label="nodeDefEdit.validationsProps.expressions"
+            label="nodeDefEdit:validationsProps.expressions"
             nodeDefUuidContext={nodeDefUuidContext}
             onChange={onValidationExpressionsUpdate}
             propExtractor={() => NodeDefValidations.getExpressions(nodeDefValidations)}
             propName={`${NodeDef.keysPropsAdvanced.validations}.${NodeDefValidations.keys.expressions}`}
             qualifier={TestId.nodeDefDetails.validations}
             radioLabels={{
-              none: 'nodeDefEdit.validationsProps.attributeAlwaysValid',
-              defined: 'nodeDefEdit.validationsProps.attributeValidWhenConditionIsMet',
+              none: 'nodeDefEdit:validationsProps.attributeAlwaysValid',
+              defined: 'nodeDefEdit:validationsProps.attributeValidWhenConditionIsMet',
             }}
             readOnly={readOnly}
             severity

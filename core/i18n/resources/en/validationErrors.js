@@ -108,8 +108,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entity is required',
-    applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
-    applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+    applyIfDuplicate: '"$t(nodeDefEdit:expressionsProp.applyIf)" condition is duplicate',
+    applyIfInvalid: 'Invalid "$t(nodeDefEdit:advancedProps.relevantIf)" condition',
     columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
     columnWidthCannotBeLessThan: 'Column width cannot be less than {{min}}',
     countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
@@ -120,7 +120,7 @@ export default {
     defaultValuesNotSpecified: 'Default value not specified',
     entitySourceRequired: 'Entity Source required',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Only last expression can have empty "$t(nodeDefEdit.expressionsProp.applyIf)" condition',
+      'Only last expression can have empty "$t(nodeDefEdit:expressionsProp.applyIf)" condition',
     expressionDuplicate: 'Expression duplicate',
     expressionRequired: 'Expression required',
     formulaInvalid: 'Formula is invalid',
@@ -138,7 +138,7 @@ export default {
     requiredIfInvalid: 'Invalid "Required if" condition',
     requiredIfNotAllowed: '"Required if" condition allowed only for single, non-key attributes not always required',
     qualifierCannotHaveApplicableExpression:
-      'Qualifier attribute cannot have "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+      'Qualifier attribute cannot have "$t(nodeDefEdit:advancedProps.relevantIf)" condition',
     qualifierCannotHaveEditabilityRule: 'Qualifier attribute cannot have editability rules defined',
     qualifierCannotHaveDefaultValues: 'Qualifier attribute cannot have default values',
     qualifierCannotHaveValidations: 'Qualifier attribute cannot have validation rules defined',

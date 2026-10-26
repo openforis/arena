@@ -103,7 +103,7 @@ export const cloneNodeDefFromSurvey =
       if (categoriesCloned.length > 0) {
         dispatch(
           NotificationActions.notifyInfo({
-            key: 'nodeDefEdit.categoriesClonedFromSurvey',
+            key: 'nodeDefEdit:categoriesClonedFromSurvey',
             params: { names: categoriesCloned.map((category) => Category.getName(category)).join(', ') },
           })
         )
@@ -111,7 +111,7 @@ export const cloneNodeDefFromSurvey =
       if (taxonomiesCloned.length > 0) {
         dispatch(
           NotificationActions.notifyInfo({
-            key: 'nodeDefEdit.taxonomiesClonedFromSurvey',
+            key: 'nodeDefEdit:taxonomiesClonedFromSurvey',
             params: { names: taxonomiesCloned.map((taxonomy) => Taxonomy.getName(taxonomy)).join(', ') },
           })
         )
@@ -151,7 +151,7 @@ export const cloneNodeDefIntoEntityDef =
       const targetParentNodeDef = Survey.getNodeDefByUuid(targetParentNodeDefUuid)(survey)
       dispatch(
         NotificationActions.notifyInfo({
-          key: 'nodeDefEdit.nodeDefClonedSuccessfully',
+          key: 'nodeDefEdit:nodeDefClonedSuccessfully',
           params: {
             nodeDefName: NodeDef.getName(nodeDef),
             targetParentNodeDefName: NodeDef.getName(targetParentNodeDef),
@@ -169,7 +169,7 @@ const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDe
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     dispatch(
       NotificationActions.notifyWarning({
-        key: 'nodeDefEdit.movedNodeDefinitionHasErrors',
+        key: 'nodeDefEdit:movedNodeDefinitionHasErrors',
         params: { nodeDefName: NodeDef.getName(nodeDef) },
       })
     )
@@ -187,7 +187,7 @@ const _handleNodeDefMoveValidationErrors = ({ dispatch, navigate, survey, nodeDe
 
     dispatch(
       NotificationActions.notifyWarning({
-        key: 'nodeDefEdit.nodeDefintionsHaveErrors',
+        key: 'nodeDefEdit:nodeDefintionsHaveErrors',
         params: { nodeDefNames: invalidNodeDefsNames },
       })
     )
@@ -349,7 +349,7 @@ const _checkCanRemoveNodeDef = async ({ dispatch, getState, nodeDef }) => {
 
   dispatch(
     NotificationActions.notifyWarning({
-      key: 'nodeDefEdit.cannotDeleteNodeDefReferenced',
+      key: 'nodeDefEdit:cannotDeleteNodeDefReferenced',
       params: {
         nodeDef: NodeDef.getLabel(nodeDef, lang),
         nodeDefDependents: nodeDefDependentsText,

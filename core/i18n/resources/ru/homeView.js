@@ -216,7 +216,7 @@ $t(common.cantUndoWarning)`,
     expression: 'Выражение',
     resolved: 'Разрешено',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Родительский код',
       defaultValue: 'Значение по умолчанию',
       requiredIf: 'Обязательно, если',

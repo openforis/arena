@@ -79,7 +79,7 @@ const LevelDetails = (props) => {
       )}
 
       <div className="category__level-items-header">
-        <h5 className="label">{i18n.t('common.item_plural')}</h5>
+        <h5 className="label">{i18n.t('common.item_other')}</h5>
         {!readOnly && canShowItems && (
           <Button
             id={`category-level-${levelIndex}-btn-item-add`}

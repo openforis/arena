@@ -25,14 +25,14 @@ export const PasswordStrengthChecker = (props) => {
   return (
     <ExpansionPanel
       className="password-strength-checks-panel"
-      buttonLabel="resetPasswordView.passwordStrengthChecksTitle"
+      buttonLabel="guest:resetPasswordView.passwordStrengthChecksTitle"
       open={!passwordIsValid}
     >
       <ul>
         {checks.map(({ key, regExp }) => (
           <li key={key}>
             <span className={`icon icon-${regExp.test(password) ? 'checkmark' : 'cross'}`} />
-            {i18n.t(`resetPasswordView.passwordStrengthChecks.${key}`)}
+            {i18n.t(`guest:resetPasswordView.passwordStrengthChecks.${key}`)}
           </li>
         ))}
       </ul>

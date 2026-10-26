@@ -23,7 +23,7 @@ const AreaBasedEstimated = (props) => {
 
   if (NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef)) {
     return (
-      <FormItem label="nodeDefEdit.advancedProps.areaBasedEstimate">
+      <FormItem label="nodeDefEdit:advancedProps.areaBasedEstimate">
         <Checkbox
           checked={hasAreaBasedEstimateNodeDef}
           disabled={readOnly}

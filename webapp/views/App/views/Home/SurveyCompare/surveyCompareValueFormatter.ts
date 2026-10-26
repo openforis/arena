@@ -12,7 +12,7 @@ type Translate = (key: string, params?: Record<string, unknown>) => string
 
 // i18n keys of the property labels used in the node def editor
 const propLabelKeys: Record<string, string> = {
-  applicable: 'nodeDefEdit.advancedProps.relevantIf',
+  applicable: 'nodeDefEdit:advancedProps.relevantIf',
   branding: 'surveyCompareView:props.branding',
   defaultCycleKey: 'surveyCompareView:props.defaultCycleKey',
   extra: 'surveyCompareView:props.extra',
@@ -33,45 +33,45 @@ const propLabelKeys: Record<string, string> = {
   userExtraPropDefs: 'surveyCompareView:props.userExtraPropDefs',
   vernacularLanguageCodes: 'surveyCompareView:props.vernacularLanguageCodes',
   vernacularNames: 'surveyCompareView:props.vernacularNames',
-  categoryUuid: 'nodeDefEdit.codeProps.category',
-  codeShown: 'nodeDefEdit.codeProps.codeShown',
+  categoryUuid: 'nodeDefEdit:codeProps.category',
+  codeShown: 'nodeDefEdit:codeProps.codeShown',
   columnsNo: 'surveyCompareView:props.columnsNo',
   cycles: 'surveyCompareView:props.cycles',
-  defaultValueEvaluatedOneTime: 'nodeDefEdit.advancedProps.defaultValueEvaluatedOneTime',
-  defaultValues: 'nodeDefEdit.advancedProps.defaultValues',
+  defaultValueEvaluatedOneTime: 'nodeDefEdit:advancedProps.defaultValueEvaluatedOneTime',
+  defaultValues: 'nodeDefEdit:advancedProps.defaultValues',
   descriptions: 'surveyCompareView:props.descriptions',
-  editableIf: 'nodeDefEdit.advancedProps.editableIf',
-  fileNameExpression: 'nodeDefEdit.fileProps.fileNameExpression',
-  fileType: 'nodeDefEdit.fileProps.fileType',
-  formula: 'nodeDefEdit.basicProps.formula',
-  hidden: 'nodeDefEdit.advancedProps.hidden',
-  hiddenInReport: 'nodeDefEdit.advancedProps.hiddenInReport',
-  hiddenWhenNotRelevant: 'nodeDefEdit.advancedProps.hiddenWhenNotRelevant',
-  includeSeconds: 'nodeDefEdit.timeProps.includeSeconds',
+  editableIf: 'nodeDefEdit:advancedProps.editableIf',
+  fileNameExpression: 'nodeDefEdit:fileProps.fileNameExpression',
+  fileType: 'nodeDefEdit:fileProps.fileType',
+  formula: 'nodeDefEdit:basicProps.formula',
+  hidden: 'nodeDefEdit:advancedProps.hidden',
+  hiddenInReport: 'nodeDefEdit:advancedProps.hiddenInReport',
+  hiddenWhenNotRelevant: 'nodeDefEdit:advancedProps.hiddenWhenNotRelevant',
+  includeSeconds: 'nodeDefEdit:timeProps.includeSeconds',
   itemExtraDef: 'surveyCompareView:props.itemExtraDef',
-  itemsFilter: 'nodeDefEdit.advancedProps.itemsFilter',
-  key: 'nodeDefEdit.basicProps.key',
+  itemsFilter: 'nodeDefEdit:advancedProps.itemsFilter',
+  key: 'nodeDefEdit:basicProps.key',
   labels: 'surveyCompareView:props.labels',
-  labelValue: 'nodeDefEdit.booleanProps.labelValue',
+  labelValue: 'nodeDefEdit:booleanProps.labelValue',
   layout: 'surveyCompareView:props.layout',
   levels: 'surveyCompareView:props.levels',
-  mapMarkerColor: 'nodeDefEdit.coordinateProps.mapMarkerColor',
-  maxFileSize: 'nodeDefEdit.fileProps.maxFileSize',
-  maxNumberDecimalDigits: 'nodeDefEdit.decimalProps.maxNumberDecimalDigits',
-  multiple: 'nodeDefEdit.basicProps.multiple',
+  mapMarkerColor: 'nodeDefEdit:coordinateProps.mapMarkerColor',
+  maxFileSize: 'nodeDefEdit:fileProps.maxFileSize',
+  maxNumberDecimalDigits: 'nodeDefEdit:decimalProps.maxNumberDecimalDigits',
+  multiple: 'nodeDefEdit:basicProps.multiple',
   name: 'common.name',
-  ownPage: 'nodeDefEdit.basicProps.ownPage',
+  ownPage: 'nodeDefEdit:basicProps.ownPage',
   parent: 'surveyCompareView:props.parent',
-  parentCodeDefUuid: 'nodeDefEdit.codeProps.parentCode',
-  readOnly: 'nodeDefEdit.advancedProps.readOnly',
-  renderType: 'nodeDefEdit.basicProps.displayAs',
+  parentCodeDefUuid: 'nodeDefEdit:codeProps.parentCode',
+  readOnly: 'nodeDefEdit:advancedProps.readOnly',
+  renderType: 'nodeDefEdit:basicProps.displayAs',
   taxonomyUuid: 'common.taxonomy',
-  textInputType: 'nodeDefEdit.textProps.textInputType',
-  textTransform: 'nodeDefEdit.textProps.textTransform',
+  textInputType: 'nodeDefEdit:textProps.textInputType',
+  textTransform: 'nodeDefEdit:textProps.textTransform',
   type: 'common.type',
-  unit: 'nodeDefEdit.numericProps.unit',
+  unit: 'nodeDefEdit:numericProps.unit',
   validations: 'surveyCompareView:props.validations',
-  visibleIf: 'nodeDefEdit.advancedProps.visibleIf',
+  visibleIf: 'nodeDefEdit:advancedProps.visibleIf',
 }
 
 // e.g. "hiddenInMobile" => "Hidden in mobile"
@@ -135,9 +135,9 @@ const formatExpression = ({
   indent: number
 }) => {
   const { expression: expr, applyIf, severity, messages } = expression
-  const lines: FormattedLine[] = [{ label: t('nodeDefEdit.expressionsProp.expression'), value: expr ?? '', indent }]
-  if (applyIf) lines.push({ label: t('nodeDefEdit.expressionsProp.applyIf'), value: applyIf, indent })
-  if (severity) lines.push({ label: t('nodeDefEdit.expressionsProp.severity'), value: t(`common.${severity}`), indent })
+  const lines: FormattedLine[] = [{ label: t('nodeDefEdit:expressionsProp.expression'), value: expr ?? '', indent }]
+  if (applyIf) lines.push({ label: t('nodeDefEdit:expressionsProp.applyIf'), value: applyIf, indent })
+  if (severity) lines.push({ label: t('nodeDefEdit:expressionsProp.severity'), value: t(`common.${severity}`), indent })
   if (isPlainObject(messages)) {
     lines.push(
       { label: t('surveyCompareView:props.messages'), indent },
@@ -177,11 +177,11 @@ const formatValidations = ({
   const { required, unique, count, expressions, ...others } = value
   const lines: FormattedLine[] = []
   if (required) lines.push({ value: t('common.required'), indent })
-  if (unique) lines.push({ value: t('nodeDefEdit.unique.label'), indent })
+  if (unique) lines.push({ value: t('nodeDefEdit:unique.label'), indent })
   const { min, max } = count ?? {}
   for (const [labelKey, countValue] of [
-    ['nodeDefEdit.validationsProps.minCount', min],
-    ['nodeDefEdit.validationsProps.maxCount', max],
+    ['nodeDefEdit:validationsProps.minCount', min],
+    ['nodeDefEdit:validationsProps.maxCount', max],
   ]) {
     if (countValue === undefined) continue
     if (Array.isArray(countValue)) {
@@ -195,7 +195,7 @@ const formatValidations = ({
   }
   if (Array.isArray(expressions)) {
     lines.push(
-      { label: t('nodeDefEdit.validationsProps.expressions'), indent },
+      { label: t('nodeDefEdit:validationsProps.expressions'), indent },
       ...formatExpressions({ t, singleLang, expressions, indent: indent + 1 })
     )
   }

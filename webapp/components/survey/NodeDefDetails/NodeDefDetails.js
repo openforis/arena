@@ -45,7 +45,7 @@ const NodeDefDetails = (props) => {
     const tabProps = { state, Actions, editingFromDesigner }
     const _tabs = [
       {
-        label: 'nodeDefEdit.basic',
+        label: 'nodeDefEdit:basic',
         component: BasicProps,
         id: TestId.nodeDefDetails.basic,
         props: tabProps,
@@ -53,7 +53,7 @@ const NodeDefDetails = (props) => {
     ]
     if (!nodeDefIsRoot) {
       _tabs.push({
-        label: 'nodeDefEdit.advanced',
+        label: 'nodeDefEdit:advanced',
         component: AdvancedProps,
         id: TestId.nodeDefDetails.advanced,
         props: tabProps,
@@ -61,7 +61,7 @@ const NodeDefDetails = (props) => {
     }
     if (NodeDef.isEntity(nodeDef)) {
       _tabs.push({
-        label: 'nodeDefEdit.print',
+        label: 'nodeDefEdit:print',
         component: PrintProps,
         id: TestId.nodeDefDetails.print,
         props: tabProps,
@@ -70,7 +70,7 @@ const NodeDefDetails = (props) => {
     if (!nodeDefIsRoot) {
       if (canHaveMobileProps) {
         _tabs.push({
-          label: 'nodeDefEdit.mobileApp',
+          label: 'nodeDefEdit:mobileApp',
           component: MobileAppProps,
           id: TestId.nodeDefDetails.mobile,
           props: tabProps,
@@ -83,7 +83,7 @@ const NodeDefDetails = (props) => {
         (!NodeDef.isQualifier(nodeDef) || NodeDef.hasValidationsDefined(nodeDef))
       ) {
         _tabs.push({
-          label: 'nodeDefEdit.validations',
+          label: 'nodeDefEdit:validations',
           component: ValidationsProps,
           id: TestId.nodeDefDetails.validations,
           props: tabProps,

@@ -43,13 +43,13 @@ export default {
       <p>The following user has requested access to $t(common.appNameFull).</p>
       <p>
         <ul>
-          <li>$t(accessRequestView.fields.email): {{email}}</li>
-          <li>$t(accessRequestView.fields.props.firstName): {{firstName}}</li>
-          <li>$t(accessRequestView.fields.props.lastName): {{lastName}}</li>
-          <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
-          <li>$t(accessRequestView.fields.props.country): {{country}}</li>
-          <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
-          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
+          <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
+          <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(guest:accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
       </p>
       <p>Please evaluate this request and get back to the user as soon as possible.</p>

@@ -29,7 +29,7 @@ Voulez-vous les ignorer ?`,
     cantUndoWarning: 'Cette opération ne peut pas être annulée',
     cantBeDeletedUsedItem: 'Cet {{item}} est utilisé par des définitions de nœud et ne peut pas être supprimé',
     chain: 'Chaîne',
-    chain_plural: 'Chaînes',
+    chain_other: 'Chaînes',
     childrenEmpty: 'Définissez au moins un élément enfant',
     clear: 'Effacer',
     clone: 'Cloner',
@@ -44,14 +44,14 @@ Voulez-vous les ignorer ?`,
     createdWith: 'Créé avec',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Cycle',
-    cycle_plural: 'Cycles',
+    cycle_other: 'Cycles',
     dateCreated: 'Date de création',
     dateLastModified: 'Date de dernière modification',
     delete: 'Supprimer',
     deleted: 'Supprimé !',
     descending: 'Décroissant',
     description: 'Description',
-    description_plural: 'Descriptions',
+    description_other: 'Descriptions',
     designerNotes: 'Notes du concepteur',
     designerNotesInfo: `Les notes du concepteur ne seront visibles que dans le concepteur de formulaire et ne seront pas visibles dans le formulaire de saisie de données.`,
     details: 'Détails',
@@ -73,11 +73,11 @@ Veuillez également vérifier le dossier Spam/Courrier indésirable.`,
     empty: 'Vide',
     entity: 'Entité',
     error: 'Erreur',
-    error_plural: 'Erreurs',
+    error_other: 'Erreurs',
     errorFound: '1 erreur trouvée',
     errorFound_other: '{{count}} erreurs trouvées',
     errorMessage: "Message d'erreur",
-    errorMessage_plural: "Messages d'erreur",
+    errorMessage_other: "Messages d'erreur",
     expand: 'Développer',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Exporter',
@@ -88,7 +88,7 @@ Veuillez également vérifier le dossier Spam/Courrier indésirable.`,
     expression: 'Expression',
     false: 'Faux',
     file: 'Fichier',
-    file_plural: 'Fichiers',
+    file_other: 'Fichiers',
     formContainsErrors: 'Le formulaire contient des erreurs',
     formContainsErrorsCannotContinue: 'Le formulaire contient des erreurs. Veuillez les corriger avant de continuer.',
     formContainsErrorsCannotSave: 'Le formulaire contient des erreurs. Veuillez les corriger avant de sauvegarder.',
@@ -105,12 +105,12 @@ Veuillez également vérifier le dossier Spam/Courrier indésirable.`,
     info: 'Info',
     invalid: 'INVALIDE',
     item: 'Élément',
-    item_plural: 'Éléments',
+    item_other: 'Éléments',
     itemAlreadyAdded: 'Élément déjà ajouté',
     label: 'Étiquette',
-    label_plural: 'Étiquettes',
+    label_other: 'Étiquettes',
     language: 'Langue',
-    language_plural: 'Langues',
+    language_other: 'Langues',
     leavePageConfirmMessage: `Il y a des modifications non sauvegardées dans le formulaire. 
 
 En confirmant, toutes les modifications seront perdues.
@@ -122,11 +122,11 @@ Voulez-vous continuer ?`,
     max: 'Maximum',
     med: 'Médiane',
     manage: 'Gérer',
-    message_plural: 'Messages',
+    message_other: 'Messages',
     measure: 'Mesure',
     measure_other: 'Mesures',
     measurePrevSteps: 'Mesurer les étapes précédentes',
-    measurePrevSteps_plural: 'Mesures des étapes précédentes',
+    measurePrevSteps_other: 'Mesures des étapes précédentes',
     min: 'Minimum',
     moveUp: 'Monter',
     moveDown: 'Descendre',
@@ -134,7 +134,7 @@ Voulez-vous continuer ?`,
     new: 'Nouveau',
     next: 'Suivant',
     no: 'Non',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
     notification: 'Notification',
     notification_other: 'Notifications',
     notSpecified: '---Non spécifié---',
@@ -241,7 +241,7 @@ Réessayer ?`,
     value: 'Valeur',
     view: 'Voir',
     warning: 'Avertissement',
-    warning_plural: 'Avertissements',
+    warning_other: 'Avertissements',
     yes: 'Oui',
     date: {
       aMomentAgo: 'Il y a un moment',
@@ -268,11 +268,9 @@ Réessayer ?`,
       visibleColumns: 'Colonnes visibles',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'Pour confirmer, saisissez le texte suivant : **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage:
       "(Seuls les fichiers {{acceptedExtensions}} d'une taille maximale de {{maxSize}} seront acceptés)",
@@ -285,17 +283,14 @@ Réessayer ?`,
     selectedFile: 'Fichier sélectionné',
     selectedFile_other: 'Fichiers sélectionnés',
   },
-
   error: {
     pageNotFound: 'Page introuvable',
   },
-
   geo: {
     area: 'Surface',
     vertices: 'Sommets',
     perimeter: 'Périmètre',
   },
-
   files: {
     header: 'Fichiers',
     missing: ' Fichiers manquants : {{count}}',
@@ -303,11 +298,9 @@ Réessayer ?`,
     fileName: 'Nom du fichier',
     fileSize: 'Taille du fichier',
   },
-
   sidebar: {
     logout: 'Déconnexion',
   },
-
   header: {
     theme: {
       label: 'Thème',
@@ -327,7 +320,6 @@ Réessayer ?`,
       error: 'Erreur lors de la génération du QR code : {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Entier',
     decimal: 'Décimal',
@@ -344,7 +336,6 @@ Réessayer ?`,
   },
 
   // ====== Modules et vues de l'application
-
   appModules: {
     home: 'Accueil',
     landing: 'Bienvenue',
@@ -386,24 +377,24 @@ Réessayer ?`,
     userNew: 'Nouvel utilisateur',
     usersSurvey: 'Liste des utilisateurs',
     userGroup: "Groupe d'utilisateurs",
-    userGroup_plural: "Groupes d'utilisateurs",
+    userGroup_other: "Groupes d'utilisateurs",
     userGroupNew: "Nouveau groupe d'utilisateurs",
     usersList: 'Liste des utilisateurs (tous)',
     user2FADevice: 'Appareil 2FA',
-    user2FADevice_plural: 'Appareils 2FA',
+    user2FADevice_other: 'Appareils 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Analyse',
     chain: 'Chaîne',
-    chain_plural: 'Chaînes',
+    chain_other: 'Chaînes',
     virtualEntity: 'Entité virtuelle',
     entities: 'Entités virtuelles',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Instances',
 
     message: 'Message',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
 
     systemAdmin: 'Administration du système',
     jobMonitor: 'Moniteur des tâches',
@@ -416,88 +407,9 @@ Réessayer ?`,
     disclaimer: 'Avertissement',
     userManual: 'Manuel utilisateur',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: "Cette section n'est disponible que lorsque le formulaire est publié",
   },
-
-  loginView: {
-    yourName: 'Votre nom',
-    yourEmail: 'Votre e-mail',
-    yourPassword: 'Votre mot de passe',
-    yourNewPassword: 'Votre nouveau mot de passe',
-    repeatYourPassword: 'Répétez votre mot de passe',
-    repeatYourNewPassword: 'Répétez votre nouveau mot de passe',
-    requestAccess: "Nouveau sur $t(common.appNameFull) ? Demander l'accès",
-    resetPassword: 'Réinitialiser le mot de passe',
-    login: 'Connexion',
-    loginUsingBackupCode: 'Connexion avec un code de sauvegarde 2FA',
-    forgotPassword: 'Mot de passe oublié',
-    sendPasswordResetEmail: "Envoyer l'e-mail de réinitialisation du mot de passe",
-    twoFactorBackupCode: 'Code de sauvegarde 2FA',
-    twoFactorToken: 'Code de vérification',
-    twoFactorTokenDescription: `Pour assurer la sécurité de votre compte, nous vérifions votre identité.
-
-Entrez le code généré par votre application d'authentification.`,
-  },
-
-  accessRequestView: {
-    error: "Erreur lors de la demande d'accès : {{error}}",
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Prénom',
-        lastName: 'Nom de famille',
-        institution: 'Institution',
-        country: 'Pays',
-        purpose: 'Pour quoi en avez-vous besoin ?',
-        surveyName: 'Proposez un nom de formulaire',
-        templateUuid: "Commencer à partir d'un modèle ?",
-      },
-    },
-    introduction: `Nos ressources sont limitées, vous devez donc demander l'accès à la plateforme.
-Nous sommes également intéressés par ce que vous souhaitez faire avec, alors faites-le nous savoir !
-Vous avez la possibilité de commencer à partir d'un **nouveau formulaire vierge** ou de cloner un **modèle** existant et vous devrez suggérer un nom pour le formulaire nouvellement créé.
-Vous serez assigné le rôle d'***Administrateur de formulaire*** pour ce formulaire : vous pourrez le modifier et inviter de nouveaux utilisateurs à rejoindre votre formulaire et y contribuer.
-Vous serez également un ***Gestionnaire de formulaire*** et vous pourrez **créer de nouveaux formulaires** (jusqu'à 5) si nécessaire.
-Pour plus d'informations, veuillez visiter notre site web : $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Une fois votre demande envoyée, veuillez attendre un e-mail d'invitation pour accéder à Arena.**`,
-    reCaptchaNotAnswered: 'ReCaptcha non répondu',
-    requestSent: "Demande d'accès envoyée correctement",
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-Veuillez nous accorder quelques jours pour traiter votre demande.
-Une fois celle-ci acceptée, nous vous enverrons un autre e-mail à **{{email}}** avec les instructions pour accéder à $t(common.appName).
-Merci et profitez de **$t(common.appNameFull)** !`,
-    sendRequest: 'Envoyer la demande',
-    sendRequestConfirm: "Demander l'accès à $t(common.appNameFull) ?",
-    templateNotSelected: 'Non sélectionné (commencer de zéro)',
-    title: "Demande d'accès à $t(common.appNameFull)",
-    whitelistSenderSuggestion:
-      "Si vous le trouvez dans le dossier Spam/Courrier indésirable, veuillez ajouter **{{senderEmail}}** à vos contacts (carnet d'adresses) ou le marquer comme sûr/non indésirable, afin que nos prochains e-mails arrivent directement dans votre boîte de réception.",
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Complétez votre inscription à Arena',
-      setYourNewPassword: 'Définissez votre nouveau mot de passe',
-    },
-    setNewPassword: 'Définir un nouveau mot de passe',
-    forgotPasswordLinkInvalid: "La page à laquelle vous avez essayé d'accéder n'existe pas ou n'est plus valide",
-    passwordSuccessfullyReset: 'Votre mot de passe a été réinitialisé avec succès',
-    passwordStrengthChecksTitle: 'Vérifications de la solidité du mot de passe',
-    passwordStrengthChecks: {
-      noWhiteSpaces: "Pas d'espaces",
-      atLeast8CharactersLong: 'Au moins 8 caractères',
-      containsLowerCaseLetters: 'Contient des lettres minuscules',
-      containsUpperCaseLetters: 'Contient des lettres majuscules',
-      containsNumbers: 'Contient des chiffres',
-    },
-    completeRegistration: "Compléter l'inscription",
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Types de dépendance',
     dependencyTypes: {
@@ -515,11 +427,9 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     selectAtLeastOneDependencyType: 'Sélectionnez au moins un type de dépendance',
     noDependenciesToDisplay: 'Aucune dépendance à afficher',
   },
-
   designerView: {
     formPreview: 'Aperçu du formulaire',
   },
-
   recordView: {
     justDeleted: "Cet enregistrement vient d'être supprimé",
     sessionExpired: "La session d'enregistrement a expiré",
@@ -535,7 +445,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       unlock: "Autoriser la modification de l'attribut qualificatif",
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: "Supprimer cette fonction d'agrégation personnalisée ?",
@@ -543,7 +452,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     },
     editRecord: "Modifier l'enregistrement",
   },
-
   mapView: {
     changeMarkerColor: 'Modifier la couleur du marqueur',
     createRecord: 'Créer un nouvel enregistrement',
@@ -573,7 +481,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     },
     selectedPeriod: 'Période sélectionnée',
   },
-
   samplingPolygonOptions: {
     circle: 'Cercle',
     controlPointOffsetEast: 'Décalage Est du point de référence (m)',
@@ -590,18 +497,15 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     samplingPolygon: "Polygone d'échantillonnage",
     shape: 'Forme',
   },
-
   kmlUploader: {
     opacity: 'opacité',
     selectFile: 'Sélectionner un fichier',
     title: 'Options KML/KMZ/Shapefile',
   },
-
   mapBaseLayerPeriodSelector: {
     chooseAPeriodToCompareWith: 'Choisissez une période à comparer',
     falseColor: 'Fausses couleurs',
   },
-
   surveysView: {
     chains: 'Chaînes',
     confirmUpdateSurveyOwner: `Changer le propriétaire du formulaire "{{surveyName}}" en "{{ownerName}}" ?`,
@@ -624,7 +528,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       'published-draft': 'Publié/Brouillon',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Accepté',
@@ -643,7 +546,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       template: 'Modèle',
     },
   },
-
   userView: {
     scale: 'Échelle',
     rotate: 'Faire pivoter',
@@ -666,7 +568,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
       title: "Gérer les appareils d'authentification à deux facteurs",
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: "Changement de mot de passe pour l'utilisateur : {{user}}",
     oldPassword: 'Ancien mot de passe',
@@ -677,7 +578,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     notAuthorizedToChangePasswordOfAnotherUser:
       "Vous n'êtes pas autorisé(e) à changer le mot de passe d'un autre utilisateur",
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: "Inviter l'utilisateur {{email}} en tant qu'Administrateur système ?",
     confirmInviteSystemAdmin_other: "Inviter les utilisateurs {{email}} en tant qu'Administrateurs système ?",
@@ -769,7 +669,6 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
       Si vous souhaitez inviter des utilisateurs avec d'autres rôles, vous devez d'abord publier le formulaire.`,
     typeEmail: 'Saisissez une adresse e-mail, puis appuyez sur le bouton Ajouter',
   },
-
   user: {
     mapApiKeys: {
       title: 'Clés API de carte',
@@ -786,7 +685,6 @@ Il peut être du texte simple ou du langage Markdown (https://www.markdownguide.
       preferNotToSay: 'Préfère ne pas préciser',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete:
@@ -922,7 +820,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Table de données de rapport et jointures avec les attributs',
     showSamplingAttributes: "Afficher les attributs d'échantillonnage",
   },
-
   instancesView: {
     title: 'Instances',
     terminate: 'Terminer',
@@ -942,12 +839,10 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Jeton invalide ou expiré',
     },
   },
-
   itemsTable: {
     unused: 'Inutilisé',
     noItemsAdded: 'Aucun élément ajouté',
   },
-
   expression: {
     functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
     functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
@@ -991,326 +886,9 @@ $t(common.appNameFull)
   },
 
   // ====== Vues du formulaire
-
-  nodeDefEdit: {
-    additionalFields: 'Champs supplémentaires',
-    basic: 'Basique',
-    advanced: 'Avancé',
-    mobileApp: 'Application mobile',
-    print: 'Impression',
-    printProps: {
-      printOrientation: {
-        label: 'Orientation de la page',
-        info: "Orientation utilisée lorsque cette entité commence sa propre section imprimable. Par défaut, hérite de l'orientation du document choisie lors de l'export.",
-      },
-      orientations: {
-        default: 'Par défaut (document)',
-        portrait: 'Portrait',
-        landscape: 'Paysage',
-      },
-    },
-    validations: 'Validations',
-    function: 'Fonction',
-    editingFunction: 'Modification de la fonction {{functionName}}',
-    editorHelp: {
-      json: 'Les expressions valides sont un sous-ensemble de Javascript.',
-      sql: 'Seules les expressions SQL valides sont autorisées.',
-    },
-    editorCompletionHelp: '- Afficher les variables et fonctions disponibles pouvant être utilisées',
-    functionDescriptions: {
-      categoryItemProp:
-        "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un élément de catégorie ayant le code spécifié",
-      dateTimeDiff: 'Renvoie la différence (en minutes) entre 2 couples date-heure',
-      distance: 'Renvoie la distance (en mètres) entre les coordonnées spécifiées',
-      first: "Renvoie la première valeur ou le premier nœud de l'attribut ou de l'entité multiple spécifié(e)",
-      geoCoordinateAtDistance:
-        'Renvoie les coordonnées à une distance et un cap spécifiés depuis les coordonnées spécifiées',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      geoPolygon: "Génère un polygone en GeoJSON à partir d'une liste de coordonnées",
-      includes: "Renvoie vrai si l'attribut multiple spécifié inclut la valeur spécifiée.",
-      index: "Renvoie l'index du nœud spécifié parmi ses voisins",
-      isEmpty: "Renvoie vrai si l'argument n'a pas de valeur spécifiée",
-      isNotEmpty: "Renvoie vrai si l'argument a une valeur spécifiée",
-      last: "Renvoie la dernière valeur ou le dernier nœud de l'attribut ou de l'entité multiple spécifié(e)",
-      ln: 'Renvoie le logarithme naturel de X',
-      log10: 'Renvoie le logarithme en base 10 de X',
-      max: 'Renvoie le maximum des arguments',
-      min: 'Renvoie le minimum des arguments',
-      now: "Renvoie la date ou l'heure actuelle",
-      parent: "Renvoie l'entité parente du nœud spécifié",
-      pow: "Renvoie la valeur d'une base élevée à une puissance",
-      prevCycleNote:
-        'Fonctionne uniquement dans Arena Mobile lorsque plusieurs cycles sont définis et que le lien au cycle précédent est activé',
-      prevCycleValue:
-        "Retourne la valeur du même attribut dans l'enregistrement du cycle précédent. $t(nodeDefEdit.functionDescriptions.prevCycleNote)",
-      prevCycleValues:
-        "Retourne les valeurs des mêmes attributs dans l'enregistrement du cycle précédent. $t(nodeDefEdit.functionDescriptions.prevCycleNote)",
-      recordCycle: "Renvoie le cycle de l'enregistrement actuel",
-      recordDateCreated:
-        "Renvoie la date et l'heure de création de l'enregistrement actuel sous forme de valeur datetime. Peut être utilisé dans un attribut texte, date ou heure",
-      recordDateLastModified:
-        "Renvoie la date et l'heure de dernière modification de l'enregistrement actuel sous forme de valeur datetime. Peut être utilisé dans un attribut texte, date ou heure",
-      recordOwnerEmail: "Renvoie l'e-mail de l'utilisateur propriétaire de l'enregistrement",
-      recordOwnerName: "Renvoie le nom de l'utilisateur propriétaire de l'enregistrement",
-      recordOwnerRole: "Renvoie le rôle (dans le formulaire actuel) de l'utilisateur propriétaire de l'enregistrement",
-      rowIndex: "Renvoie l'index de la ligne de tableau actuelle (ou du formulaire)",
-      taxonProp: "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un taxon ayant le code spécifié",
-      taxonVernacularName:
-        "Renvoie le (premier) nom vernaculaire (ou local) dans la langue spécifiée d'un taxon ayant le code spécifié",
-      unique: "Renvoie les valeurs uniques d'un attribut ou d'une entité multiple",
-      userEmail: "Renvoie l'e-mail de l'utilisateur connecté",
-      userIsRecordOwner:
-        'Renvoie la valeur booléenne "vrai" si l\'utilisateur modifiant l\'enregistrement en est également le propriétaire, "faux" sinon',
-      userName: "Renvoie le nom de l'utilisateur connecté",
-      userProp: "Renvoie la valeur de la $t(extraProp.label) spécifiée de l'utilisateur connecté",
-      uuid: "Génère un UUID (identifiant universel unique) pouvant être utilisé comme identifiant (par ex. comme attribut clé d'une entité)",
-      // Fonctions SQL
-      avg: "Renvoie la valeur moyenne d'une variable numérique",
-      count: 'Renvoie le nombre de lignes correspondant à un critère spécifié',
-      sum: "Renvoie la somme totale d'une variable numérique",
-    },
-    functionName: {
-      rowIndex: 'Index de ligne',
-    },
-    basicProps: {
-      analysis: 'Analyse',
-      autoIncrementalKey: {
-        label: 'Auto-incrémentiel',
-        info: 'La valeur sera générée automatiquement',
-      },
-      autoCreateMinCountItems: {
-        label: "Créer automatiquement le minimum d'éléments",
-        info: "Lorsque l'entité devient pertinente ou que son entité parente est créée, un nombre d'entités égal au minimum est généré automatiquement.",
-      },
-      displayAs: 'Afficher comme',
-      displayIn: 'Afficher dans',
-      entitySource: "Source de l'entité",
-      enumerate: {
-        label: 'Énumérer',
-        info: `Les lignes seront générées automatiquement à partir des éléments de catégorie associés à un attribut code marqué comme Clé définie dans l'entité ; les lignes ne peuvent pas être ajoutées ou supprimées et l'attribut code clé ne sera pas modifiable`,
-      },
-      enumeratingItemsExpression: {
-        label: "Expression des éléments d'énumération",
-        info: 'Expression facultative qui filtre les éléments de catégorie à énumérer (par ex. unique(table_source.source_type)). Si elle est vide, tous les éléments de la catégorie sont utilisés.',
-      },
-      enumerator: {
-        label: 'Énumérateur',
-        info: "Les éléments de la catégorie seront utilisés pour générer les lignes de l'entité parente",
-      },
-      form: 'Formulaire',
-      formula: 'Formule',
-      includedInClonedData: 'Inclus dans les données clonées',
-      includedInMultipleEntitySummary: {
-        label: "Inclure dans le résumé de l'entité multiple",
-        info: `Si coché, la valeur de l'attribut sera visible dans le sélecteur d'entités et dans la vue récapitulative de l'entité`,
-      },
-      includedInRecordsList: {
-        label: 'Inclure dans la liste des enregistrements',
-        info: `Si coché, l'attribut sera visible dans la liste des enregistrements`,
-      },
-      key: 'Clé',
-      maxKeysCountReached: 'Nombre maximum de clés atteint ({{maxKeysCount}})',
-      multiple: 'Multiple',
-      ownPage: 'Sa propre page',
-      parentPage: 'Page parente ({{parentPage}})',
-      qualifier: {
-        label: 'Qualificateur',
-        info: `Lorsqu'un nouvel enregistrement est créé par un utilisateur appartenant à un groupe, cet attribut sera automatiquement rempli avec la valeur spécifiée pour celui-ci dans les qualificateurs du groupe de l'utilisateur. Les utilisateurs ne pourront voir et modifier que les enregistrements appartenant à leur propre groupe, s'ils appartiennent à un groupe.`,
-      },
-      table: 'Tableau',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Valeurs par défaut non spécifiées',
-      defaultValuesSpecified: 'Valeurs par défaut spécifiées',
-      editableAlways: 'Toujours modifiable',
-      editableIfConditionIsMet: 'Modifiable lorsque la condition est remplie',
-      relevantIfRadioNone: 'Toujours pertinent',
-      relevantIfRadioDefined: 'Pertinent lorsque la condition est remplie',
-      visibleAlways: 'Toujours visible',
-      visibleIfConditionIsMet: 'Visible lorsque la condition est remplie',
-      areaBasedEstimate: 'Estimation basée sur la surface',
-      defaultValues: 'Valeurs par défaut',
-      defaultValuesInfo: `Cela permet de renseigner automatiquement une réponse selon des règles précises.
-    Si vous configurez plusieurs règles, le système les vérifie dans l'ordre, de haut en bas.
-    Il applique la première règle qui correspond aux conditions et utilise ce résultat comme réponse.`,
-      defaultValueEvaluatedOneTime: 'Valeur par défaut évaluée une seule fois',
-      defaultValueEvaluatedOneTimeInfo: `La valeur par défaut sera évaluée une seule fois, lorsque l'attribut est créé.
-    Si ce n'est pas coché, la valeur par défaut sera réévaluée à chaque mise à jour de l'enregistrement.
-    Cela doit être coché lors de l'utilisation d'expressions comme now() ou uuid(), qui doivent être évaluées une seule fois, lors de la première génération de la valeur de l'attribut.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Valeurs par défaut non modifiables car la clé auto-incrémentielle est définie',
-      editableIf: 'Modifiable si',
-      editableIfInfo: `Par défaut, un utilisateur peut toujours accéder à un champ pertinent.
-Ici, nous pouvons définir une règle indiquant si l'utilisateur peut saisir ou modifier ce champ.
-Cela détermine si un utilisateur peut saisir ou modifier ce champ.
-Si les conditions définies sont remplies, le champ est modifiable. Sinon, il devient « lecture seule » (verrouillé).`,
-      hidden: 'Toujours masqué',
-      hiddenInReport: 'Masquer dans le tableau de bord analytique',
-      hiddenInReportInfo: `Si coché, l'attribut ne sera pas visible dans le tableau de bord analytique`,
-      hiddenWhenNotRelevant: 'Masqué quand non pertinent',
-      itemsFilter: "Filtre d'éléments",
-      itemsFilterInfo: `Expression utilisée pour filtrer les éléments sélectionnables.
-Dans l'expression, le mot "this" fera référence à l'élément lui-même. 
-Ex. this.region = nom_attribut_region 
-(où "region" est le nom d'une propriété supplémentaire définie pour l'élément et nom_attribut_region est le nom d'un attribut dans le formulaire)`,
-      readOnly: 'Lecture seule',
-      relevantIf: 'Pertinent si',
-      relevantIfInfo: `Par défaut, tous les champs sont actifs.
-    Si vous définissez une règle de pertinence et qu'elle n'est pas respectée, le champ devient grisé ou complètement masqué,
-    et les réponses automatiques sont ignorées.
-    Utilisez cela pour afficher ou masquer dynamiquement des parties du formulaire ; par exemple, afficher « Veuillez préciser » seulement si l'utilisateur choisit « Autre ».`,
-      script: 'Script',
-      visibleIf: 'Visible si',
-      visibleIfInfo: `Par défaut, un champ est toujours visible.
-    Si vous définissez une règle, il ne sera visible que lorsque cette règle est respectée ; sinon, il sera masqué.
-    Remarque : contrairement à un champ masqué car « non pertinent », un champ masqué peut quand même enregistrer une réponse automatique.
-    C'est pratique pour masquer des sections entières du formulaire selon la personne connectée (par exemple, selon le rôle).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Masqué dans Arena Mobile',
-        info: `Si coché, l'attribut ne sera pas visible dans AM`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Inclure dans le lien du cycle précédent',
-        info: `Si coché, la valeur du cycle précédent sera affichée dans le formulaire de saisie de données (lorsque le lien vers le cycle précédent est activé dans l'application mobile)`,
-      },
-    },
-    numericProps: {
-      unit: 'Unité',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Nombre maximum de décimales',
-    },
-    fileProps: {
-      fileNameExpression: 'Expression du nom de fichier',
-      fileType: 'Type de fichier',
-      fileTypes: {
-        image: 'Image',
-        video: 'Vidéo',
-        audio: 'Audio',
-        other: 'Autre',
-      },
-      maxFileSize: 'Taille maximale du fichier (Mo)',
-      numberOfFiles: 'Allez dans Validations pour modifier le nombre Min. et Max. de fichiers.',
-      showGeotagInformation: 'Afficher les informations de géolocalisation',
-    },
-    mobileProps: {
-      title: 'Application mobile',
-    },
-    timeProps: {
-      includeSeconds: 'Inclure les secondes',
-    },
-    formHeaderProps: {
-      headerColorLabel: "Couleur d'en-tête",
-      headerColor: {
-        blue: 'Bleu',
-        green: 'Vert',
-        orange: 'Orange',
-        red: 'Rouge',
-        yellow: 'Jaune',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Hyperlien',
-        markdown: 'Markdown',
-        text: 'Texte',
-      },
-      textInputType: 'Type de saisie de texte',
-      textInputTypes: {
-        singleLine: 'Ligne unique',
-        multiLine: 'Multiligne',
-      },
-      textTransform: 'Transformation du texte',
-      textTransformTypes: {
-        none: 'aucune',
-        capitalize: 'majuscule initiale',
-        uppercase: 'majuscules',
-        lowercase: 'minuscules',
-      },
-    },
-    booleanProps: {
-      labelValue: "Valeur d'étiquette",
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Catégorie',
-      codeShown: 'Afficher le code',
-      displayAsTypes: {
-        checkbox: 'Case à cocher',
-        dropdown: 'Liste déroulante',
-      },
-      parentCode: 'Code parent',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: "Autoriser uniquement la coordonnée de l'appareil",
-      allowOnlyDeviceCoordinateInfo: `S'applique uniquement à Arena Mobile : si coché, l'utilisateur ne pourra pas modifier les valeurs X/Y, seul le GPS de l'appareil peut être utilisé pour les obtenir`,
-      mapMarkerColor: 'Couleur du marqueur de carte',
-    },
-    expressionsProp: {
-      expression: 'Expression',
-      applyIf: 'Appliquer si',
-      confirmDelete: 'Supprimer cette expression ?',
-      severity: 'Sévérité',
-    },
-    validationsProps: {
-      minCount: 'Nombre minimum',
-      maxCount: 'Nombre maximum',
-      expressions: 'Expressions de validation',
-      attributeAlwaysValid: 'Attribut toujours valide',
-      attributeValidWhenConditionIsMet: 'Attribut valide lorsque la condition est remplie',
-      notRequired: 'Non obligatoire',
-      alwaysRequired: 'Toujours obligatoire',
-      requiredWhenConditionIsMet: 'Obligatoire lorsque la condition est remplie',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Ce nœud ne peut pas être converti en multiple car il a des valeurs par défaut.',
-    cannotDeleteNodeDefReferenced: `Impossible de supprimer "{{nodeDef}}" : il est référencé par ces définitions de nœud : {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Cloner',
-      title: 'Clonage de la définition de nœud "{{nodeDefName}}"',
-      entitySelectLabel: 'Entité dans laquelle cloner :',
-    },
-    conversion: {
-      dialogTitle: 'Convertir {{nodeDefName}} en un autre type',
-      fromType: 'Du type',
-      toType: 'Vers le type',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Déplacer',
-      title: 'Déplacement de la définition de nœud "{{nodeDefName}}" depuis "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Entité dans laquelle déplacer :',
-    },
-    movedNodeDefinitionHasErrors:
-      'La définition de nœud "{{nodeDefName}}" que vous avez déplacée contient des erreurs ; veuillez les corriger.',
-    nodeDefintionsHaveErrors:
-      'Ces définitions de nœud contiennent des erreurs : {{nodeDefNames}}. Veuillez les corriger.',
-    filterVariable: 'Variable pour filtrer les éléments',
-    filterVariableForLevel: 'Variable pour {{levelName}}',
-    unique: {
-      label: 'Unique',
-      info: `Lorsqu'un attribut est marqué comme **Unique**, sa valeur doit être unique dans l'entité multiple la plus proche (une erreur sera affichée sinon).  
-
----
-
-Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un attribut *espece_arbre* marqué comme **Unique**, vous ne pouvez avoir qu'un seul arbre par espèce dans la même *parcelle*.`,
-    },
-    nodeDefClonedSuccessfully:
-      'Définition de nœud "{{nodeDefName}}" clonée avec succès dans "{{targetParentNodeDefName}}"',
-    categoriesClonedFromSurvey:
-      "Les catégories suivantes ont également été clonées depuis l'enquête source : {{names}}",
-    taxonomiesClonedFromSurvey:
-      "Les taxonomies suivantes ont également été clonées depuis l'enquête source : {{names}}",
-  },
-
   languagesEditor: {
     languages: 'Langue(s)',
   },
-
   taxonomy: {
     header: 'Taxonomie',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomie'})`,
@@ -1340,7 +918,6 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
     taxaCount: 'Nombre de taxons',
     vernacularNameLabel: 'Étiquette du nom vernaculaire',
   },
-
   categoryList: {
     batchImport: 'Importer des catégories en lot (depuis un ZIP)',
     batchImportCompleteSuccessfully: `{{importedCategories}} catégories importées avec succès !
@@ -1366,7 +943,6 @@ Ex. dans une structure comme *cluster -> parcelle -> arbre*, si vous avez un att
       samplingPointData: "Données de points d'échantillonnage",
     },
   },
-
   categoryEdit: {
     header: 'Catégorie',
     addLevel: 'Ajouter un niveau',
@@ -1479,10 +1055,9 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     templateFor_samplingPointDataImport_xlsx:
       "Modèle pour l'importation de données de points d'échantillonnage (Excel)",
   },
-
   extraProp: {
     label: 'Propriété supplémentaire',
-    label_plural: 'Propriétés supplémentaires',
+    label_other: 'Propriétés supplémentaires',
     addExtraProp: 'Ajouter une propriété supplémentaire',
     dataTypes: {
       geometryPoint: 'Point géométrique',
@@ -1490,7 +1065,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       text: 'Texte',
     },
     editor: {
-      title: 'Modifier les $t(extraProp.label_plural)',
+      title: 'Modifier les $t(extraProp.label_other)',
       confirmDelete: 'Supprimer la propriété supplémentaire "{{name}}" ?',
       confirmSave: `Sauvegarder les modifications des définitions des propriétés supplémentaires ?
 
@@ -1505,7 +1080,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     name: 'Nom de la propriété {{position}}',
     value: 'Valeur',
   },
-
   record: {
     ancestorNotFound: "Nœud ancêtre introuvable dans l'enregistrement",
     keyDuplicate: "Clé d'enregistrement dupliquée",
@@ -1531,7 +1105,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
   },
 
   // ====== Composants communs
-
   expressionEditor: {
     and: 'ET',
     or: 'OU',
@@ -1600,7 +1173,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     arenaRScriptsInGitHub:
       '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
   },
-
   aiExpression: {
     title: 'Générer une expression à partir d’une description',
     hint: "Décrivez en langage courant ce que l'expression doit faire. L'IA la traduira en syntaxe Arena. Appuyez sur Ctrl+Entrée pour générer.",
@@ -1619,7 +1191,6 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       timeout: "L'IA a mis trop de temps à répondre. Veuillez réessayer.",
     },
   },
-
   aiTranslation: {
     translateButton_one: 'Traduire dans {{count}} autre langue',
     translateButton_other: 'Traduire dans {{count}} autres langues',
@@ -1630,14 +1201,12 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     failed: 'Échec de la traduction : {{message}}',
     timeout: 'La demande de traduction a expiré. Veuillez réessayer.',
   },
-
   aiActivityLog: {
     title: "Résumé du journal d'activité",
     summarizeButton: 'Résumer',
     thinking: "Agrégation des événements et demande de résumé à l'IA…",
     error: 'Échec de la récupération du résumé : {{message}}',
   },
-
   aiChatbot: {
     open: 'Aide et documentation',
     title: 'Aide et documentation',

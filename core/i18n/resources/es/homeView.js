@@ -199,7 +199,7 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
     expression: 'Expresión',
     resolved: 'Resuelto',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Código padre',
       defaultValue: 'Valor predeterminado',
       requiredIf: 'Obligatorio si',

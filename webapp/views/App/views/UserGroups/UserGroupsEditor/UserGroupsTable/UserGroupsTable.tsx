@@ -22,7 +22,7 @@ const UserGroupsTable = (): React.ReactElement => {
     () => [
       { field: 'groupName', headerName: i18n.t('usersView:userGroup.name'), flex: 1 },
       { field: 'groupLabel', headerName: i18n.t('usersView:userGroup.label'), flex: 1 },
-      { field: 'qualifiers', headerName: i18n.t('usersView:userGroup.qualifier_plural'), flex: 1.5 },
+      { field: 'qualifiers', headerName: i18n.t('usersView:userGroup.qualifier_other'), flex: 1.5 },
       { field: 'memberName', headerName: i18n.t('usersView:userGroup.memberName'), flex: 1 },
       { field: 'memberEmail', headerName: i18n.t('usersView:userGroup.memberEmail'), flex: 1.5 },
       {

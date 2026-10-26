@@ -108,8 +108,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'La entidad es obligatoria',
-    applyIfDuplicate: 'La condición "$t(nodeDefEdit.expressionsProp.applyIf)" está duplicada',
-    applyIfInvalid: 'Condición "$t(nodeDefEdit.advancedProps.relevantIf)" no válida',
+    applyIfDuplicate: 'La condición "$t(nodeDefEdit:expressionsProp.applyIf)" está duplicada',
+    applyIfInvalid: 'Condición "$t(nodeDefEdit:advancedProps.relevantIf)" no válida',
     columnWidthCannotBeGreaterThan: 'El ancho de columna no puede ser mayor que {{max}}',
     columnWidthCannotBeLessThan: 'El ancho de columna no puede ser menor que {{min}}',
     countMaxMustBePositiveNumber: 'El recuento máximo debe ser un número entero positivo',
@@ -120,7 +120,7 @@ export default {
     defaultValuesNotSpecified: 'Valor predeterminado no especificado',
     entitySourceRequired: 'Se requiere la fuente de la entidad',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Solo la última expresión puede tener una condición "$t(nodeDefEdit.expressionsProp.applyIf)" vacía',
+      'Solo la última expresión puede tener una condición "$t(nodeDefEdit:expressionsProp.applyIf)" vacía',
     expressionDuplicate: 'Expresión duplicada',
     expressionRequired: 'Expresión obligatoria',
     formulaInvalid: 'La fórmula es inválida',
@@ -138,7 +138,7 @@ export default {
     requiredIfNotAllowed:
       'La condición "Obligatorio si" solo se permite en atributos simples, no clave y no siempre obligatorios',
     qualifierCannotHaveApplicableExpression:
-      'El atributo calificador no puede tener la condición "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'El atributo calificador no puede tener la condición "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'El atributo calificador no puede tener reglas de editabilidad definidas',
     qualifierCannotHaveDefaultValues: 'El atributo calificador no puede tener valores por defecto',
     qualifierCannotHaveValidations: 'El atributo calificador no puede tener reglas de validación definidas',

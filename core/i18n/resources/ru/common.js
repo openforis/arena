@@ -29,7 +29,7 @@ export default {
     cantUndoWarning: 'Эту операцию нельзя отменить',
     cantBeDeletedUsedItem: 'Этот {{item}} используется определениями узлов и не может быть удален',
     chain: 'Цепочка',
-    chain_plural: 'Цепочки',
+    chain_other: 'Цепочки',
     childrenEmpty: 'Определите хотя бы один дочерний элемент',
     clear: 'Очистить',
     clone: 'Клонировать',
@@ -44,14 +44,14 @@ export default {
     createdWith: 'Создано с помощью',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Цикл',
-    cycle_plural: 'Циклы',
+    cycle_other: 'Циклы',
     dateCreated: 'Дата создания',
     dateLastModified: 'Дата последнего изменения',
     delete: 'Удалить',
     deleted: 'Удалено!',
     descending: 'По убыванию',
     description: 'Описание',
-    description_plural: 'Описания',
+    description_other: 'Описания',
     designerNotes: 'Заметки дизайнера',
     designerNotesInfo: `Заметки дизайнера будут видны только в дизайнере формы опроса и не будут видны в форме ввода данных.`,
     details: 'Подробности',
@@ -73,11 +73,13 @@ export default {
     empty: 'Пусто',
     entity: 'Сущность',
     error: 'Ошибка',
-    error_plural: 'Ошибки',
+    error_other: 'Ошибки',
+    error_few: 'Ошибки',
+    error_many: 'Ошибки',
     errorFound: 'Найдена 1 ошибка',
     errorFound_other: 'Найдено {{count}} ошибок',
     errorMessage: 'Сообщение об ошибке',
-    errorMessage_plural: 'Сообщения об ошибках',
+    errorMessage_other: 'Сообщения об ошибках',
     expand: 'Развернуть',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Экспорт',
@@ -88,7 +90,7 @@ export default {
     expression: 'Выражение',
     false: 'Ложь',
     file: 'Файл',
-    file_plural: 'Файлы',
+    file_other: 'Файлы',
     formContainsErrors: 'Форма содержит ошибки',
     formContainsErrorsCannotContinue: 'Форма содержит ошибки. Пожалуйста, исправьте их, прежде чем продолжить.',
     formContainsErrorsCannotSave: 'Форма содержит ошибки. Пожалуйста, исправьте их, прежде чем сохранить.',
@@ -105,12 +107,12 @@ export default {
     info: 'Информация',
     invalid: 'НЕВЕРНЫЙ',
     item: 'Элемент',
-    item_plural: 'Элементы',
+    item_other: 'Элементы',
     itemAlreadyAdded: 'Элемент уже добавлен',
     label: 'Метка',
-    label_plural: 'Метки',
+    label_other: 'Метки',
     language: 'Язык',
-    language_plural: 'Языки',
+    language_other: 'Языки',
     leavePageConfirmMessage: `На форме есть несохраненные изменения.
 
 При подтверждении все изменения будут потеряны.
@@ -122,11 +124,13 @@ export default {
     max: 'Максимум',
     med: 'Медиана',
     manage: 'Управление',
-    message_plural: 'Сообщения',
+    message_other: 'Сообщения',
     measure: 'Измерение',
     measure_other: 'Измерения',
     measurePrevSteps: 'Измерения предыдущих шагов',
-    measurePrevSteps_plural: 'Измерения предыдущих шагов',
+    measurePrevSteps_other: 'Измерения предыдущих шагов',
+    measurePrevSteps_few: 'Измерения предыдущих шагов',
+    measurePrevSteps_many: 'Измерения предыдущих шагов',
     min: 'Минимум',
     moveUp: 'Переместить вверх',
     moveDown: 'Переместить вниз',
@@ -134,7 +138,7 @@ export default {
     new: 'Новый',
     next: 'Далее',
     no: 'Нет',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
     notification: 'Уведомление',
     notification_other: 'Уведомления',
     notSpecified: '---Не указано---',
@@ -240,7 +244,7 @@ export default {
     value: 'Значение',
     view: 'Просмотр',
     warning: 'Предупреждение',
-    warning_plural: 'Предупреждения',
+    warning_other: 'Предупреждения',
     yes: 'Да',
     date: {
       aMomentAgo: 'Несколько секунд назад',
@@ -267,11 +271,9 @@ export default {
       visibleColumns: 'Видимые столбцы',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'Для подтверждения введите следующий текст: **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage: '(Будут приняты только файлы {{acceptedExtensions}} с максимальным размером {{maxSize}})',
     error: {
@@ -283,17 +285,14 @@ export default {
     selectedFile: 'Выбранный файл',
     selectedFile_other: 'Выбранные файлы',
   },
-
   error: {
     pageNotFound: 'Страница не найдена',
   },
-
   geo: {
     area: 'Площадь',
     vertices: 'Вершины',
     perimeter: 'Периметр',
   },
-
   files: {
     header: 'Файлы',
     missing: ' Отсутствующие файлы: {{count}}',
@@ -301,11 +300,9 @@ export default {
     fileName: 'Имя файла',
     fileSize: 'Размер файла',
   },
-
   sidebar: {
     logout: 'Выйти',
   },
-
   header: {
     theme: {
       label: 'Тема',
@@ -325,7 +322,6 @@ export default {
       error: 'Ошибка при генерации QR-кода: {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Целое число',
     decimal: 'Десятичное число',
@@ -342,7 +338,6 @@ export default {
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'Главная',
     landing: 'Приветствие',
@@ -384,23 +379,23 @@ export default {
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
     userGroup: 'Группа пользователей',
-    userGroup_plural: 'Группы пользователей',
+    userGroup_other: 'Группы пользователей',
     userGroupNew: 'Новая группа пользователей',
     usersList: 'Список пользователей (все)',
     user2FADevice: 'Устройство 2FA',
-    user2FADevice_plural: 'Устройства 2FA',
+    user2FADevice_other: 'Устройства 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Анализ',
     chain: 'Цепочка',
-    chain_plural: 'Цепочки',
+    chain_other: 'Цепочки',
     virtualEntity: 'Виртуальная сущность',
     entities: 'Виртуальные сущности',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Экземпляры',
     message: 'Сообщение',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
 
     systemAdmin: 'Администрирование системы',
     jobMonitor: 'Монитор заданий',
@@ -413,89 +408,9 @@ export default {
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'Этот раздел доступен только после публикации опроса',
   },
-
-  loginView: {
-    yourName: 'Ваше имя',
-    yourEmail: 'Ваш адрес электронной почты',
-    yourPassword: 'Ваш пароль',
-    yourNewPassword: 'Ваш новый пароль',
-    repeatYourPassword: 'Повторите ваш пароль',
-    repeatYourNewPassword: 'Повторите ваш новый пароль',
-    requestAccess: 'Впервые в $t(common.appNameFull)? Запросить доступ',
-    resetPassword: 'Сбросить пароль',
-    login: 'Войти',
-    loginUsingBackupCode: 'Войти с помощью резервного кода 2FA',
-    forgotPassword: 'Забыли пароль',
-    sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
-    twoFactorBackupCode: 'Резервный код 2FA',
-    twoFactorToken: 'Код подтверждения',
-    twoFactorTokenDescription: `Чтобы обеспечить безопасность вашей учетной записи, мы подтверждаем вашу личность.
-
-  Введите код, сгенерированный вашим приложением-аутентификатором.`,
-  },
-
-  accessRequestView: {
-    error: 'Ошибка при запросе доступа: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Имя',
-        lastName: 'Фамилия',
-        institution: 'Учреждение',
-        country: 'Страна',
-        purpose: 'Для чего вам это нужно?',
-        surveyName: 'Предложите название опроса',
-        templateUuid: 'Начать с шаблона?',
-      },
-    },
-    introduction: `Наши ресурсы ограничены, поэтому вы должны запросить доступ к платформе.
-Нам также интересно, что вы хотите с ней делать, поэтому, пожалуйста, сообщите нам!
-У вас есть возможность начать с **нового пустого опроса** или клонировать существующий **шаблон**, и вам нужно будет предложить название для вновь созданного опроса.
-Вам будет назначена роль ***Администратора опроса*** для этого опроса: вы сможете редактировать его и приглашать новых пользователей присоединяться к вашему опросу и вносить свой вклад.
-Вы также будете ***Менеджером опросов*** и сможете **создавать новые опросы** (до 5), если потребуется.
-Для получения дополнительной информации, пожалуйста, посетите наш веб-сайт: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**После отправки запроса, пожалуйста, дождитесь приглашения по электронной почте для доступа к Arena.**`,
-    reCaptchaNotAnswered: 'ReCaptcha не отвечена',
-    requestSent: 'Запрос на доступ успешно отправлен',
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-Пожалуйста, дайте нам пару дней для обработки вашего запроса.
-Как только он будет одобрен, мы отправим еще одно письмо на адрес **{{email}}** с инструкциями по доступу к $t(common.appName).
-Спасибо и наслаждайтесь **$t(common.appNameFull)**!`,
-    sendRequest: 'Отправить запрос',
-    sendRequestConfirm: 'Запросить доступ к $t(common.appNameFull)?',
-    templateNotSelected: 'Не выбрано (начать с нуля)',
-    title: 'Запрос доступа к $t(common.appNameFull)',
-    whitelistSenderSuggestion:
-      'Если вы найдете его в папке «Спам», добавьте **{{senderEmail}}** в свои контакты (адресную книгу) или отметьте письмо как безопасное/не спам, чтобы наши следующие письма попадали прямо во входящие.',
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Завершите регистрацию в Arena',
-      setYourNewPassword: 'Установите ваш новый пароль',
-    },
-    setNewPassword: 'Установить новый пароль',
-    forgotPasswordLinkInvalid:
-      'Страница, к которой вы пытались получить доступ, не существует или больше недействительна',
-    passwordSuccessfullyReset: 'Ваш пароль успешно сброшен',
-    passwordStrengthChecksTitle: 'Проверка надежности пароля',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Нет пробелов',
-      atLeast8CharactersLong: 'Не менее 8 символов',
-      containsLowerCaseLetters: 'Содержит строчные буквы',
-      containsUpperCaseLetters: 'Содержит прописные буквы',
-      containsNumbers: 'Содержит цифры',
-    },
-    completeRegistration: 'Завершить регистрацию',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Типы зависимостей',
     dependencyTypes: {
@@ -513,11 +428,9 @@ $t(accessRequestView.whitelistSenderSuggestion)
     selectAtLeastOneDependencyType: 'Выберите хотя бы один тип зависимости',
     noDependenciesToDisplay: 'Нет зависимостей для отображения',
   },
-
   designerView: {
     formPreview: 'Предварительный просмотр формы',
   },
-
   recordView: {
     justDeleted: 'Эта запись только что была удалена',
     sessionExpired: 'Сессия записи истекла',
@@ -533,7 +446,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       unlock: 'Разрешить редактирование атрибута-квалификатора',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Удалить эту пользовательскую агрегатную функцию?',
@@ -541,7 +453,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     editRecord: 'Редактировать запись',
   },
-
   mapView: {
     changeMarkerColor: 'Изменить цвет маркера',
     createRecord: 'Создать новую запись',
@@ -571,7 +482,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     selectedPeriod: 'Выбранный период',
   },
-
   samplingPolygonOptions: {
     circle: 'Круг',
     controlPointOffsetEast: 'Смещение опорной точки на восток (м)',
@@ -588,18 +498,15 @@ $t(accessRequestView.whitelistSenderSuggestion)
     samplingPolygon: 'Полигон выборки',
     shape: 'Форма',
   },
-
   kmlUploader: {
     opacity: 'непрозрачность',
     selectFile: 'Выбрать файл',
     title: 'Параметры KML/KMZ/Shapefile',
   },
-
   mapBaseLayerPeriodSelector: {
     chooseAPeriodToCompareWith: 'Выберите период для сравнения',
     falseColor: 'Псевдоцвет',
   },
-
   surveysView: {
     chains: 'Цепочки',
     confirmUpdateSurveyOwner: `Изменить владельца опроса "{{surveyName}}" на "{{ownerName}}"?`,
@@ -621,7 +528,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       'published-draft': 'Опубликован/Черновик',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Принято',
@@ -640,7 +546,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       template: 'Шаблон',
     },
   },
-
   userView: {
     scale: 'Масштаб',
     rotate: 'Повернуть',
@@ -663,7 +568,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       title: 'Управление устройствами двухфакторной аутентификации',
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'Смена пароля для пользователя: {{user}}',
     oldPassword: 'Старый пароль',
@@ -673,7 +577,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     passwordChangedSuccessfully: 'Пароль успешно изменен!',
     notAuthorizedToChangePasswordOfAnotherUser: 'У вас нет прав на изменение пароля другого пользователя',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'Пригласить пользователя {{email}} в качестве системного администратора?',
     confirmInviteSystemAdmin_other: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
@@ -769,7 +672,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       Если вы хотите пригласить пользователей с другими ролями, вы должны сначала опубликовать опрос.`,
     typeEmail: 'Введите адрес электронной почты, затем нажмите кнопку Добавить',
   },
-
   user: {
     mapApiKeys: {
       title: 'Ключи API карты',
@@ -786,7 +688,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       preferNotToSay: 'Предпочитаю не говорить',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
@@ -919,7 +820,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Таблица отчетных данных и соединения с атрибутами',
     showSamplingAttributes: 'Показать атрибуты выборки',
   },
-
   instancesView: {
     title: 'Экземпляры',
     terminate: 'Завершить',
@@ -938,12 +838,10 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Недействительный или просроченный токен',
     },
   },
-
   itemsTable: {
     unused: 'Неиспользуемые',
     noItemsAdded: 'Нет добавленных элементов',
   },
-
   expression: {
     functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} аргументов (получено {{numArgs}})',
     functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} аргументов (получено {{numArgs}})',
@@ -985,320 +883,9 @@ $t(common.appNameFull)
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: 'Дополнительные поля',
-    basic: 'Основное',
-    advanced: 'Расширенные',
-    mobileApp: 'Мобильное приложение',
-    print: 'Печать',
-    printProps: {
-      printOrientation: {
-        label: 'Ориентация страницы',
-        info: 'Ориентация, используемая когда эта сущность начинает свою собственную печатную секцию. По умолчанию наследуется ориентация документа, выбранная при экспорте.',
-      },
-      orientations: {
-        default: 'По умолчанию (документ)',
-        portrait: 'Портретная',
-        landscape: 'Альбомная',
-      },
-    },
-    validations: 'Проверки',
-    function: 'Функция',
-    editingFunction: 'Редактирование функции {{functionName}}',
-    editorHelp: {
-      json: 'Допустимые выражения являются подмножеством Javascript.',
-      sql: 'Разрешены только допустимые SQL-выражения.',
-    },
-    editorCompletionHelp: '- Показать доступные переменные и функции, которые можно использовать',
-    functionDescriptions: {
-      categoryItemProp: 'Возвращает значение указанного $t(extraProp.label) элемента категории с указанным кодом',
-      dateTimeDiff: 'Возвращает разницу (в минутах) между двумя парами дата-время',
-      distance: 'Возвращает расстояние (в метрах) между указанными координатами',
-      geoCoordinateAtDistance: 'Возвращает координаты на указанном расстоянии и азимуте от указанных координат',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      first: 'Возвращает первое значение или узел указанного множественного атрибута или сущности',
-      geoPolygon: 'Генерирует полигон в GeoJSON из списка координат',
-      includes: 'Возвращает true, если указанный множественный атрибут включает указанное значение.',
-      index: 'Возвращает индекс указанного узла среди его братьев',
-      isEmpty: 'Возвращает true, если для аргумента не указано значение',
-      isNotEmpty: 'Возвращает true, если для аргумента указано некоторое значение',
-      last: 'Возвращает последнее значение или узел указанного множественного атрибута или сущности',
-      ln: 'Возвращает натуральный логарифм X',
-      log10: 'Возвращает логарифм X по основанию 10',
-      max: 'Возвращает максимум из аргументов',
-      min: 'Возвращает минимум из аргументов',
-      now: 'Возвращает текущую дату или время',
-      parent: 'Возвращает родительскую сущность указанного узла',
-      pow: 'Возвращает значение основания, возведенного в степень',
-      prevCycleNote:
-        'Работает только в Arena Mobile, если определены несколько циклов и включена ссылка на предыдущий цикл',
-      prevCycleValue:
-        'Возвращает значение того же атрибута в записи предыдущего цикла. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Возвращает значения тех же атрибутов в записи предыдущего цикла. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Возвращает цикл текущей записи',
-      recordDateCreated:
-        'Возвращает дату и время создания текущей записи в виде значения datetime. Может использоваться в текстовом, датовом или временном атрибуте',
-      recordDateLastModified:
-        'Возвращает дату и время последнего изменения текущей записи в виде значения datetime. Может использоваться в текстовом, датовом или временном атрибуте',
-      recordOwnerEmail: 'Возвращает email пользователя, которому принадлежит запись',
-      recordOwnerName: 'Возвращает имя пользователя, которому принадлежит запись',
-      recordOwnerRole: 'Возвращает роль (в текущем опросе) пользователя, которому принадлежит запись',
-      rowIndex: 'Возвращает текущий индекс строки таблицы (или формы)',
-      taxonProp: 'Возвращает значение указанного $t(extraProp.label) таксона с указанным кодом',
-      taxonVernacularName:
-        'Возвращает (первое) народное (или местное) название на указанном языке таксона с указанным кодом',
-      unique: 'Возвращает уникальные значения множественного атрибута или сущности',
-      userEmail: 'Возвращает email вошедшего в систему пользователя',
-      userIsRecordOwner:
-        'Возвращает логическое значение "true", если пользователь, редактирующий запись, также является ее владельцем, "false" в противном случае',
-      userName: 'Возвращает имя вошедшего в систему пользователя',
-      userProp: 'Возвращает значение указанного $t(extraProp.label) вошедшего в систему пользователя',
-      uuid: 'Генерирует UUID (универсальный уникальный идентификатор), который может быть использован в качестве идентификатора (например, в качестве ключевого атрибута сущности)',
-      // SQL functions
-      avg: 'Возвращает среднее значение числовой переменной',
-      count: 'Возвращает количество строк, соответствующих указанному критерию',
-      sum: 'Возвращает общую сумму числовой переменной',
-    },
-    functionName: {
-      rowIndex: 'Индекс строки',
-    },
-    basicProps: {
-      analysis: 'Анализ',
-      autoIncrementalKey: {
-        label: 'Автоинкрементный ключ',
-        info: 'Значение будет генерироваться автоматически',
-      },
-      autoCreateMinCountItems: {
-        label: 'Автосоздание минимального количества элементов',
-        info: 'Когда сущность становится актуальной или создается ее родительская сущность, автоматически создается количество сущностей, равное минимальному значению.',
-      },
-      displayAs: 'Отображать как',
-      displayIn: 'Отображать в',
-      entitySource: 'Источник сущности',
-      enumerate: {
-        label: 'Перечислить',
-        info: `Строки будут автоматически генерироваться с использованием элементов категории, связанных с атрибутом кода, помеченным как Ключ, определенный внутри сущности; строки нельзя добавлять или удалять, а атрибут кода ключа не будет редактируемым`,
-      },
-      enumeratingItemsExpression: {
-        label: 'Выражение для перечисляемых элементов',
-        info: 'Необязательное выражение, которое определяет, какие элементы категории перечисляются (например, unique(table_source.source_type)). Если оно пустое, используются все элементы категории.',
-      },
-      enumerator: {
-        label: 'Перечислитель',
-        info: 'Элементы в категории будут использоваться для генерации строк родительской сущности',
-      },
-      form: 'Форма',
-      formula: 'Формула',
-      includedInClonedData: 'Включено в клонированные данные',
-      includedInMultipleEntitySummary: {
-        label: 'Включить в сводку множественной сущности',
-        info: `Если отмечено, значение атрибута будет отображаться в списке выбора сущности и в представлении сводки сущности`,
-      },
-      includedInRecordsList: {
-        label: 'Включить в список записей',
-        info: `Если отмечено, атрибут будет виден в списке записей`,
-      },
-      key: 'Ключ',
-      maxKeysCountReached: 'Достигнуто максимальное количество ключей ({{maxKeysCount}})',
-      multiple: 'Множественный',
-      ownPage: 'Собственная страница',
-      parentPage: 'Родительская страница ({{parentPage}})',
-      qualifier: {
-        label: 'Квалификатор',
-        info: `Когда пользователь, принадлежащий к группе, создаёт новую запись, этот атрибут будет автоматически заполнен значением, указанным для него в квалификаторах группы пользователя. Пользователи смогут видеть и изменять только записи, принадлежащие их собственной группе, если они входят в какую-либо группу.`,
-      },
-      table: 'Таблица',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Значения по умолчанию не указаны',
-      defaultValuesSpecified: 'Значения по умолчанию указаны',
-      editableAlways: 'Всегда редактируемо',
-      editableIfConditionIsMet: 'Редактируемо при выполнении условия',
-      relevantIfRadioNone: 'Всегда актуально',
-      relevantIfRadioDefined: 'Актуально при выполнении условия',
-      visibleAlways: 'Всегда видимо',
-      visibleIfConditionIsMet: 'Видимо при выполнении условия',
-      areaBasedEstimate: 'Оценка по площади',
-      defaultValues: 'Значения по умолчанию',
-      defaultValuesInfo: `Это позволяет автоматически заполнять ответ по заданным правилам.
-    Если настроено несколько правил, система проверит их по порядку сверху вниз.
-    Будет применено первое правило, которое подходит под условия, и его результат станет ответом.`,
-      defaultValueEvaluatedOneTime: 'Значение по умолчанию оценивается только один раз',
-      defaultValueEvaluatedOneTimeInfo: `Значение по умолчанию будет вычисляться только один раз, при создании атрибута.
-    Если флажок не установлен, значение по умолчанию будет пересчитываться при каждом обновлении записи.
-    Это следует отмечать при использовании выражений вроде now() или uuid(), которые должны вычисляться только один раз, при первом формировании значения атрибута.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
-      editableIf: 'Редактируемо, если',
-      editableIfInfo: `По умолчанию пользователь всегда может работать с релевантным полем.
-Здесь можно задать правило, определяющее, может ли пользователь вводить или изменять значение этого поля.
-Это определяет, может ли пользователь вводить или менять значение в этом поле.
-Если заданные условия выполняются, поле можно редактировать. Иначе оно становится только для чтения (заблокировано).`,
-      hidden: 'Всегда скрыто',
-      hiddenInReport: 'Скрыть в аналитической панели',
-      hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
-      hiddenWhenNotRelevant: 'Скрыто, когда неактуально',
-      itemsFilter: 'Фильтр элементов',
-      itemsFilterInfo: `Выражение, используемое для фильтрации выбираемых элементов.
-В выражении слово "this" будет относиться к самому элементу.
-Например: this.region = region_attribute_name
-(где "region" - это имя дополнительного свойства, определенного для элемента, а region_attribute_name - это имя атрибута в опросе)`,
-      readOnly: 'Только для чтения',
-      relevantIf: 'Актуально, если',
-      relevantIfInfo: `По умолчанию все поля активны.
-    Если вы зададите правило актуальности и оно не выполнится, поле станет серым или полностью скроется,
-    а автоматические ответы будут игнорироваться.
-    Используйте это, чтобы динамически показывать или скрывать части формы; например, показывать поле «Уточните», только если пользователь выбрал «Другое».`,
-      script: 'Скрипт',
-      visibleIf: 'Видимо, если',
-      visibleIfInfo: `По умолчанию поле всегда видно.
-    Если задать правило, поле будет видно только когда это правило выполняется; иначе оно будет скрыто.
-    Важно: в отличие от скрытия «неактуального» поля, скрытое поле все равно может сохранять автоматический ответ.
-    Это удобно для сокрытия целых разделов формы в зависимости от того, кто вошел в систему (например, по роли).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Скрыто в Arena Mobile',
-        info: `Если отмечено, атрибут не будет виден в AM`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Включить в ссылку на предыдущий цикл',
-        info: `Если отмечено, значение из предыдущего цикла будет отображаться в форме ввода данных (когда ссылка на предыдущий цикл активна в мобильном приложении)"`,
-      },
-    },
-    numericProps: {
-      unit: 'Единица',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Максимальное количество десятичных знаков',
-    },
-    fileProps: {
-      fileNameExpression: 'Выражение имени файла',
-      fileType: 'Тип файла',
-      fileTypes: {
-        image: 'Изображение',
-        video: 'Видео',
-        audio: 'Аудио',
-        other: 'Другое',
-      },
-      maxFileSize: 'Макс. размер файла (МБ)',
-      numberOfFiles: 'Перейдите в раздел "Проверки", чтобы изменить минимальное и максимальное количество файлов.',
-      showGeotagInformation: 'Показать информацию о геотегах',
-    },
-    mobileProps: {
-      title: 'Мобильное приложение',
-    },
-    timeProps: {
-      includeSeconds: 'Включить секунды',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Цвет заголовка',
-      headerColor: {
-        blue: 'Синий',
-        green: 'Зеленый',
-        orange: 'Оранжевый',
-        red: 'Красный',
-        yellow: 'Желтый',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Гиперссылка',
-        markdown: 'Markdown',
-        text: 'Текст',
-      },
-      textInputType: 'Тип текстового ввода',
-      textInputTypes: {
-        singleLine: 'Одна строка',
-        multiLine: 'Многострочный',
-      },
-      textTransform: 'Преобразование текста',
-      textTransformTypes: {
-        none: 'нет',
-        capitalize: 'с большой буквы',
-        uppercase: 'в верхний регистр',
-        lowercase: 'в нижний регистр',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Значение метки',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Категория',
-      codeShown: 'Показать код',
-      displayAsTypes: {
-        checkbox: 'Флажок',
-        dropdown: 'Выпадающий список',
-      },
-      parentCode: 'Родительский код',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Разрешить только координаты устройства',
-      allowOnlyDeviceCoordinateInfo: `Применяется только к Arena Mobile: если отмечено, пользователь не сможет изменять значения X/Y, но для их получения можно будет использовать только GPS устройства`,
-      mapMarkerColor: 'Цвет маркера на карте',
-    },
-    expressionsProp: {
-      expression: 'Выражение',
-      applyIf: 'Применить, если',
-      confirmDelete: 'Удалить это выражение?',
-      severity: 'Важность',
-    },
-    validationsProps: {
-      minCount: 'Минимальное количество',
-      maxCount: 'Максимальное количество',
-      expressions: 'Выражения валидации',
-      attributeAlwaysValid: 'Атрибут всегда корректен',
-      attributeValidWhenConditionIsMet: 'Атрибут корректен при выполнении условия',
-      notRequired: 'Не обязательно',
-      alwaysRequired: 'Всегда обязательно',
-      requiredWhenConditionIsMet: 'Обязательно при выполнении условия',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Этот узел не может быть преобразован в множественный, потому что у него есть значения по умолчанию.',
-    cannotDeleteNodeDefReferenced: `Невозможно удалить "{{nodeDef}}": на него ссылаются следующие определения узлов: {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Клонировать',
-      title: 'Клонирование определения узла "{{nodeDefName}}"',
-      entitySelectLabel: 'Сущность для клонирования:',
-    },
-    conversion: {
-      dialogTitle: 'Преобразовать {{nodeDefName}} в другой тип',
-      fromType: 'Из типа',
-      toType: 'В тип',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Переместить',
-      title: 'Перемещение определения узла "{{nodeDefName}}" из "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Сущность, в которую нужно переместить:',
-    },
-    movedNodeDefinitionHasErrors:
-      'Определение узла "{{nodeDefName}}", которое вы переместили, содержит ошибки; пожалуйста, исправьте их.',
-    nodeDefintionsHaveErrors: 'Эти определения узлов содержат ошибки: {{nodeDefNames}}. Пожалуйста, исправьте их.',
-    filterVariable: 'Переменная для фильтрации элементов',
-    filterVariableForLevel: 'Переменная для {{levelName}}',
-    unique: {
-      label: 'Уникальный',
-      info: `Когда атрибут помечен как **Уникальный**, его значение должно быть уникальным внутри ближайшей множественной сущности (иначе будет показана ошибка).
-
----
-
-Например, в структуре *кластер -> участок -> дерево*, если у вас есть атрибут *tree_species*, помеченный как **Уникальный**, вы можете иметь только одно дерево каждого вида внутри одного и того же *участка*.`,
-    },
-    nodeDefClonedSuccessfully: 'Определение узла "{{nodeDefName}}" успешно клонировано в "{{targetParentNodeDefName}}"',
-    categoriesClonedFromSurvey: 'Следующие категории также были клонированы из исходного опроса: {{names}}',
-    taxonomiesClonedFromSurvey: 'Следующие таксономии также были клонированы из исходного опроса: {{names}}',
-  },
-
   languagesEditor: {
     languages: 'Язык(и)',
   },
-
   taxonomy: {
     header: 'Таксономия',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
@@ -1328,7 +915,6 @@ $t(common.appNameFull)
     taxaCount: 'Количество таксонов',
     vernacularNameLabel: 'Метка местного названия',
   },
-
   categoryList: {
     batchImport: 'Пакетный импорт категорий (из ZIP)',
     batchImportCompleteSuccessfully: `{{importedCategories}} категорий успешно импортировано!
@@ -1354,7 +940,6 @@ $t(common.appNameFull)
       samplingPointData: 'Данные точек выборки',
     },
   },
-
   categoryEdit: {
     header: 'Категория',
     addLevel: 'Добавить уровень',
@@ -1466,10 +1051,9 @@ $t(common.cantUndoWarning)`,
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },
-
   extraProp: {
     label: 'Дополнительное свойство',
-    label_plural: 'Дополнительные свойства',
+    label_other: 'Дополнительные свойства',
     addExtraProp: 'Добавить дополнительное свойство',
     dataTypes: {
       geometryPoint: 'Геометрия точки',
@@ -1477,7 +1061,7 @@ $t(common.cantUndoWarning)`,
       text: 'Текст',
     },
     editor: {
-      title: 'Редактировать $t(extraProp.label_plural)',
+      title: 'Редактировать $t(extraProp.label_other)',
       confirmDelete: 'Удалить дополнительное свойство "{{name}}"?',
       confirmSave: `Сохранить изменения в определениях дополнительных свойств?
 
@@ -1492,7 +1076,6 @@ $t(common.cantUndoWarning)`,
     name: 'Название свойства {{position}}',
     value: 'Значение',
   },
-
   record: {
     ancestorNotFound: 'Родительский узел не найден в записи',
     keyDuplicate: 'Дубликат ключа записи',
@@ -1518,7 +1101,6 @@ $t(common.cantUndoWarning)`,
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'И',
     or: 'ИЛИ',
@@ -1570,13 +1152,11 @@ $t(common.cantUndoWarning)`,
       expression: 'Выражение',
     },
   },
-
   urls: {
     openforisWebsite: 'https://www.openforis.org',
     openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
     supportForum: 'https://openforis.support',
   },
-
   links: {
     openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
     openforisArenaWebsite:
@@ -1591,7 +1171,6 @@ $t(common.cantUndoWarning)`,
     arenaRScriptsInGitHub:
       '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
   },
-
   aiExpression: {
     title: 'Сгенерировать выражение по описанию',
     hint: 'Опишите простыми словами, что должно делать выражение. ИИ переведет его в синтаксис Arena. Нажмите Ctrl+Enter для генерации.',
@@ -1610,7 +1189,6 @@ $t(common.cantUndoWarning)`,
       timeout: 'ИИ слишком долго не отвечает. Повторите попытку.',
     },
   },
-
   aiTranslation: {
     translateButton_one: 'Перевести на {{count}} другой язык',
     translateButton_few: 'Перевести на {{count}} других языка',
@@ -1625,14 +1203,12 @@ $t(common.cantUndoWarning)`,
     failed: 'Не удалось выполнить перевод: {{message}}',
     timeout: 'Время ожидания перевода истекло. Повторите попытку.',
   },
-
   aiActivityLog: {
     title: 'Сводка журнала активности',
     summarizeButton: 'Составить сводку',
     thinking: 'Собираем события и запрашиваем у ИИ сводку…',
     error: 'Не удалось получить сводку: {{message}}',
   },
-
   aiChatbot: {
     open: 'Справка и документация',
     title: 'Справка и документация',

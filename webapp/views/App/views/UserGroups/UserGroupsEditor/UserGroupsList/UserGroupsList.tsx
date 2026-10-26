@@ -46,7 +46,7 @@ const UserGroupsList = (): React.ReactElement => {
       },
       {
         field: 'qualifiers',
-        headerName: i18n.t('usersView:userGroup.qualifier_plural'),
+        headerName: i18n.t('usersView:userGroup.qualifier_other'),
         flex: 1,
         valueGetter: (_value, row) => UserGroup.getQualifiers(row).length,
       },

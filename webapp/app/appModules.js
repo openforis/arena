@@ -213,7 +213,7 @@ export const userModules = {
     path: 'userPasswordChange',
   },
   user2FADevices: {
-    key: 'user2FADevice_plural',
+    key: 'user2FADevice_other',
     path: '2fa-devices',
   },
   userInvite: {
@@ -225,7 +225,7 @@ export const userModules = {
     path: 'usersAccessRequest',
   },
   userGroups: {
-    key: 'userGroup_plural',
+    key: 'userGroup_other',
     path: 'userGroups',
   },
   userGroupNew: {
@@ -240,7 +240,7 @@ export const userModules = {
 
 export const analysisModules = {
   chains: {
-    key: 'chain_plural',
+    key: 'chain_other',
     path: 'chains',
   },
   chain: {
@@ -286,7 +286,7 @@ export const systemAdminModules = {
     path: 'systemLogs',
   },
   messages: {
-    key: 'message_plural',
+    key: 'message_other',
     path: 'messages',
   },
   message: {

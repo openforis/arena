@@ -25,7 +25,7 @@ export const RecordPageStatusIcon = ({ hasErrors, hasWarnings, isComplete }: Pro
 
   if (hasErrors) {
     return (
-      <Tooltip title={i18n.t('common.error_plural')}>
+      <Tooltip title={i18n.t('common.error_other')}>
         <SvgIcon sx={{ fontSize: 16, color: themeColors.error, flexShrink: 0 }}>
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z" />
         </SvgIcon>
@@ -34,7 +34,7 @@ export const RecordPageStatusIcon = ({ hasErrors, hasWarnings, isComplete }: Pro
   }
   if (hasWarnings) {
     return (
-      <Tooltip title={i18n.t('common.warning_plural')}>
+      <Tooltip title={i18n.t('common.warning_other')}>
         <SvgIcon sx={{ fontSize: 16, color: themeColors.warning, flexShrink: 0 }}>
           <path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" />
         </SvgIcon>

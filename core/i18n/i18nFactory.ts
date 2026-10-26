@@ -11,6 +11,7 @@ import jaTranslation from './resources/ja'
 import mnTranslation from './resources/mn'
 import ptTranslation from './resources/pt'
 import ruTranslation from './resources/ru'
+import srTranslation from './resources/sr'
 
 const resources = {
   en: enTranslation,
@@ -20,6 +21,7 @@ const resources = {
   mn: mnTranslation,
   pt: ptTranslation,
   ru: ruTranslation,
+  sr: srTranslation,
 }
 
 export const defaultLanguage = 'en'

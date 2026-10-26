@@ -29,7 +29,7 @@ export default {
     cantUndoWarning: 'Энэ үйлдлийг буцаах боломжгүй',
     cantBeDeletedUsedItem: 'Энэ {{item}} нь зарим зангилааны тодорхойлолтуудад ашиглагдсан тул устгах боломжгүй',
     chain: 'Гинж',
-    chain_plural: 'Гинжүүд',
+    chain_other: 'Гинжүүд',
     childrenEmpty: 'Наад зах нь нэг хүүхэд элементийг тодорхойлно уу',
     clear: 'Арилгах',
     clone: 'Хувилах',
@@ -44,14 +44,14 @@ export default {
     createdWith: 'Үүсгэсэн',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Мөчлөг',
-    cycle_plural: 'Мөчлөгүүд',
+    cycle_other: 'Мөчлөгүүд',
     dateCreated: 'Үүсгэсэн огноо',
     dateLastModified: 'Сүүлд өөрчилсөн огноо',
     delete: 'Устгах',
     deleted: 'Устгагдсан!',
     descending: 'Буурах',
     description: 'Тайлбар',
-    description_plural: 'Тайлбарууд',
+    description_other: 'Тайлбарууд',
     designerNotes: 'Дизайнерын тэмдэглэл',
     designerNotesInfo: `Дизайнерын тэмдэглэл зөвхөн судалгааны маягт дизайнерт харагдах бөгөөд өгөгдөл оруулах маягтанд харагдахгүй.`,
     details: 'Дэлгэрэнгүй',
@@ -73,11 +73,11 @@ export default {
     empty: 'Хоосон',
     entity: 'Объект',
     error: 'Алдаа',
-    error_plural: 'Алдаанууд',
+    error_other: 'Алдаанууд',
     errorFound: '1 алдаа олдов',
     errorFound_other: '{{count}} алдаа олдов',
     errorMessage: 'Алдааны мессеж',
-    errorMessage_plural: 'Алдааны мессежүүд',
+    errorMessage_other: 'Алдааны мессежүүд',
     expand: 'Дэлгэх',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Экспортлох',
@@ -88,7 +88,7 @@ export default {
     expression: 'Илэрхийлэл',
     false: 'Худал',
     file: 'Файл',
-    file_plural: 'Файлууд',
+    file_other: 'Файлууд',
     formContainsErrors: 'Маягт алдаатай байна',
     formContainsErrorsCannotContinue: 'Маягт алдаатай байна. Үргэлжлүүлэхийн өмнө засарна уу.',
     formContainsErrorsCannotSave: 'Маягт алдаатай байна. Хадгалахын өмнө засарна уу.',
@@ -105,12 +105,12 @@ export default {
     info: 'Мэдээлэл',
     invalid: 'ХҮЧИНГҮЙ',
     item: 'Элемент',
-    item_plural: 'Элементүүд',
+    item_other: 'Элементүүд',
     itemAlreadyAdded: 'Элемент нэмэгдсэн байна',
     label: 'Шошго',
-    label_plural: 'Шошгууд',
+    label_other: 'Шошгууд',
     language: 'Хэл',
-    language_plural: 'Хэлнүүд',
+    language_other: 'Хэлнүүд',
     leavePageConfirmMessage: `Маягтанд хадгалгдаагүй өөрчлөлтүүд байна.
 
 Батлахдаа, бүх өөрчлөлтүүд алдагдана.
@@ -122,11 +122,11 @@ export default {
     max: 'Хамгийн их',
     med: 'Дундаж',
     manage: 'Удирдах',
-    message_plural: 'Мессежүүд',
+    message_other: 'Мессежүүд',
     measure: 'Хэмжилт',
     measure_other: 'Хэмжилтүүд',
     measurePrevSteps: 'Өмнөх алхмуудыг хэмжих',
-    measurePrevSteps_plural: 'Өмнөх алхмуудыг хэмжих',
+    measurePrevSteps_other: 'Өмнөх алхмуудыг хэмжих',
     min: 'Хамгийн бага',
     moveUp: 'Дээш зөөх',
     moveDown: 'Доош зөөх',
@@ -134,7 +134,7 @@ export default {
     new: 'Шинэ',
     next: 'Дараах',
     no: 'Үгүй',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
     notification: 'Мэдэгдэл',
     notification_other: 'Мэдэгдлүүд',
     notSpecified: '---Заагаагүй---',
@@ -240,7 +240,7 @@ export default {
     value: 'Утга',
     view: 'Харах',
     warning: 'Анхааруулга',
-    warning_plural: 'Анхааруулгууд',
+    warning_other: 'Анхааруулгууд',
     yes: 'Тийм',
     date: {
       aMomentAgo: 'Саяхан',
@@ -267,11 +267,9 @@ export default {
       visibleColumns: 'Харагдах баганууд',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'Батлахын тулд дараах текстийг бичнэ үү: **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage:
       '(Зөвхөн {{acceptedExtensions}} өргөтгөлтэй, хамгийн ихдээ {{maxSize}} хэмжээтэй файлуудыг хүлээн авна)',
@@ -284,17 +282,14 @@ export default {
     selectedFile: 'Сонгогдсон файл',
     selectedFile_other: 'Сонгогдсон файлууд',
   },
-
   error: {
     pageNotFound: 'Хуудас олдсонгүй',
   },
-
   geo: {
     area: 'Талбай',
     vertices: 'Оройнууд',
     perimeter: 'Периметр',
   },
-
   files: {
     header: 'Файлууд',
     missing: ' Дутуу файлууд: {{count}}',
@@ -302,11 +297,9 @@ export default {
     fileName: 'Файлын нэр',
     fileSize: 'Файлын хэмжээ',
   },
-
   sidebar: {
     logout: 'Гарах',
   },
-
   header: {
     theme: {
       label: 'Загвар',
@@ -326,7 +319,6 @@ export default {
       error: 'QR код үүсгэхэд алдаа гарлаа: {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Бүхэл тоо',
     decimal: 'Бутархай тоо',
@@ -343,7 +335,6 @@ export default {
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'Нүүр хуудас',
     landing: 'Тавтай морил',
@@ -385,23 +376,23 @@ export default {
     userNew: 'Шинэ хэрэглэгч',
     usersSurvey: 'Хэрэглэгчдийн жагсаалт',
     userGroup: 'Хэрэглэгчийн бүлэг',
-    userGroup_plural: 'Хэрэглэгчийн бүлгүүд',
+    userGroup_other: 'Хэрэглэгчийн бүлгүүд',
     userGroupNew: 'Шинэ хэрэглэгчийн бүлэг',
     usersList: 'Хэрэглэгчдийн жагсаалт (бүгд)',
     user2FADevice: '2FA төхөөрөмж',
-    user2FADevice_plural: '2FA төхөөрөмжүүд',
+    user2FADevice_other: '2FA төхөөрөмжүүд',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Шинжилгээ',
     chain: 'Гинж',
-    chain_plural: 'Гинжүүд',
+    chain_other: 'Гинжүүд',
     virtualEntity: 'Виртуал объект',
     entities: 'Виртуал объектууд',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Жишээнүүд',
     message: 'Мессеж',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
 
     systemAdmin: 'Системийн удирдлага',
     jobMonitor: 'Ажлын хяналт',
@@ -414,88 +405,9 @@ export default {
     disclaimer: 'Хариуцлагаас татгалзах',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'Энэ хэсэг нь зөвхөн судалгаа нийтлэгдсэн үед л боломжтой.',
   },
-
-  loginView: {
-    yourName: 'Таны нэр',
-    yourEmail: 'Таны имэйл',
-    yourPassword: 'Таны нууц үг',
-    yourNewPassword: 'Таны шинэ нууц үг',
-    repeatYourPassword: 'Нууц үгээ давтана уу',
-    repeatYourNewPassword: 'Шинэ нууц үгээ давтана уу',
-    requestAccess: '$t(common.appNameFull)-д шинээр ирсэн үү? Хандалтын хүсэлт илгээх',
-    resetPassword: 'Нууц үг сэргээх',
-    login: 'Нэвтрэх',
-    loginUsingBackupCode: '2FA нөөц кодоор нэвтрэх',
-    forgotPassword: 'Нууц үг мартсан',
-    sendPasswordResetEmail: 'Нууц үг сэргээх имэйл илгээх',
-    twoFactorBackupCode: '2FA нөөц код',
-    twoFactorToken: 'Баталгаажуулах код',
-    twoFactorTokenDescription: `Таны бүртгэлийг аюулгүй байлгахын тулд бид таныг баталгаажуулна.
-
-  Таны баталгаажуулагч апп-аас үүсгэсэн кодыг оруулна уу.`,
-  },
-
-  accessRequestView: {
-    error: 'Хандалтын хүсэлт гаргахад алдаа гарлаа: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Нэр',
-        lastName: 'Овог',
-        institution: 'Байгууллага',
-        country: 'Улс',
-        purpose: 'Та юунд ашиглах хэрэгтэй вэ?',
-        surveyName: 'Судалгааны нэр санал болгох',
-        templateUuid: 'Загвараас эхлэх үү?',
-      },
-    },
-    introduction: `Манай нөөц хязгаарлагдмал тул та платформ руу нэвтрэх хүсэлт гаргах ёстой.
-Та юу хийхийг хүсэж байгаагаа бидэнд мэдэгдээрэй!
-Та **шинэ хоосон судалгаагаар** эхлэх эсвэл одоо байгаа **загвараас** хувилах боломжтой бөгөөд шинээр үүсгэсэн судалгаанд нэр санал болгох шаардлагатай болно.
-Та тухайн судалгааны ***Судалгааны Администратор***-ын үүрэгтэй болно: та үүнийг засах, шинэ хэрэглэгчдийг судалгаандаа урьж, хувь нэмэр оруулах боломжтой болно.
-Та мөн ***Судалгааны Менежер*** болно бөгөөд шаардлагатай бол **шинэ судалгаа** (5 хүртэл) үүсгэх боломжтой болно.
-Илүү дэлгэрэнгүй мэдээлэл авахыг хүсвэл манай вэбсайтаар зочилно уу: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Хүсэлтээ илгээсний дараа Арена руу нэвтрэх урилгын имэйлийг хүлээгээрэй.**`,
-    reCaptchaNotAnswered: 'ReCaptcha хариулагдаагүй',
-    requestSent: 'Хандалтын хүсэлт амжилттай илгээгдсэн',
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-Таны хүсэлтийг боловсруулахад хэдхэн хоног өгнө үү.
-Хүсэлт зөвшөөрөгдсөний дараа бид **{{email}}** хаяг руу $t(common.appName) руу хэрхэн нэвтрэх тухай заавар бүхий өөр нэг имэйл илгээх болно.
-Баярлалаа, **$t(common.appNameFull)**-г ашиглаарай!`,
-    sendRequest: 'Хүсэлт илгээх',
-    sendRequestConfirm: '$t(common.appNameFull) руу хандах хүсэлт илгээх үү?',
-    templateNotSelected: 'Сонгогдоогүй (эхнээс нь эхлэх)',
-    title: '$t(common.appNameFull) руу хандах хүсэлт гаргах',
-    whitelistSenderSuggestion:
-      'Хэрэв та үүнийг Спам/Хэрэггүй имэйлийн хавтаснаас олсон бол **{{senderEmail}}** хаягийг харилцагчдын жагсаалтдаа (хаягийн дэвтэр) нэмэх эсвэл аюулгүй/спам биш гэж тэмдэглэнэ үү. Ингэснээр бидний дараагийн имэйлүүд таны ирсэн имэйлийн хайрцагт шууд очих болно.',
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Арена дахь бүртгэлээ гүйцээх',
-      setYourNewPassword: 'Шинэ нууц үгээ тохируулах',
-    },
-    setNewPassword: 'Шинэ нууц үг тохируулах',
-    forgotPasswordLinkInvalid: 'Таны нэвтрэх гэсэн хуудас байхгүй эсвэл хүчингүй болсон',
-    passwordSuccessfullyReset: 'Таны нууц үг амжилттай сэргээгдсэн',
-    passwordStrengthChecksTitle: 'Нууц үгийн бат бөх байдлын шалгалт',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Хоосон зай байхгүй',
-      atLeast8CharactersLong: 'Наад зах нь 8 тэмдэгтээс бүрдсэн',
-      containsLowerCaseLetters: 'Бага үсгүүд агуулсан',
-      containsUpperCaseLetters: 'Том үсгүүд агуулсан',
-      containsNumbers: 'Тоонууд агуулсан',
-    },
-    completeRegistration: 'Бүртгэлээ гүйцээх',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Хамаарлын төрлүүд',
     dependencyTypes: {
@@ -513,11 +425,9 @@ $t(accessRequestView.whitelistSenderSuggestion)
     selectAtLeastOneDependencyType: 'Наад зах нь нэг хамаарлын төрлийг сонгоно уу',
     noDependenciesToDisplay: 'Харуулах хамаарал байхгүй',
   },
-
   designerView: {
     formPreview: 'Маягтын урьдчилан харах',
   },
-
   recordView: {
     justDeleted: 'Энэ бичлэг саяхан устгагдсан',
     sessionExpired: 'Бичлэгийн сесс дууссан',
@@ -533,7 +443,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       unlock: 'Квалификатор атрибутыг засахыг зөвшөөрөх',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Энэ өөрчлөн нэгтгэсэн функцийг устгах уу?',
@@ -541,7 +450,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     editRecord: 'Бичлэгийг засах',
   },
-
   mapView: {
     changeMarkerColor: 'Тэмдэглэгээний өнгө өөрчлөх',
     createRecord: 'Шинэ бичлэг үүсгэх',
@@ -571,7 +479,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     selectedPeriod: 'Сонгогдсон хугацаа',
   },
-
   samplingPolygonOptions: {
     circle: 'Дугуй',
     controlPointOffsetEast: 'Лавлах цэгийн зүүн зүгт шилжилт (м)',
@@ -588,18 +495,15 @@ $t(accessRequestView.whitelistSenderSuggestion)
     samplingPolygon: 'Түүвэрлэх олон өнцөгт',
     shape: 'Хэлбэр',
   },
-
   kmlUploader: {
     opacity: 'тунгалаг байдал',
     selectFile: 'Файл сонгох',
     title: 'KML/KMZ/Shapefile сонголтууд',
   },
-
   mapBaseLayerPeriodSelector: {
     chooseAPeriodToCompareWith: 'Харьцуулах хугацааг сонгоно уу',
     falseColor: 'Худал өнгө',
   },
-
   surveysView: {
     chains: 'Гинжүүд',
     confirmUpdateSurveyOwner: `Судалгаа "{{surveyName}}"-ийн эзэмшигчийг "{{ownerName}}" болгож өөрчлөх үү?`,
@@ -621,7 +525,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       'published-draft': 'Нийтэлсэн/Ноорог',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Хүлээн авсан',
@@ -640,7 +543,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       template: 'Загвар',
     },
   },
-
   userView: {
     scale: 'Хэмжээс',
     rotate: 'Эргүүлэх',
@@ -663,7 +565,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       title: 'Хоёр хүчин зүйлийн баталгаажуулалтын төхөөрөмжүүдийг удирдах',
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'Хэрэглэгчийн нууц үг солих: {{user}}',
     oldPassword: 'Хуучин нууц үг',
@@ -673,7 +574,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     passwordChangedSuccessfully: 'Нууц үг амжилттай солигдлоо!',
     notAuthorizedToChangePasswordOfAnotherUser: 'Та өөр хэрэглэгчийн нууц үгийг солих эрхгүй байна',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
     confirmInviteSystemAdmin_other: 'Хэрэглэгч {{email}}-г Систем Администратороор урих уу?',
@@ -765,7 +665,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       Хэрэв та өөр үүрэгтэй хэрэглэгчдийг урихыг хүсвэл эхлээд судалгаагаа нийтлэх хэрэгтэй.`,
     typeEmail: 'Имэйл хаягийг бичээд, Нэмэх товчийг дарна уу',
   },
-
   user: {
     mapApiKeys: {
       title: 'Газрын зураг API түлхүүрүүд',
@@ -782,7 +681,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       preferNotToSay: 'Хэлэхгүй байхыг хүсэж байна',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete:
@@ -908,7 +806,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Тайлагнах өгөгдлийн хүснэгт болон шинж чанаруудтай нэгдэл',
     showSamplingAttributes: 'Түүвэрлэх шинж чанаруудыг харуулах',
   },
-
   instancesView: {
     title: 'Жишээнүүд',
     terminate: 'Дуусгах',
@@ -927,12 +824,10 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Хүчингүй эсвэл хугацаа нь дууссан токен',
     },
   },
-
   itemsTable: {
     unused: 'Ашиглагдаагүй',
     noItemsAdded: 'Элемент нэмэгдээгүй',
   },
-
   expression: {
     functionHasTooFewArguments: 'Функц {{fnName}}-д наад зах нь {{minArity}} аргумент шаардлагатай ({{numArgs}} авсан)',
     functionHasTooManyArguments:
@@ -975,315 +870,9 @@ $t(common.appNameFull)
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: 'Нэмэлт талбарууд',
-    basic: 'Үндсэн',
-    advanced: 'Нарийвчилсан',
-    mobileApp: 'Мобайл апп',
-    print: 'Хэвлэх',
-    printProps: {
-      printOrientation: {
-        label: 'Хуудасны чиглэл',
-        info: 'Энэ объект өөрийн хэвлэх хэсгийг эхлүүлэхэд ашиглагдах чиглэл. Анхдагчаар экспортод сонгосон баримтын чиглэлийг дагана.',
-      },
-      orientations: {
-        default: 'Анхдагч (баримт)',
-        portrait: 'Босоо',
-        landscape: 'Хэвтээ',
-      },
-    },
-    validations: 'Баталгаажуулалтууд',
-    function: 'Функц',
-    editingFunction: 'Функц {{functionName}}-г засах',
-    editorHelp: {
-      json: 'Хүчинтэй илэрхийлэл нь Javascript-ийн дэд олонлог юм.',
-      sql: 'Зөвхөн хүчинтэй SQL илэрхийллийг зөвшөөрнө.',
-    },
-    editorCompletionHelp: '- Боломжтой хувьсагчид болон ашиглаж болох функцуудыг харуулах',
-    functionDescriptions: {
-      categoryItemProp: 'Заасан кодтой ангиллын элементийн заасан $t(extraProp.label)-ийн утгыг буцаана',
-      dateTimeDiff: '2 огноо-цагийн хоорондох ялгааг (минутаар) буцаана',
-      distance: 'Заасан координатуудын хоорондох зайг (метрээр) буцаана',
-      geoCoordinateAtDistance: 'Заасан координатаас тодорхой зай болон чиглэлд байрлах координатыг буцаана',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      first: 'Заасан олон шинж чанар эсвэл объектын эхний утга эсвэл зангилааг буцаана',
-      geoPolygon: 'Координатуудын жагсаалтаас GeoJSON-д олон өнцөгт үүсгэнэ',
-      includes: 'Заасан олон шинж чанар заасан утгыг агуулсан бол үнэн буцаана.',
-      index: 'Заасан зангилааны ах дүүсийнх нь доторх индексийг буцаана',
-      isEmpty: 'Хэрэв аргумент утгагүй бол үнэн буцаана',
-      isNotEmpty: 'Хэрэв аргумент ямар нэгэн утгатай бол үнэн буцаана',
-      last: 'Заасан олон шинж чанар эсвэл объектын сүүлийн утга эсвэл зангилааг буцаана',
-      ln: 'X-ийн натурал логарифмыг буцаана',
-      log10: 'X-ийн 10-н суурьтай логарифмыг буцаана',
-      max: 'Аргументуудын хамгийн их утгыг буцаана',
-      min: 'Аргументуудын хамгийн бага утгыг буцаана',
-      now: 'Одоогийн огноо эсвэл цагийг буцаана',
-      parent: 'Заасан зангилааны эцэг объектыг буцаана',
-      pow: 'Суурийн утгыг зэрэгт өргөсөн утгыг буцаана',
-      prevCycleNote:
-        'Зөвхөн Arena Mobile-д ажилладаг, олон мөчлөг тодорхойлогдсон бөгөөд өмнөх мөчлөгтэй холбоос идэвхжүүлсэн үед',
-      prevCycleValue:
-        'Өмнөх мөчлөгийн бичлэгт ижил шинж чанарын утгыг буцаана. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Өмнөх мөчлөгийн бичлэгт ижил шинж чанаруудын утгуудыг буцаана. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Одоогийн бичлэгийн мөчлөгийг буцаана',
-      recordDateCreated:
-        'Одоогийн бичлэгийн үүсгэсэн огноо, цагийг datetime утгаар буцаана. Үүнийг текст, огноо эсвэл цагийн шинж чанарт ашиглаж болно',
-      recordDateLastModified:
-        'Одоогийн бичлэгийн сүүлд өөрчилсөн огноо, цагийг datetime утгаар буцаана. Үүнийг текст, огноо эсвэл цагийн шинж чанарт ашиглаж болно',
-      recordOwnerEmail: 'Бичлэгийг эзэмшигч хэрэглэгчийн имэйлийг буцаана',
-      recordOwnerName: 'Бичлэгийг эзэмшигч хэрэглэгчийн нэрийг буцаана',
-      recordOwnerRole: 'Бичлэгийг эзэмшигч хэрэглэгчийн үүргийг (одоогийн судалгаанд) буцаана',
-      rowIndex: 'Одоогийн хүснэгтийн мөрний (эсвэл маягтын) индексыг буцаана',
-      taxonProp: 'Заасан кодтой таксоны заасан $t(extraProp.label)-ийн утгыг буцаана',
-      taxonVernacularName: 'Заасан кодтой таксоны заасан хэлээрх (эхний) нутгийн нэрийг буцаана',
-      unique: 'Олон шинж чанар эсвэл объектын өвөрмөц утгуудыг буцаана',
-      userEmail: 'Нэвтэрсэн хэрэглэгчийн имэйлийг буцаана',
-      userIsRecordOwner:
-        'Бичлэгийг засаж буй хэрэглэгч нь мөн түүний эзэмшигч бол "үнэн", үгүй бол "худал" гэсэн боол утгыг буцаана',
-      userName: 'Нэвтэрсэн хэрэглэгчийн нэрийг буцаана',
-      userProp: 'Нэвтэрсэн хэрэглэгчийн заасан $t(extraProp.label)-ийн утгыг буцаана',
-      uuid: 'UUID (бүх нийтийн өвөрмөц танигч)-г үүсгэнэ, үүнийг танигч болгон ашиглаж болно (жишээ нь, объектын түлхүүр шинж чанар болгон)',
-      // SQL functions
-      avg: 'Тоон хувьсагчийн дундаж утгыг буцаана',
-      count: 'Заасан шалгуурт тохирох мөрүүдийн тоог буцаана',
-      sum: 'Тоон хувьсагчийн нийт нийлбэрийг буцаана',
-    },
-    functionName: {
-      rowIndex: 'Мөрийн индекс',
-    },
-    basicProps: {
-      analysis: 'Шинжилгээ',
-      autoIncrementalKey: {
-        label: 'Автомат өсөн нэмэгдэх түлхүүр',
-        info: 'Утга автоматаар үүсгэгдэнэ',
-      },
-      autoCreateMinCountItems: {
-        label: 'Хамгийн бага элементийг автоматаар үүсгэх',
-        info: 'Объект хэрэгжиж эхлэх үед эсвэл түүний эцэг объект үүсгэгдэх үед хамгийн бага тооны объектууд автоматаар үүсгэгдэнэ.',
-      },
-      displayAs: 'Илэрхийлэх',
-      displayIn: 'Илэрхийлэхдээ',
-      entitySource: 'Объектын эх үүсвэр',
-      enumerate: {
-        label: 'Тоолох',
-        info: `Мөрүүд нь объектын дотор тодорхойлогдсон Түлхүүр гэж тэмдэглэгдсэн кодын шинж чанартай холбоотой ангиллын элементүүдийг ашиглан автоматаар үүсгэгдэнэ; мөр нэмэх эсвэл устгах боломжгүй бөгөөд түлхүүр кодын шинж чанарыг засах боломжгүй`,
-      },
-      enumeratingItemsExpression: {
-        label: 'Тоочих элементүүдийн илэрхийлэл',
-        info: 'Ангиллын аль элементүүдийг тоочихыг шүүх нэмэлт илэрхийлэл (жишээ нь unique(table_source.source_type)). Хоосон үед ангиллын бүх элементийг ашиглана.',
-      },
-      enumerator: {
-        label: 'Тоологч',
-        info: 'Ангиллын элементүүд эцэг объектын мөрүүдийг үүсгэхэд ашиглагдана',
-      },
-      form: 'Маягт',
-      formula: 'Томьёо',
-      includedInClonedData: 'Хувилах өгөгдөлд оруулсан',
-      includedInMultipleEntitySummary: {
-        label: 'Олон объектын хураангуйд оруулах',
-        info: `Хэрэв тэмдэглэгдсэн бол шинж чанарын утга объект сонгогч болон объектын хураангуй харагдацад харагдана`,
-      },
-      includedInRecordsList: {
-        label: 'Бүртгэлийн жагсаалтад оруулах',
-        info: `Хэрэв тэмдэглэсэн бол уг шинж чанар нь бүртгэлийн жагсаалтад харагдах болно`,
-      },
-      key: 'Түлхүүр',
-      maxKeysCountReached: 'Түлхүүрийн дээд тоо хүрсэн ({{maxKeysCount}})',
-      multiple: 'Олон',
-      ownPage: 'Өөрийн хуудас',
-      parentPage: 'Эцэг хуудас ({{parentPage}})',
-      qualifier: {
-        label: 'Тодорхойлогч',
-        info: `Бүлэгт харьяалагддаг хэрэглэгч шинэ бичлэг үүсгэхэд энэ атрибут нь хэрэглэгчийн бүлгийн тодорхойлогчид заасан утгаар автоматаар бөглөгдөнө. Хэрэглэгчид зөвхөн өөрийн бүлэгт хамаарах бичлэгүүдийг харах, засах боломжтой байх болно, хэрэв тэд бүлэгт харьяалагддаг бол.`,
-      },
-      table: 'Хүснэгт',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Үндсэн утгууд тодорхойлогдоогүй',
-      defaultValuesSpecified: 'Үндсэн утгууд тодорхойлогдсон',
-      editableAlways: 'Үргэлж засварлах боломжтой',
-      editableIfConditionIsMet: 'Нөхцөл биелсэн үед засварлах боломжтой',
-      relevantIfRadioNone: 'Үргэлж хамааралтай',
-      relevantIfRadioDefined: 'Нөхцөл биелсэн үед хамааралтай',
-      visibleAlways: 'Үргэлж харагдах',
-      visibleIfConditionIsMet: 'Нөхцөл биелсэн үед харагдах',
-      areaBasedEstimate: 'Талбай дээр суурилсан тооцоо',
-      defaultValues: 'Үндсэн утгууд',
-      defaultValuesInfo: `Энэ нь тодорхой дүрмийн дагуу хариуг автоматаар бөглөх боломжийг олгоно.
-    Хэрэв хэд хэдэн дүрэм тохируулсан бол систем тэдгээрийг дээрээс доош дарааллаар шалгана.
-    Нөхцөлд нийцсэн эхний дүрмийг хэрэглэж, түүний үр дүнг хариу болгон ашиглана.`,
-      defaultValueEvaluatedOneTime: 'Үндсэн утга нэг удаа үнэлэгдсэн',
-      defaultValueEvaluatedOneTimeInfo: `Шинж чанар үүсэх үед үндсэн утгыг зөвхөн нэг удаа үнэлнэ.
-    Хэрэв тэмдэглээгүй бол бичлэг шинэчлэх бүрт үндсэн утгыг дахин үнэлнэ.
-    now() эсвэл uuid() зэрэг зөвхөн нэг удаа үнэлэгдэх ёстой илэрхийллүүдийг ашиглах үед үүнийг тэмдэглэх хэрэгтэй.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Автоматаар өсөн нэмэгдэх түлхүүр тохируулагдсан тул үндсэн утгуудыг засах боломжгүй',
-      editableIf: 'Хэрэв засварлах боломжтой бол',
-      editableIfInfo: `Анхдагчаар хэрэглэгч хамааралтай талбарт үргэлж хандах боломжтой.
-Энд хэрэглэгч энэ талбарт бичих эсвэл утгыг өөрчлөх эсэхийг тодорхойлох дүрэм тохируулж болно.
-Энэ нь хэрэглэгч энэ талбарт бичих эсвэл утгыг өөрчлөх боломжтой эсэхийг шийднэ.
-    Хэрэв таны тохируулсан нөхцөл биелбэл талбарыг засварлаж болно. Үгүй бол зөвхөн унших (түгжигдсэн) болно.`,
-      hidden: 'Үргэлж нуух',
-      hiddenInReport: 'Аналитик хяналтын самбарт нуух',
-      hiddenInReportInfo: `Хэрэв тэмдэглэгдсэн бол шинж чанар Аналитик хяналтын самбарт харагдахгүй`,
-      hiddenWhenNotRelevant: 'Хамааралгүй үед нуух',
-      itemsFilter: 'Элементүүдийн шүүлтүүр',
-      itemsFilterInfo: `Сонгогдох элементүүдийг шүүхэд ашиглагдах илэрхийлэл.
-Илэрхийлэлд "this" гэдэг үг нь элементийг өөрийг нь заана.
-Жишээ нь: this.region = region_attribute_name
-(энд "region" нь элементийн хувьд тодорхойлогдсон нэмэлт шинж чанарын нэр, region_attribute_name нь судалгаан дахь шинж чанарын нэр юм)`,
-      readOnly: 'Зөвхөн унших',
-      relevantIf: 'Хэрэв хамааралтай бол',
-      relevantIfInfo: `Анхдагчаар бүх талбар идэвхтэй байна.
-    Хэрэв хамааралтын дүрэм тохируулж, тэр нь биелэхгүй бол талбар саарал болох эсвэл бүрэн нуугдана,
-    мөн автомат хариунуудыг үл тоомсорлоно.
-    Үүнийг маягтын хэсгийг динамикаар харуулах/нуухад ашиглана; жишээ нь хэрэглэгч "Бусад" сонгосон үед л "Тодруулна уу" талбарыг харуулах.`,
-      script: 'Скрипт',
-      visibleIf: 'Хэрэв харагдах бол',
-      visibleIfInfo: `Анхдагчаар талбар үргэлж харагдана.
-    Хэрэв дүрэм тохируулбал, тэр дүрэм биелсэн үед л харагдана; эс тэгвээс нуугдана.
-    Тэмдэглэл: "хамааралгүй" талбарыг нуухаас ялгаатай нь, нуугдсан талбар автомат хариуг хадгалж болно.
-    Энэ нь хэн нэвтэрснээс (жишээ нь үүргээс) хамаарч маягтын бүхэл хэсгийг нуухад тохиромжтой.`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Арена Мобайл-д нуугдсан',
-        info: `Хэрэв тэмдэглэгдсэн бол шинж чанар AM-д харагдахгүй`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Өмнөх мөчлөгийн холбоосонд оруулах',
-        info: `Хэрэв тэмдэглэгдсэн бол өмнөх мөчлөгийн утга өгөгдөл оруулах маягт дээр харагдана (мобайл апп-д өмнөх мөчлөгт холбоос идэвхтэй үед)"`,
-      },
-    },
-    numericProps: {
-      unit: 'Нэгж',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Бутархай тооны хамгийн их орон',
-    },
-    fileProps: {
-      fileNameExpression: 'Файлын нэрийн илэрхийлэл',
-      fileType: 'Файлын төрөл',
-      fileTypes: {
-        image: 'Зураг',
-        video: 'Видео',
-        audio: 'Аудио',
-        other: 'Бусад',
-      },
-      maxFileSize: 'Хамгийн их файлын хэмжээ (МБ)',
-      numberOfFiles: 'Хамгийн бага болон хамгийн их файлын тоог өөрчлөхийн тулд Баталгаажуулалт руу орно уу.',
-      showGeotagInformation: 'Газарзүйн мэдээллийг харуулах',
-    },
-    mobileProps: {
-      title: 'Мобайл апп',
-    },
-    timeProps: {
-      includeSeconds: 'Секунд оруулах',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Толгой хэсгийн өнгө',
-      headerColor: {
-        blue: 'Цэнхэр',
-        green: 'Ногоон',
-        orange: 'Улбар шар',
-        red: 'Улаан',
-        yellow: 'Шар',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Гиперлинк',
-        markdown: 'Markdown',
-        text: 'Текст',
-      },
-      textInputType: 'Текстийн оролтын төрөл',
-      textInputTypes: {
-        singleLine: 'Нэг мөр',
-        multiLine: 'Олон мөр',
-      },
-      textTransform: 'Текстийн хувиргалт',
-      textTransformTypes: {
-        none: 'байхгүй',
-        capitalize: 'том үсгээр эхлэх',
-        uppercase: 'том үсгээр',
-        lowercase: 'бага үсгээр',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Шошгын утга',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Ангилал',
-      codeShown: 'Кодыг харуулах',
-      displayAsTypes: {
-        checkbox: 'Чекбокс',
-        dropdown: 'Дропдаун',
-      },
-      parentCode: 'Эх код',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Зөвхөн төхөөрөмжийн координатыг зөвшөөрөх',
-      allowOnlyDeviceCoordinateInfo: `Зөвхөн Арена Мобайл-д хамаарна: хэрэв шалгагдсан бол хэрэглэгч X/Y утгуудыг өөрчлөх боломжгүй, зөвхөн төхөөрөмжийн GPS-г ашиглан тэдгээрийг авах боломжтой`,
-      mapMarkerColor: 'Газрын зураг дээрх тэмдэглэгээний өнгө',
-    },
-    expressionsProp: {
-      expression: 'Илэрхийлэл',
-      applyIf: 'Хэрэв хэрэглэх бол',
-      confirmDelete: 'Энэ илэрхийллийг устгах уу?',
-      severity: 'Хүндрэл',
-    },
-    validationsProps: {
-      minCount: 'Хамгийн бага тоо',
-      maxCount: 'Хамгийн их тоо',
-      expressions: 'Баталгаажуулалтын илэрхийлэл',
-      attributeAlwaysValid: 'Шинж чанар үргэлж хүчинтэй',
-      attributeValidWhenConditionIsMet: 'Нөхцөл биелсэн үед шинж чанар хүчинтэй',
-    },
-    cannotChangeIntoMultipleWithDefaultValues: 'Энэ зангилааг үндсэн утгуудтай олон болгох боломжгүй.',
-    cannotDeleteNodeDefReferenced: `Зангилааны тодорхойлолт "{{nodeDef}}"-г устгах боломжгүй: энэ нь дараах зангилааны тодорхойлолтуудаар холбогдсон байна: {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Хувилах',
-      title: 'Зангилааны тодорхойлолт "{{nodeDefName}}"-г хувилах',
-      entitySelectLabel: 'Хувилах объект:',
-    },
-    conversion: {
-      dialogTitle: '{{nodeDefName}}-г өөр төрөл болгон хөрвүүлэх',
-      fromType: 'Эхний төрөл',
-      toType: 'Хүртэлх төрөл',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Шилжүүлэх',
-      title: '"{{parentNodeDefName}}" -аас "{{nodeDefName}}" зангилааны тодорхойлолтыг зөөж байна',
-      entitySelectLabel: 'Шилжүүлэх объект:',
-    },
-    movedNodeDefinitionHasErrors: 'Таны шилжүүлсэн зангилааны тодорхойлолт "{{nodeDefName}}" алдаатай байна; засна уу.',
-    nodeDefintionsHaveErrors: 'Эдгээр зангилааны тодорхойлолтууд алдаатай байна: {{nodeDefNames}}. Засна уу.',
-    filterVariable: 'Элементүүдийг шүүх хувьсагч',
-    filterVariableForLevel: 'Түвшин {{levelName}}-д зориулсан хувьсагч',
-    unique: {
-      label: 'Өвөрмөц',
-      info: `Шинж чанарыг **Өвөрмөц** гэж тэмдэглэсэн үед түүний утга нь хамгийн ойрын олон объектын дотор өвөрмөц байх ёстой (эсрэгээр нь алдаа гарна).
-
----
-
-Жишээ нь, *бүлэглэл -> талбай -> мод* гэсэн бүтэцтэй бол, хэрэв танд **Өвөрмөц** гэж тэмдэглэгдсэн *tree_species* гэсэн шинж чанар байвал, нэг *талбай* дотор зөвхөн нэг төрлийн мод байж болно.`,
-    },
-    nodeDefClonedSuccessfully:
-      'Зангилааны тодорхойлолт "{{nodeDefName}}"-г "{{targetParentNodeDefName}}" руу амжилттай хувиллаа',
-    categoriesClonedFromSurvey: 'Дараах ангилалууд эх судалгаанаас мөн хувилагдсан: {{names}}',
-    taxonomiesClonedFromSurvey: 'Дараах таксономууд эх судалгаанаас мөн хувилагдсан: {{names}}',
-  },
-
   languagesEditor: {
     languages: 'Хэл(нүүд)',
   },
-
   taxonomy: {
     header: 'Таксоном',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
@@ -1313,7 +902,6 @@ $t(common.appNameFull)
     taxaCount: 'Таксоны тоо',
     vernacularNameLabel: 'Нутгийн нэрийн шошго',
   },
-
   categoryList: {
     batchImport: 'Ангилалуудыг багцаар импортлох (ZIP-ээс)',
     batchImportCompleteSuccessfully: `{{importedCategories}} ангилал амжилттай импортлогдлоо!
@@ -1339,7 +927,6 @@ $t(common.appNameFull)
       samplingPointData: 'Дээж цэгийн өгөгдөл',
     },
   },
-
   categoryEdit: {
     header: 'Ангилал',
     addLevel: 'Түвшин нэмэх',
@@ -1450,10 +1037,9 @@ $t(common.cantUndoWarning)`,
     templateFor_samplingPointDataImport_csv: 'Түүвэрлэлтийн цэгийн загвар (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Түүвэрлэлтийн цэгийн загвар (Excel)',
   },
-
   extraProp: {
     label: 'Нэмэлт талбар',
-    label_plural: 'Нэмэлт',
+    label_other: 'Нэмэлт',
     addExtraProp: 'Талбар нэмэх',
     dataTypes: {
       geometryPoint: 'Геометрийн цэг',
@@ -1461,7 +1047,7 @@ $t(common.cantUndoWarning)`,
       text: 'Текст',
     },
     editor: {
-      title: '$t(extraProp.label_plural)-г засах',
+      title: '$t(extraProp.label_other)-г засах',
       confirmDelete: 'Нэмэлт шинж чанар "{{name}}"-г устгах уу?',
       confirmSave: `Нэмэлт шинж чанарын тодорхойлолтуудад өөрчлөлт хадгалах уу?
 
@@ -1476,7 +1062,6 @@ $t(common.cantUndoWarning)`,
     name: 'Шинж чанар {{position}} нэр',
     value: 'Утга',
   },
-
   record: {
     ancestorNotFound: 'Бичлэгт дээд зангилаа олдсонгүй',
     keyDuplicate: 'Бичлэгийн түлхүүр давхцсан',
@@ -1502,7 +1087,6 @@ $t(common.cantUndoWarning)`,
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'БА',
     or: 'ЭСВЭЛ',
@@ -1554,13 +1138,11 @@ $t(common.cantUndoWarning)`,
       expression: 'Илэрхийлэл',
     },
   },
-
   urls: {
     openforisWebsite: 'https://www.openforis.org',
     openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
     supportForum: 'https://openforis.support',
   },
-
   links: {
     openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
     openforisArenaWebsite:
@@ -1575,7 +1157,6 @@ $t(common.cantUndoWarning)`,
     arenaRScriptsInGitHub:
       '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
   },
-
   aiExpression: {
     title: 'Тайлбараас илэрхийлэл үүсгэх',
     hint: 'Илэрхийлэл юу хийх ёстойг энгийн үгээр тайлбарлана уу. AI үүнийг Arena-ийн синтакс руу хөрвүүлнэ. Үүсгэхийн тулд Ctrl+Enter дарна уу.',
@@ -1594,7 +1175,6 @@ $t(common.cantUndoWarning)`,
       timeout: 'AI хариу өгөхөд хэт удлаа. Дахин оролдоно уу.',
     },
   },
-
   aiTranslation: {
     translateButton_one: 'Өөр {{count}} хэл рүү орчуулах',
     translateButton_other: 'Өөр {{count}} хэл рүү орчуулах',
@@ -1605,14 +1185,12 @@ $t(common.cantUndoWarning)`,
     failed: 'Орчуулга амжилтгүй боллоо: {{message}}',
     timeout: 'Орчуулгын хүсэлтийн хугацаа дууслаа. Дахин оролдоно уу.',
   },
-
   aiActivityLog: {
     title: 'Үйл ажиллагааны бүртгэлийн хураангуй',
     summarizeButton: 'Хураангуйлах',
     thinking: 'Үйл явдлуудыг нэгтгэж, AI-аас хураангуй хүсэж байна…',
     error: 'Хураангуйг авч чадсангүй: {{message}}',
   },
-
   aiChatbot: {
     open: 'Тусламж ба баримт бичиг',
     title: 'Тусламж ба баримт бичиг',

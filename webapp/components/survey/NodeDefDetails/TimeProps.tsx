@@ -21,7 +21,7 @@ const TimeProps = (props: TimePropsProps) => {
   const nodeDef = State.getNodeDef(state)
 
   return (
-    <FormItem label="nodeDefEdit.timeProps.includeSeconds">
+    <FormItem label="nodeDefEdit:timeProps.includeSeconds">
       <Checkbox
         checked={NodeDef.isSecondsIncluded(nodeDef)}
         disabled={readOnly}

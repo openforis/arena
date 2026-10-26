@@ -35,9 +35,9 @@ export const PrintProps = (props: PrintPropsProps) => {
 
   const items = useMemo(
     () => [
-      { value: ORIENTATION_DEFAULT, label: i18n.t('nodeDefEdit.printProps.orientations.default') },
-      { value: PrintOrientations.portrait, label: i18n.t('nodeDefEdit.printProps.orientations.portrait') },
-      { value: PrintOrientations.landscape, label: i18n.t('nodeDefEdit.printProps.orientations.landscape') },
+      { value: ORIENTATION_DEFAULT, label: i18n.t('nodeDefEdit:printProps.orientations.default') },
+      { value: PrintOrientations.portrait, label: i18n.t('nodeDefEdit:printProps.orientations.portrait') },
+      { value: PrintOrientations.landscape, label: i18n.t('nodeDefEdit:printProps.orientations.landscape') },
     ],
     [i18n]
   )
@@ -45,8 +45,8 @@ export const PrintProps = (props: PrintPropsProps) => {
   return (
     <Box className="form" sx={{ display: 'flex', flexDirection: 'column', gap: 2, pt: 1 }}>
       <FormItem
-        label="nodeDefEdit.printProps.printOrientation.label"
-        info="nodeDefEdit.printProps.printOrientation.info"
+        label="nodeDefEdit:printProps.printOrientation.label"
+        info="nodeDefEdit:printProps.printOrientation.info"
       >
         <Dropdown
           className="node-def-print-orientation-dropdown"

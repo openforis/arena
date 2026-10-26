@@ -109,8 +109,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entidade obrigatória',
-    applyIfDuplicate: 'A condição "$t(nodeDefEdit.expressionsProp.applyIf)" está duplicada',
-    applyIfInvalid: 'Condição "$t(nodeDefEdit.advancedProps.relevantIf)" inválida',
+    applyIfDuplicate: 'A condição "$t(nodeDefEdit:expressionsProp.applyIf)" está duplicada',
+    applyIfInvalid: 'Condição "$t(nodeDefEdit:advancedProps.relevantIf)" inválida',
     columnWidthCannotBeGreaterThan: 'A largura da coluna não pode ser maior que {{max}}',
     columnWidthCannotBeLessThan: 'A largura da coluna não pode ser menor que {{min}}',
     countMaxMustBePositiveNumber: 'A contagem máxima deve ser um inteiro positivo',
@@ -121,7 +121,7 @@ export default {
     defaultValuesNotSpecified: 'Valor padrão não especificado',
     entitySourceRequired: 'Origem da entidade obrigatória',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Somente a última expressão pode ter a condição "$t(nodeDefEdit.expressionsProp.applyIf)" vazia',
+      'Somente a última expressão pode ter a condição "$t(nodeDefEdit:expressionsProp.applyIf)" vazia',
     expressionDuplicate: 'Expressão duplicada',
     expressionRequired: 'Expressão obrigatória',
     formulaInvalid: 'Fórmula inválida',
@@ -139,7 +139,7 @@ export default {
     requiredIfNotAllowed:
       'A condição "Obrigatório se" só é permitida para atributos simples, não chave e não sempre obrigatórios',
     qualifierCannotHaveApplicableExpression:
-      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
     qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
     qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
