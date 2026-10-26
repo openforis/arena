@@ -37,6 +37,36 @@ const _getNodesArrayDifference = (nodes, otherNodes) => nodes.filter((node) => !
 const _getNodesArrayIntersection = (nodes, otherNodes) =>
   nodes.filter((node) => !!_findNodeWithSameUuid(node, otherNodes))
 
+const _areAttributeValuesEqual = ({ survey, attrDef, recordTarget, entityTarget, attrSource, attrTarget }) => {
+  const valueSource = Node.getValue(attrSource)
+  const valueTarget = Node.getValue(attrTarget)
+  if (Objects.isEmpty(valueSource) && Objects.isEmpty(valueTarget)) return true
+  return NodeValues.isValueEqual({
+    survey,
+    nodeDef: attrDef,
+    value: valueSource,
+    valueSearch: valueTarget,
+    record: recordTarget,
+    parentNode: entityTarget,
+  })
+}
+
+/**
+ * Updates the target attribute with the source one when its value is different and newer (or the target one is empty).
+ * Nodes added to passiveNodeUuids are persisted but they don't trigger the update of the dependent nodes:
+ * attributes with the same value (only their date modified changes) and read-only attributes, whose value
+ * was already calculated in the source record (e.g. by Arena Mobile) and is kept as it is.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.attrDef - The attribute definition.
+ * @param {!object} params.recordTarget - The record being updated.
+ * @param {!object} params.entityTarget - The parent entity of the target attribute.
+ * @param {!object} params.attrSource - The source attribute.
+ * @param {!object} params.attrTarget - The target attribute.
+ * @param {!Set<string>} params.passiveNodeUuids - Uuids of the updated nodes not triggering the dependents update.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @returns {RecordUpdateResult|null} - The update result or null if the attribute is not updated.
+ */
 const _replaceAttributeValueIfEmptyOrModified = ({
   survey,
   attrDef,
@@ -44,26 +74,58 @@ const _replaceAttributeValueIfEmptyOrModified = ({
   entityTarget,
   attrSource,
   attrTarget,
+  passiveNodeUuids,
   sideEffect,
 }) => {
   const sourceDateModified = Node.getDateModified(attrSource)
-  const targetDateModified = Node.getDateModified(attrTarget)
-  const valueSource = Node.getValue(attrSource)
-  const valueTarget = Node.getValue(attrTarget)
-  if (Objects.isEmpty(valueTarget) || Dates.isAfter(sourceDateModified, targetDateModified)) {
-    const attributeUpdateResult = updateAttributeValue({
-      survey,
-      record: recordTarget,
-      entity: entityTarget,
-      attributeDef: attrDef,
-      attribute: attrTarget,
-      value: valueSource,
-      dateModified: sourceDateModified,
-      sideEffect,
-    })
-    return attributeUpdateResult
+  const sourceIsNewer = Dates.isAfter(sourceDateModified, Node.getDateModified(attrTarget))
+  const valuesEqual = _areAttributeValuesEqual({ survey, attrDef, recordTarget, entityTarget, attrSource, attrTarget })
+  if (valuesEqual) {
+    if (!sourceIsNewer) return null
+    // same value: only the date modified is updated
+    const attrUpdated = A.pipe(Node.assocDateModified(sourceDateModified), Node.assocUpdated(true))(attrTarget)
+    const updateResult = new RecordUpdateResult({ record: recordTarget })
+    updateResult.addNode(attrUpdated, { sideEffect })
+    passiveNodeUuids.add(Node.getUuid(attrTarget))
+    return updateResult
   }
-  return null
+  if (!sourceIsNewer && !Node.isValueBlank(attrTarget)) return null
+
+  const attributeUpdateResult = updateAttributeValue({
+    survey,
+    record: recordTarget,
+    entity: entityTarget,
+    attributeDef: attrDef,
+    attribute: attrTarget,
+    value: Node.getValue(attrSource),
+    dateModified: sourceDateModified,
+    sideEffect,
+  })
+  if (attributeUpdateResult && NodeDef.isReadOnly(attrDef)) {
+    passiveNodeUuids.add(Node.getUuid(attrTarget))
+  }
+  return attributeUpdateResult
+}
+
+/**
+ * Updates the dependents of the updated nodes, except the passive ones: they are kept as they are.
+ * @param {!object} params - The afterNodesUpdate parameters.
+ * @param {!RecordUpdateResult} params.updateResult - The result of the nodes update.
+ * @param {!Set<string>} params.passiveNodeUuids - Uuids of the updated nodes not triggering the dependents update.
+ * @returns {Promise<RecordUpdateResult>} - The update result, including the dependent nodes.
+ */
+const _afterNodesUpdateExceptPassiveNodes = async ({ updateResult, passiveNodeUuids, ...otherParams }) => {
+  const activeNodes = {}
+  const passiveNodes = {}
+  for (const [uuid, node] of Object.entries(updateResult.nodes)) {
+    if (passiveNodeUuids.has(uuid)) {
+      // copy: the dependents update could modify it in place
+      passiveNodes[uuid] = { ...node }
+    } else {
+      activeNodes[uuid] = node
+    }
+  }
+  return afterNodesUpdate({ ...otherParams, record: updateResult.record, nodes: activeNodes, passiveNodes })
 }
 
 const _replaceUpdatedNodesInEntities = ({
@@ -72,6 +134,7 @@ const _replaceUpdatedNodesInEntities = ({
   recordTarget,
   entitySource,
   entityTarget,
+  passiveNodeUuids,
   sideEffect = false,
 }) => {
   const includeAnalysis = false
@@ -128,6 +191,7 @@ const _replaceUpdatedNodesInEntities = ({
           entityTarget,
           attrSource: childSource,
           attrTarget: childTargetToUpdate,
+          passiveNodeUuids,
           sideEffect,
         })
         if (attrUpdateResult) {
@@ -140,6 +204,7 @@ const _replaceUpdatedNodesInEntities = ({
           recordTarget: updateResult.record,
           entitySource: childSource,
           entityTarget: childTargetToUpdate,
+          passiveNodeUuids,
         })
         updateResult.merge(childEntityUpdateResult)
       }
@@ -157,19 +222,21 @@ export const replaceUpdatedNodes =
       // it should never happen...
       throw new Error('error merging records: root entities have different uuids')
     }
+    const passiveNodeUuids = new Set()
     const updateResult = _replaceUpdatedNodesInEntities({
       survey,
       recordSource,
       recordTarget,
       entitySource: rootSource,
       entityTarget: rootTarget,
+      passiveNodeUuids,
       sideEffect,
     })
-    return afterNodesUpdate({
+    return _afterNodesUpdateExceptPassiveNodes({
       user,
       survey,
-      record: updateResult.record,
-      nodes: updateResult.nodes,
+      updateResult,
+      passiveNodeUuids,
       categoryItemProvider,
       taxonProvider,
       timezoneOffset,
@@ -218,6 +285,7 @@ const _mergeSingleAttributeValues = ({
   entityTarget,
   childSource,
   childTarget,
+  passiveNodeUuids,
   sideEffect,
 }) => {
   const valueSource = Node.getValue(childSource)
@@ -242,6 +310,7 @@ const _mergeSingleAttributeValues = ({
     entityTarget,
     attrSource: childSource,
     attrTarget: childTarget,
+    passiveNodeUuids,
     sideEffect,
   })
 }
@@ -395,6 +464,7 @@ const _mergeRecordsNodes = ({
   entityTarget,
   stack,
   keepNodeUuids,
+  passiveNodeUuids,
   sideEffect,
 }) => {
   const childDefUuid = NodeDef.getUuid(childDef)
@@ -413,6 +483,7 @@ const _mergeRecordsNodes = ({
           childDef,
           childSource,
           childTarget,
+          passiveNodeUuids,
           sideEffect,
         })
         if (attrUpdateResult) {
@@ -463,6 +534,7 @@ export const mergeRecords =
     const recordUuid = ObjectUtils.getUuid(recordTarget)
     const keepNodeUuids = !!recordUuid && recordUuid === ObjectUtils.getUuid(recordSource)
 
+    const passiveNodeUuids = new Set()
     const stack = [{ entitySource: rootSource, entityTarget: rootTarget }]
     while (stack.length > 0) {
       const { entitySource, entityTarget } = stack.pop()
@@ -479,15 +551,16 @@ export const mergeRecords =
           entityTarget,
           stack,
           keepNodeUuids,
+          passiveNodeUuids,
           sideEffect,
         })
       })
     }
-    return afterNodesUpdate({
+    return _afterNodesUpdateExceptPassiveNodes({
       user,
       survey,
-      record: updateResult.record,
-      nodes: updateResult.nodes,
+      updateResult,
+      passiveNodeUuids,
       categoryItemProvider,
       taxonProvider,
       timezoneOffset,
