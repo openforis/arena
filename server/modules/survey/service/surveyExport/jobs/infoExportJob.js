@@ -1,4 +1,4 @@
-import { ArenaExportInfoFactory } from '@openforis/arena-core'
+import { ArenaExportInfoFactory, ArenaExportType } from '@openforis/arena-core'
 
 import { AppInfo } from '@core/app/appInfo'
 import * as Survey from '@core/survey/survey'
@@ -8,12 +8,6 @@ import Job from '@server/job/job'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { ExportFile } from '../exportFile'
-
-// values of ArenaExportType (arena-core)
-export const exportTypes = {
-  survey: 'survey',
-  records: 'records',
-}
 
 export default class InfoExportJob extends Job {
   constructor(params) {
@@ -25,7 +19,7 @@ export default class InfoExportJob extends Job {
       archive,
       surveyId,
       user,
-      exportType = exportTypes.survey,
+      exportType = ArenaExportType.survey,
       backup,
       includeResultAttributes,
       includeActivityLog,
@@ -41,7 +35,7 @@ export default class InfoExportJob extends Job {
       options: {
         backup,
         includeActivityLog,
-        includeData: backup || exportType === exportTypes.records,
+        includeData: backup || exportType === ArenaExportType.records,
         includeResultAttributes,
       },
       survey: {
