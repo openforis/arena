@@ -15,7 +15,7 @@ const NodeDefUnitFormItem = (props) => {
   if (!NodeDef.isAnalysis(nodeDef)) return null
 
   return (
-    <FormItem label="nodeDefEdit.numericProps.unit">
+    <FormItem label="nodeDefEdit:numericProps.unit">
       <Input
         className="node-def-unit-input"
         onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.unit, value })}

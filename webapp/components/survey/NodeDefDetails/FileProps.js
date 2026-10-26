@@ -16,7 +16,7 @@ import { NodeDefSingleExpressionProp } from './ExpressionsProp/NodeDefSingleExpr
 
 const fileTypes = Object.keys(NodeDef.fileTypeValues).map((key) => ({
   key,
-  label: `nodeDefEdit.fileProps.fileTypes.${key}`,
+  label: `nodeDefEdit:fileProps.fileTypes.${key}`,
 }))
 
 const FileProps = (props) => {
@@ -45,21 +45,21 @@ const FileProps = (props) => {
     <>
       {NodeDef.isNumberOfFilesEnabled(nodeDef) && (
         <FormItem label="">
-          <p>{i18n.t('nodeDefEdit.fileProps.numberOfFiles')}</p>
+          <p>{i18n.t('nodeDefEdit:fileProps.numberOfFiles')}</p>
         </FormItem>
       )}
-      <FormItem label="nodeDefEdit.fileProps.maxFileSize">
+      <FormItem label="nodeDefEdit:fileProps.maxFileSize">
         <Input
           className="max-file-size"
           disabled={readOnly}
-          placeholder="nodeDefEdit.fileProps.maxFileSize"
+          placeholder="nodeDefEdit:fileProps.maxFileSize"
           value={NodeDef.getMaxFileSize(nodeDef)}
           type="number"
           onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.maxFileSize, value })}
           validation={Validation.getFieldValidation(NodeDef.propKeys.maxFileSize)(validation)}
         />
       </FormItem>
-      <FormItem label="nodeDefEdit.fileProps.fileNameExpression">
+      <FormItem label="nodeDefEdit:fileProps.fileNameExpression">
         <NodeDefSingleExpressionProp
           canBeConstant
           excludeCurrentNodeDef
@@ -73,7 +73,7 @@ const FileProps = (props) => {
           validation={Validation.getFieldValidation(NodeDef.keysPropsAdvanced.fileNameExpression)(validation)}
         />
       </FormItem>
-      <FormItem label="nodeDefEdit.fileProps.fileType">
+      <FormItem label="nodeDefEdit:fileProps.fileType">
         <div className="form-item_body">
           <ButtonGroup
             disabled={readOnly}
@@ -85,7 +85,7 @@ const FileProps = (props) => {
             <Checkbox
               checked={NodeDef.isGeotagInformationShown(nodeDef)}
               disabled={readOnly}
-              label="nodeDefEdit.fileProps.showGeotagInformation"
+              label="nodeDefEdit:fileProps.showGeotagInformation"
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.geotagInformationShown, value })}
             />
           )}

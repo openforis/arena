@@ -161,7 +161,7 @@ const RScriptEditor = (props) => {
   }, [generateLocalScript])
 
   return (
-    <FormItem label="nodeDefEdit.advancedProps.script" className="script-form">
+    <FormItem label="nodeDefEdit:advancedProps.script" className="script-form">
       <ScriptEditor
         key={localScript}
         name="node_def_analysis_script"

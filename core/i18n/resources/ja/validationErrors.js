@@ -107,8 +107,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: '項目は必須です',
-    applyIfDuplicate: '「$t(nodeDefEdit.expressionsProp.applyIf)」条件が重複しています',
-    applyIfInvalid: '「$t(nodeDefEdit.advancedProps.relevantIf)」条件が無効です',
+    applyIfDuplicate: '「$t(nodeDefEdit:expressionsProp.applyIf)」条件が重複しています',
+    applyIfInvalid: '「$t(nodeDefEdit:advancedProps.relevantIf)」条件が無効です',
     columnWidthCannotBeGreaterThan: '列幅は{{max}}より大きくできません',
     columnWidthCannotBeLessThan: '列幅は{{min}}より小さくできません',
     countMaxMustBePositiveNumber: '最大数は正の整数である必要があります',
@@ -119,7 +119,7 @@ export default {
     defaultValuesNotSpecified: 'デフォルト値が指定されていません',
     entitySourceRequired: '項目のソースは必須です',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      '「$t(nodeDefEdit.expressionsProp.applyIf)」条件を空にできるのは最後の式のみです',
+      '「$t(nodeDefEdit:expressionsProp.applyIf)」条件を空にできるのは最後の式のみです',
     expressionDuplicate: '式が重複しています',
     expressionRequired: '式は必須です',
     formulaInvalid: '数式が無効です',
@@ -136,7 +136,7 @@ export default {
     requiredIfInvalid: '「必須条件」が無効です',
     requiredIfNotAllowed: '「必須条件」は、キーではなく常に必須でもない単一の属性にのみ設定できます',
     qualifierCannotHaveApplicableExpression:
-      'グループ識別属性には「$t(nodeDefEdit.advancedProps.relevantIf)」条件を設定できません',
+      'グループ識別属性には「$t(nodeDefEdit:advancedProps.relevantIf)」条件を設定できません',
     qualifierCannotHaveEditabilityRule: 'グループ識別属性には編集可能ルールを設定できません',
     qualifierCannotHaveDefaultValues: 'グループ識別属性にはデフォルト値を設定できません',
     qualifierCannotHaveValidations: 'グループ識別属性には検証ルールを設定できません',

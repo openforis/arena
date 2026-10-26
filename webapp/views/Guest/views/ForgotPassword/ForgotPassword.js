@@ -53,13 +53,13 @@ const ForgotPassword = () => {
           setObjectField('email', value)
         }}
         name="username"
-        label="loginView.yourEmail"
+        label="guest:loginView.yourEmail"
       />
 
       <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onSubmit}>
           <span className="icon icon-envelop icon-12px icon-left" />
-          {i18n.t('loginView.sendPasswordResetEmail')}
+          {i18n.t('guest:loginView.sendPasswordResetEmail')}
         </button>
       </div>
 

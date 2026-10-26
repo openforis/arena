@@ -69,7 +69,7 @@ const ExpressionEditorPopup = (props) => {
           {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
             <Button
               className="expression-editor-popup__toggle-advanced"
-              label={advanced ? 'nodeDefEdit.basic' : 'nodeDefEdit.advanced'}
+              label={advanced ? 'nodeDefEdit:basic' : 'nodeDefEdit:advanced'}
               onClick={onToggleAdvancedEditor}
               size="small"
               testId={TestId.expressionEditor.toggleModeBtn}

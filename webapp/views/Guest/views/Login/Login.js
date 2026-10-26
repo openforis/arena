@@ -96,15 +96,19 @@ const Login = () => {
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
       {is2FAViewState && (
         <>
-          <div className="two-factor-token-description">{i18n.t('loginView.twoFactorTokenDescription')}</div>
+          <div className="two-factor-token-description">{i18n.t('guest:loginView.twoFactorTokenDescription')}</div>
           <SimpleTextInput
-            label={viewState === ViewState.ask2FAToken ? 'loginView.twoFactorToken' : 'loginView.twoFactorBackupCode'}
+            label={
+              viewState === ViewState.ask2FAToken
+                ? 'guest:loginView.twoFactorToken'
+                : 'guest:loginView.twoFactorBackupCode'
+            }
             name={FormFields.twoFactorToken}
             onChange={onChangeTwoFactorToken}
             value={formObject.twoFactorToken}
           />
           {viewState === ViewState.ask2FAToken && (
-            <Button label="loginView.loginUsingBackupCode" onClick={onLoginUsingBackupCodeClick} variant="text" />
+            <Button label="guest:loginView.loginUsingBackupCode" onClick={onLoginUsingBackupCodeClick} variant="text" />
           )}
         </>
       )}
@@ -112,7 +116,7 @@ const Login = () => {
         <>
           <EmailInput
             defaultValue={email}
-            label="loginView.yourEmail"
+            label="guest:loginView.yourEmail"
             name={FormFields.email}
             onChange={onChangeEmail}
           />
@@ -120,7 +124,7 @@ const Login = () => {
           <PasswordInput
             defaultValue={formObject.password}
             name={FormFields.password}
-            label="loginView.yourPassword"
+            label="guest:loginView.yourPassword"
             onChange={onChangePassword}
           />
 
@@ -129,7 +133,7 @@ const Login = () => {
             to={appModuleUri(guestModules.forgotPassword)}
           >
             <span className="icon icon-question icon-left icon-12px" />
-            {i18n.t('loginView.forgotPassword')}
+            {i18n.t('guest:loginView.forgotPassword')}
           </Link>
         </>
       )}
@@ -142,7 +146,7 @@ const Login = () => {
           <span className="spacer" />
         )}
         <button type="submit" className="btn login" onClick={onClickLogin}>
-          {i18n.t('loginView.login')}
+          {i18n.t('guest:loginView.login')}
         </button>
         <span className="spacer" />
       </div>
@@ -153,7 +157,7 @@ const Login = () => {
           to={appModuleUri(guestModules.accessRequest)}
         >
           <span className="icon icon-question icon-left icon-12px" />
-          {i18n.t('loginView.requestAccess')}
+          {i18n.t('guest:loginView.requestAccess')}
         </Link>
       )}
       <Error error={error} />

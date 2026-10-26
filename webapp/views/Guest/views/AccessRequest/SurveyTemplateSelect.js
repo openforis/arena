@@ -42,7 +42,7 @@ export const SurveyTemplateSelect = (props) => {
       itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
       itemValue={Survey.getUuid}
       onChange={(item) => onChange(Survey.getUuid(item))}
-      placeholder={i18n.t('accessRequestView.templateNotSelected')}
+      placeholder={i18n.t('guest:accessRequestView.templateNotSelected')}
       selection={selectedItem}
     />
   )

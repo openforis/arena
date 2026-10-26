@@ -212,7 +212,7 @@ $t(common.cantUndoWarning)`,
     expression: '式',
     resolved: '解決済み',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: '親コード',
       defaultValue: 'デフォルト値',
       requiredIf: '必須条件',

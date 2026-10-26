@@ -195,12 +195,12 @@ export const NodeDefEditButtonsMenu = (props) => {
         <NodeDefEntitySelectorDialog
           filterFn={(entityDef) => isEntityVisibleByAction[action]({ cycle, entityDef, nodeDef })}
           isEntitySelectable={(entityDefUuid) => isEntitySelectableByAction[action]({ entityDefUuid, nodeDef })}
-          confirmButtonLabel={`nodeDefEdit.${action}Dialog.confirmButtonLabel`}
+          confirmButtonLabel={`nodeDefEdit:${action}Dialog.confirmButtonLabel`}
           currentNodeDef={nodeDef}
-          entitySelectLabel={`nodeDefEdit.${action}Dialog.entitySelectLabel`}
+          entitySelectLabel={`nodeDefEdit:${action}Dialog.entitySelectLabel`}
           onConfirm={onEntitySelectConfirm}
           onClose={closeEntitySelectDialog}
-          title={`nodeDefEdit.${action}Dialog.title`}
+          title={`nodeDefEdit:${action}Dialog.title`}
         />
       )}
       {conversionDialogOpen && <NodeDefConversionDialog nodeDef={nodeDef} onClose={closeConversionDialog} />}

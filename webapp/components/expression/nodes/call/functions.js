@@ -17,7 +17,7 @@ const { functionNames } = Expression
 
 const complexFunctions = {
   rowIndex: {
-    labelKey: 'nodeDefEdit.functionName.rowIndex',
+    labelKey: 'nodeDefEdit:functionName.rowIndex',
     exprString: 'index($context)',
   },
 }

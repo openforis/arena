@@ -19,7 +19,7 @@ const headerColorItems = ({ i18n }) =>
   toButtonGroupItems({
     i18n,
     object: FormHeaderColor,
-    labelPrefix: 'nodeDefEdit.formHeaderProps.headerColor.',
+    labelPrefix: 'nodeDefEdit:formHeaderProps.headerColor.',
     icon: ({ key }) => (
       <span className="form-header-color-icon" style={{ backgroundColor: headerColorRgbCodesByColor[key] }} />
     ),
@@ -45,7 +45,7 @@ const FormHeaderProps = (props) => {
   const items = useMemo(() => headerColorItems({ i18n }), [i18n])
 
   return (
-    <FormItem label={i18n.t('nodeDefEdit.formHeaderProps.headerColorLabel')}>
+    <FormItem label={i18n.t('nodeDefEdit:formHeaderProps.headerColorLabel')}>
       <ButtonGroup
         className="form-header-color-btn-group"
         disabled={readOnly}

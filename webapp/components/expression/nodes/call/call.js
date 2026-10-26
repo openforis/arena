@@ -47,7 +47,7 @@ const Call = (props) => {
     return availableFunctionEntries.map(([functionKey, func]) => ({
       value: functionKey,
       label: extractFunctionLabel({ i18n, functionKey, func }),
-      description: i18n.t(`nodeDefEdit.functionDescriptions.${functionKey}`),
+      description: i18n.t(`nodeDefEdit:functionDescriptions.${functionKey}`),
     }))
   }, [i18n, initialSelectedFunctionKey])
 

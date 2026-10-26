@@ -122,9 +122,9 @@ const AdvancedExpressionEditorPopup = (props) => {
         />
       </div>
       <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t(`nodeDefEdit.editorHelp.${mode}`)}</p>
+        <p>{i18n.t(`nodeDefEdit:editorHelp.${mode}`)}</p>
         <p>
-          <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit.editorCompletionHelp')}
+          <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit:editorCompletionHelp')}
         </p>
       </div>
     </>

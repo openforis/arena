@@ -216,7 +216,7 @@ $t(common.cantUndoWarning)`,
     expression: 'Илэрхийлэл',
     resolved: 'Шийдэгдсэн',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Эх код',
       defaultValue: 'Үндсэн утга',
       validationRule: 'Баталгаажуулалтын дүрэм',

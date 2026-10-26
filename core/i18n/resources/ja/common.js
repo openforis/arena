@@ -263,11 +263,9 @@ export default {
       visibleColumns: '表示する列',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: '確認のため、次のテキストを入力してください：**{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage: '（受け付けるのは{{acceptedExtensions}}ファイルのみ、最大サイズは{{maxSize}}です）',
     error: {
@@ -279,17 +277,14 @@ export default {
     selectedFile: '選択したファイル',
     selectedFile_other: '選択したファイル',
   },
-
   error: {
     pageNotFound: 'ページが見つかりません',
   },
-
   geo: {
     area: '面積',
     vertices: '頂点',
     perimeter: '周囲長',
   },
-
   files: {
     header: 'ファイル',
     missing: ' 見つからないファイル：{{count}}件',
@@ -297,11 +292,9 @@ export default {
     fileName: 'ファイル名',
     fileSize: 'ファイルサイズ',
   },
-
   sidebar: {
     logout: 'ログアウト',
   },
-
   header: {
     theme: {
       label: 'テーマ',
@@ -321,7 +314,6 @@ export default {
       error: 'QRコードの生成中にエラーが発生しました：{{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: '整数',
     decimal: '小数',
@@ -338,7 +330,6 @@ export default {
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'ホーム',
     landing: 'ランディング',
@@ -410,87 +401,9 @@ export default {
     disclaimer: '免責事項',
     userManual: 'ユーザーマニュアル',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'このセクションは調査が公開されている場合のみ利用できます',
   },
-
-  loginView: {
-    yourName: 'お名前',
-    yourEmail: 'メールアドレス',
-    yourPassword: 'パスワード',
-    yourNewPassword: '新しいパスワード',
-    repeatYourPassword: 'パスワード（確認）',
-    repeatYourNewPassword: '新しいパスワード（確認）',
-    requestAccess: '$t(common.appNameFull)を初めて利用しますか？アクセスを申請する',
-    resetPassword: 'パスワードを再設定',
-    login: 'ログイン',
-    loginUsingBackupCode: '2FA（二段階認証）バックアップコードでログイン',
-    forgotPassword: 'パスワードをお忘れですか',
-    sendPasswordResetEmail: 'パスワード再設定メールを送信',
-    twoFactorBackupCode: '2FA（二段階認証）バックアップコード',
-    twoFactorToken: '確認コード',
-    twoFactorTokenDescription: `アカウントを安全に保つため、本人確認を行っています。
-
-認証アプリで生成されたコードを入力してください。`,
-  },
-
-  accessRequestView: {
-    error: 'アクセス申請中にエラーが発生しました：{{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: '名',
-        lastName: '姓',
-        institution: '所属機関',
-        country: '国',
-        purpose: 'ご利用の目的は何ですか？',
-        surveyName: '調査名を提案してください',
-        templateUuid: 'テンプレートから開始しますか？',
-      },
-    },
-    introduction: `リソースには限りがあるため、プラットフォームへのアクセスには申請が必要です。
-また、どのような目的でご利用になるかにも関心がありますので、ぜひお知らせください！
-**新規の空の調査**から始めるか、既存の**テンプレート**を複製するかを選択でき、新しく作成する調査には名前を提案していただきます。
-その調査については***調査管理者***の役割が割り当てられます：編集や、新しいユーザーを招待して調査に参加・貢献してもらうことができます。
-また***調査マネージャー***にもなり、必要に応じて**新しい調査を作成**できます（最大5件まで）。
-詳しくは公式サイトをご覧ください：$t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**申請を送信した後は、Arenaへのアクセスを許可する招待メールをお待ちください。**`,
-    reCaptchaNotAnswered: 'reCAPTCHAが未回答です',
-    requestSent: 'アクセス申請を送信しました',
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-処理には数日かかりますので、しばらくお待ちください。
-承認され次第、**{{email}}**宛に$t(common.appName)へのアクセス方法をご案内するメールを送信します。
-ありがとうございます。**$t(common.appNameFull)**をお楽しみください！`,
-    sendRequest: '申請を送信',
-    sendRequestConfirm: '$t(common.appNameFull)へのアクセスを申請しますか？',
-    templateNotSelected: '未選択（最初から作成）',
-    title: '$t(common.appNameFull)へのアクセス申請',
-    whitelistSenderSuggestion: `迷惑メールフォルダに入っていた場合は、今後のメールが確実に受信トレイに届くよう、**{{senderEmail}}**を連絡先に追加するか、安全な送信者としてマークしてください。`,
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Arenaへの登録を完了する',
-      setYourNewPassword: '新しいパスワードを設定',
-    },
-    setNewPassword: '新しいパスワードを設定',
-    forgotPasswordLinkInvalid: 'アクセスしようとしたページは存在しないか、無効になっています',
-    passwordSuccessfullyReset: 'パスワードを再設定しました',
-    passwordStrengthChecksTitle: 'パスワード強度チェック',
-    passwordStrengthChecks: {
-      noWhiteSpaces: '空白文字を含まない',
-      atLeast8CharactersLong: '8文字以上',
-      containsLowerCaseLetters: '小文字を含む',
-      containsUpperCaseLetters: '大文字を含む',
-      containsNumbers: '数字を含む',
-    },
-    completeRegistration: '登録を完了',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: '依存関係の種類',
     dependencyTypes: {
@@ -508,11 +421,9 @@ $t(accessRequestView.whitelistSenderSuggestion)
     selectAtLeastOneDependencyType: '少なくとも1つの依存関係の種類を選択してください',
     noDependenciesToDisplay: '表示する依存関係がありません',
   },
-
   designerView: {
     formPreview: 'フォームプレビュー',
   },
-
   recordView: {
     justDeleted: 'この記録は削除されたばかりです',
     sessionExpired: '記録のセッションの有効期限が切れました',
@@ -528,7 +439,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       unlock: 'グループ識別属性の編集を許可',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'このカスタム集計関数を削除しますか？',
@@ -536,7 +446,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     editRecord: '記録を編集',
   },
-
   mapView: {
     changeMarkerColor: 'マーカーの色を変更',
     createRecord: '新規記録を作成',
@@ -566,7 +475,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     },
     selectedPeriod: '選択中の期間',
   },
-
   samplingPolygonOptions: {
     circle: '円',
     controlPointOffsetEast: '基準点オフセット（東方向、m）',
@@ -583,18 +491,15 @@ $t(accessRequestView.whitelistSenderSuggestion)
     samplingPolygon: 'サンプリングポリゴン',
     shape: '形状',
   },
-
   kmlUploader: {
     opacity: '不透明度',
     selectFile: 'ファイルを選択',
     title: 'KML/KMZ/Shapefileオプション',
   },
-
   mapBaseLayerPeriodSelector: {
     chooseAPeriodToCompareWith: '比較する期間を選択',
     falseColor: '偽合成色（フォールスカラー）',
   },
-
   surveysView: {
     chains: '処理チェーン',
     confirmUpdateSurveyOwner: `調査「{{surveyName}}」の所有者を「{{ownerName}}」に変更しますか？`,
@@ -616,7 +521,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       'published-draft': '公開済み/下書き',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: '承認済み',
@@ -635,7 +539,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       template: 'テンプレート',
     },
   },
-
   userView: {
     scale: '拡大縮小',
     rotate: '回転',
@@ -658,7 +561,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       title: '二要素認証デバイスの管理',
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'パスワードを変更するユーザー：{{user}}',
     oldPassword: '現在のパスワード',
@@ -668,7 +570,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
     passwordChangedSuccessfully: 'パスワードを変更しました！',
     notAuthorizedToChangePasswordOfAnotherUser: '他のユーザーのパスワードを変更する権限がありません',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'ユーザー{{email}}をシステム管理者として招待しますか？',
     confirmInviteSystemAdmin_other: 'ユーザー{{email}}をシステム管理者として招待しますか？',
@@ -758,7 +659,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       それ以外の役割でユーザーを招待したい場合は、先に調査を公開してください。`,
     typeEmail: 'メールアドレスを入力し、追加ボタンを押してください',
   },
-
   user: {
     mapApiKeys: {
       title: '地図APIキー',
@@ -775,7 +675,6 @@ $t(accessRequestView.whitelistSenderSuggestion)
       preferNotToSay: '回答しない',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete: '基本単位を削除すると、すべての「面積ベース変数」の選択が解除されます。続行しますか？',
@@ -910,7 +809,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'レポートデータテーブルと属性の結合',
     showSamplingAttributes: 'サンプリング属性を表示',
   },
-
   instancesView: {
     title: 'インスタンス',
     terminate: '終了',
@@ -929,12 +827,10 @@ $t(common.cantUndoWarning)`,
       invalidToken: '無効または期限切れのトークンです',
     },
   },
-
   itemsTable: {
     unused: '未使用',
     noItemsAdded: '項目が追加されていません',
   },
-
   expression: {
     functionHasTooFewArguments:
       '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
@@ -978,313 +874,9 @@ $t(common.appNameFull)
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: '追加フィールド',
-    basic: '基本',
-    advanced: '詳細設定',
-    mobileApp: 'モバイルアプリ',
-    print: '印刷',
-    printProps: {
-      printOrientation: {
-        label: 'ページの向き',
-        info: 'この項目が独自の印刷セクションを開始する際に使用される向きです。デフォルトはエクスポート時に選択されたドキュメントの向きを継承します。',
-      },
-      orientations: {
-        default: 'デフォルト（ドキュメント）',
-        portrait: '縦',
-        landscape: '横',
-      },
-    },
-    validations: '検証ルール',
-    function: '関数',
-    editingFunction: '関数{{functionName}}を編集中',
-    editorHelp: {
-      json: '有効な式はJavaScriptのサブセットです。',
-      sql: '有効なSQL式のみが使用できます。',
-    },
-    editorCompletionHelp: '- 利用可能な変数と関数を表示',
-    functionDescriptions: {
-      categoryItemProp: '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
-      dateTimeDiff: '2つの日時の組の差（分単位）を返します',
-      distance: '指定した座標間の距離（メートル単位）を返します',
-      first: '指定した複数属性または項目の最初の値またはノードを返します',
-      geoCoordinateAtDistance: '指定した座標から指定した距離・方位にある座標を返します',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      geoPolygon: '座標のリストからGeoJSON形式のポリゴンを生成します',
-      includes: '指定した複数属性に指定した値が含まれている場合にtrueを返します。',
-      index: '指定したノードの、兄弟ノード内でのインデックスを返します',
-      isEmpty: '引数に値が指定されていない場合にtrueを返します',
-      isNotEmpty: '引数に何らかの値が指定されている場合にtrueを返します',
-      last: '指定した複数属性または項目の最後の値またはノードを返します',
-      ln: 'Xの自然対数を返します',
-      log10: 'Xの常用対数（底10）を返します',
-      max: '引数のうち最大の値を返します',
-      min: '引数のうち最小の値を返します',
-      now: '現在の日付または時刻を返します',
-      parent: '指定したノードの親項目を返します',
-      pow: '底をべき乗した値を返します',
-      prevCycleNote: '複数サイクルが定義されており、前サイクルへのリンクが有効な場合のみ、Arena Mobileで動作します',
-      prevCycleValue:
-        '前サイクルの記録における同じ属性の値を返します。$t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        '前サイクルの記録における同じ属性群の値を返します。$t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: '現在の記録のサイクルを返します',
-      recordDateCreated: '現在の記録の作成日時を日時値として返します。テキスト、日付、または時刻属性で使用できます',
-      recordDateLastModified:
-        '現在の記録の最終更新日時を日時値として返します。テキスト、日付、または時刻属性で使用できます',
-      recordOwnerEmail: '記録を所有するユーザーのメールアドレスを返します',
-      recordOwnerName: '記録を所有するユーザーの名前を返します',
-      recordOwnerRole: '記録を所有するユーザーの（現在の調査における）役割を返します',
-      rowIndex: '現在のテーブル行（またはフォーム）のインデックスを返します',
-      taxonProp: '指定したコードを持つ分類群の、指定した$t(extraProp.label)の値を返します',
-      taxonVernacularName: '指定したコードを持つ分類群の、指定した言語での（最初の）通称名（現地名）を返します',
-      unique: '複数属性または項目の一意な値を返します',
-      userEmail: 'ログイン中のユーザーのメールアドレスを返します',
-      userIsRecordOwner:
-        '記録を編集しているユーザーがその記録の所有者でもある場合は真偽値「true」、そうでなければ「false」を返します',
-      userName: 'ログイン中のユーザーの名前を返します',
-      userProp: 'ログイン中のユーザーの、指定した$t(extraProp.label)の値を返します',
-      uuid: '識別子として使用できるUUID（汎用一意識別子）を生成します（例：項目のキー属性として）',
-      // SQL functions
-      avg: '数値変数の平均値を返します',
-      count: '指定した条件に一致する行数を返します',
-      sum: '数値変数の合計値を返します',
-    },
-    functionName: {
-      rowIndex: '行インデックス',
-    },
-    basicProps: {
-      analysis: '分析',
-      autoIncrementalKey: {
-        label: '自動連番',
-        info: '値は自動的に生成されます',
-      },
-      autoCreateMinCountItems: {
-        label: '最小項目数を自動作成',
-        info: '項目が適用対象になった時、または親項目が作成された時に、最小数に等しい数の項目が自動的に生成されます。',
-      },
-      displayAs: '表示形式',
-      displayIn: '表示先',
-      entitySource: '項目のソース',
-      enumerate: {
-        label: '列挙',
-        info: `項目内でキーとして指定されたコード属性に関連付けられたカテゴリ項目を使用して、行が自動的に生成されます。行の追加・削除はできず、キーとなるコード属性も編集できません`,
-      },
-      enumeratingItemsExpression: {
-        label: '列挙項目の式',
-        info: '列挙するカテゴリ項目を絞り込む任意の式です（例：unique(table_source.source_type)）。空の場合、すべてのカテゴリ項目が使用されます。',
-      },
-      enumerator: {
-        label: '列挙元',
-        info: 'このカテゴリの項目を使って、親項目の行が生成されます',
-      },
-      form: 'フォーム',
-      formula: '数式',
-      includedInClonedData: '複製データに含める',
-      includedInMultipleEntitySummary: {
-        label: '複数項目の概要に含める',
-        info: `有効にすると、この属性の値が、エンティティ選択リストおよびエンティティ概要ビューに表示されます`,
-      },
-      includedInRecordsList: {
-        label: '記録一覧に含める',
-        info: `有効にすると、この属性が記録一覧に表示されます`,
-      },
-      key: 'キー',
-      maxKeysCountReached: 'キーの最大数に達しました（{{maxKeysCount}}）',
-      multiple: '複数',
-      ownPage: '専用ページ',
-      parentPage: '親ページ（{{parentPage}}）',
-      qualifier: {
-        label: 'グループ識別属性',
-        info: `グループに所属するユーザーが新規記録を作成すると、この属性にはそのユーザーが属するグループに設定された値が自動的に入力されます。グループに所属するユーザーは、自分のグループに属する記録のみを閲覧・編集できます。`,
-      },
-      table: 'テーブル',
-    },
-    advancedProps: {
-      areaBasedEstimate: '面積ベース推定',
-      defaultValues: 'デフォルト値',
-      defaultValuesInfo: `特定のルールに基づいて回答を自動入力できます。
-複数のルールを設定した場合、システムは上から順にチェックします。
-条件に一致する最初のルールが適用され、その結果が回答として使用されます。`,
-      defaultValueEvaluatedOneTime: 'デフォルト値は一度だけ評価',
-      defaultValueEvaluatedOneTimeInfo: `属性が作成される時に一度だけデフォルト値が評価されます。
-チェックしない場合、記録が更新されるたびにデフォルト値が再評価されます。
-now()やuuid()のように、属性値が最初に生成される時だけ評価されるべき式を使う場合はチェックしてください。`,
-      defaultValuesNotEditableForAutoIncrementalKey: '自動連番キーが設定されているため、デフォルト値は編集できません',
-      defaultValuesNotSpecified: 'デフォルト値が指定されていません',
-      defaultValuesSpecified: 'デフォルト値が指定されています',
-      editableIf: '編集可能性',
-      editableIfInfo: `デフォルトでは、ユーザーは常に該当するフィールドにアクセスできます。
-ここでは、このフィールドに入力・変更できるかどうかのルールを設定できます。
-設定した条件が満たされている場合は編集可能に、そうでない場合は「読み取り専用」（ロック）になります。`,
-      editableAlways: '常に編集可能',
-      editableIfConditionIsMet: '条件を満たす場合に編集可能',
-      hidden: '常に非表示',
-      hiddenInReport: '分析ダッシュボードで非表示',
-      hiddenInReportInfo: `有効にすると、この属性は分析ダッシュボードに表示されません`,
-      hiddenWhenNotRelevant: '適用対象外の場合は非表示',
-      itemsFilter: '項目フィルター',
-      itemsFilterInfo: `選択可能な項目を絞り込むために使用される式です。
-式の中では「this」という単語がその項目自体を指します。
-例：this.region = region_attribute_name
-（「region」は項目に定義された追加プロパティの名前、region_attribute_nameは調査内の属性名です）`,
-      readOnly: '読み取り専用',
-      relevantIf: '適用性',
-      relevantIfInfo: `デフォルトでは、すべてのフィールドは常に有効です。
-適用ルールを設定し、それが満たされない場合、フィールドはグレー表示または完全に非表示になり、
-自動入力された回答も無視されます。
-調査の一部を動的に表示・非表示にするために使用します。例：前の質問で「その他」を選択した場合のみ「詳細を記入」テキストボックスを表示する、など。`,
-      relevantIfRadioNone: '常に適用',
-      relevantIfRadioDefined: '条件を満たす場合に適用',
-      script: 'スクリプト',
-      visibleIf: '可視性',
-      visibleIfInfo: `デフォルトでは、フィールドは常に表示されます。
-ルールを設定すると、そのルールが満たされる場合のみ表示され、それ以外は非表示になります。
-注：「適用対象外」で非表示になるフィールドとは異なり、非表示になったフィールドでも裏側で自動入力された回答が保存され続ける場合があります。
-ユーザーの役割など、ログインしているユーザーに応じて調査の特定部分を非表示にする場合に最適です。`,
-      visibleAlways: '常に表示',
-      visibleIfConditionIsMet: '条件を満たす場合に表示',
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Arena Mobileで非表示',
-        info: `有効にすると、この属性はArena Mobileに表示されません`,
-      },
-      includedInPreviousCycleLink: {
-        label: '前サイクルへのリンクに含める',
-        info: `有効にすると、モバイルアプリで前サイクルへのリンクが有効な場合、データ入力フォームに前サイクルの値が表示されます`,
-      },
-    },
-    numericProps: {
-      unit: '単位',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: '小数点以下の最大桁数',
-    },
-    fileProps: {
-      fileNameExpression: 'ファイル名の式',
-      fileType: 'ファイルの種類',
-      fileTypes: {
-        image: '画像',
-        video: '動画',
-        audio: '音声',
-        other: 'その他',
-      },
-      maxFileSize: '最大ファイルサイズ（MB）',
-      numberOfFiles: 'ファイル数の最小・最大を変更するには「検証ルール」に移動してください。',
-      showGeotagInformation: 'ジオタグ情報を表示',
-    },
-    mobileProps: {
-      title: 'モバイルアプリ',
-    },
-    timeProps: {
-      includeSeconds: '秒を含める',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'ヘッダーの色',
-      headerColor: {
-        blue: '青',
-        green: '緑',
-        orange: 'オレンジ',
-        red: '赤',
-        yellow: '黄',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'ハイパーリンク',
-        markdown: 'Markdown',
-        text: 'テキスト',
-      },
-      textInputType: 'テキスト入力タイプ',
-      textInputTypes: {
-        singleLine: '1行',
-        multiLine: '複数行',
-      },
-      textTransform: 'テキスト変換',
-      textTransformTypes: {
-        none: 'なし',
-        capitalize: '先頭大文字',
-        uppercase: '大文字',
-        lowercase: '小文字',
-      },
-    },
-    booleanProps: {
-      labelValue: 'ラベルの値',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'カテゴリ',
-      codeShown: 'コードを表示',
-      displayAsTypes: {
-        checkbox: 'チェックボックス',
-        dropdown: 'ドロップダウン',
-      },
-      parentCode: '親コード',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'デバイスの座標のみ許可',
-      allowOnlyDeviceCoordinateInfo: `Arena Mobileにのみ適用されます：チェックすると、ユーザーはX/Y値を手動で編集できず、デバイスのGPSでのみ座標を取得できるようになります`,
-      mapMarkerColor: '地図マーカーの色',
-    },
-    expressionsProp: {
-      expression: '式',
-      applyIf: '適用条件',
-      confirmDelete: 'この式を削除しますか？',
-      severity: '重要度',
-    },
-    validationsProps: {
-      minCount: '最小数',
-      maxCount: '最大数',
-      expressions: '検証式',
-      attributeAlwaysValid: '属性は常に有効',
-      attributeValidWhenConditionIsMet: '条件を満たす場合に属性は有効',
-      notRequired: '必須ではない',
-      alwaysRequired: '常に必須',
-      requiredWhenConditionIsMet: '条件を満たす場合に必須',
-    },
-    cannotChangeIntoMultipleWithDefaultValues: 'デフォルト値が設定されているため、このノードを複数に変換できません。',
-    cannotDeleteNodeDefReferenced: `「{{nodeDef}}」は以下のノード定義から参照されているため削除できません：{{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: '複製',
-      title: 'ノード定義「{{nodeDefName}}」を複製',
-      entitySelectLabel: '複製先の項目：',
-    },
-    conversion: {
-      dialogTitle: '{{nodeDefName}}を別の型に変換',
-      fromType: '変換元の型',
-      toType: '変換先の型',
-    },
-    moveDialog: {
-      confirmButtonLabel: '移動',
-      title: 'ノード定義「{{nodeDefName}}」を「{{parentNodeDefName}}」から移動',
-      entitySelectLabel: '移動先の項目：',
-    },
-    movedNodeDefinitionHasErrors: '移動したノード定義「{{nodeDefName}}」にはエラーがあります。修正してください。',
-    nodeDefintionsHaveErrors: '以下のノード定義にはエラーがあります：{{nodeDefNames}}。修正してください。',
-    filterVariable: '項目を絞り込む変数',
-    filterVariableForLevel: '{{levelName}}用の変数',
-    unique: {
-      label: '一意',
-      info: `属性を**一意**としてマークすると、その値は最も近い複数項目内で一意である必要があります（そうでない場合はエラーが表示されます）。
-
----
-
-例：*クラスター → プロット → 樹木*のような構造で、属性*tree_species*を**一意**としてマークすると、同じ*プロット*内では樹種ごとに1本の木しか登録できません。`,
-    },
-    nodeDefClonedSuccessfully: 'ノード定義「{{nodeDefName}}」を「{{targetParentNodeDefName}}」に複製しました',
-    categoriesClonedFromSurvey: '以下のカテゴリも複製元の調査から複製されました：{{names}}',
-    taxonomiesClonedFromSurvey: '以下の分類体系も複製元の調査から複製されました：{{names}}',
-  },
-
   languagesEditor: {
     languages: '言語',
   },
-
   taxonomy: {
     header: '分類体系',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
@@ -1314,7 +906,6 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     taxaCount: '分類群の数',
     vernacularNameLabel: '通称名ラベル',
   },
-
   categoryList: {
     batchImport: 'カテゴリを一括インポート（ZIPから）',
     batchImportCompleteSuccessfully: `{{importedCategories}}件のカテゴリをインポートしました！
@@ -1340,7 +931,6 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
       samplingPointData: '抽出地点データ',
     },
   },
-
   categoryEdit: {
     header: 'カテゴリ',
     addLevel: 'レベルを追加',
@@ -1451,7 +1041,6 @@ $t(common.cantUndoWarning)`,
     templateFor_samplingPointDataImport_csv: '抽出地点データインポート用テンプレート（CSV）',
     templateFor_samplingPointDataImport_xlsx: '抽出地点データインポート用テンプレート（Excel）',
   },
-
   extraProp: {
     label: '追加プロパティ',
     label_plural: '追加プロパティ',
@@ -1477,7 +1066,6 @@ $t(common.cantUndoWarning)`,
     name: 'プロパティ{{position}}の名前',
     value: '値',
   },
-
   record: {
     ancestorNotFound: '記録内に上位階層ノードが見つかりません',
     keyDuplicate: '記録キーが重複しています',
@@ -1503,7 +1091,6 @@ $t(common.cantUndoWarning)`,
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'AND',
     or: 'OR',
@@ -1568,7 +1155,6 @@ $t(common.cantUndoWarning)`,
     arenaInGitHub: `<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>`,
     arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>`,
   },
-
   aiExpression: {
     title: '説明から式を生成',
     hint: '式にどんな動作をさせたいかを自然な言葉で説明してください。AIがArenaの構文に変換します。Ctrl+Enterで生成します。',
@@ -1589,7 +1175,6 @@ $t(common.cantUndoWarning)`,
       timeout: 'AIの応答に時間がかかりすぎました。もう一度お試しください。',
     },
   },
-
   aiTranslation: {
     translateButton_one: '他の{{count}}言語に翻訳',
     translateButton_other: '他の{{count}}言語に翻訳',
@@ -1602,14 +1187,12 @@ $t(common.cantUndoWarning)`,
     failed: '翻訳に失敗しました：{{message}}',
     timeout: '翻訳リクエストがタイムアウトしました。もう一度お試しください。',
   },
-
   aiActivityLog: {
     title: 'アクティビティログの要約',
     summarizeButton: '要約する',
     thinking: 'イベントを集計し、AIに要約を依頼しています…',
     error: '要約の取得に失敗しました：{{message}}',
   },
-
   aiChatbot: {
     open: 'ヘルプとドキュメント',
     title: 'ヘルプとドキュメント',

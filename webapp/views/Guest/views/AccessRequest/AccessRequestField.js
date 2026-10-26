@@ -108,7 +108,7 @@ export const AccessRequestField = (props) => {
   const fieldValidation = Validation.getFieldValidation(validationFieldName)(validation)
 
   return (
-    <FormItem label={`accessRequestView.fields.${name}`} required={required}>
+    <FormItem label={`guest:accessRequestView.fields.${name}`} required={required}>
       <ValidationTooltip validation={fieldValidation}>{fieldComponent}</ValidationTooltip>
     </FormItem>
   )

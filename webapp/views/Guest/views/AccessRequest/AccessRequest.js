@@ -19,11 +19,11 @@ const AccessRequest = () => {
   if (requestSentSuccessfully) {
     return (
       <div className="access-request">
-        <div className="title">{i18n.t('accessRequestView.requestSent')}</div>
+        <div className="title">{i18n.t('guest:accessRequestView.requestSent')}</div>
         <div className="content">
           <Markdown
             className="request-sent-message"
-            source={i18n.t('accessRequestView.requestSentMessage', {
+            source={i18n.t('guest:accessRequestView.requestSentMessage', {
               email: request.email,
               senderEmail: ProcessUtils.ENV.emailFromResolved,
             })}
@@ -34,10 +34,10 @@ const AccessRequest = () => {
   }
   return (
     <div className="access-request">
-      <div className="title">{i18n.t('accessRequestView.title')}</div>
+      <div className="title">{i18n.t('guest:accessRequestView.title')}</div>
       <div className="content">
         <div className="introduction">
-          <Markdown source={i18n.t('accessRequestView.introduction')} />
+          <Markdown source={i18n.t('guest:accessRequestView.introduction')} />
         </div>
         <form onSubmit={(event) => event.preventDefault()}>
           {UserAccessRequest.editableFields.map((field) => (
@@ -55,7 +55,7 @@ const AccessRequest = () => {
 
           <div className="guest__buttons">
             <button type="submit" className="btn" onClick={onSubmit}>
-              {i18n.t('accessRequestView.sendRequest')}
+              {i18n.t('guest:accessRequestView.sendRequest')}
             </button>
           </div>
         </form>

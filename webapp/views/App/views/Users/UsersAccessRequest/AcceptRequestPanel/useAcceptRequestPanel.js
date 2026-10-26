@@ -47,7 +47,7 @@ export const useAcceptRequestPanel = (props) => {
     if (templateUuid) {
       void loadTemplateLabel()
     } else {
-      setTemplateLabel(i18n.t('accessRequestView.templateNotSelected'))
+      setTemplateLabel(i18n.t('guest:accessRequestView.templateNotSelected'))
     }
   }, [templateUuid])
 

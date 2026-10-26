@@ -63,13 +63,13 @@ export const useResetPassword = () => {
     if (userFetched) {
       actions.initUser(userFetched)(dispatch)
     } else {
-      dispatchRedux(NotificationActions.notifyError({ key: 'resetPasswordView.forgotPasswordLinkInvalid' }))
+      dispatchRedux(NotificationActions.notifyError({ key: 'guest:resetPasswordView.forgotPasswordLinkInvalid' }))
     }
   }, [userFetched])
 
   useOnUpdate(() => {
     navigate(appModuleUri())
-    dispatchRedux(NotificationActions.notifyInfo({ key: 'resetPasswordView.passwordSuccessfullyReset' }))
+    dispatchRedux(NotificationActions.notifyInfo({ key: 'guest:resetPasswordView.passwordSuccessfullyReset' }))
   }, [resetComplete])
 
   return {

@@ -42,7 +42,7 @@ export const UsersAccessRequest = () => {
       Countries.getCountryName({ code: fieldValue }),
     [`props.${UserAccessRequest.keysProps.templateUuid}`]: ({ fieldValue, i18n }) => {
       if (!fieldValue) {
-        return i18n.t('accessRequestView.templateNotSelected')
+        return i18n.t('guest:accessRequestView.templateNotSelected')
       }
       const template = surveyTemplates.find((t) => t.uuid === fieldValue)
       return Survey.getLabel(template, Survey.getDefaultLanguage(template))
@@ -73,7 +73,7 @@ export const UsersAccessRequest = () => {
         columns={[
           ...UserAccessRequest.editableFields.map(({ name }) => ({
             key: name,
-            header: `accessRequestView.fields.${name}`,
+            header: `guest:accessRequestView.fields.${name}`,
             renderItem: ({ item }) => {
               const fieldValue = Objects.path(name.split('.'))(item) || ''
               const renderer = columnContentRendererByFieldName[name]

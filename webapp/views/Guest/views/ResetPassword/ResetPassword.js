@@ -36,12 +36,12 @@ const ResetPassword = () => {
       <div className="title">
         {i18n.t(
           hasAlreadyAccepted
-            ? 'resetPasswordView.title.setYourNewPassword'
-            : 'resetPasswordView.title.completeRegistration'
+            ? 'guest:resetPasswordView.title.setYourNewPassword'
+            : 'guest:resetPasswordView.title.completeRegistration'
         )}
       </div>
 
-      <TextInput label={i18n.t('loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
+      <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
       {!hasAlreadyAccepted && (
         <>
@@ -50,7 +50,7 @@ const ResetPassword = () => {
             defaultValue={user.name}
             name="name"
             autoComplete="new-name"
-            label={i18n.t('loginView.yourName')}
+            label={i18n.t('guest:loginView.yourName')}
             onChange={(value) => onChangeUser({ prop: 'name', value })}
           />
         </>
@@ -58,7 +58,7 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.password}
-        label={i18n.t(hasAlreadyAccepted ? 'loginView.yourNewPassword' : 'loginView.yourPassword')}
+        label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.yourPassword')}
         onChange={(value) => onChangeUser({ prop: 'password', value })}
       />
 
@@ -67,13 +67,19 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.passwordConfirm}
-        label={i18n.t(hasAlreadyAccepted ? 'loginView.repeatYourNewPassword' : 'loginView.repeatYourPassword')}
+        label={i18n.t(
+          hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatYourPassword'
+        )}
         onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
       />
 
       <div className="guest__buttons">
         <button type="submit" className="btn" onClick={onSubmit}>
-          {i18n.t(hasAlreadyAccepted ? 'resetPasswordView.setNewPassword' : 'resetPasswordView.completeRegistration')}
+          {i18n.t(
+            hasAlreadyAccepted
+              ? 'guest:resetPasswordView.setNewPassword'
+              : 'guest:resetPasswordView.completeRegistration'
+          )}
         </button>
       </div>
 

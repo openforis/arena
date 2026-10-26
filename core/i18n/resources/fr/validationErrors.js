@@ -109,8 +109,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: "L'entité est requise",
-    applyIfDuplicate: 'La condition "$t(nodeDefEdit.expressionsProp.applyIf)" est dupliquée',
-    applyIfInvalid: 'Condition "$t(nodeDefEdit.advancedProps.relevantIf)" invalide',
+    applyIfDuplicate: 'La condition "$t(nodeDefEdit:expressionsProp.applyIf)" est dupliquée',
+    applyIfInvalid: 'Condition "$t(nodeDefEdit:advancedProps.relevantIf)" invalide',
     columnWidthCannotBeGreaterThan: 'La largeur de colonne ne peut pas être supérieure à {{max}}',
     columnWidthCannotBeLessThan: 'La largeur de colonne ne peut pas être inférieure à {{min}}',
     countMaxMustBePositiveNumber: 'Le nombre maximum doit être un entier positif',
@@ -121,7 +121,7 @@ export default {
     defaultValuesNotSpecified: 'Valeur par défaut non spécifiée',
     entitySourceRequired: "Source de l'entité requise",
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Seule la dernière expression peut avoir une condition "$t(nodeDefEdit.expressionsProp.applyIf)" vide',
+      'Seule la dernière expression peut avoir une condition "$t(nodeDefEdit:expressionsProp.applyIf)" vide',
     expressionDuplicate: 'Expression dupliquée',
     expressionRequired: 'Expression requise',
     formulaInvalid: 'La formule est invalide',
@@ -140,7 +140,7 @@ export default {
     requiredIfNotAllowed:
       'La condition "Obligatoire si" n\'est autorisée que pour les attributs simples, non clés et pas toujours obligatoires',
     qualifierCannotHaveApplicableExpression:
-      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
     qualifierCannotHaveDefaultValues: 'Un attribut qualificatif ne peut pas avoir de valeurs par défaut',
     qualifierCannotHaveValidations: 'Un attribut qualificatif ne peut pas avoir de règles de validation définies',

@@ -109,8 +109,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Сущность обязательна',
-    applyIfDuplicate: 'Условие "$t(nodeDefEdit.expressionsProp.applyIf)" повторяется',
-    applyIfInvalid: 'Неверное условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    applyIfDuplicate: 'Условие "$t(nodeDefEdit:expressionsProp.applyIf)" повторяется',
+    applyIfInvalid: 'Неверное условие "$t(nodeDefEdit:advancedProps.relevantIf)"',
     columnWidthCannotBeGreaterThan: 'Ширина столбца не может быть больше {{max}}',
     columnWidthCannotBeLessThan: 'Ширина столбца не может быть меньше {{min}}',
     countMaxMustBePositiveNumber: 'Максимальное количество должно быть положительным целым числом',
@@ -121,7 +121,7 @@ export default {
     defaultValuesNotSpecified: 'Значение по умолчанию не указано',
     entitySourceRequired: 'Источник сущности обязателен',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Только последнее выражение может иметь пустое условие "$t(nodeDefEdit.expressionsProp.applyIf)"',
+      'Только последнее выражение может иметь пустое условие "$t(nodeDefEdit:expressionsProp.applyIf)"',
     expressionDuplicate: 'Выражение повторяется',
     expressionRequired: 'Выражение обязательно',
     formulaInvalid: 'Формула неверна',
@@ -140,7 +140,7 @@ export default {
     requiredIfNotAllowed:
       'Условие "Обязательно, если" допускается только для одиночных, неключевых и не всегда обязательных атрибутов',
     qualifierCannotHaveApplicableExpression:
-      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
     qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
     qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
