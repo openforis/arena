@@ -1,4 +1,6 @@
-import InfoExportJob, { exportTypes } from '@server/modules/survey/service/surveyExport/jobs/infoExportJob'
+import { ArenaExportType } from '@openforis/arena-core'
+
+import InfoExportJob from '@server/modules/survey/service/surveyExport/jobs/infoExportJob'
 import RecordFilesExportJob from '@server/modules/survey/service/surveyExport/jobs/recordFilesExportJob'
 import RecordsExportJob from '@server/modules/survey/service/surveyExport/jobs/recordsExportJob'
 import * as User from '@core/user/user'
@@ -8,7 +10,7 @@ import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 export default class SelectedRecordsExportJob extends ZipFileCreatorBaseJob {
   constructor(params) {
-    super(SelectedRecordsExportJob.type, { ...params, exportType: exportTypes.records }, [
+    super(SelectedRecordsExportJob.type, { ...params, exportType: ArenaExportType.records }, [
       new RecordsExportJob(),
       new RecordFilesExportJob(),
       new InfoExportJob(),
