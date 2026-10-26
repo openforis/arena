@@ -72,6 +72,7 @@ export const afterNodesUpdate = async ({
   survey,
   record,
   nodes,
+  passiveNodes = {},
   categoryItemProvider,
   taxonProvider,
   timezoneOffset,
@@ -83,6 +84,7 @@ export const afterNodesUpdate = async ({
 
   // populate refData for big category/taxonomy nodes before dependent evaluation
   await _populateRefDataForBigNodes({ survey, nodes, categoryItemProvider, taxonProvider })
+  await _populateRefDataForBigNodes({ survey, nodes: passiveNodes, categoryItemProvider, taxonProvider })
 
   // 1. update dependent nodes
   const updateResultDependents = await updateNodesDependents({
@@ -100,6 +102,12 @@ export const afterNodesUpdate = async ({
   })
 
   updateResult.merge(updateResultDependents)
+
+  // passive nodes (updated nodes not triggering the dependents update) are kept as they are,
+  // even if the dependents update re-evaluated them
+  for (const passiveNode of Object.values(passiveNodes)) {
+    updateResult.addNode(passiveNode, { sideEffect })
+  }
 
   // 2. update node validations
   const nodesValidation = await RecordValidator.validateNodes({
