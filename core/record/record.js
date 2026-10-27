@@ -39,6 +39,7 @@ export const getSurveyUuid = A.prop(keys.surveyUuid)
 
 export const { getUuid } = ObjectUtils
 export const isPreview = A.propEq(keys.preview, true)
+export const isReadOnly = A.propEq(keys.readOnly, true)
 export const getOwnerUuid = A.prop(keys.ownerUuid)
 export const getOwnerName = A.prop(keys.ownerName)
 export const getStep = A.prop(keys.step)
@@ -104,6 +105,7 @@ export const {
 export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
 export const { recomputeUserDependentNodeState } = RecordUserDependentStateUpdater
 export const assocOwnerUuid = A.assoc(keys.ownerUuid)
+export const assocReadOnly = A.assoc(keys.readOnly)
 
 // ====== DELETE
 export const { deleteNode } = RecordUpdater

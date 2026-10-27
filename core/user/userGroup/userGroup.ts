@@ -13,6 +13,7 @@ export const keysProps = {
   name: 'name',
   labels: ObjectUtils.keysProps.labels,
   qualifiers: 'qualifiers',
+  readableGroupUuids: 'readableGroupUuids',
 }
 
 // ====== CREATE
@@ -23,6 +24,7 @@ export const { getUuid, getProps, getLabels, getLabel, isEqual } = ObjectUtils
 export const getSurveyUuid = A.propOr(null, keys.surveyUuid)
 export const getName = ObjectUtils.getProp<string>(keysProps.name, '')
 export const getQualifiers = ObjectUtils.getProp<Array<{ name: string; value: string }>>(keysProps.qualifiers, [])
+export const getReadableGroupUuids = ObjectUtils.getProp<string[]>(keysProps.readableGroupUuids, [])
 export const { getValidation } = Validation
 
 // ====== UPDATE
@@ -30,3 +32,5 @@ export const assocName = (name: string) => ObjectUtils.setProp(keysProps.name, n
 export const { assocLabels } = ObjectUtils
 export const assocQualifiers = (qualifiers: Array<{ name: string; value: string }>) =>
   ObjectUtils.setProp(keysProps.qualifiers, qualifiers)
+export const assocReadableGroupUuids = (readableGroupUuids: string[]) =>
+  ObjectUtils.setProp(keysProps.readableGroupUuids, readableGroupUuids)

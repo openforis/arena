@@ -120,6 +120,7 @@ export const countRecordsBySurveyId = async (
     ownerUuid = null,
     includeMerged = false,
     qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
   },
   client = db
 ) => {
@@ -132,6 +133,7 @@ export const countRecordsBySurveyId = async (
       summaryDefs,
       search,
       qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
     })
     return recordsWithSearch.length
   }
@@ -293,10 +295,13 @@ export const fetchRecordsSummaryBySurveyId = async (
     includePreview = false,
     includeMerged = false,
     qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
   },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
+  // readable groups' filters are relevant only when the user is restricted to its own group
+  const readableFilterSets = qualifierNodeDefFilters.length > 0 ? readableQualifierNodeDefFilterSets : []
 
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
@@ -310,7 +315,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
   const qualifierColumnNames = [
     ...new Set(
-      qualifierNodeDefFilters
+      [qualifierNodeDefFilters, ...readableFilterSets]
+        .flat()
         .map(({ nodeDef }) => NodeDefTable.getColumnName(nodeDef))
         .filter((colName) => !nodeDefKeysColumnNames.has(colName))
     ),
@@ -364,13 +370,27 @@ export const fetchRecordsSummaryBySurveyId = async (
   // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
   // WHERE clause here applies to the outer query, where the root entity table alias is out of scope
   const qualifierFilterParams = {}
-  qualifierNodeDefFilters.forEach(({ nodeDef, value }, index) => {
-    const paramName = `qualifierValue${index}`
-    const colName = NodeDefTable.getColumnName(nodeDef)
-    recordsSelectWhereConditions.push(`"${colName}" = $/${paramName}/`)
-    const columnValue = NodeDef.isCode(nodeDef) ? value?.code : value
-    qualifierFilterParams[paramName] = columnValue
-  })
+  const buildQualifierFiltersCondition = (filters, setIndex) =>
+    filters
+      .map(({ nodeDef, value }, index) => {
+        const paramName = `qualifierValue${setIndex}_${index}`
+        const colName = NodeDefTable.getColumnName(nodeDef)
+        qualifierFilterParams[paramName] = NodeDef.isCode(nodeDef) ? value?.code : value
+        return `"${colName}" = $/${paramName}/`
+      })
+      .join(' AND ')
+  const ownQualifiersCondition = buildQualifierFiltersCondition(qualifierNodeDefFilters, 0)
+  const readableQualifiersConditions = readableFilterSets.map((filters, index) =>
+    buildQualifierFiltersCondition(filters, index + 1)
+  )
+  if (ownQualifiersCondition) {
+    recordsSelectWhereConditions.push(
+      [ownQualifiersCondition, ...readableQualifiersConditions].map((condition) => `(${condition})`).join(' OR ')
+    )
+  }
+  // records of the readable groups only (not matching the user's own group) can be read but not edited
+  const readOnlySelect =
+    readableQualifiersConditions.length > 0 ? `, NOT COALESCE((${ownQualifiersCondition}), FALSE) AS read_only` : ''
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
@@ -410,7 +430,7 @@ export const fetchRecordsSummaryBySurveyId = async (
             : ''
         }
     )
-    SELECT * FROM records
+    SELECT *${readOnlySelect} FROM records
     
     ${whereCondition}
 

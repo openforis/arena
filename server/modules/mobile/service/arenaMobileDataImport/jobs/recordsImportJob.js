@@ -13,6 +13,7 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
@@ -189,6 +190,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
+  async recordMatchesUserGroupQualifiers(record) {
+    const { context, tx, user } = this
+    const { survey } = context
+    this.userQualifierFilters ??= await SurveyManager.fetchUserQualifierFilters({ user, survey }, tx)
+    return RecordManager.recordMatchesQualifierFilters({ survey, record, qualifierFilters: this.userQualifierFilters })
+  }
+
   async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null, merge = false } = {}) {
     const { context, currentRecord: record, tx, user } = this
     const { survey, surveyId } = context
@@ -208,6 +216,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
     if (!Authorizer.canEditRecord(user, recordTarget)) {
       const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
+    }
+    // records of other user groups (e.g. downloaded read-only) cannot be updated
+    if (!(await this.recordMatchesUserGroupQualifiers(recordTarget))) {
+      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      throw new SystemError('dataImport.recordOfAnotherUserGroup', { recordUuid, recordKeyValues })
     }
 
     const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }

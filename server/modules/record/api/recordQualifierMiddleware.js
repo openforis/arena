@@ -28,7 +28,8 @@ const _fetchSurveyByCycleCached =
     return surveysByCycle.get(cycle)
   }
 
-const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, pendingNode, fetchSurveyByCycle }) => {
+// whether the record can be read and edited by the user, according to the user's group qualifiers
+const _determineRecordAccessByUserGroup = async ({ user, surveyId, recordUuid, pendingNode, fetchSurveyByCycle }) => {
   const record = await RecordManager.fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid,
@@ -36,11 +37,11 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
     includeRefData: false,
   })
   // let the actual route handler deal with a missing record (e.g. respond with 404)
-  if (!record) return true
+  if (!record) return { readable: true, editable: true }
 
   const survey = await fetchSurveyByCycle(Record.getCycle(record))
 
-  const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey })
+  const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
 
   const canEditQualifierValue = Authorizer.canEditQualifierAttributeValue(user, Survey.getSurveyInfo(survey))
 
@@ -48,17 +49,81 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
   // was fetched with fetchForUpdate: false, so its _nodesIndex hasn't been built, and assocNode would
   // initialize one containing only pendingNode, shadowing every other already-persisted node (see
   // recordMatchesQualifierFilters' jsdoc for details)
-  return RecordManager.recordMatchesQualifierFilters({
+  const editable = RecordManager.recordMatchesQualifierFilters({
     survey,
     record,
-    qualifierFilters,
+    qualifierFilters: own,
     pendingNode,
     canEditQualifierValue,
   })
+  return {
+    editable,
+    readable:
+      editable ||
+      readable.some((qualifierFilters) =>
+        RecordManager.recordMatchesQualifierFilters({ survey, record, qualifierFilters })
+      ),
+  }
 }
 
+const _requireRecordAccess =
+  ({ accessType }) =>
+  async (req, res, next) => {
+    try {
+      const { surveyId, recordUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+      const pendingNode = accessType === 'editable' ? Request.getJsonParam(req, 'node') : null
+
+      const surveysByCycle = new Map()
+      const access = await _determineRecordAccessByUserGroup({
+        user,
+        surveyId,
+        recordUuid,
+        pendingNode,
+        fetchSurveyByCycle: _fetchSurveyByCycleCached({ surveyId, surveysByCycle }),
+      })
+      if (access[accessType]) {
+        next()
+        return
+      }
+      sendForbiddenError(req, res)
+    } catch (error) {
+      next(error)
+    }
+  }
+
+const _requireRecordsAccess =
+  ({ accessType }) =>
+  async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const recordUuids = Requests.getArrayParam('recordUuids')(req)
+
+      if (recordUuids.length === 0) {
+        next()
+        return
+      }
+
+      const user = Request.getUser(req)
+
+      const surveysByCycle = new Map()
+      const fetchSurveyByCycle = _fetchSurveyByCycleCached({ surveyId, surveysByCycle })
+
+      for (const recordUuid of recordUuids) {
+        const access = await _determineRecordAccessByUserGroup({ user, surveyId, recordUuid, fetchSurveyByCycle })
+        if (!access[accessType]) {
+          sendForbiddenError(req, res)
+          return
+        }
+      }
+      next()
+    } catch (error) {
+      next(error)
+    }
+  }
+
 /**
- * Rejects requests targeting a single record that doesn't belong to the current user's group
+ * Rejects requests modifying a single record that doesn't belong to the current user's group
  * (based on the record's qualifier attribute values), when the user belongs to a UserGroup with qualifiers.
  * If the request carries a node to be created/updated (e.g. a node edit request), the node's value is
  * applied to the record before checking, so an edit setting a qualifier attribute to a value outside the
@@ -66,30 +131,9 @@ const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, recordUuid, p
  * @param {object} req - Express request.
  * @param {object} res - Express response.
  * @param {Function} next - Express next middleware.
+ * @returns {Promise<void>} - Resolves when the request has been passed on or rejected.
  */
-export const requireRecordMatchesUserGroupQualifiers = async (req, res, next) => {
-  try {
-    const { surveyId, recordUuid } = Request.getParams(req)
-    const user = Request.getUser(req)
-    const pendingNode = Request.getJsonParam(req, 'node')
-
-    const surveysByCycle = new Map()
-    const matches = await _recordMatchesUserGroupQualifiers({
-      user,
-      surveyId,
-      recordUuid,
-      pendingNode,
-      fetchSurveyByCycle: _fetchSurveyByCycleCached({ surveyId, surveysByCycle }),
-    })
-    if (matches) {
-      next()
-      return
-    }
-    sendForbiddenError(req, res)
-  } catch (error) {
-    next(error)
-  }
-}
+export const requireRecordMatchesUserGroupQualifiers = _requireRecordAccess({ accessType: 'editable' })
 
 /**
  * Plural variant of requireRecordMatchesUserGroupQualifiers, for batch endpoints:
@@ -97,31 +141,25 @@ export const requireRecordMatchesUserGroupQualifiers = async (req, res, next) =>
  * @param {object} req - Express request.
  * @param {object} res - Express response.
  * @param {Function} next - Express next middleware.
+ * @returns {Promise<void>} - Resolves when the request has been passed on or rejected.
  */
-export const requireRecordsMatchUserGroupQualifiers = async (req, res, next) => {
-  try {
-    const { surveyId } = Request.getParams(req)
-    const recordUuids = Requests.getArrayParam('recordUuids')(req)
+export const requireRecordsMatchUserGroupQualifiers = _requireRecordsAccess({ accessType: 'editable' })
 
-    if (recordUuids.length === 0) {
-      next()
-      return
-    }
+/**
+ * Rejects requests reading a single record that belongs neither to the current user's group
+ * nor to one of the groups whose records the user's group can read (UserGroup readableGroupUuids).
+ * @param {object} req - Express request.
+ * @param {object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ * @returns {Promise<void>} - Resolves when the request has been passed on or rejected.
+ */
+export const requireRecordReadableByUserGroup = _requireRecordAccess({ accessType: 'readable' })
 
-    const user = Request.getUser(req)
-
-    const surveysByCycle = new Map()
-    const fetchSurveyByCycle = _fetchSurveyByCycleCached({ surveyId, surveysByCycle })
-
-    for (const recordUuid of recordUuids) {
-      const matches = await _recordMatchesUserGroupQualifiers({ user, surveyId, recordUuid, fetchSurveyByCycle })
-      if (!matches) {
-        sendForbiddenError(req, res)
-        return
-      }
-    }
-    next()
-  } catch (error) {
-    next(error)
-  }
-}
+/**
+ * Plural variant of requireRecordReadableByUserGroup, for batch endpoints.
+ * @param {object} req - Express request.
+ * @param {object} res - Express response.
+ * @param {Function} next - Express next middleware.
+ * @returns {Promise<void>} - Resolves when the request has been passed on or rejected.
+ */
+export const requireRecordsReadableByUserGroup = _requireRecordsAccess({ accessType: 'readable' })

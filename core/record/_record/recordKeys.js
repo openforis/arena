@@ -20,6 +20,8 @@ export const keys = {
   filesCount: 'filesCount',
   filesSize: 'filesSize',
   filesMissing: 'filesMissing',
+  // record of a user group the current user can only read (see UserGroup readableGroupUuids)
+  readOnly: 'readOnly',
 
   // temporary properties
   keysObj: 'keysObj',

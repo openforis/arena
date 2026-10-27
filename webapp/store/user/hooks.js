@@ -66,7 +66,7 @@ export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(
 // ====== Auth / Records
 export const useAuthCanCreateRecord = () => Authorizer.canCreateRecord(useUser(), useSurveyInfo())
 const _canEditRecord = ({ user, surveyInfo, record }) => {
-  const canEdit = Authorizer.canEditRecord(user, record)
+  const canEdit = Authorizer.canEditRecord(user, record) && !Record.isReadOnly(record)
   return canEdit && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 }
 export const useAuthCanEditRecords = (records) => {

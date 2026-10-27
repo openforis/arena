@@ -39,7 +39,9 @@ import {
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
   requireRecordMatchesUserGroupQualifiers,
+  requireRecordReadableByUserGroup,
   requireRecordsMatchUserGroupQualifiers,
+  requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
@@ -183,7 +185,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -316,7 +318,7 @@ export const init = (app) => {
     '/survey/:surveyId/records/export',
     requireRecordsExportPermission,
     requireMobileAppMinVersion(minMobileAppVersionRecordsDownload),
-    requireRecordsMatchUserGroupQualifiers,
+    requireRecordsReadableByUserGroup,
     startSelectedRecordsExport
   )
 
@@ -324,7 +326,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/records/export-selected',
     requireRecordsExportPermission,
-    requireRecordsMatchUserGroupQualifiers,
+    requireRecordsReadableByUserGroup,
     startSelectedRecordsExport
   )
 
@@ -345,6 +347,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, nodeUuid } = Request.getParams(req)
@@ -361,6 +364,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       let tempFilePath
       try {
@@ -471,55 +475,65 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
-        Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/docx',
+    requireRecordViewPermission,
+    requireRecordReadableByUserGroup,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordDocx({
-        user,
-        surveyId,
-        recordUuid,
-        lang,
-        exportScope,
-        entityDefUuid,
-        entityNodeUuid,
-        orientation,
-        includeQrCode: includeQrCode === true,
-        serverUrl,
-        outputStream: res,
-      })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordDocx({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
-        Request.getParams(req)
-      const serverUrl = Request.getPublicServerUrl(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/pdf',
+    requireRecordViewPermission,
+    requireRecordReadableByUserGroup,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordPdf({
-        user,
-        surveyId,
-        recordUuid,
-        lang,
-        exportScope,
-        entityDefUuid,
-        entityNodeUuid,
-        orientation,
-        includeQrCode: includeQrCode === true,
-        serverUrl,
-        outputStream: res,
-      })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordPdf({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   // ==== UPDATE
 
@@ -546,7 +560,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/record/:recordUuid/checkin',
     requireRecordViewPermission,
-    requireRecordMatchesUserGroupQualifiers,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid, draft, timezoneOffset, lang } = Request.getParams(req)

@@ -72,6 +72,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   let summaryDefs = null
   let survey = null
   let qualifierNodeDefFilters = []
+  let readableQualifierNodeDefFilterSets = []
   if (includeRootKeyValues) {
     // when fetching summary defs, use the cycle param if provided, otherwise use the survey default cycle
     const cycle = cycleParam ?? Survey.getDefaultCycleKey(surveyInfo)
@@ -79,7 +80,9 @@ export const fetchRecordsSummaryBySurveyId = async (
     summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
     nodeDefKeys = Survey.getNodeDefRootKeysSorted({ cycle })(survey)
     if (user) {
-      qualifierNodeDefFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, client)
+      const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey }, client)
+      qualifierNodeDefFilters = own
+      readableQualifierNodeDefFilterSets = readable
     }
   }
 
@@ -100,6 +103,7 @@ export const fetchRecordsSummaryBySurveyId = async (
       recordUuids: recordUuid ? [recordUuid] : null,
       includePreview,
       qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
     },
     client
   )
@@ -162,10 +166,22 @@ export const countRecordsBySurveyId = async (
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft: nodeDefsDraft }, client)
   const nodeDefKeys = Survey.getNodeDefRootKeys(survey)
   const summaryDefs = Survey.getRootSummaryDefs({ cycle })(survey)
-  const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }, client) : []
+  const { own: qualifierNodeDefFilters, readable: readableQualifierNodeDefFilterSets } = user
+    ? await SurveyManager.fetchUserGroupAccessFilters({ user, survey }, client)
+    : { own: [], readable: [] }
 
   return RecordRepository.countRecordsBySurveyId(
-    { surveyId, cycle, search, nodeDefKeys, summaryDefs, nodeDefRoot, ownerUuid, qualifierNodeDefFilters },
+    {
+      surveyId,
+      cycle,
+      search,
+      nodeDefKeys,
+      summaryDefs,
+      nodeDefRoot,
+      ownerUuid,
+      qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
+    },
     client
   )
 }

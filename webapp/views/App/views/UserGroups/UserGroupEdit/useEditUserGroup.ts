@@ -37,6 +37,7 @@ interface UseEditUserGroupResult {
   onNameChange: (name: string) => void
   onLabelsChange: (labels: Record<string, string>) => void
   onQualifiersChange: (qualifiers: Array<{ name: string; value: string }>) => void
+  onReadableGroupUuidsChange: (readableGroupUuids: string[]) => void
   onSave: () => Promise<void>
   onDelete: () => void
 }
@@ -145,6 +146,12 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
     [updateAndValidate, userGroup]
   )
 
+  const onReadableGroupUuidsChange = useCallback(
+    (readableGroupUuids: string[]) =>
+      updateAndValidate(UserGroup.assocReadableGroupUuids(readableGroupUuids)(userGroup)),
+    [updateAndValidate, userGroup]
+  )
+
   const onSave = useCallback(async () => {
     try {
       dispatch(LoaderActions.showLoader())
@@ -204,6 +211,7 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
     onNameChange,
     onLabelsChange,
     onQualifiersChange,
+    onReadableGroupUuidsChange,
     onSave,
     onDelete,
   }
