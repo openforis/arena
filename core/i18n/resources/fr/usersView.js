@@ -77,6 +77,9 @@ $t(common.pressRefreshToReloadPage)`,
     confirmReassign:
       '{{userName}} est actuellement dans le groupe "{{groupName}}". Le déplacer vers ce groupe à la place ?',
     notFound: 'Groupe introuvable',
+    readableGroups: 'Peut consulter les enregistrements de',
+    readableGroupsInfo:
+      'Les membres de ce groupe peuvent consulter, exporter et télécharger (aussi dans Arena Mobile) les enregistrements des groupes sélectionnés, mais ne peuvent pas les modifier',
   },
   updateUserConfirmation: "L'utilisateur {{name}} a été mis à jour",
   userNotInvitedToAnySurvey: `Utilisateur non invité à aucun formulaire`,

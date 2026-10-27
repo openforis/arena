@@ -23,6 +23,7 @@ export default {
       '以前アップロードされたファイルが見つかりません。有効期限が切れた可能性があります。再度アップロードしてください。',
     recordMergeWithSameKeysNotAllowed:
       '記録「{{recordKeyValues}}」をインポートできません：同じキーを持つ別の記録が既に存在し、この調査では同じキーを持つ記録の統合が許可されていません',
+    recordOfAnotherUserGroup: '記録「{{recordKeyValues}}」は別のユーザーグループに属しているため更新できません',
     recordOwnedByAnotherUser: '記録「{{recordKeyValues}}」は別のユーザーが所有しているため更新できません',
   },
   entryDataNotFound: '入力データが見つかりません：{{entryName}}',
