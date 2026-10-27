@@ -29,8 +29,9 @@ runs:
         git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -m "App version $APP_VERSION"
 
     - name: Install Heroku CLI
+      # pinned version from the npm registry (integrity checked), instead of piping a downloaded install script to sh
       shell: bash
-      run: curl https://cli-assets.heroku.com/install.sh | sh
+      run: npm install -g --ignore-scripts heroku@11.12.0
 
     - name: Deploy to Heroku
       uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
