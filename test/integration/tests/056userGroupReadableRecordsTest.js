@@ -82,7 +82,8 @@ describe('User group readable groups', () => {
       [3, 'contractor_b'],
     ]
     for (const [clusterNo, team] of clusters) {
-      await RB.record(
+      // records stored one at a time (same survey RDB tables)
+      await /* NOSONAR */ RB.record(
         user,
         survey,
         RB.entity(entityName, RB.attribute('cluster_no', clusterNo), RB.attribute('team', team))
@@ -125,7 +126,7 @@ describe('User group readable groups', () => {
   test('own group records are editable, readable groups records are read-only, others are hidden', async () => {
     const summariesByClusterNo = await fetchSummariesByClusterNo()
 
-    expect(Object.keys(summariesByClusterNo).sort()).toEqual(['1', '2'])
+    expect(Object.keys(summariesByClusterNo).sort((a, b) => a.localeCompare(b))).toEqual(['1', '2'])
     expect(Record.isReadOnly(summariesByClusterNo[1])).toBe(false)
     expect(Record.isReadOnly(summariesByClusterNo[2])).toBe(true)
   })
