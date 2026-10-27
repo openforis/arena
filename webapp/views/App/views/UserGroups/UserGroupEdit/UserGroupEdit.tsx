@@ -80,12 +80,14 @@ const UserGroupEdit = (): React.ReactElement | null => {
         readOnly={!canEdit}
       />
 
-      <UserGroupReadableGroupsEditor
-        otherGroups={otherGroupsInSurvey}
-        readableGroupUuids={UserGroup.getReadableGroupUuids(userGroup)}
-        onChange={onReadableGroupUuidsChange}
-        readOnly={!canEdit}
-      />
+      {otherGroupsInSurvey.length > 0 && (
+        <UserGroupReadableGroupsEditor
+          otherGroups={otherGroupsInSurvey}
+          readableGroupUuids={UserGroup.getReadableGroupUuids(userGroup)}
+          onChange={onReadableGroupUuidsChange}
+          readOnly={!canEdit}
+        />
+      )}
 
       {groupUuid && <UserGroupMembersEditor groupUuid={groupUuid} canEdit={canEdit} />}
 
