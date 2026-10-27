@@ -39,6 +39,8 @@ export default {
       'Le fichier précédemment téléchargé est introuvable ; il a peut-être expiré. Veuillez le télécharger à nouveau.',
     recordMergeWithSameKeysNotAllowed:
       'Impossible d’importer l’enregistrement "{{recordKeyValues}}" : un autre enregistrement avec les mêmes clés existe déjà et la fusion des enregistrements avec les mêmes clés n’est pas autorisée dans cette enquête',
+    recordOfAnotherUserGroup:
+      'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre groupe d’utilisateurs',
     recordOwnedByAnotherUser:
       'Impossible de mettre à jour l’enregistrement "{{recordKeyValues}}" car il appartient à un autre utilisateur',
   },

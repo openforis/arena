@@ -707,4 +707,4 @@ export const deleteAllActivityLog = async ({ surveyId }, client = db) =>
 
 export const { dropSurveySchema } = SurveyRepository
 
-export { fetchUserQualifierFilters } from './surveyUserGroupQualifierFilters'
+export { fetchUserGroupAccessFilters, fetchUserQualifierFilters } from './surveyUserGroupQualifierFilters'

@@ -200,10 +200,12 @@ const _determineRecordUuidsFilter = async ({
   user,
 }) => {
   // recordUuids explicitly selected by the user are already checked against qualifiers by
-  // requireRecordsMatchUserGroupQualifiers, at the API layer
+  // requireRecordsReadableByUserGroup, at the API layer
   if (recordUuids) return recordUuids
 
-  const qualifierNodeDefFilters = user ? await SurveyManager.fetchUserQualifierFilters({ user, survey }) : []
+  const { own: qualifierNodeDefFilters, readable: readableQualifierNodeDefFilterSets } = user
+    ? await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
+    : { own: [], readable: [] }
 
   if (
     Objects.isEmpty(search) &&
@@ -223,6 +225,7 @@ const _determineRecordUuidsFilter = async ({
     cycle,
     search,
     qualifierNodeDefFilters,
+    readableQualifierNodeDefFilterSets,
   })
   if (recordsModifiedAfter) {
     recordsSummaries = recordsSummaries.filter((recordSummary) =>

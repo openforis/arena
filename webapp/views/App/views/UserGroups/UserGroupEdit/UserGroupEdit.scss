@@ -10,7 +10,7 @@
   // different grid ratios by default) so labels and input fields line up across rows.
   .form-item,
   .labels-editor.with-label {
-    grid-template-columns: 10rem 1fr;
+    grid-template-columns: 14rem 1fr;
     align-items: start;
     height: auto;
   }
@@ -21,7 +21,7 @@
     gap: 0.25rem;
 
     .form-item {
-      grid-template-columns: 10rem 1fr 1fr auto;
+      grid-template-columns: 14rem 1fr 1fr auto;
     }
 
     > .btn {

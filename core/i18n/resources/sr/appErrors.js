@@ -24,6 +24,7 @@ export default {
       'Prethodno otpremljeni fajl više nije moguće pronaći; možda je istekao. Molimo otpremite ga ponovo.',
     recordMergeWithSameKeysNotAllowed:
       'Nije moguće uvesti zapis "{{recordKeyValues}}": drugi zapis sa istim ključevima već postoji, a spajanje zapisa sa istim ključevima nije dozvoljeno u ovom istraživanju',
+    recordOfAnotherUserGroup: 'Nije moguće ažurirati zapis "{{recordKeyValues}}" jer pripada drugoj grupi korisnika',
     recordOwnedByAnotherUser: 'Nije moguće ažurirati zapis "{{recordKeyValues}}" jer je njegov vlasnik drugi korisnik',
   },
   entryDataNotFound: 'Podaci za unos nisu pronađeni: {{entryName}}',

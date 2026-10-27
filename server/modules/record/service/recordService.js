@@ -271,6 +271,12 @@ export const deleteRecordsPreview = async (olderThan24Hours = false) => {
   return count
 }
 
+const _recordMatchesUserGroupQualifiers = async ({ user, surveyId, cycle, draft, record }) => {
+  const surveyWithDefs = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle, draft })
+  const qualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey: surveyWithDefs })
+  return RecordManager.recordMatchesQualifierFilters({ survey: surveyWithDefs, record, qualifierFilters })
+}
+
 export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, timezoneOffset, lang }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const surveyInfo = Survey.getSurveyInfo(survey)
@@ -285,7 +291,10 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
 
   await _assocSocketBestEffort({ recordUuid, socketId })
 
-  if (preview || (Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user, record))) {
+  // records of the groups the user's group can only read (see UserGroup readableGroupUuids)
+  const readOnly = !preview && !(await _recordMatchesUserGroupQualifiers({ user, surveyId, cycle, draft, record }))
+
+  if (preview || (Survey.isPublished(surveyInfo) && !readOnly && Authorizer.canEditRecord(user, record))) {
     // Create record thread
     const thread = RecordsUpdateThreadService.getOrCreatedThread()
     // initialize record if empty
@@ -303,7 +312,7 @@ export const checkIn = async ({ socketId, user, surveyId, recordUuid, draft, tim
     }
   }
 
-  return record
+  return readOnly ? Record.assocReadOnly(true)(record) : record
 }
 
 export const checkOut = async (socketId, user, surveyId, recordUuid) => {

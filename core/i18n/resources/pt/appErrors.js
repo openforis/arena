@@ -35,6 +35,8 @@ export default {
       'O arquivo enviado anteriormente não foi encontrado; ele pode ter expirado. Por favor, envie-o novamente.',
     recordMergeWithSameKeysNotAllowed:
       'Não é possível importar o registro "{{recordKeyValues}}": já existe outro registro com as mesmas chaves e a mesclagem de registros com as mesmas chaves não é permitida nesta pesquisa',
+    recordOfAnotherUserGroup:
+      'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro grupo de usuários',
     recordOwnedByAnotherUser: 'Não é possível atualizar o registro "{{recordKeyValues}}" pois pertence a outro usuário',
   },
   entryDataNotFound: 'Dados de entrada não encontrados: {{entryName}}',

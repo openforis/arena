@@ -151,8 +151,10 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         key: 'action-buttons',
         className: 'action-buttons-col',
         renderItem: ({ item: record, itemPosition }) => {
-          const canEdit = Authorizer.canEditRecord(user, record)
-          const canDelete = Authorizer.canDeleteRecord(user, record)
+          // records of other user groups can only be viewed
+          const readOnly = Record.isReadOnly(record)
+          const canEdit = !readOnly && Authorizer.canEditRecord(user, record)
+          const canDelete = !readOnly && Authorizer.canDeleteRecord(user, record)
           return (
             <>
               <Button
