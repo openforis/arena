@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import path from 'node:path'
 import fs from 'node:fs'
-import { execSync } from 'node:child_process'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
@@ -13,30 +12,14 @@ import CopyPlugin from 'copy-webpack-plugin'
 
 import { v4 as uuidv4 } from 'uuid'
 
-const config = {
-  mode: process.env.NODE_ENV || 'development',
-  path: path.resolve(__dirname, 'dist'),
-}
-
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 const appVersionFile = path.resolve(__dirname, '.app-version')
 
-const readGitDescribe = () => {
-  try {
-    return execSync('git describe --always --tags', { stdio: ['ignore', 'pipe', 'ignore'] })
-      .toString()
-      .trim()
-  } catch {
-    return undefined
-  }
-}
-
-// written by the deploy workflows (no .git in Heroku/Docker builds); takes precedence over a possibly stale APP_VERSION
+// written by the deploy workflows (no .git in Heroku/Docker builds); takes precedence over a possibly stale APP_VERSION.
+// No git fallback in local builds: without a version, surveys are stamped with the latest data migration version.
 export const appVersion =
-  (fs.existsSync(appVersionFile) ? fs.readFileSync(appVersionFile, 'utf8').trim() : null) ||
-  process.env.APP_VERSION ||
-  readGitDescribe()
+  (fs.existsSync(appVersionFile) ? fs.readFileSync(appVersionFile, 'utf8').trim() : null) || process.env.APP_VERSION
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
