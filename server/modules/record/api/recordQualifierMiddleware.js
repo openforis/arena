@@ -17,19 +17,27 @@ const sendForbiddenError = (req, res) => {
   res.status(StatusCodes.FORBIDDEN).send(JSON.stringify(error))
 }
 
-// Survey (with node defs), keyed by cycle, cached for the lifetime of a single request:
-// avoids refetching it once per record uuid when checking a batch of records in the same cycle.
-const _fetchSurveyByCycleCached =
-  ({ surveyId, surveysByCycle }) =>
+// Survey (with node defs) and user group access filters, keyed by cycle, cached for the lifetime of a single
+// request: avoids refetching them once per record uuid when checking a batch of records in the same cycle.
+const _fetchSurveyAndAccessFiltersByCycleCached =
+  ({ surveyId, user, cacheByCycle }) =>
   async (cycle) => {
-    if (!surveysByCycle.has(cycle)) {
-      surveysByCycle.set(cycle, await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle }))
+    if (!cacheByCycle.has(cycle)) {
+      const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+      const accessFilters = await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
+      cacheByCycle.set(cycle, { survey, accessFilters })
     }
-    return surveysByCycle.get(cycle)
+    return cacheByCycle.get(cycle)
   }
 
 // whether the record can be read and edited by the user, according to the user's group qualifiers
-const _determineRecordAccessByUserGroup = async ({ user, surveyId, recordUuid, pendingNode, fetchSurveyByCycle }) => {
+const _determineRecordAccessByUserGroup = async ({
+  user,
+  surveyId,
+  recordUuid,
+  pendingNode,
+  fetchSurveyAndAccessFiltersByCycle,
+}) => {
   const record = await RecordManager.fetchRecordAndNodesByUuid({
     surveyId,
     recordUuid,
@@ -39,9 +47,8 @@ const _determineRecordAccessByUserGroup = async ({ user, surveyId, recordUuid, p
   // let the actual route handler deal with a missing record (e.g. respond with 404)
   if (!record) return { readable: true, editable: true }
 
-  const survey = await fetchSurveyByCycle(Record.getCycle(record))
-
-  const { own, readable } = await SurveyManager.fetchUserGroupAccessFilters({ user, survey })
+  const { survey, accessFilters } = await fetchSurveyAndAccessFiltersByCycle(Record.getCycle(record))
+  const { own, readable } = accessFilters
 
   const canEditQualifierValue = Authorizer.canEditQualifierAttributeValue(user, Survey.getSurveyInfo(survey))
 
@@ -74,13 +81,16 @@ const _requireRecordAccess =
       const user = Request.getUser(req)
       const pendingNode = accessType === 'editable' ? Request.getJsonParam(req, 'node') : null
 
-      const surveysByCycle = new Map()
       const access = await _determineRecordAccessByUserGroup({
         user,
         surveyId,
         recordUuid,
         pendingNode,
-        fetchSurveyByCycle: _fetchSurveyByCycleCached({ surveyId, surveysByCycle }),
+        fetchSurveyAndAccessFiltersByCycle: _fetchSurveyAndAccessFiltersByCycleCached({
+          surveyId,
+          user,
+          cacheByCycle: new Map(),
+        }),
       })
       if (access[accessType]) {
         next()
@@ -106,11 +116,19 @@ const _requireRecordsAccess =
 
       const user = Request.getUser(req)
 
-      const surveysByCycle = new Map()
-      const fetchSurveyByCycle = _fetchSurveyByCycleCached({ surveyId, surveysByCycle })
+      const fetchSurveyAndAccessFiltersByCycle = _fetchSurveyAndAccessFiltersByCycleCached({
+        surveyId,
+        user,
+        cacheByCycle: new Map(),
+      })
 
       for (const recordUuid of recordUuids) {
-        const access = await _determineRecordAccessByUserGroup({ user, surveyId, recordUuid, fetchSurveyByCycle })
+        const access = await _determineRecordAccessByUserGroup({
+          user,
+          surveyId,
+          recordUuid,
+          fetchSurveyAndAccessFiltersByCycle,
+        })
         if (!access[accessType]) {
           sendForbiddenError(req, res)
           return
