@@ -310,3 +310,6 @@ test/e2e/playwright-report/
 infra/k8s/overlays/*/secrets.env
 infra/k8s/overlays/*/db.env
 infra/k8s/overlays/*/rstudio.htpasswd
+
+# app version written by the deploy workflows (read at build time)
+.app-version

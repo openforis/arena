@@ -1,4 +1,5 @@
 declare const __BUST__: string
+declare const __APP_VERSION__: string
 
 declare module '*.css' {
   const content: Record<string, string>

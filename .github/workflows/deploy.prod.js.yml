@@ -16,32 +16,11 @@ jobs:
           fetch-depth: 0 # fetch all tags, default 1
           persist-credentials: false # avoid leaking the token into .git/config (COPY'd into the Docker image)
 
-      - name: Use Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: ./.github/actions/deploy-heroku
         with:
-          node-version: '24.22.1'
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn install --immutable
-
-      - name: Get the version
-        id: app_version
-        run: echo "APP_VERSION=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
-
-      - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
-
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Deploy to Heroku
-        uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME_PRODUCTION}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-        env:
-          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME_PRODUCTION }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}
 
   push_to_docker_hub:
     if: ${{ startsWith(github.ref, 'refs/tags/v') }}
@@ -53,20 +32,9 @@ jobs:
           fetch-depth: 0 # fetch all tags, default 1
           persist-credentials: false # avoid leaking the token into .git/config (COPY'd into the Docker image)
 
-      - name: Use Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: '24.22.1'
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn install --immutable
-
-      - name: Get the version
+      - name: App version
         id: app_version
-        run: echo "APP_VERSION=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
-
-      - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
+        uses: ./.github/actions/app-version
 
       - name: Login to Docker Hub
         uses: docker/login-action@81c6f93d4bc991e510b342a00b419b3bb4efc5c6 # v4.7.0
@@ -85,4 +53,4 @@ jobs:
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/arena:latest
-            ${{ secrets.DOCKER_HUB_USERNAME }}/arena:${{ steps.app_version.outputs.APP_VERSION }}
+            ${{ secrets.DOCKER_HUB_USERNAME }}/arena:${{ steps.app_version.outputs.version }}

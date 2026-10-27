@@ -1,0 +1,40 @@
+name: Deploy to Heroku
+description: >
+  Deploys the checked out repository to a Heroku app, with the app version (see the app-version action) included in
+  the pushed code. Requires the repository to be checked out with its tags (actions/checkout with `fetch-depth: 0`).
+inputs:
+  heroku_api_key:
+    description: Heroku API key
+    required: true
+  heroku_app_name:
+    description: Name of the Heroku app to deploy to
+    required: true
+  heroku_email:
+    description: Email of the Heroku account
+    required: true
+runs:
+  using: composite
+  steps:
+    - name: App version
+      id: app_version
+      uses: ./.github/actions/app-version
+
+    - name: Commit the version file
+      # committed locally only, to be included in the push to Heroku
+      shell: bash
+      env:
+        APP_VERSION: ${{ steps.app_version.outputs.version }}
+      run: |
+        git add -f .app-version
+        git -c user.name="github-actions" -c user.email="github-actions@users.noreply.github.com" commit -m "App version $APP_VERSION"
+
+    - name: Install Heroku CLI
+      shell: bash
+      run: curl https://cli-assets.heroku.com/install.sh | sh
+
+    - name: Deploy to Heroku
+      uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
+      with:
+        heroku_api_key: ${{ inputs.heroku_api_key }}
+        heroku_app_name: ${{ inputs.heroku_app_name }}
+        heroku_email: ${{ inputs.heroku_email }}

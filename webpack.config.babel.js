@@ -1,12 +1,12 @@
 import 'dotenv/config'
 import path from 'node:path'
 import fs from 'node:fs'
+import { execSync } from 'node:child_process'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 import webpack from 'webpack'
 import HtmlWebpackPlugin from 'html-webpack-plugin'
 import MiniCssExtractPlugin from 'mini-css-extract-plugin'
 import OptimizeCSSAssetsPlugin from 'optimize-css-assets-webpack-plugin'
-import { GitRevisionPlugin } from 'git-revision-webpack-plugin'
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer'
 import TerserPlugin from 'terser-webpack-plugin'
 import CopyPlugin from 'copy-webpack-plugin'
@@ -20,7 +20,23 @@ const config = {
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const gitRevisionPlugin = config.mode === 'production' ? null : new GitRevisionPlugin()
+const appVersionFile = path.resolve(__dirname, '.app-version')
+
+const readGitDescribe = () => {
+  try {
+    return execSync('git describe --always --tags', { stdio: ['ignore', 'pipe', 'ignore'] })
+      .toString()
+      .trim()
+  } catch {
+    return undefined
+  }
+}
+
+// written by the deploy workflows (no .git in Heroku/Docker builds); takes precedence over a possibly stale APP_VERSION
+export const appVersion =
+  (fs.existsSync(appVersionFile) ? fs.readFileSync(appVersionFile, 'utf8').trim() : null) ||
+  process.env.APP_VERSION ||
+  readGitDescribe()
 
 // Remove mini-css-extract-plugin log spam
 // See: https://github.com/webpack-contrib/extract-text-webpack-plugin/issues/97
@@ -48,7 +64,6 @@ const mobilePreviewUrlDefault = fs.existsSync(path.resolve(__dirname, 'mobile-pr
 const environment = process.env.NODE_ENV ?? 'development'
 
 const plugins = [
-  ...(gitRevisionPlugin ? [gitRevisionPlugin] : []),
   new MiniCssExtractPlugin({
     filename: 'styles-[fullhash].css',
     ignoreOrder: true,
@@ -62,9 +77,7 @@ const plugins = [
       env: {
         NODE_ENV: JSON.stringify(environment),
         ALLOW_USER_ACCESS_REQUEST: JSON.stringify(process.env.ALLOW_USER_ACCESS_REQUEST),
-        APP_VERSION: gitRevisionPlugin
-          ? JSON.stringify(gitRevisionPlugin.version())
-          : JSON.stringify(process.env.APP_VERSION),
+        APP_VERSION: JSON.stringify(appVersion),
         RECAPTCHA_ENABLED: JSON.stringify(process.env.RECAPTCHA_ENABLED),
         RECAPTCHA_SITE_KEY: JSON.stringify(process.env.RECAPTCHA_SITE_KEY),
         RSTUDIO_DOWNLOAD_SERVER_URL: JSON.stringify(process.env.RSTUDIO_DOWNLOAD_SERVER_URL),
