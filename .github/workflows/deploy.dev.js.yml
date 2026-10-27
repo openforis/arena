@@ -14,29 +14,8 @@ jobs:
           fetch-depth: 0 # fetch all tags, default 1
           persist-credentials: false # this job never pushes back to git, so don't leave a token in .git/config
 
-      - name: Use Node.js
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+      - uses: ./.github/actions/deploy-heroku
         with:
-          node-version: '24.22.1'
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn install --immutable
-
-      - name: Get the version
-        id: app_version
-        run: echo "APP_VERSION=$(git describe --always --tags)" >> "$GITHUB_OUTPUT"
-
-      - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
-
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Deploy to Heroku (dev)
-        uses: akhileshns/heroku-deploy@1b080913896a5d6d44a18e9e208f8eb1fee9b0f7 # v3.15.15
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME_DEVELOPMENT}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-        env:
-          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME_DEVELOPMENT }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}

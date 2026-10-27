@@ -10674,15 +10674,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"git-revision-webpack-plugin@npm:^5.0.0":
-  version: 5.0.0
-  resolution: "git-revision-webpack-plugin@npm:5.0.0"
-  peerDependencies:
-    webpack: ^5.0.0
-  checksum: 10c0/7fcf5e48c704e1bbc4261425562f63bae675d67c051d885bb416c9e19f396261f14429e84a548adbef72b052da216ca8d92ffc5f3486a77973e26e732a2fe150
-  languageName: node
-  linkType: hard
-
 "gl-matrix@npm:^3.4.4":
   version: 3.4.4
   resolution: "gl-matrix@npm:3.4.4"
@@ -14286,7 +14277,6 @@ __metadata:
     fast-csv: "npm:^5.0.8"
     file-loader: "npm:^6.2.0"
     file-saver: "npm:^2.0.5"
-    git-revision-webpack-plugin: "npm:^5.0.0"
     glob: "npm:^13.0.6"
     heic-to: "npm:^1.6.6"
     html-replace-webpack-plugin: "npm:^2.6.0"

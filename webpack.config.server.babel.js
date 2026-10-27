@@ -1,7 +1,7 @@
 import * as path from 'node:path'
 import * as webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
-import mainConfig from './webpack.config.babel'
+import mainConfig, { appVersion } from './webpack.config.babel'
 
 const nodeEnv = process.env.NODE_ENV
 const arenaRoot = process.env.ARENA_ROOT || __dirname
@@ -14,6 +14,7 @@ const plugins = [
     'process.env.NODE_ENV': JSON.stringify(nodeEnv),
     'process.env.ARENA_ROOT': JSON.stringify(arenaRoot),
     'process.env.ARENA_DIST': JSON.stringify(arenaDist),
+    __APP_VERSION__: JSON.stringify(appVersion ?? ''),
   }),
   ...(isProduction ? [] : [new webpack.HotModuleReplacementPlugin()]),
 ]

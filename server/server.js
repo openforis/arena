@@ -1,4 +1,5 @@
 import 'dotenv/config'
+import './system/appVersionEnv'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
