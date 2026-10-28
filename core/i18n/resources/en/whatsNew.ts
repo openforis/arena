@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    areaOfInterest: {
+      title: 'Area of interest: check if a location is inside an area',
+      description: `In **Survey info → Map**, upload a polygon in GeoJSON format as the survey **area of interest**.
+
+The new expression function \`geoDistanceToAOIBoundary(location)\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. It works offline in **Arena Mobile** too.
+
+Thanks to **ASSEDEV – Alerte Environnement** for the request.`,
+    },
     mobilePreview: {
       title: 'Preview the survey in Arena Mobile',
       description: `In the form designer, open the menu next to the **Preview** button and choose **Preview (mobile)** to try the draft survey as it looks in **Arena Mobile**, on a phone or a tablet, in portrait or landscape orientation.

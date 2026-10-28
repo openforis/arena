@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    areaOfInterest: {
+      title: "Zone d'intérêt : vérifier si un emplacement se trouve dans une zone",
+      description: `Dans **Infos de l'enquête → Carte**, importez un polygone au format GeoJSON comme **zone d'intérêt** de l'enquête.
+
+La nouvelle fonction d'expression \`geoDistanceToAOIBoundary(location)\` renvoie la distance en mètres entre un emplacement et la limite de la zone : négative à l'intérieur, positive à l'extérieur. Comparez-la avec la précision GPS (\`location.accuracy\`) pour classer les emplacements comme à l'intérieur, à l'extérieur ou incertains, par exemple dans les valeurs par défaut d'attributs en lecture seule et dans des règles de validation de gravité *avertissement*. Elle fonctionne aussi hors ligne dans **Arena Mobile**.
+
+Merci à **ASSEDEV – Alerte Environnement** pour la demande.`,
+    },
     mobilePreview: {
       title: "Aperçu de l'enquête dans Arena Mobile",
       description: `Dans le concepteur de formulaires, ouvrez le menu à côté du bouton **Aperçu** et choisissez **Aperçu (mobile)** pour essayer l'enquête en brouillon telle qu'elle apparaît dans **Arena Mobile**, sur un téléphone ou une tablette, en orientation portrait ou paysage.

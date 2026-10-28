@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    areaOfInterest: {
+      title: 'Área de interés: comprobar si una ubicación está dentro de un área',
+      description: `En **Información de la encuesta → Mapa**, cargue un polígono en formato GeoJSON como **área de interés** de la encuesta.
+
+La nueva función de expresión \`geoDistanceToAOIBoundary(location)\` devuelve la distancia en metros entre una ubicación y el límite del área: negativa dentro, positiva fuera. Compárela con la precisión GPS (\`location.accuracy\`) para clasificar las ubicaciones como dentro, fuera o inciertas, por ejemplo en valores por defecto de atributos de solo lectura y en reglas de validación con severidad *advertencia*. También funciona sin conexión en **Arena Mobile**.
+
+Gracias a **ASSEDEV – Alerte Environnement** por la solicitud.`,
+    },
     mobilePreview: {
       title: 'Vista previa de la encuesta en Arena Mobile',
       description: `En el diseñador de formularios, abre el menú junto al botón **Vista previa** y elige **Vista previa (móvil)** para probar la encuesta en borrador tal como se ve en **Arena Mobile**, en un teléfono o una tableta, en orientación vertical u horizontal.
