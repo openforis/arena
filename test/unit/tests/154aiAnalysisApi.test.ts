@@ -124,9 +124,23 @@ describe('analysis API', () => {
     expect(items).toEqual([{ uuid: 'u1' }, { uuid: 'u2' }])
     expect(calls[0]).toMatchObject({
       url: '/api/survey/3/categories/c1/items',
-      params: { draft: false, search: 'pin', lang: 'en' },
+      params: { draft: false, search: 'pin', lang: 'en', limit: 100 },
     })
-    expect(calls[0].params).not.toHaveProperty('parentUuid')
+    expect(calls[0].params.parentUuid).toBeUndefined()
+  })
+
+  test('category items: a parent and a smaller limit are sent as given', async () => {
+    const { http, calls } = newFakeHttp(() => ({ items: {} }))
+    const api = createAnalysisApi({ http })
+    await api.fetchCategoryItems({
+      surveyId: 3,
+      categoryUuid: 'c1',
+      parentUuid: 'p1',
+      search: '',
+      draft: false,
+      limit: 5,
+    })
+    expect(calls[0].params).toMatchObject({ parentUuid: 'p1', limit: 5 })
   })
 })
 

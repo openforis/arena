@@ -1,6 +1,11 @@
 import axios from 'axios'
 
-import { analysisRequestTimeoutMs, withTimeoutError } from '@webapp/ai/tools/analysis/analysisApi'
+import {
+  analysisRequestTimeoutMs,
+  axiosAnalysisHttp,
+  createAnalysisApi,
+  withTimeoutError,
+} from '@webapp/ai/tools/analysis/analysisApi'
 
 export type ValidationReportFilter = {
   surveyId: number
@@ -68,6 +73,8 @@ const isRecordUnavailableError = (error: any): boolean => [403, 404].includes(er
 const getWithTimeout = (url: string, config: { params: object; signal?: AbortSignal }): Promise<{ data: any }> =>
   withTimeoutError(() => axios.get(url, { ...config, timeout: analysisRequestTimeoutMs }))
 
+const analysisApi = createAnalysisApi({ http: axiosAnalysisHttp })
+
 export const axiosCleaningApi: CleaningApi = {
   /**
    * Fetches a page of validation report rows.
@@ -124,13 +131,15 @@ export const axiosCleaningApi: CleaningApi = {
    * @param {object} params - Request parameters.
    * @returns {Promise<any>} The items.
    */
-  fetchCategoryItems: async ({ surveyId, categoryUuid, parentUuid, search, signal }) => {
-    const { data } = await getWithTimeout(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
-      params: { draft: false, parentUuid, search, limit: 100 },
+  fetchCategoryItems: ({ surveyId, categoryUuid, parentUuid, search, signal }) =>
+    analysisApi.fetchCategoryItems({
+      surveyId,
+      categoryUuid,
+      parentUuid,
+      search,
+      draft: false,
       signal,
-    })
-    return Object.values(data.items ?? {})
-  },
+    }),
   /**
    * Finds published taxa by code or scientific name.
    * @param {object} params - Request parameters.

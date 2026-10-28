@@ -31,9 +31,11 @@ export type AnalysisApi = {
   fetchCategoryItems: (params: {
     surveyId: number
     categoryUuid: string
+    parentUuid?: string | null
     search: string
-    lang: string
+    lang?: string
     draft: boolean
+    limit?: number
     signal?: AbortSignal
   }) => Promise<object[]>
 }
@@ -120,12 +122,12 @@ export const createAnalysisApi = ({ http }: { http: AnalysisHttp }): AnalysisApi
           timeout: analysisRequestTimeoutMs,
         })) as { date: string; count: number | string }[]
     ),
-  fetchCategoryItems: async ({ surveyId, categoryUuid, search, lang, draft, signal }) => {
+  fetchCategoryItems: async ({ surveyId, categoryUuid, parentUuid, search, lang, draft, limit = 100, signal }) => {
     const data = await withTimeoutError(
       async () =>
         (await http.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {
           // no parentUuid: first level items
-          params: { draft, search, lang },
+          params: { draft, parentUuid, search, lang, limit },
           signal,
           timeout: analysisRequestTimeoutMs,
         })) as { items?: Record<string, object> } | null

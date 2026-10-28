@@ -264,27 +264,3 @@ export const fetchItemsLabelsByUuids = async (
     { itemUuids }
   )
 }
-
-/**
- * Writes the label of an item in one language, in the draft props (the other languages are kept).
- * @param {object} params - Parameters.
- * @param {number|string} params.surveyId - Survey id.
- * @param {string} params.itemUuid - Item uuid.
- * @param {string} params.lang - Language.
- * @param {string} params.text - Label.
- * @param {object} client - Database client (a transaction).
- * @returns {Promise<Record<string, string>>} The combined labels after the write.
- */
-export const updateItemLabel = async (
-  { surveyId, itemUuid, lang, text }: { surveyId: number | string; itemUuid: string; lang: string; text: string },
-  client: any
-): Promise<Record<string, string>> =>
-  client.one(
-    `UPDATE ${getSurveyDBSchema(surveyId)}.category_item AS i
-     SET props_draft = COALESCE(i.props_draft, '{}'::jsonb)
-       || jsonb_build_object('labels', ${combinedLabels('i')} || jsonb_build_object($/lang/::text, $/text/::text))
-     WHERE i.uuid = $/itemUuid/
-     RETURNING ${combinedLabels('i')} AS labels`,
-    { itemUuid, lang, text },
-    (row: { labels: Record<string, string> }) => row.labels
-  )

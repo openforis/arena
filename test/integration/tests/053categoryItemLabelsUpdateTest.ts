@@ -21,7 +21,7 @@ import * as SB from '@test/utils/surveyBuilder'
 import { expectEditPermissionOnly } from '@test/utils/routePermissionTestUtils'
 import { collectRoutes } from '@test/utils/routeUtils'
 
-const COLORS = ['Red', 'Green', 'Blue', 'Yellow', 'Black', 'White', 'Grey']
+const COLORS = ['Red', 'Green', 'Blue', 'Yellow', 'Black', 'White', 'Grey', 'Orange', 'Pink']
 
 describe('Category item labels update (053)', () => {
   let user: any
@@ -129,6 +129,59 @@ describe('Category item labels update (053)', () => {
     })
     const answer = await update([{ itemUuid: black, lang: 'fr', text: 'Noir', expectedText: null }])
     expect(answer.applied).toEqual([{ itemUuid: black, lang: 'fr' }])
+  })
+
+  test('writes several labels with one UPDATE statement, and two languages of one item both stay', async () => {
+    const [orange, pink] = ['8', '9'].map((code) => uuidByCode.get(code) as string)
+    // counts the UPDATE statements of the transaction
+    let updates = 0
+    const countingClient = {
+      tx: (callback: (tx: any) => Promise<any>) =>
+        db.tx((tx: any) =>
+          callback(
+            new Proxy(tx, {
+              get: (target, prop) => {
+                const member = target[prop]
+                if (typeof member !== 'function') return member
+                return (query: unknown, ...args: unknown[]) => {
+                  if (typeof query === 'string' && /^\s*UPDATE .*category_item/i.test(query)) updates += 1
+                  return member.call(target, query, ...args)
+                }
+              },
+            })
+          )
+        ),
+    }
+    const answer = await CategoryItemLabelsManager.updateItemsLabels(
+      {
+        user,
+        surveyId,
+        items: [
+          { itemUuid: orange, lang: 'fr', text: 'Orange', expectedText: null },
+          { itemUuid: pink, lang: 'fr', text: 'Rose', expectedText: null },
+          { itemUuid: pink, lang: 'en', text: 'Pink!', expectedText: 'Pink' },
+        ],
+      },
+      countingClient
+    )
+    expect(answer.conflicts).toEqual([])
+    expect(answer.applied).toHaveLength(3)
+    expect(updates).toBe(1)
+    expect((await fetchStoredProps(pink)).props_draft.labels).toEqual({ en: 'Pink!', fr: 'Rose' })
+    expect((await fetchStoredProps(orange)).props_draft.labels).toEqual({ en: 'Orange', fr: 'Orange' })
+  })
+
+  test('the items route returns at most the requested limit', async () => {
+    const route = collectRoutes(CategoryApi.init).find(
+      ({ method, path }) => method === 'get' && path === '/survey/:surveyId/categories/:categoryUuid/items'
+    )
+    const fetchCount = async (query: object) => {
+      const res = createFakeResponse()
+      await route?.handlers[1]({ params: { surveyId: String(surveyId), categoryUuid }, query, body: {}, user }, res)
+      return Object.keys(res.body.items).length
+    }
+    expect(await fetchCount({ draft: 'true' })).toBe(COLORS.length)
+    expect(await fetchCount({ draft: 'true', limit: '3' })).toBe(3)
   })
 
   test('a deleted item is an itemMissing conflict, not an error', async () => {

@@ -78,7 +78,7 @@ export const bulkUpdateSurveySchemaTableProp = async (
     columns: [
       { name: 'recordUuid', cast: 'uuid' }, // Key 1: For WHERE condition
       'key', // Key 2: The JSON key to update
-      'value', // Key 3: The JSON value
+      { name: 'value', mod: ':json', cast: 'jsonb' }, // Key 3: The JSON value (a number, an object...)
     ],
   })
   const valuesClause = DbUtils.createBulkUpdateValues({ columnSet, values })

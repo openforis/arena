@@ -389,9 +389,18 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, categoryUuid, parentUuid, draft, search, lang } = Request.getParams(req)
+        const limit = Request.getNumericParam(req, 'limit')
 
         const items = ObjectUtils.toUuidIndexedObj(
-          await CategoryService.fetchItemsByParentUuid({ surveyId, categoryUuid, parentUuid, draft, search, lang })
+          await CategoryService.fetchItemsByParentUuid({
+            surveyId,
+            categoryUuid,
+            parentUuid,
+            draft,
+            search,
+            lang,
+            limit,
+          })
         )
 
         res.json({ items })

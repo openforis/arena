@@ -24,7 +24,10 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as CategoryItemLabelsRepository from '@server/modules/category/repository/categoryItemLabelsRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
-import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import {
+  bulkUpdateSurveySchemaTableProp,
+  markSurveyDraft,
+} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Creates the error of an invalid request.
@@ -240,6 +243,7 @@ const writeUpdates = async (
   const conflicts: CategoryItemLabelConflict[] = []
   const activities: any[] = []
   const categoryUuids = new Set<string>()
+  const labelsByItemUuid = new Map<string, Record<string, string>>()
   for (const update of updates) {
     const row = rowsByUuid.get(update.itemUuid)
     const conflict = getConflict(update, row)
@@ -248,13 +252,17 @@ const writeUpdates = async (
       continue
     }
     const { itemUuid, lang, text } = update
-    const labels = await CategoryItemLabelsRepository.updateItemLabel({ surveyId, itemUuid, lang, text }, tx)
+    const labels = { ...row.labels, [lang]: text }
     // a second language of the same item compares with the labels after this write
     rowsByUuid.set(itemUuid, { ...row, labels })
+    labelsByItemUuid.set(itemUuid, labels)
     applied.push({ itemUuid, lang })
     activities.push(newLabelsActivity(row, labels))
     categoryUuids.add(row.categoryUuid)
   }
+  // one UPDATE for all the items; the rows are locked and were compared above
+  const labelUpdates = [...labelsByItemUuid].map(([recordUuid, value]) => ({ recordUuid, key: 'labels', value }))
+  await bulkUpdateSurveySchemaTableProp({ surveyId, tableName: 'category_item', updates: labelUpdates }, tx)
   return { applied, conflicts, activities, categoryUuids }
 }
 
