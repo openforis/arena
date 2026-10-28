@@ -7,7 +7,6 @@ import { resolveAiAccessLevel } from '@common/ai/accessLevel'
 import { getLocalServerHostingClass } from '@common/ai/localServerAddress'
 import type { AiPolicy } from '@common/ai/policy'
 import { normalizeAiPolicy } from '@common/ai/policy'
-import type { AiDefaultProviderOrigin } from '@common/ai/providerIds'
 
 import type { AiFeatureSwitches } from './featureSwitches'
 import type { LocalProvider } from './localProviders'
@@ -26,7 +25,6 @@ export type AiSettingsSnapshot = AiFeatureSwitches & {
   policyCeilings?: AiPolicy
   maxPromptChars?: number
   defaultProviderId?: string
-  defaultProviderOrigin?: AiDefaultProviderOrigin
   providers?: AiPublicProvider[]
   adminDefault?: AiAdminDefault | null
 }

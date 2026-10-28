@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { unknownUsageV4 } from '@common/ai/sseParser'
 
-import { buildHistory, buildTrimmedHistory, getToolDefinitionChars } from '@webapp/ai/agent/agentMessages'
+import { buildTrimmedHistory, getToolDefinitionChars } from '@webapp/ai/agent/agentMessages'
 import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { buildTurnUsage, estimateContextTokens, toContextTokens } from '@webapp/ai/agent/turnUsage'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
@@ -129,7 +129,7 @@ describe('turn usage (204)', () => {
     expect(getToolDefinitionChars([])).toBe(0)
   })
 
-  test('buildTrimmedHistory counts the dropped messages; buildHistory returns the same messages', () => {
+  test('buildTrimmedHistory counts the dropped messages', () => {
     const messages = [
       userMsg('a'.repeat(50)),
       answerMsg('b'.repeat(50)),
@@ -140,7 +140,6 @@ describe('turn usage (204)', () => {
     expect(buildTrimmedHistory({ messages, userMessage, budgetChars: 10000 }).droppedCount).toBe(0)
     const trimmed = buildTrimmedHistory({ messages, userMessage, budgetChars: 160 })
     expect(trimmed.droppedCount).toBe(2)
-    expect(trimmed.messages).toEqual(buildHistory({ messages, userMessage, budgetChars: 160 }))
     // the kept answer can't start the history: it is dropped too
     expect(buildTrimmedHistory({ messages, userMessage, budgetChars: 110 }).droppedCount).toBe(4)
   })

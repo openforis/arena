@@ -8,9 +8,8 @@ import { AiProvider } from './aiProvider'
 export const ARENA_DEFAULT_PROVIDER_ID = 'arena-default'
 export const ACCOUNT_PROVIDER_PREFIX = 'acct:'
 export const LOCAL_PROVIDER_PREFIX = 'local:'
-// fixed ids of the providers converted from the old single settings, so the conversion is stable across reads
+// fixed id of the provider converted from the old single settings, so the conversion is stable across reads
 export const LEGACY_ACCOUNT_PROVIDER_ID = `${ACCOUNT_PROVIDER_PREFIX}legacy`
-export const LEGACY_LOCAL_PROVIDER_ID = `${LOCAL_PROVIDER_PREFIX}legacy`
 export const LOCAL_PROVIDER_TYPE = 'local'
 export const AI_PROVIDER_NAME_MAX_CHARS = 60
 

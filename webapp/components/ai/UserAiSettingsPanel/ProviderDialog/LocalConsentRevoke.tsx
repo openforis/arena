@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react'
 
 import { getCurrentUserUuid } from '@webapp/ai/engines/capabilitiesStore'
 import { hasLocalServerConsent, revokeLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
-import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -27,12 +27,16 @@ export const LocalConsentRevoke = ({ baseUrl }: Props) => {
     baseUrl,
     revokedBaseUrl,
     hasConsent: (url) =>
-      hasLocalServerConsent({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), baseUrl: url }),
+      hasLocalServerConsent({ storage: getBrowserLocalStorage(), userUuid: getCurrentUserUuid(), baseUrl: url }),
   })
 
   const onRevoke = useCallback(() => {
     if (!baseUrl) return
-    const done = revokeLocalServerConsent({ storage: getBrowserStorage(), userUuid: getCurrentUserUuid(), baseUrl })
+    const done = revokeLocalServerConsent({
+      storage: getBrowserLocalStorage(),
+      userUuid: getCurrentUserUuid(),
+      baseUrl,
+    })
     if (done) setRevokedBaseUrl(baseUrl)
   }, [baseUrl])
 

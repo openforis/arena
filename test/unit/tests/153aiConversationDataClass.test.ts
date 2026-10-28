@@ -2,10 +2,11 @@ import {
   escalateConversationDataClass,
   getConversationDataClass,
   isDataToolResult,
+  isToolErrorOutput,
 } from '@webapp/ai/conversations/dataClass'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { getTurnDataClass, resolveAssistantTurnModel } from '@webapp/ai/agent/turnModel'
-import { createTurnState, isToolErrorOutput } from '@webapp/ai/agent/turnState'
+import { createTurnState } from '@webapp/ai/agent/turnState'
 
 import { getAiFeatureMinDataClass } from '@common/ai/features'
 

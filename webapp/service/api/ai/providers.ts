@@ -89,19 +89,16 @@ export const removeProvider = async (id: string): Promise<{ settings: SettingsBo
 }
 
 /**
- * Sets the default provider. `origin: 'converted'` is only for the conversion of the old local settings.
+ * Sets the default provider.
  * @param {object} params - Parameters.
  * @param {string} params.providerId - Provider id.
- * @param {string} [params.origin] - 'converted' for the conversion call.
- * @returns {Promise<{applied: boolean, settings: object}>} Whether the default changed, and the settings.
+ * @returns {Promise<{settings: object}>} The settings.
  */
 export const setDefaultProvider = async ({
   providerId,
-  origin,
 }: {
   providerId: string
-  origin?: 'converted'
-}): Promise<{ applied: boolean; settings: SettingsBody }> => {
-  const { data } = await axios.put('/api/ai/settings/default', origin ? { providerId, origin } : { providerId })
+}): Promise<{ settings: SettingsBody }> => {
+  const { data } = await axios.put('/api/ai/settings/default', { providerId })
   return data
 }

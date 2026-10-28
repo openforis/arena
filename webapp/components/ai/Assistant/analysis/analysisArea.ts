@@ -1,7 +1,7 @@
 import type { AiDataClass } from '@common/ai/features'
 import { appModuleUri, appModules, dataModules } from '@webapp/app/appModules'
 
-import { isToolErrorOutput } from '@webapp/ai/agent/turnState'
+import { isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
 import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
 

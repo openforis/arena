@@ -1,9 +1,8 @@
 import { generateText, streamText } from 'ai'
 
-import { createGatewayEngine } from '@webapp/ai/engines/gatewayEngine'
 import { getGatewayEngineInfo, getLocalServerEngineInfo } from '@webapp/ai/engines/engineInfo'
 import { createLocalServerEngine } from '@webapp/ai/engines/localServerEngine'
-import type { AiLocalServerCapability, AiProviderEntry, AiSelectedEngine } from '@webapp/ai/engines/types'
+import type { AiLocalServerCapability, AiProviderEntry } from '@webapp/ai/engines/types'
 import { getAiErrorKey } from '@webapp/ai/runtime/runtimeErrors'
 
 const localServer = (overrides: Partial<AiLocalServerCapability> = {}): AiLocalServerCapability => ({
@@ -193,29 +192,5 @@ describe('createLocalServerEngine', () => {
     expect(() => createLocalServerEngine({ localServer: localServer({ modelId: null }), fetchImpl })).toThrow(
       'aiNoEngineAvailable'
     )
-  })
-})
-
-describe('createGatewayEngine', () => {
-  const engine = gatewayInfo() as AiSelectedEngine
-
-  test('passes the request options and the provider to the gateway model factory', () => {
-    const received: unknown[] = []
-    const fakeModel = { modelId: 'gateway' } as any
-    const gatewayEngine = createGatewayEngine({
-      engine,
-      createGatewayModel: (options) => {
-        received.push(options)
-        return fakeModel
-      },
-    })
-    expect(gatewayEngine.createModel({ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7 })).toBe(fakeModel)
-    expect(received).toEqual([{ feature: 'activityLogSummary', dataClass: 'data', surveyId: 7, providerId: 'acct:a1' }])
-  })
-
-  test('refuses an engine without a provider', () => {
-    expect(() =>
-      createGatewayEngine({ engine: { ...engine, providerId: undefined }, createGatewayModel: () => ({}) as any })
-    ).toThrow('aiNoEngineAvailable')
   })
 })

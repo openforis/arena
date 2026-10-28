@@ -1,11 +1,7 @@
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { createMemoryConversationStore, getConversationStore } from '@webapp/ai/conversations/conversationStore'
-import {
-  createOpenConversations,
-  getOpenConversationId,
-  setOpenConversationId,
-} from '@webapp/ai/conversations/openConversations'
+import { createOpenConversations, browserOpenConversations } from '@webapp/ai/conversations/openConversations'
 import { createAssistantLogout, resetAssistantOnLogout } from '@webapp/components/ai/Assistant/assistantLogout'
 import { createAssistantTurnRegistry } from '@webapp/components/ai/Assistant/assistantTurnRegistry'
 import { assistantPanelStore, initialAssistantPanelState } from '@webapp/components/ai/Assistant/assistantPanelStore'
@@ -59,13 +55,13 @@ describe('assistant logout and clear conversations (202)', () => {
     const conversation = createConversation({ userUuid: 'user-202', surveyId: 7, area: 'design' })
     await store.save(conversation)
     const key = { userUuid: 'user-202', surveyId: 7, area: 'design' }
-    setOpenConversationId({ ...key, conversationId: conversation.id })
+    browserOpenConversations.set({ ...key, conversationId: conversation.id })
     assistantPanelStore.setScope({ userUuid: 'user-202', surveyId: 7 })
 
     await resetAssistantOnLogout()
 
     expect(await store.get(conversation.id, 'user-202')).not.toBeNull()
-    expect(getOpenConversationId(key)).toBe(conversation.id)
+    expect(browserOpenConversations.get(key)).toBe(conversation.id)
     expect(assistantPanelStore.getState()).toEqual(initialAssistantPanelState)
   })
 

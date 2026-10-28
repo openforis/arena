@@ -357,39 +357,10 @@ describe('AI provider service (261)', () => {
     store.set(user.prefs.ai)
     await AiProviderService.removeProvider({ user, id: 'acct:org', deps })
     expect(saved[1].defaultProviderId).toBe('acct:own')
-    const local = await AiProviderService.setDefaultProvider({ user, providerId: 'local:abc', deps })
-    expect(local.applied).toBe(true)
+    await AiProviderService.setDefaultProvider({ user, providerId: 'local:abc', deps })
     expect(saved[2]).toMatchObject({ defaultProviderId: 'local:abc', defaultProviderOrigin: 'user' })
     await AiProviderService.setDefaultProvider({ user, providerId: 'arena-default', deps })
     expect(saved[3].defaultProviderId).toBe('arena-default')
-  })
-
-  test('the conversion call sets the default only while the origin is still converted', async () => {
-    const chosen = userWithProviders()
-    const { deps, saved, store } = createDeps({}, chosen)
-    const skipped = await AiProviderService.setDefaultProvider({
-      user: chosen,
-      providerId: 'local:legacy',
-      origin: 'converted',
-      deps,
-    })
-    expect(skipped.applied).toBe(false)
-    expect(saved).toEqual([])
-    const oldSlot = userWith({ provider: 'openai', model: 'gpt-x', enabled: true, apiKeyEncrypted: 'enc:k' })
-    store.set(oldSlot.prefs.ai)
-    const converted = await AiProviderService.setDefaultProvider({
-      user: oldSlot,
-      providerId: 'local:legacy',
-      origin: 'converted',
-      deps,
-    })
-    expect(converted.applied).toBe(true)
-    expect(saved[0]).toMatchObject({
-      defaultProviderId: 'local:legacy',
-      defaultProviderOrigin: 'converted',
-      providers: [expect.objectContaining({ id: 'acct:legacy', apiKeyEncrypted: 'enc:k' })],
-    })
-    expect(saved[0]).not.toHaveProperty('provider')
   })
 
   test('a test stamps only a saved provider tested with its saved values', async () => {

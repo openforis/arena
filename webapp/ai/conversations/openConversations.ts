@@ -162,18 +162,3 @@ export const createOpenConversations = ({
 export const browserOpenConversations: OpenConversations = createOpenConversations({
   getStorage: getBrowserLocalStorage,
 })
-
-/**
- * Returns the open conversation of an area (browser storage).
- * @param {OpenConversationKey} key - User, survey and area.
- * @returns {string|null} The conversation id.
- */
-export const getOpenConversationId = (key: OpenConversationKey): string | null => browserOpenConversations.get(key)
-
-/**
- * Remembers (or forgets, with null) the open conversation of an area (browser storage).
- * @param {object} params - User, survey, area and conversation id.
- * @returns {void}
- */
-export const setOpenConversationId = (params: OpenConversationKey & { conversationId: string | null }): void =>
-  browserOpenConversations.set(params)

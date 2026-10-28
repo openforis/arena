@@ -14,7 +14,7 @@ import {
   refreshAiCapabilities,
 } from '@webapp/ai/engines/capabilitiesStore'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
-import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalProviderStatus } from '@webapp/ai/engines/providerEntries'
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
@@ -84,7 +84,7 @@ const testAccountProvider = async (id: string): Promise<boolean> => {
  * @returns {Promise<boolean>} False when the browser storage could not be written (nothing changed).
  */
 const removeLocalProvider = async ({ id, defaultProviderId }: { id: string; defaultProviderId: string }) => {
-  const storage = getBrowserStorage()
+  const storage = getBrowserLocalStorage()
   const userUuid = getCurrentUserUuid()
   const { providers, resetDefault } = buildLocalProviderRemoval({
     providers: loadLocalProviders({ storage, userUuid }),

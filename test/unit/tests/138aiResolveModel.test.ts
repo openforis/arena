@@ -1,6 +1,6 @@
 import type { AiPolicy } from '@common/ai/policy'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
-import { loadLocalServerConsent, saveLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
+import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import {
   createModelResolver,
   type LocalServerConsentAnswer,
@@ -215,14 +215,6 @@ describe('createModelResolver', () => {
     const error = await resolve({ feature: 'activityLogSummary', surveyId: 2 }).catch((e) => e)
     expect(error.key).toBe('aiLocalServerConsentCancelled')
     expect(state.requests.length).toBe(2)
-  })
-
-  test('a decline stored by the old dialog asks again', async () => {
-    const { resolve, state, storage } = setup({ answers: ['continue'] })
-    saveLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: BASE_URL, decision: 'declined' })
-    const { engine } = await resolve({ feature: 'expressionExplain', surveyId: 1 })
-    expect(state.requests.length).toBe(1)
-    expect(engine.id).toBe('localServer')
   })
 
   test('Choose another provider fails the request: no other provider is tried', async () => {

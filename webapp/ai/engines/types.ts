@@ -85,16 +85,6 @@ export type AiUnavailableReason =
 
 export type AiEngineSelection = { engine: AiSelectedEngine } | { unavailable: AiUnavailableReason[] }
 
-export type AiLocalServerSettings = {
-  enabled: boolean
-  baseUrl: string
-  modelId: string | null
-  preferLocal: boolean
-}
-
-export type AiConsentDecision = 'accepted' | 'declined'
+export type AiConsentDecision = 'accepted'
 
 export type StorageLike = Pick<Storage, 'getItem' | 'setItem'>
-
-// the conversion of the old local server settings removes the old key
-export type RemovableStorage = StorageLike & Pick<Storage, 'removeItem'>

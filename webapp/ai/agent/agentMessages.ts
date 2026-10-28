@@ -128,20 +128,6 @@ export const buildTrimmedHistory = ({
 }
 
 /**
- * Builds the model messages of a turn.
- * @param {object} params - Parameters.
- * @param {ConversationMessage[]} params.messages - Earlier messages of the conversation.
- * @param {string} params.userMessage - The new user message.
- * @param {number} params.budgetChars - Characters available for the history (new message included).
- * @returns {ModelMessage[]} The messages, the new user message last.
- */
-export const buildHistory = (params: {
-  messages: ConversationMessage[]
-  userMessage: string
-  budgetChars: number
-}): ModelMessage[] => buildTrimmedHistory(params).messages
-
-/**
  * Returns the characters of the tool definitions sent to the model.
  * @param {AiTool[]} tools - Tools offered.
  * @returns {number} The length of their JSON descriptors (0 without tools).

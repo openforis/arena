@@ -2,11 +2,12 @@
  * Draft of the add / edit provider dialog: the values typed so far and what is derived from them (the name, the model
  * and the address that are saved). Pure.
  */
+import { stripTrailingSlashes } from '@common/ai/allowlist'
 import { withDefaultHttpScheme } from '@common/ai/localServerAddress'
 import { normalizeProviderName } from '@common/ai/providerIds'
 
 import { normalizeLocalProviderBaseUrl } from '@webapp/ai/engines/localProviders'
-import { DEFAULT_LOCAL_SERVER_BASE_URL, stripTrailingSlashes } from '@webapp/ai/engines/localServerSettings'
+import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 
 import {
   getDefaultNameOf,

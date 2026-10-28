@@ -1,6 +1,12 @@
 import { AiDataClass, getAiDataClassLevel, isAiDataClass } from '@common/ai/features'
 
-import { isToolErrorOutput } from '@webapp/ai/agent/turnState'
+/**
+ * Returns true for the structured error results of the tool wrapper.
+ * @param {unknown} output - Tool output.
+ * @returns {boolean} True when the output is `{ error: … }`.
+ */
+export const isToolErrorOutput = (output: unknown): boolean =>
+  typeof output === 'object' && output !== null && 'error' in output
 
 /**
  * Returns the data class of a conversation.

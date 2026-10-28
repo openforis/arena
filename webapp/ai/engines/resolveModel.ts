@@ -17,7 +17,6 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import { OFF_POLICY } from '@webapp/ai/policy/effectivePolicy'
 
 import { type AiFeatureSwitches, isAiFeatureEnabledInSettings } from './featureSwitches'
-import { createGatewayEngine, type GatewayModelFactory } from './gatewayEngine'
 import { loadLocalServerConsent, saveLocalServerConsent } from './localServerConsent'
 import { selectEngine } from './selectEngine'
 import type {
@@ -43,6 +42,9 @@ export type LocalServerConsentRequest = {
 
 // chooseOther: the user wants another provider; the request fails so the UI can offer the switcher or the settings
 export type LocalServerConsentAnswer = 'continue' | 'chooseOther' | 'cancel'
+
+// the server calls exactly the provider the request names (no fallback)
+export type GatewayModelFactory = (options: AiEngineModelOptions & { providerId: string }) => LanguageModel
 
 export type ResolveModelParams = {
   feature: AiFeatureKey
@@ -194,15 +196,19 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   })
 
   /**
-   * Creates the model with the gateway engine of the provider.
+   * Creates the gateway model (POST /api/ai/model) of the selected provider.
    * @param {Context} context - Request context.
    * @param {AiSelectedEngine} engine - The selected gateway engine.
    * @param {AiPolicy} policy - The effective policy the engine was selected with.
    * @returns {ResolvedModel} The model, the engine and the policy.
    */
   const createWithGateway = (context: Context, engine: AiSelectedEngine, policy: AiPolicy): ResolvedModel => {
-    const gatewayEngine = createGatewayEngine({ engine, createGatewayModel: deps.createGatewayModel })
-    return { model: gatewayEngine.createModel(context.options), engine, policy }
+    const { providerId } = engine
+    // without a provider id the server would pick one: refused, so a request never goes to an unnamed provider
+    if (engine.id !== 'gateway' || !providerId) {
+      throw new SystemError('aiNoEngineAvailable', { reasons: ['notAvailable'] }, StatusCodes.CONFLICT)
+    }
+    return { model: deps.createGatewayModel({ ...context.options, providerId }), engine, policy }
   }
 
   /**
@@ -305,9 +311,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
     const capability = getLocalCapability(context, engine)
     let checked = await recheckLocal(context, engine, capability)
     const turn: Context = { ...context, options: { ...context.options, dataClass: checked.dataClass } }
-    // a decline stored by the older dialog counts as not asked: there is no other provider to fall back to
-    const consented = loadLocalServerConsent(consentParams(turn, checked.capability)) === 'accepted'
-    if (!consented) {
+    if (!loadLocalServerConsent(consentParams(turn, checked.capability))) {
       await askConsent(turn, checked.engine, checked.capability)
       checked = await recheckLocal(context, checked.engine, checked.capability)
       // the policy now asks for more than the user agreed to

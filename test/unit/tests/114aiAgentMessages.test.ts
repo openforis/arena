@@ -1,6 +1,11 @@
 import { z } from 'zod'
 
-import { APPLY_NOTE_PREFIX, buildHistory, describeToolPart, getHistoryBudget } from '@webapp/ai/agent/agentMessages'
+import {
+  APPLY_NOTE_PREFIX,
+  buildTrimmedHistory,
+  describeToolPart,
+  getHistoryBudget,
+} from '@webapp/ai/agent/agentMessages'
 import type { ConversationMessage, ConversationToolPart } from '@webapp/ai/conversations/types'
 import type { AiTool } from '@webapp/ai/tools/types'
 
@@ -50,7 +55,10 @@ describe('describeToolPart interrupted', () => {
   })
 })
 
-describe('buildHistory', () => {
+/** Returns the model messages of a turn. */
+const buildHistory = (params: Parameters<typeof buildTrimmedHistory>[0]) => buildTrimmedHistory(params).messages
+
+describe('buildTrimmedHistory', () => {
   test('thinking stays out of the history', () => {
     const history = buildHistory({
       messages: [user('u1', 'Hi'), assistant('a1', [{ type: 'reasoning', text: 'They greet me.' }, text('Hello!')])],

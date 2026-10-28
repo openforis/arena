@@ -1,12 +1,13 @@
 /**
  * Mutable holder of the conversation during a turn: each change makes a new conversation object and reports it.
  */
-import { getMaxAiDataClass, type AiDataClass } from '@common/ai/features'
+import type { AiDataClass } from '@common/ai/features'
 import { uuidv4 } from '@core/uuid'
 
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import type { ChangeSet } from '@webapp/ai/changeSets/types'
 import { toConversationTitle } from '@webapp/ai/conversations/conversationModel'
+import { escalateConversationDataClass, isToolErrorOutput } from '@webapp/ai/conversations/dataClass'
 import type {
   AssistantMessage,
   AssistantMessageStatus,
@@ -28,14 +29,6 @@ export type TurnState = {
   setTitle: (title: string) => void
   finish: (status: AssistantMessageStatus, errorKey?: string) => void
 }
-
-/**
- * Returns true for the structured error results of the tool wrapper.
- * @param {unknown} output - Tool output.
- * @returns {boolean} True when the output is `{ error: … }`.
- */
-export const isToolErrorOutput = (output: unknown): boolean =>
-  typeof output === 'object' && output !== null && 'error' in output
 
 /**
  * Appends text to the last part of an answer when it has the same type (or starts a new part).
@@ -128,9 +121,9 @@ export const createTurnState = ({
       })),
     addChangeSet: (changeSet) =>
       set({ ...current, changeSets: { ...current.changeSets, [changeSet.id]: { changeSet } } }),
-    // never lowers the class (same rule as escalateConversationDataClass, without importing it: no cycle)
     escalateDataClass: (dataClass) => {
-      if (getMaxAiDataClass(current.dataClass, dataClass) !== current.dataClass) set({ ...current, dataClass })
+      const next = escalateConversationDataClass({ conversation: current, dataClass })
+      if (next !== current) set(next)
     },
     setQueries: (queries) => set({ ...current, queries }),
     setUsage: (usage) => updateAnswer((message) => ({ ...message, usage })),

@@ -53,19 +53,13 @@ describe('local consent per data class (371)', () => {
     expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBeNull()
   })
 
-  test('an entry stored before the data class existed counts as the survey design: record data asks again', () => {
-    const storage = memoryStorage()
-    storage.setItem(getLocalServerConsentKey('u1'), JSON.stringify({ '1': { decision: 'accepted', baseUrl: URL_A } }))
-    expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'schema' })).toBe('accepted')
-    expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBeNull()
-  })
-
-  test('an unknown stored data class counts as the survey design', () => {
+  test.each([[undefined], ['everything']])('an entry with the data class %s is not a consent', (dataClass) => {
     const storage = memoryStorage()
     storage.setItem(
       getLocalServerConsentKey('u1'),
-      JSON.stringify({ '1': { decision: 'accepted', baseUrl: URL_A, dataClass: 'everything' } })
+      JSON.stringify({ '1': { decision: 'accepted', baseUrl: URL_A, dataClass } })
     )
+    expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'schema' })).toBeNull()
     expect(loadLocalServerConsent({ storage, ...base, surveyId: 1, dataClass: 'data' })).toBeNull()
   })
 
@@ -131,12 +125,6 @@ describe('local consent can be revoked (371)', () => {
     expect(hasLocalServerConsent({ storage, ...base, baseUrl: URL_B })).toBe(false)
     expect(hasLocalServerConsent({ storage, ...base, userUuid: 'u2' })).toBe(false)
     revokeLocalServerConsent({ storage, ...base })
-    expect(hasLocalServerConsent({ storage, ...base })).toBe(false)
-  })
-
-  test('a declined entry is not a consent', () => {
-    const storage = memoryStorage()
-    saveLocalServerConsent({ storage, ...base, surveyId: 1, decision: 'declined' })
     expect(hasLocalServerConsent({ storage, ...base })).toBe(false)
   })
 

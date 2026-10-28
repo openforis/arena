@@ -1,7 +1,7 @@
 import { createConsentRequestQueue } from '@webapp/ai/engines/consentRequests'
 import type { AiPolicy } from '@common/ai/policy'
 import type { AiFeatureSwitches } from '@webapp/ai/engines/featureSwitches'
-import { loadLocalServerConsent, saveLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
+import { loadLocalServerConsent } from '@webapp/ai/engines/localServerConsent'
 import {
   createModelResolver,
   type LocalServerConsentAnswer,
@@ -113,23 +113,6 @@ describe('resolveModel: local consent per data class (372)', () => {
     expect(error.key).toBe('aiProviderChooseAnother')
     expect(load(storage, 'schema')).toBeNull()
     expect(load(storage, 'data')).toBeNull()
-  })
-
-  test('a consent stored before the data class existed asks again for record data only', async () => {
-    const { resolve, requests, storage } = setup(['continue'])
-    storage.setItem('arena.ai.localServerConsent.u1', JSON.stringify({ '1': { decision: 'accepted', baseUrl: URL_A } }))
-    await resolve({ feature: 'expressionExplain', surveyId: 1 })
-    expect(requests).toHaveLength(0)
-    await resolve({ feature: 'activityLogSummary', surveyId: 1 })
-    expect(requests.map((request) => request.dataClass)).toEqual(['data'])
-  })
-
-  test('a decline stored by the older dialog counts as not asked', async () => {
-    const { resolve, requests, storage } = setup(['continue', 'continue'])
-    await resolve({ feature: 'expressionExplain', surveyId: 1 })
-    saveLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: URL_A, decision: 'declined' })
-    await resolve({ feature: 'expressionExplain', surveyId: 1 })
-    expect(requests).toHaveLength(2)
   })
 })
 

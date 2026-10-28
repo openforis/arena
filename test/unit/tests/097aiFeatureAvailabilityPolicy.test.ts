@@ -43,7 +43,7 @@ describe('policy blocked reason keys', () => {
 describe('getAiDataLocationText', () => {
   test.each([
     [cloud, 'aiDataLocation.cloudWithProvider{"provider":"OpenAI"}'],
-    [{ hostingClass: 'cloud', provider: 'mock', model: null }, 'aiDataLocation.cloudWithProvider{"provider":"mock"}'],
+    [{ hostingClass: 'cloud', provider: 'acme', model: null }, 'aiDataLocation.cloudWithProvider{"provider":"acme"}'],
     [{ hostingClass: 'cloud', provider: null, model: null }, 'aiDataLocation.cloud'],
     [orgHosted, 'aiDataLocation.orgHosted'],
     [{ ...orgHosted, engine: '10.0.0.5:8000' }, 'aiDataLocation.orgHostedWithEngine{"engine":"10.0.0.5:8000"}'],

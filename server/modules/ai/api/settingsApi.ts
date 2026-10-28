@@ -4,7 +4,7 @@
  *
  *   GET    /api/ai/settings          — settings, providers (no keys), admin default, engine fields
  *   PUT    /api/ai/settings          — save the access level and toggles (other fields are ignored)
- *   PUT    /api/ai/settings/default  — { providerId, origin? } choose the default provider
+ *   PUT    /api/ai/settings/default  — { providerId } choose the default provider
  *   POST   /api/ai/providers/test    — test a draft or a saved provider (`id` + changed fields)
  *   POST   /api/ai/providers/models  — list the models of a draft or a saved provider
  *   POST   /api/ai/providers         — add an account provider (tested again here)
@@ -114,12 +114,8 @@ export const init = (app): void => {
     '/ai/settings/default',
     ...guards,
     jsonRoute(async ({ user, body }) => {
-      const { user: updated, applied } = await AiProviderService.setDefaultProvider({
-        user,
-        providerId: body.providerId,
-        origin: body.origin,
-      })
-      return { applied, settings: buildResponseBody(updated) }
+      const { user: updated } = await AiProviderService.setDefaultProvider({ user, providerId: body.providerId })
+      return { settings: buildResponseBody(updated) }
     })
   )
 

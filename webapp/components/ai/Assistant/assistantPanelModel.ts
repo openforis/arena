@@ -10,7 +10,7 @@ import type { OperationResult } from '@webapp/ai/changeSets/types'
 import type { ApplyNoteMessage, Conversation, ConversationToolPart } from '@webapp/ai/conversations/types'
 import type { AiTranslate } from '@webapp/ai/tools/types'
 
-// told to the model on its next turn (APPLY_NOTE_PREFIX is added by buildHistory)
+// told to the model on its next turn (APPLY_NOTE_PREFIX is added by buildTrimmedHistory)
 export const DISCARD_NOTE = 'The user discarded these proposed changes.'
 
 const LABEL_PARAM_NAMES = ['name', 'text', 'query']

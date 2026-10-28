@@ -1,4 +1,4 @@
-import { buildHistory } from '@webapp/ai/agent/agentMessages'
+import { buildTrimmedHistory } from '@webapp/ai/agent/agentMessages'
 import { createTurnState } from '@webapp/ai/agent/turnState'
 import type { ChangeSet, ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
@@ -126,7 +126,11 @@ describe('Do it plumbing (214)', () => {
     state.appendText('Proposed 1 batch. 2 remain.')
     state.finish('done')
     expect(state.get().title).toBe('Translate the 3 missing texts into Italian.')
-    const history = buildHistory({ messages: state.get().messages, userMessage: 'continue', budgetChars: 10000 })
+    const { messages: history } = buildTrimmedHistory({
+      messages: state.get().messages,
+      userMessage: 'continue',
+      budgetChars: 10000,
+    })
     expect(history[0]).toEqual({ role: 'user', content: 'Translate the survey texts with survey_listMissingTexts' })
     // a typed message has no display text
     const typed = createTurnState({ conversation: base, userMessage: 'Hi', onUpdate: () => undefined }).get()

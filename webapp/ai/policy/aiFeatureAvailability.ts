@@ -4,6 +4,7 @@
  */
 import { AiFeaturePermission, getAiFeature } from '@common/ai/features'
 import type { AiHostingClass, AiPolicy, AiPolicyLevel } from '@common/ai/policy'
+import { getDefaultProviderName } from '@common/ai/providerIds'
 
 export type AiFeatureAvailabilityStatus = 'available' | 'disabled' | 'policyBlocked' | 'noEngine'
 
@@ -20,15 +21,6 @@ export type AiFeatureAvailability = {
   status: AiFeatureAvailabilityStatus
   location: AiDataLocation
   reasonKeys?: string[]
-}
-
-// brand names: not translated
-export const providerDisplayNames: Record<string, string> = {
-  openai: 'OpenAI',
-  anthropic: 'Anthropic',
-  google: 'Google',
-  'openai-compatible': 'OpenAI-compatible',
-  'vercel-ai-sdk': 'Vercel AI SDK',
 }
 
 /**
@@ -118,7 +110,7 @@ export const getAiDataLocationText = ({
   const provider = location.provider && nameKey ? t(nameKey) : location.provider
   const engine = location.engine && nameKey ? t(nameKey) : location.engine
   if (hostingClass === 'cloud') {
-    const providerName = provider ? (providerDisplayNames[provider] ?? provider) : null
+    const providerName = provider ? getDefaultProviderName(provider) : null
     return providerName ? t('aiDataLocation.cloudWithProvider', { provider: providerName }) : t('aiDataLocation.cloud')
   }
   if (hostingClass === 'orgHosted') {

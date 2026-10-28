@@ -6,6 +6,7 @@ import { isConfigAiFeaturesEnabled } from '@webapp/store/system/info/state'
 import { store as reduxStore } from '@webapp/store/store'
 import { getEffectivePolicyFor } from '@webapp/ai/policy/policyContext'
 import { getGatewayModel } from '@webapp/ai/runtime/getModel'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 
 import {
   getAiCapabilitiesStore,
@@ -14,7 +15,6 @@ import {
   notifyAiCapabilities,
 } from './capabilitiesStore'
 import { requestLocalServerConsent } from './consentRequests'
-import { getBrowserStorage } from './localServerSettings'
 import type { ModelResolverDeps } from './resolveModel'
 
 export const appModelResolverDeps: ModelResolverDeps = {
@@ -23,7 +23,7 @@ export const appModelResolverDeps: ModelResolverDeps = {
   getSettings: () => getAiCapabilitiesStore().getSettings(),
   loadCapabilities: loadAiCapabilities,
   getEffectivePolicyFor,
-  storage: getBrowserStorage(),
+  storage: getBrowserLocalStorage(),
   requestConsent: requestLocalServerConsent,
   onConsentChange: notifyAiCapabilities,
   createGatewayModel: (options) => getGatewayModel(options),

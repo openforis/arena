@@ -859,43 +859,31 @@ export const removeProvider = async ({
 
 /**
  * Sets the default provider. `acct:` ids must be the user's; `local:` ids live in a browser, so only their format is
- * checked; `arena-default` is always accepted. With `origin: 'converted'` (the conversion of the old local settings)
- * it applies only while the origin is still 'converted', so a default the user picked is never overwritten.
+ * checked; `arena-default` is always accepted.
  * @param {object} params - Parameters.
  * @param {User} params.user - The user.
  * @param {unknown} params.providerId - Provider id (untrusted).
- * @param {unknown} [params.origin] - 'converted' for the conversion call; anything else is a user choice.
  * @param {AiProviderServiceDeps} [params.deps] - Dependencies.
- * @returns {Promise<{user: User, applied: boolean}>} The user and whether the default changed.
+ * @returns {Promise<{user: User}>} The user.
  */
 export const setDefaultProvider = async ({
   user,
   providerId,
-  origin = undefined,
   deps = createDefaultAiProviderServiceDeps(),
 }: {
   user: User
   providerId: unknown
-  origin?: unknown
   deps?: AiProviderServiceDeps
-}): Promise<{ user: User; applied: boolean }> => {
+}): Promise<{ user: User }> => {
   if (!isAiProviderId(providerId)) throw notFound(providerId)
-  let applied = false
-  const { user: userUpdated } = await commitProviderPrefs({
+  return commitProviderPrefs({
     user,
     deps,
     change: (latest) => {
       if (isAccountProviderId(providerId)) findOwnProvider(latest, providerId)
-      applied = origin !== 'converted' || latest.defaultProviderOrigin === 'converted'
-      if (!applied) return null
-      return {
-        ...latest,
-        defaultProviderId: providerId,
-        defaultProviderOrigin: origin === 'converted' ? 'converted' : 'user',
-      }
+      return { ...latest, defaultProviderId: providerId, defaultProviderOrigin: 'user' }
     },
   })
-  return { user: userUpdated, applied }
 }
 
 /**

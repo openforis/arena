@@ -12,7 +12,7 @@ import type { AiProviderRequest, AiProviderTestResponse } from '@webapp/service/
 
 import { getCurrentUserUuid, refreshAiCapabilities, testLocalServer } from '@webapp/ai/engines/capabilitiesStore'
 import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/localProviders'
-import { getBrowserStorage } from '@webapp/ai/engines/localServerSettings'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
@@ -182,7 +182,7 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
 
   /** Stores the Local server in this browser; false when it could not be saved. */
   const saveLocal = useCallback(async (): Promise<boolean> => {
-    const storage = getBrowserStorage()
+    const storage = getBrowserLocalStorage()
     const userUuid = getCurrentUserUuid()
     const next = buildLocalProviderSave({
       providers: loadLocalProviders({ storage, userUuid }),

@@ -18,12 +18,6 @@ export const getEntityViewDataCountRequest = ({ surveyId, query, cycle }) => ({
   body: { cycle, query },
 })
 
-export const fetchEntityViewDataCount = async ({ surveyId, query, cycle }) => {
-  const { url, body } = getEntityViewDataCountRequest({ surveyId, query, cycle })
-  const { data } = await axios.post(url, body)
-  return data
-}
-
 export const fetchEntityViewDataRowsCountByDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
   const url = `/api/surveyRdb/${surveyId}/view_data_rows_counts`
   const { data } = await axios.get(url, {

@@ -3,9 +3,9 @@
  */
 import * as User from '@core/user/user'
 
-import { setDefaultProvider } from '@webapp/service/api/ai/providers'
 import { isAiSettingsFetchError } from '@webapp/components/ai/hooks/aiSettingsCache'
 import { fetchAiSettingsOnce, invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { store as reduxStore } from '@webapp/store/store'
 import { UserState } from '@webapp/store/user'
 
@@ -15,8 +15,7 @@ import {
   createCapabilitiesStore,
   getCapabilitiesSnapshotForUser,
 } from './capabilities'
-import { convertLegacyLocalServer, loadLocalProviders, loadSettingsWithLocalConversion } from './localProviders'
-import { getBrowserStorage } from './localServerSettings'
+import { loadLocalProviders } from './localProviders'
 import { type LocalServerProbeResult, probeLocalServer } from './localServerProbe'
 import type { AiCapabilities } from './types'
 
@@ -24,26 +23,13 @@ import type { AiCapabilities } from './types'
 const browserFetch = (url: string, init?: RequestInit): Promise<Response> => fetch(url, init)
 
 const capabilitiesStore = createCapabilitiesStore({
-  loadSettings: ({ force, userUuid }) =>
-    loadSettingsWithLocalConversion({
-      force,
-      userUuid,
-      loadSettings: async ({ force: reload }) => {
-        if (reload) invalidateAiSettingsCache()
-        const settings = await fetchAiSettingsOnce()
-        // a fetch that failed for a reason that may pass is no settings: the next load() asks again
-        return isAiSettingsFetchError(settings) ? null : (settings as AiSettingsSnapshot)
-      },
-      // the old local server becomes local:legacy; its default is applied only while the account default was never picked
-      convert: ({ userUuid: uuid, defaultProviderOrigin }) =>
-        convertLegacyLocalServer({
-          storage: getBrowserStorage(),
-          userUuid: uuid,
-          defaultProviderOrigin,
-          setDefault: async (providerId) => (await setDefaultProvider({ providerId, origin: 'converted' })).applied,
-        }),
-    }),
-  loadLocalProviders: (userUuid) => loadLocalProviders({ storage: getBrowserStorage(), userUuid }),
+  loadSettings: async ({ force }) => {
+    if (force) invalidateAiSettingsCache()
+    const settings = await fetchAiSettingsOnce()
+    // a fetch that failed for a reason that may pass is no settings: the next load() asks again
+    return isAiSettingsFetchError(settings) ? null : (settings as AiSettingsSnapshot)
+  },
+  loadLocalProviders: (userUuid) => loadLocalProviders({ storage: getBrowserLocalStorage(), userUuid }),
   probe: ({ baseUrl, modelId }) => probeLocalServer({ baseUrl, modelId, fetchImpl: browserFetch }),
 })
 

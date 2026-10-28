@@ -6,14 +6,12 @@ import { type AiDataClass, getAiDataClassLevel, isAiDataClass } from '@common/ai
 
 import type { AiConsentDecision, StorageLike } from './types'
 
-// dataClass: the highest class the user accepted; absent in entries stored before the class existed
-type ConsentEntry = { decision: AiConsentDecision; baseUrl: string; dataClass?: AiDataClass }
+// dataClass: the highest class the user accepted
+type ConsentEntry = { decision: AiConsentDecision; baseUrl: string; dataClass: AiDataClass }
 type ConsentMap = Record<string, ConsentEntry>
 
-// the class of a request that names none, and of a stored entry that names none or an unknown one
+// the class of a request that names none
 const DEFAULT_DATA_CLASS: AiDataClass = 'schema'
-
-const DECISIONS: AiConsentDecision[] = ['accepted', 'declined']
 
 /**
  * Returns the localStorage key of the user's consent decisions.
@@ -45,26 +43,17 @@ const readMap = (storage: StorageLike, userUuid: string): ConsentMap => {
 }
 
 /**
- * Returns the data class of a stored entry (the survey design when it names none or an unknown one: an older entry
- * never covered record data, so the user is asked again for it).
- * @param {ConsentEntry} entry - The stored entry.
- * @returns {AiDataClass} The class.
- */
-const getEntryDataClass = (entry: ConsentEntry): AiDataClass =>
-  isAiDataClass(entry.dataClass) ? entry.dataClass : DEFAULT_DATA_CLASS
-
-/**
- * Returns whether the stored entry is a valid one for this server URL.
+ * Returns whether the stored entry is a valid one for this server URL (an entry without a known class is not).
  * @param {ConsentEntry|undefined} entry - The stored entry.
  * @param {string} baseUrl - Server URL.
  * @returns {boolean} True for a well-formed entry of that URL.
  */
 const isEntryOf = (entry: ConsentEntry | undefined, baseUrl: string): entry is ConsentEntry =>
-  !!entry && DECISIONS.includes(entry.decision) && entry.baseUrl === baseUrl
+  entry?.decision === 'accepted' && entry.baseUrl === baseUrl && isAiDataClass(entry.dataClass)
 
 /**
- * Returns the stored decision for the survey, or null when the user must be asked (none, another URL, or an
- * accepted consent that does not reach the requested data class).
+ * Returns the stored decision for the survey, or null when the user must be asked (none, another URL, or a
+ * consent that does not reach the requested data class).
  * @param {object} params - Parameters.
  * @param {StorageLike|null} params.storage - Storage.
  * @param {string|null} params.userUuid - User UUID.
@@ -89,29 +78,24 @@ export const loadLocalServerConsent = ({
   if (!storage || !userUuid) return null
   const entry = readMap(storage, userUuid)[surveyKey(surveyId)]
   if (!isEntryOf(entry, baseUrl)) return null
-  if (entry.decision === 'accepted' && getAiDataClassLevel(getEntryDataClass(entry)) < getAiDataClassLevel(dataClass)) {
-    return null
-  }
-  return entry.decision
+  return getAiDataClassLevel(entry.dataClass) < getAiDataClassLevel(dataClass) ? null : entry.decision
 }
 
 /**
- * Returns the class to store: the highest of the new one and the accepted one already stored for the same server
+ * Returns the class to store: the highest of the new one and the one already stored for the same server
  * (a consent for the survey design never lowers a consent for record data).
  * @param {ConsentEntry|undefined} previous - The stored entry of the survey.
  * @param {object} params - What is being saved.
  * @param {string} params.baseUrl - Server URL.
- * @param {AiConsentDecision} params.decision - The decision.
  * @param {AiDataClass} params.dataClass - The new class.
  * @returns {AiDataClass} The class.
  */
 const getClassToStore = (
   previous: ConsentEntry | undefined,
-  { baseUrl, decision, dataClass }: { baseUrl: string; decision: AiConsentDecision; dataClass: AiDataClass }
+  { baseUrl, dataClass }: { baseUrl: string; dataClass: AiDataClass }
 ): AiDataClass => {
-  if (decision !== 'accepted' || !isEntryOf(previous, baseUrl) || previous.decision !== 'accepted') return dataClass
-  const stored = getEntryDataClass(previous)
-  return getAiDataClassLevel(stored) > getAiDataClassLevel(dataClass) ? stored : dataClass
+  if (!isEntryOf(previous, baseUrl)) return dataClass
+  return getAiDataClassLevel(previous.dataClass) > getAiDataClassLevel(dataClass) ? previous.dataClass : dataClass
 }
 
 /**
@@ -147,7 +131,7 @@ export const saveLocalServerConsent = ({
     const entry: ConsentEntry = {
       decision,
       baseUrl,
-      dataClass: getClassToStore(current[key], { baseUrl, decision, dataClass }),
+      dataClass: getClassToStore(current[key], { baseUrl, dataClass }),
     }
     storage.setItem(getLocalServerConsentKey(userUuid), JSON.stringify({ ...current, [key]: entry }))
     return true
@@ -157,7 +141,7 @@ export const saveLocalServerConsent = ({
 }
 
 /**
- * Returns whether the user has an accepted consent, for any survey and data class, for the server URL.
+ * Returns whether the user has a consent, for any survey and data class, for the server URL.
  * @param {object} params - Parameters.
  * @param {StorageLike|null} params.storage - Storage.
  * @param {string|null} params.userUuid - User UUID.
@@ -174,9 +158,7 @@ export const hasLocalServerConsent = ({
   baseUrl: string
 }): boolean => {
   if (!storage || !userUuid) return false
-  return Object.values(readMap(storage, userUuid)).some(
-    (entry) => isEntryOf(entry, baseUrl) && entry.decision === 'accepted'
-  )
+  return Object.values(readMap(storage, userUuid)).some((entry) => isEntryOf(entry, baseUrl))
 }
 
 /**
