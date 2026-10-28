@@ -129,13 +129,11 @@ const setup = async ({
   }
   const cards = { applyOperations: jest.fn(), applyRecordEdits: jest.fn() }
   const clearUserData = jest.fn(async () => undefined)
-  const loadAccess = jest.fn(async () => ({ effective: null }))
   const controller = createAssistantConversationController({
     getStore: async () => store,
     panel,
     registry,
     runTurn,
-    loadAccess,
     clearUserData,
     suggestions,
     cards,
@@ -143,7 +141,7 @@ const setup = async ({
   panel.setScope({ userUuid: scope.userUuid, surveyId: scope.surveyId })
   panel.setArea('design')
   if (open) await controller.init()
-  return { controller, panel, registry, store, suggestions, cards, clearUserData, runTurn, loadAccess }
+  return { controller, panel, registry, store, suggestions, cards, clearUserData, runTurn }
 }
 
 const lastSaved = (store: ReturnType<typeof createFakeStore>, id: string): Conversation | undefined =>
@@ -161,7 +159,6 @@ describe('assistant conversation controller (403)', () => {
         panel: createAssistantPanelStore({ openConversations: createOpenConversations({ getStorage: () => null }) }),
         registry: createAssistantTurnRegistry(),
         runTurn: instantTurn,
-        loadAccess: async () => ({ effective: null }),
         clearUserData: async () => undefined,
         suggestions: {
           withScope: (c) => c,
@@ -199,7 +196,6 @@ describe('assistant conversation controller (403)', () => {
         panel,
         registry: createAssistantTurnRegistry(),
         runTurn: instantTurn,
-        loadAccess: async () => ({ effective: null }),
         clearUserData: async () => undefined,
         suggestions: {
           withScope: (c) => c,
@@ -391,20 +387,6 @@ describe('assistant conversation controller (403)', () => {
   })
 
   describe('turns', () => {
-    test("the policy read before a turn is the one of the area's feature (the Help chat: no survey)", async () => {
-      const { controller, registry, loadAccess, panel } = await setup()
-      await controller.send(env, 'hello')
-      await registry.settle()
-      expect(loadAccess).toHaveBeenLastCalledWith({ feature: 'assistantDesign', surveyId: env.surveyId })
-      panel.setArea('help')
-      const helpEnv = { ...env, area: 'help' as const }
-      controller.setScope(helpEnv)
-      controller.newConversation()
-      await controller.send(helpEnv, 'how?')
-      await registry.settle()
-      expect(loadAccess).toHaveBeenLastCalledWith({ feature: 'chatbot', surveyId: null })
-    })
-
     test('Stop aborts the running turn and busy ends with it', async () => {
       const turn = createTurnControl()
       const { controller, registry } = await setup({ runTurn: turn.run })
@@ -836,11 +818,11 @@ describe('assistant conversation controller (403)', () => {
       expect(lastSaved(store, 'c1')?.changeSets.cs1.results).toEqual([{ id: 'e1', status: 'applied' }])
     })
 
-    test('a store error while saving record edit results is caught', async () => {
+    test('a store error while saving record edit results is not swallowed (the card shows it)', async () => {
       const { controller, cards, store } = await openCard()
       cards.applyRecordEdits.mockResolvedValueOnce({ results: [], note: 'Edited.' })
       store.save.mockRejectedValueOnce(new Error('idb'))
-      await expect(controller.applyRecordEdits(env, 'cs1', ['e1'])).resolves.toBeUndefined()
+      await expect(controller.applyRecordEdits(env, 'cs1', ['e1'])).rejects.toThrow('idb')
       expect(controller.getState().applying).toBe(false)
     })
 

@@ -13,11 +13,11 @@ import {
 } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
 import { chunkOperationsByRecord } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
 import { Button } from '@webapp/components/buttons'
-import { Checkbox } from '@webapp/components/form'
+import { useNotifyError } from '@webapp/components/hooks'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { useExclusiveRun } from '../useExclusiveRun'
+import { runWithFailureNotice } from '../runWithFailureNotice'
 import { useOperationSelection } from '../useOperationSelection'
 
 type Props = {
@@ -60,11 +60,13 @@ const EditRow = ({ operation, result, selected, selectable, onToggle }: EditRowP
   const empty = i18n.t('aiCleaning.card.empty')
   return (
     <li className="ai-cleaning-card__edit" data-testid={TestId.aiCleaning.edit} data-node-uuid={operation.nodeUuid}>
-      <Checkbox
+      <input
+        aria-label={`${operation.recordKeys} ${operation.path}: ${operation.display.from ?? empty} → ${operation.display.to ?? empty}`}
         checked={selected}
+        data-testid={TestId.aiCleaning.editCheckbox}
         disabled={!selectable}
         onChange={() => onToggle(operation.id)}
-        testId={TestId.aiCleaning.editCheckbox}
+        type="checkbox"
       />
       <div className="ai-cleaning-card__edit-body">
         <div className="ai-cleaning-card__path">{operation.path}</div>
@@ -106,28 +108,32 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
   const groups = useMemo(() => groupOperationsByRecord(operations), [operations])
   const selectableIds = useMemo(() => getSelectableOperationIds(operations, results), [operations, results])
   const { selectedIds, toggle } = useOperationSelection({ selectableIds })
-  const { running, run } = useExclusiveRun()
+  const notifyError = useNotifyError()
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const resultById = useMemo(() => new Map(results.map((result) => [result.id, result])), [results])
   const counts = countOperationResults(results)
 
+  // the conversation holds the guard against a second Apply; a rejection (store error) is shown on the card
   const apply = useCallback(
     (operationIds: string[]) =>
-      run(async () => {
-        // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
-        const selected = operations.filter((operation) => operationIds.includes(operation.id))
-        setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
-        try {
-          await onApply(operationIds, (done, total) => setProgress({ done, total }))
-        } finally {
-          setProgress(null)
-        }
+      runWithFailureNotice({
+        action: async () => {
+          // the number of requests, as the applier will report it (no "0 of 0" while the first one is prepared)
+          const selected = operations.filter((operation) => operationIds.includes(operation.id))
+          setProgress({ done: 0, total: chunkOperationsByRecord(selected).length })
+          try {
+            await onApply(operationIds, (done, total) => setProgress({ done, total }))
+          } finally {
+            setProgress(null)
+          }
+        },
+        notifyError,
+        key: 'aiAssistant.card.applyFailed',
       }),
-    [onApply, operations, run]
+    [notifyError, onApply, operations]
   )
 
   const retryIds = getRetryOperationIds(results)
-  const locked = running || busy
 
   return (
     <div className="ai-cleaning-card" data-testid={TestId.aiCleaning.card}>
@@ -151,7 +157,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
                 operation={operation}
                 result={resultById.get(operation.id)}
                 selected={selectedIds.includes(operation.id)}
-                selectable={!locked && selectableIds.includes(operation.id)}
+                selectable={!busy && selectableIds.includes(operation.id)}
                 onToggle={toggle}
               />
             ))}
@@ -167,7 +173,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
       <div className="ai-cleaning-card__actions">
         <Button
           primary
-          disabled={locked || selectedIds.length === 0}
+          disabled={busy || selectedIds.length === 0}
           label="aiCleaning.card.applySelected"
           labelParams={{ count: selectedIds.length }}
           onClick={() => apply(selectedIds)}
@@ -175,7 +181,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
         />
         {retryIds.length > 0 && (
           <Button
-            disabled={locked}
+            disabled={busy}
             label="aiCleaning.card.retryFailed"
             labelParams={{ count: retryIds.length }}
             onClick={() => apply(retryIds)}

@@ -304,7 +304,7 @@ export const ChangeSetReviewDialog = ({
   const [filter, setFilter] = useState<ReviewFilter>('all')
   const [search, setSearch] = useState('')
   const [activeGroupKey, setActiveGroupKey] = useState<string | null>(null)
-  const { pendingIds, conflictIds, selectableIds, selectedIds, applying } = selection
+  const { pendingIds, conflictIds, selectableIds, selectedIds } = selection
   const columns = useMemo(() => getReviewColumns(items), [items])
 
   useEffect(() => {
@@ -470,7 +470,7 @@ export const ChangeSetReviewDialog = ({
           </span>
           {pendingIds.length > 0 && (
             <Button
-              disabled={busy || applying}
+              disabled={busy}
               label="aiAssistant.card.review.discardAll"
               onClick={selection.discard}
               testId={TestId.aiAssistant.reviewDiscardBtn}
@@ -480,7 +480,7 @@ export const ChangeSetReviewDialog = ({
           <Button label="aiAssistant.card.review.close" onClick={onClose} />
           {pendingIds.length > 0 && (
             <Button
-              disabled={busy || applying || dirty || selectedIds.length === 0}
+              disabled={busy || dirty || selectedIds.length === 0}
               label="aiAssistant.card.applySelectedCount"
               labelParams={{ count: selectedIds.length }}
               onClick={selection.apply}

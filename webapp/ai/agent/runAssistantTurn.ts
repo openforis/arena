@@ -54,7 +54,8 @@ export type RunAssistantTurnParams = {
   displayText?: string
   area: AssistantPromptArea
   ctx: AiToolContext
-  access: { effective: AiPolicy | null }
+  // policy inputs the caller gives with its own model (tests); the resolver sets them otherwise
+  access?: { effective: AiPolicy | null }
   onUpdate: (conversation: Conversation) => void
   signal: AbortSignal
   model?: LanguageModel

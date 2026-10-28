@@ -41,7 +41,7 @@ const ChangeSetFullCard = ({
   const dirty = useIsSurveyDirty()
   const showNodeDef = useShowNodeDef()
   const nodeDefExists = useNodeDefExists()
-  const { pendingIds, conflicts, conflictIds, selectedIds, applying, toggle } = selection
+  const { pendingIds, conflicts, conflictIds, selectedIds, toggle } = selection
   const { nodeDefItems, categoryGroups } = useMemo(() => splitReviewItems(items), [items])
 
   /**
@@ -99,14 +99,14 @@ const ChangeSetFullCard = ({
         <div className="ai-assistant-card__footer">
           {dirty && <p className="ai-assistant-card__hint">{t('aiAssistant.card.saveCurrentEditFirst')}</p>}
           <Button
-            disabled={busy || applying || dirty || selectedIds.length === 0}
+            disabled={busy || dirty || selectedIds.length === 0}
             label="aiAssistant.card.applySelected"
             onClick={selection.apply}
             primary
             testId={TestId.aiAssistant.applyBtn}
           />
           <Button
-            disabled={busy || applying}
+            disabled={busy}
             label="aiAssistant.card.discard"
             onClick={selection.discard}
             testId={TestId.aiAssistant.discardBtn}

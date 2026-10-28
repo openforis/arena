@@ -5,7 +5,6 @@ import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 
 import { getOperationConflicts, getPendingOperationIds } from './changeSetCardModel'
 import { getBehaviourOperationIds, getInitialDeselectedIds } from './changeSetSelectionModel'
-import { useExclusiveRun } from './useExclusiveRun'
 import { runWithFailureNotice } from './runWithFailureNotice'
 import { useOperationSelection } from './useOperationSelection'
 
@@ -19,10 +18,9 @@ export type ChangeSetSelection = {
   selectedIds: string[]
   // expression and property changes that are not selected (they start unselected on a long change set)
   unselectedBehaviourIds: string[]
-  applying: boolean
   toggle: (id: string) => void
   setSelected: (ids: string[], selected: boolean) => void
-  apply: () => Promise<void>
+  apply: () => Promise<boolean>
   // asks first: a discarded proposal can't be brought back
   discard: () => void
 }
@@ -59,7 +57,6 @@ export const useChangeSetSelection = ({
     selectableIds,
     getInitialDeselectedIds: () => getInitialDeselectedIds({ changeSet: cardState.changeSet, compact }),
   })
-  const { running: applying, run } = useExclusiveRun()
   const confirm = useConfirm()
   const notifyError = useNotifyError()
 
@@ -78,26 +75,21 @@ export const useChangeSetSelection = ({
     selectableIds,
     selectedIds,
     unselectedBehaviourIds,
-    applying,
     toggle,
     setSelected,
     // a rejection (designer or store error) is shown, not left unhandled
     apply: () =>
-      run(async () => {
-        await runWithFailureNotice({
-          action: () => onApply(selectedIds),
-          notifyError,
-          key: 'aiAssistant.card.applyFailed',
-        })
+      runWithFailureNotice({
+        action: () => onApply(selectedIds),
+        notifyError,
+        key: 'aiAssistant.card.applyFailed',
       }),
     // onCancel is required by useConfirm's inferred (untyped) parameter
     discard: () =>
       confirm({
         key: 'aiAssistant.discardConfirm',
         onOk: () =>
-          void run(async () => {
-            await runWithFailureNotice({ action: onDiscard, notifyError, key: 'aiAssistant.card.discardFailed' })
-          }),
+          void runWithFailureNotice({ action: onDiscard, notifyError, key: 'aiAssistant.card.discardFailed' }),
         onCancel: undefined,
       }),
   }

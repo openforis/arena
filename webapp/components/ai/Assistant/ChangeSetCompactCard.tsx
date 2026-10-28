@@ -150,7 +150,7 @@ export const ChangeSetCompactCard = ({
   const [applyButton, setApplyButton] = useState<HTMLButtonElement | null>(null)
   // the line of statuses and results: where the focus goes when the confirmation closes after Apply
   const [statusLine, setStatusLine] = useState<HTMLUListElement | null>(null)
-  const { pendingIds, conflicts, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds, applying } = selection
+  const { pendingIds, conflicts, conflictIds, selectableIds, selectedIds, unselectedBehaviourIds } = selection
   const kinds = groupReviewItems(items, 'field')
   const results = countResults(items)
   const conflictItems = items.filter((item) => conflictIds.includes(item.id))
@@ -255,7 +255,7 @@ export const ChangeSetCompactCard = ({
       )}
       {showConfirmation && (
         <ApplyConfirmation
-          disabled={busy || applying || dirty}
+          disabled={busy || dirty}
           focus={focus}
           items={items}
           onApply={onConfirmedApply}
@@ -279,7 +279,7 @@ export const ChangeSetCompactCard = ({
           <>
             <Button
               aria-expanded={showConfirmation}
-              disabled={busy || applying || dirty || selectedIds.length === 0}
+              disabled={busy || dirty || selectedIds.length === 0}
               label={allSelected ? 'aiAssistant.card.applyAll' : 'aiAssistant.card.applySelectedCount'}
               labelParams={{ count: selectedIds.length }}
               onClick={onApplyClick}
@@ -287,7 +287,7 @@ export const ChangeSetCompactCard = ({
               testId={TestId.aiAssistant.applyBtn}
             />
             <Button
-              disabled={busy || applying}
+              disabled={busy}
               label="aiAssistant.card.discard"
               onClick={selection.discard}
               testId={TestId.aiAssistant.discardBtn}

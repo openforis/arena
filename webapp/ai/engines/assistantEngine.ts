@@ -27,7 +27,7 @@ export type AssistantEngine<TModel, TAccess extends object> = {
  * @param {object} [params.model] - Model given by the caller (tests): used as is.
  * @param {AiEngineLimits} [params.limits] - Limits given by the caller (win over the engine's).
  * @param {AiEngineLimits} params.defaultLimits - Limits when neither the caller nor an engine gives them.
- * @param {object} params.access - The caller's access (policy inputs of the tools).
+ * @param {object} [params.access] - The caller's access (tests; the resolver sets it otherwise).
  * @param {AiFeatureKey} params.feature - Feature of the area.
  * @param {number} [params.surveyId] - Survey (none for Help).
  * @param {AiDataClass} params.dataClass - Data class of the conversation.
@@ -40,7 +40,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends object>({
   model,
   limits,
   defaultLimits,
-  access,
+  access = {} as TAccess,
   feature,
   surveyId,
   dataClass,
@@ -51,7 +51,7 @@ export const resolveAssistantEngine = async <TModel, TAccess extends object>({
   model?: TModel
   limits?: AiEngineLimits
   defaultLimits: AiEngineLimits
-  access: TAccess
+  access?: TAccess
   feature: AiFeatureKey
   surveyId?: number
   dataClass: AiDataClass

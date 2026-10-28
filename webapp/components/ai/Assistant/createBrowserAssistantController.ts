@@ -6,7 +6,6 @@ import { runAssistantTurn } from '@webapp/ai/agent/runAssistantTurn'
 import { clearUserConversations } from '@webapp/ai/conversations/clearUserConversations'
 import { getConversationStore } from '@webapp/ai/conversations/conversationStore'
 import { browserOpenConversations } from '@webapp/ai/conversations/openConversations'
-import { loadPolicyContext } from '@webapp/ai/policy/policyContext'
 import {
   holdSuggestionTurnLock,
   reportSuggestionSettle,
@@ -39,7 +38,6 @@ export const createBrowserAssistantController = (reduxStore: {
     panel: assistantPanelStore,
     registry: assistantTurnRegistry,
     runTurn: runAssistantTurn,
-    loadAccess: loadPolicyContext,
     clearUserData: async ({ conversationStore, userUuid }) => {
       // the open conversations of every area and the suggestions pointing to them go too
       await clearUserConversations({
