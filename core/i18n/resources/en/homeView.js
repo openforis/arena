@@ -140,6 +140,8 @@ When checked, those values are kept in the record, even if the attributes are no
 
     areaOfInterest: {
       title: 'Area of interest',
+      polygons: 'Polygons',
+      vertices: 'Vertices',
       info: 'Polygon (GeoJSON, WGS84 coordinates) used by the expression function geoDistanceToAOIBoundary to check if a location is inside the area, also offline in Arena Mobile',
       summary: '{{polygons}} polygon(s), {{vertices}} vertices',
       invalidFile: 'The file does not contain a valid polygon in GeoJSON format with WGS84 coordinates',

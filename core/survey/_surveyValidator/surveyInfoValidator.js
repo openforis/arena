@@ -1,4 +1,3 @@
-import { parseAreaOfInterest } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -25,13 +24,6 @@ const validateFieldManualLinks = (_propName, survey) => {
   return links.every((link) => URL.canParse(link))
     ? null
     : { key: Validation.messageKeys.surveyInfoEdit.fieldManualLinksInvalid }
-}
-
-const validateAreaOfInterest = (_propName, survey) => {
-  const areaOfInterest = Survey.getAreaOfInterest(survey)
-  return !areaOfInterest || parseAreaOfInterest(areaOfInterest)
-    ? null
-    : { key: Validation.messageKeys.surveyInfoEdit.areaOfInterestInvalid }
 }
 
 export const validateNewSurvey = async ({ newSurvey, surveyInfos }) =>
@@ -61,7 +53,6 @@ export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
       Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired),
     ],
     [`${infoKeys.props}.${infoKeys.fieldManualLinks}`]: [validateFieldManualLinks],
-    [`${infoKeys.props}.${infoKeys.areaOfInterest}`]: [validateAreaOfInterest],
   })
 
   const cyclesValidation = await SurveyCyclesValidator.validateCycles(Survey.getCycles(surveyInfo))

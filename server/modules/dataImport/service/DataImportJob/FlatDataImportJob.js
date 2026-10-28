@@ -143,7 +143,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const { cycle } = this.context
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, cycle, draft: false, advanced: true },
+      { surveyId, cycle, draft: false, advanced: true, includeAreaOfInterest: true },
       tx
     )
   }

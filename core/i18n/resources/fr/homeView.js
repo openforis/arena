@@ -141,6 +141,8 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
 
     areaOfInterest: {
       title: "Zone d'intérêt",
+      polygons: 'Polygones',
+      vertices: 'Sommets',
       info: "Polygone (GeoJSON, coordonnées WGS84) utilisé par la fonction d'expression geoDistanceToAOIBoundary pour vérifier si un emplacement se trouve dans la zone, également hors ligne dans Arena Mobile",
       summary: '{{polygons}} polygone(s), {{vertices}} sommets',
       invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',

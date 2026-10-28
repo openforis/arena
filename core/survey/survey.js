@@ -113,7 +113,6 @@ export const {
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,
   getSamplingPolygon,
-  getAreaOfInterest,
   isPreloadedMapLayersEnabled,
   getPreloadedMapLayers,
   getSurveyDocImages,

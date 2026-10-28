@@ -17,13 +17,23 @@ import * as SB from '../../utils/surveyBuilder'
 
 import { getContextUser } from '../config/context'
 
-describe('Survey files export/import - branding and doc-layout images', () => {
+describe('Survey files export/import - branding and doc-layout images, area of interest', () => {
   let sourceSurveyId
   let logoFileUuid
   let logoContent
   let headerFileUuid
   let headerContent
+  let areaOfInterestFileUuid
+  let areaOfInterestContent
   const createdSurveyIds = []
+
+  const expectSameFileContent = async ({ surveyId, fileUuid, content }) => {
+    const contentInSurvey = await SurveyFileService.fetchFileContentAsBuffer({
+      surveyId,
+      fileSummary: { uuid: fileUuid },
+    })
+    expect(Buffer.compare(contentInSurvey, content)).toBe(0)
+  }
 
   beforeAll(async () => {
     // The integration test harness never runs the app bootstrap (server/system/appCluster.js),
@@ -81,6 +91,38 @@ describe('Survey files export/import - branding and doc-layout images', () => {
         },
       },
     ])
+
+    areaOfInterestFileUuid = uuidv4()
+    areaOfInterestContent = Buffer.from(
+      JSON.stringify({
+        type: 'Polygon',
+        coordinates: [
+          [
+            [12.48, 41.88],
+            [12.5, 41.88],
+            [12.5, 41.9],
+            [12.48, 41.88],
+          ],
+        ],
+      })
+    )
+    await SurveyFileService.insertFile(
+      sourceSurveyId,
+      SurveyFile.createFile({
+        uuid: areaOfInterestFileUuid,
+        name: 'aoi.geojson',
+        size: areaOfInterestContent.length,
+        content: areaOfInterestContent,
+        type: SurveyFile.SurveyFileType.areaOfInterest,
+      })
+    )
+    await SurveyManager.updateSurveyProp(user, sourceSurveyId, Survey.infoKeys.areaOfInterestFile, {
+      fileUuid: areaOfInterestFileUuid,
+      name: 'aoi.geojson',
+      size: areaOfInterestContent.length,
+      polygons: 1,
+      vertices: 4,
+    })
   })
 
   afterAll(async () => {
@@ -117,6 +159,12 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(importedHeaderContent, headerContent)).toBe(0)
+
+    await expectSameFileContent({
+      surveyId: importedSurveyId,
+      fileUuid: areaOfInterestFileUuid,
+      content: areaOfInterestContent,
+    })
   })
 
   test('branding logo and doc header image content survive survey cloning', async () => {
@@ -140,6 +188,12 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
+
+    await expectSameFileContent({
+      surveyId: clonedSurveyId,
+      fileUuid: areaOfInterestFileUuid,
+      content: areaOfInterestContent,
+    })
   })
 
   test('import warns and skips missing survey file content when skipMissingFiles is true', async () => {

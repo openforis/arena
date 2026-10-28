@@ -35,6 +35,7 @@ export const invalidPropKeys = {
 }
 
 export const SurveyFileType = {
+  areaOfInterest: 'areaOfInterest',
   chainMau: 'chainMau',
   preloadedMapLayer: 'preloadedMapLayer',
   printableExportPdf: 'printableExportPdf',

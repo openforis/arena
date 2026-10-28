@@ -13,14 +13,14 @@ import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
 export const SurveyInfoMap = (props) => {
   const {
-    areaOfInterest,
+    areaOfInterestFile,
     canUseAnalysis = false,
     preloadedMapLayers,
     preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     getFieldValidation,
-    setAreaOfInterest,
+    setAreaOfInterestFile,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
     setPreloadedMapLayersEnabled,
@@ -50,10 +50,10 @@ export const SurveyInfoMap = (props) => {
         />
       )}
       <AreaOfInterestEditor
-        areaOfInterest={areaOfInterest}
+        areaOfInterestFile={areaOfInterestFile}
         readOnly={readOnly}
-        setAreaOfInterest={setAreaOfInterest}
-        validation={getFieldValidation(Survey.infoKeys.areaOfInterest)}
+        setAreaOfInterestFile={setAreaOfInterestFile}
+        validation={getFieldValidation(Survey.infoKeys.areaOfInterestFile)}
       />
       {experimentalFeatures && (
         <>
@@ -78,9 +78,9 @@ export const SurveyInfoMap = (props) => {
 }
 
 SurveyInfoMap.propTypes = {
-  areaOfInterest: PropTypes.object,
+  areaOfInterestFile: PropTypes.object,
   canUseAnalysis: PropTypes.bool,
-  setAreaOfInterest: PropTypes.func.isRequired,
+  setAreaOfInterestFile: PropTypes.func.isRequired,
   getFieldValidation: PropTypes.func.isRequired,
   sampleBasedImageInterpretationEnabled: PropTypes.bool,
   samplingPolygon: PropTypes.object,

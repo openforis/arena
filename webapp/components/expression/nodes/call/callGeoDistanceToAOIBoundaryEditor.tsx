@@ -1,8 +1,8 @@
 import React from 'react'
 
 import * as Expression from '@core/expressionParser/expression'
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 
 import { Alert } from '@webapp/components/Alert'
 import { useSurveyInfo } from '@webapp/store/survey'
@@ -24,7 +24,7 @@ export const CallGeoDistanceToAOIBoundaryEditor = (props: Props) => {
   const { expressionNode, onConfirm, variables } = props
 
   const surveyInfo = useSurveyInfo()
-  const areaOfInterestDefined = !!Survey.getAreaOfInterest(surveyInfo)
+  const areaOfInterestDefined = !!SurveyAreaOfInterest.getAreaOfInterestFileUuid(surveyInfo)
 
   return (
     <div className="function-editor">

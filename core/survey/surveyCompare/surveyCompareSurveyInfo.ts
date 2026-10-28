@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as ObjectUtils from '@core/objectUtils'
@@ -30,7 +31,6 @@ export const comparedSurveyInfoProps: string[] = [
   infoKeys.keepNonApplicableValues,
   infoKeys.sampleBasedImageInterpretationEnabled,
   infoKeys.samplingPolygon,
-  infoKeys.areaOfInterest,
   infoKeys.userExtraPropDefs,
   infoKeys.preloadedMapLayersEnabled,
   infoKeys.surveyDocOptions,
@@ -45,11 +45,20 @@ const withoutBrandingImages = (branding: Record<string, any> = {}) =>
 
 const getInfoProps = (survey: any): Record<string, any> => ObjectUtils.getProps(Survey.getSurveyInfo(survey)) ?? {}
 
+// the area of interest file uuid differs in every survey: the file is identified by its summary
+const withoutFileUuid = (areaOfInterestFile: Record<string, any> | null | undefined) =>
+  areaOfInterestFile
+    ? Object.fromEntries(
+        Object.entries(areaOfInterestFile).filter(([key]) => key !== SurveyAreaOfInterest.keys.fileUuid)
+      )
+    : areaOfInterestFile
+
 export const normalizeSurveyInfoProp = ({ key, value }: { key: string; value: any }) => {
   if (key === infoKeys.srs) {
     return normalizeValue((value ?? []).map((srs: any) => srs.code).sort((a: string, b: string) => a.localeCompare(b)))
   }
   if (key === infoKeys.branding) return normalizeValue(withoutBrandingImages(value))
+  if (key === infoKeys.areaOfInterestFile) return normalizeValue(withoutFileUuid(value))
   return normalizeValue(value, key)
 }
 
@@ -124,6 +133,7 @@ const SurveyFileKind = {
   preloadedMapLayers: 'preloadedMapLayers',
   surveyDocImages: 'surveyDocImages',
   branding: 'branding',
+  areaOfInterest: 'areaOfInterest',
 } as const
 
 interface SurveyFileEntry {
@@ -171,8 +181,27 @@ const getBrandingFileEntries = (survey: any): SurveyFileEntry[] => {
   })
 }
 
+const getAreaOfInterestFileEntries = (survey: any): SurveyFileEntry[] => {
+  const descriptor = SurveyAreaOfInterest.getAreaOfInterestFile(survey)
+  const summary = SurveyAreaOfInterest.getAreaOfInterestFileSummary(survey)
+  if (!descriptor || !summary) return []
+  const { fileUuid, name, ...normalized } = descriptor
+  return [
+    {
+      kind: SurveyFileKind.areaOfInterest,
+      key: SurveyFileKind.areaOfInterest,
+      name,
+      fileType: SurveyFile.SurveyFileType.areaOfInterest,
+      fileUuid,
+      normalized: normalizeValue(normalized) ?? {},
+      summary,
+    },
+  ]
+}
+
 /**
- * Returns the survey files referenced by the survey info (preloaded map layers, survey doc images, branding images).
+ * Returns the survey files referenced by the survey info (preloaded map layers, survey doc images, branding images,
+ * area of interest).
  * @param {any} survey - The survey.
  * @returns {SurveyFileEntry[]} - The file entries.
  */
@@ -180,6 +209,7 @@ export const getSurveyFileEntries = (survey: any): SurveyFileEntry[] => [
   ...getListFileEntries({ survey, kind: SurveyFileKind.preloadedMapLayers }),
   ...getListFileEntries({ survey, kind: SurveyFileKind.surveyDocImages }),
   ...getBrandingFileEntries(survey),
+  ...getAreaOfInterestFileEntries(survey),
 ]
 
 const indexEntries = (entries: SurveyFileEntry[]): Record<string, SurveyFileEntry> =>
@@ -205,8 +235,9 @@ const newSurveyFileDiff = ({
 })
 
 /**
- * Compares the survey files (preloaded map layers, survey doc images, branding images) of two surveys.
- * Files are matched by name (branding images by slot) and compared by size and labels.
+ * Compares the survey files (preloaded map layers, survey doc images, branding images, area of interest) of two
+ * surveys. Files are matched by name (branding images and area of interest by slot) and compared by size and labels
+ * (area of interest by size and summary).
  * @param {object} params - The parameters.
  * @param {any} params.sourceSurvey - Source survey.
  * @param {any} params.targetSurvey - Target survey.
@@ -274,7 +305,10 @@ const getSourceSurveyInfoPropValue = ({ sourceSurvey, targetSurvey, key }) => {
 const newFileFromEntry = (entry: SurveyFileEntry) =>
   SurveyFile.createFile({
     name: entry.name,
-    labels: entry.kind === SurveyFileKind.branding ? null : SurveyFile.getLabels(entry.summary),
+    labels:
+      entry.kind === SurveyFileKind.preloadedMapLayers || entry.kind === SurveyFileKind.surveyDocImages
+        ? SurveyFile.getLabels(entry.summary)
+        : null,
     size: entry.normalized.size ?? SurveyFile.getSize(entry.summary),
     type: entry.fileType,
   })
@@ -298,15 +332,23 @@ const applyFileDiffToList = ({ list, diff, sourceEntry, newFile }) => {
   return result
 }
 
+const planAreaOfInterestFileDiff = ({ sourceSurvey, plan, newFile }) => {
+  plan.surveyProps[infoKeys.areaOfInterestFile] = newFile
+    ? { ...SurveyAreaOfInterest.getAreaOfInterestFile(sourceSurvey), fileUuid: SurveyFile.getUuid(newFile) }
+    : null
+}
+
 const planSurveyFileDiff = ({ context, diff }) => {
-  const { sourceEntries, targetEntries, plan, lists, branding } = context
+  const { sourceSurvey, sourceEntries, targetEntries, plan, lists, branding } = context
   const sourceEntry = sourceEntries[diff.id]
   const targetEntry = targetEntries[diff.id]
   const entry = sourceEntry ?? targetEntry
   const newFile = sourceEntry ? newFileFromEntry(sourceEntry) : null
   if (newFile) plan.surveyFilesToInsert.push({ sourceUuid: sourceEntry.fileUuid, file: newFile })
   if (targetEntry) plan.surveyFileUuidsToDelete.push(targetEntry.fileUuid)
-  if (entry.kind === SurveyFileKind.branding) {
+  if (entry.kind === SurveyFileKind.areaOfInterest) {
+    planAreaOfInterestFileDiff({ sourceSurvey, plan, newFile })
+  } else if (entry.kind === SurveyFileKind.branding) {
     branding.value = { ...branding.value }
     if (newFile) {
       branding.value[entry.key] = SurveyBranding.newBrandingImageDescriptor({
@@ -355,6 +397,7 @@ export const buildSurveyInfoApplyPlan = ({
   }
   const targetProps = getInfoProps(targetSurvey)
   const context = {
+    sourceSurvey,
     sourceEntries: indexEntries(getSurveyFileEntries(sourceSurvey)),
     targetEntries: indexEntries(getSurveyFileEntries(targetSurvey)),
     plan,

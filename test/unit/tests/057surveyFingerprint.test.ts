@@ -1,3 +1,4 @@
+import * as Survey from '@core/survey/survey'
 import { SurveyFingerprintType, buildSurveyFingerprintContent } from '@core/survey/surveyCompare'
 
 import {
@@ -9,6 +10,12 @@ import {
   setValidationExpression,
   updateNodeDef,
 } from '../../utils/surveyCompareTestUtils'
+
+const withAreaOfInterestFile = ({ survey, fileUuid, vertices = 5 }) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const areaOfInterestFile = { fileUuid, name: 'aoi.geojson', size: 100, polygons: 1, vertices }
+  return { ...survey, info: { ...surveyInfo, props: { ...surveyInfo.props, areaOfInterestFile } } }
+}
 
 const fingerprint = ({ survey, items, type }) =>
   buildSurveyFingerprintContent({ survey, itemsByCategoryUuid: itemsByCategoryUuid(survey, items), type })
@@ -36,6 +43,16 @@ describe('Survey fingerprint', () => {
     const fingerprintsB = fingerprints(surveyB)
     expect(fingerprintsB.structural).toEqual(fingerprintsA.structural)
     expect(fingerprintsB.strict).not.toEqual(fingerprintsA.strict)
+  })
+
+  test('the area of interest is part of the fingerprints, its file uuid is not', async () => {
+    const { survey, items } = await buildSurvey()
+    const original = fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-1' }), items })
+    expect(fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-2' }), items })).toEqual(original)
+    expect(fingerprints({ survey, items }).structural).not.toEqual(original.structural)
+    expect(
+      fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-1', vertices: 7 }), items }).structural
+    ).not.toEqual(original.structural)
   })
 
   test('a change in the definition changes both fingerprints', async () => {

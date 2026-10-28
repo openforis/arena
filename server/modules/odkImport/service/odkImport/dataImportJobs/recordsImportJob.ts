@@ -90,7 +90,7 @@ export default class RecordsImportJob extends Job {
       !Survey.isPublished(surveyInfoSummary)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, cycle, draft: fetchDraft, advanced: true },
+      { surveyId, cycle, draft: fetchDraft, advanced: true, includeAreaOfInterest: true },
       tx
     )
     const surveyInfo = Survey.getSurveyInfo(survey)

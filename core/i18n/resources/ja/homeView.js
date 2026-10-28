@@ -140,6 +140,8 @@ export default {
 
     areaOfInterest: {
       title: '関心領域',
+      polygons: 'ポリゴン',
+      vertices: '頂点',
       info: '式関数 geoDistanceToAOIBoundary で位置が領域内にあるかを確認するために使用されるポリゴン（GeoJSON、WGS84座標）。Arena Mobile ではオフラインでも使用できます',
       summary: 'ポリゴン {{polygons}} 個、頂点 {{vertices}} 個',
       invalidFile: 'ファイルにWGS84座標のGeoJSON形式の有効なポリゴンが含まれていません',

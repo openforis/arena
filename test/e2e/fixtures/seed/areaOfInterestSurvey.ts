@@ -1,11 +1,16 @@
+import type { AreaOfInterest } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SB from '@test/utils/surveyBuilder'
 
 // pilot area (WGS84) around the location set as browser geolocation in the Playwright config
-export const areaOfInterest = {
+export const areaOfInterest: AreaOfInterest = {
   type: 'Polygon',
   coordinates: [
     [
@@ -77,10 +82,28 @@ export const insertAreaOfInterestSurvey = async ({
     .label('Report')
     .displayInOwnPage()
 
-  const surveyBuilder = SB.survey(user, rootBuilder).props({ [Survey.infoKeys.areaOfInterest]: areaOfInterest })
+  // the area of interest is stored as survey file, referenced by the survey info
+  const content = Buffer.from(JSON.stringify(areaOfInterest))
+  const fileName = 'pilot_area.geojson'
+  const areaOfInterestFile = SurveyFile.createFile({
+    type: SurveyFile.SurveyFileType.areaOfInterest,
+    name: fileName,
+    size: content.length,
+    content,
+  })
+  const surveyBuilder = SB.survey(user, rootBuilder).props({
+    [Survey.infoKeys.areaOfInterestFile]: SurveyAreaOfInterest.newAreaOfInterestFileDescriptor({
+      fileUuid: SurveyFile.getUuid(areaOfInterestFile),
+      name: fileName,
+      size: content.length,
+      areaOfInterest,
+    }),
+  })
   surveyBuilder.name = name
   surveyBuilder.label = label
 
   const survey = await surveyBuilder.buildAndStore(true)
-  return Number(Survey.getId(survey))
+  const surveyId = Number(Survey.getId(survey))
+  await SurveyFileManager.insertFile(surveyId, areaOfInterestFile)
+  return surveyId
 }

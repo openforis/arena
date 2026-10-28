@@ -97,7 +97,11 @@ export const createRecord = async ({ user, surveyId, recordToCreate }) => {
 }
 
 export const createRecordFromSamplingPointDataItem = async ({ user, surveyId, cycle, itemUuid }) => {
-  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true })
+  const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+    surveyId,
+    advanced: true,
+    includeAreaOfInterest: true,
+  })
   return RecordManager.createRecordFromSamplingPointDataItem({
     user,
     survey,
@@ -669,7 +673,13 @@ export const mergeRecords = async (
     const recordTarget = await fetchRecordAndNodesByUuid({ surveyId, recordUuid: targetRecordUuid, user }, tx)
 
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },
+      {
+        surveyId,
+        advanced: true,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+        includeAreaOfInterest: true,
+      },
       tx
     )
 

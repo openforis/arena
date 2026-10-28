@@ -27,4 +27,11 @@ describe('SurveyMobilePackage', () => {
       { uuid: 'logo', type: SurveyFile.SurveyFileType.brandingSurveyLogo1, name: 'logo.png', size: 5 },
     ])
   })
+
+  test('area of interest', () => {
+    const props = { areaOfInterestFile: { fileUuid: 'aoi', name: 'aoi.geojson', size: 100, polygons: 1, vertices: 5 } }
+    expect(SurveyMobilePackage.getFileSummaries(surveyInfo(props))).toEqual([
+      { uuid: 'aoi', type: SurveyFile.SurveyFileType.areaOfInterest, name: 'aoi.geojson', size: 100 },
+    ])
+  })
 })

@@ -108,6 +108,7 @@ export default {
     brandingSurveyLogo2: '調査ロゴ 2',
     brandingSurveyLogo3: '調査ロゴ 3',
     brandingLandingBackground: 'ランディングページの背景',
+    areaOfInterest: '関心領域',
   },
   cycle: 'サイクル {{cycle}}',
   property: 'プロパティ',

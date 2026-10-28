@@ -24,7 +24,9 @@ export const keys = {
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
   // Props
+  // area of interest geometry: set only in memory on the server, for the expression evaluator
   areaOfInterest: 'areaOfInterest',
+  areaOfInterestFile: 'areaOfInterestFile',
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
@@ -143,7 +145,6 @@ export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonAppl
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
-export const getAreaOfInterest = ObjectUtils.getProp(keys.areaOfInterest, null)
 
 export const getSamplingPolygon = (surveyInfo) => {
   const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo) as object

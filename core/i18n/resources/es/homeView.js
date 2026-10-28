@@ -127,6 +127,8 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
 
     areaOfInterest: {
       title: 'Área de interés',
+      polygons: 'Polígonos',
+      vertices: 'Vértices',
       info: 'Polígono (GeoJSON, coordenadas WGS84) usado por la función de expresión geoDistanceToAOIBoundary para comprobar si una ubicación está dentro del área, también sin conexión en Arena Mobile',
       summary: '{{polygons}} polígono(s), {{vertices}} vértices',
       invalidFile: 'El archivo no contiene un polígono válido en formato GeoJSON con coordenadas WGS84',

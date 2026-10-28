@@ -45,7 +45,10 @@ export default class ArenaMobileDataImportJob extends Job {
       this.setContext({ filePath })
     }
 
-    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, advanced: true }, tx)
+    const survey = await SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
+      { surveyId, advanced: true, includeAreaOfInterest: true },
+      tx
+    )
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (!Surveys.isVisibleInMobile(surveyInfo) || !Surveys.isRecordsUploadFromMobileAllowed(surveyInfo)) {
       throw new SystemError('dataImport.importFromMobileNotAllawed')

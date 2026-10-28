@@ -1,4 +1,4 @@
-import { getAreaOfInterestSummary, parseAreaOfInterest } from '@core/geo/areaOfInterestParser'
+import { getAreaOfInterestSummary, parseAreaOfInterest, parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 
 const ring1 = [
   [12.4, 41.8],
@@ -59,6 +59,12 @@ describe('Area of interest parser', () => {
       parseAreaOfInterest({ type: 'Polygon', coordinates: [ring1.map(([x, y]) => [x * 1000, y * 1000])] })
     ).toBeNull()
     expect(parseAreaOfInterest({ type: 'FeatureCollection', features: [] })).toBeNull()
+  })
+
+  test('JSON text', () => {
+    expect(parseAreaOfInterestJson(JSON.stringify(feature(polygon)))).toEqual(polygon)
+    expect(parseAreaOfInterestJson('not a json')).toBeNull()
+    expect(parseAreaOfInterestJson(JSON.stringify({ type: 'Point', coordinates: [12.5, 41.9] }))).toBeNull()
   })
 
   test('summary', () => {

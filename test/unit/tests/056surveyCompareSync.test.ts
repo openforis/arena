@@ -377,6 +377,50 @@ describe('SurveyCompare: full sync', () => {
       expect(SurveyFile.getSize(layerUpdated)).toBe(20)
       expect(surveyInfoPlan.surveyProps.branding.surveyLogo1.name).toBe('logo.png')
     })
+
+    test('the area of interest file is compared by its summary and replaced with a new file', async () => {
+      const { survey, items } = await buildSurvey()
+      const areaOfInterestFile = ({ fileUuid, vertices }) => ({
+        fileUuid,
+        name: 'aoi.geojson',
+        size: 100,
+        polygons: 1,
+        vertices,
+      })
+      const target = updateSurveyInfoProps(survey, {
+        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'target-aoi', vertices: 5 }),
+      })
+      // same file with another uuid (e.g. survey imported): no changes
+      const sourceSame = updateSurveyInfoProps(clone(survey), {
+        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'source-aoi', vertices: 5 }),
+      })
+      expect(compare({ source: sourceSame, target, sourceItems: items, targetItems: items }).surveyFiles).toEqual([])
+
+      const source = updateSurveyInfoProps(clone(survey), {
+        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'source-aoi', vertices: 7 }),
+      })
+      const result = compare({ source, target, sourceItems: items, targetItems: items })
+      expect(result.surveyInfo).toEqual([])
+      expect(result.surveyFiles.map((diff) => [diff.name, diff.fileType, diff.status])).toEqual([
+        ['aoi.geojson', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.changed],
+      ])
+      expect(result.surveyFiles[0].propDiffs.map((propDiff) => propDiff.key)).toEqual(['vertices'])
+
+      const surveyInfoPlan = buildSurveyInfoApplyPlan({
+        sourceSurvey: source,
+        targetSurvey: target,
+        surveyInfoDiffs: result.surveyInfo,
+        surveyFileDiffs: result.surveyFiles,
+        appliedIds: new Set(result.surveyFiles.map((diff) => diff.id)),
+      })
+      const [{ sourceUuid, file }] = surveyInfoPlan.surveyFilesToInsert
+      expect(sourceUuid).toBe('source-aoi')
+      expect(SurveyFile.getType(file)).toBe(SurveyFile.SurveyFileType.areaOfInterest)
+      expect(surveyInfoPlan.surveyFileUuidsToDelete).toEqual(['target-aoi'])
+      expect(surveyInfoPlan.surveyProps.areaOfInterestFile).toEqual(
+        areaOfInterestFile({ fileUuid: SurveyFile.getUuid(file), vertices: 7 })
+      )
+    })
   })
 
   describe('renames', () => {

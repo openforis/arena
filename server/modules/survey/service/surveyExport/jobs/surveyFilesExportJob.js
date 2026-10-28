@@ -6,6 +6,7 @@ import { ExportFile } from '../exportFile'
 import * as DbUtils from '@server/db/dbUtils'
 
 const SURVEY_FILE_TYPES_TO_EXPORT = [
+  SurveyFile.SurveyFileType.areaOfInterest,
   SurveyFile.SurveyFileType.preloadedMapLayer,
   SurveyFile.SurveyFileType.surveyDocImage,
   SurveyFile.SurveyFileType.brandingSurveyLogo1,

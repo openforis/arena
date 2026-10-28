@@ -25,7 +25,7 @@ const SurveyInfoForm = () => {
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const {
-    areaOfInterest,
+    areaOfInterestFile,
     preloadedMapLayers,
     preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
@@ -53,7 +53,7 @@ const SurveyInfoForm = () => {
     setSurveyDocOptions,
     setUserExtraPropDefs,
     setBranding,
-    setAreaOfInterest,
+    setAreaOfInterestFile,
     getFieldValidation,
     saveProps,
 
@@ -99,10 +99,10 @@ const SurveyInfoForm = () => {
     component: SurveyInfoMap,
     label: 'homeView:surveyInfo.map',
     props: {
-      areaOfInterest,
+      areaOfInterestFile,
       canUseAnalysis,
       getFieldValidation,
-      setAreaOfInterest,
+      setAreaOfInterestFile,
       sampleBasedImageInterpretationEnabled,
       samplingPolygon,
       setSampleBasedImageInterpretationEnabled,

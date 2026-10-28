@@ -62,6 +62,21 @@ export const parseAreaOfInterest = (geoJson: unknown): AreaOfInterest | null => 
 }
 
 /**
+ * Extracts the area of interest from the text of a GeoJSON file.
+ *
+ * @param {string} text - The GeoJSON text.
+ * @returns {AreaOfInterest|null} - The area of interest or null if the text is not valid JSON or has no valid polygon.
+ */
+export const parseAreaOfInterestJson = (text: string): AreaOfInterest | null => {
+  try {
+    return parseAreaOfInterest(JSON.parse(text))
+  } catch {
+    // not a valid JSON text
+    return null
+  }
+}
+
+/**
  * Returns the number of polygons and vertices of an area of interest.
  *
  * @param {AreaOfInterest} areaOfInterest - The area of interest.

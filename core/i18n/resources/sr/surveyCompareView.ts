@@ -111,6 +111,7 @@ Izmjene se čuvaju kao nacrt: zapisi će ih dobiti tek kada istraživanje bude o
     brandingSurveyLogo2: 'Logo istraživanja 2',
     brandingSurveyLogo3: 'Logo istraživanja 3',
     brandingLandingBackground: 'Pozadina početne stranice',
+    areaOfInterest: 'Područje od interesa',
   },
   cycle: 'ciklus {{cycle}}',
   property: 'Svojstvo',

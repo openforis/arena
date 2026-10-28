@@ -15,7 +15,10 @@ export default class RecordsValidationJob extends Job {
     const { context, tx } = this
     const { surveyId } = context
 
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, advanced: true }, tx)
+    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
+      { surveyId, advanced: true, includeAreaOfInterest: true },
+      tx
+    )
     this.setContext({ survey })
   }
 

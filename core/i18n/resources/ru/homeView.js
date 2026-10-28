@@ -140,6 +140,8 @@ export default {
 
     areaOfInterest: {
       title: 'Область интереса',
+      polygons: 'Полигоны',
+      vertices: 'Вершины',
       info: 'Полигон (GeoJSON, координаты WGS84), используемый функцией выражения geoDistanceToAOIBoundary для проверки, находится ли местоположение внутри области, в том числе офлайн в Arena Mobile',
       summary: 'Полигонов: {{polygons}}, вершин: {{vertices}}',
       invalidFile: 'Файл не содержит допустимого полигона в формате GeoJSON с координатами WGS84',
