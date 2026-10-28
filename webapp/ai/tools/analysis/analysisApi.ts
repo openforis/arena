@@ -40,6 +40,9 @@ export type AnalysisApi = {
   }) => Promise<object[]>
 }
 
+/** Items a category search returns at most; a result at this size may have more. */
+export const categoryItemsFetchLimit = 100
+
 /**
  * Axios implementation of the analysis HTTP calls.
  */
@@ -122,7 +125,16 @@ export const createAnalysisApi = ({ http }: { http: AnalysisHttp }): AnalysisApi
           timeout: analysisRequestTimeoutMs,
         })) as { date: string; count: number | string }[]
     ),
-  fetchCategoryItems: async ({ surveyId, categoryUuid, parentUuid, search, lang, draft, limit = 100, signal }) => {
+  fetchCategoryItems: async ({
+    surveyId,
+    categoryUuid,
+    parentUuid,
+    search,
+    lang,
+    draft,
+    limit = categoryItemsFetchLimit,
+    signal,
+  }) => {
     const data = await withTimeoutError(
       async () =>
         (await http.get(`/api/survey/${surveyId}/categories/${categoryUuid}/items`, {

@@ -13,7 +13,7 @@ import { AiToolFailure } from '@webapp/ai/tools/toolFailure'
 import { canViewCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
 import type { AiTool } from '@webapp/ai/tools/types'
 
-import type { AnalysisApi } from './analysisApi'
+import { categoryItemsFetchLimit, type AnalysisApi } from './analysisApi'
 import { getAnalysisContext, toRequestFailure } from './toolResults'
 
 export const categoryItemsMax = 20
@@ -89,14 +89,17 @@ export const createFindCategoryItemsTool = ({ api }: { api: AnalysisApi }): AiTo
       )
     }
     const found = items.filter(matches(text, lang))
+    // the server stops at the fetch limit: a full page means more items may exist, so there is no exact total
+    const totalIsLowerBound = items.length >= categoryItemsFetchLimit
     const result = {
       attribute,
       columns: ColumnNodeDef.getColumnNames(nodeDef),
       items: found
         .slice(0, categoryItemsMax)
         .map((item: any) => ({ code: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) })),
-      total: found.length,
-      truncated: found.length > categoryItemsMax,
+      // total is omitted when the fetch hit its limit
+      ...(totalIsLowerBound ? {} : { total: found.length }),
+      truncated: totalIsLowerBound || found.length > categoryItemsMax,
     }
     const fitted = fitListToBudget(result, 'items')
     return { ...fitted, truncated: result.truncated || (fitted.truncated ?? false) }
