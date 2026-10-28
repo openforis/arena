@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'Таны импортлох гэж буй файл хоосон байна',
+    emptyFileName: '{{headers}} баганад файлын нэр хоосон байна',
     invalidHeaders: 'Хүчингүй баганууд: {{invalidHeaders}}',
     invalidBoolean: 'Багана {{headers}}-д хүчингүй боол утга: {{value}}',
     invalidCode: `'{{attributeName}}' шинж чанарт хүчингүй код: {{code}}`,

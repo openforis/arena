@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'インポートしようとしているファイルが空です',
+    emptyFileName: '列 {{headers}} のファイル名が空です',
     invalidHeaders: '無効な列：{{invalidHeaders}}',
     invalidBoolean: '列{{headers}}の真偽値が無効です：{{value}}',
     invalidCode: `属性「{{attributeName}}」のコードが無効です：{{code}}`,

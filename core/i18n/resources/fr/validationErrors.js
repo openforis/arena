@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: "Le fichier que vous essayez d'importer est vide",
+    emptyFileName: 'Nom de fichier vide dans la colonne {{headers}}',
     invalidHeaders: 'Colonnes invalides : {{invalidHeaders}}',
     invalidBoolean: 'Valeur booléenne invalide dans la colonne {{headers}} : {{value}}',
     invalidCode: `Code invalide pour l'attribut '{{attributeName}}' : {{code}}`,

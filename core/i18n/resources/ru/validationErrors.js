@@ -71,6 +71,7 @@ export default {
 
   dataImport: {
     emptyFile: 'Файл, который вы пытаетесь импортировать, пуст',
+    emptyFileName: 'Пустое имя файла в столбце {{headers}}',
     invalidHeaders: 'Неверные столбцы: {{invalidHeaders}}',
     invalidBoolean: 'Неверное логическое значение в столбце {{headers}}: {{value}}',
     invalidCode: `Неверный код для атрибута '{{attributeName}}': {{code}}`,

@@ -80,7 +80,11 @@ test.describe('AI features (mock provider)', () => {
 
   test('hides the AI entry points when the user turns AI off', async ({ page, api }) => {
     await api.disableAiFeatures()
-    await page.goto(Urls.home)
+    // the settings load asynchronously: the absence only counts once they have arrived
+    await Promise.all([
+      page.waitForResponse((response) => response.url().includes('/api/ai/settings') && response.ok()),
+      page.goto(Urls.home),
+    ])
     await expect(page.getByTestId(TestId.aiAssistant.openBtn)).toHaveCount(0)
   })
 })

@@ -108,6 +108,7 @@ test.describe('Module introduction (mock provider)', () => {
     await openAssistantPanel(page)
     await selectAssistantArea(page, 'Help')
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.input)).toBeVisible()
+    await waitForSuggestionDetectors(page)
     await expect(cards(page).filter({ hasText: 'New to the form designer?' })).toHaveCount(0)
   })
 

@@ -10,7 +10,6 @@ import {
   applyCardAndCheckStatus,
   askAssistantAboutFirstRow,
   buildInvalidTreeRecord,
-  cleaningAreaLabel,
   expectReportRowCount,
   fixedValue,
   recordEditCard,
@@ -162,9 +161,8 @@ test.describe('AI cleaning assistant (mock model on the stub local server)', () 
       await page.goto(Urls.records)
       await openAssistantPanel(page)
       const areaTabs = assistantPanel(page).getByRole('tab')
-      // positive control: the panel lists its areas, so the missing Cleaning tab is a real absence
-      await expect(areaTabs.first()).toBeVisible()
-      await expect(areaTabs.filter({ hasText: cleaningAreaLabel })).toHaveCount(0)
+      // the exact list is the positive control: Design stays (unavailable), Analysis and Cleaning are hidden
+      await expect(areaTabs).toHaveText(['Design', 'Help'])
 
       // the report is not even routed without the permission: wait for the app to boot, then check its absence
       await Promise.all([
