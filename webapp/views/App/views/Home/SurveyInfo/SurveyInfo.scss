@@ -53,6 +53,20 @@
     flex-direction: column;
   }
 
+  .survey-info__area-of-interest {
+    margin-top: 1rem;
+
+    p {
+      margin: 0 0 0.5rem;
+    }
+  }
+
+  .survey-info__area-of-interest-summary {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+
   .survey-configuration {
     width: 25rem;
 

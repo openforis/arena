@@ -1113,6 +1113,11 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       distanceAttribute: 'Atributo de distância',
       bearingAttribute: 'Atributo de azimute',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        'A área de interesse do inquérito ainda não está definida: defina-a em Informações do inquérito → Mapa',
+    },
+    coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
 
     dateTimeDiffEditor: {

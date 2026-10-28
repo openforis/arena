@@ -138,6 +138,14 @@ export default {
     map: '地図',
     viewInfo: '情報を表示',
 
+    areaOfInterest: {
+      title: '関心領域',
+      info: '式関数 geoDistanceToAOIBoundary で位置が領域内にあるかを確認するために使用されるポリゴン（GeoJSON、WGS84座標）。Arena Mobile ではオフラインでも使用できます',
+      summary: 'ポリゴン {{polygons}} 個、頂点 {{vertices}} 個',
+      invalidFile: 'ファイルにWGS84座標のGeoJSON形式の有効なポリゴンが含まれていません',
+      confirmDelete: '関心領域を削除してもよろしいですか？',
+    },
+
     preloadedMapLayers: {
       enabledMessage: '事前ロード済み地図レイヤーが有効です',
       title: '事前ロード済み地図レイヤー',

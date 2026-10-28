@@ -31,6 +31,8 @@ export default {
     first: 'Vraća prvu vrijednost ili čvor navedenog višestrukog atributa ili entiteta',
     geoCoordinateAtDistance: 'Vraća koordinate na navedenoj udaljenosti i azimutu od navedenih koordinata',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoDistanceToAOIBoundary:
+      'Vraća udaljenost (u metrima) između koordinate i granice područja od interesa istraživanja: negativna unutar područja, pozitivna van njega',
     geoPolygon: 'Generiše poligon u GeoJSON formatu iz liste koordinata',
     includes: 'Vraća true ako navedeni višestruki atribut sadrži navedenu vrijednost.',
     index: 'Vraća indeks navedenog čvora među njegovim srodnim čvorovima',

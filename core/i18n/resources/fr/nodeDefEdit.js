@@ -32,6 +32,8 @@ export default {
     geoCoordinateAtDistance:
       'Renvoie les coordonnées à une distance et un cap spécifiés depuis les coordonnées spécifiées',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoDistanceToAOIBoundary:
+      "Renvoie la distance (en mètres) entre une coordonnée et la limite de la zone d'intérêt de l'enquête : négative à l'intérieur de la zone, positive à l'extérieur",
     geoPolygon: "Génère un polygone en GeoJSON à partir d'une liste de coordonnées",
     includes: "Renvoie vrai si l'attribut multiple spécifié inclut la valeur spécifiée.",
     index: "Renvoie l'index du nœud spécifié parmi ses voisins",

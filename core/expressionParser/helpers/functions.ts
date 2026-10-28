@@ -7,6 +7,7 @@ export const functionNames = {
   first: 'first',
   geoCoordinateAtDistance: 'geoCoordinateAtDistance',
   geoDistance: 'geoDistance',
+  geoDistanceToAOIBoundary: 'geoDistanceToAOIBoundary',
   geoPolygon: 'geoPolygon',
   includes: 'includes',
   index: 'index',

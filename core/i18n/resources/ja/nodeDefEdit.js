@@ -30,6 +30,8 @@ export default {
     first: '指定した複数属性または項目の最初の値またはノードを返します',
     geoCoordinateAtDistance: '指定した座標から指定した距離・方位にある座標を返します',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoDistanceToAOIBoundary:
+      '座標と調査の関心領域の境界との距離（メートル単位）を返します：領域内では負、領域外では正の値',
     geoPolygon: '座標のリストからGeoJSON形式のポリゴンを生成します',
     includes: '指定した複数属性に指定した値が含まれている場合にtrueを返します。',
     index: '指定したノードの、兄弟ノード内でのインデックスを返します',

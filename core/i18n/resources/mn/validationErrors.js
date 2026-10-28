@@ -171,6 +171,7 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'Мөчлөгийн дуусах огноо сүүлийн мөчлөгөөс бусад бүх мөчлөгт заавал байх ёстой',
     fieldManualLinksInvalid: 'Талбайн гарын авлагын холбоос хүчингүй',
+    areaOfInterestInvalid: 'Сонирхсон бүс нь WGS84 координаттай GeoJSON форматын олон өнцөгт байх ёстой',
   },
 
   surveyPreloadedMapLayer: {

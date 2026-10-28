@@ -32,6 +32,8 @@ export default {
     geoCoordinateAtDistance:
       'Returns the coordinates at a specified distance and bearing from the specified coordinates',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoDistanceToAOIBoundary:
+      'Returns the distance (in meters) between a coordinate and the boundary of the survey area of interest: negative inside the area, positive outside',
     geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
     includes: 'Returns true if the specified multiple attribute includes the specified value.',
     index: 'Returns the index of the specified node among its siblings',

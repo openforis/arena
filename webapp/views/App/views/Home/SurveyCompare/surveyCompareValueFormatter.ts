@@ -1,5 +1,7 @@
 // Formats the (normalized) values of a survey comparison like they are shown in the survey designer.
 
+import { getAreaOfInterestSummary, parseAreaOfInterest } from '@core/geo/areaOfInterestParser'
+
 export interface FormattedLine {
   label?: string
   value?: string
@@ -12,6 +14,7 @@ type Translate = (key: string, params?: Record<string, unknown>) => string
 
 // i18n keys of the property labels used in the node def editor
 const propLabelKeys: Record<string, string> = {
+  areaOfInterest: 'homeView:surveyInfo.areaOfInterest.title',
   applicable: 'nodeDefEdit:advancedProps.relevantIf',
   branding: 'surveyCompareView:props.branding',
   defaultCycleKey: 'surveyCompareView:props.defaultCycleKey',
@@ -304,6 +307,13 @@ const formatFileSize = (size: number): string => {
   return `${(size / (1024 * 1024)).toFixed(1)} MB`
 }
 
+// the summary instead of the (possibly very long) list of coordinates
+const formatAreaOfInterest = ({ t, value, indent }): FormattedLine[] | null => {
+  const areaOfInterest = parseAreaOfInterest(value)
+  if (!areaOfInterest) return null
+  return [{ value: t('homeView:surveyInfo.areaOfInterest.summary', getAreaOfInterestSummary(areaOfInterest)), indent }]
+}
+
 const formatByKey = ({ t, key, value, indent }): FormattedLine[] | null => {
   if (key === 'cycles' && Array.isArray(value)) {
     return [{ value: value.map(formatCycleNumber).join(', '), indent }]
@@ -311,6 +321,7 @@ const formatByKey = ({ t, key, value, indent }): FormattedLine[] | null => {
   if (key === 'cycles' && isPlainObject(value)) return formatSurveyCycles({ t, value, indent })
   if (key === 'defaultCycleKey') return [{ value: formatCycleNumber(value), indent }]
   if (key === 'size' && typeof value === 'number') return [{ value: formatFileSize(value), indent }]
+  if (key === 'areaOfInterest') return formatAreaOfInterest({ t, value, indent })
   return null
 }
 

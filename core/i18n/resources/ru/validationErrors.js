@@ -174,6 +174,7 @@ export default {
     cycleDateEndInvalid: 'Дата окончания цикла недействительна',
     cycleDateEndMandatoryExceptForLastCycle: 'Дата окончания цикла обязательна для всех циклов, кроме последнего',
     fieldManualLinksInvalid: 'Неверная ссылка на полевое руководство',
+    areaOfInterestInvalid: 'Область интереса должна быть полигоном в формате GeoJSON с координатами WGS84',
   },
 
   surveyPreloadedMapLayer: {

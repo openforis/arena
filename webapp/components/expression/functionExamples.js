@@ -10,6 +10,8 @@ const functionExamples = {
     [functionNames.geoCoordinateAtDistance]:
       'geoCoordinateAtDistance(coordinate_attribute, 20, 90), geoCoordinateAtDistance(coordinate_attribute, distance_attribute, bearing_attribute), ...',
     [functionNames.geoDistance]: 'geoDistance(coordinate_attribute_1, coordinate_attribute_2)',
+    [functionNames.geoDistanceToAOIBoundary]:
+      'geoDistanceToAOIBoundary(coordinate_attribute) (< 0 inside the area of interest, > 0 outside), geoDistanceToAOIBoundary(coordinate_attribute) < -coordinate_attribute.accuracy',
     [functionNames.geoPolygon]:
       'geoPolygon(coordinate_attribute_1, coordinate_attribute_2, ...), geoPolygon(multiple_entity_name.coordinate_attribute), ...',
     [functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,

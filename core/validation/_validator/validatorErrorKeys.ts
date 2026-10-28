@@ -137,6 +137,7 @@ export const ValidatorErrorKeys = {
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors:surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors:surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
     fieldManualLinksInvalid: 'validationErrors:surveyInfoEdit.fieldManualLinksInvalid',
+    areaOfInterestInvalid: 'validationErrors:surveyInfoEdit.areaOfInterestInvalid',
   },
 
   surveyPreloadedMapLayer: {

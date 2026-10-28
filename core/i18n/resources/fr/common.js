@@ -1119,6 +1119,11 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       distanceAttribute: 'Attribut de distance',
       bearingAttribute: 'Attribut de cap',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        "La zone d'intérêt de l'enquête n'est pas encore définie : définissez-la dans Infos de l'enquête → Carte",
+    },
+    coordinateAttribute: 'Attribut de coordonnées',
     coordinateAttributeWithPosition: 'Attribut de coordonnée {{position}}',
 
     dateTimeDiffEditor: {

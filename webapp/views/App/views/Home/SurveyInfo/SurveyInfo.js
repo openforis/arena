@@ -25,6 +25,7 @@ const SurveyInfoForm = () => {
   const canUseAnalysis = useAuthCanUseAnalysis()
 
   const {
+    areaOfInterest,
     preloadedMapLayers,
     preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
@@ -52,6 +53,7 @@ const SurveyInfoForm = () => {
     setSurveyDocOptions,
     setUserExtraPropDefs,
     setBranding,
+    setAreaOfInterest,
     getFieldValidation,
     saveProps,
 
@@ -92,24 +94,25 @@ const SurveyInfoForm = () => {
       },
     })
   }
-  if (canUseAnalysis) {
-    tabs.push({
-      key: 'sampleBasedInterpretation',
-      component: SurveyInfoMap,
-      label: 'homeView:surveyInfo.map',
-      props: {
-        getFieldValidation,
-        sampleBasedImageInterpretationEnabled,
-        samplingPolygon,
-        setSampleBasedImageInterpretationEnabled,
-        setSamplingPolygon,
-        preloadedMapLayers,
-        preloadedMapLayersEnabled,
-        setPreloadedMapLayers,
-        setPreloadedMapLayersEnabled,
-      },
-    })
-  }
+  tabs.push({
+    key: 'sampleBasedInterpretation',
+    component: SurveyInfoMap,
+    label: 'homeView:surveyInfo.map',
+    props: {
+      areaOfInterest,
+      canUseAnalysis,
+      getFieldValidation,
+      setAreaOfInterest,
+      sampleBasedImageInterpretationEnabled,
+      samplingPolygon,
+      setSampleBasedImageInterpretationEnabled,
+      setSamplingPolygon,
+      preloadedMapLayers,
+      preloadedMapLayersEnabled,
+      setPreloadedMapLayers,
+      setPreloadedMapLayersEnabled,
+    },
+  })
   if (!readOnly) {
     tabs.push({
       key: 'documents',

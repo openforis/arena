@@ -176,6 +176,7 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'La date de fin du cycle est obligatoire pour tous les cycles sauf le dernier',
     fieldManualLinksInvalid: 'Le lien vers le manuel de terrain est invalide',
+    areaOfInterestInvalid: "La zone d'intérêt doit être un polygone au format GeoJSON avec des coordonnées WGS84",
   },
 
   surveyPreloadedMapLayer: {

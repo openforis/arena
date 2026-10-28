@@ -36,6 +36,7 @@ const fingerprintSurveyInfoProps: string[] = [
   infoKeys.keepNonApplicableValues,
   infoKeys.sampleBasedImageInterpretationEnabled,
   infoKeys.samplingPolygon,
+  infoKeys.areaOfInterest,
   infoKeys.userExtraPropDefs,
 ]
 

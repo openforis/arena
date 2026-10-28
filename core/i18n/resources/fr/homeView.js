@@ -139,6 +139,14 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
     editInfo: 'Modifier les infos',
     viewInfo: 'Voir les infos',
 
+    areaOfInterest: {
+      title: "Zone d'intérêt",
+      info: "Polygone (GeoJSON, coordonnées WGS84) utilisé par la fonction d'expression geoDistanceToAOIBoundary pour vérifier si un emplacement se trouve dans la zone, également hors ligne dans Arena Mobile",
+      summary: '{{polygons}} polygone(s), {{vertices}} sommets',
+      invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',
+      confirmDelete: "Êtes-vous sûr de vouloir supprimer la zone d'intérêt ?",
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Couches de carte préchargées activées',
       title: 'Couches de carte préchargées',

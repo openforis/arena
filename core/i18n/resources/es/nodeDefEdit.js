@@ -31,6 +31,8 @@ export default {
     geoCoordinateAtDistance:
       'Devuelve las coordenadas a una distancia y rumbo especificados desde las coordenadas especificadas',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoDistanceToAOIBoundary:
+      'Devuelve la distancia (en metros) entre una coordenada y el límite del área de interés de la encuesta: negativa dentro del área, positiva fuera',
     first: 'Devuelve el primer valor o nodo del atributo o entidad múltiple especificado',
     geoPolygon: 'Genera un polígono en GeoJSON a partir de una lista de coordenadas',
     includes: 'Devuelve verdadero si el atributo múltiple especificado incluye el valor especificado.',

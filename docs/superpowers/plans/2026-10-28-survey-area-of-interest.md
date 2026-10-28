@@ -245,46 +245,58 @@ add to `Surveys` in `src/survey/surveys/index.ts`.
 
 ## Part 2: arena (repo `openforis/arena`, branch `survey-area-of-interest`)
 
+**Status:** implemented in openforis/arena#4588, needs arena-core with openforis/arena-core#491.
+
+Changes from the original plan:
+
+- arena-core#491: `Surveys.getAreaOfInterest` also reads `survey.info.props` (the Arena survey object); without it the function always returned `null` in Arena.
+- The Survey info → Map tab is now visible to every survey user (the AOI does not depend on Analysis); only the sample-based image interpretation settings still require Analysis.
+- AOI editor: summary (polygons / vertices) + download + delete, no map preview (follow-up).
+- Survey compare: the AOI is compared and shown as summary, not as list of coordinates.
+- Expression editor: new `CallGeoDistanceToAOIBoundaryEditor` (TypeScript), coordinate attributes only, with a warning when the survey has no AOI; `CallSingleParameterEditor` got an optional `label` prop.
+
 ### Task 3: arena-core bump and survey info prop
 
 **Files:** `package.json`, `yarn.lock`, `core/survey/_survey/surveyInfo.ts`, `core/survey/survey.js`, `core/survey/surveyCompare/surveyFingerprint.ts`.
 
-- [ ] Bump `@openforis/arena-core` to the released version (and `@openforis/arena-server` if it requires it), `yarn dedupe @openforis/arena-core`.
-- [ ] `surveyInfo.ts`: `keys.areaOfInterest: 'areaOfInterest'`; `export const getAreaOfInterest = ObjectUtils.getProp(keys.areaOfInterest, null)`; expose `Survey.getAreaOfInterest` in `core/survey/survey.js`.
-- [ ] `surveyFingerprint.ts`: add `infoKeys.areaOfInterest` to the compared info keys, so survey compare / publish warnings detect AOI changes.
-- [ ] Check the survey export/import (Arena format) and Arena Mobile survey download keep `props.areaOfInterest` (props are copied as a whole: verify with an integration test of export → import).
-- [ ] Commit `Survey info: areaOfInterest prop, arena-core bump`.
+- [x] Bump `@openforis/arena-core` to the released version (and `@openforis/arena-server` if it requires it), `yarn dedupe @openforis/arena-core`.
+- [x] `surveyInfo.ts`: `keys.areaOfInterest: 'areaOfInterest'`; `export const getAreaOfInterest = ObjectUtils.getProp(keys.areaOfInterest, null)`; expose `Survey.getAreaOfInterest` in `core/survey/survey.js`.
+- [x] `surveyFingerprint.ts`: add `infoKeys.areaOfInterest` to the compared info keys, so survey compare / publish warnings detect AOI changes.
+- [x] Check the survey export/import (Arena format) and Arena Mobile survey download keep `props.areaOfInterest`: verified in the code (`surveyCreatorJob` and `Survey.newSurvey` keep all the props), no integration test added.
+- [x] Commit `Survey info: areaOfInterest prop, arena-core bump`.
 
 ### Task 4: AOI editor in Survey info → Map
 
 **Files:**
 
 - Create `core/geo/areaOfInterestParser.ts`: `parseAreaOfInterest(geoJson: unknown): AreaOfInterest | null` — accepts a `Polygon`/`MultiPolygon` geometry, a `Feature`, or a `FeatureCollection` of polygon features (merged into a `MultiPolygon`); returns null for anything else.
-- Create `test/unit/geo/areaOfInterestParser.test.ts`: polygon, multipolygon, feature, feature collection (mixed with points → only polygons kept), invalid input → null.
+- Create `test/unit/tests/areaOfInterestParser.test.ts`: polygon, multipolygon, feature, feature collection (mixed with points → only polygons kept), invalid input → null.
 - Create `webapp/views/App/views/Home/SurveyInfo/AreaOfInterestEditor.tsx`: Dropzone (`.geojson`, max 1 MB, like `PreloadedMapLayerEditor`), shows the number of polygons / vertices, a small map preview (reuse `MapContainer` with a GeoJSON layer), "Remove" button; read-only when the user cannot edit the survey.
 - Modify `SurveyInfoMap.js`, `store/useSurveyInfoForm.js`: `areaOfInterest` value and `setAreaOfInterest = (value) => setObjectField(Survey.infoKeys.areaOfInterest, value)`.
 - Modify `core/i18n/resources/en/homeView.js` (+ other languages): labels `surveyInfo.areaOfInterest.*` (title, upload hint, invalid file, remove, info text explaining `geoDistanceToAOIBoundary`).
 - Server: validate the prop on survey info update (`server/modules/survey/...` validator): must parse with `parseAreaOfInterest`, size limit.
 
-- [ ] Write the parser unit tests (failing), implement the parser, run `yarn test:unit` → PASS, commit.
-- [ ] Implement the editor + form wiring, check with `yarn watch` (upload, preview, remove, save, reload), run `yarn typecheck` and eslint, commit.
+- [x] Write the parser unit tests (failing), implement the parser, run `yarn test:unit` → PASS, commit.
+- [x] Implement the editor + form wiring, run `yarn typecheck` and eslint, commit.
+- [ ] Manual check with `yarn watch`: upload, remove, download, save, reload; expression editor function list.
+- [ ] (Follow-up, optional) map preview of the AOI in the editor and in the Data → Map view.
 - [ ] (Follow-up, optional) KML upload, converting with the existing Leaflet KML support (`webapp/components/MapContainer/L.KML.js`) to GeoJSON.
 
 ### Task 5: Expression editor support
 
 **Files:** `core/expressionParser/helpers/functions.ts`, `webapp/components/expression/functionExamples.js`, `core/i18n/resources/*/nodeDefEdit.js`.
 
-- [ ] Add `geoDistanceToAOIBoundary: 'geoDistanceToAOIBoundary'` to the function names.
-- [ ] Example: `geoDistanceToAOIBoundary(coordinate_attribute) (negative inside the area of interest, positive outside)`.
-- [ ] Description (en): `Returns the distance in meters between a coordinate and the boundary of the survey area of interest (negative inside, positive outside)`; translate in the other languages.
-- [ ] Verify the function is offered in the advanced expression editor (autocomplete) and in the simple editor function list, if applicable (`webapp/components/expression/nodes/call/functions.js`).
-- [ ] Commit.
+- [x] Add `geoDistanceToAOIBoundary: 'geoDistanceToAOIBoundary'` to the function names.
+- [x] Example: `geoDistanceToAOIBoundary(coordinate_attribute) (negative inside the area of interest, positive outside)`.
+- [x] Description (en): `Returns the distance in meters between a coordinate and the boundary of the survey area of interest (negative inside, positive outside)`; translate in the other languages.
+- [x] Verify the function is offered in the advanced expression editor (autocomplete) and in the simple editor function list, if applicable (`webapp/components/expression/nodes/call/functions.js`).
+- [x] Commit.
 
 ### Task 6: Release notes, credit to ASSEDEV
 
-- [ ] `CHANGELOG.md`: entry like "survey info: area of interest (AOI) polygon and new expression function `geoDistanceToAOIBoundary`, to check if a location is inside the area also offline in Arena Mobile (requested by ASSEDEV – Alerte Environnement) (#PR)".
-- [ ] `core/whatsNew/whatsNewItems.ts`: new item with the same content and the credit to ASSEDEV; translations.
-- [ ] Commit, open the PR, address the GitHub findings.
+- [x] `CHANGELOG.md`: entry like "survey info: area of interest (AOI) polygon and new expression function `geoDistanceToAOIBoundary`, to check if a location is inside the area also offline in Arena Mobile (requested by ASSEDEV – Alerte Environnement) (#PR)".
+- [x] `core/whatsNew/whatsNewItems.ts`: new item with the same content and the credit to ASSEDEV; translations.
+- [x] Commit, open the PR, address the GitHub findings.
 
 ---
 

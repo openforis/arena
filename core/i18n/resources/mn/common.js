@@ -1102,6 +1102,11 @@ $t(common.cantUndoWarning)`,
       bearingAttribute: 'Азимутын шинж чанар',
     },
 
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        'Судалгааны сонирхсон бүс хараахан тодорхойлогдоогүй байна: Судалгааны мэдээлэл → Газрын зураг хэсэгт тодорхойлно уу',
+    },
+    coordinateAttribute: 'Координатын атрибут',
     coordinateAttributeWithPosition: 'Координат шинж чанар {{position}}',
 
     dateTimeDiffEditor: {

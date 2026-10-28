@@ -999,6 +999,11 @@ $t(common.appNameFull)
       distanceAttribute: 'Atributo de distancia',
       bearingAttribute: 'Atributo de rumbo',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        'El área de interés de la encuesta aún no está definida: defínala en Información de la encuesta → Mapa',
+    },
+    coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
     dateTimeDiffEditor: {
       firstDateAttribute: 'Primer atributo de fecha',

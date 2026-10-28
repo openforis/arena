@@ -138,6 +138,14 @@ export default {
     editInfo: 'Мэдээллийг засах',
     viewInfo: 'Мэдээллийг харах',
 
+    areaOfInterest: {
+      title: 'Сонирхсон бүс',
+      info: 'Байршил бүсийн дотор байгаа эсэхийг geoDistanceToAOIBoundary илэрхийллийн функцээр шалгахад ашиглах олон өнцөгт (GeoJSON, WGS84 координат), Arena Mobile-д офлайн үед ч ажиллана',
+      summary: '{{polygons}} олон өнцөгт, {{vertices}} орой',
+      invalidFile: 'Файлд WGS84 координаттай GeoJSON форматын хүчинтэй олон өнцөгт алга',
+      confirmDelete: 'Сонирхсон бүсийг устгахдаа итгэлтэй байна уу?',
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Урьдчилан ачаалсан газрын зургийн давхаргууд идэвхжсэн',
       title: 'Урьдчилан ачаалсан газрын зургийн давхаргууд',

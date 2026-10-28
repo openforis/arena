@@ -1116,6 +1116,11 @@ $t(common.cantUndoWarning)`,
       bearingAttribute: 'Атрибут азимута',
     },
 
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        'Область интереса обследования ещё не определена: задайте её в разделе «Информация об обследовании» → «Карта»',
+    },
+    coordinateAttribute: 'Атрибут координат',
     coordinateAttributeWithPosition: 'Атрибут координат {{position}}',
 
     dateTimeDiffEditor: {

@@ -1105,6 +1105,10 @@ $t(common.cantUndoWarning)`,
       distanceAttribute: '距離属性',
       bearingAttribute: '方位属性',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined: '調査の関心領域はまだ定義されていません：調査情報 → 地図 で定義してください',
+    },
+    coordinateAttribute: '座標属性',
     coordinateAttributeWithPosition: '座標属性{{position}}',
 
     dateTimeDiffEditor: {

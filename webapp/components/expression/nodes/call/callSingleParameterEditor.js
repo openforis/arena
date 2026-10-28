@@ -1,4 +1,5 @@
 import React, { useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 
 import * as Expression from '@core/expressionParser/expression'
 
@@ -8,7 +9,14 @@ import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
 
 export const CallSingleParameterEditor = (props) => {
-  const { callee, expressionNode, onConfirm: onConfirmProp, variables, variablesFilterFn } = props
+  const {
+    callee,
+    expressionNode,
+    label = 'expressionEditor.var',
+    onConfirm: onConfirmProp,
+    variables,
+    variablesFilterFn,
+  } = props
 
   const initialIdentifierName = expressionNode?.arguments?.[0]?.name
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
@@ -36,7 +44,7 @@ export const CallSingleParameterEditor = (props) => {
   )
 
   return (
-    <FormItem label="expressionEditor.var">
+    <FormItem label={label}>
       <Identifier
         node={identifier}
         onChange={onIdentifierChange}
@@ -47,4 +55,8 @@ export const CallSingleParameterEditor = (props) => {
   )
 }
 
-CallSingleParameterEditor.propTypes = CallEditorPropTypes
+CallSingleParameterEditor.propTypes = {
+  ...CallEditorPropTypes,
+  callee: PropTypes.string.isRequired,
+  label: PropTypes.string,
+}

@@ -1106,6 +1106,10 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       distanceAttribute: 'Distance attribute',
       bearingAttribute: 'Bearing attribute',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined: 'The area of interest of the survey is not defined yet: define it in Survey info → Map',
+    },
+    coordinateAttribute: 'Coordinate attribute',
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
     dateTimeDiffEditor: {

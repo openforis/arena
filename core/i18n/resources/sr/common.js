@@ -1126,6 +1126,11 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
       distanceAttribute: 'Atribut udaljenosti',
       bearingAttribute: 'Atribut azimuta',
     },
+    geoDistanceToAOIBoundaryEditor: {
+      areaOfInterestNotDefined:
+        'Područje od interesa istraživanja još nije definisano: definišite ga u Informacije o istraživanju → Mapa',
+    },
+    coordinateAttribute: 'Atribut koordinate',
     coordinateAttributeWithPosition: 'Atribut koordinate {{position}}',
 
     dateTimeDiffEditor: {

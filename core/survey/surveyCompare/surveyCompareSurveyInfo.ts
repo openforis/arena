@@ -30,6 +30,7 @@ export const comparedSurveyInfoProps: string[] = [
   infoKeys.keepNonApplicableValues,
   infoKeys.sampleBasedImageInterpretationEnabled,
   infoKeys.samplingPolygon,
+  infoKeys.areaOfInterest,
   infoKeys.userExtraPropDefs,
   infoKeys.preloadedMapLayersEnabled,
   infoKeys.surveyDocOptions,
