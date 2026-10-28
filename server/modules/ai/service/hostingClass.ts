@@ -3,27 +3,9 @@
  * Used by the survey AI policy. Local engines (on this device) are classified in the browser.
  */
 import { ENV } from '@core/processUtils'
-import { AiProvider } from '@common/ai/aiProvider'
-
-import { isAllowlisted } from './baseUrlGuard'
+import { isAllowlisted, parseUrl, providerTypeUsesBaseUrl } from '@common/ai/allowlist'
 
 export type GatewayHostingClass = 'orgHosted' | 'cloud'
-
-// only these providers send the data to a base URL chosen by the user or the admin
-const providersWithBaseUrl = new Set<string>([AiProvider.openaiCompatible, AiProvider.vercelAiSdk])
-
-/**
- * Parses a base URL, returning null when it is not a valid URL.
- * @param {string} baseUrl - Base URL to parse.
- * @returns {URL|null} The URL or null.
- */
-const parseUrl = (baseUrl: string): URL | null => {
-  try {
-    return new URL(baseUrl)
-  } catch {
-    return null
-  }
-}
 
 /**
  * Returns the hosting class of a provider config: orgHosted only when its base URL is allowlisted.
@@ -42,8 +24,8 @@ export const getProviderHostingClass = ({
   baseUrl?: string | null
   allowlist?: string[]
 }): GatewayHostingClass => {
-  if (!providersWithBaseUrl.has(provider) || !baseUrl) return 'cloud'
+  if (!providerTypeUsesBaseUrl(provider) || !baseUrl) return 'cloud'
   const url = parseUrl(baseUrl)
   if (!url) return 'cloud'
-  return isAllowlisted(url, allowlist ?? []) ? 'orgHosted' : 'cloud'
+  return isAllowlisted(url, allowlist) ? 'orgHosted' : 'cloud'
 }

@@ -52,8 +52,8 @@ const rejectionOf = (call: PromiseLike<unknown>): Promise<any> => Promise.resolv
 
 const delta = (text: string) => `data: {"type":"text-delta","delta":"${text}"}\n\n`
 
-describe('SSE parser: caps per frame and per response (323)', () => {
-  const create = (limits: { maxFrameChars?: number; maxTotalChars?: number }) => {
+describe('SSE parser: cap per frame (323)', () => {
+  const create = (limits: { maxFrameChars?: number }) => {
     const events: unknown[] = []
     const parser = createSseParser({ onEvent: (event) => events.push(event), limits })
     return { parser, events }
@@ -76,15 +76,6 @@ describe('SSE parser: caps per frame and per response (323)', () => {
     const { parser, events } = create({ maxFrameChars: 30 })
     for (let index = 0; index < 100; index += 1) parser.push('data: {"a":1}\n\n')
     expect(events).toHaveLength(100)
-  })
-
-  test('the response cap counts everything that was pushed', async () => {
-    const { parser, events } = create({ maxTotalChars: 50 })
-    parser.push('data: {"a":1}\n\n')
-    parser.push('data: {"a":2}\n\n')
-    expect(events).toHaveLength(2)
-    parser.push('data: {"a":3}\n\n')
-    await expectSystemErrorKey(() => parser.push('data: {"a":4}\n\n'), TOO_LARGE)
   })
 
   test('a frame exactly at the cap is accepted', () => {
@@ -193,8 +184,7 @@ describe('response limits: the vercel-ai-sdk provider (323)', () => {
     const { body, state } = endlessBody(delta('word '.repeat(20)))
     const model = createVercelAiSdkModel({
       baseUrl,
-      fetchImpl: async () => new Response(body, { status: 200 }),
-      limits: { maxResponseBytes: 2000 },
+      fetchImpl: createResponseLimitedFetch(async () => new Response(body, { status: 200 }), 2000),
     })
     const error = await expectSystemErrorKey(() => model.doGenerate(callOptions), TOO_LARGE)
     expect(error.statusCode).toBe(502)
@@ -206,8 +196,7 @@ describe('response limits: the vercel-ai-sdk provider (323)', () => {
     const { body, state } = endlessBody(delta('word '.repeat(20)))
     const model = createVercelAiSdkModel({
       baseUrl,
-      fetchImpl: async () => new Response(body, { status: 200 }),
-      limits: { maxResponseBytes: 2000 },
+      fetchImpl: createResponseLimitedFetch(async () => new Response(body, { status: 200 }), 2000),
     })
     const { stream } = await model.doStream(callOptions)
     const types: string[] = []
@@ -228,7 +217,7 @@ describe('response limits: the vercel-ai-sdk provider (323)', () => {
     const model = createVercelAiSdkModel({
       baseUrl,
       fetchImpl: async () => new Response(body, { status: 200 }),
-      limits: { maxFrameChars: 500, maxResponseBytes: 1000000 },
+      limits: { maxFrameChars: 500 },
     })
     await expectSystemErrorKey(() => model.doGenerate(callOptions), TOO_LARGE)
   })
@@ -238,8 +227,8 @@ describe('response limits: the vercel-ai-sdk provider (323)', () => {
     const frames = [delta(text), delta(text), 'data: [DONE]\n\n']
     const model = createVercelAiSdkModel({
       baseUrl,
-      fetchImpl: async () => new Response(frames.join(''), { status: 200 }),
-      limits: { maxResponseBytes: 10000, maxFrameChars: 2000 },
+      fetchImpl: createResponseLimitedFetch(async () => new Response(frames.join(''), { status: 200 }), 10000),
+      limits: { maxFrameChars: 2000 },
     })
     const result = await model.doGenerate(callOptions)
     expect(result.content).toEqual([{ type: 'text', text: text + text }])
@@ -442,7 +431,13 @@ describe('response limits: the cap follows the configured output tokens (323)', 
   test('vercel-ai-sdk: a long legitimate answer passes when the output token limit allows it, else it is cut', async () => {
     const body = [...longAnswerFrames(delta), 'data: [DONE]\n\n'].join('')
     const buildModel = () =>
-      createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', fetchImpl: async () => new Response(body) })
+      createVercelAiSdkModel({
+        baseUrl: 'https://agent.example/chat',
+        fetchImpl: createResponseLimitedFetch(
+          async () => new Response(body),
+          getProviderResponseLimits(ENV.aiMaxOutputTokens).maxResponseBytes
+        ),
+      })
     ENV.aiMaxOutputTokens = 4096
     await expectSystemErrorKey(() => buildModel().doGenerate(callOptions), TOO_LARGE)
     ENV.aiMaxOutputTokens = 10000

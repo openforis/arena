@@ -217,7 +217,7 @@ const send = ({
  *   that is too large.
  */
 export const createGuardedFetch = ({
-  allowlist = ENV.aiOrgHostedBaseUrls ?? [],
+  allowlist = ENV.aiOrgHostedBaseUrls,
   lookup = defaultLookup,
   maxBodyBytes = DEFAULT_MAX_BODY_BYTES,
   timeoutMs = ENV.aiRequestTimeoutMs,

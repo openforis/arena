@@ -13,7 +13,7 @@ const DONE_TOKEN = '[DONE]'
 export type SseParser = { push: (text: string) => void; end: () => void }
 
 // no cap when absent; a frame is the text up to the next blank line
-export type SseLimits = { maxFrameChars?: number; maxTotalChars?: number }
+export type SseLimits = { maxFrameChars?: number }
 
 const tooLarge = () => new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
 
@@ -30,8 +30,7 @@ const parseJson = (payload: string): { ok: boolean; value?: unknown } => {
  * @param {object} params - Parameters.
  * @param {Function} params.onEvent - Called with each JSON payload; errors it throws propagate to the caller.
  * @param {Function} [params.onDone] - Called once, on `[DONE]` (argument true) or at `end()` (false).
- * @param {SseLimits} [params.limits] - Caps on one frame and on the whole text; `push` throws
- *   aiProviderResponseTooLarge (502) when one is exceeded.
+ * @param {SseLimits} [params.limits] - Cap on one frame; `push` throws aiProviderResponseTooLarge (502) when exceeded.
  * @returns {SseParser} The parser.
  */
 export const createSseParser = ({
@@ -43,11 +42,10 @@ export const createSseParser = ({
   onDone?: (receivedDoneToken: boolean) => void
   limits?: SseLimits
 }): SseParser => {
-  const { maxFrameChars = Infinity, maxTotalChars = Infinity } = limits
+  const { maxFrameChars = Infinity } = limits
   // the text of the frame being received, as the chunks that arrived (never re-concatenated per push)
   let pending: string[] = []
   let pendingChars = 0
-  let total = 0
   let terminated = false
 
   const terminate = (receivedDoneToken: boolean) => {
@@ -108,8 +106,6 @@ export const createSseParser = ({
   return {
     push: (text: string) => {
       if (terminated || !text) return
-      total += text.length
-      if (total > maxTotalChars) throw tooLarge()
       drain(text)
     },
     end: () => {

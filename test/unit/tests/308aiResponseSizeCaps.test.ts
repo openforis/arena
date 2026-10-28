@@ -107,14 +107,14 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
 
     test('a list over the cap is refused', async () => {
       answer(200, modelListOf(3 * MIB))
-      const error: any = await expectSystemErrorKey(deps.listModels(cfg()), 'aiModelListFailed')
+      const error: any = await expectSystemErrorKey(deps.listModels(cfg()), 'aiProviderResponseTooLarge')
       expect(error.statusCode).toBe(502)
     })
 
     test('a body that never ends is cut at the cap and the connection is closed', async () => {
       answerForever(200)
       const start = Date.now()
-      await expectSystemErrorKey(deps.listModels(cfg()), 'aiModelListFailed')
+      await expectSystemErrorKey(deps.listModels(cfg()), 'aiProviderResponseTooLarge')
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
       await untilClientClosed()
     })
@@ -125,7 +125,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
         response.write('{"data":[')
       }
       const start = Date.now()
-      await expectSystemErrorKey(deps.listModels(cfg()), 'aiModelListFailed')
+      await expectSystemErrorKey(deps.listModels(cfg()), 'aiProviderResponseTooLarge')
       expect(Date.now() - start).toBeLessThan(PROMPT_MS)
       await untilClientClosed()
     })
@@ -209,7 +209,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
           { provider: 'openai-compatible', baseUrl: `http://127.0.0.1:${port}/v1`, apiKey: 'k' },
           { allowlist: ENV.aiOrgHostedBaseUrls, fetchImpl } as any
         ),
-        'aiModelListFailed'
+        'aiProviderResponseTooLarge'
       )
     })
   })

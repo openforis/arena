@@ -1,3 +1,4 @@
+import { providerTypeUsesBaseUrl } from '@common/ai/allowlist'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   getAiProviderKind,
@@ -11,7 +12,6 @@ import {
   findStoredProvider,
   getProviderPrefs,
   isSameEndpoint,
-  providerTypeUsesBaseUrl,
   toPublicProvider,
   withProviderPrefs,
 } from '@server/modules/ai/service/aiProviderPrefs'

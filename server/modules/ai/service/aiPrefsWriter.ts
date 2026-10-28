@@ -40,7 +40,7 @@ export const createDefaultAiPrefsWriterDeps = (): AiPrefsWriterDeps => ({
   updateAiPrefs: (userUuid, update) => updateAiPrefs({ userUuid, update }),
   cipher: { encrypt: SecretBox.encrypt, decrypt: SecretBox.decrypt, isLegacy: SecretBox.isLegacyEnvelope },
   isEncryptionConfigured: SecretBox.isConfigured,
-  allowlist: ENV.aiOrgHostedBaseUrls ?? [],
+  allowlist: ENV.aiOrgHostedBaseUrls,
   findCopiedEnvelopes: findEnvelopesOfOtherUsers,
 })
 

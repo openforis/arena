@@ -11,6 +11,7 @@ import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
 import { uuidv4 } from '@core/uuid'
 import { AiProvider } from '@common/ai/aiProvider'
+import { providerTypeUsesBaseUrl } from '@common/ai/allowlist'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   createAccountProviderId,
@@ -34,7 +35,6 @@ import {
   isSameEndpoint,
   type KeyCipher,
   type PublicAiProvider,
-  providerTypeUsesBaseUrl,
   type StoredAiProvider,
   toPublicProvider,
   trimmedOrNull,
@@ -197,7 +197,7 @@ export const createDefaultAiProviderServiceDeps = (): AiProviderServiceDeps => (
    * @returns {string} ISO timestamp.
    */
   now: () => new Date().toISOString(),
-  allowlist: ENV.aiOrgHostedBaseUrls ?? [],
+  allowlist: ENV.aiOrgHostedBaseUrls,
   findCopiedEnvelopes: createDefaultAiPrefsWriterDeps().findCopiedEnvelopes,
 })
 

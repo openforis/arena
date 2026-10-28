@@ -4,7 +4,7 @@
  */
 import SystemError, { StatusCodes } from '@core/systemError'
 import { AiProvider } from '@common/ai/aiProvider'
-import { isAllowlisted } from '@common/ai/allowlist'
+import { isAllowlisted, providerTypeUsesBaseUrl, stripTrailingSlashes } from '@common/ai/allowlist'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
   type AiDefaultProviderOrigin,
@@ -69,9 +69,6 @@ const LEGACY_SLOT_KEYS = new Set([
 // the mock is accepted in storage; the provider service creates it only when AI_MOCK_PROVIDER_ENABLED is on
 const ACCOUNT_PROVIDER_TYPES = new Set<string>([...Object.values(AiProvider), MOCK_PROVIDER])
 
-// the providers that call a base URL chosen by the user
-const BASE_URL_TYPES = new Set<string>([AiProvider.openaiCompatible, AiProvider.vercelAiSdk])
-
 /**
  * Returns the trimmed value when it is a string with content, else null.
  * @param {unknown} value - Stored or submitted value (untrusted).
@@ -111,32 +108,13 @@ export const assertProviderCountBelowLimit = (providers: readonly unknown[]): vo
 }
 
 /**
- * Returns true when the provider type calls a base URL chosen by the user.
- * @param {string} type - Provider type.
- * @returns {boolean} Whether the type uses a base URL.
- */
-export const providerTypeUsesBaseUrl = (type: string): boolean => BASE_URL_TYPES.has(type)
-
-/**
- * Removes the trailing slashes of a URL (a loop, not a regex: no backtracking on long input).
- * @param {string|null} url - URL.
- * @returns {string} The URL without trailing slashes ('' for null).
- */
-export const stripTrailingSlashes = (url: string | null): string => {
-  const value = url ?? ''
-  let end = value.length
-  while (end > 0 && value[end - 1] === '/') end -= 1
-  return value.slice(0, end)
-}
-
-/**
  * Returns true when two base URLs name the same endpoint (trailing slashes ignored).
  * @param {string|null} a - First base URL.
  * @param {string|null} b - Second base URL.
  * @returns {boolean} Whether they are the same endpoint.
  */
 export const isSameEndpoint = (a: string | null, b: string | null): boolean =>
-  stripTrailingSlashes(a) === stripTrailingSlashes(b)
+  stripTrailingSlashes(a ?? '') === stripTrailingSlashes(b ?? '')
 
 /**
  * Returns a stored list item as a provider, or null when it is not a valid account provider.
@@ -152,7 +130,7 @@ const toStoredProvider = (item: unknown): StoredAiProvider | null => {
     type,
     name: normalizeProviderName(name, type),
     model: trimmedOrNull(model),
-    baseUrl: BASE_URL_TYPES.has(type) ? trimmedOrNull(baseUrl) : null,
+    baseUrl: providerTypeUsesBaseUrl(type) ? trimmedOrNull(baseUrl) : null,
     apiKeyEncrypted: trimmedOrNull(apiKeyEncrypted),
     lastTestOk: typeof lastTestOk === 'boolean' ? lastTestOk : null,
     lastTestAt: trimmedOrNull(lastTestAt),
@@ -196,7 +174,7 @@ const convertLegacySlot = (aiPrefs: Record<string, any>): StoredAiProvider | nul
     type,
     name: getDefaultProviderName(type),
     model,
-    baseUrl: BASE_URL_TYPES.has(type) ? trimmedOrNull(aiPrefs.baseUrl) : null,
+    baseUrl: providerTypeUsesBaseUrl(type) ? trimmedOrNull(aiPrefs.baseUrl) : null,
     apiKeyEncrypted: trimmedOrNull(aiPrefs.apiKeyEncrypted),
     lastTestOk: typeof aiPrefs.lastTestOk === 'boolean' ? aiPrefs.lastTestOk : null,
     lastTestAt: trimmedOrNull(aiPrefs.lastTestAt),
@@ -292,7 +270,7 @@ export const buildKeyAad = ({
 }): string => {
   if (typeof userUuid !== 'string' || userUuid.length === 0) throw new TypeError('buildKeyAad: userUuid is required')
   // ids and types have no "|", and the base URL is last, so two different providers never share an AAD
-  return [userUuid, provider.id, provider.type, stripTrailingSlashes(provider.baseUrl)].join('|')
+  return [userUuid, provider.id, provider.type, stripTrailingSlashes(provider.baseUrl ?? '')].join('|')
 }
 
 /**

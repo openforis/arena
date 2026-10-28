@@ -12,8 +12,7 @@ import { isIP } from 'node:net'
 
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
-import { AiProvider } from '@common/ai/aiProvider'
-import { isAllowlisted } from '@common/ai/allowlist'
+import { isAllowlisted, parseUrl, providerTypeUsesBaseUrl } from '@common/ai/allowlist'
 import { isNonPublicIpAddress } from '@common/ai/ipAddress'
 
 export { isAllowlisted }
@@ -28,8 +27,6 @@ export type GuardOptions = { allowlist?: string[]; lookup?: LookupFn }
 // the system resolver, which answers with every address of a name
 export const defaultLookup = dnsLookup as unknown as LookupFn
 
-const PROVIDERS_WITH_USER_BASE_URL = new Set<string>([AiProvider.openaiCompatible, AiProvider.vercelAiSdk])
-
 export const notAllowed = (baseUrl: string) =>
   new SystemError('aiBaseUrlNotAllowed', { baseUrl: String(baseUrl).slice(0, 200) }, StatusCodes.BAD_REQUEST)
 
@@ -40,14 +37,6 @@ export const notAllowed = (baseUrl: string) =>
  * @returns {boolean} True when blocked.
  */
 export const isBlockedAddress = (address: string): boolean => isNonPublicIpAddress(address)
-
-const parseUrl = (value: string): URL | null => {
-  try {
-    return new URL(value)
-  } catch {
-    return null
-  }
-}
 
 /**
  * Returns true when every address may be called (and there is at least one).
@@ -99,6 +88,6 @@ export const assertProviderBaseUrlAllowed = async (
   { provider, baseUrl }: { provider: string; baseUrl?: string | null },
   options?: GuardOptions
 ): Promise<void> => {
-  if (!PROVIDERS_WITH_USER_BASE_URL.has(provider) || !baseUrl) return
+  if (!providerTypeUsesBaseUrl(provider) || !baseUrl) return
   await assertBaseUrlAllowed(baseUrl, options)
 }

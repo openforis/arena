@@ -26,11 +26,11 @@ const TEXT_ID = 'vercel-ai-sdk-text'
 type ChatMessage = { role: 'user' | 'assistant'; parts: { type: 'text'; text: string }[] }
 type FetchImpl = (url: string, init: RequestInit) => Promise<Response>
 
-export type VercelAiSdkLimits = { maxResponseBytes?: number; maxFrameChars?: number; maxErrorBodyBytes?: number }
+export type VercelAiSdkLimits = { maxFrameChars?: number; maxErrorBodyBytes?: number }
 type ResolvedLimits = Required<VercelAiSdkLimits>
 
 const resolveLimits = (limits: VercelAiSdkLimits): ResolvedLimits => ({
-  ...getProviderResponseLimits(ENV.aiMaxOutputTokens),
+  maxFrameChars: getProviderResponseLimits(ENV.aiMaxOutputTokens).maxFrameChars,
   maxErrorBodyBytes: AiLimits.providerErrorBodyMaxBytes,
   ...limits,
 })
@@ -137,16 +137,13 @@ const readAll = async ({
   response,
   onText,
   signal,
-  maxBytes,
 }: {
   response: Response
   onText: (text: string) => void
   signal: AbortSignal
-  maxBytes: number
 }): Promise<void> => {
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
-  let received = 0
   // cancelling the reader unblocks a pending read when the call is aborted
   const onAbort = () => reader.cancel(signal.reason).catch(() => undefined)
   signal.addEventListener('abort', onAbort, { once: true })
@@ -154,8 +151,6 @@ const readAll = async ({
     while (!signal.aborted) {
       const { value, done } = await reader.read()
       if (done) break
-      received += value.byteLength
-      if (received > maxBytes) throw new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
       onText(decoder.decode(value, { stream: true }))
     }
     // an abort (caller, timeout) must not look like a complete answer
@@ -194,7 +189,7 @@ const generateFullText = async ({
     },
     limits: { maxFrameChars: limits.maxFrameChars },
   })
-  await readAll({ response, onText: parser.push, signal, maxBytes: limits.maxResponseBytes })
+  await readAll({ response, onText: parser.push, signal })
   parser.end()
   // upstream closing without [DONE] / finish means a truncated answer
   if (!completed) throw incompleteStreamError()
@@ -245,7 +240,7 @@ const createPartsStream = ({
       })
       enqueue({ type: 'stream-start', warnings: [] })
       try {
-        await readAll({ response, onText: parser.push, signal: call.signal, maxBytes: limits.maxResponseBytes })
+        await readAll({ response, onText: parser.push, signal: call.signal })
         parser.end()
         if (completed && !failed) {
           if (textStarted) enqueue({ type: 'text-end', id: TEXT_ID })
@@ -274,7 +269,8 @@ const createPartsStream = ({
  * @param {object} cfg - Config.
  * @param {string} cfg.baseUrl - Chat endpoint URL.
  * @param {FetchImpl} [cfg.fetchImpl] - Fetch implementation (tests).
- * @param {VercelAiSdkLimits} [cfg.limits] - Caps on the answer (default: AiLimits.provider*, raised by AI_MAX_OUTPUT_TOKENS).
+ * @param {VercelAiSdkLimits} [cfg.limits] - Caps on one frame and on an error body (default: AiLimits.provider*, raised by
+ *   AI_MAX_OUTPUT_TOKENS). The cap on the whole answer is on the fetch (see providerRegistry).
  * @returns {LanguageModelV4} The model.
  */
 export const createVercelAiSdkModel = ({

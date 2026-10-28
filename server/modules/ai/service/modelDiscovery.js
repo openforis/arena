@@ -12,12 +12,14 @@
  */
 import { ENV } from '@core/processUtils'
 import SystemError, { StatusCodes } from '@core/systemError'
+import { stripTrailingSlashes } from '@common/ai/allowlist'
 
 import * as Log from '@server/log/log'
 
 import { assertBaseUrlAllowed } from './baseUrlGuard'
 import { createGuardedFetch } from './guardedFetch'
 import * as ProviderRegistry from './providerRegistry'
+import { limitResponseBytes } from './responseLimits'
 
 const logger = Log.getLogger('AiModelDiscovery')
 
@@ -35,41 +37,11 @@ class UpstreamStatusError extends Error {
   }
 }
 
-// the upstream sent more than a model list can be
-class ResponseTooLargeError extends Error {
-  constructor(limit) {
-    super(`response over ${limit} bytes`)
-  }
-}
-
 /**
  * Returns the time a list may take: the timeout of a model call, and at most the time a dropdown is worth waiting.
  * @returns {number} The timeout in milliseconds.
  */
 const getListTimeoutMs = () => Math.min(ENV.aiRequestTimeoutMs, LIST_TIMEOUT_MS)
-
-/**
- * Reads the body of a response as JSON, and stops reading (closing the connection) when it is over the cap.
- * @param {Response} response - The response.
- * @param {number} maxBytes - The largest body accepted.
- * @returns {Promise<unknown>} The parsed body.
- * @throws {ResponseTooLargeError} When the body, or its declared size, is over the cap.
- */
-const readJsonCapped = async (response, maxBytes) => {
-  if (Number(response.headers.get('content-length')) > maxBytes) {
-    await response.body?.cancel().catch(() => undefined)
-    throw new ResponseTooLargeError(maxBytes)
-  }
-  const chunks = []
-  let received = 0
-  // leaving the loop cancels the stream
-  for await (const chunk of response.body ?? []) {
-    received += chunk.byteLength
-    if (received > maxBytes) throw new ResponseTooLargeError(maxBytes)
-    chunks.push(chunk)
-  }
-  return JSON.parse(Buffer.concat(chunks).toString('utf8'))
-}
 
 /**
  * Reads a JSON list from an URL. The timeout covers the connection, the headers and the body, and the body is capped.
@@ -79,7 +51,7 @@ const readJsonCapped = async (response, maxBytes) => {
  * @param {Function} [options.fetchImpl] - The fetch to use.
  * @returns {Promise<unknown>} The parsed body.
  * @throws {UpstreamStatusError} When the upstream does not answer with a 2xx status.
- * @throws {ResponseTooLargeError} When the body is over the cap.
+ * @throws {SystemError} aiProviderResponseTooLarge when the body is over the cap.
  */
 const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
   const signal = AbortSignal.timeout(getListTimeoutMs())
@@ -89,17 +61,10 @@ const fetchJson = async (url, { headers, fetchImpl = fetch } = {}) => {
     await response.body?.cancel().catch(() => undefined)
     throw new UpstreamStatusError(response.status)
   }
-  return readJsonCapped(response, MAX_LIST_BYTES)
+  return limitResponseBytes(response, MAX_LIST_BYTES).json()
 }
 
-const stripTrailingSlash = (s) => {
-  if (!s) return s
-  let end = s.length
-  while (end > 0 && s[end - 1] === '/') end -= 1
-  return s.slice(0, end)
-}
-
-const normaliseOpenAiBase = (baseUrl) => stripTrailingSlash(baseUrl || 'https://api.openai.com/v1')
+const normaliseOpenAiBase = (baseUrl) => stripTrailingSlashes(baseUrl || 'https://api.openai.com/v1')
 
 // Heuristic filter that drops obvious non-chat models when an OpenAI-shaped
 // API returns the kitchen sink. Best-effort only — anything unfamiliar is
