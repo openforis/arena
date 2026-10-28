@@ -94,6 +94,7 @@ const setup = ({
   settings = ON_SETTINGS as AiFeatureSwitches | null,
   instanceEnabled = true,
   requestConsent = undefined as ModelResolverDeps['requestConsent'] | undefined,
+  capabilitiesOverride = {} as Partial<AiCapabilities>,
 } = {}) => {
   const currentUser = { uuid: userUuid }
   const storage = memoryStorage()
@@ -112,7 +113,10 @@ const setup = ({
     getUserUuid: () => currentUser.uuid,
     isInstanceEnabled: () => instanceEnabled,
     getSettings: () => settings,
-    loadCapabilities: async () => capabilities({ defaultProviderId, baseUrl: state.baseUrl, localUp }),
+    loadCapabilities: async () => ({
+      ...capabilities({ defaultProviderId, baseUrl: state.baseUrl, localUp }),
+      ...capabilitiesOverride,
+    }),
     getEffectivePolicyFor: async ({ surveyId, fresh }) => {
       // the first read may come from the cache; the one before a local model is created never does
       if (!fresh) state.policyCalls.push(surveyId)
@@ -184,6 +188,15 @@ describe('createModelResolver', () => {
     expect(error.key).toBe('aiNoEngineAvailable')
     expect(error.statusCode).toBe(409)
     expect(error.params).toEqual({ reasons: ['policyForbids'], dataClass: 'data' })
+  })
+
+  test('a gateway engine without a provider id is refused, never sent to an unnamed provider', async () => {
+    const { resolve, state } = setup({
+      capabilitiesOverride: { providers: [{ ...ACCOUNT, id: '' }], defaultProviderId: '' },
+    })
+    const error = await resolve({ feature: 'expressionExplain', surveyId: 1 }).catch((e) => e)
+    expect(error.key).toBe('aiNoEngineAvailable')
+    expect(state.gatewayCalls).toEqual([])
   })
 
   test('an unreachable default is never replaced by another provider', async () => {
