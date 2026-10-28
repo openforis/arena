@@ -82,7 +82,7 @@ export const readHeadersAndRows = async ({ stream, fileFormat }: { stream: Reada
 }
 
 /**
- * Builds (in memory) a survey with a root entity (cluster), a multiple entity (plot) with attributes of several types and a multiple entity (tree) with a taxon key.
+ * Builds (in memory) a survey with a root entity (cluster), a multiple entity (plot) with attributes of several types and multiple entities with a taxon key (tree) and a coordinate key (sample_point).
  * @param {object} user - The user.
  * @returns {Promise<object>} - The survey.
  */
@@ -100,7 +100,13 @@ export const buildTestSurvey = async (user: any) =>
         SB.attribute('plot_visit_date', NodeDef.nodeDefType.date),
         SB.attribute('plot_status', NodeDef.nodeDefType.code).category('plot_status'),
         SB.attribute('plot_remarks', NodeDef.nodeDefType.text),
-        SB.entity('tree', SB.attribute('tree_species', NodeDef.nodeDefType.taxon).taxonomy('trees').key()).multiple()
+        SB.entity('tree', SB.attribute('tree_species', NodeDef.nodeDefType.taxon).taxonomy('trees').key()).multiple(),
+        SB.entity(
+          'sample_point',
+          SB.attribute('sample_point_location', NodeDef.nodeDefType.coordinate)
+            .prop(NodeDef.propKeys.includeAccuracy, true)
+            .key()
+        ).multiple()
       ).multiple()
     )
   )

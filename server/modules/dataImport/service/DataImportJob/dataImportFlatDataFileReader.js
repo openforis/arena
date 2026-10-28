@@ -241,11 +241,22 @@ const checkAllHeadersAreValid =
     }
   }
 
+// value props required for key attributes; other columns of the same attribute are optional
+// (coordinate additional fields, taxon scientific and vernacular names used only for unlisted taxa)
+const requiredValuePropsByNodeDefType = {
+  [NodeDef.nodeDefType.coordinate]: [
+    Node.valuePropsCoordinate.x,
+    Node.valuePropsCoordinate.y,
+    Node.valuePropsCoordinate.srs,
+  ],
+  [NodeDef.nodeDefType.taxon]: [Node.valuePropsTaxon.code],
+}
+
 const isRequiredColumn = (column) => {
   const { key, nodeDef, valueProp } = column
   if (!key) return false
-  // taxon scientific and vernacular names are optional (used only for unlisted taxa): the code identifies the taxon
-  return NodeDef.getType(nodeDef) !== NodeDef.nodeDefType.taxon || valueProp === Node.valuePropsTaxon.code
+  const requiredValueProps = requiredValuePropsByNodeDefType[NodeDef.getType(nodeDef)]
+  return !requiredValueProps || requiredValueProps.includes(valueProp)
 }
 
 const checkRequiredHeadersNotMissing =

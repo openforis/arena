@@ -117,4 +117,34 @@ describe.each(fileFormats)('Data import: conversion of %s rows into node values'
     })
     expect(items).toHaveLength(1)
   })
+
+  test('coordinate additional fields are not required for a key coordinate attribute', async () => {
+    const items = await readRowItems({
+      survey,
+      entityName: 'sample_point',
+      fileFormat,
+      rows: [
+        ['cluster_id', 'plot_id', 'sample_point_location_x', 'sample_point_location_y', 'sample_point_location_srs'],
+        [1, 2, 12.5, 41.9, 'EPSG:4326'],
+      ],
+    })
+    expect(items).toHaveLength(1)
+  })
+
+  test('fails when the srs column of a key coordinate attribute is missing', async () => {
+    await expect(
+      readRowItems({
+        survey,
+        entityName: 'sample_point',
+        fileFormat,
+        rows: [
+          ['cluster_id', 'plot_id', 'sample_point_location_x', 'sample_point_location_y'],
+          [1, 2, 12.5, 41.9],
+        ],
+      })
+    ).rejects.toMatchObject({
+      key: 'validationErrors:dataImport.missingRequiredHeaders',
+      params: { missingRequiredHeaders: ['sample_point_location_srs'] },
+    })
+  })
 })
