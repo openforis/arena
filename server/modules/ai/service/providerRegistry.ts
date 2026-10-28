@@ -1,7 +1,7 @@
 /**
  * Thin factories that turn a provider config object into a Vercel AI SDK
  * model handle. Centralised here so that adding a provider (e.g. Mistral)
- * is a one-liner without touching the resolver or model client.
+ * is a one-liner without touching the resolver.
  *
  * The `openai-compatible` case routes to `@ai-sdk/openai`'s `createOpenAI`
  * with a custom `baseURL`, which transparently covers Azure OpenAI,

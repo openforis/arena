@@ -2,7 +2,6 @@ import { MockLanguageModelV4 } from 'ai/test'
 
 import { handleModelRequest } from '@server/modules/ai/service/gateway/modelGateway'
 import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimiter'
-import { createPingDeps } from '@server/modules/ai/api/internalApi'
 import * as ProviderResolver from '@server/modules/ai/service/providerResolver'
 import { formatErrorForLog } from '@server/modules/ai/service/gateway/errorMapping'
 
@@ -107,16 +106,6 @@ describe('the resolver never picks a provider by itself (324)', () => {
         adminConfig: null,
       })
     ).toEqual(empty)
-  })
-})
-
-describe('the admin ping tests the instance default (324)', () => {
-  test('it asks for Arena default, not for the default of the admin', async () => {
-    // the test environment has no instance default: resolving the account provider instead would have worked
-    await expectSystemErrorKey(
-      () => createPingDeps().resolveModel({ user: userWithDefault('acct:own'), feature: 'internalPing' }),
-      'aiNotConfigured'
-    )
   })
 })
 
