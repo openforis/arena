@@ -20,7 +20,6 @@ import { createSseParser, stopFinishReason, unknownUsageV4 } from '@common/ai/ss
 
 import { getProviderResponseLimits, readTextCapped } from './responseLimits'
 
-const DEFAULT_TIMEOUT_MS = 60000
 const ERROR_BODY_MESSAGE_CHARS = 500
 const TEXT_ID = 'vercel-ai-sdk-text'
 
@@ -91,10 +90,9 @@ const getDelta = (event: any): string | null => {
 const getErrorText = (event: any): string =>
   typeof event?.errorText === 'string' ? event.errorText : 'AI SDK upstream error'
 
-// one AbortController per call: aborted by the caller's signal, the timeout or a stream cancel
-const createCallAbort = (externalSignal: AbortSignal | undefined, timeoutMs: number) => {
+// one AbortController per call: aborted by the caller's signal (which carries the timeout) or a stream cancel
+const createCallAbort = (externalSignal: AbortSignal | undefined) => {
   const controller = new AbortController()
-  const timer = setTimeout(() => controller.abort(new Error('AI SDK upstream timeout')), timeoutMs)
   const onExternalAbort = () => controller.abort(externalSignal?.reason)
   if (externalSignal?.aborted) controller.abort(externalSignal.reason)
   else externalSignal?.addEventListener('abort', onExternalAbort, { once: true })
@@ -102,7 +100,6 @@ const createCallAbort = (externalSignal: AbortSignal | undefined, timeoutMs: num
     signal: controller.signal,
     abort: (reason?: unknown) => controller.abort(reason),
     cleanup: () => {
-      clearTimeout(timer)
       externalSignal?.removeEventListener('abort', onExternalAbort)
     },
   }
@@ -161,7 +158,7 @@ const readAll = async ({
       if (received > maxBytes) throw new SystemError('aiProviderResponseTooLarge', {}, StatusCodes.BAD_GATEWAY)
       onText(decoder.decode(value, { stream: true }))
     }
-    // an abort (timeout, caller) must not look like a complete answer
+    // an abort (caller, timeout) must not look like a complete answer
     if (signal.aborted) throw signal.reason
   } catch (error) {
     // the endpoint must not keep sending to a call that failed here
@@ -276,19 +273,16 @@ const createPartsStream = ({
  * Builds the model handle for an AI SDK chat endpoint.
  * @param {object} cfg - Config.
  * @param {string} cfg.baseUrl - Chat endpoint URL.
- * @param {number} [cfg.timeoutMs] - Per-call timeout (default 60s).
  * @param {FetchImpl} [cfg.fetchImpl] - Fetch implementation (tests).
  * @param {VercelAiSdkLimits} [cfg.limits] - Caps on the answer (default: AiLimits.provider*, raised by AI_MAX_OUTPUT_TOKENS).
  * @returns {LanguageModelV4} The model.
  */
 export const createVercelAiSdkModel = ({
   baseUrl,
-  timeoutMs = DEFAULT_TIMEOUT_MS,
   fetchImpl = (url, init) => fetch(url, init),
   limits: limitsOverride = {},
 }: {
   baseUrl: string
-  timeoutMs?: number
   fetchImpl?: FetchImpl
   limits?: VercelAiSdkLimits
 }): LanguageModelV4 => {
@@ -300,7 +294,7 @@ export const createVercelAiSdkModel = ({
     supportedUrls: {},
 
     async doGenerate(options) {
-      const call = createCallAbort(options.abortSignal, timeoutMs)
+      const call = createCallAbort(options.abortSignal)
       try {
         const response = await postChat({
           fetchImpl,
@@ -325,7 +319,7 @@ export const createVercelAiSdkModel = ({
     },
 
     async doStream(options) {
-      const call = createCallAbort(options.abortSignal, timeoutMs)
+      const call = createCallAbort(options.abortSignal)
       try {
         const response = await postChat({
           fetchImpl,

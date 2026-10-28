@@ -98,10 +98,29 @@ describe('vercel-ai-sdk provider (LanguageModelV4)', () => {
     expect(upstreamSignal.aborted).toBe(true)
   })
 
-  test('a timeout fails generation instead of returning a truncated answer', async () => {
+  test('the abort signal of the caller (its timeout) fails generation instead of returning a truncated answer', async () => {
     const fetchImpl = async () => new Response(new ReadableStream({ start() {} }), { status: 200 })
-    const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', timeoutMs: 20, fetchImpl })
-    await expect(generateText({ model, prompt: 'Hi', maxRetries: 0 })).rejects.toThrow()
+    const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', fetchImpl })
+    await expect(
+      generateText({ model, prompt: 'Hi', maxRetries: 0, abortSignal: AbortSignal.timeout(20) })
+    ).rejects.toThrow()
+  })
+
+  test('there is no timer of its own: a call that is not aborted keeps waiting past 60 s', async () => {
+    jest.useFakeTimers()
+    try {
+      let settled = false
+      const fetchImpl = async () => new Response(new ReadableStream({ start() {} }), { status: 200 })
+      const model = createVercelAiSdkModel({ baseUrl: 'https://agent.example/chat', fetchImpl })
+      generateText({ model, prompt: 'Hi', maxRetries: 0 }).then(
+        () => (settled = true),
+        () => (settled = true)
+      )
+      await jest.advanceTimersByTimeAsync(120000)
+      expect(settled).toBe(false)
+    } finally {
+      jest.useRealTimers()
+    }
   })
 
   test('generation fails when the upstream closes without [DONE]', async () => {
