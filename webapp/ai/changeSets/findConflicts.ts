@@ -41,8 +41,6 @@ const checkChange = (
   if (!nodeDef) return createdUuids.has(op.nodeDefUuid) ? null : 'nodeDefMissing'
   if (!isDeepEqual(getOperationCurrentValue(nodeDef, op), op.from)) return 'valueChanged'
   if (isRefMissing(op, survey)) return 'refMissing'
-  if (op.type === 'nodeDef.update' && op.prop === 'name' && isNameTaken(survey, op.to, op.nodeDefUuid))
-    return 'nameTaken'
   return null
 }
 

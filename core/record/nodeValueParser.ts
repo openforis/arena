@@ -511,7 +511,7 @@ const parseDecimalInput: InputParser = async (params) => {
  */
 const parseIntegerInput: InputParser = async (params) => {
   const parsed = await parseDecimalInput(params)
-  if (!Number.isInteger(parsed.value)) {
+  if (!Number.isSafeInteger(parsed.value)) {
     throw new SystemError('validationErrors:dataImport.invalidNumber', {
       value: String(params.input),
       headers: headersOf(params.nodeDef),

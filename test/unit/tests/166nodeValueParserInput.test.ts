@@ -111,6 +111,10 @@ describe('nodeValueParser: parseNodeValueInput (the assistant layer)', () => {
   test('integers must be whole numbers; decimals accept fractions', async () => {
     expect((await parse('cluster_id', '12')).value).toBe(12)
     await expect(parse('cluster_id', '1.5')).rejects.toMatchObject({ key: 'validationErrors:dataImport.invalidNumber' })
+    // beyond the safe range the server refuses the value, so it is refused at the proposal
+    await expect(parse('cluster_id', '1e20')).rejects.toMatchObject({
+      key: 'validationErrors:dataImport.invalidNumber',
+    })
     expect((await parse('cluster_size', '1.5')).value).toBe(1.5)
     await expect(parse('cluster_size', 'abc')).rejects.toMatchObject({
       key: 'validationErrors:dataImport.invalidNumber',

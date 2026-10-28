@@ -54,7 +54,7 @@ const createOp = (name = 'cluster_remarks'): ChangeOperation & { type: 'nodeDef.
   return {
     id: `create-${name}`,
     type: 'nodeDef.create',
-    nodeDef: createProposedNodeDef({ parent, type: 'text', cycle: '0', name }),
+    nodeDef: createProposedNodeDef({ parent, type: 'text', cycles: ['0'], name }),
     parentUuid: NodeDef.getUuid(parent),
   }
 }
@@ -91,20 +91,22 @@ describe('findConflicts', () => {
     expect(findConflicts(changeSetOf([updateOp()]), changed)).toEqual([{ id: 'update', reason: 'valueChanged' }])
   })
 
-  test('nodeDef.update: a rename to a name taken in the meantime', () => {
-    const rename: ChangeOperation = {
-      id: 'rename',
-      type: 'nodeDef.update',
-      nodeDefUuid: uuidOf('cluster_notes'),
-      prop: 'name',
-      from: 'cluster_notes',
-      to: 'cluster_remarks',
-    }
+  test('nodeDef.update: a rename chain is no conflict (duplicate names are found on the draft at Apply)', () => {
     const parent = getDefByName(survey, 'cluster')
-    const other = createProposedNodeDef({ parent, type: 'text', cycle: '0', name: 'cluster_remarks' })
-    expect(findConflicts(changeSetOf([rename]), replaceDef(survey, other))).toEqual([
-      { id: 'rename', reason: 'nameTaken' },
-    ])
+    const other = createProposedNodeDef({ parent, type: 'text', cycles: ['0'], name: 'cluster_remarks' })
+    const rename = (id: string, nodeDefUuid: string, from: string, to: string): ChangeOperation => ({
+      id,
+      type: 'nodeDef.update',
+      nodeDefUuid,
+      prop: 'name',
+      from,
+      to,
+    })
+    const chain = [
+      rename('first', uuidOf('cluster_notes'), 'cluster_notes', 'cluster_remarks'),
+      rename('second', NodeDef.getUuid(other), 'cluster_remarks', 'cluster_comments'),
+    ]
+    expect(findConflicts(changeSetOf(chain), replaceDef(survey, other))).toEqual([])
   })
 
   test('expression.set: valueChanged', () => {
@@ -128,8 +130,8 @@ describe('findConflicts', () => {
 
   test('operations on a node definition created by the same change set are not conflicts', () => {
     const parent = getDefByName(survey, 'cluster')
-    const entity = createProposedNodeDef({ parent, type: 'entity', cycle: '0', name: 'site' })
-    const child = createProposedNodeDef({ parent: entity, type: 'text', cycle: '0', name: 'site_name' })
+    const entity = createProposedNodeDef({ parent, type: 'entity', cycles: ['0'], name: 'site' })
+    const child = createProposedNodeDef({ parent: entity, type: 'text', cycles: ['0'], name: 'site_name' })
     const operations: ChangeOperation[] = [
       { id: 'e', type: 'nodeDef.create', nodeDef: entity, parentUuid: NodeDef.getUuid(parent) },
       { id: 'c', type: 'nodeDef.create', nodeDef: child, parentUuid: NodeDef.getUuid(entity) },
