@@ -10,7 +10,6 @@
  *     featuresEnabled,        // accessLevel > 0, kept for existing readers
  *     featureToggles,         // one boolean per AiFeatureCategory (common/ai/features.ts)
  *     defaultProviderId,      // 'arena-default' | 'acct:<id>' | 'local:<id>' (common/ai/providerIds.ts)
- *     defaultProviderOrigin,  // 'converted' until the user picks a default
  *     providers,              // account providers (aiProviderPrefs.ts); keys encrypted (secretBox), never sent back
  *   }
  *
@@ -35,13 +34,12 @@ import {
 export const getPublicSettings = (user) => {
   const raw = getRawPrefs(user)
   const accessLevel = getAccessLevelForUser(user)
-  const { defaultProviderId, defaultProviderOrigin } = getProviderPrefs(raw)
+  const { defaultProviderId } = getProviderPrefs(raw)
   return {
     accessLevel,
     featuresEnabled: accessLevel > 0,
     featureToggles: sanitiseFeatureToggles(raw?.featureToggles),
     defaultProviderId,
-    defaultProviderOrigin,
     providers: AiProviderService.getPublicProviders(user),
   }
 }

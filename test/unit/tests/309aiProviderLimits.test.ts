@@ -30,7 +30,6 @@ const storedProvider = (n: number): any => ({
 const aiPrefsWith = (count: number): any => ({
   accessLevel: 1,
   defaultProviderId: 'arena-default',
-  defaultProviderOrigin: 'user',
   providers: Array.from({ length: count }, (_value, n) => storedProvider(n)),
 })
 

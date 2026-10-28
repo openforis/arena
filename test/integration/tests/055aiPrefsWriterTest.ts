@@ -189,7 +189,6 @@ describe('AI prefs writer (055)', () => {
       aiPrefs: {
         accessLevel: 2,
         defaultProviderId: 'arena-default',
-        defaultProviderOrigin: 'user',
         providers: [keyless('acct:a'), keyless('acct:b')],
       },
     })

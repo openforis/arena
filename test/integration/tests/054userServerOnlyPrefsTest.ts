@@ -19,7 +19,6 @@ const VICTIM_CIPHERTEXT = 'v2:victim-ciphertext'
 const victimAi = {
   accessLevel: 2,
   defaultProviderId: 'acct:victim',
-  defaultProviderOrigin: 'user',
   providers: [
     {
       id: 'acct:victim',

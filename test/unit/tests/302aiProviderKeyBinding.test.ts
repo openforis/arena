@@ -46,7 +46,7 @@ const storedProvider = (fields: Record<string, unknown>): any => ({
  */
 const userWith = (uuid: string, providers: any[]): any => ({
   uuid,
-  prefs: { ai: { accessLevel: 1, defaultProviderId: 'arena-default', defaultProviderOrigin: 'user', providers } },
+  prefs: { ai: { accessLevel: 1, defaultProviderId: 'arena-default', providers } },
 })
 
 /**

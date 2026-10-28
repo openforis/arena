@@ -23,7 +23,6 @@ const listUser = {
       featuresEnabled: true,
       featureToggles: {},
       defaultProviderId: 'acct:a1',
-      defaultProviderOrigin: 'user',
       providers: [storedProvider],
     },
   },
@@ -60,7 +59,6 @@ describe('single-provider compatibility removed (273)', () => {
     expect(sortedKeys(AiSettingsService.getPublicSettings(listUser))).toEqual([
       'accessLevel',
       'defaultProviderId',
-      'defaultProviderOrigin',
       'featureToggles',
       'featuresEnabled',
       'providers',
@@ -69,7 +67,6 @@ describe('single-provider compatibility removed (273)', () => {
       'accessLevel',
       'adminDefault',
       'defaultProviderId',
-      'defaultProviderOrigin',
       'disabledFeatures',
       'encryptionConfigured',
       'featureToggles',
@@ -97,23 +94,11 @@ describe('single-provider compatibility removed (273)', () => {
     expect(saved).toMatchObject({
       accessLevel: 2,
       defaultProviderId: 'acct:a1',
-      defaultProviderOrigin: 'user',
       providers: [storedProvider],
     })
     expect(saved).not.toHaveProperty('provider')
     expect(saved).not.toHaveProperty('enabled')
     expect(JSON.stringify(saved)).not.toContain('sk-old-body')
-
-    // a default that was never picked stays 'converted'
-    const keptOrigin = AiSettingsService.buildSavedAiPrefs({
-      existing: { ...listUser.prefs.ai, defaultProviderOrigin: 'converted' },
-      update: { accessLevel: 1, provider: 'openai', enabled: false },
-    })
-    expect(keptOrigin).toMatchObject({
-      defaultProviderId: 'acct:a1',
-      defaultProviderOrigin: 'converted',
-      providers: [storedProvider],
-    })
 
     // a user who never opened the new list keeps the old provider, written as acct:legacy
     const converted = AiSettingsService.buildSavedAiPrefs({
@@ -129,7 +114,6 @@ describe('single-provider compatibility removed (273)', () => {
     expect(converted).toMatchObject({
       accessLevel: 3,
       defaultProviderId: 'acct:legacy',
-      defaultProviderOrigin: 'converted',
       providers: [
         expect.objectContaining({ id: 'acct:legacy', type: 'openai', model: 'gpt-x', apiKeyEncrypted: 'iv:tag:data' }),
       ],

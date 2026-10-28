@@ -14,7 +14,6 @@ export const LOCAL_PROVIDER_TYPE = 'local'
 export const AI_PROVIDER_NAME_MAX_CHARS = 60
 
 export type AiProviderKind = 'account' | 'local' | 'arenaDefault'
-export type AiDefaultProviderOrigin = 'converted' | 'user'
 
 // uuids and the fixed "legacy" body; no separators, so an id never escapes a URL path segment or a storage key
 const ID_BODY_PATTERN = /^[A-Za-z0-9-]{1,64}$/

@@ -75,8 +75,8 @@ describe('AI provider ids and stored list (260)', () => {
     expect(providerTypeUsesBaseUrl('openai')).toBe(false)
   })
 
-  test('nothing stored: no providers, Arena default, converted origin', () => {
-    const empty = { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, defaultProviderOrigin: 'converted', providers: [] }
+  test('nothing stored: no providers, Arena default', () => {
+    const empty = { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, providers: [] }
     expect(getProviderPrefs(null)).toEqual(empty)
     expect(getProviderPrefs({ accessLevel: 1, featuresEnabled: true })).toEqual(empty)
   })
@@ -84,7 +84,6 @@ describe('AI provider ids and stored list (260)', () => {
   test('the old slot converts to acct:legacy, the default when it was enabled', () => {
     expect(getProviderPrefs(legacySlot)).toEqual({
       defaultProviderId: 'acct:legacy',
-      defaultProviderOrigin: 'converted',
       providers: [legacyProvider],
     })
     // stable: every read gives the same id, so defaults and conversations that point to it stay valid
@@ -130,10 +129,9 @@ describe('AI provider ids and stored list (260)', () => {
       },
     ])
     expect(prefs.defaultProviderId).toBe('arena-default')
-    expect(prefs.defaultProviderOrigin).toBe('user')
     // a local default is kept: it lives in a browser, the server cannot check it
     const local = getProviderPrefs({ providers: [], defaultProviderId: 'local:xyz' })
-    expect(local).toMatchObject({ defaultProviderId: 'local:xyz', defaultProviderOrigin: 'converted' })
+    expect(local).toMatchObject({ defaultProviderId: 'local:xyz' })
   })
 
   test('writing the list drops the old slot and keeps the access fields', () => {
@@ -143,14 +141,12 @@ describe('AI provider ids and stored list (260)', () => {
       featuresEnabled: true,
       featureToggles: { chat: true },
       defaultProviderId: 'acct:legacy',
-      defaultProviderOrigin: 'converted',
       providers: [legacyProvider],
     })
     // the written prefs read back the same
     expect(getProviderPrefs(written)).toEqual(getProviderPrefs(legacySlot))
     expect(withProviderPrefs(null, getProviderPrefs(null))).toEqual({
       defaultProviderId: 'arena-default',
-      defaultProviderOrigin: 'converted',
       providers: [],
     })
   })

@@ -683,7 +683,7 @@ export const addProvider = async ({
       return {
         ...latest,
         providers: [...latest.providers, provider],
-        ...(becomesDefault ? { defaultProviderId: provider.id, defaultProviderOrigin: 'user' as const } : {}),
+        ...(becomesDefault ? { defaultProviderId: provider.id } : {}),
       }
     },
   })
@@ -850,7 +850,7 @@ export const removeProvider = async ({
       return {
         ...latest,
         providers: latest.providers.filter((provider) => provider.id !== saved.id),
-        ...(wasDefault ? { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID, defaultProviderOrigin: 'user' as const } : {}),
+        ...(wasDefault ? { defaultProviderId: ARENA_DEFAULT_PROVIDER_ID } : {}),
       }
     },
   })
@@ -881,7 +881,7 @@ export const setDefaultProvider = async ({
     deps,
     change: (latest) => {
       if (isAccountProviderId(providerId)) findOwnProvider(latest, providerId)
-      return { ...latest, defaultProviderId: providerId, defaultProviderOrigin: 'user' }
+      return { ...latest, defaultProviderId: providerId }
     },
   })
 }

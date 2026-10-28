@@ -30,7 +30,7 @@ const storedProvider = (fields: Record<string, unknown>): any => ({
 const userWith = (provider: any): any => ({
   uuid: 'attacker',
   prefs: {
-    ai: { accessLevel: 1, defaultProviderId: provider.id, defaultProviderOrigin: 'user', providers: [provider] },
+    ai: { accessLevel: 1, defaultProviderId: provider.id, providers: [provider] },
   },
 })
 

@@ -7,7 +7,6 @@ import { AiProvider } from '@common/ai/aiProvider'
 import { isAllowlisted, providerTypeUsesBaseUrl, stripTrailingSlashes } from '@common/ai/allowlist'
 import {
   ARENA_DEFAULT_PROVIDER_ID,
-  type AiDefaultProviderOrigin,
   getDefaultProviderName,
   isAccountProviderId,
   isLocalProviderId,
@@ -31,7 +30,6 @@ export type StoredAiProvider = {
 
 export type AiProviderPrefs = {
   defaultProviderId: string
-  defaultProviderOrigin: AiDefaultProviderOrigin
   providers: StoredAiProvider[]
 }
 
@@ -153,7 +151,6 @@ const readStoredList = (aiPrefs: Record<string, any>): AiProviderPrefs => {
   const defaultKnown = isLocalProviderId(stored) || providers.some((provider) => provider.id === stored)
   return {
     defaultProviderId: defaultKnown ? stored : ARENA_DEFAULT_PROVIDER_ID,
-    defaultProviderOrigin: aiPrefs.defaultProviderOrigin === 'user' ? 'user' : 'converted',
     providers,
   }
 }
@@ -191,7 +188,6 @@ export const getProviderPrefs = (aiPrefs: Record<string, any> | null | undefined
   const legacy = aiPrefs ? convertLegacySlot(aiPrefs) : null
   return {
     defaultProviderId: legacy && aiPrefs?.enabled ? LEGACY_ACCOUNT_PROVIDER_ID : ARENA_DEFAULT_PROVIDER_ID,
-    defaultProviderOrigin: 'converted',
     providers: legacy ? [legacy] : [],
   }
 }
@@ -210,7 +206,6 @@ export const withProviderPrefs = (
   return {
     ...rest,
     defaultProviderId: providerPrefs.defaultProviderId,
-    defaultProviderOrigin: providerPrefs.defaultProviderOrigin,
     providers: providerPrefs.providers,
   }
 }

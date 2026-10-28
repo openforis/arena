@@ -46,7 +46,6 @@ const userWith = (ai: Record<string, unknown>): any => ({
 const userWithProviders = (extra: Record<string, unknown> = {}) =>
   userWith({
     defaultProviderId: 'acct:own',
-    defaultProviderOrigin: 'user',
     providers: [savedOpenAi, savedCompatible],
     ...extra,
   })
@@ -249,7 +248,7 @@ describe('AI provider service (261)', () => {
     expect(tests).toEqual([{ provider: 'anthropic', model: 'claude-x', baseUrl: null, apiKey: 'sk-new' }])
     expect(opened(saved[0].providers[0])).toBe('sk-new')
     // no admin default and the default was Arena default: the first provider becomes the default
-    expect(saved[0]).toMatchObject({ defaultProviderId: 'acct:id-1', defaultProviderOrigin: 'user' })
+    expect(saved[0]).toMatchObject({ defaultProviderId: 'acct:id-1' })
     expect((user.prefs as any).ai.providers).toHaveLength(1)
     // with an admin default the default does not change
     const withAdmin = createDeps()
@@ -352,13 +351,13 @@ describe('AI provider service (261)', () => {
     const user = userWithProviders()
     const { deps, saved, store } = createDeps({}, user)
     await AiProviderService.removeProvider({ user, id: 'acct:own', deps })
-    expect(saved[0]).toMatchObject({ defaultProviderId: 'arena-default', defaultProviderOrigin: 'user' })
+    expect(saved[0]).toMatchObject({ defaultProviderId: 'arena-default' })
     expect(saved[0].providers.map((provider: any) => provider.id)).toEqual(['acct:org'])
     store.set(user.prefs.ai)
     await AiProviderService.removeProvider({ user, id: 'acct:org', deps })
     expect(saved[1].defaultProviderId).toBe('acct:own')
     await AiProviderService.setDefaultProvider({ user, providerId: 'local:abc', deps })
-    expect(saved[2]).toMatchObject({ defaultProviderId: 'local:abc', defaultProviderOrigin: 'user' })
+    expect(saved[2]).toMatchObject({ defaultProviderId: 'local:abc' })
     await AiProviderService.setDefaultProvider({ user, providerId: 'arena-default', deps })
     expect(saved[3].defaultProviderId).toBe('arena-default')
   })

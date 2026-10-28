@@ -51,7 +51,7 @@ test.describe('AI account providers API (mock provider)', () => {
     expect((await api.getAiSettings()).defaultProviderId).toBe('arena-default')
 
     await api.setAiDefaultProvider(provider.id)
-    expect(await api.getAiSettings()).toMatchObject({ defaultProviderId: provider.id, defaultProviderOrigin: 'user' })
+    expect(await api.getAiSettings()).toMatchObject({ defaultProviderId: provider.id })
 
     for (const providerId of [provider.id, 'arena-default']) {
       const { status } = await api.requestRaw('post', '/api/ai/model', chatCall(providerId))

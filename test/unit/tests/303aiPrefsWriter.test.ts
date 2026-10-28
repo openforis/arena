@@ -40,7 +40,6 @@ const userWith = (providers: any[]): any => ({
     ai: {
       accessLevel: 2,
       defaultProviderId: providers[0]?.id ?? 'arena-default',
-      defaultProviderOrigin: 'user',
       providers,
     },
   },
