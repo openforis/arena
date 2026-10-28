@@ -41,7 +41,7 @@ export const generateExpressionWorkflow = async ({
 
 /**
  * Streams the explanation of an expression.
- * @param {object} params - Parameters (survey, surveyId, nodeDefUuid, expression, errorMessage, onChunk, signal, model).
+ * @param {object} params - Parameters (survey, surveyId, nodeDefUuid, expression, onChunk, signal, model).
  * @returns {Promise<void>} Resolves when the explanation is complete.
  */
 export const explainExpressionWorkflow = async ({
@@ -49,18 +49,16 @@ export const explainExpressionWorkflow = async ({
   surveyId,
   nodeDefUuid,
   expression,
-  errorMessage,
   onChunk,
   signal,
   model,
 }: ExpressionContext & {
   expression: string
-  errorMessage?: string
   onChunk: (chunk: string) => void
   signal?: AbortSignal
 }): Promise<void> => {
   // validated before resolving the model: an empty expression never reaches the network
-  const request = buildExplainExpressionRequest({ survey, nodeDefUuid, expression, errorMessage })
+  const request = buildExplainExpressionRequest({ survey, nodeDefUuid, expression })
   const resolvedModel = model ?? (await resolveModel({ feature: 'expressionExplain', surveyId, signal })).model
   await streamTextChunks({ model: resolvedModel, ...request, onChunk, signal })
 }

@@ -5,7 +5,6 @@
 import type { Middleware } from 'redux'
 
 import * as JobSerialized from '@common/job/jobSerialized'
-import { logAiWarning } from '@webapp/ai/log/aiLog'
 import { JOB_UPDATE } from '@webapp/store/app/job/actions'
 import { surveyCategoryDelete } from '@webapp/store/survey/actions/actionTypes'
 import { surveyInfoUpdate } from '@webapp/store/survey/surveyInfo/actions'
@@ -57,31 +56,18 @@ const getEvents = (action: any): SuggestionEvent[] => {
 
 /**
  * Creates the middleware.
- * @param {Notify} notify - Receives the events.
- * @param {Function} [log] - Reports a listener that failed.
+ * @param {Notify} notify - Receives the events (notifySuggestionEvent already isolates a failing subscriber).
  * @returns {Middleware} The middleware.
  */
 export const createAiSuggestionsMiddleware =
-  (notify: Notify, log: (message: string, error?: unknown) => void = logAiWarning): Middleware =>
+  (notify: Notify): Middleware =>
   () =>
   (next) =>
   (action: any) => {
     const result = next(action)
-    /**
-     * Sends an event; a suggestion must never break the app's dispatch.
-     * @param {SuggestionEvent} event - Event.
-     * @returns {void}
-     */
-    const send = (event: SuggestionEvent): void => {
-      try {
-        notify(event)
-      } catch (error) {
-        log(`A suggestion listener failed on ${event.type}`, error)
-      }
-    }
     for (const event of getEvents(action)) {
-      if (DEFERRED_EVENTS.includes(event.type)) queueMicrotask(() => send(event))
-      else send(event)
+      if (DEFERRED_EVENTS.includes(event.type)) queueMicrotask(() => notify(event))
+      else notify(event)
     }
     return result
   }

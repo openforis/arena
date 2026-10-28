@@ -134,23 +134,19 @@ export const generateExpression = async ({
  * @param {object} params.survey - Survey with its node defs.
  * @param {string} params.nodeDefUuid - Node def owning the expression.
  * @param {string} params.expression - The expression to explain.
- * @param {string} [params.errorMessage] - Parser / validation error to diagnose.
  * @returns {AiTextRequest} The system prompt and prompt.
  */
 export const buildExplainExpressionRequest = ({
   survey,
   nodeDefUuid,
   expression,
-  errorMessage,
 }: {
   survey: any
   nodeDefUuid: string
   expression: string
-  errorMessage?: string
 }): AiTextRequest => {
   if (!expression?.trim()) throw badRequest('aiExpressionExpressionMissing')
   assertMaxLength(expression, 'expression', AiLimits.expressionMaxChars)
-  assertMaxLength(errorMessage, 'errorMessage', AiLimits.expressionErrorMessageMaxChars)
   const nodeDef = getTargetNodeDef({ survey, nodeDefUuid })
-  return buildExpressionExplainPrompt({ survey, nodeDef, expression, errorMessage })
+  return buildExpressionExplainPrompt({ survey, nodeDef, expression })
 }

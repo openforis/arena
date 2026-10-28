@@ -1,3 +1,4 @@
+import { useI18nT } from '@webapp/store/system'
 import './ProviderDialog.scss'
 
 import React, { useCallback } from 'react'
@@ -11,7 +12,6 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { TestId } from '@webapp/utils/testId'
 
-import { useT } from '../useT'
 import { AccountProviderFields } from './AccountProviderFields'
 import { LocalProviderFields } from './LocalProviderFields'
 import type { ProviderDialogContext } from './providerDialogState'
@@ -44,7 +44,7 @@ const NameField = ({
   spec: ProviderTypeSpec
   onChange: (name: string) => void
 }) => {
-  const t = useT()
+  const t = useI18nT()
   return (
     <FormItem label="userAiSettings:dialog.name" htmlFor={TestId.ai.providerName}>
       <Input
@@ -75,7 +75,7 @@ const ConnectStep = ({
   saved: SavedProvider | null
   context: ProviderDialogContext
 }) => {
-  const t = useT()
+  const t = useI18nT()
   const { state, view, actions } = dialog
   const { spec } = view
   const { draft, saveError } = state
@@ -155,7 +155,7 @@ const DialogFooter = ({
   onCancel: () => void
   onSave: () => void
 }) => {
-  const t = useT()
+  const t = useI18nT()
   return (
     <ModalFooter>
       {connecting && !editing && (
@@ -187,7 +187,7 @@ const DialogFooter = ({
  * @returns {React.ReactElement} The dialog.
  */
 export const ProviderDialog = ({ saved, context, onClose, onSaved }: Props) => {
-  const t = useT()
+  const t = useI18nT()
   const dialog = useProviderDialog({ saved, context, onSaved })
   const { state, view, groups, actions } = dialog
   const onDismiss = useCallback(() => {

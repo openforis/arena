@@ -1,3 +1,4 @@
+import { useI18nT } from '@webapp/store/system'
 import React from 'react'
 
 import { Button } from '@webapp/components/buttons'
@@ -7,7 +8,6 @@ import { Spinner } from '@webapp/components/Spinner'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
-import { useT } from '../useT'
 import { type ApiKeyFieldState, getApiKeyFieldState } from './apiKeyField'
 import type { ModelsState, ProviderDialogView } from './providerDialogState'
 import type { ProviderDraft } from './providerDraft'
@@ -37,7 +37,7 @@ type BaseUrlFieldProps = {
  */
 const BaseUrlField = (props: BaseUrlFieldProps) => {
   const { baseUrl, placeholder, isOrgServer, allowlist, orgServerRefused, localUrlHint, editing } = props
-  const t = useT()
+  const t = useI18nT()
   return (
     <FormItem label="userAiSettings:baseUrl" htmlFor={TestId.ai.providerBaseUrl}>
       <div className="provider-dialog__field">
@@ -100,7 +100,7 @@ type ApiKeyFieldProps = {
 const ApiKeyField = (props: ApiKeyFieldProps) => {
   const { apiKey, fieldState, encryptionConfigured, canRemoveKey } = props
   const { keyKept, keyRemoved, placeholderKey, showClearedHint, showUnreadableHint } = fieldState
-  const t = useT()
+  const t = useI18nT()
   return (
     <FormItem label="userAiSettings:apiKey" htmlFor={TestId.ai.providerApiKey}>
       <div className="provider-dialog__field">
@@ -179,7 +179,7 @@ type ModelFieldProps = {
  */
 const ModelField = (props: ModelFieldProps) => {
   const { model, placeholder, models, useSelect, fetching, error } = props
-  const t = useT()
+  const t = useI18nT()
   return (
     <FormItem label="userAiSettings:model" htmlFor={TestId.ai.providerModel}>
       <div className="provider-dialog__field">
@@ -207,7 +207,7 @@ const ModelField = (props: ModelFieldProps) => {
           {fetching && <span className="provider-dialog__hint">{t('common.loading')}</span>}
         </div>
         {error && (
-          <div className="provider-dialog__hint provider-dialog__hint--error">
+          <div role="alert" className="provider-dialog__hint provider-dialog__hint--error">
             {t('userAiSettings:modelsFetchFailed', { message: error, interpolation: { escapeValue: false } })}
           </div>
         )}
@@ -291,7 +291,7 @@ export const AccountProviderFields = ({
   testing,
   actions,
 }: Props) => {
-  const t = useT()
+  const t = useI18nT()
   const isOrgServer = spec.value === 'orgServer'
   const account = view.test?.account ?? null
   const testText = account

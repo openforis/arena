@@ -2,6 +2,7 @@
  * The add / edit provider dialog: wires the state machine (providerDialogState) to the server. The dialog stores
  * nothing before "Add provider" / "Save"; then the settings cache and the capabilities are refreshed.
  */
+import { useI18nT } from '@webapp/store/system'
 import { useCallback, useEffect, useMemo } from 'react'
 
 import { createLocalProviderId } from '@common/ai/providerIds'
@@ -15,10 +16,8 @@ import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/local
 import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
-import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 
 import { getApiErrorMessage } from '../aiSettingsForm'
-import { useT } from '../useT'
 import { getLocalDraftUrl } from './providerDraft'
 import { buildLocalProviderSave, buildAccountRequest, shouldBecomeDefault } from './providerSave'
 import { canListModels } from './providerModels'
@@ -101,7 +100,7 @@ const withoutId = (request: AiProviderRequest): AiProviderRequest => {
  * @returns {ProviderDialogApi} The dialog API.
  */
 export const useProviderDialog = ({ saved, context, onSaved }: Params): ProviderDialogApi => {
-  const t = useT()
+  const t = useI18nT()
   const capabilities = useAiCapabilities()
   const { allowlist } = context
   const [state, dispatch, getLatest] = useLatestReducer(providerDialogReducer, () =>
@@ -222,7 +221,6 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
       } else {
         await saveAccount()
       }
-      invalidateAiSettingsCache()
       refreshAiCapabilities().catch(() => undefined)
       onSaved()
     } catch (error) {

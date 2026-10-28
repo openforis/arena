@@ -1,15 +1,16 @@
 import './AiActivityLogSummaryModal.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
 
-import { AiWorkflows, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
+import { AiWorkflows, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
+import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
 
@@ -23,52 +24,15 @@ const AiActivityLogSummaryModal = ({ onClose }) => {
   const surveyId = useSurveyId()
   const surveyInfo = useSurveyInfo()
   const surveyName = Survey.getName(surveyInfo)
-  const cancelRef = useRef(null)
 
-  const [text, setText] = useState('')
-  const [done, setDone] = useState(false)
-  const [error, setError] = useState(null)
-  // the latest onClose at call time: a new callback identity must not restart the stream
-  const onCloseRef = useRef(onClose)
-  useEffect(() => {
-    onCloseRef.current = onClose
-  }, [onClose])
-  const [attempt, setAttempt] = useState(0)
-  const onRetry = useCallback(() => setAttempt((count) => count + 1), [])
-
-  useEffect(() => {
-    if (!surveyId) return undefined
-    // Reset stream state when inputs change; the stream subscription below
-    // is the external system this effect synchronizes with.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setText('')
-
-    setDone(false)
-
-    setError(null)
-    const cancel = AiWorkflows.summarizeActivityLog({
-      surveyId,
-      surveyName,
-      onChunk: (chunk) => setText((prev) => prev + chunk),
-      onDone: () => setDone(true),
-      onError: (err) => {
-        if (isAiAbortError(err)) {
-          // the user closed the first-use dialog
-          onCloseRef.current()
-          return
-        }
-        setError(err)
-        setDone(true)
-      },
-    })
-    cancelRef.current = cancel
-    return () => {
-      cancelRef.current?.()
-    }
-  }, [surveyId, surveyName, attempt])
+  const start = useCallback(
+    (callbacks) => AiWorkflows.summarizeActivityLog({ surveyId, surveyName, ...callbacks }),
+    [surveyId, surveyName]
+  )
+  const { text, done, error, onRetry, cancel } = useAiTextStream({ start, onClose, enabled: Boolean(surveyId) })
 
   const onCancel = () => {
-    cancelRef.current?.()
+    cancel()
     onClose()
   }
 

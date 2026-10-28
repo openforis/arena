@@ -2,12 +2,11 @@ import './AiPolicyBlockedTooltip.scss'
 
 import React, { useCallback, useId, useMemo, useReducer, useState } from 'react'
 import { Paper, Popper } from '@mui/material'
-import { useNavigate } from 'react-router'
 
 import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import type { AiFeatureAvailability } from '@webapp/ai/policy/aiFeatureAvailability'
-import { appModuleUri, homeModules } from '@webapp/app/appModules'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
+import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditSurveyAiPolicy } from '@webapp/store/user'
@@ -51,7 +50,7 @@ const hasKeyboardFocus = (target: EventTarget): boolean => {
 export const AiPolicyBlockedTooltip = (props: Props) => {
   const { availability, children } = props
   const i18n = useI18n()
-  const navigate = useNavigate()
+  const runAction = useAiEngineActions()
   const reasonId = useId()
   const canEditPolicy = useAuthCanEditSurveyAiPolicy()
   // the control the reasons open under (state: the popper reads it while rendering)
@@ -66,8 +65,8 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   const showPolicyLink = canEditPolicy && reasonKeys.some((key) => key.startsWith('aiPolicy.blocked.'))
 
   const openPolicyTab = useCallback(() => {
-    navigate(appModuleUri(homeModules.surveyInfo), { state: { tab: 'aiPolicy' } })
-  }, [navigate])
+    runAction('changePolicy')
+  }, [runAction])
 
   const renderTitle = useCallback(() => {
     if (availability.status === 'noEngine') {

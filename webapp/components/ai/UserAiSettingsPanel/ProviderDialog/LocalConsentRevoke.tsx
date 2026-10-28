@@ -40,18 +40,22 @@ export const LocalConsentRevoke = ({ baseUrl }: Props) => {
     if (done) setRevokedBaseUrl(baseUrl)
   }, [baseUrl])
 
-  if (state === 'revoked') return <div className="provider-dialog__hint">{t('aiEngine.consent.revoked')}</div>
   if (state === 'none') return null
+  const revoked = state === 'revoked'
   return (
     <div className="provider-dialog__row">
       <span className="provider-dialog__hint">{t('aiEngine.consent.revokeHint')}</span>
       <Button
+        disabled={revoked}
         label="aiEngine.consent.revoke"
         onClick={onRevoke}
         size="small"
         testId={TestId.ai.consentRevoke}
         variant="outlined"
       />
+      <span role="status" className="provider-dialog__hint">
+        {revoked ? t('aiEngine.consent.revoked') : ''}
+      </span>
     </div>
   )
 }

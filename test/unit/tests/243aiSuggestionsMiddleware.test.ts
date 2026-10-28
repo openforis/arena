@@ -100,28 +100,6 @@ describe('AI suggestions middleware (243)', () => {
     expect(events.map((event) => event.type)).toEqual(['jobSucceeded'])
   })
 
-  test('a listener that fails for one event does not stop the next one', () => {
-    const events: string[] = []
-    const log = jest.fn()
-    const middleware = createAiSuggestionsMiddleware((event) => {
-      events.push(event.type)
-      if (event.type === 'jobSucceeded') throw new Error('listener failed')
-    }, log)
-    const job = { ...succeededJob, type: 'CategoryImportJob' }
-    dispatchThrough(middleware, { type: JOB_UPDATE, job }, (action) => action)
-    expect(events).toEqual(['jobSucceeded', 'categoriesChanged'])
-    expect(log).toHaveBeenCalledTimes(1)
-    expect(log).toHaveBeenCalledWith(expect.stringContaining('jobSucceeded'), expect.any(Error))
-  })
-
-  test('a failing listener never breaks the dispatch', () => {
-    const middleware = createAiSuggestionsMiddleware(() => {
-      throw new Error('listener failed')
-    }, jest.fn())
-    const action = { type: JOB_UPDATE, job: succeededJob }
-    expect(dispatchThrough(middleware, action, (dispatched) => dispatched)).toBe(action)
-  })
-
   test('the app middleware is built on notifySuggestionEvent', () => {
     expect(typeof aiSuggestionsMiddleware).toBe('function')
   })

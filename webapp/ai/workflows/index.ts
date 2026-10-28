@@ -45,7 +45,6 @@ const explainExpression = ({
   surveyId: number
   nodeDefUuid: string
   expression: string
-  errorMessage?: string
 }): (() => void) =>
   runStreamWithCallbacks({
     run: async (signal) => (await loadExpression()).explainExpressionWorkflow({ ...params, onChunk, signal }),

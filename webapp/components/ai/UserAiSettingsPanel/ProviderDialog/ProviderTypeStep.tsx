@@ -1,9 +1,9 @@
+import { useI18nT } from '@webapp/store/system'
 import React from 'react'
 
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { TestId } from '@webapp/utils/testId'
 
-import { useT } from '../useT'
 import type { ProviderDialogType, ProviderTypeGroup } from './providerTypes'
 
 // the small line under a type name; the cloud types without one are well known
@@ -30,7 +30,7 @@ type Props = {
  * @returns {React.ReactElement} The step.
  */
 export const ProviderTypeStep = ({ groups, onChoose }: Props) => {
-  const t = useT()
+  const t = useI18nT()
   return (
     <div className="provider-dialog__types">
       {groups.map((group) => (

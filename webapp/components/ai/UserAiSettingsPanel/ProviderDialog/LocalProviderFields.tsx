@@ -7,11 +7,10 @@ import { getAiErrorMessage } from '@webapp/ai/runtime/runtimeErrors'
 import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Spinner } from '@webapp/components/Spinner'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
 import { StatusPill } from '../StatusPill'
-import { useT } from '../useT'
 import { LocalConsentRevoke } from './LocalConsentRevoke'
 
 /**
@@ -21,7 +20,7 @@ import { LocalConsentRevoke } from './LocalConsentRevoke'
  * @returns {React.ReactElement} The lines.
  */
 const LocalAnswered = ({ view }: { view: LocalServerTestView }) => {
-  const t = useT()
+  const t = useI18nT()
   const location = getAiDataLocationText({
     location: { hostingClass: view.hostingClass, provider: null, model: null, engine: null },
     t,
@@ -52,7 +51,7 @@ const LocalAnswered = ({ view }: { view: LocalServerTestView }) => {
  */
 const LocalTestResult = ({ view }: { view: LocalServerTestView | null }) => {
   const i18n = useI18n()
-  const t = useT()
+  const t = useI18nT()
   if (!view) return null
   return (
     <div className="provider-dialog__result">
@@ -110,7 +109,7 @@ export const LocalProviderFields = ({
   onModelChange,
   onTest,
 }: Props) => {
-  const t = useT()
+  const t = useI18nT()
   return (
     <>
       <FormItem label="userAiSettings:localServer.baseUrl" htmlFor={TestId.ai.providerBaseUrl}>

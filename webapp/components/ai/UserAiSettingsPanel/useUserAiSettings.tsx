@@ -9,9 +9,8 @@ import type { AiAccessLevel } from '@common/ai/accessLevel'
 import * as API from '@webapp/service/api'
 
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
-import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useI18nT } from '@webapp/store/system'
 
 import {
   type AiSettings,
@@ -23,7 +22,6 @@ import {
   settingsToForm,
   withAccessLevel,
 } from './aiSettingsForm'
-import { useT } from './useT'
 
 export type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
@@ -31,7 +29,6 @@ export type UseUserAiSettingsResult = {
   settings: AiSettings | null
   form: FormState
   dirty: boolean
-  saving: boolean
   onAccessLevelChange: (level: AiAccessLevel) => void
   onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
   onSave: () => Promise<void>
@@ -54,7 +51,7 @@ const isAiDisabledError = (error: any): boolean => {
  */
 export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const i18n = useI18n()
-  const t = useT()
+  const t = useI18nT()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
 
@@ -62,7 +59,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const [settings, setSettings] = useState<AiSettings | null>(null)
   const [form, setForm] = useState<FormState>(createEmptyForm)
   const [dirty, setDirty] = useState(false)
-  const [saving, setSaving] = useState(false)
 
   const fetchSettings = useCallback(async () => {
     setLoading(true)
@@ -109,19 +105,15 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   )
 
   const onSave = useCallback(async () => {
-    setSaving(true)
     try {
       const data: AiSettings = await API.aiSettings.saveSettings(buildSettingsUpdate(form))
       setSettings(data)
       setDirty(false)
-      invalidateAiSettingsCache()
       // the features a level turns on or off change what the badges and menus show
       refreshAiCapabilities().catch(() => undefined)
       notifyInfo({ key: 'userAiSettings:savedSuccessfully' })
     } catch (error: any) {
       notifyError({ key: 'userAiSettings:saveFailed', params: { message: getApiErrorMessage({ error, t }) } })
-    } finally {
-      setSaving(false)
     }
   }, [form, notifyError, notifyInfo, t])
 
@@ -131,7 +123,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     settings,
     form,
     dirty,
-    saving,
     onAccessLevelChange,
     onFeatureToggleChange,
     onSave,

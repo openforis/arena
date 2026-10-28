@@ -1,17 +1,18 @@
 import './AiExplainPanel.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
-import { AiWorkflows, getAiErrorKey, getAiErrorMessage, isAiAbortError } from '@webapp/ai/workflows'
+import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'
 import { AiEngineErrorActions } from '@webapp/components/ai/AiNotAvailable'
 import { AiFeatureDataLocationBadge } from '@webapp/components/ai/AiDataLocationBadge'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import { AssistantMarkdown } from '@webapp/components/ai/Assistant/AssistantMarkdown'
+import { useAiTextStream } from '@webapp/components/ai/hooks/useAiTextStream'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey, useSurveyId } from '@webapp/store/survey'
 
-const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
+const AiExplainPanel = ({ expression, nodeDefUuid, onClose }) => {
   const i18n = useI18n()
   // See AiActivityLogSummary: i18next escapes {{message}} by default,
   // which mangles quoted identifiers (e.g. Postgres column names) in
@@ -19,59 +20,21 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
   const tUnescaped = useI18nT({ unescapeHtml: true })
   const survey = useSurvey()
   const surveyId = useSurveyId()
-  const cancelRef = useRef(null)
   // read the latest survey at call time: a store update must not restart the stream
   const surveyRef = useRef(survey)
   useEffect(() => {
     surveyRef.current = survey
   }, [survey])
 
-  const [text, setText] = useState('')
-  const [done, setDone] = useState(false)
-  const [error, setError] = useState(null)
-  // the latest onClose at call time: a new callback identity must not restart the stream
-  const onCloseRef = useRef(onClose)
-  useEffect(() => {
-    onCloseRef.current = onClose
-  }, [onClose])
-  const [attempt, setAttempt] = useState(0)
-  const onRetry = useCallback(() => setAttempt((count) => count + 1), [])
-
-  useEffect(() => {
-    // Reset stream state when inputs change; the stream subscription below
-    // is the external system this effect synchronizes with.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setText('')
-
-    setDone(false)
-
-    setError(null)
-    const cancel = AiWorkflows.explainExpression({
-      survey: surveyRef.current,
-      surveyId,
-      nodeDefUuid,
-      expression,
-      errorMessage,
-      onChunk: (chunk) => setText((prev) => prev + chunk),
-      onDone: () => setDone(true),
-      onError: (err) => {
-        if (isAiAbortError(err)) {
-          // the user closed the first-use dialog
-          onCloseRef.current()
-          return
-        }
-        setError(err)
-        setDone(true)
-      },
-    })
-    cancelRef.current = cancel
-    return () => {
-      cancelRef.current?.()
-    }
-  }, [surveyId, nodeDefUuid, expression, errorMessage, attempt])
+  const start = useCallback(
+    (callbacks) =>
+      AiWorkflows.explainExpression({ survey: surveyRef.current, surveyId, nodeDefUuid, expression, ...callbacks }),
+    [surveyId, nodeDefUuid, expression]
+  )
+  const { text, done, error, onRetry, cancel } = useAiTextStream({ start, onClose })
 
   const onCancel = () => {
-    cancelRef.current?.()
+    cancel()
     onClose()
   }
 
@@ -102,7 +65,6 @@ const AiExplainPanel = ({ expression, nodeDefUuid, errorMessage, onClose }) => {
 AiExplainPanel.propTypes = {
   expression: PropTypes.string.isRequired,
   nodeDefUuid: PropTypes.string,
-  errorMessage: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 }
 

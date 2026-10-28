@@ -92,7 +92,6 @@ describe('buildExplainExpressionRequest', () => {
   test.each([
     [{ expression: ' ' }, 'aiExpressionExpressionMissing'],
     [{ expression: 'x'.repeat(4001) }, 'aiInputTooLong'],
-    [{ errorMessage: 'e'.repeat(4001) }, 'aiInputTooLong'],
     [{ nodeDefUuid: 'missing' }, 'aiExpressionNodeDefNotFound'],
   ])('rejects %p with %p', async (override, key) => {
     await expectSystemErrorKey(

@@ -5,7 +5,6 @@
 export const AiLimits = {
   expressionDescriptionMaxChars: 4000,
   expressionMaxChars: 4000,
-  expressionErrorMessageMaxChars: 4000,
   dataQueryDescriptionMaxChars: 2000,
   langCodeMaxChars: 16,
   translationMaxItems: 50,

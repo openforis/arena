@@ -19,7 +19,8 @@ import {
 import { FileUploadDialogActions } from '@webapp/store/ui'
 import { useNodeDefPage } from '@webapp/store/ui/surveyForm'
 import { AiBatchProgressDialog } from '@webapp/components/ai/AiBatchProgressDialog'
-import { useAiFeatureEnabled } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+import { isAiFeatureUsable } from '@webapp/ai/policy/aiFeatureAvailability'
+import { useAiFeatureAvailability } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
 import { TestId } from '@webapp/utils/testId'
 
 import * as API from '@webapp/service/api'
@@ -51,8 +52,8 @@ const FormHeaderAdvancedButton = ({ canEditDef }) => {
   const lang = useSurveyPreferredLang()
   const surveyIsDirty = useIsSurveyDirty()
   const nodeDefPage = useNodeDefPage()
-  const dataDictionaryAiEnabled = useAiFeatureEnabled('dataDictionary')
-  const aiTranslationEnabled = useAiFeatureEnabled('translation')
+  const dataDictionaryAiEnabled = isAiFeatureUsable(useAiFeatureAvailability('dataDictionary'))
+  const aiTranslationEnabled = isAiFeatureUsable(useAiFeatureAvailability('translation'))
   const surveyLangs = useSurveyLangs()
   const {
     batchRun,

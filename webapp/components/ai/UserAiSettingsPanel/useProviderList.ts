@@ -18,11 +18,10 @@ import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalProviderStatus } from '@webapp/ai/engines/providerEntries'
 import type { AiProviderEntry } from '@webapp/ai/engines/types'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
-import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
-import { useI18n } from '@webapp/store/system'
+import { useI18nT } from '@webapp/store/system'
 
-import { type AiSettings, getApiErrorMessage, type TFunction, toT } from './aiSettingsForm'
+import { type AiSettings, getApiErrorMessage, type TFunction } from './aiSettingsForm'
 import type { ProviderDialogContext } from './ProviderDialog/providerDialogState'
 import { type SavedProvider, toSavedProvider } from './ProviderDialog/providerTypes'
 import {
@@ -103,8 +102,7 @@ const removeLocalProvider = async ({ id, defaultProviderId }: { id: string; defa
  * @returns {ProviderListApi} The list API.
  */
 export const useProviderList = ({ settings, reloadSettings }: Params): ProviderListApi => {
-  const i18n = useI18n()
-  const t = useMemo(() => toT(i18n), [i18n])
+  const t = useI18nT()
   const notifyInfo = useNotifyInfo()
   const notifyError = useNotifyError()
   const confirm = useConfirmAsync()
@@ -123,7 +121,6 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
    * @returns {Promise<void>} Resolves when everything is refreshed.
    */
   const refreshAll = useCallback(async () => {
-    invalidateAiSettingsCache()
     await Promise.all([refreshAiCapabilities().catch(() => undefined), reloadSettings()])
   }, [reloadSettings])
 
