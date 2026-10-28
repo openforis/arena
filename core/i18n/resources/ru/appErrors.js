@@ -159,7 +159,6 @@ export default {
   aiDataDictionaryInvalid: 'ИИ не вернул пригодные описания полей.',
   aiDescriptionsInvalid: 'Описания полей от ИИ, отправленные с экспортом, недействительны.',
   aiIncludeAiDescriptionsRemoved: 'Эта страница устарела. Перезагрузите её и повторите экспорт.',
-  aiSchemaMissing: 'Отсутствует схема структурированного вывода ИИ для функции "{{feature}}".',
   aiProviderInvalid: 'Неподдерживаемый провайдер ИИ: {{provider}}.',
   aiModelMissing: 'Требуется идентификатор модели ИИ.',
   aiApiKeyMissing: 'Для провайдера {{provider}} требуется ключ API.',

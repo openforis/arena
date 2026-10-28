@@ -39,7 +39,7 @@ export const isNodeDefBatchEditable = (nodeDef: any): boolean =>
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey.
  * @param {object} params.record - The record.
- * @param {string} params.recordUuid - The uuid of the record being edited (authorised by the service).
+ * @param {string} params.recordUuid - The uuid of the record being edited (authorised in `applyEditsInLock`).
  * @param {NodesBatchRecordEdit} params.edit - The edit.
  * @returns {BatchEditCheck} The node and its definition, or the result of a refused edit.
  */

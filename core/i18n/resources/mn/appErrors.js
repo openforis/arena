@@ -155,7 +155,6 @@ export default {
   aiDataDictionaryInvalid: 'AI ашиглах боломжтой талбарын тайлбар буцаасангүй.',
   aiDescriptionsInvalid: 'Экспорттой хамт илгээсэн AI талбарын тайлбар буруу байна.',
   aiIncludeAiDescriptionsRemoved: 'Энэ хуудас хуучирсан байна. Дахин ачаалж, дахин экспортлоно уу.',
-  aiSchemaMissing: '"{{feature}}" функцийн AI бүтэцлэгдсэн гаралтын схем байхгүй байна.',
   aiProviderInvalid: 'Дэмжигдээгүй AI үйлчилгээ үзүүлэгч: {{provider}}.',
   aiModelMissing: 'AI загварын танигч шаардлагатай.',
   aiApiKeyMissing: '{{provider}} үйлчилгээ үзүүлэгчид API түлхүүр шаардлагатай.',

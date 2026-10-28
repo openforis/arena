@@ -11,11 +11,15 @@ import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import { assertFeatureEnabled } from '../service/featureGate'
-import { toAiSystemError } from '../service/gateway/errorMapping'
+import SystemError from '@core/systemError'
+import * as Log from '@server/log/log'
+
+import { formatErrorForLog, toAiSystemError } from '../service/gateway/errorMapping'
 import { assertPolicyAllows } from '../service/gateway/policy'
 import * as ProviderResolver from '../service/providerResolver'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
 
+const logger = Log.getLogger('AiInternalApi')
 const FEATURE = 'internalPing'
 
 export const init = (app) => {
@@ -43,6 +47,7 @@ export const init = (app) => {
         const { text, usage } = await generateText({ model, prompt: 'Reply with the single word "ok".', abortSignal })
         res.json({ ok: true, latencyMs: Date.now() - start, effective, text, usage })
       } catch (error) {
+        if (!(error instanceof SystemError)) logger.warn(formatErrorForLog(FEATURE, error))
         next(toAiSystemError(error, { timedOut: abortSignal.aborted }))
       }
     }
