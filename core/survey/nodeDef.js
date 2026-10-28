@@ -888,6 +888,7 @@ export const canBeHiddenInMobile = (nodeDef) =>
 
 export const canIncludeInMultipleEntitySummary = (cycle) => (nodeDef) =>
   isAttribute(nodeDef) &&
+  !isLayoutElement(nodeDef) &&
   !isKey(nodeDef) &&
   !isMultiple(nodeDef) &&
   !isFile(nodeDef) &&
