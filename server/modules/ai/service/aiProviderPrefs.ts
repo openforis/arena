@@ -365,14 +365,29 @@ export const decryptStoredKey = (
 }
 
 /**
- * Returns true when the provider has an old key (no AAD) that may be encrypted again.
+ * Returns true when the provider has an old key (no AAD) that may be encrypted again and can be decrypted.
  * @param {StoredAiProvider} provider - Stored provider.
- * @param {KeyCipher['isLegacy']} isLegacy - Tells an old envelope from a new one.
+ * @param {string} userUuid - The user that owns the provider.
+ * @param {Pick<KeyCipher, 'isLegacy' | 'decrypt'>} cipher - Tells an old envelope from a new one; decrypts it.
  * @param {string[]} allowlist - Org-hosted base URLs.
  * @returns {boolean} Whether the key can be upgraded.
  */
-const hasUpgradableKey = (provider: StoredAiProvider, isLegacy: KeyCipher['isLegacy'], allowlist: string[]): boolean =>
-  !!provider.apiKeyEncrypted && isLegacy(provider.apiKeyEncrypted) && isLegacyKeyAllowed(provider, allowlist)
+const hasUpgradableKey = (
+  provider: StoredAiProvider,
+  userUuid: string,
+  cipher: Pick<KeyCipher, 'isLegacy' | 'decrypt'>,
+  allowlist: string[]
+): boolean => {
+  if (!provider.apiKeyEncrypted || !cipher.isLegacy(provider.apiKeyEncrypted)) return false
+  if (!isLegacyKeyAllowed(provider, allowlist)) return false
+  try {
+    decryptStoredKey(provider, userUuid, cipher.decrypt, allowlist)
+    return true
+  } catch {
+    // an unreadable key would be retried (and the user row locked) on every settings read
+    return false
+  }
+}
 
 /**
  * Returns the provider with its old key (no AAD) encrypted again with the AAD. A key found in the record of another
@@ -400,7 +415,7 @@ const upgradeLegacyKey = ({
   copied: ReadonlySet<string>
 }): StoredAiProvider => {
   const { apiKeyEncrypted } = provider
-  if (!apiKeyEncrypted || !hasUpgradableKey(provider, cipher.isLegacy, allowlist)) return provider
+  if (!apiKeyEncrypted || !hasUpgradableKey(provider, userUuid, cipher, allowlist)) return provider
   // random IVs: the same ciphertext in two records can only be a copy, so the key counts as exposed
   if (copied.has(apiKeyEncrypted)) return { ...provider, apiKeyEncrypted: null }
   try {
@@ -417,18 +432,20 @@ const upgradeLegacyKey = ({
 /**
  * Returns the old keys (no AAD) of the providers that may be encrypted again.
  * @param {AiProviderPrefs} prefs - Provider prefs.
- * @param {KeyCipher['isLegacy']} isLegacy - Tells an old envelope from a new one.
+ * @param {string} userUuid - The user.
+ * @param {Pick<KeyCipher, 'isLegacy' | 'decrypt'>} cipher - Tells an old envelope from a new one; decrypts it.
  * @param {string[]} allowlist - Org-hosted base URLs.
  * @returns {string[]} The envelopes, without repeats.
  */
 export const listUpgradableKeys = (
   prefs: AiProviderPrefs,
-  isLegacy: KeyCipher['isLegacy'],
+  userUuid: string,
+  cipher: Pick<KeyCipher, 'isLegacy' | 'decrypt'>,
   allowlist: string[]
 ): string[] => [
   ...new Set(
     prefs.providers
-      .filter((provider) => hasUpgradableKey(provider, isLegacy, allowlist))
+      .filter((provider) => hasUpgradableKey(provider, userUuid, cipher, allowlist))
       .map((provider) => provider.apiKeyEncrypted as string)
   ),
 ]
@@ -436,12 +453,17 @@ export const listUpgradableKeys = (
 /**
  * Returns true when a provider has a key stored without AAD that may be encrypted again.
  * @param {AiProviderPrefs} prefs - Provider prefs.
- * @param {KeyCipher['isLegacy']} isLegacy - Tells an old envelope from a new one.
+ * @param {string} userUuid - The user.
+ * @param {Pick<KeyCipher, 'isLegacy' | 'decrypt'>} cipher - Tells an old envelope from a new one; decrypts it.
  * @param {string[]} allowlist - Org-hosted base URLs.
  * @returns {boolean} Whether a key needs to be encrypted again.
  */
-export const hasLegacyKeys = (prefs: AiProviderPrefs, isLegacy: KeyCipher['isLegacy'], allowlist: string[]): boolean =>
-  prefs.providers.some((provider) => hasUpgradableKey(provider, isLegacy, allowlist))
+export const hasLegacyKeys = (
+  prefs: AiProviderPrefs,
+  userUuid: string,
+  cipher: Pick<KeyCipher, 'isLegacy' | 'decrypt'>,
+  allowlist: string[]
+): boolean => prefs.providers.some((provider) => hasUpgradableKey(provider, userUuid, cipher, allowlist))
 
 /**
  * Returns the provider prefs with every old key (no AAD) encrypted again with its AAD.
@@ -466,7 +488,7 @@ export const upgradeLegacyKeys = ({
   allowlist: string[]
   copied?: ReadonlySet<string>
 }): AiProviderPrefs => {
-  if (!hasLegacyKeys(prefs, cipher.isLegacy, allowlist)) return prefs
+  if (!hasLegacyKeys(prefs, userUuid, cipher, allowlist)) return prefs
   const providers = prefs.providers.map((provider) =>
     upgradeLegacyKey({ provider, userUuid, cipher, allowlist, copied })
   )

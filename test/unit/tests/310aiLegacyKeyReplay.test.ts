@@ -161,6 +161,26 @@ describe('Keys saved without an AAD cannot be replayed (310)', () => {
     })
   })
 
+  describe('an old key that cannot be decrypted', () => {
+    test('the settings read neither locks the user row nor writes', async () => {
+      const user = userWith(
+        storedProvider({ type: 'openai', baseUrl: null, apiKeyEncrypted: legacyEnvelope('sk-own') })
+      )
+      const { deps } = createDeps(user)
+      const updateAiPrefs = jest.fn(deps.updateAiPrefs)
+      const decrypt = jest.fn(() => {
+        throw new Error('bad decrypt')
+      })
+      const result = await AiProviderService.upgradeLegacyProviderKeys({
+        user,
+        deps: { ...deps, updateAiPrefs, decrypt },
+      })
+      expect(result).toBe(user)
+      expect(decrypt).toHaveBeenCalled()
+      expect(updateAiPrefs).not.toHaveBeenCalled()
+    })
+  })
+
   describe('a key that is also stored in the record of another user', () => {
     test('it is removed, not encrypted again for its holder', async () => {
       const envelope = legacyEnvelope('sk-victim')

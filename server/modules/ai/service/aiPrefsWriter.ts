@@ -75,7 +75,7 @@ const upgradeOldKeys = async ({
   deps: AiPrefsWriterDeps
 }): Promise<StoredAiPrefs | null> => {
   const { cipher, allowlist } = deps
-  const envelopes = listUpgradableKeys(getProviderPrefs(aiPrefs), cipher.isLegacy, allowlist)
+  const envelopes = listUpgradableKeys(getProviderPrefs(aiPrefs), user.uuid, cipher, allowlist)
   if (envelopes.length === 0) return aiPrefs
   const copied = new Set(await deps.findCopiedEnvelopes({ userUuid: user.uuid, envelopes }, client))
   return upgradeLegacyKeysInAiPrefs({ aiPrefs, userUuid: user.uuid, cipher, allowlist, copied })

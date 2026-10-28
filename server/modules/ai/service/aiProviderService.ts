@@ -913,7 +913,7 @@ export const upgradeLegacyProviderKeys = async ({
   user: User
   deps?: AiProviderServiceDeps
 }): Promise<User> => {
-  const hasOldKeys = hasLegacyKeys(getProviderPrefs(getAiPrefs(user)), deps.isLegacyEnvelope, deps.allowlist)
+  const hasOldKeys = hasLegacyKeys(getProviderPrefs(getAiPrefs(user)), user.uuid, cipherOf(deps), deps.allowlist)
   if (!hasOldKeys || !deps.isEncryptionConfigured()) return user
   try {
     return (await commitProviderPrefs({ user, deps, change: () => null })).user
