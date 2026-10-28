@@ -30,6 +30,7 @@ export const whatsNewItems: WhatsNewItem[] = [
     id: 'areaOfInterest',
     version: '2.10.8',
     audience: whatsNewAudiences.surveyAdmin,
+    image: '/img/whats-new/areaOfInterest.png',
   },
   {
     id: 'mobilePreview',

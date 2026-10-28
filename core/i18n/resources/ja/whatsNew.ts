@@ -12,7 +12,7 @@ export default {
 
 新しい式関数 \`geoDistanceToAOIBoundary(location)\` は、位置と領域の境界との距離（メートル）を返します：領域内では負、領域外では正の値です。GPS精度（\`location.accuracy\`）と比較して、位置を領域内・領域外・不確定に分類できます（例：読み取り専用属性の既定値や、重大度 *警告* の検証ルール）。**Arena Mobile** ではオフラインでも動作します。
 
-ご要望をいただいた **ASSEDEV – Alerte Environnement** に感謝します。`,
+ご要望をいただいた **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) に感謝します。`,
     },
     mobilePreview: {
       title: 'Arena Mobile で調査をプレビュー',

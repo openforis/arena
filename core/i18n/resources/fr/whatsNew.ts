@@ -12,7 +12,7 @@ export default {
 
 La nouvelle fonction d'expression \`geoDistanceToAOIBoundary(location)\` renvoie la distance en mètres entre un emplacement et la limite de la zone : négative à l'intérieur, positive à l'extérieur. Comparez-la avec la précision GPS (\`location.accuracy\`) pour classer les emplacements comme à l'intérieur, à l'extérieur ou incertains, par exemple dans les valeurs par défaut d'attributs en lecture seule et dans des règles de validation de gravité *avertissement*. Elle fonctionne aussi hors ligne dans **Arena Mobile**.
 
-Merci à **ASSEDEV – Alerte Environnement** pour la demande.`,
+Merci à **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) pour la demande.`,
     },
     mobilePreview: {
       title: "Aperçu de l'enquête dans Arena Mobile",
