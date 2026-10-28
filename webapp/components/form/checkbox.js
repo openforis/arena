@@ -99,7 +99,6 @@ Checkbox.propTypes = {
   id: PropTypes.string,
   checked: PropTypes.bool,
   controlStyle: PropTypes.object,
-  // id of the element describing the checkbox (aria-describedby)
   disabled: PropTypes.bool,
   indeterminate: PropTypes.bool,
   info: PropTypes.string,

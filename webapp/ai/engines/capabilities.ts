@@ -318,7 +318,7 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
     },
     refresh: ({ userUuid }) => {
       resetIfOtherUser(userUuid)
-      if (inflight && inflight.userUuid === userUuid && inflight.force) return inflight.promise
+      // never joins a run in flight: it may have read the settings before the change that asks for this refresh
       return run({ userUuid, force: true })
     },
     reset,

@@ -1,3 +1,4 @@
+import { createAiSettingsCache } from '@webapp/components/ai/hooks/aiSettingsCache'
 import {
   buildInstanceCapability,
   createCapabilitiesStore,
@@ -188,15 +189,38 @@ describe('user switch and failures', () => {
     expect(store.get().local['local:l1'].models).toEqual(['u2-model'])
   })
 
-  test('concurrent refreshes of the same user share one run', async () => {
+  test('a refresh after a save reads the settings again, and both refreshes resolve with the newer result', async () => {
     const first = deferred<LocalServerProbeResult>()
-    const { calls, deps } = fakeDeps([desk])
-    const store = createCapabilitiesStore({ ...deps, probe: () => first.promise })
+    const second = deferred<LocalServerProbeResult>()
+    const store = storeWithProbes([first, second])
     const a = store.refresh({ userUuid: 'u1' })
     const b = store.refresh({ userUuid: 'u1' })
-    first.resolve(reachableProbe)
-    await Promise.all([a, b])
-    expect(calls.settings).toEqual([true])
+    second.resolve({ ...reachableProbe, models: ['new'] })
+    await b
+    first.resolve({ ...reachableProbe, models: ['old'] })
+    expect((await a).local['local:l1'].models).toEqual(['new'])
+  })
+
+  test('a refresh started before a save does not leave the pre-save settings in the cache', async () => {
+    const reads = [deferred<Record<string, unknown>>(), deferred<Record<string, unknown>>()]
+    let index = 0
+    const cache = createAiSettingsCache({ fetchSettings: () => reads[index++].promise })
+    const store = createCapabilitiesStore({
+      loadSettings: async ({ force }) => {
+        if (force) cache.invalidate()
+        return (await cache.fetchOnce()) as any
+      },
+      loadLocalProviders: () => [],
+      probe: async () => reachableProbe,
+    })
+    const before = store.refresh({ userUuid: 'u1' })
+    // the user saves, then the panel refreshes again
+    const after = store.refresh({ userUuid: 'u1' })
+    reads[1].resolve({ ...settingsSnapshot, featuresEnabled: false })
+    await after
+    reads[0].resolve(settingsSnapshot)
+    await before
+    expect(cache.getSnapshot()?.featuresEnabled).toBe(false)
   })
 
   test('a load overtaken by a refresh of the same user resolves with the newer result', async () => {
