@@ -13,6 +13,20 @@ describe('createRateLimiter', () => {
     expect(limiter.take('ann')).toBe(true)
   })
 
+  test('keys whose calls all left the window are dropped once the map passes 10,000 entries', () => {
+    let time = 0
+    const limiter = createRateLimiter({ limitPerMinute: 2, now: () => time })
+    for (let i = 0; i <= 10_000; i += 1) limiter.take(`user-${i}`)
+    time = 60_001
+    const deleteSpy = jest.spyOn(Map.prototype, 'delete')
+    try {
+      limiter.take('someone-new')
+      expect(deleteSpy.mock.calls.length).toBeGreaterThan(10_000)
+    } finally {
+      deleteSpy.mockRestore()
+    }
+  })
+
   test('a limit of 0 disables limiting', () => {
     const limiter = createRateLimiter({ limitPerMinute: 0 })
     for (let i = 0; i < 100; i += 1) expect(limiter.take('ann')).toBe(true)

@@ -3,6 +3,8 @@
  * runaway loops; deployments with several replicas get limitPerMinute × replicas in the worst case.
  */
 const WINDOW_MS = 60_000
+// keys of users who called once are dropped in a sweep when the map grows past this
+const MAX_KEYS = 10_000
 
 export type RateLimiter = { take: (key: string) => boolean }
 
@@ -33,6 +35,7 @@ export const createRateLimiter = ({
     take: (key: string): boolean => {
       if (!(limitPerMinute > 0)) return true
       const time = now()
+      if (callTimesByKey.size > MAX_KEYS) for (const known of callTimesByKey.keys()) prune(known, time)
       const recent = prune(key, time)
       if (recent.length >= limitPerMinute) return false
       callTimesByKey.set(key, [...recent, time])
