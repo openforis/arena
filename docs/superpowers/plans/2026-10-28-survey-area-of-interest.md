@@ -307,3 +307,46 @@ Changes from the original plan:
 - [ ] Bump `@openforis/arena-core` to the release containing `geoDistanceToAOIBoundary`.
 - [ ] Test offline: download a survey with AOI + the attributes of "Intended usage", turn off the connection, enter locations inside / outside / near the boundary, check the warnings and the stored values, then sync and check them in Arena.
 - [ ] (Optional) show the AOI on the location map.
+
+---
+
+## Part 4: AOI stored as survey file (rework of Part 2, before merging #4588)
+
+Why: a big GeoJSON in the survey info props is loaded everywhere the survey info is (survey list, header,
+every survey fetch, mobile survey JSON). Store it as a survey file and load it only where expressions are
+evaluated on records.
+
+Not released yet: no migration of the `areaOfInterest` info prop.
+
+### Task 8: survey file and info reference
+
+- [ ] `SurveyFile.SurveyFileType.areaOfInterest`.
+- [ ] Info prop `areaOfInterestFile` (replaces `areaOfInterest`): `{ fileUuid, name, size, polygons, vertices }`
+      (summary kept in the props: shown in the editor and in the survey compare without loading the file).
+- [ ] Editor: parse/validate the uploaded GeoJSON in the browser, upload the normalized geometry
+      (`parseAreaOfInterest`) as temporary survey file (`API.insertSurveyFile`), set the reference; download
+      from `API.getSurveyFileDownloadUrl`; max size 10 MB (as preloaded map layers).
+- [ ] Server `insertSurveyFile`: reject an `areaOfInterest` file whose content is not a valid AOI.
+- [ ] `updateSurveyProps`: clear the temporary flag of the referenced AOI file;
+      `deleteUnusedSurveyFiles` (publish): delete the AOI files no longer referenced.
+- [ ] Fingerprint / compare / validator use `areaOfInterestFile`.
+
+### Task 9: survey export / import / mobile package
+
+- [ ] `surveyFilesExportJob`: export the `areaOfInterest` files; `surveyFilesImportJob`: import the referenced one.
+- [ ] `SurveyMobilePackage.getFileSummaries`: include the AOI file (Arena Mobile reads it from the package
+      folder, `surveyfiles/<uuid>.bin`).
+
+### Task 10: AOI available to the expression evaluator (server)
+
+- [ ] `SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ includeAreaOfInterest })`: reads the AOI file
+      and sets `info.props.areaOfInterest` in memory (read by arena-core `Surveys.getAreaOfInterest`).
+- [ ] Pass `includeAreaOfInterest: true` where records are evaluated: records update thread, record
+      creation from sampling point data, records merge, record check job, data imports (flat data,
+      Arena Mobile, Collect, ODK), chain results persistence.
+- [ ] Integration test: AOI file → `geoDistanceToAOIBoundary` evaluated on a record.
+
+### Task 11: arena-mobile (separate PR, after openforis/arena-mobile#289)
+
+- [ ] On survey load: read `surveyfiles/<areaOfInterestFile.fileUuid>.bin` from the package folder and set
+      `survey.props.areaOfInterest` in memory (missing file → function returns null).
