@@ -51,7 +51,6 @@ describe('failed save request (502)', () => {
     const applyWithPutError = (error: unknown) => {
       const deps: ApplierDeps = {
         getSurvey: () => survey,
-        getCycle: () => '0',
         isSurveyDirty: () => false,
         postNodeDef: async () => undefined,
         putNodeDefProps: async () => {

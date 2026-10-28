@@ -43,7 +43,6 @@ test('a record operation never reaches the survey paths', async () => {
   }
   const deps: ApplierDeps = {
     getSurvey: () => survey,
-    getCycle: () => '0',
     isSurveyDirty: () => false,
     postNodeDef: fail,
     putNodeDefProps: fail,

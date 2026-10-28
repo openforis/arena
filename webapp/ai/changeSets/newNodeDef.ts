@@ -58,7 +58,6 @@ const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object
  * @param {string} params.type - Type.
  * @param {string[]} [params.cycles] - Cycles (default: those of the parent, so the node definition exists wherever its
  * parent does).
- * @param {string} [params.cycle] - A single cycle, instead of `cycles` (what the designer does: the current cycle).
  * @param {string} params.name - Name.
  * @param {object} [params.labels] - Labels by language.
  * @param {object} [params.descriptions] - Descriptions by language.
@@ -70,8 +69,7 @@ const nonEmpty = (texts: Record<string, string> | undefined) => (texts && Object
 export const createProposedNodeDef = ({
   parent,
   type,
-  cycle,
-  cycles = cycle ? [cycle] : NodeDef.getCycles(parent),
+  cycles = NodeDef.getCycles(parent),
   name,
   labels,
   descriptions,
@@ -81,7 +79,6 @@ export const createProposedNodeDef = ({
 }: {
   parent: any
   type: string
-  cycle?: string
   cycles?: string[]
   name: string
   labels?: Record<string, string>

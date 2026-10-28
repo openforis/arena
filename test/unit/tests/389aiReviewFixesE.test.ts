@@ -142,7 +142,6 @@ describe('Apply does not count on a create it will not apply (389)', () => {
     const puts: any[] = []
     const deps: ApplierDeps = {
       getSurvey: () => current,
-      getCycle: () => '0',
       isSurveyDirty: () => false,
       postNodeDef: async (nodeDef) => {
         posts.push(nodeDef)

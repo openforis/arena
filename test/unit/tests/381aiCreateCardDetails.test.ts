@@ -86,7 +86,7 @@ describe('the card of a new node definition lists what it sets (381)', () => {
 
   test('read only is listed too (a card can hold it even if the designer refuses it at proposal)', () => {
     const cluster = getDefByName(survey, 'cluster')
-    const nodeDef = createProposedNodeDef({ parent: cluster, type: 'text', cycle: '0', name: 'ro', readOnly: true })
+    const nodeDef = createProposedNodeDef({ parent: cluster, type: 'text', cycles: ['0'], name: 'ro', readOnly: true })
     const changeSet = buildChangeSet({
       drafts: [{ type: 'nodeDef.create', nodeDef, parentUuid: NodeDef.getUuid(cluster) }],
       survey,
@@ -100,7 +100,7 @@ describe('the card of a new node definition lists what it sets (381)', () => {
     const nodeDef = createProposedNodeDef({
       parent: getDefByName(survey, 'cluster'),
       type: 'text',
-      cycle: '0',
+      cycles: ['0'],
       name: 'k',
       key: true,
     })
@@ -118,7 +118,7 @@ describe('the card of a new node definition lists what it sets (381)', () => {
     const nodeDef = createProposedNodeDef({
       parent: getDefByName(survey, 'cluster'),
       type: 'entity',
-      cycle: '0',
+      cycles: ['0'],
       name: 'e',
       labels: { en: 'E' },
       descriptions: { en: 'D' },

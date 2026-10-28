@@ -17,7 +17,6 @@ import type { ChangeSet, NodeDefOperation, OperationConflict, OperationResult } 
 
 export type ApplierDeps = {
   getSurvey: () => any
-  getCycle: () => string
   isSurveyDirty: () => boolean
   postNodeDef: (nodeDef: any) => Promise<void>
   putNodeDefProps: (params: {

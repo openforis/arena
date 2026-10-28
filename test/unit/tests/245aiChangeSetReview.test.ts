@@ -64,7 +64,7 @@ describe('change set review (245)', () => {
     const remarks = createProposedNodeDef({
       parent: getDefByName(survey, 'plot'),
       type: 'text',
-      cycle: '0',
+      cycles: ['0'],
       name: 'plot_remarks',
       labels: { en: 'Remarks' },
     })

@@ -1,6 +1,8 @@
 import { z } from 'zod'
 import { Dates } from '@openforis/arena-core'
 
+import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
+
 import type { AiTool } from '@webapp/ai/tools/types'
 import { toRequestFailure } from '@webapp/ai/tools/analysis/toolResults'
 import { canCleanseCurrentSurvey } from '@webapp/ai/tools/common/toolPermissions'
@@ -56,9 +58,6 @@ const inputSchema = z.object({
 
 type Input = z.infer<typeof inputSchema>
 
-// same limit as the server's batch endpoint (records per Apply)
-const RECORDS_PER_PROPOSAL_MAX = 50
-
 const TIMEOUT_HINT = 'Loading the records is too slow. Retry with fewer edits.'
 
 const common: Pick<AiTool, 'area' | 'dataClass' | 'requires'> = {
@@ -100,12 +99,12 @@ export const createRecordsProposeEditsTool = ({
    * @returns {Promise<object>} The proposal result, or a tool error.
    */
   execute: async ({ summary, edits }, ctx) => {
-    if (new Set(edits.map((edit) => edit.recordUuid)).size > RECORDS_PER_PROPOSAL_MAX) {
+    if (new Set(edits.map((edit) => edit.recordUuid)).size > NodesBatchLimits.maxRecords) {
       throw invalidProposal('Too many records in one change set.', [
         {
           operation: 0,
           field: 'tooManyRecords',
-          message: `At most ${RECORDS_PER_PROPOSAL_MAX} records per change set: split into smaller change sets.`,
+          message: `At most ${NodesBatchLimits.maxRecords} records per change set: split into smaller change sets.`,
         },
       ])
     }

@@ -3,7 +3,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
-import { VALUE_PROP_DEFAULT, extractTimeValue, parseNodeValueProps } from '@core/record/nodeValueParser'
+import { VALUE_PROP_DEFAULT, parseNodeValueProps } from '@core/record/nodeValueParser'
 
 import * as SB from '../../utils/surveyBuilder'
 
@@ -78,11 +78,6 @@ describe('nodeValueParser: parseNodeValueProps (the import layer)', () => {
     await expect(parse('cluster_time', { value: '25:99' })).rejects.toMatchObject({
       key: 'validationErrors:dataImport.invalidTime',
     })
-  })
-
-  test('extractTimeValue is exported for the import tests', () => {
-    const nodeDef = Survey.getNodeDefByName('cluster_time')(survey)
-    expect(extractTimeValue({ value: { value: '10:30' }, headers: ['t'], nodeDef }).value).toBe('10:30')
   })
 
   test('codes of a flat category are found in the survey index, with the item as ref data', async () => {

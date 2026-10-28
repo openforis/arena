@@ -7,9 +7,6 @@ import { VALUE_PROP_DEFAULT, parseNodeValueProps } from '@core/record/nodeValueP
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
-// kept for the existing time import tests
-export { extractTimeValue } from '@core/record/nodeValueParser'
-
 const checkAllHeadersAreValid =
   ({ csvDataExportModel }) =>
   (headers) => {

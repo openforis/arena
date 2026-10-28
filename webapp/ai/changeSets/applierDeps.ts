@@ -23,7 +23,6 @@ export const createApplierDeps = ({
   getState: () => any
 }): ApplierDeps => ({
   getSurvey: () => SurveyState.getSurvey(getState()),
-  getCycle: () => SurveyState.getSurveyCycleKey(getState()),
   isSurveyDirty: () => SurveyStatusState.isDirty(getState()),
   postNodeDef: async (nodeDef) => {
     await dispatch(NodeDefsActions.postNodeDef({ nodeDef }))

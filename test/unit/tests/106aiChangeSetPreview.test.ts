@@ -33,7 +33,7 @@ const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(survey, name))
 
 const createDraft = (params: { parentName: string; type: string; name: string; labels?: Record<string, string> }) => {
   const parent = getDefByName(survey, params.parentName)
-  const nodeDef = createProposedNodeDef({ parent, cycle: '0', ...params })
+  const nodeDef = createProposedNodeDef({ parent, cycles: ['0'], ...params })
   return { type: 'nodeDef.create', nodeDef, parentUuid: NodeDef.getUuid(parent) } as ChangeOperationDraft
 }
 
@@ -97,7 +97,7 @@ describe('previewChangeSet', () => {
 
   test('a new entity without children is accepted, and a child can refer to it', async () => {
     const entityDraft: any = createDraft({ parentName: 'cluster', type: 'entity', name: 'site' })
-    const child = createProposedNodeDef({ parent: entityDraft.nodeDef, type: 'text', cycle: '0', name: 'site_name' })
+    const child = createProposedNodeDef({ parent: entityDraft.nodeDef, type: 'text', cycles: ['0'], name: 'site_name' })
     expect((await preview([entityDraft])).validation.valid).toBe(true)
     const withChild = await preview([
       entityDraft,
@@ -225,7 +225,7 @@ describe('previewChangeSet', () => {
 
     test('a new boolean cannot be created multiple', async () => {
       const parent = getDefByName(survey, 'cluster')
-      const nodeDef = createProposedNodeDef({ parent, cycle: '0', type: 'boolean', name: 'flag', multiple: true })
+      const nodeDef = createProposedNodeDef({ parent, cycles: ['0'], type: 'boolean', name: 'flag', multiple: true })
       const result = await preview([
         { type: 'nodeDef.create', nodeDef, parentUuid: NodeDef.getUuid(parent) } as ChangeOperationDraft,
       ])
@@ -246,7 +246,7 @@ describe('previewChangeSet', () => {
       const newKey = (type: string, multiple = false) =>
         ({
           type: 'nodeDef.create',
-          nodeDef: createProposedNodeDef({ parent, cycle: '0', type, name: 'k_new', key: true, multiple }),
+          nodeDef: createProposedNodeDef({ parent, cycles: ['0'], type, name: 'k_new', key: true, multiple }),
           parentUuid: NodeDef.getUuid(parent),
         }) as ChangeOperationDraft
       expect(messages(await preview([newKey('boolean')]))).toEqual([
@@ -263,7 +263,7 @@ describe('previewChangeSet', () => {
     const parent = getDefByName(survey, 'cluster')
     const nodeDef = createProposedNodeDef({
       parent,
-      cycle: '0',
+      cycles: ['0'],
       type: 'text',
       name: 'cluster_remarks',
       labels: { en: 'Remarks', fr: 'Remarques' },

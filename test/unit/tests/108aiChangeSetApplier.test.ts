@@ -21,7 +21,6 @@ const createFakeDeps = (overrides: Partial<ApplierDeps> = {}) => {
   const prevDefs: any[] = []
   const deps: ApplierDeps = {
     getSurvey: () => survey,
-    getCycle: () => '0',
     isSurveyDirty: () => false,
     postNodeDef: async (nodeDef) => {
       calls.push(['post', NodeDef.getName(nodeDef)])
@@ -50,8 +49,8 @@ const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(initialSurvey, nam
 
 const buildOperations = () => {
   const cluster = getDefByName(initialSurvey, 'cluster')
-  const site = createProposedNodeDef({ parent: cluster, type: 'entity', cycle: '0', name: 'site' })
-  const siteName = createProposedNodeDef({ parent: site, type: 'text', cycle: '0', name: 'site_name' })
+  const site = createProposedNodeDef({ parent: cluster, type: 'entity', cycles: ['0'], name: 'site' })
+  const siteName = createProposedNodeDef({ parent: site, type: 'text', cycles: ['0'], name: 'site_name' })
   const notesUuid = uuidOf('cluster_notes')
   const operations: ChangeOperation[] = [
     { id: 'o1', type: 'nodeDef.create', nodeDef: site, parentUuid: NodeDef.getUuid(cluster) },

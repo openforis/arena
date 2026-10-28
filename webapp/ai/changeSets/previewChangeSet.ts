@@ -9,6 +9,8 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import { isKeyEditDisabled, isMaxKeysCountReached, isMultipleEditDisabled } from '@core/survey/nodeDefEditGuards'
 
+import { getSurveyLanguages } from '@webapp/ai/tools/design/missingTexts'
+
 import { checkNodeDefExpression, singleExpressionProps } from './expressionProps'
 import { checkCategoryItemLabels } from './categoryItemLabels/checkCategoryItemLabels'
 import { isCategoryItemLabelOperation } from './categoryItemLabels/types'
@@ -46,12 +48,9 @@ const issue = (t: Translate, field: string, key: string, params: Record<string, 
 
 const nodeDefNotFound = (t: Translate, uuid: string) => issue(t, 'nodeDefUuid', 'nodeDefNotFound', { name: uuid })
 
-const surveyLanguages = (survey: any): string[] =>
-  Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
-
 // languages of a labels/descriptions map that the survey does not have
 const checkTextLanguages = (survey: any, nodeDef: any, t: Translate): FieldIssue[] => {
-  const languages = surveyLanguages(survey)
+  const languages = getSurveyLanguages(survey)
   const kinds = [
     ['labels', NodeDef.getLabels(nodeDef)],
     ['descriptions', NodeDef.getDescriptions(nodeDef)],
@@ -143,7 +142,7 @@ const checkUpdate = ({ survey, op, t }: CheckParams<NodeDefUpdateOperation>): Fi
 
 const checkLabel = ({ survey, op, t }: CheckParams<LabelSetOperation>): FieldIssue[] => {
   if (!Survey.getNodeDefByUuid(op.nodeDefUuid)(survey)) return nodeDefNotFound(t, op.nodeDefUuid)
-  const languages = surveyLanguages(survey)
+  const languages = getSurveyLanguages(survey)
   return languages.includes(op.lang) ? [] : issue(t, `${op.kind}.${op.lang}`, 'languageNotInSurvey', { lang: op.lang })
 }
 

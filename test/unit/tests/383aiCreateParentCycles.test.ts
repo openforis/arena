@@ -64,10 +64,9 @@ describe('a new node definition takes the cycles of its parent (383)', () => {
     for (const cycle of ['0', '1']) expect(NodeDefLayout.isRenderForm(cycle)(site)).toBe(true)
   })
 
-  test('createProposedNodeDef: cycles default to the parent cycles; `cycle` picks a single one', () => {
+  test('createProposedNodeDef: cycles default to the parent cycles; `cycles` picks others', () => {
     const parent = NodeDef.assocCycles(['0', '2'])(getDefByName(survey, 'cluster'))
     expect(NodeDef.getCycles(createProposedNodeDef({ parent, type: 'text', name: 'a' }))).toEqual(['0', '2'])
-    expect(NodeDef.getCycles(createProposedNodeDef({ parent, type: 'text', name: 'a', cycle: '2' }))).toEqual(['2'])
     expect(NodeDef.getCycles(createProposedNodeDef({ parent, type: 'text', name: 'a', cycles: ['0'] }))).toEqual(['0'])
   })
 

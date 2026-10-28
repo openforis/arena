@@ -110,7 +110,6 @@ export const categoryLabelChangeSet = (operations: ChangeSet['operations'], id =
  */
 export const createApplierDepsStub = (survey: any, overrides: Partial<ApplierDeps> = {}): ApplierDeps => ({
   getSurvey: () => survey,
-  getCycle: () => '0',
   isSurveyDirty: () => false,
   postNodeDef: async () => undefined,
   putNodeDefProps: async () => undefined,

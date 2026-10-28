@@ -51,7 +51,7 @@ describe('translation source of a proposed label (543)', () => {
     const remarks = createProposedNodeDef({
       parent: cluster,
       type: 'text',
-      cycle: '0',
+      cycles: ['0'],
       name: 'cluster_remarks',
       labels: { en: 'Remarks' },
     })

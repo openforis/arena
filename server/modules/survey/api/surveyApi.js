@@ -374,9 +374,7 @@ export const init = (app) => {
       } = params
       const user = Request.getUser(req)
       const ai =
-        aiDescriptions === null
-          ? {}
-          : await parseExportAiDescriptions({ user, surveyId, cycle, aiDescriptions, aiDescriptionsFailedCount })
+        aiDescriptions === null ? {} : parseExportAiDescriptions({ user, aiDescriptions, aiDescriptionsFailedCount })
       const job = SurveyService.startSchemaSummaryExportJob({ user, surveyId, cycle, fileFormat, ...ai })
       res.json({ job: JobUtils.jobToJSON(job) })
     } catch (error) {

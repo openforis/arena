@@ -43,7 +43,6 @@ const applyWithFakeDeps = async (start: any, changeSet: ChangeSet, operationIds?
   const posts: any[] = []
   const deps: ApplierDeps = {
     getSurvey: () => current,
-    getCycle: () => '0',
     isSurveyDirty: () => false,
     postNodeDef: async (nodeDef) => {
       posts.push(nodeDef)

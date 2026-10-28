@@ -17,6 +17,7 @@ import { canEditCurrentSurvey } from '../common/toolPermissions'
 import { AiToolFailure } from '../toolFailure'
 import type { AiTool, AiToolContext } from '../types'
 import { checkScope, requireCategory } from './categoryItemsListMissingLabels'
+import { getSurveyLanguages } from './missingTexts'
 import { proposeChangeSet, summarySchema } from './proposeChangeSet'
 import { requireSurvey } from './surveyLookup'
 
@@ -38,10 +39,6 @@ const inputSchema = z.object({
 type CategoryLabelsInput = z.infer<typeof inputSchema>
 
 type CategoryLabelItem = CategoryLabelsInput['items'][number]
-
-// core/survey is untyped JS: getLanguages returns the codes array, default first
-const getSurveyLanguages = (survey: any): string[] =>
-  Survey.getLanguages(Survey.getSurveyInfo(survey)) as unknown as string[]
 
 /**
  * Converts one proposed item to an operation draft.
