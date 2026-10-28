@@ -241,10 +241,17 @@ const checkAllHeadersAreValid =
     }
   }
 
+const isRequiredColumn = (column) => {
+  const { key, nodeDef, valueProp } = column
+  if (!key) return false
+  // taxon scientific and vernacular names are optional (used only for unlisted taxa): the code identifies the taxon
+  return NodeDef.getType(nodeDef) !== NodeDef.nodeDefType.taxon || valueProp === Node.valuePropsTaxon.code
+}
+
 const checkRequiredHeadersNotMissing =
   ({ csvDataExportModel }) =>
   (headers) => {
-    const requiredHeaders = csvDataExportModel.columns.filter((col) => col.key).map((col) => col.header)
+    const requiredHeaders = csvDataExportModel.columns.filter(isRequiredColumn).map((col) => col.header)
     const missingRequiredHeaders = requiredHeaders.filter((header) => !headers.includes(header))
     if (missingRequiredHeaders.length > 0) {
       throw new SystemError('validationErrors:dataImport.missingRequiredHeaders', { missingRequiredHeaders })

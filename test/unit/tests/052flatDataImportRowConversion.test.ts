@@ -104,4 +104,17 @@ describe.each(fileFormats)('Data import: conversion of %s rows into node values'
       key: 'validationErrors:dataImport.missingRequiredHeaders',
     })
   })
+
+  test('only the code column is required for a key taxon attribute', async () => {
+    const items = await readRowItems({
+      survey,
+      entityName: 'tree',
+      fileFormat,
+      rows: [
+        ['cluster_id', 'plot_id', 'tree_species'],
+        [1, 2, 'QUE'],
+      ],
+    })
+    expect(items).toHaveLength(1)
+  })
 })
