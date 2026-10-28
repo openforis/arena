@@ -9,6 +9,7 @@ import { AI_GATEWAY_URL, deserializeGenerateResult, type AiGatewayCall } from '@
 
 import type { FetchLike } from './authorizedFetch'
 import { readSseParts } from './sseReader'
+import { createDeltaCoalescer } from '../engines/coalesceDeltas'
 
 const FORWARDED_OPTIONS = [
   'prompt',
@@ -127,7 +128,7 @@ export const createGatewayModel = ({
     },
     async doStream(options) {
       const response = await post(options, true)
-      return { stream: readSseParts(response) }
+      return { stream: readSseParts(response).pipeThrough(createDeltaCoalescer()) }
     },
   }
 }

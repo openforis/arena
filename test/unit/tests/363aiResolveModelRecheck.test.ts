@@ -68,6 +68,8 @@ type Setup = {
   baseUrl?: () => string
   onConsent?: () => void
   defaultProviderId?: string
+  // read each time, like the policy
+  settings?: () => AiFeatureSwitches
 }
 
 const setup = ({
@@ -76,6 +78,7 @@ const setup = ({
   baseUrl = () => URL_A,
   onConsent,
   defaultProviderId,
+  settings = () => SETTINGS,
 }: Setup = {}) => {
   const storage = memoryStorage()
   const state = {
@@ -87,7 +90,7 @@ const setup = ({
   const resolve = createModelResolver({
     getUserUuid: () => 'u1',
     isInstanceEnabled: () => true,
-    getSettings: () => SETTINGS,
+    getSettings: settings,
     loadCapabilities: async () => ({ ...capabilities(baseUrl()), ...(defaultProviderId ? { defaultProviderId } : {}) }),
     getEffectivePolicyFor: async ({ surveyId, fresh }) => {
       state.policyCalls.push({ surveyId, fresh: fresh === true })
@@ -143,6 +146,21 @@ describe('resolveModel: the last policy check before a local engine is created (
     expect(error.params.reasons).toEqual(['policyForbids'])
     expect(state.localEngines).toEqual([])
     expect(state.consentChanges).toBe(0)
+    expect(loadLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: URL_A })).toBeNull()
+  })
+
+  test('the user turns the feature off while the dialog was open: nothing is created', async () => {
+    let current = SETTINGS
+    const { resolve, state, storage } = setup({
+      answers: ['continue'],
+      settings: () => current,
+      onConsent: () => {
+        current = { ...SETTINGS, featureToggles: { ...SETTINGS.featureToggles, userActivity: false } }
+      },
+    })
+    const error = await resolve({ feature: 'activityLogSummary', surveyId: 1 }).catch((e) => e)
+    expect(error.key).toBe('aiFeaturesDisabled')
+    expect(state.localEngines).toEqual([])
     expect(loadLocalServerConsent({ storage, userUuid: 'u1', surveyId: 1, baseUrl: URL_A })).toBeNull()
   })
 

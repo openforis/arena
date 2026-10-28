@@ -268,6 +268,7 @@ export const createModelResolver = (deps: ModelResolverDeps) => {
   const recheckLocal = async (context: Context, engine: AiSelectedEngine, capability: AiLocalServerCapability) => {
     const { options } = context
     const capabilities = await deps.loadCapabilities()
+    assertFeatureEnabled(options.feature)
     const policy = await deps.getEffectivePolicyFor({
       feature: options.feature,
       surveyId: options.surveyId,

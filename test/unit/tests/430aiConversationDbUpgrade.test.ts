@@ -27,7 +27,7 @@ describe('conversation database upgrades (430)', () => {
       ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
     )
     const store = second.transaction('conversations').objectStore('conversations')
-    expect([...store.indexNames].sort()).toEqual(['updatedAt', 'userSurvey', 'userUuid'])
+    expect([...store.indexNames].sort()).toEqual(['userSurvey', 'userUuid'])
     second.close()
   })
 
@@ -41,7 +41,7 @@ describe('conversation database upgrades (430)', () => {
       ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
     )
     const store = second.transaction('conversations').objectStore('conversations')
-    expect([...store.indexNames].sort()).toEqual(['updatedAt', 'userSurvey', 'userUuid'])
+    expect([...store.indexNames].sort()).toEqual(['userSurvey', 'userUuid'])
     second.close()
   })
 

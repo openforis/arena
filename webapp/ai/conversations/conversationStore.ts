@@ -47,7 +47,6 @@ const transactionDone = (transaction: IDBTransaction): Promise<void> =>
 const INDEXES: [name: string, keyPath: string | string[]][] = [
   ['userSurvey', ['userUuid', 'surveyKey']],
   ['userUuid', 'userUuid'],
-  ['updatedAt', 'updatedAt'],
 ]
 
 /**
@@ -196,6 +195,16 @@ const createIndexedDbStore = (
         transaction.objectStore(STORE).put(withSurveyKey(conversation))
         await transactionDone(transaction)
       })
+      const count = await withDb((db) =>
+        requestResult(
+          db
+            .transaction(STORE, 'readonly')
+            .objectStore(STORE)
+            .index('userSurvey')
+            .count([conversation.userUuid, toSurveyKey(conversation.surveyId)])
+        )
+      )
+      if (count <= keep) return
       const all = await list(conversation)
       await removeAll(all.slice(keep).map((item) => item.id))
     },
