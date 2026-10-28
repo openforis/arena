@@ -9,9 +9,11 @@ import * as RecordService from '@server/modules/record/service/recordService'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as TaxonomyService from '@server/modules/taxonomy/service/taxonomyService'
 import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ArenaMobileImportService from '../service/arenaMobileImportService'
+import * as SurveyMobilePackageService from '../service/surveyMobilePackageService'
 
 const Logger = Log.getLogger('Mobile API')
 
@@ -50,6 +52,27 @@ export const init = (app) => {
       res.json({ survey })
     } catch (e) {
       next(e)
+    }
+  })
+
+  // ====== READ - survey package (zip with the Arena export layout: info.json, survey.json, surveyfiles/)
+  app.get('/mobile/survey/:surveyId/package', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+    try {
+      const { surveyId, cycle, draft = false } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      const survey = await fetchSurvey({ surveyId, cycle, draft })
+
+      Response.setContentTypeFile({ res, fileName: `survey_${surveyId}.zip`, contentType: Response.contentTypes.zip })
+      await SurveyMobilePackageService.writeSurveyMobilePackage({ user, survey, outputStream: res })
+    } catch (e) {
+      if (res.headersSent) {
+        // the zip is partially sent: the app sees a failed download and keeps the survey it has
+        Logger.error(`error writing survey package: ${e}`)
+        res.destroy(e)
+      } else {
+        next(e)
+      }
     }
   })
 

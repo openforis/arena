@@ -6,7 +6,7 @@ export type MobilePackageFileSummary = { uuid: string; type: string; name?: stri
 
 const getPreloadedMapLayerFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] => {
   if (!Survey.isPreloadedMapLayersEnabled(surveyInfo)) return []
-  return Survey.getPreloadedMapLayers(surveyInfo)
+  return (Survey.getPreloadedMapLayers(surveyInfo) as any[])
     .filter((file: any) => !SurveyFile.isDeleted(file))
     .map((file: any) => ({
       uuid: SurveyFile.getUuid(file),
