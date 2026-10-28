@@ -7,11 +7,11 @@ import {
   getProposedChangeSetId,
   getRetryBase,
   getToolRowLabel,
-  mergeOperationResults,
   normalizeLoadedConversation,
   withApplyResults,
   withDiscarded,
 } from '@webapp/components/ai/Assistant/assistantPanelModel'
+import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 
 const createdAt = '2026-10-06T10:00:00.000Z'
 

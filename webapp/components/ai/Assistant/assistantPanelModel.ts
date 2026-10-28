@@ -82,9 +82,6 @@ export const getRetryBase = (
   }
 }
 
-// the merge lives with the change sets (the record edit card model uses it too)
-export { mergeOperationResults }
-
 /**
  * Builds an apply note message.
  * @param {object} params - Parameters.

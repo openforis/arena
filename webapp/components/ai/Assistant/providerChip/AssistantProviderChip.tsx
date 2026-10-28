@@ -10,8 +10,8 @@ import type { Conversation } from '@webapp/ai/conversations/types'
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { getAiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { useAiEngineActions } from '@webapp/components/ai/AiNotAvailable/useAiEngineActions'
+import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { useAiFeaturePolicy } from '@webapp/components/ai/hooks/useAiFeatureAvailability'
-import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
 import { getHostingIconClass } from '@webapp/components/ai/hostingIcons'
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { getApiErrorMessage, type TFunction } from '@webapp/components/ai/UserAiSettingsPanel/aiSettingsForm'
@@ -47,16 +47,19 @@ type Props = {
  * @param {object} props - Props.
  * @param {ProviderChoice} props.choice - Row.
  * @param {Function} props.onChoose - Called with the provider id.
+ * @param {object} props.itemProps - Ref and tabIndex of the roving focus.
  * @param {TFunction} props.t - Translation function.
  * @returns {React.ReactElement} The row.
  */
 const ProviderChoiceRow = ({
   choice,
   onChoose,
+  itemProps,
   t,
 }: {
   choice: ProviderChoice
   onChoose: (providerId: string) => void
+  itemProps: ReturnType<ReturnType<typeof useRovingFocus>['getItemProps']>
   t: TFunction
 }) => {
   const { entry, selected, isDefault, disabled, reasonKey, whereKey } = choice
@@ -68,6 +71,7 @@ const ProviderChoiceRow = ({
     .join(' · ')
   return (
     <button
+      {...itemProps}
       aria-checked={selected}
       // not `disabled`: a blocked row stays focusable so its reason is read out
       aria-disabled={disabled}
@@ -117,6 +121,14 @@ const ProviderChooser = ({
   t: TFunction
 }) => {
   const [makeDefault, setMakeDefault] = useState(false)
+  // arrows move the focus only: choosing a row closes the popover, so Enter or Space picks it
+  const { onKeyDown, getItemProps } = useRovingFocus({
+    count: choices.length,
+    activeIndex: Math.max(
+      0,
+      choices.findIndex((choice) => choice.selected)
+    ),
+  })
   return (
     <div
       aria-label={t('aiAssistant.providerChip.answerWith')}
@@ -128,10 +140,17 @@ const ProviderChooser = ({
       <div
         aria-label={t('aiAssistant.providerChip.answerWith')}
         className="ai-provider-chooser__rows"
+        onKeyDown={onKeyDown}
         role="radiogroup"
       >
-        {choices.map((choice) => (
-          <ProviderChoiceRow choice={choice} key={choice.entry.id} onChoose={(id) => onChoose(id, makeDefault)} t={t} />
+        {choices.map((choice, index) => (
+          <ProviderChoiceRow
+            choice={choice}
+            itemProps={getItemProps(index)}
+            key={choice.entry.id}
+            onChoose={(id) => onChoose(id, makeDefault)}
+            t={t}
+          />
         ))}
       </div>
       <div className="ai-provider-chooser__footer">
@@ -217,8 +236,7 @@ export const AssistantProviderChip = (props: Props) => {
       if (!makeDefault) return
       try {
         await setDefaultProvider({ providerId: id })
-        // the settings cache and the capabilities hold the default: read again
-        invalidateAiSettingsCache()
+        // the capabilities hold the default (the refresh also reads the settings again)
         await refreshAiCapabilities()
       } catch (error) {
         notifyError({

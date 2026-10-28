@@ -17,10 +17,9 @@ import {
 import { createAssistantPanelStore } from '@webapp/components/ai/Assistant/assistantPanelStore'
 import {
   buildCardRows,
-  getConflictingOperationIds,
   getNodeDefNavigation,
   getPendingOperationIds,
-  isCardStale,
+  getOperationConflicts,
 } from '@webapp/components/ai/Assistant/changeSetCardModel'
 import { TreeSelectViewMode } from '@webapp/model'
 import { buildAssistantSurvey, getDefByName } from '@test/unit/utils/assistantTestUtils'
@@ -250,15 +249,17 @@ describe('change set card model', () => {
     const results = [{ id: create.id, status: 'applied' as const }]
     expect(getPendingOperationIds({ changeSet, results })).not.toContain(create.id)
     expect(getPendingOperationIds({ changeSet, discarded: true })).toEqual([])
-    expect(isCardStale({ cardState: { changeSet }, survey })).toBe(false)
     const clusterId = getDefByName(survey, 'cluster_id')
     const relabelled = NodeDef.assocLabels({ ...NodeDef.getLabels(clusterId), fr: 'Autre' })(clusterId)
     const changedSurvey = Survey.assocNodeDef({ nodeDef: relabelled })(survey)
-    expect(isCardStale({ cardState: { changeSet }, survey: changedSurvey })).toBe(true)
-    expect(getConflictingOperationIds({ cardState: { changeSet }, survey })).toEqual([])
-    expect(getConflictingOperationIds({ cardState: { changeSet }, survey: changedSurvey })).toEqual([clusterIdLabel.id])
+    expect(getOperationConflicts({ cardState: { changeSet }, survey })).toEqual([])
+    expect(getOperationConflicts({ cardState: { changeSet }, survey: changedSurvey }).map((c) => c.id)).toEqual([
+      clusterIdLabel.id,
+    ])
     const appliedLabel = [{ id: clusterIdLabel.id, status: 'applied' as const }]
-    expect(isCardStale({ cardState: { changeSet, results: appliedLabel }, survey: changedSurvey })).toBe(false)
+    expect(getOperationConflicts({ cardState: { changeSet, results: appliedLabel }, survey: changedSurvey })).toEqual(
+      []
+    )
   })
 
   test('designer links: select in "all node defs" mode, else the nearest page', () => {

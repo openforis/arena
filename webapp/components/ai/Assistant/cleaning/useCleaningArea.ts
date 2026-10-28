@@ -12,7 +12,7 @@ import { useAuthCanCleanseRecords, useUser } from '@webapp/store/user'
 
 import type { AssistantAreaStatus } from '../assistantAreas'
 import { useAssistantFeatureAvailability } from '../useAssistantFeatureAvailability'
-import { useAssistantOpenWithDraft } from '../useAssistantPanel'
+import { assistantPanelStore } from '../assistantPanelStore'
 import { getCleaningAreaStatus } from './cleaningArea'
 
 /**
@@ -48,7 +48,6 @@ export const useAskAssistantAboutRow = () => {
   const user = useUser()
   const lang = useSurveyPreferredLang()
   const i18n = useI18n()
-  const openWithDraft = useAssistantOpenWithDraft()
 
   return useCallback(
     (row: any) => {
@@ -63,8 +62,8 @@ export const useAskAssistantAboutRow = () => {
           messages: item.messages,
         },
       })
-      openWithDraft({ area: 'cleaning', draft })
+      assistantPanelStore.openWithDraft({ area: 'cleaning', draft })
     },
-    [i18n, lang, openWithDraft, survey, user]
+    [i18n, lang, survey, user]
   )
 }

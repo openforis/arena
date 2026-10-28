@@ -33,7 +33,7 @@ export const useContextMeter = (conversation: Conversation | null): ContextMeter
  * @param {ContextMeter|null} props.meter - Meter of the shown conversation.
  * @returns {React.ReactElement|null} The ring.
  */
-export const AssistantContextRing = ({ meter }: { meter: ContextMeter | null }) => {
+const AssistantContextRing = ({ meter }: { meter: ContextMeter | null }) => {
   const t = useI18nT({ unescapeHtml: true })
   if (!meter) return null
   const text = getContextMeterText({ meter, t })

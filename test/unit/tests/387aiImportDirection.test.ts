@@ -3,7 +3,6 @@ import path from 'path'
 
 import { mergeOperationResults } from '@webapp/ai/changeSets/operationResults'
 import { mergeOperationResults as mergeFromCardModel } from '@webapp/ai/changeSets/recordEdits/recordEditCardModel'
-import { mergeOperationResults as mergeFromPanelModel } from '@webapp/components/ai/Assistant/assistantPanelModel'
 
 const aiDir = path.resolve(__dirname, '../../../webapp/ai')
 
@@ -21,9 +20,8 @@ describe('imports point from the UI to webapp/ai, not the other way (387)', () =
     expect(offenders).toEqual([])
   })
 
-  test('the card models and the panel share one merge of operation results', () => {
+  test('the record edit card model re-exports the one merge of operation results', () => {
     expect(mergeFromCardModel).toBe(mergeOperationResults)
-    expect(mergeFromPanelModel).toBe(mergeOperationResults)
     const merged = mergeOperationResults(
       [
         { id: 'a', status: 'failed' },

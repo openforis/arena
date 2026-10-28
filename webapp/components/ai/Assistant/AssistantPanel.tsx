@@ -7,6 +7,7 @@ import MoreHorizIcon from '@mui/icons-material/MoreHoriz'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { AiNotAvailable } from '@webapp/components/ai/AiNotAvailable'
 import { ButtonIconAdd, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
+import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { useConfirm, useNotifyError } from '@webapp/components/hooks'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -53,32 +54,34 @@ const AssistantTabs = ({
   byArea: SuggestionsByArea
 }) => {
   const t = useI18nT()
+  const tabAreas = statuses.filter((status) => status.status !== 'hidden').map((status) => status.area)
+  // arrow keys move to the next tab and open it (automatic activation)
+  const { onKeyDown, getItemProps } = useRovingFocus({
+    count: tabAreas.length,
+    activeIndex: Math.max(0, tabAreas.indexOf(area)),
+    onMove: (index) => assistantPanelStore.setArea(tabAreas[index], { byUser: true }),
+  })
   return (
-    <div className="ai-assistant-panel__tabs" role="tablist">
-      {statuses
-        .filter((status) => status.status !== 'hidden')
-        .map(({ area: tabArea }) => (
-          <button
-            aria-selected={tabArea === area}
-            className="ai-assistant-panel__tab"
-            data-testid={TestId.aiAssistant.tab(tabArea)}
-            disabled={busy}
-            key={tabArea}
-            onClick={() => assistantPanelStore.setArea(tabArea, { byUser: true })}
-            role="tab"
-            type="button"
-          >
-            {t(areaTabLabelKeys[tabArea])}
-            {(byArea[tabArea]?.length ?? 0) > 0 && (
-              // the button's label reads the count; the tab keeps its name
-              <span
-                aria-hidden="true"
-                className="ai-assistant-panel__tab-dot"
-                data-testid={TestId.aiAssistant.tabDot}
-              />
-            )}
-          </button>
-        ))}
+    <div className="ai-assistant-panel__tabs" onKeyDown={onKeyDown} role="tablist">
+      {tabAreas.map((tabArea, index) => (
+        <button
+          {...getItemProps(index)}
+          aria-selected={tabArea === area}
+          className="ai-assistant-panel__tab"
+          data-testid={TestId.aiAssistant.tab(tabArea)}
+          disabled={busy}
+          key={tabArea}
+          onClick={() => assistantPanelStore.setArea(tabArea, { byUser: true })}
+          role="tab"
+          type="button"
+        >
+          {t(areaTabLabelKeys[tabArea])}
+          {(byArea[tabArea]?.length ?? 0) > 0 && (
+            // the button's label reads the count; the tab keeps its name
+            <span aria-hidden="true" className="ai-assistant-panel__tab-dot" data-testid={TestId.aiAssistant.tabDot} />
+          )}
+        </button>
+      ))}
     </div>
   )
 }

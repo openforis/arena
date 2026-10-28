@@ -4,7 +4,7 @@ import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { buildCategoryLabelGroups } from '@webapp/components/ai/Assistant/categoryLabelCardModel'
 import {
   buildCardRows,
-  getConflictingOperationIds,
+  getOperationConflicts,
   getPendingOperationIds,
 } from '@webapp/components/ai/Assistant/changeSetCardModel'
 
@@ -83,7 +83,7 @@ describe('category label card (235)', () => {
     const cardState = cardOf({ results: [{ id: 'c1', status: 'applied' }] })
     expect(buildCardRows({ cardState, survey, lang: 'en' })).toEqual([])
     expect(getPendingOperationIds(cardState)).toEqual(['c2', 'c3'])
-    expect(getConflictingOperationIds({ cardState, survey })).toEqual([])
+    expect(getOperationConflicts({ cardState, survey })).toEqual([])
     expect(getPendingOperationIds(cardOf({ discarded: true }))).toEqual([])
   })
 })

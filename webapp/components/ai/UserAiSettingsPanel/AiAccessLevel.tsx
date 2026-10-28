@@ -1,4 +1,4 @@
-import React, { useId, useRef, useState } from 'react'
+import React, { useId, useState } from 'react'
 import { Tooltip } from '@mui/material'
 
 import {
@@ -7,6 +7,7 @@ import {
   isCategoryWithinAccessLevel,
 } from '@common/ai/accessLevel'
 
+import { useRovingFocus } from '@webapp/components/ai/hooks/useRovingFocus'
 import { Fieldset } from '@webapp/components/Fieldset'
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
@@ -46,19 +47,15 @@ const LevelSteps = ({
   onLevelChange: (level: AccessLevel) => void
 }) => {
   const i18n = useI18n()
-  const buttonsRef = useRef<(HTMLButtonElement | null)[]>([])
   // why: re-selecting the current level changes nothing, so it must not mark the profile dirty
   const select = (level: AccessLevel) => {
     if (level !== accessLevel) onLevelChange(level)
   }
-  const onKeyDown = (event: React.KeyboardEvent) => {
-    const step = { ArrowRight: 1, ArrowDown: 1, ArrowLeft: -1, ArrowUp: -1 }[event.key]
-    if (!step) return
-    event.preventDefault()
-    const next = Math.min(3, Math.max(0, accessLevel + step)) as AccessLevel
-    select(next)
-    buttonsRef.current[next]?.focus()
-  }
+  const { onKeyDown, getItemProps } = useRovingFocus({
+    count: AI_ACCESS_LEVELS.length,
+    activeIndex: accessLevel,
+    onMove: (level) => select(level as AccessLevel),
+  })
   return (
     <div
       className="user-ai-settings-panel__levels"
@@ -69,14 +66,11 @@ const LevelSteps = ({
       {AI_ACCESS_LEVELS.map((level) => (
         <button
           key={level}
-          ref={(element) => {
-            buttonsRef.current[level] = element
-          }}
           type="button"
           role="radio"
           aria-checked={level === accessLevel}
           // roving tab stop: Tab enters on the selected step
-          tabIndex={level === accessLevel ? 0 : -1}
+          {...getItemProps(level)}
           className={`user-ai-settings-panel__level${level === accessLevel ? ' user-ai-settings-panel__level--on' : ''}`}
           onClick={() => select(level)}
           data-testid={TestId.ai.accessLevel(level)}

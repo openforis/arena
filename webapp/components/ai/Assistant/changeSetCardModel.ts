@@ -290,18 +290,6 @@ export const getPendingOperationIds = (cardState: ChangeSetCardState): string[] 
 }
 
 /**
- * Returns true when the survey changed since the proposal for a pending operation (the card shows a warning;
- * Apply reports these operations as conflicts).
- * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
- * @param {object} params.survey - Current survey.
- * @returns {boolean} True when stale.
- */
-export const isCardStale = ({ cardState, survey }: { cardState: ChangeSetCardState; survey: any }): boolean => {
-  return getConflictingOperationIds({ cardState, survey }).length > 0
-}
-
-/**
  * Returns the pending operations that conflict with the current survey, each with its reason (a plain reason such as
  * valueChanged, or an i18n key with its params when the designer's rules refuse it).
  * @param {object} params - Parameters.
@@ -320,21 +308,6 @@ export const getOperationConflicts = ({
   if (operationIds.length === 0) return []
   return findConflicts(cardState.changeSet, survey, { operationIds })
 }
-
-/**
- * Returns the pending operations that conflict with the current survey (they stay unchecked and cannot be selected).
- * @param {object} params - Parameters.
- * @param {ChangeSetCardState} params.cardState - Card state.
- * @param {object} params.survey - Current survey.
- * @returns {string[]} Operation ids.
- */
-export const getConflictingOperationIds = ({
-  cardState,
-  survey,
-}: {
-  cardState: ChangeSetCardState
-  survey: any
-}): string[] => getOperationConflicts({ cardState, survey }).map((conflict) => conflict.id)
 
 /**
  * Returns the nearest page node definition containing a node definition.

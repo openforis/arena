@@ -10,7 +10,6 @@ import { nodeDefProposeUpdateTool } from '@webapp/ai/tools/design/nodeDefPropose
 import { nodeDefProposeCreateTool } from '@webapp/ai/tools/design/nodeDefProposeCreate'
 import { expressionsProposeSetTool } from '@webapp/ai/tools/design/expressionsProposeSet'
 import { runTool } from '@webapp/ai/tools/registry'
-import { isCardStale } from '@webapp/components/ai/Assistant/changeSetCardModel'
 import { createToolContext, getDefByName } from '@test/unit/utils/assistantTestUtils'
 import { buildRefSurvey, withNodeDef } from '@test/unit/utils/designSuggestionTestUtils'
 
@@ -80,7 +79,6 @@ describe('Apply re-runs the designer guards (380)', () => {
         params: { name: 'region' },
       },
     ])
-    expect(isCardStale({ cardState: { changeSet: changeSet! }, survey: published })).toBe(true)
 
     const { results, puts } = await applyWithFakeDeps(published, changeSet!)
     expect(results).toEqual([
