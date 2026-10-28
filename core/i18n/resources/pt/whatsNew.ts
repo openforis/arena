@@ -12,7 +12,7 @@ export default {
 
 A nova função de expressão \`geoDistanceToAOIBoundary(location)\` retorna a distância em metros entre uma localização e o limite da área: negativa dentro, positiva fora. Compare-a com a precisão do GPS (\`location.accuracy\`) para classificar as localizações como dentro, fora ou incertas, por exemplo em valores padrão de atributos só de leitura e em regras de validação com severidade *aviso*. Também funciona offline no **Arena Mobile**.
 
-Obrigado à **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) pelo pedido.`,
+Obrigado à **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) pelo pedido.`,
     },
     mobilePreview: {
       title: 'Visualização do inquérito no Arena Mobile',

@@ -12,7 +12,7 @@ export default {
 
 The new expression function \`geoDistanceToAOIBoundary(location)\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. It works offline in **Arena Mobile** too.
 
-Thanks to **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) for the request.`,
+Thanks to **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) for the request.`,
     },
     mobilePreview: {
       title: 'Preview the survey in Arena Mobile',

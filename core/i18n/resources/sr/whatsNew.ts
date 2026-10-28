@@ -12,7 +12,7 @@ export default {
 
 Nova funkcija izraza \`geoDistanceToAOIBoundary(location)\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. Radi i oflajn u **Arena Mobile**.
 
-Hvala **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) na zahtevu.`,
+Hvala **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) na zahtevu.`,
     },
     mobilePreview: {
       title: 'Pregled istraživanja u aplikaciji Arena Mobile',

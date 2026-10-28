@@ -12,7 +12,7 @@ export default {
 
 Новая функция выражения \`geoDistanceToAOIBoundary(location)\` возвращает расстояние в метрах между местоположением и границей области: отрицательное внутри, положительное снаружи. Сравните его с точностью GPS (\`location.accuracy\`), чтобы классифицировать местоположения как внутри, снаружи или неопределённые, например в значениях по умолчанию атрибутов только для чтения и в правилах проверки с уровнем *предупреждение*. Функция работает и офлайн в **Arena Mobile**.
 
-Спасибо **ASSEDEV** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) за запрос.`,
+Спасибо **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) за запрос.`,
     },
     mobilePreview: {
       title: 'Предварительный просмотр анкеты в Arena Mobile',
