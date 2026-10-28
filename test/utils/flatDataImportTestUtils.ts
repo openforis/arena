@@ -82,7 +82,7 @@ export const readHeadersAndRows = async ({ stream, fileFormat }: { stream: Reada
 }
 
 /**
- * Builds (in memory) a survey with a root entity (cluster) and a multiple entity (plot) with attributes of several types.
+ * Builds (in memory) a survey with a root entity (cluster), a multiple entity (plot) with attributes of several types and multiple entities with a taxon key (tree) and a coordinate key (sample_point).
  * @param {object} user - The user.
  * @returns {Promise<object>} - The survey.
  */
@@ -99,11 +99,19 @@ export const buildTestSurvey = async (user: any) =>
         SB.attribute('plot_accessible', NodeDef.nodeDefType.boolean),
         SB.attribute('plot_visit_date', NodeDef.nodeDefType.date),
         SB.attribute('plot_status', NodeDef.nodeDefType.code).category('plot_status'),
-        SB.attribute('plot_remarks', NodeDef.nodeDefType.text)
+        SB.attribute('plot_remarks', NodeDef.nodeDefType.text),
+        SB.entity('tree', SB.attribute('tree_species', NodeDef.nodeDefType.taxon).taxonomy('trees').key()).multiple(),
+        SB.entity(
+          'sample_point',
+          SB.attribute('sample_point_location', NodeDef.nodeDefType.coordinate)
+            .prop(NodeDef.propKeys.includeAccuracy, true)
+            .key()
+        ).multiple()
       ).multiple()
     )
   )
     .categories(SB.category('plot_status').items(SB.categoryItem('A'), SB.categoryItem('B')))
+    .taxonomies(SB.taxonomy('trees').taxa(SB.taxon('QUE', 'Fagaceae', 'Quercus', 'Quercus sp.')))
     .build()
 
 /**

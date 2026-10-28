@@ -241,10 +241,28 @@ const checkAllHeadersAreValid =
     }
   }
 
+// value props required for key attributes; other columns of the same attribute are optional
+// (coordinate additional fields, taxon scientific and vernacular names used only for unlisted taxa)
+const requiredValuePropsByNodeDefType = {
+  [NodeDef.nodeDefType.coordinate]: [
+    Node.valuePropsCoordinate.x,
+    Node.valuePropsCoordinate.y,
+    Node.valuePropsCoordinate.srs,
+  ],
+  [NodeDef.nodeDefType.taxon]: [Node.valuePropsTaxon.code],
+}
+
+const isRequiredColumn = (column) => {
+  const { key, nodeDef, valueProp } = column
+  if (!key) return false
+  const requiredValueProps = requiredValuePropsByNodeDefType[NodeDef.getType(nodeDef)]
+  return !requiredValueProps || requiredValueProps.includes(valueProp)
+}
+
 const checkRequiredHeadersNotMissing =
   ({ csvDataExportModel }) =>
   (headers) => {
-    const requiredHeaders = csvDataExportModel.columns.filter((col) => col.key).map((col) => col.header)
+    const requiredHeaders = csvDataExportModel.columns.filter(isRequiredColumn).map((col) => col.header)
     const missingRequiredHeaders = requiredHeaders.filter((header) => !headers.includes(header))
     if (missingRequiredHeaders.length > 0) {
       throw new SystemError('validationErrors:dataImport.missingRequiredHeaders', { missingRequiredHeaders })
