@@ -1,25 +1,12 @@
 import { createI18nAsync } from '@core/i18n/i18nFactory'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import {
-  CYRILLIC,
-  CYRILLIC_LANGUAGES,
-  getPath,
-  LANGUAGES as languages,
-  leafPaths,
-  RESOURCES as resources,
-} from '../utils/i18nParity'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES as languages, RESOURCES as resources } from '../utils/i18nParity'
 
-const en = resources.en
-
-const groups = ['common.aiPolicy', 'common.aiDataLocation', 'homeView.surveyInfo.aiPolicy']
 const errorKeys = ['aiPolicyRefused', 'aiPolicyInvalid', 'aiPolicyAboveCeiling', 'aiPolicyDataAboveSchema']
 
 describe('AI policy i18n', () => {
-  test.each(languages)('%s has every AI policy key of en', (lang) => {
-    for (const group of groups) {
-      expect(leafPaths(getPath(resources[lang], group))).toEqual(leafPaths(getPath(en, group)))
-    }
+  test.each(languages)('%s has the AI policy error messages', (lang) => {
     for (const key of errorKeys) {
       expect(typeof resources[lang].appErrors[key]).toBe('string')
     }

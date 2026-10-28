@@ -1,7 +1,5 @@
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
-jest.mock('@server/db/db', () => ({ db: {} }))
-
 const surveyInfo = { id: 7, uuid: '11111111-1111-4111-8111-111111111111', published: false }
 
 /**

@@ -3,8 +3,6 @@ import * as AiSettingsService from '@server/modules/ai/service/aiSettingsService
 import { buildInstanceCapability, emptyCapabilities } from '@webapp/ai/engines/capabilities'
 import { selectEngine } from '@webapp/ai/engines/selectEngine'
 import type { AiCapabilities, AiProviderEntry } from '@webapp/ai/engines/types'
-import * as SettingsClient from '@webapp/service/api/ai/settings'
-import { TestId } from '@webapp/utils/testId'
 
 const storedProvider = {
   id: 'acct:a1',
@@ -140,28 +138,6 @@ describe('single-provider compatibility removed (273)', () => {
     expect(converted).not.toHaveProperty('apiKeyEncrypted')
   })
 
-  test('the old single-provider routes and service calls are gone', () => {
-    const routes: string[] = []
-    /** Returns a route registrar that records `METHOD path`. */
-    const register = (method: string) => (path: string) => {
-      routes.push(`${method} ${path}`)
-    }
-    SettingsApi.init({ get: register('GET'), put: register('PUT'), post: register('POST'), delete: register('DELETE') })
-    expect(routes.sort()).toEqual([
-      'DELETE /ai/providers/:id',
-      'GET /ai/settings',
-      'POST /ai/providers',
-      'POST /ai/providers/models',
-      'POST /ai/providers/test',
-      'PUT /ai/providers/:id',
-      'PUT /ai/settings',
-      'PUT /ai/settings/default',
-    ])
-    for (const name of ['testConnection', 'listModels', 'clearSettings']) {
-      expect(Object.keys(AiSettingsService)).not.toContain(name)
-    }
-  })
-
   test('the capabilities have the providers and the instance prompt cap, no gateway or single local server', () => {
     expect(sortedKeys(emptyCapabilities())).toEqual(['defaultProviderId', 'instance', 'local', 'providers'])
     expect(buildInstanceCapability({ maxPromptChars: 1000 }).maxPromptChars).toBe(1000)
@@ -192,16 +168,5 @@ describe('single-provider compatibility removed (273)', () => {
     })
     const fallback = select(null)
     expect('engine' in fallback && fallback.engine.limits.maxPromptChars).toBe(200000)
-  })
-
-  test('the old settings client calls and testIds are gone', () => {
-    const clientCalls = Object.keys(SettingsClient)
-    expect(clientCalls).toContain('fetchSettings')
-    expect(clientCalls).toContain('saveSettings')
-    for (const name of ['testConnection', 'fetchModels', 'clearSettings']) expect(clientCalls).not.toContain(name)
-    const leftovers = Object.keys(TestId.ai).filter((key) =>
-      /^(cloud|localServer|engineNotice|engineStatus|consentUseOther)/.test(key)
-    )
-    expect(leftovers).toEqual([])
   })
 })

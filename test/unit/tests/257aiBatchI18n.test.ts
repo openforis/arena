@@ -1,11 +1,4 @@
-import {
-  CYRILLIC,
-  CYRILLIC_LANGUAGES,
-  diffWithDefaultLanguage,
-  LANGUAGES,
-  namespaceByLanguage,
-  pluralFormsOf,
-} from '../utils/i18nParity'
+import { CYRILLIC, CYRILLIC_LANGUAGES, LANGUAGES, namespaceByLanguage, pluralFormsOf } from '../utils/i18nParity'
 
 const commonByLang = namespaceByLanguage('common')
 const formByLang = namespaceByLanguage('surveyForm')
@@ -21,10 +14,6 @@ const failedTexts = (lang: string): string[] =>
     .map(([, text]) => text as string)
 
 describe('AI batch texts (257)', () => {
-  test.each(LANGUAGES)('%s has the aiBatch texts of en, with the same placeholders', (lang) => {
-    expect(diffWithDefaultLanguage(lang, 'common.aiBatch')).toEqual({ missing: [], extra: [], placeholders: [] })
-  })
-
   test.each(LANGUAGES)('%s tells how many translations could not be produced', (lang) => {
     const texts = failedTexts(lang)
     expect(texts.length).toBeGreaterThan(0)

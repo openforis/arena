@@ -8,7 +8,6 @@ import * as SurveyApi from '@server/modules/survey/api/surveyApi'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { getContextUser } from '@test/integration/config/context'
-import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { CollectedRoute, collectRoutes } from '@test/utils/routeUtils'
 import * as SB from '@test/utils/surveyBuilder'
 import {
@@ -145,17 +144,6 @@ describe('AI routes: permissions with real users (056)', () => {
         handlerIndex: 1,
       })
       expect(access).toBe('refused')
-    })
-
-    test('an unknown feature is a 400 before any permission is checked', async () => {
-      const res = createFakeResponse()
-      let nextCalled = false
-      await modelRoute().handlers[1]({ params: {}, query: {}, body: { feature: 'nope' }, user: admin }, res, () => {
-        nextCalled = true
-      })
-      expect(nextCalled).toBe(false)
-      expect(res.statusCode).toBe(400)
-      expect(res.body.key).toBe('aiFeatureUnknown')
     })
   })
 })

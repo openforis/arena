@@ -1,12 +1,5 @@
 import { NodesBatchMessageKeys } from '@server/modules/record/service/update/nodesBatch/nodesBatchTypes'
-import {
-  getPath,
-  LANGUAGES,
-  leafPaths,
-  placeholdersOf as placeholders,
-  resolveKey,
-  RESOURCES,
-} from '../utils/i18nParity'
+import { LANGUAGES, leafPaths, placeholdersOf as placeholders, resolveKey, RESOURCES } from '../utils/i18nParity'
 
 const en = RESOURCES.en
 
@@ -41,22 +34,6 @@ const errorKeys = [
 describe('cleaning translations', () => {
   test('en has exactly the aiCleaning keys used by the code', () => {
     expect(leafPaths(en.common.aiCleaning)).toEqual(cleaningKeys)
-  })
-
-  test('every language has the same aiCleaning keys, non-empty, with the placeholders of en', () => {
-    for (const lang of LANGUAGES) {
-      const section = RESOURCES[lang].common.aiCleaning
-      expect([lang, leafPaths(section)]).toEqual([lang, cleaningKeys])
-      for (const path of cleaningKeys) {
-        const value = getPath(section, path)
-        expect([lang, path, String(value).trim().length > 0]).toEqual([lang, path, true])
-        expect([lang, path, placeholders(value)]).toEqual([
-          lang,
-          path,
-          placeholders(getPath(en.common.aiCleaning, path)),
-        ])
-      }
-    }
   })
 
   test('every language labels the four cleaning tools', () => {

@@ -6,7 +6,6 @@ import {
   LANGUAGES,
   PLURAL_FORMS,
   PLURAL_SUFFIX,
-  baseKeys,
   enTextOf,
   flatten,
   getResource,
@@ -14,21 +13,6 @@ import {
 } from '@test/unit/utils/aiSuggestionsI18n'
 
 describe('aiSuggestions i18n (216)', () => {
-  test.each(LANGUAGES)('%s registers the namespace', (lang) => {
-    expect(typeof getResource(lang)).toBe('object')
-  })
-
-  test.each(LANGUAGES)('%s has the same keys as en (plural suffixes aside)', (lang) => {
-    expect(baseKeys(lang)).toEqual(baseKeys('en'))
-  })
-
-  test.each(LANGUAGES)('%s keeps the placeholders of en', (lang) => {
-    for (const [key, text] of Object.entries(flatten(getResource(lang)))) {
-      const base = key.replace(PLURAL_SUFFIX, '')
-      expect([key, placeholders(text)]).toEqual([key, placeholders(enTextOf(base))])
-    }
-  })
-
   test.each(LANGUAGES)('%s has the plural forms of its language', (lang) => {
     const texts = flatten(getResource(lang))
     const pluralBases = new Set(

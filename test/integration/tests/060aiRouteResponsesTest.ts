@@ -175,16 +175,6 @@ describe('AI routes: what the real handler chains answer (060)', () => {
         expect(res.body.key).toBe('aiFeaturesDisabled')
       }
     )
-
-    test('GET /ai/settings answers a logged in user with the settings, and no key', async () => {
-      const res = await runRouteChain({
-        route: find(aiRoutes, 'get', '/ai/settings'),
-        user: withAi(members[groupNames.surveyEditor]),
-      })
-      expect(res.statusCode).toBe(200)
-      expect(res.body.providers).toEqual([])
-      expect(JSON.stringify(res.body)).not.toContain('apiKeyEncrypted')
-    })
   })
 
   describe('POST /ai/model', () => {

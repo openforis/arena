@@ -3,8 +3,6 @@ import {
   fetchItemsMissingLabels,
 } from '@server/modules/category/repository/categoryItemLabelsRepository'
 
-jest.mock('@server/db/db', () => ({ db: {} }))
-
 const pgStatementTimeoutCode = '57014'
 
 /**
