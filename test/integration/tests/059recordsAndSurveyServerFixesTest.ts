@@ -222,21 +222,7 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
       expect(await update([editOf(record, 'root/num', 1, 2)])).toEqual([{ index: 0, status: 'applied' }])
       // the step change does not touch the date the cache is checked with
       await RecordRepository.updateRecordStep(surveyId, Record.getUuid(record), RecordStep.analysisCode)
-      // the request check is skipped on purpose (the race): the thread check is the only guard
-      const staleRecord = await fetchRecord(record)
-      const staleDeps = { ...deps(), fetchRecord: async () => ({ ...staleRecord, step: '1' }) }
-
-      const results = await updateNodesBatch(
-        {
-          user,
-          surveyId,
-          cycle: Survey.cycleOneKey,
-          edits: [editOf(record, 'root/num', 2, 3)] as any,
-          timezoneOffset: 0,
-          lang: 'en',
-        },
-        staleDeps
-      )
+      const results = await update([editOf(record, 'root/num', 2, 3)])
 
       expect(results).toEqual([{ index: 0, status: 'failed', messageKey: 'appErrors:forbidden' }])
       expect(Node.getValue(nodeOf(await fetchRecord(record), 'root/num'))).toBe(2)
@@ -439,16 +425,6 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
       aiOn.restore()
     }
   }
-
-  test('the batch record edit answers with nodesBatchUnexpected', async () => {
-    const res = await callWithMissingSurvey({
-      init: RecordApi.init,
-      method: 'post',
-      path: '/survey/:surveyId/records/nodes/update',
-      body: { cycle: '0', edits: [{ recordUuid: uuidv4(), nodeUuid: uuidv4(), from: 1, to: 2 }] },
-    })
-    expectNoErrorText(res, 'appErrors:record.nodesBatchUnexpected')
-  })
 
   test('the schema summary AI items answer with the generic unexpected key', async () => {
     const res = await callWithMissingSurvey({

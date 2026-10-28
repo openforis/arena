@@ -44,7 +44,7 @@ export type NodesBatchProcessorDeps = {
     recordUuid: string
     t: any
   }) => Promise<{ step: string; ownerUuid: string } | null>
-  // the group qualifier filters of the user (the same rule as the request check, see the batch service)
+  // the group qualifier filters of the user
   fetchQualifierFilters: (params: { msg: NodesBatchPersistMessage; survey: ArenaSurvey; t: any }) => Promise<any>
   recordMatchesQualifierFilters: (params: {
     survey: ArenaSurvey
@@ -229,8 +229,7 @@ const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: 
 }
 
 /**
- * Checks, with the record as it is under the lock, that the user may edit it (step, ownership, group qualifiers): it
- * may have changed since the request was checked.
+ * Checks, with the record as it is under the lock, that the user may edit it (step, ownership, group qualifiers).
  * @param {BatchState} state - The batch state.
  * @param {object} record - The record.
  * @returns {boolean} Whether the user may edit the record.
@@ -302,7 +301,8 @@ const applyEditsInLock = async (state: BatchState, t: any): Promise<NodesBatchEd
   // the lock wait may have used up the time: the caller already reported these edits as timed out
   if (isPastDeadline(state)) return failedResults(edits, NodesBatchMessageKeys.applyTimeout)
   let record = await deps.getOrFetchRecord({ msg, recordUuid, t })
-  if (!record) return edits.map(({ index }) => conflictResult(index))
+  // a record of another cycle is not the one the proposal saw
+  if (!record || Record.getCycle(record) !== msg.cycle) return edits.map(({ index }) => conflictResult(index))
   state.qualifierFilters = await deps.fetchQualifierFilters({ msg, survey, t })
   const recordToCheck = await withFreshStepAndOwner(state, record, t)
   if (!recordToCheck) return edits.map(({ index }) => conflictResult(index))

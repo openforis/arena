@@ -87,11 +87,6 @@ describe('updateNodesBatch concurrency (340)', () => {
     const replies = createNodesBatchReplyRegistry()
     const pendingRequestIds: string[] = []
     const deps: NodesBatchServiceDeps = {
-      fetchSurvey: async () => survey,
-      fetchQualifierFilters: async () => null,
-      fetchRecord: async () => record,
-      fetchNodeRecordUuid: async () => null,
-      recordMatchesQualifierFilters: () => true,
       postBatchMessage: (msg) => {
         pendingRequestIds.push(msg.requestId)
       },
@@ -162,37 +157,10 @@ describe('updateNodesBatch concurrency (340)', () => {
     await expect(Promise.all([first, second])).resolves.toHaveLength(2)
   })
 
-  test('the slot is released when the batch throws before reaching the thread', async () => {
-    const { deps, answer } = buildDeps({
-      fetchSurvey: async () => {
-        throw new Error('db down')
-      },
-    })
-    await expect(run(user, deps)).rejects.toThrow('db down')
-    expect(deps.slots.size()).toBe(0)
-
-    const working = buildDeps({ slots: deps.slots })
-    const next = run(user, working.deps)
-    await tick()
-    working.answer()
-    await expect(next).resolves.toHaveLength(1)
-    answer()
-  })
-
   test('the slot is released when the thread never answers (timeout)', async () => {
     const { deps } = buildDeps({ replies: createNodesBatchReplyRegistry({ timeoutMs: 5 }) })
     const results = await run(user, deps)
     expect(results).toEqual([{ index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.applyTimeout }])
-    expect(deps.slots.size()).toBe(0)
-  })
-
-  test('the slot is released when the qualifier filters cannot be loaded', async () => {
-    const { deps } = buildDeps({
-      fetchQualifierFilters: async () => {
-        throw new Error('no filters')
-      },
-    })
-    await expect(run(user, deps)).rejects.toThrow('no filters')
     expect(deps.slots.size()).toBe(0)
   })
 })

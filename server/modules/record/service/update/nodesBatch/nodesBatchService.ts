@@ -1,33 +1,19 @@
 /**
- * Batch record edit (assistant record-edit change sets): permission checks per record, then one
- * nodesBatchPersist message per record to the records update thread, waiting for the replies.
+ * Batch record edit (assistant record-edit change sets): one nodesBatchPersist message per record to the records
+ * update thread, which checks and applies the edits inside the record lock, waiting for the replies.
  */
-import type {
-  Node as ArenaNode,
-  Record as ArenaRecord,
-  Survey as ArenaSurvey,
-  User as ArenaUser,
-} from '@openforis/arena-core'
+import type { User as ArenaUser } from '@openforis/arena-core'
 
-import * as Authorizer from '@core/auth/authorizer'
-import * as Survey from '@core/survey/survey'
-import * as Record from '@core/record/record'
-import * as Node from '@core/record/node'
 import SystemError from '@core/systemError'
 import * as User from '@core/user/user'
 import { uuidv4 } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
-
-import * as RecordManager from '@server/modules/record/manager/recordManager'
-import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as Log from '@server/log/log'
 
 import { RecordsUpdateThreadService } from '../surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '../thread/recordsThreadMessageTypes'
 import { NodesBatchReplies, NodesBatchReplyRegistry } from './nodesBatchReplies'
-import { withSurveyUuid } from './nodesBatchRecordPermission'
 import { groupEditsByRecord } from './nodesBatchRequest'
 import { NodesBatchProcessSlots, NodesBatchSlots } from './nodesBatchSlots'
 import {
@@ -36,8 +22,6 @@ import {
   NodesBatchMessageKeys,
   NodesBatchPersistMessage,
   NodesBatchRecordEdit,
-  conflictResult,
-  failedResult,
   failedResults,
 } from './nodesBatchTypes'
 
@@ -48,21 +32,10 @@ const GATEWAY_TIMEOUT = 504
 
 // the thread stops before the caller stops waiting, so a commit never lands after the timeout was reported
 const COMMIT_MARGIN_MS = 2000
-// a batch stuck before posting (a database call that never answers) gives its slot back after the deadline plus this
+// a batch that never ends (a reply wait that is never released) gives its slot back after the deadline plus this
 const SLOT_RELEASE_GRACE_MS = 5000
 
 export type NodesBatchServiceDeps = {
-  fetchSurvey: (params: { surveyId: number; cycle: string }) => Promise<ArenaSurvey>
-  fetchQualifierFilters: (params: { user: ArenaUser; survey: ArenaSurvey }) => Promise<any>
-  fetchRecord: (params: { surveyId: number; recordUuid: string }) => Promise<ArenaRecord | null>
-  fetchNodeRecordUuid: (params: { surveyId: number; nodeUuid: string }) => Promise<string | null>
-  recordMatchesQualifierFilters: (params: {
-    survey: ArenaSurvey
-    record: ArenaRecord
-    qualifierFilters: any
-    pendingNode: ArenaNode | null
-    canEditQualifierValue: boolean
-  }) => boolean
   postBatchMessage: (msg: NodesBatchPersistMessage) => void
   replies: NodesBatchReplyRegistry
   slots: NodesBatchSlots
@@ -75,10 +48,7 @@ type RequestContext = {
   cycle: string
   timezoneOffset: number | null
   lang: string | null
-  survey: ArenaSurvey
-  qualifierFilters: any
-  canEditQualifierValue: boolean
-  // one deadline for the whole request: the records are checked one after the other
+  // one deadline for the whole request: the records are sent one after the other
   deadline: number
   deps: NodesBatchServiceDeps
 }
@@ -88,88 +58,11 @@ type RequestContext = {
  * @returns {NodesBatchServiceDeps} The dependencies.
  */
 export const createDefaultNodesBatchServiceDeps = (): NodesBatchServiceDeps => ({
-  fetchSurvey: ({ surveyId, cycle }) => SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle }),
-  fetchQualifierFilters: ({ user, survey }) => SurveyManager.fetchUserQualifierFilters({ user, survey }),
-  fetchRecord: ({ surveyId, recordUuid }) =>
-    RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, fetchForUpdate: false, includeRefData: false }),
-  fetchNodeRecordUuid: ({ surveyId, nodeUuid }) => NodeRepository.fetchNodeRecordUuid(surveyId, nodeUuid),
-  recordMatchesQualifierFilters: (params) => RecordManager.recordMatchesQualifierFilters(params),
   postBatchMessage: (msg) => RecordsUpdateThreadService.getOrCreatedThread().postMessage(msg),
   replies: NodesBatchReplies,
   slots: NodesBatchProcessSlots,
   logError: (message) => Logger.error(message),
 })
-
-/**
- * Returns true when the record matches the user group qualifiers (optionally with a pending node value).
- * @param {RequestContext} context - The request context.
- * @param {object} record - The record.
- * @param {object|null} pendingNode - The node with its new value, or null.
- * @returns {boolean} Whether the record matches.
- */
-const matchesQualifiers = (context: RequestContext, record: ArenaRecord, pendingNode: ArenaNode | null): boolean =>
-  context.deps.recordMatchesQualifierFilters({
-    survey: context.survey,
-    record,
-    qualifierFilters: context.qualifierFilters,
-    pendingNode,
-    canEditQualifierValue: context.canEditQualifierValue,
-  })
-
-/**
- * Checks one edit of a permitted record before sending it to the thread.
- * @param {RequestContext} context - The request context.
- * @param {object} record - The record.
- * @param {NodesBatchRecordEdit} edit - The edit.
- * @returns {Promise<NodesBatchEditResult|null>} The result of a refused edit, or null when the edit can be sent.
- */
-const checkEditBeforeSend = async (
-  context: RequestContext,
-  record: ArenaRecord,
-  edit: NodesBatchRecordEdit
-): Promise<NodesBatchEditResult | null> => {
-  const node = Record.getNodeByUuid(edit.nodeUuid)(record)
-  if (!node) {
-    const nodeRecordUuid = await context.deps.fetchNodeRecordUuid({
-      surveyId: context.surveyId,
-      nodeUuid: edit.nodeUuid,
-    })
-    return nodeRecordUuid ? failedResult(edit.index, NodesBatchMessageKeys.nodeNotInRecord) : conflictResult(edit.index)
-  }
-  if (!matchesQualifiers(context, record, Node.assocValue(edit.to)(node))) {
-    return failedResult(edit.index, NodesBatchMessageKeys.forbidden)
-  }
-  return null
-}
-
-/**
- * Checks a record and its edits: the refused edits get a result, the others are returned to be sent.
- * @param {RequestContext} context - The request context.
- * @param {string} recordUuid - The record uuid.
- * @param {NodesBatchRecordEdit[]} edits - The edits of the record.
- * @returns {Promise<{results: NodesBatchEditResult[], accepted: NodesBatchRecordEdit[]}>} The outcome.
- */
-const checkRecordEdits = async (context: RequestContext, recordUuid: string, edits: NodesBatchRecordEdit[]) => {
-  const recordDb = await context.deps.fetchRecord({ surveyId: context.surveyId, recordUuid })
-  if (!recordDb || Record.getCycle(recordDb) !== context.cycle) {
-    return { results: edits.map(({ index }) => conflictResult(index)), accepted: [] }
-  }
-  const record = withSurveyUuid(recordDb, context.survey)
-  if (!Authorizer.canEditRecord(context.user, record) || !matchesQualifiers(context, record, null)) {
-    return { results: failedResults(edits, NodesBatchMessageKeys.forbidden), accepted: [] }
-  }
-  const results: NodesBatchEditResult[] = []
-  const accepted: NodesBatchRecordEdit[] = []
-  for (const edit of edits) {
-    const refused = await checkEditBeforeSend(context, record, edit)
-    if (refused) {
-      results.push(refused)
-    } else {
-      accepted.push(edit)
-    }
-  }
-  return { results, accepted }
-}
 
 /**
  * Sends the edits of a record to the records update thread and waits for the reply.
@@ -241,32 +134,7 @@ type NodesBatchParams = {
 }
 
 /**
- * Checks the edits of a record, sends the accepted ones and waits for the reply. A failure fails only this record.
- * @param {RequestContext} context - The request context.
- * @param {string} recordUuid - The record uuid.
- * @param {NodesBatchRecordEdit[]} recordEdits - The edits of the record.
- * @returns {Promise<NodesBatchEditResult[]>} The results of the edits of the record.
- */
-const processRecordEdits = async (
-  context: RequestContext,
-  recordUuid: string,
-  recordEdits: NodesBatchRecordEdit[]
-): Promise<NodesBatchEditResult[]> => {
-  // the request was reported as timed out: do not start more work
-  if (Date.now() >= context.deadline) return failedResults(recordEdits, NodesBatchMessageKeys.applyTimeout)
-  try {
-    const { results: refused, accepted } = await checkRecordEdits(context, recordUuid, recordEdits)
-    if (accepted.length === 0) return refused
-    return [...refused, ...(await sendRecordEditsSafely(context, recordUuid, accepted))]
-  } catch (error) {
-    // one record's failure must not hide the results of the others
-    context.deps.logError(`error checking the batch edits of record ${recordUuid}: ${(error as Error)?.stack ?? error}`)
-    return failedResults(recordEdits, NodesBatchMessageKeys.unexpected)
-  }
-}
-
-/**
- * Checks the edits record by record, sends the accepted ones to the records update thread and collects the results.
+ * Sends the edits record by record to the records update thread and collects the results.
  * @param {NodesBatchParams} params - The request.
  * @param {NodesBatchServiceDeps} deps - The dependencies.
  * @returns {Promise<NodesBatchEditResult[]>} One result per edit, sorted by index.
@@ -275,25 +143,25 @@ const runNodesBatch = async (
   { user, surveyId, cycle, edits, timezoneOffset = null, lang = null }: NodesBatchParams,
   deps: NodesBatchServiceDeps
 ): Promise<NodesBatchEditResult[]> => {
-  const deadline = Date.now() + NodesBatchLimits.replyTimeoutMs
-  const survey = await deps.fetchSurvey({ surveyId, cycle })
   const context: RequestContext = {
     user,
     surveyId,
     cycle,
     timezoneOffset,
     lang,
-    survey,
-    qualifierFilters: await deps.fetchQualifierFilters({ user, survey }),
-    canEditQualifierValue: Authorizer.canEditQualifierAttributeValue(user, Survey.getSurveyInfo(survey)),
-    deadline,
+    deadline: Date.now() + NodesBatchLimits.replyTimeoutMs,
     deps,
   }
   const results: NodesBatchEditResult[] = []
   // one record at a time: the thread has one queue, so the messages of a batch would delay the form edits of all
   // the users behind them
   for (const [recordUuid, recordEdits] of groupEditsByRecord(edits)) {
-    results.push(...(await processRecordEdits(context, recordUuid, recordEdits)))
+    // the request was reported as timed out: do not start more work
+    results.push(
+      ...(Date.now() >= context.deadline
+        ? failedResults(recordEdits, NodesBatchMessageKeys.applyTimeout)
+        : await sendRecordEditsSafely(context, recordUuid, recordEdits))
+    )
   }
   return results.sort((resultA, resultB) => resultA.index - resultB.index)
 }
@@ -323,7 +191,8 @@ const runUntilHung = async (batch: Promise<NodesBatchEditResult[]>): Promise<Nod
 }
 
 /**
- * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest).
+ * Applies attribute value edits to published records (at most 200 edits on 50 records, see parseNodesBatchRequest);
+ * the records update thread checks the permissions and the edits inside the record lock.
  * A user has one batch at a time, and a survey and the process a few: the others get a 429.
  * @param {NodesBatchParams} params - The request.
  * @param {object} params.user - The user.

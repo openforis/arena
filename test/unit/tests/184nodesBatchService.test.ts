@@ -17,7 +17,6 @@ import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 
 const admin = { uuid: uuidv4(), authGroups: [{ name: 'systemAdmin' }] }
-const nobody = { uuid: uuidv4(), authGroups: [] }
 
 describe('updateNodesBatch', () => {
   let survey: any
@@ -53,11 +52,6 @@ describe('updateNodesBatch', () => {
     const errors: string[] = []
     const replies = createNodesBatchReplyRegistry()
     const deps: NodesBatchServiceDeps = {
-      fetchSurvey: async () => survey,
-      fetchQualifierFilters: async () => null,
-      fetchRecord: async () => record,
-      fetchNodeRecordUuid: async () => null,
-      recordMatchesQualifierFilters: () => true,
       postBatchMessage: (msg) => {
         posted.push(msg)
         replies.resolveReply({
@@ -104,84 +98,6 @@ describe('updateNodesBatch', () => {
     ])
   })
 
-  test('a record of another cycle is a conflict and nothing is posted', async () => {
-    const { deps, posted } = buildDeps()
-    const results = await run(admin, [edit(aUuid, 5)], deps, '1')
-    expect(results).toEqual([{ index: 0, status: 'conflict' }])
-    expect(posted).toHaveLength(0)
-  })
-
-  test('a missing record is a conflict', async () => {
-    const { deps } = buildDeps({ fetchRecord: async () => null })
-    expect(await run(admin, [edit(aUuid, 5)], deps)).toEqual([{ index: 0, status: 'conflict' }])
-  })
-
-  test('a user who cannot edit the record is forbidden', async () => {
-    const { deps, posted } = buildDeps()
-    const results = await run(nobody, [edit(aUuid, 5)], deps)
-    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.forbidden }])
-    expect(posted).toHaveLength(0)
-  })
-
-  test('a record outside the user qualifiers is forbidden', async () => {
-    const { deps } = buildDeps({ recordMatchesQualifierFilters: () => false })
-    const results = await run(admin, [edit(aUuid, 5)], deps)
-    expect(results).toEqual([{ index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.forbidden }])
-  })
-
-  test('a new value that takes the record out of the qualifiers is forbidden, the other edit is sent', async () => {
-    const { deps, posted } = buildDeps({
-      recordMatchesQualifierFilters: ({ pendingNode }) => !pendingNode || Node.getValue(pendingNode) !== 99,
-    })
-    const results = await run(admin, [edit(aUuid, 99), edit(bUuid, 6)], deps)
-    expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.forbidden },
-      { index: 1, status: 'applied' },
-    ])
-    expect(posted[0].edits.map((e: any) => e.index)).toEqual([1])
-  })
-
-  test('a node of another record is failed, a node that exists nowhere is a conflict', async () => {
-    const foreign = uuidv4()
-    const gone = uuidv4()
-    const { deps } = buildDeps({
-      fetchNodeRecordUuid: async ({ nodeUuid }) => (nodeUuid === foreign ? uuidv4() : null),
-    })
-    const results = await run(admin, [edit(foreign, 1), edit(gone, 1)], deps)
-    expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.nodeNotInRecord },
-      { index: 1, status: 'conflict' },
-    ])
-  })
-
-  test('an exception on one record fails its edits with generic, is logged, and the other records proceed', async () => {
-    const otherRecord = RB.record(
-      admin,
-      survey,
-      RB.entity('root', RB.attribute('root_key', '2'), RB.attribute('a', 1), RB.attribute('b', 2))
-    ).build()
-    const otherUuid = Record.getUuid(otherRecord)
-    const otherNode = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, otherRecord))
-    const { deps, errors } = buildDeps({
-      fetchRecord: async ({ recordUuid: uuid }) => {
-        if (uuid === recordUuid) throw new Error('db down')
-        return otherRecord
-      },
-    })
-    const results = await run(
-      admin,
-      [edit(aUuid, 5), { recordUuid: otherUuid, nodeUuid: otherNode, from: 1, to: 5 }, edit(bUuid, 6)],
-      deps
-    )
-    expect(results).toEqual([
-      { index: 0, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
-      { index: 1, status: 'applied' },
-      { index: 2, status: 'failed', messageKey: NodesBatchMessageKeys.unexpected },
-    ])
-    expect(errors).toHaveLength(1)
-    expect(errors[0]).toContain('db down')
-  })
-
   test('a failure to send the edits of one record fails only that record: the batch is not a 500', async () => {
     const otherRecord = RB.record(
       admin,
@@ -190,9 +106,7 @@ describe('updateNodesBatch', () => {
     ).build()
     const otherUuid = Record.getUuid(otherRecord)
     const otherNode = Node.getUuid(RecordUtils.findNodeByPath('root/a')(survey, otherRecord))
-    const { deps, errors } = buildDeps({
-      fetchRecord: async ({ recordUuid: uuid }) => (uuid === recordUuid ? record : otherRecord),
-    })
+    const { deps, errors } = buildDeps()
     const postBatchMessage = deps.postBatchMessage
     deps.postBatchMessage = (msg) => {
       if (msg.recordUuid === recordUuid) throw new Error('the thread is gone')
@@ -223,25 +137,23 @@ describe('updateNodesBatch', () => {
       waits.push(timeoutMs)
       return waitFor(requestId, timeoutMs)
     }
-    // the first record check is slow: 20 s pass before the second record is sent
+    // the thread takes 10 s for each record
     let now = 1_000_000
     const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
-    const slowDeps = {
-      ...deps,
-      fetchRecord: async () => {
-        now += 10_000
-        return record
-      },
+    const postBatchMessage = deps.postBatchMessage
+    deps.postBatchMessage = (msg) => {
+      now += 10_000
+      postBatchMessage(msg)
     }
     try {
-      await run(admin, [edit(aUuid, 5), { ...edit(bUuid, 6), recordUuid: 'other-record' }], slowDeps)
+      await run(admin, [edit(aUuid, 5), { ...edit(bUuid, 6), recordUuid: 'other-record' }], deps)
     } finally {
       nowSpy.mockRestore()
     }
     expect(posted).toHaveLength(2)
     // the thread stops 2 s before the reply wait ends, so no commit lands after the timeout was reported
     expect(posted.map((msg) => msg.deadline)).toEqual([1_058_000, 1_058_000])
-    expect(waits).toEqual([60_000 - 10_000, 60_000 - 20_000])
+    expect(waits).toEqual([60_000, 60_000 - 10_000])
   })
 
   describe('one message at a time', () => {
@@ -258,8 +170,7 @@ describe('updateNodesBatch', () => {
 
     test('a batch never has more than one message in flight: it waits for the reply before sending the next', async () => {
       const items = buildRecords(4)
-      const byUuid = new Map(items.map((item) => [item.recordUuid, item.rec]))
-      const { deps, posted } = buildDeps({ fetchRecord: async ({ recordUuid: uuid }) => byUuid.get(uuid) ?? null })
+      const { deps, posted } = buildDeps()
       let inFlight = 0
       let maxInFlight = 0
       deps.postBatchMessage = (msg) => {
@@ -289,8 +200,7 @@ describe('updateNodesBatch', () => {
 
     test('the records not yet sent when the deadline passes get aiApplyTimeout and are not posted', async () => {
       const items = buildRecords(3)
-      const byUuid = new Map(items.map((item) => [item.recordUuid, item.rec]))
-      const { deps, posted } = buildDeps({ fetchRecord: async ({ recordUuid: uuid }) => byUuid.get(uuid) ?? null })
+      const { deps, posted } = buildDeps()
       let now = 1_000_000
       const nowSpy = jest.spyOn(Date, 'now').mockImplementation(() => now)
       deps.postBatchMessage = (msg) => {
@@ -324,18 +234,15 @@ describe('updateNodesBatch', () => {
     })
   })
 
-  describe('a batch that hangs before posting', () => {
+  describe('a batch that never ends', () => {
     afterEach(() => {
       jest.useRealTimers()
     })
 
-    test.each([
-      ['the survey fetch', { fetchSurvey: () => new Promise<any>(() => undefined) }],
-      ['the qualifier filters', { fetchQualifierFilters: () => new Promise<any>(() => undefined) }],
-      ['the record fetch', { fetchRecord: () => new Promise<any>(() => undefined) }],
-    ])('does not keep its slot after the deadline (hung in %s)', async (_description, overrides) => {
+    test('does not keep its slot after the deadline (a reply wait that is never released)', async () => {
       jest.useFakeTimers()
-      const { deps, posted } = buildDeps(overrides)
+      const replies = { ...createNodesBatchReplyRegistry(), waitFor: () => new Promise<any>(() => undefined) }
+      const { deps, posted } = buildDeps({ replies })
       const outcome = run(admin, [edit(aUuid, 5)], deps).then(
         () => null,
         (error) => error
@@ -347,7 +254,7 @@ describe('updateNodesBatch', () => {
       const error = await outcome
       expect(error).toMatchObject({ key: NodesBatchMessageKeys.applyTimeout })
       expect(deps.slots.size()).toBe(0)
-      expect(posted).toHaveLength(0)
+      expect(posted).toHaveLength(1)
     })
   })
 })

@@ -387,6 +387,14 @@ describe('processNodesBatch', () => {
     expect(posted).toEqual([])
   })
 
+  test('a record of another cycle: every edit is a conflict and nothing is written', async () => {
+    const otherCycle = { ...record, [Record.keys.cycle]: '1' }
+    const { deps, calls } = createDeps({ recordInDb: otherCycle })
+    const results = await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 1, to: 2 }]), deps })
+    expect(results).toEqual([{ index: 0, status: 'conflict' }])
+    expect(calls.persistNode).toBe(0)
+  })
+
   test('nothing applied: no nodesUpdateCompleted and no cache write', async () => {
     const { deps, posted, calls } = createDeps()
     await processNodesBatch({ msg: msgOf([{ index: 0, nodeUuid: aUuid, from: 5, to: 2 }]), deps })
