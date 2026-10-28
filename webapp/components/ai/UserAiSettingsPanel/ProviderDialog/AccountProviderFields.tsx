@@ -1,4 +1,3 @@
-import { useI18nT } from '@webapp/store/system'
 import React from 'react'
 
 import { Button } from '@webapp/components/buttons'
@@ -6,6 +5,7 @@ import { FormItem, Input } from '@webapp/components/form/Input'
 import { PasswordInput } from '@webapp/components/form/PasswordInput'
 import { Spinner } from '@webapp/components/Spinner'
 import { TestId } from '@webapp/utils/testId'
+import { useI18nT } from '@webapp/store/system'
 
 import { StatusPill } from '../StatusPill'
 import { type ApiKeyFieldState, getApiKeyFieldState } from './apiKeyField'

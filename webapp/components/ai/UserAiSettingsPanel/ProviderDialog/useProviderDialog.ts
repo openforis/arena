@@ -2,7 +2,6 @@
  * The add / edit provider dialog: wires the state machine (providerDialogState) to the server. The dialog stores
  * nothing before "Add provider" / "Save"; then the settings cache and the capabilities are refreshed.
  */
-import { useI18nT } from '@webapp/store/system'
 import { useCallback, useEffect, useMemo } from 'react'
 
 import { createLocalProviderId } from '@common/ai/providerIds'
@@ -16,6 +15,7 @@ import { loadLocalProviders, saveLocalProviders } from '@webapp/ai/engines/local
 import { getBrowserLocalStorage } from '@webapp/ai/storage/resilientStorage'
 import { getLocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { useAiCapabilities } from '@webapp/components/ai/hooks/useAiCapabilities'
+import { useI18nT } from '@webapp/store/system'
 
 import { getApiErrorMessage } from '../aiSettingsForm'
 import { getLocalDraftUrl } from './providerDraft'

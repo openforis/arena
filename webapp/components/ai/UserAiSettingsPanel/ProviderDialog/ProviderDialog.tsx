@@ -1,4 +1,3 @@
-import { useI18nT } from '@webapp/store/system'
 import './ProviderDialog.scss'
 
 import React, { useCallback } from 'react'
@@ -11,6 +10,7 @@ import { Button } from '@webapp/components/buttons'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
 import { TestId } from '@webapp/utils/testId'
+import { useI18nT } from '@webapp/store/system'
 
 import { AccountProviderFields } from './AccountProviderFields'
 import { LocalProviderFields } from './LocalProviderFields'
