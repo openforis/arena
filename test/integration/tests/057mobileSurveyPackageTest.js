@@ -42,7 +42,7 @@ const getEntryNames = (zip) =>
     .map((entry) => entry.entryName)
     .sort((a, b) => a.localeCompare(b))
 
-const readJsonEntry = (zip, name) => JSON.parse(zip.readAsText(name))
+const readJsonEntry = (zip, name) => JSON.parse(zip.readFile(name).toString('utf8'))
 
 describe('Arena Mobile survey package', () => {
   const surveysToDelete = []
