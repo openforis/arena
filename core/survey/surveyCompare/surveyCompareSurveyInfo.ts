@@ -45,20 +45,18 @@ const withoutBrandingImages = (branding: Record<string, any> = {}) =>
 
 const getInfoProps = (survey: any): Record<string, any> => ObjectUtils.getProps(Survey.getSurveyInfo(survey)) ?? {}
 
-// the area of interest file uuid differs in every survey: the file is identified by its summary
-const withoutFileUuid = (areaOfInterestFile: Record<string, any> | null | undefined) =>
-  areaOfInterestFile
-    ? Object.fromEntries(
-        Object.entries(areaOfInterestFile).filter(([key]) => key !== SurveyAreaOfInterest.keys.fileUuid)
-      )
-    : areaOfInterestFile
+// the area of interest file uuids differ in every survey: the files are identified by name and summary
+const withoutFileUuids = (areasOfInterest: Record<string, any>[] | null | undefined) =>
+  areasOfInterest?.map((areaOfInterest) =>
+    Object.fromEntries(Object.entries(areaOfInterest).filter(([key]) => key !== SurveyAreaOfInterest.keys.fileUuid))
+  )
 
 export const normalizeSurveyInfoProp = ({ key, value }: { key: string; value: any }) => {
   if (key === infoKeys.srs) {
     return normalizeValue((value ?? []).map((srs: any) => srs.code).sort((a: string, b: string) => a.localeCompare(b)))
   }
   if (key === infoKeys.branding) return normalizeValue(withoutBrandingImages(value))
-  if (key === infoKeys.areaOfInterestFile) return normalizeValue(withoutFileUuid(value))
+  if (key === infoKeys.areasOfInterest) return normalizeValue(withoutFileUuids(value))
   return normalizeValue(value, key)
 }
 
@@ -136,6 +134,11 @@ const SurveyFileKind = {
   areaOfInterest: 'areaOfInterest',
 } as const
 
+// survey info prop holding the files of each kind (when different from the kind)
+const surveyInfoKeyByFileKind: Record<string, string> = {
+  [SurveyFileKind.areaOfInterest]: infoKeys.areasOfInterest,
+}
+
 interface SurveyFileEntry {
   kind: string
   key: string
@@ -182,26 +185,23 @@ const getBrandingFileEntries = (survey: any): SurveyFileEntry[] => {
 }
 
 const getAreaOfInterestFileEntries = (survey: any): SurveyFileEntry[] => {
-  const descriptor = SurveyAreaOfInterest.getAreaOfInterestFile(survey)
-  const summary = SurveyAreaOfInterest.getAreaOfInterestFileSummary(survey)
-  if (!descriptor || !summary) return []
-  const { fileUuid, name, ...normalized } = descriptor
-  return [
-    {
+  const summaries = SurveyAreaOfInterest.getAreaOfInterestFileSummaries(survey)
+  return SurveyAreaOfInterest.getAreasOfInterest(survey).map(
+    ({ name, labels, fileUuid, size, polygons, vertices }, index) => ({
       kind: SurveyFileKind.areaOfInterest,
-      key: SurveyFileKind.areaOfInterest,
+      key: name,
       name,
       fileType: SurveyFile.SurveyFileType.areaOfInterest,
       fileUuid,
-      normalized: normalizeValue(normalized) ?? {},
-      summary,
-    },
-  ]
+      normalized: normalizeValue({ labels, size, polygons, vertices }) ?? {},
+      summary: summaries[index],
+    })
+  )
 }
 
 /**
  * Returns the survey files referenced by the survey info (preloaded map layers, survey doc images, branding images,
- * area of interest).
+ * areas of interest).
  * @param {any} survey - The survey.
  * @returns {SurveyFileEntry[]} - The file entries.
  */
@@ -235,9 +235,9 @@ const newSurveyFileDiff = ({
 })
 
 /**
- * Compares the survey files (preloaded map layers, survey doc images, branding images, area of interest) of two
- * surveys. Files are matched by name (branding images and area of interest by slot) and compared by size and labels
- * (area of interest by size and summary).
+ * Compares the survey files (preloaded map layers, survey doc images, branding images, areas of interest) of two
+ * surveys. Files are matched by name (branding images by slot, areas of interest by area name) and compared by size
+ * and labels (areas of interest also by summary).
  * @param {object} params - The parameters.
  * @param {any} params.sourceSurvey - Source survey.
  * @param {any} params.targetSurvey - Target survey.
@@ -304,7 +304,8 @@ const getSourceSurveyInfoPropValue = ({ sourceSurvey, targetSurvey, key }) => {
 
 const newFileFromEntry = (entry: SurveyFileEntry) =>
   SurveyFile.createFile({
-    name: entry.name,
+    // the entry name of an area of interest is the area name, not the file name
+    name: entry.kind === SurveyFileKind.areaOfInterest ? entry.summary.props.name : entry.name,
     labels:
       entry.kind === SurveyFileKind.preloadedMapLayers || entry.kind === SurveyFileKind.surveyDocImages
         ? SurveyFile.getLabels(entry.summary)
@@ -332,10 +333,18 @@ const applyFileDiffToList = ({ list, diff, sourceEntry, newFile }) => {
   return result
 }
 
-const planAreaOfInterestFileDiff = ({ sourceSurvey, plan, newFile }) => {
-  plan.surveyProps[infoKeys.areaOfInterestFile] = newFile
-    ? { ...SurveyAreaOfInterest.getAreaOfInterestFile(sourceSurvey), fileUuid: SurveyFile.getUuid(newFile) }
-    : null
+// areas of interest are descriptors (not file summaries): matched by file uuid
+const applyAreaOfInterestDiffToList = ({ list, diff, sourceSurvey, sourceEntry, newFile }) => {
+  const index = list.findIndex((descriptor) => descriptor.fileUuid === diff.targetUuid)
+  const result = index < 0 ? [...list] : list.filter((_descriptor, i) => i !== index)
+  if (!newFile) return result
+  const sourceDescriptor = SurveyAreaOfInterest.getAreasOfInterest(sourceSurvey).find(
+    (descriptor) => descriptor.fileUuid === sourceEntry.fileUuid
+  )
+  const descriptor = { ...sourceDescriptor, fileUuid: SurveyFile.getUuid(newFile) }
+  if (index < 0) return [...result, descriptor]
+  result.splice(index, 0, descriptor)
+  return result
 }
 
 const planSurveyFileDiff = ({ context, diff }) => {
@@ -347,7 +356,14 @@ const planSurveyFileDiff = ({ context, diff }) => {
   if (newFile) plan.surveyFilesToInsert.push({ sourceUuid: sourceEntry.fileUuid, file: newFile })
   if (targetEntry) plan.surveyFileUuidsToDelete.push(targetEntry.fileUuid)
   if (entry.kind === SurveyFileKind.areaOfInterest) {
-    planAreaOfInterestFileDiff({ sourceSurvey, plan, newFile })
+    lists[entry.kind] = applyAreaOfInterestDiffToList({
+      list: lists[entry.kind],
+      diff,
+      sourceSurvey,
+      sourceEntry,
+      newFile,
+    })
+    context.listsChanged.add(entry.kind)
   } else if (entry.kind === SurveyFileKind.branding) {
     branding.value = { ...branding.value }
     if (newFile) {
@@ -404,6 +420,7 @@ export const buildSurveyInfoApplyPlan = ({
     lists: {
       [SurveyFileKind.preloadedMapLayers]: targetProps[SurveyFileKind.preloadedMapLayers] ?? [],
       [SurveyFileKind.surveyDocImages]: targetProps[SurveyFileKind.surveyDocImages] ?? [],
+      [SurveyFileKind.areaOfInterest]: targetProps[infoKeys.areasOfInterest] ?? [],
     },
     listsChanged: new Set<string>(),
     branding: { value: plan.surveyProps[infoKeys.branding] ?? targetProps[infoKeys.branding] ?? {}, changed: false },
@@ -412,7 +429,7 @@ export const buildSurveyInfoApplyPlan = ({
     if (appliedIds.has(diff.id)) planSurveyFileDiff({ context, diff })
   }
   for (const kind of context.listsChanged) {
-    plan.surveyProps[kind] = context.lists[kind]
+    plan.surveyProps[surveyInfoKeyByFileKind[kind] ?? kind] = context.lists[kind]
   }
   if (context.branding.changed) {
     plan.surveyProps[infoKeys.branding] = context.branding.value

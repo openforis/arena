@@ -11,10 +11,10 @@ import {
   updateNodeDef,
 } from '../../utils/surveyCompareTestUtils'
 
-const withAreaOfInterestFile = ({ survey, fileUuid, vertices = 5 }) => {
+const withAreaOfInterest = ({ survey, fileUuid, name = 'area_a', vertices = 5 }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
-  const areaOfInterestFile = { fileUuid, name: 'aoi.geojson', size: 100, polygons: 1, vertices }
-  return { ...survey, info: { ...surveyInfo, props: { ...surveyInfo.props, areaOfInterestFile } } }
+  const areasOfInterest = [{ name, fileUuid, fileName: 'aoi.geojson', size: 100, polygons: 1, vertices }]
+  return { ...survey, info: { ...surveyInfo, props: { ...surveyInfo.props, areasOfInterest } } }
 }
 
 const fingerprint = ({ survey, items, type }) =>
@@ -45,13 +45,16 @@ describe('Survey fingerprint', () => {
     expect(fingerprintsB.strict).not.toEqual(fingerprintsA.strict)
   })
 
-  test('the area of interest is part of the fingerprints, its file uuid is not', async () => {
+  test('the areas of interest are part of the fingerprints, their file uuids are not', async () => {
     const { survey, items } = await buildSurvey()
-    const original = fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-1' }), items })
-    expect(fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-2' }), items })).toEqual(original)
+    const original = fingerprints({ survey: withAreaOfInterest({ survey, fileUuid: 'aoi-1' }), items })
+    expect(fingerprints({ survey: withAreaOfInterest({ survey, fileUuid: 'aoi-2' }), items })).toEqual(original)
     expect(fingerprints({ survey, items }).structural).not.toEqual(original.structural)
     expect(
-      fingerprints({ survey: withAreaOfInterestFile({ survey, fileUuid: 'aoi-1', vertices: 7 }), items }).structural
+      fingerprints({ survey: withAreaOfInterest({ survey, fileUuid: 'aoi-1', vertices: 7 }), items }).structural
+    ).not.toEqual(original.structural)
+    expect(
+      fingerprints({ survey: withAreaOfInterest({ survey, fileUuid: 'aoi-1', name: 'area_b' }), items }).structural
     ).not.toEqual(original.structural)
   })
 

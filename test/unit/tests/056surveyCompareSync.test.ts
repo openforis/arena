@@ -378,31 +378,47 @@ describe('SurveyCompare: full sync', () => {
       expect(surveyInfoPlan.surveyProps.branding.surveyLogo1.name).toBe('logo.png')
     })
 
-    test('the area of interest file is compared by its summary and replaced with a new file', async () => {
+    test('the areas of interest are compared by name and summary and replaced with new files', async () => {
       const { survey, items } = await buildSurvey()
-      const areaOfInterestFile = ({ fileUuid, vertices }) => ({
+      const area = ({ name, fileUuid, vertices = 5 }) => ({
+        name,
         fileUuid,
-        name: 'aoi.geojson',
+        fileName: `${name}.geojson`,
         size: 100,
         polygons: 1,
         vertices,
       })
       const target = updateSurveyInfoProps(survey, {
-        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'target-aoi', vertices: 5 }),
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'target-a' }),
+          area({ name: 'area_b', fileUuid: 'target-b' }),
+          area({ name: 'area_c', fileUuid: 'target-c' }),
+        ],
       })
-      // same file with another uuid (e.g. survey imported): no changes
+      // same areas with other file uuids (e.g. survey imported): no changes
       const sourceSame = updateSurveyInfoProps(clone(survey), {
-        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'source-aoi', vertices: 5 }),
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'source-a' }),
+          area({ name: 'area_b', fileUuid: 'source-b' }),
+          area({ name: 'area_c', fileUuid: 'source-c' }),
+        ],
       })
       expect(compare({ source: sourceSame, target, sourceItems: items, targetItems: items }).surveyFiles).toEqual([])
 
+      // area_a unchanged, area_b changed, area_c removed, area_d added
       const source = updateSurveyInfoProps(clone(survey), {
-        areaOfInterestFile: areaOfInterestFile({ fileUuid: 'source-aoi', vertices: 7 }),
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'source-a' }),
+          area({ name: 'area_d', fileUuid: 'source-d' }),
+          area({ name: 'area_b', fileUuid: 'source-b', vertices: 7 }),
+        ],
       })
       const result = compare({ source, target, sourceItems: items, targetItems: items })
       expect(result.surveyInfo).toEqual([])
       expect(result.surveyFiles.map((diff) => [diff.name, diff.fileType, diff.status])).toEqual([
-        ['aoi.geojson', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.changed],
+        ['area_b', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.changed],
+        ['area_c', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.removed],
+        ['area_d', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.added],
       ])
       expect(result.surveyFiles[0].propDiffs.map((propDiff) => propDiff.key)).toEqual(['vertices'])
 
@@ -413,13 +429,19 @@ describe('SurveyCompare: full sync', () => {
         surveyFileDiffs: result.surveyFiles,
         appliedIds: new Set(result.surveyFiles.map((diff) => diff.id)),
       })
-      const [{ sourceUuid, file }] = surveyInfoPlan.surveyFilesToInsert
-      expect(sourceUuid).toBe('source-aoi')
-      expect(SurveyFile.getType(file)).toBe(SurveyFile.SurveyFileType.areaOfInterest)
-      expect(surveyInfoPlan.surveyFileUuidsToDelete).toEqual(['target-aoi'])
-      expect(surveyInfoPlan.surveyProps.areaOfInterestFile).toEqual(
-        areaOfInterestFile({ fileUuid: SurveyFile.getUuid(file), vertices: 7 })
+      const newFileUuidBySourceUuid = Object.fromEntries(
+        surveyInfoPlan.surveyFilesToInsert.map(({ sourceUuid, file }) => [sourceUuid, SurveyFile.getUuid(file)])
       )
+      expect(Object.keys(newFileUuidBySourceUuid).sort()).toEqual(['source-b', 'source-d'])
+      for (const { file } of surveyInfoPlan.surveyFilesToInsert) {
+        expect(SurveyFile.getType(file)).toBe(SurveyFile.SurveyFileType.areaOfInterest)
+      }
+      expect(surveyInfoPlan.surveyFileUuidsToDelete.sort()).toEqual(['target-b', 'target-c'])
+      expect(surveyInfoPlan.surveyProps.areasOfInterest).toEqual([
+        area({ name: 'area_a', fileUuid: 'target-a' }),
+        area({ name: 'area_b', fileUuid: newFileUuidBySourceUuid['source-b'], vertices: 7 }),
+        area({ name: 'area_d', fileUuid: newFileUuidBySourceUuid['source-d'] }),
+      ])
     })
   })
 

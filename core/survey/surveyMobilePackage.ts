@@ -26,12 +26,13 @@ const getBrandingFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] =
   }))
 
 // read by Arena Mobile to evaluate the geoDistanceToAOIBoundary function offline
-const getAreaOfInterestFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] => {
-  const summary = SurveyAreaOfInterest.getAreaOfInterestFileSummary(surveyInfo)
-  if (!summary) return []
-  const { uuid, props } = summary
-  return [{ uuid, type: props.type, name: props.name, size: props.size }]
-}
+const getAreaOfInterestFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] =>
+  SurveyAreaOfInterest.getAreaOfInterestFileSummaries(surveyInfo).map(({ uuid, props }) => ({
+    uuid,
+    type: props.type,
+    name: props.name,
+    size: props.size,
+  }))
 
 /**
  * Returns the survey files to include in the Arena Mobile survey package (the ones referenced by the survey info).
