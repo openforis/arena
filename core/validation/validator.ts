@@ -90,7 +90,6 @@ export const {
   validateNotKeyword,
   validateName,
   validateNumber,
-  validatePositiveNumber,
   validatePositiveOrZeroNumber,
   validateEmail,
   validateEmails,

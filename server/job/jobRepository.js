@@ -1,5 +1,7 @@
 import { db } from '@server/db/db'
 
+import { jobStatus } from './jobUtils'
+
 const selectAllJobs = `
   SELECT
     j.uuid, j.type, j.status, j.processed, j.total, j.props,
@@ -30,3 +32,14 @@ const rowToJob = (row) => ({
 })
 
 export const getAll = ({ limit = 200 } = {}) => db.map(selectAllJobs, [limit], rowToJob)
+
+// marks still active jobs as alive (see the stale jobs cleanup scheduler)
+export const touchActiveJobs = async ({ uuids }, client = db) => {
+  if (uuids.length === 0) return
+  await client.none(
+    `UPDATE job
+     SET date_modified = (now() AT TIME ZONE 'UTC')
+     WHERE uuid IN ($1:csv) AND status IN ($2, $3)`,
+    [uuids, jobStatus.pending, jobStatus.running]
+  )
+}
