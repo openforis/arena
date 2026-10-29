@@ -23,6 +23,8 @@ export const areaOfInterest: AreaOfInterest = {
   ],
 }
 
+export const pilotAreaName = 'pilot_area'
+
 export const aoiStatusMessages = {
   outside: 'Report outside the pilot area',
   uncertain: 'Improve the GPS accuracy of the location',
@@ -33,7 +35,7 @@ const warning = ({ expression, message }: { expression: string; message: string 
 
 /**
  * Inserts a "citizen report" survey (location, distance to the area of interest boundary and location status)
- * with the area of interest defined, owned by the specified user and set as its current survey.
+ * with the area of interest "pilot_area" defined, owned by the specified user and set as its current survey.
  * @param {object} params - Parameters.
  * @param {string} params.userEmail - Email of the survey owner.
  * @param {string} params.name - Survey name.
@@ -61,7 +63,9 @@ export const insertAreaOfInterestSurvey = async ({
       .label('Distance to the pilot area boundary (m)')
       .readOnly()
       .defaultValues(
-        NodeDefExpression.createExpression({ expression: 'Math.round(geoDistanceToAOIBoundary(location))' })
+        NodeDefExpression.createExpression({
+          expression: `Math.round(geoDistanceToAOIBoundary(location, '${pilotAreaName}'))`,
+        })
       ),
     SB.attribute('aoi_status', NodeDef.nodeDefType.text)
       .label('Location status')
@@ -82,7 +86,7 @@ export const insertAreaOfInterestSurvey = async ({
     .label('Report')
     .displayInOwnPage()
 
-  // the area of interest is stored as survey file, referenced by the survey info
+  // the area of interest is stored as survey file, referenced by its descriptor in the survey info
   const content = Buffer.from(JSON.stringify(areaOfInterest))
   const fileName = 'pilot_area.geojson'
   const areaOfInterestFile = SurveyFile.createFile({
@@ -92,12 +96,15 @@ export const insertAreaOfInterestSurvey = async ({
     content,
   })
   const surveyBuilder = SB.survey(user, rootBuilder).props({
-    [Survey.infoKeys.areaOfInterestFile]: SurveyAreaOfInterest.newAreaOfInterestFileDescriptor({
-      fileUuid: SurveyFile.getUuid(areaOfInterestFile),
-      name: fileName,
-      size: content.length,
-      areaOfInterest,
-    }),
+    [Survey.infoKeys.areasOfInterest]: [
+      SurveyAreaOfInterest.newAreaOfInterestDescriptor({
+        name: pilotAreaName,
+        fileUuid: SurveyFile.getUuid(areaOfInterestFile),
+        fileName,
+        size: content.length,
+        areaOfInterest,
+      }),
+    ],
   })
   surveyBuilder.name = name
   surveyBuilder.label = label

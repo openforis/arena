@@ -5,7 +5,7 @@ import { Locator, Page } from '@playwright/test'
 import { TestId } from '@webapp/utils/testId'
 
 import { expect, generateSurveyName, test } from '../fixtures'
-import { aoiStatusMessages, insertAreaOfInterestSurvey } from '../fixtures/seed/areaOfInterestSurvey'
+import { aoiStatusMessages, insertAreaOfInterestSurvey, pilotAreaName } from '../fixtures/seed/areaOfInterestSurvey'
 import { ArenaApi } from '../fixtures/arenaApi'
 import { RecordForm } from '../helpers/recordForm'
 import { Urls } from '../helpers/urls'
@@ -59,7 +59,7 @@ const defs = {
 const openMapTab = async (page: Page): Promise<Locator> => {
   await page.goto(Urls.surveyInfo)
   await page.getByRole('button', { name: 'Map', exact: true }).click()
-  const section = page.locator('.survey-info__area-of-interest')
+  const section = page.locator('.survey-info__areas-of-interest')
   await expect(section).toBeVisible()
   return section
 }
@@ -90,22 +90,33 @@ const enterLocation = async ({
 }
 
 test.describe('Area of interest', () => {
-  test('uploads, saves and deletes the survey area of interest', async ({ page, survey: _ }) => {
+  test('adds, saves and deletes an area of interest', async ({ page, survey: _ }) => {
     let section = await openMapTab(page)
 
-    await section.locator('input[type="file"]').setInputFiles(geoJsonPath)
-    await expect(section.getByText('1 polygon(s), 5 vertices')).toBeVisible()
+    await section.getByRole('button', { name: 'Add' }).click()
+    const dialog = page.locator('.file-upload-dialog')
+    const okButton = dialog.getByRole('button', { name: 'Ok' })
+    await dialog.locator('input[type="file"]').setInputFiles(geoJsonPath)
+    // the name is a valid identifier, used in the expressions
+    await dialog.getByRole('textbox').first().fill('Pilot area')
+    await expect(okButton).toBeDisabled()
+    await dialog.getByRole('textbox').first().fill(pilotAreaName)
+    await okButton.click()
+
+    const row = section.getByRole('row').filter({ hasText: pilotAreaName })
+    await expect(row).toContainText('area_of_interest.geojson')
+    await expect(row.getByRole('gridcell', { name: '5', exact: true })).toBeVisible()
 
     await page.getByTestId(TestId.surveyInfo.saveBtn).click()
     await expect(page.getByText('Saved!')).toBeVisible()
 
     section = await openMapTab(page)
-    await expect(section.getByText('1 polygon(s), 5 vertices')).toBeVisible()
+    await expect(row).toBeVisible()
     await saveScreenshot(section, 'areaOfInterestEditor')
 
-    await section.locator('.btn-delete').click()
+    await row.locator('.btn-delete').click()
     await page.getByRole('button', { name: 'Ok' }).click()
-    await expect(section.locator('input[type="file"]')).toBeAttached()
+    await expect(row).toHaveCount(0)
   })
 
   test('location status in data entry, using geoDistanceToAOIBoundary and the location accuracy', async ({
