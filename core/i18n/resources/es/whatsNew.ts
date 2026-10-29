@@ -7,10 +7,10 @@ export default {
   noItems: 'No hay novedades para mostrar.',
   items: {
     areaOfInterest: {
-      title: 'Área de interés: comprobar si una ubicación está dentro de un área',
-      description: `En **Información de la encuesta → Mapa**, cargue un polígono en formato GeoJSON como **área de interés** de la encuesta.
+      title: 'Áreas de interés: comprobar si una ubicación está dentro de un área',
+      description: `En **Información de la encuesta → Mapa**, agregue una o más **áreas de interés** (p. ej. los municipios de un área piloto), cada una con un nombre y un polígono en formato GeoJSON.
 
-La nueva función de expresión \`geoDistanceToAOIBoundary(location)\` devuelve la distancia en metros entre una ubicación y el límite del área: negativa dentro, positiva fuera. Compárela con la precisión GPS (\`location.accuracy\`) para clasificar las ubicaciones como dentro, fuera o inciertas, por ejemplo en valores por defecto de atributos de solo lectura y en reglas de validación con severidad *advertencia*. También funciona sin conexión en **Arena Mobile**.
+La nueva función de expresión \`geoDistanceToAOIBoundary(location, 'area_name')\` devuelve la distancia en metros entre una ubicación y el límite del área: negativa dentro, positiva fuera. Compárela con la precisión GPS (\`location.accuracy\`) para clasificar las ubicaciones como dentro, fuera o inciertas, por ejemplo en valores por defecto de atributos de solo lectura y en reglas de validación con severidad *advertencia*. \`geoAOIContaining(location)\` devuelve el nombre del área que contiene la ubicación. Ambas funcionan también sin conexión en **Arena Mobile**.
 
 Gracias a **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) por la solicitud.`,
     },

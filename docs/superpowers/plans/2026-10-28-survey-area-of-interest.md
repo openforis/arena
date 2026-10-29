@@ -1,5 +1,9 @@
 # Survey Area of Interest (AOI) Implementation Plan
 
+> **Superseded in part:** multiple areas of interest per survey, fetched by a provider, are implemented by
+> `docs/superpowers/plans/2026-10-29-survey-multiple-areas-of-interest.md` (spec:
+> `docs/superpowers/specs/2026-10-29-survey-multiple-areas-of-interest-design.md`).
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let survey designers define an Area of Interest (AOI) polygon in the survey info (Map section) and expose a new expression function `geoDistanceToAOIBoundary(coordinate)` returning the signed distance (meters) between a coordinate and the AOI boundary, usable in default values and validation rules, also offline in Arena Mobile.

@@ -7,10 +7,10 @@ export default {
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
     areaOfInterest: {
-      title: 'Područje od interesa: provera da li je lokacija unutar područja',
-      description: `U **Informacije o istraživanju → Mapa** otpremite poligon u GeoJSON formatu kao **područje od interesa** istraživanja.
+      title: 'Područja od interesa: provera da li je lokacija unutar područja',
+      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu.
 
-Nova funkcija izraza \`geoDistanceToAOIBoundary(location)\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. Radi i oflajn u **Arena Mobile**.
+Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. \`geoAOIContaining(location)\` vraća naziv područja koje sadrži lokaciju. Obe rade i oflajn u **Arena Mobile**.
 
 Hvala **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) na zahtevu.`,
     },

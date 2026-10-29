@@ -7,10 +7,10 @@ export default {
   noItems: 'Aucune nouveauté à afficher.',
   items: {
     areaOfInterest: {
-      title: "Zone d'intérêt : vérifier si un emplacement se trouve dans une zone",
-      description: `Dans **Infos de l'enquête → Carte**, importez un polygone au format GeoJSON comme **zone d'intérêt** de l'enquête.
+      title: "Zones d'intérêt : vérifier si un emplacement se trouve dans une zone",
+      description: `Dans **Infos de l'enquête → Carte**, ajoutez une ou plusieurs **zones d'intérêt** (par ex. les communes d'une zone pilote), chacune avec un nom et un polygone au format GeoJSON.
 
-La nouvelle fonction d'expression \`geoDistanceToAOIBoundary(location)\` renvoie la distance en mètres entre un emplacement et la limite de la zone : négative à l'intérieur, positive à l'extérieur. Comparez-la avec la précision GPS (\`location.accuracy\`) pour classer les emplacements comme à l'intérieur, à l'extérieur ou incertains, par exemple dans les valeurs par défaut d'attributs en lecture seule et dans des règles de validation de gravité *avertissement*. Elle fonctionne aussi hors ligne dans **Arena Mobile**.
+La nouvelle fonction d'expression \`geoDistanceToAOIBoundary(location, 'area_name')\` renvoie la distance en mètres entre un emplacement et la limite de la zone : négative à l'intérieur, positive à l'extérieur. Comparez-la avec la précision GPS (\`location.accuracy\`) pour classer les emplacements comme à l'intérieur, à l'extérieur ou incertains, par exemple dans les valeurs par défaut d'attributs en lecture seule et dans des règles de validation de gravité *avertissement*. \`geoAOIContaining(location)\` renvoie le nom de la zone contenant l'emplacement. Les deux fonctionnent aussi hors ligne dans **Arena Mobile**.
 
 Merci à **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) pour la demande.`,
     },

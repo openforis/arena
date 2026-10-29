@@ -7,10 +7,10 @@ export default {
   noItems: 'No new features to show.',
   items: {
     areaOfInterest: {
-      title: 'Area of interest: check if a location is inside an area',
-      description: `In **Survey info → Map**, upload a polygon in GeoJSON format as the survey **area of interest**.
+      title: 'Areas of interest: check if a location is inside an area',
+      description: `In **Survey info → Map**, add one or more **areas of interest** (e.g. the municipalities of a pilot area), each with a name and a polygon in GeoJSON format.
 
-The new expression function \`geoDistanceToAOIBoundary(location)\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. It works offline in **Arena Mobile** too.
+The new expression function \`geoDistanceToAOIBoundary(location, 'area_name')\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. \`geoAOIContaining(location)\` returns the name of the area containing the location. Both work offline in **Arena Mobile** too.
 
 Thanks to **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement) for the request.`,
     },
