@@ -2,6 +2,7 @@ import * as A from '@core/arena'
 
 import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { ValidatorErrorKeys } from './validatorErrorKeys'
@@ -77,14 +78,11 @@ export const validateNumber =
   (propName, item) => {
     const value = getProp(propName)(item)
 
-    return value && Number.isNaN(Number(value)) ? { key: errorKey, params: errorParams } : null
+    return value && Number.isNaN(NumberUtils.toNumber(value)) ? { key: errorKey, params: errorParams } : null
   }
 
-export const validatePositiveNumber = (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
-  validatePositiveOrZeroNumber(errorKey, errorParams, false)
-
 export const validatePositiveOrZeroNumber =
-  (errorKey: string, errorParams: Record<string, unknown> = {}, allowZero = true): ValidatorFn =>
+  (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
   (propName, item) => {
     const validateNumberResult = validateNumber(errorKey, errorParams)(propName, item)
     if (validateNumberResult) {
@@ -93,8 +91,7 @@ export const validatePositiveOrZeroNumber =
 
     const value = getProp(propName)(item) as number
 
-    const invalid = allowZero ? value < 0 : value <= 0
-    return value && invalid ? { key: errorKey, params: errorParams } : null
+    return value && value < 0 ? { key: errorKey, params: errorParams } : null
   }
 
 export const isEmailValueValid = (email: unknown): boolean =>

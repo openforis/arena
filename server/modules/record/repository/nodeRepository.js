@@ -182,6 +182,34 @@ export const countNodesWithMissingFile = async ({ surveyId, nodeDefFileUuids, re
 }
 
 /**
+ * Counts the file attribute nodes whose file is missing, for each of the specified records.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string[]} params.nodeDefFileUuids - The uuids of the file attribute definitions.
+ * @param {!string[]} params.recordUuids - The uuids of the records.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<object>} - Counts indexed by record uuid (only records with missing files).
+ */
+export const countNodesWithMissingFileByRecordUuids = async (
+  { surveyId, nodeDefFileUuids, recordUuids },
+  client = db
+) => {
+  if (nodeDefFileUuids.length === 0 || recordUuids.length === 0) return {}
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const rows = await client.any(
+    `SELECT n.record_uuid, COUNT(n.*)
+    FROM ${schema}.node n
+    WHERE n.node_def_uuid IN ($/nodeDefFileUuids:csv/)
+      AND n.record_uuid IN ($/recordUuids:csv/)
+      AND n.value->>'${Node.valuePropsFile.fileUuid}' IS NOT NULL
+      AND NOT EXISTS (SELECT 1 FROM ${schema}.file f WHERE f.uuid = (n.value->>'${Node.valuePropsFile.fileUuid}')::uuid)
+    GROUP BY n.record_uuid`,
+    { nodeDefFileUuids, recordUuids }
+  )
+  return Object.fromEntries(rows.map((row) => [row.record_uuid, Number(row.count)]))
+}
+
+/**
  * Finds file-attribute-value nodes belonging to PREVIEW records only, that either have one of the
  * given node def UUIDs themselves, or are descendants of a node that does - found via the node's
  * immutable meta.hierarchy ancestor-chain (no recursive query needed: hierarchy is set once at node

@@ -4,8 +4,6 @@ import { DateFormats, Dates, I18n } from '@openforis/arena-core'
 
 const {
   add,
-  addHours,
-  addMinutes,
   convertDate,
   diffInMinutes,
   diffInHours,
@@ -20,7 +18,7 @@ const {
   subYears,
 } = Dates
 
-export { add, addHours, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
+export { add, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
 
@@ -123,8 +121,6 @@ export const isValidDateInFormat = (dateStr: string, format: string): boolean =>
 }
 
 export const formatDateISO = (date: unknown): string => format(date, formats.dateISO)
-
-export const formatDateDisplay = (date: unknown): string => format(date, formats.dateDefault)
 
 export const formatDateTimeDefault = (date: unknown): string => format(date, formats.datetimeDefault)
 

@@ -19,14 +19,6 @@ const environments = {
   production: 'production',
 } as const
 
-const dbUrl = process.env.DATABASE_URL
-const regExDbUrl = /postgres:\/\/(\w+):(\w+)@([\w.-]+):(\d+)\/(\w+)/
-const dbUrlMatch = dbUrl ? dbUrl.match(regExDbUrl) : null
-
-const [pgUser, pgPassword, pgHost, pgPort, pgDatabase] = dbUrlMatch
-  ? [dbUrlMatch[1], dbUrlMatch[2], dbUrlMatch[3], dbUrlMatch[4], dbUrlMatch[5]]
-  : [process.env.PGUSER, process.env.PGPASSWORD, process.env.PGHOST, process.env.PGPORT, process.env.PGDATABASE]
-
 export const ENV = {
   arenaRoot: process.env.ARENA_ROOT,
   arenaDist: process.env.ARENA_DIST,
@@ -37,15 +29,6 @@ export const ENV = {
   buildReport: isTrue(process.env.BUILD_REPORT),
   // APP VERSION
   applicationVersion: process.env.APP_VERSION,
-  // DB
-  dbUrl,
-  pgUser,
-  pgPassword,
-  pgHost,
-  pgPort,
-  pgDatabase,
-  pgSsl: isTrue(process.env.PGSSL),
-  pgSslAllowUnauthorized: isTrue(process.env.PGSSL_ALLOW_UNAUTHORIZED),
   // EMAIL
   emailService: process.env.EMAIL_SERVICE || 'sendgrid',
   emailFrom: process.env.EMAIL_FROM,
