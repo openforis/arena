@@ -6,9 +6,12 @@ import { SystemError as CoreSystemError } from '@openforis/arena-core'
 import { FileFormats } from '@core/fileFormats'
 import SystemError, { StatusCodes } from '@core/systemError'
 
+import * as Log from '@server/log/log'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import UnauthorizedError from './unauthorizedError'
+
+const logger = Log.getLogger('Response')
 
 const status = {
   ok: 'ok',
@@ -48,10 +51,12 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
-    res.status(err.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
+    // details of unexpected errors (e.g. SQL errors) stay in the server log, not in the response
+    logger.error(err?.stack ?? String(err))
+    res.status(err?.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
-        params: { text: `Could not serve: ${err.toString()}` },
+        params: { text: 'Internal server error' },
       })
     )
   }
