@@ -12,7 +12,7 @@ export default {
 
 Шинэ илэрхийллийн функц \`geoDistanceToAOIBoundary(location, 'area_name')\` нь байршил болон бүсийн хилийн хоорондох зайг метрээр буцаана: дотор сөрөг, гадна эерэг. Үүнийг GPS нарийвчлалтай (\`location.accuracy\`) харьцуулж байршлыг дотор, гадна эсвэл тодорхойгүй гэж ангилна, жишээ нь зөвхөн унших атрибутын анхдагч утга болон *анхааруулга* түвшний шалгалтын дүрэмд. \`geoAOIContaining(location)\` нь байршлыг агуулсан бүсийн нэрийг буцаана. Хоёулаа **Arena Mobile**-д офлайн үед ч ажиллана.
 
-Хүсэлт гаргасан **[ASSEDEV](https://www.assedev.fr/)** (Association pour l’Assainissement, la Sauvegarde de l’Environnement et le Développement)-д баярлалаа.`,
+Хүсэлт гаргасан **[ASSEDEV Alerte Environnement](https://assedev.fr)**-д баярлалаа.`,
     },
     mobilePreview: {
       title: 'Судалгааг Arena Mobile дээр урьдчилан харах',
