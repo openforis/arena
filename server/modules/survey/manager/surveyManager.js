@@ -35,7 +35,6 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
-import * as SurveyAreaOfInterestManager from '@server/modules/survey/manager/surveyAreaOfInterestManager'
 import {
   getCurrentAppVersionStamp,
   isSurveyDataMigrationPending,
@@ -304,8 +303,6 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     backup = false,
     includeAnalysis = true,
     skipMigrationCheck = false,
-    // true when records are evaluated (geoDistanceToAOIBoundary function): the area of interest is read from its file
-    includeAreaOfInterest = false,
   },
   client = db
 ) => {
@@ -339,9 +336,6 @@ export const fetchSurveyAndNodeDefsBySurveyId = async (
     const validation = await SurveyValidator.validateNodeDefs(survey)
     survey = Survey.assocNodeDefsValidation(validation)(survey)
   }
-  if (includeAreaOfInterest) {
-    survey = await SurveyAreaOfInterestManager.assocAreaOfInterestFromFile({ survey }, client)
-  }
   return survey
 }
 
@@ -357,12 +351,11 @@ export const fetchSurveyAndNodeDefsAndRefDataBySurveyId = async (
     backup = false,
     includeBigCategories = false,
     includeBigTaxonomies = false,
-    includeAreaOfInterest = false,
   },
   client = db
 ) => {
   const survey = await fetchSurveyAndNodeDefsBySurveyId(
-    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup, includeAreaOfInterest },
+    { surveyId, cycle, draft, advanced, validate, includeDeleted, includeAnalysis, backup },
     client
   )
   const categoryItemsRefData = await CategoryRepository.fetchIndex({ surveyId, draft, includeBigCategories }, client)
@@ -596,9 +589,8 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     for (const fileUuid of SurveyBranding.getBrandingFileUuids(branding)) {
       await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
-    const areaOfInterestFileUuid = SurveyAreaOfInterest.getAreaOfInterestFileUuid(surveyInfoUpdated)
-    if (areaOfInterestFileUuid) {
-      await SurveyFileManager.clearFileTemporaryFlag(surveyId, areaOfInterestFileUuid, t)
+    for (const fileUuid of SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfoUpdated)) {
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
     await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
 
@@ -628,13 +620,12 @@ export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
     },
     client
   )
-  // the area of interest file is replaced (not updated) when a new one is uploaded
-  const areaOfInterestFileUuid = SurveyAreaOfInterest.getAreaOfInterestFileUuid(surveyInfo)
+  // an area of interest file is replaced (not updated) when a new one is uploaded
   await deleteUnusedSurveyFilesByType(
     {
       surveyId,
       type: SurveyFile.SurveyFileType.areaOfInterest,
-      usedFileUuids: new Set(areaOfInterestFileUuid ? [areaOfInterestFileUuid] : []),
+      usedFileUuids: new Set(SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfo)),
     },
     client
   )

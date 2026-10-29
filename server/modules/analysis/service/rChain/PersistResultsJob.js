@@ -42,7 +42,6 @@ export default class PersistResultsJob extends FlatDataImportJob {
         advanced: true,
         draft: true,
         includeAnalysis: true,
-        includeAreaOfInterest: true,
       },
       tx
     )

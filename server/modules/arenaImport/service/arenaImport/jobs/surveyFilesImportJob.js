@@ -18,7 +18,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
     const preloadedMapLayerFiles = Survey.getPreloadedMapLayers(surveyInfo)
     const surveyDocImageFiles = Survey.getSurveyDocImages(surveyInfo)
     const brandingFiles = SurveyBranding.getBrandingFileSummaries(SurveyBranding.getBranding(surveyInfo))
-    const areaOfInterestFile = SurveyAreaOfInterest.getAreaOfInterestFileSummary(surveyInfo)
+    const areaOfInterestFiles = SurveyAreaOfInterest.getAreaOfInterestFileSummaries(surveyInfo)
     // chain MAU files metadata is not part of the survey definition: read it from its own manifest file
     const chainMauFiles = await ArenaSurveyFileZip.getChainMauFilesSummaries(arenaSurveyFileZip)
 
@@ -26,7 +26,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
       ...preloadedMapLayerFiles,
       ...surveyDocImageFiles,
       ...brandingFiles,
-      ...(areaOfInterestFile ? [areaOfInterestFile] : []),
+      ...areaOfInterestFiles,
       ...chainMauFiles,
     ]
 

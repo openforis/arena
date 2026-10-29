@@ -272,7 +272,7 @@ export default class RecordCheckJob extends Job {
     const { surveyId, tx } = this
     this.logDebugOptional('survey has been updated: record check necessary; fetching survey and ref data...')
     const survey = await SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
-      { surveyId, cycle, draft: true, advanced: true, includeDeleted: true, includeAreaOfInterest: true },
+      { surveyId, cycle, draft: true, advanced: true, includeDeleted: true },
       tx
     )
     result.survey = survey

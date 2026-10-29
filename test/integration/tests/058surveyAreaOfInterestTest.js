@@ -13,6 +13,7 @@ import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
@@ -23,30 +24,45 @@ import * as RB from '../../utils/recordBuilder'
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SB from '../../utils/surveyBuilder'
 
-// The area of interest is stored as survey file: the server reads it only where records are evaluated.
+// The areas of interest are stored as survey files: the server provider reads them when records are evaluated.
 
-const areaOfInterest = {
+const polygon = ({ west, east }) => ({
   type: 'Polygon',
   coordinates: [
     [
-      [12.48, 41.88],
-      [12.5, 41.88],
-      [12.5, 41.9],
-      [12.48, 41.9],
-      [12.48, 41.88],
+      [west, 41.88],
+      [east, 41.88],
+      [east, 41.9],
+      [west, 41.9],
+      [west, 41.88],
     ],
   ],
+})
+
+const areas = { west: polygon({ west: 12.48, east: 12.49 }), east: polygon({ west: 12.49, east: 12.5 }) }
+
+const createAreaOfInterestFile = ({ name, areaOfInterest }) => {
+  const content = Buffer.from(JSON.stringify(areaOfInterest))
+  const file = SurveyFile.createFile({
+    type: SurveyFile.SurveyFileType.areaOfInterest,
+    name: `${name}.geojson`,
+    size: content.length,
+    content,
+  })
+  const descriptor = SurveyAreaOfInterest.newAreaOfInterestDescriptor({
+    name,
+    fileUuid: SurveyFile.getUuid(file),
+    fileName: `${name}.geojson`,
+    size: content.length,
+    areaOfInterest,
+  })
+  return { file, descriptor }
 }
 
-const fetchSurvey = ({ surveyId, includeAreaOfInterest }) =>
-  SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-    surveyId,
-    draft: true,
-    advanced: true,
-    includeAreaOfInterest,
-  })
+const fetchSurvey = (surveyId) =>
+  SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({ surveyId, draft: true, advanced: true })
 
-const evaluateDistance = async ({ survey, record, location }) => {
+const evaluate = async ({ survey, record, location }) => {
   const locationNode = RecordUtils.findNodeByPath('report/location')(survey, record)
   const nodesUpdated = { [Node.getUuid(locationNode)]: Node.assocValue(location)(locationNode) }
   const { record: recordUpdated } = await RecordManager.updateNodesDependents({
@@ -54,24 +70,23 @@ const evaluateDistance = async ({ survey, record, location }) => {
     record: Record.mergeNodes(nodesUpdated)(record),
     nodes: nodesUpdated,
   })
-  return Node.getValue(RecordUtils.findNodeByPath('report/aoi_distance')(survey, recordUpdated))
+  const valueOf = (nodePath) => Node.getValue(RecordUtils.findNodeByPath(nodePath)(survey, recordUpdated))
+  return { distance: valueOf('report/aoi_distance'), areaName: valueOf('report/aoi_name') }
 }
 
-describe('Survey area of interest', () => {
+const location = (x) => ({ x, y: 41.89, srs: '4326' })
+
+describe('Survey areas of interest', () => {
   let survey = null
   let record = null
   let tempDir = null
 
   beforeAll(async () => {
     const user = getContextUser()
-    const content = Buffer.from(JSON.stringify(areaOfInterest))
-    const file = SurveyFile.createFile({
-      type: SurveyFile.SurveyFileType.areaOfInterest,
-      name: 'aoi.geojson',
-      size: content.length,
-      content,
-    })
-    survey = await SB.survey(
+    const areaFiles = Object.entries(areas).map(([name, areaOfInterest]) =>
+      createAreaOfInterestFile({ name, areaOfInterest })
+    )
+    const surveyBuilt = await SB.survey(
       user,
       SB.entity(
         'report',
@@ -79,19 +94,21 @@ describe('Survey area of interest', () => {
         SB.attribute('location', NodeDef.nodeDefType.coordinate),
         SB.attribute('aoi_distance', NodeDef.nodeDefType.decimal)
           .readOnly()
-          .defaultValues(NodeDefExpression.createExpression({ expression: 'geoDistanceToAOIBoundary(location)' }))
+          .defaultValues(
+            NodeDefExpression.createExpression({ expression: `geoDistanceToAOIBoundary(location, 'east')` })
+          ),
+        SB.attribute('aoi_name', NodeDef.nodeDefType.text)
+          .readOnly()
+          .defaultValues(NodeDefExpression.createExpression({ expression: 'geoAOIContaining(location)' }))
       )
     )
-      .props({
-        [Survey.infoKeys.areaOfInterestFile]: SurveyAreaOfInterest.newAreaOfInterestFileDescriptor({
-          fileUuid: SurveyFile.getUuid(file),
-          name: 'aoi.geojson',
-          size: content.length,
-          areaOfInterest,
-        }),
-      })
+      .props({ [Survey.infoKeys.areasOfInterest]: areaFiles.map(({ descriptor }) => descriptor) })
       .buildAndStore()
-    await SurveyFileManager.insertFile(Survey.getId(survey), file)
+    const surveyId = Survey.getId(surveyBuilt)
+    for (const { file } of areaFiles) {
+      await SurveyFileManager.insertFile(surveyId, file)
+    }
+    survey = await fetchSurvey(surveyId)
     record = await RB.record(user, survey, RB.entity('report', RB.attribute('report_id', 1))).buildAndStore()
     tempDir = await mkdtemp(path.join(os.tmpdir(), 'aoi-test-'))
   })
@@ -101,37 +118,35 @@ describe('Survey area of interest', () => {
     if (tempDir) await rm(tempDir, { recursive: true, force: true })
   })
 
-  test('area of interest read from its file when evaluating records', async () => {
-    const surveyWithAreaOfInterest = await fetchSurvey({ surveyId: Survey.getId(survey), includeAreaOfInterest: true })
-
-    const distanceInside = await evaluateDistance({
-      survey: surveyWithAreaOfInterest,
-      record,
-      location: { x: 12.49, y: 41.89, srs: '4326' },
-    })
-    expect(distanceInside).toBeLessThan(0)
-
-    const distanceOutside = await evaluateDistance({
-      survey: surveyWithAreaOfInterest,
-      record,
-      location: { x: 12.51, y: 41.89, srs: '4326' },
-    })
-    expect(distanceOutside).toBeGreaterThan(0)
+  test('the survey holds only the descriptors', () => {
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    expect(SurveyAreaOfInterest.getAreaOfInterestNames(surveyInfo)).toEqual(['west', 'east'])
+    expect(JSON.stringify(surveyInfo)).not.toContain('coordinates')
   })
 
-  test('area of interest not loaded by default', async () => {
-    const surveyFetched = await fetchSurvey({ surveyId: Survey.getId(survey), includeAreaOfInterest: false })
-    expect(Survey.getSurveyInfo(surveyFetched).props.areaOfInterest).toBeUndefined()
-    const distance = await evaluateDistance({
-      survey: surveyFetched,
-      record,
-      location: { x: 12.49, y: 41.89, srs: '4326' },
-    })
-    // the function returns null: no value is set
-    expect(Objects.isEmpty(distance)).toBe(true)
+  test('distance to a named area and area containing the location', async () => {
+    const inEast = await evaluate({ survey, record, location: location(12.495) })
+    expect(inEast.distance).toBeLessThan(0)
+    expect(inEast.areaName).toBe('east')
+
+    const inWest = await evaluate({ survey, record, location: location(12.485) })
+    expect(inWest.distance).toBeGreaterThan(0)
+    expect(inWest.areaName).toBe('west')
+
+    const outside = await evaluate({ survey, record, location: location(12.51) })
+    expect(outside.distance).toBeGreaterThan(0)
+    expect(Objects.isEmpty(outside.areaName)).toBe(true)
+  })
+
+  test('the provider caches the geometries', async () => {
+    const first = await AreaOfInterestProviderDefault.getAreaOfInterest({ survey, name: 'west' })
+    expect(first).toEqual(areas.west)
+    expect(await AreaOfInterestProviderDefault.getAreaOfInterest({ survey, name: 'west' })).toBe(first)
+    expect(await AreaOfInterestProviderDefault.getAreaOfInterest({ survey, name: 'unknown' })).toBeUndefined()
   })
 
   test('upload of an area of interest file without a valid polygon is rejected', async () => {
+    const surveyId = Survey.getId(survey)
     const filePath = path.join(tempDir, 'point.geojson')
     await writeFile(filePath, JSON.stringify({ type: 'Point', coordinates: [12.49, 41.89] }))
     const surveyFile = SurveyFile.createFile({
@@ -139,11 +154,7 @@ describe('Survey area of interest', () => {
       name: 'point.geojson',
       temporary: true,
     })
-    await expect(
-      SurveyService.insertSurveyFile({ surveyId: Survey.getId(survey), filePath, surveyFile })
-    ).rejects.toThrow()
-    expect(
-      await SurveyFileManager.fetchFileSummaryByUuid(Survey.getId(survey), SurveyFile.getUuid(surveyFile))
-    ).toBeNull()
+    await expect(SurveyService.insertSurveyFile({ surveyId, filePath, surveyFile })).rejects.toThrow()
+    expect(await SurveyFileManager.fetchFileSummaryByUuid(surveyId, SurveyFile.getUuid(surveyFile))).toBeNull()
   })
 })

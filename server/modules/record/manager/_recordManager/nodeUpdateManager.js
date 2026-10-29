@@ -15,6 +15,7 @@ import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
 import * as RecordFileManager from '../recordFileManager'
@@ -25,6 +26,7 @@ const logger = Log.getLogger('NodeUpdateManager')
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 const _isFileValueNode = (survey, node) => {
   if (!Node.getFileUuid(node)) return false
@@ -223,6 +225,7 @@ export const updateRequiredFlags = async ({ user, survey, record, nodeDefUuids, 
     nodeDefUuids,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     lang: Survey.getDefaultLanguage(survey),
     sideEffect,
   })
@@ -248,6 +251,7 @@ export const updateNodesDependents = async (
     nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
     // fall back to the survey default when no UI language was provided (e.g. background jobs)

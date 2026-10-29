@@ -209,7 +209,6 @@ export class RecordsUpdateThread extends Thread {
       advanced: true,
       includeBigCategories: false,
       includeBigTaxonomies: false,
-      includeAreaOfInterest: true,
     })
 
     // always rebuild dependency graph to ensure it's up to date
