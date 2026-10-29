@@ -106,7 +106,7 @@ describe('Survey areas of interest', () => {
       .buildAndStore()
     const surveyId = Survey.getId(surveyBuilt)
     for (const { file } of areaFiles) {
-      await SurveyFileManager.insertFile(surveyId, file)
+      await SurveyFileManager.insertFile(surveyId, file) // NOSONAR
     }
     survey = await fetchSurvey(surveyId)
     record = await RB.record(user, survey, RB.entity('report', RB.attribute('report_id', 1))).buildAndStore()
