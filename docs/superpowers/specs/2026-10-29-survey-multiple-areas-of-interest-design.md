@@ -75,7 +75,8 @@ overlapping areas (first in list wins), no area containing the coordinate; valid
 
 - Info prop `areasOfInterest`: list of `AreaOfInterestDescriptor` (replaces `areaOfInterestFile`).
 - Each area is a survey file of type `areaOfInterest` (as now).
-- Validation (`surveyInfoValidator`): names required, valid identifiers, unique; file required.
+- Validation (`SurveyAreaOfInterestValidator`, in the add / edit dialog, like the preloaded map layers): name
+  required, valid identifier, not a keyword, unique; file required.
 - The temporary flag of every referenced file is cleared on survey props save; the unreferenced files are deleted on
   publish (`deleteUnusedSurveyFilesByType`, as now).
 
