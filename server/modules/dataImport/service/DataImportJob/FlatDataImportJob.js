@@ -432,6 +432,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entity,
         nodeDefUuids: nodeDefUuidsToClear,
+        areaOfInterestProvider,
         sideEffect,
       })(this.currentRecord)
 
