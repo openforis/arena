@@ -21,6 +21,7 @@ const activeJobSummariesByUserUuid = new DelayedDeleteCache({ deleteDelaySeconds
 // USER JOB WORKERS
 
 const userJobThreads = new ThreadsCache()
+const jobThreadsByJobUuid = new ThreadsCache()
 
 const _persistJobUpdate = async (jobSerialized) => {
   const { uuid, status, processed, total, result, errors, ended } = jobSerialized
@@ -36,29 +37,33 @@ const _persistJobUpdate = async (jobSerialized) => {
 export const _notifyJobUpdateForTest = _persistJobUpdate
 
 const _notifyJobUpdate = (jobSerialized) => {
-  const { userUuid } = jobSerialized
+  const { userUuid, uuid: jobUuid } = jobSerialized
 
-  activeJobSummariesByUserUuid.set(userUuid, jobSerialized)
+  const jobThread = jobThreadsByJobUuid.getThread(jobUuid)
+  // the notification is throttled: a newer job of the same user can be already running
+  const isUserCurrentJob = !jobThread || userJobThreads.getThread(userUuid) === jobThread
 
+  if (isUserCurrentJob) {
+    activeJobSummariesByUserUuid.set(userUuid, jobSerialized)
+  }
   WebSocketServer.notifyUser(userUuid, WebSocketEvent.jobUpdate, jobSerialized)
   _persistJobUpdate(jobSerialized).catch((error) => logger.error(`error persisting job update: ${error}`))
 
   if (!jobSerialized.ended) {
     return
   }
-
-  const jobThread = userJobThreads.getThread(userUuid)
+  if (isUserCurrentJob) {
+    activeJobSummariesByUserUuid.delete(userUuid)
+  }
   if (!jobThread) {
     return
   }
-
-  // Delay thread termination by 1 second (give time to print debug info to the console)
-  setTimeout(() => {
-    jobThread.terminate()
+  jobThreadsByJobUuid.removeThread(jobUuid)
+  if (isUserCurrentJob) {
     userJobThreads.removeThread(userUuid)
-  }, threadCleanupDelay)
-
-  activeJobSummariesByUserUuid.delete(userUuid)
+  }
+  // Delay thread termination by 1 second (give time to print debug info to the console)
+  setTimeout(() => jobThread.terminate(), threadCleanupDelay)
 }
 
 // ====== READ
@@ -142,4 +147,5 @@ export const executeJobThread = (job, onUpdate) => {
 
   const thread = new ThreadManager('jobThread.js', { jobType, jobParams, jobUuid }, onJobUpdate, onThreadExit)
   userJobThreads.putThread(userUuid, thread)
+  jobThreadsByJobUuid.putThread(jobUuid, thread)
 }
