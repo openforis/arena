@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
