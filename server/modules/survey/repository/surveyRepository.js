@@ -122,7 +122,7 @@ const _getSurveysSelectQuery = ({
     survey_view AS (
       SELECT s.*, 
         ${propsCol} ->> 'name' AS name, 
-        ${propsCol} #>> '{${Survey.infoKeys.labels},${lang}}' AS preferred_label, 
+        ${propsCol} #>> ARRAY['${Survey.infoKeys.labels}', $/lang/] AS preferred_label, 
         (${propsCol} -> '${Survey.infoKeys.labels}') ->> 
             (SELECT lang FROM default_lang WHERE default_lang.id = s.id LIMIT 1) as default_label,
         -- STATUS
@@ -169,9 +169,9 @@ const _getSurveysSelectQuery = ({
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       ${_getSelectWhereCondition({ draft, search })}
       ${onlyOwn ? ' AND s.owner_uuid = $/userUuid/' : ''}
-    ORDER BY ${sortByField} ${sortOrder}
-    LIMIT ${limit === null ? 'ALL' : limit}
-    OFFSET ${offset}
+    ORDER BY ${sortByField} ${DB.DbOrder.normalize(sortOrder, DB.DbOrder.desc).toUpperCase()}
+    LIMIT $/limit/
+    OFFSET $/offset/
     `
 }
 
@@ -207,7 +207,14 @@ export const fetchUserSurveys = async (
       includeOwnerEmailAddress,
       onlyOwn,
     }),
-    { userUuid: User.getUuid(user), template, search },
+    {
+      userUuid: User.getUuid(user),
+      template,
+      search,
+      lang,
+      limit: A.isNil(limit) ? null : Number(limit),
+      offset: Number(offset ?? 0),
+    },
     (def) => DB.transformCallback(def, true)
   )
 }
@@ -222,7 +229,7 @@ export const countUserSurveys = async (
     `
     SELECT COUNT(*)
     FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search, onlyOwn })}) AS s`,
-    { search, template, userUuid: User.getUuid(user) },
+    { search, template, lang, limit: null, offset: 0, userUuid: User.getUuid(user) },
     (row) => Number(row.count)
   )
 }

@@ -297,10 +297,10 @@ export const fetchTaxa = async (
     }
     ORDER BY
         t.id
-    LIMIT ${limit || 'ALL'} 
+    LIMIT $/limit/
     OFFSET $/offset/
     `,
-    { taxonomyUuid, offset },
+    { taxonomyUuid, limit: limit ? Number(limit) : null, offset },
     (record) => DB.transformCallback(record, draft, true, backup)
   )
 

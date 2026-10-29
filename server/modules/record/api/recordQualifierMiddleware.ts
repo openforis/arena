@@ -132,12 +132,19 @@ const _requireRecordAccess =
     }
   }
 
+const _getRecordUuidsParam = (req: ExpressRequest): string[] => Requests.getArrayParam('recordUuids')(req) as string[]
+
+const _getMergeRecordUuidsParams = (req: ExpressRequest): string[] => {
+  const { sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+  return [sourceRecordUuid, targetRecordUuid]
+}
+
 const _requireRecordsAccess =
-  (accessType: RecordAccessType) =>
+  (accessType: RecordAccessType, getRecordUuids: (req: ExpressRequest) => string[] = _getRecordUuidsParam) =>
   async (req: ExpressRequest, res: Response, next: NextFunction): Promise<void> => {
     try {
       const { surveyId } = Request.getParams(req)
-      const recordUuids = Requests.getArrayParam('recordUuids')(req) as string[]
+      const recordUuids = getRecordUuids(req)
 
       if (recordUuids.length === 0) {
         next()
@@ -186,3 +193,8 @@ export const requireRecordReadableByUserGroup = _requireRecordAccess('readable')
  * Plural variant of requireRecordReadableByUserGroup, for batch endpoints (`recordUuids` param).
  */
 export const requireRecordsReadableByUserGroup = _requireRecordsAccess('readable')
+
+/**
+ * Variant of requireRecordsMatchUserGroupQualifiers for the records merge endpoint (source and target record params).
+ */
+export const requireMergeRecordsMatchUserGroupQualifiers = _requireRecordsAccess('editable', _getMergeRecordUuidsParams)

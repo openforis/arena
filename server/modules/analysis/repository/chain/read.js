@@ -47,9 +47,9 @@ export const fetchChains = async (params, client = DB.client) => {
   return client.map(
     `${tableChain.getSelect({ surveyId, includeScript })}
     ORDER BY ${tableChain.columnDateCreated} DESC
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    [],
+    LIMIT $1
+    OFFSET $2`,
+    [limit ? Number(limit) : null, Number(offset ?? 0)],
     transformCallback
   )
 }
@@ -70,5 +70,5 @@ export const fetchChain = async (params, client = DB.client) => {
 
   const tableChain = new TableChain(surveyId)
 
-  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), [chainUuid], transformCallback)
+  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), { chainUuid }, transformCallback)
 }

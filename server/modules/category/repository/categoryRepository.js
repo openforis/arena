@@ -389,7 +389,7 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
   const labelsCol = DbUtils.getPropColCombined(CategoryItem.keysProps.labels, draft, 'i.', false)
   return `AND (
     lower(${codeCol}) LIKE $/search/ 
-    OR lower(${labelsCol} ->> '${lang}') LIKE $/search/
+    OR lower(${labelsCol} ->> $/lang/) LIKE $/search/
   )`
 }
 
@@ -405,7 +405,7 @@ const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, l
     JOIN ${schema}.category_level l 
       ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $/categoryUuid/ 
-      AND i.parent_uuid ${parentUuid ? `= '${parentUuid}'` : 'IS NULL'}
+      AND i.parent_uuid ${parentUuid ? '= $/parentUuid/' : 'IS NULL'}
       ${searchValueCondition}
     ORDER BY ${indexCol}
     ${limit ? 'LIMIT $/limit/' : ''}`
@@ -417,7 +417,11 @@ export const countItemsByParentUuid = async (
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang })
-  return client.one(`SELECT COUNT(items.*) FROM (${select}) AS items`, { categoryUuid, search }, (r) => Number(r.count))
+  return client.one(
+    `SELECT COUNT(items.*) FROM (${select}) AS items`,
+    { categoryUuid, parentUuid, search, lang },
+    (r) => Number(r.count)
+  )
 }
 
 export const fetchItemsByParentUuid = async (
@@ -434,7 +438,11 @@ export const fetchItemsByParentUuid = async (
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
-  const items = await client.map(select, { categoryUuid, search, limit }, itemDBTransformCallback({ draft }))
+  const items = await client.map(
+    select,
+    { categoryUuid, parentUuid, search, lang, limit },
+    itemDBTransformCallback({ draft })
+  )
   return draft ? items : A.filter((item) => item.published)(items)
 }
 
