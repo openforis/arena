@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 
@@ -24,6 +25,15 @@ const getBrandingFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] =
     size: props.size,
   }))
 
+// read by Arena Mobile to evaluate the geoDistanceToAOIBoundary function offline
+const getAreaOfInterestFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] =>
+  SurveyAreaOfInterest.getAreaOfInterestFileSummaries(surveyInfo).map(({ uuid, props }) => ({
+    uuid,
+    type: props.type,
+    name: props.name,
+    size: props.size,
+  }))
+
 /**
  * Returns the survey files to include in the Arena Mobile survey package (the ones referenced by the survey info).
  *
@@ -33,6 +43,7 @@ const getBrandingFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] =
 const getFileSummaries = (surveyInfo: any): MobilePackageFileSummary[] => [
   ...getPreloadedMapLayerFileSummaries(surveyInfo),
   ...getBrandingFileSummaries(surveyInfo),
+  ...getAreaOfInterestFileSummaries(surveyInfo),
 ]
 
 export const SurveyMobilePackage = { getFileSummaries }

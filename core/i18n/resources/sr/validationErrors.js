@@ -173,6 +173,13 @@ export default {
     cycleDateEndInvalid: 'Datum završetka ciklusa nije važeći',
     cycleDateEndMandatoryExceptForLastCycle: 'Datum završetka ciklusa je obavezan za sve cikluse osim posljednjeg',
     fieldManualLinksInvalid: 'Link ka terenskom priručniku nije važeći',
+    areaOfInterestInvalid: 'Područje od interesa mora biti poligon u GeoJSON formatu sa WGS84 koordinatama',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Fajl je obavezan',
+    nameDuplicate: 'Već postoji drugo područje od interesa sa istim nazivom',
+    nameRequired: 'Naziv je obavezan',
   },
 
   surveyPreloadedMapLayer: {

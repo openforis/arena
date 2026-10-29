@@ -138,6 +138,19 @@ When checked, those values are kept in the record, even if the attributes are no
     map: 'Map',
     viewInfo: 'View info',
 
+    areasOfInterest: {
+      title: 'Areas of interest',
+      info: 'Polygons (GeoJSON, WGS84 coordinates) used by the expression functions geoDistanceToAOIBoundary (distance to the boundary of an area) and geoAOIContaining (area containing a location), also offline in Arena Mobile. The name of an area is used in the expressions.',
+      name: 'Name',
+      polygons: 'Polygons',
+      vertices: 'Vertices',
+      invalidFile: 'The file does not contain a valid polygon in GeoJSON format with WGS84 coordinates',
+      confirmDelete: 'Are you sure you want to delete this area of interest?',
+      editor: {
+        title: 'Area of interest',
+      },
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Preloaded map layers enabled',
       title: 'Preloaded map layers',

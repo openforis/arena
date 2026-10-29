@@ -16,6 +16,7 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
 import {
@@ -31,6 +32,7 @@ const resultKeys = {
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -223,7 +225,14 @@ export default class RecordsImportJob extends DataImportBaseJob {
       throw new SystemError('dataImport.recordOfAnotherUserGroup', { recordUuid, recordKeyValues })
     }
 
-    const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }
+    const recordUpdateParams = {
+      survey,
+      categoryItemProvider,
+      taxonProvider,
+      areaOfInterestProvider,
+      recordSource: record,
+      sideEffect: true,
+    }
     const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
       ? await Record.mergeRecords(recordUpdateParams)(recordTarget)
       : await Record.replaceUpdatedNodes(recordUpdateParams)(recordTarget)

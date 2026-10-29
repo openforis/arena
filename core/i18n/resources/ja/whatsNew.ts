@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} / {{total}}',
   noItems: '表示する新機能はありません。',
   items: {
+    areaOfInterest: {
+      title: '関心領域：位置が領域内にあるかを確認',
+      description: `**調査情報 → 地図** で、名前とGeoJSON形式のポリゴンを持つ **関心領域** を1つ以上追加します（例：パイロット地域の市町村）。
+
+新しい式関数 \`geoDistanceToAOIBoundary(location, 'area_name')\` は、位置と領域の境界との距離（メートル）を返します：領域内では負、領域外では正の値です。GPS精度（\`location.accuracy\`）と比較して、位置を領域内・領域外・不確定に分類できます（例：読み取り専用属性の既定値や、重大度 *警告* の検証ルール）。\`geoAOIContaining(location)\` は位置を含む領域の名前を返します。どちらも **Arena Mobile** ではオフラインでも動作します。
+
+ご要望をいただいた **[ASSEDEV Alerte Environnement](https://assedev.fr)** に感謝します。`,
+    },
     mobilePreview: {
       title: 'Arena Mobile で調査をプレビュー',
       description: `フォームデザイナーで **プレビュー** ボタンの横のメニューを開き、**プレビュー (モバイル)** を選ぶと、下書きの調査を **Arena Mobile** での表示どおりに、スマートフォンまたはタブレット、縦向きまたは横向きで試すことができます。

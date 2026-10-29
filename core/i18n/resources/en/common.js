@@ -836,6 +836,7 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'No items added',
   },
   expression: {
+    areaOfInterestNotFound: 'Area of interest "{{name}}" not found: define it in Survey info → Map',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
     identifierNotFound: 'Attribute or entity "{{name}}" not found',
@@ -1106,6 +1107,11 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
       distanceAttribute: 'Distance attribute',
       bearingAttribute: 'Bearing attribute',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: 'Area of interest',
+      areasOfInterestNotDefined: 'No areas of interest defined yet: define them in Survey info → Map',
+    },
+    coordinateAttribute: 'Coordinate attribute',
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
     dateTimeDiffEditor: {

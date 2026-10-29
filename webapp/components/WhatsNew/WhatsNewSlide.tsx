@@ -28,7 +28,11 @@ export const WhatsNewSlide = (props: WhatsNewSlideProps) => {
           <span className="whats-new-slide__experimental-badge">{i18n.t('whatsNew:experimental')}</span>
         )}
       </div>
-      <Markdown className="whats-new-slide__description" source={i18n.t(WhatsNew.getDescriptionKey(item))} />
+      <Markdown
+        className="whats-new-slide__description"
+        openLinksInNewTab
+        source={i18n.t(WhatsNew.getDescriptionKey(item))}
+      />
       <span className="whats-new-slide__version">{i18n.t('whatsNew:since', { version: item.version })}</span>
     </div>
   )

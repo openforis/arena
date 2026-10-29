@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    areaOfInterest: {
+      title: 'Áreas de interesse: verificar se uma localização está dentro de uma área',
+      description: `Em **Informações do inquérito → Mapa**, adicione uma ou mais **áreas de interesse** (p. ex. os municípios de uma área piloto), cada uma com um nome e um polígono em formato GeoJSON.
+
+A nova função de expressão \`geoDistanceToAOIBoundary(location, 'area_name')\` retorna a distância em metros entre uma localização e o limite da área: negativa dentro, positiva fora. Compare-a com a precisão do GPS (\`location.accuracy\`) para classificar as localizações como dentro, fora ou incertas, por exemplo em valores padrão de atributos só de leitura e em regras de validação com severidade *aviso*. \`geoAOIContaining(location)\` retorna o nome da área que contém a localização. Ambas funcionam também offline no **Arena Mobile**.
+
+Obrigado à **[ASSEDEV Alerte Environnement](https://assedev.fr)** pelo pedido.`,
+    },
     mobilePreview: {
       title: 'Visualização do inquérito no Arena Mobile',
       description: `No designer de formulários, abra o menu ao lado do botão **Visualizar** e escolha **Visualizar (móvel)** para experimentar o inquérito em rascunho tal como aparece no **Arena Mobile**, num telefone ou tablet, na orientação retrato ou paisagem.

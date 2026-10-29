@@ -109,6 +109,7 @@ Changes are saved as draft: they will reach the records only when the survey is 
     brandingSurveyLogo2: 'Survey logo 2',
     brandingSurveyLogo3: 'Survey logo 3',
     brandingLandingBackground: 'Landing page background',
+    areaOfInterest: 'Area of interest',
   },
   cycle: 'cycle {{cycle}}',
   property: 'Property',

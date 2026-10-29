@@ -844,6 +844,7 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'Aucun élément ajouté',
   },
   expression: {
+    areaOfInterestNotFound: 'Zone d\'intérêt "{{name}}" introuvable : définissez-la dans Infos de l\'enquête → Carte',
     functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
     functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
     identifierNotFound: 'Attribut ou entité "{{name}}" introuvable',
@@ -1119,6 +1120,12 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
       distanceAttribute: 'Attribut de distance',
       bearingAttribute: 'Attribut de cap',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: "Zone d'intérêt",
+      areasOfInterestNotDefined:
+        "Aucune zone d'intérêt n'est encore définie : définissez-les dans Infos de l'enquête → Carte",
+    },
+    coordinateAttribute: 'Attribut de coordonnées',
     coordinateAttributeWithPosition: 'Attribut de coordonnée {{position}}',
 
     dateTimeDiffEditor: {

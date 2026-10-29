@@ -67,7 +67,7 @@ const user = {
 } as any
 
 // category items and taxa are not used: no providers needed
-const providers = { categoryItemProvider: null, taxonProvider: null, timezoneOffset: 0 }
+const providers = { categoryItemProvider: null, taxonProvider: null, areaOfInterestProvider: null, timezoneOffset: 0 }
 
 const expr = (expression: string) => NodeDefExpression.createExpression({ expression })
 

@@ -75,6 +75,7 @@ export const afterNodesUpdate = async ({
   passiveNodes = {},
   categoryItemProvider,
   taxonProvider,
+  areaOfInterestProvider,
   timezoneOffset,
   lang = undefined,
   sideEffect = false,
@@ -94,6 +95,7 @@ export const afterNodesUpdate = async ({
     nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
     // fall back to the survey default when no UI language was provided (e.g. background jobs)
@@ -116,6 +118,7 @@ export const afterNodesUpdate = async ({
     nodes: updateResult.nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,

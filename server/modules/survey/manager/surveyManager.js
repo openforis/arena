@@ -13,6 +13,7 @@ import { SortOrder } from '@core/sortOrder'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as SurveyValidator from '@core/survey/surveyValidator'
@@ -588,32 +589,46 @@ export const updateSurveyProps = async (user, surveyId, props, client = db) =>
     for (const fileUuid of SurveyBranding.getBrandingFileUuids(branding)) {
       await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
     }
+    for (const fileUuid of SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfoUpdated)) {
+      await SurveyFileManager.clearFileTemporaryFlag(surveyId, fileUuid, t) // NOSONAR
+    }
     await SurveyFileManager.deleteTemporaryFiles(surveyId, t)
 
     return surveyUpdated
   })
 
+const deleteUnusedSurveyFilesByType = async ({ surveyId, type, usedFileUuids }, client) => {
+  const fileSummaries = await SurveyFileManager.fetchFileSummariesByType({ surveyId, type }, client)
+  const fileSummariesToDelete = fileSummaries.filter(
+    (fileSummary) => !usedFileUuids.has(SurveyFile.getUuid(fileSummary))
+  )
+  if (fileSummariesToDelete.length > 0) {
+    await SurveyFileManager.deleteFilesAndContent({ surveyId, fileSummaries: fileSummariesToDelete }, client)
+    Logger.debug(`Deleted ${fileSummariesToDelete.length} unused ${type} files of survey ${surveyId}`)
+  }
+}
+
 export const deleteUnusedSurveyFiles = async (surveyId, client = db) => {
   const survey = await fetchSurveyById({ surveyId, draft: true }, client)
   const surveyInfo = Survey.getSurveyInfo(survey)
   const preloadedMapLayers = Survey.getPreloadedMapLayers(surveyInfo)
-  const preloadedMapLayerFileUuids = new Set(preloadedMapLayers.map(SurveyFile.getUuid))
-  const preloadedMapLayerFileSummaries = await SurveyFileManager.fetchFileSummariesByType(
-    { surveyId, type: SurveyFile.SurveyFileType.preloadedMapLayer },
+  await deleteUnusedSurveyFilesByType(
+    {
+      surveyId,
+      type: SurveyFile.SurveyFileType.preloadedMapLayer,
+      usedFileUuids: new Set(preloadedMapLayers.map(SurveyFile.getUuid)),
+    },
     client
   )
-  const preloadedMapLayerFileSummariesToDelete = preloadedMapLayerFileSummaries.filter(
-    (fileSummary) => !preloadedMapLayerFileUuids.has(SurveyFile.getUuid(fileSummary))
+  // an area of interest file is replaced (not updated) when a new one is uploaded
+  await deleteUnusedSurveyFilesByType(
+    {
+      surveyId,
+      type: SurveyFile.SurveyFileType.areaOfInterest,
+      usedFileUuids: new Set(SurveyAreaOfInterest.getAreaOfInterestFileUuids(surveyInfo)),
+    },
+    client
   )
-  if (preloadedMapLayerFileSummariesToDelete.length > 0) {
-    await SurveyFileManager.deleteFilesAndContent(
-      { surveyId, fileSummaries: preloadedMapLayerFileSummariesToDelete },
-      client
-    )
-    Logger.debug(
-      `Deleted ${preloadedMapLayerFileSummariesToDelete.length} unused preloaded map layer files of survey ${surveyId}`
-    )
-  }
 }
 
 export const publishSurveyProps = async (surveyId, langsDeleted, client = db) =>

@@ -172,6 +172,13 @@ export default {
     cycleDateEndInvalid: 'Cycle end date is invalid',
     cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
     fieldManualLinksInvalid: 'Field manual link is invalid',
+    areaOfInterestInvalid: 'Area of interest must be a polygon in GeoJSON format with WGS84 coordinates',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'File is required',
+    nameDuplicate: 'Another area of interest with the same name already exists',
+    nameRequired: 'Name is required',
   },
 
   surveyPreloadedMapLayer: {

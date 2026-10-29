@@ -114,6 +114,7 @@ As alterações são salvas como rascunho: chegarão aos registros somente quand
     brandingSurveyLogo2: 'Logotipo do inventário 2',
     brandingSurveyLogo3: 'Logotipo do inventário 3',
     brandingLandingBackground: 'Fundo da página inicial',
+    areaOfInterest: 'Área de interesse',
   },
   cycle: 'ciclo {{cycle}}',
   property: 'Propriedade',

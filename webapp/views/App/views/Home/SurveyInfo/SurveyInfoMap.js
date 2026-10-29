@@ -8,15 +8,19 @@ import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SamplingPolygonEditor from './SamplingPolygonEditor'
+import { AreasOfInterestEditor } from './AreasOfInterestEditor'
 import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
 export const SurveyInfoMap = (props) => {
   const {
+    areasOfInterest,
+    canUseAnalysis = false,
     preloadedMapLayers,
     preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     getFieldValidation,
+    setAreasOfInterest,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
     setPreloadedMapLayersEnabled,
@@ -28,14 +32,16 @@ export const SurveyInfoMap = (props) => {
 
   return (
     <div className="survey-info__map">
-      <Checkbox
-        checked={sampleBasedImageInterpretationEnabled}
-        disabled={readOnly}
-        label="homeView:surveyInfo.sampleBasedImageInterpretationEnabled"
-        onChange={setSampleBasedImageInterpretationEnabled}
-        validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
-      />
-      {sampleBasedImageInterpretationEnabled && (
+      {canUseAnalysis && (
+        <Checkbox
+          checked={sampleBasedImageInterpretationEnabled}
+          disabled={readOnly}
+          label="homeView:surveyInfo.sampleBasedImageInterpretationEnabled"
+          onChange={setSampleBasedImageInterpretationEnabled}
+          validation={getFieldValidation(Survey.infoKeys.sampleBasedImageInterpretationEnabled)}
+        />
+      )}
+      {canUseAnalysis && sampleBasedImageInterpretationEnabled && (
         <SamplingPolygonEditor
           samplingPolygon={samplingPolygon}
           setSamplingPolygon={setSamplingPolygon}
@@ -43,6 +49,11 @@ export const SurveyInfoMap = (props) => {
           readOnly={readOnly}
         />
       )}
+      <AreasOfInterestEditor
+        areasOfInterest={areasOfInterest}
+        readOnly={readOnly}
+        setAreasOfInterest={setAreasOfInterest}
+      />
       {experimentalFeatures && (
         <>
           <Checkbox
@@ -66,6 +77,9 @@ export const SurveyInfoMap = (props) => {
 }
 
 SurveyInfoMap.propTypes = {
+  areasOfInterest: PropTypes.array,
+  canUseAnalysis: PropTypes.bool,
+  setAreasOfInterest: PropTypes.func.isRequired,
   getFieldValidation: PropTypes.func.isRequired,
   sampleBasedImageInterpretationEnabled: PropTypes.bool,
   samplingPolygon: PropTypes.object,

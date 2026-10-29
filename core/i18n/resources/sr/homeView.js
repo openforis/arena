@@ -138,6 +138,19 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
     map: 'Mapa',
     viewInfo: 'Prikaži informacije',
 
+    areasOfInterest: {
+      title: 'Područja od interesa',
+      info: 'Poligoni (GeoJSON, WGS84 koordinate) koje koriste funkcije izraza geoDistanceToAOIBoundary (udaljenost do granice područja) i geoAOIContaining (područje koje sadrži lokaciju), i oflajn u Arena Mobile. Naziv područja se koristi u izrazima.',
+      name: 'Naziv',
+      polygons: 'Poligoni',
+      vertices: 'Temena',
+      invalidFile: 'Datoteka ne sadrži važeći poligon u GeoJSON formatu sa WGS84 koordinatama',
+      confirmDelete: 'Da li ste sigurni da želite da obrišete ovo područje od interesa?',
+      editor: {
+        title: 'Područje od interesa',
+      },
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Unaprijed učitani slojevi mape su omogućeni',
       title: 'Unaprijed učitani slojevi mape',

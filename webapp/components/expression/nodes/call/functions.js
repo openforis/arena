@@ -4,6 +4,8 @@ import { CallCategoryItemPropEditor } from './callCategoryItemPropEditor'
 import { CallCountEditor } from './callCountEditor'
 import { CallDateTimeDiffEditor } from './callDateTimeDiffEditor'
 import { CallGeoDistanceEditor } from './callGeoDistanceEditor'
+import { CallGeoAOIContainingEditor } from './callGeoAOIContainingEditor'
+import { CallGeoDistanceToAOIBoundaryEditor } from './callGeoDistanceToAOIBoundaryEditor'
 import { CallGeoCoordinateAtDistanceEditor } from './callGeoCoordinateAtDistanceEditor'
 import { CallIncludesEditor } from './callIncludesEditor'
 import { CallIsEmptyEditor } from './callIsEmptyEditor'
@@ -39,6 +41,10 @@ export const functions = {
     label: 'distance(...)',
     component: CallGeoDistanceEditor,
   },
+  [functionNames.geoAOIContaining]: {
+    label: 'geoAOIContaining(...)',
+    component: CallGeoAOIContainingEditor,
+  },
   [functionNames.geoCoordinateAtDistance]: {
     label: 'geoCoordinateAtDistance(...)',
     component: CallGeoCoordinateAtDistanceEditor,
@@ -46,6 +52,10 @@ export const functions = {
   [functionNames.geoDistance]: {
     label: 'geoDistance(...)',
     component: CallGeoDistanceEditor,
+  },
+  [functionNames.geoDistanceToAOIBoundary]: {
+    label: 'geoDistanceToAOIBoundary(...)',
+    component: CallGeoDistanceToAOIBoundaryEditor,
   },
   [functionNames.includes]: {
     label: 'includes(...)',

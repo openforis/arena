@@ -110,6 +110,7 @@ export default {
     brandingSurveyLogo2: 'Логотип опроса 2',
     brandingSurveyLogo3: 'Логотип опроса 3',
     brandingLandingBackground: 'Фон стартовой страницы',
+    areaOfInterest: 'Область интереса',
   },
   cycle: 'цикл {{cycle}}',
   property: 'Свойство',

@@ -24,6 +24,8 @@ export const keys = {
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
   // Props
+  // descriptors only: the geometries are stored as survey files
+  areasOfInterest: 'areasOfInterest',
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',
@@ -142,6 +144,7 @@ export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonAppl
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
 )
+
 export const getSamplingPolygon = (surveyInfo) => {
   const samplingPolygon = ObjectUtils.getProp(keys.samplingPolygon, {})(surveyInfo) as object
   return { ...SamplingPolygon.getSamplingPolygonDefaults(), ...samplingPolygon }
