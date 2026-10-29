@@ -139,6 +139,7 @@ export const init = (app) => {
   app.get('/surveys/export/download', AuthMiddleware.requireCanExportSurveysList, async (req, res, next) => {
     try {
       const { tempFileName, fileFormat } = Request.getParams(req)
+      FileUtils.checkIsValidTempFileName(tempFileName)
       const exportedFilePath = FileUtils.tempFilePath(tempFileName)
       const date = DateUtils.nowFormatDefault()
       const name = `arena_surveys_${date}.xlsx`

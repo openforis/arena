@@ -6,6 +6,7 @@ import * as Chain from '@common/analysis/chain'
 import * as A from '@core/arena'
 
 import * as DB from '@server/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 export const transformCallback = (row) => {
   if (!row) return {}
@@ -47,9 +48,9 @@ export const fetchChains = async (params, client = DB.client) => {
   return client.map(
     `${tableChain.getSelect({ surveyId, includeScript })}
     ORDER BY ${tableChain.columnDateCreated} DESC
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    [],
+    LIMIT $1
+    OFFSET $2`,
+    [DbUtils.normalizeLimit(limit), DbUtils.normalizeOffset(offset)],
     transformCallback
   )
 }
@@ -70,5 +71,5 @@ export const fetchChain = async (params, client = DB.client) => {
 
   const tableChain = new TableChain(surveyId)
 
-  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), [chainUuid], transformCallback)
+  return client.oneOrNone(tableChain.getSelect({ chainUuid, includeScript }), { chainUuid }, transformCallback)
 }

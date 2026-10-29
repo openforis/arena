@@ -21,12 +21,16 @@ export const addSortCriteria = (sortCriteria) => (sort) => [...sort, sortCriteri
 export const deleteSortCriteria = (idx) => (sort) => sort.filter((sortCriteria, i) => i !== idx)
 
 // ====== SQL utils
+// the sort comes from the client: never put its order value into the SQL as it is
+const _getSqlOrder = (sortCriteria) =>
+  String(SortCriteria.getOrder(sortCriteria)).toLowerCase() === SortCriteria.orders.desc ? 'DESC' : 'ASC'
+
 export const toSql = (sort) =>
   sort.reduce(
     (accumulator, sortCriteria, idx) => {
       const paramName = `sort_${idx}`
       return {
-        clause: `${accumulator.clause}${idx ? ', ' : ''} $/${paramName}:name/ ${SortCriteria.getOrder(sortCriteria)}`,
+        clause: `${accumulator.clause}${idx ? ', ' : ''} $/${paramName}:name/ ${_getSqlOrder(sortCriteria)}`,
         params: { ...accumulator.params, [paramName]: SortCriteria.getVariable(sortCriteria) },
       }
     },

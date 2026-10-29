@@ -24,8 +24,11 @@ const stdlib2sql: Record<string, string | ((param: string) => string)> = {
   '!': (param) => `NOT (${param})`,
 }
 
+// unary operators allowed in SQL (the expression can come from the client: any other operator is rejected)
 const operatorToSql: Record<string, string | ((param: string) => string)> = {
   '!': (param) => `NOT(${param})`,
+  '-': '-',
+  '+': '+',
 }
 
 const logicalOrTemplate = `CASE
@@ -33,6 +36,10 @@ const logicalOrTemplate = `CASE
   THEN NULL
   ELSE coalesce({left}, false) OR coalesce({right}, false)
 END`
+
+// own properties only: keys like "constructor" must not resolve to Object.prototype members
+const _getOwn = <T>(record: Record<string, T>, key: unknown): T | null =>
+  typeof key === 'string' && Object.hasOwn(record, key) ? record[key] : null
 
 const getParamNameNext = (params: SqlParams): string => `_${Object.keys(params).length}`
 
@@ -42,7 +49,7 @@ export const binary = (node: Record<string, unknown>, params: SqlParams): SqlRes
   const { operator, left, right } = node
   const { clause: clauseLeft, params: paramsLeft } = _toSql!(left as Record<string, unknown>, params)
   const { clause: clauseRight, params: paramsRight } = _toSql!(right as Record<string, unknown>, paramsLeft)
-  const sqlOperator = operators.js2sqlOperators[operator as string]
+  const sqlOperator = _getOwn(operators.js2sqlOperators, operator)
 
   if (!sqlOperator) {
     throw new SystemError('undefinedFunction', { fnName: operator })
@@ -73,7 +80,10 @@ export const sequence = (node: Record<string, unknown>, params: SqlParams): SqlR
 export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const { clause: clauseArguments, params: paramsUnary } = _toSql!(node.argument as Record<string, unknown>, params)
   const { operator } = node
-  const sqlOperator = operatorToSql[operator as string] ?? (operator as string)
+  const sqlOperator = _getOwn(operatorToSql, operator)
+  if (!sqlOperator) {
+    throw new SystemError('undefinedFunction', { fnName: operator })
+  }
   const clause = typeof sqlOperator === 'string' ? `${sqlOperator} ${clauseArguments}` : sqlOperator(clauseArguments)
   return {
     clause,
@@ -139,7 +149,7 @@ export const call = (node: Record<string, unknown>, params: SqlParams): SqlResul
   const { callee, arguments: argumentsNode } = node
   const calleeNode = callee as Record<string, unknown>
   const name = (calleeNode.name ?? calleeNode.value) as string // callee can be literal or identifier
-  const sqlFnNameOrFn = stdlib2sql[name]
+  const sqlFnNameOrFn = _getOwn(stdlib2sql, name)
   if (!sqlFnNameOrFn) {
     throw new SystemError('undefinedFunction', { name })
   }
@@ -175,7 +185,7 @@ const functionsByType: Record<string, (node: Record<string, unknown>, params: Sq
 
 _toSql = (expression: Record<string, unknown>, params: SqlParams = {}): SqlResult => {
   const { type } = expression
-  const fn = functionsByType[expression.type as string]
+  const fn = _getOwn(functionsByType, expression.type)
   if (!fn) {
     throw new SystemError('appErrors:undefinedExpressionType', { type })
   }
