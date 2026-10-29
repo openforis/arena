@@ -32,8 +32,10 @@ export default {
     geoCoordinateAtDistance:
       'Returns the coordinates at a specified distance and bearing from the specified coordinates',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoAOIContaining:
+      'Returns the name of the first area of interest of the survey (in the order defined in Survey info → Map) containing the specified coordinate, or nothing if no area contains it',
     geoDistanceToAOIBoundary:
-      'Returns the distance (in meters) between a coordinate and the boundary of the survey area of interest: negative inside the area, positive outside',
+      'Returns the distance (in meters) between a coordinate and the boundary of the specified area of interest of the survey: negative inside the area, positive outside',
     geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
     includes: 'Returns true if the specified multiple attribute includes the specified value.',
     index: 'Returns the index of the specified node among its siblings',

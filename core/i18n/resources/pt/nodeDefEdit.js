@@ -32,8 +32,10 @@ export default {
     geoCoordinateAtDistance:
       'Retorna as coordenadas a uma distância e direção especificadas a partir das coordenadas informadas',
     geoDistance: '$t(nodeDefEdit:functionDescriptions.distance)',
+    geoAOIContaining:
+      'Retorna o nome da primeira área de interesse do inquérito (na ordem definida em Informações do inquérito → Mapa) que contém a coordenada especificada, ou nada se nenhuma área a contiver',
     geoDistanceToAOIBoundary:
-      'Retorna a distância (em metros) entre uma coordenada e o limite da área de interesse do inquérito: negativa dentro da área, positiva fora',
+      'Retorna a distância (em metros) entre uma coordenada e o limite da área de interesse especificada do inquérito: negativa dentro da área, positiva fora',
     geoPolygon: 'Gera um polígono em GeoJSON a partir de uma lista de coordenadas',
     includes: 'Retorna verdadeiro se o atributo múltiplo especificado inclui o valor informado.',
     index: 'Retorna o índice do nó especificado entre seus irmãos',

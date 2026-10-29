@@ -854,6 +854,8 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'Nema dodatih stavki',
   },
   expression: {
+    areaOfInterestNotFound:
+      'Područje od interesa "{{name}}" nije pronađeno: definišite ga u Informacije o istraživanju → Mapa',
     functionHasTooFewArguments:
       'Funkcija {{fnName}} zahtijeva najmanje {{minArity}} argumenata (proslijeđeno: {{numArgs}})',
     functionHasTooManyArguments:
@@ -1126,9 +1128,10 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
       distanceAttribute: 'Atribut udaljenosti',
       bearingAttribute: 'Atribut azimuta',
     },
-    geoDistanceToAOIBoundaryEditor: {
-      areaOfInterestNotDefined:
-        'Područje od interesa istraživanja još nije definisano: definišite ga u Informacije o istraživanju → Mapa',
+    areaOfInterestEditor: {
+      areaOfInterest: 'Područje od interesa',
+      areasOfInterestNotDefined:
+        'Područja od interesa još nisu definisana: definišite ih u Informacije o istraživanju → Mapa',
     },
     coordinateAttribute: 'Atribut koordinate',
     coordinateAttributeWithPosition: 'Atribut koordinate {{position}}',

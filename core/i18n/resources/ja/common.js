@@ -832,6 +832,7 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: '項目が追加されていません',
   },
   expression: {
+    areaOfInterestNotFound: '関心領域「{{name}}」が見つかりません：調査情報 → 地図 で定義してください',
     functionHasTooFewArguments:
       '関数{{fnName}}には少なくとも{{minArity}}個の引数が必要です（{{numArgs}}個指定されました）',
     functionHasTooManyArguments:
@@ -1105,8 +1106,9 @@ $t(common.cantUndoWarning)`,
       distanceAttribute: '距離属性',
       bearingAttribute: '方位属性',
     },
-    geoDistanceToAOIBoundaryEditor: {
-      areaOfInterestNotDefined: '調査の関心領域はまだ定義されていません：調査情報 → 地図 で定義してください',
+    areaOfInterestEditor: {
+      areaOfInterest: '関心領域',
+      areasOfInterestNotDefined: '関心領域はまだ定義されていません：調査情報 → 地図 で定義してください',
     },
     coordinateAttribute: '座標属性',
     coordinateAttributeWithPosition: '座標属性{{position}}',

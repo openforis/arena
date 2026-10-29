@@ -5,6 +5,7 @@ export const functionNames = {
   dateTimeDiff: 'dateTimeDiff',
   distance: 'distance',
   first: 'first',
+  geoAOIContaining: 'geoAOIContaining',
   geoCoordinateAtDistance: 'geoCoordinateAtDistance',
   geoDistance: 'geoDistance',
   geoDistanceToAOIBoundary: 'geoDistanceToAOIBoundary',

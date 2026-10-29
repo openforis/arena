@@ -843,6 +843,8 @@ $t(common.cantUndoWarning)`,
     noItemsAdded: 'Нет добавленных элементов',
   },
   expression: {
+    areaOfInterestNotFound:
+      'Область интереса «{{name}}» не найдена: задайте её в разделе «Информация об обследовании» → «Карта»',
     functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} аргументов (получено {{numArgs}})',
     functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} аргументов (получено {{numArgs}})',
     identifierNotFound: 'Атрибут или сущность "{{name}}" не найдены',
@@ -1116,9 +1118,10 @@ $t(common.cantUndoWarning)`,
       bearingAttribute: 'Атрибут азимута',
     },
 
-    geoDistanceToAOIBoundaryEditor: {
-      areaOfInterestNotDefined:
-        'Область интереса обследования ещё не определена: задайте её в разделе «Информация об обследовании» → «Карта»',
+    areaOfInterestEditor: {
+      areaOfInterest: 'Область интереса',
+      areasOfInterestNotDefined:
+        'Области интереса ещё не определены: задайте их в разделе «Информация об обследовании» → «Карта»',
     },
     coordinateAttribute: 'Атрибут координат',
     coordinateAttributeWithPosition: 'Атрибут координат {{position}}',

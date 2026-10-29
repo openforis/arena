@@ -750,6 +750,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     noItemsAdded: 'No se añadieron elementos',
   },
   expression: {
+    areaOfInterestNotFound: 'Área de interés "{{name}}" no encontrada: defínala en Información de la encuesta → Mapa',
     functionHasTooFewArguments:
       'La función {{fnName}} requiere al menos {{minArity}} argumentos (se obtuvieron {{numArgs}})',
     functionHasTooManyArguments:
@@ -999,9 +1000,10 @@ $t(common.appNameFull)
       distanceAttribute: 'Atributo de distancia',
       bearingAttribute: 'Atributo de rumbo',
     },
-    geoDistanceToAOIBoundaryEditor: {
-      areaOfInterestNotDefined:
-        'El área de interés de la encuesta aún no está definida: defínala en Información de la encuesta → Mapa',
+    areaOfInterestEditor: {
+      areaOfInterest: 'Área de interés',
+      areasOfInterestNotDefined:
+        'Aún no hay áreas de interés definidas: defínalas en Información de la encuesta → Mapa',
     },
     coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
