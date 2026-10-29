@@ -206,9 +206,13 @@ export const fetchUsers = async (
 ) =>
   client.map(
     `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    { search: DbUtils.prepareParameterForFilter(search) },
+    LIMIT $/limit/
+    OFFSET $/offset/`,
+    {
+      search: DbUtils.prepareParameterForFilter(search),
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
+    },
     camelize
   )
 
@@ -246,9 +250,9 @@ export const fetchUsersBySurveyId = async (
       ON us.user_uuid = u.uuid
     GROUP BY u.uuid, g.name, ui.invited_by, ui.invited_date, us.last_login_time
     ORDER BY u.name
-    LIMIT ${limit || 'ALL'}
-    OFFSET ${offset}`,
-    [surveyId],
+    LIMIT $2
+    OFFSET $3`,
+    [surveyId, DbUtils.normalizeLimit(limit), DbUtils.normalizeOffset(offset)],
     camelize
   )
 

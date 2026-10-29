@@ -4,6 +4,7 @@ import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import { db } from '@server/db/db'
@@ -190,6 +191,26 @@ export const prepareParameterForFilter = (value, filterType = filterTypes.includ
     default:
       return `${value}%`
   }
+}
+
+/**
+ * Normalizes a LIMIT query parameter (it can come from the request).
+ * @param {any} limit - The limit value.
+ * @returns {number|null} - The limit as a positive integer, or null (LIMIT NULL = LIMIT ALL) if not valid.
+ */
+export const normalizeLimit = (limit) => {
+  const limitNumber = NumberUtils.toNumber(limit)
+  return Number.isInteger(limitNumber) && limitNumber > 0 ? limitNumber : null
+}
+
+/**
+ * Normalizes an OFFSET query parameter (it can come from the request).
+ * @param {any} offset - The offset value.
+ * @returns {number} - The offset as a non-negative integer, or 0 if not valid.
+ */
+export const normalizeOffset = (offset) => {
+  const offsetNumber = NumberUtils.toNumber(offset)
+  return Number.isInteger(offsetNumber) && offsetNumber > 0 ? offsetNumber : 0
 }
 
 export const formatQuery = pgp.as.format
