@@ -13,6 +13,7 @@ import { useUser } from '@webapp/store/user'
 
 import { getAvailableSpaceBytes } from '@webapp/components/MapContainer/workspace/screenshot/screenshotChecks'
 import {
+  buildRowAttributeNode,
   buildScreenshotFileValue,
   buildScreenshotNodeChange,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
@@ -42,23 +43,34 @@ export type ScreenshotSaveRequest = {
 export type ScreenshotReplacePrompt = { fileName: string } | null
 
 /**
- * Builds the node change function of a save request.
+ * Builds the node change functions of a save request; both use the same file value.
  * @param {ScreenshotSaveRequest} request - The save request.
- * @returns {Function} Builds the change from the fetched record.
+ * @returns {object} buildChange (from the fetched record) and buildRowAttribute (after a new entity row is created).
  */
-const createChangeBuilder =
-  ({ plot, attribute, blob, fileName }: ScreenshotSaveRequest) =>
-  (record: unknown) =>
-    buildScreenshotNodeChange({
-      nodes: Record.getNodesArray(record),
-      recordUuid: plot.recordUuid,
-      parentUuid: plot.parentUuid,
-      entityDefUuid: plot.entityDefUuid,
-      attributeDefUuid: attribute.uuid,
-      attributeParentDefUuid: attribute.parentUuid,
-      attributeMultiple: attribute.multiple,
-      value: buildScreenshotFileValue({ fileUuid: uuidv4(), fileName, fileSize: blob.size }),
-    })
+const createChangeBuilders = ({
+  plot,
+  attribute,
+  blob,
+  fileName,
+}: ScreenshotSaveRequest): Pick<ScreenshotSaveDeps, 'buildChange' | 'buildRowAttribute'> => {
+  const value = buildScreenshotFileValue({ fileUuid: uuidv4(), fileName, fileSize: blob.size })
+  return {
+    buildChange: (record) =>
+      buildScreenshotNodeChange({
+        nodes: Record.getNodesArray(record),
+        recordUuid: plot.recordUuid,
+        parentUuid: plot.parentUuid,
+        entityDefUuid: plot.entityDefUuid,
+        attributeDefUuid: attribute.uuid,
+        attributeParentDefUuid: attribute.parentUuid,
+        attributeMultiple: attribute.multiple,
+        rowParentDefUuid: attribute.rowParentDefUuid,
+        value,
+      }),
+    buildRowAttribute: (rowNode, updatedNodes) =>
+      buildRowAttributeNode({ updatedNodes, rowNode, attributeDefUuid: attribute.uuid, value }),
+  }
+}
 
 /**
  * Saves screenshots in plot records; the replace confirmation is shown inside the dialog (works in full screen).
@@ -111,7 +123,7 @@ export const useScreenshotSave = (): {
         fetchRecord: createRecordFetcher({ surveyId }),
         canEditRecord: (record) =>
           Survey.isPublished(surveyInfo) && Authorizer.canEditRecord(user as ArenaUser, record as ArenaRecord),
-        buildChange: createChangeBuilder(request),
+        ...createChangeBuilders(request),
         confirmReplace,
         subscribe: subscribeToNodeSaveEvents,
         postNode: createNodePoster({ surveyId, lang, fallbackCycle: cycle }),

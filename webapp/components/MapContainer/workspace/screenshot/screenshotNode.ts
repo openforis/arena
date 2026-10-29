@@ -10,13 +10,14 @@ export type ScreenshotNodeChangeInput = {
   attributeDefUuid: string
   attributeParentDefUuid: string
   attributeMultiple: boolean
+  rowParentDefUuid?: string | null // the attribute is in a multiple entity: a new row is created under this entity
   value: ScreenshotFileValue
 }
 
 export type ScreenshotNodeChange = {
   ok: boolean
   errorKey?: 'plotNotFound'
-  kind?: 'create' | 'update'
+  kind?: 'create' | 'update' | 'createRow' // createRow: node is the new entity row, sent first without the file
   node?: any
   replacedFileName?: string | null
 }
@@ -98,7 +99,8 @@ const findAttributeParentNode = ({
 }
 
 /**
- * Builds the node to send: an update of the existing single attribute, or a new attribute node.
+ * Builds the node to send: an update of the existing single attribute, a new attribute node, or a new entity row
+ * when the attribute is in a multiple entity (see buildRowAttributeNode for the second step).
  * @param {ScreenshotNodeChangeInput} input - The record nodes, the plot and the attribute.
  * @returns {ScreenshotNodeChange} The change, or an error key when the plot is not in the record.
  */
@@ -111,10 +113,17 @@ export const buildScreenshotNodeChange = (input: ScreenshotNodeChangeInput): Scr
     attributeDefUuid,
     attributeParentDefUuid,
     attributeMultiple,
+    rowParentDefUuid = null,
     value,
   } = input
   const nodesByUuid = new Map(nodes.map((node) => [Node.getUuid(node), node]))
   const plotNode = findSelfOrAncestorOfDef({ nodesByUuid, startUuid: parentUuid, nodeDefUuid: entityDefUuid })
+  if (plotNode && rowParentDefUuid) {
+    const rowParentNode = findAttributeParentNode({ nodes, plotNode, attributeParentDefUuid: rowParentDefUuid })
+    if (!rowParentNode) return { ok: false, errorKey: 'plotNotFound' }
+    const row = Node.newNode(attributeParentDefUuid, recordUuid, rowParentNode)
+    return { ok: true, kind: 'createRow', node: row, replacedFileName: null }
+  }
   const parentNode = plotNode ? findAttributeParentNode({ nodes, plotNode, attributeParentDefUuid }) : null
   if (!parentNode) return { ok: false, errorKey: 'plotNotFound' }
 
@@ -142,14 +151,45 @@ export const buildScreenshotNodeChange = (input: ScreenshotNodeChangeInput): Scr
 }
 
 /**
+ * Builds the attribute node of a new entity row: the empty attribute the server created with the row gets the file,
+ * else (multiple attribute) a new attribute node is created in the row.
+ * @param {object} params - The parameters.
+ * @param {Record<string, any>} params.updatedNodes - Nodes the server sent back after creating the row.
+ * @param {object} params.rowNode - The new entity row.
+ * @param {string} params.attributeDefUuid - The image attribute definition.
+ * @param {ScreenshotFileValue} params.value - The file value.
+ * @returns {object} The attribute node to send with the file.
+ */
+export const buildRowAttributeNode = ({
+  updatedNodes,
+  rowNode,
+  attributeDefUuid,
+  value,
+}: {
+  updatedNodes: Record<string, any>
+  rowNode: any
+  attributeDefUuid: string
+  value: ScreenshotFileValue
+}): any => {
+  const rowUuid = Node.getUuid(rowNode)
+  const created = Object.values(updatedNodes).find(
+    (node) =>
+      Node.getNodeDefUuid(node) === attributeDefUuid && Node.getParentUuid(node) === rowUuid && !Node.getFileUuid(node)
+  )
+  return created
+    ? { ...created, [Node.keys.value]: value }
+    : Node.newNode(attributeDefUuid, Node.getRecordUuid(rowNode), rowNode, value)
+}
+
+/**
  * Builds the multipart fields of POST /api/survey/:surveyId/record/:recordUuid/node.
  * @param {object} params - The parameters.
  * @param {object} params.node - The node to persist.
  * @param {string} params.cycle - The record cycle.
  * @param {number} params.timezoneOffset - The browser time zone offset (Dates.getTimezoneOffset()).
  * @param {string} params.lang - The UI language.
- * @param {Blob} params.file - The PNG.
- * @param {string} params.fileName - The file name.
+ * @param {Blob|null} [params.file] - The image (none for a new entity row).
+ * @param {string} [params.fileName] - The file name.
  * @returns {Array<NodePersistField>} The fields, in order.
  */
 export const buildNodePersistFields = ({
@@ -164,15 +204,15 @@ export const buildNodePersistFields = ({
   cycle: string
   timezoneOffset: number
   lang: string
-  file: Blob
-  fileName: string
+  file?: Blob | null
+  fileName?: string
 }): NodePersistField[] => [
   { name: 'node', value: JSON.stringify(node) },
   { name: 'cycle', value: String(cycle) },
   { name: 'draft', value: 'false' },
   { name: 'timezoneOffset', value: String(timezoneOffset) },
   { name: 'lang', value: lang },
-  { name: 'file', value: file, fileName },
+  ...(file ? [{ name: 'file', value: file, fileName: fileName ?? '' }] : []),
 ]
 
 /**

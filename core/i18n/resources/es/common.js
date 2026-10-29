@@ -716,7 +716,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       previewAlt: 'Vista previa de la captura del mapa',
       alsoDownload: 'Descargar también',
       downloadPng: 'Descargar PNG',
-      saveToPlot: 'Guardar en {{plot}}',
       saving: 'Guardando…',
       replace: 'Reemplazar',
       keep: 'Conservar la imagen actual',
@@ -725,6 +724,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         'Captura guardada en {{plot}} › {{attribute}}. Los equipos de campo la recibirán en su próxima descarga de registros.',
       savedPending: 'Captura enviada a {{plot}}. El registro aún se está actualizando: revíselo en un momento.',
       notices: {
+        mapHidden:
+          'El mapa está oculto en esta pantalla. Cierre el panel lateral o amplíe la ventana e inténtelo de nuevo.',
         tilesMissing: 'Teselas del mapa omitidas (su servidor no lo permite o no se cargaron): {{count}}',
         equalEarth: 'El mapa base Equal Earth no se puede capturar. Elija otro mapa base en el menú Mapa base.',
       },
@@ -736,6 +737,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         plotNotFound: 'No se encontró la parcela en el registro. Puede que se haya eliminado.',
         saveFailed: 'La captura no se guardó: {{details}}',
         fileNameRequired: 'Introduzca un nombre de archivo.',
+        rowNotConfirmed:
+          'La nueva fila para la imagen no se confirmó a tiempo, así que la captura no se guardó. Revise el registro antes de volver a intentarlo.',
       },
     },
   },

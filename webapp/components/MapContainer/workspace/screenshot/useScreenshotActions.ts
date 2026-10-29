@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 import { useI18n } from '@webapp/store/system'
 import { downloadBlobToFile } from '@webapp/utils/domUtils'
 
-import { ensurePngFileName } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
+import { ensureImageFileName } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
 import type {
   ScreenshotNotice,
   ScreenshotSaveOutcome,
@@ -67,7 +67,7 @@ const handleSaveOutcome = ({
  * Provides the dialog actions: download only, also download, save to the plot record.
  * @param {object} params - The parameters.
  * @param {ScreenshotDialogState} params.state - The dialog state.
- * @param {ScreenshotPreview} params.preview - The preview (the PNG).
+ * @param {ScreenshotPreview} params.preview - The preview (the image).
  * @param {Function} params.onClose - Closes the dialog (after "Download PNG").
  * @returns {object} The actions, the saving flag, the replace prompt, the inline error and the done notice.
  */
@@ -95,27 +95,27 @@ export const useScreenshotActions = ({
   const [actionError, setActionError] = useState<ScreenshotNotice | null>(null)
   const [done, setDone] = useState<ScreenshotDoneNotice | null>(null)
   const { blob } = preview
-  const { attribute, defaultFileName, fileName, plot } = state
+  const { attribute, defaultFileName, fileName, format, plot } = state
 
   const downloadOnly = useCallback(() => {
     if (!blob) return
-    downloadBlobToFile(blob, ensurePngFileName(defaultFileName))
+    downloadBlobToFile(blob, ensureImageFileName(defaultFileName, format.extension))
     onClose()
-  }, [blob, defaultFileName, onClose])
+  }, [blob, defaultFileName, format, onClose])
 
   const alsoDownload = useCallback(() => {
-    const name = ensurePngFileName(fileName)
+    const name = ensureImageFileName(fileName, format.extension)
     if (!name) {
       setActionError({ key: 'mapWorkspace.screenshot.errors.fileNameRequired', blocking: false })
       return
     }
     if (blob) downloadBlobToFile(blob, name)
-  }, [blob, fileName])
+  }, [blob, fileName, format])
 
   const clearActionError = useCallback(() => setActionError(null), [])
 
   const saveToRecord = useCallback(() => {
-    const name = ensurePngFileName(fileName)
+    const name = ensureImageFileName(fileName, format.extension)
     if (!name) {
       setActionError({ key: 'mapWorkspace.screenshot.errors.fileNameRequired', blocking: false })
       return
@@ -133,7 +133,7 @@ export const useScreenshotActions = ({
           i18n.exists(`appErrors:${details}`) ? i18n.t(`appErrors:${details}`) : details,
       })
     )
-  }, [attribute, blob, fileName, i18n, plot, save])
+  }, [attribute, blob, fileName, format, i18n, plot, save])
 
   return {
     downloadOnly,

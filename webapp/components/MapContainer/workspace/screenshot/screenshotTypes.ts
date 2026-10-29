@@ -2,6 +2,14 @@ export type ScreenshotCaptureMode = 'view' | 'plot'
 
 export type ScreenshotTarget = 'record' | 'file'
 
+export type ScreenshotFormat = { type: string; extension: string; quality?: number }
+
+// records get a JPEG: lighter for Arena Mobile and the attribute size limits; "Download only" keeps a lossless PNG
+export const SCREENSHOT_FORMATS: Record<ScreenshotTarget, ScreenshotFormat> = {
+  record: { type: 'image/jpeg', extension: '.jpg', quality: 0.85 },
+  file: { type: 'image/png', extension: '.png' },
+}
+
 export type ScreenshotOptions = {
   capture: ScreenshotCaptureMode
   includeData: boolean
@@ -29,6 +37,7 @@ export type ScreenshotImageAttributeOption = {
   label: string
   multiple: boolean
   maxFileSizeMb: number
+  rowParentDefUuid: string | null // set when the parent is a multiple entity: the image goes in a new row under it
 }
 
 export type ScreenshotNotice = {

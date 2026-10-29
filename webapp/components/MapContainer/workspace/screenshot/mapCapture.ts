@@ -17,6 +17,7 @@ export type MapCaptureResult = {
   failedImages: number
   center: LatLngLiteral
   zoom: number
+  atPlot: boolean // the map was centred on the plot (fit to plot)
 }
 
 const CAPTURE_BACKGROUND = '#dfe3e8'
@@ -39,6 +40,16 @@ export const hasMaplibreLayer = (map: L.Map): boolean => {
     if (typeof (layer as MaybeMaplibreLayer).getMaplibreMap === 'function') found = true
   })
   return found
+}
+
+/**
+ * Tells whether the map has no area to capture (e.g. squeezed to 0 px by the side panel on a phone).
+ * @param {L.Map} map - The map.
+ * @returns {boolean} True when the map container is 0 px wide or high.
+ */
+export const isMapHidden = (map: L.Map): boolean => {
+  const { clientWidth, clientHeight } = map.getContainer()
+  return clientWidth === 0 || clientHeight === 0
 }
 
 /**
@@ -112,7 +123,7 @@ export const captureMapView = async ({
       ),
     fetch: { placeholderImage: failures.placeholderImage },
   })
-  return { canvas, failedImages: failures.getCount(), center: { lat, lng }, zoom }
+  return { canvas, failedImages: failures.getCount(), center: { lat, lng }, zoom, atPlot: false }
 }
 
 /**
@@ -141,7 +152,7 @@ export const captureMapAtPlot = async ({
   const setCenter = map.getCenter()
   const setZoom = map.getZoom()
   try {
-    return await captureMapView({ map, includeData })
+    return { ...(await captureMapView({ map, includeData })), atPlot: true }
   } finally {
     // the user may have moved the map meanwhile (dialog closed during a slow capture): then leave it alone
     if (isMapAtCaptureView({ current: map.getCenter(), currentZoom: map.getZoom(), set: setCenter, setZoom })) {

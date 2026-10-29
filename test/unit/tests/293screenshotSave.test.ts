@@ -12,6 +12,7 @@ const input = { recordUuid, blob, fileName: 'cluster_2_2026-10-11.png', maxFileS
 
 const createChange = { ok: true, kind: 'create' as const, node: { uuid: 'node-new' }, replacedFileName: null }
 const updateChange = { ok: true, kind: 'update' as const, node: { uuid: 'node-old' }, replacedFileName: 'old.png' }
+const rowChange = { ok: true, kind: 'createRow' as const, node: { uuid: 'row-new' }, replacedFileName: null }
 
 const flush = (): Promise<void> => new Promise((resolve) => setImmediate(resolve))
 
@@ -41,6 +42,7 @@ const setup = () => {
     fetchRecord: jest.fn(async () => ({ uuid: recordUuid })),
     canEditRecord: jest.fn(() => true),
     buildChange: jest.fn(() => createChange),
+    buildRowAttribute: jest.fn(() => ({ uuid: 'row-photo' })),
     confirmReplace: jest.fn(async () => true),
     subscribe: jest.fn((handlers: NodeSaveHandlers) => {
       calls.push('subscribe')
@@ -250,7 +252,47 @@ describe('Screenshot save (293)', () => {
     socket.saved('node-1')
     socket.error({ recordUuid, key: 'late' })
     jest.runOnlyPendingTimers()
-    await expect(waiter.result).resolves.toEqual({ status: 'saved' })
+    await expect(waiter.result).resolves.toEqual({ status: 'saved', nodes: { 'node-1': {} } })
     expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
+  })
+
+  test('creates the entity row first, then sends the image in the attribute the server created in it', async () => {
+    const { deps, socket } = setup()
+    const rowNodes = { 'row-new': { uuid: 'row-new' }, 'row-photo': { uuid: 'row-photo' } }
+    deps.buildChange = jest.fn(() => rowChange)
+    deps.postNode = jest.fn(async ({ node }: { node: unknown }) => {
+      if ((node as { uuid: string }).uuid === 'row-new') {
+        socket.updated({ recordUuid, updatedNodes: rowNodes })
+        socket.completed({ recordUuid })
+      } else socket.saved('row-photo')
+    })
+    await expect(saveScreenshotToRecord(deps, input)).resolves.toEqual({ status: 'saved' })
+    expect(deps.buildRowAttribute).toHaveBeenCalledWith(rowChange.node, rowNodes)
+    expect(deps.postNode).toHaveBeenNthCalledWith(1, {
+      record: { uuid: recordUuid },
+      node: rowChange.node,
+      blob: undefined,
+      fileName: undefined,
+    })
+    expect(deps.postNode).toHaveBeenNthCalledWith(2, {
+      record: { uuid: recordUuid },
+      node: { uuid: 'row-photo' },
+      blob,
+      fileName: input.fileName,
+    })
+  })
+
+  test('does not send the image when the new entity row is not confirmed in time', async () => {
+    const { deps } = setup()
+    deps.buildChange = jest.fn(() => rowChange)
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    jest.runOnlyPendingTimers()
+    await expect(promise).resolves.toEqual({
+      status: 'error',
+      key: 'mapWorkspace.screenshot.errors.rowNotConfirmed',
+    })
+    expect(deps.postNode).toHaveBeenCalledTimes(1)
+    expect(deps.buildRowAttribute).not.toHaveBeenCalled()
   })
 })

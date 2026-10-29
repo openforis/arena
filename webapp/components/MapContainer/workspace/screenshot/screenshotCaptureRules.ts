@@ -125,15 +125,19 @@ export const createImageFailureCounter = (): { placeholderImage: () => string; g
  * @param {object} params - The parameters.
  * @param {number} params.failedImages - Number of images (tiles) left out.
  * @param {boolean} params.maplibre - Whether the base map is the MapLibre (WebGL) Equal Earth map.
+ * @param {boolean} [params.hidden] - Whether the map has no visible area (0 px wide or high).
  * @returns {ScreenshotNotice|null} The notice, or null when all went well.
  */
 export const getCaptureNotice = ({
   failedImages,
   maplibre,
+  hidden = false,
 }: {
   failedImages: number
   maplibre: boolean
+  hidden?: boolean
 }): ScreenshotNotice | null => {
+  if (hidden) return { key: 'mapWorkspace.screenshot.notices.mapHidden', blocking: true }
   if (maplibre) return { key: 'mapWorkspace.screenshot.notices.equalEarth', blocking: true }
   if (failedImages > 0) {
     return { key: 'mapWorkspace.screenshot.notices.tilesMissing', params: { count: failedImages }, blocking: false }

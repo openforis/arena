@@ -740,7 +740,6 @@ Réessayer ?`,
       previewAlt: 'Aperçu de la capture de la carte',
       alsoDownload: 'Télécharger aussi',
       downloadPng: 'Télécharger le PNG',
-      saveToPlot: 'Enregistrer dans {{plot}}',
       saving: 'Enregistrement…',
       replace: 'Remplacer',
       keep: 'Garder l’image actuelle',
@@ -750,6 +749,8 @@ Réessayer ?`,
       savedPending:
         'Capture envoyée à {{plot}}. L’enregistrement est encore en cours de mise à jour : vérifiez-le dans un instant.',
       notices: {
+        mapHidden:
+          'La carte est masquée sur cet écran. Fermez le panneau latéral ou agrandissez la fenêtre, puis réessayez.',
         tilesMissing:
           'Tuiles de carte omises (leur serveur ne le permet pas ou elles ne se sont pas chargées) : {{count}}',
         equalEarth:
@@ -763,6 +764,8 @@ Réessayer ?`,
         plotNotFound: 'La placette est introuvable dans l’enregistrement. Elle a peut-être été supprimée.',
         saveFailed: 'La capture n’a pas été enregistrée : {{details}}',
         fileNameRequired: 'Saisissez un nom de fichier.',
+        rowNotConfirmed:
+          'La nouvelle ligne pour l’image n’a pas été confirmée à temps : la capture n’a pas été enregistrée. Vérifiez l’enregistrement avant de réessayer.',
       },
     },
   },

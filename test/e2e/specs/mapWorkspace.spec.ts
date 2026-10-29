@@ -570,7 +570,7 @@ test.describe('Map screenshot', () => {
 
     const fileNameInput = page.getByTestId(ids.screenshotFileName)
     await expect(fileNameInput).toHaveValue(
-      new RegExp(String.raw`^${cluster.name}_${record.cluster_id}_\d{4}-\d{2}-\d{2}\.png$`)
+      new RegExp(String.raw`^${cluster.name}_${record.cluster_id}_\d{4}-\d{2}-\d{2}\.jpg$`)
     )
     const fileName = await fileNameInput.inputValue()
 

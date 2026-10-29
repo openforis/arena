@@ -735,7 +735,6 @@ export default {
       previewAlt: '地図のスクリーンショットのプレビュー',
       alsoDownload: 'ダウンロードもする',
       downloadPng: 'PNGをダウンロード',
-      saveToPlot: '{{plot}}に保存',
       saving: '保存しています…',
       replace: '置き換える',
       keep: '現在の画像を残す',
@@ -745,6 +744,8 @@ export default {
       savedPending:
         'スクリーンショットを{{plot}}に送信しました。記録はまだ更新中です。しばらくしてから確認してください。',
       notices: {
+        mapHidden:
+          'この画面では地図が隠れています。サイドパネルを閉じるかウィンドウを広げてから、もう一度お試しください。',
         tilesMissing: '省略された地図タイル（サーバーが許可していないか、読み込まれませんでした）：{{count}}',
         equalEarth:
           'Equal Earthのベースマップはキャプチャできません。ベースマップメニューで別のベースマップを選んでください。',
@@ -757,6 +758,8 @@ export default {
         plotNotFound: '記録にプロットが見つかりません。削除された可能性があります。',
         saveFailed: 'スクリーンショットは保存されませんでした：{{details}}',
         fileNameRequired: 'ファイル名を入力してください。',
+        rowNotConfirmed:
+          '画像用の新しい行が時間内に確認されなかったため、スクリーンショットは保存されませんでした。もう一度試す前に記録を確認してください。',
       },
     },
   },

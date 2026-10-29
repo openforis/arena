@@ -124,7 +124,6 @@ type ScreenshotDialogFooterProps = {
   canSave: boolean
   saving: boolean
   closeDisabled: boolean
-  plotLabel: string
   onCancel: () => void
   onAlsoDownload: () => void
   onSubmit: () => void
@@ -139,11 +138,12 @@ type ScreenshotDialogFooterProps = {
  */
 const getSubmitLabelKey = ({ toRecord, saving }: { toRecord: boolean; saving: boolean }): string => {
   if (!toRecord) return `${PREFIX}.downloadPng`
-  return saving ? `${PREFIX}.saving` : `${PREFIX}.saveToPlot`
+  // short: the plot is chosen just above, and its label can be long
+  return saving ? `${PREFIX}.saving` : 'common.save'
 }
 
 /**
- * Renders the dialog buttons: Cancel, Also download (attach only), Save to <plot> / Download PNG; only Close once saved.
+ * Renders the dialog buttons: Cancel, Also download (attach only), Save / Download PNG; only Close once saved.
  * @param {object} props - The props.
  * @param {boolean} props.done - Whether the image was saved (only Close is left).
  * @param {boolean} props.toRecord - Whether the image goes to a record.
@@ -151,7 +151,6 @@ const getSubmitLabelKey = ({ toRecord, saving }: { toRecord: boolean; saving: bo
  * @param {boolean} props.canSave - Whether saving is possible.
  * @param {boolean} props.saving - Whether a save is running.
  * @param {boolean} props.closeDisabled - Whether Cancel is disabled (saving without a prompt).
- * @param {string} props.plotLabel - Label of the selected plot.
  * @param {Function} props.onCancel - Closes the dialog.
  * @param {Function} props.onAlsoDownload - Downloads the PNG too.
  * @param {Function} props.onSubmit - Saves or downloads.
@@ -164,7 +163,6 @@ export const ScreenshotDialogFooter = ({
   canSave,
   saving,
   closeDisabled,
-  plotLabel,
   onCancel,
   onAlsoDownload,
   onSubmit,
@@ -202,7 +200,6 @@ export const ScreenshotDialogFooter = ({
       )}
       <Button
         label={getSubmitLabelKey({ toRecord, saving })}
-        labelParams={{ plot: plotLabel, ...PLAIN_TEXT }}
         variant="contained"
         primary
         testId={TestId.mapWorkspace.screenshotSubmit}

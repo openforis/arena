@@ -1,6 +1,6 @@
 import {
   buildScreenshotFileName,
-  ensurePngFileName,
+  ensureImageFileName,
   formatIsoDate,
   sanitizeFileNamePart,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
@@ -37,10 +37,19 @@ describe('Screenshot file name (285)', () => {
   })
 
   test('normalizes a typed file name', () => {
-    expect(ensurePngFileName(' site map.PNG ')).toBe('site_map.png')
-    expect(ensurePngFileName('a/b\\c')).toBe('a_b_c.png')
-    expect(ensurePngFileName('   ')).toBe('')
-    expect(ensurePngFileName('///')).toBe('')
+    expect(ensureImageFileName(' site map.PNG ')).toBe('site_map.png')
+    expect(ensureImageFileName('a/b\\c')).toBe('a_b_c.png')
+    expect(ensureImageFileName('   ')).toBe('')
+    expect(ensureImageFileName('///')).toBe('')
+  })
+
+  test('gives the name the extension of the image format, replacing a typed image extension', () => {
+    expect(ensureImageFileName('site map.png', '.jpg')).toBe('site_map.jpg')
+    expect(ensureImageFileName('site.JPEG', '.jpg')).toBe('site.jpg')
+    expect(ensureImageFileName('site.jpg')).toBe('site.png')
+    expect(buildScreenshotFileName({ entityName: 'plot', keys: ['4719', 'S'], date, extension: '.jpg' })).toBe(
+      'plot_4719_S_2026-10-11.jpg'
+    )
   })
 
   test('sanitizes a name part', () => {

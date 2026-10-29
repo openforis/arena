@@ -49,7 +49,7 @@ export const createRecordFetcher =
   }
 
 /**
- * Creates the function posting a node with its file to the node endpoint (the socket id header is added by the
+ * Creates the function posting a node, with its file if any, to the node endpoint (the socket id header is added by the
  * axios interceptor of appWebSocket).
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey id.
@@ -59,7 +59,17 @@ export const createRecordFetcher =
  */
 export const createNodePoster =
   ({ surveyId, lang, fallbackCycle }: { surveyId: number; lang: string; fallbackCycle: string }) =>
-  async ({ record, node, blob, fileName }: { record: unknown; node: unknown; blob: Blob; fileName: string }) => {
+  async ({
+    record,
+    node,
+    blob,
+    fileName,
+  }: {
+    record: unknown
+    node: unknown
+    blob?: Blob | null
+    fileName?: string
+  }) => {
     const fields = buildNodePersistFields({
       node,
       cycle: Record.getCycle(record) ?? fallbackCycle,

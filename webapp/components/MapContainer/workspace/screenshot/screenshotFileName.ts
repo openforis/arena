@@ -1,4 +1,5 @@
 const PNG_EXTENSION = '.png'
+const IMAGE_EXTENSION_REGEX = /\.(png|jpe?g)$/i
 const MAX_BASE_LENGTH = 100
 const DATE_SUFFIX_LENGTH = 11 // "_yyyy-mm-dd"
 const FALLBACK_BASE = 'map'
@@ -40,17 +41,16 @@ export const sanitizeFileNamePart = (text: string): string =>
 const cutCodePoints = (text: string, max: number): string => Array.from(text).slice(0, max).join('')
 
 /**
- * Normalizes a file name: sanitized, at most 100 characters before the extension, ending with ".png".
+ * Normalizes a file name: sanitized, at most 100 characters before the extension, ending with the extension (an image
+ * extension typed by the user is replaced).
  * @param {string} fileName - The file name, as typed by the user.
+ * @param {string} [extension] - The extension of the image format, e.g. ".jpg".
  * @returns {string} The normalized file name, or an empty string when nothing valid is left.
  */
-export const ensurePngFileName = (fileName: string): string => {
-  const trimmed = (fileName ?? '').trim()
-  const withoutExtension = trimmed.toLowerCase().endsWith(PNG_EXTENSION)
-    ? trimmed.slice(0, -PNG_EXTENSION.length)
-    : trimmed
+export const ensureImageFileName = (fileName: string, extension: string = PNG_EXTENSION): string => {
+  const withoutExtension = (fileName ?? '').trim().replace(IMAGE_EXTENSION_REGEX, '')
   const base = sanitizeFileNamePart(cutCodePoints(sanitizeFileNamePart(withoutExtension), MAX_BASE_LENGTH))
-  return base.length > 0 ? `${base}${PNG_EXTENSION}` : ''
+  return base.length > 0 ? `${base}${extension}` : ''
 }
 
 /**
@@ -59,20 +59,23 @@ export const ensurePngFileName = (fileName: string): string => {
  * @param {string|null} [params.entityName] - Name of the plot entity definition.
  * @param {Array<unknown>} [params.keys] - Key values of the plot.
  * @param {Date} params.date - Date of the screenshot.
+ * @param {string} [params.extension] - The extension of the image format.
  * @returns {string} The file name, e.g. "cluster_2_2026-10-11.png" or "map_2026-10-11.png".
  */
 export const buildScreenshotFileName = ({
   entityName = null,
   keys = [],
   date,
+  extension = PNG_EXTENSION,
 }: {
   entityName?: string | null
   keys?: unknown[]
   date: Date
+  extension?: string
 }): string => {
   const parts = [entityName ?? '', ...keys.map((key) => (key === null || key === undefined ? '' : String(key)))]
     .map(sanitizeFileNamePart)
     .filter((part) => part.length > 0)
   const prefix = parts.length > 0 ? cutCodePoints(parts.join('_'), MAX_BASE_LENGTH - DATE_SUFFIX_LENGTH) : FALLBACK_BASE
-  return ensurePngFileName(`${prefix}_${formatIsoDate(date)}`)
+  return ensureImageFileName(`${prefix}_${formatIsoDate(date)}`, extension)
 }

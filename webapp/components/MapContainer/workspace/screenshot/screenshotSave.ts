@@ -18,15 +18,21 @@ export type NodeSaveHandlers = {
 
 export type NodeSaveSubscribe = (handlers: NodeSaveHandlers) => () => void
 
-export type NodeSaveResult = { status: 'saved' | 'pending' | 'error'; details?: string }
+// nodes: all the nodes the server sent back for the record while waiting
+export type NodeSaveResult = {
+  status: 'saved' | 'pending' | 'error'
+  details?: string
+  nodes?: Record<string, unknown>
+}
 
 export type ScreenshotSaveDeps = {
   fetchRecord: (recordUuid: string) => Promise<unknown>
   canEditRecord: (record: unknown) => boolean
   buildChange: (record: unknown) => ScreenshotNodeChange
+  buildRowAttribute: (rowNode: unknown, updatedNodes: Record<string, unknown>) => unknown
   confirmReplace: (fileName: string) => Promise<boolean>
   subscribe: NodeSaveSubscribe
-  postNode: (params: { record: unknown; node: unknown; blob: Blob; fileName: string }) => Promise<void>
+  postNode: (params: { record: unknown; node: unknown; blob?: Blob | null; fileName?: string }) => Promise<void>
   timeoutMs?: number
 }
 
@@ -77,6 +83,7 @@ export const startNodeSaveWaiter = ({
   let settled = false
   let nodeSeen = false
   let completedSeen = false
+  const nodes: Record<string, unknown> = {}
   let unsubscribe: () => void = () => undefined
   let timerId: ReturnType<typeof setTimeout> | null = null
 
@@ -103,14 +110,16 @@ export const startNodeSaveWaiter = ({
   unsubscribe = subscribe({
     // the server notifies each event after its own async socket lookup: the completion can arrive before the node
     onNodesUpdate: (event) => {
-      if (!isForRecord(event) || !event?.updatedNodes?.[nodeUuid]) return
+      if (!isForRecord(event) || !event?.updatedNodes) return
+      Object.assign(nodes, event.updatedNodes)
+      if (!event.updatedNodes[nodeUuid]) return
       nodeSeen = true
-      if (completedSeen) finish({ status: 'saved' })
+      if (completedSeen) finish({ status: 'saved', nodes })
     },
     onCompleted: (event) => {
       if (!isForRecord(event)) return
       completedSeen = true
-      if (nodeSeen) finish({ status: 'saved' })
+      if (nodeSeen) finish({ status: 'saved', nodes })
     },
     // limit: the server sends no node or request id with the error, so the record is the only possible filter
     onError: (event) => {
@@ -136,7 +145,7 @@ export const describeSaveError = (error: unknown): string => {
 }
 
 /**
- * Checks the PNG against the attribute max size and the survey free space.
+ * Checks the image against the attribute max size and the survey free space.
  * @param {ScreenshotSaveInput} input - The save input.
  * @returns {ScreenshotSaveOutcome|null} An error outcome, or null when the size is fine.
  */
@@ -163,19 +172,19 @@ const toOutcome = (result: NodeSaveResult): ScreenshotSaveOutcome => {
 }
 
 /**
- * Subscribes to the record events, posts the node with the file and waits for the result.
+ * Subscribes to the record events, posts the node (with the file, if any) and waits for the result.
  * @param {ScreenshotSaveDeps} deps - The injected dependencies.
- * @param {object} params - The record, the node, the PNG and its name.
- * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
+ * @param {object} params - The record, the node, the image and its name.
+ * @returns {Promise<object>} The outcome and the nodes the server sent back.
  */
 const sendAndWait = async (
   deps: ScreenshotSaveDeps,
-  params: { recordUuid: string; nodeUuid: string; record: unknown; node: unknown; blob: Blob; fileName: string }
-): Promise<ScreenshotSaveOutcome> => {
-  const { recordUuid, nodeUuid, record, node, blob, fileName } = params
+  params: { recordUuid: string; record: unknown; node: unknown; blob?: Blob | null; fileName?: string }
+): Promise<{ outcome: ScreenshotSaveOutcome; nodes: Record<string, unknown> }> => {
+  const { recordUuid, record, node, blob, fileName } = params
   const waiter = startNodeSaveWaiter({
     recordUuid,
-    nodeUuid,
+    nodeUuid: (node as { uuid?: string } | undefined)?.uuid ?? '',
     subscribe: deps.subscribe,
     timeoutMs: deps.timeoutMs ?? DEFAULT_SAVE_TIMEOUT_MS,
   })
@@ -184,18 +193,21 @@ const sendAndWait = async (
   } catch (error) {
     waiter.cancel()
     const details = describeSaveError(error)
-    return details.includes(SERVER_QUOTA_ERROR)
+    const outcome = details.includes(SERVER_QUOTA_ERROR)
       ? errorOutcome('quotaExceeded')
       : errorOutcome('saveFailed', { details })
+    return { outcome, nodes: {} }
   }
   waiter.startTimer()
-  return toOutcome(await waiter.result)
+  const result = await waiter.result
+  return { outcome: toOutcome(result), nodes: result.nodes ?? {} }
 }
 
 /**
- * Saves a screenshot in an image attribute of a plot record: checks, optional replace confirmation, POST, socket result.
+ * Saves a screenshot in an image attribute of a plot record: checks, optional replace confirmation, POST (preceded by
+ * the new entity row when the attribute is in a multiple entity), socket result.
  * @param {ScreenshotSaveDeps} deps - The injected dependencies (API, permission, node builder, prompt, socket).
- * @param {ScreenshotSaveInput} input - The record, the PNG, its name and the size limits.
+ * @param {ScreenshotSaveInput} input - The record, the image, its name and the size limits.
  * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
  */
 export const saveScreenshotToRecord = async (
@@ -211,12 +223,14 @@ export const saveScreenshotToRecord = async (
   if (change.replacedFileName && !(await deps.confirmReplace(change.replacedFileName))) {
     return { status: 'cancelled' }
   }
-  return sendAndWait(deps, {
-    recordUuid: input.recordUuid,
-    nodeUuid: (change.node as { uuid?: string } | undefined)?.uuid ?? '',
-    record,
-    node: change.node,
-    blob: input.blob,
-    fileName: input.fileName,
-  })
+  const { recordUuid, blob, fileName } = input
+  let { node } = change
+  if (change.kind === 'createRow') {
+    // two steps: the server creates the row with its empty attributes, then the image goes in the row's attribute
+    const row = await sendAndWait(deps, { recordUuid, record, node })
+    if (row.outcome.status === 'pending') return errorOutcome('rowNotConfirmed')
+    if (row.outcome.status !== 'saved') return row.outcome
+    node = deps.buildRowAttribute(node, row.nodes)
+  }
+  return (await sendAndWait(deps, { recordUuid, record, node, blob, fileName })).outcome
 }

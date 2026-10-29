@@ -51,6 +51,7 @@ describe('Screenshot image attributes (287)', () => {
         label: 'photo label',
         multiple: false,
         maxFileSizeMb: 10,
+        rowParentDefUuid: null,
       },
       {
         uuid: NodeDef.getUuid(photos),
@@ -58,7 +59,18 @@ describe('Screenshot image attributes (287)', () => {
         label: 'photos label',
         multiple: true,
         maxFileSizeMb: 2,
+        rowParentDefUuid: null,
       },
     ])
+  })
+
+  test('labels the attributes of a multiple entity with the entity and points to the parent of the new row', () => {
+    const rowEntityDef = NodeDef.newNodeDef(plotDef, NodeDef.nodeDefType.entity, ['0'], {
+      name: 'plot_photos',
+      labels: { en: 'Plot photos' },
+      multiple: true,
+    })
+    const [option] = toImageAttributeOptions([photo], 'en', rowEntityDef)
+    expect(option).toMatchObject({ label: 'Plot photos › photo label', rowParentDefUuid: 'plot-def' })
   })
 })

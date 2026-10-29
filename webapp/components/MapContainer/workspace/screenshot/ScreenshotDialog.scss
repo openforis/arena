@@ -35,6 +35,7 @@
 
   &__preview {
     display: flex;
+    flex-shrink: 0; // the content scrolls instead: a shrunk box would crop the stamp and scale bar
     align-items: center;
     justify-content: center;
     min-height: 200px;

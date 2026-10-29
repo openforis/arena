@@ -4,6 +4,7 @@ import {
   type OverlayLayout,
   type OverlayRect,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotLayout'
+import type { ScreenshotFormat } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
 /**
  * Draws the scale bar as a "|____|" bracket.
@@ -48,6 +49,30 @@ const drawNorthArrow = (context: CanvasRenderingContext2D, rect: OverlayRect): v
   context.fillText('N', centerX, y + 28)
 }
 
+// yellow on a dark halo: stands out on imagery and on layer markers of any colour
+const CENTER_MARKER = { radius: 18, haloWidth: 6, haloColor: 'rgba(0, 0, 0, 0.55)', ringWidth: 3, ringColor: '#ffd400' }
+
+/**
+ * Draws a ring at the canvas centre: in a fit-to-plot capture the selected plot sits there, among nearby plots.
+ * @param {CanvasRenderingContext2D} context - The canvas context.
+ * @param {number} width - The canvas width.
+ * @param {number} height - The canvas height.
+ * @returns {void}
+ */
+const drawCenterMarker = (context: CanvasRenderingContext2D, width: number, height: number): void => {
+  const { radius, haloWidth, haloColor, ringWidth, ringColor } = CENTER_MARKER
+  for (const [color, lineWidth] of [
+    [haloColor, haloWidth],
+    [ringColor, ringWidth],
+  ] as const) {
+    context.strokeStyle = color
+    context.lineWidth = lineWidth
+    context.beginPath()
+    context.arc(width / 2, height / 2, radius, 0, 2 * Math.PI)
+    context.stroke()
+  }
+}
+
 /**
  * Draws a computed overlay layout.
  * @param {CanvasRenderingContext2D} context - The canvas context.
@@ -74,6 +99,7 @@ const drawLayout = (context: CanvasRenderingContext2D, layout: OverlayLayout): v
  * Draws the scale bar, north arrow and stamp over a captured map.
  * @param {object} params - The parameters.
  * @param {HTMLCanvasElement} params.source - The captured map.
+ * @param {boolean} params.markCenter - Whether to ring the centre (the selected plot of a fit-to-plot capture).
  * @param {boolean} params.includeScale - Whether to draw the scale bar and the north arrow.
  * @param {boolean} params.includeStamp - Whether to draw the stamp.
  * @param {object|null} params.scaleBar - Scale bar width and label (null: unknown scale).
@@ -83,6 +109,7 @@ const drawLayout = (context: CanvasRenderingContext2D, layout: OverlayLayout): v
  */
 export const composeScreenshot = ({
   source,
+  markCenter,
   includeScale,
   includeStamp,
   scaleBar,
@@ -90,6 +117,7 @@ export const composeScreenshot = ({
   rightLines,
 }: {
   source: HTMLCanvasElement
+  markCenter: boolean
   includeScale: boolean
   includeStamp: boolean
   scaleBar: { widthPx: number; label: string } | null
@@ -102,6 +130,7 @@ export const composeScreenshot = ({
   const context = canvas.getContext('2d')
   if (!context) return source
   context.drawImage(source, 0, 0)
+  if (markCenter) drawCenterMarker(context, canvas.width, canvas.height)
   const layout = computeOverlayLayout({
     width: canvas.width,
     height: canvas.height,
@@ -120,11 +149,16 @@ export const composeScreenshot = ({
 }
 
 /**
- * Encodes a canvas as a PNG blob.
+ * Encodes a canvas in an image format.
  * @param {HTMLCanvasElement} canvas - The canvas.
- * @returns {Promise<Blob>} The PNG.
+ * @param {ScreenshotFormat} format - The MIME type and, for JPEG, the quality.
+ * @returns {Promise<Blob>} The image.
  */
-export const canvasToPngBlob = (canvas: HTMLCanvasElement): Promise<Blob> =>
+export const canvasToBlob = (canvas: HTMLCanvasElement, { type, quality }: ScreenshotFormat): Promise<Blob> =>
   new Promise((resolve, reject) => {
-    canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error('The PNG could not be encoded'))), 'image/png')
+    canvas.toBlob(
+      (blob) => (blob ? resolve(blob) : reject(new Error(`The ${type} image could not be encoded`))),
+      type,
+      quality
+    )
   })

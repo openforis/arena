@@ -6,19 +6,18 @@ import {
   captureMapAtPlot,
   captureMapView,
   hasMaplibreLayer,
+  isMapHidden,
   type MapCaptureResult,
 } from '@webapp/components/MapContainer/workspace/screenshot/mapCapture'
 import { getCaptureNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCaptureRules'
-import {
-  canvasToPngBlob,
-  composeScreenshot,
-} from '@webapp/components/MapContainer/workspace/screenshot/screenshotCompose'
+import { canvasToBlob, composeScreenshot } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCompose'
 import {
   buildStampLines,
   formatStampCoordinates,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotStamp'
 import type {
   LatLngLiteral,
+  ScreenshotFormat,
   ScreenshotNotice,
   ScreenshotOptions,
   ScreenshotPlotCandidate,
@@ -47,6 +46,7 @@ type CaptureState = {
   loading: boolean
   errorDetails: string | null
   maplibre: boolean
+  hidden: boolean
 }
 
 type CaptureRequest = { map: L.Map; includeData: boolean; plotKey: string | null; fitZoom: number }
@@ -57,6 +57,8 @@ type ComposedImage = { blob: Blob | null; url: string | null; composing: boolean
 
 type ComposeRequest = {
   capture: MapCaptureResult
+  format: ScreenshotFormat
+  markCenter: boolean
   includeScale: boolean
   includeStamp: boolean
   stamp: ScreenshotStamp
@@ -101,11 +103,12 @@ const useMapCapture = ({
   fitZoom: number
 }): CaptureState => {
   const plotKey = capturePlot?.key ?? null
-  // the dialog is modal: the base map cannot change while it is open
+  // the dialog is modal: the base map and the layout cannot change while it is open
   const maplibre = useMemo(() => (map ? hasMaplibreLayer(map) : false), [map])
+  const hidden = useMemo(() => (map ? isMapHidden(map) : false), [map])
   const request = useMemo<CaptureRequest | null>(
-    () => (map && !maplibre ? { map, includeData, plotKey, fitZoom } : null),
-    [fitZoom, includeData, map, maplibre, plotKey]
+    () => (map && !maplibre && !hidden ? { map, includeData, plotKey, fitZoom } : null),
+    [fitZoom, hidden, includeData, map, maplibre, plotKey]
   )
   const [finished, setFinished] = useState<FinishedCapture>({ request: null, result: null, errorDetails: null })
   const queueRef = useRef<Promise<unknown>>(Promise.resolve())
@@ -152,15 +155,23 @@ const useMapCapture = ({
     loading: request !== null && !settled,
     errorDetails: settled ? finished.errorDetails : null,
     maplibre,
+    hidden,
   }
 }
 
 /**
- * Draws the overlay on a capture and encodes the PNG.
- * @param {ComposeRequest} request - The capture, what to include and the stamp values.
- * @returns {Promise<Blob>} The PNG.
+ * Draws the overlay on a capture and encodes the image.
+ * @param {ComposeRequest} request - The capture, the format, what to include and the stamp values.
+ * @returns {Promise<Blob>} The image.
  */
-const composePreviewPng = ({ capture, includeScale, includeStamp, stamp }: ComposeRequest): Promise<Blob> => {
+const composePreviewImage = ({
+  capture,
+  format,
+  markCenter,
+  includeScale,
+  includeStamp,
+  stamp,
+}: ComposeRequest): Promise<Blob> => {
   const lines = buildStampLines({
     plotLabel: stamp.plotLabel,
     dateText: stamp.dateText,
@@ -169,42 +180,53 @@ const composePreviewPng = ({ capture, includeScale, includeStamp, stamp }: Compo
     attributions: stamp.attributions,
   })
   const scaleBar = getScaleBar(metersPerPixel(capture.center.lat, capture.zoom), SCALE_BAR_MAX_WIDTH_PX)
-  return canvasToPngBlob(
+  return canvasToBlob(
     composeScreenshot({
       source: capture.canvas,
+      markCenter,
       includeScale,
       includeStamp,
       scaleBar,
       leftLines: lines.left,
       rightLines: lines.right,
-    })
+    }),
+    format
   )
 }
 
 /**
- * Stage 2: draws the overlay on the last capture and encodes the PNG; the object URL is revoked when replaced.
- * State is only set when the PNG is ready: "composing" is derived from the request.
+ * Stage 2: draws the overlay on the last capture and encodes the image; the object URL is revoked when replaced.
+ * State is only set when the image is ready: "composing" is derived from the request.
  * @param {object} params - The parameters.
  * @param {MapCaptureResult|null} params.capture - The last capture.
+ * @param {ScreenshotFormat} params.format - The image format.
+ * @param {boolean} params.includeData - Whether markers are shown (then the plot of a fit-to-plot capture is ringed).
  * @param {boolean} params.includeScale - Whether to draw the scale bar and north arrow.
  * @param {boolean} params.includeStamp - Whether to draw the stamp.
  * @param {ScreenshotStamp} params.stamp - The stamp values.
- * @returns {ComposedImage} The PNG and its object URL.
+ * @returns {ComposedImage} The image and its object URL.
  */
 const useComposedImage = ({
   capture,
+  format,
+  includeData,
   includeScale,
   includeStamp,
   stamp,
 }: {
   capture: MapCaptureResult | null
+  format: ScreenshotFormat
+  includeData: boolean
   includeScale: boolean
   includeStamp: boolean
   stamp: ScreenshotStamp
 }): ComposedImage => {
   const request = useMemo<ComposeRequest | null>(
-    () => (capture ? { capture, includeScale, includeStamp, stamp } : null),
-    [capture, includeScale, includeStamp, stamp]
+    () =>
+      capture
+        ? { capture, format, markCenter: capture.atPlot && includeData, includeScale, includeStamp, stamp }
+        : null,
+    [capture, format, includeData, includeScale, includeStamp, stamp]
   )
   const [finished, setFinished] = useState<FinishedImage>({ request: null, blob: null, url: null, errorDetails: null })
   const urlRef = useRef<string | null>(null)
@@ -220,7 +242,7 @@ const useComposedImage = ({
     if (!request) return undefined
     let current = true
     Promise.resolve()
-      .then(() => composePreviewPng(request))
+      .then(() => composePreviewImage(request))
       .then(
         (blob) => {
           if (!current) return
@@ -252,6 +274,7 @@ const useComposedImage = ({
  * @param {object} params - The parameters.
  * @param {L.Map|null} params.map - The map.
  * @param {ScreenshotOptions} params.options - Capture mode and what to include.
+ * @param {ScreenshotFormat} params.format - The image format of the target.
  * @param {ScreenshotPlotCandidate|null} params.plot - The selected plot.
  * @param {number} params.fitZoom - The fit-to-plot zoom.
  * @param {ScreenshotStamp} params.stamp - The stamp values.
@@ -260,12 +283,14 @@ const useComposedImage = ({
 export const useScreenshotPreview = ({
   map,
   options,
+  format,
   plot,
   fitZoom,
   stamp,
 }: {
   map: L.Map | null
   options: ScreenshotOptions
+  format: ScreenshotFormat
   plot: ScreenshotPlotCandidate | null
   fitZoom: number
   stamp: ScreenshotStamp
@@ -274,13 +299,20 @@ export const useScreenshotPreview = ({
   const capture = useMapCapture({ map, includeData: options.includeData, capturePlot, fitZoom })
   const image = useComposedImage({
     capture: capture.result,
+    format,
+    includeData: options.includeData,
     includeScale: options.includeScale,
     includeStamp: options.includeStamp,
     stamp,
   })
   const notice = useMemo(
-    () => getCaptureNotice({ failedImages: capture.result?.failedImages ?? 0, maplibre: capture.maplibre }),
-    [capture.maplibre, capture.result]
+    () =>
+      getCaptureNotice({
+        failedImages: capture.result?.failedImages ?? 0,
+        maplibre: capture.maplibre,
+        hidden: capture.hidden,
+      }),
+    [capture.hidden, capture.maplibre, capture.result]
   )
   return {
     blob: image.blob,

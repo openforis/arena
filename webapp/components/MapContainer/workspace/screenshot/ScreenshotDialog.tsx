@@ -67,6 +67,7 @@ export const ScreenshotDialog = (): React.ReactElement => {
   const preview = useScreenshotPreview({
     map: state.map,
     options: state.options,
+    format: state.format,
     plot: state.plot,
     fitZoom: state.fitZoom,
     stamp: state.stamp,
@@ -159,7 +160,6 @@ export const ScreenshotDialog = (): React.ReactElement => {
           imageReady={imageReady}
           canSave={canSave}
           saving={actions.saving && !actions.replacePrompt}
-          plotLabel={state.plot?.label ?? ''}
           closeDisabled={closeDisabled}
           onCancel={onRequestClose}
           onAlsoDownload={actions.alsoDownload}

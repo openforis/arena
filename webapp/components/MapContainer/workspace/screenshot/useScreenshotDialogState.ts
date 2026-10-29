@@ -12,21 +12,21 @@ import {
   buildScreenshotFileName,
   formatIsoDate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
-import {
-  getImageAttributeDefs,
-  toImageAttributeOptions,
-} from '@webapp/components/MapContainer/workspace/screenshot/screenshotImageAttributes'
+import { getImageAttributeOptions } from '@webapp/components/MapContainer/workspace/screenshot/screenshotImageAttributes'
 import { buildPlotCandidates } from '@webapp/components/MapContainer/workspace/screenshot/screenshotPlotCandidates'
 import {
   collectAttributions,
   getBaseMapName,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotStamp'
-import type {
-  LatLngLiteral,
-  ScreenshotImageAttributeOption,
-  ScreenshotOptions,
-  ScreenshotPlotCandidate,
-  ScreenshotTarget,
+import {
+  SCREENSHOT_FORMATS,
+  type LatLngLiteral,
+  type ScreenshotCaptureMode,
+  type ScreenshotFormat,
+  type ScreenshotImageAttributeOption,
+  type ScreenshotOptions,
+  type ScreenshotPlotCandidate,
+  type ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 import type { ScreenshotStamp } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
 
@@ -39,6 +39,7 @@ export type ScreenshotDialogState = {
   setOption: <K extends keyof ScreenshotOptions>(key: K, value: ScreenshotOptions[K]) => void
   target: ScreenshotTarget
   setTarget: (target: ScreenshotTarget) => void
+  format: ScreenshotFormat
   attributeOptions: ScreenshotImageAttributeOption[]
   attribute: ScreenshotImageAttributeOption | null
   selectAttribute: (uuid: string) => void
@@ -49,8 +50,11 @@ export type ScreenshotDialogState = {
   fitZoom: number
 }
 
-const DEFAULT_OPTIONS: ScreenshotOptions = {
-  capture: 'view',
+type OptionsChoice = Omit<ScreenshotOptions, 'capture'> & { capture: ScreenshotCaptureMode | null }
+
+// capture null: "Fit to plot" when attaching to a plot record (a world view is useless there), else "Current view"
+const DEFAULT_OPTIONS: OptionsChoice = {
+  capture: null,
   includeData: true,
   includeScale: true,
   includeStamp: true,
@@ -82,7 +86,7 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
 
   const [openedAt] = useState(() => new Date())
   const [openCenter] = useState(() => readCenter(map))
-  const [options, setOptions] = useState<ScreenshotOptions>(DEFAULT_OPTIONS)
+  const [optionsChoice, setOptions] = useState<OptionsChoice>(DEFAULT_OPTIONS)
   const [targetChoice, setTargetChoice] = useState<ScreenshotTarget | null>(null)
   const [plotKey, setPlotKey] = useState<string | null>(null)
   const [attributeUuid, setAttributeUuid] = useState<string | null>(null)
@@ -95,20 +99,29 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
   const plot = candidates.find((candidate) => candidate.key === plotKey) ?? candidates[0] ?? null
   const target: ScreenshotTarget = targetChoice ?? (candidates.length > 0 ? 'record' : 'file')
   const plotEntityDefUuid = plot?.entityDefUuid ?? null
+  const format = SCREENSHOT_FORMATS[target]
+  const options = useMemo<ScreenshotOptions>(
+    () => ({ ...optionsChoice, capture: optionsChoice.capture ?? (target === 'record' ? 'plot' : 'view') }),
+    [optionsChoice, target]
+  )
 
   const attributeOptions = useMemo(
     () =>
-      plotEntityDefUuid
-        ? toImageAttributeOptions(getImageAttributeDefs({ survey, entityDefUuid: plotEntityDefUuid, cycle }), lang)
-        : [],
+      plotEntityDefUuid ? getImageAttributeOptions({ survey, entityDefUuid: plotEntityDefUuid, cycle, lang }) : [],
     [cycle, lang, plotEntityDefUuid, survey]
   )
   const attribute = attributeOptions.find((option) => option.uuid === attributeUuid) ?? attributeOptions[0] ?? null
 
   const stampPlot = target === 'record' || options.capture === 'plot' ? plot : null
   const defaultFileName = useMemo(
-    () => buildScreenshotFileName({ entityName: stampPlot?.entityName, keys: stampPlot?.keys, date: openedAt }),
-    [openedAt, stampPlot]
+    () =>
+      buildScreenshotFileName({
+        entityName: stampPlot?.entityName,
+        keys: stampPlot?.keys,
+        date: openedAt,
+        extension: format.extension,
+      }),
+    [format, openedAt, stampPlot]
   )
   const stamp = useMemo<ScreenshotStamp>(
     () => ({
@@ -145,6 +158,7 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
     setOption,
     target,
     setTarget: setTargetChoice,
+    format,
     attributeOptions,
     attribute,
     selectAttribute: setAttributeUuid,

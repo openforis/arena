@@ -110,6 +110,13 @@ describe('Screenshot capture rules (294)', () => {
       blocking: true,
     })
   })
+
+  test('blocks the capture of a hidden (0 px) map with a notice instead of a canvas error', () => {
+    expect(getCaptureNotice({ failedImages: 0, maplibre: false, hidden: true })).toEqual({
+      key: 'mapWorkspace.screenshot.notices.mapHidden',
+      blocking: true,
+    })
+  })
 })
 
 describe('Screenshot capture view restore (294)', () => {
