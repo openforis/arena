@@ -158,6 +158,28 @@ export const fetchCountAndTotalFilesSize = async ({ surveyId, recordUuid = null 
   return { count, total }
 }
 
+/**
+ * Fetches count and total size of the (not deleted) files of the specified records.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string[]} params.recordUuids - The uuids of the records.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<object>} - Count and total size ({count, total}) indexed by record uuid (only records with files).
+ */
+export const fetchCountAndTotalFilesSizeByRecordUuids = async ({ surveyId, recordUuids }, client = db) => {
+  if (recordUuids.length === 0) return {}
+  const schema = Schemata.getSchemaSurvey(surveyId)
+  const recordUuidCol = `(props ->> '${SurveyFile.propKeys.recordUuid}')::uuid`
+  const rows = await client.any(
+    `SELECT ${recordUuidCol} AS record_uuid, COUNT(*), SUM(COALESCE((props ->> '${SurveyFile.propKeys.size}')::INTEGER, 0))
+    FROM ${schema}.file
+    WHERE ${NOT_DELETED_CONDITION} AND ${recordUuidCol} IN ($/recordUuids:csv/)
+    GROUP BY ${recordUuidCol}`,
+    { recordUuids }
+  )
+  return Object.fromEntries(rows.map((row) => [row.record_uuid, { count: Number(row.count), total: Number(row.sum) }]))
+}
+
 // ============== UPDATE
 export const markFileAsDeleted = async (surveyId, uuid, client = db) =>
   client.oneOrNone(

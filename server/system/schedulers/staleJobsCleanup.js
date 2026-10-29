@@ -16,9 +16,8 @@ const lockName = 'scheduler-stale-jobs-cleanup'
 // active row, a stale row like that would block that user/survey cluster-wide,
 // indefinitely, with no way to clear it short of manual SQL. This reaper periodically
 // marks such stale rows as 'failed' so the cluster self-heals.
-// 60 minutes is a generous threshold: no job type in this codebase declares an expected
-// duration, so this errs toward not falsely failing a legitimately long-running import/
-// export on a large survey - adjust if evidence emerges that jobs routinely run longer.
+// Running jobs touch their row every few minutes (see jobThreadExecutor heartbeat), so 60
+// minutes without updates means the process running the job is gone.
 const staleAfterMinutes = 60
 
 const staleJobErrorProps = {

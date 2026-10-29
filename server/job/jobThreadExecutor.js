@@ -8,11 +8,14 @@ import DelayedDeleteCache from '@server/utils/DelayedDeleteCache'
 import * as Log from '@server/log/log'
 
 import { jobRowToSummary, jobStatus, jobThreadMessageTypes } from './jobUtils'
+import * as LocalJobRepository from './jobRepository'
 
 const logger = Log.getLogger('JobThreadExecutor')
 
 const threadCleanupDelay = 1000 // 1 sec
 const notificationThrottleLimit = 500
+// jobs update their row only when they report progress: a long step without progress must not look stale
+const heartbeatInterval = 5 * 60 * 1000 // 5 mins
 
 // keep active job summaries in a cache (used to get active job status)
 // items deletion is delayed: it can happen that the status of the job is requested after the job has complete.
@@ -22,6 +25,18 @@ const activeJobSummariesByUserUuid = new DelayedDeleteCache({ deleteDelaySeconds
 
 const userJobThreads = new ThreadsCache()
 const jobThreadsByJobUuid = new ThreadsCache()
+
+const _touchRunningJobs = async () => {
+  const uuids = jobThreadsByJobUuid.findThreadsKeys(() => true)
+  try {
+    await LocalJobRepository.touchActiveJobs({ uuids })
+  } catch (error) {
+    logger.error(`error touching running jobs: ${error}`)
+  }
+}
+
+// heartbeat timer must not keep the process alive (e.g. at the end of the tests)
+setInterval(_touchRunningJobs, heartbeatInterval).unref?.()
 
 const _persistJobUpdate = async (jobSerialized) => {
   const { uuid, status, processed, total, result, errors, ended } = jobSerialized

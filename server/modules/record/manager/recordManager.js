@@ -118,24 +118,26 @@ export const fetchRecordsSummaryBySurveyId = async (
   const nodeDefFiles = survey ? Survey.getNodeDefsArray(survey).filter(NodeDef.isFile) : []
   const nodeDefFileUuids = nodeDefFiles.map(NodeDef.getUuid)
 
-  const listWithCounts = []
-  for (const recordSummary of list) {
+  // one query per counter for all the records (not one per record)
+  const recordUuids = list.map(Record.getUuid)
+  const filesCountAndSizeByRecordUuid = await FileRepository.fetchCountAndTotalFilesSizeByRecordUuids(
+    { surveyId, recordUuids },
+    client
+  )
+  const filesMissingByRecordUuid = await NodeRepository.countNodesWithMissingFileByRecordUuids(
+    { surveyId, nodeDefFileUuids, recordUuids },
+    client
+  )
+  const listWithCounts = list.map((recordSummary) => {
     const recordUuid = Record.getUuid(recordSummary)
-    const { count: filesCount, total: filesSize } = /* NOSONAR */ await FileRepository.fetchCountAndTotalFilesSize(
-      { surveyId, recordUuid },
-      client
-    )
-    const filesMissing = A.isEmpty(nodeDefFileUuids)
-      ? 0
-      : await NodeRepository.countNodesWithMissingFile({ surveyId, recordUuid, nodeDefFileUuids }, client) // NOSONAR
-
-    listWithCounts.push({
+    const { count: filesCount = 0, total: filesSize = 0 } = filesCountAndSizeByRecordUuid[recordUuid] ?? {}
+    return {
       ...recordSummary,
       filesCount,
       filesSize,
-      filesMissing,
-    })
-  }
+      filesMissing: filesMissingByRecordUuid[recordUuid] ?? 0,
+    }
+  })
   return {
     nodeDefKeys,
     list: listWithCounts,

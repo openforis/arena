@@ -64,11 +64,9 @@ const isType = (type: string) => A.propEq('type', type)
 export const isValidExpressionType = (nodeDef: unknown): boolean => !NodeDef.isFile(nodeDef as never)
 
 export const isBinary = isType(types.BinaryExpression)
-export const isCall = isType(types.CallExpression)
 export const isCompound = isType(types.Compound)
 export const isIdentifier = isType(types.Identifier)
 export const isLiteral = isType(types.Literal)
-export const isSequence = isType(types.SequenceExpression)
 export const isThis = isType(types.ThisExpression)
 
 // ====== Instance creators
