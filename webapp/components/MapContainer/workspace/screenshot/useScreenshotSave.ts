@@ -22,7 +22,6 @@ import {
   type ScreenshotSaveDeps,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 import {
-  browserTimers,
   createNodePoster,
   createRecordFetcher,
   subscribeToNodeSaveEvents,
@@ -116,7 +115,6 @@ export const useScreenshotSave = (): {
         confirmReplace,
         subscribe: subscribeToNodeSaveEvents,
         postNode: createNodePoster({ surveyId, lang, fallbackCycle: cycle }),
-        timers: browserTimers,
       }
       setSaving(true)
       try {

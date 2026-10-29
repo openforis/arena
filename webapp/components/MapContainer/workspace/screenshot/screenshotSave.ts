@@ -18,11 +18,6 @@ export type NodeSaveHandlers = {
 
 export type NodeSaveSubscribe = (handlers: NodeSaveHandlers) => () => void
 
-export type SaveTimers = {
-  setTimeout: (callback: () => void, ms: number) => unknown
-  clearTimeout: (id: unknown) => void
-}
-
 export type NodeSaveResult = { status: 'saved' | 'pending' | 'error'; details?: string }
 
 export type ScreenshotSaveDeps = {
@@ -32,7 +27,6 @@ export type ScreenshotSaveDeps = {
   confirmReplace: (fileName: string) => Promise<boolean>
   subscribe: NodeSaveSubscribe
   postNode: (params: { record: unknown; node: unknown; blob: Blob; fileName: string }) => Promise<void>
-  timers: SaveTimers
   timeoutMs?: number
 }
 
@@ -63,7 +57,6 @@ const errorOutcome = (key: string, params?: Record<string, string | number>): Sc
  * @param {string} params.nodeUuid - The uuid of the node sent: the completion counts only after an update including it.
  * @param {NodeSaveSubscribe} params.subscribe - Subscribes to the socket events, returns the unsubscribe function.
  * @param {number} params.timeoutMs - Time after which the result is "pending".
- * @param {SaveTimers} params.timers - Injected timers.
  * @returns {object} The result, startTimer (arms the timeout, call it once the POST is done) and cancel.
  */
 export const startNodeSaveWaiter = ({
@@ -71,13 +64,11 @@ export const startNodeSaveWaiter = ({
   nodeUuid,
   subscribe,
   timeoutMs,
-  timers,
 }: {
   recordUuid: string
   nodeUuid: string
   subscribe: NodeSaveSubscribe
   timeoutMs: number
-  timers: SaveTimers
 }): { result: Promise<NodeSaveResult>; startTimer: () => void; cancel: () => void } => {
   let resolveResult: (value: NodeSaveResult) => void = () => undefined
   const result = new Promise<NodeSaveResult>((resolve) => {
@@ -85,8 +76,9 @@ export const startNodeSaveWaiter = ({
   })
   let settled = false
   let nodeSeen = false
+  let completedSeen = false
   let unsubscribe: () => void = () => undefined
-  let timerId: unknown = null
+  let timerId: ReturnType<typeof setTimeout> | null = null
 
   /**
    * Settles the result once, then stops listening.
@@ -97,7 +89,7 @@ export const startNodeSaveWaiter = ({
     if (settled) return
     settled = true
     unsubscribe()
-    timers.clearTimeout(timerId)
+    if (timerId !== null) clearTimeout(timerId)
     resolveResult(value)
   }
 
@@ -109,12 +101,16 @@ export const startNodeSaveWaiter = ({
   const isForRecord = (event: NodeSaveEvent): boolean => event?.recordUuid === recordUuid
 
   unsubscribe = subscribe({
+    // the server notifies each event after its own async socket lookup: the completion can arrive before the node
     onNodesUpdate: (event) => {
-      if (isForRecord(event) && event?.updatedNodes?.[nodeUuid]) nodeSeen = true
+      if (!isForRecord(event) || !event?.updatedNodes?.[nodeUuid]) return
+      nodeSeen = true
+      if (completedSeen) finish({ status: 'saved' })
     },
-    // the completion of another update of the same record (before this node is processed) is ignored
     onCompleted: (event) => {
-      if (nodeSeen && isForRecord(event)) finish({ status: 'saved' })
+      if (!isForRecord(event)) return
+      completedSeen = true
+      if (nodeSeen) finish({ status: 'saved' })
     },
     // limit: the server sends no node or request id with the error, so the record is the only possible filter
     onError: (event) => {
@@ -124,7 +120,7 @@ export const startNodeSaveWaiter = ({
   // armed after the POST: the upload time (slow links) must not eat the wait for the server to process the node
   const startTimer = (): void => {
     if (settled || timerId !== null) return
-    timerId = timers.setTimeout(() => finish({ status: 'pending' }), timeoutMs)
+    timerId = setTimeout(() => finish({ status: 'pending' }), timeoutMs)
   }
   return { result, startTimer, cancel: () => finish({ status: 'pending' }) }
 }
@@ -182,7 +178,6 @@ const sendAndWait = async (
     nodeUuid,
     subscribe: deps.subscribe,
     timeoutMs: deps.timeoutMs ?? DEFAULT_SAVE_TIMEOUT_MS,
-    timers: deps.timers,
   })
   try {
     await deps.postNode({ record, node, blob, fileName })
@@ -199,7 +194,7 @@ const sendAndWait = async (
 
 /**
  * Saves a screenshot in an image attribute of a plot record: checks, optional replace confirmation, POST, socket result.
- * @param {ScreenshotSaveDeps} deps - The injected dependencies (API, permission, node builder, prompt, socket, timers).
+ * @param {ScreenshotSaveDeps} deps - The injected dependencies (API, permission, node builder, prompt, socket).
  * @param {ScreenshotSaveInput} input - The record, the PNG, its name and the size limits.
  * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
  */

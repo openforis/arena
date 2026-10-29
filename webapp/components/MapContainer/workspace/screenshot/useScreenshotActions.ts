@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react'
 import { useI18n } from '@webapp/store/system'
+import { downloadBlobToFile } from '@webapp/utils/domUtils'
 
-import { downloadBlob } from '@webapp/components/MapContainer/workspace/screenshot/downloadBlob'
 import { ensurePngFileName } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
 import type {
   ScreenshotNotice,
@@ -99,7 +99,7 @@ export const useScreenshotActions = ({
 
   const downloadOnly = useCallback(() => {
     if (!blob) return
-    downloadBlob(blob, ensurePngFileName(defaultFileName))
+    downloadBlobToFile(blob, ensurePngFileName(defaultFileName))
     onClose()
   }, [blob, defaultFileName, onClose])
 
@@ -109,7 +109,7 @@ export const useScreenshotActions = ({
       setActionError({ key: 'mapWorkspace.screenshot.errors.fileNameRequired', blocking: false })
       return
     }
-    if (blob) downloadBlob(blob, name)
+    if (blob) downloadBlobToFile(blob, name)
   }, [blob, fileName])
 
   const clearActionError = useCallback(() => setActionError(null), [])

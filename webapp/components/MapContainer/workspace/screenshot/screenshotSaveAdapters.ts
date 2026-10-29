@@ -11,7 +11,7 @@ import {
   buildNodePersistFields,
   fieldsToFormData,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
-import type { NodeSaveSubscribe, SaveTimers } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
+import type { NodeSaveSubscribe } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 
 const UPLOAD_TIMEOUT_MS = 120000
 
@@ -76,19 +76,3 @@ export const createNodePoster =
       requestConfig
     )
   }
-
-export const browserTimers: SaveTimers = {
-  /**
-   * Starts a browser timer.
-   * @param {Function} callback - The callback.
-   * @param {number} ms - The delay.
-   * @returns {unknown} The timer id.
-   */
-  setTimeout: (callback: () => void, ms: number): unknown => globalThis.setTimeout(callback, ms),
-  /**
-   * Clears a browser timer.
-   * @param {unknown} id - The timer id.
-   * @returns {void}
-   */
-  clearTimeout: (id: unknown): void => globalThis.clearTimeout(id as ReturnType<typeof setTimeout>),
-}

@@ -34,25 +34,8 @@ const createSocket = () => {
   }
 }
 
-const createTimers = () => {
-  const callbacks: Array<() => void> = []
-  return {
-    timers: {
-      setTimeout: jest.fn((callback: () => void) => {
-        callbacks.push(callback)
-        return callbacks.length
-      }),
-      clearTimeout: jest.fn(),
-    },
-    fireAll: () => {
-      for (const callback of callbacks) callback()
-    },
-  }
-}
-
 const setup = () => {
   const socket = createSocket()
-  const clock = createTimers()
   const calls: string[] = []
   const deps: ScreenshotSaveDeps = {
     fetchRecord: jest.fn(async () => ({ uuid: recordUuid })),
@@ -66,13 +49,16 @@ const setup = () => {
     postNode: jest.fn(async () => {
       calls.push('post')
     }),
-    timers: clock.timers,
     timeoutMs: 1000,
   }
-  return { deps, socket, clock, calls }
+  return { deps, socket, calls }
 }
 
 describe('Screenshot save (293)', () => {
+  // setImmediate stays real: flush() relies on it
+  beforeEach(() => jest.useFakeTimers({ doNotFake: ['setImmediate'] }))
+  afterEach(() => jest.useRealTimers())
+
   test('reports saved when the socket confirms before the POST resolves', async () => {
     const { deps, socket, calls } = setup()
     deps.postNode = jest.fn(async () => {
@@ -99,24 +85,24 @@ describe('Screenshot save (293)', () => {
   })
 
   test('ignores the events of other records and reports pending on timeout', async () => {
-    const { deps, socket, clock } = setup()
+    const { deps, socket } = setup()
     const promise = saveScreenshotToRecord(deps, input)
     await flush()
     socket.completed({ recordUuid: 'other-record' })
     socket.error({ recordUuid: 'other-record', key: 'x' })
-    clock.fireAll()
+    jest.runOnlyPendingTimers()
     await expect(promise).resolves.toEqual({ status: 'pending' })
   })
 
   test('arms the timeout only after the POST resolves, so a slow upload still ends as saved', async () => {
-    const { deps, socket, clock } = setup()
+    const { deps, socket } = setup()
     deps.postNode = jest.fn(async () => {
       // the upload takes longer than timeoutMs: no timer may be running yet
-      expect(clock.timers.setTimeout).not.toHaveBeenCalled()
+      expect(jest.getTimerCount()).toBe(0)
     })
     const promise = saveScreenshotToRecord(deps, input)
     await flush()
-    expect(clock.timers.setTimeout).toHaveBeenCalledTimes(1)
+    expect(jest.getTimerCount()).toBe(1)
     socket.saved()
     await expect(promise).resolves.toEqual({ status: 'saved' })
   })
@@ -199,7 +185,7 @@ describe('Screenshot save (293)', () => {
   })
 
   test('reports a failed POST and stops listening', async () => {
-    const { deps, socket, clock } = setup()
+    const { deps, socket } = setup()
     deps.postNode = jest.fn(async () => {
       throw new Error('Network Error')
     })
@@ -209,7 +195,7 @@ describe('Screenshot save (293)', () => {
       params: { details: 'Network Error' },
     })
     expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
-    expect(clock.timers.clearTimeout).toHaveBeenCalled()
+    expect(jest.getTimerCount()).toBe(0)
   })
 
   test('maps the server quota error', async () => {
@@ -223,7 +209,7 @@ describe('Screenshot save (293)', () => {
     })
   })
 
-  test('ignores a completion of another update of the same record until this node is updated', async () => {
+  test('waits for the update of this node, whatever completions of the same record come first', async () => {
     const { deps, socket } = setup()
     const promise = saveScreenshotToRecord(deps, input)
     await flush()
@@ -238,28 +224,32 @@ describe('Screenshot save (293)', () => {
     expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
   })
 
-  test('stops listening after the timeout', async () => {
-    const { deps, socket, clock } = setup()
+  test('reports saved when the completion arrives before the update of this node', async () => {
+    const { deps, socket } = setup()
     const promise = saveScreenshotToRecord(deps, input)
     await flush()
-    clock.fireAll()
+    socket.completed({ recordUuid })
+    socket.updated({ recordUuid, updatedNodes: { 'node-new': {} } })
+    await expect(promise).resolves.toEqual({ status: 'saved' })
+    expect(jest.getTimerCount()).toBe(0)
+  })
+
+  test('stops listening after the timeout', async () => {
+    const { deps, socket } = setup()
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    jest.runOnlyPendingTimers()
     await expect(promise).resolves.toEqual({ status: 'pending' })
     expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
   })
 
   test('settles the waiter only once', async () => {
     const socket = createSocket()
-    const clock = createTimers()
-    const waiter = startNodeSaveWaiter({
-      recordUuid,
-      nodeUuid: 'node-1',
-      subscribe: socket.subscribe,
-      timeoutMs: 10,
-      timers: clock.timers,
-    })
+    const waiter = startNodeSaveWaiter({ recordUuid, nodeUuid: 'node-1', subscribe: socket.subscribe, timeoutMs: 10 })
+    waiter.startTimer()
     socket.saved('node-1')
     socket.error({ recordUuid, key: 'late' })
-    clock.fireAll()
+    jest.runOnlyPendingTimers()
     await expect(waiter.result).resolves.toEqual({ status: 'saved' })
     expect(socket.unsubscribe).toHaveBeenCalledTimes(1)
   })
