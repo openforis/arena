@@ -51,12 +51,12 @@ export const sendErr = (res, err) => {
   } else if (err instanceof SystemError || err instanceof CoreSystemError) {
     res.status(err.statusCode).json(_getErr(err))
   } else {
-    // details of unexpected errors (e.g. SQL errors) stay in the server log, not in the response
+    // details are sent to the client too, to find the related log entry quickly when a user reports an error
     logger.error(err?.stack ?? String(err))
     res.status(err?.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
-        params: { text: 'Internal server error' },
+        params: { text: `Could not serve: ${err.toString()}` },
       })
     )
   }
