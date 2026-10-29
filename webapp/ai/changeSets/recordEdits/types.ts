@@ -2,6 +2,9 @@ import type { ChangeSet } from '@webapp/ai/changeSets/types'
 
 export const RECORD_ATTRIBUTE_UPDATE = 'record.attributeUpdate'
 
+// window event sent after an Apply changed records: open record lists (validation report) reload
+export const RECORD_EDITS_APPLIED_EVENT = 'arena:recordEditsApplied'
+
 // one change set; the model is told to split larger fixes
 export const RECORD_EDITS_MAX = 200
 

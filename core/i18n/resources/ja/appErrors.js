@@ -173,7 +173,7 @@ export default {
   aiDataQueryInvalid: 'AIはこのリクエストに対して有効なクエリを生成できませんでした：{{errors}}',
   aiDataQueryEmpty: '先に項目と属性（またはディメンションとメジャー）を選択してください。',
   aiLocalServerUnreachable:
-    'ローカル AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
+    'AI サーバー ({{baseUrl}}) に接続できませんでした。CORS を有効にして起動していますか？ブラウザーがローカルネットワーク上のデバイスへのアクセスをブロックしていませんか？',
   aiLocalServerModelMissing:
     'モデル「{{modelId}}」はローカル AI サーバーで利用できません。LM Studio で読み込むか、AI 設定で別のモデルを選択してください。',
   aiLocalServerContextExceeded:

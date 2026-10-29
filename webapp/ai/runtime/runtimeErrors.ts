@@ -38,10 +38,13 @@ export const isAiAbortError = (error: unknown): boolean =>
 export const getAiErrorMessage = ({ error, i18n }: { error: unknown; i18n: I18n }): string => {
   const aiKey = getAiErrorKey(error)
   const withParams = aiKey ? unwrap(error).find((candidate) => candidate?.key === aiKey) : null
-  if (aiKey) return String(i18n.t(`appErrors:${aiKey}`, withParams?.params ?? {}))
+  // React escapes the text: i18next must not escape it too
+  if (aiKey)
+    return String(i18n.t(`appErrors:${aiKey}`, { ...withParams?.params, interpolation: { escapeValue: false } }))
   // an API error (axios) carrying an appErrors-style key, e.g. the activity-log fetch failing
   const data = (error as any)?.response?.data
   const responseKey = typeof data?.key === 'string' ? data.key.replace(/^appErrors:/, '') : ''
-  if (responseKey) return String(i18n.t(`appErrors:${responseKey}`, data.params ?? {}))
+  if (responseKey)
+    return String(i18n.t(`appErrors:${responseKey}`, { ...data.params, interpolation: { escapeValue: false } }))
   return String(i18n.t('appErrors:aiProviderUnavailable', {}))
 }

@@ -2,6 +2,7 @@
  * Mutable holder of the conversation during a turn: each change makes a new conversation object and reports it.
  */
 import type { AiDataClass } from '@common/ai/features'
+import { toRowContextDisplayText } from '@common/ai/prompts/cleaningRowContext'
 import { uuidv4 } from '@core/uuid'
 
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
@@ -66,11 +67,13 @@ export const createTurnState = ({
   onUpdate: (conversation: Conversation) => void
 }): TurnState => {
   const now = new Date().toISOString()
+  // the model needs the row UUIDs of "Ask the assistant", the user does not
+  const shownText = displayText ?? toRowContextDisplayText(userMessage)
   const user: UserMessage = {
     id: uuidv4(),
     role: 'user',
     text: userMessage,
-    ...(displayText ? { displayText } : {}),
+    ...(shownText ? { displayText: shownText } : {}),
     createdAt: now,
   }
   const answer: AssistantMessage = { id: uuidv4(), role: 'assistant', parts: [], status: 'streaming', createdAt: now }

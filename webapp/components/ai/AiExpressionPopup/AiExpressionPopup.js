@@ -23,6 +23,13 @@ const expressionTypeFromQualifier = (qualifier) => {
   return 'validation'
 }
 
+const unusableErrorKeys = new Set([
+  'expression.identifierNotFound',
+  'expression.undefinedFunction',
+  'expression.invalidCategoryName',
+  'expression.invalidTaxonomyName',
+])
+
 /**
  * Shows the generated expression, its explanation and the related errors, if any.
  * @param {!object} props - The component props.
@@ -77,6 +84,8 @@ const AiExpressionPopup = (props) => {
   const expressionType = expressionTypeFromQualifier(qualifier)
   // result.isValid is only a server-side syntax check; validationError catches semantic issues too
   const isValid = Boolean(result?.isValid) && !validationError
+  // an expression that references something missing can never work: no "Use anyway"
+  const usable = isValid || !unusableErrorKeys.has(validationError?.key)
 
   const onGenerate = async () => {
     if (!description.trim() || busy) return
@@ -153,12 +162,14 @@ const AiExpressionPopup = (props) => {
         {result ? (
           <>
             <Button label="aiExpression.tryAgain" onClick={onTryAgain} disabled={busy} />
-            <Button
-              className="btn-primary"
-              label={isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
-              onClick={onUse}
-              disabled={busy}
-            />
+            {usable ? (
+              <Button
+                className="btn-primary"
+                label={isValid ? 'aiExpression.use' : 'aiExpression.useAnyway'}
+                onClick={onUse}
+                disabled={busy}
+              />
+            ) : null}
           </>
         ) : (
           <Button

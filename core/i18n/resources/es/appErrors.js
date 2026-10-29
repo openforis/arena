@@ -17,7 +17,7 @@ export default {
   aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
   aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
   aiLocalServerUnreachable:
-    'No se pudo conectar con el servidor de IA local en {{baseUrl}}. ¿Está en marcha, con CORS activado? ¿Bloqueó el navegador el acceso a los dispositivos de la red local?',
+    'No se pudo conectar con el servidor de IA en {{baseUrl}}. ¿Está en marcha, con CORS activado? ¿Bloqueó el navegador el acceso a los dispositivos de la red local?',
   aiLocalServerModelMissing:
     'El modelo "{{modelId}}" no está disponible en el servidor de IA local. Cárguelo en LM Studio o elija otro modelo en su configuración de IA.',
   aiLocalServerContextExceeded:

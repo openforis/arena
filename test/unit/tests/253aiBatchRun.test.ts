@@ -24,7 +24,14 @@ const onDevicePolicy = { schema: 'onDevice', data: 'onDevice' } as const
  * @returns {Function} The guard.
  */
 const cloudGuard = (deps: any) =>
-  createAiBatchGuard({ feature: 'translation', surveyId: 7, dataClass: 'schema', hostingClass: 'cloud', deps })
+  createAiBatchGuard({
+    feature: 'translation',
+    surveyId: 7,
+    dataClass: 'schema',
+    hostingClass: 'cloud',
+    deps,
+    recheckMs: 0,
+  })
 
 describe('AI batch runner (253)', () => {
   test('runs the calls in order and reports the progress', async () => {

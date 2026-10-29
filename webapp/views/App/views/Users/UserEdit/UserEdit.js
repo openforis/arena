@@ -80,7 +80,8 @@ const UserEdit = ({ ownProfile = false }) => {
 
   const onSaveAll = useCallback(async () => {
     const saves = []
-    if (dirty) saves.push(onSave())
+    // the AI and notification preferences save on their own: invalid profile fields must not block them
+    if (dirty && canSave) saves.push(onSave())
     if (aiSettingsDirty) saves.push(aiSaveRef.current?.())
     if (notificationPrefsDirty) {
       saves.push(
@@ -93,7 +94,7 @@ const UserEdit = ({ ownProfile = false }) => {
     }
     await Promise.all(saves)
     setNotificationPrefsDirty(false)
-  }, [aiSettingsDirty, dirty, dispatch, notificationPrefsDirty, notifyOnUserAccessRequest, onSave, user])
+  }, [aiSettingsDirty, canSave, dirty, dispatch, notificationPrefsDirty, notifyOnUserAccessRequest, onSave, user])
 
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -271,7 +272,7 @@ const UserEdit = ({ ownProfile = false }) => {
           {canEdit && (
             <ButtonSave
               onClick={onSaveAll}
-              disabled={!canSave || (!dirty && !aiSettingsDirty && !notificationPrefsDirty)}
+              disabled={!((dirty && canSave) || aiSettingsDirty || notificationPrefsDirty)}
               className="btn-save"
             />
           )}

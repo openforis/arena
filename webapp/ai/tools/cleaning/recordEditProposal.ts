@@ -201,7 +201,8 @@ const buildRecordDrafts = async ({
       nodeUuid,
       nodeDefUuid: Node.getNodeDefUuid(node),
       recordKeys,
-      path: describeNodePath({ survey, cycle, record, node }),
+      // shown to the user next to the validation report, which shows labels
+      path: describeNodePath({ survey, cycle, record, node, lang: context.lang }),
       from: Node.getValue(node, null),
       to: parsed.value,
       preview: { ...previewByNodeUuid[nodeUuid], recordNewErrors },

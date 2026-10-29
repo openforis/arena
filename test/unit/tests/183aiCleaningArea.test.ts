@@ -1,7 +1,12 @@
 import en from '@core/i18n/resources/en'
 import { assistantMarkers } from '@common/ai/prompts/assistantMarkers'
 import { buildAssistantCleaningPrompt } from '@common/ai/prompts/assistantCleaning'
-import { buildRowContextDraft, cleaningRowContextMarker, parseRowContext } from '@common/ai/prompts/cleaningRowContext'
+import {
+  buildRowContextDraft,
+  cleaningRowContextMarker,
+  parseRowContext,
+  toRowContextDisplayText,
+} from '@common/ai/prompts/cleaningRowContext'
 
 import { createConversation } from '@webapp/ai/conversations/conversationModel'
 import { escalateConversationDataClass } from '@webapp/ai/conversations/dataClass'
@@ -167,6 +172,10 @@ describe('row context', () => {
     expect(draft).toContain('Required value; Must be > 0')
     expect(parseRowContext(draft)).toEqual({ recordUuid: 'rec-1', nodeUuid: 'node-1' })
     expect(parseRowContext('no context here')).toBeNull()
+    expect(toRowContextDisplayText(draft)).toBe(
+      'Why is this invalid?\n\nrecord: 12\nattribute: cluster[12] / plot[1] / tree[2] / dbh\nmessages: Required value; Must be > 0'
+    )
+    expect(toRowContextDisplayText('no context here')).toBeNull()
   })
 })
 

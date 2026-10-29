@@ -3,6 +3,7 @@ import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 import * as Record from '@core/record/record'
 import * as RecordValidation from '@core/record/recordValidation'
+import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
 import type { RecordEditBadge } from '@webapp/ai/changeSets/recordEdits/types'
@@ -102,7 +103,8 @@ export const computeRecordEditPreview = async ({
   }
   const { record: recordAfter } = await Record.afterNodesUpdate({
     user,
-    survey,
+    // the store survey keeps its props under `info`: the arena-core validator reads them at the top level
+    survey: { ...Survey.getSurveyInfo(survey), ...survey },
     record: recordUpdated,
     nodes: nodesUpdated,
     categoryItemProvider,

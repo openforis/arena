@@ -17,7 +17,7 @@ describe('runtime errors', () => {
 
   test('messages are always translated appErrors keys', () => {
     expect(getAiErrorMessage({ error: new SystemError('aiInputTooLong', { field: 'f', limit: 1 }), i18n })).toBe(
-      'appErrors:aiInputTooLong{"field":"f","limit":1}'
+      'appErrors:aiInputTooLong{"field":"f","limit":1,"interpolation":{"escapeValue":false}}'
     )
     expect(getAiErrorMessage({ error: new Error('<html>502</html>'), i18n })).toBe('appErrors:aiProviderUnavailable{}')
   })
@@ -26,9 +26,9 @@ describe('runtime errors', () => {
     const apiError = Object.assign(new Error('403'), {
       response: { data: { key: 'appErrors:unauthorized', params: { user: 'u' } } },
     })
-    expect(getAiErrorMessage({ error: apiError, i18n })).toBe('appErrors:unauthorized{"user":"u"}')
+    expect(getAiErrorMessage({ error: apiError, i18n })).toBe('appErrors:unauthorized{"user":"u","interpolation":{"escapeValue":false}}')
     const plainKey = Object.assign(new Error('x'), { response: { data: { key: 'surveyNotFound' } } })
-    expect(getAiErrorMessage({ error: plainKey, i18n })).toBe('appErrors:surveyNotFound{}')
+    expect(getAiErrorMessage({ error: plainKey, i18n })).toBe('appErrors:surveyNotFound{"interpolation":{"escapeValue":false}}')
   })
 
   test('detects aborts', () => {

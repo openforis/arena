@@ -14,6 +14,7 @@ import { appModuleUri, dataModules } from '@webapp/app/appModules'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
+import { RECORD_EDITS_APPLIED_EVENT } from '@webapp/ai/changeSets/recordEdits/types'
 import { notifyValidationReportOpened } from '@webapp/ai/suggestions/notifyValidationReportOpened'
 import { useCleaningAreaStatus } from '@webapp/components/ai/Assistant/cleaning/useCleaningArea'
 import Table from '@webapp/components/Table'
@@ -59,6 +60,14 @@ const ValidationReport = () => {
   useEffect(() => {
     notifyValidationReportOpened({ cycle: surveyCycleKey, askAssistantAvailable })
   }, [surveyCycleKey, askAssistantAvailable])
+
+  // an assistant Apply changed records: remount the table so it fetches the rows again
+  const [reloadCount, setReloadCount] = useState(0)
+  useEffect(() => {
+    const onApplied = () => setReloadCount((count) => count + 1)
+    window.addEventListener(RECORD_EDITS_APPLIED_EVENT, onApplied)
+    return () => window.removeEventListener(RECORD_EDITS_APPLIED_EVENT, onApplied)
+  }, [])
 
   const allAttributesSelected = useMemo(() => {
     if (allAttributeDefUuids.length === 0) return true
@@ -112,6 +121,7 @@ const ValidationReport = () => {
   return (
     <div className="validation-report">
       <Table
+        key={reloadCount}
         className="validation-report__table"
         headerLeftComponent={HeaderLeft}
         headerProps={{

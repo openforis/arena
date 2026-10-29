@@ -83,39 +83,49 @@ export const chunkArray = <T>(array: readonly T[], size: number): T[][] => {
 // re-exported so the workflows stop a run with the same abort error as the engine layer (isAiAbortError)
 export { createAbortError }
 
+// a passed check is trusted this long: fast calls don't re-read the settings and the policy each time
+export const AI_BATCH_GUARD_RECHECK_MS = 5000
+
 /**
  * Creates the check run before each call: the feature must still be on in the user's AI settings and the survey
- * policy must still allow the engine's hosting class for the data class. Both are read fresh (fail closed).
+ * policy must still allow the engine's hosting class for the data class. Both are read fresh (fail closed), at most
+ * once every `recheckMs`.
  * @param {object} params - Parameters.
  * @param {string} params.feature - Feature key.
  * @param {number} params.surveyId - Survey id.
  * @param {string} params.dataClass - Data class sent by the feature.
  * @param {string|null} params.hostingClass - Hosting class of the engine the run uses.
  * @param {AiBatchGuardDeps} params.deps - Fresh reads of the settings and the policy.
+ * @param {number} [params.recheckMs] - How long a passed check is trusted.
  * @returns {AiBatchGuard} The guard; it rejects with aiFeatureDisabled (403) or aiPolicyRefused (403).
  */
-export const createAiBatchGuard =
-  ({
-    feature,
-    surveyId,
-    dataClass,
-    hostingClass,
-    deps,
-  }: {
-    feature: string
-    surveyId: number
-    dataClass: string
-    hostingClass: string | null
-    deps: AiBatchGuardDeps
-  }): AiBatchGuard =>
-  async () => {
+export const createAiBatchGuard = ({
+  feature,
+  surveyId,
+  dataClass,
+  hostingClass,
+  deps,
+  recheckMs = AI_BATCH_GUARD_RECHECK_MS,
+}: {
+  feature: string
+  surveyId: number
+  dataClass: string
+  hostingClass: string | null
+  deps: AiBatchGuardDeps
+  recheckMs?: number
+}): AiBatchGuard => {
+  let passedAt: number | null = null
+  return async () => {
+    if (passedAt !== null && Date.now() - passedAt < recheckMs) return
     const settings = await deps.fetchSettings()
     if (!isAiFeatureEnabledInSettings(settings, feature)) {
       throw new SystemError('aiFeatureDisabled', { feature }, StatusCodes.FORBIDDEN)
     }
     const effective = await deps.fetchEffectivePolicy(surveyId, feature)
     assertHostingAllowed({ effective: effective ?? OFF_POLICY, dataClass, hostingClass })
+    passedAt = Date.now()
   }
+}
 
 type StopCause = Pick<AiBatchStop, 'cause' | 'error'>
 

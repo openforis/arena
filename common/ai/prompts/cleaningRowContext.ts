@@ -46,3 +46,13 @@ export const parseRowContext = (text: string): { recordUuid: string; nodeUuid: s
   const nodeUuid = /\(nodeUuid: ([\w-]+)\)/.exec(text)?.[1]
   return recordUuid && nodeUuid ? { recordUuid, nodeUuid } : null
 }
+
+/**
+ * Returns what the chat shows for a message with a row context: the message without the marker and the UUIDs.
+ * @param {string} text - The message.
+ * @returns {string|null} The text to show, or null without a row context.
+ */
+export const toRowContextDisplayText = (text: string): string | null =>
+  text.includes(cleaningRowContextMarker)
+    ? text.replace(`${cleaningRowContextMarker}\n`, '').replaceAll(/ \((?:recordUuid|nodeUuid): [\w-]+\)/g, '')
+    : null

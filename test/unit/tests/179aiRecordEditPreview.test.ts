@@ -42,10 +42,10 @@ const newPlotRecord = async ({ plotId, dbh, height }: { plotId: number; dbh: num
     }),
   })
 
-const preview = (record: any, edits: [string, unknown][]) =>
+const preview = (record: any, edits: [string, unknown][], surveyToPreview = survey) =>
   computeRecordEditPreview({
     user: cleaningAdminUser,
-    survey,
+    survey: surveyToPreview,
     record,
     edits: edits.map(([path, value]) => ({
       node: RecordUtils.findNodeByPath(path)(survey, record),
@@ -89,6 +89,14 @@ describe('computeRecordEditPreview', () => {
     const dbhPreview = result.previewByNodeUuid[nodeUuidAt(record, 'plot/dbh')]
     expect(dbhPreview.badge).toBe('stillInvalid')
     expect(dbhPreview.messages.length).toBeGreaterThan(0)
+  })
+
+  test('stillInvalid with the survey as the store keeps it (props under info)', async () => {
+    const record = await newPlotRecord({ plotId: 1, dbh: -1, height: null })
+    const storeSurvey = { ...survey, info: survey }
+    delete storeSurvey.props
+    const result = await preview(record, [['plot/dbh', -5]], storeSurvey)
+    expect(result.previewByNodeUuid[nodeUuidAt(record, 'plot/dbh')].badge).toBe('stillInvalid')
   })
 
   test('noErrors: valid before and after', async () => {

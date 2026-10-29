@@ -12,6 +12,7 @@ import {
   applyRecordEdits as applyRecordEditsRequest,
   toChunkErrorResult,
 } from '@webapp/ai/changeSets/recordEdits/recordEditsApplier'
+import { RECORD_EDITS_APPLIED_EVENT } from '@webapp/ai/changeSets/recordEdits/types'
 import type { OperationResult } from '@webapp/ai/changeSets/types'
 
 import type { AssistantCardAppliers } from './assistantConversationController'
@@ -46,6 +47,8 @@ export const createCardAppliers = (reduxStore: ReduxStore): AssistantCardApplier
       // the card shows the edits as failed instead of an unhandled rejection
       results = operationIds.map((operationId) => toChunkErrorResult(operationId, error))
     }
+    if (results.some((result) => result.status === 'applied'))
+      window.dispatchEvent(new CustomEvent(RECORD_EDITS_APPLIED_EVENT))
     return { results, note: summarizeRecordEditResults({ changeSet, results }) }
   },
 })

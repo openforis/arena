@@ -1,5 +1,6 @@
 import * as Node from '@core/record/node'
 import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
 
 import {
   describeNodePath,
@@ -30,6 +31,15 @@ describe('record node describer', () => {
   test('path with the keys of the multiple entities', () => {
     expect(describeNodePath({ survey, cycle, record, node: nodeAt('cluster/plot[0]/tree[1]/dbh') })).toBe(
       'cluster[12] / plot[1] / tree[2] / dbh'
+    )
+  })
+
+  test('with a language the path shows labels, or names where there is no label', () => {
+    const dbhDef = Survey.getNodeDefByName('dbh')(survey)
+    const labelled = Survey.assocNodeDef({ nodeDef: NodeDef.assocLabel({ label: 'DBH', lang: 'en' })(dbhDef) })(survey)
+    const node = nodeAt('cluster/plot[0]/tree[1]/dbh')
+    expect(describeNodePath({ survey: labelled, cycle, record, node, lang: 'en' })).toBe(
+      'cluster[12] / plot[1] / tree[2] / DBH'
     )
   })
 

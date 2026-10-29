@@ -34,12 +34,22 @@ export const describeRecordKeys = ({ survey, cycle, record }: { survey: any; cyc
   NodeValueFormatter.getFormattedRecordKeys({ survey, cycle, record }).join(', ')
 
 /**
+ * Returns the label of a node def in the language, or its name when no language is given (for the model).
+ * @param {object} nodeDef - The node def.
+ * @param {string} [lang] - Label language.
+ * @returns {string} The label or the name.
+ */
+const getNodeDefText = (nodeDef: any, lang?: string): string =>
+  lang ? NodeDef.getLabel(nodeDef, lang) : NodeDef.getName(nodeDef)
+
+/**
  * Describes one entity of a path: its name, with its keys when it is the root or a multiple entity.
  * @param {object} params - Parameters.
  * @param {object} params.survey - The survey.
  * @param {string} params.cycle - Cycle key.
  * @param {object} params.record - The record.
  * @param {object} params.entity - The entity.
+ * @param {string} [params.lang] - Label language: labels instead of names.
  * @returns {string} E.g. tree[2].
  */
 const describeEntity = ({
@@ -47,14 +57,16 @@ const describeEntity = ({
   cycle,
   record,
   entity,
+  lang,
 }: {
   survey: any
   cycle: string
   record: any
   entity: any
+  lang?: string
 }) => {
   const entityDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(entity))(survey)
-  const name = NodeDef.getName(entityDef)
+  const name = getNodeDefText(entityDef, lang)
   if (NodeDef.isSingleEntity(entityDef) && !NodeDef.isRoot(entityDef)) return name
   const keyValues = Record.getEntityKeyNodes(
     survey,
@@ -86,6 +98,7 @@ const getAncestorsRootFirst = (record: any, node: any): any[] => {
  * @param {string} params.cycle - Cycle key.
  * @param {object} params.record - The record.
  * @param {object} params.node - The node.
+ * @param {string} [params.lang] - Label language: labels instead of names.
  * @returns {string} E.g. cluster[12] / plot[1] / tree[2] / dbh.
  */
 export const describeNodePath = ({
@@ -93,16 +106,22 @@ export const describeNodePath = ({
   cycle,
   record,
   node,
+  lang,
 }: {
   survey: any
   cycle: string
   record: any
   node: any
+  lang?: string
 }) => {
-  const parts = getAncestorsRootFirst(record, node).map((entity) => describeEntity({ survey, cycle, record, entity }))
+  const parts = getAncestorsRootFirst(record, node).map((entity) =>
+    describeEntity({ survey, cycle, record, entity, lang })
+  )
   const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
   parts.push(
-    NodeDef.isEntity(nodeDef) ? describeEntity({ survey, cycle, record, entity: node }) : NodeDef.getName(nodeDef)
+    NodeDef.isEntity(nodeDef)
+      ? describeEntity({ survey, cycle, record, entity: node, lang })
+      : getNodeDefText(nodeDef, lang)
   )
   return parts.join(' / ')
 }

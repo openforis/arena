@@ -1,6 +1,6 @@
 /**
- * App wiring of the batch guard: the AI settings and the survey's effective policy, read from the server before
- * each call. No cache: a change made during a long run must stop it.
+ * App wiring of the batch guard: the AI settings and the survey's effective policy, read from the server (the guard
+ * re-reads them every few seconds: a change made during a long run must stop it).
  */
 import axios from 'axios'
 

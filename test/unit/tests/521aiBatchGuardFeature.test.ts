@@ -11,6 +11,7 @@ describe('AI batch guard reads the policy of its feature (521)', () => {
       surveyId: 9,
       dataClass: 'schema',
       hostingClass: 'cloud',
+      recheckMs: 0,
       deps: {
         fetchSettings: async () => settingsOn,
         fetchEffectivePolicy: async (surveyId: number, feature: string) => {
@@ -25,5 +26,25 @@ describe('AI batch guard reads the policy of its feature (521)', () => {
       [9, 'dataDictionary'],
       [9, 'dataDictionary'],
     ])
+  })
+
+  test('a passed check is trusted for recheckMs: fast calls read the settings and the policy once', async () => {
+    let reads = 0
+    const guard = createAiBatchGuard({
+      feature: 'dataDictionary',
+      surveyId: 9,
+      dataClass: 'schema',
+      hostingClass: 'cloud',
+      deps: {
+        fetchSettings: async () => {
+          reads += 1
+          return settingsOn
+        },
+        fetchEffectivePolicy: async () => cloudPolicy,
+      },
+    })
+    await guard()
+    await guard()
+    expect(reads).toBe(1)
   })
 })
