@@ -97,10 +97,12 @@ test.describe('Area of interest', () => {
     const dialog = page.locator('.file-upload-dialog')
     const okButton = dialog.getByRole('button', { name: 'Ok' })
     await dialog.locator('input[type="file"]').setInputFiles(geoJsonPath)
-    // the name is a valid identifier, used in the expressions
-    await dialog.getByRole('textbox').first().fill('Pilot area')
+    // the name is used in the expressions: normalized while typing, keywords not allowed
+    const nameInput = dialog.getByRole('textbox').first()
+    await nameInput.fill('length')
     await expect(okButton).toBeDisabled()
-    await dialog.getByRole('textbox').first().fill(pilotAreaName)
+    await nameInput.fill('Pilot Area')
+    await expect(nameInput).toHaveValue(pilotAreaName)
     await okButton.click()
 
     const row = section.getByRole('row').filter({ hasText: pilotAreaName })

@@ -1,0 +1,7 @@
+.area-of-interest-dialog {
+  // share a single label column width between form-item and labels-editor (different grid ratios by default)
+  .form-item,
+  .labels-editor.with-label {
+    grid-template-columns: 8rem 1fr;
+  }
+}

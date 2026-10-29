@@ -1,3 +1,5 @@
+import './AreaOfInterestDialog.scss'
+
 import { useCallback, useEffect, useState } from 'react'
 
 import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
@@ -5,6 +7,7 @@ import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import { SurveyAreaOfInterestValidator } from '@core/survey/surveyAreaOfInterestValidator'
+import * as StringUtils from '@core/stringUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
 import type { ValidationInstance } from '@core/validation/validation'
 import * as Validation from '@core/validation/validation'
@@ -124,23 +127,26 @@ export const AreaOfInterestDialog = (props: Props) => {
       showCloseButton
     >
       <ModalBody>
-        <FormItem label="homeView:surveyInfo.areasOfInterest.name">
-          <Input
-            onChange={setName}
-            value={name}
-            validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.name)(validation)}
-          />
-        </FormItem>
-        <LabelsEditor labels={labels} onChange={setLabels} />
-        <ValidationTooltip validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}>
-          <Dropzone
-            accept={accept}
-            disabled={uploading}
-            droppedFiles={upload ? [upload.content] : []}
-            maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
-            onDrop={onFilesDrop}
-          />
-        </ValidationTooltip>
+        <div className="area-of-interest-dialog">
+          <FormItem label="homeView:surveyInfo.areasOfInterest.name">
+            <Input
+              onChange={setName}
+              textTransformFunction={StringUtils.normalizeName}
+              value={name}
+              validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.name)(validation)}
+            />
+          </FormItem>
+          <LabelsEditor labels={labels} onChange={setLabels} />
+          <ValidationTooltip validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}>
+            <Dropzone
+              accept={accept}
+              disabled={uploading}
+              droppedFiles={upload ? [upload.content] : []}
+              maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
+              onDrop={onFilesDrop}
+            />
+          </ValidationTooltip>
+        </div>
       </ModalBody>
       <ModalFooter>
         <Button
