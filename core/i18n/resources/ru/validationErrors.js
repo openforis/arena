@@ -177,6 +177,12 @@ export default {
     areaOfInterestInvalid: 'Область интереса должна быть полигоном в формате GeoJSON с координатами WGS84',
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'Файл обязателен',
+    nameDuplicate: 'Другая область интереса с таким же именем уже существует',
+    nameRequired: 'Имя обязательно',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'Файл обязателен',
     fileNameDuplicate: 'Другой файл с таким же именем уже существует',

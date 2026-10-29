@@ -174,6 +174,12 @@ export default {
     areaOfInterestInvalid: 'Сонирхсон бүс нь WGS84 координаттай GeoJSON форматын олон өнцөгт байх ёстой',
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'Файл шаардлагатай',
+    nameDuplicate: 'Ижил нэртэй өөр сонирхлын бүс аль хэдийн байна',
+    nameRequired: 'Нэр шаардлагатай',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'Файл шаардлагатай',
     fileNameDuplicate: 'Ижил нэртэй файл аль хэдийн орсон байна',

@@ -1,6 +1,4 @@
-import * as A from '@core/arena'
-
-import type { AreaOfInterest } from '@openforis/arena-core'
+import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
 
 import { getAreaOfInterestSummary } from '@core/geo/areaOfInterestParser'
 import * as ObjectUtils from '@core/objectUtils'
@@ -8,103 +6,93 @@ import * as ObjectUtils from '@core/objectUtils'
 import { getInfo, keys as infoKeys } from './_survey/surveyInfo'
 import * as SurveyFile from './surveyFile'
 
-// the area of interest geometry is stored as survey file: the survey info props only reference it
+// the geometries are stored as survey files: the survey info only holds the descriptors
 export const keys = {
-  fileUuid: 'fileUuid',
   name: 'name',
+  labels: 'labels',
+  fileUuid: 'fileUuid',
+  fileName: 'fileName',
   size: 'size',
   polygons: 'polygons',
   vertices: 'vertices',
 } as const
 
-export type AreaOfInterestFileDescriptor = {
-  [keys.fileUuid]: string
-  [keys.name]: string
-  [keys.size]: number
-  [keys.polygons]: number
-  [keys.vertices]: number
-}
-
 // same max size of the preloaded map layers
 export const AREA_OF_INTEREST_MAX_FILE_SIZE_MB = 10
 
 /**
- * Creates the descriptor of an area of interest file, stored in the survey info props.
+ * Creates the descriptor of an area of interest, stored in the survey info props.
  *
  * @param {object} params - The parameters.
- * @param {string} params.fileUuid - UUID of the survey file.
- * @param {string} params.name - Name of the uploaded file.
+ * @param {string} params.name - Area name (identifier used in expressions).
+ * @param {object} [params.labels] - Labels by language.
+ * @param {string} params.fileUuid - UUID of the survey file with the geometry.
+ * @param {string} params.fileName - Name of the uploaded file.
  * @param {number} params.size - Size of the stored file content.
- * @param {AreaOfInterest} params.areaOfInterest - The area of interest (to compute the summary).
- * @returns {AreaOfInterestFileDescriptor} - The descriptor.
+ * @param {AreaOfInterest} params.areaOfInterest - The geometry (to compute the summary).
+ * @returns {AreaOfInterestDescriptor} - The descriptor.
  */
-export const newAreaOfInterestFileDescriptor = ({
-  fileUuid,
+export const newAreaOfInterestDescriptor = ({
   name,
+  labels,
+  fileUuid,
+  fileName,
   size,
   areaOfInterest,
 }: {
-  fileUuid: string
   name: string
+  labels?: Record<string, string>
+  fileUuid: string
+  fileName: string
   size: number
   areaOfInterest: AreaOfInterest
-}): AreaOfInterestFileDescriptor => ({
-  [keys.fileUuid]: fileUuid,
-  [keys.name]: name,
-  [keys.size]: size,
+}): AreaOfInterestDescriptor => ({
+  name,
+  ...(labels ? { labels } : {}),
+  fileUuid,
+  fileName,
+  size,
   ...getAreaOfInterestSummary(areaOfInterest),
 })
 
 /**
- * Returns the descriptor of the area of interest file of the survey, if any.
+ * Returns the areas of interest of the survey.
  *
  * @param {object} surveyOrSurveyInfo - The survey or the survey info.
- * @returns {AreaOfInterestFileDescriptor|null} - The descriptor or null.
+ * @returns {AreaOfInterestDescriptor[]} - The descriptors (empty if none).
  */
-export const getAreaOfInterestFile = (surveyOrSurveyInfo: any): AreaOfInterestFileDescriptor | null =>
-  ObjectUtils.getProp(
-    infoKeys.areaOfInterestFile,
-    null
-  )(getInfo(surveyOrSurveyInfo)) as AreaOfInterestFileDescriptor | null
+export const getAreasOfInterest = (surveyOrSurveyInfo: any): AreaOfInterestDescriptor[] =>
+  ObjectUtils.getProp(infoKeys.areasOfInterest, [])(getInfo(surveyOrSurveyInfo)) as AreaOfInterestDescriptor[]
 
 /**
- * Returns the UUID of the area of interest file of the survey, if any.
+ * Returns the names of the areas of interest, in the survey order.
  *
  * @param {object} surveyOrSurveyInfo - The survey or the survey info.
- * @returns {string|null} - The file UUID or null.
+ * @returns {string[]} - The names.
  */
-export const getAreaOfInterestFileUuid = (surveyOrSurveyInfo: any): string | null =>
-  getAreaOfInterestFile(surveyOrSurveyInfo)?.[keys.fileUuid] ?? null
+export const getAreaOfInterestNames = (surveyOrSurveyInfo: any): string[] =>
+  getAreasOfInterest(surveyOrSurveyInfo).map((descriptor) => descriptor.name)
 
 /**
- * Returns the summary ({ uuid, props: { type, name, size } }) of the area of interest file, used by survey
+ * Returns the UUIDs of the area of interest files.
+ *
+ * @param {object} surveyOrSurveyInfo - The survey or the survey info.
+ * @returns {string[]} - The file UUIDs.
+ */
+export const getAreaOfInterestFileUuids = (surveyOrSurveyInfo: any): string[] =>
+  getAreasOfInterest(surveyOrSurveyInfo).map((descriptor) => descriptor.fileUuid)
+
+/**
+ * Returns the summaries ({ uuid, props: { type, name, size } }) of the area of interest files, used by survey
  * export/import and by the Arena Mobile survey package.
  *
  * @param {object} surveyOrSurveyInfo - The survey or the survey info.
- * @returns {object|null} - The file summary or null.
+ * @returns {object[]} - The file summaries.
  */
-export const getAreaOfInterestFileSummary = (
+export const getAreaOfInterestFileSummaries = (
   surveyOrSurveyInfo: any
-): { uuid: string; props: { type: string; name: string; size: number } } | null => {
-  const descriptor = getAreaOfInterestFile(surveyOrSurveyInfo)
-  const fileUuid = descriptor?.[keys.fileUuid]
-  if (!fileUuid) return null
-  return {
+): { uuid: string; props: { type: string; name: string; size: number } }[] =>
+  getAreasOfInterest(surveyOrSurveyInfo).map(({ fileUuid, fileName, size }) => ({
     uuid: fileUuid,
-    props: { type: SurveyFile.SurveyFileType.areaOfInterest, name: descriptor[keys.name], size: descriptor[keys.size] },
-  }
-}
-
-/**
- * Sets the area of interest geometry in the survey info props, only in memory: it is read from there by the
- * arena-core expression evaluator (geoDistanceToAOIBoundary function).
- *
- * @param {AreaOfInterest|null} areaOfInterest - The area of interest geometry.
- * @returns {function(object): object} - Function returning the updated survey.
- */
-export const assocAreaOfInterest =
-  (areaOfInterest: AreaOfInterest | null) =>
-  (survey: any): any =>
-    survey.info
-      ? A.assocPath([infoKeys.info, infoKeys.props, infoKeys.areaOfInterest], areaOfInterest)(survey)
-      : ObjectUtils.setProp(infoKeys.areaOfInterest, areaOfInterest)(survey)
+    props: { type: SurveyFile.SurveyFileType.areaOfInterest, name: fileName, size },
+  }))

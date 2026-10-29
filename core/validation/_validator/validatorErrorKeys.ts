@@ -140,6 +140,12 @@ export const ValidatorErrorKeys = {
     areaOfInterestInvalid: 'validationErrors:surveyInfoEdit.areaOfInterestInvalid',
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'validationErrors:surveyAreaOfInterest.fileRequired',
+    nameDuplicate: 'validationErrors:surveyAreaOfInterest.nameDuplicate',
+    nameRequired: 'validationErrors:surveyAreaOfInterest.nameRequired',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'validationErrors:surveyPreloadedMapLayer.fileRequired',
     fileNameDuplicate: 'validationErrors:surveyPreloadedMapLayer.fileNameDuplicate',

@@ -176,6 +176,12 @@ export default {
     areaOfInterestInvalid: 'Područje od interesa mora biti poligon u GeoJSON formatu sa WGS84 koordinatama',
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'Fajl je obavezan',
+    nameDuplicate: 'Već postoji druga oblast interesovanja sa istim nazivom',
+    nameRequired: 'Naziv je obavezan',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'Fajl je obavezan',
     fileNameDuplicate: 'Već postoji drugi fajl sa istim nazivom',

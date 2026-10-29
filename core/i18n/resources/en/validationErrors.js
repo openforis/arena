@@ -175,6 +175,12 @@ export default {
     areaOfInterestInvalid: 'Area of interest must be a polygon in GeoJSON format with WGS84 coordinates',
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'File is required',
+    nameDuplicate: 'Another area of interest with the same name already exists',
+    nameRequired: 'Name is required',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'File is required',
     fileNameDuplicate: 'Another file with the same name already exists',

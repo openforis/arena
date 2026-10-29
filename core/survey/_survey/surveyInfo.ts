@@ -24,9 +24,8 @@ export const keys = {
   props: ObjectUtils.keys.props,
   rdbInitialized: 'rdbInitialized',
   // Props
-  // area of interest geometry: set only in memory on the server, for the expression evaluator
-  areaOfInterest: 'areaOfInterest',
-  areaOfInterestFile: 'areaOfInterestFile',
+  // descriptors only: the geometries are stored as survey files
+  areasOfInterest: 'areasOfInterest',
   collectUri: 'collectUri',
   collectReport: 'collectReport',
   collectNodeDefsInfoByPath: 'collectNodeDefsInfoByPath',

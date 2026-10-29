@@ -179,6 +179,12 @@ export default {
     areaOfInterestInvalid: "La zone d'intérêt doit être un polygone au format GeoJSON avec des coordonnées WGS84",
   },
 
+  surveyAreaOfInterest: {
+    fileRequired: 'Le fichier est requis',
+    nameDuplicate: "Une autre zone d'intérêt avec le même nom existe déjà",
+    nameRequired: 'Le nom est requis',
+  },
+
   surveyPreloadedMapLayer: {
     fileRequired: 'Le fichier est requis',
     fileNameDuplicate: 'Un autre fichier avec le même nom existe déjà',
