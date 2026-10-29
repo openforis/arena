@@ -178,7 +178,7 @@ export default {
 
   surveyAreaOfInterest: {
     fileRequired: 'Fajl je obavezan',
-    nameDuplicate: 'Već postoji druga oblast interesovanja sa istim nazivom',
+    nameDuplicate: 'Već postoji drugo područje od interesa sa istim nazivom',
     nameRequired: 'Naziv je obavezan',
   },
 

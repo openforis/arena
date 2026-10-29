@@ -176,7 +176,7 @@ export default {
 
   surveyAreaOfInterest: {
     fileRequired: 'Файл шаардлагатай',
-    nameDuplicate: 'Ижил нэртэй өөр сонирхлын бүс аль хэдийн байна',
+    nameDuplicate: 'Ижил нэртэй өөр сонирхсон бүс аль хэдийн байна',
     nameRequired: 'Нэр шаардлагатай',
   },
 

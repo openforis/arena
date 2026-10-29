@@ -57,7 +57,7 @@ export const useSurveyInfoForm = () => {
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
   const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
   const setBranding = (value) => setObjectField(Survey.infoKeys.branding, value)
-  const setAreaOfInterestFile = (value) => setObjectField(Survey.infoKeys.areaOfInterestFile, value)
+  const setAreasOfInterest = (value) => setObjectField(Survey.infoKeys.areasOfInterest, value)
 
   const saveProps = () => {
     enableValidation()
@@ -95,6 +95,6 @@ export const useSurveyInfoForm = () => {
     setSrs,
     setUserExtraPropDefs,
     setBranding,
-    setAreaOfInterestFile,
+    setAreasOfInterest,
   }
 }

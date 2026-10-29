@@ -8,19 +8,19 @@ import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 import SamplingPolygonEditor from './SamplingPolygonEditor'
-import { AreaOfInterestEditor } from './AreaOfInterestEditor'
+import { AreasOfInterestEditor } from './AreasOfInterestEditor'
 import PreloadedMapLayersEditor from '../PreloadedMapLayersEditor'
 
 export const SurveyInfoMap = (props) => {
   const {
-    areaOfInterestFile,
+    areasOfInterest,
     canUseAnalysis = false,
     preloadedMapLayers,
     preloadedMapLayersEnabled,
     sampleBasedImageInterpretationEnabled,
     samplingPolygon,
     getFieldValidation,
-    setAreaOfInterestFile,
+    setAreasOfInterest,
     setSampleBasedImageInterpretationEnabled,
     setSamplingPolygon,
     setPreloadedMapLayersEnabled,
@@ -49,11 +49,10 @@ export const SurveyInfoMap = (props) => {
           readOnly={readOnly}
         />
       )}
-      <AreaOfInterestEditor
-        areaOfInterestFile={areaOfInterestFile}
+      <AreasOfInterestEditor
+        areasOfInterest={areasOfInterest}
         readOnly={readOnly}
-        setAreaOfInterestFile={setAreaOfInterestFile}
-        validation={getFieldValidation(Survey.infoKeys.areaOfInterestFile)}
+        setAreasOfInterest={setAreasOfInterest}
       />
       {experimentalFeatures && (
         <>
@@ -78,9 +77,9 @@ export const SurveyInfoMap = (props) => {
 }
 
 SurveyInfoMap.propTypes = {
-  areaOfInterestFile: PropTypes.object,
+  areasOfInterest: PropTypes.array,
   canUseAnalysis: PropTypes.bool,
-  setAreaOfInterestFile: PropTypes.func.isRequired,
+  setAreasOfInterest: PropTypes.func.isRequired,
   getFieldValidation: PropTypes.func.isRequired,
   sampleBasedImageInterpretationEnabled: PropTypes.bool,
   samplingPolygon: PropTypes.object,

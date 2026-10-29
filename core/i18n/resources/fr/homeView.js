@@ -139,14 +139,17 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
     editInfo: 'Modifier les infos',
     viewInfo: 'Voir les infos',
 
-    areaOfInterest: {
-      title: "Zone d'intérêt",
+    areasOfInterest: {
+      title: "Zones d'intérêt",
+      info: "Polygones (GeoJSON, coordonnées WGS84) utilisés par les fonctions d'expression geoDistanceToAOIBoundary (distance à la limite d'une zone) et geoAOIContaining (zone contenant un emplacement), également hors ligne dans Arena Mobile. Le nom d'une zone est utilisé dans les expressions.",
+      name: 'Nom',
       polygons: 'Polygones',
       vertices: 'Sommets',
-      info: "Polygone (GeoJSON, coordonnées WGS84) utilisé par la fonction d'expression geoDistanceToAOIBoundary pour vérifier si un emplacement se trouve dans la zone, également hors ligne dans Arena Mobile",
-      summary: '{{polygons}} polygone(s), {{vertices}} sommets',
       invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',
-      confirmDelete: "Êtes-vous sûr de vouloir supprimer la zone d'intérêt ?",
+      confirmDelete: "Êtes-vous sûr de vouloir supprimer cette zone d'intérêt ?",
+      editor: {
+        title: "Zone d'intérêt",
+      },
     },
 
     preloadedMapLayers: {

@@ -138,14 +138,17 @@ export default {
     map: '地図',
     viewInfo: '情報を表示',
 
-    areaOfInterest: {
+    areasOfInterest: {
       title: '関心領域',
+      info: '式関数 geoDistanceToAOIBoundary（領域の境界までの距離）と geoAOIContaining（位置を含む領域）で使用されるポリゴン（GeoJSON、WGS84座標）。Arena Mobile ではオフラインでも使用できます。領域の名前は式で使用されます。',
+      name: '名前',
       polygons: 'ポリゴン',
       vertices: '頂点',
-      info: '式関数 geoDistanceToAOIBoundary で位置が領域内にあるかを確認するために使用されるポリゴン（GeoJSON、WGS84座標）。Arena Mobile ではオフラインでも使用できます',
-      summary: 'ポリゴン {{polygons}} 個、頂点 {{vertices}} 個',
       invalidFile: 'ファイルにWGS84座標のGeoJSON形式の有効なポリゴンが含まれていません',
-      confirmDelete: '関心領域を削除してもよろしいですか？',
+      confirmDelete: 'この関心領域を削除してもよろしいですか？',
+      editor: {
+        title: '関心領域',
+      },
     },
 
     preloadedMapLayers: {

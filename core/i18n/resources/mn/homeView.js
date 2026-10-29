@@ -138,14 +138,17 @@ export default {
     editInfo: 'Мэдээллийг засах',
     viewInfo: 'Мэдээллийг харах',
 
-    areaOfInterest: {
-      title: 'Сонирхсон бүс',
+    areasOfInterest: {
+      title: 'Сонирхсон бүсүүд',
+      info: 'geoDistanceToAOIBoundary (бүсийн хил хүртэлх зай) болон geoAOIContaining (байршлыг агуулсан бүс) илэрхийллийн функцүүдэд ашиглах олон өнцөгтүүд (GeoJSON, WGS84 координат), Arena Mobile-д офлайн үед ч ажиллана. Бүсийн нэрийг илэрхийлэлд ашиглана.',
+      name: 'Нэр',
       polygons: 'Олон өнцөгтүүд',
       vertices: 'Оройнууд',
-      info: 'Байршил бүсийн дотор байгаа эсэхийг geoDistanceToAOIBoundary илэрхийллийн функцээр шалгахад ашиглах олон өнцөгт (GeoJSON, WGS84 координат), Arena Mobile-д офлайн үед ч ажиллана',
-      summary: '{{polygons}} олон өнцөгт, {{vertices}} орой',
       invalidFile: 'Файлд WGS84 координаттай GeoJSON форматын хүчинтэй олон өнцөгт алга',
-      confirmDelete: 'Сонирхсон бүсийг устгахдаа итгэлтэй байна уу?',
+      confirmDelete: 'Энэ сонирхсон бүсийг устгахдаа итгэлтэй байна уу?',
+      editor: {
+        title: 'Сонирхсон бүс',
+      },
     },
 
     preloadedMapLayers: {

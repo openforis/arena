@@ -138,14 +138,17 @@ export default {
     editInfo: 'Редактировать информацию',
     viewInfo: 'Просмотреть информацию',
 
-    areaOfInterest: {
-      title: 'Область интереса',
+    areasOfInterest: {
+      title: 'Области интереса',
+      info: 'Полигоны (GeoJSON, координаты WGS84), используемые функциями выражений geoDistanceToAOIBoundary (расстояние до границы области) и geoAOIContaining (область, содержащая местоположение), в том числе офлайн в Arena Mobile. Имя области используется в выражениях.',
+      name: 'Имя',
       polygons: 'Полигоны',
       vertices: 'Вершины',
-      info: 'Полигон (GeoJSON, координаты WGS84), используемый функцией выражения geoDistanceToAOIBoundary для проверки, находится ли местоположение внутри области, в том числе офлайн в Arena Mobile',
-      summary: 'Полигонов: {{polygons}}, вершин: {{vertices}}',
       invalidFile: 'Файл не содержит допустимого полигона в формате GeoJSON с координатами WGS84',
-      confirmDelete: 'Вы уверены, что хотите удалить область интереса?',
+      confirmDelete: 'Вы уверены, что хотите удалить эту область интереса?',
+      editor: {
+        title: 'Область интереса',
+      },
     },
 
     preloadedMapLayers: {
