@@ -3976,9 +3976,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.12.0, @openforis/arena-core@npm:^2.17.0":
-  version: 2.17.0
-  resolution: "@openforis/arena-core@npm:2.17.0"
+"@openforis/arena-core@npm:^2.12.0, @openforis/arena-core@npm:^2.18.0":
+  version: 2.18.0
+  resolution: "@openforis/arena-core@npm:2.18.0"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -3994,7 +3994,7 @@ __metadata:
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/acb8a94dc0b550ff80e5f406bad5063abb61f0a1cb3abf467cc2966a3f02aee985f884c169d083fefefca51c0872c2e6c8e5459030e815f9480a8dc5531d6f1a
+  checksum: 10c0/19ee16d822aa07718526ded6e3333c8910bfb6df3e8ca381b67b0843e2ef3a6a002271216bebb6205e7a2a3da859d3ed0d5a94cbd149730fba0fa4728d14787f
   languageName: node
   linkType: hard
 
@@ -14315,7 +14315,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9"
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
-    "@openforis/arena-core": "npm:^2.17.0"
+    "@openforis/arena-core": "npm:^2.18.0"
     "@openforis/arena-server": "npm:^2.8.0"
     "@playwright/test": "npm:1.64.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
