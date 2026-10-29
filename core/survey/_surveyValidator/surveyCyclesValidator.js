@@ -71,8 +71,8 @@ export const validateCycles = async (cycles) => {
       cyclesSize === 0
         ? Validation.messageKeys.surveyInfoEdit.cyclesRequired
         : Validation.messageKeys.surveyInfoEdit.cyclesExceedingMax
-    Validation.setErrors([ValidationResult.newInstance(errorKey)])
-    Validation.setValid(false)
+    Validation.setErrors([ValidationResult.newInstance(errorKey)])(result)
+    Validation.setValid(false)(result)
   }
 
   // 2. validate each cycle
