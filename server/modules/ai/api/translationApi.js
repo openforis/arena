@@ -30,7 +30,7 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        if (!socketId || !WebSocketServer.isSocketConnected(socketId)) {
+        if (!socketId || !(await WebSocketServer.isSocketConnected(socketId))) {
           res.status(400).json({ error: { key: 'appErrors:aiTranslationSocketMissing' } })
           return
         }
