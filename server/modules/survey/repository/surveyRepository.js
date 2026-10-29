@@ -4,7 +4,7 @@ import camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DB from '@server/db'
 
-import { now as dbNow, selectDate } from '@server/db/dbUtils'
+import { now as dbNow, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
 
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
@@ -212,8 +212,8 @@ export const fetchUserSurveys = async (
       template,
       search,
       lang,
-      limit: A.isNil(limit) ? null : Number(limit),
-      offset: Number(offset ?? 0),
+      limit: normalizeLimit(limit),
+      offset: normalizeOffset(offset),
     },
     (def) => DB.transformCallback(def, true)
   )

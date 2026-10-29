@@ -1,5 +1,6 @@
 import * as Expression from '@core/expressionParser/expression'
 import { Sort } from '@common/model/query'
+import * as DbUtils from '@server/db/dbUtils'
 
 const identifier = (name: string) => ({ type: 'Identifier', name })
 const literal = (value: string) => ({ type: 'Literal', value, raw: value })
@@ -45,5 +46,31 @@ describe('Sort.toSql', () => {
       ' $/sort_0:name/ DESC,  $/sort_1:name/ DESC,  $/sort_2:name/ ASC,  $/sort_3:name/ ASC,  $/sort_4:name/ ASC'
     )
     expect(params).toEqual({ sort_0: 'a', sort_1: 'b', sort_2: 'c', sort_3: 'd', sort_4: 'e' })
+  })
+})
+
+describe('DbUtils limit and offset normalization', () => {
+  test.each([
+    [10, 10],
+    ['10', 10],
+    [null, null],
+    [undefined, null],
+    [0, null],
+    [-1, null],
+    [1.5, null],
+    ['10; DELETE FROM survey_1.record', null],
+  ])('normalizeLimit(%p) = %p', (limit, expected) => {
+    expect(DbUtils.normalizeLimit(limit)).toBe(expected)
+  })
+
+  test.each([
+    [10, 10],
+    ['10', 10],
+    [null, 0],
+    [undefined, 0],
+    [-1, 0],
+    ['0; DELETE FROM survey_1.record', 0],
+  ])('normalizeOffset(%p) = %p', (offset, expected) => {
+    expect(DbUtils.normalizeOffset(offset)).toBe(expected)
   })
 })

@@ -210,8 +210,8 @@ export const fetchUsers = async (
     OFFSET $/offset/`,
     {
       search: DbUtils.prepareParameterForFilter(search),
-      limit: limit ? Number(limit) : null,
-      offset: Number(offset ?? 0),
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
     },
     camelize
   )
@@ -252,7 +252,7 @@ export const fetchUsersBySurveyId = async (
     ORDER BY u.name
     LIMIT $2
     OFFSET $3`,
-    [surveyId, limit ? Number(limit) : null, Number(offset ?? 0)],
+    [surveyId, DbUtils.normalizeLimit(limit), DbUtils.normalizeOffset(offset)],
     camelize
   )
 

@@ -437,7 +437,7 @@ export const fetchRecordsSummaryBySurveyId = async (
 
     ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()}
 
-    ${limit ? 'LIMIT $/limit/' : ''}
+    LIMIT $/limit/
 
     OFFSET $/offset/
   `,
@@ -446,8 +446,8 @@ export const fetchRecordsSummaryBySurveyId = async (
       cycle,
       step,
       search,
-      limit: limit ? Number(limit) : null,
-      offset: Number(offset ?? 0),
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
       recordUuids,
       ownerUuid,
       ...qualifierFilterParams,

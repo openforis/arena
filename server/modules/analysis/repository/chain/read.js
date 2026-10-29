@@ -6,6 +6,7 @@ import * as Chain from '@common/analysis/chain'
 import * as A from '@core/arena'
 
 import * as DB from '@server/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 export const transformCallback = (row) => {
   if (!row) return {}
@@ -49,7 +50,7 @@ export const fetchChains = async (params, client = DB.client) => {
     ORDER BY ${tableChain.columnDateCreated} DESC
     LIMIT $1
     OFFSET $2`,
-    [limit ? Number(limit) : null, Number(offset ?? 0)],
+    [DbUtils.normalizeLimit(limit), DbUtils.normalizeOffset(offset)],
     transformCallback
   )
 }

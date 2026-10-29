@@ -300,7 +300,7 @@ export const fetchTaxa = async (
     LIMIT $/limit/
     OFFSET $/offset/
     `,
-    { taxonomyUuid, limit: limit ? Number(limit) : null, offset },
+    { taxonomyUuid, limit: DbUtils.normalizeLimit(limit), offset: DbUtils.normalizeOffset(offset) },
     (record) => DB.transformCallback(record, draft, true, backup)
   )
 
