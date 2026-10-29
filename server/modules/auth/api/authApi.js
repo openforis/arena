@@ -105,9 +105,10 @@ export const init = (app) => {
   app.post('/auth/reset-password', async (req, res, next) => {
     try {
       const { email } = Request.getParams(req)
-      const serverUrl = Request.getServerUrl(req)
-      const { uuid, error } = await UserService.generateResetPasswordUuid(email, serverUrl)
-      res.json({ uuid, error })
+      const serverUrl = Request.getPublicServerUrl(req)
+      // never return the reset token: it is only sent by email
+      const { error } = await UserService.generateResetPasswordUuid(email, serverUrl)
+      res.json({ error })
     } catch (error) {
       next(error)
     }

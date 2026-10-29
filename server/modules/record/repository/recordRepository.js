@@ -2,6 +2,7 @@ import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
+import { DbOrder } from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as StringUtils from '@core/stringUtils'
 
@@ -434,13 +435,23 @@ export const fetchRecordsSummaryBySurveyId = async (
     
     ${whereCondition}
 
-    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${sortOrder}
+    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()}
 
-    ${limit ? 'LIMIT $/limit:value/' : ''}
+    LIMIT $/limit/
 
-    OFFSET $/offset:value/
+    OFFSET $/offset/
   `,
-    { surveyId, cycle, step, search, limit, offset, recordUuids, ownerUuid, ...qualifierFilterParams },
+    {
+      surveyId,
+      cycle,
+      step,
+      search,
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
+      recordUuids,
+      ownerUuid,
+      ...qualifierFilterParams,
+    },
     dbTransformCallback(surveyId, false)
   )
 }

@@ -12,7 +12,7 @@ function _getSelectFields({ count, includeScript }) {
  * Generate the select query for the processing_chain table by the given parameters.
  *
  * @param {!object} params - The query parameters.
- * @param {string} [params.chainUuid=null] - The chain uuid to filter by.
+ * @param {string} [params.chainUuid=null] - The chain uuid to filter by (passed as `chainUuid` query parameter).
  * @param {boolean} [params.count=false] - Whether to count.
  * @param {boolean} [params.includeScript=false] - Whether to include R scripts.
  *
@@ -28,6 +28,6 @@ export function getSelect(params) {
     FROM 
         ${this.nameAliased}
     
-    ${chainUuid ? `WHERE ${this.columnUuid} = '${chainUuid}'` : ''}
+    ${chainUuid ? `WHERE ${this.columnUuid} = $/chainUuid/` : ''}
     `
 }

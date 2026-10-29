@@ -315,6 +315,11 @@ export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = nu
     if (!invitation) {
       throw new SystemError('appErrors:userNotInvitedToSurvey')
     }
+    // the reset password token of a user who already accepted can come from a "forgot password" request
+    const userToInvite = await UserManager.fetchUserByUuid(userUuid)
+    if (!User.isInvited(userToInvite)) {
+      throw new SystemError('appErrors:userNotInvitedToSurvey')
+    }
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
@@ -433,6 +438,12 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateO
       userToUpdate,
       authGroupsNew,
     })
+  } else if (
+    User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate) &&
+    !Authorizer.canEditUserEmail(user, null, userToUpdateOldData)
+  ) {
+    // email can be changed only by system admins, even outside a survey
+    throw new UnauthorizedError(User.getName(user))
   }
 }
 

@@ -1,4 +1,4 @@
-import { ServiceRegistry } from '@openforis/arena-core'
+import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
@@ -15,6 +15,7 @@ import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
@@ -280,8 +281,13 @@ export const init = (app) => {
         onlyAccepted,
         includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
       })
+      const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+      const canViewEmails = Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
+      const listFiltered = canViewEmails
+        ? list
+        : list.map((userItem) => (User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)))
 
-      res.json({ list })
+      res.json({ list: listFiltered })
     } catch (error) {
       next(error)
     }
@@ -402,27 +408,49 @@ export const init = (app) => {
 
   // ==== UPDATE
 
-  const _insertOrUpdateUser = async (req, res) => {
-    const body = Request.getBody(req)
-    const { user: userToUpdateString } = body
-    const userToUpdate = A.parse(userToUpdateString)
-    const newUser = !User.getUuid(userToUpdate)
+  const _validateAndSendUser = async ({ res, userToUpdate, newUser, persistUser }) => {
     const userWithSameEmail = newUser ? await UserService.fetchUserByEmail(User.getEmail(userToUpdate)) : null
     const validation = await UserValidator.validateUser(userToUpdate, userWithSameEmail)
-
     if (Validation.isValid(validation)) {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const profilePicture = Request.getFile(req)
-
-      const updatedUser = newUser
-        ? await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
-        : await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
-
+      const updatedUser = await persistUser()
       res.json({ user: updatedUser })
     } else {
       res.json({ validation })
     }
+  }
+
+  const _parseUserToUpdate = (req) => A.parse(Request.getBody(req).user)
+
+  const _insertUser = async (req, res) => {
+    // a new user is always inserted: an uuid in the body is ignored
+    const userToInsert = A.dissoc(User.keys.uuid, _parseUserToUpdate(req))
+    await _validateAndSendUser({
+      res,
+      userToUpdate: userToInsert,
+      newUser: true,
+      persistUser: () =>
+        UserService.insertUser({ user: Request.getUser(req), userToInsert, profilePicture: Request.getFile(req) }),
+    })
+  }
+
+  const _updateUser = async (req, res) => {
+    const userToUpdate = _parseUserToUpdate(req)
+    const userToUpdateUuid = User.getUuid(userToUpdate)
+    // permissions are checked on the userUuid param (path or body): the updated user must be the same
+    if (
+      !userToUpdateUuid ||
+      userToUpdateUuid !== req.params.userUuid ||
+      userToUpdateUuid !== Request.getParams(req).userUuid
+    ) {
+      throw new UnauthorizedError(User.getName(Request.getUser(req)))
+    }
+    const { surveyId } = Request.getParams(req)
+    await _validateAndSendUser({
+      res,
+      userToUpdate,
+      newUser: false,
+      persistUser: () => UserService.updateUser(Request.getUser(req), surveyId, userToUpdate, Request.getFile(req)),
+    })
   }
 
   app.put(
@@ -442,7 +470,7 @@ export const init = (app) => {
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _updateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -450,7 +478,7 @@ export const init = (app) => {
 
   app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _updateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -458,7 +486,7 @@ export const init = (app) => {
 
   app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _insertUser(req, res)
     } catch (error) {
       next(error)
     }
