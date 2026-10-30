@@ -45,4 +45,13 @@ describe('Response.sendErr', () => {
     expect(res.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR)
     expect(res.body.key).toBe('appErrors:generic')
   })
+
+  it('does not throw when the error is null', () => {
+    const res = mockRes()
+
+    Response.sendErr(res, null)
+
+    expect(res.statusCode).toBe(StatusCodes.INTERNAL_SERVER_ERROR)
+    expect(res.body.params.text).toBe('Could not serve: null')
+  })
 })
