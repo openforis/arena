@@ -9,12 +9,12 @@ import {
 } from '@server/modules/survey/service/dataMigration/surveyDataMigrationSteps'
 
 describe('surveyDataMigrationSteps', () => {
-  it('has exactly five entries', () => {
-    expect(surveyDataMigrationSteps).toHaveLength(5)
+  it('has exactly six entries', () => {
+    expect(surveyDataMigrationSteps).toHaveLength(6)
   })
 
-  it('exposes the latest version as 2.9.8, computed via version comparison', () => {
-    expect(latestSurveyDataMigrationVersion).toBe('2.9.8')
+  it('exposes the latest version as 2.10.9, computed via version comparison', () => {
+    expect(latestSurveyDataMigrationVersion).toBe('2.10.9')
   })
 })
 
@@ -54,11 +54,23 @@ describe('getCurrentAppVersionStamp', () => {
     expect(() => Versions.parse(getCurrentAppVersionStamp())).not.toThrow()
   })
 
-  it('returns ProcessUtils.ENV.applicationVersion when set and parseable, otherwise falls back to latestSurveyDataMigrationVersion', () => {
-    // whether APP_VERSION is set depends on the running environment (e.g. it's loaded from the repo's .env
-    // as a side effect of requiring @openforis/arena-server's db module); compute the expected value either way.
+  describe('with APP_VERSION set', () => {
     const { applicationVersion } = ProcessUtils.ENV
-    const expected = applicationVersion || latestSurveyDataMigrationVersion
-    expect(getCurrentAppVersionStamp()).toBe(expected)
+
+    afterEach(() => {
+      ProcessUtils.ENV.applicationVersion = applicationVersion
+    })
+
+    it.each([
+      [undefined, latestSurveyDataMigrationVersion],
+      ['not-a-version', latestSurveyDataMigrationVersion],
+      ['2.3.0', latestSurveyDataMigrationVersion],
+      ['2.10.8-1-ge54d9dd88', latestSurveyDataMigrationVersion], // build between two releases
+      ['99.0.0', '99.0.0'],
+    ])('stamps %s as %s', (version, expected) => {
+      ProcessUtils.ENV.applicationVersion = version
+      expect(getCurrentAppVersionStamp()).toBe(expected)
+      expect(isSurveyDataMigrationPending({ appVersion: getCurrentAppVersionStamp() })).toBe(false)
+    })
   })
 })
