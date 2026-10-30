@@ -56,7 +56,7 @@ export const sendErr = (res, err) => {
     res.status(err?.statusCode ?? StatusCodes.INTERNAL_SERVER_ERROR).json(
       _getErr({
         key: 'appErrors:generic',
-        params: { text: `Could not serve: ${err.toString()}` },
+        params: { text: `Could not serve: ${String(err)}` },
       })
     )
   }
