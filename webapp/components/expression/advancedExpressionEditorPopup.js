@@ -84,7 +84,8 @@ const AdvancedExpressionEditorPopup = (props) => {
           : await NodeDefExpressionValidator.validate({
               survey,
               nodeDefCurrent,
-              exprString: value,
+              // the validator parses JavaScript syntax only
+              exprString: Expression.toJsString(value, mode),
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
@@ -93,7 +94,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey]
+    [excludeCurrentNodeDef, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
   )
 
   const onEditorChange = useCallback(

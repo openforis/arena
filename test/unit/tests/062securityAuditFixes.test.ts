@@ -39,6 +39,13 @@ describe('Expression SQL mode', () => {
     const expr = Expression.fromString(`a == 'x && y == z'`)
     expect(Expression.toString(expr, Expression.modes.sql)).toBe(`a = 'x && y == z'`)
   })
+
+  test('toJsString converts SQL operators to JavaScript ones', () => {
+    expect(Expression.toJsString(`plot_remarks = 'Gardening'`, Expression.modes.sql)).toBe(
+      `plot_remarks == 'Gardening'`
+    )
+    expect(Expression.toJsString(`a = 1`)).toBe(`a = 1`)
+  })
 })
 
 describe('JobManager cancel across server processes', () => {
