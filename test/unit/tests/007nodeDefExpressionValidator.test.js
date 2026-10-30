@@ -19,7 +19,8 @@ describe('NodeDefExpressionValidator Test', () => {
    * - q: expression to test
    * - r: expected result (true = valid, false = not valid)
    * - n: node def name (default to cluster_id)
-   * - s: self reference allowed (default to true).
+   * - s: self reference allowed (default to true)
+   * - m: expression mode (default to json).
    */
   const queries = [
     // use of single attribute in context
@@ -85,6 +86,11 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'visit_time.hour', r: true },
     { q: 'visit_time.minute', r: true },
     { q: 'visit_time.seconds', r: true },
+    // SQL only functions
+    { q: "like(remarks, '%x%')", m: 'sql', r: true },
+    { q: "ilike(gps_model, 'x_')", m: 'sql', r: true },
+    { q: "like(remarks, '%x%')", r: false },
+    { q: 'like(remarks)', m: 'sql', r: false },
   ]
 
   const expressionEvaluator = NodeDefExpressionUtils.nodeDefExpressionEvaluator({ surveyFn: () => survey })
