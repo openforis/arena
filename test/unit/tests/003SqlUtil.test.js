@@ -23,7 +23,7 @@ const goodExpressions = [
     q: "a != 'a'",
     r: {
       clause: '$/_0:name/ IS DISTINCT FROM $/_1/',
-      params: { _0: 'a', _1: 'a' }, // single quotes are removed: pg-promise will quote it
+      params: { _0: 'a', _1: 'a' }, // the quotes are removed: pg-promise will quote it
     },
   },
   {
@@ -52,6 +52,14 @@ const goodExpressions = [
   },
 
   {
+    q: String.raw`a == 'it\'s'`,
+    r: {
+      clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/',
+      params: { _0: 'a', _1: "it's" },
+    },
+  },
+
+  {
     q: 'min(1,2,a) < max(10/a,pow(2+a,3-a))',
     r: {
       clause:
@@ -76,13 +84,6 @@ const goodExpressions = [
       params: { _0: 'a', _1: '%x%', _2: 'b', _3: 'y_' },
     },
   },
-  {
-    q: String.raw`a == 'it\'s'`,
-    r: {
-      clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/',
-      params: { _0: 'a', _1: "it's" },
-    },
-  },
 ]
 
 const badExpressions = [
@@ -98,6 +99,16 @@ const badExpressions = [
 ]
 
 describe('dataFilter test', () => {
+  test("SQL mode: a = 'text'", () => {
+    const ps = Expression.toSql(Expression.fromString("a = 'text'", Expression.modes.sql))
+    expect(ps).toEqual({ clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/', params: { _0: 'a', _1: 'text' } })
+  })
+
+  test('literal with a value containing single quotes keeps them', () => {
+    const { params } = Expression.toSql(Expression.newLiteral("'text'"))
+    expect(params).toEqual({ _0: "'text'" })
+  })
+
   goodExpressions.forEach(({ q, r }) => {
     test(q, () => {
       const ps = Expression.toSql(Expression.fromString(q))

@@ -117,7 +117,7 @@ export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResu
 const _isQuotedString = (value: unknown): boolean =>
   typeof value === 'string' && value.length >= 2 && value.startsWith('"') && value.endsWith('"')
 
-const _isSingleQuotedString = (value: unknown): value is string =>
+const _isSingleQuotedString = (value: unknown): boolean =>
   typeof value === 'string' && value.length >= 2 && value.startsWith(`'`) && value.endsWith(`'`)
 
 /**
@@ -137,10 +137,6 @@ const _getLiteralParamValue = (value: unknown): unknown => {
       // ignore it
     }
   }
-  if (_isSingleQuotedString(value)) {
-    // SQL style string literal (e.g. written in the advanced expression editor)
-    return value.slice(1, -1).replaceAll(String.raw`\'`, `'`)
-  }
   return value
 }
 
@@ -153,7 +149,8 @@ export const literal = (node: Record<string, unknown>, params: SqlParams): SqlRe
   }
 
   const param = getParamNameNext(params)
-  const paramValue = _getLiteralParamValue(node.raw)
+  // single quoted literal (e.g. attr = 'text'): the parser has already unquoted it into node.value
+  const paramValue = _isSingleQuotedString(node.raw) ? node.value : _getLiteralParamValue(node.raw)
 
   return {
     clause: `$/${param}/`,
