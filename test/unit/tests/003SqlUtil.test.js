@@ -23,7 +23,7 @@ const goodExpressions = [
     q: "a != 'a'",
     r: {
       clause: '$/_0:name/ IS DISTINCT FROM $/_1/',
-      params: { _0: 'a', _1: "'a'" },
+      params: { _0: 'a', _1: 'a' }, // single quotes are removed: pg-promise will quote it
     },
   },
   {
@@ -37,7 +37,7 @@ const goodExpressions = [
     q: "a == 1 && b != 'b'",
     r: {
       clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/',
-      params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'" },
+      params: { _0: 'a', _1: '1', _2: 'b', _3: 'b' },
     },
   },
 
@@ -47,7 +47,7 @@ const goodExpressions = [
     r: {
       clause:
         'CASE\n  WHEN (($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/)) IS NULL AND ($/_4:name/ > $/_5/) IS NULL\n  THEN NULL\n  ELSE coalesce(($/_0:name/ IS NOT DISTINCT FROM $/_1/ AND $/_2:name/ IS DISTINCT FROM $/_3/), false) OR coalesce($/_4:name/ > $/_5/, false)\nEND',
-      params: { _0: 'a', _1: '1', _2: 'b', _3: "'b'", _4: 'c', _5: '1' },
+      params: { _0: 'a', _1: '1', _2: 'b', _3: 'b', _4: 'c', _5: '1' },
     },
   },
 
@@ -69,6 +69,20 @@ const goodExpressions = [
       },
     },
   },
+  {
+    q: "like(a, '%x%') && ilike(b, 'y_')",
+    r: {
+      clause: '($/_0:name/)::text LIKE $/_1/ AND ($/_2:name/)::text ILIKE $/_3/',
+      params: { _0: 'a', _1: '%x%', _2: 'b', _3: 'y_' },
+    },
+  },
+  {
+    q: String.raw`a == 'it\'s'`,
+    r: {
+      clause: '$/_0:name/ IS NOT DISTINCT FROM $/_1/',
+      params: { _0: 'a', _1: "it's" },
+    },
+  },
 ]
 
 const badExpressions = [
@@ -77,6 +91,10 @@ const badExpressions = [
 
   // Unknown operators raise an error:
   { q: '1 & 1' },
+
+  // LIKE functions require exactly 2 arguments
+  { q: 'like(a)' },
+  { q: "like(a, 'x', 'y')" },
 ]
 
 describe('dataFilter test', () => {

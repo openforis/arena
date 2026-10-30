@@ -89,6 +89,7 @@ const AdvancedExpressionEditorPopup = (props) => {
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
+              mode,
             })
       setErrorMessage(newErrorMessage)
       const valid = !newErrorMessage
