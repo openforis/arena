@@ -41,8 +41,7 @@ export const migrateTaxaExcelCellValues = async (
     // the object values skipped the duplicates validation: a failure on the unique index would block the survey
     if (
       scientificNameChanged &&
-      (await TaxonomyRepository.existsOtherTaxonWithScientificName(
-        // NOSONAR
+      /* NOSONAR */ (await TaxonomyRepository.existsOtherTaxonWithScientificName(
         { surveyId, taxonomyUuid, taxonUuid, scientificName },
         client
       ))
