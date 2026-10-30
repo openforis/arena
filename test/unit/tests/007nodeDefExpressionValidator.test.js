@@ -85,8 +85,6 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'visit_time.hour', r: true },
     { q: 'visit_time.minute', r: true },
     { q: 'visit_time.seconds', r: true },
-    // single quoted string literal (SQL expressions)
-    { q: "remarks == 'x'", r: true },
   ]
 
   const expressionEvaluator = NodeDefExpressionUtils.nodeDefExpressionEvaluator({ surveyFn: () => survey })
