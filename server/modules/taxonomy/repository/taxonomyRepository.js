@@ -471,6 +471,44 @@ const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
   return searchValue
 }
 
+/**
+ * Fetches the taxa having raw Excel cell objects among their props or extra props.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<Array<object>>} The taxa rows (uuid, taxonomy_uuid, props, props_draft).
+ */
+export const fetchTaxaWithExcelCellObjects = async ({ surveyId }, client = db) =>
+  client.any(
+    `SELECT uuid, taxonomy_uuid, props, props_draft
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
+    WHERE (props || props_draft) @? '$.**{1 to 2} ? (exists(@.richText) || exists(@.hyperlink) || exists(@.error) || exists(@.formula) || exists(@.sharedFormula))'
+    ORDER BY id`
+  )
+
+/**
+ * Checks if another taxon of the same taxonomy has the specified scientific name.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.taxonomyUuid - The taxonomy uuid.
+ * @param {string} params.taxonUuid - The uuid of the taxon to exclude.
+ * @param {string} params.scientificName - The scientific name.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<boolean>} True if the scientific name is already in use.
+ */
+export const existsOtherTaxonWithScientificName = async (
+  { surveyId, taxonomyUuid, taxonUuid, scientificName },
+  client = db
+) =>
+  client.one(
+    `SELECT EXISTS (
+      SELECT 1 FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
+      WHERE taxonomy_uuid = $1 AND uuid <> $2 AND (props || props_draft)->>'${Taxon.propKeys.scientificName}' = $3
+    )`,
+    [taxonomyUuid, taxonUuid, scientificName],
+    (row) => row.exists
+  )
+
 export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
   const searchValue = toSearchValue(code)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft) : ''
@@ -651,6 +689,24 @@ export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db
       client,
     }),
   ])
+
+/**
+ * Sets both the published and the draft props of a taxon, regardless of its publication status.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.taxonUuid - The taxon uuid.
+ * @param {object} params.props - The published props.
+ * @param {object} params.propsDraft - The draft props.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<null>} The query result.
+ */
+export const updateTaxonPropsAndPropsDraft = async ({ surveyId, taxonUuid, props, propsDraft }, client = db) =>
+  client.none(
+    `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.taxon
+     SET props = $2, props_draft = $3
+     WHERE uuid = $1`,
+    [taxonUuid, props, propsDraft]
+  )
 
 export const updateTaxa = async (surveyId, taxa, client = db) =>
   DbUtils.runQueries(

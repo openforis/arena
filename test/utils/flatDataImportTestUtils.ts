@@ -10,7 +10,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import * as SB from './surveyBuilder'
 
-export type Cell = string | number | boolean | Date | null
+export type Cell = ExcelJS.CellValue
 export type Rows = Cell[][] // first row: headers
 
 export type FlatDataFileFormat = typeof FileFormats.csv | typeof FileFormats.xlsx

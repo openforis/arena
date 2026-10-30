@@ -3,6 +3,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import Job from '@server/job/job'
 
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -16,7 +17,7 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip } = this.context
+    const { arenaSurveyFileZip, surveyId } = this.context
 
     const taxonomies = await ArenaSurveyFileZip.getTaxonomies(arenaSurveyFileZip)
     this.total = taxonomies.length
@@ -27,6 +28,8 @@ export default class TaxonomiesImportJob extends Job {
         this.incrementProcessedItems()
       }
     }
+
+    await migrateTaxaExcelCellValues({ surveyId }, this.tx) // backups can contain them
 
     this.setContext({ taxonomies })
   }
