@@ -175,6 +175,41 @@ describe('SamplingNodeDefs.determinePlotAreaNodeDefs', () => {
     expect(findCreated(nodeDefsToCreate, 'tree_plot_area_')).toBeUndefined()
   })
 
+  it('does not delete the plot area node def of another chain when this chain has no area based attribute in the entity', async () => {
+    const survey = await SB.survey(
+      user,
+      SB.entity('plot', SB.entity('tree', quantitativeAnalysisAttribute('volume')).multiple())
+    ).build()
+
+    const { survey: surveyWithHa } = addAreaBasedEstimateNodeDef({ survey, estimatedOfNodeDefName: 'volume' })
+
+    const plotDef = Survey.getNodeDefByName('plot')(surveyWithHa)
+    const treeDef = Survey.getNodeDefByName('tree')(surveyWithHa)
+
+    const plotAreaNodeDef = newSamplingNodeDefFixture({ nodeDefParent: treeDef, name: 'tree_plot_area_' })
+    // the other chain has an attribute in the same entity, without area based estimates
+    const otherChainNodeDef = NodeDef.newNodeDef(
+      treeDef,
+      NodeDef.nodeDefType.decimal,
+      [Survey.cycleOneKey],
+      { [NodeDef.propKeys.name]: 'height' },
+      { [NodeDef.keysPropsAdvanced.chainUuid]: OTHER_CHAIN_UUID, [NodeDef.keysPropsAdvanced.active]: true },
+      true
+    )
+    const surveyWithOtherChain = [plotAreaNodeDef, otherChainNodeDef].reduce(
+      (surveyAcc, nodeDef) => Survey.assocNodeDef({ nodeDef })(surveyAcc),
+      surveyWithHa
+    )
+
+    const otherChain = newChain({ chainUuid: OTHER_CHAIN_UUID, baseUnitNodeDefUuid: NodeDef.getUuid(plotDef) })
+    const { nodeDefsToDelete } = SamplingNodeDefs.determinePlotAreaNodeDefs({
+      survey: surveyWithOtherChain,
+      chain: otherChain,
+    })
+
+    expect(nodeDefsToDelete.map(NodeDef.getUuid)).not.toContain(NodeDef.getUuid(plotAreaNodeDef))
+  })
+
   it('deletes a plot area node def with a stale name after the entity has been renamed', async () => {
     const survey = await SB.survey(
       user,
