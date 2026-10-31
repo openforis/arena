@@ -3998,9 +3998,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.8.0":
-  version: 2.8.0
-  resolution: "@openforis/arena-server@npm:2.8.0"
+"@openforis/arena-server@npm:^2.8.7":
+  version: 2.8.7
+  resolution: "@openforis/arena-server@npm:2.8.7"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1156.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -4017,7 +4017,6 @@ __metadata:
     image-size: "npm:^2.0.4"
     jsonwebtoken: "npm:^9.0.3"
     jszip: "npm:^3.10.2"
-    lodash.throttle: "npm:^4.1.1"
     log4js: "npm:^6.9.1"
     otplib: "npm:^13.5.0"
     passport: "npm:^0.7.0"
@@ -4026,7 +4025,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/60ac5253da1993a569b559dbd41c2e6be1d8f0bd8ec59a491b7cf0f8d2647edbb9198dbd43064646d95246ee2400f36428af7f85fae6e72ce238a9eab5a5abd0
+  checksum: 10c0/0dcf82d56ba8e805f3376ab2528fe3bb7ed380809d3472612e4af5b46fb1fdc02ca048de4c79ae6a475aa1aca7828910a6259cb8424d8fafa630714231b26658
   languageName: node
   linkType: hard
 
@@ -13245,13 +13244,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.throttle@npm:^4.1.1":
-  version: 4.1.1
-  resolution: "lodash.throttle@npm:4.1.1"
-  checksum: 10c0/14628013e9e7f65ac904fc82fd8ecb0e55a9c4c2416434b1dd9cf64ae70a8937f0b15376a39a68248530adc64887ed0fe2b75204b2c9ec3eea1cb2d66ddd125d
-  languageName: node
-  linkType: hard
-
 "lodash.union@npm:^4.6.0":
   version: 4.6.0
   resolution: "lodash.union@npm:4.6.0"
@@ -14316,7 +14308,7 @@ __metadata:
     "@mui/x-tree-view": "npm:^9"
     "@ngageoint/geopackage": "patch:@ngageoint/geopackage@npm%3A4.2.9#~/.yarn/patches/@ngageoint-geopackage-npm-4.2.9-0462c5ae41.patch"
     "@openforis/arena-core": "npm:^2.18.0"
-    "@openforis/arena-server": "npm:^2.8.0"
+    "@openforis/arena-server": "npm:^2.8.7"
     "@playwright/test": "npm:1.64.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@reduxjs/toolkit": "npm:^2.13.0"
