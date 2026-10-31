@@ -9,7 +9,7 @@ export default class ThreadsCache {
 
   findThreadsKeys(keyFilterFunction) {
     const result = []
-    for (let key of this.threads.keys()) {
+    for (const key of this.threads.keys()) {
       if (keyFilterFunction(key)) {
         result.push(key)
       }

@@ -10,7 +10,8 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-const ownerLabelFunction = (user) => [User.getName(user), User.getEmail(user)].filter((part) => Objects.isNotEmpty(part)).join(' - ')
+const ownerLabelFunction = (user) =>
+  [User.getName(user), User.getEmail(user)].filter((part) => Objects.isNotEmpty(part)).join(' - ')
 
 export const SurveyOwnerDropdown = (props) => {
   const { selectedUuid, onChange } = props

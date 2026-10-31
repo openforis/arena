@@ -1,4 +1,3 @@
-
 import { Checkbox } from '@webapp/components/form'
 
 const checkboxStyle = { color: 'white' }
