@@ -1120,6 +1120,7 @@ Stavkama će biti dodato dodatno svojstvo '${locationItemExtraDefName}'.`,
     const: 'Konstantna vrijednost',
     call: 'Funkcija',
     operator: 'Operator',
+    taxonProp: 'Svojstvo taksona',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Atribut koordinate polazne tačke',

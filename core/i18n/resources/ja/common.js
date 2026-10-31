@@ -1099,6 +1099,7 @@ $t(common.cantUndoWarning)`,
     const: '定数値',
     call: '関数',
     operator: '演算子',
+    taxonProp: '分類群のプロパティ',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: '起点となる座標属性',

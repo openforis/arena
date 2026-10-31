@@ -56,7 +56,8 @@ export default {
     recordOwnerName: '記録を所有するユーザーの名前を返します',
     recordOwnerRole: '記録を所有するユーザーの（現在の調査における）役割を返します',
     rowIndex: '現在のテーブル行（またはフォーム）のインデックスを返します',
-    taxonProp: '指定したコードを持つ分類群の、指定した$t(extraProp.label)の値を返します',
+    taxonProp:
+      "指定したコードを持つ分類群の、指定したプロパティの値を返します: code、family、genus、scientificName、通称名（言語コードをプロパティ名として使用、例: 'swa'）、または$t(extraProp.label)",
     taxonVernacularName: '指定したコードを持つ分類群の、指定した言語での（最初の）通称名（現地名）を返します',
     unique: '複数属性または項目の一意な値を返します',
     userEmail: 'ログイン中のユーザーのメールアドレスを返します',

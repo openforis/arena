@@ -60,7 +60,8 @@ export default {
     recordOwnerName: 'Devuelve el nombre del usuario propietario del registro',
     recordOwnerRole: 'Devuelve el rol (en la encuesta actual) del usuario propietario del registro',
     rowIndex: 'Devuelve el índice de la fila (o formulario) actual de la tabla',
-    taxonProp: 'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
+    taxonProp:
+      "Devuelve el valor de la propiedad especificada de un taxón que tiene el código especificado: code, family, genus, scientificName, un nombre vernáculo (usando el código del idioma como nombre de la propiedad, p. ej. 'swa') o una $t(extraProp.label)",
     taxonVernacularName:
       'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
     unique: 'Devuelve los valores únicos de un atributo o entidad múltiple',

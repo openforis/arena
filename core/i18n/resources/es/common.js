@@ -994,6 +994,7 @@ $t(common.appNameFull)
     const: 'Valor constante',
     call: 'Función',
     operator: 'Operador',
+    taxonProp: 'Propiedad del taxón',
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Atributo de coordenada de origen',
       distanceAttribute: 'Atributo de distancia',

@@ -1100,6 +1100,7 @@ A '${locationItemExtraDefName}' extra property will be added to the items.`,
     const: 'Constant value',
     call: 'Function',
     operator: 'Operator',
+    taxonProp: 'Taxon property',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Coordinate attribute origin',

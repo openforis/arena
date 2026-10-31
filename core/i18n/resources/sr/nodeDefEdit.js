@@ -59,7 +59,8 @@ export default {
     recordOwnerName: 'Vraća ime korisnika koji je vlasnik zapisa',
     recordOwnerRole: 'Vraća ulogu (u trenutnom istraživanju) korisnika koji je vlasnik zapisa',
     rowIndex: 'Vraća indeks trenutnog reda tabele (ili obrasca)',
-    taxonProp: 'Vraća vrijednost navedenog svojstva $t(extraProp.label) taksona koji ima navedenu šifru',
+    taxonProp:
+      "Vraća vrijednost navedenog svojstva taksona koji ima navedenu šifru: code, family, genus, scientificName, narodni naziv (koristeći šifru jezika kao naziv svojstva, npr. 'swa') ili $t(extraProp.label)",
     taxonVernacularName: 'Vraća (prvi) narodni (ili lokalni) naziv na navedenom jeziku taksona koji ima navedenu šifru',
     unique: 'Vraća jedinstvene vrijednosti višestrukog atributa ili entiteta',
     userEmail: 'Vraća e-mail prijavljenog korisnika',

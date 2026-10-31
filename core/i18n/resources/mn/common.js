@@ -1095,6 +1095,7 @@ $t(common.cantUndoWarning)`,
     const: 'Тогтмол утга',
     call: 'Функц',
     operator: 'Оператор',
+    taxonProp: 'Таксоны шинж чанар',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Эх координатын шинж чанар',

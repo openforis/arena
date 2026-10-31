@@ -1109,6 +1109,7 @@ $t(common.cantUndoWarning)`,
     const: 'Постоянное значение',
     call: 'Функция',
     operator: 'Оператор',
+    taxonProp: 'Свойство таксона',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Атрибут исходной координаты',

@@ -60,7 +60,8 @@ export default {
     recordOwnerName: "Renvoie le nom de l'utilisateur propriétaire de l'enregistrement",
     recordOwnerRole: "Renvoie le rôle (dans le formulaire actuel) de l'utilisateur propriétaire de l'enregistrement",
     rowIndex: "Renvoie l'index de la ligne de tableau actuelle (ou du formulaire)",
-    taxonProp: "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un taxon ayant le code spécifié",
+    taxonProp:
+      "Renvoie la valeur de la propriété spécifiée d'un taxon ayant le code spécifié : code, family, genus, scientificName, un nom vernaculaire (en utilisant le code de la langue comme nom de propriété, ex. 'swa') ou une $t(extraProp.label)",
     taxonVernacularName:
       "Renvoie le (premier) nom vernaculaire (ou local) dans la langue spécifiée d'un taxon ayant le code spécifié",
     unique: "Renvoie les valeurs uniques d'un attribut ou d'une entité multiple",

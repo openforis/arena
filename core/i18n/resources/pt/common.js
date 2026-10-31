@@ -1107,6 +1107,7 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
     const: 'Valor constante',
     call: 'Função',
     operator: 'Operador',
+    taxonProp: 'Propriedade do táxon',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: 'Atributo de coordenada de origem',

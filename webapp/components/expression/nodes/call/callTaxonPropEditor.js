@@ -1,8 +1,10 @@
-import React, { useCallback, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
 import { Strings } from '@openforis/arena-core'
 
+import { getLanguageISO639part2Label } from '@core/app/languages'
 import * as Expression from '@core/expressionParser/expression'
+import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as StringUtils from '@core/stringUtils'
 
@@ -11,9 +13,34 @@ import { Dropdown } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
 import { TaxonomySelector } from '@webapp/components/survey/TaxonomySelector'
 import { useTaxonomyByName, useTaxonomyByUuid } from '@webapp/store/survey/hooks'
+import { useI18n } from '@webapp/store/system'
 
 import Identifier from '../identifier'
 import { CallEditorPropTypes } from './callEditorPropTypes'
+
+const standardPropKeys = [
+  Taxon.propKeys.code,
+  Taxon.propKeys.family,
+  Taxon.propKeys.genus,
+  Taxon.propKeys.scientificName,
+]
+
+const standardPropLabelKeys = {
+  [Taxon.propKeys.code]: 'common.code',
+  [Taxon.propKeys.family]: 'taxonomy.edit.family',
+  [Taxon.propKeys.genus]: 'taxonomy.edit.genus',
+  [Taxon.propKeys.scientificName]: 'taxonomy.edit.scientificName',
+}
+
+// Standard props, vernacular names (by language code) and extra props of the taxonomy.
+const buildPropItems = ({ taxonomy, i18n }) => [
+  ...standardPropKeys.map((key) => ({ value: key, label: `${key} (${i18n.t(standardPropLabelKeys[key])})` })),
+  ...Taxonomy.getVernacularLanguageCodes(taxonomy).map((langCode) => ({
+    value: langCode,
+    label: `${langCode} (${getLanguageISO639part2Label(langCode) ?? langCode})`,
+  })),
+  ...Taxonomy.getExtraPropKeys(taxonomy).map((key) => ({ value: key, label: key })),
+]
 
 const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdentifierName }) => {
   const initialIdentifier = initialIdentifierName ? Expression.newIdentifier(initialIdentifierName) : null
@@ -26,6 +53,8 @@ const createInitialState = ({ initialTaxonomy, initialExtraPropKey, initialIdent
 
 export const CallTaxonPropEditor = (props) => {
   const { expressionNode, onConfirm: onConfirmProp, variables } = props
+
+  const i18n = useI18n()
 
   const expressionArgumentsValues =
     expressionNode?.arguments?.map((arg) => arg.value ?? arg.name).map(StringUtils.unquote) ?? []
@@ -40,6 +69,11 @@ export const CallTaxonPropEditor = (props) => {
   const { taxonomyUuid, extraPropKey, identifier } = state
 
   const taxonomy = useTaxonomyByUuid(taxonomyUuid)
+
+  const propItems = useMemo(() => (taxonomy ? buildPropItems({ taxonomy, i18n }) : []), [i18n, taxonomy])
+  const selectedPropItem = extraPropKey
+    ? (propItems.find((item) => item.value === extraPropKey) ?? { value: extraPropKey, label: extraPropKey })
+    : null
 
   const onIdentifierChange = useCallback((identifierUpdated) => {
     setState((statePrev) => ({
@@ -66,7 +100,6 @@ export const CallTaxonPropEditor = (props) => {
     <div className="function-editor">
       <FormItem label="taxonomy.header">
         <TaxonomySelector
-          filterFunction={Taxonomy.hasExtraDefs}
           onChange={(item) => {
             setState((statePrev) => ({
               ...statePrev,
@@ -78,19 +111,17 @@ export const CallTaxonPropEditor = (props) => {
           selectedTaxonomyUuid={taxonomyUuid}
         />
       </FormItem>
-      <FormItem label="extraProp.label">
+      <FormItem label="expressionEditor.taxonProp">
         <Dropdown
           disabled={!taxonomyUuid}
-          items={Taxonomy.getExtraPropKeys(taxonomy)}
-          itemLabel={(item) => item}
-          itemValue={(item) => item}
+          items={propItems}
           onChange={(item) => {
             setState((statePrev) => ({
               ...statePrev,
-              extraPropKey: item,
+              extraPropKey: item?.value ?? null,
             }))
           }}
-          selection={extraPropKey}
+          selection={selectedPropItem}
         />
       </FormItem>
 

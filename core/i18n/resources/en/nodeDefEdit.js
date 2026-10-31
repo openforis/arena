@@ -59,7 +59,8 @@ export default {
     recordOwnerName: 'Returns the name of the user owning the record',
     recordOwnerRole: 'Returns the role (in the current survey) of the user owning the record',
     rowIndex: 'Returns the current table row (or form) index',
-    taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
+    taxonProp:
+      "Returns the value of the specified property of a taxon having the specified code: code, family, genus, scientificName, a vernacular name (using the language code as property name, e.g. 'swa') or an $t(extraProp.label)",
     taxonVernacularName:
       'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
     unique: 'Returns the unique values of a multiple attribute or entity',

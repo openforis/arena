@@ -1113,6 +1113,7 @@ Une propriété supplémentaire '${locationItemExtraDefName}' sera ajoutée aux 
     const: 'Valeur constante',
     call: 'Fonction',
     operator: 'Opérateur',
+    taxonProp: 'Propriété du taxon',
 
     geoCoordinateAtDistanceEditor: {
       coordinateAttributeOrigin: "Attribut de coordonnée d'origine",
