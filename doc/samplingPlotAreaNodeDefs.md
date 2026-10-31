@@ -49,11 +49,12 @@ for the base unit entity, e.g. as the starting point for sampling-design weight 
    - belonging to **this** chain (`NodeDef.getChainUuid(childDef) === chainUuid`)
 
    If such a child exists, a `${entity}_plot_area_` node def is created (or kept, if one with
-   the exact expected name already exists). If not, any existing one for that entity is
-   scheduled for deletion.
+   the exact expected name already exists, even if it belongs to another chain: node def names
+   are unique in a survey, so chains share it).
 3. **Cleanup pass**: independently re-scans the whole chain for any `weight` or
    `*_plot_area_`-named sampling node def and deletes whichever one wasn't re-validated in
-   steps 1-2 above (e.g. after an entity rename, or a base-unit reassignment).
+   steps 1-2 above (e.g. after an entity rename, a base-unit reassignment, or when the entity
+   has no active area-based attribute anymore). Only node defs of this chain are deleted.
 
 Weight and plot area are deliberately **not linked** to each other's hierarchy position: a
 survey can have the base unit and the area-holding entity as siblings under a common parent
