@@ -240,7 +240,8 @@
     "node-notifier/uuid": "^11.1.1",
     "sockjs/uuid": "^11.1.1",
     "@ngageoint/geopackage/file-type": "^21.3.1",
-    "@ngageoint/geopackage/image-size": "^2.0.4"
+    "@ngageoint/geopackage/image-size": "^2.0.4",
+    "test-exclude/glob": "^14.0.3"
   },
   "arenaClientPackages": {
     "META": "This exists to minimize the final Docker server image",
