@@ -476,7 +476,7 @@ const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
  * @param {object} params - The parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {object} [client] - The database client.
- * @returns {Promise<Array<object>>} The taxa rows (uuid, taxonomy_uuid, props, props_draft).
+ * @returns {Promise<Array<{uuid: string, taxonomy_uuid: string, props: object, props_draft: object}>>} The taxa rows.
  */
 export const fetchTaxaWithExcelCellObjects = async ({ surveyId }, client = db) =>
   client.any(

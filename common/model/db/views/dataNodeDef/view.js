@@ -17,9 +17,6 @@ const columnSet = {
   sampleOutlier: '_sample_outlier',
 }
 
-/**
- * @typedef {module:arena.TableDataNodeDef} module:arena.ViewDataNodeDef
- */
 export default class ViewDataNodeDef extends TableDataNodeDef {
   constructor(survey, nodeDef) {
     super(survey, nodeDef)
