@@ -43,7 +43,6 @@ export const ContentRow = (props) => {
   )
 
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
     <div
       data-testid={`${module}_${index}`}
       role="button"

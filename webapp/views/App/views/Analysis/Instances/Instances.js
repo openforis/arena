@@ -17,20 +17,6 @@ const Instances = () => {
   const [instance, setInstance] = useState({})
   const [url, setUrl] = useState('')
 
-  const getRStudioInstances = async () => {
-    try {
-      const { data } = await axios.get('/api/rstudio')
-      const { instance, rStudioProxyUrl } = data
-      setInstance(instance)
-      setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
-    } catch {
-      // no RStudio instance available
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const closeRStudioInstance = async () => {
     try {
       setLoading(true)
@@ -44,7 +30,17 @@ const Instances = () => {
   }
 
   useEffect(() => {
-    void getRStudioInstances()
+    axios
+      .get('/api/rstudio')
+      .then(({ data }) => {
+        const { instance, rStudioProxyUrl } = data
+        setInstance(instance)
+        setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
+      })
+      .catch(() => {
+        // no RStudio instance available
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   if (loading) return <p>loading...</p>

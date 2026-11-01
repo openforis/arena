@@ -46,8 +46,6 @@ export const useAcceptRequestPanel = (props) => {
     }
     if (templateUuid) {
       void loadTemplateLabel()
-    } else {
-      setTemplateLabel(i18n.t('guest:accessRequestView.templateNotSelected'))
     }
   }, [templateUuid])
 
@@ -109,5 +107,12 @@ export const useAcceptRequestPanel = (props) => {
       )
     }
   }
-  return { roleLabelFunction, onUpdate, onSubmit, accessRequestAccept, templateLabel, validation }
+  return {
+    roleLabelFunction,
+    onUpdate,
+    onSubmit,
+    accessRequestAccept,
+    templateLabel: templateUuid ? templateLabel : i18n.t('guest:accessRequestView.templateNotSelected'),
+    validation,
+  }
 }

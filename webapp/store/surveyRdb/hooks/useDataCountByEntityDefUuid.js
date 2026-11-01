@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -26,22 +26,16 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
     return [...uuidsSet.values()]
   }, [cycle, nodeDefs, survey])
 
-  const updateCounts = useCallback(async () => {
+  useEffect(() => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
-      setDataCountByEntityDefUuid(
-        await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
-          surveyId: Survey.getId(survey),
-          cycle,
-          entityDefUuids,
-        })
-      )
+      SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
+        surveyId: Survey.getId(survey),
+        cycle,
+        entityDefUuids,
+      }).then(setDataCountByEntityDefUuid)
     }
   }, [survey, cycle, entityDefUuids])
-
-  useEffect(() => {
-    updateCounts()
-  }, [updateCounts])
 
   return dataCountByEntityDefUuid
 }

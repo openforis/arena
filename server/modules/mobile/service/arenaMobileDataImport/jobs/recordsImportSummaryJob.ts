@@ -87,7 +87,7 @@ export default class RecordsImportSummaryJob extends Job {
     }
   }
 
-  generateResult() {
+  async generateResult() {
     return { items: this.items }
   }
 }

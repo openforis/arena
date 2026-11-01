@@ -103,7 +103,8 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
   const unregisterLayer = useCallback(({ key }: { key: string }) => {
     setActiveLayers((prev) => prev.filter((l) => l.key !== key))
     setLayerSortOrders((prev) => {
-      const { [key]: _removed, ...rest } = prev
+      const rest = { ...prev }
+      delete rest[key]
       return rest
     })
   }, [])

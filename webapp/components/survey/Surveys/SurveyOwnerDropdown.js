@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -24,17 +24,14 @@ export const SurveyOwnerDropdown = (props) => {
   const { users } = state
   const selectedUser = useMemo(() => users.find((user) => User.getUuid(user) === selectedUuid), [selectedUuid, users])
 
-  const fetchUsers = useCallback(async () => {
-    const usersFetched = await API.fetchUsers({
+  useEffect(() => {
+    API.fetchUsers({
       onlyAccepted: true,
       includeSystemAdmins: isSystemAdmin,
+    }).then((usersFetched) => {
+      setState({ loading: false, users: usersFetched })
     })
-    setState({ loading: false, users: usersFetched })
   }, [isSystemAdmin])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
 
   return (
     <Dropdown

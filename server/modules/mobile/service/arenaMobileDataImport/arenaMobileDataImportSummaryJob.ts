@@ -41,7 +41,7 @@ export default class ArenaMobileDataImportSummaryJob extends Job {
     this.setContext({ survey })
   }
 
-  generateResult() {
+  async generateResult() {
     return this.combineInnerJobsResults()
   }
 
