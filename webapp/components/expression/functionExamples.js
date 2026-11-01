@@ -45,6 +45,8 @@ const functionExamples = {
   [modes.sql]: {
     [functionNames.avg]: 'avg(variable_name)',
     [functionNames.count]: 'count(variable_name)',
+    [functionNames.ilike]: `ilike(variable_name, '%text%')`,
+    [functionNames.like]: `like(variable_name, '%text%')`,
     [functionNames.sum]: 'sum(variable_name)',
   },
 }

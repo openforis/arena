@@ -12,16 +12,33 @@ interface SqlResult {
   params: SqlParams
 }
 
-const stdlib2sql: Record<string, string | ((param: string) => string)> = {
+// pattern matching functions (SQL LIKE / ILIKE): the value is compared as text
+const likeFn =
+  (sqlOperator: string) =>
+  (args: string[]): string => {
+    if (args.length !== 2) {
+      throw new SystemError('functionHasTooFewArguments', {
+        fnName: sqlOperator.toLowerCase(),
+        minArity: 2,
+        numArgs: args.length,
+      })
+    }
+    const [value, pattern] = args
+    return `(${value})::text ${sqlOperator} ${pattern}`
+  }
+
+const stdlib2sql: Record<string, string | ((args: string[]) => string)> = {
   pow: 'pow',
   min: 'least',
   max: 'greatest',
   count: 'count',
   sum: 'sum',
   avg: 'avg',
-  isEmpty: (param) => `coalesce((${param})::text, '') = ''`,
-  isNotEmpty: (param) => `coalesce((${param})::text, '') <> ''`,
-  '!': (param) => `NOT (${param})`,
+  isEmpty: ([param]) => `coalesce((${param})::text, '') = ''`,
+  isNotEmpty: ([param]) => `coalesce((${param})::text, '') <> ''`,
+  like: likeFn('LIKE'),
+  ilike: likeFn('ILIKE'),
+  '!': ([param]) => `NOT (${param})`,
 }
 
 // unary operators allowed in SQL (the expression can come from the client: any other operator is rejected)
@@ -158,19 +175,18 @@ export const call = (node: Record<string, unknown>, params: SqlParams): SqlResul
     throw new SystemError('undefinedFunction', { name })
   }
 
-  const { clause: clauseArguments, params: paramsArguments } = (argumentsNode as Record<string, unknown>[]).reduce(
-    (accumulator: SqlResult, argument: Record<string, unknown>, idx: number) => {
-      const { clause: clauseCurrent, params: paramsCurrent } = _toSql!(argument, accumulator.params)
-      return {
-        clause: `${accumulator.clause}${idx ? ', ' : ''}${clauseCurrent}`,
-        params: paramsCurrent,
-      }
-    },
-    { clause: '', params }
-  )
+  const clausesArguments: string[] = []
+  let paramsArguments = params
+  for (const argument of argumentsNode as Record<string, unknown>[]) {
+    const { clause: clauseCurrent, params: paramsCurrent } = _toSql!(argument, paramsArguments)
+    clausesArguments.push(clauseCurrent)
+    paramsArguments = paramsCurrent
+  }
 
   const clause =
-    typeof sqlFnNameOrFn === 'string' ? `${sqlFnNameOrFn}(${clauseArguments})` : sqlFnNameOrFn(clauseArguments)
+    typeof sqlFnNameOrFn === 'string'
+      ? `${sqlFnNameOrFn}(${clausesArguments.join(', ')})`
+      : sqlFnNameOrFn(clausesArguments)
 
   return {
     clause,

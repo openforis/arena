@@ -77,6 +77,13 @@ const goodExpressions = [
       },
     },
   },
+  {
+    q: "like(a, '%x%') && ilike(b, 'y_')",
+    r: {
+      clause: '($/_0:name/)::text LIKE $/_1/ AND ($/_2:name/)::text ILIKE $/_3/',
+      params: { _0: 'a', _1: '%x%', _2: 'b', _3: 'y_' },
+    },
+  },
 ]
 
 const badExpressions = [
@@ -85,6 +92,10 @@ const badExpressions = [
 
   // Unknown operators raise an error:
   { q: '1 & 1' },
+
+  // LIKE functions require exactly 2 arguments
+  { q: 'like(a)' },
+  { q: "like(a, 'x', 'y')" },
 ]
 
 describe('dataFilter test', () => {

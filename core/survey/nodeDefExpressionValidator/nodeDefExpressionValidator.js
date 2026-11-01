@@ -1,4 +1,5 @@
 import * as Survey from '@core/survey/survey'
+import * as Expression from '@core/expressionParser/expression'
 
 import {
   NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
@@ -38,6 +39,21 @@ export const findReferencedNodeDefLast = async ({
   })
 }
 
+// functions available only in SQL expressions (e.g. data query filters), converted by Expression.toSql
+const likeFunction = { minArity: 2, maxArity: 2, executor: () => () => true }
+const sqlOnlyFunctions = {
+  [Expression.functionNames.like]: likeFunction,
+  [Expression.functionNames.ilike]: likeFunction,
+}
+
+const createValidator = ({ mode }) => {
+  const validator = new CoreNodeDefExpressionValidator()
+  if (mode === Expression.modes.sql) {
+    validator.functions = { ...validator.functions, ...sqlOnlyFunctions }
+  }
+  return validator
+}
+
 export const validate = async ({
   survey,
   nodeDefCurrent,
@@ -45,8 +61,9 @@ export const validate = async ({
   isContextParent = false,
   selfReferenceAllowed = false,
   includeAnalysis = false,
+  mode = Expression.modes.json,
 }) => {
-  const { validationResult } = await new CoreNodeDefExpressionValidator().validate({
+  const { validationResult } = await createValidator({ mode }).validate({
     expression: exprString,
     survey,
     nodeDefCurrent,

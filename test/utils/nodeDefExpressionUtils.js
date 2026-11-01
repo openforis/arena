@@ -31,14 +31,14 @@ const toComparableResult = ({ result, resultExpected }) => {
 /**
  * Evaluates a query and returns its result (or the error thrown) together with the expected one.
  * @param {!object} params - The parameters.
- * @param {!object} params.query - The query to test (q: expression, r: expected result, n: node path, e: expected error, s: self reference allowed).
+ * @param {!object} params.query - The query to test (q: expression, r: expected result, n: node path, e: expected error, s: self reference allowed, m: expression mode).
  * @param {!object} params.expressionEvaluator - Function evaluating the expression.
  * @returns {Promise<{actual: unknown, expected: unknown}>} - The actual and the expected result.
  */
 export const evaluateQuery = async ({ query, expressionEvaluator }) => {
-  const { q, r, n = null, e = null, s = true } = query
+  const { q, r, n = null, e = null, s = true, m = undefined } = query
   try {
-    const result = await expressionEvaluator({ nodePath: n, query: q, selfReferenceAllowed: s })
+    const result = await expressionEvaluator({ nodePath: n, query: q, selfReferenceAllowed: s, mode: m })
     return toComparableResult({ result, resultExpected: r })
   } catch (error) {
     if (e) {
@@ -60,7 +60,7 @@ export const recordExpressionEvaluator =
 
 export const nodeDefExpressionEvaluator =
   ({ surveyFn }) =>
-  async ({ nodePath, query, selfReferenceAllowed }) => {
+  async ({ nodePath, query, selfReferenceAllowed, mode }) => {
     const survey = surveyFn()
     const nodeDefCurrent = Survey.getNodeDefByName(nodePath || 'cluster_id')(survey)
     const validationResult = await NodeDefExpressionValidator.validate({
@@ -68,6 +68,7 @@ export const nodeDefExpressionEvaluator =
       nodeDefCurrent,
       exprString: query,
       selfReferenceAllowed,
+      mode,
     })
     return validationResult === null
   }
