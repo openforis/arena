@@ -31,10 +31,12 @@ const NodeDefTaxonInputField = (props) => {
 
   const inputRef = useRef(null)
   const [autocompleteOpened, setAutocompleteOpened] = useState(false)
+  const [autocompleteValue, setAutocompleteValue] = useState('')
 
   const onChangeInput = useCallback(
     (value) => {
       onChangeSelectionField(field, value)
+      setAutocompleteValue(value)
       setAutocompleteOpened(!StringUtils.isBlank(value))
     },
     [field, onChangeSelectionField]
@@ -65,7 +67,7 @@ const NodeDefTaxonInputField = (props) => {
           draft={draft}
           entryDataQuery={entryDataQuery}
           field={field}
-          fieldValue={inputRef.current.value}
+          fieldValue={autocompleteValue}
           nodeDef={nodeDef}
           inputRef={inputRef}
           onItemSelect={onItemSelectAutocomplete}

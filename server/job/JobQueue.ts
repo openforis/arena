@@ -464,7 +464,7 @@ export class JobQueue {
    */
   private async _startNextJobInternal(): Promise<void> {
     if (this._queue.length === 0) {
-      return false
+      return
     }
     if (Object.keys(this._runningJobUuidByUuid).length === this._maxConcurrentJobs) {
       this._logger.debug('max jobs running reached')

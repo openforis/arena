@@ -1,4 +1,3 @@
-
 import { noHeaderModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import { RecordNoHeader } from '@webapp/components/survey/Record/RecordNoHeader'

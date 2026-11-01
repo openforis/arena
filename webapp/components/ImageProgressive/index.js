@@ -47,7 +47,7 @@ const ImageProgressive = (props) => {
 
   useEffect(() => {
     let mounted = true
-    let createdBlobUrls = []
+    const createdBlobUrls = []
 
     const loadImages = async () => {
       if (!mounted) return
