@@ -133,7 +133,8 @@ export const ResizableModal = (props: ResizableModalProps) => {
 
   return (
     <div className={classNames('resizable-modal', className)}>
-      <div className="flexible-modal-mask" onClick={onRequestClose} />
+      {/* mouse-only: the keyboard equivalents (Esc, arrows, Ctrl + arrows) are handled at document level */}
+      <div className="flexible-modal-mask" role="presentation" onClick={onRequestClose} />
       <div className="flexible-modal" style={{ height, left: modalLeft, top: modalTop, width }}>
         <div className="resizable-modal__header">
           <h3>{header}</h3>
@@ -148,8 +149,8 @@ export const ResizableModal = (props: ResizableModalProps) => {
           {onRequestClose && <ButtonIconClose onClick={onRequestClose} />}
         </div>
         <div className="resizable-modal__body">{children}</div>
-        <div className="flexible-modal-drag-area" onMouseDown={onDragStart} />
-        <div className="flexible-modal-resizer" onMouseDown={onResizeStart} />
+        <div className="flexible-modal-drag-area" role="presentation" onMouseDown={onDragStart} />
+        <div className="flexible-modal-resizer" role="presentation" onMouseDown={onResizeStart} />
       </div>
     </div>
   )
