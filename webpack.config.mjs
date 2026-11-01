@@ -14,7 +14,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
-const appVersionFile = path.resolve(__dirname, '.app-version')
+const appVersionFile = path.resolve(import.meta.dirname, '.app-version')
 
 // written by the deploy workflows (no .git in Heroku/Docker builds); takes precedence over a possibly stale APP_VERSION.
 // No git fallback in local builds: without a version, surveys are stamped with the latest data migration version.
@@ -39,7 +39,7 @@ class CleanUpStatsPlugin {
 }
 
 // served by the server when downloaded (yarn mobile-preview:download)
-const mobilePreviewUrlDefault = fs.existsSync(path.resolve(__dirname, 'mobile-preview', 'index.html'))
+const mobilePreviewUrlDefault = fs.existsSync(path.resolve(import.meta.dirname, 'mobile-preview', 'index.html'))
   ? '/mobile-preview/'
   : undefined
 
@@ -78,7 +78,7 @@ const plugins = [
   new CopyPlugin({
     patterns: [
       {
-        from: path.resolve(__dirname, 'node_modules/maplibre-gl/dist'),
+        from: path.resolve(import.meta.dirname, 'node_modules/maplibre-gl/dist'),
         to: 'maplibre-gl/[name][ext]',
         filter: (resourcePath) => /maplibre-gl-(worker|shared)\.mjs$/.test(resourcePath),
       },
@@ -119,16 +119,16 @@ const webPackConfig = {
       '.css',
     ],
     alias: {
-      '@common': path.resolve(__dirname, 'common/'),
-      '@core': path.resolve(__dirname, 'core/'),
-      '@server': path.resolve(__dirname, 'server/'),
-      '@webapp': path.resolve(__dirname, 'webapp/'),
-      '@test': path.resolve(__dirname, 'test/'),
+      '@common': path.resolve(import.meta.dirname, 'common/'),
+      '@core': path.resolve(import.meta.dirname, 'core/'),
+      '@server': path.resolve(import.meta.dirname, 'server/'),
+      '@webapp': path.resolve(import.meta.dirname, 'webapp/'),
+      '@test': path.resolve(import.meta.dirname, 'test/'),
     },
   },
   output: {
     filename: 'bundle-[fullhash].js',
-    path: path.resolve(__dirname, 'dist'),
+    path: path.resolve(import.meta.dirname, 'dist'),
     publicPath: '/',
   },
   devServer: {
@@ -167,7 +167,7 @@ const webPackConfig = {
           {
             loader: 'babel-loader',
             options: {
-              plugins: isDevelopment ? [require.resolve('react-refresh/babel')] : [],
+              plugins: isDevelopment ? ['react-refresh/babel'] : [],
             },
           },
         ],

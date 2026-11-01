@@ -1,11 +1,11 @@
 import * as path from 'node:path'
-import * as webpack from 'webpack'
+import webpack from 'webpack'
 import nodeExternals from 'webpack-node-externals'
-import mainConfig, { appVersion } from './webpack.config.babel'
+import mainConfig, { appVersion } from './webpack.config.mjs'
 
 const nodeEnv = process.env.NODE_ENV
-const arenaRoot = process.env.ARENA_ROOT || __dirname
-const arenaDist = process.env.ARENA_DIST || path.resolve(__dirname, 'dist')
+const arenaRoot = process.env.ARENA_ROOT || import.meta.dirname
+const arenaDist = process.env.ARENA_DIST || path.resolve(import.meta.dirname, 'dist')
 const isProduction = nodeEnv === 'production'
 
 // Common plugins
@@ -21,7 +21,7 @@ const plugins = [
 
 const entry = (entryPath) => [
   ...(isProduction ? [] : ['webpack/hot/poll?1000']),
-  path.resolve(path.join(__dirname, entryPath)),
+  path.resolve(path.join(import.meta.dirname, entryPath)),
 ]
 
 export default {
@@ -41,7 +41,7 @@ export default {
   },
   output: {
     publicPath: 'dist/',
-    path: path.resolve(__dirname, './'),
+    path: path.resolve(import.meta.dirname, './'),
     filename: 'dist/[id].js',
     // LibraryTarget: 'commonjs2',
     hotUpdateChunkFilename: 'dist/hot-update-[id].js',
@@ -49,7 +49,7 @@ export default {
   },
   resolve: {
     extensions: ['.webpack-loader.js', '.web-loader.js', '.loader.js', '.ts', '.tsx', '.js', '.jsx'],
-    modules: [path.resolve(__dirname, 'node_modules')],
+    modules: [path.resolve(import.meta.dirname, 'node_modules')],
     alias: mainConfig.resolve.alias,
   },
   module: {
