@@ -5,6 +5,7 @@ import * as Survey from '@core/survey/survey'
 
 import { SurveyType } from '@webapp/model'
 import * as API from '@webapp/service/api'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 const toOption = (surveyInfo) => {
   if (!surveyInfo) return null
@@ -30,10 +31,12 @@ const toOption = (surveyInfo) => {
 }
 
 export const useSurveyDropdownOptions = ({ type }) => {
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [options, setOptions] = useState([])
 
-  const fetchSurveys = useCallback(async () => {
+  useOnValueChange(type, () => setLoading(true))
+
+  const fetchOptions = useCallback(async () => {
     const template = type === SurveyType.template
     const surveys = await API.fetchSurveys({ draft: false, template })
 
@@ -43,16 +46,15 @@ export const useSurveyDropdownOptions = ({ type }) => {
       if (a.surveyName > b.surveyName) return 1
       return 0
     }
-    const surveyOptions = surveys.map(toOption).sort(sortByNameFn)
-    setOptions(surveyOptions)
+    return surveys.map(toOption).sort(sortByNameFn)
   }, [type])
 
   useEffect(() => {
-    setLoading(true)
-    fetchSurveys().then(() => {
+    fetchOptions().then((surveyOptions) => {
+      setOptions(surveyOptions)
       setLoading(false)
     })
-  }, [fetchSurveys])
+  }, [fetchOptions])
 
   return { loading, options }
 }

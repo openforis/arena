@@ -33,7 +33,7 @@ const iconByStatus = ({ i18n }) => ({
 export const UsersAccessRequest = () => {
   const i18n = useI18n()
 
-  const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [surveyTemplates, setSurveyTemplates] = useState([])
   const [currentUserAccessRequest, setCurrentUserAccessRequest] = useState(null)
 

@@ -1,4 +1,3 @@
-
 import { SurveyCreate } from '@webapp/components/survey/SurveyCreate'
 
 const TemplateCreate = () => (

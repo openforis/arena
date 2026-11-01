@@ -1,6 +1,6 @@
 import './ValidationReport.scss'
 
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
@@ -20,6 +20,7 @@ import { ButtonBack } from '@webapp/components/buttons'
 import RowHeader from './RowHeader'
 import Row from './Row'
 import { HeaderLeft } from './HeaderLeft'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 const ValidationReport = () => {
   const navigate = useNavigate()
@@ -28,7 +29,6 @@ const ValidationReport = () => {
   const lang = useSurveyPreferredLang()
   const { recordUuid } = useParams()
   const [query, setQuery] = useState(null)
-  const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState([])
   const [selectedMessageTypeCategoryIds, setSelectedMessageTypeCategoryIds] = useState(MessageTypeFilterCategoryIds)
 
   const allAttributeDefUuids = useMemo(() => {
@@ -40,9 +40,9 @@ const ValidationReport = () => {
       .map(NodeDef.getUuid)
   }, [survey, surveyCycleKey])
 
-  useEffect(() => {
-    setSelectedAttributeDefUuids(allAttributeDefUuids)
-  }, [allAttributeDefUuids])
+  const [selectedAttributeDefUuids, setSelectedAttributeDefUuids] = useState(allAttributeDefUuids)
+
+  useOnValueChange(allAttributeDefUuids, setSelectedAttributeDefUuids)
 
   const allAttributesSelected = useMemo(() => {
     if (allAttributeDefUuids.length === 0) return true

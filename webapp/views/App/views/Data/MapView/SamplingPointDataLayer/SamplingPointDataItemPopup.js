@@ -65,6 +65,7 @@ export const SamplingPointDataItemPopup = (props) => {
   const onRecordCreate = useCallback(
     ({ recordUuid }) => {
       // update current point
+      // eslint-disable-next-line react-hooks/immutability -- the map layer owns the point feature and reuses it
       pointProperties.recordUuid = recordUuid
     },
     [pointProperties]
