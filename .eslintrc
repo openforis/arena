@@ -61,7 +61,7 @@
     "import/resolver": {
       "node": {},
       "webpack": {
-        "config": "webpack.config.babel.js"
+        "config": "webpack.config.mjs"
       }
     },
     "react": {

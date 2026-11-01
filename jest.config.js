@@ -2,6 +2,8 @@ module.exports = {
   roots: ['<rootDir>/'],
   testEnvironment: 'node',
   setupFiles: [require.resolve('./test/unit/jest.setup.js')],
+  // Jest's default transform is the babel-jest nested in jest-config, which is tied to Babel 7
+  transform: { [String.raw`\.[jt]sx?$`]: require.resolve('babel-jest') },
   // Claude Code checks out isolated git worktrees under .claude/worktrees/ (see
   // .git/info/exclude). Each one is a full copy of this repo, including its own prebuilt
   // dist/__tests__/bundle.unit.js. Without these, `roots: ['<rootDir>/']` sweeps those stale,

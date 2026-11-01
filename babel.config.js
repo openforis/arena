@@ -9,9 +9,9 @@ module.exports = function babelConfig(api) {
   return {
     presets: [
       ['@babel/preset-env', { targets: { node: '12' } }],
-      ['@babel/preset-react', { runtime: 'automatic' }],
       '@babel/preset-typescript',
     ],
-    plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
+    // JSX syntax would otherwise also apply to .ts files, where it breaks generics like <T>(x: T) => x
+    overrides: [{ exclude: /\.ts$/, presets: [['@babel/preset-react', { runtime: 'automatic' }]] }],
   }
 }
