@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -127,19 +127,16 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     }
   }, [userUuid, forceUpdateKey])
 
-  const [profilePicture, setProfilePicture] = useState(null)
+  const profilePicture = useMemo(() => (data?.size > 0 ? URL.createObjectURL(data) : null), [data])
 
-  useEffect(() => {
-    if (data && data.size > 0) {
-      const objectUrl = URL.createObjectURL(data)
-      setProfilePicture(objectUrl)
-      return () => {
-        URL.revokeObjectURL(objectUrl)
+  useEffect(
+    () => () => {
+      if (profilePicture) {
+        URL.revokeObjectURL(profilePicture)
       }
-    }
-    setProfilePicture(null)
-    return undefined
-  }, [data])
+    },
+    [profilePicture]
+  )
 
   return profilePicture
 }

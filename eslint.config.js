@@ -11,29 +11,24 @@ import parserTypeScript from '@typescript-eslint/parser'
 import pluginJest from 'eslint-plugin-jest'
 import pluginPlaywright from 'eslint-plugin-playwright' // Used for Playwright Test E2E tests
 
-// Formatting/Parser Plugins
-import babelParser from '@babel/eslint-parser'
+// Formatting Plugins
 import configPrettier from 'eslint-config-prettier'
 import pluginPrettier from 'eslint-plugin-prettier'
 
 export default [
   // --- CORE CONFIGURATION (APPLIES TO ALL JS/JSX) ---
 
-  // 1. Basic JavaScript Configuration & Parser Setup (using Babel)
+  // 1. Basic JavaScript Configuration
   {
     ...pluginJs.configs.recommended,
     files: ['**/*.js', '**/*.jsx'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      // Use Babel as the custom parser
-      parser: babelParser,
       parserOptions: {
-        requireConfigFile: false,
-        babelOptions: {
-          presets: ['@babel/preset-react', '@babel/preset-env'],
+        ecmaFeatures: {
+          jsx: true,
         },
-        jsx: true,
       },
       globals: {
         ...globals.browser, // Standard React (browser) globals
@@ -84,7 +79,8 @@ export default [
       'react-hooks': pluginReactHooks,
     },
     settings: {
-      react: { version: 'detect' },
+      // shortcut: 'detect' crashes on ESLint 10, restore it when eslint-plugin-react supports ESLint 10
+      react: { version: '19.3' },
     },
     rules: {
       // Recommended React rules

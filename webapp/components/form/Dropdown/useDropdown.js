@@ -35,7 +35,7 @@ export const useDropdown = ({
   const [state, setState] = useState({
     items: asyncItemsLoading ? [] : itemsProp,
     loading: false,
-    inputValue: selectRef?.current?.inputRef?.value ?? '',
+    inputValue: '',
   })
 
   const updateState = useCallback((newProps) => setState((statePrev) => ({ ...statePrev, ...newProps })), [])
@@ -71,6 +71,7 @@ export const useDropdown = ({
 
   // fetch items on items prop or input value update (only if async items loading is active)
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the loading state must be set before fetching items
     initializeItems()
   }, [asyncItemsLoading, itemsProp, inputValue])
 

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'
@@ -10,7 +10,8 @@ import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'
 import { useUserIsSystemAdmin } from '@webapp/store/user'
 
-const ownerLabelFunction = (user) => [User.getName(user), User.getEmail(user)].filter((part) => Objects.isNotEmpty(part)).join(' - ')
+const ownerLabelFunction = (user) =>
+  [User.getName(user), User.getEmail(user)].filter((part) => Objects.isNotEmpty(part)).join(' - ')
 
 export const SurveyOwnerDropdown = (props) => {
   const { selectedUuid, onChange } = props
@@ -23,17 +24,17 @@ export const SurveyOwnerDropdown = (props) => {
   const { users } = state
   const selectedUser = useMemo(() => users.find((user) => User.getUuid(user) === selectedUuid), [selectedUuid, users])
 
-  const fetchUsers = useCallback(async () => {
-    const usersFetched = await API.fetchUsers({
+  useEffect(() => {
+    API.fetchUsers({
       onlyAccepted: true,
       includeSystemAdmins: isSystemAdmin,
     })
-    setState({ loading: false, users: usersFetched })
+      .then((usersFetched) => {
+        setState({ loading: false, users: usersFetched })
+      })
+      // the error is shown by the axios interceptor
+      .catch(() => setState({ loading: false, users: [] }))
   }, [isSystemAdmin])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
 
   return (
     <Dropdown

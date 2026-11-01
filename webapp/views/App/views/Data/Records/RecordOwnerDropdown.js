@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as User from '@core/user/user'
@@ -21,18 +21,18 @@ export const RecordOwnerDropdown = (props) => {
   const { users } = state
   const selectedUser = useMemo(() => users.find((user) => User.getUuid(user) === selectedUuid), [selectedUuid, users])
 
-  const fetchUsers = useCallback(async () => {
-    const usersFetched = await API.fetchUsersBySurvey({
+  useEffect(() => {
+    API.fetchUsersBySurvey({
       surveyId,
       onlyAccepted: true,
       includeSystemAdmins: isSystemAdmin,
     })
-    setState({ loading: false, users: usersFetched })
+      .then((usersFetched) => {
+        setState({ loading: false, users: usersFetched })
+      })
+      // the error is shown by the axios interceptor
+      .catch(() => setState({ loading: false, users: [] }))
   }, [isSystemAdmin, surveyId])
-
-  useEffect(() => {
-    fetchUsers()
-  }, [fetchUsers])
 
   return (
     <Dropdown

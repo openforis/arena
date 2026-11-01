@@ -18,7 +18,7 @@ const UsersListSurvey = () => {
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const emailVisible = useAuthCanViewOtherUsersEmail()
-  const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [surveyExtraPropsEditorUser, setSurveyExtraPropsEditorUser] = useState(null)
 
   const onRowClick = useCallback(
