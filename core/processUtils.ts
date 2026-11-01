@@ -36,7 +36,7 @@ export const ENV = {
   emailAuthPassword: process.env.EMAIL_AUTH_PASSWORD,
   emailTransportOptions: getJson(process.env.EMAIL_TRANSPORT_OPTIONS),
   // the actual sender address used when sending emails (see server/utils/mailer/mailer.js);
-  // EMAIL_FROM_RESOLVED is only ever set by the client webpack bundle (see webpack.config.babel.js),
+  // EMAIL_FROM_RESOLVED is only ever set by the client webpack bundle (see webpack.config.mjs),
   // where it carries this same resolved value across to the browser
   emailFromResolved:
     process.env.EMAIL_FROM_RESOLVED || process.env.EMAIL_FROM || process.env.ADMIN_EMAIL || process.env.EMAIL_AUTH_USER,

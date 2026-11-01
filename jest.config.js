@@ -2,6 +2,8 @@ module.exports = {
   roots: ['<rootDir>/'],
   testEnvironment: 'node',
   setupFiles: [require.resolve('./test/unit/jest.setup.js')],
+  // Jest's default transform is the babel-jest nested in jest-config, which is tied to Babel 7
+  transform: { [String.raw`\.[jt]sx?$`]: require.resolve('babel-jest') },
   // Claude Code checks out isolated git worktrees under .claude/worktrees/ (see
   // .git/info/exclude). Each one is a full copy of this repo, including its own prebuilt
   // dist/__tests__/bundle.unit.js. Without these, `roots: ['<rootDir>/']` sweeps those stale,
@@ -19,10 +21,6 @@ module.exports = {
   transformIgnorePatterns: [
     '/node_modules/(?!.*/node_modules/)(?!change-case/|uuid/|@openforis/arena-server/|@scure/|@noble/|zod/|ai/|@ai-sdk/|eventsource-parser/|n2words/)',
   ],
-  // n2words (transitive dep of @openforis/arena-core, used by numberToWords) is exports-map-only,
-  // no "main" field - jest-resolve 27 predates Node's package.json#exports resolution support, so
-  // `require('n2words/en')` fails to resolve even though Node itself resolves it fine. Map each
-  // subpath straight to its source file until Jest is upgraded past 27.
   // Path aliases (mirrors jsconfig.json / the webpack configs): unit and integration tests are bundled
   // by webpack, which resolves them; they are needed here only for tests run directly through Jest.
   moduleNameMapper: {
@@ -31,10 +29,6 @@ module.exports = {
     '^@server/(.*)$': `${__dirname}/server/$1`,
     '^@webapp/(.*)$': `${__dirname}/webapp/$1`,
     '^@test/(.*)$': `${__dirname}/test/$1`,
-    // pdfkit (dependency of @openforis/arena-server) has an exports map only; without exports support Jest
-    // picks its ESM browser build, so point it to the CommonJS build.
-    '^pdfkit$': require.resolve('pdfkit'),
-    '^n2words/(.+)$': `${require.resolve('n2words/package.json').replace(/package\.json$/, 'src')}/$1.js`,
   },
   verbose: true,
 }
