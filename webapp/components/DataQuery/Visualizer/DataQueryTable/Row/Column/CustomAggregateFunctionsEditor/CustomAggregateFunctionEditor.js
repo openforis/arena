@@ -29,7 +29,9 @@ export const CustomAggregateFunctionEditor = (props) => {
   const [validation, setValidation] = useState(null)
 
   useEffect(() => {
-    validateAggregateFunction({ aggregateFunction, nodeDef }).then(setValidation)
+    validateAggregateFunction({ aggregateFunction, nodeDef })
+      .then(setValidation)
+      .catch(() => setValidation(null))
   }, [aggregateFunction, nodeDef])
 
   const updateAggregateFunction = ({ propName, value }) => {

@@ -33,7 +33,10 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
         surveyId: Survey.getId(survey),
         cycle,
         entityDefUuids,
-      }).then(setDataCountByEntityDefUuid)
+      })
+        .then(setDataCountByEntityDefUuid)
+        // the error is shown by the axios interceptor
+        .catch(() => setDataCountByEntityDefUuid({}))
     }
   }, [survey, cycle, entityDefUuids])
 

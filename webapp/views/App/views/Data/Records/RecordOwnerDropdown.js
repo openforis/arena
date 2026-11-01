@@ -26,9 +26,12 @@ export const RecordOwnerDropdown = (props) => {
       surveyId,
       onlyAccepted: true,
       includeSystemAdmins: isSystemAdmin,
-    }).then((usersFetched) => {
-      setState({ loading: false, users: usersFetched })
     })
+      .then((usersFetched) => {
+        setState({ loading: false, users: usersFetched })
+      })
+      // the error is shown by the axios interceptor
+      .catch(() => setState({ loading: false, users: [] }))
   }, [isSystemAdmin, surveyId])
 
   return (

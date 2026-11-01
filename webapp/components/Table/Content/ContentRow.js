@@ -42,11 +42,24 @@ export const ContentRow = (props) => {
     [item, onRowClick, onRowDoubleClick]
   )
 
+  const onKeyDown = useCallback(
+    async (event) => {
+      // keys pressed in the elements inside the row must not activate it
+      if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) {
+        event.preventDefault()
+        await onRowClick?.(item)
+      }
+    },
+    [item, onRowClick]
+  )
+
   return (
     <div
       data-testid={`${module}_${index}`}
       role="button"
+      tabIndex={onRowClick ? 0 : undefined}
       onClick={onClick}
+      onKeyDown={onKeyDown}
       className={className}
       style={{ gridTemplateColumns, height }}
     >
