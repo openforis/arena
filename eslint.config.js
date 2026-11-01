@@ -80,7 +80,7 @@ export default [
     },
     settings: {
       // shortcut: 'detect' crashes on ESLint 10, restore it when eslint-plugin-react supports ESLint 10
-      react: { version: '18.3' },
+      react: { version: '19.3' },
     },
     rules: {
       // Recommended React rules
