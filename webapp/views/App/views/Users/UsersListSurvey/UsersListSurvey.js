@@ -1,7 +1,7 @@
 import './UsersList.scss'
 
 import React, { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'

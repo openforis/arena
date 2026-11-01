@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react'
-import { Route, Routes as RouterRoutes } from 'react-router-dom'
+import { Route, Routes as RouterRoutes } from 'react-router'
 
 import * as User from '@core/user/user'
 import { app, guest, noHeader } from '@webapp/app/appModules'

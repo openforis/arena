@@ -1,6 +1,6 @@
 import './AnalysisNodeDefsHeader.scss'
 import { useDispatch } from 'react-redux'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 
 import * as Chain from '@common/analysis/chain'
 import * as NodeDef from '@core/survey/nodeDef'

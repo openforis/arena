@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import classNames from 'classnames'
 
 import { useI18n } from '@webapp/store/system'
