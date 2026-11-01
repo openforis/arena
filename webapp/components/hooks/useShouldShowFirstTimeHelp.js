@@ -36,21 +36,19 @@ export const useShouldShowFirstTimeHelp = ({ useFetchMessages, helperTypes }) =>
     }
   }, [surveyInfo])
 
-  useEffect(() => {
-    if (numberOfNodeDefs > 1) {
-      setHelp(false)
-      return
-    }
-
-    if (
-      numberOfNodeDefs === 1 && // only root entity def
-      messages.length > 0 &&
-      messages.length < 10
-    ) {
-      const helperType = determineHelperType({ survey, messages, helperTypes })
-      setHelp(helperType)
-    }
-  }, [helperTypes, messages, numberOfNodeDefs, survey])
+  let helpNext = help
+  if (numberOfNodeDefs > 1) {
+    helpNext = false
+  } else if (
+    numberOfNodeDefs === 1 && // only root entity def
+    messages.length > 0 &&
+    messages.length < 10
+  ) {
+    helpNext = determineHelperType({ numberOfNodeDefs, messages, helperTypes })
+  }
+  if (helpNext !== help) {
+    setHelp(helpNext)
+  }
 
   return help
 }

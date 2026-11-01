@@ -49,6 +49,7 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
       items={taxa}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
       itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${Taxon.getVernacularNameUuid(taxon)}`}
+      // eslint-disable-next-line react-hooks/refs -- rendered only after a change event of the input, so the ref is set
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}

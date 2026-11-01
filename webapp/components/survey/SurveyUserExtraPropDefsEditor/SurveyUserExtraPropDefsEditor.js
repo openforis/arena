@@ -22,7 +22,7 @@ export const SurveyUserExtraPropDefsEditor = (props) => {
       const prevExtraPropDef = userExtraPropDefsArray[index]
       onExtraPropDefUpdateProp?.({ prevExtraPropDef, extraPropDef })
       if (onExtraPropDefsUpdate) {
-        let extraPropDefsArrayUpdated = [...userExtraPropDefsArray]
+        const extraPropDefsArrayUpdated = [...userExtraPropDefsArray]
         extraPropDefsArrayUpdated[index] = extraPropDef
         const extraPropDefsUpdated = ObjectUtils.toIndexedObj(extraPropDefsArrayUpdated, ExtraPropDef.keys.name)
         onExtraPropDefsUpdate(extraPropDefsUpdated)

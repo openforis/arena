@@ -1,9 +1,10 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 
 import { useSurvey } from '@webapp/store/survey'
 import { useBuildTreeData } from './useBuildEntityTreeData'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 /**
  * Collects item keys that have at least one real (visible) child.
@@ -90,13 +91,12 @@ export const useNodeDefTreeSelect = (props) => {
   const [expandedNodeDefUuids, setExpandedNodeDefUuids] = useState(expandableItemKeys)
   const selectedTreeItemKeys = useMemo(() => (nodeDefUuidActive ? [nodeDefUuidActive] : []), [nodeDefUuidActive])
 
-  useEffect(() => {
-    if (expanded) {
+  // Re-sync only when expandable set changes while expanded mode is on.
+  useOnValueChange(expanded ? expandableItemKeysKey : null, (key) => {
+    if (key !== null) {
       setExpandedNodeDefUuids(expandableItemKeys)
     }
-    // Re-sync only when expandable set changes while expanded mode is on.
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentional: expandableItemKeysKey tracks content
-  }, [expanded, expandableItemKeysKey])
+  })
 
   const toggleExpanded = useCallback(() => {
     const expandedNext = !expanded

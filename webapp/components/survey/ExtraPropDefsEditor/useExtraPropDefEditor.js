@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { validateExtraPropDef } from '@core/survey/extraPropDefValidator'
 import * as Validation from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
-import { useConfirm } from '@webapp/components/hooks'
+import { useConfirm, useOnValueChange } from '@webapp/components/hooks'
 
 export const useExtraPropDefEditor = (props) => {
   const { index, extraPropDef: extraPropDefProp, extraPropDefs, onItemDelete, onItemUpdate } = props
@@ -24,9 +24,7 @@ export const useExtraPropDefEditor = (props) => {
   const dirty =
     name !== ExtraPropDef.getName(extraPropDefProp) || dataType !== ExtraPropDef.getDataType(extraPropDefProp)
 
-  useEffect(() => {
-    setState(initialState)
-  }, [initialState])
+  useOnValueChange(initialState, setState)
 
   const updateExtraPropDef = useCallback(
     async ({ extraPropDefUpdated }) => {

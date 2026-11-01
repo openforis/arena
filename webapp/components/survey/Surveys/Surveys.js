@@ -44,7 +44,7 @@ const Surveys = (props) => {
    * Parameter passed to table rest params
    * (used to reload table data on survey publish).
    */
-  const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [onlyOwn, setOnlyOwn] = useState(isSystemAdmin)
 
   // Redirect to landing on survey change

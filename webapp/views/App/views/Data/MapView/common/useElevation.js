@@ -23,14 +23,13 @@ export const useElevation = ({ point, active = true }) => {
         setElevation(_elevation === null ? 'error' : _elevation)
       }
     }
-    if (active && surveyId && pointLatLng) {
-      void fetchElevation()
-    } else {
-      setElevation('...')
-    }
+    if (!active || !surveyId || !pointLatLng) return undefined
+
+    void fetchElevation()
 
     return () => {
       cancelled = true
+      setElevation('...')
     }
   }, [active, pointLatLng, surveyId])
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, useState, useMemo } from 'react'
+import React, { useContext, useState, useMemo } from 'react'
 
 import * as User from '@core/user/user'
 import { convertDateFromISOToDisplay } from '@core/dateUtils'
@@ -56,9 +56,16 @@ const getDataKey = (item) => {
 const DailyRecordsByUser = () => {
   const i18n = useI18n()
   const { userDateCounts, userCounts } = useContext(RecordsSummaryContext)
-  const [selectedUsers, setSelectedUsers] = useState([])
+  const [usersSelectedInDropdown, setUsersSelectedInDropdown] = useState([])
   const canViewAllUsers = useAuthCanViewAllUsers()
   const user = useUser()
+
+  // the users dropdown is available only to the users who can view all users
+  const selectedUsers = useMemo(() => {
+    if (canViewAllUsers) return usersSelectedInDropdown
+    const selectedItem = userCounts.find((item) => item.owner_uuid === User.getUuid(user))
+    return selectedItem ? [selectedItem] : []
+  }, [canViewAllUsers, user, userCounts, usersSelectedInDropdown])
 
   // Sort userCounts in descending order based on count
   const sortedUserCounts = [...userCounts].sort((a, b) => b.count - a.count)
@@ -81,13 +88,6 @@ const DailyRecordsByUser = () => {
 
   const { data, dataKeys } = chartData
 
-  useEffect(() => {
-    if (!canViewAllUsers) {
-      const selectedItem = userCounts.find((item) => item.owner_uuid === User.getUuid(user))
-      setSelectedUsers(selectedItem ? [selectedItem] : [])
-    }
-  }, [user, canViewAllUsers, userCounts])
-
   return (
     <>
       <h4 className="dashboard-chart-header">{i18n.t('homeView:dashboard.dailyRecordsByUser')}</h4>
@@ -100,7 +100,7 @@ const DailyRecordsByUser = () => {
           items={sortedUserCounts}
           itemLabel={(user) => user.owner_name ?? user.owner_email}
           itemValue={(user) => user.owner_uuid}
-          onChange={setSelectedUsers}
+          onChange={setUsersSelectedInDropdown}
           placeholder={i18n.t('homeView:dashboard.selectUsers')}
         />
       )}

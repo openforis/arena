@@ -1,5 +1,5 @@
 import './NodeDefsSelector.scss'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -48,11 +48,9 @@ const NodeDefsSelector = (props) => {
   const [showFilter, setShowFilter] = useState(false)
   const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
-      setFilterChainUuids([])
-    }
-  }, [chains, filterChainUuids, setFilterChainUuids])
+  if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
+    setFilterChainUuids([])
+  }
 
   const onAttributesSelection = useCallback(
     ({ attributeDefUuids, selected }) => {

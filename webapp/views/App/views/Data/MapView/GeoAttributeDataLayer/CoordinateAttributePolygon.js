@@ -107,7 +107,7 @@ export const CoordinateAttributePolygon = (props) => {
   const centerCircle = (middle) => {
     const latlng = L.latLng(middle)
     const pointIndex = circleControlPointIndex
-    let item = (
+    const item = (
       <Circle
         center={latlng}
         radius={5}
@@ -126,7 +126,7 @@ export const CoordinateAttributePolygon = (props) => {
 
   const nCircles = (middle, radius, amount, angle = 0) => {
     const middle_latlng = L.latLng(middle)
-    let pointArray = []
+    const pointArray = []
     for (let i = 0; i < 360; i += 360 / amount) {
       const latlng = GeoUtils.destination(middle_latlng, i + angle, radius)
       const pointIndex = circleControlPointIndex
@@ -151,7 +151,7 @@ export const CoordinateAttributePolygon = (props) => {
   /******** End circle controlpoint functions  *************/
 
   const rectangleControlPoints = () => {
-    let points = []
+    const points = []
     for (let eastIndex = 0; eastIndex < numberOfPointsEast; eastIndex++) {
       for (let northIndex = 0; northIndex < numberOfPointsNorth; northIndex++) {
         const pointDistanceLng =

@@ -1,6 +1,6 @@
 import './NodeDefCode.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { Surveys } from '@openforis/arena-core'
@@ -47,23 +47,13 @@ const NodeDefCode = (props) => {
 
   const itemsNeeded = !readOnly && canEditRecord
   const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
-  const [selectedItems, setSelectedItems] = useState([])
   const autocomplete = typeof items === 'function'
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ?? NodeDefLayout.renderType.dropdown
 
-  // On items or nodes change, update selectedItems
-  useEffect(() => {
-    if (!edit) {
-      const selectedItemsUpdate = nodes.reduce((acc, node) => {
-        const categoryItem = NodeRefData.getCategoryItem(node)
-        if (categoryItem) {
-          acc.push(categoryItem)
-        }
-        return acc
-      }, [])
-      setSelectedItems(selectedItemsUpdate)
-    }
-  }, [edit, items, nodes])
+  const selectedItems = useMemo(
+    () => (edit ? [] : nodes.map((node) => NodeRefData.getCategoryItem(node)).filter(Boolean)),
+    [edit, nodes]
+  )
 
   const onItemAdd = useCallback(
     (item) => {

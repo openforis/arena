@@ -57,16 +57,14 @@ export const CategorySelector = (props) => {
   )
 
   const loadCategory = useCallback(async () => {
-    let categorySelected = null
-    if (!A.isEmpty(categoryUuid)) {
-      categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
-      onCategoryLoad(categorySelected)
-    }
-    setCategory(categorySelected)
+    if (A.isEmpty(categoryUuid)) return null
+    const categorySelected = await API.fetchCategory({ surveyId, categoryUuid })
+    onCategoryLoad(categorySelected)
+    return categorySelected
   }, [categoryUuid, onCategoryLoad, surveyId])
 
   useEffect(() => {
-    loadCategory()
+    loadCategory().then(setCategory)
   }, [loadCategory])
 
   const onCategoryUpdate = useCallback(
