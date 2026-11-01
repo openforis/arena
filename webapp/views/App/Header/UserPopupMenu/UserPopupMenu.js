@@ -3,8 +3,7 @@ import './UserPopupMenu.scss'
 import React, { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
-import { useNavigate } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 

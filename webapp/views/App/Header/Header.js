@@ -3,7 +3,7 @@ import './Header.scss'
 import classNames from 'classnames'
 import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'

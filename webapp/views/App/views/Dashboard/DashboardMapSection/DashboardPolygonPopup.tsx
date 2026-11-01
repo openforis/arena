@@ -1,6 +1,6 @@
 import React, { useCallback, useState } from 'react'
 import { Popup } from 'react-leaflet'
-import { Link as RouterLink } from 'react-router-dom'
+import { Link as RouterLink } from 'react-router'
 
 import { GeoJsonUtils } from '@core/geo/geoJsonUtils'
 import * as NodeDef from '@core/survey/nodeDef'

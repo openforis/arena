@@ -1,7 +1,7 @@
 import './UserGroupsList.scss'
 
 import React, { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { GridColDef, GridRowParams } from '@mui/x-data-grid'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
