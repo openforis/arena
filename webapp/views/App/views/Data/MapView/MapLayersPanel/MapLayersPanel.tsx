@@ -338,6 +338,7 @@ export const MapLayersPanel: FC = () => {
     prevLayerKeysRef.current = currentKeys
 
     if (activeLayers.length === 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- compares the layers with the ones of the previous commit
       setExpandedLayerKey(null)
     } else {
       const newKey = currentKeys.find((k) => !prevKeys.includes(k))

@@ -18,9 +18,6 @@ const scriptColumnNames = [columnSet.scriptCommon, columnSet.scriptEnd]
 
 const tableName = 'chain'
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableChain
- */
 export default class TableChain extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, tableName, columnSet)

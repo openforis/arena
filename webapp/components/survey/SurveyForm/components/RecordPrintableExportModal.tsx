@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
+import type { ArenaRecord } from '@openforis/arena-core'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -29,6 +30,7 @@ import {
   type PagesUuidMap,
 } from '@webapp/store/ui/record/recordPageEntity'
 import { getRecordPrintableExportUrl } from '@webapp/service/api/data/recordPrintableExportUrl'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 type Props = {
   open: boolean
@@ -41,7 +43,7 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const survey = useSurvey() as object
   const surveyId = useSurveyId() as string | number
   const lang = useSurveyPreferredLang() as string
-  const record = useRecord() as object | null | undefined
+  const record = useRecord() as ArenaRecord | null | undefined
   const nodeDefPage = useNodeDefPage() as object
   const pagesUuidMap = usePagesUuidMap() as PagesUuidMap
 
@@ -50,23 +52,21 @@ export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Pro
   const [orientation, setOrientation] = useState<PrintOrientation>(PrintOrientations.portrait)
   const [includeQrCode, setIncludeQrCode] = useState(false)
 
-  useEffect(() => {
-    setFormat(initialFormat)
-  }, [initialFormat])
+  useOnValueChange(initialFormat, setFormat)
 
-  useEffect(() => {
-    if (!open) {
+  useOnValueChange(open, (openUpdated) => {
+    if (!openUpdated) {
       setIncludeQrCode(false)
       setExportScope(PrintableExportScopes.currentPage)
       setOrientation(PrintOrientations.portrait)
     }
-  }, [open])
+  })
 
-  useEffect(() => {
-    if (includeQrCode) {
+  useOnValueChange(includeQrCode, (includeQrCodeUpdated) => {
+    if (includeQrCodeUpdated) {
       setExportScope(PrintableExportScopes.currentPage)
     }
-  }, [includeQrCode])
+  })
 
   const entityDefUuid = NodeDef.getUuid(nodeDefPage)
   const entityLabel = NodeDef.getLabel(nodeDefPage, lang) || NodeDef.getName(nodeDefPage)

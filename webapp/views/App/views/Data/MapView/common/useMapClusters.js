@@ -55,6 +55,7 @@ export const useMapClusters = (props) => {
   }, [updateState])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- bounds and zoom are read from the leaflet map
     updateState()
   }, [map, updateState])
 

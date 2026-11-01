@@ -203,6 +203,9 @@ Database migrations are in `server/db/` directory. The server automatically runs
 **TypeScript for new code:**
 New files must be written in TypeScript (`.ts` / `.tsx`), not JavaScript. When substantially rewriting an existing `.js` file, prefer converting it to TypeScript. Run `yarn typecheck` to verify types.
 
+**TypeScript version:**
+TypeScript 7 (native) is used for `tsc`, installed as the `@typescript/native` alias; the `typescript` package is an alias of `@typescript/typescript6` because typescript-eslint still needs the TypeScript 6 JavaScript API. In `.js` files, JSDoc `object` is a real type and parameters are required unless marked optional.
+
 **Types from `@openforis/arena-core`:**
 Most domain types are (or should be) defined in `@openforis/arena-core` (e.g. `Survey`, `NodeDef`, `ArenaRecord`, `Node`, `Category`, `Taxonomy`, `User`). Import them from there instead of redefining them locally. If a needed domain type is missing, point it out rather than creating a local duplicate.
 

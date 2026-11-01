@@ -1,11 +1,12 @@
 import './FileUploadDialog.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'
 
 import { FileUploadDialogActions, useFileUploadDialog } from '@webapp/store/ui'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 const initialState = { files: [] }
 
@@ -18,11 +19,11 @@ export const FileUploadDialog = () => {
 
   const { files, uploadProgressPercent, uploading } = state
 
-  useEffect(() => {
-    if (!open) {
+  useOnValueChange(open, (openUpdated) => {
+    if (!openUpdated) {
       setState(initialState)
     }
-  }, [open])
+  })
 
   const onFilesDrop = useCallback((files) => {
     setState((statePrev) => ({ ...statePrev, files }))

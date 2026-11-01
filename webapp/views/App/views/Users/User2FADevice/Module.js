@@ -1,4 +1,3 @@
-
 import { userModules, user2FADeviceModules } from '@webapp/app/appModules'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'

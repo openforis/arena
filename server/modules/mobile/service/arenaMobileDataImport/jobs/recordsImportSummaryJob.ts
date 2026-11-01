@@ -87,7 +87,7 @@ export default class RecordsImportSummaryJob extends Job {
     }
   }
 
-  generateResult() {
-    return { items: this.items }
+  generateResult(): Promise<any> {
+    return Promise.resolve({ items: this.items })
   }
 }
