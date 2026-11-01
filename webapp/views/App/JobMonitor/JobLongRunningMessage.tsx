@@ -23,13 +23,14 @@ const JobLongRunningMessage = ({ job, messageKey = undefined }: Props) => {
   const jobEnded = JobSerialized.isEnded(job)
 
   useEffect(() => {
-    setShowMessage(false)
-
     if (!messageKey || jobEnded) return undefined
 
     const timeoutId = setTimeout(() => setShowMessage(true), showMessageDelayMillis)
 
-    return () => clearTimeout(timeoutId)
+    return () => {
+      clearTimeout(timeoutId)
+      setShowMessage(false)
+    }
   }, [jobUuid, jobEnded, messageKey])
 
   if (!showMessage || jobEnded) return null

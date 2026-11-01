@@ -10,9 +10,6 @@ const columnSet = {
   propsDraft: Table.columnSetCommon.propsDraft,
 }
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableCategoryItem
- */
 export default class TableCategoryItem extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'category_item', columnSet)

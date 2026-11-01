@@ -28,6 +28,11 @@ export const useI18n = () => browserI18n
 
 export const useI18nT = ({ unescapeHtml = false } = {}) =>
   useCallback(
+    /**
+     * @param {string} textKey - The text key.
+     * @param {object} [textParams] - The text parameters.
+     * @returns {string} - The translated text.
+     */
     (textKey, textParams) => {
       const text = browserI18n.t(textKey, textParams)
       return unescapeHtml ? DomUtils.unescapeHtml(text) : text

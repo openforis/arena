@@ -99,14 +99,14 @@ describe('dataFilter test', () => {
   })
 
   goodExpressions.forEach(({ q, r }) => {
-    test(q, () => {
+    test(`${q}`, () => {
       const ps = Expression.toSql(Expression.fromString(q))
       expect(ps).toEqual(r)
     })
   })
 
   badExpressions.forEach(({ q }) => {
-    test(q, () => {
+    test(`${q}`, () => {
       const ps = () => Expression.toSql(Expression.fromString(q))
       expect(ps).toThrow()
     })

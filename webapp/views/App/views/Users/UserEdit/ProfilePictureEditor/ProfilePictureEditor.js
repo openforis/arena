@@ -1,12 +1,12 @@
 import './ProfilePictureEditor.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import AvatarEditor from 'react-avatar-editor'
 
 import * as FileTypes from '@webapp/utils/fileTypes'
 
-import { useConfirm, useFileDrop } from '@webapp/components/hooks'
+import { useConfirm, useFileDrop, useOnValueChange } from '@webapp/components/hooks'
 import { useProfilePicture } from '@webapp/store/user'
 import { useI18n } from '@webapp/store/system'
 
@@ -50,12 +50,12 @@ const ProfilePictureEditor = (props) => {
   const [scale, setScale] = useState(1)
   const [rotate, setRotate] = useState(0)
 
-  useEffect(() => {
-    if (initialProfilePicture) {
+  useOnValueChange(initialProfilePicture, (profilePicture) => {
+    if (profilePicture) {
       setSettingInitialPicture(true)
-      setImage(initialProfilePicture)
+      setImage(profilePicture)
     }
-  }, [initialProfilePicture])
+  })
 
   useFileDrop(setImage, dropRef, [FileTypes.image])
 

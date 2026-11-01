@@ -1,6 +1,6 @@
 import './KmlUploader.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { useMap } from 'react-leaflet'
 import classNames from 'classnames'
 import shp from 'shpjs'
@@ -96,29 +96,26 @@ export const KmlUploader = () => {
     [map]
   )
 
-  useEffect(() => {
-    if (!selectedFile) {
-      return
-    }
-    const extension = FileUtils.getExtension(selectedFile)?.toLowerCase()
+  const processFile = (file) => {
+    const extension = FileUtils.getExtension(file)?.toLowerCase()
     switch (extension) {
       case 'kmz':
-        void processKMZFile(selectedFile)
+        void processKMZFile(file)
         break
       case 'kml':
-        void processKMLFile(selectedFile)
+        void processKMLFile(file)
         break
       case 'zip':
-        void processShapeFile(selectedFile)
+        void processShapeFile(file)
         break
       case 'json':
       case 'geojson':
-        void processGeoJson(selectedFile)
+        void processGeoJson(file)
         break
       default:
         break
     }
-  }, [processGeoJson, processKMLFile, processKMZFile, processShapeFile, selectedFile])
+  }
 
   const onIconClick = useCallback(() => {
     setOpen(true)
@@ -129,7 +126,11 @@ export const KmlUploader = () => {
   }, [])
 
   const fileChangeHandler = (event) => {
-    setSelectedFile(event.target.files[0])
+    const file = event.target.files[0]
+    setSelectedFile(file)
+    if (file) {
+      processFile(file)
+    }
   }
 
   const rangeChangeHandler = (event) => {

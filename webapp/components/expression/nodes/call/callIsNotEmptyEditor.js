@@ -1,4 +1,3 @@
-
 import * as Expression from '@core/expressionParser/expression'
 
 import { CallSingleParameterEditor } from './callSingleParameterEditor'

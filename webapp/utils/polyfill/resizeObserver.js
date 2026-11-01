@@ -21,7 +21,7 @@ export default class ResizeObserver {
   }
 
   observe(el) {
-    if (!this.observables.some(observable => observable.el === el)) {
+    if (!this.observables.some((observable) => observable.el === el)) {
       this.observables.push({
         el,
         size: this.getElementSize(el),
@@ -30,7 +30,7 @@ export default class ResizeObserver {
   }
 
   unobserve(el) {
-    this.observables = this.observables.filter(obj => obj.el !== el)
+    this.observables = this.observables.filter((obj) => obj.el !== el)
   }
 
   disconnect() {
@@ -40,7 +40,7 @@ export default class ResizeObserver {
 
   checkSize() {
     const changedEntries = this.observables
-      .filter(obj => {
+      .filter((obj) => {
         const { width, height, x, y } = this.getElementSize(obj.el)
         const size = obj.size
 
@@ -51,7 +51,7 @@ export default class ResizeObserver {
 
         return false
       })
-      .map(obj => obj.el)
+      .map((obj) => obj.el)
 
     if (changedEntries.length > 0) {
       this.callback(changedEntries)

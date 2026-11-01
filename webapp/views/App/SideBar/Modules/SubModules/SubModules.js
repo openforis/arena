@@ -1,4 +1,3 @@
-
 import * as SideBarModule from '../utils'
 
 import ModuleLink from '../ModuleLink'
