@@ -29,7 +29,7 @@ const Records = () => {
     (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}?locked=true`),
     [navigate]
   )
-  const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
+  const [recordsRequestedAt, setRecordsRequestedAt] = useState(() => Date.now())
 
   const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())

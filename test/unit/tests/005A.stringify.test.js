@@ -111,9 +111,7 @@ describe('A.stringify', () => {
       const result = A.stringify(value)
 
       expect(String(expected)).toEqual(String(result))
-      if (!A.isEmpty(result)) {
-        expect(value).toEqual(A.parse(result))
-      }
+      expect(A.isEmpty(result) ? value : A.parse(result)).toEqual(value)
     })
   })
 })

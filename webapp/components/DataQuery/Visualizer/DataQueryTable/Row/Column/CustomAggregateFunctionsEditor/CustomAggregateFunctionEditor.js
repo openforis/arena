@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -28,19 +28,14 @@ export const CustomAggregateFunctionEditor = (props) => {
 
   const [validation, setValidation] = useState(null)
 
-  const validate = useCallback(async () => {
-    const validationUpdated = await validateAggregateFunction({ aggregateFunction, nodeDef })
-    setValidation(validationUpdated)
+  useEffect(() => {
+    validateAggregateFunction({ aggregateFunction, nodeDef })
+      .then(setValidation)
+      .catch(() => setValidation(null))
   }, [aggregateFunction, nodeDef])
 
-  useEffect(() => {
-    validate()
-  }, [validate])
-
-  const updateAggregateFunction = async ({ propName, value }) => {
-    const aggregateFunctionUpdated = { ...aggregateFunction, [propName]: value }
-    setAggregateFunction(aggregateFunctionUpdated)
-    validate()
+  const updateAggregateFunction = ({ propName, value }) => {
+    setAggregateFunction({ ...aggregateFunction, [propName]: value })
   }
 
   const onSave = () => {

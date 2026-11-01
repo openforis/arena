@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import { PointFactory, Points } from '@openforis/arena-core'
 
@@ -32,12 +32,7 @@ export const useMap = (props) => {
   const i18n = useI18n()
   const srsIndex = useSurveySrsIndex()
 
-  const [state, setState] = useState({
-    centerPositionLatLon: null,
-    markerPointUpdated: null,
-  })
-
-  const { centerPositionLatLon, markerPointUpdated } = state
+  const [markerPointUpdated, setMarkerPointUpdated] = useState(null)
 
   const fromPointToLatLon = useCallback(
     (point) => {
@@ -63,18 +58,10 @@ export const useMap = (props) => {
   }, [i18n])
 
   // on markerPoint update or after SRSs has been initialized, transform point to lat long
-  useEffect(() => {
+  const centerPositionLatLon = useMemo(() => {
     const actualCenterPoint = calculateActualCenterPoint({ centerPoint, geoJson, markerPoint, srsIndex })
-
-    setState((statePrev) => ({
-      ...statePrev,
-      centerPositionLatLon: actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null,
-    }))
+    return actualCenterPoint ? fromPointToLatLon(actualCenterPoint) : null
   }, [centerPoint, fromPointToLatLon, geoJson, markerPoint, srsIndex])
-
-  const onMarkerPointUpdated = useCallback((markerPointUpdated) => {
-    setState((statePrev) => ({ ...statePrev, markerPointUpdated }))
-  }, [])
 
   const onSaveClick = useCallback(() => {
     onMarkerPointChange(markerPointUpdated)
@@ -86,7 +73,7 @@ export const useMap = (props) => {
     centerPositionLatLon,
     markerPointUpdated,
     markerPointUpdatedToString,
-    onMarkerPointUpdated,
+    onMarkerPointUpdated: setMarkerPointUpdated,
     onSaveClick,
   }
 }

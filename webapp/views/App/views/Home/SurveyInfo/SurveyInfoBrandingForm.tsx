@@ -2,6 +2,7 @@ import './SurveyInfoBrandingForm.scss'
 
 import { useCallback, useEffect, useMemo, useRef, useState, type ChangeEvent, type RefObject } from 'react'
 import { useDispatch } from 'react-redux'
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
@@ -14,6 +15,7 @@ import type {
 } from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 import type { ValidationResultInstance } from '@core/validation/validationResult'
 
 import { Button, ButtonIconDelete, ColorInput } from '@webapp/components'
@@ -74,7 +76,7 @@ type FileValidationError = {
 }
 
 const fieldErrorValidation = (errorKey: string): ValidationResultInstance =>
-  Validation.newInstance(false, {}, [{ key: errorKey }]) as ValidationResultInstance
+  Validation.newInstance(false, {}, [ValidationResult.newInstance(errorKey)]) as ValidationResultInstance
 
 const resolvePreviewColor = (primaryColor: string): string | null =>
   SurveyBranding.isValidPrimaryColor(primaryColor) ? primaryColor : null
@@ -216,7 +218,7 @@ type SurveyInfoBrandingFormProps = {
 export const SurveyInfoBrandingForm = (props: SurveyInfoBrandingFormProps) => {
   const { branding = {}, setBranding, readOnly, labels, descriptions, name } = props
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const i18n = useI18n()
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()

@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 
 import { useActions } from './actions'
 import { State } from './state'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
   const { selectedItemUuid, item: taxonomy, canDelete, onTaxonomySelect, canSelect, initData, onTaxonomyOpen } = props
@@ -10,13 +11,8 @@ export const useLocalState = (props) => {
     State.create({ taxonomy, canDelete, selectedItemUuid, onTaxonomySelect, canSelect, initData, onTaxonomyOpen })
   )
 
-  useEffect(() => {
-    setState((prevState) => State.assocSelectedItemUuid(selectedItemUuid)(prevState))
-  }, [selectedItemUuid])
-
-  useEffect(() => {
-    setState((prevState) => State.assocTaxonomy(taxonomy)(prevState))
-  }, [taxonomy])
+  useOnValueChange(selectedItemUuid, (uuid) => setState(State.assocSelectedItemUuid(uuid)))
+  useOnValueChange(taxonomy, (taxonomyUpdated) => setState(State.assocTaxonomy(taxonomyUpdated)))
 
   const Actions = useActions()
 
