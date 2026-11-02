@@ -56,6 +56,8 @@ export default class RecordsImportSummaryJob extends Job {
     }
 
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
 

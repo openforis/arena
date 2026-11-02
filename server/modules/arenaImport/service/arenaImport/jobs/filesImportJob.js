@@ -25,6 +25,8 @@ export default class FilesImportJob extends FileImportBaseJob {
       this.total = filesSummaries.length
 
       for (const fileSummary of filesSummaries) {
+        if (this.isCancelRequestedOrNotRunning()) return
+
         let file = { ...fileSummary }
 
         file = SurveyFile.cleanupInvalidProps(file)
