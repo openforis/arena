@@ -89,22 +89,28 @@ const buildExportMenuItems = ({
     })
   }
   if (canExportRecordsData) {
-    exportMenuItems.push({
-      key: 'exportData',
-      content: (
-        <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} variant="text" />
-      ),
-    })
-    exportMenuItems.push({
-      key: 'exportDataMatrix',
-      content: (
-        <ButtonDownload
-          label="dataView:records.exportDataMatrix"
-          onClick={toggleRecordsDataMatrixExportModalOpen}
-          variant="text"
-        />
-      ),
-    })
+    exportMenuItems.push(
+      {
+        key: 'exportData',
+        content: (
+          <ButtonDownload
+            label="dataView:records.exportData"
+            onClick={toggleRecordsDataExportModalOpen}
+            variant="text"
+          />
+        ),
+      },
+      {
+        key: 'exportDataMatrix',
+        content: (
+          <ButtonDownload
+            label="dataView:records.exportDataMatrix"
+            onClick={toggleRecordsDataMatrixExportModalOpen}
+            variant="text"
+          />
+        ),
+      }
+    )
   }
   if (canAnalyzeRecords) {
     exportMenuItems.push({

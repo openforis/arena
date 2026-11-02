@@ -1,4 +1,6 @@
-type DataRow = Record<string, unknown>
+type DataValue = string | number | boolean | null | undefined
+
+type DataRow = Record<string, DataValue>
 
 type DataMatrixParams = {
   rows: DataRow[]
@@ -21,7 +23,7 @@ type DataMatrix = {
 const recordKeysSeparator = ' - '
 const multipleValuesSeparator = '; '
 
-const toText = (value: unknown): string => String(value ?? '').trim()
+const toText = (value: DataValue): string => String(value ?? '').trim()
 
 const compareNatural = (textA: string, textB: string): number =>
   textA.localeCompare(textB, undefined, { numeric: true })
@@ -44,8 +46,10 @@ const generateRecordFieldNames = ({
   const sortedEntries = [...labelByRecordUuid].sort(([, labelA], [, labelB]) => compareNatural(labelA, labelB))
   for (const [recordUuid, label] of sortedEntries) {
     let fieldName = label
-    for (let suffix = 2; usedNames.has(fieldName); suffix++) {
+    let suffix = 2
+    while (usedNames.has(fieldName)) {
       fieldName = `${label} (${suffix})`
+      suffix += 1
     }
     usedNames.add(fieldName)
     fieldNameByRecordUuid.set(recordUuid, fieldName)
