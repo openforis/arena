@@ -144,7 +144,7 @@ export default class RecordsImportJob extends Job {
         submissionDir,
       })
 
-      const existingMatch = findExistingRecordSummary({
+      const existingMatch = await findExistingRecordSummary({
         survey,
         record,
         existingRecordsSummary,

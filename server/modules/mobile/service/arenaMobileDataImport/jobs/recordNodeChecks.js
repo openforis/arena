@@ -10,7 +10,7 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const _getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
+export const getOrFetchCategoryItem = async ({ survey, nodeDef, itemUuid }) => {
   const itemInSurvey = Survey.getCategoryItemByUuid(itemUuid)(survey)
   if (itemInSurvey) {
     return itemInSurvey
@@ -66,7 +66,7 @@ const _checkCategoryItemExists = async ({ survey, node, nodeDef }) => {
   if (!NodeDef.isCode(nodeDef)) return null
   const itemUuid = Node.getCategoryItemUuid(node)
   if (!itemUuid) return null
-  const item = await _getOrFetchCategoryItem({ survey, nodeDef, itemUuid })
+  const item = await getOrFetchCategoryItem({ survey, nodeDef, itemUuid })
   if (!item) return { error: `category item with uuid ${itemUuid} does not exist` }
   return null
 }

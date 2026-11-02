@@ -45,28 +45,28 @@ describe('Record import matcher: merge of records with same keys', () => {
     record = RB.record(user, survey, RB.entity('cluster', RB.attribute('cluster_id', 1))).build()
   })
 
-  test('merge into a record with same keys is allowed by default', () => {
+  test('merge into a record with same keys is allowed by default', async () => {
     const existingRecordSummary = createRecordSummary({ uuid: 'other-record-uuid' })
-    const { action, existingRecordUuid } = determineMergeAction({ existingRecordSummary })
+    const { action, existingRecordUuid } = await determineMergeAction({ existingRecordSummary })
     expect(action).toBe(RecordImportAction.merge)
     expect(existingRecordUuid).toBe('other-record-uuid')
   })
 
-  test('merge into a record with same keys is blocked when not allowed', () => {
+  test('merge into a record with same keys is blocked when not allowed', async () => {
     const existingRecordSummary = createRecordSummary({ uuid: 'other-record-uuid' })
-    expect(() => determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary })).toThrow(
+    await expect(determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary })).rejects.toThrow(
       'dataImport.recordMergeWithSameKeysNotAllowed'
     )
   })
 
-  test('merge with the same record (same uuid) is allowed even when merging records with same keys is not', () => {
+  test('merge with the same record (same uuid) is allowed even when merging records with same keys is not', async () => {
     const existingRecordSummary = createRecordSummary()
-    const { action } = determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary })
+    const { action } = await determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary })
     expect(action).toBe(RecordImportAction.merge)
   })
 
-  test('new records are inserted when merging records with same keys is not allowed', () => {
-    const { action } = determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary: null })
+  test('new records are inserted when merging records with same keys is not allowed', async () => {
+    const { action } = await determineMergeAction({ survey: surveyWithMergeNotAllowed(), existingRecordSummary: null })
     expect(action).toBe(RecordImportAction.insert)
   })
 })
