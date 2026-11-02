@@ -122,7 +122,6 @@ export default class RecordsImportJob extends DataImportBaseJob {
     record[Record.keys.ownerUuid] = ownerSource ? ownerUuidSource : User.getUuid(user)
 
     // remove invalid nodes and build index from scratch
-    delete record['_nodesIndex']
     const nodes = Record.getNodes(record)
 
     for (const [nodeUuid, node] of Object.entries(nodes)) {
@@ -150,8 +149,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         }
       }
     }
-    // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
+    this.currentRecord = Record.replaceNodes(nodes)(record)
   }
 
   async insertOrSkipRecord() {
