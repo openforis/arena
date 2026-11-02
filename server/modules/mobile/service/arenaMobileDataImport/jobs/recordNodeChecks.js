@@ -1,6 +1,4 @@
-import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Taxonomy from '@core/survey/taxonomy'
 import * as Node from '@core/record/node'
 
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
@@ -8,19 +6,6 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
-
-const _getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
-  const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)
-  if (taxonInSurvey) {
-    return taxonInSurvey
-  }
-  const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
-  const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
-  if (!Taxonomy.isBigTaxonomy(taxonomy)) {
-    return null
-  }
-  return taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
-}
 
 const _checkParentValid = ({ nodes, node, nodeDef }) => {
   const parentUuid = Node.getParentUuid(node)
@@ -61,7 +46,7 @@ const _checkTaxonExists = async ({ survey, node, nodeDef }) => {
   if (!NodeDef.isTaxon(nodeDef)) return null
   const taxonUuid = Node.getTaxonUuid(node)
   if (!taxonUuid) return null
-  const taxon = await _getOrFetchTaxon({ survey, nodeDef, taxonUuid })
+  const taxon = await taxonProvider.getOrFetchTaxon({ survey, nodeDef, taxonUuid })
   if (!taxon) return { error: `taxon with uuid ${taxonUuid} does not exist` }
   return null
 }

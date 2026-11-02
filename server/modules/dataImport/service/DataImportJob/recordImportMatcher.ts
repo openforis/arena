@@ -6,12 +6,15 @@ import { RecordImportAction, RecordImportActionType } from '@common/dataImport/r
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Taxon from '@core/survey/taxon'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import SystemError from '@core/systemError'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { NodeValues } from '@core/record/nodeValues'
 
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 
 const formatKeyValue = async ({
   survey,
@@ -24,8 +27,13 @@ const formatKeyValue = async ({
   keyDef: any
   value: any
 }): Promise<any> => {
+  // items of big categories and taxa of big taxonomies are not in the survey ref data
+  if (NodeDef.isTaxon(keyDef) && value) {
+    const taxonUuid = value[Node.valuePropsTaxon.taxonUuid]
+    const taxon = taxonUuid ? await TaxonProviderDefault.getOrFetchTaxon({ survey, nodeDef: keyDef, taxonUuid }) : null
+    if (taxon) return Taxon.getCode(taxon)
+  }
   const itemUuid = NodeDef.isCode(keyDef) && value ? NodeValues.getValueItemUuid(value) : null
-  // items of big categories are not in the survey ref data
   const categoryItem = itemUuid
     ? await CategoryItemProviderDefault.getOrFetchItem({ survey, nodeDef: keyDef, itemUuid })
     : null
