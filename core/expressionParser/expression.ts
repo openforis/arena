@@ -67,17 +67,9 @@ const _getStringMethodByLikeAffixes = (prefix: string, suffix: string): string =
 const _likeToStringMethods = (string: string): string =>
   string.replaceAll(
     likeRegex,
-    (
-      match: string,
-      attribute?: string,
-      not?: string,
-      operator?: string,
-      quote?: string,
-      prefix = '',
-      text = '',
-      suffix = ''
-    ) => {
+    (match: string, attribute?: string, not?: string, operator?: string, quote?: string, ...pattern: string[]) => {
       if (!operator) return match
+      const [prefix = '', text = '', suffix = ''] = pattern
       const ignoreCase = operator.toUpperCase() === 'ILIKE'
       const object = ignoreCase ? `${attribute}.toLowerCase()` : attribute
       const value = `${quote}${ignoreCase ? text.toLowerCase() : text}${quote}`
