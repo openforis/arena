@@ -73,6 +73,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     // import records sequentially
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
 
       if (selectedRecordsUuids && !selectedRecordsUuids.includes(recordUuid)) {
