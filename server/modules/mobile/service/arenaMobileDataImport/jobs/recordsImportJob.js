@@ -158,13 +158,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecordSummary = findExistingRecordSummary({
+    const existingRecordSummary = await findExistingRecordSummary({
       survey,
       record,
       existingRecordsSummary,
       conflictResolutionStrategy,
     })
-    const { action, existingRecordUuid } = determineRecordAction({
+    const { action, existingRecordUuid } = await determineRecordAction({
       survey,
       record,
       existingRecordSummary,
@@ -212,12 +212,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
     )
     // check can update record
     if (!Authorizer.canEditRecord(user, recordTarget)) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
     }
     // records of other user groups (e.g. downloaded read-only) cannot be updated
     if (!(await this.recordMatchesUserGroupQualifiers(recordTarget))) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOfAnotherUserGroup', { recordUuid, recordKeyValues })
     }
 
