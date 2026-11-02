@@ -170,11 +170,20 @@ A mesclagem não pode ser realizada.`,
     title: 'Exportar dados',
   },
   dataMatrixExport: {
-    entity: 'Entidade (p. ex. lista de espécies)',
-    rowAttribute: 'Linhas (p. ex. espécie)',
+    entity: 'Entidade (p. ex. árvore)',
+    entityInfo:
+      'Entidade múltipla com os dados a exportar: os seus atributos podem ser usados como linhas e valores da tabela.',
+    info: 'Exporte uma tabela com uma linha por espécie e uma coluna por registro, o formato usado por ferramentas de análise de vegetação como Turboveg, Juice e Synbiosys.',
+    rowAttribute: 'Linhas (nome do atributo de táxon, p. ex. espécie)',
+    rowAttributeInfo:
+      'Cada valor diferente deste atributo torna-se uma linha da tabela. Os atributos de táxon são exportados com o nome científico, porque todos os táxons não listados têm o mesmo código.',
     secondRowAttribute: 'Segundo atributo de linha, opcional (p. ex. estrato)',
+    secondRowAttributeInfo:
+      'Use-o quando a mesma espécie puder aparecer mais de uma vez num registro (p. ex. em estratos diferentes): cada combinação torna-se uma linha separada.',
     title: 'Exportar matriz de dados',
     valueAttribute: 'Valores (p. ex. cobertura)',
+    valueAttributeInfo:
+      'O valor mostrado nas células. Os atributos de código são exportados com o código, não com o rótulo. Se uma linha aparecer mais de uma vez num registro com valores diferentes, a célula contém todos eles.',
   },
   dataVis: {
     errorLoadingData: 'Erro ao carregar dados',

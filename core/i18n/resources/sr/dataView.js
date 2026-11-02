@@ -173,11 +173,20 @@ Spajanje nije moguće izvršiti.`,
     title: 'Izvezi podatke',
   },
   dataMatrixExport: {
-    entity: 'Entitet (npr. lista vrsta)',
-    rowAttribute: 'Redovi (npr. vrsta)',
+    entity: 'Entitet (npr. drvo)',
+    entityInfo:
+      'Višestruki entitet sa podacima za izvoz: njegovi atributi se mogu koristiti kao redovi i vrednosti tabele.',
+    info: 'Izvezite tabelu sa jednim redom po vrsti i jednom kolonom po zapisu, u formatu koji koriste alati za analizu vegetacije kao što su Turboveg, Juice i Synbiosys.',
+    rowAttribute: 'Redovi (naziv atributa taksona, npr. vrsta)',
+    rowAttributeInfo:
+      'Svaka različita vrednost ovog atributa postaje red tabele. Atributi taksona se izvoze sa naučnim nazivom, jer svi taksoni koji nisu na listi imaju isti kod.',
     secondRowAttribute: 'Drugi atribut reda, opciono (npr. sprat)',
+    secondRowAttributeInfo:
+      'Koristite ga kada se ista vrsta može pojaviti više puta u zapisu (npr. u različitim spratovima): svaka kombinacija postaje poseban red.',
     title: 'Izvezi matricu podataka',
     valueAttribute: 'Vrednosti (npr. pokrovnost)',
+    valueAttributeInfo:
+      'Vrednost prikazana u ćelijama. Atributi koda se izvoze sa kodom, a ne sa oznakom. Ako se red pojavi više puta u zapisu sa različitim vrednostima, ćelija sadrži sve vrednosti.',
   },
   dataVis: {
     errorLoadingData: 'Greška pri učitavanju podataka',

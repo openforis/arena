@@ -17,6 +17,7 @@ import { FormItem } from '@webapp/components/form/Input'
 import { Modal, ModalBody } from '@webapp/components/modal'
 import { EntitySelector } from '@webapp/components/survey/NodeDefsSelector'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 import { RecordListActions } from '@webapp/store/ui'
 import { TestId } from '@webapp/utils/testId'
 
@@ -33,6 +34,7 @@ type Props = {
 }
 
 type AttributeDropdownProps = {
+  info: string
   items: DropdownItem[]
   label: string
   onChange: (value: string | null) => void
@@ -40,8 +42,8 @@ type AttributeDropdownProps = {
   value: string | null
 }
 
-const AttributeDropdown = ({ items, label, onChange, testId, value }: AttributeDropdownProps) => (
-  <FormItem label={label}>
+const AttributeDropdown = ({ info, items, label, onChange, testId, value }: AttributeDropdownProps) => (
+  <FormItem info={info} label={label}>
     <Dropdown
       items={items}
       onChange={(item: DropdownItem | null) => onChange(item?.value ?? null)}
@@ -55,6 +57,7 @@ export const RecordsDataMatrixExportModal = (props: Props) => {
   const { onClose, recordUuids, search } = props
 
   const dispatch = useDispatch()
+  const i18n = useI18n()
   const survey = useSurvey() as ArenaSurvey
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
@@ -103,12 +106,13 @@ export const RecordsDataMatrixExportModal = (props: Props) => {
       title="dataView:dataMatrixExport.title"
     >
       <ModalBody>
+        <p className="records-data-matrix-export__info">{i18n.t('dataView:dataMatrixExport.info')}</p>
         {multipleSources && (
           <FormItem label="dataView:dataExport.source.label">
             <RadioButtonGroup onChange={onSourceChange} value={source} items={availableSources} />
           </FormItem>
         )}
-        <FormItem label="dataView:dataMatrixExport.entity">
+        <FormItem info="dataView:dataMatrixExport.entityInfo" label="dataView:dataMatrixExport.entity">
           <EntitySelector
             filterFn={NodeDef.isMultipleEntity}
             hierarchy={hierarchy}
@@ -118,6 +122,7 @@ export const RecordsDataMatrixExportModal = (props: Props) => {
           />
         </FormItem>
         <AttributeDropdown
+          info="dataView:dataMatrixExport.rowAttributeInfo"
           items={attributeItems}
           label="dataView:dataMatrixExport.rowAttribute"
           onChange={setRowDefUuid}
@@ -125,6 +130,7 @@ export const RecordsDataMatrixExportModal = (props: Props) => {
           value={rowDefUuid}
         />
         <AttributeDropdown
+          info="dataView:dataMatrixExport.secondRowAttributeInfo"
           items={attributeItems.filter((item) => item.value !== rowDefUuid)}
           label="dataView:dataMatrixExport.secondRowAttribute"
           onChange={setSecondRowDefUuid}
@@ -132,6 +138,7 @@ export const RecordsDataMatrixExportModal = (props: Props) => {
           value={secondRowDefUuid}
         />
         <AttributeDropdown
+          info="dataView:dataMatrixExport.valueAttributeInfo"
           items={attributeItems}
           label="dataView:dataMatrixExport.valueAttribute"
           onChange={setValueDefUuid}

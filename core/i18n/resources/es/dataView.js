@@ -159,11 +159,20 @@ export default {
     title: 'Exportar datos',
   },
   dataMatrixExport: {
-    entity: 'Entidad (p. ej. lista de especies)',
-    rowAttribute: 'Filas (p. ej. especie)',
+    entity: 'Entidad (p. ej. árbol)',
+    entityInfo:
+      'Entidad múltiple con los datos a exportar: sus atributos pueden usarse como filas y valores de la tabla.',
+    info: 'Exporte una tabla con una fila por especie y una columna por registro, el formato utilizado por herramientas de análisis de vegetación como Turboveg, Juice y Synbiosys.',
+    rowAttribute: 'Filas (nombre del atributo de taxón, p. ej. especie)',
+    rowAttributeInfo:
+      'Cada valor distinto de este atributo se convierte en una fila de la tabla. Los atributos de taxón se exportan con su nombre científico, porque todos los taxones no listados tienen el mismo código.',
     secondRowAttribute: 'Segundo atributo de fila, opcional (p. ej. estrato)',
+    secondRowAttributeInfo:
+      'Úselo cuando la misma especie pueda aparecer más de una vez en un registro (p. ej. en distintos estratos): cada combinación se convierte en una fila separada.',
     title: 'Exportar matriz de datos',
     valueAttribute: 'Valores (p. ej. cobertura)',
+    valueAttributeInfo:
+      'El valor que se muestra en las celdas. Los atributos de código se exportan con su código, no con la etiqueta. Si una fila aparece más de una vez en un registro con valores distintos, la celda los contiene todos.',
   },
   dataVis: {
     errorLoadingData: 'Error al cargar datos',

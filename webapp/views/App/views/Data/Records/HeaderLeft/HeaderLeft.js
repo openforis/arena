@@ -89,28 +89,12 @@ const buildExportMenuItems = ({
     })
   }
   if (canExportRecordsData) {
-    exportMenuItems.push(
-      {
-        key: 'exportData',
-        content: (
-          <ButtonDownload
-            label="dataView:records.exportData"
-            onClick={toggleRecordsDataExportModalOpen}
-            variant="text"
-          />
-        ),
-      },
-      {
-        key: 'exportDataMatrix',
-        content: (
-          <ButtonDownload
-            label="dataView:records.exportDataMatrix"
-            onClick={toggleRecordsDataMatrixExportModalOpen}
-            variant="text"
-          />
-        ),
-      }
-    )
+    exportMenuItems.push({
+      key: 'exportData',
+      content: (
+        <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} variant="text" />
+      ),
+    })
   }
   if (canAnalyzeRecords) {
     exportMenuItems.push({
@@ -131,6 +115,18 @@ const buildExportMenuItems = ({
         <ButtonDownload
           label="dataView:records.exportSelectedRecordsArenaFormat"
           onClick={() => dispatch(RecordListActions.startSelectedRecordsExport({ recordUuids: selectedRecordsUuids }))}
+          variant="text"
+        />
+      ),
+    })
+  }
+  if (canExportRecordsData) {
+    exportMenuItems.push({
+      key: 'exportDataMatrix',
+      content: (
+        <ButtonDownload
+          label="dataView:records.exportDataMatrix"
+          onClick={toggleRecordsDataMatrixExportModalOpen}
           variant="text"
         />
       ),

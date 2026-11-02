@@ -172,11 +172,20 @@ La fusion ne peut pas être effectuée.`,
     title: 'Exporter les données',
   },
   dataMatrixExport: {
-    entity: 'Entité (p. ex. liste des espèces)',
-    rowAttribute: 'Lignes (p. ex. espèce)',
+    entity: 'Entité (p. ex. arbre)',
+    entityInfo:
+      'Entité multiple contenant les données à exporter : ses attributs peuvent servir de lignes et de valeurs du tableau.',
+    info: "Exportez un tableau avec une ligne par espèce et une colonne par enregistrement, le format utilisé par les outils d'analyse de la végétation comme Turboveg, Juice et Synbiosys.",
+    rowAttribute: "Lignes (nom de l'attribut taxon, p. ex. espèce)",
+    rowAttributeInfo:
+      'Chaque valeur différente de cet attribut devient une ligne du tableau. Les attributs taxon sont exportés avec leur nom scientifique, car tous les taxons non répertoriés ont le même code.',
     secondRowAttribute: 'Second attribut de ligne, facultatif (p. ex. strate)',
+    secondRowAttributeInfo:
+      'À utiliser lorsque la même espèce peut apparaître plusieurs fois dans un enregistrement (p. ex. dans différentes strates) : chaque combinaison devient une ligne distincte.',
     title: 'Exporter la matrice de données',
     valueAttribute: 'Valeurs (p. ex. recouvrement)',
+    valueAttributeInfo:
+      'La valeur affichée dans les cellules. Les attributs code sont exportés avec leur code, pas avec le libellé. Si une ligne apparaît plusieurs fois dans un enregistrement avec des valeurs différentes, la cellule les contient toutes.',
   },
   dataVis: {
     errorLoadingData: 'Erreur lors du chargement des données',

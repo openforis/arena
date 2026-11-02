@@ -170,11 +170,19 @@ export default {
     title: 'データをエクスポート',
   },
   dataMatrixExport: {
-    entity: 'エンティティ（例：種リスト）',
-    rowAttribute: '行（例：種）',
+    entity: 'エンティティ（例：木）',
+    entityInfo: 'エクスポートするデータを含む複数エンティティです。その属性を表の行や値として使用できます。',
+    info: '種ごとに1行、レコードごとに1列の表をエクスポートします。Turboveg、Juice、Synbiosys などの植生解析ツールで使用される形式です。',
+    rowAttribute: '行（分類群属性の名前、例：種）',
+    rowAttributeInfo:
+      'この属性の異なる値ごとに表の1行になります。未掲載の分類群はすべて同じコードを持つため、分類群属性は学名でエクスポートされます。',
     secondRowAttribute: '2番目の行属性、任意（例：階層）',
+    secondRowAttributeInfo:
+      '同じ種が1つのレコードに複数回現れる場合（例：異なる階層）に使用します。組み合わせごとに別の行になります。',
     title: 'データマトリクスをエクスポート',
     valueAttribute: '値（例：被度）',
+    valueAttributeInfo:
+      'セルに表示される値です。コード属性はラベルではなくコードでエクスポートされます。1つのレコードで同じ行が異なる値で複数回現れる場合、セルにはすべての値が含まれます。',
   },
   dataVis: {
     errorLoadingData: 'データの読み込み中にエラーが発生しました',

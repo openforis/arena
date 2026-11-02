@@ -170,11 +170,19 @@ Merge cannot be performed.`,
     title: 'Export data',
   },
   dataMatrixExport: {
-    entity: 'Entity (e.g. species list)',
-    rowAttribute: 'Rows (e.g. species)',
+    entity: 'Entity (e.g. tree)',
+    entityInfo: 'Multiple entity with the data to export: its attributes can be used as rows and values of the table.',
+    info: 'Export a table with one row per species and one column per record, the format used by vegetation analysis tools such as Turboveg, Juice and Synbiosys.',
+    rowAttribute: 'Rows (taxon attribute name, e.g. species)',
+    rowAttributeInfo:
+      'Each different value of this attribute becomes a row of the table. Taxon attributes are exported with their scientific name, because unlisted taxa all have the same code.',
     secondRowAttribute: 'Second row attribute, optional (e.g. layer)',
+    secondRowAttributeInfo:
+      'Use it when the same species can appear more than once in a record (e.g. in different layers): each combination becomes a separate row.',
     title: 'Export data matrix',
     valueAttribute: 'Values (e.g. cover)',
+    valueAttributeInfo:
+      'The value shown in the cells. Code attributes are exported with their code, not the label. If a row appears more than once in a record with different values, the cell contains all of them.',
   },
   dataVis: {
     errorLoadingData: 'Error loading data',
