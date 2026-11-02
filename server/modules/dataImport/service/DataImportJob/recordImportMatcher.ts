@@ -11,7 +11,7 @@ import SystemError from '@core/systemError'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import { NodeValues } from '@core/record/nodeValues'
 
-import { getOrFetchCategoryItem } from '@server/modules/mobile/service/arenaMobileDataImport/jobs/recordNodeChecks'
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
 const formatKeyValue = async ({
   survey,
@@ -26,7 +26,9 @@ const formatKeyValue = async ({
 }): Promise<any> => {
   const itemUuid = NodeDef.isCode(keyDef) && value ? NodeValues.getValueItemUuid(value) : null
   // items of big categories are not in the survey ref data
-  const categoryItem = itemUuid ? await getOrFetchCategoryItem({ survey, nodeDef: keyDef, itemUuid }) : null
+  const categoryItem = itemUuid
+    ? await CategoryItemProviderDefault.getOrFetchItem({ survey, nodeDef: keyDef, itemUuid })
+    : null
   const node = categoryItem ? { refData: { categoryItem } } : null
   return NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, node, value } as any)
 }
