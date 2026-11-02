@@ -82,7 +82,9 @@ export const assocNodes =
  * @returns {(record: object) => object} - Function returning the updated record.
  */
 export const replaceNodes = (nodes) => (record) => {
-  const { [keys.nodes]: _nodes, _nodesIndex, ...recordWithoutNodes } = record
+  const recordWithoutNodes = { ...record }
+  delete recordWithoutNodes[keys.nodes]
+  delete recordWithoutNodes._nodesIndex
   return Records.addNodes(nodes, { sideEffect: true, sortNodes: true })(recordWithoutNodes)
 }
 
