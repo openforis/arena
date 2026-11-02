@@ -250,7 +250,7 @@ class RChain {
   async _initNodeDefFile({ nodeDef, index, path }) {
     const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
     const entityName = NodeDef.getName(parentEntity)
-    let attributeName = NodeDef.getName(nodeDef)
+    const attributeName = NodeDef.getName(nodeDef)
     const fileIndex = padStart(
       Number((index || index === 0) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1
     )
@@ -273,10 +273,6 @@ class RChain {
     await rFile.init()
 
     const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
-
-    if (NodeDef.isCode(nodeDef)) {
-      attributeName = `${attributeName}_code`
-    }
 
     const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
 
