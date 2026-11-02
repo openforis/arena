@@ -75,7 +75,7 @@ const ExpressionEditorPopup = (props) => {
     <PanelRight onClose={onClose} width="100vw" header={header}>
       <div className="expression-editor-popup">
         <div className="expression-editor-popup__toolbar">
-          {textModeSelectable && (
+          {advanced && textModeSelectable && (
             <ButtonGroup
               groupName="expressionSyntax"
               items={ExpressionParser.textModeItems({ i18n })}
