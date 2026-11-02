@@ -4,7 +4,13 @@
     flex-direction: column;
     align-self: center;
     gap: 1rem;
-    width: 40rem;
+    width: 44rem;
+
+    // long labels wrap: rows must grow with them
+    .form-item {
+      grid-template-columns: 0.4fr 0.6fr;
+      height: auto;
+    }
   }
 
   &__info {
