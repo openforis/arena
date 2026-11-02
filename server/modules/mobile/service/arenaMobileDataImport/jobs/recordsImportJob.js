@@ -121,7 +121,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
     record[Record.keys.ownerUuid] = ownerSource ? ownerUuidSource : User.getUuid(user)
 
-    // remove invalid nodes and build index from scratch
+    // remove invalid nodes
     const nodes = Record.getNodes(record)
 
     for (const [nodeUuid, node] of Object.entries(nodes)) {
@@ -149,6 +149,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
         }
       }
     }
+    // build index from scratch, with only the valid nodes
     this.currentRecord = Record.replaceNodes(nodes)(record)
   }
 
