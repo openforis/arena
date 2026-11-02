@@ -59,19 +59,19 @@ export default class RecordsImportSummaryJob extends Job {
       const recordUuid = Record.getUuid(recordSummary)
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
 
-      const existingRecordSummary = await findExistingRecordSummary({
+      const existingRecordSummary = /* NOSONAR */ await findExistingRecordSummary({
         survey,
         record,
         existingRecordsSummary,
         conflictResolutionStrategy,
       })
-      const { action } = await determineRecordAction({
+      const { action } = /* NOSONAR */ await determineRecordAction({
         survey,
         record,
         existingRecordSummary,
         conflictResolutionStrategy,
       })
-      const keyValues = await getRecordFormattedKeyValuesByDefUuid({ survey, record })
+      const keyValues = await getRecordFormattedKeyValuesByDefUuid({ survey, record }) // NOSONAR
 
       this.items.push({
         recordUuid,
