@@ -91,7 +91,8 @@ export default class ArenaMobileDataImportJob extends Job {
     }
 
     if (filePath) {
-      await FileUtils.deleteFileAsync(filePath)
+      // the file could have been deleted already, when discarding the pending import on cancel
+      await FileUtils.deleteFileAsync(filePath).catch(() => null)
     }
   }
 }

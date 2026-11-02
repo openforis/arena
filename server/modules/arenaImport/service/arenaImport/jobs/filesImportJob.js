@@ -14,7 +14,6 @@ export default class FilesImportJob extends FileImportBaseJob {
   }
 
   async execute() {
-    const { surveyId, skipMissingFiles = false } = this.context
     const filesSummaries = await this.fetchFilesSummaries()
 
     await this.checkFileUuidsAreValid(filesSummaries)
@@ -25,37 +24,44 @@ export default class FilesImportJob extends FileImportBaseJob {
       this.total = filesSummaries.length
 
       for (const fileSummary of filesSummaries) {
-        let file = { ...fileSummary }
+        if (this.isCancelRequestedOrNotRunning()) return
 
-        file = SurveyFile.cleanupInvalidProps(file)
-
-        // load file content from a separate file
-        const fileUuid = SurveyFile.getUuid(fileSummary)
-        const fileName = SurveyFile.getName(fileSummary)
-        const fileContent = await this.fetchFileContent({ fileName, fileUuid }) // NOSONAR
-        const recordUuid = SurveyFile.getRecordUuid(fileSummary)
-        if (fileContent) {
-          file = SurveyFile.assocContent(fileContent)(file)
-
-          // update file size with actual file content length
-          file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
-
-          await this.persistFile(file) // NOSONAR
-        } else {
-          const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
-          if (skipMissingFiles) {
-            const detailedMessage = `Survey ${surveyId} - ${missingFileContentMessage}`
-            this.logWarn(detailedMessage)
-            this.missingFileSummaries.push(fileSummary)
-          } else {
-            throw new Error(missingFileContentMessage)
-          }
-        }
+        await this.importFile(fileSummary) // NOSONAR
         this.incrementProcessedItems()
       }
       await this.deleteOrphanFiles()
     } else {
       this.logInfo('no files found')
+    }
+  }
+
+  async importFile(fileSummary) {
+    const { surveyId, skipMissingFiles = false } = this.context
+    let file = { ...fileSummary }
+
+    file = SurveyFile.cleanupInvalidProps(file)
+
+    // load file content from a separate file
+    const fileUuid = SurveyFile.getUuid(fileSummary)
+    const fileName = SurveyFile.getName(fileSummary)
+    const fileContent = await this.fetchFileContent({ fileName, fileUuid })
+    const recordUuid = SurveyFile.getRecordUuid(fileSummary)
+    if (fileContent) {
+      file = SurveyFile.assocContent(fileContent)(file)
+
+      // update file size with actual file content length
+      file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
+
+      await this.persistFile(file)
+    } else {
+      const missingFileContentMessage = `Record ${recordUuid}: missing content for file ${fileUuid} (${fileName})`
+      if (skipMissingFiles) {
+        const detailedMessage = `Survey ${surveyId} - ${missingFileContentMessage}`
+        this.logWarn(detailedMessage)
+        this.missingFileSummaries.push(fileSummary)
+      } else {
+        throw new Error(missingFileContentMessage)
+      }
     }
   }
 
