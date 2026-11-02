@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    dataMatrixExport: {
+      title: `Izvoz podataka u obliku matrice`,
+      description: `U **Podaci > Zapisi** koristite **Izvezi > Izvezi matricu podataka** da dobijete tabelu sa jednim redom po vrsti (ili drugom atributu) i jednom kolonom po zapisu, sa vrednošću koju izaberete u ćelijama (npr. pokrovnost).
+
+Ovo je format koji zahtevaju alati za analizu vegetacije kao što su **Turboveg**, **Juice** i **Synbiosys**. Možete izvesti sve zapise, ili samo izabrane ili filtrirane.`,
+    },
     mobilePreview: {
       title: 'Pregled istraživanja u aplikaciji Arena Mobile',
       description: `U dizajneru obrasca otvorite meni pored dugmeta **Pregled** i izaberite **Pregled (mobilni)** da isprobate nacrt istraživanja onako kako izgleda u aplikaciji **Arena Mobile**, na telefonu ili tabletu, u uspravnoj ili položenoj orijentaciji.

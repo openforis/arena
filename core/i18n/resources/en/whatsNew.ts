@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    dataMatrixExport: {
+      title: `Export data as a matrix`,
+      description: `In **Data > Records**, use **Export > Export data matrix** to get a table with one row per species (or any other attribute) and one column per record, with the value you choose in the cells (e.g. cover).
+
+This is the format needed by vegetation analysis tools such as **Turboveg**, **Juice** and **Synbiosys**. You can export all the records, or only the selected or filtered ones.`,
+    },
     mobilePreview: {
       title: 'Preview the survey in Arena Mobile',
       description: `In the form designer, open the menu next to the **Preview** button and choose **Preview (mobile)** to try the draft survey as it looks in **Arena Mobile**, on a phone or a tablet, in portrait or landscape orientation.
