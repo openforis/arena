@@ -72,14 +72,51 @@ describe('Expression.toSql with string methods', () => {
 
 describe('Expression text modes', () => {
   test.each([
-    ["text_attr.includes('abc') AND num = 1", "text_attr.includes('abc') && num == 1"],
+    ["text_attr LIKE '%abc%' AND num = 1", "text_attr.includes('abc') && num == 1"],
     ["text_attr = 'a = b' OR num != 2", "text_attr == 'a = b' || num != 2"],
+    ["text_attr LIKE 'abc%'", "text_attr.startsWith('abc')"],
+    ["text_attr LIKE '%abc'", "text_attr.endsWith('abc')"],
+    ["text_attr NOT LIKE '%abc%'", "! text_attr.includes('abc')"],
+    ["text_attr ILIKE '%abc%'", "text_attr.toLowerCase().includes('abc')"],
+    ["parent.text_attr LIKE '%abc%'", "parent.text_attr.includes('abc')"],
+    // text that cannot be a plain LIKE pattern keeps the method syntax
+    ["text_attr.includes('50%')", "text_attr.includes('50%')"],
+    ["text_attr.includes('a_b')", "text_attr.includes('a_b')"],
+    ["text_attr.includes('it\\'s')", "text_attr.includes('it\\'s')"],
+    ["text_attr.toLowerCase().includes('Abc')", "text_attr.toLowerCase().includes('Abc')"],
+    ["text_attr.trim().includes('abc')", "text_attr.trim().includes('abc')"],
+    ['text_attr.includes(other_attr)', 'text_attr.includes(other_attr)'],
+    // quoted text is never converted
+    [`text_attr = 'x.includes(1) LIKE 2'`, `text_attr == 'x.includes(1) LIKE 2'`],
   ])('%s <-> %s', (sqlString, jsString) => {
     expect(Expression.toString(Expression.fromString(sqlString, Expression.modes.sql), Expression.modes.json)).toBe(
       jsString
     )
     expect(Expression.toString(Expression.fromString(jsString, Expression.modes.json), Expression.modes.sql)).toBe(
       sqlString
+    )
+  })
+
+  test.each([
+    ["text_attr like 'abc'", "text_attr == 'abc'"],
+    ["text_attr NOT LIKE 'abc'", "text_attr != 'abc'"],
+    ["text_attr ilike '%ABC%'", "text_attr.toLowerCase().includes('abc')"],
+    [`text_attr LIKE "%abc%"`, `text_attr.includes("abc")`],
+    [`text_attr = "a LIKE 'b%'"`, `text_attr == "a LIKE 'b%'"`],
+  ])('%s -> %s', (sqlString, jsString) => {
+    expect(Expression.toJsString(sqlString, Expression.modes.sql)).toBe(jsString)
+  })
+
+  test.each(["text_attr LIKE 'a%b'", "text_attr LIKE 'a_b'", "text_attr LIKE '%a\\%b%'"])(
+    'LIKE pattern "%s" cannot be converted',
+    (sqlString) => {
+      expect(Expression.toJsString(sqlString, Expression.modes.sql)).toBe(sqlString)
+    }
+  )
+
+  test('same SQL from LIKE and string method', () => {
+    expect(toFormattedSql("text_attr LIKE '%50%' OR text_attr ILIKE 'A%'", Expression.modes.sql)).toBe(
+      toFormattedSql("text_attr.includes('50') || text_attr.toLowerCase().startsWith('a')")
     )
   })
 })

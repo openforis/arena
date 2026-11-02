@@ -23,8 +23,10 @@ export default {
     sql: 'Only valid SQL expressions are allowed.',
   },
   editorCompletionHelp: '- Show the available variables and functions that can be used',
-  editorTextSearchHelp:
-    "Search text values with text_attr.includes('abc'), text_attr.startsWith('abc') or text_attr.endsWith('abc'); add .toLowerCase() before them to ignore the case, e.g. text_attr.toLowerCase().includes('abc')",
+  editorTextSearchHelp: {
+    json: "Search text values with text_attr.includes('abc'), text_attr.startsWith('abc') or text_attr.endsWith('abc'); add .toLowerCase() before them to ignore the case, e.g. text_attr.toLowerCase().includes('abc')",
+    sql: "Search text values with text_attr LIKE '%abc%', text_attr LIKE 'abc%' or text_attr LIKE '%abc'; use ILIKE to ignore the case. Only % at the start or end of the text is supported as a wildcard",
+  },
   expressionSyntax: {
     json: 'JavaScript',
     sql: 'SQL',

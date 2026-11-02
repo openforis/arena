@@ -1,6 +1,6 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import React, { useState, useCallback, useMemo, useRef } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
@@ -10,9 +10,11 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
+import { useOnUpdate } from '@webapp/components/hooks'
+import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
+import * as ExpressionParser from './expressionParser'
 import { useAutocompletionSource } from './useAutocompletionSource'
 
 const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
@@ -46,10 +48,15 @@ const AdvancedExpressionEditorPopup = (props) => {
   } = props
 
   const i18n = useI18n()
+  // validation errors can include operators like &&
+  const tUnescaped = useI18nT({ unescapeHtml: true })
   const survey = useSurvey()
   const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
   const [errorMessage, setErrorMessage] = useState(null)
+  // differs from query (the last valid expression) while the text being edited is not valid
+  const [text, setText] = useState(query)
+  const textModeRef = useRef(textMode)
 
   const autocompletionSource = useAutocompletionSource({
     mode,
@@ -101,6 +108,7 @@ const AdvancedExpressionEditorPopup = (props) => {
 
   const onEditorChange = useCallback(
     async (value) => {
+      setText(value)
       const valueTrimmed = value.trim()
       const valid = await validateEditorValue(valueTrimmed)
       if (valid && valueTrimmed !== query) {
@@ -110,10 +118,16 @@ const AdvancedExpressionEditorPopup = (props) => {
     [query, updateDraftQuery, validateEditorValue]
   )
 
+  useOnUpdate(() => {
+    const textModeFrom = textModeRef.current
+    textModeRef.current = textMode
+    void onEditorChange(ExpressionParser.convertQueryTextMode({ query: text, textModeFrom, textModeTo: textMode }))
+  }, [textMode])
+
   return (
     <>
       <div className="expression-editor__query-container">
-        {errorMessage && <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>}
+        {errorMessage && <div className="query invalid">{tUnescaped(errorMessage.key, errorMessage.params)}</div>}
       </div>
       <div className="expression-editor-popup__expr-container">
         <ReactCodeMirror
@@ -121,12 +135,12 @@ const AdvancedExpressionEditorPopup = (props) => {
           basicSetup={codeMirrorBasicSetup}
           extensions={codeMirrorExtensions}
           onChange={onEditorChange}
-          value={query}
+          value={text}
         />
       </div>
       <div className="expression-editor-popup__editor-help">
         <p>{i18n.t(`nodeDefEdit:editorHelp.${textMode}`)}</p>
-        {textSearchHelpVisible && <p>{i18n.t('nodeDefEdit:editorTextSearchHelp')}</p>}
+        {textSearchHelpVisible && <p>{i18n.t(`nodeDefEdit:editorTextSearchHelp.${textMode}`)}</p>}
         <p>
           <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit:editorCompletionHelp')}
         </p>
