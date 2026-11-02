@@ -41,6 +41,7 @@ const ButtonFilter = (props) => {
           excludeCurrentNodeDef={false}
           query={filter ? Expression.toString(filter) : ''}
           mode={Expression.modes.sql}
+          textModeSelectable
           header="dataView:filterRecords.expressionEditorHeader"
           onChange={({ expr }) => {
             const exprNormalized = ExpressionParser.normalize({ expr, canBeCall: true })

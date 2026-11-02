@@ -23,6 +23,12 @@ export default {
     sql: 'Only valid SQL expressions are allowed.',
   },
   editorCompletionHelp: '- Show the available variables and functions that can be used',
+  editorTextSearchHelp:
+    "Search text values with text_attr.includes('abc'), text_attr.startsWith('abc') or text_attr.endsWith('abc'); add .toLowerCase() before them to ignore the case, e.g. text_attr.toLowerCase().includes('abc')",
+  expressionSyntax: {
+    json: 'JavaScript',
+    sql: 'SQL',
+  },
   functionDescriptions: {
     categoryItemProp:
       'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',

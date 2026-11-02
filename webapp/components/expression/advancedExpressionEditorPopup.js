@@ -40,6 +40,8 @@ const AdvancedExpressionEditorPopup = (props) => {
     mode = Expression.modes.json,
     nodeDefCurrent = null,
     query = '',
+    textMode = mode,
+    textSearchHelpVisible = false,
     updateDraftQuery,
   } = props
 
@@ -85,7 +87,7 @@ const AdvancedExpressionEditorPopup = (props) => {
               survey,
               nodeDefCurrent,
               // the validator parses JavaScript syntax only
-              exprString: Expression.toJsString(value, mode),
+              exprString: Expression.toJsString(value, textMode),
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
@@ -94,7 +96,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey, textMode]
   )
 
   const onEditorChange = useCallback(
@@ -123,7 +125,8 @@ const AdvancedExpressionEditorPopup = (props) => {
         />
       </div>
       <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t(`nodeDefEdit:editorHelp.${mode}`)}</p>
+        <p>{i18n.t(`nodeDefEdit:editorHelp.${textMode}`)}</p>
+        {textSearchHelpVisible && <p>{i18n.t('nodeDefEdit:editorTextSearchHelp')}</p>}
         <p>
           <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit:editorCompletionHelp')}
         </p>
@@ -139,6 +142,8 @@ AdvancedExpressionEditorPopup.propTypes = {
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
+  textMode: PropTypes.string, // Syntax the expression is written in (defaults to mode)
+  textSearchHelpVisible: PropTypes.bool,
   updateDraftQuery: PropTypes.func.isRequired,
 }
 
