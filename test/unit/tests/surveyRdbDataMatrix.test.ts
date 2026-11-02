@@ -20,15 +20,15 @@ describe('buildDataMatrix', () => {
     const { fields, items } = buildDataMatrix({
       ...fieldNames,
       rows: [
-        row('r1', 'Strooberg 1', 'Rumex acetosella', '6', '5'),
-        row('r2', 'kelmonderbos 4', 'Rumex acetosella', '6', '2'),
-        row('r2', 'kelmonderbos 4', 'Aegopodium podagraria', '6', '6'),
+        row('r1', 'Relevee 1', 'Rumex acetosella', '6', '5'),
+        row('r2', 'Relevee 2', 'Rumex acetosella', '6', '2'),
+        row('r2', 'Relevee 2', 'Aegopodium podagraria', '6', '6'),
       ],
     })
-    expect(fields).toEqual(['species', 'layer', 'kelmonderbos 4', 'Strooberg 1'])
+    expect(fields).toEqual(['species', 'layer', 'Relevee 1', 'Relevee 2'])
     expect(items).toEqual([
-      { species: 'Aegopodium podagraria', layer: '6', 'kelmonderbos 4': '6' },
-      { species: 'Rumex acetosella', layer: '6', 'kelmonderbos 4': '2', 'Strooberg 1': '5' },
+      { species: 'Aegopodium podagraria', layer: '6', 'Relevee 2': '6' },
+      { species: 'Rumex acetosella', layer: '6', 'Relevee 1': '5', 'Relevee 2': '2' },
     ])
   })
 
