@@ -99,6 +99,7 @@ export default {
     editRecord: 'Бичлэгийг засах',
     exportList: 'Жагсаалт экспортлох',
     exportData: 'Өгөгдөл экспортлох',
+    exportDataMatrix: 'Өгөгдлийн матриц экспортлох',
     exportDataSummary: 'Өгөгдлийн хураангуй экспортлох',
     exportSelectedRecordsArenaFormat: 'Сонгосон бичлэгүүдийг экспортлох (Arena формат)',
     exportRecordDocx: 'Бичлэгийг экспортлох (Word)',
@@ -166,6 +167,13 @@ export default {
       selectedRecord_other: 'Зөвхөн сонгогдсон {{count}} бичлэг',
     },
     title: 'Өгөгдөл экспортлох',
+  },
+  dataMatrixExport: {
+    entity: 'Нэгж (жишээ нь зүйлийн жагсаалт)',
+    rowAttribute: 'Мөр (жишээ нь зүйл)',
+    secondRowAttribute: 'Хоёр дахь мөрийн шинж чанар, заавал биш (жишээ нь давхарга)',
+    title: 'Өгөгдлийн матриц экспортлох',
+    valueAttribute: 'Утга (жишээ нь бүрхэц)',
   },
   dataVis: {
     errorLoadingData: 'Өгөгдөл ачаалахад алдаа гарлаа',

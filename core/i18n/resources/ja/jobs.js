@@ -72,6 +72,7 @@ export default {
   // data export
   ArenaFileReadJob: 'Arenaファイルの読み込み',
   DataExportJob: 'データのエクスポート',
+  DataMatrixExportJob: 'データマトリクスのエクスポート',
   DataSummaryExportJob: 'データ概要のエクスポート',
   ZipCreationJob: 'ZIPファイルの作成',
   CSVDataExtraction: 'データの抽出',

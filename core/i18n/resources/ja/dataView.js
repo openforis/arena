@@ -100,6 +100,7 @@ export default {
     editRecord: '記録を編集',
     exportList: '一覧をエクスポート',
     exportData: 'データをエクスポート',
+    exportDataMatrix: 'データマトリクスをエクスポート',
     exportDataSummary: 'データ概要をエクスポート',
     exportSelectedRecordsArenaFormat: '選択した記録をエクスポート（Arena形式）',
     exportRecordDocx: '記録をエクスポート（Word）',
@@ -167,6 +168,13 @@ export default {
       selectedRecord_other: '選択した{{count}}件の記録のみ',
     },
     title: 'データをエクスポート',
+  },
+  dataMatrixExport: {
+    entity: 'エンティティ（例：種リスト）',
+    rowAttribute: '行（例：種）',
+    secondRowAttribute: '2番目の行属性、任意（例：階層）',
+    title: 'データマトリクスをエクスポート',
+    valueAttribute: '値（例：被度）',
   },
   dataVis: {
     errorLoadingData: 'データの読み込み中にエラーが発生しました',

@@ -83,6 +83,7 @@ export {
   getRecordDocxExportUrl,
   getRecordPdfExportUrl,
   startExportDataJob,
+  startExportDataMatrixJob,
   startExportDataSummaryJob,
   downloadExportedDataSummaryUrl,
   startRecordsCloneJob,

@@ -100,6 +100,7 @@ export default {
     editRecord: 'Редактировать запись',
     exportList: 'Экспортировать список',
     exportData: 'Экспортировать данные',
+    exportDataMatrix: 'Экспортировать матрицу данных',
     exportDataSummary: 'Экспортировать сводку данных',
     exportSelectedRecordsArenaFormat: 'Экспортировать выбранные записи (формат Arena)',
     exportRecordDocx: 'Экспорт записи (Word)',
@@ -167,6 +168,13 @@ export default {
       selectedRecord_other: 'Только выбранные {{count}} записей',
     },
     title: 'Экспорт данных',
+  },
+  dataMatrixExport: {
+    entity: 'Сущность (например, список видов)',
+    rowAttribute: 'Строки (например, вид)',
+    secondRowAttribute: 'Второй атрибут строки, необязательно (например, ярус)',
+    title: 'Экспортировать матрицу данных',
+    valueAttribute: 'Значения (например, покрытие)',
   },
   dataVis: {
     errorLoadingData: 'Ошибка загрузки данных',

@@ -59,6 +59,9 @@ export const TestId = {
     samplingSection: 'dashboard-sampling-section',
   },
   dataExport: {
+    dataMatrixRowAttribute: 'dataMatrixRowAttribute',
+    dataMatrixSecondRowAttribute: 'dataMatrixSecondRowAttribute',
+    dataMatrixValueAttribute: 'dataMatrixValueAttribute',
     fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
     downloadExportedFileBtn: 'downloadExportedFileBtn',
     startExport: 'startExport',

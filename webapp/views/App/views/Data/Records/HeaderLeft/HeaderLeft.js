@@ -29,6 +29,7 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { RecordsDataExportModal } from './RecordsDataExportModal'
+import { RecordsDataMatrixExportModal } from './RecordsDataMatrixExportModal'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
@@ -58,6 +59,7 @@ const extractMergeSourceAndTargetRecordsFromSelectedRecords = ({ selectedItems }
  * @param {string[]} params.selectedRecordsUuids - The uuids of the selected records.
  * @param {number} params.surveyId - The current survey id.
  * @param {() => void} params.toggleRecordsDataExportModalOpen - Opens the records data export modal.
+ * @param {() => void} params.toggleRecordsDataMatrixExportModalOpen - Opens the records data matrix export modal.
  * @returns {Array} - The menu items.
  */
 const buildExportMenuItems = ({
@@ -69,6 +71,7 @@ const buildExportMenuItems = ({
   selectedRecordsUuids,
   surveyId,
   toggleRecordsDataExportModalOpen,
+  toggleRecordsDataMatrixExportModalOpen,
 }) => {
   const exportMenuItems = []
   if (canExportRecordsSummary) {
@@ -90,6 +93,16 @@ const buildExportMenuItems = ({
       key: 'exportData',
       content: (
         <ButtonDownload label="dataView:records.exportData" onClick={toggleRecordsDataExportModalOpen} variant="text" />
+      ),
+    })
+    exportMenuItems.push({
+      key: 'exportDataMatrix',
+      content: (
+        <ButtonDownload
+          label="dataView:records.exportDataMatrix"
+          onClick={toggleRecordsDataMatrixExportModalOpen}
+          variant="text"
+        />
       ),
     })
   }
@@ -152,9 +165,15 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const [state, setState] = useState({
     recordsCloneModalOpen: false,
     recordsDataExportModalOpen: false,
+    recordsDataMatrixExportModalOpen: false,
     recordsMergePreviewModalOpen: false,
   })
-  const { recordsCloneModalOpen, recordsDataExportModalOpen, recordsMergePreviewModalOpen } = state
+  const {
+    recordsCloneModalOpen,
+    recordsDataExportModalOpen,
+    recordsDataMatrixExportModalOpen,
+    recordsMergePreviewModalOpen,
+  } = state
 
   const onSelectedRecordClick = useCallback(() => navigateToRecord(selectedItems[0]), [navigateToRecord, selectedItems])
 
@@ -165,6 +184,10 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const toggleRecordsDataExportModalOpen = useCallback(() => {
     setState((statePrev) => ({ ...statePrev, recordsDataExportModalOpen: !recordsDataExportModalOpen }))
   }, [recordsDataExportModalOpen])
+
+  const toggleRecordsDataMatrixExportModalOpen = useCallback(() => {
+    setState((statePrev) => ({ ...statePrev, recordsDataMatrixExportModalOpen: !recordsDataMatrixExportModalOpen }))
+  }, [recordsDataMatrixExportModalOpen])
 
   const onDeleteConfirm = useCallback(
     () => dispatch(RecordActions.deleteRecords({ records: selectedItems, onRecordsUpdate })),
@@ -237,6 +260,7 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
     selectedRecordsUuids,
     surveyId,
     toggleRecordsDataExportModalOpen,
+    toggleRecordsDataMatrixExportModalOpen,
   })
 
   const onValidateAllRecordsClick = useCallback(async () => {
@@ -325,6 +349,13 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
       {recordsDataExportModalOpen && (
         <RecordsDataExportModal
           onClose={toggleRecordsDataExportModalOpen}
+          recordUuids={selectedRecordsUuids}
+          search={search}
+        />
+      )}
+      {recordsDataMatrixExportModalOpen && (
+        <RecordsDataMatrixExportModal
+          onClose={toggleRecordsDataMatrixExportModalOpen}
           recordUuids={selectedRecordsUuids}
           search={search}
         />

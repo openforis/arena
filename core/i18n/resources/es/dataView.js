@@ -92,6 +92,7 @@ export default {
     editRecord: 'Editar registro',
     exportList: 'Exportar lista',
     exportData: 'Exportar datos',
+    exportDataMatrix: 'Exportar matriz de datos',
     exportDataSummary: 'Exportar resumen de datos',
     exportSelectedRecordsArenaFormat: 'Exportar registros seleccionados (formato Arena)',
     exportRecordDocx: 'Exportar registro (Word)',
@@ -156,6 +157,13 @@ export default {
       selectedRecord_other: 'Solo {{count}} registros seleccionados',
     },
     title: 'Exportar datos',
+  },
+  dataMatrixExport: {
+    entity: 'Entidad (p. ej. lista de especies)',
+    rowAttribute: 'Filas (p. ej. especie)',
+    secondRowAttribute: 'Segundo atributo de fila, opcional (p. ej. estrato)',
+    title: 'Exportar matriz de datos',
+    valueAttribute: 'Valores (p. ej. cobertura)',
   },
   dataVis: {
     errorLoadingData: 'Error al cargar datos',
