@@ -91,7 +91,7 @@ export { EntityKeysIndexCache } from './_record/entityKeysIndexCache'
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
-export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
+export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes, replaceNodes } = RecordUpdater
 export const {
   createRootEntity,
   getOrCreateEntityByKeys,
