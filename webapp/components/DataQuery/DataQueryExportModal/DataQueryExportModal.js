@@ -2,6 +2,7 @@ import './DataQueryExportModal.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
+import classNames from 'classnames'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -90,7 +91,12 @@ export const DataQueryExportModal = (props) => {
   if (Objects.isEmpty(availableOptions)) return null
 
   return (
-    <Modal className="data-query-export-modal" onClose={onClose} showCloseButton title="dataView:dataExport.title">
+    <Modal
+      className={classNames('data-query-export-modal', { 'data-matrix': layout === layouts.dataMatrix })}
+      onClose={onClose}
+      showCloseButton
+      title="dataView:dataExport.title"
+    >
       <ModalBody>
         {dataMatrixAvailable && (
           <FormItem

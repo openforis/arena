@@ -4,11 +4,11 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  width: 44rem;
+  width: min(58rem, 100%);
 
-  // long labels wrap: rows must grow with them
+  // fixed label column: labels fit in one line and the dropdowns stay aligned; longer translations wrap
   .form-item {
-    grid-template-columns: 0.4fr 0.6fr;
+    grid-template-columns: 26rem 1fr;
     height: auto;
   }
 

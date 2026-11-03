@@ -4,6 +4,13 @@
     max-height: 85vh;
   }
 
+  // wider, so the data matrix form labels fit in one line
+  &.data-matrix .modal-content {
+    width: min(62rem, 95vw);
+    margin-left: auto;
+    margin-right: auto;
+  }
+
   .modal-body {
     display: flex;
     flex-direction: column;
