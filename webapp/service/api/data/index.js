@@ -269,6 +269,12 @@ export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search,
   return job
 }
 
+export const startExportDataMatrixJob = async ({ surveyId, cycle, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-matrix-export`, { cycle, options })
+  const { job } = data
+  return job
+}
+
 export const startExportDataSummaryJob = async ({ surveyId, cycle, lang, options }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/data-summary-export`, { cycle, lang, options })
   const { job } = data

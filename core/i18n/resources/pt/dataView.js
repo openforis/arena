@@ -168,6 +168,35 @@ A mesclagem não pode ser realizada.`,
     },
     title: 'Exportar dados',
   },
+  dataMatrixExport: {
+    intro: `Exporte os dados de **{{entity}}** como uma tabela com:
+
+- uma **linha** para cada valor diferente dos atributos de linha (p. ex. cada espécie e estrato);
+- uma **coluna** para cada registro, com o nome da sua chave ({{keys}});
+- nas células, o valor do atributo de valor (p. ex. cobertura).
+
+Este é o formato usado por ferramentas de análise de vegetação como Turboveg, Juice e Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matriz de dados',
+      info: 'Tabela: linhas e colunas como mostradas no Explorador de dados. Matriz de dados: uma linha por espécie (ou outro atributo) e uma coluna por registro, como exigido por ferramentas de análise de vegetação como o Turboveg.',
+      label: 'Exportar como',
+      table: 'Tabela',
+    },
+    preview: 'Pré-visualização',
+    previewRecord: '{{keys}} do registro {{number}}',
+    recordsAll:
+      'São exportados os dados de todos os registros: defina um filtro no Explorador de dados para exportar apenas alguns.',
+    recordsFiltered: 'Apenas os dados que correspondem ao filtro atual do Explorador de dados são exportados.',
+    rowAttribute: 'Linhas (nome do atributo de táxon, p. ex. espécie)',
+    rowAttributeInfo:
+      'Cada valor diferente deste atributo torna-se uma linha da tabela. Os atributos de táxon são exportados com o nome científico, porque todos os táxons não listados têm o mesmo código.',
+    secondRowAttribute: 'Segundo atributo de linha, opcional (p. ex. estrato)',
+    secondRowAttributeInfo:
+      'Use-o quando a mesma espécie puder aparecer mais de uma vez num registro (p. ex. em estratos diferentes): cada combinação torna-se uma linha separada.',
+    valueAttribute: 'Valores (p. ex. cobertura)',
+    valueAttributeInfo:
+      'O valor mostrado nas células. Os atributos de código são exportados com o código, não com o rótulo. Se uma linha aparecer mais de uma vez num registro com valores diferentes, a célula contém todos eles.',
+  },
   dataVis: {
     errorLoadingData: 'Erro ao carregar dados',
     noData: 'Esta consulta não retornou dados',

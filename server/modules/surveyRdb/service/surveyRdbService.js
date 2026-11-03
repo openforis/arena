@@ -190,6 +190,22 @@ export const exportViewDataToTempFile = async ({
   return tempFileName
 }
 
+export const exportDataMatrixToTempFile = async ({ user, survey, cycle, options }, client) => {
+  const { fileFormat } = options
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+
+  const { fields, items } = await SurveyRdbManager.fetchEntityDataMatrix(
+    { user, survey, cycle, recordOwnerUuid, options },
+    client
+  )
+
+  const tempFileName = FileUtils.newTempFileName()
+  const outputStream = FileUtils.createWriteStream(FileUtils.tempFilePath(tempFileName))
+  await FlatDataWriter.writeItemsToStream({ outputStream, fileFormat, fields, items })
+
+  return tempFileName
+}
+
 export const fetchEntitiesDataToCsvFiles = async ({
   user,
   survey,

@@ -9,6 +9,7 @@ export const Urls = {
   formDesigner: '/app/designer/formDesigner/',
   records: '/app/data/records/',
   dataExport: '/app/data/export/',
+  dataExplorer: '/app/data/explorer/',
   validationReport: '/app/data/validationReport/',
   messages: '/app/systemAdmin/messages/',
 }

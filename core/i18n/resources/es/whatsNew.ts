@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    dataMatrixExport: {
+      title: `Exportar datos como matriz`,
+      description: `En **Datos > Explorador**, seleccione una entidad múltiple (p. ej. las especies de cada registro), haga clic en **Exportar** y elija **Exportar como: Matriz de datos** para obtener una tabla con una fila por especie (o cualquier otro atributo) y una columna por registro, con el valor que elija en las celdas (p. ej. cobertura).
+
+Es el formato que necesitan las herramientas de análisis de vegetación como **Turboveg**, **Juice** y **Synbiosys**. Defina un filtro en el Explorador para exportar solo algunos registros.`,
+    },
     mobilePreview: {
       title: 'Vista previa de la encuesta en Arena Mobile',
       description: `En el diseñador de formularios, abre el menú junto al botón **Vista previa** y elige **Vista previa (móvil)** para probar la encuesta en borrador tal como se ve en **Arena Mobile**, en un teléfono o una tableta, en orientación vertical u horizontal.
