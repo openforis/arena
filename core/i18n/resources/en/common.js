@@ -834,6 +834,8 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
+    selectedItemsCount: '{{count}} item selected',
+    selectedItemsCount_other: '{{count}} items selected',
   },
   expression: {
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
