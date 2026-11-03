@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as Expression from '@core/expressionParser/expression'
 
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
-import { ExpressionEditorStorage } from '@webapp/service/storage/expressionEditor'
 
 import * as ExpressionParser from './expressionParser'
 import * as ExpressionVariables from './expressionVariables'
@@ -20,26 +19,12 @@ const initialState = {
 // Newlines can only appear in a textarea, so a trailing newline denotes an advanced mode expression.
 export const ADVANCED_EXPRESSION_SUFFIX = '\n'
 
-const getExpressionOrParseQuery = ({ expr, query, mode, canBeConstant }) => {
+const getExpressionOrParseQuery = ({ expr, query, canBeConstant }) => {
   try {
-    return expr ?? ExpressionParser.parseQuery({ query, mode, canBeConstant })
+    return expr ?? ExpressionParser.parseQuery({ query, canBeConstant })
   } catch (error) {
-    return ExpressionParser.parseQuery({ query: '', mode, canBeConstant })
+    return ExpressionParser.parseQuery({ query: '', canBeConstant })
   }
-}
-
-// the text mode (syntax) only affects how the expression is written; mode still determines the available variables
-const getTextMode = ({ advanced, mode, textModeSelectable }) => {
-  // the syntax can be selected only in the advanced editor
-  if (!advanced || !textModeSelectable) return mode
-  const textModeStored = ExpressionEditorStorage.getTextMode()
-  return Object.values(Expression.modes).includes(textModeStored) ? textModeStored : mode
-}
-
-const assocTextMode = (textModeNext) => (state) => {
-  const convert = (query) =>
-    ExpressionParser.convertQueryTextMode({ query, textModeFrom: state.textMode, textModeTo: textModeNext })
-  return { ...state, textMode: textModeNext, query: convert(state.query), queryDraft: convert(state.queryDraft) }
 }
 
 export const useExpressionEditorPopupState = (props) => {
@@ -49,7 +34,6 @@ export const useExpressionEditorPopupState = (props) => {
     excludeCurrentNodeDef,
     expr,
     mode,
-    textModeSelectable = false,
     type,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
@@ -69,20 +53,16 @@ export const useExpressionEditorPopupState = (props) => {
     editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
 
   const [state, setState] = useState(() => {
-    const textMode = getTextMode({ advanced: initialAdvanced, mode, textModeSelectable })
     // Either expr or query are passed by the parent component
-    const exprDraft = getExpressionOrParseQuery({ expr, query, mode, canBeConstant })
-    const queryDraft = Expression.toString(exprDraft, textMode)
-    const queryAdvanced = initialAdvanced
-      ? ExpressionParser.convertQueryTextMode({ query: query.trimEnd(), textModeFrom: mode, textModeTo: textMode })
-      : null
+    const exprDraft = getExpressionOrParseQuery({ expr, query, canBeConstant })
+    // expressions are always written in JavaScript syntax, also in SQL mode (converted into SQL server side)
+    const queryDraft = Expression.toString(exprDraft)
 
     return {
       ...initialState,
       advanced: initialAdvanced,
-      textMode,
-      query: queryAdvanced ?? queryDraft,
-      queryDraft: queryAdvanced ?? queryDraft,
+      query: initialAdvanced ? query.trimEnd() : queryDraft,
+      queryDraft: initialAdvanced ? query.trimEnd() : queryDraft,
       queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
@@ -90,10 +70,8 @@ export const useExpressionEditorPopupState = (props) => {
     }
   })
 
-  const { textMode } = state
-
   const updateDraftExpr = (exprDraft) => {
-    const queryDraft = Expression.toString(exprDraft, mode)
+    const queryDraft = Expression.toString(exprDraft)
     const exprDraftValid = ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
     setState((prevState) => ({
@@ -108,7 +86,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const updateDraftQuery = useCallback(
     (queryDraft) => {
-      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, textMode)
+      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft)
       const exprDraftValid =
         queryDraft === '' ? null : ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
@@ -121,14 +99,14 @@ export const useExpressionEditorPopupState = (props) => {
         queryIsBasic: false,
       }))
     },
-    [canBeCall, canBeConstant, textMode]
+    [canBeCall, canBeConstant]
   )
 
   const resetDraftQuery = () => {
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
-      exprDraft: ExpressionParser.parseQuery({ query: '', mode, canBeConstant }),
+      exprDraft: ExpressionParser.parseQuery({ query: '', canBeConstant }),
       exprDraftValid: true,
       expressionCanBeApplied: query !== '',
     }))
@@ -141,17 +119,7 @@ export const useExpressionEditorPopupState = (props) => {
       resetDraftQuery()
     }
     const queryIsBasicNext = queryIsBasic || (advanced && !queryIsBasic)
-    const textModeNext = getTextMode({ advanced: !advanced, mode, textModeSelectable })
-    setState((prevState) => ({
-      ...assocTextMode(textModeNext)(prevState),
-      advanced: !advanced,
-      queryIsBasic: queryIsBasicNext,
-    }))
-  }
-
-  const onChangeTextMode = (textModeNext) => {
-    ExpressionEditorStorage.setTextMode(textModeNext)
-    setState(assocTextMode(textModeNext))
+    setState((prevState) => ({ ...prevState, advanced: !advanced, queryIsBasic: queryIsBasicNext }))
   }
 
   const onApply = () => {
@@ -200,7 +168,6 @@ export const useExpressionEditorPopupState = (props) => {
     ...state,
     nodeDefCurrent,
     onApply,
-    onChangeTextMode,
     onToggleAdvancedEditor,
     resetDraftQuery,
     updateDraftExpr,

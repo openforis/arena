@@ -6,13 +6,10 @@ import * as A from '@core/arena'
 import * as Expression from '@core/expressionParser/expression'
 
 import { TestId } from '@webapp/utils/testId'
-import { useI18n } from '@webapp/store/system'
 
 import PanelRight from '@webapp/components/PanelRight'
-import ButtonGroup from '@webapp/components/form/buttonGroup'
 
 import { Button } from '../buttons'
-import * as ExpressionParser from './expressionParser'
 import ButtonAiGenerateExpression from '@webapp/components/ai/ButtonAiGenerateExpression'
 import { useExpressionEditorPopupState } from './expressionEditorPopupState'
 import AdvancedExpressionEditorPopup from './advancedExpressionEditorPopup'
@@ -36,11 +33,9 @@ const ExpressionEditorPopup = (props) => {
     onClose = () => {},
     onGenerateWithAi = null,
     query = '',
-    textModeSelectable = false,
+    textSearchHelpVisible = false,
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
-
-  const i18n = useI18n()
 
   const {
     advanced,
@@ -49,10 +44,8 @@ const ExpressionEditorPopup = (props) => {
     exprDraftValid,
     nodeDefCurrent,
     onApply,
-    onChangeTextMode,
     onToggleAdvancedEditor,
     queryDraft,
-    textMode,
     updateDraftExpr,
     updateDraftQuery,
     variables,
@@ -62,7 +55,6 @@ const ExpressionEditorPopup = (props) => {
     excludeCurrentNodeDef,
     expr,
     mode,
-    textModeSelectable,
     type: types,
     nodeDefUuidContext,
     nodeDefUuidCurrent,
@@ -75,14 +67,6 @@ const ExpressionEditorPopup = (props) => {
     <PanelRight onClose={onClose} width="100vw" header={header}>
       <div className="expression-editor-popup">
         <div className="expression-editor-popup__toolbar">
-          {advanced && textModeSelectable && (
-            <ButtonGroup
-              groupName="expressionSyntax"
-              items={ExpressionParser.textModeItems({ i18n })}
-              onChange={onChangeTextMode}
-              selectedItemKey={textMode}
-            />
-          )}
           {types.includes(ExpressionEditorType.basic) && types.includes(ExpressionEditorType.advanced) && (
             <Button
               className="expression-editor-popup__toggle-advanced"
@@ -109,8 +93,7 @@ const ExpressionEditorPopup = (props) => {
             query={queryDraft}
             updateDraftQuery={updateDraftQuery}
             mode={mode}
-            textMode={textMode}
-            textSearchHelpVisible={textModeSelectable}
+            textSearchHelpVisible={textSearchHelpVisible}
           />
         ) : (
           <BasicExpressionEditorPopup
@@ -170,7 +153,7 @@ ExpressionEditorPopup.propTypes = {
   onClose: PropTypes.func,
   onGenerateWithAi: PropTypes.func, // if set, shows a button to generate the expression from a description via AI
   query: PropTypes.string, // String representing the expression
-  textModeSelectable: PropTypes.bool, // True if the expression can be written either in SQL or in JavaScript syntax
+  textSearchHelpVisible: PropTypes.bool, // True to show how to search text values (e.g. in the Data Explorer filter)
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
 }
 

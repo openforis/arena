@@ -1,6 +1,6 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useCallback, useMemo, useRef } from 'react'
+import React, { useState, useCallback, useMemo } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'
@@ -10,11 +10,9 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useOnUpdate } from '@webapp/components/hooks'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
-import * as ExpressionParser from './expressionParser'
 import { useAutocompletionSource } from './useAutocompletionSource'
 
 const codeMirrorBasicSetup = { foldGutter: false, lineNumbers: false }
@@ -42,7 +40,6 @@ const AdvancedExpressionEditorPopup = (props) => {
     mode = Expression.modes.json,
     nodeDefCurrent = null,
     query = '',
-    textMode = mode,
     textSearchHelpVisible = false,
     updateDraftQuery,
   } = props
@@ -54,9 +51,6 @@ const AdvancedExpressionEditorPopup = (props) => {
   const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
   const [errorMessage, setErrorMessage] = useState(null)
-  // differs from query (the last valid expression) while the text being edited is not valid
-  const [text, setText] = useState(query)
-  const textModeRef = useRef(textMode)
 
   const autocompletionSource = useAutocompletionSource({
     mode,
@@ -93,8 +87,7 @@ const AdvancedExpressionEditorPopup = (props) => {
           : await NodeDefExpressionValidator.validate({
               survey,
               nodeDefCurrent,
-              // the validator parses JavaScript syntax only
-              exprString: Expression.toJsString(value, textMode),
+              exprString: value,
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
@@ -103,12 +96,11 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey, textMode]
+    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey]
   )
 
   const onEditorChange = useCallback(
     async (value) => {
-      setText(value)
       const valueTrimmed = value.trim()
       const valid = await validateEditorValue(valueTrimmed)
       if (valid && valueTrimmed !== query) {
@@ -117,12 +109,6 @@ const AdvancedExpressionEditorPopup = (props) => {
     },
     [query, updateDraftQuery, validateEditorValue]
   )
-
-  useOnUpdate(() => {
-    const textModeFrom = textModeRef.current
-    textModeRef.current = textMode
-    void onEditorChange(ExpressionParser.convertQueryTextMode({ query: text, textModeFrom, textModeTo: textMode }))
-  }, [textMode])
 
   return (
     <>
@@ -135,12 +121,13 @@ const AdvancedExpressionEditorPopup = (props) => {
           basicSetup={codeMirrorBasicSetup}
           extensions={codeMirrorExtensions}
           onChange={onEditorChange}
-          value={text}
+          value={query}
         />
       </div>
       <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t(`nodeDefEdit:editorHelp.${textMode}`)}</p>
-        {textSearchHelpVisible && <p>{i18n.t(`nodeDefEdit:editorTextSearchHelp.${textMode}`)}</p>}
+        {/* expressions are always written in JavaScript syntax, also when converted into SQL */}
+        <p>{i18n.t(`nodeDefEdit:editorHelp.${Expression.modes.json}`)}</p>
+        {textSearchHelpVisible && <p>{i18n.t('nodeDefEdit:editorTextSearchHelp')}</p>}
         <p>
           <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit:editorCompletionHelp')}
         </p>
@@ -156,7 +143,6 @@ AdvancedExpressionEditorPopup.propTypes = {
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
-  textMode: PropTypes.string, // Syntax the expression is written in (defaults to mode)
   textSearchHelpVisible: PropTypes.bool,
   updateDraftQuery: PropTypes.func.isRequired,
 }
