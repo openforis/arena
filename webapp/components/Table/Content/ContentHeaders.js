@@ -11,7 +11,7 @@ export const ContentHeaders = (props) => {
     selectAllItems,
     sort,
     totalCount,
-    visibleItemsCount,
+    allVisibleItemsSelected,
   } = props
 
   return columns.map((column) => (
@@ -24,7 +24,7 @@ export const ContentHeaders = (props) => {
       selectedItemsCount={selectedItemsCount}
       sort={sort}
       totalCount={totalCount}
-      visibleItemsCount={visibleItemsCount}
+      allVisibleItemsSelected={allVisibleItemsSelected}
     />
   ))
 }
@@ -37,5 +37,5 @@ ContentHeaders.propTypes = {
   selectedItemsCount: PropTypes.number,
   sort: PropTypes.object,
   totalCount: PropTypes.number,
-  visibleItemsCount: PropTypes.number,
+  allVisibleItemsSelected: PropTypes.bool,
 }

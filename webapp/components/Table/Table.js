@@ -62,7 +62,7 @@ const Table = (props) => {
     deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
-    visibleItemsCount,
+    allVisibleItemsSelected,
   } = useTable({
     columns,
     keyExtractor,
@@ -130,9 +130,18 @@ const Table = (props) => {
         selectedItems={selectedItems}
         selectAllItems={selectAllItems}
         deselectAllItems={deselectAllItems}
-        visibleItemsCount={visibleItemsCount}
+        allVisibleItemsSelected={allVisibleItemsSelected}
       />
-      {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
+      {showFooter && (
+        <Footer
+          count={count}
+          limit={limit}
+          list={list}
+          module={module}
+          offset={offset}
+          selectedItemsCount={selectedItems.length}
+        />
+      )}
     </div>
   )
 }
