@@ -19,11 +19,11 @@ const initialState = {
 // Newlines can only appear in a textarea, so a trailing newline denotes an advanced mode expression.
 export const ADVANCED_EXPRESSION_SUFFIX = '\n'
 
-const getExpressionOrParseQuery = ({ expr, query, mode, canBeConstant }) => {
+const getExpressionOrParseQuery = ({ expr, query, canBeConstant }) => {
   try {
-    return expr ?? ExpressionParser.parseQuery({ query, mode, canBeConstant })
+    return expr ?? ExpressionParser.parseQuery({ query, canBeConstant })
   } catch (error) {
-    return ExpressionParser.parseQuery({ query: '', mode, canBeConstant })
+    return ExpressionParser.parseQuery({ query: '', canBeConstant })
   }
 }
 
@@ -54,8 +54,9 @@ export const useExpressionEditorPopupState = (props) => {
 
   const [state, setState] = useState(() => {
     // Either expr or query are passed by the parent component
-    const exprDraft = getExpressionOrParseQuery({ expr, query, mode, canBeConstant })
-    const queryDraft = Expression.toString(exprDraft, mode)
+    const exprDraft = getExpressionOrParseQuery({ expr, query, canBeConstant })
+    // expressions are always written in JavaScript syntax, also in SQL mode (converted into SQL server side)
+    const queryDraft = Expression.toString(exprDraft)
 
     return {
       ...initialState,
@@ -70,7 +71,7 @@ export const useExpressionEditorPopupState = (props) => {
   })
 
   const updateDraftExpr = (exprDraft) => {
-    const queryDraft = Expression.toString(exprDraft, mode)
+    const queryDraft = Expression.toString(exprDraft)
     const exprDraftValid = ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
     setState((prevState) => ({
@@ -85,7 +86,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const updateDraftQuery = useCallback(
     (queryDraft) => {
-      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
+      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft)
       const exprDraftValid =
         queryDraft === '' ? null : ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
@@ -98,14 +99,14 @@ export const useExpressionEditorPopupState = (props) => {
         queryIsBasic: false,
       }))
     },
-    [canBeCall, canBeConstant, mode]
+    [canBeCall, canBeConstant]
   )
 
   const resetDraftQuery = () => {
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
-      exprDraft: ExpressionParser.parseQuery({ query: '', mode, canBeConstant }),
+      exprDraft: ExpressionParser.parseQuery({ query: '', canBeConstant }),
       exprDraftValid: true,
       expressionCanBeApplied: query !== '',
     }))

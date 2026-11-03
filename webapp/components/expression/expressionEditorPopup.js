@@ -33,6 +33,7 @@ const ExpressionEditorPopup = (props) => {
     onClose = () => {},
     onGenerateWithAi = null,
     query = '',
+    textSearchHelpVisible = false,
     types = [ExpressionEditorType.basic, ExpressionEditorType.advanced],
   } = props
 
@@ -92,6 +93,7 @@ const ExpressionEditorPopup = (props) => {
             query={queryDraft}
             updateDraftQuery={updateDraftQuery}
             mode={mode}
+            textSearchHelpVisible={textSearchHelpVisible}
           />
         ) : (
           <BasicExpressionEditorPopup
@@ -151,6 +153,7 @@ ExpressionEditorPopup.propTypes = {
   onClose: PropTypes.func,
   onGenerateWithAi: PropTypes.func, // if set, shows a button to generate the expression from a description via AI
   query: PropTypes.string, // String representing the expression
+  textSearchHelpVisible: PropTypes.bool, // True to show how to search text values (e.g. in the Data Explorer filter)
   types: PropTypes.arrayOf(PropTypes.oneOf([ExpressionEditorType.basic, ExpressionEditorType.advanced])), // allowed expression types
 }
 

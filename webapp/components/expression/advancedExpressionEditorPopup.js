@@ -10,7 +10,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValidator'
 import * as Expression from '@core/expressionParser/expression'
 
-import { useI18n } from '@webapp/store/system'
+import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurvey } from '@webapp/store/survey'
 
 import { useAutocompletionSource } from './useAutocompletionSource'
@@ -40,10 +40,13 @@ const AdvancedExpressionEditorPopup = (props) => {
     mode = Expression.modes.json,
     nodeDefCurrent = null,
     query = '',
+    textSearchHelpVisible = false,
     updateDraftQuery,
   } = props
 
   const i18n = useI18n()
+  // validation errors can include operators like &&
+  const tUnescaped = useI18nT({ unescapeHtml: true })
   const survey = useSurvey()
   const nodeDefCurrentParentUuid = NodeDef.getParentUuid(nodeDefCurrent)
 
@@ -84,8 +87,7 @@ const AdvancedExpressionEditorPopup = (props) => {
           : await NodeDefExpressionValidator.validate({
               survey,
               nodeDefCurrent,
-              // the validator parses JavaScript syntax only
-              exprString: Expression.toJsString(value, mode),
+              exprString: value,
               isContextParent,
               selfReferenceAllowed: !excludeCurrentNodeDef,
               includeAnalysis,
@@ -94,7 +96,7 @@ const AdvancedExpressionEditorPopup = (props) => {
       const valid = !newErrorMessage
       return valid
     },
-    [excludeCurrentNodeDef, includeAnalysis, isContextParent, mode, nodeDefCurrent, survey]
+    [excludeCurrentNodeDef, includeAnalysis, isContextParent, nodeDefCurrent, survey]
   )
 
   const onEditorChange = useCallback(
@@ -111,7 +113,7 @@ const AdvancedExpressionEditorPopup = (props) => {
   return (
     <>
       <div className="expression-editor__query-container">
-        {errorMessage && <div className="query invalid">{i18n.t(errorMessage.key, errorMessage.params)}</div>}
+        {errorMessage && <div className="query invalid">{tUnescaped(errorMessage.key, errorMessage.params)}</div>}
       </div>
       <div className="expression-editor-popup__expr-container">
         <ReactCodeMirror
@@ -123,7 +125,9 @@ const AdvancedExpressionEditorPopup = (props) => {
         />
       </div>
       <div className="expression-editor-popup__editor-help">
-        <p>{i18n.t(`nodeDefEdit:editorHelp.${mode}`)}</p>
+        {/* expressions are always written in JavaScript syntax, also when converted into SQL */}
+        <p>{i18n.t(`nodeDefEdit:editorHelp.${Expression.modes.json}`)}</p>
+        {textSearchHelpVisible && <p>{i18n.t('nodeDefEdit:editorTextSearchHelp')}</p>}
         <p>
           <kbd>Ctrl</kbd>+<kbd>Space</kbd> {i18n.t('nodeDefEdit:editorCompletionHelp')}
         </p>
@@ -139,6 +143,7 @@ AdvancedExpressionEditorPopup.propTypes = {
   mode: PropTypes.string,
   nodeDefCurrent: PropTypes.object,
   query: PropTypes.string, // String representing the expression
+  textSearchHelpVisible: PropTypes.bool,
   updateDraftQuery: PropTypes.func.isRequired,
 }
 

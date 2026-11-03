@@ -4,8 +4,8 @@ import * as Expression from '@core/expressionParser/expression'
 
 import { isNotBlank } from '@core/stringUtils'
 
-export const parseQuery = ({ query, mode, canBeConstant = false }) => {
-  const exprQuery = Expression.fromString(query, mode)
+export const parseQuery = ({ query, canBeConstant = false }) => {
+  const exprQuery = Expression.fromString(query)
   if (
     [Expression.types.BinaryExpression, Expression.types.SequenceExpression].includes(Expression.getType(exprQuery))
   ) {
