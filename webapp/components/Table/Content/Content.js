@@ -57,7 +57,7 @@ const Content = (props) => {
     selectAllItems,
     sort,
     totalCount = undefined,
-    visibleItemsCount,
+    allVisibleItemsSelected,
   } = props
 
   const i18n = useI18n()
@@ -101,7 +101,7 @@ const Content = (props) => {
           deselectAllItems={deselectAllItems}
           selectedItemsCount={selectedItemsCount}
           totalCount={totalCount}
-          visibleItemsCount={visibleItemsCount}
+          allVisibleItemsSelected={allVisibleItemsSelected}
         />
       )
     : rowHeaderComponentParam
@@ -169,7 +169,7 @@ Content.propTypes = {
   selectAllItems: PropTypes.func,
   sort: PropTypes.object.isRequired,
   totalCount: PropTypes.number,
-  visibleItemsCount: PropTypes.number.isRequired,
+  allVisibleItemsSelected: PropTypes.bool,
 }
 
 export default Content
