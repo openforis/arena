@@ -1,8 +1,19 @@
 .data-query-export-modal {
+  // the data matrix form is long: keep the export button reachable on small screens
+  .modal-content {
+    max-height: 85vh;
+  }
+
   .modal-body {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 2rem;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  .export-layout-form-item {
+    gap: 0.5rem;
   }
 }

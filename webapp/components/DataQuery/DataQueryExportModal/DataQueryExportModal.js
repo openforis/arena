@@ -93,7 +93,11 @@ export const DataQueryExportModal = (props) => {
     <Modal className="data-query-export-modal" onClose={onClose} showCloseButton title="dataView:dataExport.title">
       <ModalBody>
         {dataMatrixAvailable && (
-          <FormItem info="dataView:dataMatrixExport.layout.info" label="dataView:dataMatrixExport.layout.label">
+          <FormItem
+            className="display-flex export-layout-form-item"
+            info="dataView:dataMatrixExport.layout.info"
+            label="dataView:dataMatrixExport.layout.label"
+          >
             <ButtonGroup
               groupName="exportLayout"
               items={Object.values(layouts).map((key) => ({ key, label: `dataView:dataMatrixExport.layout.${key}` }))}
