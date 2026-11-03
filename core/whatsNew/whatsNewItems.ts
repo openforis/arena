@@ -28,7 +28,7 @@ export type WhatsNewItem = {
 export const whatsNewItems: WhatsNewItem[] = [
   {
     id: 'dataMatrixExport',
-    version: '2.10.12',
+    version: '2.11.0',
     audience: whatsNewAudiences.dataCleanser,
     image: '/img/whats-new/dataMatrixExport.png',
   },
