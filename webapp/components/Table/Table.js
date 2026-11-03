@@ -132,7 +132,16 @@ const Table = (props) => {
         deselectAllItems={deselectAllItems}
         allVisibleItemsSelected={allVisibleItemsSelected}
       />
-      {showFooter && <Footer count={count} limit={limit} list={list} module={module} offset={offset} />}
+      {showFooter && (
+        <Footer
+          count={count}
+          limit={limit}
+          list={list}
+          module={module}
+          offset={offset}
+          selectedItemsCount={selectedItems.length}
+        />
+      )}
     </div>
   )
 }
