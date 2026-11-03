@@ -8,9 +8,9 @@ export default {
   items: {
     dataMatrixExport: {
       title: `Exportar datos como matriz`,
-      description: `En **Datos > Registros**, use **Exportar > Exportar matriz de datos** para obtener una tabla con una fila por especie (o cualquier otro atributo) y una columna por registro, con el valor que elija en las celdas (p. ej. cobertura).
+      description: `En **Datos > Explorador**, seleccione una entidad múltiple (p. ej. las especies de cada registro), haga clic en **Exportar** y elija **Exportar como: Matriz de datos** para obtener una tabla con una fila por especie (o cualquier otro atributo) y una columna por registro, con el valor que elija en las celdas (p. ej. cobertura).
 
-Es el formato que necesitan las herramientas de análisis de vegetación como **Turboveg**, **Juice** y **Synbiosys**. Puede exportar todos los registros, o solo los seleccionados o filtrados.`,
+Es el formato que necesitan las herramientas de análisis de vegetación como **Turboveg**, **Juice** y **Synbiosys**. Defina un filtro en el Explorador para exportar solo algunos registros.`,
     },
     mobilePreview: {
       title: 'Vista previa de la encuesta en Arena Mobile',

@@ -8,9 +8,9 @@ export default {
   items: {
     dataMatrixExport: {
       title: `Izvoz podataka u obliku matrice`,
-      description: `U **Podaci > Zapisi** koristite **Izvezi > Izvezi matricu podataka** da dobijete tabelu sa jednim redom po vrsti (ili drugom atributu) i jednom kolonom po zapisu, sa vrednošću koju izaberete u ćelijama (npr. pokrovnost).
+      description: `U **Podaci > Istraživač podataka** izaberite višestruki entitet (npr. vrste svakog zapisa), kliknite na **Izvezi** i izaberite **Izvezi kao: Matrica podataka** da dobijete tabelu sa jednim redom po vrsti (ili drugom atributu) i jednom kolonom po zapisu, sa vrednošću koju izaberete u ćelijama (npr. pokrovnost).
 
-Ovo je format koji zahtevaju alati za analizu vegetacije kao što su **Turboveg**, **Juice** i **Synbiosys**. Možete izvesti sve zapise, ili samo izabrane ili filtrirane.`,
+Ovo je format koji zahtevaju alati za analizu vegetacije kao što su **Turboveg**, **Juice** i **Synbiosys**. Postavite filter u Istraživaču podataka da biste izvezli samo neke zapise.`,
     },
     mobilePreview: {
       title: 'Pregled istraživanja u aplikaciji Arena Mobile',

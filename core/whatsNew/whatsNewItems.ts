@@ -29,7 +29,7 @@ export const whatsNewItems: WhatsNewItem[] = [
   {
     id: 'dataMatrixExport',
     version: '2.10.12',
-    audience: whatsNewAudiences.all,
+    audience: whatsNewAudiences.dataCleanser,
     image: '/img/whats-new/dataMatrixExport.png',
   },
   {

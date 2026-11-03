@@ -8,9 +8,9 @@ export default {
   items: {
     dataMatrixExport: {
       title: `Exporter les données sous forme de matrice`,
-      description: `Dans **Données > Enregistrements**, utilisez **Exporter > Exporter la matrice de données** pour obtenir un tableau avec une ligne par espèce (ou tout autre attribut) et une colonne par enregistrement, avec la valeur de votre choix dans les cellules (p. ex. le recouvrement).
+      description: `Dans **Données > Explorateur**, sélectionnez une entité multiple (p. ex. les espèces de chaque enregistrement), cliquez sur **Exporter** et choisissez **Exporter en tant que : Matrice de données** pour obtenir un tableau avec une ligne par espèce (ou tout autre attribut) et une colonne par enregistrement, avec la valeur de votre choix dans les cellules (p. ex. le recouvrement).
 
-C'est le format requis par les outils d'analyse de la végétation comme **Turboveg**, **Juice** et **Synbiosys**. Vous pouvez exporter tous les enregistrements, ou seulement ceux sélectionnés ou filtrés.`,
+C'est le format requis par les outils d'analyse de la végétation comme **Turboveg**, **Juice** et **Synbiosys**. Définissez un filtre dans l'Explorateur pour n'exporter que certains enregistrements.`,
     },
     mobilePreview: {
       title: "Aperçu de l'enquête dans Arena Mobile",
