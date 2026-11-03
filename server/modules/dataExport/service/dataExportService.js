@@ -9,8 +9,8 @@ export const startCsvDataExportJob = ({ user, surveyId, cycle, recordUuids, sear
   return job
 }
 
-export const startDataMatrixExportJob = ({ user, surveyId, cycle, recordUuids, search, options }) => {
-  const job = new DataMatrixExportJob({ user, surveyId, cycle, recordUuids, search, options })
+export const startDataMatrixExportJob = ({ user, surveyId, cycle, options }) => {
+  const job = new DataMatrixExportJob({ user, surveyId, cycle, options })
   JobManager.enqueueJob(job)
   return job
 }

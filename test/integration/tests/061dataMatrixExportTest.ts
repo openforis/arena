@@ -3,8 +3,8 @@ import { Readable } from 'node:stream'
 import ExcelJS from 'exceljs'
 
 import { FileFormats } from '@core/fileFormats'
+import * as Expression from '@core/expressionParser/expression'
 import * as Node from '@core/record/node'
-import * as Record from '@core/record/record'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -56,28 +56,21 @@ const floraBuilder = (species: object, layer: string, cover: string) =>
 
 describe('Data matrix export', () => {
   let survey: any = null
-  let recordB: any = null
-  let recordEmpty: any = null
 
   const getDefUuid = (name: string) => NodeDef.getUuid(Survey.getNodeDefByName(name)(survey))
 
-  const getOptions = (fileFormat: string) => ({
+  const getOptions = (fileFormat: string, filter: string | null = null) => ({
     entityDefUuid: getDefUuid('flora'),
     rowAttributeDefUuids: [getDefUuid('species'), getDefUuid('layer')],
     valueAttributeDefUuid: getDefUuid('cover'),
+    // same expression format as the Data Explorer filter
+    filter: filter ? Expression.fromString(filter) : null,
     fileFormat,
   })
 
-  const exportMatrix = async (params: object) => {
+  const exportMatrix = async (options: object) => {
     const user = getContextUser()
-    const tempFileName = await SurveyRdbService.exportDataMatrixToTempFile({
-      user,
-      survey,
-      cycle,
-      recordUuids: null,
-      search: null,
-      ...params,
-    } as any)
+    const tempFileName = await SurveyRdbService.exportDataMatrixToTempFile({ user, survey, cycle, options } as any)
     return FileUtils.tempFilePath(tempFileName)
   }
 
@@ -124,7 +117,7 @@ describe('Data matrix export', () => {
       )
     ).buildAndStore()
 
-    recordB = await RB.record(
+    await RB.record(
       user,
       survey,
       RB.entity(
@@ -135,7 +128,7 @@ describe('Data matrix export', () => {
       )
     ).buildAndStore()
 
-    recordEmpty = await RB.record(user, survey, RB.entity('relevee', RB.attribute('relevee_id', 'C'))).buildAndStore()
+    await RB.record(user, survey, RB.entity('relevee', RB.attribute('relevee_id', 'C'))).buildAndStore()
   })
 
   afterAll(async () => {
@@ -145,7 +138,7 @@ describe('Data matrix export', () => {
   })
 
   test('csv file has one row per species and layer and one column per record', async () => {
-    const filePath = await exportMatrix({ options: getOptions(FileFormats.csv) })
+    const filePath = await exportMatrix(getOptions(FileFormats.csv))
     const content = await FileUtils.readFile(filePath)
     await FileUtils.deleteFile(filePath)
 
@@ -157,7 +150,7 @@ describe('Data matrix export', () => {
   })
 
   test('xlsx file has the same content', async () => {
-    const filePath = await exportMatrix({ options: getOptions(FileFormats.xlsx) })
+    const filePath = await exportMatrix(getOptions(FileFormats.xlsx))
     const workbook = new ExcelJS.Workbook()
     await workbook.xlsx.read(Readable.from(await FileUtils.readBinaryFile(filePath)))
     await FileUtils.deleteFile(filePath)
@@ -169,11 +162,8 @@ describe('Data matrix export', () => {
     expect(rows).toEqual(expectedRows)
   })
 
-  test('only the selected records are exported', async () => {
-    const filePath = await exportMatrix({
-      recordUuids: [Record.getUuid(recordB)],
-      options: getOptions(FileFormats.csv),
-    })
+  test('only the data matching the filter is exported', async () => {
+    const filePath = await exportMatrix(getOptions(FileFormats.csv, `relevee_id == 'B'`))
     const content = await FileUtils.readFile(filePath)
     await FileUtils.deleteFile(filePath)
 
@@ -181,19 +171,19 @@ describe('Data matrix export', () => {
     expect(content).not.toContain('Rumex')
   })
 
-  test('records without rows are rejected when nothing can be exported', async () => {
-    await expect(
-      exportMatrix({ recordUuids: [Record.getUuid(recordEmpty)], options: getOptions(FileFormats.csv) })
-    ).rejects.toThrow('dataExport.noRecordsMatchingSearchCriteria')
+  test('an export without rows is rejected', async () => {
+    await expect(exportMatrix(getOptions(FileFormats.csv, `relevee_id == 'C'`))).rejects.toThrow(
+      'dataExport.noRecordsMatchingSearchCriteria'
+    )
   })
 
   test('attributes outside of the entity are rejected', async () => {
     const options = { ...getOptions(FileFormats.csv), valueAttributeDefUuid: getDefUuid('relevee_id') }
-    await expect(exportMatrix({ options })).rejects.toThrow('Invalid data matrix attribute')
+    await expect(exportMatrix(options)).rejects.toThrow('Invalid data matrix attribute')
   })
 
   test('coordinate attributes are rejected', async () => {
     const options = { ...getOptions(FileFormats.csv), valueAttributeDefUuid: getDefUuid('location') }
-    await expect(exportMatrix({ options })).rejects.toThrow('Invalid data matrix attribute')
+    await expect(exportMatrix(options)).rejects.toThrow('Invalid data matrix attribute')
   })
 })

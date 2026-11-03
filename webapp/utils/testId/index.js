@@ -62,6 +62,7 @@ export const TestId = {
     dataMatrixRowAttribute: 'dataMatrixRowAttribute',
     dataMatrixSecondRowAttribute: 'dataMatrixSecondRowAttribute',
     dataMatrixValueAttribute: 'dataMatrixValueAttribute',
+    exportLayoutOption: (layout) => `exportLayout_${layout}`,
     fileFormatOption: (fileFormat) => `fileFormat_${fileFormat}`,
     downloadExportedFileBtn: 'downloadExportedFileBtn',
     startExport: 'startExport',

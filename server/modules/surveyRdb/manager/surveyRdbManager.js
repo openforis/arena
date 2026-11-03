@@ -475,14 +475,12 @@ const checkCanExportDataMatrix = ({ fileFormat, fields, items }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are included.
- * @param {string[]} [params.recordUuids] - The UUIDs of the records to include.
- * @param {string} [params.search] - The text used to filter the records.
- * @param {!object} [params.options] - The entity, row and value definition UUIDs and the file format.
+ * @param {!object} [params.options] - The entity, row and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<{fields: string[], items: object[]}>} - The output fields and items.
  */
 export const fetchEntityDataMatrix = async (
-  { user = null, survey, cycle, recordOwnerUuid = null, recordUuids = null, search = null, options },
+  { user = null, survey, cycle, recordOwnerUuid = null, options },
   client = db
 ) => {
   // the records filter of the view data query is applied only when a cycle is specified
@@ -490,17 +488,19 @@ export const fetchEntityDataMatrix = async (
 
   const { entityDef, rowDefs, valueDef } = getDataMatrixDefs({ survey, cycle, options })
 
-  const filterRecordUuids = await _determineRecordUuidsFilter({ survey, cycle, recordUuids, search, user })
+  const filterRecordUuids = await _determineRecordUuidsFilter({ survey, cycle, user })
   if (filterRecordUuids?.length === 0) {
     throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
   }
 
   const keyDefs = Survey.getNodeDefRootKeys(survey)
-  const query = Query.create({
-    entityDefUuid: NodeDef.getUuid(entityDef),
-    attributeDefUuids: [...keyDefs, ...rowDefs, valueDef].map(NodeDef.getUuid),
-    filterRecordUuids,
-  })
+  const query = Query.assocFilter(options.filter ?? null)(
+    Query.create({
+      entityDefUuid: NodeDef.getUuid(entityDef),
+      attributeDefUuids: [...keyDefs, ...rowDefs, valueDef].map(NodeDef.getUuid),
+      filterRecordUuids,
+    })
+  )
   const rows = await fetchViewData({ survey, cycle, query, recordOwnerUuid }, client)
 
   const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)

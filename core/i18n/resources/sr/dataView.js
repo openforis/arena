@@ -101,7 +101,6 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     editRecord: 'Uredi zapis',
     exportList: 'Izvezi listu',
     exportData: 'Izvezi podatke',
-    exportDataMatrix: 'Izvezi matricu podataka',
     exportDataSummary: 'Izvezi pregled podataka',
     exportSelectedRecordsArenaFormat: 'Izvezi izabrane zapise (Arena format)',
     exportRecordDocx: 'Izvezi zapis (Word)',
@@ -173,17 +172,30 @@ Spajanje nije moguće izvršiti.`,
     title: 'Izvezi podatke',
   },
   dataMatrixExport: {
-    entity: 'Entitet (npr. drvo)',
-    entityInfo:
-      'Višestruki entitet sa podacima za izvoz: njegovi atributi se mogu koristiti kao redovi i vrednosti tabele.',
-    info: 'Izvezite tabelu sa jednim redom po vrsti i jednom kolonom po zapisu, u formatu koji koriste alati za analizu vegetacije kao što su Turboveg, Juice i Synbiosys.',
+    intro: `Izvezite podatke entiteta **{{entity}}** kao tabelu sa:
+
+- jednim **redom** za svaku različitu vrednost atributa reda (npr. za svaku vrstu i sprat);
+- jednom **kolonom** za svaki zapis, nazvanom po njegovom ključu ({{keys}});
+- u ćelijama, vrednošću atributa vrednosti (npr. pokrovnost).
+
+Ovo je format koji koriste alati za analizu vegetacije kao što su Turboveg, Juice i Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matrica podataka',
+      info: 'Tabela: redovi i kolone kako su prikazani u Istraživaču podataka. Matrica podataka: jedan red po vrsti (ili drugom atributu) i jedna kolona po zapisu, kako zahtevaju alati za analizu vegetacije kao što je Turboveg.',
+      label: 'Izvezi kao',
+      table: 'Tabela',
+    },
+    preview: 'Pregled',
+    previewRecord: '{{keys}} zapisa {{number}}',
+    recordsAll:
+      'Izvoze se podaci svih zapisa: postavite filter u Istraživaču podataka da biste izvezli samo neke od njih.',
+    recordsFiltered: 'Izvoze se samo podaci koji odgovaraju trenutnom filteru Istraživača podataka.',
     rowAttribute: 'Redovi (naziv atributa taksona, npr. vrsta)',
     rowAttributeInfo:
       'Svaka različita vrednost ovog atributa postaje red tabele. Atributi taksona se izvoze sa naučnim nazivom, jer svi taksoni koji nisu na listi imaju isti kod.',
     secondRowAttribute: 'Drugi atribut reda, opciono (npr. sprat)',
     secondRowAttributeInfo:
       'Koristite ga kada se ista vrsta može pojaviti više puta u zapisu (npr. u različitim spratovima): svaka kombinacija postaje poseban red.',
-    title: 'Izvezi matricu podataka',
     valueAttribute: 'Vrednosti (npr. pokrovnost)',
     valueAttributeInfo:
       'Vrednost prikazana u ćelijama. Atributi koda se izvoze sa kodom, a ne sa oznakom. Ako se red pojavi više puta u zapisu sa različitim vrednostima, ćelija sadrži sve vrednosti.',

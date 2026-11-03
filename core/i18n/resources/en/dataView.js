@@ -100,7 +100,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     editRecord: 'Edit record',
     exportList: 'Export list',
     exportData: 'Export data',
-    exportDataMatrix: 'Export data matrix',
     exportDataSummary: 'Export data summary',
     exportSelectedRecordsArenaFormat: 'Export selected records (Arena format)',
     exportRecordDocx: 'Export record (Word)',
@@ -170,16 +169,29 @@ Merge cannot be performed.`,
     title: 'Export data',
   },
   dataMatrixExport: {
-    entity: 'Entity (e.g. tree)',
-    entityInfo: 'Multiple entity with the data to export: its attributes can be used as rows and values of the table.',
-    info: 'Export a table with one row per species and one column per record, the format used by vegetation analysis tools such as Turboveg, Juice and Synbiosys.',
+    intro: `Export the **{{entity}}** data as a table with:
+
+- one **row** for each different value of the row attributes (e.g. each species and layer);
+- one **column** for each record, named after its key ({{keys}});
+- in the cells, the value of the value attribute (e.g. cover).
+
+This is the format used by vegetation analysis tools such as Turboveg, Juice and Synbiosys.`,
+    layout: {
+      dataMatrix: 'Data matrix',
+      info: 'Table: rows and columns as shown in Data Explorer. Data matrix: one row per species (or other attribute) and one column per record, as needed by vegetation analysis tools such as Turboveg.',
+      label: 'Export as',
+      table: 'Table',
+    },
+    preview: 'Preview',
+    previewRecord: '{{keys}} of record {{number}}',
+    recordsAll: 'The data of all the records is exported: set a filter in Data Explorer to export only some of them.',
+    recordsFiltered: 'Only the data matching the current Data Explorer filter is exported.',
     rowAttribute: 'Rows (taxon attribute name, e.g. species)',
     rowAttributeInfo:
       'Each different value of this attribute becomes a row of the table. Taxon attributes are exported with their scientific name, because unlisted taxa all have the same code.',
     secondRowAttribute: 'Second row attribute, optional (e.g. layer)',
     secondRowAttributeInfo:
       'Use it when the same species can appear more than once in a record (e.g. in different layers): each combination becomes a separate row.',
-    title: 'Export data matrix',
     valueAttribute: 'Values (e.g. cover)',
     valueAttributeInfo:
       'The value shown in the cells. Code attributes are exported with their code, not the label. If a row appears more than once in a record with different values, the cell contains all of them.',

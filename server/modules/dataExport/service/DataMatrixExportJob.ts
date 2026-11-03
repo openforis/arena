@@ -7,7 +7,7 @@ import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbSe
 import { DownloadAuthTokenUtils } from '@server/utils/downloadAuthTokenUtils'
 
 /**
- * Exports the data of a multiple entity as a matrix, with one column per record.
+ * Exports the data of a multiple entity (filtered as in Data Explorer) as a matrix, with one column per record.
  */
 export default class DataMatrixExportJob extends Job {
   static readonly type = 'DataMatrixExportJob'
@@ -17,13 +17,13 @@ export default class DataMatrixExportJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, recordUuids, search, options } = this.context as any
+    const { surveyId, cycle, options } = this.context as any
     const { fileFormat = FileFormats.xlsx } = options
 
     const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
 
     const tempFileName = await SurveyRdbService.exportDataMatrixToTempFile(
-      { user: this.user, survey, cycle, recordUuids, search, options: { ...options, fileFormat } },
+      { user: this.user, survey, cycle, options: { ...options, fileFormat } },
       this.tx
     )
     this.setContext({ fileFormat, tempFileName })

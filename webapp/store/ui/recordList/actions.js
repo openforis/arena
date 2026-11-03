@@ -4,7 +4,6 @@ import { SurveyState } from '@webapp/store/survey'
 import { JobActions } from '@webapp/store/app'
 
 import { DataExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataExportDownloadButton'
-import { DataMatrixExportDownloadButton } from '@webapp/views/App/views/Data/Records/HeaderLeft/DataMatrixExportDownloadButton'
 import { DataSummaryExportDownloadButton } from '@webapp/views/App/views/Data/DataExport/DataSummaryExportDownloadButton'
 import { SelectedRecordsExportDownloadButton } from '@webapp/views/App/views/Data/Records/HeaderLeft/SelectedRecordsExportDownloadButton'
 
@@ -18,18 +17,6 @@ export const startCSVExport =
     const job = await API.startExportDataJob({ surveyId, cycle, recordUuids, search, options })
 
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataExportDownloadButton }))
-  }
-
-export const startDataMatrixExport =
-  ({ recordUuids, search, options }) =>
-  async (dispatch, getState) => {
-    const state = getState()
-    const surveyId = SurveyState.getSurveyId(state)
-    const cycle = SurveyState.getSurveyCycleKey(state)
-
-    const job = await API.startExportDataMatrixJob({ surveyId, cycle, recordUuids, search, options })
-
-    dispatch(JobActions.showJobMonitor({ job, closeButton: DataMatrixExportDownloadButton }))
   }
 
 export const startDataSummaryExport =

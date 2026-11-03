@@ -11,17 +11,17 @@ import { Urls } from '../helpers/urls'
 test.describe('Data matrix export', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
 
-  test('exports species in rows and records in columns', async ({ page, sampleSurvey: _ }, testInfo) => {
-    await page.goto(Urls.records)
+  test('exports species in rows and records in columns from Data Explorer', async ({
+    page,
+    sampleSurvey: _,
+  }, testInfo) => {
+    await page.goto(Urls.dataExplorer)
+    await selectDropdownItem({ page, dropdown: getDropdown(page, TestId.entities.entitySelector), label: 'Tree' })
+    await page.locator('.attribute-selector', { hasText: 'Tree Species' }).click()
     await page.getByRole('button', { name: 'Export', exact: true }).click()
-    await page.getByRole('button', { name: 'Export data matrix' }).click()
 
-    const modal = page.locator('.records-data-matrix-export')
-    await selectDropdownItem({
-      page,
-      dropdown: getDropdown(modal, TestId.entities.entitySelector),
-      label: 'Tree',
-    })
+    const modal = page.locator('.data-query-export-modal')
+    await modal.getByTestId(TestId.dataExport.exportLayoutOption('dataMatrix')).click()
     await selectDropdownItem({
       page,
       dropdown: getDropdown(modal, TestId.dataExport.dataMatrixRowAttribute),
@@ -32,6 +32,8 @@ test.describe('Data matrix export', () => {
       dropdown: getDropdown(modal, TestId.dataExport.dataMatrixValueAttribute),
       label: 'Tree id',
     })
+    // the preview shows the structure of the exported table
+    await expect(modal.locator('.data-matrix-export__preview th').first()).toHaveText('Tree Species')
     await modal.getByTestId(TestId.dataExport.fileFormatOption(FileFormats.csv)).click()
     await modal.getByTestId(TestId.dataExport.startExport).click()
 

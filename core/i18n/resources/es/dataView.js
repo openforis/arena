@@ -92,7 +92,6 @@ export default {
     editRecord: 'Editar registro',
     exportList: 'Exportar lista',
     exportData: 'Exportar datos',
-    exportDataMatrix: 'Exportar matriz de datos',
     exportDataSummary: 'Exportar resumen de datos',
     exportSelectedRecordsArenaFormat: 'Exportar registros seleccionados (formato Arena)',
     exportRecordDocx: 'Exportar registro (Word)',
@@ -159,17 +158,30 @@ export default {
     title: 'Exportar datos',
   },
   dataMatrixExport: {
-    entity: 'Entidad (p. ej. árbol)',
-    entityInfo:
-      'Entidad múltiple con los datos a exportar: sus atributos pueden usarse como filas y valores de la tabla.',
-    info: 'Exporte una tabla con una fila por especie y una columna por registro, el formato utilizado por herramientas de análisis de vegetación como Turboveg, Juice y Synbiosys.',
+    intro: `Exporte los datos de **{{entity}}** como una tabla con:
+
+- una **fila** por cada valor distinto de los atributos de fila (p. ej. cada especie y estrato);
+- una **columna** por cada registro, con el nombre de su clave ({{keys}});
+- en las celdas, el valor del atributo de valor (p. ej. cobertura).
+
+Es el formato utilizado por herramientas de análisis de vegetación como Turboveg, Juice y Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matriz de datos',
+      info: 'Tabla: filas y columnas como se muestran en el Explorador de datos. Matriz de datos: una fila por especie (u otro atributo) y una columna por registro, como requieren herramientas de análisis de vegetación como Turboveg.',
+      label: 'Exportar como',
+      table: 'Tabla',
+    },
+    preview: 'Vista previa',
+    previewRecord: '{{keys}} del registro {{number}}',
+    recordsAll:
+      'Se exportan los datos de todos los registros: defina un filtro en el Explorador de datos para exportar solo algunos.',
+    recordsFiltered: 'Solo se exportan los datos que cumplen el filtro actual del Explorador de datos.',
     rowAttribute: 'Filas (nombre del atributo de taxón, p. ej. especie)',
     rowAttributeInfo:
       'Cada valor distinto de este atributo se convierte en una fila de la tabla. Los atributos de taxón se exportan con su nombre científico, porque todos los taxones no listados tienen el mismo código.',
     secondRowAttribute: 'Segundo atributo de fila, opcional (p. ej. estrato)',
     secondRowAttributeInfo:
       'Úselo cuando la misma especie pueda aparecer más de una vez en un registro (p. ej. en distintos estratos): cada combinación se convierte en una fila separada.',
-    title: 'Exportar matriz de datos',
     valueAttribute: 'Valores (p. ej. cobertura)',
     valueAttributeInfo:
       'El valor que se muestra en las celdas. Los atributos de código se exportan con su código, no con la etiqueta. Si una fila aparece más de una vez en un registro con valores distintos, la celda los contiene todos.',

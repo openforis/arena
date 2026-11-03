@@ -190,12 +190,12 @@ export const exportViewDataToTempFile = async ({
   return tempFileName
 }
 
-export const exportDataMatrixToTempFile = async ({ user, survey, cycle, recordUuids, search, options }, client) => {
+export const exportDataMatrixToTempFile = async ({ user, survey, cycle, options }, client) => {
   const { fileFormat } = options
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 
   const { fields, items } = await SurveyRdbManager.fetchEntityDataMatrix(
-    { user, survey, cycle, recordOwnerUuid, recordUuids, search, options },
+    { user, survey, cycle, recordOwnerUuid, options },
     client
   )
 

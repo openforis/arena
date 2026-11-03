@@ -102,7 +102,6 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     editRecord: "Modifier l'enregistrement",
     exportList: 'Exporter la liste',
     exportData: 'Exporter les données',
-    exportDataMatrix: 'Exporter la matrice de données',
     exportDataSummary: 'Exporter le résumé des données',
     exportSelectedRecordsArenaFormat: 'Exporter les enregistrements sélectionnés (format Arena)',
     exportRecordDocx: "Exporter l'enregistrement (Word)",
@@ -172,17 +171,30 @@ La fusion ne peut pas être effectuée.`,
     title: 'Exporter les données',
   },
   dataMatrixExport: {
-    entity: 'Entité (p. ex. arbre)',
-    entityInfo:
-      'Entité multiple contenant les données à exporter : ses attributs peuvent servir de lignes et de valeurs du tableau.',
-    info: "Exportez un tableau avec une ligne par espèce et une colonne par enregistrement, le format utilisé par les outils d'analyse de la végétation comme Turboveg, Juice et Synbiosys.",
+    intro: `Exportez les données de **{{entity}}** sous forme de tableau avec :
+
+- une **ligne** pour chaque valeur différente des attributs de ligne (p. ex. chaque espèce et strate) ;
+- une **colonne** pour chaque enregistrement, nommée d'après sa clé ({{keys}}) ;
+- dans les cellules, la valeur de l'attribut de valeur (p. ex. le recouvrement).
+
+C'est le format utilisé par les outils d'analyse de la végétation comme Turboveg, Juice et Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matrice de données',
+      info: "Tableau : lignes et colonnes telles qu'affichées dans l'Explorateur de données. Matrice de données : une ligne par espèce (ou autre attribut) et une colonne par enregistrement, comme requis par les outils d'analyse de la végétation tels que Turboveg.",
+      label: 'Exporter en tant que',
+      table: 'Tableau',
+    },
+    preview: 'Aperçu',
+    previewRecord: "{{keys}} de l'enregistrement {{number}}",
+    recordsAll:
+      "Les données de tous les enregistrements sont exportées : définissez un filtre dans l'Explorateur de données pour n'en exporter que certains.",
+    recordsFiltered: "Seules les données correspondant au filtre actuel de l'Explorateur de données sont exportées.",
     rowAttribute: "Lignes (nom de l'attribut taxon, p. ex. espèce)",
     rowAttributeInfo:
       'Chaque valeur différente de cet attribut devient une ligne du tableau. Les attributs taxon sont exportés avec leur nom scientifique, car tous les taxons non répertoriés ont le même code.',
     secondRowAttribute: 'Second attribut de ligne, facultatif (p. ex. strate)',
     secondRowAttributeInfo:
       'À utiliser lorsque la même espèce peut apparaître plusieurs fois dans un enregistrement (p. ex. dans différentes strates) : chaque combinaison devient une ligne distincte.',
-    title: 'Exporter la matrice de données',
     valueAttribute: 'Valeurs (p. ex. recouvrement)',
     valueAttributeInfo:
       'La valeur affichée dans les cellules. Les attributs code sont exportés avec leur code, pas avec le libellé. Si une ligne apparaît plusieurs fois dans un enregistrement avec des valeurs différentes, la cellule les contient toutes.',

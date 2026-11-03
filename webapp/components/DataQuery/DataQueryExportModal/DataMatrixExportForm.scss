@@ -1,0 +1,59 @@
+@use '~@webapp/style/vars' as *;
+
+.data-matrix-export {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 44rem;
+
+  // long labels wrap: rows must grow with them
+  .form-item {
+    grid-template-columns: 0.4fr 0.6fr;
+    height: auto;
+  }
+
+  &__intro {
+    p,
+    ul {
+      margin: 0 0 0.5rem;
+    }
+  }
+
+  &__preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+    margin-top: 0.5rem;
+    overflow-x: auto;
+
+    table {
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+
+    th,
+    td {
+      border: 1px solid $colorOutline;
+      padding: 0.2rem 0.5rem;
+      white-space: nowrap;
+    }
+
+    td {
+      color: $colorOnSurfaceVariant;
+      font-style: italic;
+    }
+  }
+
+  &__preview-title {
+    font-weight: 600;
+  }
+
+  &__records {
+    margin: 0;
+    color: $colorOnSurfaceVariant;
+  }
+
+  .btn-primary {
+    align-self: center;
+  }
+}

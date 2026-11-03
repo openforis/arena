@@ -47,14 +47,13 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/data-matrix-export',
     AuthMiddleware.requireRecordsExportPermission,
-    requireRecordsReadableByUserGroup,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
+        const { surveyId, cycle, options } = Request.getParams(req)
 
         const user = Request.getUser(req)
 
-        const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, recordUuids, search, options })
+        const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
 
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
