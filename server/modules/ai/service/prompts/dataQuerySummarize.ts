@@ -76,7 +76,7 @@ export const describeQuery = ({ survey, query, lang }) => {
 
   const filter = Query.getFilter(query)
   if (filter) {
-    lines.push(`Filter: ${pq(Expression.toString(filter, Expression.modes.sql), 1000)}`)
+    lines.push(`Filter: ${pq(Expression.toString(filter), 1000)}`)
   }
   const sort = Query.getSort(query)
   if (sort.length > 0) {
