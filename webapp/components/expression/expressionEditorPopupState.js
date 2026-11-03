@@ -48,21 +48,23 @@ export const useExpressionEditorPopupState = (props) => {
   const lang = useSurveyPreferredLang()
   const editorType = type.length === 1 ? type[0] : null
 
-  // The editing component ensures that all intermediate values will contain a newline.
-  const initialAdvanced =
-    editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
-
   const [state, setState] = useState(() => {
     // Either expr or query are passed by the parent component
     const exprDraft = getExpressionOrParseQuery({ expr, query, canBeConstant })
     // expressions are always written in JavaScript syntax, also in SQL mode (converted into SQL server side)
     const queryDraft = Expression.toString(exprDraft)
+    // The editing component ensures that all intermediate values will contain a newline.
+    const initialAdvanced =
+      editorType === ExpressionEditorType.advanced ||
+      new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query) ||
+      (editorType !== ExpressionEditorType.basic && !ExpressionParser.isEditableInBasicEditor(exprDraft))
+    const queryAdvanced = query.trimEnd() || queryDraft
 
     return {
       ...initialState,
       advanced: initialAdvanced,
-      query: initialAdvanced ? query.trimEnd() : queryDraft,
-      queryDraft: initialAdvanced ? query.trimEnd() : queryDraft,
+      query: initialAdvanced ? queryAdvanced : queryDraft,
+      queryDraft: initialAdvanced ? queryAdvanced : queryDraft,
       queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
