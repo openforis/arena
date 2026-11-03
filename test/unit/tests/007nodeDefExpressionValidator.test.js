@@ -65,6 +65,9 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'gps_model.toLowerCase()', r: true },
     { q: 'gps_model.substring(4,7)', r: true },
     { q: 'gps_model.length', r: true },
+    // text search methods (supported in the Data Explorer filter)
+    { q: `gps_model.includes('abc')`, r: true },
+    { q: `gps_model.toLowerCase().startsWith('abc') && gps_model.endsWith('xyz')`, r: true },
     // global objects (constructors)
     { q: 'Boolean(cluster_id)', r: true },
     { q: 'Boolean(remarks)', r: true },

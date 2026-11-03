@@ -847,6 +847,7 @@ $t(common.cantUndoWarning)`,
     invalidTaxonomyName: 'Invalid taxonomy name: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Invalid taxon vernacular name language code: {{vernacularLangCode}}',
     missingFunctionParameters: 'Missing function parameters',
+    notSupported: 'Expression not supported: check its syntax (e.g. a missing operator between two values)',
     undefinedFunction: 'Undefined function: {{name}}',
   },
 
