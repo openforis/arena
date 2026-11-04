@@ -443,8 +443,8 @@ const getDataMatrixColumnName = ({ viewDataNodeDef, nodeDef }) => {
 const getDataMatrixRecordKeyDefs = ({ survey, recordKeyAttributeDefUuids }) => {
   const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
   if (A.isNil(recordKeyAttributeDefUuids)) return rootKeyDefs
-  const rootKeyDefUuids = rootKeyDefs.map(NodeDef.getUuid)
-  const invalidUuid = recordKeyAttributeDefUuids.find((uuid) => !rootKeyDefUuids.includes(uuid))
+  const rootKeyDefUuids = new Set(rootKeyDefs.map(NodeDef.getUuid))
+  const invalidUuid = recordKeyAttributeDefUuids.find((uuid) => !rootKeyDefUuids.has(uuid))
   if (invalidUuid) throw new Error(`Invalid data matrix record key attribute: ${invalidUuid}`)
   return rootKeyDefs.filter((keyDef) => recordKeyAttributeDefUuids.includes(NodeDef.getUuid(keyDef)))
 }
