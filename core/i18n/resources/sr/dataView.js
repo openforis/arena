@@ -187,6 +187,9 @@ Ovo je format koji koriste alati za analizu vegetacije kao što su Turboveg, Jui
     },
     preview: 'Pregled',
     previewRecord: '{{keys}} zapisa {{number}}',
+    recordKeys: 'Ključni atributi za nazive kolona zapisa',
+    recordKeysInfo:
+      'Svaki zapis postaje kolona, nazvana po vrednostima izabranih ključnih atributa (npr. samo broj parcele). Podrazumevano se koriste ključni atributi izabrani u Istraživaču podataka, ili svi ako nijedan nije izabran. Potreban je bar jedan.',
     recordsAll:
       'Izvoze se podaci svih zapisa: postavite filter u Istraživaču podataka da biste izvezli samo neke od njih.',
     recordsFiltered: 'Izvoze se samo podaci koji odgovaraju trenutnom filteru Istraživača podataka.',

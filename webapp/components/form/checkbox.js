@@ -78,7 +78,12 @@ const Checkbox = (props) => {
         {Objects.isEmpty(label) ? (
           control
         ) : (
-          <MuiFormControlLabel className="btn-checkbox-label width100" control={control} label={i18n.t(label)} />
+          <MuiFormControlLabel
+            className="btn-checkbox-label width100"
+            control={control}
+            // elements (e.g. node definition labels) are shown as they are
+            label={typeof label === 'string' ? i18n.t(label) : label}
+          />
         )}
         {info && i18n.exists(info) && <ButtonIconInfo className="info-icon-btn" title={i18n.t(info, infoParams)} />}
       </ValidationTooltip>
@@ -98,7 +103,7 @@ Checkbox.propTypes = {
   indeterminate: PropTypes.bool,
   info: PropTypes.string,
   infoParams: PropTypes.object,
-  label: PropTypes.string,
+  label: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
   onChange: PropTypes.func,
   radio: PropTypes.bool,
   size: PropTypes.oneOf(['small', 'medium']),

@@ -184,6 +184,9 @@ Este é o formato usado por ferramentas de análise de vegetação como Turboveg
     },
     preview: 'Pré-visualização',
     previewRecord: '{{keys}} do registro {{number}}',
+    recordKeys: 'Atributos-chave usados para nomear as colunas dos registros',
+    recordKeysInfo:
+      'Cada registro se torna uma coluna, com o nome formado pelos valores dos atributos-chave selecionados (p. ex. apenas o número da parcela). Por padrão, são usados os atributos-chave selecionados no Explorador de dados, ou todos eles se nenhum estiver selecionado. É necessário pelo menos um.',
     recordsAll:
       'São exportados os dados de todos os registros: defina um filtro no Explorador de dados para exportar apenas alguns.',
     recordsFiltered: 'Apenas os dados que correspondem ao filtro atual do Explorador de dados são exportados.',
