@@ -76,8 +76,12 @@ Frontend uses Redux Toolkit with slices in `webapp/store/`. Each feature area ha
 **Database:**
 
 - PostgreSQL accessed via pg-promise
-- Migration system in `server/db/` (look for migration files)
+- Migrations live in `@openforis/arena-server` (`src/db/dbMigrator/migration/`)
 - JSONB columns extensively used for flexible schema (props, meta, validation)
+
+### Documentation
+
+Developer docs are in `docs/` (index: `docs/README.md`): architecture, record editing flow, analysis chains, webapp conventions. Read the relevant one before changing those areas, and update it in the same PR when the behavior it describes changes. `docs/superpowers/` holds dated design specs and plans: a record of past decisions, not maintained.
 
 ## Common Development Commands
 
@@ -196,7 +200,7 @@ When adding a new node definition type or modifying the survey schema:
 
 ### Working with Database Migrations
 
-Database migrations are in `server/db/` directory. The server automatically runs migrations on startup unless `MIGRATE_ONLY=true` is set.
+Database migrations (`public` schema and per-survey schemas) live in `@openforis/arena-server` (`src/db/dbMigrator/migration/`): adding one means releasing a new arena-server version. The server runs them on startup; survey schemas are migrated in the background by `AllSurveysDataMigrationJob`.
 
 ## Coding Conventions
 
