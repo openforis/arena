@@ -621,7 +621,6 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     },
     tools: {
       measureDistance: 'Medir distância',
-      goToCoordinates: 'Ir para coordenadas…',
     },
     quick: {
       zoomToData: 'Ajustar aos dados',
@@ -713,7 +712,6 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     },
     screenshot: {
       menuItem: 'Captura de tela para registro de parcela…',
-      quickButton: 'Captura de tela',
       title: 'Captura do mapa',
       capture: 'Capturar',
       captureView: 'Vista atual',

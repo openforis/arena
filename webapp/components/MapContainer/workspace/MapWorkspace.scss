@@ -126,16 +126,6 @@
     flex: 1;
   }
 
-  .map-toolbar__kbd {
-    margin-left: 16px;
-    padding: 0 4px;
-    border: 1px solid $colorOutline;
-    border-radius: 3px;
-    color: $colorOnSurfaceVariant;
-    font-family: inherit;
-    font-size: 0.7rem;
-  }
-
   .map-toolbar__menu-header {
     color: $colorOnSurfaceVariant;
     font-size: 0.68rem;
@@ -166,7 +156,7 @@
       box-sizing: border-box;
       width: 100%;
       height: 36px;
-      padding: 0 64px 0 32px;
+      padding: 0 8px 0 32px;
       border: 1px solid $colorOutline;
       border-radius: 6px;
       background: $colorSurfaceVariant;
@@ -181,19 +171,6 @@
         box-shadow: 0 0 0 2px with-alpha($colorPrimary, 0.25);
         background: $colorSurface;
       }
-    }
-
-    &__kbd {
-      position: absolute;
-      right: 8px;
-      padding: 1px 5px;
-      border: 1px solid $colorOutline;
-      border-radius: 4px;
-      background: $colorSurface;
-      color: $colorOnSurfaceVariant;
-      font-family: inherit;
-      font-size: 11px;
-      pointer-events: none;
     }
 
     &__results {

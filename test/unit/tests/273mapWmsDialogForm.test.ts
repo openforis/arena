@@ -11,7 +11,6 @@ import {
   getUrlLoadMode,
   isInsecureTileUrl,
   isLayerSelectable,
-  stopsMapShortcut,
   toErrorMessage,
   type WmsDialogFormAction,
   type WmsDialogFormState,
@@ -223,12 +222,6 @@ describe('map WMS dialog form (273)', () => {
     expect(toErrorMessage(new Error('Network Error'), 'mapWorkspace.wms.errors.loadFailed')).toEqual({
       key: 'mapWorkspace.wms.errors.loadFailed',
     })
-  })
-
-  test('keeps typed keys from the map shortcuts, but not Escape', () => {
-    expect(stopsMapShortcut('m')).toBe(true)
-    expect(stopsMapShortcut('a')).toBe(true)
-    expect(stopsMapShortcut('Escape')).toBe(false)
   })
 
   test('refuses WMS layer names the model refuses, and toggles a selected layer off', () => {

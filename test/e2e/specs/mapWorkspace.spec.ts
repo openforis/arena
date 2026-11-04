@@ -43,6 +43,17 @@ const openMap = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(ids.menuButton('baseMap'))).toBeVisible()
 }
 
+/**
+ * Starts a tool from the Tools menu (the full bar has no quick buttons for the tools).
+ * @param {Page} page - The page.
+ * @param {string} itemKey - The menu item: measureDistance, measureArea, screenshot.
+ * @returns {Promise<void>} Resolves when the item is clicked.
+ */
+const startFromToolsMenu = async (page: Page, itemKey: string): Promise<void> => {
+  await page.getByTestId(ids.menuButton('tools')).click()
+  await page.getByTestId(ids.menuItem(itemKey)).click()
+}
+
 // custom layers: a tile host that never resolves, answered by the route of the test
 const CUSTOM_TILE_HOST = 'https://tiles.arena-e2e.test'
 const CUSTOM_LAYER_NAME = 'Roads e2e'
@@ -277,10 +288,6 @@ test.describe('Map workspace', () => {
   test('search goes to coordinates and marks them', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
     const search = page.getByTestId(ids.searchInput)
-    await page.locator('.leaflet-container').click()
-    await page.keyboard.press('Control+k')
-    await expect(search).toBeFocused()
-
     await search.fill('41.9, 12.5')
     await expect(page.getByTestId(ids.searchResult(0))).toHaveText('Go to 41.90000, 12.50000')
     await page.keyboard.press('Enter')
@@ -298,34 +305,18 @@ test.describe('Map workspace', () => {
     await expect(page.getByTestId(ids.searchResult(0))).toHaveAttribute('aria-disabled', 'true')
   })
 
-  test('Go to coordinates in the Tools menu focuses the search box', async ({ page, sampleSurvey: _ }) => {
+  test('Escape ends the measure tool only while focus is inside the workspace', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
-    await page.getByTestId(ids.menuButton('tools')).click()
-    await page.getByTestId(ids.menuItem('goToCoordinates')).click()
-    await expect(page.getByTestId(ids.searchInput)).toBeFocused()
-  })
-
-  test('typing m in the search box does not start measuring', async ({ page, sampleSurvey: _ }) => {
-    await openMap(page)
-    const measure = page.getByTestId(ids.quickButton('measureDistance'))
-    await page.getByTestId(ids.searchInput).fill('m')
-    await page.keyboard.press('m')
-    await expect(page.getByTestId(ids.searchInput)).toHaveValue('mm')
-    await expect(measure).toHaveAttribute('aria-pressed', 'false')
-  })
-
-  test('letter shortcuts only act while focus is inside the workspace', async ({ page, sampleSurvey: _ }) => {
-    await openMap(page)
-    const measure = page.getByTestId(ids.quickButton('measureDistance'))
+    await startFromToolsMenu(page, 'measureDistance')
+    const bar = page.getByTestId(ids.measureBar)
+    await expect(bar).toBeVisible()
     await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
-    await page.keyboard.press('m')
-    await expect(measure).toHaveAttribute('aria-pressed', 'false')
-
-    await page.locator('.leaflet-container').click()
-    await page.keyboard.press('m')
-    await expect(measure).toHaveAttribute('aria-pressed', 'true')
     await page.keyboard.press('Escape')
-    await expect(measure).toHaveAttribute('aria-pressed', 'false')
+    await expect(bar).toBeVisible()
+
+    await page.locator('.leaflet-container').focus()
+    await page.keyboard.press('Escape')
+    await expect(bar).toHaveCount(0)
   })
 
   test('measures an area, changes its unit and ends with Escape in the unit select', async ({
@@ -333,12 +324,10 @@ test.describe('Map workspace', () => {
     sampleSurvey: _,
   }) => {
     await openMap(page)
-    const measureArea = page.getByTestId(ids.quickButton('measureArea'))
-    await measureArea.click()
+    await startFromToolsMenu(page, 'measureArea')
     const bar = page.getByTestId(ids.measureBar)
     await expect(bar).toBeVisible()
     await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
-    await expect(measureArea).toHaveAttribute('aria-pressed', 'true')
     const total = page.getByTestId(ids.measureTotal)
     await expect(total).toHaveText('—')
 
@@ -363,18 +352,12 @@ test.describe('Map workspace', () => {
     await unit.focus()
     await page.keyboard.press('Escape')
     await expect(bar).toHaveCount(0)
-    await expect(measureArea).toHaveAttribute('aria-pressed', 'false')
     await expect(measureLabel(page)).toHaveCount(0)
-
-    // the focus went back to the map: the shortcut starts the tool again
-    await page.keyboard.press('m')
-    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'true')
   })
 
   test('measures a distance, switches to area and ends with Done', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
-    const measureDistance = page.getByTestId(ids.quickButton('measureDistance'))
-    await measureDistance.click()
+    await startFromToolsMenu(page, 'measureDistance')
     await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'true')
 
     const point1 = await mapPoint(page, -160, 40)
@@ -396,19 +379,12 @@ test.describe('Map workspace', () => {
 
     await page.getByTestId(ids.measureModeArea).click()
     await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
-    await expect(page.getByTestId(ids.quickButton('measureArea'))).toHaveAttribute('aria-pressed', 'true')
-    await expect(measureDistance).toHaveAttribute('aria-pressed', 'false')
+    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'false')
     await expect(total).toHaveText('—')
     await expect(measureLabel(page)).toHaveCount(0)
 
     await page.getByTestId(ids.measureDone).click()
     await expect(page.getByTestId(ids.measureBar)).toHaveCount(0)
-
-    // Done removed the focused button with the bar: the focus went back to the map, so the shortcuts still work
-    await page.keyboard.press('m')
-    await expect(measureDistance).toHaveAttribute('aria-pressed', 'true')
-    await page.keyboard.press('Escape')
-    await expect(measureDistance).toHaveAttribute('aria-pressed', 'false')
   })
 
   test('finishing a measurement by double-click in the record location picker keeps the marker', async ({
@@ -475,12 +451,6 @@ test.describe('Map workspace', () => {
     await dialog.getByTestId(ids.wmsLoadButton).click()
     await expect(dialog.getByTestId(ids.wmsSummary)).toContainText('XYZ')
 
-    // "m" pressed on a focused button of the dialog must not start the measure tool
-    await dialog.getByTestId(ids.wmsAddAs('overlay')).focus()
-    await page.keyboard.press('m')
-    await expect(page.getByTestId(ids.quickButton('measureDistance'))).not.toHaveAttribute('aria-pressed', 'true')
-    await expect(dialog).toBeVisible()
-
     await dialog.getByTestId(ids.wmsNameInput).fill(CUSTOM_LAYER_NAME)
     await dialog.getByRole('radio', { name: 'Only me' }).check()
     const saved = waitForCustomLayersResponse(page, 'POST', '/geo/map/custom-layers/user')
@@ -532,9 +502,9 @@ test.describe('Map workspace', () => {
 test.describe('Map screenshot', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords, withClusterImage: true } })
 
-  test('downloads the map as a PNG from the quick button', async ({ page, sampleSurvey: _ }) => {
+  test('downloads the map as a PNG from the Tools menu', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
-    await page.getByTestId(ids.quickButton('screenshot')).click()
+    await startFromToolsMenu(page, 'screenshot')
     await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
 
     await page.getByTestId(ids.screenshotTarget('file')).click()

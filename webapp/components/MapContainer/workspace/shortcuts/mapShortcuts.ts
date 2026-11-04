@@ -1,22 +1,9 @@
-export type MapShortcutAction =
-  'focusSearch' | 'goToCoordinates' | 'measureDistance' | 'measureArea' | 'screenshot' | 'escape'
+// only Escape: letter shortcuts depend on the keyboard layout (Cyrillic, Mongolian, Japanese...)
+export type MapShortcutAction = 'escape'
 
-export type MapShortcutEvent = {
-  key: string
-  ctrlKey: boolean
-  metaKey: boolean
-  altKey: boolean
-  shiftKey: boolean
-}
+export type MapShortcutEvent = { key: string }
 
 type EditableCandidate = { tagName?: unknown; type?: unknown; isContentEditable?: unknown }
-
-const LETTER_ACTIONS: Record<string, MapShortcutAction> = {
-  a: 'measureArea',
-  g: 'goToCoordinates',
-  m: 'measureDistance',
-  s: 'screenshot',
-}
 
 const NON_TEXT_INPUT_TYPES = new Set([
   'button',
@@ -29,15 +16,6 @@ const NON_TEXT_INPUT_TYPES = new Set([
   'reset',
   'submit',
 ])
-
-// labels shown next to menu items and in button tooltips
-export const MAP_SHORTCUT_LABELS: Record<Exclude<MapShortcutAction, 'escape'>, string> = {
-  focusSearch: 'Ctrl K',
-  goToCoordinates: 'G',
-  measureArea: 'A',
-  measureDistance: 'M',
-  screenshot: 'S',
-}
 
 /**
  * Tells whether a key event target is a place where the user types text.
@@ -56,17 +34,10 @@ export const isEditableTarget = (target: EventTarget | EditableCandidate | null)
 }
 
 /**
- * Maps a key press to a map workspace action.
- * Letters only work without modifiers and outside text fields, so typing never starts a tool.
+ * Maps a key press to a map workspace action: Escape outside text fields ends the tool or closes the dialog.
  * @param {MapShortcutEvent} event - The key event.
  * @param {boolean} targetIsEditable - Whether the event target is a text field.
  * @returns {MapShortcutAction|null} The action, or null when the key is not a shortcut.
  */
-export const resolveMapShortcut = (event: MapShortcutEvent, targetIsEditable: boolean): MapShortcutAction | null => {
-  const key = (event.key ?? '').toLowerCase()
-  if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && key === 'k') return 'focusSearch'
-  if (targetIsEditable) return null
-  if (key === 'escape') return 'escape'
-  if (event.ctrlKey || event.metaKey || event.altKey || event.shiftKey) return null
-  return LETTER_ACTIONS[key] ?? null
-}
+export const resolveMapShortcut = (event: MapShortcutEvent, targetIsEditable: boolean): MapShortcutAction | null =>
+  !targetIsEditable && event.key === 'Escape' ? 'escape' : null

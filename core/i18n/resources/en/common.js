@@ -618,7 +618,6 @@ Try again?`,
     },
     tools: {
       measureDistance: 'Measure distance',
-      goToCoordinates: 'Go to coordinates…',
     },
     quick: {
       zoomToData: 'Zoom to data',
@@ -710,7 +709,6 @@ Try again?`,
     },
     screenshot: {
       menuItem: 'Screenshot to plot record…',
-      quickButton: 'Screenshot',
       title: 'Map screenshot',
       capture: 'Capture',
       captureView: 'Current view',

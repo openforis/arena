@@ -419,14 +419,6 @@ export const toErrorMessage = (error: unknown, fallbackKey: string): WmsFormMess
 }
 
 /**
- * Tells whether a key pressed in the dialog must be kept from the map shortcuts ("m" typed in a field, or pressed on
- * a focused button, must not start a tool). Escape still reaches them: it closes the dialog.
- * @param {string} key - The KeyboardEvent key.
- * @returns {boolean} True when the event propagation must stop.
- */
-export const stopsMapShortcut = (key: string): boolean => key !== 'Escape'
-
-/**
  * Tells whether the URL being added would be blocked by the browser as mixed content: an http: tile URL on an https:
  * page.
  * @param {object} params - Parameters.

@@ -633,7 +633,6 @@ export default {
     },
     tools: {
       measureDistance: 'Измерить расстояние',
-      goToCoordinates: 'Перейти к координатам…',
     },
     quick: {
       zoomToData: 'Приблизить к данным',
@@ -727,7 +726,6 @@ export default {
     },
     screenshot: {
       menuItem: 'Снимок карты в запись участка…',
-      quickButton: 'Снимок экрана',
       title: 'Снимок карты',
       capture: 'Область',
       captureView: 'Текущий вид',

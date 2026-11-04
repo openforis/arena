@@ -8,7 +8,6 @@ import { TestId } from '@webapp/utils/testId'
 type MenuActionItemProps = {
   itemKey: string
   labelKey: string
-  shortcut?: string
   disabled?: boolean
   onClick: () => void
 }
@@ -18,23 +17,15 @@ type MenuActionItemProps = {
  * @param {object} props - Component props.
  * @param {string} props.itemKey - Item key (test id suffix).
  * @param {string} props.labelKey - I18n key of the label.
- * @param {string} [props.shortcut] - Shortcut shown on the right (e.g. "M").
  * @param {boolean} [props.disabled] - Whether the item is disabled.
  * @param {Function} props.onClick - Action.
  * @returns {React.ReactElement} The item.
  */
-export const MenuActionItem = ({
-  itemKey,
-  labelKey,
-  shortcut,
-  disabled = false,
-  onClick,
-}: MenuActionItemProps): ReactElement => {
+export const MenuActionItem = ({ itemKey, labelKey, disabled = false, onClick }: MenuActionItemProps): ReactElement => {
   const t = useI18nT()
   return (
     <MenuItem dense disabled={disabled} onClick={onClick} data-testid={TestId.mapWorkspace.menuItem(itemKey)}>
       <ListItemText>{t(labelKey)}</ListItemText>
-      {shortcut && <kbd className="map-toolbar__kbd">{shortcut}</kbd>}
     </MenuItem>
   )
 }

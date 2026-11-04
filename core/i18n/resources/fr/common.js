@@ -622,7 +622,6 @@ Réessayer ?`,
     },
     tools: {
       measureDistance: 'Mesurer une distance',
-      goToCoordinates: 'Aller à des coordonnées…',
     },
     quick: {
       zoomToData: 'Zoomer sur les données',
@@ -714,7 +713,6 @@ Réessayer ?`,
     },
     screenshot: {
       menuItem: 'Capture d’écran vers un enregistrement de placette…',
-      quickButton: 'Capture d’écran',
       title: 'Capture de la carte',
       capture: 'Capturer',
       captureView: 'Vue actuelle',

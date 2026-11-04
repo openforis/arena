@@ -19,7 +19,6 @@ import {
   getSubmitLabel,
   getUrlLoadMode,
   isInsecureTileUrl,
-  stopsMapShortcut,
   toErrorMessage,
   wmsDialogFormReducer,
 } from '@webapp/components/MapContainer/workspace/customLayers/wms/wmsDialogForm'
@@ -36,15 +35,6 @@ import { useSurveyId } from '@webapp/store/survey'
 import { useI18nT } from '@webapp/store/system'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 import { TestId } from '@webapp/utils/testId'
-
-/**
- * Keeps keys typed or pressed in the dialog from the map shortcuts (Escape still closes the dialog).
- * @param {React.KeyboardEvent} event - The key event.
- * @returns {void}
- */
-const onDialogKeyDown = (event: React.KeyboardEvent): void => {
-  if (stopsMapShortcut(event.key)) event.stopPropagation()
-}
 
 /**
  * Loads the layers of a service URL; a {z}/{x}/{y} template needs no request.
@@ -162,7 +152,6 @@ export const WmsDialog = (): React.ReactElement => {
       className="map-wms-dialog"
       data-testid={TestId.mapWorkspace.wmsDialog}
       onClose={onRequestClose}
-      onKeyDown={onDialogKeyDown}
     >
       <DialogTitle>{t('mapWorkspace.wms.title')}</DialogTitle>
       <DialogContent>

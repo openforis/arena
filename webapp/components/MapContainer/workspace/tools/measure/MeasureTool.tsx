@@ -73,7 +73,7 @@ export const MeasureTool = ({ mode }: MeasureToolProps): ReactElement => {
   )
 
   // Done or Escape on a bar control unmounts the focused control with the bar and the focus falls to the body,
-  // outside the workspace root: give it back to the map so the workspace shortcuts (m, a, Escape) keep working
+  // outside the workspace root: give it back to the map so Escape keeps ending the tool
   useEffect(
     /**
      * Registers the cleanup that returns the focus to the map container.

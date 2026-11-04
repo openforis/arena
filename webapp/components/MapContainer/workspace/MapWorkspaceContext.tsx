@@ -1,5 +1,5 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useRef, useState } from 'react'
-import type { ReactElement, ReactNode, RefObject } from 'react'
+import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import type { ReactElement, ReactNode } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'
 import { createLeafletContext, LeafletContext } from '@react-leaflet/core'
@@ -14,7 +14,6 @@ export type MapWorkspaceContextValue = MapWorkspaceState & {
   setMap: (map: LeafletMap | null) => void
   layersControlTarget: HTMLElement | null
   setLayersControlTarget: (element: HTMLElement | null) => void
-  searchInputRef: RefObject<HTMLInputElement | null>
   portalContainer: HTMLElement | null
   setPortalContainer: (element: HTMLElement | null) => void
 }
@@ -44,7 +43,6 @@ export const MapWorkspaceProvider = ({
   const [map, setMap] = useState<LeafletMap | null>(null)
   const [layersControlTarget, setLayersControlTarget] = useState<HTMLElement | null>(null)
   const [portalContainer, setPortalContainer] = useState<HTMLElement | null>(null)
-  const searchInputRef = useRef<HTMLInputElement | null>(null)
 
   const value = useMemo<MapWorkspaceContextValue>(
     () => ({
@@ -55,7 +53,6 @@ export const MapWorkspaceProvider = ({
       setMap,
       layersControlTarget,
       setLayersControlTarget,
-      searchInputRef,
       portalContainer,
       setPortalContainer,
     }),

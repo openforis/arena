@@ -6,9 +6,7 @@ import { useMap } from 'react-leaflet'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'
 
-import { useMapWorkspace } from '../MapWorkspaceContext'
 import type { MapRecordCandidate, MapWorkspaceRecords } from '../mapWorkspaceTypes'
-import { MAP_SHORTCUT_LABELS } from '../shortcuts/mapShortcuts'
 import { formatCoordinates } from '../statusbar/coordinateFormat'
 import { buildMapSearchResults } from './mapSearchQuery'
 import type { MapSearchResult } from './mapSearchQuery'
@@ -40,16 +38,6 @@ const findSelectableIndex = (results: MapSearchResult[], from: number, step: 1 |
 }
 
 /**
- * Focuses the map search box and selects its text.
- * @param {HTMLInputElement|null} input - The search input.
- * @returns {void}
- */
-export const focusMapSearch = (input: HTMLInputElement | null): void => {
-  input?.focus()
-  input?.select()
-}
-
-/**
  * Search box of the top bar: coordinates (decimal, DMS, UTM) and, when the map lists records, record keys.
  * Going to coordinates flies there and marks the point until the next search.
  * @param {object} props - Component props.
@@ -59,7 +47,6 @@ export const focusMapSearch = (input: HTMLInputElement | null): void => {
 export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): ReactElement => {
   const t = useI18nT()
   const map = useMap()
-  const { searchInputRef } = useMapWorkspace()
   const listId = useId()
   const [input, setInput] = useState('')
   const [listOpen, setListOpen] = useState(false)
@@ -179,7 +166,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
     <div className="map-search">
       <span className="icon icon-search map-search__icon" aria-hidden="true" />
       <input
-        ref={searchInputRef}
         type="search"
         role="combobox"
         className="map-search__input"
@@ -200,9 +186,6 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
         onBlur={() => setListOpen(false)}
         onKeyDown={onKeyDown}
       />
-      <kbd className="map-search__kbd" aria-hidden="true">
-        {MAP_SHORTCUT_LABELS.focusSearch}
-      </kbd>
       <ul id={listId} role="listbox" className="map-search__results" hidden={!expanded}>
         {results.map((result, index) => {
           const selectable = isSelectable(result)

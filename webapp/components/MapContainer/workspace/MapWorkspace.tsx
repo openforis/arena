@@ -11,7 +11,6 @@ import { MapWorkspaceDialogs } from './MapWorkspaceDialogs'
 import { useMapWorkspace, WorkspaceLeafletProvider } from './MapWorkspaceContext'
 import type { MapRailTab, MapWorkspaceRecords } from './mapWorkspaceTypes'
 import { MapRail } from './rail/MapRail'
-import { focusMapSearch } from './search/MapSearchBox'
 import { MapStatusBar } from './statusbar/MapStatusBar'
 import { MapToolbar } from './toolbar/MapToolbar'
 import { MapWorkspaceTools } from './tools/MapWorkspaceTools'
@@ -37,7 +36,7 @@ type MapWorkspaceProps = {
  */
 export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: MapWorkspaceProps): ReactElement => {
   const t = useI18nT()
-  const { variant, dialog, dispatch, searchInputRef, setPortalContainer } = useMapWorkspace()
+  const { variant, dialog, dispatch, setPortalContainer } = useMapWorkspace()
   const rootRef = useRef<HTMLDivElement | null>(null)
 
   /**
@@ -55,23 +54,9 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
 
   const fullScreen = useFullScreen(rootRef)
 
-  /**
-   * Focuses the search box.
-   * @returns {void}
-   */
-  const focusSearch = useCallback(() => focusMapSearch(searchInputRef.current), [searchInputRef])
-
   const handlers = useMemo<MapShortcutHandlers>(
-    () => ({
-      focusSearch,
-      goToCoordinates: focusSearch,
-      measureDistance: () => dispatch({ type: 'toggleTool', tool: 'measureDistance' }),
-      // compact maps have no area button: no area shortcut either
-      measureArea: variant === 'full' ? () => dispatch({ type: 'toggleTool', tool: 'measureArea' }) : undefined,
-      screenshot: variant === 'full' ? () => dispatch({ type: 'openDialog', dialog: 'screenshot' }) : undefined,
-      escape: () => dispatch(dialog ? { type: 'closeDialog' } : { type: 'endTool' }),
-    }),
-    [dialog, dispatch, focusSearch, variant]
+    () => ({ escape: () => dispatch(dialog ? { type: 'closeDialog' } : { type: 'endTool' }) }),
+    [dialog, dispatch]
   )
   const onKeyDown = useMapShortcuts({ rootRef, handlers })
 
