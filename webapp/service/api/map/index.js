@@ -92,7 +92,7 @@ export const testMapApiKey = async ({ provider, apiKey }) => {
  * @param {object} params - Parameters.
  * @param {number} params.surveyId - The survey id.
  * @param {string} params.url - The service URL typed by the user.
- * @returns {Promise<object>} The capabilities summary (MapServiceCapabilities); rejects with the server error key.
+ * @returns {Promise<import('@core/map/customLayers/mapServiceCapabilities').MapServiceCapabilities>} The capabilities summary; rejects with the server error key.
  */
 export const fetchMapServiceCapabilities = async ({ surveyId, url }) => {
   const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/capabilities`, {

@@ -4673,18 +4673,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@react-leaflet/core@npm:2.1.0":
-  version: 2.1.0
-  resolution: "@react-leaflet/core@npm:2.1.0"
-  peerDependencies:
-    leaflet: ^1.9.0
-    react: ^18.0.0
-    react-dom: ^18.0.0
-  checksum: 10c0/d5218c79ab9decd458e1fa8a0ec3757542e3ea4e569afa151a32ef0e9ceb63a13174f3fbc740fe0d514df8b0b3e30d913bfb0b8b661dac13924934d7e430bfc9
-  languageName: node
-  linkType: hard
-
-"@react-leaflet/core@npm:^3.0.0":
+"@react-leaflet/core@npm:3.0.0, @react-leaflet/core@npm:^3.0.0":
   version: 3.0.0
   resolution: "@react-leaflet/core@npm:3.0.0"
   peerDependencies:
@@ -15660,7 +15649,7 @@ __metadata:
     "@openforis/arena-server": "npm:^2.8.10"
     "@playwright/test": "npm:1.64.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
-    "@react-leaflet/core": "npm:2.1.0"
+    "@react-leaflet/core": "npm:3.0.0"
     "@reduxjs/toolkit": "npm:^2.13.0"
     "@sendgrid/mail": "npm:^8.1.6"
     "@shopify/draggable": "npm:^1.2.1"

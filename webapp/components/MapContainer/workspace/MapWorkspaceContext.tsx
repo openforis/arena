@@ -2,7 +2,7 @@ import React, { createContext, useContext, useEffect, useMemo, useReducer, useRe
 import type { ReactElement, ReactNode, RefObject } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'
-import { createLeafletContext, LeafletProvider } from '@react-leaflet/core'
+import { createLeafletContext, LeafletContext } from '@react-leaflet/core'
 
 import { initialMapWorkspaceState, mapWorkspaceReducer } from './mapWorkspaceReducer'
 import type { MapWorkspaceAction, MapWorkspaceState, MapWorkspaceVariant } from './mapWorkspaceTypes'
@@ -99,5 +99,5 @@ export const WorkspaceLeafletProvider = ({ children }: { children: ReactNode }):
   const { map } = useMapWorkspace()
   const leafletContext = useMemo(() => (map ? createLeafletContext(map) : null), [map])
   if (!leafletContext) return null
-  return <LeafletProvider value={leafletContext}>{children}</LeafletProvider>
+  return <LeafletContext value={leafletContext}>{children}</LeafletContext>
 }

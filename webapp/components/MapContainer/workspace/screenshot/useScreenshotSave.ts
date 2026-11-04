@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 
-import type { ArenaRecord, User as ArenaUser } from '@openforis/arena-core'
+import { Authorizer, type ArenaRecord, type User as ArenaUser } from '@openforis/arena-core'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 import { uuidv4 } from '@core/uuid'
