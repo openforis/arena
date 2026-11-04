@@ -6,7 +6,7 @@
   gap: 12px;
   padding: 12px;
   font-size: 13px;
-  color: $black;
+  color: $colorOnSurface;
 
   &__intro,
   &__note,
@@ -14,7 +14,7 @@
   &__range {
     margin: 0;
     font-size: 12px;
-    color: $black;
+    color: $colorOnSurface;
     opacity: 0.7;
   }
 
@@ -51,14 +51,14 @@
     gap: 8px;
     padding: 8px;
     border-radius: 4px;
-    background-color: $grey;
+    background-color: $colorSurfaceVariant;
   }
 
   &__link {
     padding: 0;
     border: 0;
     background: none;
-    color: $blue;
+    color: $colorPrimary;
     font-size: 12px;
     cursor: pointer;
 
@@ -102,12 +102,12 @@
     width: 100%;
     min-height: 2px;
     border-radius: 2px 2px 0 0;
-    background-color: $blueLight;
+    background-color: $colorPrimaryContainer;
   }
 
   &__bar--active &__bar-fill,
   &__bar:hover:not(:disabled) &__bar-fill {
-    background-color: $blue;
+    background-color: $colorPrimary;
   }
 
   &__results {
@@ -128,9 +128,9 @@
 
   &__select {
     padding: 2px 4px;
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
     border-radius: 4px;
-    background-color: $white;
+    background-color: $colorSurface;
     font-size: 12px;
   }
 
@@ -144,11 +144,11 @@
   }
 
   &__row {
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
     border-radius: 4px;
 
     &--selected {
-      border-color: $blue;
+      border-color: $colorPrimary;
     }
   }
 
@@ -169,7 +169,7 @@
     width: 44px;
     height: 44px;
     border-radius: 2px;
-    background-color: $grey;
+    background-color: $colorSurfaceVariant;
     object-fit: cover;
   }
 

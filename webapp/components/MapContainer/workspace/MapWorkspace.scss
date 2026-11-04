@@ -1,14 +1,16 @@
+@use '~@webapp/style/vars' as *;
+
 .map-workspace {
   display: flex;
   flex-direction: column;
   height: 100%;
   min-height: 0;
-  background: #fff;
+  background: $colorSurface;
 
   &:fullscreen {
     width: 100%;
     height: 100%;
-    background: #fff;
+    background: $colorSurface;
   }
 
   &__toolbar {
@@ -21,8 +23,8 @@
     gap: 2px;
     min-height: 40px;
     padding: 0 8px;
-    border-bottom: 1px solid #d1d1dd;
-    background: #fff;
+    border-bottom: 1px solid $colorOutline;
+    background: $colorSurface;
   }
 
   &__body {
@@ -53,9 +55,9 @@
     min-height: 24px;
     padding: 0 8px;
     overflow: hidden;
-    border-top: 1px solid #d1d1dd;
-    background: #fafbfc;
-    color: #4a4e57;
+    border-top: 1px solid $colorOutline;
+    background: $colorSurfaceVariant;
+    color: $colorOnSurfaceVariant;
     font-size: 0.72rem;
     white-space: nowrap;
   }
@@ -66,7 +68,7 @@
     min-width: 0;
     height: 36px;
     padding: 0 10px;
-    color: #2f3138;
+    color: $colorOnSurface;
     font-size: 13px;
     text-transform: none;
 
@@ -82,8 +84,8 @@
     }
 
     &--open {
-      background: #e3eefa;
-      color: #1f5c99;
+      background: $colorPrimaryContainer;
+      color: $colorPrimary;
     }
   }
 
@@ -91,16 +93,16 @@
     align-self: stretch;
     width: 1px;
     margin: 8px 4px;
-    background: #d1d1dd;
+    background: $colorOutline;
   }
 
   .map-toolbar__icon-button {
     border-radius: 4px;
-    color: #2f3138;
+    color: $colorOnSurface;
 
     &--active {
-      background: #e3eefa;
-      color: #1f5c99;
+      background: $colorPrimaryContainer;
+      color: $colorPrimary;
     }
   }
 
@@ -111,7 +113,7 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    color: #5d616b;
+    color: $colorOnSurfaceVariant;
     font-size: 0.75rem;
   }
 
@@ -127,15 +129,15 @@
   .map-toolbar__kbd {
     margin-left: 16px;
     padding: 0 4px;
-    border: 1px solid #d1d1dd;
+    border: 1px solid $colorOutline;
     border-radius: 3px;
-    color: #5d616b;
+    color: $colorOnSurfaceVariant;
     font-family: inherit;
     font-size: 0.7rem;
   }
 
   .map-toolbar__menu-header {
-    color: #5d616b;
+    color: $colorOnSurfaceVariant;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -154,7 +156,7 @@
     &__icon {
       position: absolute;
       left: 10px;
-      color: #5d616b;
+      color: $colorOnSurfaceVariant;
       font-size: 14px;
       pointer-events: none;
     }
@@ -165,19 +167,19 @@
       width: 100%;
       height: 36px;
       padding: 0 64px 0 32px;
-      border: 1px solid #d1d1dd;
+      border: 1px solid $colorOutline;
       border-radius: 6px;
-      background: #f7f8fa;
-      color: #2f3138;
+      background: $colorSurfaceVariant;
+      color: $colorOnSurface;
       font: inherit;
       font-size: 13px;
       letter-spacing: normal;
 
       &:focus {
-        border-color: #1f5c99;
+        border-color: $colorPrimary;
         outline: none;
-        box-shadow: 0 0 0 2px rgb(31 92 153 / 25%);
-        background: #fff;
+        box-shadow: 0 0 0 2px with-alpha($colorPrimary, 0.25);
+        background: $colorSurface;
       }
     }
 
@@ -185,10 +187,10 @@
       position: absolute;
       right: 8px;
       padding: 1px 5px;
-      border: 1px solid #d1d1dd;
+      border: 1px solid $colorOutline;
       border-radius: 4px;
-      background: #fff;
-      color: #5d616b;
+      background: $colorSurface;
+      color: $colorOnSurfaceVariant;
       font-family: inherit;
       font-size: 11px;
       pointer-events: none;
@@ -204,10 +206,10 @@
       margin: 2px 0 0;
       padding: 4px 0;
       overflow-y: auto;
-      border: 1px solid #d1d1dd;
+      border: 1px solid $colorOutline;
       border-radius: 4px;
-      background: #fff;
-      box-shadow: 0 4px 12px rgb(0 0 0 / 15%);
+      background: $colorSurface;
+      box-shadow: 0 4px 12px with-alpha($colorShadow, 0.15);
       list-style: none;
     }
 
@@ -217,12 +219,12 @@
       cursor: pointer;
 
       &[aria-selected='true'] {
-        background: #e3eefa;
-        color: #1f5c99;
+        background: $colorPrimaryContainer;
+        color: $colorPrimary;
       }
 
       &[aria-disabled='true'] {
-        color: #5d616b;
+        color: $colorOnSurfaceVariant;
         cursor: default;
       }
     }
@@ -241,8 +243,8 @@
   display: flex;
   flex-shrink: 0;
   height: 100%;
-  border-right: 1px solid #d1d1dd;
-  background: #fff;
+  border-right: 1px solid $colorOutline;
+  background: $colorSurface;
 
   &__tabs {
     display: flex;
@@ -261,22 +263,22 @@
     border: none;
     border-left: 3px solid transparent;
     background: none;
-    color: #4a4e57;
+    color: $colorOnSurfaceVariant;
     font-size: 0.68rem;
     cursor: pointer;
 
     &:hover {
-      background: #f3f5f8;
+      background: $colorSurfaceVariant;
     }
 
     &--selected {
-      border-left-color: #1f5c99;
-      background: #e3eefa;
-      color: #1f5c99;
+      border-left-color: $colorPrimary;
+      background: $colorPrimaryContainer;
+      color: $colorPrimary;
     }
 
     &:focus-visible {
-      outline: 2px solid #3885ca;
+      outline: 2px solid $colorPrimary;
       outline-offset: -2px;
     }
   }
@@ -286,7 +288,7 @@
     flex-direction: column;
     min-width: 0;
     height: 100%;
-    border-left: 1px solid #e7e9ee;
+    border-left: 1px solid $colorOutline;
 
     &[hidden] {
       display: none;
@@ -299,7 +301,7 @@
     align-items: center;
     justify-content: space-between;
     padding: 4px 4px 4px 12px;
-    border-bottom: 1px solid #e7e9ee;
+    border-bottom: 1px solid $colorOutline;
   }
 
   &__panel-title {
@@ -322,7 +324,7 @@
 
   &__section-title {
     margin: 10px 0 4px;
-    color: #5d616b;
+    color: $colorOnSurfaceVariant;
     font-size: 0.68rem;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -331,7 +333,7 @@
 
   &__empty {
     margin: 0;
-    color: #5d616b;
+    color: $colorOnSurfaceVariant;
     font-size: 0.8rem;
   }
 
@@ -467,7 +469,7 @@
   }
 
   &__notation {
-    color: #1f5c99;
+    color: $colorPrimary;
     font-weight: 600;
   }
 
@@ -480,7 +482,7 @@
   &__scale-line {
     display: inline-block;
     height: 6px;
-    border: 1px solid #4a4e57;
+    border: 1px solid $colorOnSurfaceVariant;
     border-top: none;
   }
 
@@ -503,7 +505,7 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       background: none;
-      color: #5d616b;
+      color: $colorOnSurfaceVariant;
       font-size: 0.68rem;
 
       // the global `a` rule (formBase.scss) would wrap and restyle Leaflet's links
@@ -532,7 +534,7 @@
     gap: 2px;
 
     span {
-      color: #5d616b;
+      color: $colorOnSurfaceVariant;
       font-size: 0.72rem;
     }
 

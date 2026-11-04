@@ -1,15 +1,17 @@
+@use '~@webapp/style/vars' as *;
+
 .map-screenshot-dialog {
   display: flex;
   flex-direction: column;
   min-height: 0;
-  color: #2f3138;
+  color: $colorOnSurface;
   font-size: 13px;
 
   &__title {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #e7e9ee;
+    border-bottom: 1px solid $colorOutline;
     font-size: 16px;
     font-weight: 700;
   }
@@ -23,7 +25,7 @@
     border: 0;
     border-radius: 6px;
     background: transparent;
-    color: #4a4e57;
+    color: $colorOnSurfaceVariant;
     cursor: pointer;
   }
 
@@ -41,10 +43,10 @@
     min-height: 200px;
     max-height: 375px;
     overflow: hidden;
-    border: 1px solid #d1d1dd;
+    border: 1px solid $colorOutline;
     border-radius: 8px;
-    background: #f0f1f4;
-    color: #4a4e57;
+    background: $colorSurfaceVariant;
+    color: $colorOnSurfaceVariant;
 
     img {
       display: block;
@@ -99,7 +101,7 @@
     gap: 4px;
     padding: 3px;
     border-radius: 8px;
-    background: #f0f1f4;
+    background: $colorSurfaceVariant;
   }
 
   &__segment {
@@ -107,16 +109,16 @@
     border: 0;
     border-radius: 6px;
     background: transparent;
-    color: #4a4e57;
+    color: $colorOnSurfaceVariant;
     font: inherit;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
 
     &[aria-pressed='true'] {
-      background: #fff;
-      color: #1f5c99;
-      box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+      background: $colorSurface;
+      color: $colorPrimary;
+      box-shadow: 0 1px 2px with-alpha($colorShadow, 0.12);
     }
 
     &:disabled {
@@ -135,7 +137,7 @@
       width: 16px;
       height: 16px;
       margin: 0;
-      accent-color: #3885ca;
+      accent-color: $colorPrimary;
     }
   }
 
@@ -145,17 +147,17 @@
     align-items: flex-start;
     gap: 2px;
     padding: 10px 12px;
-    border: 1.5px solid #d1d1dd;
+    border: 1.5px solid $colorOutline;
     border-radius: 8px;
-    background: #fff;
-    color: #2f3138;
+    background: $colorSurface;
+    color: $colorOnSurface;
     font: inherit;
     text-align: left;
     cursor: pointer;
 
     &[aria-pressed='true'] {
-      border-color: #3885ca;
-      box-shadow: inset 0 0 0 1px #3885ca;
+      border-color: $colorPrimary;
+      box-shadow: inset 0 0 0 1px $colorPrimary;
     }
 
     &:disabled {
@@ -170,7 +172,7 @@
   }
 
   &__target-hint {
-    color: #4a4e57;
+    color: $colorOnSurfaceVariant;
     font-size: 12px;
   }
 
@@ -186,10 +188,10 @@
       box-sizing: border-box;
       height: 34px;
       padding: 0 8px;
-      border: 1px solid #d1d1dd;
+      border: 1px solid $colorOutline;
       border-radius: 6px;
-      background: #fff;
-      color: #2f3138;
+      background: $colorSurface;
+      color: $colorOnSurface;
       font: inherit;
       font-size: 13px;
       font-weight: 400;
@@ -202,7 +204,7 @@
 
   &__hint {
     margin: 4px 0 0;
-    color: #4a4e57;
+    color: $colorOnSurfaceVariant;
     font-size: 12px;
   }
 
@@ -217,18 +219,18 @@
   }
 
   &__note {
-    background: #eef4fb;
+    background: $colorPrimaryContainer;
   }
 
   &__notice {
-    background: #fff6e0;
+    background: $colorWarningContainer;
 
     &--error {
-      background: #fdecea;
+      background: $colorErrorContainer;
     }
 
     &--success {
-      background: #e6f4ea;
+      background: $colorSuccessContainer;
     }
   }
 
@@ -237,11 +239,11 @@
     flex-wrap: wrap;
     align-items: center;
     gap: 8px;
-    background: #fff6e0;
+    background: $colorWarningContainer;
   }
 
   &__footer {
-    border-top: 1px solid #e7e9ee;
+    border-top: 1px solid $colorOutline;
   }
 }
 

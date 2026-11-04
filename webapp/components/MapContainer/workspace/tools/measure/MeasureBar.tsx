@@ -17,7 +17,7 @@ const NO_VALUE = '—'
 
 // Compact segmented look of the mockup: sentence case (MUI uppercases by default), white selected segment on a track
 const toggleSx = {
-  bgcolor: '#f0f1f4',
+  bgcolor: 'var(--color-surface-variant)',
   p: '2px',
   gap: '2px',
   '& .MuiToggleButton-root': {
@@ -30,8 +30,8 @@ const toggleSx = {
     py: 0.25,
     color: 'text.secondary',
   },
-  '& .MuiToggleButton-root.Mui-selected': { bgcolor: '#fff', color: '#1f5c99' },
-  '& .MuiToggleButton-root.Mui-selected:hover': { bgcolor: '#fff' },
+  '& .MuiToggleButton-root.Mui-selected': { bgcolor: 'var(--color-surface)', color: 'var(--color-primary)' },
+  '& .MuiToggleButton-root.Mui-selected:hover': { bgcolor: 'var(--color-surface)' },
 }
 
 export type MeasureBarProps = {

@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .map-wms-dialog {
   .map-wms-dialog__url {
     display: flex;
@@ -19,7 +21,7 @@
   }
 
   .map-wms-dialog__error {
-    color: #c62828;
+    color: $colorError;
   }
 
   .map-wms-dialog__section {
