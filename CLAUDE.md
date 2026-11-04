@@ -233,6 +233,9 @@ Keep comments short and to the point (JSDoc descriptions included): one line whe
 **Branch names:**
 Give new branches a meaningful, possibly short name describing the change (e.g. `dashboard-activity-log-env-visibility`).
 
+**No Claude attribution:**
+Never add a `Co-Authored-By: Claude` trailer, a "Generated with Claude Code" line or a session link to commits and pull requests.
+
 After creating a PR, wait for the automated checks and reviews to complete, then keep watching the GitHub findings (comments, review threads, failing checks) and address every one:
 
 - Fetch them with `gh` (e.g. `gh pr view <PR#> --comments`, `gh api repos/openforis/arena/pulls/<PR#>/comments` for inline review comments, `gh pr checks <PR#>` for the checks status).
