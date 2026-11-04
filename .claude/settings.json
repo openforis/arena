@@ -6,5 +6,10 @@
   },
   "enabledPlugins": {
     "superpowers@superpowers-dev": true
+  },
+  "attribution": {
+    "commit": "",
+    "pr": "",
+    "sessionUrl": false
   }
 }
