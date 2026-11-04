@@ -22,6 +22,10 @@ test.describe('Data matrix export', () => {
 
     const modal = page.locator('.data-query-export-modal')
     await modal.getByTestId(TestId.dataExport.exportLayoutOption('dataMatrix')).click()
+    // the only record key is selected and cannot be unchecked
+    const recordKeyCheckbox = modal.getByTestId(TestId.dataExport.dataMatrixRecordKey('cluster_id'))
+    await expect(recordKeyCheckbox).toHaveClass(/Mui-checked/)
+    await expect(recordKeyCheckbox).toHaveClass(/Mui-disabled/)
     await selectDropdownItem({
       page,
       dropdown: getDropdown(modal, TestId.dataExport.dataMatrixRowAttribute),

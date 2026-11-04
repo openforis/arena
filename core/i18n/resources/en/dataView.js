@@ -184,6 +184,9 @@ This is the format used by vegetation analysis tools such as Turboveg, Juice and
     },
     preview: 'Preview',
     previewRecord: '{{keys}} of record {{number}}',
+    recordKeys: 'Key attributes used to name the record columns',
+    recordKeysInfo:
+      'Each record becomes a column, named after the values of the selected key attributes (e.g. only the plot number). By default, the key attributes selected in Data Explorer are used, or all of them if none is selected. At least one is required.',
     recordsAll: 'The data of all the records is exported: set a filter in Data Explorer to export only some of them.',
     recordsFiltered: 'Only the data matching the current Data Explorer filter is exported.',
     rowAttribute: 'Rows (taxon attribute name, e.g. species)',

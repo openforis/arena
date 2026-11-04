@@ -62,6 +62,7 @@ describe('Data matrix export', () => {
   const getOptions = (fileFormat: string, filter: string | null = null) => ({
     entityDefUuid: getDefUuid('flora'),
     rowAttributeDefUuids: [getDefUuid('species'), getDefUuid('layer')],
+    recordKeyAttributeDefUuids: [getDefUuid('relevee_id')],
     valueAttributeDefUuid: getDefUuid('cover'),
     // same expression format as the Data Explorer filter
     filter: filter ? Expression.fromString(filter) : null,
@@ -72,6 +73,13 @@ describe('Data matrix export', () => {
     const user = getContextUser()
     const tempFileName = await SurveyRdbService.exportDataMatrixToTempFile({ user, survey, cycle, options } as any)
     return FileUtils.tempFilePath(tempFileName)
+  }
+
+  const exportMatrixHeader = async (options: object) => {
+    const filePath = await exportMatrix(options)
+    const content = await FileUtils.readFile(filePath)
+    await FileUtils.deleteFile(filePath)
+    return content.split(/\r?\n/)[0]
   }
 
   const expectedRows = [
@@ -90,6 +98,7 @@ describe('Data matrix export', () => {
       SB.entity(
         'relevee',
         SB.attribute('relevee_id').key(),
+        SB.attribute('relevee_no', nodeDefType.integer).key(),
         SB.attribute('location', nodeDefType.coordinate),
         SB.entity(
           'flora',
@@ -110,6 +119,7 @@ describe('Data matrix export', () => {
       RB.entity(
         'relevee',
         RB.attribute('relevee_id', 'A'),
+        RB.attribute('relevee_no', 1),
         floraBuilder(findTaxonValue('AGR'), '6', '5'),
         // unlisted species have the same code but they must not be merged
         floraBuilder(findTaxonValue(Taxon.unlistedCode, 'Rumex acetosella'), '6', '7'),
@@ -123,12 +133,17 @@ describe('Data matrix export', () => {
       RB.entity(
         'relevee',
         RB.attribute('relevee_id', 'B'),
+        RB.attribute('relevee_no', 2),
         floraBuilder(findTaxonValue('AGR'), '6', '2'),
         floraBuilder(findTaxonValue('AGR'), '9', '3')
       )
     ).buildAndStore()
 
-    await RB.record(user, survey, RB.entity('relevee', RB.attribute('relevee_id', 'C'))).buildAndStore()
+    await RB.record(
+      user,
+      survey,
+      RB.entity('relevee', RB.attribute('relevee_id', 'C'), RB.attribute('relevee_no', 3))
+    ).buildAndStore()
   })
 
   afterAll(async () => {
@@ -169,6 +184,21 @@ describe('Data matrix export', () => {
 
     expect(content.split(/\r?\n/)[0]).toBe('"species_scientific_name","layer","B"')
     expect(content).not.toContain('Rumex')
+  })
+
+  test('record columns are named after the selected record keys', async () => {
+    const options = { ...getOptions(FileFormats.csv), recordKeyAttributeDefUuids: [getDefUuid('relevee_no')] }
+    expect(await exportMatrixHeader(options)).toBe('"species_scientific_name","layer","1","2"')
+  })
+
+  test('record columns are named after all the record keys when not specified', async () => {
+    const options = { ...getOptions(FileFormats.csv), recordKeyAttributeDefUuids: undefined }
+    expect(await exportMatrixHeader(options)).toBe('"species_scientific_name","layer","A - 1","B - 2"')
+  })
+
+  test('attributes other than the record keys cannot name the record columns', async () => {
+    const options = { ...getOptions(FileFormats.csv), recordKeyAttributeDefUuids: [getDefUuid('flora_row_no')] }
+    await expect(exportMatrix(options)).rejects.toThrow('Invalid data matrix record key attribute')
   })
 
   test('an export without rows is rejected', async () => {

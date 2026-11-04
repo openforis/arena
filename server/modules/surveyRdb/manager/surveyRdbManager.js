@@ -439,6 +439,16 @@ const getDataMatrixColumnName = ({ viewDataNodeDef, nodeDef }) => {
   return NodeDef.isTaxon(nodeDef) ? `${name}${ColumnNodeDef.columnSuffixTaxonScientificName}` : name
 }
 
+// all the record keys when not specified, always in the survey order
+const getDataMatrixRecordKeyDefs = ({ survey, recordKeyAttributeDefUuids }) => {
+  const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+  if (A.isNil(recordKeyAttributeDefUuids)) return rootKeyDefs
+  const rootKeyDefUuids = new Set(rootKeyDefs.map(NodeDef.getUuid))
+  const invalidUuid = recordKeyAttributeDefUuids.find((uuid) => !rootKeyDefUuids.has(uuid))
+  if (invalidUuid) throw new Error(`Invalid data matrix record key attribute: ${invalidUuid}`)
+  return rootKeyDefs.filter((keyDef) => recordKeyAttributeDefUuids.includes(NodeDef.getUuid(keyDef)))
+}
+
 const getDataMatrixDefs = ({ survey, cycle, options }) => {
   const { entityDefUuid, rowAttributeDefUuids, valueAttributeDefUuid } = options
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
@@ -453,6 +463,7 @@ const getDataMatrixDefs = ({ survey, cycle, options }) => {
   }
   return {
     entityDef,
+    keyDefs: getDataMatrixRecordKeyDefs({ survey, recordKeyAttributeDefUuids: options.recordKeyAttributeDefUuids }),
     rowDefs: rowAttributeDefUuids.map(findAttributeDef),
     valueDef: findAttributeDef(valueAttributeDefUuid),
   }
@@ -475,7 +486,7 @@ const checkCanExportDataMatrix = ({ fileFormat, fields, items }) => {
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are included.
- * @param {!object} [params.options] - The entity, row and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
+ * @param {!object} [params.options] - The entity, row, record key (all when not specified) and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<{fields: string[], items: object[]}>} - The output fields and items.
  */
@@ -486,14 +497,13 @@ export const fetchEntityDataMatrix = async (
   // the records filter of the view data query is applied only when a cycle is specified
   if (A.isNil(cycle)) throw new Error('Cycle not specified')
 
-  const { entityDef, rowDefs, valueDef } = getDataMatrixDefs({ survey, cycle, options })
+  const { entityDef, keyDefs, rowDefs, valueDef } = getDataMatrixDefs({ survey, cycle, options })
 
   const filterRecordUuids = await _determineRecordUuidsFilter({ survey, cycle, user })
   if (filterRecordUuids?.length === 0) {
     throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
   }
 
-  const keyDefs = Survey.getNodeDefRootKeys(survey)
   const query = Query.assocFilter(options.filter ?? null)(
     Query.create({
       entityDefUuid: NodeDef.getUuid(entityDef),

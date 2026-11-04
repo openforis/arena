@@ -186,6 +186,9 @@ C'est le format utilisé par les outils d'analyse de la végétation comme Turbo
     },
     preview: 'Aperçu',
     previewRecord: "{{keys}} de l'enregistrement {{number}}",
+    recordKeys: 'Attributs clés utilisés pour nommer les colonnes des enregistrements',
+    recordKeysInfo:
+      "Chaque enregistrement devient une colonne, nommée d'après les valeurs des attributs clés sélectionnés (p. ex. uniquement le numéro de placette). Par défaut, les attributs clés sélectionnés dans l'Explorateur de données sont utilisés, ou tous si aucun n'est sélectionné. Au moins un est requis.",
     recordsAll:
       "Les données de tous les enregistrements sont exportées : définissez un filtre dans l'Explorateur de données pour n'en exporter que certains.",
     recordsFiltered: "Seules les données correspondant au filtre actuel de l'Explorateur de données sont exportées.",
