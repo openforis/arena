@@ -285,6 +285,20 @@ test.describe('Map workspace', () => {
     await expect(page.getByRole('menu')).toHaveCount(0)
   })
 
+  test('search finds the records of the shown layers by key', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    const search = page.getByTestId(ids.searchInput)
+    await expect(search).toHaveAttribute('placeholder', 'Record key or coordinates')
+    await search.fill('2')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('2')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
+  })
+
   test('search goes to coordinates and marks them', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
     const search = page.getByTestId(ids.searchInput)

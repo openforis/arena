@@ -55,15 +55,13 @@ const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
   const { activeLayers, selectPoint } = useMapLayersPanel()
   const experimentalFeatures = useSystemConfigExperimentalFeatures()
 
-  const records = useMemo<MapWorkspaceRecords | undefined>(
-    () =>
-      experimentalFeatures
-        ? {
-            candidates: buildRecordCandidates(activeLayers),
-            onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
-          }
-        : undefined,
-    [activeLayers, experimentalFeatures, selectPoint]
+  // the search finds the records of the shown layers for everyone; the Records tab stays experimental
+  const records = useMemo<MapWorkspaceRecords>(
+    () => ({
+      candidates: buildRecordCandidates(activeLayers),
+      onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
+    }),
+    [activeLayers, selectPoint]
   )
 
   return (
