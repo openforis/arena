@@ -1,9 +1,11 @@
 import fs from 'node:fs'
 
-import { Locator, Page } from '@playwright/test'
+import { DB } from '@openforis/arena-server'
+import { APIRequestContext, Locator, Page, request as playwrightRequest } from '@playwright/test'
 
 import { TestId } from '@webapp/utils/testId'
 
+import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
 import { expect, test } from '../fixtures'
 import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import { RecordForm } from '../helpers/recordForm'
@@ -121,6 +123,21 @@ const boxOf = async (locator: Locator): Promise<{ x: number; y: number; width: n
  * @returns {Locator} The Leaflet tooltip.
  */
 const measureLabel = (page: Page): Locator => page.locator('.leaflet-tooltip-pane .leaflet-tooltip')
+
+/**
+ * Creates an API client logged in as a user.
+ * @param {string} baseURL - The Arena base URL.
+ * @param {string} email - The user email.
+ * @returns {Promise<APIRequestContext>} The client, sending the auth token of the user.
+ */
+const loginApi = async (baseURL: string, email: string): Promise<APIRequestContext> => {
+  const login = await playwrightRequest.newContext({ baseURL })
+  const response = await login.post('/auth/login', { data: { email, password: TEST_USER_PASSWORD } })
+  expect(response.ok(), `login of ${email} failed`).toBeTruthy()
+  const { authToken } = await response.json()
+  await login.dispose()
+  return playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Authorization: `Bearer ${authToken}` } })
+}
 
 test.describe('Map workspace', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
@@ -254,6 +271,27 @@ test.describe('Map workspace', () => {
     await row.getByRole('button', { name: 'Remove plots.kml' }).click()
     await expect(row).toHaveCount(0)
     await expect(markers).toHaveCount(0)
+  })
+
+  test('the popup of an uploaded KML place shows its text and simple HTML but runs no script', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark>
+<name>&lt;img src=x onerror="window.kmlXss=1"&gt;Plot B</name>
+<description><![CDATA[<b>bold</b><img src=x onerror="window.kmlXss=2">]]></description>
+<Point><coordinates>12.5,41.9,0</coordinates></Point></Placemark></Document></kml>`
+    await openMap(page)
+    await page
+      .getByTestId(ids.uploadInput)
+      .setInputFiles({ name: 'xss.kml', mimeType: 'application/vnd.google-earth.kml+xml', buffer: Buffer.from(kml) })
+    await page.locator('.leaflet-marker-pane .leaflet-marker-icon').click()
+    const popup = page.locator('.kml-popup')
+    await expect(popup.locator('h2')).toContainText('Plot B')
+    await expect(popup.locator('b')).toHaveText('bold')
+    await expect(popup.locator('[onerror]')).toHaveCount(0)
+    expect(await page.evaluate(() => (window as unknown as { kmlXss?: number }).kmlXss)).toBeUndefined()
   })
 
   test('unsupported and broken files show a message', async ({ page, sampleSurvey: _ }) => {
@@ -504,6 +542,52 @@ test.describe('Map workspace', () => {
     const { status, body } = await api.getRaw(`/api/survey/${sampleSurvey.id}/geo/map/custom-layers`)
     expect(status).toBe(200)
     expect(body).toEqual({ surveyLayers: [], userLayers: [] })
+  })
+
+  test('survey custom layers are written by the survey editors only', async ({ baseURL, testUser, sampleSurvey }) => {
+    const outsiderEmail = `e2e-outsider-${Date.now().toString(36)}@openforis-arena.org`
+    // a user without any survey or group: it cannot edit the survey
+    await DB.none(`INSERT INTO "user" (name, email, password, status) VALUES ('Outsider', $1, $2, 'ACCEPTED')`, [
+      outsiderEmail,
+      TEST_USER_PASSWORD_ENCRYPTED,
+    ])
+    const owner = await loginApi(baseURL!, testUser.email)
+    const outsider = await loginApi(baseURL!, outsiderEmail)
+    const base = `/api/survey/${sampleSurvey.id}/geo/map/custom-layers`
+    const layer = {
+      id: '5f0c7a4e-8a3b-4c1d-9e2f-0a1b2c3d4e5f',
+      kind: 'xyz',
+      role: 'overlay',
+      name: CUSTOM_LAYER_NAME,
+      url: `${CUSTOM_TILE_HOST}/{z}/{x}/{y}.png`,
+      format: 'image/png',
+      opacity: 1,
+      attribution: '',
+    }
+    try {
+      const refused = await outsider.post(`${base}/survey`, { data: { layers: [layer] } })
+      // shortcut: 403 expected, but the arena-server UnauthorizedError skips systemErrorMiddleware and ends as a 500
+      // on every guarded API (master too); assert 403 once that middleware handles it
+      expect(refused.status()).toBeGreaterThanOrEqual(400)
+      expect((await (await owner.get(base)).json()).surveyLayers).toEqual([])
+
+      const added = await owner.post(`${base}/survey`, { data: { layers: [layer] } })
+      expect(added.status()).toBe(200)
+      const listed = await (await owner.get(base)).json()
+      expect(listed.surveyLayers).toHaveLength(1)
+      expect(listed.surveyLayers[0].name).toBe(CUSTOM_LAYER_NAME)
+
+      expect((await outsider.delete(`${base}/survey/${listed.surveyLayers[0].id}`)).status()).toBeGreaterThanOrEqual(
+        400
+      )
+      const removed = await owner.delete(`${base}/survey/${listed.surveyLayers[0].id}`)
+      expect(removed.status()).toBe(200)
+      expect((await (await owner.get(base)).json()).surveyLayers).toEqual([])
+    } finally {
+      await owner.dispose()
+      await outsider.dispose()
+      await DB.none(`DELETE FROM "user" WHERE email = $1`, [outsiderEmail])
+    }
   })
 
   test('refuses capabilities URLs that point to the server or its network', async ({ api, sampleSurvey }) => {
