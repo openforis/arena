@@ -1,3 +1,4 @@
+/* eslint jest/expect-expect: ['warn', { assertFunctionNames: ['expect', 'expectPoint'] }] */
 import {
   buildMapSearchResults,
   findRecordCandidates,
@@ -36,6 +37,13 @@ describe('Map search query (253)', () => {
     expectPoint('37M 271977 E 9953205 N', -0.4230965, 36.951199, 5)
     expectPoint('33T 292335 4642016', 41.9028, 12.4964, 4)
     expectPoint('33t 292335, 4642016', 41.9028, 12.4964, 4)
+  })
+
+  test('UTM letter as hemisphere (S/N) or latitude band', () => {
+    expectPoint('37S 271977 9953205', -0.4230965, 36.951199, 5)
+    expectPoint('37M 271977 9953205', -0.4230965, 36.951199, 5)
+    expectPoint('37N 271977 500000', 4.52, 36.95, 1)
+    expect(parseMapSearchQuery('33X 500000 9990000')).toEqual({ type: 'invalidCoordinates' })
   })
 
   test('invalid UTM values', () => {

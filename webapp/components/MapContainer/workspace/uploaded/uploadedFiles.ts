@@ -20,3 +20,12 @@ export const getUploadedFileKind = (fileName: string): UploadedFileKind | null =
   if (dotIndex < 0) return null
   return KIND_BY_EXTENSION[fileName.slice(dotIndex + 1).toLowerCase()] ?? null
 }
+
+export const MAX_UPLOAD_SIZE_MB = 50
+
+/**
+ * Tells whether a file is too large to be read in the browser.
+ * @param {number} sizeBytes - The file size in bytes.
+ * @returns {boolean} True when it is over the limit.
+ */
+export const isUploadTooLarge = (sizeBytes: number): boolean => sizeBytes > MAX_UPLOAD_SIZE_MB * 1024 * 1024

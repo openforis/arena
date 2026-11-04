@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import type { ReactElement } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap, useMapEvents } from 'react-leaflet'
@@ -81,7 +81,11 @@ export const MapStatusBar = ({ records }: { records?: MapWorkspaceRecords }): Re
 
   const point = cursor ?? view.center
   const scaleBar = getScaleBar(metersPerPixel(view.center.lat, view.zoom))
-  const recordsInView = variant === 'full' && records ? countPointsInBounds(records.candidates, view.bounds) : null
+  // not on every mouse move: the bounds change only on moveend / resize
+  const recordsInView = useMemo(
+    () => (variant === 'full' && records ? countPointsInBounds(records.candidates, view.bounds) : null),
+    [variant, records, view.bounds]
+  )
 
   return (
     <>

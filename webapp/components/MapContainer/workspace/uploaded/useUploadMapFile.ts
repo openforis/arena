@@ -8,7 +8,7 @@ import { useNotifyError, useNotifyWarning } from '@webapp/components/hooks'
 import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 import { exitFullScreen } from '../tools/useFullScreen'
 import { readUploadedFile, setUploadedLayerOpacity } from './readUploadedFile'
-import { getUploadedFileKind } from './uploadedFiles'
+import { getUploadedFileKind, isUploadTooLarge, MAX_UPLOAD_SIZE_MB } from './uploadedFiles'
 
 const UPLOADED_LAYER_OPACITY = 0.8
 
@@ -30,6 +30,11 @@ export const useUploadMapFile = (): ((file: File) => Promise<void>) => {
         // app notifications render outside the workspace: invisible in full screen
         exitFullScreen()
         notifyWarning({ key: 'mapWorkspace.upload.unsupported' })
+        return
+      }
+      if (isUploadTooLarge(file.size)) {
+        exitFullScreen()
+        notifyWarning({ key: 'mapWorkspace.upload.tooLarge', params: { maxSize: MAX_UPLOAD_SIZE_MB } })
         return
       }
       try {

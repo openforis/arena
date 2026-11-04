@@ -1,5 +1,5 @@
 import type { MapRecordCandidate } from '../mapWorkspaceTypes'
-import { utmToLatLon } from '../statusbar/coordinateFormat'
+import { getUtmBand, utmToLatLon } from '../statusbar/coordinateFormat'
 
 export type MapSearchQuery =
   | { type: 'empty' }
@@ -51,6 +51,35 @@ const isValidLatLng = (lat: number, lng: number): boolean =>
 const toCoordinatesQuery = (lat: number, lng: number): MapSearchQuery =>
   isValidLatLng(lat, lng) ? { type: 'coordinates', lat, lng } : { type: 'invalidCoordinates' }
 
+// latitudes covered by UTM
+const UTM_MIN_LAT = -80
+const UTM_MAX_LAT = 84
+
+/**
+ * Converts a UTM coordinate whose letter is a latitude band (C-M south, N-X north) or, for S and N, a hemisphere.
+ * @param {object} params - Parameters.
+ * @param {number} params.zone - Zone number.
+ * @param {string} params.letter - The upper case letter after the zone.
+ * @param {number} params.easting - Easting in metres.
+ * @param {number} params.northing - Northing in metres.
+ * @returns {{lat: number, lng: number}|null} The point, or null when no reading fits within UTM latitudes.
+ */
+const resolveUtmPoint = (params: {
+  zone: number
+  letter: string
+  easting: number
+  northing: number
+}): { lat: number; lng: number } | null => {
+  const { zone, letter, easting, northing } = params
+  const inRange = (point: { lat: number; lng: number } | null | undefined) =>
+    point && point.lat >= UTM_MIN_LAT && point.lat <= UTM_MAX_LAT ? point : null
+  const asBand = inRange(utmToLatLon({ zone, southern: letter < 'N', easting, northing }))
+  if (asBand && getUtmBand(asBand.lat) === letter) return asBand
+  // "37S" is also the common way to write "zone 37, southern hemisphere"
+  if (letter !== 'S' && letter !== 'N') return null
+  return inRange(utmToLatLon({ zone, southern: letter === 'S', easting, northing }))
+}
+
 /**
  * Parses a UTM coordinate text.
  * @param {string} text - The trimmed search text.
@@ -66,9 +95,7 @@ const parseUtm = (text: string): MapSearchQuery | null => {
   if (zone < 1 || zone > 60 || easting < UTM_MIN_EASTING || easting > UTM_MAX_EASTING || northing > UTM_MAX_NORTHING) {
     return { type: 'invalidCoordinates' }
   }
-  // bands C-M are south of the equator
-  const southern = band.toUpperCase() < 'N'
-  const point = utmToLatLon({ zone, southern, easting, northing })
+  const point = resolveUtmPoint({ zone, letter: band.toUpperCase(), easting, northing })
   return point ? toCoordinatesQuery(point.lat, point.lng) : { type: 'invalidCoordinates' }
 }
 
