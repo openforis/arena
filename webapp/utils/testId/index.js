@@ -59,6 +59,7 @@ export const TestId = {
     samplingSection: 'dashboard-sampling-section',
   },
   dataExport: {
+    dataMatrixRecordKey: (name) => `dataMatrixRecordKey_${name}`,
     dataMatrixRowAttribute: 'dataMatrixRowAttribute',
     dataMatrixSecondRowAttribute: 'dataMatrixSecondRowAttribute',
     dataMatrixValueAttribute: 'dataMatrixValueAttribute',

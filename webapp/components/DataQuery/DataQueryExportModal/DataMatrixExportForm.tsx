@@ -12,7 +12,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
 import { Button } from '@webapp/components'
-import { ButtonGroup } from '@webapp/components/form'
+import { ButtonGroup, Checkbox } from '@webapp/components/form'
 import Dropdown from '@webapp/components/form/Dropdown'
 import { FormItem } from '@webapp/components/form/Input'
 import Markdown from '@webapp/components/markdown'
@@ -47,6 +47,35 @@ const AttributeDropdown = ({ info, items, label, onChange, testId, value }: Attr
       selection={items.find((item) => item.value === value) ?? null}
       testId={testId}
     />
+  </FormItem>
+)
+
+type RecordKeysCheckboxesProps = {
+  keyDefs: any[]
+  lang: string
+  onChange: (keyDefUuid: string, selected: boolean) => void
+  selectedKeyDefUuids: string[]
+}
+
+const RecordKeysCheckboxes = ({ keyDefs, lang, onChange, selectedKeyDefUuids }: RecordKeysCheckboxesProps) => (
+  <FormItem info="dataView:dataMatrixExport.recordKeysInfo" label="dataView:dataMatrixExport.recordKeys">
+    <div className="data-matrix-export__record-keys">
+      {keyDefs.map((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        const checked = selectedKeyDefUuids.includes(keyDefUuid)
+        return (
+          <Checkbox
+            key={keyDefUuid}
+            checked={checked}
+            // at least one key is needed to name the record columns
+            disabled={checked && selectedKeyDefUuids.length === 1}
+            label={<span>{NodeDef.getLabel(keyDef, lang)}</span>}
+            onChange={(selected: boolean) => onChange(keyDefUuid, selected)}
+            testId={TestId.dataExport.dataMatrixRecordKey(NodeDef.getName(keyDef))}
+          />
+        )
+      })}
+    </div>
   </FormItem>
 )
 
@@ -113,11 +142,27 @@ export const DataMatrixExportForm = (props: Props) => {
   const [valueDefUuid, setValueDefUuid] = useState<string | null>(null)
   const [fileFormat, setFileFormat] = useState(FileFormats.xlsx)
 
+  const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+  const rootKeyDefUuids: string[] = rootKeyDefs.map(NodeDef.getUuid)
+  // the keys selected in Data Explorer, or all of them when none is selected
+  const [recordKeyDefUuids, setRecordKeyDefUuids] = useState<string[]>(() => {
+    const queryAttributeDefUuids = Query.getAttributeDefUuids(query)
+    const queryKeyDefUuids = rootKeyDefUuids.filter((uuid) => queryAttributeDefUuids.includes(uuid))
+    return queryKeyDefUuids.length > 0 ? queryKeyDefUuids : rootKeyDefUuids
+  })
+
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const entityLabel = NodeDef.getLabel(entityDef, lang)
-  const keysLabel = Survey.getNodeDefRootKeys(survey)
+  const keysLabel = rootKeyDefs
+    .filter((keyDef: any) => recordKeyDefUuids.includes(NodeDef.getUuid(keyDef)))
     .map((keyDef: any) => NodeDef.getLabel(keyDef, lang))
     .join(' - ')
+
+  // keeps the keys in the survey order, used in the record column names
+  const onRecordKeyChange = (keyDefUuid: string, selected: boolean) =>
+    setRecordKeyDefUuids((prevUuids) =>
+      rootKeyDefUuids.filter((uuid) => (uuid === keyDefUuid ? selected : prevUuids.includes(uuid)))
+    )
 
   const attributeItems: DropdownItem[] = getDataMatrixAttributeDefs({ survey, cycle, entityDef }).map((nodeDef) => ({
     value: NodeDef.getUuid(nodeDef),
@@ -134,7 +179,14 @@ export const DataMatrixExportForm = (props: Props) => {
 
   const onExportClick = async () => {
     const rowAttributeDefUuids = [rowDefUuid, secondRowDefUuid].filter(Boolean)
-    const options = { entityDefUuid, rowAttributeDefUuids, valueAttributeDefUuid: valueDefUuid, filter, fileFormat }
+    const options = {
+      entityDefUuid,
+      rowAttributeDefUuids,
+      recordKeyAttributeDefUuids: recordKeyDefUuids,
+      valueAttributeDefUuid: valueDefUuid,
+      filter,
+      fileFormat,
+    }
     const job = await API.startExportDataMatrixJob({ surveyId, cycle, options })
     dispatch(JobActions.showJobMonitor({ job, closeButton: DataMatrixExportDownloadButton }) as any)
     onClose()
@@ -165,6 +217,12 @@ export const DataMatrixExportForm = (props: Props) => {
         onChange={setSecondRowDefUuid}
         testId={TestId.dataExport.dataMatrixSecondRowAttribute}
         value={secondRowDefUuid}
+      />
+      <RecordKeysCheckboxes
+        keyDefs={rootKeyDefs}
+        lang={lang}
+        onChange={onRecordKeyChange}
+        selectedKeyDefUuids={recordKeyDefUuids}
       />
       <AttributeDropdown
         info="dataView:dataMatrixExport.valueAttributeInfo"

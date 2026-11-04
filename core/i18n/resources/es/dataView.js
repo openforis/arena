@@ -173,6 +173,9 @@ Es el formato utilizado por herramientas de análisis de vegetación como Turbov
     },
     preview: 'Vista previa',
     previewRecord: '{{keys}} del registro {{number}}',
+    recordKeys: 'Atributos clave usados para nombrar las columnas de los registros',
+    recordKeysInfo:
+      'Cada registro se convierte en una columna, con el nombre formado por los valores de los atributos clave seleccionados (p. ej. solo el número de parcela). Por defecto se usan los atributos clave seleccionados en el Explorador de datos, o todos si no se ha seleccionado ninguno. Se requiere al menos uno.',
     recordsAll:
       'Se exportan los datos de todos los registros: defina un filtro en el Explorador de datos para exportar solo algunos.',
     recordsFiltered: 'Solo se exportan los datos que cumplen el filtro actual del Explorador de datos.',
