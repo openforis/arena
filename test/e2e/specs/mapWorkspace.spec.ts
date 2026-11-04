@@ -46,7 +46,7 @@ const openMap = async (page: Page): Promise<void> => {
 /**
  * Starts a tool from the Tools menu (the full bar has no quick buttons for the tools).
  * @param {Page} page - The page.
- * @param {string} itemKey - The menu item: measureDistance, measureArea, screenshot.
+ * @param {string} itemKey - The menu item: measureDistance, measureArea.
  * @returns {Promise<void>} Resolves when the item is clicked.
  */
 const startFromToolsMenu = async (page: Page, itemKey: string): Promise<void> => {
@@ -516,9 +516,9 @@ test.describe('Map workspace', () => {
 test.describe('Map screenshot', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords, withClusterImage: true } })
 
-  test('downloads the map as a PNG from the Tools menu', async ({ page, sampleSurvey: _ }) => {
+  test('downloads the map as a PNG from the quick button', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
-    await startFromToolsMenu(page, 'screenshot')
+    await page.getByTestId(ids.quickButton('screenshot')).click()
     await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
 
     await page.getByTestId(ids.screenshotTarget('file')).click()
@@ -543,8 +543,7 @@ test.describe('Map screenshot', () => {
     await coordinateLayer.check()
     await expect(coordinateLayer).toBeChecked()
 
-    await page.getByTestId(ids.menuButton('tools')).click()
-    await page.getByTestId(ids.menuItem('screenshot')).click()
+    await page.getByTestId(ids.quickButton('screenshot')).click()
     await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
 
     const plotSelect = page.getByTestId(ids.screenshotPlot)

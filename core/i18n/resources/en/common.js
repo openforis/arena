@@ -708,7 +708,7 @@ Try again?`,
       done: 'Done',
     },
     screenshot: {
-      menuItem: 'Screenshot to plot record…',
+      quickButton: 'Screenshot',
       title: 'Map screenshot',
       capture: 'Capture',
       captureView: 'Current view',

@@ -26,12 +26,6 @@ export const ToolsMenu = (): ReactElement => {
           labelKey="mapWorkspace.measure.measureArea"
           onClick={() => close(() => dispatch({ type: 'startTool', tool: 'measureArea' }))}
         />,
-        <MenuActionItem
-          key="screenshot"
-          itemKey="screenshot"
-          labelKey="mapWorkspace.screenshot.menuItem"
-          onClick={() => close(() => dispatch({ type: 'openDialog', dialog: 'screenshot' }))}
-        />,
       ]}
     </ToolbarMenu>
   )

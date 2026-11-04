@@ -712,7 +712,7 @@ Réessayer ?`,
       done: 'Terminé',
     },
     screenshot: {
-      menuItem: 'Capture d’écran vers un enregistrement de placette…',
+      quickButton: 'Capture d’écran',
       title: 'Capture de la carte',
       capture: 'Capturer',
       captureView: 'Vue actuelle',

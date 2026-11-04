@@ -710,7 +710,7 @@ export default {
       done: 'Болсон',
     },
     screenshot: {
-      menuItem: 'Дэлгэцийн зургийг талбайн бичлэгт…',
+      quickButton: 'Дэлгэцийн зураг',
       title: 'Газрын зургийн дэлгэцийн зураг',
       capture: 'Авах хэсэг',
       captureView: 'Одоогийн харагдац',

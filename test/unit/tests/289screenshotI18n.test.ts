@@ -28,7 +28,7 @@ const enStrings = screenshotStrings('en')
 describe('Screenshot i18n (289)', () => {
   test('English has the screenshot strings', () => {
     expect(Object.keys(enStrings)).toHaveLength(41)
-    expect(enStrings.menuItem).toBe('Screenshot to plot record…')
+    expect(enStrings.quickButton).toBe('Screenshot')
     expect(enStrings['notices.tilesMissing']).toContain('{{count}}')
   })
 

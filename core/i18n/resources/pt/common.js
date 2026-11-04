@@ -711,7 +711,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       done: 'Concluído',
     },
     screenshot: {
-      menuItem: 'Captura de tela para registro de parcela…',
+      quickButton: 'Captura de tela',
       title: 'Captura do mapa',
       capture: 'Capturar',
       captureView: 'Vista atual',

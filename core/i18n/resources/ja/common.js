@@ -707,7 +707,7 @@ export default {
       done: '完了',
     },
     screenshot: {
-      menuItem: 'スクリーンショットをプロットの記録へ…',
+      quickButton: 'スクリーンショット',
       title: '地図のスクリーンショット',
       capture: '範囲',
       captureView: '現在の表示',

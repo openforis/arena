@@ -725,7 +725,7 @@ export default {
       done: 'Готово',
     },
     screenshot: {
-      menuItem: 'Снимок карты в запись участка…',
+      quickButton: 'Снимок экрана',
       title: 'Снимок карты',
       capture: 'Область',
       captureView: 'Текущий вид',

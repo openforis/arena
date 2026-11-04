@@ -688,7 +688,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       done: 'Hecho',
     },
     screenshot: {
-      menuItem: 'Captura de pantalla a registro de parcela…',
+      quickButton: 'Captura de pantalla',
       title: 'Captura del mapa',
       capture: 'Capturar',
       captureView: 'Vista actual',
