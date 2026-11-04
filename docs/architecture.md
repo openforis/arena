@@ -18,12 +18,12 @@ flowchart LR
   mobile -. "REST API (/api/mobile/...)" .-> arena
 ```
 
-| Repository | What lives there |
-| --- | --- |
-| [arena](https://github.com/openforis/arena) | The web application (`webapp/`) and the server application (`server/`): API, jobs, imports/exports, analysis. |
-| [arena-core](https://github.com/openforis/arena-core) | TypeScript domain model shared by every other piece: survey/node def/record types and utilities, record updater, validation, expression evaluation, `ServiceRegistry`. |
+| Repository                                                | What lives there                                                                                                                                                                            |
+| --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [arena](https://github.com/openforis/arena)               | The web application (`webapp/`) and the server application (`server/`): API, jobs, imports/exports, analysis.                                                                               |
+| [arena-core](https://github.com/openforis/arena-core)     | TypeScript domain model shared by every other piece: survey/node def/record types and utilities, record updater, validation, expression evaluation, `ServiceRegistry`.                      |
 | [arena-server](https://github.com/openforis/arena-server) | Server foundation: Express app bootstrap (`ArenaServer`), DB connection and migrations, authentication, WebSocket server, cluster bus and locks, job/user/survey repositories and services. |
-| [arena-mobile](https://github.com/openforis/arena-mobile) | Offline data collection app (React Native / Expo). Downloads survey packages and uploads records through the `/api/mobile/...` endpoints (`server/modules/mobile/`). |
+| [arena-mobile](https://github.com/openforis/arena-mobile) | Offline data collection app (React Native / Expo). Downloads survey packages and uploads records through the `/api/mobile/...` endpoints (`server/modules/mobile/`).                        |
 
 Things to keep in mind:
 
@@ -66,10 +66,10 @@ socket.io; see [infra/k8s/README.md](../infra/k8s/README.md).
 
 PostgreSQL with PostGIS, accessed with pg-promise. Schemas:
 
-| Schema | Content |
-| --- | --- |
-| `public` | Users, auth groups, user groups, surveys (with their info props), jobs, messages, cluster bus tables. |
-| `survey_<id>` | The survey definition (node defs, categories, taxonomies, analysis chains), its records and nodes, files, activity log. |
+| Schema             | Content                                                                                                                                                                                          |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `public`           | Users, auth groups, user groups, surveys (with their info props), jobs, messages, cluster bus tables.                                                                                            |
+| `survey_<id>`      | The survey definition (node defs, categories, taxonomies, analysis chains), its records and nodes, files, activity log.                                                                          |
 | `survey_<id>_data` | The "RDB": one table per entity with one column per attribute, plus views. Generated from the survey definition and filled from the nodes; read by the data explorer, data exports and analysis. |
 
 - **Draft vs published.** Survey definition rows have `props` (published) and `props_draft` (changes
