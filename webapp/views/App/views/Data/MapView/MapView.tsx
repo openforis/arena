@@ -12,7 +12,7 @@ import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
 import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useI18n } from '@webapp/store/system'
 
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
@@ -38,7 +38,7 @@ type MapViewContentProps = {
   overlayGroups: LayerGroup[]
 }
 
-// the Records tab (experimental): the records of the shown layers, as in the former side panel
+// the Records tab: the records of the shown layers, to go from one to the next as in the former side panel
 const RECORDS_RAIL_TABS: MapRailTab[] = [
   {
     key: 'records',
@@ -48,14 +48,11 @@ const RECORDS_RAIL_TABS: MapRailTab[] = [
     content: <MapLayersPanel />,
   },
 ]
-const NO_RAIL_TABS: MapRailTab[] = []
 
 // MapContainer must always occupy the same position in the React tree so Leaflet never unmounts
 const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
   const { activeLayers, selectPoint } = useMapLayersPanel()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-
-  // the search finds the records of the shown layers for everyone; the Records tab stays experimental
+  // the search finds the records the Records tab lists
   const records = useMemo<MapWorkspaceRecords>(
     () => ({
       candidates: buildRecordCandidates(activeLayers),
@@ -69,7 +66,7 @@ const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
       variant="full"
       layers={layers}
       overlayGroups={overlayGroups}
-      extraRailTabs={experimentalFeatures ? RECORDS_RAIL_TABS : NO_RAIL_TABS}
+      extraRailTabs={RECORDS_RAIL_TABS}
       records={records}
     />
   )

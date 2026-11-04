@@ -285,6 +285,18 @@ test.describe('Map workspace', () => {
     await expect(page.getByRole('menu')).toHaveCount(0)
   })
 
+  test('the Records tab lists the records of the shown layers and goes to one', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    await page.getByTestId(ids.railTab('records')).click()
+    const rail = page.getByTestId(ids.rail)
+    await rail.getByRole('button', { name: '2', exact: true }).click()
+    await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
+  })
+
   test('search finds the records of the shown layers by key', async ({ page, sampleSurvey: _ }) => {
     await openMap(page)
     const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
