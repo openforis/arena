@@ -40,6 +40,9 @@ export const CAPABILITIES_MAX_BYTES = 2 * 1024 * 1024
 const REDIRECT_LOCATION_MAX_LENGTH = 300
 const TIMEOUT_ERROR_CODES = new Set(['ECONNABORTED', 'ETIMEDOUT', 'ERR_CANCELED'])
 const TIMEOUT_ERROR_NAMES = new Set(['AbortError', 'CanceledError', 'TimeoutError'])
+// a capabilities document costs much memory and event loop time to parse: refuse instead of queuing
+export const MAX_CONCURRENT_FETCHES = 4
+
 const XML_LIKE_CONTENT_TYPES = ['', 'text/plain', 'application/octet-stream']
 
 /**
@@ -223,10 +226,33 @@ const isXmlResponse = ({ contentType, body }: { contentType: string; body: strin
   return XML_LIKE_CONTENT_TYPES.includes(mimeType) && body.trimStart().startsWith('<')
 }
 
+let activeFetches = 0
+
+/**
+ * Picks the text encoding of a body: the Content-Type charset, else the XML declaration encoding, else UTF-8.
+ * @param {object} params - Parameters.
+ * @param {string} params.contentType - The lower-case Content-Type header.
+ * @param {Uint8Array|ArrayBuffer} params.data - The body bytes.
+ * @returns {string} A label accepted by TextDecoder.
+ */
+const detectEncoding = ({ contentType, data }: { contentType: string; data: ArrayBuffer | Uint8Array }): string => {
+  const head = new TextDecoder('latin1').decode(
+    (data instanceof Uint8Array ? data : new Uint8Array(data)).subarray(0, 200)
+  )
+  const label =
+    /charset\s*=\s*["']?([\w.:-]+)/.exec(contentType)?.[1] ??
+    /^\s*<\?xml[^>]*encoding\s*=\s*["']([\w.:-]+)/.exec(head)?.[1]
+  try {
+    return new TextDecoder(label ?? 'utf-8').encoding
+  } catch {
+    return 'utf-8' // unknown label
+  }
+}
+
 /**
  * Checks the status and the type of a response and decodes its body.
  * @param {HttpResponse} response - The response.
- * @returns {FetchedText} The body (UTF-8, byte order mark removed) and the content type.
+ * @returns {FetchedText} The body (decoded, byte order mark removed) and the content type.
  * @throws {SystemError} redirectNotFollowed, fetchFailed or notCapabilities.
  */
 const readResponse = (response: HttpResponse): FetchedText => {
@@ -237,7 +263,7 @@ const readResponse = (response: HttpResponse): FetchedText => {
   }
   if (status < 200 || status >= 300) throw newMapCustomLayersError('fetchFailed', { status })
   const contentType = String(headers['content-type'] ?? '').toLowerCase()
-  const body = new TextDecoder('utf-8').decode(response.data)
+  const body = new TextDecoder(detectEncoding({ contentType, data: response.data })).decode(response.data)
   if (!isXmlResponse({ contentType, body })) throw newMapCustomLayersError('notCapabilities')
   return { body, contentType }
 }
@@ -258,12 +284,11 @@ export const createSafeHttpFetcher = ({
   maxBytes = CAPABILITIES_MAX_BYTES,
 }: { dnsLookup?: DnsLookup; httpGet?: HttpGet; timeoutMs?: number; maxBytes?: number } = {}): SafeHttpFetcher => {
   /**
-   * Fetches a document: vets the host, pins the connection, checks the response.
+   * Vets the host, pins the connection, checks the response.
    * @param {URL} url - The user-given URL.
    * @returns {Promise<FetchedText>} The body and the content type.
-   * @throws {SystemError} A map custom layers error.
    */
-  const fetchText = async (url: URL): Promise<FetchedText> => {
+  const fetchVetted = async (url: URL): Promise<FetchedText> => {
     const addresses = await resolvePublicAddresses({ hostname: url.hostname, dnsLookup, timeoutMs })
     const config = buildRequestConfig({ addresses, timeoutMs, maxBytes })
     let response: HttpResponse
@@ -273,6 +298,21 @@ export const createSafeHttpFetcher = ({
       throw toFetchError(error, { timeoutMs, maxBytes })
     }
     return readResponse(response)
+  }
+  /**
+   * Fetches a document, refusing when too many fetches are running.
+   * @param {URL} url - The user-given URL.
+   * @returns {Promise<FetchedText>} The body and the content type.
+   * @throws {SystemError} A map custom layers error.
+   */
+  const fetchText = async (url: URL): Promise<FetchedText> => {
+    if (activeFetches >= MAX_CONCURRENT_FETCHES) throw newMapCustomLayersError('busy')
+    activeFetches += 1
+    try {
+      return await fetchVetted(url)
+    } finally {
+      activeFetches -= 1
+    }
   }
   return { fetchText }
 }

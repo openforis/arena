@@ -13,15 +13,17 @@ export type MapCustomLayersErrorName =
   | 'noLayers'
   | 'invalidLayers'
   | 'tooManyLayers'
+  | 'busy'
 
 // i18n keys live in core/i18n/resources/<lang>/appErrors.js, object mapCustomLayers
 export const MAP_CUSTOM_LAYERS_ERROR_KEY_PREFIX = 'appErrors:mapCustomLayers.'
 
-// the remote service failed (502/504); every other error is the caller's input (400)
+// the remote service failed (502/504) or this server is saturated (503); every other error is the caller's input (400)
 const statusCodeByName: Partial<Record<MapCustomLayersErrorName, number>> = {
   timeout: StatusCodes.GATEWAY_TIMEOUT,
   fetchFailed: StatusCodes.BAD_GATEWAY,
   unreachable: StatusCodes.BAD_GATEWAY,
+  busy: StatusCodes.SERVICE_UNAVAILABLE,
 }
 
 /**
