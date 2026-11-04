@@ -12,7 +12,8 @@ type Handler = (req: ExpressRequest, res: ExpressResponse) => Promise<void>
 const uriPrefix = '/survey/:surveyId/geo/map/'
 
 /**
- * Wraps an async route handler and answers errors with sendErr (the error middleware runs before these routes, so next(error) would end as a bare 500).
+ * Wraps an async route handler and answers every error with sendErr. systemErrorMiddleware only handles SystemErrors;
+ * the other errors (unexpected failures) would reach the default handler and be answered as an HTML page, not as JSON.
  * @param {Handler} handler - The handler.
  * @returns {Function} The Express handler.
  */

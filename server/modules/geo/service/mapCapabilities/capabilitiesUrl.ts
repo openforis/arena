@@ -1,6 +1,5 @@
+import { MAP_CUSTOM_LAYER_URL_MAX_LENGTH } from '@core/map/customLayers/mapCustomLayer'
 import { newMapCustomLayersError } from '@server/modules/geo/service/mapCustomLayersErrors'
-
-export const MAX_SERVICE_URL_LENGTH = 2048
 
 const HTTP_PROTOCOLS = new Set(['http:', 'https:'])
 const SERVICE_PARAM_KEYS = new Set(['service', 'request'])
@@ -29,7 +28,7 @@ const tryParseUrl = (text: string, baseUrl?: string): URL | null => {
  */
 export const parseServiceUrl = (value: unknown): URL => {
   const text = typeof value === 'string' ? value.trim() : ''
-  if (text.length === 0 || text.length > MAX_SERVICE_URL_LENGTH) throw newMapCustomLayersError('urlInvalid')
+  if (text.length === 0 || text.length > MAP_CUSTOM_LAYER_URL_MAX_LENGTH) throw newMapCustomLayersError('urlInvalid')
   const url = tryParseUrl(text)
   if (!url) throw newMapCustomLayersError('urlInvalid')
   if (!HTTP_PROTOCOLS.has(url.protocol) || url.username || url.password) throw newMapCustomLayersError('urlNotAllowed')

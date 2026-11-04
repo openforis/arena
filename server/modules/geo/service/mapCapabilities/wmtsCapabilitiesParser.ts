@@ -1,4 +1,9 @@
-import { type MapImageFormat, isTileTemplateUrl, mapImageFormats } from '@core/map/customLayers/mapCustomLayer'
+import {
+  MAP_CUSTOM_LAYER_MAX_ZOOM,
+  type MapImageFormat,
+  isTileTemplateUrl,
+  mapImageFormats,
+} from '@core/map/customLayers/mapCustomLayer'
 import {
   MAX_CAPABILITIES_LAYERS,
   type MapServiceCapabilities,
@@ -21,7 +26,6 @@ import {
 const WEB_MERCATOR_ZOOM_0_SCALE = 559082264.0287178
 const WEB_MERCATOR_CRS_PATTERN = /(?:^|\D)(3857|900913|102100|102113|3785)$/
 const GOOGLE_MAPS_SCALE_SET_PATTERN = /GoogleMapsCompatible/i
-const MAX_TILE_ZOOM = 24
 
 // a tile matrix set Leaflet can show: Web Mercator, identifiers "<prefix>0", "<prefix>1"...
 type WebMercatorMatrixSet = { prefix: string; maxZoom: number }
@@ -60,7 +64,7 @@ const readMatrixSet = (matrixSet: XmlElement): WebMercatorMatrixSet | null => {
   if (Math.abs(firstScale - WEB_MERCATOR_ZOOM_0_SCALE) / WEB_MERCATOR_ZOOM_0_SCALE > 0.01) return null
   const prefix = findZoomPrefix(matrices.map((matrix) => childText(matrix, 'Identifier')))
   if (prefix === null) return null
-  return { prefix, maxZoom: Math.min(matrices.length - 1, MAX_TILE_ZOOM) }
+  return { prefix, maxZoom: Math.min(matrices.length - 1, MAP_CUSTOM_LAYER_MAX_ZOOM) }
 }
 
 /**

@@ -467,7 +467,7 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
     `
     UPDATE "user"
     SET prefs = jsonb_set(
-      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[] #- ARRAY[$/layersKey/, $/surveyId/]::text[],
+      prefs #- ARRAY[$/surveysKey/, $/surveyId/]::text[],
       ${surveyCurrentJsonbPath},
       'null'
     )
@@ -477,7 +477,6 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
     {
       userUuid,
       surveysKey: User.keysPrefs.surveys,
-      layersKey: User.keysPrefs.mapCustomLayers,
       surveyId: String(surveyId),
     }
   )

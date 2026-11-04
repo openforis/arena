@@ -7,7 +7,6 @@ import {
 import { createMapCustomLayersService } from '@server/modules/geo/service/mapCustomLayersService'
 import {
   deleteUserMapCustomLayersSurvey,
-  deleteUserPrefsSurvey,
   deleteUsersPrefsSurvey,
   fetchUserByUuid,
   fetchUsers,
@@ -157,13 +156,6 @@ describe('map custom layers storage (271)', () => {
     const { client, calls } = fakeClient()
     await deleteUsersPrefsSurvey(7, client as never)
     expect(calls[1].query).toContain("#- '{mapCustomLayers,7}'")
-  })
-
-  test('removing a user from a survey removes the user layers of that survey', async () => {
-    const { client, calls } = fakeClient()
-    await deleteUserPrefsSurvey({ userUuid: 'u1', surveyId: 7 }, client as never)
-    expect(calls[0].query).toContain('#- ARRAY[$/layersKey/, $/surveyId/]::text[]')
-    expect(calls[0].values).toMatchObject({ layersKey: 'mapCustomLayers', surveyId: '7' })
   })
 
   test('removing a user from a survey drops the user layers whatever the current survey is', async () => {
