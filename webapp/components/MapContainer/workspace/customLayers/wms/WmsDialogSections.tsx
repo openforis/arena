@@ -94,31 +94,34 @@ export const WmsLayersChecklist = ({ state, dispatch }: SectionProps): React.Rea
  * @param {object} props - Props.
  * @param {WmsDialogFormState} props.state - The form state.
  * @param {Function} props.dispatch - The form dispatch.
- * @returns {React.ReactElement} The two option cards.
+ * @returns {React.ReactElement} The radio buttons, with the description of the chosen one.
  */
-export const WmsAddAsCards = ({ state, dispatch }: SectionProps): React.ReactElement => {
+export const WmsAddAsField = ({ state, dispatch }: SectionProps): React.ReactElement => {
   const t = useI18nT()
+  const labelKey = (role: MapCustomLayerRole) =>
+    role === 'overlay' ? 'mapWorkspace.wms.addAsOverlay' : 'mapWorkspace.wms.addAsBaseMap'
   return (
     <fieldset className="map-wms-dialog__section">
       <legend>{t('mapWorkspace.wms.addAs')}</legend>
-      <div className="map-wms-dialog__cards">
+      <RadioGroup
+        row
+        value={state.role}
+        onChange={(event) => dispatch({ type: 'setRole', role: event.target.value as MapCustomLayerRole })}
+      >
         {roles.map((role) => {
-          const labelKey = role === 'overlay' ? 'mapWorkspace.wms.addAsOverlay' : 'mapWorkspace.wms.addAsBaseMap'
+          // a variable, not a literal: the input slot type has no data-* attributes
+          const input = { 'data-testid': TestId.mapWorkspace.wmsAddAs(role) }
           return (
-            <button
+            <FormControlLabel
               key={role}
-              type="button"
-              className="map-wms-dialog__card"
-              aria-pressed={state.role === role}
-              data-testid={TestId.mapWorkspace.wmsAddAs(role)}
-              onClick={() => dispatch({ type: 'setRole', role })}
-            >
-              <span className="map-wms-dialog__card-title">{t(labelKey)}</span>
-              <span className="map-wms-dialog__card-description">{t(`${labelKey}Description`)}</span>
-            </button>
+              value={role}
+              control={<Radio size="small" slotProps={{ input }} />}
+              label={t(labelKey(role))}
+            />
           )
         })}
-      </div>
+      </RadioGroup>
+      <div className="map-wms-dialog__hint">{t(`${labelKey(state.role)}Description`)}</div>
     </fieldset>
   )
 }

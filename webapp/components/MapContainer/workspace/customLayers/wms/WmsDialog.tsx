@@ -24,7 +24,7 @@ import {
   wmsDialogFormReducer,
 } from '@webapp/components/MapContainer/workspace/customLayers/wms/wmsDialogForm'
 import {
-  WmsAddAsCards,
+  WmsAddAsField,
   WmsDisplayFields,
   WmsLayersChecklist,
   WmsScopeField,
@@ -203,7 +203,7 @@ export const WmsDialog = (): React.ReactElement => {
         {state.loadStatus === 'loaded' && (
           <>
             <WmsLayersChecklist state={state} dispatch={dispatch} />
-            <WmsAddAsCards state={state} dispatch={dispatch} />
+            <WmsAddAsField state={state} dispatch={dispatch} />
             <WmsDisplayFields state={state} dispatch={dispatch} formats={getAvailableFormats(state)} />
             <WmsScopeField state={state} dispatch={dispatch} canEditSurvey={canEditSurvey} />
           </>
