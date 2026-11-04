@@ -20,7 +20,7 @@ const formatPropertyValue = (value: unknown): string =>
   value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value)
 
 /**
- * Binds a popup with the properties of a feature as plain text (never HTML: the file comes from the user).
+ * Binds a popup with the properties of a feature as plain text (the file comes from the user; KML popups are sanitized in L.KML).
  * @param {object} feature - The GeoJSON feature.
  * @param {L.Layer} layer - The layer of the feature.
  * @returns {void}

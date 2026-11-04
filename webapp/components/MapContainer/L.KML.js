@@ -1,4 +1,5 @@
 const L = require('leaflet')
+const { buildKmlPopupHtml } = require('./kmlPopupContent')
 
 const styleAttributes = new Set(['color', 'width', 'Icon', 'href', 'hotSpot'])
 const groundOverlayAttributes = new Set(['Icon', 'href', 'color'])
@@ -308,7 +309,7 @@ L.Util.extend(L.KML, {
     }
 
     if (name) {
-      layer.bindPopup('<h2>' + name + '</h2>' + descr, { className: 'kml-popup' })
+      layer.bindPopup(buildKmlPopupHtml(name, descr), { className: 'kml-popup' })
     }
   },
 
