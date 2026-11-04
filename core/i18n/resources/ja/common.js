@@ -608,13 +608,6 @@ export default {
       showControlPoints: '管理点',
       showPlotReferencePoint: 'プロット基準点',
     },
-    imagery: {
-      planetPeriod: 'Planetの期間',
-      period: '期間',
-      compareWith: '左右に並べて比較',
-      noComparison: '比較しない',
-      falseColour: '偽合成色（フォールスカラー）',
-    },
     tools: {
       measureDistance: '距離を測定',
     },
@@ -677,6 +670,7 @@ export default {
     },
     upload: {
       unsupported: '対応していないファイルです。KML、KMZ、ZIP圧縮したShapefile、GeoJSONのいずれかを選択してください',
+      tooLarge: 'ファイルが大きすぎます。最大 {{maxSize}} MB です',
       error: 'ファイルを読み込めませんでした: {{details}}',
     },
     measure: {
@@ -758,6 +752,9 @@ export default {
         fileNameRequired: 'ファイル名を入力してください。',
         rowNotConfirmed:
           '画像用の新しい行が時間内に確認されなかったため、スクリーンショットは保存されませんでした。もう一度試す前に記録を確認してください。',
+        notApplicable: '画像を追加できません。この区画では属性が適用対象外です。',
+        clearsOtherValues:
+          'スクリーンショットは保存されませんでした。追加すると記録内の他の項目の値が消去されます。代わりに記録エディタから追加してください。',
       },
     },
   },

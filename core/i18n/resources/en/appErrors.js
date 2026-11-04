@@ -12,6 +12,7 @@ export default {
     noLayers: 'The service has no layer that can be displayed',
     invalidLayers: 'The map layers are not valid',
     tooManyLayers: 'At most {{max}} custom map layers can be added',
+    busy: 'The server is busy loading other services: try again in a moment',
   },
   cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
   cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',

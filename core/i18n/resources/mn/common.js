@@ -611,13 +611,6 @@ export default {
       showControlPoints: 'Хяналтын цэгүүд',
       showPlotReferencePoint: 'Талбайн лавлах цэг',
     },
-    imagery: {
-      planetPeriod: 'Planet хугацаа',
-      period: 'Хугацаа',
-      compareWith: 'Зэрэгцүүлэн харьцуулах',
-      noComparison: 'Харьцуулалтгүй',
-      falseColour: 'Худал өнгө',
-    },
     tools: {
       measureDistance: 'Зай хэмжих',
     },
@@ -680,6 +673,7 @@ export default {
     },
     upload: {
       unsupported: 'Дэмжигдээгүй файл: KML, KMZ, zip-ээр шахсан Shapefile эсвэл GeoJSON файл сонгоно уу',
+      tooLarge: 'Файл хэт том байна: хамгийн ихдээ {{maxSize}} МБ',
       error: 'Файлыг уншиж чадсангүй: {{details}}',
     },
     measure: {
@@ -761,6 +755,9 @@ export default {
         fileNameRequired: 'Файлын нэр оруулна уу.',
         rowNotConfirmed:
           'Зурагт зориулсан шинэ мөр цагтаа баталгаажаагүй тул дэлгэцийн зураг хадгалагдсангүй. Дахин оролдохоосоо өмнө бичлэгийг шалгана уу.',
+        notApplicable: 'Зургийг нэмэх боломжгүй: энэ талбайд шинж чанар хамаарахгүй.',
+        clearsOtherValues:
+          'Дэлгэцийн зураг хадгалагдсангүй: нэмбэл бичлэгийн бусад талбарын утга устах болно. Оронд нь бичлэгийн редактороос нэмнэ үү.',
       },
     },
   },

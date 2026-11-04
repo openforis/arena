@@ -589,13 +589,6 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       showControlPoints: 'Puntos de control',
       showPlotReferencePoint: 'Punto de referencia de parcela',
     },
-    imagery: {
-      planetPeriod: 'Período de Planet',
-      period: 'Período',
-      compareWith: 'Comparar lado a lado con',
-      noComparison: 'Sin comparación',
-      falseColour: 'Color falso',
-    },
     tools: {
       measureDistance: 'Medir distancia',
     },
@@ -658,6 +651,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     upload: {
       unsupported: 'Archivo no compatible: elija un archivo KML, KMZ, Shapefile comprimido (zip) o GeoJSON',
+      tooLarge: 'El archivo es demasiado grande: máximo {{maxSize}} MB',
       error: 'No se pudo leer el archivo: {{details}}',
     },
     measure: {
@@ -737,6 +731,9 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         fileNameRequired: 'Introduzca un nombre de archivo.',
         rowNotConfirmed:
           'La nueva fila para la imagen no se confirmó a tiempo, así que la captura no se guardó. Revise el registro antes de volver a intentarlo.',
+        notApplicable: 'No se puede añadir la imagen: el atributo no es aplicable en esta parcela.',
+        clearsOtherValues:
+          'La captura no se guardó: añadirla borraría valores de otros campos del registro. Añádala desde el editor de registros.',
       },
     },
   },

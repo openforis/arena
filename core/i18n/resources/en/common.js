@@ -609,13 +609,6 @@ Try again?`,
       showControlPoints: 'Control points',
       showPlotReferencePoint: 'Plot reference point',
     },
-    imagery: {
-      planetPeriod: 'Planet period',
-      period: 'Period',
-      compareWith: 'Compare side by side with',
-      noComparison: 'No comparison',
-      falseColour: 'False colour',
-    },
     tools: {
       measureDistance: 'Measure distance',
     },
@@ -678,6 +671,7 @@ Try again?`,
     },
     upload: {
       unsupported: 'Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file',
+      tooLarge: 'The file is too large: {{maxSize}} MB at most',
       error: 'The file could not be read: {{details}}',
     },
     measure: {
@@ -754,6 +748,9 @@ Try again?`,
         fileNameRequired: 'Enter a file name.',
         rowNotConfirmed:
           'The new row for the image was not confirmed in time, so the screenshot was not saved. Check the record before trying again.',
+        notApplicable: 'The image cannot be added: the attribute is not applicable in this plot.',
+        clearsOtherValues:
+          'The screenshot was not saved: adding it would clear values in other fields of the record. Add it from the record editor instead.',
       },
     },
   },

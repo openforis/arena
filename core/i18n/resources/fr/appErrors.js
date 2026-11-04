@@ -12,6 +12,7 @@ export default {
     noLayers: 'Le service n’a aucune couche affichable',
     invalidLayers: 'Les couches cartographiques ne sont pas valides',
     tooManyLayers: 'Au plus {{max}} couches cartographiques personnalisées peuvent être ajoutées',
+    busy: 'Le serveur est occupé à charger d’autres services : réessayez dans un instant',
   },
   aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",

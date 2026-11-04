@@ -12,6 +12,7 @@ export default {
     noLayers: 'El servicio no tiene ninguna capa que se pueda mostrar',
     invalidLayers: 'Las capas de mapa no son válidas',
     tooManyLayers: 'Se pueden añadir como máximo {{max}} capas de mapa personalizadas',
+    busy: 'El servidor está ocupado cargando otros servicios: inténtelo de nuevo en un momento',
   },
   aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
   aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',

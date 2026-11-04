@@ -624,13 +624,6 @@ export default {
       showControlPoints: 'Контрольные точки',
       showPlotReferencePoint: 'Точка привязки участка',
     },
-    imagery: {
-      planetPeriod: 'Период Planet',
-      period: 'Период',
-      compareWith: 'Сравнить бок о бок с',
-      noComparison: 'Без сравнения',
-      falseColour: 'Псевдоцвет',
-    },
     tools: {
       measureDistance: 'Измерить расстояние',
     },
@@ -695,6 +688,7 @@ export default {
     },
     upload: {
       unsupported: 'Неподдерживаемый файл: выберите файл KML, KMZ, Shapefile в zip-архиве или GeoJSON',
+      tooLarge: 'Файл слишком большой: не более {{maxSize}} МБ',
       error: 'Не удалось прочитать файл: {{details}}',
     },
     measure: {
@@ -773,6 +767,9 @@ export default {
         fileNameRequired: 'Введите имя файла.',
         rowNotConfirmed:
           'Новая строка для изображения не была подтверждена вовремя, поэтому снимок не сохранён. Проверьте запись, прежде чем повторить попытку.',
+        notApplicable: 'Нельзя добавить изображение: атрибут не применим в этом участке.',
+        clearsOtherValues:
+          'Снимок не сохранён: его добавление очистит значения других полей записи. Добавьте его через редактор записей.',
       },
     },
   },

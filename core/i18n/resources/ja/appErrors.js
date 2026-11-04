@@ -12,6 +12,7 @@ export default {
     noLayers: 'サービスに表示できるレイヤーがありません',
     invalidLayers: '地図レイヤーが無効です',
     tooManyLayers: 'カスタム地図レイヤーは最大 {{max}} 件まで追加できます',
+    busy: 'サーバーが他のサービスを読み込み中です。しばらくしてからもう一度お試しください',
   },
   cannotGetChild: `属性{{name}}から子要素「{{childName}}」を取得できません`,
   cannotImportFilesExceedingQuota: '記録ファイルをインポートできません：ファイルストレージの容量上限を超えます',

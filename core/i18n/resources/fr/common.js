@@ -613,13 +613,6 @@ Réessayer ?`,
       showControlPoints: 'Points de contrôle',
       showPlotReferencePoint: 'Point de référence de la parcelle',
     },
-    imagery: {
-      planetPeriod: 'Période Planet',
-      period: 'Période',
-      compareWith: 'Comparer côte à côte avec',
-      noComparison: 'Aucune comparaison',
-      falseColour: 'Fausses couleurs',
-    },
     tools: {
       measureDistance: 'Mesurer une distance',
     },
@@ -682,6 +675,7 @@ Réessayer ?`,
     },
     upload: {
       unsupported: 'Fichier non pris en charge : choisissez un fichier KML, KMZ, Shapefile zippé ou GeoJSON',
+      tooLarge: 'Le fichier est trop volumineux : {{maxSize}} Mo maximum',
       error: "Le fichier n'a pas pu être lu : {{details}}",
     },
     measure: {
@@ -764,6 +758,9 @@ Réessayer ?`,
         fileNameRequired: 'Saisissez un nom de fichier.',
         rowNotConfirmed:
           'La nouvelle ligne pour l’image n’a pas été confirmée à temps : la capture n’a pas été enregistrée. Vérifiez l’enregistrement avant de réessayer.',
+        notApplicable: 'L’image ne peut pas être ajoutée : l’attribut n’est pas applicable dans cette parcelle.',
+        clearsOtherValues:
+          'La capture n’a pas été enregistrée : l’ajouter effacerait des valeurs d’autres champs de l’enregistrement. Ajoutez-la depuis l’éditeur d’enregistrement.',
       },
     },
   },

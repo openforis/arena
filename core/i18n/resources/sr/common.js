@@ -481,10 +481,6 @@ Pokušati ponovo?`,
       showPlotReferencePoint: `Referentna tačka plohe`,
       showUtmGrid: 'Prikaži UTM mrežu',
     },
-    rulerTooltip: `Pritisnite dugme da biste započeli mjerenje udaljenosti.
-- kliknite više puta da biste izmjerili putanje
-- dvaput kliknite ili pritisnite taster ESC da biste završili mjerenje
-- ponovo pritisnite dugme da biste sakrili mjerenja`,
     samplingPointDataLayerName: 'Podaci o tačkama uzorka - nivo {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (učitavanje...)',
     samplingPointItemPopup: {
@@ -513,10 +509,6 @@ Pokušati ponovo?`,
     opacity: 'neprozirnost',
     selectFile: 'Izaberi fajl',
     title: 'Opcije za KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Izaberite period za poređenje',
-    falseColor: 'Lažne boje',
   },
   surveysView: {
     chains: 'Lanci',
