@@ -6,14 +6,16 @@ import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/st
 import { useMapContextBaseLayer } from '@webapp/components/MapContainer/MapContext'
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
-import { useMapPlotPointsLayers } from '@webapp/components/MapContainer/workspace/screenshot/MapPlotPointsContext'
 import { getFitToPlotZoom } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCaptureRules'
 import {
   buildScreenshotFileName,
   formatIsoDate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
 import { getImageAttributeOptions } from '@webapp/components/MapContainer/workspace/screenshot/screenshotImageAttributes'
-import { buildPlotCandidates } from '@webapp/components/MapContainer/workspace/screenshot/screenshotPlotCandidates'
+import {
+  buildPlotCandidates,
+  toPlotLayers,
+} from '@webapp/components/MapContainer/workspace/screenshot/screenshotPlotCandidates'
 import {
   collectAttributions,
   getBaseMapName,
@@ -28,6 +30,7 @@ import {
   type ScreenshotPlotCandidate,
   type ScreenshotTarget,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
+import { useMapLayersPanel } from '@webapp/views/App/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type { ScreenshotStamp } from '@webapp/components/MapContainer/workspace/screenshot/useScreenshotPreview'
 
 export type ScreenshotDialogState = {
@@ -80,7 +83,7 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
-  const plotLayers = useMapPlotPointsLayers()
+  const { activeLayers } = useMapLayersPanel()
   const { overlays } = useMapCustomOverlays()
   const baseLayer = useMapContextBaseLayer()
 
@@ -92,9 +95,10 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
   const [attributeUuid, setAttributeUuid] = useState<string | null>(null)
   const [fileNameInput, setFileNameInput] = useState<string | null>(null)
 
+  // the plots are the points of the location layers listed in the Records tab (empty outside Data › Map)
   const candidates = useMemo(
-    () => buildPlotCandidates({ layers: plotLayers, center: openCenter }),
-    [plotLayers, openCenter]
+    () => buildPlotCandidates({ layers: toPlotLayers({ activeLayers, survey, lang }), center: openCenter }),
+    [activeLayers, survey, lang, openCenter]
   )
   const plot = candidates.find((candidate) => candidate.key === plotKey) ?? candidates[0] ?? null
   const target: ScreenshotTarget = targetChoice ?? (candidates.length > 0 ? 'record' : 'file')

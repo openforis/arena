@@ -7,10 +7,9 @@ import * as Record from '@core/record/record'
 
 import * as AppWebSocket from '@webapp/app/appWebSocket'
 
-import {
-  buildNodePersistFields,
-  fieldsToFormData,
-} from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
+import * as API from '@webapp/service/api'
+
+import { buildNodeFormData } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
 import type { NodeSaveSubscribe } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 
 const UPLOAD_TIMEOUT_MS = 120000
@@ -20,12 +19,19 @@ const UPLOAD_TIMEOUT_MS = 120000
  * @param {object} handlers - The handlers for the nodes update, completion and error.
  * @returns {Function} Stops listening.
  */
-export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({ onNodesUpdate, onCompleted, onError }) => {
+export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({
+  onNodesUpdate,
+  onCompleted,
+  onError,
+  onClearNonApplicableConfirm,
+}) => {
   AppWebSocket.on(WebSocketEvents.nodesUpdate, onNodesUpdate)
+  AppWebSocket.on(WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm, onClearNonApplicableConfirm)
   AppWebSocket.on(WebSocketEvents.nodesUpdateCompleted, onCompleted)
   AppWebSocket.on(WebSocketEvents.applicationError, onError)
   return () => {
     AppWebSocket.off(WebSocketEvents.nodesUpdate, onNodesUpdate)
+    AppWebSocket.off(WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm, onClearNonApplicableConfirm)
     AppWebSocket.off(WebSocketEvents.nodesUpdateCompleted, onCompleted)
     AppWebSocket.off(WebSocketEvents.applicationError, onError)
   }
@@ -40,12 +46,44 @@ export const subscribeToNodeSaveEvents: NodeSaveSubscribe = ({ onNodesUpdate, on
  */
 export const createRecordFetcher =
   ({ surveyId }: { surveyId: number }) =>
-  async (recordUuid: string): Promise<unknown> => {
-    const { data } = await axios.get(`/api/survey/${surveyId}/record`, {
-      params: { recordUuid },
+  async (recordUuid: string): Promise<unknown> =>
+    API.fetchRecordAndNodes({ surveyId, recordUuid, errorHandledLocally: true })
+
+/**
+ * Creates the function checking the record out: the node requests associate this browser socket with the record, and
+ * only the checkout dissociates it (the record editor does the same on exit).
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @returns {Function} The checkout function.
+ */
+export const createRecordCheckOut =
+  ({ surveyId }: { surveyId: number }) =>
+  async (recordUuid: string): Promise<void> => {
+    await axios.post(`/api/survey/${surveyId}/record/${recordUuid}/checkout`, undefined, {
       errorHandledLocally: true,
     } as object)
-    return data
+  }
+
+/**
+ * Creates the function deleting a node (the empty entity row left by a failed save).
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.lang - The UI language.
+ * @param {string} params.fallbackCycle - Cycle used when the record has none.
+ * @returns {Function} The node deleter.
+ */
+export const createNodeDeleter =
+  ({ surveyId, lang, fallbackCycle }: { surveyId: number; lang: string; fallbackCycle: string }) =>
+  async ({ record, nodeUuid }: { record: unknown; nodeUuid: string }): Promise<void> => {
+    await axios.delete(`/api/survey/${surveyId}/record/${Record.getUuid(record)}/node/${nodeUuid}`, {
+      data: {
+        cycle: Record.getCycle(record) ?? fallbackCycle,
+        draft: false,
+        timezoneOffset: Dates.getTimezoneOffset(),
+        lang,
+      },
+      errorHandledLocally: true,
+    } as object)
   }
 
 /**
@@ -70,7 +108,7 @@ export const createNodePoster =
     blob?: Blob | null
     fileName?: string
   }) => {
-    const fields = buildNodePersistFields({
+    const formData = buildNodeFormData({
       node,
       cycle: Record.getCycle(record) ?? fallbackCycle,
       timezoneOffset: Dates.getTimezoneOffset(),
@@ -80,9 +118,5 @@ export const createNodePoster =
     })
     // errors are shown in the dialog, not by the global service error handler
     const requestConfig = { errorHandledLocally: true, timeout: UPLOAD_TIMEOUT_MS }
-    await axios.post(
-      `/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`,
-      fieldsToFormData(fields, new FormData()),
-      requestConfig
-    )
+    await axios.post(`/api/survey/${surveyId}/record/${Node.getRecordUuid(node)}/node`, formData, requestConfig)
   }

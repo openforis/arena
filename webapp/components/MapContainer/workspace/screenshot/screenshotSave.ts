@@ -14,6 +14,7 @@ export type NodeSaveHandlers = {
   onNodesUpdate: (event: NodeSaveEvent) => void
   onCompleted: (event: NodeSaveEvent) => void
   onError: (event: NodeSaveEvent) => void
+  onClearNonApplicableConfirm: (event: NodeSaveEvent) => void
 }
 
 export type NodeSaveSubscribe = (handlers: NodeSaveHandlers) => () => void
@@ -22,6 +23,7 @@ export type NodeSaveSubscribe = (handlers: NodeSaveHandlers) => () => void
 export type NodeSaveResult = {
   status: 'saved' | 'pending' | 'error'
   details?: string
+  clearsOtherValues?: boolean // the server did not apply the update: it would clear other attributes
   nodes?: Record<string, unknown>
 }
 
@@ -33,6 +35,8 @@ export type ScreenshotSaveDeps = {
   confirmReplace: (fileName: string) => Promise<boolean>
   subscribe: NodeSaveSubscribe
   postNode: (params: { record: unknown; node: unknown; blob?: Blob | null; fileName?: string }) => Promise<void>
+  deleteNode: (params: { record: unknown; nodeUuid: string }) => Promise<void>
+  checkOut: (recordUuid: string) => Promise<void>
   timeoutMs?: number
 }
 
@@ -125,6 +129,10 @@ export const startNodeSaveWaiter = ({
     onError: (event) => {
       if (isForRecord(event)) finish({ status: 'error', details: event?.key ?? '' })
     },
+    // the server then waits for a confirmation instead of applying the update, and the completion event follows
+    onClearNonApplicableConfirm: (event) => {
+      if (isForRecord(event)) finish({ status: 'error', clearsOtherValues: true })
+    },
   })
   // armed after the POST: the upload time (slow links) must not eat the wait for the server to process the node
   const startTimer = (): void => {
@@ -168,6 +176,7 @@ const checkSize = (input: ScreenshotSaveInput): ScreenshotSaveOutcome | null => 
 const toOutcome = (result: NodeSaveResult): ScreenshotSaveOutcome => {
   if (result.status === 'saved') return { status: 'saved' }
   if (result.status === 'pending') return { status: 'pending' }
+  if (result.clearsOtherValues) return errorOutcome('clearsOtherValues')
   return errorOutcome('saveFailed', { details: result.details ?? '' })
 }
 
@@ -204,6 +213,33 @@ const sendAndWait = async (
 }
 
 /**
+ * Sends the change: the new entity row first when the attribute is in a multiple entity, then the image.
+ * @param {ScreenshotSaveDeps} deps - The injected dependencies.
+ * @param {object} params - The fetched record, the change to send and the save input.
+ * @returns {Promise<ScreenshotSaveOutcome>} The outcome.
+ */
+const sendChange = async (
+  deps: ScreenshotSaveDeps,
+  { record, change, input }: { record: unknown; change: ScreenshotNodeChange; input: ScreenshotSaveInput }
+): Promise<ScreenshotSaveOutcome> => {
+  const { recordUuid, blob, fileName } = input
+  let { node } = change
+  if (change.kind !== 'createRow')
+    return (await sendAndWait(deps, { recordUuid, record, node, blob, fileName })).outcome
+
+  // two steps: the server creates the row with its empty attributes, then the image goes in the row's attribute
+  const row = await sendAndWait(deps, { recordUuid, record, node })
+  if (row.outcome.status === 'pending') return errorOutcome('rowNotConfirmed')
+  if (row.outcome.status !== 'saved') return row.outcome
+  const rowUuid = (node as { uuid: string }).uuid
+  node = deps.buildRowAttribute(node, row.nodes)
+  const { outcome } = await sendAndWait(deps, { recordUuid, record, node, blob, fileName })
+  // best effort: do not leave the empty row behind (not when pending: the image may still land in it)
+  if (outcome.status === 'error') await deps.deleteNode({ record, nodeUuid: rowUuid }).catch(() => undefined)
+  return outcome
+}
+
+/**
  * Saves a screenshot in an image attribute of a plot record: checks, optional replace confirmation, POST (preceded by
  * the new entity row when the attribute is in a multiple entity), socket result.
  * @param {ScreenshotSaveDeps} deps - The injected dependencies (API, permission, node builder, prompt, socket).
@@ -223,14 +259,10 @@ export const saveScreenshotToRecord = async (
   if (change.replacedFileName && !(await deps.confirmReplace(change.replacedFileName))) {
     return { status: 'cancelled' }
   }
-  const { recordUuid, blob, fileName } = input
-  let { node } = change
-  if (change.kind === 'createRow') {
-    // two steps: the server creates the row with its empty attributes, then the image goes in the row's attribute
-    const row = await sendAndWait(deps, { recordUuid, record, node })
-    if (row.outcome.status === 'pending') return errorOutcome('rowNotConfirmed')
-    if (row.outcome.status !== 'saved') return row.outcome
-    node = deps.buildRowAttribute(node, row.nodes)
+  try {
+    return await sendChange(deps, { record, change, input })
+  } finally {
+    // best effort: the nodes were posted, so the server tied this socket to the record
+    await deps.checkOut(input.recordUuid).catch(() => undefined)
   }
-  return (await sendAndWait(deps, { recordUuid, record, node, blob, fileName })).outcome
 }

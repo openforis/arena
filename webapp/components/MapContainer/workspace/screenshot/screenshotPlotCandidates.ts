@@ -1,20 +1,54 @@
+import * as NodeDef from '@core/survey/nodeDef'
+import * as Survey from '@core/survey/survey'
+
+import type {
+  ActiveLayer,
+  MapLayerPoint,
+} from '@webapp/views/App/views/Data/MapView/MapLayersPanel/MapLayersPanelContext'
 import type {
   LatLngLiteral,
   ScreenshotPlotCandidate,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
 
-// structural copy of the GeoJSON points built by convertDataToGeoJsonPoints (Data › Map location layers)
-export type MapPlotPoint = {
-  geometry?: { coordinates?: number[] }
-  properties?: { key?: string; recordUuid?: string; parentUuid?: string; ancestorsKeys?: unknown[] }
-}
-
-export type MapPlotPointsLayer = {
-  layerKey: string
+// the points of an active layer of Data › Map (the Records tab) that is a location attribute of a plot entity
+export type PlotLayer = {
   entityDefUuid: string
   entityName: string
   entityLabel: string
-  points: MapPlotPoint[]
+  points: MapLayerPoint[]
+}
+
+/**
+ * Keeps the active layers that are location attributes inside a multiple entity (the plot), with that entity.
+ * @param {object} params - The parameters.
+ * @param {Array<ActiveLayer>} params.activeLayers - The layers of the Records tab (their key is the attribute uuid).
+ * @param {object} params.survey - The survey.
+ * @param {string} params.lang - The language of the entity label.
+ * @returns {Array<PlotLayer>} The plot layers; sampling point layers and layers outside an entity are dropped.
+ */
+export const toPlotLayers = ({
+  activeLayers,
+  survey,
+  lang,
+}: {
+  activeLayers: ActiveLayer[]
+  survey: any
+  lang: string
+}): PlotLayer[] => {
+  const layers: PlotLayer[] = []
+  for (const { key, points } of activeLayers) {
+    const attributeDef = Survey.getNodeDefByUuid(key)(survey)
+    const entityDef = attributeDef ? Survey.getNodeDefAncestorMultipleEntity(attributeDef)(survey) : null
+    if (entityDef) {
+      layers.push({
+        entityDefUuid: NodeDef.getUuid(entityDef),
+        entityName: NodeDef.getName(entityDef),
+        entityLabel: NodeDef.getLabel(entityDef, lang),
+        points,
+      })
+    }
+  }
+  return layers
 }
 
 /**
@@ -29,11 +63,11 @@ const toKeyTexts = (ancestorsKeys: unknown[] = []): string[] =>
 
 /**
  * Builds the plot candidate of a point, when the point is valid.
- * @param {MapPlotPointsLayer} layer - The layer of the point.
- * @param {MapPlotPoint} point - The point.
+ * @param {PlotLayer} layer - The layer of the point.
+ * @param {MapLayerPoint} point - The point.
  * @returns {ScreenshotPlotCandidate|null} The candidate, or null for a point without coordinates or record.
  */
-const toCandidate = (layer: MapPlotPointsLayer, point: MapPlotPoint): ScreenshotPlotCandidate | null => {
+const toCandidate = (layer: PlotLayer, point: MapLayerPoint): ScreenshotPlotCandidate | null => {
   const [lng, lat] = point?.geometry?.coordinates ?? []
   const { key, recordUuid, parentUuid, ancestorsKeys } = point?.properties ?? {}
   if (!Number.isFinite(lat) || !Number.isFinite(lng) || !key || !recordUuid || !parentUuid) return null
@@ -65,7 +99,7 @@ export const planarDistance = (a: LatLngLiteral, b: LatLngLiteral): number => {
 /**
  * Builds the plot list of the screenshot dialog from the points of the shown location layers.
  * @param {object} params - The parameters.
- * @param {Array<MapPlotPointsLayer>} params.layers - The registered layers.
+ * @param {Array<PlotLayer>} params.layers - The plot layers.
  * @param {LatLngLiteral|null} params.center - The map centre; null sorts by label.
  * @returns {Array<ScreenshotPlotCandidate>} One candidate per plot, nearest first.
  */
@@ -73,7 +107,7 @@ export const buildPlotCandidates = ({
   layers,
   center,
 }: {
-  layers: MapPlotPointsLayer[]
+  layers: PlotLayer[]
   center: LatLngLiteral | null
 }): ScreenshotPlotCandidate[] => {
   const byKey = new Map<string, ScreenshotPlotCandidate>()

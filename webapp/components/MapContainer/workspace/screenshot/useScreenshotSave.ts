@@ -22,7 +22,9 @@ import {
   type ScreenshotSaveDeps,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 import {
+  createNodeDeleter,
   createNodePoster,
+  createRecordCheckOut,
   createRecordFetcher,
   subscribeToNodeSaveEvents,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSaveAdapters'
@@ -126,6 +128,8 @@ export const useScreenshotSave = (): {
         confirmReplace,
         subscribe: subscribeToNodeSaveEvents,
         postNode: createNodePoster({ surveyId, lang, fallbackCycle: cycle }),
+        deleteNode: createNodeDeleter({ surveyId, lang, fallbackCycle: cycle }),
+        checkOut: createRecordCheckOut({ surveyId }),
       }
       setSaving(true)
       try {

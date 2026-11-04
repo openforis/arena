@@ -32,6 +32,7 @@ const createSocket = () => {
       handlers?.onCompleted({ recordUuid })
     },
     error: (event: NodeSaveEvent) => handlers?.onError(event),
+    clearConfirm: (event: NodeSaveEvent) => handlers?.onClearNonApplicableConfirm(event),
   }
 }
 
@@ -51,6 +52,8 @@ const setup = () => {
     postNode: jest.fn(async () => {
       calls.push('post')
     }),
+    deleteNode: jest.fn(async () => undefined),
+    checkOut: jest.fn(async () => undefined),
     timeoutMs: 1000,
   }
   return { deps, socket, calls }
@@ -294,5 +297,67 @@ describe('Screenshot save (293)', () => {
     })
     expect(deps.postNode).toHaveBeenCalledTimes(1)
     expect(deps.buildRowAttribute).not.toHaveBeenCalled()
+  })
+
+  test('deletes the new empty row when the image step fails, and not when it succeeds', async () => {
+    const { deps, socket } = setup()
+    deps.buildChange = jest.fn(() => rowChange)
+    let posts = 0
+    deps.postNode = jest.fn(async () => {
+      posts += 1
+      if (posts === 1) socket.saved('row-new')
+      else throw new Error('boom')
+    })
+    await expect(saveScreenshotToRecord(deps, input)).resolves.toMatchObject({ status: 'error' })
+    expect(deps.deleteNode).toHaveBeenCalledWith({ record: { uuid: recordUuid }, nodeUuid: 'row-new' })
+
+    const ok = setup()
+    ok.deps.buildChange = jest.fn(() => rowChange)
+    let okPosts = 0
+    ok.deps.postNode = jest.fn(async () => ok.socket.saved(okPosts++ === 0 ? 'row-new' : 'row-photo'))
+    await expect(saveScreenshotToRecord(ok.deps, input)).resolves.toEqual({ status: 'saved' })
+    expect(ok.deps.deleteNode).not.toHaveBeenCalled()
+  })
+
+  test('keeps the new row when the image step is still pending: the image may still land in it', async () => {
+    const { deps, socket } = setup()
+    deps.buildChange = jest.fn(() => rowChange)
+    let posts = 0
+    deps.postNode = jest.fn(async () => {
+      posts += 1
+      if (posts === 1) socket.saved('row-new')
+    })
+    const promise = saveScreenshotToRecord(deps, input)
+    await flush()
+    jest.runOnlyPendingTimers()
+    await expect(promise).resolves.toEqual({ status: 'pending' })
+    expect(deps.deleteNode).not.toHaveBeenCalled()
+  })
+
+  test('checks the record out once after a save, and ignores a checkout failure', async () => {
+    const { deps, socket } = setup()
+    deps.postNode = jest.fn(async () => socket.saved())
+    deps.checkOut = jest.fn(async () => {
+      throw new Error('offline')
+    })
+    await expect(saveScreenshotToRecord(deps, input)).resolves.toEqual({ status: 'saved' })
+    expect(deps.checkOut).toHaveBeenCalledTimes(1)
+    expect(deps.checkOut).toHaveBeenCalledWith(recordUuid)
+  })
+
+  test('does not check out when nothing was sent', async () => {
+    const { deps } = setup()
+    deps.canEditRecord = jest.fn(() => false)
+    await saveScreenshotToRecord(deps, input)
+    expect(deps.checkOut).not.toHaveBeenCalled()
+  })
+
+  test('reports an update the server holds back to clear other values, instead of waiting', async () => {
+    const { deps, socket } = setup()
+    deps.postNode = jest.fn(async () => socket.clearConfirm({ recordUuid }))
+    await expect(saveScreenshotToRecord(deps, input)).resolves.toEqual({
+      status: 'error',
+      key: 'mapWorkspace.screenshot.errors.clearsOtherValues',
+    })
   })
 })

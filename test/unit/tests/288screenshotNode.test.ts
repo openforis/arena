@@ -1,11 +1,10 @@
 import * as Node from '@core/record/node'
 
 import {
-  buildNodePersistFields,
+  buildNodeFormData,
   buildRowAttributeNode,
   buildScreenshotFileValue,
   buildScreenshotNodeChange,
-  fieldsToFormData,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
 
 const recordUuid = 'record-1'
@@ -47,6 +46,12 @@ describe('Screenshot node change and form fields (288)', () => {
       [Node.valuePropsFile.fileName]: 'cluster_2_2026-10-11.png',
       [Node.valuePropsFile.fileSize]: 2048,
     })
+  })
+
+  test('refuses an attribute that is not applicable in the plot', () => {
+    const notApplicableRoot = { ...root, meta: { ...root.meta, childApplicability: { 'new-photo-def': false } } }
+    const change = buildScreenshotNodeChange({ ...baseInput, nodes: [notApplicableRoot, ...nodes.slice(1)] })
+    expect(change).toEqual({ ok: false, errorKey: 'notApplicable' })
   })
 
   test('creates the attribute under the plot when it has no node yet', () => {
@@ -159,41 +164,31 @@ describe('Screenshot node change and form fields (288)', () => {
     expect(Node.getFileUuid(added)).toBe('file-new')
   })
 
-  test('leaves the file field out when there is no file (new entity row)', () => {
-    const fields = buildNodePersistFields({ node: { uuid: 'row-1' }, cycle: '0', timezoneOffset: 0, lang: 'en' })
-    expect(fields.map((field) => field.name)).toEqual(['node', 'cycle', 'draft', 'timezoneOffset', 'lang'])
-  })
-
-  test('builds the multipart fields of the node endpoint in order', () => {
-    const file = new Blob(['png'])
+  test('builds the multipart body of the node endpoint, the file keeping its name', () => {
     const node = { uuid: 'node-1' }
-    const fields = buildNodePersistFields({
+    const formData = buildNodeFormData({
       node,
       cycle: '0',
       timezoneOffset: -120,
       lang: 'en',
-      file,
+      file: new Blob(['png'], { type: 'image/png' }),
       fileName: 'a.png',
     })
-    expect(fields.map((field) => field.name)).toEqual(['node', 'cycle', 'draft', 'timezoneOffset', 'lang', 'file'])
-    expect(JSON.parse(fields[0].value as string)).toEqual(node)
-    expect(fields.slice(1, 5).map((field) => field.value)).toEqual(['0', 'false', '-120', 'en'])
-    expect(fields[5]).toEqual({ name: 'file', value: file, fileName: 'a.png' })
+    expect([...formData.keys()]).toEqual(['node', 'cycle', 'draft', 'timezoneOffset', 'lang', 'file'])
+    expect(JSON.parse(formData.get('node') as string)).toEqual(node)
+    expect(['cycle', 'draft', 'timezoneOffset', 'lang'].map((name) => formData.get(name))).toEqual([
+      '0',
+      'false',
+      '-120',
+      'en',
+    ])
+    const file = formData.get('file') as File
+    expect(file.name).toBe('a.png')
+    expect(file.type).toBe('image/png')
   })
 
-  test('appends the file with its file name', () => {
-    const file = new Blob(['png'])
-    const formData = { append: jest.fn() }
-    fieldsToFormData(
-      [
-        { name: 'lang', value: 'en' },
-        { name: 'file', value: file, fileName: 'a.png' },
-      ],
-      formData
-    )
-    expect(formData.append.mock.calls).toEqual([
-      ['lang', 'en'],
-      ['file', file, 'a.png'],
-    ])
+  test('leaves the file field out when there is no file (new entity row)', () => {
+    const formData = buildNodeFormData({ node: { uuid: 'row-1' }, cycle: '0', timezoneOffset: 0, lang: 'en' })
+    expect([...formData.keys()]).toEqual(['node', 'cycle', 'draft', 'timezoneOffset', 'lang'])
   })
 })

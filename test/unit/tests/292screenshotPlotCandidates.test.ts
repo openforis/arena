@@ -1,8 +1,13 @@
+import * as Survey from '@core/survey/survey'
+import * as NodeDef from '@core/survey/nodeDef'
+
+import * as SB from '../../utils/surveyBuilder'
+
 import {
   buildPlotCandidates,
   planarDistance,
-  type MapPlotPoint,
-  type MapPlotPointsLayer,
+  toPlotLayers,
+  type PlotLayer,
 } from '@webapp/components/MapContainer/workspace/screenshot/screenshotPlotCandidates'
 
 const point = ({
@@ -17,13 +22,12 @@ const point = ({
   lat: number
   lng: number
   keys: unknown[]
-}): MapPlotPoint => ({
+}): any => ({
   geometry: { coordinates: [lng, lat] },
   properties: { key: `${recordUuid}-${parentUuid}`, recordUuid, parentUuid, ancestorsKeys: keys },
 })
 
-const clusterLayer: MapPlotPointsLayer = {
-  layerKey: 'cluster-coordinate-def',
+const clusterLayer: PlotLayer = {
   entityDefUuid: 'cluster-def',
   entityName: 'cluster',
   entityLabel: 'Cluster',
@@ -31,12 +35,11 @@ const clusterLayer: MapPlotPointsLayer = {
     point({ recordUuid: 'r1', parentUuid: 'n1', lat: 41.9, lng: 12.5, keys: [1] }),
     point({ recordUuid: 'r2', parentUuid: 'n2', lat: 42.9, lng: 13.5, keys: ['2'] }),
     point({ recordUuid: 'r3', parentUuid: 'n3', lat: Number.NaN, lng: 14.5, keys: ['3'] }),
-    { geometry: { coordinates: [1, 1] }, properties: { key: 'x', parentUuid: 'n4' } },
+    { geometry: { coordinates: [1, 1] }, properties: { key: 'x', parentUuid: 'n4' } } as any,
   ],
 }
 
-const otherLayer: MapPlotPointsLayer = {
-  layerKey: 'cluster-other-coordinate-def',
+const otherLayer: PlotLayer = {
   entityDefUuid: 'other-def',
   entityName: 'other',
   entityLabel: 'Other',
@@ -94,5 +97,30 @@ describe('Screenshot plot candidates (292)', () => {
   test('measures a planar distance corrected by latitude', () => {
     expect(planarDistance({ lat: 10, lng: 10 }, { lat: 10, lng: 10 })).toBe(0)
     expect(planarDistance({ lat: 60, lng: 0 }, { lat: 60, lng: 2 })).toBeCloseTo(1, 5)
+  })
+
+  test('keeps the active layers of a location attribute with its multiple entity, dropping the others', async () => {
+    const survey = await SB.survey(
+      { uuid: 'user' },
+      SB.entity(
+        'cluster',
+        SB.attribute('id', NodeDef.nodeDefType.integer).key(),
+        SB.entity('plot', SB.attribute('loc', NodeDef.nodeDefType.coordinate)).multiple()
+      )
+    ).build()
+    const plotDef = Survey.getNodeDefByName('plot')(survey)
+    const locDef = Survey.getNodeDefByName('loc')(survey)
+    const points = clusterLayer.points
+    const layers = toPlotLayers({
+      activeLayers: [
+        { key: NodeDef.getUuid(locDef), layerName: 'a', points, flyToPoint: jest.fn() },
+        { key: 'sampling-point-data-0', layerName: 'b', points, flyToPoint: jest.fn() },
+      ],
+      survey,
+      lang: 'en',
+    })
+    expect(layers).toEqual([
+      { entityDefUuid: NodeDef.getUuid(plotDef), entityName: 'plot', entityLabel: expect.any(String), points },
+    ])
   })
 })

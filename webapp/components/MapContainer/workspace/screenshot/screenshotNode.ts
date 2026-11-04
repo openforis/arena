@@ -1,5 +1,7 @@
 import * as Node from '@core/record/node'
 
+import { objectToFormData } from '@webapp/service/api/utils/apiUtils'
+
 export type ScreenshotFileValue = Record<string, string | number>
 
 export type ScreenshotNodeChangeInput = {
@@ -16,13 +18,11 @@ export type ScreenshotNodeChangeInput = {
 
 export type ScreenshotNodeChange = {
   ok: boolean
-  errorKey?: 'plotNotFound'
+  errorKey?: 'plotNotFound' | 'notApplicable'
   kind?: 'create' | 'update' | 'createRow' // createRow: node is the new entity row, sent first without the file
   node?: any
   replacedFileName?: string | null
 }
-
-export type NodePersistField = { name: string; value: string | Blob; fileName?: string }
 
 /**
  * Builds the value of a file attribute holding the screenshot.
@@ -102,7 +102,7 @@ const findAttributeParentNode = ({
  * Builds the node to send: an update of the existing single attribute, a new attribute node, or a new entity row
  * when the attribute is in a multiple entity (see buildRowAttributeNode for the second step).
  * @param {ScreenshotNodeChangeInput} input - The record nodes, the plot and the attribute.
- * @returns {ScreenshotNodeChange} The change, or an error key when the plot is not in the record.
+ * @returns {ScreenshotNodeChange} The change, or an error key when the plot is not in the record or the attribute is not applicable.
  */
 export const buildScreenshotNodeChange = (input: ScreenshotNodeChangeInput): ScreenshotNodeChange => {
   const {
@@ -126,6 +126,8 @@ export const buildScreenshotNodeChange = (input: ScreenshotNodeChangeInput): Scr
   }
   const parentNode = plotNode ? findAttributeParentNode({ nodes, plotNode, attributeParentDefUuid }) : null
   if (!parentNode) return { ok: false, errorKey: 'plotNotFound' }
+  // the server does not refuse a value in a non-applicable attribute; for a new row it decides on the new row itself
+  if (!Node.isChildApplicable(attributeDefUuid)(parentNode)) return { ok: false, errorKey: 'notApplicable' }
 
   const parentNodeUuid = Node.getUuid(parentNode)
   const existing = attributeMultiple
@@ -182,7 +184,7 @@ export const buildRowAttributeNode = ({
 }
 
 /**
- * Builds the multipart fields of POST /api/survey/:surveyId/record/:recordUuid/node.
+ * Builds the multipart body of POST /api/survey/:surveyId/record/:recordUuid/node.
  * @param {object} params - The parameters.
  * @param {object} params.node - The node to persist.
  * @param {string} params.cycle - The record cycle.
@@ -190,9 +192,9 @@ export const buildRowAttributeNode = ({
  * @param {string} params.lang - The UI language.
  * @param {Blob|null} [params.file] - The image (none for a new entity row).
  * @param {string} [params.fileName] - The file name.
- * @returns {Array<NodePersistField>} The fields, in order.
+ * @returns {FormData} The form data.
  */
-export const buildNodePersistFields = ({
+export const buildNodeFormData = ({
   node,
   cycle,
   timezoneOffset,
@@ -206,28 +208,13 @@ export const buildNodePersistFields = ({
   lang: string
   file?: Blob | null
   fileName?: string
-}): NodePersistField[] => [
-  { name: 'node', value: JSON.stringify(node) },
-  { name: 'cycle', value: String(cycle) },
-  { name: 'draft', value: 'false' },
-  { name: 'timezoneOffset', value: String(timezoneOffset) },
-  { name: 'lang', value: lang },
-  ...(file ? [{ name: 'file', value: file, fileName: fileName ?? '' }] : []),
-]
-
-/**
- * Appends the fields to a form data object; the file keeps its name.
- * @param {Array<NodePersistField>} fields - The fields.
- * @param {object} formData - A FormData (or any object with the same append method).
- * @returns {object} The same form data object.
- */
-export const fieldsToFormData = <T extends Pick<FormData, 'append'>>(fields: NodePersistField[], formData: T): T => {
-  for (const field of fields) {
-    if (field.fileName === undefined) {
-      formData.append(field.name, field.value as string)
-    } else {
-      formData.append(field.name, field.value as Blob, field.fileName)
-    }
-  }
-  return formData
-}
+}): FormData =>
+  objectToFormData({
+    node: JSON.stringify(node),
+    cycle,
+    draft: false,
+    timezoneOffset,
+    lang,
+    // a File (not a bare Blob) so that the upload keeps its name
+    ...(file ? { file: new File([file], fileName ?? '', { type: file.type }) } : {}),
+  })
