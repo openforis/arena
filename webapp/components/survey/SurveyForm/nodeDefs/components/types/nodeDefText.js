@@ -1,6 +1,7 @@
 import './nodeDefText.scss'
 
 import classNames from 'classnames'
+import { numericFormatter } from 'react-number-format'
 
 import { Strings } from '@openforis/arena-core'
 
@@ -12,6 +13,7 @@ import * as Node from '@core/record/node'
 
 import { Link, Markdown } from '@webapp/components'
 import { Input } from '@webapp/components/form/Input'
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
 import NodeDefErrorBadge from '../nodeDefErrorBadge'
@@ -37,13 +39,28 @@ const extractConstantMarkdownValue = (nodeDef) => {
   return A.pipe(Strings.removePrefix(`"`), Strings.removeSuffix('\n'), Strings.removeSuffix('"'))(expr)
 }
 
-const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord }) => {
+const TextInput = ({ nodeDef, readOnly, node, edit, updateNode, canEditRecord, insideTable = false }) => {
   const multiline = NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine
+  const className = classNames(`survey-form__node-def-${NodeDef.getType(nodeDef)}`, { multiline })
+  const numberFormat = NodeDefUIProps.getNumberFormat(nodeDef)
+  const disabled = edit || !canEditRecord || readOnly
+
+  if (insideTable && !edit && disabled) {
+    // table cells already have borders: show the value as a label instead of a disabled input
+    const value = String(Node.getValue(node, ''))
+    const label = numberFormat && value ? numericFormatter(value, numberFormat) : value
+    return (
+      <div className={classNames(className, 'survey-form__node-def-table-cell-value')}>
+        <LabelWithTooltip label={label} />
+      </div>
+    )
+  }
+
   return (
-    <div className={classNames(`survey-form__node-def-${NodeDef.getType(nodeDef)}`, { multiline })}>
+    <div className={className}>
       <Input
-        disabled={edit || !canEditRecord || readOnly}
-        numberFormat={NodeDefUIProps.getNumberFormat(nodeDef)}
+        disabled={disabled}
+        numberFormat={numberFormat}
         inputType={multiline ? 'textarea' : 'input'}
         textTransformFunction={NodeDef.getTextTransformFunction(nodeDef)}
         value={Node.getValue(node, '')}

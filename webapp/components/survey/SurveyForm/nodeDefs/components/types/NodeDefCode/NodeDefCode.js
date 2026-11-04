@@ -13,6 +13,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
 
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
@@ -25,6 +26,7 @@ const NodeDefCode = (props) => {
     canEditRecord = false,
     edit = false,
     entryDataQuery = false,
+    insideTable = false,
     nodeDef,
     nodes = [],
     parentNode = null,
@@ -103,7 +105,14 @@ const NodeDefCode = (props) => {
         })
       )
       .join(', ')
-    return <span className="value-preview">{nodesValueSummary}</span>
+    // in table cells show the value in a single line (ellipsis + tooltip) to avoid wrapping
+    return insideTable ? (
+      <div className="value-preview survey-form__node-def-table-cell-value">
+        <LabelWithTooltip label={nodesValueSummary} />
+      </div>
+    ) : (
+      <span className="value-preview">{nodesValueSummary}</span>
+    )
   }
 
   if (renderType === NodeDefLayout.renderType.dropdown || entryDataQuery || autocomplete) {
@@ -140,6 +149,7 @@ NodeDefCode.propTypes = {
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
   entryDataQuery: PropTypes.bool,
+  insideTable: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.arrayOf(PropTypes.object),
   parentNode: PropTypes.object,
