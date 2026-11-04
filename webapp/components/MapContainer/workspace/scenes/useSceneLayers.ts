@@ -3,9 +3,10 @@ import type L from 'leaflet'
 
 import { useNotifyError } from '@webapp/components/hooks'
 import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
+import { setGridLayerOpacity } from '@webapp/components/MapContainer/workspace/layers/customOverlays'
 import { useI18nT, useLang } from '@webapp/store/system'
 
-import { getSceneAttribution, getSceneOverlayId, removeBaseSceneOverlays, setSceneLayerOpacity } from './sceneLayerInfo'
+import { getSceneAttribution, getSceneOverlayId, removeBaseSceneOverlays } from './sceneLayerInfo'
 import { formatSceneDate } from './scenePeriod'
 import type { SceneBandMix, SceneResult } from './sceneTypes'
 
@@ -74,7 +75,7 @@ export const useSceneLayers = (map: L.Map): SceneLayersState => {
           layer,
           opacity: 1,
           attribution,
-          setOpacity: setSceneLayerOpacity,
+          setOpacity: setGridLayerOpacity,
         })
       } catch {
         if (!isSuperseded()) notifyError({ key: 'mapWorkspace.scenes.messages.layerError' })

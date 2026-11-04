@@ -17,8 +17,6 @@ import { UtmGrid } from './UtmGrid'
 import { INITIAL_ZOOM_LEVEL, MAP_MAX_ZOOM, MAP_MIN_ZOOM } from './mapZoom'
 import { MapInstanceBridge, MapWorkspaceProvider } from './workspace/MapWorkspaceContext'
 import { MapWorkspace } from './workspace/MapWorkspace'
-import { MapPlanetPeriodProvider } from './workspace/imagery/MapPlanetPeriodContext'
-import { PlanetPeriodLayers } from './workspace/imagery/PlanetPeriodLayers'
 import { MapCustomOverlaysProvider } from './workspace/layers/MapCustomOverlaysContext'
 import { CustomOverlaysRegistrar } from './workspace/customLayers/CustomOverlaysRegistrar'
 import { MapCustomLayersProvider } from './workspace/customLayers/MapCustomLayersContext'
@@ -118,7 +116,6 @@ export const MapContainer = (props) => {
       <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       <MapMarker editable={editable} point={markerPoint} onPointUpdated={onMarkerPointUpdated} title={markerTitle} />
       {geoJson && <GeoJSON data={geoJson} />}
-      {variant === 'full' && <PlanetPeriodLayers />}
       <UtmGrid />
       <ZoomControl position="bottomright" />
     </RLMapContainer>
@@ -127,22 +124,20 @@ export const MapContainer = (props) => {
   return (
     <div className={`map-wrapper map-wrapper--${variant}${editable ? ' editable' : ''}`}>
       <MapContextProvider>
-        <MapPlanetPeriodProvider>
-          <MapWorkspaceProvider variant={variant}>
-            <MapCustomOverlaysProvider>
-              <MapCustomLayersProvider>
-                {/* compact maps have no Layers tab: they get custom base maps only */}
-                {variant === 'full' && <CustomOverlaysRegistrar />}
-                <MapWorkspace
-                  hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
-                  railTabs={railTabs}
-                  records={records}
-                  mapElement={mapElement}
-                />
-              </MapCustomLayersProvider>
-            </MapCustomOverlaysProvider>
-          </MapWorkspaceProvider>
-        </MapPlanetPeriodProvider>
+        <MapWorkspaceProvider variant={variant}>
+          <MapCustomOverlaysProvider>
+            <MapCustomLayersProvider>
+              {/* compact maps have no Layers tab: they get custom base maps only */}
+              {variant === 'full' && <CustomOverlaysRegistrar />}
+              <MapWorkspace
+                hint={editable ? i18nInstance.t('mapView.locationEditInfo') : null}
+                railTabs={railTabs}
+                records={records}
+                mapElement={mapElement}
+              />
+            </MapCustomLayersProvider>
+          </MapCustomOverlaysProvider>
+        </MapWorkspaceProvider>
       </MapContextProvider>
 
       {editable && (

@@ -94,20 +94,29 @@ export const isInPeriod = (datetime: string, period: ScenePeriod): boolean => {
   return Number.isFinite(time) && time >= period.start.getTime() && time <= period.end.getTime()
 }
 
+// Building an Intl.DateTimeFormat is slow and the results list formats every row: reuse them (locales x few option sets).
+const dateFormats = new Map<string, Intl.DateTimeFormat>()
+
 /**
- * Creates a UTC date format for a locale, falling back to English for an invalid locale tag.
+ * Gets the cached UTC date format for a locale, falling back to English for an invalid locale tag.
  *
  * @param {string} locale - BCP 47 locale (the i18n language).
  * @param {Intl.DateTimeFormatOptions} options - Format options.
  * @returns {Intl.DateTimeFormat} The format.
  */
 const createDateFormat = (locale: string, options: Intl.DateTimeFormatOptions): Intl.DateTimeFormat => {
-  const utcOptions: Intl.DateTimeFormatOptions = { ...options, timeZone: 'UTC' }
-  try {
-    return new Intl.DateTimeFormat(locale, utcOptions)
-  } catch {
-    return new Intl.DateTimeFormat(FALLBACK_LOCALE, utcOptions)
+  const cacheKey = `${locale}|${JSON.stringify(options)}`
+  let format = dateFormats.get(cacheKey)
+  if (!format) {
+    const utcOptions: Intl.DateTimeFormatOptions = { ...options, timeZone: 'UTC' }
+    try {
+      format = new Intl.DateTimeFormat(locale, utcOptions)
+    } catch {
+      format = new Intl.DateTimeFormat(FALLBACK_LOCALE, utcOptions)
+    }
+    dateFormats.set(cacheKey, format)
   }
+  return format
 }
 
 /**

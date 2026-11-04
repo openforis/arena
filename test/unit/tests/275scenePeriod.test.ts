@@ -70,6 +70,9 @@ describe('Sentinel-2 scene period (275)', () => {
   test('formats dates in UTC for the user language', () => {
     expect(formatSceneDate('2026-10-07T23:30:00.000Z', 'en')).toBe('Oct 7, 2026')
     expect(formatSceneDate('2026-10-07T08:00:00.000Z', 'not a locale!')).toBe('Oct 7, 2026')
+    // second call is served from the format cache
+    expect(formatSceneDate('2026-10-07T08:00:00.000Z', 'not a locale!')).toBe('Oct 7, 2026')
+    expect(formatSceneDate('2026-10-07T23:30:00.000Z', 'en')).toBe('Oct 7, 2026')
     expect(formatMonthLabel('2026-04', 'en', false)).toBe('Apr')
     expect(formatMonthLabel('2026-04', 'en', true)).toBe('Apr 2026')
     expect(formatPeriodRange(getScenePeriod(6, NOW), 'en')).toMatch(/^Apr 11\s–\sOct 11, 2026$/)

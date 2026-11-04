@@ -1,10 +1,5 @@
 import { getSelectableBaseLayers } from '@webapp/components/MapContainer/workspace/toolbar/baseMapItems'
 import { getDisplayMenuSections } from '@webapp/components/MapContainer/workspace/toolbar/displayMenuItems'
-import {
-  formatPeriodLabel,
-  getPeriodValue,
-  indexPeriodsByValue,
-} from '@webapp/components/MapContainer/workspace/imagery/planetPeriods'
 
 const baseLayers = [
   { key: 'a', name: 'A' },
@@ -52,16 +47,5 @@ describe('Map menu models (255)', () => {
       ['showControlPoints', false],
       ['showPlotReferencePoint', false],
     ])
-  })
-
-  test('Planet period values, labels and index', () => {
-    expect(getPeriodValue({ year: 2021, month: 12 })).toBe(24264)
-    expect(getPeriodValue({ year: 2020, month: 6, yearTo: 2020, monthTo: 8 })).toBe(4040)
-    expect(getPeriodValue({ year: 2020, month: 12, yearTo: 2021, monthTo: 5 })).toBe(4041)
-    expect(formatPeriodLabel({ year: 2021, month: 12 })).toBe('2021 - 12')
-    expect(formatPeriodLabel({ year: 2020, month: 6, yearTo: 2020, monthTo: 8 })).toBe('2020 - 6 / 2020 - 8')
-    const january = { year: 2021, month: 1 }
-    const february = { year: 2021, month: 2 }
-    expect(indexPeriodsByValue([january, february])).toEqual({ 24253: january, 24254: february })
   })
 })

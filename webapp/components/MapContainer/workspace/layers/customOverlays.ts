@@ -1,4 +1,4 @@
-import type { Layer } from 'leaflet'
+import type { GridLayer, Layer } from 'leaflet'
 
 export type MapCustomOverlayGroup = 'uploaded' | 'custom' | 'scenes'
 
@@ -18,6 +18,16 @@ export type MapCustomOverlay = {
 export const MAP_CUSTOM_OVERLAY_GROUPS: MapCustomOverlayGroup[] = ['custom', 'scenes', 'uploaded']
 
 export const MIN_OVERLAY_OPACITY = 0.05
+
+/**
+ * Applies an opacity to a tile or scene layer (both are Leaflet GridLayers).
+ * @param {Layer} layer - The grid layer.
+ * @param {number} opacity - The opacity.
+ * @returns {void}
+ */
+export const setGridLayerOpacity = (layer: Layer, opacity: number): void => {
+  ;(layer as GridLayer).setOpacity(opacity)
+}
 
 /**
  * Keeps an opacity between 0.05 (never fully invisible: use "show" for that) and 1.

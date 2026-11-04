@@ -4,7 +4,13 @@
  */
 import { SCENE_INDEX_COLUMNS } from '@webapp/components/MapContainer/workspace/scenes/sceneRows'
 import { getScenePeriod } from '@webapp/components/MapContainer/workspace/scenes/scenePeriod'
-import { isAbortError, searchScenes } from '@webapp/components/MapContainer/workspace/scenes/sceneSearch'
+import {
+  failSearch,
+  finishSearch,
+  getSearchView,
+  isAbortError,
+  searchScenes,
+} from '@webapp/components/MapContainer/workspace/scenes/sceneSearch'
 import type {
   RowGroupInfo,
   SceneIndexReader,
@@ -122,5 +128,29 @@ describe('Sentinel-2 scene search (281)', () => {
     expect(isAbortError(new DOMException('cancelled', 'AbortError'))).toBe(true)
     expect(isAbortError(new Error('boom'))).toBe(false)
     expect(isAbortError(null)).toBe(false)
+  })
+})
+
+describe('Scene search state (281)', () => {
+  const scenes = [{ id: 'A' }] as never[]
+  const finished = (key: string) => ({ key, scenes, failed: false })
+
+  test('a result of an old request is ignored, the current one is shown', () => {
+    expect(getSearchView('new', finished('old'))).toEqual({ scenes, loading: true, failed: false })
+    expect(getSearchView('new', finished('new'))).toEqual({ scenes, loading: false, failed: false })
+    expect(getSearchView('new', { key: 'new', scenes: [], failed: true }).failed).toBe(true)
+    expect(getSearchView('old', { key: 'new', scenes: [], failed: true }).failed).toBe(false)
+    expect(getSearchView(null, finished('old'))).toEqual({ scenes: [], loading: false, failed: false })
+  })
+
+  test('aborted searches never finish', () => {
+    const live = new AbortController()
+    const aborted = new AbortController()
+    aborted.abort()
+    expect(finishSearch(live.signal, 'k', scenes)).toEqual(finished('k'))
+    expect(finishSearch(aborted.signal, 'k', scenes)).toBeNull()
+    expect(failSearch(aborted.signal, 'k', new Error('x'))).toBeNull()
+    expect(failSearch(live.signal, 'k', Object.assign(new Error('x'), { name: 'AbortError' }))).toBeNull()
+    expect(failSearch(live.signal, 'k', new Error('x'))).toMatchObject({ key: 'k', failed: true })
   })
 })

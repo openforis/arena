@@ -8,7 +8,6 @@ import {
   getSceneOverlayId,
   isBaseSceneOverlayId,
   removeBaseSceneOverlays,
-  setSceneLayerOpacity,
 } from '@webapp/components/MapContainer/workspace/scenes/sceneLayerInfo'
 import {
   getScenePanelMessage,
@@ -55,12 +54,6 @@ describe('Sentinel-2 layer info and panel status (283)', () => {
       removeOverlay
     )
     expect(removeOverlay.mock.calls).toEqual([['s2:base:trueColour:A']])
-  })
-
-  test('applies opacity through the grid layer', () => {
-    const layer = { setOpacity: jest.fn() }
-    setSceneLayerOpacity(layer as unknown as Parameters<typeof setSceneLayerOpacity>[0], 0.4)
-    expect(layer.setOpacity).toHaveBeenCalledWith(0.4)
   })
 
   test('explains why there is no area yet', () => {

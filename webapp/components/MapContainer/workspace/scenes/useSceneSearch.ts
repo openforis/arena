@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react'
 
-import { isAbortError, searchScenes } from './sceneSearch'
+import type { FinishedSearch } from './sceneSearch'
+import { failSearch, finishSearch, getSearchView, searchScenes } from './sceneSearch'
 import type { SceneIndexReader, ScenePeriod, SceneResult } from './sceneTypes'
 
 export type SceneSearchState = {
@@ -9,10 +10,6 @@ export type SceneSearchState = {
   failed: boolean
   retry: () => void
 }
-
-type FinishedSearch = { key: string; scenes: SceneResult[]; failed: boolean }
-
-const NO_SCENES: SceneResult[] = []
 
 // One reader per session: it caches footers and row groups across searches and panel remounts.
 let readerPromise: Promise<SceneIndexReader> | null = null
@@ -74,23 +71,15 @@ export const useSceneSearch = ({ tiles, period }: { tiles: string[]; period: Sce
     const controller = new AbortController()
     loadSceneIndexReader()
       .then((reader) => searchScenes({ reader, tiles, period, signal: controller.signal }))
-      .then((scenes) => {
-        if (!controller.signal.aborted) setFinished({ key, scenes, failed: false })
-      })
-      .catch((error: unknown) => {
-        if (!controller.signal.aborted && !isAbortError(error)) setFinished({ key, scenes: NO_SCENES, failed: true })
+      .then((scenes) => finishSearch(controller.signal, key, scenes))
+      .catch((error: unknown) => failSearch(controller.signal, key, error))
+      .then((result) => {
+        if (result) setFinished(result)
       })
     return () => controller.abort()
   }, [attempt, period, tiles])
 
   const retry = useCallback((): void => setAttempt((value) => value + 1), [])
 
-  if (requestKey === null) return { scenes: NO_SCENES, loading: false, failed: false, retry }
-  const current = finished?.key === requestKey ? finished : null
-  return {
-    scenes: finished?.scenes ?? NO_SCENES,
-    loading: current === null,
-    failed: current?.failed ?? false,
-    retry,
-  }
+  return { ...getSearchView(requestKey, finished), retry }
 }

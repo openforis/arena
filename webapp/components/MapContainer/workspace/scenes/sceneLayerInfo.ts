@@ -1,6 +1,3 @@
-// Type-only import: erased at build time, so unit tests do not load Leaflet.
-import type { GridLayer, Layer } from 'leaflet'
-
 import type { GeoBounds, SceneBandMix } from './sceneTypes'
 
 const BASE_PREFIX = 's2:base:'
@@ -61,16 +58,4 @@ export const removeBaseSceneOverlays = (overlays: Array<{ id: string }>, removeO
   for (const overlay of overlays) {
     if (isBaseSceneOverlayId(overlay.id)) removeOverlay(overlay.id)
   }
-}
-
-/**
- * Applies opacity to a scene layer (a Leaflet GridLayer).
- *
- * @param {Layer} layer - Scene layer.
- * @param {number} opacity - Opacity 0.05–1.
- * @returns {void}
- */
-export const setSceneLayerOpacity = (layer: Layer, opacity: number): void => {
-  const gridLayer = layer as GridLayer
-  gridLayer.setOpacity(opacity)
 }

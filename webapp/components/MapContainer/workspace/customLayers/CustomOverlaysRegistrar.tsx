@@ -1,4 +1,3 @@
-import type L from 'leaflet'
 import { useEffect, useRef } from 'react'
 
 import { createCustomLeafletLayer } from '@webapp/components/MapContainer/workspace/customLayers/createCustomLeafletLayer'
@@ -9,16 +8,7 @@ import {
 import { useMapCustomLayers } from '@webapp/components/MapContainer/workspace/customLayers/MapCustomLayersContext'
 import { useMapCustomOverlays } from '@webapp/components/MapContainer/workspace/layers/MapCustomOverlaysContext'
 
-/**
- * Applies an opacity to a custom overlay.
- * @param {L.Layer} layer - The tile layer.
- * @param {number} opacity - The opacity.
- * @returns {void}
- */
-const setTileLayerOpacity = (layer: L.Layer, opacity: number): void => {
-  ;(layer as L.TileLayer).setOpacity(opacity)
-}
-
+import { setGridLayerOpacity } from '@webapp/components/MapContainer/workspace/layers/customOverlays'
 /**
  * Keeps the overlay registry (Layers tab, group "Custom (WMS / WMTS)") in sync with the stored custom overlays.
  * Removing a row in the Layers tab deletes the stored layer.
@@ -54,7 +44,7 @@ export const CustomOverlaysRegistrar = (): null => {
         layer: createCustomLeafletLayer(layer),
         opacity: layer.opacity,
         attribution: layer.attribution,
-        setOpacity: setTileLayerOpacity,
+        setOpacity: setGridLayerOpacity,
         onRemove: () => {
           if (!registeredIds.delete(id)) return
           void removeLayerRef.current(layer)
