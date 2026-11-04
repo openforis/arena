@@ -61,7 +61,11 @@ export const MapWorkspace = ({ hint = null, railTabs, records, mapElement }: Map
   const onKeyDown = useMapShortcuts({ rootRef, handlers })
 
   return (
-    <div ref={setRoot} className={classNames('map-workspace', `map-workspace--${variant}`)} onKeyDown={onKeyDown}>
+    <div // NOSONAR: a keyboard handler for the whole workspace (Escape ends a tool), not a control
+      ref={setRoot}
+      className={classNames('map-workspace', `map-workspace--${variant}`)}
+      onKeyDown={onKeyDown}
+    >
       <div
         className="map-workspace__toolbar"
         role="toolbar"

@@ -396,22 +396,22 @@
       width: 12px;
       height: 12px;
       margin: 2px;
-      border: 2px solid #3885ca;
+      border: 2px solid $colorPrimary;
       border-radius: 50%;
-      background: rgba(56, 133, 202, 0.5);
+      background: with-alpha($colorPrimary, 0.5);
     }
 
     &--cluster {
       width: 20px;
       height: 20px;
       border-radius: 50%;
-      background: #3885ca;
-      color: #fff;
+      background: $colorPrimary;
+      color: $colorOnPrimary;
       font-size: 0.65rem;
     }
 
     &--polygon {
-      border: 2px solid #3885ca;
+      border: 2px solid $colorPrimary;
     }
 
     &--grid {

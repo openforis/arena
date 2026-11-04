@@ -122,7 +122,8 @@ export const useScreenshotActions = ({
     }
     if (!blob || !plot || !attribute) return
     setActionError(null)
-    save({ plot, attribute, blob, fileName: name }).then((outcome) =>
+    // save never rejects: it turns every failure into an outcome
+    void save({ plot, attribute, blob, fileName: name }).then((outcome) =>
       handleSaveOutcome({
         outcome,
         plotLabel: plot.label,

@@ -25,7 +25,7 @@ export const initialMeasureState: MeasureState = { phase: 'idle', vertices: [], 
 const applyChange = (state: MeasureState, vertices: LatLngPair[], latLngs: LatLngPair[]): MeasureState => {
   // before the first click of a new measurement only the cursor moves: keep what is shown
   if (vertices.length === 0) return state
-  const cursor = latLngs.length > vertices.length ? latLngs[latLngs.length - 1] : null
+  const cursor = latLngs.length > vertices.length ? (latLngs.at(-1) ?? null) : null
   return { phase: 'drawing', vertices, cursor }
 }
 

@@ -48,15 +48,14 @@ export const ScreenshotPreviewBox = ({
 export const ScreenshotNoticeLine = ({ notice }: { notice: ScreenshotNotice }): React.ReactElement => {
   const i18n = useI18n()
   return (
-    <p
-      role="status"
+    <output
       className={classNames('map-screenshot-dialog__notice', {
         'map-screenshot-dialog__notice--error': notice.blocking,
       })}
       data-testid={TestId.mapWorkspace.screenshotNotice}
     >
       {i18n.t(notice.key, { ...notice.params, ...PLAIN_TEXT })}
-    </p>
+    </output>
   )
 }
 
@@ -70,15 +69,14 @@ export const ScreenshotNoticeLine = ({ notice }: { notice: ScreenshotNotice }): 
 export const ScreenshotDoneLine = ({ done }: { done: ScreenshotDoneNotice }): React.ReactElement => {
   const i18n = useI18n()
   return (
-    <p
-      role="status"
+    <output
       className={classNames('map-screenshot-dialog__notice', {
         'map-screenshot-dialog__notice--success': !done.pending,
       })}
       data-testid={TestId.mapWorkspace.screenshotDone}
     >
       {i18n.t(done.key, { ...done.params, ...PLAIN_TEXT })}
-    </p>
+    </output>
   )
 }
 

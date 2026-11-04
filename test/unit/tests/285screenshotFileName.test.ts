@@ -55,5 +55,6 @@ describe('Screenshot file name (285)', () => {
   test('sanitizes a name part', () => {
     expect(sanitizeFileNamePart('__a  b__')).toBe('a_b')
     expect(sanitizeFileNamePart('-.x.-')).toBe('x')
+    expect(sanitizeFileNamePart(`a${'.'.repeat(50000)}b-`)).toBe(`a${'.'.repeat(50000)}b`)
   })
 })

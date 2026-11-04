@@ -11,6 +11,7 @@ import {
 } from '@webapp/components/MapContainer/workspace/screenshot/mapCapture'
 import { getCaptureNotice } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCaptureRules'
 import { canvasToBlob, composeScreenshot } from '@webapp/components/MapContainer/workspace/screenshot/screenshotCompose'
+import { errorToText } from '@webapp/components/MapContainer/workspace/screenshot/screenshotSave'
 import {
   buildStampLines,
   formatStampCoordinates,
@@ -72,13 +73,6 @@ type FinishedImage = {
 }
 
 const NO_IMAGE: ComposedImage = { blob: null, url: null, composing: false, errorDetails: null }
-
-/**
- * Turns an error into a short text.
- * @param {unknown} error - The error.
- * @returns {string} The message.
- */
-const errorToText = (error: unknown): string => (error instanceof Error ? error.message : String(error))
 
 /**
  * Stage 1: captures the map again when the capture mode, the plot (fit to plot only) or "markers" change.

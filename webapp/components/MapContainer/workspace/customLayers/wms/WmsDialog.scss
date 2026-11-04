@@ -15,6 +15,7 @@
   .map-wms-dialog__hint,
   .map-wms-dialog__summary,
   .map-wms-dialog__layer-name {
+    display: block;
     color: $colorOnSurfaceVariant;
     font-size: 0.85rem;
   }

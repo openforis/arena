@@ -63,7 +63,7 @@ export const getScenePeriod = (months: number, now: Date): ScenePeriod => {
   const year = Math.floor(startMonth / MONTHS_PER_YEAR)
   const monthIndex = startMonth - year * MONTHS_PER_YEAR
   const day = Math.min(now.getUTCDate(), daysInMonth(year, monthIndex))
-  return { months: normalized, start: new Date(Date.UTC(year, monthIndex, day)), end: new Date(now.getTime()) }
+  return { months: normalized, start: new Date(Date.UTC(year, monthIndex, day)), end: new Date(now) }
 }
 
 /**

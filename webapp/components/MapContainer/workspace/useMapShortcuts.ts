@@ -44,7 +44,7 @@ export const useMapShortcuts = ({
       if (event.defaultPrevented) return
       // React portals bubble through the React tree from outside the DOM subtree of the root
       const root = rootRef.current
-      if (!root || !root.contains(event.target as Node)) return
+      if (!root?.contains(event.target as Node)) return
       const ignoreKeys = isInPopup(event.target) || isEditableTarget(event.target)
       const action = resolveMapShortcut(event.nativeEvent, ignoreKeys)
       const handler = action ? handlersRef.current[action] : undefined

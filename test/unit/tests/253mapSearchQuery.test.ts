@@ -68,6 +68,20 @@ describe('Map search query (253)', () => {
     expect(parseMapSearchQuery('41° N 12° E foo')).toEqual({ type: 'invalidCoordinates' })
   })
 
+  test('DMS units out of order and a pair without spaces', () => {
+    expect(parseMapSearchQuery('41°10″5′ N 12° E')).toEqual({ type: 'invalidCoordinates' })
+    expect(parseMapSearchQuery('41°10″ N 12° E')).toEqual({ type: 'coordinates', lat: 41 + 10 / 3600, lng: 12 })
+    expectPoint('41,12', 41, 12)
+  })
+
+  test('long runs of spaces are parsed in linear time', () => {
+    const spaces = ' '.repeat(50000)
+    const started = Date.now()
+    expect(parseMapSearchQuery(`37M 1${spaces}x`).type).toBe('text')
+    expect(parseMapSearchQuery(`1${spaces}x`).type).toBe('text')
+    expect(Date.now() - started).toBeLessThan(1000)
+  })
+
   test('anything else is text', () => {
     expect(parseMapSearchQuery('12')).toEqual({ type: 'text', text: '12' })
     expect(parseMapSearchQuery(' plot 3 ')).toEqual({ type: 'text', text: 'plot 3' })

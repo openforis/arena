@@ -63,7 +63,7 @@ describe('Sentinel-2 scene panel translations (284)', () => {
     expect(enScenes.title).toBe('Sentinel-2 scenes')
     expect(enScenes.menuSearch).toBe('Search recent Sentinel-2 scenes…')
     expect(enScenes['messages.empty']).toBe('No scenes match. Allow more cloud or a longer period.')
-    expect(Object.keys(enScenes).length).toBe(56)
+    expect(Object.keys(enScenes)).toHaveLength(56)
   })
 
   test.each(LANGUAGE_CODES)('%s has every English key with the same placeholders', (lang) => {

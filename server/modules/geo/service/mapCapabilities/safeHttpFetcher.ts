@@ -43,7 +43,7 @@ const TIMEOUT_ERROR_NAMES = new Set(['AbortError', 'CanceledError', 'TimeoutErro
 // a capabilities document costs much memory and event loop time to parse: refuse instead of queuing
 export const MAX_CONCURRENT_FETCHES = 4
 
-const XML_LIKE_CONTENT_TYPES = ['', 'text/plain', 'application/octet-stream']
+const XML_LIKE_CONTENT_TYPES = new Set(['', 'text/plain', 'application/octet-stream'])
 
 /**
  * Resolves a host name with the operating system resolver, returning every address.
@@ -223,7 +223,7 @@ export const toFetchError = (
 const isXmlResponse = ({ contentType, body }: { contentType: string; body: string }): boolean => {
   if (contentType.includes('xml')) return true
   const mimeType = contentType.split(';')[0].trim()
-  return XML_LIKE_CONTENT_TYPES.includes(mimeType) && body.trimStart().startsWith('<')
+  return XML_LIKE_CONTENT_TYPES.has(mimeType) && body.trimStart().startsWith('<')
 }
 
 let activeFetches = 0
@@ -250,6 +250,13 @@ const detectEncoding = ({ contentType, data }: { contentType: string; data: Arra
 }
 
 /**
+ * Returns a header value as text.
+ * @param {unknown} value - The header value.
+ * @returns {string} The value, or '' when missing or not a string.
+ */
+const headerText = (value: unknown): string => (typeof value === 'string' ? value : '')
+
+/**
  * Checks the status and the type of a response and decodes its body.
  * @param {HttpResponse} response - The response.
  * @returns {FetchedText} The body (decoded, byte order mark removed) and the content type.
@@ -258,11 +265,11 @@ const detectEncoding = ({ contentType, data }: { contentType: string; data: Arra
 const readResponse = (response: HttpResponse): FetchedText => {
   const { status, headers = {} } = response
   if (status >= 300 && status < 400) {
-    const location = String(headers.location ?? '').slice(0, REDIRECT_LOCATION_MAX_LENGTH)
+    const location = headerText(headers.location).slice(0, REDIRECT_LOCATION_MAX_LENGTH)
     throw newMapCustomLayersError('redirectNotFollowed', { location })
   }
   if (status < 200 || status >= 300) throw newMapCustomLayersError('fetchFailed', { status })
-  const contentType = String(headers['content-type'] ?? '').toLowerCase()
+  const contentType = headerText(headers['content-type']).toLowerCase()
   const body = new TextDecoder(detectEncoding({ contentType, data: response.data })).decode(response.data)
   if (!isXmlResponse({ contentType, body })) throw newMapCustomLayersError('notCapabilities')
   return { body, contentType }

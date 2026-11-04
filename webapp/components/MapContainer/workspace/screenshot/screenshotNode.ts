@@ -62,7 +62,7 @@ const findSelfOrAncestorOfDef = ({
   nodesByUuid: Map<string, any>
   startUuid: string
   nodeDefUuid: string
-}): any | null => {
+}): any => {
   let current = nodesByUuid.get(startUuid) ?? null
   let steps = 0
   // the step limit protects against a malformed parent chain
@@ -90,7 +90,7 @@ const findAttributeParentNode = ({
   nodes: any[]
   plotNode: any
   attributeParentDefUuid: string
-}): any | null => {
+}): any => {
   if (Node.getNodeDefUuid(plotNode) === attributeParentDefUuid) return plotNode
   return (
     nodes.find((node) => Node.getNodeDefUuid(node) === attributeParentDefUuid && Node.isDescendantOf(plotNode)(node)) ??

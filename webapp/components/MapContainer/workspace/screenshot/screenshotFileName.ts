@@ -19,18 +19,33 @@ const pad2 = (value: number): string => String(value).padStart(2, '0')
 export const formatIsoDate = (date: Date): string =>
   `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`
 
+const FILE_NAME_SEPARATORS = new Set(['.', '_', '-'])
+
+/**
+ * Returns a record key value as text.
+ * @param {unknown} key - The key value.
+ * @returns {string} The text; '' for missing values and objects.
+ */
+export const toKeyText = (key: unknown): string =>
+  typeof key === 'string' || typeof key === 'number' || typeof key === 'boolean' ? String(key) : ''
+
 /**
  * Keeps letters, digits, dots, dashes and underscores; other runs become "_", separators at the ends are dropped.
  * @param {string} text - The text.
  * @returns {string} The sanitized text (possibly empty).
  */
-export const sanitizeFileNamePart = (text: string): string =>
-  text
+export const sanitizeFileNamePart = (text: string): string => {
+  const cleaned = text
     .normalize('NFC')
     .replace(/[^\p{L}\p{N}._-]+/gu, '_')
     .replace(/_+/g, '_')
-    .replace(/^[._-]+/, '')
-    .replace(/[._-]+$/, '')
+  // a loop instead of /[._-]+$/, which backtracks on long runs of separators
+  let start = 0
+  let end = cleaned.length
+  while (start < end && FILE_NAME_SEPARATORS.has(cleaned[start])) start += 1
+  while (end > start && FILE_NAME_SEPARATORS.has(cleaned[end - 1])) end -= 1
+  return cleaned.slice(start, end)
+}
 
 /**
  * Cuts a text to a number of code points, never splitting a surrogate pair.
@@ -73,9 +88,7 @@ export const buildScreenshotFileName = ({
   date: Date
   extension?: string
 }): string => {
-  const parts = [entityName ?? '', ...keys.map((key) => (key === null || key === undefined ? '' : String(key)))]
-    .map(sanitizeFileNamePart)
-    .filter((part) => part.length > 0)
+  const parts = [entityName ?? '', ...keys.map(toKeyText)].map(sanitizeFileNamePart).filter((part) => part.length > 0)
   const prefix = parts.length > 0 ? cutCodePoints(parts.join('_'), MAX_BASE_LENGTH - DATE_SUFFIX_LENGTH) : FALLBACK_BASE
   return ensureImageFileName(`${prefix}_${formatIsoDate(date)}`, extension)
 }

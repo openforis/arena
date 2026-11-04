@@ -1,6 +1,8 @@
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
+import { toKeyText } from '@webapp/components/MapContainer/workspace/screenshot/screenshotFileName'
+
 import type {
   ActiveLayer,
   MapLayerPoint,
@@ -57,9 +59,7 @@ export const toPlotLayers = ({
  * @returns {Array<string>} The key texts.
  */
 const toKeyTexts = (ancestorsKeys: unknown[] = []): string[] =>
-  ancestorsKeys
-    .map((key) => (key === null || key === undefined ? '' : String(key).trim()))
-    .filter((key) => key.length > 0)
+  ancestorsKeys.map((key) => toKeyText(key).trim()).filter((key) => key.length > 0)
 
 /**
  * Builds the plot candidate of a point, when the point is valid.

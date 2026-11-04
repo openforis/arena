@@ -41,7 +41,7 @@ const TILE_PLACEHOLDERS = new Set(['z', 'x', 'y', '-y', 's', 'r'])
 // characters that would break out of a query parameter value, plus control characters
 const WMS_LAYERS_FORBIDDEN_PATTERN = /[&=%#?\u0000-\u001f\u007f]/
 // whitespace and control characters are never valid inside a URL
-const URL_FORBIDDEN_PATTERN = /[\s\u0000-\u001f\u007f]/
+export const URL_FORBIDDEN_PATTERN = /[\s\u0000-\u0008\u000e-\u001f\u007f]/
 const PLACEHOLDER_PATTERN = /\{([^{}]*)\}/g
 
 /**

@@ -34,7 +34,7 @@ export const createSceneIndexCache = <P extends CachedPart>({
    */
   const evictPart = (url: string): void => {
     parts.delete(url)
-    for (const key of [...rowGroups.keys()]) {
+    for (const key of rowGroups.keys()) {
       if (key.startsWith(`${url}#`)) rowGroups.delete(key)
     }
   }
@@ -47,7 +47,7 @@ export const createSceneIndexCache = <P extends CachedPart>({
    */
   const getPart = (url: string): Promise<P | null> => {
     const cached = parts.get(url)
-    if (cached) return cached
+    if (cached !== undefined) return cached
     const part = openPart(url)
     parts.set(url, part)
     part.catch(() => evictPart(url))
@@ -67,7 +67,7 @@ export const createSceneIndexCache = <P extends CachedPart>({
     if (!part) return []
     const current = part.groups.find((candidate) => candidate.index === group.index)
     // The group came from an older footer: reading it here would return other rows.
-    if (!current || current.rowStart !== group.rowStart || current.rowEnd !== group.rowEnd) {
+    if (current?.rowStart !== group.rowStart || current.rowEnd !== group.rowEnd) {
       throw new Error(`Row group ${group.index} of ${url} changed since its footer was read.`)
     }
     return loadRows(part, group, columns)
@@ -93,7 +93,7 @@ export const createSceneIndexCache = <P extends CachedPart>({
     readRows: (url, group, columns) => {
       const key = `${url}#${group.rowStart}#${columns.join(',')}`
       const cached = rowGroups.get(key)
-      if (cached) return cached
+      if (cached !== undefined) return cached
       const rows = loadChecked(url, group, columns)
       rememberRows(key, rows)
       rows.catch(() => evictPart(url))

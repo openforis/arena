@@ -16,12 +16,13 @@ export type MapSearchResult =
 export const MAP_SEARCH_MAX_RECORDS = 8
 
 // "37M 271977 E 9953205 N", "37m 271977 9953205", "37M 271977.5, 9953205"
-const UTM_PATTERN = /^(\d{1,2})\s*([C-HJ-NP-X])\s+(\d+(?:\.\d+)?)\s*E?\s*[,;]?\s*(\d+(?:\.\d+)?)\s*N?$/i
-// one "12°30′15″ N" part; minutes and seconds optional, ' and ’ accepted for ′, " ” “ accepted for ″, comma decimals accepted
-const DMS_PART_PATTERN =
-  /(\d{1,3}(?:[.,]\d+)?)\s*°\s*(?:(\d{1,2}(?:[.,]\d+)?)\s*['′’]\s*)?(?:(\d{1,2}(?:[.,]\d+)?)\s*(?:["″”“]|''|’’)\s*)?([NSEW])/gi
+// one separator class between the numbers, so the pattern never backtracks over long runs of spaces
+const UTM_PATTERN = /^(\d{1,2})\s*([C-HJ-NP-X])\s+(\d+(?:\.\d+)?)[\sE,;]+(\d+(?:\.\d+)?)(?:\s*N)?$/i
+// DMS numbers by unit (°, ′, ″), comma decimals accepted
+const DMS_UNITS = ['°', '′', '″']
+const DMS_NUMBER_PATTERNS = [/^\d{1,3}(?:[.,]\d+)?$/, /^\d{1,2}(?:[.,]\d+)?$/, /^\d{1,2}(?:[.,]\d+)?$/]
 // "41.9, 12.5", "41,9 12,5", "-0.42;36.95"
-const DECIMAL_PAIR_PATTERN = /^([+-]?\d+(?:[.,]\d+)?)\s*[,;\s]\s*([+-]?\d+(?:[.,]\d+)?)$/
+const DECIMAL_PAIR_PATTERN = /^([+-]?\d+(?:[.,]\d+)?)[\s,;]+([+-]?\d+(?:[.,]\d+)?)$/
 const UTM_MIN_EASTING = 100000
 const UTM_MAX_EASTING = 900000
 const UTM_MAX_NORTHING = 10000000
@@ -100,17 +101,26 @@ const parseUtm = (text: string): MapSearchQuery | null => {
 }
 
 /**
- * Converts degrees, minutes and seconds texts to decimal degrees.
- * @param {string} degrees - Degrees text.
- * @param {string|undefined} minutes - Minutes text.
- * @param {string|undefined} seconds - Seconds text.
- * @returns {number|null} Decimal degrees, or null when minutes or seconds are 60 or more.
+ * Reads a "12°30′15″" amount (minutes and seconds optional) as decimal degrees.
+ * @param {string} text - The amount, without spaces.
+ * @returns {number|null} Decimal degrees, or null when malformed or when minutes or seconds are 60 or more.
  */
-const dmsPartToDegrees = (degrees: string, minutes: string | undefined, seconds: string | undefined): number | null => {
-  const minutesValue = toNumber(minutes)
-  const secondsValue = toNumber(seconds)
-  if (minutesValue >= 60 || secondsValue >= 60) return null
-  return toNumber(degrees) + minutesValue / 60 + secondsValue / 3600
+const readDmsAmount = (text: string): number | null => {
+  // "12°30′15″" → ["12", "°", "30", "′", "15", "″", ""]
+  const pieces = text.split(/([°′″])/)
+  if (pieces.length < 3 || pieces.at(-1) !== '') return null
+  const values = [0, 0, 0]
+  let lastUnit = -1
+  for (let index = 0; index + 1 < pieces.length; index += 2) {
+    const unit = DMS_UNITS.indexOf(pieces[index + 1])
+    const outOfOrder = unit <= lastUnit || (lastUnit === -1 && unit !== 0)
+    if (outOfOrder || !DMS_NUMBER_PATTERNS[unit].test(pieces[index])) return null
+    values[unit] = toNumber(pieces[index])
+    lastUnit = unit
+  }
+  const [degrees, minutes, seconds] = values
+  if (minutes >= 60 || seconds >= 60) return null
+  return degrees + minutes / 60 + seconds / 3600
 }
 
 /**
@@ -119,21 +129,25 @@ const dmsPartToDegrees = (degrees: string, minutes: string | undefined, seconds:
  * @returns {MapSearchQuery|null} The query, or null when the text has no degree sign.
  */
 const parseDms = (rawText: string): MapSearchQuery | null => {
-  // º (ordinal indicator) and ˚ (ring above) are common stand-ins for the degree sign
-  const text = rawText.replace(/[º˚]/g, '°')
+  // º (ordinal indicator) and ˚ (ring above) are common stand-ins for °, ' and ’ for ′, " ” “ '' and ’’ for ″
+  const text = rawText
+    .replace(/[º˚]/g, '°')
+    .replace(/''|’’/g, '″')
+    .replace(/['’]/g, '′')
+    .replace(/["”“]/g, '″')
+    .replace(/\s/g, '')
   if (!text.includes('°')) return null
+  // "0°25′23″S,36°57′04″E" → ["0°25′23″", "S", ",36°57′04″", "E", ""]
+  const pieces = text.split(/([NSEW])/i).map((piece) => piece.replace(/^[,;]+/, ''))
   const values: Record<string, number> = {}
-  for (const match of text.matchAll(DMS_PART_PATTERN)) {
-    const [, degrees, minutes, seconds, letterText] = match
-    const letter = letterText.toUpperCase()
-    const value = dmsPartToDegrees(degrees, minutes, seconds)
-    if (value === null) return { type: 'invalidCoordinates' }
+  for (let index = 0; index + 1 < pieces.length; index += 2) {
+    const letter = pieces[index + 1].toUpperCase()
+    const value = readDmsAmount(pieces[index])
     const axis = letter === 'N' || letter === 'S' ? 'lat' : 'lng'
-    if (axis in values) return { type: 'invalidCoordinates' }
+    if (value === null || axis in values) return { type: 'invalidCoordinates' }
     values[axis] = letter === 'S' || letter === 'W' ? -value : value
   }
-  const rest = text.replace(DMS_PART_PATTERN, '').replace(/[\s,;]/g, '')
-  if (rest.length > 0 || !('lat' in values) || !('lng' in values)) return { type: 'invalidCoordinates' }
+  if (pieces.at(-1) !== '' || !('lat' in values) || !('lng' in values)) return { type: 'invalidCoordinates' }
   return toCoordinatesQuery(values.lat, values.lng)
 }
 

@@ -80,7 +80,7 @@ export const startNodeSaveWaiter = ({
   subscribe: NodeSaveSubscribe
   timeoutMs: number
 }): { result: Promise<NodeSaveResult>; startTimer: () => void; cancel: () => void } => {
-  let resolveResult: (value: NodeSaveResult) => void = () => undefined
+  let resolveResult: (value: NodeSaveResult) => void
   const result = new Promise<NodeSaveResult>((resolve) => {
     resolveResult = resolve
   })
@@ -143,13 +143,24 @@ export const startNodeSaveWaiter = ({
 }
 
 /**
+ * Turns a thrown value into a short text.
+ * @param {unknown} error - The thrown value.
+ * @returns {string} The message.
+ */
+export const errorToText = (error: unknown): string => {
+  if (error instanceof Error) return error.message
+  if (typeof error === 'string') return error
+  return JSON.stringify(error) ?? 'unknown error'
+}
+
+/**
  * Extracts a short description of a failed request.
  * @param {unknown} error - The error (axios error or other).
  * @returns {string} The server error key or message, or the error message.
  */
 export const describeSaveError = (error: unknown): string => {
   const data = (error as { response?: { data?: { key?: string; message?: string } } })?.response?.data
-  return data?.key ?? data?.message ?? (error as Error)?.message ?? String(error)
+  return data?.key ?? data?.message ?? errorToText(error)
 }
 
 /**

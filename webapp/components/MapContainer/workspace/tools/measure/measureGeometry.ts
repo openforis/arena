@@ -50,10 +50,11 @@ const samePoint = (pairA: LatLngPair, pairB: LatLngPair): boolean => pairA[0] ==
 export const toOpenRing = (vertices: LatLngPair[]): LatLngPair[] => {
   const ring: LatLngPair[] = []
   for (const vertex of vertices) {
-    const last = ring[ring.length - 1]
+    const last = ring.at(-1)
     if (!last || !samePoint(last, vertex)) ring.push(vertex)
   }
-  if (ring.length > 1 && samePoint(ring[0], ring[ring.length - 1])) ring.pop()
+  const tail = ring.at(-1)
+  if (ring.length > 1 && tail && samePoint(ring[0], tail)) ring.pop()
   return ring
 }
 

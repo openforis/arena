@@ -57,7 +57,8 @@ const findParam = (url: URL, name: string): string | null => {
  */
 const withGetCapabilities = (url: URL, service: string): string => {
   const result = new URL(url.toString())
-  for (const key of [...result.searchParams.keys()]) {
+  // a copy: deleting while iterating the live keys would skip some
+  for (const key of new Set(result.searchParams.keys())) {
     if (SERVICE_PARAM_KEYS.has(key.toLowerCase())) result.searchParams.delete(key)
   }
   result.searchParams.set('SERVICE', service)

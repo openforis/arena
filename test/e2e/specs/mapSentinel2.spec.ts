@@ -155,6 +155,7 @@ test.describe('Map Sentinel-2 scenes', () => {
   })
 
   test('finds recent scenes and adds one as a layer (network)', async ({ page, sampleSurvey: _ }) => {
+    // skipped by default: it reads the public Sentinel-2 index over the network
     test.skip(!process.env.E2E_NETWORK, 'Reads the public Sentinel-2 index: run with E2E_NETWORK=1')
     test.setTimeout(180_000)
     await goToCoordinates(page, '-1.3, 36.8')

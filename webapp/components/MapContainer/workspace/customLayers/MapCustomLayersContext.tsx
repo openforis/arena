@@ -43,8 +43,8 @@ const MapCustomLayersContext = createContext<MapCustomLayersContextValue>({
   canEditSurveyLayers: false,
   fetchFailed: false,
   retryFetch: () => undefined,
-  addLayers: async () => undefined,
-  removeLayer: async () => undefined,
+  addLayers: () => Promise.resolve(),
+  removeLayer: () => Promise.resolve(),
 })
 
 /**
@@ -91,7 +91,7 @@ const useStoredMapCustomLayers = () => {
   const stored = loaded && entry ? entry.layers : emptyStoredLayers
   const setStored = useCallback(
     (update: (prev: StoredLayers) => StoredLayers) =>
-      setEntry((prev) => (prev && prev.key === key ? { key, layers: update(prev.layers) } : prev)),
+      setEntry((prev) => (prev?.key === key ? { key, layers: update(prev.layers) } : prev)),
     [key]
   )
   const fetchFailed = !loaded && key !== null && failedKey === key

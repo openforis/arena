@@ -89,14 +89,14 @@ type ScenesMessageProps = { message: ScenePanelMessage; showRetry: boolean; onRe
 const ScenesMessage = ({ message, showRetry, onRetry }: ScenesMessageProps): React.ReactElement => {
   const t = useI18nT()
   return (
-    <div className="scenes-panel__message" role="status">
+    <output className="scenes-panel__message">
       <span data-testid={TestId.mapWorkspace.scenesMessage}>{t(message.key, message.params)}</span>
       {showRetry && (
         <Button size="small" onClick={onRetry} data-testid={TestId.mapWorkspace.scenesRetry}>
           {t('mapWorkspace.scenes.messages.retry')}
         </Button>
       )}
-    </div>
+    </output>
   )
 }
 

@@ -190,10 +190,8 @@ export const MapSearchBox = ({ records }: { records?: MapWorkspaceRecords }): Re
         {results.map((result, index) => {
           const selectable = isSelectable(result)
           return (
-            <li
-              // results are rebuilt from the text on every change: the index is their identity
-
-              key={index}
+            <li // NOSONAR: the options are driven from the combobox input (aria-activedescendant), never focused
+              key={result.type === 'record' ? result.candidate.id : result.type}
               id={optionId(index)}
               role="option"
               aria-selected={index === activeIndex}

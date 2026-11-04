@@ -12,9 +12,9 @@ import type { ReactElement, ReactNode } from 'react'
 
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import { clampOpacity } from './customOverlays'
-import type { MapCustomOverlay, MapCustomOverlayGroup } from './customOverlays'
+import type { MapCustomOverlay } from './customOverlays'
 
-export type { MapCustomOverlay, MapCustomOverlayGroup }
+export type { MapCustomOverlay, MapCustomOverlayGroup } from './customOverlays'
 
 export type MapCustomOverlayInput = Omit<MapCustomOverlay, 'visible'> & { visible?: boolean }
 

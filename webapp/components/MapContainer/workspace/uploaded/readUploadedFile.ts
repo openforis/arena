@@ -17,7 +17,7 @@ type GeoJsonInput = Parameters<typeof L.geoJSON>[0]
  * @returns {string} The text (objects as JSON).
  */
 const formatPropertyValue = (value: unknown): string =>
-  value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value)
+  value !== null && typeof value === 'object' ? JSON.stringify(value) : String(value as string | number | boolean)
 
 /**
  * Binds a popup with the properties of a feature as plain text (the file comes from the user; KML popups are sanitized in L.KML).

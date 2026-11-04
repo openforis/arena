@@ -115,7 +115,8 @@ export const collectWmsLayers = (
  */
 const stripGetMapParams = (url: string): string => {
   const result = new URL(url)
-  for (const key of [...result.searchParams.keys()]) {
+  // a copy: deleting while iterating the live keys would skip some
+  for (const key of new Set(result.searchParams.keys())) {
     if (GET_MAP_PARAM_KEYS.has(key.toLowerCase())) result.searchParams.delete(key)
   }
   if ([...result.searchParams.keys()].length === 0) result.search = ''

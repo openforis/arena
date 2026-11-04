@@ -69,7 +69,7 @@ export const useSceneSearch = ({ tiles, period }: { tiles: string[]; period: Sce
     if (tiles.length === 0) return undefined
     const key = getRequestKey(tiles, period, attempt)
     const controller = new AbortController()
-    loadSceneIndexReader()
+    void loadSceneIndexReader()
       .then((reader) => searchScenes({ reader, tiles, period, signal: controller.signal }))
       .then((scenes) => finishSearch(controller.signal, key, scenes))
       .catch((error: unknown) => failSearch(controller.signal, key, error))

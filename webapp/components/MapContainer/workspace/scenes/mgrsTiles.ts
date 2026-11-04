@@ -92,7 +92,7 @@ const collectTiles = (lons: number[], lats: number[]): string[] | null => {
       if (tiles.size > MAX_SCENE_TILES) return null
     }
   }
-  return [...tiles].sort()
+  return [...tiles].sort((a, b) => a.localeCompare(b))
 }
 
 /**

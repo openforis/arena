@@ -35,7 +35,7 @@ const forEachFileInZip = async (file, callback) => {
       throw new Error('Path traversal detected')
     }
     // awaited, so that the limit is enforced before the callback
-    const content = await fileEntry.async('uint8array')
+    const content = await fileEntry.async('uint8array') // NOSONAR
     totalSize += content.length
     if (totalSize > MAX_SIZE) {
       throw new Error('Reached max. size')

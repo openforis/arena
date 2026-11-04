@@ -39,7 +39,7 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
     const step = KEY_STEPS[event.key]
     if (!step) return
     event.preventDefault()
-    const focusedIndex = tabRefs.current.findIndex((element) => element === document.activeElement)
+    const focusedIndex = tabRefs.current.indexOf(document.activeElement as HTMLButtonElement)
     const nextIndex = (Math.max(focusedIndex, 0) + step + tabs.length) % tabs.length
     tabRefs.current[nextIndex]?.focus()
   }
@@ -49,6 +49,7 @@ export const MapRail = ({ tabs }: { tabs: MapRailTab[] }): ReactElement => {
       <div
         className="map-rail__tabs"
         role="tablist"
+        tabIndex={-1}
         aria-orientation="vertical"
         aria-label={t('mapWorkspace.rail.label')}
         onKeyDown={onTabsKeyDown}

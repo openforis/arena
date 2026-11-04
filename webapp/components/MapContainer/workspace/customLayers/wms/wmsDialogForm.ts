@@ -11,6 +11,7 @@ import {
   type MapImageFormat,
   mapImageFormats,
   type MapWmsVersion,
+  URL_FORBIDDEN_PATTERN,
 } from '@core/map/customLayers/mapCustomLayer'
 import {
   MAX_CAPABILITIES_LAYERS,
@@ -60,8 +61,6 @@ export type WmsDialogFormAction =
   | { type: 'savingChanged'; saving: boolean; error?: WmsFormMessage }
 
 export const WMS_MIN_OPACITY_PERCENT = 10
-// whitespace and control characters are never valid inside a URL (the model refuses them)
-const URL_FORBIDDEN_PATTERN = /[\s\u0000-\u001f\u007f]/
 const DEFAULT_OPACITY_PERCENT_BY_ROLE: Record<MapCustomLayerRole, number> = { overlay: 80, baseMap: 100 }
 
 /**
