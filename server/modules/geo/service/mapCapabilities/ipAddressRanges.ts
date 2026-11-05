@@ -195,7 +195,7 @@ const IPV6_EMBEDDING_IPV4: Ipv6Cidr[] = [
 ]
 
 // the only IPv6 block allocated to global unicast: everything else is unrouted or special-purpose
-const IPV6_GLOBAL_UNICAST = ipv6Cidr('2000::', 3)
+const IPV6_GLOBAL_UNICAST = ipv6Cidr('2000::', 3) // NOSONAR
 
 const IPV6_NON_PUBLIC: Ipv6Cidr[] = [
   ipv6Cidr('::', 96), // unspecified, loopback, IPv4-compatible
