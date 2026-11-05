@@ -5,11 +5,13 @@
   src: url('/img/IcoMoon-Free.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
+  // icons must not be rendered with a fallback font (ligature names would be shown)
+  font-display: block;
 }
 
 .icon {
   /* use !important to prevent issues with browser extensions that change fonts */
-  font-family: 'IcoMoon-Free' !important;
+  font-family: 'IcoMoon-Free' !important; // NOSONAR
   speak: none;
   font-style: normal;
   font-weight: normal;
@@ -30,43 +32,43 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  font-size: 16px !important;
+  font-size: 16px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-8px {
-  font-size: 8px !important;
+  font-size: 8px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-10px {
-  font-size: 10px !important;
+  font-size: 10px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-12px {
-  font-size: 12px !important;
+  font-size: 12px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-14px {
-  font-size: 14px !important;
+  font-size: 14px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-16px {
-  font-size: 16px !important;
+  font-size: 16px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-18px {
-  font-size: 18px !important;
+  font-size: 18px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-20px {
-  font-size: 20px !important;
+  font-size: 20px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-24px {
-  font-size: 24px !important;
+  font-size: 24px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-32px {
-  font-size: 32px !important;
+  font-size: 32px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
 }
 
 .icon-left {
