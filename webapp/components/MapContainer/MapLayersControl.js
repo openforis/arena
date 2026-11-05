@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
 

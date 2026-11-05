@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react'
+import { createContext, useContext, useEffect, useMemo, useReducer, useState } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap } from 'react-leaflet'

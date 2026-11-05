@@ -1,6 +1,6 @@
 import './SurveyInfo.scss'
 
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { Link, useNavigate } from 'react-router'

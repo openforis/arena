@@ -1,6 +1,6 @@
 import './AutocompleteDialog.scss'
 
-import React, { useCallback, useRef, useMemo } from 'react'
+import { useCallback, useRef, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'

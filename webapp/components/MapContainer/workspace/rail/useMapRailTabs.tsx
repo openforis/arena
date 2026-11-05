@@ -1,4 +1,6 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
+
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 import type { MapRailTab, MapWorkspaceVariant } from '../mapWorkspaceTypes'
 import { scenesRailTab } from '../scenes/scenesRailTab'
@@ -8,7 +10,8 @@ import { LegendPanel } from './LegendPanel'
 const NO_RAIL_TABS: MapRailTab[] = []
 
 /**
- * Builds the rail tabs: Layers, the caller's tabs (e.g. Records), Sentinel-2, Legend. Compact maps have no rail.
+ * Builds the rail tabs: Layers, the caller's tabs (e.g. Records), Sentinel-2 (experimental), Legend.
+ * Compact maps have no rail.
  * @param {object} params - Parameters.
  * @param {MapWorkspaceVariant} params.variant - Workspace variant.
  * @param {MapRailTab[]} [params.extraRailTabs] - Tabs added by the page (memoised by the caller).
@@ -23,8 +26,9 @@ export const useMapRailTabs = ({
   variant: MapWorkspaceVariant
   extraRailTabs?: MapRailTab[]
   dataLayersCount: number
-}): MapRailTab[] =>
-  useMemo(() => {
+}): MapRailTab[] => {
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
+  return useMemo(() => {
     if (variant !== 'full') return NO_RAIL_TABS
     return [
       {
@@ -34,7 +38,7 @@ export const useMapRailTabs = ({
         content: <LayersPanel dataLayersCount={dataLayersCount} />,
       },
       ...extraRailTabs,
-      scenesRailTab,
+      ...(experimentalFeatures ? [scenesRailTab] : []),
       {
         key: 'legend',
         labelKey: 'mapWorkspace.rail.tabs.legend',
@@ -42,4 +46,5 @@ export const useMapRailTabs = ({
         content: <LegendPanel />,
       },
     ]
-  }, [dataLayersCount, extraRailTabs, variant])
+  }, [dataLayersCount, experimentalFeatures, extraRailTabs, variant])
+}

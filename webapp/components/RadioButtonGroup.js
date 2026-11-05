@@ -1,6 +1,6 @@
 import './RadioButtonGroup.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { RadioGroup } from '@mui/material'
 import classNames from 'classnames'

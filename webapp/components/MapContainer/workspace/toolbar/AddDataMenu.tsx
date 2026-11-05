@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import type { ReactElement } from 'react'
 
 import { TestId } from '@webapp/utils/testId'

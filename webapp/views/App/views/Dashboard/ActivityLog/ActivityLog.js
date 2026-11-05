@@ -1,6 +1,6 @@
 import './ActivityLog.scss'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'

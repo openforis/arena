@@ -1,6 +1,6 @@
 import './StorageCard.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 

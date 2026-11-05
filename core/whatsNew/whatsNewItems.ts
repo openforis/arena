@@ -27,6 +27,12 @@ export type WhatsNewItem = {
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
   {
+    id: 'mapWorkspace',
+    version: '2.11.0',
+    audience: whatsNewAudiences.dataCleanser,
+    image: '/img/whats-new/mapWorkspace.png',
+  },
+  {
     id: 'dataMatrixExport',
     version: '2.11.0',
     audience: whatsNewAudiences.dataCleanser,

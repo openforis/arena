@@ -1,6 +1,6 @@
 import './nodeDefTaxon.scss'
 
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react'
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react'
 import { connect } from 'react-redux'
 import * as A from '@core/arena'
 import PropTypes from 'prop-types'

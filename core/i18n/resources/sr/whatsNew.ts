@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    mapWorkspace: {
+      title: `Novi radni prostor mape`,
+      description: `**Podaci > Mapa** ima novi raspored: na vrhu menije **Osnovna mapa**, **Dodaj podatke**, **Prikaz** i **Alati** i polje za pretragu koordinata i ključeva zapisa, sa strane kartice **Slojevi**, **Zapisi** i **Legenda**, a na dnu statusnu traku sa koordinatama pokazivača i razmerom.
+
+Pregledajte zapise na mapi jedan za drugim, dodajte sopstvene datoteke (KML, Shapefile, GeoJSON) ili WMS / WMTS servise, merite rastojanja i površine i pravite snimke ekrana.`,
+    },
     dataMatrixExport: {
       title: `Izvoz podataka u obliku matrice`,
       description: `U **Podaci > Istraživač podataka** izaberite višestruki entitet (npr. vrste svakog zapisa), kliknite na **Izvezi** i izaberite **Izvezi kao: Matrica podataka** da dobijete tabelu sa jednim redom po vrsti (ili drugom atributu) i jednom kolonom po zapisu, sa vrednošću koju izaberete u ćelijama (npr. pokrovnost).

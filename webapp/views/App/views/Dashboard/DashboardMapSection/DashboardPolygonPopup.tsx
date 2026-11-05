@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import { Link as RouterLink } from 'react-router'
 

@@ -1,6 +1,6 @@
 import './ProfilePictureEditor.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import AvatarEditor from 'react-avatar-editor'
 

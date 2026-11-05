@@ -1,6 +1,6 @@
 import './SamplingPointDataSummary.scss'
 
-import React, { useEffect, useContext, useState, useMemo } from 'react'
+import { useEffect, useContext, useState, useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'

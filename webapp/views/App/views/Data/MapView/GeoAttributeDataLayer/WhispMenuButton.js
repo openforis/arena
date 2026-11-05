@@ -1,6 +1,6 @@
 import './WhispMenuButton.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import axios from 'axios'
 import PropTypes from 'prop-types'
 

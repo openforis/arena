@@ -1,6 +1,6 @@
 import './CategorySelector.scss'
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'

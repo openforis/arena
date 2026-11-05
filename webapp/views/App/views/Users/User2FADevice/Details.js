@@ -1,6 +1,6 @@
 import './Details.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import i18nInstance from '@core/i18n/i18nFactory'

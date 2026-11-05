@@ -19,6 +19,11 @@ type TestFixtures = {
    * When true (default), the browser context is logged in as the worker test user before the test starts.
    */
   authenticated: boolean
+  /**
+   * When set, overrides the experimental features flag (EXPERIMENTAL_FEATURES) of the server config read by the web app,
+   * so the test does not depend on how the server is started; undefined (default): the server setting.
+   */
+  experimentalFeatures: boolean | undefined
   api: ArenaApi
   /**
    * A new, empty survey, created before the test and set as current survey of the test user.
@@ -63,9 +68,18 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
 
   authenticated: [true, { option: true }],
 
-  context: async ({ context, authenticated, testUser, baseURL }, use) => {
+  experimentalFeatures: [undefined, { option: true }],
+
+  context: async ({ context, authenticated, experimentalFeatures, testUser, baseURL }, use) => {
     // do not send analytics from the tests
     await context.route(/google-analytics\.com|googletagmanager\.com/, (route) => route.abort())
+    if (experimentalFeatures !== undefined) {
+      await context.route('**/api/info', async (route) => {
+        const response = await route.fetch()
+        const info = await response.json()
+        await route.fulfill({ response, json: { ...info, config: { ...info.config, experimentalFeatures } } })
+      })
+    }
     if (authenticated) {
       // context.request shares the cookie jar with the browser context:
       // the refresh token cookie set by the login is then used by the web app to get its auth token

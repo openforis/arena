@@ -1,6 +1,6 @@
 import './MapWorkspace.scss'
 
-import React, { useCallback, useMemo, useRef } from 'react'
+import { useCallback, useMemo, useRef } from 'react'
 import type { ReactElement, ReactNode } from 'react'
 import classNames from 'classnames'
 

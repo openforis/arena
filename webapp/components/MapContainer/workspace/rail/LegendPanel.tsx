@@ -1,4 +1,3 @@
-import React from 'react'
 import type { ReactElement } from 'react'
 
 import * as Survey from '@core/survey/survey'

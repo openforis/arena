@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { FormControlLabel as MuiFormControlLabel, Switch as MUISwitch } from '@mui/material'
 import PropTypes from 'prop-types'
 

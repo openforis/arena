@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import { Dropdown } from '@webapp/components/form'
 import { useI18n } from '@webapp/store/system'

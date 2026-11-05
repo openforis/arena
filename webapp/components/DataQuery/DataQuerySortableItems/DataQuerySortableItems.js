@@ -1,6 +1,6 @@
 import './DataQuerySortableItems.scss'
 
-import React, { useRef } from 'react'
+import { useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'

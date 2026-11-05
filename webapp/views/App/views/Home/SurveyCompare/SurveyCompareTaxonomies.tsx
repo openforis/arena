@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { SurveyCompareResult, SurveyCompareTaxonomyDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import { SurveyCompareListWithChildren } from './SurveyCompareListWithChildren'

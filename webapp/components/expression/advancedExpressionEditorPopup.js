@@ -1,6 +1,6 @@
 import './expressionEditorPopup.scss'
 
-import React, { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import ReactCodeMirror from '@uiw/react-codemirror'
 import { javascript } from '@codemirror/lang-javascript'
 import { autocompletion } from '@codemirror/autocomplete'

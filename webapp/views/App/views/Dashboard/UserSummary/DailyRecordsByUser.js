@@ -1,4 +1,4 @@
-import React, { useContext, useState, useMemo } from 'react'
+import { useContext, useState, useMemo } from 'react'
 
 import * as User from '@core/user/user'
 import { convertDateFromISOToDisplay } from '@core/dateUtils'

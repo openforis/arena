@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { MapRailTab } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
 
 import { ScenesPanel } from './ScenesPanel'

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { CircleMarker, GeoJSON } from 'react-leaflet'
 import PropTypes from 'prop-types'
 

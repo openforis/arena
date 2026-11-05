@@ -1,7 +1,7 @@
 import './SurveyForm.scss'
 import './react-grid-layout.scss'
 
-import React, { useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { connect, useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'

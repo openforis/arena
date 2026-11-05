@@ -1,6 +1,6 @@
 import './DataQueriesPanel.scss'
 
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { DataQuerySummaries } from '@openforis/arena-core'

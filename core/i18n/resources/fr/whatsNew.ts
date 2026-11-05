@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    mapWorkspace: {
+      title: `Un nouvel espace de travail cartographique`,
+      description: `**Données > Carte** a une nouvelle disposition : en haut, les menus **Fond de carte**, **Ajouter des données**, **Affichage** et **Outils** et une zone de recherche de coordonnées et de clés d'enregistrements ; sur le côté, les onglets **Couches**, **Enregistrements** et **Légende** ; en bas, une barre d'état avec les coordonnées du pointeur et l'échelle.
+
+Parcourez les enregistrements sur la carte, ajoutez vos propres fichiers (KML, Shapefile, GeoJSON) ou services WMS / WMTS, mesurez des distances et des surfaces et faites des captures d'écran.`,
+    },
     dataMatrixExport: {
       title: `Exporter les données sous forme de matrice`,
       description: `Dans **Données > Explorateur**, sélectionnez une entité multiple (p. ex. les espèces de chaque enregistrement), cliquez sur **Exporter** et choisissez **Exporter en tant que : Matrice de données** pour obtenir un tableau avec une ligne par espèce (ou tout autre attribut) et une colonne par enregistrement, avec la valeur de votre choix dans les cellules (p. ex. le recouvrement).

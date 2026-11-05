@@ -1,6 +1,6 @@
 import './CollectImportReport.scss'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 

@@ -52,6 +52,8 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        // automatic JSX runtime: JSX does not use React, so an unused `import React` is reported
+        jsxPragma: null,
       },
       globals: {
         ...globals.browser,

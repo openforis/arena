@@ -1,6 +1,6 @@
 import './MobilePreviewPanel.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 
 import { ENV } from '@core/processUtils'

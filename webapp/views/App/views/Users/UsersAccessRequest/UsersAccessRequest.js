@@ -1,6 +1,6 @@
 import './UsersAccessRequest.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 

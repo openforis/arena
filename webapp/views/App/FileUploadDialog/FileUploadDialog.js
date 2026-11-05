@@ -1,6 +1,6 @@
 import './FileUploadDialog.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter, ProgressBar } from '@webapp/components'

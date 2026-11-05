@@ -1,6 +1,6 @@
 import './checkbox.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import classNames from 'classnames'
 import MuiFormControlLabel from '@mui/material/FormControlLabel'
 import MuiCheckbox from '@mui/material/Checkbox'

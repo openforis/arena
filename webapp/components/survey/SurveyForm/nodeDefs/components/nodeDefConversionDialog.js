@@ -1,6 +1,6 @@
 import './nodeDefConversionDialog.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import PropTypes from 'prop-types'

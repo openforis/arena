@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { ResizableBox } from 'react-resizable'
 import PropTypes from 'prop-types'
@@ -105,7 +105,6 @@ const NodeDefEntityTableCell = (props) => {
       elemBottom >= gridTop && // Vertical visibility
       elemLeft <= gridRight &&
       elemRight >= gridLeft // Horizontal visibility
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     setVisible(elemVisible)
   }, [gridSize])
 

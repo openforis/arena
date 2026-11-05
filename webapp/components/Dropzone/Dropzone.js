@@ -1,6 +1,6 @@
 import './Dropzone.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import ReactDropzone from 'react-dropzone'
 import classNames from 'classnames'

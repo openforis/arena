@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 
 import { User2FADevice } from '@core/user2FADevice'
 import * as DateUtils from '@core/dateUtils'
