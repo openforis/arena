@@ -91,3 +91,20 @@
     opacity: 0;
   }
 }
+// reduced motion: fade the balls instead of scaling them
+@keyframes ball-fade {
+  0%,
+  100% {
+    opacity: 0.2;
+  }
+
+  50% {
+    opacity: 0.8;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .loader__boxes > div {
+    animation-name: ball-fade;
+  }
+}

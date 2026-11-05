@@ -34,7 +34,7 @@ select {
 a {
   text-decoration: none;
   cursor: pointer;
-  transition: 0.2s all;
+  transition: color 0.2s;
 }
 
 a:hover {
@@ -57,7 +57,11 @@ button,
   border: 1px solid $colorOutline;
   text-decoration: none;
   background-color: $colorSurface;
-  transition: 0.2s all;
+  transition:
+    background-color 0.2s,
+    border-color 0.2s,
+    color 0.2s,
+    opacity 0.2s;
 
   &.active {
     background-color: $colorPrimaryContainerHigh;

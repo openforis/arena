@@ -105,7 +105,7 @@
   font-size: 0.8rem;
 
   .icon {
-    font-size: 0.8rem !important;
+    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
   }
 }
 
@@ -122,7 +122,7 @@
 
   &:hover {
     background-color: transparent;
-    cursor: move !important;
+    cursor: move;
 
     span {
       color: v.$colorOnSurface;

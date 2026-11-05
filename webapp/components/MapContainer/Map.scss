@@ -175,12 +175,12 @@
 
   // the attribution is in the status bar
   .leaflet-control-attribution svg {
-    display: none !important;
+    display: none !important; // NOSONAR: leaflet.css declares it with !important
   }
 
   .leaflet-div-icon {
-    background: none !important;
-    border: none !important;
+    background: none;
+    border: none;
   }
 
   .utm-grid-label {
