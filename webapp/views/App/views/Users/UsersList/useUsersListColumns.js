@@ -26,7 +26,9 @@ export const useUsersListColumns = () => {
       {
         key: 'profile-picture',
         width: '40px',
-        renderItem: ({ item }) => <ProfilePicture userUuid={User.getUuid(item)} thumbnail />,
+        renderItem: ({ item }) => (
+          <ProfilePicture userUuid={User.getUuid(item)} hasProfilePicture={User.hasProfilePicture(item)} thumbnail />
+        ),
       },
       {
         key: 'email',

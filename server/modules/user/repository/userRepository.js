@@ -19,6 +19,7 @@ import { DbOrder } from '@server/db'
 const prefsField = `u.prefs - '${User.keysPrefs.mapCustomLayers}' AS prefs`
 const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status']
 const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
+const hasProfilePictureField = 'u.profile_picture IS NOT NULL AS has_profile_picture'
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -209,7 +210,7 @@ export const fetchUsers = async (
   client = db
 ) =>
   client.map(
-    `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
+    `${_usersSelectQuery({ onlyAccepted, selectFields: [...selectFields, hasProfilePictureField], search, sortBy, sortOrder })}
     LIMIT $/limit/
     OFFSET $/offset/`,
     {
@@ -236,6 +237,7 @@ export const fetchUsersBySurveyId = async (
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
         ${columnsCommaSeparated},
+        ${hasProfilePictureField},
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
         ui.invited_date,
         ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
@@ -279,7 +281,7 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(
     `
-    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture, u.password
+    SELECT ${columnsCommaSeparated}, ${hasProfilePictureField}, u.password
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -289,7 +291,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
 export const fetchUserByUuid = async (uuid, client = db) =>
   client.oneOrNone(
     `
-    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
+    SELECT ${columnsCommaSeparated}, ${hasProfilePictureField}
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
