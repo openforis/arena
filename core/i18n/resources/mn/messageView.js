@@ -29,7 +29,6 @@ export default {
   },
   subject: 'Сэдэв',
   target: {
-    label: 'Зорилтот',
     emailsExcluded: {
       label: 'Хассан имэйлүүд',
       placeholder: 'Хасах имэйл хаягаа оруулаад Нэмэх товчийг дарна уу',

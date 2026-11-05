@@ -1106,6 +1106,8 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: '未使用',
     noItemsAdded: '項目が追加されていません',
+    selectedItemsCount: '{{count}}件の項目を選択中',
+    selectedItemsCount_other: '{{count}}件の項目を選択中',
   },
   expression: {
     functionHasTooFewArguments:
@@ -1121,6 +1123,7 @@ $t(common.cantUndoWarning)`,
     invalidTaxonomyName: '無効な分類体系名です：{{name}}',
     invalidTaxonVernacularNameLanguageCode: '無効な分類群通称名の言語コードです：{{vernacularLangCode}}',
     missingFunctionParameters: '関数のパラメータが不足しています',
+    notSupported: 'サポートされていない式です：構文を確認してください（例：2つの値の間に演算子がない）',
     undefinedFunction: '未定義の関数です：{{name}}',
   },
 
@@ -1155,7 +1158,7 @@ $t(common.appNameFull)
   },
   taxonomy: {
     header: '分類体系',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': '分類体系'})`,
     confirmDelete: '分類体系{{taxonomyName}}を削除しますか？\n$t(common.cantUndoWarning)',
     cloneFromAnotherSurvey: {
       title: '別の調査から分類体系を複製',
@@ -1211,8 +1214,8 @@ $t(common.appNameFull)
     header: 'カテゴリ',
     addLevel: 'レベルを追加',
     categoryName: 'カテゴリ名',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
-    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'カテゴリ'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'カテゴリレベル'})`,
     confirmDelete: 'カテゴリ{{categoryName}}を削除しますか？\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'このカテゴリは**空**のため削除されます。続行しますか？',
     confirmDeleteLevel: `カテゴリレベル「{{levelName}}」をすべての項目とともに削除しますか？\n$t(common.cantUndoWarning)`,

@@ -1020,6 +1020,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
   itemsTable: {
     unused: 'Sin usar',
     noItemsAdded: 'No se añadieron elementos',
+    selectedItemsCount: '{{count}} elemento seleccionado',
+    selectedItemsCount_other: '{{count}} elementos seleccionados',
   },
   expression: {
     functionHasTooFewArguments:
@@ -1037,6 +1039,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma de nombre vernáculo de taxón no válido: {{vernacularLangCode}}',
     missingFunctionParameters: 'Parámetros de función faltantes',
+    notSupported: 'Expresión no admitida: verifique su sintaxis (p. ej., falta un operador entre dos valores)',
     undefinedFunction: 'Función indefinida: {{name}}',
   },
 

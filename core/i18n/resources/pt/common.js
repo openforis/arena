@@ -1109,6 +1109,8 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Não usado',
     noItemsAdded: 'Nenhum item adicionado',
+    selectedItemsCount: '{{count}} item selecionado',
+    selectedItemsCount_other: '{{count}} itens selecionados',
   },
   expression: {
     functionHasTooFewArguments: 'A função {{fnName}} requer pelo menos {{minArity}} argumentos (recebidos {{numArgs}})',
@@ -1124,6 +1126,8 @@ $t(common.cantUndoWarning)`,
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma do nome vernacular do táxon inválido: {{vernacularLangCode}}',
     missingFunctionParameters: 'Parâmetros de função ausentes',
+    notSupported:
+      'Expressão não suportada: verifique sua sintaxe (por exemplo, um operador ausente entre dois valores)',
     undefinedFunction: 'Função indefinida: {{name}}',
   },
 
@@ -1158,7 +1162,7 @@ $t(common.appNameFull)
   },
   taxonomy: {
     header: 'Taxonomia',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomia'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     cloneFromAnotherSurvey: {
       title: 'Clonar taxonomia de outro inquérito',
@@ -1214,8 +1218,8 @@ $t(common.appNameFull)
     header: 'Categoria',
     addLevel: 'Adicionar nível',
     categoryName: 'Nome da categoria',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
-    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'categoria'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'nível de categoria'})`,
     confirmDelete: 'Excluir a categoria {{categoryName}}?\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'A categoria está **vazia** e será excluída. Continuar?',
     confirmDeleteLevel: `Excluir o nível de categoria '{{levelName}}' com todos os itens?\n$t(common.cantUndoWarning)`,

@@ -35,7 +35,7 @@ export default {
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
     'openai-compatible': 'Kompatibilan sa OpenAI (Azure, OpenRouter, Ollama, ...)',
-    'vercel-ai-sdk': 'Vercel AI SDK (chat endpoint)',
+    'vercel-ai-sdk': 'Vercel AI SDK (krajnja tačka za chat)',
   },
   defaultProviderHint: 'Koristi AI provajder koji je konfigurisao vaš Arena administrator.',
   model: 'Model',
@@ -45,7 +45,7 @@ export default {
   apiKeyPlaceholder: 'Nalijepite API ključ vašeg provajdera',
   apiKeyKept: 'Ostavite prazno da zadržite postojeći ključ.',
   vercelAiSdkHint:
-    'Vercel AI SDK chat endpoint se tretira kao fiksni agent - izbor modela i API ključ se ne primjenjuju. Generisanje slobodnog teksta radi; funkcije sa strukturiranim izlazom možda neće raditi.',
+    'Krajnja tačka za chat Vercel AI SDK-a se tretira kao fiksni agent - izbor modela i API ključ se ne primjenjuju. Generisanje slobodnog teksta radi; funkcije sa strukturiranim izlazom možda neće raditi.',
   fetchModels: 'Preuzmi modele',
   fetchingModels: 'Preuzimanje modela...',
   modelsFetchFailed: 'Nije moguće preuzeti modele: {{message}}',

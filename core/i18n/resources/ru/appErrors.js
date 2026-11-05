@@ -64,6 +64,9 @@ export default {
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
+  geoWhispSamplingPointDataCategoryMissing: 'Категория данных точек выборки не найдена.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'Не найдено ни одного элемента данных точек выборки с допустимым местоположением.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
@@ -126,6 +129,8 @@ export default {
   userHasPendingInvitation:
     "У пользователя с адресом электронной почты '{{email}}' уже есть ожидающее приглашение; его/ее нельзя пригласить в этот опрос, пока оно не будет принято",
   userHasRole: 'Данный пользователь уже имеет роль в этом опросе',
+  userHasRole_few: 'Данные пользователи уже имеют роль в этом опросе',
+  userHasRole_many: 'Данные пользователи уже имеют роль в этом опросе',
   userHasRole_other: 'Данные пользователи уже имеют роль в этом опросе',
   userInvalid: 'Неверный пользователь',
   surveyCompareFileTooLarge:

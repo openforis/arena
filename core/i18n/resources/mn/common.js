@@ -1102,6 +1102,8 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Ашиглагдаагүй',
     noItemsAdded: 'Элемент нэмэгдээгүй',
+    selectedItemsCount: '{{count}} элемент сонгогдсон',
+    selectedItemsCount_other: '{{count}} элемент сонгогдсон',
   },
   expression: {
     functionHasTooFewArguments: 'Функц {{fnName}}-д наад зах нь {{minArity}} аргумент шаардлагатай ({{numArgs}} авсан)',
@@ -1116,6 +1118,8 @@ $t(common.cantUndoWarning)`,
     invalidTaxonomyName: 'Хүчингүй таксономын нэр: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Хүчингүй таксоны нутгийн нэрийн хэлний код: {{vernacularLangCode}}',
     missingFunctionParameters: 'Функцын дутуу параметрүүд',
+    notSupported:
+      'Илэрхийллийг дэмжихгүй: бичиглэлийг шалгана уу (жишээ нь, хоёр утгын хооронд оператор дутуу байж болно)',
     undefinedFunction: 'Тодорхойгүй функц: {{name}}',
   },
 
@@ -1150,7 +1154,7 @@ $t(common.appNameFull)
   },
   taxonomy: {
     header: 'Таксоном',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'таксономи'})`,
     confirmDelete: 'Таксоном {{taxonomyName}}-г устгах уу?\n$t(common.cantUndoWarning)',
     cloneFromAnotherSurvey: {
       title: 'Өөр судалгаанаас таксоном хуулах',
@@ -1206,8 +1210,8 @@ $t(common.appNameFull)
     header: 'Ангилал',
     addLevel: 'Түвшин нэмэх',
     categoryName: 'Ангиллын нэр',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
-    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'ангилал'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'ангиллын түвшин'})`,
     confirmDelete: 'Ангилал {{categoryName}}-г устгах уу?\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'Ангилал **хоосон** тул устгагдах болно. Үргэлжлүүлэх үү?',
     confirmDeleteLevel: `Түвшин '{{levelName}}'-г бүх элементүүдтэй хамт устгах уу?\n$t(common.cantUndoWarning)`,

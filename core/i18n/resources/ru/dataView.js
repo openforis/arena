@@ -81,6 +81,8 @@ export default {
     clone: 'Клонировать',
     confirmDeleteRecord: `Удалить запись "{{keyValues}}"?`,
     confirmDeleteSelectedRecord_one: `Удалить выбранную запись?`,
+    confirmDeleteSelectedRecord_few: 'Удалить выбранные {{count}} записи?',
+    confirmDeleteSelectedRecord_many: 'Удалить выбранные {{count}} записей?',
     confirmDeleteSelectedRecord_other: `Удалить выбранные {{count}} записей?`,
     confirmMergeSelectedRecords: `### Объединить выбранные записи в одну?
 
@@ -146,6 +148,8 @@ export default {
     },
   },
   recordDeleted_one: `Запись успешно удалена!`,
+  recordDeleted_few: '{{count}} записи успешно удалены!',
+  recordDeleted_many: '{{count}} записей успешно удалено!',
   recordDeleted_other: `{{count}} записей успешно удалено!`,
   recordsSource: {
     label: 'Источник',
@@ -164,6 +168,8 @@ export default {
       allRecords: 'Все записи',
       filteredRecords: 'Только отфильтрованные записи',
       selectedRecord: 'Только выбранная запись',
+      selectedRecord_few: 'Только выбранные {{count}} записи',
+      selectedRecord_many: 'Только выбранные {{count}} записей',
       selectedRecord_other: 'Только выбранные {{count}} записей',
     },
     title: 'Экспорт данных',
@@ -217,6 +223,8 @@ export default {
     layersPanel: {
       markers: '{{count}} маркеров',
       markers_one: '{{count}} маркер',
+      markers_few: '{{count}} маркера',
+      markers_many: '{{count}} маркеров',
       markers_other: '{{count}} маркеров',
     },
   },

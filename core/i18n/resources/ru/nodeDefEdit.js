@@ -23,6 +23,8 @@ export default {
     sql: 'Разрешены только допустимые SQL-выражения.',
   },
   editorCompletionHelp: '- Показать доступные переменные и функции, которые можно использовать',
+  editorTextSearchHelp:
+    "Ищите текстовые значения с помощью text_attr.includes('abc'), text_attr.startsWith('abc') или text_attr.endsWith('abc'); добавьте перед ними .toLowerCase(), чтобы не учитывать регистр, например text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp: 'Возвращает значение указанного $t(extraProp.label) элемента категории с указанным кодом',
     dateTimeDiff: 'Возвращает разницу (в минутах) между двумя парами дата-время',
@@ -204,6 +206,10 @@ export default {
   },
   timeProps: {
     includeSeconds: 'Включить секунды',
+  },
+  geoProps: {
+    positionTracking: 'Отслеживание местоположения',
+    positionTrackingInfo: `Применяется только в Arena Mobile: если отмечено, значением является путь, пройденный пользователем при заполнении записи (записывается путём отслеживания местоположения устройства), и его нельзя изменить вручную`,
   },
   formHeaderProps: {
     headerColorLabel: 'Цвет заголовка',
