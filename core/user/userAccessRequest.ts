@@ -3,8 +3,11 @@ import * as ObjectUtils from '@core/objectUtils'
 import { normalizeName } from '@core/stringUtils'
 
 export const keys = {
+  acceptedByEmail: 'acceptedByEmail',
+  acceptedByName: 'acceptedByName',
   email: 'email',
   props: ObjectUtils.keys.props,
+  status: 'status',
 } as const
 
 export const keysProps = {
@@ -25,6 +28,30 @@ export const status = {
   REJECTED: 'REJECTED',
 } as const
 
+export type UserAccessRequestStatus = (typeof status)[keyof typeof status]
+
+export type UserAccessRequestProps = {
+  [keysProps.firstName]?: string
+  [keysProps.lastName]?: string
+  [keysProps.country]?: string
+  [keysProps.institution]?: string
+  [keysProps.purpose]?: string
+  [keysProps.surveyName]?: string
+  [keysProps.templateUuid]?: string | null
+}
+
+// not defined in @openforis/arena-core yet
+export type UserAccessRequest = {
+  uuid: string
+  email: string
+  props: UserAccessRequestProps
+  status: UserAccessRequestStatus
+  dateCreated?: string
+  dateModified?: string | null
+  acceptedByName?: string | null
+  acceptedByEmail?: string | null
+}
+
 export const editableFields = [
   { name: keys.email, required: true },
   { name: `props.${keysProps.firstName}`, required: true },
@@ -37,5 +64,8 @@ export const editableFields = [
 ]
 
 export const getEmail = A.prop(keys.email)
+export const getStatus = (userAccessRequest: UserAccessRequest): UserAccessRequestStatus => userAccessRequest.status
+export const getAcceptedByName = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByName ?? null
+export const getAcceptedByEmail = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByEmail ?? null
 
-export const { getDateCreated } = ObjectUtils
+export const { getDateCreated, getDateModified } = ObjectUtils
