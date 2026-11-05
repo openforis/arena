@@ -4,6 +4,7 @@ import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import SystemError from '@core/systemError'
 
+/** @augments {JobBase<any, any>} */
 export default class Job extends JobBase {
   constructor(type, params = {}, innerJobs = []) {
     super({ ...params, type }, innerJobs)

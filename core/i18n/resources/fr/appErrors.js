@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'L’URL du service n’est pas valide',
+    urlNotAllowed: 'Seules les adresses http et https publiques peuvent être utilisées',
+    hostNotFound: 'Hôte introuvable : {{host}}',
+    redirectNotFollowed: 'Le service redirige vers {{location}} : utilisez plutôt cette URL',
+    responseTooLarge: 'La réponse du service dépasse {{limitMb}} Mo',
+    timeout: 'Le service n’a pas répondu en {{seconds}} secondes',
+    fetchFailed: 'Le service a répondu avec le statut HTTP {{status}}',
+    unreachable: 'Le service est injoignable',
+    notCapabilities: 'Aucune capabilities WMS ou WMTS trouvée à cette URL',
+    noLayers: 'Le service n’a aucune couche affichable',
+    invalidLayers: 'Les couches cartographiques ne sont pas valides',
+    tooManyLayers: 'Au plus {{max}} couches cartographiques personnalisées peuvent être ajoutées',
+    busy: 'Le serveur est occupé à charger d’autres services : réessayez dans un instant',
+  },
   aiDataQueryDescriptionMissing: 'Veuillez décrire en langage naturel les données que vous souhaitez voir.',
   aiDataQueryEmpty: "Sélectionnez d'abord une entité et des attributs (ou des dimensions et des mesures).",
   aiDataQueryInvalid: "L'IA n'a pas pu générer une requête valide pour cette demande : {{errors}}",
@@ -53,6 +68,9 @@ export default {
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
   geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
+  geoWhispSamplingPointDataCategoryMissing: "Catégorie de données de points d'échantillonnage introuvable.",
+  geoWhispSamplingPointDataLocationsMissing:
+    "Aucun élément de données de points d'échantillonnage avec une localisation valide n'a été trouvé.",
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',
@@ -67,6 +85,7 @@ export default {
   undefinedFunction: `Fonction '{{fnName}}' non définie ou types de paramètres incorrects`,
   invalidSyntax: "La syntaxe de l'expression est invalide",
   networkError: 'Erreur de communication avec le serveur',
+  nodeDefConversionNotAllowed: `'{{name}}' ne peut pas être converti en {{toType}}`,
   record: {
     errorUpdating: "Erreur lors de la mise à jour de l'enregistrement",
     entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',

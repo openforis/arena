@@ -47,11 +47,12 @@ export const toString = (expr: unknown, exprMode: string = modes.json): string =
   return exprMode === modes.sql ? _replaceOutsideQuotes(string, _jsToSqlOperators).replaceAll('"', `'`) : string
 }
 
-export const fromString = (string: string, exprMode: string = modes.json): unknown => {
-  const exprString = exprMode === modes.json ? string : _replaceOutsideQuotes(string, _sqlToJsOperators)
+// converts an expression string written in the specified mode into its JavaScript syntax
+export const toJsString = (string: string, exprMode: string = modes.json): string =>
+  exprMode === modes.json ? string : _replaceOutsideQuotes(string, _sqlToJsOperators)
 
-  return new JavascriptExpressionParser().parse(exprString)
-}
+export const fromString = (string: string, exprMode: string = modes.json): unknown =>
+  new JavascriptExpressionParser().parse(toJsString(string, exprMode))
 
 export const { isValid } = ExpressionUtils
 

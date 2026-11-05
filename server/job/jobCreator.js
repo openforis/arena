@@ -13,6 +13,7 @@ import CollectDataImportJob from '@server/modules/collectImport/service/collectI
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 import DataExportJob from '@server/modules/dataExport/service/dataExportJob'
+import DataMatrixExportJob from '@server/modules/dataExport/service/DataMatrixExportJob'
 import DataSummaryExportJob from '@server/modules/dataExport/service/DataSummaryExportJob'
 import { GeoJsonDataExportJob } from '@server/modules/geo/service/GeoJsonDataExportJob'
 import MessageSendJob from '@server/modules/message/service/MessageSendJob'
@@ -56,6 +57,7 @@ const jobClasses = [
   DataImportJob,
   DataImportValidationJob,
   DataExportJob,
+  DataMatrixExportJob,
   DataSummaryExportJob,
   GeoJsonDataExportJob,
   MessageSendJob,

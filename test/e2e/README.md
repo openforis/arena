@@ -26,6 +26,8 @@ Set `E2E_KEEP_DATA=true` to keep the surveys created by the tests (e.g. to inspe
 - Prepare the data through the fixtures; use the UI only for the feature under test.
 - Fixtures:
   - `page` / `context`: logged in as the worker test user (`test.use({ authenticated: false })` for guest pages).
+  - `experimentalFeatures`: `test.use({ experimentalFeatures: true })` (or `false`) overrides the `EXPERIMENTAL_FEATURES`
+    setting of the server seen by the web app, to test experimental features whatever the server setting.
   - `testUser`: one system administrator per worker (the current survey is a user pref: workers must not share users).
   - `api`: `ArenaApi` REST client authenticated as the worker test user (create/find/delete surveys).
   - `survey`: a new empty survey (created through the API), set as current survey and deleted after the test.

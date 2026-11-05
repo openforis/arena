@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
@@ -249,6 +250,49 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
   )
 }
 
+/**
+ * Returns the analysis node defs to clone with a chain, including the plot area node defs it depends on:
+ * there is only one per entity, even when it's used by more chains, and it belongs to only one of them.
+ * @param {object} params - Parameters.
+ * @param {object} params.sourceSurvey - Survey the chain belongs to.
+ * @param {string} params.sourceChainUuid - Uuid of the chain being cloned.
+ * @returns {Array<object>} The analysis node defs to clone.
+ */
+const _getNodeDefsToClone = ({ sourceSurvey, sourceChainUuid }) => {
+  const analysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(NodeDef.isAnalysis)
+  const chainNodeDefs = analysisNodeDefs.filter((nd) => NodeDef.getChainUuid(nd) === sourceChainUuid)
+  const areaBasedEntityUuids = new Set(
+    chainNodeDefs.filter((nd) => NodeDef.isAreaBasedEstimatedOf(nd) && NodeDef.isActive(nd)).map(NodeDef.getParentUuid)
+  )
+  const plotAreaNodeDefsOfOtherChains = analysisNodeDefs.filter(
+    (nd) =>
+      NodeDef.getChainUuid(nd) !== sourceChainUuid &&
+      areaBasedEntityUuids.has(NodeDef.getParentUuid(nd)) &&
+      SamplingNodeDefs.isEntityAreaNodeDef({ nodeDef: nd, nodeDefParent: Survey.getNodeDefParent(nd)(sourceSurvey) })
+  )
+  return [...chainNodeDefs, ...plotAreaNodeDefsOfOtherChains]
+}
+
+/**
+ * Makes cloned area based estimates refer to the cloned attributes instead of the ones in the source survey.
+ * @param {object} params - Parameters.
+ * @param {Array<object>} params.sourceNodeDefs - The source node defs.
+ * @param {Array<object>} params.clonedNodeDefs - The cloned node defs, in the same order as the source ones.
+ * @returns {Array<object>} The cloned node defs with the references updated.
+ */
+const _remapAreaBasedEstimatedOf = ({ sourceNodeDefs, clonedNodeDefs }) => {
+  const clonedUuidBySourceUuid = Object.fromEntries(
+    sourceNodeDefs.map((nd, index) => [NodeDef.getUuid(nd), NodeDef.getUuid(clonedNodeDefs[index])])
+  )
+  return clonedNodeDefs.map((nd) =>
+    NodeDef.isAreaBasedEstimatedOf(nd)
+      ? NodeDef.mergePropsAdvanced({
+          [NodeDef.keysPropsAdvanced.areaBasedEstimatedOf]: clonedUuidBySourceUuid[NodeDef.getAreaBasedEstimatedOf(nd)],
+        })(nd)
+      : nd
+  )
+}
+
 // ====== READ - Chains available to clone from another survey
 
 /**
@@ -340,9 +384,7 @@ export const cloneChainFromSurvey = async (
       throw new SystemError('chainNotFound', { chainUuid: sourceChainUuid })
     }
 
-    const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
-      (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
-    )
+    const sourceAnalysisNodeDefs = _getNodeDefsToClone({ sourceSurvey, sourceChainUuid })
 
     // Build map of entity name → nodeDef for the target survey.
     const targetEntityByName = {}
@@ -419,7 +461,14 @@ export const cloneChainFromSurvey = async (
     // reuse an existing one in the target survey (by uuid or name), or clone it from the source survey.
     const { clonedNodeDefs: resolvedClonedNodeDefs } =
       await NodeDefService.resolveAndCloneNodeDefsCategoriesAndTaxonomies(
-        { user, sourceSurveyId, sourceSurvey, targetSurveyId: surveyId, targetSurvey, clonedNodeDefs },
+        {
+          user,
+          sourceSurveyId,
+          sourceSurvey,
+          targetSurveyId: surveyId,
+          targetSurvey,
+          clonedNodeDefs: _remapAreaBasedEstimatedOf({ sourceNodeDefs: clonableAnalysisNodeDefs, clonedNodeDefs }),
+        },
         tx
       )
 

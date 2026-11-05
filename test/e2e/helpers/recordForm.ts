@@ -178,8 +178,17 @@ export class RecordForm {
       case 'time':
         await expect(wrapper.locator('input')).toHaveValue(value as string | RegExp)
         break
-      default:
-        await expect(wrapper.locator('input[type="text"]')).toHaveValue(value as string | RegExp)
+      default: {
+        // read-only values in table cells are rendered as labels instead of inputs
+        const input = wrapper.locator('input[type="text"]')
+        const label = wrapper.locator('.survey-form__node-def-table-cell-value')
+        await expect(input.or(label).first()).toBeVisible()
+        if (await label.count()) {
+          await expect(label).toHaveText(value as string | RegExp)
+        } else {
+          await expect(input).toHaveValue(value as string | RegExp)
+        }
+      }
     }
   }
 

@@ -31,8 +31,11 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
-export const fetchRecordAndNodes = async ({ surveyId, recordUuid }) => {
-  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { recordUuid } })
+export const fetchRecordAndNodes = async ({ surveyId, recordUuid, errorHandledLocally = false }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, {
+    params: { recordUuid },
+    ...(errorHandledLocally ? { errorHandledLocally } : {}),
+  })
   return record
 }
 export {
@@ -265,6 +268,12 @@ export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search,
     search,
     options,
   })
+  const { job } = data
+  return job
+}
+
+export const startExportDataMatrixJob = async ({ surveyId, cycle, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-matrix-export`, { cycle, options })
   const { job } = data
   return job
 }

@@ -5,6 +5,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 import * as ChainManager from '@server/modules/analysis/manager'
 import * as SurveyFileManager from '@server/modules/survey/manager/surveyFileManager'
 import * as NodeRepository from '@server/modules/record/repository/nodeRepository'
+import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
 export type SurveyDataMigrationStep = {
   version: string
@@ -51,6 +52,12 @@ export const surveyDataMigrationSteps: SurveyDataMigrationStep[] = [
       await NodeRepository.vacuumFullNodeTable({ surveyId })
     },
   },
+  {
+    version: '2.10.9',
+    migrate: async ({ surveyId, client }) => {
+      await migrateTaxaExcelCellValues({ surveyId }, client)
+    },
+  },
   // future per-survey migration steps are appended here, each with its own version threshold
 ]
 
@@ -70,15 +77,17 @@ export const latestSurveyDataMigrationVersion: string =
  * Returns a guaranteed-valid application version string to stamp a survey with, meaning "fully migrated as of
  * right now". This is the single place that decides that value: it falls back to
  * `latestSurveyDataMigrationVersion` whenever `ProcessUtils.ENV.applicationVersion` is falsy (e.g. `APP_VERSION`
- * not set, as happens with `yarn dev:server` or some container startups) or is not a parseable version string,
+ * not set, as happens with `yarn dev:server` or some container startups), is not a parseable version string, or
+ * is older than that version (e.g. a build between two releases, whose surveys would otherwise stay pending),
  * so that a survey never gets stamped with a value that would later blow up `isSurveyDataMigrationPending`.
  */
 export const getCurrentAppVersionStamp = (): string => {
   const { applicationVersion } = ProcessUtils.ENV
   if (!applicationVersion) return latestSurveyDataMigrationVersion
   try {
-    Versions.parse(applicationVersion)
-    return applicationVersion
+    return Versions.isLessThan(applicationVersion, latestSurveyDataMigrationVersion)
+      ? latestSurveyDataMigrationVersion
+      : applicationVersion
   } catch {
     return latestSurveyDataMigrationVersion
   }

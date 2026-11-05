@@ -1,6 +1,6 @@
 import './nodeDefEditButtons.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector, useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'

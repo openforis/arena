@@ -1,6 +1,6 @@
 import './DataExport.scss'
 
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'

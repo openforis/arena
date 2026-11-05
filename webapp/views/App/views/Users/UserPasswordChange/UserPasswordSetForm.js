@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import * as Validation from '@core/validation/validation'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'

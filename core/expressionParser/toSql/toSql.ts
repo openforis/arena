@@ -24,6 +24,28 @@ const stdlib2sql: Record<string, string | ((param: string) => string)> = {
   '!': (param) => `NOT (${param})`,
 }
 
+interface StringMethodSql {
+  arity: number
+  toSql: (object: string, args: string[]) => string
+}
+
+// JS string methods allowed on values (e.g. text_attr.includes('abc')), converted into SQL text functions;
+// strpos/left/right are used instead of LIKE so that % and _ in the searched text don't act as wildcards
+const stringMethods2sql: Record<string, StringMethodSql> = {
+  includes: { arity: 1, toSql: (object, [search]) => `coalesce(strpos(${object}, ${search}) > 0, false)` },
+  startsWith: {
+    arity: 1,
+    toSql: (object, [search]) => `coalesce(left(${object}, length(${search})) = ${search}, false)`,
+  },
+  endsWith: {
+    arity: 1,
+    toSql: (object, [search]) => `coalesce(right(${object}, length(${search})) = ${search}, false)`,
+  },
+  toLowerCase: { arity: 0, toSql: (object) => `lower(${object})` },
+  toUpperCase: { arity: 0, toSql: (object) => `upper(${object})` },
+  trim: { arity: 0, toSql: (object) => `btrim(${object})` },
+}
+
 // unary operators allowed in SQL (the expression can come from the client: any other operator is rejected)
 const operatorToSql: Record<string, string | ((param: string) => string)> = {
   '!': (param) => `NOT(${param})`,
@@ -100,6 +122,9 @@ export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResu
 const _isQuotedString = (value: unknown): boolean =>
   typeof value === 'string' && value.length >= 2 && value.startsWith('"') && value.endsWith('"')
 
+const _isSingleQuotedString = (value: unknown): boolean =>
+  typeof value === 'string' && value.length >= 2 && value.startsWith(`'`) && value.endsWith(`'`)
+
 /**
  * Expression node value could have been "stringified" (e.g. Attributes of type code/taxon/text)
  * so it needs to be parsed.
@@ -129,7 +154,8 @@ export const literal = (node: Record<string, unknown>, params: SqlParams): SqlRe
   }
 
   const param = getParamNameNext(params)
-  const paramValue = _getLiteralParamValue(node.raw)
+  // single quoted literal (e.g. attr = 'text'): the parser has already unquoted it into node.value
+  const paramValue = _isSingleQuotedString(node.raw) ? node.value : _getLiteralParamValue(node.raw)
 
   return {
     clause: `$/${param}/`,
@@ -145,25 +171,61 @@ export const identifier = (node: Record<string, unknown>, params: SqlParams): Sq
   }
 }
 
+interface SqlArgumentsResult {
+  clauses: string[]
+  params: SqlParams
+}
+
+const argumentsToSql = (argumentNodes: Record<string, unknown>[], params: SqlParams): SqlArgumentsResult =>
+  argumentNodes.reduce<SqlArgumentsResult>(
+    (accumulator, argument) => {
+      const { clause, params: paramsCurrent } = _toSql!(argument, accumulator.params)
+      return { clauses: [...accumulator.clauses, clause], params: paramsCurrent }
+    },
+    { clauses: [], params }
+  )
+
+// e.g. text_attr.includes('abc'): only non computed calls of the allowed string methods are accepted
+const stringMethodCall = (
+  callee: Record<string, unknown>,
+  argumentNodes: Record<string, unknown>[],
+  params: SqlParams
+): SqlResult => {
+  const property = callee.property as Record<string, unknown>
+  const methodName = !callee.computed && property?.type === types.Identifier ? property.name : null
+  const method = _getOwn(stringMethods2sql, methodName)
+  if (!method) {
+    throw new SystemError('undefinedFunction', { name: methodName })
+  }
+  const numArgs = argumentNodes.length
+  if (numArgs !== method.arity) {
+    const errorKey = numArgs < method.arity ? 'functionHasTooFewArguments' : 'functionHasTooManyArguments'
+    throw new SystemError(errorKey, { fnName: methodName, minArity: method.arity, maxArity: method.arity, numArgs })
+  }
+  const { clause: clauseObject, params: paramsObject } = _toSql!(callee.object as Record<string, unknown>, params)
+  const { clauses: clausesArguments, params: paramsArguments } = argumentsToSql(argumentNodes, paramsObject)
+  const toText = (clause: string): string => `(${clause})::text`
+  return {
+    clause: method.toSql(toText(clauseObject), clausesArguments.map(toText)),
+    params: paramsArguments,
+  }
+}
+
 export const call = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
   const { callee, arguments: argumentsNode } = node
   const calleeNode = callee as Record<string, unknown>
+  const argumentNodes = argumentsNode as Record<string, unknown>[]
+  if (calleeNode.type === types.MemberExpression) {
+    return stringMethodCall(calleeNode, argumentNodes, params)
+  }
   const name = (calleeNode.name ?? calleeNode.value) as string // callee can be literal or identifier
   const sqlFnNameOrFn = _getOwn(stdlib2sql, name)
   if (!sqlFnNameOrFn) {
     throw new SystemError('undefinedFunction', { name })
   }
 
-  const { clause: clauseArguments, params: paramsArguments } = (argumentsNode as Record<string, unknown>[]).reduce(
-    (accumulator: SqlResult, argument: Record<string, unknown>, idx: number) => {
-      const { clause: clauseCurrent, params: paramsCurrent } = _toSql!(argument, accumulator.params)
-      return {
-        clause: `${accumulator.clause}${idx ? ', ' : ''}${clauseCurrent}`,
-        params: paramsCurrent,
-      }
-    },
-    { clause: '', params }
-  )
+  const { clauses, params: paramsArguments } = argumentsToSql(argumentNodes, params)
+  const clauseArguments = clauses.join(', ')
 
   const clause =
     typeof sqlFnNameOrFn === 'string' ? `${sqlFnNameOrFn}(${clauseArguments})` : sqlFnNameOrFn(clauseArguments)

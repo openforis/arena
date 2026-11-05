@@ -57,6 +57,8 @@ export default class RecordsImportJob extends Job {
 
     // import records sequentially
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
       this.logDebug(`importing record ${recordUuid}`)
 

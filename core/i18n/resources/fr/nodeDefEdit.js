@@ -23,6 +23,8 @@ export default {
     sql: 'Seules les expressions SQL valides sont autorisées.',
   },
   editorCompletionHelp: '- Afficher les variables et fonctions disponibles pouvant être utilisées',
+  editorTextSearchHelp:
+    "Recherchez des valeurs de texte avec text_attr.includes('abc'), text_attr.startsWith('abc') ou text_attr.endsWith('abc') ; ajoutez .toLowerCase() avant pour ignorer la casse, par ex. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp:
       "Renvoie la valeur de la $t(extraProp.label) spécifiée d'un élément de catégorie ayant le code spécifié",
@@ -210,6 +212,11 @@ Ex. this.region = nom_attribut_region
   },
   timeProps: {
     includeSeconds: 'Inclure les secondes',
+  },
+  geoProps: {
+    positionTracking: 'Suivi de la position',
+    positionTrackingInfo:
+      "S'applique uniquement à Arena Mobile : si coché, la valeur est le trajet parcouru par l'utilisateur pendant la saisie de l'enregistrement (enregistré en suivant la position de l'appareil) et elle ne peut pas être modifiée manuellement",
   },
   formHeaderProps: {
     headerColorLabel: "Couleur d'en-tête",

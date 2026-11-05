@@ -23,6 +23,8 @@ export default {
     sql: 'Solo se permiten expresiones SQL válidas.',
   },
   editorCompletionHelp: '- Mostrar las variables y funciones disponibles que se pueden usar',
+  editorTextSearchHelp:
+    "Busque valores de texto con text_attr.includes('abc'), text_attr.startsWith('abc') o text_attr.endsWith('abc'); agregue .toLowerCase() antes de ellos para ignorar mayúsculas y minúsculas, p. ej. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp:
       'Devuelve el valor de la $t(extraProp.label) especificada de un elemento de categoría que tiene el código especificado',
@@ -207,6 +209,11 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
   },
   timeProps: {
     includeSeconds: 'Incluir segundos',
+  },
+  geoProps: {
+    positionTracking: 'Seguimiento de la posición',
+    positionTrackingInfo:
+      'Se aplica solo a Arena Mobile: si está marcado, el valor es el recorrido realizado por el usuario mientras completa el registro (registrado mediante el seguimiento de la posición del dispositivo) y no se puede editar manualmente',
   },
   formHeaderProps: {
     headerColorLabel: 'Color de encabezado',

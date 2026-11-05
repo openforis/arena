@@ -1,5 +1,5 @@
-import { themeColors } from '@webapp/theme/tokens'
-import { getDashboardAccent, withAlpha } from '@webapp/views/App/views/Dashboard/theme/dashboardAccents'
+import { themeColors, withAlpha } from '@webapp/theme/tokens'
+import { getDashboardAccent } from '@webapp/views/App/views/Dashboard/theme/dashboardAccents'
 
 describe('withAlpha', () => {
   it('mixes the color with transparent using alpha 0–1', () => {

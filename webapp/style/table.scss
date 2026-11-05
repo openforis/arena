@@ -26,6 +26,11 @@ $tableFooterHeight: 30px;
   .table__footer {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
+  }
+
+  .table__footer-selected-items {
+    margin-right: auto;
   }
 
   .table__empty-rows {

@@ -136,13 +136,11 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
     if (hasAreaBasedDef) {
       // create new plot_area node def only if there is an active area based node def in the same chain
       createAreaNodeDefIfNecessary({ existingNodeDef: existingEntityAreaNodeDef, nodeDefParent, isWeight: false })
-    } else if (existingEntityAreaNodeDef) {
-      // delete entity area node defs when entity doesn't have any active area based node def anymore
-      nodeDefsToDelete.push(existingEntityAreaNodeDef)
     }
   }
 
-  // check if some existing entity area node def is not valid anymore and must be deleted
+  // check if some existing entity area node def of this chain is not valid anymore and must be deleted
+  // (e.g. its entity doesn't have any active area based node def anymore)
   const existingEntityAreaNodeDefs = getAllEntityAreaNodeDefs({ survey, chain })
   const validNodeDefsAlreadyExistingUuids = new Set(validNodeDefsAlreadyExisting.map(NodeDef.getUuid))
   const existingEntityAreaNodeDefsToDelete = existingEntityAreaNodeDefs.filter(

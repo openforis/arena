@@ -20,9 +20,6 @@ const columnSet = {
   dateModified: Table.columnSetCommon.dateModified,
 }
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableNode
- */
 export default class TableNode extends TableSurvey {
   constructor(survey) {
     super(Survey.getId(survey), 'node', columnSet)

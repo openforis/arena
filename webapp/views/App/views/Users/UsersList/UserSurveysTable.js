@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'

@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'Үйлчилгээний URL буруу байна',
+    urlNotAllowed: 'Зөвхөн нийтийн http болон https хаяг ашиглах боломжтой',
+    hostNotFound: 'Хост олдсонгүй: {{host}}',
+    redirectNotFollowed: 'Үйлчилгээ {{location}} руу чиглүүлж байна: тэр URL-ийг ашиглана уу',
+    responseTooLarge: 'Үйлчилгээний хариу {{limitMb}} MB-аас их байна',
+    timeout: 'Үйлчилгээ {{seconds}} секундэд хариулсангүй',
+    fetchFailed: 'Үйлчилгээ HTTP {{status}} төлөвөөр хариулав',
+    unreachable: 'Үйлчилгээнд холбогдож чадсангүй',
+    notCapabilities: 'Энэ URL-д WMS эсвэл WMTS capabilities олдсонгүй',
+    noLayers: 'Үйлчилгээнд харуулах боломжтой давхарга алга',
+    invalidLayers: 'Газрын зургийн давхаргууд буруу байна',
+    tooManyLayers: 'Хамгийн ихдээ {{max}} хувийн газрын зургийн давхарга нэмэх боломжтой',
+    busy: 'Сервер бусад үйлчилгээг ачаалж байна: түр хүлээгээд дахин оролдоно уу',
+  },
   aiDataQueryDescriptionMissing: 'Үзэхийг хүссэн өгөгдлөө энгийн үгээр тайлбарлана уу.',
   aiDataQueryEmpty: 'Эхлээд объект болон шинж чанаруудыг (эсвэл хэмжээс, хэмжигдэхүүнүүдийг) сонгоно уу.',
   aiDataQueryInvalid: 'AI энэ тайлбарт тохирох зөв хүсэлт үүсгэж чадсангүй: {{errors}}',
@@ -48,6 +63,8 @@ export default {
   functionHasTooManyArguments: 'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} зөвшөөрдөг ({{numArgs}} авсан)',
   generic: 'Гэнэтийн алдаа: {{text}}',
   geoWhispApiError: 'Whisp үйлчилгээ түр хугацаанд ажиллахгүй байна.',
+  geoWhispSamplingPointDataCategoryMissing: 'Дээж цэгийн өгөгдлийн ангилал олдсонгүй.',
+  geoWhispSamplingPointDataLocationsMissing: 'Хүчинтэй байршилтай дээж цэгийн өгөгдлийн элемент олдсонгүй.',
   importingDataIntoWrongCollectSurvey:
     'Буруу цуглуулгын судалгаанд өгөгдөл импортлож байна. Хүлээгдэж буй URI: {{collectSurveyUri}}',
   invalidType: 'Буруу төрөл {{type}}',
@@ -62,6 +79,7 @@ export default {
   undefinedFunction: "Тодорхойлогдоогүй функц '{{fnName}}' эсвэл буруу параметрийн төрлүүд",
   invalidSyntax: 'Илэрхийллийн синтакс буруу байна',
   networkError: 'Сервертэй холбогдоход алдаа гарлаа',
+  nodeDefConversionNotAllowed: `'{{name}}'-г {{toType}}-д хөрвүүлэх боломжгүй`,
   record: {
     errorUpdating: 'Бичлэг шинэчлэхэд алдаа гарлаа',
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',

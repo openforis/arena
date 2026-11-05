@@ -1,5 +1,6 @@
 import React, { useCallback, useLayoutEffect, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import IconButton from '@mui/material/IconButton'
 import Menu from '@mui/material/Menu'
@@ -102,7 +103,7 @@ const CrumbLabel = ({ crumb, isLast }: { crumb: FormPathCrumb; isLast: boolean }
 export const FormHeaderPath = ({ entry, nodeDefPageName }: Props) => {
   const crumbs = usePathCrumbs(entry)
   const survey = useSurvey()
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const i18n = useI18n()
   const notifyInfo = useNotifyInfo()
   const containerRef = useRef<HTMLDivElement>(null)

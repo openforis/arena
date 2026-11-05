@@ -1,6 +1,6 @@
 import './UsersAccessRequest.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -33,7 +33,7 @@ const iconByStatus = ({ i18n }) => ({
 export const UsersAccessRequest = () => {
   const i18n = useI18n()
 
-  const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [surveyTemplates, setSurveyTemplates] = useState([])
   const [currentUserAccessRequest, setCurrentUserAccessRequest] = useState(null)
 

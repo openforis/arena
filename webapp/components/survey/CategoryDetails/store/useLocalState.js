@@ -25,14 +25,12 @@ export const useLocalState = (props) => {
     })()
   }, [])
 
-  if (inCategoriesPath) {
-    const cleanupCategory = useCallback(async () => Actions.cleanupCategory({ categoryUuid }), [])
+  const cleanupCategory = useCallback(async () => Actions.cleanupCategory({ categoryUuid }), [])
 
-    useOnBrowserBack({
-      active: canEdit && !categoryCleaned,
-      onBack: cleanupCategory,
-    })
-  }
+  useOnBrowserBack({
+    active: inCategoriesPath && canEdit && !categoryCleaned,
+    onBack: cleanupCategory,
+  })
 
   return { state, setState }
 }

@@ -34,6 +34,7 @@ export const useTable = ({ data, setData }) => {
     const widthMax = width - colIndexWidth - 22
     const colWidthMin = 150
     const colWidthUpdate = widthMax > colsNumber * colWidthMin ? Math.floor(widthMax / colsNumber) : colWidthMin
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the width is measured from the DOM
     setColWidth(colWidthUpdate)
   }, [nodeDefsSelectorVisible, colsNumber])
 

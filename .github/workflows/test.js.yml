@@ -9,7 +9,7 @@ env:
   PGDATABASE: of-arena-test
   PGUSER: arena
   PGPASSWORD: arena
-  # needed by the build job too: it's baked into the client bundle as EMAIL_FROM_RESOLVED (see webpack.config.babel.js)
+  # needed by the build job too: it's baked into the client bundle as EMAIL_FROM_RESOLVED (see webpack.config.mjs)
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
   RATE_LIMIT_ENABLED: false
 

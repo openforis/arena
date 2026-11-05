@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'La URL del servicio no es válida',
+    urlNotAllowed: 'Solo se pueden usar direcciones http y https públicas',
+    hostNotFound: 'Host no encontrado: {{host}}',
+    redirectNotFollowed: 'El servicio redirige a {{location}}: use esa URL',
+    responseTooLarge: 'La respuesta del servicio supera los {{limitMb}} MB',
+    timeout: 'El servicio no respondió en {{seconds}} segundos',
+    fetchFailed: 'El servicio respondió con el estado HTTP {{status}}',
+    unreachable: 'No se puede acceder al servicio',
+    notCapabilities: 'No se encontraron capabilities WMS o WMTS en esta URL',
+    noLayers: 'El servicio no tiene ninguna capa que se pueda mostrar',
+    invalidLayers: 'Las capas de mapa no son válidas',
+    tooManyLayers: 'Se pueden añadir como máximo {{max}} capas de mapa personalizadas',
+    busy: 'El servidor está ocupado cargando otros servicios: inténtelo de nuevo en un momento',
+  },
   aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
   aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
   aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
@@ -53,6 +68,9 @@ export default {
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
   geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
+  geoWhispSamplingPointDataCategoryMissing: 'No se encontró la categoría de datos de puntos de muestreo.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'No se encontró ningún elemento de datos de puntos de muestreo con una ubicación válida.',
   importingDataIntoWrongCollectSurvey:
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
   invalidType: 'Tipo no válido {{type}}',
@@ -67,6 +85,7 @@ export default {
   undefinedFunction: "Función indefinida '{{fnName}}' o tipos de parámetros incorrectos",
   invalidSyntax: 'La sintaxis de la expresión no es válida',
   networkError: 'Error de comunicación con el servidor',
+  nodeDefConversionNotAllowed: `'{{name}}' no se puede convertir en {{toType}}`,
   record: {
     errorUpdating: 'Error al actualizar el registro',
     entityNotFound: 'Entidad "{{entityName}}" con claves "{{keyValues}}" no encontrada',

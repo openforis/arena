@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import * as CategoryItem from '@core/survey/categoryItem'

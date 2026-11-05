@@ -1,6 +1,6 @@
 import './Helper.scss'
 
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Trans } from 'react-i18next'
 
 import * as Survey from '@core/survey/survey'

@@ -1,7 +1,7 @@
 import '@webapp/components/ai/aiTextarea.scss'
 import './AiGenerateQueryPopup.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import * as API from '@webapp/service/api'
 import { Button } from '@webapp/components/buttons'

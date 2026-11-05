@@ -100,14 +100,9 @@ describe('CollectExpressionConverter Test', () => {
     it(`${expression} => ${result}`, async () => {
       const nodeDefCurrent = Survey.getNodeDefByName(nodeName || 'cluster_id')(survey)
       const converted = await CollectExpressionConverter.convert({ survey, nodeDefCurrent, expression })
-      if (errorExpected) {
-        expect(converted).toBeNull()
-      } else {
-        expect(converted).not.toBeNull()
-        // converted expression has a new line character at the end;
-        // remove it before comparing the expression with the expected one
-        expect(converted.trim()).toBe(result)
-      }
+      // converted expression has a new line character at the end;
+      // remove it before comparing the expression with the expected one
+      expect(converted?.trim() ?? null).toBe(errorExpected ? null : result)
     })
   })
 })

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
@@ -26,7 +26,9 @@ export const useUsersListColumns = () => {
       {
         key: 'profile-picture',
         width: '40px',
-        renderItem: ({ item }) => <ProfilePicture userUuid={User.getUuid(item)} thumbnail />,
+        renderItem: ({ item }) => (
+          <ProfilePicture userUuid={User.getUuid(item)} hasProfilePicture={User.hasProfilePicture(item)} thumbnail />
+        ),
       },
       {
         key: 'email',

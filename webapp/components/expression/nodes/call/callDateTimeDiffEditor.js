@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { Arrays, Objects } from '@openforis/arena-core'
 

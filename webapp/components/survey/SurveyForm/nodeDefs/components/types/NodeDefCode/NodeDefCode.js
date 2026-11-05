@@ -1,6 +1,6 @@
 import './NodeDefCode.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { Surveys } from '@openforis/arena-core'
@@ -13,6 +13,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as Survey from '@core/survey/survey'
 
+import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useRecordCodeAttributesUuidsHierarchy } from '@webapp/store/ui/record/hooks'
 
@@ -25,6 +26,7 @@ const NodeDefCode = (props) => {
     canEditRecord = false,
     edit = false,
     entryDataQuery = false,
+    insideTable = false,
     nodeDef,
     nodes = [],
     parentNode = null,
@@ -47,23 +49,13 @@ const NodeDefCode = (props) => {
 
   const itemsNeeded = !readOnly && canEditRecord
   const items = useItems({ nodeDef, parentNode, draft, edit, entryDataQuery, itemsNeeded })
-  const [selectedItems, setSelectedItems] = useState([])
   const autocomplete = typeof items === 'function'
   const renderType = NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef) ?? NodeDefLayout.renderType.dropdown
 
-  // On items or nodes change, update selectedItems
-  useEffect(() => {
-    if (!edit) {
-      const selectedItemsUpdate = nodes.reduce((acc, node) => {
-        const categoryItem = NodeRefData.getCategoryItem(node)
-        if (categoryItem) {
-          acc.push(categoryItem)
-        }
-        return acc
-      }, [])
-      setSelectedItems(selectedItemsUpdate)
-    }
-  }, [edit, items, nodes])
+  const selectedItems = useMemo(
+    () => (edit ? [] : nodes.map((node) => NodeRefData.getCategoryItem(node)).filter(Boolean)),
+    [edit, nodes]
+  )
 
   const onItemAdd = useCallback(
     (item) => {
@@ -113,7 +105,14 @@ const NodeDefCode = (props) => {
         })
       )
       .join(', ')
-    return <span className="value-preview">{nodesValueSummary}</span>
+    // in table cells show the value in a single line (ellipsis + tooltip) to avoid wrapping
+    return insideTable ? (
+      <div className="value-preview survey-form__node-def-table-cell-value">
+        <LabelWithTooltip label={nodesValueSummary} />
+      </div>
+    ) : (
+      <span className="value-preview">{nodesValueSummary}</span>
+    )
   }
 
   if (renderType === NodeDefLayout.renderType.dropdown || entryDataQuery || autocomplete) {
@@ -150,6 +149,7 @@ NodeDefCode.propTypes = {
   canEditRecord: PropTypes.bool,
   edit: PropTypes.bool,
   entryDataQuery: PropTypes.bool,
+  insideTable: PropTypes.bool,
   nodeDef: PropTypes.object.isRequired,
   nodes: PropTypes.arrayOf(PropTypes.object),
   parentNode: PropTypes.object,

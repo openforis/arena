@@ -2,7 +2,7 @@ import './nodeDefGeo.scss'
 
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Node from '@core/record/node'
@@ -89,7 +89,7 @@ const NodeDefGeo = (props) => {
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
+      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} />
     </PanelRight>
   ) : null
 

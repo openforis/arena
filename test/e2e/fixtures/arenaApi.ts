@@ -62,6 +62,17 @@ export class ArenaApi {
     return response.json()
   }
 
+  /**
+   * Sends a GET request and returns its status and body without checking them (to test refused requests).
+   * @param {string} url - The URL.
+   * @returns {Promise<{status: number, body: unknown}>} - The status and the JSON body (null when it is not JSON).
+   */
+  async getRaw(url: string): Promise<{ status: number; body: unknown }> {
+    const response = await this.requestContext.get(url, { headers: this.headers })
+    const body = await response.json().catch(() => null)
+    return { status: response.status(), body }
+  }
+
   private async post(url: string, data: unknown) {
     const response = await this.requestContext.post(url, { headers: this.headers, data })
     expect(response.ok(), `POST ${url} failed: ${response.status()}`).toBeTruthy()

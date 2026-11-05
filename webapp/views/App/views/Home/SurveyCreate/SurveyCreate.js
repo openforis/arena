@@ -1,4 +1,3 @@
-
 import { SurveyCreate as SurveyCreateComponent } from '@webapp/components/survey/SurveyCreate'
 
 const SurveyCreate = () => <SurveyCreateComponent />

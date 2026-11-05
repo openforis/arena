@@ -17,8 +17,12 @@ export default {
   },
   startImport: 'Начать импорт',
   survey: 'Опрос',
+  survey_few: 'Опросы',
+  survey_many: 'Опросы',
   survey_other: 'Опросы',
   template: 'Шаблон',
+  template_few: 'Шаблоны',
+  template_many: 'Шаблоны',
   template_other: 'Шаблоны',
   error: 'Ошибка создания нового опроса',
   errorMaxSurveysCountExceeded:

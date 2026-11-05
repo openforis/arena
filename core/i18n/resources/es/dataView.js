@@ -157,6 +157,38 @@ export default {
     },
     title: 'Exportar datos',
   },
+  dataMatrixExport: {
+    intro: `Exporte los datos de **{{entity}}** como una tabla con:
+
+- una **fila** por cada valor distinto de los atributos de fila (p. ej. cada especie y estrato);
+- una **columna** por cada registro, con el nombre de su clave ({{keys}});
+- en las celdas, el valor del atributo de valor (p. ej. cobertura).
+
+Es el formato utilizado por herramientas de análisis de vegetación como Turboveg, Juice y Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matriz de datos',
+      info: 'Tabla: filas y columnas como se muestran en el Explorador de datos. Matriz de datos: una fila por especie (u otro atributo) y una columna por registro, como requieren herramientas de análisis de vegetación como Turboveg.',
+      label: 'Exportar como',
+      table: 'Tabla',
+    },
+    preview: 'Vista previa',
+    previewRecord: '{{keys}} del registro {{number}}',
+    recordKeys: 'Atributos clave usados para nombrar las columnas de los registros',
+    recordKeysInfo:
+      'Cada registro se convierte en una columna, con el nombre formado por los valores de los atributos clave seleccionados (p. ej. solo el número de parcela). Por defecto se usan los atributos clave seleccionados en el Explorador de datos, o todos si no se ha seleccionado ninguno. Se requiere al menos uno.',
+    recordsAll:
+      'Se exportan los datos de todos los registros: defina un filtro en el Explorador de datos para exportar solo algunos.',
+    recordsFiltered: 'Solo se exportan los datos que cumplen el filtro actual del Explorador de datos.',
+    rowAttribute: 'Filas (nombre del atributo de taxón, p. ej. especie)',
+    rowAttributeInfo:
+      'Cada valor distinto de este atributo se convierte en una fila de la tabla. Los atributos de taxón se exportan con su nombre científico, porque todos los taxones no listados tienen el mismo código.',
+    secondRowAttribute: 'Segundo atributo de fila, opcional (p. ej. estrato)',
+    secondRowAttributeInfo:
+      'Úselo cuando la misma especie pueda aparecer más de una vez en un registro (p. ej. en distintos estratos): cada combinación se convierte en una fila separada.',
+    valueAttribute: 'Valores (p. ej. cobertura)',
+    valueAttributeInfo:
+      'El valor que se muestra en las celdas. Los atributos de código se exportan con su código, no con la etiqueta. Si una fila aparece más de una vez en un registro con valores distintos, la celda los contiene todos.',
+  },
   dataVis: {
     errorLoadingData: 'Error al cargar datos',
     noData: 'Esta consulta no devolvió datos',
@@ -172,8 +204,6 @@ export default {
       samplingPointData: 'Datos de puntos de muestreo',
     },
     layersPanel: {
-      hidePanel: 'Ocultar panel',
-      showPanel: 'Mostrar panel',
       markers: '{{count}} marcadores',
       markers_one: '{{count}} marcador',
       markers_other: '{{count}} marcadores',

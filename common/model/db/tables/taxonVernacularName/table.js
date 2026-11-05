@@ -9,9 +9,6 @@ const columnSet = {
   propsDraft: Table.columnSetCommon.propsDraft,
 }
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableTaxonVernacularName
- */
 export default class TableTaxonVernacularName extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'taxon_vernacular_name', columnSet)

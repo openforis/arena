@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { TestId } from '@webapp/utils/testId'
 
 import { DashboardSection } from '../components/DashboardSection'

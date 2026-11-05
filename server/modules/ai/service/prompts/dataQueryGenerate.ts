@@ -41,9 +41,12 @@ Schema rules (the schema is given in the user message):
 - Measures: only the entity itself (for counting) or attributes tagged [measure] listed directly under the entity.
 - Raw mode attributes: any attribute of the entity or of its ancestors.
 
-Filter (optional, null if not needed): a boolean expression evaluated on each row of the entity, using
-column names of the entity or of its ancestors. Allowed operators: =, !=, >, <, >=, <=, AND, OR, +, -, *, /,
-parentheses. Strings in double quotes. Examples: dbh > 20 AND tree_status = "L" ; plot_id = 3.
+Filter (optional, null if not needed): a boolean expression in JavaScript syntax evaluated on each row of the
+entity, using column names of the entity or of its ancestors. Allowed operators: ==, !=, >, <, >=, <=, &&, ||, !,
++, -, *, /, parentheses. Strings in double quotes. Examples: dbh > 20 && tree_status == "L" ; plot_id == 3.
+To search text values use the methods includes, startsWith and endsWith, preceded by toLowerCase() to ignore
+the case, e.g. remarks.includes("dead") ; species_scientific_name.toLowerCase().startsWith("pinus").
+No other JavaScript functions, methods or syntax (e.g. no ternary operator, regular expressions, template strings).
 For code attributes the column "<name>" contains the code and "<name>_label" the label;
 for taxon attributes "<name>" contains the taxon code and "<name>_scientific_name" the scientific name.
 

@@ -1,10 +1,11 @@
 import { Readable } from 'stream'
+import ExcelJS from 'exceljs'
 
 import { FileFormats } from '@core/fileFormats'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
-import { readHeadersAndRows, toXlsxBuffer, Rows } from '../../utils/flatDataImportTestUtils'
+import { Cell, readHeadersAndRows, toXlsxBuffer, Rows } from '../../utils/flatDataImportTestUtils'
 
 const readXlsx = async (...sheetsRows: Rows[]) =>
   readHeadersAndRows({ stream: Readable.from([await toXlsxBuffer(...sheetsRows)]), fileFormat: FileFormats.xlsx })
@@ -70,6 +71,67 @@ describe('FlatDataReader (xlsx)', () => {
     const { headers, rows } = await readXlsx([['a', 'b']])
     expect(headers).toEqual(['a', 'b'])
     expect(rows).toEqual([])
+  })
+
+  test('formula cells are read as their result', async () => {
+    const { rows } = await readXlsx([
+      ['a', 'b', 'c', 'd', 'e'],
+      [
+        { formula: 'LEFT("Abies alba",5)', result: 'Abies' },
+        { formula: '1+1', result: 2 },
+        { formula: '1-1', result: 0 },
+        { formula: 'NA()', result: { error: '#N/A' } },
+        { formula: 'A1' },
+      ] as Cell[],
+    ])
+    expect(rows).toEqual([{ a: 'Abies', b: 2, c: 0, d: '#N/A', e: '' }])
+  })
+
+  test('shared formula cells are read as their result', async () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Sheet1')
+    worksheet.addRow(['a'])
+    worksheet.getCell('A2').value = {
+      formula: 'LEFT("Abies",1)',
+      result: 'A',
+      shareType: 'shared',
+      ref: 'A2:A3',
+    } as ExcelJS.CellFormulaValue
+    worksheet.getCell('A3').value = { sharedFormula: 'A2', result: 'B' } as ExcelJS.CellSharedFormulaValue
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer())
+
+    const { rows } = await readHeadersAndRows({ stream: Readable.from([buffer]), fileFormat: FileFormats.xlsx })
+
+    expect(rows).toEqual([{ a: 'A' }, { a: 'B' }])
+  })
+
+  test('rich text and hyperlink cells are read as their text, also in the headers', async () => {
+    const { headers, rows } = await readXlsx([
+      [{ richText: [{ text: 'sci' }, { text: 'name' }] }, 'b'],
+      [
+        { richText: [{ text: 'Ulmus ' }, { font: { italic: true }, text: 'minor' }] },
+        { text: 'link', hyperlink: 'http://x.org' },
+      ],
+    ])
+    expect(headers).toEqual(['sciname', 'b'])
+    expect(rows).toEqual([{ sciname: 'Ulmus minor', b: 'link' }])
+  })
+
+  test('merged cells are read as the value of the master cell', async () => {
+    const workbook = new ExcelJS.Workbook()
+    const worksheet = workbook.addWorksheet('Sheet1')
+    worksheet.addRow(['a', 'b'])
+    worksheet.addRow([{ formula: '1-1', result: 0 }, 'x'])
+    worksheet.addRow([null, 'y'])
+    worksheet.mergeCells('A2:A3')
+    const buffer = Buffer.from(await workbook.xlsx.writeBuffer())
+
+    const { rows } = await readHeadersAndRows({ stream: Readable.from([buffer]), fileFormat: FileFormats.xlsx })
+
+    expect(rows).toEqual([
+      { a: 0, b: 'x' },
+      { a: 0, b: 'y' },
+    ])
   })
 
   test('reports the total number of rows', async () => {

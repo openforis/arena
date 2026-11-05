@@ -48,7 +48,8 @@ const rootDefColumnNamesAndTypes = [
 ]
 
 /**
- * @typedef {module:arena.TableSurveyRdb} module:arena.TableDataNodeDef
+ * Table with the data of a node definition.
+ *
  * @property {Survey} survey - The survey.
  * @property {NodeDef} nodeDef - The nodeDef table.
  * @property {ColumnNodeDef[]} columnNodeDefs - The nodeDef columns.

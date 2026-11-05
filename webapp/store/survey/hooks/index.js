@@ -153,12 +153,10 @@ export const useChains = ({ surveyCycleKey } = {}) => {
         }
       }
       void fetchChains()
-    } else {
-      setChains(null)
     }
     return () => {
       isMounted = false
     }
   }, [canUseAnalysis, surveyId, surveyCycleKey])
-  return chains
+  return canUseAnalysis ? chains : null
 }

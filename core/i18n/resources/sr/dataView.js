@@ -171,6 +171,38 @@ Spajanje nije moguće izvršiti.`,
     },
     title: 'Izvezi podatke',
   },
+  dataMatrixExport: {
+    intro: `Izvezite podatke entiteta **{{entity}}** kao tabelu sa:
+
+- jednim **redom** za svaku različitu vrednost atributa reda (npr. za svaku vrstu i sprat);
+- jednom **kolonom** za svaki zapis, nazvanom po njegovom ključu ({{keys}});
+- u ćelijama, vrednošću atributa vrednosti (npr. pokrovnost).
+
+Ovo je format koji koriste alati za analizu vegetacije kao što su Turboveg, Juice i Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matrica podataka',
+      info: 'Tabela: redovi i kolone kako su prikazani u Istraživaču podataka. Matrica podataka: jedan red po vrsti (ili drugom atributu) i jedna kolona po zapisu, kako zahtevaju alati za analizu vegetacije kao što je Turboveg.',
+      label: 'Izvezi kao',
+      table: 'Tabela',
+    },
+    preview: 'Pregled',
+    previewRecord: '{{keys}} zapisa {{number}}',
+    recordKeys: 'Ključni atributi za nazive kolona zapisa',
+    recordKeysInfo:
+      'Svaki zapis postaje kolona, nazvana po vrednostima izabranih ključnih atributa (npr. samo broj parcele). Podrazumevano se koriste ključni atributi izabrani u Istraživaču podataka, ili svi ako nijedan nije izabran. Potreban je bar jedan.',
+    recordsAll:
+      'Izvoze se podaci svih zapisa: postavite filter u Istraživaču podataka da biste izvezli samo neke od njih.',
+    recordsFiltered: 'Izvoze se samo podaci koji odgovaraju trenutnom filteru Istraživača podataka.',
+    rowAttribute: 'Redovi (naziv atributa taksona, npr. vrsta)',
+    rowAttributeInfo:
+      'Svaka različita vrednost ovog atributa postaje red tabele. Atributi taksona se izvoze sa naučnim nazivom, jer svi taksoni koji nisu na listi imaju isti kod.',
+    secondRowAttribute: 'Drugi atribut reda, opciono (npr. sprat)',
+    secondRowAttributeInfo:
+      'Koristite ga kada se ista vrsta može pojaviti više puta u zapisu (npr. u različitim spratovima): svaka kombinacija postaje poseban red.',
+    valueAttribute: 'Vrednosti (npr. pokrovnost)',
+    valueAttributeInfo:
+      'Vrednost prikazana u ćelijama. Atributi koda se izvoze sa kodom, a ne sa oznakom. Ako se red pojavi više puta u zapisu sa različitim vrednostima, ćelija sadrži sve vrednosti.',
+  },
   dataVis: {
     errorLoadingData: 'Greška pri učitavanju podataka',
     noData: 'Ovaj upit nije vratio podatke',
@@ -185,8 +217,6 @@ Spajanje nije moguće izvršiti.`,
       samplingPointData: 'Podaci o tačkama uzorka',
     },
     layersPanel: {
-      hidePanel: 'Sakrij panel',
-      showPanel: 'Prikaži panel',
       markers: '{{count}} markera',
       markers_one: '{{count}} marker',
       markers_few: '{{count}} markera',

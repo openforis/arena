@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/refs */
 import * as A from '@core/arena'
-import React, { createRef, useMemo, useRef } from 'react'
+import { createRef, useMemo, useRef } from 'react'
 import { CSSTransition, TransitionGroup } from 'react-transition-group'
 import './ServiceErrors.scss'
 

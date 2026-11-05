@@ -244,6 +244,12 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
     return nodeDefsUpdated
   })
 
+export const updateNodeDefType = async ({ surveyId, nodeDefUuid, type }, client = DB) =>
+  client.none(
+    `UPDATE ${getSchemaSurvey(surveyId)}.node_def SET type = $1, date_modified = ${DbUtils.now} WHERE uuid = $2`,
+    [type, nodeDefUuid]
+  )
+
 export const updateNodeDefTypeAndProps = async (
   { surveyId, nodeDefUuid, type, props = {}, propsAdvanced = {} },
   client = DB

@@ -301,7 +301,7 @@ export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.val
  * @param {pgPromise.IDatabase|pgPromise.ITask} [client] - The db client (pool, task or transaction); when not specified,
  * the queries are expected to use the connection pool.
  * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
- * @returns {Promise<Array<object>>} - The results of the queries.
+ * @returns {Promise<Array<*>>} - The results of the queries.
  */
 export const runQueries = async (client, queryFns) => {
   if (!client || client === db) {

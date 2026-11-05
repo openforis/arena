@@ -42,6 +42,15 @@ const filterNodeDefsWithoutSiblings = (nodeDefs) => {
   )
 }
 
+/**
+ * Returns the child definitions of a node definition.
+ * @param {object} [params] - The parameters.
+ * @param {object} [params.nodeDef] - The parent node definition.
+ * @param {boolean} [params.includeAnalysis] - True to include analysis definitions.
+ * @param {boolean} [params.includeLayoutElements] - True to include layout elements.
+ * @param {boolean} [params.includeSamplingDefsWithoutSiblings] - True to keep sampling definitions without siblings.
+ * @returns {(survey: any) => any[]} - Function that returns the child definitions of the specified survey.
+ */
 export const getNodeDefChildren =
   ({
     nodeDef,

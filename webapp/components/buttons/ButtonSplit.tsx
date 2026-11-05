@@ -1,6 +1,6 @@
 import './ButtonSplit.scss'
 
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import classNames from 'classnames'
 import ButtonGroup from '@mui/material/ButtonGroup'
 

@@ -1,4 +1,3 @@
-import React from 'react'
 import classNames from 'classnames'
 
 import { SurveyCompareChange, SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'

@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -152,7 +152,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       }))
     )
     // convert action (only for attributes)
-    if (NodeDef.isAttribute(nodeDef) && !NodeDef.isPublished(nodeDef)) {
+    if (NodeDef.getConvertibleTypes(nodeDef).length > 0) {
       _menuItems.push({
         key: 'node-convert',
         content: (

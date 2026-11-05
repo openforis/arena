@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
@@ -67,9 +67,7 @@ export const DashboardMapContent = () => {
           selectedOwnerUuid={selectedOwnerUuid}
           onOwnerSelect={setSelectedOwnerUuid}
         />
-        <div className="dashboard-map-section__map">
-          {mapVisible && <MapContainer layers={layers} showOptions={false} />}
-        </div>
+        <div className="dashboard-map-section__map">{mapVisible && <MapContainer layers={layers} />}</div>
       </div>
     </DashboardSection>
   )

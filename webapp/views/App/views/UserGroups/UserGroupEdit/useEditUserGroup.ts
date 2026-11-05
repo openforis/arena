@@ -64,8 +64,8 @@ export const useEditUserGroup = ({ groupUuid }: UseEditUserGroupParams): UseEdit
   const surveyId = useSurveyId() as string
   const canManage = useAuthCanManageUserGroups()
 
-  const [userGroupOriginal, setUserGroupOriginal] = useState<UserGroupType>(UserGroup.newUserGroup())
-  const [userGroup, setUserGroup] = useState<UserGroupType>(UserGroup.newUserGroup())
+  const [userGroupOriginal, setUserGroupOriginal] = useState<UserGroupType>(UserGroup.newUserGroup() as UserGroupType)
+  const [userGroup, setUserGroup] = useState<UserGroupType>(UserGroup.newUserGroup() as UserGroupType)
   const [otherGroupsInSurvey, setOtherGroupsInSurvey] = useState<UserGroupType[]>([])
   const [ready, setReady] = useState(!groupUuid)
 

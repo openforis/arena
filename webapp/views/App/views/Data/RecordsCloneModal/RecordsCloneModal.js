@@ -1,6 +1,6 @@
 import './RecordsCloneModal.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Objects } from '@openforis/arena-core'

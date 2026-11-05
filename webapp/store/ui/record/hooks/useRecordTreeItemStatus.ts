@@ -1,6 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import { Objects, Records } from '@openforis/arena-core'
+import type { ArenaRecord } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -141,7 +142,7 @@ const getPageCompletionPercent = ({
 const evaluatePage = (
   uuid: string,
   descendantPageUuidsByPage: Record<string, string[]>,
-  record: object,
+  record: ArenaRecord,
   state: unknown,
   { instanceScoped = false }: { instanceScoped?: boolean } = {}
 ): PageEvalResult => {
@@ -193,7 +194,7 @@ const evaluatePage = (
 const rollupCollapsedStatus = (
   scopedUuids: string[],
   descendantPageUuidsByPage: Record<string, string[]>,
-  record: object,
+  record: ArenaRecord,
   state: unknown,
   instanceScoped = false
 ): TreeItemStatus => {

@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import ModuleSwitch from '@webapp/components/moduleSwitch'

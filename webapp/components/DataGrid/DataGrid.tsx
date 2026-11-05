@@ -40,12 +40,12 @@ type Props = {
 
 const FooterWithExport =
   ({ exportFileName }: { exportFileName?: string }) =>
-    () => (
-      <GridFooterContainer>
-        <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
-        <GridFooter />
-      </GridFooterContainer>
-    )
+  () => (
+    <GridFooterContainer>
+      <GridToolbarExport printOptions={{ disableToolbarButton: true }} csvOptions={{ fileName: exportFileName }} />
+      <GridFooter />
+    </GridFooterContainer>
+  )
 
 const DataGrid = (props: Props) => {
   const {

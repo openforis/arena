@@ -1,7 +1,5 @@
 import './Dashboard.scss'
 
-import React from 'react'
-
 import * as Survey from '@core/survey/survey'
 
 import { useShouldShowFirstTimeHelp } from '@webapp/components/hooks'

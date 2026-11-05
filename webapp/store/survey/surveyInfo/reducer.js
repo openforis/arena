@@ -36,6 +36,7 @@ const actionHandlers = {
   [NodeDefsActions.nodeDefsDelete]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefSave]: SurveyInfoState.markDraft,
   [NodeDefsActions.nodeDefUpdate]: SurveyInfoState.markDraft,
+  [NodeDefsActions.nodeDefsUpdate]: SurveyInfoState.markDraft,
 
   // Category
   // Taxonomy

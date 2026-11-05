@@ -75,6 +75,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     // import records sequentially
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
 
       if (selectedRecordsUuids && !selectedRecordsUuids.includes(recordUuid)) {
@@ -123,8 +125,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
     record[Record.keys.ownerUuid] = ownerSource ? ownerUuidSource : User.getUuid(user)
 
-    // remove invalid nodes and build index from scratch
-    delete record['_nodesIndex']
+    // remove invalid nodes
     const nodes = Record.getNodes(record)
 
     for (const [nodeUuid, node] of Object.entries(nodes)) {
@@ -152,8 +153,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
         }
       }
     }
-    // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
+    // build index from scratch, with only the valid nodes
+    this.currentRecord = Record.replaceNodes(nodes)(record)
   }
 
   async insertOrSkipRecord() {
@@ -162,13 +163,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecordSummary = findExistingRecordSummary({
+    const existingRecordSummary = await findExistingRecordSummary({
       survey,
       record,
       existingRecordsSummary,
       conflictResolutionStrategy,
     })
-    const { action, existingRecordUuid } = determineRecordAction({
+    const { action, existingRecordUuid } = await determineRecordAction({
       survey,
       record,
       existingRecordSummary,
@@ -216,12 +217,12 @@ export default class RecordsImportJob extends DataImportBaseJob {
     )
     // check can update record
     if (!Authorizer.canEditRecord(user, recordTarget)) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
     }
     // records of other user groups (e.g. downloaded read-only) cannot be updated
     if (!(await this.recordMatchesUserGroupQualifiers(recordTarget))) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOfAnotherUserGroup', { recordUuid, recordKeyValues })
     }
 

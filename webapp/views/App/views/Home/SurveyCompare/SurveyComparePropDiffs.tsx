@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { SurveyComparePropDiff } from '@core/survey/surveyCompare/surveyCompareTypes'
 
 import { useSurveyLangs } from '@webapp/store/survey'

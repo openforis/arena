@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'A URL do serviço não é válida',
+    urlNotAllowed: 'Somente endereços http e https públicos podem ser usados',
+    hostNotFound: 'Host não encontrado: {{host}}',
+    redirectNotFollowed: 'O serviço redireciona para {{location}}: use essa URL',
+    responseTooLarge: 'A resposta do serviço é maior que {{limitMb}} MB',
+    timeout: 'O serviço não respondeu em {{seconds}} segundos',
+    fetchFailed: 'O serviço respondeu com o status HTTP {{status}}',
+    unreachable: 'Não é possível acessar o serviço',
+    notCapabilities: 'Nenhum capabilities WMS ou WMTS encontrado nesta URL',
+    noLayers: 'O serviço não tem nenhuma camada que possa ser exibida',
+    invalidLayers: 'As camadas de mapa não são válidas',
+    tooManyLayers: 'É possível adicionar no máximo {{max}} camadas de mapa personalizadas',
+    busy: 'O servidor está ocupado a carregar outros serviços: tente novamente dentro de instantes',
+  },
   aiDataQueryDescriptionMissing: 'Descreva em linguagem natural os dados que deseja ver.',
   aiDataQueryEmpty: 'Selecione primeiro uma entidade e alguns atributos (ou dimensões e medidas).',
   aiDataQueryInvalid: 'A IA não conseguiu gerar uma consulta válida para esta solicitação: {{errors}}',
@@ -48,6 +63,9 @@ export default {
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
   geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
+  geoWhispSamplingPointDataCategoryMissing: 'Categoria de dados de ponto amostral não encontrada.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'Nenhum item de dados de ponto amostral com localização válida foi encontrado.',
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',
@@ -61,6 +79,7 @@ export default {
   undefinedFunction: `Função '{{fnName}}' indefinida ou tipos de parâmetros incorretos`,
   invalidSyntax: 'Sintaxe da expressão é inválida',
   networkError: 'Erro de comunicação com o servidor',
+  nodeDefConversionNotAllowed: `'{{name}}' não pode ser convertido para {{toType}}`,
   record: {
     errorUpdating: 'Erro ao atualizar registro',
     entityNotFound: 'Entidade "{{entityName}}" com chaves "{{keyValues}}" não encontrada',

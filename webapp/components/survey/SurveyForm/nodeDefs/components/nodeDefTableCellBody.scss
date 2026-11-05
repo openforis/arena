@@ -50,6 +50,23 @@
   }
 }
 
+// read-only attribute value rendered as a label (no input borders)
+.survey-form__node-def-table-cell-value {
+  display: flex;
+  align-items: center;
+  height: 100%;
+  padding: 0 0.5rem;
+
+  .label {
+    width: 100%;
+  }
+
+  &.survey-form__node-def-integer .label,
+  &.survey-form__node-def-decimal .label {
+    text-align: right;
+  }
+}
+
 .survey-form__node-def-table-cell-body-multiple {
   display: grid;
   grid-template-columns: 1fr auto;

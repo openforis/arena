@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -49,15 +49,16 @@ const PreloadedMapLayerEditor = (props) => {
         temporary: true,
       })
     }
-    void SurveyPreloadedMapLayerValidator.validate({ preloadedMapLayers, preloadedMapLayer: draftPreloadedMapLayer }).then(
-      (validation) => {
-        setState((statePrev) => ({
-          ...statePrev,
-          draftPreloadedMapLayer,
-          validation,
-        }))
-      }
-    )
+    void SurveyPreloadedMapLayerValidator.validate({
+      preloadedMapLayers,
+      preloadedMapLayer: draftPreloadedMapLayer,
+    }).then((validation) => {
+      setState((statePrev) => ({
+        ...statePrev,
+        draftPreloadedMapLayer,
+        validation,
+      }))
+    })
   }, [editedPreloadedMapLayer, file, labels, preloadedMapLayers])
 
   const onOkClick = useCallback(async () => {

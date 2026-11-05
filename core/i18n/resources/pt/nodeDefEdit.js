@@ -23,6 +23,8 @@ export default {
     sql: 'Somente expressões SQL válidas são permitidas.',
   },
   editorCompletionHelp: '- Mostrar as variáveis e funções disponíveis que podem ser usadas',
+  editorTextSearchHelp:
+    "Pesquise valores de texto com text_attr.includes('abc'), text_attr.startsWith('abc') ou text_attr.endsWith('abc'); adicione .toLowerCase() antes deles para ignorar maiúsculas e minúsculas, por exemplo, text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp:
       'Retorna o valor da $t(extraProp.label) especificada de um item de categoria com o código informado',
@@ -211,6 +213,11 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
   timeProps: {
     includeSeconds: 'Incluir segundos',
   },
+  geoProps: {
+    positionTracking: 'Rastreamento de posição',
+    positionTrackingInfo:
+      'Aplica-se apenas ao Arena Mobile: se marcado, o valor é o trajeto percorrido pelo usuário durante o preenchimento do registro (gravado rastreando a posição do dispositivo) e não pode ser editado manualmente',
+  },
   formHeaderProps: {
     headerColorLabel: 'Cor do cabeçalho',
     headerColor: {
@@ -234,10 +241,10 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
     },
     textTransform: 'Transformação de texto',
     textTransformTypes: {
-      none: 'none',
-      capitalize: 'capitalize',
-      uppercase: 'uppercase',
-      lowercase: 'lowercase',
+      none: 'nenhum',
+      capitalize: 'iniciais maiúsculas',
+      uppercase: 'maiúsculas',
+      lowercase: 'minúsculas',
     },
   },
   booleanProps: {

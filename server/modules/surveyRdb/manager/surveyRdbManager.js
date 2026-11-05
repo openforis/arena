@@ -9,6 +9,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 
+import { getDataMatrixAttributeDefs } from '@common/dataExport/dataMatrixExport'
 import { ColumnNodeDef, TableDataNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -26,6 +27,7 @@ import * as DataTableInsertRepository from '../repository/dataTableInsertReposit
 import * as DataTableReadRepository from '../repository/dataTableReadRepository'
 import * as DataViewRepository from '../repository/dataView'
 import { SurveyRdbCsvExport } from './surveyRdbCsvExport'
+import { buildDataMatrix } from './surveyRdbDataMatrix'
 
 // ==== DDL
 
@@ -54,6 +56,7 @@ export { deleteNodeResultsByChainUuid, MassiveUpdateData, MassiveUpdateNodes } f
 export { clearOlapData, createOlapDataTable, insertOlapData } from '../repository/olapDataTable'
 
 const maxExcelCellsLimit = 1000000
+const maxExcelColumnsLimit = 16384
 
 // ==== DML
 
@@ -428,6 +431,103 @@ export const fetchEntitiesDataToCsvFiles = async (
     idx++
   }
   return { fileNamesByFileUuid: uniqueFileNamesGenerator.fileNamesByKey }
+}
+
+const getDataMatrixColumnName = ({ viewDataNodeDef, nodeDef }) => {
+  const { name } = new ColumnNodeDef(viewDataNodeDef, nodeDef)
+  // taxon codes cannot be used: unlisted taxa have different scientific names but the same code (e.g. UNL)
+  return NodeDef.isTaxon(nodeDef) ? `${name}${ColumnNodeDef.columnSuffixTaxonScientificName}` : name
+}
+
+// all the record keys when not specified, always in the survey order
+const getDataMatrixRecordKeyDefs = ({ survey, recordKeyAttributeDefUuids }) => {
+  const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
+  if (A.isNil(recordKeyAttributeDefUuids)) return rootKeyDefs
+  const rootKeyDefUuids = new Set(rootKeyDefs.map(NodeDef.getUuid))
+  const invalidUuid = recordKeyAttributeDefUuids.find((uuid) => !rootKeyDefUuids.has(uuid))
+  if (invalidUuid) throw new Error(`Invalid data matrix record key attribute: ${invalidUuid}`)
+  return rootKeyDefs.filter((keyDef) => recordKeyAttributeDefUuids.includes(NodeDef.getUuid(keyDef)))
+}
+
+const getDataMatrixDefs = ({ survey, cycle, options }) => {
+  const { entityDefUuid, rowAttributeDefUuids, valueAttributeDefUuid } = options
+  const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
+  if (!entityDef || !NodeDef.isMultipleEntity(entityDef) || Objects.isEmpty(rowAttributeDefUuids)) {
+    throw new Error('Invalid data matrix options')
+  }
+  const attributeDefs = getDataMatrixAttributeDefs({ survey, cycle, entityDef })
+  const findAttributeDef = (nodeDefUuid) => {
+    const attributeDef = attributeDefs.find((nodeDef) => NodeDef.getUuid(nodeDef) === nodeDefUuid)
+    if (!attributeDef) throw new Error(`Invalid data matrix attribute: ${nodeDefUuid}`)
+    return attributeDef
+  }
+  return {
+    entityDef,
+    keyDefs: getDataMatrixRecordKeyDefs({ survey, recordKeyAttributeDefUuids: options.recordKeyAttributeDefUuids }),
+    rowDefs: rowAttributeDefUuids.map(findAttributeDef),
+    valueDef: findAttributeDef(valueAttributeDefUuid),
+  }
+}
+
+const checkCanExportDataMatrix = ({ fileFormat, fields, items }) => {
+  const cellsCount = fields.length * (items.length + 1)
+  if (
+    fileFormat === FileFormats.xlsx &&
+    (fields.length > maxExcelColumnsLimit || cellsCount > StreamUtils.defaultMaxCellsLimit)
+  ) {
+    throw new SystemError(`dataExport.excelMaxCellsLimitExceeded`, { limit: maxExcelCellsLimit })
+  }
+}
+
+/**
+ * Fetches the data of a multiple entity pivoted as a matrix, with one column per record.
+ * @param {!object} params - The parameters.
+ * @param {object} [params.user] - The user: the records of the user groups the user cannot read are excluded.
+ * @param {!Survey} [params.survey] - The survey.
+ * @param {!string} [params.cycle] - The survey cycle.
+ * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are included.
+ * @param {!object} [params.options] - The entity, row, record key (all when not specified) and value definition UUIDs, the filter expression (as in Data Explorer) and the file format.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<{fields: string[], items: object[]}>} - The output fields and items.
+ */
+export const fetchEntityDataMatrix = async (
+  { user = null, survey, cycle, recordOwnerUuid = null, options },
+  client = db
+) => {
+  // the records filter of the view data query is applied only when a cycle is specified
+  if (A.isNil(cycle)) throw new Error('Cycle not specified')
+
+  const { entityDef, keyDefs, rowDefs, valueDef } = getDataMatrixDefs({ survey, cycle, options })
+
+  const filterRecordUuids = await _determineRecordUuidsFilter({ survey, cycle, user })
+  if (filterRecordUuids?.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
+
+  const query = Query.assocFilter(options.filter ?? null)(
+    Query.create({
+      entityDefUuid: NodeDef.getUuid(entityDef),
+      attributeDefUuids: [...keyDefs, ...rowDefs, valueDef].map(NodeDef.getUuid),
+      filterRecordUuids,
+    })
+  )
+  const rows = await fetchViewData({ survey, cycle, query, recordOwnerUuid }, client)
+
+  const viewDataNodeDef = new ViewDataNodeDef(survey, entityDef)
+  const getColumnName = (nodeDef) => getDataMatrixColumnName({ viewDataNodeDef, nodeDef })
+  const { fields, items } = buildDataMatrix({
+    rows,
+    recordUuidField: ViewDataNodeDef.columnSet.recordUuid,
+    recordKeyFields: keyDefs.map(getColumnName),
+    rowFields: rowDefs.map(getColumnName),
+    valueField: getColumnName(valueDef),
+  })
+  if (items.length === 0) {
+    throw new SystemError('dataExport.noRecordsMatchingSearchCriteria')
+  }
+  checkCanExportDataMatrix({ fileFormat: options.fileFormat, fields, items })
+
+  return { fields, items }
 }
 
 export const fetchEntitiesFileUuidsByCycle = async (

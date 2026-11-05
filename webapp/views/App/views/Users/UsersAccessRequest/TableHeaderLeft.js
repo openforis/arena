@@ -1,4 +1,3 @@
-
 import { ButtonDownload } from '@webapp/components'
 
 export const TableHeaderLeft = () => (

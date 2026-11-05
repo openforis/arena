@@ -23,6 +23,8 @@ export default {
     sql: 'Dozvoljeni su samo važeći SQL izrazi.',
   },
   editorCompletionHelp: '- Prikaži dostupne promjenljive i funkcije koje se mogu koristiti',
+  editorTextSearchHelp:
+    "Pretražujte tekstualne vrijednosti pomoću text_attr.includes('abc'), text_attr.startsWith('abc') ili text_attr.endsWith('abc'); dodajte .toLowerCase() ispred njih da biste zanemarili velika i mala slova, npr. text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp:
       'Vraća vrijednost navedenog svojstva $t(extraProp.label) stavke kategorije koja ima navedenu šifru',

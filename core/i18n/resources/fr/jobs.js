@@ -72,6 +72,7 @@ export default {
   // exportation de données
   ArenaFileReadJob: 'Lecture de fichier Arena',
   DataExportJob: 'Exportation de données',
+  DataMatrixExportJob: 'Exportation de la matrice de données',
   DataSummaryExportJob: 'Exportation du résumé de données',
   ZipCreationJob: 'Création de fichier ZIP',
   CSVDataExtraction: 'Extraction de données',

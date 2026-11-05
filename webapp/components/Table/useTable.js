@@ -117,23 +117,31 @@ export const useTable = ({
     updateQuery(navigate)({ offset: null })
   }, [JSON.stringify(restParams), limit])
 
-  // selected items
+  // selected items (kept across pages)
   const [selectedItems, setSelectedItems] = useState([])
 
+  const isItemSelected = useCallback(
+    (item) => {
+      const key = keyExtractor({ item })
+      return selectedItems.some((selectedItem) => keyExtractor({ item: selectedItem }) === key)
+    },
+    [keyExtractor, selectedItems]
+  )
+
+  const allVisibleItemsSelected = list.length > 0 && list.every(isItemSelected)
+
   const selectAllItems = useCallback(() => {
-    setSelectedItems(list)
-  }, [list])
+    setSelectedItems([...selectedItems, ...list.filter((item) => !isItemSelected(item))])
+  }, [isItemSelected, list, selectedItems])
 
   const deselectAllItems = useCallback(() => {
     setSelectedItems([])
   }, [])
 
-  // reset selected items on data (list) update
+  // reset selected items when filter, search or page size change, or data is refreshed (e.g. records update)
   useOnUpdate(() => {
-    if (selectedItems.length > 0) {
-      deselectAllItems()
-    }
-  }, [deselectAllItems, list])
+    deselectAllItems()
+  }, [JSON.stringify(restParams), search, limit])
 
   const onRowClick = useCallback(
     async (item) => {
@@ -179,6 +187,6 @@ export const useTable = ({
     deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
-    visibleItemsCount: list?.length ?? 0,
+    allVisibleItemsSelected,
   }
 }

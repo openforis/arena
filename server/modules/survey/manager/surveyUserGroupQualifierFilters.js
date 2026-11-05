@@ -76,7 +76,7 @@ export const fetchUserQualifierFilters = async ({ user, survey }, client = db) =
  * @param {object} params.user - The current user.
  * @param {object} params.survey - The survey, with node defs loaded.
  * @param {pgPromise.IDatabase} [client] - The db client.
- * @returns {Promise<{own: Array<{nodeDef: object, value: *}>, readable: Array<Array<{nodeDef: object, value: *}>>}>} - `own` is empty when the user is unrestricted (then `readable` is empty too);
+ * @returns {Promise<{own: Array<{nodeDef: *, value: *}>, readable: Array<Array<{nodeDef: *, value: *}>>}>} - `own` is empty when the user is unrestricted (then `readable` is empty too);
  * readable groups without qualifier filters are ignored (they would match every record).
  */
 export const fetchUserGroupAccessFilters = async ({ user, survey }, client = db) => {

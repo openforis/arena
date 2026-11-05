@@ -1,4 +1,3 @@
-
 import Record from './Record'
 import SurveyDefsLoader from '../SurveyDefsLoader/SurveyDefsLoader'
 

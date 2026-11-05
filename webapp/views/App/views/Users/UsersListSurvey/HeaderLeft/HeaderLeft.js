@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import { useI18n } from '@webapp/store/system'
 import { useAuthCanInviteUser } from '@webapp/store/user'

@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from 'react'
+import { useMemo } from 'react'
 
 const lightColors = {
   aqua: '#00ffff',
@@ -57,46 +57,24 @@ const determineAvailableColors = ({ onlyLightColors = false, onlyDarkColors = fa
   return possibleColors
 }
 
-export const useRandomColor = (dependencies = []) => {
-  const availableColorsRef = useRef(Object.values(possibleColors))
+const pickRandomColors = ({ size, onlyDarkColors, onlyLightColors }) => {
+  const availableColorsObj = determineAvailableColors({ onlyDarkColors, onlyLightColors })
+  const availableColors = Object.values(availableColorsObj)
 
-  const nextColor = useCallback(() => {
-    const availableColors = availableColorsRef.current
+  const colors = []
 
+  for (let count = 0; count < size; count++) {
     // pick a color randomly among the available (not used) ones
     const colorIndex = Math.floor(Math.random() * availableColors.length)
     const color = availableColors[colorIndex]
 
-    // update state
-    const availableColorsUpdated = [...availableColors]
-    availableColorsUpdated.splice(colorIndex, 1)
-    availableColorsRef.current =
-      availableColorsUpdated.length > 0 ? availableColorsUpdated : Object.values(possibleColors)
+    colors.push(color)
 
-    return color
-  }, dependencies)
-
-  return {
-    nextColor,
+    availableColors.splice(colorIndex, 1)
   }
+
+  return colors
 }
 
 export const useRandomColors = (size, { onlyDarkColors = false, onlyLightColors = false } = {}) =>
-  useMemo(() => {
-    const availableColorsObj = determineAvailableColors({ onlyDarkColors, onlyLightColors })
-    const availableColors = Object.values(availableColorsObj)
-
-    const colors = []
-
-    for (let count = 0; count < size; count++) {
-      // pick a color randomly among the available (not used) ones
-      const colorIndex = Math.floor(Math.random() * availableColors.length)
-      const color = availableColors[colorIndex]
-
-      colors.push(color)
-
-      availableColors.splice(colorIndex, 1)
-    }
-
-    return colors
-  }, [onlyDarkColors, onlyLightColors, size])
+  useMemo(() => pickRandomColors({ size, onlyDarkColors, onlyLightColors }), [onlyDarkColors, onlyLightColors, size])

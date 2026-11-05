@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { BarChart as ReChartsBarChart, Bar, Rectangle, XAxis, YAxis, Tooltip, Legend } from 'recharts'

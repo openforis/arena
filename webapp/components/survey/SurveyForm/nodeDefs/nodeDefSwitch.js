@@ -1,6 +1,6 @@
 import './nodeDefs.scss'
 
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as A from '@core/arena'
 import classNames from 'classnames'

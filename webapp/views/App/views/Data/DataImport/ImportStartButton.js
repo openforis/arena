@@ -1,6 +1,6 @@
 import './ImportStartButton.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 

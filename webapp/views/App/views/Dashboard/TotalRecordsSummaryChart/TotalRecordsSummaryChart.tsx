@@ -1,14 +1,13 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { Area, CartesianGrid, Line, LineChart as ReChartsLineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { convertDateFromISOToDisplay } from '@core/dateUtils'
 
 import { ChartWrapper, RotatedCustomAxisTick } from '@webapp/charts/common'
 import { useI18n } from '@webapp/store/system'
-import { themeColors } from '@webapp/theme/tokens'
+import { themeColors, withAlpha } from '@webapp/theme/tokens'
 
 import { NoRecordsAddedInSelectedPeriod } from '../NoRecordsAddedInSelectedPeriod'
-import { withAlpha } from '../theme/dashboardAccents'
 
 type RecordsCountRow = { date?: string; count?: string | number }
 

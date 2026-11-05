@@ -1,6 +1,6 @@
 import './nodeDefCoordinate.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'

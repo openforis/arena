@@ -128,6 +128,7 @@ export const ChainCloneFromSurveyDialog = ({ onClose }: ChainCloneFromSurveyDial
   }, [buildSurveyItems, currentSurveyId, i18n])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the loading state must be set before fetching surveys
     loadSurveys()
   }, [loadSurveys])
 

@@ -38,6 +38,7 @@ export const {
   updateNamePasswordAndStatus,
   updatePassword,
   deleteUserPrefsSurvey,
+  deleteUserMapCustomLayersSurvey,
   resetUsersPrefsSurveyCycle,
   importNewUser,
   deleteUser,

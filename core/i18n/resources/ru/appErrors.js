@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'Недопустимый URL сервиса',
+    urlNotAllowed: 'Можно использовать только публичные адреса http и https',
+    hostNotFound: 'Хост не найден: {{host}}',
+    redirectNotFollowed: 'Сервис перенаправляет на {{location}}: используйте этот URL',
+    responseTooLarge: 'Ответ сервиса больше {{limitMb}} МБ',
+    timeout: 'Сервис не ответил за {{seconds}} с',
+    fetchFailed: 'Сервис ответил с HTTP-статусом {{status}}',
+    unreachable: 'Сервис недоступен',
+    notCapabilities: 'По этому URL не найдены capabilities WMS или WMTS',
+    noLayers: 'У сервиса нет слоёв, которые можно показать',
+    invalidLayers: 'Недопустимые слои карты',
+    tooManyLayers: 'Можно добавить не более {{max}} пользовательских слоёв карты',
+    busy: 'Сервер занят загрузкой других сервисов: повторите попытку чуть позже',
+  },
   aiDataQueryDescriptionMissing: 'Опишите обычным языком данные, которые вы хотите увидеть.',
   aiDataQueryEmpty: 'Сначала выберите сущность и атрибуты (или измерения и меры).',
   aiDataQueryInvalid: 'ИИ не удалось сформировать корректный запрос по этому описанию: {{errors}}',
@@ -49,6 +64,9 @@ export default {
   functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} (получено {{numArgs}})',
   generic: 'Неожиданная ошибка: {{text}}',
   geoWhispApiError: 'Сервис Whisp временно недоступен.',
+  geoWhispSamplingPointDataCategoryMissing: 'Категория данных точек выборки не найдена.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'Не найдено ни одного элемента данных точек выборки с допустимым местоположением.',
   importingDataIntoWrongCollectSurvey: 'Импорт данных в неверный опрос Collect. Ожидаемый URI: {{collectSurveyUri}}',
   invalidType: 'Неверный тип {{type}}',
   jobCanceledOrErrorsFound: 'Задача отменена или обнаружены ошибки; откат транзакции',
@@ -62,6 +80,7 @@ export default {
   undefinedFunction: "Неопределенная функция '{{fnName}}' или неверные типы параметров",
   invalidSyntax: 'Недопустимый синтаксис выражения',
   networkError: 'Ошибка связи с сервером',
+  nodeDefConversionNotAllowed: `'{{name}}' нельзя преобразовать в {{toType}}`,
   record: {
     errorUpdating: 'Ошибка при обновлении записи',
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',
@@ -110,6 +129,8 @@ export default {
   userHasPendingInvitation:
     "У пользователя с адресом электронной почты '{{email}}' уже есть ожидающее приглашение; его/ее нельзя пригласить в этот опрос, пока оно не будет принято",
   userHasRole: 'Данный пользователь уже имеет роль в этом опросе',
+  userHasRole_few: 'Данные пользователи уже имеют роль в этом опросе',
+  userHasRole_many: 'Данные пользователи уже имеют роль в этом опросе',
   userHasRole_other: 'Данные пользователи уже имеют роль в этом опросе',
   userInvalid: 'Неверный пользователь',
   surveyCompareFileTooLarge:

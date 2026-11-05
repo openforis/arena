@@ -72,6 +72,7 @@ export default {
   // data export
   ArenaFileReadJob: 'Arena файл унших',
   DataExportJob: 'Өгөгдөл экспортлох',
+  DataMatrixExportJob: 'Өгөгдлийн матриц экспортлох',
   DataSummaryExportJob: 'Өгөгдлийн хураангуй экспортлох',
   ZipCreationJob: 'ZIP файл үүсгэх',
   CSVDataExtraction: 'Өгөгдөл задлах',

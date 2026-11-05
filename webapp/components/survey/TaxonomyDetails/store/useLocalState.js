@@ -25,17 +25,12 @@ export const useLocalState = (props) => {
     Actions.init({ state, taxonomyUuid })
   }, [])
 
-  if (isTaxonomiesRoute) {
-    const taxonomyEmpty = State.isTaxonomyEmpty(state)
-    const deleted = State.isDeleted(state)
+  const deleteTaxonomyIfEmpty = useCallback(async () => Actions.deleteTaxonomyIfEmpty({ taxonomyUuid }), [])
 
-    const deleteTaxonomyIfEmpty = useCallback(async () => Actions.deleteTaxonomyIfEmpty({ taxonomyUuid }), [])
-
-    useOnBrowserBack({
-      active: canEdit && taxonomyEmpty && !deleted,
-      onBack: deleteTaxonomyIfEmpty,
-    })
-  }
+  useOnBrowserBack({
+    active: isTaxonomiesRoute && canEdit && State.isTaxonomyEmpty(state) && !State.isDeleted(state),
+    onBack: deleteTaxonomyIfEmpty,
+  })
 
   return { state, Actions }
 }

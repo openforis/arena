@@ -44,7 +44,7 @@ const useFileDrop = (handler, elemRef, acceptedTypes) => {
 
       elem.removeEventListener('drop', handleDrop)
     }
-  }, [elemRef.current])
+  }, [elemRef])
 }
 
 export default useFileDrop

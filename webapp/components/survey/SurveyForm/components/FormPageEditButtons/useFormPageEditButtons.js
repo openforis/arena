@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Survey from '@core/survey/survey'
@@ -14,9 +14,6 @@ export const useFormPageEditButtons = () => {
   const nodeDefPage = useNodeDefPage()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
-
-  const [upDisabled, setUpDisabled] = useState(false)
-  const [downDisabled, setDownDisabled] = useState(false)
 
   const getSiblingUuids = useCallback(() => {
     if (!nodeDefPage || NodeDef.isRoot(nodeDefPage)) return []
@@ -55,13 +52,10 @@ export const useFormPageEditButtons = () => {
     [dispatch, getSiblingUuids, nodeDefPage, survey]
   )
 
-  useEffect(() => {
-    const siblingUuids = getSiblingUuids()
-    const { uuid: nodeDefUuid } = nodeDefPage
-    const pageIndex = siblingUuids.indexOf(nodeDefUuid)
-    setUpDisabled(siblingUuids.length <= 1 || pageIndex === 0)
-    setDownDisabled(siblingUuids.length <= 1 || pageIndex === siblingUuids.length - 1)
-  }, [getSiblingUuids, nodeDefPage])
+  const siblingUuids = getSiblingUuids()
+  const pageIndex = siblingUuids.indexOf(nodeDefPage?.uuid)
+  const upDisabled = siblingUuids.length <= 1 || pageIndex === 0
+  const downDisabled = siblingUuids.length <= 1 || pageIndex === siblingUuids.length - 1
 
   const onMoveUp = () => moveNodeDefPage(true)
   const onMoveDown = () => moveNodeDefPage(false)

@@ -153,8 +153,6 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
     preloadedMapLayers: {
       enabledMessage: 'Camadas de mapa pré-carregadas ativadas',
       title: 'Camadas de mapa pré-carregadas',
-      fileName: 'Nome do arquivo',
-      fileSize: 'Tamanho do arquivo',
       confirmDelete: 'Tem certeza de que deseja excluir esta camada de mapa pré-carregada?',
       editor: {
         title: 'Camada de mapa pré-carregada',

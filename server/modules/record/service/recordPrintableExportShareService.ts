@@ -44,15 +44,8 @@ type SurveyFileServiceLike = {
     },
     client?: DbClient
   ) => Promise<unknown>
-  fetchFileContentAsBuffer: (params: {
-    surveyId: number
-    fileSummary: SurveyFileSummary
-  }) => Promise<Buffer | null>
-  fetchFileSummaryByUuid: (
-    surveyId: number,
-    fileUuid: string,
-    client?: DbClient
-  ) => Promise<SurveyFileSummary | null>
+  fetchFileContentAsBuffer: (params: { surveyId: number; fileSummary: SurveyFileSummary }) => Promise<Buffer | null>
+  fetchFileSummaryByUuid: (surveyId: number, fileUuid: string, client?: DbClient) => Promise<SurveyFileSummary | null>
   fetchFilesStatistics?: (params: { surveyId: number }) => Promise<{ availableSpace: number }>
   insertFile: (surveyId: number, file: SurveyFileSummary, client?: DbClient) => Promise<SurveyFileSummary>
 }
@@ -99,7 +92,7 @@ type ShareRepositoryLike = {
 }
 
 type DatabaseLike = {
-  tx: <T>(callback: (tx: DbClient) => Promise<T>) => Promise<T>
+  tx: <T>(callback: (tx: any) => Promise<T>) => Promise<T>
 }
 
 type ShareServiceDependencies = {

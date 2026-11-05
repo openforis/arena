@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,25 +12,12 @@ import { useSurvey } from '@webapp/store/survey'
  */
 export const useHasSamplingPointData = (): boolean => {
   const survey = useSurvey()
-  const [hasSamplingPointData, setHasSamplingPointData] = useState(false)
-
-  useEffect(() => {
-    if (!survey) {
-      setHasSamplingPointData(false)
-      return
-    }
+  return useMemo(() => {
+    if (!survey) return false
     const samplingPointDataNodeDefs = Survey.getSamplingPointDataNodeDefs(survey)
-    if (samplingPointDataNodeDefs.length === 0) {
-      setHasSamplingPointData(false)
-      return
-    }
+    if (samplingPointDataNodeDefs.length === 0) return false
     const rootKeyDefs = Survey.getNodeDefRootKeys(survey)
     const samplingPointDataNodeDefUuids = new Set(samplingPointDataNodeDefs.map(NodeDef.getUuid))
-    const allKeysUseSamplingPointData = rootKeyDefs.every((rootKeyDef) =>
-      samplingPointDataNodeDefUuids.has(NodeDef.getUuid(rootKeyDef))
-    )
-    setHasSamplingPointData(allKeysUseSamplingPointData)
+    return rootKeyDefs.every((rootKeyDef) => samplingPointDataNodeDefUuids.has(NodeDef.getUuid(rootKeyDef)))
   }, [survey])
-
-  return hasSamplingPointData
 }

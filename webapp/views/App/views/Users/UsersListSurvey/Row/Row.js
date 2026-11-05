@@ -38,7 +38,7 @@ const Row = (props) => {
   return (
     <>
       <div data-testid={TestId.userList.profilePicture} className="users-list__cell-profile-picture">
-        <ProfilePicture userUuid={userUuid} thumbnail />
+        <ProfilePicture userUuid={userUuid} hasProfilePicture={User.hasProfilePicture(userListItem)} thumbnail />
       </div>
       <div data-testid={TestId.userList.name}>{User.getName(userListItem)}</div>
       {emailVisible && (

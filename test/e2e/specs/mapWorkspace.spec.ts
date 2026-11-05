@@ -1,0 +1,717 @@
+import fs from 'node:fs'
+
+import { DB } from '@openforis/arena-server'
+import { APIRequestContext, Locator, Page, request as playwrightRequest } from '@playwright/test'
+
+import { TestId } from '@webapp/utils/testId'
+
+import { TEST_USER_PASSWORD, TEST_USER_PASSWORD_ENCRYPTED } from '../config'
+import { expect, test } from '../fixtures'
+import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSurveyModel'
+import { RecordForm } from '../helpers/recordForm'
+import { openRecord } from '../helpers/records'
+import { Urls } from '../helpers/urls'
+
+const ids = TestId.mapWorkspace
+
+// one placemark near the sample records
+const KML = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark><name>Plot A</name>
+<Point><coordinates>12.5,41.9,0</coordinates></Point></Placemark></Document></kml>`
+
+const uploadedRows = (page: Page): Locator =>
+  page.locator(`[data-testid^="${TestId.mapWorkspace.overlayRow('uploaded-')}"]`)
+
+// label of the coordinate attribute of the sample survey (its overlay in the layers control)
+const COORDINATE_LAYER = 'Cluster coordinate'
+
+const PNG_SIGNATURE = [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]
+// tiles from the internet may be slow or missing (then they are left out and the PNG is still produced)
+const PREVIEW_TIMEOUT = 30_000
+
+/**
+ * Waits for the screenshot preview image and for the main button to be enabled.
+ * @param {Page} page - The page.
+ * @returns {Promise<void>} Resolves when the PNG is ready.
+ */
+const waitForScreenshotPreview = async (page: Page): Promise<void> => {
+  await expect(page.getByTestId(ids.screenshotPreview)).toBeVisible({ timeout: PREVIEW_TIMEOUT })
+  await expect(page.getByTestId(ids.screenshotSubmit)).toBeEnabled({ timeout: PREVIEW_TIMEOUT })
+}
+
+const openMap = async (page: Page): Promise<void> => {
+  await page.goto(Urls.map)
+  await expect(page.getByTestId(ids.toolbar)).toBeVisible()
+  await expect(page.getByTestId(ids.menuButton('baseMap'))).toBeVisible()
+}
+
+/**
+ * Starts a tool from the Tools menu (the full bar has no quick buttons for the tools).
+ * @param {Page} page - The page.
+ * @param {string} itemKey - The menu item: measureDistance, measureArea.
+ * @returns {Promise<void>} Resolves when the item is clicked.
+ */
+const startFromToolsMenu = async (page: Page, itemKey: string): Promise<void> => {
+  await page.getByTestId(ids.menuButton('tools')).click()
+  await page.getByTestId(ids.menuItem(itemKey)).click()
+}
+
+// custom layers: a tile host that never resolves, answered by the route of the test
+const CUSTOM_TILE_HOST = 'https://tiles.arena-e2e.test'
+const CUSTOM_LAYER_NAME = 'Roads e2e'
+const ONE_PIXEL_PNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=',
+  'base64'
+)
+
+/**
+ * Locates the rows of the custom overlays in the Layers panel.
+ * @param {Page} page - The page.
+ * @returns {Locator} The rows.
+ */
+const customOverlayRows = (page: Page): Locator =>
+  page.getByTestId(ids.railPanel('layers')).locator(`[data-testid^="${ids.overlayRow('custom-')}"]`)
+
+/**
+ * Waits for the response of a custom layers request.
+ * @param {Page} page - The page.
+ * @param {string} method - The HTTP method.
+ * @param {string} path - A part of the URL.
+ * @returns {Promise<Response>} The response.
+ */
+const waitForCustomLayersResponse = (page: Page, method: string, path: string) =>
+  page.waitForResponse((response) => response.url().includes(path) && response.request().method() === method)
+
+const layersControl = (page: Page): Locator =>
+  page.getByTestId(ids.railPanel('layers')).locator('.leaflet-control-layers')
+
+const overlayCheckbox = (page: Page, name: string): Locator =>
+  layersControl(page).locator('label', { hasText: name }).locator('input.leaflet-control-layers-selector')
+
+// English unit symbols (the test user's language)
+const AREA_TOTAL = /^\d+(\.\d+)? (m²|ha|km²)$/
+const DISTANCE_TOTAL = /^\d+(\.\d+)? (m|km)$/
+
+/**
+ * Returns a page point at an offset from the centre of the Leaflet map (south-west of the centre: away from the
+ * measure bar at the top and the zoom buttons at the bottom right; the data layers are off when the map opens).
+ * @param {Page} page - The page.
+ * @param {number} dx - Horizontal offset in pixels.
+ * @param {number} dy - Vertical offset in pixels.
+ * @returns {Promise<{x: number, y: number}>} The point in page coordinates.
+ */
+const mapPoint = async (page: Page, dx: number, dy: number): Promise<{ x: number; y: number }> => {
+  const box = await page.locator('.leaflet-container').boundingBox()
+  if (!box) throw new Error('The map is not visible')
+  return { x: box.x + box.width / 2 + dx, y: box.y + box.height / 2 + dy }
+}
+
+/**
+ * Returns the bounding box of a visible element.
+ * @param {Locator} locator - The element.
+ * @returns {Promise<{x: number, y: number, width: number, height: number}>} The box in page coordinates.
+ */
+const boxOf = async (locator: Locator): Promise<{ x: number; y: number; width: number; height: number }> => {
+  const box = await locator.boundingBox()
+  if (!box) throw new Error('The element is not visible')
+  return box
+}
+
+/**
+ * Returns the permanent label of the finished measurement on the map.
+ * @param {Page} page - The page.
+ * @returns {Locator} The Leaflet tooltip.
+ */
+const measureLabel = (page: Page): Locator => page.locator('.leaflet-tooltip-pane .leaflet-tooltip')
+
+/**
+ * Creates an API client logged in as a user.
+ * @param {string} baseURL - The Arena base URL.
+ * @param {string} email - The user email.
+ * @returns {Promise<APIRequestContext>} The client, sending the auth token of the user.
+ */
+const loginApi = async (baseURL: string, email: string): Promise<APIRequestContext> => {
+  const login = await playwrightRequest.newContext({ baseURL })
+  const response = await login.post('/auth/login', { data: { email, password: TEST_USER_PASSWORD } })
+  expect(response.ok(), `login of ${email} failed`).toBeTruthy()
+  const { authToken } = await response.json()
+  await login.dispose()
+  return playwrightRequest.newContext({ baseURL, extraHTTPHeaders: { Authorization: `Bearer ${authToken}` } })
+}
+
+test.describe('Map workspace', () => {
+  test.use({ sampleSurveyOptions: { records: sampleRecords } })
+
+  test('shows the top bar, the rail and the status bar instead of floating controls', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openMap(page)
+    for (const key of ['baseMap', 'display', 'tools']) {
+      await expect(page.getByTestId(ids.menuButton(key))).toBeVisible()
+    }
+    await expect(page.getByTestId(ids.rail)).toBeVisible()
+    await expect(page.getByTestId(ids.statusBar)).toBeVisible()
+    await expect(
+      page.locator('.map-options, .map-kml-uploader-wrapper, .zoom-level, .leaflet-control-scale')
+    ).toHaveCount(0)
+    await expect(layersControl(page)).toHaveCount(1)
+    await expect(page.locator('.leaflet-container .leaflet-control-layers')).toHaveCount(0)
+    await expect(page.getByTestId(ids.statusBar).locator('.leaflet-control-attribution')).toHaveCount(1)
+  })
+
+  test('collapsing and switching rail tabs keeps the layers control', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const layersPanel = page.getByTestId(ids.railPanel('layers'))
+    const legendPanel = page.getByTestId(ids.railPanel('legend'))
+    await expect(layersPanel).toBeVisible()
+
+    await page.getByTestId(ids.railTab('legend')).click()
+    await expect(layersPanel).toBeHidden()
+    await expect(legendPanel).toBeVisible()
+
+    // clicking the open tab collapses the rail
+    await page.getByTestId(ids.railTab('legend')).click()
+    await expect(legendPanel).toBeHidden()
+    await expect(layersPanel).toBeHidden()
+
+    await page.getByTestId(ids.railTab('layers')).click()
+    await expect(layersPanel).toBeVisible()
+    const checkbox = overlayCheckbox(page, COORDINATE_LAYER)
+    await checkbox.check()
+    await expect(checkbox).toBeChecked()
+  })
+
+  test('switches the base map from the Base map menu', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.menuButton('baseMap')).click()
+    await page.getByTestId(ids.menuItem('baseMap-ESRI Topographic')).click()
+    await expect(page.locator('.leaflet-tile-pane img.leaflet-tile[src*="World_Topo_Map"]').first()).toBeAttached()
+
+    await page.getByTestId(ids.menuButton('baseMap')).click()
+    await expect(page.getByTestId(ids.menuItem('baseMap-ESRI Topographic'))).toHaveAttribute('aria-checked', 'true')
+    // wait for MUI to move focus into the menu, otherwise the workspace shortcut handler takes the Escape
+    await expect.poll(() => page.evaluate(() => !!document.activeElement?.closest('[role="menu"]'))).toBe(true)
+    await page.keyboard.press('Escape')
+    await expect(page.getByRole('menu')).toHaveCount(0)
+  })
+
+  test('cycles the coordinate notation of the status bar', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const coordinates = page.getByTestId(ids.statusCoordinates)
+    const notation = page.getByTestId(ids.statusNotation)
+    await expect(notation).toHaveText('Lat, Lon')
+    await coordinates.click()
+    await expect(notation).toHaveText('DMS')
+    await coordinates.click()
+    await expect(notation).toHaveText('UTM')
+    await expect(coordinates).toContainText(/\d{1,2}[C-X] \d+ E \d+ N/)
+    await coordinates.click()
+    await expect(notation).toHaveText('Lat, Lon')
+  })
+
+  test('zooms to the data shown on the map', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const zoomToData = page.getByTestId(ids.quickButton('zoomToData'))
+    await zoomToData.click()
+    await expect(page.getByText('There is no data on the map to zoom to')).toBeVisible()
+
+    await overlayCheckbox(page, COORDINATE_LAYER).check()
+    const zoom = page.getByTestId(ids.statusZoom)
+    const zoomBefore = (await zoom.textContent()) ?? ''
+    // the points of the layer load asynchronously: retry until the map zooms
+    await expect(async () => {
+      await zoomToData.click()
+      await expect(zoom).not.toHaveText(zoomBefore, { timeout: 1000 })
+    }).toPass()
+    // the sample records are at 41.9–43.9 N, 12.5–14.5 E; the mouse is on the bar, so the status shows the centre
+    await expect(page.getByTestId(ids.statusCoordinates)).toContainText(/4[1-4]\.\d{5}, 1[2-5]\.\d{5}/)
+  })
+
+  test('the record location picker has the compact bar', async ({ page, sampleSurvey: _ }) => {
+    await openRecord(page, sampleRecords[0].cluster_id, { unlock: true })
+    await page.locator('.map-trigger-btn').first().click()
+    const panel = page.locator('.panel-right.map-panel')
+    await expect(panel.getByTestId(ids.toolbar)).toBeVisible()
+    await expect(panel.getByTestId(ids.menuButton('baseMap'))).toBeVisible()
+    await expect(panel.getByTestId(ids.menuButton('display'))).toBeVisible()
+    await expect(panel.getByTestId(ids.menuButton('addData'))).toHaveCount(0)
+    await expect(panel.getByTestId(ids.menuButton('tools'))).toHaveCount(0)
+    await expect(panel.getByTestId(ids.quickButton('measureDistance'))).toBeVisible()
+    await expect(panel.getByTestId(ids.rail)).toHaveCount(0)
+    await expect(panel.getByTestId(ids.statusBar)).toBeVisible()
+    await expect(panel.getByTestId(ids.toolbar)).toContainText(
+      'Double click on the map or drag the marker to update the location'
+    )
+    // no overlays in the picker: no layers control
+    await expect(panel.locator('.leaflet-control-layers')).toBeHidden()
+  })
+
+  test('uploads a KML file as a layer that can be hidden and removed', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.menuButton('addData')).click()
+    await expect(page.getByTestId(ids.menuItem('uploadFile'))).toBeVisible()
+    await page.keyboard.press('Escape')
+
+    await page
+      .getByTestId(ids.uploadInput)
+      .setInputFiles({ name: 'plots.kml', mimeType: 'application/vnd.google-earth.kml+xml', buffer: Buffer.from(KML) })
+    const row = uploadedRows(page)
+    await expect(row).toHaveCount(1)
+    await expect(row).toContainText('plots.kml')
+    // survey data overlays are off by default: the only marker is the placemark
+    const markers = page.locator('.leaflet-marker-pane .leaflet-marker-icon')
+    await expect(markers).toHaveCount(1)
+
+    await row.getByRole('checkbox').uncheck()
+    await expect(markers).toHaveCount(0)
+    await row.getByRole('checkbox').check()
+    await expect(markers).toHaveCount(1)
+
+    await row.getByRole('button', { name: 'Remove plots.kml' }).click()
+    await expect(row).toHaveCount(0)
+    await expect(markers).toHaveCount(0)
+  })
+
+  test('the popup of an uploaded KML place shows its text and simple HTML but runs no script', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    const kml = `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document><Placemark>
+<name>&lt;img src=x onerror="window.kmlXss=1"&gt;Plot B</name>
+<description><![CDATA[<b>bold</b><img src=x onerror="window.kmlXss=2">]]></description>
+<Point><coordinates>12.5,41.9,0</coordinates></Point></Placemark></Document></kml>`
+    await openMap(page)
+    await page
+      .getByTestId(ids.uploadInput)
+      .setInputFiles({ name: 'xss.kml', mimeType: 'application/vnd.google-earth.kml+xml', buffer: Buffer.from(kml) })
+    await page.locator('.leaflet-marker-pane .leaflet-marker-icon').click()
+    const popup = page.locator('.kml-popup')
+    await expect(popup.locator('h2')).toContainText('Plot B')
+    await expect(popup.locator('b')).toHaveText('bold')
+    await expect(popup.locator('[onerror]')).toHaveCount(0)
+    expect(await page.evaluate(() => (window as unknown as { kmlXss?: number }).kmlXss)).toBeUndefined()
+  })
+
+  test('unsupported and broken files show a message', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const input = page.getByTestId(ids.uploadInput)
+
+    await input.setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') })
+    await expect(page.getByText('Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file')).toBeVisible()
+
+    await input.setInputFiles({
+      name: 'broken.geojson',
+      mimeType: 'application/geo+json',
+      buffer: Buffer.from('{ "type": '),
+    })
+    await expect(page.getByText(/The file could not be read/)).toBeVisible()
+
+    await expect(uploadedRows(page)).toHaveCount(0)
+    // the map still works
+    await page.getByTestId(ids.menuButton('baseMap')).click()
+    await expect(page.getByRole('menu')).toBeVisible()
+    await page.keyboard.press('Escape')
+  })
+
+  test.describe('with the experimental features', () => {
+    test.use({ experimentalFeatures: true })
+
+    test('the Imagery menu offers the Sentinel-2 search without Planet periods', async ({ page, sampleSurvey: _ }) => {
+      await openMap(page)
+      await page.getByTestId(ids.menuButton('imagery')).click()
+      await expect(page.getByTestId(ids.menuItem('searchScenes'))).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('menu')).toHaveCount(0)
+    })
+  })
+
+  test('the Records tab lists the records of the shown layers and goes to one', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    await page.getByTestId(ids.railTab('records')).click()
+    const rail = page.getByTestId(ids.rail)
+    await rail.getByRole('button', { name: '2', exact: true }).click()
+    await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
+  })
+
+  test.describe('without the experimental features', () => {
+    // what every user sees (the source of the "What's new" image)
+    test.use({ experimentalFeatures: false })
+
+    test('has no Imagery menu and no Sentinel-2 tab', async ({ page, sampleSurvey: _ }) => {
+      await openMap(page)
+      await expect(page.getByTestId(ids.menuButton('tools'))).toBeVisible()
+      await expect(page.getByTestId(ids.menuButton('imagery'))).toHaveCount(0)
+      await expect(page.getByTestId(ids.railTab('legend'))).toBeVisible()
+      await expect(page.getByTestId(ids.railTab('scenes'))).toHaveCount(0)
+    })
+
+    test('shows the record chosen in the Records tab on the satellite imagery, with its popup', async ({
+      page,
+      sampleSurvey: _,
+    }, testInfo) => {
+      await openMap(page)
+      await page.getByTestId(ids.menuButton('baseMap')).click()
+      await page.getByTestId(ids.menuItem('baseMap-ESRI World Imagery')).click()
+      await expect(page.getByRole('menu')).toHaveCount(0)
+      await expect(page.locator('.leaflet-tile-pane img.leaflet-tile[src*="World_Imagery"]').first()).toBeAttached()
+
+      await overlayCheckbox(page, COORDINATE_LAYER).check()
+      await page.getByTestId(ids.railTab('records')).click()
+      const rail = page.getByTestId(ids.rail)
+      await expect(rail.getByText('3 markers')).toBeVisible()
+      await rail.getByRole('button', { name: '2', exact: true }).click()
+
+      const popup = page.locator('.leaflet-popup')
+      await expect(popup).toContainText('Cluster[2]')
+      await expect(popup.getByRole('button', { name: 'Edit record' })).toBeVisible()
+      await expect(page.getByTestId(ids.statusBar)).toContainText('1 record in view')
+
+      // screenshot in the report: tiles from the internet may be slow or missing
+      await page
+        .locator('.leaflet-tile-pane img.leaflet-tile-loaded')
+        .first()
+        .waitFor({ timeout: PREVIEW_TIMEOUT })
+        .catch(() => undefined)
+      await expect(popup).toBeVisible()
+      const screenshot = await page.screenshot({ style: '.ai-chatbot-fab { display: none; }' })
+      await testInfo.attach('map-workspace', { body: screenshot, contentType: 'image/png' })
+    })
+  })
+
+  test('search finds the records of the shown layers by key', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    const search = page.getByTestId(ids.searchInput)
+    await expect(search).toHaveAttribute('placeholder', 'Record key or coordinates')
+    await search.fill('2')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('2')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
+  })
+
+  test('search goes to coordinates and marks them', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    const search = page.getByTestId(ids.searchInput)
+    await search.fill('41.9, 12.5')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('Go to 41.90000, 12.50000')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId(ids.statusZoom)).toHaveText('Zoom 14')
+    await expect(page.locator('.map-search-marker')).toHaveCount(1)
+
+    // Escape clears the text and the mark
+    await search.focus()
+    await page.keyboard.press('Escape')
+    await expect(search).toHaveValue('')
+    await expect(page.locator('.map-search-marker')).toHaveCount(0)
+
+    await search.fill('95, 12')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveText('Coordinates out of range')
+    await expect(page.getByTestId(ids.searchResult(0))).toHaveAttribute('aria-disabled', 'true')
+  })
+
+  test('Escape ends the measure tool only while focus is inside the workspace', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await startFromToolsMenu(page, 'measureDistance')
+    const bar = page.getByTestId(ids.measureBar)
+    await expect(bar).toBeVisible()
+    await page.evaluate(() => (document.activeElement as HTMLElement | null)?.blur())
+    await page.keyboard.press('Escape')
+    await expect(bar).toBeVisible()
+
+    await page.locator('.leaflet-container').focus()
+    await page.keyboard.press('Escape')
+    await expect(bar).toHaveCount(0)
+  })
+
+  test('measures an area, changes its unit and ends with Escape in the unit select', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openMap(page)
+    await startFromToolsMenu(page, 'measureArea')
+    const bar = page.getByTestId(ids.measureBar)
+    await expect(bar).toBeVisible()
+    await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
+    const total = page.getByTestId(ids.measureTotal)
+    await expect(total).toHaveText('—')
+
+    const point1 = await mapPoint(page, -160, 40)
+    const point2 = await mapPoint(page, -40, 120)
+    const point3 = await mapPoint(page, -170, 150)
+    await page.mouse.click(point1.x, point1.y)
+    await page.mouse.click(point2.x, point2.y)
+    // the third point, then the double-click finishes the polygon
+    await page.mouse.dblclick(point3.x, point3.y)
+
+    await expect(total).toHaveText(AREA_TOTAL)
+    await expect(page.getByTestId(ids.measurePerimeter)).toContainText(/\d.*(m|km)/)
+    await expect(measureLabel(page)).toHaveText(AREA_TOTAL)
+
+    const unit = page.getByTestId(ids.measureUnit)
+    await unit.selectOption('ha')
+    await expect(total).toHaveText(/^\d+(\.\d+)? ha$/)
+    await expect(measureLabel(page)).toHaveText(/^\d+(\.\d+)? ha$/)
+
+    // the workspace shortcuts ignore keys typed in a select: the bar ends the tool itself
+    await unit.focus()
+    await page.keyboard.press('Escape')
+    await expect(bar).toHaveCount(0)
+    await expect(measureLabel(page)).toHaveCount(0)
+  })
+
+  test('measures a distance, switches to area and ends with Done', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await startFromToolsMenu(page, 'measureDistance')
+    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'true')
+
+    const point1 = await mapPoint(page, -160, 40)
+    const point2 = await mapPoint(page, -40, 120)
+    await page.mouse.click(point1.x, point1.y)
+    await page.mouse.click(point2.x, point2.y)
+    const total = page.getByTestId(ids.measureTotal)
+    // Enter typed in the search box does not finish the line
+    await expect(total).toHaveText(DISTANCE_TOTAL)
+    await page.getByTestId(ids.searchInput).focus()
+    await page.keyboard.press('Enter')
+    await expect(measureLabel(page)).toHaveCount(0)
+
+    // the map has the focus again: Enter finishes the line
+    await page.locator('.leaflet-container').focus()
+    await page.keyboard.press('Enter')
+    await expect(total).toHaveText(DISTANCE_TOTAL)
+    await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
+
+    await page.getByTestId(ids.measureModeArea).click()
+    await expect(page.getByTestId(ids.measureModeArea)).toHaveAttribute('aria-pressed', 'true')
+    await expect(page.getByTestId(ids.measureModeDistance)).toHaveAttribute('aria-pressed', 'false')
+    await expect(total).toHaveText('—')
+    await expect(measureLabel(page)).toHaveCount(0)
+
+    await page.getByTestId(ids.measureDone).click()
+    await expect(page.getByTestId(ids.measureBar)).toHaveCount(0)
+  })
+
+  test('finishing a measurement by double-click in the record location picker keeps the marker', async ({
+    page,
+    sampleSurvey: _,
+  }) => {
+    await openRecord(page, sampleRecords[0].cluster_id, { unlock: true })
+    await page.locator('.map-trigger-btn').first().click()
+    const panel = page.locator('.panel-right.map-panel')
+    const marker = panel.locator('.leaflet-marker-icon').first()
+    await expect(marker).toBeVisible()
+    // wait for the panel slide-in animation to finish: two equal consecutive reads of the marker position are not
+    // enough, a slow frame under load repeats a value while the panel is still moving
+    await expect.poll(() => panel.evaluate((element) => element.getAnimations({ subtree: true }).length)).toBe(0)
+    // then for the map to settle on the final layout
+    let previous = await marker.boundingBox()
+    await expect
+      .poll(async () => {
+        const current = await marker.boundingBox()
+        const settled = JSON.stringify(current) === JSON.stringify(previous)
+        previous = current
+        return settled
+      })
+      .toBe(true)
+    const markerBox = await boxOf(marker)
+
+    await panel.getByTestId(ids.quickButton('measureDistance')).click()
+    const mapBox = await boxOf(panel.locator('.leaflet-container'))
+    const at = (dx: number, dy: number): { x: number; y: number } => ({
+      x: mapBox.x + mapBox.width / 2 + dx,
+      y: mapBox.y + mapBox.height / 2 + dy,
+    })
+    // two points, then the double-click finishes on the marker itself
+    const p1 = at(-60, 60)
+    const p2 = at(60, 60)
+    await page.mouse.click(p1.x, p1.y)
+    await page.mouse.click(p2.x, p2.y)
+    await page.mouse.dblclick(markerBox.x + markerBox.width / 2, markerBox.y + markerBox.height / 2)
+
+    await expect(panel.getByTestId(ids.measureTotal)).toHaveText(DISTANCE_TOTAL)
+    // the permanent label proves the double-click finished the measurement
+    await expect(measureLabel(page)).toHaveText(DISTANCE_TOTAL)
+    // the double-click did not move the record location
+    await expect.poll(() => marker.boundingBox()).toEqual(markerBox)
+  })
+
+  test('adds an XYZ overlay for the current user, keeps it after a reload and removes it', async ({
+    page,
+    api,
+    sampleSurvey,
+  }) => {
+    let tileRequests = 0
+    await page.route(`${CUSTOM_TILE_HOST}/**`, (route) => {
+      tileRequests += 1
+      return route.fulfill({ status: 200, contentType: 'image/png', body: ONE_PIXEL_PNG })
+    })
+    await openMap(page)
+
+    await page.getByTestId(ids.menuButton('addData')).click()
+    await page.getByTestId(ids.menuItem('addWms')).click()
+    const dialog = page.getByTestId(ids.wmsDialog)
+    await expect(dialog).toBeVisible()
+    await dialog.getByTestId(ids.wmsUrlInput).fill(`${CUSTOM_TILE_HOST}/{z}/{x}/{y}.png`)
+    await dialog.getByTestId(ids.wmsLoadButton).click()
+    await expect(dialog.getByTestId(ids.wmsSummary)).toContainText('XYZ')
+
+    await dialog.getByTestId(ids.wmsNameInput).fill(CUSTOM_LAYER_NAME)
+    await dialog.getByRole('radio', { name: 'Only me' }).check()
+    const saved = waitForCustomLayersResponse(page, 'POST', '/geo/map/custom-layers/user')
+    await dialog.getByTestId(ids.wmsSubmit).click()
+    expect((await saved).ok()).toBe(true)
+    await expect(dialog).toBeHidden()
+
+    // the dialog opens the Layers tab on an overlay
+    await expect(page.getByTestId(ids.railPanel('layers'))).toBeVisible()
+    await expect(customOverlayRows(page)).toHaveCount(1)
+    await expect(customOverlayRows(page)).toContainText(CUSTOM_LAYER_NAME)
+    await expect.poll(() => tileRequests).toBeGreaterThan(0)
+
+    await page.reload()
+    await expect(page.getByTestId(ids.railPanel('layers'))).toBeVisible()
+    await expect(customOverlayRows(page)).toHaveCount(1)
+
+    const removed = waitForCustomLayersResponse(page, 'DELETE', '/geo/map/custom-layers/user/')
+    await customOverlayRows(page)
+      .getByRole('button', { name: `Remove ${CUSTOM_LAYER_NAME}` })
+      .click()
+    expect((await removed).ok()).toBe(true)
+    await expect(customOverlayRows(page)).toHaveCount(0)
+
+    const { status, body } = await api.getRaw(`/api/survey/${sampleSurvey.id}/geo/map/custom-layers`)
+    expect(status).toBe(200)
+    expect(body).toEqual({ surveyLayers: [], userLayers: [] })
+  })
+
+  test('survey custom layers are written by the survey editors only', async ({ baseURL, testUser, sampleSurvey }) => {
+    const outsiderEmail = `e2e-outsider-${Date.now().toString(36)}@openforis-arena.org`
+    // a user without any survey or group: it cannot edit the survey
+    await DB.none(`INSERT INTO "user" (name, email, password, status) VALUES ('Outsider', $1, $2, 'ACCEPTED')`, [
+      outsiderEmail,
+      TEST_USER_PASSWORD_ENCRYPTED,
+    ])
+    const owner = await loginApi(baseURL!, testUser.email)
+    const outsider = await loginApi(baseURL!, outsiderEmail)
+    const base = `/api/survey/${sampleSurvey.id}/geo/map/custom-layers`
+    const layer = {
+      id: '5f0c7a4e-8a3b-4c1d-9e2f-0a1b2c3d4e5f',
+      kind: 'xyz',
+      role: 'overlay',
+      name: CUSTOM_LAYER_NAME,
+      url: `${CUSTOM_TILE_HOST}/{z}/{x}/{y}.png`,
+      format: 'image/png',
+      opacity: 1,
+      attribution: '',
+    }
+    try {
+      const refused = await outsider.post(`${base}/survey`, { data: { layers: [layer] } })
+      // shortcut: 403 expected, but the arena-server UnauthorizedError skips systemErrorMiddleware and ends as a 500
+      // on every guarded API (master too); assert 403 once that middleware handles it
+      expect(refused.status()).toBeGreaterThanOrEqual(400)
+      expect((await (await owner.get(base)).json()).surveyLayers).toEqual([])
+
+      const added = await owner.post(`${base}/survey`, { data: { layers: [layer] } })
+      expect(added.status()).toBe(200)
+      const listed = await (await owner.get(base)).json()
+      expect(listed.surveyLayers).toHaveLength(1)
+      expect(listed.surveyLayers[0].name).toBe(CUSTOM_LAYER_NAME)
+
+      expect((await outsider.delete(`${base}/survey/${listed.surveyLayers[0].id}`)).status()).toBeGreaterThanOrEqual(
+        400
+      )
+      const removed = await owner.delete(`${base}/survey/${listed.surveyLayers[0].id}`)
+      expect(removed.status()).toBe(200)
+      expect((await (await owner.get(base)).json()).surveyLayers).toEqual([])
+    } finally {
+      await owner.dispose()
+      await outsider.dispose()
+      await DB.none(`DELETE FROM "user" WHERE email = $1`, [outsiderEmail])
+    }
+  })
+
+  test('refuses capabilities URLs that point to the server or its network', async ({ api, sampleSurvey }) => {
+    const urls = [
+      'http://127.0.0.1/',
+      'http://0x7f.1/',
+      'http://169.254.169.254/latest/meta-data/',
+      'http://localhost:9096/',
+      'http://[::1]/',
+      'http://[::ffff:127.0.0.1]/',
+      'file:///etc/passwd',
+    ]
+    for (const url of urls) {
+      const params = new URLSearchParams({ url })
+      const { status, body } = await api.getRaw(`/api/survey/${sampleSurvey.id}/geo/map/capabilities?${params}`)
+      expect(status, url).toBe(400)
+      expect((body as { key?: string } | null)?.key, url).toBe('appErrors:mapCustomLayers.urlNotAllowed')
+    }
+  })
+})
+
+test.describe('Map screenshot', () => {
+  test.use({ sampleSurveyOptions: { records: sampleRecords, withClusterImage: true } })
+
+  test('downloads the map as a PNG from the quick button', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await page.getByTestId(ids.quickButton('screenshot')).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
+
+    await page.getByTestId(ids.screenshotTarget('file')).click()
+    await waitForScreenshotPreview(page)
+    const downloadPromise = page.waitForEvent('download')
+    await page.getByTestId(ids.screenshotSubmit).click()
+    const download = await downloadPromise
+
+    expect(download.suggestedFilename()).toMatch(/^map_\d{4}-\d{2}-\d{2}\.png$/)
+    const bytes = fs.readFileSync(await download.path())
+    expect([...bytes.subarray(0, 8)]).toEqual(PNG_SIGNATURE)
+    await expect(page.getByTestId(ids.screenshotDialog)).toHaveCount(0)
+  })
+
+  test('saves the screenshot in the image attribute of a plot record', async ({ page, sampleSurvey: _ }) => {
+    const record = sampleRecords[1]
+    const plotLabel = `${cluster.label} ${record.cluster_id}`
+
+    await openMap(page)
+    // the points of the shown location layer are the plot list
+    const coordinateLayer = overlayCheckbox(page, COORDINATE_LAYER)
+    await coordinateLayer.check()
+    await expect(coordinateLayer).toBeChecked()
+
+    await page.getByTestId(ids.quickButton('screenshot')).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toBeVisible()
+
+    const plotSelect = page.getByTestId(ids.screenshotPlot)
+    await expect(plotSelect.locator('option')).toHaveCount(sampleRecords.length)
+    await plotSelect.selectOption({ label: plotLabel })
+    await expect(page.getByTestId(ids.screenshotAttribute).locator('option:checked')).toHaveText(clusterImage.label)
+
+    const fileNameInput = page.getByTestId(ids.screenshotFileName)
+    await expect(fileNameInput).toHaveValue(
+      new RegExp(String.raw`^${cluster.name}_${record.cluster_id}_\d{4}-\d{2}-\d{2}\.jpg$`)
+    )
+    const fileName = await fileNameInput.inputValue()
+
+    await waitForScreenshotPreview(page)
+    await page.getByTestId(ids.screenshotSubmit).click()
+    // the result is shown inside the dialog (notifications are hidden in full screen)
+    await expect(page.getByTestId(ids.screenshotDone)).toContainText(`Screenshot saved to ${plotLabel}`, {
+      timeout: PREVIEW_TIMEOUT,
+    })
+    await page.getByTestId(ids.screenshotClose).click()
+    await expect(page.getByTestId(ids.screenshotDialog)).toHaveCount(0)
+
+    await openRecord(page, record.cluster_id)
+    await expect(new RecordForm(page).nodeDefWrapper(clusterImage.name)).toContainText(fileName)
+  })
+})

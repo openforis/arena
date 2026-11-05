@@ -9,9 +9,10 @@ module.exports = function babelConfig(api) {
   return {
     presets: [
       ['@babel/preset-env', { targets: { node: '12' } }],
-      ['@babel/preset-react', { runtime: 'automatic' }],
-      '@babel/preset-typescript',
+      // Babel 8 keeps imports without the `type` keyword by default: they would load the imported modules at runtime
+      ['@babel/preset-typescript', { onlyRemoveTypeImports: false }],
     ],
-    plugins: ['@babel/plugin-proposal-object-rest-spread', '@babel/plugin-syntax-dynamic-import'],
+    // JSX syntax would otherwise also apply to .ts files, where it breaks generics like <T>(x: T) => x
+    overrides: [{ exclude: /\.ts$/, presets: [['@babel/preset-react', { runtime: 'automatic' }]] }],
   }
 }

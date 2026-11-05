@@ -23,6 +23,8 @@ export default {
     sql: 'Зөвхөн хүчинтэй SQL илэрхийллийг зөвшөөрнө.',
   },
   editorCompletionHelp: '- Боломжтой хувьсагчид болон ашиглаж болох функцуудыг харуулах',
+  editorTextSearchHelp:
+    "Текст утгуудыг text_attr.includes('abc'), text_attr.startsWith('abc') эсвэл text_attr.endsWith('abc') ашиглан хайна; том, жижиг үсгийг ялгахгүйгээр хайхын тулд өмнө нь .toLowerCase() нэмнэ үү, жишээ нь text_attr.toLowerCase().includes('abc')",
   functionDescriptions: {
     categoryItemProp: 'Заасан кодтой ангиллын элементийн заасан $t(extraProp.label)-ийн утгыг буцаана',
     dateTimeDiff: '2 огноо-цагийн хоорондох ялгааг (минутаар) буцаана',
@@ -208,6 +210,10 @@ export default {
   timeProps: {
     includeSeconds: 'Секунд оруулах',
   },
+  geoProps: {
+    positionTracking: 'Байршлыг хянах',
+    positionTrackingInfo: `Зөвхөн Arena Mobile-д хамаарна: сонгосон бол утга нь бичлэгийг бөглөх явцад хэрэглэгчийн явсан зам болно (төхөөрөмжийн байршлыг хянаж бүртгэнэ) бөгөөд гараар засах боломжгүй`,
+  },
   formHeaderProps: {
     headerColorLabel: 'Толгой хэсгийн өнгө',
     headerColor: {
@@ -270,6 +276,9 @@ export default {
     expressions: 'Баталгаажуулалтын илэрхийлэл',
     attributeAlwaysValid: 'Шинж чанар үргэлж хүчинтэй',
     attributeValidWhenConditionIsMet: 'Нөхцөл биелсэн үед шинж чанар хүчинтэй',
+    notRequired: 'Заавал биш',
+    alwaysRequired: 'Үргэлж заавал',
+    requiredWhenConditionIsMet: 'Нөхцөл биелсэн үед заавал',
   },
   cannotChangeIntoMultipleWithDefaultValues: 'Энэ зангилааг үндсэн утгуудтай олон болгох боломжгүй.',
   cannotDeleteNodeDefReferenced: `Зангилааны тодорхойлолт "{{nodeDef}}"-г устгах боломжгүй: энэ нь дараах зангилааны тодорхойлолтуудаар холбогдсон байна: {{nodeDefDependents}}`,

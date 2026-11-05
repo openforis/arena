@@ -1,4 +1,3 @@
-
 import { Button, ButtonProps } from './Button'
 
 export const ButtonNext = (props: ButtonProps) => {

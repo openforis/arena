@@ -44,6 +44,8 @@ export const baseLayerUrlByProviderFunction = {
     getArenaMapUrl({ surveyId, provider: baseLayerProviders.planet, period }),
 }
 
+// crossOrigin: true only for hosts verified to send CORS headers. Without it a screenshot still works, with those tiles
+// left out. With it on a host without CORS, the map display itself breaks (blank base map for everyone).
 export const baseLayers = [
   {
     key: 'ESRI World Imagery',
@@ -52,6 +54,7 @@ export const baseLayers = [
     attribution: '&copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
     maxZoom: 17,
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+    crossOrigin: true,
   },
   {
     key: 'ESRI Topographic',
@@ -60,6 +63,7 @@ export const baseLayers = [
     attribution: 'Esri, CGIAR, USGS | Esri, HERE, Garmin, SafeGraph, FAO, METI/NASA, USGS, EPA, NPS',
     maxZoom: 16,
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}.png',
+    crossOrigin: true,
   },
   {
     key: 'ESRI Terrain',
@@ -68,6 +72,7 @@ export const baseLayers = [
     attribution: 'Esri, NASA, NGA, USGS | VITA, Esri, HERE, Garmin, SafeGraph, METI/NASA, USGS, EPA, NPS, USDA',
     maxZoom: 9,
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Terrain_Base/MapServer/tile/{z}/{y}/{x}.png',
+    crossOrigin: true,
   },
   {
     key: 'UN ClearMap',
@@ -84,6 +89,7 @@ export const baseLayers = [
     attribution: 'Map data &copy; <a href="https://www.un.org/geospatial/">United Nations</a>',
     url: 'https://geoservices.un.org/arcgis/rest/services/ClearMap_WebTopo/MapServer/tile/{z}/{y}/{x}',
     maxZoom: 6,
+    crossOrigin: true,
   },
   {
     key: 'Equal Earth',

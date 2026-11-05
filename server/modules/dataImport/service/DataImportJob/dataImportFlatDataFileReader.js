@@ -291,7 +291,7 @@ const _validateHeaders =
  * @param {boolean} [params.validateHeaders] - Whether to validate input file headers or not.
  * @param {boolean} [params.includeFiles] - Whether to include file attributes or not.
  * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
- * @returns {object} - Object with start and cancel functions to control the reader.
+ * @returns {{start: function(): Promise<*>, cancel: function(): void}} - Object with start and cancel functions to control the reader.
  */
 const createReaderFromStream = ({
   stream,

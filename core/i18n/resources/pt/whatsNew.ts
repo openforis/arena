@@ -6,6 +6,18 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    mapWorkspace: {
+      title: `Um novo espaço de trabalho do mapa`,
+      description: `**Dados > Mapa** tem um novo layout: no topo, os menus **Mapa base**, **Adicionar dados**, **Exibição** e **Ferramentas** e uma caixa de pesquisa de coordenadas e chaves de registros; ao lado, as abas **Camadas**, **Registros** e **Legenda**; embaixo, uma barra de status com as coordenadas do ponteiro e a escala.
+
+Percorra os registros no mapa, adicione seus próprios arquivos (KML, Shapefile, GeoJSON) ou serviços WMS / WMTS, meça distâncias e áreas e faça capturas de tela.`,
+    },
+    dataMatrixExport: {
+      title: `Exportar dados como matriz`,
+      description: `Em **Dados > Explorador**, selecione uma entidade múltipla (p. ex. as espécies de cada registro), clique em **Exportar** e escolha **Exportar como: Matriz de dados** para obter uma tabela com uma linha por espécie (ou qualquer outro atributo) e uma coluna por registro, com o valor escolhido nas células (p. ex. cobertura).
+
+Este é o formato exigido por ferramentas de análise de vegetação como **Turboveg**, **Juice** e **Synbiosys**. Defina um filtro no Explorador para exportar apenas alguns registros.`,
+    },
     areaOfInterest: {
       title: 'Áreas de interesse: verificar se uma localização está dentro de uma área',
       description: `Em **Informações do inquérito → Mapa**, adicione uma ou mais **áreas de interesse** (p. ex. os municípios de uma área piloto), cada uma com um nome e um polígono em formato GeoJSON.

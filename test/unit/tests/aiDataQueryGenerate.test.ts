@@ -65,7 +65,7 @@ describe('AI data query generation', () => {
       const { query, errors } = convert({
         dimensions: ['plot_id'],
         measures: [{ attribute: 'dbh', functions: ['avg', 'max'] }],
-        filter: `dbh > 10 AND tree_type = 'T'`,
+        filter: `dbh > 10 && tree_type == 'T'`,
         sort: [{ attribute: 'plot_id', order: 'desc' }],
       })
       expect(errors).toEqual([])
@@ -80,6 +80,24 @@ describe('AI data query generation', () => {
       const [sortCriteria] = Query.getSort(query)
       expect(SortCriteria.getVariable(sortCriteria)).toBe('plot_id')
       expect(SortCriteria.isOrderDesc(sortCriteria)).toBe(true)
+    })
+
+    test('filter with text search methods and strict equality operators', () => {
+      const { query, errors } = convert({
+        mode: Query.modes.raw,
+        attributes: ['tree_id'],
+        filter: `tree_type === 'T' && !plot_remarks.toLowerCase().includes('dead') && tree_id !== 2`,
+      })
+      expect(errors).toEqual([])
+      const { clause } = Expression.toSql(Query.getFilter(query))
+      expect(clause).toMatch(/IS NOT DISTINCT FROM .* AND NOT\(coalesce\(strpos\(\(lower\(.* IS DISTINCT FROM/)
+    })
+
+    test('unsupported filter syntax', () => {
+      const convertFilter = (filter: string) =>
+        convert({ mode: Query.modes.raw, attributes: ['tree_id'], filter }).errors[0]
+      expect(convertFilter(`plot_remarks.match('x')`)).toMatch(/is not supported/)
+      expect(convertFilter(`dbh.foo > 1`)).toMatch(/is not supported/)
     })
 
     test('raw query with ancestor attributes and sort', () => {

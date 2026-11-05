@@ -751,6 +751,13 @@ export const changeParentEntity =
     }
   }
 
+// published attributes have data: they can only be converted to a type that keeps it (integer to decimal)
+export const getConvertibleTypes = (nodeDef) => {
+  if (!isAttribute(nodeDef)) return []
+  if (isPublished(nodeDef)) return isInteger(nodeDef) ? [nodeDefType.decimal] : []
+  return Object.values(nodeDefType).filter((type) => ![nodeDefType.entity, getType(nodeDef)].includes(type))
+}
+
 export const convertToType =
   ({ toType }) =>
   (nodeDef) => {

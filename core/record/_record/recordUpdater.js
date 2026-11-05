@@ -74,6 +74,20 @@ export const assocNodes =
   (record) =>
     Records.addNodes(nodes, { updateNodesIndex, sideEffect })(record)
 
+/**
+ * Replaces all the nodes of a record, building the nodes index from scratch.
+ * Use it instead of assocNodes with nodes already in the record: in that case the index would not be stored,
+ * and every following node update would rebuild it entirely.
+ * @param {!object} nodes - The nodes (indexed by uuid).
+ * @returns {(record: object) => object} - Function returning the updated record.
+ */
+export const replaceNodes = (nodes) => (record) => {
+  const recordWithoutNodes = { ...record }
+  delete recordWithoutNodes[keys.nodes]
+  delete recordWithoutNodes._nodesIndex
+  return Records.addNodes(nodes, { sideEffect: true, sortNodes: true })(recordWithoutNodes)
+}
+
 export const mergeNodeValidations = (nodeValidations) => (record) =>
   A.pipe(Validation.getValidation, Validation.mergeValidation(nodeValidations), (validationMerged) =>
     Validation.assocValidation(validationMerged)(record)

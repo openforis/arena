@@ -1,6 +1,6 @@
 import './Records.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
@@ -29,7 +29,7 @@ const Records = () => {
     (record) => navigate(`${appModuleUri(dataModules.record)}${Record.getUuid(record)}?locked=true`),
     [navigate]
   )
-  const [recordsRequestedAt, setRecordsRequestedAt] = useState(Date.now())
+  const [recordsRequestedAt, setRecordsRequestedAt] = useState(() => Date.now())
 
   const onRecordsUpdate = useCallback(() => {
     setRecordsRequestedAt(Date.now())

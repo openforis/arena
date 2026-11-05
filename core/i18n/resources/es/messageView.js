@@ -29,7 +29,6 @@ Algunas variables de marcador de posición también están disponibles:
   },
   subject: 'Asunto',
   target: {
-    label: 'Destino',
     emailsExcluded: {
       label: 'Correos electrónicos excluidos',
       placeholder: 'Escriba una dirección de correo electrónico para excluir, luego presione el botón Agregar',

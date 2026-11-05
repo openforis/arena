@@ -6,50 +6,73 @@ import { RecordImportAction, RecordImportActionType } from '@common/dataImport/r
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Taxon from '@core/survey/taxon'
+import * as Node from '@core/record/node'
 import * as Record from '@core/record/record'
 import SystemError from '@core/systemError'
 import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
+import { NodeValues } from '@core/record/nodeValues'
 
-/**
- * Returns the formatted values of the root entity key attributes of a record, in node def key order.
- */
-export const getRecordFormattedKeyValues = ({ survey, record }: { survey: any; record: any }): any[] => {
-  const rootDef = Surveys.getNodeDefRoot({ survey })
-  const recordRootEntity = Records.getRoot(record)
-  const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid(survey, recordRootEntity)(record)
-  const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
-  const cycle = Record.getCycle(record)
-  return keyDefs.map((keyDef: any) => {
-    const value = recordKeyValuesByDefUuid[NodeDef.getUuid(keyDef)]
-    return NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, value })
-  })
+import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+
+const formatKeyValue = async ({
+  survey,
+  cycle,
+  keyDef,
+  value,
+}: {
+  survey: any
+  cycle: any
+  keyDef: any
+  value: any
+}): Promise<any> => {
+  // items of big categories and taxa of big taxonomies are not in the survey ref data
+  if (NodeDef.isTaxon(keyDef) && value) {
+    const taxonUuid = value[Node.valuePropsTaxon.taxonUuid]
+    const taxon = taxonUuid ? await TaxonProviderDefault.getOrFetchTaxon({ survey, nodeDef: keyDef, taxonUuid }) : null
+    if (taxon) return Taxon.getCode(taxon)
+  }
+  const itemUuid = NodeDef.isCode(keyDef) && value ? NodeValues.getValueItemUuid(value) : null
+  const categoryItem = itemUuid
+    ? await CategoryItemProviderDefault.getOrFetchItem({ survey, nodeDef: keyDef, itemUuid })
+    : null
+  const node = categoryItem ? { refData: { categoryItem } } : null
+  return NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, node, value } as any)
 }
 
 /**
- * Same as getRecordFormattedKeyValues, but returns the values keyed by node def uuid,
+ * Returns the formatted values of the root entity key attributes of a record, keyed by node def uuid,
  * so consumers don't need to rely on key def ordering.
  */
-export const getRecordFormattedKeyValuesByDefUuid = ({
+export const getRecordFormattedKeyValuesByDefUuid = async ({
   survey,
   record,
 }: {
   survey: any
   record: any
-}): { [nodeDefUuid: string]: any } => {
+}): Promise<{ [nodeDefUuid: string]: any }> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const recordRootEntity = Records.getRoot(record)
   const recordKeyValuesByDefUuid = Records.getEntityKeyValuesByDefUuid(survey, recordRootEntity)(record)
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const cycle = Record.getCycle(record)
-  return keyDefs.reduce((acc: { [nodeDefUuid: string]: any }, keyDef: any) => {
+  const keyValuesFormatted: { [nodeDefUuid: string]: any } = {}
+  for (const keyDef of keyDefs) {
     const nodeDefUuid = NodeDef.getUuid(keyDef)
     const value = recordKeyValuesByDefUuid[nodeDefUuid]
-    acc[nodeDefUuid] = NodeValueFormatter.format({ survey, cycle, nodeDef: keyDef, value })
-    return acc
-  }, {})
+    keyValuesFormatted[nodeDefUuid] = await formatKeyValue({ survey, cycle, keyDef, value }) // NOSONAR
+  }
+  return keyValuesFormatted
 }
 
-const findExistingRecordSummaryWithSameKeys = ({
+/**
+ * Same as getRecordFormattedKeyValuesByDefUuid, but returns the values as an array, in node def key order.
+ */
+export const getRecordFormattedKeyValues = async ({ survey, record }: { survey: any; record: any }): Promise<any[]> =>
+  Object.values(await getRecordFormattedKeyValuesByDefUuid({ survey, record }))
+
+const findExistingRecordSummaryWithSameKeys = async ({
   survey,
   record,
   existingRecordsSummary,
@@ -57,11 +80,11 @@ const findExistingRecordSummaryWithSameKeys = ({
   survey: any
   record: any
   existingRecordsSummary: any[]
-}): any => {
+}): Promise<any> => {
   const rootDef = Surveys.getNodeDefRoot({ survey })
   const keyDefs = Surveys.getNodeDefKeys({ survey, nodeDef: rootDef })
   const recordSummaryKeyProps = keyDefs.map((keyDef: any) => A.camelize(NodeDef.getName(keyDef)))
-  const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
+  const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
   return existingRecordsSummary.find((recordSummary: any) => {
     const recordSummaryKeyValues = recordSummaryKeyProps.map((key: string) => recordSummary[key])
     return Objects.isEqual(recordKeyValues, recordSummaryKeyValues)
@@ -72,7 +95,7 @@ const findExistingRecordSummaryWithSameKeys = ({
  * Finds the existing record (summary) matching the given imported record: first by uuid,
  * then (only when the conflict resolution strategy is "merge") by key attribute values.
  */
-export const findExistingRecordSummary = ({
+export const findExistingRecordSummary = async ({
   survey,
   record,
   existingRecordsSummary,
@@ -82,7 +105,7 @@ export const findExistingRecordSummary = ({
   record: any
   existingRecordsSummary: any[]
   conflictResolutionStrategy: string
-}): any => {
+}): Promise<any> => {
   const recordUuid = Record.getUuid(record)
   const existingRecordWithSameUuid = existingRecordsSummary.find(
     (recordSummary: any) => Record.getUuid(recordSummary) === recordUuid
@@ -103,7 +126,7 @@ export const findExistingRecordSummary = ({
  * Throws an error if the record would be merged into a different record with the same keys
  * and the survey security settings do not allow it.
  */
-export const determineRecordAction = ({
+export const determineRecordAction = async ({
   survey,
   record,
   existingRecordSummary,
@@ -113,7 +136,7 @@ export const determineRecordAction = ({
   record: any
   existingRecordSummary: any
   conflictResolutionStrategy: string
-}): { action: RecordImportActionType; existingRecordUuid: string | null } => {
+}): Promise<{ action: RecordImportActionType; existingRecordUuid: string | null }> => {
   if (!existingRecordSummary) {
     return { action: RecordImportAction.insert, existingRecordUuid: null }
   }
@@ -137,7 +160,7 @@ export const determineRecordAction = ({
       existingRecordUuid !== Record.getUuid(record) &&
       !Surveys.isRecordsMergeWithSameKeysAllowed(Survey.getSurveyInfo(survey))
     ) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record })
       throw new SystemError('dataImport.recordMergeWithSameKeysNotAllowed', { recordKeyValues })
     }
     // applies both to a same-uuid record diverged on two clients, and to a different-uuid record matched by keys

@@ -154,8 +154,6 @@ export default {
     preloadedMapLayers: {
       enabledMessage: 'Урьдчилан ачаалсан газрын зургийн давхаргууд идэвхжсэн',
       title: 'Урьдчилан ачаалсан газрын зургийн давхаргууд',
-      fileName: 'Файлын нэр',
-      fileSize: 'Файлын хэмжээ',
       confirmDelete: 'Энэ урьдчилан ачаалсан газрын зургийн давхаргыг устгахдаа итгэлтэй байна уу?',
       editor: {
         title: 'Урьдчилан ачаалсан газрын зургийн давхарга',
@@ -232,6 +230,7 @@ $t(common.cantUndoWarning)`,
       applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Эх код',
       defaultValue: 'Үндсэн утга',
+      requiredIf: 'Заавал бөглөх нөхцөл',
       validationRule: 'Баталгаажуулалтын дүрэм',
     },
     title: 'Цуглуулгын импортын тайлан',

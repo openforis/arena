@@ -135,6 +135,9 @@ export default {
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
+    requiredIfInvalid: 'Хүчингүй "Заавал бөглөх нөхцөл"',
+    requiredIfNotAllowed:
+      '"Заавал бөглөх нөхцөл"-ийг зөвхөн үргэлж заавал биш, түлхүүр биш, ганц утгатай шинж чанарт ашиглаж болно',
     qualifierCannotHaveApplicableExpression:
       'Квалификатор шинж чанар "$t(nodeDefEdit:advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
     qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',

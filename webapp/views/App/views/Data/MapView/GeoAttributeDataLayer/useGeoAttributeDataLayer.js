@@ -166,6 +166,7 @@ export const useGeoAttributeDataLayer = (props) => {
       i18n,
     })
 
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- points are also changed by the layer toggle and the edited record
     setState((statePrev) => ({
       ...statePrev,
       data: dataFetched,

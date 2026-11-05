@@ -1,6 +1,6 @@
 import './CoordinateAttributePopUp.scss'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 

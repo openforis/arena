@@ -1,6 +1,6 @@
 import './ImageProgressive.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 
@@ -47,7 +47,7 @@ const ImageProgressive = (props) => {
 
   useEffect(() => {
     let mounted = true
-    let createdBlobUrls = []
+    const createdBlobUrls = []
 
     const loadImages = async () => {
       if (!mounted) return

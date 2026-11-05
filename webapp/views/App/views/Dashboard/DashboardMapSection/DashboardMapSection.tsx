@@ -1,7 +1,5 @@
 import './DashboardMapSection.scss'
 
-import React from 'react'
-
 import { useSurvey } from '@webapp/store/survey'
 
 import { surveyHasGeoAttributes } from '../utils/surveyHasGeoAttributes'

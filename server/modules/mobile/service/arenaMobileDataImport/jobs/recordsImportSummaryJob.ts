@@ -56,22 +56,24 @@ export default class RecordsImportSummaryJob extends Job {
     }
 
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
       const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
 
-      const existingRecordSummary = findExistingRecordSummary({
+      const existingRecordSummary = /* NOSONAR */ await findExistingRecordSummary({
         survey,
         record,
         existingRecordsSummary,
         conflictResolutionStrategy,
       })
-      const { action } = determineRecordAction({
+      const { action } = /* NOSONAR */ await determineRecordAction({
         survey,
         record,
         existingRecordSummary,
         conflictResolutionStrategy,
       })
-      const keyValues = getRecordFormattedKeyValuesByDefUuid({ survey, record })
+      const keyValues = await getRecordFormattedKeyValuesByDefUuid({ survey, record }) // NOSONAR
 
       this.items.push({
         recordUuid,
@@ -87,7 +89,7 @@ export default class RecordsImportSummaryJob extends Job {
     }
   }
 
-  generateResult() {
-    return { items: this.items }
+  generateResult(): Promise<any> {
+    return Promise.resolve({ items: this.items })
   }
 }

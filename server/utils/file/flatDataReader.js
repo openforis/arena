@@ -96,6 +96,16 @@ export async function* generateRowsFromFile({ filePath, fileFormat = FileFormats
   }
 }
 
+/**
+ * Creates a reader of the rows of a stream.
+ * @param {object} params - The parameters.
+ * @param {object} params.stream - The input stream.
+ * @param {string} [params.fileFormat] - The file format (csv or xlsx).
+ * @param {Function|null} [params.onHeaders] - Called with the headers.
+ * @param {Function|null} [params.onRow] - Called with every row.
+ * @param {Function|null} [params.onTotalChange] - Called with the total number of rows.
+ * @returns {{start: Function, cancel: Function}} - The reader.
+ */
 export const createReaderFromStream = ({
   stream,
   fileFormat = FileFormats.csv,

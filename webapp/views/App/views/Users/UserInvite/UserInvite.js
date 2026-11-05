@@ -1,6 +1,6 @@
 import './UserInvite.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import { Authorizer } from '@openforis/arena-core'

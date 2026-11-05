@@ -1,8 +1,7 @@
 import PropTypes from 'prop-types'
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useNavigate } from 'react-router'
-import { Link } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router'
 
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'

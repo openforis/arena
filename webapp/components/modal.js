@@ -1,6 +1,6 @@
 import './modal.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import MuiModal from '@mui/material/Modal'
 import Fade from '@mui/material/Fade'

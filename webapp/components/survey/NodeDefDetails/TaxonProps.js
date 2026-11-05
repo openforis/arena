@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useMemo } from 'react'
+import { useState, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Node from '@core/record/node'

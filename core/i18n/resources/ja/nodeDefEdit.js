@@ -23,6 +23,8 @@ export default {
     sql: '有効なSQL式のみが使用できます。',
   },
   editorCompletionHelp: '- 利用可能な変数と関数を表示',
+  editorTextSearchHelp:
+    "テキスト値の検索には text_attr.includes('abc')、text_attr.startsWith('abc')、text_attr.endsWith('abc') を使用します。大文字と小文字を区別しない場合は、その前に .toLowerCase() を追加します（例：text_attr.toLowerCase().includes('abc')）",
   functionDescriptions: {
     categoryItemProp: '指定したコードを持つカテゴリ項目の、指定した$t(extraProp.label)の値を返します',
     dateTimeDiff: '2つの日時の組の差（分単位）を返します',
@@ -203,6 +205,11 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
   },
   timeProps: {
     includeSeconds: '秒を含める',
+  },
+  geoProps: {
+    positionTracking: '位置の追跡',
+    positionTrackingInfo:
+      'Arena Mobileにのみ適用されます：チェックすると、値はレコード入力中にユーザーが歩いた経路（デバイスの位置を追跡して記録）となり、手動で編集することはできません',
   },
   formHeaderProps: {
     headerColorLabel: 'ヘッダーの色',
