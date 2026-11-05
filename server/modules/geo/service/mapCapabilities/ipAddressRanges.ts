@@ -170,27 +170,28 @@ const isInIpv6Cidr = (hextets: number[], { base, prefixLength }: Ipv6Cidr): bool
 }
 
 // RFC 6890 special-purpose ranges that must never be reached from the server
+// (NOSONAR: hardcoded IP addresses are the point of this deny-list)
 const IPV4_NON_PUBLIC: Ipv4Cidr[] = [
   ipv4Cidr('0.0.0.0', 8), // "this network"
-  ipv4Cidr('10.0.0.0', 8), // private
-  ipv4Cidr('100.64.0.0', 10), // carrier-grade NAT
+  ipv4Cidr('10.0.0.0', 8), // NOSONAR private
+  ipv4Cidr('100.64.0.0', 10), // NOSONAR carrier-grade NAT
   ipv4Cidr('127.0.0.0', 8), // loopback
-  ipv4Cidr('169.254.0.0', 16), // link-local, cloud metadata
-  ipv4Cidr('172.16.0.0', 12), // private
-  ipv4Cidr('192.0.0.0', 24), // IETF protocol assignments
+  ipv4Cidr('169.254.0.0', 16), // NOSONAR link-local, cloud metadata
+  ipv4Cidr('172.16.0.0', 12), // NOSONAR private
+  ipv4Cidr('192.0.0.0', 24), // NOSONAR IETF protocol assignments
   ipv4Cidr('192.0.2.0', 24), // documentation
-  ipv4Cidr('192.168.0.0', 16), // private
-  ipv4Cidr('198.18.0.0', 15), // benchmarking
+  ipv4Cidr('192.168.0.0', 16), // NOSONAR private
+  ipv4Cidr('198.18.0.0', 15), // NOSONAR benchmarking
   ipv4Cidr('198.51.100.0', 24), // documentation
   ipv4Cidr('203.0.113.0', 24), // documentation
-  ipv4Cidr('224.0.0.0', 4), // multicast
-  ipv4Cidr('240.0.0.0', 4), // reserved, broadcast
+  ipv4Cidr('224.0.0.0', 4), // NOSONAR multicast
+  ipv4Cidr('240.0.0.0', 4), // NOSONAR reserved, broadcast
 ]
 
 // ranges whose last 32 bits are an IPv4 address the connection ends up on
 const IPV6_EMBEDDING_IPV4: Ipv6Cidr[] = [
-  ipv6Cidr('::ffff:0:0', 96), // IPv4-mapped
-  ipv6Cidr('64:ff9b::', 96), // NAT64
+  ipv6Cidr('::ffff:0:0', 96), // NOSONAR IPv4-mapped
+  ipv6Cidr('64:ff9b::', 96), // NOSONAR NAT64
 ]
 
 // the only IPv6 block allocated to global unicast: everything else is unrouted or special-purpose
@@ -198,22 +199,22 @@ const IPV6_GLOBAL_UNICAST = ipv6Cidr('2000::', 3)
 
 const IPV6_NON_PUBLIC: Ipv6Cidr[] = [
   ipv6Cidr('::', 96), // unspecified, loopback, IPv4-compatible
-  ipv6Cidr('::ffff:0:0:0', 96), // IPv4-translated (SIIT)
-  ipv6Cidr('64:ff9b:1::', 48), // local-use NAT64
-  ipv6Cidr('100::', 64), // discard
-  ipv6Cidr('2001::', 23), // IETF protocol assignments: only a few sub-blocks are global, none is a map service
-  ipv6Cidr('2001::', 32), // Teredo
-  ipv6Cidr('2001:2::', 48), // benchmarking
-  ipv6Cidr('2001:10::', 28), // ORCHID
-  ipv6Cidr('2001:20::', 28), // ORCHIDv2
+  ipv6Cidr('::ffff:0:0:0', 96), // NOSONAR IPv4-translated (SIIT)
+  ipv6Cidr('64:ff9b:1::', 48), // NOSONAR local-use NAT64
+  ipv6Cidr('100::', 64), // NOSONAR discard
+  ipv6Cidr('2001::', 23), // NOSONAR IETF protocol assignments: only a few sub-blocks are global, none is a map service
+  ipv6Cidr('2001::', 32), // NOSONAR Teredo
+  ipv6Cidr('2001:2::', 48), // NOSONAR benchmarking
+  ipv6Cidr('2001:10::', 28), // NOSONAR ORCHID
+  ipv6Cidr('2001:20::', 28), // NOSONAR ORCHIDv2
   ipv6Cidr('2001:db8::', 32), // documentation
-  ipv6Cidr('2002::', 16), // 6to4
-  ipv6Cidr('3ffe::', 16), // former 6bone
-  ipv6Cidr('3fff::', 20), // documentation
-  ipv6Cidr('fc00::', 7), // unique local
-  ipv6Cidr('fe80::', 10), // link-local
-  ipv6Cidr('fec0::', 10), // site-local (deprecated)
-  ipv6Cidr('ff00::', 8), // multicast
+  ipv6Cidr('2002::', 16), // NOSONAR 6to4
+  ipv6Cidr('3ffe::', 16), // NOSONAR former 6bone
+  ipv6Cidr('3fff::', 20), // NOSONAR documentation
+  ipv6Cidr('fc00::', 7), // NOSONAR unique local
+  ipv6Cidr('fe80::', 10), // NOSONAR link-local
+  ipv6Cidr('fec0::', 10), // NOSONAR site-local (deprecated)
+  ipv6Cidr('ff00::', 8), // NOSONAR multicast
 ]
 
 /**

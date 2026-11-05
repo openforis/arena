@@ -332,8 +332,8 @@
 
     .leaflet-control-layers-list,
     .leaflet-control-layers-scrollbar {
-      // Leaflet sets a height from the map size; the rail scrolls instead
-      height: auto !important;
+      // Leaflet sets an inline height from the map size (only !important beats it); the rail scrolls instead
+      height: auto !important; // NOSONAR
       padding-right: 0;
       overflow: visible;
     }
