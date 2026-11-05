@@ -277,6 +277,9 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
     ...Object.values(UserAccessRequest.keysProps).map((key) => StringUtils.toSnakeCase(key)),
     'status',
     'date_created',
+    'accepted_by_name',
+    'accepted_by_email',
+    'date_accepted',
   ]
 
   const objectTransformer = (obj) => ({
@@ -295,6 +298,10 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
     }, {}),
     // format date_created
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+    date_accepted:
+      obj.status === UserAccessRequest.status.ACCEPTED && obj.date_modified
+        ? DateUtils.formatDateTimeDefault(obj.date_modified)
+        : null,
   })
 
   await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({

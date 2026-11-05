@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useDispatch } from 'react-redux'
+import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
+import type { UserAccessRequest } from '@core/user/userAccessRequest'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 
 import * as API from '@webapp/service/api'
@@ -13,19 +15,32 @@ import { DialogConfirmActions, LoaderActions, NotificationActions } from '@webap
 
 import * as ValidationUtils from '@webapp/utils/validationUtils'
 
-export const useAcceptRequestPanel = (props) => {
-  const { userAccessRequest, onRequestAccepted } = props
+export type AccessRequestAccept = {
+  accessRequestUuid: string
+  email: string
+  surveyName: string
+  surveyLabel: string
+  role: string
+  templateUuid?: string | null
+}
+
+type UseAcceptRequestPanelParams = {
+  userAccessRequest: UserAccessRequest
+  onRequestAccepted: () => void
+}
+
+export const useAcceptRequestPanel = ({ userAccessRequest, onRequestAccepted }: UseAcceptRequestPanelParams) => {
   const { uuid: accessRequestUuid, email, props: requestProps } = userAccessRequest
 
   const { templateUuid } = requestProps
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const i18n = useI18n()
 
-  const [accessRequestAccept, setAccessRequestAccept] = useState({
+  const [accessRequestAccept, setAccessRequestAccept] = useState<AccessRequestAccept>({
     accessRequestUuid,
     email,
-    surveyName: requestProps.surveyName,
+    surveyName: requestProps.surveyName ?? '',
     surveyLabel: i18n.t('usersAccessRequestView.acceptRequest.surveyLabelInitial'),
     role: AuthGroup.groupNames.surveyManager,
     templateUuid,
@@ -33,7 +48,7 @@ export const useAcceptRequestPanel = (props) => {
 
   const { role, surveyName } = accessRequestAccept
 
-  const [validation, setValidation] = useState(null)
+  const [validation, setValidation] = useState<any>(null)
 
   const [templateLabel, setTemplateLabel] = useState('')
 
@@ -41,7 +56,7 @@ export const useAcceptRequestPanel = (props) => {
   useEffect(() => {
     const loadTemplateLabel = async () => {
       const templates = await API.fetchSurveyTemplatesPublished()
-      const template = templates.find((template) => Survey.getUuid(template) === templateUuid)
+      const template = templates.find((template: any) => Survey.getUuid(template) === templateUuid)
       setTemplateLabel(Survey.getDefaultLabel(template))
     }
     if (templateUuid) {
@@ -49,9 +64,9 @@ export const useAcceptRequestPanel = (props) => {
     }
   }, [templateUuid])
 
-  const roleLabelFunction = (r) => i18n.t(`auth:authGroups.${r}.label`)
+  const roleLabelFunction = (r: string): string => i18n.t(`auth:authGroups.${r}.label`)
 
-  const onUpdate = async ({ field, value }) => {
+  const onUpdate = async ({ field, value }: { field: keyof AccessRequestAccept; value: string }) => {
     const accessRequestAcceptUpdated = { ...accessRequestAccept, [field]: value }
     const validationUpdated = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
       accessRequestAccept: accessRequestAcceptUpdated,
@@ -108,7 +123,6 @@ export const useAcceptRequestPanel = (props) => {
     }
   }
   return {
-    roleLabelFunction,
     onUpdate,
     onSubmit,
     accessRequestAccept,
