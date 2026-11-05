@@ -4,6 +4,7 @@ import camelize from 'camelize'
 
 import { Objects } from '@openforis/arena-core'
 
+import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -13,8 +14,11 @@ import * as AuthGroup from '@core/auth/authGroup'
 import * as DbUtils from '@server/db/dbUtils'
 import { DbOrder } from '@server/db'
 
-const selectFields = ['uuid', 'name', 'email', 'prefs', 'props', 'status']
-const columnsCommaSeparated = selectFields.map((f) => `u.${f}`).join(',')
+// the custom map layers (they may hold URL tokens) are served only by the custom layers API: never select them,
+// otherwise the users list would send them to the other members of a survey
+const prefsField = `u.prefs - '${User.keysPrefs.mapCustomLayers}' AS prefs`
+const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status']
+const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -429,6 +433,7 @@ export const updatePassword = async ({ userUuid, password }, client = db) =>
 
 // ==== PREFS
 
+// mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it
 export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
@@ -436,7 +441,7 @@ export const updateUserPrefs = async (user, client = db) =>
     SET prefs = prefs || $1::jsonb
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,
-    [User.getPrefs(user), User.getUuid(user)],
+    [A.omit([User.keysPrefs.mapCustomLayers], User.getPrefs(user)), User.getUuid(user)],
     camelize
   )
 
@@ -453,7 +458,7 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
   // Remove from surveys pref
   await client.query(`
     UPDATE "user"
-    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}'
+    SET prefs = prefs #- '{${User.keysPrefs.surveys},${surveyId}}' #- '{${User.keysPrefs.mapCustomLayers},${surveyId}}'
 `)
 }
 
@@ -475,6 +480,21 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
       surveyId: String(surveyId),
     }
   )
+
+/**
+ * Removes the custom map layers a user added in a survey, whatever their current survey is.
+ * @param {object} params - Parameters.
+ * @param {string} params.userUuid - The user uuid.
+ * @param {number|string} params.surveyId - The survey id.
+ * @param {object} [client] - The database client.
+ * @returns {Promise<object>} The query result.
+ */
+export const deleteUserMapCustomLayersSurvey = async ({ userUuid, surveyId }, client = db) =>
+  client.query(`UPDATE "user" SET prefs = prefs #- ARRAY[$/layersKey/, $/surveyId/]::text[] WHERE uuid = $/userUuid/`, {
+    userUuid,
+    layersKey: User.keysPrefs.mapCustomLayers,
+    surveyId: String(surveyId),
+  })
 
 /**.
  * Sets survey cycle user pref to Survey.cycleOneKey if the preferred cycle is among the specified (deleted) ones

@@ -31,8 +31,11 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
-export const fetchRecordAndNodes = async ({ surveyId, recordUuid }) => {
-  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, { params: { recordUuid } })
+export const fetchRecordAndNodes = async ({ surveyId, recordUuid, errorHandledLocally = false }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, {
+    params: { recordUuid },
+    ...(errorHandledLocally ? { errorHandledLocally } : {}),
+  })
   return record
 }
 export {

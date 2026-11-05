@@ -1,5 +1,4 @@
 import axios from 'axios'
-import xmljs from 'xml-js'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -99,18 +98,6 @@ export const init = (app) => {
       }
     }
     res.json(elevation)
-  })
-
-  app.get(`${uriPrefix}map/wmts/capabilities`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
-    const { url } = Request.getParams(req)
-    try {
-      const { data } = await axios.get(url)
-      const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
-      const json = JSON.parse(jsonstring)
-      res.json(json)
-    } catch (error) {
-      next(error)
-    }
   })
 
   app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res) => {

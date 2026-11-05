@@ -1,0 +1,257 @@
+@use '~@webapp/style/vars' as *;
+
+.map-screenshot-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  color: $colorOnSurface;
+  font-size: 13px;
+
+  &__title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid $colorOutline;
+    font-size: 16px;
+    font-weight: 700;
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $colorOnSurfaceVariant;
+    cursor: pointer;
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  &__preview {
+    display: flex;
+    flex-shrink: 0; // the content scrolls instead: a shrunk box would crop the stamp and scale bar
+    align-items: center;
+    justify-content: center;
+    min-height: 200px;
+    max-height: 375px;
+    overflow: hidden;
+    border: 1px solid $colorOutline;
+    border-radius: 8px;
+    background: $colorSurfaceVariant;
+    color: $colorOnSurfaceVariant;
+
+    img {
+      display: block;
+      max-width: 100%;
+      max-height: 375px;
+      object-fit: contain;
+    }
+
+    &--loading img {
+      opacity: 0.5;
+    }
+  }
+
+  &__grid,
+  &__targets,
+  &__attach {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  &__grid {
+    gap: 16px;
+  }
+
+  &__targets {
+    gap: 8px;
+  }
+
+  &__attach {
+    gap: 12px;
+  }
+
+  &__fieldset {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin: 0;
+    padding: 0;
+    border: 0;
+
+    legend {
+      margin-bottom: 6px;
+      padding: 0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+
+  &__segmented {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    padding: 3px;
+    border-radius: 8px;
+    background: $colorSurfaceVariant;
+  }
+
+  &__segment {
+    height: 30px;
+    border: 0;
+    border-radius: 6px;
+    background: transparent;
+    color: $colorOnSurfaceVariant;
+    font: inherit;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      background: $colorSurface;
+      color: $colorPrimary;
+      box-shadow: 0 1px 2px with-alpha($colorShadow, 0.12);
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
+  &__check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+
+    input {
+      width: 16px;
+      height: 16px;
+      margin: 0;
+      accent-color: $colorPrimary;
+    }
+  }
+
+  &__target {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+    padding: 10px 12px;
+    border: 1.5px solid $colorOutline;
+    border-radius: 8px;
+    background: $colorSurface;
+    color: $colorOnSurface;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+
+    &[aria-pressed='true'] {
+      border-color: $colorPrimary;
+      box-shadow: inset 0 0 0 1px $colorPrimary;
+    }
+
+    &:disabled {
+      cursor: default;
+      opacity: 0.5;
+    }
+  }
+
+  &__target-label {
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  &__target-hint {
+    color: $colorOnSurfaceVariant;
+    font-size: 12px;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    font-size: 12px;
+    font-weight: 600;
+
+    select,
+    input {
+      box-sizing: border-box;
+      height: 34px;
+      padding: 0 8px;
+      border: 1px solid $colorOutline;
+      border-radius: 6px;
+      background: $colorSurface;
+      color: $colorOnSurface;
+      font: inherit;
+      font-size: 13px;
+      font-weight: 400;
+    }
+
+    &--wide {
+      grid-column: 1 / -1;
+    }
+  }
+
+  &__hint {
+    margin: 4px 0 0;
+    color: $colorOnSurfaceVariant;
+    font-size: 12px;
+  }
+
+  &__note,
+  &__notice,
+  &__replace {
+    display: block;
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  &__note {
+    background: $colorPrimaryContainer;
+  }
+
+  &__notice {
+    background: $colorWarningContainer;
+
+    &--error {
+      background: $colorErrorContainer;
+    }
+
+    &--success {
+      background: $colorSuccessContainer;
+    }
+  }
+
+  &__replace {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    background: $colorWarningContainer;
+  }
+
+  &__footer {
+    border-top: 1px solid $colorOutline;
+  }
+}
+
+@media (max-width: 600px) {
+  .map-screenshot-dialog__grid,
+  .map-screenshot-dialog__targets,
+  .map-screenshot-dialog__attach {
+    grid-template-columns: 1fr;
+  }
+}

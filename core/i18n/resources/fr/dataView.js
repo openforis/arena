@@ -217,8 +217,6 @@ C'est le format utilisé par les outils d'analyse de la végétation comme Turbo
       samplingPointData: "Données de points d'échantillonnage",
     },
     layersPanel: {
-      hidePanel: 'Masquer le panneau',
-      showPanel: 'Afficher le panneau',
       markers: '{{count}} marqueurs',
       markers_one: '{{count}} marqueur',
       markers_other: '{{count}} marqueurs',

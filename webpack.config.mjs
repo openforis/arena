@@ -160,6 +160,12 @@ const webPackConfig = {
   },
   module: {
     rules: [
+      // georaster-layer-for-leaflet's ESM build imports 'georaster-stack/web' without a file extension
+      {
+        test: /\.m?js$/,
+        include: /node_modules[\\/](georaster-layer-for-leaflet|georaster-stack)[\\/]/,
+        resolve: { fullySpecified: false },
+      },
       {
         test: /\.(js|jsx|ts|tsx)$/,
         exclude: /node_modules/,

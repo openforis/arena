@@ -2,6 +2,7 @@ import path from 'node:path'
 
 import log4js from 'log4js'
 
+import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
 import * as UserManager from '@server/modules/user/manager/userManager'
@@ -13,6 +14,7 @@ import {
   category,
   categoryItems,
   cluster,
+  clusterImage,
   flattenCategoryItems,
   nodeDefExpressions,
   plot,
@@ -55,6 +57,8 @@ export type SampleSurveyOptions = {
   publish?: boolean
   template?: boolean
   records?: SampleRecord[]
+  /** Whether to add the image attribute "cluster_photo" to the cluster; default false. */
+  withClusterImage?: boolean
 }
 
 type ExpressionsByName = Record<string, string>
@@ -102,7 +106,16 @@ const createTaxonBuilders = () =>
  * @returns {Promise<number>} - The id of the survey inserted.
  */
 export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<number> => {
-  const { userEmail, name, label, withExpressions = true, publish = true, template = false, records = [] } = options
+  const {
+    userEmail,
+    name,
+    label,
+    withExpressions = true,
+    publish = true,
+    template = false,
+    records = [],
+    withClusterImage = false,
+  } = options
 
   const user = await UserManager.fetchUserByEmail(userEmail)
 
@@ -118,9 +131,14 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     .displayInOwnPage()
   if (withExpressions) plotBuilder.applyIf(nodeDefExpressions.relevantIf.plot)
 
+  const clusterImageBuilders = withClusterImage
+    ? [createAttributeBuilder(clusterImage, false).prop(NodeDef.propKeys.fileType, NodeDef.fileTypeValues.image)]
+    : []
+
   const clusterBuilder = SB.entity(
     cluster.name,
     ...createAttributeBuilders(cluster.children, withExpressions),
+    ...clusterImageBuilders,
     plotBuilder
   )
     .label(cluster.label)

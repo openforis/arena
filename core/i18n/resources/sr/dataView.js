@@ -217,8 +217,6 @@ Ovo je format koji koriste alati za analizu vegetacije kao što su Turboveg, Jui
       samplingPointData: 'Podaci o tačkama uzorka',
     },
     layersPanel: {
-      hidePanel: 'Sakrij panel',
-      showPanel: 'Prikaži panel',
       markers: '{{count}} markera',
       markers_one: '{{count}} marker',
       markers_few: '{{count}} markera',

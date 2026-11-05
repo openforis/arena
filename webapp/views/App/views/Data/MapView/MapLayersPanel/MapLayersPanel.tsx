@@ -14,7 +14,8 @@ import {
 
 import { SortOrder } from '@core/sortOrder'
 
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
+import { useI18n } from '@webapp/store/system'
 import {
   applySortOrder,
   type MapLayerPoint,
@@ -27,8 +28,6 @@ import {
 const SIDEBAR_BLUE = '#3885ca'
 const SIDEBAR_GREY = '#e7e9ee'
 const SIDEBAR_BLACK = '#2f3138'
-
-export const PANEL_WIDTH = 260
 
 const ITEM_HEIGHT = 36
 const OVERSCAN = 4
@@ -85,6 +84,7 @@ type SortButtonProps = {
 
 const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const i18n = useI18n()
+  const { portalContainer } = useMapWorkspace()
   const tooltipKeyBySortOrder: Record<MapSortOrder, string> = {
     [SortOrder.asc]: 'common.sortDesc',
     [SortOrder.desc]: 'common.sortNone',
@@ -93,7 +93,7 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
   const tooltipKey = tooltipKeyBySortOrder[sortOrder]
   const iconClass = sortOrder === SortOrder.desc ? 'icon-sort-alpha-desc' : 'icon-sort-alpha-asc'
   return (
-    <Tooltip title={i18n.t(tooltipKey)} placement="right">
+    <Tooltip title={i18n.t(tooltipKey)} placement="right" slotProps={{ popper: { container: portalContainer } }}>
       <IconButton
         size="small"
         onClick={onClick}
@@ -270,64 +270,9 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
   )
 }
 
-type PanelHeaderProps = {
-  onToggle: () => void
-}
-
-const PanelHeader: FC<PanelHeaderProps> = ({ onToggle }) => (
-  <Box
-    component="li"
-    sx={{
-      display: 'flex',
-      justifyContent: 'flex-end',
-      px: 0.5,
-      py: 0.25,
-      borderBottom: `1px solid #d1d1dd`,
-    }}
-  >
-    <ToggleButton isPanelVisible onClick={onToggle} />
-  </Box>
-)
-
-type ToggleButtonProps = {
-  isPanelVisible: boolean
-  onClick: () => void
-}
-
-const ToggleButton: FC<ToggleButtonProps> = ({ isPanelVisible, onClick }) => {
-  const i18n = useI18n()
-  return (
-    <Tooltip
-      title={i18n.t(
-        isPanelVisible ? 'dataView:mapView.layersPanel.hidePanel' : 'dataView:mapView.layersPanel.showPanel'
-      )}
-      placement="right"
-    >
-      <IconButton
-        size="small"
-        onClick={onClick}
-        sx={{
-          p: 0.5,
-          borderRadius: 1,
-          color: SIDEBAR_BLACK,
-          '&:hover': { bgcolor: `rgba(56, 133, 202, 0.08)` },
-        }}
-      >
-        <span className={`icon icon-12px ${isPanelVisible ? 'icon-arrow-left' : 'icon-arrow-right'}`} />
-      </IconButton>
-    </Tooltip>
-  )
-}
-
 export const MapLayersPanel: FC = () => {
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const {
-    activeLayers,
-    isPanelVisible,
-    selectedPointKey,
-    selectPoint: setSelectedPointKey,
-    togglePanelVisible,
-  } = useMapLayersPanel()
+  const i18n = useI18n()
+  const { activeLayers, selectedPointKey, selectPoint: setSelectedPointKey } = useMapLayersPanel()
 
   const [expandedLayerKey, setExpandedLayerKey] = useState<string | null>(null)
   const prevLayerKeysRef = useRef<string[]>([])
@@ -350,46 +295,21 @@ export const MapLayersPanel: FC = () => {
     }
   }, [activeLayers, expandedLayerKey])
 
-  if (!experimentalFeatures) return null
-  if (activeLayers.length === 0) return null
-
-  if (!isPanelVisible) {
+  if (activeLayers.length === 0) {
     return (
-      <Box
-        sx={{
-          position: 'absolute',
-          left: 0,
-          top: 8,
-          zIndex: 1000,
-          bgcolor: 'rgba(255,255,255,0.96)',
-          border: `1px solid #d1d1dd`,
-          borderLeft: 'none',
-          borderRadius: '0 4px 4px 0',
-          boxShadow: 2,
-          p: 0.25,
-        }}
-      >
-        <ToggleButton isPanelVisible={false} onClick={togglePanelVisible} />
-      </Box>
+      <Typography sx={{ p: 1.5, fontSize: '0.8rem', color: '#5d616b' }}>
+        {i18n.t('mapWorkspace.rail.recordsEmpty')}
+      </Typography>
     )
   }
 
+  // the rail tab gives the panel its frame (header, collapse button, border)
   return (
     <List
       dense
       disablePadding
-      sx={{
-        height: '100%',
-        width: '100%',
-        bgcolor: 'rgba(255,255,255,0.96)',
-        borderRight: `1px solid #d1d1dd`,
-        boxShadow: 2,
-        display: 'flex',
-        flexDirection: 'column',
-        overflow: 'hidden',
-      }}
+      sx={{ flex: 1, minHeight: 0, width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden' }}
     >
-      <PanelHeader onToggle={togglePanelVisible} />
       {activeLayers.map(({ key, layerName, points, flyToPoint }) => (
         <LayerAccordion
           key={key}
