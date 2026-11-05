@@ -58,7 +58,7 @@
 .survey-form__node-def-entity-wrapper {
   .survey-form__node-def-entity-form-grid {
     position: relative;
-    height: 100% !important;
+    height: 100% !important; // NOSONAR: overrides the inline height set by react-grid-layout
     width: 100%;
   }
 

@@ -32,7 +32,7 @@
   }
 
   .icon {
-    font-size: 0.8rem !important;
+    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
     opacity: 0.6;
   }
 
@@ -44,7 +44,7 @@
   }
 
   .icon-text-color {
-    font-size: 0.8rem !important;
+    font-size: 0.8rem !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
   }
 
   .add-to-label {
