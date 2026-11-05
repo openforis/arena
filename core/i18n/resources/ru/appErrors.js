@@ -77,6 +77,7 @@ export default {
   undefinedFunction: "Неопределенная функция '{{fnName}}' или неверные типы параметров",
   invalidSyntax: 'Недопустимый синтаксис выражения',
   networkError: 'Ошибка связи с сервером',
+  nodeDefConversionNotAllowed: `'{{name}}' нельзя преобразовать в {{toType}}`,
   record: {
     errorUpdating: 'Ошибка при обновлении записи',
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',

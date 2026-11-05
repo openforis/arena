@@ -64,6 +64,7 @@ export default {
   undefinedFunction: `未定義の関数「{{fnName}}」、またはパラメータの型が正しくありません`,
   invalidSyntax: '式の構文が無効です',
   networkError: 'サーバーとの通信中にエラーが発生しました',
+  nodeDefConversionNotAllowed: `「{{name}}」は{{toType}}に変換できません`,
   record: {
     errorUpdating: '記録の更新中にエラーが発生しました',
     entityNotFound: 'キー「{{keyValues}}」の項目「{{entityName}}」が見つかりません',
