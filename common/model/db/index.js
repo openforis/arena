@@ -12,4 +12,4 @@ export { default as TableDataNodeDef, ColumnNodeDef } from './tables/dataNodeDef
 export { default as ViewDataNodeDef } from './views/dataNodeDef'
 
 // not `export * as ... from`: the Babel transform of Playwright (e2e tests) does not support it
-export { Schemata }
+export { Schemata } // NOSONAR
