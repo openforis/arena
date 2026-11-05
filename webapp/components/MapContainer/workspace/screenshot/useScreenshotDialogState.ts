@@ -89,7 +89,7 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
 
   const [openedAt] = useState(() => new Date())
   const [openCenter] = useState(() => readCenter(map))
-  const [optionsChoice, setOptions] = useState<OptionsChoice>(DEFAULT_OPTIONS)
+  const [optionsChoice, setOptionsChoice] = useState<OptionsChoice>(DEFAULT_OPTIONS)
   const [targetChoice, setTargetChoice] = useState<ScreenshotTarget | null>(null)
   const [plotKey, setPlotKey] = useState<string | null>(null)
   const [attributeUuid, setAttributeUuid] = useState<string | null>(null)
@@ -144,7 +144,7 @@ export const useScreenshotDialogState = (): ScreenshotDialogState => {
 
   const setOption = useCallback(
     <K extends keyof ScreenshotOptions>(key: K, value: ScreenshotOptions[K]) =>
-      setOptions((previous) => ({ ...previous, [key]: value })),
+      setOptionsChoice((previous) => ({ ...previous, [key]: value })),
     []
   )
   const selectPlot = useCallback((key: string) => {
