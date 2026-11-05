@@ -107,8 +107,8 @@
   .survey-form__node-def-page {
     box-sizing: border-box;
     margin: 12px;
-    height: calc(100% - 24px) !important;
-    width: calc(100% - 24px) !important;
+    height: calc(100% - 24px);
+    width: calc(100% - 24px);
     background-color: $colorSurface;
     border-radius: 4px;
     border: 1px solid $colorOutline;

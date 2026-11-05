@@ -80,10 +80,10 @@ $tableFooterHeight: 30px;
 
   .table__row.hoverable {
     cursor: pointer;
-    transition: 0.2s all;
+    transition: background-color 0.2s;
 
     .icon-action {
-      transition: 0.2s all;
+      transition: color 0.2s;
     }
 
     &:hover {

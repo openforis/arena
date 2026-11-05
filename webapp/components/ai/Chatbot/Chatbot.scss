@@ -130,10 +130,10 @@
 //
 // MUI applies `menuClassName` directly onto that portal root element
 // (Menu -> Popover -> Modal root), so this class targets exactly the node
-// carrying z-index: 1300. !important wins regardless of the order in which
-// MUI injects its runtime <style> relative to this stylesheet.
-.ai-chatbot-panel__language-menu {
-  z-index: 10000 !important;
+// carrying z-index: 1300. The extra class makes this rule more specific than
+// MUI's single-class rule, whatever the order of the injected <style>s.
+.MuiModal-root.ai-chatbot-panel__language-menu {
+  z-index: 10000;
 }
 
 .ai-chatbot-message {

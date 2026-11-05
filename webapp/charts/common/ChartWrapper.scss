@@ -2,5 +2,5 @@
   max-height: 5rem;
   overflow-y: auto;
   padding-top: 0;
-  bottom: 0 !important;
+  bottom: 0 !important; // NOSONAR: overrides the inline style set by recharts
 }
