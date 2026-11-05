@@ -50,6 +50,8 @@ export type UserAccessRequest = {
   dateModified?: string | null
   acceptedByName?: string | null
   acceptedByEmail?: string | null
+  templateName?: string | null
+  createdSurveyName?: string | null
 }
 
 export const editableFields = [
@@ -67,5 +69,7 @@ export const getEmail = A.prop(keys.email)
 export const getStatus = (userAccessRequest: UserAccessRequest): UserAccessRequestStatus => userAccessRequest.status
 export const getAcceptedByName = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByName ?? null
 export const getAcceptedByEmail = (userAccessRequest: UserAccessRequest) => userAccessRequest.acceptedByEmail ?? null
+export const getCreatedSurveyName = (userAccessRequest: UserAccessRequest) =>
+  userAccessRequest.createdSurveyName ?? null
 
 export const { getDateCreated, getDateModified } = ObjectUtils

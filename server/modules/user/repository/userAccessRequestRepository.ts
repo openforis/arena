@@ -23,13 +23,28 @@ const userAccessRequestsSelect = `
         END 
         AS status,
       acc.name AS accepted_by_name,
-      acc.email AS accepted_by_email
+      acc.email AS accepted_by_email,
+      t.props ->> 'name' AS template_name,
+      cs.name AS created_survey_name
     FROM user_access_request ar
     LEFT OUTER JOIN "user" u
       ON u.email = ar.email
     -- modified_by is set to the user who accepted the request
     LEFT OUTER JOIN "user" acc
       ON acc.uuid = ar.modified_by
+    -- compared as text: templateUuid is a free JSON value
+    LEFT OUTER JOIN survey t
+      ON t.uuid::text = ar.props ->> 'templateUuid'
+    -- accepting a request invites the new user into the created survey
+    LEFT JOIN LATERAL (
+      SELECT COALESCE(s.props ->> 'name', s.props_draft ->> 'name') AS name
+      FROM user_invitation ui
+      JOIN survey s
+        ON s.uuid = ui.survey_uuid
+      WHERE ui.user_uuid = u.uuid AND ui.invited_by = ar.modified_by
+      ORDER BY ui.invited_date
+      LIMIT 1
+    ) cs ON TRUE
     ORDER BY
       ar.date_created DESC`
 

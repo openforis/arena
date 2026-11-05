@@ -805,6 +805,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     },
     acceptedBy: 'Aceito por',
     dateAccepted: 'Data de aceitação',
+    createdSurvey: 'Inventário criado',
     acceptRequest: {
       accept: 'Aceitar',
       acceptRequestAndCreateSurvey: 'Aceitar solicitação e criar inventário',

@@ -807,6 +807,7 @@ export default {
     },
     acceptedBy: 'Зөвшөөрсөн',
     dateAccepted: 'Зөвшөөрсөн огноо',
+    createdSurvey: 'Үүсгэсэн судалгаа',
     acceptRequest: {
       accept: 'Хүлээн авах',
       acceptRequestAndCreateSurvey: 'Хүсэлтийг хүлээн авч судалгаа үүсгэх',
