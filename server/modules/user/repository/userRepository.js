@@ -17,9 +17,9 @@ import { DbOrder } from '@server/db'
 // the custom map layers (they may hold URL tokens) are served only by the custom layers API: never select them,
 // otherwise the users list would send them to the other members of a survey
 const prefsField = `u.prefs - '${User.keysPrefs.mapCustomLayers}' AS prefs`
-const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status']
-const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
 const hasProfilePictureField = 'u.profile_picture IS NOT NULL AS has_profile_picture'
+const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status', hasProfilePictureField]
+const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -210,7 +210,7 @@ export const fetchUsers = async (
   client = db
 ) =>
   client.map(
-    `${_usersSelectQuery({ onlyAccepted, selectFields: [...selectFields, hasProfilePictureField], search, sortBy, sortOrder })}
+    `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
     LIMIT $/limit/
     OFFSET $/offset/`,
     {
@@ -237,7 +237,6 @@ export const fetchUsersBySurveyId = async (
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
     SELECT 
         ${columnsCommaSeparated},
-        ${hasProfilePictureField},
         (SELECT iby.name FROM "user" iby WHERE ui.invited_by = iby.uuid) as invited_by,
         ui.invited_date,
         ${DbUtils.selectDate('us.last_login_time', 'last_login_time')}
@@ -281,7 +280,7 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(
     `
-    SELECT ${columnsCommaSeparated}, ${hasProfilePictureField}, u.password
+    SELECT ${columnsCommaSeparated}, u.password
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -291,7 +290,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
 export const fetchUserByUuid = async (uuid, client = db) =>
   client.oneOrNone(
     `
-    SELECT ${columnsCommaSeparated}, ${hasProfilePictureField}
+    SELECT ${columnsCommaSeparated}
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
