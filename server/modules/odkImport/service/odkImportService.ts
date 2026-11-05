@@ -43,5 +43,5 @@ export const fetchReportItemsStream = OdkImportReportManager.fetchItemsStream
 export const countReportItems = OdkImportReportManager.countItems
 
 // UPDATE
-export const updateReportItem = async (surveyId: number, itemId: number, resolved: boolean) =>
+export const updateReportItem = (surveyId: number, itemId: number, resolved: boolean) =>
   OdkImportReportManager.updateItem(surveyId, itemId, {}, resolved)
