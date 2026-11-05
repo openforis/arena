@@ -56,26 +56,22 @@ export const applySortOrder = (points: MapLayerPoint[], sortOrder: MapSortOrder)
 
 type MapLayersPanelContextType = {
   activeLayers: ActiveLayer[]
-  isPanelVisible: boolean
   layerSortOrders: Record<string, MapSortOrder>
   selectedPointKey: string | null
   registerLayer: (layer: ActiveLayer) => void
   unregisterLayer: (params: { key: string }) => void
   selectPoint: (key: string | null) => void
   setLayerSortOrder: (layerKey: string, sortOrder: MapSortOrder) => void
-  togglePanelVisible: () => void
 }
 
 const MapLayersPanelContext = createContext<MapLayersPanelContextType>({
   activeLayers: [],
-  isPanelVisible: true,
   layerSortOrders: {},
   selectedPointKey: null,
   registerLayer: () => {},
   unregisterLayer: () => {},
   selectPoint: () => {},
   setLayerSortOrder: () => {},
-  togglePanelVisible: () => {},
 })
 
 type MapLayersPanelProviderProps = {
@@ -84,7 +80,6 @@ type MapLayersPanelProviderProps = {
 
 export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps) => {
   const [activeLayers, setActiveLayers] = useState<ActiveLayer[]>([])
-  const [isPanelVisible, setIsPanelVisible] = useState(true)
   const [selectedPointKey, setSelectedPointKey] = useState<string | null>(null)
   const [layerSortOrders, setLayerSortOrders] = useState<Record<string, MapSortOrder>>({})
 
@@ -117,33 +112,17 @@ export const MapLayersPanelProvider = ({ children }: MapLayersPanelProviderProps
     setLayerSortOrders((prev) => ({ ...prev, [layerKey]: sortOrder }))
   }, [])
 
-  const togglePanelVisible = useCallback(() => {
-    setIsPanelVisible((prev) => !prev)
-  }, [])
-
   const mapLayersContextValue = useMemo(
     () => ({
       activeLayers,
-      isPanelVisible,
       layerSortOrders,
       selectedPointKey,
       registerLayer,
       unregisterLayer,
       selectPoint,
       setLayerSortOrder,
-      togglePanelVisible,
     }),
-    [
-      activeLayers,
-      isPanelVisible,
-      layerSortOrders,
-      selectedPointKey,
-      registerLayer,
-      unregisterLayer,
-      selectPoint,
-      setLayerSortOrder,
-      togglePanelVisible,
-    ]
+    [activeLayers, layerSortOrders, selectedPointKey, registerLayer, unregisterLayer, selectPoint, setLayerSortOrder]
   )
 
   return <MapLayersPanelContext.Provider value={mapLayersContextValue}>{children}</MapLayersPanelContext.Provider>

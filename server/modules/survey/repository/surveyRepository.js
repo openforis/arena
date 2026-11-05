@@ -431,8 +431,9 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
     { surveyId, value }
   )
 
-export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
-  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
+// removes only one key: the other keys (e.g. mapCustomLayers) must survive
+export const deleteSurveyConfigurationProp = async ({ surveyId, key }, client = db) =>
+  client.none(`UPDATE survey SET config = config - $/key/::text WHERE id = $/surveyId/`, { surveyId, key })
 
 // ============== DELETE
 // the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,

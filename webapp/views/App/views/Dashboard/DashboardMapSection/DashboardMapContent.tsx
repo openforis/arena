@@ -67,9 +67,7 @@ export const DashboardMapContent = () => {
           selectedOwnerUuid={selectedOwnerUuid}
           onOwnerSelect={setSelectedOwnerUuid}
         />
-        <div className="dashboard-map-section__map">
-          {mapVisible && <MapContainer layers={layers} showOptions={false} />}
-        </div>
+        <div className="dashboard-map-section__map">{mapVisible && <MapContainer layers={layers} />}</div>
       </div>
     </DashboardSection>
   )

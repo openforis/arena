@@ -89,7 +89,7 @@ const NodeDefGeo = (props) => {
 
   const mapPanelRight = showMap ? (
     <PanelRight className="map-panel" width="40vw" onClose={toggleShowMap} header={nodeDefLabel}>
-      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} showOptions={false} />
+      <MapContainer editable={!entryDisabled} geoJson={Node.getValue(node)} />
     </PanelRight>
   ) : null
 

@@ -12,4 +12,5 @@ export const Urls = {
   dataExplorer: '/app/data/explorer/',
   validationReport: '/app/data/validationReport/',
   messages: '/app/systemAdmin/messages/',
+  map: '/app/data/map/',
 }

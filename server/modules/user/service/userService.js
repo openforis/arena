@@ -544,6 +544,9 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
       await UserManager.deleteUserPrefsSurvey({ userUuid: userUuidToRemove, surveyId }, t)
     }
 
+    // the layers of the user in that survey go whatever the current survey is
+    await UserManager.deleteUserMapCustomLayersSurvey({ userUuid: userUuidToRemove, surveyId }, t)
+
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
       t

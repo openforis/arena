@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { LayersControl, TileLayer, useMapEvents } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -7,12 +7,19 @@ import { useUser } from '@webapp/store/user'
 import { useSurveyId } from '@webapp/store/survey'
 import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
-import { baseLayers, baseLayerTypes } from './baseLayers'
+import { baseLayers, baseLayerTypes, defaultBaseLayer } from './baseLayers'
 import { EqualEarthBaseLayer } from './EqualEarthBaseLayer'
 import { useMapContext } from './MapContext'
 import { MapLayersGroupsInjector } from './MapLayersGroupsInjector'
 import { MAP_MIN_ZOOM } from './mapZoom'
-import { WmtsComponent } from './WmtsComponent'
+import { CustomBaseLayer } from './workspace/customLayers/CustomBaseLayer'
+import { findCustomBaseLayerDef, isCustomBaseLayerKey } from './workspace/customLayers/customLayerLeaflet'
+import { useMapCustomLayers } from './workspace/customLayers/MapCustomLayersContext'
+import { useMapWorkspace } from './workspace/MapWorkspaceContext'
+import { useControlContainerMove } from './workspace/layers/useControlContainerMove'
+import { getSelectableBaseLayers } from './workspace/toolbar/baseMapItems'
+
+const EMPTY_CONTROL_CLASS = 'map-layers-control--empty'
 
 export const MapLayersControl = (props) => {
   const { layers = [], baseLayersLabel, overlayGroups = [] } = props
@@ -22,12 +29,30 @@ export const MapLayersControl = (props) => {
   const experimentalFeaturesEnabled = useSystemConfigExperimentalFeatures()
   const { contextObject, onBaseLayerUpdate } = useMapContext()
   const { baseLayer: contextBaseLayer } = contextObject
+  const { variant, layersControlTarget } = useMapWorkspace()
+  const full = variant === 'full'
+  const [control, setControl] = useState(null)
+  const { baseMaps: customBaseLayerDefs } = useMapCustomLayers()
+
+  // full map: the control lives in the Layers tab of the rail; compact maps: it stays on the map, collapsed
+  useControlContainerMove(full ? control : null, layersControlTarget)
+
+  // compact maps without overlays (location picker, geo panel) show no control (the base map is in the top bar)
+  useEffect(() => {
+    control?.getContainer()?.classList.toggle(EMPTY_CONTROL_CLASS, !full && layers.length === 0)
+  }, [control, full, layers.length])
 
   // on layer add, set selected layer in map context
   useMapEvents({
     baselayerchange(event) {
+      // custom base maps are named by their key ("custom:<uuid>"), never matched against the built-in names
+      if (isCustomBaseLayerKey(event.name)) {
+        const customBaseLayerDef = findCustomBaseLayerDef({ controlName: event.name, customBaseLayerDefs })
+        if (customBaseLayerDef) onBaseLayerUpdate(customBaseLayerDef)
+        return
+      }
       const baseLayerDef = baseLayers.find((baseLayer) => baseLayer.name === event.name)
-      onBaseLayerUpdate(baseLayerDef)
+      if (baseLayerDef) onBaseLayerUpdate(baseLayerDef)
     },
   })
 
@@ -45,23 +70,29 @@ export const MapLayersControl = (props) => {
     [surveyId]
   )
 
-  // Equal Earth is experimental: hidden from the switcher unless EXPERIMENTAL_FEATURES is
-  // enabled, and never pre-selected as the default base layer even when visible.
-  const defaultBaseLayer = useMemo(
-    () => baseLayers.find((baseLayer) => baseLayer.type !== baseLayerTypes.maplibre) ?? baseLayers[0],
-    []
-  )
-
   const baseLayersControls = useMemo(() => {
+    const selectableBaseLayers = getSelectableBaseLayers({
+      baseLayers,
+      experimentalFeaturesEnabled: Boolean(experimentalFeaturesEnabled),
+      hasApiKey: (provider) => Boolean(User.getMapApiKey({ provider })(user)),
+    })
     const result = []
-    for (const baseLayer of baseLayers) {
-      const { key, apiKeyRequired, name, attribution, provider, maxZoom = 17, type, url, style } = baseLayer
+    for (const baseLayer of selectableBaseLayers) {
+      const {
+        key,
+        apiKeyRequired,
+        name,
+        attribution,
+        provider,
+        maxZoom = 17,
+        type,
+        url,
+        style,
+        crossOrigin = false,
+      } = baseLayer
 
-      if (type === baseLayerTypes.maplibre && !experimentalFeaturesEnabled) {
-        continue
-      }
-
-      const checked = (!contextBaseLayer && baseLayer === defaultBaseLayer) || contextBaseLayer?.name === name
+      // Equal Earth is never pre-selected (defaultBaseLayer skips it)
+      const checked = contextBaseLayer ? contextBaseLayer.key === key : baseLayer === defaultBaseLayer
 
       if (type === baseLayerTypes.maplibre) {
         result.push(
@@ -79,24 +110,44 @@ export const MapLayersControl = (props) => {
 
       result.push(
         <LayersControl.BaseLayer key={key} name={name} checked={checked}>
-          <TileLayer id={key} attribution={attribution} url={tileUrl} maxZoom={maxZoom} minZoom={MAP_MIN_ZOOM} />
+          <TileLayer
+            id={key}
+            attribution={attribution}
+            url={tileUrl}
+            maxZoom={maxZoom}
+            minZoom={MAP_MIN_ZOOM}
+            crossOrigin={crossOrigin ? 'anonymous' : undefined}
+          />
         </LayersControl.BaseLayer>
       )
     }
     return result
-  }, [contextBaseLayer, defaultBaseLayer, experimentalFeaturesEnabled, getTileUrl, user])
+  }, [contextBaseLayer, experimentalFeaturesEnabled, getTileUrl, user])
+
+  // custom WMS / WMTS / XYZ base maps: rendered apart from the built-in ones, without crossOrigin (their hosts may
+  // not send CORS headers)
+  const customBaseLayersControls = useMemo(
+    () =>
+      customBaseLayerDefs.map((def) => (
+        <LayersControl.BaseLayer key={def.key} name={def.name} checked={contextBaseLayer?.key === def.key}>
+          <CustomBaseLayer layer={def.custom} />
+        </LayersControl.BaseLayer>
+      )),
+    [contextBaseLayer, customBaseLayerDefs]
+  )
 
   const showGroupsInjector = baseLayersLabel || overlayGroups.length > 0
 
   return (
     <>
-      <LayersControl autoZIndex position="topright">
+      {/* collapsed is read only when the control is created; the variant of a map never changes */}
+      <LayersControl ref={setControl} autoZIndex position="topright" collapsed={!full}>
         {baseLayersControls}
-        <WmtsComponent />
+        {customBaseLayersControls}
         {layers}
       </LayersControl>
       {showGroupsInjector && (
-        <MapLayersGroupsInjector baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+        <MapLayersGroupsInjector control={control} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       )}
     </>
   )

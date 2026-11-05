@@ -24,6 +24,8 @@ const forEachFileInZip = async (file, callback) => {
   const fileNames = zip.files
   for (const fileName in fileNames) {
     const fileEntry = zip.file(fileName)
+    // directory entries have no file: skip them
+    if (!fileEntry || fileEntry.dir) continue
     fileCount++
     if (fileCount > MAX_FILES) {
       throw new Error('Reached max. number of files')
@@ -32,15 +34,12 @@ const forEachFileInZip = async (file, callback) => {
     if (isPathTraversal(fileEntry.name)) {
       throw new Error('Path traversal detected')
     }
-    zip
-      .file(fileEntry.name)
-      .async('nodebuffer')
-      .then(function (content) {
-        totalSize += content.length
-        if (totalSize > MAX_SIZE) {
-          throw new Error('Reached max. size')
-        }
-      })
+    // awaited, so that the limit is enforced before the callback
+    const content = await fileEntry.async('uint8array') // NOSONAR
+    totalSize += content.length
+    if (totalSize > MAX_SIZE) {
+      throw new Error('Reached max. size')
+    }
     await callback(fileName, fileEntry) // NOSONAR
   }
 }

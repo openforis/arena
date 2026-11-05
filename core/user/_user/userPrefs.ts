@@ -13,6 +13,7 @@ export const keysPrefs = {
   language: 'language',
   notifyOnUserAccessRequest: 'notifyOnUserAccessRequest',
   whatsNewSeenIds: 'whatsNewSeenIds',
+  mapCustomLayers: 'mapCustomLayers', // { [surveyId]: MapCustomLayer[] }, written only by the custom layers API
 } as const
 
 export const keysSurveyPrefs = {
