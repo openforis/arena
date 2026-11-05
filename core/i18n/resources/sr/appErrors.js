@@ -1,4 +1,19 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'URL servisa nije važeći',
+    urlNotAllowed: 'Mogu se koristiti samo javne http i https adrese',
+    hostNotFound: 'Host nije pronađen: {{host}}',
+    redirectNotFollowed: 'Servis preusmjerava na {{location}}: umjesto toga koristite taj URL',
+    responseTooLarge: 'Odgovor servisa je veći od {{limitMb}} MB',
+    timeout: 'Servis nije odgovorio u roku od {{seconds}} sekundi',
+    fetchFailed: 'Servis je odgovorio HTTP statusom {{status}}',
+    unreachable: 'Servis nije dostupan',
+    notCapabilities: 'Na ovom URL-u nisu pronađene WMS ili WMTS mogućnosti (capabilities)',
+    noLayers: 'Servis nema nijedan sloj koji se može prikazati',
+    invalidLayers: 'Slojevi mape nisu važeći',
+    tooManyLayers: 'Može se dodati najviše {{max}} prilagođenih slojeva mape',
+    busy: 'Server je zauzet učitavanjem drugih servisa: pokušajte ponovo za trenutak',
+  },
   cannotGetChild: `Nije moguće dobiti podređeni čvor '{{childName}}' iz atributa {{name}}`,
   cannotImportFilesExceedingQuota:
     'Nije moguće uvesti fajlove zapisa: kvota za skladištenje fajlova bi bila prekoračena',

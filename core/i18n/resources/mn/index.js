@@ -1,3 +1,4 @@
+import activityLog from './activityLog'
 import appErrors from './appErrors'
 import auth from './auth'
 import common from './common'
@@ -21,6 +22,7 @@ import validationErrors from './validationErrors'
 import whatsNew from './whatsNew'
 
 export default {
+  activityLog,
   appErrors,
   auth,
   common,

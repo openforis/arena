@@ -142,8 +142,6 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
     preloadedMapLayers: {
       enabledMessage: 'Couches de carte préchargées activées',
       title: 'Couches de carte préchargées',
-      fileName: 'Nom du fichier',
-      fileSize: 'Taille du fichier',
       confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette couche de carte préchargée ?',
       editor: {
         title: 'Couche de carte préchargée',

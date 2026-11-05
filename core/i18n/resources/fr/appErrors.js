@@ -68,6 +68,9 @@ export default {
   functionHasTooManyArguments: 'La fonction {{fnName}} accepte au maximum {{maxArity}} arguments (reçu {{numArgs}})',
   generic: 'Erreur inattendue : {{text}}',
   geoWhispApiError: 'Le service Whisp est temporairement indisponible.',
+  geoWhispSamplingPointDataCategoryMissing: "Catégorie de données de points d'échantillonnage introuvable.",
+  geoWhispSamplingPointDataLocationsMissing:
+    "Aucun élément de données de points d'échantillonnage avec une localisation valide n'a été trouvé.",
   importingDataIntoWrongCollectSurvey:
     'Importation de données dans le mauvais formulaire. URI attendu : {{collectSurveyUri}}',
   invalidType: 'Type invalide {{type}}',

@@ -63,6 +63,9 @@ export default {
   functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} (recebido {{numArgs}})',
   generic: 'Erro inesperado: {{text}}',
   geoWhispApiError: 'O serviço Whisp está temporariamente indisponível.',
+  geoWhispSamplingPointDataCategoryMissing: 'Categoria de dados de ponto amostral não encontrada.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'Nenhum item de dados de ponto amostral com localização válida foi encontrado.',
   importingDataIntoWrongCollectSurvey: 'Importando dados no inventário errado. URI esperada: {{collectSurveyUri}}',
   invalidType: 'Tipo inválido {{type}}',
   jobCanceledOrErrorsFound: 'Job cancelado ou erros encontrados; revertendo transação',

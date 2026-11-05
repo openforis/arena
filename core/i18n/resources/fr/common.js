@@ -1118,6 +1118,8 @@ $t(common.cantUndoWarning)`,
   itemsTable: {
     unused: 'Inutilisé',
     noItemsAdded: 'Aucun élément ajouté',
+    selectedItemsCount: '{{count}} élément sélectionné',
+    selectedItemsCount_other: '{{count}} éléments sélectionnés',
   },
   expression: {
     functionHasTooFewArguments: 'La fonction {{fnName}} nécessite au moins {{minArity}} arguments (reçu {{numArgs}})',
@@ -1133,6 +1135,8 @@ $t(common.cantUndoWarning)`,
     invalidTaxonVernacularNameLanguageCode:
       'Code de langue de nom vernaculaire de taxon invalide : {{vernacularLangCode}}',
     missingFunctionParameters: 'Paramètres de fonction manquants',
+    notSupported:
+      'Expression non prise en charge : vérifiez sa syntaxe (par ex. un opérateur manquant entre deux valeurs)',
     undefinedFunction: 'Fonction non définie : {{name}}',
   },
 

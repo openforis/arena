@@ -128,8 +128,6 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
     preloadedMapLayers: {
       enabledMessage: 'Capas de mapa precargadas habilitadas',
       title: 'Capas de mapa precargadas',
-      fileName: 'Nombre del archivo',
-      fileSize: 'Tamaño del archivo',
       confirmDelete: '¿Está seguro de que desea eliminar esta capa de mapa precargada?',
       editor: {
         title: 'Capa de mapa precargada',

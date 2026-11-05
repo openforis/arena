@@ -68,6 +68,9 @@ export default {
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
   geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
+  geoWhispSamplingPointDataCategoryMissing: 'No se encontró la categoría de datos de puntos de muestreo.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'No se encontró ningún elemento de datos de puntos de muestreo con una ubicación válida.',
   importingDataIntoWrongCollectSurvey:
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
   invalidType: 'Tipo no válido {{type}}',
