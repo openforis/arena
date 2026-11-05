@@ -63,7 +63,7 @@ export default class AllSurveysDataMigrationJob extends Job {
 
             if (innerJob.isSucceeded()) {
               this.logDebug(`data for survey ${surveyId} migrated successfully`)
-              await this.runStepsAfterCommit({ surveyId, appVersion })
+              await this.runStepsAfterCommit({ surveyId, appVersion }) // NOSONAR
               this.incrementProcessedItems()
             } else {
               surveyIdsWithErrors.push(surveyId)
