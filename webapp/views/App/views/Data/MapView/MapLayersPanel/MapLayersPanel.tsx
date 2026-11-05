@@ -16,6 +16,7 @@ import { SortOrder } from '@core/sortOrder'
 
 import { useMapWorkspace } from '@webapp/components/MapContainer/workspace/MapWorkspaceContext'
 import { useI18n } from '@webapp/store/system'
+import { themeColors, withAlpha } from '@webapp/theme/tokens'
 import {
   applySortOrder,
   type MapLayerPoint,
@@ -24,10 +25,7 @@ import {
   useMapLayersPanel,
 } from './MapLayersPanelContext'
 
-// Colors from SideBar: $blue #3885ca, $grey #e7e9ee, $greyBorder #d1d1dd, $black #2f3138
-const SIDEBAR_BLUE = '#3885ca'
-const SIDEBAR_GREY = '#e7e9ee'
-const SIDEBAR_BLACK = '#2f3138'
+const SUMMARY_HOVER_BG = `color-mix(in srgb, ${themeColors.secondaryContainer}, ${themeColors.primary} 10%)`
 
 const ITEM_HEIGHT = 36
 const OVERSCAN = 4
@@ -52,11 +50,11 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
       onClick={() => onClick(point)}
       sx={{
         height: ITEM_HEIGHT,
-        borderLeft: `3px solid ${isSelected ? SIDEBAR_BLUE : 'transparent'}`,
-        bgcolor: isSelected ? `rgba(56, 133, 202, 0.1)` : 'transparent',
+        borderLeft: `3px solid ${isSelected ? themeColors.primary : 'transparent'}`,
+        bgcolor: isSelected ? withAlpha(themeColors.primary, 0.1) : 'transparent',
         pl: isSelected ? 1.25 : 1.5,
         '&:hover': {
-          bgcolor: isSelected ? `rgba(56, 133, 202, 0.15)` : `rgba(56, 133, 202, 0.06)`,
+          bgcolor: withAlpha(themeColors.primary, isSelected ? 0.15 : 0.06),
         },
       }}
     >
@@ -68,7 +66,7 @@ const PointListItem: FC<PointListItemProps> = ({ point, isSelected, onClick }) =
             sx: {
               fontSize: '0.8rem',
               fontWeight: isSelected ? 600 : 400,
-              color: isSelected ? SIDEBAR_BLUE : SIDEBAR_BLACK,
+              color: isSelected ? themeColors.primary : themeColors.onSurface,
             },
           },
         }}
@@ -102,9 +100,9 @@ const SortButton: FC<SortButtonProps> = ({ sortOrder, onClick }) => {
           ml: 0.5,
           borderRadius: 1,
           gap: 0.25,
-          color: sortOrder === 'none' ? SIDEBAR_BLACK : SIDEBAR_BLUE,
+          color: sortOrder === 'none' ? themeColors.onSurface : themeColors.primary,
           opacity: sortOrder === 'none' ? 0.4 : 1,
-          '&:hover': { bgcolor: 'rgba(56, 133, 202, 0.12)', opacity: 1 },
+          '&:hover': { bgcolor: withAlpha(themeColors.primary, 0.12), opacity: 1 },
         }}
       >
         <span className={`icon icon-12px ${iconClass}`} />
@@ -223,28 +221,28 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
         overflow: 'hidden',
         listStyle: 'none',
         borderRadius: '0 !important',
-        borderBottom: `1px solid #d1d1dd`,
+        borderBottom: `1px solid ${themeColors.outline}`,
         '&:before': { display: 'none' },
       }}
     >
       <AccordionSummary
         expandIcon={isSingleLayer ? null : <span className="icon icon-12px icon-arrow-down" />}
         sx={{
-          bgcolor: SIDEBAR_GREY,
-          color: SIDEBAR_BLACK,
-          borderLeft: `3px solid ${SIDEBAR_BLUE}`,
+          bgcolor: themeColors.secondaryContainer,
+          color: themeColors.onSecondaryContainer,
+          borderLeft: `3px solid ${themeColors.primary}`,
           minHeight: '0 !important',
           px: 1.5,
           flexShrink: 0,
           '& .MuiAccordionSummary-content': { my: 0.75, flexDirection: 'column', gap: 0.25, mr: 0.5 },
-          ...(isSingleLayer ? { cursor: 'default', '&:hover': {} } : { '&:hover': { bgcolor: '#dde3ed' } }),
+          ...(isSingleLayer ? { cursor: 'default', '&:hover': {} } : { '&:hover': { bgcolor: SUMMARY_HOVER_BG } }),
         }}
       >
         <Typography variant="subtitle2" sx={{ fontWeight: 700, fontSize: '0.82rem', lineHeight: 1.3 }}>
           {layerName}
         </Typography>
         <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Typography variant="caption" sx={{ color: SIDEBAR_BLACK, opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
+          <Typography variant="caption" sx={{ color: 'inherit', opacity: 0.7, fontSize: '0.72rem', lineHeight: 1 }}>
             {i18n.t('dataView:mapView.layersPanel.markers', { count: points.length })}
           </Typography>
           <SortButton sortOrder={sortOrder} onClick={handleSortToggle} />
@@ -297,7 +295,7 @@ export const MapLayersPanel: FC = () => {
 
   if (activeLayers.length === 0) {
     return (
-      <Typography sx={{ p: 1.5, fontSize: '0.8rem', color: '#5d616b' }}>
+      <Typography sx={{ p: 1.5, fontSize: '0.8rem', color: themeColors.onSurfaceVariant }}>
         {i18n.t('mapWorkspace.rail.recordsEmpty')}
       </Typography>
     )

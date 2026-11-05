@@ -69,6 +69,18 @@ export const themeColors = Object.fromEntries(
   colorTokens.map((token) => [token, `var(--color-${toKebabCase(token)})`])
 ) as ArenaPalette
 
+/**
+ * Returns the color with the given opacity; works with CSS variables too (e.g. theme colors).
+ *
+ * @param {string} color - CSS color or CSS variable reference.
+ * @param {number} alpha - Opacity from 0 to 1.
+ * @returns {string} The CSS color expression.
+ */
+export const withAlpha = (color: string, alpha: number): string => {
+  const percent = Math.round(Math.min(1, Math.max(0, alpha)) * 100)
+  return `color-mix(in srgb, ${color} ${percent}%, transparent)`
+}
+
 export const defaultTokens = {
   typography: {
     fontFamily: "'Noto Sans', sans-serif",

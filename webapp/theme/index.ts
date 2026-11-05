@@ -1,4 +1,4 @@
-export { defaultTokens, themeColors, themeModes, themePalettes } from './tokens'
+export { defaultTokens, themeColors, themeModes, themePalettes, withAlpha } from './tokens'
 export type { ArenaPalette, ThemeMode } from './tokens'
 export { createArenaTheme } from './createArenaTheme'
 export { applyCssVars, buildCssVarMap } from './applyCssVars'
