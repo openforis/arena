@@ -1,7 +1,5 @@
 import './GuestToolbar.scss'
 
-import React from 'react'
-
 import { ThemeButtonMenu } from '@webapp/components/ThemeButtonMenu'
 
 import { GuestLanguageButtonMenu } from './GuestLanguageButtonMenu'

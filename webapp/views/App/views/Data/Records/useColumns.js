@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'

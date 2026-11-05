@@ -1,5 +1,5 @@
 import './AnalysisNodeDefs.scss'
-import React, { useRef, useMemo, useState } from 'react'
+import { useRef, useMemo, useState } from 'react'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'

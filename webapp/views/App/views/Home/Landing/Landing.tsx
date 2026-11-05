@@ -1,6 +1,5 @@
 import './Landing.scss'
 
-import React from 'react'
 import classNames from 'classnames'
 import { useNavigate } from 'react-router'
 

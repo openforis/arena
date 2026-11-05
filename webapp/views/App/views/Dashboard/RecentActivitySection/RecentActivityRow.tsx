@@ -1,5 +1,3 @@
-import React from 'react'
-
 import * as DateUtils from '@core/dateUtils'
 
 import Markdown from '@webapp/components/markdown'

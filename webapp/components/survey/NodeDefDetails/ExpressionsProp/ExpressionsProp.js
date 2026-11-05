@@ -1,6 +1,6 @@
 import './ExpressionsProp.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import * as A from '@core/arena'

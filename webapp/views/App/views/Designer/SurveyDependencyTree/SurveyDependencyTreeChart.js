@@ -1,4 +1,4 @@
-import React, { forwardRef, useCallback, useEffect } from 'react'
+import { forwardRef, useCallback, useEffect } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'

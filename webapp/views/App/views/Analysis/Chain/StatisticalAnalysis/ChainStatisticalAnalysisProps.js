@@ -1,6 +1,6 @@
 import './ChainStatisticalAnalysis.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Chain from '@common/analysis/chain'

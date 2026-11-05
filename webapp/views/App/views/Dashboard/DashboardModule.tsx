@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { appModules } from '@webapp/app/appModules'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 

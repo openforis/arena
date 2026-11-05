@@ -1,6 +1,6 @@
 import './Records.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'

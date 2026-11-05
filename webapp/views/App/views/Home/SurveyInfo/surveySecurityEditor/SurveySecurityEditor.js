@@ -1,6 +1,6 @@
 import './SurveySecurityEditor.scss'
 
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'

@@ -1,7 +1,5 @@
 import './RecordsSummaryPeriodSelector.scss'
 
-import React from 'react'
-
 import * as DateUtils from '@core/dateUtils'
 
 import { useI18n } from '@webapp/store/system'

@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { useI18n } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'

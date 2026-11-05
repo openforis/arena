@@ -1,6 +1,6 @@
 import './DataQueryExportModal.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 

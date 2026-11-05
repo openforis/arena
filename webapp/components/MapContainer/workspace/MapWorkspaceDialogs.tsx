@@ -1,4 +1,3 @@
-import React from 'react'
 import type { ComponentType, ReactElement } from 'react'
 
 import { WmsDialog } from './customLayers/wms/WmsDialog'

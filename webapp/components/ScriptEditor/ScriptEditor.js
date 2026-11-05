@@ -1,6 +1,6 @@
 import './ScriptEditor.scss'
 
-import React, { useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import AceEditor from 'react-ace'

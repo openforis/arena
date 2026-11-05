@@ -1,5 +1,5 @@
 import './AnalysisNodeDef.scss'
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { Link } from 'react-router'
 import PropTypes from 'prop-types'

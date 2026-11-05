@@ -1,4 +1,4 @@
-import React, { type ReactNode, useCallback } from 'react'
+import { type ReactNode, useCallback } from 'react'
 
 import { useMapCustomLayers } from '@webapp/components/MapContainer/workspace/customLayers/MapCustomLayersContext'
 import { useMapBaseLayerApi } from '@webapp/components/MapContainer/workspace/customLayers/useMapBaseLayerApi'

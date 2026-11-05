@@ -1,6 +1,6 @@
 import './itemDetails.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
 import ErrorRounded from '@mui/icons-material/ErrorRounded'

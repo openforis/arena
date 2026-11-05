@@ -1,7 +1,7 @@
 import '../aiTextarea.scss'
 import './AiExpressionPopup.scss'
 
-import React, { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'

@@ -1,6 +1,6 @@
 import './AiActivityLogSummaryModal.scss'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'

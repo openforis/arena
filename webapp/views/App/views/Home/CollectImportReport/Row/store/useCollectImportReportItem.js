@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 import { useI18n } from '@webapp/store/system'

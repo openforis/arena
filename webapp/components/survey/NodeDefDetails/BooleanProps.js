@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'

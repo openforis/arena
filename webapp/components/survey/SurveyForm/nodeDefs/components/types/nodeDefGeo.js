@@ -2,7 +2,7 @@ import './nodeDefGeo.scss'
 
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import * as Node from '@core/record/node'

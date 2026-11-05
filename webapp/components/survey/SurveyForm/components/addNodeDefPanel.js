@@ -1,6 +1,6 @@
 import './addNodeDefPanel.scss'
 
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { connect } from 'react-redux'
 import { useNavigate } from 'react-router'
 

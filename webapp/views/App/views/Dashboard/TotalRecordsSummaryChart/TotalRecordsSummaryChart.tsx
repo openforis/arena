@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import { Area, CartesianGrid, Line, LineChart as ReChartsLineChart, Tooltip, XAxis, YAxis } from 'recharts'
 
 import { convertDateFromISOToDisplay } from '@core/dateUtils'

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Box } from '@mui/material'
 import type { ArenaRecord } from '@openforis/arena-core'
 

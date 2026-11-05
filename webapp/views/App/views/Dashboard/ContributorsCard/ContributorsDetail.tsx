@@ -1,7 +1,5 @@
 import './ContributorsCard.scss'
 
-import React from 'react'
-
 import { useI18n } from '@webapp/store/system'
 
 import { filterActiveContributors, UserCountRow } from '../utils/filterActiveContributors'

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import type { ReactElement } from 'react'
 import type { Map as LeafletMap } from 'leaflet'
 import { useMap, useMapEvents } from 'react-leaflet'

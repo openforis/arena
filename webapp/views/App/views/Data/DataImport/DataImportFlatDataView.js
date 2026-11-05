@@ -1,6 +1,6 @@
 import './DataImportFlatDataView.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import { Objects, UUIDs } from '@openforis/arena-core'
