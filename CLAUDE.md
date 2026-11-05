@@ -71,7 +71,7 @@ Server modules follow a layered architecture:
 - `manager/` - Higher-level coordination across services
 
 **State Management:**
-Frontend uses Redux Toolkit with slices in `webapp/store/`. Each feature area has its own slice (survey, record, user, etc.).
+Frontend uses a Redux store in `webapp/store/` (created with Redux Toolkit's `configureStore`). Each feature area (survey, record, user, etc.) has its own folder with actions, reducer, state and hooks; only `dataExplorer` uses `createSlice`. See `docs/webapp-conventions.md`.
 
 **Database:**
 
