@@ -74,3 +74,9 @@
     opacity: 1;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .panel-right {
+    animation: none;
+  }
+}

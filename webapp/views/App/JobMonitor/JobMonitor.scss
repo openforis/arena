@@ -84,6 +84,10 @@
 
           &.icon-spinner {
             animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
+
+            @media (prefers-reduced-motion: reduce) {
+              animation-duration: 3s;
+            }
           }
         }
       }
