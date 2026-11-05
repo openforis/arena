@@ -195,8 +195,9 @@ const LayerAccordion: FC<LayerAccordionProps> = ({
 
   const handleItemClick = useCallback(
     (point: MapLayerPoint) => {
-      onSelect(point.properties.key)
+      // flying closes the open popup, which deselects its point: select afterwards
       onItemClick(point)
+      onSelect(point.properties.key)
     },
     [onItemClick, onSelect]
   )

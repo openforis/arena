@@ -49,6 +49,7 @@ export const selectRecordCandidate = ({
   const layer = activeLayers.find((activeLayer) => activeLayer.key === layerKey)
   const point = layer?.points.find((layerPoint) => layerPoint.properties.key === pointKey)
   if (!layer || !point) return
-  selectPoint(pointKey)
+  // flying closes the open popup, which deselects its point: select afterwards
   layer.flyToPoint(point)
+  selectPoint(pointKey)
 }
