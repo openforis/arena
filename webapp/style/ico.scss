@@ -5,8 +5,8 @@
   src: url('/img/IcoMoon-Free.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
-  // icons must not be rendered with a fallback font (ligature names would be shown)
-  font-display: block;
+  // same-origin font: at most a brief blank glyph before it is loaded
+  font-display: swap;
 }
 
 .icon {

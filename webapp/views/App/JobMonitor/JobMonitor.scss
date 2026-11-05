@@ -9,6 +9,17 @@
   }
 }
 
+// reduced motion: fade the spinner instead of rotating it
+@keyframes app-job-monitor-inner-job-spinner-fade {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .app-job-monitor {
   .modal-body {
     padding-top: 0;
@@ -86,7 +97,7 @@
             animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
 
             @media (prefers-reduced-motion: reduce) {
-              animation-duration: 3s;
+              animation-name: app-job-monitor-inner-job-spinner-fade;
             }
           }
         }
