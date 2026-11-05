@@ -17,7 +17,8 @@ import { DbOrder } from '@server/db'
 // the custom map layers (they may hold URL tokens) are served only by the custom layers API: never select them,
 // otherwise the users list would send them to the other members of a survey
 const prefsField = `u.prefs - '${User.keysPrefs.mapCustomLayers}' AS prefs`
-const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status']
+const hasProfilePictureField = 'u.profile_picture IS NOT NULL AS has_profile_picture'
+const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status', hasProfilePictureField]
 const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
@@ -279,7 +280,7 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
 export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
   client.one(
     `
-    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture, u.password
+    SELECT ${columnsCommaSeparated}, u.password
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
@@ -289,7 +290,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
 export const fetchUserByUuid = async (uuid, client = db) =>
   client.oneOrNone(
     `
-    SELECT ${columnsCommaSeparated}, u.profile_picture IS NOT NULL as has_profile_picture
+    SELECT ${columnsCommaSeparated}
     FROM "user" u
     WHERE u.uuid = $1`,
     [uuid],
