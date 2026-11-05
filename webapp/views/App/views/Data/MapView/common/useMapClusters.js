@@ -1,7 +1,7 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import L from 'leaflet'
 import { useMap } from 'react-leaflet'
-import useSupercluster from 'use-supercluster'
+import Supercluster from 'supercluster'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -66,12 +66,17 @@ export const useMapClusters = (props) => {
     }
   }, [map, onMove])
 
-  const { clusters, supercluster } = useSupercluster({
-    points,
-    bounds,
-    zoom,
-    options: { radius: clusterRadius, maxZoom: clusterMaxZoom },
-  })
+  // index built only when the points change (use-supercluster rebuilt it on every map move)
+  const supercluster = useMemo(() => {
+    const index = new Supercluster({ radius: clusterRadius, maxZoom: clusterMaxZoom })
+    index.load(points)
+    return index
+  }, [points])
+
+  const clusters = useMemo(
+    () => (bounds ? supercluster.getClusters(bounds, Math.round(zoom)) : []),
+    [bounds, supercluster, zoom]
+  )
 
   const getClusterLeaves = useCallback(
     (cluster) => {

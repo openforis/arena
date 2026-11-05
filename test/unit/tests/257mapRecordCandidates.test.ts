@@ -32,6 +32,8 @@ describe('Map record candidates (257)', () => {
     expect(selectPoint).toHaveBeenCalledWith('k1')
     expect(layers[1].flyToPoint).toHaveBeenCalledWith(layers[1].points[0])
     expect(layers[0].flyToPoint).not.toHaveBeenCalled()
+    // flying closes the open popup (deselecting its point): the selection must come after
+    expect(selectPoint.mock.invocationCallOrder[0]).toBeGreaterThan(layers[1].flyToPoint.mock.invocationCallOrder[0])
   })
 
   test('an unknown candidate does nothing', () => {

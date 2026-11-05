@@ -9,6 +9,27 @@
   width: 100%;
 }
 
+@keyframes map-view-fly-to-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// Leaflet positions the marker with a transform: the inner icon spins
+.map-view__fly-to-loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background-color: $colorSurface;
+  color: $colorPrimary;
+  box-shadow: $shadow1;
+
+  .icon {
+    animation: map-view-fly-to-loader-spin 1s linear infinite;
+  }
+}
+
 .map-wrapper {
   .leaflet-container {
     .cluster-marker__clustered-points-popup {
