@@ -78,6 +78,9 @@ const mapPoint = async (page: Page, dx: number, dy: number): Promise<{ x: number
 }
 
 test.describe('Map Sentinel-2 scenes', () => {
+  // the Imagery menu and the Sentinel-2 tab are experimental features
+  test.use({ experimentalFeatures: true })
+
   test('opens from the Imagery menu with the default filters, before Legend', async ({ page, sampleSurvey: _ }) => {
     const { aborted } = await blockSceneIndex(page)
     await openMap(page)

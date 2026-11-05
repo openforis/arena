@@ -1,5 +1,7 @@
 import type { ReactElement } from 'react'
 
+import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+
 import { useMapWorkspace } from '../MapWorkspaceContext'
 import type { MapWorkspaceRecords } from '../mapWorkspaceTypes'
 import { MapSearchBox } from '../search/MapSearchBox'
@@ -12,7 +14,8 @@ import { MapQuickButtons } from './MapQuickButtons'
 import { ToolsMenu } from './ToolsMenu'
 
 /**
- * Content of the top bar. Full: Base map, Add data, Display, Imagery, Tools, quick buttons, search.
+ * Content of the top bar. Full: Base map, Add data, Display, Imagery (Sentinel-2, experimental), Tools, quick buttons,
+ * search.
  * Compact: Base map, Display, measure distance, search (coordinates only).
  * @param {object} props - Component props.
  * @param {string|null} props.hint - Hint shown after the buttons (e.g. how to move the marker in the picker).
@@ -31,12 +34,13 @@ export const MapToolbar = ({
 }): ReactElement => {
   const { variant } = useMapWorkspace()
   const full = variant === 'full'
+  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   return (
     <>
       <BaseMapMenu />
       {full && <AddDataMenu />}
       <DisplayMenu />
-      {full && <ImageryMenu />}
+      {full && experimentalFeatures && <ImageryMenu />}
       {full && <ToolsMenu />}
       <span className="map-toolbar__separator" aria-hidden="true" />
       <MapQuickButtons fullScreen={fullScreen} />

@@ -315,12 +315,16 @@ test.describe('Map workspace', () => {
     await page.keyboard.press('Escape')
   })
 
-  test('the Imagery menu offers the Sentinel-2 search without Planet periods', async ({ page, sampleSurvey: _ }) => {
-    await openMap(page)
-    await page.getByTestId(ids.menuButton('imagery')).click()
-    await expect(page.getByTestId(ids.menuItem('searchScenes'))).toBeVisible()
-    await page.keyboard.press('Escape')
-    await expect(page.getByRole('menu')).toHaveCount(0)
+  test.describe('with the experimental features', () => {
+    test.use({ experimentalFeatures: true })
+
+    test('the Imagery menu offers the Sentinel-2 search without Planet periods', async ({ page, sampleSurvey: _ }) => {
+      await openMap(page)
+      await page.getByTestId(ids.menuButton('imagery')).click()
+      await expect(page.getByTestId(ids.menuItem('searchScenes'))).toBeVisible()
+      await page.keyboard.press('Escape')
+      await expect(page.getByRole('menu')).toHaveCount(0)
+    })
   })
 
   test('the Records tab lists the records of the shown layers and goes to one', async ({ page, sampleSurvey: _ }) => {
@@ -333,6 +337,51 @@ test.describe('Map workspace', () => {
     const rail = page.getByTestId(ids.rail)
     await rail.getByRole('button', { name: '2', exact: true }).click()
     await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
+  })
+
+  test.describe('without the experimental features', () => {
+    // what every user sees (the source of the "What's new" image)
+    test.use({ experimentalFeatures: false })
+
+    test('has no Imagery menu and no Sentinel-2 tab', async ({ page, sampleSurvey: _ }) => {
+      await openMap(page)
+      await expect(page.getByTestId(ids.menuButton('tools'))).toBeVisible()
+      await expect(page.getByTestId(ids.menuButton('imagery'))).toHaveCount(0)
+      await expect(page.getByTestId(ids.railTab('legend'))).toBeVisible()
+      await expect(page.getByTestId(ids.railTab('scenes'))).toHaveCount(0)
+    })
+
+    test('shows the record chosen in the Records tab on the satellite imagery, with its popup', async ({
+      page,
+      sampleSurvey: _,
+    }, testInfo) => {
+      await openMap(page)
+      await page.getByTestId(ids.menuButton('baseMap')).click()
+      await page.getByTestId(ids.menuItem('baseMap-ESRI World Imagery')).click()
+      await expect(page.getByRole('menu')).toHaveCount(0)
+      await expect(page.locator('.leaflet-tile-pane img.leaflet-tile[src*="World_Imagery"]').first()).toBeAttached()
+
+      await overlayCheckbox(page, COORDINATE_LAYER).check()
+      await page.getByTestId(ids.railTab('records')).click()
+      const rail = page.getByTestId(ids.rail)
+      await expect(rail.getByText('3 markers')).toBeVisible()
+      await rail.getByRole('button', { name: '2', exact: true }).click()
+
+      const popup = page.locator('.leaflet-popup')
+      await expect(popup).toContainText('Cluster[2]')
+      await expect(popup.getByRole('button', { name: 'Edit record' })).toBeVisible()
+      await expect(page.getByTestId(ids.statusBar)).toContainText('1 record in view')
+
+      // screenshot in the report: tiles from the internet may be slow or missing
+      await page
+        .locator('.leaflet-tile-pane img.leaflet-tile-loaded')
+        .first()
+        .waitFor({ timeout: PREVIEW_TIMEOUT })
+        .catch(() => undefined)
+      await expect(popup).toBeVisible()
+      const screenshot = await page.screenshot({ style: '.ai-chatbot-fab { display: none; }' })
+      await testInfo.attach('map-workspace', { body: screenshot, contentType: 'image/png' })
+    })
   })
 
   test('search finds the records of the shown layers by key', async ({ page, sampleSurvey: _ }) => {
