@@ -18,6 +18,13 @@ import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDef
 import { useColumn } from './store'
 import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
+/**
+ * Returns the node def field (e.g. code, label) shown in the specified view column.
+ * @param {object} params - Parameters.
+ * @param {string} params.columnName - View column name.
+ * @param {object} params.nodeDef - Node definition.
+ * @returns {string} The field name.
+ */
 const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
   if (columnName === NodeDef.getName(nodeDef)) {
     if (NodeDef.isTaxon(nodeDef) || NodeDef.isCode(nodeDef)) {
