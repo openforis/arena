@@ -48,22 +48,8 @@ const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionE
     { pattern: '/', replace: '.' },
     // boolean values: true, true(), TRUE or TRUE(), false, false(), FALSE or FALSE()
     {
-      pattern: /([\s|=]*)((true|false)(\(\))?)([\s|=]*)/,
-      replace: (_match, p1, p2, _p3, _p4, p5) => {
-        const parts = []
-
-        // p1: start
-        if (p1 !== undefined) parts.push(p1)
-
-        // p2: true or false value
-        const replaceValue = String(p2.toLowerCase().startsWith('true'))
-        parts.push(replaceValue)
-
-        // p5: end
-        if (p5 !== undefined) parts.push(p5)
-
-        return parts.join('')
-      },
+      pattern: /(true|false)(\(\))?/,
+      replace: (_match, value) => value.toLowerCase(),
       ignoreCase: true,
     },
     // object conversion
