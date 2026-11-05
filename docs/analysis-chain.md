@@ -40,6 +40,7 @@ API. This document explains the pieces of a chain, that round trip, and where ea
   reporting method and area, non-response bias correction, clustering-only variances) are only used by
   the statistical analysis step. The base unit also drives the auto-generated `weight` and plot area
   attributes: see [sampling-plot-area-node-defs.md](sampling-plot-area-node-defs.md).
+
 - **Cycles**: a chain is not tied to a cycle. Analysis attributes get all the survey cycles (on creation
   and again on every publish). The R project is generated for the cycle selected in the UI, and data are
   read and results written for that cycle only.
