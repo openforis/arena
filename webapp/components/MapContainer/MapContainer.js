@@ -167,6 +167,6 @@ MapContainer.propTypes = {
   markerTitle: PropTypes.string,
   onMarkerPointChange: PropTypes.func,
   overlayGroups: PropTypes.array,
-  records: PropTypes.shape({ candidates: PropTypes.array.isRequired, onSelect: PropTypes.func.isRequired }),
+  records: PropTypes.shape({ candidates: PropTypes.array, onSelect: PropTypes.func }),
   variant: PropTypes.oneOf(['full', 'compact']),
 }
