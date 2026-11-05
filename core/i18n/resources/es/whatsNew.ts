@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    areaOfInterest: {
+      title: 'Áreas de interés: comprobar si una ubicación está dentro de un área',
+      description: `En **Información de la encuesta → Mapa**, agregue una o más **áreas de interés** (p. ej. los municipios de un área piloto), cada una con un nombre y un polígono en formato GeoJSON.
+
+La nueva función de expresión \`geoDistanceToAOIBoundary(location, 'area_name')\` devuelve la distancia en metros entre una ubicación y el límite del área: negativa dentro, positiva fuera. Compárela con la precisión GPS (\`location.accuracy\`) para clasificar las ubicaciones como dentro, fuera o inciertas, por ejemplo en valores por defecto de atributos de solo lectura y en reglas de validación con severidad *advertencia*. \`geoAOIContaining(location)\` devuelve el nombre del área que contiene la ubicación. Ambas funcionan también sin conexión en **Arena Mobile**.
+
+Gracias a **[ASSEDEV Alerte Environnement](https://assedev.fr)** por la solicitud.`,
+    },
     mapWorkspace: {
       title: `Un nuevo espacio de trabajo del mapa`,
       description: `**Datos > Mapa** tiene un nuevo diseño: arriba, los menús **Mapa base**, **Añadir datos**, **Visualización** y **Herramientas** y un cuadro de búsqueda de coordenadas y claves de registros; al lado, las pestañas **Capas**, **Registros** y **Leyenda**; abajo, una barra de estado con las coordenadas del puntero y la escala.
@@ -17,14 +25,6 @@ Recorra los registros en el mapa, añada sus propios archivos (KML, Shapefile, G
       description: `En **Datos > Explorador**, seleccione una entidad múltiple (p. ej. las especies de cada registro), haga clic en **Exportar** y elija **Exportar como: Matriz de datos** para obtener una tabla con una fila por especie (o cualquier otro atributo) y una columna por registro, con el valor que elija en las celdas (p. ej. cobertura).
 
 Es el formato que necesitan las herramientas de análisis de vegetación como **Turboveg**, **Juice** y **Synbiosys**. Defina un filtro en el Explorador para exportar solo algunos registros.`,
-    },
-    areaOfInterest: {
-      title: 'Áreas de interés: comprobar si una ubicación está dentro de un área',
-      description: `En **Información de la encuesta → Mapa**, agregue una o más **áreas de interés** (p. ej. los municipios de un área piloto), cada una con un nombre y un polígono en formato GeoJSON.
-
-La nueva función de expresión \`geoDistanceToAOIBoundary(location, 'area_name')\` devuelve la distancia en metros entre una ubicación y el límite del área: negativa dentro, positiva fuera. Compárela con la precisión GPS (\`location.accuracy\`) para clasificar las ubicaciones como dentro, fuera o inciertas, por ejemplo en valores por defecto de atributos de solo lectura y en reglas de validación con severidad *advertencia*. \`geoAOIContaining(location)\` devuelve el nombre del área que contiene la ubicación. Ambas funcionan también sin conexión en **Arena Mobile**.
-
-Gracias a **[ASSEDEV Alerte Environnement](https://assedev.fr)** por la solicitud.`,
     },
     mobilePreview: {
       title: 'Vista previa de la encuesta en Arena Mobile',

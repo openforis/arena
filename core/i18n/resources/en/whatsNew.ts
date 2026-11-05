@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    areaOfInterest: {
+      title: 'Areas of interest: check if a location is inside an area',
+      description: `In **Survey info → Map**, add one or more **areas of interest** (e.g. the municipalities of a pilot area), each with a name and a polygon in GeoJSON format.
+
+The new expression function \`geoDistanceToAOIBoundary(location, 'area_name')\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. \`geoAOIContaining(location)\` returns the name of the area containing the location. Both work offline in **Arena Mobile** too.
+
+Thanks to **[ASSEDEV Alerte Environnement](https://assedev.fr)** for the request.`,
+    },
     mapWorkspace: {
       title: 'A new map workspace',
       description: `**Data > Map** has a new layout: the **Base map**, **Add data**, **Display** and **Tools** menus and a search box for coordinates and record keys at the top, the **Layers**, **Records** and **Legend** tabs on the side, and a status bar with the pointer coordinates and the scale.
@@ -17,14 +25,6 @@ Go through the records on the map, add your own files (KML, Shapefile, GeoJSON) 
       description: `In **Data > Explorer**, select a multiple entity (e.g. the species of each record), click **Export** and choose **Export as: Data matrix** to get a table with one row per species (or any other attribute) and one column per record, with the value you choose in the cells (e.g. cover).
 
 This is the format needed by vegetation analysis tools such as **Turboveg**, **Juice** and **Synbiosys**. Set a filter in the Explorer to export only some of the records.`,
-    },
-    areaOfInterest: {
-      title: 'Areas of interest: check if a location is inside an area',
-      description: `In **Survey info → Map**, add one or more **areas of interest** (e.g. the municipalities of a pilot area), each with a name and a polygon in GeoJSON format.
-
-The new expression function \`geoDistanceToAOIBoundary(location, 'area_name')\` returns the distance in meters between a location and the boundary of the area: negative inside, positive outside. Compare it with the GPS accuracy (\`location.accuracy\`) to classify locations as inside, outside or uncertain, e.g. in default values of read-only attributes and in validation rules with severity *warning*. \`geoAOIContaining(location)\` returns the name of the area containing the location. Both work offline in **Arena Mobile** too.
-
-Thanks to **[ASSEDEV Alerte Environnement](https://assedev.fr)** for the request.`,
     },
     mobilePreview: {
       title: 'Preview the survey in Arena Mobile',

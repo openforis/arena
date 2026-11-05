@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    areaOfInterest: {
+      title: 'Područja od interesa: provera da li je lokacija unutar područja',
+      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu.
+
+Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. \`geoAOIContaining(location)\` vraća naziv područja koje sadrži lokaciju. Obe rade i oflajn u **Arena Mobile**.
+
+Hvala **[ASSEDEV Alerte Environnement](https://assedev.fr)** na zahtevu.`,
+    },
     mapWorkspace: {
       title: `Novi radni prostor mape`,
       description: `**Podaci > Mapa** ima novi raspored: na vrhu menije **Osnovna mapa**, **Dodaj podatke**, **Prikaz** i **Alati** i polje za pretragu koordinata i ključeva zapisa, sa strane kartice **Slojevi**, **Zapisi** i **Legenda**, a na dnu statusnu traku sa koordinatama pokazivača i razmerom.
@@ -17,14 +25,6 @@ Pregledajte zapise na mapi jedan za drugim, dodajte sopstvene datoteke (KML, Sha
       description: `U **Podaci > Istraživač podataka** izaberite višestruki entitet (npr. vrste svakog zapisa), kliknite na **Izvezi** i izaberite **Izvezi kao: Matrica podataka** da dobijete tabelu sa jednim redom po vrsti (ili drugom atributu) i jednom kolonom po zapisu, sa vrednošću koju izaberete u ćelijama (npr. pokrovnost).
 
 Ovo je format koji zahtevaju alati za analizu vegetacije kao što su **Turboveg**, **Juice** i **Synbiosys**. Postavite filter u Istraživaču podataka da biste izvezli samo neke zapise.`,
-    },
-    areaOfInterest: {
-      title: 'Područja od interesa: provera da li je lokacija unutar područja',
-      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu.
-
-Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. \`geoAOIContaining(location)\` vraća naziv područja koje sadrži lokaciju. Obe rade i oflajn u **Arena Mobile**.
-
-Hvala **[ASSEDEV Alerte Environnement](https://assedev.fr)** na zahtevu.`,
     },
     mobilePreview: {
       title: 'Pregled istraživanja u aplikaciji Arena Mobile',
