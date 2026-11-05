@@ -9,6 +9,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as NodeDefLayoutUpdater from '@core/survey/nodeDefLayoutUpdater'
 
 import * as ObjectUtils from '@core/objectUtils'
+import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -430,18 +431,36 @@ export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, clie
 
     const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    let nodeDefUpdated = NodeDef.convertToType({ toType })(nodeDef)
+    if (!NodeDef.getConvertibleTypes(nodeDef).includes(toType)) {
+      throw new SystemError('nodeDefConversionNotAllowed', { name: NodeDef.getName(nodeDef), toType })
+    }
 
-    nodeDefUpdated = await NodeDefRepository.updateNodeDefTypeAndProps(
-      {
-        surveyId,
-        nodeDefUuid,
-        type: toType,
-        props: NodeDef.getProps(nodeDefUpdated),
-        propsAdvanced: NodeDef.getPropsAdvanced(nodeDefUpdated),
-      },
-      t
-    )
+    let nodeDefUpdated
+    if (NodeDef.isPublished(nodeDef)) {
+      // props are kept; validations in the draft make the survey publish re-validate the records
+      await NodeDefRepository.updateNodeDefType({ surveyId, nodeDefUuid, type: toType }, t)
+      nodeDefUpdated = await NodeDefRepository.updateNodeDefProps(
+        {
+          surveyId,
+          nodeDefUuid,
+          parentUuid: NodeDef.getParentUuid(nodeDef),
+          propsAdvanced: { [NodeDef.keysPropsAdvanced.validations]: NodeDef.getValidations(nodeDef) },
+        },
+        t
+      )
+    } else {
+      const nodeDefConverted = NodeDef.convertToType({ toType })(nodeDef)
+      nodeDefUpdated = await NodeDefRepository.updateNodeDefTypeAndProps(
+        {
+          surveyId,
+          nodeDefUuid,
+          type: toType,
+          props: NodeDef.getProps(nodeDefConverted),
+          propsAdvanced: NodeDef.getPropsAdvanced(nodeDefConverted),
+        },
+        t
+      )
+    }
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeDefConversion, nodeDefUpdated, false, t)
 
     await markSurveyDraft(surveyId, t)

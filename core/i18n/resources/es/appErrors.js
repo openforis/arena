@@ -82,6 +82,7 @@ export default {
   undefinedFunction: "Función indefinida '{{fnName}}' o tipos de parámetros incorrectos",
   invalidSyntax: 'La sintaxis de la expresión no es válida',
   networkError: 'Error de comunicación con el servidor',
+  nodeDefConversionNotAllowed: `'{{name}}' no se puede convertir en {{toType}}`,
   record: {
     errorUpdating: 'Error al actualizar el registro',
     entityNotFound: 'Entidad "{{entityName}}" con claves "{{keyValues}}" no encontrada',

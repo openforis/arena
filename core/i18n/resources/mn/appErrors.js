@@ -77,6 +77,7 @@ export default {
   undefinedFunction: "Тодорхойлогдоогүй функц '{{fnName}}' эсвэл буруу параметрийн төрлүүд",
   invalidSyntax: 'Илэрхийллийн синтакс буруу байна',
   networkError: 'Сервертэй холбогдоход алдаа гарлаа',
+  nodeDefConversionNotAllowed: `'{{name}}'-г {{toType}}-д хөрвүүлэх боломжгүй`,
   record: {
     errorUpdating: 'Бичлэг шинэчлэхэд алдаа гарлаа',
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',

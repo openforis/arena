@@ -64,6 +64,7 @@ export default {
   undefinedFunction: `Undefined function '{{fnName}}' or wrong parameter types`,
   invalidSyntax: 'Expression syntax is invalid',
   networkError: 'Error communicating with the server',
+  nodeDefConversionNotAllowed: `'{{name}}' cannot be converted to {{toType}}`,
   record: {
     errorUpdating: 'Error updating record',
     entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',

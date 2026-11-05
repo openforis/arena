@@ -82,6 +82,7 @@ export default {
   undefinedFunction: `Fonction '{{fnName}}' non définie ou types de paramètres incorrects`,
   invalidSyntax: "La syntaxe de l'expression est invalide",
   networkError: 'Erreur de communication avec le serveur',
+  nodeDefConversionNotAllowed: `'{{name}}' ne peut pas être converti en {{toType}}`,
   record: {
     errorUpdating: "Erreur lors de la mise à jour de l'enregistrement",
     entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',
