@@ -880,6 +880,7 @@ export default {
     },
     acceptedBy: 'Принято',
     dateAccepted: 'Дата принятия',
+    createdSurvey: 'Созданный опрос',
     acceptRequest: {
       accept: 'Принять',
       acceptRequestAndCreateSurvey: 'Принять запрос и создать опрос',

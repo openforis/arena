@@ -840,6 +840,7 @@ Pokušati ponovo?`,
     },
     acceptedBy: 'Prihvatio',
     dateAccepted: 'Datum prihvatanja',
+    createdSurvey: 'Kreirano istraživanje',
     acceptRequest: {
       accept: 'Prihvati',
       acceptRequestAndCreateSurvey: 'Prihvati zahtjev i kreiraj istraživanje',

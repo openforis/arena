@@ -804,6 +804,7 @@ export default {
     },
     acceptedBy: '承認者',
     dateAccepted: '承認日',
+    createdSurvey: '作成された調査',
     acceptRequest: {
       accept: '承認',
       acceptRequestAndCreateSurvey: '申請を承認して調査を作成',

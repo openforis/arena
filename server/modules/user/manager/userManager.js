@@ -275,11 +275,13 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
   const fields = [
     'email',
     ...Object.values(UserAccessRequest.keysProps).map((key) => StringUtils.toSnakeCase(key)),
+    'template_name',
     'status',
     'date_created',
     'accepted_by_name',
     'accepted_by_email',
     'date_accepted',
+    'created_survey_name',
   ]
 
   const objectTransformer = (obj) => ({

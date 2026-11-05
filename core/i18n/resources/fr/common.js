@@ -811,6 +811,7 @@ Réessayer ?`,
     },
     acceptedBy: 'Acceptée par',
     dateAccepted: "Date d'acceptation",
+    createdSurvey: 'Formulaire créé',
     acceptRequest: {
       accept: 'Accepter',
       acceptRequestAndCreateSurvey: 'Accepter la demande et créer le formulaire',

@@ -133,6 +133,15 @@ export const UsersAccessRequest = () => {
       width: '10rem',
     },
     {
+      key: 'createdSurvey',
+      header: 'usersAccessRequestView.createdSurvey',
+      hidden: true,
+      renderItem: ({ item }: { item: UserAccessRequestItem }) => (
+        <LabelWithTooltip label={UserAccessRequest.getCreatedSurveyName(item)} />
+      ),
+      width: defaultFieldWidth,
+    },
+    {
       key: 'accept',
       header: '',
       renderItem: ({ item }: { item: UserAccessRequestItem }) =>

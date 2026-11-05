@@ -781,6 +781,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     },
     acceptedBy: 'Aceptada por',
     dateAccepted: 'Fecha de aceptación',
+    createdSurvey: 'Encuesta creada',
     acceptRequest: {
       accept: 'Aceptar',
       acceptRequestAndCreateSurvey: 'Aceptar solicitud y crear encuesta',

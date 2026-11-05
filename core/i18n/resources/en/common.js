@@ -800,6 +800,7 @@ Try again?`,
     },
     acceptedBy: 'Accepted by',
     dateAccepted: 'Date accepted',
+    createdSurvey: 'Created survey',
     acceptRequest: {
       accept: 'Accept',
       acceptRequestAndCreateSurvey: 'Accept request and create survey',
