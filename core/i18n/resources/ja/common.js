@@ -1184,7 +1184,7 @@ $t(common.appNameFull)
       synonym: '異名/ラテン語名',
       extraPropsNotDefined: 'この分類体系には追加プロパティが定義されていません',
       importMissingPublishedTaxa:
-        'インポートファイルに見つからず、変更されなかった公開済み分類群：{{count}}件。コード：{{codes}}',
+        'インポートファイルに見つからなかった公開済み分類群：{{count}}件（変更せず、インポートされた分類群の後に配置）。コード：{{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa)（他{{extra}}件）',
     },
     taxaCount: '分類群の数',

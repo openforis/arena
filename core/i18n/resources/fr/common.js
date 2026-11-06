@@ -1197,7 +1197,7 @@ $t(common.appNameFull)
       synonym: 'Synonyme / Latin',
       extraPropsNotDefined: 'Propriétés supplémentaires non définies pour cette taxonomie',
       importMissingPublishedTaxa:
-        '{{count}} taxon(s) publié(s) introuvable(s) dans le fichier importé et laissé(s) inchangé(s). Codes : {{codes}}',
+        '{{count}} taxon(s) publié(s) introuvable(s) dans le fichier importé : laissé(s) inchangé(s), après ceux importés. Codes : {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} de plus)',
     },
     taxaCount: 'Nombre de taxons',

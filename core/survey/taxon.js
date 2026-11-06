@@ -19,7 +19,8 @@ export const propKeys = {
   family: 'family',
   genus: 'genus',
   scientificName: 'scientificName',
-  index: 'index',
+  index: 'index', // rank among the taxa of the taxonomy, computed when fetching them
+  position: 'position', // row index in the last imported file: it determines the order of the taxa
   extra: ObjectUtils.keysProps.extra,
 }
 
@@ -48,6 +49,7 @@ export const getCode = ObjectUtils.getProp(propKeys.code, '')
 export const getFamily = ObjectUtils.getProp(propKeys.family, '')
 export const getGenus = ObjectUtils.getProp(propKeys.genus, '')
 export const getScientificName = ObjectUtils.getProp(propKeys.scientificName, '')
+export const getPosition = ObjectUtils.getProp(propKeys.position)
 
 export const getVernacularNames = A.propOr({}, keys.vernacularNames)
 export const getVernacularNamesArray = (taxon) => Object.values(getVernacularNames(taxon)).flat()
@@ -103,6 +105,8 @@ export const mergeProps = (taxonNew) => (taxon) => {
     {}
   )
 
+  const positionNew = getPosition(taxonNew)
+
   return {
     ...taxon,
     [keys.props]: {
@@ -111,6 +115,7 @@ export const mergeProps = (taxonNew) => (taxon) => {
       [propKeys.genus]: getGenus(taxonNew),
       [propKeys.scientificName]: getScientificName(taxonNew),
       [propKeys.extra]: getExtra(taxonNew),
+      ...(A.isNil(positionNew) ? {} : { [propKeys.position]: positionNew }),
     },
     [keys.vernacularNames]: vernacularNamesUpdated,
   }
