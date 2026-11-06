@@ -64,6 +64,8 @@ test.describe('Area of interest', () => {
     const dialog = page.locator('.file-upload-dialog')
     const okButton = dialog.getByRole('button', { name: 'Ok' })
     await dialog.locator('input[type="file"]').setInputFiles(geoJsonPath)
+    // the dropped file is previewed on a map
+    await expect(dialog.locator('.map-file-preview .leaflet-overlay-pane path')).toBeVisible()
     // the name is used in the expressions: normalized while typing, keywords not allowed
     const nameInput = dialog.getByRole('textbox').first()
     await nameInput.fill('length')
@@ -75,6 +77,12 @@ test.describe('Area of interest', () => {
     const row = section.getByRole('row').filter({ hasText: pilotAreaName })
     await expect(row).toContainText('area_of_interest.geojson')
     await expect(row.getByRole('gridcell', { name: '5', exact: true })).toBeVisible()
+
+    await row.getByRole('button', { name: 'Show on map' }).click()
+    const mapPanel = page.locator('.panel-right.map-panel')
+    await expect(mapPanel.locator('.leaflet-overlay-pane path')).toBeVisible()
+    await mapPanel.getByTestId(TestId.panelRight.closeBtn).click()
+    await expect(mapPanel).toHaveCount(0)
 
     await page.getByTestId(TestId.surveyInfo.saveBtn).click()
     await expect(page.getByText('Saved!')).toBeVisible()
