@@ -145,6 +145,7 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
       vertices: 'Vértices',
       invalidFile: 'O ficheiro não contém um polígono válido em formato GeoJSON com coordenadas WGS84',
       confirmDelete: 'Tem a certeza de que deseja eliminar esta área de interesse?',
+      showAllOnMap: 'Mostrar todas no mapa',
       editor: {
         title: 'Área de interesse',
       },

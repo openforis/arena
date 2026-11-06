@@ -7,7 +7,7 @@ import { useNotifyError, useNotifyWarning } from '@webapp/components/hooks'
 
 import { useMapCustomOverlays } from '../layers/MapCustomOverlaysContext'
 import { exitFullScreen } from '../tools/useFullScreen'
-import { readUploadedFile, setUploadedLayerOpacity } from './readUploadedFile'
+import { getReadErrorDetails, readUploadedFile, setUploadedLayerOpacity } from './readUploadedFile'
 import { getUploadedFileKind, isUploadTooLarge, MAX_UPLOAD_SIZE_MB } from './uploadedFiles'
 
 const UPLOADED_LAYER_OPACITY = 0.8
@@ -53,7 +53,7 @@ export const useUploadMapFile = (): ((file: File) => Promise<void>) => {
         }
         if (bounds.isValid()) map.fitBounds(bounds, { padding: [32, 32], maxZoom: 16 })
       } catch (error) {
-        const details = error instanceof Error ? error.message : String(error)
+        const details = getReadErrorDetails(error)
         exitFullScreen()
         notifyError({ key: 'mapWorkspace.upload.error', params: { details } })
       }

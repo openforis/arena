@@ -8,7 +8,7 @@ export default {
   items: {
     areaOfInterest: {
       title: "Zones d'intérêt : vérifier si un emplacement se trouve dans une zone",
-      description: `Dans **Infos de l'enquête → Carte**, ajoutez une ou plusieurs **zones d'intérêt** (par ex. les communes d'une zone pilote), chacune avec un nom et un polygone au format GeoJSON.
+      description: `Dans **Infos de l'enquête → Carte**, ajoutez une ou plusieurs **zones d'intérêt** (par ex. les communes d'une zone pilote), chacune avec un nom et un polygone au format GeoJSON. Visualisez-les sur une carte en les ajoutant, une par une ou toutes ensemble (**Tout afficher sur la carte**), et affichez-les comme couches dans **Données > Carte**.
 
 La nouvelle fonction d'expression \`geoDistanceToAOIBoundary(location, 'area_name')\` renvoie la distance en mètres entre un emplacement et la limite de la zone : négative à l'intérieur, positive à l'extérieur. Comparez-la avec la précision GPS (\`location.accuracy\`) pour classer les emplacements comme à l'intérieur, à l'extérieur ou incertains, par exemple dans les valeurs par défaut d'attributs en lecture seule et dans des règles de validation de gravité *avertissement*. \`geoAOIContaining(location)\` renvoie le nom de la zone contenant l'emplacement. Les deux fonctionnent aussi hors ligne dans **Arena Mobile**.
 

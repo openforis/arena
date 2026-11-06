@@ -146,6 +146,7 @@ When checked, those values are kept in the record, even if the attributes are no
       vertices: 'Vertices',
       invalidFile: 'The file does not contain a valid polygon in GeoJSON format with WGS84 coordinates',
       confirmDelete: 'Are you sure you want to delete this area of interest?',
+      showAllOnMap: 'Show all on map',
       editor: {
         title: 'Area of interest',
       },

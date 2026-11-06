@@ -208,6 +208,7 @@ This is the format used by vegetation analysis tools such as Turboveg, Juice and
   viewSelectedRecord: 'View selected record',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Areas of interest',
       baseLayers: 'Base layers',
       inputData: 'Input data',
       preloadedLayers: 'Preloaded layers',

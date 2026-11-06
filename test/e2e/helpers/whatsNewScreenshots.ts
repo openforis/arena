@@ -24,7 +24,11 @@ export const waitForMapTiles = async (page: Page): Promise<void> => {
   if (!screenshotsDir) return
   await page
     .waitForFunction(
-      () => !document.querySelector('.leaflet-tile-pane img.leaflet-tile:not(.leaflet-tile-loaded)'),
+      // loaded and faded in
+      () =>
+        [...document.querySelectorAll('.leaflet-tile-pane img.leaflet-tile')].every(
+          (tile) => tile.classList.contains('leaflet-tile-loaded') && getComputedStyle(tile).opacity === '1'
+        ),
       undefined,
       { timeout: 30_000 }
     )
@@ -35,10 +39,11 @@ export const waitForMapTiles = async (page: Page): Promise<void> => {
  * Saves a screenshot of an element, if WHATS_NEW_SCREENSHOTS_DIR is set.
  * @param {Locator} locator - The element.
  * @param {string} name - The file name, without extension.
+ * @param {ImageType} [type] - The image type: jpeg for photo-like content (e.g. satellite imagery), much smaller.
  * @returns {Promise<void>} Resolves when the screenshot is saved.
  */
-export const saveScreenshot = async (locator: Locator, name: string): Promise<void> => {
-  if (screenshotsDir) await locator.screenshot({ path: screenshotPath(name), style })
+export const saveScreenshot = async (locator: Locator, name: string, type: ImageType = 'png'): Promise<void> => {
+  if (screenshotsDir) await locator.screenshot({ path: screenshotPath(name, type), style })
 }
 
 /**

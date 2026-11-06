@@ -133,6 +133,7 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
       vertices: 'Vértices',
       invalidFile: 'El archivo no contiene un polígono válido en formato GeoJSON con coordenadas WGS84',
       confirmDelete: '¿Está seguro de que desea eliminar esta área de interés?',
+      showAllOnMap: 'Mostrar todas en el mapa',
       editor: {
         title: 'Área de interés',
       },
