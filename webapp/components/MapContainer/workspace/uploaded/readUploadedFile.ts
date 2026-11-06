@@ -106,6 +106,14 @@ export const readFileLayerGroup = async (file: File): Promise<L.FeatureGroup> =>
 }
 
 /**
+ * Returns the details of an error thrown while reading a file, to show to the user.
+ * @param {unknown} error - The error (an Error from the parsers or the download; other values shown as JSON).
+ * @returns {string} The details.
+ */
+export const getReadErrorDetails = (error: unknown): string =>
+  error instanceof Error ? error.message : JSON.stringify(error)
+
+/**
  * Applies an opacity to an uploaded layer: markers, lines and polygons (fill at half), ground overlays.
  * @param {L.Layer} layer - The layer (groups are walked).
  * @param {number} opacity - Opacity 0–1.

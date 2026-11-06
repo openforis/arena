@@ -4,7 +4,7 @@ import { useMap } from 'react-leaflet'
 
 import { useNotifyError } from '@webapp/components/hooks'
 
-import { readFileLayerGroup } from '../workspace/uploaded/readUploadedFile'
+import { getReadErrorDetails, readFileLayerGroup } from '../workspace/uploaded/readUploadedFile'
 
 export type MapFile = {
   // e.g. downloads a survey file or returns a dropped file
@@ -19,8 +19,6 @@ type Props = {
 }
 
 const FIT_BOUNDS_OPTIONS: L.FitBoundsOptions = { padding: [32, 32], maxZoom: 16 }
-
-const getErrorDetails = (error: unknown): string => (error instanceof Error ? error.message : String(error))
 
 /**
  * Shows KML, KMZ, zipped Shapefile or GeoJSON files on the map and zooms to them; files that cannot be read show an error.
@@ -45,7 +43,8 @@ export const MapFileLayers = (props: Props): null => {
         group.addTo(map)
         groups.push(group)
       } catch (error) {
-        if (!unmounted) notifyError({ key: 'mapWorkspace.upload.error', params: { details: getErrorDetails(error) } })
+        if (!unmounted)
+          notifyError({ key: 'mapWorkspace.upload.error', params: { details: getReadErrorDetails(error) } })
       }
     }
 

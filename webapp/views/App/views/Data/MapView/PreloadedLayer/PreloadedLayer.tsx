@@ -7,7 +7,10 @@ import type { SurveyFile as SurveyFileModel } from '@openforis/arena-core'
 import * as SurveyFile from '@core/survey/surveyFile'
 import { useNotifyError } from '@webapp/components/hooks'
 import { fetchSurveyFileAsFile } from '@webapp/components/MapContainer/fileLayers'
-import { readFileLayerGroup } from '@webapp/components/MapContainer/workspace/uploaded/readUploadedFile'
+import {
+  getReadErrorDetails,
+  readFileLayerGroup,
+} from '@webapp/components/MapContainer/workspace/uploaded/readUploadedFile'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import { useMapLayerToggle } from '../common'
@@ -50,8 +53,7 @@ export const PreloadedLayer = (props: Props) => {
         map.fitBounds(bounds)
       }
     } catch (error) {
-      const details = error instanceof Error ? error.message : String(error)
-      notifyError({ key: 'mapWorkspace.upload.error', params: { details } })
+      notifyError({ key: 'mapWorkspace.upload.error', params: { details: getReadErrorDetails(error) } })
     }
   }, [fileUuid, surveyId, removePreviousLayer, preloadedMapLayer, map, notifyError])
 
