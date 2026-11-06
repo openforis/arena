@@ -4,32 +4,32 @@ const createJob = () => new TaxonomyImportJob({ taxonomyUuid: 'uuid', filePath: 
 
 describe('TaxonomyImportJob', () => {
   describe('generateResult', () => {
-    it('does not include missingPublishedTaxaCodes when empty', () => {
+    it('does not include missingPublishedTaxaCodes when empty', async () => {
       const job = createJob()
       job.missingPublishedTaxaCodes = []
 
-      const result = job.generateResult()
+      const result = await job.generateResult()
 
       expect(result.missingPublishedTaxaCodes).toBeUndefined()
       expect(result.missingPublishedTaxaCodesTotal).toBeUndefined()
     })
 
-    it('includes all codes and matching total when below the limit', () => {
+    it('includes all codes and matching total when below the limit', async () => {
       const job = createJob()
       job.missingPublishedTaxaCodes = ['code_1', 'code_2']
 
-      const result = job.generateResult()
+      const result = await job.generateResult()
 
       expect(result.missingPublishedTaxaCodes).toEqual(['code_1', 'code_2'])
       expect(result.missingPublishedTaxaCodesTotal).toBe(2)
     })
 
-    it('truncates codes to the max preview size while reporting the full total', () => {
+    it('truncates codes to the max preview size while reporting the full total', async () => {
       const job = createJob()
       const allCodes = Array.from({ length: 25 }, (_, index) => `code_${index}`)
       job.missingPublishedTaxaCodes = allCodes
 
-      const result = job.generateResult()
+      const result = await job.generateResult()
 
       expect(result.missingPublishedTaxaCodes).toEqual(
         allCodes.slice(0, TaxonomyImportJob.maxMissingPublishedTaxaCodesPreview)

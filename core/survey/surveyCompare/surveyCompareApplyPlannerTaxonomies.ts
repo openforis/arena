@@ -48,9 +48,14 @@ const getUsedUuids = (targetTaxaByTaxonomyUuid: Record<string, any[]>): UsedUuid
 // uuids are kept unless already used in the target survey
 const keepOrNewUuid = (uuid: string, used: Set<string>): string => (used.has(uuid) ? uuidv4() : uuid)
 
-const withoutIndex = (props: Record<string, any>) => {
-  const result = { ...props }
+// the position (order) is not taken from the source: an existing target taxonomy keeps its order, added taxa go last
+const propsToApply = ({ sourceTaxon, position }: { sourceTaxon: any; position: number | null }) => {
+  const result = { ...Taxon.getProps(sourceTaxon) }
   delete result[Taxon.propKeys.index]
+  delete result[Taxon.propKeys.position]
+  if (position !== null) {
+    result[Taxon.propKeys.position] = position
+  }
   return result
 }
 
@@ -71,10 +76,10 @@ const groupByLang = (vernacularNames: any[]): Record<string, any[]> => {
   return result
 }
 
-const newTaxonFromSource = ({ sourceTaxon, taxonomyUuid, usedUuids }) => ({
+const newTaxonFromSource = ({ sourceTaxon, taxonomyUuid, usedUuids, position }) => ({
   uuid: keepOrNewUuid(Taxon.getUuid(sourceTaxon), usedUuids.taxa),
   taxonomyUuid,
-  props: withoutIndex(Taxon.getProps(sourceTaxon)),
+  props: propsToApply({ sourceTaxon, position }),
   vernacularNames: groupByLang(
     Taxon.getVernacularNamesArray(sourceTaxon).map((vernacularName) => newVernacularName({ vernacularName, usedUuids }))
   ),
@@ -90,7 +95,7 @@ const newUpdatedTaxon = ({ sourceTaxon, targetTaxon, usedUuids }) => {
   return {
     uuid: Taxon.getUuid(targetTaxon),
     taxonomyUuid: Taxon.getTaxonomyUuid(targetTaxon),
-    props: withoutIndex(Taxon.getProps(sourceTaxon)),
+    props: propsToApply({ sourceTaxon, position: Taxon.getPosition(targetTaxon) }),
     vernacularNames: groupByLang(namesToAdd),
   }
 }
@@ -99,7 +104,7 @@ const planTaxonomyInsert = ({ params, diff, plan, usedUuids }) => {
   const taxonomy = Survey.getTaxonomyByUuid(diff.sourceUuid)(params.sourceSurvey)
   const taxonomyUuid = Taxonomy.getUuid(taxonomy)
   const taxa = (params.sourceTaxaByTaxonomyUuid?.[taxonomyUuid] ?? []).map((sourceTaxon) =>
-    newTaxonFromSource({ sourceTaxon, taxonomyUuid, usedUuids })
+    newTaxonFromSource({ sourceTaxon, taxonomyUuid, usedUuids, position: Taxon.getPosition(sourceTaxon) })
   )
   plan.taxonomiesToInsert.push({ taxonomy, taxa })
 }
@@ -122,7 +127,7 @@ const planTaxonomyUpdate = ({ params, diff, plan, usedUuids }) => {
   for (const { code, status } of diff.taxa) {
     const sourceTaxon = sourceIndex[code]
     if (status === SurveyCompareStatus.added) {
-      taxaToInsert.push(newTaxonFromSource({ sourceTaxon, taxonomyUuid: diff.targetUuid, usedUuids }))
+      taxaToInsert.push(newTaxonFromSource({ sourceTaxon, taxonomyUuid: diff.targetUuid, usedUuids, position: null }))
     } else if (status === SurveyCompareStatus.changed) {
       taxaToUpdate.push(newUpdatedTaxon({ sourceTaxon, targetTaxon: targetIndex[code], usedUuids }))
     }

@@ -298,6 +298,41 @@ describe('SurveyCompare: full sync', () => {
       expect(applyPlan.taxonUuidsToDelete).toEqual([Taxon.getUuid(pin)])
     })
 
+    test('the target taxonomy keeps its taxa order: changed taxa keep their position, added ones go last', async () => {
+      const target = await buildTaxonomySurvey({ taxa: [SB.taxon('QUE', 'Fagaceae', 'Quercus', 'Quercus sp.')] })
+      const [[taxonomyUuid, [que]]] = Object.entries(target.taxaByTaxonomyUuid)
+      target.taxaByTaxonomyUuid[taxonomyUuid] = [Taxon.setProp(Taxon.propKeys.position, 3)(que)]
+      const queMoved = Taxon.setProp(Taxon.propKeys.position, 0)(clone(que))
+      const queSource = Taxon.setProp(Taxon.propKeys.family, 'Fagaceae updated')(queMoved)
+      const abiNew = Taxon.newTaxon({
+        taxonomyUuid,
+        code: 'ABI',
+        family: 'Pinaceae',
+        genus: 'Abies',
+        scientificName: 'Abies sp.',
+      })
+      const abi = Taxon.setProp(Taxon.propKeys.position, 1)(abiNew)
+      const source = { survey: target.survey, taxaByTaxonomyUuid: { [taxonomyUuid]: [queSource, abi] } }
+      const result = compareWithTaxa({ source, target })
+      const [taxonomyDiff] = result.taxonomies
+
+      const applyPlan = buildApplyPlan({
+        sourceSurvey: source.survey,
+        targetSurvey: target.survey,
+        sourceItemsByCategoryUuid: {},
+        targetItemsByCategoryUuid: {},
+        sourceTaxaByTaxonomyUuid: source.taxaByTaxonomyUuid,
+        targetTaxaByTaxonomyUuid: target.taxaByTaxonomyUuid,
+        result,
+        selectedIds: [taxonomyDiff.id],
+      })
+      const [queUpdate] = applyPlan.taxaToUpdate[0].taxa
+      expect(Taxon.getFamily(queUpdate)).toBe('Fagaceae updated')
+      expect(Taxon.getPosition(queUpdate)).toBe(3)
+      const [abiInsert] = applyPlan.taxaToInsert[0].taxa
+      expect(Taxon.getPosition(abiInsert)).toBeNull()
+    })
+
     test('a taxon attribute using a new taxonomy depends on it', async () => {
       const source = await buildTaxonomySurvey({ taxa: [SB.taxon('QUE', 'Fagaceae', 'Quercus', 'Quercus sp.')] })
       const targetSurvey = dissocNodeDefs({ survey: clone(source.survey), names: ['tree_taxon'] })

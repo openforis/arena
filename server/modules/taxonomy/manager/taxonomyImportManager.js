@@ -48,6 +48,7 @@ export default class TaxonomyImportManager {
     this.insertedCodes = new Set() // Inserted taxa codes
     this.insertedScientificNames = new Set() // Inserted taxa scientific names
     this.seenCodes = new Set() // All codes seen in the imported file
+    this.existingTaxa = [] // Existing taxa (in their current order)
     this.existingTaxaByCode = {} // Existing taxa (indexed by code)
     this.existingTaxaByScientificName = {} // Existing taxa (indexed by scientific name)
   }
@@ -64,6 +65,7 @@ export default class TaxonomyImportManager {
         this.tx
       )
 
+      this.existingTaxa = taxa
       this.existingTaxaByCode = ObjectUtils.toIndexedObj(taxa, `${Taxon.keys.props}.${Taxon.propKeys.code}`)
       this.existingTaxaByScientificName = ObjectUtils.toIndexedObj(
         taxa,
@@ -128,13 +130,27 @@ export default class TaxonomyImportManager {
     return { success: true }
   }
 
+  // the taxa keep their relative order, after the ones in the file (positions from 0 to seenCodes.size - 1)
+  async moveAfterImportedTaxa(taxa) {
+    let position = this.seenCodes.size
+    for (const taxon of taxa) {
+      if (Taxon.getPosition(taxon) !== position) {
+        const taxonMoved = Taxon.setProp(Taxon.propKeys.position, position)(taxon)
+        // predefined taxa are merged later with the existing ones: they must keep the new position
+        this.existingTaxaByCode[Taxon.getCode(taxon)] = taxonMoved
+        await this.batchPersisterUpdate.addItem(taxonMoved) // NOSONAR
+      }
+      position += 1
+    }
+  }
+
   async finalizeImport() {
     const { user, surveyId } = this
 
-    // Compute published taxa codes absent from the imported file (before adding predefined taxa)
-    const missingPublishedCodes = Object.keys(this.existingTaxaByCode).filter(
-      (code) => !this.seenCodes.has(code) && !predefinedCodes.has(code)
-    )
+    // published taxa absent from the imported file (computed before adding predefined taxa)
+    const taxaNotInFile = this.existingTaxa.filter((taxon) => !this.seenCodes.has(Taxon.getCode(taxon)))
+    await this.moveAfterImportedTaxa(taxaNotInFile)
+    const missingPublishedCodes = taxaNotInFile.map(Taxon.getCode).filter((code) => !predefinedCodes.has(code))
 
     // Insert predefined taxa (UNL - UNK)
     const predefinedTaxaToInsert = A.pipe(

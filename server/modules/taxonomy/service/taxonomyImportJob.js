@@ -115,8 +115,8 @@ export default class TaxonomyImportJob extends Job {
     }
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     const { missingPublishedTaxaCodes } = this
     if (missingPublishedTaxaCodes.length > 0) {
       result.missingPublishedTaxaCodes = missingPublishedTaxaCodes.slice(
