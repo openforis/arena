@@ -45,7 +45,6 @@ export default {
     },
     manageQueries: 'クエリを管理',
     mode: {
-      label: 'モード：',
       aggregate: '集計',
       raw: '生データ',
       rawEdit: '生データ編集',
@@ -53,6 +52,15 @@ export default {
     replaceQueryConfirmMessage: '現在のクエリを選択したクエリで置き換えますか？',
     showCodes: 'コードを表示',
     showTotalAndPercentage: '合計と割合を表示',
+    sidebar: {
+      addFilter: 'フィルターを追加',
+      addSort: '並べ替えを追加',
+      aggregateFunctionsOf: '{{name}} の集計関数',
+      customAggregateFunctions: 'カスタム集計関数…',
+      remove: '{{name}} を削除',
+      removeFilter: 'フィルターを削除',
+      toggleSortOrder: '並び順: {{order}}（クリックで切り替え）',
+    },
     total: '合計',
     viewOptions: '表示',
   },

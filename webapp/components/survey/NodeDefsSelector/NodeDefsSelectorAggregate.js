@@ -38,6 +38,7 @@ const getPrevCalculations = ({ nodeDefUuidEntity, survey }) => {
 const NodeDefsSelectorAggregate = (props) => {
   const {
     dimensions,
+    header = null,
     measures,
     nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
     nodeDefUuidEntity = null,
@@ -98,6 +99,8 @@ const NodeDefsSelectorAggregate = (props) => {
         showSingleEntities={false}
       />
 
+      {header}
+
       {nodeDefUuidEntity && (
         <>
           {showSearch && <NodeDefsSelectorSearch search={search} setSearch={setSearch} />}
@@ -156,6 +159,7 @@ const NodeDefsSelectorAggregate = (props) => {
 
 NodeDefsSelectorAggregate.propTypes = {
   dimensions: PropTypes.arrayOf(String).isRequired,
+  header: PropTypes.node,
   measures: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   nodeDefUuidEntity: PropTypes.string,

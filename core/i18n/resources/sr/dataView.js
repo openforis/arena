@@ -45,7 +45,6 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     },
     manageQueries: 'Upravljaj upitima',
     mode: {
-      label: 'Režim:',
       aggregate: 'Agregirano',
       raw: 'Neobrađeno',
       rawEdit: 'Uređivanje neobrađenih',
@@ -53,6 +52,15 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     replaceQueryConfirmMessage: 'Zamijeniti trenutni upit izabranim?',
     showCodes: 'Prikaži šifre',
     showTotalAndPercentage: 'Prikaži ukupno i procenat',
+    sidebar: {
+      addFilter: 'Dodaj filter',
+      addSort: 'Dodaj sortiranje',
+      aggregateFunctionsOf: 'Agregatne funkcije za {{name}}',
+      customAggregateFunctions: 'Prilagođene agregatne funkcije…',
+      remove: 'Ukloni {{name}}',
+      removeFilter: 'Ukloni filter',
+      toggleSortOrder: 'Redosled: {{order}} (kliknite za promenu)',
+    },
     total: 'Ukupno',
     viewOptions: 'Prikaz',
   },

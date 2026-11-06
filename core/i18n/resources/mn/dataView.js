@@ -44,7 +44,6 @@ export default {
     },
     manageQueries: 'Хүсэлтүүдийг удирдах',
     mode: {
-      label: 'Горим:',
       aggregate: 'Нэгтгэх',
       raw: 'Түүхий',
       rawEdit: 'Түүхийг засах',
@@ -52,6 +51,15 @@ export default {
     replaceQueryConfirmMessage: 'Одоогийн хүсэлтийг сонгосон хүсэлтээр солих уу?',
     showCodes: 'Кодуудыг харуулах',
     showTotalAndPercentage: 'Нийт дүн ба хувийг харуулах',
+    sidebar: {
+      addFilter: 'Шүүлтүүр нэмэх',
+      addSort: 'Эрэмбэ нэмэх',
+      aggregateFunctionsOf: '{{name}}-ийн нэгтгэх функцүүд',
+      customAggregateFunctions: 'Өөрийн нэгтгэх функцүүд…',
+      remove: '{{name}}-ийг хасах',
+      removeFilter: 'Шүүлтүүрийг хасах',
+      toggleSortOrder: 'Эрэмбэ: {{order}} (өөрчлөхийн тулд дарна уу)',
+    },
     total: 'Нийт',
     viewOptions: 'Харагдац',
   },

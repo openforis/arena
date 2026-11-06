@@ -1,26 +1,39 @@
 @use '~@webapp/style/vars' as *;
 
-.data-query__sortable-items-form-item {
+.data-query__sortable-items {
   display: flex;
-  height: auto;
-  flex: 1;
-
-  .form-label {
-    text-wrap: nowrap;
-  }
+  flex-direction: column;
+  gap: 0.2rem;
 }
 
-.data-query__sortable-items-wrapper {
-  flex: 1;
+.data-query__sortable-item {
   display: flex;
-  flex-flow: wrap;
+  align-items: center;
   gap: 0.3rem;
-  max-height: 7rem;
-  overflow-y: auto;
-}
+  min-height: 28px;
+  padding-left: 0.2rem;
+  border-radius: 4px;
+  background-color: $colorSurfaceVariant;
 
-.data-query__sortable-item-chip.MuiChip-root {
-  background-color: $colorSurface;
+  .data-query__sortable-item-handle {
+    cursor: grab;
+    color: $colorOnSurfaceVariant;
+    padding: 0 0.2rem;
+  }
+
+  .data-query__sortable-item-index {
+    font-size: 0.7rem;
+    font-weight: 600;
+    min-width: 1rem;
+    text-align: center;
+    color: $colorOnSurfaceVariant;
+  }
+
+  .data-query__sortable-item-label {
+    flex: 1;
+    min-width: 0;
+    font-size: 0.8rem;
+  }
 
   &.draggable-mirror {
     background-color: tint($colorWarningContainer, 45%);
@@ -28,7 +41,6 @@
   }
 
   &.draggable-source--is-dragging {
-    color: transparent;
-    background-color: transparent;
+    visibility: hidden;
   }
 }

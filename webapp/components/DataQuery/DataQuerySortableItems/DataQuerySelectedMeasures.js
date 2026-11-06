@@ -7,10 +7,11 @@ import { Query } from '@common/model/query'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
+import { MeasureAggregateFunctionsButton } from '../QuerySidebar/MeasureAggregateFunctionsButton'
 import { DataQuerySortableItems } from './DataQuerySortableItems'
 
 export const DataQuerySelectedMeasures = (props) => {
-  const { nodeDefLabelType } = props
+  const { disabled = false, nodeDefLabelType } = props
 
   const query = DataExplorerSelectors.useQuery()
   const measures = Query.getMeasures(query)
@@ -52,10 +53,12 @@ export const DataQuerySelectedMeasures = (props) => {
       nodeDefUuids={measuresDefUuids}
       onItemDelete={onMeasureDelete}
       onItemsSort={onMeasuresSort}
+      renderItemExtra={(nodeDef) => <MeasureAggregateFunctionsButton disabled={disabled} nodeDef={nodeDef} />}
     />
   )
 }
 
 DataQuerySelectedMeasures.propTypes = {
+  disabled: PropTypes.bool,
   nodeDefLabelType: PropTypes.string,
 }

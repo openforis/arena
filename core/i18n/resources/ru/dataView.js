@@ -45,7 +45,6 @@ export default {
     },
     manageQueries: 'Управление запросами',
     mode: {
-      label: 'Режим:',
       aggregate: 'Агрегировать',
       raw: 'Исходные данные',
       rawEdit: 'Редактировать исходные данные',
@@ -53,6 +52,15 @@ export default {
     replaceQueryConfirmMessage: 'Заменить текущий запрос выбранным?',
     showCodes: 'Показать коды',
     showTotalAndPercentage: 'Показать итог и процент',
+    sidebar: {
+      addFilter: 'Добавить фильтр',
+      addSort: 'Добавить сортировку',
+      aggregateFunctionsOf: 'Агрегатные функции {{name}}',
+      customAggregateFunctions: 'Пользовательские агрегатные функции…',
+      remove: 'Удалить {{name}}',
+      removeFilter: 'Удалить фильтр',
+      toggleSortOrder: 'Порядок: {{order}} (нажмите, чтобы изменить)',
+    },
     total: 'Итого',
     viewOptions: 'Вид',
   },

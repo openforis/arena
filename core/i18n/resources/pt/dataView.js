@@ -45,7 +45,6 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     },
     manageQueries: 'Gerenciar consultas',
     mode: {
-      label: 'Modo:',
       aggregate: 'Agregado',
       raw: 'Bruto',
       rawEdit: 'Edição bruta',
@@ -53,6 +52,15 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     replaceQueryConfirmMessage: 'Substituir a consulta atual pela selecionada?',
     showCodes: 'Mostrar códigos',
     showTotalAndPercentage: 'Mostrar total e percentagem',
+    sidebar: {
+      addFilter: 'Adicionar filtro',
+      addSort: 'Adicionar ordenação',
+      aggregateFunctionsOf: 'Funções de agregação de {{name}}',
+      customAggregateFunctions: 'Funções de agregação personalizadas…',
+      remove: 'Remover {{name}}',
+      removeFilter: 'Remover filtro',
+      toggleSortOrder: 'Ordem: {{order}} (clique para alterar)',
+    },
     total: 'Total',
     viewOptions: 'Visualização',
   },

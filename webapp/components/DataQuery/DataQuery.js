@@ -13,14 +13,9 @@ import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditM
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
-import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
-import {
-  DataQuerySelectedAttributes,
-  DataQuerySelectedDimensions,
-  DataQuerySelectedMeasures,
-} from './DataQuerySortableItems'
+import { QuerySidebar } from './QuerySidebar/QuerySidebar'
 
 const DataQuery = () => {
   const dispatch = useDispatch()
@@ -53,7 +48,7 @@ const DataQuery = () => {
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
+      <QuerySidebar dataLoaded={dataLoaded} dataLoading={dataLoading} nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -72,10 +67,6 @@ const DataQuery = () => {
             setQueryOffset={setOffset}
           />
         </div>
-
-        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
-        <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
-        <DataQuerySelectedMeasures nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           data={data}

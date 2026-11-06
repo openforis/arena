@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -12,11 +12,9 @@ import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
-import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import { useColumn } from './store'
-import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
 /**
  * Returns the node def field (e.g. code, label) shown in the specified view column.
@@ -77,13 +75,8 @@ const ColumnHeader = (props) => {
     percentageVisible,
   })
 
-  const entityDefUuid = Query.getEntityDefUuid(query)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang, nodeDefLabelType)
-  // measure is editable only when the node def is not equal to the context entity (e.g. entity count measure is not editable)
-  const canEditMeasure = nodeDefUuid !== entityDefUuid
-
-  const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
   const sortableVariable = sortableVariablesByUuid[nodeDefUuid]
   const sortable = Boolean(sortableVariable) && !modeEdit
@@ -132,13 +125,6 @@ const ColumnHeader = (props) => {
               />
             )}
             <span className="ellipsis">{nodeDefLabel}</span>
-            {isMeasure && canEditMeasure && (
-              <ButtonIconGear
-                className="btn btn-s btn-transparent btn-aggregates"
-                onClick={() => setShowAggregateFunctionsPanel(true)}
-                title={i18n.t('common.aggregateFunction', { count: 2 })}
-              />
-            )}
           </>
         )}
       </div>
@@ -170,16 +156,6 @@ const ColumnHeader = (props) => {
             )
           })}
         </div>
-      )}
-
-      {showAggregateFunctionsPanel && (
-        <AggregateFunctionsPanel
-          nodeDef={nodeDef}
-          aggregateFunctions={aggregateFunctions}
-          onChangeQuery={onChangeQuery}
-          onClose={() => setShowAggregateFunctionsPanel(false)}
-          query={query}
-        />
       )}
     </div>
   )

@@ -47,7 +47,6 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
     manageQueries: 'Gérer les requêtes',
     mode: {
-      label: 'Mode :',
       aggregate: 'Agrégat',
       raw: 'Brut',
       rawEdit: 'Édition brute',
@@ -55,6 +54,15 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête sélectionnée ?',
     showCodes: 'Afficher les codes',
     showTotalAndPercentage: 'Afficher le total et le pourcentage',
+    sidebar: {
+      addFilter: 'Ajouter un filtre',
+      addSort: 'Ajouter un tri',
+      aggregateFunctionsOf: "Fonctions d'agrégation de {{name}}",
+      customAggregateFunctions: "Fonctions d'agrégation personnalisées…",
+      remove: 'Retirer {{name}}',
+      removeFilter: 'Retirer le filtre',
+      toggleSortOrder: 'Ordre : {{order}} (cliquer pour changer)',
+    },
     total: 'Total',
     viewOptions: 'Affichage',
   },

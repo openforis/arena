@@ -45,7 +45,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
     manageQueries: 'Manage queries',
     mode: {
-      label: 'Mode:',
       aggregate: 'Aggregate',
       raw: 'Raw',
       rawEdit: 'Raw edit',
@@ -53,6 +52,15 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     replaceQueryConfirmMessage: 'Replace current query with the selected one?',
     showCodes: 'Show codes',
     showTotalAndPercentage: 'Show total and percentage',
+    sidebar: {
+      addFilter: 'Add filter',
+      addSort: 'Add sort',
+      aggregateFunctionsOf: 'Aggregate functions of {{name}}',
+      customAggregateFunctions: 'Custom aggregate functions…',
+      remove: 'Remove {{name}}',
+      removeFilter: 'Remove filter',
+      toggleSortOrder: 'Sort order: {{order}} (click to change)',
+    },
     total: 'Total',
     viewOptions: 'View',
   },
