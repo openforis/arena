@@ -31,6 +31,13 @@ L.Marker.prototype.options.icon = L.icon({
   iconUrl: require('leaflet/dist/images/marker-icon.png').default,
   shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 })
+// markers using the default icon (e.g. KML points without icon style): image URLs are the bundled ones, not prefixed
+L.Icon.Default.imagePath = ''
+L.Icon.Default.mergeOptions({
+  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
+})
 // end of workaround
 
 // Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
