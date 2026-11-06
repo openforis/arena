@@ -24,6 +24,7 @@ export const areaOfInterest: AreaOfInterest = {
 }
 
 export const pilotAreaName = 'pilot_area'
+export const pilotAreaLabel = 'Pilot area'
 
 export const aoiStatusMessages = {
   outside: 'Report outside the pilot area',
@@ -99,6 +100,7 @@ export const insertAreaOfInterestSurvey = async ({
     [Survey.infoKeys.areasOfInterest]: [
       SurveyAreaOfInterest.newAreaOfInterestDescriptor({
         name: pilotAreaName,
+        labels: { en: pilotAreaLabel },
         fileUuid: SurveyFile.getUuid(areaOfInterestFile),
         fileName,
         size: content.length,

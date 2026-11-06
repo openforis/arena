@@ -146,6 +146,7 @@ export default {
       vertices: '頂点',
       invalidFile: 'ファイルにWGS84座標のGeoJSON形式の有効なポリゴンが含まれていません',
       confirmDelete: 'この関心領域を削除してもよろしいですか？',
+      showAllOnMap: 'すべて地図に表示',
       editor: {
         title: '関心領域',
       },

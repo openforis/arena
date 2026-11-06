@@ -215,6 +215,7 @@ export default {
   viewSelectedRecord: 'Просмотреть выбранную запись',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Области интереса',
       baseLayers: 'Базовые слои',
       inputData: 'Входные данные',
       preloadedLayers: 'Предзагруженные слои',

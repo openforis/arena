@@ -31,6 +31,13 @@ L.Marker.prototype.options.icon = L.icon({
   iconUrl: require('leaflet/dist/images/marker-icon.png').default,
   shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
 })
+// markers using the default icon (e.g. KML points without icon style): image URLs are the bundled ones, not prefixed
+L.Icon.Default.imagePath = ''
+L.Icon.Default.mergeOptions({
+  iconUrl: require('leaflet/dist/images/marker-icon.png').default,
+  iconRetinaUrl: require('leaflet/dist/images/marker-icon-2x.png').default,
+  shadowUrl: require('leaflet/dist/images/marker-shadow.png').default,
+})
 // end of workaround
 
 // Explicit, unconditional map-level maxZoom keeps map.getMaxZoom() finite and stable
@@ -73,6 +80,7 @@ export const MapContainer = (props) => {
   const {
     baseLayersLabel,
     centerPoint,
+    children = null,
     editable = false,
     extraRailTabs,
     geoJson = null,
@@ -116,6 +124,7 @@ export const MapContainer = (props) => {
       <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       <MapMarker editable={editable} point={markerPoint} onPointUpdated={onMarkerPointUpdated} title={markerTitle} />
       {geoJson && <GeoJSON data={geoJson} />}
+      {children}
       <UtmGrid />
       <ZoomControl position="bottomright" />
     </RLMapContainer>
@@ -159,6 +168,8 @@ export const MapContainer = (props) => {
 MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
+  // rendered inside the Leaflet map (e.g. layers using react-leaflet's useMap)
+  children: PropTypes.node,
   editable: PropTypes.bool,
   extraRailTabs: PropTypes.array,
   geoJson: PropTypes.object,

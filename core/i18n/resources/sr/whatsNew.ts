@@ -8,7 +8,7 @@ export default {
   items: {
     areaOfInterest: {
       title: 'Područja od interesa: provera da li je lokacija unutar područja',
-      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu.
+      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu. Proverite ih na mapi prilikom dodavanja, jedno po jedno ili sva zajedno (**Prikaži sve na mapi**), i prikažite ih kao slojeve u **Podaci > Mapa**.
 
 Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. \`geoAOIContaining(location)\` vraća naziv područja koje sadrži lokaciju. Obe rade i oflajn u **Arena Mobile**.
 

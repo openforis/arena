@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import { SurveyPreloadedMapLayerValidator } from '@core/survey/surveyPreloadedMapLayerValidator'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
+import { MapFilePreview } from '@webapp/components/MapContainer/fileLayers'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
@@ -28,6 +29,17 @@ const PreloadedMapLayerEditor = (props) => {
   })
 
   const { draftPreloadedMapLayer, file, labels, validation } = state
+
+  const editedSurveyFile = useMemo(
+    () =>
+      editedPreloadedMapLayer
+        ? {
+            fileUuid: SurveyFile.getUuid(editedPreloadedMapLayer),
+            fileName: SurveyFile.getName(editedPreloadedMapLayer),
+          }
+        : null,
+    [editedPreloadedMapLayer]
+  )
 
   const onLabelsChange = useCallback((newLabels) => setState((statePrev) => ({ ...statePrev, labels: newLabels })), [])
 
@@ -69,7 +81,7 @@ const PreloadedMapLayerEditor = (props) => {
 
   return (
     <Modal
-      className="file-upload-dialog"
+      className="file-upload-dialog file-upload-dialog--map-preview"
       title="homeView:surveyInfo.preloadedMapLayers.editor.title"
       onClose={onClose}
       showCloseButton
@@ -85,6 +97,7 @@ const PreloadedMapLayerEditor = (props) => {
             <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
           </ValidationTooltip>
         )}
+        <MapFilePreview file={file} surveyFile={editedSurveyFile} />
       </ModalBody>
       <ModalFooter>
         <Button
