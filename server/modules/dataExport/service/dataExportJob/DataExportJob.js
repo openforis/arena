@@ -75,8 +75,8 @@ export default class DataExportJob extends Job {
         })
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
 
     const { token: downloadToken } = this.generateDownloadToken()
 
