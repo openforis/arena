@@ -16,6 +16,11 @@ import { useDataQuery } from './store'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
 import { QuerySidebar } from './QuerySidebar/QuerySidebar'
+import {
+  DataQuerySelectedAttributes,
+  DataQuerySelectedDimensions,
+  DataQuerySelectedMeasures,
+} from './DataQuerySortableItems'
 
 const DataQuery = () => {
   const dispatch = useDispatch()
@@ -67,6 +72,13 @@ const DataQuery = () => {
             setQueryOffset={setOffset}
           />
         </div>
+
+        <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
+        <DataQuerySelectedMeasures
+          disabled={Query.isModeRawEdit(query) || !dataLoaded || dataLoading}
+          nodeDefLabelType={nodeDefLabelType}
+        />
 
         <Visualizer
           data={data}

@@ -8,11 +8,6 @@ import { useIsAppSaving } from '@webapp/store/app'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import QueryNodeDefsSelector from '../QueryNodeDefsSelector'
-import {
-  DataQuerySelectedAttributes,
-  DataQuerySelectedDimensions,
-  DataQuerySelectedMeasures,
-} from '../DataQuerySortableItems'
 import { QueryFilterSection } from './QueryFilterSection'
 import { QuerySortSection } from './QuerySortSection'
 
@@ -37,7 +32,7 @@ type Props = {
 }
 
 /**
- * Left panel holding the whole query, top to bottom: mode, entity, selected variables, filter, sort, variables tree.
+ * Left panel with the query definition, top to bottom: mode, entity, filter, sort, variables tree.
  * @param {Props} props - The component props.
  * @returns {React.ReactElement} - The sidebar element.
  */
@@ -48,28 +43,13 @@ export const QuerySidebar = (props: Props) => {
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
 
-  const modeAggregate = Query.isModeAggregate(query)
   const modeEdit = Query.isModeRawEdit(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
 
-  const selection = modeAggregate ? (
-    <>
-      <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
-      <DataQuerySelectedMeasures disabled={queryChangeDisabled} nodeDefLabelType={nodeDefLabelType} />
-    </>
-  ) : (
-    <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
-  )
-
-  const header = Query.getEntityDefUuid(query) ? (
+  const header = Query.hasSelection(query) ? (
     <div className="query-sidebar__query">
-      {selection}
-      {Query.hasSelection(query) && (
-        <>
-          <QueryFilterSection disabled={queryChangeDisabled} />
-          <QuerySortSection disabled={queryChangeDisabled} />
-        </>
-      )}
+      <QueryFilterSection disabled={queryChangeDisabled} />
+      <QuerySortSection disabled={queryChangeDisabled} />
     </div>
   ) : null
 

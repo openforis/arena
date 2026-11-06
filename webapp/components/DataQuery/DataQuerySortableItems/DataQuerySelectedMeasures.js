@@ -7,7 +7,7 @@ import { Query } from '@common/model/query'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
-import { MeasureAggregateFunctionsButton } from '../QuerySidebar/MeasureAggregateFunctionsButton'
+import { MeasureAggregateFunctionsButton } from './MeasureAggregateFunctionsButton'
 import { DataQuerySortableItems } from './DataQuerySortableItems'
 
 export const DataQuerySelectedMeasures = (props) => {

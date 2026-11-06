@@ -75,7 +75,7 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
     <>
       <ButtonMenu
         aria-label={`${title}: ${fnsLabel}`}
-        className="query-sidebar__aggregate-fns-btn"
+        className="data-query__aggregate-fns-btn"
         closeMenuOnItemClick={false}
         disabled={disabled}
         items={items}

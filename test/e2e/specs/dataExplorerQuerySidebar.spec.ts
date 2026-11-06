@@ -8,10 +8,7 @@ import { Urls } from '../helpers/urls'
 test.describe('Data Explorer query sidebar', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
 
-  test('edits the selected variables, aggregate functions and sort from the sidebar', async ({
-    page,
-    sampleSurvey: _,
-  }) => {
+  test('edits the measure aggregate functions and the sort', async ({ page, sampleSurvey: _ }) => {
     await page.goto(Urls.dataExplorer)
     await selectDropdownItem({ page, dropdown: getDropdown(page, TestId.entities.entitySelector), label: 'Tree' })
     const sidebar = page.locator('.query-sidebar')
@@ -19,12 +16,8 @@ test.describe('Data Explorer query sidebar', () => {
     await page.locator('.attribute-selector', { hasText: 'Tree id' }).click()
     await page.locator('.attribute-selector', { hasText: 'Tree decimal 1' }).click()
 
-    // selected variables listed in the sidebar
-    const dimensionItem = sidebar.locator('.data-query__sortable-item', { hasText: 'Tree id' })
-    await expect(dimensionItem).toContainText('1')
-
-    // aggregate functions picked next to the measure; the last one cannot be removed
-    const fnsButton = sidebar.getByRole('button', { name: /^Aggregate functions of Tree decimal 1/ })
+    // aggregate functions picked next to the measure chip; the last one cannot be removed
+    const fnsButton = page.getByRole('button', { name: /^Aggregate functions of Tree decimal 1/ })
     await expect(fnsButton).toHaveText('Sum')
     await fnsButton.click()
     const sumItem = page.getByRole('menuitemcheckbox', { name: 'Sum' })
@@ -46,9 +39,5 @@ test.describe('Data Explorer query sidebar', () => {
     await expect(rows.first()).toContainText('154.5')
     await sortItem.getByRole('button', { name: 'Remove Tree id' }).click()
     await expect(sidebar.getByRole('button', { name: 'Add sort' })).toBeVisible()
-
-    // removing the dimension from the sidebar
-    await dimensionItem.getByRole('button', { name: 'Remove Tree id' }).click()
-    await expect(dimensionItem).toBeHidden()
   })
 })

@@ -1,41 +1,30 @@
 @use '~@webapp/style/vars' as *;
 
-.data-query__sortable-items {
+.data-query__sortable-items-form-item {
   display: flex;
-  flex-direction: column;
-  gap: 0.2rem;
+  height: auto;
+  flex: 1;
+
+  .form-label {
+    text-wrap: nowrap;
+  }
+}
+
+.data-query__sortable-items-wrapper {
+  flex: 1;
+  display: flex;
+  flex-flow: wrap;
+  gap: 0.3rem;
+  max-height: 7rem;
+  overflow-y: auto;
 }
 
 .data-query__sortable-item {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.3rem;
-  min-height: 28px;
-  padding-left: 0.2rem;
-  border-radius: 4px;
-  background-color: $colorSurfaceVariant;
+  gap: 0.2rem;
 
-  .data-query__sortable-item-handle {
-    cursor: grab;
-    color: $colorOnSurfaceVariant;
-    padding: 0 0.2rem;
-  }
-
-  .data-query__sortable-item-index {
-    font-size: 0.7rem;
-    font-weight: 600;
-    min-width: 1rem;
-    text-align: center;
-    color: $colorOnSurfaceVariant;
-  }
-
-  .data-query__sortable-item-label {
-    flex: 1;
-    min-width: 0;
-    font-size: 0.8rem;
-  }
-
-  &.draggable-mirror {
+  &.draggable-mirror .MuiChip-root {
     background-color: tint($colorWarningContainer, 45%);
     border: 1px dashed $colorPrimary;
   }
@@ -43,4 +32,19 @@
   &.draggable-source--is-dragging {
     visibility: hidden;
   }
+}
+
+.data-query__sortable-item-chip.MuiChip-root {
+  background-color: $colorSurface;
+}
+
+.data-query__aggregate-fns-btn.MuiButton-root.btn {
+  flex: none;
+  max-width: 9rem;
+  min-height: 24px;
+  padding: 0 0.4rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  white-space: nowrap;
 }
