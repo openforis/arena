@@ -54,9 +54,9 @@ export const ContentRow = (props) => {
   )
 
   return (
-    <div
+    <div // NOSONAR: role="button" with interactive children (buttons), a native <button> cannot wrap them
       data-testid={`${module}_${index}`}
-      role="button" // NOSONAR: contains interactive children (buttons), a native <button> cannot wrap them
+      role="button"
       tabIndex={onRowClick ? 0 : undefined}
       onClick={onClick}
       onKeyDown={onKeyDown}

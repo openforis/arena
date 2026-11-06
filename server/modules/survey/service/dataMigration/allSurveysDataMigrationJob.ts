@@ -59,7 +59,7 @@ export default class AllSurveysDataMigrationJob extends Job {
 
             this.logDebug(`migrating data for survey ${surveyId}`)
             const innerJob = new SurveyDataMigrationJob({ surveyId, surveyAppVersion: appVersion })
-            await innerJob.start() // own transaction, like SurveysRdbRefreshJob's inner job NOSONAR
+            await innerJob.start() // NOSONAR: own transaction, like SurveysRdbRefreshJob's inner job
 
             if (innerJob.isSucceeded()) {
               this.logDebug(`data for survey ${surveyId} migrated successfully`)
