@@ -3,14 +3,34 @@
     height: 15rem;
   }
 
-  // dropzone and map preview side by side: the dialog does not get taller
-  .file-upload-dialog__file-row {
-    display: flex;
-    gap: 1rem;
+  // dialogs with a map preview of the file: the map takes most of the height and shrinks first,
+  // so the dialog and its OK button stay in the viewport (the modal does not scroll)
+  &.file-upload-dialog--map-preview {
+    .modal-content {
+      width: 70vw;
+      max-height: 90vh;
+      margin: 5vh auto 0;
+    }
 
-    > * {
-      flex: 1;
-      min-width: 0;
+    .modal-body {
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+
+      > :not(.map-file-preview) {
+        flex-shrink: 0;
+      }
+    }
+
+    .dropzone {
+      height: auto;
+      min-height: 8rem;
+    }
+
+    .map-file-preview {
+      flex: 0 1 60vh;
+      min-height: 12rem;
+      margin-top: 1rem;
     }
   }
 

@@ -81,7 +81,7 @@ const PreloadedMapLayerEditor = (props) => {
 
   return (
     <Modal
-      className="file-upload-dialog"
+      className="file-upload-dialog file-upload-dialog--map-preview"
       title="homeView:surveyInfo.preloadedMapLayers.editor.title"
       onClose={onClose}
       showCloseButton
@@ -92,14 +92,12 @@ const PreloadedMapLayerEditor = (props) => {
           onChange={onLabelsChange}
           validation={Validation.getFieldValidation(SurveyFile.propKeys.labels)(validation)}
         />
-        <div className="file-upload-dialog__file-row">
-          {!editedPreloadedMapLayer && (
-            <ValidationTooltip validation={Validation.getFieldValidation(SurveyFile.propKeys.name)(validation)}>
-              <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
-            </ValidationTooltip>
-          )}
-          <MapFilePreview file={file} surveyFile={editedSurveyFile} />
-        </div>
+        {!editedPreloadedMapLayer && (
+          <ValidationTooltip validation={Validation.getFieldValidation(SurveyFile.propKeys.name)(validation)}>
+            <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+          </ValidationTooltip>
+        )}
+        <MapFilePreview file={file} surveyFile={editedSurveyFile} />
       </ModalBody>
       <ModalFooter>
         <Button

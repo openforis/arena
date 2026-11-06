@@ -130,37 +130,31 @@ export const AreaOfInterestDialog = (props: Props) => {
 
   return (
     <Modal
-      className="file-upload-dialog"
+      className="file-upload-dialog file-upload-dialog--map-preview area-of-interest-dialog"
       title="homeView:surveyInfo.areasOfInterest.editor.title"
       onClose={onClose}
       showCloseButton
     >
       <ModalBody>
-        <div className="area-of-interest-dialog">
-          <FormItem label="homeView:surveyInfo.areasOfInterest.name">
-            <Input
-              onChange={setName}
-              textTransformFunction={StringUtils.normalizeName}
-              value={name}
-              validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.name)(validation)}
-            />
-          </FormItem>
-          <LabelsEditor labels={labels} onChange={setLabels} />
-          <div className="file-upload-dialog__file-row">
-            <ValidationTooltip
-              validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}
-            >
-              <Dropzone
-                accept={accept}
-                disabled={uploading}
-                droppedFiles={upload ? [upload.content] : []}
-                maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
-                onDrop={onFilesDrop}
-              />
-            </ValidationTooltip>
-            <MapFilePreview file={upload?.content} surveyFile={editedSurveyFile} />
-          </div>
-        </div>
+        <FormItem label="homeView:surveyInfo.areasOfInterest.name">
+          <Input
+            onChange={setName}
+            textTransformFunction={StringUtils.normalizeName}
+            value={name}
+            validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.name)(validation)}
+          />
+        </FormItem>
+        <LabelsEditor labels={labels} onChange={setLabels} />
+        <ValidationTooltip validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}>
+          <Dropzone
+            accept={accept}
+            disabled={uploading}
+            droppedFiles={upload ? [upload.content] : []}
+            maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
+            onDrop={onFilesDrop}
+          />
+        </ValidationTooltip>
+        <MapFilePreview file={upload?.content} surveyFile={editedSurveyFile} />
       </ModalBody>
       <ModalFooter>
         <Button
