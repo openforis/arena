@@ -1181,7 +1181,7 @@ $t(common.appNameFull)
       synonym: 'Ижил нэр / Латин',
       extraPropsNotDefined: 'Энэ таксономын нэмэлт шинж чанарууд тодорхойлогдоогүй',
       importMissingPublishedTaxa:
-        '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй тул өөрчлөгдөлгүй үлдлээ. Кодууд: {{codes}}',
+        '{{count}} нийтлэгдсэн таксон импортлосон файлд олдоогүй: өөрчлөгдөлгүй, импортлосон таксонуудын дараа үлдлээ. Кодууд: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} дахин)',
     },
     taxaCount: 'Таксоны тоо',

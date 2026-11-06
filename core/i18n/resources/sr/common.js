@@ -1226,7 +1226,7 @@ $t(common.appNameFull)
       synonym: 'Sinonim / latinski',
       extraPropsNotDefined: 'Dodatna svojstva nisu definisana za ovu taksonomiju',
       importMissingPublishedTaxa:
-        'Objavljenih taksona koji nisu pronađeni u uvezenom fajlu i ostali su nepromijenjeni: {{count}}. Šifre: {{codes}}',
+        'Objavljenih taksona koji nisu pronađeni u uvezenom fajlu, ostavljenih nepromijenjenih poslije uvezenih: {{count}}. Šifre: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} još)',
     },
     taxaCount: 'Broj taksona',
