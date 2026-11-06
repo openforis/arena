@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import { SurveyPreloadedMapLayerValidator } from '@core/survey/surveyPreloadedMapLayerValidator'
 
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
+import { MapFilePreview } from '@webapp/components/MapContainer/fileLayers'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import { contentTypes } from '@webapp/service/api'
@@ -28,6 +29,17 @@ const PreloadedMapLayerEditor = (props) => {
   })
 
   const { draftPreloadedMapLayer, file, labels, validation } = state
+
+  const editedSurveyFile = useMemo(
+    () =>
+      editedPreloadedMapLayer
+        ? {
+            fileUuid: SurveyFile.getUuid(editedPreloadedMapLayer),
+            fileName: SurveyFile.getName(editedPreloadedMapLayer),
+          }
+        : null,
+    [editedPreloadedMapLayer]
+  )
 
   const onLabelsChange = useCallback((newLabels) => setState((statePrev) => ({ ...statePrev, labels: newLabels })), [])
 
@@ -80,11 +92,14 @@ const PreloadedMapLayerEditor = (props) => {
           onChange={onLabelsChange}
           validation={Validation.getFieldValidation(SurveyFile.propKeys.labels)(validation)}
         />
-        {!editedPreloadedMapLayer && (
-          <ValidationTooltip validation={Validation.getFieldValidation(SurveyFile.propKeys.name)(validation)}>
-            <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
-          </ValidationTooltip>
-        )}
+        <div className="file-upload-dialog__file-row">
+          {!editedPreloadedMapLayer && (
+            <ValidationTooltip validation={Validation.getFieldValidation(SurveyFile.propKeys.name)(validation)}>
+              <Dropzone accept={accept} maxSize={maxSize} onDrop={onFilesDrop} droppedFiles={file ? [file] : []} />
+            </ValidationTooltip>
+          )}
+          <MapFilePreview file={file} surveyFile={editedSurveyFile} />
+        </div>
       </ModalBody>
       <ModalFooter>
         <Button

@@ -1,6 +1,6 @@
 import './AreaOfInterestDialog.scss'
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 import type { AreaOfInterest, AreaOfInterestDescriptor } from '@openforis/arena-core'
 
@@ -15,6 +15,7 @@ import * as Validation from '@core/validation/validation'
 import { Button, Dropzone, Modal, ModalBody, ModalFooter } from '@webapp/components'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useNotifyWarning } from '@webapp/components/hooks'
+import { MapFilePreview } from '@webapp/components/MapContainer/fileLayers'
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import * as API from '@webapp/service/api'
@@ -88,6 +89,14 @@ export const AreaOfInterestDialog = (props: Props) => {
 
   const draft = buildDraft({ editedAreaOfInterest, name, labels, upload })
 
+  const editedSurveyFile = useMemo(
+    () =>
+      editedAreaOfInterest
+        ? { fileUuid: editedAreaOfInterest.fileUuid, fileName: editedAreaOfInterest.fileName }
+        : null,
+    [editedAreaOfInterest]
+  )
+
   useEffect(() => {
     void SurveyAreaOfInterestValidator.validate({ areasOfInterest, areaOfInterest: draft }).then(setValidation)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -137,15 +146,20 @@ export const AreaOfInterestDialog = (props: Props) => {
             />
           </FormItem>
           <LabelsEditor labels={labels} onChange={setLabels} />
-          <ValidationTooltip validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}>
-            <Dropzone
-              accept={accept}
-              disabled={uploading}
-              droppedFiles={upload ? [upload.content] : []}
-              maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
-              onDrop={onFilesDrop}
-            />
-          </ValidationTooltip>
+          <div className="file-upload-dialog__file-row">
+            <ValidationTooltip
+              validation={Validation.getFieldValidation(SurveyAreaOfInterest.keys.fileUuid)(validation)}
+            >
+              <Dropzone
+                accept={accept}
+                disabled={uploading}
+                droppedFiles={upload ? [upload.content] : []}
+                maxSize={SurveyAreaOfInterest.AREA_OF_INTEREST_MAX_FILE_SIZE_MB}
+                onDrop={onFilesDrop}
+              />
+            </ValidationTooltip>
+            <MapFilePreview file={upload?.content} surveyFile={editedSurveyFile} />
+          </div>
         </div>
       </ModalBody>
       <ModalFooter>

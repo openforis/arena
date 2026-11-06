@@ -3,6 +3,17 @@
     height: 15rem;
   }
 
+  // dropzone and map preview side by side: the dialog does not get taller
+  .file-upload-dialog__file-row {
+    display: flex;
+    gap: 1rem;
+
+    > * {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
   .progress-bar-with-label {
     flex-direction: column;
   }
