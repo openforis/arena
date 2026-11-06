@@ -20,8 +20,8 @@ export const DataQuerySortableItems = (props) => {
 
   useSortable({
     containerRef,
-    draggableClassName: '.data-query__sortable-item',
-    handleClassName: '.data-query__sortable-item-chip .MuiChip-label',
+    draggableClassName: '.data-query__sortable-item-chip',
+    handleClassName: '.data-query__sortable-item-chip-label',
     items: nodeDefs,
     onItemsSort,
   })
@@ -32,14 +32,14 @@ export const DataQuerySortableItems = (props) => {
     <FormItem className="data-query__sortable-items-form-item" info="dataView:sortableItemsInfo" label={label}>
       <div className="data-query__sortable-items-wrapper" ref={containerRef}>
         {nodeDefs.map((nodeDef) => (
-          <div key={NodeDef.getUuid(nodeDef)} className="data-query__sortable-item">
-            <DataQuerySortableItemChip
-              nodeDefDef={nodeDef}
-              nodeDefLabelType={nodeDefLabelType}
-              onDelete={onItemDelete}
-            />
+          <DataQuerySortableItemChip
+            key={NodeDef.getUuid(nodeDef)}
+            nodeDefDef={nodeDef}
+            nodeDefLabelType={nodeDefLabelType}
+            onDelete={onItemDelete}
+          >
             {renderItemExtra?.(nodeDef)}
-          </div>
+          </DataQuerySortableItemChip>
         ))}
       </div>
     </FormItem>
@@ -52,6 +52,6 @@ DataQuerySortableItems.propTypes = {
   nodeDefLabelType: PropTypes.string,
   onItemsSort: PropTypes.func.isRequired,
   onItemDelete: PropTypes.func.isRequired,
-  // extra content rendered next to each item chip (e.g. the measure aggregate functions)
+  // extra content rendered inside each item chip (e.g. the measure aggregate functions)
   renderItemExtra: PropTypes.func,
 }

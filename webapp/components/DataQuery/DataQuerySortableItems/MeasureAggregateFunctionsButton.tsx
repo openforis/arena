@@ -83,7 +83,7 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
         labelIsI18nKey={false}
         title={title}
         titleIsI18nKey={false}
-        variant="outlined"
+        variant="text"
       />
       {panelOpen && (
         <AggregateFunctionsPanel
