@@ -68,6 +68,7 @@ const replaceUpdatedNodes = ({ survey, recordSource, recordTarget }: any) =>
     recordSource,
     categoryItemProvider: null,
     taxonProvider: null,
+    areaOfInterestProvider: null,
     timezoneOffset: 0,
     sideEffect: false,
   })(recordTarget)

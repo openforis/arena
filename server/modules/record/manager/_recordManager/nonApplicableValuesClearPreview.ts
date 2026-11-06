@@ -6,6 +6,7 @@ import * as Survey from '@core/survey/survey'
 
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 
 type PreviewParams = {
   user: any
@@ -30,6 +31,7 @@ const _findNodeDefUuidsToClear = async ({
     nodes,
     categoryItemProvider: CategoryItemProviderDefault,
     taxonProvider: TaxonProviderDefault,
+    areaOfInterestProvider: AreaOfInterestProviderDefault,
     timezoneOffset,
     lang: lang ?? Survey.getDefaultLanguage(survey),
     clearNonApplicableValues: true,

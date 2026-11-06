@@ -45,11 +45,9 @@ describe('WhatsNew catalog', () => {
   })
 
   test('every image exists in web-resources', () => {
-    whatsNewItems
-      .filter((item) => item.image)
-      .forEach((item) => {
-        expect(fs.existsSync(path.resolve(process.cwd(), 'web-resources', `.${item.image}`))).toBe(true)
-      })
+    for (const image of whatsNewItems.flatMap((item) => item.images ?? [])) {
+      expect(fs.existsSync(path.resolve(process.cwd(), 'web-resources', `.${image}`))).toBe(true)
+    }
   })
 
   test('every item has English title and description', () => {

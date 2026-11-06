@@ -41,7 +41,7 @@ const filterVariablesOrGroups = ({ variables, variablesFilterFn = null }) => {
   }, [])
 }
 
-const Identifier = ({ disabled, node, onChange, variables = [], variablesFilterFn = null }) => {
+const Identifier = ({ disabled = false, node, onChange, variables = [], variablesFilterFn = null }) => {
   // exclude entities from basic expression editor identifiers
   const variablesFiltered = filterVariablesOrGroups({ variables, variablesFilterFn })
 

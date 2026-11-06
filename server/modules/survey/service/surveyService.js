@@ -3,7 +3,10 @@ import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@op
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
+import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as Validation from '@core/validation/validation'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
@@ -264,8 +267,17 @@ export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) =
   return JobManager.enqueueJob(job)
 }
 
+const checkAreaOfInterestFileContent = (content) => {
+  if (!parseAreaOfInterestJson(content.toString('utf8'))) {
+    throw new SystemError(Validation.messageKeys.surveyInfoEdit.areaOfInterestInvalid, {}, StatusCodes.BAD_REQUEST)
+  }
+}
+
 export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
   const content = await FileUtils.readBinaryFile(filePath)
+  if (SurveyFile.getType(surveyFile) === SurveyFile.SurveyFileType.areaOfInterest) {
+    checkAreaOfInterestFileContent(content)
+  }
   const surveyFileToStore = { ...surveyFile, content }
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }

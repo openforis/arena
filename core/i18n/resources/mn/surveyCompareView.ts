@@ -111,6 +111,7 @@ export default {
     brandingSurveyLogo2: 'Судалгааны лого 2',
     brandingSurveyLogo3: 'Судалгааны лого 3',
     brandingLandingBackground: 'Нүүр хуудасны дэвсгэр',
+    areaOfInterest: 'Сонирхсон бүс',
   },
   cycle: 'мөчлөг {{cycle}}',
   property: 'Шинж чанар',

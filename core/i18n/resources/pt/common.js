@@ -1117,6 +1117,7 @@ $t(common.cantUndoWarning)`,
     selectedItemsCount_other: '{{count}} itens selecionados',
   },
   expression: {
+    areaOfInterestNotFound: 'Área de interesse "{{name}}" não encontrada: defina-a em Informações do inquérito → Mapa',
     functionHasTooFewArguments: 'A função {{fnName}} requer pelo menos {{minArity}} argumentos (recebidos {{numArgs}})',
     functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} argumentos (recebidos {{numArgs}})',
     identifierNotFound: 'Atributo ou entidade "{{name}}" não encontrado',
@@ -1393,6 +1394,12 @@ Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`
       distanceAttribute: 'Atributo de distância',
       bearingAttribute: 'Atributo de azimute',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: 'Área de interesse',
+      areasOfInterestNotDefined:
+        'Ainda não há áreas de interesse definidas: defina-as em Informações do inquérito → Mapa',
+    },
+    coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
 
     dateTimeDiffEditor: {

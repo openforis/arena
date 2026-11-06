@@ -1110,6 +1110,8 @@ $t(common.cantUndoWarning)`,
     selectedItemsCount_other: '{{count}} элемент сонгогдсон',
   },
   expression: {
+    areaOfInterestNotFound:
+      'Сонирхсон бүс "{{name}}" олдсонгүй: Судалгааны мэдээлэл → Газрын зураг хэсэгт тодорхойлно уу',
     functionHasTooFewArguments: 'Функц {{fnName}}-д наад зах нь {{minArity}} аргумент шаардлагатай ({{numArgs}} авсан)',
     functionHasTooManyArguments:
       'Функц {{fnName}} нь хамгийн ихдээ {{maxArity}} аргумент хүлээн авдаг ({{numArgs}} авсан)',
@@ -1385,6 +1387,12 @@ $t(common.cantUndoWarning)`,
       bearingAttribute: 'Азимутын шинж чанар',
     },
 
+    areaOfInterestEditor: {
+      areaOfInterest: 'Сонирхсон бүс',
+      areasOfInterestNotDefined:
+        'Сонирхсон бүс хараахан тодорхойлогдоогүй байна: Судалгааны мэдээлэл → Газрын зураг хэсэгт тодорхойлно уу',
+    },
+    coordinateAttribute: 'Координатын атрибут',
     coordinateAttributeWithPosition: 'Координат шинж чанар {{position}}',
 
     dateTimeDiffEditor: {

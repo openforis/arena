@@ -39,6 +39,7 @@ import { CategoryItemProviderDefault } from '@server/modules/category/manager/ca
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
@@ -65,6 +66,7 @@ const Logger = Log.getLogger('RecordService')
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 // The socket-to-record association is only delivery bookkeeping ("which sockets should be notified
 // about updates to this record"): it must never make the record read/write it's attached to fail.
@@ -678,6 +680,7 @@ export const mergeRecords = async (
       recordSource,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       sideEffect: true,
     })(recordTarget)
 

@@ -125,6 +125,19 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
     editInfo: 'Editar información',
     viewInfo: 'Ver información',
 
+    areasOfInterest: {
+      title: 'Áreas de interés',
+      info: 'Polígonos (GeoJSON, coordenadas WGS84) usados por las funciones de expresión geoDistanceToAOIBoundary (distancia al límite de un área) y geoAOIContaining (área que contiene una ubicación), también sin conexión en Arena Mobile. El nombre de un área se usa en las expresiones.',
+      name: 'Nombre',
+      polygons: 'Polígonos',
+      vertices: 'Vértices',
+      invalidFile: 'El archivo no contiene un polígono válido en formato GeoJSON con coordenadas WGS84',
+      confirmDelete: '¿Está seguro de que desea eliminar esta área de interés?',
+      editor: {
+        title: 'Área de interés',
+      },
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Capas de mapa precargadas habilitadas',
       title: 'Capas de mapa precargadas',

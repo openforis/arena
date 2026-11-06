@@ -12,6 +12,7 @@ import * as Validation from '@core/validation/validation'
 
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 
 import * as RecordRepository from '../../repository/recordRepository'
 
@@ -19,6 +20,7 @@ import * as RecordUniquenessValidator from './recordUniquenessValidator'
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
@@ -63,6 +65,7 @@ export const validateSortedNodesAndPersistValidation = async (
     survey,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     record,
     nodesArray,
   })

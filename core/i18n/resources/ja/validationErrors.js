@@ -170,6 +170,13 @@ export default {
     cycleDateEndInvalid: 'サイクルの終了日が無効です',
     cycleDateEndMandatoryExceptForLastCycle: '最後のサイクルを除き、終了日は必須です',
     fieldManualLinksInvalid: 'フィールドマニュアルへのリンクが無効です',
+    areaOfInterestInvalid: '関心領域はWGS84座標のGeoJSON形式のポリゴンである必要があります',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'ファイルは必須です',
+    nameDuplicate: '同じ名前の別の関心領域が既に存在します',
+    nameRequired: '名前は必須です',
   },
 
   surveyPreloadedMapLayer: {

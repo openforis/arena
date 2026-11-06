@@ -113,6 +113,7 @@ Los cambios se guardan como borrador: llegarán a los registros solo cuando se p
     brandingSurveyLogo2: 'Logotipo de la encuesta 2',
     brandingSurveyLogo3: 'Logotipo de la encuesta 3',
     brandingLandingBackground: 'Fondo de la página de inicio',
+    areaOfInterest: 'Área de interés',
   },
   cycle: 'ciclo {{cycle}}',
   property: 'Propiedad',

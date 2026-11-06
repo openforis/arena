@@ -77,10 +77,11 @@ const NodeDefCoordinate = (props) => {
     let fieldValue
     if (StringUtils.isBlank(value)) {
       fieldValue = null
-    } else if ([Node.valuePropsCoordinate.x, Node.valuePropsCoordinate.y].includes(field)) {
-      fieldValue = Number(value)
-    } else {
+    } else if (field === Node.valuePropsCoordinate.srs) {
       fieldValue = value
+    } else {
+      // x, y and additional fields (accuracy, altitude...) are numbers (e.g. used in expressions like -location.accuracy)
+      fieldValue = Number(value)
     }
     handleValueChange({ ...Node.getValue(node), [field]: fieldValue })
   }

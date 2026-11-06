@@ -4,10 +4,29 @@
   max-width: 800px;
   max-height: 90vh;
   margin: 5vh auto auto;
+  // fallback for very small viewports: normally only the slide description scrolls
   overflow-y: auto;
 
   .modal-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     padding-top: 0;
+  }
+
+  // shrinkable flex column chain down to the description, to keep stepper and footer visible
+  .whats-new-carousel,
+  .whats-new-carousel > .carousel__item,
+  .whats-new-slide {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+  }
+
+  .whats-new-slide__description {
+    min-height: 3rem;
+    overflow-y: auto;
   }
 
   .modal-footer {
@@ -27,6 +46,20 @@
     padding: 1.5rem 1rem;
     border-radius: 8px;
     background: linear-gradient(135deg, $colorPrimaryContainer, $colorSecondaryContainer);
+  }
+
+  // full width, so the stepper does not move when images have different sizes
+  .whats-new-slide__images-carousel {
+    width: 100%;
+
+    > .carousel__item {
+      display: flex;
+      justify-content: center;
+    }
+
+    > .carousel__stepper.MuiMobileStepper-root {
+      padding-top: 0.5rem;
+    }
   }
 
   .whats-new-slide__image {

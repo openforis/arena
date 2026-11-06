@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    areaOfInterest: {
+      title: 'Áreas de interesse: verificar se uma localização está dentro de uma área',
+      description: `Em **Informações do inquérito → Mapa**, adicione uma ou mais **áreas de interesse** (p. ex. os municípios de uma área piloto), cada uma com um nome e um polígono em formato GeoJSON.
+
+A nova função de expressão \`geoDistanceToAOIBoundary(location, 'area_name')\` retorna a distância em metros entre uma localização e o limite da área: negativa dentro, positiva fora. Compare-a com a precisão do GPS (\`location.accuracy\`) para classificar as localizações como dentro, fora ou incertas, por exemplo em valores padrão de atributos só de leitura e em regras de validação com severidade *aviso*. \`geoAOIContaining(location)\` retorna o nome da área que contém a localização. Ambas funcionam também offline no **Arena Mobile**.
+
+Obrigado à **[ASSEDEV Alerte Environnement](https://assedev.fr)** pelo pedido.`,
+    },
     mapWorkspace: {
       title: `Um novo espaço de trabalho do mapa`,
       description: `**Dados > Mapa** tem um novo layout: no topo, os menus **Mapa base**, **Adicionar dados**, **Exibição** e **Ferramentas** e uma caixa de pesquisa de coordenadas e chaves de registros; ao lado, as abas **Camadas**, **Registros** e **Legenda**; embaixo, uma barra de status com as coordenadas do ponteiro e a escala.

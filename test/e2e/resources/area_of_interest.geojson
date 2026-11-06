@@ -1,0 +1,21 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Pilot area" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [12.48, 41.88],
+            [12.5, 41.88],
+            [12.5, 41.9],
+            [12.48, 41.9],
+            [12.48, 41.88]
+          ]
+        ]
+      }
+    }
+  ]
+}

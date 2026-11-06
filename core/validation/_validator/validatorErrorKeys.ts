@@ -137,6 +137,13 @@ export const ValidatorErrorKeys = {
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors:surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors:surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
     fieldManualLinksInvalid: 'validationErrors:surveyInfoEdit.fieldManualLinksInvalid',
+    areaOfInterestInvalid: 'validationErrors:surveyInfoEdit.areaOfInterestInvalid',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'validationErrors:surveyAreaOfInterest.fileRequired',
+    nameDuplicate: 'validationErrors:surveyAreaOfInterest.nameDuplicate',
+    nameRequired: 'validationErrors:surveyAreaOfInterest.nameRequired',
   },
 
   surveyPreloadedMapLayer: {

@@ -174,6 +174,13 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'A data de término do ciclo é obrigatória para todos os ciclos, exceto o último',
     fieldManualLinksInvalid: 'Link do manual de campo inválido',
+    areaOfInterestInvalid: 'A área de interesse deve ser um polígono em formato GeoJSON com coordenadas WGS84',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Arquivo obrigatório',
+    nameDuplicate: 'Já existe outra área de interesse com o mesmo nome',
+    nameRequired: 'Nome obrigatório',
   },
 
   surveyPreloadedMapLayer: {

@@ -377,6 +377,72 @@ describe('SurveyCompare: full sync', () => {
       expect(SurveyFile.getSize(layerUpdated)).toBe(20)
       expect(surveyInfoPlan.surveyProps.branding.surveyLogo1.name).toBe('logo.png')
     })
+
+    test('the areas of interest are compared by name and summary and replaced with new files', async () => {
+      const { survey, items } = await buildSurvey()
+      const area = ({ name, fileUuid, vertices = 5 }) => ({
+        name,
+        fileUuid,
+        fileName: `${name}.geojson`,
+        size: 100,
+        polygons: 1,
+        vertices,
+      })
+      const target = updateSurveyInfoProps(survey, {
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'target-a' }),
+          area({ name: 'area_b', fileUuid: 'target-b' }),
+          area({ name: 'area_c', fileUuid: 'target-c' }),
+        ],
+      })
+      // same areas with other file uuids (e.g. survey imported): no changes
+      const sourceSame = updateSurveyInfoProps(clone(survey), {
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'source-a' }),
+          area({ name: 'area_b', fileUuid: 'source-b' }),
+          area({ name: 'area_c', fileUuid: 'source-c' }),
+        ],
+      })
+      expect(compare({ source: sourceSame, target, sourceItems: items, targetItems: items }).surveyFiles).toEqual([])
+
+      // area_a unchanged, area_b changed, area_c removed, area_d added
+      const source = updateSurveyInfoProps(clone(survey), {
+        areasOfInterest: [
+          area({ name: 'area_a', fileUuid: 'source-a' }),
+          area({ name: 'area_d', fileUuid: 'source-d' }),
+          area({ name: 'area_b', fileUuid: 'source-b', vertices: 7 }),
+        ],
+      })
+      const result = compare({ source, target, sourceItems: items, targetItems: items })
+      expect(result.surveyInfo).toEqual([])
+      expect(result.surveyFiles.map((diff) => [diff.name, diff.fileType, diff.status])).toEqual([
+        ['area_b', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.changed],
+        ['area_c', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.removed],
+        ['area_d', SurveyFile.SurveyFileType.areaOfInterest, SurveyCompareStatus.added],
+      ])
+      expect(result.surveyFiles[0].propDiffs.map((propDiff) => propDiff.key)).toEqual(['vertices'])
+
+      const surveyInfoPlan = buildSurveyInfoApplyPlan({
+        sourceSurvey: source,
+        targetSurvey: target,
+        surveyInfoDiffs: result.surveyInfo,
+        surveyFileDiffs: result.surveyFiles,
+        appliedIds: new Set(result.surveyFiles.map((diff) => diff.id)),
+      })
+      const newFileUuidBySourceUuid = Object.fromEntries(
+        surveyInfoPlan.surveyFilesToInsert.map(({ sourceUuid, file }) => [sourceUuid, SurveyFile.getUuid(file)])
+      )
+      expect(Object.keys(newFileUuidBySourceUuid).sort()).toEqual(['source-b', 'source-d'])
+      for (const { file } of surveyInfoPlan.surveyFilesToInsert) {
+        expect(SurveyFile.getType(file)).toBe(SurveyFile.SurveyFileType.areaOfInterest)
+      }
+      expect(surveyInfoPlan.surveyFileUuidsToDelete.sort()).toEqual(['target-b', 'target-c'])
+      expect(surveyInfoPlan.surveyProps.areasOfInterest).toEqual([
+        area({ name: 'area_a', fileUuid: 'target-a' }),
+        area({ name: 'area_b', fileUuid: newFileUuidBySourceUuid['source-b'], vertices: 7 }),
+        area({ name: 'area_d', fileUuid: newFileUuidBySourceUuid['source-d'] }),
+      ])
+    })
   })
 
   describe('renames', () => {

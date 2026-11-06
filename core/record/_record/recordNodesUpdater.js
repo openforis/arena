@@ -194,6 +194,7 @@ const _addEntityAndKeyValues =
     survey,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     entityDef,
     parentNode,
     keyValuesByDefUuid,
@@ -206,6 +207,7 @@ const _addEntityAndKeyValues =
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       record,
       parentNode,
       nodeDef: entityDef,
@@ -249,6 +251,7 @@ const _getOrCreateEntityByKeys =
     survey,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     entityDefUuid,
     valuesByDefUuid,
     insertMissingNodes,
@@ -303,6 +306,7 @@ const _getOrCreateEntityByKeys =
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
@@ -327,6 +331,7 @@ const getOrCreateEntityByKeys =
     valuesByDefUuid,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
@@ -341,6 +346,7 @@ const getOrCreateEntityByKeys =
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
@@ -362,6 +368,7 @@ const getOrCreateEntityByKeys =
         nodes: updateResultEntity.nodes,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -386,6 +393,7 @@ const updateAttributesInEntityWithValues =
     refDataByDefUuid = null,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     sideEffect = false,
     updateDependents = true,
@@ -408,6 +416,7 @@ const updateAttributesInEntityWithValues =
         nodes: nodeUpdateResult.nodes,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -433,6 +442,7 @@ const updateAttributesInEntityWithValues =
           survey,
           categoryItemProvider,
           taxonProvider,
+          areaOfInterestProvider,
           entity: attributeParentEntity,
           attributeDef,
           value,
@@ -454,6 +464,7 @@ const updateAttributesWithValues =
     valuesByDefUuid,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
@@ -469,6 +480,7 @@ const updateAttributesWithValues =
       valuesByDefUuid,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       timezoneOffset,
       insertMissingNodes,
       sideEffect,
@@ -483,6 +495,7 @@ const updateAttributesWithValues =
       valuesByDefUuid,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       timezoneOffset,
       sideEffect,
     })(updateResult.record)
@@ -493,7 +506,16 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, taxonProvider, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entity,
+    nodeDefUuids,
+    categoryItemProvider,
+    taxonProvider,
+    areaOfInterestProvider,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -510,6 +532,7 @@ const deleteNodesInEntityByNodeDefUuid =
       nodeUuids: nodeUuidsToDelete,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)

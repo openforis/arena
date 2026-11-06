@@ -116,6 +116,7 @@ Les modifications sont enregistrées en brouillon : elles n'atteindront les enre
     brandingSurveyLogo2: 'Logo du formulaire 2',
     brandingSurveyLogo3: 'Logo du formulaire 3',
     brandingLandingBackground: "Arrière-plan de la page d'accueil",
+    areaOfInterest: "Zone d'intérêt",
   },
   cycle: 'cycle {{cycle}}',
   property: 'Propriété',

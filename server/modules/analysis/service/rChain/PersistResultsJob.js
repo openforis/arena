@@ -4,11 +4,13 @@ import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/
 import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 
 import { RecordsProvider } from './RecordsProvider'
 import { FileFormats } from '@core/fileFormats'
 
 const categoryItemProvider = CategoryItemProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export default class PersistResultsJob extends FlatDataImportJob {
   constructor(params) {
@@ -83,6 +85,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
       survey,
       entity,
       valuesByDefUuid,
+      areaOfInterestProvider,
       sideEffect: true,
     })(record)
 

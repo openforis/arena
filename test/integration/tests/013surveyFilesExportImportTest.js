@@ -17,13 +17,23 @@ import * as SB from '../../utils/surveyBuilder'
 
 import { getContextUser } from '../config/context'
 
-describe('Survey files export/import - branding and doc-layout images', () => {
+describe('Survey files export/import - branding and doc-layout images, area of interest', () => {
   let sourceSurveyId
   let logoFileUuid
   let logoContent
   let headerFileUuid
   let headerContent
+  // two areas of interest: { name, fileUuid, content }
+  let areaOfInterestFiles
   const createdSurveyIds = []
+
+  const expectSameFileContent = async ({ surveyId, fileUuid, content }) => {
+    const contentInSurvey = await SurveyFileService.fetchFileContentAsBuffer({
+      surveyId,
+      fileSummary: { uuid: fileUuid },
+    })
+    expect(Buffer.compare(contentInSurvey, content)).toBe(0)
+  }
 
   beforeAll(async () => {
     // The integration test harness never runs the app bootstrap (server/system/appCluster.js),
@@ -81,6 +91,49 @@ describe('Survey files export/import - branding and doc-layout images', () => {
         },
       },
     ])
+
+    const areaOfInterestContent = (west) =>
+      Buffer.from(
+        JSON.stringify({
+          type: 'Polygon',
+          coordinates: [
+            [
+              [west, 41.88],
+              [west + 0.01, 41.88],
+              [west + 0.01, 41.9],
+              [west, 41.88],
+            ],
+          ],
+        })
+      )
+    areaOfInterestFiles = [
+      { name: 'area_a', fileUuid: uuidv4(), content: areaOfInterestContent(12.48) },
+      { name: 'area_b', fileUuid: uuidv4(), content: areaOfInterestContent(12.49) },
+    ]
+    for (const { name, fileUuid, content } of areaOfInterestFiles) {
+      const type = SurveyFile.SurveyFileType.areaOfInterest
+      const file = SurveyFile.createFile({
+        uuid: fileUuid,
+        name: `${name}.geojson`,
+        size: content.length,
+        content,
+        type,
+      })
+      await SurveyFileService.insertFile(sourceSurveyId, file) // NOSONAR
+    }
+    await SurveyManager.updateSurveyProp(
+      user,
+      sourceSurveyId,
+      Survey.infoKeys.areasOfInterest,
+      areaOfInterestFiles.map(({ name, fileUuid, content }) => ({
+        name,
+        fileUuid,
+        fileName: `${name}.geojson`,
+        size: content.length,
+        polygons: 1,
+        vertices: 4,
+      }))
+    )
   })
 
   afterAll(async () => {
@@ -117,6 +170,10 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(importedHeaderContent, headerContent)).toBe(0)
+
+    for (const { fileUuid, content } of areaOfInterestFiles) {
+      await expectSameFileContent({ surveyId: importedSurveyId, fileUuid, content }) // NOSONAR
+    }
   })
 
   test('branding logo and doc header image content survive survey cloning', async () => {
@@ -140,6 +197,10 @@ describe('Survey files export/import - branding and doc-layout images', () => {
       fileSummary: { uuid: headerFileUuid },
     })
     expect(Buffer.compare(clonedHeaderContent, headerContent)).toBe(0)
+
+    for (const { fileUuid, content } of areaOfInterestFiles) {
+      await expectSameFileContent({ surveyId: clonedSurveyId, fileUuid, content }) // NOSONAR
+    }
   })
 
   test('import warns and skips missing survey file content when skipMissingFiles is true', async () => {

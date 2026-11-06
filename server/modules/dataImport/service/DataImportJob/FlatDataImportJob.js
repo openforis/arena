@@ -14,6 +14,7 @@ import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
@@ -27,6 +28,7 @@ const eventLoopYieldIntervalMillis = 200
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 const determineAncestorMultipleEntityDefUuid = ({ survey, nodeDefUuid }) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -269,6 +271,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         refDataByDefUuid,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         insertMissingNodes,
         sideEffect,
         updateDependents: false,
@@ -296,6 +299,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         sideEffect,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         updateDependents: false,
       })(this.currentRecord)
 
@@ -372,6 +376,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       nodes: nodesUpdated,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       sideEffect: !includeFiles,
     })
     this.currentRecord = recordUpdated
@@ -427,6 +432,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
         survey,
         entity,
         nodeDefUuids: nodeDefUuidsToClear,
+        areaOfInterestProvider,
         sideEffect,
       })(this.currentRecord)
 

@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    areaOfInterest: {
+      title: 'Područja od interesa: provera da li je lokacija unutar područja',
+      description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu.
+
+Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća udaljenost u metrima između lokacije i granice područja: negativnu unutar, pozitivnu van njega. Uporedite je sa GPS preciznošću (\`location.accuracy\`) da biste lokacije klasifikovali kao unutar, van ili neizvesne, npr. u podrazumevanim vrednostima atributa samo za čitanje i u pravilima validacije sa nivoom *upozorenje*. \`geoAOIContaining(location)\` vraća naziv područja koje sadrži lokaciju. Obe rade i oflajn u **Arena Mobile**.
+
+Hvala **[ASSEDEV Alerte Environnement](https://assedev.fr)** na zahtevu.`,
+    },
     mapWorkspace: {
       title: `Novi radni prostor mape`,
       description: `**Podaci > Mapa** ima novi raspored: na vrhu menije **Osnovna mapa**, **Dodaj podatke**, **Prikaz** i **Alati** i polje za pretragu koordinata i ključeva zapisa, sa strane kartice **Slojevi**, **Zapisi** i **Legenda**, a na dnu statusnu traku sa koordinatama pokazivača i razmerom.
