@@ -18,6 +18,7 @@ const initialState = {
   [DataExplorerState.keys.query]: Query.create(),
   [DataExplorerState.keys.selectedQuerySummaryUuid]: null,
   [DataExplorerState.keys.codesVisible]: false,
+  [DataExplorerState.keys.totalsVisible]: false,
 }
 
 const exportQueryData = createAsyncThunk('dataQuery/exportData', async (params, { dispatch, getState }) => {
@@ -60,6 +61,8 @@ export const slice = createSlice({
 
     setCodesVisible: (state, action) => DataExplorerState.assocCodesVisible(action.payload)(state),
 
+    setTotalsVisible: (state, action) => DataExplorerState.assocTotalsVisible(action.payload)(state),
+
     openRecordEditModal: (state, action) => DataExplorerState.assocRecordEditModalProps(action.payload)(state),
 
     closeRecordEditModal: (state) => DataExplorerState.dissocRecordEditModalProps(state),
@@ -77,6 +80,7 @@ const {
   setQuery,
   setSelectedQuerySummaryUuid,
   setCodesVisible,
+  setTotalsVisible,
   openRecordEditModal,
   closeRecordEditModal,
 } = slice.actions
@@ -89,6 +93,7 @@ export const DataExplorerActions = {
   setQuery,
   setSelectedQuerySummaryUuid,
   setCodesVisible,
+  setTotalsVisible,
   openRecordEditModal,
   closeRecordEditModal,
   exportQueryData,

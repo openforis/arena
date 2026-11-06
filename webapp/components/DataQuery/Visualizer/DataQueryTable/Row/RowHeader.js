@@ -15,6 +15,7 @@ const RowHeader = (props) => {
     nodeDefCols,
     nodeDefLabelType,
     onChangeQuery,
+    percentageVisible = false,
     query,
     sortableVariablesByUuid,
   } = props
@@ -34,6 +35,7 @@ const RowHeader = (props) => {
           nodeDef={nodeDef}
           nodeDefLabelType={nodeDefLabelType}
           onChangeQuery={onChangeQuery}
+          percentageVisible={percentageVisible}
           query={query}
           sortableVariablesByUuid={sortableVariablesByUuid}
         />
@@ -50,6 +52,7 @@ RowHeader.propTypes = {
   nodeDefCols: PropTypes.arrayOf(Object).isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  percentageVisible: PropTypes.bool,
   query: PropTypes.object.isRequired,
   sortableVariablesByUuid: PropTypes.object.isRequired,
 }
