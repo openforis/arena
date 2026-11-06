@@ -23,7 +23,8 @@ const options = {
       },
     },
   },
-  apis: ['./**/*Api.js', './docs/api/*.js'],
+  // not './**': that walks node_modules at every server startup
+  apis: ['./server/**/*Api.js', './docs/api/*.js'],
 }
 
 const specs = swaggerJSDoc(options)
