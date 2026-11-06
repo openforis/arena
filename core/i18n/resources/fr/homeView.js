@@ -147,6 +147,7 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
       vertices: 'Sommets',
       invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',
       confirmDelete: "Êtes-vous sûr de vouloir supprimer cette zone d'intérêt ?",
+      showAllOnMap: 'Tout afficher sur la carte',
       editor: {
         title: "Zone d'intérêt",
       },

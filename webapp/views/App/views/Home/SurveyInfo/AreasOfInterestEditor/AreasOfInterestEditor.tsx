@@ -2,7 +2,7 @@ import { useCallback, useState } from 'react'
 
 import type { AreaOfInterestDescriptor } from '@openforis/arena-core'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
+import { Button, ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useConfirmAsync } from '@webapp/components/hooks'
@@ -84,11 +84,30 @@ export const AreasOfInterestEditor = (props: Props) => {
     [lang]
   )
 
+  const onShowAllOnMap = useCallback(
+    () =>
+      setMapPanel({
+        header: 'homeView:surveyInfo.areasOfInterest.title',
+        surveyFiles: areasOfInterest.map(toSurveyFileRef(lang)),
+      }),
+    [areasOfInterest, lang]
+  )
+
   return (
     <fieldset className="survey-info__areas-of-interest">
       <legend>{i18n.t('homeView:surveyInfo.areasOfInterest.title')}</legend>
       <p>{i18n.t('homeView:surveyInfo.areasOfInterest.info')}</p>
-      {!readOnly && <ButtonAdd onClick={() => setDialog({ open: true, edited: null })} size="small" />}
+      <div className="survey-info__areas-of-interest-buttons">
+        {!readOnly && <ButtonAdd onClick={() => setDialog({ open: true, edited: null })} size="small" />}
+        {canUseMap && areasOfInterest.length > 0 && (
+          <Button
+            iconClassName="icon-map icon-12px"
+            label="homeView:surveyInfo.areasOfInterest.showAllOnMap"
+            onClick={onShowAllOnMap}
+            size="small"
+          />
+        )}
+      </div>
       <DataGrid
         columns={[
           ...(readOnly

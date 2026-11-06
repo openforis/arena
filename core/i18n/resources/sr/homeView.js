@@ -146,6 +146,7 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
       vertices: 'Temena',
       invalidFile: 'Datoteka ne sadrži važeći poligon u GeoJSON formatu sa WGS84 koordinatama',
       confirmDelete: 'Da li ste sigurni da želite da obrišete ovo područje od interesa?',
+      showAllOnMap: 'Prikaži sve na mapi',
       editor: {
         title: 'Područje od interesa',
       },
