@@ -22,6 +22,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Funções de agregação de {{name}}',
     ai: {
       button: 'Perguntar à IA',
       buttonTitle: 'Gerar uma consulta a partir de uma descrição usando IA',
@@ -38,6 +39,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
       generatedSuccessfully:
         'Consulta gerada: {{explanation}} Verifique o resultado e salve a consulta se quiser mantê-la.',
     },
+    customAggregateFunctions: 'Funções de agregação personalizadas…',
     deleteConfirmMessage: 'Excluir a consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',
@@ -45,7 +47,6 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     },
     manageQueries: 'Gerenciar consultas',
     mode: {
-      label: 'Modo:',
       aggregate: 'Agregado',
       raw: 'Bruto',
       rawEdit: 'Edição bruta',

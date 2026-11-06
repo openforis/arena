@@ -13,9 +13,9 @@ import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditM
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
-import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
+import { QuerySidebar } from './QuerySidebar/QuerySidebar'
 import {
   DataQuerySelectedAttributes,
   DataQuerySelectedDimensions,
@@ -53,7 +53,7 @@ const DataQuery = () => {
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
+      <QuerySidebar nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {

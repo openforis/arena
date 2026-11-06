@@ -22,6 +22,16 @@
 .data-query__sortable-item-chip.MuiChip-root {
   background-color: $colorSurface;
 
+  .MuiChip-label {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+  }
+
+  .data-query__sortable-item-chip-label {
+    cursor: grab;
+  }
+
   &.draggable-mirror {
     background-color: tint($colorWarningContainer, 45%);
     border: 1px dashed $colorPrimary;
@@ -31,4 +41,18 @@
     color: transparent;
     background-color: transparent;
   }
+}
+
+.data-query__aggregate-fns-btn.MuiButton-root.btn {
+  max-width: 9rem;
+  min-height: 22px;
+  padding: 0 0.3rem;
+  overflow: hidden;
+  font-size: 0.75rem;
+  letter-spacing: normal;
+  white-space: nowrap;
+  border: none;
+  border-left: 1px solid $colorOutline;
+  border-radius: 0;
+  background-color: transparent;
 }

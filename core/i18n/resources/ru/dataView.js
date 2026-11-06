@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Агрегатные функции {{name}}',
     ai: {
       button: 'Спросить ИИ',
       buttonTitle: 'Сформировать запрос по описанию с помощью ИИ',
@@ -38,6 +39,7 @@ export default {
       generatedSuccessfully:
         'Запрос сформирован: {{explanation}} Проверьте результат и сохраните запрос, если он вам нужен.',
     },
+    customAggregateFunctions: 'Пользовательские агрегатные функции…',
     deleteConfirmMessage: 'Удалить запрос "{{name}}"?',
     displayType: {
       chart: 'Диаграмма',
@@ -45,7 +47,6 @@ export default {
     },
     manageQueries: 'Управление запросами',
     mode: {
-      label: 'Режим:',
       aggregate: 'Агрегировать',
       raw: 'Исходные данные',
       rawEdit: 'Редактировать исходные данные',
