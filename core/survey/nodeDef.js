@@ -934,60 +934,71 @@ export const canBeHiddenInReport = (nodeDef) =>
 
 export const canHaveAutoCreateMinCountItems = (nodeDef) => isMultipleEntity(nodeDef) && !isEnumerate(nodeDef)
 
+// props (or layout props) to clear when not applicable to the node def, checked in order on the updated node def
+const notApplicablePropClearers = (cycle) => [
+  {
+    isToClear: (nodeDef) => !canHaveAutoCreateMinCountItems(nodeDef) && isAutoCreateMinCountItems(nodeDef),
+    clear: assocProp({ key: propKeys.autoCreateMinCountItems, value: false }),
+  },
+  {
+    isToClear: (nodeDef) => !canBeHidden(nodeDef) && isHidden(nodeDef),
+    clear: assocHidden(false),
+  },
+  {
+    isToClear: (nodeDef) => !canBeHiddenInMobile(nodeDef) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef),
+    clear: dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile }),
+  },
+  {
+    // text attribute: render type hyperlink or Markdown
+    isToClear: (nodeDef) =>
+      isText(nodeDef) &&
+      !canBeShownAsHyperlinkOrMarkdown(nodeDef) &&
+      NodeDefLayout.getRenderType(cycle)(nodeDef) !== NodeDefLayout.textRenderType.text,
+    clear: dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.renderType }),
+  },
+  {
+    isToClear: (nodeDef) =>
+      !canIncludeInMultipleEntitySummary(cycle)(nodeDef) &&
+      NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDef),
+    clear: dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary }),
+  },
+  {
+    isToClear: (nodeDef) =>
+      !canIncludeInPreviousCycleLink(cycle)(nodeDef) && NodeDefLayout.isIncludedInPreviousCycleLink(cycle)(nodeDef),
+    clear: dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink }),
+  },
+  {
+    isToClear: (nodeDef) => !canBeExcludedInClone(nodeDef) && isExcludedInClone(nodeDef),
+    clear: assocExcludedInClone(false),
+  },
+  {
+    isToClear: (nodeDef) => !canShowGeotagInformation(nodeDef) && isGeotagInformationShown(nodeDef),
+    clear: ObjectUtils.setProp(propKeys.geotagInformationShown, false),
+  },
+  {
+    isToClear: (nodeDef) => !canBePositionTracking(nodeDef) && isPositionTracking(nodeDef),
+    clear: ObjectUtils.setProp(propKeys.positionTracking, false),
+  },
+  {
+    isToClear: (nodeDef) => !canBeHiddenInReport(nodeDef) && isHiddenInReport(nodeDef),
+    clear: assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false }),
+  },
+  {
+    isToClear: (nodeDef) => NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDef) && A.isEmpty(getApplicable(nodeDef)),
+    clear: dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenWhenNotRelevant }),
+  },
+  {
+    isToClear: (nodeDef) => isDefaultValueEvaluatedOneTime(nodeDef) && A.isEmpty(getDefaultValues(nodeDef)),
+    clear: assocDefaultValueEvaluatedOnlyOneTime(false),
+  },
+]
+
 export const clearNotApplicableProps = (cycle) => (nodeDef) => {
   let nodeDefUpdated = nodeDef
-  if (!canHaveAutoCreateMinCountItems(nodeDefUpdated) && isAutoCreateMinCountItems(nodeDefUpdated)) {
-    nodeDefUpdated = assocProp({ key: propKeys.autoCreateMinCountItems, value: false })(nodeDefUpdated)
-  }
-  // clear hidden if not applicable
-  if (!canBeHidden(nodeDefUpdated) && isHidden(nodeDefUpdated)) {
-    nodeDefUpdated = assocHidden(false)(nodeDefUpdated)
-  }
-  // clear hidden in mobile if not applicable
-  if (!canBeHiddenInMobile(nodeDefUpdated) && NodeDefLayout.isHiddenInMobile(cycle)(nodeDef)) {
-    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenInMobile })(nodeDefUpdated)
-  }
-  // text attribute: clear render type hyperlink or Markdown if not applicable
-  if (
-    isText(nodeDef) &&
-    !canBeShownAsHyperlinkOrMarkdown(nodeDefUpdated) &&
-    NodeDefLayout.getRenderType(cycle)(nodeDef) !== NodeDefLayout.textRenderType.text
-  ) {
-    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.renderType })(nodeDefUpdated)
-  }
-  // clear include in multiple entity summary if not applicable
-  if (
-    !canIncludeInMultipleEntitySummary(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(nodeDefUpdated)
-  ) {
-    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInMultipleEntitySummary })(
-      nodeDefUpdated
-    )
-  }
-  // clear include in previous cycle link if not applicable
-  if (
-    !canIncludeInPreviousCycleLink(cycle)(nodeDefUpdated) &&
-    NodeDefLayout.isIncludedInPreviousCycleLink(cycle)(nodeDefUpdated)
-  ) {
-    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.includedInPreviousCycleLink })(nodeDefUpdated)
-  }
-  if (!canBeExcludedInClone(nodeDefUpdated) && isExcludedInClone(nodeDefUpdated)) {
-    nodeDefUpdated = assocExcludedInClone(false)(nodeDefUpdated)
-  }
-  if (!canShowGeotagInformation(nodeDefUpdated) && isGeotagInformationShown(nodeDefUpdated)) {
-    nodeDefUpdated = ObjectUtils.setProp(propKeys.geotagInformationShown, false)(nodeDefUpdated)
-  }
-  if (!canBePositionTracking(nodeDefUpdated) && isPositionTracking(nodeDefUpdated)) {
-    nodeDefUpdated = ObjectUtils.setProp(propKeys.positionTracking, false)(nodeDefUpdated)
-  }
-  if (!canBeHiddenInReport(nodeDefUpdated) && isHiddenInReport(nodeDefUpdated)) {
-    nodeDefUpdated = assocProp({ key: keysPropsAdvanced.hiddenInReport, value: false })(nodeDefUpdated)
-  }
-  if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefUpdated) && A.isEmpty(getApplicable(nodeDefUpdated))) {
-    nodeDefUpdated = dissocLayoutProp({ cycle, prop: NodeDefLayout.keys.hiddenWhenNotRelevant })(nodeDefUpdated)
-  }
-  if (isDefaultValueEvaluatedOneTime(nodeDefUpdated) && A.isEmpty(getDefaultValues(nodeDefUpdated))) {
-    nodeDefUpdated = assocDefaultValueEvaluatedOnlyOneTime(false)(nodeDefUpdated)
+  for (const { isToClear, clear } of notApplicablePropClearers(cycle)) {
+    if (isToClear(nodeDefUpdated)) {
+      nodeDefUpdated = clear(nodeDefUpdated)
+    }
   }
   return nodeDefUpdated
 }
