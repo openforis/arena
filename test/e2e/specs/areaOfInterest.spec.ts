@@ -9,42 +9,9 @@ import { aoiStatusMessages, insertAreaOfInterestSurvey, pilotAreaName } from '..
 import { ArenaApi } from '../fixtures/arenaApi'
 import { RecordForm } from '../helpers/recordForm'
 import { Urls } from '../helpers/urls'
+import { saveAreaScreenshot, saveScreenshot } from '../helpers/whatsNewScreenshots'
 
 const geoJsonPath = path.resolve(__dirname, '..', 'resources', 'area_of_interest.geojson')
-
-// set WHATS_NEW_SCREENSHOTS_DIR to save the screenshots used in the "What's new" dialog
-const screenshotsDir = process.env.WHATS_NEW_SCREENSHOTS_DIR
-
-const saveScreenshot = async (locator: Locator, name: string): Promise<void> => {
-  if (screenshotsDir) await locator.screenshot({ path: path.join(screenshotsDir, `${name}.png`) })
-}
-
-// screenshot of the page area containing the specified elements, with some margin (e.g. for tooltips below them)
-const saveAreaScreenshot = async ({
-  page,
-  locators,
-  name,
-  marginBottom = 0,
-  marginRight = 0,
-}: {
-  page: Page
-  locators: Locator[]
-  name: string
-  marginBottom?: number
-  marginRight?: number
-}): Promise<void> => {
-  if (!screenshotsDir) return
-  const boxes = (await Promise.all(locators.map((locator) => locator.boundingBox()))).filter((box) => !!box)
-  const margin = 10
-  const x = Math.min(...boxes.map((box) => box.x)) - margin
-  const y = Math.min(...boxes.map((box) => box.y)) - margin
-  const right = Math.max(...boxes.map((box) => box.x + box.width)) + margin + marginRight
-  const bottom = Math.max(...boxes.map((box) => box.y + box.height)) + margin + marginBottom
-  await page.screenshot({
-    path: path.join(screenshotsDir, `${name}.png`),
-    clip: { x, y, width: right - x, height: bottom - y },
-  })
-}
 
 // set E2E_KEEP_DATA=true to keep the survey (e.g. to inspect it after a failure)
 const deleteSurvey = async ({ api, surveyId }: { api: ArenaApi; surveyId: number }): Promise<void> => {
@@ -146,6 +113,13 @@ test.describe('Area of interest', () => {
       await expect(status).toHaveValue('outside')
       await form.errorBadge('aoi_status').hover()
       await expect(page.getByText(aoiStatusMessages.outside)).toBeVisible()
+      await saveAreaScreenshot({
+        page,
+        locators: [form.nodeDefWrapper(defs.location.name), form.nodeDefWrapper('aoi_status')],
+        name: 'areaOfInterestOutside',
+        marginBottom: 40,
+        marginRight: 60,
+      })
       await page.mouse.move(0, 0)
 
       // inside but close to the boundary (~8 m) with a poor accuracy
@@ -156,7 +130,7 @@ test.describe('Area of interest', () => {
       await saveAreaScreenshot({
         page,
         locators: [form.nodeDefWrapper(defs.location.name), form.nodeDefWrapper('aoi_status')],
-        name: 'areaOfInterestDataEntry',
+        name: 'areaOfInterestUncertain',
         marginBottom: 40,
         marginRight: 60,
       })

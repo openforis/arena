@@ -10,10 +10,12 @@ type CarouselProps<T> = {
   className?: string
   items: T[]
   renderItem: (item: T, index: number) => ReactNode
+  /** When false, the Previous and Next buttons show only their icon (label as tooltip). */
+  showButtonLabels?: boolean
 }
 
 export const Carousel = <T,>(props: CarouselProps<T>) => {
-  const { className, items, renderItem } = props
+  const { className, items, renderItem, showButtonLabels = true } = props
 
   const [activeIndexState, setActiveIndexState] = useState(0)
   const count = items.length
@@ -58,6 +60,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
               disabled={activeIndex === 0}
               onClick={goToPrevious}
               onKeyDown={onButtonKeyDown}
+              showLabel={showButtonLabels}
               size="small"
               variant="text"
             />
@@ -68,6 +71,7 @@ export const Carousel = <T,>(props: CarouselProps<T>) => {
               disabled={activeIndex === lastIndex}
               onClick={goToNext}
               onKeyDown={onButtonKeyDown}
+              showLabel={showButtonLabels}
               size="small"
               variant="text"
             />

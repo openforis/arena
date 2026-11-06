@@ -124,6 +124,8 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         gap: 1.5,
         p: 0.75,
         borderRadius: 1,
+        // absolutely positioned at 50%: without an explicit width it would shrink the select and the Done button
+        width: 'max-content',
         maxWidth: 'calc(100% - 24px)',
         fontSize: 13,
         cursor: 'default',
@@ -166,7 +168,10 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
       )}
 
       {showHint && (
-        <Typography component="span" sx={{ fontSize: 12, color: 'text.secondary' }}>
+        <Typography
+          component="span"
+          sx={{ fontSize: 12, color: 'text.secondary', minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis' }}
+        >
           {t('mapWorkspace.measure.hint')}
         </Typography>
       )}
@@ -175,7 +180,7 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
         value={unit}
         onChange={onSelectChange}
         inputProps={unitInputProps}
-        sx={{ fontSize: 12, height: 30 }}
+        sx={{ fontSize: 12, height: 30, flexShrink: 0 }}
       >
         {unitOptions.map((option) => (
           <option key={option} value={option}>
@@ -187,7 +192,7 @@ export const MeasureBar = (props: MeasureBarProps): ReactElement => {
       <Button
         size="small"
         variant="outlined"
-        sx={{ height: 30, textTransform: 'none' }}
+        sx={{ height: 30, textTransform: 'none', flexShrink: 0 }}
         data-testid={TestId.mapWorkspace.measureDone}
         onClick={onDone}
       >

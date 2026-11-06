@@ -11,6 +11,7 @@ import { cluster, clusterImage, sampleRecords } from '../fixtures/seed/sampleSur
 import { RecordForm } from '../helpers/recordForm'
 import { openRecord } from '../helpers/records'
 import { Urls } from '../helpers/urls'
+import { saveAreaScreenshot, savingWhatsNewScreenshots, waitForMapTiles } from '../helpers/whatsNewScreenshots'
 
 const ids = TestId.mapWorkspace
 
@@ -37,6 +38,18 @@ const PREVIEW_TIMEOUT = 30_000
 const waitForScreenshotPreview = async (page: Page): Promise<void> => {
   await expect(page.getByTestId(ids.screenshotPreview)).toBeVisible({ timeout: PREVIEW_TIMEOUT })
   await expect(page.getByTestId(ids.screenshotSubmit)).toBeEnabled({ timeout: PREVIEW_TIMEOUT })
+}
+
+// the top of the workspace, wide like the other images of the "What's new" dialog (they have the same height there)
+const saveWorkspaceScreenshot = async (page: Page, name: string): Promise<void> => {
+  await waitForMapTiles(page)
+  await saveAreaScreenshot({
+    page,
+    locators: [page.getByTestId(ids.toolbar), page.getByTestId(ids.statusBar)],
+    name,
+    maxHeight: 470,
+    type: 'jpeg',
+  })
 }
 
 const openMap = async (page: Page): Promise<void> => {
@@ -713,5 +726,103 @@ test.describe('Map screenshot', () => {
 
     await openRecord(page, record.cluster_id)
     await expect(new RecordForm(page).nodeDefWrapper(clusterImage.name)).toContainText(fileName)
+  })
+})
+
+// scenes of the "What's new" dialog (see core/whatsNew/README.md): defined only when saving its screenshots
+const describeWhatsNewScreenshots = savingWhatsNewScreenshots ? test.describe : () => undefined
+
+describeWhatsNewScreenshots("What's new screenshots", () => {
+  test.use({ sampleSurveyOptions: { records: sampleRecords } })
+
+  // the hills around the sample record 2, at zoom 16
+  const goToSampleRecord = async (page: Page): Promise<void> => {
+    const search = page.getByTestId(ids.searchInput)
+    await search.fill('42.9, 13.5')
+    await page.keyboard.press('Enter')
+    await expect(page.getByTestId(ids.statusZoom)).toHaveText('Zoom 14')
+    // clear the search mark
+    await search.focus()
+    await page.keyboard.press('Escape')
+    for (const zoom of [15, 16]) {
+      await page.locator('.leaflet-control-zoom-in').click()
+      await expect(page.getByTestId(ids.statusZoom)).toHaveText(`Zoom ${zoom}`)
+    }
+    await overlayCheckbox(page, COORDINATE_LAYER).check()
+    await page.mouse.move(0, 0)
+  }
+
+  // square plots of 50 m, 100 m away from the sample record 2 (42.9 N, 13.5 E) in the 4 diagonal directions
+  const clusterPlotsKml = (): string => {
+    const metersToLat = (meters: number) => meters / 111_320
+    const metersToLon = (meters: number) => meters / (111_320 * Math.cos((42.9 * Math.PI) / 180))
+    const placemarks = [
+      [-1, 1],
+      [1, 1],
+      [1, -1],
+      [-1, -1],
+    ].map(([xSign, ySign], index) => {
+      const [x, y] = [13.5 + metersToLon(xSign * 100), 42.9 + metersToLat(ySign * 100)]
+      const [dx, dy] = [metersToLon(25), metersToLat(25)]
+      const ring = [
+        [x - dx, y - dy],
+        [x + dx, y - dy],
+        [x + dx, y + dy],
+        [x - dx, y + dy],
+        [x - dx, y - dy],
+      ]
+      const coordinates = ring.map(([lon, lat]) => `${lon},${lat},0`).join(' ')
+      return `<Placemark><name>Plot ${index + 1}</name><styleUrl>#plot</styleUrl><Polygon><outerBoundaryIs><LinearRing>
+<coordinates>${coordinates}</coordinates></LinearRing></outerBoundaryIs></Polygon></Placemark>`
+    })
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2"><Document>
+<Style id="plot"><LineStyle><color>ff00ffff</color><width>3</width></LineStyle><PolyStyle><color>4000ffff</color></PolyStyle></Style>
+${placemarks.join('\n')}</Document></kml>`
+  }
+
+  test('layers: own file next to the survey data', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await goToSampleRecord(page)
+    await page.getByTestId(ids.uploadInput).setInputFiles({
+      name: 'cluster_plots.kml',
+      mimeType: 'application/vnd.google-earth.kml+xml',
+      buffer: Buffer.from(clusterPlotsKml()),
+    })
+    await expect(uploadedRows(page)).toHaveCount(1)
+    await page.mouse.move(0, 0)
+    await saveWorkspaceScreenshot(page, 'mapWorkspaceLayers')
+  })
+
+  test('measure: area of a meadow', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await goToSampleRecord(page)
+    await startFromToolsMenu(page, 'measureArea')
+    await expect(page.getByTestId(ids.measureBar)).toBeVisible()
+    // the meadow east of the record, at zoom 16 (offsets from the centre of the map, in pixels)
+    const vertices = [
+      [197, -113],
+      [230, -133],
+      [260, -113],
+      [290, -73],
+      [315, -28],
+      [307, 12],
+      [280, 17],
+      [245, -8],
+      [225, -38],
+      [205, -73],
+    ]
+    for (const [dx, dy] of vertices.slice(0, -1)) {
+      const point = await mapPoint(page, dx, dy)
+      await page.mouse.click(point.x, point.y)
+    }
+    // the double-click on the last vertex finishes the polygon
+    const [lastDx, lastDy] = vertices.at(-1)!
+    const lastPoint = await mapPoint(page, lastDx, lastDy)
+    await page.mouse.dblclick(lastPoint.x, lastPoint.y)
+    await page.getByTestId(ids.measureUnit).selectOption('ha')
+    await expect(measureLabel(page)).toHaveText(/^\d+(\.\d+)? ha$/)
+    await page.mouse.move(0, 0)
+    await saveWorkspaceScreenshot(page, 'mapWorkspaceMeasure')
   })
 })
