@@ -427,12 +427,8 @@ export default class CategoryImportJob extends Job {
   }
 
   generateResult() {
-    const result = super.generateResult()
     const { category } = this.context
-    return {
-      ...result,
-      category,
-    }
+    return { category }
   }
 }
 

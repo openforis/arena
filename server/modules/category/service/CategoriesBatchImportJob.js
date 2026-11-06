@@ -108,7 +108,6 @@ export default class CategoriesBatchImportJob extends Job {
   generateResult() {
     const { insertedCategories, updatedCategories, total } = this
     return {
-      ...super.generateResult(),
       importedCategories: total,
       insertedCategories,
       updatedCategories,

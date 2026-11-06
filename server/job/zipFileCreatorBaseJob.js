@@ -32,11 +32,7 @@ export default class ZipFileCreatorBaseJob extends Job {
   }
 
   generateResult() {
-    const result = super.generateResult()
     const { outputFileName } = this.context
-    return {
-      ...result,
-      outputFileName,
-    }
+    return { outputFileName }
   }
 }
