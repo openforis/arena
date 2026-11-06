@@ -65,6 +65,17 @@ export const getAreasOfInterest = (surveyOrSurveyInfo: any): AreaOfInterestDescr
   ObjectUtils.getProp(infoKeys.areasOfInterest, [])(getInfo(surveyOrSurveyInfo)) as AreaOfInterestDescriptor[]
 
 /**
+ * Returns the label of an area of interest in a language, or its name if it has no label in that language.
+ *
+ * @param {string} lang - The language code.
+ * @returns {(descriptor: AreaOfInterestDescriptor) => string} - Function returning the label of a descriptor.
+ */
+export const getLabel =
+  (lang: string) =>
+  (descriptor: AreaOfInterestDescriptor): string =>
+    descriptor.labels?.[lang] || descriptor.name
+
+/**
  * Returns the names of the areas of interest, in the survey order.
  *
  * @param {object} surveyOrSurveyInfo - The survey or the survey info.

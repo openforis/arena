@@ -2,13 +2,17 @@ import { useCallback, useState } from 'react'
 
 import type { AreaOfInterestDescriptor } from '@openforis/arena-core'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit } from '@webapp/components'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
+
+import { Button, ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useConfirmAsync } from '@webapp/components/hooks'
+import { type SurveyFileRef, SurveyFilesMapPanel } from '@webapp/components/MapContainer/fileLayers'
 import * as API from '@webapp/service/api'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 
 import { AreaOfInterestDialog } from './AreaOfInterestDialog'
 
@@ -20,8 +24,18 @@ type Props = {
 
 type DialogState = { open: boolean; edited: AreaOfInterestDescriptor | null }
 
+type MapPanelState = { header: string; surveyFiles: SurveyFileRef[] }
+
 const isSameArea = (areaA: AreaOfInterestDescriptor | null) => (areaB: AreaOfInterestDescriptor) =>
   areaA?.fileUuid === areaB.fileUuid
+
+const toSurveyFileRef =
+  (lang: string) =>
+  (area: AreaOfInterestDescriptor): SurveyFileRef => ({
+    fileUuid: area.fileUuid,
+    fileName: area.fileName,
+    label: SurveyAreaOfInterest.getLabel(lang)(area),
+  })
 
 export const AreasOfInterestEditor = (props: Props) => {
   const { areasOfInterest = [], readOnly, setAreasOfInterest } = props
@@ -30,8 +44,10 @@ export const AreasOfInterestEditor = (props: Props) => {
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
   const confirm = useConfirmAsync()
+  const canUseMap = useAuthCanUseMap()
 
   const [dialog, setDialog] = useState<DialogState>({ open: false, edited: null })
+  const [mapPanel, setMapPanel] = useState<MapPanelState | null>(null)
 
   const closeDialog = useCallback(() => setDialog({ open: false, edited: null }), [])
 
@@ -62,11 +78,39 @@ export const AreasOfInterestEditor = (props: Props) => {
     [areasOfInterest, confirm, setAreasOfInterest]
   )
 
+  const onShowOnMap = useCallback(
+    (areaOfInterest: AreaOfInterestDescriptor) =>
+      setMapPanel({
+        header: SurveyAreaOfInterest.getLabel(lang)(areaOfInterest),
+        surveyFiles: [toSurveyFileRef(lang)(areaOfInterest)],
+      }),
+    [lang]
+  )
+
+  const onShowAllOnMap = useCallback(
+    () =>
+      setMapPanel({
+        header: 'homeView:surveyInfo.areasOfInterest.title',
+        surveyFiles: areasOfInterest.map(toSurveyFileRef(lang)),
+      }),
+    [areasOfInterest, lang]
+  )
+
   return (
     <fieldset className="survey-info__areas-of-interest">
       <legend>{i18n.t('homeView:surveyInfo.areasOfInterest.title')}</legend>
       <p>{i18n.t('homeView:surveyInfo.areasOfInterest.info')}</p>
-      {!readOnly && <ButtonAdd onClick={() => setDialog({ open: true, edited: null })} size="small" />}
+      <div className="survey-info__areas-of-interest-buttons">
+        {!readOnly && <ButtonAdd onClick={() => setDialog({ open: true, edited: null })} size="small" />}
+        {canUseMap && areasOfInterest.length > 0 && (
+          <Button
+            iconClassName="icon-map icon-12px"
+            label="homeView:surveyInfo.areasOfInterest.showAllOnMap"
+            onClick={onShowAllOnMap}
+            size="small"
+          />
+        )}
+      </div>
       <DataGrid
         columns={[
           ...(readOnly
@@ -102,6 +146,18 @@ export const AreasOfInterestEditor = (props: Props) => {
             sortable: false,
           },
           {
+            field: 'polygons',
+            width: 100,
+            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.polygons'),
+            sortable: false,
+          },
+          {
+            field: 'vertices',
+            width: 100,
+            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.vertices'),
+            sortable: false,
+          },
+          {
             field: 'download',
             width: 60,
             headerName: '',
@@ -114,18 +170,17 @@ export const AreasOfInterestEditor = (props: Props) => {
             ),
             sortable: false,
           },
-          {
-            field: 'polygons',
-            width: 100,
-            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.polygons'),
-            sortable: false,
-          },
-          {
-            field: 'vertices',
-            width: 100,
-            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.vertices'),
-            sortable: false,
-          },
+          ...(canUseMap
+            ? [
+                {
+                  field: 'map',
+                  width: 60,
+                  headerName: '',
+                  renderCell: ({ row }) => <ButtonIconMap onClick={() => onShowOnMap(row)} />,
+                  sortable: false,
+                },
+              ]
+            : []),
           ...(readOnly
             ? []
             : [
@@ -150,6 +205,13 @@ export const AreasOfInterestEditor = (props: Props) => {
           editedAreaOfInterest={dialog.edited}
           onClose={closeDialog}
           onOk={onDialogOk}
+        />
+      )}
+      {mapPanel && (
+        <SurveyFilesMapPanel
+          header={mapPanel.header}
+          onClose={() => setMapPanel(null)}
+          surveyFiles={mapPanel.surveyFiles}
         />
       )}
     </fieldset>

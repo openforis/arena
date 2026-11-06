@@ -14,24 +14,26 @@
     padding-top: 0;
   }
 
-  // shrinkable flex column chain down to the description, to keep stepper and footer visible
-  .whats-new-carousel,
-  .whats-new-carousel > .carousel__item,
-  .whats-new-slide {
-    display: flex;
-    flex-direction: column;
-    flex: 1 1 auto;
-    min-height: 0;
-  }
-
-  .whats-new-slide__description {
-    min-height: 3rem;
-    overflow-y: auto;
-  }
-
   .modal-footer {
     padding-top: 1rem;
   }
+}
+
+// shrinkable (not growing) flex column chain down to the description: in a container with a bounded height
+// (dialog, Help view) only the description scrolls, the stepper (and the dialog footer) stay visible below the content
+// (.carousel: more specific than the Carousel styles, whatever the order of the style sheets)
+.carousel.whats-new-carousel,
+.carousel.whats-new-carousel > .carousel__item,
+.whats-new-slide {
+  display: flex;
+  flex-direction: column;
+  flex: 0 1 auto;
+  min-height: 0;
+}
+
+.whats-new-slide__description {
+  min-height: 3rem;
+  overflow-y: auto;
 }
 
 .whats-new-slide {
