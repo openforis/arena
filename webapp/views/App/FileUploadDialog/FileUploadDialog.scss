@@ -16,6 +16,8 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
+      // when even the smallest map does not fit (short windows, labels in many languages)
+      overflow-y: auto;
 
       > :not(.map-file-preview) {
         flex-shrink: 0;
@@ -31,6 +33,34 @@
       flex: 0 1 60vh;
       min-height: 12rem;
       margin-top: 1rem;
+    }
+
+    // short windows (e.g. 1280x800 laptops): less spacing, more room for the map
+    @media (max-height: 800px) {
+      .modal-content {
+        max-height: 96vh;
+        margin-top: 2vh;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+      }
+
+      .modal-header {
+        margin-bottom: 0.5rem;
+      }
+
+      .modal-body,
+      .modal-footer {
+        padding-top: 1rem;
+      }
+
+      .dropzone {
+        min-height: 5rem;
+        padding: 0.5rem;
+      }
+
+      .map-file-preview {
+        margin-top: 0.5rem;
+      }
     }
   }
 
