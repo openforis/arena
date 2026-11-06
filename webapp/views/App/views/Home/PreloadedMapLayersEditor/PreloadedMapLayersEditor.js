@@ -103,11 +103,31 @@ const PreloadedMapLayersEditor = (props) => {
                 sortable: false,
               },
               {
+                field: 'label',
+                flex: 0.5,
+                headerName: i18n.t('common.label'),
+                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
+                sortable: false,
+              },
+              {
                 field: 'fileName',
                 flex: 0.4,
                 headerName: i18n.t('common:files.fileName'),
                 renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
                 sortable: false,
+              },
+              {
+                field: 'fileSize',
+                width: 120,
+                headerName: i18n.t('common:files.fileSize'),
+                renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
+                sortable: false,
+              },
+              {
+                field: 'dateCreated',
+                width: 180,
+                headerName: i18n.t('common.dateCreated'),
+                renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
               {
                 field: 'download',
@@ -133,34 +153,19 @@ const PreloadedMapLayersEditor = (props) => {
                     },
                   ]
                 : []),
-              {
-                field: 'label',
-                flex: 0.5,
-                headerName: i18n.t('common.label'),
-                renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getLabel(lang)(row)} />,
-                sortable: false,
-              },
-              {
-                field: 'fileSize',
-                width: 120,
-                headerName: i18n.t('common:files.fileSize'),
-                renderCell: ({ row }) => FileUtils.toHumanReadableFileSize(SurveyFile.getSize(row)),
-                sortable: false,
-              },
-              {
-                field: 'dateCreated',
-                width: 180,
-                headerName: i18n.t('common.dateCreated'),
-                renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
-              },
-              {
-                field: 'delete',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row: preloadedMapLayer }) =>
-                  !readOnly && <ButtonIconDelete onClick={onDeleteClick({ preloadedMapLayer })} />,
-                sortable: false,
-              },
+              ...(readOnly
+                ? []
+                : [
+                    {
+                      field: 'delete',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row: preloadedMapLayer }) => (
+                        <ButtonIconDelete onClick={onDeleteClick({ preloadedMapLayer })} />
+                      ),
+                      sortable: false,
+                    },
+                  ]),
             ]}
             density="compact"
             getRowId={(row) => SurveyFile.getUuid(row)}

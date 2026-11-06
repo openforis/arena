@@ -143,6 +143,18 @@ export const AreasOfInterestEditor = (props: Props) => {
             sortable: false,
           },
           {
+            field: 'polygons',
+            width: 100,
+            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.polygons'),
+            sortable: false,
+          },
+          {
+            field: 'vertices',
+            width: 100,
+            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.vertices'),
+            sortable: false,
+          },
+          {
             field: 'download',
             width: 60,
             headerName: '',
@@ -166,18 +178,6 @@ export const AreasOfInterestEditor = (props: Props) => {
                 },
               ]
             : []),
-          {
-            field: 'polygons',
-            width: 100,
-            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.polygons'),
-            sortable: false,
-          },
-          {
-            field: 'vertices',
-            width: 100,
-            headerName: i18n.t('homeView:surveyInfo.areasOfInterest.vertices'),
-            sortable: false,
-          },
           ...(readOnly
             ? []
             : [
