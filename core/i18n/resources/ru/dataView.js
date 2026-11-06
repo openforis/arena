@@ -54,6 +54,7 @@ export default {
     showCodes: 'Показать коды',
     showTotalAndPercentage: 'Показать итог и процент',
     total: 'Итого',
+    viewOptions: 'Вид',
   },
   editSelectedRecord: 'Редактировать выбранную запись',
   filterAttributeTypes: 'Фильтр типов атрибутов',

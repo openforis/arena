@@ -9,17 +9,11 @@ import { Query } from '@common/model/query'
 
 import { Spinner, Switch } from '@webapp/components'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
+import { ButtonGroup } from '@webapp/components/form'
 import { FormItem } from '@webapp/components/form/Input'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import {
-  DataExplorerActions,
-  DataExplorerHooks,
-  DataExplorerSelectors,
-  DataExplorerState,
-} from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 
 import { DataQueryExportModal } from '../DataQueryExportModal'
@@ -29,6 +23,7 @@ import ButtonSort from './ButtonSort'
 import ButtonManageQueries from './ButtonManageQueries'
 import { ButtonAiGenerateQuery } from './ButtonAiGenerateQuery'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
+import { ButtonViewOptions } from './ButtonViewOptions'
 
 const { modes } = Query
 
@@ -66,11 +61,8 @@ const ButtonBar = (props) => {
   const dispatch = useDispatch()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
-  const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
-  const codesVisible = DataExplorerSelectors.useCodesVisible()
-  const totalsVisible = DataExplorerSelectors.useTotalsVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { Actions, state } = useButtonBar()
 
@@ -85,8 +77,6 @@ const ButtonBar = (props) => {
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
-  const displayTypeTable = displayType === DataExplorerState.displayTypes.table
-  const singleMeasure = Query.isModeAggregate(query) && Query.getMeasuresKeys(query).length === 1
 
   return (
     <div className="data-query-button-bar">
@@ -121,23 +111,7 @@ const ButtonBar = (props) => {
         </div>
       )}
 
-      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
-
-      {displayTypeTable && (
-        <Checkbox
-          checked={codesVisible}
-          onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
-          label="dataView:dataQuery.showCodes"
-        />
-      )}
-
-      {displayTypeTable && singleMeasure && (
-        <Checkbox
-          checked={totalsVisible}
-          onChange={(val) => dispatch(DataExplorerActions.setTotalsVisible(val))}
-          label="dataView:dataQuery.showTotalAndPercentage"
-        />
-      )}
+      <ButtonViewOptions nodeDefLabelType={nodeDefLabelType} onNodeDefLabelTypeChange={onNodeDefLabelTypeChange} />
 
       <ButtonAiGenerateQuery disabled={appSaving || modeEdit} state={state} Actions={Actions} />
 

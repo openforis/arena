@@ -54,6 +54,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     showCodes: 'Show codes',
     showTotalAndPercentage: 'Show total and percentage',
     total: 'Total',
+    viewOptions: 'View',
   },
   editSelectedRecord: 'Edit selected record',
   filterAttributeTypes: 'Filter attribute types',

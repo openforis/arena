@@ -54,6 +54,7 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     showCodes: 'Prikaži šifre',
     showTotalAndPercentage: 'Prikaži ukupno i procenat',
     total: 'Ukupno',
+    viewOptions: 'Prikaz',
   },
   editSelectedRecord: 'Uredi izabrani zapis',
   filterAttributeTypes: 'Filtriraj tipove atributa',

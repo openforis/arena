@@ -53,6 +53,7 @@ export default {
     showCodes: 'Mostrar códigos',
     showTotalAndPercentage: 'Mostrar total y porcentaje',
     total: 'Total',
+    viewOptions: 'Vista',
   },
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',

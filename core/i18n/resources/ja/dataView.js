@@ -54,6 +54,7 @@ export default {
     showCodes: 'コードを表示',
     showTotalAndPercentage: '合計と割合を表示',
     total: '合計',
+    viewOptions: '表示',
   },
   editSelectedRecord: '選択した記録を編集',
   filterAttributeTypes: '属性の種類で絞り込み',

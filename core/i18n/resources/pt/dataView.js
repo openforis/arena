@@ -54,6 +54,7 @@ Refine sua consulta (por exemplo, adicionando um filtro) para reduzir o número 
     showCodes: 'Mostrar códigos',
     showTotalAndPercentage: 'Mostrar total e percentagem',
     total: 'Total',
+    viewOptions: 'Visualização',
   },
   editSelectedRecord: 'Editar registro selecionado',
   filterAttributeTypes: 'Filtrar tipos de atributo',

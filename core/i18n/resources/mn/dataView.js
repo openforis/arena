@@ -53,6 +53,7 @@ export default {
     showCodes: 'Кодуудыг харуулах',
     showTotalAndPercentage: 'Нийт дүн ба хувийг харуулах',
     total: 'Нийт',
+    viewOptions: 'Харагдац',
   },
   editSelectedRecord: 'Сонгогдсон бичлэгийг засах',
   filterAttributeTypes: 'Шинж чанарын төрлүүдийг шүүх',

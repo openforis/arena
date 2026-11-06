@@ -15,8 +15,12 @@ test.describe('Data Explorer aggregate totals', () => {
     await page.locator('.attribute-selector', { hasText: 'Tree id' }).click()
     await page.locator('.attribute-selector', { hasText: 'Tree decimal 1' }).click()
 
-    const totalsCheckbox = page.getByText('Show total and percentage')
-    await totalsCheckbox.click()
+    const viewOptionsBtn = page.getByRole('button', { name: 'View' })
+    const totalsItem = page.getByRole('menuitemcheckbox', { name: 'Show total and percentage' })
+    await viewOptionsBtn.click()
+    await totalsItem.click()
+    await expect(totalsItem).toHaveAttribute('aria-checked', 'true')
+    await page.keyboard.press('Escape')
 
     // tree_dec_1 sum by tree id (3 records): 34.5, 64.5, 94.5, 124.5, 154.5
     const rows = page.locator('.table__data-rows .table__row')
@@ -29,7 +33,9 @@ test.describe('Data Explorer aggregate totals', () => {
 
     // available only with a single measure
     await page.locator('.attribute-selector', { hasText: 'Tree decimal 2' }).click()
-    await expect(totalsCheckbox).toBeHidden()
     await expect(totalRow).toBeHidden()
+    await viewOptionsBtn.click()
+    await expect(page.getByRole('menuitemcheckbox', { name: 'Show names' })).toBeVisible()
+    await expect(totalsItem).toBeHidden()
   })
 })

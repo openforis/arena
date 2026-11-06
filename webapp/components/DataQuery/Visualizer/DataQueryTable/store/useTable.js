@@ -12,20 +12,31 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 
 import { useListenOnNodeUpdates } from './hooks/useListenToNodeUpdates'
 
-export const useTable = ({ data, setData }) => {
+// measures have a column for every aggregate function (and its percentage, if visible)
+const getMeasuresColsNumber = ({ query, percentageVisible }) =>
+  Object.values(Query.getMeasures(query)).flat().length * (percentageVisible ? 2 : 1)
+
+export const useTable = ({ data, setData, percentageVisible = false }) => {
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const query = DataExplorerSelectors.useQuery()
 
   const [colWidth, setColWidth] = useState(null)
 
-  const nodeDefColUuids = Query.isModeAggregate(query)
+  const modeAggregate = Query.isModeAggregate(query)
+  const nodeDefColUuids = modeAggregate
     ? [...Query.getDimensions(query), ...Query.getMeasuresKeys(query)]
     : Query.getAttributeDefUuids(query)
   const nodeDefCols = useNodeDefsByUuids(nodeDefColUuids)
-  const columnNames = nodeDefCols.flatMap(ColumnNodeDef.getColumnNames)
-  const colsNumber = Query.isModeRawEdit(query)
-    ? nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFieldsLength(nodeDefCol), 0)
-    : columnNames.length
+  const dimensionDefs = useNodeDefsByUuids(modeAggregate ? Query.getDimensions(query) : [])
+  let colsNumber
+  if (Query.isModeRawEdit(query)) {
+    colsNumber = nodeDefCols.reduce((tot, nodeDefCol) => tot + NodeDefUIProps.getFormFieldsLength(nodeDefCol), 0)
+  } else if (modeAggregate) {
+    colsNumber =
+      dimensionDefs.flatMap(ColumnNodeDef.getColumnNames).length + getMeasuresColsNumber({ query, percentageVisible })
+  } else {
+    colsNumber = nodeDefCols.flatMap(ColumnNodeDef.getColumnNames).length
+  }
 
   const colIndexWidth = 70
 

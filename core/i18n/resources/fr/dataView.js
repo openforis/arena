@@ -56,6 +56,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     showCodes: 'Afficher les codes',
     showTotalAndPercentage: 'Afficher le total et le pourcentage',
     total: 'Total',
+    viewOptions: 'Affichage',
   },
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",

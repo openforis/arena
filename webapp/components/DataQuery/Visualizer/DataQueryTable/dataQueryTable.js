@@ -21,12 +21,12 @@ const DataQueryTable = (props) => {
   const codesVisible = DataExplorerSelectors.useCodesVisible()
   const totalsVisibleSelected = DataExplorerSelectors.useTotalsVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData })
-  const sortableVariables = useQuerySortableVariables({ query })
-  const sortableVariablesByUuid = useMemo(() => ObjectUtils.toUuidIndexedObj(sortableVariables), [sortableVariables])
   const totalsVisible =
     totalsVisibleSelected && Query.isModeAggregate(query) && Query.getMeasuresKeys(query).length === 1
   const totals = useTotals({ query, enabled: totalsVisible })
+  const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData, percentageVisible: Boolean(totals) })
+  const sortableVariables = useQuerySortableVariables({ query })
+  const sortableVariablesByUuid = useMemo(() => ObjectUtils.toUuidIndexedObj(sortableVariables), [sortableVariables])
 
   if (!colWidth) return null
 

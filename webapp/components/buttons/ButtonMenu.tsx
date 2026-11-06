@@ -2,6 +2,7 @@ import './ButtonMenu.scss'
 
 import React, { useState } from 'react'
 import classNames from 'classnames'
+import Checkbox from '@mui/material/Checkbox'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
@@ -9,6 +10,8 @@ import { Button, ButtonProps } from './Button'
 
 export type ButtonMenuItem = {
   key: string
+  // when defined, the item is a checkbox (it toggles on click)
+  checked?: boolean
   className?: string
   content?: React.ReactNode
   disabled?: boolean
@@ -72,7 +75,13 @@ export const ButtonMenuPopup = (props: ButtonMenuPopupProps) => {
           disabled={item.disabled}
           onClick={onItemClick(item)}
           selected={item.key === selectedItemKey}
+          role={item.checked === undefined ? undefined : 'menuitemcheckbox'}
+          aria-checked={item.checked}
         >
+          {item.checked !== undefined && (
+            // not focusable: the menu item handles click and keyboard
+            <Checkbox checked={item.checked} disableRipple size="small" tabIndex={-1} />
+          )}
           {item.content ?? (
             <Button
               className={classNames(item.className)}
