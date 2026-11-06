@@ -74,9 +74,9 @@ export const EditableColumn = <T extends object>(props: Props<T>) => {
   }
 
   return (
-    <div
+    <div // NOSONAR: role="button" with interactive children (inputs, edit button), a native <button> cannot wrap them
       className={classNames(className, { editing })}
-      role="button" // NOSONAR: contains interactive children (inputs, edit button), a native <button> cannot wrap them
+      role="button"
       tabIndex={0}
       onClick={onContainerClick}
       onFocus={onContainerFocus}
