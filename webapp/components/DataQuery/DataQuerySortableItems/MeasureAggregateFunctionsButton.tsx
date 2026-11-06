@@ -13,7 +13,6 @@ import { useI18n } from '@webapp/store/system'
 const defaultAggregateFunctions: string[] = Object.values(Query.DEFAULT_AGGREGATE_FUNCTIONS)
 
 type Props = {
-  disabled?: boolean
   nodeDef: any
 }
 
@@ -23,7 +22,7 @@ type Props = {
  * @returns {React.ReactElement|null} - The menu button, or null for the entity count measure (not editable).
  */
 export const MeasureAggregateFunctionsButton = (props: Props) => {
-  const { disabled = false, nodeDef } = props
+  const { nodeDef } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -57,7 +56,7 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
   }
 
   const fnsLabel = selectedFns.map(getFnLabel).join(', ')
-  const title = i18n.t('dataView:dataQuery.sidebar.aggregateFunctionsOf', { name: NodeDef.getLabel(nodeDef, lang) })
+  const title = i18n.t('dataView:dataQuery.aggregateFunctionsOf', { name: NodeDef.getLabel(nodeDef, lang) })
 
   const items: ButtonMenuItem[] = [
     ...defaultAggregateFunctions.map((fn) => toFnItem(fn, i18n.t(`common.${fn}`))),
@@ -66,7 +65,7 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
       key: 'manageCustom',
       closeMenuOnClick: true,
       iconClassName: 'icon-cog icon-12px',
-      label: 'dataView:dataQuery.sidebar.customAggregateFunctions',
+      label: 'dataView:dataQuery.customAggregateFunctions',
       onClick: () => setPanelOpen(true),
     },
   ]
@@ -77,12 +76,9 @@ export const MeasureAggregateFunctionsButton = (props: Props) => {
         aria-label={`${title}: ${fnsLabel}`}
         className="data-query__aggregate-fns-btn"
         closeMenuOnItemClick={false}
-        disabled={disabled}
         items={items}
         label={fnsLabel}
         labelIsI18nKey={false}
-        title={title}
-        titleIsI18nKey={false}
         variant="text"
       />
       {panelOpen && (

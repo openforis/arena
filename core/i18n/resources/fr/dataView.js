@@ -24,6 +24,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: "Fonctions d'agrégation de {{name}}",
     ai: {
       button: "Demander à l'IA",
       buttonTitle: "Générer une requête à partir d'une description avec l'IA",
@@ -40,6 +41,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
       generatedSuccessfully:
         'Requête générée : {{explanation}} Vérifiez le résultat et enregistrez la requête si vous souhaitez la conserver.',
     },
+    customAggregateFunctions: "Fonctions d'agrégation personnalisées…",
     deleteConfirmMessage: 'Supprimer la requête "{{name}}" ?',
     displayType: {
       chart: 'Graphique',
@@ -54,15 +56,6 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête sélectionnée ?',
     showCodes: 'Afficher les codes',
     showTotalAndPercentage: 'Afficher le total et le pourcentage',
-    sidebar: {
-      addFilter: 'Ajouter un filtre',
-      addSort: 'Ajouter un tri',
-      aggregateFunctionsOf: "Fonctions d'agrégation de {{name}}",
-      customAggregateFunctions: "Fonctions d'agrégation personnalisées…",
-      remove: 'Retirer {{name}}',
-      removeFilter: 'Retirer le filtre',
-      toggleSortOrder: 'Ordre : {{order}} (cliquer pour changer)',
-    },
     total: 'Total',
     viewOptions: 'Affichage',
   },

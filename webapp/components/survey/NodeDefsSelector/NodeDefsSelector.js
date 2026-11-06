@@ -24,7 +24,6 @@ import { getNodeDefSearchFilterFunction } from './nodeDefsSelectorSearchUtils'
 const NodeDefsSelector = (props) => {
   const {
     canSelectAttributes = true,
-    header = null,
     hierarchy = null,
     nodeDefLabelType = NodeDef.NodeDefLabelTypes.label,
     nodeDefUuidEntity = null,
@@ -93,8 +92,6 @@ const NodeDefsSelector = (props) => {
         showSingleEntities={showSingleEntities}
       />
 
-      {header}
-
       <ButtonIconFilter
         className={classNames('btn-s', 'btn-toggle-filter', { highlight: showFilter || filterTypes.length > 0 })}
         disabled={A.isEmpty(nodeDefUuidEntity)}
@@ -158,7 +155,6 @@ NodeDefsSelector.propTypes = {
   nodeDefUuidsAttributes: PropTypes.arrayOf(String),
   hierarchy: PropTypes.object,
   canSelectAttributes: PropTypes.bool,
-  header: PropTypes.node,
   showAnalysisAttributes: PropTypes.bool,
   showAncestors: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,

@@ -21,6 +21,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Funciones de agregación de {{name}}',
     ai: {
       button: 'Preguntar a la IA',
       buttonTitle: 'Generar una consulta a partir de una descripción usando IA',
@@ -37,6 +38,7 @@ export default {
       generatedSuccessfully:
         'Consulta generada: {{explanation}} Revise el resultado y guarde la consulta si desea conservarla.',
     },
+    customAggregateFunctions: 'Funciones de agregación personalizadas…',
     deleteConfirmMessage: '¿Eliminar la consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',
@@ -51,15 +53,6 @@ export default {
     replaceQueryConfirmMessage: '¿Reemplazar la consulta actual por la seleccionada?',
     showCodes: 'Mostrar códigos',
     showTotalAndPercentage: 'Mostrar total y porcentaje',
-    sidebar: {
-      addFilter: 'Añadir filtro',
-      addSort: 'Añadir orden',
-      aggregateFunctionsOf: 'Funciones de agregación de {{name}}',
-      customAggregateFunctions: 'Funciones de agregación personalizadas…',
-      remove: 'Quitar {{name}}',
-      removeFilter: 'Quitar filtro',
-      toggleSortOrder: 'Orden: {{order}} (clic para cambiar)',
-    },
     total: 'Total',
     viewOptions: 'Vista',
   },

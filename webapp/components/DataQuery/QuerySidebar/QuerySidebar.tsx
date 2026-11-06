@@ -8,8 +8,6 @@ import { useIsAppSaving } from '@webapp/store/app'
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
 import QueryNodeDefsSelector from '../QueryNodeDefsSelector'
-import { QueryFilterSection } from './QueryFilterSection'
-import { QuerySortSection } from './QuerySortSection'
 
 const { modes } = Query
 
@@ -26,32 +24,20 @@ const uiModeByQueryMode = {
 }
 
 type Props = {
-  dataLoaded: boolean
-  dataLoading: boolean
   nodeDefLabelType: string
 }
 
 /**
- * Left panel with the query definition, top to bottom: mode, entity, filter, sort, variables tree.
+ * Left panel: query mode (raw / aggregate) on top of the entity and variables selector.
  * @param {Props} props - The component props.
  * @returns {React.ReactElement} - The sidebar element.
  */
 export const QuerySidebar = (props: Props) => {
-  const { dataLoaded, dataLoading, nodeDefLabelType } = props
+  const { nodeDefLabelType } = props
 
   const appSaving = useIsAppSaving()
   const query = DataExplorerSelectors.useQuery()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
-
-  const modeEdit = Query.isModeRawEdit(query)
-  const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
-
-  const header = Query.hasSelection(query) ? (
-    <div className="query-sidebar__query">
-      <QueryFilterSection disabled={queryChangeDisabled} />
-      <QuerySortSection disabled={queryChangeDisabled} />
-    </div>
-  ) : null
 
   return (
     <aside className="query-sidebar">
@@ -63,7 +49,7 @@ export const QuerySidebar = (props: Props) => {
         onChange={(mode: string) => onChangeQuery(Query.assocMode(mode)(query))}
         items={modeButtonItems}
       />
-      <QueryNodeDefsSelector header={header} nodeDefLabelType={nodeDefLabelType} />
+      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
     </aside>
   )
 }

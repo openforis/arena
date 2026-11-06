@@ -12,7 +12,7 @@ import { DataExplorerHooks } from '@webapp/store/dataExplorer'
 import { DataExplorerSelectors } from '@webapp/store/dataExplorer/selectors'
 
 const QueryNodeDefsSelector = (props) => {
-  const { header = null, nodeDefLabelType = NodeDef.NodeDefLabelTypes.label } = props
+  const { nodeDefLabelType = NodeDef.NodeDefLabelTypes.label } = props
 
   const query = DataExplorerSelectors.useQuery()
   const modeAggregate = Query.isModeAggregate(query)
@@ -37,7 +37,6 @@ const QueryNodeDefsSelector = (props) => {
       nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
       dimensions={Query.getDimensions(query)}
-      header={header}
       measures={Query.getMeasures(query)}
       onChangeEntity={onChangeEntity}
       onChangeMeasures={(measuresUpdate) => onChangeQuery(Query.assocMeasures(measuresUpdate)(query))}
@@ -47,7 +46,6 @@ const QueryNodeDefsSelector = (props) => {
     />
   ) : (
     <NodeDefsSelector
-      header={header}
       hierarchy={hierarchy}
       nodeDefLabelType={nodeDefLabelType}
       nodeDefUuidEntity={Query.getEntityDefUuid(query)}
@@ -63,7 +61,6 @@ const QueryNodeDefsSelector = (props) => {
 }
 
 QueryNodeDefsSelector.propTypes = {
-  header: PropTypes.node,
   nodeDefLabelType: PropTypes.string,
 }
 

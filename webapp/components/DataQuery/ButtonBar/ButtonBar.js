@@ -18,6 +18,8 @@ import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
 import ButtonManageQueries from './ButtonManageQueries'
 import { ButtonAiGenerateQuery } from './ButtonAiGenerateQuery'
+import ButtonFilter from './ButtonFilter'
+import ButtonSort from './ButtonSort'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
 import { ButtonViewOptions } from './ButtonViewOptions'
 
@@ -72,7 +74,11 @@ const ButtonBar = (props) => {
         <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
         <ButtonViewOptions nodeDefLabelType={nodeDefLabelType} onNodeDefLabelTypeChange={onNodeDefLabelTypeChange} />
         {hasSelection && (
-          <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
+          <>
+            <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
+            <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
+            <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
+          </>
         )}
         {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
         <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />

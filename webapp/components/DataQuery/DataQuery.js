@@ -53,7 +53,7 @@ const DataQuery = () => {
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QuerySidebar dataLoaded={dataLoaded} dataLoading={dataLoading} nodeDefLabelType={nodeDefLabelType} />
+      <QuerySidebar nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -75,10 +75,7 @@ const DataQuery = () => {
 
         <DataQuerySelectedAttributes nodeDefLabelType={nodeDefLabelType} />
         <DataQuerySelectedDimensions nodeDefLabelType={nodeDefLabelType} />
-        <DataQuerySelectedMeasures
-          disabled={Query.isModeRawEdit(query) || !dataLoaded || dataLoading}
-          nodeDefLabelType={nodeDefLabelType}
-        />
+        <DataQuerySelectedMeasures nodeDefLabelType={nodeDefLabelType} />
 
         <Visualizer
           data={data}

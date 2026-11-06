@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: '{{name}} の集計関数',
     ai: {
       button: 'AIに質問',
       buttonTitle: 'AIを使って説明からクエリを生成',
@@ -38,6 +39,7 @@ export default {
       generatedSuccessfully:
         'クエリを生成しました：{{explanation}} 結果を確認し、残したい場合はクエリを保存してください。',
     },
+    customAggregateFunctions: 'カスタム集計関数…',
     deleteConfirmMessage: 'クエリ「{{name}}」を削除しますか？',
     displayType: {
       chart: 'グラフ',
@@ -52,15 +54,6 @@ export default {
     replaceQueryConfirmMessage: '現在のクエリを選択したクエリで置き換えますか？',
     showCodes: 'コードを表示',
     showTotalAndPercentage: '合計と割合を表示',
-    sidebar: {
-      addFilter: 'フィルターを追加',
-      addSort: '並べ替えを追加',
-      aggregateFunctionsOf: '{{name}} の集計関数',
-      customAggregateFunctions: 'カスタム集計関数…',
-      remove: '{{name}} を削除',
-      removeFilter: 'フィルターを削除',
-      toggleSortOrder: '並び順: {{order}}（クリックで切り替え）',
-    },
     total: '合計',
     viewOptions: '表示',
   },

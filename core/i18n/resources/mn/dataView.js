@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: '{{name}}-ийн нэгтгэх функцүүд',
     ai: {
       button: 'AI-аас асуух',
       buttonTitle: 'AI ашиглан тайлбараас хүсэлт үүсгэх',
@@ -37,6 +38,7 @@ export default {
       suggestSummaryTitle: 'Одоогийн сонголтууд дээр үндэслэн хүсэлтийн нэр, шошго, тайлбарыг AI ашиглан санал болгох',
       generatedSuccessfully: 'Хүсэлт үүслээ: {{explanation}} Үр дүнг шалгаад, хадгалах бол хүсэлтийг хадгална уу.',
     },
+    customAggregateFunctions: 'Өөрийн нэгтгэх функцүүд…',
     deleteConfirmMessage: 'Хүсэлт "{{name}}"-г устгах уу?',
     displayType: {
       chart: 'График',
@@ -51,15 +53,6 @@ export default {
     replaceQueryConfirmMessage: 'Одоогийн хүсэлтийг сонгосон хүсэлтээр солих уу?',
     showCodes: 'Кодуудыг харуулах',
     showTotalAndPercentage: 'Нийт дүн ба хувийг харуулах',
-    sidebar: {
-      addFilter: 'Шүүлтүүр нэмэх',
-      addSort: 'Эрэмбэ нэмэх',
-      aggregateFunctionsOf: '{{name}}-ийн нэгтгэх функцүүд',
-      customAggregateFunctions: 'Өөрийн нэгтгэх функцүүд…',
-      remove: '{{name}}-ийг хасах',
-      removeFilter: 'Шүүлтүүрийг хасах',
-      toggleSortOrder: 'Эрэмбэ: {{order}} (өөрчлөхийн тулд дарна уу)',
-    },
     total: 'Нийт',
     viewOptions: 'Харагдац',
   },

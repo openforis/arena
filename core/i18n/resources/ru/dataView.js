@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Агрегатные функции {{name}}',
     ai: {
       button: 'Спросить ИИ',
       buttonTitle: 'Сформировать запрос по описанию с помощью ИИ',
@@ -38,6 +39,7 @@ export default {
       generatedSuccessfully:
         'Запрос сформирован: {{explanation}} Проверьте результат и сохраните запрос, если он вам нужен.',
     },
+    customAggregateFunctions: 'Пользовательские агрегатные функции…',
     deleteConfirmMessage: 'Удалить запрос "{{name}}"?',
     displayType: {
       chart: 'Диаграмма',
@@ -52,15 +54,6 @@ export default {
     replaceQueryConfirmMessage: 'Заменить текущий запрос выбранным?',
     showCodes: 'Показать коды',
     showTotalAndPercentage: 'Показать итог и процент',
-    sidebar: {
-      addFilter: 'Добавить фильтр',
-      addSort: 'Добавить сортировку',
-      aggregateFunctionsOf: 'Агрегатные функции {{name}}',
-      customAggregateFunctions: 'Пользовательские агрегатные функции…',
-      remove: 'Удалить {{name}}',
-      removeFilter: 'Удалить фильтр',
-      toggleSortOrder: 'Порядок: {{order}} (нажмите, чтобы изменить)',
-    },
     total: 'Итого',
     viewOptions: 'Вид',
   },
