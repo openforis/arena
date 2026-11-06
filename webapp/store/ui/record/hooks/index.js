@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useReducer } from 'react'
 import { useSelector } from 'react-redux'
 
 import { NodeDefs, Nodes, Objects, Records, Surveys } from '@openforis/arena-core'
@@ -44,13 +44,13 @@ const useRecordOrFetchByParentNode = ({ nodeDef, parentNode }) => {
   const recordUuid =
     !isRecordInStateUsable && needsParentCodeAttribute && parentNode ? Node.getRecordUuid(parentNode) : null
   // Used only to force a re-render once the on-demand fetch resolves (its value is never read).
-  const [, forceRenderAfterFetch] = useState(0)
+  const [, forceRenderAfterFetch] = useReducer((count) => count + 1, 0)
 
   useEffect(() => {
     if (!recordUuid || getResolvedRecord(recordUuid)) return
     let cancelled = false
     void fetchRecordAndNodesOnce({ surveyId, recordUuid }).then(() => {
-      if (!cancelled) forceRenderAfterFetch((n) => n + 1)
+      if (!cancelled) forceRenderAfterFetch()
     })
     return () => {
       cancelled = true

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import { getLanguageLabel } from '@core/app/languages'
 import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
 import { uuidv4 } from '@core/uuid'
@@ -165,10 +166,7 @@ const ChatbotPanel = ({ onClose }) => {
         setMessages((prev) => {
           const current = prev[assistantIdx]
           if (current && stripText(current).length === 0) {
-            setReasoningByIdx((prevReasoning) => {
-              const { [assistantIdx]: _removed, ...rest } = prevReasoning
-              return rest
-            })
+            setReasoningByIdx(A.dissoc(assistantIdx))
             return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
           }
           return prev
@@ -180,10 +178,7 @@ const ChatbotPanel = ({ onClose }) => {
         setMessages((prev) => {
           const current = prev[assistantIdx]
           if (current && stripText(current).length === 0) {
-            setReasoningByIdx((prevReasoning) => {
-              const { [assistantIdx]: _removed, ...rest } = prevReasoning
-              return rest
-            })
+            setReasoningByIdx(A.dissoc(assistantIdx))
             return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
           }
           return prev
