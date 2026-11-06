@@ -54,6 +54,8 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
     replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête sélectionnée ?',
     showCodes: 'Afficher les codes',
+    showTotalAndPercentage: 'Afficher le total et le pourcentage',
+    total: 'Total',
   },
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",

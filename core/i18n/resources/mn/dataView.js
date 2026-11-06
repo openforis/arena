@@ -51,6 +51,8 @@ export default {
     },
     replaceQueryConfirmMessage: 'Одоогийн хүсэлтийг сонгосон хүсэлтээр солих уу?',
     showCodes: 'Кодуудыг харуулах',
+    showTotalAndPercentage: 'Нийт дүн ба хувийг харуулах',
+    total: 'Нийт',
   },
   editSelectedRecord: 'Сонгогдсон бичлэгийг засах',
   filterAttributeTypes: 'Шинж чанарын төрлүүдийг шүүх',

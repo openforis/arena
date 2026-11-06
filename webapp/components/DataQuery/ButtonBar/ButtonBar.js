@@ -70,6 +70,7 @@ const ButtonBar = (props) => {
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const codesVisible = DataExplorerSelectors.useCodesVisible()
+  const totalsVisible = DataExplorerSelectors.useTotalsVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { Actions, state } = useButtonBar()
 
@@ -84,6 +85,8 @@ const ButtonBar = (props) => {
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
+  const displayTypeTable = displayType === DataExplorerState.displayTypes.table
+  const singleMeasure = Query.isModeAggregate(query) && Query.getMeasuresKeys(query).length === 1
 
   return (
     <div className="data-query-button-bar">
@@ -120,11 +123,19 @@ const ButtonBar = (props) => {
 
       <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
 
-      {displayType === DataExplorerState.displayTypes.table && (
+      {displayTypeTable && (
         <Checkbox
           checked={codesVisible}
           onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
           label="dataView:dataQuery.showCodes"
+        />
+      )}
+
+      {displayTypeTable && singleMeasure && (
+        <Checkbox
+          checked={totalsVisible}
+          onChange={(val) => dispatch(DataExplorerActions.setTotalsVisible(val))}
+          label="dataView:dataQuery.showTotalAndPercentage"
         />
       )}
 

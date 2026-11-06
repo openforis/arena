@@ -52,6 +52,8 @@ export default {
     },
     replaceQueryConfirmMessage: 'Заменить текущий запрос выбранным?',
     showCodes: 'Показать коды',
+    showTotalAndPercentage: 'Показать итог и процент',
+    total: 'Итого',
   },
   editSelectedRecord: 'Редактировать выбранную запись',
   filterAttributeTypes: 'Фильтр типов атрибутов',

@@ -59,6 +59,11 @@ $rowHeaderHeight: 45px;
   }
 
   .table__row {
+    &.table__row--total {
+      font-weight: 600;
+      border-top: 2px solid $colorOutline;
+    }
+
     .btn-transparent {
       color: $colorOnSurface;
       font-weight: 400;

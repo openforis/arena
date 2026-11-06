@@ -52,6 +52,8 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
     replaceQueryConfirmMessage: 'Replace current query with the selected one?',
     showCodes: 'Show codes',
+    showTotalAndPercentage: 'Show total and percentage',
+    total: 'Total',
   },
   editSelectedRecord: 'Edit selected record',
   filterAttributeTypes: 'Filter attribute types',

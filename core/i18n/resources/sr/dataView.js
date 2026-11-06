@@ -52,6 +52,8 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     },
     replaceQueryConfirmMessage: 'Zamijeniti trenutni upit izabranim?',
     showCodes: 'Prikaži šifre',
+    showTotalAndPercentage: 'Prikaži ukupno i procenat',
+    total: 'Ukupno',
   },
   editSelectedRecord: 'Uredi izabrani zapis',
   filterAttributeTypes: 'Filtriraj tipove atributa',

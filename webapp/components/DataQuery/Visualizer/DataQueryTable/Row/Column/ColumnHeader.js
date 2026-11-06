@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Fragment, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -52,6 +52,7 @@ const ColumnHeader = (props) => {
     nodeDef,
     nodeDefLabelType,
     onChangeQuery,
+    percentageVisible = false,
     query,
     sortableVariablesByUuid,
   } = props
@@ -59,11 +60,21 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
 
-  const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
+  const {
+    modeEdit,
+    columnNames,
+    isMeasure,
+    aggregateFunctions,
+    noCols,
+    percentageColumnsVisible,
+    widthInner,
+    widthOuter,
+  } = useColumn({
     codesVisible,
     query,
     colWidth,
     nodeDef,
+    percentageVisible,
   })
 
   const entityDefUuid = Query.getEntityDefUuid(query)
@@ -152,9 +163,10 @@ const ColumnHeader = (props) => {
               ? customAggregateFunction?.name
               : i18n.t(`common.${aggregateFn}`)
             return (
-              <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-                {aggregateFunctionLabel}
-              </div>
+              <Fragment key={`${nodeDefUuid}_${aggregateFn}`}>
+                <div style={{ width: widthInner }}>{aggregateFunctionLabel}</div>
+                {percentageColumnsVisible && <div style={{ width: widthInner }}>%</div>}
+              </Fragment>
             )
           })}
         </div>
@@ -180,6 +192,7 @@ ColumnHeader.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  percentageVisible: PropTypes.bool,
   query: PropTypes.object.isRequired,
   sortableVariablesByUuid: PropTypes.object.isRequired,
 }

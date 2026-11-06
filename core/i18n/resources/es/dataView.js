@@ -51,6 +51,8 @@ export default {
     },
     replaceQueryConfirmMessage: '¿Reemplazar la consulta actual por la seleccionada?',
     showCodes: 'Mostrar códigos',
+    showTotalAndPercentage: 'Mostrar total y porcentaje',
+    total: 'Total',
   },
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',

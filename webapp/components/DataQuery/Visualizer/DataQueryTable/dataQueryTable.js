@@ -11,7 +11,7 @@ import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExpl
 import { useI18n } from '@webapp/store/system'
 
 import { RowHeader, RowData } from './Row'
-import { useTable } from './store'
+import { useTable, useTotals } from './store'
 
 const DataQueryTable = (props) => {
   const { data, dataEmpty, dataLoading = false, dataLoadingError = false, nodeDefLabelType, offset, setData } = props
@@ -19,10 +19,14 @@ const DataQueryTable = (props) => {
   const i18n = useI18n()
   const query = DataExplorerSelectors.useQuery()
   const codesVisible = DataExplorerSelectors.useCodesVisible()
+  const totalsVisibleSelected = DataExplorerSelectors.useTotalsVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData })
   const sortableVariables = useQuerySortableVariables({ query })
   const sortableVariablesByUuid = useMemo(() => ObjectUtils.toUuidIndexedObj(sortableVariables), [sortableVariables])
+  const totalsVisible =
+    totalsVisibleSelected && Query.isModeAggregate(query) && Query.getMeasuresKeys(query).length === 1
+  const totals = useTotals({ query, enabled: totalsVisible })
 
   if (!colWidth) return null
 
@@ -43,6 +47,7 @@ const DataQueryTable = (props) => {
         nodeDefCols={nodeDefCols}
         nodeDefLabelType={nodeDefLabelType}
         onChangeQuery={onChangeQuery}
+        percentageVisible={Boolean(totals)}
         query={query}
         sortableVariablesByUuid={sortableVariablesByUuid}
       />
@@ -62,9 +67,23 @@ const DataQueryTable = (props) => {
               query={query}
               row={row}
               rowNo={rowNo}
+              totals={totals}
             />
           )
         })}
+        {totals && !dataEmpty && (
+          <RowData
+            className="table__row--total"
+            codesVisible={codesVisible}
+            colIndexWidth={colIndexWidth}
+            colWidth={colWidth}
+            nodeDefCols={nodeDefCols}
+            query={query}
+            row={totals}
+            rowNo={i18n.t('dataView:dataQuery.total')}
+            totals={totals}
+          />
+        )}
       </div>
     </div>
   )
