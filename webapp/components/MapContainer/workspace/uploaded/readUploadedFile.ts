@@ -5,7 +5,7 @@ import { ZipUtils } from '@webapp/utils/zipUtils'
 
 // side effect: defines L.KML
 import '../../L.KML'
-import type { UploadedFileKind } from './uploadedFiles'
+import { getUploadedFileKind, type UploadedFileKind } from './uploadedFiles'
 
 type KmlLayerConstructor = new (kml: Document) => L.FeatureGroup
 type ZipEntry = { async: (type: 'string') => Promise<string> }
@@ -91,6 +91,18 @@ export const readUploadedFile = async (file: File, kind: UploadedFileKind): Prom
     case 'geojson':
       return [toGeoJsonLayer(JSON.parse(await file.text()))]
   }
+}
+
+/**
+ * Reads a KML, KMZ, zipped Shapefile or GeoJSON file into a single Leaflet layer group (not added to the map).
+ * @param {File} file - The file (its kind comes from its extension).
+ * @returns {Promise<L.FeatureGroup>} The group with all the layers of the file.
+ * @throws {Error} When the file is not supported or cannot be parsed.
+ */
+export const readFileLayerGroup = async (file: File): Promise<L.FeatureGroup> => {
+  const kind = getUploadedFileKind(file.name)
+  if (!kind) throw new Error(`unsupported file: ${file.name}`)
+  return L.featureGroup(await readUploadedFile(file, kind))
 }
 
 /**
