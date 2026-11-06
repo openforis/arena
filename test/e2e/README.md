@@ -10,7 +10,7 @@ their data directly in its DB (connection read from the `PG*` env variables / `.
 Use a dedicated DB: the tests create users and surveys.
 
 ```bash
-yarn build && PGDATABASE=arena_e2e node dist/server.js   # in another terminal
+yarn build && PGDATABASE=arena_e2e RATE_LIMIT_ENABLED=false node dist/server.js   # in another terminal (every test logs in: no login rate limit, as in CI)
 PGDATABASE=arena_e2e yarn test:e2e                       # run all the specs
 PGDATABASE=arena_e2e yarn test:e2e specs/records.spec.ts # run a single spec
 PGDATABASE=arena_e2e yarn test:e2e:ui                    # UI mode (watch, time travel, locator picker)

@@ -1,5 +1,8 @@
+// fills the module height (first child of .app-module): only the slide description scrolls, the stepper stays visible
 .whats-new-view {
+  display: flex;
+  flex-direction: column;
   max-width: 800px;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 0;
 }

@@ -209,6 +209,7 @@ Este é o formato usado por ferramentas de análise de vegetação como Turboveg
   viewSelectedRecord: 'Visualizar registro selecionado',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Áreas de interesse',
       baseLayers: 'Camadas base',
       inputData: 'Dados de entrada',
       preloadedLayers: 'Camadas pré-carregadas',

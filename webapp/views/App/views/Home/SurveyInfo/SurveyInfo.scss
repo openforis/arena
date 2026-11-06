@@ -61,6 +61,11 @@
     }
   }
 
+  .survey-info__areas-of-interest-buttons {
+    display: flex;
+    gap: 0.5rem;
+  }
+
   .survey-configuration {
     width: 25rem;
 

@@ -32,6 +32,8 @@ export const whatsNewItems: WhatsNewItem[] = [
     audience: whatsNewAudiences.surveyAdmin,
     images: [
       '/img/whats-new/areaOfInterestEditor.png',
+      '/img/whats-new/areaOfInterestDialog.jpg',
+      '/img/whats-new/areaOfInterestDataMap.jpg',
       '/img/whats-new/areaOfInterestOutside.png',
       '/img/whats-new/areaOfInterestUncertain.png',
     ],
