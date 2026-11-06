@@ -20,6 +20,8 @@
   .node-defs-selector {
     flex: 1;
     min-height: 0;
+    // the implicit grid column grows with the longest (non-wrapping) label: keep it as wide as the sidebar
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
