@@ -31,8 +31,8 @@ export default class ZipFileCreatorBaseJob extends Job {
     await archive?.finalize()
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     const { outputFileName } = this.context
     return {
       ...result,

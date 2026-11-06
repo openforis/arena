@@ -105,10 +105,11 @@ export default class CategoriesBatchImportJob extends Job {
     return true
   }
 
-  generateResult() {
+  async generateResult() {
+    const result = await super.generateResult()
     const { insertedCategories, updatedCategories, total } = this
     return {
-      ...super.generateResult(),
+      ...result,
       importedCategories: total,
       insertedCategories,
       updatedCategories,
