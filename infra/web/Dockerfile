@@ -4,7 +4,7 @@ ARG node_version=24.11.1
 
 FROM node:${node_version} AS base
 RUN apt-get update \
-    && apt-get install -y git \
+    && apt-get install -y --no-install-recommends git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
