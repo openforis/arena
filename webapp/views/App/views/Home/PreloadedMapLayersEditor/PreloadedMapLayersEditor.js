@@ -4,16 +4,21 @@ import PropTypes from 'prop-types'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit } from '@webapp/components'
+import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
+import { SurveyFilesMapPanel } from '@webapp/components/MapContainer/fileLayers'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { useAuthCanUseMap } from '@webapp/store/user/hooks'
 import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
 
 import PreloadedMapLayerEditor from './PreloadedMapLayerEditor'
+
+const getLayerLabel = (lang) => (preloadedMapLayer) =>
+  SurveyFile.getLabel(lang)(preloadedMapLayer) || SurveyFile.getName(preloadedMapLayer)
 
 const PreloadedMapLayersEditor = (props) => {
   const { preloadedMapLayers, setPreloadedMapLayers, readOnly } = props
@@ -22,7 +27,9 @@ const PreloadedMapLayersEditor = (props) => {
   const surveyId = useSurveyId()
   const lang = useSurveyPreferredLang()
   const confirm = useConfirmAsync()
+  const canUseMap = useAuthCanUseMap()
 
+  const [mapPanel, setMapPanel] = useState(null)
   const [preloadedLayerDialogVisible, setPreloadedLayerDialogVisible] = useState(false)
   const [editedPreloadedMapLayer, setEditedPreloadedMapLayer] = useState(null)
 
@@ -70,6 +77,16 @@ const PreloadedMapLayersEditor = (props) => {
     setPreloadedLayerDialogVisible(true)
   }, [])
 
+  const onShowOnMap = useCallback(
+    (preloadedMapLayer) => {
+      const label = getLayerLabel(lang)(preloadedMapLayer)
+      const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
+      const fileName = SurveyFile.getName(preloadedMapLayer)
+      setMapPanel({ header: label, surveyFiles: [{ fileUuid, fileName, label }] })
+    },
+    [lang]
+  )
+
   return (
     <>
       <fieldset className="preloaded-map-layers-editor">
@@ -105,6 +122,17 @@ const PreloadedMapLayersEditor = (props) => {
                 ),
                 sortable: false,
               },
+              ...(canUseMap
+                ? [
+                    {
+                      field: 'map',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row }) => <ButtonIconMap onClick={() => onShowOnMap(row)} />,
+                      sortable: false,
+                    },
+                  ]
+                : []),
               {
                 field: 'label',
                 flex: 0.5,
@@ -149,6 +177,13 @@ const PreloadedMapLayersEditor = (props) => {
           onClose={onPreloadedLayerDialogClose}
           onOk={onPreloadedLayerDialogOk}
           preloadedMapLayers={preloadedMapLayers}
+        />
+      )}
+      {mapPanel && (
+        <SurveyFilesMapPanel
+          header={mapPanel.header}
+          onClose={() => setMapPanel(null)}
+          surveyFiles={mapPanel.surveyFiles}
         />
       )}
     </>
