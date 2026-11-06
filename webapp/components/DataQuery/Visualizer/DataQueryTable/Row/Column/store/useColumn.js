@@ -23,9 +23,8 @@ export const useColumn = ({ codesVisible, colWidth, query, nodeDef, percentageVi
       ? columnNames.filter((colName) => NodeDef.getName(nodeDef) !== colName)
       : columnNames
 
-  const noCols = modeEdit
-    ? NodeDefUIProps.getFormFieldsLength(nodeDef)
-    : visibleColumnNames.length * (percentageColumnsVisible ? 2 : 1)
+  const colsPerColumnName = percentageColumnsVisible ? 2 : 1
+  const noCols = modeEdit ? NodeDefUIProps.getFormFieldsLength(nodeDef) : visibleColumnNames.length * colsPerColumnName
 
   const widthOuter = colWidth * noCols
   const widthInner = `${(1 / noCols) * 100}%`
