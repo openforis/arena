@@ -181,7 +181,7 @@ button:disabled,
     &.btn-primary {
       color: $colorOnPrimary;
       background-color: $colorError;
-      border-color: with-alpha($colorError, 0.5) !important;
+      border-color: with-alpha($colorError, 0.5);
     }
   }
 
