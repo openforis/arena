@@ -73,6 +73,7 @@ export const MapContainer = (props) => {
   const {
     baseLayersLabel,
     centerPoint,
+    children = null,
     editable = false,
     extraRailTabs,
     geoJson = null,
@@ -116,6 +117,7 @@ export const MapContainer = (props) => {
       <MapLayersControl layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
       <MapMarker editable={editable} point={markerPoint} onPointUpdated={onMarkerPointUpdated} title={markerTitle} />
       {geoJson && <GeoJSON data={geoJson} />}
+      {children}
       <UtmGrid />
       <ZoomControl position="bottomright" />
     </RLMapContainer>
@@ -159,6 +161,8 @@ export const MapContainer = (props) => {
 MapContainer.propTypes = {
   baseLayersLabel: PropTypes.string,
   centerPoint: PropTypes.object,
+  // rendered inside the Leaflet map (e.g. layers using react-leaflet's useMap)
+  children: PropTypes.node,
   editable: PropTypes.bool,
   extraRailTabs: PropTypes.array,
   geoJson: PropTypes.object,
