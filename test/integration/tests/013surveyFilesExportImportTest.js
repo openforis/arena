@@ -149,6 +149,10 @@ describe('Survey files export/import - branding and doc-layout images, area of i
     const exportJob = new SurveyExportJob({ surveyId: sourceSurveyId, user, backup: true })
     await exportJob.start()
     expect(exportJob.isSucceeded()).toBe(true)
+    // result of ZipFileCreatorBaseJob (outputFileName) and of SurveyExportJob (downloadToken): both needed to download
+    expect(exportJob.result).toEqual(
+      expect.objectContaining({ outputFileName: expect.any(String), downloadToken: expect.any(String) })
+    )
 
     const { filePath } = exportJob.context
 

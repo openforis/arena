@@ -55,8 +55,8 @@ export class FileImportBaseJob extends Job {
     }
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     return {
       ...result,
       insertedFiles: this.insertedFileUuids.length,

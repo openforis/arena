@@ -10,6 +10,7 @@ export default class Job extends JobBase {
     super({ ...params, type }, innerJobs)
     this.params = params // original reference, distinct from the (copied, shared) context
     this.result = {} // arena's convention: generateResult()/setResult() build this up incrementally
+    // JobBase.generateResult() is async: overrides calling it must await it
   }
 
   createLogger() {

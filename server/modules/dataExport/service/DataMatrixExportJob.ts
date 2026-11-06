@@ -29,12 +29,13 @@ export default class DataMatrixExportJob extends Job {
     this.setContext({ fileFormat, tempFileName })
   }
 
-  generateResult() {
+  async generateResult() {
     const { fileFormat, tempFileName } = this.context as any
     const { token: downloadToken } = DownloadAuthTokenUtils.generateToken({
       userUuid: User.getUuid(this.user),
       fileName: tempFileName,
     })
-    return { ...super.generateResult(), downloadToken, fileFormat }
+    const result = await super.generateResult()
+    return { ...result, downloadToken, fileFormat }
   }
 }

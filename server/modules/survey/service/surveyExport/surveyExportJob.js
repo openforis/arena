@@ -50,8 +50,8 @@ export default class SurveyExportJob extends ZipFileCreatorBaseJob {
     )
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
 
     const { token: downloadToken } = this.generateDownloadToken()
 
