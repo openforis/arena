@@ -208,6 +208,7 @@ export default {
   viewSelectedRecord: '選択した記録を表示',
   mapView: {
     layersControl: {
+      areasOfInterest: '関心領域',
       baseLayers: 'ベースレイヤー',
       inputData: '入力データ',
       preloadedLayers: 'プリロード済みレイヤー',

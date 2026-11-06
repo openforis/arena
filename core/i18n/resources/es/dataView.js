@@ -198,6 +198,7 @@ Es el formato utilizado por herramientas de análisis de vegetación como Turbov
   viewSelectedRecord: 'Ver registro seleccionado',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Áreas de interés',
       baseLayers: 'Capas base',
       inputData: 'Datos de entrada',
       preloadedLayers: 'Capas precargadas',

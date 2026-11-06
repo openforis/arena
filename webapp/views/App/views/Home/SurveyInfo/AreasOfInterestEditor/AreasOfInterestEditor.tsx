@@ -2,6 +2,8 @@ import { useCallback, useState } from 'react'
 
 import type { AreaOfInterestDescriptor } from '@openforis/arena-core'
 
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
+
 import { Button, ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
 import { DataGrid } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
@@ -27,14 +29,12 @@ type MapPanelState = { header: string; surveyFiles: SurveyFileRef[] }
 const isSameArea = (areaA: AreaOfInterestDescriptor | null) => (areaB: AreaOfInterestDescriptor) =>
   areaA?.fileUuid === areaB.fileUuid
 
-const getAreaLabel = (lang: string) => (area: AreaOfInterestDescriptor) => area.labels?.[lang] || area.name
-
 const toSurveyFileRef =
   (lang: string) =>
   (area: AreaOfInterestDescriptor): SurveyFileRef => ({
     fileUuid: area.fileUuid,
     fileName: area.fileName,
-    label: getAreaLabel(lang)(area),
+    label: SurveyAreaOfInterest.getLabel(lang)(area),
   })
 
 export const AreasOfInterestEditor = (props: Props) => {
@@ -80,7 +80,10 @@ export const AreasOfInterestEditor = (props: Props) => {
 
   const onShowOnMap = useCallback(
     (areaOfInterest: AreaOfInterestDescriptor) =>
-      setMapPanel({ header: getAreaLabel(lang)(areaOfInterest), surveyFiles: [toSurveyFileRef(lang)(areaOfInterest)] }),
+      setMapPanel({
+        header: SurveyAreaOfInterest.getLabel(lang)(areaOfInterest),
+        surveyFiles: [toSurveyFileRef(lang)(areaOfInterest)],
+      }),
     [lang]
   )
 

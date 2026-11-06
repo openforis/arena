@@ -211,6 +211,7 @@ Ovo je format koji koriste alati za analizu vegetacije kao što su Turboveg, Jui
   viewSelectedRecord: 'Prikaži izabrani zapis',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Područja od interesa',
       baseLayers: 'Osnovni slojevi',
       inputData: 'Uneseni podaci',
       preloadedLayers: 'Unaprijed učitani slojevi',

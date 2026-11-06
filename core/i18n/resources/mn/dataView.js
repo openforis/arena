@@ -208,6 +208,7 @@ export default {
   viewSelectedRecord: 'Сонгогдсон бичлэгийг харах',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Сонирхсон бүсүүд',
       baseLayers: 'Үндсэн давхаргууд',
       inputData: 'Оруулах өгөгдөл',
       preloadedLayers: 'Урьдчилан ачаалсан давхаргууд',

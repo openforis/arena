@@ -211,6 +211,7 @@ C'est le format utilisé par les outils d'analyse de la végétation comme Turbo
   viewSelectedRecord: "Voir l'enregistrement sélectionné",
   mapView: {
     layersControl: {
+      areasOfInterest: "Zones d'intérêt",
       baseLayers: 'Couches de base',
       inputData: "Données d'entrée",
       preloadedLayers: 'Couches préchargées',

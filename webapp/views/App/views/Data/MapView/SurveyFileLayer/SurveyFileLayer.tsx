@@ -2,35 +2,37 @@ import { useCallback, useEffect, useRef } from 'react'
 import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 import type L from 'leaflet'
 
-import type { SurveyFile as SurveyFileModel } from '@openforis/arena-core'
-
-import * as SurveyFile from '@core/survey/surveyFile'
 import { useNotifyError } from '@webapp/components/hooks'
-import { fetchSurveyFileAsFile } from '@webapp/components/MapContainer/fileLayers'
+import { fetchSurveyFileAsFile, type SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import {
   getReadErrorDetails,
   readFileLayerGroup,
 } from '@webapp/components/MapContainer/workspace/uploaded/readUploadedFile'
-import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useSurveyId } from '@webapp/store/survey'
 
 import { useMapLayerToggle } from '../common'
 
 type Props = {
-  preloadedMapLayer: SurveyFileModel
+  // its label is the overlay name in the layers control
+  surveyFile: SurveyFileRef
 }
 
-export const PreloadedLayer = (props: Props) => {
-  const { preloadedMapLayer } = props
+/**
+ * Overlay showing a survey file (preloaded map layer, area of interest), downloaded when the overlay is checked.
+ * @param {Props} props - The props.
+ * @returns {React.ReactElement} The overlay.
+ */
+export const SurveyFileLayer = (props: Props) => {
+  const { surveyFile } = props
+  const { fileUuid, fileName, label } = surveyFile
 
   const map = useMap()
   const surveyId = useSurveyId()
-  const lang = useSurveyPreferredLang()
   const notifyError = useNotifyError()
 
   const layerRef = useRef<L.FeatureGroup | null>(null)
 
-  const fileUuid = SurveyFile.getUuid(preloadedMapLayer)
-  const layerName = SurveyFile.getLabel(lang)(preloadedMapLayer)
+  const layerName = label || fileName
 
   const removePreviousLayer = useCallback(() => {
     const layer = layerRef.current
@@ -44,7 +46,6 @@ export const PreloadedLayer = (props: Props) => {
     if (!fileUuid || !surveyId) return
     removePreviousLayer()
     try {
-      const fileName = SurveyFile.getName(preloadedMapLayer)
       const layer = await readFileLayerGroup(await fetchSurveyFileAsFile({ surveyId, fileUuid, fileName }))
       layerRef.current = layer
       map.addLayer(layer)
@@ -55,7 +56,7 @@ export const PreloadedLayer = (props: Props) => {
     } catch (error) {
       notifyError({ key: 'mapWorkspace.upload.error', params: { details: getReadErrorDetails(error) } })
     }
-  }, [fileUuid, surveyId, removePreviousLayer, preloadedMapLayer, map, notifyError])
+  }, [fileUuid, fileName, surveyId, removePreviousLayer, map, notifyError])
 
   useEffect(() => {
     // Cleanup on unmount
