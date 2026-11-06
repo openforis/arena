@@ -426,9 +426,13 @@ export default class CategoryImportJob extends Job {
     super(type, params, [new internalJobConstructor(params), new CategoryValidationJob(params)])
   }
 
-  generateResult() {
+  async generateResult() {
+    const result = await super.generateResult()
     const { category } = this.context
-    return { category }
+    return {
+      ...result,
+      category,
+    }
   }
 }
 

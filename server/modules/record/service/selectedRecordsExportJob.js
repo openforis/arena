@@ -17,8 +17,8 @@ export default class SelectedRecordsExportJob extends ZipFileCreatorBaseJob {
     ])
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     // lets Arena web download the file with a direct GET (not buffered in memory)
     const { user, outputFileName } = this.context
     const { token: downloadToken } = DownloadAuthTokenUtils.generateToken({
