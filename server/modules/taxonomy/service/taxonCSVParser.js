@@ -29,7 +29,7 @@ export default class TaxonCSVParser {
     // the genus is always the first word of the scientific name
     const genus = genusRow ?? (scientificName ? scientificName.split(' ')[0] : null)
 
-    const taxon = Taxon.newTaxon({
+    const taxonNew = Taxon.newTaxon({
       taxonomyUuid: this.taxonomyUuid,
       code: String(StringUtils.nullToEmpty(code)),
       family,
@@ -38,6 +38,7 @@ export default class TaxonCSVParser {
       vernacularNames: this._parseVernacularNames(otherProps),
       extra: this._parseExtraProps(otherProps),
     })
+    const taxon = Taxon.setProp(Taxon.propKeys.position, this.processedRow)(taxonNew)
 
     const validation = await this._validateTaxon(taxon)
 

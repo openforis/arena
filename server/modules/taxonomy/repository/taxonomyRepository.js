@@ -31,6 +31,10 @@ const searchValueProcessorByType = {
   [searchTypes.startsWith]: (value) => `${value}%`,
 }
 
+// taxa follow their position in the last imported file; the ones without it (e.g. added later) go last
+const getTaxaOrderBy = (draft) =>
+  `(${DbUtils.getPropColCombined(Taxon.propKeys.position, draft, 't.')})::integer NULLS LAST, t.id`
+
 const getTaxonVernacularNameSelectFields = (draft) => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
@@ -295,8 +299,7 @@ export const fetchTaxa = async (
         AND taxonomy.props <> '{}'::jsonb`
         : ''
     }
-    ORDER BY
-        t.id
+    ORDER BY ${getTaxaOrderBy(draft)}
     LIMIT $/limit/
     OFFSET $/offset/
     `,
@@ -368,7 +371,7 @@ export const fetchTaxaWithVernacularNames = async (
             ) FILTER (WHERE vn.lang IS NOT NULL),
             '{}'
           ) as vernacular_names,
-        ROW_NUMBER () OVER (partition by t.taxonomy_uuid order by t.id) AS index
+        ROW_NUMBER () OVER (partition by t.taxonomy_uuid order by ${getTaxaOrderBy(draft)}) AS index
       FROM
           ${Schemata.getSchemaSurvey(surveyId)}.taxon t
       ${
@@ -386,8 +389,7 @@ export const fetchTaxaWithVernacularNames = async (
       ${whereCondition}
       GROUP BY
           t.taxonomy_uuid, t.id
-      ORDER BY
-          t.id
+      ORDER BY ${getTaxaOrderBy(draft)}
       LIMIT ${limit ? '$/limit/' : 'ALL'} 
       OFFSET $/offset/
     `,
@@ -447,7 +449,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
           ${Schemata.getSchemaSurvey(surveyId)}.taxon t
       WHERE
           t.taxonomy_uuid = $1
-      ORDER BY t.id`
+      ORDER BY ${getTaxaOrderBy(draft)}`
 
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, [taxonomyUuid]))
 }
