@@ -14,6 +14,12 @@ Nova funkcija izraza \`geoDistanceToAOIBoundary(location, 'area_name')\` vraća 
 
 Hvala **[ASSEDEV Alerte Environnement](https://assedev.fr)** na zahtevu.`,
     },
+    dataQueryTotals: {
+      title: 'Ukupne vrednosti i procenti u Istraživaču podataka',
+      description: `U **Podaci > Istraživač podataka**, u režimu **Agregirano** sa jednom merom (npr. zbir zapremine stabala po vrsti), otvorite meni **Prikaz** i izaberite **Prikaži ukupno i procenat**: svaki red prikazuje svoj procenat od ukupne vrednosti, a na dnu tabele se dodaje red **Ukupno**.
+
+Opcije **Prikaži nazive** i **Prikaži šifre** se takođe nalaze u meniju **Prikaz**.`,
+    },
     mapWorkspace: {
       title: `Novi radni prostor mape`,
       description: `**Podaci > Mapa** ima novi raspored: na vrhu menije **Osnovna mapa**, **Dodaj podatke**, **Prikaz** i **Alati** i polje za pretragu koordinata i ključeva zapisa, sa strane kartice **Slojevi**, **Zapisi** i **Legenda**, a na dnu statusnu traku sa koordinatama pokazivača i razmerom.

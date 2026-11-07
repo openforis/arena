@@ -14,6 +14,12 @@ The new expression function \`geoDistanceToAOIBoundary(location, 'area_name')\` 
 
 Thanks to **[ASSEDEV Alerte Environnement](https://assedev.fr)** for the request.`,
     },
+    dataQueryTotals: {
+      title: 'Totals and percentages in the Data Explorer',
+      description: `In **Data > Explorer**, in **Aggregate** mode with a single measure (e.g. the sum of the tree volume by species), open the **View** menu and choose **Show total and percentage**: each row shows its percentage of the total, and a **Total** row is added at the bottom of the table.
+
+The **Show names** and **Show codes** options are in the **View** menu too.`,
+    },
     mapWorkspace: {
       title: 'A new map workspace',
       description: `**Data > Map** has a new layout: the **Base map**, **Add data**, **Display** and **Tools** menus and a search box for coordinates and record keys at the top, the **Layers**, **Records** and **Legend** tabs on the side, and a status bar with the pointer coordinates and the scale.

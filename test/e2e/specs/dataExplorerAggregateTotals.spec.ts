@@ -4,6 +4,7 @@ import { expect, test } from '../fixtures'
 import { sampleRecords } from '../fixtures/seed/sampleSurveyModel'
 import { getDropdown, selectDropdownItem } from '../helpers/dropdown'
 import { Urls } from '../helpers/urls'
+import { saveAreaScreenshot } from '../helpers/whatsNewScreenshots'
 
 test.describe('Data Explorer aggregate totals', () => {
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
@@ -30,6 +31,17 @@ test.describe('Data Explorer aggregate totals', () => {
     await expect(totalRow).toContainText('Total')
     await expect(totalRow).toContainText('472.5')
     await expect(totalRow).toContainText('100 %')
+
+    await viewOptionsBtn.click()
+    const menuPaper = page.locator('.MuiMenu-paper')
+    // menu faded in
+    await expect(menuPaper).toHaveCSS('opacity', '1')
+    await saveAreaScreenshot({
+      page,
+      locators: [page.locator('.data-query-button-bar'), totalRow, menuPaper],
+      name: 'dataQueryTotals',
+    })
+    await page.keyboard.press('Escape')
 
     // available only with a single measure
     await page.locator('.attribute-selector', { hasText: 'Tree decimal 2' }).click()

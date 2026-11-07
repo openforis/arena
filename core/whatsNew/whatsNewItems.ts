@@ -39,6 +39,12 @@ export const whatsNewItems: WhatsNewItem[] = [
     ],
   },
   {
+    id: 'dataQueryTotals',
+    version: '2.12.0',
+    audience: whatsNewAudiences.dataCleanser,
+    images: ['/img/whats-new/dataQueryTotals.png'],
+  },
+  {
     id: 'mapWorkspace',
     version: '2.11.0',
     audience: whatsNewAudiences.dataCleanser,
