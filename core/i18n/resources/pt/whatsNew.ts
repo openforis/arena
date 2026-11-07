@@ -14,6 +14,12 @@ A nova função de expressão \`geoDistanceToAOIBoundary(location, 'area_name')\
 
 Obrigado à **[ASSEDEV Alerte Environnement](https://assedev.fr)** pelo pedido.`,
     },
+    dataQueryTotals: {
+      title: 'Totais e percentagens no Explorador de dados',
+      description: `Em **Dados > Explorador**, no modo **Agregado** com uma única medida (p. ex. a soma do volume das árvores por espécie), abra o menu **Visualização** e escolha **Mostrar total e percentagem**: cada linha mostra a sua percentagem do total e é adicionada uma linha **Total** no fim da tabela.
+
+As opções **Mostrar nomes** e **Mostrar códigos** também estão no menu **Visualização**.`,
+    },
     mapWorkspace: {
       title: `Um novo espaço de trabalho do mapa`,
       description: `**Dados > Mapa** tem um novo layout: no topo, os menus **Mapa base**, **Adicionar dados**, **Exibição** e **Ferramentas** e uma caixa de pesquisa de coordenadas e chaves de registros; ao lado, as abas **Camadas**, **Registros** e **Legenda**; embaixo, uma barra de status com as coordenadas do ponteiro e a escala.
