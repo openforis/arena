@@ -1,6 +1,8 @@
 import { useCallback, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import { useLang } from '@webapp/store/system'
+
 import * as SideBarModule from './utils'
 
 import Module from './Module'
@@ -15,7 +17,8 @@ const Modules = (props) => {
   const [popupMenu, setPopupMenu] = useState(null)
   const modulePopupMenu = popupMenu?.module ?? null
 
-  const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo).filter(
+  const lang = useLang()
+  const modulesHierarchy = SideBarModule.getModulesHierarchy(user, surveyInfo, lang).filter(
     (module) => !SideBarModule.isHidden(module)
   )
 
