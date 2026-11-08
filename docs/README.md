@@ -23,7 +23,7 @@ Elsewhere in the repo: [e2e tests](../test/e2e/README.md), [load tests](../test/
 - [superpowers/](superpowers/): design specs and implementation plans written while building a feature.
   They record the decisions made at that time and are not updated afterwards: check the code (or the
   guides above) for the current behavior.
-- [user-manual/](user-manual/): the user manual (`.docx` and PDF, in English, French and Spanish), also published with every release.
+- [user-manual/](user-manual/): the user manual (`.docx`, in English, French and Spanish); its PDFs are attached to every release.
 - [whats-new-2026/](whats-new-2026/): "What's new in 2026" presentation, its screenshots and its animated, narrated video.
 
 ## Writing docs
