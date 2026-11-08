@@ -35,7 +35,7 @@
 
 <!--- Provide screenshots of any changes in the UI -->
 
-- [ ] User manual (`docs/user-manual/`, English, French and Spanish, PDFs regenerated) updated, or not needed
+- [ ] User manual (`docs/user-manual/`, English, French and Spanish) updated, or not needed
 
 ## Disclaimer
 
