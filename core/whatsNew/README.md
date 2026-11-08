@@ -26,7 +26,7 @@ Some e2e specs save the screenshots of their feature when `WHATS_NEW_SCREENSHOTS
 groups, skipped otherwise). Regenerate them after UI changes, e.g.:
 
 ```bash
-WHATS_NEW_SCREENSHOTS_DIR=$PWD/web-resources/img/whats-new yarn test:e2e specs/areaOfInterest.spec.ts specs/mapWorkspace.spec.ts specs/dataExplorerAggregateTotals.spec.ts -g "Area of interest|What's new screenshots|Data Explorer aggregate totals"
+WHATS_NEW_SCREENSHOTS_DIR=$PWD/web-resources/img/whats-new yarn test:e2e specs/areaOfInterest.spec.ts specs/mapWorkspace.spec.ts specs/dataExplorerAggregateTotals.spec.ts specs/dashboardUpgrade.spec.ts -g "Area of interest|What's new screenshots|Data Explorer aggregate totals"
 ```
 
 Use JPEG for photo-like content such as satellite imagery (`type: 'jpeg'`): PNG files would be several times larger.
