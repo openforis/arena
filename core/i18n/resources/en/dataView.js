@@ -22,6 +22,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Aggregate functions of {{name}}',
     ai: {
       button: 'Ask AI',
       buttonTitle: 'Generate a query from a description using AI',
@@ -38,6 +39,7 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
       generatedSuccessfully:
         'Query generated: {{explanation}} Check the result and save the query if you want to keep it.',
     },
+    customAggregateFunctions: 'Custom aggregate functions…',
     deleteConfirmMessage: 'Delete the query "{{name}}"?',
     displayType: {
       chart: 'Chart',
@@ -45,7 +47,6 @@ Please refine your query (e.g. adding a filter) to reduce the number of items.
     },
     manageQueries: 'Manage queries',
     mode: {
-      label: 'Mode:',
       aggregate: 'Aggregate',
       raw: 'Raw',
       rawEdit: 'Raw edit',

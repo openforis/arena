@@ -23,6 +23,7 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Agregatne funkcije za {{name}}',
     ai: {
       button: 'Pitaj AI',
       buttonTitle: 'Generiši upit iz opisa pomoću AI',
@@ -38,6 +39,7 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
       generatedSuccessfully:
         'Upit je generisan: {{explanation}} Provjerite rezultat i sačuvajte upit ako želite da ga zadržite.',
     },
+    customAggregateFunctions: 'Prilagođene agregatne funkcije…',
     deleteConfirmMessage: 'Obrisati upit "{{name}}"?',
     displayType: {
       chart: 'Grafikon',
@@ -45,7 +47,6 @@ Precizirajte upit (npr. dodavanjem filtera) da biste smanjili broj stavki.
     },
     manageQueries: 'Upravljaj upitima',
     mode: {
-      label: 'Režim:',
       aggregate: 'Agregirano',
       raw: 'Neobrađeno',
       rawEdit: 'Uređivanje neobrađenih',

@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: '{{name}} の集計関数',
     ai: {
       button: 'AIに質問',
       buttonTitle: 'AIを使って説明からクエリを生成',
@@ -38,6 +39,7 @@ export default {
       generatedSuccessfully:
         'クエリを生成しました：{{explanation}} 結果を確認し、残したい場合はクエリを保存してください。',
     },
+    customAggregateFunctions: 'カスタム集計関数…',
     deleteConfirmMessage: 'クエリ「{{name}}」を削除しますか？',
     displayType: {
       chart: 'グラフ',
@@ -45,7 +47,6 @@ export default {
     },
     manageQueries: 'クエリを管理',
     mode: {
-      label: 'モード：',
       aggregate: '集計',
       raw: '生データ',
       rawEdit: '生データ編集',

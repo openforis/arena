@@ -13,6 +13,8 @@ export type ButtonMenuItem = {
   // when defined, the item is a checkbox (it toggles on click)
   checked?: boolean
   className?: string
+  // overrides closeMenuOnItemClick for this item
+  closeMenuOnClick?: boolean
   content?: React.ReactNode
   disabled?: boolean
   icon?: React.ReactNode
@@ -61,7 +63,7 @@ export const ButtonMenuPopup = (props: ButtonMenuPopupProps) => {
   const onItemClick = (item: ButtonMenuItem) => () => {
     item.onClick?.()
     onItemClickProp?.(item)
-    if (closeMenuOnItemClick) {
+    if (item.closeMenuOnClick ?? closeMenuOnItemClick) {
       onClose()
     }
   }

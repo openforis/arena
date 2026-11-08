@@ -13,7 +13,7 @@ import { useNodeDefsByUuids } from '@webapp/store/survey'
 import { DataQuerySortableItemChip } from './DataQuerySortableItemChip'
 
 export const DataQuerySortableItems = (props) => {
-  const { nodeDefUuids, label, nodeDefLabelType, onItemsSort, onItemDelete } = props
+  const { nodeDefUuids, label, nodeDefLabelType, onItemsSort, onItemDelete, renderItemExtra = null } = props
 
   const containerRef = useRef(null)
   const nodeDefs = useNodeDefsByUuids(nodeDefUuids)
@@ -21,7 +21,7 @@ export const DataQuerySortableItems = (props) => {
   useSortable({
     containerRef,
     draggableClassName: '.data-query__sortable-item-chip',
-    handleClassName: '.data-query__sortable-item-chip .MuiChip-label',
+    handleClassName: '.data-query__sortable-item-chip-label',
     items: nodeDefs,
     onItemsSort,
   })
@@ -37,7 +37,9 @@ export const DataQuerySortableItems = (props) => {
             nodeDefDef={nodeDef}
             nodeDefLabelType={nodeDefLabelType}
             onDelete={onItemDelete}
-          />
+          >
+            {renderItemExtra?.(nodeDef)}
+          </DataQuerySortableItemChip>
         ))}
       </div>
     </FormItem>
@@ -50,4 +52,6 @@ DataQuerySortableItems.propTypes = {
   nodeDefLabelType: PropTypes.string,
   onItemsSort: PropTypes.func.isRequired,
   onItemDelete: PropTypes.func.isRequired,
+  // extra content rendered inside each item chip (e.g. the measure aggregate functions)
+  renderItemExtra: PropTypes.func,
 }

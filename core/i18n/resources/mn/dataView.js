@@ -23,6 +23,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: '{{name}}-ийн нэгтгэх функцүүд',
     ai: {
       button: 'AI-аас асуух',
       buttonTitle: 'AI ашиглан тайлбараас хүсэлт үүсгэх',
@@ -37,6 +38,7 @@ export default {
       suggestSummaryTitle: 'Одоогийн сонголтууд дээр үндэслэн хүсэлтийн нэр, шошго, тайлбарыг AI ашиглан санал болгох',
       generatedSuccessfully: 'Хүсэлт үүслээ: {{explanation}} Үр дүнг шалгаад, хадгалах бол хүсэлтийг хадгална уу.',
     },
+    customAggregateFunctions: 'Өөрийн нэгтгэх функцүүд…',
     deleteConfirmMessage: 'Хүсэлт "{{name}}"-г устгах уу?',
     displayType: {
       chart: 'График',
@@ -44,7 +46,6 @@ export default {
     },
     manageQueries: 'Хүсэлтүүдийг удирдах',
     mode: {
-      label: 'Горим:',
       aggregate: 'Нэгтгэх',
       raw: 'Түүхий',
       rawEdit: 'Түүхийг засах',

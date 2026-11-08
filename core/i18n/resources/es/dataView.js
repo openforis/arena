@@ -21,6 +21,7 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Funciones de agregación de {{name}}',
     ai: {
       button: 'Preguntar a la IA',
       buttonTitle: 'Generar una consulta a partir de una descripción usando IA',
@@ -37,6 +38,7 @@ export default {
       generatedSuccessfully:
         'Consulta generada: {{explanation}} Revise el resultado y guarde la consulta si desea conservarla.',
     },
+    customAggregateFunctions: 'Funciones de agregación personalizadas…',
     deleteConfirmMessage: '¿Eliminar la consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',
@@ -44,7 +46,6 @@ export default {
     },
     manageQueries: 'Administrar consultas',
     mode: {
-      label: 'Modo:',
       aggregate: 'Agregar',
       raw: 'Crudo',
       rawEdit: 'Edición en bruto',

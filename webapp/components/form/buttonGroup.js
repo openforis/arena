@@ -14,7 +14,7 @@ const ButtonGroup = ({
   groupName = null,
   items = [],
   multiple = false,
-  onChange = () => {},
+  onChange = (_value) => {},
   selectedItemKey = null,
 }) => {
   const onItemClick =
