@@ -4,7 +4,7 @@ The manual (Open Foris Arena Handbook), edited with Word or LibreOffice Writer, 
 
 | Language | Source | PDF |
 |---|---|---|
-| English | `arena-user-manual.docx` | `arena-user-manual.pdf` |
+| English | `arena-user-manual-en.docx` | `arena-user-manual-en.pdf` |
 | French | `arena-user-manual-fr.docx` | `arena-user-manual-fr.pdf` |
 | Spanish | `arena-user-manual-es.docx` | `arena-user-manual-es.pdf` |
 
@@ -16,7 +16,7 @@ These links don't change over time: they always open the manual of the latest Ar
 
 | Language | Release asset | GitHub Pages (opens in the browser) |
 |---|---|---|
-| English | <https://github.com/openforis/arena/releases/latest/download/arena-user-manual.pdf> | <https://openforis.github.io/arena/arena-user-manual.pdf> |
+| English | <https://github.com/openforis/arena/releases/latest/download/arena-user-manual-en.pdf> | <https://openforis.github.io/arena/arena-user-manual-en.pdf> |
 | French | <https://github.com/openforis/arena/releases/latest/download/arena-user-manual-fr.pdf> | <https://openforis.github.io/arena/arena-user-manual-fr.pdf> |
 | Spanish | <https://github.com/openforis/arena/releases/latest/download/arena-user-manual-es.pdf> | <https://openforis.github.io/arena/arena-user-manual-es.pdf> |
 
