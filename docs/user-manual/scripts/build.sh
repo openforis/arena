@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates the PDFs of the user manual (arena-user-manual[-fr|-es].pdf) from the .docx files with LibreOffice,
+# Generates the PDFs of the user manual (arena-user-manual-en|fr|es.pdf) from the .docx files with LibreOffice,
 # filling in the version and the date. Requires LibreOffice and node.
 set -euo pipefail
 
@@ -49,7 +49,7 @@ cd "$MANUAL_DIR"
 LANGS="${*:-en fr es}"
 for LANG_CODE in $LANGS; do
   case "$LANG_CODE" in
-    en) FILE="$NAME" LOCALE=en-GB ;;
+    en) FILE="$NAME-en" LOCALE=en-GB ;;
     fr) FILE="$NAME-fr" LOCALE=fr-FR ;;
     es) FILE="$NAME-es" LOCALE=es-ES ;;
     *) echo "Unknown language: $LANG_CODE" >&2; exit 1 ;;

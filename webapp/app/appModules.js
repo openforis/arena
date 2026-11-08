@@ -315,22 +315,22 @@ export const helpModules = {
   },
   userManual: {
     key: 'userManual',
-    uri: 'https://github.com/openforis/arena/releases/latest/download/arena-user-manual.pdf',
+    uri: 'https://github.com/openforis/arena/releases/latest/download/arena-user-manual-en.pdf',
     external: true,
   },
 }
 
-const userManualLanguages = new Set(['fr', 'es'])
+const userManualLanguages = new Set(['en', 'fr', 'es'])
 
 /**
- * Returns the URL of the user manual PDF of the latest release, in the specified UI language if available.
+ * Returns the URL of the user manual PDF of the latest release, in the specified UI language if available (English otherwise).
  * @param {string} [lang] - UI language code (e.g. 'fr').
  * @returns {string} - The URL of the user manual.
  */
 export const getUserManualUri = (lang) => {
   const langCode = lang?.split('-')[0]
-  const suffix = userManualLanguages.has(langCode) ? `-${langCode}` : ''
-  return `https://github.com/openforis/arena/releases/latest/download/arena-user-manual${suffix}.pdf`
+  const manualLang = userManualLanguages.has(langCode) ? langCode : 'en'
+  return `https://github.com/openforis/arena/releases/latest/download/arena-user-manual-${manualLang}.pdf`
 }
 
 const allAppModuleGroups = [
