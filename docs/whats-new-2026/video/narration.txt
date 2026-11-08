@@ -1,0 +1,20 @@
+Welcome to Open Foris Arena. Here is what is new in twenty twenty six: a year of new features, from survey design to data analysis.
+It was a year of steady releases: seventy one versions of Arena, eighteen headline features, and three new interface languages: Portuguese, Japanese and Serbian.
+Arena has a fresh look. The new dashboard shows records, contributors and a map of your data at a glance. And you can now switch between a light and a dark theme.
+Survey designers get smarter forms. An attribute can be required only when a condition is true. An expression can decide which rows an enumerated entity gets. And any attribute can be cloned, with all its properties, into another entity.
+Preview your survey as it looks in Arena Mobile: on a phone or a tablet, in portrait or landscape, right in the browser, with no device needed.
+Moving surveys between servers is easier. Compare a survey with one from another server, and apply only the changes you pick. You can also create a survey from an O D K form, and import its data.
+With branding, each survey gets its own look: up to three logos, a background image, and a primary colour applied to the whole application.
+Records can now be printed, in Word or P D F, following the form layout, with pictures, a Q R code, and your own letterhead.
+Data entry keeps your data cleaner. When a change makes some fields no longer relevant, their values are cleared, after asking you to confirm.
+Security is stronger, with two factor authentication, Q R code login for Arena Mobile, and finer control over which user groups can see which records.
+In the Data Explorer, export species by records tables for vegetation analysis tools. And, new in version two point twelve, show totals and percentages in aggregate mode.
+The map has a brand new workspace. Add your own layers, from K M L, Shapefile and Geo Jason files, to W M S services. Measure distances and areas, take screenshots, and search by coordinates or record keys.
+And now, the highlight of version two point twelve: areas of interest. In the survey info, add one or more polygons, for example the municipalities of a pilot area, and check them on a map while you add them. They also appear as layers in the data map.
+Areas of interest work in expressions. Geo distance to A O I boundary gives the distance from a location to the edge of an area: negative inside, positive outside. Compare it with the G P S accuracy, and tell field teams right away if a plot is inside, outside, or uncertain. It works offline in Arena Mobile, too.
+For analysis, run Whisp on every sampling point in the background, and build richer processing chains, with two phase sampling and templates.
+Optional A I features help survey designers: write expressions from plain language, explain existing ones, and translate labels in one click.
+Ask in plain language: the A I builds Data Explorer queries for you, and a help chatbot answers your questions about Arena. You choose the A I provider.
+Under the hood, Arena is faster. Importing large records now takes seconds instead of minutes, records are lighter, and duplicates are merged automatically.
+System administrators get everything on one page: live server logs, user backup and restore, messages, and more.
+Thank you for watching! The full changelog and the source code are on GitHub, at github dot com slash openforis slash arena.
