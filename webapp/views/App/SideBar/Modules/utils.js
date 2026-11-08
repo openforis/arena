@@ -15,6 +15,7 @@ import {
   userModules,
   helpModules,
   systemAdminModules,
+  getUserManualUri,
 } from '@webapp/app/appModules'
 
 const keys = {
@@ -105,11 +106,11 @@ const getSystemAdminModules = (user) => {
   ]
 }
 
-const getHelpModule = (user) =>
+const getHelpModule = (user, lang) =>
   getModule({
     module: appModules.help,
     children: [
-      helpModules.userManual,
+      { ...helpModules.userManual, uri: getUserManualUri(lang) },
       helpModules.about,
       helpModules.whatsNew,
       ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
@@ -117,7 +118,7 @@ const getHelpModule = (user) =>
     ],
   })
 
-export const getModulesHierarchy = (user, surveyInfo) => [
+export const getModulesHierarchy = (user, surveyInfo, lang) => [
   getModule({ module: appModules.home }),
   // the dashboard is not available to data editors and survey guests
   getModule({ module: appModules.dashboard, hidden: !Authorizer.canCleanseRecords(user, surveyInfo) }),
@@ -125,7 +126,7 @@ export const getModulesHierarchy = (user, surveyInfo) => [
   getDataModule(user, surveyInfo),
   getAnalysisModule(user, surveyInfo),
   getUsersModule(user, surveyInfo),
-  getHelpModule(user),
+  getHelpModule(user, lang),
   ...getSystemAdminModules(user),
 ]
 

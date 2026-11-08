@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Generates arena-user-manual.pdf from arena-user-manual.docx with LibreOffice,
+# Generates the PDFs of the user manual (arena-user-manual[-fr|-es].pdf) from the .docx files with LibreOffice,
 # filling in the version and the date. Requires LibreOffice and node.
 set -euo pipefail
 
@@ -32,7 +32,6 @@ if [[ -z "${PYTHON:-}" ]]; then
 fi
 
 VERSION="$(node -p "require('$MANUAL_DIR/../../package.json').version")"
-DATE="$(node -p "new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })")"
 
 TMP_DIR="$(mktemp -d)"
 SOFFICE_PID=""
@@ -46,15 +45,27 @@ trap cleanup EXIT
 
 cd "$MANUAL_DIR"
 
-echo "Exporting $NAME.pdf (version $VERSION, $DATE)..."
-# separate profile: works also when another LibreOffice instance is running
-PIPE_NAME="arena_manual_$$"
-"$SOFFICE" --headless --invisible --norestore \
-  "-env:UserInstallation=file://$TMP_DIR/profile" \
-  "--accept=pipe,name=$PIPE_NAME;urp;" &
-SOFFICE_PID=$!
-"$PYTHON" scripts/export.py "$PIPE_NAME" "$NAME.docx" "$NAME.pdf" "$VERSION" "$DATE"
-wait "$SOFFICE_PID" || true
-SOFFICE_PID=""
+# languages to export (default: all); file name suffix and locale of the date on the cover
+LANGS="${*:-en fr es}"
+for LANG_CODE in $LANGS; do
+  case "$LANG_CODE" in
+    en) FILE="$NAME" LOCALE=en-GB ;;
+    fr) FILE="$NAME-fr" LOCALE=fr-FR ;;
+    es) FILE="$NAME-es" LOCALE=es-ES ;;
+    *) echo "Unknown language: $LANG_CODE" >&2; exit 1 ;;
+  esac
+  DATE="$(node -p "new Date().toLocaleDateString('$LOCALE', { day: 'numeric', month: 'long', year: 'numeric' })")"
 
-echo "Done: $MANUAL_DIR/$NAME.pdf"
+  echo "Exporting $FILE.pdf (version $VERSION, $DATE)..."
+  # separate profile: works also when another LibreOffice instance is running
+  PIPE_NAME="arena_manual_$$_$LANG_CODE"
+  "$SOFFICE" --headless --invisible --norestore \
+    "-env:UserInstallation=file://$TMP_DIR/profile" \
+    "--accept=pipe,name=$PIPE_NAME;urp;" &
+  SOFFICE_PID=$!
+  "$PYTHON" scripts/export.py "$PIPE_NAME" "$FILE.docx" "$FILE.pdf" "$VERSION" "$DATE"
+  wait "$SOFFICE_PID" || true
+  SOFFICE_PID=""
+
+  echo "Done: $MANUAL_DIR/$FILE.pdf"
+done
