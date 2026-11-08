@@ -35,6 +35,8 @@
 
 <!--- Provide screenshots of any changes in the UI -->
 
+- [ ] User manual (`docs/user-manual/arena-user-manual.docx`) updated, or not needed
+
 ## Disclaimer
 
 <!--- Provide a description about anything unusual. -->
