@@ -396,7 +396,9 @@
       scene.div = div
       return scene
     })
-    return Promise.all([document.fonts.ready, ...ready]).then(() => true)
+    // all the fonts, also those used only in scenes not shown yet (font-display: swap would show a fallback)
+    const fonts = [...document.fonts].map((font) => font.load())
+    return Promise.all([...fonts, ...ready]).then(() => true)
   }
 
   const REVEAL_R = 1250

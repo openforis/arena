@@ -1,9 +1,9 @@
-@font-face { font-family: 'Rubik'; font-weight: 500; src: url(fonts/rubik-latin-500-normal.woff2) format('woff2'); font-display: block; }
-@font-face { font-family: 'Rubik'; font-weight: 700; src: url(fonts/rubik-latin-700-normal.woff2) format('woff2'); font-display: block; }
-@font-face { font-family: 'Rubik'; font-weight: 800; src: url(fonts/rubik-latin-800-normal.woff2) format('woff2'); font-display: block; }
-@font-face { font-family: 'Nunito Sans'; font-weight: 400; src: url(fonts/nunito-sans-latin-400-normal.woff2) format('woff2'); font-display: block; }
-@font-face { font-family: 'Nunito Sans'; font-weight: 600; src: url(fonts/nunito-sans-latin-600-normal.woff2) format('woff2'); font-display: block; }
-@font-face { font-family: 'Nunito Sans'; font-weight: 700; src: url(fonts/nunito-sans-latin-700-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Rubik'; font-weight: 500; src: url(fonts/rubik-latin-500-normal.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Rubik'; font-weight: 700; src: url(fonts/rubik-latin-700-normal.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Rubik'; font-weight: 800; src: url(fonts/rubik-latin-800-normal.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 400; src: url(fonts/nunito-sans-latin-400-normal.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 600; src: url(fonts/nunito-sans-latin-600-normal.woff2) format('woff2'); font-display: swap; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 700; src: url(fonts/nunito-sans-latin-700-normal.woff2) format('woff2'); font-display: swap; }
 
 :root {
   --ink: #13302B;
