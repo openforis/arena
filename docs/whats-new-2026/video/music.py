@@ -46,53 +46,53 @@ def envelope(n, attack, release):
     return env
 
 
-def main():
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('seconds', type=float)
-    p.add_argument('out')
-    args = p.parse_args()
+BAR = 4 * BEAT
+CHORD_LEN = 2 * BAR
 
+
+def drum_sounds():
     rng = np.random.default_rng(7)
-    total = args.seconds
-    buf = np.zeros((int(total * SR) + SR * 4, 2))
-    bar = 4 * BEAT
-    chord_len = 2 * bar
-    n_chords = int(np.ceil(total / chord_len)) + 1
     tk = np.arange(int(0.35 * SR)) / SR
     kick = np.sin(2 * np.pi * (50 * tk + 70 * (1 - np.exp(-tk * 30)) / 30)) * np.exp(-tk * 9)
     hat = rng.standard_normal(int(0.06 * SR))
     hat = np.diff(hat, prepend=0) * np.exp(-np.arange(len(hat)) / SR * 70)
+    return kick, hat
 
-    for c in range(n_chords):
-        start = c * chord_len
-        bass, tones = CHORDS[c % len(CHORDS)]
-        # pad
-        for m in tones:
-            sig = tone(hz(m), chord_len + 0.8, (1.0, 0.25, 0.08), detune=0.002)
-            add(buf, start, sig * envelope(len(sig), 0.9, 1.2), 0.035, pan=(m % 7 - 3) / 8)
-        # bass, one note per bar
-        for b in range(2):
-            sig = tone(hz(bass), bar, (1.0, 0.3))
-            add(buf, start + b * bar, sig * envelope(len(sig), 0.02, 0.4) * np.exp(-np.arange(len(sig)) / SR * 0.6),
-                0.11)
-        # plucked arpeggio, eighth notes, one octave up
-        intro = start < 4 * bar
-        for e in range(16):
-            m = tones[ARP[e % 8]] + 12
-            sig = tone(hz(m), 0.9, (1.0, 0.5, 0.2))
-            t = np.arange(len(sig)) / SR
-            sig *= np.exp(-t * 5.5) * np.minimum(1, t * 400)
-            vel = 0.9 if e % 4 == 0 else 0.6
-            add(buf, start + e * BEAT / 2, sig, (0.03 if intro else 0.05) * vel, pan=0.4 if e % 2 else -0.4)
-        # soft drums after the intro
-        if not intro:
-            for b in range(8):
-                beat_t = start + b * BEAT
-                if b % 2 == 0:
-                    add(buf, beat_t, kick, 0.22)
-                add(buf, beat_t + BEAT / 2, hat, 0.035, pan=0.2)
 
-    # simple stereo echo for space
+def add_pad(buf, start, tones):
+    for m in tones:
+        sig = tone(hz(m), CHORD_LEN + 0.8, (1.0, 0.25, 0.08), detune=0.002)
+        add(buf, start, sig * envelope(len(sig), 0.9, 1.2), 0.035, pan=(m % 7 - 3) / 8)
+
+
+def add_bass(buf, start, bass):
+    # one note per bar
+    for b in range(2):
+        sig = tone(hz(bass), BAR, (1.0, 0.3))
+        sig *= envelope(len(sig), 0.02, 0.4) * np.exp(-np.arange(len(sig)) / SR * 0.6)
+        add(buf, start + b * BAR, sig, 0.11)
+
+
+def add_arpeggio(buf, start, tones, gain):
+    # plucked eighth notes, one octave up
+    for e in range(16):
+        sig = tone(hz(tones[ARP[e % 8]] + 12), 0.9, (1.0, 0.5, 0.2))
+        t = np.arange(len(sig)) / SR
+        sig *= np.exp(-t * 5.5) * np.minimum(1, t * 400)
+        vel = 0.9 if e % 4 == 0 else 0.6
+        add(buf, start + e * BEAT / 2, sig, gain * vel, pan=0.4 if e % 2 else -0.4)
+
+
+def add_drums(buf, start, kick, hat):
+    for b in range(8):
+        beat_t = start + b * BEAT
+        if b % 2 == 0:
+            add(buf, beat_t, kick, 0.22)
+        add(buf, beat_t + BEAT / 2, hat, 0.035, pan=0.2)
+
+
+def finish(buf, total):
+    """Stereo echo for space, fades and normalization."""
     out = buf.copy()
     for delay, gain in ((0.19, 0.25), (0.37, 0.15), (0.61, 0.08)):
         d = int(delay * SR)
@@ -102,8 +102,28 @@ def main():
     fade_in, fade_out = int(2 * SR), int(5 * SR)
     out[:fade_in] *= np.linspace(0, 1, fade_in)[:, None]
     out[-fade_out:] *= np.linspace(1, 0, fade_out)[:, None]
-    out *= 0.9 / np.max(np.abs(out))
-    sf.write(args.out, out.astype(np.float32), SR)
+    return out * 0.9 / np.max(np.abs(out))
+
+
+def main():
+    p = argparse.ArgumentParser(description=__doc__)
+    p.add_argument('seconds', type=float)
+    p.add_argument('out')
+    args = p.parse_args()
+
+    total = args.seconds
+    buf = np.zeros((int(total * SR) + SR * 4, 2))
+    kick, hat = drum_sounds()
+    for c in range(int(np.ceil(total / CHORD_LEN)) + 1):
+        start = c * CHORD_LEN
+        bass, tones = CHORDS[c % len(CHORDS)]
+        intro = start < 4 * BAR
+        add_pad(buf, start, tones)
+        add_bass(buf, start, bass)
+        add_arpeggio(buf, start, tones, 0.03 if intro else 0.05)
+        if not intro:
+            add_drums(buf, start, kick, hat)
+    sf.write(args.out, finish(buf, total).astype(np.float32), SR)
 
 
 if __name__ == '__main__':

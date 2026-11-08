@@ -1,6 +1,8 @@
 """Narrate scenes.json with the Kokoro voice; writes the narration track, the timeline and the subtitles."""
 import argparse
 import json
+import re
+import tempfile
 import urllib.request
 from pathlib import Path
 
@@ -14,9 +16,22 @@ LEAD, FIRST_LEAD = 0.7, 1.4  # silence before the first sentence of a scene (sec
 GAP = 0.35  # between sentences
 TAIL = 0.9  # after the last sentence
 XF = 0.6  # scene overlap (transition)
+VOICE_RE = re.compile(r'^[a-z]{2}_[a-z]+$')
+
+
+def safe_path(value, suffix=None):
+    """Resolve a path given on the command line; it must be in this folder or in the temp folder."""
+    path = Path(value).resolve()
+    if not any(path.is_relative_to(root) for root in (HERE.resolve(), Path(tempfile.gettempdir()).resolve())):
+        raise SystemExit(f'{value}: use a path in {HERE} or in {tempfile.gettempdir()}')
+    if suffix and path.suffix != suffix:
+        raise SystemExit(f'{value}: expected a {suffix} file')
+    return path
 
 
 def ensure_model(model_dir, voice):
+    if not VOICE_RE.match(voice):
+        raise SystemExit(f'invalid voice: {voice}')
     model_dir.mkdir(parents=True, exist_ok=True)
     model = model_dir / 'model.onnx'
     if not model.exists():
@@ -40,13 +55,14 @@ def main():
     p.add_argument('--work-dir', type=Path, default=HERE / 'build')
     p.add_argument('--model-dir', type=Path, default=HERE / 'build' / 'kokoro')
     args = p.parse_args()
+    work_dir, model_dir = safe_path(args.work_dir), safe_path(args.model_dir)
 
     from kokoro_onnx import Kokoro
 
     spec = json.loads((HERE / 'scenes.json').read_text())
     voice, speed = spec['voice'], spec.get('speed', 1.0)
     lang = 'en-gb' if voice.startswith('b') else 'en-us'
-    model, voices = ensure_model(args.model_dir, voice)
+    model, voices = ensure_model(model_dir, voice)
     kokoro = Kokoro(str(model), str(voices))
 
     clips, scenes, subtitles = [], [], []
@@ -74,12 +90,12 @@ def main():
     for t, audio in clips:
         i = int(t * SR)
         track[i:i + len(audio)] += audio
-    args.work_dir.mkdir(parents=True, exist_ok=True)
-    sf.write(args.work_dir / 'narration.wav', track[:int(total * SR)], SR)
-    (args.work_dir / 'timing.json').write_text(json.dumps({'total': round(total, 3), 'xf': XF, 'scenes': scenes}))
-    (args.work_dir / 'timing.js').write_text('window.TIMING = ' + json.dumps({'total': total, 'xf': XF, 'scenes': scenes}))
+    work_dir.mkdir(parents=True, exist_ok=True)
+    sf.write(work_dir / 'narration.wav', track[:int(total * SR)], SR)
+    (work_dir / 'timing.json').write_text(json.dumps({'total': round(total, 3), 'xf': XF, 'scenes': scenes}))
+    (work_dir / 'timing.js').write_text('window.TIMING = ' + json.dumps({'total': total, 'xf': XF, 'scenes': scenes}))
     srt = [f'{i}\n{srt_time(a)} --> {srt_time(b)}\n{text}\n' for i, (a, b, text) in enumerate(subtitles, 1)]
-    (args.work_dir / 'subtitles.srt').write_text('\n'.join(srt))
+    (work_dir / 'subtitles.srt').write_text('\n'.join(srt))
     print(f'total: {total:.1f}s')
 
 

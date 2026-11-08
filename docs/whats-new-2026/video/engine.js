@@ -88,7 +88,11 @@
       } }
     },
     shot(it, scene, idx) {
-      const capH = it.caption ? (it.sub ? 86 : 52) : 0
+      const captionHeight = () => {
+        if (!it.caption) return 0
+        return it.sub ? 86 : 52
+      }
+      const capH = captionHeight()
       const chrome = it.paper ? 0 : 30
       const img = new Image()
       img.src = imgSrc(it.src)
@@ -98,7 +102,8 @@
       e.appendChild(frame)
       let cap
       if (it.caption) {
-        cap = el('caption', `${it.caption}${it.sub ? `<small>${it.sub}</small>` : ''}`)
+        const sub = it.sub ? `<small>${it.sub}</small>` : ''
+        cap = el('caption', it.caption + sub)
         e.appendChild(cap)
       }
       const layout = () => {
@@ -110,7 +115,6 @@
         frame.querySelector('.view').style.top = `${chrome}px`
         if (cap) { cap.style.top = `${(boxH + h) / 2 + 18}px`; cap.style.left = `${(it.w - w) / 2 + 4}px` }
       }
-      img.decode().then(layout)
       const seed = idx * 1.7
       return { e, ready: img.decode().then(layout), update: (lt, sl) => {
         const p = prog(lt, 0, 1.1, ease.outQuart)
@@ -265,7 +269,10 @@
     const colors = { inside: '#2FA36B', outside: '#D9534F', uncertain: '#F0A030' }
     let fields = ''
     let seed = 3
-    const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647)
+    const rnd = () => {
+      seed = (seed * 16807) % 2147483647
+      return seed / 2147483647
+    }
     for (let gx = -1; gx < 9; gx++) for (let gy = -1; gy < 7; gy++) {
       const x = gx * 125 + rnd() * 30, y = gy * 115 + rnd() * 30
       const shade = ['#CFDDC0', '#DCE5CF', '#C3D5B4', '#E4E8D5', '#BFD0AE'][Math.floor(rnd() * 5)]
@@ -394,8 +401,11 @@
 
   const REVEAL_R = 1250
   const mask = (e, r, inside) => {
-    const m = r === null ? 'none'
-      : `radial-gradient(circle at 50% 55%, ${inside ? '#000' : 'transparent'} ${r}px, ${inside ? 'transparent' : '#000'} ${r + 2}px)`
+    let m = 'none'
+    if (r !== null) {
+      const [from, to] = inside ? ['#000', 'transparent'] : ['transparent', '#000']
+      m = `radial-gradient(circle at 50% 55%, ${from} ${r}px, ${to} ${r + 2}px)`
+    }
     e.style.webkitMaskImage = m
     e.style.maskImage = m
   }
@@ -410,57 +420,66 @@
     return null
   }
 
-  window.render = (t) => {
+  // draws a scene at time t; returns its weight in the light/dark background blend (0 when it does not count)
+  const renderScene = (sc, t, sw) => {
     const xf = TIMING.xf
+    const lt = t - sc.start
+    const visible = lt >= 0 && lt <= sc.dur
+    sc.div.style.display = visible ? 'block' : 'none'
+    if (!visible) return null
+    for (const it of sc.items) it.update(lt - it.enter, lt)
+    if (sw && (sc === sw.a || sc === sw.b)) {
+      sc.div.style.opacity = 1
+      sc.div.style.transform = 'none'
+      mask(sc.div, sw.r, sc === sw.b)
+      return null
+    }
+    const out = clamp((lt - (sc.dur - xf)) / xf)
+    mask(sc.div, null)
+    sc.div.style.opacity = sc === scenes.at(-1) ? 1 - clamp((lt - (sc.dur - 1.2)) / 1.2) : (1 - out) ** 2
+    sc.div.style.transform = `translateY(${-50 * ease.inOutCubic(out)}px) scale(${1 - 0.03 * out})`
+    return { w: Math.min(clamp(lt / xf), 1 - out) + 1e-6, dark: sc.theme === 'dark' }
+  }
+
+  const drawThemeSwitch = (t, sw, darkness) => {
+    const bgDark = document.getElementById('bg-dark')
+    const ring = document.getElementById('ring')
+    if (!sw) {
+      drawBackground(t, darkness)
+      mask(bgDark, null)
+      ring.style.display = 'none'
+      return
+    }
+    drawBackground(t, 1)
+    mask(bgDark, sw.r, sw.b.theme === 'dark')
+    Object.assign(ring.style, { display: 'block', width: `${2 * sw.r}px`, height: `${2 * sw.r}px`,
+      left: `${960 - sw.r}px`, top: `${594 - sw.r}px`, opacity: Math.sin(Math.PI * sw.r / REVEAL_R) })
+    document.getElementById('watermark').style.opacity = 0
+  }
+
+  // light sweep across the transitions that are not theme switches
+  const drawSweep = (t, sw) => {
+    const sweep = document.getElementById('sweep')
+    const p = sw ? -1 : Math.max(-1, ...scenes.slice(1).map((sc) => (t - (sc.start - 0.1)) / (TIMING.xf + 0.5)).filter((x) => x >= 0 && x <= 1))
+    if (p < 0) {
+      sweep.style.opacity = 0
+      return
+    }
+    sweep.style.left = `${lerp(-700, 2300, ease.inOutCubic(p))}px`
+    sweep.style.opacity = Math.sin(Math.PI * p)
+  }
+
+  window.render = (t) => {
     const sw = themeSwitch(t)
     let darkW = 0, weight = 0
     for (const sc of scenes) {
-      const lt = t - sc.start
-      const visible = lt >= 0 && lt <= sc.dur
-      sc.div.style.display = visible ? 'block' : 'none'
-      if (!visible) continue
-      const out = clamp((lt - (sc.dur - xf)) / xf)
-      const inn = clamp(lt / xf)
-      const isLast = sc === scenes[scenes.length - 1]
-      for (const it of sc.items) it.update(lt - it.enter, lt)
-      if (sw && (sc === sw.a || sc === sw.b)) {
-        sc.div.style.opacity = 1
-        sc.div.style.transform = 'none'
-        mask(sc.div, sw.r, sc === sw.b)
-        continue
-      }
-      mask(sc.div, null)
-      sc.div.style.opacity = isLast ? 1 - clamp((lt - (sc.dur - 1.2)) / 1.2) : (1 - out) ** 2
-      sc.div.style.transform = `translateY(${-50 * ease.inOutCubic(out)}px) scale(${1 - 0.03 * out})`
-      const w = Math.min(inn, 1 - out) + 1e-6
-      darkW += (sc.theme === 'dark' ? 1 : 0) * w
-      weight += w
+      const r = renderScene(sc, t, sw)
+      if (!r) continue
+      darkW += r.dark ? r.w : 0
+      weight += r.w
     }
-    const bgDark = document.getElementById('bg-dark')
-    const ring = document.getElementById('ring')
-    if (sw) {
-      drawBackground(t, 1)
-      mask(bgDark, sw.r, sw.b.theme === 'dark')
-      Object.assign(ring.style, { display: 'block', width: `${2 * sw.r}px`, height: `${2 * sw.r}px`,
-        left: `${960 - sw.r}px`, top: `${594 - sw.r}px`, opacity: Math.sin(Math.PI * sw.r / REVEAL_R) })
-      document.getElementById('watermark').style.opacity = 0
-    } else {
-      drawBackground(t, weight ? Math.round(darkW / weight) : 0)
-      mask(bgDark, null)
-      ring.style.display = 'none'
-    }
-    // light sweep across the other transitions
-    const sweep = document.getElementById('sweep')
-    let swept = false
-    for (const sc of scenes.slice(1)) {
-      const p = (t - (sc.start - 0.1)) / (xf + 0.5)
-      if (!sw && p >= 0 && p <= 1) {
-        swept = true
-        sweep.style.left = `${lerp(-700, 2300, ease.inOutCubic(p))}px`
-        sweep.style.opacity = Math.sin(Math.PI * p)
-      }
-    }
-    if (!swept) sweep.style.opacity = 0
+    drawThemeSwitch(t, sw, weight ? Math.round(darkW / weight) : 0)
+    drawSweep(t, sw)
     document.getElementById('progress-fill').style.width = `${(100 * t) / TIMING.total}%`
   }
 })()

@@ -1,9 +1,9 @@
-@font-face { font-family: 'Rubik'; font-weight: 500; src: url(fonts/rubik-latin-500-normal.woff2) format('woff2'); }
-@font-face { font-family: 'Rubik'; font-weight: 700; src: url(fonts/rubik-latin-700-normal.woff2) format('woff2'); }
-@font-face { font-family: 'Rubik'; font-weight: 800; src: url(fonts/rubik-latin-800-normal.woff2) format('woff2'); }
-@font-face { font-family: 'Nunito Sans'; font-weight: 400; src: url(fonts/nunito-sans-latin-400-normal.woff2) format('woff2'); }
-@font-face { font-family: 'Nunito Sans'; font-weight: 600; src: url(fonts/nunito-sans-latin-600-normal.woff2) format('woff2'); }
-@font-face { font-family: 'Nunito Sans'; font-weight: 700; src: url(fonts/nunito-sans-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Rubik'; font-weight: 500; src: url(fonts/rubik-latin-500-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Rubik'; font-weight: 700; src: url(fonts/rubik-latin-700-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Rubik'; font-weight: 800; src: url(fonts/rubik-latin-800-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 400; src: url(fonts/nunito-sans-latin-400-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 600; src: url(fonts/nunito-sans-latin-600-normal.woff2) format('woff2'); font-display: block; }
+@font-face { font-family: 'Nunito Sans'; font-weight: 700; src: url(fonts/nunito-sans-latin-700-normal.woff2) format('woff2'); font-display: block; }
 
 :root {
   --ink: #13302B;
@@ -78,7 +78,7 @@ body { font-family: 'Nunito Sans', 'DejaVu Sans', 'IPAGothic', sans-serif; color
 .chip .ic.img { background: none; }
 .chip .ic.img img { width: 44px; height: 44px; border-radius: 10px; }
 .chips.row .chip { padding-left: 26px; }
-.dark .chip { background: rgba(255, 255, 255, .09); color: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); }
+.dark .chip { background: #2A443F; color: #fff; box-shadow: 0 0 0 1px rgba(255, 255, 255, .16); }
 
 /* cards and stats */
 .card { background: rgba(255, 255, 255, .94); border-radius: 28px; padding: 44px; box-shadow: 0 40px 70px -40px rgba(10, 35, 30, .45), 0 0 0 1px rgba(19, 48, 43, .05); }
@@ -90,7 +90,7 @@ body { font-family: 'Nunito Sans', 'DejaVu Sans', 'IPAGothic', sans-serif; color
   -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 18px; }
 .stat h3 { margin-bottom: 8px; }
 
-.badge { padding: 10px 24px; border-radius: 999px; background: linear-gradient(120deg, #36B877, #1E7A52); color: #fff; overflow: hidden;
+.badge { padding: 10px 24px; border-radius: 999px; background-color: #1E7A52; background-image: linear-gradient(120deg, #23885A, #1E7A52); color: #fff; overflow: hidden;
   font: 700 22px 'Rubik', sans-serif; letter-spacing: .14em; text-transform: uppercase; box-shadow: 0 14px 30px -10px rgba(47, 163, 107, .7); white-space: nowrap; }
 .badge .shine { position: absolute; top: -20px; bottom: -20px; width: 60px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .6), transparent); transform: skewX(-20deg); }
 
@@ -128,7 +128,7 @@ body { font-family: 'Nunito Sans', 'DejaVu Sans', 'IPAGothic', sans-serif; color
 .speed .now .val { color: var(--green); }
 
 .url { display: flex; justify-content: center; }
-.url span { display: inline-flex; align-items: center; gap: 22px; padding: 22px 44px; border-radius: 999px; background: rgba(255, 255, 255, .1);
+.url span { display: inline-flex; align-items: center; gap: 22px; padding: 22px 44px; border-radius: 999px; background: #2B4641;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, .2); font: 700 52px 'Rubik', sans-serif; color: #fff; }
 .url svg { width: 54px; height: 54px; stroke: #8FE0B5; stroke-width: 2.4; fill: none; stroke-linecap: round; stroke-linejoin: round; }
 
