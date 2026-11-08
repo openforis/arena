@@ -8,7 +8,7 @@ import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
 
 export const DataQuerySortableItemChip = (props) => {
-  const { nodeDefDef, nodeDefLabelType, onDelete: onDeleteProp } = props
+  const { children = null, nodeDefDef, nodeDefLabelType, onDelete: onDeleteProp } = props
 
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
@@ -30,12 +30,19 @@ export const DataQuerySortableItemChip = (props) => {
       key={NodeDef.getUuid(nodeDefDef)}
       className="data-query__sortable-item-chip"
       onDelete={onDelete}
-      label={label}
+      label={
+        <>
+          {/* drag handle: only the text, not the extra content */}
+          <span className="data-query__sortable-item-chip-label">{label}</span>
+          {children}
+        </>
+      }
     />
   )
 }
 
 DataQuerySortableItemChip.propTypes = {
+  children: PropTypes.node,
   nodeDefDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string,
   onDelete: PropTypes.func.isRequired,
