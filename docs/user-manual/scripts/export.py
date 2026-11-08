@@ -82,8 +82,8 @@ def main():
                 ExportBookmarks=True,
                 UseTaggedPDF=True,
                 ReduceImageResolution=True,
-                MaxImageResolution=300,
-                Quality=85,
+                MaxImageResolution=200,
+                Quality=80,
             ),
         )
         doc.storeToURL(
