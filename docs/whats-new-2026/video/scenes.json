@@ -3,7 +3,8 @@
   "speed": 1.0,
   "images": {
     "web": "../../../web-resources/img/",
-    "deck": "../"
+    "deck": "../",
+    "local": ""
   },
   "scenes": [
     {
@@ -239,7 +240,7 @@
         {
           "type": "logo",
           "at": 1,
-          "src": "web:of_arena_mobile_2_icon.png",
+          "src": "local:arena-mobile-icon.png",
           "x": 1100,
           "y": 330,
           "w": 110,
@@ -699,7 +700,7 @@
           "items": [
             "Offline in Arena Mobile, too"
           ],
-          "icon": "web:of_arena_mobile_2_icon.png"
+          "icon": "local:arena-mobile-icon.png"
         }
       ]
     },
