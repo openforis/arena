@@ -1,5 +1,7 @@
 import * as A from '@core/arena'
 
+import { Authorizer } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -40,12 +42,6 @@ export const { insertNode } = RecordUpdateManager
 export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
-
-const _canEditRecordsInSurvey = ({ user, surveyInfo }) => {
-  if (User.isSystemAdmin(user)) return true
-  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(user)
-  return !!authGroup && AuthGroup.getPermissions(authGroup).includes(AuthGroup.permissions.recordEdit)
-}
 
 export const fetchRecordsSummaryBySurveyId = async (
   {
@@ -115,7 +111,7 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
   // e.g. survey guests: all the records are read-only (also in Arena Mobile)
   const list =
-    user && !_canEditRecordsInSurvey({ user, surveyInfo })
+    user && !Authorizer.canEditRecords(user, surveyInfo)
       ? listFetched.map((recordSummary) => Record.assocReadOnly(true)(recordSummary))
       : listFetched
 
