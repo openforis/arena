@@ -27,6 +27,7 @@ export default {
   Таны баталгаажуулагч апп-аас үүсгэсэн кодыг оруулна уу.`,
   },
   accessRequestView: {
+    whatHappensNext: 'Дараа нь юу болох вэ?',
     alreadyHaveAnAccount: 'Бүртгэлтэй юу?',
     steps: {
       sendRequest: {

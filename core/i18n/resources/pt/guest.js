@@ -27,6 +27,7 @@ export default {
 Insira o código gerado pelo seu aplicativo autenticador.`,
   },
   accessRequestView: {
+    whatHappensNext: 'O que acontece depois?',
     alreadyHaveAnAccount: 'Já tem uma conta?',
     steps: {
       sendRequest: {

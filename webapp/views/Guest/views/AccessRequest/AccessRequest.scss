@@ -114,11 +114,13 @@
 }
 
 @media screen and (max-width: 900px) {
-  .access-request__form {
-    grid-template-columns: minmax(0, 1fr);
+  // only first and last name share a row
+  .access-request__form .form-item {
+    grid-column: 1 / -1;
 
-    .form-item {
-      grid-column: 1 / -1;
+    &.access-request__field--firstName,
+    &.access-request__field--lastName {
+      grid-column: auto;
     }
   }
 }

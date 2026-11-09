@@ -27,6 +27,7 @@ export default {
 認証アプリで生成されたコードを入力してください。`,
   },
   accessRequestView: {
+    whatHappensNext: 'この後の流れ',
     alreadyHaveAnAccount: 'すでにアカウントをお持ちですか？',
     steps: {
       sendRequest: {

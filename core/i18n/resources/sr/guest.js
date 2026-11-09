@@ -27,6 +27,7 @@ export default {
 Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
   },
   accessRequestView: {
+    whatHappensNext: 'Šta se dešava dalje?',
     alreadyHaveAnAccount: 'Već imate nalog?',
     steps: {
       sendRequest: {

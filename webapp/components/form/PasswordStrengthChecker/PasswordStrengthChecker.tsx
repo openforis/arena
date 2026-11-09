@@ -31,14 +31,15 @@ export const PasswordStrengthChecker = ({ password = '' }: Props) => {
 
   return (
     <div className="password-strength-checker">
-      <div
-        className="password-strength-checker__meter"
-        role="meter"
+      <meter
+        className="password-strength-checker__meter-value"
         aria-label={title}
-        aria-valuemin={0}
-        aria-valuemax={checks.length}
-        aria-valuenow={passedCount}
-      >
+        min={0}
+        max={checks.length}
+        value={passedCount}
+      />
+      {/* visual representation of the meter value: one segment for each passed check */}
+      <div className="password-strength-checker__meter" aria-hidden="true">
         {results.map(({ key }, index) => (
           <span key={key} className={classNames({ passed: index < passedCount })} />
         ))}

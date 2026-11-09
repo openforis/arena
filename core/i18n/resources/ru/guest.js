@@ -27,6 +27,7 @@ export default {
   Введите код, сгенерированный вашим приложением-аутентификатором.`,
   },
   accessRequestView: {
+    whatHappensNext: 'Что дальше?',
     alreadyHaveAnAccount: 'Уже есть учетная запись?',
     steps: {
       sendRequest: {
