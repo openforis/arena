@@ -1,20 +1,11 @@
 @use '~@webapp/style/vars' as *;
 
 .guest-errors {
-  background-color: $colorError;
-  font-size: 0.9rem;
-  font-weight: 600;
-  color: $colorOnPrimary;
-  padding: 0.5rem;
-  position: fixed;
-  width: 30vw;
-  left: 35vw;
-  top: 20px;
-}
-
-@media screen and (max-width: 768px) {
-  .guest-errors {
-    width: 80vw;
-    left: 10vw;
-  }
+  padding: 0.7rem 0.85rem;
+  border-radius: 8px;
+  border-left: 3px solid $colorError;
+  background-color: $colorErrorContainer;
+  color: $colorOnSurface;
+  font-size: 0.85rem;
+  line-height: 1.45;
 }

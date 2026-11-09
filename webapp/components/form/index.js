@@ -21,3 +21,4 @@ export {
 export { PasswordInput } from './PasswordInput'
 export { PasswordStrengthChecker } from './PasswordStrengthChecker'
 export { SimpleTextInput as TextInput } from './SimpleTextInput'
+export { VerificationCodeInput } from './VerificationCodeInput'

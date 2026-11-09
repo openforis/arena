@@ -1,9 +1,8 @@
-import './ResetPassword.scss'
-
 import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
+import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
@@ -25,21 +24,21 @@ const ResetPassword = () => {
   if (!user?.email)
     return (
       <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-        <Button className="btn-goto-home" label="common.goToHomePage" onClick={navigateToHomePage} />
+        <Button className="guest__submit" label="common.goToHomePage" onClick={navigateToHomePage} />
       </form>
     )
 
   const hasAlreadyAccepted = User.hasAccepted(initialUser)
+  const viewKey = hasAlreadyAccepted ? 'setYourNewPassword' : 'completeRegistration'
 
   return (
-    <form onSubmit={(event) => event.preventDefault()} className="guest__form reset-password">
-      <div className="title">
-        {i18n.t(
-          hasAlreadyAccepted
-            ? 'guest:resetPasswordView.title.setYourNewPassword'
-            : 'guest:resetPasswordView.title.completeRegistration'
-        )}
-      </div>
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      <GuestViewHeader
+        description={`guest:resetPasswordView.description.${viewKey}`}
+        icon={hasAlreadyAccepted ? 'icon-key' : 'icon-user-plus'}
+        title={`guest:resetPasswordView.title.${viewKey}`}
+      />
+      <Error error={error} />
 
       <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
@@ -73,17 +72,14 @@ const ResetPassword = () => {
         onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
       />
 
-      <div className="guest__buttons">
-        <button type="submit" className="btn" onClick={onSubmit}>
-          {i18n.t(
-            hasAlreadyAccepted
-              ? 'guest:resetPasswordView.setNewPassword'
-              : 'guest:resetPasswordView.completeRegistration'
-          )}
-        </button>
-      </div>
-
-      <Error error={error} />
+      <Button
+        className="guest__submit"
+        label={
+          hasAlreadyAccepted ? 'guest:resetPasswordView.setNewPassword' : 'guest:resetPasswordView.completeRegistration'
+        }
+        onClick={onSubmit}
+        type="submit"
+      />
     </form>
   )
 }

@@ -1,16 +1,24 @@
 export default {
   loginView: {
+    title: 'Entrar',
+    subtitle: 'Bem-vindo! Insira suas credenciais para acessar o $t(common.appNameFull).',
+    backToLogin: 'Voltar para o login',
+    newToArena: 'Novo no $t(common.appNameFull)?',
+    or: 'ou',
+    twoFactorTitle: 'Verificação em duas etapas',
+    verify: 'Verificar',
+    lostYourDevice: 'Não consegue usar seu aplicativo autenticador?',
     yourName: 'Seu nome',
     yourEmail: 'Seu email',
     yourPassword: 'Sua senha',
     yourNewPassword: 'Sua nova senha',
     repeatYourPassword: 'Repita sua senha',
     repeatYourNewPassword: 'Repita sua nova senha',
-    requestAccess: 'Novo no $t(common.appNameFull)? Solicite acesso',
+    requestAccess: 'Solicitar acesso',
     resetPassword: 'Redefinir senha',
     login: 'Entrar',
-    loginUsingBackupCode: 'Entrar com código de backup 2FA',
-    forgotPassword: 'Esqueceu a senha',
+    loginUsingBackupCode: 'Usar um código de backup',
+    forgotPassword: 'Esqueceu a senha?',
     sendPasswordResetEmail: 'Enviar email de redefinição de senha',
     twoFactorBackupCode: 'Código de backup 2FA',
     twoFactorToken: 'Código de verificação',
@@ -19,6 +27,30 @@ export default {
 Insira o código gerado pelo seu aplicativo autenticador.`,
   },
   accessRequestView: {
+    whatHappensNext: 'O que acontece depois?',
+    alreadyHaveAnAccount: 'Já tem uma conta?',
+    steps: {
+      sendRequest: {
+        title: 'Envie a solicitação',
+        description:
+          'Sugira um nome para sua primeira pesquisa: comece com uma pesquisa em branco ou a partir de um modelo.',
+      },
+      review: {
+        title: 'Nós a analisamos',
+        description: 'Por favor, aguarde alguns dias para processarmos sua solicitação.',
+      },
+      invitation: {
+        title: 'Receba seu convite',
+        description:
+          'Você receberá um e-mail de **{{senderEmail}}** com o link para acessar o $t(common.appName). Não está na sua caixa de entrada? Verifique a pasta de spam/lixo eletrônico e adicione o remetente aos seus contatos ou marque o e-mail como não spam.',
+        descriptionWithoutSender:
+          'Você receberá um e-mail com o link para acessar o $t(common.appName). Não está na sua caixa de entrada? Verifique a pasta de spam/lixo eletrônico e adicione o remetente aos seus contatos ou marque o e-mail como não spam.',
+      },
+      startWorking: {
+        title: 'Comece a trabalhar',
+        description: 'Você será Administrador da nova pesquisa e poderá criar até 5 pesquisas.',
+      },
+    },
     error: 'Erro ao solicitar acesso: {{error}}',
     fields: {
       email: '$t(common.email)',
@@ -32,14 +64,8 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
         templateUuid: 'Começar com um modelo?',
       },
     },
-    introduction: `Nossos recursos são limitados, então você deve solicitar acesso à plataforma.
-  Também estamos interessados ​​no que você deseja fazer com ela, então informe-nos!
-  Você pode começar a partir de um **novo inventário em branco** ou clonar um **modelo** existente, e deverá sugerir um nome para o inventário recém-criado.
-  Você receberá a função de ***Administrador do Inventário*** para esse inventário: poderá editá-lo e convidar novos usuários para participar do seu inventário e contribuir com ele.
-  Você também será um ***Gerente de Inventários*** e poderá **criar novos inventários** (até 5), se necessário.
-Para mais informações, visite nosso site: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Depois de enviar a solicitação, aguarde um e-mail de convite para acessar a Arena.**`,
+    introduction:
+      'Nossos recursos são limitados, por isso o acesso é concedido mediante solicitação. Conte-nos o que você quer fazer com o $t(common.appName)!',
     reCaptchaNotAnswered: 'ReCaptcha não respondido',
     requestSent: 'Solicitação de acesso enviada com sucesso',
     requestSentMessage: `$t(common.emailSentToSelfConfirmation)
@@ -51,11 +77,15 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     sendRequest: 'Enviar solicitação',
     sendRequestConfirm: 'Solicitar acesso ao $t(common.appNameFull)?',
     templateNotSelected: 'Não selecionado (começar do zero)',
-    title: 'Solicitando acesso ao $t(common.appNameFull)',
+    title: 'Solicitar acesso',
     whitelistSenderSuggestion:
       'Se você o encontrar na pasta de Spam/Lixo eletrônico, adicione **{{senderEmail}}** aos seus contatos (catálogo de endereços) ou marque-o como seguro/não é spam, para que nossos próximos emails cheguem diretamente à sua caixa de entrada.',
   },
   resetPasswordView: {
+    description: {
+      completeRegistration: 'Configure sua conta para começar.',
+      setYourNewPassword: 'Escolha uma nova senha para sua conta.',
+    },
     title: {
       completeRegistration: 'Conclua seu cadastro no Arena',
       setYourNewPassword: 'Defina sua nova senha',
@@ -72,5 +102,31 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       containsNumbers: 'Contém números',
     },
     completeRegistration: 'Concluir cadastro',
+  },
+  forgotPasswordView: {
+    title: 'Redefinir sua senha',
+    description: 'Insira o e-mail da sua conta e enviaremos um link para escolher uma nova senha.',
+  },
+  pitch: {
+    default: {
+      title: 'Dados de campo, da coleta à análise.',
+      description:
+        'Crie formulários multilíngues, gerencie inventários de vários ciclos, valide a qualidade dos dados e analise os resultados com o RStudio integrado.',
+    },
+    accessRequest: {
+      title: 'Comece sua primeira pesquisa no $t(common.appName).',
+    },
+    tags: {
+      forestInventories: 'Inventários florestais',
+      questionnaires: 'Questionários',
+      multiCycle: 'Vários ciclos',
+      statisticalAnalysis: 'Análise estatística',
+    },
+  },
+  footer: {
+    website: 'Sobre o $t(common.appName)',
+    userManual: 'Manual do usuário',
+    supportForum: 'Fórum de suporte',
+    version: 'Versão {{version}}',
   },
 }

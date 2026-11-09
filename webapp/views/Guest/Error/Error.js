@@ -8,7 +8,11 @@ const GuestError = (props) => {
   const i18n = useI18n()
   if (!error) return null
 
-  return <div className="guest-errors text-center">{i18n.t(error)}</div>
+  return (
+    <div className="guest-errors" role="alert">
+      {i18n.t(error)}
+    </div>
+  )
 }
 
 GuestError.propTypes = {

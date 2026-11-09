@@ -4,6 +4,7 @@ export const guest = 'guest'
 
 export const guestModules = {
   login: {
+    key: 'login',
     path: 'login/',
   },
   resetPassword: {
