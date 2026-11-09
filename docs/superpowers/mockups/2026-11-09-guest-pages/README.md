@@ -32,3 +32,5 @@ Common to all three:
 - Password strength meter with a two-column checklist.
 - Request access: two-column form, "what happens next" steps instead of the long introduction, templates as cards.
 - Only theme tokens (`primary`, `surface`, `outline`, ...), so light/dark and survey branding colors keep working.
+
+**Outcome:** direction C was chosen and implemented in `webapp/views/Guest`.

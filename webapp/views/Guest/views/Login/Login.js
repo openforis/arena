@@ -1,4 +1,3 @@
-import './Login.scss'
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router'
@@ -13,6 +12,7 @@ import { EmailInput, PasswordInput } from '@webapp/components/form'
 import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import Error from '@webapp/views/Guest/Error'
+import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
@@ -92,75 +92,75 @@ const Login = () => {
     dispatch(LoginActions.setViewState(ViewState.ask2FABackupCode))
   }, [dispatch])
 
+  if (is2FAViewState) {
+    return (
+      <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+        <GuestViewHeader
+          backToLogin
+          description="guest:loginView.twoFactorTokenDescription"
+          icon="icon-shield"
+          onBackClick={onClickBack}
+          title="guest:loginView.twoFactorTitle"
+        />
+        <Error error={error} />
+        <SimpleTextInput
+          autoComplete="one-time-code"
+          autoFocus
+          label={
+            viewState === ViewState.ask2FAToken
+              ? 'guest:loginView.twoFactorToken'
+              : 'guest:loginView.twoFactorBackupCode'
+          }
+          name={FormFields.twoFactorToken}
+          onChange={onChangeTwoFactorToken}
+          value={formObject.twoFactorToken}
+        />
+        <Button className="guest__submit" label="guest:loginView.verify" onClick={onClickLogin} type="submit" />
+        {viewState === ViewState.ask2FAToken && (
+          <p className="guest__footnote">
+            {i18n.t('guest:loginView.lostYourDevice')}{' '}
+            <button type="button" className="guest__link btn-transparent" onClick={onLoginUsingBackupCodeClick}>
+              {i18n.t('guest:loginView.loginUsingBackupCode')}
+            </button>
+          </p>
+        )}
+      </form>
+    )
+  }
+
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-      {is2FAViewState && (
-        <>
-          <div className="two-factor-token-description">{i18n.t('guest:loginView.twoFactorTokenDescription')}</div>
-          <SimpleTextInput
-            label={
-              viewState === ViewState.ask2FAToken
-                ? 'guest:loginView.twoFactorToken'
-                : 'guest:loginView.twoFactorBackupCode'
-            }
-            name={FormFields.twoFactorToken}
-            onChange={onChangeTwoFactorToken}
-            value={formObject.twoFactorToken}
-          />
-          {viewState === ViewState.ask2FAToken && (
-            <Button label="guest:loginView.loginUsingBackupCode" onClick={onLoginUsingBackupCodeClick} variant="text" />
-          )}
-        </>
-      )}
-      {viewState === ViewState.askUsernameAndPassword && (
-        <>
-          <EmailInput
-            defaultValue={email}
-            label="guest:loginView.yourEmail"
-            name={FormFields.email}
-            onChange={onChangeEmail}
-          />
-
-          <PasswordInput
-            defaultValue={formObject.password}
-            name={FormFields.password}
-            label="guest:loginView.yourPassword"
-            onChange={onChangePassword}
-          />
-
-          <Link
-            className="btn btn-s btn-transparent guest-login__btn-forgot-pwd"
-            to={appModuleUri(guestModules.forgotPassword)}
-          >
-            <span className="icon icon-question icon-left icon-12px" />
-            {i18n.t('guest:loginView.forgotPassword')}
-          </Link>
-        </>
-      )}
-      <div className="guest__buttons">
-        {is2FAViewState ? (
-          <button type="button" className="btn back" onClick={onClickBack}>
-            {i18n.t('common.back')}
-          </button>
-        ) : (
-          <span className="spacer" />
-        )}
-        <button type="submit" className="btn login" onClick={onClickLogin}>
-          {i18n.t('guest:loginView.login')}
-        </button>
-        <span className="spacer" />
-      </div>
-
-      {allowAccessRequest && viewState === ViewState.askUsernameAndPassword && (
-        <Link
-          className="btn btn-s btn-transparent guest-login__btn-request-access"
-          to={appModuleUri(guestModules.accessRequest)}
-        >
-          <span className="icon icon-question icon-left icon-12px" />
-          {i18n.t('guest:loginView.requestAccess')}
-        </Link>
-      )}
+      <GuestViewHeader description="guest:loginView.subtitle" title="guest:loginView.title" />
       <Error error={error} />
+      <EmailInput
+        autoComplete="username"
+        defaultValue={email}
+        label="guest:loginView.yourEmail"
+        name={FormFields.email}
+        onChange={onChangeEmail}
+      />
+      <PasswordInput
+        autoComplete="current-password"
+        defaultValue={formObject.password}
+        name={FormFields.password}
+        label="guest:loginView.yourPassword"
+        onChange={onChangePassword}
+      />
+      <Link className="guest__link guest-login__forgot-password" to={appModuleUri(guestModules.forgotPassword)}>
+        {i18n.t('guest:loginView.forgotPassword')}
+      </Link>
+      <Button className="guest__submit" label="guest:loginView.login" onClick={onClickLogin} type="submit" />
+      {allowAccessRequest && (
+        <>
+          <div className="guest__divider">{i18n.t('guest:loginView.or')}</div>
+          <p className="guest__footnote">
+            {i18n.t('guest:loginView.newToArena')}{' '}
+            <Link className="guest__link" to={appModuleUri(guestModules.accessRequest)}>
+              {i18n.t('guest:loginView.requestAccess')}
+            </Link>
+          </p>
+        </>
+      )}
     </form>
   )
 }

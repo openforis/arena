@@ -57,6 +57,11 @@ $colorHighlightContainer: var(--color-highlight-container);
 $colorShadow: var(--color-shadow);
 $colorScrim: var(--color-scrim);
 
+$colorBrandGradientStart: var(--color-brand-gradient-start);
+$colorBrandGradientMiddle: var(--color-brand-gradient-middle);
+$colorBrandGradientEnd: var(--color-brand-gradient-end);
+$colorOnBrandGradient: var(--color-on-brand-gradient);
+
 /// Returns the color with the given opacity (runtime equivalent of `rgba($color, $opacity)`).
 /// @param {Color} $color - Color (or CSS variable).
 /// @param {Number} $opacity - Opacity between 0 and 1.

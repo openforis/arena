@@ -1,16 +1,24 @@
 export default {
   loginView: {
+    title: 'Вход',
+    subtitle: 'Добро пожаловать! Введите свои учетные данные, чтобы продолжить работу в $t(common.appNameFull).',
+    backToLogin: 'Вернуться ко входу',
+    newToArena: 'Впервые в $t(common.appNameFull)?',
+    or: 'или',
+    twoFactorTitle: 'Двухэтапная проверка',
+    verify: 'Подтвердить',
+    lostYourDevice: 'Не можете воспользоваться приложением-аутентификатором?',
     yourName: 'Ваше имя',
     yourEmail: 'Ваш адрес электронной почты',
     yourPassword: 'Ваш пароль',
     yourNewPassword: 'Ваш новый пароль',
     repeatYourPassword: 'Повторите ваш пароль',
     repeatYourNewPassword: 'Повторите ваш новый пароль',
-    requestAccess: 'Впервые в $t(common.appNameFull)? Запросить доступ',
+    requestAccess: 'Запросить доступ',
     resetPassword: 'Сбросить пароль',
     login: 'Войти',
-    loginUsingBackupCode: 'Войти с помощью резервного кода 2FA',
-    forgotPassword: 'Забыли пароль',
+    loginUsingBackupCode: 'Использовать резервный код',
+    forgotPassword: 'Забыли пароль?',
     sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
     twoFactorBackupCode: 'Резервный код 2FA',
     twoFactorToken: 'Код подтверждения',
@@ -19,6 +27,23 @@ export default {
   Введите код, сгенерированный вашим приложением-аутентификатором.`,
   },
   accessRequestView: {
+    alreadyHaveAnAccount: 'Уже есть учетная запись?',
+    steps: {
+      sendRequest: {
+        title: 'Отправьте запрос',
+        description:
+          'Предложите название для вашего первого обследования: начните с пустого обследования или с шаблона.',
+      },
+      review: {
+        title: 'Мы его рассмотрим',
+        description: 'Пожалуйста, дайте нам пару дней на обработку вашего запроса.',
+      },
+      invitation: {
+        title: 'Получите приглашение',
+        description:
+          'Вы получите письмо для доступа к $t(common.appName): вы станете администратором нового обследования и сможете создать до 5 обследований.',
+      },
+    },
     error: 'Ошибка при запросе доступа: {{error}}',
     fields: {
       email: '$t(common.email)',
@@ -32,14 +57,8 @@ export default {
         templateUuid: 'Начать с шаблона?',
       },
     },
-    introduction: `Наши ресурсы ограничены, поэтому вы должны запросить доступ к платформе.
-Нам также интересно, что вы хотите с ней делать, поэтому, пожалуйста, сообщите нам!
-У вас есть возможность начать с **нового пустого опроса** или клонировать существующий **шаблон**, и вам нужно будет предложить название для вновь созданного опроса.
-Вам будет назначена роль ***Администратора опроса*** для этого опроса: вы сможете редактировать его и приглашать новых пользователей присоединяться к вашему опросу и вносить свой вклад.
-Вы также будете ***Менеджером опросов*** и сможете **создавать новые опросы** (до 5), если потребуется.
-Для получения дополнительной информации, пожалуйста, посетите наш веб-сайт: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**После отправки запроса, пожалуйста, дождитесь приглашения по электронной почте для доступа к Arena.**`,
+    introduction:
+      'Наши ресурсы ограничены, поэтому доступ предоставляется по запросу. Расскажите нам, что вы хотите делать в $t(common.appName)!',
     reCaptchaNotAnswered: 'ReCaptcha не отвечена',
     requestSent: 'Запрос на доступ успешно отправлен',
     requestSentMessage: `$t(common.emailSentToSelfConfirmation)
@@ -51,11 +70,15 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
     sendRequest: 'Отправить запрос',
     sendRequestConfirm: 'Запросить доступ к $t(common.appNameFull)?',
     templateNotSelected: 'Не выбрано (начать с нуля)',
-    title: 'Запрос доступа к $t(common.appNameFull)',
+    title: 'Запрос доступа',
     whitelistSenderSuggestion:
       'Если вы найдете его в папке «Спам», добавьте **{{senderEmail}}** в свои контакты (адресную книгу) или отметьте письмо как безопасное/не спам, чтобы наши следующие письма попадали прямо во входящие.',
   },
   resetPasswordView: {
+    description: {
+      completeRegistration: 'Настройте свою учетную запись, чтобы начать работу.',
+      setYourNewPassword: 'Выберите новый пароль для своей учетной записи.',
+    },
     title: {
       completeRegistration: 'Завершите регистрацию в Arena',
       setYourNewPassword: 'Установите ваш новый пароль',
@@ -73,5 +96,37 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       containsNumbers: 'Содержит цифры',
     },
     completeRegistration: 'Завершить регистрацию',
+  },
+  forgotPasswordView: {
+    title: 'Сброс пароля',
+    description:
+      'Введите адрес электронной почты вашей учетной записи, и мы отправим вам ссылку для выбора нового пароля.',
+  },
+  pitch: {
+    default: {
+      title: 'Полевые данные: от сбора до анализа.',
+      description:
+        'Создавайте многоязычные формы, ведите многоцикловые инвентаризации, проверяйте качество данных и анализируйте результаты во встроенном RStudio.',
+    },
+    accessRequest: {
+      title: 'Создайте своё первое обследование в $t(common.appName).',
+      description:
+        'Расскажите нам о своем проекте. После одобрения вы сможете создавать формы, приглашать полевые группы и анализировать данные в одном месте.',
+    },
+    tags: {
+      forestInventories: 'Лесные инвентаризации',
+      questionnaires: 'Анкеты',
+      multiCycle: 'Многоцикловость',
+      statisticalAnalysis: 'Статистический анализ',
+      freeAndOpenSource: 'Свободное ПО с открытым кодом',
+      openForis: 'ФАО · Open Foris',
+      upToFiveSurveys: 'До 5 обследований',
+    },
+  },
+  footer: {
+    website: 'О $t(common.appName)',
+    userManual: 'Руководство пользователя',
+    supportForum: 'Форум поддержки',
+    version: 'Версия {{version}}',
   },
 }

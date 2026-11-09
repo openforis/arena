@@ -1,16 +1,24 @@
 export default {
   loginView: {
+    title: 'Prijava',
+    subtitle: 'Dobrodošli! Unesite svoje podatke za nastavak u aplikaciji $t(common.appNameFull).',
+    backToLogin: 'Nazad na prijavu',
+    newToArena: 'Novi ste u $t(common.appNameFull)?',
+    or: 'ili',
+    twoFactorTitle: 'Verifikacija u dva koraka',
+    verify: 'Potvrdi',
+    lostYourDevice: 'Ne možete koristiti aplikaciju za autentifikaciju?',
     yourName: 'Vaše ime',
     yourEmail: 'Vaša e-adresa',
     yourPassword: 'Vaša lozinka',
     yourNewPassword: 'Vaša nova lozinka',
     repeatYourPassword: 'Ponovite lozinku',
     repeatYourNewPassword: 'Ponovite novu lozinku',
-    requestAccess: 'Novi ste u $t(common.appNameFull)? Zatražite pristup',
+    requestAccess: 'Zatražite pristup',
     resetPassword: 'Resetuj lozinku',
     login: 'Prijavi se',
-    loginUsingBackupCode: 'Prijavi se pomoću 2FA rezervnog koda',
-    forgotPassword: 'Zaboravljena lozinka',
+    loginUsingBackupCode: 'Koristi rezervni kod',
+    forgotPassword: 'Zaboravljena lozinka?',
     sendPasswordResetEmail: 'Pošalji e-poruku za resetovanje lozinke',
     twoFactorBackupCode: '2FA rezervni kod',
     twoFactorToken: 'Verifikacioni kod',
@@ -19,6 +27,22 @@ export default {
 Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
   },
   accessRequestView: {
+    alreadyHaveAnAccount: 'Već imate nalog?',
+    steps: {
+      sendRequest: {
+        title: 'Pošaljite zahtjev',
+        description: 'Predložite naziv svog prvog istraživanja: počnite od praznog istraživanja ili od šablona.',
+      },
+      review: {
+        title: 'Mi ga pregledamo',
+        description: 'Molimo vas da nam date nekoliko dana da obradimo vaš zahtjev.',
+      },
+      invitation: {
+        title: 'Primite pozivnicu',
+        description:
+          'Dobićete e-poruku za pristup aplikaciji $t(common.appName): bićete administrator novog istraživanja i moći ćete da kreirate do 5 istraživanja.',
+      },
+    },
     error: 'Greška pri zahtjevu za pristup: {{error}}',
     fields: {
       email: '$t(common.email)',
@@ -32,14 +56,8 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
         templateUuid: 'Početi od šablona?',
       },
     },
-    introduction: `Naši resursi su ograničeni, pa morate zatražiti pristup platformi.
-Zanima nas i šta želite da radite s njom, pa vas molimo da nam to kažete!
-Možete početi od **novog praznog istraživanja** ili klonirati postojeći **šablon**, a moraćete da predložite naziv za novokreirano istraživanje.
-Biće vam dodijeljena uloga ***administratora istraživanja*** za to istraživanje: moći ćete da ga uređujete i da pozivate nove korisnike da se pridruže vašem istraživanju i doprinesu mu.
-Bićete i ***menadžer istraživanja*** i moći ćete da **kreirate nova istraživanja** (do 5) ako bude potrebno.
-Za više informacija posjetite naš veb-sajt: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Kada pošaljete zahtjev, sačekajte e-poruku sa pozivnicom za pristup Areni.**`,
+    introduction:
+      'Naši resursi su ograničeni, pa se pristup odobrava na zahtjev. Recite nam šta želite da radite u aplikaciji $t(common.appName)!',
     reCaptchaNotAnswered: 'ReCaptcha nije riješena',
     requestSent: 'Zahtjev za pristup je uspješno poslat',
     requestSentMessage: `$t(common.emailSentToSelfConfirmation)
@@ -51,10 +69,14 @@ Hvala vam i uživajte u **$t(common.appNameFull)**!`,
     sendRequest: 'Pošalji zahtjev',
     sendRequestConfirm: 'Zatražiti pristup aplikaciji $t(common.appNameFull)?',
     templateNotSelected: 'Nije izabrano (počni od početka)',
-    title: 'Zahtjev za pristup aplikaciji $t(common.appNameFull)',
+    title: 'Zatražite pristup',
     whitelistSenderSuggestion: `Ako je pronađete u fascikli Spam/Neželjena pošta, dodajte **{{senderEmail}}** u svoje kontakte (adresar) ili je označite kao bezbjednu/nije spam, kako bi naše buduće e-poruke stizale direktno u vaše prijemno sanduče.`,
   },
   resetPasswordView: {
+    description: {
+      completeRegistration: 'Podesite svoj nalog da biste započeli.',
+      setYourNewPassword: 'Izaberite novu lozinku za svoj nalog.',
+    },
     title: {
       completeRegistration: 'Završite registraciju u Areni',
       setYourNewPassword: 'Postavite novu lozinku',
@@ -71,5 +93,36 @@ Hvala vam i uživajte u **$t(common.appNameFull)**!`,
       containsNumbers: 'Sadrži brojeve',
     },
     completeRegistration: 'Završi registraciju',
+  },
+  forgotPasswordView: {
+    title: 'Resetujte lozinku',
+    description: 'Unesite adresu e-pošte svog naloga i poslaćemo vam link za izbor nove lozinke.',
+  },
+  pitch: {
+    default: {
+      title: 'Terenski podaci, od prikupljanja do analize.',
+      description:
+        'Kreirajte višejezične obrasce, upravljajte višeciklusnim inventurama, provjerite kvalitet podataka i analizirajte rezultate pomoću integrisanog RStudija.',
+    },
+    accessRequest: {
+      title: 'Započnite svoje prvo istraživanje u aplikaciji $t(common.appName).',
+      description:
+        'Recite nam nešto o svom projektu. Nakon odobrenja moći ćete da kreirate obrasce, pozovete terenske timove i analizirate podatke na jednom mjestu.',
+    },
+    tags: {
+      forestInventories: 'Inventure šuma',
+      questionnaires: 'Upitnici',
+      multiCycle: 'Više ciklusa',
+      statisticalAnalysis: 'Statistička analiza',
+      freeAndOpenSource: 'Besplatan i otvorenog koda',
+      openForis: 'FAO · Open Foris',
+      upToFiveSurveys: 'Do 5 istraživanja',
+    },
+  },
+  footer: {
+    website: 'O aplikaciji $t(common.appName)',
+    userManual: 'Korisničko uputstvo',
+    supportForum: 'Forum podrške',
+    version: 'Verzija {{version}}',
   },
 }

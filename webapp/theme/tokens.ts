@@ -43,6 +43,10 @@ const colorTokenValues = {
   highlight: ['#fee997', '#6b5d22'],
   highlightContainer: ['#f8f6cc', '#3d3a22'],
   shadow: ['#2f3138', '#000000'],
+  brandGradientStart: ['#12406b', '#0b1f33'],
+  brandGradientMiddle: ['#1d5a5a', '#10302f'],
+  brandGradientEnd: ['#3c7a2f', '#1d3a17'],
+  onBrandGradient: ['#ffffff', '#ffffff'],
 } as const satisfies Record<string, readonly [string, string]>
 
 export type ArenaColorToken = keyof typeof colorTokenValues

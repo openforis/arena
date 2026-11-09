@@ -54,6 +54,12 @@
 
   --color-shadow: #2f3138;
   --color-scrim: rgb(0 0 0 / 10%);
+
+  // brand gradient (blue to green, from the Arena logo) used as background of the guest views
+  --color-brand-gradient-start: #12406b;
+  --color-brand-gradient-middle: #1d5a5a;
+  --color-brand-gradient-end: #3c7a2f;
+  --color-on-brand-gradient: #ffffff;
 }
 
 :root[data-theme='dark'] {
@@ -100,4 +106,9 @@
 
   --color-shadow: #000000;
   --color-scrim: rgb(0 0 0 / 40%);
+
+  --color-brand-gradient-start: #0b1f33;
+  --color-brand-gradient-middle: #10302f;
+  --color-brand-gradient-end: #1d3a17;
+  --color-on-brand-gradient: #ffffff;
 }

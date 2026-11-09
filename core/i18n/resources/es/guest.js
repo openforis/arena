@@ -1,15 +1,23 @@
 export default {
   loginView: {
+    title: 'Iniciar sesión',
+    subtitle: '¡Bienvenido! Introduzca sus credenciales para acceder a $t(common.appNameFull).',
+    backToLogin: 'Volver al inicio de sesión',
+    newToArena: '¿Nuevo en $t(common.appNameFull)?',
+    or: 'o',
+    twoFactorTitle: 'Verificación en dos pasos',
+    verify: 'Verificar',
+    lostYourDevice: '¿No puede usar su aplicación de autenticación?',
     yourName: 'Su nombre',
     yourEmail: 'Su correo electrónico',
     yourPassword: 'Su contraseña',
     yourNewPassword: 'Su nueva contraseña',
     repeatYourPassword: 'Repita su contraseña',
     repeatYourNewPassword: 'Repita su nueva contraseña',
-    requestAccess: '¿Nuevo en $t(common.appNameFull)? Solicitar acceso',
+    requestAccess: 'Solicitar acceso',
     resetPassword: 'Restablecer contraseña',
     login: 'Iniciar sesión',
-    loginUsingBackupCode: 'Iniciar sesion con codigo de respaldo 2FA',
+    loginUsingBackupCode: 'Usar un código de respaldo',
     forgotPassword: '¿Olvidó su contraseña?',
     sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
     twoFactorBackupCode: 'Codigo de respaldo 2FA',
@@ -19,6 +27,20 @@ export default {
   Ingrese el código generado por su aplicación de autenticación.`,
   },
   accessRequestView: {
+    alreadyHaveAnAccount: '¿Ya tiene una cuenta?',
+    steps: {
+      sendRequest: {
+        title: 'Envíe la solicitud',
+        description:
+          'Sugiera un nombre para su primera encuesta: empiece con una encuesta en blanco o desde una plantilla.',
+      },
+      review: { title: 'La revisamos', description: 'Por favor, denos un par de días para procesar su solicitud.' },
+      invitation: {
+        title: 'Reciba su invitación',
+        description:
+          'Recibirá un correo electrónico para acceder a $t(common.appName): será Administrador de la nueva encuesta y podrá crear hasta 5 encuestas.',
+      },
+    },
     error: 'Error al solicitar acceso: {{error}}',
     fields: {
       email: '$t(common.email)',
@@ -33,7 +55,7 @@ export default {
       },
     },
     introduction:
-      'Nuestros recursos son limitados, por lo que debe solicitar acceso a la plataforma. También nos interesa saber qué desea hacer con ella, ¡así que háganoslo saber! Tiene la posibilidad de empezar desde una **nueva encuesta en blanco** o clonar una **plantilla** existente y tendrá que sugerir un nombre para la nueva encuesta creada. Se le asignará el rol de ***Administrador de encuestas*** para esa encuesta: podrá editarla e invitar a nuevos usuarios a unirse a su encuesta y contribuir a ella. También será un ***Gerente de encuestas*** y podrá **crear nuevas encuestas** (hasta 5) si es necesario. Para obtener más información, visite nuestro sitio web: $t(links.openforisArenaWebsite) $t(common.raiseTicketInSupportForum) **Una vez que envíe la solicitud, espere un correo electrónico de invitación para acceder a Arena.**',
+      'Nuestros recursos son limitados, por lo que el acceso se concede previa solicitud. ¡Cuéntenos qué quiere hacer con $t(common.appName)!',
     reCaptchaNotAnswered: 'ReCaptcha no respondido',
     requestSent: 'Solicitud de acceso enviada correctamente',
     requestSentMessage: `$t(common.emailSentToSelfConfirmation)
@@ -45,11 +67,15 @@ Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las
     sendRequest: 'Enviar solicitud',
     sendRequestConfirm: '¿Solicitar acceso a $t(common.appNameFull)?',
     templateNotSelected: 'No seleccionado (empezar desde cero)',
-    title: 'Solicitando acceso a $t(common.appNameFull)',
+    title: 'Solicitar acceso',
     whitelistSenderSuggestion:
       'Si lo encuentra en la carpeta de Spam/Correo no deseado, añada **{{senderEmail}}** a sus contactos (libreta de direcciones) o márquelo como seguro/no es spam, para que nuestros próximos correos lleguen directamente a su bandeja de entrada.',
   },
   resetPasswordView: {
+    description: {
+      completeRegistration: 'Configure su cuenta para empezar.',
+      setYourNewPassword: 'Elija una nueva contraseña para su cuenta.',
+    },
     title: {
       completeRegistration: 'Complete su registro en Arena',
       setYourNewPassword: 'Establezca su nueva contraseña',
@@ -66,5 +92,37 @@ Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las
       containsNumbers: 'Contiene números',
     },
     completeRegistration: 'Completar registro',
+  },
+  forgotPasswordView: {
+    title: 'Restablecer su contraseña',
+    description:
+      'Introduzca el correo electrónico de su cuenta y le enviaremos un enlace para elegir una nueva contraseña.',
+  },
+  pitch: {
+    default: {
+      title: 'Datos de campo, de la recolección al análisis.',
+      description:
+        'Diseñe formularios multilingües, gestione inventarios de varios ciclos, valide la calidad de los datos y analice los resultados con RStudio integrado.',
+    },
+    accessRequest: {
+      title: 'Cree su primera encuesta en $t(common.appName).',
+      description:
+        'Cuéntenos sobre su proyecto. Una vez aprobado, podrá diseñar formularios, invitar a sus equipos de campo y analizar los datos en un solo lugar.',
+    },
+    tags: {
+      forestInventories: 'Inventarios forestales',
+      questionnaires: 'Cuestionarios',
+      multiCycle: 'Varios ciclos',
+      statisticalAnalysis: 'Análisis estadístico',
+      freeAndOpenSource: 'Libre y de código abierto',
+      openForis: 'FAO · Open Foris',
+      upToFiveSurveys: 'Hasta 5 encuestas',
+    },
+  },
+  footer: {
+    website: 'Acerca de $t(common.appName)',
+    userManual: 'Manual de usuario',
+    supportForum: 'Foro de soporte',
+    version: 'Versión {{version}}',
   },
 }
