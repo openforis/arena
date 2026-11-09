@@ -114,9 +114,6 @@ Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las
       questionnaires: 'Cuestionarios',
       multiCycle: 'Varios ciclos',
       statisticalAnalysis: 'Análisis estadístico',
-      freeAndOpenSource: 'Libre y de código abierto',
-      openForis: 'FAO · Open Foris',
-      upToFiveSurveys: 'Hasta 5 encuestas',
     },
   },
   footer: {

@@ -17,22 +17,6 @@ import { useI18n } from '@webapp/store/system'
 import { useAccessRequest } from './useAccessRequest'
 import { AccessRequestField } from './AccessRequestField'
 
-const steps = ['sendRequest', 'review', 'invitation']
-
-const AccessRequestSteps = () => {
-  const i18n = useI18n()
-  return (
-    <ol className="access-request__steps">
-      {steps.map((step) => (
-        <li key={step}>
-          <strong>{i18n.t(`guest:accessRequestView.steps.${step}.title`)}</strong>
-          <span>{i18n.t(`guest:accessRequestView.steps.${step}.description`)}</span>
-        </li>
-      ))}
-    </ol>
-  )
-}
-
 const AccessRequestSent = ({ email }) => {
   const i18n = useI18n()
   const navigate = useNavigate()
@@ -70,12 +54,7 @@ const AccessRequest = () => {
   }
   return (
     <div className="access-request">
-      <GuestViewHeader
-        backToLogin
-        description="guest:accessRequestView.introduction"
-        title="guest:accessRequestView.title"
-      />
-      <AccessRequestSteps />
+      <GuestViewHeader description="guest:accessRequestView.introduction" title="guest:accessRequestView.title" />
       <form className="access-request__form" onSubmit={(event) => event.preventDefault()}>
         {UserAccessRequest.editableFields.map((field) => (
           <AccessRequestField
@@ -86,23 +65,25 @@ const AccessRequest = () => {
             validation={validation}
           />
         ))}
-        <div className="access-request__required-field-label">{`* = ${i18n.t('common.requiredField')}`}</div>
-
-        <ReCaptcha ref={reCaptchaRef} />
-
         <div className="access-request__buttons">
-          <span className="guest__footnote">
-            {i18n.t('guest:accessRequestView.alreadyHaveAnAccount')}{' '}
-            <Link className="guest__link" to={appModuleUri(guestModules.login)}>
-              {i18n.t('guest:loginView.login')}
-            </Link>
-          </span>
-          <Button
-            iconClassName="icon-envelop icon-12px"
-            label="guest:accessRequestView.sendRequest"
-            onClick={onSubmit}
-            type="submit"
-          />
+          <div className="access-request__notes">
+            <span>{`* = ${i18n.t('common.requiredField')}`}</span>
+            <span>
+              {i18n.t('guest:accessRequestView.alreadyHaveAnAccount')}{' '}
+              <Link className="guest__link" to={appModuleUri(guestModules.login)}>
+                {i18n.t('guest:loginView.login')}
+              </Link>
+            </span>
+          </div>
+          <div className="access-request__submit">
+            <ReCaptcha ref={reCaptchaRef} />
+            <Button
+              iconClassName="icon-envelop icon-12px"
+              label="guest:accessRequestView.sendRequest"
+              onClick={onSubmit}
+              type="submit"
+            />
+          </div>
         </div>
       </form>
     </div>

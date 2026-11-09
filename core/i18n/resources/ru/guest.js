@@ -118,9 +118,6 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       questionnaires: 'Анкеты',
       multiCycle: 'Многоцикловость',
       statisticalAnalysis: 'Статистический анализ',
-      freeAndOpenSource: 'Свободное ПО с открытым кодом',
-      openForis: 'ФАО · Open Foris',
-      upToFiveSurveys: 'До 5 обследований',
     },
   },
   footer: {

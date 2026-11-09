@@ -111,9 +111,6 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       questionnaires: 'アンケート',
       multiCycle: '複数サイクル',
       statisticalAnalysis: '統計分析',
-      freeAndOpenSource: '無料・オープンソース',
-      openForis: 'FAO · Open Foris',
-      upToFiveSurveys: '最大5件の調査',
     },
   },
   footer: {

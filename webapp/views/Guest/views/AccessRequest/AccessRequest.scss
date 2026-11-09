@@ -1,49 +1,18 @@
 @use '~@webapp/style/vars' as *;
 
-.access-request__steps {
-  display: grid;
-  gap: 0.9rem;
-  margin: 0 0 1.5rem;
-  padding: 0;
-  list-style: none;
-  counter-reset: access-request-step;
-
-  li {
-    display: grid;
-    grid-template-columns: 1.75rem 1fr;
-    column-gap: 0.75rem;
-    line-height: 1.45;
-    counter-increment: access-request-step;
-
-    &::before {
-      content: counter(access-request-step);
-      grid-row: span 2;
-      width: 1.75rem;
-      height: 1.75rem;
-      border-radius: 50%;
-      display: grid;
-      place-items: center;
-      font-size: 0.8rem;
-      font-weight: 700;
-      color: $colorPrimary;
-      background-color: $colorPrimaryContainer;
-    }
-
-    span {
-      font-size: 0.85rem;
-      color: $colorOnSurfaceVariant;
-    }
-  }
+.access-request .guest__view-header {
+  margin-bottom: 1rem;
 }
 
+// fields placed in a two-column grid (DOM order comes from UserAccessRequest.editableFields)
 .access-request__form {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1rem;
+  gap: 0.75rem 1rem;
 
   .form-item {
     grid-template-columns: minmax(0, 1fr);
-    row-gap: 0.35rem;
+    row-gap: 0.25rem;
     padding: 0;
     height: auto;
 
@@ -58,34 +27,49 @@
       width: 100%;
 
       .MuiInputBase-input {
-        padding: 0.7rem 0.85rem;
+        padding: 0.6rem 0.85rem;
       }
     }
 
     .dropdown__control {
-      min-height: 2.75rem;
+      min-height: 2.6rem;
     }
 
     .loading-bar {
       position: relative;
     }
-
-    // email, purpose, survey name and template take the whole row
-    &:nth-child(1),
-    &:nth-child(n + 6) {
-      grid-column: 1 / -1;
-    }
   }
 
-  .access-request__required-field-label,
-  .recaptcha-wrapper,
-  .access-request__buttons {
+  .access-request__field--firstName {
+    order: 1;
+  }
+  .access-request__field--lastName {
+    order: 2;
+  }
+  .access-request__field--email {
+    order: 3;
+  }
+  .access-request__field--institution {
+    order: 4;
+  }
+  .access-request__field--country {
+    order: 5;
+  }
+  .access-request__field--surveyName {
+    order: 6;
+  }
+  .access-request__field--purpose {
+    order: 7;
+    grid-column: 1 / -1;
+  }
+  .access-request__field--templateUuid {
+    order: 8;
     grid-column: 1 / -1;
   }
 
-  .access-request__required-field-label {
-    font-size: 0.75rem;
-    color: $colorOnSurfaceVariant;
+  .access-request__buttons {
+    order: 9;
+    grid-column: 1 / -1;
   }
 }
 
@@ -93,8 +77,33 @@
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-top: 0.25rem;
+}
+
+.access-request__notes {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: $colorOnSurfaceVariant;
+}
+
+// reCAPTCHA (when enabled) next to the submit button
+.access-request__submit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-left: auto;
+
+  .recaptcha-wrapper {
+    display: block;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
 }
 
 .access-request__sent-message {
@@ -107,5 +116,9 @@
 @media screen and (max-width: 900px) {
   .access-request__form {
     grid-template-columns: minmax(0, 1fr);
+
+    .form-item {
+      grid-column: 1 / -1;
+    }
   }
 }

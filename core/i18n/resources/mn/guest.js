@@ -112,9 +112,6 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
       questionnaires: 'Асуулга',
       multiCycle: 'Олон мөчлөг',
       statisticalAnalysis: 'Статистик шинжилгээ',
-      freeAndOpenSource: 'Үнэгүй, нээлттэй эх',
-      openForis: 'FAO · Open Foris',
-      upToFiveSurveys: '5 хүртэл судалгаа',
     },
   },
   footer: {
