@@ -4104,9 +4104,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.18.13, @openforis/arena-core@npm:^2.18.21":
-  version: 2.18.21
-  resolution: "@openforis/arena-core@npm:2.18.21"
+"@openforis/arena-core@npm:^2.18.13, @openforis/arena-core@npm:^2.18.22":
+  version: 2.18.22
+  resolution: "@openforis/arena-core@npm:2.18.22"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -4122,13 +4122,13 @@ __metadata:
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/943bc0155397fbba1dbeb1000b143bcb4ba7963a66fc26c598e8f0e9447a1cd55e34b540a70f309c8bbad958342e674267610a91b46625e89243e5918d2697d3
+  checksum: 10c0/248d5436d07f8e8e38e24fd63cd2c45b41567c2c89ed3266b38c83ac5ba8874e3ed1a2814b2dc1b0428dd97ebdcdcef4f553f915742d312ef680db1bc2fdbce0
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.8.10":
-  version: 2.8.10
-  resolution: "@openforis/arena-server@npm:2.8.10"
+"@openforis/arena-server@npm:^2.8.11":
+  version: 2.8.11
+  resolution: "@openforis/arena-server@npm:2.8.11"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1159.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -4153,7 +4153,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/1481ac8d9548701e2724701d61c32d1c401685f5d47803d47891692508e61365b8c5bc98f0084402ddfea25210a00e785296040581069bcfb590a712db2ea840
+  checksum: 10c0/1714902f3d3e5db72dba4aa1039c9fa344e06182b8d357215dc80bb70f3456f712fc13a32d7209a350db77c6db924e9e6c3fbc2a62fca9141817506d309e712a
   languageName: node
   linkType: hard
 
@@ -15363,8 +15363,8 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.17.0"
     "@mui/x-tree-view": "npm:^9.17.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
-    "@openforis/arena-core": "npm:^2.18.21"
-    "@openforis/arena-server": "npm:^2.8.10"
+    "@openforis/arena-core": "npm:^2.18.22"
+    "@openforis/arena-server": "npm:^2.8.11"
     "@playwright/test": "npm:1.65.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@react-leaflet/core": "npm:3.0.0"
