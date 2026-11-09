@@ -43,9 +43,9 @@ export default {
       description: 'Može da uređuje zapise u koraku analize podataka',
     },
     surveyGuest: {
-      label: 'Gost istraživanja',
-      label_few: 'Gosti istraživanja',
-      label_other: 'Gosti istraživanja',
+      label: 'Gost',
+      label_few: 'Gosta',
+      label_other: 'Gostiju',
       description: 'Može da pregleda zapise',
     },
   },

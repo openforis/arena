@@ -932,6 +932,12 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
         <li>adicionar novos registros (inventários próprios)</li>
         <li>editar registros existentes (inventários próprios)</li>
         <li>enviar registros para a fase “Limpeza”</li>`,
+      surveyGuest: `
+        <li>Dados: 
+          <ul>
+            <li>visualizar os registros (inventários próprios), sem editá-los</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Mensagem (opcional)',
     messageInfo: `A mensagem aparecerá no email enviado ao usuário. 

@@ -1,5 +1,7 @@
 import * as A from '@core/arena'
 
+import { Authorizer } from '@openforis/arena-core'
+
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as AuthGroup from '@core/auth/authGroup'
@@ -86,7 +88,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     }
   }
 
-  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
+  const listFetched = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
       surveyId,
       cycle: cycleParam,
@@ -107,6 +109,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     },
     client
   )
+  // e.g. survey guests: all the records are read-only (also in Arena Mobile)
+  const list =
+    user && !Authorizer.canEditRecords(user, surveyInfo)
+      ? listFetched.map((recordSummary) => Record.assocReadOnly(true)(recordSummary))
+      : listFetched
 
   if (!includeCounts) {
     return {

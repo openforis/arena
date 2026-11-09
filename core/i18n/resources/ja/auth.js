@@ -36,8 +36,8 @@ export default {
       description: 'データ分析手順で記録の編集が可能',
     },
     surveyGuest: {
-      label: '調査ゲスト',
-      label_other: '調査ゲスト',
+      label: 'ゲスト',
+      label_other: 'ゲスト',
       description: '記録の閲覧が可能',
     },
   },

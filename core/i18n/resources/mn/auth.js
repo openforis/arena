@@ -36,8 +36,8 @@ export default {
       description: 'Өгөгдөл шинжилгээний алхамд бүртгэл засах боломжтой',
     },
     surveyGuest: {
-      label: 'Судалгааны зочин',
-      label_other: 'Судалгааны зочид',
+      label: 'Зочин',
+      label_other: 'Зочид',
       description: 'Бичлэгийг үзэх боломжтой',
     },
   },

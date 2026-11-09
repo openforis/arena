@@ -925,6 +925,12 @@ Try again?`,
         <li>add new records (own surveys)</li>
         <li>edit existing records (own surveys)</li>
         <li>submit records to “Cleansing” phase</li>`,
+      surveyGuest: `
+        <li>Data: 
+          <ul>
+            <li>view the records (own surveys), without editing them</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Message (optional)',
     messageInfo: `The message will appear in the email sent to the user. 

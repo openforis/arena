@@ -939,6 +939,12 @@ Réessayer ?`,
         <li>ajouter de nouveaux enregistrements (ses propres formulaires)</li>
         <li>modifier les enregistrements existants (ses propres formulaires)</li>
         <li>soumettre des enregistrements à la phase "Nettoyage"</li>`,
+      surveyGuest: `
+        <li>Données :
+          <ul>
+            <li>consulter les enregistrements (ses propres formulaires), sans les modifier</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Message (optionnel)',
     messageInfo: `Le message apparaîtra dans l'e-mail envoyé à l'utilisateur. 

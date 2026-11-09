@@ -6,6 +6,7 @@ import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -187,8 +188,16 @@ export const insertSurvey = async (params, client = db) => {
   }
 }
 
+// surveys exported before a role was introduced (e.g. survey guest) do not have its group
+const _addMissingDefaultAuthGroups = (authGroups) => {
+  const groupNames = new Set(authGroups.map(AuthGroup.getName))
+  const missingGroups = Survey.getDefaultAuthGroups().filter((group) => !groupNames.has(AuthGroup.getName(group)))
+  return [...authGroups, ...missingGroups]
+}
+
 export const importSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, authGroups = Survey.getDefaultAuthGroups(), backup } = params
+  const { user, surveyInfo: surveyInfoParam, authGroups: authGroupsParam, backup } = params
+  const authGroups = authGroupsParam ? _addMissingDefaultAuthGroups(authGroupsParam) : Survey.getDefaultAuthGroups()
 
   // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
   // run inside a transaction held open by this function (same connection-pool starvation risk).

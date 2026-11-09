@@ -77,6 +77,11 @@ sequenceDiagram
    groups the user may only read);
 4. if the user can edit it and it has no nodes yet, posts `recordInit` to the thread.
 
+Users whose role cannot edit records (Guest role, `surveyGuest` auth group, with the `recordView` permission only) see all the
+records (`Authorizer.canViewNotOwnedRecords`), restricted by the qualifiers of their user group if any; the
+records summary (`RecordManager.fetchRecordsSummaryBySurveyId`) marks them all as read-only, so Arena
+Mobile locks them too.
+
 A **new record** is created in two steps: `RecordActions.createRecord` posts an empty record
 (`POST /survey/:surveyId/record` → `RecordManager.insertRecord`, record row only), then navigates to the
 record view, whose check-in triggers `recordInit`. The thread runs `RecordManager.initNewRecord`, which

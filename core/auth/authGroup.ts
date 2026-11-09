@@ -94,6 +94,7 @@ export const permissionsByGroupName = {
     permissions.recordCleanse,
   ],
   [groupNames.dataEditor]: [permissions.recordView, permissions.recordCreate, permissions.recordEdit],
+  [groupNames.surveyGuest]: [permissions.recordView],
 }
 
 const sortedGroupNames = [
