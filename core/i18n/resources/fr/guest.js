@@ -40,7 +40,13 @@ Entrez le code généré par votre application d'authentification.`,
       invitation: {
         title: 'Recevez votre invitation',
         description:
-          "Vous recevrez un e-mail pour accéder à $t(common.appName) : vous serez Administrateur de la nouvelle enquête et pourrez créer jusqu'à 5 enquêtes.",
+          "Vous recevrez un e-mail de **{{senderEmail}}** avec le lien pour accéder à $t(common.appName). Vous ne le trouvez pas dans votre boîte de réception ? Vérifiez le dossier Spam/Courrier indésirable, puis ajoutez l'expéditeur à vos contacts ou marquez l'e-mail comme non indésirable.",
+        descriptionWithoutSender:
+          "Vous recevrez un e-mail avec le lien pour accéder à $t(common.appName). Vous ne le trouvez pas dans votre boîte de réception ? Vérifiez le dossier Spam/Courrier indésirable, puis ajoutez l'expéditeur à vos contacts ou marquez l'e-mail comme non indésirable.",
+      },
+      startWorking: {
+        title: 'Commencez à travailler',
+        description: "Vous serez Administrateur de la nouvelle enquête et pourrez créer jusqu'à 5 enquêtes.",
       },
     },
     error: "Erreur lors de la demande d'accès : {{error}}",
@@ -108,8 +114,6 @@ Merci et profitez de **$t(common.appNameFull)** !`,
     },
     accessRequest: {
       title: 'Créez votre première enquête dans $t(common.appName).',
-      description:
-        'Parlez-nous de votre projet. Une fois approuvé, vous pourrez concevoir des formulaires, inviter vos équipes de terrain et analyser les données au même endroit.',
     },
     tags: {
       forestInventories: 'Inventaires forestiers',

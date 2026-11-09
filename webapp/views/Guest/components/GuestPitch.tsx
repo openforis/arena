@@ -1,7 +1,10 @@
+import * as ProcessUtils from '@core/processUtils'
+
+import Markdown from '@webapp/components/markdown'
 import { useI18nT } from '@webapp/store/system'
 
 const defaultTags = ['forestInventories', 'questionnaires', 'multiCycle', 'statisticalAnalysis']
-const accessRequestSteps = ['sendRequest', 'review', 'invitation']
+const accessRequestSteps = ['sendRequest', 'review', 'invitation', 'startWorking']
 
 type Props = {
   accessRequest?: boolean
@@ -19,14 +22,25 @@ const PitchTags = () => {
 }
 
 // what happens after an access request is sent
+const getStepDescriptionKey = (step: string, senderEmail: string | undefined): string => {
+  const descriptionKey = step === 'invitation' && !senderEmail ? 'descriptionWithoutSender' : 'description'
+  return `guest:accessRequestView.steps.${step}.${descriptionKey}`
+}
+
 const AccessRequestSteps = () => {
   const t = useI18nT()
+  // emails are sent from this address: users should look for it (also in the spam folder)
+  const senderEmail = ProcessUtils.ENV.emailFromResolved
   return (
     <ol className="guest__pitch-steps">
       {accessRequestSteps.map((step) => (
         <li key={step}>
           <strong>{t(`guest:accessRequestView.steps.${step}.title`)}</strong>
-          <span>{t(`guest:accessRequestView.steps.${step}.description`)}</span>
+          <Markdown
+            className="guest__pitch-step-description"
+            container="span"
+            source={t(getStepDescriptionKey(step, senderEmail), { senderEmail })}
+          />
         </li>
       ))}
     </ol>
@@ -46,8 +60,14 @@ export const GuestPitch = ({ accessRequest = false }: Props) => {
   return (
     <section className="guest__pitch">
       <h1>{t(`${prefix}.title`)}</h1>
-      <p>{t(`${prefix}.description`)}</p>
-      {accessRequest ? <AccessRequestSteps /> : <PitchTags />}
+      {accessRequest ? (
+        <AccessRequestSteps />
+      ) : (
+        <>
+          <p>{t('guest:pitch.default.description')}</p>
+          <PitchTags />
+        </>
+      )}
     </section>
   )
 }

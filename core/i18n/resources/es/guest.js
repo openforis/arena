@@ -38,7 +38,13 @@ export default {
       invitation: {
         title: 'Reciba su invitación',
         description:
-          'Recibirá un correo electrónico para acceder a $t(common.appName): será Administrador de la nueva encuesta y podrá crear hasta 5 encuestas.',
+          'Recibirá un correo electrónico de **{{senderEmail}}** con el enlace para acceder a $t(common.appName). ¿No está en su bandeja de entrada? Revise la carpeta de correo no deseado (Spam) y luego añada el remitente a sus contactos o marque el correo como deseado.',
+        descriptionWithoutSender:
+          'Recibirá un correo electrónico con el enlace para acceder a $t(common.appName). ¿No está en su bandeja de entrada? Revise la carpeta de correo no deseado (Spam) y luego añada el remitente a sus contactos o marque el correo como deseado.',
+      },
+      startWorking: {
+        title: 'Empiece a trabajar',
+        description: 'Será Administrador de la nueva encuesta y podrá crear hasta 5 encuestas.',
       },
     },
     error: 'Error al solicitar acceso: {{error}}',
@@ -106,8 +112,6 @@ Una vez aceptada, le enviaremos otro correo electrónico a **{{email}}** con las
     },
     accessRequest: {
       title: 'Cree su primera encuesta en $t(common.appName).',
-      description:
-        'Cuéntenos sobre su proyecto. Una vez aprobado, podrá diseñar formularios, invitar a sus equipos de campo y analizar los datos en un solo lugar.',
     },
     tags: {
       forestInventories: 'Inventarios forestales',

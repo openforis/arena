@@ -37,8 +37,11 @@ export default {
       invitation: {
         title: '招待を受け取る',
         description:
-          '$t(common.appName)にアクセスするためのメールが届きます：新しい調査の管理者となり、最大5件の調査を作成できます。',
+          '**{{senderEmail}}** から$t(common.appName)にアクセスするためのリンクを記載したメールが届きます。 受信トレイに見当たらない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを「迷惑メールではない」としてマークしてください。',
+        descriptionWithoutSender:
+          '$t(common.appName)にアクセスするためのリンクを記載したメールが届きます。 受信トレイに見当たらない場合は、迷惑メールフォルダを確認し、送信者を連絡先に追加するか、メールを「迷惑メールではない」としてマークしてください。',
       },
+      startWorking: { title: '利用開始', description: '新しい調査の管理者となり、最大5件の調査を作成できます。' },
     },
     error: 'アクセス申請中にエラーが発生しました：{{error}}',
     fields: {
@@ -103,8 +106,6 @@ $t(guest:accessRequestView.whitelistSenderSuggestion)
     },
     accessRequest: {
       title: '$t(common.appName)で最初の調査を始めましょう。',
-      description:
-        'プロジェクトについてお聞かせください。承認されると、フォームの設計、現地チームの招待、データの分析を一か所で行えます。',
     },
     tags: {
       forestInventories: '森林インベントリ',

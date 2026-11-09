@@ -139,9 +139,25 @@ $guestMobileBreakpoint: 900px;
           border: 1px solid with-alpha($colorOnBrandGradient, 0.3);
         }
 
-        span {
+        .guest__pitch-step-description {
           font-size: 0.85rem;
+
           opacity: 0.85;
+
+          p {
+            margin: 0;
+          }
+
+          strong {
+            font-weight: 600;
+            overflow-wrap: anywhere;
+          }
+
+          // the sender email address is rendered as a mailto link
+          a {
+            color: inherit;
+            text-decoration: underline;
+          }
         }
       }
     }

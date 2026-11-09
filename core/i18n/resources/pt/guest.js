@@ -41,7 +41,13 @@ Insira o código gerado pelo seu aplicativo autenticador.`,
       invitation: {
         title: 'Receba seu convite',
         description:
-          'Você receberá um e-mail para acessar o $t(common.appName): será Administrador da nova pesquisa e poderá criar até 5 pesquisas.',
+          'Você receberá um e-mail de **{{senderEmail}}** com o link para acessar o $t(common.appName). Não está na sua caixa de entrada? Verifique a pasta de spam/lixo eletrônico e adicione o remetente aos seus contatos ou marque o e-mail como não spam.',
+        descriptionWithoutSender:
+          'Você receberá um e-mail com o link para acessar o $t(common.appName). Não está na sua caixa de entrada? Verifique a pasta de spam/lixo eletrônico e adicione o remetente aos seus contatos ou marque o e-mail como não spam.',
+      },
+      startWorking: {
+        title: 'Comece a trabalhar',
+        description: 'Você será Administrador da nova pesquisa e poderá criar até 5 pesquisas.',
       },
     },
     error: 'Erro ao solicitar acesso: {{error}}',
@@ -108,8 +114,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     },
     accessRequest: {
       title: 'Comece sua primeira pesquisa no $t(common.appName).',
-      description:
-        'Conte-nos sobre seu projeto. Depois de aprovado, você poderá criar formulários, convidar suas equipes de campo e analisar os dados em um só lugar.',
     },
     tags: {
       forestInventories: 'Inventários florestais',

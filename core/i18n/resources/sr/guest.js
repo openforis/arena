@@ -40,7 +40,13 @@ Unesite kod generisan u vašoj aplikaciji za autentifikaciju.`,
       invitation: {
         title: 'Primite pozivnicu',
         description:
-          'Dobićete e-poruku za pristup aplikaciji $t(common.appName): bićete administrator novog istraživanja i moći ćete da kreirate do 5 istraživanja.',
+          'Dobićete e-poruku od **{{senderEmail}}** sa linkom za pristup aplikaciji $t(common.appName). Nije u prijemnom sandučetu? Provjerite folder Spam/Neželjena pošta, a zatim dodajte pošiljaoca u kontakte ili označite poruku kao da nije neželjena.',
+        descriptionWithoutSender:
+          'Dobićete e-poruku sa linkom za pristup aplikaciji $t(common.appName). Nije u prijemnom sandučetu? Provjerite folder Spam/Neželjena pošta, a zatim dodajte pošiljaoca u kontakte ili označite poruku kao da nije neželjena.',
+      },
+      startWorking: {
+        title: 'Počnite sa radom',
+        description: 'Bićete administrator novog istraživanja i moći ćete da kreirate do 5 istraživanja.',
       },
     },
     error: 'Greška pri zahtjevu za pristup: {{error}}',
@@ -106,8 +112,6 @@ Hvala vam i uživajte u **$t(common.appNameFull)**!`,
     },
     accessRequest: {
       title: 'Započnite svoje prvo istraživanje u aplikaciji $t(common.appName).',
-      description:
-        'Recite nam nešto o svom projektu. Nakon odobrenja moći ćete da kreirate obrasce, pozovete terenske timove i analizirate podatke na jednom mjestu.',
     },
     tags: {
       forestInventories: 'Inventure šuma',
