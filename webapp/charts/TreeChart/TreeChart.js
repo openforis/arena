@@ -1,6 +1,8 @@
 import './TreeChart.scss'
 
 import * as d3 from 'd3'
+// d3 is flagged side-effect free: import d3-transition explicitly so selection.transition() is not tree-shaken
+import 'd3-transition'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { Objects } from '@openforis/arena-core'
