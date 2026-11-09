@@ -7,8 +7,8 @@ export default {
   noItems: 'No new features to show.',
   items: {
     surveyGuestRole: {
-      title: 'New role: Survey guest, to view the records without editing them',
-      description: `Invite users with the new role **Survey guest** (**Users > Invite user**): they can view all the records of the survey, also in **Arena Mobile**, but they cannot edit or delete them, nor add new ones.
+      title: 'New role: Guest, to view the records without editing them',
+      description: `Invite users with the new role **Guest** (**Users > Invite user**): they can view all the records of the survey, also in **Arena Mobile**, but they cannot edit or delete them, nor add new ones.
 
 Add the guest to a **user group** (**Users > User Groups**) with qualifiers to show only a part of the data: the records whose qualifier attributes match the values of the group (e.g. the plots of a region). Groups with the **Can view the records of** setting give access to the records of other groups too.
 

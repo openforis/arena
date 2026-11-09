@@ -36,8 +36,8 @@ export default {
       description: "Peut modifier les enregistrements à l'étape d'analyse des données",
     },
     surveyGuest: {
-      label: 'Invité du formulaire',
-      label_other: 'Invités du formulaire',
+      label: 'Invité',
+      label_other: 'Invités',
       description: 'Peut consulter les enregistrements',
     },
   },

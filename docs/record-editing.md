@@ -77,7 +77,7 @@ sequenceDiagram
    groups the user may only read);
 4. if the user can edit it and it has no nodes yet, posts `recordInit` to the thread.
 
-Users whose role cannot edit records (survey guests, with the `recordView` permission only) see all the
+Users whose role cannot edit records (Guest role, `surveyGuest` auth group, with the `recordView` permission only) see all the
 records (`Authorizer.canViewNotOwnedRecords`), restricted by the qualifiers of their user group if any; the
 records summary (`RecordManager.fetchRecordsSummaryBySurveyId`) marks them all as read-only, so Arena
 Mobile locks them too.

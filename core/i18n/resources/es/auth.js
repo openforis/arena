@@ -36,8 +36,8 @@ export default {
       description: 'Puede editar registros en el paso de análisis de datos',
     },
     surveyGuest: {
-      label: 'Invitado de la encuesta',
-      label_other: 'Invitados de la encuesta',
+      label: 'Invitado',
+      label_other: 'Invitados',
       description: 'Puede ver registros',
     },
   },

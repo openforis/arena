@@ -36,8 +36,8 @@ export default {
       description: 'Can edit records in data analysis step',
     },
     surveyGuest: {
-      label: 'Survey guest',
-      label_other: 'Survey guests',
+      label: 'Guest',
+      label_other: 'Guests',
       description: 'Can view records',
     },
   },

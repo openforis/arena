@@ -165,11 +165,11 @@ describe('User group readable groups', () => {
     expect(readable.map((filters) => filters.map(({ value }) => value))).toEqual([['contractor_a']])
   })
 
-  test('survey guest: records of the user groups are listed, all read-only', async () => {
+  test('guest: records of the user groups are listed, all read-only', async () => {
     const guestGroup = Survey.getAuthGroupByName(AuthGroup.groupNames.surveyGuest)(Survey.getSurveyInfo(survey))
     expect(AuthGroup.getPermissions(guestGroup)).toEqual([AuthGroup.permissions.recordView])
 
-    // same user (member of the control group), with the survey guest role only
+    // same user (member of the control group), with the guest role only
     const guest = { ...getContextUser(), authGroups: [guestGroup] }
     const summariesByClusterNo = await fetchSummariesByClusterNo(guest)
 
