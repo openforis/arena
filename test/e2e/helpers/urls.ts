@@ -7,6 +7,7 @@ export const Urls = {
   surveyInfo: '/app/home/surveyInfo/',
   dashboard: '/app/dashboard/',
   formDesigner: '/app/designer/formDesigner/',
+  surveyHierarchy: '/app/designer/surveyHierarchy/',
   records: '/app/data/records/',
   dataExport: '/app/data/export/',
   dataExplorer: '/app/data/explorer/',
