@@ -1,6 +1,6 @@
 import './VerificationCodeInput.scss'
 
-import React, { useCallback, useRef } from 'react'
+import React, { useCallback, useEffect, useId, useMemo, useRef } from 'react'
 import classNames from 'classnames'
 
 import { useI18nT } from '@webapp/store/system'
@@ -9,7 +9,7 @@ const defaultLength = 6
 const nonDigitsRegExp = /\D/g
 
 type Props = {
-  autoFocus?: boolean
+  focusOnMount?: boolean
   hideLabel?: boolean
   label: string
   length?: number
@@ -25,7 +25,7 @@ const toDigits = (text: string): string[] => text.replaceAll(nonDigitsRegExp, ''
  * Typing moves to the next box, Backspace to the previous one; pasting a whole code fills all the boxes.
  *
  * @param {Props} props - The props.
- * @param {boolean} [props.autoFocus] - True to focus the first box when mounted.
+ * @param {boolean} [props.focusOnMount] - True to focus the first box when mounted.
  * @param {boolean} [props.hideLabel] - True to hide the label (e.g. when shown by a form item).
  * @param {string} props.label - Label (i18n key).
  * @param {number} [props.length] - Number of digits.
@@ -35,11 +35,20 @@ const toDigits = (text: string): string[] => text.replaceAll(nonDigitsRegExp, ''
  * @returns {React.ReactElement} The verification code input.
  */
 export const VerificationCodeInput = (props: Props) => {
-  const { autoFocus = false, hideLabel = false, label, length = defaultLength, name, onChange, value } = props
+  const { focusOnMount = false, hideLabel = false, label, length = defaultLength, name, onChange, value } = props
 
   const t = useI18nT()
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const digits = Array.from({ length }, (_, index) => value[index] ?? '')
+  // stable id of each box (also used as key)
+  const idPrefix = useId()
+  const boxIds = useMemo(() => Array.from({ length }, (_, index) => `${idPrefix}-${index}`), [idPrefix, length])
+
+  useEffect(() => {
+    if (focusOnMount) {
+      inputRefs.current[0]?.focus()
+    }
+  }, [focusOnMount])
 
   const focusBox = useCallback(
     (index: number) => {
@@ -110,16 +119,15 @@ export const VerificationCodeInput = (props: Props) => {
       {/* hidden (but still read by assistive technologies) when the label is shown by the containing form item */}
       <legend className={classNames({ 'verification-code-input__legend--hidden': hideLabel })}>{labelText}</legend>
       <div className="verification-code-input__boxes">
-        {digits.map((digit, index) => (
+        {boxIds.map((boxId, index) => (
           <input
-            // the boxes never change order: the position identifies them
-            key={index}
+            key={boxId}
+            id={boxId}
             ref={(element) => {
               inputRefs.current[index] = element
             }}
             aria-label={`${labelText} ${index + 1}/${length}`}
             autoComplete={index === 0 ? 'one-time-code' : 'off'}
-            autoFocus={autoFocus && index === 0}
             inputMode="numeric"
             name={index === 0 ? name : undefined}
             onChange={onInputChange(index)}
@@ -128,7 +136,7 @@ export const VerificationCodeInput = (props: Props) => {
             onPaste={onPaste(index)}
             pattern="[0-9]*"
             type="text"
-            value={digit}
+            value={digits[index]}
           />
         ))}
       </div>

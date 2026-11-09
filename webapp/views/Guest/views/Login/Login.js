@@ -113,7 +113,7 @@ const Login = () => {
         <Error error={error} />
         {viewState === ViewState.ask2FAToken ? (
           <VerificationCodeInput
-            autoFocus
+            focusOnMount
             label="guest:loginView.twoFactorToken"
             name={FormFields.twoFactorToken}
             onChange={onChangeTwoFactorToken}
@@ -122,7 +122,6 @@ const Login = () => {
         ) : (
           <SimpleTextInput
             autoComplete="one-time-code"
-            autoFocus
             label="guest:loginView.twoFactorBackupCode"
             name={FormFields.twoFactorToken}
             onChange={onChangeTwoFactorToken}
