@@ -1,10 +1,11 @@
 import { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link } from 'react-router'
+import { Link, Navigate } from 'react-router'
 
 import * as ProcessUtils from '@core/processUtils'
+import * as User from '@core/user/user'
 
-import { appModuleUri, guestModules } from '@webapp/app/appModules'
+import { appModuleUri, appModules, guestModules } from '@webapp/app/appModules'
 
 import { Button } from '@webapp/components'
 import { useFormObject } from '@webapp/components/hooks'
@@ -16,6 +17,7 @@ import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
+import { useUser } from '@webapp/store/user'
 
 const { ViewState } = LoginState
 
@@ -33,6 +35,7 @@ const Login = () => {
   const viewState = useSelector(LoginState.getViewState)
   const is2FAViewState = useSelector(LoginState.is2FAViewState)
   const allowAccessRequest = ProcessUtils.ENV.allowUserAccessRequest
+  const user = useUser()
 
   const validatorFn = useCallback(
     (obj) => LoginValidator.validateLoginObj({ requireTwoFactorToken: is2FAViewState })(obj),
@@ -91,6 +94,11 @@ const Login = () => {
   const onLoginUsingBackupCodeClick = useCallback(() => {
     dispatch(LoginActions.setViewState(ViewState.ask2FABackupCode))
   }, [dispatch])
+
+  // logged in (e.g. just now): leave the guest views (the /guest/* route is rendered for logged-in users too)
+  if (user && User.hasAccepted(user)) {
+    return <Navigate to={appModuleUri(appModules.home)} replace />
+  }
 
   if (is2FAViewState) {
     return (
