@@ -39,7 +39,7 @@ export const VerificationCodeInput = (props: Props) => {
 
   const t = useI18nT()
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
-  const digits = Array.from({ length }, (_, index) => value[index] ?? '')
+  const digits = useMemo(() => Array.from({ length }, (_, index) => value[index] ?? ''), [length, value])
   // stable id of each box (also used as key)
   const idPrefix = useId()
   const boxIds = useMemo(() => Array.from({ length }, (_, index) => `${idPrefix}-${index}`), [idPrefix, length])
