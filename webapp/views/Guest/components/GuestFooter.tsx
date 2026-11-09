@@ -2,14 +2,8 @@ import { useTranslation } from 'react-i18next'
 
 import * as ProcessUtils from '@core/processUtils'
 
+import { getUserManualUri } from '@webapp/app/appModules'
 import { useI18nT } from '@webapp/store/system'
-
-const userManualLanguages = new Set(['en', 'es', 'fr'])
-
-const getUserManualUrl = (language: string): string => {
-  const lang = userManualLanguages.has(language) ? language : 'en'
-  return `https://openforis.github.io/arena/arena-user-manual-${lang}.pdf`
-}
 
 /**
  * Footer of the guest views, with links to the Arena website, user manual and support forum.
@@ -23,7 +17,7 @@ export const GuestFooter = () => {
 
   const links = [
     { key: 'website', href: t('urls.openforisArenaWebsite'), label: t('guest:footer.website') },
-    { key: 'userManual', href: getUserManualUrl(i18n.language), label: t('guest:footer.userManual') },
+    { key: 'userManual', href: getUserManualUri(i18n.language), label: t('guest:footer.userManual') },
     { key: 'supportForum', href: t('urls.supportForum'), label: t('guest:footer.supportForum') },
   ]
   return (
