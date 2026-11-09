@@ -1,6 +1,7 @@
 import { ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -46,11 +47,11 @@ const insertGroup = async ({ surveyUuid, props }) =>
 let survey = null
 let userGroupServicePrev = null
 
-const fetchSummariesByClusterNo = async () => {
+const fetchSummariesByClusterNo = async (user = getContextUser()) => {
   const { list } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId: Survey.getId(survey),
     cycle: Survey.cycleOneKey,
-    user: getContextUser(),
+    user,
   })
   return Object.fromEntries(list.map((summary) => [Number(summary.clusterNo), summary]))
 }
@@ -162,5 +163,18 @@ describe('User group readable groups', () => {
     })
     expect(own.map(({ value }) => value)).toEqual(['control'])
     expect(readable.map((filters) => filters.map(({ value }) => value))).toEqual([['contractor_a']])
+  })
+
+  test('survey guest: records of the user groups are listed, all read-only', async () => {
+    const guestGroup = Survey.getAuthGroupByName(AuthGroup.groupNames.surveyGuest)(Survey.getSurveyInfo(survey))
+    expect(AuthGroup.getPermissions(guestGroup)).toEqual([AuthGroup.permissions.recordView])
+
+    // same user (member of the control group), with the survey guest role only
+    const guest = { ...getContextUser(), authGroups: [guestGroup] }
+    const summariesByClusterNo = await fetchSummariesByClusterNo(guest)
+
+    expect(Object.keys(summariesByClusterNo).sort((a, b) => a.localeCompare(b))).toEqual(['1', '2'])
+    expect(Record.isReadOnly(summariesByClusterNo[1])).toBe(true)
+    expect(Record.isReadOnly(summariesByClusterNo[2])).toBe(true)
   })
 })

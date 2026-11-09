@@ -857,6 +857,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         '        <li>Datos: \n          <ul>$t(userInviteView.groupPermissions.dataEditorData)</ul>\n        </li>',
       dataEditorData:
         '        <li>añadir nuevos registros (encuestas propias)</li>\n        <li>editar registros existentes (encuestas propias)</li>\n        <li>enviar registros a la fase de “Limpieza”</li>',
+      surveyGuest:
+        '        <li>Datos: \n          <ul>\n            <li>ver los registros (encuestas propias), sin editarlos</li>\n          </ul>\n        </li>',
     },
     messageOptional: 'Mensaje (opcional)',
     messageInfo:

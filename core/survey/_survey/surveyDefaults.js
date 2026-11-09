@@ -43,10 +43,11 @@ export const getDefaultAuthGroups = () => [
       1: AuthGroup.keys.own,
     },
   },
-  // ,
-  // {
-  //   name: AuthGroup.groupNames.surveyGuest,
-  //   labels: {[lang]: 'Survey guest'},
-  //   descriptions: {[lang]: `Can view records`},
-  // },
+  {
+    name: AuthGroup.groupNames.surveyGuest,
+    permissions: [...AuthGroup.permissionsByGroupName[AuthGroup.groupNames.surveyGuest]],
+    recordSteps: {
+      3: AuthGroup.keys.all,
+    },
+  },
 ]

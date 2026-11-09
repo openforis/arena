@@ -967,6 +967,12 @@ Pokušati ponovo?`,
         <li>dodavanje novih zapisa (sopstvena istraživanja)</li>
         <li>uređivanje postojećih zapisa (sopstvena istraživanja)</li>
         <li>slanje zapisa u fazu „Čišćenje“</li>`,
+      surveyGuest: `
+        <li>Podaci:
+          <ul>
+            <li>pregled zapisa (sopstvena istraživanja), bez njihovog uređivanja</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Poruka (opciono)',
     messageInfo: `Poruka će se pojaviti u e-poruci poslatoj korisniku.

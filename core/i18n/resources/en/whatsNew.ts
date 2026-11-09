@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    surveyGuestRole: {
+      title: 'New role: Survey guest, to view the records without editing them',
+      description: `Invite users with the new role **Survey guest** (**Users > Invite user**): they can view all the records of the survey, also in **Arena Mobile**, but they cannot edit or delete them, nor add new ones.
+
+Add the guest to a **user group** (**Users > User Groups**) with qualifiers to show only a part of the data: the records whose qualifier attributes match the values of the group (e.g. the plots of a region). Groups with the **Can view the records of** setting give access to the records of other groups too.
+
+Existing surveys get the new role automatically.`,
+    },
     areaOfInterest: {
       title: 'Areas of interest: check if a location is inside an area',
       description: `In **Survey info → Map**, add one or more **areas of interest** (e.g. the municipalities of a pilot area), each with a name and a polygon in GeoJSON format. Check them on a map while adding them, one by one or all together (**Show all on map**), and show them as layers in **Data > Map**.

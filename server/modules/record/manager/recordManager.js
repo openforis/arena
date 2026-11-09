@@ -41,6 +41,12 @@ export const { generateRdbUpates, persistNodesToRDB } = NodeRdbManager
 
 // ==== READ
 
+const _canEditRecordsInSurvey = ({ user, surveyInfo }) => {
+  if (User.isSystemAdmin(user)) return true
+  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid: Survey.getUuid(surveyInfo) })(user)
+  return !!authGroup && AuthGroup.getPermissions(authGroup).includes(AuthGroup.permissions.recordEdit)
+}
+
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
@@ -86,7 +92,7 @@ export const fetchRecordsSummaryBySurveyId = async (
     }
   }
 
-  const list = await RecordRepository.fetchRecordsSummaryBySurveyId(
+  const listFetched = await RecordRepository.fetchRecordsSummaryBySurveyId(
     {
       surveyId,
       cycle: cycleParam,
@@ -107,6 +113,11 @@ export const fetchRecordsSummaryBySurveyId = async (
     },
     client
   )
+  // e.g. survey guests: all the records are read-only (also in Arena Mobile)
+  const list =
+    user && !_canEditRecordsInSurvey({ user, surveyInfo })
+      ? listFetched.map((recordSummary) => Record.assocReadOnly(true)(recordSummary))
+      : listFetched
 
   if (!includeCounts) {
     return {
