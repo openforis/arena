@@ -162,6 +162,7 @@
     "cluster": "^0.7.7",
     "codemirror": "^6.0.2",
     "d3": "^7.9.2",
+    "d3-transition": "^3.0.2",
     "dayjs": "^1.11.23",
     "dompurify": "^3.4.17",
     "dotenv": "^18.0.9",

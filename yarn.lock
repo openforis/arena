@@ -15407,6 +15407,7 @@ __metadata:
     css-loader: "npm:^7.1.5"
     csv-load-sync: "npm:^2.3.1"
     d3: "npm:^7.9.2"
+    d3-transition: "npm:^3.0.2"
     dayjs: "npm:^1.11.23"
     dompurify: "npm:^3.4.17"
     dotenv: "npm:^18.0.9"
