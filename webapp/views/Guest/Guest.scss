@@ -420,3 +420,8 @@ $guestMobileBreakpoint: 900px;
 .guest__form .password-strength-checker {
   margin-top: -0.5rem;
 }
+
+// verification code boxes as wide as the form
+.guest__card .verification-code-input__boxes {
+  justify-content: space-between;
+}

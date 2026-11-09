@@ -1,6 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
 .verification-code-input {
+  position: relative;
   margin: 0;
   padding: 0;
   border: none;
@@ -13,12 +14,21 @@
     font-weight: 600;
     color: $colorOnSurface;
   }
+
+  .verification-code-input__legend--hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
 }
 
 .verification-code-input__boxes {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 3.25rem));
-  justify-content: space-between;
+  justify-content: start;
   gap: 0.5rem;
 
   input {

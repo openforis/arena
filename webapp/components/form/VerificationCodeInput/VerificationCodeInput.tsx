@@ -1,6 +1,7 @@
 import './VerificationCodeInput.scss'
 
 import React, { useCallback, useRef } from 'react'
+import classNames from 'classnames'
 
 import { useI18nT } from '@webapp/store/system'
 
@@ -9,6 +10,7 @@ const nonDigitsRegExp = /\D/g
 
 type Props = {
   autoFocus?: boolean
+  hideLabel?: boolean
   label: string
   length?: number
   name?: string
@@ -23,10 +25,17 @@ const toDigits = (text: string): string[] => text.replaceAll(nonDigitsRegExp, ''
  * Typing moves to the next box, Backspace to the previous one; pasting a whole code fills all the boxes.
  *
  * @param {Props} props - The props.
+ * @param {boolean} [props.autoFocus] - True to focus the first box when mounted.
+ * @param {boolean} [props.hideLabel] - True to hide the label (e.g. when shown by a form item).
+ * @param {string} props.label - Label (i18n key).
+ * @param {number} [props.length] - Number of digits.
+ * @param {string} [props.name] - Name of the first box.
+ * @param {Function} props.onChange - Called with the code (digits only).
+ * @param {string} props.value - The code.
  * @returns {React.ReactElement} The verification code input.
  */
 export const VerificationCodeInput = (props: Props) => {
-  const { autoFocus = false, label, length = defaultLength, name, onChange, value } = props
+  const { autoFocus = false, hideLabel = false, label, length = defaultLength, name, onChange, value } = props
 
   const t = useI18nT()
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
@@ -98,7 +107,8 @@ export const VerificationCodeInput = (props: Props) => {
 
   return (
     <fieldset className="verification-code-input">
-      <legend>{labelText}</legend>
+      {/* hidden (but still read by assistive technologies) when the label is shown by the containing form item */}
+      <legend className={classNames({ 'verification-code-input__legend--hidden': hideLabel })}>{labelText}</legend>
       <div className="verification-code-input__boxes">
         {digits.map((digit, index) => (
           <input
