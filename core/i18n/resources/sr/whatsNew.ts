@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    surveyGuestRole: {
+      title: 'Nova uloga: Gost, za pregled zapisa bez izmena',
+      description: `Pozovite korisnike sa novom ulogom **Gost** (**Korisnici > Pozovi korisnika**): mogu da pregledaju sve zapise istraživanja, i u **Arena Mobile**, ali ne mogu da ih menjaju ili brišu, niti da dodaju nove.
+
+Dodajte gosta u **korisničku grupu** (**Korisnici > Korisničke grupe**) sa kvalifikatorima da biste prikazali samo deo podataka: zapise čiji se atributi kvalifikatori poklapaju sa vrednostima grupe (npr. parcele jednog regiona). Grupe sa podešavanjem **Može da pregleda zapise grupa** daju pristup i zapisima drugih grupa.
+
+Postojeća istraživanja automatski dobijaju novu ulogu.`,
+    },
     areaOfInterest: {
       title: 'Područja od interesa: provera da li je lokacija unutar područja',
       description: `U **Informacije o istraživanju → Mapa** dodajte jedno ili više **područja od interesa** (npr. opštine pilot područja), svako sa nazivom i poligonom u GeoJSON formatu. Proverite ih na mapi prilikom dodavanja, jedno po jedno ili sva zajedno (**Prikaži sve na mapi**), i prikažite ih kao slojeve u **Podaci > Mapa**.

@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    surveyGuestRole: {
+      title: 'Novo papel: Convidado, para ver os registros sem editá-los',
+      description: `Convide usuários com o novo papel **Convidado** (**Usuários > Convidar usuário**): eles podem ver todos os registros do levantamento, também no **Arena Mobile**, mas não podem editá-los nem excluí-los, nem adicionar novos.
+
+Adicione o convidado a um **grupo de usuários** (**Usuários > Grupos de usuários**) com qualificadores para mostrar apenas uma parte dos dados: os registros cujos atributos qualificadores correspondem aos valores do grupo (p. ex. as parcelas de uma região). Os grupos com a opção **Pode ver os registros de** dão acesso também aos registros de outros grupos.
+
+Os levantamentos existentes recebem o novo papel automaticamente.`,
+    },
     areaOfInterest: {
       title: 'Áreas de interesse: verificar se uma localização está dentro de uma área',
       description: `Em **Informações do inquérito → Mapa**, adicione uma ou mais **áreas de interesse** (p. ex. os municípios de uma área piloto), cada uma com um nome e um polígono em formato GeoJSON. Visualize-as num mapa ao adicioná-las, uma a uma ou todas juntas (**Mostrar todas no mapa**), e mostre-as como camadas em **Dados > Mapa**.

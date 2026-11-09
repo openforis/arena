@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    surveyGuestRole: {
+      title: 'Nouveau rôle : Invité, pour consulter les enregistrements sans les modifier',
+      description: `Invitez des utilisateurs avec le nouveau rôle **Invité** (**Utilisateurs > Inviter un utilisateur**) : ils peuvent consulter tous les enregistrements de l'enquête, aussi dans **Arena Mobile**, mais ils ne peuvent ni les modifier, ni les supprimer, ni en ajouter de nouveaux.
+
+Ajoutez l'invité à un **groupe d'utilisateurs** (**Utilisateurs > Groupes d'utilisateurs**) avec des qualificatifs pour n'afficher qu'une partie des données : les enregistrements dont les attributs qualificatifs correspondent aux valeurs du groupe (par ex. les placettes d'une région). Les groupes avec l'option **Peut consulter les enregistrements de** donnent aussi accès aux enregistrements d'autres groupes.
+
+Les enquêtes existantes reçoivent automatiquement le nouveau rôle.`,
+    },
     areaOfInterest: {
       title: "Zones d'intérêt : vérifier si un emplacement se trouve dans une zone",
       description: `Dans **Infos de l'enquête → Carte**, ajoutez une ou plusieurs **zones d'intérêt** (par ex. les communes d'une zone pilote), chacune avec un nom et un polygone au format GeoJSON. Visualisez-les sur une carte en les ajoutant, une par une ou toutes ensemble (**Tout afficher sur la carte**), et affichez-les comme couches dans **Données > Carte**.

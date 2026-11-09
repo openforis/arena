@@ -6,6 +6,14 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    surveyGuestRole: {
+      title: 'Nuevo rol: Invitado, para ver los registros sin editarlos',
+      description: `Invite usuarios con el nuevo rol **Invitado** (**Usuarios > Invitar usuario**): pueden ver todos los registros de la encuesta, también en **Arena Mobile**, pero no pueden editarlos ni eliminarlos, ni añadir nuevos.
+
+Añada el invitado a un **grupo de usuarios** (**Usuarios > Grupos de usuarios**) con calificadores para mostrar solo una parte de los datos: los registros cuyos atributos calificadores coinciden con los valores del grupo (p. ej. las parcelas de una región). Los grupos con la opción **Puede ver los registros de** dan acceso también a los registros de otros grupos.
+
+Las encuestas existentes obtienen el nuevo rol automáticamente.`,
+    },
     areaOfInterest: {
       title: 'Áreas de interés: comprobar si una ubicación está dentro de un área',
       description: `En **Información de la encuesta → Mapa**, agregue una o más **áreas de interés** (p. ej. los municipios de un área piloto), cada una con un nombre y un polígono en formato GeoJSON. Visualícelas en un mapa al agregarlas, una por una o todas juntas (**Mostrar todas en el mapa**), y muéstrelas como capas en **Datos > Mapa**.
