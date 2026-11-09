@@ -13,6 +13,7 @@ import { SimpleTextInput } from '@webapp/components/form/SimpleTextInput'
 
 import Error from '@webapp/views/Guest/Error'
 import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
+import { VerificationCodeInput } from '@webapp/views/Guest/components/VerificationCodeInput'
 
 import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
@@ -103,18 +104,24 @@ const Login = () => {
           title="guest:loginView.twoFactorTitle"
         />
         <Error error={error} />
-        <SimpleTextInput
-          autoComplete="one-time-code"
-          autoFocus
-          label={
-            viewState === ViewState.ask2FAToken
-              ? 'guest:loginView.twoFactorToken'
-              : 'guest:loginView.twoFactorBackupCode'
-          }
-          name={FormFields.twoFactorToken}
-          onChange={onChangeTwoFactorToken}
-          value={formObject.twoFactorToken}
-        />
+        {viewState === ViewState.ask2FAToken ? (
+          <VerificationCodeInput
+            autoFocus
+            label="guest:loginView.twoFactorToken"
+            name={FormFields.twoFactorToken}
+            onChange={onChangeTwoFactorToken}
+            value={formObject.twoFactorToken}
+          />
+        ) : (
+          <SimpleTextInput
+            autoComplete="one-time-code"
+            autoFocus
+            label="guest:loginView.twoFactorBackupCode"
+            name={FormFields.twoFactorToken}
+            onChange={onChangeTwoFactorToken}
+            value={formObject.twoFactorToken}
+          />
+        )}
         <Button className="guest__submit" label="guest:loginView.verify" onClick={onClickLogin} type="submit" />
         {viewState === ViewState.ask2FAToken && (
           <p className="guest__footnote">
