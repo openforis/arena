@@ -70,6 +70,7 @@ const maxExcelColumnsLimit = 16384
  * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be fetched.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes, so large datasets can be visualized without fetching them entirely.
@@ -87,6 +88,7 @@ export const fetchViewData = async (params, client = db) => {
     includeFileAttributeDefs = true,
     recordSteps = null,
     recordOwnerUuid = null,
+    userGroupAccessFilters = null,
     offset = 0,
     limit = null,
     randomize = false,
@@ -112,6 +114,7 @@ export const fetchViewData = async (params, client = db) => {
       includeDateCreated,
       recordSteps,
       recordOwnerUuid,
+      userGroupAccessFilters,
       offset,
       limit,
       randomize,
@@ -165,6 +168,7 @@ export const fetchViewData = async (params, client = db) => {
  * @param {!Query} [params.query] - The query object.
  * @param {number} [params.offset] - The query offset.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
  * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.outputStream] - The output to be used to stream the data (if specified).
  * @param {object} [params.options] - Export options object (e.g. {fileFormat: 'csv'}).
@@ -172,12 +176,22 @@ export const fetchViewData = async (params, client = db) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, outputStream = null, options = {} } = params
+  const {
+    survey,
+    cycle,
+    query,
+    recordOwnerUuid = null,
+    userGroupAccessFilters = null,
+    limit,
+    offset,
+    outputStream = null,
+    options = {},
+  } = params
   const { fileFormat = FileFormats.csv } = options
 
   // Fetch data
   const result = await DataViewRepository.fetchViewDataAgg(
-    { survey, cycle, query, recordOwnerUuid, limit, offset, stream: Boolean(outputStream) },
+    { survey, cycle, query, recordOwnerUuid, userGroupAccessFilters, limit, offset, stream: Boolean(outputStream) },
     client
   )
 
@@ -494,7 +508,7 @@ export const fetchEntityDataMatrix = async (
   { user = null, survey, cycle, recordOwnerUuid = null, options },
   client = db
 ) => {
-  // the records filter of the view data query is applied only when a cycle is specified
+  // one column per record: records of different cycles could have the same keys
   if (A.isNil(cycle)) throw new Error('Cycle not specified')
 
   const { entityDef, keyDefs, rowDefs, valueDef } = getDataMatrixDefs({ survey, cycle, options })
@@ -586,15 +600,23 @@ export const fetchEntitiesFileUuidsByCycle = async (
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the rows.
+ * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
  * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<number>} - The number of rows.
  */
-export const countTable = async ({ survey, cycle, recordOwnerUuid, query }, client = db) => {
+export const countTable = async (
+  { survey, cycle, recordOwnerUuid, userGroupAccessFilters = null, query },
+  client = db
+) => {
   const surveyId = Survey.getId(survey)
   const nodeDefTable = Survey.getNodeDefByUuid(Query.getEntityDefUuid(query))(survey)
   const tableName = NodeDefTable.getViewName(nodeDefTable, Survey.getNodeDefParent(nodeDefTable)(survey))
   const filter = Query.getFilter(query)
-  return DataViewRepository.countDataTableRows({ surveyId, cycle, tableName, filter, recordOwnerUuid }, client)
+  return DataViewRepository.countDataTableRows(
+    { surveyId, cycle, tableName, filter, recordOwnerUuid, survey, userGroupAccessFilters },
+    client
+  )
 }
 
 /**
@@ -604,11 +626,13 @@ export const countTable = async ({ survey, cycle, recordOwnerUuid, query }, clie
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {string[]} [params.entityDefUuids] - The UUIDs of the entity definition data views to count.
+ * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
  * @param {pgPromise.IDatabase} client - The database client.
  * @returns {Promise<object>} - Count of view data table rows indexed by related view data entity def UUID.
  */
 export const fetchTableRowsCountByEntityDefUuid = async (
-  { survey, cycle, entityDefUuids: entityDefUuidsParam = [] },
+  { survey, cycle, entityDefUuids: entityDefUuidsParam = [], recordOwnerUuid = null, userGroupAccessFilters = null },
   client = db
 ) => {
   const entityDefUuids =
@@ -622,7 +646,11 @@ export const fetchTableRowsCountByEntityDefUuid = async (
     DbUtils.runQueries(
       tx,
       entityDefUuids.map(
-        (entityDefUuid) => () => countTable({ survey, cycle, query: Query.create({ entityDefUuid }) }, tx)
+        (entityDefUuid) => () =>
+          countTable(
+            { survey, cycle, recordOwnerUuid, userGroupAccessFilters, query: Query.create({ entityDefUuid }) },
+            tx
+          )
       )
     )
   )
