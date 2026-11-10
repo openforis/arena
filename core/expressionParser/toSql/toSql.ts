@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import { types } from '../helpers/types'
 import { operators } from '../helpers/operators'
@@ -11,6 +11,15 @@ interface SqlResult {
   clause: string
   params: SqlParams
 }
+
+export interface ToSqlOptions {
+  // when specified, any other identifier is rejected (e.g. columns of the queried view only)
+  allowedIdentifiers?: Set<string>
+  // identifiers are qualified with it, so they cannot resolve to columns of other tables in scope
+  tableAlias?: string
+}
+
+type ToSqlFn = (node: Record<string, unknown>, params: SqlParams, options?: ToSqlOptions) => SqlResult
 
 const stdlib2sql: Record<string, string | ((param: string) => string)> = {
   pow: 'pow',
@@ -65,12 +74,12 @@ const _getOwn = <T>(record: Record<string, T>, key: unknown): T | null =>
 
 const getParamNameNext = (params: SqlParams): string => `_${Object.keys(params).length}`
 
-let _toSql: ((expression: Record<string, unknown>, params?: SqlParams) => SqlResult) | null = null
+let _toSql: ToSqlFn | null = null
 
-export const binary = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
+export const binary: ToSqlFn = (node, params, options = {}) => {
   const { operator, left, right } = node
-  const { clause: clauseLeft, params: paramsLeft } = _toSql!(left as Record<string, unknown>, params)
-  const { clause: clauseRight, params: paramsRight } = _toSql!(right as Record<string, unknown>, paramsLeft)
+  const { clause: clauseLeft, params: paramsLeft } = _toSql!(left as Record<string, unknown>, params, options)
+  const { clause: clauseRight, params: paramsRight } = _toSql!(right as Record<string, unknown>, paramsLeft, options)
   const sqlOperator = _getOwn(operators.js2sqlOperators, operator)
 
   if (!sqlOperator) {
@@ -90,17 +99,21 @@ export const binary = (node: Record<string, unknown>, params: SqlParams): SqlRes
   }
 }
 
-export const sequence = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
+export const sequence: ToSqlFn = (node, params, options = {}) => {
   const { expression } = node
-  const { clause, params: paramsGroup } = _toSql!(expression as Record<string, unknown>, params)
+  const { clause, params: paramsGroup } = _toSql!(expression as Record<string, unknown>, params, options)
   return {
     clause: `(${clause})`,
     params: paramsGroup,
   }
 }
 
-export const unary = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
-  const { clause: clauseArguments, params: paramsUnary } = _toSql!(node.argument as Record<string, unknown>, params)
+export const unary: ToSqlFn = (node, params, options = {}) => {
+  const { clause: clauseArguments, params: paramsUnary } = _toSql!(
+    node.argument as Record<string, unknown>,
+    params,
+    options
+  )
   const { operator } = node
   const sqlOperator = _getOwn(operatorToSql, operator)
   if (!sqlOperator) {
@@ -163,11 +176,21 @@ export const literal = (node: Record<string, unknown>, params: SqlParams): SqlRe
   }
 }
 
-export const identifier = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
+export const identifier: ToSqlFn = (node, params, options = {}) => {
+  const { allowedIdentifiers, tableAlias } = options
+  const { name } = node
+  if (allowedIdentifiers && !(typeof name === 'string' && allowedIdentifiers.has(name))) {
+    throw new SystemError('appErrors:expression.identifierNotFound', { name }, StatusCodes.BAD_REQUEST)
+  }
   const param = getParamNameNext(params)
+  const paramsWithName = { ...params, [param]: name }
+  if (!tableAlias) {
+    return { clause: `$/${param}:name/`, params: paramsWithName }
+  }
+  const aliasParam = getParamNameNext(paramsWithName)
   return {
-    clause: `$/${param}:name/`,
-    params: { ...params, [param]: node.name },
+    clause: `$/${aliasParam}:name/.$/${param}:name/`,
+    params: { ...paramsWithName, [aliasParam]: tableAlias },
   }
 }
 
@@ -176,10 +199,14 @@ interface SqlArgumentsResult {
   params: SqlParams
 }
 
-const argumentsToSql = (argumentNodes: Record<string, unknown>[], params: SqlParams): SqlArgumentsResult =>
+const argumentsToSql = (
+  argumentNodes: Record<string, unknown>[],
+  params: SqlParams,
+  options: ToSqlOptions
+): SqlArgumentsResult =>
   argumentNodes.reduce<SqlArgumentsResult>(
     (accumulator, argument) => {
-      const { clause, params: paramsCurrent } = _toSql!(argument, accumulator.params)
+      const { clause, params: paramsCurrent } = _toSql!(argument, accumulator.params, options)
       return { clauses: [...accumulator.clauses, clause], params: paramsCurrent }
     },
     { clauses: [], params }
@@ -189,7 +216,8 @@ const argumentsToSql = (argumentNodes: Record<string, unknown>[], params: SqlPar
 const stringMethodCall = (
   callee: Record<string, unknown>,
   argumentNodes: Record<string, unknown>[],
-  params: SqlParams
+  params: SqlParams,
+  options: ToSqlOptions
 ): SqlResult => {
   const property = callee.property as Record<string, unknown>
   const methodName = !callee.computed && property?.type === types.Identifier ? property.name : null
@@ -202,8 +230,12 @@ const stringMethodCall = (
     const errorKey = numArgs < method.arity ? 'functionHasTooFewArguments' : 'functionHasTooManyArguments'
     throw new SystemError(errorKey, { fnName: methodName, minArity: method.arity, maxArity: method.arity, numArgs })
   }
-  const { clause: clauseObject, params: paramsObject } = _toSql!(callee.object as Record<string, unknown>, params)
-  const { clauses: clausesArguments, params: paramsArguments } = argumentsToSql(argumentNodes, paramsObject)
+  const { clause: clauseObject, params: paramsObject } = _toSql!(
+    callee.object as Record<string, unknown>,
+    params,
+    options
+  )
+  const { clauses: clausesArguments, params: paramsArguments } = argumentsToSql(argumentNodes, paramsObject, options)
   const toText = (clause: string): string => `(${clause})::text`
   return {
     clause: method.toSql(toText(clauseObject), clausesArguments.map(toText)),
@@ -211,12 +243,12 @@ const stringMethodCall = (
   }
 }
 
-export const call = (node: Record<string, unknown>, params: SqlParams): SqlResult => {
+export const call: ToSqlFn = (node, params, options = {}) => {
   const { callee, arguments: argumentsNode } = node
   const calleeNode = callee as Record<string, unknown>
   const argumentNodes = argumentsNode as Record<string, unknown>[]
   if (calleeNode.type === types.MemberExpression) {
-    return stringMethodCall(calleeNode, argumentNodes, params)
+    return stringMethodCall(calleeNode, argumentNodes, params, options)
   }
   const name = (calleeNode.name ?? calleeNode.value) as string // callee can be literal or identifier
   const sqlFnNameOrFn = _getOwn(stdlib2sql, name)
@@ -224,7 +256,7 @@ export const call = (node: Record<string, unknown>, params: SqlParams): SqlResul
     throw new SystemError('undefinedFunction', { name })
   }
 
-  const { clauses, params: paramsArguments } = argumentsToSql(argumentNodes, params)
+  const { clauses, params: paramsArguments } = argumentsToSql(argumentNodes, params, options)
   const clauseArguments = clauses.join(', ')
 
   const clause =
@@ -236,7 +268,7 @@ export const call = (node: Record<string, unknown>, params: SqlParams): SqlResul
   }
 }
 
-const functionsByType: Record<string, (node: Record<string, unknown>, params: SqlParams) => SqlResult> = {
+const functionsByType: Record<string, ToSqlFn> = {
   [types.Identifier]: identifier,
   [types.Literal]: literal,
   [types.UnaryExpression]: unary,
@@ -245,13 +277,17 @@ const functionsByType: Record<string, (node: Record<string, unknown>, params: Sq
   [types.CallExpression]: call,
 }
 
-_toSql = (expression: Record<string, unknown>, params: SqlParams = {}): SqlResult => {
+export const toSql = (
+  expression: Record<string, unknown>,
+  params: SqlParams = {},
+  options: ToSqlOptions = {}
+): SqlResult => {
   const { type } = expression
-  const fn = _getOwn(functionsByType, expression.type)
+  const fn = _getOwn(functionsByType, type)
   if (!fn) {
     throw new SystemError('appErrors:undefinedExpressionType', { type })
   }
-  return fn(expression, params)
+  return fn(expression, params, options)
 }
 
-export const toSql = _toSql
+_toSql = toSql
