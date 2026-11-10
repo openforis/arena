@@ -151,7 +151,10 @@ describe('SQL generated from the survey', () => {
             ])
         ).multiple()
       )
-    ).build()
+    )
+      .build()
+      // not stored, but the SQL needs the survey id (schema name)
+      .then((survey: any) => ({ ...survey, id: 1 }))
 
   const virtualEntitySql = async (formula: string): Promise<string> => {
     const survey = await buildSurvey({ formula })
