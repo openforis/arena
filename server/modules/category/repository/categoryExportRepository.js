@@ -1,7 +1,7 @@
 import { Schemata } from '@openforis/arena-server'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
+import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as DbUtils from '@server/db/dbUtils'
@@ -70,16 +70,21 @@ const generateCategoryExportQuery = ({
   const extraProps = Category.getItemExtraDefKeys(category)
   const queryPrefix = getQueryPrefix({ surveyId, draft })
   const asAlias = (alias) => `AS ${params.add(alias, ':name')}`
+  // aliases are the export file headers
   const codesFields = levels.map(
-    (level, index) => `COALESCE(level_codes[${index + 1}], '') ${asAlias(`${CategoryLevel.getName(level)}_code`)}`
+    (level, index) =>
+      `COALESCE(level_codes[${index + 1}], '') ${asAlias(CategoryExportFile.getLevelCodeHeader({ level }))}`
   )
-  const getLabelsOrDescriptionsFields = (propName, aliasPrefix) =>
-    languages.map((lang) => {
-      const column = `(${DbUtils.getPropColCombined(propName, draft, 'i.', false)}) ->> ${params.add(lang)}`
-      return `${column} ${asAlias(`${aliasPrefix}_${lang}`)}`
+  const getLabelsOrDescriptionsFields = (propName, getHeader) =>
+    languages.map((language) => {
+      const column = `(${DbUtils.getPropColCombined(propName, draft, 'i.', false)}) ->> ${params.add(language)}`
+      return `${column} ${asAlias(getHeader({ language }))}`
     })
-  const labelsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.labels, 'label')
-  const descriptionsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.descriptions, 'description')
+  const labelsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.labels, CategoryExportFile.getLabelHeader)
+  const descriptionsFields = getLabelsOrDescriptionsFields(
+    CategoryItem.keysProps.descriptions,
+    CategoryExportFile.getDescriptionHeader
+  )
   const extraPropsFields = extraProps.map((extraPropName) => {
     const column = getExtraPropColumn({ columnPrefix: 'i.', extraPropNameParam: params.add(extraPropName), draft })
     return `${column} ${asAlias(extraPropName)}`
