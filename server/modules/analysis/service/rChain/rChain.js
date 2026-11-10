@@ -31,6 +31,7 @@ import {
 } from './rFile/system'
 import { RFileCommon, RFileCommonEnd } from './rFile/user'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
+import { getChainDirPath } from './rChainDir'
 
 const FILE_R_PROFILE = FileUtils.join(__dirname, 'rFile', '.Rprofile')
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -205,7 +206,12 @@ class RChain {
     const surveyInfo = Survey.getSurveyInfo(this.survey)
     const surveyName = Survey.getName(surveyInfo)
     const chainLabel = Chain.getLabel(Survey.getDefaultLanguage(surveyInfo))(this.chain)
-    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, surveyName, chainLabel)
+    this._dir = getChainDirPath({
+      outputDir: ProcessUtils.ENV.analysisOutputDir,
+      surveyName,
+      chainLabel,
+      chainUuid: Chain.getUuid(this.chain),
+    })
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
