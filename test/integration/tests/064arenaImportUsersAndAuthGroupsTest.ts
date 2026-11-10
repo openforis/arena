@@ -30,7 +30,7 @@ const archiveUserEmail = `arena_import_archive_user_${testId}@openforis-arena.or
 
 const sortNames = (names: string[]): string[] => [...names].sort((nameA, nameB) => nameA.localeCompare(nameB))
 
-const defaultGroupNames = sortNames(Survey.getDefaultAuthGroups().map(AuthGroup.getName))
+const defaultGroupNames = sortNames(Survey.getDefaultAuthGroups().map((group) => AuthGroup.getName(group)))
 
 let sourceSurveyId: number
 let sourceSurveyUuid: string
@@ -46,7 +46,7 @@ const createdSurveyIds: number[] = []
  */
 const createModifiedBackup = ({ users }: { users: object[] }): string => {
   const zip = new AdmZip(backupFilePath)
-  const survey = JSON.parse(zip.readAsText(ExportFile.survey))
+  const survey = JSON.parse(zip.readFile(ExportFile.survey).toString('utf8'))
   const surveyInfo = Survey.getSurveyInfo(survey)
   surveyInfo.authGroups = [
     ...Survey.getAuthGroups(surveyInfo),
@@ -85,7 +85,7 @@ const fetchSurveyGroupNames = async (surveyId: number): Promise<string[]> =>
     )
   )
 
-const fetchUserGroupNameInSurvey = async ({ userUuid, surveyId }: { userUuid: string; surveyId: number }) =>
+const fetchUserGroupNameInSurvey = ({ userUuid, surveyId }: { userUuid: string; surveyId: number }) =>
   db.oneOrNone(
     `SELECT g.name FROM auth_group_user gu
     JOIN auth_group g ON g.uuid = gu.group_uuid
@@ -95,7 +95,7 @@ const fetchUserGroupNameInSurvey = async ({ userUuid, surveyId }: { userUuid: st
     (row: any) => row?.name ?? null
   )
 
-const countUsersByEmail = async (email: string): Promise<number> =>
+const countUsersByEmail = (email: string): Promise<number> =>
   db.one(`SELECT COUNT(*) FROM "user" WHERE email = $1`, [email], (row: any) => Number(row.count))
 
 describe('Arena backup import: users and auth groups', () => {
