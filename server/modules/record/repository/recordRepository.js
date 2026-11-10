@@ -17,6 +17,8 @@ import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSchemaSurvey } from '@common/model/db/schemata'
 import { ColumnNodeDef } from '@common/model/db'
 
+import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
+
 const tableName = 'record'
 const tableColumns = [
   Record.keys.uuid,
@@ -133,6 +135,7 @@ export const countRecordsBySurveyId = async (
       nodeDefKeys,
       summaryDefs,
       search,
+      ownerUuid,
       qualifierNodeDefFilters,
       readableQualifierNodeDefFilterSets,
     })
@@ -370,24 +373,17 @@ export const fetchRecordsSummaryBySurveyId = async (
 
   // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
   // WHERE clause here applies to the outer query, where the root entity table alias is out of scope
-  const qualifierFilterParams = {}
-  const buildQualifierFiltersCondition = (filters, setIndex) =>
-    filters
-      .map(({ nodeDef, value }, index) => {
-        const paramName = `qualifierValue${setIndex}_${index}`
-        const colName = NodeDefTable.getColumnName(nodeDef)
-        qualifierFilterParams[paramName] = NodeDef.isCode(nodeDef) ? value?.code : value
-        return `"${colName}" = $/${paramName}/`
-      })
-      .join(' AND ')
-  const ownQualifiersCondition = buildQualifierFiltersCondition(qualifierNodeDefFilters, 0)
-  const readableQualifiersConditions = readableFilterSets.map((filters, index) =>
-    buildQualifierFiltersCondition(filters, index + 1)
-  )
-  if (ownQualifiersCondition) {
-    recordsSelectWhereConditions.push(
-      [ownQualifiersCondition, ...readableQualifiersConditions].map((condition) => `(${condition})`).join(' OR ')
-    )
+  const {
+    ownCondition: ownQualifiersCondition,
+    readableConditions: readableQualifiersConditions,
+    condition: qualifiersCondition,
+    params: qualifierFilterParams,
+  } = buildQualifierFiltersSqlConditions({
+    qualifierNodeDefFilters,
+    readableQualifierNodeDefFilterSets: readableFilterSets,
+  })
+  if (qualifiersCondition) {
+    recordsSelectWhereConditions.push(qualifiersCondition)
   }
   // records of the readable groups only (not matching the user's own group) can be read but not edited
   const readOnlySelect =
@@ -500,16 +496,20 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsUuidAndCycle = async ({ surveyId, recordUuidsIncluded = null }, client = db) =>
+export const fetchRecordsUuidAndCycle = async (
+  { surveyId, recordUuidsIncluded = null, ownerUuid = null },
+  client = db
+) =>
   client.any(
     `
     SELECT uuid, cycle 
     FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE
     ${Objects.isEmpty(recordUuidsIncluded) ? '' : `AND uuid IN ($/recordUuidsIncluded:csv/)`}
+    ${ownerUuid ? 'AND owner_uuid = $/ownerUuid/' : ''}
     ORDER BY cycle
   `,
-    { recordUuidsIncluded }
+    { recordUuidsIncluded, ownerUuid }
   )
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
