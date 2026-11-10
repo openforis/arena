@@ -2,6 +2,8 @@ import { useEffect } from 'react'
 import L from 'leaflet'
 import { useMap } from 'react-leaflet'
 
+import { escapeHtml } from '@core/stringUtils'
+
 import { useNotifyError } from '@webapp/components/hooks'
 
 import { getReadErrorDetails, readFileLayerGroup } from '../workspace/uploaded/readUploadedFile'
@@ -39,7 +41,8 @@ export const MapFileLayers = (props: Props): null => {
       try {
         const group = await readFileLayerGroup(await getFile())
         if (unmounted) return
-        if (label) group.bindTooltip(label, { sticky: true })
+        // Leaflet renders string tooltips as HTML
+        if (label) group.bindTooltip(escapeHtml(label), { sticky: true })
         group.addTo(map)
         groups.push(group)
       } catch (error) {

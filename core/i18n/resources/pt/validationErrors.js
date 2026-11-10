@@ -128,6 +128,7 @@ export default {
     keysEmpty: 'Defina pelo menos um atributo-chave',
 
     keysExceedingMax: 'Excede o número máximo de atributos-chave',
+    mapMarkerColorInvalid: 'A cor do marcador no mapa deve ser um código de cor como #ff0000',
     maxFileSizeInvalid: 'O tamanho máximo do arquivo deve ser maior que 0 e menor que {{max}}',
     nameInvalid: 'Nome inválido (deve conter apenas letras minúsculas, números e sublinhados, começando com uma letra)',
     taxonomyRequired: 'Taxonomia obrigatória',

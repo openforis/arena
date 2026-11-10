@@ -104,6 +104,7 @@ export const ValidatorErrorKeys = {
     formulaInvalid: 'validationErrors:nodeDefEdit.formulaInvalid',
     keysEmpty: 'validationErrors:nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors:nodeDefEdit.keysExceedingMax',
+    mapMarkerColorInvalid: 'validationErrors:nodeDefEdit.mapMarkerColorInvalid',
     maxFileSizeInvalid: 'validationErrors:nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors:nodeDefEdit.nameInvalid',
     qualifierCannotHaveApplicableExpression: 'validationErrors:nodeDefEdit.qualifierCannotHaveApplicableExpression',
