@@ -73,6 +73,7 @@ export default {
   mobileAppVersionNotSupported:
     'Arena Mobile-ийн энэ хувилбарыг сервер дэмжихгүй байна: {{minVersion}} эсвэл түүнээс хойшхи хувилбар руу шинэчилнэ үү',
   paramIsRequired: 'Парам {{param}} шаардлагатай',
+  paramMustBeInteger: 'Парам {{param}} бүхэл тоо байх ёстой',
   propUpdateNotAllowed: '"{{key}}" шинж чанарыг шинэчлэх боломжгүй',
   unableToFindParent: '{{name}}-н эцгийг олж чадахгүй байна',
   unableToFindNode: '{{name}} нэртэй зангилааг олж чадахгүй байна',

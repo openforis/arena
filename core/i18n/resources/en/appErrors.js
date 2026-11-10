@@ -58,6 +58,7 @@ export default {
   mobileAppVersionNotSupported:
     'This version of Arena Mobile is not supported by the server: update it to version {{minVersion}} or later',
   paramIsRequired: 'Param {{param}} is required',
+  paramMustBeInteger: 'Param {{param}} must be an integer',
   propUpdateNotAllowed: 'Property "{{key}}" cannot be updated',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',

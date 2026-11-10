@@ -76,6 +76,26 @@ export const getRequiredIntegerParam = (req, param) => {
   return value
 }
 
+const integerStringRegex = /^-?\d+$/
+
+/**
+ * Returns the value of an optional integer param.
+ * @param {object} req - The HTTP request.
+ * @param {string} param - The param name.
+ * @returns {number|null} The param value as an integer, or null when the param is not specified.
+ * @throws {SystemError} With status 400 when the param is specified but it is not an integer.
+ */
+export const getIntegerParam = (req, param) => {
+  const value = A.prop(param, getParams(req))
+  if (value === undefined || value === null || value === '') return null
+  // strict string check: Number() would also accept values like '1e3', '0x10' or ' 1 '
+  const integerValue = typeof value === 'string' && integerStringRegex.test(value) ? Number(value) : value
+  if (!Number.isSafeInteger(integerValue)) {
+    throw new SystemError('appErrors:paramMustBeInteger', { param }, StatusCodes.BAD_REQUEST)
+  }
+  return integerValue
+}
+
 /**
  * Returns the "key" param of a prop update request, failing when that prop cannot be updated through the request.
  * @param {object} req - The request.

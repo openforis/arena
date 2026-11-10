@@ -1,3 +1,4 @@
+import { isHexColor } from '@core/colorUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as SurveyFile from '@core/survey/surveyFile'
 
@@ -35,8 +36,6 @@ export const BRANDING_IMAGE_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 
 /** Maximum landing background upload size in bytes (5 MiB). */
 export const LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES = BRANDING_IMAGE_MAX_FILE_SIZE_BYTES
-
-const HEX_COLOR_REGEXP = /^#[0-9A-Fa-f]{6}$/
 
 const titleFontSizeRemByPreset: Record<FontSizePreset, string> = {
   [fontSizePreset.small]: '1.5rem',
@@ -96,8 +95,7 @@ export const isValidFontSizePreset = (value: unknown): value is FontSizePreset =
 /**
  * Returns whether value is a valid #RRGGBB primary color.
  */
-export const isValidPrimaryColor = (value: unknown): value is string =>
-  typeof value === 'string' && HEX_COLOR_REGEXP.test(value)
+export const isValidPrimaryColor = (value: unknown): value is string => isHexColor(value)
 
 /**
  * Returns whether branding props are valid for save.

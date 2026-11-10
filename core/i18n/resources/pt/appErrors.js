@@ -73,6 +73,7 @@ export default {
   mobileAppVersionNotSupported:
     'Esta versão do Arena Mobile não é suportada pelo servidor: atualize-a para a versão {{minVersion}} ou posterior',
   paramIsRequired: 'O parâmetro {{param}} é obrigatório',
+  paramMustBeInteger: 'O parâmetro {{param}} deve ser um número inteiro',
   propUpdateNotAllowed: 'A propriedade "{{key}}" não pode ser atualizada',
   unableToFindParent: 'Não foi possível encontrar o pai de {{name}}',
   unableToFindNode: 'Não foi possível encontrar nó com nome {{name}}',
