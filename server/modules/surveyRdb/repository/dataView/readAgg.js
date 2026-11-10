@@ -10,7 +10,9 @@ import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
 import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
 
-const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
+import { getUserGroupAccessCondition } from './userGroupAccessCondition'
+
+const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -41,6 +43,16 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
     queryBuilder.addParams({ recordOwnerUuid })
   }
 
+  const userGroupAccessCondition = getUserGroupAccessCondition({
+    survey,
+    accessFilters: userGroupAccessFilters,
+    recordUuidColumn: ViewDataNodeDef.columnSet.recordUuid,
+  })
+  if (userGroupAccessCondition) {
+    queryBuilder.where(userGroupAccessCondition.clause)
+    queryBuilder.addParams(userGroupAccessCondition.params)
+  }
+
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (filterClause) {
     queryBuilder.where(filterClause)
@@ -66,12 +78,13 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be included.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, recordOwnerUuid = null } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
   return client.tx(dbUtils.txOptionsReadOnly, (t) =>
     t.one(
@@ -95,6 +108,7 @@ export const countViewDataAgg = async (params, client = db) => {
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to filter records. If null, all records will be considered.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
@@ -102,8 +116,8 @@ export const countViewDataAgg = async (params, client = db) => {
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, stream } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null, limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
   const selectWithLimit = `${select}     
     ${A.isNil(limit) ? '' : 'LIMIT $/limit/'}
