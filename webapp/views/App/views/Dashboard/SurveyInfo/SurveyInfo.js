@@ -14,7 +14,7 @@ import { useI18n, useSystemConfigActivityLogDisabled } from '@webapp/store/syste
 import { SurveyActions, useChains, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
 import { useConfirm, useConfirmDelete } from '@webapp/components/hooks'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useAuthCanExportSurvey } from '@webapp/store/user/hooks'
+import { useAuthCanExportSurvey, useAuthCanExportSurveyData } from '@webapp/store/user/hooks'
 import { TestId } from '@webapp/utils/testId'
 
 import ButtonPublishSurvey from '@webapp/components/buttonPublishSurvey'
@@ -32,6 +32,7 @@ const SurveyInfo = (props) => {
 
   const canEditSurvey = useAuthCanEditSurvey()
   const canExportSurvey = useAuthCanExportSurvey()
+  const canExportSurveyData = useAuthCanExportSurveyData()
   const chains = useChains()
   const hasChains = chains?.length > 0
   const activityLogDisabled = useSystemConfigActivityLogDisabled()
@@ -151,7 +152,7 @@ const SurveyInfo = (props) => {
         testId: TestId.dashboard.surveyExportOnlySurveyBtn,
       },
     ]
-    if (!Survey.isTemplate(surveyInfo)) {
+    if (canExportSurveyData && !Survey.isTemplate(surveyInfo)) {
       items.push({
         key: 'survey-export-with-data',
         label: 'homeView:dashboard.exportWithData',
@@ -183,7 +184,7 @@ const SurveyInfo = (props) => {
       }
     }
     return items
-  }, [activityLogDisabled, dispatch, hasChains, surveyInfo])
+  }, [activityLogDisabled, canExportSurveyData, dispatch, hasChains, surveyInfo])
 
   return (
     <div className="home-dashboard__survey-info">
