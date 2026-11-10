@@ -78,6 +78,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'El registro con claves "{{keyValues}}" está en el paso de análisis y no se puede actualizar',
     recordKeyMissingOrInvalid: 'Valor faltante o no válido para el atributo clave "{{keyName}}"',
+    recordNotEditable: 'El registro con claves "{{keyValues}}" no se puede actualizar: no tiene permiso para editarlo',
     recordNotFound: 'Registro con claves "{{keyValues}}" no encontrado',
   },
 
