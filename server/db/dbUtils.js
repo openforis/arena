@@ -215,6 +215,22 @@ export const normalizeOffset = (offset) => {
 
 export const formatQuery = pgp.as.format
 
+/**
+ * Collects positional query parameters, so that values (e.g. stored names or language codes) are escaped by pg-promise
+ * instead of being written into the SQL text.
+ * @param {Array<unknown>} [initialValues] - Values of the first parameters ($1, $2...).
+ * @returns {{values: Array<unknown>, add: function(unknown, string=): string}} - The collected values and a function that adds
+ * a value and returns its placeholder (e.g. "$2", or "$2:name" when the modifier ":name" is specified).
+ */
+export const newQueryParams = (initialValues = []) => {
+  const values = [...initialValues]
+  const add = (value, modifier = '') => {
+    values.push(value)
+    return `$${values.length}${modifier}`
+  }
+  return { values, add }
+}
+
 export const asName = (name) => (name.startsWith('"') ? name : StringUtils.quoteDouble(name))
 
 export const getPublishedCondition = ({ draft, tableAlias = null }) => {

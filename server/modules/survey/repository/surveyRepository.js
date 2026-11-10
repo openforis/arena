@@ -4,7 +4,7 @@ import camelize from 'camelize'
 import { db } from '@server/db/db'
 import * as DB from '@server/db'
 
-import { now as dbNow, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
+import { now as dbNow, newQueryParams, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
 
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
@@ -426,9 +426,9 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
 export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
   client.none(
     `UPDATE survey
-    SET config = jsonb_set(coalesce(config, '{}'), '{${key}}', $/value/)
+    SET config = jsonb_set(coalesce(config, '{}'), $/path/::text[], $/value/)
     WHERE id = $/surveyId/`,
-    { surveyId, value }
+    { surveyId, path: [key], value }
   )
 
 // removes only one key: the other keys (e.g. mapCustomLayers) must survive
@@ -442,20 +442,22 @@ export const deleteSurvey = async (id, client = db) =>
   client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
-  const propsUpdateCond = A.pipe(
-    A.map(
-      (langCode) => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`
-    ),
-    A.join(' ')
-  )(langCodes)
+  // one "#-" operator per path, with the path passed as a parameter
+  const params = newQueryParams([id])
+  const propsUpdateCond = langCodes
+    .flatMap((langCode) => [
+      `#- ${params.add([NodeDef.propKeys.labels, langCode])}::text[]`,
+      `#- ${params.add([NodeDef.propKeys.descriptions, langCode])}::text[]`,
+    ])
+    .join(' ')
 
   await client.none(
     `
-    UPDATE survey 
+    UPDATE survey
     SET props = props ${propsUpdateCond}
     WHERE id = $1
   `,
-    [id]
+    params.values
   )
 }
 

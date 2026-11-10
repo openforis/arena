@@ -24,7 +24,7 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
         (cr.props)->>'${CollectImportReportItem.propKeys.expressionType}' as type,
         (cr.props)->>'${CollectImportReportItem.propKeys.expression}' as expression,
         (cr.props)->>'${CollectImportReportItem.propKeys.applyIf}' as apply_if,
-        (cr.props)#>>'{${CollectImportReportItem.propKeys.messages},${messageLangCode}}' as message,
+        (cr.props)#>>$/messagePath/::text[] as message,
         cr.props as props,
         cr.resolved as resolved
       FROM ${getSurveyDBSchema(surveyId)}.import_report cr
@@ -33,7 +33,9 @@ export const fetchItemsStream = async ({ surveyId, messageLangCode }) => {
       ORDER BY id
    `
 
-  return new DbUtils.QueryStream(DbUtils.formatQuery(select, []))
+  return new DbUtils.QueryStream(
+    DbUtils.formatQuery(select, { messagePath: [CollectImportReportItem.propKeys.messages, messageLangCode] })
+  )
 }
 
 export const countItems = async ({ surveyId, excludeResolved }, client) =>

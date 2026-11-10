@@ -17,6 +17,8 @@ export const getSurveyDBSchema = Schemata.getSchemaSurvey
 // ====== UPDATE
 
 /**
+ * @param surveyId
+ * @param client
  * @deprecated - Implement it in survey repository.
  */
 export const markSurveyDraft = async (surveyId, client = db) =>
@@ -118,5 +120,6 @@ export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordU
 }
 
 export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
-  client.none(`
-    UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName} SET props = props #- '{${deletePath.join(',')}}'`)
+  client.none(`UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName} SET props = props #- $/deletePath/::text[]`, {
+    deletePath,
+  })
