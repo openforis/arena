@@ -97,6 +97,10 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
     throw new UnauthorizedError(User.getName(user))
   }
 
+  // Survey groups can be assigned only in their own survey
+  if (AuthGroup.isSurveyGroup(group) && AuthGroup.getSurveyUuid(group) !== Survey.getUuid(surveyInfo)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
   // If the survey is not published, only system admins, survey managers and survey admins can be invited
   if (
     !Survey.isPublished(surveyInfo) &&
@@ -107,6 +111,27 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
   }
 }
 
+/**
+ * Checks if a user has roles or invitations only in the specified survey (or none), and is not a system admin.
+ * Whoever sets the password of a pending user gets all its roles: only then a survey can manage its invitation.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.userToInvite - The user to check (with auth groups).
+ * @param {!string} params.surveyUuid - UUID of the survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<boolean>} - True if the user is involved only in the specified survey.
+ */
+export const isUserInvolvedOnlyInSurvey = async ({ userToInvite, surveyUuid }, client = db) => {
+  if (User.isSystemAdmin(userToInvite) || User.hasAuthGroupsInOtherSurveys({ surveyUuid })(userToInvite)) {
+    return false
+  }
+  const userUuid = User.getUuid(userToInvite)
+  const invitedToOtherSurveys = await UserInvitationManager.existsUserInvitationInOtherSurveys(
+    { userUuid, surveyUuid },
+    client
+  )
+  return !invitedToOtherSurveys
+}
+
 const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParams, i18n }, t) => {
   const surveyUuid = Survey.getUuid(survey)
   const userToInviteUuid = User.getUuid(userToInvite)
@@ -114,6 +139,49 @@ const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParam
   await _generateResetPasswordAndSendEmail({ email, emailParams, i18n }, t)
   await UserInvitationManager.deleteUserInvitation({ surveyUuid, userUuid: userToInviteUuid }, t)
   await UserInvitationManager.insertUserInvitation({ user, survey, userToInvite }, t)
+}
+
+/**
+ * Invites a user who has not accepted an invitation yet (pending user), or sends again the invitation to this survey.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user sending the invitation.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.group - The group to add the user to.
+ * @param {!object} params.userToInvite - The pending user.
+ * @param {!string} params.email - Email of the pending user.
+ * @param {boolean} params.repeatInvitation - Whether to send again the invitation to this survey.
+ * @param {!object} params.emailParams - Parameters of the invitation email.
+ * @param {!object} params.i18n - The i18n object.
+ * @param {pgPromise.IDatabase} t - The database transaction.
+ */
+const _invitePendingUser = async (
+  { user, survey, group, userToInvite, email, repeatInvitation, emailParams, i18n },
+  t
+) => {
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  const userUuid = User.getUuid(userToInvite)
+  // an old removed invitation allows the user to be invited again
+  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({ surveyUuid, userUuid }, t)
+  const invitationPending = Boolean(invitation) && !UserInvitation.hasBeenRemoved(invitation)
+
+  if (repeatInvitation) {
+    // only a pending invitation to this survey can be sent again
+    if (!invitationPending) {
+      throw new SystemError('appErrors:userNotInvitedToSurvey', { email }, StatusCodes.CONFLICT)
+    }
+  } else {
+    // the invitation (password reset) link is account-wide: a pending user involved in other surveys
+    // can be added only by a system admin
+    if (
+      invitationPending ||
+      (!User.isSystemAdmin(user) && !(await isUserInvolvedOnlyInSurvey({ userToInvite, surveyUuid }, t)))
+    ) {
+      throw new SystemError('appErrors:userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
+    }
+    await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
+  }
+  await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
 }
 
 const _inviteUser = async (
@@ -144,8 +212,6 @@ const _inviteUser = async (
 
     const userToInvite = await UserManager.fetchUserByEmail(email, t)
     if (userToInvite) {
-      const userToInviteUuid = User.getUuid(userToInvite)
-
       // User to invite already exists
       if (User.hasAccepted(userToInvite)) {
         // User has already accepted an invitation previously
@@ -156,23 +222,8 @@ const _inviteUser = async (
         await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
         // Send email
         await Mailer.sendEmail({ to: email, msgKey: 'emails:userInviteExistingUser', msgParams: emailParams, lang })
-      } else if (repeatInvitation) {
-        // User has a pending invitation still
-        await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
       } else {
-        // check if there is an old removed invitation; in that case allow the user to be invited again;
-        const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-          surveyUuid,
-          userUuid: userToInviteUuid,
-        })
-        if (invitation && !UserInvitation.hasBeenRemoved(invitation)) {
-          throw new SystemError('appErrors:userHasPendingInvitation', { email }, StatusCodes.CONFLICT)
-        } else {
-          // Add user to group
-          await UserManager.addUserToGroup({ user, surveyInfo, group, userToAdd: userToInvite }, t)
-
-          await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
-        }
+        await _invitePendingUser({ user, survey, group, userToInvite, email, repeatInvitation, emailParams, i18n }, t)
       }
       return userToInvite
     } else {

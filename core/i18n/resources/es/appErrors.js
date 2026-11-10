@@ -137,12 +137,15 @@ export default {
   userHasRole: 'El usuario dado ya tiene un rol en esta encuesta',
   userHasRole_other: 'Los usuarios dados ya tienen un rol en esta encuesta',
   userInvalid: 'Usuario inválido',
+  userInvitationLinkNotAvailable:
+    'Solo un administrador del sistema puede copiar el enlace de invitación de este usuario, porque el usuario tiene roles o invitaciones fuera de esta encuesta',
   surveyCompareFileTooLarge:
     'El archivo de la encuesta es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
   userNotFound: 'Usuario no encontrado: {{userUuid}}',
+  userNotInvitedToSurvey: 'El usuario no tiene ninguna invitación pendiente a esta encuesta',
   usersBackupImport: {
     invalidFile: 'El archivo no es una copia de seguridad de usuarios de Arena válida',
   },

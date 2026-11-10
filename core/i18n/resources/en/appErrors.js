@@ -128,12 +128,15 @@ Try to refresh the page.`,
   userHasRole: 'The given user has already a role in this survey',
   userHasRole_other: 'The given users have already a role in this survey',
   userInvalid: 'Invalid user',
+  userInvitationLinkNotAvailable:
+    'The invitation link of this user can be copied only by a system administrator, because the user has roles or invitations outside this survey',
   surveyCompareFileTooLarge:
     'The survey file is too big (max {{maxSize}} MB): export the survey without data, records and their files are not needed to compare surveys',
   userIsAdmin: 'The given user is already a system administrator',
   userNotAllowedToChangePref: 'User not allowed to change pref',
   userNotAuthorized: 'User {{userName}} is not authorized',
   userNotFound: 'User not found: {{userUuid}}',
+  userNotInvitedToSurvey: 'The user has no pending invitation to this survey',
   usersBackupImport: {
     invalidFile: 'The file is not a valid Arena users backup',
   },
