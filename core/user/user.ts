@@ -85,6 +85,27 @@ export const getAuthGroupsNonSurvey = () => (user: any) => {
 export const getSystemAdminGroup = (user: any) => user && getAuthGroups(user).find(AuthGroup.isSystemAdminGroup)
 export const getSurveyManagerGroup = (user: any) => user && getAuthGroups(user).find(AuthGroup.isSurveyManagerGroup)
 
+/**
+ * Returns a predicate checking if a group is a survey group not belonging to the given survey.
+ * @param surveyUuid - UUID of the survey (null to match every survey group).
+ * @returns The predicate.
+ */
+const _isGroupOfOtherSurvey =
+  (surveyUuid: string | null) =>
+  (group: any): boolean =>
+    AuthGroup.isSurveyGroup(group) && AuthGroup.getSurveyUuid(group) !== surveyUuid
+
+/**
+ * Checks if the user has roles in surveys other than the given one.
+ * @param params - The parameters.
+ * @param params.surveyUuid - UUID of the survey.
+ * @returns A function returning true if the user has roles in other surveys.
+ */
+export const hasAuthGroupsInOtherSurveys =
+  ({ surveyUuid }: { surveyUuid: string }) =>
+  (user: any): boolean =>
+    getAuthGroups(user).some(_isGroupOfOtherSurvey(surveyUuid))
+
 export const assocAuthGroups = (authGroups: any[]) =>
   A.pipe(
     A.assoc(keys.authGroups, authGroups),
@@ -96,6 +117,15 @@ export const assocAuthGroups = (authGroups: any[]) =>
 
 const _updateAuthGroups = (updateFn: (a: unknown[]) => unknown[]) => (user: any) =>
   A.pipe(getAuthGroups, updateFn, (authGroups) => assocAuthGroups(authGroups as any[])(user))(user)
+
+/**
+ * Removes the roles in surveys other than the given one, keeping the global ones (system admin, survey manager).
+ * @param params - The parameters.
+ * @param [params.surveyUuid] - UUID of the survey whose roles are kept (if null, only the global roles are kept).
+ * @returns A function returning the updated user.
+ */
+export const dissocAuthGroupsOfOtherSurveys = ({ surveyUuid = null }: { surveyUuid?: string | null }) =>
+  _updateAuthGroups((authGroups) => authGroups.filter((group) => !_isGroupOfOtherSurvey(surveyUuid)(group)))
 
 export const assocAuthGroup = (authGroup: any) => _updateAuthGroups(A.append(authGroup))
 export const dissocAuthGroup = (authGroup: any) => _updateAuthGroups(A.reject(AuthGroup.isEqual(authGroup as never)))

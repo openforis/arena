@@ -140,12 +140,15 @@ Essayez de rafraîchir la page.`,
   userHasRole: "L'utilisateur a déjà un rôle dans ce formulaire",
   userHasRole_other: 'Les utilisateurs ont déjà un rôle dans ce formulaire',
   userInvalid: 'Utilisateur invalide',
+  userInvitationLinkNotAvailable:
+    "Seul un administrateur système peut copier le lien d'invitation de cet utilisateur, car l'utilisateur a des rôles ou des invitations en dehors de ce formulaire",
   surveyCompareFileTooLarge:
     'Le fichier du formulaire est trop volumineux (max {{maxSize}} Mo) : exportez le formulaire sans données, les enregistrements et leurs fichiers ne sont pas nécessaires pour comparer des formulaires',
   userIsAdmin: "L'utilisateur est déjà administrateur système",
   userNotAllowedToChangePref: 'Utilisateur non autorisé à modifier les préférences',
   userNotAuthorized: 'Utilisateur {{userName}} non autorisé',
   userNotFound: 'Utilisateur introuvable : {{userUuid}}',
+  userNotInvitedToSurvey: "L'utilisateur n'a aucune invitation en attente pour ce formulaire",
   usersBackupImport: {
     invalidFile: "Le fichier n'est pas une sauvegarde d'utilisateurs Arena valide",
   },

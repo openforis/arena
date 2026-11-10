@@ -135,12 +135,15 @@ Pokušajte da osvježite stranicu.`,
   userHasRole_few: 'Navedeni korisnici već imaju ulogu u ovom istraživanju',
   userHasRole_other: 'Navedeni korisnici već imaju ulogu u ovom istraživanju',
   userInvalid: 'Neispravan korisnik',
+  userInvitationLinkNotAvailable:
+    'Samo sistemski administrator može kopirati link pozivnice ovog korisnika, jer korisnik ima uloge ili pozivnice izvan ovog istraživanja',
   surveyCompareFileTooLarge:
     'Fajl istraživanja je prevelik (najviše {{maxSize}} MB): izvezite istraživanje bez podataka, zapisi i njihovi fajlovi nisu potrebni za poređenje istraživanja',
   userIsAdmin: 'Navedeni korisnik je već sistemski administrator',
   userNotAllowedToChangePref: 'Korisniku nije dozvoljeno da mijenja postavku',
   userNotAuthorized: 'Korisnik {{userName}} nije ovlašćen',
   userNotFound: 'Korisnik nije pronađen: {{userUuid}}',
+  userNotInvitedToSurvey: 'Korisnik nema pozivnicu na čekanju za ovo istraživanje',
   usersBackupImport: {
     invalidFile: 'Fajl nije ispravna rezervna kopija korisnika Arena',
   },
