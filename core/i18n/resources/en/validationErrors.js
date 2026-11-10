@@ -78,6 +78,7 @@ export default {
     recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
     recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
     recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
+    recordNotEditable: 'Record with keys "{{keyValues}}" cannot be updated: you are not allowed to edit it',
     recordNotFound: 'Record with keys "{{keyValues}}" not found',
   },
 

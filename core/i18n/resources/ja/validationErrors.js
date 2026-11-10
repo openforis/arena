@@ -77,6 +77,7 @@ export default {
     recordAlreadyExisting: 'キー「{{keyValues}}」の記録は既に存在します',
     recordInAnalysisStepCannotBeUpdated: 'キー「{{keyValues}}」の記録は分析ステップにあるため更新できません',
     recordKeyMissingOrInvalid: 'キー属性「{{keyName}}」の値が未入力または無効です',
+    recordNotEditable: 'キー「{{keyValues}}」の記録は更新できません：編集する権限がありません',
     recordNotFound: 'キー「{{keyValues}}」の記録が見つかりません',
   },
 
