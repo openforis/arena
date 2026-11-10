@@ -9,6 +9,7 @@ import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tem
 import * as TempFileManager from '@server/modules/file/manager/tempFileManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as ProcessUtils from '@core/processUtils'
+import { uuidv4 } from '@core/uuid'
 
 describe('TempFileManager storage routing', () => {
   test('routes to S3 functions when S3 storage is configured, regardless of file size', () => {
@@ -69,7 +70,7 @@ describe('TempFileManager storage routing', () => {
     // that startup path, so ensure it exists here too (this is the actual temp folder, not a mock).
     await FileUtils.mkdir(ProcessUtils.ENV.tempFolder)
 
-    const fileId = 'test-file-no-size-branch'
+    const fileId = uuidv4()
     await TempFileManager.writeChunkToTempFile({
       fileId,
       chunk: 1,
