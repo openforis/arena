@@ -79,6 +79,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Түлхүүр "{{keyValues}}"-тэй бичлэг нь шинжилгээний алхамд байгаа тул шинэчлэх боломжгүй',
     recordKeyMissingOrInvalid: 'Түлхүүр шинж чанар "{{keyName}}"-д дутуу эсвэл хүчингүй утга',
+    recordNotEditable: 'Түлхүүр "{{keyValues}}"-тэй бичлэгийг шинэчлэх боломжгүй: танд үүнийг засах эрх байхгүй',
     recordNotFound: 'Түлхүүр "{{keyValues}}"-тэй бичлэг олдсонгүй',
   },
 
