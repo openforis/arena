@@ -18,7 +18,7 @@ import * as CollectImportService from '../service/collectImportService'
 export const init = (app) => {
   // CREATE
 
-  app.post('/survey/collect-import', async (req, res, next) => {
+  app.post('/survey/collect-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
     try {
       const tempFile = await processChunkedFileForBackgroundMerge({ req })
       if (tempFile) {
