@@ -21,6 +21,7 @@ import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as UserInvitationManager from './userInvitationManager'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -76,8 +77,25 @@ const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = nu
   return groupsToAdd
 }
 
+/**
+ * Throws an error if the group is a survey group not belonging to the specified survey.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the operation.
+ * @param {!object} params.group - The group to check.
+ * @param {object} [params.surveyInfo] - The survey info.
+ */
+const _checkGroupBelongsToSurvey = ({ user, group, surveyInfo }) => {
+  if (
+    AuthGroup.isSurveyGroup(group) &&
+    (!surveyInfo || AuthGroup.getSurveyUuid(group) !== Survey.getUuid(surveyInfo))
+  ) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+}
+
 export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
+    _checkGroupBelongsToSurvey({ user, group, surveyInfo })
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
     const userUuid = User.getUuid(userToAdd)
     const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)

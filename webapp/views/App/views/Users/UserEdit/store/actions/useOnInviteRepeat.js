@@ -11,11 +11,13 @@ import { appModuleUri, userModules } from '@webapp/app/appModules'
 
 import { LoaderActions, NotificationActions } from '@webapp/store/ui'
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
+import { useSurveyUuid } from '@webapp/store/survey/hooks'
 
 export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
   const surveyId = useSurveyId()
+  const surveyUuid = useSurveyUuid()
   const surveyCycleKey = useSurveyCycleKey()
 
   return useCallback(
@@ -24,9 +26,8 @@ export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
         e.stopPropagation()
         dispatch(LoaderActions.showLoader())
 
-        const authGroups = User.getAuthGroups(userToInvite)
-        // authGroups is never empty when repeating an invitation
-        const authGroup = authGroups[0]
+        // the server accepts only the groups of the current survey (or global ones)
+        const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid, defaultToMainGroup: true })(userToInvite)
 
         const userInvite = UserInvite.newUserGroupInvitation(User.getEmail(userToInvite), authGroup.uuid)
         const userInviteParams = { ...userInvite, surveyCycleKey, repeatInvitation: true }
@@ -52,6 +53,6 @@ export const useOnInviteRepeat = ({ userToInvite, hasToNavigate = true }) => {
         dispatch(LoaderActions.hideLoader())
       }
     },
-    [dispatch, navigate, surveyCycleKey, userToInvite]
+    [dispatch, hasToNavigate, navigate, surveyCycleKey, surveyId, surveyUuid, userToInvite]
   )
 }
