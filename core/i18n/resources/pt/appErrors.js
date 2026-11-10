@@ -131,12 +131,15 @@ Tente atualizar a página.`,
   userHasRole: 'O usuário informado já possui uma função neste inventário',
   userHasRole_other: 'Os usuários informados já possuem uma função neste inventário',
   userInvalid: 'Usuário inválido',
+  userInvitationLinkNotAvailable:
+    'Somente um administrador do sistema pode copiar o link de convite deste usuário, pois o usuário possui funções ou convites fora deste inventário',
   surveyCompareFileTooLarge:
     'O arquivo do inventário é grande demais (máx. {{maxSize}} MB): exporte o inventário sem dados, os registros e seus arquivos não são necessários para comparar inventários',
   userIsAdmin: 'O usuário informado já é administrador do sistema',
   userNotAllowedToChangePref: 'Usuário sem permissão para alterar preferências',
   userNotAuthorized: 'Usuário {{userName}} não está autorizado',
   userNotFound: 'Usuário não encontrado: {{userUuid}}',
+  userNotInvitedToSurvey: 'O usuário não possui nenhum convite pendente para este inventário',
   usersBackupImport: {
     invalidFile: 'O arquivo não é um backup de usuários do Arena válido',
   },

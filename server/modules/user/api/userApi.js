@@ -107,6 +107,24 @@ export const init = (app) => {
 
   // ==== READ
 
+  /**
+   * Removes from the users the roles in surveys other than the specified one: they are visible only to system admins
+   * and to the users themselves.
+   * @param {!object} params - The parameters.
+   * @param {!object} params.user - The user making the request.
+   * @param {string} [params.surveyUuid] - UUID of the survey whose roles are kept (only global roles kept if null).
+   * @param {!object[]} params.users - The users to filter.
+   * @returns {object[]} - The filtered users.
+   */
+  const _dissocOtherSurveysAuthGroups = ({ user, surveyUuid = null, users }) => {
+    if (User.isSystemAdmin(user)) return users
+    return users.map((userItem) =>
+      !userItem || User.isEqual(user)(userItem)
+        ? userItem
+        : User.dissocAuthGroupsOfOtherSurveys({ surveyUuid })(userItem)
+    )
+  }
+
   const _fetchUser = async (req) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
@@ -115,8 +133,23 @@ export const init = (app) => {
     return userResult
   }
 
+  /**
+   * Returns the UUID of the survey in the path, if the user can view it.
+   * @param {!object} req - The request.
+   * @returns {Promise<string|null>} - The survey UUID or null.
+   */
+  const _fetchPathSurveyUuidViewable = async (req) => {
+    // path param only: the user view permission does not depend on the survey
+    const { surveyId } = req.params
+    if (!surveyId) return null
+    const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+    return Authorizer.canViewSurvey(Request.getUser(req), surveyInfo) ? Survey.getUuid(surveyInfo) : null
+  }
+
   const _getUser = async (req, res) => {
-    const user = await _fetchUser(req)
+    const surveyUuid = await _fetchPathSurveyUuidViewable(req)
+    const users = [await _fetchUser(req)]
+    const [user] = _dissocOtherSurveysAuthGroups({ user: Request.getUser(req), surveyUuid, users })
     res.json(user)
   }
 
@@ -283,9 +316,16 @@ export const init = (app) => {
       })
       const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
       const canViewEmails = Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
+      const listWithSurveyGroups = _dissocOtherSurveysAuthGroups({
+        user,
+        surveyUuid: Survey.getUuid(surveyInfo),
+        users: list,
+      })
       const listFiltered = canViewEmails
-        ? list
-        : list.map((userItem) => (User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)))
+        ? listWithSurveyGroups
+        : listWithSurveyGroups.map((userItem) =>
+            User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)
+          )
 
       res.json({ list: listFiltered })
     } catch (error) {
@@ -299,8 +339,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, userUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
         const serverUrl = Request.getServerUrl(req)
-        const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+        const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
         res.json(url)
       } catch (error) {
         next(error)
@@ -325,8 +366,9 @@ export const init = (app) => {
   app.get('/user/:userUuid/resetpasswordurl', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
       const { surveyId, userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
-      const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+      const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
       res.json(url)
     } catch (error) {
       next(error)
