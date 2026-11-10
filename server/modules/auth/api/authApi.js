@@ -22,10 +22,28 @@ const Logger = Log.getLogger('AuthAPI')
 
 const sendResponse = (res, user, survey = null, error = null) => res.json({ user, survey, error })
 
+/**
+ * Removes the survey from the user prefs and sends the user without survey.
+ * @param {!object} res - The response.
+ * @param {!object} user - The user.
+ * @param {!number} surveyId - ID of the survey to remove from the user prefs.
+ * @returns {Promise<void>} - Resolves when the response has been sent.
+ */
+const deletePrefSurveyAndSendUser = async (res, user, surveyId) => {
+  const _user = User.deletePrefSurvey(surveyId)(user)
+  sendResponse(res, await UserService.updateUserPrefsAndFetchGroups(_user))
+}
+
 const sendUserSurvey = async (res, user, surveyId) => {
   try {
     let survey = await SurveyService.fetchSurveyById({ surveyId, draft: false, validate: false })
-    if (Authorizer.canEditSurvey(user, Survey.getSurveyInfo(survey))) {
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    if (!Authorizer.canViewSurvey(user, surveyInfo)) {
+      // the current survey pref can be set to any survey id: treat a survey the user cannot view as not found
+      await deletePrefSurveyAndSendUser(res, user, surveyId)
+      return
+    }
+    if (Authorizer.canEditSurvey(user, surveyInfo)) {
       survey = await SurveyService.fetchSurveyById({ surveyId, draft: true, validate: true })
       survey = await SurveyService.fetchAndAssocStorageInfo({ survey })
     }
@@ -41,8 +59,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
     }
 
     // Survey not found (or otherwise inaccessible) with user pref: removing user pref
-    const _user = User.deletePrefSurvey(surveyId)(user)
-    sendResponse(res, await UserService.updateUserPrefsAndFetchGroups(_user))
+    await deletePrefSurveyAndSendUser(res, user, surveyId)
   }
 }
 
