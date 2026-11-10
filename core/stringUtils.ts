@@ -112,9 +112,9 @@ export const removeSuffix =
 export const quote = (text: string): string => (isBlank(text) ? '' : `'${text}'`)
 
 /**
- * Quote text with double quotes.
+ * Quote text with double quotes (e.g. SQL identifiers), escaping the double quotes it contains by doubling them.
  */
-export const quoteDouble = (text: string): string => (isBlank(text) ? '' : `"${text}"`)
+export const quoteDouble = (text: string): string => (isBlank(text) ? '' : `"${String(text).replaceAll('"', '""')}"`)
 
 /**
  * Remove single quotes from beginning and end.
