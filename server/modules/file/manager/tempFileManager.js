@@ -49,7 +49,18 @@ export const deleteTempFile = async (fileNameOrPath) => {
   await deleteFn({ fileNameOrPath })
 }
 
+/**
+ * Throws an error if the file id is not a uuid: it is used to build temp file names.
+ * @param {string} fileId - The file id to check.
+ */
+const checkFileIdIsValid = (fileId) => {
+  if (typeof fileId !== 'string' || !isUuid(fileId)) {
+    throw new Error(`Invalid file id: ${fileId}`)
+  }
+}
+
 export const writeChunkToTempFile = async ({ fileId, chunk, filePath = null, fileContent = null }) => {
+  checkFileIdIsValid(fileId)
   const writeChunkFunction = getStorageFunctionOrThrow({
     functionByStorageType: chunkWriteFunctionByStorageType,
     operation: 'writeChunkToTempFile',
@@ -58,6 +69,7 @@ export const writeChunkToTempFile = async ({ fileId, chunk, filePath = null, fil
 }
 
 export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
+  checkFileIdIsValid(fileId)
   const mergeChunksFunction = getStorageFunctionOrThrow({
     functionByStorageType: chunkMergeFunctionByStorageType,
     operation: 'mergeTempChunks',
@@ -73,12 +85,6 @@ export const keepFileFunctionByStorageType = {
 export const getKeptFilePathFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.getKeptFilePath,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.getKeptFilePath,
-}
-
-const checkFileIdIsValid = (fileId) => {
-  if (!isUuid(fileId)) {
-    throw new Error(`Invalid file id: ${fileId}`)
-  }
 }
 
 /**
