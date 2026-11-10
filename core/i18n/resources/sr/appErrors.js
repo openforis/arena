@@ -61,6 +61,7 @@ export default {
   mobileAppVersionNotSupported:
     'Server ne podržava ovu verziju aplikacije Arena Mobile: ažurirajte je na verziju {{minVersion}} ili noviju',
   paramIsRequired: 'Parametar {{param}} je obavezan',
+  propUpdateNotAllowed: 'Svojstvo "{{key}}" ne može da se ažurira',
   unableToFindParent: 'Nije moguće pronaći nadređeni čvor za {{name}}',
   unableToFindNode: 'Nije moguće pronaći čvor sa nazivom {{name}}',
   unableToFindSibling: 'Nije moguće pronaći srodni čvor sa nazivom {{name}}',
@@ -86,6 +87,8 @@ Pokušajte da osvježite stranicu.`,
     nodeDefNameNotFound: 'Definicija čvora nije pronađena: {{name}}',
     dataMigrationInProgress: 'Ovo istraživanje se nadograđuje, molimo pokušajte ponovo uskoro.',
     fileNotFound: 'Fajl nije pronađen',
+    languageCodeInvalid: 'Kod jezika nije važeći: {{lang}}',
+    cycleKeysInvalid: 'Ciklusi moraju biti numerisani redom, počevši od 1',
   },
   unsupportedFunctionType: 'Nepodržan tip funkcije: {{exprType}}',
   // AI gateway errors

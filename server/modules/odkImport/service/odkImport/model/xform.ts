@@ -1,5 +1,5 @@
 import * as StringUtils from '@core/stringUtils'
-import { languageCodes } from '@core/app/languages'
+import { getLanguageLabel, languageCodes } from '@core/app/languages'
 
 import * as FileXml from '@server/utils/file/fileXml'
 
@@ -286,13 +286,19 @@ const LANG_CODE_SUFFIX_PATTERN = /\(([a-zA-Z-]+)\)\s*$/
 // "label::English (en)"), and pyxform/ODK Central preserve that whole string verbatim as the itext
 // <translation lang="..."> attribute - not a bare ISO code (confirmed against real pyxform output,
 // e.g. a reported `lang="Portuguese (pt)"`). Arena's own language model expects a real ISO 639-1 code
-// (core/app/languages.ts), so this extracts the parenthesized code when present and recognized,
-// falling back to the raw attribute value unchanged otherwise (already a bare code, or some other
-// convention) rather than guessing at a transformation with no evidence behind it.
+// (core/app/languages.ts), so this extracts the parenthesized code when present and recognized, or
+// maps a bare code or an English language name (e.g. "French", also produced by XLSForm) to its code,
+// falling back to the raw attribute value unchanged otherwise: the survey creation then fails, since
+// survey languages must be valid codes.
+const languageCodeByEnglishName: Record<string, string> = Object.fromEntries(
+  languageCodes.map((code) => [getLanguageLabel(code)?.toLowerCase(), code])
+)
+
 const normalizeLangCode = (rawLang: string): string => {
   const match = LANG_CODE_SUFFIX_PATTERN.exec(rawLang)
-  const code = match?.[1]?.toLowerCase()
-  return code && languageCodes.includes(code) ? code : rawLang
+  const code = (match?.[1] ?? rawLang).trim().toLowerCase()
+  if (languageCodes.includes(code)) return code
+  return languageCodeByEnglishName[rawLang.trim().toLowerCase()] ?? rawLang
 }
 
 /**

@@ -1,6 +1,7 @@
 import * as A from '@core/arena'
 
 import * as ProcessUtils from '@core/processUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
 export const getServerUrl = (req) => `${req.protocol}://${req.get('host')}`
@@ -73,6 +74,20 @@ export const getRequiredIntegerParam = (req, param) => {
     throw new TypeError(`${param} must be a valid integer`)
   }
   return value
+}
+
+/**
+ * Returns the "key" param of a prop update request, failing when that prop cannot be updated through the request.
+ * @param {object} req - The request.
+ * @param {string[]} updatablePropKeys - The keys of the props that can be updated.
+ * @returns {string} - The prop key.
+ */
+export const getUpdatablePropKey = (req, updatablePropKeys) => {
+  const key = A.prop('key', getParams(req))
+  if (!updatablePropKeys.includes(key)) {
+    throw new SystemError('propUpdateNotAllowed', { key }, StatusCodes.BAD_REQUEST)
+  }
+  return key
 }
 
 export const getFile = A.pathOr(null, ['files', 'file'])

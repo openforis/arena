@@ -183,26 +183,23 @@ describe('odkImport / xform', () => {
 
   test('getItextTranslations resolves translations and the explicit default language', () => {
     const { translations, defaultLang } = XForm.getItextTranslations(xform)
-    expect(defaultLang).toBe('English')
-    expect(translations['/data/name:label']).toEqual({ English: 'Name', French: 'Nom' })
+    // English language names are mapped to their ISO 639-1 code
+    expect(defaultLang).toBe('en')
+    expect(translations['/data/name:label']).toEqual({ en: 'Name', fr: 'Nom' })
   })
 
   test('resolveLabels prefers itext indirection, falls back to a literal label in the default language', () => {
     const { translations } = XForm.getItextTranslations(xform)
 
     expect(
-      XForm.resolveLabels({ labelRef: '/data/name:label', labelText: null, translations, defaultLanguage: 'English' })
-    ).toEqual({ English: 'Name', French: 'Nom' })
+      XForm.resolveLabels({ labelRef: '/data/name:label', labelText: null, translations, defaultLanguage: 'en' })
+    ).toEqual({ en: 'Name', fr: 'Nom' })
 
-    expect(XForm.resolveLabels({ labelRef: null, labelText: 'Age', translations, defaultLanguage: 'English' })).toEqual(
-      {
-        English: 'Age',
-      }
-    )
+    expect(XForm.resolveLabels({ labelRef: null, labelText: 'Age', translations, defaultLanguage: 'en' })).toEqual({
+      en: 'Age',
+    })
 
-    expect(XForm.resolveLabels({ labelRef: null, labelText: null, translations, defaultLanguage: 'English' })).toEqual(
-      {}
-    )
+    expect(XForm.resolveLabels({ labelRef: null, labelText: null, translations, defaultLanguage: 'en' })).toEqual({})
   })
 
   test('labelFromElementName splits camelCase/PascalCase and snake_case ids into a readable label', () => {
@@ -271,6 +268,6 @@ describe('odkImport / xform', () => {
   <h:body><upload ref="/data/photo_field"><label ref="jr:itext('/data/photo_field:label')"/></upload></h:body>
 </h:html>`)
     const { translations } = XForm.getItextTranslations(xformWithMediaItext)
-    expect(translations['/data/photo_field:label']).toEqual({ English: 'Take a photo' })
+    expect(translations['/data/photo_field:label']).toEqual({ en: 'Take a photo' })
   })
 })

@@ -79,21 +79,22 @@ describe('odkImport / real ODK form (Household Survey, getodk/sample-forms)', ()
 
       // none of this real form's <translation> elements carries a default="true()" attribute -
       // defaultLang falls back to the first one encountered, per getItextTranslations' documented rule
-      expect(defaultLang).toBe('English')
+      // the language names of this form are mapped to their ISO 639-1 codes
+      expect(defaultLang).toBe('en')
 
       expect(translations.EnterNameLabel).toEqual({
-        English: 'Enter your name.',
-        Spanish: 'Escriba su nombre.',
-        French: 'Entrez votre nom.',
-        Swahili: 'Andika jina lako.',
-        Chinese: '输入你的名字。',
+        en: 'Enter your name.',
+        es: 'Escriba su nombre.',
+        fr: 'Entrez votre nom.',
+        sw: 'Andika jina lako.',
+        zh: '输入你的名字。',
       })
       expect(translations.Yes).toEqual({
-        English: 'Yes',
-        Spanish: 'Sí',
-        French: 'Oui',
-        Swahili: 'Ndyio',
-        Chinese: '是',
+        en: 'Yes',
+        es: 'Sí',
+        fr: 'Oui',
+        sw: 'Ndyio',
+        zh: '是',
       })
     })
   })

@@ -162,10 +162,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Jezik je obavezan',
+    langInvalid: 'Kod jezika nije važeći: {{lang}}',
     srsRequired: 'Prostorni referentni sistem je obavezan',
     cycleRequired: 'Ciklus je obavezan',
     cyclesRequired: 'Mora biti definisan najmanje jedan ciklus',
     cyclesExceedingMax: 'Istraživanje može imati najviše 10 ciklusa',
+    cycleKeysInvalid: 'Ciklusi moraju biti numerisani redom, počevši od 1',
     cycleDateStartBeforeDateEnd: 'Datum početka ciklusa mora biti prije datuma završetka',
     cycleDateStartAfterPrevDateEnd: 'Datum početka ciklusa mora biti poslije datuma završetka prethodnog ciklusa',
     cycleDateStartInvalid: 'Datum početka ciklusa nije važeći',

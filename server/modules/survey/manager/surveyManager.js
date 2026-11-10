@@ -99,6 +99,17 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
   }
 }
 
+// language codes and cycle keys are used as JSON keys and export column names: imported surveys must have valid ones
+const _checkLanguagesAndCycles = (props) => {
+  const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
+  if (langsInvalid.length > 0) {
+    throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
+  }
+  if (!SurveyValidator.areCycleKeysValid(props?.[Survey.infoKeys.cycles])) {
+    throw new SystemError('survey.cycleKeysInvalid', {}, StatusCodes.BAD_REQUEST)
+  }
+}
+
 /**
  * Creates a new survey given the specified parameters.
  * @param {!object} params - The survey creation parameters.
@@ -126,6 +137,7 @@ export const insertSurvey = async (params, client = db) => {
   // from the same pool. Under concurrent survey creation this starves the pool (no connectionTimeoutMillis
   // is configured) and can hang the whole server, since every other request also needs a pool connection.
   const surveyProps = { ...Survey.getProps(surveyInfoParam) }
+  _checkLanguagesAndCycles(surveyProps)
   if (temporary) {
     surveyProps.temporary = true
   }
@@ -198,6 +210,8 @@ const _addMissingDefaultAuthGroups = (authGroups) => {
 export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, authGroups: authGroupsParam, backup } = params
   const authGroups = authGroupsParam ? _addMissingDefaultAuthGroups(authGroupsParam) : Survey.getDefaultAuthGroups()
+  _checkLanguagesAndCycles(Survey.getProps(surveyInfoParam))
+  _checkLanguagesAndCycles(Survey.getPropsDraft(surveyInfoParam))
 
   // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
   // run inside a transaction held open by this function (same connection-pool starvation risk).

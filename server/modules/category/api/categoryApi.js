@@ -3,6 +3,7 @@ import * as Response from '@server/utils/response'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as ObjectUtils from '@core/objectUtils'
 import { FileFormats } from '@core/fileFormats'
 
@@ -11,6 +12,14 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+
+// props edited by the category editor: the other ones have dedicated routes (e.g. extradef, with validation)
+const categoryUpdatablePropKeys = [
+  Category.keysProps.name,
+  Category.keysProps.designerNotes,
+  Category.keysProps.reportingData,
+]
+const levelUpdatablePropKeys = [CategoryLevel.keysProps.name]
 
 export const init = (app) => {
   // ==== CREATE
@@ -450,7 +459,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, key, value } = Request.getParams(req)
+        const { surveyId, categoryUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, categoryUpdatablePropKeys)
         const user = Request.getUser(req)
 
         const category = await CategoryService.updateCategoryProp({ user, surveyId, categoryUuid, key, value })
@@ -492,7 +502,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, levelUuid, key, value } = Request.getParams(req)
+        const { surveyId, categoryUuid, levelUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, levelUpdatablePropKeys)
         const user = Request.getUser(req)
 
         const { category } = await CategoryService.updateLevelProp(user, surveyId, categoryUuid, levelUuid, key, value)

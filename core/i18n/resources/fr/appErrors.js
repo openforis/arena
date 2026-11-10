@@ -79,6 +79,7 @@ export default {
   mobileAppVersionNotSupported:
     "Cette version d'Arena Mobile n'est pas prise en charge par le serveur : mettez-la à jour vers la version {{minVersion}} ou ultérieure",
   paramIsRequired: 'Le paramètre {{param}} est requis',
+  propUpdateNotAllowed: 'La propriété "{{key}}" ne peut pas être modifiée',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
   unableToFindSibling: 'Impossible de trouver le sibling avec le nom {{name}}',
@@ -104,6 +105,8 @@ Essayez de rafraîchir la page.`,
     nodeDefNameNotFound: 'Définition de nœud introuvable : {{name}}',
     dataMigrationInProgress: 'Ce formulaire est en cours de mise à niveau ; veuillez réessayer sous peu.',
     fileNotFound: 'Fichier introuvable',
+    languageCodeInvalid: "Le code de langue n'est pas valide : {{lang}}",
+    cycleKeysInvalid: 'Les cycles doivent être numérotés de façon consécutive, à partir de 1',
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
   aiNotConfigured:

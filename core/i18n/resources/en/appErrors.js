@@ -58,6 +58,7 @@ export default {
   mobileAppVersionNotSupported:
     'This version of Arena Mobile is not supported by the server: update it to version {{minVersion}} or later',
   paramIsRequired: 'Param {{param}} is required',
+  propUpdateNotAllowed: 'Property "{{key}}" cannot be updated',
   unableToFindParent: 'Unable to find parent of {{name}}',
   unableToFindNode: 'Unable to find node with name {{name}}',
   unableToFindSibling: 'Unable to find sibling with name {{name}}',
@@ -83,6 +84,8 @@ Try to refresh the page.`,
     nodeDefNameNotFound: 'Node definition not found: {{name}}',
     dataMigrationInProgress: 'This survey is being upgraded, please retry shortly.',
     fileNotFound: 'File not found',
+    languageCodeInvalid: 'Language code is not valid: {{lang}}',
+    cycleKeysInvalid: 'Cycles must be numbered consecutively, starting from 1',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors

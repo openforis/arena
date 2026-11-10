@@ -163,10 +163,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'La langue est requise',
+    langInvalid: "Le code de langue n'est pas valide : {{lang}}",
     srsRequired: 'Le système de référence spatiale est requis',
     cycleRequired: 'Le cycle est requis',
     cyclesRequired: 'Au moins un cycle doit être défini',
     cyclesExceedingMax: 'Un formulaire peut avoir au maximum 10 cycles',
+    cycleKeysInvalid: 'Les cycles doivent être numérotés de façon consécutive, à partir de 1',
     cycleDateStartBeforeDateEnd: 'La date de début du cycle doit être antérieure à sa date de fin',
     cycleDateStartAfterPrevDateEnd:
       'La date de début du cycle doit être postérieure à la date de fin du cycle précédent',

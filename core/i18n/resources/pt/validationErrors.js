@@ -162,10 +162,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Idioma obrigatório',
+    langInvalid: 'O código de idioma não é válido: {{lang}}',
     srsRequired: 'Sistema de Referência Espacial obrigatório',
     cycleRequired: 'Ciclo obrigatório',
     cyclesRequired: 'Pelo menos um ciclo deve ser definido',
     cyclesExceedingMax: 'Um inventário pode ter no máximo 10 ciclos',
+    cycleKeysInvalid: 'Os ciclos devem ser numerados consecutivamente, começando por 1',
     cycleDateStartBeforeDateEnd: 'A data de início do ciclo deve ser anterior à data de término',
     cycleDateStartAfterPrevDateEnd: 'A data de início do ciclo deve ser posterior ao término do ciclo anterior',
     cycleDateStartInvalid: 'Data de início do ciclo inválida',

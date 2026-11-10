@@ -162,10 +162,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Хэл шаардлагатай',
+    langInvalid: 'Хэлний код буруу байна: {{lang}}',
     srsRequired: 'Орон зайн лавлах систем шаардлагатай',
     cycleRequired: 'Мөчлөг шаардлагатай',
     cyclesRequired: 'Наад зах нь нэг мөчлөг тодорхойлогдсон байх ёстой',
     cyclesExceedingMax: 'Судалгаа хамгийн ихдээ 10 мөчлөгтэй байж болно',
+    cycleKeysInvalid: 'Мөчлөгүүд 1-ээс эхлэн дараалсан дугаартай байх ёстой',
     cycleDateStartBeforeDateEnd: 'Мөчлөгийн эхлэх огноо дуусах огнооноос өмнө байх ёстой',
     cycleDateStartAfterPrevDateEnd: 'Мөчлөгийн эхлэх огноо өмнөх мөчлөгийн дуусах огнооноос хойш байх ёстой',
     cycleDateStartInvalid: 'Мөчлөгийн эхлэх огноо хүчингүй',

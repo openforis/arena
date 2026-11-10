@@ -73,6 +73,7 @@ export default {
   mobileAppVersionNotSupported:
     'Esta versão do Arena Mobile não é suportada pelo servidor: atualize-a para a versão {{minVersion}} ou posterior',
   paramIsRequired: 'O parâmetro {{param}} é obrigatório',
+  propUpdateNotAllowed: 'A propriedade "{{key}}" não pode ser atualizada',
   unableToFindParent: 'Não foi possível encontrar o pai de {{name}}',
   unableToFindNode: 'Não foi possível encontrar nó com nome {{name}}',
   unableToFindSibling: 'Não foi possível encontrar irmão com nome {{name}}',
@@ -98,6 +99,8 @@ Tente atualizar a página.`,
     nodeDefNameNotFound: 'Definição de nó não encontrada: {{name}}',
     dataMigrationInProgress: 'Esta pesquisa está sendo atualizada; tente novamente em breve.',
     fileNotFound: 'Arquivo não encontrado',
+    languageCodeInvalid: 'O código de idioma não é válido: {{lang}}',
+    cycleKeysInvalid: 'Os ciclos devem ser numerados consecutivamente, começando por 1',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
   aiNotConfigured:

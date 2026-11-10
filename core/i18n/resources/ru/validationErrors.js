@@ -163,10 +163,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Язык обязателен',
+    langInvalid: 'Недопустимый код языка: {{lang}}',
     srsRequired: 'Система пространственной привязки обязательна',
     cycleRequired: 'Цикл обязателен',
     cyclesRequired: 'Должен быть определен хотя бы один цикл',
     cyclesExceedingMax: 'Опрос может иметь не более 10 циклов',
+    cycleKeysInvalid: 'Циклы должны быть пронумерованы последовательно, начиная с 1',
     cycleDateStartBeforeDateEnd: 'Дата начала цикла должна быть раньше даты его окончания',
     cycleDateStartAfterPrevDateEnd: 'Дата начала цикла должна быть после даты окончания предыдущего цикла',
     cycleDateStartInvalid: 'Дата начала цикла недействительна',

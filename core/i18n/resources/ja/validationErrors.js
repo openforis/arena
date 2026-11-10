@@ -159,10 +159,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: '言語は必須です',
+    langInvalid: '言語コードが無効です：{{lang}}',
     srsRequired: '空間参照系は必須です',
     cycleRequired: 'サイクルは必須です',
     cyclesRequired: '少なくとも1つのサイクルを定義してください',
     cyclesExceedingMax: '調査に設定できるサイクルは最大10個までです',
+    cycleKeysInvalid: 'サイクルは1から始まる連番である必要があります',
     cycleDateStartBeforeDateEnd: 'サイクルの開始日は終了日より前である必要があります',
     cycleDateStartAfterPrevDateEnd: 'サイクルの開始日は前のサイクルの終了日より後である必要があります',
     cycleDateStartInvalid: 'サイクルの開始日が無効です',

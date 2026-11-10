@@ -60,6 +60,7 @@ export default {
   mobileAppVersionNotSupported:
     'このバージョンのArena Mobileはサーバーでサポートされていません：バージョン{{minVersion}}以降に更新してください',
   paramIsRequired: 'パラメータ{{param}}は必須です',
+  propUpdateNotAllowed: 'プロパティ「{{key}}」は更新できません',
   unableToFindParent: '{{name}}の親要素が見つかりません',
   unableToFindNode: '名前が{{name}}のノードが見つかりません',
   unableToFindSibling: '名前が{{name}}の兄弟要素が見つかりません',
@@ -85,6 +86,8 @@ export default {
     nodeDefNameNotFound: 'ノード定義が見つかりません：{{name}}',
     dataMigrationInProgress: 'この調査はアップグレード中です。しばらくしてから再度お試しください。',
     fileNotFound: 'ファイルが見つかりません',
+    languageCodeInvalid: '言語コードが無効です：{{lang}}',
+    cycleKeysInvalid: 'サイクルは1から始まる連番である必要があります',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors

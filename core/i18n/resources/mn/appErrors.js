@@ -73,6 +73,7 @@ export default {
   mobileAppVersionNotSupported:
     'Arena Mobile-ийн энэ хувилбарыг сервер дэмжихгүй байна: {{minVersion}} эсвэл түүнээс хойшхи хувилбар руу шинэчилнэ үү',
   paramIsRequired: 'Парам {{param}} шаардлагатай',
+  propUpdateNotAllowed: '"{{key}}" шинж чанарыг шинэчлэх боломжгүй',
   unableToFindParent: '{{name}}-н эцгийг олж чадахгүй байна',
   unableToFindNode: '{{name}} нэртэй зангилааг олж чадахгүй байна',
   unableToFindSibling: '{{name}} нэртэй ах дүүг олж чадахгүй байна',
@@ -97,6 +98,8 @@ export default {
     nodeDefNameNotFound: 'Зангилааны тодорхойлолт олдсонгүй: {{name}}',
     dataMigrationInProgress: 'Энэ судалгааг шинэчилж байна; түр хүлээгээд дахин оролдоно уу.',
     fileNotFound: 'Файл олдсонгүй',
+    languageCodeInvalid: 'Хэлний код буруу байна: {{lang}}',
+    cycleKeysInvalid: 'Мөчлөгүүд 1-ээс эхлэн дараалсан дугаартай байх ёстой',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   aiNotConfigured:
