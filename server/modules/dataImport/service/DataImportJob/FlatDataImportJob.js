@@ -98,6 +98,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     }
 
     await this.fetchRecordsSummary()
+    await this.fetchUserQualifierFilters()
 
     this.flatDataReader = await this.createFlatDataReader()
     await this.startFlatDataReader()
@@ -166,6 +167,15 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     )
 
     this.setContext({ recordsSummary: recordsSummary.list })
+  }
+
+  async fetchUserQualifierFilters() {
+    const { context, tx, user } = this
+    const { survey } = context
+
+    // records of other user groups cannot be updated (see DataImportRecordPermissions)
+    const userQualifierFilters = await SurveyManager.fetchUserQualifierFilters({ user, survey }, tx)
+    this.setContext({ userQualifierFilters })
   }
 
   async createFlatDataReader() {
