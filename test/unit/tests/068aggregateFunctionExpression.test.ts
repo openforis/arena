@@ -1,5 +1,6 @@
 import pgPromise from 'pg-promise'
 
+import * as Expression from '@core/expressionParser/expression'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
@@ -120,6 +121,16 @@ describe('validateAggregateFunction', () => {
   })
 })
 
+describe('Expression.toSql with logarithm functions', () => {
+  test.each([
+    ['ln(x)', 'ln("x")'],
+    ['log10(x)', 'log10("x")'],
+  ])('%s', (expression, expectedSql) => {
+    const { clause, params } = Expression.toSql(Expression.fromString(expression) as Record<string, unknown>)
+    expect(pgp.as.format(clause, params)).toBe(expectedSql)
+  })
+})
+
 describe('SQL generated from the survey', () => {
   const buildSurvey = ({ formula = 'true', aggregateFunctions = {} } = {}) =>
     SB.survey(
@@ -154,6 +165,7 @@ describe('SQL generated from the survey', () => {
     [`tree_status == "x' OR 1=1 --"`, `"tree_status" = 'x'' OR 1=1 --'`],
     [`dbh > 10.5 && tree_status != 'x'`, `"dbh" > 10.5 AND "tree_status" != 'x'`],
     [`isEmpty(tree_status) && dbh >= -2`, `coalesce(("tree_status")::text, '') = '' AND "dbh" >= - 2`],
+    [`ln(dbh) > 1 && log10(dbh) < 2`, `ln("dbh") > 1 AND log10("dbh") < 2`],
   ])('virtual entity formula %s', async (formula, expectedSql) => {
     expect(await virtualEntitySql(formula)).toBe(expectedSql)
   })

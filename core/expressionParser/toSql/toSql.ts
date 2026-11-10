@@ -19,6 +19,8 @@ const stdlib2sql: Record<string, string | ((param: string) => string)> = {
   count: 'count',
   sum: 'sum',
   avg: 'avg',
+  ln: 'ln',
+  log10: 'log10',
   isEmpty: (param) => `coalesce((${param})::text, '') = ''`,
   isNotEmpty: (param) => `coalesce((${param})::text, '') <> ''`,
   '!': (param) => `NOT (${param})`,
