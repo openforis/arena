@@ -82,6 +82,13 @@ records (`Authorizer.canViewNotOwnedRecords`), restricted by the qualifiers of t
 records summary (`RecordManager.fetchRecordsSummaryBySurveyId`) marks them all as read-only, so Arena
 Mobile locks them too.
 
+Reading a record (check-in, record and file download, PDF/DOCX and records export) requires, besides the
+role permission, that the user can view it: if the survey security settings don't let the user's role view
+records owned by others (`Authorizer.canViewNotOwnedRecords`), only the user's own records
+(`recordOwnerMiddleware.ts`), and only records of the user's group or of its readable groups
+(`recordQualifierMiddleware.ts`). Records lists, the validation report and its export apply the same
+restrictions in their queries.
+
 The same group restriction applies to the Data Explorer queries, counts and exports (and to the map data
 export): `SurveyRdbService` fetches the user's group access filters and the data view queries keep only the
 records whose qualifier columns in the root entity data view match the user's group or one of the groups it
