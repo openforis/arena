@@ -128,6 +128,7 @@ export default {
     keysEmpty: 'Definišite najmanje jedan ključni atribut',
 
     keysExceedingMax: 'Premašen je maksimalan broj ključnih atributa',
+    mapMarkerColorInvalid: 'Boja markera na mapi mora biti kod boje u obliku #ff0000',
     maxFileSizeInvalid: 'Maksimalna veličina fajla mora biti veća od 0 i manja od {{max}}',
     nameInvalid: 'Naziv nije važeći (smije sadržati samo mala slova, brojeve i donje crte, i mora počinjati slovom)',
     taxonomyRequired: 'Taksonomija je obavezna',
