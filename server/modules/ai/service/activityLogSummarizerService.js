@@ -68,9 +68,7 @@ export const summarize = async ({ user, surveyId, from, to, userUuid, signal }) 
   const fromMs = from ? Date.parse(from) : 0
   const toMs = to ? Date.parse(to) : Number.MAX_SAFE_INTEGER
 
-  // ActivityLogManager.fetch's `orderBy` is the sort DIRECTION only — the
-  // SQL orders by `l.id ${orderBy}` with the column hardcoded. Passing a
-  // full clause like `'date_created DESC'` produces invalid SQL.
+  // ActivityLogManager.fetch's `orderBy` is the direction (ASC or DESC) of the sort by id
   const raw = await ActivityLogManager.fetch({
     user,
     surveyId,

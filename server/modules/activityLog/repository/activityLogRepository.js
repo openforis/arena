@@ -89,7 +89,9 @@ export const fetch = async ({
   const schema = getSurveyDBSchema(surveyId)
 
   const limitedById = idGreaterThan || idLessThan
-  const conditionLimitedById = idGreaterThan ? ` id > ${idGreaterThan}` : ` id < ${idLessThan}`
+  const conditionLimitedById = idGreaterThan ? ' id > $4' : ' id < $5'
+  // orderBy is interpolated in the query: allow only a sort direction
+  const orderDirection = String(orderBy).toUpperCase() === 'ASC' ? 'ASC' : 'DESC'
 
   return client.map(
     `
@@ -248,8 +250,8 @@ export const fetch = async ({
     -- end of analysis activities part
 
     ORDER BY
-      l.id ${orderBy}`,
-    [surveyUuid, activityTypes, limit],
+      l.id ${orderDirection}`,
+    [surveyUuid, activityTypes, limit, idGreaterThan, idLessThan],
     camelize
   )
 }
