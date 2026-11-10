@@ -50,28 +50,28 @@ const insertUser = async (name: string, status: string): Promise<string> => {
   return userUuid
 }
 
-const addUserToSurveyGroup = async ({ userUuid, survey, groupName }: any) =>
+const addUserToSurveyGroup = ({ userUuid, survey, groupName }: any) =>
   db.none(
     `INSERT INTO auth_group_user (user_uuid, group_uuid)
     SELECT $1, uuid FROM auth_group WHERE survey_uuid = $2 AND name = $3`,
     [userUuid, survey.surveyUuid, groupName]
   )
 
-const addUserToGlobalGroup = async ({ userUuid, groupName }: any) =>
+const addUserToGlobalGroup = ({ userUuid, groupName }: any) =>
   db.none(
     `INSERT INTO auth_group_user (user_uuid, group_uuid)
     SELECT $1, uuid FROM auth_group WHERE survey_uuid IS NULL AND name = $2`,
     [userUuid, groupName]
   )
 
-const insertInvitation = async ({ userUuid, survey }: any) =>
+const insertInvitation = ({ userUuid, survey }: any) =>
   db.none(`INSERT INTO user_invitation (user_uuid, survey_uuid, invited_by) VALUES ($1, $2, $3)`, [
     userUuid,
     survey.surveyUuid,
     User.getUuid(getContextUser()),
   ])
 
-const fetchSurveyGroupUuid = async (survey: TestSurvey, groupName: string): Promise<string> =>
+const fetchSurveyGroupUuid = (survey: TestSurvey, groupName: string): Promise<string> =>
   db.one(
     `SELECT uuid FROM auth_group WHERE survey_uuid = $1 AND name = $2`,
     [survey.surveyUuid, groupName],
@@ -87,7 +87,7 @@ const insertPendingUserInvitedToA = async (name: string): Promise<string> => {
   return userUuid
 }
 
-const inviteToA = async ({ user = adminA, email, groupUuid, repeatInvitation = false }: any) =>
+const inviteToA = ({ user = adminA, email, groupUuid, repeatInvitation = false }: any) =>
   UserInviteService.inviteUsers({
     user,
     surveyId: surveyA.surveyId,
@@ -97,10 +97,10 @@ const inviteToA = async ({ user = adminA, email, groupUuid, repeatInvitation = f
     repeatInvitation,
   })
 
-const fetchResetPasswordUrlInA = async ({ user = adminA, userUuid }: any) =>
+const fetchResetPasswordUrlInA = ({ user = adminA, userUuid }: any) =>
   UserService.fetchResetPasswordUrl({ user, serverUrl, userUuid, surveyId: surveyA.surveyId })
 
-const fetchUserGroupsInSurvey = async (userUuid: string, survey: TestSurvey) =>
+const fetchUserGroupsInSurvey = (userUuid: string, survey: TestSurvey) =>
   db.map(
     `SELECT g.name FROM auth_group_user gu JOIN auth_group g ON g.uuid = gu.group_uuid
     WHERE gu.user_uuid = $1 AND g.survey_uuid = $2`,
@@ -135,12 +135,9 @@ describe('User invitations: survey groups and invitation links', () => {
   })
 
   afterAll(async () => {
-    for (const surveyId of surveyIds) {
-      await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true })
-    }
-    for (const userUuid of userUuids) {
-      await UserManager.deleteUser(userUuid)
-    }
+    // every survey (and every user) is independent of the others: delete them in parallel
+    await Promise.all(surveyIds.map((surveyId) => SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true })))
+    await Promise.all(userUuids.map((userUuid) => UserManager.deleteUser(userUuid)))
   })
 
   test('invitation into a group of another survey is rejected', async () => {
