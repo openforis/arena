@@ -30,7 +30,7 @@ export default class SurveyCreatorJob extends Job {
     const {
       collectUri,
       collectNodeDefsInfoByPath,
-      // eslint-disable-next-line no-unused-vars
+
       collectReport, // always ignore Collect import report when survey is imported or cloned
       ...propsToImport
     } = surveyInfoArenaSurvey.props
@@ -68,7 +68,6 @@ export default class SurveyCreatorJob extends Job {
     const survey = await SurveyManager.importSurvey({
       user: this.user,
       surveyInfo: newSurveyInfo,
-      authGroups: Survey.getAuthGroups(surveyInfoArenaSurvey),
       backup,
     })
 
