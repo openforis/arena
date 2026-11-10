@@ -14,11 +14,7 @@ export interface SampleSurveyUuids {
 // core/auth/authGroup.ts (permissionsByGroupName.surveyAdmin) rather than imported: files in
 // test/load run standalone via `node --experimental-strip-types` with no path-alias resolution
 // for @core/*, matching every other file in this directory (see test/load/lib/config.ts etc.).
-// A survey.json with zero authGroups fails import: SurveyCreatorJob passes
-// Survey.getAuthGroups(...) (an explicit R.propOr([], 'authGroups') default) straight into
-// SurveyManager.importSurvey, which only falls back to its own default authGroups when the
-// argument is literally undefined -- an explicit [] suppresses that fallback, leaving no
-// surveyAdmin group for _addUserToSurveyAdmins to add the importing user to.
+// Kept to mirror a real export: on import the server ignores it and creates the default survey groups.
 const SAMPLE_SURVEY_AUTH_GROUPS = [
   {
     name: 'surveyAdmin',

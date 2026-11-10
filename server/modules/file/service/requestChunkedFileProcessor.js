@@ -1,3 +1,5 @@
+import { isUuid } from '@core/uuid'
+
 import * as Request from '../../../utils/request'
 import * as FileUtils from '../../../utils/file/fileUtils'
 
@@ -42,7 +44,8 @@ const getChunkedFileParams = (req) => {
   if (isChunkedUpload) {
     const isValidPositiveInteger = (value) => Number.isFinite(value) && Number.isInteger(value) && value > 0
 
-    if (typeof fileId !== 'string' || fileId.trim() === '') {
+    // fileId is used to name the temp chunk files
+    if (typeof fileId !== 'string' || !isUuid(fileId)) {
       const error = new Error('Invalid fileId for chunked upload')
       error.statusCode = 400
       throw error
