@@ -22,4 +22,15 @@ describe.each(fileFormats)('Data import (%s)', (fileFormat) => {
   test('Dry run does not persist any change', async () => DataImportTest.dataImportDryRunTest(params()))
 
   test('Dry run reports missing key columns', async () => DataImportTest.dataImportDryRunMissingKeyColumnTest(params()))
+
+  test('A data editor cannot update records owned by another user', async () =>
+    DataImportTest.dataImportRecordOfAnotherUserTest(params()))
+
+  test('A system admin can delete the existing entities not in the file', async () =>
+    DataImportTest.dataImportDeleteExistingEntitiesTest(params()))
+})
+
+describe('Data import options', () => {
+  test('Options restricted in the UI are rejected for a data editor', async () =>
+    DataImportTest.dataImportRestrictedOptionsTest({ user: getContextUser() }))
 })

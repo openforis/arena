@@ -1,4 +1,4 @@
-import { Queue } from '@openforis/arena-core'
+import { Authorizer, Queue } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -10,10 +10,12 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as RecordExpressionParser from '@core/record/recordExpressionParser'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
 
 import BatchPersister from '@server/db/batchPersister'
 import * as FileXml from '@server/utils/file/fileXml'
 import Job from '@server/job/job'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as SurveyManager from '../../../../survey/manager/surveyManager'
@@ -78,6 +80,10 @@ export default class RecordsImportJob extends Job {
     }
 
     if (deleteAllRecords) {
+      // already checked when starting the import: checked again because every record of the cycle is deleted
+      if (!Authorizer.canEditSurvey(user, surveyInfo)) {
+        throw new UnauthorizedError(User.getName(user))
+      }
       this.logDebug('deleting all records before import')
       await RecordManager.deleteRecordsByCycles(surveyId, [cycle], this.tx)
     }

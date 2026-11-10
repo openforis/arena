@@ -79,6 +79,8 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       "L'enregistrement avec les clés \"{{keyValues}}\" est à l'étape d'analyse et ne peut pas être mis à jour",
     recordKeyMissingOrInvalid: 'Valeur manquante ou invalide pour l\'attribut clé "{{keyName}}"',
+    recordNotEditable:
+      'L\'enregistrement avec les clés "{{keyValues}}" ne peut pas être mis à jour : vous n\'êtes pas autorisé à le modifier',
     recordNotFound: 'Enregistrement avec les clés "{{keyValues}}" introuvable',
   },
 

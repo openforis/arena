@@ -79,6 +79,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Запись с ключами "{{keyValues}}" находится на этапе анализа и не может быть обновлена',
     recordKeyMissingOrInvalid: 'Отсутствует или неверное значение для ключевого атрибута "{{keyName}}"',
+    recordNotEditable: 'Запись с ключами "{{keyValues}}" не может быть обновлена: у вас нет прав на ее редактирование',
     recordNotFound: 'Запись с ключами "{{keyValues}}" не найдена',
   },
 
