@@ -2,8 +2,7 @@ import './MapView.scss'
 
 import React, { useCallback, useMemo, useState } from 'react'
 
-import { Objects } from '@openforis/arena-core'
-
+import { isHexColor } from '@core/colorUtils'
 import * as Survey from '@core/survey/survey'
 import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
@@ -82,8 +81,8 @@ const getGeoAttributeLayerMarkersColor = ({
 }): string => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
 
-  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef) as string
-  return Objects.isEmpty(mapMarkerColor) ? defaultColor : mapMarkerColor
+  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
+  return isHexColor(mapMarkerColor) ? mapMarkerColor : defaultColor
 }
 
 const getSamplingPointDataLevels = (survey: any): any[] => {

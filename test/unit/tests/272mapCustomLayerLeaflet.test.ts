@@ -1,7 +1,6 @@
 import type { MapCustomLayer, MapCustomLayerWithScope } from '@core/map/customLayers/mapCustomLayer'
 import {
   diffOverlayIds,
-  escapeAttribution,
   findCustomBaseLayerDef,
   getCustomLayerLeafletConfig,
   toCustomBaseLayerDef,
@@ -35,12 +34,6 @@ const tileLayer: MapCustomLayerWithScope = {
 }
 
 describe('map custom layer Leaflet helpers (272)', () => {
-  test('escapes attributions, which Leaflet renders as HTML', () => {
-    expect(escapeAttribution(`<b onclick="x">'A' & B</b>`)).toBe(
-      '&lt;b onclick=&quot;x&quot;&gt;&#39;A&#39; &amp; B&lt;/b&gt;'
-    )
-  })
-
   test('builds a WMS overlay: GetMap parameters apart from the Leaflet options, escaped attribution', () => {
     expect(getCustomLayerLeafletConfig(wmsLayer)).toEqual({
       type: 'wms',

@@ -128,6 +128,7 @@ export default {
     keysEmpty: 'Define at least one key attribute',
 
     keysExceedingMax: 'Exceeding maximum number of key attributes',
+    mapMarkerColorInvalid: 'Map marker color must be a color code like #ff0000',
     maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
     nameInvalid:
       'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
