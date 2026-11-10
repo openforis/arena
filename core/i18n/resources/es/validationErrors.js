@@ -87,6 +87,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'El registro con claves "{{keyValues}}" está en el paso de análisis y no se puede actualizar',
     recordKeyMissingOrInvalid: 'Valor faltante o no válido para el atributo clave "{{keyName}}"',
+    recordNotEditable: 'El registro con claves "{{keyValues}}" no se puede actualizar: no tiene permiso para editarlo',
     recordNotFound: 'Registro con claves "{{keyValues}}" no encontrado',
   },
 
@@ -135,6 +136,7 @@ export default {
     formulaInvalid: 'La fórmula es inválida',
     keysEmpty: 'Defina al menos un atributo clave',
     keysExceedingMax: 'Excediendo el número máximo de atributos clave',
+    mapMarkerColorInvalid: 'El color del marcador en el mapa debe ser un código de color como #ff0000',
     maxFileSizeInvalid: 'El tamaño máximo de archivo debe ser mayor que 0 y menor que {{max}}',
     nameInvalid:
       'El nombre no es válido (debe contener solo letras minúsculas, números y guiones bajos, comenzando con una letra)',

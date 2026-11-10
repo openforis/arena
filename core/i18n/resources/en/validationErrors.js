@@ -87,6 +87,7 @@ export default {
     recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
     recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
     recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
+    recordNotEditable: 'Record with keys "{{keyValues}}" cannot be updated: you are not allowed to edit it',
     recordNotFound: 'Record with keys "{{keyValues}}" not found',
   },
 
@@ -136,6 +137,7 @@ export default {
     keysEmpty: 'Define at least one key attribute',
 
     keysExceedingMax: 'Exceeding maximum number of key attributes',
+    mapMarkerColorInvalid: 'Map marker color must be a color code like #ff0000',
     maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
     nameInvalid:
       'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',

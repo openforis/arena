@@ -80,6 +80,7 @@ export default {
   mobileAppVersionNotSupported:
     "Cette version d'Arena Mobile n'est pas prise en charge par le serveur : mettez-la à jour vers la version {{minVersion}} ou ultérieure",
   paramIsRequired: 'Le paramètre {{param}} est requis',
+  paramMustBeInteger: 'Le paramètre {{param}} doit être un nombre entier',
   unableToFindParent: 'Impossible de trouver le parent de {{name}}',
   unableToFindNode: 'Impossible de trouver le nœud avec le nom {{name}}',
   unableToFindSibling: 'Impossible de trouver le sibling avec le nom {{name}}',

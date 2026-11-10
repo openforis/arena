@@ -61,6 +61,7 @@ export default {
   mobileAppVersionNotSupported:
     'このバージョンのArena Mobileはサーバーでサポートされていません：バージョン{{minVersion}}以降に更新してください',
   paramIsRequired: 'パラメータ{{param}}は必須です',
+  paramMustBeInteger: 'パラメータ{{param}}は整数である必要があります',
   unableToFindParent: '{{name}}の親要素が見つかりません',
   unableToFindNode: '名前が{{name}}のノードが見つかりません',
   unableToFindSibling: '名前が{{name}}の兄弟要素が見つかりません',

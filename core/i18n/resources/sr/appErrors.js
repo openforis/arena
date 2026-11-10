@@ -62,6 +62,7 @@ export default {
   mobileAppVersionNotSupported:
     'Server ne podržava ovu verziju aplikacije Arena Mobile: ažurirajte je na verziju {{minVersion}} ili noviju',
   paramIsRequired: 'Parametar {{param}} je obavezan',
+  paramMustBeInteger: 'Parametar {{param}} mora biti ceo broj',
   unableToFindParent: 'Nije moguće pronaći nadređeni čvor za {{name}}',
   unableToFindNode: 'Nije moguće pronaći čvor sa nazivom {{name}}',
   unableToFindSibling: 'Nije moguće pronaći srodni čvor sa nazivom {{name}}',

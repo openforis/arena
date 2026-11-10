@@ -88,6 +88,8 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Registro com chaves "{{keyValues}}" está na etapa Análise e não pode ser atualizado',
     recordKeyMissingOrInvalid: 'Valor ausente ou inválido para o atributo-chave "{{keyName}}"',
+    recordNotEditable:
+      'O registro com chaves "{{keyValues}}" não pode ser atualizado: você não tem permissão para editá-lo',
     recordNotFound: 'Registro com chaves "{{keyValues}}" não encontrado',
   },
 
@@ -137,6 +139,7 @@ export default {
     keysEmpty: 'Defina pelo menos um atributo-chave',
 
     keysExceedingMax: 'Excede o número máximo de atributos-chave',
+    mapMarkerColorInvalid: 'A cor do marcador no mapa deve ser um código de cor como #ff0000',
     maxFileSizeInvalid: 'O tamanho máximo do arquivo deve ser maior que 0 e menor que {{max}}',
     nameInvalid: 'Nome inválido (deve conter apenas letras minúsculas, números e sublinhados, começando com uma letra)',
     taxonomyRequired: 'Taxonomia obrigatória',

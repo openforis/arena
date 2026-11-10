@@ -86,6 +86,7 @@ export default {
     recordAlreadyExisting: 'キー「{{keyValues}}」の記録は既に存在します',
     recordInAnalysisStepCannotBeUpdated: 'キー「{{keyValues}}」の記録は分析ステップにあるため更新できません',
     recordKeyMissingOrInvalid: 'キー属性「{{keyName}}」の値が未入力または無効です',
+    recordNotEditable: 'キー「{{keyValues}}」の記録は更新できません：編集する権限がありません',
     recordNotFound: 'キー「{{keyValues}}」の記録が見つかりません',
   },
 
@@ -135,6 +136,7 @@ export default {
     keysEmpty: '少なくとも1つのキー属性を定義してください',
 
     keysExceedingMax: 'キー属性の最大数を超えています',
+    mapMarkerColorInvalid: '地図マーカーの色は #ff0000 のようなカラーコードである必要があります',
     maxFileSizeInvalid: '最大ファイルサイズは0より大きく、{{max}}未満である必要があります',
     nameInvalid: '名前が無効です（半角小文字・数字・アンダースコアのみを使用し、先頭は文字である必要があります）',
     taxonomyRequired: '分類体系は必須です',
