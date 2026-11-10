@@ -15,8 +15,6 @@ import * as Log from '@server/log/log'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 import { PrintableExportScopes, PrintOrientations } from '@common/record/printableExport'
-import { Query } from '@common/model/query'
-import { ViewDataNodeDef } from '@common/model/db'
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -61,6 +59,7 @@ import SelectedRecordsExportJob from './selectedRecordsExportJob'
 import { RecordsUpdateThreadService } from './update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from './update/thread/recordsThreadMessageTypes'
 import VaidationReportGenerationJob from './validationReportGenerationJob'
+import { resolveValidationReportParams } from './validationReportParams'
 
 const Logger = Log.getLogger('RecordService')
 
@@ -163,11 +162,12 @@ export const formatTimeSummaryValue = ({ value, nodeDef }) =>
     keepTimeZone: false,
   })
 
-export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, user }) => {
+export const exportRecordsSummary = async ({ res, surveyId, cycle, fileFormat, ownerUuid = null, user }) => {
   const { list, nodeDefKeys } = await RecordManager.fetchRecordsSummaryBySurveyId({
     surveyId,
     cycle,
     includeCounts: true,
+    ownerUuid,
     user,
   })
 
@@ -343,39 +343,8 @@ export const checkOut = async (socketId, user, surveyId, recordUuid) => {
 export const dissocSocketFromUpdateThread = RecordsUpdateThreadService.dissocSocketBySocketId
 
 // VALIDATION REPORT
-const _resolveValidationReportFilterBySurveyAttrs = async ({
-  surveyId,
-  cycle,
-  query,
-  attributeDefUuids = null,
-  messageTypeKeys = null,
-}) => {
-  const filter = query ? Query.getFilter(query) : null
-  const hasAttributeFilter = Array.isArray(attributeDefUuids)
-  const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
-  if (!filter && !hasAttributeFilter && !hasMessageTypeFilter) return null
-
-  const output = {}
-
-  if (hasAttributeFilter) {
-    output.attributeDefUuids = attributeDefUuids
-  }
-
-  if (hasMessageTypeFilter) {
-    output.messageTypeKeys = messageTypeKeys
-  }
-
-  if (filter) {
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-    const rootNodeDef = Survey.getNodeDefRoot(survey)
-    output.filter = filter
-    output.rootDataViewName = new ViewDataNodeDef(survey, rootNodeDef).name
-  }
-
-  return output
-}
-
 export const fetchValidationReport = async ({
+  user,
   surveyId,
   cycle,
   offset,
@@ -387,7 +356,8 @@ export const fetchValidationReport = async ({
   sortBy,
   sortOrder,
 }) => {
-  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+  const { rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
+    user,
     surveyId,
     cycle,
     query,
@@ -400,13 +370,16 @@ export const fetchValidationReport = async ({
     offset,
     limit,
     recordUuid,
+    rootDataViewName,
     filterBySurveyAttrs,
+    recordAccessFilters,
     sortBy,
     sortOrder,
   })
 }
 
 export const countValidationReportItems = async ({
+  user,
   surveyId,
   cycle,
   recordUuid,
@@ -414,14 +387,22 @@ export const countValidationReportItems = async ({
   attributeDefUuids = null,
   messageTypeKeys = null,
 }) => {
-  const filterBySurveyAttrs = await _resolveValidationReportFilterBySurveyAttrs({
+  const { rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
+    user,
     surveyId,
     cycle,
     query,
     attributeDefUuids,
     messageTypeKeys,
   })
-  return RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid, filterBySurveyAttrs })
+  return RecordManager.countValidationReportItems({
+    surveyId,
+    cycle,
+    recordUuid,
+    rootDataViewName,
+    filterBySurveyAttrs,
+    recordAccessFilters,
+  })
 }
 
 // RECORDS CLONE

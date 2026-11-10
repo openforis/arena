@@ -32,6 +32,31 @@ describe('Expression.toSql with client provided expressions', () => {
   })
 })
 
+describe('Expression.toSql with allowed identifiers and table alias', () => {
+  const expression = {
+    type: 'BinaryExpression',
+    operator: '==',
+    left: identifier('a'),
+    right: { type: 'CallExpression', callee: identifier('isEmpty'), arguments: [identifier('b')] },
+  }
+
+  test('allowed identifiers are qualified with the table alias', () => {
+    const { clause, params } = Expression.toSql(
+      expression,
+      {},
+      { allowedIdentifiers: new Set(['a', 'b']), tableAlias: 't' }
+    )
+    expect(clause).toBe(`$/_1:name/.$/_0:name/ IS NOT DISTINCT FROM coalesce(($/_3:name/.$/_2:name/)::text, '') = ''`)
+    expect(params).toEqual({ _0: 'a', _1: 't', _2: 'b', _3: 't' })
+  })
+
+  test.each(['c', 'email', 'constructor'])('identifier "%s" not allowed throws', (name) => {
+    expect(() =>
+      Expression.toSql({ ...expression, left: identifier(name) }, {}, { allowedIdentifiers: new Set(['a', 'b']) })
+    ).toThrow('appErrors:expression.identifierNotFound')
+  })
+})
+
 describe('Sort.toSql', () => {
   test('only ASC or DESC end up in the SQL', () => {
     const sort = [
