@@ -12,6 +12,15 @@ export default {
   requiredField: '{{field}} es obligatorio',
   rowsDuplicate: 'fila: {{row}} fila duplicada: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `La función "{{name}}" no está permitida`,
+    expressionInvalid: `"{{text}}" no está permitido en la expresión`,
+    expressionRequired: 'Expresión obligatoria',
+    expressionUnbalancedParentheses: 'Paréntesis no balanceados',
+    expressionUnknownColumn: `"{{name}}" no es una columna de la entidad`,
+    expressionUnterminatedQuote: 'Texto entre comillas sin cerrar',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'La etiqueta en el idioma predeterminado de la encuesta es obligatoria',
     analysisNodeDefsRequired: 'Se requiere al menos un atributo calculado',

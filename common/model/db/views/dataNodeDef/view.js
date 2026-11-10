@@ -17,6 +17,18 @@ const columnSet = {
   sampleOutlier: '_sample_outlier',
 }
 
+/**
+ * Makes numeric literals SQL numbers instead of text (e.g. integer_attr > 1.5 would fail with a text literal).
+ * @param {object} node - The expression node.
+ * @returns {object} - The expression node with numeric literals having their number value as raw value.
+ */
+const _numericLiteralsAsNumbers = (node) => {
+  if (Array.isArray(node)) return node.map((item) => _numericLiteralsAsNumbers(item))
+  if (!node || typeof node !== 'object') return node
+  if (Expression.isLiteral(node) && typeof node.value === 'number') return { ...node, raw: node.value }
+  return Object.fromEntries(Object.entries(node).map(([key, value]) => [key, _numericLiteralsAsNumbers(value)]))
+}
+
 export default class ViewDataNodeDef extends TableDataNodeDef {
   constructor(survey, nodeDef) {
     super(survey, nodeDef)
@@ -140,14 +152,21 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this._virtual
   }
 
+  /**
+   * Virtual entity formula converted into SQL, with literals and identifiers as query parameters.
+   * @returns {{clause: string, params: object}|null} - The SQL clause and its parameters, or null if there is no formula.
+   */
   get virtualExpression() {
     const formulas = NodeDef.getFormula(this.nodeDef)
-    if (this.virtual && formulas.length > 0) {
-      const expression = NodeDefExpression.getExpression(formulas[0])
-      const expressionString = Expression.fromString(expression)
-      return Expression.toString(expressionString, Expression.modes.sql)
+    const expression = this.virtual && formulas.length > 0 ? NodeDefExpression.getExpression(formulas[0]) : null
+    if (!expression) return null
+
+    const { clause, params } = Expression.toSql(_numericLiteralsAsNumbers(Expression.fromString(expression)))
+    // = and != as plain SQL comparisons (rows with empty values never match them), as in the views created so far
+    return {
+      clause: clause.replaceAll(' IS NOT DISTINCT FROM ', ' = ').replaceAll(' IS DISTINCT FROM ', ' != '),
+      params,
     }
-    return null
   }
 }
 

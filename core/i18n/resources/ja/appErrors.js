@@ -14,6 +14,7 @@ export default {
     tooManyLayers: 'カスタム地図レイヤーは最大 {{max}} 件まで追加できます',
     busy: 'サーバーが他のサービスを読み込み中です。しばらくしてからもう一度お試しください',
   },
+  aggregateFunctionInvalid: 'カスタム集計関数「{{name}}」は無効です。編集して修正してください',
   cannotGetChild: `属性{{name}}から子要素「{{childName}}」を取得できません`,
   cannotImportFilesExceedingQuota: '記録ファイルをインポートできません：ファイルストレージの容量上限を超えます',
   cannotInsertFileExceedingQuota: 'ファイルを追加できません：ファイルストレージの容量上限を超えます',

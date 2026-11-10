@@ -10,7 +10,12 @@ export const ValidatorErrorKeys = {
   nameRequired: 'validationErrors:nameRequired',
 
   aggregateFunction: {
+    expressionFunctionNotAllowed: 'validationErrors:aggregateFunction.expressionFunctionNotAllowed',
+    expressionInvalid: 'validationErrors:aggregateFunction.expressionInvalid',
     expressionRequired: 'validationErrors:aggregateFunction.expressionRequired',
+    expressionUnbalancedParentheses: 'validationErrors:aggregateFunction.expressionUnbalancedParentheses',
+    expressionUnknownColumn: 'validationErrors:aggregateFunction.expressionUnknownColumn',
+    expressionUnterminatedQuote: 'validationErrors:aggregateFunction.expressionUnterminatedQuote',
   },
 
   analysis: {
