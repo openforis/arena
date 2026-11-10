@@ -29,9 +29,9 @@ const parseGroup = (row: any) => ({ uuid: row.uuid, surveyUuid: row.survey_uuid,
 
 // minimal user group service (registered by ArenaServer.init when the server runs)
 const userGroupServiceTest = {
-  getAll: async ({ surveyUuid }: any, client: any = db) =>
+  getAll: ({ surveyUuid }: any, client: any = db) =>
     client.map(`SELECT * FROM user_group WHERE survey_uuid = $1`, [surveyUuid], parseGroup),
-  getManyByUser: async ({ userUuid, surveyUuid }: any, client: any = db) =>
+  getManyByUser: ({ userUuid, surveyUuid }: any, client: any = db) =>
     client.map(
       `SELECT g.* FROM user_group g JOIN user_group_user gu ON gu.group_uuid = g.uuid
       WHERE gu.user_uuid = $1 AND g.survey_uuid = $2`,
@@ -55,7 +55,7 @@ const getDataEditor = () => {
   return { ...getAdmin(), authGroups: [dataEditorGroup] }
 }
 
-const setDataEditorViewNotOwnedRecordsAllowed = async (allowed: boolean) =>
+const setDataEditorViewNotOwnedRecordsAllowed = (allowed: boolean) =>
   db.none(
     `UPDATE survey
     SET props = props || jsonb_build_object('security', COALESCE(props -> 'security', '{}'::jsonb) || jsonb_build_object('dataEditorViewNotOwnedRecordsAllowed', $2::boolean))

@@ -56,6 +56,27 @@ const getRootDataConditions = ({ filterBySurveyAttrs, recordAccessFilters }) => 
   return { conditions, params: { ...filterParams, ...qualifierParams } }
 }
 
+const getRootDataClause = ({ surveyRdbSchema, rootDataViewName, rootDataConditions }) => {
+  if (rootDataConditions.length === 0) return ''
+  if (!rootDataViewName) {
+    throw new Error('rootDataViewName is required to filter the validation report')
+  }
+  return `
+      AND EXISTS (
+        SELECT 1
+        FROM ${surveyRdbSchema}.$/rootDataViewName:name/ ${rootDataAlias}
+        WHERE ${rootDataAlias}.record_uuid = r.uuid
+          AND ${rootDataAlias}.record_cycle = r.cycle
+          AND ${rootDataConditions.join(' AND ')}
+      )`
+}
+
+// an empty selection (array) matches no rows, a missing one (null) doesn't filter
+const getSelectionFilterClause = ({ values, clause }) => {
+  if (!Array.isArray(values)) return ''
+  return values.length === 0 ? 'AND 1 = 0' : clause
+}
+
 const query = ({
   surveyId,
   recordUuid,
@@ -76,38 +97,15 @@ const query = ({
     filterBySurveyAttrs,
     recordAccessFilters,
   })
-  if (rootDataConditions.length > 0 && !rootDataViewName) {
-    throw new Error('rootDataViewName is required to filter the validation report')
-  }
-  const rootDataClause =
-    rootDataConditions.length > 0
-      ? `
-      AND EXISTS (
-        SELECT 1
-        FROM ${surveyRdbSchema}.$/rootDataViewName:name/ ${rootDataAlias}
-        WHERE ${rootDataAlias}.record_uuid = r.uuid
-          AND ${rootDataAlias}.record_cycle = r.cycle
-          AND ${rootDataConditions.join(' AND ')}
-      )`
-      : ''
-
-  let filterByAttributeDefsClause
-  if (Array.isArray(attributeDefUuids) && attributeDefUuids.length === 0) {
-    filterByAttributeDefsClause = 'AND 1 = 0'
-  } else if (attributeDefUuids?.length > 0) {
-    filterByAttributeDefsClause = 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)'
-  } else {
-    filterByAttributeDefsClause = ''
-  }
-
-  let filterByMessageTypesClause
-  if (Array.isArray(messageTypeKeys) && messageTypeKeys.length === 0) {
-    filterByMessageTypesClause = 'AND 1 = 0'
-  } else if (messageTypeKeys?.length > 0) {
-    filterByMessageTypesClause = `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`
-  } else {
-    filterByMessageTypesClause = ''
-  }
+  const rootDataClause = getRootDataClause({ surveyRdbSchema, rootDataViewName, rootDataConditions })
+  const filterByAttributeDefsClause = getSelectionFilterClause({
+    values: attributeDefUuids,
+    clause: 'AND n.node_def_uuid IN ($/attributeDefUuids:csv/)',
+  })
+  const filterByMessageTypesClause = getSelectionFilterClause({
+    values: messageTypeKeys,
+    clause: `AND jsonb_path_query_array(nv.validation, '$.**.key') ?| ARRAY[$/messageTypeKeys:csv/]::text[]`,
+  })
 
   const orderByClause = getOrderByClause({ sortBy, sortOrder })
 
