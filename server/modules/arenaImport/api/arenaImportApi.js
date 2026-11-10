@@ -4,12 +4,13 @@ import * as JobUtils from '@server/job/jobUtils'
 import { processChunkedFileForBackgroundMerge } from '@server/modules/file/service/requestChunkedFileProcessor'
 import * as Request from '@server/utils/request'
 
+import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ArenaImportService from '../service/arenaImportService'
 
 export const init = (app) => {
   // CREATE
 
-  app.post('/survey/arena-import', async (req, res, next) => {
+  app.post('/survey/arena-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
     try {
       const tempFile = await processChunkedFileForBackgroundMerge({ req })
       if (tempFile) {

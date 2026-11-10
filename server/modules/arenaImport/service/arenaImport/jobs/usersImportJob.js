@@ -121,6 +121,12 @@ export default class UsersImportJob extends Job {
     super('UsersImportJob', params)
   }
 
+  // accounts, passwords and global roles come from the imported file: only system admins can restore them;
+  // otherwise records are assigned to the importing user (see RecordsImportJob)
+  async shouldExecute() {
+    return User.isSystemAdmin(this.user)
+  }
+
   async execute() {
     const { arenaSurveyFileZip, surveyId, arenaSurvey, survey, user } = this.context
 
