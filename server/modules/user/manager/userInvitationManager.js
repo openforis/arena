@@ -5,6 +5,7 @@ export const {
   updateRemovedDate,
   fetchUserInvitationBySurveyAndUserUuid,
   fetchUserInvitationsBySurveyUuid,
+  existsUserInvitationInOtherSurveys,
   deleteUserInvitation,
   deleteExpiredInvitations,
 } = UserInvitationRepository

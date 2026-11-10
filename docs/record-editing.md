@@ -89,6 +89,11 @@ records owned by others (`Authorizer.canViewNotOwnedRecords`), only the user's o
 (`recordQualifierMiddleware.ts`). Records lists, the validation report and its export apply the same
 restrictions in their queries.
 
+The same group restriction applies to the Data Explorer queries, counts and exports (and to the map data
+export): `SurveyRdbService` fetches the user's group access filters and the data view queries keep only the
+records whose qualifier columns in the root entity data view match the user's group or one of the groups it
+can read.
+
 A **new record** is created in two steps: `RecordActions.createRecord` posts an empty record
 (`POST /survey/:surveyId/record` → `RecordManager.insertRecord`, record row only), then navigates to the
 record view, whose check-in triggers `recordInit`. The thread runs `RecordManager.initNewRecord`, which
