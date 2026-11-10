@@ -63,4 +63,33 @@ describe('Activity Log Test', () => {
 
     await SurveyManager.deleteSurvey(surveyId)
   })
+
+  test('Activity Log fetch filtered by id', async () => {
+    const user = getContextUser()
+
+    const survey = await SB.survey(user, SB.entity('cluster', SB.attribute('cluster_no').key())).buildAndStore()
+    const surveyId = Survey.getId(survey)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+
+    await RecordManager.insertRecord(user, surveyId, RecordUtils.newRecord(user))
+    await RecordManager.insertRecord(user, surveyId, RecordUtils.newRecord(user))
+
+    const getIds = (logs) => logs.map((log) => Number(ActivityLog.getId(log)))
+
+    const allIds = getIds(await ActivityLogRepository.fetch({ surveyInfo }))
+    expect(allIds.length).toBeGreaterThanOrEqual(2)
+    const minId = Math.min(...allIds)
+    const maxId = Math.max(...allIds)
+
+    const olderIds = getIds(await ActivityLogRepository.fetch({ surveyInfo, idLessThan: maxId }))
+    expect(olderIds.length).toBeGreaterThan(0)
+    expect(olderIds.every((id) => id < maxId)).toBe(true)
+
+    const newerIds = getIds(await ActivityLogRepository.fetch({ surveyInfo, idGreaterThan: minId, orderBy: 'ASC' }))
+    expect(newerIds.length).toBeGreaterThan(0)
+    expect(newerIds.every((id) => id > minId)).toBe(true)
+    expect(newerIds).toEqual([...newerIds].sort((idA, idB) => idA - idB))
+
+    await SurveyManager.deleteSurvey(surveyId)
+  })
 })
