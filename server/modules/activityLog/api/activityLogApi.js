@@ -16,7 +16,9 @@ export const init = (app) => {
    */
   app.get('/survey/:surveyId/activity-log', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, idGreaterThan, idLessThan } = Request.getParams(req)
+      const { surveyId } = Request.getParams(req)
+      const idGreaterThan = Request.getIntegerParam(req, 'idGreaterThan')
+      const idLessThan = Request.getIntegerParam(req, 'idLessThan')
       const user = Request.getUser(req)
 
       const activityLogs = await ActivityLogService.fetch({ user, surveyId, idGreaterThan, idLessThan })
