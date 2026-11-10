@@ -86,15 +86,17 @@ export const countViewDataAgg = async (params, client = db) => {
   const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
   const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
-  return client.one(
-    `
+  return client.tx(dbUtils.txOptionsReadOnly, (t) =>
+    t.one(
+      `
     SELECT COUNT(*) AS count
     FROM (
       ${select}
     ) AS t
     `,
-    { ...queryParams },
-    (row) => Number(row.count)
+      { ...queryParams },
+      (row) => Number(row.count)
+    )
   )
 }
 
@@ -129,5 +131,5 @@ export const fetchViewDataAgg = async (params, client = db) => {
 
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit))
-    : client.any(selectWithLimit, queryParamsWithLimit)
+    : client.tx(dbUtils.txOptionsReadOnly, (t) => t.any(selectWithLimit, queryParamsWithLimit))
 }

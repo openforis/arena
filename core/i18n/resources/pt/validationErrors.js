@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} é obrigatório',
   rowsDuplicate: 'linha: {{row}} linha duplicada: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `A função "{{name}}" não é permitida`,
+    expressionInvalid: `"{{text}}" não é permitido na expressão`,
+    expressionRequired: 'Expressão obrigatória',
+    expressionUnbalancedParentheses: 'Parênteses não balanceados',
+    expressionUnknownColumn: `"{{name}}" não é uma coluna da entidade`,
+    expressionUnterminatedQuote: 'Texto entre aspas não fechado',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Rótulo no idioma padrão do inventário é obrigatório',
     analysisNodeDefsRequired: 'Pelo menos um atributo calculado é obrigatório',

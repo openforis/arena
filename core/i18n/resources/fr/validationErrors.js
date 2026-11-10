@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} est requis',
   rowsDuplicate: 'ligne : {{row}} ligne dupliquée : {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `La fonction "{{name}}" n'est pas autorisée`,
+    expressionInvalid: `"{{text}}" n'est pas autorisé dans l'expression`,
+    expressionRequired: 'Expression requise',
+    expressionUnbalancedParentheses: 'Parenthèses non équilibrées',
+    expressionUnknownColumn: `"{{name}}" n'est pas une colonne de l'entité`,
+    expressionUnterminatedQuote: 'Texte entre guillemets non fermé',
+  },
+
   analysis: {
     labelDefaultLangRequired: "L'étiquette dans la langue par défaut du formulaire est requise",
     analysisNodeDefsRequired: 'Au moins un attribut calculé est requis',

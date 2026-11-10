@@ -29,6 +29,7 @@ export default {
   userCannotDeleteSelf: 'Vous ne pouvez pas supprimer votre propre compte utilisateur',
   userEmailInvalid:
     "L'e-mail d'invitation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
+  aggregateFunctionInvalid: `La fonction d'agrégation personnalisée "{{name}}" n'est pas valide : modifiez-la pour la corriger`,
   cannotGetChild: `Impossible d'obtenir l'enfant '{{childName}}' depuis l'attribut {{name}}`,
   cannotImportFilesExceedingQuota:
     "Impossible d'importer les fichiers d'enregistrement : le quota de stockage serait dépassé",
