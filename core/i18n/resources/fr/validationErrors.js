@@ -128,6 +128,7 @@ export default {
     keysEmpty: 'Définissez au moins un attribut clé',
 
     keysExceedingMax: "Nombre maximum d'attributs clés dépassé",
+    mapMarkerColorInvalid: 'La couleur du marqueur de carte doit être un code couleur comme #ff0000',
     maxFileSizeInvalid: 'La taille maximale du fichier doit être supérieure à 0 et inférieure à {{max}}',
     nameInvalid:
       'Le nom est invalide (il doit contenir uniquement des lettres minuscules, des chiffres et des traits de soulignement, en commençant par une lettre)',

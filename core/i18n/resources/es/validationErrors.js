@@ -126,6 +126,7 @@ export default {
     formulaInvalid: 'La fórmula es inválida',
     keysEmpty: 'Defina al menos un atributo clave',
     keysExceedingMax: 'Excediendo el número máximo de atributos clave',
+    mapMarkerColorInvalid: 'El color del marcador en el mapa debe ser un código de color como #ff0000',
     maxFileSizeInvalid: 'El tamaño máximo de archivo debe ser mayor que 0 y menor que {{max}}',
     nameInvalid:
       'El nombre no es válido (debe contener solo letras minúsculas, números y guiones bajos, comenzando con una letra)',
