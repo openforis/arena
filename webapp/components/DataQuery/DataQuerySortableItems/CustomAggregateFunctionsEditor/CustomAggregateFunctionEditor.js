@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -6,9 +6,12 @@ import { AggregateFunction } from '@core/survey/aggregateFunction'
 import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import { ViewDataNodeDef } from '@common/model/db'
 
 import { FormItem, Input } from '@webapp/components/form/Input'
+import { FormItemWithValidation } from '@webapp/components/form/FormItemWithValidation'
 import { ButtonCancel, ButtonDelete, ButtonSave } from '@webapp/components'
+import { useSurvey } from '@webapp/store/survey'
 import { NotificationActions } from '@webapp/store/ui'
 import { AggregateFunctionExpressionEditor } from './AggregateFunctionExpressionEditor'
 
@@ -23,16 +26,19 @@ export const CustomAggregateFunctionEditor = (props) => {
   } = props
 
   const dispatch = useDispatch()
+  const survey = useSurvey()
 
   const [aggregateFunction, setAggregateFunction] = useState(aggregateFunctionParam)
 
   const [validation, setValidation] = useState(null)
 
+  const columnNames = useMemo(() => new ViewDataNodeDef(survey, entityDef).columnNodeDefNames, [survey, entityDef])
+
   useEffect(() => {
-    validateAggregateFunction({ aggregateFunction, nodeDef })
+    validateAggregateFunction({ aggregateFunction, nodeDef, columnNames })
       .then(setValidation)
       .catch(() => setValidation(null))
-  }, [aggregateFunction, nodeDef])
+  }, [aggregateFunction, nodeDef, columnNames])
 
   const updateAggregateFunction = ({ propName, value }) => {
     setAggregateFunction({ ...aggregateFunction, [propName]: value })
@@ -59,7 +65,10 @@ export const CustomAggregateFunctionEditor = (props) => {
           }
         />
       </FormItem>
-      <FormItem label="dataExplorerView.customAggregateFunction.sqlExpression">
+      <FormItemWithValidation
+        label="dataExplorerView.customAggregateFunction.sqlExpression"
+        validation={Validation.getFieldValidation(AggregateFunction.keys.expression)(validation)}
+      >
         <AggregateFunctionExpressionEditor
           entityDef={entityDef}
           nodeDef={nodeDef}
@@ -71,7 +80,7 @@ export const CustomAggregateFunctionEditor = (props) => {
             })
           }
         />
-      </FormItem>
+      </FormItemWithValidation>
       <div className="button-bar">
         <ButtonSave onClick={onSave} />
         <ButtonCancel onClick={() => onCancel(aggregateFunction)} />

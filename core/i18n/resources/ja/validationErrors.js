@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}}は必須です',
   rowsDuplicate: '行：{{row}} 重複する行：{{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: '関数「{{name}}」は使用できません',
+    expressionInvalid: '「{{text}}」は式で使用できません',
+    expressionRequired: '式は必須です',
+    expressionUnbalancedParentheses: '括弧の対応が取れていません',
+    expressionUnknownColumn: '「{{name}}」は項目の列ではありません',
+    expressionUnterminatedQuote: '引用符が閉じられていません',
+  },
+
   analysis: {
     labelDefaultLangRequired: '調査のデフォルト言語でのラベルは必須です',
     analysisNodeDefsRequired: '少なくとも1つの計算属性が必要です',

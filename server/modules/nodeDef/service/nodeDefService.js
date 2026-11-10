@@ -6,6 +6,9 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 import * as SurveyValidator from '@core/survey/surveyValidator'
 import * as Validation from '@core/validation/validation'
 import * as ObjectUtils from '@core/objectUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { validateAggregateFunction } from '@core/survey/aggregateFunctionValidator'
+import { ColumnNodeDef } from '@common/model/db'
 
 import { db } from '@server/db/db'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -102,12 +105,43 @@ export const insertNodeDefs = async ({ user, surveyId, cycle = Survey.cycleOneKe
     return afterNodeDefUpdate({ survey: surveyUpdated, nodeDefsUpdated: nodeDefs })
   })
 
+/**
+ * Throws an error if the custom aggregate functions being saved are not valid (e.g. not allowed SQL in the expression).
+ * @param {object} params - The parameters.
+ * @param {object} params.survey - The survey.
+ * @param {string} params.nodeDefUuid - The UUID of the node definition being updated.
+ * @param {object} params.propsAdvanced - The advanced props being saved.
+ * @returns {Promise<void>} - The validation promise.
+ */
+const _checkAggregateFunctions = async ({ survey, nodeDefUuid, propsAdvanced }) => {
+  const aggregateFunctions = propsAdvanced[NodeDef.keysPropsAdvanced.aggregateFunctions]
+  const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
+  if (!aggregateFunctions || !nodeDefPrev) return
+
+  const nodeDef = NodeDef.mergePropsAdvanced(propsAdvanced)(nodeDefPrev)
+  // the function can be used in queries of any entity whose data view includes the measure: allow any survey column
+  const columnNames = Survey.getNodeDefsArray(survey).flatMap((def) => ColumnNodeDef.getColumnNames(def))
+  const aggregateFunctionsArray = Object.values(aggregateFunctions)
+  const validations = await Promise.all(
+    aggregateFunctionsArray.map((aggregateFunction) =>
+      validateAggregateFunction({ aggregateFunction, nodeDef, columnNames })
+    )
+  )
+  const invalidIndex = validations.findIndex((validation) => !Validation.isValid(validation))
+  if (invalidIndex >= 0) {
+    const name = aggregateFunctionsArray[invalidIndex]?.name
+    throw new SystemError('appErrors:aggregateFunctionInvalid', { name }, StatusCodes.BAD_REQUEST)
+  }
+}
+
 export const updateNodeDefProps = async (
   { user, surveyId, cycle, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false },
   client = db
 ) =>
   client.tx(async (t) => {
     const survey = await fetchSurvey({ surveyId, cycle }, t)
+
+    await _checkAggregateFunctions({ survey, nodeDefUuid, propsAdvanced })
 
     const nodeDefsDependentsUuids = Survey.getNodeDefDependentsUuids(nodeDefUuid)(survey)
 

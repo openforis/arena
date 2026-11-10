@@ -82,7 +82,7 @@ const _getJoinsWithMultipleAttributeDataTables = (viewDataNodeDef) => {
  */
 export const createDataView = async ({ survey, nodeDef }, client) => {
   const viewDataNodeDef = new ViewDataNodeDef(survey, nodeDef)
-  const { tableData, viewDataParent } = viewDataNodeDef
+  const { tableData, viewDataParent, virtualExpression } = viewDataNodeDef
 
   // select * from virtual entities includes the parent_uuid column too (see https://github.com/openforis/arena/issues/728)
   const selectFields = viewDataNodeDef.virtual
@@ -121,7 +121,7 @@ export const createDataView = async ({ survey, nodeDef }, client) => {
         ${tableData.nameAliased}
       ${joinWithParentView}
       ${_getJoinsWithMultipleAttributeDataTables(viewDataNodeDef)}
-      ${viewDataNodeDef.virtualExpression ? `WHERE ${viewDataNodeDef.virtualExpression}` : ''}
+      ${virtualExpression ? `WHERE ${DbUtils.formatQuery(virtualExpression.clause, virtualExpression.params)}` : ''}
      )`
   return client.query(query)
 }

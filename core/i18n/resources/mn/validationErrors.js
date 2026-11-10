@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} шаардлагатай',
   rowsDuplicate: 'мөр: {{row}} давхцсан мөр: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `"{{name}}" функцийг ашиглахыг зөвшөөрөхгүй`,
+    expressionInvalid: `"{{text}}" илэрхийлэлд зөвшөөрөгдөхгүй`,
+    expressionRequired: 'Илэрхийлэл шаардлагатай',
+    expressionUnbalancedParentheses: 'Хаалт тэнцвэргүй байна',
+    expressionUnknownColumn: `"{{name}}" нь объектын багана биш`,
+    expressionUnterminatedQuote: 'Хашилт хаагдаагүй байна',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Судалгааны үндсэн хэл дээрх шошго шаардлагатай',
     analysisNodeDefsRequired: 'Наад зах нь нэг тооцоолсон шинж чанар шаардлагатай',
