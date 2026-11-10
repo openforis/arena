@@ -11,11 +11,36 @@ import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+import { DataImportRecordPermissions } from './dataImportRecordPermissions'
+
 const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
     const keyName = NodeDef.getName(rootKeyDefs[emptyRootKeyValueIndex])
     throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissingOrInvalid, { keyName })
+  }
+}
+
+/**
+ * Throws an error if the user running the import cannot update the specified existing record.
+ * @param {!object} params - The function parameters.
+ * @param {!object} params.context - The import job context.
+ * @param {!object} params.record - The record (with nodes) to update.
+ * @param {!string} params.keyValues - The record key values (formatted), used in the error message.
+ * @returns {void}
+ */
+const checkCanUpdateRecord = ({ context, record, keyValues }) => {
+  const { survey, updateRecordsInAnalysis, user, userQualifierFilters } = context
+  if (
+    !DataImportRecordPermissions.canUpdateRecord({
+      user,
+      survey,
+      record,
+      updateRecordsInAnalysis,
+      userQualifierFilters,
+    })
+  ) {
+    throw new SystemError(Validation.messageKeys.dataImport.recordNotEditable, { keyValues })
   }
 }
 
@@ -179,6 +204,8 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
     // fetch record
     await flushCallback() // flush before fetching a record: nodes could have been inserted/updated/deleted before
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, tx)
+
+    checkCanUpdateRecord({ context, record, keyValues: keyNameValuePairs })
 
     return {
       newRecord: false,

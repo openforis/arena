@@ -16,7 +16,7 @@ export const init = (app) => {
       const { surveyId, deleteAllRecords, cycle, forceImport } = Request.getParams(req)
       const file = Request.getFile(req)
 
-      const job = DataImportService.startCollectDataImportJob({
+      const job = await DataImportService.startCollectDataImportJob({
         user,
         surveyId,
         filePath: file.tempFilePath,
@@ -47,6 +47,9 @@ export const init = (app) => {
         deleteExistingEntities,
         abortOnErrors,
       } = Request.getParams(req)
+
+      // rejected on the first chunk, before the whole file is uploaded
+      DataImportService.checkFlatDataImportOptions({ user, includeFiles, deleteExistingEntities })
 
       const tempFile = await processChunkedFileForBackgroundMerge({ req })
       if (tempFile) {

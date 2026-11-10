@@ -79,6 +79,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Zapis sa ključevima "{{keyValues}}" je u koraku Analiza i ne može se ažurirati',
     recordKeyMissingOrInvalid: 'Nedostaje ili nije važeća vrijednost ključnog atributa "{{keyName}}"',
+    recordNotEditable: 'Zapis sa ključevima "{{keyValues}}" nije moguće ažurirati: nemate dozvolu da ga uređujete',
     recordNotFound: 'Zapis sa ključevima "{{keyValues}}" nije pronađen',
   },
 
