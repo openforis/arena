@@ -1,4 +1,5 @@
 import type { MapCustomLayer, MapCustomLayerWithScope } from '@core/map/customLayers/mapCustomLayer'
+import * as StringUtils from '@core/stringUtils'
 import { MAP_MAX_ZOOM, MAP_MIN_ZOOM } from '@webapp/components/MapContainer/mapZoom'
 
 // above the built-in overlays (Leaflet's default 1) and below the markers pane
@@ -36,16 +37,6 @@ export type CustomBaseLayerDef = {
   custom: MapCustomLayerWithScope
 }
 
-const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
-
-/**
- * Escapes an attribution: Leaflet's attribution control renders HTML, and attributions are typed by users or read
- * from remote capabilities documents.
- * @param {string} text - The plain-text attribution.
- * @returns {string} The HTML-escaped text.
- */
-export const escapeAttribution = (text: string): string => text.replace(/[&<>"']/g, (char) => HTML_ESCAPES[char])
-
 /**
  * Builds the Leaflet options of a custom layer.
  * @param {MapCustomLayer} layer - The layer.
@@ -53,7 +44,8 @@ export const escapeAttribution = (text: string): string => text.replace(/[&<>"']
  */
 const buildTileOptions = (layer: MapCustomLayer): CustomLayerTileOptions => ({
   opacity: layer.opacity,
-  attribution: escapeAttribution(layer.attribution),
+  // Leaflet's attribution control renders HTML; attributions are typed by users or read from capabilities documents
+  attribution: StringUtils.escapeHtml(layer.attribution),
   minZoom: MAP_MIN_ZOOM,
   maxZoom: MAP_MAX_ZOOM,
   ...(layer.role === 'overlay' ? { zIndex: CUSTOM_OVERLAY_Z_INDEX } : {}),

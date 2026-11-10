@@ -1,13 +1,7 @@
 // browser-only DOMPurify: the isomorphic one pulls jsdom, which the unit test bundle cannot load (checked in e2e)
 import DOMPurify from 'dompurify'
 
-/**
- * Escapes the characters that make text HTML.
- * @param {string} text - The text.
- * @returns {string} The text, safe inside HTML.
- */
-const escapeHtml = (text: string): string =>
-  text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+import { escapeHtml } from '@core/stringUtils'
 
 /**
  * Builds the popup HTML of a KML place. The name is plain text; the description keeps its simple HTML
