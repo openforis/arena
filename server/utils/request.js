@@ -1,6 +1,7 @@
 import * as A from '@core/arena'
 
 import * as ProcessUtils from '@core/processUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
 export const getServerUrl = (req) => `${req.protocol}://${req.get('host')}`
@@ -73,6 +74,26 @@ export const getRequiredIntegerParam = (req, param) => {
     throw new TypeError(`${param} must be a valid integer`)
   }
   return value
+}
+
+const integerStringRegex = /^-?\d+$/
+
+/**
+ * Returns the value of an optional integer param.
+ * @param {object} req - The HTTP request.
+ * @param {string} param - The param name.
+ * @returns {number|null} The param value as an integer, or null when the param is not specified.
+ * @throws {SystemError} With status 400 when the param is specified but it is not an integer.
+ */
+export const getIntegerParam = (req, param) => {
+  const value = A.prop(param, getParams(req))
+  if (value === undefined || value === null || value === '') return null
+  // strict string check: Number() would also accept values like '1e3', '0x10' or ' 1 '
+  const integerValue = typeof value === 'string' && integerStringRegex.test(value) ? Number(value) : value
+  if (!Number.isSafeInteger(integerValue)) {
+    throw new SystemError('appErrors:paramMustBeInteger', { param }, StatusCodes.BAD_REQUEST)
+  }
+  return integerValue
 }
 
 export const getFile = A.pathOr(null, ['files', 'file'])

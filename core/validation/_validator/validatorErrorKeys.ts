@@ -55,6 +55,7 @@ export const ValidatorErrorKeys = {
     multipleRecordsMatchingKeys: 'validationErrors:dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors:dataImport.recordAlreadyExisting',
     recordKeyMissingOrInvalid: 'validationErrors:dataImport.recordKeyMissingOrInvalid',
+    recordNotEditable: 'validationErrors:dataImport.recordNotEditable',
     recordNotFound: 'validationErrors:dataImport.recordNotFound',
   },
 
@@ -104,6 +105,7 @@ export const ValidatorErrorKeys = {
     formulaInvalid: 'validationErrors:nodeDefEdit.formulaInvalid',
     keysEmpty: 'validationErrors:nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors:nodeDefEdit.keysExceedingMax',
+    mapMarkerColorInvalid: 'validationErrors:nodeDefEdit.mapMarkerColorInvalid',
     maxFileSizeInvalid: 'validationErrors:nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors:nodeDefEdit.nameInvalid',
     qualifierCannotHaveApplicableExpression: 'validationErrors:nodeDefEdit.qualifierCannotHaveApplicableExpression',
