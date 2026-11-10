@@ -6,7 +6,6 @@ import { DBMigrator, Schemata } from '@openforis/arena-server'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import * as AuthGroup from '@core/auth/authGroup'
 import { uuidv4 } from '@core/uuid'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -200,16 +199,8 @@ export const insertSurvey = async (params, client = db) => {
   }
 }
 
-// surveys exported before a role was introduced (e.g. survey guest) do not have its group
-const _addMissingDefaultAuthGroups = (authGroups) => {
-  const groupNames = new Set(authGroups.map(AuthGroup.getName))
-  const missingGroups = Survey.getDefaultAuthGroups().filter((group) => !groupNames.has(AuthGroup.getName(group)))
-  return [...authGroups, ...missingGroups]
-}
-
 export const importSurvey = async (params, client = db) => {
-  const { user, surveyInfo: surveyInfoParam, authGroups: authGroupsParam, backup } = params
-  const authGroups = authGroupsParam ? _addMissingDefaultAuthGroups(authGroupsParam) : Survey.getDefaultAuthGroups()
+  const { user, surveyInfo: surveyInfoParam, backup } = params
   _checkLanguagesAndCycles(Survey.getProps(surveyInfoParam))
   _checkLanguagesAndCycles(Survey.getPropsDraft(surveyInfoParam))
 
@@ -234,9 +225,10 @@ export const importSurvey = async (params, client = db) => {
     await DBMigrator.migrateSurveySchema(surveyId)
 
     return await client.tx(async (t) => {
-      // Create default groups for this survey
+      // Create default groups for this survey: groups in the imported file are ignored (they can't be trusted
+      // and could miss roles introduced after the export, e.g. survey guest)
       let surveyInfoUpdated = Survey.assocAuthGroups(
-        await AuthGroupRepository.createSurveyGroups(surveyId, authGroups, t)
+        await AuthGroupRepository.createSurveyGroups(surveyId, Survey.getDefaultAuthGroups(), t)
       )(surveyInfo)
 
       surveyInfoUpdated = await _fetchAndAssocAdditionalInfo({ surveyInfo: surveyInfoUpdated }, t)

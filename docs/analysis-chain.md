@@ -104,12 +104,16 @@ for localhost), so R calls back the URL it downloaded from.
 
 ## The generated R project
 
-`RChain.init` (`server/modules/analysis/service/rChain/rChain.js`) writes the project into
-`ANALYSIS_OUTPUT_DIR/<survey name>/<chain label>/`. Each R file is an `RFile` subclass
-(`rChain/rFile/`) whose `init` writes the file and appends a `source(...)` of it to `arena.R`, the
-entry point; the R code strings come from the helpers in `rChain/rFunctions/`. `chain_summary.json`
-(`ChainSummaryGenerator`, also downloadable from the chain page) carries the chain, sampling design and
-statistical analysis settings, loaded in R as `arena.chainSummary`. `arena.R` runs, in order:
+`RChain.init` (`server/modules/analysis/service/rChain/rChain.js`) deletes and rewrites the project in
+`ANALYSIS_OUTPUT_DIR/<survey name>/<chain folder>/`. The chain folder name (`rChain/rChainDir.ts`) is the
+chain label in the survey default language normalized like a node definition name (lowercase letters,
+digits and underscores) plus the first 8 characters of the chain uuid, e.g. `volume_calc_3f2a9b1c` (only
+the uuid part if no character of the label is kept); generation fails if `ANALYSIS_OUTPUT_DIR` is not set
+or the folder does not resolve inside it. Each R file is an `RFile` subclass (`rChain/rFile/`) whose
+`init` writes the file and appends a `source(...)` of it to `arena.R`, the entry point; the R code
+strings come from the helpers in `rChain/rFunctions/`. `chain_summary.json` (`ChainSummaryGenerator`,
+also downloadable from the chain page) carries the chain, sampling design and statistical analysis
+settings, loaded in R as `arena.chainSummary`. `arena.R` runs, in order:
 
 1. `system/init.R`: installs/loads packages, defines the API helpers (`system/init/init-api.R`) and sets
    `arena.host` and `arena.token`.

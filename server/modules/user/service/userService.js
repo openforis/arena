@@ -11,6 +11,7 @@ import { Countries } from '@core/Countries'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'
+import { UserInvitation } from '@core/user/userInvitation'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
@@ -304,22 +305,65 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
 
 export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
 
-export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = null }) => {
+/**
+ * Checks if a survey user (not a system admin) can get the invitation (password reset) link of a pending user.
+ * The link sets the password of the whole account: the pending user must not be a system admin and must have roles
+ * and invitations only in this survey; the global survey manager role is accepted only together with the survey admin
+ * role of this survey, because inviting a survey admin grants it.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.userToInvite - The pending user (with auth groups).
+ * @param {!object} params.surveyInfo - The survey info.
+ * @returns {Promise<boolean>} - True if the link can be returned to a survey user.
+ */
+const _canSurveyUserGetResetPasswordUrl = async ({ userToInvite, surveyInfo }) => {
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  if (User.isSurveyManager(userToInvite)) {
+    const surveyGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToInvite)
+    if (AuthGroup.getName(surveyGroup) !== AuthGroup.groupNames.surveyAdmin) {
+      return false
+    }
+  }
+  return UserInviteService.isUserInvolvedOnlyInSurvey({ userToInvite, surveyUuid })
+}
+
+/**
+ * Throws an error if the user cannot get the invitation link of the specified user in the specified survey.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user requesting the link.
+ * @param {!string} params.userUuid - UUID of the invited user.
+ * @param {!number} params.surveyId - ID of the survey.
+ */
+const _checkCanGetSurveyUserResetPasswordUrl = async ({ user, userUuid, surveyId }) => {
+  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({ surveyUuid, userUuid })
+  if (!invitation || UserInvitation.hasBeenRemoved(invitation)) {
+    throw new SystemError('appErrors:userNotInvitedToSurvey', {}, StatusCodes.NOT_FOUND)
+  }
+  // the reset password token of a user who already accepted can come from a "forgot password" request
+  const userToInvite = await UserManager.fetchUserByUuid(userUuid)
+  if (!User.isInvited(userToInvite)) {
+    throw new SystemError('appErrors:userNotInvitedToSurvey', {}, StatusCodes.NOT_FOUND)
+  }
+  if (!User.isSystemAdmin(user) && !(await _canSurveyUserGetResetPasswordUrl({ userToInvite, surveyInfo }))) {
+    throw new SystemError('appErrors:userInvitationLinkNotAvailable', {}, StatusCodes.FORBIDDEN)
+  }
+}
+
+/**
+ * Returns the reset password (or invitation) URL of a user.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user requesting the URL.
+ * @param {!string} params.serverUrl - Address of the server.
+ * @param {!string} params.userUuid - UUID of the user whose URL is requested.
+ * @param {number} [params.surveyId] - ID of the survey the user has been invited to (required for non system admins).
+ * @returns {Promise<string>} - The reset password URL.
+ */
+export const fetchResetPasswordUrl = async ({ user, serverUrl, userUuid, surveyId = null }) => {
   if (surveyId) {
-    const survey = await SurveyManager.fetchSurveyById({ surveyId })
-    const surveyUuid = Survey.getUuid(survey)
-    const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-      surveyUuid,
-      userUuid,
-    })
-    if (!invitation) {
-      throw new SystemError('appErrors:userNotInvitedToSurvey')
-    }
-    // the reset password token of a user who already accepted can come from a "forgot password" request
-    const userToInvite = await UserManager.fetchUserByUuid(userUuid)
-    if (!User.isInvited(userToInvite)) {
-      throw new SystemError('appErrors:userNotInvitedToSurvey')
-    }
+    await _checkCanGetSurveyUserResetPasswordUrl({ user, userUuid, surveyId })
+  } else if (!User.isSystemAdmin(user)) {
+    throw new UnauthorizedError(User.getName(user))
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
@@ -376,8 +420,8 @@ const _canAssignGlobalRoles = ({ user, userToUpdateOld, authGroupsNew }) => {
     return false
   }
 
-  // Only survey managers can promote users to survey manager
-  if (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager) {
+  // Non-system admins cannot grant or revoke the survey manager role
+  if (userToUpdateWasSurveyManager !== userToUpdateWillBeSurveyManager) {
     return false
   }
 
