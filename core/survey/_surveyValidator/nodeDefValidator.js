@@ -2,6 +2,7 @@ import * as A from '@core/arena'
 
 import { NodeDefExpressionValidator } from '@openforis/arena-core'
 
+import { isHexColor } from '@core/colorUtils'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -225,6 +226,13 @@ const validateMaxFileSize = (_propName, nodeDef) => {
   return null
 }
 
+// the color goes into the map layers control HTML and marker styles
+const validateMapMarkerColor = (_propName, nodeDef) => {
+  const color = NodeDef.getMapMarkerColor(nodeDef)
+  if (A.isEmpty(color) || isHexColor(color)) return null
+  return { key: Validation.messageKeys.nodeDefEdit.mapMarkerColorInvalid }
+}
+
 const validateNameIsNotKeyword = (propName, nodeDef) => {
   if (NodeDef.isSampling(nodeDef)) return null
   return Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword)(propName, nodeDef)
@@ -255,6 +263,8 @@ const propsValidations = (survey) => ({
   ],
   // Code
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
+  // Coordinate
+  [`${keys.props}.${propKeys.mapMarkerColor}`]: [validateMapMarkerColor],
   // File
   [`${keys.props}.${propKeys.maxFileSize}`]: [validateMaxFileSize],
   // Taxon
