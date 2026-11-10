@@ -103,6 +103,22 @@ export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
   }
 }
 
+// survey export: what the export includes depends also on the user role (see SurveyService.createSurveyExportJob)
+export const requireSurveyExportPermission = async (req, res, next) => {
+  try {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+    if (Authorizer.canExportSurvey(user, surveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
 // survey compare: the survey used as source must be visible to the user (published templates included)
 export const requireSurveyCompareSourceViewPermission = async (req, res, next) => {
   try {

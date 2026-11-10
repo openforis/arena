@@ -228,7 +228,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
+  app.get('/survey/:surveyId/export', AuthMiddleware.requireSurveyExportPermission, async (req, res, next) => {
     try {
       const {
         surveyId,
@@ -239,7 +239,7 @@ export const init = (app) => {
 
       const user = Request.getUser(req)
 
-      const { job, outputFileName } = SurveyService.exportSurvey({
+      const { job, outputFileName } = await SurveyService.exportSurvey({
         surveyId,
         user,
         includeData,

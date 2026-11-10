@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
@@ -54,6 +55,7 @@ export const useOnNewSurveyClick = ({ onAfterClick } = {}) => {
 
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
 export const useAuthCanExportSurvey = () => Authorizer.canExportSurvey(useUser(), useSurveyInfo())
+export const useAuthCanExportSurveyData = () => canExportSurveyData(useUser(), useSurveyInfo())
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
 export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
