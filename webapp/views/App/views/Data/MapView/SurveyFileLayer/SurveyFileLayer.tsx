@@ -2,6 +2,8 @@ import { useCallback, useEffect, useRef } from 'react'
 import { LayerGroup, LayersControl, useMap } from 'react-leaflet'
 import type L from 'leaflet'
 
+import { escapeHtml } from '@core/stringUtils'
+
 import { useNotifyError } from '@webapp/components/hooks'
 import { fetchSurveyFileAsFile, type SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
 import {
@@ -32,7 +34,8 @@ export const SurveyFileLayer = (props: Props) => {
 
   const layerRef = useRef<L.FeatureGroup | null>(null)
 
-  const layerName = label || fileName
+  // Leaflet's layers control renders the overlay name as HTML
+  const layerName = escapeHtml(label || fileName)
 
   const removePreviousLayer = useCallback(() => {
     const layer = layerRef.current

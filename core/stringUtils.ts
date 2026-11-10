@@ -68,6 +68,16 @@ export const removeNewLines = (value: unknown): unknown => {
 export const nullToEmpty = (value: Stringifiable): string =>
   value === null || value === undefined ? '' : String(value)
 
+const HTML_ESCAPES: Record<string, string> = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }
+
+/**
+ * Escapes the HTML special characters of a plain text placed into an HTML string.
+ * @param {Stringifiable} text - The plain text (null and undefined become an empty string).
+ * @returns {string} The escaped text, safe inside HTML elements and quoted attributes.
+ */
+export const escapeHtml = (text: Stringifiable): string =>
+  nullToEmpty(text).replaceAll(/[&<>"']/g, (char) => HTML_ESCAPES[char])
+
 /**
  * Append suffix if not already present.
  */
