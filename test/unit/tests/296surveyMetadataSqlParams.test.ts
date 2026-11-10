@@ -83,21 +83,25 @@ describe('Survey info validation', () => {
   const newSurveyInfo = (props: Record<string, unknown>) =>
     Survey.newSurvey({ ownerUuid: 'owner-uuid', name: 'survey_test', languages: ['en'], ...props })
 
-  test('known language codes are valid', async () => {
-    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', 'fr'] }))
+  test('language codes with a safe format are valid', async () => {
+    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', 'fr', 'default'] }))
     expect(Validation.isValid(validation)).toBe(true)
   })
 
-  test('unknown language codes are not valid', async () => {
+  test('language codes with other characters are not valid', async () => {
     const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', langWithQuote] }))
     const languagesValidation = Validation.getFieldValidation(Survey.infoKeys.languages)(validation)
     expect(getErrorKeys(languagesValidation)).toEqual([Validation.messageKeys.surveyInfoEdit.langInvalid])
-    expect(SurveyValidator.getInvalidLanguageCodes(['en', langWithQuote, 'eng'])).toEqual([langWithQuote, 'eng'])
+    // codes outside the known list are accepted when they have a safe format
+    expect(SurveyValidator.getInvalidLanguageCodes(['en', 'default', 'fr CA', langWithQuote])).toEqual([
+      'fr CA',
+      langWithQuote,
+    ])
   })
 
-  test('the language of a new survey must be a known code', async () => {
+  test('the language of a new survey must be a valid code', async () => {
     const validation = await SurveyValidator.validateNewSurvey({
-      newSurvey: { name: 'survey_test', lang: 'eng' },
+      newSurvey: { name: 'survey_test', lang: langWithQuote },
       surveyInfos: null,
     })
     const langValidation = Validation.getFieldValidation('lang')(validation)

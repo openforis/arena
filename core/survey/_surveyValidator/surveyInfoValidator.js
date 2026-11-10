@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import { languageCodes } from '@core/app/languages'
+import { isLanguageCodeFormatValid } from '@core/app/languages'
 import * as Survey from '@core/survey/survey'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -29,13 +29,12 @@ const validateFieldManualLinks = (_propName, survey) => {
 }
 
 /**
- * Returns the language codes that are not among the known ones (ISO 639-1).
+ * Returns the language codes with an invalid format (e.g. containing quotes, spaces or commas).
  * @param {string[]} languages - The language codes to check.
  * @returns {string[]} - The invalid language codes.
  */
-export const getInvalidLanguageCodes = (languages) => languages.filter((lang) => !languageCodes.includes(lang))
+export const getInvalidLanguageCodes = (languages) => languages.filter((lang) => !isLanguageCodeFormatValid(lang))
 
-// language codes are used as JSON keys and export column names: only known codes are allowed
 const validateLanguageCodes = (propName, obj) => {
   const value = Validator.getProp(propName)(obj)
   if (A.isEmpty(value)) return null

@@ -1,5 +1,5 @@
 import * as StringUtils from '@core/stringUtils'
-import { getLanguageLabel, languageCodes } from '@core/app/languages'
+import { getLanguageLabel, isLanguageCodeFormatValid, languageCodes } from '@core/app/languages'
 
 import * as FileXml from '@server/utils/file/fileXml'
 
@@ -286,19 +286,26 @@ const LANG_CODE_SUFFIX_PATTERN = /\(([a-zA-Z-]+)\)\s*$/
 // "label::English (en)"), and pyxform/ODK Central preserve that whole string verbatim as the itext
 // <translation lang="..."> attribute - not a bare ISO code (confirmed against real pyxform output,
 // e.g. a reported `lang="Portuguese (pt)"`). Arena's own language model expects a real ISO 639-1 code
-// (core/app/languages.ts), so this extracts the parenthesized code when present and recognized, or
-// maps a bare code or an English language name (e.g. "French", also produced by XLSForm) to its code,
-// falling back to the raw attribute value unchanged otherwise: the survey creation then fails, since
-// survey languages must be valid codes.
+// (core/app/languages.ts), so this extracts the parenthesized code when present, or maps a bare code or
+// an English language name (e.g. "French", also produced by XLSForm) to its code. Any other value (e.g.
+// "default", for XLSForm label columns without a language) is kept, with the characters not allowed in
+// language codes (used as JSON keys and export column names) replaced.
 const languageCodeByEnglishName: Record<string, string> = Object.fromEntries(
   languageCodes.map((code) => [getLanguageLabel(code)?.toLowerCase(), code])
 )
+
+const toValidLangCode = (rawLang: string): string => {
+  const sanitized = rawLang.trim().replaceAll(/[^A-Za-z0-9_-]/g, '_')
+  return (/^[A-Za-z]/.test(sanitized) ? sanitized : `lang_${sanitized}`).slice(0, 32)
+}
 
 const normalizeLangCode = (rawLang: string): string => {
   const match = LANG_CODE_SUFFIX_PATTERN.exec(rawLang)
   const code = (match?.[1] ?? rawLang).trim().toLowerCase()
   if (languageCodes.includes(code)) return code
-  return languageCodeByEnglishName[rawLang.trim().toLowerCase()] ?? rawLang
+  const codeByEnglishName = languageCodeByEnglishName[rawLang.trim().toLowerCase()]
+  if (codeByEnglishName) return codeByEnglishName
+  return match && isLanguageCodeFormatValid(code) ? code : toValidLangCode(rawLang)
 }
 
 /**
