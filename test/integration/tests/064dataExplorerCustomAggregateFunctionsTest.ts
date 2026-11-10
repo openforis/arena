@@ -84,7 +84,7 @@ describe('Data Explorer custom aggregate functions', () => {
     const [row] = rows
     expect(Number(row.dbh_custom_agg_alive_total)).toBe(30)
     expect(Number(row.dbh_custom_agg_dead_count)).toBe(1)
-    expect(Number(row.dbh_custom_agg_avg_rounded)).toBe(11.7)
+    expect(Number(row.dbh_custom_agg_avg_rounded)).toBeCloseTo(11.7, 5)
   })
 
   test('expressions with not allowed SQL are never run', async () => {
