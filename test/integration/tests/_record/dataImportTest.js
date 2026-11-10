@@ -2,14 +2,18 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 
+import * as AuthGroup from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import { getExtensionByFileFormat } from '@core/fileFormats'
+import { uuidv4 } from '@core/uuid'
 
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as DataImportService from '@server/modules/dataImport/service/dataImportService'
 import DataImportJob from '@server/modules/dataImport/service/DataImportJob/DataImportJob'
 import DataImportValidationJob from '@server/modules/dataImport/service/DataImportValidationJob'
 
@@ -306,4 +310,118 @@ export const dataImportDryRunMissingKeyColumnTest = async ({ user, fileFormat })
   const errors = Object.values(job.errors)
   expect(errors.length).toBeGreaterThan(0)
   expect(JSON.stringify(errors)).toContain('validationErrors:dataImport.missingRequiredHeaders')
+}
+
+// same user with the data editor role only (records step 1, own records); another user if otherUser is true
+const _toDataEditor = ({ user, survey, otherUser = false }) => {
+  const dataEditorGroup = Survey.getAuthGroupByName(AuthGroup.groupNames.dataEditor)(Survey.getSurveyInfo(survey))
+  return { ...user, ...(otherUser ? { uuid: uuidv4() } : {}), authGroups: [dataEditorGroup] }
+}
+
+const _insertClusters = async ({ user, survey, fileFormat }) =>
+  _runImport({
+    user,
+    survey,
+    fileFormat,
+    entityName: clusterName,
+    rows: [[clusterIdName], [1], [2]],
+    insertNewRecords: true,
+  })
+
+export const dataImportRecordOfAnotherUserTest = async ({ user, fileFormat }) => {
+  const survey = await _buildSurvey({ user })
+  _expectJobSucceeded(await _insertClusters({ user, survey, fileFormat }))
+
+  const plotRows = [
+    [clusterIdName, plotIdName, plotSizeName],
+    [1, 1, 10],
+  ]
+  // records owned by another user cannot be updated by a data editor
+  const otherUserJob = await _runImport({
+    user: _toDataEditor({ user, survey, otherUser: true }),
+    survey,
+    fileFormat,
+    entityName: plotName,
+    rows: plotRows,
+    insertMissingNodes: true,
+  })
+  expect(otherUserJob.status).toBe('failed')
+  expect(JSON.stringify(otherUserJob.errors)).toContain('validationErrors:dataImport.recordNotEditable')
+  expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({})
+
+  // own records can be updated
+  const ownerJob = await _runImport({
+    user: _toDataEditor({ user, survey }),
+    survey,
+    fileFormat,
+    entityName: plotName,
+    rows: plotRows,
+    insertMissingNodes: true,
+  })
+  _expectJobSucceeded(ownerJob)
+  expect((await _fetchRecordsSummaries({ survey }))[0].plots).toEqual({ 1: { size: 10, sizeDouble: 20 } })
+}
+
+export const dataImportRestrictedOptionsTest = async ({ user }) => {
+  const survey = await _buildSurvey({ user })
+  const surveyId = Survey.getId(survey)
+  const dataEditor = _toDataEditor({ user, survey })
+
+  // options offered by the UI only to system admins (flat data import) or survey admins (Collect import)
+  expect(() => DataImportService.checkFlatDataImportOptions({ user: dataEditor, includeFiles: true })).toThrow(
+    UnauthorizedError
+  )
+  expect(() =>
+    DataImportService.checkFlatDataImportOptions({ user: dataEditor, deleteExistingEntities: true })
+  ).toThrow(UnauthorizedError)
+  expect(() =>
+    DataImportService.startFlatDataImportJob({ user: dataEditor, surveyId, deleteExistingEntities: true })
+  ).toThrow(UnauthorizedError)
+  await expect(
+    DataImportService.startCollectDataImportJob({ user: dataEditor, surveyId, deleteAllRecords: true })
+  ).rejects.toThrow(UnauthorizedError)
+
+  expect(() => DataImportService.checkFlatDataImportOptions({ user: dataEditor })).not.toThrow()
+  expect(() =>
+    DataImportService.checkFlatDataImportOptions({ user, includeFiles: true, deleteExistingEntities: true })
+  ).not.toThrow()
+}
+
+export const dataImportDeleteExistingEntitiesTest = async ({ user, fileFormat }) => {
+  const survey = await _buildSurvey({ user })
+  _expectJobSucceeded(await _insertClusters({ user, survey, fileFormat }))
+  _expectJobSucceeded(
+    await _runImport({
+      user,
+      survey,
+      fileFormat,
+      entityName: plotName,
+      rows: [
+        [clusterIdName, plotIdName, plotSizeName],
+        [1, 1, 10],
+        [1, 2, 20],
+        [2, 1, 30],
+      ],
+      insertMissingNodes: true,
+    })
+  )
+
+  // system admin: the plots not in the file are deleted in all the records
+  const job = await _runImport({
+    user,
+    survey,
+    fileFormat,
+    entityName: plotName,
+    rows: [
+      [clusterIdName, plotIdName, plotSizeName],
+      [1, 1, 15],
+    ],
+    deleteExistingEntities: true,
+  })
+  _expectJobSucceeded(job)
+  expect(job.result.entitiesDeleted).toBe(2)
+
+  const records = await _fetchRecordsSummaries({ survey })
+  expect(records[0].plots).toEqual({ 1: { size: 15, sizeDouble: 30 } })
+  expect(records[1].plots).toEqual({})
 }
