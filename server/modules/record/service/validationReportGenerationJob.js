@@ -4,17 +4,14 @@ import * as DateUtils from '@core/dateUtils'
 import i18nInstance from '@core/i18n/i18nFactory'
 import * as RecordValidationReportItem from '@core/record/recordValidationReportItem'
 import * as NodeDef from '@core/survey/nodeDef'
-import * as Survey from '@core/survey/survey'
 import * as ValidationResult from '@core/validation/validationResult'
 import { ValidationUtils } from '@core/validation/validationUtils'
-import { Query } from '@common/model/query'
-import { ViewDataNodeDef } from '@common/model/db'
 
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
+import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {
   constructor(params) {
@@ -23,6 +20,7 @@ export default class VaidationReportGenerationJob extends Job {
 
   async execute() {
     const {
+      user,
       surveyId,
       cycle,
       fileFormat,
@@ -32,23 +30,14 @@ export default class VaidationReportGenerationJob extends Job {
       attributeDefUuids = null,
       messageTypeKeys = null,
     } = this.context
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
-    const filter = query ? Query.getFilter(query) : null
-    const hasAttributeFilter = Array.isArray(attributeDefUuids)
-    const hasMessageTypeFilter = Array.isArray(messageTypeKeys)
-    const filterBySurveyAttrs =
-      filter || hasAttributeFilter || hasMessageTypeFilter
-        ? {
-            ...(filter
-              ? {
-                  filter,
-                  rootDataViewName: new ViewDataNodeDef(survey, Survey.getNodeDefRoot(survey)).name,
-                }
-              : {}),
-            ...(hasAttributeFilter ? { attributeDefUuids } : {}),
-            ...(hasMessageTypeFilter ? { messageTypeKeys } : {}),
-          }
-        : null
+    const { survey, rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
+      user,
+      surveyId,
+      cycle,
+      query,
+      attributeDefUuids,
+      messageTypeKeys,
+    })
 
     // create temp file
     const tempFileName = FileUtils.newTempFileName()
@@ -110,7 +99,7 @@ export default class VaidationReportGenerationJob extends Job {
     ]
 
     this.total = await RecordManager.countValidationReportItems(
-      { surveyId, cycle, recordUuid, filterBySurveyAttrs },
+      { surveyId, cycle, recordUuid, rootDataViewName, filterBySurveyAttrs, recordAccessFilters },
       this.tx
     )
 
@@ -119,7 +108,9 @@ export default class VaidationReportGenerationJob extends Job {
         surveyId,
         cycle,
         recordUuid,
+        rootDataViewName,
         filterBySurveyAttrs,
+        recordAccessFilters,
         processor: async (dbStream) => {
           this.dbStream = dbStream
           await FlatDataWriter.writeItemsStreamToStream({

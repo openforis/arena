@@ -46,6 +46,7 @@ import {
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
+import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 
 const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
@@ -168,11 +169,19 @@ export const init = (app) => {
 
   // ==== READ
 
+  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
+    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
+    return canViewNotOwnedRecords ? null : User.getUuid(user)
+  }
+
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search, ownerUuid })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -193,6 +202,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
@@ -211,19 +221,13 @@ export const init = (app) => {
     try {
       const { surveyId } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle({ surveyId })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle({ surveyId, ownerUuid })
       res.json(recordsSummary)
     } catch (error) {
       next(error)
     }
   })
-
-  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
-    const user = Request.getUser(req)
-    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
-    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
-    return canViewNotOwnedRecords ? null : User.getUuid(user)
-  }
 
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
@@ -270,7 +274,8 @@ export const init = (app) => {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat, user })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat, ownerUuid, user })
     } catch (error) {
       next(error)
     }
@@ -326,6 +331,7 @@ export const init = (app) => {
     '/survey/:surveyId/records/export',
     requireRecordsExportPermission,
     requireMobileAppMinVersion(minMobileAppVersionRecordsDownload),
+    requireNotOwnedRecordsViewAllowed,
     requireRecordsReadableByUserGroup,
     startSelectedRecordsExport
   )
@@ -334,6 +340,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/records/export-selected',
     requireRecordsExportPermission,
+    requireNotOwnedRecordsViewAllowed,
     requireRecordsReadableByUserGroup,
     startSelectedRecordsExport
   )
@@ -358,6 +365,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
@@ -375,6 +383,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       let tempFilePath
@@ -400,8 +409,10 @@ export const init = (app) => {
       const query = Request.getJsonParam(req, 'query')
       const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
       const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
+      const user = Request.getUser(req)
 
       const list = await RecordService.fetchValidationReport({
+        user,
         surveyId,
         cycle,
         offset,
@@ -426,8 +437,10 @@ export const init = (app) => {
       const query = Request.getJsonParam(req, 'query')
       const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
       const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
+      const user = Request.getUser(req)
 
       const count = await RecordService.countValidationReportItems({
+        user,
         surveyId,
         cycle,
         recordUuid,
@@ -489,6 +502,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/docx',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
@@ -519,6 +533,7 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/pdf',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
@@ -571,6 +586,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/record/:recordUuid/checkin',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
     requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {

@@ -82,6 +82,13 @@ records (`Authorizer.canViewNotOwnedRecords`), restricted by the qualifiers of t
 records summary (`RecordManager.fetchRecordsSummaryBySurveyId`) marks them all as read-only, so Arena
 Mobile locks them too.
 
+Reading a record (check-in, record and file download, PDF/DOCX and records export) requires, besides the
+role permission, that the user can view it: if the survey security settings don't let the user's role view
+records owned by others (`Authorizer.canViewNotOwnedRecords`), only the user's own records
+(`recordOwnerMiddleware.ts`), and only records of the user's group or of its readable groups
+(`recordQualifierMiddleware.ts`). Records lists, the validation report and its export apply the same
+restrictions in their queries.
+
 A **new record** is created in two steps: `RecordActions.createRecord` posts an empty record
 (`POST /survey/:surveyId/record` → `RecordManager.insertRecord`, record row only), then navigates to the
 record view, whose check-in triggers `recordInit`. The thread runs `RecordManager.initNewRecord`, which
