@@ -109,6 +109,7 @@ Essayez de rafraîchir la page.`,
     fileNotFound: 'Fichier introuvable',
     languageCodeInvalid: "Le code de langue n'est pas valide : {{lang}}",
     cycleKeysInvalid: 'Les cycles doivent être numérotés de façon consécutive, à partir de 1',
+    srsCodeInvalid: "Le code du système de référence spatiale n'est pas valide : {{code}}",
   },
   unsupportedFunctionType: 'Type de fonction non pris en charge : {{exprType}}',
   aiNotConfigured:

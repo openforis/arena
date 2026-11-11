@@ -27,7 +27,8 @@ export default class SurveyCreatorJob extends Job {
 
     const collectUri = CollectSurvey.getUri(collectSurvey)
 
-    const startingName = newSurveyParam.name || A.pipe(A.split('/'), A.last)(collectUri)
+    // names from the request or the Collect survey URI normalized like the names entered in the survey editor
+    const startingName = StringUtils.normalizeName(newSurveyParam.name || A.pipe(A.split('/'), A.last)(collectUri))
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 
     const languages = A.pipe(CollectSurvey.getElementsByName('language'), A.map(CollectSurvey.getText))(collectSurvey)

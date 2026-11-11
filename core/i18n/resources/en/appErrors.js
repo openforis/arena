@@ -88,6 +88,7 @@ Try to refresh the page.`,
     fileNotFound: 'File not found',
     languageCodeInvalid: 'Language code is not valid: {{lang}}',
     cycleKeysInvalid: 'Cycles must be numbered consecutively, starting from 1',
+    srsCodeInvalid: 'Spatial reference system code is not valid: {{code}}',
   },
   unsupportedFunctionType: 'Unsupported function type: {{exprType}}',
   // AI gateway errors

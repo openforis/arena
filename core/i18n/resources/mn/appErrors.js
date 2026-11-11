@@ -102,6 +102,7 @@ export default {
     fileNotFound: 'Файл олдсонгүй',
     languageCodeInvalid: 'Хэлний код буруу байна: {{lang}}',
     cycleKeysInvalid: 'Мөчлөгүүд 1-ээс эхлэн дараалсан дугаартай байх ёстой',
+    srsCodeInvalid: 'Орон зайн лавлах системийн код буруу байна: {{code}}',
   },
   unsupportedFunctionType: 'Дэмжигдээгүй функцийн төрөл: {{exprType}}',
   aiNotConfigured:

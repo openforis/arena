@@ -133,6 +133,7 @@ export const ValidatorErrorKeys = {
 
   surveyInfoEdit: {
     langInvalid: 'validationErrors:surveyInfoEdit.langInvalid',
+    srsInvalid: 'validationErrors:surveyInfoEdit.srsInvalid',
     langRequired: 'validationErrors:surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors:surveyInfoEdit.srsRequired',
     cycleRequired: 'validationErrors:surveyInfoEdit.cycleRequired',

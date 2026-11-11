@@ -103,6 +103,7 @@ export default {
     fileNotFound: 'Файл не найден',
     languageCodeInvalid: 'Недопустимый код языка: {{lang}}',
     cycleKeysInvalid: 'Циклы должны быть пронумерованы последовательно, начиная с 1',
+    srsCodeInvalid: 'Недопустимый код системы пространственной привязки: {{code}}',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   aiNotConfigured:

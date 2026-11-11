@@ -90,6 +90,7 @@ export default {
     fileNotFound: 'ファイルが見つかりません',
     languageCodeInvalid: '言語コードが無効です：{{lang}}',
     cycleKeysInvalid: 'サイクルは1から始まる連番である必要があります',
+    srsCodeInvalid: '空間参照系のコードが無効です：{{code}}',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors
