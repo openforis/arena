@@ -21,6 +21,7 @@ import * as NodeDefRepository from '@server/modules/nodeDef/repository/nodeDefRe
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
 import * as TaxonomyRepository from '@server/modules/taxonomy/repository/taxonomyRepository'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -173,14 +174,17 @@ export default class SurveyCompareApplyJob extends Job {
       activities.push(ActivityLog.newActivity(ActivityLog.type.categoryInsert, category))
     }
     for (const { categoryUuid, key, value } of plan.categoryPropsToUpdate) {
+      CategoryManager.checkCategoryProp(key, value)
       await CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, tx) // NOSONAR
       activities.push(ActivityLog.newActivity(ActivityLog.type.categoryPropUpdate, { uuid: categoryUuid, key, value }))
     }
     for (const level of plan.categoryLevelsToInsert) {
+      CategoryManager.checkLevel(level)
       await CategoryRepository.insertLevel({ surveyId, level, client: tx }) // NOSONAR
       activities.push(ActivityLog.newActivity(ActivityLog.type.categoryLevelInsert, level))
     }
     for (const { categoryUuid, levelUuid, key, value } of plan.categoryLevelPropsToUpdate) {
+      CategoryManager.checkLevelProp(key, value)
       await CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, tx) // NOSONAR
       activities.push(
         ActivityLog.newActivity(ActivityLog.type.categoryLevelPropUpdate, { uuid: levelUuid, categoryUuid, key, value })
@@ -211,11 +215,13 @@ export default class SurveyCompareApplyJob extends Job {
     const tx = this.tx
     const activities = []
     for (const { taxonomy, taxa } of plan.taxonomiesToInsert) {
+      TaxonomyManager.checkTaxonomy(taxonomy)
       await TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy }, tx) // NOSONAR
       await TaxonomyRepository.insertTaxa({ surveyId, taxa, client: tx }) // NOSONAR
       activities.push(ActivityLog.newActivity(ActivityLog.type.taxonomyCreate, taxonomy))
     }
     for (const { taxonomyUuid, key, value } of plan.taxonomyPropsToUpdate) {
+      TaxonomyManager.checkTaxonomyProp(key, value)
       await TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, tx) // NOSONAR
       activities.push(ActivityLog.newActivity(ActivityLog.type.taxonomyPropUpdate, { uuid: taxonomyUuid, key, value }))
     }

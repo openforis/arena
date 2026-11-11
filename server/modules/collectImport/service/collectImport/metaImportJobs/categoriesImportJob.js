@@ -5,6 +5,7 @@ import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as ObjectUtils from '@core/objectUtils'
+import * as StringUtils from '@core/stringUtils'
 
 import Job from '@server/job/job'
 import BatchPersister from '@server/db/batchPersister'
@@ -82,8 +83,13 @@ export default class CategoriesImportJob extends Job {
     // Create levels
     const hierarchyLevels = CollectSurvey.getElementsByPath(['hierarchy', 'level'])(collectCodeList)
     if (!A.isEmpty(hierarchyLevels)) {
+      // level names normalized like the ones entered in the category editor (validated before saving)
       const levels = hierarchyLevels.map((hierarchyLevel, index) =>
-        Category.newLevel(categoryToCreate, { [CategoryLevel.keysProps.name]: hierarchyLevel.attributes.name }, index)
+        Category.newLevel(
+          categoryToCreate,
+          { [CategoryLevel.keysProps.name]: StringUtils.normalizeName(hierarchyLevel.attributes.name) },
+          index
+        )
       )
       categoryToCreate = Category.assocLevelsArray(levels)(categoryToCreate)
     }
