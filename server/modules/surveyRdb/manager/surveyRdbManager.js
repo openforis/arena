@@ -19,6 +19,7 @@ import * as DbUtils from '@server/db/dbUtils'
 import * as RecordRepository from '@server/modules/record/repository/recordRepository'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { toSafeFileName } from '@server/utils/file/fileNames'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import { StreamUtils } from '@server/utils/streamUtils'
 
@@ -319,7 +320,7 @@ const createEntityFetchParams = ({
   const ancestorEntityDefUuid = NodeDef.getUuid(ancestorMultipleEntity)
   const outputFilePrefix = StringUtils.padStart(2, '0')(String(idx + 1))
   const extension = getExtensionByFileFormat(fileFormat)
-  const outputFileName = `${outputFilePrefix}_${NodeDef.getName(nodeDefContext)}.${extension}`
+  const outputFileName = `${outputFilePrefix}_${toSafeFileName(NodeDef.getName(nodeDefContext))}.${extension}`
   const outputFilePath = FileUtils.join(outputDir, outputFileName)
   const outputStream = FileUtils.createWriteStream(outputFilePath)
 
