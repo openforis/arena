@@ -60,7 +60,7 @@ describe('Arena import: survey name and spatial reference systems', () => {
 
   afterAll(async () => {
     for (const surveyId of createdSurveyIds) {
-      await SurveyManager.deleteSurvey(surveyId)
+      await SurveyManager.deleteSurvey(surveyId) // NOSONAR
     }
   })
 
