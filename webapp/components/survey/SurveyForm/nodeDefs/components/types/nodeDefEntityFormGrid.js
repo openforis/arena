@@ -11,8 +11,10 @@ import { NodeDefLayoutSizes } from '@core/survey/nodeDefLayoutSizes'
 import * as Node from '@core/record/node'
 
 import NodeDefSwitch from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefSwitch'
+import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
 import { useIsMountedRef } from '@webapp/components/hooks'
 import { NodeDefsActions, SurveyState } from '@webapp/store/survey'
+import { useRecord } from '@webapp/store/ui/record'
 import { useAuthCanEditSurvey } from '@webapp/store/user'
 
 const ResponsiveGridLayout = WidthProvider(Responsive)
@@ -38,6 +40,7 @@ const NodeDefEntityFormGrid = (props) => {
   const entryContainerRef = useRef(null)
 
   const survey = useSelector(SurveyState.getSurvey)
+  const record = useRecord()
   const cycle = useSelector(SurveyState.getSurveyCycleKey)
 
   const canEditDef = useAuthCanEditSurvey()
@@ -75,18 +78,25 @@ const NodeDefEntityFormGrid = (props) => {
       (nodeDefInnerPage) =>
         // hide hidden read-only fields
         !(NodeDef.isReadOnly(nodeDefInnerPage) && NodeDef.isHidden(nodeDefInnerPage)) &&
-        // hide not applicable fields marked as 'hidden when not applicable'
-        (!NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefInnerPage) ||
-          Node.isChildApplicable(nodeDefInnerPage.uuid)(node)) &&
+        // hide not applicable empty fields marked as 'hidden when not applicable'
+        !isChildHiddenWhenNotRelevant({ cycle, record, parentNode: node, childDef: nodeDefInnerPage }) &&
         // hide not visible fields
         Node.isChildVisible(nodeDefInnerPage.uuid)(node)
     )
-  }, [cycle, entry, node, nodeDefsInnerPage])
+  }, [cycle, entry, node, nodeDefsInnerPage, record])
 
   const rdgLayoutOriginal = NodeDefLayout.getLayoutChildren(cycle)(nodeDef)
   const rdgLayout = useMemo(
     () =>
-      (entry ? Node.getNodeLayoutChildren({ cycle, nodeDef, childDefs })(node) : rdgLayoutOriginal).map((gridItem) => {
+      (entry
+        ? Node.getNodeLayoutChildren({
+            cycle,
+            nodeDef,
+            childDefs,
+            isChildHidden: (childDef) => isChildHiddenWhenNotRelevant({ cycle, record, parentNode: node, childDef }),
+          })(node)
+        : rdgLayoutOriginal
+      ).map((gridItem) => {
         const { i: gridItemNodeDefUuid } = gridItem
 
         const gridItemNodeDef = gridItemNodeDefUuid ? Survey.getNodeDefByUuid(gridItemNodeDefUuid)(survey) : null
@@ -97,7 +107,7 @@ const NodeDefEntityFormGrid = (props) => {
         const maxH = NodeDefLayoutSizes.getMaxGridItemHeight({ nodeDef: gridItemNodeDef })
         return { ...gridItem, minH, maxH }
       }),
-    [childDefs, cycle, entry, node, nodeDef, rdgLayoutOriginal, survey]
+    [childDefs, cycle, entry, node, nodeDef, rdgLayoutOriginal, record, survey]
   )
 
   const styleByNodeDefUuid = useMemo(() => {
