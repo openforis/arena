@@ -30,7 +30,7 @@ import * as TaxonomyValidator from '../taxonomyValidator'
 
 /**
  * Throws a bad request error if the prop value contains vernacular language codes not in the ISO 639-2 list
- * or invalid extra prop names.
+ * or invalid names (taxonomy name or extra prop names).
  * @param {!string} key - The key of the taxonomy prop.
  * @param {unknown} value - The value of the taxonomy prop.
  * @returns {void}
@@ -41,6 +41,8 @@ export const checkTaxonomyProp = (key, value) => {
     if (langsInvalid.length > 0) {
       throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
     }
+  } else if (key === Taxonomy.keysProps.name) {
+    Validator.checkNamesAreValid([value])
   } else if (key === Taxonomy.keysProps.extraPropsDefs) {
     Validator.checkNamesAreValid(Object.keys(value ?? {}))
   }

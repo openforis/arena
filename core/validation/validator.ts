@@ -82,13 +82,18 @@ export const validate = async (
   return validation
 }
 
+// characters allowed in names
+const nameCharsRegex = /^[a-z0-9_]*$/
+
 /**
- * Throws a bad request error if one of the names is not valid: names of category levels and extra props are used as
- * export column names and in expressions. Blank names are allowed (reported by the validation of the item).
+ * Throws a bad request error if one of the names contains characters not allowed in names (lowercase letters, numbers
+ * and "_"): names (e.g. of categories, levels and extra props) are used as export column names and file names and in
+ * expressions. The full name format (e.g. the first letter) is checked by the validation of the item, so that names
+ * being typed (e.g. "2") can be saved.
  * @param names - The names to check.
  */
 export const checkNamesAreValid = (names: unknown[]): void => {
-  const nameInvalid = names.find((name) => !Objects.isEmpty(name) && !ValidatorFunctions.isNameValid(name))
+  const nameInvalid = names.find((name) => !A.isNil(name) && (typeof name !== 'string' || !nameCharsRegex.test(name)))
   if (nameInvalid !== undefined) {
     throw new SystemError(Validation.messageKeys.nameInvalid, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
   }

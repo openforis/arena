@@ -26,11 +26,14 @@ const getError = (fn: () => void) => {
 const badRequest = (key: string, params: Record<string, unknown>) => ({ key, params, statusCode: 400 })
 
 describe('Validator.checkNamesAreValid', () => {
-  test('valid and blank names are accepted', () => {
-    expect(getError(() => Validator.checkNamesAreValid(['region', 'level_1', 'a', '', null, undefined]))).toBeNull()
+  test('names with only lowercase letters, numbers and "_" and blank names are accepted', () => {
+    // names being typed (e.g. starting with a number) are reported by the validation
+    expect(
+      getError(() => Validator.checkNamesAreValid(['region', 'level_1', '1st_level', '_', '', null, undefined]))
+    ).toBeNull()
   })
 
-  test.each(['Region', '1st_level', '_', 'area (ha)', "x'y", 'a'.repeat(41)])('name %p is rejected', (name) => {
+  test.each(['Region', 'area (ha)', "x'y", '../x', 12])('name %p is rejected', (name) => {
     expect(getError(() => Validator.checkNamesAreValid(['region', name]))).toEqual(badRequest(nameInvalidKey, { name }))
   })
 })
@@ -51,7 +54,7 @@ describe('Category names check', () => {
   })
 
   test('invalid extra prop names are rejected', () => {
-    expect(getError(checkItemExtraDef('area', '2020_pop'))).toEqual(badRequest(nameInvalidKey, { name: '2020_pop' }))
+    expect(getError(checkItemExtraDef('area', 'pop 2020'))).toEqual(badRequest(nameInvalidKey, { name: 'pop 2020' }))
   })
 
   test('invalid level names are rejected, also in the draft props', () => {
@@ -66,8 +69,11 @@ describe('Category names check', () => {
     )
   })
 
-  test('other props are not checked', () => {
-    expect(getError(() => CategoryManager.checkCategoryProp(Category.keysProps.name, 'Any Name'))).toBeNull()
+  test('category names are checked, other props are not', () => {
+    expect(getError(() => CategoryManager.checkCategoryProp(Category.keysProps.name, 'Any Name'))).toEqual(
+      badRequest(nameInvalidKey, { name: 'Any Name' })
+    )
+    expect(getError(() => CategoryManager.checkCategoryProp(Category.keysProps.designerNotes, 'Any Text'))).toBeNull()
     expect(getError(() => CategoryManager.checkLevelProp('other', 'Any Value'))).toBeNull()
   })
 })
@@ -95,8 +101,13 @@ describe('Taxonomy check', () => {
   test('invalid extra prop names are rejected, also in the draft props', () => {
     const taxonomy = {
       ...Taxonomy.newTaxonomy({ [Taxonomy.keysProps.extraPropsDefs]: extraDefs('max_height') }),
-      propsDraft: { [Taxonomy.keysProps.extraPropsDefs]: extraDefs('max_height', '_') },
+      propsDraft: { [Taxonomy.keysProps.extraPropsDefs]: extraDefs('max_height', 'Max Height') },
     }
-    expect(getError(() => TaxonomyManager.checkTaxonomy(taxonomy))).toEqual(badRequest(nameInvalidKey, { name: '_' }))
+    expect(getError(() => TaxonomyManager.checkTaxonomy(taxonomy))).toEqual(
+      badRequest(nameInvalidKey, { name: 'Max Height' })
+    )
+    expect(getError(() => TaxonomyManager.checkTaxonomyProp(Taxonomy.keysProps.name, 'trees/x'))).toEqual(
+      badRequest(nameInvalidKey, { name: 'trees/x' })
+    )
   })
 })

@@ -189,7 +189,7 @@ describe('Survey metadata passed to SQL queries as parameters', () => {
       CategoryManager.insertCategory({ user, surveyId, category: newCategory({ levelName: 'Region' }) })
     ).rejects.toThrow(nameInvalidKey)
     await expect(
-      CategoryManager.insertCategory({ user, surveyId, category: newCategory({ extraName: '2020_area' }) })
+      CategoryManager.insertCategory({ user, surveyId, category: newCategory({ extraName: 'area 2020' }) })
     ).rejects.toThrow(nameInvalidKey)
     await expect(
       TaxonomyManager.insertTaxonomy({

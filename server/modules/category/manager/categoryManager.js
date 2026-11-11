@@ -186,13 +186,15 @@ export const validateCategories = async (survey, client = db) => {
 // level and item extra prop names are used as export column names and in expressions: check them before saving
 
 /**
- * Throws a bad request error if the prop value contains invalid names (item extra prop names).
+ * Throws a bad request error if the prop value contains invalid names (category name or item extra prop names).
  * @param {!string} key - The key of the category prop.
  * @param {unknown} value - The value of the category prop.
  * @returns {void}
  */
 export const checkCategoryProp = (key, value) => {
-  if (key === Category.keysProps.itemExtraDef) {
+  if (key === Category.keysProps.name) {
+    Validator.checkNamesAreValid([value])
+  } else if (key === Category.keysProps.itemExtraDef) {
     Validator.checkNamesAreValid(Object.keys(value ?? {}))
   }
 }
