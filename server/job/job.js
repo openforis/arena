@@ -4,6 +4,9 @@ import { db } from '@server/db/db'
 import * as Log from '@server/log/log'
 import SystemError from '@core/systemError'
 
+// i18n key with namespace, e.g. "appErrors:generic" or "validationErrors:nameInvalid"
+const namespacedKeyRegex = /^[A-Za-z]+:/
+
 /** @augments {JobBase<any, any>} */
 export default class Job extends JobBase {
   constructor(type, params = {}, innerJobs = []) {
@@ -44,8 +47,8 @@ export default class Job extends JobBase {
 
   getErrorInfo(error) {
     if (error instanceof SystemError) {
-      // some errors (e.g. Whisp API ones) are thrown with an already namespaced key
-      const key = error.key.startsWith('appErrors:') ? error.key : `appErrors:${error.key}`
+      // some errors are thrown with an already namespaced key (e.g. Whisp API ones or validation errors)
+      const key = namespacedKeyRegex.test(error.key) ? error.key : `appErrors:${error.key}`
       return { key, params: error.params }
     }
     return super.getErrorInfo(error)

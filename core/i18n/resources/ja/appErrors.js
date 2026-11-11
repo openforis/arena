@@ -70,6 +70,7 @@ export default {
   invalidSyntax: '式の構文が無効です',
   networkError: 'サーバーとの通信中にエラーが発生しました',
   nodeDefConversionNotAllowed: `「{{name}}」は{{toType}}に変換できません`,
+  nodeDefTypeInvalid: '無効なノード定義タイプです: {{type}}',
   record: {
     errorUpdating: '記録の更新中にエラーが発生しました',
     entityNotFound: 'キー「{{keyValues}}」の項目「{{entityName}}」が見つかりません',

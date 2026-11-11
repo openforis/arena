@@ -2,6 +2,7 @@ import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
 import * as Expression from '../../../../../core/expressionParser/expression'
+import * as StringUtils from '../../../../../core/stringUtils'
 
 import TableDataNodeDef from '../../tables/dataNodeDef'
 import ColumnNodeDef from '../../tables/dataNodeDef/columnNodeDef'
@@ -66,7 +67,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
 
   get columnIdName() {
     const { nodeDef } = this.tableData
-    return `_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`
+    return StringUtils.quoteDouble(`_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`)
   }
 
   get columnNodeDefUuids() {

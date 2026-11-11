@@ -11,6 +11,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 import * as DbUtils from '@server/db/dbUtils'
 
+import { checkNodeDef, checkNodeDefProps, checkNodeDefType } from './nodeDefWriteCheck'
+
 const { getSchemaSurvey } = Schemata
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =>
@@ -22,8 +24,9 @@ const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, vir
 
 // ============== CREATE
 
-export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
-  client.one(
+export const insertNodeDef = async (surveyId, nodeDef, client = DB) => {
+  checkNodeDef(nodeDef)
+  return client.one(
     `
     INSERT INTO ${getSchemaSurvey(surveyId)}.node_def 
       (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta, analysis, virtual)
@@ -41,8 +44,12 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
     ],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
+}
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
+  for (const nodeDef of nodeDefs) {
+    checkNodeDef(nodeDef)
+  }
   const schema = getSchemaSurvey(surveyId)
   // Build values and query for batch insert with RETURNING *
   const columns = [
@@ -203,8 +210,9 @@ const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, cl
 export const updateNodeDefProps = async (
   { surveyId, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, meta = {} },
   client = DB
-) =>
-  client.one(
+) => {
+  checkNodeDefProps(props)
+  return client.one(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
@@ -218,9 +226,13 @@ export const updateNodeDefProps = async (
     [props, propsAdvanced, parentUuid, meta, nodeDefUuid],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
+}
 
-export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
-  client.tx(async (tx) => {
+export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) => {
+  for (const { props } of nodeDefs) {
+    checkNodeDefProps(props)
+  }
+  return client.tx(async (tx) => {
     const schema = getSchemaSurvey(surveyId)
     const nodeDefsUpdated = await DbUtils.runQueries(
       tx,
@@ -243,18 +255,23 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
     )
     return nodeDefsUpdated
   })
+}
 
-export const updateNodeDefType = async ({ surveyId, nodeDefUuid, type }, client = DB) =>
-  client.none(
+export const updateNodeDefType = async ({ surveyId, nodeDefUuid, type }, client = DB) => {
+  checkNodeDefType(type)
+  return client.none(
     `UPDATE ${getSchemaSurvey(surveyId)}.node_def SET type = $1, date_modified = ${DbUtils.now} WHERE uuid = $2`,
     [type, nodeDefUuid]
   )
+}
 
 export const updateNodeDefTypeAndProps = async (
   { surveyId, nodeDefUuid, type, props = {}, propsAdvanced = {} },
   client = DB
-) =>
-  client.one(
+) => {
+  checkNodeDefType(type)
+  checkNodeDefProps(props)
+  return client.one(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.node_def 
       SET 
@@ -268,6 +285,7 @@ export const updateNodeDefTypeAndProps = async (
     [type, props, propsAdvanced, nodeDefUuid],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
+}
 
 // CYCLES
 

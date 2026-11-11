@@ -49,7 +49,6 @@ const rootDefColumnNamesAndTypes = [
 
 /**
  * Table with the data of a node definition.
- *
  * @property {Survey} survey - The survey.
  * @property {NodeDef} nodeDef - The nodeDef table.
  * @property {ColumnNodeDef[]} columnNodeDefs - The nodeDef columns.
@@ -146,7 +145,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   _getConstraintFk(tableReferenced, column) {
-    return `CONSTRAINT ${this.name}_${tableReferenced.name}_fk 
+    return `CONSTRAINT ${StringUtils.quoteDouble(`${this.name}_${tableReferenced.name}_fk`)} 
     FOREIGN KEY (${column}) 
     REFERENCES ${tableReferenced.nameQualified} (${columnSet.uuid}) 
     ON DELETE CASCADE`
@@ -168,7 +167,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   getConstraintUuidUnique() {
-    return `CONSTRAINT ${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1 UNIQUE (${columnSet.uuid})`
+    return `CONSTRAINT ${StringUtils.quoteDouble(`${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1`)} UNIQUE (${columnSet.uuid})`
   }
 
   getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {

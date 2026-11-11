@@ -2,6 +2,7 @@ import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { arenaInfo, sourceWithTryCatch, source } from '../rFunctions'
+import { isPathInsideDir } from '../rChainDir'
 
 const _contentSeparator = `${StringUtils.NEW_LINE}${StringUtils.NEW_LINE}`
 
@@ -16,6 +17,10 @@ export default class RFile {
     this._dir = dir
     this._fileName = `${fileName}.R`
     this._path = FileUtils.join(this._dir, this._fileName)
+    // folder and file names can come from node def names
+    if (!isPathInsideDir({ dir: this._rChain.dir, filePath: this._path })) {
+      throw new Error(`R file must be inside the R project folder: ${this._path}`)
+    }
     this._pathRelative = this._path.slice(this._rChain.dir.length + 1)
   }
 
