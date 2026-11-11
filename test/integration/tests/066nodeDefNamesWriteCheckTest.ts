@@ -107,15 +107,9 @@ describe('Node def names check on write', () => {
     expect(job.isSucceeded()).toBe(false)
     expect(JSON.stringify(job.errors)).toContain(nameInvalidKey)
 
-    // the temporary survey is deleted once the job transaction has ended
+    // the temporary survey is deleted when the job ends
     const temporarySurveyId = job.context.surveyId
     expect(temporarySurveyId).toBeDefined()
-    let surveyFound = true
-    for (let attempt = 0; attempt < 20 && surveyFound; attempt++) {
-      // polling: sequential on purpose
-      await new Promise((resolve) => setTimeout(resolve, 200)) // NOSONAR
-      surveyFound = await surveyExists(temporarySurveyId) // NOSONAR
-    }
-    expect(surveyFound).toBe(false)
+    expect(await surveyExists(temporarySurveyId)).toBe(false)
   })
 })
