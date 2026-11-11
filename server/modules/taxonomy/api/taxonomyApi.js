@@ -21,6 +21,9 @@ const sendTaxonomies = async (res, surveyId, draft, validate) => {
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
 }
 
+// props edited by the taxonomy editor: extra props and vernacular languages are updated through dedicated routes or import
+const taxonomyUpdatablePropKeys = [Taxonomy.keysProps.name, Taxonomy.keysProps.descriptions]
+
 export const init = (app) => {
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -44,9 +47,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { sourceSurveyId, sourceTaxonomyUuid } = Request.getBody(req)
-
-        if (!sourceTaxonomyUuid) throw new Error('sourceTaxonomyUuid is required')
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceTaxonomyUuid = Request.getRequiredParam(req, 'sourceTaxonomyUuid')
 
         const taxonomy = await TaxonomyService.cloneTaxonomyFromSurvey({
           user,
@@ -239,7 +241,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, taxonomyUuid, key, value } = Request.getParams(req)
+        const { surveyId, taxonomyUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, taxonomyUpdatablePropKeys)
         const user = Request.getUser(req)
 
         await TaxonomyService.updateTaxonomyProp(user, surveyId, taxonomyUuid, key, value)

@@ -15,6 +15,8 @@ export const WebSocketEvents = {
   nodesUpdate: 'nodesUpdate',
   nodesUpdateCompleted: 'nodesUpdateCompleted',
   nodeValidationsUpdate: 'nodeValidationsUpdate',
+  // sent only to the socket that requested a node update which would clear non-applicable values
+  nodesUpdateClearNonApplicableValuesConfirm: 'nodesUpdateClearNonApplicableValuesConfirm',
 
   // Record events
   recordDelete: 'recordDelete',

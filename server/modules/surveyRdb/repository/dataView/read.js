@@ -1,5 +1,5 @@
-import * as R from 'ramda'
-import * as camelize from 'camelize'
+import * as A from '@core/arena'
+import camelize from 'camelize'
 import * as pgPromise from 'pg-promise'
 
 import { Objects } from '@openforis/arena-core'
@@ -29,11 +29,21 @@ import SqlSelectBuilder from '../../../../../common/model/db/sql/sqlSelectBuilde
 
 import { TableDataNodeDefColUtils } from '@common/model/db/tables/dataNodeDef/colUtils'
 
+import { getUserGroupAccessCondition } from './userGroupAccessCondition'
+
 const _getAncestorMultipleEntityUuidColumnName = (viewDataNodeDef, nodeDef) => {
   const { survey } = viewDataNodeDef
   const ancestorMultipleEntityDef = Survey.getNodeDefAncestorMultipleEntity(nodeDef)(survey)
   return ColumnNodeDef.getColumnName(ancestorMultipleEntityDef)
 }
+
+/**
+ * Determines the Postgres TO_CHAR format to use to format a time column value.
+ * @param {object} nodeDefCol - The time node definition column.
+ * @returns {string} The TO_CHAR format, including seconds if the node definition includes them.
+ */
+export const getTimeColumnToCharFormat = (nodeDefCol) =>
+  NodeDef.isSecondsIncluded(nodeDefCol) ? 'HH24:MI:SS' : 'HH24:MI'
 
 const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ streamMode, nameFull, namesFull, alias }) => {
@@ -59,7 +69,9 @@ const columnTransformByNodeDefType = {
   [NodeDef.nodeDefType.date]: ({ nameFull, alias }) => [
     `TO_CHAR(${nameFull}, 'YYYY-MM-DD') AS ${DbUtils.asName(alias)}`,
   ],
-  [NodeDef.nodeDefType.time]: ({ nameFull, alias }) => [`TO_CHAR(${nameFull}, 'HH24:MI') AS ${DbUtils.asName(alias)}`],
+  [NodeDef.nodeDefType.time]: ({ nodeDefCol, nameFull, alias }) => [
+    `TO_CHAR(${nameFull}, '${getTimeColumnToCharFormat(nodeDefCol)}') AS ${DbUtils.asName(alias)}`,
+  ],
 }
 
 const _selectFieldsByNodeDefType =
@@ -75,7 +87,15 @@ const _selectFieldsByNodeDefType =
 
     const columnTransform = columnTransformByNodeDefType[NodeDef.getType(nodeDefCol)]
     if (columnTransform) {
-      return columnTransform({ streamMode, viewAlias: viewDataNodeDef.alias, nameFull, namesFull, names, alias })
+      return columnTransform({
+        streamMode,
+        viewAlias: viewDataNodeDef.alias,
+        nodeDefCol,
+        nameFull,
+        namesFull,
+        names,
+        alias,
+      })
     }
     return namesFull
   }
@@ -102,7 +122,7 @@ const _prepareSelectFields = ({
         .filter((columnNodeDef) => includeFileAttributeDefs || !NodeDef.isFile(columnNodeDef.nodeDef))
         .flatMap((columnNodeDef) => _selectFieldsByNodeDefType({ viewDataNodeDef, streamMode })(columnNodeDef.nodeDef))
     )
-  } else if (R.isEmpty(nodeDefCols)) {
+  } else if (A.isEmpty(nodeDefCols)) {
     queryBuilder.select('*')
   } else {
     queryBuilder.select(
@@ -188,6 +208,138 @@ const _dbTransformCallbackSelect =
     return rowUpdated
   }
 
+/**
+ * Adds the conditions filtering the records (cycle, record UUIDs, steps, owner and user group) to the query.
+ * The record filters are applied also without a cycle (e.g. when exporting the data of all cycles).
+ * @param {!object} params - The parameters.
+ * @param {!SqlSelectBuilder} params.queryBuilder - The query builder.
+ * @param {!ViewDataNodeDef} params.viewDataNodeDef - The queried data view.
+ * @param {string} [params.cycle] - The survey cycle (all cycles if not specified).
+ * @param {!object} params.query - The Query object (with the record UUID filters).
+ * @param {Array} [params.recordSteps] - The record steps (all steps if empty).
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID (all owners if empty).
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters (see SurveyManager.fetchUserGroupAccessFilters).
+ * @returns {void}
+ */
+const _prepareRecordsWhereConditions = ({
+  queryBuilder,
+  viewDataNodeDef,
+  cycle,
+  query,
+  recordSteps,
+  recordOwnerUuid,
+  userGroupAccessFilters,
+}) => {
+  if (!A.isNil(cycle)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
+    queryBuilder.addParams({ cycle })
+  }
+  const recordUuid = Query.getFilterRecordUuid(query)
+  if (recordUuid) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
+    queryBuilder.addParams({ recordUuid })
+  }
+  const recordUuids = Query.getFilterRecordUuids(query)
+  if (recordUuids?.length > 0) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} IN ($/recordUuids:csv/)`)
+    queryBuilder.addParams({ recordUuids })
+  }
+  if (!Objects.isEmpty(recordSteps)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordStep} IN ($/recordSteps:csv/)`)
+    queryBuilder.addParams({ recordSteps })
+  }
+  if (!Objects.isEmpty(recordOwnerUuid)) {
+    queryBuilder.where(`${viewDataNodeDef.columnRecordOwnerUuid} = $/recordOwnerUuid/`)
+    queryBuilder.addParams({ recordOwnerUuid })
+  }
+  const userGroupAccessCondition = getUserGroupAccessCondition({
+    survey: viewDataNodeDef.survey,
+    accessFilters: userGroupAccessFilters,
+    recordUuidColumn: viewDataNodeDef.columnRecordUuid,
+  })
+  if (userGroupAccessCondition) {
+    queryBuilder.where(userGroupAccessCondition.clause)
+    queryBuilder.addParams(userGroupAccessCondition.params)
+  }
+}
+
+// values farther than this many interquartile ranges from the quartiles are outliers (Tukey's fences)
+const outlierIqrFactor = 1.5
+
+const _isNumericNodeDef = (nodeDef) => NodeDef.isDecimal(nodeDef) || NodeDef.isInteger(nodeDef)
+
+const _getSampleNumericColumns = ({ viewDataNodeDef, nodeDefCols }) =>
+  nodeDefCols
+    .filter(_isNumericNodeDef)
+    // same X and Y axes used by the scatter chart: first 2 numeric attributes
+    .slice(0, 2)
+    .map((nodeDefCol) => {
+      const { name } = new ColumnNodeDef(viewDataNodeDef, nodeDefCol)
+      return `sample_base.${DbUtils.asName(name)}::double precision`
+    })
+
+const _getSampleOutlierExpressions = ({ values }) => {
+  const conditions = []
+  const scores = []
+  for (const [idx, value] of values.entries()) {
+    const q1 = `q1_${idx}`
+    const q3 = `q3_${idx}`
+    const iqr = `(${q3} - ${q1})`
+    conditions.push(
+      `${value} < ${q1} - ${outlierIqrFactor} * ${iqr}`,
+      `${value} > ${q3} + ${outlierIqrFactor} * ${iqr}`
+    )
+    // distance from the nearest quartile, in interquartile ranges
+    scores.push(`GREATEST(${q1} - ${value}, ${value} - ${q3}) / NULLIF(${iqr}, 0)`)
+  }
+  return {
+    condition: `COALESCE(${conditions.join(' OR ')}, FALSE)`,
+    score: `COALESCE(GREATEST(${scores.join(', ')}), 0)`,
+  }
+}
+
+/**
+ * Wraps the specified select into a query returning a random sample of rows (up to the limit), always including
+ * (first, most extreme first) the outliers of the first 2 numeric attributes, so they can be spotted in the scatter chart.
+ * Outliers are values outside the Tukey's fences of X, Y or of the residuals of the X/Y linear regression
+ * (points far from the trend line, even if X and Y are in range).
+ * @param {!object} params - The parameters.
+ * @param {!string} params.baseSelect - The select query (without sort, offset and limit) to sample.
+ * @param {!ViewDataNodeDef} params.viewDataNodeDef - The data view of the queried entity.
+ * @param {!Array} params.nodeDefCols - The selected attribute definitions.
+ * @returns {string} - The sampling select query (it uses the "limit" parameter), flagging the outlier rows.
+ */
+const _createSampleWithOutliersSelect = ({ baseSelect, viewDataNodeDef, nodeDefCols }) => {
+  const columns = _getSampleNumericColumns({ viewDataNodeDef, nodeDefCols })
+  if (columns.length === 0) {
+    return `SELECT * FROM (${baseSelect}) AS sample_base ORDER BY random() LIMIT $/limit/`
+  }
+  const values = [...columns]
+  const ctes = [`sample_base AS (${baseSelect})`]
+  const joins = ['sample_base']
+  if (columns.length === 2) {
+    const [x, y] = columns
+    ctes.push(
+      `sample_regr AS (SELECT regr_slope(${y}, ${x}) AS slope, regr_intercept(${y}, ${x}) AS intercept FROM sample_base)`
+    )
+    joins.push('sample_regr')
+    values.push(`(${y} - (intercept + slope * ${x}))`)
+  }
+  const statsFields = values.flatMap((value, idx) => [
+    `percentile_cont(0.25) WITHIN GROUP (ORDER BY ${value}) AS q1_${idx}`,
+    `percentile_cont(0.75) WITHIN GROUP (ORDER BY ${value}) AS q3_${idx}`,
+  ])
+  ctes.push(`sample_stats AS (SELECT ${statsFields.join(', ')} FROM ${joins.join(' CROSS JOIN ')})`)
+  joins.push('sample_stats')
+
+  const { condition, score } = _getSampleOutlierExpressions({ values })
+  return `WITH ${ctes.join(', ')}
+    SELECT sample_base.*, ${condition} AS ${DbUtils.asName(ViewDataNodeDef.columnSet.sampleOutlier)}
+    FROM ${joins.join(' CROSS JOIN ')}
+    ORDER BY CASE WHEN ${condition} THEN ${score} END DESC NULLS LAST, random()
+    LIMIT $/limit/`
+}
+
 const _createViewDataQuery = (params) => {
   const {
     survey,
@@ -198,8 +350,10 @@ const _createViewDataQuery = (params) => {
     includeDateCreated = false,
     recordSteps,
     recordOwnerUuid = null,
+    userGroupAccessFilters = null,
     offset = null,
     limit = null,
+    randomize = false,
     stream = false,
   } = params
 
@@ -225,51 +379,41 @@ const _createViewDataQuery = (params) => {
   _prepareFromClause({ queryBuilder, viewDataNodeDef, nodeDefCols, editMode })
 
   // WHERE clause
-  if (!R.isNil(cycle)) {
-    queryBuilder.where(`${viewDataNodeDef.columnRecordCycle} = $/cycle/`)
-    queryBuilder.addParams({ cycle })
-
-    const recordUuid = Query.getFilterRecordUuid(query)
-    if (recordUuid) {
-      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} = $/recordUuid/`)
-      queryBuilder.addParams({ recordUuid })
-    }
-    const recordUuids = Query.getFilterRecordUuids(query)
-    if (recordUuids?.length > 0) {
-      queryBuilder.where(`${viewDataNodeDef.columnRecordUuid} IN ($/recordUuids:csv/)`)
-      queryBuilder.addParams({ recordUuids })
-    }
-  }
-
-  if (!Objects.isEmpty(recordSteps)) {
-    queryBuilder.where(`${viewDataNodeDef.columnRecordStep} IN ($/recordSteps:csv/)`)
-    queryBuilder.addParams({ recordSteps })
-  }
-
-  if (!Objects.isEmpty(recordOwnerUuid)) {
-    queryBuilder.where(`${viewDataNodeDef.columnRecordOwnerUuid} = $/recordOwnerUuid/`)
-    queryBuilder.addParams({ recordOwnerUuid })
-  }
+  _prepareRecordsWhereConditions({
+    queryBuilder,
+    viewDataNodeDef,
+    cycle,
+    query,
+    recordSteps,
+    recordOwnerUuid,
+    userGroupAccessFilters,
+  })
 
   const filter = Query.getFilter(query)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
-  if (!R.isNil(filterClause)) {
+  if (!A.isNil(filterClause)) {
     queryBuilder.where(filterClause)
     queryBuilder.addParams(filterParams)
+  }
+
+  if (randomize && !A.isNil(limit)) {
+    // random sampling: the requested sort and offset are ignored
+    const select = _createSampleWithOutliersSelect({ baseSelect: queryBuilder.build(), viewDataNodeDef, nodeDefCols })
+    return { select, selectFields: queryBuilder.selectFields, queryParams: { ...queryBuilder.params, limit } }
   }
 
   // SORT clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
+  if (!A.isEmpty(sortParams)) {
     queryBuilder.orderBy(sortClause)
     queryBuilder.addParams(sortParams)
   }
-  if (!R.isNil(limit)) {
+  if (!A.isNil(limit)) {
     queryBuilder.limit('$/limit/')
     queryBuilder.addParams({ limit })
   }
-  if (!R.isNil(offset)) {
+  if (!A.isNil(offset)) {
     queryBuilder.offset('$/offset/')
     queryBuilder.addParams({ offset })
   }
@@ -291,8 +435,10 @@ const _createViewDataQuery = (params) => {
  * @param {boolean} [params.includeFileAttributeDefs] - Whether to include file attribute column node defs.
  * @param {Array} [params.recordSteps] - The record steps used to filter data. If null or empty, data in all steps will be fetched.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID. If null, data from all records will be fetched, otherwise only the ones owned by the specified user.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including the outliers of the first 2 numeric attributes. Ignored when no limit is specified.
  * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
@@ -321,12 +467,30 @@ export const countViewData = async (params, client = db) => {
   return { selectFields, count: Number(countResult.count) }
 }
 
+/**
+ * Counts the rows of a data table or view in the specified cycle.
+ * @param {!object} params - The parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string} params.cycle - The survey cycle.
+ * @param {!string} params.tableName - The name of the data table or view.
+ * @param {object} [params.filter] - The filter expression.
+ * @param {string} [params.recordOwnerUuid] - If specified, only the records owned by this user are considered.
+ * @param {object} [params.survey] - The survey (required only with userGroupAccessFilters).
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user are considered.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<number>} - The count of rows.
+ */
 export const countDataTableRows = async (
-  { surveyId, cycle, tableName, filter = null, recordOwnerUuid = null },
+  { surveyId, cycle, tableName, filter = null, recordOwnerUuid = null, survey = null, userGroupAccessFilters = null },
   client = db
 ) => {
   const schemaName = SchemaRdb.getName(surveyId)
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
+  const userGroupAccessCondition = getUserGroupAccessCondition({
+    survey,
+    accessFilters: userGroupAccessFilters,
+    recordUuidColumn: TableDataNodeDef.columnSet.recordUuid,
+  })
 
   const countRS = await client.one(
     `
@@ -337,10 +501,12 @@ export const countDataTableRows = async (
     WHERE 
       ${TableDataNodeDef.columnSet.recordCycle} = $/cycle/
       ${recordOwnerUuid ? ` AND ${TableDataNodeDef.columnSet.recordOwnerUuid} = $/recordOwnerUuid/` : ''}
-      ${R.isNil(filterClause) ? '' : ` AND ${filterClause}`}
+      ${A.isNil(filterClause) ? '' : ` AND ${filterClause}`}
+      ${userGroupAccessCondition ? ` AND ${userGroupAccessCondition.clause}` : ''}
     `,
     {
       ...filterParams,
+      ...userGroupAccessCondition?.params,
       cycle,
       recordOwnerUuid,
       schemaName,
@@ -364,13 +530,13 @@ const countDuplicateRecordsByNodeDefs = async ({ survey, record, nodeDefsUnique 
     operator: Expression.operators.comparison.notEq.value,
   })
 
-  const filter = R.reduce(
+  const filter = A.reduce(
     (whereExprAcc, nodeDefUnique) => {
       const nodeUnique = Record.getNodeChildByDefUuid(nodeRoot, NodeDef.getUuid(nodeDefUnique))(record)
 
       const identifier = Expression.newIdentifier(NodeDefTable.getColumnName(nodeDefUnique))
       const colValue = TableDataNodeDefColUtils.getValue(survey, nodeDefUnique, nodeUnique)
-      const colValueString = R.isNil(colValue) ? null : String(colValue)
+      const colValueString = A.isNil(colValue) ? null : String(colValue)
       const value = Expression.newLiteral(colValueString)
 
       const condition = Expression.newBinary({

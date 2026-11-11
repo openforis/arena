@@ -12,6 +12,15 @@ export default {
   requiredField: '{{field}} es obligatorio',
   rowsDuplicate: 'fila: {{row}} fila duplicada: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `La función "{{name}}" no está permitida`,
+    expressionInvalid: `"{{text}}" no está permitido en la expresión`,
+    expressionRequired: 'Expresión obligatoria',
+    expressionUnbalancedParentheses: 'Paréntesis no balanceados',
+    expressionUnknownColumn: `"{{name}}" no es una columna de la entidad`,
+    expressionUnterminatedQuote: 'Texto entre comillas sin cerrar',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'La etiqueta en el idioma predeterminado de la encuesta es obligatoria',
     analysisNodeDefsRequired: 'Se requiere al menos un atributo calculado',
@@ -32,6 +41,11 @@ export default {
     levelDuplicate: 'El nombre del nivel está duplicado',
     levelsInvalid: 'Al menos un nivel no válido',
     nameNotSpecified: 'Nombre de categoría no especificado',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Ya existe una categoría de Datos de puntos de muestreo en esta encuesta; solo puede haber una.',
   },
 
   categoryImport: {
@@ -65,7 +79,7 @@ export default {
     invalidNumber: 'Número no válido en la columna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código no válido en la columna {{headers}}: {{value}}',
     invalidTime:
-      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm. Ej.: 09:45 o 16:30',
+      'Hora no válida en la columna {{headers}}: {{value}}. La hora debe tener el formato HH:mm o HH:mm:ss. Ej.: 09:45, 16:30 o 09:45:30',
     missingRequiredHeaders: 'Faltan columnas obligatorias: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error al actualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Se encontraron varios registros que coinciden con las claves "{{keyValues}}"',
@@ -73,6 +87,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'El registro con claves "{{keyValues}}" está en el paso de análisis y no se puede actualizar',
     recordKeyMissingOrInvalid: 'Valor faltante o no válido para el atributo clave "{{keyName}}"',
+    recordNotEditable: 'El registro con claves "{{keyValues}}" no se puede actualizar: no tiene permiso para editarlo',
     recordNotFound: 'Registro con claves "{{keyValues}}" no encontrado',
   },
 
@@ -103,8 +118,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'La entidad es obligatoria',
-    applyIfDuplicate: 'La condición "$t(nodeDefEdit.expressionsProp.applyIf)" está duplicada',
-    applyIfInvalid: 'Condición "$t(nodeDefEdit.advancedProps.relevantIf)" no válida',
+    applyIfDuplicate: 'La condición "$t(nodeDefEdit:expressionsProp.applyIf)" está duplicada',
+    applyIfInvalid: 'Condición "$t(nodeDefEdit:advancedProps.relevantIf)" no válida',
     columnWidthCannotBeGreaterThan: 'El ancho de columna no puede ser mayor que {{max}}',
     columnWidthCannotBeLessThan: 'El ancho de columna no puede ser menor que {{min}}',
     countMaxMustBePositiveNumber: 'El recuento máximo debe ser un número entero positivo',
@@ -115,12 +130,13 @@ export default {
     defaultValuesNotSpecified: 'Valor predeterminado no especificado',
     entitySourceRequired: 'Se requiere la fuente de la entidad',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Solo la última expresión puede tener una condición "$t(nodeDefEdit.expressionsProp.applyIf)" vacía',
+      'Solo la última expresión puede tener una condición "$t(nodeDefEdit:expressionsProp.applyIf)" vacía',
     expressionDuplicate: 'Expresión duplicada',
     expressionRequired: 'Expresión obligatoria',
     formulaInvalid: 'La fórmula es inválida',
     keysEmpty: 'Defina al menos un atributo clave',
     keysExceedingMax: 'Excediendo el número máximo de atributos clave',
+    mapMarkerColorInvalid: 'El color del marcador en el mapa debe ser un código de color como #ff0000',
     maxFileSizeInvalid: 'El tamaño máximo de archivo debe ser mayor que 0 y menor que {{max}}',
     nameInvalid:
       'El nombre no es válido (debe contener solo letras minúsculas, números y guiones bajos, comenzando con una letra)',
@@ -129,8 +145,11 @@ export default {
     countMaxInvalid: 'Recuento máximo no válido',
     countMinInvalid: 'Recuento mínimo no válido',
     readOnlyCannotHaveEditableIf: 'Un nodo de solo lectura no puede tener la condición "Editable si"',
+    requiredIfInvalid: 'Condición "Obligatorio si" no válida',
+    requiredIfNotAllowed:
+      'La condición "Obligatorio si" solo se permite en atributos simples, no clave y no siempre obligatorios',
     qualifierCannotHaveApplicableExpression:
-      'El atributo calificador no puede tener la condición "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'El atributo calificador no puede tener la condición "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'El atributo calificador no puede tener reglas de editabilidad definidas',
     qualifierCannotHaveDefaultValues: 'El atributo calificador no puede tener valores por defecto',
     qualifierCannotHaveValidations: 'El atributo calificador no puede tener reglas de validación definidas',
@@ -153,10 +172,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'El idioma es obligatorio',
+    langInvalid: 'El código de idioma no es válido: {{lang}}',
+    srsInvalid: 'El código del sistema de referencia espacial no es válido: {{code}}',
     srsRequired: 'El sistema de referencia espacial es obligatorio',
     cycleRequired: 'El ciclo es obligatorio',
     cyclesRequired: 'Se debe definir al menos un ciclo',
     cyclesExceedingMax: 'Una encuesta puede tener como máximo 10 ciclos',
+    cycleKeysInvalid: 'Los ciclos deben estar numerados de forma consecutiva, empezando por 1',
     cycleDateStartBeforeDateEnd: 'La fecha de inicio del ciclo debe ser anterior a su fecha de finalización',
     cycleDateStartAfterPrevDateEnd:
       'La fecha de inicio del ciclo debe ser posterior a la fecha de finalización del ciclo anterior',
@@ -166,6 +188,13 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'La fecha de finalización del ciclo es obligatoria para todos los ciclos excepto el último',
     fieldManualLinksInvalid: 'El enlace del manual de campo no es válido',
+    areaOfInterestInvalid: 'El área de interés debe ser un polígono en formato GeoJSON con coordenadas WGS84',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'El archivo es obligatorio',
+    nameDuplicate: 'Ya existe otra área de interés con el mismo nombre',
+    nameRequired: 'El nombre es obligatorio',
   },
 
   surveyPreloadedMapLayer: {
@@ -214,6 +243,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Ya existe un usuario con el mismo correo electrónico',
     emailRequired: 'El correo electrónico es obligatorio',
     emailInvalid: 'Correo electrónico no válido',
     emailNotFound: 'Correo electrónico no encontrado',
@@ -228,6 +258,7 @@ export default {
     passwordChangeRequired: 'Cambio de contraseña obligatorio',
     passwordResetNotAllowedWithPendingInvitation:
       'Restablecimiento de contraseña no permitido: el usuario ha sido invitado a una encuesta pero la invitación aún no ha sido aceptada',
+    twoFactorTokenRequired: 'El código de verificación es obligatorio',
   },
 
   userAccessRequest: {
@@ -241,6 +272,8 @@ export default {
     invalidRequest: 'Solicitud de acceso de usuario no válida',
     userAlreadyExisting: 'Usuario con correo electrónico {{email}} ya existente',
     requestAlreadySent: 'Solicitud de acceso para el usuario con correo electrónico {{email}} ya enviada',
+    emailNotReachable:
+      'El correo electrónico de confirmación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
     invalidReCaptcha: 'ReCaptcha no válido',
   },
 
@@ -251,6 +284,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'El rol es obligatorio',
     surveyNameRequired: 'El nombre de la encuesta es obligatorio',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Ya existe un grupo con el mismo nombre: {{name}}',
+    qualifiersInvalid: 'Uno o más calificadores tienen una clave no válida o duplicada',
+    qualifierNameDuplicate: 'Ya existe un calificador con el mismo nombre en este grupo: {{name}}',
+    qualifierNameInvalid: 'Nombre de calificador no válido',
+    qualifierNameRequired: 'El nombre del calificador es obligatorio',
   },
 
   userPasswordChange: {

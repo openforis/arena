@@ -8,6 +8,12 @@ export default {
 maximum {{maxItems}} éléments attendus.
 Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le nombre d'éléments.
 `,
+      sampleRandomOnly:
+        "Affichage d'un échantillon aléatoire de {{sampleSize}} éléments sur {{totalCount}} (aucune valeur aberrante trouvée).",
+      sampleWithOutliers:
+        'Affichage de {{sampleSize}} éléments sur {{totalCount}} : {{outliersCount}} valeurs aberrantes et un échantillon aléatoire de {{randomCount}} des autres éléments.',
+      sampleOutliersOnly:
+        'Affichage des {{sampleSize}} valeurs aberrantes les plus extrêmes sur {{totalCount}} éléments.',
     },
     type: {
       area: 'Graphique en aires',
@@ -18,6 +24,24 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: "Fonctions d'agrégation de {{name}}",
+    ai: {
+      button: "Demander à l'IA",
+      buttonTitle: "Générer une requête à partir d'une description avec l'IA",
+      title: "Générer une requête avec l'IA",
+      hint: "Décrivez les données que vous souhaitez voir ; l'IA sélectionnera l'entité, les attributs (ou les dimensions et les mesures), le filtre et le tri. Vous pourrez ensuite vérifier la requête générée et l'enregistrer depuis le gestionnaire de requêtes.",
+      placeholder: "ex. nombre d'arbres regroupés par espèce",
+      generate: 'Générer',
+      generating: 'Génération…',
+      replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête générée ?',
+      suggestSummary: 'Suggérer un nom et une description',
+      suggestSummaryFailed: 'Impossible de suggérer le nom et la description de la requête : {{message}}',
+      suggestSummaryTitle:
+        "Utiliser l'IA pour suggérer le nom, le libellé et la description de la requête d'après les sélections actuelles",
+      generatedSuccessfully:
+        'Requête générée : {{explanation}} Vérifiez le résultat et enregistrez la requête si vous souhaitez la conserver.',
+    },
+    customAggregateFunctions: "Fonctions d'agrégation personnalisées…",
     deleteConfirmMessage: 'Supprimer la requête "{{name}}" ?',
     displayType: {
       chart: 'Graphique',
@@ -25,18 +49,31 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     },
     manageQueries: 'Gérer les requêtes',
     mode: {
-      label: 'Mode :',
       aggregate: 'Agrégat',
       raw: 'Brut',
       rawEdit: 'Édition brute',
     },
     replaceQueryConfirmMessage: 'Remplacer la requête actuelle par la requête sélectionnée ?',
     showCodes: 'Afficher les codes',
+    showTotalAndPercentage: 'Afficher le total et le pourcentage',
+    total: 'Total',
+    viewOptions: 'Affichage',
   },
   editSelectedRecord: "Modifier l'enregistrement sélectionné",
   filterAttributeTypes: "Filtrer les types d'attributs",
+  filterAttributes: 'Filtrer les attributs',
+  filterMessages: 'Filtrer les messages',
+  messageTypeFilter: {
+    valueRequired: 'Valeur requise',
+    valueInvalid: 'Valeur invalide',
+    uniqueDuplicate: 'Valeur en double',
+    customValidation: 'Validation personnalisée',
+    entityKeyDuplicate: "Clé d'entité en double",
+    recordKeyDuplicate: "Clé d'enregistrement dupliquée",
+    nodesCount: 'Nombre de nœuds',
+  },
   filterRecords: {
-    buttonTitle: 'Filtrer',
+    buttonTitle: 'Filtrer les enregistrements',
     expressionEditorHeader: 'Expression pour filtrer les enregistrements',
   },
   invalidRecord: 'Enregistrement invalide',
@@ -44,6 +81,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     hide: 'Masquer le sélecteur de définitions de nœud',
     show: 'Afficher le sélecteur de définitions de nœud',
     nodeDefFrequency: `{{nodeDefLabel}} (fréquence)`,
+    searchPlaceholder: 'Rechercher une variable par nom',
   },
   records: {
     clone: 'Cloner',
@@ -69,6 +107,7 @@ Veuillez affiner votre requête (par ex. en ajoutant un filtre) pour réduire le
     exportList: 'Exporter la liste',
     exportData: 'Exporter les données',
     exportDataSummary: 'Exporter le résumé des données',
+    exportSelectedRecordsArenaFormat: 'Exporter les enregistrements sélectionnés (format Arena)',
     exportRecordDocx: "Exporter l'enregistrement (Word)",
     filterPlaceholder: 'Filtrer par clés ou propriétaire',
     merge: {
@@ -135,6 +174,38 @@ La fusion ne peut pas être effectuée.`,
     },
     title: 'Exporter les données',
   },
+  dataMatrixExport: {
+    intro: `Exportez les données de **{{entity}}** sous forme de tableau avec :
+
+- une **ligne** pour chaque valeur différente des attributs de ligne (p. ex. chaque espèce et strate) ;
+- une **colonne** pour chaque enregistrement, nommée d'après sa clé ({{keys}}) ;
+- dans les cellules, la valeur de l'attribut de valeur (p. ex. le recouvrement).
+
+C'est le format utilisé par les outils d'analyse de la végétation comme Turboveg, Juice et Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matrice de données',
+      info: "Tableau : lignes et colonnes telles qu'affichées dans l'Explorateur de données. Matrice de données : une ligne par espèce (ou autre attribut) et une colonne par enregistrement, comme requis par les outils d'analyse de la végétation tels que Turboveg.",
+      label: 'Exporter en tant que',
+      table: 'Tableau',
+    },
+    preview: 'Aperçu',
+    previewRecord: "{{keys}} de l'enregistrement {{number}}",
+    recordKeys: 'Attributs clés utilisés pour nommer les colonnes des enregistrements',
+    recordKeysInfo:
+      "Chaque enregistrement devient une colonne, nommée d'après les valeurs des attributs clés sélectionnés (p. ex. uniquement le numéro de placette). Par défaut, les attributs clés sélectionnés dans l'Explorateur de données sont utilisés, ou tous si aucun n'est sélectionné. Au moins un est requis.",
+    recordsAll:
+      "Les données de tous les enregistrements sont exportées : définissez un filtre dans l'Explorateur de données pour n'en exporter que certains.",
+    recordsFiltered: "Seules les données correspondant au filtre actuel de l'Explorateur de données sont exportées.",
+    rowAttribute: "Lignes (nom de l'attribut taxon, p. ex. espèce)",
+    rowAttributeInfo:
+      'Chaque valeur différente de cet attribut devient une ligne du tableau. Les attributs taxon sont exportés avec leur nom scientifique, car tous les taxons non répertoriés ont le même code.',
+    secondRowAttribute: 'Second attribut de ligne, facultatif (p. ex. strate)',
+    secondRowAttributeInfo:
+      'À utiliser lorsque la même espèce peut apparaître plusieurs fois dans un enregistrement (p. ex. dans différentes strates) : chaque combinaison devient une ligne distincte.',
+    valueAttribute: 'Valeurs (p. ex. recouvrement)',
+    valueAttributeInfo:
+      'La valeur affichée dans les cellules. Les attributs code sont exportés avec leur code, pas avec le libellé. Si une ligne apparaît plusieurs fois dans un enregistrement avec des valeurs différentes, la cellule les contient toutes.',
+  },
   dataVis: {
     errorLoadingData: 'Erreur lors du chargement des données',
     noData: "Cette requête n'a retourné aucune donnée",
@@ -144,14 +215,13 @@ La fusion ne peut pas être effectuée.`,
   viewSelectedRecord: "Voir l'enregistrement sélectionné",
   mapView: {
     layersControl: {
+      areasOfInterest: "Zones d'intérêt",
       baseLayers: 'Couches de base',
       inputData: "Données d'entrée",
       preloadedLayers: 'Couches préchargées',
       samplingPointData: "Données de points d'échantillonnage",
     },
     layersPanel: {
-      hidePanel: 'Masquer le panneau',
-      showPanel: 'Afficher le panneau',
       markers: '{{count}} marqueurs',
       markers_one: '{{count}} marqueur',
       markers_other: '{{count}} marqueurs',

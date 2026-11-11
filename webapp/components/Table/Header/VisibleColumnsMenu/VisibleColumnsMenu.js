@@ -1,6 +1,6 @@
 import './VisibleColumnsMenu.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects } from '@openforis/arena-core'

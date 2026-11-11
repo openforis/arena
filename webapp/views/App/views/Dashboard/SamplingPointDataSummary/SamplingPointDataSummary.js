@@ -1,6 +1,6 @@
 import './SamplingPointDataSummary.scss'
 
-import React, { useEffect, useContext, useState, useMemo } from 'react'
+import { useEffect, useContext, useState, useMemo } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as RecordStep from '@core/record/recordStep'
@@ -58,7 +58,7 @@ const SamplingPointDataSummary = () => {
       const response = await countData.request
       setTotalItems(response.data.count)
     }
-    fetchTotalItems()
+    void fetchTotalItems()
   }, [surveyId])
 
   if (!totalItems) return null

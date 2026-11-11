@@ -1,6 +1,6 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
-import { Points, Promises } from '@openforis/arena-core'
+import { Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -24,13 +24,14 @@ const keys = {
 const validateNotEmptyFirstLevelItems =
   ({ itemsCache }) =>
   (_propName, level) =>
-    CategoryLevel.getIndex(level) === 0 && R.isEmpty(itemsCache?.getFirstLevelItems())
+    CategoryLevel.getIndex(level) === 0 && A.isEmpty(itemsCache?.getFirstLevelItems())
       ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
       : null
 
 const levelValidators = ({ levels, itemsCache, bigCategory }) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels),
   ],
@@ -47,7 +48,7 @@ const validateLevels = async ({ category, itemsCache, bigCategory }) => {
 
   const validations = await Promise.all(levels.map(validateLevel({ levels, itemsCache, bigCategory })))
 
-  const valid = R.all(Validation.isValid, validations)
+  const valid = A.all(Validation.isValid, validations)
 
   return valid
     ? null
@@ -62,7 +63,7 @@ const groupItemsByParentAndCode = (items) =>
   ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
 
 const getSiblingItems = ({ itemsByParentAndCode, item }) =>
-  R.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
+  A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
 
 const validateItemCodeUniqueness = (itemsByParentAndCode) => (_propName, item) => {
   const siblingItems = getSiblingItems({ itemsByParentAndCode, item })
@@ -113,12 +114,12 @@ const _validateItemExtraProps =
 
     const extra = CategoryItem.getExtra(item)
     return extra
-      ? R.pipe(
-          R.keys,
-          R.reduce((accValidation, key) => {
+      ? A.pipe(
+          A.keys,
+          A.reduce((accValidation, key) => {
             const validationResult = _validateItemExtraProp({ key, extra })
-            return R.unless(
-              R.always(R.isNil(validationResult)),
+            return A.unless(
+              A.always(A.isNil(validationResult)),
               Validation.assocFieldValidation(
                 `${CategoryItem.keysProps.extra}_${key}`,
                 Validation.newInstance(false, {}, [validationResult])
@@ -135,7 +136,7 @@ const validateAllItems = async ({ survey, category, itemsCache, onProgress = nul
 }
 
 const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validation }) => {
-  const childrenValid = R.all((itemChild) =>
+  const childrenValid = A.all((itemChild) =>
     Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
   )(itemChildren)
 
@@ -145,8 +146,8 @@ const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validati
       return Validation.isError(childValidation)
     })
     const validationResult = { key: Validation.messageKeys.categoryEdit.childrenInvalid }
-    validation = R.pipe(
-      R.defaultTo(Validation.newInstance()),
+    validation = A.pipe(
+      A.defaultTo(Validation.newInstance()),
       Validation.setValid(false),
       childrenHasErrors ? Validation.setErrors([validationResult]) : Validation.setWarnings([validationResult])
     )(validation)
@@ -207,8 +208,8 @@ const validateItemsAndDescendants = async ({
 
   pushItems(itemsToValidate)
 
-  while (!R.isEmpty(stack) && !stopIfFn?.()) {
-    const item = stack[stack.length - 1] // Do not pop item: it can be visited again
+  while (!A.isEmpty(stack) && !stopIfFn?.()) {
+    const item = stack.at(-1) // Do not pop item: it can be visited again
     const { itemsByParentAndCode } = item
     const itemUuid = CategoryItem.getUuid(item)
     const isLeaf = Category.isItemLeaf(item)(category)
@@ -220,7 +221,7 @@ const validateItemsAndDescendants = async ({
 
     if (visited || childrenCount === 0) {
       // Validate leaf items or items without children or items already visited (all descendants have been already visited)
-      validation = await Validator.validate(
+      validation = /* NOSONAR */ await Validator.validate(
         item,
         itemValidators({ isLeaf, itemsByParentAndCode, childrenCount }),
         false
@@ -255,6 +256,7 @@ const validateItemsAndDescendants = async ({
 const categoryValidators = (categories) => ({
   [`${Category.keys.props}.${Category.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories),
   ],
@@ -292,8 +294,8 @@ export const validateCategory = async ({
   }
   const itemsValidation = nextItemsValidation ?? prevItemsValidation
 
-  return R.pipe(
-    Validation.setValid(R.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
+  return A.pipe(
+    Validation.setValid(A.all(Validation.isValid, [categoryValidation, levelsValidation, itemsValidation])),
     Validation.setField(keys.levels, levelsValidation),
     Validation.setField(keys.items, itemsValidation),
     Validation.cleanup
@@ -317,7 +319,9 @@ export const validateItems = async ({ category, itemsToValidate, itemsCountByIte
     )
     itemsValidationUpdated = Validation.assocFieldValidation(itemUuid, itemValidation)(itemsValidationUpdated)
   }
-  await Promises.each(itemsToValidate, _validateItem)
+  for (const item of itemsToValidate) {
+    await _validateItem(item) // NOSONAR sequential: each call updates the shared validation
+  }
   const categoryValidationUpdated = Validation.assocFieldValidation(keys.items, itemsValidationUpdated)(prevValidation)
   return Validation.cleanup(categoryValidationUpdated)
 }

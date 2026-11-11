@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: arena-rstudio
+  labels:
+    app.kubernetes.io/name: arena-rstudio
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: arena-rstudio
+  ports:
+    - name: http
+      port: 8787
+      targetPort: http

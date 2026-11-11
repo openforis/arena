@@ -40,8 +40,8 @@ export const copyToClipboard = async (text) => {
   try {
     await navigator.clipboard.writeText(text)
     return true
-  } catch (error) {
-    // ignore it
+  } catch {
+    // clipboard not available or permission denied
     return false
   }
 }
@@ -52,7 +52,7 @@ export const downloadToFile = (url, outputFileName) => {
   link.download = outputFileName
   document.body.appendChild(link)
   link.click()
-  document.body.removeChild(link)
+  link.remove()
 }
 
 export const downloadBlobToFile = (blob, outputFileName) => {
@@ -97,7 +97,8 @@ export const htmlToString = (html) => {
     const div = document.createElement('div')
     div.setHTMLUnsafe(html)
     return div.innerText
-  } catch (error) {
+  } catch {
+    // not parsable as HTML: return the original html
     return html
   }
 }
@@ -106,8 +107,8 @@ export const unescapeHtml = (text) => {
   try {
     const doc = new DOMParser().parseFromString(text, 'text/html')
     return doc.documentElement.textContent
-  } catch (ignored) {
-    // ignore the error
+  } catch {
+    // not parsable as HTML: return the original text
     return text
   }
 }

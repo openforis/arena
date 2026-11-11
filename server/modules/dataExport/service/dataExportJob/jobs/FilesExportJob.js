@@ -35,7 +35,7 @@ export default class FilesExportJob extends Job {
       for (const fileUuid of fileUuids) {
         const exportedFileName = fileNamesByFileUuid[fileUuid]
         if (Objects.isNotEmpty(exportedFileName)) {
-          await this.writeFile({ fileUuid, cycle })
+          await this.writeFile({ fileUuid, cycle }) // NOSONAR
         }
         this.incrementProcessedItems()
       }
@@ -51,7 +51,7 @@ export default class FilesExportJob extends Job {
       this.logWarn(`File with UUID ${fileUuid} not found`)
       return false
     }
-    const recordFileContent = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid }, this.tx)
+    const recordFileContent = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary }, this.tx)
     if (!recordFileContent) {
       this.logWarn(`File content for file with UUID ${fileUuid} not found`)
       return false

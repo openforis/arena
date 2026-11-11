@@ -18,10 +18,14 @@ export default {
   errors: {
     rowNum: 'Мөр #',
   },
+  fileUploadChunkSize: {
+    label: 'Файл байршуулах хэсгийн хэмжээ',
+  },
   forceImportFromAnotherSurvey: 'Өөр судалгаанаас албадан импортлох',
 
   importFromArena: 'Арена/Арена Мобайл',
   importFromCollect: 'Цуглуулах / Цуглуулах Мобайл',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Импортлох алхамууд
 1. Зорилтот объектыг сонгох
@@ -73,6 +77,11 @@ export default {
     CollectDataImportJob: {
       importCompleteSuccessfully: `Цуглуулгын өгөгдлийн импорт амжилттай боллоо:
         - {{insertedRecords}} бичлэг үүсгэгдсэн`,
+    },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `ODK өгөгдлийн импорт амжилттай боллоо:
+        - {{submittedCount}} бичлэг үүсгэгдсэн
+        - {{skippedCount}} давхардсан илгээлт алгассан`,
     },
     DataImportJob: {
       importCompleteSummary: `

@@ -1,5 +1,5 @@
 import camelize from 'camelize'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '../../../../../core/survey/survey'
 import * as Node from '../../../../../core/record/node'
@@ -20,9 +20,6 @@ const columnSet = {
   dateModified: Table.columnSetCommon.dateModified,
 }
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableNode
- */
 export default class TableNode extends TableSurvey {
   constructor(survey) {
     super(Survey.getId(survey), 'node', columnSet)
@@ -56,6 +53,6 @@ export default class TableNode extends TableSurvey {
 }
 
 TableNode.dbTransformCallback = (node) =>
-  R.pipe(R.dissoc(Node.keys.meta), camelize, R.assoc(Node.keys.meta, R.prop(Node.keys.meta, node)))(node)
+  A.pipe(A.dissoc(Node.keys.meta), camelize, A.assoc(Node.keys.meta, A.prop(Node.keys.meta, node)))(node)
 
 TableNode.columnSet = columnSet

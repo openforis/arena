@@ -83,7 +83,7 @@ export const SurveyInfoBasicForm = (props) => {
         <SrsEditor readOnly={readOnly} srs={srs} setSrs={setSrs} validation={getFieldValidation('srs')} />
       </FormItem>
 
-      <FormItem label="common.cycle_plural">
+      <FormItem label="common.cycle_other">
         <CyclesEditor
           cycles={cycles}
           readOnly={readOnly}

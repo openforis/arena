@@ -1,3 +1,5 @@
 import useAsync from './useAsync'
 
-export default (url, config = {}) => useAsync({ method: 'delete', url, ...config })
+const useAsyncDeleteRequest = (url, config = {}) => useAsync({ method: 'delete', url, ...config })
+
+export default useAsyncDeleteRequest

@@ -8,6 +8,7 @@ export const dependencyTypes = {
   maxCount: 'maxCount',
   minCount: 'minCount',
   parentCode: 'parentCode',
+  required: 'required',
   validations: 'validations',
   visible: 'visible',
 }
@@ -22,6 +23,7 @@ export const isContextParentByDependencyType = {
   [dependencyTypes.maxCount]: true,
   [dependencyTypes.minCount]: true,
   [dependencyTypes.parentCode]: false,
+  [dependencyTypes.required]: true,
   [dependencyTypes.validations]: false,
   [dependencyTypes.visible]: true,
 }
@@ -36,6 +38,7 @@ export const selfReferenceAllowedByDependencyType = {
   [dependencyTypes.maxCount]: false,
   [dependencyTypes.minCount]: false,
   [dependencyTypes.parentCode]: false,
+  [dependencyTypes.required]: false,
   [dependencyTypes.validations]: true,
   [dependencyTypes.visible]: false,
 }

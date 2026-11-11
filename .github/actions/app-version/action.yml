@@ -1,0 +1,20 @@
+name: App version
+description: >
+  Gets the app version from the git tags (`git describe`) and writes it to the `.app-version` file, read at build
+  time (where .git is not available, e.g. Heroku and Docker builds). Requires the repository to be checked out with
+  its tags (actions/checkout with `fetch-depth: 0`).
+outputs:
+  version:
+    description: The app version (e.g. v2.10.7 or v2.10.7-3-g1a2b3c4d5)
+    value: ${{ steps.app_version.outputs.version }}
+runs:
+  using: composite
+  steps:
+    - name: Get the version and write the version file
+      id: app_version
+      shell: bash
+      run: |
+        version="$(git describe --always --tags)"
+        echo "App version: $version"
+        echo "$version" > .app-version
+        echo "version=$version" >> "$GITHUB_OUTPUT"

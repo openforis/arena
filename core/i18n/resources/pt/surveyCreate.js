@@ -13,6 +13,7 @@ export default {
     label: 'Origem',
     arena: 'Arena (.zip)',
     collect: 'Collect (.collect, .collect-backup, .collect-data)',
+    odk: 'ODK (.xml)',
   },
   startImport: 'Iniciar importação',
   survey: 'Inventário',

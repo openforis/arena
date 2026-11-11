@@ -194,6 +194,7 @@ const _addEntityAndKeyValues =
     survey,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     entityDef,
     parentNode,
     keyValuesByDefUuid,
@@ -201,11 +202,12 @@ const _addEntityAndKeyValues =
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
-    const updateResultDescendants = await CoreRecordNodesUpdater.createNodeAndDescendants({
+    const updateResultDescendants = await CoreRecordNodesUpdater.addNodeAndDescendants({
       user,
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       record,
       parentNode,
       nodeDef: entityDef,
@@ -227,7 +229,7 @@ const _addEntityAndKeyValues =
         })
       }
 
-      const keyAttributeUpdateResult = await _addOrUpdateAttribute({
+      const keyAttributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
         survey,
         categoryItemProvider,
         entity,
@@ -249,10 +251,12 @@ const _getOrCreateEntityByKeys =
     survey,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     entityDefUuid,
     valuesByDefUuid,
     insertMissingNodes,
     sideEffect = false,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
@@ -262,6 +266,7 @@ const _getOrCreateEntityByKeys =
       survey,
       descendantDefUuid: entityDefUuid,
       keyValuesByDefUuid: valuesByDefUuid,
+      entityKeysIndexCache,
     })(record)
 
     if (entity) {
@@ -285,6 +290,7 @@ const _getOrCreateEntityByKeys =
           survey,
           descendantDefUuid: NodeDef.getUuid(entityParentDef),
           keyValuesByDefUuid: valuesByDefUuid,
+          entityKeysIndexCache,
         })(record)
 
     if (!entityParent) {
@@ -300,11 +306,19 @@ const _getOrCreateEntityByKeys =
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
       sideEffect,
     })(record)
+
+    entityKeysIndexCache?.addEntity({
+      parentNode: entityParent,
+      entity: entityInserted,
+      getKeyAttribute: (entity, keyDefUuid) =>
+        RecordReader.getNodeChildByDefUuid(entity, keyDefUuid)(updateResult.record),
+    })
 
     return { entity: entityInserted, updateResult }
   }
@@ -317,9 +331,12 @@ const getOrCreateEntityByKeys =
     valuesByDefUuid,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
+    updateDependents = true,
+    entityKeysIndexCache = null,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -329,15 +346,21 @@ const getOrCreateEntityByKeys =
       survey,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
       sideEffect,
+      entityKeysIndexCache,
     })(record)
 
     if (updateResultEntity) {
       updateResult.merge(updateResultEntity)
 
+      if (!updateDependents) {
+        // caller is responsible for updating dependent nodes and validation (see afterNodesUpdate)
+        return { entity, updateResult }
+      }
       const dependentsUpdateResult = await afterNodesUpdate({
         user,
         survey,
@@ -345,6 +368,7 @@ const getOrCreateEntityByKeys =
         nodes: updateResultEntity.nodes,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -369,8 +393,10 @@ const updateAttributesInEntityWithValues =
     refDataByDefUuid = null,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     sideEffect = false,
+    updateDependents = true,
   }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
@@ -380,6 +406,9 @@ const updateAttributesInEntityWithValues =
 
       updateResult.merge(nodeUpdateResult)
 
+      // when not updating dependents, the caller is responsible for it (see afterNodesUpdate)
+      if (!updateDependents) return
+
       const dependentsUpdateResult = await afterNodesUpdate({
         user,
         survey,
@@ -387,6 +416,7 @@ const updateAttributesInEntityWithValues =
         nodes: nodeUpdateResult.nodes,
         categoryItemProvider,
         taxonProvider,
+        areaOfInterestProvider,
         timezoneOffset,
         sideEffect,
       })
@@ -408,10 +438,11 @@ const updateAttributesInEntityWithValues =
 
         const refData = refDataByDefUuid?.[attributeDefUuid] ?? null
 
-        const attributeUpdateResult = await _addOrUpdateAttribute({
+        const attributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
           survey,
           categoryItemProvider,
           taxonProvider,
+          areaOfInterestProvider,
           entity: attributeParentEntity,
           attributeDef,
           value,
@@ -419,7 +450,7 @@ const updateAttributesInEntityWithValues =
           sideEffect,
         })(currentRecord)
 
-        await updateDependentNodes(attributeUpdateResult)
+        await updateDependentNodes(attributeUpdateResult) // NOSONAR
       }
     }
     return updateResult
@@ -433,6 +464,7 @@ const updateAttributesWithValues =
     valuesByDefUuid,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
@@ -448,6 +480,7 @@ const updateAttributesWithValues =
       valuesByDefUuid,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       timezoneOffset,
       insertMissingNodes,
       sideEffect,
@@ -462,6 +495,7 @@ const updateAttributesWithValues =
       valuesByDefUuid,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       timezoneOffset,
       sideEffect,
     })(updateResult.record)
@@ -472,7 +506,16 @@ const updateAttributesWithValues =
   }
 
 const deleteNodesInEntityByNodeDefUuid =
-  ({ user, survey, entity, nodeDefUuids, categoryItemProvider, taxonProvider, sideEffect = false }) =>
+  ({
+    user,
+    survey,
+    entity,
+    nodeDefUuids,
+    categoryItemProvider,
+    taxonProvider,
+    areaOfInterestProvider,
+    sideEffect = false,
+  }) =>
   async (record) => {
     const updateResult = new RecordUpdateResult({ record })
 
@@ -489,6 +532,7 @@ const deleteNodesInEntityByNodeDefUuid =
       nodeUuids: nodeUuidsToDelete,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)

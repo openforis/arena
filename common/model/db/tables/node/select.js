@@ -43,7 +43,8 @@ export function getSelect(params) {
 
   const _addUuidEqualCondition = (column, value) => {
     if (value) {
-      whereConditions.push(`${column} = ${isUuid(value) ? `'${value}'` : value}`)
+      const valueSql = isUuid(value) ? `'${value}'` : value
+      whereConditions.push(`${column} = ${valueSql}`)
     }
   }
 

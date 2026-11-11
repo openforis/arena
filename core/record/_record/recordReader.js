@@ -1,8 +1,6 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
-import { Nodes, Records } from '@openforis/arena-core'
-
-import Queue from '@core/queue'
+import { Nodes, Queue, Records } from '@openforis/arena-core'
 
 import * as SurveyNodeDefs from '@core/survey/_survey/surveyNodeDefs'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -12,6 +10,7 @@ import * as Node from '../node'
 import { NodeValues } from '../nodeValues'
 
 import { keys } from './recordKeys'
+import { EntityKeysIndexCache } from './entityKeysIndexCache'
 
 const {
   getChildren: getNodeChildren,
@@ -24,7 +23,7 @@ const {
 /**
  * === simple getters.
  */
-export const getNodes = R.propOr({}, keys.nodes)
+export const getNodes = A.propOr({}, keys.nodes)
 export const getNodesArray = (record) => Object.values(getNodes(record))
 
 export { getNodeChildren, getNodeByUuid, getNodesByDefUuid, getRootNode, getParentNode }
@@ -40,31 +39,24 @@ export const findNodeChildren = (parentNode, childDefUuid) => (record) => {
 // ==== hierarchy
 // ancestors
 
-export const visitAncestorsAndSelf =
-  ({ node, visitor }) =>
-  (record) =>
-    Records.visitAncestorsAndSelf(node, visitor)(record)
+export const visitAncestorsAndSelf = (node, visitor) => (record) =>
+  // the visitor return value is ignored: the visit never stops early
+  Records.visitAncestorsAndSelf(node, (visitedNode) => {
+    visitor(visitedNode)
+  })(record)
 
 /**
  * Returns the list of ancestors from the given node to the root entity.
- * @param node
+ * @param {object} node - The node to start from.
+ * @returns {Function} - Function taking the record and returning the node and its ancestors.
  */
-export const getAncestorsAndSelf = (node) => (record) => {
-  const ancestors = []
-  visitAncestorsAndSelf({
-    node,
-    visitor: (currentNode) => {
-      ancestors.push(currentNode)
-    },
-  })(record)
-  return ancestors
-}
+export const getAncestorsAndSelf = (node) => (record) => Records.getAncestorsAndSelf(node)(record)
 
 export const getAncestorByNodeDefUuid = (node, ancestorDefUuid) => (record) =>
-  R.pipe(
+  A.pipe(
     getParentNode(node),
     (parentNode) => getAncestorsAndSelf(parentNode)(record),
-    R.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
+    A.find((ancestor) => Node.getNodeDefUuid(ancestor) === ancestorDefUuid)
   )(record)
 
 // Descendants
@@ -83,7 +75,7 @@ export const getNodeChildrenByDefUuid = (parentNode, nodeDefUuid) => (record) =>
 }
 
 export const getNodeChildByDefUuid = (parentNode, nodeDefUuid) =>
-  R.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), R.head)
+  A.pipe(getNodeChildrenByDefUuid(parentNode, nodeDefUuid), A.head)
 
 export const getNodeChildIndex = (node) => (record) => {
   const parentNode = getParentNode(node)(record)
@@ -103,7 +95,7 @@ export const visitDescendantsAndSelf =
 
       visitor(node)
 
-      if (stopIfFn && stopIfFn(node)) {
+      if (stopIfFn?.(node)) {
         break
       }
       const children = getNodeChildren(node)(record)
@@ -111,7 +103,17 @@ export const visitDescendantsAndSelf =
     }
   }
 
-export const findDescendantOrSelf = (node, filterFn) => (record) => Records.findDescendantOrSelf(node, filterFn)(record)
+export const findDescendantOrSelf = (node, filterFn) => (record) => {
+  let found = null
+  visitDescendantsAndSelf(
+    node,
+    (currentNode) => {
+      if (filterFn(currentNode)) found = currentNode
+    },
+    () => found !== null
+  )(record)
+  return found
+}
 
 /**
  * Finds a the parent node of the specified node def, starting from the specified parent node and traversing
@@ -189,20 +191,20 @@ export const isNodeApplicable = (node) => (record) => {
 export const getDependentNodePointers =
   (survey, node, dependencyType, includeSelf = false, filterFn = null) =>
   (record) =>
-    Records.getDependentNodePointers({ survey, record, node, dependencyType, includeSelf, filterFn })
+    Records.getDependentNodePointers(survey, node, dependencyType, includeSelf, filterFn)(record)
 
 // Code attributes
 export const getDependentCodeAttributes = (node) => (record) => Records.getDependentCodeAttributes(node)(record)
 
 export const getParentCodeAttribute = (_survey, parentNode, nodeDef) => (record) =>
-  Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
+  Records.getParentCodeAttribute(parentNode, nodeDef)(record)
 
 // Visits the ancestor code attributes in bottom-up order
 export const visitAncestorCodeAttributes =
   ({ survey, parentNode, nodeDef, visitor }) =>
   (record) => {
     const visitedNodeUuids = new Set() // avoid cycles
-    let currentParentCodeAttribute = Records.getParentCodeAttribute({ parentNode, nodeDef })(record)
+    let currentParentCodeAttribute = Records.getParentCodeAttribute(parentNode, nodeDef)(record)
     while (currentParentCodeAttribute && !visitedNodeUuids.has(Node.getUuid(currentParentCodeAttribute))) {
       visitedNodeUuids.add(Node.getUuid(currentParentCodeAttribute))
       visitor(currentParentCodeAttribute)
@@ -210,10 +212,7 @@ export const visitAncestorCodeAttributes =
         Node.getNodeDefUuid(currentParentCodeAttribute)
       )(survey)
       const ancestorNode = Records.getParent(currentParentCodeAttribute)(record)
-      currentParentCodeAttribute = Records.getParentCodeAttribute({
-        parentNode: ancestorNode,
-        nodeDef: parentCodeAttributeNodeDef,
-      })(record)
+      currentParentCodeAttribute = Records.getParentCodeAttribute(ancestorNode, parentCodeAttributeNodeDef)(record)
     }
   }
 
@@ -236,44 +235,62 @@ export const getAncestorCodeAttributes =
 // ====== Keys
 
 export const getEntityKeyNodes = (survey, nodeEntity) => (record) =>
-  Records.getEntityKeyNodes({ survey, record, entity: nodeEntity })
+  Records.getEntityKeyNodes(survey, nodeEntity)(record)
 
 export const getEntityKeyValues = (survey, nodeEntity) =>
-  R.pipe(getEntityKeyNodes(survey, nodeEntity), R.map(Node.getValue))
+  A.pipe(getEntityKeyNodes(survey, nodeEntity), A.map(Node.getValue))
 
 export const findChildByKeyValues =
-  ({ survey, parentNode, childDefUuid, keyValuesByDefUuid }) =>
+  ({ survey, parentNode, childDefUuid, keyValuesByDefUuid, entityKeysIndexCache = null }) =>
   (record) => {
     const childDef = SurveyNodeDefs.getNodeDefByUuid(childDefUuid)(survey)
     const siblings = getNodeChildrenByDefUuidUnsorted(parentNode, childDefUuid)(record)
-    return siblings.find((sibling) => {
-      if (NodeDef.isSingleEntity(childDef)) {
-        return sibling
-      }
-      const keyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey)
-      return keyDefs
-        .filter((keyDef) => Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef)))
-        .every((keyDef) => {
-          const keyDefUuid = NodeDef.getUuid(keyDef)
-          const keyAttribute = getNodeChildByDefUuid(sibling, keyDefUuid)(record)
-          const keyAttributeValue = Node.getValue(keyAttribute)
-          const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
+    if (NodeDef.isSingleEntity(childDef)) {
+      return siblings[0]
+    }
+    // key defs are computed once (and not for every sibling): siblings can be many (e.g. when importing data)
+    const applicableKeyDefs = SurveyNodeDefs.getNodeDefKeys(childDef)(survey).filter((keyDef) =>
+      Nodes.isChildApplicable(parentNode, NodeDef.getUuid(keyDef))
+    )
+    const hasKeyValues = (entity) =>
+      applicableKeyDefs.every((keyDef) => {
+        const keyDefUuid = NodeDef.getUuid(keyDef)
+        const keyAttribute = getNodeChildByDefUuid(entity, keyDefUuid)(record)
+        const keyAttributeValue = Node.getValue(keyAttribute)
+        const keyAttributeValueSearch = keyValuesByDefUuid[keyDefUuid]
 
-          return NodeValues.isValueEqual({
-            survey,
-            nodeDef: keyDef,
-            record,
-            parentNode: sibling,
-            attribute: keyAttribute,
-            value: keyAttributeValue,
-            valueSearch: keyAttributeValueSearch,
-          })
+        return NodeValues.isValueEqual({
+          survey,
+          nodeDef: keyDef,
+          record,
+          parentNode: entity,
+          attribute: keyAttribute,
+          value: keyAttributeValue,
+          valueSearch: keyAttributeValueSearch,
         })
-    })
+      })
+
+    if (entityKeysIndexCache && EntityKeysIndexCache.canBeUsed(applicableKeyDefs)) {
+      const entityUuids = entityKeysIndexCache.findEntityUuids({
+        parentNode,
+        childDefUuid,
+        keyDefs: applicableKeyDefs,
+        siblings,
+        getKeyAttribute: (entity, keyDefUuid) => getNodeChildByDefUuid(entity, keyDefUuid)(record),
+        keyValuesByDefUuid,
+      })
+      if (entityUuids) {
+        // entities found in the index are checked again: key values could have been modified after the index has been built
+        return entityUuids
+          .map((entityUuid) => getNodeByUuid(entityUuid)(record))
+          .find((entity) => entity && !Node.isDeleted(entity) && hasKeyValues(entity))
+      }
+    }
+    return siblings.find(hasKeyValues)
   }
 
 export const findDescendantByKeyValues =
-  ({ survey, descendantDefUuid, keyValuesByDefUuid }) =>
+  ({ survey, descendantDefUuid, keyValuesByDefUuid, entityKeysIndexCache = null }) =>
   (record) => {
     // start from root node
     const rootNode = getRootNode(record)
@@ -294,6 +311,7 @@ export const findDescendantByKeyValues =
         parentNode: currentNode,
         childDefUuid: nodeDefUuid,
         keyValuesByDefUuid,
+        entityKeysIndexCache,
       })(record)
 
       currentNode = descendant

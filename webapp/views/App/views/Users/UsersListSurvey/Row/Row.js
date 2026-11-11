@@ -16,7 +16,7 @@ import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 const Row = (props) => {
-  const { onEditSurveyUserExtraProps, row: userListItem } = props
+  const { onEditSurveyUserExtraProps, item: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
@@ -38,7 +38,7 @@ const Row = (props) => {
   return (
     <>
       <div data-testid={TestId.userList.profilePicture} className="users-list__cell-profile-picture">
-        <ProfilePicture userUuid={userUuid} thumbnail />
+        <ProfilePicture userUuid={userUuid} hasProfilePicture={User.hasProfilePicture(userListItem)} thumbnail />
       </div>
       <div data-testid={TestId.userList.name}>{User.getName(userListItem)}</div>
       {emailVisible && (
@@ -47,7 +47,7 @@ const Row = (props) => {
         </div>
       )}
       <div data-testid={TestId.userList.authGroup} data-value={authGroupName}>
-        <LabelWithTooltip label={i18n.t(`auth:authGroups.${authGroupName}.label_plural`)} />
+        <LabelWithTooltip label={i18n.t(`auth:authGroups.${authGroupName}.label_other`)} />
       </div>
       <div data-testid={TestId.userList.invitedBy} data-value={invitedBy}>
         <LabelWithTooltip label={invitedBy} />
@@ -97,8 +97,8 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
+  item: PropTypes.object.isRequired,
   onEditSurveyUserExtraProps: PropTypes.func.isRequired,
-  row: PropTypes.object.isRequired,
 }
 
 export default Row

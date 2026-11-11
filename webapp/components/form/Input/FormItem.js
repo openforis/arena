@@ -7,9 +7,7 @@ import { ButtonIconInfo } from '@webapp/components/buttons'
 import { useIsMobile } from '@webapp/components/hooks/useIsMobile'
 import { useI18n } from '@webapp/store/system'
 
-const getLabel = (props, i18n) => {
-  const { appendColonToLabel = false, label: labelProp, labelParams } = props
-
+const getLabel = ({ appendColonToLabel, labelProp, labelParams, i18n }) => {
   if (Objects.isNotEmpty(labelProp) && typeof labelProp === 'string') {
     const label = i18n.t(labelProp, { ...labelParams, interpolation: { escapeValue: false } })
     return appendColonToLabel && label ? `${label}:` : label
@@ -20,6 +18,7 @@ const getLabel = (props, i18n) => {
 
 export const FormItem = (props) => {
   const {
+    appendColonToLabel = false,
     children,
     className = '',
     hideLabelInMobile = false,
@@ -28,12 +27,14 @@ export const FormItem = (props) => {
     infoTitleMarkdownClassName = undefined,
     infoTitleMaxWidth = undefined,
     isInfoMarkdown = false,
+    label: labelProp,
+    labelParams,
     onInfoClick = null,
     required = false,
   } = props
 
   const i18n = useI18n()
-  const label = getLabel(props, i18n)
+  const label = getLabel({ appendColonToLabel, labelProp, labelParams, i18n })
   const isMobile = useIsMobile()
 
   const labelComponent =

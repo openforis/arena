@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -29,7 +29,7 @@ const NodeDefCodeDropdown = (props) => {
   const autocomplete = typeof items === 'function'
   const entryDisabled = edit || !canEditRecord || readOnly
 
-  const disabled = R.isEmpty(items)
+  const disabled = A.isEmpty(items)
   const minCharactersToAutocomplete = autocomplete ? 1 : 0
 
   return (
@@ -60,7 +60,7 @@ const NodeDefCodeDropdown = (props) => {
           }}
           placeholder={autocomplete ? i18n.t('surveyForm:nodeDefCode.typeCodeOrLabel') : undefined}
           readOnly={entryDisabled}
-          selection={Objects.isEmpty(selectedItems) ? null : R.head(selectedItems)}
+          selection={Objects.isEmpty(selectedItems) ? null : A.head(selectedItems)}
           testId={TestId.surveyForm.codeInputDropdown(NodeDef.getName(nodeDef))}
         />
       )}

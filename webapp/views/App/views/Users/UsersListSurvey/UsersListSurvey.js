@@ -1,7 +1,7 @@
 import './UsersList.scss'
 
-import React, { useCallback, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router'
 
 import * as User from '@core/user/user'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
@@ -18,7 +18,7 @@ const UsersListSurvey = () => {
   const navigate = useNavigate()
   const surveyId = useSurveyId()
   const emailVisible = useAuthCanViewOtherUsersEmail()
-  const [requestedAt, setRequestedAt] = useState(Date.now())
+  const [requestedAt, setRequestedAt] = useState(() => Date.now())
   const [surveyExtraPropsEditorUser, setSurveyExtraPropsEditorUser] = useState(null)
 
   const onRowClick = useCallback(

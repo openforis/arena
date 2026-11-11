@@ -23,7 +23,7 @@ export const ContentRow = (props) => {
 
   const [rowExpanded, setRowExpanded] = useState(false)
 
-  const active = isRowActive && isRowActive(item)
+  const active = isRowActive?.(item)
   const className = classNames('table__row', { hoverable: Boolean(onRowClick), active, expanded: rowExpanded })
 
   const onRowExpandToggle = () => setRowExpanded((oldExpanded) => !oldExpanded)
@@ -42,12 +42,24 @@ export const ContentRow = (props) => {
     [item, onRowClick, onRowDoubleClick]
   )
 
+  const onKeyDown = useCallback(
+    async (event) => {
+      // keys pressed in the elements inside the row must not activate it
+      if (event.target === event.currentTarget && ['Enter', ' '].includes(event.key)) {
+        event.preventDefault()
+        await onRowClick?.(item)
+      }
+    },
+    [item, onRowClick]
+  )
+
   return (
-    // eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus
-    <div
+    <div // NOSONAR: role="button" with interactive children (buttons), a native <button> cannot wrap them
       data-testid={`${module}_${index}`}
       role="button"
+      tabIndex={onRowClick ? 0 : undefined}
       onClick={onClick}
+      onKeyDown={onKeyDown}
       className={className}
       style={{ gridTemplateColumns, height }}
     >
@@ -60,8 +72,6 @@ export const ContentRow = (props) => {
         offset,
         item,
         itemPosition,
-        row: item, // TODO remove it and pass only item
-        rowNo: itemPosition, // TODO remove it and pass only itemPosition
         onRowExpandToggle,
         expandableRows,
         isRowExpandable,

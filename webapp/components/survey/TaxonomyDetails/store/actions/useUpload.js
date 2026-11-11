@@ -16,7 +16,7 @@ import { NotificationActions } from '@webapp/store/ui'
 import { State } from '../state'
 import { useRefreshTaxonomy } from './useRefreshTaxonomy'
 
-const allowedFileFormats = [FileFormats.csv, FileFormats.xlsx]
+const allowedFileFormats = new Set([FileFormats.csv, FileFormats.xlsx])
 
 export const useUpload = ({ setState }) => {
   const dispatch = useDispatch()
@@ -54,7 +54,7 @@ export const useUpload = ({ setState }) => {
   return useCallback(
     async ({ state, file }) => {
       const fileFormat = FileUtils.determineFileFormatFromFileName(file.name)
-      if (!allowedFileFormats.includes(fileFormat)) {
+      if (!allowedFileFormats.has(fileFormat)) {
         const extension = FileUtils.getExtension(file)
         dispatch(
           NotificationActions.notifyWarning({ key: 'dropzone.error.invalidFileExtension', params: { extension } })

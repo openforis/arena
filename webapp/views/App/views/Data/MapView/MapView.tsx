@@ -1,33 +1,32 @@
 import './MapView.scss'
 
-import React, { useCallback, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useMemo, useState } from 'react'
 
-import { Objects } from '@openforis/arena-core'
-
+import { isHexColor } from '@core/colorUtils'
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 
 import * as API from '@webapp/service/api'
-import { useSurvey, useSurveyInfo } from '@webapp/store/survey'
-import { useI18n, useSystemConfigExperimentalFeatures } from '@webapp/store/system'
+import { useSurvey, useSurveyInfo, useSurveyPreferredLang } from '@webapp/store/survey'
+import { useI18n } from '@webapp/store/system'
 
-import { useHorizontalResize } from '@webapp/components/hooks'
 import { useRandomColors } from '@webapp/components/hooks/useRandomColors'
 import { MapContainer } from '@webapp/components/MapContainer'
+import type { SurveyFileRef } from '@webapp/components/MapContainer/fileLayers'
+import type { MapRailTab, MapWorkspaceRecords } from '@webapp/components/MapContainer/workspace/mapWorkspaceTypes'
+import { exitFullScreen } from '@webapp/components/MapContainer/workspace/tools/useFullScreen'
 
 import { SamplingPointDataLayer } from './SamplingPointDataLayer'
 import { RecordEditModal } from '../common/RecordEditModal'
 import { GeoAttributeDataLayer } from './GeoAttributeDataLayer'
-import { PreloadedLayer } from './PreloadedLayer/PreloadedLayer'
+import { SurveyFileLayer } from './SurveyFileLayer/SurveyFileLayer'
 import { MapLayersPanel, MapLayersPanelProvider } from './MapLayersPanel'
 import { useMapLayersPanel } from './MapLayersPanel/MapLayersPanelContext'
-
-const PANEL_DEFAULT_WIDTH = 260
-const PANEL_MIN_WIDTH = 100
-const MAP_MIN_WIDTH = 300
+import { buildRecordCandidates, selectRecordCandidate } from './mapRecordCandidates'
 
 type LayerGroup = {
   label: string
@@ -35,59 +34,41 @@ type LayerGroup = {
 }
 
 type MapViewContentProps = {
-  baseLayersLabel: string
   layers: React.ReactElement[]
   overlayGroups: LayerGroup[]
 }
 
-// MapContainer must always occupy the same position in the React tree so Leaflet never
-// unmounts. We achieve this with a stable flex layout where only the panel-pane width
-// changes — no conditional Split mount/unmount.
-const MapViewContent = ({ baseLayersLabel, layers, overlayGroups }: MapViewContentProps) => {
-  const { activeLayers, isPanelVisible } = useMapLayersPanel()
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const panelOpen = experimentalFeatures && isPanelVisible && activeLayers.length > 0
+// the Records tab: the records of the shown layers, to go from one to the next as in the former side panel
+const RECORDS_RAIL_TABS: MapRailTab[] = [
+  {
+    key: 'records',
+    labelKey: 'mapWorkspace.rail.tabs.records',
+    titleKey: 'mapWorkspace.rail.titles.records',
+    iconClassName: 'icon-list',
+    content: <MapLayersPanel />,
+  },
+]
 
-  const {
-    width: panelWidth,
-    maxWidth: panelMaxWidth,
-    onGutterMouseDown,
-    onGutterKeyDown,
-    onGutterTouchStart,
-  } = useHorizontalResize({
-    containerRef,
-    initialWidth: PANEL_DEFAULT_WIDTH,
-    minLeftWidth: PANEL_MIN_WIDTH,
-    minRightWidth: MAP_MIN_WIDTH,
-  })
+// MapContainer must always occupy the same position in the React tree so Leaflet never unmounts
+const MapViewContent = ({ layers, overlayGroups }: MapViewContentProps) => {
+  const { activeLayers, selectPoint } = useMapLayersPanel()
+  // the search finds the records the Records tab lists
+  const records = useMemo<MapWorkspaceRecords>(
+    () => ({
+      candidates: buildRecordCandidates(activeLayers),
+      onSelect: (id: string) => selectRecordCandidate({ id, activeLayers, selectPoint }),
+    }),
+    [activeLayers, selectPoint]
+  )
 
   return (
-    <div ref={containerRef} className="map-view-content">
-      <div
-        className="map-view-content__panel"
-        style={{ width: panelOpen ? panelWidth : 0, overflow: panelOpen ? 'hidden' : 'visible' }}
-      >
-        <MapLayersPanel />
-      </div>
-      {panelOpen && (
-        <div
-          role="slider"
-          aria-orientation="vertical"
-          aria-valuenow={panelWidth}
-          aria-valuemin={PANEL_MIN_WIDTH}
-          aria-valuemax={panelMaxWidth}
-          tabIndex={0}
-          className="map-view-content__gutter"
-          onMouseDown={onGutterMouseDown}
-          onKeyDown={onGutterKeyDown}
-          onTouchStart={onGutterTouchStart}
-        />
-      )}
-      <div className="map-view-content__map">
-        <MapContainer layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
-      </div>
-    </div>
+    <MapContainer
+      variant="full"
+      layers={layers}
+      overlayGroups={overlayGroups}
+      extraRailTabs={RECORDS_RAIL_TABS}
+      records={records}
+    />
   )
 }
 
@@ -100,8 +81,8 @@ const getGeoAttributeLayerMarkersColor = ({
 }): string => {
   if (!NodeDef.isCoordinate(attributeDef)) return defaultColor
 
-  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef) as string
-  return Objects.isEmpty(mapMarkerColor) ? defaultColor : mapMarkerColor
+  const mapMarkerColor = NodeDef.getMapMarkerColor(attributeDef)
+  return isHexColor(mapMarkerColor) ? mapMarkerColor : defaultColor
 }
 
 const getSamplingPointDataLevels = (survey: any): any[] => {
@@ -120,6 +101,7 @@ type MapWrapperState = {
 
 const MapWrapper = () => {
   const i18n = useI18n()
+  const lang = useSurveyPreferredLang()
   const survey = useSurvey() as any
 
   const surveyInfo = useSurveyInfo() as any
@@ -139,18 +121,33 @@ const MapWrapper = () => {
   )
   const samplingPointDataLevels = useMemo(() => getSamplingPointDataLevels(survey), [survey])
 
-  const preloadedLayerSummaries = useMemo(() => {
+  const preloadedLayerRefs = useMemo((): SurveyFileRef[] => {
     if (!Survey.isPreloadedMapLayersEnabled(surveyInfo)) return []
 
-    return Survey.getPreloadedMapLayers(surveyInfo) as any[]
-  }, [surveyInfo])
+    return (Survey.getPreloadedMapLayers(surveyInfo) as any[]).map((preloadedMapLayer) => ({
+      fileUuid: SurveyFile.getUuid(preloadedMapLayer),
+      fileName: SurveyFile.getName(preloadedMapLayer),
+      label: SurveyFile.getLabel(lang)(preloadedMapLayer),
+    }))
+  }, [lang, surveyInfo])
+
+  const areaOfInterestRefs = useMemo(
+    (): SurveyFileRef[] =>
+      SurveyAreaOfInterest.getAreasOfInterest(surveyInfo).map((areaOfInterest) => ({
+        fileUuid: areaOfInterest.fileUuid,
+        fileName: areaOfInterest.fileName,
+        label: SurveyAreaOfInterest.getLabel(lang)(areaOfInterest),
+      })),
+    [lang, surveyInfo]
+  )
 
   const layerColors = useRandomColors(
-    samplingPointDataLevels.length + geoAttributeDefs.length + preloadedLayerSummaries.length
+    samplingPointDataLevels.length + geoAttributeDefs.length + preloadedLayerRefs.length
   )
 
   const onRecordEditClick = useCallback((params?: { recordUuid?: string; parentUuid?: string }) => {
     const { recordUuid, parentUuid } = params ?? {}
+    exitFullScreen()
     setState((statePrev) => ({
       ...statePrev,
       editingRecordUuid: recordUuid ?? null,
@@ -169,6 +166,7 @@ const MapWrapper = () => {
   const createRecordFromSamplingPointDataItem = useCallback(
     async ({ itemUuid, callback }: { itemUuid: string; callback?: (params: { recordUuid: string }) => void }) => {
       const recordUuid = await API.createRecordFromSamplingPointDataItem({ surveyId, itemUuid })
+      exitFullScreen()
       setState((statePrev) => ({ ...statePrev, editingRecordUuid: recordUuid }))
       callback?.({ recordUuid })
     },
@@ -177,15 +175,16 @@ const MapWrapper = () => {
 
   const layers = useMemo(
     () => [
-      ...preloadedLayerSummaries.map((preloadedLayerSummary: any) => (
-        <PreloadedLayer key={SurveyFile.getUuid(preloadedLayerSummary)} preloadedMapLayer={preloadedLayerSummary} />
+      // same order as the overlay groups
+      ...[...preloadedLayerRefs, ...areaOfInterestRefs].map((surveyFile) => (
+        <SurveyFileLayer key={surveyFile.fileUuid} surveyFile={surveyFile} />
       )),
 
       ...samplingPointDataLevels.map((level: any, index: number) => (
         <SamplingPointDataLayer
           key={CategoryLevel.getUuid(level)}
           levelIndex={CategoryLevel.getIndex(level)}
-          markersColor={layerColors[preloadedLayerSummaries.length + index]}
+          markersColor={layerColors[preloadedLayerRefs.length + index]}
           onRecordEditClick={onRecordEditClick}
           createRecordFromSamplingPointDataItem={createRecordFromSamplingPointDataItem}
         />
@@ -197,27 +196,27 @@ const MapWrapper = () => {
           attributeDef={attributeDef}
           markersColor={getGeoAttributeLayerMarkersColor({
             attributeDef,
-            defaultColor: layerColors[preloadedLayerSummaries.length + samplingPointDataLevels.length + index],
+            defaultColor: layerColors[preloadedLayerRefs.length + samplingPointDataLevels.length + index],
           })}
           onRecordEditClick={onRecordEditClick}
         />
       )),
     ],
     [
+      areaOfInterestRefs,
       createRecordFromSamplingPointDataItem,
       geoAttributeDefs,
       layerColors,
       onRecordEditClick,
-      preloadedLayerSummaries,
+      preloadedLayerRefs,
       samplingPointDataLevels,
     ]
   )
 
-  const baseLayersLabel = i18n.t('dataView:mapView.layersControl.baseLayers')
-
   const overlayGroups = useMemo(() => {
     const layersCountByGroup = {
-      preloadedLayers: preloadedLayerSummaries.length,
+      preloadedLayers: preloadedLayerRefs.length,
+      areasOfInterest: areaOfInterestRefs.length,
       samplingPointData: samplingPointDataLevels.length,
       inputData: geoAttributeDefs.length,
     }
@@ -227,7 +226,13 @@ const MapWrapper = () => {
         count: groupLayersCount,
       }))
       .filter((g) => g.count > 0)
-  }, [geoAttributeDefs.length, i18n, preloadedLayerSummaries.length, samplingPointDataLevels.length])
+  }, [
+    areaOfInterestRefs.length,
+    geoAttributeDefs.length,
+    i18n,
+    preloadedLayerRefs.length,
+    samplingPointDataLevels.length,
+  ])
 
   if (layers.length > 0 && layerColors.length === 0) {
     // layer colors not generated yet
@@ -237,7 +242,7 @@ const MapWrapper = () => {
   return (
     <MapLayersPanelProvider>
       <div className="map-view-layout">
-        <MapViewContent layers={layers} baseLayersLabel={baseLayersLabel} overlayGroups={overlayGroups} />
+        <MapViewContent layers={layers} overlayGroups={overlayGroups} />
       </div>
       {editingRecordUuid && (
         <RecordEditModal
@@ -252,4 +257,4 @@ const MapWrapper = () => {
   )
 }
 
-export const MapView = () => <MapWrapper />
+export const MapView = MapWrapper

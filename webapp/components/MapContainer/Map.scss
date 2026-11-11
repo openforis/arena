@@ -1,4 +1,5 @@
 @import 'leaflet/dist/leaflet.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 .panel-right {
   &.map-panel > * {
@@ -8,10 +9,17 @@
 }
 
 .map-wrapper {
+  display: flex;
+  flex-direction: column;
   height: 100%;
 
-  .location-edit-info,
+  .map-workspace {
+    flex: 1;
+    min-height: 0;
+  }
+
   .button-bar {
+    flex-shrink: 0;
     height: 2rem;
     text-align: center;
   }
@@ -40,70 +48,11 @@
     }
 
     .leaflet-control-container {
-      // layers control
       .leaflet-control-layers-toggle {
         background-image: url('/img/map-layers-toggle.png');
       }
       .leaflet-top.leaflet-right {
         z-index: 6;
-      }
-
-      .layer-selector-row {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 4px;
-
-        .layer-selector-name {
-          flex: 1;
-          max-width: 15rem;
-        }
-
-        .layer-selector-button-bar {
-          display: flex;
-          align-items: center;
-          width: auto;
-
-          .layer-selector-earth-map-btn {
-            width: 14px;
-            height: 14px;
-            padding: 0;
-            border: none;
-          }
-
-          .layer-color-picker {
-            width: 14px;
-            height: 14px;
-            padding: 0;
-            border: none;
-            border-radius: 50%;
-            cursor: pointer;
-            background: none;
-            overflow: hidden;
-            &::-webkit-color-swatch-wrapper {
-              padding: 0;
-              border-radius: 50%;
-            }
-            &::-webkit-color-swatch {
-              border: none;
-              border-radius: 50%;
-            }
-            &::-moz-color-swatch {
-              border: none;
-              border-radius: 50%;
-            }
-          }
-        }
-      }
-
-      .leaflet-ruler {
-        background-image: url('/img/ruler-icon-24x24.png');
-        position: absolute;
-        top: 100px;
-        right: 0;
-        height: 34px;
-        width: 34px;
-        z-index: 5;
       }
     }
 
@@ -115,29 +64,25 @@
         padding-inline-start: 20px;
       }
     }
+  }
+
+  // layers control: collapsed on compact maps, moved into the rail on the full map
+  .leaflet-control-layers {
+    &.map-layers-control--empty {
+      display: none;
+    }
+
+    // the base map is picked in the top bar
     .leaflet-control-layers-base,
+    .leaflet-control-layers-separator {
+      display: none;
+    }
+
     .leaflet-control-layers-overlays {
       label {
         padding: 0.3rem;
       }
-    }
 
-    .leaflet-control-layers-group-label {
-      font-size: 0.68rem;
-      font-weight: 700;
-      color: #888;
-      padding: 5px 0 2px;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-
-      &:not(:first-child) {
-        margin-top: 4px;
-        padding-top: 6px;
-        border-top: 1px solid #ddd;
-      }
-    }
-
-    .leaflet-control-layers-overlays {
       label span,
       label span span {
         display: flex;
@@ -164,20 +109,78 @@
       }
     }
 
-    .leaflet-control-attribution svg {
-      display: none !important;
+    .leaflet-control-layers-group-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--color-on-surface-variant);
+      padding: 5px 0 2px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+
+      &:not(:first-child) {
+        margin-top: 4px;
+        padding-top: 6px;
+        border-top: 1px solid var(--color-outline);
+      }
+    }
+
+    .layer-selector-row {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+
+      .layer-selector-name {
+        flex: 1;
+        max-width: 15rem;
+      }
+
+      .layer-selector-button-bar {
+        display: flex;
+        align-items: center;
+        width: auto;
+
+        .layer-selector-earth-map-btn {
+          width: 14px;
+          height: 14px;
+          padding: 0;
+          border: none;
+        }
+
+        .layer-color-picker {
+          width: 14px;
+          height: 14px;
+          padding: 0;
+          border: none;
+          border-radius: 50%;
+          cursor: pointer;
+          background: none;
+          overflow: hidden;
+          &::-webkit-color-swatch-wrapper {
+            padding: 0;
+            border-radius: 50%;
+          }
+          &::-webkit-color-swatch {
+            border: none;
+            border-radius: 50%;
+          }
+          &::-moz-color-swatch {
+            border: none;
+            border-radius: 50%;
+          }
+        }
+      }
     }
   }
 
-  &.editable {
-    .leaflet-container {
-      height: calc(100% - 4rem);
-    }
+  // the attribution is in the status bar
+  .leaflet-control-attribution svg {
+    display: none !important; // NOSONAR: leaflet.css declares it with !important
   }
 
   .leaflet-div-icon {
-    background: none !important;
-    border: none !important;
+    background: none;
+    border: none;
   }
 
   .utm-grid-label {

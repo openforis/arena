@@ -7,7 +7,7 @@ import * as Request from '@server/utils/request'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import { sendTempFileToResponse } from '@server/modules/fileDownload/api/fileDownloadApi'
-import { requireRecordsMatchUserGroupQualifiers } from '@server/modules/record/api/recordQualifierMiddleware'
+import { requireRecordsReadableByUserGroup } from '@server/modules/record/api/recordQualifierMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as DataExportService from '../service/dataExportService'
@@ -22,7 +22,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/data-export',
     AuthMiddleware.requireRecordsExportPermission,
-    requireRecordsMatchUserGroupQualifiers,
+    requireRecordsReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
@@ -37,6 +37,24 @@ export const init = (app) => {
           search,
           options,
         })
+        res.json({ job: JobUtils.jobToJSON(job) })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/data-matrix-export',
+    AuthMiddleware.requireRecordsExportPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, cycle, options } = Request.getParams(req)
+
+        const user = Request.getUser(req)
+
+        const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
+
         res.json({ job: JobUtils.jobToJSON(job) })
       } catch (error) {
         next(error)

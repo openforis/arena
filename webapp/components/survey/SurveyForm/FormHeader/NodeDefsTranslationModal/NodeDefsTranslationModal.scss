@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .node-defs-translation-modal {
   display: flex;
   align-items: center;
@@ -24,7 +26,7 @@
     display: flex;
     align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid var(--c-neutral-300, #e0e0e0);
+    border-bottom: 1px solid $colorOutline;
     margin-bottom: 0.5rem;
   }
 
@@ -40,14 +42,14 @@
 
     th,
     td {
-      border: 1px solid var(--c-neutral-300, #e0e0e0);
+      border: 1px solid $colorOutline;
       padding: 0.3rem 0.5rem;
       vertical-align: top;
       white-space: nowrap;
     }
 
     th {
-      background: var(--c-neutral-100, #f5f5f5);
+      background: $colorBackground;
       font-weight: 600;
       position: sticky;
       top: 0;
@@ -59,14 +61,14 @@
 
     .path-cell {
       white-space: normal;
-      word-break: break-word;
+      overflow-wrap: anywhere;
       font-family: monospace;
       font-size: 0.75rem;
     }
 
     .default-value-cell {
       white-space: normal;
-      word-break: break-word;
+      overflow-wrap: anywhere;
     }
   }
 }
@@ -78,9 +80,9 @@
 
   .default-lang-cell__value {
     flex: 1;
-    word-break: break-word;
+    overflow-wrap: anywhere;
     font-size: 0.8rem;
-    color: var(--c-neutral-700, #444);
+    color: $colorOnSurfaceVariant;
   }
 
   button {
@@ -123,12 +125,12 @@
 
   &__value {
     flex: 1;
-    word-break: break-word;
-    color: var(--c-neutral-700, #444);
+    overflow-wrap: anywhere;
+    color: $colorOnSurfaceVariant;
   }
 
   &__empty {
-    color: var(--c-neutral-400, #bdbdbd);
+    color: with-alpha($colorOnSurfaceVariant, 0.6);
     font-style: normal;
   }
 }
@@ -150,8 +152,8 @@
   }
 
   .option-text {
-    word-break: break-word;
-    color: var(--c-neutral-700, #444);
+    overflow-wrap: anywhere;
+    color: $colorOnSurfaceVariant;
     font-size: 0.8rem;
   }
 }

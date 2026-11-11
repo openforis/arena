@@ -2,7 +2,7 @@
 @use '~@webapp/style/layoutMixins' as *;
 
 .app__container {
-  background-color: $greyAppBg;
+  background-color: $colorBackground;
   display: flex;
   height: calc(100vh - #{$headerHeight});
 

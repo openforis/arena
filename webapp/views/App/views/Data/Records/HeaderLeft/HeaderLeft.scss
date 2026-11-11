@@ -15,8 +15,8 @@ $tableHeaderHeight: 30px;
 
   .records__header-left__input-search {
     padding: 5px 5px;
-    border: 1px solid $greyBorder;
-    background: white;
+    border: 1px solid $colorOutline;
+    background: $colorSurface;
     width: 15rem;
   }
 }

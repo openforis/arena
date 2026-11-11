@@ -1,4 +1,3 @@
-
 import { SimpleTextInput } from './SimpleTextInput'
 
 const EmailInput = (props) => {

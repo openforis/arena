@@ -3,6 +3,7 @@ import * as Response from '@server/utils/response'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
+import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as ObjectUtils from '@core/objectUtils'
 import { FileFormats } from '@core/fileFormats'
 
@@ -11,6 +12,14 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as CategoryService from '../service/categoryService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
+
+// props edited by the category editor: the other ones have dedicated routes (e.g. extradef, with validation)
+const categoryUpdatablePropKeys = [
+  Category.keysProps.name,
+  Category.keysProps.designerNotes,
+  Category.keysProps.reportingData,
+]
+const levelUpdatablePropKeys = [CategoryLevel.keysProps.name]
 
 export const init = (app) => {
   // ==== CREATE
@@ -34,9 +43,8 @@ export const init = (app) => {
       try {
         const { surveyId } = Request.getParams(req)
         const user = Request.getUser(req)
-        const { sourceSurveyId, sourceCategoryUuid } = Request.getBody(req)
-
-        if (!sourceCategoryUuid) throw new Error('sourceCategoryUuid is required')
+        const { sourceSurveyId } = Request.getBody(req)
+        const sourceCategoryUuid = Request.getRequiredParam(req, 'sourceCategoryUuid')
 
         const category = await CategoryService.cloneCategoryFromSurvey({
           user,
@@ -163,6 +171,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, draft = false, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
         const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
         const surveyInfo = Survey.getSurveyInfo(survey)
         const name = `${Survey.getName(surveyInfo)}_categories.zip`
@@ -266,6 +277,49 @@ export const init = (app) => {
         const { surveyId, categoryUuid, draft = true, fileFormat = FileFormats.xlsx } = Request.getParams(req)
 
         await CategoryService.exportCategory({ surveyId, categoryUuid, draft, res, fileFormat })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const job = CategoryService.exportCategoryToGeoPackage({ user, surveyId, categoryUuid, draft })
+        res.json({ job })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/categories/:categoryUuid/export/geopackage/download',
+    AuthMiddleware.requireSurveyViewPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, draft = true, tempFileName } = Request.getParams(req)
+
+        FileUtils.checkIsValidTempFileName(tempFileName)
+
+        const survey = await SurveyService.fetchSurveyById({ surveyId, draft })
+        const surveyInfo = Survey.getSurveyInfo(survey)
+        const category = await CategoryService.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
+        const name = `${Survey.getName(surveyInfo)}_${Category.getName(category)}.gpkg`
+        const exportedFilePath = FileUtils.tempFilePath(tempFileName)
+
+        Response.sendFile({
+          res,
+          path: exportedFilePath,
+          name,
+          contentType: Response.contentTypes.gpkg,
+        })
       } catch (error) {
         next(error)
       }
@@ -405,7 +459,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, key, value } = Request.getParams(req)
+        const { surveyId, categoryUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, categoryUpdatablePropKeys)
         const user = Request.getUser(req)
 
         const category = await CategoryService.updateCategoryProp({ user, surveyId, categoryUuid, key, value })
@@ -447,7 +502,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, categoryUuid, levelUuid, key, value } = Request.getParams(req)
+        const { surveyId, categoryUuid, levelUuid, value } = Request.getParams(req)
+        const key = Request.getUpdatablePropKey(req, levelUpdatablePropKeys)
         const user = Request.getUser(req)
 
         const { category } = await CategoryService.updateLevelProp(user, surveyId, categoryUuid, levelUuid, key, value)
@@ -531,6 +587,53 @@ export const init = (app) => {
           user,
           surveyId,
           categoryUuid,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToSamplingPointData',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToSamplingPointData({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
+        })
+
+        res.json({ category })
+      } catch (error) {
+        // Response.sendErr (not next(error)): the error middleware registered by ArenaServer.init runs
+        // before these routes in the Express stack, so next(error) never reaches it and the specific
+        // error key/params would be lost (the client would get a generic HTML error page instead).
+        Response.sendErr(res, error)
+      }
+    }
+  )
+
+  app.put(
+    '/survey/:surveyId/categories/:categoryUuid/convertToGeoPackage',
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, categoryUuid, locked = true } = Request.getParams(req)
+        const user = Request.getUser(req)
+
+        const category = await CategoryService.convertCategoryToGeoPackage({
+          user,
+          surveyId,
+          categoryUuid,
+          locked,
         })
 
         res.json({ category })

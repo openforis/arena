@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -57,7 +57,7 @@ export const validateRecordsUniqueness = async (
     { survey, cycle, nodeDefs: nodeDefsUnique, nodes: nodesUnique, recordUuidsExcluded },
     tx
   )
-  if (R.isEmpty(recordsCountRows)) return {}
+  if (A.isEmpty(recordsCountRows)) return {}
 
   const result = {}
   for (const { recordUuid, count, nodesKeyUuids } of recordsCountRows) {

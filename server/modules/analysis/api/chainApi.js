@@ -1,10 +1,8 @@
+import * as SurveyFile from '@core/survey/surveyFile'
+
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
-import UnauthorizedError from '@server/utils/unauthorizedError'
-
-import * as Authorizer from '@core/auth/authorizer'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as AnalysisService from '../service'
 
@@ -32,20 +30,60 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceChainUuid } = Request.getBody(req)
+        const { skipMissingEntityAttributes = false } = Request.getBody(req)
         const user = Request.getUser(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!sourceChainUuid) throw new Error('sourceChainUuid is required')
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
 
-        const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
-        if (!Authorizer.canViewSurvey(user, sourceSurveyInfo)) {
-          throw new UnauthorizedError(user?.name)
-        }
-
-        const chain = await AnalysisService.cloneChainFromSurvey({ user, surveyId, sourceSurveyId, sourceChainUuid })
+        const chain = await AnalysisService.cloneChainFromSurvey({
+          user,
+          surveyId,
+          sourceSurveyId,
+          sourceChainUuid,
+          skipMissingEntityAttributes,
+        })
 
         res.json(chain)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/chains',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+
+        const list = await AnalysisService.fetchChainsForCloneFromSurvey({ user, sourceSurveyId })
+
+        res.json({ list })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/clone-from-survey/entities',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const sourceSurveyId = Request.getRequiredIntegerParam(req, 'sourceSurveyId')
+        const sourceChainUuid = Request.getRequiredParam(req, 'sourceChainUuid')
+
+        const entityNames = await AnalysisService.fetchChainSourceEntityNames({
+          user,
+          sourceSurveyId,
+          sourceChainUuid,
+        })
+
+        res.json({ entityNames })
       } catch (error) {
         next(error)
       }
@@ -225,4 +263,91 @@ export const init = (app) => {
       next(error)
     }
   })
+
+  // === MAU file
+
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+
+        const file = await AnalysisService.fetchChainMauFileSummary({ surveyId, chainUuid, cycle })
+
+        res.json({ file })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.post(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+        const upload = Request.getFile(req)
+        const filePath = Request.getFilePath(req)
+        if (!upload || !filePath) {
+          res.sendStatus(400)
+          return
+        }
+        const { name: fileName, size: fileSize } = upload
+
+        const file = await AnalysisService.uploadChainMauFile({
+          surveyId,
+          chainUuid,
+          cycle,
+          filePath,
+          fileName,
+          fileSize,
+        })
+
+        res.json({ file })
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.get(
+    '/survey/:surveyId/chain/:chainUuid/mau/content',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+
+        const result = await AnalysisService.fetchChainMauFileContent({ surveyId, chainUuid, cycle })
+        if (!result) {
+          res.sendStatus(404)
+          return
+        }
+        const { summary, contentStream } = result
+        const fileName = SurveyFile.getName(summary)
+        const fileSize = SurveyFile.getSize(summary)
+        Response.setContentTypeFile({ res, fileName, fileSize, contentType: Response.contentTypes.zip })
+        contentStream.pipe(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
+
+  app.delete(
+    '/survey/:surveyId/chain/:chainUuid/mau',
+    AuthMiddleware.requireRecordAnalysisPermission,
+    async (req, res, next) => {
+      try {
+        const { surveyId, chainUuid, cycle } = Request.getParams(req)
+
+        await AnalysisService.deleteChainMauFile({ surveyId, chainUuid, cycle })
+
+        Response.sendOk(res)
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 }

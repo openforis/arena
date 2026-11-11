@@ -2,35 +2,62 @@ import * as express from 'express'
 import morgan from 'morgan'
 
 import { ServiceType } from '@openforis/arena-core'
-import { ArenaServer } from '@openforis/arena-server'
+import { ArenaServer, JobRepository, ProcessEnv, runWithClusterLock } from '@openforis/arena-server'
 
 import * as ProcessUtils from '@core/processUtils'
 
+import * as JobManager from '@server/job/jobManager'
 import * as Log from '@server/log/log'
 import * as authApi from '@server/modules/auth/api/authApi'
+import AllSurveysDataMigrationJob from '@server/modules/survey/service/dataMigration/allSurveysDataMigrationJob'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
+import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
-import { DataMigrator } from './dataMigrator'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
+import * as StaleJobsCleanup from './schedulers/staleJobsCleanup'
 import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
+import { mobilePreviewMiddleware } from './mobilePreviewMiddleware'
 import { SwaggerInitializer } from './swaggerInitializer'
+import { systemErrorMiddleware } from './systemErrorMiddleware'
+
+const createHttpRequestLogger = () => {
+  if (!ProcessUtils.isEnvDevelopment && !ProcessUtils.ENV.logHttpRequests) return null
+  // written through log4js (not to stdout directly), so requests end up in the log file too
+  const httpLogger = Log.getLogger('HttpRequest')
+  const stream = { write: (message) => httpLogger.debug(message.trimEnd()) }
+  return morgan(':method :url :status :response-time ms - :res[content-length]', { stream })
+}
 
 export const run = async () => {
   const logger = Log.getLogger('AppCluster')
 
   logger.info('server initialization start')
 
-  const arenaApp = await ArenaServer.init()
+  // Skip arena-server's own startup-time survey-schema migration loop (still migrates the public schema
+  // synchronously here, as before): AllSurveysDataMigrationJob (below) now migrates each survey's schema
+  // itself, together with that survey's data migration, so the two no longer need to run twice.
+  // registered by arena-server before its own middlewares, so rejected requests (e.g. 401) are logged too
+  const httpRequestLogger = createHttpRequestLogger()
+  const arenaApp = await ArenaServer.init({
+    skipSurveySchemaDbMigrations: true,
+    initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
+  })
   const { express: app, serviceRegistry } = arenaApp
 
-  if (ProcessUtils.isEnvDevelopment) {
-    app.use(morgan('dev'))
+  // Fail any pending/running job rows left behind by a previous incarnation of this exact process
+  // (crash or restart): must run before this process enqueues any job of its own, since a
+  // pending/running row still tagged with this instanceId at this point can only be orphaned - a
+  // fresh boot couldn't have created it yet. Cluster-wide staleness (a dyno that never comes back)
+  // is still covered by StaleJobsCleanup below.
+  const orphanedJobsCount = await JobRepository.failOrphanedByInstanceId(ProcessEnv.instanceId)
+  if (orphanedJobsCount > 0) {
+    logger.warn(`marked ${orphanedJobsCount} orphaned job(s) as failed (instanceId: ${ProcessEnv.instanceId})`)
   }
 
   // ====== app initializations
@@ -44,6 +71,10 @@ export const run = async () => {
   app.use('/guest{/*path}', express.static(dist))
   const imgDir = `${arenaRoot}/web-resources/img`
   app.use('/img', express.static(imgDir))
+  const geoDir = `${arenaRoot}/web-resources/geo`
+  app.use('/geo', express.static(geoDir))
+  // Arena Mobile web preview (yarn mobile-preview:download)
+  app.use('/mobile-preview', mobilePreviewMiddleware, express.static(`${arenaRoot}/mobile-preview`))
   app.use('/noHeader{/*path}', express.static(dist))
 
   // ====== APIs
@@ -52,14 +83,25 @@ export const run = async () => {
 
   SwaggerInitializer.init(app)
 
-  // Data migrations
-  await DataMigrator.migrateData({ logger, serviceRegistry })
+  // registered after the routes: the arena-server error middleware is registered before them and never reached
+  app.use(systemErrorMiddleware)
 
   // ====== System Admin user creation
-  await UserService.insertSystemAdminUserIfNotExisting()
+  await runWithClusterLock({
+    lockName: 'boot-insert-system-admin-user',
+    fn: () => UserService.insertSystemAdminUserIfNotExisting(),
+  })
 
   // run files storage check after DB migrations
   await SurveyFileService.checkFilesStorage()
+
+  // system admin user needed to run the surveys data migration job (enqueued below)
+  const adminUser = await UserManager.fetchUserByEmail(ProcessUtils.ENV.adminEmail)
+  if (!adminUser) {
+    const message = `cannot start surveys data migration job: system admin user not found for ADMIN_EMAIL "${ProcessUtils.ENV.adminEmail}"; check that ADMIN_EMAIL is correctly configured and that a matching system admin user exists`
+    logger.error(message)
+    throw new Error(message)
+  }
 
   // ====== Update app version in DB
   const infoService = serviceRegistry.getService(ServiceType.info)
@@ -69,13 +111,21 @@ export const run = async () => {
   await ArenaServer.start(arenaApp)
 
   // ====== Schedulers
+  // initialized first: their startup run deletes surveys (temporary ones and the untouched ones of users with expired
+  // invitation) that the surveys data migration job would otherwise migrate needlessly (or while they are being deleted)
+  await TemporarySurveysCleanup.init()
+  await ExpiredUserInvitationsCleanup.init()
+
+  // Migrate surveys data in the background, without blocking server startup;
+  // enqueued after checkFilesStorage (above) completes, so the two do not concurrently move the same survey files
+  JobManager.enqueueJob(new AllSurveysDataMigrationJob({ user: adminUser }))
+
   await TempFilesCleanup.init()
   await UserResetPasswordCleanup.init()
-  await TemporarySurveysCleanup.init()
   await RecordPreviewCleanup.init()
   // await SurveysFilesPropsCleanup.init()
-  await ExpiredUserInvitationsCleanup.init()
   await UserTempAuthTokensCleanup.init()
+  await StaleJobsCleanup.init()
 
   logger.info('server initialization complete; server started.')
 }

@@ -192,7 +192,7 @@ export const streamSse = (url, handlers = {}) => {
     }
   }
 
-  run()
+  void run()
   return cancel
 }
 
@@ -234,6 +234,6 @@ export const streamSsePost = (url, body, handlers = {}) => {
     }
   }
 
-  run()
+  void run()
   return cancel
 }

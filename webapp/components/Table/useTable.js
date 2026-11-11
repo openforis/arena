@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
 import { ArrayUtils } from '@core/arrayUtils'
+import { SortOrder } from '@core/sortOrder'
 
 import { useSurveyId } from '@webapp/store/survey'
 import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
-import { TablesActions, useTableMaxRows, useTableVisibleColumns } from '@webapp/store/ui/tables'
+import { TablesActions, useTableMaxRows, useTableSort, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
 export const useTable = ({
   columns,
@@ -41,7 +42,9 @@ export const useTable = ({
   const apiUri = moduleApiUri || `/api/survey/${surveyId}/${module}`
 
   const offset = getOffset()
-  const sort = getSort()
+  const sortInState = useTableSort(module)
+  const sortInLink = getSort()
+  const sort = sortInState ?? sortInLink
   const search = getSearch()
 
   const {
@@ -77,11 +80,9 @@ export const useTable = ({
   // init data on mount and on restParams and search update
   useEffect(initData, [JSON.stringify(restParams), search])
 
-  useEffect(() => {
-    if (totalCount < count) {
-      setTotalCount(count)
-    }
-  }, [count, totalCount])
+  if (totalCount < count) {
+    setTotalCount(count)
+  }
 
   useOnUpdate(() => {
     fetchData()
@@ -89,12 +90,19 @@ export const useTable = ({
 
   const handleSortBy = useCallback(
     (orderByField) => {
-      let order = sort.by !== orderByField && sort.order !== 'asc' ? 'desc' : 'asc'
-      order = sort.by === orderByField && sort.order === 'asc' ? null : order
+      const currentOrder = sort.by === orderByField ? sort.order : null
+      let order = SortOrder.asc
+      if (currentOrder === SortOrder.asc) {
+        order = SortOrder.desc
+      } else if (currentOrder === SortOrder.desc) {
+        order = null
+      }
 
-      updateQuery(navigate)({ sort: { by: orderByField, order }, offset: null })
+      const sortUpdated = { by: orderByField, order }
+      updateQuery(navigate)({ sort: sortUpdated, offset: null })
+      dispatch(TablesActions.updateSort({ module, sort: sortUpdated }))
     },
-    [navigate, sort.by, sort.order]
+    [dispatch, module, navigate, sort.by, sort.order]
   )
 
   const handleSearch = useCallback(
@@ -109,23 +117,31 @@ export const useTable = ({
     updateQuery(navigate)({ offset: null })
   }, [JSON.stringify(restParams), limit])
 
-  // selected items
+  // selected items (kept across pages)
   const [selectedItems, setSelectedItems] = useState([])
 
+  const isItemSelected = useCallback(
+    (item) => {
+      const key = keyExtractor({ item })
+      return selectedItems.some((selectedItem) => keyExtractor({ item: selectedItem }) === key)
+    },
+    [keyExtractor, selectedItems]
+  )
+
+  const allVisibleItemsSelected = list.length > 0 && list.every(isItemSelected)
+
   const selectAllItems = useCallback(() => {
-    setSelectedItems(list)
-  }, [list])
+    setSelectedItems([...selectedItems, ...list.filter((item) => !isItemSelected(item))])
+  }, [isItemSelected, list, selectedItems])
 
   const deselectAllItems = useCallback(() => {
     setSelectedItems([])
   }, [])
 
-  // reset selected items on data (list) update
+  // reset selected items when filter, search or page size change, or data is refreshed (e.g. records update)
   useOnUpdate(() => {
-    if (selectedItems.length > 0) {
-      deselectAllItems()
-    }
-  }, [deselectAllItems, list])
+    deselectAllItems()
+  }, [JSON.stringify(restParams), search, limit])
 
   const onRowClick = useCallback(
     async (item) => {
@@ -171,6 +187,6 @@ export const useTable = ({
     deselectAllItems,
     visibleColumnKeys,
     visibleColumns,
-    visibleItemsCount: list?.length ?? 0,
+    allVisibleItemsSelected,
   }
 }

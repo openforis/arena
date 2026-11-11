@@ -133,7 +133,6 @@ NodeDefTableCellBody.propTypes = {
   renderType: PropTypes.string.isRequired,
   surveyCycleKey: PropTypes.string.isRequired,
   surveyInfo: PropTypes.object.isRequired,
-  // TODO do not pass them to nested components
   removeNode: PropTypes.func.isRequired,
   createNodePlaceholder: PropTypes.func.isRequired,
   updateNode: PropTypes.func.isRequired,

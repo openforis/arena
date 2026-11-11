@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -15,7 +15,7 @@ export const UserSurveysTable = (props) => {
   const i18n = useI18n()
 
   useEffect(() => {
-    ;(async () => {
+    void (async () => {
       const { surveys: surveysLoaded } = await API.fetchUserSurveys({ userUuid: user.uuid })
       setState({ surveys: surveysLoaded, loading: false })
     })()

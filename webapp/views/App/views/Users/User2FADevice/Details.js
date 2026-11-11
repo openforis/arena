@@ -1,6 +1,6 @@
 import './Details.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
 import i18nInstance from '@core/i18n/i18nFactory'
@@ -9,7 +9,7 @@ import * as Validation from '@core/validation/validation'
 
 import { Button, ButtonDelete, ButtonSave, QRCode } from '@webapp/components'
 import { TooltipNew } from '@webapp/components/TooltipNew'
-import { Checkbox } from '@webapp/components/form'
+import { Checkbox, VerificationCodeInput } from '@webapp/components/form'
 import { FormItem, Input } from '@webapp/components/form/Input'
 import { useConfirmAsync, useNotifyError, useNotifyInfo } from '@webapp/components/hooks'
 
@@ -17,6 +17,8 @@ import * as API from '@webapp/service/api'
 import { useUser } from '@webapp/store/user'
 
 import { User2FADeviceValidator } from './user2FADeviceValidator'
+
+const authenticatorCodeLength = 6
 
 export const User2FADeviceDetails = () => {
   const { uuid: deviceUuidParam } = useParams()
@@ -41,6 +43,8 @@ export const User2FADeviceDetails = () => {
   const deviceUuid = deviceUuidParam || User2FADevice.getUuid(device)
   const deviceNameEditable = isNew && !deviceCreated
   const deviceNameFinal = User2FADevice.getDeviceNameFinal({ user })(device)
+  const authenticatorCodesComplete =
+    authenticatorCodeOne.length === authenticatorCodeLength && authenticatorCodeTwo.length === authenticatorCodeLength
 
   useEffect(() => {
     let isMounted = true
@@ -59,15 +63,13 @@ export const User2FADeviceDetails = () => {
     } else {
       // new device
       API.getDevices()
-        .then((list) => {
+        .then(async (list) => {
+          if (!isMounted) return
+          setExistingDevices(list)
+          const newDeviceObj = {}
+          const nextValidation = await User2FADeviceValidator.validateDevice(list)(newDeviceObj)
           if (isMounted) {
-            setExistingDevices(list)
-            const newDeviceObj = {}
-            User2FADeviceValidator.validateDevice(list)(newDeviceObj).then((nextValidation) => {
-              if (isMounted) {
-                setDevice(Validation.assocValidation(nextValidation))
-              }
-            })
+            setDevice(Validation.assocValidation(nextValidation))
           }
         })
         .catch((error) => {
@@ -150,7 +152,7 @@ export const User2FADeviceDetails = () => {
     (value) => {
       setDevice((prevDevice) => {
         const nextDevice = { ...prevDevice, [User2FADevice.keys.deviceName]: value }
-        User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
+        void User2FADeviceValidator.validateDevice(existingDevices)(nextDevice).then((nextValidation) => {
           const nextDeviceWithValidation = Validation.assocValidation(nextValidation)(nextDevice)
           setDevice(nextDeviceWithValidation)
         })
@@ -231,15 +233,17 @@ export const User2FADeviceDetails = () => {
             <h3>{i18nInstance.t('user2FADevice:validationSteps.typeAuthenticatorCodes.title')}</h3>
             <p>{i18nInstance.t('user2FADevice:validationSteps.typeAuthenticatorCodes.description')}</p>
             <FormItem label="user2FADevice:authenticatorCodeOne">
-              <Input
-                className="authenticator-code"
+              <VerificationCodeInput
+                hideLabel
+                label="user2FADevice:authenticatorCodeOne"
                 onChange={onAuthenticatorCodeOneChange}
                 value={authenticatorCodeOne}
               />
             </FormItem>
             <FormItem label="user2FADevice:authenticatorCodeTwo" info="user2FADevice:authenticatorCodeTwoInfo">
-              <Input
-                className="authenticator-code"
+              <VerificationCodeInput
+                hideLabel
+                label="user2FADevice:authenticatorCodeTwo"
                 onChange={onAuthenticatorCodeTwoChange}
                 value={authenticatorCodeTwo}
               />
@@ -255,7 +259,7 @@ export const User2FADeviceDetails = () => {
             {deviceCreated ? (
               <ButtonSave
                 className="save-btn"
-                disabled={Validation.isNotValid(validation)}
+                disabled={Validation.isNotValid(validation) || !authenticatorCodesComplete}
                 label="user2FADevice:validation.label"
                 onClick={onValidateClick}
               />

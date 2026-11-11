@@ -10,7 +10,12 @@ export const ValidatorErrorKeys = {
   nameRequired: 'validationErrors:nameRequired',
 
   aggregateFunction: {
+    expressionFunctionNotAllowed: 'validationErrors:aggregateFunction.expressionFunctionNotAllowed',
+    expressionInvalid: 'validationErrors:aggregateFunction.expressionInvalid',
     expressionRequired: 'validationErrors:aggregateFunction.expressionRequired',
+    expressionUnbalancedParentheses: 'validationErrors:aggregateFunction.expressionUnbalancedParentheses',
+    expressionUnknownColumn: 'validationErrors:aggregateFunction.expressionUnknownColumn',
+    expressionUnterminatedQuote: 'validationErrors:aggregateFunction.expressionUnterminatedQuote',
   },
 
   analysis: {
@@ -55,6 +60,7 @@ export const ValidatorErrorKeys = {
     multipleRecordsMatchingKeys: 'validationErrors:dataImport.multipleRecordsMatchingKeys',
     recordAlreadyExisting: 'validationErrors:dataImport.recordAlreadyExisting',
     recordKeyMissingOrInvalid: 'validationErrors:dataImport.recordKeyMissingOrInvalid',
+    recordNotEditable: 'validationErrors:dataImport.recordNotEditable',
     recordNotFound: 'validationErrors:dataImport.recordNotFound',
   },
 
@@ -104,6 +110,7 @@ export const ValidatorErrorKeys = {
     formulaInvalid: 'validationErrors:nodeDefEdit.formulaInvalid',
     keysEmpty: 'validationErrors:nodeDefEdit.keysEmpty',
     keysExceedingMax: 'validationErrors:nodeDefEdit.keysExceedingMax',
+    mapMarkerColorInvalid: 'validationErrors:nodeDefEdit.mapMarkerColorInvalid',
     maxFileSizeInvalid: 'validationErrors:nodeDefEdit.maxFileSizeInvalid',
     nameInvalid: 'validationErrors:nodeDefEdit.nameInvalid',
     qualifierCannotHaveApplicableExpression: 'validationErrors:nodeDefEdit.qualifierCannotHaveApplicableExpression',
@@ -111,6 +118,8 @@ export const ValidatorErrorKeys = {
     qualifierCannotHaveEditabilityRule: 'validationErrors:nodeDefEdit.qualifierCannotHaveEditabilityRule',
     qualifierCannotHaveValidations: 'validationErrors:nodeDefEdit.qualifierCannotHaveValidations',
     readOnlyCannotHaveEditableIf: 'validationErrors:nodeDefEdit.readOnlyCannotHaveEditableIf',
+    requiredIfInvalid: 'validationErrors:nodeDefEdit.requiredIfInvalid',
+    requiredIfNotAllowed: 'validationErrors:nodeDefEdit.requiredIfNotAllowed',
     taxonomyRequired: 'validationErrors:nodeDefEdit.taxonomyRequired',
     validationsInvalid: 'validationErrors:nodeDefEdit.validationsInvalid',
   },
@@ -123,11 +132,14 @@ export const ValidatorErrorKeys = {
   },
 
   surveyInfoEdit: {
+    langInvalid: 'validationErrors:surveyInfoEdit.langInvalid',
+    srsInvalid: 'validationErrors:surveyInfoEdit.srsInvalid',
     langRequired: 'validationErrors:surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors:surveyInfoEdit.srsRequired',
     cycleRequired: 'validationErrors:surveyInfoEdit.cycleRequired',
     cyclesRequired: 'validationErrors:surveyInfoEdit.cyclesRequired',
     cyclesExceedingMax: 'validationErrors:surveyInfoEdit.cyclesExceedingMax',
+    cycleKeysInvalid: 'validationErrors:surveyInfoEdit.cycleKeysInvalid',
     cycleDateStartMandatory: 'validationErrors:surveyInfoEdit.cycleDateStartMandatory',
     cycleDateStartInvalid: 'validationErrors:surveyInfoEdit.cycleDateStartInvalid',
     cycleDateStartBeforeDateEnd: 'validationErrors:surveyInfoEdit.cycleDateStartBeforeDateEnd',
@@ -135,6 +147,13 @@ export const ValidatorErrorKeys = {
     cycleDateEndMandatoryExceptForLastCycle: 'validationErrors:surveyInfoEdit.cycleDateEndMandatoryExceptForLastCycle',
     cycleDateStartAfterPrevDateEnd: 'validationErrors:surveyInfoEdit.cycleDateStartAfterPrevDateEnd',
     fieldManualLinksInvalid: 'validationErrors:surveyInfoEdit.fieldManualLinksInvalid',
+    areaOfInterestInvalid: 'validationErrors:surveyInfoEdit.areaOfInterestInvalid',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'validationErrors:surveyAreaOfInterest.fileRequired',
+    nameDuplicate: 'validationErrors:surveyAreaOfInterest.nameDuplicate',
+    nameRequired: 'validationErrors:surveyAreaOfInterest.nameRequired',
   },
 
   surveyPreloadedMapLayer: {

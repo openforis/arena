@@ -1,7 +1,6 @@
 import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { useParams } from 'react-router-dom'
-import { useNavigate } from 'react-router'
+import { useParams, useNavigate } from 'react-router'
 
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 import * as Survey from '@core/survey/survey'
@@ -60,6 +59,13 @@ export const useLocalState = (props) => {
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodeValidationsUpdate,
     eventHandler: useCallback((content) => dispatch(RecordActions.nodeValidationsUpdate(content)), []),
+  })
+  useOnWebSocketEvent({
+    eventName: WebSocketEvents.nodesUpdateClearNonApplicableValuesConfirm,
+    eventHandler: useCallback(
+      (content) => dispatch(RecordActions.confirmClearNonApplicableValues(content)),
+      [dispatch]
+    ),
   })
   useOnWebSocketEvent({
     eventName: WebSocketEvents.nodesUpdateCompleted,

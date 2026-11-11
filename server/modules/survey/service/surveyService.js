@@ -3,7 +3,12 @@ import { NodeDefExpressionEvaluator, SurveyDocImages, SurveyDocPlace } from '@op
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import * as A from '@core/arena'
+import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
+import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
+import * as SurveyFile from '@core/survey/surveyFile'
+import * as Validation from '@core/validation/validation'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
@@ -19,7 +24,9 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import * as SurveyManager from '../manager/surveyManager'
 import * as SurveyFileManager from '../manager/surveyFileManager'
 import SurveyCloneJob from './clone/surveyCloneJob'
+import SurveyCreatorJob from './surveyCreateJob'
 import SurveyPublishJob from './publish/surveyPublishJob'
+import { checkPublishRecordValuesUpdateWarning } from './publish/recordValuesUpdateWarning'
 import { SchemaSummaryExportJob } from './schemaSummary'
 import SurveyActivityLogClearJob from './surveyActivityLogClearJob'
 import SurveyExportJob from './surveyExport/surveyExportJob'
@@ -47,14 +54,28 @@ export const fetchAndAssocStorageInfo = async ({ survey }) => {
 }
 
 // JOBS
-export const startPublishJob = ({ user, surveyId, cleanupRecords }) => {
+
+export const startPublishJob = async ({
+  user,
+  surveyId,
+  cleanupRecords,
+  updateRecordValues,
+  skipDataUpdate = false,
+}) => {
+  if (!updateRecordValues && !skipDataUpdate) {
+    const recordValuesUpdateWarning = await checkPublishRecordValuesUpdateWarning({ surveyId })
+    if (recordValuesUpdateWarning) {
+      return { recordValuesUpdateWarning }
+    }
+  }
+
   RecordsUpdateThreadService.clearSurveyDataFromThread({ surveyId })
 
-  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords })
+  const job = new SurveyPublishJob({ user, surveyId, cleanupRecords, updateRecordValues, skipDataUpdate })
 
   JobManager.enqueueJob(job)
 
-  return job
+  return { job }
 }
 
 export const startUnpublishJob = (user, surveyId) => {
@@ -77,22 +98,47 @@ export const startDeleteActivityLogJob = (user, surveyId) => {
   return job
 }
 
-export const exportSurvey = ({
+/**
+ * Creates (without starting it) the survey export job.
+ * Records, users and activity log are included only if requested and if the user can export the survey data.
+ * @param {object} params - The export parameters.
+ * @param {number} params.surveyId - The id of the survey to export.
+ * @param {object} params.user - The user performing the export.
+ * @param {string} [params.outputFileName] - The name of the export file (generated automatically if not specified).
+ * @param {boolean} [params.includeData] - If true, records, users and activity log are requested.
+ * @param {boolean} [params.includeResultAttributes] - If true, result attributes values are requested.
+ * @param {boolean} [params.includeActivityLog] - If true, users and activity log are requested.
+ * @returns {Promise<SurveyExportJob>} - The export job.
+ */
+export const createSurveyExportJob = async ({
   surveyId,
   user,
+  outputFileName = undefined,
   includeData = false,
   includeResultAttributes = true,
   includeActivityLog = true,
 }) => {
-  const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
-  const job = new SurveyExportJob({
+  const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+  const canExportData = canExportSurveyData(user, surveyInfo)
+  return new SurveyExportJob({
     surveyId,
     user,
     outputFileName,
-    backup: includeData,
-    includeResultAttributes,
-    includeActivityLog,
+    backup: includeData && canExportData,
+    includeResultAttributes: includeResultAttributes && canExportData,
+    includeActivityLog: includeActivityLog && canExportData,
   })
+}
+
+/**
+ * Starts the survey export job (see createSurveyExportJob).
+ * @param {object} params - The export parameters (see createSurveyExportJob).
+ * @returns {Promise<{job: object}>} - The started job, serialized.
+ */
+export const exportSurvey = async (params) => {
+  const { surveyId } = params
+  const outputFileName = `survey_export_${surveyId}_${Date.now()}.zip`
+  const job = await createSurveyExportJob({ ...params, outputFileName })
 
   JobManager.enqueueJob(job)
 
@@ -109,6 +155,12 @@ export const startSurveysListExport = ({ user, draft, template }) => {
 
 export const cloneSurvey = ({ user, surveyId, surveyInfoTarget, cycle = null }) => {
   const job = new SurveyCloneJob({ user, surveyId, surveyInfoTarget, cycle })
+  JobManager.enqueueJob(job)
+  return JobUtils.jobToJSON(job)
+}
+
+export const startCreateSurveyJob = ({ user, surveyInfo }) => {
+  const job = new SurveyCreatorJob({ user, surveyInfo })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }
@@ -241,15 +293,29 @@ export const startLabelsImportJob = ({ user, surveyId, filePath, fileFormat }) =
   return JobManager.enqueueJob(job)
 }
 
+const checkAreaOfInterestFileContent = (content) => {
+  if (!parseAreaOfInterestJson(content.toString('utf8'))) {
+    throw new SystemError(Validation.messageKeys.surveyInfoEdit.areaOfInterestInvalid, {}, StatusCodes.BAD_REQUEST)
+  }
+}
+
 export const insertSurveyFile = async ({ surveyId, filePath, surveyFile }) => {
   const content = await FileUtils.readBinaryFile(filePath)
+  if (SurveyFile.getType(surveyFile) === SurveyFile.SurveyFileType.areaOfInterest) {
+    checkAreaOfInterestFileContent(content)
+  }
   const surveyFileToStore = { ...surveyFile, content }
   await SurveyFileManager.insertFile(surveyId, surveyFileToStore)
 }
 
 export const fetchSurveyFile = async ({ surveyId, fileUuid }) => {
   const summary = await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid)
-  const contentStream = await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileUuid })
+  const contentStream = summary
+    ? await SurveyFileManager.fetchFileContentAsStream({ surveyId, fileSummary: summary })
+    : null
+  if (!contentStream) {
+    throw new SystemError('appErrors:survey.fileNotFound', { fileUuid }, StatusCodes.NOT_FOUND)
+  }
   return { summary, contentStream }
 }
 

@@ -87,8 +87,8 @@ export default class SurveyLabelsImportJob extends Job {
         SurveyLabelsExportModel.getDescriptionColumn(langCode)
       )
     })
-    const validHeaders = [...fixedHeaders, ...dynamicHeaders]
-    const invalidHeaders = headers.filter((header) => !validHeaders.includes(header)).join(', ')
+    const validHeaders = new Set([...fixedHeaders, ...dynamicHeaders])
+    const invalidHeaders = headers.filter((header) => !validHeaders.has(header)).join(', ')
     if (invalidHeaders) {
       await this.addErrorAndStopFlatDataReader('invalidHeaders', { invalidHeaders })
     }

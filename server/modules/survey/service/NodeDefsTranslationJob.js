@@ -117,7 +117,7 @@ export default class NodeDefsTranslationJob extends Job {
     for (const batch of batches) {
       if (this.isCanceled()) break
 
-      const result = await TranslationService.translate({
+      const result = /* NOSONAR */ await TranslationService.translate({
         user,
         sourceLang: defaultLang,
         targetLangs: otherLangs,

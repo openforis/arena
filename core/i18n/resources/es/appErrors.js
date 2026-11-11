@@ -1,4 +1,34 @@
 export default {
+  mapCustomLayers: {
+    urlInvalid: 'La URL del servicio no es válida',
+    urlNotAllowed: 'Solo se pueden usar direcciones http y https públicas',
+    hostNotFound: 'Host no encontrado: {{host}}',
+    redirectNotFollowed: 'El servicio redirige a {{location}}: use esa URL',
+    responseTooLarge: 'La respuesta del servicio supera los {{limitMb}} MB',
+    timeout: 'El servicio no respondió en {{seconds}} segundos',
+    fetchFailed: 'El servicio respondió con el estado HTTP {{status}}',
+    unreachable: 'No se puede acceder al servicio',
+    notCapabilities: 'No se encontraron capabilities WMS o WMTS en esta URL',
+    noLayers: 'El servicio no tiene ninguna capa que se pueda mostrar',
+    invalidLayers: 'Las capas de mapa no son válidas',
+    tooManyLayers: 'Se pueden añadir como máximo {{max}} capas de mapa personalizadas',
+    busy: 'El servidor está ocupado cargando otros servicios: inténtelo de nuevo en un momento',
+  },
+  aiDataQueryDescriptionMissing: 'Describa en lenguaje natural los datos que desea ver.',
+  aiDataQueryEmpty: 'Primero seleccione una entidad y algunos atributos (o dimensiones y medidas).',
+  aiDataQueryInvalid: 'La IA no pudo generar una consulta válida para esta solicitud: {{errors}}',
+  aiDataQueryNoEntities: 'Esta encuesta no tiene entidades que se puedan consultar.',
+  aiDataQuerySummaryInvalid:
+    'La IA no pudo sugerir un nombre y una descripción para esta consulta. Inténtelo de nuevo.',
+  userCannotDeleteHasMessages:
+    'Este usuario no se puede eliminar: es autor de {{count}} mensaje(s); elimínelos o reasígnelos primero',
+  userCannotDeleteLastSystemAdmin: 'Este usuario no se puede eliminar: es el último administrador del sistema',
+  userCannotDeleteOwnsSurveys:
+    'Este usuario no se puede eliminar: es propietario de {{count}} encuesta(s); transfiera la propiedad primero',
+  userCannotDeleteSelf: 'No puede eliminar su propia cuenta de usuario',
+  userEmailInvalid:
+    'El correo electrónico de invitación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
+  aggregateFunctionInvalid: `La función de agregación personalizada "{{name}}" no es válida: edítela para corregirla`,
   cannotGetChild: "No se puede obtener el hijo '{{childName}}' del atributo {{name}}",
   cannotImportFilesExceedingQuota:
     'No se pueden importar archivos de registro: se excedería la cuota de almacenamiento de archivos',
@@ -23,6 +53,10 @@ export default {
     noRecordsFound: 'No se encontraron registros en el archivo de importación o formato de archivo incorrecto',
     pendingImportFileNotFoundOrExpired:
       'No se puede encontrar el archivo subido anteriormente; puede haber expirado. Por favor, súbalo de nuevo.',
+    recordMergeWithSameKeysNotAllowed:
+      'No se puede importar el registro "{{recordKeyValues}}": ya existe otro registro con las mismas claves y la fusión de registros con las mismas claves no está permitida en esta encuesta',
+    recordOfAnotherUserGroup:
+      'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro grupo de usuarios',
     recordOwnedByAnotherUser:
       'No se puede actualizar el registro "{{recordKeyValues}}" porque pertenece a otro usuario',
   },
@@ -35,34 +69,91 @@ export default {
   functionHasTooManyArguments: 'La función {{fnName}} solo acepta un máximo de {{maxArity}} (obtenido {{numArgs}})',
   generic: 'Error inesperado: {{text}}',
   geoWhispApiError: 'El servicio Whisp no está disponible temporalmente.',
+  geoWhispSamplingPointDataCategoryMissing: 'No se encontró la categoría de datos de puntos de muestreo.',
+  geoWhispSamplingPointDataLocationsMissing:
+    'No se encontró ningún elemento de datos de puntos de muestreo con una ubicación válida.',
   importingDataIntoWrongCollectSurvey:
     'Importando datos en la encuesta Collect incorrecta. URI esperado: {{collectSurveyUri}}',
   invalidType: 'Tipo no válido {{type}}',
   jobCanceledOrErrorsFound: 'Trabajo cancelado o errores encontrados; transacción de reversión',
+  jobOrphanedOnRestart: 'El trabajo se interrumpió por un reinicio del servidor. Vuelva a intentarlo.',
+  mobileAppVersionNotSupported:
+    'Esta versión de Arena Mobile no es compatible con el servidor: actualícela a la versión {{minVersion}} o posterior',
   paramIsRequired: 'El parámetro {{param}} es obligatorio',
+  paramMustBeInteger: 'El parámetro {{param}} debe ser un número entero',
+  propUpdateNotAllowed: 'La propiedad "{{key}}" no se puede actualizar',
   unableToFindParent: 'No se puede encontrar el padre de {{name}}',
   unableToFindNode: 'No se puede encontrar el nodo con el nombre {{name}}',
   unableToFindSibling: 'No se puede encontrar el hermano con el nombre {{name}}',
   undefinedFunction: "Función indefinida '{{fnName}}' o tipos de parámetros incorrectos",
   invalidSyntax: 'La sintaxis de la expresión no es válida',
   networkError: 'Error de comunicación con el servidor',
+  nodeDefConversionNotAllowed: `'{{name}}' no se puede convertir en {{toType}}`,
+  nodeDefTypeInvalid: 'Tipo de definición de nodo no válido: {{type}}',
   record: {
     errorUpdating: 'Error al actualizar el registro',
     entityNotFound: 'Entidad "{{entityName}}" con claves "{{keyValues}}" no encontrada',
     updateSelfAndDependentsDefaultValues:
       'Error al actualizar el registro; error al evaluar la expresión en el nodo {{nodeDefName}}: {{details}}',
   },
+  recordPrintableExport: {
+    missingEntityParams: 'La exportación de la página actual requiere entityDefUuid y entityNodeUuid',
+    entityNotFound: 'Entidad no encontrada para la exportación especificada',
+    missingServerUrl: 'Se requiere la URL pública del servidor al exportar con un código QR',
+    qrTokenMismatch: 'No se pudo finalizar la exportación con código QR; inténtelo de nuevo',
+  },
   sessionExpiredRefreshPage: 'La sesión podría haber caducado.\nIntente actualizar la página.',
   survey: {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
+    dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
+    fileNotFound: 'Archivo no encontrado',
+    languageCodeInvalid: 'El código de idioma no es válido: {{lang}}',
+    cycleKeysInvalid: 'Los ciclos deben estar numerados de forma consecutiva, empezando por 1',
+    srsCodeInvalid: 'El código del sistema de referencia espacial no es válido: {{code}}',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
+  aiNotConfigured:
+    'La IA no está configurada. Configure un proveedor personal en la Configuración de IA o pida a su administrador que configure uno predeterminado.',
+  aiFeaturesDisabled: 'Las funciones de IA están deshabilitadas en este despliegue.',
+  aiFeatureDisabled: 'La función de IA "{{feature}}" está deshabilitada.',
+  aiPromptTooLarge: 'El prompt de IA es demasiado grande ({{size}} caracteres; límite {{limit}}).',
+  aiInputTooLong: 'El campo de entrada de IA "{{field}}" supera el límite de {{limit}} caracteres.',
+  aiSchemaMissing: 'Falta el esquema de salida estructurada de IA para la función "{{feature}}".',
+  aiProviderInvalid: 'Proveedor de IA no compatible: {{provider}}.',
+  aiModelMissing: 'El identificador del modelo de IA es obligatorio.',
+  aiApiKeyMissing: 'La clave de API es obligatoria para el proveedor {{provider}}.',
+  aiBaseUrlMissing: 'Se requiere una URL base para el proveedor compatible con OpenAI.',
+  aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
+  aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
+  aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
+  aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',
+  aiExpressionNodeDefNotFound: 'No se pudo encontrar el campo de destino (uuid {{nodeDefUuid}}).',
+  aiExpressionExpressionMissing: 'No se puede explicar una expresión vacía.',
+  aiTranslationSocketMissing: 'WebSocket no conectado. Espere un momento e inténtelo de nuevo.',
+  aiTranslationSourceLangMissing: 'El idioma de origen es obligatorio para la traducción.',
+  aiTranslationTargetLangsMissing: 'Se requiere al menos un idioma de destino para la traducción.',
+  aiTranslationItemsMissing: 'Nada que traducir.',
+  aiTranslationTooManyItems: 'Demasiados elementos en un solo lote ({{count}}); el límite es {{limit}}.',
+  aiActivityLogSurveyMissing: 'Se requiere una encuesta para resumir el registro de actividad.',
+  aiChatbotDisabled: 'El chatbot de documentación está deshabilitado en este despliegue.',
+  aiChatbotUpstreamError:
+    'El chatbot de documentación no está disponible temporalmente. Inténtelo de nuevo en un momento.',
+  aiChatbotPayloadTooLarge: 'Su conversación es demasiado grande. Borre el chat e intente con una pregunta más corta.',
   userHasPendingInvitation:
     "Ya hay una invitación pendiente para el usuario con el correo electrónico '{{email}}'; no se le puede invitar a esta encuesta hasta que sea aceptada",
   userHasRole: 'El usuario dado ya tiene un rol en esta encuesta',
   userHasRole_other: 'Los usuarios dados ya tienen un rol en esta encuesta',
   userInvalid: 'Usuario inválido',
+  userInvitationLinkNotAvailable:
+    'Solo un administrador del sistema puede copiar el enlace de invitación de este usuario, porque el usuario tiene roles o invitaciones fuera de esta encuesta',
+  surveyCompareFileTooLarge:
+    'El archivo de la encuesta es demasiado grande (máx. {{maxSize}} MB): exporte la encuesta sin datos, los registros y sus archivos no son necesarios para comparar encuestas',
   userIsAdmin: 'El usuario dado ya es un administrador del sistema',
   userNotAllowedToChangePref: 'Usuario no permitido para cambiar la preferencia',
   userNotAuthorized: 'El usuario {{userName}} no está autorizado',
+  userNotFound: 'Usuario no encontrado: {{userUuid}}',
+  userNotInvitedToSurvey: 'El usuario no tiene ninguna invitación pendiente a esta encuesta',
+  usersBackupImport: {
+    invalidFile: 'El archivo no es una copia de seguridad de usuarios de Arena válida',
+  },
 }

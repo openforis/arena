@@ -1,6 +1,7 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import { State } from './state'
+import { useOnValueChange } from '@webapp/components/hooks'
 
 export const useLocalState = (props) => {
   const { canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
@@ -9,9 +10,7 @@ export const useLocalState = (props) => {
     State.create({ canSelect, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid })
   )
 
-  useEffect(() => {
-    setState((prevState) => State.assocSelectedItemUuid(selectedItemUuid)(prevState))
-  }, [selectedItemUuid])
+  useOnValueChange(selectedItemUuid, (uuid) => setState(State.assocSelectedItemUuid(uuid)))
 
   return { state, setState }
 }

@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Active',
@@ -23,7 +29,7 @@ Do you want to ignore them?`,
     cantUndoWarning: 'This operation cannot be undone',
     cantBeDeletedUsedItem: 'This {{item}} is used by some node definitions and cannot be deleted',
     chain: 'Chain',
-    chain_plural: 'Chains',
+    chain_other: 'Chains',
     childrenEmpty: 'Define at least one child item',
     clear: 'Clear',
     clone: 'Clone',
@@ -38,14 +44,14 @@ Do you want to ignore them?`,
     createdWith: 'Created with',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Cycle',
-    cycle_plural: 'Cycles',
+    cycle_other: 'Cycles',
     dateCreated: 'Date created',
     dateLastModified: 'Date last modified',
     delete: 'Delete',
     deleted: 'Deleted!',
     descending: 'Descending',
     description: 'Description',
-    description_plural: 'Descriptions',
+    description_other: 'Descriptions',
     designerNotes: 'Designer notes',
     designerNotesInfo: `Designer notes will be visible only in the survey form designer and won't be visible in the data entry form.`,
     details: 'Details',
@@ -55,6 +61,7 @@ Do you want to ignore them?`,
     download: 'Download',
     draft: 'Draft',
     edit: 'Edit',
+    elapsed: 'Elapsed',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `An email to {{email}} has been sent.
@@ -66,11 +73,11 @@ Please check also the Spam/Junk mail folder.`,
     empty: 'Empty',
     entity: 'Entity',
     error: 'Error',
-    error_plural: 'Errors',
+    error_other: 'Errors',
     errorFound: '1 error found',
     errorFound_other: '{{count}} errors found',
     errorMessage: 'Error message',
-    errorMessage_plural: 'Error messages',
+    errorMessage_other: 'Error messages',
     expand: 'Expand',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Export',
@@ -81,7 +88,7 @@ Please check also the Spam/Junk mail folder.`,
     expression: 'Expression',
     false: 'False',
     file: 'File',
-    file_plural: 'Files',
+    file_other: 'Files',
     formContainsErrors: 'Form contains errors',
     formContainsErrorsCannotContinue: 'The form contains errors. Please, fix them before continuing.',
     formContainsErrorsCannotSave: 'The form contains errors. Please, fix them before saving.',
@@ -98,12 +105,12 @@ Please check also the Spam/Junk mail folder.`,
     info: 'Info',
     invalid: 'INVALID',
     item: 'Item',
-    item_plural: 'Items',
+    item_other: 'Items',
     itemAlreadyAdded: 'Item already added',
     label: 'Label',
-    label_plural: 'Labels',
+    label_other: 'Labels',
     language: 'Language',
-    language_plural: 'Languages',
+    language_other: 'Languages',
     leavePageConfirmMessage: `There are unsaved changes in the form. 
 
 By confirming, all changes will be lost.
@@ -115,11 +122,11 @@ Do you want to proceed?`,
     max: 'Maximum',
     med: 'Median',
     manage: 'Manage',
-    message_plural: 'Messages',
+    message_other: 'Messages',
     measure: 'Measure',
     measure_other: 'Measures',
     measurePrevSteps: 'Measure Previous Steps',
-    measurePrevSteps_plural: 'Measures Previous Steps',
+    measurePrevSteps_other: 'Measures Previous Steps',
     min: 'Minimum',
     moveUp: 'Move up',
     moveDown: 'Move down',
@@ -127,7 +134,7 @@ Do you want to proceed?`,
     new: 'New',
     next: 'Next',
     no: 'No',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
     notification: 'Notification',
     notification_other: 'Notifications',
     notSpecified: '---Not specified---',
@@ -159,9 +166,31 @@ Do you want to proceed?`,
 - Taxa cannot be deleted.
 
 **Are you sure you want to continue?**`,
+    publishRecordValuesUpdateConfirm: `#### Publishing {{survey}} will update data already recorded ####
+
+{{reasons}}
+
+This operation can permanently change or clear data already entered.
+
+To publish without updating the existing data instead, check "Skip data update" below (not recommended).`,
+    publishRecordValuesUpdateConfirmHeader: 'Existing record data will be updated',
+    publishRecordValuesUpdateConfirmOk: 'Publish and update data',
+    publishRecordValuesUpdateConfirmInputLabel: 'Type the survey name "{{strongConfirmRequiredText}}" to confirm',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'The following attributes will be modified, and their values in existing records will be automatically recalculated: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'The following attributes use an extra property of a category or taxonomy that changed, which will recalculate their value in existing records: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Skip data update',
+    publishSkipDataUpdateConfirmOk: 'Skip data update and publish',
+    publishSkipDataUpdateImplications: 'Skipping the data update means:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Existing records may no longer match with the new survey definition',
+    publishSkipDataUpdateImplicationStaleValues: "Affected values won't be recalculated until re-entered manually",
+    publishSkipDataUpdateImplicationChains: 'Processing chains using these attributes may produce outdated results',
     raiseTicketInSupportForum: `In case of problems please raise a ticket with a tag 'arena' in our <b>Support Forum</b>: $t(links.supportForum)`,
     record: 'Record',
     record_other: 'Records',
+    remaining: 'Remaining',
     remote: 'Remote',
     required: 'Required',
     requiredField: 'required field',
@@ -209,7 +238,7 @@ Try again?`,
     value: 'Value',
     view: 'View',
     warning: 'Warning',
-    warning_plural: 'Warnings',
+    warning_other: 'Warnings',
     yes: 'Yes',
     date: {
       aMomentAgo: 'A moment ago',
@@ -225,20 +254,20 @@ Try again?`,
     },
     paginator: {
       firstPage: 'First page',
+      goToPage: 'Go to page',
       itemsPerPage: 'Items per page',
       lastPage: 'Last page',
       nextPage: 'Next page',
+      page: 'Page',
       previousPage: 'Previous page',
     },
     table: {
       visibleColumns: 'Visible columns',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'To confirm type the following text: **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage: '(Only {{acceptedExtensions}} files with a max size of {{maxSize}} will be accepted)',
     error: {
@@ -250,17 +279,14 @@ Try again?`,
     selectedFile: 'Selected file',
     selectedFile_other: 'Selected files',
   },
-
   error: {
     pageNotFound: 'Page not found',
   },
-
   geo: {
     area: 'Area',
     vertices: 'Vertices',
     perimeter: 'Perimeter',
   },
-
   files: {
     header: 'Files',
     missing: ' Missing files: {{count}}',
@@ -268,12 +294,16 @@ Try again?`,
     fileName: 'File name',
     fileSize: 'File size',
   },
-
   sidebar: {
     logout: 'Logout',
   },
-
   header: {
+    theme: {
+      label: 'Theme',
+      light: 'Light',
+      dark: 'Dark',
+      system: 'System default',
+    },
     myProfile: 'My profile',
     qrCodeLoginDialog: {
       title: 'Login to Arena Mobile using QR code',
@@ -286,7 +316,6 @@ Try again?`,
       error: 'Error generating QR code: {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Integer',
     decimal: 'Decimal',
@@ -303,7 +332,6 @@ Try again?`,
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'Home',
     landing: 'Landing',
@@ -320,6 +348,7 @@ Try again?`,
     formDesigner: 'Form Designer',
     surveyHierarchy: 'Hierarchy',
     surveyDependencyTree: 'Dependency tree',
+    surveyCompare: 'Compare / update from file',
     category: 'Category',
     categories: 'Categories',
     nodeDef: 'Node Definition',
@@ -344,111 +373,39 @@ Try again?`,
     userNew: 'New User',
     usersSurvey: 'Users list',
     userGroup: 'User Group',
-    userGroup_plural: 'User Groups',
+    userGroup_other: 'User Groups',
     userGroupNew: 'New User Group',
     usersList: 'Users list (all)',
     user2FADevice: '2FA device',
-    user2FADevice_plural: '2FA devices',
+    user2FADevice_other: '2FA devices',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Analysis',
     chain: 'Chain',
-    chain_plural: 'Chains',
+    chain_other: 'Chains',
     virtualEntity: 'Virtual Entity',
     entities: 'Virtual entities',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Instances',
 
     message: 'Message',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
+
+    systemAdmin: 'System Administration',
+    jobMonitor: 'Job Monitor',
+    systemLogs: 'System Logs',
 
     help: 'Help',
     about: 'About',
+    changelog: 'Changelog',
+    whatsNew: "What's new",
     disclaimer: 'Disclaimer',
     userManual: 'User Manual',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'This section is available only when survey is published',
   },
-
-  loginView: {
-    yourName: 'Your name',
-    yourEmail: 'Your email',
-    yourPassword: 'Your password',
-    yourNewPassword: 'Your new password',
-    repeatYourPassword: 'Repeat your password',
-    repeatYourNewPassword: 'Repeat your new password',
-    requestAccess: 'New to $t(common.appNameFull)? Request access',
-    resetPassword: 'Reset password',
-    login: 'Login',
-    loginUsingBackupCode: 'Login using 2FA backup code',
-    forgotPassword: 'Forgot password',
-    sendPasswordResetEmail: 'Send password reset email',
-    twoFactorBackupCode: '2FA backup code',
-    twoFactorToken: 'Verification code',
-    twoFactorTokenDescription: `To keep your account secure, we verify your identity.
-
-Enter the code generated by your authenticator app.`,
-  },
-
-  accessRequestView: {
-    error: 'Error requesting access: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'First Name',
-        lastName: 'Last Name',
-        institution: 'Institution',
-        country: 'Country',
-        purpose: 'What do you need it for?',
-        surveyName: 'Propose a Survey Name',
-        templateUuid: 'Start from a template?',
-      },
-    },
-    introduction: `Our resources are limited, so you have to request access to the platform.
-We are also interested in what you want to do with it so please let us know!
-You have the possibility to start from a **new blank survey** or clone an existing **template** and you will have to suggest a name for the newly created survey.
-You will be assigned the role of ***Survey Administrator*** for that survey: you will be able to edit it and to invite new users to join your survey and contribute to it.
-You will be also a ***Survey Manager*** and you will be able to **create new surveys** (up to 5) if needed.
-For more information please visit our website: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Once you send the request, please wait for an invitation email to access Arena.**`,
-    reCaptchaNotAnswered: 'ReCaptcha not answered',
-    requestSent: 'Access Request sent correctly',
-    requestSentMessage: `$t(common.emailSentToSelfConfirmation)
-$t(accessRequestView.whitelistSenderSuggestion)
-
-Please give us a couple of days to process your request.
-We will send you another email to **{{email}}** with the instructions on how to access $t(common.appName), once it's accepted.
-Thank you and enjoy **$t(common.appNameFull)**!`,
-    sendRequest: 'Send Request',
-    sendRequestConfirm: 'Request access to $t(common.appNameFull)?',
-    templateNotSelected: 'Not selected (start from scratch)',
-    title: 'Requesting access to $t(common.appNameFull)',
-    whitelistSenderSuggestion: `If you find it in the Spam/Junk folder, please add **{{senderEmail}}** to your contacts (address book) or mark it as safe/not spam, so that future emails from us reach your inbox directly.`,
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Complete your registration to Arena',
-      setYourNewPassword: 'Set your new password',
-    },
-    setNewPassword: 'Set new password',
-    forgotPasswordLinkInvalid: 'The page you have tried to access does not exist or is no longer valid',
-    passwordSuccessfullyReset: 'Your password has been successfully reset',
-    passwordStrengthChecksTitle: 'Password strength checks',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'No white spaces',
-      atLeast8CharactersLong: 'At least 8 characters long',
-      containsLowerCaseLetters: 'Contains lowercase letters',
-      containsUpperCaseLetters: 'Contains uppercase letters',
-      containsNumbers: 'Contains numbers',
-    },
-    completeRegistration: 'Complete registration',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Dependency types',
     dependencyTypes: {
@@ -466,11 +423,9 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     selectAtLeastOneDependencyType: 'Select at least one dependency type',
     noDependenciesToDisplay: 'No dependencies to display',
   },
-
   designerView: {
     formPreview: 'Form preview',
   },
-
   recordView: {
     justDeleted: 'This record has just been deleted',
     sessionExpired: 'Record session has expired',
@@ -486,7 +441,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       unlock: 'Allow editing of qualifier attribute',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Delete this custom aggregate function?',
@@ -494,7 +448,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     },
     editRecord: 'Edit record',
   },
-
   mapView: {
     changeMarkerColor: 'Change marker color',
     createRecord: 'Create new record',
@@ -504,18 +457,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     locationEditInfo: 'Double click on the map or drag the marker to update the location',
     locationNotValidOrOutOfRange: 'Location not valid or out of UTM zone range',
     locationUpdated: 'Location updated',
-    options: {
-      showLocationMarkers: 'Show location markers',
-      showMarkersLabels: `Show markers' labels`,
-      showSamplingPolygon: `Sampling polygon`,
-      showControlPoints: `Control points`,
-      showPlotReferencePoint: `Plot reference point`,
-      showUtmGrid: 'Show UTM grid',
-    },
-    rulerTooltip: `Press the button to start measuring distances.
-- click multiple times to measure paths
-- double click or press ESC button to finish measuring
-- press the button again to hide measurements`,
     samplingPointDataLayerName: 'Sampling point data - level {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (loading...)',
     samplingPointItemPopup: {
@@ -523,6 +464,295 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       levelCode: 'Level {{level}} code',
     },
     selectedPeriod: 'Selected period',
+  },
+
+  mapWorkspace: {
+    scenes: {
+      tab: 'Sentinel-2',
+      title: 'Sentinel-2 scenes',
+      menuSearch: 'Search recent Sentinel-2 scenes…',
+      intro:
+        "Sentinel-2 L2A, 10 m. Searched in the browser from a static STAC GeoParquet index, and drawn straight from each scene's cloud-optimised GeoTIFF. No tile server.",
+      area: {
+        label: 'Area',
+        view: 'Map view',
+        plot: 'Selected plot',
+        draw: 'Draw area',
+        drawAgain: 'Draw again',
+      },
+      period: {
+        label: 'Period',
+        hint: 'up to 6 months back',
+        months_one: '{{count}} month',
+        months_other: '{{count}} months',
+      },
+      maxCloud: 'Max cloud',
+      minCoverage: 'Min coverage',
+      percent: '{{value}} %',
+      chart: {
+        title: 'Clear scenes per month',
+        allMonths: 'All months',
+        bar_one: '{{month}}: {{count}} scene',
+        bar_other: '{{month}}: {{count}} scenes',
+      },
+      count_one: '{{count}} scene',
+      count_other: '{{count}} scenes',
+      countInMonth_one: '{{count}} scene in {{month}}',
+      countInMonth_other: '{{count}} scenes in {{month}}',
+      sort: {
+        label: 'Sort',
+        newest: 'Newest',
+        leastCloud: 'Least cloud',
+        mostCoverage: 'Most coverage',
+      },
+      rowDetails: 'Tile {{tile}} · {{cloud}} cloud · {{coverage}} cover',
+      unknownValue: '–',
+      thumbnailAlt: 'Preview of the scene of {{date}}',
+      addAsLayer: 'Add as layer',
+      alreadyOnMap: 'Already on the map',
+      useAsBaseMap: 'Use as base map',
+      loadingScene: 'Loading the scene…',
+      bands: {
+        label: 'Bands',
+        trueColour: 'True colour (fast, one file)',
+        falseColourVegetation: 'False colour, vegetation (B8, B4, B3)',
+        swir: 'Short-wave infrared (B12, B8A, B4)',
+        note: 'Other band mixes read three files per scene, so they load more slowly.',
+      },
+      bandsShort: {
+        trueColour: 'true colour',
+        falseColourVegetation: 'false colour',
+        swir: 'SWIR',
+      },
+      layerName: 'Sentinel-2 {{date}} · {{tile}} · {{bands}}',
+      baseLayerName: '{{name}} (base map)',
+      messages: {
+        drawing: 'Click two opposite corners on the map to draw the area.',
+        noPlot: 'Open a plot marker on the map to search around it.',
+        noDrawnArea: 'Draw a rectangle on the map to search inside it.',
+        tooLarge: 'The area is too large: zoom in until it covers at most {{max}} Sentinel-2 tiles.',
+        outside: 'Sentinel-2 tiles only cover latitudes from 80° S to 84° N.',
+        error: 'The scene index could not be read.',
+        retry: 'Retry',
+        searching_one: 'Searching {{count}} tile…',
+        searching_other: 'Searching {{count}} tiles…',
+        empty: 'No scenes match. Allow more cloud or a longer period.',
+        layerError: 'The scene could not be displayed.',
+      },
+    },
+    wms: {
+      menuItem: 'Add a WMS / WMTS service…',
+      title: 'Add a WMS / WMTS service',
+      serviceUrl: 'Service URL',
+      serviceUrlPlaceholder: 'https://example.org/geoserver/wms',
+      loadLayers: 'Load layers',
+      loading: 'Loading…',
+      urlHint: 'WMS or WMTS GetCapabilities URL, or an XYZ tile template with {z}/{x}/{y}',
+      insecureUrlHint: 'This service uses http: the browser may block its tiles on this https page',
+      layersCount: '{{count}} layers',
+      layersCount_one: '{{count}} layer',
+      layersCount_other: '{{count}} layers',
+      webMercatorSupported: 'Web Mercator supported',
+      webMercatorMissing: 'No layer in Web Mercator',
+      truncated: 'only the first {{max}} layers are listed',
+      xyzSummary: 'XYZ tile template · no capabilities needed',
+      layersToAdd: 'Layers to add',
+      layerNotWebMercator: 'Not available in Web Mercator',
+      addAs: 'Add as',
+      addAsOverlay: 'Overlay layer',
+      addAsOverlayDescription: 'Shown over the base map, listed in the Layers tab',
+      addAsBaseMap: 'Base map',
+      addAsBaseMapDescription: 'Replaces the base map, listed in the Base map menu',
+      displayName: 'Display name',
+      displayNameMultiple: 'Each layer keeps its own title',
+      imageFormat: 'Image format',
+      formatPng: 'PNG (transparent)',
+      formatJpeg: 'JPEG (smaller)',
+      opacity: 'Opacity',
+      attribution: 'Attribution',
+      whoSeesIt: 'Who sees it',
+      scopeSurvey: 'Everyone in this survey',
+      scopeUser: 'Only me',
+      submitOverlays: 'Add {{count}} overlays',
+      submitOverlays_one: 'Add {{count}} overlay',
+      submitOverlays_other: 'Add {{count}} overlays',
+      submitBaseMaps: 'Add {{count}} base maps',
+      submitBaseMaps_one: 'Add {{count}} base map',
+      submitBaseMaps_other: 'Add {{count}} base maps',
+      removeSelectedBaseMap: 'Remove selected custom base map',
+      hiddenForSession:
+        'Layer hidden until the map is reopened: only people who can edit the survey can remove layers shared with everyone',
+      errors: {
+        fetchLayersFailed: 'Could not load the custom map layers',
+        loadFailed: 'Could not load the layers of this service',
+        saveFailed: 'Could not save the layers',
+        removeFailed: 'Could not remove the layer',
+      },
+    },
+    toolbarLabel: 'Map tools',
+    menus: {
+      baseMap: 'Base map',
+      addData: 'Add data',
+      display: 'Display',
+      imagery: 'Imagery',
+      tools: 'Tools',
+    },
+    addData: {
+      uploadFile: 'Upload KML, KMZ or Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Location markers',
+      showMarkersLabels: 'Marker labels',
+      showUtmGrid: 'UTM grid',
+      imageInterpretation: 'Image interpretation',
+      showSamplingPolygon: 'Sampling polygon',
+      showControlPoints: 'Control points',
+      showPlotReferencePoint: 'Plot reference point',
+    },
+    tools: {
+      measureDistance: 'Measure distance',
+    },
+    quick: {
+      zoomToData: 'Zoom to data',
+      fullScreen: 'Full screen',
+      exitFullScreen: 'Exit full screen',
+      noDataToZoom: 'There is no data on the map to zoom to',
+    },
+    search: {
+      label: 'Search the map',
+      placeholderFull: 'Record key or coordinates',
+      placeholderCompact: 'Coordinates',
+      goTo: 'Go to {{coordinates}}',
+      invalidCoordinates: 'Coordinates out of range',
+      noMatch: 'No record or coordinates match',
+      coordinatesHint: 'Type coordinates, e.g. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Map panels',
+      close: 'Collapse panel',
+      tabs: {
+        layers: 'Layers',
+        records: 'Records',
+        legend: 'Legend',
+      },
+      titles: {
+        records: 'Records on the map',
+      },
+      recordsEmpty: 'Show a survey data layer to list its records',
+    },
+    layers: {
+      noSurveyData: 'This survey has no data to show on the map',
+      groups: {
+        custom: 'Custom (WMS / WMTS)',
+        scenes: 'Sentinel-2 scenes',
+        uploaded: 'Uploaded files',
+      },
+      opacity: 'Opacity of {{name}}',
+      remove: 'Remove {{name}}',
+    },
+    legend: {
+      marker: 'Record location',
+      cluster: 'Group of nearby records',
+      samplingPolygon: 'Sampling polygon',
+      utmGrid: 'UTM grid',
+      addedLayers: 'Added layers',
+    },
+    status: {
+      changeNotation: 'Click to change notation',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'DMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Scale',
+      recordsInView_one: '{{count}} record in view',
+      recordsInView_other: '{{count}} records in view',
+    },
+    upload: {
+      unsupported: 'Unsupported file: choose a KML, KMZ, zipped Shapefile or GeoJSON file',
+      tooLarge: 'The file is too large: {{maxSize}} MB at most',
+      error: 'The file could not be read: {{details}}',
+    },
+    measure: {
+      measureArea: 'Measure area',
+      barLabel: 'Measure',
+      modes: {
+        distance: 'Distance',
+        area: 'Area',
+      },
+      hint: 'Click to add points, double-click to finish',
+      units: 'Units',
+      unitOptions: {
+        auto: 'Automatic',
+        m: 'Meters (m)',
+        km: 'Kilometers (km)',
+        m2: 'Square meters (m²)',
+        ha: 'Hectares (ha)',
+        km2: 'Square kilometers (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perimeter {{value}}',
+      done: 'Done',
+    },
+    screenshot: {
+      quickButton: 'Screenshot',
+      title: 'Map screenshot',
+      capture: 'Capture',
+      captureView: 'Current view',
+      capturePlot: 'Fit to plot',
+      include: 'Include',
+      includeData: 'Markers and measurements',
+      includeScale: 'Scale bar and north arrow',
+      includeStamp: 'Plot, date, coordinates, base map',
+      saveTo: 'Save to',
+      targetRecord: 'Attach to a plot record',
+      targetRecordHint: 'Saved in an image attribute',
+      targetFile: 'Download only',
+      targetFileHint: 'PNG file on this computer',
+      plot: 'Plot record',
+      attribute: 'Image attribute',
+      fileName: 'File name',
+      mobileNote:
+        'Only image attributes of the plot are listed. Field teams see this image in Arena Mobile once the record is downloaded to their device.',
+      noPlots: 'No plots on the map. Show a location layer in the Layers tab to attach the image to a plot record.',
+      noImageAttributes: 'This plot has no image attribute that can be edited.',
+      previewLoading: 'Preparing the preview…',
+      previewAlt: 'Preview of the map screenshot',
+      alsoDownload: 'Also download',
+      downloadPng: 'Download PNG',
+      saving: 'Saving…',
+      replace: 'Replace',
+      keep: 'Keep the current image',
+      confirmReplace: 'This attribute already holds the image "{{fileName}}". Replace it with the screenshot?',
+      saved: 'Screenshot saved to {{plot}} › {{attribute}}. Field teams get it on their next records download.',
+      savedPending: 'Screenshot sent to {{plot}}. The record is still being updated: check it in a moment.',
+      notices: {
+        mapHidden: 'The map is hidden on this screen. Close the side panel or widen the window, then try again.',
+        tilesMissing: 'Map tiles left out (their server does not allow it, or they did not load): {{count}}',
+        equalEarth: 'The Equal Earth base map cannot be captured. Choose another base map in the Base map menu.',
+      },
+      errors: {
+        captureFailed: 'Could not capture the map: {{details}}',
+        cannotEditRecord: 'You cannot edit this record (or the survey is not published).',
+        fileTooLarge: 'The image is {{size}} MB, above the {{limit}} MB allowed for this attribute.',
+        quotaExceeded: 'Not enough free file space in this survey for the image.',
+        plotNotFound: 'The plot was not found in the record. It may have been deleted.',
+        saveFailed: 'The screenshot was not saved: {{details}}',
+        fileNameRequired: 'Enter a file name.',
+        rowNotConfirmed:
+          'The new row for the image was not confirmed in time, so the screenshot was not saved. Check the record before trying again.',
+        notApplicable: 'The image cannot be added: the attribute is not applicable in this plot.',
+        clearsOtherValues:
+          'The screenshot was not saved: adding it would clear values in other fields of the record. Add it from the record editor instead.',
+      },
+    },
   },
 
   samplingPolygonOptions: {
@@ -540,17 +770,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     rectangle: 'Rectangle',
     samplingPolygon: 'Sampling Polygon',
     shape: 'Shape',
-  },
-
-  kmlUploader: {
-    opacity: 'opacity',
-    selectFile: 'Select File',
-    title: 'KML/KMZ/Shapefile Options',
-  },
-
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Choose a period to compare with',
-    falseColor: 'False Color',
   },
 
   surveysView: {
@@ -574,12 +793,14 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       'published-draft': 'Published/Draft',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Accepted',
       CREATED: 'Pending',
     },
+    acceptedBy: 'Accepted by',
+    dateAccepted: 'Date accepted',
+    createdSurvey: 'Created survey',
     acceptRequest: {
       accept: 'Accept',
       acceptRequestAndCreateSurvey: 'Accept request and create survey',
@@ -587,13 +808,13 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         'Accept the access request for **{{email}}** as **{{role}}** and create a new survey **{{surveyName}}**?',
       error: 'Error accepting the access request: {{error}}',
       requestAcceptedSuccessfully: 'Access request accepted successfully. $t(common.emailSentConfirmation)',
-      surveyLabel: 'Survey label',
       surveyLabelInitial: '(Change survey name and label as needed)',
       surveyName: 'Survey Name',
+      newSurvey: 'New survey',
+      requestDetails: 'Request details',
       template: 'Template',
     },
   },
-
   userView: {
     scale: 'Scale',
     rotate: 'Rotate',
@@ -616,7 +837,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
       title: 'Manage Two-Factor Authentication Devices',
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'Changing password for user: {{user}}',
     oldPassword: 'Old password',
@@ -626,7 +846,6 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
     passwordChangedSuccessfully: 'Password changed successfully!',
     notAuthorizedToChangePasswordOfAnotherUser: 'You are not authorized to change the password of another user',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'Invite the user {{email}} as System Administrator?',
     confirmInviteSystemAdmin_other: 'Invite the users {{email}} as System Administrators?',
@@ -706,6 +925,12 @@ Thank you and enjoy **$t(common.appNameFull)**!`,
         <li>add new records (own surveys)</li>
         <li>edit existing records (own surveys)</li>
         <li>submit records to “Cleansing” phase</li>`,
+      surveyGuest: `
+        <li>Data: 
+          <ul>
+            <li>view the records (own surveys), without editing them</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Message (optional)',
     messageInfo: `The message will appear in the email sent to the user. 
@@ -716,7 +941,6 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       If you want to invite users with other roles you should first publish the survey.`,
     typeEmail: 'Type an email address, then press the Add button',
   },
-
   user: {
     mapApiKeys: {
       title: 'Map API Keys',
@@ -733,17 +957,40 @@ It can be simple text or Markdown language (https://www.markdownguide.org).`,
       preferNotToSay: 'Prefer not to say',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete: 'By deleting the base unit, you will uncheck all "area-based variable" selections. Continue?',
     },
     downloadSummaryJSON: 'Download Summary (JSON)',
-    firstPhaseCategory: '1st phase category',
-    firstPhaseCommonAttribute: {
-      label: 'Common attribute',
-      info: `Attribute in common between base unit and 1st phase table 
-(it must be a code attribute with the same name of an extra property defined for the 1st phase category)`,
+    mauFile: {
+      upload: 'Upload MAU.zip',
+      download: 'Download MAU.zip',
+      delete: 'Delete MAU.zip',
+      confirmCycleAssociation:
+        'The MAU.zip file will be associated to the current cycle ({{cycle}}). Do you want to continue?',
+      confirmReplace: 'A MAU.zip file has already been uploaded for this chain. Do you want to replace it?',
+      confirmDelete: 'Delete the MAU.zip file uploaded for this chain?',
+      uploadComplete: 'MAU.zip file uploaded successfully',
+      deleteComplete: 'MAU.zip file deleted',
+      invalidFileExtension: 'Please select a .zip file',
+    },
+    phase1Category: '1st phase category',
+    phase1CategoryInfo: 'Select the category that contains the first-phase samples.',
+    phase2JoinEntity: {
+      label: 'Join entity (2nd phase)',
+      info: 'Entity used to join the base unit with the 1st phase category: the base unit entity itself, or one of its parent entities.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Join by using Sampling Point Data linkage',
+      info: 'The second-phase entity key(s) are read from the Sampling Point Data table, which is the same table used for the first phase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Join attribute (1st phase)',
+      info: 'Select the column of the $t(chainView.phase1Category) table (an extra property, or "code") used to join it with the 2nd phase join entity.',
+    },
+    phase2JoinAttribute: {
+      label: 'Join attribute (2nd phase)',
+      info: `Select the attribute (of 2nd phase entity) to join with 1st phase table; its value is matched against the previous 1st phase join attribute.`,
     },
     formLabel: 'Processing chain label',
     basic: 'Basic',
@@ -787,9 +1034,14 @@ This might be a slow process.`,
       reportingAreaInfo: `With stratified sampling, give areas of strata within the stratum attribute's category table (column name 'area')`,
     },
     stratumAttribute: 'Stratum attribute',
+    stratumAttributeInfo: 'Select the variable used to stratify the sample.',
+    stratumAttribute2ndPhaseInfo:
+      'Select the variable used to sub-stratify the first-phase sample before drawing the final, detailed subsample. Only attributes whose name also appears as a column of the 1st phase category are shown.',
     postStratificationAttribute: 'Post stratification attribute',
     areaWeightingMethod: 'Area Weighting Method',
     clusteringEntity: 'Clustering entity',
+    clusteringEntityInfo:
+      'The entity defining primary sampling units. Note: This is used exclusively for cluster analysis within the R survey package framework.',
     clusteringOnlyVariances: 'Clustering only for variances',
     errorNoLabel: 'Chain should have a valid Label',
     dateExecuted: 'Date executed',
@@ -805,6 +1057,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Source chain',
       entityCheck: 'Entity compatibility',
       entityMissing: 'missing in target survey',
+      skipMissingEntities: 'Skip analysis attributes for entities missing in the target survey',
       noAnalysisAttributes: 'This chain has no analysis attributes',
       cloneComplete: 'Chain cloned successfully',
       missingEntities: 'Cannot clone: the following entities do not exist in the target survey: {{entities}}',
@@ -839,7 +1092,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Reporting data table and joins with attributes',
     showSamplingAttributes: 'Show sampling attributes',
   },
-
   instancesView: {
     title: 'Instances',
     terminate: 'Terminate',
@@ -859,13 +1111,14 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Invalid or expired token',
     },
   },
-
   itemsTable: {
     unused: 'Unused',
     noItemsAdded: 'No items added',
+    selectedItemsCount: '{{count}} item selected',
+    selectedItemsCount_other: '{{count}} items selected',
   },
-
   expression: {
+    areaOfInterestNotFound: 'Area of interest "{{name}}" not found: define it in Survey info → Map',
     functionHasTooFewArguments: 'Function {{fnName}} requires at least {{minArity}} arguments (got {{numArgs}})',
     functionHasTooManyArguments: 'Function {{fnName}} only accepts at most {{maxArity}} arguments (got {{numArgs}})',
     identifierNotFound: 'Attribute or entity "{{name}}" not found',
@@ -877,6 +1130,7 @@ $t(common.cantUndoWarning)`,
     invalidTaxonomyName: 'Invalid taxonomy name: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Invalid taxon vernacular name language code: {{vernacularLangCode}}',
     missingFunctionParameters: 'Missing function parameters',
+    notSupported: 'Expression not supported: check its syntax (e.g. a missing operator between two values)',
     undefinedFunction: 'Undefined function: {{name}}',
   },
 
@@ -889,7 +1143,7 @@ About
 
 $t(common.appNameFull)
 --------
- 
+
  * Developed by: $t(links.openforis)
  * Version: {{version}}
  * Website: $t(links.openforisArenaWebsite)
@@ -900,296 +1154,15 @@ $t(common.appNameFull)
  * Arena R Scripts in GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: 'Additional fields',
-    basic: 'Basic',
-    advanced: 'Advanced',
-    mobileApp: 'Mobile App',
-    validations: 'Validations',
-    function: 'Function',
-    editingFunction: 'Editing function {{functionName}}',
-    editorHelp: {
-      json: 'Valid expressions are a subset of Javascript.',
-      sql: 'Only valid SQL expressions are allowed.',
-    },
-    editorCompletionHelp: '- Show the available variables and functions that can be used',
-    functionDescriptions: {
-      categoryItemProp:
-        'Returns the value of the specified $t(extraProp.label) of a category item having the specified code',
-      dateTimeDiff: 'Returns the difference (in minutes) from 2 date-time couples',
-      distance: 'Returns the distance (in meters) between the specified coordinates',
-      first: 'Returns the first value or node of the specified multiple attribute or entity',
-      geoCoordinateAtDistance:
-        'Returns the coordinates at a specified distance and bearing from the specified coordinates',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      geoPolygon: 'Generates a polygon in GeoJSON from a list of coordinates',
-      includes: 'Returns true if the specified multiple attribute includes the specified value.',
-      index: 'Returns the index of the specified node among its siblings',
-      isEmpty: 'Returns true if the argument has no value specified',
-      isNotEmpty: 'Returns true if the argument has some value specified',
-      last: 'Returns the last value or node of the specified multiple attribute or entity',
-      ln: 'Returns the natural logarithm of X',
-      log10: 'Returns the base 10 logarithm of X',
-      max: 'Returns the maximum of the arguments',
-      min: 'Returns the minimum of the arguments',
-      now: 'Returns the current date or time',
-      parent: 'Returns the parent entity of the specified node',
-      pow: 'Returns the value of a base raised to a power',
-      prevCycleNote:
-        'Works only in Arena Mobile when multiple cycles are defined and the previous-cycle link is enabled',
-      prevCycleValue:
-        'Returns the value of the same attribute in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Returns the values of the same attributes in the record of the previous cycle. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Returns the cycle of the current record',
-      recordDateCreated:
-        'Returns the creation date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
-      recordDateLastModified:
-        'Returns the last modified date and time of the current record as a datetime value. It can be used in a text, date, or time attribute',
-      recordOwnerEmail: 'Returns the email of the user owning the record',
-      recordOwnerName: 'Returns the name of the user owning the record',
-      recordOwnerRole: 'Returns the role (in the current survey) of the user owning the record',
-      rowIndex: 'Returns the current table row (or form) index',
-      taxonProp: 'Returns the value of the specified $t(extraProp.label) of a taxon having the specified code',
-      taxonVernacularName:
-        'Returns the (first) vernacular (or local) name in the specified language of a taxon having the specified code',
-      userEmail: 'Returns the email of the logged in user',
-      userIsRecordOwner:
-        'Returns a boolean value "true" if the user editing the record is also its owner, "false" otherwise',
-      userName: 'Returns the name of the logged in user',
-      userProp: 'Returns the value of the specified $t(extraProp.label) of the logged in user',
-      uuid: 'Generates a UUID (universally unique identifier) that can be used as identifier (e.g. as a key attribute of an enity)',
-      // SQL functions
-      avg: 'Returns the average value of a numeric variable',
-      count: 'Returns the number of rows that matches a specified criterion',
-      sum: 'Returns the total sum of a numeric variable',
-    },
-    functionName: {
-      rowIndex: 'Row index',
-    },
-    basicProps: {
-      analysis: 'Analysis',
-      autoIncrementalKey: {
-        label: 'Auto incremental',
-        info: 'Value will be automatically generated',
-      },
-      displayAs: 'Display as',
-      displayIn: 'Display in',
-      entitySource: 'Entity Source',
-      enumerate: {
-        label: 'Enumerate',
-        info: `The rows will be automatically generated using the category items associated to a code attribute marked as Key defined inside the entity; rows cannot be added or deleted and the key code attribute won't be editable`,
-      },
-      enumerator: {
-        label: 'Enumerator',
-        info: 'The items in the category will be used to generate the rows of the parent entity',
-      },
-      form: 'Form',
-      formula: 'Formula',
-      includedInClonedData: 'Included in cloned data',
-      includedInRecordsList: {
-        label: 'Include in records list',
-        info: `If marked, the attribute will be visible in records list`,
-      },
-      key: 'Key',
-      maxKeysCountReached: 'Max keys count reached ({{maxKeysCount}})',
-      multiple: 'Multiple',
-      ownPage: 'Its own page',
-      parentPage: 'Parent page ({{parentPage}})',
-      qualifier: {
-        label: 'Qualifier',
-        info: `When a new record is created by a user belonging to a group, this attribute will be automatically filled with the value specified for it in the qualifiers of the user's group. Users will only be able to see and modify records belonging to their own group, if they belong to one.`,
-      },
-      table: 'Table',
-    },
-    advancedProps: {
-      areaBasedEstimate: 'Area-based estimate',
-      defaultValues: 'Default values',
-      defaultValuesInfo: `This allows you to automatically fill in an answer based on specific rules.  
-If you set up multiple rules, the system will check them in order from top to bottom.  
-It will apply the very first rule that matches your conditions and use that as the answer.`,
-      defaultValueEvaluatedOneTime: 'Default value evaluated only one time',
-      defaultValueEvaluatedOneTimeInfo: `The default value will be evaluated only one time, when the attribute is created.
-If not marked, the default value will be re-evaluated every time the record is updated.
-It should be marked when using expressions like now() or uuid() that should be evaluated only once, when the attribute value is generated for the first time.`,
-      defaultValuesNotEditableForAutoIncrementalKey: 'Default values not editable because auto incremental key is set',
-      defaultValuesNotSpecified: 'Default values not specified',
-      defaultValuesSpecified: 'Default values specified',
-      editableIf: 'Editability',
-      editableIfInfo: `By default, a user can always access a relevant field.  
-Here we can set a rule whether a user can type into or change this field.  
-If the conditions you set are met, the field can be edited. If not, it becomes "read-only" (locked).`,
-      editableAlways: 'Always editable',
-      editableIfConditionIsMet: 'Editable if condition is met',
-      hidden: 'Always hidden',
-      hiddenInReport: 'Hidden in Analytical Dashboard',
-      hiddenInReportInfo: `If marked, the attribute won't be visible in the Analytical Dashboard`,
-      hiddenWhenNotRelevant: 'Hidden when not relevant',
-      itemsFilter: 'Items filter',
-      itemsFilterInfo: `Expression used to filter selectable items.
-In the expression, the word "this" will refer to the item itself. 
-E.g. this.region = region_attribute_name 
-(where "region" is the name of an extra property defined for the item and region_attribute_name is the name of an attribute in the survey)`,
-      readOnly: 'Read only',
-      relevantIf: 'Relevance',
-      relevantIfInfo: `By default, all fields are always active.  
-If you set a relevance rule and it isn't met, the field will either turn grey or be hidden entirely,  
-and any automatic answers will be ignored.  
-Use this to dynamically show or hide parts of your survey; e.g. only revealing a "Please specify" text box if a user selects "Other" in the previous question.`,
-      relevantIfRadioNone: 'Always relevant',
-      relevantIfRadioDefined: 'Relevant if condition is met',
-      script: 'Script',
-      visibleIf: 'Visibility',
-      visibleIfInfo: `By default, a field is always visible.  
-If you set a rule, it will only be visible when that rule is met; otherwise, it will be hidden.  
-Note: unlike hiding an "inactive" (irrelevant) field, a hidden field can still have an automatic answer saved behind the scenes.  
-This is perfect for hiding entire parts of a survey based on who is logged in (like user roles).`,
-      visibleAlways: 'Always visible',
-      visibleIfConditionIsMet: 'Visible if condition is met',
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Hidden in Arena Mobile',
-        info: `If marked, the attribute won't be visible in AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Include in multiple entity summary',
-        info: `If marked, the attribute will be visible in the entity summary view (in Arena Mobile)`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Include in previous cycle link',
-        info: `If marked, the value from the previous cycle will be shown on the data entry form (when the link to the previous cycle is set active in the mobile app)`,
-      },
-    },
-    numericProps: {
-      unit: 'Unit',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Max number of decimal digits',
-    },
-    fileProps: {
-      fileNameExpression: 'File name expression',
-      fileType: 'File type',
-      fileTypes: {
-        image: 'Image',
-        video: 'Video',
-        audio: 'Audio',
-        other: 'Other',
-      },
-      maxFileSize: 'Max. file size (Mb)',
-      numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
-      showGeotagInformation: 'Show geotag information',
-    },
-    mobileProps: {
-      title: 'Mobile App',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Header color',
-      headerColor: {
-        blue: 'Blue',
-        green: 'Green',
-        orange: 'Orange',
-        red: 'Red',
-        yellow: 'Yellow',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Hyperlink',
-        markdown: 'Markdown',
-        text: 'Text',
-      },
-      textInputType: 'Text input type',
-      textInputTypes: {
-        singleLine: 'Single line',
-        multiLine: 'Multi line',
-      },
-      textTransform: 'Text transform',
-      textTransformTypes: {
-        none: 'none',
-        capitalize: 'capitalize',
-        uppercase: 'uppercase',
-        lowercase: 'lowercase',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Label value',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Category',
-      codeShown: 'Show code',
-      displayAsTypes: {
-        checkbox: 'Checkbox',
-        dropdown: 'Dropdown',
-      },
-      parentCode: 'Parent Code',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Allow only device coordinate',
-      allowOnlyDeviceCoordinateInfo: `It applies only to Arena Mobile: if checked, the user won't be able to modify the X/Y values, but only device GPS can be used to get them`,
-      mapMarkerColor: 'Map marker color',
-    },
-    expressionsProp: {
-      expression: 'Expression',
-      applyIf: 'Apply If',
-      confirmDelete: 'Delete this expression?',
-      severity: 'Severity',
-    },
-    validationsProps: {
-      minCount: 'Min count',
-      maxCount: 'Max count',
-      expressions: 'Validation expressions',
-      attributeAlwaysValid: 'Attribute always valid',
-      attributeValidWhenConditionIsMet: 'Attribute valid when condition is met',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'This node cannot be converted to multiple because it has default values.',
-    cannotDeleteNodeDefReferenced: `Cannot delete "{{nodeDef}}": it's referenced by these node definitions: {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Clone',
-      title: 'Cloning node definition "{{nodeDefName}}"',
-      entitySelectLabel: 'Entity to clone into:',
-    },
-    conversion: {
-      dialogTitle: 'Convert {{nodeDefName}} into another type',
-      fromType: 'From type',
-      toType: 'To type',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Move',
-      title: 'Moving node definition "{{nodeDefName}}" from "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Entity to move into:',
-    },
-    movedNodeDefinitionHasErrors: 'The node definition "{{nodeDefName}}" you have moved has errors; please fix them.',
-    nodeDefintionsHaveErrors: 'These node definitions have errors: {{nodeDefNames}}. Please fix them.',
-    filterVariable: 'Variable to filter items',
-    filterVariableForLevel: 'Variable for {{levelName}}',
-    unique: {
-      label: 'Unique',
-      info: `When an attribute is marked as **Unique**, its value must be unique inside the closest multiple entity (an error will be shown otherwise).  
-
----
-
-E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tree_species* marked as **Unique**, you can have only one tree per species inside the same *plot*.`,
-    },
-    nodeDefClonedSuccessfully:
-      'Node definition "{{nodeDefName}}" cloned successfully into "{{targetParentNodeDefName}}"',
-    categoriesClonedFromSurvey: 'The following categories were also cloned from the source survey: {{names}}',
-    taxonomiesClonedFromSurvey: 'The following taxonomies were also cloned from the source survey: {{names}}',
-  },
-
   languagesEditor: {
     languages: 'Language(s)',
   },
-
   taxonomy: {
     header: 'Taxonomy',
     cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
@@ -1213,13 +1186,12 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       synonym: 'Synonym / Latin',
       extraPropsNotDefined: 'Extra properties not defined for this taxonomy',
       importMissingPublishedTaxa:
-        '{{count}} published taxon/taxa not found in the imported file and left unchanged. Codes: {{codes}}',
+        '{{count}} published taxon/taxa not found in the imported file: left unchanged, after the imported ones. Codes: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} more)',
     },
     taxaCount: 'Taxa count',
     vernacularNameLabel: 'Vernacular name label',
   },
-
   categoryList: {
     batchImport: 'Import categories in batch (from ZIP)',
     batchImportCompleteSuccessfully: `{{importedCategories}} categories imported successfully!
@@ -1236,13 +1208,15 @@ E.g. in a structure like *cluster -> plot -> tree*, if you have an attribute *tr
       noCategoriesAvailable: 'No categories available in the selected survey',
     },
     itemsCount: 'Items count',
+    structure: 'Structure',
     types: {
       flat: 'Flat',
       hierarchical: 'Hierarchical',
       reportingData: 'Reporting Data',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Sampling Point Data',
     },
   },
-
   categoryEdit: {
     header: 'Category',
     addLevel: 'Add level',
@@ -1267,6 +1241,54 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     convertToSimpleCategory: {
       confirmMessage: `Convert this Reporting Data category to a simple category?`,
     },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convert to Sampling Point Data',
+      confirmMessage: `Convert this category to the Sampling Point Data category?
+
+The category will be renamed to '${samplingPointDataCategoryName}' and a '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convert to GeoPackage category',
+      confirmMessage: `Convert this category to a GeoPackage category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this GeoPackage category to a simple category?
+
+The '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convert to simple category',
+      confirmMessage: `Convert this Sampling Point Data category to a simple category?
+
+The category name will be cleared (you'll need to give it a new name), and the '${locationItemExtraDefName}' extra property will be unlocked, so it can be renamed, retyped or deleted like any other extra property. Its data is not affected.`,
+    },
+    geoPackageCategory: 'This category has geo capabilities',
+    geoPackageCategoryInfo: `This category has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
+    samplingPointDataCategoryType: 'This is the Sampling Point Data category',
+    samplingPointDataCategoryTypeInfo: `This is a predefined category for sampling point data. It has an extra property called '${locationItemExtraDefName}', which allows it to be exported as a GeoPackage file.`,
+    samplingPointDataCategoryLocationMissing: `The '${locationItemExtraDefName}' extra property is missing`,
+    createCategory: {
+      menuLabel: 'Add category',
+      simple: 'Simple category',
+      otherTypes: 'More category types',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Sampling Point Data category',
+      description: 'Predefined category for sampling point data, including a location field for each item.',
+      message: `Create a new Sampling Point Data category?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Category with geo capabilities',
+      description: 'Adds a location field to items, so the category can be exported as a GeoPackage file.',
+      message: `Create a new category with geo capabilities?
+
+A '${locationItemExtraDefName}' extra property will be added to the items.`,
+    },
     deleteItem: 'Delete item',
     level: {
       title: 'Level {{levelPosition}}',
@@ -1290,13 +1312,23 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       title: 'Category import summary',
     },
     reportingData: 'Reporting data',
+    exportToGeoPackage: 'Export to GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(s) without a valid location were skipped.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Generate Whisp analysis',
+      confirmMessage: `Generate the Whisp analysis for all the sampling points?
+
+- every sampling point with a location will be sent to Open Foris Whisp for the analysis
+- the results will be combined with the sampling point data and stored in the category '${samplingPointDataWhispCategoryName}'
+- if the category '${samplingPointDataWhispCategoryName}' already exists, its content will be replaced
+- the analysis runs in the background and it can take several minutes, depending on the number of sampling points`,
+    },
     templateFor_samplingPointDataImport_csv: 'Template for Sampling Point Data import (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Template for Sampling Point Data import (Excel)',
   },
-
   extraProp: {
     label: 'Extra property',
-    label_plural: 'Extra properties',
+    label_other: 'Extra properties',
     addExtraProp: 'Add extra property',
     dataTypes: {
       geometryPoint: 'Geometry Point',
@@ -1304,7 +1336,7 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       text: 'Text',
     },
     editor: {
-      title: 'Edit $t(extraProp.label_plural)',
+      title: 'Edit $t(extraProp.label_other)',
       confirmDelete: 'Delete the extra property "{{name}}"?',
       confirmSave: `Save the changes to the extra properties definitions?
 
@@ -1319,7 +1351,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     name: 'Property {{position}} name',
     value: 'Value',
   },
-
   record: {
     ancestorNotFound: 'Ancestor node not found in record',
     keyDuplicate: 'Duplicate record key',
@@ -1345,7 +1376,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'AND',
     or: 'OR',
@@ -1360,6 +1390,11 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       distanceAttribute: 'Distance attribute',
       bearingAttribute: 'Bearing attribute',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: 'Area of interest',
+      areasOfInterestNotDefined: 'No areas of interest defined yet: define them in Survey info → Map',
+    },
+    coordinateAttribute: 'Coordinate attribute',
     coordinateAttributeWithPosition: 'Coordinate attribute {{position}}',
 
     dateTimeDiffEditor: {
@@ -1410,7 +1445,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     arenaInGitHub: `<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>`,
     arenaRScriptsInGitHub: `<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>`,
   },
-
   aiExpression: {
     title: 'Generate expression from description',
     hint: 'Describe in plain language what the expression should do. The AI will translate it into Arena syntax. Press Ctrl+Enter to generate.',
@@ -1431,7 +1465,6 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
       timeout: 'The AI took too long to respond. Please try again.',
     },
   },
-
   aiTranslation: {
     translateButton_one: 'Translate to {{count}} other language',
     translateButton_other: 'Translate to {{count}} other languages',
@@ -1444,14 +1477,12 @@ Levels will be renamed into level_1, level_2... level_N and an extra 'area' prop
     failed: 'Translation failed: {{message}}',
     timeout: 'Translation request timed out. Please try again.',
   },
-
   aiActivityLog: {
     title: 'Activity log summary',
     summarizeButton: 'Summarize',
     thinking: 'Aggregating events and asking the AI to summarize…',
     error: 'Failed to fetch summary: {{message}}',
   },
-
   aiChatbot: {
     open: 'Help & documentation',
     title: 'Help & documentation',

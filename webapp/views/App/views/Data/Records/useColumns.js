@@ -1,11 +1,11 @@
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 
 import * as A from '@core/arena'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Validation from '@core/validation/validation'
 import * as DateUtils from '@core/dateUtils'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { useNodeDefRootKeys, useSurvey, useSurveyPreferredLang } from '@webapp/store/survey'
 
@@ -137,13 +137,13 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
       },
       {
         key: 'errors',
-        header: 'common.error_plural',
+        header: 'common.error_other',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getErrorsCount)(record),
         width: '6rem',
       },
       {
         key: 'warnings',
-        header: 'common.warning_plural',
+        header: 'common.warning_other',
         renderItem: ({ item: record }) => A.pipe(Validation.getValidation, Validation.getWarningsCount)(record),
         width: '6rem',
       },
@@ -151,8 +151,10 @@ export const useColumns = ({ categoryItemsByCodeDefUuid, navigateToRecord, onRec
         key: 'action-buttons',
         className: 'action-buttons-col',
         renderItem: ({ item: record, itemPosition }) => {
-          const canEdit = Authorizer.canEditRecord(user, record)
-          const canDelete = Authorizer.canDeleteRecord(user, record)
+          // records of other user groups can only be viewed
+          const readOnly = Record.isReadOnly(record)
+          const canEdit = !readOnly && Authorizer.canEditRecord(user, record)
+          const canDelete = !readOnly && Authorizer.canDeleteRecord(user, record)
           return (
             <>
               <Button

@@ -1,6 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -21,11 +21,11 @@ import { State, useNodeDefEditReadOnly } from './store'
 const displayAsItems = [
   {
     key: NodeDefLayout.renderType.dropdown,
-    label: 'nodeDefEdit.codeProps.displayAsTypes.dropdown',
+    label: 'nodeDefEdit:codeProps.displayAsTypes.dropdown',
   },
   {
     key: NodeDefLayout.renderType.checkbox,
-    label: 'nodeDefEdit.codeProps.displayAsTypes.checkbox',
+    label: 'nodeDefEdit:codeProps.displayAsTypes.checkbox',
   },
 ]
 
@@ -61,7 +61,7 @@ const CodeProps = (props) => {
 
   return (
     <>
-      <FormItem label="nodeDefEdit.codeProps.category">
+      <FormItem label="nodeDefEdit:codeProps.category">
         <CategorySelector
           disabled={readOnly || !canUpdateCategory}
           categoryUuid={nodeDefCategoryUuid}
@@ -75,7 +75,7 @@ const CodeProps = (props) => {
       {!NodeDef.isAnalysis(nodeDef) && (
         <>
           {Category.isHierarchical(category) && (
-            <FormItem label="nodeDefEdit.codeProps.parentCode">
+            <FormItem label="nodeDefEdit:codeProps.parentCode">
               <div
                 style={{
                   display: 'grid',
@@ -83,7 +83,7 @@ const CodeProps = (props) => {
                 }}
               >
                 <Dropdown
-                  disabled={readOnly || !canUpdateCategory || R.isEmpty(candidateParentCodeNodeDefs)}
+                  disabled={readOnly || !canUpdateCategory || A.isEmpty(candidateParentCodeNodeDefs)}
                   items={candidateParentCodeNodeDefs}
                   selection={parentCodeDef}
                   itemValue="uuid"
@@ -97,7 +97,7 @@ const CodeProps = (props) => {
             </FormItem>
           )}
 
-          <FormItem label="nodeDefEdit.basicProps.displayAs">
+          <FormItem label="nodeDefEdit:basicProps.displayAs">
             <ButtonGroup
               disabled={readOnly}
               selectedItemKey={NodeDefLayout.getRenderType(surveyCycleKey)(nodeDef)}
@@ -106,7 +106,7 @@ const CodeProps = (props) => {
             />
           </FormItem>
 
-          <FormItem label="nodeDefEdit.codeProps.codeShown">
+          <FormItem label="nodeDefEdit:codeProps.codeShown">
             <Checkbox
               checked={NodeDefLayout.isCodeShown(surveyCycleKey)(nodeDef)}
               disabled={readOnly}

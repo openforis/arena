@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
@@ -29,7 +29,7 @@ export default class TaxonCSVParser {
     // the genus is always the first word of the scientific name
     const genus = genusRow ?? (scientificName ? scientificName.split(' ')[0] : null)
 
-    const taxon = Taxon.newTaxon({
+    const taxonNew = Taxon.newTaxon({
       taxonomyUuid: this.taxonomyUuid,
       code: String(StringUtils.nullToEmpty(code)),
       family,
@@ -38,6 +38,7 @@ export default class TaxonCSVParser {
       vernacularNames: this._parseVernacularNames(otherProps),
       extra: this._parseExtraProps(otherProps),
     })
+    const taxon = Taxon.setProp(Taxon.propKeys.position, this.processedRow)(taxonNew)
 
     const validation = await this._validateTaxon(taxon)
 
@@ -51,7 +52,7 @@ export default class TaxonCSVParser {
 
     // validate taxon uniqueness among inserted values
     if (Validation.isValid(validation)) {
-      const code = R.pipe(Taxon.getCode, R.toString, R.toUpper)(taxon)
+      const code = A.pipe(Taxon.getCode, A.toString, A.toUpper)(taxon)
       this._addValueToIndex(Taxon.propKeys.code, code, Validation.messageKeys.taxonomyEdit.codeDuplicate, validation)
 
       const scientificName = Taxon.getScientificName(taxon)
@@ -69,7 +70,7 @@ export default class TaxonCSVParser {
   _addValueToIndex(field, value, errorKeyDuplicate, validation) {
     const duplicateRow = this.rowsByField[field][value]
     if (duplicateRow) {
-      R.pipe(
+      A.pipe(
         Validation.setValid(false),
         Validation.setField(
           field,

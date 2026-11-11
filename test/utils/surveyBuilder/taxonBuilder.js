@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
@@ -15,9 +15,9 @@ export class TaxonBuilder {
   }
 
   vernacularName(lang, name) {
-    this.vernacularNames = R.pipe(
-      R.propOr([], lang),
-      R.append(TaxonVernacularName.newTaxonVernacularName(lang, name))
+    this.vernacularNames = A.pipe(
+      A.propOr([], lang),
+      A.append(TaxonVernacularName.newTaxonVernacularName(lang, name))
     )(this.vernacularNames)
     return this
   }

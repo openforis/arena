@@ -1,4 +1,6 @@
+import { isHexColor } from '@core/colorUtils'
 import * as ObjectUtils from '@core/objectUtils'
+import * as SurveyFile from '@core/survey/surveyFile'
 
 export const keys = {
   branding: 'branding',
@@ -10,6 +12,8 @@ export const keys = {
   titleFontSize: 'titleFontSize',
   descriptionFontSize: 'descriptionFontSize',
   fileUuid: 'fileUuid',
+  size: 'size',
+  name: 'name',
 } as const
 
 export type SurveyLogoKey = typeof keys.surveyLogo1 | typeof keys.surveyLogo2 | typeof keys.surveyLogo3
@@ -33,8 +37,6 @@ export const BRANDING_IMAGE_MAX_FILE_SIZE_BYTES = 5 * 1024 * 1024
 /** Maximum landing background upload size in bytes (5 MiB). */
 export const LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES = BRANDING_IMAGE_MAX_FILE_SIZE_BYTES
 
-const HEX_COLOR_REGEXP = /^#[0-9A-Fa-f]{6}$/
-
 const titleFontSizeRemByPreset: Record<FontSizePreset, string> = {
   [fontSizePreset.small]: '1.5rem',
   [fontSizePreset.default]: '2rem',
@@ -49,8 +51,22 @@ const descriptionFontSizeRemByPreset: Record<FontSizePreset, string> = {
 
 const imageDescriptorKeys = [...surveyLogoKeys, keys.landingBackground] as const
 
+const brandingImageFileTypeByKey: Record<(typeof imageDescriptorKeys)[number], string> = {
+  [keys.surveyLogo1]: SurveyFile.SurveyFileType.brandingSurveyLogo1,
+  [keys.surveyLogo2]: SurveyFile.SurveyFileType.brandingSurveyLogo2,
+  [keys.surveyLogo3]: SurveyFile.SurveyFileType.brandingSurveyLogo3,
+  [keys.landingBackground]: SurveyFile.SurveyFileType.brandingLandingBackground,
+}
+
+export type BrandingFileSummary = {
+  uuid: string
+  props: { type: string; size?: number; name?: string }
+}
+
 export type BrandingImageDescriptor = {
   [keys.fileUuid]?: string
+  [keys.size]?: number
+  [keys.name]?: string
 }
 
 export type SurveyBranding = {
@@ -79,8 +95,7 @@ export const isValidFontSizePreset = (value: unknown): value is FontSizePreset =
 /**
  * Returns whether value is a valid #RRGGBB primary color.
  */
-export const isValidPrimaryColor = (value: unknown): value is string =>
-  typeof value === 'string' && HEX_COLOR_REGEXP.test(value)
+export const isValidPrimaryColor = (value: unknown): value is string => isHexColor(value)
 
 /**
  * Returns whether branding props are valid for save.
@@ -159,6 +174,23 @@ export const getLandingBackground = (surveyInfo: SurveyInfoLike): BrandingImageD
   getBranding(surveyInfo)[keys.landingBackground] || null
 
 /**
+ * Creates a branding image descriptor pointing at an uploaded file.
+ */
+export const newBrandingImageDescriptor = ({
+  fileUuid,
+  size,
+  name,
+}: {
+  fileUuid: string
+  size: number
+  name: string
+}): BrandingImageDescriptor => ({
+  [keys.fileUuid]: fileUuid,
+  [keys.size]: size,
+  [keys.name]: name,
+})
+
+/**
  * Returns whether a logo descriptor has a file UUID.
  */
 export const hasLogoDescriptor = (logo: BrandingImageDescriptor | null | undefined): boolean => {
@@ -177,4 +209,29 @@ export const getBrandingFileUuids = (branding: SurveyBranding = {}): string[] =>
     if (typeof fileUuid === 'string' && fileUuid.length > 0) uuids.push(fileUuid)
   }
   return uuids
+}
+
+/**
+ * Returns file summaries ({ uuid, props: { type, size, name } }) for every branding image
+ * descriptor that has a fileUuid, keyed by the SurveyFileType matching its branding slot.
+ * size/name are passed through as stored on the descriptor. Used by survey export/import to
+ * restore branding image file content.
+ */
+export const getBrandingFileSummaries = (branding: SurveyBranding = {}): BrandingFileSummary[] => {
+  const summaries: BrandingFileSummary[] = []
+  for (const imageKey of imageDescriptorKeys) {
+    const descriptor = branding?.[imageKey]
+    const fileUuid = descriptor?.[keys.fileUuid]
+    if (typeof fileUuid === 'string' && fileUuid.length > 0) {
+      summaries.push({
+        uuid: fileUuid,
+        props: {
+          type: brandingImageFileTypeByKey[imageKey],
+          size: descriptor?.[keys.size],
+          name: descriptor?.[keys.name],
+        },
+      })
+    }
+  }
+  return summaries
 }

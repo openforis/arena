@@ -1,0 +1,87 @@
+name: User manual
+
+# Generates the user manual PDFs (English, French, Spanish) from docs/user-manual/arena-user-manual-*.docx:
+# - pull requests changing them: uploaded as workflow artifact, to check the result
+# - published releases: attached to the release (permanent link to the latest version:
+#   https://github.com/openforis/arena/releases/latest/download/arena-user-manual-en.pdf, -fr.pdf, -es.pdf)
+#   and published on GitHub Pages: https://openforis.github.io/arena/arena-user-manual-en.pdf
+# - manual run: built from the selected branch and attached to the given existing release
+
+on:
+  pull_request:
+    paths:
+      - docs/user-manual/**
+      - .github/workflows/user-manual.yml
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Tag of an existing release to attach the PDFs to (e.g. v2.12.0); built from the selected branch
+        required: true
+
+jobs:
+  user-manual:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Install LibreOffice
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libreoffice-writer python3-uno fonts-crosextra-carlito fonts-crosextra-caladea fonts-liberation2
+
+      - name: Generate user manual
+        env:
+          PYTHON: /usr/bin/python3
+        run: bash docs/user-manual/scripts/build.sh
+
+      - name: Upload artifact
+        if: github.event_name == 'pull_request'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: user-manual
+          path: docs/user-manual/arena-user-manual-*.pdf
+
+      - name: Upload release assets
+        if: env.TAG != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release upload "$TAG" \
+            docs/user-manual/arena-user-manual-*.pdf \
+            --clobber --repo "$GITHUB_REPOSITORY"
+
+      - name: Prepare GitHub Pages content
+        if: env.TAG != ''
+        run: |
+          mkdir -p pages
+          cp docs/user-manual/arena-user-manual-*.pdf pages/
+
+      - name: Upload GitHub Pages artifact
+        if: env.TAG != ''
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: pages
+
+  pages:
+    needs: user-manual
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}arena-user-manual-en.pdf
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

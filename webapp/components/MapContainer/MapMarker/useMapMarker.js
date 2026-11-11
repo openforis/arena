@@ -35,6 +35,7 @@ export const useMapMarker = (props) => {
   // on point update or after SRSs has been initialized, transform point to lat long
   useEffect(() => {
     if (point) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect -- pointLatLon also changes on marker drag
       setState((statePrev) => ({
         ...statePrev,
         pointLatLon: fromPointToLatLon(point),

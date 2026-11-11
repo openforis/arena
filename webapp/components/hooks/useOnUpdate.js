@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 
-export default (effect, inputs = []) => {
+const useOnUpdate = (effect, inputs = []) => {
   const isInitialMount = useRef(true)
 
   useEffect(() => {
@@ -11,3 +11,5 @@ export default (effect, inputs = []) => {
     }
   }, inputs)
 }
+
+export default useOnUpdate

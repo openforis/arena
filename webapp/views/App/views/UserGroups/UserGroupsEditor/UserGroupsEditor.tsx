@@ -1,7 +1,7 @@
 import './UserGroupsEditor.scss'
 
 import React from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 
 import { useAuthCanManageUserGroups } from '@webapp/store/user'
 import { ButtonIconAdd } from '@webapp/components'

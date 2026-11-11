@@ -1,9 +1,9 @@
 import './Header.scss'
 
 import classNames from 'classnames'
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -21,6 +21,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import CycleSelector from '@webapp/components/survey/CycleSelector'
 import { SurveyPreferredLanguageSelector } from '@webapp/components/survey/SurveyPreferredLanguageSelector'
+import { ThemeButtonMenu } from '@webapp/components/ThemeButtonMenu'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { useHasMessageNotifications } from '@webapp/store/ui'
 
@@ -122,6 +123,7 @@ const Header = () => {
             {showMessageNotifications && <MessageNotificationPanel onClose={toggleShowMessageNotifications} />}
           </>
         )}
+        <ThemeButtonMenu />
         <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"

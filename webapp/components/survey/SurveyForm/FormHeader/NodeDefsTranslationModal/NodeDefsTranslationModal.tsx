@@ -1,6 +1,6 @@
 import './NodeDefsTranslationModal.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as API from '@webapp/service/api'

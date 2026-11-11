@@ -38,6 +38,7 @@ export type ButtonProps = Omit<MuiButtonProps, 'color' | 'title' | 'variant' | '
   titleMarkdownClassName?: string
   titleMaxWidth?: string | number
   titleParams?: Record<string, unknown>
+  to?: string // destination, when component is a router link
   variant?: 'contained' | 'outlined' | 'text'
 }
 

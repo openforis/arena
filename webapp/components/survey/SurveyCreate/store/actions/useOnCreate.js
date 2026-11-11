@@ -1,6 +1,6 @@
 import { useDispatch } from 'react-redux'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 
 import { SurveyActions } from '@webapp/store/survey'
@@ -33,6 +33,7 @@ export const useOnCreate = ({ newSurvey, setNewSurvey }) => {
               const { surveyId } = JobSerialized.getResult(_job)
               dispatch(SurveyActions.setActiveSurvey(surveyId, true, true))
             },
+            autoHide: true,
           })
         )
       } else if (survey) {

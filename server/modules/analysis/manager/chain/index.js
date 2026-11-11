@@ -1,28 +1,31 @@
-import { ChainFactory } from '@openforis/arena-core'
-
-import * as R from 'ramda'
+import { Authorizer, ChainFactory } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Chain from '@common/analysis/chain'
 import { ChainSamplingDesign } from '@common/analysis/chainSamplingDesign'
 import { ChainStatisticalAnalysis } from '@common/analysis/chainStatisticalAnalysis'
+import { SamplingNodeDefs } from '@common/analysis/samplingNodeDefs'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import { UniqueNameGenerator } from '@core/uniqueNameGenerator'
 import { uuidv4 } from '@core/uuid'
 import SystemError from '@core/systemError'
+import * as User from '@core/user/user'
 
 import { TableChain } from '@common/model/db'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ChainValidator from '@common/analysis/chainValidator'
 
+import * as DbUtils from '@server/db/dbUtils'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as NodeDefService from '@server/modules/nodeDef/service/nodeDefService'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import { markSurveyDraft } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import * as ChainMauFileService from '@server/modules/analysis/service/chainMauFile'
 
 import * as DB from '@server/db'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as ChainRepository from '../../repository/chain'
 
@@ -65,26 +68,31 @@ export const updateChainValidation = async ({ surveyId, chainUuid, validation },
 
 export const updateChainStatusExec = async ({ user, surveyId, chainUuid, statusExec }) =>
   DB.client.tx(async (tx) => {
-    const promises = [
-      ChainRepository.updateChain(
-        { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
-        tx
-      ),
+    const queryFns = [
+      () =>
+        ChainRepository.updateChain(
+          { surveyId, chainUuid, fields: { [TableChain.columnSet.statusExec]: statusExec }, dateExecuted: true },
+          tx
+        ),
     ]
     if (statusExec === Chain.statusExec.success) {
       const type = ActivityLog.type.chainStatusExecSuccess
       const content = { [ActivityLog.keysContent.uuid]: chainUuid }
-      promises.push(ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
+      queryFns.push(() => ActivityLogRepository.insert(user, surveyId, type, content, false, tx))
     }
 
-    return Promise.all(promises)
+    return DbUtils.runQueries(tx, queryFns)
   })
+
+// ====== MIGRATION
+
+export { migrateSamplingDesignPhaseProps } from './chainSamplingDesignMigration'
 
 const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
   const chainUuid = Chain.getUuid(chain)
   const propsToUpdate = Chain.getPropsDiff(chain)(chainDb)
   // activity log for each updated prop
-  const promises = Object.entries(propsToUpdate).map(([key, value]) => {
+  const queryFns = Object.entries(propsToUpdate).map(([key, value]) => () => {
     const content = { [ActivityLog.keysContent.uuid]: chainUuid, key, value }
     const type = ActivityLog.type.chainPropUpdate
     return ActivityLogRepository.insert(user, surveyId, type, content, false, client)
@@ -95,14 +103,18 @@ const _updateChain = async ({ user, surveyId, chain, chainDb }, client) => {
     [TableChain.columnSet.validation]: Chain.getValidation(chain),
   }
   const params = { surveyId, chainUuid, dateModified: true, fields }
-  promises.push(ChainRepository.updateChain(params, client))
+  queryFns.push(() => ChainRepository.updateChain(params, client))
 
-  return Promise.all(promises)
+  return DbUtils.runQueries(client, queryFns)
 }
 
 // ====== PERSIST
-/* eslint-disable */
 /**
+ * @param root0
+ * @param root0.user
+ * @param root0.surveyId
+ * @param root0.chain
+ * @param client
  * @deprecated
  */
 export const persistChain = async ({ user, surveyId, chain }, client) => {
@@ -119,7 +131,7 @@ export const _deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cl
   const deletedChainUuid = Chain.getUuid(deletedChain)
   const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
     { surveyId, draft: true, advanced: true, includeAnalysis: true },
-    (client = DB.client)
+    client
   )
 
   const nodeDefsUuidsInDeleteChains = Survey.getNodeDefsArray(survey)
@@ -127,6 +139,8 @@ export const _deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cl
     .map(NodeDef.getUuid)
 
   await NodeDefService.markNodeDefsDeleted({ user, surveyId, nodeDefUuids: nodeDefsUuidsInDeleteChains }, client)
+
+  await ChainMauFileService.deleteChainMauFile({ surveyId, chainUuid: deletedChainUuid }, client)
 
   return deletedChain
 }
@@ -139,9 +153,9 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
       [ActivityLog.keysContent.uuid]: chainUuid,
       [ActivityLog.keysContent.labels]: Chain.getLabels(deletedChain),
     }
-    return tx.batch([
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
-      markSurveyDraft(surveyId, tx),
+    return DbUtils.runQueries(tx, [
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainDelete, content, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
   })
 
@@ -150,7 +164,6 @@ export const deleteChain = async ({ user, surveyId, chainUuid }, client = DB.cli
 /**
  * Remaps nodeDef UUID from source survey to target survey by node name.
  * Returns undefined when the nodeDef cannot be found in the target.
- *
  * @param {object} params - Parameters.
  * @param {string} params.uuid - NodeDef UUID in the source survey.
  * @param {object} params.sourceSurvey - Source survey object.
@@ -161,7 +174,7 @@ const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
   if (!uuid) return undefined
   const sourceNodeDef = Survey.getNodeDefByUuid(uuid)(sourceSurvey)
   if (!sourceNodeDef) return undefined
-  const targetNodeDef = Survey.getNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
+  const targetNodeDef = Survey.findNodeDefByName(NodeDef.getName(sourceNodeDef))(targetSurvey)
   return targetNodeDef ? NodeDef.getUuid(targetNodeDef) : undefined
 }
 
@@ -169,7 +182,6 @@ const _remapNodeDefUuid = ({ uuid, sourceSurvey, targetSurvey }) => {
  * Sanitizes chain props before inserting into a different survey.
  * Remaps nodeDef UUIDs by name where possible, clears category UUIDs and
  * selected record UUIDs that are meaningless outside the source survey.
- *
  * @param {object} params - Parameters.
  * @param {object} params.sourceChain - The chain being cloned.
  * @param {object} params.sourceSurvey - Survey the chain belongs to.
@@ -196,11 +208,16 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
       [ChainSamplingDesign.keysProps.postStratificationAttributeDefUuid]: remap(
         ChainSamplingDesign.getPostStratificationAttributeDefUuid(sourceSamplingDesign)
       ),
-      [ChainSamplingDesign.keysProps.firstPhaseCommonAttributeUuid]: remap(
-        ChainSamplingDesign.getFirstPhaseCommonAttributeUuid(sourceSamplingDesign)
+      [ChainSamplingDesign.keysProps.phase2JoinEntityUuid]: remap(
+        ChainSamplingDesign.getPhase2JoinEntityUuid(sourceSamplingDesign)
       ),
-      // Category UUIDs are survey-specific and cannot be remapped; clear them
-      [ChainSamplingDesign.keysProps.firstPhaseCategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.phase2JoinAttribute]: remap(
+        ChainSamplingDesign.getPhase2JoinAttribute(sourceSamplingDesign)
+      ),
+      // Category UUIDs are survey-specific and cannot be remapped; clear them, and the join
+      // attribute that only makes sense in the context of that category
+      [ChainSamplingDesign.keysProps.phase1CategoryUuid]: undefined,
+      [ChainSamplingDesign.keysProps.phase1JoinAttribute]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataCategoryUuid]: undefined,
       [ChainSamplingDesign.keysProps.reportingDataAttributeDefsByLevelUuid]: undefined,
     }).filter(([, v]) => v !== undefined)
@@ -233,8 +250,123 @@ const _sanitizeChainPropsForClone = ({ sourceChain, sourceSurvey, targetSurvey }
   )
 }
 
-export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sourceChainUuid }, client = DB.client) =>
-  client.tx(async (tx) => {
+/**
+ * Returns the analysis node defs to clone with a chain, including the plot area node defs it depends on:
+ * there is only one per entity, even when it's used by more chains, and it belongs to only one of them.
+ * @param {object} params - Parameters.
+ * @param {object} params.sourceSurvey - Survey the chain belongs to.
+ * @param {string} params.sourceChainUuid - Uuid of the chain being cloned.
+ * @returns {Array<object>} The analysis node defs to clone.
+ */
+const _getNodeDefsToClone = ({ sourceSurvey, sourceChainUuid }) => {
+  const analysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(NodeDef.isAnalysis)
+  const chainNodeDefs = analysisNodeDefs.filter((nd) => NodeDef.getChainUuid(nd) === sourceChainUuid)
+  const areaBasedEntityUuids = new Set(
+    chainNodeDefs.filter((nd) => NodeDef.isAreaBasedEstimatedOf(nd) && NodeDef.isActive(nd)).map(NodeDef.getParentUuid)
+  )
+  const plotAreaNodeDefsOfOtherChains = analysisNodeDefs.filter(
+    (nd) =>
+      NodeDef.getChainUuid(nd) !== sourceChainUuid &&
+      areaBasedEntityUuids.has(NodeDef.getParentUuid(nd)) &&
+      SamplingNodeDefs.isEntityAreaNodeDef({ nodeDef: nd, nodeDefParent: Survey.getNodeDefParent(nd)(sourceSurvey) })
+  )
+  return [...chainNodeDefs, ...plotAreaNodeDefsOfOtherChains]
+}
+
+/**
+ * Makes cloned area based estimates refer to the cloned attributes instead of the ones in the source survey.
+ * @param {object} params - Parameters.
+ * @param {Array<object>} params.sourceNodeDefs - The source node defs.
+ * @param {Array<object>} params.clonedNodeDefs - The cloned node defs, in the same order as the source ones.
+ * @returns {Array<object>} The cloned node defs with the references updated.
+ */
+const _remapAreaBasedEstimatedOf = ({ sourceNodeDefs, clonedNodeDefs }) => {
+  const clonedUuidBySourceUuid = Object.fromEntries(
+    sourceNodeDefs.map((nd, index) => [NodeDef.getUuid(nd), NodeDef.getUuid(clonedNodeDefs[index])])
+  )
+  return clonedNodeDefs.map((nd) =>
+    NodeDef.isAreaBasedEstimatedOf(nd)
+      ? NodeDef.mergePropsAdvanced({
+          [NodeDef.keysPropsAdvanced.areaBasedEstimatedOf]: clonedUuidBySourceUuid[NodeDef.getAreaBasedEstimatedOf(nd)],
+        })(nd)
+      : nd
+  )
+}
+
+// ====== READ - Chains available to clone from another survey
+
+/**
+ * Checks that the given user is allowed to view the source survey used as a chain-clone source
+ * (a survey they have access to, or a published template, per
+ * `Authorizer.canViewSurveyOrPublishedTemplate`). Throws when the check fails.
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting to view the source survey.
+ * @param {number} params.sourceSurveyId - Id of the survey to be used as a chain-clone source.
+ * @returns {Promise<void>} Resolves when the user is authorized.
+ * @throws {UnauthorizedError} If the user cannot view the source survey.
+ */
+const _checkCanViewSourceSurveyForClone = async ({ user, sourceSurveyId }) => {
+  const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: sourceSurveyId })
+  if (!Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+}
+
+/**
+ * Fetches the chains of a survey to be offered as clone sources, after checking that the user is
+ * allowed to view that source survey (own survey, membership survey, or published template).
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting the list of chains.
+ * @param {number} params.sourceSurveyId - Id of the source survey to fetch chains from.
+ * @returns {Promise<Array<object>>} The chains belonging to the source survey.
+ * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
+ */
+export const fetchChainsForCloneFromSurvey = async ({ user, sourceSurveyId }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+  return fetchChains({ surveyId: sourceSurveyId })
+}
+
+/**
+ * Fetches the distinct names of the entities holding analysis attributes of a source chain, after
+ * checking that the user is allowed to view the source survey (own survey, membership survey, or
+ * published template). Used to check entity compatibility with a target survey before cloning.
+ * @param {object} params - Parameters.
+ * @param {object} params.user - User requesting the entity names.
+ * @param {number} params.sourceSurveyId - Id of the source survey the chain belongs to.
+ * @param {string} params.sourceChainUuid - Uuid of the source chain to inspect.
+ * @returns {Promise<Array<string>>} Distinct entity names holding analysis attributes of the chain.
+ * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
+ */
+export const fetchChainSourceEntityNames = async ({ user, sourceSurveyId, sourceChainUuid }) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+
+  const sourceSurvey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({
+    surveyId: sourceSurveyId,
+    draft: true,
+    advanced: true,
+    includeAnalysis: true,
+  })
+  const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
+    (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
+  )
+  const entityNames = []
+  sourceAnalysisNodeDefs.forEach((nd) => {
+    const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+    if (parentEntity) {
+      const name = NodeDef.getName(parentEntity)
+      if (!entityNames.includes(name)) entityNames.push(name)
+    }
+  })
+  return entityNames
+}
+
+export const cloneChainFromSurvey = async (
+  { user, surveyId, sourceSurveyId, sourceChainUuid, skipMissingEntityAttributes = false },
+  client = DB.client
+) => {
+  await _checkCanViewSourceSurveyForClone({ user, sourceSurveyId })
+
+  return client.tx(async (tx) => {
     const fetchSurveyFull = (sid) =>
       SurveyManager.fetchSurveyAndNodeDefsBySurveyId(
         { surveyId: sid, draft: true, advanced: true, includeAnalysis: true },
@@ -252,9 +384,7 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
       throw new SystemError('chainNotFound', { chainUuid: sourceChainUuid })
     }
 
-    const sourceAnalysisNodeDefs = Survey.getNodeDefsArray(sourceSurvey).filter(
-      (nd) => NodeDef.isAnalysis(nd) && NodeDef.getChainUuid(nd) === sourceChainUuid
-    )
+    const sourceAnalysisNodeDefs = _getNodeDefsToClone({ sourceSurvey, sourceChainUuid })
 
     // Build map of entity name → nodeDef for the target survey.
     const targetEntityByName = {}
@@ -277,11 +407,18 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
         missingEntityNames.push(parentName)
       }
     }
-    if (missingEntityNames.length > 0) {
+    if (missingEntityNames.length > 0 && !skipMissingEntityAttributes) {
       throw new SystemError('chainView.cloneFromAnotherSurveyDialog.missingEntities', {
         entities: missingEntityNames.join(', '),
       })
     }
+
+    // When skipping, drop analysis attributes whose parent entity is missing in the target survey.
+    const clonableAnalysisNodeDefs = sourceAnalysisNodeDefs.filter((nd) => {
+      const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey)
+      const parentName = NodeDef.getName(parentEntity)
+      return !missingEntityNames.includes(parentName)
+    })
 
     // Create new chain with a new UUID, copying props from source with UUID references sanitized.
     const newChain = {
@@ -302,7 +439,7 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
 
     // Clone analysis node defs, remapping parent entity to target survey and updating chainUuid.
     const usedNames = new Set(Survey.getNodeDefsArray(targetSurvey).map(NodeDef.getName))
-    const clonedNodeDefs = sourceAnalysisNodeDefs.map((nd) => {
+    const clonedNodeDefs = clonableAnalysisNodeDefs.map((nd) => {
       const sourceParentName = NodeDef.getName(Survey.getNodeDefByUuid(NodeDef.getParentUuid(nd))(sourceSurvey))
       const targetParentEntity = targetEntityByName[sourceParentName]
       const uniqueName = UniqueNameGenerator.generateUniqueName({
@@ -317,14 +454,21 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
         ignoreApplicability: false,
         ignoreValidations: false,
       })(nd)
-      return R.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
+      return A.assocPath([NodeDef.keys.propsAdvanced, NodeDef.keysPropsAdvanced.chainUuid], newChainUuid)(cloned)
     })
 
     // Resolve categories/taxonomies referenced by cloned code/taxon analysis attributes:
     // reuse an existing one in the target survey (by uuid or name), or clone it from the source survey.
     const { clonedNodeDefs: resolvedClonedNodeDefs } =
       await NodeDefService.resolveAndCloneNodeDefsCategoriesAndTaxonomies(
-        { user, sourceSurveyId, sourceSurvey, targetSurveyId: surveyId, targetSurvey, clonedNodeDefs },
+        {
+          user,
+          sourceSurveyId,
+          sourceSurvey,
+          targetSurveyId: surveyId,
+          targetSurvey,
+          clonedNodeDefs: _remapAreaBasedEstimatedOf({ sourceNodeDefs: clonableAnalysisNodeDefs, clonedNodeDefs }),
+        },
         tx
       )
 
@@ -341,11 +485,12 @@ export const cloneChainFromSurvey = async ({ user, surveyId, sourceSurveyId, sou
       survey: updatedTargetSurvey,
     })
 
-    await tx.batch([
-      updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
-      markSurveyDraft(surveyId, tx),
+    await DbUtils.runQueries(tx, [
+      () => updateChainValidation({ surveyId, chainUuid: newChainUuid, validation }, tx),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.chainCreate, insertedChain, false, tx),
+      () => markSurveyDraft(surveyId, tx),
     ])
 
     return Chain.assocValidation(validation)(insertedChain)
   })
+}

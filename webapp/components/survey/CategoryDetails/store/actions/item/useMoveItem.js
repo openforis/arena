@@ -46,7 +46,7 @@ const moveItemByOffset = ({ dispatch, state, surveyId, categoryUuid, levelIndex,
     stateUpdated = State.assocItemProp({ levelIndex, itemUuid: uuid, key: indexPropKey, value: index })(stateUpdated)
   }
 
-  sendUpdateIndexesRequest({ dispatch, surveyId, categoryUuid, parentUuid, indexByUuid: updatedIndexByUuid })
+  void sendUpdateIndexesRequest({ dispatch, surveyId, categoryUuid, parentUuid, indexByUuid: updatedIndexByUuid })
 
   return { stateUpdated, updated: true }
 }

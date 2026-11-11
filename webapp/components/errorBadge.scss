@@ -2,29 +2,29 @@
 
 .error-badge {
   display: block;
-  background-color: $red;
-  color: white;
+  background-color: $colorError;
+  color: $colorOnPrimary;
 
   &.warning {
-    background-color: $orange;
+    background-color: $colorWarning;
   }
 }
 
 .error-badge-inverse {
   background-color: transparent;
-  color: $red;
+  color: $colorError;
 
   .icon-warning {
     font-weight: bold;
-    color: $red;
+    color: $colorError;
   }
 
   &.warning {
     background-color: transparent;
-    color: $orange;
+    color: $colorWarning;
 
     .icon-warning {
-      color: $orange;
+      color: $colorWarning;
     }
   }
 }

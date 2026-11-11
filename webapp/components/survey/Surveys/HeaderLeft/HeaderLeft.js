@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -8,6 +8,25 @@ import { Checkbox, TextInput } from '@webapp/components/form'
 import { ButtonDownload } from '@webapp/components/buttons'
 import { useAuthCanExportSurveysList, useUserIsSystemAdmin } from '@webapp/store/user/hooks'
 import { JobActions } from '@webapp/store/app'
+
+const SurveysListExportCloseButton = ({ job }) => {
+  const dispatch = useDispatch()
+  const { outputTempFileName: tempFileName } = job.result
+  const date = DateUtils.nowFormatDefault()
+  const fileName = `arena_surveys_${date}.xlsx`
+  return (
+    <ButtonDownload
+      fileName={fileName}
+      href={API.getSurveyListExportedFileDownloadUrl({ tempFileName })}
+      onClick={() => dispatch(JobActions.hideJobMonitor())}
+      variant="contained"
+    />
+  )
+}
+
+SurveysListExportCloseButton.propTypes = {
+  job: PropTypes.object.isRequired,
+}
 
 const HeaderLeft = (props) => {
   const { count, handleSearch, onlyOwn = false, search, setOnlyOwn = null } = props
@@ -22,19 +41,7 @@ const HeaderLeft = (props) => {
     dispatch(
       JobActions.showJobMonitor({
         job,
-        closeButton: ({ job: jobCompleted }) => {
-          const { outputTempFileName: tempFileName } = jobCompleted.result
-          const date = DateUtils.nowFormatDefault()
-          const fileName = `arena_surveys_${date}.xlsx`
-          return (
-            <ButtonDownload
-              fileName={fileName}
-              href={API.getSurveyListExportedFileDownloadUrl({ tempFileName })}
-              onClick={() => dispatch(JobActions.hideJobMonitor())}
-              variant="contained"
-            />
-          )
-        },
+        closeButton: SurveysListExportCloseButton,
       })
     )
   }, [dispatch])

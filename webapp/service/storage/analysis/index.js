@@ -1,3 +1,1 @@
-import * as AnalysisStorage from './storage'
-
-export { AnalysisStorage }
+export * as AnalysisStorage from './storage'

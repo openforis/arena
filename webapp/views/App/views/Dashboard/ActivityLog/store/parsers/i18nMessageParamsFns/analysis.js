@@ -1,10 +1,10 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-const _getChainLabel = (lang) => R.pipe(ActivityLog.getChainLabels, R.prop(lang))
+const _getChainLabel = (lang) => A.pipe(ActivityLog.getChainLabels, A.prop(lang))
 
 export default {
   // ====== Chain
@@ -28,6 +28,6 @@ export default {
   }),
 
   [ActivityLog.type.chainDelete]: (survey, i18n) => (activityLog) => ({
-    label: R.pipe(ActivityLog.getContentLabels, R.prop(i18n.language))(activityLog),
+    label: A.pipe(ActivityLog.getContentLabels, A.prop(i18n.language))(activityLog),
   }),
 }

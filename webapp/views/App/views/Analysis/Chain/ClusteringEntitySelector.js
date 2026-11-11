@@ -19,10 +19,8 @@ export const ClusteringEntitySelector = () => {
   const survey = useSurvey()
 
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
-  const hierarchy = Survey.getHierarchy(
-    (nodeDef) =>
-      NodeDef.isRoot(nodeDef) || (NodeDef.isMultipleEntity(nodeDef) && NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef))
-  )(survey)
+  const isAncestorOfBaseUnit = (nodeDef) => NodeDef.isAncestorOf(baseUnitNodeDef)(nodeDef)
+  const hierarchy = Survey.getHierarchy((nodeDef) => NodeDef.isRoot(nodeDef) || isAncestorOfBaseUnit(nodeDef))(survey)
   const samplingDesign = Chain.getSamplingDesign(chain)
   const selectedEntityUuid = ChainSamplingDesign.getClusteringNodeDefUuid(samplingDesign)
 
@@ -34,9 +32,10 @@ export const ClusteringEntitySelector = () => {
   }
 
   return (
-    <FormItem label="chainView.clusteringEntity">
+    <FormItem label="chainView.clusteringEntity" info="chainView.clusteringEntityInfo">
       <EntitySelector
         hierarchy={hierarchy}
+        filterFn={isAncestorOfBaseUnit}
         nodeDefUuidEntity={selectedEntityUuid}
         onChange={onChange}
         showSingleEntities={false}

@@ -6,7 +6,7 @@
   padding: 10px;
   border: $profilePictureBorder;
   border-radius: 2px;
-  background-color: $white;
+  background-color: $colorSurface;
 }
 
 .profile-picture-thumbnail {
@@ -14,5 +14,5 @@
   height: 30px;
   padding: 2px;
   border-radius: 100%;
-  border: 1px solid $greyBorder;
+  border: 1px solid $colorOutline;
 }

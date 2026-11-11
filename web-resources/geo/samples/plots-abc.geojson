@@ -1,0 +1,53 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "name": "Sample plot A" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [12.49, 41.88],
+            [12.495, 41.88],
+            [12.495, 41.885],
+            [12.49, 41.885],
+            [12.49, 41.88]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Sample plot B" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [12.5, 41.882],
+            [12.507, 41.882],
+            [12.507, 41.888],
+            [12.5, 41.888],
+            [12.5, 41.882]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": { "name": "Sample plot C" },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [12.492, 41.89],
+            [12.5, 41.89],
+            [12.5, 41.896],
+            [12.492, 41.896],
+            [12.492, 41.89]
+          ]
+        ]
+      }
+    }
+  ]
+}

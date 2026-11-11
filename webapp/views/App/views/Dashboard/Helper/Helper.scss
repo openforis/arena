@@ -12,7 +12,7 @@
 
 .helper__survey_info {
   margin-bottom: 5rem;
-  height: initial !important;
+  height: initial;
 }
 
 .helper__first_time_help__container {
@@ -24,12 +24,12 @@
   }
 
   &.with-background {
-    background: white;
-    border: 1px solid #d1d1dd;
+    background: $colorSurface;
+    border: 1px solid $colorOutline;
 
     .helper__first_time_help-survey-info {
       padding: 1rem 2rem 1rem 1rem;
-      background: #f6f7f9;
+      background: $colorBackground;
       margin: 1rem 0rem;
     }
   }

@@ -1,5 +1,5 @@
 import './NodeDefsSelector.scss'
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
@@ -13,11 +13,13 @@ import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/n
 import { ButtonIconFilter } from '@webapp/components/buttons'
 
 import { useI18n } from '@webapp/store/system'
-import { useChains, useSurvey, useSurveyCycleKey } from '@webapp/store/survey'
+import { useChains, useSurvey, useSurveyCycleKey, useSurveyPreferredLang } from '@webapp/store/survey'
 
 import AttributesSelector from './AttributesSelector'
 import EntitySelector from './EntitySelector'
 import FilterByChain from './FilterByChain'
+import NodeDefsSelectorSearch from './NodeDefsSelectorSearch'
+import { getNodeDefSearchFilterFunction } from './nodeDefsSelectorSearchUtils'
 
 const NodeDefsSelector = (props) => {
   const {
@@ -31,23 +33,24 @@ const NodeDefsSelector = (props) => {
     showAnalysisAttributes = false,
     showAncestors = true,
     showMultipleAttributes = true,
+    showSearch = false,
     showSingleEntities = false,
   } = props
 
   const i18n = useI18n()
   const survey = useSurvey()
   const surveyCycleKey = useSurveyCycleKey()
+  const lang = useSurveyPreferredLang()
   const chains = useChains({ surveyCycleKey })
 
   const [filterTypes, setFilterTypes] = useState([])
   const [filterChainUuids, setFilterChainUuids] = useState([])
   const [showFilter, setShowFilter] = useState(false)
+  const [search, setSearch] = useState('')
 
-  useEffect(() => {
-    if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
-      setFilterChainUuids([])
-    }
-  }, [chains, filterChainUuids, setFilterChainUuids])
+  if ((!chains || chains.length <= 1) && filterChainUuids.length > 0) {
+    setFilterChainUuids([])
+  }
 
   const onAttributesSelection = useCallback(
     ({ attributeDefUuids, selected }) => {
@@ -76,6 +79,8 @@ const NodeDefsSelector = (props) => {
       ),
     []
   )
+
+  const filterFunction = useMemo(() => getNodeDefSearchFilterFunction({ search, lang }), [search, lang])
 
   return (
     <div className="node-defs-selector">
@@ -122,20 +127,24 @@ const NodeDefsSelector = (props) => {
       )}
 
       {nodeDefUuidEntity && (
-        <AttributesSelector
-          nodeDefUuidEntity={nodeDefUuidEntity}
-          nodeDefUuidsAttributes={nodeDefUuidsAttributes}
-          onAttributesSelection={onAttributesSelection}
-          onToggleAttribute={onToggleAttribute}
-          filterTypes={filterTypes}
-          filterChainUuids={filterChainUuids}
-          canSelectAttributes={canSelectAttributes}
-          showAnalysisAttributes={showAnalysisAttributes}
-          showAncestors={showAncestors}
-          showMultipleAttributes={showMultipleAttributes}
-          showSiblingsInSingleEntities
-          nodeDefLabelType={nodeDefLabelType}
-        />
+        <>
+          {showSearch && <NodeDefsSelectorSearch search={search} setSearch={setSearch} />}
+          <AttributesSelector
+            nodeDefUuidEntity={nodeDefUuidEntity}
+            nodeDefUuidsAttributes={nodeDefUuidsAttributes}
+            onAttributesSelection={onAttributesSelection}
+            onToggleAttribute={onToggleAttribute}
+            filterFunction={filterFunction}
+            filterTypes={filterTypes}
+            filterChainUuids={filterChainUuids}
+            canSelectAttributes={canSelectAttributes}
+            showAnalysisAttributes={showAnalysisAttributes}
+            showAncestors={showAncestors}
+            showMultipleAttributes={showMultipleAttributes}
+            showSiblingsInSingleEntities
+            nodeDefLabelType={nodeDefLabelType}
+          />
+        </>
       )}
     </div>
   )
@@ -149,6 +158,7 @@ NodeDefsSelector.propTypes = {
   showAnalysisAttributes: PropTypes.bool,
   showAncestors: PropTypes.bool,
   showMultipleAttributes: PropTypes.bool,
+  showSearch: PropTypes.bool,
   showSingleEntities: PropTypes.bool,
   onChangeAttributes: PropTypes.func,
   onChangeEntity: PropTypes.func,

@@ -42,6 +42,7 @@ export const useSurveyInfoForm = () => {
   const setDefaultCycleKey = (value) => setObjectField(Survey.infoKeys.defaultCycleKey, value)
   const setDescriptions = (descriptions) => setObjectField(Survey.infoKeys.descriptions, descriptions)
   const setFieldManualLinks = (links) => setObjectField(Survey.infoKeys.fieldManualLinks, links)
+  const setKeepNonApplicableValues = (value) => setObjectField(Survey.infoKeys.keepNonApplicableValues, value)
   const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
@@ -56,6 +57,7 @@ export const useSurveyInfoForm = () => {
   const setSrs = (value) => setObjectField(Survey.infoKeys.srs, value)
   const setUserExtraPropDefs = (value) => setObjectField(Survey.infoKeys.userExtraPropDefs, value)
   const setBranding = (value) => setObjectField(Survey.infoKeys.branding, value)
+  const setAreasOfInterest = (value) => setObjectField(Survey.infoKeys.areasOfInterest, value)
 
   const saveProps = () => {
     enableValidation()
@@ -79,6 +81,7 @@ export const useSurveyInfoForm = () => {
     setDefaultCycleKey,
     setDescriptions,
     setFieldManualLinks,
+    setKeepNonApplicableValues,
     setLabels,
     setLanguages,
     setName,
@@ -92,5 +95,6 @@ export const useSurveyInfoForm = () => {
     setSrs,
     setUserExtraPropDefs,
     setBranding,
+    setAreasOfInterest,
   }
 }

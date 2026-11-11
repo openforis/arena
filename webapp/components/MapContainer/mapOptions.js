@@ -7,11 +7,6 @@ const keys = {
   showUtmGrid: 'showUtmGrid',
 }
 
-const isOnlyForSampleBasedImageInterpretation = (key) =>
-  [keys.showControlPoints, keys.showLocationMarkers, keys.showPlotReferencePoint, keys.showSamplingPolygon].includes(
-    key
-  )
-
 const createDefaultOptions = ({ sampleBasedImageInterpretationEnabled = false } = {}) => ({
   [keys.showControlPoints]: sampleBasedImageInterpretationEnabled,
   [keys.showMarkersLabels]: false,
@@ -36,8 +31,6 @@ export const MapOptions = {
   keys,
   // create
   createDefaultOptions,
-  // read
-  isOnlyForSampleBasedImageInterpretation,
   // update
   assocOption,
 }

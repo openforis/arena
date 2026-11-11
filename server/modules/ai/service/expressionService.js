@@ -25,6 +25,7 @@ import * as Log from '@server/log/log'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as ModelClient from './modelClient'
+import { stripFence } from './responseParsers'
 import { buildExpressionGeneratePrompt } from './prompts/expressionGenerate'
 import { buildExpressionExplainPrompt } from './prompts/expressionExplain'
 
@@ -41,19 +42,6 @@ const MAX_ERROR_MESSAGE_LEN = 4000
 
 const EXPRESSION_TAG_RE = /<expression>([\s\S]*?)<\/expression>/i
 const EXPLANATION_TAG_RE = /<explanation>([\s\S]*?)<\/explanation>/i
-const FENCE_RE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
-
-/**
- * Strip a single wrapping triple-backtick code fence if the model decided
- * to add one despite being told not to.
- * @param {string} value - Raw extracted text.
- * @returns {string} Cleaned text.
- */
-const stripFence = (value) => {
-  const trimmed = value.trim()
-  const match = FENCE_RE.exec(trimmed)
-  return (match ? match[1] : trimmed).trim()
-}
 
 /**
  * Parse the model's tagged text response into `{ expression, explanation }`.
@@ -172,7 +160,7 @@ export const generate = async ({ user, surveyId, nodeDefUuid, expressionType, de
  *   The streaming result.
  */
 export const explain = async ({ user, surveyId, nodeDefUuid, expression, errorMessage, signal }) => {
-  if (!expression || !expression.trim()) {
+  if (!expression?.trim()) {
     throw new SystemError('aiExpressionExpressionMissing')
   }
   if (expression.length > MAX_EXPRESSION_LEN) {

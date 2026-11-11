@@ -6,7 +6,7 @@ export const CallEditorDialog = (props) => {
   const { children, functionName, onClose } = props
 
   return (
-    <Modal onClose={onClose} showCloseButton title="nodeDefEdit.editingFunction" titleParams={{ functionName }}>
+    <Modal onClose={onClose} showCloseButton title="nodeDefEdit:editingFunction" titleParams={{ functionName }}>
       <ModalBody>{children}</ModalBody>
     </Modal>
   )

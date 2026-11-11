@@ -31,6 +31,7 @@ import {
 } from './rFile/system'
 import { RFileCommon, RFileCommonEnd } from './rFile/user'
 import { FileChainSummaryJson } from './rFile/fileChainSummaryJson'
+import { getChainDirPath } from './rChainDir'
 
 const FILE_R_PROFILE = FileUtils.join(__dirname, 'rFile', '.Rprofile')
 const FILE_R_STUDIO_PROJECT = FileUtils.join(__dirname, 'rFile', 'r_studio_project.Rproj')
@@ -205,7 +206,12 @@ class RChain {
     const surveyInfo = Survey.getSurveyInfo(this.survey)
     const surveyName = Survey.getName(surveyInfo)
     const chainLabel = Chain.getLabel(Survey.getDefaultLanguage(surveyInfo))(this.chain)
-    this._dir = FileUtils.join(ProcessUtils.ENV.analysisOutputDir, surveyName, chainLabel)
+    this._dir = getChainDirPath({
+      outputDir: ProcessUtils.ENV.analysisOutputDir,
+      surveyName,
+      chainLabel,
+      chainUuid: Chain.getUuid(this.chain),
+    })
     await FileUtils.rmdir(this._dir)
     await FileUtils.mkdir(this._dir)
 
@@ -250,7 +256,7 @@ class RChain {
   async _initNodeDefFile({ nodeDef, index, path }) {
     const parentEntity = Survey.getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(this.survey)
     const entityName = NodeDef.getName(parentEntity)
-    let attributeName = NodeDef.getName(nodeDef)
+    const attributeName = NodeDef.getName(nodeDef)
     const fileIndex = padStart(
       Number((index || index === 0) && !Number.isNaN(index) ? index : NodeDef.getChainIndex(nodeDef)) + 1
     )
@@ -273,10 +279,6 @@ class RChain {
     await rFile.init()
 
     const script = NodeDef.getPropOrDraftAdvanced(NodeDef.keysPropsAdvanced.script)(nodeDef)
-
-    if (NodeDef.isCode(nodeDef)) {
-      attributeName = `${attributeName}_code`
-    }
 
     const content = StringUtils.isBlank(script) ? setVar(dfVar(entityName, attributeName), NA) : script
 
@@ -318,24 +320,25 @@ class RChain {
 
       for (let index = 0; index < samplingDefs.length; index++) {
         const nodeDef = samplingDefs[index]
-        await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath })
+        await this._initNodeDefFile({ nodeDef, index: index - 1, path: samplingPath }) // NOSONAR
       }
 
       const entityPath = this.dirUser
       await FileUtils.mkdir(entityPath)
 
       const nonSamplingDefs = this._analysisNodeDefs.filter((_nodeDef) => !NodeDef.isSampling(_nodeDef))
-      for (const nodeDef of nonSamplingDefs) {
-        await this._initNodeDefFile({ nodeDef, path: entityPath })
+      for (let index = 0; index < nonSamplingDefs.length; index++) {
+        const nodeDef = nonSamplingDefs[index]
+        await this._initNodeDefFile({ nodeDef, index, path: entityPath }) // NOSONAR
         const areaBasedEstimated = Survey.getNodeDefAreaBasedEstimate(nodeDef)(this.survey)
 
         // at this moment we dont like to have the areaBasedEstimated files
         const DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES = false
         if (areaBasedEstimated && DO_WE_LIKE_THE_AREA_BASED_ESTIMATED_FILES) {
-          await this._initNodeDefFile({
+          /* NOSONAR */ await this._initNodeDefFile({
             nodeDef: areaBasedEstimated,
             path: entityPath,
-            index: NodeDef.getChainIndex(nodeDef),
+            index,
           })
         }
       }

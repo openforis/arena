@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -44,7 +44,7 @@ const CategoryLevelVariable = (props) => {
   return (
     <FormItem
       key={levelUuid}
-      label={hierarchicalCategory ? 'nodeDefEdit.filterVariableForLevel' : 'nodeDefEdit.filterVariable'}
+      label={hierarchicalCategory ? 'nodeDefEdit:filterVariableForLevel' : 'nodeDefEdit:filterVariable'}
       labelParams={{ levelName: CategoryLevel.getName(level) }}
     >
       <Dropdown
@@ -136,7 +136,7 @@ export const CallCategoryItemPropEditor = (props) => {
 
   return (
     <div className="function-editor">
-      <FormItem label="nodeDefEdit.codeProps.category">
+      <FormItem label="nodeDefEdit:codeProps.category">
         <CategorySelector
           categoryUuid={categoryUuid}
           filterFunction={Category.hasExtraDefs}

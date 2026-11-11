@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { uuidv4 } from '@core/uuid'
@@ -35,23 +35,24 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
 }
 
 // ====== READ
-export const getSurveyUuid = R.prop(keys.surveyUuid)
+export const getSurveyUuid = A.prop(keys.surveyUuid)
 
 export const { getUuid } = ObjectUtils
-export const isPreview = R.propEq(keys.preview, true)
-export const getOwnerUuid = R.prop(keys.ownerUuid)
-export const getOwnerName = R.prop(keys.ownerName)
-export const getStep = R.prop(keys.step)
+export const isPreview = A.propEq(keys.preview, true)
+export const isReadOnly = A.propEq(keys.readOnly, true)
+export const getOwnerUuid = A.prop(keys.ownerUuid)
+export const getOwnerName = A.prop(keys.ownerName)
+export const getStep = A.prop(keys.step)
 export const isInAnalysisStep = (record) => {
   const stepId = getStep(record)
   const step = RecordStep.getStep(stepId)
   return RecordStep.getName(step) === RecordStep.stepNames.analysis
 }
-export const getCycle = R.prop(keys.cycle)
-export const getMergedIntoRecordUuid = R.prop(keys.mergedIntoRecordUuid)
+export const getCycle = A.prop(keys.cycle)
+export const getMergedIntoRecordUuid = A.prop(keys.mergedIntoRecordUuid)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
-export const getInfo = R.propOr({}, keys.info)
+export const getInfo = A.propOr({}, keys.info)
 export const getCreatedWithAppId = (record) => {
   const info = getInfo(record)
   const createdWith = info[infoKeys.createdWith]
@@ -73,6 +74,7 @@ export const {
   findNodeChildren,
   visitAncestorsAndSelf,
   visitDescendantsAndSelf,
+  findDescendantOrSelf,
 } = RecordReader
 
 // ==== utils
@@ -83,15 +85,17 @@ export const { getDependentNodePointers, getParentCodeAttribute, getDependentCod
 
 // ====== Keys
 export const { getEntityKeyNodes, getEntityKeyValues, findDescendantByKeyValues, findChildByKeyValues } = RecordReader
+export { EntityKeysIndexCache } from './_record/entityKeysIndexCache'
 
 // ====== Unique
 export const { getAttributesUniqueDependent, getAttributesUniqueSibling } = RecordReader
 
 // ====== UPDATE
-export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes } = RecordUpdater
+export const { assocDateModified, assocNodes, assocNode, dissocNodes, mergeNodes, replaceNodes } = RecordUpdater
 export const {
   createRootEntity,
   getOrCreateEntityByKeys,
+  afterNodesUpdate,
   updateNodesDependents,
   updateAttributesInEntityWithValues,
   updateAttributesWithValues,
@@ -100,7 +104,8 @@ export const {
 } = RecordNodesUpdater
 export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
 export const { recomputeUserDependentNodeState } = RecordUserDependentStateUpdater
-export const assocOwnerUuid = R.assoc(keys.ownerUuid)
+export const assocOwnerUuid = A.assoc(keys.ownerUuid)
+export const assocReadOnly = A.assoc(keys.readOnly)
 
 // ====== DELETE
 export const { deleteNode } = RecordUpdater
@@ -110,9 +115,9 @@ export const { mergeNodeValidations } = RecordUpdater
 export const { getValidation } = Validation
 
 // ====== RECORD SUMMARY
-export const getFilesCount = R.prop(keys.filesCount)
-export const getFilesSize = R.prop(keys.filesSize)
-export const getFilesMissing = R.prop(keys.filesMissing)
+export const getFilesCount = A.prop(keys.filesCount)
+export const getFilesSize = A.prop(keys.filesSize)
+export const getFilesMissing = A.prop(keys.filesMissing)
 
-export const getKeysObj = R.propOr({}, keys.keysObj)
-export const getSummaryAttributesObj = R.propOr({}, keys.summaryAttributesObj)
+export const getKeysObj = A.propOr({}, keys.keysObj)
+export const getSummaryAttributesObj = A.propOr({}, keys.summaryAttributesObj)

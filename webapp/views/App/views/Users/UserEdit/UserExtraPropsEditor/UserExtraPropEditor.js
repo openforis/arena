@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as StringUtils from '@core/stringUtils'
@@ -52,7 +52,7 @@ export const UserExtraPropEditor = (props) => {
 
   useEffect(() => {
     if (!editing) return
-    validateExtraProp(editedItem, items).then((val) => {
+    void validateExtraProp(editedItem, items).then((val) => {
       setState((statePrev) => ({ ...statePrev, validation: val }))
     })
   }, [editedItem, editing, items])

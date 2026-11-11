@@ -1,8 +1,7 @@
-import { Dates } from '@openforis/arena-core'
+import { Authorizer, Dates } from '@openforis/arena-core'
 
 import { RecordImportAction } from '@common/dataImport'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
@@ -14,25 +13,34 @@ import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaIm
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
-import { getRecordFormattedKeyValues, findExistingRecordSummary, determineRecordAction } from './recordImportMatcher'
+import {
+  getRecordFormattedKeyValues,
+  findExistingRecordSummary,
+  determineRecordAction,
+} from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
 
 const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
+  mergedSameRecordUuids: 'mergedSameRecordUuids',
 }
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
-    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of the record in which it has been merged
+    this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of a *different* record it has been merged into (duplicate-key case)
+    this.mergedSameRecordUuids = new Set() // uuids of records merged node-by-node with their own existing (same-uuid) server record
   }
 
   async onStart() {
@@ -67,6 +75,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     // import records sequentially
     for (const recordSummary of recordSummaries) {
+      if (this.isCancelRequestedOrNotRunning()) return
+
       const recordUuid = Record.getUuid(recordSummary)
 
       if (selectedRecordsUuids && !selectedRecordsUuids.includes(recordUuid)) {
@@ -76,11 +86,11 @@ export default class RecordsImportJob extends DataImportBaseJob {
         continue
       }
 
-      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid)
+      const record = await ArenaSurveyFileZip.getRecord(arenaSurveyFileZip, recordUuid) // NOSONAR
       this.currentRecord = record
-      await this.cleanupCurrentRecord()
+      await this.cleanupCurrentRecord() // NOSONAR
 
-      await this.insertOrSkipRecord()
+      await this.insertOrSkipRecord() // NOSONAR
 
       this.incrementProcessedItems()
     }
@@ -115,14 +125,13 @@ export default class RecordsImportJob extends DataImportBaseJob {
     const ownerSource = await UserService.fetchUserByUuid(ownerUuidSource, tx)
     record[Record.keys.ownerUuid] = ownerSource ? ownerUuidSource : User.getUuid(user)
 
-    // remove invalid nodes and build index from scratch
-    delete record['_nodesIndex']
+    // remove invalid nodes
     const nodes = Record.getNodes(record)
 
     for (const [nodeUuid, node] of Object.entries(nodes)) {
       const nodeDefUuid = Node.getNodeDefUuid(node)
       const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
-      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef })
+      const { valid, error, warn } = await checkNodeIsValid({ survey, nodes, node, nodeDef }) // NOSONAR
       if (valid) {
         // ensure recordUuid is set in node
         node[Node.keys.recordUuid] = recordUuid
@@ -144,8 +153,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
         }
       }
     }
-    // assoc nodes and build index from scratch
-    this.currentRecord = Record.assocNodes({ nodes, sideEffect: true })(record)
+    // build index from scratch, with only the valid nodes
+    this.currentRecord = Record.replaceNodes(nodes)(record)
   }
 
   async insertOrSkipRecord() {
@@ -154,13 +163,14 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     const recordUuid = Record.getUuid(record)
 
-    const existingRecordSummary = findExistingRecordSummary({
+    const existingRecordSummary = await findExistingRecordSummary({
       survey,
       record,
       existingRecordsSummary,
       conflictResolutionStrategy,
     })
-    const { action, existingRecordUuid } = determineRecordAction({
+    const { action, existingRecordUuid } = await determineRecordAction({
+      survey,
       record,
       existingRecordSummary,
       conflictResolutionStrategy,
@@ -172,10 +182,10 @@ export default class RecordsImportJob extends DataImportBaseJob {
         this.logDebug(`record ${recordUuid} skipped; it already exists`)
         break
       case RecordImportAction.overwrite:
-        await this.mergeWithExistingRecord()
+        await this.mergeWithExistingRecord({ merge: false })
         break
       case RecordImportAction.merge:
-        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid })
+        await this.mergeWithExistingRecord({ targetRecordUuid: existingRecordUuid, merge: true })
         break
       case RecordImportAction.insert:
       default:
@@ -183,14 +193,19 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
   }
 
-  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null } = {}) {
+  async recordMatchesUserGroupQualifiers(record) {
+    const { context, tx, user } = this
+    const { survey } = context
+    this.userQualifierFilters ??= await SurveyManager.fetchUserQualifierFilters({ user, survey }, tx)
+    return RecordManager.recordMatchesQualifierFilters({ survey, record, qualifierFilters: this.userQualifierFilters })
+  }
+
+  async mergeWithExistingRecord({ targetRecordUuid: targetRecordUuidParam = null, merge = false } = {}) {
     const { context, currentRecord: record, tx, user } = this
     const { survey, surveyId } = context
 
     const recordUuid = Record.getUuid(record)
     const targetRecordUuid = targetRecordUuidParam ?? recordUuid
-
-    const merge = targetRecordUuid !== recordUuid
 
     this.logDebug(
       merge ? `merging record ${recordUuid} into existing record ${targetRecordUuid}` : `updating record ${recordUuid}`
@@ -202,11 +217,23 @@ export default class RecordsImportJob extends DataImportBaseJob {
     )
     // check can update record
     if (!Authorizer.canEditRecord(user, recordTarget)) {
-      const recordKeyValues = getRecordFormattedKeyValues({ survey, record: recordTarget })
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
       throw new SystemError('dataImport.recordOwnedByAnotherUser', { recordUuid, recordKeyValues })
     }
+    // records of other user groups (e.g. downloaded read-only) cannot be updated
+    if (!(await this.recordMatchesUserGroupQualifiers(recordTarget))) {
+      const recordKeyValues = await getRecordFormattedKeyValues({ survey, record: recordTarget })
+      throw new SystemError('dataImport.recordOfAnotherUserGroup', { recordUuid, recordKeyValues })
+    }
 
-    const recordUpdateParams = { survey, categoryItemProvider, taxonProvider, recordSource: record, sideEffect: true }
+    const recordUpdateParams = {
+      survey,
+      categoryItemProvider,
+      taxonProvider,
+      areaOfInterestProvider,
+      recordSource: record,
+      sideEffect: true,
+    }
     const { record: recordTargetUpdated, nodes: nodesUpdated } = merge
       ? await Record.mergeRecords(recordUpdateParams)(recordTarget)
       : await Record.replaceUpdatedNodes(recordUpdateParams)(recordTarget)
@@ -215,7 +242,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.trackFileUuids({ nodes: nodesUpdated })
 
     const recordSourceDateModified = Record.getDateModified(record)
-    const recordTargetDateModified = Record.getDateCreated(recordTarget)
+    const recordTargetDateModified = Record.getDateModified(recordTarget)
     const dateModified =
       merge && Dates.isAfter(recordTargetDateModified, recordSourceDateModified)
         ? recordTargetDateModified
@@ -224,7 +251,15 @@ export default class RecordsImportJob extends DataImportBaseJob {
 
     this.updatedRecordsUuids.add(targetRecordUuid)
     if (merge) {
-      this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      if (targetRecordUuid !== recordUuid) {
+        // duplicate-key merge into a *different* existing record: track the uuid mapping (used by clients to
+        // reconcile their local copy of the now-superseded record)
+        this.mergedRecordsMap[recordUuid] = targetRecordUuid
+      } else {
+        // same-uuid merge: the record was reconciled with its own newer server copy, not superseded by another
+        // record, so it must not be flagged via mergedRecordsMap (clients treat that as "hide this record")
+        this.mergedSameRecordUuids.add(recordUuid)
+      }
     }
     this.logDebug(`record update complete (${Object.values(nodesUpdated).length} nodes modified)`)
   }
@@ -283,6 +318,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
   generateResult() {
     const result = super.generateResult()
     result[resultKeys.mergedRecordsMap] = this.mergedRecordsMap
+    result[resultKeys.mergedSameRecordUuids] = Array.from(this.mergedSameRecordUuids)
     return result
   }
 }

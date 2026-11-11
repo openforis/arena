@@ -11,6 +11,8 @@ import * as NodeDef from '@core/survey/nodeDef'
 import { userDependentFunctionNames } from '@core/expressionParser/helpers/functions'
 import * as DbUtils from '@server/db/dbUtils'
 
+import { checkNodeDef, checkNodeDefProps, checkNodeDefType } from './nodeDefWriteCheck'
+
 const { getSchemaSurvey } = Schemata
 
 const dbTransformCallback = ({ row, draft, advanced = false, backup = false }) =>
@@ -22,8 +24,9 @@ const nodeDefSelectFields = `id, uuid, parent_uuid, type, deleted, analysis, vir
 
 // ============== CREATE
 
-export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
-  client.one(
+export const insertNodeDef = async (surveyId, nodeDef, client = DB) => {
+  checkNodeDef(nodeDef)
+  return client.one(
     `
     INSERT INTO ${getSchemaSurvey(surveyId)}.node_def 
       (parent_uuid, uuid, type, props_draft, props_advanced_draft, meta, analysis, virtual)
@@ -41,8 +44,12 @@ export const insertNodeDef = async (surveyId, nodeDef, client = DB) =>
     ],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when creating or updating a nodeDef
   )
+}
 
 export const insertNodeDefsBatch = async ({ surveyId, nodeDefs, backup = false }, client = DB) => {
+  for (const nodeDef of nodeDefs) {
+    checkNodeDef(nodeDef)
+  }
   const schema = getSchemaSurvey(surveyId)
   // Build values and query for batch insert with RETURNING *
   const columns = [
@@ -107,6 +114,19 @@ export const countNodeDefsBySurveyId = async ({ surveyId, draft = true }, client
     ${!draft ? " AND props <> '{}'::jsonb" : ''}`,
     {},
     (row) => Number(row.count)
+  )
+
+// Lightweight alternative to fetchNodeDefsBySurveyId when only the uuids of file node defs are needed
+// (e.g. to check for missing files), avoiding fetching and transforming full node def rows.
+export const fetchFileNodeDefUuidsBySurveyId = async ({ surveyId }, client = DB) =>
+  client.map(
+    `
+    SELECT uuid
+    FROM ${getSchemaSurvey(surveyId)}.node_def
+    WHERE type = $/type/
+    AND NOT deleted`,
+    { type: NodeDef.nodeDefType.file },
+    (row) => row.uuid
   )
 
 // Cheap survey-level check for whether any node def expression references a function whose
@@ -190,8 +210,9 @@ const fetchAreaBasedEstimateNodeDefsOf = async (surveyId, nodeDefUuid, draft, cl
 export const updateNodeDefProps = async (
   { surveyId, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, meta = {} },
   client = DB
-) =>
-  client.one(
+) => {
+  checkNodeDefProps(props)
+  return client.one(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def 
     SET props_draft = props_draft || $1::jsonb,
@@ -205,12 +226,17 @@ export const updateNodeDefProps = async (
     [props, propsAdvanced, parentUuid, meta, nodeDefUuid],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
+}
 
-export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) =>
-  client.tx(async (tx) => {
+export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client = DB) => {
+  for (const { props } of nodeDefs) {
+    checkNodeDefProps(props)
+  }
+  return client.tx(async (tx) => {
     const schema = getSchemaSurvey(surveyId)
-    const nodeDefsUpdated = await tx.batch(
-      nodeDefs.map(async (nodeDef) => {
+    const nodeDefsUpdated = await DbUtils.runQueries(
+      tx,
+      nodeDefs.map((nodeDef) => async () => {
         const { nodeDefUuid, props = {}, propsAdvanced = {} } = nodeDef
         return tx.one(
           `
@@ -229,12 +255,23 @@ export const updateNodeDefPropsInBatch = async ({ surveyId, nodeDefs }, client =
     )
     return nodeDefsUpdated
   })
+}
+
+export const updateNodeDefType = async ({ surveyId, nodeDefUuid, type }, client = DB) => {
+  checkNodeDefType(type)
+  return client.none(
+    `UPDATE ${getSchemaSurvey(surveyId)}.node_def SET type = $1, date_modified = ${DbUtils.now} WHERE uuid = $2`,
+    [type, nodeDefUuid]
+  )
+}
 
 export const updateNodeDefTypeAndProps = async (
   { surveyId, nodeDefUuid, type, props = {}, propsAdvanced = {} },
   client = DB
-) =>
-  client.one(
+) => {
+  checkNodeDefType(type)
+  checkNodeDefProps(props)
+  return client.one(
     `
       UPDATE ${getSchemaSurvey(surveyId)}.node_def 
       SET 
@@ -248,21 +285,24 @@ export const updateNodeDefTypeAndProps = async (
     [type, props, propsAdvanced, nodeDefUuid],
     (row) => dbTransformCallback({ row, draft: true, advanced: true }) // Always loading draft when updating a nodeDef
   )
+}
 
 // CYCLES
 
 const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
-  const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
+  // every new cycle gets a copy of the layout of the start cycle
+  const layoutCycleStartPath = `(props || props_draft) #> $/layoutCycleStartPath/::text[]`
   await client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles
-      .map((c) => `'${c}', ${layoutCycleStartPath}`)
-      .join(', ')}), TRUE)
+    SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || COALESCE(
+      (SELECT jsonb_object_agg(cycle_key, ${layoutCycleStartPath}) FROM unnest($/cycles/::text[]) AS cycle_key),
+      '{}'::jsonb
+    ), TRUE)
     WHERE ${layoutCycleStartPath} IS NOT NULL
-    ${nodeDefUuid ? ' AND uuid = $1' : ''} 
+    ${nodeDefUuid ? ' AND uuid = $/nodeDefUuid/' : ''} 
   `,
-    [nodeDefUuid]
+    { layoutCycleStartPath: [NodeDef.propKeys.layout, cycleStart], cycles, nodeDefUuid }
   )
 }
 
@@ -284,23 +324,22 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
   client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles
-      .map((c) => `- '${c}'`)
-      .join(' ')})
+    SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') - $/cycles/::text[])
     WHERE (props || props_draft) -> 'layout' IS NOT NULL
-    ${nodeDefUuid ? ' AND uuid = $1' : ''}
+    ${nodeDefUuid ? ' AND uuid = $/nodeDefUuid/' : ''}
   `,
-    [nodeDefUuid]
+    { cycles, nodeDefUuid }
   )
 
 export const deleteNodeDefsCycles = async (surveyId, cycles, client = DB) => {
   // Delete cycles from props
-  await client.query(`
+  await client.query(
+    `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') ${cycles
-      .map((c) => `- '${c}'`)
-      .join(' ')})
-  `)
+    SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') - $/cycles/::text[])
+  `,
+    { cycles }
+  )
   // Delete cycles layouts
   await deleteNodeDefsCyclesLayout(surveyId, null, cycles, client)
 }
@@ -354,15 +393,17 @@ export const markNodeDefDeleted = async (surveyId, nodeDefUuid, client = DB) => 
   )
 
   const childNodeDefs = await fetchNodeDefsByParentUuid(surveyId, nodeDefUuid, true, client)
-  await Promise.all(
-    childNodeDefs.map(async (childNodeDef) => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client))
+  await DbUtils.runQueries(
+    client,
+    childNodeDefs.map((childNodeDef) => async () => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client))
   )
 
   const relatedNodeDefsToDelete = await fetchAreaBasedEstimateNodeDefsOf(surveyId, nodeDefUuid, true, client)
 
-  await Promise.all(
-    relatedNodeDefsToDelete.map(async (childNodeDef) =>
-      markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
+  await DbUtils.runQueries(
+    client,
+    relatedNodeDefsToDelete.map(
+      (childNodeDef) => async () => markNodeDefDeleted(surveyId, NodeDef.getUuid(childNodeDef), client)
     )
   )
 
@@ -404,10 +445,13 @@ export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   `)
 
 const _deleteNodeDefsProp = async (surveyId, deletePath, client = DB) =>
-  client.none(`
-    UPDATE ${getSchemaSurvey(surveyId)}.node_def 
-    SET props = props #- '{${deletePath.join(',')}}'
-  `)
+  client.none(
+    `
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
+    SET props = props #- $/deletePath/::text[]
+  `,
+    { deletePath }
+  )
 
 export const deleteNodeDefsLabels = async (surveyId, langCode, client = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
@@ -417,16 +461,18 @@ export const deleteNodeDefsDescriptions = async (surveyId, langCode, client = DB
 
 export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = DB) => {
   const schema = getSchemaSurvey(surveyId)
+  // one "#-" operator per language, with the path passed as a parameter
+  const params = DbUtils.newQueryParams()
+  const deleteMessagesOperators = langs.map((lang) => `#- ${params.add(['messages', lang])}::text[]`).join(' ')
 
-  await client.query(`
+  await client.query(
+    `
     WITH
       expressions AS
       (
         SELECT
           n.uuid,
-          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${langs
-            .map((l) => `#- '{messages, ${l}}'`)
-            .join(' ')} AS expr
+          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${deleteMessagesOperators} AS expr
         FROM
           ${schema}.node_def n
       ),
@@ -452,7 +498,9 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
       expressions_agg e
     WHERE
       e.uuid = n.uuid
-  `)
+  `,
+    params.values
+  )
 }
 
 /**

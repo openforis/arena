@@ -2,12 +2,12 @@
 
 .clone-from-survey-dialog {
   &__message {
-    color: var(--text-color);
+    color: $colorOnSurface;
     font-size: 0.85rem;
     padding: 0.25rem 0.1rem;
 
     &.error {
-      color: $red;
+      color: $colorError;
     }
   }
 }

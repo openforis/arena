@@ -7,10 +7,10 @@
   }
 
   .dropdown {
-    background-color: white;
+    background-color: $colorSurface;
 
     &:focus-within {
-      background-color: $blueLightFocus;
+      background-color: $colorPrimaryContainerLow;
     }
   }
 }

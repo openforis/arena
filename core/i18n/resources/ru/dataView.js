@@ -8,6 +8,11 @@ export default {
 ожидается максимум {{maxItems}} элементов.
 Пожалуйста, уточните ваш запрос (например, добавьте фильтр), чтобы уменьшить количество элементов.
 `,
+      sampleRandomOnly:
+        'Отображается случайная выборка из {{sampleSize}} элементов (всего {{totalCount}}); выбросов не обнаружено.',
+      sampleWithOutliers:
+        'Отображается {{sampleSize}} из {{totalCount}} элементов: {{outliersCount}} выбросов и случайная выборка из {{randomCount}} остальных элементов.',
+      sampleOutliersOnly: 'Отображаются {{sampleSize}} наиболее экстремальных выбросов из {{totalCount}} элементов.',
     },
     type: {
       area: 'Диаграмма с областями',
@@ -18,6 +23,23 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Агрегатные функции {{name}}',
+    ai: {
+      button: 'Спросить ИИ',
+      buttonTitle: 'Сформировать запрос по описанию с помощью ИИ',
+      title: 'Сформировать запрос с помощью ИИ',
+      hint: 'Опишите данные, которые вы хотите увидеть; ИИ выберет сущность, атрибуты (или измерения и меры), фильтр и сортировку. Затем вы сможете проверить сформированный запрос и сохранить его в диспетчере запросов.',
+      placeholder: 'например, количество деревьев по породам',
+      generate: 'Сформировать',
+      generating: 'Формирование…',
+      replaceQueryConfirmMessage: 'Заменить текущий запрос сформированным?',
+      suggestSummary: 'Предложить название и описание',
+      suggestSummaryFailed: 'Не удалось предложить название и описание запроса: {{message}}',
+      suggestSummaryTitle: 'Использовать ИИ, чтобы предложить имя, метку и описание запроса на основе текущего выбора',
+      generatedSuccessfully:
+        'Запрос сформирован: {{explanation}} Проверьте результат и сохраните запрос, если он вам нужен.',
+    },
+    customAggregateFunctions: 'Пользовательские агрегатные функции…',
     deleteConfirmMessage: 'Удалить запрос "{{name}}"?',
     displayType: {
       chart: 'Диаграмма',
@@ -25,18 +47,31 @@ export default {
     },
     manageQueries: 'Управление запросами',
     mode: {
-      label: 'Режим:',
       aggregate: 'Агрегировать',
       raw: 'Исходные данные',
       rawEdit: 'Редактировать исходные данные',
     },
     replaceQueryConfirmMessage: 'Заменить текущий запрос выбранным?',
     showCodes: 'Показать коды',
+    showTotalAndPercentage: 'Показать итог и процент',
+    total: 'Итого',
+    viewOptions: 'Вид',
   },
   editSelectedRecord: 'Редактировать выбранную запись',
   filterAttributeTypes: 'Фильтр типов атрибутов',
+  filterAttributes: 'Фильтр атрибутов',
+  filterMessages: 'Фильтр сообщений',
+  messageTypeFilter: {
+    valueRequired: 'Требуемое значение',
+    valueInvalid: 'Неверное значение',
+    uniqueDuplicate: 'Дублирующее значение',
+    customValidation: 'Пользовательская проверка',
+    entityKeyDuplicate: 'Дублирующийся ключ сущности',
+    recordKeyDuplicate: 'Дубликат ключа записи',
+    nodesCount: 'Количество узлов',
+  },
   filterRecords: {
-    buttonTitle: 'Фильтр',
+    buttonTitle: 'Фильтр записей',
     expressionEditorHeader: 'Выражение для фильтрации записей',
   },
   invalidRecord: 'Неверная запись',
@@ -44,11 +79,14 @@ export default {
     hide: 'Скрыть селектор определений узлов',
     show: 'Показать селектор определений узлов',
     nodeDefFrequency: `{{nodeDefLabel}} (частота)`,
+    searchPlaceholder: 'Поиск переменной по названию',
   },
   records: {
     clone: 'Клонировать',
     confirmDeleteRecord: `Удалить запись "{{keyValues}}"?`,
     confirmDeleteSelectedRecord_one: `Удалить выбранную запись?`,
+    confirmDeleteSelectedRecord_few: 'Удалить выбранные {{count}} записи?',
+    confirmDeleteSelectedRecord_many: 'Удалить выбранные {{count}} записей?',
     confirmDeleteSelectedRecord_other: `Удалить выбранные {{count}} записей?`,
     confirmMergeSelectedRecords: `### Объединить выбранные записи в одну?
 
@@ -69,6 +107,7 @@ export default {
     exportList: 'Экспортировать список',
     exportData: 'Экспортировать данные',
     exportDataSummary: 'Экспортировать сводку данных',
+    exportSelectedRecordsArenaFormat: 'Экспортировать выбранные записи (формат Arena)',
     exportRecordDocx: 'Экспорт записи (Word)',
     filterPlaceholder: 'Фильтровать по ключам или владельцу',
     merge: {
@@ -113,6 +152,8 @@ export default {
     },
   },
   recordDeleted_one: `Запись успешно удалена!`,
+  recordDeleted_few: '{{count}} записи успешно удалены!',
+  recordDeleted_many: '{{count}} записей успешно удалено!',
   recordDeleted_other: `{{count}} записей успешно удалено!`,
   recordsSource: {
     label: 'Источник',
@@ -131,9 +172,43 @@ export default {
       allRecords: 'Все записи',
       filteredRecords: 'Только отфильтрованные записи',
       selectedRecord: 'Только выбранная запись',
+      selectedRecord_few: 'Только выбранные {{count}} записи',
+      selectedRecord_many: 'Только выбранные {{count}} записей',
       selectedRecord_other: 'Только выбранные {{count}} записей',
     },
     title: 'Экспорт данных',
+  },
+  dataMatrixExport: {
+    intro: `Экспорт данных **{{entity}}** в виде таблицы:
+
+- одна **строка** для каждого отдельного значения атрибутов строк (например, для каждого вида и яруса);
+- один **столбец** для каждой записи, названный по её ключу ({{keys}});
+- в ячейках — значение атрибута значения (например, покрытие).
+
+Этот формат используют инструменты анализа растительности, такие как Turboveg, Juice и Synbiosys.`,
+    layout: {
+      dataMatrix: 'Матрица данных',
+      info: 'Таблица: строки и столбцы, как в Обозревателе данных. Матрица данных: одна строка на вид (или другой атрибут) и один столбец на запись, как требуют инструменты анализа растительности, например Turboveg.',
+      label: 'Экспортировать как',
+      table: 'Таблица',
+    },
+    preview: 'Предпросмотр',
+    previewRecord: '{{keys}} записи {{number}}',
+    recordKeys: 'Ключевые атрибуты для названий столбцов записей',
+    recordKeysInfo:
+      'Каждая запись становится столбцом, названным по значениям выбранных ключевых атрибутов (например, только номер участка). По умолчанию используются ключевые атрибуты, выбранные в Обозревателе данных, или все, если ни один не выбран. Нужен хотя бы один.',
+    recordsAll:
+      'Экспортируются данные всех записей: задайте фильтр в Обозревателе данных, чтобы экспортировать только некоторые из них.',
+    recordsFiltered: 'Экспортируются только данные, соответствующие текущему фильтру Обозревателя данных.',
+    rowAttribute: 'Строки (имя атрибута таксона, например, вид)',
+    rowAttributeInfo:
+      'Каждое отдельное значение этого атрибута становится строкой таблицы. Атрибуты таксона экспортируются с научным названием, потому что все таксоны не из списка имеют один и тот же код.',
+    secondRowAttribute: 'Второй атрибут строки, необязательно (например, ярус)',
+    secondRowAttributeInfo:
+      'Используйте, когда один и тот же вид может встречаться в записи несколько раз (например, в разных ярусах): каждая комбинация становится отдельной строкой.',
+    valueAttribute: 'Значения (например, покрытие)',
+    valueAttributeInfo:
+      'Значение, отображаемое в ячейках. Атрибуты кода экспортируются с кодом, а не с меткой. Если строка встречается в записи несколько раз с разными значениями, ячейка содержит их все.',
   },
   dataVis: {
     errorLoadingData: 'Ошибка загрузки данных',
@@ -144,16 +219,17 @@ export default {
   viewSelectedRecord: 'Просмотреть выбранную запись',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Области интереса',
       baseLayers: 'Базовые слои',
       inputData: 'Входные данные',
       preloadedLayers: 'Предзагруженные слои',
       samplingPointData: 'Данные точек выборки',
     },
     layersPanel: {
-      hidePanel: 'Скрыть панель',
-      showPanel: 'Показать панель',
       markers: '{{count}} маркеров',
       markers_one: '{{count}} маркер',
+      markers_few: '{{count}} маркера',
+      markers_many: '{{count}} маркеров',
       markers_other: '{{count}} маркеров',
     },
   },

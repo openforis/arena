@@ -36,23 +36,23 @@
     -webkit-appearance: none;
     height: 8px;
     border-radius: 4px;
-    background: $blueLight;
+    background: $colorPrimaryContainer;
     outline: none;
     opacity: 0.7;
 
     &:focus {
-      background-color: $blueLight;
+      background-color: $colorPrimaryContainer;
     }
 
     &:disabled {
-      background: rgba($blueLight, 0.5);
+      background: with-alpha($colorPrimaryContainer, 0.5);
 
       &::-webkit-slider-thumb {
-        background: rgba($blue, 0.3);
+        background: with-alpha($colorPrimary, 0.3);
       }
 
       &::-moz-range-thumb {
-        background: rgba($blue, 0.3);
+        background: with-alpha($colorPrimary, 0.3);
       }
     }
 
@@ -62,14 +62,14 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: $blue;
+      background: $colorPrimary;
     }
 
     &::-moz-range-thumb {
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: $blue;
+      background: $colorPrimary;
     }
 
     &::-moz-focus-outer {

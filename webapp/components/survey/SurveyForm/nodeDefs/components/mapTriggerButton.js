@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useSelector } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -61,7 +61,6 @@ export const MapTriggerButton = (props) => {
           markerPoint={mapMarkerPoint}
           markerTitle={mapMarkerTitle}
           onMarkerPointChange={onMapMarkerPointChange}
-          showOptions={false}
         />
       </PanelRight>
     ) : null

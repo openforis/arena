@@ -1,18 +1,15 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects, Validation as ArenaValidation } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { ValidatorErrorKeys } from './validatorErrorKeys'
 import * as ValidatorNameKeywords from './validatorNameKeywords'
 
 export type ValidatorResult =
-  | { key: string; params?: Record<string, unknown> }
-  | string
-  | ArenaValidation
-  | null
-  | undefined
+  { key: string; params?: Record<string, unknown> } | string | ArenaValidation | null | undefined
 
 export type ValidatorFn = (propName: string, obj: unknown) => ValidatorResult | Promise<ValidatorResult>
 
@@ -21,19 +18,41 @@ export type ValidatorFn = (propName: string, obj: unknown) => ValidatorResult | 
  */
 const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
-const validEmailRegex =
-  /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+// characters allowed in names (the full format is checked by validateName)
+const nameCharsRegex = /^[a-z0-9_]*$/
+
+/**
+ * Returns true if the name contains only the characters allowed in names (lowercase letters, numbers and "_"),
+ * without checking the full name format (e.g. the first letter or the length).
+ * @param name - The name to check.
+ * @returns True if the name contains only characters allowed in names.
+ */
+export const isNameCharsValid = (name: unknown): boolean => typeof name === 'string' && nameCharsRegex.test(name)
+
+// Email local part and domain are validated separately to keep each regex simple
+const validEmailLocalPartRegex = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*|".+")$/
+const validEmailDomainRegex = /^(\[\d{1,3}(\.\d{1,3}){3}]|([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/
+
+const isEmailFormatValid = (email: string): boolean => {
+  // the domain cannot contain '@', so the local part ends at the last one
+  const atIndex = email.lastIndexOf('@')
+  return (
+    atIndex >= 0 &&
+    validEmailLocalPartRegex.test(email.substring(0, atIndex)) &&
+    validEmailDomainRegex.test(email.substring(atIndex + 1))
+  )
+}
 
 export const getProp =
   (propName: string, defaultValue: unknown = null) =>
   (obj: unknown): unknown =>
-    R.pathOr(defaultValue, propName.split('.'))(obj as Record<string, unknown>)
+    A.pathOr(defaultValue, propName.split('.'))(obj as Record<string, unknown>)
 
 export const validateRequired =
   (errorKey: string): ValidatorFn =>
   (propName, obj) => {
-    const value = R.pipe(getProp(propName), R.defaultTo(''))(obj)
-    return R.isEmpty(value as string) ? { key: errorKey } : null
+    const value = A.pipe(getProp(propName), A.defaultTo(''))(obj)
+    return A.isEmpty(value as string) ? { key: errorKey } : null
   }
 
 export const validateItemPropUniqueness =
@@ -42,7 +61,7 @@ export const validateItemPropUniqueness =
   (propName, item: Record<string, unknown>) => {
     const hasDuplicates =
       items &&
-      R.any(
+      A.any(
         (i: Record<string, unknown>) =>
           !ObjectUtils.isEqual(i)(item) && getProp(propName)(i) === getProp(propName)(item),
         items
@@ -70,14 +89,11 @@ export const validateNumber =
   (propName, item) => {
     const value = getProp(propName)(item)
 
-    return value && isNaN(value as number) ? { key: errorKey, params: errorParams } : null
+    return value && Number.isNaN(NumberUtils.toNumber(value)) ? { key: errorKey, params: errorParams } : null
   }
 
-export const validatePositiveNumber = (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
-  validatePositiveOrZeroNumber(errorKey, errorParams, false)
-
 export const validatePositiveOrZeroNumber =
-  (errorKey: string, errorParams: Record<string, unknown> = {}, allowZero = true): ValidatorFn =>
+  (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
   (propName, item) => {
     const validateNumberResult = validateNumber(errorKey, errorParams)(propName, item)
     if (validateNumberResult) {
@@ -86,21 +102,21 @@ export const validatePositiveOrZeroNumber =
 
     const value = getProp(propName)(item) as number
 
-    return value && (allowZero ? value < 0 : value <= 0) ? { key: errorKey, params: errorParams } : null
+    return value && value < 0 ? { key: errorKey, params: errorParams } : null
   }
 
 export const isEmailValueValid = (email: unknown): boolean =>
-  Objects.isEmpty(email) || validEmailRegex.test(email as string)
+  Objects.isEmpty(email) || isEmailFormatValid(String(email as string))
 
 export const validateEmail =
-  ({ errorKey }: { errorKey: string } = { errorKey: ValidatorErrorKeys.invalidEmail }): ValidatorFn =>
+  ({ errorKey = ValidatorErrorKeys.invalidEmail }: { errorKey?: string } = {}): ValidatorFn =>
   (propName, item) => {
     const email = getProp(propName)(item)
     return isEmailValueValid(email) ? null : { key: errorKey }
   }
 
 export const validateEmails =
-  ({ errorKey }: { errorKey: string } = { errorKey: ValidatorErrorKeys.invalidEmail }): ValidatorFn =>
+  ({ errorKey = ValidatorErrorKeys.invalidEmail }: { errorKey?: string } = {}): ValidatorFn =>
   (propName, item) => {
     const emails = getProp(propName, [])(item) as unknown[]
     const hasErrors = emails.some((email) => !isEmailValueValid(email))

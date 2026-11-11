@@ -1,4 +1,5 @@
 import * as A from '@core/arena'
+import { SortOrder } from '@core/sortOrder'
 
 const keys = {
   label: 'label',
@@ -6,10 +7,7 @@ const keys = {
   variable: 'variable',
 }
 
-export const orders = {
-  asc: 'asc',
-  desc: 'desc',
-}
+export const orders = SortOrder
 
 export const create = () => ({
   [keys.label]: null,

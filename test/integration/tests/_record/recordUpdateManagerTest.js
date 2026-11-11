@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { db } from '@server/db/db'
 
@@ -42,10 +42,9 @@ export const recordCreationTest = async () => {
 
   const reloadedRecord = await RecordManager.fetchRecordByUuid(surveyId, Record.getUuid(record))
 
-  /* eslint-disable no-unused-expressions */
   expect(reloadedRecord).toBeDefined()
 
-  expect(R.isEmpty(nodes)).toBe(false)
+  expect(A.isEmpty(nodes)).toBe(false)
 }
 
 export const defaultValueAppliedTest = async () => {
@@ -72,7 +71,7 @@ export const defaultValueAppliedTest = async () => {
 
     const nodes = Record.getNodeChildrenByDefUuid(root, NodeDef.getUuid(nodeDef))(record)
 
-    const reloadedNode = R.head(nodes)
+    const reloadedNode = A.head(nodes)
 
     // Compare value with default value
     expect(Node.getValue(reloadedNode)).toBe('default value 2')

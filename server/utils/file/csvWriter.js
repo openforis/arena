@@ -34,7 +34,7 @@ export const writeItemsToStream = ({
     transform.on('error', reject)
     outputStream.on('error', reject)
     transform.on('finish', () => {
-      outputCompletePromise.then(resolve)
+      outputCompletePromise.then(resolve, reject)
     })
 
     for (const row of items) {

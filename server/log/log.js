@@ -1,4 +1,11 @@
+import path from 'node:path'
 import log4js from 'log4js'
+import { ProcessEnv } from '@openforis/arena-server'
+
+// same file name used by arena-server (LOG_FILE_NAME), whose poller uploads it to S3
+export const LOG_FILE_NAME = 'arena.log'
+
+export const getLogFilePath = () => path.join(path.resolve(ProcessEnv.logFolder), LOG_FILE_NAME)
 
 const logger = log4js.getLogger('arena')
 
@@ -8,13 +15,19 @@ const layout = process.stdout.isTTY ? { type: 'colored' } : { type: 'basic' }
 log4js.configure({
   appenders: {
     console: { type: 'console', layout },
-    // { file: { type: 'file', filename: 'arena.log' }
+    // keep the file appender configured by arena-server: log4js.configure replaces the whole configuration
+    file: {
+      type: 'file',
+      filename: getLogFilePath(),
+      maxLogSize: ProcessEnv.logMaxSizeBytes,
+      backups: 5,
+      compress: true,
+    },
   },
   categories: {
     default: {
-      appenders: ['console'],
+      appenders: ['console', 'file'],
       level: 'debug',
-      // Appenders: ['file'], level: 'error'
     },
   },
 })

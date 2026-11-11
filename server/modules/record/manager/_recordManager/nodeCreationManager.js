@@ -39,7 +39,7 @@ export const insertNodesInBulk = async ({ user, surveyId, nodesArray, systemActi
     Node.getParentUuid(node),
     Node.getNodeDefUuid(node),
     JSON.stringify(Node.getValue(node, null)),
-    Node.getMeta(node),
+    Node.compactMeta(Node.getMeta(node)),
   ])
 
   await NodeRepository.insertNodesFromValues(surveyId, nodeValues, tx)
@@ -65,6 +65,7 @@ export const insertNode = async (
     node,
     system,
     timezoneOffset,
+    lang,
     persistNodes = true,
     createMultipleEntities = true,
     sideEffect = false,
@@ -92,13 +93,14 @@ export const insertNode = async (
   let recordUpdated = Record.assocNode(node, { sideEffect })(record)
 
   if (NodeDef.isEntity(nodeDef)) {
-    const descendantsCreateResult = await RecordNodesUpdater.createDescendants({
+    const descendantsCreateResult = await RecordNodesUpdater.addDescendants({
       user,
       survey,
       record: recordUpdated,
       parentNode: node,
       nodeDef,
       timezoneOffset,
+      lang,
       createMultipleEntities,
     })
     Object.assign(nodesCreated, descendantsCreateResult.nodes)

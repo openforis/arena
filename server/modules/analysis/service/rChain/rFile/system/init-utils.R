@@ -1,7 +1,5 @@
 arena.dfColumnsAs = function (df, columns, mutateFunction) {
-  return ( df %>% 
-    dplyr::mutate(across( any_of( columns), mutateFunction))
-  )
+  return ( dplyr::mutate(df, across( any_of( columns), mutateFunction)) )
 }
 
 arena.dfColumnsAsCharacter = function (df, columns) {

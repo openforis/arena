@@ -1,4 +1,3 @@
-
 import { useI18n } from '@webapp/store/system'
 
 const RowHeader = () => {
@@ -9,7 +8,7 @@ const RowHeader = () => {
       <div />
       <div>{i18n.t('common.name')}</div>
       <div>{i18n.t('common.label')}</div>
-      <div>{i18n.t('nodeDefEdit.basicProps.entitySource')}</div>
+      <div>{i18n.t('nodeDefEdit:basicProps.entitySource')}</div>
       <div />
     </>
   )

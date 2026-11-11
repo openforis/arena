@@ -16,13 +16,14 @@ const initialState = {
   exprDraftValid: true,
 }
 
-const ADVANCED_EXPRESSION_SUFFIX = '\n'
+// Newlines can only appear in a textarea, so a trailing newline denotes an advanced mode expression.
+export const ADVANCED_EXPRESSION_SUFFIX = '\n'
 
-const getExpressionOrParseQuery = ({ expr, query, mode, canBeConstant }) => {
+const getExpressionOrParseQuery = ({ expr, query, canBeConstant }) => {
   try {
-    return expr ?? ExpressionParser.parseQuery({ query, mode, canBeConstant })
+    return expr ?? ExpressionParser.parseQuery({ query, canBeConstant })
   } catch (error) {
-    return ExpressionParser.parseQuery({ query: '', mode, canBeConstant })
+    return ExpressionParser.parseQuery({ query: '', canBeConstant })
   }
 }
 
@@ -47,22 +48,23 @@ export const useExpressionEditorPopupState = (props) => {
   const lang = useSurveyPreferredLang()
   const editorType = type.length === 1 ? type[0] : null
 
-  // An encoding trick. Newlines can only appear in a textarea,
-  // so denote advanced mode expressions as anything that contains a newline.
-  // The editing component ensures that all intermediate values will contain one.
-  const initialAdvanced =
-    editorType === ExpressionEditorType.advanced || new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query)
-
   const [state, setState] = useState(() => {
     // Either expr or query are passed by the parent component
-    const exprDraft = getExpressionOrParseQuery({ expr, query, mode, canBeConstant })
-    const queryDraft = Expression.toString(exprDraft, mode)
+    const exprDraft = getExpressionOrParseQuery({ expr, query, canBeConstant })
+    // expressions are always written in JavaScript syntax, also in SQL mode (converted into SQL server side)
+    const queryDraft = Expression.toString(exprDraft)
+    // The editing component ensures that all intermediate values will contain a newline.
+    const initialAdvanced =
+      editorType === ExpressionEditorType.advanced ||
+      new RegExp(ADVANCED_EXPRESSION_SUFFIX).test(query) ||
+      (editorType !== ExpressionEditorType.basic && !ExpressionParser.isEditableInBasicEditor(exprDraft))
+    const queryAdvanced = query.trimEnd() || queryDraft
 
     return {
       ...initialState,
       advanced: initialAdvanced,
-      query: initialAdvanced ? query.trimRight() : queryDraft,
-      queryDraft: initialAdvanced ? query.trimRight() : queryDraft,
+      query: initialAdvanced ? queryAdvanced : queryDraft,
+      queryDraft: initialAdvanced ? queryAdvanced : queryDraft,
       queryIsBasic: !initialAdvanced,
       exprDraft,
       exprDraftValid: true,
@@ -71,7 +73,7 @@ export const useExpressionEditorPopupState = (props) => {
   })
 
   const updateDraftExpr = (exprDraft) => {
-    const queryDraft = Expression.toString(exprDraft, mode)
+    const queryDraft = Expression.toString(exprDraft)
     const exprDraftValid = ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
     setState((prevState) => ({
@@ -86,7 +88,7 @@ export const useExpressionEditorPopupState = (props) => {
 
   const updateDraftQuery = useCallback(
     (queryDraft) => {
-      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft, mode)
+      const exprDraft = queryDraft === '' ? null : Expression.fromString(queryDraft)
       const exprDraftValid =
         queryDraft === '' ? null : ExpressionParser.isExprValid({ expr: exprDraft, canBeConstant, canBeCall })
 
@@ -99,14 +101,14 @@ export const useExpressionEditorPopupState = (props) => {
         queryIsBasic: false,
       }))
     },
-    [canBeCall, canBeConstant, mode]
+    [canBeCall, canBeConstant]
   )
 
   const resetDraftQuery = () => {
     setState((prevState) => ({
       ...prevState,
       queryDraft: '',
-      exprDraft: ExpressionParser.parseQuery({ query: '', mode, canBeConstant }),
+      exprDraft: ExpressionParser.parseQuery({ query: '', canBeConstant }),
       exprDraftValid: true,
       expressionCanBeApplied: query !== '',
     }))
@@ -137,7 +139,7 @@ export const useExpressionEditorPopupState = (props) => {
   const [variables, setVariables] = useState([])
   useEffect(() => {
     const nodeDefContext = Survey.getNodeDefByUuid(nodeDefUuidContext)(survey)
-    ExpressionVariables.getVariables({
+    void ExpressionVariables.getVariables({
       survey,
       cycle,
       nodeDefContext,

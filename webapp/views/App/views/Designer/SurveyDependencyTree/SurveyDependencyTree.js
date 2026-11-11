@@ -1,6 +1,6 @@
 import './SurveyDependencyTree.scss'
 
-import React, { useState, useRef, useMemo, useCallback, useEffect } from 'react'
+import { useState, useRef, useMemo, useCallback, useEffect } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -35,12 +35,12 @@ const calculateDependentNodeDefsByUuid = ({ survey, dependencyGraph, selectedNod
       return acc
     }
     const sourceAndDependentUuids = [nodeDefUuid, ...dependentNodeDefUuids]
-    const nodeDefUuids =
-      !selectedNodeDefUuid || nodeDefUuid === selectedNodeDefUuid
-        ? sourceAndDependentUuids
-        : dependentNodeDefUuids.includes(selectedNodeDefUuid)
-          ? [nodeDefUuid, selectedNodeDefUuid]
-          : []
+    let nodeDefUuids = []
+    if (!selectedNodeDefUuid || nodeDefUuid === selectedNodeDefUuid) {
+      nodeDefUuids = sourceAndDependentUuids
+    } else if (dependentNodeDefUuids.includes(selectedNodeDefUuid)) {
+      nodeDefUuids = [nodeDefUuid, selectedNodeDefUuid]
+    }
 
     nodeDefUuids.forEach((uuid) => {
       if (!acc[uuid]) {

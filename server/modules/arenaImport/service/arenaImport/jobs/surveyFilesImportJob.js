@@ -1,4 +1,6 @@
 import * as Survey from '@core/survey/survey'
+import * as SurveyAreaOfInterest from '@core/survey/surveyAreaOfInterest'
+import * as SurveyBranding from '@core/survey/surveyBranding'
 import * as SurveyFile from '@core/survey/surveyFile'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
@@ -14,13 +16,26 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
 
     const surveyInfo = Survey.getSurveyInfo(survey)
     const preloadedMapLayerFiles = Survey.getPreloadedMapLayers(surveyInfo)
+    const surveyDocImageFiles = Survey.getSurveyDocImages(surveyInfo)
+    const brandingFiles = SurveyBranding.getBrandingFileSummaries(SurveyBranding.getBranding(surveyInfo))
+    const areaOfInterestFiles = SurveyAreaOfInterest.getAreaOfInterestFileSummaries(surveyInfo)
+    // chain MAU files metadata is not part of the survey definition: read it from its own manifest file
+    const chainMauFiles = await ArenaSurveyFileZip.getChainMauFilesSummaries(arenaSurveyFileZip)
 
-    this.total = preloadedMapLayerFiles.length
+    const fileSummaries = [
+      ...preloadedMapLayerFiles,
+      ...surveyDocImageFiles,
+      ...brandingFiles,
+      ...areaOfInterestFiles,
+      ...chainMauFiles,
+    ]
+
+    this.total = fileSummaries.length
 
     if (this.total > 0) {
-      this.logDebug(`preloaded map layer files to import: ${this.total}`)
-      await this.checkFilesNotExceedingAvailableQuota(preloadedMapLayerFiles)
-      for (const fileSummary of preloadedMapLayerFiles) {
+      this.logDebug(`survey files to import: ${this.total}`)
+      await this.checkFilesNotExceedingAvailableQuota(fileSummaries)
+      for (const fileSummary of fileSummaries) {
         if (this.isCanceled()) {
           break
         }
@@ -29,7 +44,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
         // load file content
         const fileUuid = SurveyFile.getUuid(fileSummary)
         const fileName = SurveyFile.getName(fileSummary)
-        const fileContent = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid)
+        const fileContent = await ArenaSurveyFileZip.getSurveyFile(arenaSurveyFileZip, fileUuid) // NOSONAR
 
         if (!fileContent && !skipMissingFiles) {
           throw new Error(`Missing content for file ${fileUuid} (${fileName})`)
@@ -40,7 +55,7 @@ export default class SurveyFilesImportJob extends FileImportBaseJob {
           // update file size with actual file content length
           file = SurveyFile.assocSize(Buffer.byteLength(fileContent))(file)
 
-          await this.persistFile(file)
+          await this.persistFile(file) // NOSONAR
         } else {
           this.logWarn(`Survey ${surveyId}: missing content for survey file ${fileUuid} (${fileName})`)
         }

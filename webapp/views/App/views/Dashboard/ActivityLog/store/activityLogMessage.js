@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import * as ActivityLog from '@common/activityLog/activityLog'
 
 export const keys = {
@@ -11,7 +11,7 @@ export const keys = {
 // ====== CREATE
 
 export const newMessage = (activityLog, message, itemDeleted, highlighted = false) => ({
-  ...R.omit([ActivityLog.keys.content], activityLog),
+  ...A.omit([ActivityLog.keys.content], activityLog),
   [keys.message]: message,
   [keys.itemDeleted]: itemDeleted,
   [keys.highlighted]: highlighted,
@@ -20,10 +20,10 @@ export const newMessage = (activityLog, message, itemDeleted, highlighted = fals
 // ====== READ
 
 export const { getId, getUserUuid, getUserName, getType, getDateCreated } = ActivityLog
-export const getMessage = R.prop(keys.message)
-export const isItemDeleted = R.propEq(keys.itemDeleted, true)
-export const isHighlighted = R.propEq(keys.highlighted, true)
+export const getMessage = A.prop(keys.message)
+export const isItemDeleted = A.propEq(keys.itemDeleted, true)
+export const isHighlighted = A.propEq(keys.highlighted, true)
 
 // ====== UPDATE
 
-export const dissocHighlighted = R.dissoc(keys.highlighted)
+export const dissocHighlighted = A.dissoc(keys.highlighted)

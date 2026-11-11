@@ -1,4 +1,3 @@
-
 import PropTypes from 'prop-types'
 import ValidationTooltip from '../validationTooltip'
 import { FormItem } from './Input'

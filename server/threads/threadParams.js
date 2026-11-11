@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 export const keys = {
   cycle: 'cycle',
@@ -8,4 +8,4 @@ export const keys = {
   user: 'user',
 }
 
-export const getSocketId = R.prop(keys.socketId)
+export const getSocketId = A.prop(keys.socketId)

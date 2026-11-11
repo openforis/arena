@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { JavascriptExpressionParser } from '@openforis/arena-core'
 
@@ -17,48 +17,57 @@ export { operators } from './helpers/operators'
 export { functionNames } from './helpers/functions'
 export { toSql } from './toSql'
 
-export const getName = R.prop('name') as (expr: { name?: string }) => string | undefined
+export const getName = A.prop('name') as (expr: { name?: string }) => string | undefined
+
+// single or double quoted strings (with escaped chars)
+const quotedStringRegex = /('(?:[^'\\]|\\.)*'|"(?:[^"\\]|\\.)*")/
+
+// applies the replace function only to the parts of the string outside quoted strings (literal values)
+const _replaceOutsideQuotes = (string: string, replaceFn: (part: string) => string): string =>
+  string
+    .split(quotedStringRegex)
+    .map((part, index) => (index % 2 === 0 ? replaceFn(part) : part))
+    .join('')
+
+const _jsToSqlOperators = (part: string): string =>
+  part.replaceAll('&&', 'AND').replaceAll('||', 'OR').replaceAll('==', '=')
+
+const _sqlToJsOperators = (part: string): string =>
+  part
+    .replaceAll(/\bAND\b/g, '&&')
+    .replaceAll(/\bOR\b/g, '||')
+    .replaceAll(/=+/g, '==')
+    .replaceAll('!==', '!=')
+    .replaceAll('>==', '>=')
+    .replaceAll('<==', '<=')
 
 export const toString = (expr: unknown, exprMode: string = modes.json): string => {
   const string = ExpressionUtils.toString(expr as ExpressionUtils.ExpressionNode)
 
-  return exprMode === modes.sql
-    ? R.pipe(R.replace(/&&/g, 'AND'), R.replace(/\|\|/g, 'OR'), R.replace(/==/g, '='), R.replace(/"/g, `'`))(string)
-    : string
+  return exprMode === modes.sql ? _replaceOutsideQuotes(string, _jsToSqlOperators).replaceAll('"', `'`) : string
 }
 
-export const fromString = (string: string, exprMode: string = modes.json): unknown => {
-  const exprString =
-    exprMode === modes.json
-      ? string
-      : R.pipe(
-          R.replace(/AND/g, '&&'),
-          R.replace(/OR/g, '||'),
-          R.replace(/=+/g, '=='),
-          R.replace(/!==/g, '!='),
-          R.replace(/>==/g, '>='),
-          R.replace(/<==/g, '<=')
-        )(string)
+// converts an expression string written in the specified mode into its JavaScript syntax
+export const toJsString = (string: string, exprMode: string = modes.json): string =>
+  exprMode === modes.json ? string : _replaceOutsideQuotes(string, _sqlToJsOperators)
 
-  return new JavascriptExpressionParser().parse(exprString)
-}
+export const fromString = (string: string, exprMode: string = modes.json): unknown =>
+  new JavascriptExpressionParser().parse(toJsString(string, exprMode))
 
 export const { isValid } = ExpressionUtils
 
 // ====== Type checking
 
-export const getType = R.prop('type') as (expr: { type?: string }) => string | undefined
-const isType = (type: string) => R.propEq('type', type)
+export const getType = A.prop('type') as (expr: { type?: string }) => string | undefined
+const isType = (type: string) => A.propEq('type', type)
 
 // Return true if the nodeDef can be used in expressions and false otherwise
 export const isValidExpressionType = (nodeDef: unknown): boolean => !NodeDef.isFile(nodeDef as never)
 
 export const isBinary = isType(types.BinaryExpression)
-export const isCall = isType(types.CallExpression)
 export const isCompound = isType(types.Compound)
 export const isIdentifier = isType(types.Identifier)
 export const isLiteral = isType(types.Literal)
-export const isSequence = isType(types.SequenceExpression)
 export const isThis = isType(types.ThisExpression)
 
 // ====== Instance creators

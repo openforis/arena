@@ -36,7 +36,7 @@ const NodeDefCodeCheckbox = (props) => {
             </button>
           ))
         : items.map((item) => {
-            const selected = Boolean(selectedItems.find(CategoryItem.isEqual(item)))
+            const selected = selectedItems.some(CategoryItem.isEqual(item))
             return (
               <button
                 key={CategoryItem.getUuid(item)}

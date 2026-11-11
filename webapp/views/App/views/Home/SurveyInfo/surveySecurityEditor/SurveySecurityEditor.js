@@ -1,6 +1,6 @@
 import './SurveySecurityEditor.scss'
 
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
@@ -44,12 +44,17 @@ const deleteSecurityPropsEqualToDefault = (security) => {
 }
 
 export const SurveySecurityEditor = (props) => {
-  const { security: securityProp, onSecurityUpdate } = props
+  const {
+    security: securityProp,
+    onSecurityUpdate,
+    keepNonApplicableValues = false,
+    onKeepNonApplicableValuesUpdate = null,
+  } = props
 
   const security = useMemo(
     () => ({
       ...surveySecurityDefaults,
-      ...(securityProp ?? {}),
+      ...securityProp,
     }),
     [securityProp]
   )
@@ -80,6 +85,14 @@ export const SurveySecurityEditor = (props) => {
           onChange={onPropUpdate(key)}
         />
       ))}
+      {onKeepNonApplicableValuesUpdate && (
+        <Checkbox
+          checked={Boolean(keepNonApplicableValues)}
+          info="homeView:surveyInfo.keepNonApplicableValuesInfo"
+          label="homeView:surveyInfo.keepNonApplicableValues"
+          onChange={onKeepNonApplicableValuesUpdate}
+        />
+      )}
     </div>
   )
 }
@@ -87,4 +100,6 @@ export const SurveySecurityEditor = (props) => {
 SurveySecurityEditor.propTypes = {
   security: PropTypes.object,
   onSecurityUpdate: PropTypes.func.isRequired,
+  keepNonApplicableValues: PropTypes.bool,
+  onKeepNonApplicableValuesUpdate: PropTypes.func,
 }

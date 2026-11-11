@@ -18,10 +18,14 @@ export default {
   errors: {
     rowNum: 'Строка #',
   },
+  fileUploadChunkSize: {
+    label: 'Размер фрагмента при загрузке файла',
+  },
   forceImportFromAnotherSurvey: 'Принудительный импорт из другого опроса',
 
   importFromArena: 'Arena/Arena Mobile',
   importFromCollect: 'Collect / Collect Mobile',
+  importFromOdk: 'ODK / ODK Collect',
   importFromCsvExcel: 'CSV/Excel',
   importFromCsvStepsInfo: `### Шаги импорта
 1. Выберите целевую сущность
@@ -73,6 +77,11 @@ export default {
     CollectDataImportJob: {
       importCompleteSuccessfully: `Импорт данных Collect завершен:
         - {{insertedRecords}} записей создано`,
+    },
+    OdkDataImportJob: {
+      importCompleteSuccessfully: `Импорт данных ODK завершен:
+        - {{submittedCount}} записей создано
+        - {{skippedCount}} повторных отправок пропущено`,
     },
     DataImportJob: {
       importCompleteSummary: `

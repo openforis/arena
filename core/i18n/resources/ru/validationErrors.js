@@ -13,6 +13,15 @@ export default {
   requiredField: 'Поле {{field}} обязательно',
   rowsDuplicate: 'строка: {{row}} дублирующая строка: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `Функция "{{name}}" не разрешена`,
+    expressionInvalid: `"{{text}}" не допускается в выражении`,
+    expressionRequired: 'Выражение обязательно',
+    expressionUnbalancedParentheses: 'Несбалансированные скобки',
+    expressionUnknownColumn: `"{{name}}" не является столбцом сущности`,
+    expressionUnterminatedQuote: 'Незакрытые кавычки',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Метка на языке по умолчанию для опроса обязательна',
     analysisNodeDefsRequired: 'Требуется хотя бы один вычисляемый атрибут',
@@ -33,6 +42,11 @@ export default {
     levelDuplicate: 'Имя уровня повторяется',
     levelsInvalid: 'Хотя бы один неверный уровень',
     nameNotSpecified: 'Имя категории не указано',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Категория данных точек выборки уже существует в этом опросе; может быть только одна.',
   },
 
   categoryImport: {
@@ -66,7 +80,7 @@ export default {
     invalidNumber: 'Неверное число в столбце {{headers}}: {{value}}',
     invalidTaxonCode: 'Неверный код в столбце {{headers}}: {{value}}',
     invalidTime:
-      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm. Например, 09:45 или 16:30',
+      'Неверное время в столбце {{headers}}: {{value}}. Время должно быть отформатировано как HH:mm или HH:mm:ss. Например, 09:45, 16:30 или 09:45:30',
     missingRequiredHeaders: 'Отсутствуют обязательные столбцы: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Ошибка обновления значений: {{details}}',
     multipleRecordsMatchingKeys: 'Найдено несколько записей, соответствующих ключам "{{keyValues}}"',
@@ -74,6 +88,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Запись с ключами "{{keyValues}}" находится на этапе анализа и не может быть обновлена',
     recordKeyMissingOrInvalid: 'Отсутствует или неверное значение для ключевого атрибута "{{keyName}}"',
+    recordNotEditable: 'Запись с ключами "{{keyValues}}" не может быть обновлена: у вас нет прав на ее редактирование',
     recordNotFound: 'Запись с ключами "{{keyValues}}" не найдена',
   },
 
@@ -104,8 +119,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Сущность обязательна',
-    applyIfDuplicate: 'Условие "$t(nodeDefEdit.expressionsProp.applyIf)" повторяется',
-    applyIfInvalid: 'Неверное условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+    applyIfDuplicate: 'Условие "$t(nodeDefEdit:expressionsProp.applyIf)" повторяется',
+    applyIfInvalid: 'Неверное условие "$t(nodeDefEdit:advancedProps.relevantIf)"',
     columnWidthCannotBeGreaterThan: 'Ширина столбца не может быть больше {{max}}',
     columnWidthCannotBeLessThan: 'Ширина столбца не может быть меньше {{min}}',
     countMaxMustBePositiveNumber: 'Максимальное количество должно быть положительным целым числом',
@@ -116,13 +131,14 @@ export default {
     defaultValuesNotSpecified: 'Значение по умолчанию не указано',
     entitySourceRequired: 'Источник сущности обязателен',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Только последнее выражение может иметь пустое условие "$t(nodeDefEdit.expressionsProp.applyIf)"',
+      'Только последнее выражение может иметь пустое условие "$t(nodeDefEdit:expressionsProp.applyIf)"',
     expressionDuplicate: 'Выражение повторяется',
     expressionRequired: 'Выражение обязательно',
     formulaInvalid: 'Формула неверна',
     keysEmpty: 'Определите хотя бы один ключевой атрибут',
 
     keysExceedingMax: 'Превышено максимальное количество ключевых атрибутов',
+    mapMarkerColorInvalid: 'Цвет маркера на карте должен быть кодом цвета вида #ff0000',
     maxFileSizeInvalid: 'Максимальный размер файла должен быть больше 0 и меньше {{max}}',
     nameInvalid:
       'Имя недействительно (оно должно содержать только строчные буквы, цифры и подчеркивания, начинаться с буквы)',
@@ -131,8 +147,11 @@ export default {
     countMaxInvalid: 'Неверное "Максимальное количество"',
     countMinInvalid: 'Неверное "Минимальное количество"',
     readOnlyCannotHaveEditableIf: 'Узел только для чтения не может иметь условие "Editable if"',
+    requiredIfInvalid: 'Неверное условие "Обязательно, если"',
+    requiredIfNotAllowed:
+      'Условие "Обязательно, если" допускается только для одиночных, неключевых и не всегда обязательных атрибутов',
     qualifierCannotHaveApplicableExpression:
-      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'Атрибут-квалификатор не может иметь условие "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'Атрибут-квалификатор не может иметь правил редактируемости',
     qualifierCannotHaveDefaultValues: 'Атрибут-квалификатор не может иметь значения по умолчанию',
     qualifierCannotHaveValidations: 'Атрибут-квалификатор не может иметь правил проверки',
@@ -155,10 +174,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Язык обязателен',
+    langInvalid: 'Недопустимый код языка: {{lang}}',
+    srsInvalid: 'Недопустимый код системы пространственной привязки: {{code}}',
     srsRequired: 'Система пространственной привязки обязательна',
     cycleRequired: 'Цикл обязателен',
     cyclesRequired: 'Должен быть определен хотя бы один цикл',
     cyclesExceedingMax: 'Опрос может иметь не более 10 циклов',
+    cycleKeysInvalid: 'Циклы должны быть пронумерованы последовательно, начиная с 1',
     cycleDateStartBeforeDateEnd: 'Дата начала цикла должна быть раньше даты его окончания',
     cycleDateStartAfterPrevDateEnd: 'Дата начала цикла должна быть после даты окончания предыдущего цикла',
     cycleDateStartInvalid: 'Дата начала цикла недействительна',
@@ -166,6 +188,13 @@ export default {
     cycleDateEndInvalid: 'Дата окончания цикла недействительна',
     cycleDateEndMandatoryExceptForLastCycle: 'Дата окончания цикла обязательна для всех циклов, кроме последнего',
     fieldManualLinksInvalid: 'Неверная ссылка на полевое руководство',
+    areaOfInterestInvalid: 'Область интереса должна быть полигоном в формате GeoJSON с координатами WGS84',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Файл обязателен',
+    nameDuplicate: 'Другая область интереса с таким же именем уже существует',
+    nameRequired: 'Имя обязательно',
   },
 
   surveyPreloadedMapLayer: {
@@ -214,6 +243,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Пользователь с таким адресом электронной почты уже существует',
     emailRequired: 'Электронная почта обязательна',
     emailInvalid: 'Неверный адрес электронной почты',
     emailNotFound: 'Адрес электронной почты не найден',
@@ -228,6 +258,7 @@ export default {
     userNotFound: 'Пользователь не найден. Убедитесь, что email и пароль верны',
     passwordChangeRequired: 'Требуется смена пароля',
     passwordResetNotAllowedWithPendingInvitation: `Сброс пароля не разрешен: пользователь был приглашен в опрос, но приглашение еще не принято`,
+    twoFactorTokenRequired: 'Код подтверждения обязателен',
   },
 
   userAccessRequest: {
@@ -241,6 +272,7 @@ export default {
     invalidRequest: 'Неверный запрос на доступ пользователя',
     userAlreadyExisting: 'Пользователь с адресом электронной почты {{email}} уже существует',
     requestAlreadySent: `Запрос на доступ для пользователя с адресом электронной почты {{email}} уже отправлен`,
+    emailNotReachable: 'Не удалось доставить письмо с подтверждением на адрес {{email}}; проверьте правильность адреса',
     invalidReCaptcha: 'Неверная ReCaptcha',
   },
 
@@ -251,6 +283,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Роль обязательна',
     surveyNameRequired: 'Название опроса обязательно',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Группа с таким именем уже существует: {{name}}',
+    qualifiersInvalid: 'Один или несколько квалификаторов имеют недопустимый или повторяющийся ключ',
+    qualifierNameDuplicate: 'Квалификатор с таким именем уже существует в этой группе: {{name}}',
+    qualifierNameInvalid: 'Недопустимое имя квалификатора',
+    qualifierNameRequired: 'Имя квалификатора обязательно',
   },
 
   userPasswordChange: {

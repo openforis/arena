@@ -1,11 +1,11 @@
 import axios from 'axios'
+import { useCallback } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
 
 import { useSurveyCycleKey, useSurveyId } from '@webapp/store/survey'
 
 import { getFromDate } from '../utils'
-import { useCallback } from 'react'
 
 const formatDate = (date) => DateUtils.formatDateISO(date)
 
@@ -20,18 +20,13 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
     const now = Date.now()
     const from = formatDate(getFromDate(now, timeRange))
     const to = formatDate(now)
-    const { data: counts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-      params: { cycle, from, to, countType: 'default' },
-    })
-    const { data: userCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-      params: { cycle, from, to, countType: 'user' },
-    })
-    const { data: userDateCounts } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-      params: { cycle, from, to, addDate: true, countType: 'user' },
-    })
-    const { data: countsByStep } = await axios.get(`/api/survey/${surveyId}/records/dashboard/count`, {
-      params: { cycle, countType: 'step' },
-    })
+    const countUrl = `/api/survey/${surveyId}/records/dashboard/count`
+
+    const [{ data: counts }, { data: userCounts }, { data: countsByStep }] = await Promise.all([
+      axios.get(countUrl, { params: { cycle, from, to, countType: 'default' } }),
+      axios.get(countUrl, { params: { cycle, from, to, countType: 'user' } }),
+      axios.get(countUrl, { params: { cycle, countType: 'step' } }),
+    ])
 
     const [dataEntry, dataCleansing, dataAnalysis] = Object.values(countsByStep)
 
@@ -41,7 +36,6 @@ export const useGetRecordsSummary = ({ recordsSummary, setRecordsSummary }) => {
       to,
       timeRange,
       userCounts,
-      userDateCounts,
       dataEntry,
       dataCleansing,
       dataAnalysis,

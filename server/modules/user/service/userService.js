@@ -1,24 +1,26 @@
-import * as fs from 'fs'
+import * as fs from 'node:fs'
 
-import { WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
+import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
+import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
 import { db } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
+import * as i18nFactory from '@core/i18n/i18nFactory'
 import { Countries } from '@core/Countries'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as UserGroupInvitation from '@core/user/userGroupInvitation'
+import { UserInvitation } from '@core/user/userInvitation'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
 import * as UserAccessRequestValidator from '@core/user/userAccessRequestValidator'
 import * as UserAccessRequestAcceptValidator from '@core/user/userAccessRequestAcceptValidator'
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import { UserPasswordChangeFormValidator } from '@core/user/userPasswordChangeFormValidator'
 import { UserPasswordChangeForm } from '@core/user/userPasswordChangeForm'
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
 import { WebSocketEvents } from '@common/webSocket/webSocketEvents'
 
 import UnauthorizedError from '@server/utils/unauthorizedError'
@@ -36,6 +38,7 @@ import * as UserInvitationManager from '../manager/userInvitationManager'
 import * as UserPasswordUtils from './userPasswordUtils'
 import { SystemAdminUserValidator } from './systemAdminUserValidator'
 import * as UserInviteService from './userInviteService'
+import { UserRegistrationExpiredEmail } from './userRegistrationExpiredEmail'
 
 const Logger = Log.getLogger('UserService')
 
@@ -150,8 +153,9 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     // send the emails only after use access request has been inserted into the db
     const systemAdminEmails = await UserManager.fetchSystemAdministratorsEmail()
 
+    // use bcc so that system administrators cannot see each other's email addresses
     await Mailer.sendEmail({
-      to: systemAdminEmails,
+      bcc: systemAdminEmails,
       msgKey: 'emails:userAccessRequest',
       msgParams: { ...props, country, email, serverUrl },
     })
@@ -167,7 +171,7 @@ const _fetchSurveyTemplateId = async ({ user, templateUuid }) => {
   return template ? Survey.getId(template) : null
 }
 
-const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t) => {
+const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }) => {
   const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
   if (templateId) {
     const job = new SurveyCloneJob({ user, surveyId: templateId, surveyInfoTarget })
@@ -179,84 +183,102 @@ const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }, t)
       return await SurveyManager.fetchSurveyById({ surveyId, draft: true })
     }
   }
-  return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false }, t)
+  // Insert survey out of the caller's transaction: SurveyManager.insertSurvey creates the survey data
+  // schema using its own separate db connections, so it must not run inside a transaction held open by
+  // the caller (same connection-pool starvation risk migrateSurveySchema was fixed for elsewhere).
+  return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false })
 }
 
-export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) =>
-  db.tx(async (t) => {
-    const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
+export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) => {
+  const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
-    // 1) validation
-    // check access request exists
-    const accessRequestDb = await UserManager.fetchUserAccessRequestByUuid({ uuid: accessRequestUuid }, t)
-    if (!accessRequestDb) {
-      return {
-        validation: Validation.newInstance(false, {}, [
-          Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
-        ]),
-      }
+  // 1) validation
+  // check access request exists
+  const accessRequestDb = await UserManager.fetchUserAccessRequestByUuid({ uuid: accessRequestUuid })
+  if (!accessRequestDb) {
+    return {
+      validation: Validation.newInstance(false, {}, [
+        Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
+      ]),
     }
+  }
 
-    const { email, status: accessRequestStatus } = accessRequestDb
+  const { email, status: accessRequestStatus } = accessRequestDb
 
-    // check access request not processed already
-    if (accessRequestStatus !== UserAccessRequest.status.CREATED) {
-      return {
-        validation: Validation.newInstance(false, {}, [
-          ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestAlreadyProcessed),
-        ]),
-      }
+  // check access request not processed already
+  if (accessRequestStatus !== UserAccessRequest.status.CREATED) {
+    return {
+      validation: Validation.newInstance(false, {}, [
+        ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestAlreadyProcessed),
+      ]),
     }
+  }
 
-    // validate survey name
-    const surveyInfosWithSameName = await SurveyManager.fetchSurveysByName(surveyName, t)
-    const validation = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
-      accessRequestAccept,
-      surveyInfosWithSameName,
-    })
-    if (Validation.isNotValid(validation)) {
-      return { validation }
-    }
-
-    // 2) insert survey
-    const surveyInfoTarget = Survey.newSurvey({
-      ownerUuid: User.getUuid(user),
-      name: surveyName,
-      label: surveyLabel,
-      languages: ['en'],
-    })
-
-    let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid }, t)
-
-    // 3) find group to associate to the user
-    let group = null
-    if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
-      group = await AuthManager.fetchGroupByName({ name: role }, t)
-    } else {
-      const surveyGroups = await AuthManager.fetchSurveyGroups(Survey.getId(survey), t)
-      group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
-    }
-
-    // 4) invite user to that group and send email
-    const surveyId = Survey.getId(survey)
-    const { invitedUsers } = await UserInviteService.inviteUsers(
-      {
-        user,
-        surveyId,
-        surveyCycleKey: Survey.cycleOneKey,
-        invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
-        serverUrl,
-      },
-      t
-    )
-    const userInvited = invitedUsers[0]
-    const surveyOwnerUuid = User.getUuid(userInvited)
-
-    await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
-    survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
-
-    return { survey, userInvited }
+  // validate survey name
+  const surveyInfosWithSameName = await SurveyManager.fetchSurveysByName(surveyName)
+  const validation = await UserAccessRequestAcceptValidator.validateUserAccessRequestAccept({
+    accessRequestAccept,
+    surveyInfosWithSameName,
   })
+  if (Validation.isNotValid(validation)) {
+    return { validation }
+  }
+
+  // 2) insert or clone survey (out of the transaction below; see _insertOrCloneSurvey)
+  const surveyInfoTarget = Survey.newSurvey({
+    ownerUuid: User.getUuid(user),
+    name: surveyName,
+    label: surveyLabel,
+    languages: ['en'],
+  })
+
+  let survey = await _insertOrCloneSurvey({ user, surveyInfoTarget, templateUuid })
+  const surveyId = Survey.getId(survey)
+
+  try {
+    return await db.tx(async (t) => {
+      // 3) find group to associate to the user
+      let group = null
+      if ([AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager].includes(role)) {
+        group = await AuthManager.fetchGroupByName({ name: role }, t)
+      } else {
+        const surveyGroups = await AuthManager.fetchSurveyGroups(surveyId, t)
+        group = surveyGroups.find((surveyGroup) => AuthGroup.getName(surveyGroup) === role)
+      }
+
+      // 4) invite user to that group and send email
+      const { invitedUsers } = await UserInviteService.inviteUsers(
+        {
+          user,
+          surveyId,
+          surveyCycleKey: Survey.cycleOneKey,
+          invitation: UserGroupInvitation.newUserGroupInvitation(email, AuthGroup.getUuid(group)),
+          serverUrl,
+        },
+        t
+      )
+      const userInvited = invitedUsers[0]
+      const surveyOwnerUuid = User.getUuid(userInvited)
+
+      await SurveyManager.updateSurveyOwner({ user, surveyId, ownerUuid: surveyOwnerUuid, system: true }, t)
+      survey = Survey.assocOwnerUuid(surveyOwnerUuid)(survey)
+
+      return { survey, userInvited }
+    })
+  } catch (error) {
+    // The survey was already created (committed) outside of this failed transaction; clean it up so a
+    // failed access request acceptance doesn't leave an orphaned survey/schema behind.
+    Logger.error(`error accepting user access request, cleaning up survey ${surveyId}: ${error.stack || error}`)
+    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }).catch((cleanupError) => {
+      Logger.error(
+        `error cleaning up survey ${surveyId} after failed access request acceptance: ${
+          cleanupError.stack || cleanupError
+        }`
+      )
+    })
+    throw error
+  }
+}
 
 // ====== READ
 
@@ -283,17 +305,65 @@ export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
 
 export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
 
-export const fetchResetPasswordUrl = async ({ serverUrl, userUuid, surveyId = null }) => {
-  if (surveyId) {
-    const survey = await SurveyManager.fetchSurveyById({ surveyId })
-    const surveyUuid = Survey.getUuid(survey)
-    const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({
-      surveyUuid,
-      userUuid,
-    })
-    if (!invitation) {
-      throw new SystemError('appErrors:userNotInvitedToSurvey')
+/**
+ * Checks if a survey user (not a system admin) can get the invitation (password reset) link of a pending user.
+ * The link sets the password of the whole account: the pending user must not be a system admin and must have roles
+ * and invitations only in this survey; the global survey manager role is accepted only together with the survey admin
+ * role of this survey, because inviting a survey admin grants it.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.userToInvite - The pending user (with auth groups).
+ * @param {!object} params.surveyInfo - The survey info.
+ * @returns {Promise<boolean>} - True if the link can be returned to a survey user.
+ */
+const _canSurveyUserGetResetPasswordUrl = async ({ userToInvite, surveyInfo }) => {
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  if (User.isSurveyManager(userToInvite)) {
+    const surveyGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToInvite)
+    if (AuthGroup.getName(surveyGroup) !== AuthGroup.groupNames.surveyAdmin) {
+      return false
     }
+  }
+  return UserInviteService.isUserInvolvedOnlyInSurvey({ userToInvite, surveyUuid })
+}
+
+/**
+ * Throws an error if the user cannot get the invitation link of the specified user in the specified survey.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user requesting the link.
+ * @param {!string} params.userUuid - UUID of the invited user.
+ * @param {!number} params.surveyId - ID of the survey.
+ */
+const _checkCanGetSurveyUserResetPasswordUrl = async ({ user, userUuid, surveyId }) => {
+  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+  const surveyUuid = Survey.getUuid(surveyInfo)
+  const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({ surveyUuid, userUuid })
+  if (!invitation || UserInvitation.hasBeenRemoved(invitation)) {
+    throw new SystemError('appErrors:userNotInvitedToSurvey', {}, StatusCodes.NOT_FOUND)
+  }
+  // the reset password token of a user who already accepted can come from a "forgot password" request
+  const userToInvite = await UserManager.fetchUserByUuid(userUuid)
+  if (!User.isInvited(userToInvite)) {
+    throw new SystemError('appErrors:userNotInvitedToSurvey', {}, StatusCodes.NOT_FOUND)
+  }
+  if (!User.isSystemAdmin(user) && !(await _canSurveyUserGetResetPasswordUrl({ userToInvite, surveyInfo }))) {
+    throw new SystemError('appErrors:userInvitationLinkNotAvailable', {}, StatusCodes.FORBIDDEN)
+  }
+}
+
+/**
+ * Returns the reset password (or invitation) URL of a user.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user requesting the URL.
+ * @param {!string} params.serverUrl - Address of the server.
+ * @param {!string} params.userUuid - UUID of the user whose URL is requested.
+ * @param {number} [params.surveyId] - ID of the survey the user has been invited to (required for non system admins).
+ * @returns {Promise<string>} - The reset password URL.
+ */
+export const fetchResetPasswordUrl = async ({ user, serverUrl, userUuid, surveyId = null }) => {
+  if (surveyId) {
+    await _checkCanGetSurveyUserResetPasswordUrl({ user, userUuid, surveyId })
+  } else if (!User.isSystemAdmin(user)) {
+    throw new UnauthorizedError(User.getName(user))
   }
   const resetPasswordUuid = await UserManager.fetchResetPasswordUuidByUserUuid(userUuid)
   return UserInviteService.getResetPasswordUrl({ serverUrl, uuid: resetPasswordUuid })
@@ -350,8 +420,8 @@ const _canAssignGlobalRoles = ({ user, userToUpdateOld, authGroupsNew }) => {
     return false
   }
 
-  // Only survey managers can promote users to survey manager
-  if (!userToUpdateWasSurveyManager && userToUpdateWillBeSurveyManager) {
+  // Non-system admins cannot grant or revoke the survey manager role
+  if (userToUpdateWasSurveyManager !== userToUpdateWillBeSurveyManager) {
     return false
   }
 
@@ -412,6 +482,12 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateO
       userToUpdate,
       authGroupsNew,
     })
+  } else if (
+    User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate) &&
+    !Authorizer.canEditUserEmail(user, null, userToUpdateOldData)
+  ) {
+    // email can be changed only by system admins, even outside a survey
+    throw new UnauthorizedError(User.getName(user))
   }
 }
 
@@ -512,6 +588,9 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
       await UserManager.deleteUserPrefsSurvey({ userUuid: userUuidToRemove, surveyId }, t)
     }
 
+    // the layers of the user in that survey go whatever the current survey is
+    await UserManager.deleteUserMapCustomLayersSurvey({ userUuid: userUuidToRemove, surveyId }, t)
+
     await RecordManager.updateRecordsOwner(
       { surveyId, fromOwnerUuid: userUuidToRemove, toOwnerUuid: User.getUuid(user) },
       t
@@ -538,9 +617,122 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
   return userToDelete
 }
 
+export const deleteUser = async ({ user, userUuidToDelete }) =>
+  db.tx(async (t) => {
+    if (User.getUuid(user) === userUuidToDelete) {
+      throw new SystemError('appErrors:userCannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)
+    }
+
+    const userToDelete = await UserManager.fetchUserByUuid(userUuidToDelete, t)
+    if (!userToDelete) {
+      throw new SystemError('appErrors:userNotFound', { userUuid: userUuidToDelete }, StatusCodes.NOT_FOUND)
+    }
+
+    if (User.isSystemAdmin(userToDelete)) {
+      const adminsCount = await UserManager.countSystemAdministrators(t)
+      if (adminsCount <= 1) {
+        throw new SystemError('appErrors:userCannotDeleteLastSystemAdmin', {}, StatusCodes.CONFLICT)
+      }
+    }
+
+    // Surveys the target owns block deletion at the DB level (survey.owner_uuid has no ON DELETE
+    // action). Blocked, not auto-reassigned: transferring survey ownership is too significant to do
+    // silently as a side effect of deleting an account. Use the unfiltered FK-scoped count (not the
+    // UI listing query), since that listing excludes templates/temporary surveys and can miss surveys
+    // the target owns but isn't a member of -- letting them slip past this check and hit the FK
+    // violation at DELETE time instead.
+    const ownedSurveysCount = await SurveyManager.countOwnedSurveys({ user: userToDelete }, t)
+    if (ownedSurveysCount > 0) {
+      throw new SystemError('appErrors:userCannotDeleteOwnsSurveys', { count: ownedSurveysCount }, StatusCodes.CONFLICT)
+    }
+
+    // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
+    // ON DELETE action). MessageService has no by-author query, so fetch all and filter.
+    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const messages = await messageService.getAll(t)
+    const ownMessagesCount = messages.filter((message) => message.createdByUserUuid === userUuidToDelete).length
+    if (ownMessagesCount > 0) {
+      throw new SystemError('appErrors:userCannotDeleteHasMessages', { count: ownMessagesCount }, StatusCodes.CONFLICT)
+    }
+
+    // Records the target owns (record.owner_uuid) also block deletion, and can't be nulled out
+    // (NOT NULL) -- reassign them to the acting admin. Iterate every survey in the instance rather
+    // than the membership-filtered listing query, since that listing can miss surveys the target owns
+    // (or owned) records in without being a current member -- e.g. a template/temporary survey, or a
+    // membership that was removed after the records were created. A no-op for surveys where the
+    // target owns no records, so safe to call unconditionally; no more expensive than the FK check
+    // Postgres already has to run against every survey schema to allow the delete at all.
+    const allSurveyIds = await SurveyManager.fetchAllSurveyIds(t)
+    for (const surveyId of allSurveyIds) {
+      /* NOSONAR */ await RecordManager.updateRecordsOwner(
+        { surveyId, fromOwnerUuid: userUuidToDelete, toOwnerUuid: User.getUuid(user) },
+        t
+      )
+    }
+
+    Logger.info(
+      `user ${User.getEmail(user)} [${User.getUuid(user)}] deleted user ${User.getEmail(userToDelete)} ` +
+        `[${userUuidToDelete}]; records owned by the deleted user were reassigned to the acting admin, ` +
+        `checking ${allSurveyIds.length} surveys`
+    )
+
+    // Everything else (sessions, tokens, 2FA, group membership, activity log, invitations this user
+    // sent/received, access requests they processed) is cleaned up by the existing ON DELETE CASCADE
+    // foreign keys in arena-server's schema -- see the spec's "Cascade side effects" section.
+    return UserManager.deleteUser(userUuidToDelete, t)
+  })
+
+// returns name and label of the survey if deleted, null otherwise
+const _deleteUntouchedSurvey = async ({ surveyId }, client) => {
+  try {
+    const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId }, client)
+    if (recordsCount > 0) {
+      Logger.debug(`survey ${surveyId} not deleted: it has ${recordsCount} records`)
+      return null
+    }
+    // only name and label are read: a pending data migration must not prevent the deletion
+    const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true, skipMigrationCheck: true }, client)
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: true }, client)
+    return { surveyId, name: Survey.getName(surveyInfo), label: Survey.getDefaultLabel(surveyInfo) }
+  } catch (error) {
+    Logger.error(`error deleting survey ${surveyId}: ${String(error)}`)
+    return null
+  }
+}
+
+const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
+  const surveys = await UserManager.fetchSurveysOfExpiredInvitationUsers(client)
+  Logger.info(
+    `IDs of untouched surveys of users with expired invitation to delete: ${surveys.map(({ surveyId }) => surveyId)}`
+  )
+  const deletedSurveys = []
+  // one at a time: every deletion drops a schema and the client could be a transaction
+  for (const { surveyId, userUuid } of surveys) {
+    const deletedSurvey = await _deleteUntouchedSurvey({ surveyId }, client) // NOSONAR
+    if (deletedSurvey) {
+      deletedSurveys.push({ ...deletedSurvey, userUuid })
+    }
+  }
+  return deletedSurveys
+}
+
+// a failure sending the email must not interrupt the cleanup
+const _notifyUserRegistrationExpired = async ({ user, surveys, i18n }) => {
+  const email = User.getEmail(user)
+  try {
+    const { msgKey, getMsgParams } = UserRegistrationExpiredEmail
+    const msgParams = getMsgParams({ i18n, surveys, serverUrl: ProcessUtils.ENV.arenaPublicUrl })
+    await Mailer.sendEmail({ to: email, msgKey, msgParams, i18n })
+  } catch (error) {
+    Logger.error(`error notifying user ${email} about the account deletion: ${String(error)}`)
+  }
+}
+
 export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
-  const surveyIds = await UserManager.fetchSurveyIdsOfExpiredInvitationUsers(client)
-  Logger.info(`IDs of surveys that could be deleted (if without any activity): ${surveyIds}`)
+  // surveys must be deleted before their users: they are identified by the users' expired invitations
+  const deletedSurveys = await _deleteUntouchedSurveysOfExpiredInvitationUsers(client)
+  const deletedSurveyIds = deletedSurveys.map(({ surveyId }) => surveyId)
 
   Logger.debug('deleting users with expired invitations')
   const usersWithExpiredInvitation = await UserManager.fetchUsersWithExpiredInvitation(client)
@@ -550,16 +742,20 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
     const usersWithExpiredInvitationEmails = usersWithExpiredInvitation.map(User.getEmail)
     const usersWithExpiredInvitationUuids = usersWithExpiredInvitation.map(User.getUuid)
     Logger.debug(`deleting users: ${usersWithExpiredInvitationEmails} ${usersWithExpiredInvitationUuids}`)
+    const i18n = await i18nFactory.createI18nAsync()
     for (const user of usersWithExpiredInvitation) {
       const userUuid = User.getUuid(user)
       const userEmail = User.getEmail(user)
       try {
-        await UserManager.deleteUser(userUuid, client)
+        await UserManager.deleteUser(userUuid, client) // NOSONAR
         deletedUsers.push(user)
         deletedUsersEmails.push(userEmail)
       } catch (error) {
         Logger.debug(`error deleting user ${userEmail} [${userUuid}]: ${String(error)}`)
+        continue
       }
+      const surveys = deletedSurveys.filter((survey) => survey.userUuid === userUuid)
+      await _notifyUserRegistrationExpired({ user, surveys, i18n }) // NOSONAR
     }
     if (deletedUsersEmails.length > 0) {
       Logger.debug('deleting expired users access requests by expired invitations')
@@ -569,7 +765,7 @@ export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
   Logger.debug('deleting expired users access requests')
   await UserManager.deleteExpiredUserAccessRequests(client)
 
-  return { deletedUsers, deletedSurveyIds: surveyIds }
+  return { deletedUsers, deletedSurveyIds }
 }
 
 // ==== User prefs

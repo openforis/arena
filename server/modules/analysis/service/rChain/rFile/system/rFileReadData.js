@@ -54,10 +54,10 @@ export default class RFileReadData extends RFileSystem {
           entityUuid: NodeDef.getUuid(entityDef),
         })
       )
-      await this.appendContent(setVar(dfName, dataCSV))
-      await this.appendContentToConvertDataTypes({ entityDef })
+      await this.appendContent(setVar(dfName, dataCSV)) // NOSONAR
+      await this.appendContentToConvertDataTypes({ entityDef }) // NOSONAR
 
-      await this.initMultipleAttributesData({ entityDef })
+      await this.initMultipleAttributesData({ entityDef }) // NOSONAR
     }
   }
 
@@ -77,7 +77,7 @@ export default class RFileReadData extends RFileSystem {
           attributeDefUuid: NodeDef.getUuid(multipleAttrDef),
         })
       )
-      await this.appendContent(setVar(dfName, dataCSV))
+      await this.appendContent(setVar(dfName, dataCSV)) // NOSONAR
     }
   }
 

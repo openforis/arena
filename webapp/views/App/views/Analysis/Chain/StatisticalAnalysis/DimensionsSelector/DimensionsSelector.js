@@ -1,6 +1,6 @@
 import './DimensionsSelector.scss'
 
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -46,7 +46,7 @@ export const DimensionsSelector = (props) => {
       const dimensionsInAncestor = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,
         includeAnalysis: showAnalysisAttributes,
-      })(survey).filter(isDimensionIncluded)
+      })(survey).filter((nodeDef) => isDimensionIncluded(nodeDef))
 
       const nestedOptions = dimensionsInAncestor.map((dimension) => {
         const dimensionUuid = NodeDef.getUuid(dimension)

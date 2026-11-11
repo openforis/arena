@@ -5,6 +5,7 @@ import * as SurveyBranding from '@core/survey/surveyBranding'
 import type { BrandingImageDescriptor } from '@core/survey/surveyBranding'
 
 import * as API from '@webapp/service/api'
+import { getFileNameFromContentDisposition } from '@webapp/utils/contentDispositionUtils'
 
 const MIME_BY_EXTENSION: Record<string, string> = {
   png: 'image/png',
@@ -19,9 +20,7 @@ const MIME_BY_EXTENSION: Record<string, string> = {
  * Infers an image MIME type from a Content-Disposition filename.
  */
 const mimeTypeFromContentDisposition = (contentDisposition: string | undefined | null): string | null => {
-  if (!contentDisposition) return null
-  const fileNameMatch = /filename\*?=(?:UTF-8''|")?([^";]+)/i.exec(contentDisposition)
-  const fileName = fileNameMatch?.[1] ? decodeURIComponent(fileNameMatch[1].replaceAll('"', '')) : null
+  const fileName = getFileNameFromContentDisposition(contentDisposition)
   if (!fileName) return null
   const extension = fileName.split('.').pop()?.toLowerCase()
   return extension ? MIME_BY_EXTENSION[extension] || null : null
@@ -36,8 +35,9 @@ const toDisplayableImageBlob = (response: AxiosResponse<Blob>): Blob => {
     return blob
   }
   const headerType = response.headers?.['content-type']
+  const headerTypeString = typeof headerType === 'string' ? headerType : null
   const mimeType =
-    (headerType && headerType !== 'application/octet-stream' ? headerType : null) ||
+    (headerTypeString && headerTypeString !== 'application/octet-stream' ? headerTypeString : null) ||
     mimeTypeFromContentDisposition(response.headers?.['content-disposition']) ||
     'application/octet-stream'
   return new Blob([blob], { type: mimeType })
@@ -49,17 +49,25 @@ type UseBrandingLogoSrcParams = {
   localObjectUrl?: string | null
 }
 
+type BrandingLogoState = {
+  src: string | null
+  /** True when the referenced file could not be loaded (e.g. missing from the storage). */
+  loadError: boolean
+}
+
+const emptyState: BrandingLogoState = { src: null, loadError: false }
+
 /**
- * Resolves a displayable image src for a branding logo.
+ * Resolves a displayable image src for a branding logo, reporting load failures.
  * Survey file UUIDs are fetched as blobs because the file API serves Content-Disposition: attachment
  * (not usable as img src).
  */
-export const useBrandingLogoSrc = ({
+export const useBrandingLogo = ({
   surveyId,
   logo,
   localObjectUrl = null,
-}: UseBrandingLogoSrcParams): string | null => {
-  const [src, setSrc] = useState<string | null>(null)
+}: UseBrandingLogoSrcParams): BrandingLogoState => {
+  const [state, setState] = useState<BrandingLogoState>(emptyState)
 
   useEffect(() => {
     let cancelled = false
@@ -67,27 +75,27 @@ export const useBrandingLogoSrc = ({
 
     const resolve = async () => {
       if (localObjectUrl) {
-        setSrc(localObjectUrl)
+        setState({ src: localObjectUrl, loadError: false })
         return
       }
 
       const fileUuid = logo?.[SurveyBranding.keys.fileUuid]
       if (!fileUuid || !surveyId) {
-        setSrc(null)
+        setState(emptyState)
         return
       }
 
       try {
-        const response = await API.fetchSurveyFile({ surveyId, fileUuid })
+        const response = await API.fetchSurveyFile({ surveyId, fileUuid, errorHandledLocally: true })
         if (cancelled) return
         blobUrlToRevoke = URL.createObjectURL(toDisplayableImageBlob(response))
-        setSrc(blobUrlToRevoke)
+        setState({ src: blobUrlToRevoke, loadError: false })
       } catch {
-        if (!cancelled) setSrc(null)
+        if (!cancelled) setState({ src: null, loadError: true })
       }
     }
 
-    resolve()
+    void resolve()
 
     return () => {
       cancelled = true
@@ -97,5 +105,10 @@ export const useBrandingLogoSrc = ({
     }
   }, [localObjectUrl, logo?.[SurveyBranding.keys.fileUuid], surveyId])
 
-  return src
+  return state
 }
+
+/**
+ * Resolves a displayable image src for a branding logo (null when missing or not loadable).
+ */
+export const useBrandingLogoSrc = (params: UseBrandingLogoSrcParams): string | null => useBrandingLogo(params).src

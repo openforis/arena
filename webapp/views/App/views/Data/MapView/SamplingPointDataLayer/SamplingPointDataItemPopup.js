@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { Popup } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -65,6 +65,7 @@ export const SamplingPointDataItemPopup = (props) => {
   const onRecordCreate = useCallback(
     ({ recordUuid }) => {
       // update current point
+      // eslint-disable-next-line react-hooks/immutability -- the map layer owns the point feature and reuses it
       pointProperties.recordUuid = recordUuid
     },
     [pointProperties]

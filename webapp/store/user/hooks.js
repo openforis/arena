@@ -1,12 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
 import * as RecordStep from '@core/record/recordStep'
 
 import * as User from '@core/user/user'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { useAsyncGetRequest } from '@webapp/components/hooks'
 
 import { useSurveyId, useSurveyInfo } from '@webapp/store/survey'
@@ -54,6 +55,7 @@ export const useOnNewSurveyClick = ({ onAfterClick } = {}) => {
 
 export const useAuthCanEditSurvey = () => Authorizer.canEditSurvey(useUser(), useSurveyInfo())
 export const useAuthCanExportSurvey = () => Authorizer.canExportSurvey(useUser(), useSurveyInfo())
+export const useAuthCanExportSurveyData = () => canExportSurveyData(useUser(), useSurveyInfo())
 export const useAuthCanViewTemplates = () => Authorizer.canViewTemplates(useUser())
 export const useAuthCanCreateTemplate = () => Authorizer.canCreateTemplate(useUser())
 export const useAuthCanEditTemplates = () => Authorizer.canEditTemplates(useUser())
@@ -66,7 +68,7 @@ export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(
 // ====== Auth / Records
 export const useAuthCanCreateRecord = () => Authorizer.canCreateRecord(useUser(), useSurveyInfo())
 const _canEditRecord = ({ user, surveyInfo, record }) => {
-  const canEdit = Authorizer.canEditRecord(user, record)
+  const canEdit = Authorizer.canEditRecord(user, record) && !Record.isReadOnly(record)
   return canEdit && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
 }
 export const useAuthCanEditRecords = (records) => {
@@ -100,8 +102,6 @@ export const useAuthCanValidateAllRecords = useUserIsSystemAdmin
 // ====== Auth / Map
 export const useAuthCanUseMap = () => Authorizer.canUseMap(useUser(), useSurveyInfo())
 
-export const useAuthCanUseMessages = useUserIsSystemAdmin
-
 // ====== Auth / Users
 export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
@@ -129,19 +129,16 @@ export const useProfilePicture = ({ userUuid = null, forceUpdateKey = null }) =>
     }
   }, [userUuid, forceUpdateKey])
 
-  const [profilePicture, setProfilePicture] = useState(null)
+  const profilePicture = useMemo(() => (data?.size > 0 ? URL.createObjectURL(data) : null), [data])
 
-  useEffect(() => {
-    if (data && data.size > 0) {
-      const objectUrl = URL.createObjectURL(data)
-      setProfilePicture(objectUrl)
-      return () => {
-        URL.revokeObjectURL(objectUrl)
+  useEffect(
+    () => () => {
+      if (profilePicture) {
+        URL.revokeObjectURL(profilePicture)
       }
-    }
-    setProfilePicture(null)
-    return undefined
-  }, [data])
+    },
+    [profilePicture]
+  )
 
   return profilePicture
 }
@@ -154,7 +151,7 @@ export const useUserName = ({ userUuid, active = true }) => {
 
   useEffect(() => {
     if (canViewUsersName && userUuid && active) {
-      API.fetchUserName({ userUuid, surveyId }).then((name) => {
+      void API.fetchUserName({ userUuid, surveyId }).then((name) => {
         setUserName(name)
       })
     }

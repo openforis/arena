@@ -43,13 +43,13 @@ export default {
       <p>The following user has requested access to $t(common.appNameFull).</p>
       <p>
         <ul>
-          <li>$t(accessRequestView.fields.email): {{email}}</li>
-          <li>$t(accessRequestView.fields.props.firstName): {{firstName}}</li>
-          <li>$t(accessRequestView.fields.props.lastName): {{lastName}}</li>
-          <li>$t(accessRequestView.fields.props.institution): {{institution}}</li>
-          <li>$t(accessRequestView.fields.props.country): {{country}}</li>
-          <li>$t(accessRequestView.fields.props.purpose): {{purpose}}</li>
-          <li>$t(accessRequestView.fields.props.surveyName): {{surveyName}}</li>
+          <li>$t(guest:accessRequestView.fields.email): {{email}}</li>
+          <li>$t(guest:accessRequestView.fields.props.firstName): {{firstName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.lastName): {{lastName}}</li>
+          <li>$t(guest:accessRequestView.fields.props.institution): {{institution}}</li>
+          <li>$t(guest:accessRequestView.fields.props.country): {{country}}</li>
+          <li>$t(guest:accessRequestView.fields.props.purpose): {{purpose}}</li>
+          <li>$t(guest:accessRequestView.fields.props.surveyName): {{surveyName}}</li>
         </ul>
       </p>
       <p>Please evaluate this request and get back to the user as soon as possible.</p>
@@ -72,6 +72,20 @@ export default {
     body: `<p>Hello {{name}},</p>
       <p>You have been removed from the survey <strong>{{surveyName}} - {{surveyLabel}}</strong></p>
       <p>If you want to have access again to that survey, please contact the survey administrator.</p>
+      $t(emails:signature)`,
+  },
+  userRegistrationExpired: {
+    subject: 'Your $t(common.appNameFull) account has been removed',
+    accountRemoved: '<p>For this reason your account has been removed.</p>',
+    accountAndSurveysRemoved: `<p>For this reason your account has been removed, together with the following survey(s), which had not been modified since they were created:</p>
+      <ul>{{-surveysList}}</ul>`,
+    surveyItem: '<li><b>{{survey}}</b></li>',
+    requestAccessAgain: `<p>If you still want to use $t(common.appNameFull), you can request access again here: <a href="{{serverUrl}}">{{serverUrl}}</a></p>`,
+    body: `<p>Hello,</p>
+      <p>Your registration to $t(common.appNameFull) was not completed within 7 days of receiving the registration link, so the link has expired.</p>
+      {{-accountRemovedMsg}}
+      {{-requestAccessAgainMsg}}
+      <p>$t(common.raiseTicketInSupportForum)</p>
       $t(emails:signature)`,
   },
 }

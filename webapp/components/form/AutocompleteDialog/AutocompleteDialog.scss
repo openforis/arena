@@ -3,7 +3,7 @@
 .autocomplete-list {
   position: fixed;
   z-index: $zIndex20Dropdown;
-  background-color: $blueLightFocus;
+  background-color: $colorPrimaryContainerLow;
   justify-content: center;
 
   overflow-y: auto;
@@ -15,7 +15,7 @@
     &:hover,
     &:focus {
       cursor: pointer;
-      background-color: rgba($blueLight, 0.5);
+      background-color: with-alpha($colorPrimaryContainer, 0.5);
       outline: none;
     }
   }

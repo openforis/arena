@@ -1,6 +1,5 @@
 import { isUuid } from '@core/uuid'
 import SystemError from '@core/systemError'
-import * as FileUtils from '@server/utils/file/fileUtils'
 
 import { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 import * as TempFileRepositoryFileSystem from '../repository/tempFileRepositoryFileSystem'
@@ -8,27 +7,33 @@ import * as TempFileRepositoryS3Bucket from '../repository/tempFileRepositoryS3B
 
 export { fileContentStorageTypes, getFileContentStorageType } from './fileManagerCommon'
 
-const minFileSizeToUseAlternativeStorage = 10 * 1024 * 1024 // 10MB - For files larger than this, use the configured storage type (e.g. S3 bucket) instead of file system storage.
-
-const contentDeleteFunctionByStorageType = {
+export const contentDeleteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deleteFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deleteFile,
 }
 
-const chunkWriteFunctionByStorageType = {
+export const chunkWriteFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.writeChunkToTempFile,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.writeChunkToTempFile,
 }
 
-const chunkMergeFunctionByStorageType = {
+export const chunkMergeFunctionByStorageType = {
   [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.mergeTempChunks,
   [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.mergeTempChunks,
 }
 
-const getStorageFunctionOrThrow = ({ functionByStorageType, operation, defaultFn = null }) => {
-  const fileStorageType = getFileContentStorageType()
+// `storageType` defaults to the real, current storage type on every call it's omitted - this
+// param exists purely as a test seam (this repo's webpack-bundled unit tests can't jest.mock()
+// local modules, so tests call this directly with an explicit storageType instead). Production
+// code should never pass it explicitly.
+export const getStorageFunctionOrThrow = ({
+  functionByStorageType,
+  operation,
+  defaultFn = null,
+  storageType = getFileContentStorageType(),
+}) => {
   const tempFileStorageType =
-    fileStorageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : fileStorageType
+    storageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : storageType
   const fn = functionByStorageType[tempFileStorageType] ?? defaultFn
   if (!fn) {
     throw new Error(`Operation '${operation}' not implemented for storage type '${tempFileStorageType}'`)
@@ -44,80 +49,86 @@ export const deleteTempFile = async (fileNameOrPath) => {
   await deleteFn({ fileNameOrPath })
 }
 
-export const writeChunkToTempFile = async ({ fileId, chunk, totalFileSize, filePath = null, fileContent = null }) => {
-  let writeChunkFunction
-  if (totalFileSize > minFileSizeToUseAlternativeStorage) {
-    // For larger files, use the configured storage type (e.g. S3 bucket) to write chunks.
-    writeChunkFunction = getStorageFunctionOrThrow({
-      functionByStorageType: chunkWriteFunctionByStorageType,
-      operation: 'writeChunkToTempFile',
-    })
-  } else {
-    // For smaller files, default to file system storage to avoid overhead of alternative storage types.
-    writeChunkFunction = chunkWriteFunctionByStorageType[fileContentStorageTypes.fileSystem]
-  }
-  await writeChunkFunction({ filePath, fileContent, fileId, chunk })
-}
-
-export const mergeTempChunks = async ({ fileId, totalChunks, totalFileSize, onChunkMerged = null }) => {
-  let mergeChunksFunction
-  if (totalFileSize > minFileSizeToUseAlternativeStorage) {
-    // For larger files, use the configured storage type (e.g. S3 bucket) to merge chunks.
-    mergeChunksFunction = getStorageFunctionOrThrow({
-      functionByStorageType: chunkMergeFunctionByStorageType,
-      operation: 'mergeTempChunks',
-    })
-  } else {
-    // For smaller files, default to file system storage to merge chunks.
-    mergeChunksFunction = chunkMergeFunctionByStorageType[fileContentStorageTypes.fileSystem]
-  }
-  return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
-}
-
-// Whatever the chunk storage type, mergeTempChunks always produces its final merged file on the local
-// file system (see tempFileRepositoryFileSystem/tempFileRepositoryS3Bucket implementations), so these
-// two functions only need to deal with local files.
-
-const pendingImportFilePrefix = 'pendingImport_'
-const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
-
+/**
+ * Throws an error if the file id is not a uuid: it is used to build temp file names.
+ * @param {string} fileId - The file id to check.
+ */
 const checkFileIdIsValid = (fileId) => {
-  if (!isUuid(fileId)) {
+  if (typeof fileId !== 'string' || !isUuid(fileId)) {
     throw new Error(`Invalid file id: ${fileId}`)
   }
 }
 
-/**
- * Moves a previously merged temp file to a location that can be found again later using only its fileId,
- * so it can be reused by a later request instead of being uploaded again (e.g. confirming an import after
- * previewing it). The file keeps living in the temp folder, so it's still covered by the periodic temp
- * files cleanup.
- * @param {!object} params - The params.
- * @param {!string} params.fileId - The uuid the file was originally uploaded with.
- * @param {!string} params.filePath - The current path of the merged temp file.
- * @returns {Promise<string>} - The new path of the file.
- */
-export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+export const writeChunkToTempFile = async ({ fileId, chunk, filePath = null, fileContent = null }) => {
   checkFileIdIsValid(fileId)
-  const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  await FileUtils.renameFile(filePath, destPath)
-  return destPath
+  const writeChunkFunction = getStorageFunctionOrThrow({
+    functionByStorageType: chunkWriteFunctionByStorageType,
+    operation: 'writeChunkToTempFile',
+  })
+  await writeChunkFunction({ filePath, fileContent, fileId, chunk })
+}
+
+export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
+  checkFileIdIsValid(fileId)
+  const mergeChunksFunction = getStorageFunctionOrThrow({
+    functionByStorageType: chunkMergeFunctionByStorageType,
+    operation: 'mergeTempChunks',
+  })
+  return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
+}
+
+export const keepFileFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.keepFileForLaterUse,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.keepFileForLaterUse,
+}
+
+export const getKeptFilePathFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.getKeptFilePath,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.getKeptFilePath,
 }
 
 /**
- * Resolves the path of a file previously kept with keepFileForLaterUse.
+ * Moves a previously merged temp file to storage that can be found again later using only its fileId,
+ * so it can be reused by a later request instead of being uploaded again (e.g. confirming an import
+ * after previewing it). Uses the configured storage type, so the later request can land on any dyno.
+ * @param {!object} params - The params.
+ * @param {!string} params.fileId - The uuid the file was originally uploaded with.
+ * @param {!string} params.filePath - The current local path of the merged temp file.
+ * @returns {Promise<void>} - Resolved once the file has been moved.
+ */
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  checkFileIdIsValid(fileId)
+  const keepFn = getStorageFunctionOrThrow({
+    functionByStorageType: keepFileFunctionByStorageType,
+    operation: 'keepFileForLaterUse',
+  })
+  await keepFn({ fileId, filePath })
+}
+
+/**
+ * Resolves the local path of a file previously kept with keepFileForLaterUse, downloading it from
+ * external storage into a fresh local temp file first if it isn't already on local disk.
  * Throws if the fileId is invalid or the file cannot be found anymore (e.g. it expired and got cleaned up).
  * @param {!object} params - The params.
  * @param {!string} params.fileId - The uuid the file was originally uploaded with.
- * @returns {string} - The path of the kept file.
+ * @returns {Promise<string>} - The local path of the kept file.
  */
-export const getKeptFilePath = ({ fileId }) => {
+export const getKeptFilePath = async ({ fileId }) => {
   checkFileIdIsValid(fileId)
-  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  if (!FileUtils.exists(filePath)) {
+  const getFn = getStorageFunctionOrThrow({
+    functionByStorageType: getKeptFilePathFunctionByStorageType,
+    operation: 'getKeptFilePath',
+  })
+  const filePath = await getFn({ fileId })
+  if (!filePath) {
     throw new SystemError('dataImport.pendingImportFileNotFoundOrExpired', { fileId })
   }
   return filePath
+}
+
+export const deletePendingImportFunctionByStorageType = {
+  [fileContentStorageTypes.fileSystem]: TempFileRepositoryFileSystem.deletePendingImportFileIfAny,
+  [fileContentStorageTypes.s3Bucket]: TempFileRepositoryS3Bucket.deletePendingImportFileIfAny,
 }
 
 /**
@@ -130,8 +141,9 @@ export const getKeptFilePath = ({ fileId }) => {
  */
 export const deletePendingImportFileIfAny = async ({ fileId }) => {
   checkFileIdIsValid(fileId)
-  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
-  if (FileUtils.exists(filePath)) {
-    await FileUtils.deleteFileAsync(filePath)
-  }
+  const deleteFn = getStorageFunctionOrThrow({
+    functionByStorageType: deletePendingImportFunctionByStorageType,
+    operation: 'deletePendingImportFileIfAny',
+  })
+  await deleteFn({ fileId })
 }

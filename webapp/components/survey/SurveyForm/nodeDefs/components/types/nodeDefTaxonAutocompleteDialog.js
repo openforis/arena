@@ -13,18 +13,11 @@ const NodeDefTaxonAutocompleteItemRenderer = (props) => {
   const vernacularLang = Taxon.getVernacularLanguage(taxon)
 
   return (
-    <div
-      key={Taxon.getUuid(taxon)}
-      className="item"
-      onKeyDown={onKeyDown}
-      onMouseDown={onMouseDown}
-      role="button"
-      tabIndex="1"
-    >
+    <button key={Taxon.getUuid(taxon)} className="item" onKeyDown={onKeyDown} onMouseDown={onMouseDown} type="button">
       <div>{Taxon.getCode(taxon)}</div>
       <div>{Taxon.getScientificName(taxon)}</div>
       {vernacularLang && <div style={{ gridColumn: 2 }}>{`${Taxon.getVernacularName(taxon)} (${vernacularLang})`}</div>}
-    </div>
+    </button>
   )
 }
 
@@ -56,6 +49,7 @@ const NodeDefTaxonAutocompleteDialog = (props) => {
       items={taxa}
       itemRenderer={NodeDefTaxonAutocompleteItemRenderer}
       itemKey={(taxon) => `${Taxon.getUuid(taxon)}_${Taxon.getVernacularNameUuid(taxon)}`}
+      // eslint-disable-next-line react-hooks/refs -- rendered only after a change event of the input, so the ref is set
       inputField={inputRef.current}
       onItemSelect={onItemSelect}
       onClose={onClose}

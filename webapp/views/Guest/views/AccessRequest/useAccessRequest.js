@@ -14,7 +14,7 @@ export const useAccessRequest = () => {
   const dispatch = useDispatch()
   const i18n = useI18n()
 
-  const [request, setRequestState] = useState({})
+  const [request, setRequest] = useState({})
   const [requestSentSuccessfully, setRequestSentSuccessfully] = useState(false)
   const [validation, setValidation] = useState(null)
   const reCaptchaRef = useRef(null)
@@ -24,7 +24,7 @@ export const useAccessRequest = () => {
   const validate = async () => setValidation(await UserAccessRequestValidator.validateUserAccessRequest(request))
 
   const onFieldValueChange = async ({ name, value }) => {
-    setRequestState((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
+    setRequest((reqPrev) => ObjectUtils.setInPath(name.split('.'), value)({ ...reqPrev }))
     await validate()
   }
 
@@ -39,7 +39,7 @@ export const useAccessRequest = () => {
 
     if (ProcessUtils.ENV.reCaptchaEnabled) {
       if (!getRecaptchaToken()) {
-        dispatch(NotificationActions.notifyWarning({ key: 'accessRequestView.reCaptchaNotAnswered' }))
+        dispatch(NotificationActions.notifyWarning({ key: 'guest:accessRequestView.reCaptchaNotAnswered' }))
         return false
       }
     }
@@ -61,7 +61,9 @@ export const useAccessRequest = () => {
 
       if (error) {
         const errorMessage = i18n.t(error, errorParams)
-        dispatch(NotificationActions.notifyError({ key: 'accessRequestView.error', params: { error: errorMessage } }))
+        dispatch(
+          NotificationActions.notifyError({ key: 'guest:accessRequestView.error', params: { error: errorMessage } })
+        )
         reCaptchaRef.current?.reset()
       } else {
         setRequestSentSuccessfully(true)
@@ -71,7 +73,7 @@ export const useAccessRequest = () => {
     if (await checkFormValid()) {
       dispatch(
         DialogConfirmActions.showDialogConfirm({
-          key: 'accessRequestView.sendRequestConfirm',
+          key: 'guest:accessRequestView.sendRequestConfirm',
           onOk: onSubmitConfirm,
         })
       )

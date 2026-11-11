@@ -12,6 +12,7 @@ const keys = {
   recordEditModalProps: 'recordEditModalProps',
   selectedQuerySummaryUuid: 'selectedQuerySummaryUuid',
   codesVisible: 'codesVisible',
+  totalsVisible: 'totalsVisible',
 }
 
 const chartTypes = {
@@ -44,6 +45,7 @@ const getQuery = getProp(keys.query)
 const getRecordEditModalProps = getProp(keys.recordEditModalProps)
 const getSelectedQuerySummaryUuid = getProp(keys.selectedQuerySummaryUuid)
 const codesVisible = (state) => getProp(keys.codesVisible)(state) === true
+const totalsVisible = (state) => getProp(keys.totalsVisible)(state) === true
 
 // update (context data explorer state)
 const assocChartType = A.assoc(keys.chartType)
@@ -106,6 +108,7 @@ const assocRecordEditModalProps = A.assoc(keys.recordEditModalProps)
 const dissocRecordEditModalProps = A.dissoc(keys.recordEditModalProps)
 
 const assocCodesVisible = A.assoc(keys.codesVisible)
+const assocTotalsVisible = A.assoc(keys.totalsVisible)
 
 // utils
 const isChartTypeAvailable =
@@ -127,6 +130,7 @@ export const DataExplorerState = {
   getSelectedQuerySummaryUuid,
   getRecordEditModalProps,
   codesVisible,
+  totalsVisible,
   // update
   assocChartType,
   assocDisplayType,
@@ -137,6 +141,7 @@ export const DataExplorerState = {
   assocRecordEditModalProps,
   dissocRecordEditModalProps,
   assocCodesVisible,
+  assocTotalsVisible,
 
   // utils
   isChartTypeAvailable,

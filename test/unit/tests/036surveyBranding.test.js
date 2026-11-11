@@ -84,6 +84,16 @@ describe('SurveyBranding', () => {
     })
   })
 
+  describe('newBrandingImageDescriptor', () => {
+    it('builds a descriptor from fileUuid, size and name', () => {
+      expect(SurveyBranding.newBrandingImageDescriptor({ fileUuid: 'uuid-1', size: 100, name: 'logo.png' })).toEqual({
+        fileUuid: 'uuid-1',
+        size: 100,
+        name: 'logo.png',
+      })
+    })
+  })
+
   describe('hasLogoDescriptor', () => {
     it('detects fileUuid', () => {
       expect(SurveyBranding.hasLogoDescriptor({ fileUuid: 'a' })).toBe(true)
@@ -139,6 +149,42 @@ describe('SurveyBranding', () => {
       expect(SurveyBranding.LANDING_BACKGROUND_MAX_FILE_SIZE_BYTES).toBe(
         SurveyBranding.BRANDING_IMAGE_MAX_FILE_SIZE_BYTES
       )
+    })
+  })
+
+  describe('getBrandingFileSummaries', () => {
+    it('returns a summary with type, size and name for every populated logo/background slot', () => {
+      const branding = {
+        surveyLogo1: { fileUuid: 'uuid-logo-1', size: 100, name: 'logo1.png' },
+        surveyLogo2: { fileUuid: 'uuid-logo-2', size: 200, name: 'logo2.svg' },
+        surveyLogo3: { fileUuid: 'uuid-logo-3', size: 300, name: 'logo3.png' },
+        landingBackground: { fileUuid: 'uuid-bg', size: 400, name: 'background.png' },
+      }
+      expect(SurveyBranding.getBrandingFileSummaries(branding)).toEqual([
+        { uuid: 'uuid-logo-1', props: { type: 'brandingSurveyLogo1', size: 100, name: 'logo1.png' } },
+        { uuid: 'uuid-logo-2', props: { type: 'brandingSurveyLogo2', size: 200, name: 'logo2.svg' } },
+        { uuid: 'uuid-logo-3', props: { type: 'brandingSurveyLogo3', size: 300, name: 'logo3.png' } },
+        { uuid: 'uuid-bg', props: { type: 'brandingLandingBackground', size: 400, name: 'background.png' } },
+      ])
+    })
+
+    it('skips slots without a fileUuid', () => {
+      const branding = { surveyLogo2: { fileUuid: 'uuid-logo-2', size: 200, name: 'logo2.png' } }
+      expect(SurveyBranding.getBrandingFileSummaries(branding)).toEqual([
+        { uuid: 'uuid-logo-2', props: { type: 'brandingSurveyLogo2', size: 200, name: 'logo2.png' } },
+      ])
+    })
+
+    it('returns an empty array for empty branding', () => {
+      expect(SurveyBranding.getBrandingFileSummaries({})).toEqual([])
+      expect(SurveyBranding.getBrandingFileSummaries()).toEqual([])
+    })
+
+    it('passes size/name through as undefined when the descriptor lacks them, without a fallback', () => {
+      const branding = { surveyLogo2: { fileUuid: 'uuid-logo-2' } }
+      const [summary] = SurveyBranding.getBrandingFileSummaries(branding)
+      expect(summary.props.size).toBeUndefined()
+      expect(summary.props.name).toBeUndefined()
     })
   })
 })

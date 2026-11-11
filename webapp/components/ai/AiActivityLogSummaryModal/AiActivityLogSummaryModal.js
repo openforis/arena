@@ -1,6 +1,6 @@
 import './AiActivityLogSummaryModal.scss'
 
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as API from '@webapp/service/api'
@@ -9,7 +9,7 @@ import Markdown from '@webapp/components/markdown'
 import { useI18n, useI18nT } from '@webapp/store/system'
 import { useSurveyId } from '@webapp/store/survey'
 
-const AiActivityLogSummaryModal = ({ from, to, userUuid, onClose }) => {
+const AiActivityLogSummaryModal = ({ from = undefined, to = undefined, userUuid = undefined, onClose }) => {
   const i18n = useI18n()
   // Server-side error messages may contain quoted identifiers (Postgres
   // column names, etc.) which i18next escapes by default — appears as

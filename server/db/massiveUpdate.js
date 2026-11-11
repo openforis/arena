@@ -26,7 +26,8 @@ export default class MassiveUpdate {
   async push(...values) {
     this.values.push(...values)
 
-    if (this.values.length === this.bufferSize) {
+    // values can be pushed in batches, so the buffer size can be exceeded
+    if (this.values.length >= this.bufferSize) {
       await this.flush()
     }
   }

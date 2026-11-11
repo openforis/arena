@@ -7,15 +7,15 @@
   border-top: none;
   border-left: none;
   border-right: none;
-  border-bottom: 1px dotted $greyBorder;
+  border-bottom: 1px dotted $colorOutline;
   text-align: left;
 
   &.not-selectable {
-    cursor: default !important;
+    cursor: default;
   }
 
   .icon {
-    font-size: 11px !important;
+    font-size: 11px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
   }
 
   .node-def__icon-wrapper {

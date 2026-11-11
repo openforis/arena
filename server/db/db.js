@@ -1,3 +1,1 @@
-import { DB } from '@openforis/arena-server'
-
-export const db = DB
+export { DB as db } from '@openforis/arena-server'

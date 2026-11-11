@@ -73,7 +73,7 @@ const BinaryOperand = (props) => {
   )
 
   const applicableOperandExpressionTypes = useMemo(
-    () => availableOperandExpressionTypes.filter(canOperandExpressionBeOfType),
+    () => availableOperandExpressionTypes.filter((type) => canOperandExpressionBeOfType(type)),
     [canOperandExpressionBeOfType]
   )
 

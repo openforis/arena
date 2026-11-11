@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -18,6 +18,21 @@ const validateCountProp =
       ? NodeDefExpressionsValidator.validate(survey, nodeDef, dependencyType)
       : Validator.validatePositiveOrZeroNumber(errorKey)(propName, item)
   }
+
+// "required if" is allowed only for single non-key attributes, as an alternative to "always required"
+const canHaveRequiredIf = (nodeDef) =>
+  NodeDef.isAttribute(nodeDef) &&
+  NodeDef.isSingle(nodeDef) &&
+  !NodeDef.isKey(nodeDef) &&
+  !NodeDefValidations.isRequired(NodeDef.getValidations(nodeDef))
+
+const validateRequiredIf = async (survey, nodeDef) => {
+  if (!NodeDefValidations.isRequiredIfDefined(NodeDef.getValidations(nodeDef))) return null
+  if (!canHaveRequiredIf(nodeDef)) {
+    return Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.requiredIfNotAllowed }])
+  }
+  return NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.required)
+}
 
 export const validate = async (survey, nodeDef) => {
   const nodeDefValidations = NodeDef.getValidations(nodeDef)
@@ -42,11 +57,12 @@ export const validate = async (survey, nodeDef) => {
       })
     : Validation.newInstance()
 
-  return R.pipe(
+  return A.pipe(
     Validation.assocFieldValidation(
       keys.expressions,
       await NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.validations)
     ),
-    R.unless(Validation.isValid, Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]))
+    Validation.assocFieldValidation(keys.requiredIf, await validateRequiredIf(survey, nodeDef)),
+    A.unless(Validation.isValid, Validation.setErrors([{ key: Validation.messageKeys.nodeDefEdit.validationsInvalid }]))
   )(validation)
 }

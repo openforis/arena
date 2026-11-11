@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .ai-activity-log-summary-modal {
   .modal-content {
     max-height: 80vh;
@@ -33,7 +35,7 @@
   }
 
   &__error {
-    color: #c62828;
+    color: $colorError;
     font-size: 0.9rem;
   }
 }

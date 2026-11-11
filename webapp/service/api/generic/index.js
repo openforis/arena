@@ -8,6 +8,13 @@ export const fetchVersion = async () => {
   return version
 }
 
+export const fetchChangelog = async () => {
+  const {
+    data: { content },
+  } = await axios.get(`/api/changelog`)
+  return content
+}
+
 export const downloadFileUrl = ({ downloadToken, fileType, fileFormat, surveyId = null, cycle = null }) => {
   const params = { downloadToken, fileType, fileFormat, surveyId, cycle }
   const cleanParams = Objects.deleteEmptyProps(params)

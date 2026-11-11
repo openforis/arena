@@ -8,7 +8,7 @@ const { updateTablesFromUpdates } = DataTableUpdateRepository
 const generateRdbUpates = ({ survey, record, nodesArray }) => {
   // include ancestor nodes (used to find the correct rdb table to update)
   const nodesAndDependentsAndAncestors = nodesArray.reduce((nodesAcc, node) => {
-    Record.visitAncestorsAndSelf({ node, visitor: (n) => (nodesAcc[n.uuid] = n) })(record)
+    Record.visitAncestorsAndSelf(node, (n) => (nodesAcc[n.uuid] = n))(record)
     return nodesAcc
   }, {})
   const rdbUpdates = DataTableUpdateRepository.generateRdbUpdates({

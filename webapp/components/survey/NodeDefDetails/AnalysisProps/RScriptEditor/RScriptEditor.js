@@ -1,6 +1,6 @@
 import './RScriptEditor.scss'
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -161,7 +161,7 @@ const RScriptEditor = (props) => {
   }, [generateLocalScript])
 
   return (
-    <FormItem label="nodeDefEdit.advancedProps.script" className="script-form">
+    <FormItem label="nodeDefEdit:advancedProps.script" className="script-form">
       <ScriptEditor
         key={localScript}
         name="node_def_analysis_script"

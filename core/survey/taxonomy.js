@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
@@ -34,9 +34,9 @@ export const { getDescriptions, getDescription } = ObjectUtils
 export const getVernacularLanguageCodes = ObjectUtils.getProp(keysProps.vernacularLanguageCodes, [])
 export const getExtraPropsDefs = ObjectUtils.getProp(keysProps.extraPropsDefs, {})
 export const getExtraPropKeys = (taxonomy) => Object.keys(getExtraPropsDefs(taxonomy))
-export const getExtraPropsDefsArray = R.pipe(getExtraPropsDefs, ExtraPropDef.extraDefsToArray)
+export const getExtraPropsDefsArray = A.pipe(getExtraPropsDefs, ExtraPropDef.extraDefsToArray)
 
-export const getTaxaCount = R.prop(keys.taxaCount)
+export const getTaxaCount = A.prop(keys.taxaCount)
 
 export const isBigTaxonomy = (taxonomy) => {
   const taxaCount = getTaxaCount(taxonomy)
@@ -49,5 +49,5 @@ export const assocExtraPropsDefs = (extraPropsDefs) => (taxonomy) =>
 
 // UTILS
 export const isEmpty = (taxonomy) =>
-  StringUtils.isBlank(Taxonomy.getName(taxonomy)) && R.isEmpty(Taxonomy.getDescriptions(taxonomy))
+  StringUtils.isBlank(Taxonomy.getName(taxonomy)) && A.isEmpty(Taxonomy.getDescriptions(taxonomy))
 export const hasExtraDefs = (taxonomy) => getExtraPropKeys(taxonomy).length > 0

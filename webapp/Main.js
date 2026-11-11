@@ -6,15 +6,19 @@ import './style/main.scss'
 import { createRoot } from 'react-dom/client'
 import { Provider } from 'react-redux'
 import { I18nextProvider } from 'react-i18next'
-import { BrowserRouter } from 'react-router-dom'
+import { BrowserRouter } from 'react-router'
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
-import { AdapterMoment } from '@mui/x-date-pickers/AdapterMoment'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { store } from '@webapp/store'
 import Arena from '@webapp/views/Arena'
 import { SurveyThemeBridge } from '@webapp/theme/SurveyThemeBridge'
+import { applyThemeMode, getThemePreference, resolveThemeMode } from '@webapp/theme/themeMode'
 
 import i18nInstance from '@core/i18n/i18nFactory'
+
+// apply the theme before the first render to avoid a flash of the light theme
+applyThemeMode(resolveThemeMode(getThemePreference()))
 
 // remove preloader
 document.getElementById('preloader-wrapper').remove()
@@ -27,7 +31,7 @@ root.render(
     <SurveyThemeBridge>
       <I18nextProvider i18n={i18nInstance}>
         <BrowserRouter>
-          <LocalizationProvider dateAdapter={AdapterMoment}>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
             <Arena />
           </LocalizationProvider>
         </BrowserRouter>

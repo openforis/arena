@@ -1,3 +1,5 @@
+import './MessageNotificationPanel.scss'
+
 import PropTypes from 'prop-types'
 
 import { Messages } from '@openforis/arena-core'
@@ -19,7 +21,7 @@ export const MessageNotificationPanel = (props) => {
           content: (
             <div className="message-notification">
               <div className="message-notification__body">
-                <Markdown source={Messages.getBody(message)} />
+                <Markdown openLinksInNewTab source={Messages.getBody(message)} />
               </div>
             </div>
           ),

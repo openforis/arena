@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -7,6 +7,7 @@ import { Query } from '@common/model/query'
 
 import { DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 
+import { MeasureAggregateFunctionsButton } from './MeasureAggregateFunctionsButton'
 import { DataQuerySortableItems } from './DataQuerySortableItems'
 
 export const DataQuerySelectedMeasures = (props) => {
@@ -52,6 +53,7 @@ export const DataQuerySelectedMeasures = (props) => {
       nodeDefUuids={measuresDefUuids}
       onItemDelete={onMeasureDelete}
       onItemsSort={onMeasuresSort}
+      renderItemExtra={(nodeDef) => <MeasureAggregateFunctionsButton nodeDef={nodeDef} />}
     />
   )
 }

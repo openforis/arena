@@ -1,149 +1,427 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
-@use '~@webapp/style/layoutMixins' as *;
 
-@keyframes not-logged-in__bg-animation {
-  0%,
-  100% {
-    transform: scale(1, 1);
-    opacity: 0.2;
-  }
+$guestMobileBreakpoint: 900px;
 
-  50% {
-    transform: scale(1.1, 1.1);
-    opacity: 0.05;
-  }
-}
+.guest {
+  // intensity of the blue/green glows over the gradient (lower in dark theme)
+  --guest-glow-amount: 85%;
 
-.guest__wrapper {
+  position: fixed;
+  inset: 0;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  overflow: auto;
+  color: $colorOnBrandGradient;
+  background:
+    radial-gradient(
+      75rem 44rem at 85% 110%,
+      color-mix(in srgb, #{$colorSuccess} var(--guest-glow-amount), transparent) 0%,
+      transparent 60%
+    ),
+    radial-gradient(
+      56rem 38rem at 0% 0%,
+      color-mix(in srgb, #{$colorPrimary} var(--guest-glow-amount), transparent) 0%,
+      transparent 55%
+    ),
+    linear-gradient(135deg, $colorBrandGradientStart 0%, $colorBrandGradientMiddle 50%, $colorBrandGradientEnd 100%);
+  background-attachment: fixed;
+}
+
+:root[data-theme='dark'] .guest {
+  --guest-glow-amount: 40%;
+}
+
+.guest__background {
+  position: fixed;
+  inset: 0;
   width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0.55;
 }
 
-.guest__bg {
-  @include full-screen-fixed();
-  z-index: -1;
-  background-size: cover;
-  background-position: center;
-  background-image: url('/img/not-logged-in-bg.jpg');
-  opacity: 0.2;
-  animation: not-logged-in__bg-animation 15s infinite;
+.guest__background-flow {
+  fill: none;
+  stroke: $colorOnBrandGradient;
+  stroke-linecap: round;
 }
 
-.guest__openforis,
-.guest__of-arena-logo {
+.guest__background-cell {
+  fill: $colorSuccess;
+}
+
+.guest__header,
+.guest__main,
+.guest__footer {
+  position: relative;
+}
+
+.guest__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.25rem 2rem;
+
+  .guest__toolbar .MuiButton-root {
+    color: $colorOnBrandGradient;
+  }
+}
+
+.guest__brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  color: $colorOnBrandGradient;
+  text-decoration: none;
+
+  img {
+    width: 2.25rem;
+    height: 2.25rem;
+  }
+}
+
+.guest__brand-name {
+  line-height: 1.05;
+
+  small {
+    display: block;
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.8;
+  }
+
+  strong {
+    font-size: 1.15rem;
+  }
+}
+
+.guest__main {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 28rem;
+  gap: 3rem;
+  align-items: center;
+  padding: 1rem 4rem 3rem;
+
+  &--wide {
+    grid-template-columns: minmax(0, 1fr) 40rem;
+    padding-bottom: 1.5rem;
+
+    .guest__card {
+      padding: 1.75rem 2rem 1.5rem;
+    }
+  }
+}
+
+// shown only on small screens
+.guest__pitch-steps-toggle {
   display: none;
 }
 
-@media screen and (max-width: 768px) {
-  .guest__of-arena-logo {
-    display: flex;
-    margin: 1rem;
+.guest__pitch-steps {
+  display: grid;
+  gap: 1rem;
+  max-width: 30rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: guest-pitch-step;
 
-    img {
-      height: 100px;
+  li {
+    display: grid;
+    grid-template-columns: 1.75rem 1fr;
+    column-gap: 0.75rem;
+    line-height: 1.45;
+    counter-increment: guest-pitch-step;
+
+    &::before {
+      content: counter(guest-pitch-step);
+      grid-row: span 2;
+      width: 1.75rem;
+      height: 1.75rem;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      background-color: with-alpha($colorOnBrandGradient, 0.15);
+      border: 1px solid with-alpha($colorOnBrandGradient, 0.3);
+    }
+
+    .guest__pitch-step-description {
+      font-size: 0.85rem;
+      opacity: 0.85;
+
+      p {
+        margin: 0;
+      }
+
+      strong {
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+
+      // the sender email address is rendered as a mailto link
+      a {
+        color: inherit;
+        text-decoration: underline;
+      }
     }
   }
 }
 
-@media only screen and (min-width: 768px) {
-  .guest__openforis {
-    position: fixed;
-    width: 60px;
-    right: 5vw;
-    top: 0;
-    border-left: 2px solid $green;
-    border-bottom: 2px solid $green;
-    border-right: 2px solid $green;
-    padding: 10px;
-    display: grid;
-    grid-row-gap: 10px;
-    z-index: $zIndex10TopOfApp;
-
-    > div {
-      padding: 10px 0;
-      text-align: center;
-      font-size: 1.25rem;
-      color: white;
-      text-transform: uppercase;
-    }
-
-    .openforis {
-      background-color: rgba($green, 0.9);
-
-      .separator {
-        font-size: 0.3rem;
-      }
-    }
-
-    .arena {
-      background-color: rgba($red, 0.8);
-    }
+.guest__pitch {
+  h1 {
+    font-size: 2.6rem;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    max-width: 16ch;
+    margin: 0 0 1rem;
   }
 
-  .guest__form {
-    position: fixed;
-    width: 35vw;
-    min-width: 20rem;
-    height: 70vh;
-    top: 15vh;
-    left: 30vw;
+  p {
+    max-width: 44ch;
+    margin: 0 0 1.5rem;
+    line-height: 1.6;
+    opacity: 0.85;
   }
+}
+
+.guest__pitch-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    padding: 0.35rem 0.75rem;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    background-color: with-alpha($colorOnBrandGradient, 0.11);
+    border: 1px solid with-alpha($colorOnBrandGradient, 0.19);
+  }
+}
+
+.guest__card {
+  color: $colorOnSurface;
+  background-color: with-alpha($colorSurface, 0.94);
+  backdrop-filter: blur(16px);
+  border: 1px solid with-alpha($colorOnBrandGradient, 0.25);
+  border-radius: 20px;
+  padding: 2.25rem;
+  box-shadow: 0 30px 60px -25px with-alpha($colorShadow, 0.6);
+
+  // default MUI field height, so that the floating labels fit
+  .MuiTextField-root .MuiInputBase-input {
+    padding: 1rem 0.85rem;
+  }
+
+  .dropdown__control {
+    min-height: 3.4rem;
+  }
+}
+
+.guest__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 1.25rem;
+  padding: 0 2rem 1rem;
+  font-size: 0.75rem;
+  opacity: 0.8;
+
+  a {
+    color: inherit;
+  }
+}
+
+// ===== content of the card (shared by all the guest views)
+
+.guest__view-header {
+  margin-bottom: 1.5rem;
+}
+
+.guest__back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.85rem;
+  color: $colorOnSurfaceVariant;
+  text-decoration: none;
+
+  &:hover {
+    color: $colorOnSurface;
+  }
+}
+
+.guest__view-icon {
+  width: 3.25rem;
+  height: 3.25rem;
+  margin-bottom: 1rem;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+
+  &--primary {
+    color: $colorPrimary;
+    background-color: $colorPrimaryContainerLow;
+  }
+
+  &--success {
+    color: $colorSuccess;
+    background-color: $colorSuccessContainer;
+  }
+}
+
+.guest__view-title {
+  margin: 0;
+  line-height: 1.25;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.guest__view-description {
+  margin: 0.4rem 0 0;
+  line-height: 1.5;
+  white-space: pre-line;
+  color: $colorOnSurfaceVariant;
 }
 
 .guest__form {
-  margin: 1rem 3rem;
   display: grid;
-  grid-template-columns: 1fr;
-  align-content: start;
-  grid-row-gap: 1rem;
-  overflow-y: auto;
+  gap: 1rem;
 
-  .title {
-    font-size: 1.5rem;
-    text-align: center;
+  .MuiTextField-root {
+    width: 100%;
   }
 }
 
-.guest__form input {
+.guest__submit.btn {
+  width: 100%;
+  height: 2.75rem;
+  font-weight: 600;
+  text-transform: none;
+}
+
+.guest__link {
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+  color: $colorPrimary;
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.guest__footnote {
+  margin: 0;
   text-align: center;
-  color: $black;
-  background-color: white;
-  font-size: 1rem;
+  font-size: 0.85rem;
+  color: $colorOnSurfaceVariant;
+}
 
-  &:focus,
-  &:active,
-  &:-webkit-autofill,
-  &:-webkit-autofill:hover,
-  &:-webkit-autofill:focus {
-    background-color: color.adjust($greenLight, $lightness: 10%);
-    color: $black;
-    -webkit-text-fill-color: $black;
-    box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
-    -webkit-box-shadow: 0 0 0px 1000px color.adjust($greenLight, $lightness: 10%) inset;
-    font-family: $fontFamily;
-    font-size: 1rem;
+.guest__divider {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.8rem;
+  color: $colorOnSurfaceVariant;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: $colorOutline;
   }
 }
 
-.guest__buttons {
-  min-width: 70%;
-  display: grid;
-  justify-self: center;
-  align-self: center;
-  grid-row-gap: 0.5rem;
+@media screen and (max-width: $guestMobileBreakpoint) {
+  .guest__header {
+    padding: 0.75rem 1rem;
+  }
 
-  button[type='submit'] {
-    border: none;
-    background-color: rgba($green, 0.5);
-    padding: 1rem;
-    text-transform: uppercase;
-    font-weight: 600;
+  .guest__main,
+  .guest__main--wide {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1.25rem;
+    padding: 0.5rem 1rem 2rem;
+  }
 
-    &:hover {
-      background-color: rgba($green, 0.8);
+  .guest__pitch {
+    h1 {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+
+    > p,
+    .guest__pitch-tags {
+      display: none;
     }
   }
+
+  // access request: the card title is enough and the steps are collapsible, to keep the form visible
+  .guest__pitch--access-request {
+    h1 {
+      display: none;
+    }
+
+    .guest__pitch-steps.collapsed {
+      display: none;
+    }
+  }
+
+  .guest__pitch-steps-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.4rem 0.75rem;
+    border-radius: 99px;
+    border: 1px solid with-alpha($colorOnBrandGradient, 0.3);
+    background-color: with-alpha($colorOnBrandGradient, 0.11);
+    color: $colorOnBrandGradient;
+    font: inherit;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .guest__card,
+  .guest__main--wide .guest__card {
+    padding: 1.5rem 1.25rem;
+  }
+
+  .guest__pitch-steps {
+    margin-top: 0.75rem;
+  }
+
+  .guest__footer {
+    justify-content: center;
+  }
+}
+
+.guest-login__forgot-password {
+  justify-self: end;
+  margin-top: -0.5rem;
+  font-size: 0.8rem;
+}
+
+// keep the password strength checks close to the password field
+.guest__form .password-strength-checker {
+  margin-top: -0.5rem;
+}
+
+// verification code boxes as wide as the form
+.guest__card .verification-code-input__boxes {
+  justify-content: space-between;
 }

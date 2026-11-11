@@ -21,24 +21,21 @@ const ModuleSwitch = (props) => {
 
   const navigate = useNavigate()
 
-  if (moduleDefault) {
-    // redirect to default module/url
-    const rootPath = moduleRoot ? appModuleUri(moduleRoot) : `/${app}`
+  const rootPath = moduleRoot ? appModuleUri(moduleRoot) : `/${app}`
+  const isInRootModule = useIsInRoute(rootPath)
 
-    const isInRootModule = useIsInRoute(rootPath)
-
-    useEffect(() => {
-      if (isInRootModule) {
-        navigate(appModuleUri(moduleDefault), { replace: true })
-      }
-    }, [isInRootModule, moduleDefault, navigate])
-  }
+  // redirect to default module/url
+  useEffect(() => {
+    if (moduleDefault && isInRootModule) {
+      navigate(appModuleUri(moduleDefault), { replace: true })
+    }
+  }, [isInRootModule, moduleDefault, navigate])
 
   return (
     <Routes>
-      {modules.map((module, i) => (
+      {modules.map((module) => (
         <Route
-          key={i}
+          key={module.path}
           path={module.path}
           element={
             <React.Suspense fallback={<FallbackComponent />}>

@@ -1,9 +1,8 @@
-import './ResetPassword.scss'
-
 import * as User from '@core/user/user'
 
 import { useI18n } from '@webapp/store/system'
 import Error from '@webapp/views/Guest/Error'
+import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
 import DropdownUserTitle from '@webapp/components/form/DropdownUserTitle'
 
@@ -22,26 +21,26 @@ const ResetPassword = () => {
     navigateToHomePage,
   } = useResetPassword()
 
-  if (!user || !user.email)
+  if (!user?.email)
     return (
       <form onSubmit={(event) => event.preventDefault()} className="guest__form">
-        <Button className="btn-goto-home" label="common.goToHomePage" onClick={navigateToHomePage} />
+        <Button className="guest__submit" label="common.goToHomePage" onClick={navigateToHomePage} />
       </form>
     )
 
   const hasAlreadyAccepted = User.hasAccepted(initialUser)
+  const viewKey = hasAlreadyAccepted ? 'setYourNewPassword' : 'completeRegistration'
 
   return (
-    <form onSubmit={(event) => event.preventDefault()} className="guest__form reset-password">
-      <div className="title">
-        {i18n.t(
-          hasAlreadyAccepted
-            ? 'resetPasswordView.title.setYourNewPassword'
-            : 'resetPasswordView.title.completeRegistration'
-        )}
-      </div>
+    <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      <GuestViewHeader
+        description={`guest:resetPasswordView.description.${viewKey}`}
+        icon={hasAlreadyAccepted ? 'icon-key' : 'icon-user-plus'}
+        title={`guest:resetPasswordView.title.${viewKey}`}
+      />
+      <Error error={error} />
 
-      <TextInput label={i18n.t('loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
+      <TextInput label={i18n.t('guest:loginView.yourEmail')} value={user.email} readOnly type="text" name="email" />
 
       {!hasAlreadyAccepted && (
         <>
@@ -50,7 +49,7 @@ const ResetPassword = () => {
             defaultValue={user.name}
             name="name"
             autoComplete="new-name"
-            label={i18n.t('loginView.yourName')}
+            label={i18n.t('guest:loginView.yourName')}
             onChange={(value) => onChangeUser({ prop: 'name', value })}
           />
         </>
@@ -58,7 +57,7 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.password}
-        label={i18n.t(hasAlreadyAccepted ? 'loginView.yourNewPassword' : 'loginView.yourPassword')}
+        label={i18n.t(hasAlreadyAccepted ? 'guest:loginView.yourNewPassword' : 'guest:loginView.yourPassword')}
         onChange={(value) => onChangeUser({ prop: 'password', value })}
       />
 
@@ -67,17 +66,20 @@ const ResetPassword = () => {
       <PasswordInput
         autoComplete="new-password"
         defaultValue={user.passwordConfirm}
-        label={i18n.t(hasAlreadyAccepted ? 'loginView.repeatYourNewPassword' : 'loginView.repeatYourPassword')}
+        label={i18n.t(
+          hasAlreadyAccepted ? 'guest:loginView.repeatYourNewPassword' : 'guest:loginView.repeatYourPassword'
+        )}
         onChange={(value) => onChangeUser({ prop: 'passwordConfirm', value })}
       />
 
-      <div className="guest__buttons">
-        <button type="submit" className="btn" onClick={onSubmit}>
-          {i18n.t(hasAlreadyAccepted ? 'resetPasswordView.setNewPassword' : 'resetPasswordView.completeRegistration')}
-        </button>
-      </div>
-
-      <Error error={error} />
+      <Button
+        className="guest__submit"
+        label={
+          hasAlreadyAccepted ? 'guest:resetPasswordView.setNewPassword' : 'guest:resetPasswordView.completeRegistration'
+        }
+        onClick={onSubmit}
+        type="submit"
+      />
     </form>
   )
 }

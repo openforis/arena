@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
 import { defaults } from './defaults'
-import { keys, modes, displayTypes } from './keys'
+import { keys, modes } from './keys'
 
 export const DEFAULT_AGGREGATE_FUNCTIONS = {
   avg: 'avg',
@@ -27,7 +27,7 @@ export const create = ({
 })
 
 // ====== READ
-export { displayTypes, modes }
+export { displayTypes, modes } from './keys'
 const getPropOrDefault = (key) => A.propOr(defaults[key], key)
 export const getMode = A.prop(keys.mode)
 export const getDisplayType = A.prop(keys.displayType)

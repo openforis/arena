@@ -1,12 +1,12 @@
 import PropTypes from 'prop-types'
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 const TaxaTableRow = (props) => {
-  const { extraPropsDefsArray, idx, offset, row: taxon, vernacularLanguageCodes } = props
+  const { extraPropsDefsArray, idx, offset, item: taxon, vernacularLanguageCodes } = props
 
   const extraPropKeys = extraPropsDefsArray.map(ExtraPropDef.getName)
 
@@ -21,7 +21,7 @@ const TaxaTableRow = (props) => {
         const vernacularNames = Taxon.getVernacularNamesByLang(lang)(taxon)
         return (
           <div key={`${Taxon.getUuid(taxon)}_vernacular_name_${lang}`}>
-            {R.pipe(R.map(TaxonVernacularName.getName), R.join(TaxonVernacularName.NAMES_SEPARATOR))(vernacularNames)}
+            {A.pipe(A.map(TaxonVernacularName.getName), A.join(TaxonVernacularName.NAMES_SEPARATOR))(vernacularNames)}
           </div>
         )
       })}
@@ -34,8 +34,8 @@ const TaxaTableRow = (props) => {
 TaxaTableRow.propTypes = {
   extraPropsDefsArray: PropTypes.array.isRequired,
   idx: PropTypes.number.isRequired,
+  item: PropTypes.object.isRequired,
   offset: PropTypes.number.isRequired,
-  row: PropTypes.object.isRequired,
   vernacularLanguageCodes: PropTypes.array.isRequired,
 }
 

@@ -2,6 +2,7 @@ import './ButtonMenu.scss'
 
 import React, { useState } from 'react'
 import classNames from 'classnames'
+import Checkbox from '@mui/material/Checkbox'
 import Menu from '@mui/material/Menu'
 import MenuItem from '@mui/material/MenuItem'
 
@@ -9,8 +10,13 @@ import { Button, ButtonProps } from './Button'
 
 export type ButtonMenuItem = {
   key: string
+  // when defined, the item is a checkbox (it toggles on click)
+  checked?: boolean
   className?: string
+  // overrides closeMenuOnItemClick for this item
+  closeMenuOnClick?: boolean
   content?: React.ReactNode
+  disabled?: boolean
   icon?: React.ReactNode
   iconClassName?: string
   label?: string
@@ -26,6 +32,74 @@ type ButtonMenuProps = ButtonProps & {
   menuClassName?: string
   onItemClick?: (item: ButtonMenuItem) => void
   selectedItemKey?: string
+}
+
+type ButtonMenuPopupProps = {
+  anchorEl: HTMLElement | null
+  closeMenuOnItemClick?: boolean
+  items: ButtonMenuItem[]
+  menuClassName?: string
+  onClose: () => void
+  onItemClick?: (item: ButtonMenuItem) => void
+  selectedItemKey?: string
+}
+
+/**
+ * Menu with the items of a menu button, anchored to the given element.
+ * @param {ButtonMenuPopupProps} props - The menu props.
+ * @returns {React.ReactElement} - The menu element.
+ */
+export const ButtonMenuPopup = (props: ButtonMenuPopupProps) => {
+  const {
+    anchorEl,
+    closeMenuOnItemClick = true,
+    items,
+    menuClassName,
+    onClose,
+    onItemClick: onItemClickProp,
+    selectedItemKey,
+  } = props
+
+  const onItemClick = (item: ButtonMenuItem) => () => {
+    item.onClick?.()
+    onItemClickProp?.(item)
+    if (item.closeMenuOnClick ?? closeMenuOnItemClick) {
+      onClose()
+    }
+  }
+
+  return (
+    <Menu anchorEl={anchorEl} className={menuClassName} open={Boolean(anchorEl)} onClose={onClose}>
+      {items.map((item) => (
+        <MenuItem
+          key={item.key}
+          className="button-menu__item"
+          disabled={item.disabled}
+          onClick={onItemClick(item)}
+          selected={item.key === selectedItemKey}
+          role={item.checked === undefined ? undefined : 'menuitemcheckbox'}
+          aria-checked={item.checked}
+        >
+          {item.checked !== undefined && (
+            // not focusable: the menu item handles click and keyboard
+            <Checkbox checked={item.checked} disableRipple size="small" tabIndex={-1} />
+          )}
+          {item.content ?? (
+            <Button
+              className={classNames(item.className)}
+              icon={item.icon}
+              iconClassName={item.iconClassName}
+              label={item.label}
+              labelIsI18nKey={item.labelIsI18nKey}
+              labelParams={item.labelParams}
+              testId={item.testId}
+              variant="text"
+            />
+          )}
+        </MenuItem>
+      ))}
+    </Menu>
+  )
 }
 
 export const ButtonMenu = (props: ButtonMenuProps) => {
@@ -51,16 +125,6 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
     setAnchorEl(null)
   }
 
-  const onItemClick = (item: ButtonMenuItem) => () => {
-    item.onClick?.()
-    onItemClickProp?.(item)
-    if (closeMenuOnItemClick) {
-      closeMenu()
-    }
-  }
-
-  const open = Boolean(anchorEl)
-
   return (
     <>
       <Button
@@ -73,28 +137,15 @@ export const ButtonMenu = (props: ButtonMenuProps) => {
         <span className="icon icon-ctrl button-menu__button-icon" />
       </Button>
 
-      <Menu anchorEl={anchorEl} className={menuClassName} open={open} onClose={closeMenu}>
-        {items.map((item) => (
-          <MenuItem
-            key={item.key}
-            className="button-menu__item"
-            onClick={onItemClick(item)}
-            selected={item.key === selectedItemKey}
-          >
-            {item.content ?? (
-              <Button
-                className={classNames(item.className)}
-                iconClassName={item.iconClassName}
-                label={item.label}
-                labelIsI18nKey={item.labelIsI18nKey}
-                labelParams={item.labelParams}
-                testId={item.testId}
-                variant="text"
-              />
-            )}
-          </MenuItem>
-        ))}
-      </Menu>
+      <ButtonMenuPopup
+        anchorEl={anchorEl}
+        closeMenuOnItemClick={closeMenuOnItemClick}
+        items={items}
+        menuClassName={menuClassName}
+        onClose={closeMenu}
+        onItemClick={onItemClickProp}
+        selectedItemKey={selectedItemKey}
+      />
     </>
   )
 }

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Marker, Popup, useMap } from 'react-leaflet'
 import PropTypes from 'prop-types'
 
@@ -16,9 +16,13 @@ const ClusteredPointsPopup = (props) => {
           const { key } = properties
           return (
             <li key={key}>
-              <a onClick={() => openPopupOfPoint(point)}>
+              <button
+                type="button"
+                className="cluster-marker__clustered-point-btn"
+                onClick={() => openPopupOfPoint(point)}
+              >
                 <LabelWithTooltip label={pointLabelFunction(point)} />
-              </a>
+              </button>
             </li>
           )
         })}

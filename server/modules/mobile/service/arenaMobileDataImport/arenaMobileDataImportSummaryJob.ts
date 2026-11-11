@@ -41,12 +41,14 @@ export default class ArenaMobileDataImportSummaryJob extends Job {
     this.setContext({ survey })
   }
 
-  generateResult() {
-    return this.combineInnerJobsResults()
+  generateResult(): Promise<any> {
+    return Promise.resolve(this.combineInnerJobsResults())
   }
 
   async onEnd() {
     await super.onEnd()
+
+    this.errors = this.combineInnerJobsErrors()
 
     const context: any = this.context
     const { arenaSurveyFileZip, filePath, fileId } = context

@@ -2,7 +2,7 @@ import { db } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
-import * as camelize from 'camelize'
+import camelize from 'camelize'
 import * as DbUtils from '@server/db/dbUtils'
 
 export const tableName = 'user_invitation'
@@ -42,6 +42,25 @@ export const fetchUserInvitationBySurveyAndUserUuid = async ({ surveyUuid, userU
     `,
     [surveyUuid, userUuid],
     camelize
+  )
+
+/**
+ * Checks if the user has invitations (not removed) to surveys other than the specified one.
+ * @param {!object} params - The parameters.
+ * @param {!string} params.userUuid - UUID of the user.
+ * @param {!string} params.surveyUuid - UUID of the survey to exclude.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<boolean>} - True if the user has been invited to other surveys.
+ */
+export const existsUserInvitationInOtherSurveys = async ({ userUuid, surveyUuid }, client = db) =>
+  client.one(
+    `SELECT EXISTS (
+      SELECT 1
+      FROM ${tableName}
+      WHERE user_uuid = $1 AND survey_uuid <> $2 AND removed_date IS NULL
+    ) AS result`,
+    [userUuid, surveyUuid],
+    (row) => row.result
   )
 
 export const fetchUserInvitationsBySurveyUuid = async ({ surveyUuid }, client = db) =>

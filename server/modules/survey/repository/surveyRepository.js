@@ -1,10 +1,10 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import camelize from 'camelize'
 
 import { db } from '@server/db/db'
 import * as DB from '@server/db'
 
-import { selectDate } from '@server/db/dbUtils'
+import { now as dbNow, newQueryParams, normalizeLimit, normalizeOffset, selectDate } from '@server/db/dbUtils'
 
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
@@ -19,7 +19,8 @@ const _getLabelColumn = (tableAlias) => {
 
 const _getSurveySelectFields = (alias = '') => {
   const prefix = alias ? `${alias}.` : ''
-  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template']
+  // 'app_version' requires a migration from the separate `@openforis/arena-server` package to exist on the DB.
+  const columns = ['id', 'uuid', 'published', 'draft', 'props', 'props_draft', 'owner_uuid', 'template', 'app_version']
   return [
     ...columns.map((c) => `${prefix}${c}`),
     selectDate(`${prefix}date_created`, 'date_created'),
@@ -30,11 +31,24 @@ const _getSurveySelectFields = (alias = '') => {
 
 // ============== CREATE
 
-export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, client = db) =>
+/**
+ * Inserts a new survey row.
+ * @param {object} params - The insert parameters.
+ * @param {object} params.survey - The survey (or survey info) being inserted.
+ * @param {object} [params.props] - The survey published props.
+ * @param {object} [params.propsDraft] - The survey draft props.
+ * @param {string} [params.appVersion] - The app version to stamp the new survey with. A brand-new survey has no
+ *   legacy file paths to migrate, so callers should pass the "current fully-migrated" stamp value (see
+ *   `getCurrentAppVersionStamp` in `surveyDataMigrationSteps.js`) rather than leaving this unset, otherwise the
+ *   survey would be treated as pending a data migration and become unavailable (503) until the next migration run.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<object>} - The newly inserted survey row.
+ */
+export const insertSurvey = async ({ survey, props = {}, propsDraft = {}, appVersion = null }, client = db) =>
   client.one(
     `
-      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template)
-      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      INSERT INTO survey (uuid, props, props_draft, owner_uuid, published, draft, template, app_version)
+      VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
       RETURNING ${_getSurveySelectFields()}
     `,
     [
@@ -45,13 +59,14 @@ export const insertSurvey = async ({ survey, props = {}, propsDraft = {} }, clie
       Survey.isPublished(survey),
       Survey.isDraft(survey),
       Survey.isTemplate(survey),
+      appVersion,
     ],
     (def) => DB.transformCallback(def, true)
   )
 
 // ============== READ
 
-export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], R.prop('id'))
+export const fetchAllSurveyIds = async (client = db) => client.map('SELECT id FROM survey', [], A.prop('id'))
 
 const _getSelectWhereCondition = ({ draft, search }) => {
   const propsCol = draft ? '(s.props || s.props_draft)' : 's.props'
@@ -107,7 +122,7 @@ const _getSurveysSelectQuery = ({
     survey_view AS (
       SELECT s.*, 
         ${propsCol} ->> 'name' AS name, 
-        ${propsCol} #>> '{${Survey.infoKeys.labels},${lang}}' AS preferred_label, 
+        ${propsCol} #>> ARRAY['${Survey.infoKeys.labels}', $/lang/] AS preferred_label, 
         (${propsCol} -> '${Survey.infoKeys.labels}') ->> 
             (SELECT lang FROM default_lang WHERE default_lang.id = s.id LIMIT 1) as default_label,
         -- STATUS
@@ -154,9 +169,9 @@ const _getSurveysSelectQuery = ({
       ${draft ? '' : `s.props <> '{}'::jsonb AND `}
       ${_getSelectWhereCondition({ draft, search })}
       ${onlyOwn ? ' AND s.owner_uuid = $/userUuid/' : ''}
-    ORDER BY ${sortByField} ${sortOrder}
-    LIMIT ${limit === null ? 'ALL' : limit}
-    OFFSET ${offset}
+    ORDER BY ${sortByField} ${DB.DbOrder.normalize(sortOrder, DB.DbOrder.desc).toUpperCase()}
+    LIMIT $/limit/
+    OFFSET $/offset/
     `
 }
 
@@ -192,7 +207,14 @@ export const fetchUserSurveys = async (
       includeOwnerEmailAddress,
       onlyOwn,
     }),
-    { userUuid: User.getUuid(user), template, search },
+    {
+      userUuid: User.getUuid(user),
+      template,
+      search,
+      lang,
+      limit: normalizeLimit(limit),
+      offset: normalizeOffset(offset),
+    },
     (def) => DB.transformCallback(def, true)
   )
 }
@@ -207,7 +229,7 @@ export const countUserSurveys = async (
     `
     SELECT COUNT(*)
     FROM (${_getSurveysSelectQuery({ user, draft, template, lang, search, onlyOwn })}) AS s`,
-    { search, template, userUuid: User.getUuid(user) },
+    { search, template, lang, limit: null, offset: 0, userUuid: User.getUuid(user) },
     (row) => Number(row.count)
   )
 }
@@ -253,6 +275,17 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
     camelize
   )
 
+/**
+ * Fetches the id and app version of every survey, most recently modified first.
+ * Used to prioritize the startup data migration: surveys ordered this way have their more
+ * recently active (and therefore more likely to be opened again soon) surveys migrated first,
+ * reducing the window in which any given survey is temporarily unavailable while migrating.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<Array<{ id: number, appVersion: string }>>} - The list of survey ids and app versions.
+ */
+export const fetchSurveyIdsAndAppVersions = async (client = db) =>
+  client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
+
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     DB.transformCallback(def, draft, false, backup)
@@ -262,7 +295,7 @@ export const fetchDependencies = async (surveyId, client = db) =>
   client.oneOrNone(
     "SELECT meta#>'{dependencyGraphs}' as dependencies FROM survey WHERE id = $1",
     [surveyId],
-    R.prop('dependencies')
+    A.prop('dependencies')
   )
 
 export const fetchFilesTotalSpace = async (surveyId, client = db) =>
@@ -271,7 +304,7 @@ export const fetchFilesTotalSpace = async (surveyId, client = db) =>
      FROM survey 
      WHERE id = $1`,
     [surveyId],
-    R.prop('value')
+    A.prop('value')
   )
 
 export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {}, client = db) =>
@@ -282,10 +315,13 @@ export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {},
      ${olderThan24Hours ? "AND date_created <= NOW() - INTERVAL '24 HOURS'" : ''}
     `,
     [],
-    R.prop('id')
+    A.prop('id')
   )
 
 // ============== UPDATE
+export const markSurveyDraft = async (surveyId, client = db) =>
+  client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
+
 export const updateSurveyProp = async (surveyId, key, value, client = db) => {
   const prop = { [key]: value }
 
@@ -308,6 +344,22 @@ export const updateSurveyOwner = async ({ surveyId, ownerUuid }, client = db) =>
     SET owner_uuid = $/ownerUuid/
     WHERE id = $/surveyId/`,
     { surveyId, ownerUuid }
+  )
+
+/**
+ * Updates the app version associated to the specified survey.
+ * @param {object} params - The update parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.version - The app version to associate to the survey.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
+export const updateSurveyAppVersion = async ({ surveyId, version }, client = db) =>
+  client.none(
+    `UPDATE survey
+    SET app_version = $/version/
+    WHERE id = $/surveyId/`,
+    { surveyId, version }
   )
 
 export const publishSurveyProps = async (surveyId, client = db) =>
@@ -374,32 +426,38 @@ export const removeSurveyTemporaryFlag = async ({ surveyId }, client = db) =>
 export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, client = db) =>
   client.none(
     `UPDATE survey
-    SET config = jsonb_set(coalesce(config, '{}'), '{${key}}', $/value/)
+    SET config = jsonb_set(coalesce(config, '{}'), $/path/::text[], $/value/)
     WHERE id = $/surveyId/`,
-    { surveyId, value }
+    { surveyId, path: [key], value }
   )
 
-export const clearSurveyConfiguration = async ({ surveyId }, client = db) =>
-  client.none(`UPDATE survey SET config = null WHERE id = $1`, [surveyId])
+// removes only one key: the other keys (e.g. mapCustomLayers) must survive
+export const deleteSurveyConfigurationProp = async ({ surveyId, key }, client = db) =>
+  client.none(`UPDATE survey SET config = config - $/key/::text WHERE id = $/surveyId/`, { surveyId, key })
 
 // ============== DELETE
-export const deleteSurvey = async (id, client = db) => client.one('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
+// the survey row could be missing (e.g. when cleaning up after a failed survey creation): do not fail in that case,
+// otherwise the whole delete transaction (dropping the survey schemas) would be rolled back
+export const deleteSurvey = async (id, client = db) =>
+  client.oneOrNone('DELETE FROM survey WHERE id = $1 RETURNING id', [id])
 
 export const deleteSurveyLabelsAndDescriptions = async (id, langCodes, client = db) => {
-  const propsUpdateCond = R.pipe(
-    R.map(
-      (langCode) => `#-'{${NodeDef.propKeys.labels},${langCode}}' #-'{${NodeDef.propKeys.descriptions},${langCode}}'`
-    ),
-    R.join(' ')
-  )(langCodes)
+  // one "#-" operator per path, with the path passed as a parameter
+  const params = newQueryParams([id])
+  const propsUpdateCond = langCodes
+    .flatMap((langCode) => [
+      `#- ${params.add([NodeDef.propKeys.labels, langCode])}::text[]`,
+      `#- ${params.add([NodeDef.propKeys.descriptions, langCode])}::text[]`,
+    ])
+    .join(' ')
 
   await client.none(
     `
-    UPDATE survey 
+    UPDATE survey
     SET props = props ${propsUpdateCond}
     WHERE id = $1
   `,
-    [id]
+    params.values
   )
 }
 

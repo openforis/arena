@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: "Journal d'activité",
       size: '$t(homeView:dashboard.activityLog.title) taille : {{size}}',
+      loadError: "Impossible de charger l'activité.",
+      empty: 'Aucune activité pour le moment.',
     },
     exportWithData: 'Exporter + données (Sauvegarde)',
     exportWithDataNoActivityLog: "Exporter + données (SANS Journal d'activité)",
@@ -47,6 +49,24 @@ export default {
       totalItems: 'Total des éléments : {{totalItems}}',
       remainingItems: 'Éléments restants',
     },
+    kpi: {
+      records: 'Enregistrements',
+      contributors: 'Contributeurs',
+      storage: 'Stockage',
+      expandDetails: 'Afficher les détails',
+      collapseDetails: 'Masquer les détails',
+    },
+    recordsCard: {
+      total: 'Enregistrements ajoutés sur la période sélectionnée',
+      byStep: 'Par étape du flux de travail (tout le temps)',
+    },
+    contributorsCard: {
+      active: 'Contributeurs actifs sur la période sélectionnée : {{count}}',
+    },
+    map: {
+      title: 'Carte',
+      allOwners: 'Tous les propriétaires',
+    },
     step: {
       entry: 'Saisie de données',
       cleansing: 'Nettoyage de données',
@@ -69,24 +89,28 @@ export default {
     branding: {
       title: 'Image de marque',
       primaryColor: 'Couleur principale',
-      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
-      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      titleFontSize: 'Taille de police du titre',
+      descriptionFontSize: 'Taille de police de la description',
       fontSizePreset: {
-        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
-        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
-        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+        small: 'Petite',
+        default: 'Par défaut',
+        large: 'Grande',
       },
-      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
-      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
-      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
-      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      surveyLogo1: 'Logo du formulaire 1',
+      surveyLogo2: 'Logo du formulaire 2',
+      surveyLogo3: 'Logo du formulaire 3',
+      landingBackground: "Image d'arrière-plan de la page d'accueil",
       uploadLogo: 'Téléverser le logo',
-      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
-      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      logoFileFormatHint: 'PNG, JPEG, WebP ou SVG (max. {{maxMb}} Mo)',
+      logoFileTooLarge: "L'image du logo ne doit pas dépasser {{maxMb}} Mo",
       preview: 'Aperçu',
-      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      backgroundFileTooLarge: "L'image d'arrière-plan ne doit pas dépasser {{maxMb}} Mo",
       invalidPrimaryColor: 'Saisissez une couleur #RRGGBB valide ou laissez vide',
-      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+      invalidSaveBlocked:
+        "Corrigez les champs d'image de marque invalides avant d'enregistrer les informations du formulaire",
+      imageLoadError: 'Impossible de charger l\'image "{{name}}". Supprimez-la et téléversez-en une nouvelle.',
+      imageLoadErrorReadOnly: 'Impossible de charger l\'image "{{name}}"',
+      downloadImage: "Cliquez pour télécharger l'image",
     },
     configuration: {
       title: 'Configuration',
@@ -96,6 +120,9 @@ export default {
     confirmDeleteCycle: `Êtes-vous sûr(e) de vouloir supprimer le cycle {{cycle}} ?\n\n$t(common.cantUndoWarning)\n\n
 Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     cycleForArenaMobile: 'Cycle pour Arena Mobile',
+    keepNonApplicableValues: `Conserver les valeurs des attributs non pertinents`,
+    keepNonApplicableValuesInfo: `Si la case n'est pas cochée (par défaut), lors de la saisie des données, les valeurs des attributs qui ne sont plus pertinents sont effacées (après confirmation de l'utilisateur).
+Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même si les attributs ne sont plus pertinents.`,
     deleteActivityLog: "Effacer le journal d'activité",
     deleteActivityLogConfirm: {
       headerText: "Effacer TOUTES les données du journal d'activité pour ce formulaire ?",
@@ -112,11 +139,23 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
     editInfo: 'Modifier les infos',
     viewInfo: 'Voir les infos',
 
+    areasOfInterest: {
+      title: "Zones d'intérêt",
+      info: "Polygones (GeoJSON, coordonnées WGS84) utilisés par les fonctions d'expression geoDistanceToAOIBoundary (distance à la limite d'une zone) et geoAOIContaining (zone contenant un emplacement), également hors ligne dans Arena Mobile. Le nom d'une zone est utilisé dans les expressions.",
+      name: 'Nom',
+      polygons: 'Polygones',
+      vertices: 'Sommets',
+      invalidFile: 'Le fichier ne contient pas de polygone valide au format GeoJSON avec des coordonnées WGS84',
+      confirmDelete: "Êtes-vous sûr de vouloir supprimer cette zone d'intérêt ?",
+      showAllOnMap: 'Tout afficher sur la carte',
+      editor: {
+        title: "Zone d'intérêt",
+      },
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Couches de carte préchargées activées',
       title: 'Couches de carte préchargées',
-      fileName: 'Nom du fichier',
-      fileSize: 'Taille du fichier',
       confirmDelete: 'Êtes-vous sûr de vouloir supprimer cette couche de carte préchargée ?',
       editor: {
         title: 'Couche de carte préchargée',
@@ -158,6 +197,8 @@ Si des enregistrements sont associés à ce cycle, ils seront supprimés.`,
         'Autoriser le téléversement des enregistrements depuis Arena Mobile vers le serveur',
       allowRecordsWithErrorsUploadFromMobile:
         'Autoriser le téléversement des enregistrements avec des erreurs de validation depuis Arena Mobile vers le serveur',
+      allowRecordsMergeWithSameKeys:
+        'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
     },
     srsPlaceholder: "Tapez le code ou l'étiquette",
     unpublish: 'Dépublier et supprimer les données',
@@ -191,9 +232,10 @@ $t(common.cantUndoWarning)`,
     expression: 'Expression',
     resolved: 'Résolu',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Code parent',
       defaultValue: 'Valeur par défaut',
+      requiredIf: 'Obligatoire si',
       validationRule: 'Règle de validation',
     },
     title: "Rapport d'importation Collect",

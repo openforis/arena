@@ -13,7 +13,9 @@
 
   .data-query-button-bar__internal-container {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
+    gap: 0.3rem;
   }
 
   .btn-toggle-node-defs-selector {
@@ -29,14 +31,9 @@
     flex-shrink: 0;
   }
 
-  .mode-form-item {
-    display: flex;
-    width: 23rem;
-  }
-
   button {
     &.highlight {
-      background-color: $yellowHighlight;
+      background-color: $colorHighlightContainer;
     }
   }
 

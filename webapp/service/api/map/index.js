@@ -80,26 +80,80 @@ export const testMapApiKey = async ({ provider, apiKey }) => {
   try {
     const mosaics = await fetchAvailableMapPeriods({ provider, apiKey })
     return mosaics.length > 0
-  } catch (_e) {
+  } catch {
+    // invalid API key or provider not reachable
     return false
   }
 }
 
-/* Query the user given url through our server to avoid CORS violations. The layer urls are not proxied through our server yet, but maybe they should. 
-   If you get CORS problems, that will be the solution.
-*/
-export const fetchMapWmtsCapabilities = async ({ surveyId, url }) => {
-  try {
-    const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/wmts/capabilities/`, { params: { url } })
-    return data
-  } catch {
-    return null
-  }
+/**
+ * Reads the layers of a WMS / WMTS service through the Arena server (browsers cannot read most capabilities documents
+ * because of CORS; the server request is SSRF-safe).
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.url - The service URL typed by the user.
+ * @returns {Promise<import('@core/map/customLayers/mapServiceCapabilities').MapServiceCapabilities>} The capabilities summary; rejects with the server error key.
+ */
+export const fetchMapServiceCapabilities = async ({ surveyId, url }) => {
+  const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/capabilities`, {
+    params: { url },
+    errorHandledLocally: true,
+  })
+  return data
+}
+
+/**
+ * Fetches the custom map layers of a survey: those shared with everyone and those of the current user.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @returns {Promise<{surveyLayers: object[], userLayers: object[]}>} The layers.
+ */
+export const fetchMapCustomLayers = async ({ surveyId }) => {
+  const { data } = await axios.get(`/api/survey/${surveyId}/geo/map/custom-layers`, { errorHandledLocally: true })
+  return data
+}
+
+/**
+ * Stores new custom map layers.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.scope - "survey" (everyone in the survey) or "user" (only me).
+ * @param {object[]} params.layers - The layers (MapCustomLayer).
+ * @returns {Promise<object[]>} All the layers of that scope.
+ */
+export const addMapCustomLayers = async ({ surveyId, scope, layers }) => {
+  const { data } = await axios.post(
+    `/api/survey/${surveyId}/geo/map/custom-layers/${scope}`,
+    { layers },
+    { errorHandledLocally: true }
+  )
+  return data.layers
+}
+
+/**
+ * Deletes a stored custom map layer.
+ * @param {object} params - Parameters.
+ * @param {number} params.surveyId - The survey id.
+ * @param {string} params.scope - "survey" or "user".
+ * @param {string} params.layerId - The layer id.
+ * @returns {Promise<object[]>} The remaining layers of that scope.
+ */
+export const deleteMapCustomLayer = async ({ surveyId, scope, layerId }) => {
+  const { data } = await axios.delete(
+    `/api/survey/${surveyId}/geo/map/custom-layers/${scope}/${encodeURIComponent(layerId)}`,
+    { errorHandledLocally: true }
+  )
+  return data.layers
 }
 
 export const startGeoAttributeJsonDataExport = async ({ surveyId, attributeDefUuid }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/geo/geojsondata/${attributeDefUuid}/start-export`)
   return data
+}
+
+export const startSamplingPointDataWhispJob = async ({ surveyId }) => {
+  const { data: job } = await axios.post(`/api/survey/${surveyId}/geo/whisp/sampling-point-data/start`)
+  return job
 }
 
 export const getGeoJsonDataDownloadUrl = ({ surveyId, tempFileName }) =>

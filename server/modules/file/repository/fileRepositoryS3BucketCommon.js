@@ -1,4 +1,5 @@
 import {
+  CopyObjectCommand,
   DeleteObjectCommand,
   GetObjectCommand,
   HeadBucketCommand,
@@ -39,6 +40,33 @@ export const checkCanAccessS3Bucket = async () => {
 
 const createCommandParams = ({ getFileKey, params }) => ({ Bucket, Key: getFileKey(params) })
 
+export const checkFileExistsInS3 = async ({ key }) => {
+  try {
+    const command = new HeadObjectCommand({ Bucket, Key: key })
+    await _sendCommand(command)
+    return true
+  } catch (error) {
+    if (error.$metadata?.httpStatusCode === 404) {
+      return false
+    }
+    throw error
+  }
+}
+
+export const copyObjectInS3 = async ({ sourceKey, destinationKey }) => {
+  const command = new CopyObjectCommand({
+    Bucket,
+    CopySource: `${Bucket}/${sourceKey}`,
+    Key: destinationKey,
+  })
+  return _sendCommand(command)
+}
+
+export const deleteObjectFromS3 = async ({ key }) => {
+  const command = new DeleteObjectCommand({ Bucket, Key: key })
+  return _sendCommand(command)
+}
+
 export const createS3BucketRepository = ({ getFileKey }) => {
   const uploadFileContent = async ({ content, ...params }) => {
     const command = new PutObjectCommand({
@@ -71,12 +99,22 @@ export const createS3BucketRepository = ({ getFileKey }) => {
 
   const deleteFile = async (params) => {
     const command = new DeleteObjectCommand(createCommandParams({ getFileKey, params }))
-    return _sendCommand(command)
+    try {
+      return await _sendCommand(command)
+    } catch (error) {
+      // ignore error if the object is already missing from the bucket (nothing left to delete);
+      // check the specific error name rather than the (ambiguous) 404 status alone, so that e.g. a
+      // missing/misconfigured bucket (NoSuchBucket) still fails loudly instead of being swallowed
+      if (error.name === 'NoSuchKey') {
+        return null
+      }
+      throw error
+    }
   }
 
   const deleteFiles = async ({ fileUuids, ...params }) => {
     for (const fileUuid of fileUuids) {
-      await deleteFile({ ...params, fileUuid })
+      await deleteFile({ ...params, fileUuid }) // NOSONAR
     }
   }
 
@@ -92,7 +130,7 @@ export const createS3BucketRepository = ({ getFileKey }) => {
         Prefix: prefix,
         ...(continuationToken ? { ContinuationToken: continuationToken } : {}),
       })
-      const response = await _sendCommand(command)
+      const response = await _sendCommand(command) // NOSONAR
       results.push(...(response.Contents ?? []))
       continuationToken = response.IsTruncated ? response.NextContinuationToken : undefined
     } while (continuationToken)

@@ -29,7 +29,6 @@ Algunas variables de marcador de posición también están disponibles:
   },
   subject: 'Asunto',
   target: {
-    label: 'Destino',
     emailsExcluded: {
       label: 'Correos electrónicos excluidos',
       placeholder: 'Escriba una dirección de correo electrónico para excluir, luego presione el botón Agregar',
@@ -42,6 +41,7 @@ Algunas variables de marcador de posición también están disponibles:
       label: 'Tipo de usuario objetivo',
       all: 'Todos los usuarios',
       system_admins: 'Administradores del sistema',
+      survey_admins: 'Administradores de encuestas',
       survey_managers: 'Gestores de encuestas',
       data_analysts: 'Analistas de datos',
       data_cleaners: 'Limpiadores de datos',

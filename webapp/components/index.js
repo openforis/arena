@@ -14,6 +14,7 @@ export {
   ButtonIconFilter,
   ButtonIconGear,
   ButtonIconInfo,
+  ButtonIconMap,
   ButtonIconView,
   ButtonManage,
   ButtonMenu,

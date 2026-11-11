@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} is required',
   rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `Function "{{name}}" is not allowed`,
+    expressionInvalid: `"{{text}}" is not allowed in the expression`,
+    expressionRequired: 'Expression required',
+    expressionUnbalancedParentheses: 'Unbalanced parentheses',
+    expressionUnknownColumn: `"{{name}}" is not a column of the entity`,
+    expressionUnterminatedQuote: 'Unterminated quoted text',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Label in survey default language is required',
     analysisNodeDefsRequired: 'At least one calculated attribute is required',
@@ -33,6 +42,11 @@ export default {
     levelDuplicate: 'Level name is duplicate',
     levelsInvalid: 'At least one invalid level',
     nameNotSpecified: 'Category name not specified',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'A Sampling Point Data category already exists in this survey; there can be only one.',
   },
 
   categoryImport: {
@@ -66,13 +80,14 @@ export default {
     invalidNumber: 'Invalid number in column {{headers}}: {{value}}',
     invalidTaxonCode: 'Invalid code in column {{headers}}: {{value}}',
     invalidTime:
-      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm. E.g. 09:45 or 16:30',
+      'Invalid time in column {{headers}}: {{value}}. Time should be formatted as HH:mm or HH:mm:ss. E.g. 09:45, 16:30 or 09:45:30',
     missingRequiredHeaders: 'Missing required columns: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Error updating values: {{details}}',
     multipleRecordsMatchingKeys: 'Multiple records found matching keys "{{keyValues}}"',
     recordAlreadyExisting: 'Record with keys "{{keyValues}}" already existing',
     recordInAnalysisStepCannotBeUpdated: 'Record with keys "{{keyValues}}" is in Analysis step and cannot be updated',
     recordKeyMissingOrInvalid: 'Missing or invalid value for key attribute "{{keyName}}"',
+    recordNotEditable: 'Record with keys "{{keyValues}}" cannot be updated: you are not allowed to edit it',
     recordNotFound: 'Record with keys "{{keyValues}}" not found',
   },
 
@@ -103,8 +118,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entity is required',
-    applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" condition is duplicate',
-    applyIfInvalid: 'Invalid "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+    applyIfDuplicate: '"$t(nodeDefEdit:expressionsProp.applyIf)" condition is duplicate',
+    applyIfInvalid: 'Invalid "$t(nodeDefEdit:advancedProps.relevantIf)" condition',
     columnWidthCannotBeGreaterThan: 'Column width cannot be greater than {{max}}',
     columnWidthCannotBeLessThan: 'Column width cannot be less than {{min}}',
     countMaxMustBePositiveNumber: 'Max Count must be a positive integer',
@@ -115,13 +130,14 @@ export default {
     defaultValuesNotSpecified: 'Default value not specified',
     entitySourceRequired: 'Entity Source required',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Only last expression can have empty "$t(nodeDefEdit.expressionsProp.applyIf)" condition',
+      'Only last expression can have empty "$t(nodeDefEdit:expressionsProp.applyIf)" condition',
     expressionDuplicate: 'Expression duplicate',
     expressionRequired: 'Expression required',
     formulaInvalid: 'Formula is invalid',
     keysEmpty: 'Define at least one key attribute',
 
     keysExceedingMax: 'Exceeding maximum number of key attributes',
+    mapMarkerColorInvalid: 'Map marker color must be a color code like #ff0000',
     maxFileSizeInvalid: 'Max file size must be greater than 0 and less than {{max}}',
     nameInvalid:
       'Name is invalid (it must contain only lowercase letters, numbers and underscores, starting with a letter)',
@@ -130,8 +146,10 @@ export default {
     countMaxInvalid: 'Invalid "Max count"',
     countMinInvalid: 'Invalid "Min count"',
     readOnlyCannotHaveEditableIf: 'Read-only node cannot have "Editable if" condition',
+    requiredIfInvalid: 'Invalid "Required if" condition',
+    requiredIfNotAllowed: '"Required if" condition allowed only for single, non-key attributes not always required',
     qualifierCannotHaveApplicableExpression:
-      'Qualifier attribute cannot have "$t(nodeDefEdit.advancedProps.relevantIf)" condition',
+      'Qualifier attribute cannot have "$t(nodeDefEdit:advancedProps.relevantIf)" condition',
     qualifierCannotHaveEditabilityRule: 'Qualifier attribute cannot have editability rules defined',
     qualifierCannotHaveDefaultValues: 'Qualifier attribute cannot have default values',
     qualifierCannotHaveValidations: 'Qualifier attribute cannot have validation rules defined',
@@ -154,10 +172,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Language is required',
+    langInvalid: 'Language code is not valid: {{lang}}',
+    srsInvalid: 'Spatial reference system code is not valid: {{code}}',
     srsRequired: 'Spatial Reference System is required',
     cycleRequired: 'Cycle is required',
     cyclesRequired: 'At least one cycle must be defined',
     cyclesExceedingMax: 'A survey can have at most 10 cycles',
+    cycleKeysInvalid: 'Cycles must be numbered consecutively, starting from 1',
     cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
     cycleDateStartAfterPrevDateEnd: 'Cycle start date must be after previous cycle end date',
     cycleDateStartInvalid: 'Cycle start date is invalid',
@@ -165,6 +186,13 @@ export default {
     cycleDateEndInvalid: 'Cycle end date is invalid',
     cycleDateEndMandatoryExceptForLastCycle: 'Cycle end date is mandatory for all but the last cycle',
     fieldManualLinksInvalid: 'Field manual link is invalid',
+    areaOfInterestInvalid: 'Area of interest must be a polygon in GeoJSON format with WGS84 coordinates',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'File is required',
+    nameDuplicate: 'Another area of interest with the same name already exists',
+    nameRequired: 'Name is required',
   },
 
   surveyPreloadedMapLayer: {

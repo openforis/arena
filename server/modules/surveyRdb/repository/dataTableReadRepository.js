@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -39,9 +39,9 @@ export const fetchRecordsWithDuplicateEntities = async (survey, cycle, nodeDefEn
   const getNullableColEqualCondition = (columnName) =>
     `(${aliasA}.${columnName} IS NULL AND ${aliasB}.${columnName} IS NULL OR ${getColEqualCondition(columnName)})`
 
-  const equalKeysCondition = R.pipe(
-    R.map((nodeDefKey) => getNullableColEqualCondition(NodeDefTable.getColumnName(nodeDefKey))),
-    R.join(' AND ')
+  const equalKeysCondition = A.pipe(
+    A.map((nodeDefKey) => getNullableColEqualCondition(NodeDefTable.getColumnName(nodeDefKey))),
+    A.join(' AND ')
   )(nodeDefKeys)
 
   const recordAndParentEqualCondition = NodeDef.isRoot(nodeDefEntity)
@@ -86,7 +86,7 @@ export const fetchEntityKeysByRecordAndNodeDefUuid = async (
   const entityDef = Survey.getNodeDefByUuid(entityDefUuid)(survey)
   const tableDef = new TableDataNodeDef(survey, entityDef)
   const entityDefKeys = Survey.getNodeDefKeys(entityDef)(survey)
-  const keyColumns = R.pipe(R.map(NodeDefTable.getColumnName), R.join(', '))(entityDefKeys)
+  const keyColumns = A.pipe(A.map(NodeDefTable.getColumnName), A.join(', '))(entityDefKeys)
   const nodeUuidWhereCondition = NodeDef.isRoot(entityDef) ? '' : `AND ${tableDef.columnUuid} = $2`
 
   return await client.oneOrNone(

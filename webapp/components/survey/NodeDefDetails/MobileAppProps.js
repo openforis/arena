@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -8,7 +8,7 @@ import * as Validation from '@core/validation/validation'
 import { Checkbox } from '@webapp/components/form'
 
 import { useAuthCanEditSurvey } from '@webapp/store/user'
-import { useSurveyCycleKey, useIsAncestorMultipleEntityRoot } from '@webapp/store/survey'
+import { useSurveyCycleKey } from '@webapp/store/survey'
 
 import { State, useNodeDefEditReadOnly } from './store'
 
@@ -23,19 +23,17 @@ export const MobileAppProps = (props) => {
 
   const nodeDef = State.getNodeDef(state)
   const validation = State.getValidation(state)
-  const isAncestorMultipleEntityRoot = useIsAncestorMultipleEntityRoot(nodeDef)
 
   const canBeHiddenInMobile = NodeDef.canBeHiddenInMobile(nodeDef)
   const canIncludeInPreviousCycleLink = NodeDef.canIncludeInPreviousCycleLink(cycle)(nodeDef)
-  const canIncludeInMultipleEntitySummary = NodeDef.canIncludeInMultipleEntitySummary(cycle)(nodeDef)
 
   const createLayoutPropCheckbox = useCallback(
     ({ prop }) => (
       <Checkbox
         checked={NodeDefLayout.getPropLayout(cycle, prop)(nodeDef)}
         disabled={readOnly}
-        info={`nodeDefEdit.mobileAppProps.${prop}.info`}
-        label={`nodeDefEdit.mobileAppProps.${prop}.label`}
+        info={`nodeDefEdit:mobileAppProps.${prop}.info`}
+        label={`nodeDefEdit:mobileAppProps.${prop}.label`}
         validation={Validation.getFieldValidation(prop)(validation)}
         onChange={(value) => Actions.setLayoutProp({ state, key: prop, value })}
       />
@@ -46,10 +44,6 @@ export const MobileAppProps = (props) => {
   return (
     <div className="form mobile-props">
       {canBeHiddenInMobile && createLayoutPropCheckbox({ prop: NodeDefLayout.keys.hiddenInMobile })}
-
-      {canIncludeInMultipleEntitySummary &&
-        !isAncestorMultipleEntityRoot &&
-        createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInMultipleEntitySummary })}
 
       {canIncludeInPreviousCycleLink &&
         createLayoutPropCheckbox({ prop: NodeDefLayout.keys.includedInPreviousCycleLink })}

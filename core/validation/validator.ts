@@ -1,8 +1,9 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as Validation from './validation'
 import * as ValidationResult from './validationResult'
@@ -27,7 +28,7 @@ const extractNestedErrorsOrWarnings = (
       } else if ((currentItem as Record<string, unknown>).key) {
         const item = currentItem as ValidationResult.ValidationResultInstance
         const arr = ValidationResult.isError(item) ? errors : warnings
-        const itemToAdd = R.omit([ValidationResult.keys.severity], item)
+        const itemToAdd = A.omit([ValidationResult.keys.severity], item)
         addUniqueItems([itemToAdd as ValidationResult.ValidationResultInstance])(arr)
       } else {
         const validation = currentItem as Validation.ValidationInstance
@@ -54,7 +55,7 @@ const validateProp = async (
     errors.push(...errorsCurrent)
     warnings.push(...warningsCurrent)
   })
-  return Validation.newInstance(R.isEmpty(errors) && R.isEmpty(warnings), {}, errors, warnings)
+  return Validation.newInstance(A.isEmpty(errors) && A.isEmpty(warnings), {}, errors, warnings)
 }
 
 export const validate = async (
@@ -65,11 +66,11 @@ export const validate = async (
   const validation = Validation.newInstance()
 
   for (const [prop, propValidations] of Object.entries(propsValidations)) {
-    const validationProp = await validateProp(obj, prop, propValidations)
+    const validationProp = await validateProp(obj, prop, propValidations) // NOSONAR
     const validationPropValid = Validation.isValid(validationProp)
 
     if (!validationPropValid || !removeValidFields) {
-      const validationPropKey = R.pipe(R.split('.'), R.last)(prop) as string
+      const validationPropKey = A.pipe(A.split('.'), A.last)(prop) as string
       Validation.setField(validationPropKey, validationProp)(validation)
     }
 
@@ -81,6 +82,21 @@ export const validate = async (
   return validation
 }
 
+/**
+ * Throws a bad request error if one of the names contains characters not allowed in names (lowercase letters, numbers
+ * and "_"): names (e.g. of node defs, categories, levels and extra props) are used as SQL identifiers, export column
+ * names and file names and in expressions. The full name format (e.g. the first letter) is checked by the validation of
+ * the item, so that names being typed (e.g. "2") can be saved.
+ * @param names - The names to check (null or undefined values are ignored).
+ * @param errorKey - The key of the error message.
+ */
+export const checkNamesAreValid = (names: unknown[], errorKey: string = Validation.messageKeys.nameInvalid): void => {
+  const nameInvalid = names.find((name) => !A.isNil(name) && !ValidatorFunctions.isNameCharsValid(name))
+  if (nameInvalid !== undefined) {
+    throw new SystemError(errorKey, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
+  }
+}
+
 // Validator functions
 export const {
   getProp,
@@ -90,7 +106,6 @@ export const {
   validateNotKeyword,
   validateName,
   validateNumber,
-  validatePositiveNumber,
   validatePositiveOrZeroNumber,
   validateEmail,
   validateEmails,

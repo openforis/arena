@@ -1,7 +1,7 @@
 @use '~@webapp/style/vars' as *;
 
 .node-defs-selector__chains {
-  background-color: rgba($greyBorder, 0.8);
+  background-color: with-alpha($colorOutline, 0.8);
   padding: 1rem;
   margin-top: -0.3rem;
 
@@ -20,11 +20,11 @@
       justify-content: space-between;
 
       .icon-left {
-        margin-left: 0 !important;
+        margin-left: 0;
       }
 
       .icon {
-        font-size: 14px !important;
+        font-size: 14px !important; // NOSONAR: icon sizes must beat the MUI button icon size and the base .icon size
       }
     }
   }

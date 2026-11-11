@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as Taxonomy from '@core/survey/taxonomy'
@@ -20,7 +20,7 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 const SPECIES_FILES_PATH = 'species/'
 const VERNACULAR_NAMES_SEPARATOR_REGEX = /[,/]/
 
-const fixedColumns = ['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms']
+const fixedColumns = new Set(['id', 'parent_id', 'rank', 'no', 'code', 'scientific_name', 'synonyms'])
 
 /**
  * Inserts a taxonomy for each taxonomy in the Collect survey.
@@ -79,7 +79,7 @@ export default class TaxonomiesImportJob extends Job {
     this.rowNumberByScientificName = {}
 
     // 2. insert taxonomy
-    const taxonomyName = speciesFileName.slice(0, speciesFileName.length - 4)
+    const taxonomyName = speciesFileName.slice(0, -4)
 
     const taxonomyParam = Taxonomy.newTaxonomy({
       [Taxonomy.keysProps.name]: taxonomyName,
@@ -124,10 +124,12 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async onHeaders(headers) {
-    this.vernacularLangCodes = R.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    this.vernacularLangCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    // extra prop names normalized like in the taxonomy import (validated before saving)
     this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
-      if (!fixedColumns.includes(header) && !languageCodesISO639part2.includes(header)) {
-        extraPropsAcc[header] = { key: header }
+      if (!fixedColumns.has(header) && !languageCodesISO639part2.includes(header)) {
+        const extraPropName = StringUtils.normalizeName(header)
+        extraPropsAcc[extraPropName] = { key: extraPropName, originalHeader: header }
       }
       return extraPropsAcc
     }, {})
@@ -151,10 +153,10 @@ export default class TaxonomiesImportJob extends Job {
     this.rowById[id] = { id, parent_id: parentId, rank, scientific_name: scientificName } // skip vernacular names in rows cache
 
     if (this.validateRow(speciesFileName, row)) {
-      const genus = R.pipe(R.split(' '), R.head)(scientificName)
+      const genus = A.pipe(A.split(' '), A.head)(scientificName)
       const family = this.extractFamily({ row })
 
-      const vernacularNames = R.reduce(
+      const vernacularNames = A.reduce(
         (accVernacularNames, lang) => {
           const vernacularNames = this.extractVernacularNames({ row, lang })
           const vernacularNamesObjects = vernacularNames.map((name) =>
@@ -167,8 +169,8 @@ export default class TaxonomiesImportJob extends Job {
         this.vernacularLangCodes
       )
 
-      const extra = Object.keys(this.extraPropsDefs).reduce((accExtraProps, extraPropName) => {
-        const value = row[extraPropName]
+      const extra = Object.entries(this.extraPropsDefs).reduce((accExtraProps, [extraPropName, { originalHeader }]) => {
+        const value = row[originalHeader]
         if (StringUtils.isBlank(value)) {
           return accExtraProps
         }
@@ -263,6 +265,6 @@ export default class TaxonomiesImportJob extends Job {
     const vernacularNamesStr = row[lang] || ''
     const vernacularNames = vernacularNamesStr.split(VERNACULAR_NAMES_SEPARATOR_REGEX)
     const vernacularNamesTrimmed = vernacularNames.map((vernacularName) => StringUtils.trim(vernacularName))
-    return R.uniq(vernacularNamesTrimmed)
+    return A.uniq(vernacularNamesTrimmed)
   }
 }

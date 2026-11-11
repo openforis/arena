@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 import { Rectangle, Circle } from 'react-leaflet'
 import L from 'leaflet'
@@ -44,8 +44,10 @@ export const CoordinateAttributePolygon = (props) => {
   const pointDistanceLat = latitudeDeg / numberOfPointsNorth
   const startLat = bounds.getSouthWest().lat + latitudeDeg / numberOfPointsEast / 2 - pointSizeLat / 2
 
-  const [colors, setColors] = useState([...Array(numberOfPointsEast)].map(() => Array(numberOfPointsNorth).fill(0))) // this generates zero matrix
-  const [circleColors, setCircleColors] = useState(Array(numberOfPointsCircle).fill(0))
+  const [colors, setColors] = useState(
+    Array.from({ length: numberOfPointsEast }, () => new Array(numberOfPointsNorth).fill(0))
+  ) // this generates zero matrix
+  const [circleColors, setCircleColors] = useState(new Array(numberOfPointsCircle).fill(0))
   let circleControlPointIndex = 0
 
   const onClickControlPoint = (j, i) => {
@@ -105,7 +107,7 @@ export const CoordinateAttributePolygon = (props) => {
   const centerCircle = (middle) => {
     const latlng = L.latLng(middle)
     const pointIndex = circleControlPointIndex
-    let item = (
+    const item = (
       <Circle
         center={latlng}
         radius={5}
@@ -124,7 +126,7 @@ export const CoordinateAttributePolygon = (props) => {
 
   const nCircles = (middle, radius, amount, angle = 0) => {
     const middle_latlng = L.latLng(middle)
-    let pointArray = []
+    const pointArray = []
     for (let i = 0; i < 360; i += 360 / amount) {
       const latlng = GeoUtils.destination(middle_latlng, i + angle, radius)
       const pointIndex = circleControlPointIndex
@@ -149,7 +151,7 @@ export const CoordinateAttributePolygon = (props) => {
   /******** End circle controlpoint functions  *************/
 
   const rectangleControlPoints = () => {
-    let points = []
+    const points = []
     for (let eastIndex = 0; eastIndex < numberOfPointsEast; eastIndex++) {
       for (let northIndex = 0; northIndex < numberOfPointsNorth; northIndex++) {
         const pointDistanceLng =

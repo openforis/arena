@@ -19,8 +19,8 @@ describe('CategoryImportSummaryGenerator Test', () => {
       }),
     },
     {
-      title: 'flat code list (missing column district_code)',
-      columns: ['region_code', 'district_label'],
+      title: 'flat code list (missing code column)',
+      columns: ['region_label', 'district_label'],
       error: true,
     },
     {
@@ -224,21 +224,20 @@ describe('CategoryImportSummaryGenerator Test', () => {
       summary: summaryExpected,
       error: errorExpected,
     } = item
-    it(title, () => {
-      try {
-        const summary = CategoryImportSummaryGenerator.createImportSummaryFromColumnNames({
-          columnNames,
-          codeColumnPattern,
-          ignoreLabelsAndDescriptions,
-        })
-        expect(summary).toStrictEqual(summaryExpected)
-      } catch (e) {
-        if (errorExpected) {
-          expect(e).toBeDefined()
-        } else {
-          throw e
-        }
-      }
-    })
+    const createSummary = () =>
+      CategoryImportSummaryGenerator.createImportSummaryFromColumnNames({
+        columnNames,
+        codeColumnPattern,
+        ignoreLabelsAndDescriptions,
+      })
+    if (errorExpected) {
+      it(`${title}`, () => {
+        expect(createSummary).toThrow()
+      })
+    } else {
+      it(`${title}`, () => {
+        expect(createSummary()).toStrictEqual(summaryExpected)
+      })
+    }
   })
 })

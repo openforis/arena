@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
 
@@ -52,7 +52,7 @@ export const init = (app) => {
         cycle: surveyCycleKey,
         nodeDef,
       })
-      res.json({ nodeDefsUpdated: R.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
+      res.json({ nodeDefsUpdated: A.dissoc(NodeDef.getUuid(nodeDef), nodeDefsUpdated), nodeDefsValidation })
     } catch (error) {
       next(error)
     }
@@ -81,7 +81,7 @@ export const init = (app) => {
   app.get('/survey/:surveyId/nodeDefs', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, draft, validate, includeAnalysis } = Request.getParams(req)
-      const advanced = true // Always fetch advanced props (TODO fetch only what is needed- now in dataentry min/max count are needed)
+      const advanced = true // always fetch advanced props: some of them (e.g. min/max count) are needed in data entry
       const sendNodeDefs = true
 
       await sendRespNodeDefsAndValidation({
@@ -215,12 +215,11 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId } = Request.getParams(req)
-        const { sourceSurveyId, sourceNodeDefUuid, targetParentNodeDefUuid } = Request.getBody(req)
         const user = Request.getUser(req)
 
-        if (!sourceSurveyId) throw new Error('sourceSurveyId is required')
-        if (!sourceNodeDefUuid) throw new Error('sourceNodeDefUuid is required')
-        if (!targetParentNodeDefUuid) throw new Error('targetParentNodeDefUuid is required')
+        const sourceSurveyId = Request.getRequiredParam(req, 'sourceSurveyId')
+        const sourceNodeDefUuid = Request.getRequiredParam(req, 'sourceNodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
 
         const { nodeDefsUpdated, nodeDefsValidation, categoriesCloned, taxonomiesCloned } =
           await NodeDefService.cloneNodeDefFromSurvey({
@@ -242,15 +241,11 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyEditPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, nodeDefUuid } = Request.getParams(req)
-        const { targetParentNodeDefUuid } = Request.getBody(req)
+        const { surveyId } = Request.getParams(req)
 
-        if (!nodeDefUuid) {
-          throw new Error('nodeDefUuid is required')
-        }
-        if (!targetParentNodeDefUuid) {
-          throw new Error('targetParentNodeDefUuid is required')
-        }
+        const nodeDefUuid = Request.getRequiredParam(req, 'nodeDefUuid')
+        const targetParentNodeDefUuid = Request.getRequiredParam(req, 'targetParentNodeDefUuid')
+
         const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.cloneNodeDef({
           surveyId,
           nodeDefUuid,

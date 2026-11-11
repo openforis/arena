@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -91,7 +91,7 @@ const extractCoordinateValueAndMeta = ({ nodeDef, collectNode }) => {
   const { x, y, srs, accuracy, altitude } = CollectRecord.getTextValues(collectNode)
 
   if (!Objects.isEmpty(x) && !Objects.isEmpty(y) && !Objects.isEmpty(srs)) {
-    const srsId = R.ifElse(R.isEmpty, R.identity, R.pipe(R.split(':'), R.last))(srs)
+    const srsId = A.ifElse(A.isEmpty, A.identity, A.pipe(A.split(':'), A.last))(srs)
     const value = {
       [Node.valuePropsCoordinate.x]: Number(x),
       [Node.valuePropsCoordinate.y]: Number(y),

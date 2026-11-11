@@ -6,6 +6,7 @@ import * as Validation from '@core/validation/validation'
 import Job from '@server/job/job'
 import * as AnalysisManager from '@server/modules/analysis/manager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 export default class ChainsValidationJob extends Job {
   constructor(params) {
@@ -15,9 +16,9 @@ export default class ChainsValidationJob extends Job {
   async execute() {
     const { surveyId, tx } = this
 
-    const [survey, chains] = await Promise.all([
-      SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx),
-      AnalysisManager.fetchChains({ surveyId }, tx),
+    const [survey, chains] = await DbUtils.runQueries(tx, [
+      () => SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, draft: true, advanced: true }, tx),
+      () => AnalysisManager.fetchChains({ surveyId }, tx),
     ])
 
     const defaultLang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))

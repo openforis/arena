@@ -12,7 +12,7 @@ import * as Validation from '@core/validation/validation'
 import { SurveyState } from '@webapp/store/survey'
 import { RecordState } from '@webapp/store/ui/record'
 
-export default (props) => {
+const useValidation = (props) => {
   const { edit, node, nodeDef, nodes, parentNode } = props
 
   return useSelector((state) => {
@@ -57,3 +57,5 @@ export default (props) => {
     return Validation.newInstance()
   }, Objects.isEqual)
 }
+
+export default useValidation

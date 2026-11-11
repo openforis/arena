@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -23,7 +23,7 @@ const AreaBasedEstimated = (props) => {
 
   if (NodeDef.isDecimal(nodeDef) && !NodeDef.isSampling(nodeDef)) {
     return (
-      <FormItem label="nodeDefEdit.advancedProps.areaBasedEstimate">
+      <FormItem label="nodeDefEdit:advancedProps.areaBasedEstimate">
         <Checkbox
           checked={hasAreaBasedEstimateNodeDef}
           disabled={readOnly}

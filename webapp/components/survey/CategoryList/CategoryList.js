@@ -21,10 +21,12 @@ import TableHeaderLeft from './TableHeaderLeft'
 
 import { State, useActions, useLocalState } from './store'
 
-const getType = ({ category }) => {
+const getStructure = ({ category }) => (Category.isHierarchical(category) ? 'hierarchical' : 'flat')
+
+const getKind = ({ category }) => {
+  if (Category.getName(category) === Category.samplingPointDataCategoryName) return 'samplingPointData'
   if (Category.isReportingData(category)) return 'reportingData'
-  if (Category.isHierarchical(category)) return 'hierarchical'
-  return 'flat'
+  return null
 }
 const CategoryList = (props) => {
   const { canSelect = false, onCategoryCreated, onCategoryOpen, onSelect, selectedItemUuid } = props
@@ -55,23 +57,30 @@ const CategoryList = (props) => {
       renderItem: ({ item: category }) => Category.getName(category),
       width: '1fr',
     },
-    // TYPE
+    // TYPE (reporting data / Sampling Point Data / blank for a plain category)
     {
       key: 'type',
       header: 'common.type',
       renderItem: ({ item: category }) => {
-        const type = getType({ category })
-        return i18n.t(`categoryList.types.${type}`)
+        const kind = getKind({ category })
+        return kind ? i18n.t(`categoryList.types.${kind}`) : null
       },
-      width: '10rem',
+      width: '12rem',
     },
     // Extra props
     {
       key: 'extraProps',
-      header: 'extraProp.label_plural',
+      header: 'extraProp.label_other',
       renderItem: ({ item: category }) =>
         Category.getItemExtraDefsArray(category).length > 0 ? <span className="icon icon-checkmark" /> : null,
       width: '8rem',
+    },
+    // STRUCTURE (flat / hierarchical)
+    {
+      key: 'structure',
+      header: 'categoryList.structure',
+      renderItem: ({ item: category }) => i18n.t(`categoryList.types.${getStructure({ category })}`),
+      width: '10rem',
     },
     // Items count
     {

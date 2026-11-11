@@ -1,4 +1,2 @@
-import * as TaxonomiesState from './state'
-import TaxonomiesReducer from './reducer'
-
-export { TaxonomiesReducer, TaxonomiesState }
+export * as TaxonomiesState from './state'
+export { default as TaxonomiesReducer } from './reducer'

@@ -11,6 +11,7 @@ export const StatusCodes = {
   FORBIDDEN: 403,
   NOT_FOUND: 404,
   CONFLICT: 409,
+  UPGRADE_REQUIRED: 426,
 
   INTERNAL_SERVER_ERROR: 500,
   NOT_IMPLEMENTED: 501,
@@ -24,7 +25,7 @@ export default class SystemError extends Error {
   private readonly _params: any
   private readonly _statusCode: number
 
-  constructor(key: string, params?: any, statusCode = StatusCodes.INTERNAL_SERVER_ERROR) {
+  constructor(key: string, params?: any, statusCode: number = StatusCodes.INTERNAL_SERVER_ERROR) {
     super(key)
 
     this.name = 'SystemError'

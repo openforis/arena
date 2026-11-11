@@ -4,3 +4,17 @@ export const fetchActiveJob = async () => {
   const { data } = await axios.get('/api/jobs/active')
   return data
 }
+
+export const fetchJob = async (jobUuid) => {
+  const { data } = await axios.get(`/api/jobs/${jobUuid}`)
+  return data
+}
+
+export const fetchAllJobs = async () => {
+  const { data } = await axios.get('/api/jobs')
+  return data
+}
+
+export const cancelJob = async (jobUuid) => {
+  await axios.delete(`/api/jobs/${jobUuid}`)
+}

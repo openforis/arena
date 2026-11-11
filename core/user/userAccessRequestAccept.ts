@@ -1,5 +1,3 @@
-import * as AuthGroup from '@core/auth/authGroup'
-
 export const keys = {
   accessRequestUuid: 'accessRequestUuid',
   email: 'email',
@@ -7,5 +5,3 @@ export const keys = {
   surveyLabel: 'surveyLabel',
   role: 'role',
 } as const
-
-export const requestAcceptRoles = [AuthGroup.groupNames.systemAdmin, AuthGroup.groupNames.surveyManager]

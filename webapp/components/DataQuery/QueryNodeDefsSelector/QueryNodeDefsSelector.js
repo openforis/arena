@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -42,6 +42,7 @@ const QueryNodeDefsSelector = (props) => {
       onChangeMeasures={(measuresUpdate) => onChangeQuery(Query.assocMeasures(measuresUpdate)(query))}
       onChangeDimensions={(dimensionsUpdate) => onChangeQuery(Query.assocDimensions(dimensionsUpdate)(query))}
       showAnalysisAttributes
+      showSearch
     />
   ) : (
     <NodeDefsSelector
@@ -54,6 +55,7 @@ const QueryNodeDefsSelector = (props) => {
         onChangeQuery(Query.assocAttributeDefUuids(nodeDefUuidsAttributesUpdated)(query))
       }
       showAnalysisAttributes
+      showSearch
     />
   )
 }

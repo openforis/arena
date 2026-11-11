@@ -24,7 +24,7 @@
     margin-left: 10px;
 
     &:hover {
-      color: $orange;
+      color: $colorWarning;
     }
   }
 
@@ -51,9 +51,9 @@
 
   .survey-form__node-def-entity-table-data-rows-wrapper {
     position: absolute;
-    top: $formTableRowHeaderHeight;
+    top: var(--column-header-height, #{$formTableRowHeaderHeight});
     width: 100%;
-    height: calc(100% - #{$formTableRowHeaderHeight});
+    height: calc(100% - var(--column-header-height, #{$formTableRowHeaderHeight}));
     overflow: auto;
 
     .survey-form__node-def-entity-table-data-rows {
@@ -65,8 +65,8 @@
 .survey-form__node-def-entity-table-row-header {
   position: absolute;
   display: flex;
-  height: $formTableRowHeaderHeight;
-  background-color: rgba($blueLight, 0.3);
+  min-height: $formTableRowHeaderHeight;
+  background-color: with-alpha($colorPrimaryContainer, 0.3);
   border-right: 1px solid transparent;
 
   &.drag-in-progress .draggable-item * {
@@ -89,14 +89,14 @@
     .react-grid-item {
       display: grid;
       border-right: $formBorder;
-      border-top: 1px solid $black;
+      border-top: 1px solid $colorOnSurface;
 
       &:first-child {
-        border-left: 1px solid $black;
+        border-left: 1px solid $colorOnSurface;
       }
 
       &:last-child {
-        border-right: 1px solid $black;
+        border-right: 1px solid $colorOnSurface;
       }
     }
   }

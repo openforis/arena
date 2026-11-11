@@ -1,6 +1,6 @@
 import './AttributesList.scss'
 
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import * as PropTypes from 'prop-types'
 
 import * as ObjectUtils from '@core/objectUtils'

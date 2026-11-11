@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import * as JobSerialized from '@common/job/jobSerialized'
 
 import { useJob, JobActions } from '@webapp/store/app'
+import { useI18n } from '@webapp/store/system'
 
 import { Button } from '@webapp/components/buttons'
 import { Modal, ModalBody, ModalFooter } from '@webapp/components/modal'
@@ -18,17 +19,19 @@ import JobTiming from './JobTiming'
 
 const getCustomCloseButtonComponent = ({ closeButton, closeButtonProps, job }) => {
   if (!closeButton || !JobSerialized.isSucceeded(job)) return null
-  if (closeButton instanceof Function) return React.createElement(closeButton, { job, ...closeButtonProps })
+  if (typeof closeButton === 'function') return React.createElement(closeButton, { job, ...closeButtonProps })
   if (closeButton instanceof Object) return closeButton
   return null
 }
 
 const JobMonitor = () => {
   const dispatch = useDispatch()
+  const i18n = useI18n()
   const { job, closeButton, closeButtonProps, errorKeyHeaderName, errorsExportFileName, longRunningMessageKey } =
     useJob()
 
-  if (!job || JobSerialized.isCanceled(job)) return null
+  if (!job) return null
+  if (JobSerialized.isCanceled(job) && !JobSerialized.isCanceledByAdmin(job)) return null
 
   const innerJobs = JobSerialized.getInnerJobs(job)
   const hasInnerJobs = innerJobs.length > 0
@@ -37,6 +40,9 @@ const JobMonitor = () => {
   return (
     <Modal className="app-job-monitor" closeOnEsc={false} title={`jobs:${JobSerialized.getType(job)}`}>
       <ModalBody>
+        {JobSerialized.isCanceledByAdmin(job) && (
+          <div className="job-monitor__canceled-by-admin-message">{i18n.t('jobMonitorView:jobCanceledByAdmin')}</div>
+        )}
         <JobProgress job={job} />
         <JobTiming job={job} />
         <JobLongRunningMessage job={job} messageKey={longRunningMessageKey} />

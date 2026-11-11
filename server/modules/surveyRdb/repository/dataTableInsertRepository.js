@@ -105,7 +105,7 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
     let lastId = 0
     while (!stopIfFunction?.()) {
       // 2. fetch nodes using keyset pagination on id
-      const nodeRows = await client.any(
+      const nodeRows = /* NOSONAR */ await client.any(
         `SELECT * FROM ${materializedViewFullName} 
         WHERE id > $/lastId/
         ORDER BY id 
@@ -123,11 +123,11 @@ export const populateTable = async ({ survey, nodeDef, stopIfFunction = null, on
       const nodesRowValuesByColumnName = nodeRows.map(nodeRowToColumnValues)
 
       // 4. insert node values
-      await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName))
+      await client.none(insertAllQueryBatch(schema, tableName, columnNames, nodesRowValuesByColumnName)) // NOSONAR
 
       if (onProgress) {
         processed += processingCount
-        await onProgress({ total, processed })
+        await onProgress({ total, processed }) // NOSONAR
       }
     }
   } finally {

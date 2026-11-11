@@ -1,3 +1,5 @@
 import useAsync from './useAsync'
 
-export default (url, data = {}, config = {}) => useAsync({ method: 'post', url, data, ...config })
+const useAsyncPostRequest = (url, data = {}, config = {}) => useAsync({ method: 'post', url, data, ...config })
+
+export default useAsyncPostRequest

@@ -1,7 +1,8 @@
-import { ServiceRegistry } from '@openforis/arena-core'
+import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
+import * as DateUtils from '@core/dateUtils'
 import { FileFormats } from '@core/fileFormats'
 
 import * as Request from '@server/utils/request'
@@ -14,11 +15,14 @@ import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
 import SystemError from '@core/systemError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import * as UserService from '../service/userService'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import { UserExportService } from '../service/userExportService'
+import { UsersBackupService } from '../service/usersBackup/usersBackupService'
+import * as FileUtils from '@server/utils/file/fileUtils'
 
 export const init = (app) => {
   // ==== CREATE
@@ -103,6 +107,24 @@ export const init = (app) => {
 
   // ==== READ
 
+  /**
+   * Removes from the users the roles in surveys other than the specified one: they are visible only to system admins
+   * and to the users themselves.
+   * @param {!object} params - The parameters.
+   * @param {!object} params.user - The user making the request.
+   * @param {string} [params.surveyUuid] - UUID of the survey whose roles are kept (only global roles kept if null).
+   * @param {!object[]} params.users - The users to filter.
+   * @returns {object[]} - The filtered users.
+   */
+  const _dissocOtherSurveysAuthGroups = ({ user, surveyUuid = null, users }) => {
+    if (User.isSystemAdmin(user)) return users
+    return users.map((userItem) =>
+      !userItem || User.isEqual(user)(userItem)
+        ? userItem
+        : User.dissocAuthGroupsOfOtherSurveys({ surveyUuid })(userItem)
+    )
+  }
+
   const _fetchUser = async (req) => {
     const { userUuid } = Request.getParams(req)
     const user = await UserService.fetchUserByUuid(userUuid)
@@ -111,8 +133,23 @@ export const init = (app) => {
     return userResult
   }
 
+  /**
+   * Returns the UUID of the survey in the path, if the user can view it.
+   * @param {!object} req - The request.
+   * @returns {Promise<string|null>} - The survey UUID or null.
+   */
+  const _fetchPathSurveyUuidViewable = async (req) => {
+    // path param only: the user view permission does not depend on the survey
+    const { surveyId } = req.params
+    if (!surveyId) return null
+    const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+    return Authorizer.canViewSurvey(Request.getUser(req), surveyInfo) ? Survey.getUuid(surveyInfo) : null
+  }
+
   const _getUser = async (req, res) => {
-    const user = await _fetchUser(req)
+    const surveyUuid = await _fetchPathSurveyUuidViewable(req)
+    const users = [await _fetchUser(req)]
+    const [user] = _dissocOtherSurveysAuthGroups({ user: Request.getUser(req), surveyUuid, users })
     res.json(user)
   }
 
@@ -195,6 +232,64 @@ export const init = (app) => {
     }
   })
 
+  // users backup (to be imported into another server)
+  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { includePasswords = true } = Request.getParams(req)
+      const serverUrl = Request.getPublicServerUrl(req)
+      const job = UsersBackupService.startExportJob({ user, includePasswords, serverUrl })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      FileUtils.checkIsValidTempFileName(tempFileName)
+      const path = FileUtils.tempFilePath(tempFileName)
+      const name = `arena_users_backup_${DateUtils.nowFormatDefault()}.zip`
+      // the file contains password hashes: delete it once downloaded
+      Response.sendFile({ res, path, name, onEnd: () => FileUtils.deleteFileAsync(path) })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // reads the uploaded backup: the import starts only after choosing what to do with every user
+  app.post('/users/backup/import/preview', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const uploadedFilePath = Request.getFilePath(req)
+      const preview = await UsersBackupService.readImportPreview({ uploadedFilePath })
+      res.json(preview)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { tempFileName, actionsByEmail, restorePasswordEmails } = Request.getParams(req)
+      const job = UsersBackupService.startImportJob({ user, tempFileName, actionsByEmail, restorePasswordEmails })
+      res.json({ job })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/users/backup/import/cancel', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { tempFileName } = Request.getParams(req)
+      await UsersBackupService.cancelImport({ tempFileName })
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
   app.get('/survey/:surveyId/users/count', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
       const { surveyId } = Request.getParams(req)
@@ -219,8 +314,20 @@ export const init = (app) => {
         onlyAccepted,
         includeSystemAdmins: includeSystemAdmins && User.isSystemAdmin(user),
       })
+      const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
+      const canViewEmails = Authorizer.canViewOtherUsersEmail({ user, surveyInfo })
+      const listWithSurveyGroups = _dissocOtherSurveysAuthGroups({
+        user,
+        surveyUuid: Survey.getUuid(surveyInfo),
+        users: list,
+      })
+      const listFiltered = canViewEmails
+        ? listWithSurveyGroups
+        : listWithSurveyGroups.map((userItem) =>
+            User.isEqual(user)(userItem) ? userItem : A.dissoc(User.keys.email, userItem)
+          )
 
-      res.json({ list })
+      res.json({ list: listFiltered })
     } catch (error) {
       next(error)
     }
@@ -232,8 +339,9 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const { surveyId, userUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
         const serverUrl = Request.getServerUrl(req)
-        const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+        const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
         res.json(url)
       } catch (error) {
         next(error)
@@ -258,8 +366,9 @@ export const init = (app) => {
   app.get('/user/:userUuid/resetpasswordurl', AuthMiddleware.requireUsersAllViewPermission, async (req, res, next) => {
     try {
       const { surveyId, userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
       const serverUrl = Request.getServerUrl(req)
-      const url = await UserService.fetchResetPasswordUrl({ serverUrl, surveyId, userUuid })
+      const url = await UserService.fetchResetPasswordUrl({ user, serverUrl, surveyId, userUuid })
       res.json(url)
     } catch (error) {
       next(error)
@@ -341,27 +450,49 @@ export const init = (app) => {
 
   // ==== UPDATE
 
-  const _insertOrUpdateUser = async (req, res) => {
-    const body = Request.getBody(req)
-    const { user: userToUpdateString } = body
-    const userToUpdate = A.parse(userToUpdateString)
-    const newUser = !User.getUuid(userToUpdate)
+  const _validateAndSendUser = async ({ res, userToUpdate, newUser, persistUser }) => {
     const userWithSameEmail = newUser ? await UserService.fetchUserByEmail(User.getEmail(userToUpdate)) : null
     const validation = await UserValidator.validateUser(userToUpdate, userWithSameEmail)
-
     if (Validation.isValid(validation)) {
-      const { surveyId } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const profilePicture = Request.getFile(req)
-
-      const updatedUser = newUser
-        ? await UserService.insertUser({ user, userToInsert: userToUpdate, profilePicture })
-        : await UserService.updateUser(user, surveyId, userToUpdate, profilePicture)
-
+      const updatedUser = await persistUser()
       res.json({ user: updatedUser })
     } else {
       res.json({ validation })
     }
+  }
+
+  const _parseUserToUpdate = (req) => A.parse(Request.getBody(req).user)
+
+  const _insertUser = async (req, res) => {
+    // a new user is always inserted: an uuid in the body is ignored
+    const userToInsert = A.dissoc(User.keys.uuid, _parseUserToUpdate(req))
+    await _validateAndSendUser({
+      res,
+      userToUpdate: userToInsert,
+      newUser: true,
+      persistUser: () =>
+        UserService.insertUser({ user: Request.getUser(req), userToInsert, profilePicture: Request.getFile(req) }),
+    })
+  }
+
+  const _updateUser = async (req, res) => {
+    const userToUpdate = _parseUserToUpdate(req)
+    const userToUpdateUuid = User.getUuid(userToUpdate)
+    // permissions are checked on the userUuid param (path or body): the updated user must be the same
+    if (
+      !userToUpdateUuid ||
+      userToUpdateUuid !== req.params.userUuid ||
+      userToUpdateUuid !== Request.getParams(req).userUuid
+    ) {
+      throw new UnauthorizedError(User.getName(Request.getUser(req)))
+    }
+    const { surveyId } = Request.getParams(req)
+    await _validateAndSendUser({
+      res,
+      userToUpdate,
+      newUser: false,
+      persistUser: () => UserService.updateUser(Request.getUser(req), surveyId, userToUpdate, Request.getFile(req)),
+    })
   }
 
   app.put(
@@ -381,7 +512,7 @@ export const init = (app) => {
 
   app.put('/survey/:surveyId/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _updateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -389,7 +520,7 @@ export const init = (app) => {
 
   app.put('/user/:userUuid', AuthMiddleware.requireUserEditPermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _updateUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -397,7 +528,7 @@ export const init = (app) => {
 
   app.post('/user', AuthMiddleware.requireUserCreatePermission, async (req, res, next) => {
     try {
-      await _insertOrUpdateUser(req, res)
+      await _insertUser(req, res)
     } catch (error) {
       next(error)
     }
@@ -440,6 +571,19 @@ export const init = (app) => {
       const user = Request.getUser(req)
 
       await UserService.deleteUserFromSurvey({ user, userUuidToRemove: userUuid, surveyId })
+
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.delete('/user/:userUuid', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+    try {
+      const { userUuid } = Request.getParams(req)
+      const user = Request.getUser(req)
+
+      await UserService.deleteUser({ user, userUuidToDelete: userUuid })
 
       Response.sendOk(res)
     } catch (error) {

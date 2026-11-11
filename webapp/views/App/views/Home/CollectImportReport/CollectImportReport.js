@@ -1,6 +1,6 @@
 import './CollectImportReport.scss'
 
-import React, { useState } from 'react'
+import { useState } from 'react'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
@@ -27,9 +27,8 @@ const CollectImportReport = () => {
         moduleApiUri={`/api/survey/${surveyId}/collect-import/report`}
         restParams={{ excludeResolved }}
         gridTemplateColumns="3rem 0.3fr 12rem 0.3fr 0.2fr 0.2fr 7rem 3rem"
-        headerLeftComponent={() => (
-          <HeaderLeft excludeResolved={excludeResolved} setExcludeResolved={setExcludeResolved} />
-        )}
+        headerLeftComponent={HeaderLeft}
+        headerProps={{ excludeResolved, setExcludeResolved }}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
       />

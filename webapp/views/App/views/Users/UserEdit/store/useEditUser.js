@@ -1,14 +1,13 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
-import * as R from 'ramda'
 
 import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 import * as Validation from '@core/validation/validation'
 import * as AuthGroup from '@core/auth/authGroup'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import { useQuery } from '@webapp/components/hooks'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
@@ -72,12 +71,13 @@ export const useEditUser = ({ userUuid }) => {
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
 
-  const ready = !userUuid || !R.isEmpty(userToUpdate)
-  const dirty = !R.equals(userToUpdate, userToUpdateOriginal)
+  const ready = !userUuid || !A.isEmpty(userToUpdate)
+  const dirty = !A.equals(userToUpdate, userToUpdateOriginal)
   const editCapabilities = getEditCapabilities({ user, userToUpdate, surveyInfo, ready })
   const editingSameUser = User.isEqual(user)(userToUpdate)
 
   const { onGetUser, onUpdate, onUpdateProfilePicture, onSave, onRemove, onInviteRepeat } = useActions({
+    userUuid,
     userToUpdate,
     setUserToUpdate,
     userToUpdateOriginal,

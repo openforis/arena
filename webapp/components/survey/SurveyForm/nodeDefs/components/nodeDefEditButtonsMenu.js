@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import PropTypes from 'prop-types'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
@@ -12,7 +12,6 @@ import { Button, ButtonDelete, ButtonMenu } from '@webapp/components'
 
 import { NodeDefEntitySelectorDialog } from './nodeDefEntitySelectorDialog'
 import { NodeDefConversionDialog } from './nodeDefConversionDialog'
-import { useSystemConfigExperimentalFeatures } from '@webapp/store/system'
 
 const actionsWithEntitySelection = { clone: 'clone', move: 'move' }
 
@@ -40,8 +39,7 @@ const isEntitySelectableByAction = {
 }
 
 const availabilityByAction = {
-  [actionsWithEntitySelection.clone]: ({ nodeDef, experimentalFeatures }) =>
-    experimentalFeatures || NodeDef.isAttribute(nodeDef),
+  [actionsWithEntitySelection.clone]: ({ nodeDef }) => NodeDef.isAttribute(nodeDef),
   [actionsWithEntitySelection.move]: ({ survey, cycle, nodeDef }) => {
     // published node defs cannot be moved
     if (NodeDef.isPublished(nodeDef)) return false
@@ -73,7 +71,6 @@ export const NodeDefEditButtonsMenu = (props) => {
   const dispatch = useDispatch()
   const navigate = useNavigate()
 
-  const experimentalFeatures = useSystemConfigExperimentalFeatures()
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()
@@ -136,7 +133,7 @@ export const NodeDefEditButtonsMenu = (props) => {
     const _menuItems = []
     // items with entity selection (clone or move actions)
     const availableActions = Object.keys(actionsWithEntitySelection).filter((action) =>
-      availabilityByAction[action]({ survey, cycle, nodeDef, experimentalFeatures })
+      availabilityByAction[action]({ survey, cycle, nodeDef })
     )
     _menuItems.push(
       ...availableActions.map((action) => ({
@@ -155,7 +152,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       }))
     )
     // convert action (only for attributes)
-    if (NodeDef.isAttribute(nodeDef) && !NodeDef.isPublished(nodeDef)) {
+    if (NodeDef.getConvertibleTypes(nodeDef).length > 0) {
       _menuItems.push({
         key: 'node-convert',
         content: (
@@ -187,16 +184,7 @@ export const NodeDefEditButtonsMenu = (props) => {
       })
     }
     return _menuItems
-  }, [
-    cycle,
-    dispatch,
-    experimentalFeatures,
-    nodeDef,
-    nodeDefLabel,
-    openConvertIntoDialog,
-    openEntitySelectDialog,
-    survey,
-  ])
+  }, [cycle, dispatch, nodeDef, nodeDefLabel, openConvertIntoDialog, openEntitySelectDialog, survey])
 
   if (menuItems.length === 0) return null
 
@@ -207,12 +195,12 @@ export const NodeDefEditButtonsMenu = (props) => {
         <NodeDefEntitySelectorDialog
           filterFn={(entityDef) => isEntityVisibleByAction[action]({ cycle, entityDef, nodeDef })}
           isEntitySelectable={(entityDefUuid) => isEntitySelectableByAction[action]({ entityDefUuid, nodeDef })}
-          confirmButtonLabel={`nodeDefEdit.${action}Dialog.confirmButtonLabel`}
+          confirmButtonLabel={`nodeDefEdit:${action}Dialog.confirmButtonLabel`}
           currentNodeDef={nodeDef}
-          entitySelectLabel={`nodeDefEdit.${action}Dialog.entitySelectLabel`}
+          entitySelectLabel={`nodeDefEdit:${action}Dialog.entitySelectLabel`}
           onConfirm={onEntitySelectConfirm}
           onClose={closeEntitySelectDialog}
-          title={`nodeDefEdit.${action}Dialog.title`}
+          title={`nodeDefEdit:${action}Dialog.title`}
         />
       )}
       {conversionDialogOpen && <NodeDefConversionDialog nodeDef={nodeDef} onClose={closeConversionDialog} />}

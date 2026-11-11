@@ -1,5 +1,3 @@
-import * as I18nState from './state'
+export * as I18nState from './state'
 
-export { useI18n, useI18nT, useLang } from './hooks'
-
-export { I18nState }
+export { detectUILanguage, useI18n, useI18nT, useLang } from './hooks'

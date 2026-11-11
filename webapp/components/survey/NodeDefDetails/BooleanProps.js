@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useMemo } from 'react'
+import { useEffect, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -13,11 +13,11 @@ import { State, useNodeDefEditReadOnly } from './store'
 const booleanAnswerTypes = [
   {
     key: NodeDef.booleanLabelValues.trueFalse,
-    label: 'nodeDefEdit.booleanProps.labelValues.trueFalse',
+    label: 'nodeDefEdit:booleanProps.labelValues.trueFalse',
   },
   {
     key: NodeDef.booleanLabelValues.yesNo,
-    label: 'nodeDefEdit.booleanProps.labelValues.yesNo',
+    label: 'nodeDefEdit:booleanProps.labelValues.yesNo',
   },
 ]
 
@@ -41,7 +41,7 @@ const BooleanProps = (props) => {
   }, [nodeDef, selectLabelValue])
 
   return (
-    <FormItem label="nodeDefEdit.booleanProps.labelValue">
+    <FormItem label="nodeDefEdit:booleanProps.labelValue">
       <ButtonGroup
         disabled={readOnly}
         selectedItemKey={NodeDef.getLabelValue(nodeDef)}

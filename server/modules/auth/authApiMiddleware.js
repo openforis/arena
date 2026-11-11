@@ -2,7 +2,7 @@ import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer, ServiceRegistry, ServiceType } from '@openforis/arena-core'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
@@ -78,6 +78,83 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
       return
     }
     return sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
+  try {
+    const { cloneFrom } = Request.getBody(req)
+    if (!cloneFrom) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: cloneFrom })
+    // published templates can be cloned by any user allowed to create surveys
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// survey export: what the export includes depends also on the user role (see SurveyService.createSurveyExportJob)
+export const requireSurveyExportPermission = async (req, res, next) => {
+  try {
+    const { surveyId } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyManager.fetchSurveyById({ surveyId })
+    if (Authorizer.canExportSurvey(user, surveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// survey compare: the survey used as source must be visible to the user (published templates included)
+export const requireSurveyCompareSourceViewPermission = async (req, res, next) => {
+  try {
+    const { sourceSurveyId } = Request.getParams(req)
+    if (!sourceSurveyId) {
+      next()
+      return
+    }
+    const user = Request.getUser(req)
+    const sourceSurveyInfo = await SurveyManager.fetchSurveyById({ surveyId: Number(sourceSurveyId) })
+    if (Authorizer.canViewSurveyOrPublishedTemplate(user, sourceSurveyInfo)) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// records merge: the user must be able to edit both the source and the target record
+export const requireRecordsMergePermission = async (req, res, next) => {
+  try {
+    const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+    const user = Request.getUser(req)
+    const recordService = ServiceRegistry.getInstance().getService(ServiceType.record)
+    const records = await recordService.getManyByUuids({ surveyId, uuids: [sourceRecordUuid, targetRecordUuid] })
+    if (
+      sourceRecordUuid !== targetRecordUuid &&
+      records.length === 2 &&
+      records.every((record) => Authorizer.canEditRecord(user, record))
+    ) {
+      next()
+      return
+    }
+    sendForbiddenError({ req, res })
   } catch (error) {
     next(error)
   }

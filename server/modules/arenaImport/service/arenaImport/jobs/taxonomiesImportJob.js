@@ -3,6 +3,7 @@ import * as Taxonomy from '@core/survey/taxonomy'
 import Job from '@server/job/job'
 
 import * as TaxonomyManager from '@server/modules/taxonomy/manager/taxonomyManager'
+import { migrateTaxaExcelCellValues } from '@server/modules/taxonomy/manager/taxaExcelCellValuesMigration'
 
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 
@@ -16,17 +17,19 @@ export default class TaxonomiesImportJob extends Job {
   }
 
   async execute() {
-    const { arenaSurveyFileZip } = this.context
+    const { arenaSurveyFileZip, surveyId } = this.context
 
     const taxonomies = await ArenaSurveyFileZip.getTaxonomies(arenaSurveyFileZip)
     this.total = taxonomies.length
 
     for (const taxonomy of taxonomies) {
       if (!this.isCanceled()) {
-        await this._insertTaxonomy({ taxonomy })
+        await this._insertTaxonomy({ taxonomy }) // NOSONAR
         this.incrementProcessedItems()
       }
     }
+
+    await migrateTaxaExcelCellValues({ surveyId }, this.tx) // backups can contain them
 
     this.setContext({ taxonomies })
   }
@@ -46,8 +49,8 @@ export default class TaxonomiesImportJob extends Job {
       const partsCount = ArenaSurveyFileZip.getTaxaPartsCount({ zipFile, taxonomyUuid })
       let partIndex = 0
       while (partIndex < partsCount) {
-        taxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index: partIndex })
-        await this.insertTaxa({ taxa })
+        taxa = await ArenaSurveyFileZip.getTaxaPart({ zipFile, taxonomyUuid, index: partIndex }) // NOSONAR
+        await this.insertTaxa({ taxa }) // NOSONAR
         partIndex = partIndex + 1
       }
     }

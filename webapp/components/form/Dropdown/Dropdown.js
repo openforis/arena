@@ -7,6 +7,7 @@ import classNames from 'classnames'
 import { TestId } from '@webapp/utils/testId'
 import ValidationTooltip from '@webapp/components/validationTooltip'
 import { LabelWithTooltip } from '../LabelWithTooltip'
+import { dropdownTheme } from './dropdownTheme'
 import { useDropdown } from './useDropdown'
 
 const OptionComponent =
@@ -61,7 +62,7 @@ const Dropdown = (props) => {
     onBeforeChange = null,
     onChange: onChangeProp,
     placeholder = undefined,
-    readOnly = false, // TODO: investigate why there are both disabled and readOnly
+    readOnly = false, // unlike disabled, the dropdown is not greyed out but its menu cannot be opened
     renderOptionLabel = null,
     searchable = true,
     selection = undefined,
@@ -128,6 +129,7 @@ const Dropdown = (props) => {
         options={options}
         placeholder={placeholder}
         ref={selectRef}
+        theme={dropdownTheme}
         value={value}
       />
     </ValidationTooltip>

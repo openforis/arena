@@ -1,7 +1,7 @@
 import './UserGroupsList.scss'
 
 import React, { useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { GridColDef, GridRowParams } from '@mui/x-data-grid'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
@@ -46,7 +46,7 @@ const UserGroupsList = (): React.ReactElement => {
       },
       {
         field: 'qualifiers',
-        headerName: i18n.t('usersView:userGroup.qualifier_plural'),
+        headerName: i18n.t('usersView:userGroup.qualifier_other'),
         flex: 1,
         valueGetter: (_value, row) => UserGroup.getQualifiers(row).length,
       },
@@ -59,8 +59,9 @@ const UserGroupsList = (): React.ReactElement => {
     [i18n, preferredLang]
   )
 
-  const onRowClick = (params: GridRowParams): void =>
+  const onRowClick = (params: GridRowParams): void => {
     navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(params.row)}`)
+  }
 
   if (loading) {
     return <LoadingBar />

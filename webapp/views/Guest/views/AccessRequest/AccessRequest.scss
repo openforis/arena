@@ -1,87 +1,126 @@
-.access-request {
-  z-index: 2;
-  flex: 1;
-  max-width: 60rem;
-  display: flex;
-  flex-direction: column;
-  row-gap: 1rem;
-  margin: 1rem auto;
-  overflow: hidden;
+@use '~@webapp/style/vars' as *;
 
-  .title {
-    font-size: 1.5rem;
-    text-align: center;
+.access-request .guest__view-header {
+  margin-bottom: 1rem;
+}
+
+// fields placed in a two-column grid (DOM order comes from UserAccessRequest.editableFields)
+.access-request__form {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+
+  .form-item {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 0.25rem;
+    padding: 0;
+    height: auto;
+
+    .form-label {
+      justify-self: start;
+      text-align: start;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .MuiTextField-root {
+      width: 100%;
+
+      .MuiInputBase-input {
+        padding: 0.6rem 0.85rem;
+      }
+    }
+
+    .dropdown__control {
+      min-height: 2.6rem;
+    }
+
+    .loading-bar {
+      position: relative;
+    }
   }
 
-  .content {
-    flex: 1;
-    overflow: auto;
+  .access-request__field--firstName {
+    order: 1;
+  }
+  .access-request__field--lastName {
+    order: 2;
+  }
+  .access-request__field--email {
+    order: 3;
+  }
+  .access-request__field--institution {
+    order: 4;
+  }
+  .access-request__field--country {
+    order: 5;
+  }
+  .access-request__field--surveyName {
+    order: 6;
+  }
+  .access-request__field--purpose {
+    order: 7;
+    grid-column: 1 / -1;
+  }
+  .access-request__field--templateUuid {
+    order: 8;
+    grid-column: 1 / -1;
+  }
 
-    .introduction,
-    .request-sent-message {
-      white-space: pre-line;
-    }
-
-    .introduction {
-      padding: 1rem;
-    }
-
-    form {
-      display: flex;
-      flex-direction: column;
-
-      .form-item {
-        height: 3rem;
-
-        .loading-bar {
-          position: relative;
-        }
-
-        .MuiTextField-root {
-          width: 100%;
-
-          input {
-            padding: 0.4rem 0.6rem;
-          }
-        }
-      }
-
-      .required-field-label {
-        width: 95%;
-      }
-
-      .recaptcha-wrapper {
-        display: block;
-        width: auto;
-        height: auto;
-        margin: auto;
-      }
-
-      .guest__buttons {
-        width: inherit;
-        margin: 1rem auto auto auto;
-        justify-items: center;
-      }
-    }
-
-    .request-sent-message {
-      text-align: center;
-      line-height: 3rem;
-      font-size: 1.2rem;
-    }
+  .access-request__buttons {
+    order: 9;
+    grid-column: 1 / -1;
   }
 }
 
-@media only screen and (min-width: 768px) {
-  .access-request {
-    .content {
-      height: calc(100% - 7rem);
-    }
+.access-request__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 0.75rem 1rem;
+  margin-top: 0.25rem;
+}
 
-    form {
-      .form-item {
-        width: 90%;
-      }
+.access-request__notes {
+  display: grid;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+  color: $colorOnSurfaceVariant;
+}
+
+// reCAPTCHA (when enabled) next to the submit button
+.access-request__submit {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-end;
+  gap: 0.75rem;
+  margin-left: auto;
+
+  .recaptcha-wrapper {
+    display: block;
+    width: auto;
+    height: auto;
+    margin: 0;
+  }
+}
+
+.access-request__sent-message {
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  white-space: pre-line;
+  color: $colorOnSurfaceVariant;
+}
+
+@media screen and (max-width: 900px) {
+  // only first and last name share a row
+  .access-request__form .form-item {
+    grid-column: 1 / -1;
+
+    &.access-request__field--firstName,
+    &.access-request__field--lastName {
+      grid-column: auto;
     }
   }
 }

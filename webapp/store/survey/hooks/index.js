@@ -152,13 +152,11 @@ export const useChains = ({ surveyCycleKey } = {}) => {
           setChains(_chains)
         }
       }
-      fetchChains()
-    } else {
-      setChains(null)
+      void fetchChains()
     }
     return () => {
       isMounted = false
     }
   }, [canUseAnalysis, surveyId, surveyCycleKey])
-  return chains
+  return canUseAnalysis ? chains : null
 }

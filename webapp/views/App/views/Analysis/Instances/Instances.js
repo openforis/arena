@@ -1,6 +1,6 @@
 import './Instances.scss'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import axios from 'axios'
 
 import * as User from '@core/user/user'
@@ -17,19 +17,6 @@ const Instances = () => {
   const [instance, setInstance] = useState({})
   const [url, setUrl] = useState('')
 
-  const getRStudioInstances = async () => {
-    try {
-      const { data } = await axios.get('/api/rstudio')
-      const { instance, rStudioProxyUrl } = data
-      setInstance(instance)
-      setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
-    } catch (err) {
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const closeRStudioInstance = async () => {
     try {
       setLoading(true)
@@ -43,7 +30,17 @@ const Instances = () => {
   }
 
   useEffect(() => {
-    getRStudioInstances()
+    axios
+      .get('/api/rstudio')
+      .then(({ data }) => {
+        const { instance, rStudioProxyUrl } = data
+        setInstance(instance)
+        setUrl(`${rStudioProxyUrl}${instance.instanceId}_${User.getUuid(user)}`)
+      })
+      .catch(() => {
+        // no RStudio instance available
+      })
+      .finally(() => setLoading(false))
   }, [])
 
   if (loading) return <p>loading...</p>
@@ -52,7 +49,7 @@ const Instances = () => {
       <p>{i18n.t('instancesView.title')}</p>
       {!A.isEmpty(instance) && (
         <div className="instance-row">
-          <a href={url} target="_blank">
+          <a href={url} target="_blank" rel="noreferrer">
             <p>
               {instance.Purpose || 'RStudio'} - {instance.instanceId}{' '}
             </p>

@@ -1,11 +1,9 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
-import { DateFormats, Dates } from '@openforis/arena-core'
+import { DateFormats, Dates, I18n } from '@openforis/arena-core'
 
 const {
   add,
-  addHours,
-  addMinutes,
   convertDate,
   diffInMinutes,
   diffInHours,
@@ -20,7 +18,7 @@ const {
   subYears,
 } = Dates
 
-export { add, addHours, addMinutes, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
+export { add, convertDate, diffInHours, parse, parseISO, sub, subDays, subMonths, subYears }
 
 import { isBlank } from './stringUtils'
 
@@ -32,12 +30,13 @@ export const formats = {
   datetimeDisplay: DateFormats.datetimeDisplay,
   datetimeISO: DateFormats.datetimeStorage,
   timeStorage: DateFormats.timeStorage,
+  timeWithSeconds: DateFormats.timeWithSeconds,
 } as const
 
 const normalizeDateTimeValue =
   (length: number) =>
   (value: unknown): string =>
-    R.pipe(R.ifElse(R.is(String), R.identity, R.toString), (val: string) => val.padStart(length, '0'))(value)
+    A.pipe(A.ifElse(A.is(String), A.identity, A.toString), (val: string) => val.padStart(length, '0'))(value)
 
 export const format = (date: unknown, format: string = formats.dateDefault): string =>
   Dates.format(date as Date, format)
@@ -45,11 +44,8 @@ export const format = (date: unknown, format: string = formats.dateDefault): str
 /**
  * Get a relative date string (e.g., "2 weeks ago").
  */
-export const getRelativeDate = (
-  i18n: { t: (key: string, params?: Record<string, unknown>) => string },
-  date: unknown
-): string | null => {
-  if (R.isNil(date)) {
+export const getRelativeDate = (i18n: Pick<I18n, 't'>, date: unknown): string | null => {
+  if (A.isNil(date)) {
     return null
   }
 
@@ -108,12 +104,13 @@ export const isValidDate = (year: unknown, month: unknown, day: unknown): boolea
 }
 
 /**
- * Check if time (hour:minute) is valid.
+ * Check if time (hour:minute:seconds) is valid. Seconds default to a valid 0 when omitted.
  */
-export const isValidTime = (hour: unknown = '', minutes: unknown = ''): boolean =>
-  isBlank(hour) || isBlank(minutes)
-    ? false
-    : Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60
+export const isValidTime = (hour: unknown = '', minutes: unknown = '', seconds: unknown = 0): boolean => {
+  if (isBlank(hour) || isBlank(minutes)) return false
+  if (!(Number(hour) >= 0 && Number(hour) < 24 && Number(minutes) >= 0 && Number(minutes) < 60)) return false
+  return Number(seconds) >= 0 && Number(seconds) < 60
+}
 
 /**
  * Check if a date string is valid for the given format.
@@ -125,16 +122,19 @@ export const isValidDateInFormat = (dateStr: string, format: string): boolean =>
 
 export const formatDateISO = (date: unknown): string => format(date, formats.dateISO)
 
-export const formatDateDisplay = (date: unknown): string => format(date, formats.dateDefault)
-
 export const formatDateTimeDefault = (date: unknown): string => format(date, formats.datetimeDefault)
 
 export const formatDateTimeDisplay = (date: unknown): string => format(date, formats.datetimeDisplay)
 
 export const formatDateTimeExport = (date: unknown): string => format(date, formats.datetimeExport)
 
-export const formatTime = (hour: unknown, minute: unknown): string =>
-  `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+export const formatTime = (hour: unknown, minute: unknown, seconds?: unknown): string => {
+  const base = `${normalizeDateTimeValue(2)(hour)}:${normalizeDateTimeValue(2)(minute)}`
+  return seconds === undefined ? base : `${base}:${normalizeDateTimeValue(2)(seconds)}`
+}
+
+export const getTimeFormat = (includeSeconds: boolean): string =>
+  includeSeconds ? formats.timeWithSeconds : formats.timeStorage
 
 export const parseDateISO = (dateStr: string): unknown => parse(dateStr, formats.dateISO)
 
@@ -145,11 +145,15 @@ export const convertDateFromISOToDisplay = (dateStr: string): unknown =>
     formatTo: formats.dateDefault,
   })
 
+/**
+ * Formats an ISO (UTC) timestamp for display in the local time zone of the browser.
+ */
 export const convertDateTimeFromISOToDisplay = (dateStr: string): unknown =>
   convertDate({
     dateStr,
     formatFrom: formats.datetimeISO,
     formatTo: formats.datetimeDisplay,
+    keepTimeZone: false,
   })
 
 export const nowFormatDefault = (): string => format(Date.now(), formats.datetimeDefault)

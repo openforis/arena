@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 import pgPromise from 'pg-promise'
 
 import { db } from '../../../../db/db'
@@ -10,7 +10,9 @@ import { Schemata, ViewDataNodeDef } from '../../../../../common/model/db'
 import { Sort, Query } from '../../../../../common/model/query'
 import SqlSelectAggBuilder from '../../../../../common/model/db/sql/sqlSelectAggBuilder'
 
-const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
+import { getUserGroupAccessCondition } from './userGroupAccessCondition'
+
+const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query }) => {
   const entityDefUuid = Query.getEntityDefUuid(query)
   const filter = Query.getFilter(query)
 
@@ -41,6 +43,16 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
     queryBuilder.addParams({ recordOwnerUuid })
   }
 
+  const userGroupAccessCondition = getUserGroupAccessCondition({
+    survey,
+    accessFilters: userGroupAccessFilters,
+    recordUuidColumn: ViewDataNodeDef.columnSet.recordUuid,
+  })
+  if (userGroupAccessCondition) {
+    queryBuilder.where(userGroupAccessCondition.clause)
+    queryBuilder.addParams(userGroupAccessCondition.params)
+  }
+
   const { clause: filterClause, params: filterParams } = filter ? Expression.toSql(filter) : {}
   if (filterClause) {
     queryBuilder.where(filterClause)
@@ -50,7 +62,7 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
   // ORDER BY clause
   const sort = Query.getSort(query)
   const { clause: sortClause, params: sortParams } = Sort.toSql(sort)
-  if (!R.isEmpty(sortParams)) {
+  if (!A.isEmpty(sortParams)) {
     queryBuilder.orderBy(sortClause)
     queryBuilder.addParams(sortParams)
   }
@@ -61,55 +73,55 @@ const _getSelectQuery = ({ survey, cycle, recordOwnerUuid, query }) => {
  * Counts the number of rows of a data view associated to an entity node definition,
  * aggregated by the given measures aggregate functions, grouped by the given dimensions and
  * filtered by the given filter.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query used to filter the rows.
  * @param {string} [params.recordOwnerUuid] - The record owner UUID used to tilter the records. If null, all records will be included.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be included.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<number>} - The count of rows.
  */
 export const countViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, recordOwnerUuid = null } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
-  return client.one(
-    `
+  return client.tx(dbUtils.txOptionsReadOnly, (t) =>
+    t.one(
+      `
     SELECT COUNT(*) AS count
     FROM (
       ${select}
     ) AS t
     `,
-    { ...queryParams },
-    (row) => Number(row.count)
+      { ...queryParams },
+      (row) => Number(row.count)
+    )
   )
 }
 
 /**
  * Runs a select query on a data view associated to an entity node definition,
  * aggregating the rows by the given measures aggregate functions and grouping by the given dimensions.
- *
  * @param {!object} params - The query parameters.
  * @param {!Survey} [params.survey] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The query object.
- * @param {string} [params.recordOwnerUuid=null] - The record owner UUID used to filter records. If null, all records will be considered.
- * @param {number} [params.offset=null] - The query offset.
- * @param {number} [params.limit=null] - The query limit.
- * @param {boolean} [params.stream=false] - Whether to fetch rows to be streamed.
- * @param {pgPromise.IDatabase} [client=db] - The database client.
- *
+ * @param {string} [params.recordOwnerUuid] - The record owner UUID used to filter records. If null, all records will be considered.
+ * @param {object} [params.userGroupAccessFilters] - The user group access filters: if specified, only the records readable by the user will be considered.
+ * @param {number} [params.offset] - The query offset.
+ * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.stream] - Whether to fetch rows to be streamed.
+ * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewDataAgg = async (params, client = db) => {
-  const { survey, cycle, query, recordOwnerUuid = null, limit, offset, stream } = params
-  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid })
+  const { survey, cycle, query, recordOwnerUuid = null, userGroupAccessFilters = null, limit, offset, stream } = params
+  const { select, queryParams } = _getSelectQuery({ survey, cycle, query, recordOwnerUuid, userGroupAccessFilters })
 
   const selectWithLimit = `${select}     
-    ${R.isNil(limit) ? '' : 'LIMIT $/limit/'}
-    ${R.isNil(offset) ? '' : 'OFFSET $/offset/'}`
+    ${A.isNil(limit) ? '' : 'LIMIT $/limit/'}
+    ${A.isNil(offset) ? '' : 'OFFSET $/offset/'}`
 
   const queryParamsWithLimit = {
     ...queryParams,
@@ -119,5 +131,5 @@ export const fetchViewDataAgg = async (params, client = db) => {
 
   return stream
     ? new dbUtils.QueryStream(dbUtils.formatQuery(selectWithLimit, queryParamsWithLimit))
-    : client.any(selectWithLimit, queryParamsWithLimit)
+    : client.tx(dbUtils.txOptionsReadOnly, (t) => t.any(selectWithLimit, queryParamsWithLimit))
 }

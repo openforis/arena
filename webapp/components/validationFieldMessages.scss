@@ -5,7 +5,7 @@
   flex-direction: column;
 
   .validation-field_message {
-    color: white;
+    color: $colorOnPrimary;
 
     .icon {
       padding-right: 0.2em;
@@ -13,11 +13,11 @@
     }
 
     &.warning .icon {
-      color: $orange;
+      color: $colorWarning;
     }
 
     &.error .icon {
-      color: $red;
+      color: $colorError;
     }
   }
 

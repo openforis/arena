@@ -1,6 +1,8 @@
-import * as fs from 'fs'
-import * as path from 'path'
+import * as fs from 'node:fs'
+import * as path from 'node:path'
 import * as schedule from 'node-schedule'
+
+import { runWithClusterLock } from '@openforis/arena-server'
 
 import * as Log from '@server/log/log'
 
@@ -12,28 +14,30 @@ import * as TempFileRepositoryS3Bucket from '@server/modules/file/repository/tem
 
 const Logger = Log.getLogger('TempFilesCleanup')
 
+const lockName = 'scheduler-temp-files-cleanup'
+
 const initSchedule = () =>
   // Execute the cron job every day at 2AM
   schedule.scheduleJob('0 2 * * *', async () => {
     // Cleanup temp files older than 6 hours
-    await cleanupTempFiles(6)
+    await cleanupTempFilesWithLock(6)
   })
 
-const cleanupFileSystemTempFiles = async (olderThanHours = 4) => {
+const cleanupFileSystemTempFiles = (olderThanHours = 4) => {
   const tempFolder = ProcessUtils.ENV.tempFolder
 
   Logger.debug(`Cleaning up temp files in folder ${tempFolder}`)
 
   let count = 0
   try {
-    if (await fs.existsSync(tempFolder)) {
+    if (fs.existsSync(tempFolder)) {
       const now = new Date()
-      const files = await fs.readdirSync(tempFolder)
+      const files = fs.readdirSync(tempFolder)
       for (const file of files) {
         const filePath = path.join(tempFolder, file)
-        const stat = await fs.statSync(filePath)
+        const stat = fs.statSync(filePath)
         if (stat.isFile() && DateUtils.diffInHours(now, new Date(stat.ctime)) >= olderThanHours) {
-          await fs.unlinkSync(filePath)
+          fs.unlinkSync(filePath)
           Logger.debug('Temp file deleted', filePath)
           count++
         }
@@ -58,12 +62,20 @@ const cleanupS3TempFiles = async (olderThanHours = 4) => {
 }
 
 const cleanupTempFiles = async (olderThanHours = 4) => {
-  await cleanupFileSystemTempFiles(olderThanHours)
+  // Local-filesystem temp files are per-dyno by nature (each dyno only has its own disk), so this
+  // part is safe to run on every dyno unconditionally - only the shared S3 cleanup below needs the lock.
+  cleanupFileSystemTempFiles(olderThanHours)
 
   if (getFileContentStorageType() === fileContentStorageTypes.s3Bucket) {
-    await cleanupS3TempFiles(olderThanHours)
+    try {
+      await runWithClusterLock({ lockName, fn: () => cleanupS3TempFiles(olderThanHours) })
+    } catch (error) {
+      Logger.error('Error acquiring cluster lock for S3 temp files cleanup', error)
+    }
   }
 }
+
+const cleanupTempFilesWithLock = cleanupTempFiles
 
 export const init = async () => {
   await cleanupTempFiles()

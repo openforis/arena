@@ -8,21 +8,21 @@
   padding: 20px;
   border-width: 2px;
   border-radius: 2px;
-  border-color: #eeeeee;
+  border-color: $colorOutline;
   border-style: dashed;
-  background-color: $backgroundColorSecondary;
-  color: $colorTextPrimary;
+  background-color: $colorSurface;
+  color: $colorOnPrimaryContainer;
   outline: none;
   transition: border 0.24s ease-in-out;
 
   &.drag-accept {
-    border-color: $dragAcceptColor;
+    border-color: $colorSuccess;
   }
   &.drag-reject {
-    border-color: $dragRejectColor;
+    border-color: $colorError;
   }
   &.focused {
-    border-color: $borderColorFocussed;
+    border-color: $colorOnPrimaryContainer;
   }
 
   &.disabled {

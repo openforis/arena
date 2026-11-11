@@ -1,6 +1,6 @@
 import './About.scss'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as ProcessUtils from '@core/processUtils'
 
@@ -19,7 +19,7 @@ export const About = () => {
       setVersion(await API.fetchVersion())
     }
     if (!initialVersion) {
-      fetchVersion()
+      void fetchVersion()
     }
   }, [])
 

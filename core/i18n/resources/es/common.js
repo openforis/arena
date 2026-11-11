@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Activo',
@@ -21,7 +27,7 @@ export default {
     cantUndoWarning: 'Esta operación no se puede deshacer',
     cantBeDeletedUsedItem: 'Este {{item}} es utilizado por algunas definiciones de nodo y no puede ser eliminado',
     chain: 'Cadena',
-    chain_plural: 'Cadenas',
+    chain_other: 'Cadenas',
     childrenEmpty: 'Defina al menos un elemento hijo',
     clear: 'Limpiar',
     clone: 'Clonar',
@@ -36,14 +42,14 @@ export default {
     createdWith: 'Creado con',
     createdWithApp: '$t(common.createdWith) {{app}}',
     cycle: 'Ciclo',
-    cycle_plural: 'Ciclos',
+    cycle_other: 'Ciclos',
     dateCreated: 'Fecha de creación',
     dateLastModified: 'Fecha de última modificación',
     delete: 'Eliminar',
     deleted: '¡Eliminado!',
     descending: 'Descendente',
     description: 'Descripción',
-    description_plural: 'Descripciones',
+    description_other: 'Descripciones',
     designerNotes: 'Notas del diseñador',
     designerNotesInfo:
       'Las notas del diseñador solo serán visibles en el diseñador del formulario de la encuesta y no serán visibles en el formulario de entrada de datos.',
@@ -54,6 +60,7 @@ export default {
     download: 'Descargar',
     draft: 'Borrador',
     edit: 'Editar',
+    elapsed: 'Transcurrido',
     email: 'Correo electrónico',
     email_other: 'Correos electrónicos',
     emailSentConfirmation:
@@ -63,11 +70,11 @@ export default {
     empty: 'Vacío',
     entity: 'Entidad',
     error: 'Error',
-    error_plural: 'Errores',
+    error_other: 'Errores',
     errorFound: '1 error encontrado',
     errorFound_other: '{{count}} errores encontrados',
     errorMessage: 'Mensaje de error',
-    errorMessage_plural: 'Mensajes de error',
+    errorMessage_other: 'Mensajes de error',
     expand: 'Expandir',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Exportar',
@@ -78,7 +85,7 @@ export default {
     expression: 'Expresión',
     false: 'Falso',
     file: 'Archivo',
-    file_plural: 'Archivos',
+    file_other: 'Archivos',
     formContainsErrors: 'El formulario contiene errores',
     formContainsErrorsCannotContinue: 'El formulario contiene errores. Por favor, corríjalos antes de continuar.',
     formContainsErrorsCannotSave: 'El formulario contiene errores. Por favor, corríjalos antes de guardar.',
@@ -95,12 +102,12 @@ export default {
     info: 'Información',
     invalid: 'INVÁLIDO',
     item: 'Artículo',
-    item_plural: 'Artículos',
+    item_other: 'Artículos',
     itemAlreadyAdded: 'Artículo ya añadido',
     label: 'Etiqueta',
-    label_plural: 'Etiquetas',
+    label_other: 'Etiquetas',
     language: 'Idioma',
-    language_plural: 'Idiomas',
+    language_other: 'Idiomas',
     leavePageConfirmMessage:
       'Hay cambios sin guardar en el formulario. \nAl confirmar, todos los cambios se perderán. \n¿Desea continuar?',
     local: 'Local',
@@ -110,17 +117,21 @@ export default {
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Administrar',
-    message_plural: 'Mensajes',
+    message_other: 'Mensajes',
     measure: 'Medida',
     measure_other: 'Medidas',
     measurePrevSteps: 'Medir pasos previos',
-    measurePrevSteps_plural: 'Medidas pasos previos',
+    measurePrevSteps_other: 'Medidas pasos previos',
     min: 'Mínimo',
+    moveUp: 'Mover arriba',
+    moveDown: 'Mover abajo',
     name: 'Nombre',
     new: 'Nuevo',
     next: 'Siguiente',
     no: 'No',
-    noItems: '$t(common.no) $t(common.item_plural)',
+    noItems: '$t(common.no) $t(common.item_other)',
+    notification: 'Notificación',
+    notification_other: 'Notificaciones',
     notSpecified: '---No especificado---',
     orderBy: 'Ordenar por',
     of: 'de',
@@ -137,10 +148,35 @@ export default {
     publish: 'Publicar',
     publishConfirm:
       '#### Está a punto de publicar la encuesta {{survey}} ####\n\n###### El proceso de publicación *eliminará permanentemente* la siguiente información ###### \n- Etiquetas asociadas a idiomas eliminados.\n- Registros asociados a ciclos eliminados.\n- Datos asociados a campos de formulario eliminados.\n\n###### Después de publicar: ###### \n- Los campos de formulario no se pueden cambiar de único a múltiple y viceversa.\n- Los códigos de elementos de categoría no se pueden cambiar.\n- Los elementos de categoría no se pueden eliminar.\n- Los códigos de taxonomía no se pueden cambiar.\n- Los taxones no se pueden eliminar.\n\n**¿Está seguro de que desea continuar?**',
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} actualizará datos ya registrados ####
+
+{{reasons}}
+
+Esta operación puede cambiar o borrar permanentemente datos ya introducidos.
+
+Para publicar sin actualizar los datos existentes, marque "Omitir actualización de datos" a continuación (no recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Se actualizarán los datos de los registros existentes',
+    publishRecordValuesUpdateConfirmOk: 'Publicar y actualizar datos',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Escriba el nombre de la encuesta "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Los siguientes atributos serán modificados, y sus valores en los registros existentes se recalcularán automáticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Los siguientes atributos utilizan una propiedad adicional de una categoría o taxonomía que ha cambiado, lo que hará que se recalcule su valor en los registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Omitir actualización de datos',
+    publishSkipDataUpdateConfirmOk: 'Omitir actualización de datos y publicar',
+    publishSkipDataUpdateImplications: 'Omitir la actualización de datos implica lo siguiente:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Los registros existentes pueden dejar de coincidir con la nueva definición de la encuesta',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Los valores afectados no se recalcularán hasta que se vuelvan a introducir manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'Las cadenas de procesamiento que usan estos atributos pueden producir resultados desactualizados',
     raiseTicketInSupportForum:
       "En caso de problemas, por favor, abra un ticket con la etiqueta 'arena' en nuestro <b>Foro de soporte</b>: $t(links.supportForum)",
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Requerido',
     requiredField: 'campo requerido',
@@ -188,7 +224,7 @@ export default {
     value: 'Valor',
     view: 'Ver',
     warning: 'Advertencia',
-    warning_plural: 'Advertencias',
+    warning_other: 'Advertencias',
     yes: 'Sí',
     date: {
       aMomentAgo: 'Hace un momento',
@@ -204,9 +240,11 @@ export default {
     },
     paginator: {
       firstPage: 'Primera página',
+      goToPage: 'Ir a la página',
       itemsPerPage: 'Elementos por página',
       lastPage: 'Última página',
       nextPage: 'Página siguiente',
+      page: 'Página',
       previousPage: 'Página anterior',
     },
     table: {
@@ -246,6 +284,12 @@ export default {
     logout: 'Cerrar sesión',
   },
   header: {
+    theme: {
+      label: 'Tema',
+      light: 'Claro',
+      dark: 'Oscuro',
+      system: 'Predeterminado del sistema',
+    },
     myProfile: 'Mi perfil',
     qrCodeLoginDialog: {
       title: 'Iniciar sesión en Arena Mobile usando código QR',
@@ -287,6 +331,7 @@ export default {
     formDesigner: 'Diseñador de formularios',
     surveyHierarchy: 'Jerarquía',
     surveyDependencyTree: 'Árbol de dependencias',
+    surveyCompare: 'Comparar / actualizar desde archivo',
     category: 'Categoría',
     categories: 'Categorías',
     nodeDef: 'Definición de nodo',
@@ -309,89 +354,36 @@ export default {
     userNew: 'Nuevo usuario',
     usersSurvey: 'Lista de usuarios',
     userGroup: 'Grupo de usuarios',
-    userGroup_plural: 'Grupos de usuarios',
+    userGroup_other: 'Grupos de usuarios',
     userGroupNew: 'Nuevo grupo de usuarios',
     usersList: 'Lista de usuarios (todos)',
     user2FADevice: 'Dispositivo 2FA',
-    user2FADevice_plural: 'Dispositivos 2FA',
+    user2FADevice_other: 'Dispositivos 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
     analysis: 'Análisis',
     chain: 'Cadena',
-    chain_plural: 'Cadenas',
+    chain_other: 'Cadenas',
     virtualEntity: 'Entidad virtual',
     entities: 'Entidades virtuales',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Instancias',
+    message: 'Mensaje',
+    message_other: '$t(common.message_other)',
+
+    systemAdmin: 'Administración del sistema',
+    jobMonitor: 'Monitor de trabajos',
+    systemLogs: 'Registros del sistema',
+
     help: 'Ayuda',
     about: 'Acerca de',
+    changelog: 'Registro de cambios',
+    whatsNew: 'Novedades',
     disclaimer: 'Descargo de responsabilidad',
     userManual: 'Manual de usuario',
   },
   surveyDefsLoader: {
     requireSurveyPublish: 'Esta sección solo está disponible cuando la encuesta está publicada',
-  },
-  loginView: {
-    yourName: 'Su nombre',
-    yourEmail: 'Su correo electrónico',
-    yourPassword: 'Su contraseña',
-    yourNewPassword: 'Su nueva contraseña',
-    repeatYourPassword: 'Repita su contraseña',
-    repeatYourNewPassword: 'Repita su nueva contraseña',
-    requestAccess: '¿Nuevo en $t(common.appNameFull)? Solicitar acceso',
-    resetPassword: 'Restablecer contraseña',
-    login: 'Iniciar sesión',
-    loginUsingBackupCode: 'Iniciar sesion con codigo de respaldo 2FA',
-    forgotPassword: '¿Olvidó su contraseña?',
-    sendPasswordResetEmail: 'Enviar correo electrónico de restablecimiento de contraseña',
-    twoFactorBackupCode: 'Codigo de respaldo 2FA',
-    twoFactorToken: 'Código de verificación',
-    twoFactorTokenDescription: `Para mantener su cuenta segura, verificamos su identidad.
-
-  Ingrese el código generado por su aplicación de autenticación.`,
-  },
-  accessRequestView: {
-    error: 'Error al solicitar acceso: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Nombre',
-        lastName: 'Apellido',
-        institution: 'Institución',
-        country: 'País',
-        purpose: '¿Para qué lo necesita?',
-        surveyName: 'Proponer un nombre de encuesta',
-        templateUuid: '¿Empezar desde una plantilla?',
-      },
-    },
-    introduction:
-      'Nuestros recursos son limitados, por lo que debe solicitar acceso a la plataforma. También nos interesa saber qué desea hacer con ella, ¡así que háganoslo saber! Tiene la posibilidad de empezar desde una **nueva encuesta en blanco** o clonar una **plantilla** existente y tendrá que sugerir un nombre para la nueva encuesta creada. Se le asignará el rol de ***Administrador de encuestas*** para esa encuesta: podrá editarla e invitar a nuevos usuarios a unirse a su encuesta y contribuir a ella. También será un ***Gerente de encuestas*** y podrá **crear nuevas encuestas** (hasta 5) si es necesario. Para obtener más información, visite nuestro sitio web: $t(links.openforisArenaWebsite) $t(common.raiseTicketInSupportForum) **Una vez que envíe la solicitud, espere un correo electrónico de invitación para acceder a Arena.**',
-    reCaptchaNotAnswered: 'ReCaptcha no respondido',
-    requestSent: 'Solicitud de acceso enviada correctamente',
-    requestSentMessage:
-      'Por favor, concédanos un par de días para procesar su solicitud. Le enviaremos pronto un correo electrónico a **{{email}}** con las instrucciones sobre cómo acceder a $t(common.appName). ¡Gracias y disfrute de **$t(common.appNameFull)**!',
-    sendRequest: 'Enviar solicitud',
-    sendRequestConfirm: '¿Solicitar acceso a $t(common.appNameFull)?',
-    templateNotSelected: 'No seleccionado (empezar desde cero)',
-    title: 'Solicitando acceso a $t(common.appNameFull)',
-  },
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Complete su registro en Arena',
-      setYourNewPassword: 'Establezca su nueva contraseña',
-    },
-    setNewPassword: 'Establecer nueva contraseña',
-    forgotPasswordLinkInvalid: 'La página a la que ha intentado acceder no existe o ya no es válida',
-    passwordSuccessfullyReset: 'Su contraseña ha sido restablecida correctamente',
-    passwordStrengthChecksTitle: 'Verificaciones de seguridad de la contraseña',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Sin espacios en blanco',
-      atLeast8CharactersLong: 'Al menos 8 caracteres',
-      containsLowerCaseLetters: 'Contiene letras minúsculas',
-      containsUpperCaseLetters: 'Contiene letras mayúsculas',
-      containsNumbers: 'Contiene números',
-    },
-    completeRegistration: 'Completar registro',
   },
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Tipos de dependencia',
@@ -444,14 +436,6 @@ export default {
     locationEditInfo: 'Haga doble clic en el mapa o arrastre el marcador para actualizar la ubicación',
     locationNotValidOrOutOfRange: 'Ubicación no válida o fuera del rango de la zona UTM',
     locationUpdated: 'Ubicación actualizada',
-    options: {
-      showLocationMarkers: 'Mostrar marcadores de ubicación',
-      showMarkersLabels: 'Mostrar etiquetas de marcadores',
-      showSamplingPolygon: 'Polígono de muestreo',
-      showControlPoints: 'Puntos de control',
-      showPlotReferencePoint: 'Punto de referencia de parcela',
-      showUtmGrid: 'Mostrar cuadrícula UTM',
-    },
     samplingPointDataLayerName: 'Datos de puntos de muestreo - nivel {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (cargando...)',
     samplingPointItemPopup: {
@@ -459,6 +443,299 @@ export default {
       levelCode: 'Código de nivel {{level}}',
     },
     selectedPeriod: 'Período seleccionado',
+  },
+
+  mapWorkspace: {
+    scenes: {
+      tab: 'Sentinel-2',
+      title: 'Escenas de Sentinel-2',
+      menuSearch: 'Buscar escenas recientes de Sentinel-2…',
+      intro:
+        'Sentinel-2 L2A, 10 m. Se buscan en el navegador en un índice STAC GeoParquet estático y se dibujan directamente desde el GeoTIFF optimizado para la nube de cada escena. Sin servidor de teselas.',
+      area: {
+        label: 'Área',
+        view: 'Vista del mapa',
+        plot: 'Parcela seleccionada',
+        draw: 'Dibujar área',
+        drawAgain: 'Dibujar de nuevo',
+      },
+      period: {
+        label: 'Período',
+        hint: 'hasta 6 meses atrás',
+        months_one: '{{count}} mes',
+        months_other: '{{count}} meses',
+      },
+      maxCloud: 'Nubosidad máx.',
+      minCoverage: 'Cobertura mín.',
+      percent: '{{value}} %',
+      chart: {
+        title: 'Escenas despejadas por mes',
+        allMonths: 'Todos los meses',
+        bar_one: '{{month}}: {{count}} escena',
+        bar_other: '{{month}}: {{count}} escenas',
+      },
+      count_one: '{{count}} escena',
+      count_other: '{{count}} escenas',
+      countInMonth_one: '{{count}} escena en {{month}}',
+      countInMonth_other: '{{count}} escenas en {{month}}',
+      sort: {
+        label: 'Ordenar',
+        newest: 'Más recientes',
+        leastCloud: 'Menos nubes',
+        mostCoverage: 'Mayor cobertura',
+      },
+      rowDetails: 'Tesela {{tile}} · {{cloud}} de nubes · {{coverage}} de cobertura',
+      unknownValue: '–',
+      thumbnailAlt: 'Vista previa de la escena del {{date}}',
+      addAsLayer: 'Añadir como capa',
+      alreadyOnMap: 'Ya está en el mapa',
+      useAsBaseMap: 'Usar como mapa base',
+      loadingScene: 'Cargando la escena…',
+      bands: {
+        label: 'Bandas',
+        trueColour: 'Color verdadero (rápido, un archivo)',
+        falseColourVegetation: 'Falso color, vegetación (B8, B4, B3)',
+        swir: 'Infrarrojo de onda corta (B12, B8A, B4)',
+        note: 'Las demás combinaciones de bandas leen tres archivos por escena, por lo que cargan más despacio.',
+      },
+      bandsShort: {
+        trueColour: 'color verdadero',
+        falseColourVegetation: 'falso color',
+        swir: 'SWIR',
+      },
+      layerName: 'Sentinel-2 {{date}} · {{tile}} · {{bands}}',
+      baseLayerName: '{{name}} (mapa base)',
+      messages: {
+        drawing: 'Haga clic en dos esquinas opuestas del mapa para dibujar el área.',
+        noPlot: 'Abra el marcador de una parcela en el mapa para buscar a su alrededor.',
+        noDrawnArea: 'Dibuje un rectángulo en el mapa para buscar dentro de él.',
+        tooLarge:
+          'El área es demasiado grande: acerque el mapa hasta que cubra como máximo {{max}} teselas de Sentinel-2.',
+        outside: 'Las teselas de Sentinel-2 solo cubren las latitudes de 80° S a 84° N.',
+        error: 'No se pudo leer el índice de escenas.',
+        retry: 'Reintentar',
+        searching_one: 'Buscando en {{count}} tesela…',
+        searching_other: 'Buscando en {{count}} teselas…',
+        empty: 'Ninguna escena coincide. Permita más nubes o un período más largo.',
+        layerError: 'No se pudo mostrar la escena.',
+      },
+    },
+    wms: {
+      menuItem: 'Añadir un servicio WMS / WMTS…',
+      title: 'Añadir un servicio WMS / WMTS',
+      serviceUrl: 'URL del servicio',
+      serviceUrlPlaceholder: 'https://example.org/geoserver/wms',
+      loadLayers: 'Cargar capas',
+      loading: 'Cargando…',
+      urlHint: 'URL GetCapabilities de un WMS o WMTS, o una plantilla de teselas XYZ con {z}/{x}/{y}',
+      insecureUrlHint: 'Este servicio usa http: el navegador puede bloquear sus teselas en esta página https',
+      layersCount: '{{count}} capas',
+      layersCount_one: '{{count}} capa',
+      layersCount_other: '{{count}} capas',
+      webMercatorSupported: 'Web Mercator disponible',
+      webMercatorMissing: 'Ninguna capa en Web Mercator',
+      truncated: 'solo se muestran las primeras {{max}} capas',
+      xyzSummary: 'Plantilla de teselas XYZ · no requiere capabilities',
+      layersToAdd: 'Capas para añadir',
+      layerNotWebMercator: 'No disponible en Web Mercator',
+      addAs: 'Añadir como',
+      addAsOverlay: 'Capa superpuesta',
+      addAsOverlayDescription: 'Se muestra sobre el mapa base, en la pestaña Capas',
+      addAsBaseMap: 'Mapa base',
+      addAsBaseMapDescription: 'Sustituye el mapa base, en el menú Mapa base',
+      displayName: 'Nombre visible',
+      displayNameMultiple: 'Cada capa conserva su propio título',
+      imageFormat: 'Formato de imagen',
+      formatPng: 'PNG (transparente)',
+      formatJpeg: 'JPEG (más ligero)',
+      opacity: 'Opacidad',
+      attribution: 'Atribución',
+      whoSeesIt: 'Quién la ve',
+      scopeSurvey: 'Todos en esta encuesta',
+      scopeUser: 'Solo yo',
+      submitOverlays: 'Añadir {{count}} capas superpuestas',
+      submitOverlays_one: 'Añadir {{count}} capa superpuesta',
+      submitOverlays_other: 'Añadir {{count}} capas superpuestas',
+      submitBaseMaps: 'Añadir {{count}} mapas base',
+      submitBaseMaps_one: 'Añadir {{count}} mapa base',
+      submitBaseMaps_other: 'Añadir {{count}} mapas base',
+      removeSelectedBaseMap: 'Quitar el mapa base personalizado seleccionado',
+      hiddenForSession:
+        'Capa oculta hasta que se vuelva a abrir el mapa: solo quienes pueden editar la encuesta pueden quitar las capas compartidas con todos',
+      errors: {
+        fetchLayersFailed: 'No se pudieron cargar las capas de mapa personalizadas',
+        loadFailed: 'No se pudieron cargar las capas de este servicio',
+        saveFailed: 'No se pudieron guardar las capas',
+        removeFailed: 'No se pudo quitar la capa',
+      },
+    },
+    toolbarLabel: 'Herramientas del mapa',
+    menus: {
+      baseMap: 'Mapa base',
+      addData: 'Añadir datos',
+      display: 'Visualización',
+      imagery: 'Imágenes',
+      tools: 'Herramientas',
+    },
+    addData: {
+      uploadFile: 'Subir KML, KMZ o Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Marcadores de ubicación',
+      showMarkersLabels: 'Etiquetas de marcadores',
+      showUtmGrid: 'Cuadrícula UTM',
+      imageInterpretation: 'Interpretación de imágenes',
+      showSamplingPolygon: 'Polígono de muestreo',
+      showControlPoints: 'Puntos de control',
+      showPlotReferencePoint: 'Punto de referencia de parcela',
+    },
+    tools: {
+      measureDistance: 'Medir distancia',
+    },
+    quick: {
+      zoomToData: 'Ajustar a los datos',
+      fullScreen: 'Pantalla completa',
+      exitFullScreen: 'Salir de pantalla completa',
+      noDataToZoom: 'No hay datos en el mapa a los que acercarse',
+    },
+    search: {
+      label: 'Buscar en el mapa',
+      placeholderFull: 'Clave de registro o coordenadas',
+      placeholderCompact: 'Coordenadas',
+      goTo: 'Ir a {{coordinates}}',
+      invalidCoordinates: 'Coordenadas fuera de rango',
+      noMatch: 'Ningún registro ni coordenadas coinciden',
+      coordinatesHint: 'Escriba coordenadas, p. ej. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Paneles del mapa',
+      close: 'Contraer panel',
+      tabs: {
+        layers: 'Capas',
+        records: 'Registros',
+        legend: 'Leyenda',
+      },
+      titles: {
+        records: 'Registros en el mapa',
+      },
+      recordsEmpty: 'Muestre una capa de datos de la encuesta para listar sus registros',
+    },
+    layers: {
+      noSurveyData: 'Esta encuesta no tiene datos para mostrar en el mapa',
+      groups: {
+        custom: 'Personalizadas (WMS / WMTS)',
+        scenes: 'Escenas Sentinel-2',
+        uploaded: 'Archivos subidos',
+      },
+      opacity: 'Opacidad de {{name}}',
+      remove: 'Quitar {{name}}',
+    },
+    legend: {
+      marker: 'Ubicación del registro',
+      cluster: 'Grupo de registros cercanos',
+      samplingPolygon: 'Polígono de muestreo',
+      utmGrid: 'Cuadrícula UTM',
+      addedLayers: 'Capas añadidas',
+    },
+    status: {
+      changeNotation: 'Haga clic para cambiar la notación',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'GMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Escala',
+      recordsInView_one: '{{count}} registro visible',
+      recordsInView_other: '{{count}} registros visibles',
+    },
+    upload: {
+      unsupported: 'Archivo no compatible: elija un archivo KML, KMZ, Shapefile comprimido (zip) o GeoJSON',
+      tooLarge: 'El archivo es demasiado grande: máximo {{maxSize}} MB',
+      error: 'No se pudo leer el archivo: {{details}}',
+    },
+    measure: {
+      measureArea: 'Medir área',
+      barLabel: 'Medición',
+      modes: {
+        distance: 'Distancia',
+        area: 'Área',
+      },
+      hint: 'Haga clic para añadir puntos y doble clic para terminar',
+      units: 'Unidades',
+      unitOptions: {
+        auto: 'Automática',
+        m: 'Metros (m)',
+        km: 'Kilómetros (km)',
+        m2: 'Metros cuadrados (m²)',
+        ha: 'Hectáreas (ha)',
+        km2: 'Kilómetros cuadrados (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perímetro {{value}}',
+      done: 'Hecho',
+    },
+    screenshot: {
+      quickButton: 'Captura de pantalla',
+      title: 'Captura del mapa',
+      capture: 'Capturar',
+      captureView: 'Vista actual',
+      capturePlot: 'Ajustar a la parcela',
+      include: 'Incluir',
+      includeData: 'Marcadores y mediciones',
+      includeScale: 'Barra de escala y flecha norte',
+      includeStamp: 'Parcela, fecha, coordenadas, mapa base',
+      saveTo: 'Guardar en',
+      targetRecord: 'Adjuntar a un registro de parcela',
+      targetRecordHint: 'Se guarda en un atributo de imagen',
+      targetFile: 'Solo descargar',
+      targetFileHint: 'Archivo PNG en este equipo',
+      plot: 'Registro de parcela',
+      attribute: 'Atributo de imagen',
+      fileName: 'Nombre del archivo',
+      mobileNote:
+        'Solo se muestran los atributos de imagen de la parcela. Los equipos de campo verán esta imagen en Arena Mobile cuando descarguen el registro en su dispositivo.',
+      noPlots:
+        'No hay parcelas en el mapa. Muestre una capa de ubicaciones en la pestaña Capas para adjuntar la imagen a un registro de parcela.',
+      noImageAttributes: 'Esta parcela no tiene ningún atributo de imagen editable.',
+      previewLoading: 'Preparando la vista previa…',
+      previewAlt: 'Vista previa de la captura del mapa',
+      alsoDownload: 'Descargar también',
+      downloadPng: 'Descargar PNG',
+      saving: 'Guardando…',
+      replace: 'Reemplazar',
+      keep: 'Conservar la imagen actual',
+      confirmReplace: 'Este atributo ya contiene la imagen "{{fileName}}". ¿Reemplazarla por la captura?',
+      saved:
+        'Captura guardada en {{plot}} › {{attribute}}. Los equipos de campo la recibirán en su próxima descarga de registros.',
+      savedPending: 'Captura enviada a {{plot}}. El registro aún se está actualizando: revíselo en un momento.',
+      notices: {
+        mapHidden:
+          'El mapa está oculto en esta pantalla. Cierre el panel lateral o amplíe la ventana e inténtelo de nuevo.',
+        tilesMissing: 'Teselas del mapa omitidas (su servidor no lo permite o no se cargaron): {{count}}',
+        equalEarth: 'El mapa base Equal Earth no se puede capturar. Elija otro mapa base en el menú Mapa base.',
+      },
+      errors: {
+        captureFailed: 'No se pudo capturar el mapa: {{details}}',
+        cannotEditRecord: 'No puede editar este registro (o la encuesta no está publicada).',
+        fileTooLarge: 'La imagen ocupa {{size}} MB, más de los {{limit}} MB permitidos para este atributo.',
+        quotaExceeded: 'No hay suficiente espacio libre para archivos en esta encuesta.',
+        plotNotFound: 'No se encontró la parcela en el registro. Puede que se haya eliminado.',
+        saveFailed: 'La captura no se guardó: {{details}}',
+        fileNameRequired: 'Introduzca un nombre de archivo.',
+        rowNotConfirmed:
+          'La nueva fila para la imagen no se confirmó a tiempo, así que la captura no se guardó. Revise el registro antes de volver a intentarlo.',
+        notApplicable: 'No se puede añadir la imagen: el atributo no es aplicable en esta parcela.',
+        clearsOtherValues:
+          'La captura no se guardó: añadirla borraría valores de otros campos del registro. Añádala desde el editor de registros.',
+      },
+    },
   },
   samplingPolygonOptions: {
     circle: 'Círculo',
@@ -475,15 +752,6 @@ export default {
     rectangle: 'Rectángulo',
     samplingPolygon: 'Polígono de muestreo',
     shape: 'Forma',
-  },
-  kmlUploader: {
-    opacity: 'opacidad',
-    selectFile: 'Seleccionar archivo',
-    title: 'Opciones de KML/KMZ/Shapefile',
-  },
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Elija un período para comparar',
-    falseColor: 'Color falso',
   },
   surveysView: {
     chains: 'Cadenas',
@@ -511,6 +779,9 @@ export default {
       ACCEPTED: 'Aceptado',
       CREATED: 'Pendiente',
     },
+    acceptedBy: 'Aceptada por',
+    dateAccepted: 'Fecha de aceptación',
+    createdSurvey: 'Encuesta creada',
     acceptRequest: {
       accept: 'Aceptar',
       acceptRequestAndCreateSurvey: 'Aceptar solicitud y crear encuesta',
@@ -518,9 +789,10 @@ export default {
         '¿Aceptar la solicitud de acceso para **{{email}}** como **{{role}}** y crear una nueva encuesta **{{surveyName}}**?',
       error: 'Error al aceptar la solicitud de acceso: {{error}}',
       requestAcceptedSuccessfully: 'Solicitud de acceso aceptada correctamente. $t(common.emailSentConfirmation)',
-      surveyLabel: 'Etiqueta de encuesta',
       surveyLabelInitial: '(Cambie el nombre y la etiqueta de la encuesta según sea necesario)',
       surveyName: 'Nombre de la encuesta',
+      newSurvey: 'Nueva encuesta',
+      requestDetails: 'Detalles de la solicitud',
       template: 'Plantilla',
     },
   },
@@ -529,6 +801,7 @@ export default {
     rotate: 'Rotar',
     dragAndDrop: 'Arrastre y suelte una imagen aquí o',
     upload: 'haga clic aquí para subir',
+    remove: '¿Eliminar la foto de perfil?',
     sendNewInvitation: 'Enviar nueva invitación',
     removeFromSurvey: 'Eliminar de la encuesta',
     confirmRemove: '¿Está seguro de que desea revocar el acceso de {{user}} a la encuesta {{survey}}?',
@@ -537,6 +810,12 @@ export default {
     preferredUILanguage: {
       label: 'Idioma de interfaz de usuario preferido',
       auto: 'Detectado automáticamente ({{detectedLanguage}})',
+    },
+    newPassword: 'Contraseña',
+    confirmPassword: 'Confirmar contraseña',
+    manageTwoFactorDevices: {
+      label: 'Gestionar 2FA',
+      title: 'Gestionar dispositivos de autenticación de dos factores',
     },
   },
   userPasswordChangeView: {
@@ -555,6 +834,10 @@ export default {
       '$t(common.emailSentConfirmation)\n\n    $t(userInviteView.skippedEmailsNotice)',
     skippedEmailsNotice:
       'Se han omitido {{skppedEmailsCount}} direcciones (ya fueron invitadas a esta encuesta anteriormente): {{skippedEmails}}',
+    invalidEmailsWarning:
+      'No se pudo contactar con la dirección de correo electrónico {{emails}} y es posible que no exista. Se ha mantenido en la lista de abajo: corríjala o elimínela e intente invitar de nuevo.',
+    invalidEmailsWarning_other:
+      'No se pudo contactar con las direcciones de correo electrónico {{emails}} y es posible que no existan. Se han mantenido en la lista de abajo: corríjalas o elimínelas e intente invitar de nuevo.',
     groupPermissions: {
       label: 'Permisos',
       systemAdmin: '        <li>Derechos de acceso completos al sistema</li>',
@@ -574,6 +857,8 @@ export default {
         '        <li>Datos: \n          <ul>$t(userInviteView.groupPermissions.dataEditorData)</ul>\n        </li>',
       dataEditorData:
         '        <li>añadir nuevos registros (encuestas propias)</li>\n        <li>editar registros existentes (encuestas propias)</li>\n        <li>enviar registros a la fase de “Limpieza”</li>',
+      surveyGuest:
+        '        <li>Datos: \n          <ul>\n            <li>ver los registros (encuestas propias), sin editarlos</li>\n          </ul>\n        </li>',
     },
     messageOptional: 'Mensaje (opcional)',
     messageInfo:
@@ -605,10 +890,34 @@ export default {
         'Al eliminar la unidad base, se desmarcarán todas las selecciones de "variable basada en área". ¿Continuar?',
     },
     downloadSummaryJSON: 'Descargar resumen (JSON)',
-    firstPhaseCategory: 'Categoría de primera fase',
-    firstPhaseCommonAttribute: {
-      label: 'Atributo común',
-      info: 'Atributo común entre la unidad base y la tabla de primera fase (debe ser un atributo de código con el mismo nombre que una propiedad extra definida para la categoría de primera fase)',
+    mauFile: {
+      upload: 'Subir MAU.zip',
+      download: 'Descargar MAU.zip',
+      delete: 'Eliminar MAU.zip',
+      confirmCycleAssociation: 'El archivo MAU.zip se asociará al ciclo actual ({{cycle}}). ¿Desea continuar?',
+      confirmReplace: 'Ya se ha subido un archivo MAU.zip para esta cadena. ¿Desea reemplazarlo?',
+      confirmDelete: '¿Eliminar el archivo MAU.zip subido para esta cadena?',
+      uploadComplete: 'Archivo MAU.zip subido correctamente',
+      deleteComplete: 'Archivo MAU.zip eliminado',
+      invalidFileExtension: 'Seleccione un archivo .zip',
+    },
+    phase1Category: 'Categoría de primera fase',
+    phase1CategoryInfo: 'Seleccione la categoría que contiene las muestras de la primera fase.',
+    phase2JoinEntity: {
+      label: 'Entidad de unión (2ª fase)',
+      info: 'Entidad utilizada para unir la unidad base con la categoría de 1ª fase: la propia entidad de la unidad base, o una de sus entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando el enlace de Sampling Point Data',
+      info: 'La(s) clave(s) de la entidad de 2ª fase se leen de la tabla de Sampling Point Data, que es la misma tabla utilizada para la 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de unión (1ª fase)',
+      info: 'Seleccione la columna de la tabla $t(chainView.phase1Category) (una propiedad adicional, o "code") utilizada para unirla con la entidad de unión de la 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de unión (2ª fase)',
+      info: 'Seleccione el atributo (de la entidad de 2ª fase) para unir con la tabla de 1ª fase; su valor se compara con el atributo de unión de la 1ª fase anterior.',
     },
     formLabel: 'Etiqueta de cadena de procesamiento',
     basic: 'Básico',
@@ -653,9 +962,14 @@ export default {
       reportingAreaInfo: `Con muestreo estratificado, proporcione las áreas de los estratos en la tabla de categorías del atributo de estrato (nombre de la columna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Seleccione la variable utilizada para estratificar la muestra.',
+    stratumAttribute2ndPhaseInfo:
+      'Seleccione la variable utilizada para subestratificar la muestra de la primera fase antes de extraer la submuestra final y detallada. Solo se muestran los atributos cuyo nombre también aparece como columna de la categoría de la 1ª fase.',
     postStratificationAttribute: 'Atributo de postestratificación',
     areaWeightingMethod: 'Método de ponderación de área',
     clusteringEntity: 'Entidad de agrupación',
+    clusteringEntityInfo:
+      'La entidad que define las unidades primarias de muestreo. Nota: se utiliza exclusivamente para el análisis de conglomerados dentro del marco del paquete R survey.',
     clusteringOnlyVariances: 'Agrupación solo para varianzas',
     errorNoLabel: 'La cadena debe tener una etiqueta válida',
     dateExecuted: 'Fecha de ejecución',
@@ -669,6 +983,7 @@ export default {
       sourceChain: 'Cadena de origen',
       entityCheck: 'Compatibilidad de entidades',
       entityMissing: 'falta en el estudio destino',
+      skipMissingEntities: 'Omitir atributos de análisis de entidades que faltan en el estudio destino',
       noAnalysisAttributes: 'Esta cadena no tiene atributos de análisis',
       cloneComplete: 'Cadena clonada correctamente',
       missingEntities: 'No se puede clonar: las siguientes entidades no existen en el estudio destino: {{entities}}',
@@ -711,8 +1026,11 @@ export default {
   itemsTable: {
     unused: 'Sin usar',
     noItemsAdded: 'No se añadieron elementos',
+    selectedItemsCount: '{{count}} elemento seleccionado',
+    selectedItemsCount_other: '{{count}} elementos seleccionados',
   },
   expression: {
+    areaOfInterestNotFound: 'Área de interés "{{name}}" no encontrada: defínala en Información de la encuesta → Mapa',
     functionHasTooFewArguments:
       'La función {{fnName}} requiere al menos {{minArity}} argumentos (se obtuvieron {{numArgs}})',
     functionHasTooManyArguments:
@@ -728,6 +1046,7 @@ export default {
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma de nombre vernáculo de taxón no válido: {{vernacularLangCode}}',
     missingFunctionParameters: 'Parámetros de función faltantes',
+    notSupported: 'Expresión no admitida: verifique su sintaxis (p. ej., falta un operador entre dos valores)',
     undefinedFunction: 'Función indefinida: {{name}}',
   },
 
@@ -751,284 +1070,9 @@ $t(common.appNameFull)
  * Scripts R de Arena en GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
-  },
-  nodeDefEdit: {
-    additionalFields: 'Campos adicionales',
-    basic: 'Básico',
-    advanced: 'Avanzado',
-    mobileApp: 'Aplicación móvil',
-    validations: 'Validaciones',
-    function: 'Función',
-    editingFunction: 'Editando función {{functionName}}',
-    editorHelp: {
-      json: 'Las expresiones válidas son un subconjunto de Javascript.',
-      sql: 'Solo se permiten expresiones SQL válidas.',
+    changelog: {
+      title: '$t(appModules.changelog)',
     },
-    editorCompletionHelp: '- Mostrar las variables y funciones disponibles que se pueden usar',
-    functionDescriptions: {
-      categoryItemProp:
-        'Devuelve el valor de la $t(extraProp.label) especificada de un elemento de categoría que tiene el código especificado',
-      dateTimeDiff: 'Devuelve la diferencia (en minutos) de 2 pares de fecha-hora',
-      distance: 'Devuelve la distancia (en metros) entre las coordenadas especificadas',
-      geoCoordinateAtDistance:
-        'Devuelve las coordenadas a una distancia y rumbo especificados desde las coordenadas especificadas',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      first: 'Devuelve el primer valor o nodo del atributo o entidad múltiple especificado',
-      geoPolygon: 'Genera un polígono en GeoJSON a partir de una lista de coordenadas',
-      includes: 'Devuelve verdadero si el atributo múltiple especificado incluye el valor especificado.',
-      index: 'Devuelve el índice del nodo especificado entre sus hermanos',
-      isEmpty: 'Devuelve verdadero si el argumento no tiene ningún valor especificado',
-      isNotEmpty: 'Devuelve verdadero si el argumento tiene algún valor especificado',
-      last: 'Devuelve el último valor o nodo del atributo o entidad múltiple especificado',
-      ln: 'Devuelve el logaritmo natural de X',
-      log10: 'Devuelve el logaritmo en base 10 de X',
-      max: 'Devuelve el máximo de los argumentos',
-      min: 'Devuelve el mínimo de los argumentos',
-      now: 'Devuelve la fecha u hora actual',
-      parent: 'Devuelve la entidad padre del nodo especificado',
-      pow: 'Devuelve el valor de una base elevada a una potencia',
-      prevCycleNote:
-        'Funciona solo en Arena Mobile cuando se definen múltiples ciclos y el enlace al ciclo anterior está habilitado',
-      prevCycleValue:
-        'Devuelve el valor del mismo atributo en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Devuelve los valores de los mismos atributos en el registro del ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Devuelve el ciclo del registro actual',
-      recordDateCreated:
-        'Devuelve la fecha y hora de creación del registro actual como un valor de fecha y hora. Se puede usar en un atributo de texto, fecha u hora',
-      recordDateLastModified:
-        'Devuelve la fecha y hora de la última modificación del registro actual como un valor de fecha y hora. Se puede usar en un atributo de texto, fecha u hora',
-      recordOwnerEmail: 'Devuelve el correo electrónico del usuario propietario del registro',
-      recordOwnerName: 'Devuelve el nombre del usuario propietario del registro',
-      recordOwnerRole: 'Devuelve el rol (en la encuesta actual) del usuario propietario del registro',
-      rowIndex: 'Devuelve el índice de la fila (o formulario) actual de la tabla',
-      taxonProp:
-        'Devuelve el valor de la $t(extraProp.label) especificada de un taxón que tiene el código especificado',
-      taxonVernacularName:
-        'Devuelve el (primer) nombre vernáculo (o local) en el idioma especificado de un taxón que tiene el código especificado',
-      userEmail: 'Devuelve el correo electrónico del usuario que ha iniciado sesión',
-      userIsRecordOwner:
-        'Devuelve un valor booleano "verdadero" si el usuario que edita el registro también es su propietario, "falso" en caso contrario',
-      userName: 'Devuelve el nombre del usuario que ha iniciado sesión',
-      userProp: 'Devuelve el valor de la $t(extraProp.label) especificada del usuario que ha iniciado sesión',
-      uuid: 'Genera un UUID (identificador universalmente único) que se puede usar como identificador (por ejemplo, como atributo clave de una entidad)',
-      avg: 'Devuelve el valor promedio de una variable numérica',
-      count: 'Devuelve el número de filas que coinciden con un criterio especificado',
-      sum: 'Devuelve la suma total de una variable numérica',
-    },
-    functionName: {
-      rowIndex: 'Índice de fila',
-    },
-    basicProps: {
-      analysis: 'Análisis',
-      autoIncrementalKey: {
-        label: 'Clave auto incremental',
-        info: 'El valor se generará automáticamente',
-      },
-      displayAs: 'Mostrar como',
-      displayIn: 'Mostrar en',
-      entitySource: 'Fuente de la entidad',
-      enumerate: {
-        label: 'Enumerar',
-        info: 'Las filas se generarán automáticamente utilizando los elementos de categoría asociados a un atributo de código marcado como Clave definido dentro de la entidad; las filas no se pueden añadir ni eliminar y el atributo de código clave no será editable',
-      },
-      enumerator: {
-        label: 'Enumerador',
-        info: 'Los elementos de la categoría se utilizarán para generar las filas de la entidad padre',
-      },
-      form: 'Formulario',
-      formula: 'Fórmula',
-      includedInClonedData: 'Incluido en los datos clonados',
-      includedInRecordsList: {
-        label: 'Incluir en la lista de registros',
-        info: `Si está marcado, el atributo será visible en la lista de registros`,
-      },
-      key: 'Clave',
-      maxKeysCountReached: 'Número máximo de claves alcanzado ({{maxKeysCount}})',
-      multiple: 'Múltiple',
-      ownPage: 'Su propia página',
-      parentPage: 'Página padre ({{parentPage}})',
-      qualifier: {
-        label: 'Calificador',
-        info: `Cuando un usuario que pertenece a un grupo crea un nuevo registro, este atributo se completará automáticamente con el valor especificado para él en los calificadores del grupo del usuario. Los usuarios solo podrán ver y modificar los registros que pertenezcan a su propio grupo, si pertenecen a uno.`,
-      },
-      table: 'Tabla',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Valores predeterminados no especificados',
-      defaultValuesSpecified: 'Valores predeterminados especificados',
-      editableAlways: 'Siempre editable',
-      editableIfConditionIsMet: 'Editable cuando se cumple la condición',
-      relevantIfRadioNone: 'Siempre relevante',
-      relevantIfRadioDefined: 'Relevante cuando se cumple la condición',
-      visibleAlways: 'Siempre visible',
-      visibleIfConditionIsMet: 'Visible cuando se cumple la condición',
-      areaBasedEstimate: 'Estimación basada en el área',
-      defaultValues: 'Valores predeterminados',
-      defaultValuesInfo: `Esto permite completar automáticamente una respuesta según reglas específicas.
-    Si configura varias reglas, el sistema las comprobará en orden, de arriba hacia abajo.
-    Aplicará la primera regla que cumpla las condiciones y usará ese resultado como respuesta.`,
-      defaultValueEvaluatedOneTime: 'Valor predeterminado evaluado solo una vez',
-      defaultValueEvaluatedOneTimeInfo: `El valor predeterminado se evaluará solo una vez, cuando se cree el atributo.
-    Si no está marcado, el valor predeterminado se volverá a evaluar cada vez que se actualice el registro.
-    Debe marcarse al usar expresiones como now() o uuid(), que deben evaluarse solo una vez, cuando el valor del atributo se genera por primera vez.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Valores predeterminados no editables porque la clave auto incremental está configurada',
-      editableIf: 'Editable si',
-      editableIfInfo: `Por defecto, un usuario siempre puede acceder a un campo relevante.
-Aquí se puede definir una regla para indicar si el usuario puede escribir o modificar este campo.
-Esto decide si un usuario puede escribir o cambiar este campo.
-Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será de solo lectura (bloqueado).`,
-      hidden: 'Siempre oculto',
-      hiddenInReport: 'Ocultar en el Panel Analítico',
-      hiddenInReportInfo: `Si está marcado, el atributo no será visible en el Panel Analítico`,
-      hiddenWhenNotRelevant: 'Oculto cuando no es relevante',
-      itemsFilter: 'Filtro de elementos',
-      itemsFilterInfo:
-        'Expresión utilizada para filtrar elementos seleccionables. En la expresión, la palabra "this" se referirá al elemento en sí. Ej.: this.region = region_attribute_name (donde "region" es el nombre de una propiedad extra definida para el elemento y region_attribute_name es el nombre de un atributo en la encuesta)',
-      readOnly: 'Solo lectura',
-      relevantIf: 'Relevante si',
-      relevantIfInfo: `Por defecto, todos los campos están activos.
-    Si define una regla de relevancia y no se cumple, el campo se mostrará en gris o se ocultará por completo,
-    y las respuestas automáticas se ignorarán.
-    Úselo para mostrar u ocultar partes de la encuesta de forma dinámica; por ejemplo, mostrar "Especifique" solo cuando el usuario elige "Otro".`,
-      script: 'Script',
-      visibleIf: 'Visible si',
-      visibleIfInfo: `Por defecto, un campo siempre es visible.
-    Si define una regla, solo será visible cuando esa regla se cumpla; en caso contrario, quedará oculto.
-    Nota: a diferencia de ocultar un campo "no relevante", un campo oculto puede seguir guardando una respuesta automática.
-    Esto es útil para ocultar secciones completas de la encuesta según quién haya iniciado sesión (por ejemplo, por rol).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Oculto en Arena Mobile',
-        info: 'Si está marcado, el atributo no será visible en AM',
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Incluir en el resumen de entidades múltiples',
-        info: 'Si está marcado, el atributo será visible en la vista de resumen de la entidad',
-      },
-      includedInPreviousCycleLink: {
-        label: 'Incluir en el enlace del ciclo anterior',
-        info: 'Si está marcado, el valor del ciclo anterior se mostrará en el formulario de entrada de datos (cuando el enlace al ciclo anterior esté activo en la aplicación móvil)',
-      },
-    },
-    numericProps: {
-      unit: 'Unidad',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Número máximo de dígitos decimales',
-    },
-    fileProps: {
-      fileNameExpression: 'Expresión de nombre de archivo',
-      fileType: 'Tipo de archivo',
-      fileTypes: {
-        image: 'Imagen',
-        video: 'Video',
-        audio: 'Audio',
-        other: 'Otro',
-      },
-      maxFileSize: 'Tamaño máximo de archivo (Mb)',
-      numberOfFiles: 'Vaya a Validaciones para cambiar el número mínimo y máximo de archivos.',
-      showGeotagInformation: 'Mostrar información de geoetiqueta',
-    },
-    mobileProps: {
-      title: 'Aplicación móvil',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Color de encabezado',
-      headerColor: {
-        blue: 'Azul',
-        green: 'Verde',
-        orange: 'Naranja',
-        red: 'Rojo',
-        yellow: 'Amarillo',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Hipervínculo',
-        markdown: 'Markdown',
-        text: 'Texto',
-      },
-      textInputType: 'Tipo de entrada de texto',
-      textInputTypes: {
-        singleLine: 'Una sola línea',
-        multiLine: 'Varias líneas',
-      },
-      textTransform: 'Transformación de texto',
-      textTransformTypes: {
-        none: 'ninguno',
-        capitalize: 'capitalizar',
-        uppercase: 'mayúsculas',
-        lowercase: 'minúsculas',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Valor de la etiqueta',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Categoría',
-      codeShown: 'Mostrar código',
-      displayAsTypes: {
-        checkbox: 'Casilla de verificación',
-        dropdown: 'Desplegable',
-      },
-      parentCode: 'Código padre',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Permitir solo coordenadas del dispositivo',
-      allowOnlyDeviceCoordinateInfo:
-        'Solo se aplica a Arena Mobile: si está marcado, el usuario no podrá modificar los valores X/Y, solo se podrá usar el GPS del dispositivo para obtenerlos',
-      mapMarkerColor: 'Color del marcador en el mapa',
-    },
-    expressionsProp: {
-      expression: 'Expresión',
-      applyIf: 'Aplicar si',
-      confirmDelete: '¿Eliminar esta expresión?',
-      severity: 'Severidad',
-    },
-    validationsProps: {
-      minCount: 'Conteo mínimo',
-      maxCount: 'Conteo máximo',
-      expressions: 'Expresiones de validación',
-      attributeAlwaysValid: 'Atributo siempre válido',
-      attributeValidWhenConditionIsMet: 'Atributo válido cuando se cumple la condición',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Este nodo no se puede convertir a múltiple porque tiene valores predeterminados.',
-    cannotDeleteNodeDefReferenced:
-      'No se puede eliminar "{{nodeDef}}": está referenciado por estas definiciones de nodo: {{nodeDefDependents}}',
-    cloneDialog: {
-      confirmButtonLabel: 'Clonar',
-      title: 'Clonando definición de nodo "{{nodeDefName}}"',
-      entitySelectLabel: 'Entidad en la que clonar:',
-    },
-    conversion: {
-      dialogTitle: 'Convertir {{nodeDefName}} a otro tipo',
-      fromType: 'De tipo',
-      toType: 'A tipo',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Mover',
-      title: 'Moviendo la definición del nodo "{{nodeDefName}}" desde "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Entidad a la que mover:',
-    },
-    movedNodeDefinitionHasErrors:
-      'La definición de nodo "{{nodeDefName}}" que ha movido tiene errores; por favor, corríjalos.',
-    nodeDefintionsHaveErrors: 'Estas definiciones de nodo tienen errores: {{nodeDefNames}}. Por favor, corríjalos.',
-    filterVariable: 'Variable para filtrar elementos',
-    filterVariableForLevel: 'Variable para {{levelName}}',
-    unique: {
-      label: 'Único',
-      info: 'Cuando un atributo está marcado como **Único**, su valor debe ser único dentro de la entidad múltiple más cercana (se mostrará un error en caso contrario). \n\n---\n\nEj.: en una estructura como *clúster -> parcela -> árbol*, si tiene un atributo *tree_species* marcado como **Único**, solo puede tener un árbol por especie dentro de la misma *parcela*.',
-    },
-    categoriesClonedFromSurvey: 'Las siguientes categorías también se clonaron desde la encuesta de origen: {{names}}',
-    taxonomiesClonedFromSurvey: 'Las siguientes taxonomías también se clonaron desde la encuesta de origen: {{names}}',
   },
   languagesEditor: {
     languages: 'Idioma(s)',
@@ -1056,7 +1100,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       synonym: 'Sinónimo / Latín',
       extraPropsNotDefined: 'Propiedades extra no definidas para esta taxonomía',
       importMissingPublishedTaxa:
-        '{{count}} taxón/taxa publicado/s no encontrado/s en el archivo importado y dejado/s sin cambios. Códigos: {{codes}}',
+        '{{count}} taxón/taxa publicado/s no encontrado/s en el archivo importado: dejado/s sin cambios, después de los importados. Códigos: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} más)',
     },
     taxaCount: 'Recuento de taxones',
@@ -1077,10 +1121,13 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       noCategoriesAvailable: 'No hay categorías disponibles en la encuesta seleccionada',
     },
     itemsCount: 'Recuento de elementos',
+    structure: 'Estructura',
     types: {
       flat: 'Plana',
       hierarchical: 'Jerárquica',
       reportingData: 'Datos de informes',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Datos de puntos de muestreo',
     },
   },
   categoryEdit: {
@@ -1102,6 +1149,44 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     },
     convertToSimpleCategory: {
       confirmMessage: '¿Convertir esta categoría de datos de informes a una categoría simple?',
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Convertir a Datos de puntos de muestreo',
+      confirmMessage: `¿Convertir esta categoría en la categoría de Datos de puntos de muestreo?\n\nLa categoría se renombrará a '${samplingPointDataCategoryName}' y se añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Convertir a categoría GeoPackage',
+      confirmMessage: `¿Convertir esta categoría en una categoría GeoPackage?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría GeoPackage en una categoría simple?\n\nSe desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Convertir a categoría simple',
+      confirmMessage: `¿Convertir esta categoría de Datos de puntos de muestreo en una categoría simple?\n\nSe borrará el nombre de la categoría (deberá asignarle uno nuevo), y se desbloqueará la propiedad extra '${locationItemExtraDefName}', para que pueda renombrarse, cambiar de tipo o eliminarse como cualquier otra propiedad extra. Sus datos no se ven afectados.`,
+    },
+    geoPackageCategory: 'Esta categoría tiene capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoría tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
+    samplingPointDataCategoryType: 'Esta es la categoría de Datos de puntos de muestreo',
+    samplingPointDataCategoryTypeInfo: `Esta es una categoría predefinida para datos de puntos de muestreo. Tiene una propiedad extra llamada '${locationItemExtraDefName}', que permite exportarla como un archivo GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `Falta la propiedad extra '${locationItemExtraDefName}'`,
+    createCategory: {
+      menuLabel: 'Añadir categoría',
+      simple: 'Categoría simple',
+      otherTypes: 'Más tipos de categoría',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoría de Datos de puntos de muestreo',
+      description:
+        'Categoría predefinida para datos de puntos de muestreo, que incluye un campo de ubicación para cada elemento.',
+      message: `¿Crear una nueva categoría de Datos de puntos de muestreo?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoría con capacidades geográficas',
+      description:
+        'Añade un campo de ubicación a los elementos, para que la categoría se pueda exportar como un archivo GeoPackage.',
+      message: `¿Crear una nueva categoría con capacidades geográficas?\n\nSe añadirá una propiedad extra '${locationItemExtraDefName}' a los elementos.`,
     },
     deleteItem: 'Eliminar elemento',
     level: {
@@ -1125,12 +1210,23 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       title: 'Resumen de importación de categoría',
     },
     reportingData: 'Datos de informes',
+    exportToGeoPackage: 'Exportar a GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} elemento(s) sin una ubicación válida fueron omitidos.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Generar análisis Whisp',
+      confirmMessage: `¿Generar el análisis Whisp para todos los puntos de muestreo?
+
+- cada punto de muestreo con una ubicación será enviado a Open Foris Whisp para el análisis
+- los resultados se combinarán con los datos de los puntos de muestreo y se guardarán en la categoría '${samplingPointDataWhispCategoryName}'
+- si la categoría '${samplingPointDataWhispCategoryName}' ya existe, su contenido será reemplazado
+- el análisis se ejecuta en segundo plano y puede tardar varios minutos, dependiendo del número de puntos de muestreo`,
+    },
     templateFor_samplingPointDataImport_csv: 'Plantilla para importación de datos de puntos de muestreo (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Plantilla para importación de datos de puntos de muestreo (Excel)',
   },
   extraProp: {
     label: 'Propiedad extra',
-    label_plural: 'Propiedades extra',
+    label_other: 'Propiedades extra',
     addExtraProp: 'Añadir propiedad extra',
     dataTypes: {
       geometryPoint: 'Punto de geometría',
@@ -1138,7 +1234,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       text: 'Texto',
     },
     editor: {
-      title: 'Editar $t(extraProp.label_plural)',
+      title: 'Editar $t(extraProp.label_other)',
       confirmDelete: '¿Eliminar la propiedad extra "{{name}}"?',
       confirmSave:
         '¿Guardar los cambios en las definiciones de propiedades extra?\n\n**Advertencias**:\n\n{{warnings}}',
@@ -1185,6 +1281,12 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       distanceAttribute: 'Atributo de distancia',
       bearingAttribute: 'Atributo de rumbo',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: 'Área de interés',
+      areasOfInterestNotDefined:
+        'Aún no hay áreas de interés definidas: defínalas en Información de la encuesta → Mapa',
+    },
+    coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
     dateTimeDiffEditor: {
       firstDateAttribute: 'Primer atributo de fecha',
@@ -1215,5 +1317,70 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
       constant: 'Constante',
       expression: 'Expresión',
     },
+  },
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+  aiExpression: {
+    title: 'Generar expresión a partir de una descripción',
+    hint: 'Describa en lenguaje sencillo lo que debe hacer la expresión. La IA la traducirá a la sintaxis de Arena. Presione Ctrl+Enter para generar.',
+    placeholder: 'p. ej. la altura del árbol debe ser mayor que 0 y menor que 200',
+    generate: 'Generar',
+    generating: 'Generando…',
+    use: 'Usar esta expresión',
+    useAnyway: 'Usar de todos modos',
+    tryAgain: 'Probar con otra descripción',
+    parseError:
+      'La expresión generada no se pudo analizar correctamente: {{message}}. Aun así puede aplicarla y editarla a mano, o intentar reformularla.',
+    explain: {
+      title: 'Explicar esta expresión',
+      thinking: 'Pidiendo a la IA que explique esta expresión…',
+      error: 'Error al obtener la explicación: {{message}}',
+      timeout: 'La IA tardó demasiado en responder. Inténtelo de nuevo.',
+    },
+  },
+  aiTranslation: {
+    translateButton_one: 'Traducir a {{count}} otro idioma',
+    translateButton_other: 'Traducir a {{count}} otros idiomas',
+    translateButton: 'Traducir a otros idiomas',
+    success_one: 'Traducido a {{count}} idioma. Revise y guarde.',
+    success_other: 'Traducido a {{count}} idiomas. Revise y guarde.',
+    success: 'Traducido. Revise y guarde.',
+    failed: 'La traducción falló: {{message}}',
+    timeout: 'La solicitud de traducción ha caducado. Inténtelo de nuevo.',
+  },
+  aiActivityLog: {
+    title: 'Resumen del registro de actividad',
+    summarizeButton: 'Resumir',
+    thinking: 'Agregando eventos y pidiendo a la IA que los resuma…',
+    error: 'Error al obtener el resumen: {{message}}',
+  },
+  aiChatbot: {
+    open: 'Ayuda y documentación',
+    title: 'Ayuda y documentación',
+    empty: 'Pregúnteme lo que quiera sobre Open Foris Arena.',
+    placeholder: 'Escriba su pregunta…',
+    send: 'Enviar',
+    stop: 'Detener',
+    clear: 'Borrar',
+    showReasoning: 'Mostrar razonamiento',
+    error: 'Error del chatbot: {{message}}',
+    language: 'Idioma de respuesta',
   },
 }

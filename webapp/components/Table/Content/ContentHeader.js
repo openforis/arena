@@ -5,6 +5,11 @@ import { useI18n } from '@webapp/store/system'
 
 import { TableColumnPropType } from '../tablePropTypes'
 
+const getHeaderText = ({ header, headerIsTranslationKey, i18n }) => {
+  if (!header) return ''
+  return headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header
+}
+
 export const ContentHeader = (props) => {
   const {
     column,
@@ -14,7 +19,7 @@ export const ContentHeader = (props) => {
     selectedItemsCount,
     sort,
     totalCount,
-    visibleItemsCount,
+    allVisibleItemsSelected,
   } = props
 
   const i18n = useI18n()
@@ -23,8 +28,8 @@ export const ContentHeader = (props) => {
   return (
     <div key={key}>
       {sortable && <SortToggle sort={sort} handleSortBy={handleSortBy} field={sortField || key} />}
-      {renderHeader?.({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, visibleItemsCount })}
-      {header ? (headerIsTranslationKey && i18n.exists(header) ? i18n.t(header) : header) : ''}
+      {renderHeader?.({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, allVisibleItemsSelected })}
+      {getHeaderText({ header, headerIsTranslationKey, i18n })}
     </div>
   )
 }
@@ -37,5 +42,5 @@ ContentHeader.propTypes = {
   selectedItemsCount: PropTypes.number,
   sort: PropTypes.object,
   totalCount: PropTypes.number,
-  visibleItemsCount: PropTypes.number,
+  allVisibleItemsSelected: PropTypes.bool,
 }

@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Ativo',
@@ -23,7 +29,7 @@ Deseja ignorá-las?`,
     cantUndoWarning: 'Esta operação não pode ser desfeita',
     cantBeDeletedUsedItem: 'Este(a) {{item}} é usado(a) por algumas definições de nó e não pode ser excluído(a)',
     chain: 'Cadeia',
-    chain_plural: 'Cadeias',
+    chain_other: 'Cadeias',
     childrenEmpty: 'Defina pelo menos um item filho',
     clear: 'Limpar',
     clone: 'Clonar',
@@ -38,14 +44,14 @@ Deseja ignorá-las?`,
     createdWith: 'Criado com',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Ciclo',
-    cycle_plural: 'Ciclos',
+    cycle_other: 'Ciclos',
     dateCreated: 'Data de criação',
     dateLastModified: 'Data da última alteração',
     delete: 'Excluir',
     deleted: 'Excluído!',
     descending: 'Decrescente',
     description: 'Descrição',
-    description_plural: 'Descrições',
+    description_other: 'Descrições',
     designerNotes: 'Notas do designer',
     designerNotesInfo: `As notas do designer ficarão visíveis apenas no designer de formulários do inventário e não ficarão visíveis no formulário de entrada de dados.`,
     details: 'Detalhes',
@@ -55,6 +61,7 @@ Deseja ignorá-las?`,
     download: 'Baixar',
     draft: 'Rascunho',
     edit: 'Editar',
+    elapsed: 'Decorrido',
     email: 'Email',
     email_other: 'Emails',
     emailSentConfirmation: `Um email para {{email}} foi enviado.
@@ -66,11 +73,11 @@ Deseja ignorá-las?`,
     empty: 'Vazio',
     entity: 'Entidade',
     error: 'Erro',
-    error_plural: 'Erros',
+    error_other: 'Erros',
     errorFound: '1 erro encontrado',
     errorFound_other: '{{count}} erros encontrados',
     errorMessage: 'Mensagem de erro',
-    errorMessage_plural: 'Mensagens de erro',
+    errorMessage_other: 'Mensagens de erro',
     expand: 'Expandir',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Exportar',
@@ -81,7 +88,7 @@ Deseja ignorá-las?`,
     expression: 'Expressão',
     false: 'Falso',
     file: 'Arquivo',
-    file_plural: 'Arquivos',
+    file_other: 'Arquivos',
     formContainsErrors: 'O formulário contém erros',
     formContainsErrorsCannotContinue: 'O formulário contém erros. Corrija-os antes de continuar.',
     formContainsErrorsCannotSave: 'O formulário contém erros. Corrija-os antes de salvar.',
@@ -98,12 +105,12 @@ Deseja ignorá-las?`,
     info: 'Informações',
     invalid: 'INVÁLIDO',
     item: 'Item',
-    item_plural: 'Itens',
+    item_other: 'Itens',
     itemAlreadyAdded: 'Item já adicionado',
     label: 'Rótulo',
-    label_plural: 'Rótulos',
+    label_other: 'Rótulos',
     language: 'Idioma',
-    language_plural: 'Idiomas',
+    language_other: 'Idiomas',
     leavePageConfirmMessage: `Existem alterações não salvas no formulário. 
 
 Ao confirmar, todas as alterações serão perdidas.
@@ -115,11 +122,11 @@ Deseja prosseguir?`,
     max: 'Máximo',
     med: 'Mediana',
     manage: 'Gerenciar',
-    message_plural: 'Mensagens',
+    message_other: 'Mensagens',
     measure: 'Medida',
     measure_other: 'Medidas',
     measurePrevSteps: 'Medida das etapas anteriores',
-    measurePrevSteps_plural: 'Medidas das etapas anteriores',
+    measurePrevSteps_other: 'Medidas das etapas anteriores',
     min: 'Mínimo',
     moveUp: 'Mover para cima',
     moveDown: 'Mover para baixo',
@@ -127,7 +134,7 @@ Deseja prosseguir?`,
     new: 'Novo',
     next: 'Próximo',
     no: 'Não',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
     notification: 'Notificação',
     notification_other: 'Notificações',
     notSpecified: '---Não especificado---',
@@ -159,9 +166,34 @@ Deseja prosseguir?`,
 - Os táxons não podem ser excluídos.
 
 **Tem certeza de que deseja continuar?**`,
+    publishRecordValuesUpdateConfirm: `#### Publicar {{survey}} irá atualizar dados já registrados ####
+
+{{reasons}}
+
+Esta operação pode alterar ou apagar permanentemente dados já inseridos.
+
+Para publicar sem atualizar os dados existentes, marque "Pular atualização de dados" abaixo (não recomendado).`,
+    publishRecordValuesUpdateConfirmHeader: 'Os dados de registros existentes serão atualizados',
+    publishRecordValuesUpdateConfirmOk: 'Publicar e atualizar dados',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Digite o nome da pesquisa "{{strongConfirmRequiredText}}" para confirmar',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Os seguintes atributos serão modificados, e seus valores nos registros existentes serão recalculados automaticamente: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Os seguintes atributos usam uma propriedade extra de uma categoria ou taxonomia que foi alterada, o que fará com que seu valor seja recalculado nos registros existentes: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Pular atualização de dados',
+    publishSkipDataUpdateConfirmOk: 'Pular atualização de dados e publicar',
+    publishSkipDataUpdateImplications: 'Pular a atualização de dados significa que:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Os registros existentes podem não corresponder mais à nova definição da pesquisa',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Os valores afetados não serão recalculados até serem reinseridos manualmente',
+    publishSkipDataUpdateImplicationChains:
+      'As cadeias de processamento que usam esses atributos podem produzir resultados desatualizados',
     raiseTicketInSupportForum: `Em caso de problemas, abra um chamado com a tag 'arena' no nosso <b>Fórum de Suporte</b>: $t(links.supportForum)`,
     record: 'Registro',
     record_other: 'Registros',
+    remaining: 'Restante',
     remote: 'Remoto',
     required: 'Obrigatório',
     requiredField: 'campo obrigatório',
@@ -209,7 +241,7 @@ Deseja prosseguir?`,
     value: 'Valor',
     view: 'Visualizar',
     warning: 'Aviso',
-    warning_plural: 'Avisos',
+    warning_other: 'Avisos',
     yes: 'Sim',
     date: {
       aMomentAgo: 'Agora há pouco',
@@ -225,20 +257,20 @@ Deseja prosseguir?`,
     },
     paginator: {
       firstPage: 'Primeira página',
+      goToPage: 'Ir para a página',
       itemsPerPage: 'Itens por página',
       lastPage: 'Última página',
       nextPage: 'Próxima página',
+      page: 'Página',
       previousPage: 'Página anterior',
     },
     table: {
       visibleColumns: 'Colunas visíveis',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'Para confirmar, digite o seguinte texto: **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage: '(Somente arquivos {{acceptedExtensions}} com tamanho máximo de {{maxSize}} serão aceitos)',
     error: {
@@ -250,17 +282,14 @@ Deseja prosseguir?`,
     selectedFile: 'Arquivo selecionado',
     selectedFile_other: 'Arquivos selecionados',
   },
-
   error: {
     pageNotFound: 'Página não encontrada',
   },
-
   geo: {
     area: 'Área',
     vertices: 'Vértices',
     perimeter: 'Perímetro',
   },
-
   files: {
     header: 'Arquivos',
     missing: ' Arquivos ausentes: {{count}}',
@@ -268,12 +297,16 @@ Deseja prosseguir?`,
     fileName: 'Nome do arquivo',
     fileSize: 'Tamanho do arquivo',
   },
-
   sidebar: {
     logout: 'Sair',
   },
-
   header: {
+    theme: {
+      label: 'Tema',
+      light: 'Claro',
+      dark: 'Escuro',
+      system: 'Padrão do sistema',
+    },
     myProfile: 'Meu perfil',
     qrCodeLoginDialog: {
       title: 'Faça login no Arena Mobile usando o código QR',
@@ -286,7 +319,6 @@ Deseja prosseguir?`,
       error: 'Erro ao gerar o código QR: {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Inteiro',
     decimal: 'Decimal',
@@ -303,7 +335,6 @@ Deseja prosseguir?`,
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'Início',
     landing: 'Boas-vindas',
@@ -320,6 +351,7 @@ Deseja prosseguir?`,
     formDesigner: 'Designer de formulário',
     surveyHierarchy: 'Hierarquia',
     surveyDependencyTree: 'Árvore de dependências',
+    surveyCompare: 'Comparar / atualizar a partir de arquivo',
     category: 'Categoria',
     categories: 'Categorias',
     nodeDef: 'Definição de nó',
@@ -344,107 +376,39 @@ Deseja prosseguir?`,
     userNew: 'Novo usuário',
     usersSurvey: 'Lista de usuários',
     userGroup: 'Grupo de usuários',
-    userGroup_plural: 'Grupos de usuários',
+    userGroup_other: 'Grupos de usuários',
     userGroupNew: 'Novo grupo de usuários',
     usersList: 'Lista de usuários (todos)',
     user2FADevice: 'Dispositivo 2FA',
-    user2FADevice_plural: 'Dispositivos 2FA',
+    user2FADevice_other: 'Dispositivos 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Análise',
     chain: 'Cadeia',
-    chain_plural: 'Cadeias',
+    chain_other: 'Cadeias',
     virtualEntity: 'Entidade virtual',
     entities: 'Entidades virtuais',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Instâncias',
 
     message: 'Mensagem',
-    message_plural: '$t(common.message_plural)',
+    message_other: '$t(common.message_other)',
+
+    systemAdmin: 'Administração do sistema',
+    jobMonitor: 'Monitor de tarefas',
+    systemLogs: 'Registos do sistema',
 
     help: 'Ajuda',
     about: 'Sobre',
+    changelog: 'Registo de alterações',
+    whatsNew: 'Novidades',
     disclaimer: 'Aviso legal',
     userManual: 'Manual do usuário',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'Esta seção está disponível somente quando o inventário é publicado',
   },
-
-  loginView: {
-    yourName: 'Seu nome',
-    yourEmail: 'Seu email',
-    yourPassword: 'Sua senha',
-    yourNewPassword: 'Sua nova senha',
-    repeatYourPassword: 'Repita sua senha',
-    repeatYourNewPassword: 'Repita sua nova senha',
-    requestAccess: 'Novo no $t(common.appNameFull)? Solicite acesso',
-    resetPassword: 'Redefinir senha',
-    login: 'Entrar',
-    loginUsingBackupCode: 'Entrar com código de backup 2FA',
-    forgotPassword: 'Esqueceu a senha',
-    sendPasswordResetEmail: 'Enviar email de redefinição de senha',
-    twoFactorBackupCode: 'Código de backup 2FA',
-    twoFactorToken: 'Código de verificação',
-    twoFactorTokenDescription: `Para manter sua conta segura, verificamos sua identidade.
-
-Insira o código gerado pelo seu aplicativo autenticador.`,
-  },
-
-  accessRequestView: {
-    error: 'Erro ao solicitar acesso: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Primeiro nome',
-        lastName: 'Sobrenome',
-        institution: 'Instituição',
-        country: 'País',
-        purpose: 'Para que você precisa?',
-        surveyName: 'Proponha um nome para o inventário',
-        templateUuid: 'Começar com um modelo?',
-      },
-    },
-    introduction: `Nossos recursos são limitados, então você deve solicitar acesso à plataforma.
-  Também estamos interessados ​​no que você deseja fazer com ela, então informe-nos!
-  Você pode começar a partir de um **novo inventário em branco** ou clonar um **modelo** existente, e deverá sugerir um nome para o inventário recém-criado.
-  Você receberá a função de ***Administrador do Inventário*** para esse inventário: poderá editá-lo e convidar novos usuários para participar do seu inventário e contribuir com ele.
-  Você também será um ***Gerente de Inventários*** e poderá **criar novos inventários** (até 5), se necessário.
-Para mais informações, visite nosso site: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**Depois de enviar a solicitação, aguarde um e-mail de convite para acessar a Arena.**`,
-    reCaptchaNotAnswered: 'ReCaptcha não respondido',
-    requestSent: 'Solicitação de acesso enviada com sucesso',
-    requestSentMessage: `Por favor, dê-nos alguns dias para processar sua solicitação.
-Enviaremos em breve um email para **{{email}}** com as instruções de como acessar $t(common.appName).
-Obrigado e aproveite **$t(common.appNameFull)**!`,
-    sendRequest: 'Enviar solicitação',
-    sendRequestConfirm: 'Solicitar acesso ao $t(common.appNameFull)?',
-    templateNotSelected: 'Não selecionado (começar do zero)',
-    title: 'Solicitando acesso ao $t(common.appNameFull)',
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Conclua seu cadastro no Arena',
-      setYourNewPassword: 'Defina sua nova senha',
-    },
-    setNewPassword: 'Definir nova senha',
-    forgotPasswordLinkInvalid: 'A página que você tentou acessar não existe ou não é mais válida',
-    passwordSuccessfullyReset: 'Sua senha foi redefinida com sucesso',
-    passwordStrengthChecksTitle: 'Verificações de força da senha',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Sem espaços em branco',
-      atLeast8CharactersLong: 'Pelo menos 8 caracteres',
-      containsLowerCaseLetters: 'Contém letras minúsculas',
-      containsUpperCaseLetters: 'Contém letras maiúsculas',
-      containsNumbers: 'Contém números',
-    },
-    completeRegistration: 'Concluir cadastro',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Tipos de dependência',
     dependencyTypes: {
@@ -462,11 +426,9 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     selectAtLeastOneDependencyType: 'Selecione pelo menos um tipo de dependência',
     noDependenciesToDisplay: 'Nenhuma dependência para exibir',
   },
-
   designerView: {
     formPreview: 'Pré-visualização do formulário',
   },
-
   recordView: {
     justDeleted: 'Este registro acabou de ser excluído',
     sessionExpired: 'A sessão de gravação expirou',
@@ -482,7 +444,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       unlock: 'Permitir editar o atributo qualificador',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Excluir esta função agregada personalizada?',
@@ -490,7 +451,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     },
     editRecord: 'Editar registro',
   },
-
   mapView: {
     changeMarkerColor: 'Alterar cor do marcador',
     createRecord: 'Criar novo registro',
@@ -500,18 +460,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     locationEditInfo: 'Dê duplo clique no mapa ou arraste o marcador para atualizar a localização',
     locationNotValidOrOutOfRange: 'Localização inválida ou fora do alcance da zona UTM',
     locationUpdated: 'Localização atualizada',
-    options: {
-      showLocationMarkers: 'Mostrar marcadores de localização',
-      showMarkersLabels: `Mostrar rótulos dos marcadores`,
-      showSamplingPolygon: `Polígono amostral`,
-      showControlPoints: `Pontos de controle`,
-      showPlotReferencePoint: `Ponto de referência da parcela`,
-      showUtmGrid: 'Mostrar grade UTM',
-    },
-    rulerTooltip: `Pressione o botão para começar a medir distâncias.
-  - clique várias vezes para medir percursos
-  - dê duplo clique ou pressione ESC para finalizar a medição
-  - pressione o botão novamente para ocultar as medições`,
     samplingPointDataLayerName: 'Dados de ponto amostral - nível {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (carregando...)',
     samplingPointItemPopup: {
@@ -519,6 +467,297 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       levelCode: 'Código do nível {{level}}',
     },
     selectedPeriod: 'Período selecionado',
+  },
+
+  mapWorkspace: {
+    scenes: {
+      tab: 'Sentinel-2',
+      title: 'Cenas do Sentinel-2',
+      menuSearch: 'Pesquisar cenas recentes do Sentinel-2…',
+      intro:
+        'Sentinel-2 L2A, 10 m. Pesquisadas no navegador a partir de um índice STAC GeoParquet estático e desenhadas diretamente do GeoTIFF otimizado para a nuvem de cada cena. Sem servidor de blocos.',
+      area: {
+        label: 'Área',
+        view: 'Vista do mapa',
+        plot: 'Parcela selecionada',
+        draw: 'Desenhar área',
+        drawAgain: 'Desenhar novamente',
+      },
+      period: {
+        label: 'Período',
+        hint: 'até 6 meses atrás',
+        months_one: '{{count}} mês',
+        months_other: '{{count}} meses',
+      },
+      maxCloud: 'Nuvens máx.',
+      minCoverage: 'Cobertura mín.',
+      percent: '{{value}} %',
+      chart: {
+        title: 'Cenas limpas por mês',
+        allMonths: 'Todos os meses',
+        bar_one: '{{month}}: {{count}} cena',
+        bar_other: '{{month}}: {{count}} cenas',
+      },
+      count_one: '{{count}} cena',
+      count_other: '{{count}} cenas',
+      countInMonth_one: '{{count}} cena em {{month}}',
+      countInMonth_other: '{{count}} cenas em {{month}}',
+      sort: {
+        label: 'Ordenar',
+        newest: 'Mais recentes',
+        leastCloud: 'Menos nuvens',
+        mostCoverage: 'Maior cobertura',
+      },
+      rowDetails: 'Bloco {{tile}} · {{cloud}} de nuvens · {{coverage}} de cobertura',
+      unknownValue: '–',
+      thumbnailAlt: 'Pré-visualização da cena de {{date}}',
+      addAsLayer: 'Adicionar como camada',
+      alreadyOnMap: 'Já está no mapa',
+      useAsBaseMap: 'Usar como mapa base',
+      loadingScene: 'Carregando a cena…',
+      bands: {
+        label: 'Bandas',
+        trueColour: 'Cor verdadeira (rápido, um arquivo)',
+        falseColourVegetation: 'Falsa cor, vegetação (B8, B4, B3)',
+        swir: 'Infravermelho de ondas curtas (B12, B8A, B4)',
+        note: 'As outras combinações de bandas leem três arquivos por cena, por isso carregam mais devagar.',
+      },
+      bandsShort: {
+        trueColour: 'cor verdadeira',
+        falseColourVegetation: 'falsa cor',
+        swir: 'SWIR',
+      },
+      layerName: 'Sentinel-2 {{date}} · {{tile}} · {{bands}}',
+      baseLayerName: '{{name}} (mapa base)',
+      messages: {
+        drawing: 'Clique em dois cantos opostos no mapa para desenhar a área.',
+        noPlot: 'Abra o marcador de uma parcela no mapa para pesquisar ao redor.',
+        noDrawnArea: 'Desenhe um retângulo no mapa para pesquisar dentro dele.',
+        tooLarge: 'A área é grande demais: aproxime o mapa até que cubra no máximo {{max}} blocos do Sentinel-2.',
+        outside: 'Os blocos do Sentinel-2 cobrem apenas as latitudes de 80° S a 84° N.',
+        error: 'Não foi possível ler o índice de cenas.',
+        retry: 'Tentar novamente',
+        searching_one: 'Pesquisando em {{count}} bloco…',
+        searching_other: 'Pesquisando em {{count}} blocos…',
+        empty: 'Nenhuma cena corresponde. Permita mais nuvens ou um período mais longo.',
+        layerError: 'Não foi possível exibir a cena.',
+      },
+    },
+    wms: {
+      menuItem: 'Adicionar um serviço WMS / WMTS…',
+      title: 'Adicionar um serviço WMS / WMTS',
+      serviceUrl: 'URL do serviço',
+      serviceUrlPlaceholder: 'https://example.org/geoserver/wms',
+      loadLayers: 'Carregar camadas',
+      loading: 'Carregando…',
+      urlHint: 'URL GetCapabilities de um WMS ou WMTS, ou um modelo de blocos XYZ com {z}/{x}/{y}',
+      insecureUrlHint: 'Este serviço usa http: o navegador pode bloquear seus blocos nesta página https',
+      layersCount: '{{count}} camadas',
+      layersCount_one: '{{count}} camada',
+      layersCount_other: '{{count}} camadas',
+      webMercatorSupported: 'Web Mercator disponível',
+      webMercatorMissing: 'Nenhuma camada em Web Mercator',
+      truncated: 'apenas as primeiras {{max}} camadas são listadas',
+      xyzSummary: 'Modelo de blocos XYZ · não precisa de capabilities',
+      layersToAdd: 'Camadas a adicionar',
+      layerNotWebMercator: 'Não disponível em Web Mercator',
+      addAs: 'Adicionar como',
+      addAsOverlay: 'Camada sobreposta',
+      addAsOverlayDescription: 'Exibida sobre o mapa base, na aba Camadas',
+      addAsBaseMap: 'Mapa base',
+      addAsBaseMapDescription: 'Substitui o mapa base, no menu Mapa base',
+      displayName: 'Nome exibido',
+      displayNameMultiple: 'Cada camada mantém seu próprio título',
+      imageFormat: 'Formato de imagem',
+      formatPng: 'PNG (transparente)',
+      formatJpeg: 'JPEG (mais leve)',
+      opacity: 'Opacidade',
+      attribution: 'Atribuição',
+      whoSeesIt: 'Quem vê',
+      scopeSurvey: 'Todos neste inventário',
+      scopeUser: 'Somente eu',
+      submitOverlays: 'Adicionar {{count}} camadas sobrepostas',
+      submitOverlays_one: 'Adicionar {{count}} camada sobreposta',
+      submitOverlays_other: 'Adicionar {{count}} camadas sobrepostas',
+      submitBaseMaps: 'Adicionar {{count}} mapas base',
+      submitBaseMaps_one: 'Adicionar {{count}} mapa base',
+      submitBaseMaps_other: 'Adicionar {{count}} mapas base',
+      removeSelectedBaseMap: 'Remover o mapa base personalizado selecionado',
+      hiddenForSession:
+        'Camada oculta até o mapa ser reaberto: somente quem pode editar o inventário pode remover camadas compartilhadas com todos',
+      errors: {
+        fetchLayersFailed: 'Não foi possível carregar as camadas de mapa personalizadas',
+        loadFailed: 'Não foi possível carregar as camadas deste serviço',
+        saveFailed: 'Não foi possível salvar as camadas',
+        removeFailed: 'Não foi possível remover a camada',
+      },
+    },
+    toolbarLabel: 'Ferramentas do mapa',
+    menus: {
+      baseMap: 'Mapa base',
+      addData: 'Adicionar dados',
+      display: 'Exibição',
+      imagery: 'Imagens',
+      tools: 'Ferramentas',
+    },
+    addData: {
+      uploadFile: 'Carregar KML, KMZ ou Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Marcadores de localização',
+      showMarkersLabels: 'Rótulos dos marcadores',
+      showUtmGrid: 'Grade UTM',
+      imageInterpretation: 'Interpretação de imagens',
+      showSamplingPolygon: 'Polígono amostral',
+      showControlPoints: 'Pontos de controle',
+      showPlotReferencePoint: 'Ponto de referência da parcela',
+    },
+    tools: {
+      measureDistance: 'Medir distância',
+    },
+    quick: {
+      zoomToData: 'Ajustar aos dados',
+      fullScreen: 'Tela cheia',
+      exitFullScreen: 'Sair da tela cheia',
+      noDataToZoom: 'Não há dados no mapa para ajustar o zoom',
+    },
+    search: {
+      label: 'Pesquisar no mapa',
+      placeholderFull: 'Chave do registro ou coordenadas',
+      placeholderCompact: 'Coordenadas',
+      goTo: 'Ir para {{coordinates}}',
+      invalidCoordinates: 'Coordenadas fora do intervalo',
+      noMatch: 'Nenhum registro ou coordenada corresponde',
+      coordinatesHint: 'Digite coordenadas, p. ex. 41.9, 12.5',
+    },
+    rail: {
+      label: 'Painéis do mapa',
+      close: 'Recolher painel',
+      tabs: {
+        layers: 'Camadas',
+        records: 'Registros',
+        legend: 'Legenda',
+      },
+      titles: {
+        records: 'Registros no mapa',
+      },
+      recordsEmpty: 'Mostre uma camada de dados do inventário para listar seus registros',
+    },
+    layers: {
+      noSurveyData: 'Este inventário não tem dados para mostrar no mapa',
+      groups: {
+        custom: 'Personalizadas (WMS / WMTS)',
+        scenes: 'Cenas Sentinel-2',
+        uploaded: 'Arquivos carregados',
+      },
+      opacity: 'Opacidade de {{name}}',
+      remove: 'Remover {{name}}',
+    },
+    legend: {
+      marker: 'Localização do registro',
+      cluster: 'Grupo de registros próximos',
+      samplingPolygon: 'Polígono amostral',
+      utmGrid: 'Grade UTM',
+      addedLayers: 'Camadas adicionadas',
+    },
+    status: {
+      changeNotation: 'Clique para mudar a notação',
+      notations: {
+        latLon: 'Lat, Lon',
+        dms: 'GMS',
+        utm: 'UTM',
+      },
+      zoom: 'Zoom',
+      scale: 'Escala',
+      recordsInView_one: '{{count}} registro visível',
+      recordsInView_other: '{{count}} registros visíveis',
+    },
+    upload: {
+      unsupported: 'Arquivo não suportado: escolha um arquivo KML, KMZ, Shapefile compactado (zip) ou GeoJSON',
+      tooLarge: 'O arquivo é grande demais: máximo de {{maxSize}} MB',
+      error: 'Não foi possível ler o arquivo: {{details}}',
+    },
+    measure: {
+      measureArea: 'Medir área',
+      barLabel: 'Medição',
+      modes: {
+        distance: 'Distância',
+        area: 'Área',
+      },
+      hint: 'Clique para adicionar pontos e clique duas vezes para terminar',
+      units: 'Unidades',
+      unitOptions: {
+        auto: 'Automática',
+        m: 'Metros (m)',
+        km: 'Quilômetros (km)',
+        m2: 'Metros quadrados (m²)',
+        ha: 'Hectares (ha)',
+        km2: 'Quilômetros quadrados (km²)',
+      },
+      unitSymbols: {
+        m: 'm',
+        km: 'km',
+        m2: 'm²',
+        ha: 'ha',
+        km2: 'km²',
+      },
+      perimeter: 'Perímetro {{value}}',
+      done: 'Concluído',
+    },
+    screenshot: {
+      quickButton: 'Captura de tela',
+      title: 'Captura do mapa',
+      capture: 'Capturar',
+      captureView: 'Vista atual',
+      capturePlot: 'Ajustar à parcela',
+      include: 'Incluir',
+      includeData: 'Marcadores e medições',
+      includeScale: 'Barra de escala e seta norte',
+      includeStamp: 'Parcela, data, coordenadas, mapa base',
+      saveTo: 'Salvar em',
+      targetRecord: 'Anexar a um registro de parcela',
+      targetRecordHint: 'Salva em um atributo de imagem',
+      targetFile: 'Apenas baixar',
+      targetFileHint: 'Arquivo PNG neste computador',
+      plot: 'Registro de parcela',
+      attribute: 'Atributo de imagem',
+      fileName: 'Nome do arquivo',
+      mobileNote:
+        'Apenas os atributos de imagem da parcela são listados. As equipes de campo veem esta imagem no Arena Mobile depois de baixar o registro no dispositivo.',
+      noPlots:
+        'Nenhuma parcela no mapa. Mostre uma camada de localização na aba Camadas para anexar a imagem a um registro de parcela.',
+      noImageAttributes: 'Esta parcela não tem nenhum atributo de imagem editável.',
+      previewLoading: 'Preparando a pré-visualização…',
+      previewAlt: 'Pré-visualização da captura do mapa',
+      alsoDownload: 'Baixar também',
+      downloadPng: 'Baixar PNG',
+      saving: 'Salvando…',
+      replace: 'Substituir',
+      keep: 'Manter a imagem atual',
+      confirmReplace: 'Este atributo já contém a imagem "{{fileName}}". Substituí-la pela captura?',
+      saved:
+        'Captura salva em {{plot}} › {{attribute}}. As equipes de campo a recebem no próximo download de registros.',
+      savedPending: 'Captura enviada para {{plot}}. O registro ainda está sendo atualizado: verifique-o em instantes.',
+      notices: {
+        mapHidden: 'O mapa está oculto nesta tela. Feche o painel lateral ou amplie a janela e tente novamente.',
+        tilesMissing: 'Blocos do mapa omitidos (o servidor deles não permite ou não carregaram): {{count}}',
+        equalEarth: 'O mapa base Equal Earth não pode ser capturado. Escolha outro mapa base no menu Mapa base.',
+      },
+      errors: {
+        captureFailed: 'Não foi possível capturar o mapa: {{details}}',
+        cannotEditRecord: 'Você não pode editar este registro (ou o inventário não está publicado).',
+        fileTooLarge: 'A imagem tem {{size}} MB, acima dos {{limit}} MB permitidos para este atributo.',
+        quotaExceeded: 'Não há espaço livre suficiente para arquivos neste inventário.',
+        plotNotFound: 'A parcela não foi encontrada no registro. Ela pode ter sido excluída.',
+        saveFailed: 'A captura não foi salva: {{details}}',
+        fileNameRequired: 'Informe um nome de arquivo.',
+        rowNotConfirmed:
+          'A nova linha para a imagem não foi confirmada a tempo, então a captura não foi salva. Verifique o registro antes de tentar novamente.',
+        notApplicable: 'Não é possível adicionar a imagem: o atributo não é aplicável nesta parcela.',
+        clearsOtherValues:
+          'A captura não foi salva: adicioná-la apagaria valores de outros campos do registro. Adicione-a pelo editor de registros.',
+      },
+    },
   },
 
   samplingPolygonOptions: {
@@ -536,17 +775,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     rectangle: 'Retângulo',
     samplingPolygon: 'Polígono amostral',
     shape: 'Forma',
-  },
-
-  kmlUploader: {
-    opacity: 'opacidade',
-    selectFile: 'Selecionar arquivo',
-    title: 'Opções de KML/KMZ/Shapefile',
-  },
-
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Escolha um período para comparar',
-    falseColor: 'Falsa cor',
   },
 
   surveysView: {
@@ -570,12 +798,14 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       'published-draft': 'Publicado/Rascunho',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Aceito',
       CREATED: 'Pendente',
     },
+    acceptedBy: 'Aceito por',
+    dateAccepted: 'Data de aceitação',
+    createdSurvey: 'Inventário criado',
     acceptRequest: {
       accept: 'Aceitar',
       acceptRequestAndCreateSurvey: 'Aceitar solicitação e criar inventário',
@@ -583,13 +813,13 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         'Aceitar a solicitação de acesso de **{{email}}** como **{{role}}** e criar um novo inventário **{{surveyName}}**?',
       error: 'Erro ao aceitar a solicitação de acesso: {{error}}',
       requestAcceptedSuccessfully: 'Solicitação de acesso aceita com sucesso. $t(common.emailSentConfirmation)',
-      surveyLabel: 'Rótulo do inventário',
       surveyLabelInitial: '(Altere nome e rótulo do inventário conforme necessário)',
       surveyName: 'Nome do inventário',
+      newSurvey: 'Novo inventário',
+      requestDetails: 'Detalhes do pedido',
       template: 'Modelo',
     },
   },
-
   userView: {
     scale: 'Escala',
     rotate: 'Rotacionar',
@@ -612,7 +842,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       title: 'Gerenciar dispositivos de autenticação em dois fatores',
     },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'Alterando senha do usuário: {{user}}',
     oldPassword: 'Senha antiga',
@@ -622,7 +851,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
     passwordChangedSuccessfully: 'Senha alterada com sucesso!',
     notAuthorizedToChangePasswordOfAnotherUser: 'Você não tem autorização para alterar a senha de outro usuário',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'Convidar o usuário {{email}} como Administrador do Sistema?',
     confirmInviteSystemAdmin_other: 'Convidar os usuários {{email}} como Administradores do Sistema?',
@@ -630,6 +858,10 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} endereços foram ignorados (já haviam sido convidados para este inventário anteriormente): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      'O endereço de email {{emails}} não pôde ser alcançado e pode não existir. Ele foi mantido na lista abaixo: corrija-o ou remova-o e tente convidar novamente.',
+    invalidEmailsWarning_other:
+      'Os endereços de email {{emails}} não puderam ser alcançados e podem não existir. Eles foram mantidos na lista abaixo: corrija-os ou remova-os e tente convidar novamente.',
     groupPermissions: {
       label: 'Permissões',
       systemAdmin: `
@@ -700,6 +932,12 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
         <li>adicionar novos registros (inventários próprios)</li>
         <li>editar registros existentes (inventários próprios)</li>
         <li>enviar registros para a fase “Limpeza”</li>`,
+      surveyGuest: `
+        <li>Dados: 
+          <ul>
+            <li>visualizar os registros (inventários próprios), sem editá-los</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Mensagem (opcional)',
     messageInfo: `A mensagem aparecerá no email enviado ao usuário. 
@@ -710,7 +948,6 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       Se você quiser convidar usuários com outros papéis, publique o inventário primeiro.`,
     typeEmail: 'Digite um endereço de email e pressione o botão Adicionar',
   },
-
   user: {
     mapApiKeys: {
       title: 'Chaves de API de mapa',
@@ -727,18 +964,40 @@ Obrigado e aproveite **$t(common.appNameFull)**!`,
       preferNotToSay: 'Prefiro não informar',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete:
         'Ao excluir a unidade base, todas as seleções de "variável baseada em área" serão desmarcadas. Continuar?',
     },
     downloadSummaryJSON: 'Baixar resumo (JSON)',
-    firstPhaseCategory: 'Categoria da 1ª fase',
-    firstPhaseCommonAttribute: {
-      label: 'Atributo comum',
-      info: `Atributo em comum entre a unidade base e a tabela da 1ª fase 
-    (deve ser um atributo de código com o mesmo nome de uma propriedade extra definida para a categoria da 1ª fase)`,
+    mauFile: {
+      upload: 'Enviar MAU.zip',
+      download: 'Baixar MAU.zip',
+      delete: 'Excluir MAU.zip',
+      confirmCycleAssociation: 'O arquivo MAU.zip será associado ao ciclo atual ({{cycle}}). Deseja continuar?',
+      confirmReplace: 'Já foi enviado um arquivo MAU.zip para esta cadeia. Deseja substituí-lo?',
+      confirmDelete: 'Excluir o arquivo MAU.zip enviado para esta cadeia?',
+      uploadComplete: 'Arquivo MAU.zip enviado com sucesso',
+      deleteComplete: 'Arquivo MAU.zip excluído',
+      invalidFileExtension: 'Selecione um arquivo .zip',
+    },
+    phase1Category: 'Categoria da 1ª fase',
+    phase1CategoryInfo: 'Selecione a categoria que contém as amostras da 1ª fase.',
+    phase2JoinEntity: {
+      label: 'Entidade de junção (2ª fase)',
+      info: 'Entidade usada para unir a unidade base à categoria da 1ª fase: a própria entidade da unidade base, ou uma das suas entidades superiores.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Unir usando a ligação de Sampling Point Data',
+      info: 'A(s) chave(s) da entidade da 2ª fase são lidas da tabela Sampling Point Data, que é a mesma tabela usada para a 1ª fase.',
+    },
+    phase1JoinAttribute: {
+      label: 'Atributo de junção (1ª fase)',
+      info: 'Selecione a coluna da tabela $t(chainView.phase1Category) (uma propriedade extra, ou "code") usada para a unir à entidade de junção da 2ª fase.',
+    },
+    phase2JoinAttribute: {
+      label: 'Atributo de junção (2ª fase)',
+      info: 'Selecione o atributo (da entidade da 2ª fase) para unir com a tabela da 1ª fase; o seu valor é comparado com o atributo de junção da 1ª fase anterior.',
     },
     formLabel: 'Rótulo da cadeia de processamento',
     basic: 'Básico',
@@ -782,9 +1041,12 @@ Este processo pode ser lento.`,
       reportingAreaInfo: `Com amostragem estratificada, forneça as áreas dos estratos na tabela de categorias do atributo de estrato (nome da coluna 'area')`,
     },
     stratumAttribute: 'Atributo de estrato',
+    stratumAttributeInfo: 'Selecione a variável usada para estratificar a amostra.',
+    stratumAttribute2ndPhaseInfo: `Selecione a variável usada para subestratificar a amostra da 1ª fase antes de extrair a subamostra final e detalhada. Apenas são apresentados os atributos cujo nome também aparece como coluna da categoria da 1ª fase.`,
     postStratificationAttribute: 'Atributo de pós-estratificação',
     areaWeightingMethod: 'Método de ponderação por área',
     clusteringEntity: 'Entidade de agrupamento',
+    clusteringEntityInfo: `A entidade que define as unidades amostrais primárias. Nota: usada exclusivamente para análise de conglomerados no âmbito do pacote R survey.`,
     clusteringOnlyVariances: 'Agrupamento apenas para variâncias',
     errorNoLabel: 'A cadeia deve ter um rótulo válido',
     dateExecuted: 'Data de execução',
@@ -800,6 +1062,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Cadeia de origem',
       entityCheck: 'Compatibilidade de entidades',
       entityMissing: 'ausente no estudo destino',
+      skipMissingEntities: 'Ignorar atributos de análise de entidades ausentes no estudo destino',
       noAnalysisAttributes: 'Esta cadeia não tem atributos de análise',
       cloneComplete: 'Cadeia clonada com sucesso',
       missingEntities: 'Não é possível clonar: as seguintes entidades não existem no estudo destino: {{entities}}',
@@ -834,7 +1097,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Tabela de dados de reporte e junções com atributos',
     showSamplingAttributes: 'Mostrar atributos amostrais',
   },
-
   instancesView: {
     title: 'Instâncias',
     terminate: 'Encerrar',
@@ -854,13 +1116,14 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Token inválido ou expirado',
     },
   },
-
   itemsTable: {
     unused: 'Não usado',
     noItemsAdded: 'Nenhum item adicionado',
+    selectedItemsCount: '{{count}} item selecionado',
+    selectedItemsCount_other: '{{count}} itens selecionados',
   },
-
   expression: {
+    areaOfInterestNotFound: 'Área de interesse "{{name}}" não encontrada: defina-a em Informações do inquérito → Mapa',
     functionHasTooFewArguments: 'A função {{fnName}} requer pelo menos {{minArity}} argumentos (recebidos {{numArgs}})',
     functionHasTooManyArguments: 'A função {{fnName}} aceita no máximo {{maxArity}} argumentos (recebidos {{numArgs}})',
     identifierNotFound: 'Atributo ou entidade "{{name}}" não encontrado',
@@ -874,6 +1137,8 @@ $t(common.cantUndoWarning)`,
     invalidTaxonVernacularNameLanguageCode:
       'Código de idioma do nome vernacular do táxon inválido: {{vernacularLangCode}}',
     missingFunctionParameters: 'Parâmetros de função ausentes',
+    notSupported:
+      'Expressão não suportada: verifique sua sintaxe (por exemplo, um operador ausente entre dois valores)',
     undefinedFunction: 'Função indefinida: {{name}}',
   },
 
@@ -897,299 +1162,18 @@ $t(common.appNameFull)
  * Scripts R do Arena no GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: 'Campos adicionais',
-    basic: 'Básico',
-    advanced: 'Avançado',
-    mobileApp: 'Aplicativo móvel',
-    validations: 'Validações',
-    function: 'Função',
-    editingFunction: 'Editando função {{functionName}}',
-    editorHelp: {
-      json: 'Expressões válidas são um subconjunto de Javascript.',
-      sql: 'Somente expressões SQL válidas são permitidas.',
-    },
-    editorCompletionHelp: '- Mostrar as variáveis e funções disponíveis que podem ser usadas',
-    functionDescriptions: {
-      categoryItemProp:
-        'Retorna o valor da $t(extraProp.label) especificada de um item de categoria com o código informado',
-      dateTimeDiff: 'Retorna a diferença (em minutos) entre 2 pares de data e hora',
-      distance: 'Retorna a distância (em metros) entre as coordenadas especificadas',
-      first: 'Retorna o primeiro valor ou nó do atributo múltiplo ou entidade especificada',
-      geoCoordinateAtDistance:
-        'Retorna as coordenadas a uma distância e direção especificadas a partir das coordenadas informadas',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      geoPolygon: 'Gera um polígono em GeoJSON a partir de uma lista de coordenadas',
-      includes: 'Retorna verdadeiro se o atributo múltiplo especificado inclui o valor informado.',
-      index: 'Retorna o índice do nó especificado entre seus irmãos',
-      isEmpty: 'Retorna verdadeiro se o argumento não tiver valor definido',
-      isNotEmpty: 'Retorna verdadeiro se o argumento tiver algum valor definido',
-      last: 'Retorna o último valor ou nó do atributo múltiplo ou entidade especificada',
-      ln: 'Retorna o logaritmo natural de X',
-      log10: 'Retorna o logaritmo de base 10 de X',
-      max: 'Retorna o máximo dos argumentos',
-      min: 'Retorna o mínimo dos argumentos',
-      now: 'Retorna a data ou hora atual',
-      parent: 'Retorna a entidade pai do nó especificado',
-      pow: 'Retorna o valor de uma base elevada a uma potência',
-      prevCycleNote:
-        'Funciona apenas no Arena Mobile quando múltiplos ciclos são definidos e o vínculo ao ciclo anterior está habilitado',
-      prevCycleValue:
-        'Retorna o valor do mesmo atributo no registro do ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Retorna os valores dos mesmos atributos no registro do ciclo anterior. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Retorna o ciclo do registro atual',
-      recordDateCreated:
-        'Retorna a data e hora de criação do registro atual como valor datetime. Pode ser usada em atributo de texto, data ou hora',
-      recordDateLastModified:
-        'Retorna a data e hora da última modificação do registro atual como valor datetime. Pode ser usada em atributo de texto, data ou hora',
-      recordOwnerEmail: 'Retorna o email do usuário proprietário do registro',
-      recordOwnerName: 'Retorna o nome do usuário proprietário do registro',
-      recordOwnerRole: 'Retorna o papel (no inventário atual) do usuário proprietário do registro',
-      rowIndex: 'Retorna o índice atual da linha da tabela (ou formulário)',
-      taxonProp: 'Retorna o valor da $t(extraProp.label) especificada de um táxon com o código informado',
-      taxonVernacularName:
-        'Retorna o (primeiro) nome vernacular (ou local) no idioma especificado de um táxon com o código informado',
-      userEmail: 'Retorna o email do usuário autenticado',
-      userIsRecordOwner:
-        'Retorna um valor booleano "true" se o usuário que edita o registro também for seu proprietário, "false" caso contrário',
-      userName: 'Retorna o nome do usuário autenticado',
-      userProp: 'Retorna o valor da $t(extraProp.label) especificada do usuário autenticado',
-      uuid: 'Gera um UUID (identificador universalmente único) que pode ser usado como identificador (ex.: como atributo-chave de uma entidade)',
-      // SQL functions
-      avg: 'Retorna o valor médio de uma variável numérica',
-      count: 'Retorna o número de linhas que atendem a um critério especificado',
-      sum: 'Retorna a soma total de uma variável numérica',
-    },
-    functionName: {
-      rowIndex: 'Índice da linha',
-    },
-    basicProps: {
-      analysis: 'Análise',
-      autoIncrementalKey: {
-        label: 'Auto incremental',
-        info: 'O valor será gerado automaticamente',
-      },
-      displayAs: 'Exibir como',
-      displayIn: 'Exibir em',
-      entitySource: 'Origem da entidade',
-      enumerate: {
-        label: 'Enumerar',
-        info: `As linhas serão geradas automaticamente usando os itens de categoria associados a um atributo de código marcado como Chave definido dentro da entidade; as linhas não podem ser adicionadas nem excluídas e o atributo de código-chave não será editável`,
-      },
-      enumerator: {
-        label: 'Enumerador',
-        info: 'Os itens da categoria serão usados para gerar as linhas da entidade pai',
-      },
-      form: 'Formulário',
-      formula: 'Fórmula',
-      includedInClonedData: 'Incluído nos dados clonados',
-      includedInRecordsList: {
-        label: 'Incluir na lista de registros',
-        info: `Se marcado, o atributo ficará visível na lista de registros`,
-      },
-      key: 'Chave',
-      maxKeysCountReached: 'Número máximo de chaves atingido ({{maxKeysCount}})',
-      multiple: 'Múltiplo',
-      ownPage: 'Página própria',
-      parentPage: 'Página pai ({{parentPage}})',
-      qualifier: {
-        label: 'Qualificador',
-        info: `Quando um novo registro é criado por um usuário pertencente a um grupo, este atributo será automaticamente preenchido com o valor especificado para ele nos qualificadores do grupo do usuário. Os usuários só poderão ver e modificar registros pertencentes ao seu próprio grupo, se pertencerem a um.`,
-      },
-      table: 'Tabela',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Valores padrão não especificados',
-      defaultValuesSpecified: 'Valores padrão especificados',
-      editableAlways: 'Sempre editável',
-      editableIfConditionIsMet: 'Editável quando a condição é atendida',
-      relevantIfRadioNone: 'Sempre relevante',
-      relevantIfRadioDefined: 'Relevante quando a condição é atendida',
-      visibleAlways: 'Sempre visível',
-      visibleIfConditionIsMet: 'Visível quando a condição é atendida',
-      areaBasedEstimate: 'Estimativa baseada em área',
-      defaultValues: 'Valores padrão',
-      defaultValuesInfo: `Isto permite preencher automaticamente uma resposta com base em regras específicas.
-    Se você configurar várias regras, o sistema irá verificá-las em ordem, de cima para baixo.
-    Ele aplicará a primeira regra que atender às condições e usará esse resultado como resposta.`,
-      defaultValueEvaluatedOneTime: 'Valor padrão avaliado apenas uma vez',
-      defaultValueEvaluatedOneTimeInfo: `O valor padrão será avaliado apenas uma vez, quando o atributo for criado.
-    Se não estiver marcado, o valor padrão será reavaliado toda vez que o registro for atualizado.
-    Deve ser marcado ao usar expressões como now() ou uuid(), que devem ser avaliadas apenas uma vez, quando o valor do atributo for gerado pela primeira vez.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Valores padrão não editáveis porque a chave auto incremental está definida',
-      editableIf: 'Editável se',
-      editableIfInfo: `Por padrão, um usuário sempre pode acessar um campo relevante.
-Aqui podemos definir uma regra para indicar se o usuário pode digitar ou alterar este campo.
-Isto define se um usuário pode digitar ou alterar este campo.
-Se as condições definidas forem atendidas, o campo pode ser editado. Caso contrário, ele fica somente leitura (bloqueado).`,
-      hidden: 'Sempre oculto',
-      hiddenInReport: 'Ocultar no Painel Analítico',
-      hiddenInReportInfo: `Se marcado, o atributo não ficará visível no Painel Analítico`,
-      hiddenWhenNotRelevant: 'Oculto quando não relevante',
-      itemsFilter: 'Filtro de itens',
-      itemsFilterInfo: `Expressão usada para filtrar itens selecionáveis.
-    Na expressão, a palavra "this" se referirá ao próprio item. 
-    Ex.: this.region = region_attribute_name 
-    (onde "region" é o nome de uma propriedade extra definida para o item e region_attribute_name é o nome de um atributo no inventário)`,
-      readOnly: 'Somente leitura',
-      relevantIf: 'Relevante se',
-      relevantIfInfo: `Por padrão, todos os campos ficam ativos.
-    Se você definir uma regra de relevância e ela não for atendida, o campo ficará cinza ou será ocultado por completo,
-    e respostas automáticas serão ignoradas.
-    Use isso para mostrar ou ocultar partes do formulário dinamicamente; por exemplo, mostrar "Especifique" apenas quando o usuário selecionar "Outro".`,
-      script: 'Script',
-      visibleIf: 'Visível se',
-      visibleIfInfo: `Por padrão, um campo é sempre visível.
-    Se você definir uma regra, ele só será visível quando essa regra for atendida; caso contrário, ficará oculto.
-    Observação: diferente de ocultar um campo "não relevante", um campo oculto ainda pode salvar uma resposta automática.
-    Isso é útil para ocultar seções inteiras do formulário com base em quem está logado (por exemplo, por função).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Oculto no Arena Mobile',
-        info: `Se marcado, o atributo não ficará visível no AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Incluir no resumo da entidade múltipla',
-        info: `Se marcado, o atributo ficará visível na tela de resumo da entidade (no Arena Mobile)`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Incluir no link para ciclo anterior',
-        info: `Se marcado, o valor do ciclo anterior será exibido no formulário de entrada de dados (quando o link para o ciclo anterior estiver ativo no app móvel)`,
-      },
-    },
-    numericProps: {
-      unit: 'Unidade',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Número máximo de casas decimais',
-    },
-    fileProps: {
-      fileNameExpression: 'Expressão do nome do arquivo',
-      fileType: 'Tipo de arquivo',
-      fileTypes: {
-        image: 'Imagem',
-        video: 'Vídeo',
-        audio: 'Áudio',
-        other: 'Outro',
-      },
-      maxFileSize: 'Tamanho máx. do arquivo (Mb)',
-      numberOfFiles: 'Vá para Validações para alterar o número mín. e máx. de arquivos.',
-      showGeotagInformation: 'Mostrar informações de geotag',
-    },
-    mobileProps: {
-      title: 'Aplicativo móvel',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Cor do cabeçalho',
-      headerColor: {
-        blue: 'Azul',
-        green: 'Verde',
-        orange: 'Laranja',
-        red: 'Vermelho',
-        yellow: 'Amarelo',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Hiperlink',
-        markdown: 'Markdown',
-        text: 'Texto',
-      },
-      textInputType: 'Tipo de entrada de texto',
-      textInputTypes: {
-        singleLine: 'Uma linha',
-        multiLine: 'Múltiplas linhas',
-      },
-      textTransform: 'Transformação de texto',
-      textTransformTypes: {
-        none: 'none',
-        capitalize: 'capitalize',
-        uppercase: 'uppercase',
-        lowercase: 'lowercase',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Valor do rótulo',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Categoria',
-      codeShown: 'Mostrar código',
-      displayAsTypes: {
-        checkbox: 'Caixa de seleção',
-        dropdown: 'Lista suspensa',
-      },
-      parentCode: 'Código pai',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Permitir apenas coordenada do dispositivo',
-      allowOnlyDeviceCoordinateInfo: `Aplica-se apenas ao Arena Mobile: se marcado, o usuário não poderá modificar os valores X/Y, e somente o GPS do dispositivo poderá ser usado para obtê-los`,
-      mapMarkerColor: 'Cor do marcador no mapa',
-    },
-    expressionsProp: {
-      expression: 'Expressão',
-      applyIf: 'Aplicar se',
-      confirmDelete: 'Excluir esta expressão?',
-      severity: 'Severidade',
-    },
-    validationsProps: {
-      minCount: 'Contagem mínima',
-      maxCount: 'Contagem máxima',
-      expressions: 'Expressões de validação',
-      attributeAlwaysValid: 'Atributo sempre válido',
-      attributeValidWhenConditionIsMet: 'Atributo válido quando a condição é atendida',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Este nó não pode ser convertido para múltiplo porque possui valores padrão.',
-    cannotDeleteNodeDefReferenced: `Não é possível excluir "{{nodeDef}}": ele é referenciado por estas definições de nó: {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Clonar',
-      title: 'Clonando definição de nó "{{nodeDefName}}"',
-      entitySelectLabel: 'Entidade para clonar:',
-    },
-    conversion: {
-      dialogTitle: 'Converter {{nodeDefName}} para outro tipo',
-      fromType: 'Do tipo',
-      toType: 'Para o tipo',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Mover',
-      title: 'Movendo definição de nó "{{nodeDefName}}" de "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Entidade para mover:',
-    },
-    movedNodeDefinitionHasErrors: 'A definição de nó "{{nodeDefName}}" que você moveu contém erros; corrija-os.',
-    nodeDefintionsHaveErrors: 'Estas definições de nó contêm erros: {{nodeDefNames}}. Corrija-os.',
-    filterVariable: 'Variável para filtrar itens',
-    filterVariableForLevel: 'Variável para {{levelName}}',
-    unique: {
-      label: 'Único',
-      info: `Quando um atributo é marcado como **Único**, seu valor deve ser único dentro da entidade múltipla mais próxima (um erro será mostrado caso contrário).  
-
----
-
-Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo *tree_species* marcado como **Único**, poderá ter apenas uma árvore por espécie dentro do mesmo *plot*.`,
-    },
-    categoriesClonedFromSurvey: 'As seguintes categorias também foram clonadas do inventário de origem: {{names}}',
-    taxonomiesClonedFromSurvey: 'As seguintes taxonomias também foram clonadas do inventário de origem: {{names}}',
-  },
-
   languagesEditor: {
     languages: 'Idioma(s)',
   },
-
   taxonomy: {
     header: 'Taxonomia',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomia'})`,
     confirmDelete: 'Excluir a taxonomia {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     cloneFromAnotherSurvey: {
       title: 'Clonar taxonomia de outro inquérito',
@@ -1210,13 +1194,12 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       synonym: 'Sinônimo / Latim',
       extraPropsNotDefined: 'Propriedades extras não definidas para esta taxonomia',
       importMissingPublishedTaxa:
-        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado e mantido(s) sem alterações. Códigos: {{codes}}',
+        '{{count}} táxon/taxa publicado(s) não encontrado(s) no arquivo importado: mantido(s) sem alterações, depois dos importados. Códigos: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (+{{extra}} mais)',
     },
     taxaCount: 'Contagem de táxons',
     vernacularNameLabel: 'Rótulo do nome vernacular',
   },
-
   categoryList: {
     batchImport: 'Importar categorias em lote (de ZIP)',
     batchImportCompleteSuccessfully: `{{importedCategories}} categorias importadas com sucesso!
@@ -1233,19 +1216,21 @@ Ex.: em uma estrutura como *cluster -> plot -> tree*, se você tiver um atributo
       noCategoriesAvailable: 'Nenhuma categoria disponível no inquérito selecionado',
     },
     itemsCount: 'Contagem de itens',
+    structure: 'Estrutura',
     types: {
       flat: 'Plano',
       hierarchical: 'Hierárquico',
       reportingData: 'Dados de reporte',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Dados de Ponto Amostral',
     },
   },
-
   categoryEdit: {
     header: 'Categoria',
     addLevel: 'Adicionar nível',
     categoryName: 'Nome da categoria',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
-    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'categoria'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'nível de categoria'})`,
     confirmDelete: 'Excluir a categoria {{categoryName}}?\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'A categoria está **vazia** e será excluída. Continuar?',
     confirmDeleteLevel: `Excluir o nível de categoria '{{levelName}}' com todos os itens?\n$t(common.cantUndoWarning)`,
@@ -1263,6 +1248,56 @@ $t(common.cantUndoWarning)`,
     },
     convertToSimpleCategory: {
       confirmMessage: `Converter esta categoria de dados de reporte em uma categoria simples?`,
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Converter para Dados de Ponto Amostral',
+      confirmMessage: `Converter esta categoria na categoria de Dados de Ponto Amostral?
+
+A categoria será renomeada para '${samplingPointDataCategoryName}' e uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Converter para categoria GeoPackage',
+      confirmMessage: `Converter esta categoria em uma categoria GeoPackage?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria GeoPackage em uma categoria simples?
+
+A propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Converter para categoria simples',
+      confirmMessage: `Converter esta categoria de Dados de Ponto Amostral em uma categoria simples?
+
+O nome da categoria será apagado (você precisará dar um novo nome a ela), e a propriedade extra '${locationItemExtraDefName}' será desbloqueada, podendo ser renomeada, ter seu tipo alterado ou ser excluída como qualquer outra propriedade extra. Os dados não serão afetados.`,
+    },
+    geoPackageCategory: 'Esta categoria tem capacidades geográficas',
+    geoPackageCategoryInfo: `Esta categoria possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
+    samplingPointDataCategoryType: 'Esta é a categoria de Dados de Ponto Amostral',
+    samplingPointDataCategoryTypeInfo: `Esta é uma categoria predefinida para dados de ponto amostral. Ela possui uma propriedade extra chamada '${locationItemExtraDefName}', que permite exportá-la como um arquivo GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `A propriedade extra '${locationItemExtraDefName}' está ausente`,
+    createCategory: {
+      menuLabel: 'Adicionar categoria',
+      simple: 'Categoria simples',
+      otherTypes: 'Mais tipos de categoria',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Categoria de Dados de Ponto Amostral',
+      description:
+        'Categoria predefinida para dados de ponto amostral, incluindo um campo de localização para cada item.',
+      message: `Criar uma nova categoria de Dados de Ponto Amostral?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Categoria com capacidades geográficas',
+      description:
+        'Adiciona um campo de localização aos itens, para que a categoria possa ser exportada como um arquivo GeoPackage.',
+      message: `Criar uma nova categoria com capacidades geográficas?
+
+Uma propriedade extra '${locationItemExtraDefName}' será adicionada aos itens.`,
     },
     deleteItem: 'Excluir item',
     level: {
@@ -1287,13 +1322,23 @@ $t(common.cantUndoWarning)`,
       title: 'Resumo da importação de categoria',
     },
     reportingData: 'Dados de reporte',
+    exportToGeoPackage: 'Exportar para GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} item(ns) sem localização válida foram ignorados.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Gerar análise Whisp',
+      confirmMessage: `Gerar a análise Whisp para todos os pontos amostrais?
+
+- cada ponto amostral com uma localização será enviado ao Open Foris Whisp para a análise
+- os resultados serão combinados com os dados dos pontos amostrais e armazenados na categoria '${samplingPointDataWhispCategoryName}'
+- se a categoria '${samplingPointDataWhispCategoryName}' já existir, o seu conteúdo será substituído
+- a análise é executada em segundo plano e pode levar vários minutos, dependendo do número de pontos amostrais`,
+    },
     templateFor_samplingPointDataImport_csv: 'Modelo para importação de dados de ponto amostral (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Modelo para importação de dados de ponto amostral (Excel)',
   },
-
   extraProp: {
     label: 'Propriedade extra',
-    label_plural: 'Propriedades extras',
+    label_other: 'Propriedades extras',
     addExtraProp: 'Adicionar propriedade extra',
     dataTypes: {
       geometryPoint: 'Ponto geométrico',
@@ -1301,7 +1346,7 @@ $t(common.cantUndoWarning)`,
       text: 'Texto',
     },
     editor: {
-      title: 'Editar $t(extraProp.label_plural)',
+      title: 'Editar $t(extraProp.label_other)',
       confirmDelete: 'Excluir a propriedade extra "{{name}}"?',
       confirmSave: `Salvar as alterações nas definições de propriedades extras?
 
@@ -1316,7 +1361,6 @@ $t(common.cantUndoWarning)`,
     name: 'Nome da propriedade {{position}}',
     value: 'Valor',
   },
-
   record: {
     ancestorNotFound: 'Nó ancestral não encontrado no registro',
     keyDuplicate: 'Chave de registro duplicada',
@@ -1342,7 +1386,6 @@ $t(common.cantUndoWarning)`,
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'AND',
     or: 'OR',
@@ -1357,6 +1400,12 @@ $t(common.cantUndoWarning)`,
       distanceAttribute: 'Atributo de distância',
       bearingAttribute: 'Atributo de azimute',
     },
+    areaOfInterestEditor: {
+      areaOfInterest: 'Área de interesse',
+      areasOfInterestNotDefined:
+        'Ainda não há áreas de interesse definidas: defina-as em Informações do inquérito → Mapa',
+    },
+    coordinateAttribute: 'Atributo de coordenadas',
     coordinateAttributeWithPosition: 'Atributo de coordenada {{position}}',
 
     dateTimeDiffEditor: {
@@ -1402,5 +1451,59 @@ $t(common.cantUndoWarning)`,
     openforis: `<a href="$t(urls.openforisWebsite)" target="_blank">$t(common.openForis)</a>`,
     openforisArenaWebsite: `<a href="$t(urls.openforisArenaWebsite)" target="_blank">$t(urls.openforisArenaWebsite)</a>`,
     supportForum: `<a href="$t(urls.supportForum)" target="_blank">$t(urls.supportForum)</a>`,
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+  aiExpression: {
+    title: 'Gerar expressão a partir de uma descrição',
+    hint: 'Descreva em linguagem simples o que a expressão deve fazer. A IA irá traduzi-la para a sintaxe do Arena. Pressione Ctrl+Enter para gerar.',
+    placeholder: 'ex.: a altura da árvore deve ser maior que 0 e menor que 200',
+    generate: 'Gerar',
+    generating: 'Gerando…',
+    use: 'Usar esta expressão',
+    useAnyway: 'Usar mesmo assim',
+    tryAgain: 'Tentar uma descrição diferente',
+    parseError:
+      'A expressão gerada não pôde ser analisada corretamente: {{message}}. Você ainda pode aplicá-la e editá-la manualmente, ou tentar reformular.',
+    explain: {
+      title: 'Explicar esta expressão',
+      thinking: 'Pedindo à IA para explicar esta expressão…',
+      error: 'Falha ao obter a explicação: {{message}}',
+      timeout: 'A IA demorou demais para responder. Tente novamente.',
+    },
+  },
+  aiTranslation: {
+    translateButton_one: 'Traduzir para {{count}} outro idioma',
+    translateButton_other: 'Traduzir para {{count}} outros idiomas',
+    translateButton: 'Traduzir para outros idiomas',
+    success_one: 'Traduzido para {{count}} idioma. Revise e salve.',
+    success_other: 'Traduzido para {{count}} idiomas. Revise e salve.',
+    success: 'Traduzido. Revise e salve.',
+    failed: 'Falha na tradução: {{message}}',
+    timeout: 'A solicitação de tradução expirou. Tente novamente.',
+  },
+  aiActivityLog: {
+    title: 'Resumo do log de atividades',
+    summarizeButton: 'Resumir',
+    thinking: 'Agregando eventos e pedindo à IA para resumir…',
+    error: 'Falha ao obter o resumo: {{message}}',
+  },
+  aiChatbot: {
+    open: 'Ajuda e documentação',
+    title: 'Ajuda e documentação',
+    empty: 'Pergunte-me qualquer coisa sobre o Open Foris Arena.',
+    placeholder: 'Digite sua pergunta…',
+    send: 'Enviar',
+    stop: 'Parar',
+    clear: 'Limpar',
+    showReasoning: 'Mostrar raciocínio',
+    error: 'Erro do chatbot: {{message}}',
+    language: 'Idioma da resposta',
   },
 }

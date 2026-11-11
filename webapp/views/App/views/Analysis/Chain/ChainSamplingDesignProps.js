@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -16,8 +16,11 @@ import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 
 import BaseUnitSelector from './BaseUnitSelector'
 import { ClusteringEntitySelector } from './ClusteringEntitySelector'
-import { FirstPhaseCategorySelector } from './FirstPhaseCategorySelector'
-import { FirstPhaseCommonAttributeSelector } from './FirstPhaseCommonAttributeSelector'
+import { Phase1CategorySelector } from './Phase1CategorySelector'
+import { Phase1JoinAttributeSelector } from './Phase1JoinAttributeSelector'
+import { Phase2AsSamplingPointDataSelector } from './Phase2AsSamplingPointDataSelector'
+import { Phase2JoinAttributeSelector } from './Phase2JoinAttributeSelector'
+import { Phase2JoinEntitySelector } from './Phase2JoinEntitySelector'
 import { SamplingDesignStrategySelector } from './SamplingDesignStrategySelector'
 import { StratumAttributeSelector } from './StratumAttributeSelector'
 
@@ -61,20 +64,28 @@ export const ChainSamplingDesignProps = (props) => {
   return (
     <div className="chain-sampling-design">
       <div className="form">
+        <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+
         {(Chain.hasSamplingDesign(chain) || hasBaseUnit) && <BaseUnitSelector />}
 
         {hasBaseUnit && (
           <>
-            <SamplingDesignStrategySelector chain={chain} updateChain={updateChain} />
+            {ChainSamplingDesign.isPhase1CategorySelectionEnabled(samplingDesign) && (
+              <>
+                <Phase1CategorySelector />
+                <Phase2JoinEntitySelector />
+                <Phase2AsSamplingPointDataSelector />
+                {ChainSamplingDesign.isPhase1JoinAttributeSelectionEnabled(samplingDesign) && (
+                  <Phase1JoinAttributeSelector />
+                )}
+                {ChainSamplingDesign.isPhase2JoinAttributeSelectionEnabled(samplingDesign) && (
+                  <Phase2JoinAttributeSelector />
+                )}
+              </>
+            )}
 
             {ChainSamplingDesign.isStratificationEnabled(samplingDesign) && <StratumAttributeSelector />}
             {/* {ChainSamplingDesign.isPostStratificationEnabled(samplingDesign) && <PostStratificationAttributeSelector />} */}
-
-            {ChainSamplingDesign.isFirstPhaseCategorySelectionEnabled(samplingDesign) && <FirstPhaseCategorySelector />}
-
-            {ChainSamplingDesign.isFirstPhaseCommonAttributeSelectionEnabled(samplingDesign) && (
-              <FirstPhaseCommonAttributeSelector />
-            )}
 
             <ClusteringEntitySelector />
           </>

@@ -24,7 +24,7 @@ export default class RecordsExportJob extends Job {
       if (this.isCanceled()) break
 
       const recordUuid = Record.getUuid(record)
-      const recordData = await RecordService.fetchRecordAndNodesByUuid({
+      const recordData = /* NOSONAR */ await RecordService.fetchRecordAndNodesByUuid({
         surveyId,
         recordUuid,
         fetchForUpdate: false,

@@ -13,9 +13,9 @@ import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditM
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
-import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
+import { QuerySidebar } from './QuerySidebar/QuerySidebar'
 import {
   DataQuerySelectedAttributes,
   DataQuerySelectedDimensions,
@@ -25,6 +25,7 @@ import {
 const DataQuery = () => {
   const dispatch = useDispatch()
   const displayType = DataExplorerSelectors.useDisplayType()
+  const chartType = DataExplorerSelectors.useChartType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
   const recordEditModalProps = DataExplorerSelectors.useRecordEditModalProps()
@@ -41,13 +42,18 @@ const DataQuery = () => {
     setLimit,
     setOffset,
     setData,
-  } = useDataQuery({ query })
+  } = useDataQuery({
+    query,
+    // scatter chart (available only in raw mode) is used to find outliers: fetch a random sample including them
+    randomize:
+      displayType === DataExplorerState.displayTypes.chart && chartType === DataExplorerState.chartTypes.scatter,
+  })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
   return (
     <div className={classNames('data-query', { 'nodedefs-selector-off': !nodeDefsSelectorVisible })}>
-      <QueryNodeDefsSelector nodeDefLabelType={nodeDefLabelType} />
+      <QuerySidebar nodeDefLabelType={nodeDefLabelType} />
 
       <div
         className={classNames('data-query__container', 'table', {
@@ -57,7 +63,6 @@ const DataQuery = () => {
       >
         <div className="table__header">
           <ButtonBar
-            dataCount={count}
             dataEmpty={dataEmpty}
             dataLoaded={dataLoaded}
             dataLoading={dataLoading}
@@ -74,6 +79,7 @@ const DataQuery = () => {
 
         <Visualizer
           data={data}
+          dataCount={count}
           dataEmpty={dataEmpty}
           dataLoading={dataLoading}
           dataLoadingError={dataLoadingError}

@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .flexible-modal-mask {
   position: fixed;
   height: 100%;
@@ -12,8 +14,8 @@
 .flexible-modal {
   position: absolute;
   z-index: 2;
-  border: 1px solid #ccc;
-  background: white;
+  border: 1px solid $colorOutline;
+  background: $colorSurface;
 
   .flexible-modal-resizer {
     position: absolute;
@@ -21,14 +23,17 @@
     bottom: 0;
     cursor: se-resize;
     margin: 5px;
-    border-bottom: solid 2px #333;
-    border-right: solid 2px #333;
+    width: 16px;
+    height: 16px;
+    border-bottom: solid 2px $colorOnSurface;
+    border-right: solid 2px $colorOnSurface;
   }
 
   .flexible-modal-drag-area {
     background: transparent;
     height: 35px;
     position: absolute;
+    left: 0;
     right: 0;
     top: 0;
     cursor: move;

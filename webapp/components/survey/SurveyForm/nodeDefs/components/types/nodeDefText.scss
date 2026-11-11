@@ -25,7 +25,7 @@
   border-top: $formBorder;
   border-left: $formBorder;
   border-right: $formBorder;
-  background-color: white;
+  background-color: $colorSurface;
 
   .form-input {
     border: 1px solid transparent;
@@ -36,7 +36,7 @@
   }
 
   &:focus-within {
-    background-color: $blueLightFocus;
+    background-color: $colorPrimaryContainerLow;
   }
 }
 

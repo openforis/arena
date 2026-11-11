@@ -1,15 +1,16 @@
 global_arena_error <- FALSE  
 global_arena_errors <- list()
 
+# the errors state is stored in the global environment, where the chain scripts are sourced
 saveError = function(e) {
     print(e);
-    global_arena_error <<- TRUE;
-    global_arena_errors <<- append(global_arena_errors, e);
+    assign("global_arena_error", TRUE, envir = .GlobalEnv)
+    assign("global_arena_errors", append(global_arena_errors, e), envir = .GlobalEnv)
 }
 
 clearGlobalErrors = function () {
-    global_arena_error <<- FALSE;
-    global_arena_errors <<- list()
+    assign("global_arena_error", FALSE, envir = .GlobalEnv)
+    assign("global_arena_errors", list(), envir = .GlobalEnv)
 }
 
 checkGlobalErrors = function(message) {
@@ -28,7 +29,7 @@ checkGlobalErrors = function(message) {
         
         if (interactive()) {
             aReply=askYesNo(paste0(" Errors in the chain, see the console!\n\n ", message, "\n\n Clear chain's error list and try to fix the issues?"), default = FALSE)
-            if (aReply==TRUE) {
+            if (isTRUE(aReply)) {
                 clearGlobalErrors()
             }
         }

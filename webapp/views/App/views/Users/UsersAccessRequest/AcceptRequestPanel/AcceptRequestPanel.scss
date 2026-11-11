@@ -1,0 +1,30 @@
+@use '~@webapp/style/vars' as *;
+
+.user-access-request-accept.form {
+  grid-row-gap: 0.5rem;
+
+  .section-title {
+    font-weight: 600;
+    padding: 0.5rem 0.4rem 0.2rem;
+    border-bottom: 1px solid $colorOutline;
+
+    &:not(:first-child) {
+      margin-top: 1rem;
+    }
+  }
+
+  .button-bar {
+    margin-top: 1rem;
+  }
+
+  // on small screens show labels above the inputs
+  &.mobile .form-item {
+    grid-template-columns: 1fr;
+    grid-row-gap: 0.2rem;
+
+    .form-label {
+      justify-self: start;
+      text-align: start;
+    }
+  }
+}

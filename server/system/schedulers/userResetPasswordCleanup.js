@@ -1,20 +1,28 @@
 import * as schedule from 'node-schedule'
 
+import { runWithClusterLock } from '@openforis/arena-server'
+
 import * as Log from '@server/log/log'
 
 const Logger = Log.getLogger('UserResetPasswordCleanup')
 
 import * as UserService from '@server/modules/user/service/userService'
 
+const lockName = 'scheduler-user-reset-password-cleanup'
 const entriesType = 'expired user reset password entries'
 
 const deleteExpiredItems = async () => {
   try {
-    Logger.debug(`Deleting ${entriesType}`)
+    await runWithClusterLock({
+      lockName,
+      fn: async () => {
+        Logger.debug(`Deleting ${entriesType}`)
 
-    const count = await UserService.deleteUserResetPasswordExpired()
+        const count = await UserService.deleteUserResetPasswordExpired()
 
-    Logger.debug(`${count} ${entriesType} deleted`)
+        Logger.debug(`${count} ${entriesType} deleted`)
+      },
+    })
   } catch (error) {
     Logger.error(`Error deleting ${entriesType}: ${error.toString()}`)
   }

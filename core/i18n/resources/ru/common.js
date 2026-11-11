@@ -1,3 +1,9 @@
+import {
+  samplingPointDataCategoryName,
+  samplingPointDataWhispCategoryName,
+  locationItemExtraDefName,
+} from '@core/survey/category'
+
 export default {
   common: {
     active: 'Активно',
@@ -8,7 +14,13 @@ export default {
     appNameFull: '$t(common.openForis) Arena',
     apply: 'Применить',
     aggregateFunction: 'Агрегатная функция',
+    aggregateFunction_few: 'Агрегатные функции',
+    aggregateFunction_many: 'Агрегатные функции',
     aggregateFunction_other: 'Агрегатные функции',
+    attribute: 'Атрибут',
+    attribute_few: 'Атрибуты',
+    attribute_many: 'Атрибуты',
+    attribute_other: 'Атрибуты',
     avg: 'Среднее',
     ascending: 'По возрастанию',
     areaBased: 'по площади',
@@ -19,9 +31,11 @@ export default {
 
 Вы хотите их игнорировать?`,
     cantUndoWarning: 'Эту операцию нельзя отменить',
-    cantBeDeletedUsedItem: 'Этот {{item}} используется определениями узлов и не может быть удален',
+    cantBeDeletedUsedItem: 'Невозможно удалить: {{item}} используется определениями узлов',
     chain: 'Цепочка',
-    chain_plural: 'Цепочки',
+    chain_few: 'Цепочки',
+    chain_many: 'Цепочки',
+    chain_other: 'Цепочки',
     childrenEmpty: 'Определите хотя бы один дочерний элемент',
     clear: 'Очистить',
     clone: 'Клонировать',
@@ -36,24 +50,33 @@ export default {
     createdWith: 'Создано с помощью',
     createdWithApp: `$t(common.createdWith) {{app}}`,
     cycle: 'Цикл',
-    cycle_plural: 'Циклы',
+    cycle_few: 'Циклы',
+    cycle_many: 'Циклы',
+    cycle_other: 'Циклы',
     dateCreated: 'Дата создания',
     dateLastModified: 'Дата последнего изменения',
     delete: 'Удалить',
     deleted: 'Удалено!',
     descending: 'По убыванию',
     description: 'Описание',
-    description_plural: 'Описания',
+    description_few: 'Описания',
+    description_many: 'Описания',
+    description_other: 'Описания',
     designerNotes: 'Заметки дизайнера',
     designerNotesInfo: `Заметки дизайнера будут видны только в дизайнере формы опроса и не будут видны в форме ввода данных.`,
     details: 'Подробности',
     dimension: 'Измерение',
+    dimension_few: 'Измерения',
+    dimension_many: 'Измерения',
     dimension_other: 'Измерения',
     done: 'Готово',
     download: 'Скачать',
     draft: 'Черновик',
     edit: 'Редактировать',
+    elapsed: 'Прошедшее время',
     email: 'Электронная почта',
+    email_few: 'Электронные письма',
+    email_many: 'Электронные письма',
     email_other: 'Электронные письма',
     emailSentConfirmation: `Письмо на адрес {{email}} отправлено.
 
@@ -64,11 +87,18 @@ export default {
     empty: 'Пусто',
     entity: 'Сущность',
     error: 'Ошибка',
-    error_plural: 'Ошибки',
+    error_other: 'Ошибки',
+    error_few: 'Ошибки',
+    error_many: 'Ошибки',
     errorFound: 'Найдена 1 ошибка',
+    errorFound_one: 'Найдена {{count}} ошибка',
+    errorFound_few: 'Найдено {{count}} ошибки',
+    errorFound_many: 'Найдено {{count}} ошибок',
     errorFound_other: 'Найдено {{count}} ошибок',
     errorMessage: 'Сообщение об ошибке',
-    errorMessage_plural: 'Сообщения об ошибках',
+    errorMessage_few: 'Сообщения об ошибках',
+    errorMessage_many: 'Сообщения об ошибках',
+    errorMessage_other: 'Сообщения об ошибках',
     expand: 'Развернуть',
     expandCollapse: '$t(common.expand) / $t(common.collapse)',
     export: 'Экспорт',
@@ -79,7 +109,9 @@ export default {
     expression: 'Выражение',
     false: 'Ложь',
     file: 'Файл',
-    file_plural: 'Файлы',
+    file_few: 'Файлы',
+    file_many: 'Файлы',
+    file_other: 'Файлы',
     formContainsErrors: 'Форма содержит ошибки',
     formContainsErrorsCannotContinue: 'Форма содержит ошибки. Пожалуйста, исправьте их, прежде чем продолжить.',
     formContainsErrorsCannotSave: 'Форма содержит ошибки. Пожалуйста, исправьте их, прежде чем сохранить.',
@@ -96,12 +128,18 @@ export default {
     info: 'Информация',
     invalid: 'НЕВЕРНЫЙ',
     item: 'Элемент',
-    item_plural: 'Элементы',
+    item_few: 'Элементы',
+    item_many: 'Элементы',
+    item_other: 'Элементы',
     itemAlreadyAdded: 'Элемент уже добавлен',
     label: 'Метка',
-    label_plural: 'Метки',
+    label_few: 'Метки',
+    label_many: 'Метки',
+    label_other: 'Метки',
     language: 'Язык',
-    language_plural: 'Языки',
+    language_few: 'Языки',
+    language_many: 'Языки',
+    language_other: 'Языки',
     leavePageConfirmMessage: `На форме есть несохраненные изменения.
 
 При подтверждении все изменения будут потеряны.
@@ -113,17 +151,27 @@ export default {
     max: 'Максимум',
     med: 'Медиана',
     manage: 'Управление',
-    message_plural: 'Сообщения',
+    message_other: 'Сообщения',
     measure: 'Измерение',
+    measure_few: 'Измерения',
+    measure_many: 'Измерения',
     measure_other: 'Измерения',
     measurePrevSteps: 'Измерения предыдущих шагов',
-    measurePrevSteps_plural: 'Измерения предыдущих шагов',
+    measurePrevSteps_other: 'Измерения предыдущих шагов',
+    measurePrevSteps_few: 'Измерения предыдущих шагов',
+    measurePrevSteps_many: 'Измерения предыдущих шагов',
     min: 'Минимум',
+    moveUp: 'Переместить вверх',
+    moveDown: 'Переместить вниз',
     name: 'Имя',
     new: 'Новый',
     next: 'Далее',
     no: 'Нет',
-    noItems: `$t(common.no) $t(common.item_plural)`,
+    noItems: `$t(common.no) $t(common.item_other)`,
+    notification: 'Уведомление',
+    notification_few: 'Уведомления',
+    notification_many: 'Уведомления',
+    notification_other: 'Уведомления',
     notSpecified: '---Не указано---',
     orderBy: 'Сортировать по',
     of: 'из',
@@ -153,9 +201,36 @@ export default {
 - Таксоны нельзя будет удалить.
 
 **Вы уверены, что хотите продолжить?**`,
+    publishRecordValuesUpdateConfirm: `#### Публикация {{survey}} обновит уже записанные данные ####
+
+{{reasons}}
+
+Эта операция может безвозвратно изменить или удалить уже введённые данные.
+
+Чтобы опубликовать без обновления существующих данных, отметьте «Пропустить обновление данных» ниже (не рекомендуется).`,
+    publishRecordValuesUpdateConfirmHeader: 'Данные существующих записей будут обновлены',
+    publishRecordValuesUpdateConfirmOk: 'Опубликовать и обновить данные',
+    publishRecordValuesUpdateConfirmInputLabel:
+      'Введите название анкеты "{{strongConfirmRequiredText}}" для подтверждения',
+    publishRecordValuesUpdateReasonAttributeChanged:
+      'Следующие атрибуты будут изменены, и их значения в существующих записях будут автоматически пересчитаны: **{{attributeNames}}**.',
+    publishRecordValuesUpdateReasonCategoryOrTaxonomyExtraPropChanged:
+      'Следующие атрибуты используют дополнительное свойство категории или таксономии, которое изменилось, из-за чего их значение будет пересчитано в существующих записях: **{{attributeNames}}**.',
+    publishSkipDataUpdate: 'Пропустить обновление данных',
+    publishSkipDataUpdateConfirmOk: 'Пропустить обновление данных и опубликовать',
+    publishSkipDataUpdateImplications: 'Пропуск обновления данных означает следующее:\n\n{{implications}}',
+    publishSkipDataUpdateImplicationInconsistentData:
+      'Существующие записи могут перестать соответствовать новому определению анкеты',
+    publishSkipDataUpdateImplicationStaleValues:
+      'Затронутые значения не будут пересчитаны, пока не будут введены заново вручную',
+    publishSkipDataUpdateImplicationChains:
+      'Цепочки обработки, использующие эти атрибуты, могут выдавать устаревшие результаты',
     raiseTicketInSupportForum: `В случае проблем, пожалуйста, создайте заявку с тегом 'arena' на нашем <b>Форуме поддержки</b>: $t(links.supportForum)`,
     record: 'Запись',
+    record_few: 'Записи',
+    record_many: 'Записи',
     record_other: 'Записи',
+    remaining: 'Оставшееся время',
     remote: 'Удаленно',
     required: 'Обязательно',
     requiredField: 'обязательное поле',
@@ -202,36 +277,46 @@ export default {
     value: 'Значение',
     view: 'Просмотр',
     warning: 'Предупреждение',
-    warning_plural: 'Предупреждения',
+    warning_few: 'Предупреждения',
+    warning_many: 'Предупреждения',
+    warning_other: 'Предупреждения',
     yes: 'Да',
     date: {
       aMomentAgo: 'Несколько секунд назад',
       hour: 'час',
+      hour_few: 'часа',
+      hour_many: 'часов',
       hour_other: 'часов',
       day: 'день',
+      day_few: 'дня',
+      day_many: 'дней',
       day_other: 'дней',
-      minute: 'минута',
+      minute: 'минуту',
+      minute_few: 'минуты',
+      minute_many: 'минут',
       minute_other: 'минут',
-      week: 'неделя',
+      week: 'неделю',
+      week_few: 'недели',
+      week_many: 'недель',
       week_other: 'недель',
       timeDiff: `{{count}} $t(common.date.{{unit}}, { 'count': {{count}} }) назад`,
     },
     paginator: {
       firstPage: 'Первая страница',
+      goToPage: 'Перейти на страницу',
       itemsPerPage: 'Элементов на страницу',
       lastPage: 'Последняя страница',
       nextPage: 'Следующая страница',
+      page: 'Страница',
       previousPage: 'Предыдущая страница',
     },
     table: {
       visibleColumns: 'Видимые столбцы',
     },
   },
-
   confirm: {
     strongConfirmInputLabel: 'Для подтверждения введите следующий текст: **{{strongConfirmRequiredText}}**',
   },
-
   dropzone: {
     acceptedFilesMessage: '(Будут приняты только файлы {{acceptedExtensions}} с максимальным размером {{maxSize}})',
     error: {
@@ -241,19 +326,18 @@ export default {
     },
     message: 'Перетащите файл сюда или нажмите, чтобы выбрать его',
     selectedFile: 'Выбранный файл',
+    selectedFile_few: 'Выбранные файлы',
+    selectedFile_many: 'Выбранные файлы',
     selectedFile_other: 'Выбранные файлы',
   },
-
   error: {
     pageNotFound: 'Страница не найдена',
   },
-
   geo: {
     area: 'Площадь',
     vertices: 'Вершины',
     perimeter: 'Периметр',
   },
-
   files: {
     header: 'Файлы',
     missing: ' Отсутствующие файлы: {{count}}',
@@ -261,12 +345,16 @@ export default {
     fileName: 'Имя файла',
     fileSize: 'Размер файла',
   },
-
   sidebar: {
     logout: 'Выйти',
   },
-
   header: {
+    theme: {
+      label: 'Тема',
+      light: 'Светлая',
+      dark: 'Тёмная',
+      system: 'Системная',
+    },
     myProfile: 'Мой профиль',
     qrCodeLoginDialog: {
       title: 'Вход в Arena Mobile с помощью QR-кода',
@@ -279,7 +367,6 @@ export default {
       error: 'Ошибка при генерации QR-кода: {{error}}',
     },
   },
-
   nodeDefsTypes: {
     integer: 'Целое число',
     decimal: 'Десятичное число',
@@ -296,7 +383,6 @@ export default {
   },
 
   // ====== App modules and views
-
   appModules: {
     home: 'Главная',
     landing: 'Приветствие',
@@ -313,6 +399,7 @@ export default {
     formDesigner: 'Дизайнер форм',
     surveyHierarchy: 'Иерархия',
     surveyDependencyTree: 'Дерево зависимостей',
+    surveyCompare: 'Сравнить / обновить из файла',
     category: 'Категория',
     categories: 'Категории',
     nodeDef: 'Определение узла',
@@ -337,105 +424,48 @@ export default {
     userNew: 'Новый пользователь',
     usersSurvey: 'Список пользователей',
     userGroup: 'Группа пользователей',
-    userGroup_plural: 'Группы пользователей',
+    userGroup_few: 'Группы пользователей',
+    userGroup_many: 'Группы пользователей',
+    userGroup_other: 'Группы пользователей',
     userGroupNew: 'Новая группа пользователей',
     usersList: 'Список пользователей (все)',
     user2FADevice: 'Устройство 2FA',
-    user2FADevice_plural: 'Устройства 2FA',
+    user2FADevice_few: 'Устройства 2FA',
+    user2FADevice_many: 'Устройства 2FA',
+    user2FADevice_other: 'Устройства 2FA',
     user2FADeviceDetails: '$t(appModules.user2FADevice)',
-    user2FADeviceList: '$t(appModules.user2FADevice_plural)',
+    user2FADeviceList: '$t(appModules.user2FADevice_other)',
 
     analysis: 'Анализ',
     chain: 'Цепочка',
-    chain_plural: 'Цепочки',
+    chain_few: 'Цепочки',
+    chain_many: 'Цепочки',
+    chain_other: 'Цепочки',
     virtualEntity: 'Виртуальная сущность',
     entities: 'Виртуальные сущности',
-    virtualEntity_plural: '$t(appModules.entities)',
+    virtualEntity_few: '$t(appModules.entities)',
+    virtualEntity_many: '$t(appModules.entities)',
+    virtualEntity_other: '$t(appModules.entities)',
     instances: 'Экземпляры',
+    message: 'Сообщение',
+    message_few: '$t(common.message_other)',
+    message_many: '$t(common.message_other)',
+    message_other: '$t(common.message_other)',
+
+    systemAdmin: 'Администрирование системы',
+    jobMonitor: 'Монитор заданий',
+    systemLogs: 'Системные журналы',
 
     help: 'Помощь',
     about: 'О программе',
+    changelog: 'Журнал изменений',
+    whatsNew: 'Что нового',
     disclaimer: 'Отказ от ответственности',
     userManual: 'Руководство пользователя',
   },
-
   surveyDefsLoader: {
     requireSurveyPublish: 'Этот раздел доступен только после публикации опроса',
   },
-
-  loginView: {
-    yourName: 'Ваше имя',
-    yourEmail: 'Ваш адрес электронной почты',
-    yourPassword: 'Ваш пароль',
-    yourNewPassword: 'Ваш новый пароль',
-    repeatYourPassword: 'Повторите ваш пароль',
-    repeatYourNewPassword: 'Повторите ваш новый пароль',
-    requestAccess: 'Впервые в $t(common.appNameFull)? Запросить доступ',
-    resetPassword: 'Сбросить пароль',
-    login: 'Войти',
-    loginUsingBackupCode: 'Войти с помощью резервного кода 2FA',
-    forgotPassword: 'Забыли пароль',
-    sendPasswordResetEmail: 'Отправить письмо для сброса пароля',
-    twoFactorBackupCode: 'Резервный код 2FA',
-    twoFactorToken: 'Код подтверждения',
-    twoFactorTokenDescription: `Чтобы обеспечить безопасность вашей учетной записи, мы подтверждаем вашу личность.
-
-  Введите код, сгенерированный вашим приложением-аутентификатором.`,
-  },
-
-  accessRequestView: {
-    error: 'Ошибка при запросе доступа: {{error}}',
-    fields: {
-      email: '$t(common.email)',
-      props: {
-        firstName: 'Имя',
-        lastName: 'Фамилия',
-        institution: 'Учреждение',
-        country: 'Страна',
-        purpose: 'Для чего вам это нужно?',
-        surveyName: 'Предложите название опроса',
-        templateUuid: 'Начать с шаблона?',
-      },
-    },
-    introduction: `Наши ресурсы ограничены, поэтому вы должны запросить доступ к платформе.
-Нам также интересно, что вы хотите с ней делать, поэтому, пожалуйста, сообщите нам!
-У вас есть возможность начать с **нового пустого опроса** или клонировать существующий **шаблон**, и вам нужно будет предложить название для вновь созданного опроса.
-Вам будет назначена роль ***Администратора опроса*** для этого опроса: вы сможете редактировать его и приглашать новых пользователей присоединяться к вашему опросу и вносить свой вклад.
-Вы также будете ***Менеджером опросов*** и сможете **создавать новые опросы** (до 5), если потребуется.
-Для получения дополнительной информации, пожалуйста, посетите наш веб-сайт: $t(links.openforisArenaWebsite)
-$t(common.raiseTicketInSupportForum)
-**После отправки запроса, пожалуйста, дождитесь приглашения по электронной почте для доступа к Arena.**`,
-    reCaptchaNotAnswered: 'ReCaptcha не отвечена',
-    requestSent: 'Запрос на доступ успешно отправлен',
-    requestSentMessage: `Пожалуйста, дайте нам пару дней для обработки вашего запроса.
-Мы скоро отправим письмо на адрес **{{email}}** с инструкциями по доступу к $t(common.appName).
-Спасибо и наслаждайтесь **$t(common.appNameFull)**!`,
-    sendRequest: 'Отправить запрос',
-    sendRequestConfirm: 'Запросить доступ к $t(common.appNameFull)?',
-    templateNotSelected: 'Не выбрано (начать с нуля)',
-    title: 'Запрос доступа к $t(common.appNameFull)',
-  },
-
-  resetPasswordView: {
-    title: {
-      completeRegistration: 'Завершите регистрацию в Arena',
-      setYourNewPassword: 'Установите ваш новый пароль',
-    },
-    setNewPassword: 'Установить новый пароль',
-    forgotPasswordLinkInvalid:
-      'Страница, к которой вы пытались получить доступ, не существует или больше недействительна',
-    passwordSuccessfullyReset: 'Ваш пароль успешно сброшен',
-    passwordStrengthChecksTitle: 'Проверка надежности пароля',
-    passwordStrengthChecks: {
-      noWhiteSpaces: 'Нет пробелов',
-      atLeast8CharactersLong: 'Не менее 8 символов',
-      containsLowerCaseLetters: 'Содержит строчные буквы',
-      containsUpperCaseLetters: 'Содержит прописные буквы',
-      containsNumbers: 'Содержит цифры',
-    },
-    completeRegistration: 'Завершить регистрацию',
-  },
-
   surveyDependencyTreeView: {
     dependencyTypesLabel: 'Типы зависимостей',
     dependencyTypes: {
@@ -453,11 +483,9 @@ $t(common.raiseTicketInSupportForum)
     selectAtLeastOneDependencyType: 'Выберите хотя бы один тип зависимости',
     noDependenciesToDisplay: 'Нет зависимостей для отображения',
   },
-
   designerView: {
     formPreview: 'Предварительный просмотр формы',
   },
-
   recordView: {
     justDeleted: 'Эта запись только что была удалена',
     sessionExpired: 'Сессия записи истекла',
@@ -473,7 +501,6 @@ $t(common.raiseTicketInSupportForum)
       unlock: 'Разрешить редактирование атрибута-квалификатора',
     },
   },
-
   dataExplorerView: {
     customAggregateFunction: {
       confirmDelete: 'Удалить эту пользовательскую агрегатную функцию?',
@@ -481,7 +508,6 @@ $t(common.raiseTicketInSupportForum)
     },
     editRecord: 'Редактировать запись',
   },
-
   mapView: {
     changeMarkerColor: 'Изменить цвет маркера',
     createRecord: 'Создать новую запись',
@@ -491,14 +517,6 @@ $t(common.raiseTicketInSupportForum)
     locationEditInfo: 'Дважды щелкните на карте или перетащите маркер, чтобы обновить местоположение',
     locationNotValidOrOutOfRange: 'Местоположение недействительно или вне диапазона зоны UTM',
     locationUpdated: 'Местоположение обновлено',
-    options: {
-      showLocationMarkers: 'Показать маркеры местоположения',
-      showMarkersLabels: `Показать метки маркеров`,
-      showSamplingPolygon: `Полигон выборки`,
-      showControlPoints: `Контрольные точки`,
-      showPlotReferencePoint: `Точка привязки участка`,
-      showUtmGrid: 'Показать сетку UTM',
-    },
     samplingPointDataLayerName: 'Данные точки выборки - уровень {{level}}',
     samplingPointDataLayerNameLoading: '$t(mapView.samplingPointDataLayerName) (загрузка...)',
     samplingPointItemPopup: {
@@ -506,6 +524,315 @@ $t(common.raiseTicketInSupportForum)
       levelCode: 'Код уровня {{level}}',
     },
     selectedPeriod: 'Выбранный период',
+  },
+
+  mapWorkspace: {
+    scenes: {
+      tab: 'Sentinel-2',
+      title: 'Снимки Sentinel-2',
+      menuSearch: 'Найти свежие снимки Sentinel-2…',
+      intro:
+        'Sentinel-2 L2A, 10 м. Поиск выполняется в браузере по статическому индексу STAC GeoParquet, а снимки отрисовываются прямо из облачно-оптимизированного GeoTIFF каждого снимка. Без тайлового сервера.',
+      area: {
+        label: 'Область',
+        view: 'Вид карты',
+        plot: 'Выбранный участок',
+        draw: 'Нарисовать область',
+        drawAgain: 'Нарисовать заново',
+      },
+      period: {
+        label: 'Период',
+        hint: 'не более 6 месяцев назад',
+        months_one: '{{count}} месяц',
+        months_few: '{{count}} месяца',
+        months_many: '{{count}} месяцев',
+        months_other: '{{count}} месяца',
+      },
+      maxCloud: 'Макс. облачность',
+      minCoverage: 'Мин. покрытие',
+      percent: '{{value}} %',
+      chart: {
+        title: 'Безоблачные снимки по месяцам',
+        allMonths: 'Все месяцы',
+        bar_one: '{{month}}: {{count}} снимок',
+        bar_few: '{{month}}: {{count}} снимка',
+        bar_many: '{{month}}: {{count}} снимков',
+        bar_other: '{{month}}: {{count}} снимка',
+      },
+      count_one: '{{count}} снимок',
+      count_few: '{{count}} снимка',
+      count_many: '{{count}} снимков',
+      count_other: '{{count}} снимка',
+      countInMonth_one: '{{count}} снимок за {{month}}',
+      countInMonth_few: '{{count}} снимка за {{month}}',
+      countInMonth_many: '{{count}} снимков за {{month}}',
+      countInMonth_other: '{{count}} снимка за {{month}}',
+      sort: {
+        label: 'Сортировка',
+        newest: 'Сначала новые',
+        leastCloud: 'Меньше облаков',
+        mostCoverage: 'Больше покрытие',
+      },
+      rowDetails: 'Тайл {{tile}} · облачность {{cloud}} · покрытие {{coverage}}',
+      unknownValue: '–',
+      thumbnailAlt: 'Превью снимка от {{date}}',
+      addAsLayer: 'Добавить как слой',
+      alreadyOnMap: 'Уже на карте',
+      useAsBaseMap: 'Сделать базовой картой',
+      loadingScene: 'Загрузка снимка…',
+      bands: {
+        label: 'Каналы',
+        trueColour: 'Естественные цвета (быстро, один файл)',
+        falseColourVegetation: 'Псевдоцвета, растительность (B8, B4, B3)',
+        swir: 'Коротковолновый инфракрасный (B12, B8A, B4)',
+        note: 'Другие комбинации каналов читают по три файла на снимок, поэтому загружаются медленнее.',
+      },
+      bandsShort: {
+        trueColour: 'естественные цвета',
+        falseColourVegetation: 'псевдоцвета',
+        swir: 'SWIR',
+      },
+      layerName: 'Sentinel-2 {{date}} · {{tile}} · {{bands}}',
+      baseLayerName: '{{name}} (базовая карта)',
+      messages: {
+        drawing: 'Щёлкните по двум противоположным углам карты, чтобы нарисовать область.',
+        noPlot: 'Откройте маркер участка на карте, чтобы искать вокруг него.',
+        noDrawnArea: 'Нарисуйте прямоугольник на карте, чтобы искать внутри него.',
+        tooLarge: 'Область слишком велика: приблизьте карту, чтобы она охватывала не более {{max}} тайлов Sentinel-2.',
+        outside: 'Тайлы Sentinel-2 покрывают только широты от 80° ю. ш. до 84° с. ш.',
+        error: 'Не удалось прочитать индекс снимков.',
+        retry: 'Повторить',
+        searching_one: 'Поиск в {{count}} тайле…',
+        searching_few: 'Поиск в {{count}} тайлах…',
+        searching_many: 'Поиск в {{count}} тайлах…',
+        searching_other: 'Поиск в {{count}} тайлах…',
+        empty: 'Нет подходящих снимков. Допустите больше облаков или выберите более длинный период.',
+        layerError: 'Не удалось показать снимок.',
+      },
+    },
+    wms: {
+      menuItem: 'Добавить сервис WMS / WMTS…',
+      title: 'Добавить сервис WMS / WMTS',
+      serviceUrl: 'URL сервиса',
+      serviceUrlPlaceholder: 'https://example.org/geoserver/wms',
+      loadLayers: 'Загрузить слои',
+      loading: 'Загрузка…',
+      urlHint: 'URL GetCapabilities сервиса WMS или WMTS либо шаблон тайлов XYZ с {z}/{x}/{y}',
+      insecureUrlHint: 'Этот сервис использует http: браузер может заблокировать его тайлы на этой странице https',
+      layersCount: 'Слоёв: {{count}}',
+      layersCount_one: 'Слоёв: {{count}}',
+      layersCount_few: 'Слоёв: {{count}}',
+      layersCount_many: 'Слоёв: {{count}}',
+      layersCount_other: 'Слоёв: {{count}}',
+      webMercatorSupported: 'Web Mercator поддерживается',
+      webMercatorMissing: 'Нет слоёв в Web Mercator',
+      truncated: 'показаны только первые {{max}} слоёв',
+      xyzSummary: 'Шаблон тайлов XYZ · capabilities не нужны',
+      layersToAdd: 'Добавляемые слои',
+      layerNotWebMercator: 'Недоступен в Web Mercator',
+      addAs: 'Добавить как',
+      addAsOverlay: 'Накладываемый слой',
+      addAsOverlayDescription: 'Показывается поверх базовой карты, на вкладке «Слои»',
+      addAsBaseMap: 'Базовая карта',
+      addAsBaseMapDescription: 'Заменяет базовую карту, в меню «Базовая карта»',
+      displayName: 'Отображаемое название',
+      displayNameMultiple: 'Каждый слой сохраняет своё название',
+      imageFormat: 'Формат изображения',
+      formatPng: 'PNG (прозрачный)',
+      formatJpeg: 'JPEG (меньший размер)',
+      opacity: 'Непрозрачность',
+      attribution: 'Атрибуция',
+      whoSeesIt: 'Кто видит',
+      scopeSurvey: 'Все участники этого опроса',
+      scopeUser: 'Только я',
+      submitOverlays: 'Добавить накладываемые слои: {{count}}',
+      submitOverlays_one: 'Добавить накладываемые слои: {{count}}',
+      submitOverlays_few: 'Добавить накладываемые слои: {{count}}',
+      submitOverlays_many: 'Добавить накладываемые слои: {{count}}',
+      submitOverlays_other: 'Добавить накладываемые слои: {{count}}',
+      submitBaseMaps: 'Добавить базовые карты: {{count}}',
+      submitBaseMaps_one: 'Добавить базовые карты: {{count}}',
+      submitBaseMaps_few: 'Добавить базовые карты: {{count}}',
+      submitBaseMaps_many: 'Добавить базовые карты: {{count}}',
+      submitBaseMaps_other: 'Добавить базовые карты: {{count}}',
+      removeSelectedBaseMap: 'Удалить выбранную пользовательскую базовую карту',
+      hiddenForSession:
+        'Слой скрыт до повторного открытия карты: удалять общие слои могут только те, кто может редактировать опрос',
+      errors: {
+        fetchLayersFailed: 'Не удалось загрузить пользовательские слои карты',
+        loadFailed: 'Не удалось загрузить слои этого сервиса',
+        saveFailed: 'Не удалось сохранить слои',
+        removeFailed: 'Не удалось удалить слой',
+      },
+    },
+    toolbarLabel: 'Инструменты карты',
+    menus: {
+      baseMap: 'Базовая карта',
+      addData: 'Добавить данные',
+      display: 'Отображение',
+      imagery: 'Снимки',
+      tools: 'Инструменты',
+    },
+    addData: {
+      uploadFile: 'Загрузить KML, KMZ или Shapefile…',
+    },
+    display: {
+      showLocationMarkers: 'Маркеры местоположения',
+      showMarkersLabels: 'Подписи маркеров',
+      showUtmGrid: 'Сетка UTM',
+      imageInterpretation: 'Дешифрирование снимков',
+      showSamplingPolygon: 'Полигон выборки',
+      showControlPoints: 'Контрольные точки',
+      showPlotReferencePoint: 'Точка привязки участка',
+    },
+    tools: {
+      measureDistance: 'Измерить расстояние',
+    },
+    quick: {
+      zoomToData: 'Приблизить к данным',
+      fullScreen: 'Полноэкранный режим',
+      exitFullScreen: 'Выйти из полноэкранного режима',
+      noDataToZoom: 'На карте нет данных для приближения',
+    },
+    search: {
+      label: 'Поиск по карте',
+      placeholderFull: 'Ключ записи или координаты',
+      placeholderCompact: 'Координаты',
+      goTo: 'Перейти к {{coordinates}}',
+      invalidCoordinates: 'Координаты вне допустимого диапазона',
+      noMatch: 'Нет подходящих записей или координат',
+      coordinatesHint: 'Введите координаты, например 41.9, 12.5',
+    },
+    rail: {
+      label: 'Панели карты',
+      close: 'Свернуть панель',
+      tabs: {
+        layers: 'Слои',
+        records: 'Записи',
+        legend: 'Легенда',
+      },
+      titles: {
+        records: 'Записи на карте',
+      },
+      recordsEmpty: 'Покажите слой данных опроса, чтобы увидеть его записи',
+    },
+    layers: {
+      noSurveyData: 'В этом опросе нет данных для показа на карте',
+      groups: {
+        custom: 'Пользовательские (WMS / WMTS)',
+        scenes: 'Сцены Sentinel-2',
+        uploaded: 'Загруженные файлы',
+      },
+      opacity: 'Непрозрачность: {{name}}',
+      remove: 'Удалить {{name}}',
+    },
+    legend: {
+      marker: 'Местоположение записи',
+      cluster: 'Группа близких записей',
+      samplingPolygon: 'Полигон выборки',
+      utmGrid: 'Сетка UTM',
+      addedLayers: 'Добавленные слои',
+    },
+    status: {
+      changeNotation: 'Нажмите, чтобы сменить формат',
+      notations: {
+        latLon: 'Шир., Долг.',
+        dms: 'ГМС',
+        utm: 'UTM',
+      },
+      zoom: 'Зум',
+      scale: 'Масштаб',
+      recordsInView_one: '{{count}} запись в области просмотра',
+      recordsInView_few: '{{count}} записи в области просмотра',
+      recordsInView_many: '{{count}} записей в области просмотра',
+      recordsInView_other: '{{count}} записи в области просмотра',
+    },
+    upload: {
+      unsupported: 'Неподдерживаемый файл: выберите файл KML, KMZ, Shapefile в zip-архиве или GeoJSON',
+      tooLarge: 'Файл слишком большой: не более {{maxSize}} МБ',
+      error: 'Не удалось прочитать файл: {{details}}',
+    },
+    measure: {
+      measureArea: 'Измерить площадь',
+      barLabel: 'Измерение',
+      modes: {
+        distance: 'Расстояние',
+        area: 'Площадь',
+      },
+      hint: 'Щёлкните, чтобы добавить точки, дважды щёлкните, чтобы завершить',
+      units: 'Единицы',
+      unitOptions: {
+        auto: 'Автоматически',
+        m: 'Метры (м)',
+        km: 'Километры (км)',
+        m2: 'Квадратные метры (м²)',
+        ha: 'Гектары (га)',
+        km2: 'Квадратные километры (км²)',
+      },
+      unitSymbols: {
+        m: 'м',
+        km: 'км',
+        m2: 'м²',
+        ha: 'га',
+        km2: 'км²',
+      },
+      perimeter: 'Периметр {{value}}',
+      done: 'Готово',
+    },
+    screenshot: {
+      quickButton: 'Снимок экрана',
+      title: 'Снимок карты',
+      capture: 'Область',
+      captureView: 'Текущий вид',
+      capturePlot: 'По участку',
+      include: 'Включить',
+      includeData: 'Маркеры и измерения',
+      includeScale: 'Масштабная линейка и стрелка севера',
+      includeStamp: 'Участок, дата, координаты, базовая карта',
+      saveTo: 'Сохранить в',
+      targetRecord: 'Прикрепить к записи участка',
+      targetRecordHint: 'Сохраняется в атрибуте-изображении',
+      targetFile: 'Только скачать',
+      targetFileHint: 'PNG-файл на этом компьютере',
+      plot: 'Запись участка',
+      attribute: 'Атрибут-изображение',
+      fileName: 'Имя файла',
+      mobileNote:
+        'Показаны только атрибуты-изображения участка. Полевые группы увидят это изображение в Arena Mobile после загрузки записи на устройство.',
+      noPlots:
+        'На карте нет участков. Включите слой местоположений на вкладке «Слои», чтобы прикрепить изображение к записи участка.',
+      noImageAttributes: 'У этого участка нет редактируемых атрибутов-изображений.',
+      previewLoading: 'Подготовка предпросмотра…',
+      previewAlt: 'Предпросмотр снимка карты',
+      alsoDownload: 'Также скачать',
+      downloadPng: 'Скачать PNG',
+      saving: 'Сохранение…',
+      replace: 'Заменить',
+      keep: 'Оставить текущее изображение',
+      confirmReplace: 'В этом атрибуте уже есть изображение «{{fileName}}». Заменить его снимком?',
+      saved: 'Снимок сохранён в {{plot}} › {{attribute}}. Полевые группы получат его при следующей загрузке записей.',
+      savedPending: 'Снимок отправлен в {{plot}}. Запись ещё обновляется: проверьте её чуть позже.',
+      notices: {
+        mapHidden: 'Карта скрыта на этом экране. Закройте боковую панель или расширьте окно и повторите попытку.',
+        tilesMissing: 'Пропущено фрагментов карты (их сервер этого не разрешает или они не загрузились): {{count}}',
+        equalEarth:
+          'Базовую карту Equal Earth нельзя сохранить снимком. Выберите другую базовую карту в меню «Базовая карта».',
+      },
+      errors: {
+        captureFailed: 'Не удалось сделать снимок карты: {{details}}',
+        cannotEditRecord: 'Вы не можете редактировать эту запись (или опрос не опубликован).',
+        fileTooLarge: 'Размер изображения {{size}} МБ, больше допустимых для этого атрибута {{limit}} МБ.',
+        quotaExceeded: 'В этом опросе недостаточно свободного места для файлов.',
+        plotNotFound: 'Участок не найден в записи. Возможно, он был удалён.',
+        saveFailed: 'Снимок не сохранён: {{details}}',
+        fileNameRequired: 'Введите имя файла.',
+        rowNotConfirmed:
+          'Новая строка для изображения не была подтверждена вовремя, поэтому снимок не сохранён. Проверьте запись, прежде чем повторить попытку.',
+        notApplicable: 'Нельзя добавить изображение: атрибут не применим в этом участке.',
+        clearsOtherValues:
+          'Снимок не сохранён: его добавление очистит значения других полей записи. Добавьте его через редактор записей.',
+      },
+    },
   },
 
   samplingPolygonOptions: {
@@ -523,17 +850,6 @@ $t(common.raiseTicketInSupportForum)
     rectangle: 'Прямоугольник',
     samplingPolygon: 'Полигон выборки',
     shape: 'Форма',
-  },
-
-  kmlUploader: {
-    opacity: 'непрозрачность',
-    selectFile: 'Выбрать файл',
-    title: 'Параметры KML/KMZ/Shapefile',
-  },
-
-  mapBaseLayerPeriodSelector: {
-    chooseAPeriodToCompareWith: 'Выберите период для сравнения',
-    falseColor: 'Псевдоцвет',
   },
 
   surveysView: {
@@ -557,12 +873,14 @@ $t(common.raiseTicketInSupportForum)
       'published-draft': 'Опубликован/Черновик',
     },
   },
-
   usersAccessRequestView: {
     status: {
       ACCEPTED: 'Принято',
       CREATED: 'В ожидании',
     },
+    acceptedBy: 'Принято',
+    dateAccepted: 'Дата принятия',
+    createdSurvey: 'Созданный опрос',
     acceptRequest: {
       accept: 'Принять',
       acceptRequestAndCreateSurvey: 'Принять запрос и создать опрос',
@@ -570,18 +888,19 @@ $t(common.raiseTicketInSupportForum)
         'Принять запрос на доступ для **{{email}}** как **{{role}}** и создать новый опрос **{{surveyName}}**?',
       error: 'Ошибка при принятии запроса на доступ: {{error}}',
       requestAcceptedSuccessfully: 'Запрос на доступ успешно принят. $t(common.emailSentConfirmation)',
-      surveyLabel: 'Метка опроса',
       surveyLabelInitial: '(Измените название и метку опроса при необходимости)',
       surveyName: 'Название опроса',
+      newSurvey: 'Новый опрос',
+      requestDetails: 'Подробности запроса',
       template: 'Шаблон',
     },
   },
-
   userView: {
     scale: 'Масштаб',
     rotate: 'Повернуть',
     dragAndDrop: 'Перетащите изображение сюда или',
     upload: 'нажмите здесь, чтобы загрузить',
+    remove: 'Удалить фото профиля?',
     sendNewInvitation: 'Отправить новое приглашение',
     removeFromSurvey: 'Удалить из опроса',
     confirmRemove: 'Вы уверены, что хотите лишить пользователя {{user}} доступа к опросу {{survey}}?',
@@ -591,8 +910,13 @@ $t(common.raiseTicketInSupportForum)
       label: 'Предпочитаемый язык интерфейса',
       auto: 'Автоматически определено ({{detectedLanguage}})',
     },
+    newPassword: 'Пароль',
+    confirmPassword: 'Подтвердите пароль',
+    manageTwoFactorDevices: {
+      label: 'Управление 2FA',
+      title: 'Управление устройствами двухфакторной аутентификации',
+    },
   },
-
   userPasswordChangeView: {
     changingPasswordForUser: 'Смена пароля для пользователя: {{user}}',
     oldPassword: 'Старый пароль',
@@ -602,14 +926,23 @@ $t(common.raiseTicketInSupportForum)
     passwordChangedSuccessfully: 'Пароль успешно изменен!',
     notAuthorizedToChangePasswordOfAnotherUser: 'У вас нет прав на изменение пароля другого пользователя',
   },
-
   userInviteView: {
     confirmInviteSystemAdmin: 'Пригласить пользователя {{email}} в качестве системного администратора?',
+    confirmInviteSystemAdmin_few: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
+    confirmInviteSystemAdmin_many: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
     confirmInviteSystemAdmin_other: 'Пригласить пользователей {{email}} в качестве системных администраторов?',
     emailSentConfirmationWithSkippedEmails: `$t(common.emailSentConfirmation)
 
     $t(userInviteView.skippedEmailsNotice)`,
     skippedEmailsNotice: `{{skppedEmailsCount}} адресов были пропущены (они уже были приглашены в этот опрос ранее): {{skippedEmails}}`,
+    invalidEmailsWarning:
+      'Адрес электронной почты {{emails}} недоступен и, возможно, не существует. Он оставлен в списке ниже: исправьте или удалите его и повторите приглашение.',
+    invalidEmailsWarning_few:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
+    invalidEmailsWarning_many:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
+    invalidEmailsWarning_other:
+      'Адреса электронной почты {{emails}} недоступны и, возможно, не существуют. Они оставлены в списке ниже: исправьте или удалите их и повторите приглашение.',
     groupPermissions: {
       label: 'Разрешения',
       systemAdmin: `
@@ -680,6 +1013,12 @@ $t(common.raiseTicketInSupportForum)
         <li>добавлять новые записи (собственные опросы)</li>
         <li>редактировать существующие записи (собственные опросы)</li>
         <li>отправлять записи на фазу "Очистка"</li>`,
+      surveyGuest: `
+        <li>Данные:
+          <ul>
+            <li>просматривать записи (собственные опросы) без их редактирования</li>
+          </ul>
+        </li>`,
     },
     messageOptional: 'Сообщение (необязательно)',
     messageInfo: `Сообщение появится в электронном письме, отправленном пользователю.
@@ -690,7 +1029,6 @@ $t(common.raiseTicketInSupportForum)
       Если вы хотите пригласить пользователей с другими ролями, вы должны сначала опубликовать опрос.`,
     typeEmail: 'Введите адрес электронной почты, затем нажмите кнопку Добавить',
   },
-
   user: {
     mapApiKeys: {
       title: 'Ключи API карты',
@@ -707,17 +1045,39 @@ $t(common.raiseTicketInSupportForum)
       preferNotToSay: 'Предпочитаю не говорить',
     },
   },
-
   chainView: {
     baseUnit: {
       confirmDelete: 'При удалении базовой единицы вы снимите все отметки "переменная на основе площади". Продолжить?',
     },
     downloadSummaryJSON: 'Скачать сводку (JSON)',
-    firstPhaseCategory: 'Категория 1-й фазы',
-    firstPhaseCommonAttribute: {
-      label: 'Общий атрибут',
-      info: `Атрибут, общий для базовой единицы и таблицы 1-й фазы
-(это должен быть кодовый атрибут с тем же именем, что и дополнительное свойство, определенное для категории 1-й фазы)`,
+    mauFile: {
+      upload: 'Загрузить MAU.zip',
+      download: 'Скачать MAU.zip',
+      delete: 'Удалить MAU.zip',
+      confirmCycleAssociation: 'Файл MAU.zip будет связан с текущим циклом ({{cycle}}). Продолжить?',
+      confirmReplace: 'Файл MAU.zip уже загружен для этой цепочки. Заменить его?',
+      confirmDelete: 'Удалить файл MAU.zip, загруженный для этой цепочки?',
+      uploadComplete: 'Файл MAU.zip успешно загружен',
+      deleteComplete: 'Файл MAU.zip удалён',
+      invalidFileExtension: 'Пожалуйста, выберите файл .zip',
+    },
+    phase1Category: 'Категория 1-й фазы',
+    phase1CategoryInfo: 'Выберите категорию, содержащую выборки 1-й фазы.',
+    phase2JoinEntity: {
+      label: 'Объект соединения (2-я фаза)',
+      info: 'Объект, используемый для соединения базовой единицы с категорией 1-й фазы: сама базовая единица или одна из её родительских сущностей.',
+    },
+    phase2AsSamplingPointData: {
+      label: 'Соединять с использованием связи Sampling Point Data',
+      info: 'Ключ(и) объекта 2-й фазы считываются из таблицы Sampling Point Data, той же таблицы, что используется для 1-й фазы.',
+    },
+    phase1JoinAttribute: {
+      label: 'Атрибут соединения (1-я фаза)',
+      info: 'Выберите столбец таблицы $t(chainView.phase1Category) (дополнительное свойство или "code"), используемый для соединения с объектом соединения 2-й фазы.',
+    },
+    phase2JoinAttribute: {
+      label: 'Атрибут соединения (2-я фаза)',
+      info: 'Выберите атрибут (объекта 2-й фазы) для соединения с таблицей 1-й фазы; его значение сопоставляется с предыдущим атрибутом соединения 1-й фазы.',
     },
     formLabel: 'Метка цепочки обработки',
     basic: 'Основное',
@@ -761,9 +1121,12 @@ $t(common.raiseTicketInSupportForum)
       reportingAreaInfo: `При стратифицированной выборке укажите площади страт в таблице категорий атрибута страты (название столбца 'area')`,
     },
     stratumAttribute: 'Атрибут страты',
+    stratumAttributeInfo: 'Выберите переменную, используемую для стратификации выборки.',
+    stratumAttribute2ndPhaseInfo: `Выберите переменную, используемую для подразделения выборки 1-й фазы на страты перед формированием окончательной детальной подвыборки. Показываются только те атрибуты, имя которых также присутствует как столбец категории 1-й фазы.`,
     postStratificationAttribute: 'Атрибут послестратификации',
     areaWeightingMethod: 'Метод взвешивания по площади',
     clusteringEntity: 'Сущность кластеризации',
+    clusteringEntityInfo: `Сущность, определяющая первичные единицы выборки. Примечание: используется исключительно для кластерного анализа в рамках пакета R survey.`,
     clusteringOnlyVariances: 'Кластеризация только для дисперсий',
     errorNoLabel: 'Цепочка должна иметь допустимую метку',
     dateExecuted: 'Дата выполнения',
@@ -779,6 +1142,7 @@ $t(common.cantUndoWarning)`,
       sourceChain: 'Исходная цепочка',
       entityCheck: 'Совместимость сущностей',
       entityMissing: 'отсутствует в целевом опросе',
+      skipMissingEntities: 'Пропустить атрибуты анализа для сущностей, отсутствующих в целевом опросе',
       noAnalysisAttributes: 'Эта цепочка не имеет атрибутов анализа',
       cloneComplete: 'Цепочка успешно клонирована',
       missingEntities: 'Невозможно клонировать: следующие сущности не существуют в целевом опросе: {{entities}}',
@@ -813,7 +1177,6 @@ $t(common.cantUndoWarning)`,
     reportingDataTableAndJoinsWithAttributes: 'Таблица отчетных данных и соединения с атрибутами',
     showSamplingAttributes: 'Показать атрибуты выборки',
   },
-
   instancesView: {
     title: 'Экземпляры',
     terminate: 'Завершить',
@@ -832,13 +1195,17 @@ $t(common.cantUndoWarning)`,
       invalidToken: 'Недействительный или просроченный токен',
     },
   },
-
   itemsTable: {
     unused: 'Неиспользуемые',
     noItemsAdded: 'Нет добавленных элементов',
+    selectedItemsCount: '{{count}} элемент выбран',
+    selectedItemsCount_few: '{{count}} элемента выбрано',
+    selectedItemsCount_many: '{{count}} элементов выбрано',
+    selectedItemsCount_other: '{{count}} элемента выбрано',
   },
-
   expression: {
+    areaOfInterestNotFound:
+      'Область интереса «{{name}}» не найдена: задайте её в разделе «Информация об обследовании» → «Карта»',
     functionHasTooFewArguments: 'Функция {{fnName}} требует как минимум {{minArity}} аргументов (получено {{numArgs}})',
     functionHasTooManyArguments: 'Функция {{fnName}} принимает не более {{maxArity}} аргументов (получено {{numArgs}})',
     identifierNotFound: 'Атрибут или сущность "{{name}}" не найдены',
@@ -850,6 +1217,8 @@ $t(common.cantUndoWarning)`,
     invalidTaxonomyName: 'Неверное имя таксономии: {{name}}',
     invalidTaxonVernacularNameLanguageCode: 'Неверный код языка местного названия таксона: {{vernacularLangCode}}',
     missingFunctionParameters: 'Отсутствуют параметры функции',
+    notSupported:
+      'Выражение не поддерживается: проверьте его синтаксис (например, отсутствует оператор между двумя значениями)',
     undefinedFunction: 'Неопределенная функция: {{name}}',
   },
 
@@ -873,298 +1242,18 @@ $t(common.appNameFull)
  * Скрипты Arena R на GitHub: $t(links.arenaRScriptsInGitHub)
 `,
     },
+    changelog: {
+      title: '$t(appModules.changelog)',
+    },
   },
 
   // ====== Survey views
-
-  nodeDefEdit: {
-    additionalFields: 'Дополнительные поля',
-    basic: 'Основное',
-    advanced: 'Расширенные',
-    mobileApp: 'Мобильное приложение',
-    validations: 'Проверки',
-    function: 'Функция',
-    editingFunction: 'Редактирование функции {{functionName}}',
-    editorHelp: {
-      json: 'Допустимые выражения являются подмножеством Javascript.',
-      sql: 'Разрешены только допустимые SQL-выражения.',
-    },
-    editorCompletionHelp: '- Показать доступные переменные и функции, которые можно использовать',
-    functionDescriptions: {
-      categoryItemProp: 'Возвращает значение указанного $t(extraProp.label) элемента категории с указанным кодом',
-      dateTimeDiff: 'Возвращает разницу (в минутах) между двумя парами дата-время',
-      distance: 'Возвращает расстояние (в метрах) между указанными координатами',
-      geoCoordinateAtDistance: 'Возвращает координаты на указанном расстоянии и азимуте от указанных координат',
-      geoDistance: '$t(nodeDefEdit.functionDescriptions.distance)',
-      first: 'Возвращает первое значение или узел указанного множественного атрибута или сущности',
-      geoPolygon: 'Генерирует полигон в GeoJSON из списка координат',
-      includes: 'Возвращает true, если указанный множественный атрибут включает указанное значение.',
-      index: 'Возвращает индекс указанного узла среди его братьев',
-      isEmpty: 'Возвращает true, если для аргумента не указано значение',
-      isNotEmpty: 'Возвращает true, если для аргумента указано некоторое значение',
-      last: 'Возвращает последнее значение или узел указанного множественного атрибута или сущности',
-      ln: 'Возвращает натуральный логарифм X',
-      log10: 'Возвращает логарифм X по основанию 10',
-      max: 'Возвращает максимум из аргументов',
-      min: 'Возвращает минимум из аргументов',
-      now: 'Возвращает текущую дату или время',
-      parent: 'Возвращает родительскую сущность указанного узла',
-      pow: 'Возвращает значение основания, возведенного в степень',
-      prevCycleNote:
-        'Работает только в Arena Mobile, если определены несколько циклов и включена ссылка на предыдущий цикл',
-      prevCycleValue:
-        'Возвращает значение того же атрибута в записи предыдущего цикла. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      prevCycleValues:
-        'Возвращает значения тех же атрибутов в записи предыдущего цикла. $t(nodeDefEdit.functionDescriptions.prevCycleNote)',
-      recordCycle: 'Возвращает цикл текущей записи',
-      recordDateCreated:
-        'Возвращает дату и время создания текущей записи в виде значения datetime. Может использоваться в текстовом, датовом или временном атрибуте',
-      recordDateLastModified:
-        'Возвращает дату и время последнего изменения текущей записи в виде значения datetime. Может использоваться в текстовом, датовом или временном атрибуте',
-      recordOwnerEmail: 'Возвращает email пользователя, которому принадлежит запись',
-      recordOwnerName: 'Возвращает имя пользователя, которому принадлежит запись',
-      recordOwnerRole: 'Возвращает роль (в текущем опросе) пользователя, которому принадлежит запись',
-      rowIndex: 'Возвращает текущий индекс строки таблицы (или формы)',
-      taxonProp: 'Возвращает значение указанного $t(extraProp.label) таксона с указанным кодом',
-      taxonVernacularName:
-        'Возвращает (первое) народное (или местное) название на указанном языке таксона с указанным кодом',
-      userEmail: 'Возвращает email вошедшего в систему пользователя',
-      userIsRecordOwner:
-        'Возвращает логическое значение "true", если пользователь, редактирующий запись, также является ее владельцем, "false" в противном случае',
-      userName: 'Возвращает имя вошедшего в систему пользователя',
-      userProp: 'Возвращает значение указанного $t(extraProp.label) вошедшего в систему пользователя',
-      uuid: 'Генерирует UUID (универсальный уникальный идентификатор), который может быть использован в качестве идентификатора (например, в качестве ключевого атрибута сущности)',
-      // SQL functions
-      avg: 'Возвращает среднее значение числовой переменной',
-      count: 'Возвращает количество строк, соответствующих указанному критерию',
-      sum: 'Возвращает общую сумму числовой переменной',
-    },
-    functionName: {
-      rowIndex: 'Индекс строки',
-    },
-    basicProps: {
-      analysis: 'Анализ',
-      autoIncrementalKey: {
-        label: 'Автоинкрементный ключ',
-        info: 'Значение будет генерироваться автоматически',
-      },
-      displayAs: 'Отображать как',
-      displayIn: 'Отображать в',
-      entitySource: 'Источник сущности',
-      enumerate: {
-        label: 'Перечислить',
-        info: `Строки будут автоматически генерироваться с использованием элементов категории, связанных с атрибутом кода, помеченным как Ключ, определенный внутри сущности; строки нельзя добавлять или удалять, а атрибут кода ключа не будет редактируемым`,
-      },
-      enumerator: {
-        label: 'Перечислитель',
-        info: 'Элементы в категории будут использоваться для генерации строк родительской сущности',
-      },
-      form: 'Форма',
-      formula: 'Формула',
-      includedInClonedData: 'Включено в клонированные данные',
-      includedInRecordsList: {
-        label: 'Включить в список записей',
-        info: `Если отмечено, атрибут будет виден в списке записей`,
-      },
-      key: 'Ключ',
-      maxKeysCountReached: 'Достигнуто максимальное количество ключей ({{maxKeysCount}})',
-      multiple: 'Множественный',
-      ownPage: 'Собственная страница',
-      parentPage: 'Родительская страница ({{parentPage}})',
-      qualifier: {
-        label: 'Квалификатор',
-        info: `Когда пользователь, принадлежащий к группе, создаёт новую запись, этот атрибут будет автоматически заполнен значением, указанным для него в квалификаторах группы пользователя. Пользователи смогут видеть и изменять только записи, принадлежащие их собственной группе, если они входят в какую-либо группу.`,
-      },
-      table: 'Таблица',
-    },
-    advancedProps: {
-      defaultValuesNotSpecified: 'Значения по умолчанию не указаны',
-      defaultValuesSpecified: 'Значения по умолчанию указаны',
-      editableAlways: 'Всегда редактируемо',
-      editableIfConditionIsMet: 'Редактируемо при выполнении условия',
-      relevantIfRadioNone: 'Всегда актуально',
-      relevantIfRadioDefined: 'Актуально при выполнении условия',
-      visibleAlways: 'Всегда видимо',
-      visibleIfConditionIsMet: 'Видимо при выполнении условия',
-      areaBasedEstimate: 'Оценка по площади',
-      defaultValues: 'Значения по умолчанию',
-      defaultValuesInfo: `Это позволяет автоматически заполнять ответ по заданным правилам.
-    Если настроено несколько правил, система проверит их по порядку сверху вниз.
-    Будет применено первое правило, которое подходит под условия, и его результат станет ответом.`,
-      defaultValueEvaluatedOneTime: 'Значение по умолчанию оценивается только один раз',
-      defaultValueEvaluatedOneTimeInfo: `Значение по умолчанию будет вычисляться только один раз, при создании атрибута.
-    Если флажок не установлен, значение по умолчанию будет пересчитываться при каждом обновлении записи.
-    Это следует отмечать при использовании выражений вроде now() или uuid(), которые должны вычисляться только один раз, при первом формировании значения атрибута.`,
-      defaultValuesNotEditableForAutoIncrementalKey:
-        'Значения по умолчанию нередактируемы, так как установлен автоинкрементный ключ',
-      editableIf: 'Редактируемо, если',
-      editableIfInfo: `По умолчанию пользователь всегда может работать с релевантным полем.
-Здесь можно задать правило, определяющее, может ли пользователь вводить или изменять значение этого поля.
-Это определяет, может ли пользователь вводить или менять значение в этом поле.
-Если заданные условия выполняются, поле можно редактировать. Иначе оно становится только для чтения (заблокировано).`,
-      hidden: 'Всегда скрыто',
-      hiddenInReport: 'Скрыть в аналитической панели',
-      hiddenInReportInfo: `Если отмечено, атрибут не будет виден в аналитической панели`,
-      hiddenWhenNotRelevant: 'Скрыто, когда неактуально',
-      itemsFilter: 'Фильтр элементов',
-      itemsFilterInfo: `Выражение, используемое для фильтрации выбираемых элементов.
-В выражении слово "this" будет относиться к самому элементу.
-Например: this.region = region_attribute_name
-(где "region" - это имя дополнительного свойства, определенного для элемента, а region_attribute_name - это имя атрибута в опросе)`,
-      readOnly: 'Только для чтения',
-      relevantIf: 'Актуально, если',
-      relevantIfInfo: `По умолчанию все поля активны.
-    Если вы зададите правило актуальности и оно не выполнится, поле станет серым или полностью скроется,
-    а автоматические ответы будут игнорироваться.
-    Используйте это, чтобы динамически показывать или скрывать части формы; например, показывать поле «Уточните», только если пользователь выбрал «Другое».`,
-      script: 'Скрипт',
-      visibleIf: 'Видимо, если',
-      visibleIfInfo: `По умолчанию поле всегда видно.
-    Если задать правило, поле будет видно только когда это правило выполняется; иначе оно будет скрыто.
-    Важно: в отличие от скрытия «неактуального» поля, скрытое поле все равно может сохранять автоматический ответ.
-    Это удобно для сокрытия целых разделов формы в зависимости от того, кто вошел в систему (например, по роли).`,
-    },
-    mobileAppProps: {
-      hiddenInMobile: {
-        label: 'Скрыто в Arena Mobile',
-        info: `Если отмечено, атрибут не будет виден в AM`,
-      },
-      includedInMultipleEntitySummary: {
-        label: 'Включить в сводку множественной сущности',
-        info: `Если отмечено, атрибут будет виден в представлении сводки сущности`,
-      },
-      includedInPreviousCycleLink: {
-        label: 'Включить в ссылку на предыдущий цикл',
-        info: `Если отмечено, значение из предыдущего цикла будет отображаться в форме ввода данных (когда ссылка на предыдущий цикл активна в мобильном приложении)"`,
-      },
-    },
-    numericProps: {
-      unit: 'Единица',
-    },
-    decimalProps: {
-      maxNumberDecimalDigits: 'Максимальное количество десятичных знаков',
-    },
-    fileProps: {
-      fileNameExpression: 'Выражение имени файла',
-      fileType: 'Тип файла',
-      fileTypes: {
-        image: 'Изображение',
-        video: 'Видео',
-        audio: 'Аудио',
-        other: 'Другое',
-      },
-      maxFileSize: 'Макс. размер файла (МБ)',
-      numberOfFiles: 'Перейдите в раздел "Проверки", чтобы изменить минимальное и максимальное количество файлов.',
-      showGeotagInformation: 'Показать информацию о геотегах',
-    },
-    mobileProps: {
-      title: 'Мобильное приложение',
-    },
-    formHeaderProps: {
-      headerColorLabel: 'Цвет заголовка',
-      headerColor: {
-        blue: 'Синий',
-        green: 'Зеленый',
-        orange: 'Оранжевый',
-        red: 'Красный',
-        yellow: 'Желтый',
-      },
-    },
-    textProps: {
-      displayAsTypes: {
-        hyperlink: 'Гиперссылка',
-        markdown: 'Markdown',
-        text: 'Текст',
-      },
-      textInputType: 'Тип текстового ввода',
-      textInputTypes: {
-        singleLine: 'Одна строка',
-        multiLine: 'Многострочный',
-      },
-      textTransform: 'Преобразование текста',
-      textTransformTypes: {
-        none: 'нет',
-        capitalize: 'с большой буквы',
-        uppercase: 'в верхний регистр',
-        lowercase: 'в нижний регистр',
-      },
-    },
-    booleanProps: {
-      labelValue: 'Значение метки',
-      labelValues: {
-        trueFalse: '$t(common.true)/$t(common.false)',
-        yesNo: '$t(common.yes)/$t(common.no)',
-      },
-    },
-    codeProps: {
-      category: 'Категория',
-      codeShown: 'Показать код',
-      displayAsTypes: {
-        checkbox: 'Флажок',
-        dropdown: 'Выпадающий список',
-      },
-      parentCode: 'Родительский код',
-    },
-    coordinateProps: {
-      allowOnlyDeviceCoordinate: 'Разрешить только координаты устройства',
-      allowOnlyDeviceCoordinateInfo: `Применяется только к Arena Mobile: если отмечено, пользователь не сможет изменять значения X/Y, но для их получения можно будет использовать только GPS устройства`,
-      mapMarkerColor: 'Цвет маркера на карте',
-    },
-    expressionsProp: {
-      expression: 'Выражение',
-      applyIf: 'Применить, если',
-      confirmDelete: 'Удалить это выражение?',
-      severity: 'Важность',
-    },
-    validationsProps: {
-      minCount: 'Минимальное количество',
-      maxCount: 'Максимальное количество',
-      expressions: 'Выражения валидации',
-      attributeAlwaysValid: 'Атрибут всегда корректен',
-      attributeValidWhenConditionIsMet: 'Атрибут корректен при выполнении условия',
-    },
-    cannotChangeIntoMultipleWithDefaultValues:
-      'Этот узел не может быть преобразован в множественный, потому что у него есть значения по умолчанию.',
-    cannotDeleteNodeDefReferenced: `Невозможно удалить "{{nodeDef}}": на него ссылаются следующие определения узлов: {{nodeDefDependents}}`,
-    cloneDialog: {
-      confirmButtonLabel: 'Клонировать',
-      title: 'Клонирование определения узла "{{nodeDefName}}"',
-      entitySelectLabel: 'Сущность для клонирования:',
-    },
-    conversion: {
-      dialogTitle: 'Преобразовать {{nodeDefName}} в другой тип',
-      fromType: 'Из типа',
-      toType: 'В тип',
-    },
-    moveDialog: {
-      confirmButtonLabel: 'Переместить',
-      title: 'Перемещение определения узла "{{nodeDefName}}" из "{{parentNodeDefName}}"',
-      entitySelectLabel: 'Сущность, в которую нужно переместить:',
-    },
-    movedNodeDefinitionHasErrors:
-      'Определение узла "{{nodeDefName}}", которое вы переместили, содержит ошибки; пожалуйста, исправьте их.',
-    nodeDefintionsHaveErrors: 'Эти определения узлов содержат ошибки: {{nodeDefNames}}. Пожалуйста, исправьте их.',
-    filterVariable: 'Переменная для фильтрации элементов',
-    filterVariableForLevel: 'Переменная для {{levelName}}',
-    unique: {
-      label: 'Уникальный',
-      info: `Когда атрибут помечен как **Уникальный**, его значение должно быть уникальным внутри ближайшей множественной сущности (иначе будет показана ошибка).
-
----
-
-Например, в структуре *кластер -> участок -> дерево*, если у вас есть атрибут *tree_species*, помеченный как **Уникальный**, вы можете иметь только одно дерево каждого вида внутри одного и того же *участка*.`,
-    },
-    categoriesClonedFromSurvey: 'Следующие категории также были клонированы из исходного опроса: {{names}}',
-    taxonomiesClonedFromSurvey: 'Следующие таксономии также были клонированы из исходного опроса: {{names}}',
-  },
-
   languagesEditor: {
     languages: 'Язык(и)',
   },
-
   taxonomy: {
     header: 'Таксономия',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'taxonomy'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'таксономия'})`,
     confirmDelete: 'Удалить таксономию {{taxonomyName}}?\n$t(common.cantUndoWarning)',
     cloneFromAnotherSurvey: {
       title: 'Клонировать таксономию из другого опроса',
@@ -1185,13 +1274,12 @@ $t(common.appNameFull)
       synonym: 'Синоним / Латинское название',
       extraPropsNotDefined: 'Дополнительные свойства не определены для этой таксономии',
       importMissingPublishedTaxa:
-        '{{count}} опубликованный таксон/таксона не найден(ы) в импортируемом файле и оставлен(ы) без изменений. Коды: {{codes}}',
+        '{{count}} опубликованный таксон/таксона не найден(ы) в импортируемом файле: оставлен(ы) без изменений, после импортированных. Коды: {{codes}}',
       importMissingPublishedTaxaTruncated: '$t(taxonomy.edit.importMissingPublishedTaxa) (ещё {{extra}})',
     },
     taxaCount: 'Количество таксонов',
     vernacularNameLabel: 'Метка местного названия',
   },
-
   categoryList: {
     batchImport: 'Пакетный импорт категорий (из ZIP)',
     batchImportCompleteSuccessfully: `{{importedCategories}} категорий успешно импортировано!
@@ -1208,19 +1296,21 @@ $t(common.appNameFull)
       noCategoriesAvailable: 'В выбранном опросе нет доступных категорий',
     },
     itemsCount: 'Количество элементов',
+    structure: 'Структура',
     types: {
       flat: 'Плоская',
       hierarchical: 'Иерархическая',
       reportingData: 'Отчетные данные',
+      geoPackage: 'GeoPackage',
+      samplingPointData: 'Данные точек выборки',
     },
   },
-
   categoryEdit: {
     header: 'Категория',
     addLevel: 'Добавить уровень',
     categoryName: 'Название категории',
-    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'category'})`,
-    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'category level'})`,
+    cantBeDeleted: `$t(common.cantBeDeletedUsedItem, {'item': 'категория'})`,
+    cantBeDeletedLevel: `$t(common.cantBeDeletedUsedItem, {'item': 'уровень категории'})`,
     confirmDelete: 'Удалить категорию {{categoryName}}?\n$t(common.cantUndoWarning)',
     confirmDeleteEmptyCategory: 'Категория **пуста** и будет удалена. Продолжить?',
     confirmDeleteLevel: `Удалить уровень категории "{{levelName}}" со всеми элементами?\n$t(common.cantUndoWarning)`,
@@ -1238,6 +1328,56 @@ $t(common.cantUndoWarning)`,
     },
     convertToSimpleCategory: {
       confirmMessage: `Преобразовать эту категорию отчетных данных в простую категорию?`,
+    },
+    convertToSamplingPointDataCategory: {
+      buttonLabel: 'Преобразовать в данные точек выборки',
+      confirmMessage: `Преобразовать эту категорию в категорию данных точек выборки?
+
+Категория будет переименована в '${samplingPointDataCategoryName}', и к элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertToGeoPackageCategory: {
+      buttonLabel: 'Преобразовать в категорию GeoPackage',
+      confirmMessage: `Преобразовать эту категорию в категорию GeoPackage?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    convertGeoPackageCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию GeoPackage в простую категорию?
+
+Дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    convertSamplingPointDataCategoryToSimple: {
+      buttonLabel: 'Преобразовать в простую категорию',
+      confirmMessage: `Преобразовать эту категорию данных точек выборки в простую категорию?
+
+Имя категории будет очищено (вам нужно будет присвоить ей новое имя), а дополнительное свойство '${locationItemExtraDefName}' будет разблокировано — его можно будет переименовать, изменить его тип или удалить, как любое другое дополнительное свойство. Данные при этом не пострадают.`,
+    },
+    geoPackageCategory: 'Эта категория имеет геопространственные возможности',
+    geoPackageCategoryInfo: `У этой категории есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryType: 'Это категория данных точек выборки',
+    samplingPointDataCategoryTypeInfo: `Это предопределенная категория для данных точек выборки. У неё есть дополнительное свойство '${locationItemExtraDefName}', которое позволяет экспортировать её в виде файла GeoPackage.`,
+    samplingPointDataCategoryLocationMissing: `Дополнительное свойство '${locationItemExtraDefName}' отсутствует`,
+    createCategory: {
+      menuLabel: 'Добавить категорию',
+      simple: 'Простая категория',
+      otherTypes: 'Другие типы категорий',
+    },
+    createSamplingPointDataCategory: {
+      buttonLabel: 'Категория данных точек выборки',
+      description:
+        'Предопределенная категория для данных точек выборки, включающая поле местоположения для каждого элемента.',
+      message: `Создать новую категорию данных точек выборки?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
+    },
+    createGeoPackageCategory: {
+      buttonLabel: 'Категория с геопространственными возможностями',
+      description:
+        'Добавляет элементам поле местоположения, чтобы категорию можно было экспортировать в виде файла GeoPackage.',
+      message: `Создать новую категорию с геопространственными возможностями?
+
+К элементам будет добавлено дополнительное свойство '${locationItemExtraDefName}'.`,
     },
     deleteItem: 'Удалить элемент',
     level: {
@@ -1262,13 +1402,25 @@ $t(common.cantUndoWarning)`,
       title: 'Сводка импорта категорий',
     },
     reportingData: 'Отчетные данные',
+    exportToGeoPackage: 'Экспорт в GeoPackage',
+    exportToGeoPackageSkippedItems: '{{count}} элемент(ов) без действительного местоположения были пропущены.',
+    generateSamplingPointDataWhisp: {
+      buttonLabel: 'Сгенерировать анализ Whisp',
+      confirmMessage: `Сгенерировать анализ Whisp для всех точек выборки?
+
+- каждая точка выборки с местоположением будет отправлена в Open Foris Whisp для анализа
+- результаты будут объединены с данными точек выборки и сохранены в категории '${samplingPointDataWhispCategoryName}'
+- если категория '${samplingPointDataWhispCategoryName}' уже существует, её содержимое будет заменено
+- анализ выполняется в фоновом режиме и может занять несколько минут в зависимости от количества точек выборки`,
+    },
     templateFor_samplingPointDataImport_csv: 'Шаблон для импорта данных точек выборки (CSV)',
     templateFor_samplingPointDataImport_xlsx: 'Шаблон для импорта данных точек выборки (Excel)',
   },
-
   extraProp: {
     label: 'Дополнительное свойство',
-    label_plural: 'Дополнительные свойства',
+    label_few: 'Дополнительные свойства',
+    label_many: 'Дополнительные свойства',
+    label_other: 'Дополнительные свойства',
     addExtraProp: 'Добавить дополнительное свойство',
     dataTypes: {
       geometryPoint: 'Геометрия точки',
@@ -1276,7 +1428,7 @@ $t(common.cantUndoWarning)`,
       text: 'Текст',
     },
     editor: {
-      title: 'Редактировать $t(extraProp.label_plural)',
+      title: 'Редактировать $t(extraProp.label_other)',
       confirmDelete: 'Удалить дополнительное свойство "{{name}}"?',
       confirmSave: `Сохранить изменения в определениях дополнительных свойств?
 
@@ -1291,7 +1443,6 @@ $t(common.cantUndoWarning)`,
     name: 'Название свойства {{position}}',
     value: 'Значение',
   },
-
   record: {
     ancestorNotFound: 'Родительский узел не найден в записи',
     keyDuplicate: 'Дубликат ключа записи',
@@ -1317,7 +1468,6 @@ $t(common.cantUndoWarning)`,
   },
 
   // ====== Common components
-
   expressionEditor: {
     and: 'И',
     or: 'ИЛИ',
@@ -1333,6 +1483,12 @@ $t(common.cantUndoWarning)`,
       bearingAttribute: 'Атрибут азимута',
     },
 
+    areaOfInterestEditor: {
+      areaOfInterest: 'Область интереса',
+      areasOfInterestNotDefined:
+        'Области интереса ещё не определены: задайте их в разделе «Информация об обследовании» → «Карта»',
+    },
+    coordinateAttribute: 'Атрибут координат',
     coordinateAttributeWithPosition: 'Атрибут координат {{position}}',
 
     dateTimeDiffEditor: {
@@ -1368,5 +1524,74 @@ $t(common.cantUndoWarning)`,
       constant: 'Константа',
       expression: 'Выражение',
     },
+  },
+  urls: {
+    openforisWebsite: 'https://www.openforis.org',
+    openforisArenaWebsite: '$t(urls.openforisWebsite)/arena',
+    supportForum: 'https://openforis.support',
+  },
+  links: {
+    openforis: '<a href="$t(urls.openforisWebsite)" target="_blank" rel="noopener noreferrer">$t(common.openForis)</a>',
+    openforisArenaWebsite:
+      '<a href="$t(urls.openforisArenaWebsite)" target="_blank" rel="noopener noreferrer">$t(urls.openforisArenaWebsite)</a>',
+    supportForum: '<a href="$t(urls.supportForum)" target="_blank" rel="noopener noreferrer">$t(urls.supportForum)</a>',
+    arenaVideoTutorialsInFaoElearningAcademy:
+      '<a href="https://elearning.fao.org/course/view.php?id=1455" target="_blank" rel="noopener noreferrer">FAO elearning Academy</a>',
+    arenaVideoTutorialsInYouTube:
+      '<a href="https://www.youtube.com/playlist?list=PL0Rrgop7D4QAWSJMtRQojzKuhF4vPS6Rs" target="_blank" rel="noopener noreferrer">YouTube</a>',
+    arenaInGitHub:
+      '<a href="https://github.com/openforis/arena" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena</a>',
+    arenaRScriptsInGitHub:
+      '<a href="https://github.com/openforis/arena-r" target="_blank" rel="noopener noreferrer">https://github.com/openforis/arena-r</a>',
+  },
+  aiExpression: {
+    title: 'Сгенерировать выражение по описанию',
+    hint: 'Опишите простыми словами, что должно делать выражение. ИИ переведет его в синтаксис Arena. Нажмите Ctrl+Enter для генерации.',
+    placeholder: 'например: высота дерева должна быть больше 0 и меньше 200',
+    generate: 'Сгенерировать',
+    generating: 'Генерация…',
+    use: 'Использовать это выражение',
+    useAnyway: 'Все равно использовать',
+    tryAgain: 'Попробовать другое описание',
+    parseError:
+      'Сгенерированное выражение не удалось корректно разобрать: {{message}}. Вы все равно можете применить его и отредактировать вручную или попробовать переформулировать описание.',
+    explain: {
+      title: 'Объяснить это выражение',
+      thinking: 'Запрашиваем у ИИ объяснение этого выражения…',
+      error: 'Не удалось получить объяснение: {{message}}',
+      timeout: 'ИИ слишком долго не отвечает. Повторите попытку.',
+    },
+  },
+  aiTranslation: {
+    translateButton_one: 'Перевести на {{count}} другой язык',
+    translateButton_few: 'Перевести на {{count}} других языка',
+    translateButton_many: 'Перевести на {{count}} других языков',
+    translateButton_other: 'Перевести на {{count}} другого языка',
+    translateButton: 'Перевести на другие языки',
+    success_one: 'Переведено на {{count}} язык. Проверьте и сохраните.',
+    success_few: 'Переведено на {{count}} языка. Проверьте и сохраните.',
+    success_many: 'Переведено на {{count}} языков. Проверьте и сохраните.',
+    success_other: 'Переведено на {{count}} языка. Проверьте и сохраните.',
+    success: 'Переведено. Проверьте и сохраните.',
+    failed: 'Не удалось выполнить перевод: {{message}}',
+    timeout: 'Время ожидания перевода истекло. Повторите попытку.',
+  },
+  aiActivityLog: {
+    title: 'Сводка журнала активности',
+    summarizeButton: 'Составить сводку',
+    thinking: 'Собираем события и запрашиваем у ИИ сводку…',
+    error: 'Не удалось получить сводку: {{message}}',
+  },
+  aiChatbot: {
+    open: 'Справка и документация',
+    title: 'Справка и документация',
+    empty: 'Задайте мне любой вопрос об Open Foris Arena.',
+    placeholder: 'Введите ваш вопрос…',
+    send: 'Отправить',
+    stop: 'Остановить',
+    clear: 'Очистить',
+    showReasoning: 'Показать рассуждения',
+    error: 'Ошибка чат-бота: {{message}}',
+    language: 'Язык ответа',
   },
 }

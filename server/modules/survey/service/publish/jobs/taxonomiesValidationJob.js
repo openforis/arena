@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import Job from '@server/job/job'
 
@@ -18,12 +18,12 @@ export default class TaxonomiesValidationJob extends Job {
       this.tx
     )
 
-    const invalidTaxonomies = R.reject(Validation.isObjValid)(taxonomies)
+    const invalidTaxonomies = A.reject(Validation.isObjValid)(taxonomies)
 
-    if (!R.isEmpty(invalidTaxonomies)) {
-      this.errors = R.reduce(
+    if (!A.isEmpty(invalidTaxonomies)) {
+      this.errors = A.reduce(
         (acc, taxonomy) =>
-          R.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
+          A.assoc(Taxonomy.getName(taxonomy), Validation.getFieldValidations(taxonomy.validation), acc),
         {},
         invalidTaxonomies
       )

@@ -1,4 +1,6 @@
-import * as R from 'ramda'
+import { RecordNodesUpdater } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -13,19 +15,32 @@ import * as Log from '@server/log/log'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 import * as FileRepository from '../../repository/fileRepository'
+import * as RecordFileManager from '../recordFileManager'
+import { findFilesToRemove, removeFiles } from './nodeFilesRemover'
+import * as DbUtils from '@server/db/dbUtils'
 
 const logger = Log.getLogger('NodeUpdateManager')
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
+
+const _isFileValueNode = (survey, node) => {
+  if (!Node.getFileUuid(node)) return false
+  const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
+  return NodeDef.isFile(nodeDef)
+}
+
+const _toFileDeleteParams = (node) => ({ fileUuid: Node.getFileUuid(node), recordUuid: Node.getRecordUuid(node) })
 
 const _createUpdateResult = (record, node = null, nodes = {}) => {
-  if (!node && R.isEmpty(nodes)) {
+  if (!node && A.isEmpty(nodes)) {
     return { record, nodes: {} }
   }
-  let recordUpdated = R.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
+  let recordUpdated = A.isEmpty(nodes) ? record : Record.mergeNodes(nodes)(record)
 
   const parentNode = Record.getParentNode(node)(recordUpdated)
 
@@ -42,7 +57,6 @@ const _createUpdateResult = (record, node = null, nodes = {}) => {
 }
 
 const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
-  // TODO check if it should be removed
   const surveyId = Survey.getId(survey)
 
   let updatedNodes = nodeDependents || {}
@@ -52,9 +66,10 @@ const _onNodeUpdate = async (survey, record, node, nodeDependents, t) => {
   if (NodeDef.isCode(nodeDef)) {
     const nodesDependent = Record.getDependentCodeAttributes(node)(record)
 
-    if (!R.isEmpty(nodesDependent)) {
-      const nodesClearedArray = await Promise.all(
-        nodesDependent.map((nodeDependent) => {
+    if (!A.isEmpty(nodesDependent)) {
+      const nodesClearedArray = await DbUtils.runQueries(
+        t,
+        nodesDependent.map((nodeDependent) => () => {
           const nodeDefDependent = Survey.getNodeDefByUuid(Node.getNodeDefUuid(nodeDependent))(survey)
 
           return NodeDef.isMultiple(nodeDefDependent)
@@ -93,20 +108,29 @@ export const updateNode = async ({ user, survey, record, node, system = false, u
   }
   if (!Record.isPreview(record)) {
     // Keep only node uuid, recordUuid, meta and value
-    const logContent = R.pipe(
-      R.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
-      R.assoc(Node.keys.meta, meta)
+    const logContent = A.pipe(
+      A.pick([Node.keys.uuid, Node.keys.recordUuid, Node.keys.nodeDefUuid, Node.keys.value]),
+      A.assoc(Node.keys.meta, meta)
     )(node)
     await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.nodeValueUpdate, logContent, system, t)
   }
 
   const value = Node.getValue(node)
   if (NodeDef.isFile(nodeDef)) {
-    // mark old file as deleted if changed
+    // mark/delete old file if changed
     const nodePrev = await NodeRepository.fetchNodeByUuid(surveyId, Node.getUuid(node), t)
     const fileUuidPrev = Node.getFileUuid(nodePrev)
     if (fileUuidPrev !== null && fileUuidPrev !== Node.getFileUuid(node)) {
-      await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+      if (Record.isPreview(record)) {
+        // preview records: hard-delete now, nothing ever purges soft-deleted preview files
+        await RecordFileManager.deleteFileByUuid(
+          { surveyId, fileUuid: fileUuidPrev, recordUuid: Node.getRecordUuid(nodePrev) },
+          t
+        )
+      } else {
+        // non-preview records: soft-delete; no-op if the file row is already missing
+        await FileRepository.markFileAsDeleted(surveyId, fileUuidPrev, t)
+      }
     }
   }
 
@@ -139,7 +163,7 @@ const _reloadNodes = async ({ surveyId, record, nodes }, tx) => {
   ).map((nodeReloaded) => {
     // preserve status flags (used in rdb updates)
     const oldNode = nodes[Node.getUuid(nodeReloaded)]
-    return R.pipe(
+    return A.pipe(
       Node.assocCreated(Node.isCreated(oldNode)),
       Node.assocDeleted(Node.isDeleted(oldNode)),
       Node.assocUpdated(Node.isUpdated(oldNode))
@@ -163,7 +187,8 @@ const _groupNodesByFlags = (nodesArray) =>
     { nodesInserted: [], nodesUpdated: [], nodesDeleted: [] }
   )
 
-const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
+const _persistNodes = async ({ survey, record, nodesArray, isPreview = false }, tx) => {
+  const surveyId = Survey.getId(survey)
   const { nodesInserted, nodesUpdated, nodesDeleted } = _groupNodesByFlags(nodesArray)
 
   if (nodesInserted.length) {
@@ -172,13 +197,51 @@ const _persistNodes = async ({ surveyId, nodesArray }, tx) => {
   if (nodesUpdated.length) {
     await NodeRepository.updateNodes({ surveyId, nodes: nodesUpdated }, tx)
   }
+  // dependency/applicability-driven updates and deletions (e.g. attributes cleared because not applicable):
+  // nodesArray already includes every individual descendant node explicitly (Record.updateNodesDependents
+  // flattens the whole subtree), so no separate subtree lookup is needed - use the nodes we already have in memory
+  const files = findFilesToRemove({ survey, record, nodes: nodesArray })
   if (nodesDeleted.length) {
     await NodeRepository.deleteNodesByUuids(surveyId, nodesDeleted.map(Node.getUuid), tx)
   }
+  await removeFiles({ surveyId, files, isPreview }, tx)
 }
 
+/**
+ * Recomputes the "required if" flags (parent nodes meta) of the specified node defs in the whole record (nodes not persisted).
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the update.
+ * @param {!object} params.survey - The survey.
+ * @param {!object} params.record - The record.
+ * @param {!string[]} params.nodeDefUuids - UUIDs of the node defs whose "required if" condition has changed.
+ * @param {boolean} [params.sideEffect] - Whether to update the record in place (false by default).
+ * @returns {Promise<object>} - The update result (updated record and nodes).
+ */
+export const updateRequiredFlags = async ({ user, survey, record, nodeDefUuids, sideEffect = false }) =>
+  RecordNodesUpdater.updateRequiredFlags({
+    user,
+    survey,
+    record,
+    nodeDefUuids,
+    categoryItemProvider,
+    taxonProvider,
+    areaOfInterestProvider,
+    lang: Survey.getDefaultLanguage(survey),
+    sideEffect,
+  })
+
 export const updateNodesDependents = async (
-  { user, survey, record, nodes, timezoneOffset, persistNodes = true, sideEffect = false },
+  {
+    user,
+    survey,
+    record,
+    nodes,
+    timezoneOffset,
+    lang,
+    persistNodes = true,
+    sideEffect = false,
+    clearNonApplicableValues = false,
+  },
   tx
 ) => {
   const { record: recordUpdatedDependents, nodes: allNodesUpdated } = await Record.updateNodesDependents({
@@ -188,19 +251,24 @@ export const updateNodesDependents = async (
     nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
+    // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
+    // fall back to the survey default when no UI language was provided (e.g. background jobs)
+    lang: lang ?? Survey.getDefaultLanguage(survey),
     logger,
     sideEffect,
+    clearNonApplicableValues,
   })
 
   let recordUpdated = recordUpdatedDependents
 
   // persist updates in batch
-  if (persistNodes && !R.isEmpty(allNodesUpdated)) {
+  if (persistNodes && !A.isEmpty(allNodesUpdated)) {
     const nodesArray = Object.values(allNodesUpdated)
     const surveyId = Survey.getId(survey)
 
-    await _persistNodes({ surveyId, nodesArray }, tx)
+    await _persistNodes({ survey, record, nodesArray, isPreview: Record.isPreview(record) }, tx)
 
     // reload nodes to get nodes ref data
     const nodesReloaded = await _reloadNodes({ surveyId, record: recordUpdated, nodes: allNodesUpdated }, tx)
@@ -223,20 +291,20 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
   if (NodeDef.isMultipleEntity(nodeDef)) {
     // Find sibling entities with same key values
     const nodeDeletedKeyValues = Record.getEntityKeyValues(survey, node)(record)
-    if (!R.isEmpty(nodeDeletedKeyValues)) {
+    if (!A.isEmpty(nodeDeletedKeyValues)) {
       const nodeParent = Record.getParentNode(node)(record)
-      const nodeSiblings = R.pipe(
+      const nodeSiblings = A.pipe(
         Record.getNodeChildrenByDefUuid(nodeParent, NodeDef.getUuid(nodeDef)),
-        R.reject(ObjectUtils.isEqual(node))
+        A.reject(ObjectUtils.isEqual(node))
       )(record)
 
       nodeSiblings.forEach((nodeSibling) => {
         const nodeKeys = Record.getEntityKeyNodes(survey, nodeSibling)(record)
         // If key nodes are the same as the ones of the deleted node,
         // add them to the accumulator
-        const nodeKeyValues = R.map(Node.getValue)(nodeKeys)
+        const nodeKeyValues = A.map(Node.getValue)(nodeKeys)
 
-        if (R.equals(nodeKeyValues, nodeDeletedKeyValues)) {
+        if (A.equals(nodeKeyValues, nodeDeletedKeyValues)) {
           nodeKeys.forEach((nodeKey) => {
             nodeDependentKeyAttributes[Node.getUuid(nodeKey)] = nodeKey
           })
@@ -250,6 +318,21 @@ const _getNodeDependentKeyAttributes = (survey, record, node) => {
 
 export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   const surveyId = Survey.getId(survey)
+
+  if (Record.isPreview(record)) {
+    // record is still fully loaded at this point (nothing has removed descendants from it yet),
+    // so the subtree can be found in memory instead of querying the DB - gather and hard-delete
+    // files of any file-type nodes in this subtree BEFORE the cascading DELETE removes descendant
+    // node rows silently
+    const rootNode = Record.getNodeByUuid(nodeUuid)(record)
+    const files = Record.getNodesArray(record)
+      .filter((n) => rootNode && (Node.getUuid(n) === nodeUuid || Node.isDescendantOf(rootNode)(n)))
+      .filter((n) => _isFileValueNode(survey, n))
+      .map(_toFileDeleteParams)
+    if (files.length > 0) {
+      await RecordFileManager.deleteFiles({ surveyId, files }, t)
+    }
+  }
 
   const node = await NodeRepository.deleteNode(surveyId, nodeUuid, t)
 
@@ -291,16 +374,28 @@ export const deleteNode = async (user, survey, record, nodeUuid, t) => {
   )
 }
 
-export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, record, client = db) =>
+// This delete is NOT scoped to a single record - it can affect nodes across many records of the
+// survey at once (e.g. RecordCheckJob runs it once per cycle, for a node def that no longer
+// exists, rather than once per record). On a large survey it can match millions of rows, so unlike
+// most node mutations here, it intentionally does not return or log the individual affected nodes:
+// pulling them all into memory (or logging one activity per node) is enough on its own to exhaust
+// a job worker's heap - see NodeRepository.deleteNodesByNodeDefUuids. Callers that need to reflect
+// the deletion in an already-loaded record should do so locally instead, filtering that record's
+// own nodes by nodeDefUuids (they're already in memory, so this needs no extra data from here).
+export const deleteNodesByNodeDefUuids = async (user, surveyId, nodeDefUuids, client = db) =>
   client.tx(async (t) => {
-    const nodesDeleted = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
-    const activities = nodesDeleted.map((node) =>
-      ActivityLog.newActivity(ActivityLog.type.nodeDelete, { uuid: Node.getUuid(node) }, true)
+    // NOTE: do not gate this on Record.isPreview(record) (that would wrongly skip cleanup of other
+    // preview records' files). Correctness relies entirely on the SQL-level `record.preview = true`
+    // join inside deleteFilesByNodeDefUuids/fetchFileValueNodesByNodeDefUuids.
+    await RecordFileManager.deleteFilesByNodeDefUuids({ surveyId, nodeDefUuids }, t)
+    const deletedCount = await NodeRepository.deleteNodesByNodeDefUuids(surveyId, nodeDefUuids, t)
+    // One activity per node def (matches the bulk-delete convention used by e.g.
+    // taxonomyTaxaDelete), not one per deleted node.
+    const activities = nodeDefUuids.map((nodeDefUuid) =>
+      ActivityLog.newActivity(ActivityLog.type.nodeDefNodesDelete, { uuid: nodeDefUuid }, true)
     )
     await ActivityLogRepository.insertMany(user, surveyId, activities, t)
-    const nodesDeletedByUuid = ObjectUtils.toUuidIndexedObj(nodesDeleted)
-    const recordUpdated = Record.mergeNodes(nodesDeletedByUuid, { sideEffect: true })(record)
-    return { record: recordUpdated, nodesDeleted }
+    return deletedCount
   })
 
 export const deleteNodesByUuids = async ({ user, surveyId, nodeUuids, systemActivity = false }, tx) => {

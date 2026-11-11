@@ -9,8 +9,7 @@ type AnyFn = (...args: any[]) => any
  */
 export const pipe =
   (...functions: AnyFn[]) =>
-  (...values: any[]): any =>
-    functions.reduce(
-      (currentValue, currentFunction, idx) => (idx === 0 ? currentFunction(...values) : currentFunction(currentValue)),
-      {}
-    )
+  (...values: any[]): any => {
+    const [first, ...rest] = functions
+    return rest.reduce((currentValue, currentFunction) => currentFunction(currentValue), first(...values))
+  }

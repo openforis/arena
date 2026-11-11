@@ -1,6 +1,6 @@
 import './buttonBar.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -9,51 +9,22 @@ import { Query } from '@common/model/query'
 
 import { Spinner, Switch } from '@webapp/components'
 import { Button, ButtonDownload } from '@webapp/components/buttons'
-import { ButtonGroup, Checkbox } from '@webapp/components/form'
-import { FormItem } from '@webapp/components/form/Input'
-import NodeDefLabelSwitch from '@webapp/components/survey/NodeDefLabelSwitch'
 
 import { useIsAppSaving } from '@webapp/store/app'
-import {
-  DataExplorerActions,
-  DataExplorerHooks,
-  DataExplorerSelectors,
-  DataExplorerState,
-} from '@webapp/store/dataExplorer'
+import { DataExplorerActions, DataExplorerHooks, DataExplorerSelectors } from '@webapp/store/dataExplorer'
 import { useAuthCanCleanseRecords } from '@webapp/store/user'
 
 import { DataQueryExportModal } from '../DataQueryExportModal'
 import { State, useButtonBar } from './store'
+import ButtonManageQueries from './ButtonManageQueries'
+import { ButtonAiGenerateQuery } from './ButtonAiGenerateQuery'
 import ButtonFilter from './ButtonFilter'
 import ButtonSort from './ButtonSort'
-import ButtonManageQueries from './ButtonManageQueries'
 import { ButtonGroupDisplayType } from './ButtonGroupDisplayType'
-
-const { modes } = Query
-
-const modeButtonItems = [
-  {
-    key: modes.raw,
-    iconClassName: 'icon-file-text2',
-    label: 'dataView:dataQuery.mode.raw',
-  },
-  {
-    key: modes.aggregate,
-    iconClassName: 'icon-sigma',
-    label: 'dataView:dataQuery.mode.aggregate',
-  },
-]
-
-const uiModeByQueryMode = {
-  [modes.raw]: modes.raw,
-  // raw edit mode shown as "raw" in mode button group
-  [modes.rawEdit]: modes.raw,
-  [modes.aggregate]: modes.aggregate,
-}
+import { ButtonViewOptions } from './ButtonViewOptions'
 
 const ButtonBar = (props) => {
   const {
-    dataCount,
     dataEmpty,
     dataLoaded,
     dataLoading,
@@ -66,10 +37,8 @@ const ButtonBar = (props) => {
   const dispatch = useDispatch()
   const appSaving = useIsAppSaving()
   const canEdit = useAuthCanCleanseRecords()
-  const displayType = DataExplorerSelectors.useDisplayType()
   const query = DataExplorerSelectors.useQuery()
   const nodeDefsSelectorVisible = DataExplorerSelectors.useIsNodeDefsSelectorVisible()
-  const codesVisible = DataExplorerSelectors.useCodesVisible()
   const onChangeQuery = DataExplorerHooks.useSetQuery()
   const { Actions, state } = useButtonBar()
 
@@ -80,7 +49,6 @@ const ButtonBar = (props) => {
     },
     [onChangeQuery, query]
   )
-  const selectedMode = uiModeByQueryMode[Query.getMode(query)]
   const modeEdit = Query.isModeRawEdit(query)
   const hasSelection = Query.hasSelection(query)
   const queryChangeDisabled = modeEdit || !dataLoaded || dataLoading
@@ -96,47 +64,30 @@ const ButtonBar = (props) => {
           variant="outlined"
         />
         <div className="data-query-loading-spinner">{dataLoading && <Spinner size={18} />}</div>
-        <FormItem className="mode-form-item" label="dataView:dataQuery.mode.label">
-          <ButtonGroup
-            disabled={appSaving || !nodeDefsSelectorVisible}
-            groupName="queryMode"
-            selectedItemKey={selectedMode}
-            onChange={(mode) => onChangeQuery(Query.assocMode(mode)(query))}
-            items={modeButtonItems}
-          />
-          {canEdit && hasSelection && selectedMode !== modes.aggregate && (
-            <Switch checked={modeEdit} disabled={dataEmpty} label="common.edit" onChange={onEditCheckboxChange} />
-          )}
-        </FormItem>
+        {canEdit && hasSelection && !Query.isModeAggregate(query) && (
+          <Switch checked={modeEdit} disabled={dataEmpty} label="common.edit" onChange={onEditCheckboxChange} />
+        )}
       </div>
-      {hasSelection && (
-        <div className="data-query-button-bar__internal-container">
-          <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
-          <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
-          <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
-          {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
-        </div>
-      )}
 
-      <NodeDefLabelSwitch labelType={nodeDefLabelType} onChange={onNodeDefLabelTypeChange} />
-
-      {displayType === DataExplorerState.displayTypes.table && (
-        <Checkbox
-          checked={codesVisible}
-          onChange={(val) => dispatch(DataExplorerActions.setCodesVisible(val))}
-          label="dataView:dataQuery.showCodes"
-        />
-      )}
-
-      <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
-
-      <ButtonGroupDisplayType dataCount={dataCount} setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      <div className="data-query-button-bar__internal-container">
+        <ButtonAiGenerateQuery disabled={appSaving || modeEdit} state={state} Actions={Actions} />
+        <ButtonManageQueries onChangeQuery={onChangeQuery} state={state} Actions={Actions} />
+        <ButtonViewOptions nodeDefLabelType={nodeDefLabelType} onNodeDefLabelTypeChange={onNodeDefLabelTypeChange} />
+        {hasSelection && (
+          <>
+            <ButtonFilter disabled={queryChangeDisabled} state={state} Actions={Actions} />
+            <ButtonSort disabled={queryChangeDisabled} state={state} Actions={Actions} />
+            <ButtonDownload disabled={queryChangeDisabled} label="common.export" onClick={Actions.togglePanelExport} />
+          </>
+        )}
+        {State.isPanelExportShown(state) && <DataQueryExportModal onClose={Actions.togglePanelExport} />}
+        <ButtonGroupDisplayType setQueryLimit={setQueryLimit} setQueryOffset={setQueryOffset} />
+      </div>
     </div>
   )
 }
 
 ButtonBar.propTypes = {
-  dataCount: PropTypes.number,
   dataEmpty: PropTypes.bool.isRequired,
   dataLoaded: PropTypes.bool.isRequired,
   dataLoading: PropTypes.bool.isRequired,

@@ -1,6 +1,6 @@
 import './LabelsEditor.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 import * as A from '@core/arena'
 import classNames from 'classnames'

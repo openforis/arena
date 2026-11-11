@@ -1,13 +1,18 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 
 import TableSurveyRdb from '../tableSurveyRdb'
 import * as SQL from '../../sql'
 
 const tableNamePrefix = 'olap_data'
 
-const includedAttributeTypes = [NodeDef.nodeDefType.boolean, NodeDef.nodeDefType.code, NodeDef.nodeDefType.taxon]
-const includedAnalysisAttributeTypes = [NodeDef.nodeDefType.integer, NodeDef.nodeDefType.decimal]
+const includedAttributeTypes = new Set([
+  NodeDef.nodeDefType.boolean,
+  NodeDef.nodeDefType.code,
+  NodeDef.nodeDefType.taxon,
+])
+const includedAnalysisAttributeTypes = new Set([NodeDef.nodeDefType.integer, NodeDef.nodeDefType.decimal])
 
 const baseColumnSet = {
   id: 'id',
@@ -42,8 +47,8 @@ export default class TableOlapData extends TableSurveyRdb {
         (nodeDef) =>
           (NodeDef.isSingleAttribute(nodeDef) &&
             ((NodeDef.isKey(nodeDef) && NodeDef.getParentUuid(nodeDef) !== NodeDef.getUuid(this._entityDef)) ||
-              includedAttributeTypes.includes(NodeDef.getType(nodeDef)))) ||
-          (NodeDef.isAnalysis(nodeDef) && includedAnalysisAttributeTypes.includes(NodeDef.getType(nodeDef)))
+              includedAttributeTypes.has(NodeDef.getType(nodeDef)))) ||
+          (NodeDef.isAnalysis(nodeDef) && includedAnalysisAttributeTypes.has(NodeDef.getType(nodeDef)))
       )
       filteredDefs.forEach((nodeDef) => {
         const uuid = NodeDef.getUuid(nodeDef)
@@ -92,9 +97,11 @@ export default class TableOlapData extends TableSurveyRdb {
       // base columns
       ...baseColumnNamesAndTypes,
       // base unit UUID
-      `${this.baseUnitUuidColumnName} ${SQL.types.uuid}`,
+      `${StringUtils.quoteDouble(this.baseUnitUuidColumnName)} ${SQL.types.uuid}`,
       // attribute columns
-      ...this.attributeDefsForColumns.map((attrDef) => `${NodeDef.getName(attrDef)} ${SQL.types.varchar}`),
+      ...this.attributeDefsForColumns.map(
+        (attrDef) => `${StringUtils.quoteDouble(NodeDef.getName(attrDef))} ${SQL.types.varchar}`
+      ),
     ]
   }
 }

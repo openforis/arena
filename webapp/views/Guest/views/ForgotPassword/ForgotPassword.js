@@ -1,13 +1,14 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 
 import { useFormObject } from '@webapp/components/hooks'
 import { EmailInput } from '@webapp/components/form'
 
+import { Button } from '@webapp/components'
 import Error from '@webapp/views/Guest/Error'
+import { GuestViewHeader } from '@webapp/views/Guest/components/GuestViewHeader'
 
-import { useI18n } from '@webapp/store/system'
 import { LoginState, LoginValidator, LoginActions } from '@webapp/store/login'
 
 const ForgotPassword = () => {
@@ -15,7 +16,6 @@ const ForgotPassword = () => {
   const error = useSelector(LoginState.getError)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const i18n = useI18n()
 
   useEffect(() => {
     dispatch(LoginActions.setLoginError(null))
@@ -46,24 +46,30 @@ const ForgotPassword = () => {
 
   return (
     <form onSubmit={(event) => event.preventDefault()} className="guest__form">
+      <GuestViewHeader
+        backToLogin
+        description="guest:forgotPasswordView.description"
+        icon="icon-key"
+        title="guest:forgotPasswordView.title"
+      />
+      <Error error={error} />
       <EmailInput
+        autoComplete="username"
         value={formObject.email}
         onChange={(value) => {
           dispatch(LoginActions.setLoginError(null))
           setObjectField('email', value)
         }}
         name="username"
-        label="loginView.yourEmail"
+        label="guest:loginView.yourEmail"
       />
 
-      <div className="guest__buttons">
-        <button type="submit" className="btn" onClick={onSubmit}>
-          <span className="icon icon-envelop icon-12px icon-left" />
-          {i18n.t('loginView.sendPasswordResetEmail')}
-        </button>
-      </div>
-
-      <Error error={error} />
+      <Button
+        className="guest__submit"
+        label="guest:loginView.sendPasswordResetEmail"
+        onClick={onSubmit}
+        type="submit"
+      />
     </form>
   )
 }

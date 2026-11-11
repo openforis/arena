@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react'
+import { useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { DateFormats, Objects } from '@openforis/arena-core'
@@ -84,6 +84,16 @@ export const DataExportOptionsPanel = (props) => {
         <DateInput
           onChange={onOptionChange(options.recordsModifiedAfter)}
           value={selectedOptionsByKey[options.recordsModifiedAfter]}
+          valueFormat={DateFormats.dateStorage}
+        />
+      </FormItem>
+      <FormItem
+        info={`dataExportView:optionsInfo.${options.recordsModifiedBefore}`}
+        label={`dataExportView:options.${options.recordsModifiedBefore}`}
+      >
+        <DateInput
+          onChange={onOptionChange(options.recordsModifiedBefore)}
+          value={selectedOptionsByKey[options.recordsModifiedBefore]}
           valueFormat={DateFormats.dateStorage}
         />
       </FormItem>

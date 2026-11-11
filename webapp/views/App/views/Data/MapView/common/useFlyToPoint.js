@@ -1,7 +1,17 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import L from 'leaflet'
 import { useMap } from 'react-leaflet'
 
 import { Numbers } from '@openforis/arena-core'
+
+// shown at the destination until the popup of the point opens
+const flyToLoaderIcon = L.divIcon({
+  className: 'map-view__fly-to-loader',
+  html: '<span class="icon icon-16px icon-spinner"></span>',
+  iconSize: [28, 28],
+})
+// the loader is removed anyway if no popup opens (e.g. layer hidden during the flight)
+const flyToLoaderTimeoutAfterMoveEnd = 2000
 
 export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel = true }) => {
   const map = useMap()
@@ -11,6 +21,9 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
 
   // Have a Reference to points for opening popups automatically
   const markersByKeyRef = useRef({})
+
+  // removes the loader and the listeners of the last flight, if still pending
+  const pendingFlightCleanupRef = useRef(null)
 
   const getPointKey = useCallback((point) => point?.properties?.key, [])
 
@@ -50,13 +63,43 @@ export const useFlyToPoint = ({ points, onRecordEditClick = null, zoomToMaxLevel
       // close record edit popup
       onRecordEditClick?.(null)
 
+      pendingFlightCleanupRef.current?.()
+      // the open popup would show the previous point until the new one opens
+      map.closePopup()
+      // stopping a running pan fires moveend: do it before listening to it
+      map.stop()
+
       const [longitude, latitude] = point.geometry.coordinates
-      const nextZoomLevel = zoomToMaxLevel ? map.getMaxZoom() : undefined
-      map.flyTo([latitude, longitude], nextZoomLevel)
-      map.once('zoomend', () => openPopupOfPoint(point))
+      const latLng = L.latLng(latitude, longitude)
+      const loader = L.marker(latLng, { icon: flyToLoaderIcon, interactive: false, keyboard: false }).addTo(map)
+      const cleanup = () => {
+        map.off('moveend', onMoveEnd)
+        map.off('popupopen', cleanup)
+        loader.remove()
+        if (pendingFlightCleanupRef.current === cleanup) {
+          pendingFlightCleanupRef.current = null
+        }
+      }
+      const onMoveEnd = () => {
+        openPopupOfPoint(point)
+        setTimeout(cleanup, flyToLoaderTimeoutAfterMoveEnd)
+      }
+      pendingFlightCleanupRef.current = cleanup
+      map.once('moveend', onMoveEnd)
+      map.once('popupopen', cleanup)
+
+      const nextZoomLevel = zoomToMaxLevel ? map.getMaxZoom() : map.getZoom()
+      if (nextZoomLevel === map.getZoom() && map.getBounds().contains(latLng)) {
+        // point already in view: a short pan instead of the 2 seconds flight
+        map.panTo(latLng)
+      } else {
+        map.flyTo(latLng, nextZoomLevel, { duration: 2, easeLinearity: 0.5 })
+      }
     },
     [map, onRecordEditClick, openPopupOfPoint, zoomToMaxLevel]
   )
+
+  useEffect(() => () => pendingFlightCleanupRef.current?.(), [])
 
   const flyToNextPoint = useCallback(
     (point) => {

@@ -65,7 +65,7 @@ const ExpressionProp = (props) => {
         )}
 
         <div className="expression-item">
-          <div className="label">{i18n.t('nodeDefEdit.expressionsProp.expression')}</div>
+          <div className="label">{i18n.t('nodeDefEdit:expressionsProp.expression')}</div>
 
           <ExpressionEditor
             index={index}
@@ -90,7 +90,7 @@ const ExpressionProp = (props) => {
 
         {applyIf && !isPlaceholder && !expressionEmpty && (
           <div className="expression-item">
-            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.applyIf')}</div>
+            <div className="label">{i18n.t('nodeDefEdit:expressionsProp.applyIf')}</div>
 
             <ExpressionEditor
               index={index}
@@ -112,7 +112,7 @@ const ExpressionProp = (props) => {
         )}
         {severity && (
           <div className="expression-item severity">
-            <div className="label">{i18n.t('nodeDefEdit.expressionsProp.severity')}</div>
+            <div className="label">{i18n.t('nodeDefEdit:expressionsProp.severity')}</div>
 
             <ButtonGroup
               selectedItemKey={NodeDefExpression.getSeverity(expression)}

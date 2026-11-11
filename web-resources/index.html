@@ -1,10 +1,12 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" translate="no">
   <head>
     <title>Open Foris - Arena</title>
 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- browser translation alters the DOM managed by React and breaks re-renders (removeChild errors) -->
+    <meta name="google" content="notranslate" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
     <!-- start of favicon -->
@@ -94,6 +96,24 @@
           -webkit-transform: scale(1);
           transform: scale(1);
           opacity: 0;
+        }
+      }
+
+      /* reduced motion: fade the balls instead of scaling them */
+      @keyframes ball-fade {
+        0%,
+        100% {
+          opacity: 0.2;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .preloader-loader__ball {
+          -webkit-animation-name: ball-fade;
+          animation-name: ball-fade;
         }
       }
     </style>

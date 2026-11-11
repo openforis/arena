@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} é obrigatório',
   rowsDuplicate: 'linha: {{row}} linha duplicada: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `A função "{{name}}" não é permitida`,
+    expressionInvalid: `"{{text}}" não é permitido na expressão`,
+    expressionRequired: 'Expressão obrigatória',
+    expressionUnbalancedParentheses: 'Parênteses não balanceados',
+    expressionUnknownColumn: `"{{name}}" não é uma coluna da entidade`,
+    expressionUnterminatedQuote: 'Texto entre aspas não fechado',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Rótulo no idioma padrão do inventário é obrigatório',
     analysisNodeDefsRequired: 'Pelo menos um atributo calculado é obrigatório',
@@ -33,6 +42,11 @@ export default {
     levelDuplicate: 'Nome de nível duplicado',
     levelsInvalid: 'Pelo menos um nível inválido',
     nameNotSpecified: 'Nome da categoria não especificado',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Já existe uma categoria de Dados de Ponto Amostral neste inventário; só pode haver uma.',
   },
 
   categoryImport: {
@@ -66,7 +80,7 @@ export default {
     invalidNumber: 'Número inválido na coluna {{headers}}: {{value}}',
     invalidTaxonCode: 'Código inválido na coluna {{headers}}: {{value}}',
     invalidTime:
-      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm. Ex.: 09:45 ou 16:30',
+      'Hora inválida na coluna {{headers}}: {{value}}. A hora deve estar no formato HH:mm ou HH:mm:ss. Ex.: 09:45, 16:30 ou 09:45:30',
     missingRequiredHeaders: 'Colunas obrigatórias ausentes: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erro ao atualizar valores: {{details}}',
     multipleRecordsMatchingKeys: 'Vários registros encontrados com as chaves "{{keyValues}}"',
@@ -74,6 +88,8 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Registro com chaves "{{keyValues}}" está na etapa Análise e não pode ser atualizado',
     recordKeyMissingOrInvalid: 'Valor ausente ou inválido para o atributo-chave "{{keyName}}"',
+    recordNotEditable:
+      'O registro com chaves "{{keyValues}}" não pode ser atualizado: você não tem permissão para editá-lo',
     recordNotFound: 'Registro com chaves "{{keyValues}}" não encontrado',
   },
 
@@ -104,8 +120,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Entidade obrigatória',
-    applyIfDuplicate: 'A condição "$t(nodeDefEdit.expressionsProp.applyIf)" está duplicada',
-    applyIfInvalid: 'Condição "$t(nodeDefEdit.advancedProps.relevantIf)" inválida',
+    applyIfDuplicate: 'A condição "$t(nodeDefEdit:expressionsProp.applyIf)" está duplicada',
+    applyIfInvalid: 'Condição "$t(nodeDefEdit:advancedProps.relevantIf)" inválida',
     columnWidthCannotBeGreaterThan: 'A largura da coluna não pode ser maior que {{max}}',
     columnWidthCannotBeLessThan: 'A largura da coluna não pode ser menor que {{min}}',
     countMaxMustBePositiveNumber: 'A contagem máxima deve ser um inteiro positivo',
@@ -116,13 +132,14 @@ export default {
     defaultValuesNotSpecified: 'Valor padrão não especificado',
     entitySourceRequired: 'Origem da entidade obrigatória',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Somente a última expressão pode ter a condição "$t(nodeDefEdit.expressionsProp.applyIf)" vazia',
+      'Somente a última expressão pode ter a condição "$t(nodeDefEdit:expressionsProp.applyIf)" vazia',
     expressionDuplicate: 'Expressão duplicada',
     expressionRequired: 'Expressão obrigatória',
     formulaInvalid: 'Fórmula inválida',
     keysEmpty: 'Defina pelo menos um atributo-chave',
 
     keysExceedingMax: 'Excede o número máximo de atributos-chave',
+    mapMarkerColorInvalid: 'A cor do marcador no mapa deve ser um código de cor como #ff0000',
     maxFileSizeInvalid: 'O tamanho máximo do arquivo deve ser maior que 0 e menor que {{max}}',
     nameInvalid: 'Nome inválido (deve conter apenas letras minúsculas, números e sublinhados, começando com uma letra)',
     taxonomyRequired: 'Taxonomia obrigatória',
@@ -130,8 +147,11 @@ export default {
     countMaxInvalid: '"Contagem máxima" inválida',
     countMinInvalid: '"Contagem mínima" inválida',
     readOnlyCannotHaveEditableIf: 'Um nó somente leitura não pode ter a condição "Editable if"',
+    requiredIfInvalid: 'Condição "Obrigatório se" inválida',
+    requiredIfNotAllowed:
+      'A condição "Obrigatório se" só é permitida para atributos simples, não chave e não sempre obrigatórios',
     qualifierCannotHaveApplicableExpression:
-      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'O atributo qualificador não pode ter a condição "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: 'O atributo qualificador não pode ter regras de editabilidade definidas',
     qualifierCannotHaveDefaultValues: 'O atributo qualificador não pode ter valores padrão',
     qualifierCannotHaveValidations: 'O atributo qualificador não pode ter regras de validação definidas',
@@ -154,10 +174,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Idioma obrigatório',
+    langInvalid: 'O código de idioma não é válido: {{lang}}',
+    srsInvalid: 'O código do sistema de referência espacial não é válido: {{code}}',
     srsRequired: 'Sistema de Referência Espacial obrigatório',
     cycleRequired: 'Ciclo obrigatório',
     cyclesRequired: 'Pelo menos um ciclo deve ser definido',
     cyclesExceedingMax: 'Um inventário pode ter no máximo 10 ciclos',
+    cycleKeysInvalid: 'Os ciclos devem ser numerados consecutivamente, começando por 1',
     cycleDateStartBeforeDateEnd: 'A data de início do ciclo deve ser anterior à data de término',
     cycleDateStartAfterPrevDateEnd: 'A data de início do ciclo deve ser posterior ao término do ciclo anterior',
     cycleDateStartInvalid: 'Data de início do ciclo inválida',
@@ -166,6 +189,13 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'A data de término do ciclo é obrigatória para todos os ciclos, exceto o último',
     fieldManualLinksInvalid: 'Link do manual de campo inválido',
+    areaOfInterestInvalid: 'A área de interesse deve ser um polígono em formato GeoJSON com coordenadas WGS84',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Arquivo obrigatório',
+    nameDuplicate: 'Já existe outra área de interesse com o mesmo nome',
+    nameRequired: 'Nome obrigatório',
   },
 
   surveyPreloadedMapLayer: {
@@ -243,6 +273,7 @@ export default {
     invalidRequest: 'Solicitação de acesso de usuário inválida',
     userAlreadyExisting: 'Usuário com email {{email}} já existe',
     requestAlreadySent: `Solicitação de acesso para o usuário com email {{email}} já enviada`,
+    emailNotReachable: 'O email de confirmação não pôde ser entregue a {{email}}; verifique se o endereço está correto',
     invalidReCaptcha: 'ReCaptcha inválido',
   },
 
@@ -253,6 +284,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Papel obrigatório',
     surveyNameRequired: 'Nome do inventário obrigatório',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Já existe um grupo com o mesmo nome: {{name}}',
+    qualifiersInvalid: 'Um ou mais qualificadores têm uma chave inválida ou duplicada',
+    qualifierNameDuplicate: 'Já existe um qualificador com o mesmo nome neste grupo: {{name}}',
+    qualifierNameInvalid: 'Nome de qualificador inválido',
+    qualifierNameRequired: 'O nome do qualificador é obrigatório',
   },
 
   userPasswordChange: {

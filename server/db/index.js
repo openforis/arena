@@ -1,7 +1,5 @@
 // ==== Client
-import { db } from './db'
-
-export { db as client }
+export { db as client } from './db'
 
 // ==== Utility functions
 export { DbOrder } from './utils/dbOrder'

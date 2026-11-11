@@ -17,7 +17,7 @@ export class FileImportBaseJob extends Job {
   async checkFilesNotExceedingAvailableQuota(filesSummaries) {
     const { surveyId } = this.context
     const filesStatistics = await SurveyFileService.fetchFilesStatistics({ surveyId })
-    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + SurveyFile.getSize(fileSummary), 0)
+    const totalSize = filesSummaries.reduce((tot, fileSummary) => tot + (SurveyFile.getSize(fileSummary) ?? 0), 0)
     if (totalSize > filesStatistics.availableSpace) {
       throw new SystemError('cannotImportFilesExceedingQuota')
     }
@@ -55,8 +55,8 @@ export class FileImportBaseJob extends Job {
     }
   }
 
-  generateResult() {
-    const result = super.generateResult()
+  async generateResult() {
+    const result = await super.generateResult()
     return {
       ...result,
       insertedFiles: this.insertedFileUuids.length,

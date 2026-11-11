@@ -28,12 +28,35 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
     // extract temporary chunk content
     const chunkFileName = getChunkFileName({ fileId, chunk })
     const chunkFilePath = FileUtils.tempFilePath(chunkFileName)
-    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath)
-    await writeStreamAndWaitForEnd({ writeStream, chunkFileContent })
+    const chunkFileContent = await FileUtils.readBinaryFile(chunkFilePath) // NOSONAR
+    await writeStreamAndWaitForEnd({ writeStream, chunkFileContent }) // NOSONAR
     // delete temporary chunk
-    await FileUtils.deleteFileAsync(chunkFilePath)
-    await onChunkMerged?.({ chunk, totalChunks })
+    await FileUtils.deleteFileAsync(chunkFilePath) // NOSONAR
+    await onChunkMerged?.({ chunk, totalChunks }) // NOSONAR
   }
   await endWriteStream(writeStream)
   return finalFilePath
+}
+
+const pendingImportFilePrefix = 'pendingImport_'
+const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
+
+export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+  const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  await FileUtils.renameFile(filePath, destPath)
+}
+
+export const getKeptFilePath = async ({ fileId }) => {
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (!FileUtils.exists(filePath)) {
+    return null
+  }
+  return filePath
+}
+
+export const deletePendingImportFileIfAny = async ({ fileId }) => {
+  const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
+  if (FileUtils.exists(filePath)) {
+    await FileUtils.deleteFileAsync(filePath)
+  }
 }

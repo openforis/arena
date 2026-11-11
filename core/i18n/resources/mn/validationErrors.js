@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} шаардлагатай',
   rowsDuplicate: 'мөр: {{row}} давхцсан мөр: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `"{{name}}" функцийг ашиглахыг зөвшөөрөхгүй`,
+    expressionInvalid: `"{{text}}" илэрхийлэлд зөвшөөрөгдөхгүй`,
+    expressionRequired: 'Илэрхийлэл шаардлагатай',
+    expressionUnbalancedParentheses: 'Хаалт тэнцвэргүй байна',
+    expressionUnknownColumn: `"{{name}}" нь объектын багана биш`,
+    expressionUnterminatedQuote: 'Хашилт хаагдаагүй байна',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Судалгааны үндсэн хэл дээрх шошго шаардлагатай',
     analysisNodeDefsRequired: 'Наад зах нь нэг тооцоолсон шинж чанар шаардлагатай',
@@ -33,6 +42,11 @@ export default {
     levelDuplicate: 'Түвшний нэр давхцсан',
     levelsInvalid: 'Наад зах нь нэг хүчингүй түвшин',
     nameNotSpecified: 'Ангиллын нэр заагаагүй',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      'Энэ судалгаанд Дээж цэгийн өгөгдлийн ангилал аль хэдийн байна; зөвхөн нэг л байж болно.',
   },
 
   categoryImport: {
@@ -66,7 +80,7 @@ export default {
     invalidNumber: 'Багана {{headers}}-д хүчингүй тоо: {{value}}',
     invalidTaxonCode: 'Багана {{headers}}-д хүчингүй таксоны код: {{value}}',
     invalidTime:
-      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ форматаар байх ёстой. Жишээ нь: 09:45 эсвэл 16:30',
+      'Багана {{headers}}-д хүчингүй цаг: {{value}}. Цагийг ЦАГ:МИНУТ эсвэл ЦАГ:МИНУТ:СЕКУНД форматаар байх ёстой. Жишээ нь: 09:45, 16:30 эсвэл 09:45:30',
     missingRequiredHeaders: 'Шаардлагатай баганууд дутуу: {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Утгуудыг шинэчлэхэд алдаа гарлаа: {{details}}',
     multipleRecordsMatchingKeys: 'Түлхүүр "{{keyValues}}"-д тохирох олон бичлэг олдов',
@@ -74,6 +88,7 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       'Түлхүүр "{{keyValues}}"-тэй бичлэг нь шинжилгээний алхамд байгаа тул шинэчлэх боломжгүй',
     recordKeyMissingOrInvalid: 'Түлхүүр шинж чанар "{{keyName}}"-д дутуу эсвэл хүчингүй утга',
+    recordNotEditable: 'Түлхүүр "{{keyValues}}"-тэй бичлэгийг шинэчлэх боломжгүй: танд үүнийг засах эрх байхгүй',
     recordNotFound: 'Түлхүүр "{{keyValues}}"-тэй бичлэг олдсонгүй',
   },
 
@@ -104,8 +119,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: 'Объект шаардлагатай',
-    applyIfDuplicate: '"$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөл давхцсан',
-    applyIfInvalid: 'Хүчингүй "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөл',
+    applyIfDuplicate: '"$t(nodeDefEdit:expressionsProp.applyIf)" нөхцөл давхцсан',
+    applyIfInvalid: 'Хүчингүй "$t(nodeDefEdit:advancedProps.relevantIf)" нөхцөл',
     columnWidthCannotBeGreaterThan: 'Баганын өргөн {{max}}-аас их байх боломжгүй',
     columnWidthCannotBeLessThan: 'Баганын өргөн {{min}}-ээс бага байх боломжгүй',
     countMaxMustBePositiveNumber: 'Хамгийн их тоо эерэг бүхэл тоо байх ёстой',
@@ -116,13 +131,14 @@ export default {
     defaultValuesNotSpecified: 'Үндсэн утга заагаагүй',
     entitySourceRequired: 'Объектын эх үүсвэр шаардлагатай',
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Зөвхөн сүүлийн илэрхийлэл нь хоосон "$t(nodeDefEdit.expressionsProp.applyIf)" нөхцөлтэй байж болно',
+      'Зөвхөн сүүлийн илэрхийлэл нь хоосон "$t(nodeDefEdit:expressionsProp.applyIf)" нөхцөлтэй байж болно',
     expressionDuplicate: 'Илэрхийлэл давхцсан',
     expressionRequired: 'Илэрхийлэл шаардлагатай',
     formulaInvalid: 'Томьёо хүчингүй байна',
     keysEmpty: 'Наад зах нь нэг түлхүүр шинж чанарыг тодорхойлно уу',
 
     keysExceedingMax: 'Түлхүүр шинж чанаруудын хамгийн их тооноос хэтэрсэн',
+    mapMarkerColorInvalid: 'Газрын зураг дээрх тэмдэглэгээний өнгө #ff0000 хэлбэрийн өнгөний код байх ёстой',
     maxFileSizeInvalid: 'Хамгийн их файлын хэмжээ 0-ээс их ба {{max}}-ээс бага байх ёстой',
     nameInvalid: 'Нэр хүчингүй байна (зөвхөн бага үсэг, тоо, доогуур зураас агуулсан, үсгээр эхэлсэн байх ёстой)',
     taxonomyRequired: 'Таксоном шаардлагатай',
@@ -130,8 +146,11 @@ export default {
     countMaxInvalid: 'Хүчингүй "Хамгийн их тоо"',
     countMinInvalid: 'Хүчингүй "Хамгийн бага тоо"',
     readOnlyCannotHaveEditableIf: 'Зөвхөн унших зангилаа "Editable if" нөхцөлтэй байж болохгүй',
+    requiredIfInvalid: 'Хүчингүй "Заавал бөглөх нөхцөл"',
+    requiredIfNotAllowed:
+      '"Заавал бөглөх нөхцөл"-ийг зөвхөн үргэлж заавал биш, түлхүүр биш, ганц утгатай шинж чанарт ашиглаж болно',
     qualifierCannotHaveApplicableExpression:
-      'Квалификатор шинж чанар "$t(nodeDefEdit.advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
+      'Квалификатор шинж чанар "$t(nodeDefEdit:advancedProps.relevantIf)" нөхцөлтэй байж болохгүй',
     qualifierCannotHaveEditabilityRule: 'Квалификатор шинж чанар засварлах дүрэмтэй байж болохгүй',
     qualifierCannotHaveDefaultValues: 'Квалификатор шинж чанар өгөгдмөл утгатай байж болохгүй',
     qualifierCannotHaveValidations: 'Квалификатор шинж чанар баталгаажуулах дүрэмтэй байж болохгүй',
@@ -154,10 +173,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Хэл шаардлагатай',
+    langInvalid: 'Хэлний код буруу байна: {{lang}}',
+    srsInvalid: 'Орон зайн лавлах системийн код буруу байна: {{code}}',
     srsRequired: 'Орон зайн лавлах систем шаардлагатай',
     cycleRequired: 'Мөчлөг шаардлагатай',
     cyclesRequired: 'Наад зах нь нэг мөчлөг тодорхойлогдсон байх ёстой',
     cyclesExceedingMax: 'Судалгаа хамгийн ихдээ 10 мөчлөгтэй байж болно',
+    cycleKeysInvalid: 'Мөчлөгүүд 1-ээс эхлэн дараалсан дугаартай байх ёстой',
     cycleDateStartBeforeDateEnd: 'Мөчлөгийн эхлэх огноо дуусах огнооноос өмнө байх ёстой',
     cycleDateStartAfterPrevDateEnd: 'Мөчлөгийн эхлэх огноо өмнөх мөчлөгийн дуусах огнооноос хойш байх ёстой',
     cycleDateStartInvalid: 'Мөчлөгийн эхлэх огноо хүчингүй',
@@ -166,6 +188,13 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'Мөчлөгийн дуусах огноо сүүлийн мөчлөгөөс бусад бүх мөчлөгт заавал байх ёстой',
     fieldManualLinksInvalid: 'Талбайн гарын авлагын холбоос хүчингүй',
+    areaOfInterestInvalid: 'Сонирхсон бүс нь WGS84 координаттай GeoJSON форматын олон өнцөгт байх ёстой',
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Файл шаардлагатай',
+    nameDuplicate: 'Ижил нэртэй өөр сонирхсон бүс аль хэдийн байна',
+    nameRequired: 'Нэр шаардлагатай',
   },
 
   surveyPreloadedMapLayer: {
@@ -214,6 +243,7 @@ export default {
   },
 
   user: {
+    emailDuplicate: 'Ижил имэйлтэй хэрэглэгч аль хэдийн байна',
     emailRequired: 'Имэйл шаардлагатай',
     emailInvalid: 'Имэйл хүчингүй',
     emailNotFound: 'Имэйл олдсонгүй',
@@ -228,6 +258,7 @@ export default {
     userNotFound: 'Хэрэглэгч олдсонгүй. Имэйл болон нууц үг зөв эсэхийг шалгана уу',
     passwordChangeRequired: 'Нууц үг солих шаардлагатай',
     passwordResetNotAllowedWithPendingInvitation: `Нууц үг сэргээхийг зөвшөөрөхгүй: хэрэглэгч судалгаанд уригдсан боловч урилгыг хараахан хүлээн аваагүй байна`,
+    twoFactorTokenRequired: 'Баталгаажуулах код шаардлагатай',
   },
 
   userAccessRequest: {
@@ -241,6 +272,7 @@ export default {
     invalidRequest: 'Хүчингүй хэрэглэгчийн хандалтын хүсэлт',
     userAlreadyExisting: 'Имэйл {{email}}-тэй хэрэглэгч аль хэдийн байна',
     requestAlreadySent: `Имэйл {{email}}-тэй хэрэглэгчийн хандалтын хүсэлт аль хэдийн илгээгдсэн`,
+    emailNotReachable: 'Баталгаажуулах имэйлийг {{email}} хаяг руу хүргэж чадсангүй; хаяг зөв эсэхийг шалгана уу',
     invalidReCaptcha: 'Хүчингүй ReCaptcha',
   },
 
@@ -251,6 +283,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Үүрэг шаардлагатай',
     surveyNameRequired: 'Судалгааны нэр шаардлагатай',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Ижил нэртэй бүлэг аль хэдийн байна: {{name}}',
+    qualifiersInvalid: 'Нэг буюу хэд хэдэн тодотгол хүчингүй эсвэл давхардсан түлхүүртэй байна',
+    qualifierNameDuplicate: 'Энэ бүлэгт ижил нэртэй тодотгол аль хэдийн байна: {{name}}',
+    qualifierNameInvalid: 'Тодотголын нэр хүчингүй',
+    qualifierNameRequired: 'Тодотголын нэр шаардлагатай',
   },
 
   userPasswordChange: {

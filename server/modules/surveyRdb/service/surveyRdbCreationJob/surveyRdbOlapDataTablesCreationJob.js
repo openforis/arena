@@ -134,11 +134,10 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
 
     for (let index = 0; index < cycles.length && !stopIfFunction(); index++) {
       const cycle = cycles[index]
-      // TODO generate only reporting tables
       for (let index = 0; index < entityDefs.length && !stopIfFunction(); index++) {
         const entityDef = entityDefs[index]
         this.logDebug(`create OLAP table for entity def ${NodeDef.getName(entityDef)}`)
-        await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx)
+        await SurveyRdbManager.createOlapDataTable({ survey, cycle, baseUnitDef, entityDef }, tx) // NOSONAR
         this.incrementProcessedItems()
       }
     }
@@ -148,7 +147,8 @@ export default class SurveyRdbOlapDataTablesCreationJob extends Job {
     const { surveyId, tx } = this
     const surveySummary = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx)
     const surveyInfo = Survey.getSurveyInfo(surveySummary)
-    const fetchDraft = Survey.isFromCollect(surveyInfo) && !Survey.isPublished(surveyInfo)
+    const fetchDraft =
+      (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
 
     return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId(
       { surveyId, draft: fetchDraft, advanced: true, includeBigCategories: false, includeBigTaxonomies: false },

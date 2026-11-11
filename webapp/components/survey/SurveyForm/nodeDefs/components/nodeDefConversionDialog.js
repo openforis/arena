@@ -1,6 +1,6 @@
 import './nodeDefConversionDialog.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 import PropTypes from 'prop-types'
@@ -32,9 +32,7 @@ export const NodeDefConversionDialog = (props) => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const nodeDefType = NodeDef.getType(nodeDef)
 
-  const availableToTypes = Object.values(NodeDef.nodeDefType).filter(
-    (type) => ![NodeDef.nodeDefType.entity, NodeDef.getType(nodeDef)].includes(type)
-  )
+  const availableToTypes = NodeDef.getConvertibleTypes(nodeDef)
   const confirmButtonDisabled = !selectedToType
 
   return (
@@ -42,12 +40,12 @@ export const NodeDefConversionDialog = (props) => {
       className="survey-form__node-def-conversion-dialog"
       onClose={onClose}
       showCloseButton
-      title="nodeDefEdit.conversion.dialogTitle"
+      title="nodeDefEdit:conversion.dialogTitle"
       titleParams={{ nodeDefName }}
     >
       <ModalBody>
-        <FormItem label="nodeDefEdit.conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
-        <FormItem label="nodeDefEdit.conversion.toType">
+        <FormItem label="nodeDefEdit:conversion.fromType">{i18n.t(`nodeDefsTypes.${nodeDefType}`)}</FormItem>
+        <FormItem label="nodeDefEdit:conversion.toType">
           <Dropdown
             className="to-type-dropdown"
             items={availableToTypes}

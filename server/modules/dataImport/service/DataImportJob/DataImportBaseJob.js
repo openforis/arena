@@ -64,11 +64,11 @@ export default class DataImportBaseJob extends Job {
 
     for (const node of nodesArray) {
       if (Node.isDeleted(node)) {
-        await this.nodesDeleteBatchPersister.addItem(node)
+        await this.nodesDeleteBatchPersister.addItem(node) // NOSONAR
       } else if (Node.isCreated(node)) {
-        await this.nodesInsertBatchPersister.addItem(node)
+        await this.nodesInsertBatchPersister.addItem(node) // NOSONAR
       } else if (Node.isUpdated(node)) {
-        await this.nodesUpdateBatchPersister.addItem(node)
+        await this.nodesUpdateBatchPersister.addItem(node) // NOSONAR
       }
     }
     await RecordManager.assocRefDataToNodes({ survey, nodes: nodesArray }, tx)

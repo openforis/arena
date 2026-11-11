@@ -38,13 +38,10 @@ export const useCreateSurvey = ({ template = false } = {}) => {
   const onCreateTypeUpdate = (createType) => {
     const newSurveyProps = { createType }
 
-    switch (createType) {
-      case createTypes.fromScratch:
-        break
-      default:
-        // reset label and lang (they will be hidden)
-        newSurveyProps.label = ''
-        newSurveyProps.lang = 'en'
+    if (createType !== createTypes.fromScratch) {
+      // reset label and lang (they will be hidden)
+      newSurveyProps.label = ''
+      newSurveyProps.lang = 'en'
     }
     setNewSurvey((surveyPrev) => ({ ...surveyPrev, ...newSurveyProps }))
   }

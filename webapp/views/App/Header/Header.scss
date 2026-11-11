@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .app-header {
@@ -6,7 +5,7 @@
   display: grid;
   grid-template-columns: 70px 1fr 1fr 1fr 70px;
   align-items: center;
-  border-bottom: 1px solid $greyBorder;
+  border-bottom: 1px solid $colorOutline;
 
   &.sidebar-open {
     grid-template-columns: 200px 1fr 1fr 1fr 70px;
@@ -29,7 +28,7 @@
   gap: 1rem;
   font-size: 0.9rem;
   font-weight: 600;
-  color: color.adjust($black, $lightness: 20%);
+  color: $colorOnSurfaceVariant;
 
   .cycle-selector {
     width: 8rem;
@@ -80,6 +79,8 @@
     align-items: center;
     cursor: pointer;
     border: unset;
+    background-color: transparent;
+    color: inherit;
 
     .icon {
       padding: 1.2rem 0 0.7rem 0.2rem;

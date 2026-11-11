@@ -5,6 +5,7 @@ import * as Category from '@core/survey/category'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 import * as FileUtils from '@server/utils/file/fileUtils'
+import { toSafeFileName } from '@server/utils/file/fileNames'
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 
 const categoriesOutputFolderName = 'categories'
@@ -27,9 +28,10 @@ export default class CategoriesExportJob extends Job {
     for (const category of categories) {
       const { uuid: categoryUuid } = category
       const extension = getExtensionByFileFormat(fileFormat)
-      const categoryTempFilePath = FileUtils.join(categoriesDir, `${Category.getName(category)}.${extension}`)
+      const fileName = toSafeFileName(Category.getName(category)) || categoryUuid
+      const categoryTempFilePath = FileUtils.join(categoriesDir, `${fileName}.${extension}`)
       const outputStream = FileUtils.createWriteStream(categoryTempFilePath)
-      await CategoryManager.exportCategoryToStream({ survey, categoryUuid, outputStream, fileFormat }, this.tx)
+      await CategoryManager.exportCategoryToStream({ survey, categoryUuid, outputStream, fileFormat }, this.tx) // NOSONAR
       this.incrementProcessedItems()
     }
   }

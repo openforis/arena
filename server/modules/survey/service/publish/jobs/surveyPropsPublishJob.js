@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import Job from '@server/job/job'
 
@@ -15,7 +15,7 @@ const findDeletedLanguages = async ({ surveyId }, t) => {
   if (Survey.isPublished(surveyInfoNext)) {
     const publishedSurvey = await SurveyManager.fetchSurveyById({ surveyId, draft: false, validate: false }, t)
     const publishedSurveyInfo = Survey.getSurveyInfo(publishedSurvey)
-    return R.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfoNext))
+    return A.difference(Survey.getLanguages(publishedSurveyInfo), Survey.getLanguages(surveyInfoNext))
   }
   return []
 }

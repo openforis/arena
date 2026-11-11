@@ -15,6 +15,7 @@ import { useSurveyLangs } from '@webapp/store/survey'
 import { useEditUserGroup } from './useEditUserGroup'
 import { UserGroupMembersEditor } from './UserGroupMembersEditor'
 import { UserGroupQualifiersEditor } from './UserGroupQualifiersEditor'
+import { UserGroupReadableGroupsEditor } from './UserGroupReadableGroupsEditor'
 
 /**
  * Create/edit/delete page for a single User Group, reading `groupUuid` from the route params.
@@ -33,9 +34,11 @@ const UserGroupEdit = (): React.ReactElement | null => {
     canSave,
     canDelete,
     userGroup,
+    otherGroupsInSurvey,
     onNameChange,
     onLabelsChange,
     onQualifiersChange,
+    onReadableGroupUuidsChange,
     onSave,
     onDelete,
   } = useEditUserGroup({
@@ -76,6 +79,15 @@ const UserGroupEdit = (): React.ReactElement | null => {
         onChange={onQualifiersChange}
         readOnly={!canEdit}
       />
+
+      {otherGroupsInSurvey.length > 0 && (
+        <UserGroupReadableGroupsEditor
+          otherGroups={otherGroupsInSurvey}
+          readableGroupUuids={UserGroup.getReadableGroupUuids(userGroup)}
+          onChange={onReadableGroupUuidsChange}
+          readOnly={!canEdit}
+        />
+      )}
 
       {groupUuid && <UserGroupMembersEditor groupUuid={groupUuid} canEdit={canEdit} />}
 

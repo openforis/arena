@@ -3,6 +3,7 @@ import * as Node from '@core/record/node'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import DataImportBaseJob from './DataImportBaseJob'
+import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
 export default class EntitiesDeleteJob extends DataImportBaseJob {
   constructor(params) {
@@ -12,7 +13,7 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
   async execute() {
     const { context, tx } = this
-    const { recordsSummary, surveyId } = context
+    const { recordsSummary, survey, surveyId, updateRecordsInAnalysis, user, userQualifierFilters } = context
 
     if (!recordsSummary) return
 
@@ -20,9 +21,20 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
 
     for (const recordSummary of recordsSummary) {
       const recordUuid = Record.getUuid(recordSummary)
-      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx)
-      this.currentRecord = record
-      await this.deleteNotUpdatedEntities()
+      const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid }, tx) // NOSONAR
+      // records the user cannot edit are left untouched
+      if (
+        DataImportRecordPermissions.canUpdateRecord({
+          user,
+          survey,
+          record,
+          updateRecordsInAnalysis,
+          userQualifierFilters,
+        })
+      ) {
+        this.currentRecord = record
+        await this.deleteNotUpdatedEntities() // NOSONAR
+      }
       this.incrementProcessedItems()
     }
   }

@@ -14,12 +14,14 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
+import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
 import * as RecordRepository from '../../repository/recordRepository'
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
 
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
+const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
@@ -45,7 +47,7 @@ const _fetchCategoryItemAndAncestors = async ({ surveyId, itemUuid }, tx) => {
   const items = []
   let currentItemUuid = itemUuid
   while (currentItemUuid) {
-    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: currentItemUuid }, tx)
+    const categoryItem = await CategoryRepository.fetchItemByUuid({ surveyId, uuid: currentItemUuid }, tx) // NOSONAR
     items.unshift(categoryItem)
     currentItemUuid = CategoryItem.getParentUuid(categoryItem)
   }
@@ -97,6 +99,7 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
       valuesByDefUuid,
       categoryItemProvider,
       taxonProvider,
+      areaOfInterestProvider,
       insertMissingNodes: true,
     })(record)
 

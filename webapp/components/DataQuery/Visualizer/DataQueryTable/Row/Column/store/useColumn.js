@@ -4,12 +4,14 @@ import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefUIProps from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefUIProps'
 
-export const useColumn = ({ codesVisible, colWidth, query, nodeDef }) => {
+export const useColumn = ({ codesVisible, colWidth, query, nodeDef, percentageVisible = false }) => {
   const modeEdit = Query.isModeRawEdit(query)
   const modeAggregate = Query.isModeAggregate(query)
 
   const aggregateFunctions = modeAggregate ? Query.getMeasureAggregateFunctions(NodeDef.getUuid(nodeDef))(query) : null
   const isMeasure = modeAggregate && aggregateFunctions.length > 0
+  // a percentage column next to every aggregate function column
+  const percentageColumnsVisible = isMeasure && percentageVisible
 
   const columnNames = isMeasure
     ? // for every measure add a column for each aggregate function
@@ -21,7 +23,8 @@ export const useColumn = ({ codesVisible, colWidth, query, nodeDef }) => {
       ? columnNames.filter((colName) => NodeDef.getName(nodeDef) !== colName)
       : columnNames
 
-  const noCols = modeEdit ? NodeDefUIProps.getFormFieldsLength(nodeDef) : visibleColumnNames.length
+  const colsPerColumnName = percentageColumnsVisible ? 2 : 1
+  const noCols = modeEdit ? NodeDefUIProps.getFormFieldsLength(nodeDef) : visibleColumnNames.length * colsPerColumnName
 
   const widthOuter = colWidth * noCols
   const widthInner = `${(1 / noCols) * 100}%`
@@ -32,6 +35,7 @@ export const useColumn = ({ codesVisible, colWidth, query, nodeDef }) => {
     isMeasure,
     aggregateFunctions,
     noCols,
+    percentageColumnsVisible,
     widthInner,
     widthOuter,
   }

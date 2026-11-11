@@ -27,6 +27,12 @@ describe('UserGroup', () => {
     expect(UserGroup.getQualifiers(group)).toEqual(qualifiers)
   })
 
+  test('assocReadableGroupUuids sets the readable groups prop', () => {
+    expect(UserGroup.getReadableGroupUuids(UserGroup.newUserGroup())).toEqual([])
+    const group = UserGroup.assocReadableGroupUuids(['g-2', 'g-3'])(UserGroup.newUserGroup())
+    expect(UserGroup.getReadableGroupUuids(group)).toEqual(['g-2', 'g-3'])
+  })
+
   test('getUuid/getSurveyUuid read top-level fields', () => {
     const group = { uuid: 'g-1', surveyUuid: 's-1', props: {} }
     expect(UserGroup.getUuid(group)).toBe('g-1')

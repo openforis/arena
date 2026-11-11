@@ -1,5 +1,4 @@
 import axios from 'axios'
-import xmljs from 'xml-js'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -56,7 +55,8 @@ export const init = (app) => {
         const url = getMapTileForwardUrl(req)
         const { data: dataStream } = await axios.get(url, { responseType: 'stream' })
         dataStream.pipe(res)
-      } catch (error) {
+      } catch {
+        // remote service not reachable: return an empty result
         res.json({})
       }
     }
@@ -100,18 +100,6 @@ export const init = (app) => {
     res.json(elevation)
   })
 
-  app.get(`${uriPrefix}map/wmts/capabilities`, AuthMiddleware.requireMapUsePermission, async (req, res, next) => {
-    const { url } = Request.getParams(req)
-    try {
-      const { data } = await axios.get(url)
-      const jsonstring = xmljs.xml2json(data, { compact: true, spaces: 4 })
-      const json = JSON.parse(jsonstring)
-      res.json(json)
-    } catch (error) {
-      next(error)
-    }
-  })
-
   app.post(`${uriPrefix}whisp/geojson/csv`, AuthMiddleware.requireMapUsePermission, async (req, res) => {
     try {
       const geojson = Request.getBody(req)
@@ -121,6 +109,21 @@ export const init = (app) => {
       Response.sendErr(res, error)
     }
   })
+
+  app.post(
+    `${uriPrefix}whisp/sampling-point-data/start`,
+    AuthMiddleware.requireSurveyEditPermission,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId } = Request.getParams(req)
+        const job = GeoService.startSamplingPointDataWhispJob({ user, surveyId })
+        res.json(JobUtils.jobToJSON(job))
+      } catch (error) {
+        next(error)
+      }
+    }
+  )
 
   app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,

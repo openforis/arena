@@ -9,31 +9,32 @@
  * preserved.
  */
 
-const FENCE_RE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
+const FENCE = '```'
+const FENCE_LANGUAGE_RE = /^[a-zA-Z]*/
+
+/**
+ * Strip a single wrapping triple-backtick code fence (with optional language tag), if any.
+ * Plain string operations instead of a regex, to avoid super-linear backtracking on large model outputs.
+ * @param {string} value - Raw text.
+ * @returns {string} Trimmed text without the wrapping fence.
+ */
+export const stripFence = (value) => {
+  const trimmed = value.trim()
+  if (trimmed.length < FENCE.length * 2 || !trimmed.startsWith(FENCE) || !trimmed.endsWith(FENCE)) return trimmed
+  const inner = trimmed.slice(FENCE.length, -FENCE.length)
+  return inner.replace(FENCE_LANGUAGE_RE, '').trim()
+}
 
 /**
  * Pull a JSON object out of the model's raw text response. Tolerates a
- * surrounding ``` code fence and trims any prose by clipping to the
+ * surrounding triple-backtick code fence and trims any prose by clipping to the
  * outermost `{...}`.
- *
  * @param {string} text - Raw model output.
  * @returns {object} Parsed JSON value.
  * @throws {Error} When no parsable JSON object is found.
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
- * @param text
  */
 export const parseJsonResponse = (text) => {
-  const trimmed = (text || '').trim()
-  const fenceMatch = trimmed.match(FENCE_RE)
-  const candidate = (fenceMatch ? fenceMatch[1] : trimmed).trim()
+  const candidate = stripFence(text || '')
   const start = candidate.indexOf('{')
   const end = candidate.lastIndexOf('}')
   if (start < 0 || end < start) {

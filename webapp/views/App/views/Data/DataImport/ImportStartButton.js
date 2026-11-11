@@ -1,6 +1,6 @@
 import './ImportStartButton.scss'
 
-import React, { useCallback, useRef, useState } from 'react'
+import { useCallback, useRef, useState } from 'react'
 import { useDispatch } from 'react-redux'
 import PropTypes from 'prop-types'
 
@@ -93,13 +93,13 @@ export const ImportStartButton = (props) => {
       processorRef.current = startRes.processor
       setState((statePrev) => ({ ...statePrev, hasProcessor: Boolean(startRes.processor) }))
       try {
-        const result = await promise
+        const result = await promise // NOSONAR
         setState((statePrev) => ({ ...statePrev, uploadProgressPercent: 100 }))
-        await wait(completedProgressVisibleMs)
+        await wait(completedProgressVisibleMs) // NOSONAR
         onUploadComplete(result)
         reset()
       } catch (error) {
-        retry = await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } })
+        retry = await confirm({ key: 'common.uploadErrorConfirm.message', params: { error } }) // NOSONAR
         if (!retry) {
           reset()
         }

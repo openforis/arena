@@ -1,4 +1,4 @@
-import { appModuleUri, messageModules } from '@webapp/app/appModules'
+import { appModuleUri, systemAdminModules } from '@webapp/app/appModules'
 import { MessageActionTypes } from './actionTypes'
 
 export const resetMessage =
@@ -7,5 +7,5 @@ export const resetMessage =
     dispatch({ type: MessageActionTypes.messageReset })
 
     // navigate to messages list
-    navigate(appModuleUri(messageModules.messages))
+    navigate(appModuleUri(systemAdminModules.messages))
   }

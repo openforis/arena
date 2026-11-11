@@ -21,10 +21,10 @@ const ButtonSort = (props) => {
 
   const i18n = useI18n()
 
-  const tooltipMessages = sort.map(
-    (sortCriteria) =>
-      `${SortCriteria.getLabel(sortCriteria)} (${i18n.t(`common.${SortCriteria.getOrder(sortCriteria)}ending`)})`
-  )
+  const tooltipMessages = sort.map((sortCriteria) => {
+    const orderLabel = i18n.t(`common.${SortCriteria.getOrder(sortCriteria)}ending`)
+    return `${SortCriteria.getLabel(sortCriteria)} (${orderLabel})`
+  })
 
   return (
     <>

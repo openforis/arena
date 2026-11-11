@@ -1,9 +1,8 @@
-import * as R from 'ramda'
-
 import { Dates, Objects } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { db } from '@server/db/db'
+import { DbOrder } from '@server/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as StringUtils from '@core/stringUtils'
 
@@ -17,6 +16,8 @@ import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
 import * as SchemaRdb from '@common/surveyRdb/schemaRdb'
 import { getSchemaSurvey } from '@common/model/db/schemata'
 import { ColumnNodeDef } from '@common/model/db'
+
+import { buildQualifierFiltersSqlConditions } from './qualifierFiltersSqlConditions'
 
 const tableName = 'record'
 const tableColumns = [
@@ -47,11 +48,11 @@ const dbTransformCallback =
   (record) => {
     if (!record) return null
     const validation = Record.getValidation(record)
-    return R.pipe(
-      R.dissoc(Validation.keys.validation),
+    return A.pipe(
+      A.dissoc(Validation.keys.validation),
       A.camelizePartial({ limitToLevel: 1 }),
-      R.assoc('surveyId', surveyId),
-      R.assoc(
+      A.assoc('surveyId', surveyId),
+      A.assoc(
         Validation.keys.validation,
         includeValidationFields
           ? validation
@@ -122,6 +123,7 @@ export const countRecordsBySurveyId = async (
     ownerUuid = null,
     includeMerged = false,
     qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
   },
   client = db
 ) => {
@@ -133,7 +135,9 @@ export const countRecordsBySurveyId = async (
       nodeDefKeys,
       summaryDefs,
       search,
+      ownerUuid,
       qualifierNodeDefFilters,
+      readableQualifierNodeDefFilterSets,
     })
     return recordsWithSearch.length
   }
@@ -245,6 +249,38 @@ const nodeDefsToJsonb = ({ nodeDefs, tableAlias, alias }) => {
     .join(', ')}) AS ${alias}`
 }
 
+const buildRecordsSummarySearchCondition = ({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }) => {
+  const searchConditions = []
+  if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
+  if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
+  searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
+  return searchConditions.join(' OR ')
+}
+
+const buildRecordsSummarySelectWhereConditions = ({
+  cycle,
+  step,
+  search,
+  ownerUuid,
+  recordUuids,
+  includePreview,
+  includeMerged,
+  nodeDefKeysWhereConditions,
+  summaryDefsWhereConditions,
+}) => {
+  const conditions = []
+  if (!includePreview) conditions.push('preview = FALSE')
+  conditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
+  if (!A.isNull(cycle)) conditions.push('cycle = $/cycle/')
+  if (!A.isNull(step)) conditions.push('step = $/step/')
+  if (!A.isNull(recordUuids)) conditions.push('uuid IN ($/recordUuids:csv/)')
+  if (!A.isEmpty(search)) {
+    conditions.push(buildRecordsSummarySearchCondition({ nodeDefKeysWhereConditions, summaryDefsWhereConditions }))
+  }
+  if (!A.isNull(ownerUuid)) conditions.push('owner_uuid = $/ownerUuid/')
+  return conditions
+}
+
 export const fetchRecordsSummaryBySurveyId = async (
   {
     surveyId,
@@ -263,10 +299,13 @@ export const fetchRecordsSummaryBySurveyId = async (
     includePreview = false,
     includeMerged = false,
     qualifierNodeDefFilters = [],
+    readableQualifierNodeDefFilterSets = [],
   },
   client = db
 ) => {
   const rootEntityTableAlias = 'n0'
+  // readable groups' filters are relevant only when the user is restricted to its own group
+  const readableFilterSets = qualifierNodeDefFilters.length > 0 ? readableQualifierNodeDefFilterSets : []
 
   const nodeDefKeysSelect = nodeDefKeys
     ?.flatMap((nodeDefKey) => {
@@ -280,7 +319,8 @@ export const fetchRecordsSummaryBySurveyId = async (
   )
   const qualifierColumnNames = [
     ...new Set(
-      qualifierNodeDefFilters
+      [qualifierNodeDefFilters, ...readableFilterSets]
+        .flat()
         .map(({ nodeDef }) => NodeDefTable.getColumnName(nodeDef))
         .filter((colName) => !nodeDefKeysColumnNames.has(colName))
     ),
@@ -319,31 +359,35 @@ export const fetchRecordsSummaryBySurveyId = async (
     objAlias: recordSummaryAttributesObjAlias,
   })
 
-  const recordsSelectWhereConditions = []
-  if (!includePreview) recordsSelectWhereConditions.push('preview = FALSE')
-  recordsSelectWhereConditions.push(`merged_into_record_uuid ${includeMerged ? 'IS NOT NULL' : 'IS NULL'}`)
-  if (!A.isNull(cycle)) recordsSelectWhereConditions.push('cycle = $/cycle/')
-  if (!A.isNull(step)) recordsSelectWhereConditions.push('step = $/step/')
-  if (!A.isNull(recordUuids)) recordsSelectWhereConditions.push('uuid IN ($/recordUuids:csv/)')
-  if (!A.isEmpty(search)) {
-    const searchConditions = []
-    if (nodeDefKeysWhereConditions) searchConditions.push(`(${nodeDefKeysWhereConditions})`)
-    if (summaryDefsWhereConditions) searchConditions.push(`(${summaryDefsWhereConditions})`)
-    searchConditions.push(`(owner_name ilike '%$/search:value/%')`)
-    recordsSelectWhereConditions.push(searchConditions.join(' OR '))
-  }
-  if (!A.isNull(ownerUuid)) recordsSelectWhereConditions.push('owner_uuid = $/ownerUuid/')
+  const recordsSelectWhereConditions = buildRecordsSummarySelectWhereConditions({
+    cycle,
+    step,
+    search,
+    ownerUuid,
+    recordUuids,
+    includePreview,
+    includeMerged,
+    nodeDefKeysWhereConditions,
+    summaryDefsWhereConditions,
+  })
 
   // note: qualifier columns are selected (unqualified) in the "records" CTE below, since the
   // WHERE clause here applies to the outer query, where the root entity table alias is out of scope
-  const qualifierFilterParams = {}
-  qualifierNodeDefFilters.forEach(({ nodeDef, value }, index) => {
-    const paramName = `qualifierValue${index}`
-    const colName = NodeDefTable.getColumnName(nodeDef)
-    recordsSelectWhereConditions.push(`"${colName}" = $/${paramName}/`)
-    const columnValue = NodeDef.isCode(nodeDef) ? value?.code : value
-    qualifierFilterParams[paramName] = columnValue
+  const {
+    ownCondition: ownQualifiersCondition,
+    readableConditions: readableQualifiersConditions,
+    condition: qualifiersCondition,
+    params: qualifierFilterParams,
+  } = buildQualifierFiltersSqlConditions({
+    qualifierNodeDefFilters,
+    readableQualifierNodeDefFilterSets: readableFilterSets,
   })
+  if (qualifiersCondition) {
+    recordsSelectWhereConditions.push(qualifiersCondition)
+  }
+  // records of the readable groups only (not matching the user's own group) can be read but not edited
+  const readOnlySelect =
+    readableQualifiersConditions.length > 0 ? `, NOT COALESCE((${ownQualifiersCondition}), FALSE) AS read_only` : ''
 
   const whereConditionsJoint = recordsSelectWhereConditions.map((condition) => `(${condition})`).join(' AND ')
   const whereCondition = whereConditionsJoint ? `WHERE ${whereConditionsJoint}` : ''
@@ -383,17 +427,27 @@ export const fetchRecordsSummaryBySurveyId = async (
             : ''
         }
     )
-    SELECT * FROM records
+    SELECT *${readOnlySelect} FROM records
     
     ${whereCondition}
 
-    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${sortOrder}
+    ORDER BY ${determineOrderBy({ nodeDefKeys, summaryDefs, sortBy })} ${DbOrder.normalize(sortOrder, DbOrder.desc).toUpperCase()}
 
-    ${limit ? 'LIMIT $/limit:value/' : ''}
+    LIMIT $/limit/
 
-    OFFSET $/offset:value/
+    OFFSET $/offset/
   `,
-    { surveyId, cycle, step, search, limit, offset, recordUuids, ownerUuid, ...qualifierFilterParams },
+    {
+      surveyId,
+      cycle,
+      step,
+      search,
+      limit: DbUtils.normalizeLimit(limit),
+      offset: DbUtils.normalizeOffset(offset),
+      recordUuids,
+      ownerUuid,
+      ...qualifierFilterParams,
+    },
     dbTransformCallback(surveyId, false)
   )
 }
@@ -442,16 +496,20 @@ export const fetchRecordsByUuids = async (surveyId, recordUuids, client = db) =>
     dbTransformCallback(surveyId)
   )
 
-export const fetchRecordsUuidAndCycle = async ({ surveyId, recordUuidsIncluded = null }, client = db) =>
+export const fetchRecordsUuidAndCycle = async (
+  { surveyId, recordUuidsIncluded = null, ownerUuid = null },
+  client = db
+) =>
   client.any(
     `
     SELECT uuid, cycle 
     FROM ${getSchemaSurvey(surveyId)}.record 
     WHERE preview = FALSE
     ${Objects.isEmpty(recordUuidsIncluded) ? '' : `AND uuid IN ($/recordUuidsIncluded:csv/)`}
+    ${ownerUuid ? 'AND owner_uuid = $/ownerUuid/' : ''}
     ORDER BY cycle
   `,
-    { recordUuidsIncluded }
+    { recordUuidsIncluded, ownerUuid }
   )
 
 export const fetchRecordCreatedCountsByDates = async (surveyId, cycle, from, to, client = db) =>
@@ -541,12 +599,22 @@ export const fetchRecordCreatedCountsByUser = async (surveyId, cycle, from, to, 
 
 export const updateRecordDateModified = async ({ surveyId, recordUuid, dateModified = new Date() }, client = db) =>
   client.one(
-    `UPDATE ${getSchemaSurvey(surveyId)}.record 
+    `UPDATE ${getSchemaSurvey(surveyId)}.record
      SET date_modified = $2
      WHERE uuid = $1
     RETURNING ${recordSelectFields}`,
     [recordUuid, Dates.formatForStorage(dateModified)]
   )
+
+export const fetchRecordDateModified = async ({ surveyId, recordUuid }, client = db) => {
+  const row = await client.oneOrNone(
+    `SELECT ${DbUtils.selectDate('date_modified')}
+     FROM ${getSchemaSurvey(surveyId)}.record
+     WHERE uuid = $1`,
+    [recordUuid]
+  )
+  return row?.date_modified ? Dates.parseISO(row.date_modified) : null
+}
 
 export const updateValidation = async (surveyId, recordUuid, validation, client = db) =>
   client.one(
@@ -636,7 +704,7 @@ export const deleteRecordsPreview = async (surveyId, olderThan24Hours = false, c
     RETURNING uuid
     `,
     [true],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
@@ -647,7 +715,7 @@ export const deleteRecordsByCycles = async (surveyId, cycles, client = db) =>
     RETURNING uuid
   `,
     [cycles],
-    R.prop('uuid')
+    A.prop('uuid')
   )
 
 export const deleteRecordsBySurvey = async (surveyId, client = db) =>

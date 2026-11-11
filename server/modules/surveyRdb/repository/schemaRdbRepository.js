@@ -31,7 +31,7 @@ const dropDataTablesAndViewsWithPrefixes = async ({ surveyId, prefixes }, client
   const items = await DbUtils.selectTablesAndViewsStartingWithPrefixes({ schema, prefixes }, client)
   for (const { table_name: name, table_type: tableType } of items) {
     const type = tableType === 'BASE TABLE' ? 'TABLE' : 'VIEW'
-    await client.query(`DROP ${type} IF EXISTS ${schema}.${name} CASCADE`)
+    await client.query(`DROP ${type} IF EXISTS ${schema}.${name} CASCADE`) // NOSONAR
   }
 }
 

@@ -1,4 +1,4 @@
-const keywords = [
+const keywords = new Set([
   'asc',
   'category',
   'date_created',
@@ -26,6 +26,6 @@ const keywords = [
   'uuid',
   'value',
   'weight',
-]
+])
 
-export const isKeyword = (value: unknown): boolean => keywords.includes(value as string)
+export const isKeyword = (value: unknown): boolean => keywords.has(value as string)

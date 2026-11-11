@@ -60,9 +60,9 @@ const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider
     const nodeDef = Survey.getNodeDefByUuid(Node.getNodeDefUuid(node))(survey)
     const value = Node.getValue(node)
     if (NodeDef.isCode(nodeDef)) {
-      await _populateRefDataForCodeNode({ survey, node, nodeDef, value, categoryItemProvider })
+      await _populateRefDataForCodeNode({ survey, node, nodeDef, value, categoryItemProvider }) // NOSONAR
     } else if (NodeDef.isTaxon(nodeDef)) {
-      await _populateRefDataForTaxonNode({ survey, node, nodeDef, value, taxonProvider })
+      await _populateRefDataForTaxonNode({ survey, node, nodeDef, value, taxonProvider }) // NOSONAR
     }
   }
 }
@@ -72,9 +72,12 @@ export const afterNodesUpdate = async ({
   survey,
   record,
   nodes,
+  passiveNodes = {},
   categoryItemProvider,
   taxonProvider,
+  areaOfInterestProvider,
   timezoneOffset,
+  lang = undefined,
   sideEffect = false,
 }) => {
   // output
@@ -82,6 +85,7 @@ export const afterNodesUpdate = async ({
 
   // populate refData for big category/taxonomy nodes before dependent evaluation
   await _populateRefDataForBigNodes({ survey, nodes, categoryItemProvider, taxonProvider })
+  await _populateRefDataForBigNodes({ survey, nodes: passiveNodes, categoryItemProvider, taxonProvider })
 
   // 1. update dependent nodes
   const updateResultDependents = await updateNodesDependents({
@@ -91,11 +95,21 @@ export const afterNodesUpdate = async ({
     nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
     timezoneOffset,
+    // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
+    // fall back to the survey default when no UI language was provided (e.g. background jobs)
+    lang: lang ?? Survey.getDefaultLanguage(survey),
     sideEffect,
   })
 
   updateResult.merge(updateResultDependents)
+
+  // passive nodes (updated nodes not triggering the dependents update) are kept as they are,
+  // even if the dependents update re-evaluated them
+  for (const passiveNode of Object.values(passiveNodes)) {
+    updateResult.addNode(passiveNode, { sideEffect })
+  }
 
   // 2. update node validations
   const nodesValidation = await RecordValidator.validateNodes({
@@ -104,6 +118,7 @@ export const afterNodesUpdate = async ({
     nodes: updateResult.nodes,
     categoryItemProvider,
     taxonProvider,
+    areaOfInterestProvider,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,

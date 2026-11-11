@@ -1,13 +1,11 @@
-
 import { Checkbox } from '@webapp/components/form'
 
 const checkboxStyle = { color: 'white' }
 
 export const TableSelectionColumn = ({ key = 'selected' } = {}) => ({
   key,
-  renderHeader: ({ deselectAllItems, selectAllItems, selectedItemsCount, totalCount, visibleItemsCount }) => {
+  renderHeader: ({ deselectAllItems, selectAllItems, allVisibleItemsSelected, selectedItemsCount, totalCount }) => {
     const allItemsSelected = selectedItemsCount === totalCount
-    const allVisibleItemsSelected = selectedItemsCount === visibleItemsCount
     return (
       <Checkbox
         checked={allItemsSelected}

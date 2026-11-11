@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,7 +10,7 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
   const survey = useSurvey()
   const cycle = useSurveyCycleKey()
 
-  const [dataCountByEntityDefUuid, setDataCountsByEntityDefUuid] = useState({})
+  const [dataCountByEntityDefUuid, setDataCountByEntityDefUuid] = useState({})
 
   const entityDefUuids = useMemo(() => {
     const uuidsSet = nodeDefs.reduce((entityDefUuidsSet, nodeDef) => {
@@ -26,22 +26,19 @@ export const useDataCountByEntityDefUuid = ({ nodeDefs }) => {
     return [...uuidsSet.values()]
   }, [cycle, nodeDefs, survey])
 
-  const updateCounts = useCallback(async () => {
+  useEffect(() => {
     const surveyInfo = Survey.getSurveyInfo(survey)
     if (Survey.isPublished(surveyInfo) || Survey.getCollectUri(surveyInfo)) {
-      setDataCountsByEntityDefUuid(
-        await SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
-          surveyId: Survey.getId(survey),
-          cycle,
-          entityDefUuids,
-        })
-      )
+      SurveyRdbApi.fetchEntityViewDataRowsCountByDefUuid({
+        surveyId: Survey.getId(survey),
+        cycle,
+        entityDefUuids,
+      })
+        .then(setDataCountByEntityDefUuid)
+        // the error is shown by the axios interceptor
+        .catch(() => setDataCountByEntityDefUuid({}))
     }
   }, [survey, cycle, entityDefUuids])
-
-  useEffect(() => {
-    updateCounts()
-  }, [updateCounts])
 
   return dataCountByEntityDefUuid
 }

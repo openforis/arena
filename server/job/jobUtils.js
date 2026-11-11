@@ -1,3 +1,5 @@
+import * as A from '@core/arena'
+
 import * as JobSerialized from '@common/job/jobSerialized'
 
 export const jobStatus = {
@@ -46,7 +48,7 @@ const calculateJobProgress = (job) => {
 }
 
 const calculatedElapsedMillis = (job) =>
-  job.startTime ? (job.endTime ? job.endTime : new Date()).getTime() - job.startTime.getTime() : 0
+  job.startTime ? (job.endTime ?? new Date()).getTime() - job.startTime.getTime() : 0
 
 export const jobToJSON = (job) => ({
   [JobSerialized.keys.uuid]: job.uuid,
@@ -63,6 +65,7 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.running]: job.status === jobStatus.running,
   [JobSerialized.keys.succeeded]: job.status === jobStatus.succeeded,
   [JobSerialized.keys.canceled]: job.status === jobStatus.canceled,
+  [JobSerialized.keys.canceledByAdmin]: !!job.canceledByAdmin,
   [JobSerialized.keys.failed]: job.status === jobStatus.failed,
   [JobSerialized.keys.ended]: job.isEnded(),
 
@@ -73,6 +76,48 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.elapsedMillis]: calculatedElapsedMillis(job),
 
   // Output
-  [JobSerialized.keys.errors]: jobStatus.failed ? job.errors : null,
-  [JobSerialized.keys.result]: jobStatus.succeeded ? job.result : null,
+  // errors sent even if the job succeeded (e.g. data import validation completed with errors)
+  [JobSerialized.keys.errors]: A.isEmpty(job.errors) ? null : job.errors,
+  [JobSerialized.keys.result]: job.status === jobStatus.succeeded ? job.result : null,
 })
+
+export const jobRowToSummary = (jobRow) => {
+  const { uuid, userUuid, surveyId, type, status, processed, total, props, dateCreated, dateModified } = jobRow
+  const ended = [jobStatus.succeeded, jobStatus.failed, jobStatus.canceled].includes(status)
+  const baseProgressPercent = total > 0 ? Math.floor((100 * processed) / total) : 0
+  const progressPercent = status === jobStatus.succeeded ? 100 : baseProgressPercent
+  const elapsedMillis = (ended ? new Date(dateModified) : new Date()).getTime() - new Date(dateCreated).getTime()
+
+  return {
+    [JobSerialized.keys.uuid]: uuid,
+    [JobSerialized.keys.type]: type,
+    [JobSerialized.keys.userUuid]: userUuid,
+    [JobSerialized.keys.surveyId]: surveyId,
+    [JobSerialized.keys.innerJobs]: [],
+    [JobSerialized.keys.currentInnerJobIndex]: -1,
+    [JobSerialized.keys.status]: status,
+    [JobSerialized.keys.pending]: status === jobStatus.pending,
+    [JobSerialized.keys.running]: status === jobStatus.running,
+    [JobSerialized.keys.succeeded]: status === jobStatus.succeeded,
+    [JobSerialized.keys.canceled]: status === jobStatus.canceled,
+    [JobSerialized.keys.failed]: status === jobStatus.failed,
+    [JobSerialized.keys.ended]: ended,
+    [JobSerialized.keys.total]: total,
+    [JobSerialized.keys.processed]: processed,
+    [JobSerialized.keys.progressPercent]: progressPercent,
+    [JobSerialized.keys.elapsedMillis]: elapsedMillis,
+    [JobSerialized.keys.errors]: props?.errors ?? null,
+    [JobSerialized.keys.result]: props?.result ?? null,
+  }
+}
+
+export const jobRowToMonitorSummary = (jobRow) => {
+  const { dateCreated, userName, userEmail, surveyName } = jobRow
+  return {
+    ...jobRowToSummary(jobRow),
+    dateCreated,
+    userName,
+    userEmail,
+    surveyName,
+  }
+}

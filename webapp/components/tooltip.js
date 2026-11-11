@@ -1,6 +1,6 @@
 import './tooltip.scss'
 
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import ReactDom from 'react-dom'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
@@ -93,7 +93,7 @@ const Tooltip = (props) => {
           ...statePrev,
           messageElement: (
             <div className={messageElementClassName} style={style}>
-              {messageComponent || messages.map((msg, i) => <div key={i}>{msg}</div>)}
+              {messageComponent || messages.map((msg) => <div key={msg}>{msg}</div>)}
             </div>
           ),
         }))

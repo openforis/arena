@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
@@ -21,7 +21,9 @@ import * as UserRepository from '@server/modules/user/repository/userRepository'
 import * as UserResetPasswordRepository from '@server/modules/user/repository/userResetPasswordRepository'
 import * as UserAccessRequestRepository from '@server/modules/user/repository/userAccessRequestRepository'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as UserInvitationManager from './userInvitationManager'
+import * as DbUtils from '@server/db/dbUtils'
 
 const { groupNames } = AuthGroup
 
@@ -37,6 +39,7 @@ export const {
   updateNamePasswordAndStatus,
   updatePassword,
   deleteUserPrefsSurvey,
+  deleteUserMapCustomLayersSurvey,
   resetUsersPrefsSurveyCycle,
   importNewUser,
   deleteUser,
@@ -50,7 +53,7 @@ export const {
   deleteUserResetPasswordExpired,
 } = UserResetPasswordRepository
 
-export const { fetchSurveyIdsOfExpiredInvitationUsers } = AuthGroupRepository
+export const { fetchSurveyIdsOfExpiredInvitationUsers, fetchSurveysOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
 const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = null }, client = db) => {
@@ -74,21 +77,38 @@ const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = nu
   return groupsToAdd
 }
 
+/**
+ * Throws an error if the group is a survey group not belonging to the specified survey.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user performing the operation.
+ * @param {!object} params.group - The group to check.
+ * @param {object} [params.surveyInfo] - The survey info.
+ */
+const _checkGroupBelongsToSurvey = ({ user, group, surveyInfo }) => {
+  if (
+    AuthGroup.isSurveyGroup(group) &&
+    (!surveyInfo || AuthGroup.getSurveyUuid(group) !== Survey.getUuid(surveyInfo))
+  ) {
+    throw new UnauthorizedError(User.getName(user))
+  }
+}
+
 export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
   client.tx(async (t) => {
+    _checkGroupBelongsToSurvey({ user, group, surveyInfo })
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
     const userUuid = User.getUuid(userToAdd)
     const groupsToAdd = await _determineGroupsToAddTo({ user, userToAdd, group, surveyInfo }, t)
     for (const groupToAdd of groupsToAdd) {
       const groupUuid = AuthGroup.getUuid(groupToAdd)
-      await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t)
+      await AuthGroupRepository.insertUserGroup({ groupUuid, userUuid }, t) // NOSONAR
 
       if (AuthGroup.isSurveyGroup(groupToAdd)) {
         const logContent = {
           [ActivityLog.keysContent.uuid]: userUuid,
           [ActivityLog.keysContent.groupUuid]: groupUuid,
         }
-        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t)
+        await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.userInvite, logContent, false, t) // NOSONAR
       }
     }
   })
@@ -163,7 +183,7 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
   // Assoc auth groups
 
-  const _userGroups = R.isEmpty(userGroups)
+  const _userGroups = A.isEmpty(userGroups)
     ? await AuthGroupRepository.fetchUserGroups(User.getUuid(user), t)
     : userGroups
   let userUpdated = User.assocAuthGroups(_userGroups)(user)
@@ -186,23 +206,33 @@ const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserU
 
   const authGroups = await AuthGroupRepository.fetchUsersGroups(usersUuids, t)
 
-  return Promise.all(
-    users.map((user) =>
-      _attachAuthGroupsAndInvitationToUser({
-        user,
-        invitationsByUserUuid,
-        userGroups: authGroups.filter((group) => group.userUuid === User.getUuid(user)),
-        t,
-      })
+  // index groups by user uuid: filtering all groups for every user is quadratic (slow with thousands of users)
+  const authGroupsByUserUuid = {}
+  for (const group of authGroups) {
+    const { userUuid } = group
+    authGroupsByUserUuid[userUuid] ??= []
+    authGroupsByUserUuid[userUuid].push(group)
+  }
+
+  return DbUtils.runQueries(
+    t,
+    users.map(
+      (user) => () =>
+        _attachAuthGroupsAndInvitationToUser({
+          user,
+          invitationsByUserUuid,
+          userGroups: authGroupsByUserUuid[User.getUuid(user)] ?? [],
+          t,
+        })
     )
   )
 }
 
 const _userFetcher =
-  (fetchFn) =>
+  (fetchFn, clientArgIndex = 1) =>
   async (...args) => {
     const user = await fetchFn(...args)
-    return user ? _attachAuthGroupsAndInvitationToUser({ user }) : null
+    return user ? _attachAuthGroupsAndInvitationToUser({ user, t: args[clientArgIndex] }) : null
   }
 
 export const fetchUserByEmail = _userFetcher(UserRepository.fetchUserByEmail)
@@ -245,7 +275,7 @@ export const findUserByEmailAndPassword = async (email, password, passwordCompar
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
-    return _attachAuthGroupsAndInvitationToUser({ user: R.dissoc('password', user) })
+    return _attachAuthGroupsAndInvitationToUser({ user: A.dissoc('password', user) })
 
   return null
 }
@@ -262,9 +292,14 @@ export {
 export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFormat }) => {
   const fields = [
     'email',
-    ...Object.values(UserAccessRequest.keysProps).map(StringUtils.toSnakeCase),
+    ...Object.values(UserAccessRequest.keysProps).map((key) => StringUtils.toSnakeCase(key)),
+    'template_name',
     'status',
     'date_created',
+    'accepted_by_name',
+    'accepted_by_email',
+    'date_accepted',
+    'created_survey_name',
   ]
 
   const objectTransformer = (obj) => ({
@@ -283,6 +318,10 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
     }, {}),
     // format date_created
     date_created: DateUtils.formatDateTimeDefault(obj.date_created),
+    date_accepted:
+      obj.status === UserAccessRequest.status.ACCEPTED && obj.date_modified
+        ? DateUtils.formatDateTimeDefault(obj.date_modified)
+        : null,
   })
 
   await UserAccessRequestRepository.fetchUserAccessRequestsAsStream({
@@ -382,7 +421,7 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
     )
   })
 
-export const updateUser = _userFetcher(_updateUser)
+export const updateUser = _userFetcher(_updateUser, 4)
 
 export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
   AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
@@ -400,16 +439,17 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, survey }, c
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))
-    return Promise.all([
-      AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
-      ActivityLogRepository.insert(
-        user,
-        surveyId,
-        ActivityLog.type.userRemove,
-        { [ActivityLog.keysContent.uuid]: userUuidToRemove },
-        false,
-        t
-      ),
-      UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
+    return DbUtils.runQueries(t, [
+      () => AuthGroupRepository.deleteUserGroupBySurveyAndUser(surveyId, userUuidToRemove, t),
+      () =>
+        ActivityLogRepository.insert(
+          user,
+          surveyId,
+          ActivityLog.type.userRemove,
+          { [ActivityLog.keysContent.uuid]: userUuidToRemove },
+          false,
+          t
+        ),
+      () => UserInvitationManager.updateRemovedDate({ surveyUuid, userUuidToRemove }, t),
     ])
   })

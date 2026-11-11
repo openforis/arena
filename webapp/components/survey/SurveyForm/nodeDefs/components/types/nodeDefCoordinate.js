@@ -1,6 +1,6 @@
 import './nodeDefCoordinate.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import PropTypes from 'prop-types'
 import { useSelector } from 'react-redux'
 import classNames from 'classnames'
@@ -14,8 +14,7 @@ import * as NodeDefLayout from '@core/survey/nodeDefLayout'
 
 import { RecordState } from '@webapp/store/ui/record'
 
-import { FormItem, Input } from '@webapp/components/form/Input'
-import { NumberFormats } from '@webapp/components/form/Input'
+import { FormItem, Input, NumberFormats } from '@webapp/components/form/Input'
 import SrsDropdown from '@webapp/components/survey/SrsDropdown'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useAuthCanUseMap } from '@webapp/store/user/hooks'
@@ -78,10 +77,11 @@ const NodeDefCoordinate = (props) => {
     let fieldValue
     if (StringUtils.isBlank(value)) {
       fieldValue = null
-    } else if ([Node.valuePropsCoordinate.x, Node.valuePropsCoordinate.y].includes(field)) {
-      fieldValue = Number(value)
-    } else {
+    } else if (field === Node.valuePropsCoordinate.srs) {
       fieldValue = value
+    } else {
+      // x, y and additional fields (accuracy, altitude...) are numbers (e.g. used in expressions like -location.accuracy)
+      fieldValue = Number(value)
     }
     handleValueChange({ ...Node.getValue(node), [field]: fieldValue })
   }

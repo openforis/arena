@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 // MOVE import from table
 import * as NodeDefTable from '@common/surveyRdb/nodeDefTable'
@@ -18,7 +18,7 @@ const getValues = (survey, nodeDefCol, nodeCol = {}) => {
   return Object.values(valuesByColumnName)
 }
 
-const getValue = R.pipe(getValues, R.head)
+const getValue = A.pipe(getValues, A.head)
 
 export const TableDataNodeDefColUtils = {
   getValue,

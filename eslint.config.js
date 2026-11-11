@@ -9,31 +9,26 @@ import parserTypeScript from '@typescript-eslint/parser'
 
 // Testing Plugins
 import pluginJest from 'eslint-plugin-jest'
-import pluginPlaywright from 'eslint-plugin-playwright' // Used for Jest-Playwright E2E tests
+import pluginPlaywright from 'eslint-plugin-playwright' // Used for Playwright Test E2E tests
 
-// Formatting/Parser Plugins
-import babelParser from '@babel/eslint-parser'
+// Formatting Plugins
 import configPrettier from 'eslint-config-prettier'
 import pluginPrettier from 'eslint-plugin-prettier'
 
 export default [
   // --- CORE CONFIGURATION (APPLIES TO ALL JS/JSX) ---
 
-  // 1. Basic JavaScript Configuration & Parser Setup (using Babel)
+  // 1. Basic JavaScript Configuration
   {
     ...pluginJs.configs.recommended,
     files: ['**/*.js', '**/*.jsx'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
-      // Use Babel as the custom parser
-      parser: babelParser,
       parserOptions: {
-        requireConfigFile: false,
-        babelOptions: {
-          presets: ['@babel/preset-react', '@babel/preset-env'],
+        ecmaFeatures: {
+          jsx: true,
         },
-        jsx: true,
       },
       globals: {
         ...globals.browser, // Standard React (browser) globals
@@ -57,6 +52,8 @@ export default [
         ecmaFeatures: {
           jsx: true,
         },
+        // automatic JSX runtime: JSX does not use React, so an unused `import React` is reported
+        jsxPragma: null,
       },
       globals: {
         ...globals.browser,
@@ -84,7 +81,8 @@ export default [
       'react-hooks': pluginReactHooks,
     },
     settings: {
-      react: { version: 'detect' },
+      // shortcut: 'detect' crashes on ESLint 10, restore it when eslint-plugin-react supports ESLint 10
+      react: { version: '19.3' },
     },
     rules: {
       // Recommended React rules
@@ -119,6 +117,8 @@ export default [
   {
     // Apply this to files matching Jest naming convention
     files: ['test/**/*.js', 'test/**/*.ts', '**/*.test.js', '**/*.spec.js', '**/*.test.ts', '**/*.spec.ts'],
+    // e2e tests run with Playwright Test (see below)
+    ignores: ['test/e2e/**'],
     plugins: {
       jest: pluginJest,
     },
@@ -137,19 +137,16 @@ export default [
     },
   },
 
-  // 6. Jest-Playwright (E2E Tests) Configuration
+  // 6. Playwright Test (E2E Tests) Configuration
   {
-    // Apply this to files matching Playwright test naming convention (often different than Jest unit tests)
-    files: ['test/e2e/**/*.js', 'test/e2e/**/*.jsx', 'test/e2e/**/*.ts', 'test/e2e/**/*.tsx'],
-    plugins: {
-      playwright: pluginPlaywright,
-    },
+    ...pluginPlaywright.configs['flat/recommended'],
+    files: ['test/e2e/**/*.ts'],
     rules: {
-      // Use the recommended Playwright rules
-      ...pluginPlaywright.configs['playwright-test'].rules,
-      // Playwright-specific rules (e.g., forcing async/await usage on Playwright methods)
-      // 'playwright/prefer-web-first-assertions': 'error',
-      // 'playwright/await-expect': 'error',
+      ...pluginPlaywright.configs['flat/recommended'].rules,
+      // Playwright fixtures receive a `use` callback that is not a React hook
+      'react-hooks/rules-of-hooks': 'off',
+      // helpers performing assertions
+      'playwright/expect-expect': ['warn', { assertFunctionNames: ['expectReportMessages', 'publishSurvey'] }],
     },
   },
 

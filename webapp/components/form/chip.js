@@ -17,7 +17,7 @@ const Chip = (props) => {
 
 Chip.propTypes = {
   className: PropTypes.string,
-  label: PropTypes.string.isRequired,
+  label: PropTypes.node.isRequired,
   readOnly: PropTypes.bool,
   onDelete: PropTypes.func,
   variant: PropTypes.oneOf(['filled', 'outlined']),

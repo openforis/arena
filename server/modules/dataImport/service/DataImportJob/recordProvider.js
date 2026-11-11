@@ -11,6 +11,8 @@ import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 
+import { DataImportRecordPermissions } from './dataImportRecordPermissions'
+
 const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
   const emptyRootKeyValueIndex = rootKeyValuesFormatted.findIndex(Objects.isEmpty)
   if (emptyRootKeyValueIndex >= 0) {
@@ -18,6 +20,100 @@ const checkRootKeysSpecified = ({ rootKeyDefs, rootKeyValuesFormatted }) => {
     throw new SystemError(Validation.messageKeys.dataImport.recordKeyMissingOrInvalid, { keyName })
   }
 }
+
+/**
+ * Throws an error if the user running the import cannot update the specified existing record.
+ * @param {!object} params - The function parameters.
+ * @param {!object} params.context - The import job context.
+ * @param {!object} params.record - The record (with nodes) to update.
+ * @param {!string} params.keyValues - The record key values (formatted), used in the error message.
+ * @returns {void}
+ */
+const checkCanUpdateRecord = ({ context, record, keyValues }) => {
+  const { survey, updateRecordsInAnalysis, user, userQualifierFilters } = context
+  if (
+    !DataImportRecordPermissions.canUpdateRecord({
+      user,
+      survey,
+      record,
+      updateRecordsInAnalysis,
+      userQualifierFilters,
+    })
+  ) {
+    throw new SystemError(Validation.messageKeys.dataImport.recordNotEditable, { keyValues })
+  }
+}
+
+const getRecordSummaryKey = ({ survey, rootKeyDefs, record }) =>
+  NodeValues.getFastEqualityCompositeKey({
+    nodeDefs: rootKeyDefs,
+    getKey: (rootKeyDef) =>
+      NodeValues.getFastEqualityKeyWithoutRecordContext({
+        survey,
+        nodeDef: rootKeyDef,
+        value: record[A.camelize(NodeDef.getName(rootKeyDef))],
+      }),
+  })
+
+/**
+ * Builds a Map index of recordsSummary bucketed by root key values, so that a matching record can be
+ * looked up in O(1) instead of scanning the whole array for every imported row (recordsSummary can hold
+ * every existing record in the survey, and this lookup otherwise runs once per imported row).
+ * Returns null when at least one root key def's type isn't supported by
+ * NodeValues.getFastEqualityKeyWithoutRecordContext: callers should fall back to a full scan in that case,
+ * matching the pre-existing behavior exactly (see fetchOrCreateRecord below).
+ * @param {!object} params - The function parameters.
+ * @param {!object} params.survey - The survey object.
+ * @param {!Array<object>} params.rootKeyDefs - The root entity key node defs.
+ * @param {!Array<object>} params.recordsSummary - The records summary list to index.
+ * @returns {Map<string, Array<object>>|null} - The index, or null if it cannot be built safely.
+ */
+const buildRecordsSummaryIndex = ({ survey, rootKeyDefs, recordsSummary }) => {
+  if (!rootKeyDefs.every((rootKeyDef) => NodeValues.isTypeFastIndexable(NodeDef.getType(rootKeyDef)))) {
+    return null
+  }
+  const index = new Map()
+  recordsSummary.forEach((record) => {
+    const { key: bucketKey } = getRecordSummaryKey({ survey, rootKeyDefs, record })
+    if (bucketKey === null) return // record has an empty root key value: never matches, skip indexing it
+    const bucket = index.get(bucketKey)
+    if (bucket) {
+      bucket.push(record)
+    } else {
+      index.set(bucketKey, [record])
+    }
+  })
+  return index
+}
+
+const findRecordSummariesMatchingKeysByIndex = ({ survey, rootKeyDefs, valuesByDefUuid, index }) => {
+  const { key: bucketKey } = NodeValues.getFastEqualityCompositeKey({
+    nodeDefs: rootKeyDefs,
+    getKey: (rootKeyDef) =>
+      NodeValues.getFastEqualityKeyWithoutRecordContext({
+        survey,
+        nodeDef: rootKeyDef,
+        value: valuesByDefUuid[NodeDef.getUuid(rootKeyDef)],
+      }),
+  })
+  if (bucketKey === null) return [] // empty value in the row: never matches, same as the full-scan comparator
+  return index.get(bucketKey) ?? []
+}
+
+const findRecordSummariesMatchingKeysByScan = ({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary }) =>
+  recordsSummary.filter((record) =>
+    rootKeyDefs.every((rootKeyDef) => {
+      const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
+      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
+
+      return NodeValues.isValueEqual({
+        survey,
+        nodeDef: rootKeyDef,
+        value: keyValueInRecord,
+        valueSearch: keyValueInRow,
+      })
+    })
+  )
 
 const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback, currentRecord = null }) => {
   const { cycle, dryRun, insertNewRecords, recordsSummary, survey, surveyId, updateRecordsInAnalysis, user } = context
@@ -35,19 +131,21 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
 
   checkRootKeysSpecified({ rootKeyDefs, rootKeyValuesFormatted })
 
-  const recordSummariesMatchingKeys = recordsSummary.filter((record) =>
-    rootKeyDefs.every((rootKeyDef) => {
-      const keyValueInRecord = record[A.camelize(NodeDef.getName(rootKeyDef))]
-      const keyValueInRow = valuesByDefUuid[NodeDef.getUuid(rootKeyDef)]
-
-      return NodeValues.isValueEqual({
-        survey,
-        nodeDef: rootKeyDef,
-        value: keyValueInRecord,
-        valueSearch: keyValueInRow,
-      })
+  if (context.recordsSummaryIndex === undefined) {
+    // built lazily on first row and cached on the (per-job, mutable) context for subsequent rows;
+    // not enumerable so it doesn't leak into job context logging/serialization
+    Object.defineProperty(context, 'recordsSummaryIndex', {
+      value: buildRecordsSummaryIndex({ survey, rootKeyDefs, recordsSummary }),
+      enumerable: false,
+      writable: true,
     })
-  )
+  }
+  const { recordsSummaryIndex } = context
+
+  const recordSummariesMatchingKeys = recordsSummaryIndex
+    ? findRecordSummariesMatchingKeysByIndex({ survey, rootKeyDefs, valuesByDefUuid, index: recordsSummaryIndex })
+    : findRecordSummariesMatchingKeysByScan({ survey, rootKeyDefs, valuesByDefUuid, recordsSummary })
+
   const keyNameValuePairs = rootKeyDefs
     .map((keyDef, index) => {
       const name = NodeDef.getName(keyDef)
@@ -106,6 +204,8 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
     // fetch record
     await flushCallback() // flush before fetching a record: nodes could have been inserted/updated/deleted before
     const record = await RecordManager.fetchRecordAndNodesByUuid({ surveyId, recordUuid, user }, tx)
+
+    checkCanUpdateRecord({ context, record, keyValues: keyNameValuePairs })
 
     return {
       newRecord: false,

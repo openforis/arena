@@ -1,7 +1,8 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { NodeDefExpressionValidator } from '@openforis/arena-core'
 
+import { isHexColor } from '@core/colorUtils'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
@@ -40,7 +41,7 @@ const validateTaxonomy = async (propName, nodeDef) =>
 const validateChildren = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const children = Survey.getNodeDefChildren({ nodeDef, includeAnalysis: NodeDef.isAnalysis(nodeDef) })(survey)
-    if (R.isEmpty(children)) {
+    if (A.isEmpty(children)) {
       return { key: Validation.messageKeys.nodeDefEdit.childrenEmpty }
     }
   }
@@ -49,20 +50,17 @@ const validateChildren = (survey) => (propName, nodeDef) => {
 }
 
 const countKeyAttributes = (survey, nodeDefEntity) =>
-  R.pipe(
+  A.pipe(
     Survey.getNodeDefChildren({ nodeDef: nodeDefEntity, includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) }),
-    R.filter(NodeDef.isKey),
-    R.length
+    A.filter(NodeDef.isKey),
+    A.length
   )(survey)
 
 const validateKeyAttributes = (survey) => (propName, nodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
-    if (
-      keyAttributesCount === 0 &&
-      (NodeDef.isRoot(nodeDef) || (NodeDefLayout.isRenderForm(nodeDef) && NodeDef.isMultiple(nodeDef)))
-    ) {
+    if (keyAttributesCount === 0 && (NodeDef.isRoot(nodeDef) || NodeDef.isMultiple(nodeDef))) {
       return { key: Validation.messageKeys.nodeDefEdit.keysEmpty }
     }
 
@@ -90,10 +88,10 @@ const validateReadOnly = (propName, nodeDef) => {
   if (!NodeDef.isReadOnly(nodeDef)) {
     return null
   }
-  if (R.isEmpty(NodeDef.getDefaultValues(nodeDef))) {
+  if (A.isEmpty(NodeDef.getDefaultValues(nodeDef))) {
     return { key: Validation.messageKeys.nodeDefEdit.defaultValuesNotSpecified }
   }
-  if (!R.isEmpty(NodeDef.getEditableIf(nodeDef))) {
+  if (!A.isEmpty(NodeDef.getEditableIf(nodeDef))) {
     return { key: Validation.messageKeys.nodeDefEdit.readOnlyCannotHaveEditableIf }
   }
   return null
@@ -103,14 +101,14 @@ const validateReadOnly = (propName, nodeDef) => {
 // then only survey admins may correct it, see canEditQualifierAttributeValue in authorizer.ts), so
 // designer-configured applicable/editability rules for it are meaningless and must be cleared
 const validateQualifierApplicable = (_propName, nodeDef) => {
-  if (NodeDef.isQualifier(nodeDef) && !R.isEmpty(NodeDef.getApplicable(nodeDef))) {
+  if (NodeDef.isQualifier(nodeDef) && !A.isEmpty(NodeDef.getApplicable(nodeDef))) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveApplicableExpression }
   }
   return null
 }
 
 const validateQualifierEditableIf = (_propName, nodeDef) => {
-  if (NodeDef.isQualifier(nodeDef) && (NodeDef.isReadOnly(nodeDef) || !R.isEmpty(NodeDef.getEditableIf(nodeDef)))) {
+  if (NodeDef.isQualifier(nodeDef) && (NodeDef.isReadOnly(nodeDef) || !A.isEmpty(NodeDef.getEditableIf(nodeDef)))) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveEditabilityRule }
   }
   return null
@@ -133,7 +131,7 @@ const validateQualifierValidations = (_propName, nodeDef) => {
 }
 
 const validateParentEntityUuid = (_propName, nodeDef) => {
-  if (NodeDef.isAnalysis(nodeDef) && R.isNil(NodeDef.getParentUuid(nodeDef))) {
+  if (NodeDef.isAnalysis(nodeDef) && A.isNil(NodeDef.getParentUuid(nodeDef))) {
     const errorKey = NodeDef.isVirtual(nodeDef)
       ? Validation.messageKeys.nodeDefEdit.entitySourceRequired
       : Validation.messageKeys.nodeDefEdit.analysisParentEntityRequired
@@ -143,13 +141,13 @@ const validateParentEntityUuid = (_propName, nodeDef) => {
 }
 
 const validateVirtualEntityFormula = async (survey, nodeDef) =>
-  NodeDef.isVirtual(nodeDef) && !R.isEmpty(NodeDef.getFormula(nodeDef))
+  NodeDef.isVirtual(nodeDef) && !A.isEmpty(NodeDef.getFormula(nodeDef))
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
 const validateItemsFilterExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getItemsFilter(nodeDef)
-  if (R.isEmpty(expression)) return null
+  if (A.isEmpty(expression)) return null
 
   const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
@@ -164,7 +162,23 @@ const validateItemsFilterExpression = async (survey, nodeDef) => {
 
 const validateFileNameExpression = async (survey, nodeDef) => {
   const expression = NodeDef.getFileNameExpression(nodeDef)
-  if (R.isEmpty(expression)) return null
+  if (A.isEmpty(expression)) return null
+
+  const { validationResult } = await nodeDefExpressionValidator.validate({
+    survey,
+    nodeDefCurrent: nodeDef,
+    expression,
+    isContextParent: true,
+    selfReferenceAllowed: false,
+  })
+  return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
+}
+
+const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
+  if (!NodeDef.isEntity(nodeDef) || !NodeDef.isEnumerate(nodeDef)) return null
+
+  const expression = NodeDef.getEnumeratingItemsExpression(nodeDef)
+  if (A.isEmpty(expression)) return null
 
   const { validationResult } = await nodeDefExpressionValidator.validate({
     survey,
@@ -212,6 +226,13 @@ const validateMaxFileSize = (_propName, nodeDef) => {
   return null
 }
 
+// the color goes into the map layers control HTML and marker styles
+const validateMapMarkerColor = (_propName, nodeDef) => {
+  const color = NodeDef.getMapMarkerColor(nodeDef)
+  if (A.isEmpty(color) || isHexColor(color)) return null
+  return { key: Validation.messageKeys.nodeDefEdit.mapMarkerColorInvalid }
+}
+
 const validateNameIsNotKeyword = (propName, nodeDef) => {
   if (NodeDef.isSampling(nodeDef)) return null
   return Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword)(propName, nodeDef)
@@ -242,6 +263,8 @@ const propsValidations = (survey) => ({
   ],
   // Code
   [`${keys.props}.${propKeys.categoryUuid}`]: [validateCategory],
+  // Coordinate
+  [`${keys.props}.${propKeys.mapMarkerColor}`]: [validateMapMarkerColor],
   // File
   [`${keys.props}.${propKeys.maxFileSize}`]: [validateMaxFileSize],
   // Taxon
@@ -264,14 +287,15 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     [keysPropsAdvanced.formula]: validateVirtualEntityFormula(survey, nodeDef),
     [keysPropsAdvanced.itemsFilter]: validateItemsFilterExpression(survey, nodeDef),
     [keysPropsAdvanced.fileNameExpression]: validateFileNameExpression(survey, nodeDef),
+    [keysPropsAdvanced.enumeratingItemsExpression]: validateEnumeratingItemsExpression(survey, nodeDef),
   }
   const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
   const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {
     acc[prop] = validationResultsArray[index]
     return acc
   }, {})
-  const valid = R.all(Validation.isValid, validationResultsArray)
-  const notValidValidationsByProp = R.reject(Validation.isValid, validationResultsByProp)
+  const valid = A.all(Validation.isValid, validationResultsArray)
+  const notValidValidationsByProp = A.reject(Validation.isValid, validationResultsByProp)
 
   return Validation.newInstance(valid, notValidValidationsByProp)
 }
@@ -284,7 +308,7 @@ export const validateNodeDef = async (survey, nodeDef) => {
   const valid = Validation.isValid(nodeDefValidation) && Validation.isValid(advancedPropsValidation)
   if (valid) return null
 
-  return R.pipe(R.mergeDeepLeft(advancedPropsValidation), Validation.setValid(valid))(nodeDefValidation)
+  return A.pipe(A.mergeDeepLeft(advancedPropsValidation), Validation.setValid(valid))(nodeDefValidation)
 }
 
 export const validateNodeDefs = async (survey) => {
@@ -292,7 +316,7 @@ export const validateNodeDefs = async (survey) => {
 
   const nodeDefsValidation = []
   for (const nodeDef of Object.values(nodeDefs)) {
-    nodeDefsValidation.push(await validateNodeDef(survey, nodeDef))
+    nodeDefsValidation.push(await validateNodeDef(survey, nodeDef)) // NOSONAR
   }
 
   // exclude valid node def validations
@@ -304,7 +328,7 @@ export const validateNodeDefs = async (survey) => {
     }
   }, {})
 
-  return Validation.newInstance(R.isEmpty(fieldsValidation), fieldsValidation)
+  return Validation.newInstance(A.isEmpty(fieldsValidation), fieldsValidation)
 }
 
 // ===== CHECK
@@ -316,11 +340,11 @@ export const isValidationValidOrHasOnlyMissingChildrenErrors = (nodeDef, validat
 
   if (NodeDef.isEntity(nodeDef)) {
     // Empty new entity (only missing children or key attributes errors)
-    const hasOnlyChildrenOrKeyAttributesErrors = R.pipe(
+    const hasOnlyChildrenOrKeyAttributesErrors = A.pipe(
       Validation.getFieldValidations,
-      R.keys,
-      R.without([keysValidationFields.children, keysValidationFields.keyAttributes]),
-      R.isEmpty
+      A.keys,
+      A.without([keysValidationFields.children, keysValidationFields.keyAttributes]),
+      A.isEmpty
     )(validation)
 
     if (hasOnlyChildrenOrKeyAttributesErrors) {

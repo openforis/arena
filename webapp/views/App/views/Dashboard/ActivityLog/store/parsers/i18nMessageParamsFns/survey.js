@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -14,7 +14,7 @@ export default {
 
   [ActivityLog.type.nodeDefCreate]: (survey) => (activityLog) => {
     const nodeDef = ActivityLogMessageParserUtils.getNodeDef(survey)(activityLog)
-    const nodeDefParent = R.pipe(ActivityLog.getContentParentUuid, (nodeDefUuid) =>
+    const nodeDefParent = A.pipe(ActivityLog.getContentParentUuid, (nodeDefUuid) =>
       Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     )(activityLog)
 

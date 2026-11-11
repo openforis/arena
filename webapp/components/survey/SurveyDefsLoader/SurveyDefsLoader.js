@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from 'react'
+import { useCallback, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { useNavigate } from 'react-router'
 import PropTypes from 'prop-types'
@@ -73,7 +73,7 @@ const SurveyDefsLoader = (props) => {
   if (
     !requirePublish ||
     Survey.isPublished(surveyInfo) ||
-    (Survey.isFromCollect(surveyInfo) && Survey.isRdbInitialized(surveyInfo))
+    ((Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && Survey.isRdbInitialized(surveyInfo))
   ) {
     return children
   }

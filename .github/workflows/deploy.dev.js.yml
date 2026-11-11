@@ -8,36 +8,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    env:
-      NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0 # fetch all tags, default 1
+          persist-credentials: false # this job never pushes back to git, so don't leave a token in .git/config
 
-      - name: Use Node.js
-        uses: actions/setup-node@v5
+      - uses: ./.github/actions/deploy-heroku
         with:
-          node-version: '24.11.1'
-          cache: 'yarn'
-
-      - name: Install Dependencies
-        run: yarn install --immutable
-
-      - name: Get the version
-        id: app_version
-        run: echo ::set-output name=APP_VERSION::$(git describe --always --tags)
-
-      - run: echo ${{ steps.app_version.outputs.APP_VERSION }}
-
-      - name: Install Heroku CLI
-        run: curl https://cli-assets.heroku.com/install.sh | sh
-
-      - name: Deploy to Heroku (dev)
-        uses: akhileshns/heroku-deploy@v3.13.15
-        with:
-          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: ${{secrets.HEROKU_APP_NAME_DEVELOPMENT}}
-          heroku_email: ${{secrets.HEROKU_EMAIL}}
-        env:
-          HD_APP_VERSION: ${{ steps.app_version.outputs.APP_VERSION }}
+          heroku_api_key: ${{ secrets.HEROKU_API_KEY }}
+          heroku_app_name: ${{ secrets.HEROKU_APP_NAME_DEVELOPMENT }}
+          heroku_email: ${{ secrets.HEROKU_EMAIL }}

@@ -91,7 +91,7 @@ export const UserGroupQualifiersEditor = (props: Props): React.ReactElement => {
   const onRemove = (index: number) => emitChange(ArrayUtils.removeItemAtIndex<QualifierUi>({ index })(qualifiersUi))
 
   return (
-    <Fieldset className="user-group-qualifiers-editor" legend="usersView:userGroup.qualifier_plural">
+    <Fieldset className="user-group-qualifiers-editor" legend="usersView:userGroup.qualifier_other">
       {qualifiersUi.map((qualifier, index) => (
         <FormItem key={qualifier.uuid} label="usersView:userGroup.qualifier" labelParams={{ index: index + 1 }}>
           <Input

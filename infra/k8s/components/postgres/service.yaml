@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: arena-db
+  labels:
+    app.kubernetes.io/name: arena-db
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: arena-db
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres

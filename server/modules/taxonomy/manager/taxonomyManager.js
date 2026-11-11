@@ -1,15 +1,19 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { languageCodesISO639part2 } from '@core/app/languages'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as Validator from '@core/validation/validator'
 import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import { db } from '@server/db/db'
+import * as DbUtils from '@server/db/dbUtils'
 
 import {
   publishSurveySchemaTableProps,
@@ -20,6 +24,43 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
+
+// vernacular language codes and extra prop names are used as export column names and in expressions:
+// check them before saving
+
+/**
+ * Throws a bad request error if the prop value contains vernacular language codes not in the ISO 639-2 list
+ * or invalid names (taxonomy name or extra prop names).
+ * @param {!string} key - The key of the taxonomy prop.
+ * @param {unknown} value - The value of the taxonomy prop.
+ * @returns {void}
+ */
+export const checkTaxonomyProp = (key, value) => {
+  if (key === Taxonomy.keysProps.vernacularLanguageCodes) {
+    const langsInvalid = [value ?? []]
+      .flat()
+      .filter((lang) => !languageCodesISO639part2.includes(lang))
+      .map((lang) => (typeof lang === 'string' ? lang : JSON.stringify(lang)))
+    if (langsInvalid.length > 0) {
+      throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
+    }
+  } else if (key === Taxonomy.keysProps.name) {
+    Validator.checkNamesAreValid([value])
+  } else if (key === Taxonomy.keysProps.extraPropsDefs) {
+    Validator.checkNamesAreValid(Object.keys(value ?? {}))
+  }
+}
+
+/**
+ * Throws a bad request error if the taxonomy has invalid vernacular language codes or extra prop names.
+ * @param {!object} taxonomy - The taxonomy to check.
+ * @returns {void}
+ */
+export const checkTaxonomy = (taxonomy) => {
+  for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(taxonomy)) {
+    checkTaxonomyProp(key, value)
+  }
+}
 
 /**.
  * ====== CREATE
@@ -36,29 +77,32 @@ import * as TaxonomyValidator from '../taxonomyValidator'
 export const insertTaxonomy = async (
   { user, surveyId, taxonomy, addLogs = true, system = false, backup = false },
   client = db
-) =>
-  client.tx(async (t) => {
-    const [taxonomyInserted] = await Promise.all([
-      TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy, backup }, t),
+) => {
+  checkTaxonomy(taxonomy)
+  return client.tx(async (t) => {
+    const [taxonomyInserted] = await DbUtils.runQueries(t, [
+      () => TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy, backup }, t),
       ...(addLogs
-        ? [ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)]
+        ? [() => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyCreate, taxonomy, system, t)]
         : []),
     ])
     return validateTaxonomy(surveyId, [], taxonomyInserted, true, t)
   })
+}
 
 export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup = false, client = db }) =>
   client.tx(async (t) =>
-    Promise.all([
-      TaxonomyRepository.insertTaxa({ surveyId, taxa, backup, client: t }),
+    DbUtils.runQueries(t, [
+      () => TaxonomyRepository.insertTaxa({ surveyId, taxa, backup, client: t }),
       ...(addLogs
         ? [
-            ActivityLogRepository.insertMany(
-              user,
-              surveyId,
-              taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
-              t
-            ),
+            () =>
+              ActivityLogRepository.insertMany(
+                user,
+                surveyId,
+                taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonInsert, taxon, true)),
+                t
+              ),
           ]
         : []),
     ])
@@ -115,9 +159,9 @@ export const cloneTaxonomyFromSurvey = async (
       [ActivityLog.keysContent.uuid]: sourceTaxonomyUuid,
       [ActivityLog.keysContent.taxonomyName]: taxonomyName,
     }
-    await Promise.all([
-      markSurveyDraft(targetSurveyId, t),
-      ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.taxonomyCreate, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(targetSurveyId, t),
+      () => ActivityLogRepository.insert(user, targetSurveyId, ActivityLog.type.taxonomyCreate, logContent, false, t),
     ])
 
     const taxonomyCloned = await TaxonomyRepository.fetchTaxonomyByUuid(targetSurveyId, sourceTaxonomyUuid, true, t)
@@ -147,7 +191,10 @@ export const fetchTaxonomiesBySurveyId = async (
   )
 
   return validate
-    ? Promise.all(taxonomies.map(async (taxonomy) => validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client)))
+    ? DbUtils.runQueries(
+        client,
+        taxonomies.map((taxonomy) => async () => validateTaxonomy(surveyId, taxonomies, taxonomy, draft, client))
+      )
     : taxonomies
 }
 
@@ -182,7 +229,7 @@ const associateSingleVernacularNamesToTaxa = async ({ surveyId, taxonomyUuid, ta
   const result = []
   for (const taxon of taxa) {
     const taxonUuid = Taxon.getUuid(taxon)
-    const taxaWithVernacularNames = await TaxonomyRepository.fetchTaxaWithVernacularNamesByTaxonUuid(
+    const taxaWithVernacularNames = /* NOSONAR */ await TaxonomyRepository.fetchTaxaWithVernacularNamesByTaxonUuid(
       { surveyId, taxonomyUuid, taxonUuid, draft },
       client
     )
@@ -207,9 +254,9 @@ const prepareTaxaAsResult = async ({
     }
     return taxa
   }
-  return Promise.all([
-    TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft, client),
-    TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, draft, client),
+  return DbUtils.runQueries(client, [
+    () => TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unknownCode, draft, client),
+    () => TaxonomyRepository.fetchTaxonByCode(surveyId, taxonomyUuid, Taxon.unlistedCode, draft, client),
   ])
 }
 
@@ -308,55 +355,65 @@ const allTaxonomyRelatedTables = ['taxonomy', 'taxon', 'taxon_vernacular_name']
 
 export const publishTaxonomiesProps = async (surveyId, client = db) =>
   client.tx(async (t) =>
-    Promise.all(allTaxonomyRelatedTables.map((table) => publishSurveySchemaTableProps(surveyId, table, t)))
+    DbUtils.runQueries(
+      t,
+      allTaxonomyRelatedTables.map((table) => () => publishSurveySchemaTableProps(surveyId, table, t))
+    )
   )
 
 export const unpublishTaxonomiesProps = async (surveyId, client = db) =>
   client.tx(async (t) =>
-    Promise.all(allTaxonomyRelatedTables.map((table) => unpublishSurveySchemaTableProps(surveyId, table, t)))
+    DbUtils.runQueries(
+      t,
+      allTaxonomyRelatedTables.map((table) => () => unpublishSurveySchemaTableProps(surveyId, table, t))
+    )
   )
 
-export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
-  client.tx(
+export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) => {
+  checkTaxonomyProp(key, value)
+  return client.tx(
     async (t) =>
       (
-        await Promise.all([
-          TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
-          markSurveyDraft(surveyId, t),
-          ActivityLogRepository.insert(
-            user,
-            surveyId,
-            ActivityLog.type.taxonomyPropUpdate,
-            {
-              [ActivityLog.keysContent.uuid]: taxonomyUuid,
-              [ActivityLog.keysContent.key]: key,
-              [ActivityLog.keysContent.value]: value,
-            },
-            system,
-            t
-          ),
+        await DbUtils.runQueries(t, [
+          () => TaxonomyRepository.updateTaxonomyProp(surveyId, taxonomyUuid, key, value, t),
+          () => markSurveyDraft(surveyId, t),
+          () =>
+            ActivityLogRepository.insert(
+              user,
+              surveyId,
+              ActivityLog.type.taxonomyPropUpdate,
+              {
+                [ActivityLog.keysContent.uuid]: taxonomyUuid,
+                [ActivityLog.keysContent.key]: key,
+                [ActivityLog.keysContent.value]: value,
+              },
+              system,
+              t
+            ),
         ])
       )[0]
   )
+}
 
 export const updateTaxonAndVernacularNames = async (user, surveyId, taxon, client = db) =>
   client.tx(async (t) =>
-    Promise.all([
-      TaxonomyRepository.updateTaxonAndVernacularNames(surveyId, taxon, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonUpdate, taxon, true, t),
+    DbUtils.runQueries(t, [
+      () => TaxonomyRepository.updateTaxonAndVernacularNames(surveyId, taxon, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonUpdate, taxon, true, t),
     ])
   )
 
 export const updateTaxa = async (user, surveyId, taxa, client = db) =>
   client.tx(async (t) =>
-    Promise.all([
-      TaxonomyRepository.updateTaxa(surveyId, taxa, t),
-      ActivityLogRepository.insertMany(
-        user,
-        surveyId,
-        taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonUpdate, taxon, true)),
-        t
-      ),
+    DbUtils.runQueries(t, [
+      () => TaxonomyRepository.updateTaxa(surveyId, taxa, t),
+      () =>
+        ActivityLogRepository.insertMany(
+          user,
+          surveyId,
+          taxa.map((taxon) => ActivityLog.newActivity(ActivityLog.type.taxonUpdate, taxon, true)),
+          t
+        ),
     ])
   )
 
@@ -366,7 +423,7 @@ const _updateTaxaExtraDefProp = async ({ surveyId, taxonomyUuid, propName, extra
 
   const taxaUpdated = []
   taxa.forEach((taxon) => {
-    if (R.isNil(Taxon.getExtraProp(propName)(taxon))) return
+    if (A.isNil(Taxon.getExtraProp(propName)(taxon))) return
 
     const taxonUpdated = deleted
       ? Taxon.dissocExtraProp(propName)(taxon)
@@ -426,22 +483,23 @@ export const deleteTaxonomy = async ({ user, surveyId, taxonomyUuid, onlyIfEmpty
       [ActivityLog.keysContent.uuid]: taxonomyUuid,
       [ActivityLog.keysContent.taxonomyName]: Taxonomy.getName(taxonomy),
     }
-    await Promise.all([
-      markSurveyDraft(surveyId, t),
-      ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyDelete, logContent, false, t),
+    await DbUtils.runQueries(t, [
+      () => markSurveyDraft(surveyId, t),
+      () => ActivityLogRepository.insert(user, surveyId, ActivityLog.type.taxonomyDelete, logContent, false, t),
     ])
     return true
   })
 
 export const deleteDraftTaxaByTaxonomyUuid = async (user, surveyId, taxonomyUuid, t) =>
-  Promise.all([
-    TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
-    ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.taxonomyTaxaDelete,
-      { [ActivityLog.keysContent.uuid]: taxonomyUuid },
-      true,
-      t
-    ),
+  DbUtils.runQueries(t, [
+    () => TaxonomyRepository.deleteDraftTaxaByTaxonomyUuid(surveyId, taxonomyUuid, t),
+    () =>
+      ActivityLogRepository.insert(
+        user,
+        surveyId,
+        ActivityLog.type.taxonomyTaxaDelete,
+        { [ActivityLog.keysContent.uuid]: taxonomyUuid },
+        true,
+        t
+      ),
   ])

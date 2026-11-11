@@ -1,7 +1,7 @@
 import * as A from '@core/arena'
 import { Query } from '../../../../common/model/query'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as User from '@core/user/user'
@@ -21,16 +21,42 @@ import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 
 const Logger = Log.getLogger('SurveyRdbService')
 
-const _fetchSurvey = async ({ surveyId, cycle }) => {
-  const draft = true // always load draft node defs (needed for custom aggregate functions)
-  return SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
-    surveyId,
-    cycle,
-    draft,
-    advanced: true,
-    includeBigCategories: false,
-    includeBigTaxonomies: false,
-  })
+// promises of the surveys being fetched, indexed by fetch parameters;
+// concurrent requests (e.g. data explorer data and count requests coming from many users at the same time)
+// share the same fetch instead of loading the same survey from the DB multiple times
+const surveyFetchPromisesByKey = new Map()
+
+const _doFetchSurvey = async ({ surveyId, cycle, includeRefData, draft }) => {
+  const params = { surveyId, cycle, draft, advanced: true }
+  return includeRefData
+    ? SurveyManager.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
+        ...params,
+        includeBigCategories: false,
+        includeBigTaxonomies: false,
+      })
+    : SurveyManager.fetchSurveyAndNodeDefsBySurveyId(params)
+}
+
+/**
+ * Fetches the survey used to run queries on the data views.
+ * Concurrent calls with the same parameters share the same (in-progress) fetch.
+ * @param {!object} params - The fetch parameters.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {string} [params.cycle] - The survey cycle.
+ * @param {boolean} [params.includeRefData] - Whether to include categories and taxonomies reference data (needed only when exporting data).
+ * @param {boolean} [params.draft] - Whether to load draft node defs (needed for custom aggregate functions).
+ * @returns {Promise<object>} - The fetched survey.
+ */
+const _fetchSurvey = async ({ surveyId, cycle, includeRefData = false, draft = true }) => {
+  const key = `${surveyId}_${cycle}_${includeRefData}_${draft}`
+  let fetchPromise = surveyFetchPromisesByKey.get(key)
+  if (!fetchPromise) {
+    fetchPromise = _doFetchSurvey({ surveyId, cycle, includeRefData, draft }).finally(() => {
+      surveyFetchPromisesByKey.delete(key)
+    })
+    surveyFetchPromisesByKey.set(key, fetchPromise)
+  }
+  return fetchPromise
 }
 
 const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
@@ -41,14 +67,48 @@ const _getRecordOwnerUuidForQuery = ({ user, survey }) => {
 }
 
 /**
- * Executes a select query on an entity definition data view.
+ * Determines the qualifier filters of the user's group and of the groups it can read (see SurveyManager.fetchUserGroupAccessFilters).
+ * @param {!object} params - The parameters.
+ * @param {object} [params.user] - The user running the query.
+ * @param {!object} params.survey - The survey used to run the query.
+ * @param {string} [params.cycle] - The survey cycle.
+ * @returns {Promise<{own: Array, readable: Array}>} - The access filters (`own` is empty when the user is not restricted).
+ */
+const _fetchUserGroupAccessFilters = async ({ user, survey, cycle }) => {
+  if (!user) return { own: [], readable: [] }
+  const surveyInfo = Survey.getSurveyInfo(survey)
+  // same node defs used to generate the data views and to filter the records list (draft only if not published yet)
+  const draft = (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
+  const surveyForAccessFilters = await _fetchSurvey({ surveyId: Survey.getId(survey), cycle, draft })
+  return SurveyManager.fetchUserGroupAccessFilters({ user, survey: surveyForAccessFilters })
+}
+
+// export options that can be specified by the client: the other query parameters are determined server-side
+const exportOptionKeys = [
+  'fileFormat',
+  'includeCategoryItemsLabels',
+  'expandCategoryItems',
+  'includeInternalUuids',
+  'includeDateCreated',
+  'includeFileAttributeDefs',
+  'nullsToEmpty',
+]
+
+const _pickExportOptions = (options) =>
+  options && typeof options === 'object' ? A.pick(exportOptionKeys, options) : {}
+
+/**
+ * Executes a select query on an entity definition data view, only on the records readable by the user.
  * @param {!object} params - The query parameters.
+ * @param {object} [params.user] - The user running the query.
  * @param {!string} [params.surveyId] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query to execute.
  * @param {number} [params.offset] - The query offset.
  * @param {number} [params.limit] - The query limit.
+ * @param {boolean} [params.randomize] - Whether to return a random sample of rows (up to limit) always including outliers (used by the scatter chart). Applied only in raw mode.
  * @param {Stream.Writable} [params.outputStream] - The output to be used to stream the data (if specified).
+ * @param {object} [params.options] - The export options (only the ones in exportOptionKeys are considered).
  * @returns {Promise<any[]>} - An object with fetched rows and selected fields.
  */
 export const fetchViewData = async (params) => {
@@ -59,6 +119,7 @@ export const fetchViewData = async (params) => {
     query,
     offset = 0,
     limit = null,
+    randomize = false,
     columnNodeDefs = false,
     outputStream = null,
     addCycle = false,
@@ -69,8 +130,12 @@ export const fetchViewData = async (params) => {
   if (typeof query === 'string') {
     parsedQuery = A.parse(query)
   }
-  const survey = await _fetchSurvey({ surveyId, cycle })
+  // reference data (category items, taxa) is needed only to write category item labels in exported files
+  const includeRefData = Boolean(outputStream)
+  const survey = await _fetchSurvey({ surveyId, cycle, includeRefData })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+  const userGroupAccessFilters = await _fetchUserGroupAccessFilters({ user, survey, cycle })
+  const exportOptions = _pickExportOptions(options)
 
   const data = Query.isModeAggregate(parsedQuery)
     ? await SurveyRdbManager.fetchViewDataAgg({
@@ -78,30 +143,35 @@ export const fetchViewData = async (params) => {
         cycle,
         query,
         recordOwnerUuid,
+        userGroupAccessFilters,
         offset,
         limit,
         outputStream,
-        options,
+        options: exportOptions,
       })
     : await SurveyRdbManager.fetchViewData({
+        ...exportOptions,
         survey,
         cycle,
         query,
         columnNodeDefs,
         recordOwnerUuid,
+        userGroupAccessFilters,
         offset,
         limit,
+        // sampling is meant only for the scatter chart (raw mode)
+        randomize: randomize && Query.isModeRaw(parsedQuery),
         outputStream,
         addCycle,
-        ...options,
       })
 
   return data
 }
 
 /**
- * Counts the number of rows in an entity definition data view, filtered by the given filter object.
+ * Counts the number of rows in an entity definition data view, filtered by the given filter object, only in the records readable by the user.
  * @param {!object} params - The query parameters.
+ * @param {object} [params.user] - The user running the query.
  * @param {!string} [params.surveyId] - The survey.
  * @param {!string} [params.cycle] - The survey cycle.
  * @param {!Query} [params.query] - The Query used to filter the records.
@@ -112,16 +182,34 @@ export const countTable = async (params) => {
 
   const survey = await _fetchSurvey({ surveyId, cycle })
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+  const userGroupAccessFilters = await _fetchUserGroupAccessFilters({ user, survey, cycle })
 
   return Query.isModeAggregate(query)
-    ? SurveyRdbManager.countViewDataAgg({ survey, cycle, recordOwnerUuid, query })
-    : SurveyRdbManager.countTable({ survey, cycle, recordOwnerUuid, query })
+    ? SurveyRdbManager.countViewDataAgg({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query })
+    : SurveyRdbManager.countTable({ survey, cycle, recordOwnerUuid, userGroupAccessFilters, query })
 }
 
-export const fetchTableRowsCountByEntityDefUuid = async ({ surveyId, cycle, entityDefUuids = [] }) => {
+/**
+ * Counts the rows in the data views of the specified entity definitions, only in the records readable by the user.
+ * @param {!object} params - The parameters.
+ * @param {!object} params.user - The user.
+ * @param {!number} params.surveyId - The survey id.
+ * @param {!string} params.cycle - The survey cycle.
+ * @param {string[]} [params.entityDefUuids] - The entity definition UUIDs (all multiple entities if empty).
+ * @returns {Promise<object>} - The count of rows indexed by entity definition UUID.
+ */
+export const fetchTableRowsCountByEntityDefUuid = async ({ user, surveyId, cycle, entityDefUuids = [] }) => {
   const survey = await _fetchSurvey({ surveyId, cycle })
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+  const userGroupAccessFilters = await _fetchUserGroupAccessFilters({ user, survey, cycle })
 
-  return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({ survey, cycle, entityDefUuids })
+  return SurveyRdbManager.fetchTableRowsCountByEntityDefUuid({
+    survey,
+    cycle,
+    entityDefUuids,
+    recordOwnerUuid,
+    userGroupAccessFilters,
+  })
 }
 
 export const refreshAllRdbs = async () => {
@@ -150,6 +238,22 @@ export const exportViewDataToTempFile = async ({
   const outputStream = FileUtils.createWriteStream(tempFilePath)
 
   await fetchViewData({ user, surveyId, cycle, query, columnNodeDefs, outputStream, addCycle, options })
+
+  return tempFileName
+}
+
+export const exportDataMatrixToTempFile = async ({ user, survey, cycle, options }, client) => {
+  const { fileFormat } = options
+  const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
+
+  const { fields, items } = await SurveyRdbManager.fetchEntityDataMatrix(
+    { user, survey, cycle, recordOwnerUuid, options },
+    client
+  )
+
+  const tempFileName = FileUtils.newTempFileName()
+  const outputStream = FileUtils.createWriteStream(FileUtils.tempFilePath(tempFileName))
+  await FlatDataWriter.writeItemsToStream({ outputStream, fileFormat, fields, items })
 
   return tempFileName
 }
@@ -222,7 +326,7 @@ export const fetchEntitiesDataSummaryToFlatData = async ({ exportUuid, survey, c
   for (const entityDef of entityDefs) {
     const entityDefUuid = NodeDef.getUuid(entityDef)
     const query = Query.create({ entityDefUuid })
-    const count = await SurveyRdbManager.countTable({ survey, cycle, query })
+    const count = await SurveyRdbManager.countTable({ survey, cycle, query }) // NOSONAR
     items.push({ name: NodeDef.getName(entityDef), label: NodeDef.getLabel(entityDef, lang), count })
   }
   const tempFilePath = FileUtils.tempFilePath(`${exportUuid}.${getExtensionByFileFormat(fileFormat)}`)

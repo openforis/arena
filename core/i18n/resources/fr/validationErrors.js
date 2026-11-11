@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} est requis',
   rowsDuplicate: 'ligne : {{row}} ligne dupliquée : {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `La fonction "{{name}}" n'est pas autorisée`,
+    expressionInvalid: `"{{text}}" n'est pas autorisé dans l'expression`,
+    expressionRequired: 'Expression requise',
+    expressionUnbalancedParentheses: 'Parenthèses non équilibrées',
+    expressionUnknownColumn: `"{{name}}" n'est pas une colonne de l'entité`,
+    expressionUnterminatedQuote: 'Texte entre guillemets non fermé',
+  },
+
   analysis: {
     labelDefaultLangRequired: "L'étiquette dans la langue par défaut du formulaire est requise",
     analysisNodeDefsRequired: 'Au moins un attribut calculé est requis',
@@ -33,6 +42,11 @@ export default {
     levelDuplicate: 'Le nom du niveau est en double',
     levelsInvalid: 'Au moins un niveau invalide',
     nameNotSpecified: 'Nom de catégorie non spécifié',
+  },
+
+  category: {
+    samplingPointDataCategoryAlreadyExists:
+      "Une catégorie de Données de points d'échantillonnage existe déjà dans ce formulaire ; il ne peut y en avoir qu'une seule.",
   },
 
   categoryImport: {
@@ -66,7 +80,7 @@ export default {
     invalidNumber: 'Nombre invalide dans la colonne {{headers}} : {{value}}',
     invalidTaxonCode: 'Code invalide dans la colonne {{headers}} : {{value}}',
     invalidTime:
-      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm. Ex. 09:45 ou 16:30",
+      "Heure invalide dans la colonne {{headers}} : {{value}}. L'heure doit être au format HH:mm ou HH:mm:ss. Ex. 09:45, 16:30 ou 09:45:30",
     missingRequiredHeaders: 'Colonnes requises manquantes : {{missingRequiredHeaders}}',
     errorUpdatingValues: 'Erreur lors de la mise à jour des valeurs : {{details}}',
     multipleRecordsMatchingKeys: 'Plusieurs enregistrements trouvés correspondant aux clés "{{keyValues}}"',
@@ -74,6 +88,8 @@ export default {
     recordInAnalysisStepCannotBeUpdated:
       "L'enregistrement avec les clés \"{{keyValues}}\" est à l'étape d'analyse et ne peut pas être mis à jour",
     recordKeyMissingOrInvalid: 'Valeur manquante ou invalide pour l\'attribut clé "{{keyName}}"',
+    recordNotEditable:
+      'L\'enregistrement avec les clés "{{keyValues}}" ne peut pas être mis à jour : vous n\'êtes pas autorisé à le modifier',
     recordNotFound: 'Enregistrement avec les clés "{{keyValues}}" introuvable',
   },
 
@@ -104,8 +120,8 @@ export default {
 
   nodeDefEdit: {
     analysisParentEntityRequired: "L'entité est requise",
-    applyIfDuplicate: 'La condition "$t(nodeDefEdit.expressionsProp.applyIf)" est dupliquée',
-    applyIfInvalid: 'Condition "$t(nodeDefEdit.advancedProps.relevantIf)" invalide',
+    applyIfDuplicate: 'La condition "$t(nodeDefEdit:expressionsProp.applyIf)" est dupliquée',
+    applyIfInvalid: 'Condition "$t(nodeDefEdit:advancedProps.relevantIf)" invalide',
     columnWidthCannotBeGreaterThan: 'La largeur de colonne ne peut pas être supérieure à {{max}}',
     columnWidthCannotBeLessThan: 'La largeur de colonne ne peut pas être inférieure à {{min}}',
     countMaxMustBePositiveNumber: 'Le nombre maximum doit être un entier positif',
@@ -116,13 +132,14 @@ export default {
     defaultValuesNotSpecified: 'Valeur par défaut non spécifiée',
     entitySourceRequired: "Source de l'entité requise",
     expressionApplyIfOnlyLastOneCanBeEmpty:
-      'Seule la dernière expression peut avoir une condition "$t(nodeDefEdit.expressionsProp.applyIf)" vide',
+      'Seule la dernière expression peut avoir une condition "$t(nodeDefEdit:expressionsProp.applyIf)" vide',
     expressionDuplicate: 'Expression dupliquée',
     expressionRequired: 'Expression requise',
     formulaInvalid: 'La formule est invalide',
     keysEmpty: 'Définissez au moins un attribut clé',
 
     keysExceedingMax: "Nombre maximum d'attributs clés dépassé",
+    mapMarkerColorInvalid: 'La couleur du marqueur de carte doit être un code couleur comme #ff0000',
     maxFileSizeInvalid: 'La taille maximale du fichier doit être supérieure à 0 et inférieure à {{max}}',
     nameInvalid:
       'Le nom est invalide (il doit contenir uniquement des lettres minuscules, des chiffres et des traits de soulignement, en commençant par une lettre)',
@@ -131,8 +148,11 @@ export default {
     countMaxInvalid: '"Nombre maximum" invalide',
     countMinInvalid: '"Nombre minimum" invalide',
     readOnlyCannotHaveEditableIf: 'Un noeud en lecture seule ne peut pas avoir de condition "Editable if"',
+    requiredIfInvalid: 'Condition "Obligatoire si" invalide',
+    requiredIfNotAllowed:
+      'La condition "Obligatoire si" n\'est autorisée que pour les attributs simples, non clés et pas toujours obligatoires',
     qualifierCannotHaveApplicableExpression:
-      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit.advancedProps.relevantIf)"',
+      'Un attribut qualificatif ne peut pas avoir de condition "$t(nodeDefEdit:advancedProps.relevantIf)"',
     qualifierCannotHaveEditabilityRule: "Un attribut qualificatif ne peut pas avoir de règles d'éditabilité définies",
     qualifierCannotHaveDefaultValues: 'Un attribut qualificatif ne peut pas avoir de valeurs par défaut',
     qualifierCannotHaveValidations: 'Un attribut qualificatif ne peut pas avoir de règles de validation définies',
@@ -155,10 +175,13 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'La langue est requise',
+    langInvalid: "Le code de langue n'est pas valide : {{lang}}",
+    srsInvalid: "Le code du système de référence spatiale n'est pas valide : {{code}}",
     srsRequired: 'Le système de référence spatiale est requis',
     cycleRequired: 'Le cycle est requis',
     cyclesRequired: 'Au moins un cycle doit être défini',
     cyclesExceedingMax: 'Un formulaire peut avoir au maximum 10 cycles',
+    cycleKeysInvalid: 'Les cycles doivent être numérotés de façon consécutive, à partir de 1',
     cycleDateStartBeforeDateEnd: 'La date de début du cycle doit être antérieure à sa date de fin',
     cycleDateStartAfterPrevDateEnd:
       'La date de début du cycle doit être postérieure à la date de fin du cycle précédent',
@@ -168,6 +191,13 @@ export default {
     cycleDateEndMandatoryExceptForLastCycle:
       'La date de fin du cycle est obligatoire pour tous les cycles sauf le dernier',
     fieldManualLinksInvalid: 'Le lien vers le manuel de terrain est invalide',
+    areaOfInterestInvalid: "La zone d'intérêt doit être un polygone au format GeoJSON avec des coordonnées WGS84",
+  },
+
+  surveyAreaOfInterest: {
+    fileRequired: 'Le fichier est requis',
+    nameDuplicate: "Une autre zone d'intérêt avec le même nom existe déjà",
+    nameRequired: 'Le nom est requis',
   },
 
   surveyPreloadedMapLayer: {
@@ -246,6 +276,8 @@ export default {
     invalidRequest: "Demande d'accès utilisateur invalide",
     userAlreadyExisting: "Un utilisateur avec l'e-mail {{email}} existe déjà",
     requestAlreadySent: `La demande d'accès pour l'utilisateur avec l'e-mail {{email}} a déjà été envoyée`,
+    emailNotReachable:
+      "L'e-mail de confirmation n'a pas pu être remis à {{email}} ; veuillez vérifier que l'adresse est correcte",
     invalidReCaptcha: 'ReCaptcha invalide',
   },
 
@@ -256,6 +288,13 @@ export default {
     emailInvalid: '$t(validationErrors:user.emailInvalid)',
     roleRequired: 'Le rôle est requis',
     surveyNameRequired: 'Le nom du formulaire est requis',
+  },
+  userGroupEdit: {
+    nameDuplicate: 'Un groupe avec le même nom existe déjà : {{name}}',
+    qualifiersInvalid: 'Un ou plusieurs qualificatifs ont une clé invalide ou en double',
+    qualifierNameDuplicate: 'Un qualificatif avec le même nom existe déjà dans ce groupe : {{name}}',
+    qualifierNameInvalid: 'Nom de qualificatif invalide',
+    qualifierNameRequired: 'Le nom du qualificatif est requis',
   },
 
   userPasswordChange: {

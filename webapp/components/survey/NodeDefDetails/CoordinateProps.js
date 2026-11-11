@@ -17,9 +17,9 @@ const CoordinateProps = (props) => {
 
   return (
     <>
-      <FormItem label="nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinate">
+      <FormItem label="nodeDefEdit:coordinateProps.allowOnlyDeviceCoordinate">
         <div className="form-item_body checkbox-with-info">
-          <ButtonIconInfo title="nodeDefEdit.coordinateProps.allowOnlyDeviceCoordinateInfo" />
+          <ButtonIconInfo title="nodeDefEdit:coordinateProps.allowOnlyDeviceCoordinateInfo" />
           <Checkbox
             checked={NodeDef.isAllowOnlyDeviceCoordinate(nodeDef)}
             disabled={readOnly}
@@ -28,7 +28,7 @@ const CoordinateProps = (props) => {
         </div>
       </FormItem>
 
-      <FormItem label="nodeDefEdit.additionalFields">
+      <FormItem label="nodeDefEdit:additionalFields">
         <div className="display-flex">
           <Checkbox
             checked={NodeDef.isAccuracyIncluded(nodeDef)}
@@ -50,7 +50,7 @@ const CoordinateProps = (props) => {
           />
         </div>
       </FormItem>
-      <FormItem label="nodeDefEdit.coordinateProps.mapMarkerColor">
+      <FormItem label="nodeDefEdit:coordinateProps.mapMarkerColor">
         <ColorInput
           disabled={readOnly}
           value={mapMarkerColor}

@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: arena-db
+  labels:
+    app.kubernetes.io/name: arena-db
+spec:
+  serviceName: arena-db
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: arena-db
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: arena-db
+    spec:
+      automountServiceAccountToken: false
+      terminationGracePeriodSeconds: 60
+      securityContext:
+        runAsNonRoot: true
+        # postgres user of the image
+        runAsUser: 999
+        runAsGroup: 999
+        fsGroup: 999
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgis/postgis:17-3.5
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            # Same credentials Arena connects with; only used when the data volume is empty.
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: arena-db-credentials
+                  key: PGDATABASE
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: arena-db-credentials
+                  key: PGUSER
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: arena-db-credentials
+                  key: PGPASSWORD
+            # A subdirectory: the volume root may contain lost+found.
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          # TCP check: the init-time server only listens on the unix socket.
+          readinessProbe:
+            exec:
+              command: ['sh', '-c', 'pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            exec:
+              command: ['sh', '-c', 'pg_isready -h 127.0.0.1 -U "$POSTGRES_USER" -d "$POSTGRES_DB"']
+            initialDelaySeconds: 60
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 6
+          # Starting values: tune them to the size of the installation.
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              memory: 2Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes:
+          - ReadWriteOnce
+        resources:
+          requests:
+            storage: 20Gi

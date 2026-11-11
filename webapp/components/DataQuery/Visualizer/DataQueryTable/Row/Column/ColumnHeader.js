@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { Fragment } from 'react'
 import PropTypes from 'prop-types'
 
 import * as A from '@core/arena'
@@ -12,12 +12,17 @@ import { SortToggle } from '@webapp/components/Table'
 import { useI18n } from '@webapp/store/system'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 
-import { ButtonIconGear } from '@webapp/components/buttons/ButtonIconGear'
 import NodeDefTableCellHeader from '@webapp/components/survey/SurveyForm/nodeDefs/components/nodeDefTableCellHeader'
 
 import { useColumn } from './store'
-import { AggregateFunctionsPanel } from './AggregateFunctionsPanel'
 
+/**
+ * Returns the node def field (e.g. code, label) shown in the specified view column.
+ * @param {object} params - Parameters.
+ * @param {string} params.columnName - View column name.
+ * @param {object} params.nodeDef - Node definition.
+ * @returns {string} The field name.
+ */
 const getFieldByViewColumnName = ({ columnName, nodeDef }) => {
   if (columnName === NodeDef.getName(nodeDef)) {
     if (NodeDef.isTaxon(nodeDef) || NodeDef.isCode(nodeDef)) {
@@ -45,6 +50,7 @@ const ColumnHeader = (props) => {
     nodeDef,
     nodeDefLabelType,
     onChangeQuery,
+    percentageVisible = false,
     query,
     sortableVariablesByUuid,
   } = props
@@ -52,20 +58,25 @@ const ColumnHeader = (props) => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
 
-  const { modeEdit, columnNames, isMeasure, aggregateFunctions, noCols, widthInner, widthOuter } = useColumn({
+  const {
+    modeEdit,
+    columnNames,
+    isMeasure,
+    aggregateFunctions,
+    noCols,
+    percentageColumnsVisible,
+    widthInner,
+    widthOuter,
+  } = useColumn({
     codesVisible,
     query,
     colWidth,
     nodeDef,
+    percentageVisible,
   })
 
-  const entityDefUuid = Query.getEntityDefUuid(query)
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefLabel = NodeDef.getLabel(nodeDef, lang, nodeDefLabelType)
-  // measure is editable only when the node def is not equal to the context entity (e.g. entity count measure is not editable)
-  const canEditMeasure = nodeDefUuid !== entityDefUuid
-
-  const [showAggregateFunctionsPanel, setShowAggregateFunctionsPanel] = useState(false)
 
   const sortableVariable = sortableVariablesByUuid[nodeDefUuid]
   const sortable = Boolean(sortableVariable) && !modeEdit
@@ -114,13 +125,6 @@ const ColumnHeader = (props) => {
               />
             )}
             <span className="ellipsis">{nodeDefLabel}</span>
-            {isMeasure && canEditMeasure && (
-              <ButtonIconGear
-                className="btn btn-s btn-transparent btn-aggregates"
-                onClick={() => setShowAggregateFunctionsPanel(true)}
-                title={i18n.t('common.aggregateFunction', { count: 2 })}
-              />
-            )}
           </>
         )}
       </div>
@@ -145,22 +149,13 @@ const ColumnHeader = (props) => {
               ? customAggregateFunction?.name
               : i18n.t(`common.${aggregateFn}`)
             return (
-              <div key={`${nodeDefUuid}_${aggregateFn}`} style={{ width: widthInner }}>
-                {aggregateFunctionLabel}
-              </div>
+              <Fragment key={`${nodeDefUuid}_${aggregateFn}`}>
+                <div style={{ width: widthInner }}>{aggregateFunctionLabel}</div>
+                {percentageColumnsVisible && <div style={{ width: widthInner }}>%</div>}
+              </Fragment>
             )
           })}
         </div>
-      )}
-
-      {showAggregateFunctionsPanel && (
-        <AggregateFunctionsPanel
-          nodeDef={nodeDef}
-          aggregateFunctions={aggregateFunctions}
-          onChangeQuery={onChangeQuery}
-          onClose={() => setShowAggregateFunctionsPanel(false)}
-          query={query}
-        />
       )}
     </div>
   )
@@ -173,6 +168,7 @@ ColumnHeader.propTypes = {
   nodeDef: PropTypes.object.isRequired,
   nodeDefLabelType: PropTypes.string.isRequired,
   onChangeQuery: PropTypes.func.isRequired,
+  percentageVisible: PropTypes.bool,
   query: PropTypes.object.isRequired,
   sortableVariablesByUuid: PropTypes.object.isRequired,
 }

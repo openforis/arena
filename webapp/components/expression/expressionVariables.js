@@ -6,7 +6,7 @@ import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 import * as Expression from '@core/expressionParser/expression'
 import { ExpressionEditorType } from './expressionEditorType'
 
-// TODO: match all nodeDefTypes and throw an error if unknown:
+// other node def types are treated as text
 const sqlTypeByNodeDefType = {
   [NodeDef.nodeDefType.integer]: sqlTypes.bigint,
   [NodeDef.nodeDefType.decimal]: sqlTypes.decimal,

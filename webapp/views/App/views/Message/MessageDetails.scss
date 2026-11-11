@@ -15,10 +15,17 @@
   }
 
   .message-body-preview {
-    border: 1px solid $greyBorder;
+    border: 1px solid $colorOutline;
     border-radius: 4px;
-    background-color: $grey;
+    background-color: $colorSurfaceVariant;
     padding: 0.4rem;
+
+    // same link style as in the notifications panel
+    a {
+      color: $colorPrimary;
+      font-size: inherit;
+      text-decoration: underline;
+    }
   }
 
   .message-date-modified-input {

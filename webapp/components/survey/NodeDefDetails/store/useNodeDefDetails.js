@@ -1,7 +1,13 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useState } from 'react'
 import { useNavigate, useParams } from 'react-router'
 
-import { useIsDesignerNodeDefRoute, useOnUpdate, useOnBrowserBack, useOnPageUnload } from '@webapp/components/hooks'
+import {
+  useIsDesignerNodeDefRoute,
+  useOnUpdate,
+  useOnBrowserBack,
+  useOnPageUnload,
+  useOnValueChange,
+} from '@webapp/components/hooks'
 
 import { appModuleUri, analysisModules } from '@webapp/app/appModules'
 import { useNodeDefByUuid, useSurveyCycleKey } from '@webapp/store/survey'
@@ -22,7 +28,7 @@ export const useNodeDefDetails = (props) => {
   const validation = useNodeDefValidationByUuid(nodeDefUuid)
   const surveyCycleKey = useSurveyCycleKey()
 
-  const [state, setState] = useState({})
+  const [state, setState] = useState(() => (nodeDefUuid ? State.create({ nodeDef, validation }) : {}))
 
   const Actions = useActions({ setState })
 
@@ -35,13 +41,12 @@ export const useNodeDefDetails = (props) => {
 
   useOnPageUnload({ active: State.isDirty(state) })
 
-  // create initial state on mount
-  useEffect(() => {
+  useOnValueChange(nodeDefUuid, (nodeDefUuidUpdated) => {
     // Editing a nodeDef
-    if (nodeDefUuid) {
+    if (nodeDefUuidUpdated) {
       setState(State.create({ nodeDef, validation }))
     }
-  }, [nodeDefUuid])
+  })
 
   useOnUpdate(() => {
     if (editingFromDesigner) {

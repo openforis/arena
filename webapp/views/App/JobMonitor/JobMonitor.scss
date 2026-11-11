@@ -9,6 +9,17 @@
   }
 }
 
+// reduced motion: fade the spinner instead of rotating it
+@keyframes app-job-monitor-inner-job-spinner-fade {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
 .app-job-monitor {
   .modal-body {
     padding-top: 0;
@@ -16,13 +27,19 @@
 
   .job-timing {
     font-size: 0.8rem;
-    color: rgba($black, 0.55);
+    color: $colorOnSurfaceVariant;
   }
 
   .job-long-running-message {
     font-size: 0.8rem;
-    color: $orange;
+    color: $colorWarning;
     margin-top: 0.25rem;
+  }
+
+  .job-monitor__canceled-by-admin-message {
+    font-size: 0.8rem;
+    color: $colorError;
+    margin-bottom: 0.5rem;
   }
 }
 
@@ -39,7 +56,7 @@
   }
 
   .data-grid {
-    background-color: white;
+    background-color: $colorSurface;
   }
 }
 
@@ -49,7 +66,7 @@
     overflow-y: auto;
     overflow-x: hidden;
     padding: 1rem 0.5rem 0 0.5rem;
-    background-color: white;
+    background-color: $colorSurface;
 
     .expansion-panel__content {
       padding: 0;
@@ -69,15 +86,19 @@
           text-align: center;
 
           &.icon-checkbox-checked {
-            color: $green;
+            color: $colorSuccess;
           }
 
           &.icon-cross {
-            color: $red;
+            color: $colorError;
           }
 
           &.icon-spinner {
             animation: app-job-monitor-inner-job-spinner-spin 1s linear infinite;
+
+            @media (prefers-reduced-motion: reduce) {
+              animation-name: app-job-monitor-inner-job-spinner-fade;
+            }
           }
         }
       }

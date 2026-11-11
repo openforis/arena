@@ -20,7 +20,7 @@ const prepareTaxonToCompare = (taxon) =>
 
       const vernacularNamesArrayUpdated = vernacularNamesArray
         // sort by lang and name
-        .sort((vn1, vn2) => {
+        .toSorted((vn1, vn2) => {
           const langCompare = TaxonVernacularName.getLang(vn1).localeCompare(TaxonVernacularName.getLang(vn2))
           if (langCompare !== 0) return langCompare
           return TaxonVernacularName.getName(vn1).localeCompare(TaxonVernacularName.getName(vn2))

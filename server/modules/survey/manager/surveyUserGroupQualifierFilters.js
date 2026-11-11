@@ -12,6 +12,40 @@ import * as Node from '@core/record/node'
 import { db } from '@server/db/db'
 import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 
+const _fetchUserGroups = async ({ user, survey }, client) => {
+  const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+  return userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid: Survey.getUuid(survey) }, client)
+}
+
+const _buildQualifierFilters = async ({ survey, userGroup }, client) => {
+  const qualifierNodeDefs = Survey.getQualifierNodeDefs(survey)
+  const qualifiers = UserGroup.getQualifiers(userGroup)
+  if (qualifierNodeDefs.length === 0 || qualifiers.length === 0) return []
+
+  const filters = []
+  for (const nodeDef of qualifierNodeDefs) {
+    const qualifier = qualifiers.find((q) => UserGroupQualifier.getName(q) === NodeDef.getName(nodeDef))
+    const qualifierValue = qualifier ? UserGroupQualifier.getValue(qualifier) : null
+    if (Objects.isEmpty(qualifierValue)) continue
+
+    if (NodeDef.isCode(nodeDef)) {
+      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
+      const item = /* NOSONAR */ await CategoryItemProviderDefault.getItemByCode(
+        { survey, categoryUuid, code: qualifierValue },
+        client
+      )
+      if (!item) continue
+      filters.push({
+        nodeDef,
+        value: Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item), code: qualifierValue }),
+      })
+    } else {
+      filters.push({ nodeDef, value: qualifierValue })
+    }
+  }
+  return filters
+}
+
 /**
  * Determines the qualifier attribute/value pairs that the given user's group restricts them to, if any.
  * Mirrors the lookup used to auto-fill qualifier attributes when a new record is created
@@ -30,40 +64,41 @@ import { CategoryItemProviderDefault } from '@server/modules/category/manager/ca
  * filters to apply.
  */
 export const fetchUserQualifierFilters = async ({ user, survey }, client = db) => {
-  const qualifierNodeDefs = Survey.getQualifierNodeDefs(survey)
-  if (qualifierNodeDefs.length === 0) return []
+  if (Survey.getQualifierNodeDefs(survey).length === 0) return []
+  const [userGroup] = await _fetchUserGroups({ user, survey }, client)
+  return userGroup ? _buildQualifierFilters({ survey, userGroup }, client) : []
+}
+
+/**
+ * Determines the qualifier filters of the user's group (records the user can edit) and of the groups
+ * whose records the user's group can only read (see UserGroup readableGroupUuids).
+ * @param {object} params - The function parameters.
+ * @param {object} params.user - The current user.
+ * @param {object} params.survey - The survey, with node defs loaded.
+ * @param {pgPromise.IDatabase} [client] - The db client.
+ * @returns {Promise<{own: Array<{nodeDef: *, value: *}>, readable: Array<Array<{nodeDef: *, value: *}>>}>} - `own` is empty when the user is unrestricted (then `readable` is empty too);
+ * readable groups without qualifier filters are ignored (they would match every record).
+ */
+export const fetchUserGroupAccessFilters = async ({ user, survey }, client = db) => {
+  const noFilters = { own: [], readable: [] }
+  if (Survey.getQualifierNodeDefs(survey).length === 0) return noFilters
+
+  const [userGroup] = await _fetchUserGroups({ user, survey }, client)
+  if (!userGroup) return noFilters
+
+  const own = await _buildQualifierFilters({ survey, userGroup }, client)
+  const readableGroupUuids = UserGroup.getReadableGroupUuids(userGroup)
+  if (own.length === 0 || readableGroupUuids.length === 0) return { own, readable: [] }
 
   const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
-  const userGroups = await userGroupService.getManyByUser(
-    { userUuid: User.getUuid(user), surveyUuid: Survey.getUuid(survey) },
-    client
+  const surveyGroups = await userGroupService.getAll({ surveyUuid: Survey.getUuid(survey) }, client)
+  const readableGroups = surveyGroups.filter(
+    (group) => group.uuid !== userGroup.uuid && readableGroupUuids.includes(group.uuid)
   )
-  const userGroup = userGroups[0]
-  if (!userGroup) return []
-
-  const qualifiers = UserGroup.getQualifiers(userGroup)
-  if (qualifiers.length === 0) return []
-
-  const filters = []
-  for (const nodeDef of qualifierNodeDefs) {
-    const qualifier = qualifiers.find((q) => UserGroupQualifier.getName(q) === NodeDef.getName(nodeDef))
-    const qualifierValue = qualifier ? UserGroupQualifier.getValue(qualifier) : null
-    if (Objects.isEmpty(qualifierValue)) continue
-
-    if (NodeDef.isCode(nodeDef)) {
-      const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const item = await CategoryItemProviderDefault.getItemByCode(
-        { survey, categoryUuid, code: qualifierValue },
-        client
-      )
-      if (!item) continue
-      filters.push({
-        nodeDef,
-        value: Node.newNodeValueCode({ itemUuid: CategoryItem.getUuid(item), code: qualifierValue }),
-      })
-    } else {
-      filters.push({ nodeDef, value: qualifierValue })
-    }
+  const readable = []
+  for (const readableGroup of readableGroups) {
+    const filters = /* NOSONAR */ await _buildQualifierFilters({ survey, userGroup: readableGroup }, client)
+    if (filters.length > 0) readable.push(filters)
   }
-  return filters
+  return { own, readable }
 }

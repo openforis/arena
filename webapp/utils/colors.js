@@ -1,9 +1,9 @@
 import { Strings } from '@openforis/arena-core'
 
 const toYiq = (hexColor) => {
-  const r = parseInt(hexColor.substr(1, 2), 16)
-  const g = parseInt(hexColor.substr(3, 2), 16)
-  const b = parseInt(hexColor.substr(5, 2), 16)
+  const r = Number.parseInt(hexColor.substr(1, 2), 16)
+  const g = Number.parseInt(hexColor.substr(3, 2), 16)
+  const b = Number.parseInt(hexColor.substr(5, 2), 16)
   return (r * 299 + g * 587 + b * 114) / 1000
 }
 
@@ -21,7 +21,7 @@ const lightenColor = (hexColor, percent) => {
     return value
   }
 
-  const num = parseInt(Strings.removePrefix('#')(hexColor), 16)
+  const num = Number.parseInt(Strings.removePrefix('#')(hexColor), 16)
   const amt = Math.round(2.55 * percent)
   const R = (num >> 16) + amt
   const B = ((num >> 8) & 0x00ff) + amt

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import PropTypes from 'prop-types'
 
 import * as Survey from '@core/survey/survey'
@@ -22,7 +22,7 @@ export const SurveyTemplateSelect = (props) => {
       const fetchedItems = await API.fetchSurveyTemplatesPublished()
       setState({ loading: false, items: fetchedItems })
     }
-    loadItems()
+    void loadItems()
   }, [])
 
   if (loading) return <LoadingBar />
@@ -37,12 +37,12 @@ export const SurveyTemplateSelect = (props) => {
         const languages = Survey.getLanguages(item)
           .map((lang) => Languages.getLanguageLabel(lang))
           .join(', ')
-        return [description, `${i18n.t('common.language_plural')}: ${languages}`].filter(Boolean).join('\n\n')
+        return [description, `${i18n.t('common.language_other')}: ${languages}`].filter(Boolean).join('\n\n')
       }}
       itemLabel={(item) => Survey.getDefaultLabel(item) || Survey.getName(item)}
       itemValue={Survey.getUuid}
       onChange={(item) => onChange(Survey.getUuid(item))}
-      placeholder={i18n.t('accessRequestView.templateNotSelected')}
+      placeholder={i18n.t('guest:accessRequestView.templateNotSelected')}
       selection={selectedItem}
     />
   )

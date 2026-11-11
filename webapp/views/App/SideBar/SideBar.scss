@@ -1,4 +1,3 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 //== buttons
@@ -38,8 +37,8 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 
     &.popup-menu-opened {
       .sidebar__module.over {
-        // Soft brand tint; --blue is set by SurveyThemeBridge
-        background: color-mix(in srgb, var(--blue) 18%, white);
+        // soft brand tint on the theme surface (readable in the dark theme too)
+        background: tint($colorPrimary, 82%);
       }
     }
   }
@@ -48,7 +47,7 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
   .sidebar__module-placeholder {
     display: grid;
     grid-row-gap: 15px;
-    border-right: 1px solid $greyBorder;
+    border-right: 1px solid $colorOutline;
     padding: 25px 15px;
     cursor: pointer;
 
@@ -58,16 +57,16 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 
     &.active {
       opacity: 1;
-      border-right-color: var(--blue);
+      border-right-color: $colorPrimary;
       background: linear-gradient(
         to left,
-        color-mix(in srgb, var(--blue) 10%, transparent) 0%,
-        color-mix(in srgb, var(--blue) 4%, transparent) 50%,
+        color-mix(in srgb, $colorPrimary 10%, transparent) 0%,
+        color-mix(in srgb, $colorPrimary 4%, transparent) 50%,
         transparent 80%
       );
 
       .icon {
-        color: var(--blue);
+        color: $colorPrimary;
       }
     }
   }
@@ -84,7 +83,7 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 
     &:only-child.active {
       font-weight: bold;
-      color: var(--blue);
+      color: $colorPrimary;
     }
   }
 
@@ -94,7 +93,7 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
 
     &.active {
       font-weight: bold;
-      color: var(--blue);
+      color: $colorPrimary;
     }
   }
 
@@ -118,7 +117,7 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
     width: $sidebarWidthOpened;
     padding: 10px 20px;
     font-size: 0.75rem;
-    color: color.adjust($black, $lightness: 25%);
+    color: $colorOnSurfaceVariant;
     font-weight: 600;
     text-align: center;
   }
@@ -129,10 +128,10 @@ $sidebarBtnTransparent: $sidebarBtnMargin solid transparent;
   position: fixed;
   z-index: $zIndex10TopOfApp;
   left: $sidebarWidthClosed - 1px;
-  background-color: color-mix(in srgb, var(--blue) 18%, white);
-  border-top: 1px solid $greyBorder;
-  border-right: 1px solid $greyBorder;
-  border-bottom: 1px solid $greyBorder;
+  background-color: tint($colorPrimary, 82%);
+  border-top: 1px solid $colorOutline;
+  border-right: 1px solid $colorOutline;
+  border-bottom: 1px solid $colorOutline;
   display: grid;
   grid-row-gap: 1.5rem;
   padding: 30px 10px;

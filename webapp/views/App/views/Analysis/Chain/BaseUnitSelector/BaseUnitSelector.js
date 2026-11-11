@@ -1,6 +1,6 @@
 import './BaseUnitSelector.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
 
 import * as Chain from '@common/analysis/chain'

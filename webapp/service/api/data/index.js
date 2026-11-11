@@ -31,11 +31,21 @@ export const fetchRecordSummary = async ({ surveyId, cycle, recordUuid }) => {
   const list = await fetchRecordsSummary({ surveyId, cycle, recordUuid })
   return list?.[0]
 }
-export const getRecordDocxExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/docx?${new URLSearchParams({ lang })}`
-
-export const getRecordPdfExportUrl = ({ surveyId, recordUuid, lang }) =>
-  `/api/survey/${surveyId}/record/${recordUuid}/export/pdf?${new URLSearchParams({ lang })}`
+export const fetchRecordAndNodes = async ({ surveyId, recordUuid, errorHandledLocally = false }) => {
+  const { data: record } = await axios.get(`/api/survey/${surveyId}/record`, {
+    params: { recordUuid },
+    ...(errorHandledLocally ? { errorHandledLocally } : {}),
+  })
+  return record
+}
+export {
+  getRecordPrintableExportUrl,
+  getRecordDocxExportUrl,
+  getRecordPdfExportUrl,
+  PrintableExportFormats,
+  PrintableExportScopes,
+  PrintOrientations,
+} from './recordPrintableExportUrl'
 
 // ==== RECORD FILE
 export const getRecordNodeFileUrl = ({ surveyId, node }) =>
@@ -58,6 +68,14 @@ export const startCollectRecordsImportJob = async ({
   const formData = objectToFormData({ file, deleteAllRecords, cycle, forceImport })
 
   const { data } = await axios.post(`/api/survey/${surveyId}/data-import/collect`, formData, { onUploadProgress })
+  const { job } = data
+  return job
+}
+
+export const startOdkDataImportJob = async ({ surveyId, file, cycle, onUploadProgress } = {}) => {
+  const formData = objectToFormData({ file, cycle })
+
+  const { data } = await axios.post(`/api/odk-import/survey/${surveyId}`, formData, { onUploadProgress })
   const { job } = data
   return job
 }
@@ -254,6 +272,12 @@ export const startExportDataJob = async ({ surveyId, cycle, recordUuids, search,
   return job
 }
 
+export const startExportDataMatrixJob = async ({ surveyId, cycle, options }) => {
+  const { data } = await axios.post(`/api/survey/${surveyId}/data-matrix-export`, { cycle, options })
+  const { job } = data
+  return job
+}
+
 export const startExportDataSummaryJob = async ({ surveyId, cycle, lang, options }) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/data-summary-export`, { cycle, lang, options })
   const { job } = data
@@ -303,6 +327,14 @@ export const startRecordsCloneJob = async ({ surveyId, cycleFrom, cycleTo, recor
   return job
 }
 
+// SELECTED RECORDS EXPORT (ARENA FORMAT)
+export const startSelectedRecordsExportJob = async ({ surveyId, recordUuids }) => {
+  const {
+    data: { job },
+  } = await axios.post(`/api/survey/${surveyId}/records/export-selected`, { recordUuids })
+  return job
+}
+
 // RECORDS VALIDAATION
 export const startRecordsValidationJob = async ({ surveyId }) => {
   const {
@@ -321,11 +353,22 @@ export const mergeRecords = async ({ surveyId, sourceRecordUuid, targetRecordUui
 }
 
 // ==== Validation Report
-export const startValidationReportGeneration = async ({ surveyId, cycle, recordUuid, lang }) => {
+export const startValidationReportGeneration = async ({
+  surveyId,
+  cycle,
+  recordUuid,
+  lang,
+  query,
+  attributeDefUuids,
+  messageTypeKeys,
+}) => {
   const { data } = await axios.post(`/api/survey/${surveyId}/validationReport/start-export`, {
     cycle,
     recordUuid,
     lang,
+    query,
+    attributeDefUuids,
+    messageTypeKeys,
   })
   return data
 }

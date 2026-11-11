@@ -12,9 +12,6 @@ const columnSet = {
   validation: 'validation',
 }
 
-/**
- * @typedef {module:arena.TableSurvey} module:arena.TableRecord
- */
 export default class TableRecord extends TableSurvey {
   constructor(surveyId) {
     super(surveyId, 'record', columnSet)

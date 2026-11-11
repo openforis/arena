@@ -1,0 +1,7 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+# Single-instance PostgreSQL/PostGIS: no replication, no backups.
+resources:
+  - statefulset.yaml
+  - service.yaml

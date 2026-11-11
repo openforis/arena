@@ -42,8 +42,8 @@ const getVariableCompletion = ({ group = null, variable }) => {
 }
 
 const getFunctionCompletion = ({ mode, i18n, fnName, functionExample }) => {
-  const description = i18n.t(`nodeDefEdit.functionDescriptions.${fnName}`)
-  // const label = `${i18n.t('nodeDefEdit.function')}: ${fnName}: ${exampleUsage}`
+  const description = i18n.t(`nodeDefEdit:functionDescriptions.${fnName}`)
+  // const label = `${i18n.t('nodeDefEdit:function')}: ${fnName}: ${exampleUsage}`
   const completion = {
     label: fnName,
     detail: `e.g. ${functionExample}\n${description}`,

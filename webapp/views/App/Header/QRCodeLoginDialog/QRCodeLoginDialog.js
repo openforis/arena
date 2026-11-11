@@ -75,6 +75,7 @@ export const QRCodeLoginDialog = (props) => {
   }, [cancelAuthTokenFetchInterval, fetchTempAuthTokenInternal])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- the loading state must be set before fetching the token
     fetchTempAuthToken()
 
     return () => {

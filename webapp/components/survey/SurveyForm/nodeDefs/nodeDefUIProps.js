@@ -1,4 +1,4 @@
-import * as R from 'ramda'
+import * as A from '@core/arena'
 
 import { FormHeaderColor } from '@openforis/arena-core'
 
@@ -149,9 +149,9 @@ const propsUI = {
 const getPropByType =
   (prop, defaultValue = null) =>
   (nodeDefType) =>
-    R.pathOr(defaultValue, [nodeDefType, prop], propsUI)
+    A.pathOr(defaultValue, [nodeDefType, prop], propsUI)
 
-const getProp = (prop, defaultValue = null) => R.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
+const getProp = (prop, defaultValue = null) => A.pipe(NodeDef.getType, getPropByType(prop, defaultValue))
 
 export const getIconByType = getPropByType('icon')
 
@@ -177,6 +177,31 @@ export const getIconByNodeDef = ({ nodeDef, cycle, includeKey = false }) => (
     {NodeDef.isEntity(nodeDef) ? getEntityIcon({ nodeDef, cycle }) : getIconByType(NodeDef.getType(nodeDef))}
   </div>
 )
+
+/**
+ * Extracts the CSS class name and text content of the given icon React element.
+ * Used to render the same node def type icons outside of React (e.g. in a D3 chart).
+ * @param {ReactElement} element - Icon element defined in this module.
+ * @returns {{className: string, text: string|null}|null} Icon descriptor, or null if no element is given.
+ */
+const getIconDescriptor = (element) => {
+  if (!element) return null
+  const { className, children } = element.props
+  return { className, text: typeof children === 'string' ? children : null }
+}
+
+/**
+ * Returns a plain descriptor (CSS class name and optional text content) of the icon
+ * representing the type of the given node definition, for use outside of React rendering.
+ * @param {object} params - Parameters.
+ * @param {object} params.nodeDef - Node definition.
+ * @param {string} params.cycle - Survey cycle key.
+ * @returns {{className: string, text: string|null}|null} Icon descriptor, or null for the root entity.
+ */
+export const getIconDescriptorByNodeDef = ({ nodeDef, cycle }) =>
+  NodeDef.isEntity(nodeDef)
+    ? getIconDescriptor(getEntityIcon({ nodeDef, cycle }))
+    : getIconDescriptor(getIconByType(NodeDef.getType(nodeDef)))
 
 export const getNumberFormat = (nodeDef) =>
   NodeDef.isDecimal(nodeDef)

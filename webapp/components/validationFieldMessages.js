@@ -1,6 +1,5 @@
 import './validationFieldMessages.scss'
 
-
 import { ValidationUtils } from '@core/validation/validationUtils'
 
 import { useSurvey } from '@webapp/store/survey'
@@ -21,8 +20,8 @@ const ValidationFieldMessages = (props) => {
 
   return (
     <div className="validation-field_messages">
-      {messages.map(({ severity, text }, i) => (
-        <div className={`validation-field_message ${severity}`} key={i}>
+      {messages.map(({ severity, text }) => (
+        <div className={`validation-field_message ${severity}`} key={`${severity}_${text}`}>
           {showIcons && <span className="icon icon-warning icon-12px icon-left" />}
           <Markdown className="validation-field-message__text" source={text} />
         </div>

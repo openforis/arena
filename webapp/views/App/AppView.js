@@ -7,11 +7,12 @@ import { appModules } from '@webapp/app/appModules'
 import { AppReducer, AppState } from '@webapp/store/app'
 import { injectReducers } from '@webapp/store'
 
-import { useAuthCanUseAnalysis, useAuthCanUseMessages } from '@webapp/store/user'
+import { useAuthCanCleanseRecords, useAuthCanUseAnalysis, useUserIsSystemAdmin } from '@webapp/store/user'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 
 import ChatbotFab from '@webapp/components/ai/Chatbot'
+import { WhatsNewDialog } from '@webapp/components/WhatsNew'
 
 import Header from './Header'
 import JobMonitor from './JobMonitor'
@@ -25,7 +26,7 @@ const Designer = React.lazy(() => import('./views/Designer'))
 const Home = React.lazy(() => import('./views/Home'))
 const Dashboard = React.lazy(() => import('./views/Dashboard'))
 const Users = React.lazy(() => import('./views/Users'))
-const Message = React.lazy(() => import('./views/Message'))
+const SystemAdmin = React.lazy(() => import('./views/SystemAdmin'))
 const Help = React.lazy(() => import('./views/Help'))
 
 const AppView = () => {
@@ -34,18 +35,15 @@ const AppView = () => {
   }, [])
 
   const isSideBarOpen = useIsSidebarOpened()
+  const canViewDashboard = useAuthCanCleanseRecords()
   const canAnalyzeRecords = useAuthCanUseAnalysis()
-  const canUseMessages = useAuthCanUseMessages()
+  const isSystemAdmin = useUserIsSystemAdmin()
 
   const modules = useMemo(() => {
     const result = [
       {
         component: Home,
         path: `${appModules.home.path}/*`,
-      },
-      {
-        component: Dashboard,
-        path: `${appModules.dashboard.path}/*`,
       },
       {
         component: Designer,
@@ -56,6 +54,12 @@ const AppView = () => {
         path: `${appModules.data.path}/*`,
       },
     ]
+    if (canViewDashboard) {
+      result.push({
+        component: Dashboard,
+        path: `${appModules.dashboard.path}/*`,
+      })
+    }
     if (canAnalyzeRecords) {
       result.push({
         component: Analysis,
@@ -66,15 +70,15 @@ const AppView = () => {
       component: Users,
       path: `${appModules.users.path}/*`,
     })
-    if (canUseMessages) {
-      result.push({ component: Message, path: `${appModules.messages.path}/*` })
+    if (isSystemAdmin) {
+      result.push({ component: SystemAdmin, path: `${appModules.systemAdmin.path}/*` })
     }
     result.push({
       component: Help,
       path: `${appModules.help.path}/*`,
     })
     return result
-  }, [canAnalyzeRecords, canUseMessages])
+  }, [canAnalyzeRecords, canViewDashboard, isSystemAdmin])
 
   return (
     <>
@@ -91,6 +95,7 @@ const AppView = () => {
       <FileUploadDialog />
       <ServiceErrors />
       <ChatbotFab />
+      <WhatsNewDialog />
     </>
   )
 }

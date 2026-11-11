@@ -6,6 +6,11 @@ export default {
       selectAtLeast2NumericAttributes: 'Por favor, seleccione 2 atributos numéricos para mostrar el gráfico',
       tooManyItemsToShowChart:
         'Demasiados elementos para mostrar el gráfico;\nse esperan un máximo de {{maxItems}} elementos.\nPor favor, refine su consulta (por ejemplo, añadiendo un filtro) para reducir el número de elementos.\n',
+      sampleRandomOnly:
+        'Mostrando una muestra aleatoria de {{sampleSize}} de {{totalCount}} elementos (no se encontraron valores atípicos).',
+      sampleWithOutliers:
+        'Mostrando {{sampleSize}} de {{totalCount}} elementos: {{outliersCount}} valores atípicos y una muestra aleatoria de {{randomCount}} de los demás elementos.',
+      sampleOutliersOnly: 'Mostrando los {{sampleSize}} valores atípicos más extremos de {{totalCount}} elementos.',
     },
     type: {
       area: 'Gráfico de área',
@@ -16,6 +21,24 @@ export default {
     },
   },
   dataQuery: {
+    aggregateFunctionsOf: 'Funciones de agregación de {{name}}',
+    ai: {
+      button: 'Preguntar a la IA',
+      buttonTitle: 'Generar una consulta a partir de una descripción usando IA',
+      title: 'Generar una consulta con IA',
+      hint: 'Describa los datos que desea ver; la IA seleccionará la entidad, los atributos (o dimensiones y medidas), el filtro y el orden. Luego podrá revisar la consulta generada y guardarla desde el administrador de consultas.',
+      placeholder: 'p. ej. número de árboles agrupados por especie',
+      generate: 'Generar',
+      generating: 'Generando…',
+      replaceQueryConfirmMessage: '¿Reemplazar la consulta actual por la generada?',
+      suggestSummary: 'Sugerir nombre y descripción',
+      suggestSummaryFailed: 'No se pudo sugerir el nombre y la descripción de la consulta: {{message}}',
+      suggestSummaryTitle:
+        'Usar IA para sugerir el nombre, la etiqueta y la descripción de la consulta según las selecciones actuales',
+      generatedSuccessfully:
+        'Consulta generada: {{explanation}} Revise el resultado y guarde la consulta si desea conservarla.',
+    },
+    customAggregateFunctions: 'Funciones de agregación personalizadas…',
     deleteConfirmMessage: '¿Eliminar la consulta "{{name}}"?',
     displayType: {
       chart: 'Gráfico',
@@ -23,18 +46,31 @@ export default {
     },
     manageQueries: 'Administrar consultas',
     mode: {
-      label: 'Modo:',
       aggregate: 'Agregar',
       raw: 'Crudo',
       rawEdit: 'Edición en bruto',
     },
     replaceQueryConfirmMessage: '¿Reemplazar la consulta actual por la seleccionada?',
     showCodes: 'Mostrar códigos',
+    showTotalAndPercentage: 'Mostrar total y porcentaje',
+    total: 'Total',
+    viewOptions: 'Vista',
   },
   editSelectedRecord: 'Editar registro seleccionado',
   filterAttributeTypes: 'Filtrar tipos de atributos',
+  filterAttributes: 'Filtrar atributos',
+  filterMessages: 'Filtrar mensajes',
+  messageTypeFilter: {
+    valueRequired: 'Valor obligatorio',
+    valueInvalid: 'Valor inválido',
+    uniqueDuplicate: 'Valor duplicado',
+    customValidation: 'Validación personalizada',
+    entityKeyDuplicate: 'Clave de entidad duplicada',
+    recordKeyDuplicate: 'Clave de registro duplicada',
+    nodesCount: 'Recuento de nodos',
+  },
   filterRecords: {
-    buttonTitle: 'Filtrar',
+    buttonTitle: 'Filtrar registros',
     expressionEditorHeader: 'Expresión para filtrar registros',
   },
   invalidRecord: 'Registro no válido',
@@ -42,6 +78,7 @@ export default {
     hide: 'Ocultar selector de definiciones de nodo',
     show: 'Mostrar selector de definiciones de nodo',
     nodeDefFrequency: '{{nodeDefLabel}} (frecuencia)',
+    searchPlaceholder: 'Buscar variable por nombre',
   },
   records: {
     clone: 'Clonar',
@@ -60,6 +97,7 @@ export default {
     exportList: 'Exportar lista',
     exportData: 'Exportar datos',
     exportDataSummary: 'Exportar resumen de datos',
+    exportSelectedRecordsArenaFormat: 'Exportar registros seleccionados (formato Arena)',
     exportRecordDocx: 'Exportar registro (Word)',
     filterPlaceholder: 'Filtrar por claves o propietario',
     merge: {
@@ -123,6 +161,38 @@ export default {
     },
     title: 'Exportar datos',
   },
+  dataMatrixExport: {
+    intro: `Exporte los datos de **{{entity}}** como una tabla con:
+
+- una **fila** por cada valor distinto de los atributos de fila (p. ej. cada especie y estrato);
+- una **columna** por cada registro, con el nombre de su clave ({{keys}});
+- en las celdas, el valor del atributo de valor (p. ej. cobertura).
+
+Es el formato utilizado por herramientas de análisis de vegetación como Turboveg, Juice y Synbiosys.`,
+    layout: {
+      dataMatrix: 'Matriz de datos',
+      info: 'Tabla: filas y columnas como se muestran en el Explorador de datos. Matriz de datos: una fila por especie (u otro atributo) y una columna por registro, como requieren herramientas de análisis de vegetación como Turboveg.',
+      label: 'Exportar como',
+      table: 'Tabla',
+    },
+    preview: 'Vista previa',
+    previewRecord: '{{keys}} del registro {{number}}',
+    recordKeys: 'Atributos clave usados para nombrar las columnas de los registros',
+    recordKeysInfo:
+      'Cada registro se convierte en una columna, con el nombre formado por los valores de los atributos clave seleccionados (p. ej. solo el número de parcela). Por defecto se usan los atributos clave seleccionados en el Explorador de datos, o todos si no se ha seleccionado ninguno. Se requiere al menos uno.',
+    recordsAll:
+      'Se exportan los datos de todos los registros: defina un filtro en el Explorador de datos para exportar solo algunos.',
+    recordsFiltered: 'Solo se exportan los datos que cumplen el filtro actual del Explorador de datos.',
+    rowAttribute: 'Filas (nombre del atributo de taxón, p. ej. especie)',
+    rowAttributeInfo:
+      'Cada valor distinto de este atributo se convierte en una fila de la tabla. Los atributos de taxón se exportan con su nombre científico, porque todos los taxones no listados tienen el mismo código.',
+    secondRowAttribute: 'Segundo atributo de fila, opcional (p. ej. estrato)',
+    secondRowAttributeInfo:
+      'Úselo cuando la misma especie pueda aparecer más de una vez en un registro (p. ej. en distintos estratos): cada combinación se convierte en una fila separada.',
+    valueAttribute: 'Valores (p. ej. cobertura)',
+    valueAttributeInfo:
+      'El valor que se muestra en las celdas. Los atributos de código se exportan con su código, no con la etiqueta. Si una fila aparece más de una vez en un registro con valores distintos, la celda los contiene todos.',
+  },
   dataVis: {
     errorLoadingData: 'Error al cargar datos',
     noData: 'Esta consulta no devolvió datos',
@@ -132,14 +202,13 @@ export default {
   viewSelectedRecord: 'Ver registro seleccionado',
   mapView: {
     layersControl: {
+      areasOfInterest: 'Áreas de interés',
       baseLayers: 'Capas base',
       inputData: 'Datos de entrada',
       preloadedLayers: 'Capas precargadas',
       samplingPointData: 'Datos de puntos de muestreo',
     },
     layersPanel: {
-      hidePanel: 'Ocultar panel',
-      showPanel: 'Mostrar panel',
       markers: '{{count}} marcadores',
       markers_one: '{{count}} marcador',
       markers_other: '{{count}} marcadores',

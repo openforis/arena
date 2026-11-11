@@ -11,17 +11,17 @@
 }
 
 .tooltip__message {
-  background-color: $yellow;
+  background-color: $colorHighlight;
   padding: 1rem;
   opacity: 0.97;
   font-weight: 600;
   font-size: 0.85rem;
-  color: black;
+  color: $colorOnSurface;
   visibility: visible;
   position: fixed;
   margin-top: 0.5rem;
   border-radius: 0.4rem;
-  border: 1px solid $yellow;
+  border: 1px solid $colorHighlight;
   z-index: $zIndex20Tooltip;
 
   &:after {
@@ -35,14 +35,14 @@
   &.bottom {
     &:after {
       bottom: 100%;
-      border-color: transparent transparent $yellow transparent;
+      border-color: transparent transparent $colorHighlight transparent;
     }
   }
 
   &.top {
     &:after {
       top: 100%;
-      border-color: $yellow transparent transparent transparent;
+      border-color: $colorHighlight transparent transparent transparent;
     }
   }
 }
@@ -51,7 +51,7 @@
   @extend .tooltip;
 
   .btn-checkbox .icon {
-    border: 2px solid rgba($red, 0.6);
+    border: 2px solid with-alpha($colorError, 0.6);
   }
 
   .MuiTextField-root fieldset,
@@ -66,7 +66,7 @@
 .tooltip__message-info {
   @extend .tooltip__message;
 
-  color: white;
+  color: $colorOnPrimary;
   border: 1px solid;
   opacity: 0.97;
 
@@ -80,40 +80,40 @@
 }
 
 .tooltip__message-error {
-  background-color: $red;
-  border-color: $red;
+  background-color: $colorError;
+  border-color: $colorError;
 
   &.bottom:after {
-    border-bottom-color: $red;
+    border-bottom-color: $colorError;
   }
 
   &.top:after {
-    border-top-color: $red;
+    border-top-color: $colorError;
   }
 }
 
 .tooltip__message-warning {
-  background-color: $orange;
-  border-color: $orange;
+  background-color: $colorWarning;
+  border-color: $colorWarning;
 
   &.bottom:after {
-    border-bottom-color: $orange;
+    border-bottom-color: $colorWarning;
   }
 
   &.top:after {
-    border-top-color: $orange;
+    border-top-color: $colorWarning;
   }
 }
 
 .tooltip__message-info {
-  background-color: $greyAppBg;
-  border-color: $greyAppBg;
+  background-color: $colorBackground;
+  border-color: $colorBackground;
 
   &.bottom:after {
-    border-bottom-color: $greyAppBg;
+    border-bottom-color: $colorBackground;
   }
 
   &.top:after {
-    border-top-color: $greyAppBg;
+    border-top-color: $colorBackground;
   }
 }

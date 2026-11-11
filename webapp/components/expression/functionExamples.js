@@ -7,9 +7,12 @@ const functionExamples = {
     [functionNames.categoryItemProp]: `cateoryItemProp('category_name', 'prop_name', 'codeLevel1', 'codeLevel2', ...)`,
     [functionNames.dateTimeDiff]: 'dateTimeDiff(date_1, time_1, date_2, time_2)',
     [functionNames.first]: 'first(multiple_attribute_name), first(multiple_entity_name).entity_attribute_name, ...',
+    [functionNames.geoAOIContaining]: `geoAOIContaining(coordinate_attribute) = 'area_name' (name of the first area of interest containing the location, empty if none)`,
     [functionNames.geoCoordinateAtDistance]:
       'geoCoordinateAtDistance(coordinate_attribute, 20, 90), geoCoordinateAtDistance(coordinate_attribute, distance_attribute, bearing_attribute), ...',
     [functionNames.geoDistance]: 'geoDistance(coordinate_attribute_1, coordinate_attribute_2)',
+    [functionNames.geoDistanceToAOIBoundary]:
+      "geoDistanceToAOIBoundary(coordinate_attribute, 'area_name') (< 0 inside the area of interest, > 0 outside), geoDistanceToAOIBoundary(coordinate_attribute, 'area_name') < -coordinate_attribute.accuracy",
     [functionNames.geoPolygon]:
       'geoPolygon(coordinate_attribute_1, coordinate_attribute_2, ...), geoPolygon(multiple_entity_name.coordinate_attribute), ...',
     [functionNames.includes]: `includes(multiple_attribute_name, 'value') = true/false`,
@@ -22,6 +25,7 @@ const functionExamples = {
     [functionNames.max]: 'max(3,1,2) = 3',
     [functionNames.min]: 'min(3,1) = 1',
     [functionNames.now]: 'now()',
+    [functionNames.numberToWords]: `numberToWords(numeric_attribute_name) = 'one hundred twenty-three'`,
     [functionNames.parent]: `parent(this), parent($context), parent(node_name)`,
     [functionNames.pow]: 'pow(2,3) = 2³ = 8',
     [functionNames.prevCycleValue]: `prevCycleValue(attribute_name)`,
@@ -34,6 +38,7 @@ const functionExamples = {
     [functionNames.recordOwnerRole]: 'recordOwnerRole()',
     [functionNames.taxonProp]: `taxonProp('taxonomy_name', 'extra_prop', taxon_attribute_name)`,
     [functionNames.taxonVernacularName]: `taxonVernacularName('taxonomy_name', 'swa', taxon_attribute_name)`,
+    [functionNames.unique]: `unique(multiple_attribute_name), unique(multiple_entity_name.entity_attribute_name), ...`,
     [functionNames.userEmail]: 'userEmail()',
     [functionNames.userIsRecordOwner]: 'userIsRecordOwner()',
     [functionNames.userName]: 'userName()',

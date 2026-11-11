@@ -1,6 +1,6 @@
 import './Chatbot.scss'
 
-import React, { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import * as API from '@webapp/service/api'
 import { useI18n } from '@webapp/store/system'

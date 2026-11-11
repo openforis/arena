@@ -1,9 +1,10 @@
-import * as R from 'ramda'
-import * as pgPromise from 'pg-promise'
-import * as _QueryStream from 'pg-query-stream'
+import * as A from '@core/arena'
+import pgPromise from 'pg-promise'
+import _QueryStream from 'pg-query-stream'
 
 import { Objects, Strings } from '@openforis/arena-core'
 
+import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
 
 import { db } from '@server/db/db'
@@ -105,10 +106,10 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
  * @returns {string} Generated query string.
  */
 export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColumnName = (col) => R.propOr(col, 'name', col)
+  const getColumnName = (col) => A.propOr(col, 'name', col)
 
   const idColumnName = getColumnName(idCol)
-  const idColCast = R.propOr('text', 'cast', idCol)
+  const idColCast = A.propOr('text', 'cast', idCol)
 
   const cols = [`?${idColumnName}`, ...updateCols]
 
@@ -145,9 +146,9 @@ export const getPropsPublishedCondition = ({ draft, tableAlias = null }) => {
  */
 export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
   const columnPrefix = tableAlias ? Strings.appendIfMissing('.')(tableAlias) : ''
-  return draft
-    ? `${columnPrefix}props || ${columnPrefix}props_draft${alias ? ` AS ${alias}` : ''}`
-    : `${columnPrefix}props${alias ? ` AS ${alias}` : ''}`
+  const aliasSql = alias ? ` AS ${alias}` : ''
+  const propsSql = draft ? `${columnPrefix}props || ${columnPrefix}props_draft` : `${columnPrefix}props`
+  return `${propsSql}${aliasSql}`
 }
 /**
  * Combines a draft and a published column prop, if needed.
@@ -158,8 +159,10 @@ export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
  * @param {string} alias - Alias of the result column.
  * @returns {string} - The column with combined props.
  */
-export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) =>
-  `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${alias ? ` AS ${alias}` : ''}`
+export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) => {
+  const aliasSql = alias ? ` AS ${alias}` : ''
+  return `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${aliasSql}`
+}
 
 /**
  * Generates a filter condition (LIKE) with a named parameter.
@@ -190,9 +193,51 @@ export const prepareParameterForFilter = (value, filterType = filterTypes.includ
   }
 }
 
+/**
+ * Normalizes a LIMIT query parameter (it can come from the request).
+ * @param {any} limit - The limit value.
+ * @returns {number|null} - The limit as a positive integer, or null (LIMIT NULL = LIMIT ALL) if not valid.
+ */
+export const normalizeLimit = (limit) => {
+  const limitNumber = NumberUtils.toNumber(limit)
+  return Number.isInteger(limitNumber) && limitNumber > 0 ? limitNumber : null
+}
+
+/**
+ * Normalizes an OFFSET query parameter (it can come from the request).
+ * @param {any} offset - The offset value.
+ * @returns {number} - The offset as a non-negative integer, or 0 if not valid.
+ */
+export const normalizeOffset = (offset) => {
+  const offsetNumber = NumberUtils.toNumber(offset)
+  return Number.isInteger(offsetNumber) && offsetNumber > 0 ? offsetNumber : 0
+}
+
 export const formatQuery = pgp.as.format
 
-export const asName = (name) => (name.startsWith('"') ? name : StringUtils.quoteDouble(name))
+/**
+ * Collects positional query parameters, so that values (e.g. stored names or language codes) are escaped by pg-promise
+ * instead of being written into the SQL text.
+ * @param {Array<unknown>} [initialValues] - Values of the first parameters ($1, $2...).
+ * @returns {{values: Array<unknown>, add: function(unknown, string=): string}} - The collected values and a function that adds
+ * a value and returns its placeholder (e.g. "$2", or "$2:name" when the modifier ":name" is specified).
+ */
+export const newQueryParams = (initialValues = []) => {
+  const values = [...initialValues]
+  const add = (value, modifier = '') => {
+    values.push(value)
+    return `$${values.length}${modifier}`
+  }
+  return { values, add }
+}
+
+// options of client.tx: statements modifying data fail (applied to top-level transactions only)
+export const txOptionsReadOnly = { mode: new pgp.txMode.TransactionMode({ readOnly: true }) }
+
+// a quoted identifier: inner double quotes are doubled
+const quotedIdentifierRegex = /^"(?:[^"]|"")*"$/
+
+export const asName = (name) => (quotedIdentifierRegex.test(name) ? name : StringUtils.quoteDouble(name))
 
 export const getPublishedCondition = ({ draft, tableAlias = null }) => {
   if (draft) return ''
@@ -205,16 +250,41 @@ export const getWhereClause = (...conditions) => {
   return nonEmptyConditions.length > 0 ? `WHERE ${nonEmptyConditions.join(' AND ')}` : ''
 }
 
-// VACUUM (removes dead tuples)
-export const vacuumTable = async ({ schema, table }, client = db) => client.query(`VACUUM ${schema}.${table}`)
+// Disables Postgres parallel query workers for the rest of the current transaction (SET LOCAL is
+// transaction-scoped, so this reverts automatically on commit/rollback). Parallel workers request
+// dynamic shared memory from /dev/shm, which some deployments cap well below what a worker may
+// need (e.g. Docker's default 64MB shm-size), failing with "could not resize shared memory
+// segment ... No space left on device". Use this in a transaction expected to run large/complex
+// queries where hitting that ceiling is a real risk and losing intra-query parallelism there is an
+// acceptable trade-off.
+export const disableParallelQueryForTransaction = async (client) =>
+  client.none('SET LOCAL max_parallel_workers_per_gather = 0')
+
+/**
+ * Runs VACUUM on the specified table: it removes dead tuples, making their space reusable.
+ * It cannot be run inside a transaction.
+ * @param {!object} params - The parameters.
+ * @param {!string} params.schema - The table schema.
+ * @param {!string} params.table - The table name.
+ * @param {boolean} [params.full] - If true, rewrites the table giving the space back to the OS (it locks the table while running).
+ * @param {boolean} [params.analyze] - If true, updates the table statistics too.
+ * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
+ * @returns {Promise<null>} - The query result.
+ */
+export const vacuumTable = async ({ schema, table, full = false, analyze = false }, client = db) => {
+  const options = [full && 'FULL', analyze && 'ANALYZE'].filter(Boolean)
+  const optionsClause = options.length > 0 ? `(${options.join(', ')}) ` : ''
+  return client.none(`VACUUM ${optionsClause}$1:name.$2:name`, [schema, table])
+}
 
 export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
   client.one(
     `SELECT 
-		SUM(pg_relation_size(pg_catalog.pg_class.oid)) as size
+		SUM(pg_total_relation_size(pg_catalog.pg_class.oid)) as size
     FROM pg_catalog.pg_class
       JOIN pg_catalog.pg_namespace ON relnamespace = pg_catalog.pg_namespace.oid
     WHERE pg_catalog.pg_namespace.nspname = $1
+      AND pg_catalog.pg_class.relkind IN ('r', 'm', 'p')
 `,
     [schema],
     (row) => Number(row.size)
@@ -244,3 +314,24 @@ export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, ta
   )
 
 export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)
+
+/**
+ * Runs the specified queries and returns their results (in the same order).
+ * Queries are run in parallel only when the client is the connection pool: in a task or a transaction they share
+ * the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are run
+ * one after the other.
+ * @param {pgPromise.IDatabase|pgPromise.ITask} [client] - The db client (pool, task or transaction); when not specified,
+ * the queries are expected to use the connection pool.
+ * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
+ * @returns {Promise<Array<*>>} - The results of the queries.
+ */
+export const runQueries = async (client, queryFns) => {
+  if (!client || client === db) {
+    return Promise.all(queryFns.map((queryFn) => queryFn()))
+  }
+  const results = []
+  for (const queryFn of queryFns) {
+    results.push(await queryFn()) // NOSONAR
+  }
+  return results
+}

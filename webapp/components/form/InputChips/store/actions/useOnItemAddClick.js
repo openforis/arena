@@ -11,7 +11,7 @@ export const useOnItemAddClick = ({ onChange, onItemAdd, setState }) => {
     ({ selection }) => {
       setState((statePrev) => {
         const value = State.getInputFieldValue(statePrev)
-        if (selection.indexOf(value) >= 0) {
+        if (selection.includes(value)) {
           dispatch(NotificationActions.notifyWarning({ key: 'common.itemAlreadyAdded' }))
           return statePrev
         }

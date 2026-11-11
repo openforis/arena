@@ -1,8 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import PropTypes from 'prop-types'
 
+import * as A from '@core/arena'
 import { getLanguageLabel } from '@core/app/languages'
 import { defaultLanguage, supportedLanguages } from '@core/i18n/i18nFactory'
+import { uuidv4 } from '@core/uuid'
 
 import * as API from '@webapp/service/api'
 import { Button, ButtonIconClose, ButtonMenu } from '@webapp/components/buttons'
@@ -27,7 +29,8 @@ const loadHistory = () => {
     const raw = sessionStorage.getItem(HISTORY_KEY)
     if (!raw) return []
     const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : []
+    // messages saved before ids were introduced get one now (used as React key)
+    return Array.isArray(parsed) ? parsed.map((message) => (message.id ? message : { ...message, id: uuidv4() })) : []
   } catch {
     return []
   }
@@ -120,15 +123,17 @@ const ChatbotPanel = ({ onClose }) => {
     const text = input.trim()
     if (!text || streaming) return
     setError(null)
-    const userMsg = { role: 'user', parts: [{ type: 'text', text }] }
+    const userMsg = { id: uuidv4(), role: 'user', parts: [{ type: 'text', text }] }
     // Insert the assistant placeholder so streaming chunks have a home.
-    const assistantMsg = { role: 'assistant', parts: [{ type: 'text', text: '' }] }
+    const assistantMsg = { id: uuidv4(), role: 'assistant', parts: [{ type: 'text', text: '' }] }
     const nextMessages = [...messages, userMsg, assistantMsg]
     const assistantIdx = nextMessages.length - 1
 
-    // We send the history up to and including the user turn — not the
-    // empty assistant placeholder.
+    // Drop the empty assistant placeholder and any stale empty messages from earlier failed turns.
     const outboundMessages = [...messages, userMsg]
+      .filter((m) => stripText(m).length > 0)
+      // the id is used only in the UI
+      .map(({ id: _id, ...message }) => message)
 
     setMessages(nextMessages)
     setInput('')
@@ -157,10 +162,27 @@ const ChatbotPanel = ({ onClose }) => {
       },
       onTitle: (next) => setTitle(next),
       onDone: () => {
+        // Drop the placeholder if the stream produced no text at all, instead of persisting it.
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx(A.dissoc(assistantIdx))
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setStreaming(false)
         cancelRef.current = null
       },
       onError: (err) => {
+        setMessages((prev) => {
+          const current = prev[assistantIdx]
+          if (current && stripText(current).length === 0) {
+            setReasoningByIdx(A.dissoc(assistantIdx))
+            return prev.slice(0, assistantIdx).concat(prev.slice(assistantIdx + 1))
+          }
+          return prev
+        })
         setError(err?.message || 'unknown')
         setStreaming(false)
         cancelRef.current = null
@@ -210,7 +232,7 @@ const ChatbotPanel = ({ onClose }) => {
   }
 
   return (
-    <div className="ai-chatbot-panel" role="dialog" aria-modal="false">
+    <dialog className="ai-chatbot-panel" open>
       <div className="ai-chatbot-panel__header">
         <div className="ai-chatbot-panel__title">{title || i18n.t('aiChatbot.title')}</div>
         <div className="ai-chatbot-panel__header-actions">
@@ -245,7 +267,7 @@ const ChatbotPanel = ({ onClose }) => {
         ) : (
           messages.map((m, idx) => (
             <ChatbotMessage
-              key={idx}
+              key={m.id}
               role={m.role}
               text={stripText(m)}
               reasoning={reasoningByIdx[idx]}
@@ -275,7 +297,7 @@ const ChatbotPanel = ({ onClose }) => {
           )}
         </div>
       </div>
-    </div>
+    </dialog>
   )
 }
 

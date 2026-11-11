@@ -6,17 +6,8 @@ export default {
     activityLog: {
       title: 'Журнал активности',
       size: '$t(homeView:dashboard.activityLog.title) размер: {{size}}',
-    },
-    deleteActivityLog: 'Очистить журнал активности',
-    deleteActivityLogDataConfirm: {
-      headerText: 'Очистить ВСЕ данные журнала активности для этого опроса?',
-      message: `
-  - БУДУТ удалены ВСЕ данные журнала активности для опроса **{{surveyName}}**;\n\n
-  - место, занимаемое опросом в БД, будет сокращено;\n\n
-  - это не повлияет на введенные данные опроса;\n\n
-  
-  $t(common.cantUndoWarning)`,
-      confirmName: 'Введите название этого опроса для подтверждения:',
+      loadError: 'Не удалось загрузить активность.',
+      empty: 'Активности пока нет.',
     },
     exportWithData: 'Экспорт + данные (резервная копия)',
     exportWithDataNoActivityLog: 'Экспорт + данные (БЕЗ журнала активности)',
@@ -58,6 +49,24 @@ export default {
       totalItems: 'Всего элементов: {{totalItems}}',
       remainingItems: 'Оставшиеся элементы',
     },
+    kpi: {
+      records: 'Записи',
+      contributors: 'Участники',
+      storage: 'Хранилище',
+      expandDetails: 'Показать подробности',
+      collapseDetails: 'Скрыть подробности',
+    },
+    recordsCard: {
+      total: 'Записи, добавленные за выбранный период',
+      byStep: 'По этапу рабочего процесса (за всё время)',
+    },
+    contributorsCard: {
+      active: 'Активные участники за выбранный период: {{count}}',
+    },
+    map: {
+      title: 'Карта',
+      allOwners: 'Все владельцы',
+    },
     step: {
       entry: 'Ввод данных',
       cleansing: 'Очистка данных',
@@ -80,24 +89,27 @@ export default {
     branding: {
       title: 'Брендинг',
       primaryColor: 'Основной цвет',
-      titleFontSize: '$t(homeView:surveyInfo.branding.titleFontSize)',
-      descriptionFontSize: '$t(homeView:surveyInfo.branding.descriptionFontSize)',
+      titleFontSize: 'Размер шрифта заголовка',
+      descriptionFontSize: 'Размер шрифта описания',
       fontSizePreset: {
-        small: '$t(homeView:surveyInfo.branding.fontSizePreset.small)',
-        default: '$t(homeView:surveyInfo.branding.fontSizePreset.default)',
-        large: '$t(homeView:surveyInfo.branding.fontSizePreset.large)',
+        small: 'Мелкий',
+        default: 'По умолчанию',
+        large: 'Крупный',
       },
-      surveyLogo1: '$t(homeView:surveyInfo.branding.surveyLogo1)',
-      surveyLogo2: '$t(homeView:surveyInfo.branding.surveyLogo2)',
-      surveyLogo3: '$t(homeView:surveyInfo.branding.surveyLogo3)',
-      landingBackground: '$t(homeView:surveyInfo.branding.landingBackground)',
+      surveyLogo1: 'Логотип опроса 1',
+      surveyLogo2: 'Логотип опроса 2',
+      surveyLogo3: 'Логотип опроса 3',
+      landingBackground: 'Фоновое изображение стартовой страницы',
       uploadLogo: 'Загрузить логотип',
-      logoFileFormatHint: '$t(homeView:surveyInfo.branding.logoFileFormatHint)',
-      logoFileTooLarge: '$t(homeView:surveyInfo.branding.logoFileTooLarge)',
+      logoFileFormatHint: 'PNG, JPEG, WebP или SVG (макс. {{maxMb}} МБ)',
+      logoFileTooLarge: 'Размер изображения логотипа не должен превышать {{maxMb}} МБ',
       preview: 'Предпросмотр',
-      backgroundFileTooLarge: '$t(homeView:surveyInfo.branding.backgroundFileTooLarge)',
+      backgroundFileTooLarge: 'Размер фонового изображения не должен превышать {{maxMb}} МБ',
       invalidPrimaryColor: 'Введите допустимый цвет #RRGGBB или оставьте пустым',
-      invalidSaveBlocked: '$t(homeView:surveyInfo.branding.invalidSaveBlocked)',
+      invalidSaveBlocked: 'Исправьте недопустимые поля брендинга перед сохранением информации об опросе',
+      imageLoadError: 'Не удалось загрузить изображение "{{name}}". Удалите его и загрузите новое.',
+      imageLoadErrorReadOnly: 'Не удалось загрузить изображение "{{name}}"',
+      downloadImage: 'Нажмите, чтобы скачать изображение',
     },
     configuration: {
       title: 'Конфигурация',
@@ -107,16 +119,42 @@ export default {
     confirmDeleteCycle: `Вы уверены, что хотите удалить цикл {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 Если к этому циклу привязаны записи, они будут удалены.`,
     cycleForArenaMobile: 'Цикл для Arena Mobile',
+    keepNonApplicableValues: `Сохранять значения неактуальных атрибутов`,
+    keepNonApplicableValuesInfo: `Если флажок не установлен (по умолчанию), при вводе данных значения атрибутов, которые стали неактуальными, удаляются (после подтверждения пользователем).
+Если флажок установлен, эти значения сохраняются в записи, даже если атрибуты больше не актуальны.`,
+    deleteActivityLog: 'Очистить журнал активности',
+    deleteActivityLogConfirm: {
+      headerText: 'Очистить ВСЕ данные журнала активности для этого опроса?',
+      message: `
+  - БУДУТ удалены ВСЕ данные журнала активности для опроса **{{surveyName}}**;\n\n
+  - место, занимаемое опросом в БД, будет сокращено;\n\n
+  - это не повлияет на введенные данные опроса;\n\n
+  
+  $t(common.cantUndoWarning)`,
+      confirmName: 'Введите название этого опроса для подтверждения:',
+    },
     fieldManualLink: 'Ссылка на полевое руководство',
     map: 'Карта',
     editInfo: 'Редактировать информацию',
     viewInfo: 'Просмотреть информацию',
 
+    areasOfInterest: {
+      title: 'Области интереса',
+      info: 'Полигоны (GeoJSON, координаты WGS84), используемые функциями выражений geoDistanceToAOIBoundary (расстояние до границы области) и geoAOIContaining (область, содержащая местоположение), в том числе офлайн в Arena Mobile. Имя области используется в выражениях.',
+      name: 'Имя',
+      polygons: 'Полигоны',
+      vertices: 'Вершины',
+      invalidFile: 'Файл не содержит допустимого полигона в формате GeoJSON с координатами WGS84',
+      confirmDelete: 'Вы уверены, что хотите удалить эту область интереса?',
+      showAllOnMap: 'Показать все на карте',
+      editor: {
+        title: 'Область интереса',
+      },
+    },
+
     preloadedMapLayers: {
       enabledMessage: 'Включены предзагруженные слои карты',
       title: 'Предзагруженные слои карты',
-      fileName: 'Имя файла',
-      fileSize: 'Размер файла',
       confirmDelete: 'Вы уверены, что хотите удалить этот предзагруженный слой карты?',
       editor: {
         title: 'Предзагруженный слой карты',
@@ -153,6 +191,10 @@ export default {
       visibleInMobile: 'Видно в Arena Mobile',
       allowRecordsDownloadInMobile: 'Разрешить загрузку записей с сервера в Arena Mobile',
       allowRecordsUploadFromMobile: 'Разрешить загрузку записей из Arena Mobile на сервер',
+      allowRecordsWithErrorsUploadFromMobile:
+        'Разрешить загрузку записей с ошибками проверки из Arena Mobile на сервер',
+      allowRecordsMergeWithSameKeys:
+        'Разрешить объединение записей с одинаковыми ключами (например, записей, созданных на разных устройствах с Arena Mobile)',
     },
     srsPlaceholder: 'Введите код или метку',
     unpublish: 'Отменить публикацию и удалить данные',
@@ -186,9 +228,10 @@ $t(common.cantUndoWarning)`,
     expression: 'Выражение',
     resolved: 'Разрешено',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Родительский код',
       defaultValue: 'Значение по умолчанию',
+      requiredIf: 'Обязательно, если',
       validationRule: 'Правило проверки',
     },
     title: 'Отчет об импорте Collect',
@@ -197,12 +240,20 @@ $t(common.cantUndoWarning)`,
     recordsAddedInTheLast: 'Записи, добавленные за последние:',
     fromToPeriod: 'с {{from}} по {{to}}',
     record: '{{count}} Запись',
+    record_few: '{{count}} Записи',
+    record_many: '{{count}} Записей',
     record_other: '{{count}} Записей',
     week: '{{count}} Неделя',
+    week_few: '{{count}} Недели',
+    week_many: '{{count}} Недель',
     week_other: '{{count}} Недель',
     month: '{{count}} Месяц',
+    month_few: '{{count}} Месяца',
+    month_many: '{{count}} Месяцев',
     month_other: '{{count}} Месяцев',
     year: '{{count}} Год',
+    year_few: '{{count}} Года',
+    year_many: '{{count}} Лет',
     year_other: '{{count}} Лет',
   },
 }

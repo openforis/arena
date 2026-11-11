@@ -19,27 +19,33 @@
     .node-grid {
       display: flex;
       align-items: center;
-      border: 1px solid $greyBorder;
-      justify-content: space-between;
+      border: 1px solid $colorOutline;
       transition: background-color 1s ease;
-      background-color: white;
+      background-color: $colorSurface;
       height: auto;
       padding: 6px;
 
+      .node-icon {
+        flex-shrink: 0;
+      }
+
       .btn {
+        flex-shrink: 0;
+        margin-left: auto;
         transform: rotate(-90deg);
         padding: 0.3rem;
       }
 
       &.node-virtual {
-        background-color: $grey;
+        background-color: $colorSurfaceVariant;
       }
 
       &.highlight {
-        background-color: $blueLightActive;
+        background-color: $colorPrimaryContainerHigh;
       }
 
       .node-label {
+        flex: 1;
         text-overflow: ellipsis;
         overflow: hidden;
         line-height: 1.5;
@@ -52,7 +58,7 @@
 
   .link {
     fill: none;
-    stroke: $blueLightActive;
+    stroke: $colorPrimaryContainerHigh;
     stroke-width: 1px;
   }
 }

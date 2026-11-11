@@ -26,7 +26,7 @@ const filterItems = async ({
   for (const item of items) {
     const itemFilterResult =
       alwaysIncludeItemFunction?.(item) ||
-      (await expressionEvaluator.evalExpression({ user, survey, record, node: parentNode, query: itemsFilter, item }))
+      (await expressionEvaluator.evalExpression({ user, survey, record, node: parentNode, query: itemsFilter, item })) // NOSONAR
     itemsFilterResults.push(itemFilterResult)
   }
   return items.filter((_, index) => itemsFilterResults[index])
@@ -45,7 +45,7 @@ export const useItemsFilter = ({ nodeDef, parentNode, items, alwaysIncludeItemFu
 
     const record = RecordState.getRecord(state)
 
-    filterItems({
+    void filterItems({
       user,
       survey,
       record,

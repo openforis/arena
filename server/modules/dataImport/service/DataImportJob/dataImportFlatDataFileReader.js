@@ -17,8 +17,8 @@ import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 const VALUE_PROP_DEFAULT = 'value'
 
-const allowedBooleanValues = ['true', 'false', 'yes', 'no', '1', '0']
-const booleanTrueValues = ['true', 'yes', '1']
+const allowedBooleanValues = new Set(['true', 'false', 'yes', 'no', '1', '0'])
+const booleanTrueValues = new Set(['true', 'yes', '1'])
 
 const generateAllowedDateFormats = (sep) => [
   `DD${sep}MM${sep}YYYY`,
@@ -37,7 +37,7 @@ const allowedDateFormats = dateFormatsSeparators.reduce((acc, separator) => {
   acc.push(...generateAllowedDateFormats(separator))
   return acc
 }, [])
-const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm']
+const allowedTimeFormats = [DateUtils.formats.timeStorage, 'H:mm', DateUtils.formats.timeWithSeconds, 'H:mm:ss']
 
 const singlePropValueConverter = ({ value }) => value[VALUE_PROP_DEFAULT]
 
@@ -100,13 +100,44 @@ const findTaxon = async ({ survey, taxonProvider, nodeDef, taxonCode }) => {
   )
 }
 
+const timeWithSecondsValuePattern = /^\d{1,2}:\d{2}:\d{2}$/
+
+/**
+ * Extracts and validates a time value from an imported row, formatting it according to the node definition's seconds setting.
+ * @param {!object} params - The parameters object.
+ * @param {!object} params.value - The raw value object read from the input row.
+ * @param {!Array<string>} params.headers - The input file headers, used for error reporting.
+ * @param {!object} params.nodeDef - The time node definition the value belongs to.
+ * @returns {object} An object with the formatted time `value` and a null `refData`.
+ */
+export const extractTimeValue = ({ value, headers, nodeDef }) => {
+  const val = value[VALUE_PROP_DEFAULT]
+  // Only apply the node def's seconds-including format when the input value itself carries
+  // seconds; otherwise fall back to the plain HH:mm storage format, so an HH:mm input into a
+  // seconds-enabled attribute is accepted as-is, instead of being padded with a spurious ":00".
+  const valueHasSeconds = typeof val === 'string' && timeWithSecondsValuePattern.test(val.trim())
+  const formatTo = valueHasSeconds
+    ? DateUtils.getTimeFormat(NodeDef.isSecondsIncluded(nodeDef))
+    : DateUtils.formats.timeStorage
+  return {
+    value: extractDateOrTime({
+      value,
+      allowedFormats: allowedTimeFormats,
+      formatTo,
+      headers,
+      errorKey: 'validationErrors:dataImport.invalidTime',
+    }),
+    refData: null,
+  }
+}
+
 const nodeValueAndRefDataExtractorByNodeDefType = {
   [NodeDef.nodeDefType.boolean]: ({ value, headers }) => {
     const val = singlePropValueConverter({ value })
-    if (!allowedBooleanValues.includes(String(val).toLocaleLowerCase())) {
+    if (!allowedBooleanValues.has(String(val).toLocaleLowerCase())) {
       throw new SystemError('validationErrors:dataImport.invalidBoolean', { value: val, headers })
     }
-    return { value: String(booleanTrueValues.includes(String(val).toLocaleLowerCase())), refData: null }
+    return { value: String(booleanTrueValues.has(String(val).toLocaleLowerCase())), refData: null }
   },
   [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, nodeDef, value }) => {
     const code = value[Node.valuePropsCode.code]
@@ -197,16 +228,7 @@ const nodeValueAndRefDataExtractorByNodeDefType = {
     const val = singlePropValueConverter({ value })
     return { value: val === null || val === undefined ? null : String(val), refData: null }
   },
-  [NodeDef.nodeDefType.time]: ({ value, headers }) => ({
-    value: extractDateOrTime({
-      value,
-      allowedFormats: allowedTimeFormats,
-      formatTo: DateUtils.formats.timeStorage,
-      headers,
-      errorKey: 'validationErrors:dataImport.invalidTime',
-    }),
-    refData: null,
-  }),
+  [NodeDef.nodeDefType.time]: extractTimeValue,
 }
 
 const checkAllHeadersAreValid =
@@ -219,10 +241,28 @@ const checkAllHeadersAreValid =
     }
   }
 
+// value props required for key attributes; other columns of the same attribute are optional
+// (coordinate additional fields, taxon scientific and vernacular names used only for unlisted taxa)
+const requiredValuePropsByNodeDefType = {
+  [NodeDef.nodeDefType.coordinate]: [
+    Node.valuePropsCoordinate.x,
+    Node.valuePropsCoordinate.y,
+    Node.valuePropsCoordinate.srs,
+  ],
+  [NodeDef.nodeDefType.taxon]: [Node.valuePropsTaxon.code],
+}
+
+const isRequiredColumn = (column) => {
+  const { key, nodeDef, valueProp } = column
+  if (!key) return false
+  const requiredValueProps = requiredValuePropsByNodeDefType[NodeDef.getType(nodeDef)]
+  return !requiredValueProps || requiredValueProps.includes(valueProp)
+}
+
 const checkRequiredHeadersNotMissing =
   ({ csvDataExportModel }) =>
   (headers) => {
-    const requiredHeaders = csvDataExportModel.columns.filter((col) => col.key).map((col) => col.header)
+    const requiredHeaders = csvDataExportModel.columns.filter(isRequiredColumn).map((col) => col.header)
     const missingRequiredHeaders = requiredHeaders.filter((header) => !headers.includes(header))
     if (missingRequiredHeaders.length > 0) {
       throw new SystemError('validationErrors:dataImport.missingRequiredHeaders', { missingRequiredHeaders })
@@ -251,7 +291,7 @@ const _validateHeaders =
  * @param {boolean} [params.validateHeaders] - Whether to validate input file headers or not.
  * @param {boolean} [params.includeFiles] - Whether to include file attributes or not.
  * @param {Function} [params.onTotalChange] - Function invoked when total number of rows is calculated.
- * @returns {object} - Object with start and cancel functions to control the reader.
+ * @returns {{start: function(): Promise<*>, cancel: function(): void}} - Object with start and cancel functions to control the reader.
  */
 const createReaderFromStream = ({
   stream,
@@ -323,7 +363,7 @@ const createReaderFromStream = ({
         try {
           const { value: nodeValue, refData } = Objects.isEmpty(valueTemp)
             ? { value: null, refData: null }
-            : await extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers })
+            : await extractor({ survey, categoryItemProvider, taxonProvider, nodeDef, value: valueTemp, headers }) // NOSONAR
           valuesByDefUuid[nodeDefUuid] = nodeValue
           refDataByDefUuid[nodeDefUuid] = refData
         } catch (error) {

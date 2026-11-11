@@ -6,6 +6,8 @@ export default {
     activityLog: {
       title: 'Activity log',
       size: '$t(homeView:dashboard.activityLog.title) size: {{size}}',
+      loadError: 'Activity could not be loaded.',
+      empty: 'No activity yet.',
     },
     exportWithData: 'Export + data (Backup)',
     exportWithDataNoActivityLog: 'Export + data (NO Activity Log)',
@@ -47,6 +49,24 @@ export default {
       totalItems: 'Total items: {{totalItems}}',
       remainingItems: 'Remaining items',
     },
+    kpi: {
+      records: 'Records',
+      contributors: 'Contributors',
+      storage: 'Storage',
+      expandDetails: 'Show details',
+      collapseDetails: 'Hide details',
+    },
+    recordsCard: {
+      total: 'Records added in selected period',
+      byStep: 'By workflow step (all time)',
+    },
+    contributorsCard: {
+      active: 'Active contributors in selected period: {{count}}',
+    },
+    map: {
+      title: 'Map',
+      allOwners: 'All owners',
+    },
     step: {
       entry: 'Data Entry',
       cleansing: 'Data Cleansing',
@@ -87,6 +107,9 @@ export default {
       backgroundFileTooLarge: 'Background image must be {{maxMb}} MB or smaller',
       invalidPrimaryColor: 'Enter a valid #RRGGBB color or leave empty',
       invalidSaveBlocked: 'Fix invalid branding fields before saving survey info',
+      imageLoadError: 'Could not load image "{{name}}". Delete it and upload a new one.',
+      imageLoadErrorReadOnly: 'Could not load image "{{name}}"',
+      downloadImage: 'Click to download the image',
     },
     configuration: {
       title: 'Configuration',
@@ -96,6 +119,9 @@ export default {
     confirmDeleteCycle: `Are you sure you want to delete the cycle {{cycle}}?\n\n$t(common.cantUndoWarning)\n\n
 If there are records associated to this cycle, they will be deleted.`,
     cycleForArenaMobile: 'Cycle for Arena Mobile',
+    keepNonApplicableValues: 'Keep values of non-relevant attributes',
+    keepNonApplicableValuesInfo: `When unchecked (default), during data entry the values of attributes that are no longer relevant are cleared (after the user confirms it).
+When checked, those values are kept in the record, even if the attributes are not relevant anymore.`,
     deleteActivityLog: 'Clear activity log',
     deleteActivityLogConfirm: {
       headerText: 'Clear ALL the activity log data for this survey?',
@@ -111,6 +137,20 @@ If there are records associated to this cycle, they will be deleted.`,
     editInfo: 'Edit info',
     map: 'Map',
     viewInfo: 'View info',
+
+    areasOfInterest: {
+      title: 'Areas of interest',
+      info: 'Polygons (GeoJSON, WGS84 coordinates) used by the expression functions geoDistanceToAOIBoundary (distance to the boundary of an area) and geoAOIContaining (area containing a location), also offline in Arena Mobile. The name of an area is used in the expressions.',
+      name: 'Name',
+      polygons: 'Polygons',
+      vertices: 'Vertices',
+      invalidFile: 'The file does not contain a valid polygon in GeoJSON format with WGS84 coordinates',
+      confirmDelete: 'Are you sure you want to delete this area of interest?',
+      showAllOnMap: 'Show all on map',
+      editor: {
+        title: 'Area of interest',
+      },
+    },
 
     preloadedMapLayers: {
       enabledMessage: 'Preloaded map layers enabled',
@@ -153,6 +193,8 @@ If there are records associated to this cycle, they will be deleted.`,
       allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
       allowRecordsWithErrorsUploadFromMobile:
         'Allow uploading records with validation errors from Arena Mobile to server',
+      allowRecordsMergeWithSameKeys:
+        'Allow merging records with same keys (e.g. records created in different Arena Mobile devices)',
     },
     srsPlaceholder: 'Type code or label',
     unpublish: 'Unpublish and delete data',
@@ -186,9 +228,10 @@ $t(common.cantUndoWarning)`,
     expression: 'Expression',
     resolved: 'Resolved',
     exprType: {
-      applicable: '$t(nodeDefEdit.advancedProps.relevantIf)',
+      applicable: '$t(nodeDefEdit:advancedProps.relevantIf)',
       codeParent: 'Parent code',
       defaultValue: 'Default value',
+      requiredIf: 'Required if',
       validationRule: 'Validation rule',
     },
     title: 'Collect Import Report',

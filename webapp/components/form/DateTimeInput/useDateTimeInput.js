@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useCallback, useRef } from 'react'
 
 import * as DateUtils from '@core/dateUtils'
@@ -6,7 +6,7 @@ import * as DateUtils from '@core/dateUtils'
 export const useDateTimeInput = ({ onChange: onChangeProp, value, valueFormat }) => {
   const errorRef = useRef(false)
 
-  const dateValue = value ? moment(DateUtils.parse(value, valueFormat, { keepTimeZone: false })) : null
+  const dateValue = value ? dayjs(DateUtils.parse(value, valueFormat, { keepTimeZone: false })) : null
 
   const applyChange = useCallback(
     (dateFormatted) => {

@@ -1,3 +1,5 @@
+@use '~@webapp/style/vars' as *;
+
 .user-ai-settings-panel {
   display: flex;
   flex-direction: column;
@@ -6,8 +8,8 @@
   justify-self: center;
 
   &__status {
-    background: var(--colorGrey300);
-    border: 1px solid var(--colorGrey500);
+    background: $colorSurfaceVariant;
+    border: 1px solid shade($colorOutline, 30%);
     border-radius: 4px;
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
@@ -15,17 +17,17 @@
     text-align: center;
 
     &--missing {
-      background: #ffebee;
-      border-color: #ef9a9a;
+      background: $colorErrorContainer;
+      border-color: with-alpha($colorError, 0.5);
     }
   }
 
   &__hint {
     font-size: 0.8rem;
-    color: var(--colorGrey700);
+    color: $colorOnSurfaceVariant;
 
     &--error {
-      color: #c62828;
+      color: $colorError;
     }
   }
 
@@ -43,7 +45,7 @@
 
   &__fetch-models {
     background: none;
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid shade($colorOutline, 30%);
     border-radius: 4px;
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
@@ -51,7 +53,7 @@
 
     &:disabled {
       cursor: default;
-      color: var(--colorGrey600);
+      color: $colorOnSurfaceVariant;
     }
   }
 
@@ -68,7 +70,7 @@
 
   &__categories,
   &__provider {
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid shade($colorOutline, 30%);
     border-radius: 4px;
     padding: 0.25rem 0.75rem 0.5rem;
     margin: 0.25rem 0;
@@ -78,7 +80,7 @@
       margin: 0 auto;
       font-size: 0.85rem;
       font-weight: 600;
-      color: var(--colorGrey700);
+      color: $colorOnSurfaceVariant;
       text-align: center;
     }
   }
@@ -99,7 +101,7 @@
   &__effective {
     text-align: center;
     font-size: 0.85rem;
-    color: var(--colorGrey700);
+    color: $colorOnSurfaceVariant;
     padding: 0.25rem 0 0.5rem;
   }
 
@@ -107,10 +109,10 @@
     margin-top: 0.25rem;
     font-size: 0.85rem;
     &.ok {
-      color: #2e7d32;
+      color: $colorSuccess;
     }
     &.fail {
-      color: #c62828;
+      color: $colorError;
     }
   }
 }

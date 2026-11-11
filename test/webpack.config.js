@@ -1,15 +1,31 @@
-const path = require('path')
+const fs = require('node:fs')
+const path = require('node:path')
 const glob = require('glob')
 const nodeExternals = require('webpack-node-externals')
+
+const isEsmOnlyModule = (moduleName) => {
+  const [first, second] = moduleName.split('/')
+  const packageName = first.startsWith('@') ? `${first}/${second}` : first
+  try {
+    const packageJson = JSON.parse(
+      fs.readFileSync(path.resolve(__dirname, '..', 'node_modules', packageName, 'package.json'), 'utf8')
+    )
+    return packageJson.type === 'module'
+  } catch {
+    return false
+  }
+}
 
 const getEntry = (type) =>
   // glob v13 requires forward slashes; path.resolve uses backslashes on Windows.
   glob
-    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replace(/\\/g, '/'))
+    .globSync(path.resolve(__dirname, type, 'tests', '*.{js,jsx,ts,tsx}').replaceAll('\\', '/'))
     .sort((fileA, fileB) => {
-      const idxA = fileA.substr(0, 3)
-      const idxB = fileB.substr(0, 3)
-      return idxA < idxB
+      const idxA = path.basename(fileA).substr(0, 3)
+      const idxB = path.basename(fileB).substr(0, 3)
+      if (idxA < idxB) return -1
+      if (idxA > idxB) return 1
+      return 0
     })
 
 const getOutput = (type) => ({
@@ -23,7 +39,7 @@ const getModule = () => ({
     {
       test: /\.(js|jsx|ts|tsx)$/,
       exclude: /(node_modules|bower_components)/,
-      use: [{ loader: 'babel-loader' }],
+      use: [{ loader: 'babel-loader', options: { cacheDirectory: true } }],
     },
   ],
 })
@@ -50,12 +66,19 @@ const getResolve = () => ({
   },
 })
 
-module.exports = (type) => ({
+const createWebpackConfig = (type) => ({
   entry: getEntry(type),
   target: 'node', // Ignore built-in modules like path, fs, etc.
-  externals: [nodeExternals()], // Ignore all modules in node_modules folder
+  // Ignore all modules in node_modules folder, except the ESM-only ones: Jest can only require() ESM
+  // natively on Node >= 24.9, so they are bundled (and transpiled) into the test bundle instead.
+  // @turf/* is bundled too: @turf/length needs its nested @turf/distance 7.x, but the hoisted one is 6.x
+  externals: [nodeExternals({ allowlist: [isEsmOnlyModule, /^@turf\//] })],
   mode: 'development',
   devtool: 'source-map',
+  cache: {
+    type: 'filesystem',
+    cacheDirectory: path.resolve(__dirname, '..', 'node_modules', '.cache', 'webpack-test', type),
+  },
   node: {
     __filename: true,
     __dirname: true,
@@ -64,3 +87,5 @@ module.exports = (type) => ({
   resolve: getResolve(),
   module: getModule(),
 })
+
+module.exports = createWebpackConfig

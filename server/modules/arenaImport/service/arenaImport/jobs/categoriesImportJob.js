@@ -27,7 +27,7 @@ export default class CategoriesImportJob extends Job {
 
       for (const category of categoriesArray) {
         if (!this.isCanceled()) {
-          await this._insertCategory({ category })
+          await this._insertCategory({ category }) // NOSONAR
           this.incrementProcessedItems()
         }
       }
@@ -84,7 +84,7 @@ export default class CategoriesImportJob extends Job {
         let items = []
         while (partIndex < partsCount) {
           this.logDebug(`Inserting part ${partIndex + 1} of ${partsCount} for category ${Category.getName(category)}`)
-          items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex })
+          items = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: partIndex }) // NOSONAR
           const itemsToInsert = []
           for (const item of items) {
             const itemUuid = CategoryItem.getUuid(item)
@@ -95,7 +95,7 @@ export default class CategoriesImportJob extends Job {
               itemsToInsert.push(item)
             }
           }
-          await CategoryService.insertItemsInBatch({ surveyId, items: itemsToInsert, backup }, nestedTx)
+          await CategoryService.insertItemsInBatch({ surveyId, items: itemsToInsert, backup }, nestedTx) // NOSONAR
           partIndex = partIndex + 1
         }
       })
@@ -106,7 +106,7 @@ export default class CategoriesImportJob extends Job {
       try {
         const totalItems = []
         for (let i = 0; i < partsCount; i++) {
-          const partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i })
+          const partItems = await ArenaSurveyFileZip.getCategoryItemsPart({ zipFile, categoryUuid, index: i }) // NOSONAR
           totalItems.push(...partItems)
         }
         this.logDebug(`Total items to insert for category ${categoryName}: ${totalItems.length}`)

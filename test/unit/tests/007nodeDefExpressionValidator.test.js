@@ -65,6 +65,9 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'gps_model.toLowerCase()', r: true },
     { q: 'gps_model.substring(4,7)', r: true },
     { q: 'gps_model.length', r: true },
+    // text search methods (supported in the Data Explorer filter)
+    { q: `gps_model.includes('abc')`, r: true },
+    { q: `gps_model.toLowerCase().startsWith('abc') && gps_model.endsWith('xyz')`, r: true },
     // global objects (constructors)
     { q: 'Boolean(cluster_id)', r: true },
     { q: 'Boolean(remarks)', r: true },
@@ -84,8 +87,13 @@ describe('NodeDefExpressionValidator Test', () => {
     { q: 'visit_date.hour', r: false },
     { q: 'visit_time.hour', r: true },
     { q: 'visit_time.minute', r: true },
-    { q: 'visit_time.seconds', r: false },
+    { q: 'visit_time.seconds', r: true },
   ]
 
-  NodeDefExpressionUtils.testNodeDefExpressions({ surveyFn: () => survey, queries })
+  const expressionEvaluator = NodeDefExpressionUtils.nodeDefExpressionEvaluator({ surveyFn: () => survey })
+
+  test.each(NodeDefExpressionUtils.toTestCases(queries))('%s', async (_title, query) => {
+    const { actual, expected } = await NodeDefExpressionUtils.evaluateQuery({ query, expressionEvaluator })
+    expect(actual).toEqual(expected)
+  })
 })

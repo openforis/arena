@@ -29,7 +29,6 @@ export default {
   },
   subject: 'Сэдэв',
   target: {
-    label: 'Зорилтот',
     emailsExcluded: {
       label: 'Хассан имэйлүүд',
       placeholder: 'Хасах имэйл хаягаа оруулаад Нэмэх товчийг дарна уу',
@@ -42,6 +41,7 @@ export default {
       label: 'Зорилтот хэрэглэгчийн төрөл',
       all: 'Бүх хэрэглэгчид',
       system_admins: 'Системийн администраторууд',
+      survey_admins: 'Судалгааны админууд',
       survey_managers: 'Судалгааны менежерүүд',
       data_analysts: 'Өгөгдөл шинжээчид',
       data_cleaners: 'Өгөгдөл цэвэрлэгчид',

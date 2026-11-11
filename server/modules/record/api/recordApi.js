@@ -1,9 +1,8 @@
 import exifr from 'exifr'
 
-import { Objects } from '@openforis/arena-core'
+import { Authorizer, Objects } from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
-import * as Authorizer from '@core/auth/authorizer'
 import * as ProcessUtils from '@core/processUtils'
 
 import * as Request from '@server/utils/request'
@@ -11,6 +10,7 @@ import * as Response from '@server/utils/response'
 import { sendFile, sendOk, setContentTypeFile } from '@server/utils/response'
 import * as JobUtils from '@server/job/jobUtils'
 import * as FileUtils from '@server/utils/file/fileUtils'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 
 import * as User from '@core/user/user'
 import * as Record from '@core/record/record'
@@ -22,6 +22,7 @@ import { FileFormats } from '@core/fileFormats'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
+import { minMobileAppVersionRecordsDownload } from '@common/mobile'
 import * as RecordService from '../service/recordService'
 
 import {
@@ -35,19 +36,32 @@ import {
   requireRecordViewPermission,
   requireRecordsEditPermission,
   requireRecordsExportPermission,
+  requireRecordsMergePermission,
 } from '../../auth/authApiMiddleware'
+import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
+  requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
+  requireRecordReadableByUserGroup,
   requireRecordsMatchUserGroupQualifiers,
+  requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
+import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 
-const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
+const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
-  const fileUuid = Node.getFileUuid(node)
+  // permissions are checked on recordUuid: the node must belong to that record
+  const fileUuid = node && Node.getRecordUuid(node) === recordUuid ? Node.getFileUuid(node) : null
   const file = fileUuid ? await SurveyFileService.fetchFileSummaryByUuid(surveyId, fileUuid) : null
   if (file) {
     const fileName = await RecordService.generateNodeFileNameForDownload({ surveyId, nodeUuid, file })
-    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileUuid })
+    const contentStream = await SurveyFileService.fetchFileContentAsStream({ surveyId, fileSummary: file })
+    if (!contentStream) {
+      // the file is registered but its content is missing from the storage (e.g. deleted from the S3 bucket)
+      const error = new Error(`File content not found for node ${nodeUuid}`)
+      error.statusCode = 404
+      throw error
+    }
     return { fileName, file, contentStream }
   } else {
     const error = new Error(`File not found for node ${nodeUuid}`)
@@ -97,12 +111,28 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { surveyId, cycle, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, recordUuid, cycle, draft, timezoneOffset, lang, clearNonApplicableValuesConfirmed } =
+          Request.getParams(req)
         const node = Request.getJsonParam(req, 'node')
+        // permissions are checked on recordUuid: the node must belong to that record
+        if (Node.getRecordUuid(node) !== recordUuid) {
+          throw new UnauthorizedError(User.getName(Request.getUser(req)))
+        }
         const file = Request.getFile(req)
         const socketId = Request.getSocketId(req)
 
-        await RecordService.persistNode({ socketId, user, surveyId, cycle, draft, node, file, timezoneOffset })
+        await RecordService.persistNode({
+          socketId,
+          user,
+          surveyId,
+          cycle,
+          draft,
+          node,
+          file,
+          timezoneOffset,
+          lang,
+          clearNonApplicableValuesConfirmed,
+        })
 
         sendOk(res)
       } catch (error) {
@@ -139,11 +169,19 @@ export const init = (app) => {
 
   // ==== READ
 
+  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
+    const user = Request.getUser(req)
+    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
+    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
+    return canViewNotOwnedRecords ? null : User.getUuid(user)
+  }
+
   app.get('/survey/:surveyId/records/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, search } = Request.getParams(req)
 
-      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      const count = await RecordService.countRecordsBySurveyId({ surveyId, cycle, search, ownerUuid })
       res.json({ count })
     } catch (error) {
       next(error)
@@ -164,7 +202,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireRecordMatchesUserGroupQualifiers,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -182,19 +221,13 @@ export const init = (app) => {
     try {
       const { surveyId } = Request.getParams(req)
 
-      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle({ surveyId })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      const recordsSummary = await RecordService.fetchRecordsUuidAndCycle({ surveyId, ownerUuid })
       res.json(recordsSummary)
     } catch (error) {
       next(error)
     }
   })
-
-  const determineOwnerUuidForQuery = async ({ req, surveyId }) => {
-    const user = Request.getUser(req)
-    const surveyInfo = await SurveyService.fetchSurveyById({ surveyId })
-    const canViewNotOwnedRecords = Authorizer.canViewNotOwnedRecords(user, surveyInfo)
-    return canViewNotOwnedRecords ? null : User.getUuid(user)
-  }
 
   app.get('/survey/:surveyId/records/summary/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
@@ -241,7 +274,8 @@ export const init = (app) => {
       const { surveyId, cycle, fileFormat = FileFormats.xlsx } = Request.getParams(req)
       const user = Request.getUser(req)
 
-      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat, user })
+      const ownerUuid = await determineOwnerUuidForQuery({ req, surveyId })
+      await RecordService.exportRecordsSummary({ res, surveyId, cycle, fileFormat, ownerUuid, user })
     } catch (error) {
       next(error)
     }
@@ -272,34 +306,53 @@ export const init = (app) => {
     }
   })
 
-  // records export (only specified uuids)
+  // export of the specified records in Arena format (zip file that can be imported into Arena and Arena Mobile)
+  const startSelectedRecordsExport = async (req, res, next) => {
+    try {
+      const { surveyId } = Request.getParams(req)
+      const recordUuids = Request.getJsonParam(req, 'recordUuids')
+      // uuids of the files the client already has: their content is left out of the exported file
+      const excludedFileUuids = Request.getJsonParam(req, 'excludedFileUuids', [])
+      const user = Request.getUser(req)
+
+      if (Objects.isEmpty(recordUuids)) {
+        throw new Error('record uuids not specified')
+      }
+
+      const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids, excludedFileUuids })
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
+    }
+  }
+
+  // used by Arena Mobile to download records
   app.post(
     '/survey/:surveyId/records/export',
     requireRecordsExportPermission,
-    requireRecordsMatchUserGroupQualifiers,
-    async (req, res, next) => {
-      try {
-        const { surveyId } = Request.getParams(req)
-        const recordUuids = Request.getJsonParam(req, 'recordUuids')
-        const user = Request.getUser(req)
+    requireMobileAppMinVersion(minMobileAppVersionRecordsDownload),
+    requireNotOwnedRecordsViewAllowed,
+    requireRecordsReadableByUserGroup,
+    startSelectedRecordsExport
+  )
 
-        if (Objects.isEmpty(recordUuids)) {
-          throw new Error('record uuids not specified')
-        }
-
-        const job = RecordService.startRecordsExportJob({ user, surveyId, recordUuids })
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
-    }
+  // used by Arena web: no mobile app version check
+  app.post(
+    '/survey/:surveyId/records/export-selected',
+    requireRecordsExportPermission,
+    requireNotOwnedRecordsViewAllowed,
+    requireRecordsReadableByUserGroup,
+    startSelectedRecordsExport
   )
 
   // download generated record export file
   app.get('/survey/:surveyId/records/export/download', requireRecordsExportPermission, async (req, res, next) => {
     try {
-      const { surveyName, fileName } = Request.getParams(req)
-
+      const { surveyId, surveyName, fileName } = Request.getParams(req)
+      // only files generated by the records export job of this survey (see ZipFileCreatorBaseJob)
+      if (!new RegExp(String.raw`^export_${Number(surveyId)}_\d+\.zip$`).test(String(fileName))) {
+        throw new Error(`Invalid file name: ${fileName}`)
+      }
       const path = FileUtils.join(ProcessUtils.ENV.tempFolder, fileName)
       const prefix = 'arena_records'
       const date = DateUtils.nowFormatDefault()
@@ -312,11 +365,13 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
+        const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
 
-        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { fileName, file, contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeUuid })
         setContentTypeFile({ res, fileName, fileSize: SurveyFile.getSize(file) })
         contentStream.pipe(res)
       } catch (error) {
@@ -328,11 +383,13 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       let tempFilePath
       try {
-        const { surveyId, nodeUuid } = Request.getParams(req)
-        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, nodeUuid })
+        const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
+        const { contentStream } = await fetchRecordNodeFileAsStream({ surveyId, recordUuid, nodeUuid })
         ;({ tempFilePath } = await FileUtils.writeStreamToTempFile(contentStream))
         const info = await exifr.parse(tempFilePath)
         res.json(info)
@@ -348,9 +405,25 @@ export const init = (app) => {
 
   app.get('/survey/:surveyId/validationReport', requireRecordListViewPermission, async (req, res, next) => {
     try {
-      const { surveyId, offset, limit, cycle, recordUuid } = Request.getParams(req)
+      const { surveyId, offset, limit, cycle, recordUuid, sortBy, sortOrder } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
+      const user = Request.getUser(req)
 
-      const list = await RecordService.fetchValidationReport({ surveyId, cycle, offset, limit, recordUuid })
+      const list = await RecordService.fetchValidationReport({
+        user,
+        surveyId,
+        cycle,
+        offset,
+        limit,
+        recordUuid,
+        query,
+        attributeDefUuids,
+        messageTypeKeys,
+        sortBy,
+        sortOrder,
+      })
 
       res.json({ list })
     } catch (error) {
@@ -361,8 +434,20 @@ export const init = (app) => {
   app.get('/survey/:surveyId/validationReport/count', requireRecordListViewPermission, async (req, res, next) => {
     try {
       const { surveyId, cycle, recordUuid } = Request.getParams(req)
+      const query = Request.getJsonParam(req, 'query')
+      const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+      const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
+      const user = Request.getUser(req)
 
-      const count = await RecordService.countValidationReportItems({ surveyId, cycle, recordUuid })
+      const count = await RecordService.countValidationReportItems({
+        user,
+        surveyId,
+        cycle,
+        recordUuid,
+        query,
+        attributeDefUuids,
+        messageTypeKeys,
+      })
 
       res.json({ count })
     } catch (error) {
@@ -377,6 +462,9 @@ export const init = (app) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, cycle, lang, recordUuid, fileFormat = FileFormats.xlsx } = Request.getParams(req)
+        const query = Request.getJsonParam(req, 'query')
+        const attributeDefUuids = Request.getJsonParam(req, 'attributeDefUuids')
+        const messageTypeKeys = Request.getJsonParam(req, 'messageTypeKeys')
 
         const job = RecordService.startValidationReportGenerationJob({
           user,
@@ -384,6 +472,9 @@ export const init = (app) => {
           cycle,
           lang,
           recordUuid,
+          query,
+          attributeDefUuids,
+          messageTypeKeys,
           fileFormat,
         })
         res.json(JobUtils.jobToJSON(job))
@@ -408,27 +499,67 @@ export const init = (app) => {
     }
   })
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/docx', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang } = Request.getParams(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/docx',
+    requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordDocx({ user, surveyId, recordUuid, lang, outputStream: res })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordDocx({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
-  app.get('/survey/:surveyId/record/:recordUuid/export/pdf', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const user = Request.getUser(req)
-      const { surveyId, recordUuid, lang } = Request.getParams(req)
+  app.get(
+    '/survey/:surveyId/record/:recordUuid/export/pdf',
+    requireRecordViewPermission,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
+    async (req, res, next) => {
+      try {
+        const user = Request.getUser(req)
+        const { surveyId, recordUuid, lang, exportScope, entityDefUuid, entityNodeUuid, orientation, includeQrCode } =
+          Request.getParams(req)
+        const serverUrl = Request.getPublicServerUrl(req)
 
-      await RecordService.exportRecordPdf({ user, surveyId, recordUuid, lang, outputStream: res })
-    } catch (error) {
-      next(error)
+        await RecordService.exportRecordPdf({
+          user,
+          surveyId,
+          recordUuid,
+          lang,
+          exportScope,
+          entityDefUuid,
+          entityNodeUuid,
+          orientation,
+          includeQrCode: includeQrCode === true,
+          serverUrl,
+          outputStream: res,
+        })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   // ==== UPDATE
 
@@ -455,14 +586,23 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/record/:recordUuid/checkin',
     requireRecordViewPermission,
-    requireRecordMatchesUserGroupQualifiers,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
-        const { surveyId, recordUuid, draft, timezoneOffset } = Request.getParams(req)
+        const { surveyId, recordUuid, draft, timezoneOffset, lang } = Request.getParams(req)
         const user = Request.getUser(req)
         const socketId = Request.getSocketId(req)
 
-        const record = await RecordService.checkIn({ socketId, user, surveyId, recordUuid, draft, timezoneOffset })
+        const record = await RecordService.checkIn({
+          socketId,
+          user,
+          surveyId,
+          recordUuid,
+          draft,
+          timezoneOffset,
+          lang,
+        })
 
         res.json({ record })
       } catch (error) {
@@ -488,7 +628,7 @@ export const init = (app) => {
   // update records' step in batch from one step into another
   app.post(
     '/survey/:surveyId/records/step',
-    requireRecordListViewPermission,
+    requireRecordAnalysisPermission,
     requireRecordsMatchUserGroupQualifiers,
     async (req, res, next) => {
       try {
@@ -529,23 +669,28 @@ export const init = (app) => {
     }
   )
 
-  app.post('/survey/:surveyId/records/merge', requireRecordViewPermission, async (req, res, next) => {
-    try {
-      const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
-      const user = Request.getUser(req)
+  app.post(
+    '/survey/:surveyId/records/merge',
+    requireRecordsMergePermission,
+    requireMergeRecordsMatchUserGroupQualifiers,
+    async (req, res, next) => {
+      try {
+        const { dryRun, surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
+        const user = Request.getUser(req)
 
-      const { record, nodesCreated, nodesUpdated } = await RecordService.mergeRecords({
-        user,
-        surveyId,
-        sourceRecordUuid,
-        targetRecordUuid,
-        dryRun,
-      })
-      res.json({ record, nodesCreated, nodesUpdated })
-    } catch (error) {
-      next(error)
+        const { record, nodesCreated, nodesUpdated } = await RecordService.mergeRecords({
+          user,
+          surveyId,
+          sourceRecordUuid,
+          targetRecordUuid,
+          dryRun,
+        })
+        res.json({ record, nodesCreated, nodesUpdated })
+      } catch (error) {
+        next(error)
+      }
     }
-  })
+  )
 
   // ==== DELETE
   app.delete(
@@ -591,13 +736,38 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/node/:nodeUuid',
     requireRecordEditPermission,
     requireRecordMatchesUserGroupQualifiers,
-    (req, res) => {
-      const { surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset } = Request.getParams(req)
-      const user = Request.getUser(req)
-      const socketId = Request.getSocketId(req)
+    async (req, res, next) => {
+      try {
+        const {
+          surveyId,
+          cycle,
+          draft,
+          recordUuid,
+          nodeUuid,
+          timezoneOffset,
+          lang,
+          clearNonApplicableValuesConfirmed,
+        } = Request.getParams(req)
+        const user = Request.getUser(req)
+        const socketId = Request.getSocketId(req)
 
-      RecordService.deleteNode({ socketId, user, surveyId, cycle, draft, recordUuid, nodeUuid, timezoneOffset })
-      sendOk(res)
+        await RecordService.deleteNode({
+          socketId,
+          user,
+          surveyId,
+          cycle,
+          draft,
+          recordUuid,
+          nodeUuid,
+          timezoneOffset,
+          lang,
+          clearNonApplicableValuesConfirmed,
+        })
+
+        sendOk(res)
+      } catch (error) {
+        next(error)
+      }
     }
   )
 }

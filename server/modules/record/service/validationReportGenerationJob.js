@@ -10,8 +10,8 @@ import { ValidationUtils } from '@core/validation/validationUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '../manager/recordManager'
+import { resolveValidationReportParams } from './validationReportParams'
 
 export default class VaidationReportGenerationJob extends Job {
   constructor(params) {
@@ -19,8 +19,25 @@ export default class VaidationReportGenerationJob extends Job {
   }
 
   async execute() {
-    const { surveyId, cycle, fileFormat, recordUuid, lang } = this.context
-    const survey = await SurveyManager.fetchSurveyAndNodeDefsBySurveyId({ surveyId, cycle })
+    const {
+      user,
+      surveyId,
+      cycle,
+      fileFormat,
+      recordUuid,
+      lang,
+      query,
+      attributeDefUuids = null,
+      messageTypeKeys = null,
+    } = this.context
+    const { survey, rootDataViewName, filterBySurveyAttrs, recordAccessFilters } = await resolveValidationReportParams({
+      user,
+      surveyId,
+      cycle,
+      query,
+      attributeDefUuids,
+      messageTypeKeys,
+    })
 
     // create temp file
     const tempFileName = FileUtils.newTempFileName()
@@ -81,13 +98,19 @@ export default class VaidationReportGenerationJob extends Job {
       'record_date_modified',
     ]
 
-    this.total = await RecordManager.countValidationReportItems({ surveyId, cycle, recordUuid }, this.tx)
+    this.total = await RecordManager.countValidationReportItems(
+      { surveyId, cycle, recordUuid, rootDataViewName, filterBySurveyAttrs, recordAccessFilters },
+      this.tx
+    )
 
     await RecordManager.getValidationReportAsStream(
       {
         surveyId,
         cycle,
         recordUuid,
+        rootDataViewName,
+        filterBySurveyAttrs,
+        recordAccessFilters,
         processor: async (dbStream) => {
           this.dbStream = dbStream
           await FlatDataWriter.writeItemsStreamToStream({

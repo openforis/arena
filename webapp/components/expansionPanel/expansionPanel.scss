@@ -1,14 +1,13 @@
-@use 'sass:color';
 @use '~@webapp/style/vars' as *;
 
 .expansion-panel {
   .btn-toggle {
-    color: $black;
+    color: $colorOnSurface;
     padding: 1px 0.3rem 0;
     transform: rotate(90deg);
 
     &:hover {
-      color: color.adjust($black, $lightness: 25%);
+      color: $colorOnSurfaceVariant;
     }
   }
 }
@@ -24,7 +23,24 @@
 }
 
 .expansion-panel__header {
+  // reset the default button style
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  text-align: inherit;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: inherit;
   cursor: pointer;
+
+  .btn-toggle {
+    // rotated by the transform of the expansion panel styles (not applied to inline elements)
+    display: inline-block;
+  }
 }
 
 .expansion-panel__content {
