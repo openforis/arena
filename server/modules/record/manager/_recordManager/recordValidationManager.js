@@ -10,17 +10,11 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as Validation from '@core/validation/validation'
 
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 import * as RecordRepository from '../../repository/recordRepository'
 
 import * as RecordUniquenessValidator from './recordUniquenessValidator'
-
-const categoryItemProvider = CategoryItemProviderDefault
-const taxonProvider = TaxonProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export const persistValidation = async ({ survey, record }, tx) =>
   RecordRepository.updateValidation(Survey.getId(survey), Record.getUuid(record), Record.getValidation(record), tx)
@@ -61,11 +55,7 @@ export const validateSortedNodesAndPersistValidation = async (
 ) => {
   // 1. validate node values
   const nodesValueValidation = await RecordValidator.validateSortedNodes({
-    user,
-    survey,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
+    ...createRecordEvaluationContext({ user, survey }),
     record,
     nodesArray,
   })

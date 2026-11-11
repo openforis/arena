@@ -3,14 +3,10 @@ import * as Record from '@core/record/record'
 import FlatDataImportJob from '@server/modules/dataImport/service/DataImportJob/FlatDataImportJob'
 import { DataImportFlatDataFileReader } from '@server/modules/dataImport/service/DataImportJob/dataImportFlatDataFileReader'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { RecordProvidersDefault } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 import { RecordsProvider } from './RecordsProvider'
 import { FileFormats } from '@core/fileFormats'
-
-const categoryItemProvider = CategoryItemProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export default class PersistResultsJob extends FlatDataImportJob {
   constructor(params) {
@@ -57,7 +53,7 @@ export default class PersistResultsJob extends FlatDataImportJob {
       stream,
       fileFormat: FileFormats.csv,
       survey,
-      categoryItemProvider,
+      categoryItemProvider: RecordProvidersDefault.categoryItemProvider,
       cycle,
       nodeDefUuid,
       onRowItem: async (item) => this.onRowItem(item),
@@ -68,7 +64,6 @@ export default class PersistResultsJob extends FlatDataImportJob {
   }
 
   async onRowItem(item) {
-    const { survey } = this.context
     const { errors, row, valuesByDefUuid } = item
 
     if (errors.length > 0) {
@@ -82,10 +77,9 @@ export default class PersistResultsJob extends FlatDataImportJob {
     const record = await this.recordsProvider.getOrFetch(recordUuid)
     const entity = Record.getNodeByUuid(entityUuid)(record)
     const { nodes: nodesUpdated, record: recordUpdated } = await Record.updateAttributesInEntityWithValues({
-      survey,
+      ...this.getRecordEvaluationContext(),
       entity,
       valuesByDefUuid,
-      areaOfInterestProvider,
       sideEffect: true,
     })(record)
 

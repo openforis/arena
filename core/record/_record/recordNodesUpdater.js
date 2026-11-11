@@ -13,6 +13,7 @@ import * as NodeRefData from '../nodeRefData'
 import * as CategoryItem from '@core/survey/categoryItem'
 import SystemError from '@core/systemError'
 
+import { RecordEvaluationContext } from '../recordEvaluationContext'
 import * as RecordReader from './recordReader'
 import { NodeValueFormatter } from '../nodeValueFormatter'
 import { updateAttributeValue } from './recordNodeValueUpdater'
@@ -129,44 +130,19 @@ const _valueAdapterByType = {
   },
 }
 
-const _adaptValue = async ({
-  survey,
-  categoryItemProvider,
-  taxonProvider,
-  record,
-  parentNode,
-  attributeDef,
-  value,
-}) => {
+// params (context) are the ones of RecordEvaluationContext: providers are taken from there
+const _adaptValue = async ({ context, record, parentNode, attributeDef, value }) => {
   const valueAdapter = _valueAdapterByType[NodeDef.getType(attributeDef)]
-  return valueAdapter
-    ? valueAdapter({ survey, categoryItemProvider, taxonProvider, record, parentNode, attributeDef, value })
-    : value
+  return valueAdapter ? valueAdapter({ ...context, record, parentNode, attributeDef, value }) : value
 }
 
 const _addOrUpdateAttribute =
-  ({
-    survey,
-    categoryItemProvider,
-    taxonProvider,
-    entity,
-    attributeDef,
-    value: valueParam,
-    refData = null,
-    sideEffect = false,
-  }) =>
+  ({ context, entity, attributeDef, value: valueParam, refData = null, sideEffect = false }) =>
   async (record) => {
+    const { survey } = context
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
-    const value = await _adaptValue({
-      survey,
-      categoryItemProvider,
-      taxonProvider,
-      record,
-      parentNode: entity,
-      attributeDef,
-      value: valueParam,
-    })
+    const value = await _adaptValue({ context, record, parentNode: entity, attributeDef, value: valueParam })
 
     if (!attribute || NodeDef.isMultipleAttribute(attributeDef)) {
       // create new attribute
@@ -189,25 +165,12 @@ const _addOrUpdateAttribute =
   }
 
 const _addEntityAndKeyValues =
-  ({
-    user,
-    survey,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    entityDef,
-    parentNode,
-    keyValuesByDefUuid,
-    sideEffect = false,
-  }) =>
+  ({ context, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
   async (record) => {
+    const { survey } = context
     const updateResult = new RecordUpdateResult({ record })
     const updateResultDescendants = await CoreRecordNodesUpdater.addNodeAndDescendants({
-      user,
-      survey,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
+      ...context,
       record,
       parentNode,
       nodeDef: entityDef,
@@ -230,8 +193,7 @@ const _addEntityAndKeyValues =
       }
 
       const keyAttributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
-        survey,
-        categoryItemProvider,
+        context,
         entity,
         attributeDef: keyDef,
         value: keyValue,
@@ -246,19 +208,9 @@ const _addEntityAndKeyValues =
   }
 
 const _getOrCreateEntityByKeys =
-  ({
-    user,
-    survey,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    entityDefUuid,
-    valuesByDefUuid,
-    insertMissingNodes,
-    sideEffect = false,
-    entityKeysIndexCache = null,
-  }) =>
+  ({ context, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false, entityKeysIndexCache = null }) =>
   async (record) => {
+    const { survey } = context
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
     }
@@ -302,11 +254,7 @@ const _getOrCreateEntityByKeys =
       })
     }
     const { entity: entityInserted, updateResult } = await _addEntityAndKeyValues({
-      user,
-      survey,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
+      context,
       entityDef,
       parentNode: entityParent,
       keyValuesByDefUuid: valuesByDefUuid,
@@ -323,30 +271,33 @@ const _getOrCreateEntityByKeys =
     return { entity: entityInserted, updateResult }
   }
 
+/**
+ * Finds the entity with the specified key values, inserting it (and its keys) if missing and insertMissingNodes is true.
+ * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
+ * @param {!string} params.entityDefUuid - The UUID of the entity definition.
+ * @param {!object} params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
+ * @param {boolean} [params.insertMissingNodes] - Whether to insert the entity when not found.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @param {boolean} [params.updateDependents] - Whether to update the dependent nodes of the inserted ones.
+ * @param {object} [params.entityKeysIndexCache] - Cache of the entities indexed by key values.
+ * @returns {function(object): Promise<object>} - Function taking the record and returning the entity and the update result.
+ */
 const getOrCreateEntityByKeys =
   ({
-    user,
-    survey,
     entityDefUuid,
     valuesByDefUuid,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
     insertMissingNodes = false,
     sideEffect = false,
     updateDependents = true,
     entityKeysIndexCache = null,
+    ...otherParams
   }) =>
   async (record) => {
+    const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
     const { entity, updateResult: updateResultEntity } = await _getOrCreateEntityByKeys({
-      user,
-      survey,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
+      context,
       entityDefUuid,
       valuesByDefUuid,
       insertMissingNodes,
@@ -362,14 +313,9 @@ const getOrCreateEntityByKeys =
         return { entity, updateResult }
       }
       const dependentsUpdateResult = await afterNodesUpdate({
-        user,
-        survey,
+        ...context,
         record: updateResultEntity.record,
         nodes: updateResultEntity.nodes,
-        categoryItemProvider,
-        taxonProvider,
-        areaOfInterestProvider,
-        timezoneOffset,
         sideEffect,
       })
       updateResult.merge(dependentsUpdateResult)
@@ -384,21 +330,21 @@ const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
   // update also read-only values with value evaluated only one time with external data (e.g. from CSV)
   (!NodeDef.isReadOnly(attributeDef) || NodeDef.isDefaultValueEvaluatedOneTime(attributeDef))
 
+/**
+ * Updates the attributes descendants of the specified entity with the specified values.
+ * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
+ * @param {!object} params.entity - The entity whose descendant attributes will be updated.
+ * @param {!object} params.valuesByDefUuid - The values indexed by attribute definition UUID.
+ * @param {object} [params.refDataByDefUuid] - The ref data of the values indexed by attribute definition UUID.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @param {boolean} [params.updateDependents] - Whether to update the dependent nodes of the updated ones.
+ * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ */
 const updateAttributesInEntityWithValues =
-  ({
-    user,
-    survey,
-    entity,
-    valuesByDefUuid,
-    refDataByDefUuid = null,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
-    sideEffect = false,
-    updateDependents = true,
-  }) =>
+  ({ entity, valuesByDefUuid, refDataByDefUuid = null, sideEffect = false, updateDependents = true, ...otherParams }) =>
   async (record) => {
+    const context = RecordEvaluationContext.extract(otherParams)
+    const { survey } = context
     const updateResult = new RecordUpdateResult({ record })
 
     const updateDependentNodes = async (nodeUpdateResult) => {
@@ -410,14 +356,9 @@ const updateAttributesInEntityWithValues =
       if (!updateDependents) return
 
       const dependentsUpdateResult = await afterNodesUpdate({
-        user,
-        survey,
+        ...context,
         record: nodeUpdateResult.record,
         nodes: nodeUpdateResult.nodes,
-        categoryItemProvider,
-        taxonProvider,
-        areaOfInterestProvider,
-        timezoneOffset,
         sideEffect,
       })
       updateResult.merge(dependentsUpdateResult)
@@ -439,10 +380,7 @@ const updateAttributesInEntityWithValues =
         const refData = refDataByDefUuid?.[attributeDefUuid] ?? null
 
         const attributeUpdateResult = /* NOSONAR */ await _addOrUpdateAttribute({
-          survey,
-          categoryItemProvider,
-          taxonProvider,
-          areaOfInterestProvider,
+          context,
           entity: attributeParentEntity,
           attributeDef,
           value,
@@ -456,32 +394,27 @@ const updateAttributesInEntityWithValues =
     return updateResult
   }
 
+/**
+ * Updates the attributes descendants of the entity with the specified key values, inserting it if missing and
+ * insertMissingNodes is true.
+ * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
+ * @param {!string} params.entityDefUuid - The UUID of the entity definition.
+ * @param {!object} params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
+ * @param {boolean} [params.insertMissingNodes] - Whether to insert the entity when not found.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ */
 const updateAttributesWithValues =
-  ({
-    user,
-    survey,
-    entityDefUuid,
-    valuesByDefUuid,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
-    insertMissingNodes = false,
-    sideEffect = false,
-  }) =>
+  ({ entityDefUuid, valuesByDefUuid, insertMissingNodes = false, sideEffect = false, ...otherParams }) =>
   async (record) => {
+    const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
     // 1. get or create context entity
     const { entity, updateResult: updateResultEntity } = await getOrCreateEntityByKeys({
-      user,
-      survey,
+      ...context,
       entityDefUuid,
       valuesByDefUuid,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
-      timezoneOffset,
       insertMissingNodes,
       sideEffect,
     })(record)
@@ -490,13 +423,9 @@ const updateAttributesWithValues =
 
     // 2. update values in descendant attributes
     const updateResultAttributes = await updateAttributesInEntityWithValues({
-      survey,
+      ...context,
       entity,
       valuesByDefUuid,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
-      timezoneOffset,
       sideEffect,
     })(updateResult.record)
 
@@ -505,18 +434,18 @@ const updateAttributesWithValues =
     return updateResult
   }
 
+/**
+ * Deletes the nodes of the specified definitions children of the specified entity.
+ * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
+ * @param {!object} params.entity - The parent entity of the nodes to delete.
+ * @param {!string[]} params.nodeDefUuids - The UUIDs of the definitions of the nodes to delete.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ */
 const deleteNodesInEntityByNodeDefUuid =
-  ({
-    user,
-    survey,
-    entity,
-    nodeDefUuids,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    sideEffect = false,
-  }) =>
+  ({ entity, nodeDefUuids, sideEffect = false, ...otherParams }) =>
   async (record) => {
+    const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
     const nodeUuidsToDelete = []
@@ -526,13 +455,9 @@ const deleteNodesInEntityByNodeDefUuid =
     }
 
     const nodesDeleteUpdateResult = await deleteNodes({
-      user,
-      survey,
+      ...context,
       record,
       nodeUuids: nodeUuidsToDelete,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
       sideEffect,
     })
     return updateResult.merge(nodesDeleteUpdateResult)

@@ -12,16 +12,10 @@ import * as Validation from '@core/validation/validation'
 import { db } from '@server/db/db'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as RecordRepository from '../../repository/recordRepository'
 import * as NodeCreationManager from './nodeCreationManager'
 import { NodeRdbManager } from './nodeRDBManager'
-
-const categoryItemProvider = CategoryItemProviderDefault
-const taxonProvider = TaxonProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export const insertRecord = async (user, surveyId, record, system = false, client = db) =>
   client.tx(async (t) => {
@@ -39,7 +33,10 @@ export const insertRecord = async (user, surveyId, record, system = false, clien
 
 const _createRecordAndNodes = async ({ user, survey, cycle }) => {
   const record = Record.newRecord(user, cycle)
-  const { record: recordWithNodes } = await Record.createRootEntity({ user, survey, record })
+  const { record: recordWithNodes } = await Record.createRootEntity({
+    ...createRecordEvaluationContext({ user, survey }),
+    record,
+  })
   return recordWithNodes
 }
 
@@ -94,12 +91,9 @@ export const createRecordFromSamplingPointDataItem = async ({ user, survey, cycl
 
     // update record and validate nodes
     const { record: recordUpdated } = await Record.updateAttributesWithValues({
-      survey,
+      ...createRecordEvaluationContext({ user, survey }),
       entityDefUuid: NodeDef.getUuid(rootDef),
       valuesByDefUuid,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
       insertMissingNodes: true,
     })(record)
 

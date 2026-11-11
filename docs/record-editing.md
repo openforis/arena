@@ -37,7 +37,11 @@ The thread keeps two idle-expiring caches (`IdleTimeoutCache`):
 - **survey data** per survey/cycle/draft (`getOrFetchSurveyData`): the survey with node defs and
   reference data, plus its dependency graph (`Survey.buildDependencyGraph`, i.e. which node defs'
   expressions depend on which others). Big categories and taxonomies are not loaded: their items are
-  looked up through `CategoryItemProviderDefault` / `TaxonProviderDefault`.
+  looked up through `CategoryItemProviderDefault` / `TaxonProviderDefault`. The params the expression
+  evaluator needs (user, survey, these providers, `areaOfInterestProvider`, timezone offset, language)
+  form a `RecordEvaluationContext` (`core/record/recordEvaluationContext.ts`): on the server, create it
+  with `createRecordEvaluationContext` (`server/modules/record/manager/recordEvaluationContextDefault.ts`)
+  and spread it in the params of the record update and validation functions, which forward it as a whole.
 - **records** (`getOrFetchRecord`): reused only while their `date_modified` still matches the DB,
   otherwise reloaded (see [Several server instances](#several-server-instances)).
 
