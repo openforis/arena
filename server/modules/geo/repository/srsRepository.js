@@ -24,7 +24,8 @@ const rowToSrs = (row) => {
 }
 
 export const fetchSRSsByCodes = async ({ srsCodes }, client = db) =>
-  client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)
+  // "IN ()" is not valid SQL
+  srsCodes.length === 0 ? [] : client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)
 
 export const findSRSByCodeOrName = async (codeOrName, client = db) => {
   const codeOrNameTrimmed = codeOrName.trim().toLowerCase()

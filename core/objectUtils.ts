@@ -201,3 +201,13 @@ export const getPropsAndPropsDraftCombined = (obj: Record<string, unknown>): Rec
   ...getProps(obj),
   ...getPropsDraft(obj),
 })
+
+/**
+ * Returns the entries of both the published and the draft props (both stored when importing a backup).
+ * @param obj - The object.
+ * @returns The [key, value] entries of the props followed by the ones of the draft props.
+ */
+export const getPropsAndPropsDraftEntries = (obj: Record<string, unknown>): [string, unknown][] => [
+  ...Object.entries(getProps(obj) ?? {}),
+  ...Object.entries(getPropsDraft(obj) ?? {}),
+]
