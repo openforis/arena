@@ -1,5 +1,5 @@
 import { Messages, MessageNotificationType, MessageStatus } from '@openforis/arena-core'
-import { ArenaServer, ServerServiceType } from '@openforis/arena-server'
+import { ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
 import { parseMarkdown } from '@core/markdownUtils'
@@ -8,10 +8,11 @@ import Job from '@server/job/job'
 import * as UserService from '@server/modules/user/service/userService'
 import * as User from '@core/user/user'
 import * as Mailer from '@server/utils/mailer'
+import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 const getMessageService = () => {
   // Ensure services are initialized
-  const serviceRegistry = ArenaServer.initServices()
+  const serviceRegistry = initArenaServerServices()
   return serviceRegistry.getService(ServerServiceType.message)
 }
 
