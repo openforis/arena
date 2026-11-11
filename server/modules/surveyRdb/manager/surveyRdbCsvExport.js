@@ -9,6 +9,8 @@ import { ArrayUtils } from '@core/arrayUtils'
 import { ColumnNodeDef, ViewDataNodeDef } from '@common/model/db'
 import { Query } from '@common/model/query'
 
+import { toSafeFileName } from '@server/utils/file/fileNames'
+
 const maxExpandedCategoryItems = 20
 
 const visitCategoryItems = ({ survey, nodeDef, itemVisitor }) => {
@@ -164,7 +166,9 @@ const getCsvObjectTransformerUniqueFileNames = ({ survey, query, uniqueFileNames
       const fileNameField = ColumnNodeDef.getFileNameColumnName(nodeDef)
       const fileName = obj[fileNameField]
       if (fileUuid && Objects.isNotEmpty(fileName)) {
-        const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(fileName, fileUuid)
+        // the exported files are written with this name
+        const safeFileName = toSafeFileName(fileName) || fileUuid
+        const uniqueFileName = uniqueFileNamesGenerator.generateUniqueFileName(safeFileName, fileUuid)
         obj[fileNameField] = uniqueFileName
       }
     }
