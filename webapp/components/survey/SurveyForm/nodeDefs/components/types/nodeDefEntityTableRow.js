@@ -8,6 +8,8 @@ import * as Node from '@core/record/node'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
+import { useRecord } from '@webapp/store/ui/record'
+import { isChildHiddenWhenNotRelevant } from '@webapp/components/survey/SurveyForm/nodeDefs/nodeDefChildVisibility'
 
 import NodeDeleteButton from '../nodeDeleteButton'
 import NodeDefEntityTableCell from './nodeDefEntityTableCell'
@@ -37,6 +39,7 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
   const dispatch = useDispatch()
 
   const cycle = useSurveyCycleKey()
+  const record = useRecord()
 
   const draggable = edit && canEditDef && !resizing
   const resizable = edit && renderType === NodeDefLayout.renderType.tableHeader
@@ -132,13 +135,13 @@ const NodeDefEntityTableRow = forwardRef((props, ref) => {
     if (NodeDef.isReadOnly(nodeDefChild) && NodeDef.isHidden(nodeDefChild)) {
       return true
     }
-    if (NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefChild)) {
-      const allSiblinNodesNotRelevant = siblingEntities.every(
-        (siblingEntity) => !Node.isChildApplicable(nodeDefChild.uuid)(siblingEntity)
+    // column hidden only when the field is not relevant and empty in every row
+    return (
+      NodeDefLayout.isHiddenWhenNotRelevant(cycle)(nodeDefChild) &&
+      siblingEntities.every((siblingEntity) =>
+        isChildHiddenWhenNotRelevant({ cycle, record, parentNode: siblingEntity, childDef: nodeDefChild })
       )
-      return allSiblinNodesNotRelevant
-    }
-    return false
+    )
   }
 
   return (
