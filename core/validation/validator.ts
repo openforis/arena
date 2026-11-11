@@ -82,20 +82,18 @@ export const validate = async (
   return validation
 }
 
-// characters allowed in names
-const nameCharsRegex = /^[a-z0-9_]*$/
-
 /**
  * Throws a bad request error if one of the names contains characters not allowed in names (lowercase letters, numbers
- * and "_"): names (e.g. of categories, levels and extra props) are used as export column names and file names and in
- * expressions. The full name format (e.g. the first letter) is checked by the validation of the item, so that names
- * being typed (e.g. "2") can be saved.
- * @param names - The names to check.
+ * and "_"): names (e.g. of node defs, categories, levels and extra props) are used as SQL identifiers, export column
+ * names and file names and in expressions. The full name format (e.g. the first letter) is checked by the validation of
+ * the item, so that names being typed (e.g. "2") can be saved.
+ * @param names - The names to check (null or undefined values are ignored).
+ * @param errorKey - The key of the error message.
  */
-export const checkNamesAreValid = (names: unknown[]): void => {
-  const nameInvalid = names.find((name) => !A.isNil(name) && (typeof name !== 'string' || !nameCharsRegex.test(name)))
+export const checkNamesAreValid = (names: unknown[], errorKey: string = Validation.messageKeys.nameInvalid): void => {
+  const nameInvalid = names.find((name) => !A.isNil(name) && !ValidatorFunctions.isNameCharsValid(name))
   if (nameInvalid !== undefined) {
-    throw new SystemError(Validation.messageKeys.nameInvalid, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
+    throw new SystemError(errorKey, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
   }
 }
 
