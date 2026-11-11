@@ -109,6 +109,7 @@ export default {
     fileNotFound: 'Archivo no encontrado',
     languageCodeInvalid: 'El código de idioma no es válido: {{lang}}',
     cycleKeysInvalid: 'Los ciclos deben estar numerados de forma consecutiva, empezando por 1',
+    srsCodeInvalid: 'El código del sistema de referencia espacial no es válido: {{code}}',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   aiNotConfigured:

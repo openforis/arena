@@ -1,5 +1,6 @@
 import * as A from '@core/arena'
 import { languageCodes } from '@core/app/languages'
+import * as Srs from '@core/geo/srs'
 import * as Survey from '@core/survey/survey'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -34,6 +35,24 @@ const validateFieldManualLinks = (_propName, survey) => {
  * @returns {string[]} - The invalid language codes.
  */
 export const getInvalidLanguageCodes = (languages) => languages.filter((lang) => !languageCodes.includes(lang))
+
+// spatial reference system codes are EPSG codes
+const srsCodeRegex = /^\d{1,10}$/
+
+/**
+ * Returns the codes of the spatial reference systems that are not EPSG codes (numbers).
+ * @param {object[]} srss - The spatial reference systems to check (with code and name).
+ * @returns {string[]} - The invalid codes.
+ */
+export const getInvalidSrsCodes = (srss) =>
+  srss.map((srs) => srs?.[Srs.keys.code]).filter((code) => !srsCodeRegex.test(String(code)))
+
+const validateSrsCodes = (propName, obj) => {
+  const codesInvalid = getInvalidSrsCodes([Validator.getProp(propName)(obj) ?? []].flat())
+  return codesInvalid.length > 0
+    ? { key: Validation.messageKeys.surveyInfoEdit.srsInvalid, params: { code: codesInvalid.join(', ') } }
+    : null
+}
 
 const validateLanguageCodes = (propName, obj) => {
   const value = Validator.getProp(propName)(obj)
@@ -72,6 +91,7 @@ export const validateSurveyInfo = async (surveyInfo, surveyInfos) => {
     [`${infoKeys.props}.${infoKeys.name}`]: getSurveyNameValidations({ surveyInfos }),
     [`${infoKeys.props}.${infoKeys.srs}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyInfoEdit.srsRequired),
+      validateSrsCodes,
     ],
     [`${infoKeys.props}.${infoKeys.fieldManualLinks}`]: [validateFieldManualLinks],
   })

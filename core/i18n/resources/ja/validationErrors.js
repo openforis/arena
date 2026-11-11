@@ -171,6 +171,7 @@ export default {
   surveyInfoEdit: {
     langRequired: '言語は必須です',
     langInvalid: '言語コードが無効です：{{lang}}',
+    srsInvalid: '空間参照系のコードが無効です：{{code}}',
     srsRequired: '空間参照系は必須です',
     cycleRequired: 'サイクルは必須です',
     cyclesRequired: '少なくとも1つのサイクルを定義してください',
