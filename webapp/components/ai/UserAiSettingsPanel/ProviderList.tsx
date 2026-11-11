@@ -50,7 +50,7 @@ const RowMenu = ({ row, t, busy, onAction }: RowProps) => {
         label: MENU_LABELS[action],
         testId: TestId.ai.providerMenuItem(action),
         onClick: () => {
-          onAction(row, action)
+          void onAction(row, action)
         },
       }))}
     />

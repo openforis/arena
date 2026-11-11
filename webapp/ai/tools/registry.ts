@@ -14,7 +14,7 @@ import { limitToolResult, toolError } from './common/toolResult'
 import { AiToolFailure } from './toolFailure'
 import type { AiTool, AiToolArea, AiToolContext } from './types'
 
-export const AI_TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/
+export const AI_TOOL_NAME_PATTERN = /^[a-zA-Z]\w{0,63}$/
 
 /**
  * Returns the tools the area offers in this context: permission (`requires`) and survey AI policy (the tool's data

@@ -119,7 +119,10 @@ describe('AI prefs writer (055)', () => {
         },
       })
     await Promise.all([add('acct:a'), add('acct:b')])
-    expect(idsOf(await readAiPrefs({ userUuid: uuid() })).sort()).toEqual(['acct:a', 'acct:b'])
+    expect(idsOf(await readAiPrefs({ userUuid: uuid() })).sort((a, b) => a.localeCompare(b))).toEqual([
+      'acct:a',
+      'acct:b',
+    ])
   })
 
   test('a failing or empty change writes nothing', async () => {

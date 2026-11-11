@@ -221,8 +221,12 @@ describe('large surveys keep every live target and every dismissal (425)', () =>
       data,
       storage: {
         getItem: (key: string) => data.get(key) ?? null,
-        setItem: (key: string, value: string) => void data.set(key, value),
-        removeItem: (key: string) => void data.delete(key),
+        setItem: (key: string, value: string) => {
+          data.set(key, value)
+        },
+        removeItem: (key: string) => {
+          data.delete(key)
+        },
       },
     }
   }
@@ -319,8 +323,12 @@ describe('the bucket cap keeps the surveys in use (425)', () => {
       access: {
         getStorage: () => ({
           getItem: (key: string) => data.get(key) ?? null,
-          setItem: (key: string, value: string) => void data.set(key, value),
-          removeItem: (key: string) => void data.delete(key),
+          setItem: (key: string, value: string) => {
+            data.set(key, value)
+          },
+          removeItem: (key: string) => {
+            data.delete(key)
+          },
         }),
         addStorageListener: () => () => undefined,
       },

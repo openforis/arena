@@ -72,7 +72,7 @@ export const parseGatewayRequest = (body: unknown): AiGatewayRequest => {
   return { surveyId, feature, dataClass, stream, call: call as AiGatewayCall, ...(providerId ? { providerId } : {}) }
 }
 
-const TOOL_NAME_PATTERN = /^[a-zA-Z][a-zA-Z0-9_]{0,63}$/
+const TOOL_NAME_PATTERN = /^[a-zA-Z]\w{0,63}$/
 const MAX_TOOLS = 32
 const MAX_TOOL_DESCRIPTION_CHARS = 4000
 const TOOL_CHOICE_TYPES = new Set(['auto', 'none', 'required'])

@@ -43,7 +43,7 @@ export const pluralFormsOf = (lang: string): string[] => {
  * @returns {string[]} The categories, sorted.
  */
 export const pluralCategoriesOf = (lang: string): string[] =>
-  [...new Intl.PluralRules(lang).resolvedOptions().pluralCategories].sort()
+  [...new Intl.PluralRules(lang).resolvedOptions().pluralCategories].sort((a, b) => a.localeCompare(b))
 
 /**
  * Tells whether a language is written in the Cyrillic script (its texts must then contain Cyrillic letters).
@@ -97,7 +97,7 @@ export const flattenTexts = (obj: unknown, prefix = ''): Record<string, string> 
  * @param {object} obj - Resource.
  * @returns {string[]} The paths.
  */
-export const leafPaths = (obj: unknown): string[] => Object.keys(flattenTexts(obj)).sort()
+export const leafPaths = (obj: unknown): string[] => Object.keys(flattenTexts(obj)).sort((a, b) => a.localeCompare(b))
 
 /**
  * Returns the sorted {{placeholder}} names of a text.
@@ -105,7 +105,7 @@ export const leafPaths = (obj: unknown): string[] => Object.keys(flattenTexts(ob
  * @returns {string[]} The names.
  */
 export const placeholdersOf = (text: string): string[] =>
-  Array.from(String(text).matchAll(/{{\s*(\w+)\s*}}/g), (match) => match[1]).sort()
+  Array.from(String(text).matchAll(/{{\s*(\w+)\s*}}/g), (match) => match[1]).sort((a, b) => a.localeCompare(b))
 
 /**
  * Strips the plural suffix of a path (a plural text has one key per form: seeAll_one, seeAll_few...).
@@ -120,7 +120,7 @@ export const baseKeyOf = (path: string): string => path.replace(PLURAL_SUFFIX, '
  * @returns {string[]} The base keys.
  */
 export const baseKeysOf = (flat: Record<string, string>): string[] =>
-  [...new Set(Object.keys(flat).map(baseKeyOf))].sort()
+  [...new Set(Object.keys(flat).map(baseKeyOf))].sort((a, b) => a.localeCompare(b))
 
 /**
  * Returns the general form of a text: the "other" form of a plural, else the text itself.
@@ -149,7 +149,7 @@ export const getPluralMismatches = (
     if (match) formsByKey.set(baseKeyOf(path), [...(formsByKey.get(baseKeyOf(path)) ?? []), match[1]])
   }
   return [...formsByKey.entries()]
-    .map(([baseKey, forms]) => ({ baseKey, forms: forms.sort() }))
+    .map(([baseKey, forms]) => ({ baseKey, forms: [...forms].sort((a, b) => a.localeCompare(b)) }))
     .filter(({ forms }) => forms.join() !== expected)
 }
 
@@ -184,7 +184,7 @@ export const diffWithDefaultLanguage = (
   const texts = groupByBaseKey(flattenTexts(getPath(RESOURCES[lang], group)))
   // the placeholders of a key: those of all its forms (one form may leave out {{count}})
   const placeholdersOfKey = (groups: Map<string, string[]>, base: string): string =>
-    [...new Set(groups.get(base)!.flatMap(placeholdersOf))].sort().join()
+    [...new Set(groups.get(base)!.flatMap(placeholdersOf))].sort((a, b) => a.localeCompare(b)).join()
   return {
     missing: [...reference.keys()].filter((base) => !texts.has(base)),
     extra: [...texts.keys()].filter((base) => !reference.has(base)),

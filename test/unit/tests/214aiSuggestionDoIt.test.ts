@@ -274,7 +274,7 @@ describe('Do it plumbing (214)', () => {
         return release
       }) as unknown as LockManager['request'],
     }
-    let fail: (error: Error) => void = () => undefined
+    let fail!: (error: Error) => void
     const done = new Promise<void>((_resolve, reject) => {
       fail = reject
     })
@@ -282,9 +282,11 @@ describe('Do it plumbing (214)', () => {
     holdSuggestionTurnLock({ conversationId: 'c1', done, locks })
     expect(requested).toEqual([getSuggestionTurnLockName('c1')])
     let released = false
-    release!.then(() => {
-      released = true
-    })
+    release!
+      .then(() => {
+        released = true
+      })
+      .catch(() => undefined)
     await Promise.resolve()
     expect(released).toBe(false)
     fail(new Error('turn failed'))
@@ -297,7 +299,11 @@ describe('Do it plumbing (214)', () => {
   test('Clear conversations clears the suggestions of the user too', async () => {
     const calls: string[] = []
     await clearUserConversations({
-      conversationStore: { clearUser: async (userUuid) => void calls.push(`conversations:${userUuid}`) },
+      conversationStore: {
+        clearUser: async (userUuid) => {
+          calls.push(`conversations:${userUuid}`)
+        },
+      },
       openConversations: { clear: (userUuid) => calls.push(`open:${userUuid}`) },
       suggestions: { clearUser: (userUuid) => calls.push(`suggestions:${userUuid}`) },
       userUuid: 'u1',

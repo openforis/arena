@@ -31,13 +31,15 @@ describe('assistant logout and clear conversations (202)', () => {
     const controller = new AbortController()
     registry.register(controller)
     // the turn ends with its final save after the abort, as runTurn does
-    registry.track(
-      new Promise<void>((resolve) => {
-        controller.signal.addEventListener('abort', () => setTimeout(resolve, 0))
-      }).then(() => {
-        calls.push('final save')
-      })
-    )
+    registry
+      .track(
+        new Promise<void>((resolve) => {
+          controller.signal.addEventListener('abort', () => setTimeout(resolve, 0))
+        }).then(() => {
+          calls.push('final save')
+        })
+      )
+      .catch(() => undefined)
     const logout = createAssistantLogout({
       abortTurns: () => registry.abortAll(),
       settleSaves: () => registry.settle(),

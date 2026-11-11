@@ -30,7 +30,7 @@ const expectNoKey = (response: unknown, secret: string): void => {
 }
 
 test.describe('AI account providers API (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.beforeEach(async ({ api }) => {
     await api.enableAiFeatures()

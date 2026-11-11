@@ -7,7 +7,7 @@ import { Urls } from '../helpers/urls'
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 test.describe('What AI can see (access levels)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   // the worker user is shared with the other specs
   test.afterEach(async ({ api }) => {

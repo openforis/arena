@@ -49,7 +49,7 @@ export const AiEngineErrorActions = (props: Props) => {
         <Button
           disabled={retrying || disabled}
           label="aiEngine.action.retry"
-          onClick={retry}
+          onClick={() => void retry()}
           size="small"
           testId={TestId.ai.engineErrorRetry}
           variant="outlined"
@@ -58,7 +58,7 @@ export const AiEngineErrorActions = (props: Props) => {
       {view.openSettings && (
         <Button
           label="aiEngine.action.openSettings"
-          onClick={() => runAction('openSettings')}
+          onClick={() => void runAction('openSettings')}
           size="small"
           testId={TestId.ai.engineErrorOpenSettings}
           variant="text"

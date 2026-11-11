@@ -88,7 +88,12 @@ const capabilities = ({
 /** Builds an in-memory storage. */
 const memoryStorage = (): StorageLike => {
   const data = new Map<string, string>()
-  return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }
+  return {
+    getItem: (key) => data.get(key) ?? null,
+    setItem: (key, value) => {
+      data.set(key, value)
+    },
+  }
 }
 
 /** Builds a model resolver over the capabilities, recording every gateway, local and consent call. */

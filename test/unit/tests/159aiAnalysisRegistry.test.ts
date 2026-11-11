@@ -24,7 +24,7 @@ const dataToolNames = ['query_count', 'query_run', 'records_countByStep', 'recor
 const toolNames = ({ effective = defaultAiPolicy, hostingClass, user = undefined, area = 'analysis' }: any) =>
   getTools({ area, ctx: newAnalysisToolContext({ survey, ...(user ? { user } : {}) }), effective, hostingClass })
     .map((tool) => tool.name)
-    .sort()
+    .sort((a, b) => a.localeCompare(b))
 
 beforeAll(async () => {
   survey = await DataTest.createTestSurvey({ user: getContextUser() })
@@ -44,12 +44,16 @@ describe('analysis tools in the registry', () => {
   })
 
   test('default policy, on-device engine: data tools too', () => {
-    expect(toolNames({ hostingClass: 'onDevice' })).toEqual([...schemaToolNames, ...dataToolNames].sort())
+    expect(toolNames({ hostingClass: 'onDevice' })).toEqual(
+      [...schemaToolNames, ...dataToolNames].sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test('a policy that allows data in the cloud offers the data tools to the cloud engine', () => {
     const effective = { schema: 'cloud', data: 'cloud' }
-    expect(toolNames({ effective, hostingClass: 'cloud' })).toEqual([...schemaToolNames, ...dataToolNames].sort())
+    expect(toolNames({ effective, hostingClass: 'cloud' })).toEqual(
+      [...schemaToolNames, ...dataToolNames].sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test('a policy that is off offers nothing', () => {
@@ -70,7 +74,7 @@ describe('analysis tools in the registry', () => {
   test('names are valid function names and WebMCP descriptors can be built', () => {
     expect(analysisTools).toHaveLength(7)
     for (const tool of analysisTools) {
-      expect(tool.name).toMatch(/^[a-zA-Z][a-zA-Z0-9_]{0,63}$/)
+      expect(tool.name).toMatch(/^[a-zA-Z]\w{0,63}$/)
       const descriptor = toWebMcpDescriptor(tool)
       expect(descriptor.inputSchema.type).toBe('object')
       expect(descriptor.annotations.readOnlyHint).toBe(true)

@@ -52,7 +52,9 @@ describe('gateway feature → permission middleware mapping', () => {
   const gatewayFeatures = Object.keys(AiFeatures).filter((feature) => isGatewayFeature(feature))
 
   test('every gateway feature is covered by this table', () => {
-    expect(gatewayFeatures.sort()).toEqual(Object.keys(expected).sort())
+    expect([...gatewayFeatures].sort((a, b) => a.localeCompare(b))).toEqual(
+      Object.keys(expected).sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test.each(Object.keys(expected))('%s resolves to its expected middleware', (feature) => {

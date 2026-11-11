@@ -16,10 +16,10 @@ export const useAiEngineActions = (): ((action: AiUnavailableAction) => Promise<
       if (action === 'retry') {
         await refreshAiCapabilities()
       } else if (action === 'changePolicy') {
-        navigate(appModuleUri(homeModules.surveyInfo), { state: { tab: 'aiPolicy' } })
+        void navigate(appModuleUri(homeModules.surveyInfo), { state: { tab: 'aiPolicy' } })
       } else {
         // openSettings: the provider list in the user's profile
-        navigate(appModuleUri(userModules.user))
+        void navigate(appModuleUri(userModules.user))
       }
     },
     [navigate]

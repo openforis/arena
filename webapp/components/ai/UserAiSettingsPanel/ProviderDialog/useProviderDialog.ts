@@ -140,7 +140,7 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
 
   // an account provider opened for editing lists its models with the saved key
   useEffect(() => {
-    if (saved?.kind === 'account') fetchModels()
+    if (saved?.kind === 'account') void fetchModels()
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only on open
   }, [])
 
@@ -241,11 +241,11 @@ export const useProviderDialog = ({ saved, context, onSaved }: Params): Provider
       setBaseUrl: (baseUrl) => dispatch({ type: 'baseUrlSet', baseUrl }),
       // the models are listed once the address or the key is left
       commitBaseUrl: () => {
-        fetchModels()
+        void fetchModels()
       },
       setApiKey: (apiKey) => dispatch({ type: 'apiKeySet', apiKey }),
       commitApiKey: () => {
-        fetchModels()
+        void fetchModels()
       },
       removeKey: () => dispatch({ type: 'apiKeyRemoved' }),
       keepKey: () => dispatch({ type: 'apiKeyKept' }),

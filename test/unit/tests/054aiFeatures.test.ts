@@ -30,7 +30,7 @@ describe('AI feature registry', () => {
       allFeatures
         .filter((f) => f.gateway)
         .map((f) => f.key)
-        .sort()
+        .sort((a, b) => a.localeCompare(b))
     ).toEqual(
       [
         'activityLogSummary',
@@ -44,7 +44,7 @@ describe('AI feature registry', () => {
         'expressionExplain',
         'expressionGenerate',
         'translation',
-      ].sort()
+      ].sort((a, b) => a.localeCompare(b))
     )
     expect(isGatewayFeature('dataDictionary')).toBe(true)
     expect(isGatewayFeature('internalPing')).toBe(false)

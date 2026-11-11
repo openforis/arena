@@ -21,7 +21,7 @@ const cleaningKeys = [
   'result.skipped',
   'rowAction.askAssistant',
   'rowAction.question',
-].sort()
+].sort((a, b) => a.localeCompare(b))
 
 const toolNames = ['validation_summarize', 'validation_list', 'record_getValues', 'records_proposeEdits']
 

@@ -66,7 +66,9 @@ describe('AI route permissions: the middleware chain of every route (320)', () =
       'get /survey/:surveyId/ai-policy',
       'put /survey/:surveyId/ai-policy',
     ])
-    expect(aiRoutes.map(({ method, path }) => `${method} ${path}`).sort()).toEqual([...covered].sort())
+    expect(aiRoutes.map(({ method, path }) => `${method} ${path}`).sort((a, b) => a.localeCompare(b))).toEqual(
+      [...covered].sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test('POST /ai/model checks the AI switch, then the permission of the requested feature, then runs the gateway', () => {

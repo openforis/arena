@@ -97,7 +97,7 @@ const ConnectStep = ({
           savedBaseUrl={saved?.baseUrl ?? null}
           onBaseUrlChange={actions.setBaseUrl}
           onModelChange={actions.setModel}
-          onTest={actions.runTest}
+          onTest={() => void actions.runTest()}
         />
       ) : (
         <AccountProviderFields
@@ -224,7 +224,7 @@ export const ProviderDialog = ({ saved, context, onClose, onSaved }: Props) => {
         busy={state.testing || state.saving}
         onBack={actions.back}
         onCancel={onClose}
-        onSave={actions.save}
+        onSave={() => void actions.save()}
       />
     </Modal>
   )

@@ -176,7 +176,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
           disabled={busy || selectedIds.length === 0}
           label="aiCleaning.card.applySelected"
           labelParams={{ count: selectedIds.length }}
-          onClick={() => apply(selectedIds)}
+          onClick={() => void apply(selectedIds)}
           testId={TestId.aiCleaning.applyBtn}
         />
         {retryIds.length > 0 && (
@@ -184,7 +184,7 @@ export const RecordEditCard = ({ changeSet, results = [], busy, onApply }: Props
             disabled={busy}
             label="aiCleaning.card.retryFailed"
             labelParams={{ count: retryIds.length }}
-            onClick={() => apply(retryIds)}
+            onClick={() => void apply(retryIds)}
             testId={TestId.aiCleaning.retryBtn}
             variant="outlined"
           />

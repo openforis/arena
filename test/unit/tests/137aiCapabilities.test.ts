@@ -106,7 +106,7 @@ describe('createCapabilitiesStore', () => {
     })
     await store.load({ userUuid: 'u1' })
     await store.refresh({ userUuid: 'u1' })
-    expect(calls.probes.length).toBe(2)
+    expect(calls.probes).toHaveLength(2)
     expect(calls.settings).toEqual([false, true])
     expect(notified).toBe(2)
     unsubscribe()
@@ -119,7 +119,7 @@ describe('createCapabilitiesStore', () => {
     const store = createCapabilitiesStore(deps)
     await store.load({ userUuid: 'u1' })
     await store.load({ userUuid: 'u2' })
-    expect(calls.probes.length).toBe(2)
+    expect(calls.probes).toHaveLength(2)
   })
 
   test('an unreachable server keeps the probe error and is not available', async () => {

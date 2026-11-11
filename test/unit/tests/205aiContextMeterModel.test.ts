@@ -51,8 +51,8 @@ describe('context meter model (205)', () => {
   })
 
   test('thresholds: amber from 80 %, red from 95 %', () => {
-    expect(CONTEXT_WARNING_RATIO).toBe(0.8)
-    expect(CONTEXT_CRITICAL_RATIO).toBe(0.95)
+    expect(CONTEXT_WARNING_RATIO).toBeCloseTo(0.8)
+    expect(CONTEXT_CRITICAL_RATIO).toBeCloseTo(0.95)
     expect(getContextMeterLevel(null)).toBe('normal')
     expect(getContextMeterLevel(0.79)).toBe('normal')
     expect(getContextMeterLevel(0.8)).toBe('warning')

@@ -27,7 +27,7 @@ describe('conversation database upgrades (430)', () => {
       ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
     )
     const store = second.transaction('conversations').objectStore('conversations')
-    expect([...store.indexNames].sort()).toEqual(['userSurvey', 'userUuid'])
+    expect([...store.indexNames].sort((a, b) => a.localeCompare(b))).toEqual(['userSurvey', 'userUuid'])
     second.close()
   })
 
@@ -41,7 +41,7 @@ describe('conversation database upgrades (430)', () => {
       ensureConversationsSchema(request.result, request.transaction as IDBTransaction)
     )
     const store = second.transaction('conversations').objectStore('conversations')
-    expect([...store.indexNames].sort()).toEqual(['userSurvey', 'userUuid'])
+    expect([...store.indexNames].sort((a, b) => a.localeCompare(b))).toEqual(['userSurvey', 'userUuid'])
     second.close()
   })
 
@@ -78,7 +78,9 @@ describe('conversation database upgrades (430)', () => {
       await store.save(
         createConversation({ userUuid: 'u1', surveyId: 1, area: 'design', idFactory: () => `c${version}` })
       )
-      expect((await store.list({ userUuid: 'u1', surveyId: 1 })).map((item) => item.id).sort()).toContain(`c${version}`)
+      expect(
+        (await store.list({ userUuid: 'u1', surveyId: 1 })).map((item) => item.id).sort((a, b) => a.localeCompare(b))
+      ).toContain(`c${version}`)
     }
   })
 })

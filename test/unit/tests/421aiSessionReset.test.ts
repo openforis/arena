@@ -25,8 +25,18 @@ describe('AI session reset (421)', () => {
         calls.push('assistant')
       },
       resets: [
-        { name: 'one', run: () => void calls.push('one') },
-        { name: 'two', run: async () => void calls.push('two') },
+        {
+          name: 'one',
+          run: () => {
+            calls.push('one')
+          },
+        },
+        {
+          name: 'two',
+          run: async () => {
+            calls.push('two')
+          },
+        },
       ],
       log: noLog,
     })
@@ -48,7 +58,12 @@ describe('AI session reset (421)', () => {
             throw new Error('broken')
           },
         },
-        { name: 'fine', run: () => void calls.push('fine') },
+        {
+          name: 'fine',
+          run: () => {
+            calls.push('fine')
+          },
+        },
       ],
       log,
     })
@@ -98,8 +113,12 @@ describe('auth session (421)', () => {
           calls.push('POST /auth/logout')
           return requestLogout()
         },
-        setAuthToken: (token) => void calls.push(`token ${token}`),
-        resetAiSession: async () => void calls.push('reset AI'),
+        setAuthToken: (token) => {
+          calls.push(`token ${token}`)
+        },
+        resetAiSession: async () => {
+          calls.push('reset AI')
+        },
         log,
         wait: async () => undefined,
       }),
@@ -157,8 +176,12 @@ describe('another user on the same browser (421)', () => {
     const data = new Map<string, string>()
     const localStorage: OpenConversationsStorage = {
       getItem: (key) => data.get(key) ?? null,
-      setItem: (key, value) => void data.set(key, value),
-      removeItem: (key) => void data.delete(key),
+      setItem: (key, value) => {
+        data.set(key, value)
+      },
+      removeItem: (key) => {
+        data.delete(key)
+      },
       key: (index) => [...data.keys()][index] ?? null,
       get length() {
         return data.size

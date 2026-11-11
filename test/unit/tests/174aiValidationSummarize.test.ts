@@ -126,7 +126,10 @@ describe('validation_summarize tool', () => {
       countValidationReportRows: () => 1200,
     })
     const result = await runTool(getTool(api), { recordUuid: RECORD_UUID }, newCleaningToolContext({ survey }))
-    expect(calls.map((call) => call.name).sort()).toEqual(['countValidationReportRows', 'fetchValidationReportRows'])
+    expect(calls.map((call) => call.name).sort((a, b) => a.localeCompare(b))).toEqual([
+      'countValidationReportRows',
+      'fetchValidationReportRows',
+    ])
     const fetchCall = calls.find((call) => call.name === 'fetchValidationReportRows')
     expect(fetchCall?.params).toMatchObject({
       surveyId: 1,

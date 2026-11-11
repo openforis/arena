@@ -5,7 +5,7 @@
 import SystemError, { StatusCodes } from '@core/systemError'
 import type { MissingLabelsCounts, MissingLabelsItem } from '@common/ai/categoryItemLabels'
 import { db } from '@server/db/db'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { Schemata } from '@common/model/db'
 
 // the missing labels queries read every item of the categories: a huge category must not hold a connection for long
 const queryTimeoutMs = 15_000
@@ -46,8 +46,8 @@ const isBlank = (text: string): string => `(COALESCE(${text}, '') ~ ${BLANK})`
  * @returns {string} The SQL condition.
  */
 const missingLabelCondition = (labels: string, lang: string): string =>
-  `(${isBlank(`${labels} ->> ${lang}`)} AND EXISTS (SELECT 1 FROM unnest($/langs/::text[]) AS other(lang) ` +
-  `WHERE other.lang <> ${lang} AND NOT ${isBlank(`${labels} ->> other.lang`)}))`
+  `(${isBlank(labels + ' ->> ' + lang)} AND EXISTS (SELECT 1 FROM unnest($/langs/::text[]) AS other(lang) ` +
+  `WHERE other.lang <> ${lang} AND NOT ${isBlank(labels + ' ->> other.lang')}))`
 
 /**
  * Returns the SQL of the code of an item alias.
@@ -89,7 +89,7 @@ export const countItemsMissingLabels = async (
   { surveyId, langs }: { surveyId: number | string; langs: string[] },
   client: any = db
 ): Promise<MissingLabelsCounts> => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const rows: { categoryUuid: string; lang: string; count: number }[] = await runBounded(client, (t) =>
     t.any(
       `WITH items AS (
@@ -124,7 +124,7 @@ export const categoryExists = async (
   client: any = db
 ): Promise<boolean> =>
   client.one(
-    `SELECT EXISTS (SELECT 1 FROM ${getSurveyDBSchema(surveyId)}.category WHERE uuid = $/categoryUuid/) AS found`,
+    `SELECT EXISTS (SELECT 1 FROM ${Schemata.getSchemaSurvey(surveyId)}.category WHERE uuid = $/categoryUuid/) AS found`,
     { categoryUuid },
     (row: { found: boolean }) => row.found
   )
@@ -168,7 +168,7 @@ export const fetchItemsMissingLabels = async (
   },
   client: any = db
 ): Promise<{ total: number; items: MissingLabelsItem[] }> => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   // the code path is built (upwards) only for the missing items and the cursor item, not for the whole category
   const row: { total: number; items: MissingLabelsRow[] } = await runBounded(client, (t) =>
     t.one(
@@ -252,7 +252,7 @@ export const fetchItemsLabelsByUuids = async (
   { surveyId, itemUuids }: { surveyId: number | string; itemUuids: string[] },
   client: any
 ): Promise<ItemLabelsRow[]> => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   return client.any(
     `SELECT i.uuid, l.category_uuid AS "categoryUuid", i.level_uuid AS "levelUuid", ${itemCode('i')} AS code,
        ${combinedLabels('i')} AS labels

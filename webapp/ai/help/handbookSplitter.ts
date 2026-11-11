@@ -15,7 +15,7 @@ export const SECTION_MAX_CHARS = 4000
 export const HANDBOOK_MIN_IDS = 50
 
 // "6.1.2. Branding        18", "Annex 1. System architecture   150"
-const TOC_LINE = /^((?:\d+\.)+|Annex \d+\.)\s+(.+?)\s{2,}\d+\s*$/
+const TOC_NUMBER = /^((?:\d+\.)+|Annex \d+\.)\s/
 const UNNUMBERED_TOC_LINE = /^(Acknowledgements)\s{2,}\d+\s*$/
 const PAGE_BREAK = /^_{8,}\s*$/
 
@@ -30,11 +30,26 @@ export const toLines = (raw: string): string[] =>
     .replace(/\r\n?/g, '\n')
     .split('\n')
 
+/**
+ * Returns the title of a table of contents entry without the page number: two or more spaces and the digits at its end.
+ * @param {string} text - The entry after its number.
+ * @returns {string|null} The title, or null when the entry has no page number.
+ */
+const readTocTitle = (text: string): string | null => {
+  let digitsStart = text.length
+  while (digitsStart > 0 && text[digitsStart - 1] >= '0' && text[digitsStart - 1] <= '9') digitsStart -= 1
+  if (digitsStart === text.length) return null
+  let titleEnd = digitsStart
+  while (titleEnd > 0 && /\s/.test(text[titleEnd - 1])) titleEnd -= 1
+  return titleEnd > 0 && digitsStart - titleEnd >= 2 ? text.slice(0, titleEnd) : null
+}
+
 const toTocEntry = (line: string): TocEntry | null => {
   const trimmed = line.trim()
-  const numbered = TOC_LINE.exec(trimmed)
-  if (numbered) {
-    const [, number, title] = numbered
+  const numbered = TOC_NUMBER.exec(trimmed)
+  const title = numbered ? readTocTitle(trimmed.slice(numbered[0].length).trimStart()) : null
+  if (numbered && title !== null) {
+    const number = numbered[1]
     const annex = /^Annex (\d+)\.$/.exec(number)
     const id = annex ? `A${annex[1]}` : number.slice(0, -1)
     const level = annex ? 1 : id.split('.').length

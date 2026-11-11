@@ -169,6 +169,28 @@ const prepareCall = async ({ req, user, deps }: { req: any; user: User; deps: Mo
 }
 
 /**
+ * Sends the error event to the client unless the response is already closed.
+ * @param {object} params - Parameters.
+ * @param {any} params.res - The response.
+ * @param {Function} params.writeEvent - The SSE event writer.
+ * @param {unknown} params.error - The error to send.
+ * @param {ReturnType<typeof createCallControl>['state']} params.state - The state of the call.
+ */
+const sendErrorIfOpen = ({
+  res,
+  writeEvent,
+  error,
+  state,
+}: {
+  res: any
+  writeEvent: ReturnType<typeof createSseEventWriter>
+  error: unknown
+  state: ReturnType<typeof createCallControl>['state']
+}): void => {
+  if (!isSseClosed(res)) writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(error, state)) })
+}
+
+/**
  * Copies the provider stream to the SSE response; stream errors are sent as keys only.
  * @param {object} params - Parameters.
  * @returns {Promise<object>} The outcome (usage or error).
@@ -190,7 +212,13 @@ const pumpStream = async ({
   const reader = stream.getReader()
   const outcome: { usage?: unknown; error?: unknown } = {}
   // a client disconnect must also stop a provider that ignores the abort signal
-  control.signal.addEventListener('abort', () => reader.cancel(control.signal.reason).catch(() => {}), { once: true })
+  control.signal.addEventListener(
+    'abort',
+    () => {
+      void reader.cancel(control.signal.reason).catch(() => {})
+    },
+    { once: true }
+  )
   try {
     for (;;) {
       const { value: part, done } = await reader.read()
@@ -203,7 +231,7 @@ const pumpStream = async ({
     }
   } catch (error) {
     outcome.error = error
-    if (!isSseClosed(res)) writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(error, control.state)) })
+    sendErrorIfOpen({ res, writeEvent, error, state: control.state })
     // the provider must not keep producing for a call that failed here
     await reader.cancel(error).catch(() => {})
   } finally {
@@ -213,8 +241,7 @@ const pumpStream = async ({
   // (a timer firing after the finish part must not turn a completed answer into a timeout)
   if (control.state.timedOut && !outcome.error && !outcome.usage) {
     outcome.error = control.signal.reason
-    if (!isSseClosed(res))
-      writeEvent({ type: 'error', error: toAiWireError(toAiSystemError(outcome.error, control.state)) })
+    sendErrorIfOpen({ res, writeEvent, error: outcome.error, state: control.state })
   }
   record(outcome)
   return outcome

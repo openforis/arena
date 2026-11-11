@@ -180,7 +180,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       answer(500, 'e'.repeat(60 * 1024))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls })
       const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
-      expect((await response.text()).length).toBe(60 * 1024)
+      expect(await response.text()).toHaveLength(60 * 1024)
     })
 
     test('a call with no signal times out, and one with a signal keeps its own', async () => {
@@ -199,7 +199,7 @@ describe('the size of what an endpoint of a user sends is capped (308)', () => {
       answer(200, 'a'.repeat(50_000))
       const guardedFetch = createGuardedFetch({ allowlist: ENV.aiOrgHostedBaseUrls, maxBodyBytes: 100_000 })
       const response = await guardedFetch(`http://127.0.0.1:${port}/x`)
-      expect((await response.text()).length).toBe(50_000)
+      expect(await response.text()).toHaveLength(50_000)
     })
 
     test('a list is capped whatever fetch brings it (the cloud providers use the global fetch)', async () => {

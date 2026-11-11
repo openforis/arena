@@ -85,7 +85,9 @@ describe('aiBaseUrlNotAllowed points to the local AI server', () => {
   }
 
   test('every language of the app has its expected name (a new language needs one here)', () => {
-    expect(Object.keys(localServerNames).sort()).toEqual([...LANGUAGES].sort())
+    expect(Object.keys(localServerNames).sort((a, b) => a.localeCompare(b))).toEqual(
+      [...LANGUAGES].sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test.each(LANGUAGES)('%s', (lang) => {

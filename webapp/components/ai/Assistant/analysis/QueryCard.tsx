@@ -47,7 +47,14 @@ export const QueryCard = ({ entry }: Props) => {
 
   const show = useCallback(
     (displayType: string, chartType: string | null = null) =>
-      dispatch(DataExplorerActions.showQuery({ query: entry.query, displayType, chartType, navigate })),
+      dispatch(
+        DataExplorerActions.showQuery({
+          query: entry.query,
+          displayType,
+          chartType,
+          navigate: (to: string) => void navigate(to),
+        })
+      ),
     [dispatch, entry, navigate]
   )
 
@@ -56,7 +63,7 @@ export const QueryCard = ({ entry }: Props) => {
   }
   const { queryId } = model
   const measures = model.measures.map(
-    ({ attribute, functions }) => `${attribute} (${functions.map((fn) => i18n.t(`common.${fn}`)).join(', ')})`
+    ({ attribute, functions }) => `${attribute} (${functions.map((fn) => i18n.t('common.' + fn)).join(', ')})`
   )
   const sort = model.sort.map(
     ({ attribute, order }) => `${attribute} (${i18n.t(order === 'desc' ? 'common.descending' : 'common.ascending')})`

@@ -1,4 +1,4 @@
-import type { Node as ArenaNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -24,7 +24,8 @@ const uniquenessErrorKeys = new Set<string>([
   Validation.messageKeys.record.uniqueAttributeDuplicate,
 ])
 
-export type BatchEditCheck = { ok: true; node: ArenaNode; nodeDef: any } | { ok: false; result: NodesBatchEditResult }
+export type BatchEditCheck =
+  { ok: true; node: ArenaRecordNode; nodeDef: any } | { ok: false; result: NodesBatchEditResult }
 
 /**
  * Returns true when the attribute can be edited by a batch edit (editable, and not a file).

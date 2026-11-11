@@ -24,10 +24,7 @@ import * as SurveyRepository from '@server/modules/survey/repository/surveyRepos
 import * as CategoryItemLabelsRepository from '@server/modules/category/repository/categoryItemLabelsRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as CategoryRepository from '@server/modules/category/repository/categoryRepository'
-import {
-  bulkUpdateSurveySchemaTableProp,
-  markSurveyDraft,
-} from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { bulkUpdateSurveySchemaTableProp } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 
 /**
  * Creates the error of an invalid request.
@@ -284,7 +281,7 @@ export const updateItemsLabels = async (
     const updates = parseUpdates(items, langs)
     const { applied, conflicts, activities, categoryUuids } = await writeUpdates({ surveyId, updates }, tx)
     if (activities.length > 0) {
-      await markSurveyDraft(surveyId, tx)
+      await SurveyRepository.markSurveyDraft(surveyId, tx)
       await ActivityLogRepository.insertMany(user, surveyId, activities, tx)
     }
     const categories: any[] = []

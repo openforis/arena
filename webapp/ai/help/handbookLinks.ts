@@ -12,7 +12,7 @@ export type ManualLinks = { manualUrl: string; sections: Map<string, ManualSecti
 const PART_SUFFIX = / \(\d+\/\d+\)$/
 
 // code blocks, inline code and Markdown links are copied as they are (links get their target resolved)
-const PROTECTED = /(```[\s\S]*?(?:```|$)|`[^`\n]*`|\[[^\]\n]*\]\([^)\n]*\))/
+const PROTECTED = /(```[\s\S]*?(?:```|$)|`[^`\n]*`|\[[^\]\n]*\]\([^)\n]*\))/ // NOSONAR: only a line of text is scanned per '[', no backtracking into it
 const LINK = /^\[([^\]\n]*)\]\(([^)\n]*)\)$/
 const CITATION = /§ ?(A\d+|\d+(?:\.\d+)*)(\.?)/g
 const SECTION_TARGET = /^§ ?(A\d+|\d+(?:\.\d+)*)\.?$/

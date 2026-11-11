@@ -145,7 +145,9 @@ const readAll = async ({
   const reader = response.body.getReader()
   const decoder = new TextDecoder()
   // cancelling the reader unblocks a pending read when the call is aborted
-  const onAbort = () => reader.cancel(signal.reason).catch(() => undefined)
+  const onAbort = () => {
+    void reader.cancel(signal.reason).catch(() => undefined)
+  }
   signal.addEventListener('abort', onAbort, { once: true })
   try {
     while (!signal.aborted) {

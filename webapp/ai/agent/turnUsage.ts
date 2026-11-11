@@ -30,9 +30,7 @@ const isCount = (value: unknown): value is number => typeof value === 'number' &
  * @param {object} [usage] - AI SDK step usage.
  * @returns {number|null} The tokens, or null when the input is not counted (no usage, or zeros).
  */
-export const toContextTokens = (
-  usage: { inputTokens?: number | undefined; outputTokens?: number | undefined } | undefined
-): number | null => {
+export const toContextTokens = (usage: { inputTokens?: number; outputTokens?: number } | undefined): number | null => {
   if (!isCount(usage?.inputTokens)) return null
   return usage.inputTokens + (isCount(usage.outputTokens) ? usage.outputTokens : 0)
 }

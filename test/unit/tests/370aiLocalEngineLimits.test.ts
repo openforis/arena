@@ -89,7 +89,7 @@ describe('the local engine limits its output (370)', () => {
     const { bodies, fetchImpl } = recorder(() => sse(['ok']))
     const engine = createLocalServerEngine({ localServer: localServer({ contextTokens: 32768 }), fetchImpl })
     const result = streamText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
-    for await (const part of result.fullStream) void part
+    await result.consumeStream()
     expect(bodies[0].max_tokens).toBe(LOCAL_SERVER_MAX_OUTPUT_TOKENS)
   })
 })
@@ -101,7 +101,7 @@ describe('the local engine does not send a part per token (370)', () => {
     const engine = createLocalServerEngine({ localServer: localServer(), fetchImpl })
     const result = streamText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
     const deltas: string[] = []
-    for await (const part of result.fullStream) {
+    for await (const part of result.stream) {
       if (part.type === 'text-delta') deltas.push(part.text)
     }
     expect(deltas.join('')).toBe(words.join(''))
@@ -116,7 +116,7 @@ describe('the local engine does not send a part per token (370)', () => {
     let text = ''
     let reasoning = ''
     const types: string[] = []
-    for await (const part of result.fullStream) {
+    for await (const part of result.stream) {
       if (part.type === 'text-delta') text += part.text
       if (part.type === 'reasoning-delta') reasoning += part.text
       if (part.type === 'text-delta' || part.type === 'reasoning-delta') types.push(part.type)

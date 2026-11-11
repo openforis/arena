@@ -101,7 +101,7 @@ const ChangeSetFullCard = ({
           <Button
             disabled={busy || dirty || selectedIds.length === 0}
             label="aiAssistant.card.applySelected"
-            onClick={selection.apply}
+            onClick={() => void selection.apply()}
             primary
             testId={TestId.aiAssistant.applyBtn}
           />

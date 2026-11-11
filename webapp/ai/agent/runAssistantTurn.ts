@@ -283,7 +283,7 @@ export const runAssistantTurn = async ({
       // errors arrive as 'error' parts of the full stream
       onError: () => undefined,
     })
-    for await (const part of result.fullStream) {
+    for await (const part of result.stream) {
       handleStreamPart(part, state, outcome)
       escalateOnDataResult({ part, toolList, state })
     }

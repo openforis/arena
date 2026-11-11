@@ -117,7 +117,7 @@ describe('survey AI policy cache', () => {
     await first
     changes.length = 0
 
-    cache.invalidate(1)
+    void cache.invalidate(1)
     expect(changes).toEqual([1])
     expect(cache.peek(1)).toEqual(stateOf('onDevice'))
     const next = cache.get(1)
@@ -200,7 +200,7 @@ describe('survey AI policy cache: invalidate and reset', () => {
     const onUnhandled = (reason: unknown) => unhandled.push(reason)
     process.on('unhandledRejection', onUnhandled)
     try {
-      cache.invalidate(1)
+      void cache.invalidate(1)
       fetches[0].d.reject(new Error('network'))
       await new Promise((resolve) => setTimeout(resolve, 10))
       expect(unhandled).toEqual([])
@@ -225,7 +225,7 @@ describe('survey AI policy cache: invalidate and reset', () => {
     cache.reset()
     expect(cache.peek(1)).toBeNull()
     expect(cache.peek(2)).toBeNull()
-    expect([...changes].sort()).toEqual([1, 2])
+    expect([...changes].sort((a, b) => a - b)).toEqual([1, 2])
     const next = cache.get(1)
     expect(fetches).toHaveLength(3)
     fetches[2].d.resolve(stateOf('off'))
@@ -291,7 +291,7 @@ describe('survey AI policy cache: a fresh read returns its own server answer', (
   test('a plain read superseded by an update still gets the updated value', async () => {
     const harness = createHarness()
     await prime(harness)
-    harness.cache.invalidate(1)
+    void harness.cache.invalidate(1)
     const plain = harness.cache.get(1)
     const update = harness.cache.update(1, { schema: 'cloud', data: 'off' })
     harness.fetches[1].d.resolve(stateOf('onDevice'))

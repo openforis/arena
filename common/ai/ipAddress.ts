@@ -91,31 +91,31 @@ const ipv6Range = (network: string, prefix: number, ipClass: IpAddressClass): Ra
 // the first range that matches wins: the narrow ranges come before the ones that contain them
 const IPV4_RANGES: Range[] = [
   ipv4Range('0.0.0.0', 8, 'unspecified'),
-  ipv4Range('10.0.0.0', 8, 'private'),
-  ipv4Range('100.64.0.0', 10, 'private'), // carrier-grade NAT
+  ipv4Range('10.0.0.0', 8, 'private'), // NOSONAR: range table used to classify addresses
+  ipv4Range('100.64.0.0', 10, 'private'), // carrier-grade NAT // NOSONAR: range table used to classify addresses
   ipv4Range('127.0.0.0', 8, 'loopback'),
-  ipv4Range('169.254.0.0', 16, 'private'), // link-local (cloud metadata)
-  ipv4Range('172.16.0.0', 12, 'private'),
-  ipv4Range('192.0.0.0', 24, 'reserved'), // IETF protocol assignments
-  ipv4Range('192.168.0.0', 16, 'private'),
-  ipv4Range('198.18.0.0', 15, 'reserved'), // benchmarking
-  ipv4Range('224.0.0.0', 4, 'reserved'), // multicast
-  ipv4Range('240.0.0.0', 4, 'reserved'), // reserved and broadcast
+  ipv4Range('169.254.0.0', 16, 'private'), // link-local (cloud metadata) // NOSONAR: range table used to classify addresses
+  ipv4Range('172.16.0.0', 12, 'private'), // NOSONAR: range table used to classify addresses
+  ipv4Range('192.0.0.0', 24, 'reserved'), // IETF protocol assignments // NOSONAR: range table used to classify addresses
+  ipv4Range('192.168.0.0', 16, 'private'), // NOSONAR: range table used to classify addresses
+  ipv4Range('198.18.0.0', 15, 'reserved'), // benchmarking // NOSONAR: range table used to classify addresses
+  ipv4Range('224.0.0.0', 4, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
+  ipv4Range('240.0.0.0', 4, 'reserved'), // reserved and broadcast // NOSONAR: range table used to classify addresses
 ]
 
 const IPV6_RANGES: Range[] = [
   ipv6Range('::', 128, 'unspecified'),
   ipv6Range('::1', 128, 'loopback'),
   ipv6Range('::', 96, 'reserved'), // IPv4-compatible
-  ipv6Range('64:ff9b::', 96, 'reserved'), // NAT64 (can reach internal IPv4)
-  ipv6Range('64:ff9b:1::', 48, 'reserved'), // local-use NAT64
-  ipv6Range('2002::', 16, 'reserved'), // 6to4 (embeds an IPv4)
-  ipv6Range('2001::', 32, 'reserved'), // Teredo (embeds an IPv4)
-  ipv6Range('::ffff:0:0:0', 96, 'reserved'), // IPv4-translated (SIIT)
-  ipv6Range('fc00::', 7, 'private'), // unique local
-  ipv6Range('fe80::', 10, 'private'), // link-local
-  ipv6Range('fec0::', 10, 'private'), // deprecated site-local
-  ipv6Range('ff00::', 8, 'reserved'), // multicast
+  ipv6Range('64:ff9b::', 96, 'reserved'), // NAT64 (can reach internal IPv4) // NOSONAR: range table used to classify addresses
+  ipv6Range('64:ff9b:1::', 48, 'reserved'), // local-use NAT64 // NOSONAR: range table used to classify addresses
+  ipv6Range('2002::', 16, 'reserved'), // 6to4 (embeds an IPv4) // NOSONAR: range table used to classify addresses
+  ipv6Range('2001::', 32, 'reserved'), // Teredo (embeds an IPv4) // NOSONAR: range table used to classify addresses
+  ipv6Range('::ffff:0:0:0', 96, 'reserved'), // IPv4-translated (SIIT) // NOSONAR: range table used to classify addresses
+  ipv6Range('fc00::', 7, 'private'), // unique local // NOSONAR: range table used to classify addresses
+  ipv6Range('fe80::', 10, 'private'), // link-local // NOSONAR: range table used to classify addresses
+  ipv6Range('fec0::', 10, 'private'), // deprecated site-local // NOSONAR: range table used to classify addresses
+  ipv6Range('ff00::', 8, 'reserved'), // multicast // NOSONAR: range table used to classify addresses
 ]
 
 /**

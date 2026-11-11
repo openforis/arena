@@ -19,7 +19,7 @@ describe('i18n parity helper (461)', () => {
       .readdirSync(resourcesDir, { withFileTypes: true })
       .filter((entry) => entry.isDirectory())
       .map((entry) => entry.name)
-    expect([...LANGUAGES].sort()).toEqual(folders.sort())
+    expect([...LANGUAGES].sort((a, b) => a.localeCompare(b))).toEqual([...folders].sort((a, b) => a.localeCompare(b)))
     expect(OTHER_LANGUAGES).not.toContain('en')
     expect(OTHER_LANGUAGES).toHaveLength(LANGUAGES.length - 1)
   })

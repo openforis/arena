@@ -14,7 +14,12 @@ const URL_A = 'http://localhost:1234/v1'
 
 const memoryStorage = (): StorageLike => {
   const data = new Map<string, string>()
-  return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }
+  return {
+    getItem: (key) => data.get(key) ?? null,
+    setItem: (key, value) => {
+      data.set(key, value)
+    },
+  }
 }
 
 const SETTINGS: AiFeatureSwitches = {

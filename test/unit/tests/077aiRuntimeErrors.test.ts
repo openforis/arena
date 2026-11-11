@@ -59,6 +59,6 @@ describe('runStreamWithCallbacks', () => {
     })
     cancel()
     await new Promise((resolve) => setTimeout(resolve, 10))
-    expect(events.sort()).toEqual(['done', 'error'])
+    expect([...events].sort((a, b) => a.localeCompare(b))).toEqual(['done', 'error'])
   })
 })

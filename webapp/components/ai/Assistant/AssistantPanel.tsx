@@ -107,7 +107,7 @@ const AssistantMenu = ({ api }: { api: AssistantConversationApi }) => {
           iconClassName: 'icon-cog icon-12px',
           label: 'aiAssistant.menu.aiSettings',
           // own profile: the AI settings panel (as the not-available actions do)
-          onClick: () => navigate(appModuleUri(userModules.user)),
+          onClick: () => void navigate(appModuleUri(userModules.user)),
           testId: TestId.aiAssistant.aiSettingsBtn,
         },
         {

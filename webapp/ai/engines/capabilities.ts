@@ -243,10 +243,10 @@ export const createCapabilitiesStore = (deps: CapabilitiesStoreDeps): AiCapabili
    * @param {string|null} userUuid - UUID of the user whose run is waited for.
    * @returns {Promise<AiCapabilities>} The capabilities.
    */
-  const newerRun = (userUuid: string | null): Promise<AiCapabilities> =>
-    inflight && inflight.userUuid === userUuid
-      ? inflight.promise
-      : Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
+  const newerRun = (userUuid: string | null): Promise<AiCapabilities> => {
+    if (inflight && inflight.userUuid === userUuid) return inflight.promise
+    return Promise.resolve(loadedFor === userUuid ? capabilities : emptyCapabilities())
+  }
 
   /**
    * Probes a local server; a failure gives null (not available).

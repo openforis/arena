@@ -8,16 +8,19 @@ import { createRateLimiter } from '@server/modules/ai/service/gateway/rateLimite
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
 import { collectRoutes } from '@test/utils/routeUtils'
 
+/** Builds a caller of the middleware for a user uuid; returns the response. */
+const callOf = (middleware: ReturnType<typeof createProviderRateLimit>, next: jest.Mock) => (uuid: string) => {
+  const res = createFakeResponse()
+  middleware({ user: { uuid } }, res, next)
+  return res
+}
+
 describe('Rate limit of the calls to the endpoints of the providers (307)', () => {
   test('a user over the limit is refused with 429 "aiRateLimited" and the request goes no further', () => {
     const limiter = createRateLimiter({ limitPerMinute: 2 })
     const middleware = createProviderRateLimit({ limiter })
     const next = jest.fn()
-    const call = (uuid: string) => {
-      const res = createFakeResponse()
-      middleware({ user: { uuid } }, res, next)
-      return res
-    }
+    const call = callOf(middleware, next)
     expect(call('u1').statusCode).not.toBe(429)
     expect(call('u1').statusCode).not.toBe(429)
     expect(next).toHaveBeenCalledTimes(2)
@@ -33,11 +36,7 @@ describe('Rate limit of the calls to the endpoints of the providers (307)', () =
   test('a user with 3 calls in flight is refused a 4th, and a finished call frees its place', () => {
     const middleware = createProviderRateLimit({ limiter: createRateLimiter({ limitPerMinute: 100 }) })
     const next = jest.fn()
-    const call = (uuid: string) => {
-      const res = createFakeResponse()
-      middleware({ user: { uuid } }, res, next)
-      return res
-    }
+    const call = callOf(middleware, next)
     const running = [call('u1'), call('u1'), call('u1')]
     expect(next).toHaveBeenCalledTimes(3)
     const refused = call('u1')
@@ -60,7 +59,7 @@ describe('Rate limit of the calls to the endpoints of the providers (307)', () =
     const limited = routes
       .filter((route) => route.handlers.includes(limitProviderCalls))
       .map(({ method, path }) => `${method} ${path}`)
-    expect(limited.sort()).toEqual([
+    expect([...limited].sort((a, b) => a.localeCompare(b))).toEqual([
       'post /ai/providers',
       'post /ai/providers/models',
       'post /ai/providers/test',

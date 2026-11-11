@@ -11,7 +11,9 @@ const kinds = Object.keys(SUGGESTION_GROWTH_STEPS) as SuggestionKind[]
 
 describe('suggestion registry (423)', () => {
   test('every kind is registered once, and the entry holds its own definition, detector and resolver', () => {
-    expect(Object.keys(SUGGESTION_REGISTRY).sort()).toEqual([...kinds].sort())
+    expect(Object.keys(SUGGESTION_REGISTRY).sort((a, b) => a.localeCompare(b))).toEqual(
+      [...kinds].sort((a, b) => a.localeCompare(b))
+    )
     for (const kind of kinds) {
       const { definition, stateDetector, eventDetector, resolver } = SUGGESTION_REGISTRY[kind]
       const entryKinds = [definition, stateDetector, eventDetector, resolver].map((part) => part?.kind ?? kind)
@@ -27,7 +29,9 @@ describe('suggestion registry (423)', () => {
   })
 
   test('the definitions map is complete and the arrays hold what the entries declare', () => {
-    expect(Object.keys(SUGGESTION_DEFINITIONS).sort()).toEqual([...kinds].sort())
+    expect(Object.keys(SUGGESTION_DEFINITIONS).sort((a, b) => a.localeCompare(b))).toEqual(
+      [...kinds].sort((a, b) => a.localeCompare(b))
+    )
     const registrations = Object.values(SUGGESTION_REGISTRY)
     expect(STATE_DETECTORS).toEqual(registrations.flatMap((entry) => entry.stateDetector ?? []))
     expect(EVENT_DETECTORS).toEqual(registrations.flatMap((entry) => entry.eventDetector ?? []))

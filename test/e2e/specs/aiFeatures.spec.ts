@@ -19,7 +19,7 @@ import { getWorkerSurveyEditor, insertSurveyEditor } from '../fixtures/testUsers
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 test.describe('AI features (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.beforeEach(async ({ api }) => {
     await api.enableAiFeatures()
@@ -94,7 +94,7 @@ test.describe('AI features (mock provider)', () => {
 })
 
 test.describe('Survey AI policy (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.beforeEach(async ({ api }) => {
     await api.enableAiFeatures()

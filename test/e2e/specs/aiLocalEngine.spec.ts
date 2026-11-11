@@ -81,7 +81,7 @@ const closeSummary = async (page: Page): Promise<void> => {
 }
 
 test.describe('Local AI provider (stub local server)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   let stub: LocalModelServerStub | null = null
 

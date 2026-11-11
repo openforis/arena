@@ -328,7 +328,7 @@ describe('handleModelRequest: stream', () => {
       await new Promise((resolve) => setImmediate(resolve))
 
       expect(state.signal.aborted).toBe(true)
-      expect(res.writes.length).toBe(writesBefore)
+      expect(res.writes).toHaveLength(writesBefore)
       expect(telemetry).toHaveLength(1)
       expect(unhandled).toEqual([])
     } finally {

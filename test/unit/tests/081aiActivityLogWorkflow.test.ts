@@ -47,7 +47,7 @@ describe('summarizeActivityLogWorkflow', () => {
     expect(promptText).toMatch(/recordCreate/)
     expect(promptText).toMatch(/count=8/)
     // aggregated: only the first 3 sample times of the 8 entries are listed
-    const samples = promptText.match(/samples=([^\\]*)/)?.[1].split(', ')
+    const samples = /samples=([^\\]*)/.exec(promptText)?.[1].split(', ')
     expect(samples).toEqual(['2026-05-01T10:00:07', '2026-05-01T10:00:06', '2026-05-01T10:00:05'])
   })
 })

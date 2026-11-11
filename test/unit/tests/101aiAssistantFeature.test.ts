@@ -23,7 +23,7 @@ describe('assistantDesign feature', () => {
     const toolFeatures = Object.values(AiFeatures)
       .filter((feature) => feature.tools)
       .map((feature) => feature.key)
-      .sort()
+      .sort((a, b) => a.localeCompare(b))
     expect(toolFeatures).toEqual(['assistantAnalysis', 'assistantCleaning', 'assistantDesign', 'chatbot'])
   })
 

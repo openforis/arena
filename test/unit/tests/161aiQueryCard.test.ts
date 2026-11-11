@@ -83,7 +83,7 @@ describe('translations', () => {
         'queryCard.title',
         'recordDataNotice.message',
         'recordDataNotice.newConversation',
-      ].sort()
+      ].sort((a, b) => a.localeCompare(b))
     )
     for (const lang of OTHER_LANGUAGES) {
       const section = RESOURCES[lang].common.aiAnalysis

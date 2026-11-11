@@ -120,7 +120,9 @@ describe('gateway server rules: the data class follows the tool results (321)', 
     const browserSchemaTools = ALL_TOOLS.filter((candidate) => candidate.dataClass === 'schema').map(
       (candidate) => candidate.name
     )
-    expect([...SCHEMA_TOOL_NAMES].sort()).toEqual(browserSchemaTools.sort())
+    expect([...SCHEMA_TOOL_NAMES].sort((a, b) => a.localeCompare(b))).toEqual(
+      [...browserSchemaTools].sort((a, b) => a.localeCompare(b))
+    )
     for (const candidate of ALL_TOOLS)
       expect([candidate.name, isSchemaTool(candidate.name)]).toEqual([candidate.name, candidate.dataClass === 'schema'])
   })
@@ -196,7 +198,9 @@ describe('gateway server rules: tool allowlist (321)', () => {
     const helpTools = ALL_TOOLS.filter((candidate) => candidate.area.includes('help')).map(
       (candidate) => candidate.name
     )
-    expect([...(getAiFeature('chatbot')?.toolNames ?? [])].sort()).toEqual(helpTools.sort())
+    expect([...(getAiFeature('chatbot')?.toolNames ?? [])].sort((a, b) => a.localeCompare(b))).toEqual(
+      [...helpTools].sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test('a tool outside the allowlist of the feature is refused', async () => {

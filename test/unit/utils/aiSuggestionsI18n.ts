@@ -34,7 +34,9 @@ export const flatten = flattenTexts
  * @returns {string[]} The base keys.
  */
 export const baseKeys = (lang: string): string[] =>
-  [...new Set(Object.keys(flatten(getResource(lang))).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort()
+  [...new Set(Object.keys(flatten(getResource(lang))).map((key) => key.replace(PLURAL_SUFFIX, '')))].sort((a, b) =>
+    a.localeCompare(b)
+  )
 
 export const placeholders = placeholdersOf
 

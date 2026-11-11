@@ -28,17 +28,17 @@ beforeAll(async () => {
 
 const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(survey, name))
 
-const leaveDesigner = (target: any, names: string[], options: { draft?: boolean } = {}) => {
+const leaveDesigner = async (target: any, names: string[], options: { draft?: boolean } = {}) => {
   const { store, added } = createAddRecorder()
   const event = { type: 'designerLeft' as const, newNodeDefUuids: names.map(uuidOf) }
-  newEntriesDescriptionsDetector.handle(event, createDetectorContext({ survey: target, store, ...options }))
+  await newEntriesDescriptionsDetector.handle(event, createDetectorContext({ survey: target, store, ...options }))
   return added
 }
 
 describe('new entries descriptions detector (222)', () => {
-  test('adds the new entries without a description in any language', () => {
+  test('adds the new entries without a description in any language', async () => {
     const changed = withTexts(survey, 'cluster_notes', 'descriptions', { fr: 'Remarques' })
-    expect(leaveDesigner(changed, ['tree_dec_1', 'cluster_notes', 'tree'])).toEqual([
+    expect(await leaveDesigner(changed, ['tree_dec_1', 'cluster_notes', 'tree'])).toEqual([
       {
         id: 'newEntriesDescriptions:visit',
         kind: 'newEntriesDescriptions',
@@ -52,33 +52,33 @@ describe('new entries descriptions detector (222)', () => {
     ])
   })
 
-  test('only saved, eligible node definitions; nothing to add, nothing added', () => {
+  test('only saved, eligible node definitions; nothing to add, nothing added', async () => {
     let changed = withNodeDef(survey, 'tree_dec_1', (nodeDef) => ({ ...nodeDef, temporary: true }))
     changed = withNodeDef(changed, 'plot_id', (nodeDef) => ({ ...nodeDef, analysis: true }))
     changed = withNodeDef(changed, 'cluster_id', (nodeDef) => ({ ...nodeDef, deleted: true }))
-    expect(leaveDesigner(changed, ['tree_dec_1', 'plot_id', 'cluster_id'])).toEqual([])
-    expect(leaveDesigner(survey, [])).toEqual([])
+    expect(await leaveDesigner(changed, ['tree_dec_1', 'plot_id', 'cluster_id'])).toEqual([])
+    expect(await leaveDesigner(survey, [])).toEqual([])
   })
 
-  test('ignores other events, published defs and unknown uuids', () => {
+  test('ignores other events, published defs and unknown uuids', async () => {
     const { store, added } = createAddRecorder()
-    newEntriesDescriptionsDetector.handle({ type: 'publishClicked' }, createDetectorContext({ survey, store }))
-    newEntriesDescriptionsDetector.handle(
+    await newEntriesDescriptionsDetector.handle({ type: 'publishClicked' }, createDetectorContext({ survey, store }))
+    await newEntriesDescriptionsDetector.handle(
       { type: 'designerLeft', newNodeDefUuids: ['no-such-uuid'] },
       createDetectorContext({ survey, store })
     )
     expect(added).toEqual([])
-    expect(leaveDesigner(survey, ['tree_dec_1'], { draft: false })).toEqual([])
+    expect(await leaveDesigner(survey, ['tree_dec_1'], { draft: false })).toEqual([])
   })
 
-  test('the resolver drops entries that have a description, or are gone', () => {
+  test('the resolver drops entries that have a description, or are gone', async () => {
     const changed = withTexts(survey, 'tree_dec_1', 'descriptions', { fr: 'Diamètre' })
     expect(newEntriesDescriptionsResolver.isResolved(uuidOf('tree_dec_1'), changed)).toBe(true)
     expect(newEntriesDescriptionsResolver.isResolved(uuidOf('tree'), changed)).toBe(false)
     expect(newEntriesDescriptionsResolver.isResolved('no-such-uuid', changed)).toBe(true)
   })
 
-  test('is registered as a Design event detector on designerLeft, with its resolver', () => {
+  test('is registered as a Design event detector on designerLeft, with its resolver', async () => {
     expect(EVENT_DETECTORS).toContain(newEntriesDescriptionsDetector)
     expect(newEntriesDescriptionsDetector).toMatchObject({
       kind: 'newEntriesDescriptions',
@@ -93,14 +93,14 @@ describe('new entries descriptions detector (222)', () => {
 describe('new entries descriptions card and prompt (222)', () => {
   const suggestion = buildSuggestion('newEntriesDescriptions', 'visit', ['a', 'b'])
 
-  test('the card counts the visible targets', () => {
+  test('the card counts the visible targets', async () => {
     expect(newEntriesDescriptionsDefinition.card(suggestion, describeContext(survey))).toEqual({
       key: 'newEntriesDescriptions.card',
       params: { count: 2 },
     })
   })
 
-  test('the prompt names the survey languages', () => {
+  test('the prompt names the survey languages', async () => {
     expect(newEntriesDescriptionsDefinition.prompt(suggestion, describeContext(survey))).toBe(
       'Write a short description (one sentence, for the data collector) for each new entry, in every survey ' +
         'language (en (English), fr (French)). List them with survey_listMissingTexts (kind descriptions, ' +
@@ -109,7 +109,7 @@ describe('new entries descriptions card and prompt (222)', () => {
     )
   })
 
-  test('is registered', () => {
+  test('is registered', async () => {
     expect(SUGGESTION_DEFINITIONS.newEntriesDescriptions).toBe(newEntriesDescriptionsDefinition)
   })
 })

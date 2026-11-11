@@ -215,7 +215,7 @@ export const ChangeSetCompactCard = ({
         )}
         {results.map(([status, count]) => (
           <li className={`ai-assistant-card__chip ai-assistant-card__chip--${status}`} key={status}>
-            {`${t(`aiAssistant.card.status.${status}`)}: ${count}`}
+            {`${t('aiAssistant.card.status.' + status)}: ${count}`}
           </li>
         ))}
       </ul>

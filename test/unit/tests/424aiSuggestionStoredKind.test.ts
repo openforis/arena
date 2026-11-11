@@ -147,12 +147,16 @@ describe('suggestion state: the stored kind (424)', () => {
       },
     }
     const tracked = getTrackedOf(state, '1')
-    expect(tracked.map((item) => [item.id, item.kind]).sort()).toEqual([
+    expect(tracked.map((item) => [item.id, item.kind]).sort(([a], [b]) => a.localeCompare(b))).toEqual([
       ['entityWithoutKey:e', 'entityWithoutKey'],
       ['publishErrors:p', 'publishErrors'],
     ])
     const publish = tracked.find((item) => item.id === 'publishErrors:p')
-    expect([...(publish?.targetKeys ?? [])].sort()).toEqual(['a:labels', 'b:labels', 'c:labels'])
+    expect([...(publish?.targetKeys ?? [])].sort((a, b) => a.localeCompare(b))).toEqual([
+      'a:labels',
+      'b:labels',
+      'c:labels',
+    ])
     expect(getTrackedOf(state, 'none')).toEqual([])
   })
 })

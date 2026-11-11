@@ -45,9 +45,9 @@ export const streamTextChunks = async ({
   signal?: AbortSignal
 }): Promise<void> => {
   const options = { model, system, abortSignal: signal, maxRetries: 0, onError: () => {} }
-  // errors are read from fullStream; the noop onError keeps the SDK from logging them to the console
+  // errors are read from the stream; the noop onError keeps the SDK from logging them to the console
   const result = messages ? streamText({ ...options, messages }) : streamText({ ...options, prompt: prompt ?? '' })
-  for await (const part of result.fullStream) {
+  for await (const part of result.stream) {
     if (part.type === 'text-delta') onChunk(part.text)
     else if (part.type === 'error') throw part.error
   }

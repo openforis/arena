@@ -168,7 +168,7 @@ export const SurveyAiPolicyEditor = () => {
           dataClass={dataClass}
           state={state}
           disabled={readOnly || saving}
-          onChange={onChange}
+          onChange={(dataClass, level) => void onChange(dataClass, level)}
         />
       ))}
       <p className="survey-ai-policy__note">{i18n.t('homeView:surveyInfo.aiPolicy.onDeviceNote')}</p>

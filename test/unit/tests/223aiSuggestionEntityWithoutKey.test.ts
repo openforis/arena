@@ -31,15 +31,15 @@ const uuidOf = (name: string) => NodeDef.getUuid(getDefByName(survey, name))
 const withKey = (target: any, name: string) =>
   withNodeDef(target, name, (nodeDef) => NodeDef.assocProp({ key: 'key', value: true })(nodeDef))
 
-const leaveDesigner = (target: any, names: string[]) => {
+const leaveDesigner = async (target: any, names: string[]) => {
   const { store, added } = createAddRecorder()
   const event = { type: 'designerLeft' as const, newNodeDefUuids: names.map(uuidOf) }
-  entityWithoutKeyDetector.handle(event, createDetectorContext({ survey: target, store }))
+  await entityWithoutKeyDetector.handle(event, createDetectorContext({ survey: target, store }))
   return added
 }
 
 describe('entity without a key detector (223)', () => {
-  test('only multiple entities without a key among their direct children', () => {
+  test('only multiple entities without a key among their direct children', async () => {
     expect(isEntityWithoutKey(survey, getDefByName(survey, 'tree'))).toBe(true)
     expect(isEntityWithoutKey(survey, getDefByName(survey, 'plot'))).toBe(false)
     expect(isEntityWithoutKey(survey, getDefByName(survey, 'cluster'))).toBe(false)
@@ -49,23 +49,23 @@ describe('entity without a key detector (223)', () => {
     expect(isEntityWithoutKey(deletedKey, getDefByName(deletedKey, 'plot'))).toBe(true)
   })
 
-  test('adds the new entities without a key on leaving the designer', () => {
-    const added = leaveDesigner(survey, ['tree', 'plot', 'cluster_id'])
+  test('adds the new entities without a key on leaving the designer', async () => {
+    const added = await leaveDesigner(survey, ['tree', 'plot', 'cluster_id'])
     expect(added).toHaveLength(1)
     expect(added[0]).toMatchObject({ id: 'entityWithoutKey:visit', kind: 'entityWithoutKey', area: 'design' })
     expect(added[0].targets).toEqual([{ key: uuidOf('tree') }])
-    expect(leaveDesigner(survey, ['plot'])).toEqual([])
+    expect(await leaveDesigner(survey, ['plot'])).toEqual([])
     const unsaved = withNodeDef(survey, 'tree', (nodeDef) => ({ ...nodeDef, temporary: true }))
-    expect(leaveDesigner(unsaved, ['tree'])).toEqual([])
+    expect(await leaveDesigner(unsaved, ['tree'])).toEqual([])
   })
 
-  test('the resolver drops entities that now have a key, or are gone', () => {
+  test('the resolver drops entities that now have a key, or are gone', async () => {
     expect(entityWithoutKeyResolver.isResolved(uuidOf('tree'), survey)).toBe(false)
     expect(entityWithoutKeyResolver.isResolved(uuidOf('tree'), withKey(survey, 'tree_dec_1'))).toBe(true)
     expect(entityWithoutKeyResolver.isResolved('no-such-uuid', survey)).toBe(true)
   })
 
-  test('is registered as a Design event detector on designerLeft, with its resolver', () => {
+  test('is registered as a Design event detector on designerLeft, with its resolver', async () => {
     expect(EVENT_DETECTORS).toContain(entityWithoutKeyDetector)
     expect(entityWithoutKeyDetector).toMatchObject({ kind: 'entityWithoutKey', area: 'design', on: ['designerLeft'] })
     expect(TARGET_RESOLVERS).toContain(entityWithoutKeyResolver)
@@ -73,7 +73,7 @@ describe('entity without a key detector (223)', () => {
 })
 
 describe('entity without a key card and prompt (223)', () => {
-  test('one entity: its name; several: the count; a target that is gone is not named', () => {
+  test('one entity: its name; several: the count; a target that is gone is not named', async () => {
     const one = buildSuggestion('entityWithoutKey', 'visit', [uuidOf('tree')])
     expect(entityWithoutKeyDefinition.card(one, describeContext(survey))).toEqual({
       key: 'entityWithoutKey.cardSingle',
@@ -92,7 +92,7 @@ describe('entity without a key card and prompt (223)', () => {
     expect(getTargetNodeDefNames(two, null)).toEqual([])
   })
 
-  test('the prompt quotes the names of the visible targets', () => {
+  test('the prompt quotes the names of the visible targets', async () => {
     const two = buildSuggestion('entityWithoutKey', 'visit', [uuidOf('tree'), uuidOf('plot')])
     expect(entityWithoutKeyDefinition.prompt(two, describeContext(survey))).toBe(
       'These entities have no key attribute: "tree", "plot". Records of a multiple entity are told apart by their ' +
@@ -101,14 +101,14 @@ describe('entity without a key card and prompt (223)', () => {
     )
   })
 
-  test('a long list is cut with the number left out', () => {
+  test('a long list is cut with the number left out', async () => {
     const items = Array.from({ length: 52 }, (_, index) => `n${index}`)
     const text = formatPromptList(items)
     expect(text.startsWith('n0, n1, ')).toBe(true)
     expect(text.endsWith('n49 and 2 more')).toBe(true)
   })
 
-  test('is registered', () => {
+  test('is registered', async () => {
     expect(SUGGESTION_DEFINITIONS.entityWithoutKey).toBe(entityWithoutKeyDefinition)
   })
 })

@@ -22,7 +22,7 @@ describe('provider chip labels and icons (406)', () => {
     expect(getHostingIconClass('orgHosted')).toBe('icon-office')
     expect(getHostingIconClass('onDevice')).toBe('icon-laptop')
     expect(getHostingIconClass(null)).toBe(NEUTRAL_HOSTING_ICON)
-    expect(getHostingIconClass(undefined)).toBe(NEUTRAL_HOSTING_ICON)
+    expect(getHostingIconClass()).toBe(NEUTRAL_HOSTING_ICON)
     // not the icon of a real location: a missing provider is not "on this computer"
     expect(NEUTRAL_HOSTING_ICON).not.toBe(getHostingIconClass('onDevice'))
   })

@@ -483,7 +483,7 @@ export const ChangeSetReviewDialog = ({
               disabled={busy || dirty || selectedIds.length === 0}
               label="aiAssistant.card.applySelectedCount"
               labelParams={{ count: selectedIds.length }}
-              onClick={selection.apply}
+              onClick={() => void selection.apply()}
               primary
               testId={TestId.aiAssistant.reviewApplyBtn}
             />

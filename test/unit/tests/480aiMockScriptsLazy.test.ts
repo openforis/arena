@@ -5,16 +5,23 @@ import { createMockModel } from '@server/modules/ai/service/mockProvider'
 
 const serviceDir = path.resolve(__dirname, '../../../server/modules/ai/service')
 
+/** True when a statement of the source is an import/export from a path through mock/mockScripts. */
+const importsMockScripts = (source: string): boolean =>
+  source
+    .split(';')
+    .some(
+      (statement) =>
+        /^\s*(?:import|export)\b/.test(statement) &&
+        /\bfrom\s+['"]/.test(statement) &&
+        statement.includes('mock/mockScripts')
+    )
+
 describe('the e2e mock scripts load only on demand (480)', () => {
   test('no file outside the mock folder imports the scripts statically', () => {
     const offenders = fs
       .readdirSync(serviceDir, { recursive: true, encoding: 'utf8' })
       .filter((file) => /\.tsx?$/.test(file) && !file.startsWith('mock/'))
-      .filter((file) =>
-        /^\s*(import|export)\b[^;]*\bfrom\s+['"][^'"]*mock\/mockScripts[^'"]*['"]/m.test(
-          fs.readFileSync(path.join(serviceDir, file), 'utf8')
-        )
-      )
+      .filter((file) => importsMockScripts(fs.readFileSync(path.join(serviceDir, file), 'utf8')))
     expect(offenders).toEqual([])
   })
 

@@ -4,7 +4,7 @@ const normalize = (value: unknown): unknown => {
     const source = value as Record<string, unknown>
     return Object.fromEntries(
       Object.keys(source)
-        .sort()
+        .sort((a, b) => a.localeCompare(b))
         .map((key) => [key, normalize(source[key])])
     )
   }

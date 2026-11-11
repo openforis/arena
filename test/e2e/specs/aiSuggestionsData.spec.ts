@@ -130,7 +130,7 @@ const expectStoredPending = async (page: Page, userUuid: string, surveyId: numbe
 }
 
 test.describe('AI suggestion: many validation messages (stub local server)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { records: [buildRecordWithManyErrors()] } })
 
@@ -206,7 +206,7 @@ test.describe('AI suggestion: many validation messages (stub local server)', () 
 })
 
 test.describe('AI suggestion: data imported (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { withExpressions: false } })
 

@@ -64,7 +64,12 @@ describe('getTools', () => {
 describe('toWebMcpDescriptor', () => {
   test('has the WebMCP shape, read-only hint included for propose tools', () => {
     const descriptor = toWebMcpDescriptor(editTool)
-    expect(Object.keys(descriptor).sort()).toEqual(['annotations', 'description', 'inputSchema', 'name'])
+    expect(Object.keys(descriptor).sort((a, b) => a.localeCompare(b))).toEqual([
+      'annotations',
+      'description',
+      'inputSchema',
+      'name',
+    ])
     expect(descriptor.name).toBe('design_propose')
     expect(descriptor.annotations).toEqual({ readOnlyHint: true })
     expect(descriptor.inputSchema).toMatchObject({

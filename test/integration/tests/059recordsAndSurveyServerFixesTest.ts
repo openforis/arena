@@ -91,7 +91,7 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
     ...createDefaultNodesBatchServiceDeps(),
     replies,
     postBatchMessage: (msg: any) => {
-      thread.onMessage(msg)
+      void thread.onMessage(msg)
     },
   })
 

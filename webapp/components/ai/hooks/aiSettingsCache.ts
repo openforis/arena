@@ -82,16 +82,18 @@ export const createAiSettingsCache = ({ fetchSettings }: AiSettingsCacheDeps): A
    */
   const fetchOnce = (): Promise<AiSettingsResponse> => {
     if (cache) return Promise.resolve(cache)
-    if (inflight) return inflight
+    if (inflight !== null) return inflight
     const startedAt = generation
     const current: Promise<AiSettingsResponse> = (async () => {
       const { result, keep } = await read()
       // reset or invalidated meanwhile: this result is not the cache's to keep (that run owns inflight now)
-      if (startedAt !== generation) return result
-      inflight = null
-      if (!keep) return result
-      cache = result
-      notify()
+      if (startedAt === generation) {
+        inflight = null
+        if (keep) {
+          cache = result
+          notify()
+        }
+      }
       return result
     })()
     inflight = current

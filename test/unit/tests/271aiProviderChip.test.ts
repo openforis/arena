@@ -258,7 +258,7 @@ describe('provider chip (271)', () => {
   })
 
   test('every language has the chip texts, and no "Now using" text', () => {
-    const keys = Object.keys(resources.en.common.aiAssistant.providerChip).sort()
+    const keys = Object.keys(resources.en.common.aiAssistant.providerChip).sort((a, b) => a.localeCompare(b))
     expect(keys).toEqual([
       'answerWith',
       'chooseAnother',
@@ -273,7 +273,7 @@ describe('provider chip (271)', () => {
     ])
     for (const [lang, resource] of Object.entries(resources)) {
       const chip = resource.common.aiAssistant.providerChip
-      expect([lang, Object.keys(chip).sort()]).toEqual([lang, keys])
+      expect([lang, Object.keys(chip).sort((a, b) => a.localeCompare(b))]).toEqual([lang, keys])
       expect([lang, resource.common.aiEngine.nowUsing]).toEqual([lang, undefined])
     }
     for (const lang of CYRILLIC_LANGUAGES) {

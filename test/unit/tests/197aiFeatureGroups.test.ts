@@ -13,7 +13,9 @@ describe('feature groups', () => {
 
   test('every category is in exactly one group', () => {
     const grouped = FEATURE_GROUPS.flatMap((group) => group.categories)
-    expect([...grouped].sort()).toEqual(Object.values(AiFeatureCategory).sort())
+    expect([...grouped].sort((a, b) => a.localeCompare(b))).toEqual(
+      Object.values(AiFeatureCategory).sort((a, b) => a.localeCompare(b))
+    )
   })
 
   test("a group's data class is the data class of its features (the Help chat reads no survey)", () => {

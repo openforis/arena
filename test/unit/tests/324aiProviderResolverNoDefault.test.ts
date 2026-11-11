@@ -145,7 +145,7 @@ describe('the logged body of a failed provider call is short (324)', () => {
 
   test('the stack is logged as frames only: the message of the error is not repeated in it', () => {
     const text = formatErrorForLog('chatbot', new Error('secret echo '.repeat(100)))
-    expect(text).toMatch(/\n\s+at /)
+    expect(text).toMatch(/\n[^\S\n]+at /)
     expect(text.split('secret echo ').length - 1).toBeLessThanOrEqual(26)
   })
 

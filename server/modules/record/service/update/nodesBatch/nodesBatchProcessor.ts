@@ -1,7 +1,7 @@
 /**
  * Applies the edits of one record inside the record lock (see RecordsUpdateThread.processNodesBatchPersistMsg).
  */
-import type { Node as ArenaNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { ArenaRecordNode, ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
 import { Authorizer } from '@openforis/arena-core'
@@ -50,7 +50,7 @@ export type NodesBatchProcessorDeps = {
     survey: ArenaSurvey
     record: ArenaRecord
     qualifierFilters: any
-    pendingNode: ArenaNode | null
+    pendingNode: ArenaRecordNode | null
     canEditQualifierValue: boolean
   }) => boolean
   // uuid of the record owning the node, or null when the node does not exist (in any record)
@@ -129,7 +129,7 @@ const persistEdit = async ({
 }: {
   state: BatchState
   record: ArenaRecord
-  node: ArenaNode
+  node: ArenaRecordNode
   edit: NodesBatchRecordEdit
   t: any
 }) => {
@@ -217,7 +217,7 @@ const assertBeforeDeadline = (state: BatchState): void => {
  * @param {object|null} pendingNode - The node with its new value, or null.
  * @returns {boolean} Whether the record matches.
  */
-const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: ArenaNode | null): boolean => {
+const matchesQualifiers = (state: BatchState, record: ArenaRecord, pendingNode: ArenaRecordNode | null): boolean => {
   const { msg, deps, survey, qualifierFilters } = state
   return deps.recordMatchesQualifierFilters({
     survey,

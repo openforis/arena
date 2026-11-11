@@ -111,7 +111,8 @@ export const checkRouteAccess = async ({
   if (nextCalled && error === undefined) return 'granted'
   if (error instanceof UnauthorizedError) return 'refused'
   if (!nextCalled && [401, 403].includes(res.statusCode)) return 'refused'
-  throw new Error(`Unexpected outcome: ${nextCalled ? `next(${String(error)})` : `status ${res.statusCode}`}`)
+  const detail = nextCalled ? `next(${String(error)})` : `status ${res.statusCode}`
+  throw new Error(`Unexpected outcome: ${detail}`)
 }
 
 /**

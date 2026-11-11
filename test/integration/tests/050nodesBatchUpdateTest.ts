@@ -65,7 +65,7 @@ describe('Batch record edit (POST /records/nodes/update)', () => {
     ...createDefaultNodesBatchServiceDeps(),
     replies,
     postBatchMessage: (msg: any) => {
-      thread.onMessage(msg)
+      void thread.onMessage(msg)
     },
   })
 

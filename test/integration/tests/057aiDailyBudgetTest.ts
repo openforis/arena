@@ -5,7 +5,7 @@ import { chargeAiUsage } from '@server/modules/ai/repository/aiUsageRepository'
 const PAST_DAY = '2020-01-01'
 
 const insertUser = async (prefs: object = {}): Promise<string> => {
-  const email = `ai_budget_${Date.now()}_${Math.random().toString(36).slice(2)}@openforis.org`
+  const email = `ai_budget_${Date.now()}_${Math.random().toString(36).slice(2)}@openforis.org` // NOSONAR: unique test e-mail, not security related
   const { uuid } = await db.one(
     `INSERT INTO "user" (name, email, password, status, prefs)
      VALUES ('Budget', $1, 'test_password', 'ACCEPTED', $2::jsonb)

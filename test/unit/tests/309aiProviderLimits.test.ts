@@ -56,7 +56,10 @@ const createDeps = (aiPrefs: any) => {
     isMockEnabled: () => false,
     newId: (() => {
       let n = 100
-      return () => `new-${(n += 1)}`
+      return () => {
+        n += 1
+        return `new-${n}`
+      }
     })(),
     now: () => '2026-10-15T00:00:00.000Z',
     allowlist: [],
@@ -109,7 +112,10 @@ describe('Limits of the providers of an account (309)', () => {
         AiProviderService.addProvider({ user: userWith(prefs), input: newProvider, deps }),
         AiProviderService.addProvider({ user: userWith(prefs), input: newProvider, deps }),
       ])
-      expect(results.map((result) => result.status).sort()).toEqual(['fulfilled', 'rejected'])
+      expect(results.map((result) => result.status).sort((a, b) => a.localeCompare(b))).toEqual([
+        'fulfilled',
+        'rejected',
+      ])
       const rejected = results.find((result) => result.status === 'rejected') as PromiseRejectedResult
       expect(rejected.reason.key).toBe('aiProviderLimitReached')
       expect(store.get()?.providers).toHaveLength(AI_MAX_ACCOUNT_PROVIDERS)

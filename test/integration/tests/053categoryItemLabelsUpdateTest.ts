@@ -13,7 +13,7 @@ import * as CategoryItemLabelsManager from '@server/modules/category/manager/cat
 import * as CategoryManager from '@server/modules/category/manager/categoryManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRepository from '@server/modules/survey/repository/surveyRepository'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { Schemata } from '@common/model/db'
 
 import { getContextUser } from '@test/integration/config/context'
 import { createFakeResponse } from '@test/unit/utils/fakeExpress'
@@ -35,7 +35,9 @@ describe('Category item labels update (053)', () => {
   const update = (items: unknown) => CategoryItemLabelsManager.updateItemsLabels({ user, surveyId, items })
 
   const fetchStoredProps = (itemUuid: string): Promise<{ props: any; props_draft: any }> =>
-    db.one(`SELECT props, props_draft FROM ${getSurveyDBSchema(surveyId)}.category_item WHERE uuid = $1`, [itemUuid])
+    db.one(`SELECT props, props_draft FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item WHERE uuid = $1`, [
+      itemUuid,
+    ])
 
   const countLabelActivities = async (itemUuid: string): Promise<number> => {
     const activities = await ActivityLogRepository.fetchSimple({ surveyId, limit: 1000, offset: 0 })

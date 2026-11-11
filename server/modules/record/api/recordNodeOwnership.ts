@@ -1,4 +1,4 @@
-import type { Node as ArenaNode } from '@openforis/arena-core'
+import type { ArenaRecordNode } from '@openforis/arena-core'
 
 import SystemError, { StatusCodes } from '@core/systemError'
 import * as Node from '@core/record/node'
@@ -21,7 +21,7 @@ export const getNodeRecordMismatchError = ({
   node,
   recordUuid,
 }: {
-  node: ArenaNode | null | undefined
+  node: ArenaRecordNode | null | undefined
   recordUuid: string
 }): SystemError | null => {
   if (!node) return null

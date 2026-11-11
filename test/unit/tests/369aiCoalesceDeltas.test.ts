@@ -17,7 +17,9 @@ const manualTimers = () => {
         callbacks.set(next, callback)
         return next++
       },
-      clearTimer: (timer: unknown) => void callbacks.delete(timer as number),
+      clearTimer: (timer: unknown) => {
+        callbacks.delete(timer as number)
+      },
     },
     pendingCount: () => callbacks.size,
     fire: () => {

@@ -57,7 +57,8 @@ export const createConsentRequestQueue = () => {
         const key = keyOf(request)
         const existing = entries.find((entry) => entry.key === key)
         // resolves this caller only, and drops the dialog when nobody else waits for it
-        const entry: Entry = existing ?? { id: (nextId += 1), key, request, resolvers: [] }
+        if (!existing) nextId += 1
+        const entry: Entry = existing ?? { id: nextId, key, request, resolvers: [] }
         const abandon = () => {
           entry.resolvers = entry.resolvers.filter((candidate) => candidate !== settle)
           resolve('cancel')

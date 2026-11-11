@@ -262,20 +262,26 @@ describe('handleModelRequest with tools', () => {
   })
 })
 
+/** Builds a gateway model whose fetch records the request bodies and answers with an empty stop result. */
+const newRecordingGatewayModel = () => {
+  const bodies: any[] = []
+  const fetchImpl = async (_url: string, init: RequestInit) => {
+    bodies.push(JSON.parse(String(init.body)))
+    const result = { content: [], finishReason: { unified: 'stop' }, usage: {}, warnings: [] }
+    return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } })
+  }
+  const model = createGatewayModel({
+    feature: 'chatbot',
+    dataClass: 'schema',
+    providerId: 'arena-default',
+    fetchImpl: fetchImpl as any,
+  })
+  return { bodies, model }
+}
+
 describe('gateway model', () => {
   test('sends function tools (definition only) and the tool choice', async () => {
-    const bodies: any[] = []
-    const fetchImpl = async (_url: string, init: RequestInit) => {
-      bodies.push(JSON.parse(String(init.body)))
-      const result = { content: [], finishReason: { unified: 'stop' }, usage: {}, warnings: [] }
-      return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } })
-    }
-    const model = createGatewayModel({
-      feature: 'chatbot',
-      dataClass: 'schema',
-      providerId: 'arena-default',
-      fetchImpl: fetchImpl as any,
-    })
+    const { bodies, model } = newRecordingGatewayModel()
     await model.doGenerate({
       prompt: prompt as any,
       tools: [{ ...tool, providerOptions: { x: { y: 1 } } } as any],
@@ -286,18 +292,7 @@ describe('gateway model', () => {
   })
 
   test('sends no tool choice without tools', async () => {
-    const bodies: any[] = []
-    const fetchImpl = async (_url: string, init: RequestInit) => {
-      bodies.push(JSON.parse(String(init.body)))
-      const result = { content: [], finishReason: { unified: 'stop' }, usage: {}, warnings: [] }
-      return new Response(JSON.stringify(result), { status: 200, headers: { 'Content-Type': 'application/json' } })
-    }
-    const model = createGatewayModel({
-      feature: 'chatbot',
-      dataClass: 'schema',
-      providerId: 'arena-default',
-      fetchImpl: fetchImpl as any,
-    })
+    const { bodies, model } = newRecordingGatewayModel()
     await model.doGenerate({ prompt: prompt as any, toolChoice: { type: 'auto' } })
     expect(bodies[0].call.tools).toBeUndefined()
     expect(bodies[0].call.toolChoice).toBeUndefined()

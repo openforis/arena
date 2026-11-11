@@ -48,7 +48,10 @@ const shrinkOnce = (value: unknown): unknown => {
   if (!isPlainObject(value)) return value
   const keys = Object.keys(value).filter((key) => key !== 'truncated')
   if (keys.length === 0) return value
-  const largestKey = keys.reduce((largest, key) => (sizeOf(value[key]) > sizeOf(value[largest]) ? key : largest))
+  const largestKey = keys.reduce(
+    (largest, key) => (sizeOf(value[key]) > sizeOf(value[largest]) ? key : largest),
+    keys[0]
+  )
   const shrunk = shrinkOnce(value[largestKey])
   if (shrunk !== value[largestKey]) return { ...value, [largestKey]: shrunk }
   return Object.fromEntries(Object.entries(value).filter(([key]) => key !== largestKey))

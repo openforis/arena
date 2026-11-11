@@ -48,14 +48,17 @@ const warningOnly = () =>
     ),
   })
 
-const clickPublish = (target: any, { draft = true }: { draft?: boolean } = {}) => {
+const clickPublish = async (target: any, { draft = true }: { draft?: boolean } = {}) => {
   const { store, added } = createAddRecorder()
-  publishErrorsDetector.handle({ type: 'publishClicked' }, createDetectorContext({ survey: target, store, draft }))
+  await publishErrorsDetector.handle(
+    { type: 'publishClicked' },
+    createDetectorContext({ survey: target, store, draft })
+  )
   return added
 }
 
 describe('errors before publishing detector (229)', () => {
-  test('errors count, at any field (children included); warnings do not', () => {
+  test('errors count, at any field (children included); warnings do not', async () => {
     const validated = withValidation(survey, {
       tree: errorOn('children', childrenEmpty),
       plot: warningOnly(),
@@ -65,13 +68,13 @@ describe('errors before publishing detector (229)', () => {
     expect(hasPublishErrors(validated, getDefByName(validated, 'cluster_id'))).toBe(false)
   })
 
-  test('on publish, adds the entries with errors in hierarchy order', () => {
+  test('on publish, adds the entries with errors in hierarchy order', async () => {
     const validated = withValidation(survey, {
       tree: errorOn('children', childrenEmpty),
       plot: errorOn('keyAttributes', keysEmpty),
       cluster_id: warningOnly(),
     })
-    const added = clickPublish(validated)
+    const added = await clickPublish(validated)
     expect(added).toHaveLength(1)
     expect(added[0]).toMatchObject({ id: 'publishErrors:survey', kind: 'publishErrors', area: 'design' })
     expect(added[0].targets).toEqual([{ key: uuidOf('plot') }, { key: uuidOf('tree') }])
@@ -79,39 +82,39 @@ describe('errors before publishing detector (229)', () => {
 
   test('the real validator: an entity without a key is an error', async () => {
     const validated = Survey.assocNodeDefsValidation(await SurveyValidator.validateNodeDefs(survey))(survey)
-    const [suggestion] = clickPublish(validated)
+    const [suggestion] = await clickPublish(validated)
     expect(suggestion.targets).toContainEqual({ key: uuidOf('tree') })
     expect(suggestion.targets).not.toContainEqual({ key: uuidOf('plot') })
   })
 
-  test('nothing without errors, for unsaved entries, outside the draft or on another event', () => {
-    expect(clickPublish(withValidation(survey, { plot: warningOnly() }))).toEqual([])
+  test('nothing without errors, for unsaved entries, outside the draft or on another event', async () => {
+    expect(await clickPublish(withValidation(survey, { plot: warningOnly() }))).toEqual([])
     const unsaved = withNodeDef(
       withValidation(survey, { tree: errorOn('children', childrenEmpty) }),
       'tree',
       (nodeDef) => ({ ...nodeDef, temporary: true })
     )
-    expect(clickPublish(unsaved)).toEqual([])
+    expect(await clickPublish(unsaved)).toEqual([])
     expect(
-      clickPublish(withValidation(survey, { tree: errorOn('children', childrenEmpty) }), { draft: false })
+      await clickPublish(withValidation(survey, { tree: errorOn('children', childrenEmpty) }), { draft: false })
     ).toEqual([])
     const { store, added } = createAddRecorder()
     const validated = withValidation(survey, { tree: errorOn('children', childrenEmpty) })
-    publishErrorsDetector.handle(
+    await publishErrorsDetector.handle(
       { type: 'designerLeft', newNodeDefUuids: [uuidOf('tree')] },
       createDetectorContext({ survey: validated, store })
     )
     expect(added).toEqual([])
   })
 
-  test('the resolver drops entries that no longer have errors, or are gone', () => {
+  test('the resolver drops entries that no longer have errors, or are gone', async () => {
     const validated = withValidation(survey, { tree: errorOn('children', childrenEmpty) })
     expect(publishErrorsResolver.isResolved(uuidOf('tree'), validated)).toBe(false)
     expect(publishErrorsResolver.isResolved(uuidOf('tree'), withValidation(survey, { tree: warningOnly() }))).toBe(true)
     expect(publishErrorsResolver.isResolved('no-such-uuid', validated)).toBe(true)
   })
 
-  test('is registered as a Design event detector on publishClicked, with its resolver', () => {
+  test('is registered as a Design event detector on publishClicked, with its resolver', async () => {
     expect(EVENT_DETECTORS).toContain(publishErrorsDetector)
     expect(publishErrorsDetector).toMatchObject({
       kind: 'publishErrors',
@@ -124,7 +127,7 @@ describe('errors before publishing detector (229)', () => {
 })
 
 describe('errors before publishing card and prompt (229)', () => {
-  test('the card counts the entries; the prompt names them and points to survey_getValidation', () => {
+  test('the card counts the entries; the prompt names them and points to survey_getValidation', async () => {
     const suggestion = buildSuggestion('publishErrors', 'survey', [uuidOf('plot'), uuidOf('tree')])
     expect(publishErrorsDefinition.card(suggestion, describeContext(survey))).toEqual({
       key: 'publishErrors.card',

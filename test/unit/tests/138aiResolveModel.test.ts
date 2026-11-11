@@ -12,7 +12,12 @@ import type { AiCapabilities, AiEngine, AiProviderEntry, StorageLike } from '@we
 /** Builds an in-memory storage. */
 const memoryStorage = (): StorageLike => {
   const data = new Map<string, string>()
-  return { getItem: (key) => data.get(key) ?? null, setItem: (key, value) => void data.set(key, value) }
+  return {
+    getItem: (key) => data.get(key) ?? null,
+    setItem: (key, value) => {
+      data.set(key, value)
+    },
+  }
 }
 
 const ON_SETTINGS: AiFeatureSwitches = {
@@ -221,13 +226,13 @@ describe('createModelResolver', () => {
     )
 
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
-    expect(state.requests.length).toBe(1)
+    expect(state.requests).toHaveLength(1)
     expect(state.localEngines).toEqual([BASE_URL, BASE_URL])
 
     // another survey asks again (answers exhausted → cancel)
     const error = await resolve({ feature: 'activityLogSummary', surveyId: 2 }).catch((e) => e)
     expect(error.key).toBe('aiLocalServerConsentCancelled')
-    expect(state.requests.length).toBe(2)
+    expect(state.requests).toHaveLength(2)
   })
 
   test('Choose another provider fails the request: no other provider is tried', async () => {
@@ -269,7 +274,7 @@ describe('createModelResolver', () => {
     const { resolve, state } = setup({ answers: ['continue'] })
     await resolve({ feature: 'chatbot' })
     await resolve({ feature: 'chatbot' })
-    expect(state.requests.length).toBe(1)
+    expect(state.requests).toHaveLength(1)
     expect(state.requests[0].surveyId).toBeUndefined()
   })
 
@@ -288,7 +293,7 @@ describe('createModelResolver', () => {
     const { resolve, state } = setup({ answers: ['continue', 'continue'], ...options })
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
     await resolve({ feature: 'activityLogSummary', surveyId: 1 })
-    expect(state.requests.length).toBe(2)
+    expect(state.requests).toHaveLength(2)
   })
 
   describe('the AI switches', () => {

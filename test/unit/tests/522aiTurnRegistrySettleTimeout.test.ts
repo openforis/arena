@@ -11,7 +11,7 @@ describe('assistant turn registry: settle is bounded (522)', () => {
   test('a save that never ends does not hold settle past the timeout, and the timeout is logged', async () => {
     const log = jest.fn()
     const registry = createAssistantTurnRegistry({ log })
-    registry.track(new Promise<void>(() => undefined))
+    registry.track(new Promise<void>(() => undefined)).catch(() => undefined)
     let settled = false
     void registry.settle().then(() => {
       settled = true
@@ -27,7 +27,7 @@ describe('assistant turn registry: settle is bounded (522)', () => {
   test('saves that end in time settle without a log and leave no timer behind', async () => {
     const log = jest.fn()
     const registry = createAssistantTurnRegistry({ log })
-    registry.track(Promise.resolve())
+    await registry.track(Promise.resolve())
     await registry.settle()
     expect(log).not.toHaveBeenCalled()
     expect(jest.getTimerCount()).toBe(0)

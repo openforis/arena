@@ -52,15 +52,15 @@ const capabilitiesWithCap = (maxPromptChars: number | null): AiCapabilities => (
 })
 
 /** Returns the sorted keys of an object. */
-const sortedKeys = (value: object): string[] => Object.keys(value).sort()
+const sortedKeys = (value: object): string[] => Object.keys(value).sort((a, b) => a.localeCompare(b))
 
 describe('single-provider compatibility removed (273)', () => {
   test('the settings have the provider list only, no single-provider fields', () => {
     expect(sortedKeys(AiSettingsService.getPublicSettings(listUser))).toEqual([
       'accessLevel',
       'defaultProviderId',
-      'featureToggles',
       'featuresEnabled',
+      'featureToggles',
       'providers',
     ])
     expect(sortedKeys(SettingsApi.buildResponseBody(listUser))).toEqual([
@@ -69,8 +69,8 @@ describe('single-provider compatibility removed (273)', () => {
       'defaultProviderId',
       'disabledFeatures',
       'encryptionConfigured',
-      'featureToggles',
       'featuresEnabled',
+      'featureToggles',
       'maxPromptChars',
       'mockProviderEnabled',
       'orgHostedBaseUrls',

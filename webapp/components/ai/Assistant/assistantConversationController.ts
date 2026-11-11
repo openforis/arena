@@ -428,12 +428,12 @@ export const createAssistantConversationController = (
   }
 
   // waits for the load of the selected conversation (a newer selection starts another one)
-  const whenLoaded = (): Promise<void> => (loading ? loading.then(whenLoaded) : Promise.resolve())
+  const whenLoaded = (): Promise<void> => (loading !== null ? loading.then(whenLoaded) : Promise.resolve())
 
   const send = (env: AssistantConversationEnv, text: string, options: AssistantSendOptions = {}) => {
     if (!conversationStore) return Promise.resolve(null)
     // the remembered conversation is loading: the message goes into it once it is there
-    if (loading) {
+    if (loading !== null) {
       return whenLoaded().then(() => {
         // the area, survey or user changed while waiting: the message belongs to the context it was typed in
         if (scopeKey !== null && scopeKey !== toScopeKey(env)) return null

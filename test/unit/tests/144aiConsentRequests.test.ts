@@ -35,8 +35,8 @@ describe('consent request queue', () => {
 
   test('another server URL is another request', () => {
     const queue = createConsentRequestQueue()
-    queue.request(request(1))
-    queue.request(request(1, 'http://localhost:1235/v1'))
+    void queue.request(request(1))
+    void queue.request(request(1, 'http://localhost:1235/v1'))
     queue.answer(queue.getPending()!.id, 'continue')
     expect(queue.getPending()?.baseUrl).toBe('http://localhost:1235/v1')
   })
@@ -47,12 +47,12 @@ describe('consent request queue', () => {
     const unsubscribe = queue.subscribe(() => {
       calls += 1
     })
-    queue.request(request(1))
+    void queue.request(request(1))
     expect(queue.getPending()).toBe(queue.getPending())
     queue.answer(queue.getPending()!.id, 'continue')
     expect(calls).toBe(2)
     unsubscribe()
-    queue.request(request(2))
+    void queue.request(request(2))
     expect(calls).toBe(2)
   })
 

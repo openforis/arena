@@ -342,7 +342,7 @@ export const AccountProviderFields = ({
         result={account && testText !== null ? { ok: account.ok, text: testText } : null}
         testing={testing}
         canTest={view.canTest}
-        onTest={actions.runTest}
+        onTest={() => void actions.runTest()}
       />
     </>
   )

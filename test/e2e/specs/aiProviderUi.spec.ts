@@ -78,7 +78,7 @@ const resetAiProviders = async (api: ArenaApi): Promise<void> => {
 }
 
 test.describe('AI provider list and dialog (mock provider, stub local server)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   let stub: LocalModelServerStub | null = null
 
@@ -153,7 +153,7 @@ test.describe('AI provider list and dialog (mock provider, stub local server)', 
 })
 
 test.describe('AI provider chip in the assistant (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { withExpressions: false, publish: false } })
 

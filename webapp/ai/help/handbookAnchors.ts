@@ -23,6 +23,23 @@ const decodeEntities = (text: string): string =>
 export const normalizeHeading = (text: string): string => text.replace(/\s+/g, ' ').trim()
 
 /**
+ * Removes the tags (`<` up to the next `>`) of a fragment; a `<` without a `>` after it stays.
+ * @param {string} html - HTML fragment.
+ * @returns {string} The text.
+ */
+const stripTags = (html: string): string => {
+  let result = ''
+  let position = 0
+  for (let open = html.indexOf('<'); open !== -1; open = html.indexOf('<', position)) {
+    const close = html.indexOf('>', open)
+    if (close === -1) break
+    result += html.slice(position, open)
+    position = close + 1
+  }
+  return result + html.slice(position)
+}
+
+/**
  * Maps the text of each heading of the HTML export to its anchor id (the first one when a heading repeats).
  * @param {string} html - HTML export.
  * @returns {Record<string, string>} Anchor id by normalized heading text.
@@ -30,7 +47,7 @@ export const normalizeHeading = (text: string): string => text.replace(/\s+/g, '
 export const readHeadingAnchors = (html: string): Record<string, string> => {
   const anchors: Record<string, string> = {}
   for (const [, , id, content] of html.matchAll(HEADING)) {
-    const heading = normalizeHeading(decodeEntities(content.replace(/<[^>]*>/g, '')))
+    const heading = normalizeHeading(decodeEntities(stripTags(content)))
     if (heading && !(heading in anchors)) anchors[heading] = id
   }
   return anchors

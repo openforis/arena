@@ -27,7 +27,7 @@ import { startLocalModelServer } from '../stubs/localModelServer'
 const aiMock = process.env.E2E_AI_MOCK === 'true'
 
 test.describe('AI analysis assistant (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { records: sampleRecords } })
 

@@ -74,7 +74,9 @@ export const summarizeResults = ({
     .map((result) => {
       const op = changeSet.operations.find((operation) => operation.id === result.id)
       const what = op ? describeOperation(op, { changeSet, survey }) : result.id
-      return `${what}: ${result.status}${result.message ? ` (${result.message})` : ''}`
+      const message = result.message ? ` (${result.message})` : ''
+      return `${what}: ${result.status}${message}`
     })
-  return `Applied ${applied} of ${results.length} operations${others.length > 0 ? `; ${others.join('; ')}` : ''}.`
+  const othersPart = others.length > 0 ? `; ${others.join('; ')}` : ''
+  return `Applied ${applied} of ${results.length} operations${othersPart}.`
 }

@@ -13,7 +13,9 @@ describe('auth session: the logout retry (524)', () => {
       setAuthToken: () => undefined,
       resetAiSession: async () => undefined,
       log: jest.fn(),
-      wait: async (ms) => void calls.push(`wait ${ms}`),
+      wait: async (ms) => {
+        calls.push(`wait ${ms}`)
+      },
     })
     await expect(session.end()).resolves.toEqual({ serverSessionEnded: true })
     expect(calls).toEqual(['request 1', `wait ${LOGOUT_RETRY_DELAY_MS}`, 'request 2'])

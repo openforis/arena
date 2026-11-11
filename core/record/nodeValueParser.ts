@@ -486,7 +486,7 @@ const parseSinglePropInput: InputParser = (params) =>
     headers: headersOf(params.nodeDef),
   })
 
-const decimalPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/
+const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
 
 /**
  * Parses a decimal: layer 1, plus a plain decimal notation and finite check (no hex, Infinity, etc.).

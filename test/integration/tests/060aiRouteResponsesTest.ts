@@ -149,7 +149,9 @@ describe('AI routes: what the real handler chains answer (060)', () => {
       const registered = aiRoutes
         .filter(({ path }) => path.startsWith('/ai/settings') || path.startsWith('/ai/providers'))
         .map(({ method, path }) => `${method} ${path}`)
-      expect(registered.sort()).toEqual(settingsRoutes.map(([method, path]) => `${method} ${path}`).sort())
+      expect([...registered].sort((a, b) => a.localeCompare(b))).toEqual(
+        settingsRoutes.map(([method, path]) => `${method} ${path}`).sort((a, b) => a.localeCompare(b))
+      )
     })
 
     test.each(settingsRoutes)('%s %s: not logged in is 401, with AI on and with AI off', async (method, path) => {

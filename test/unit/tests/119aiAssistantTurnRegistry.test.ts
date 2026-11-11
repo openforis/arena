@@ -20,12 +20,12 @@ describe('assistant turn registry', () => {
     const registry = createAssistantTurnRegistry()
     const done: string[] = []
     let releaseFirst: () => void = () => undefined
-    registry.track(
+    void registry.track(
       new Promise<void>((resolve) => {
         releaseFirst = resolve
       }).then(() => {
         done.push('first')
-        registry.track(Promise.resolve().then(() => done.push('second')))
+        void registry.track(Promise.resolve().then(() => done.push('second')))
       })
     )
     const settled = registry.settle().then(() => done.push('settled'))

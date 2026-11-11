@@ -77,14 +77,10 @@ describe('category labels counts (237)', () => {
       suggestions: detectCategoryItemTranslations(counts, survey, { surveyId: 7, now: TEST_NOW }),
     })
     expect(detector).toMatchObject({ kind: 'categoryItemTranslations', area: 'design', needsDraft: true })
-    expect([...detector.on].sort()).toEqual(
-      [
-        'categoriesChanged',
-        'categoryEditorLeft',
-        'categoryLabelsApplied',
-        'generationStarted',
-        'surveyInfoSaved',
-      ].sort()
+    expect([...detector.on].sort((a, b) => a.localeCompare(b))).toEqual(
+      ['categoriesChanged', 'categoryEditorLeft', 'categoryLabelsApplied', 'generationStarted', 'surveyInfoSaved'].sort(
+        (a, b) => a.localeCompare(b)
+      )
     )
     expect(EVENT_DETECTORS).toContain(categoryItemTranslationsDetector)
   })

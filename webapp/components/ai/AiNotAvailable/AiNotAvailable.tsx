@@ -42,7 +42,7 @@ export const AiNotAvailable = (props: Props) => {
             <Button
               key={action}
               label={`aiEngine.action.${action}`}
-              onClick={() => runAction(action)}
+              onClick={() => void runAction(action)}
               size="small"
               testId={TestId.ai.notAvailableAction(action)}
               variant="text"

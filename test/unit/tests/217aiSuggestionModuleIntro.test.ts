@@ -37,7 +37,7 @@ const contextOf = (store: SuggestionStore, now = NOW): DetectorContext => ({
   now: () => now,
 })
 
-const enter = (store: SuggestionStore, module: string, now = NOW) =>
+const enter = async (store: SuggestionStore, module: string, now = NOW) =>
   moduleIntroDetector.handle({ type: 'moduleEntered', module }, contextOf(store, now))
 
 const helpPending = (store: SuggestionStore) => store.getPending({ userUuid: 'u1', surveyId: null })
@@ -107,9 +107,9 @@ const toolResult = (id: string): any => ({
 })
 
 describe('module introduction and suggestion actions (217)', () => {
-  test('the first visit to the designer, Data or Analysis adds its introduction to Help; other modules add nothing', () => {
+  test('the first visit to the designer, Data or Analysis adds its introduction to Help; other modules add nothing', async () => {
     const store = newStore()
-    for (const module of ['designer', 'home', 'data', 'users', 'analysis']) enter(store, module)
+    for (const module of ['designer', 'home', 'data', 'users', 'analysis']) await enter(store, module)
     expect(helpPending(store)).toEqual(
       ['designer', 'data', 'analysis'].map((module) => buildModuleIntroSuggestion(module as any, NOW))
     )
@@ -125,17 +125,17 @@ describe('module introduction and suggestion actions (217)', () => {
     })
   })
 
-  test('a seen module is never offered; a second visit keeps the pending introduction as it is', () => {
+  test('a seen module is never offered; a second visit keeps the pending introduction as it is', async () => {
     const store = newStore()
     store.markModuleSeen({ userUuid: 'u1', module: 'designer' })
-    enter(store, 'designer')
+    await enter(store, 'designer')
     expect(helpPending(store)).toEqual([])
-    enter(store, 'data')
-    enter(store, 'data', LATER)
+    await enter(store, 'data')
+    await enter(store, 'data', LATER)
     expect(helpPending(store)).toEqual([buildModuleIntroSuggestion('data', NOW)])
   })
 
-  test('registered: the detector listens to moduleEntered in Help, the definition removes the card on Do it', () => {
+  test('registered: the detector listens to moduleEntered in Help, the definition removes the card on Do it', async () => {
     expect(EVENT_DETECTORS).toContain(moduleIntroDetector)
     expect(moduleIntroDetector).toMatchObject({
       kind: 'moduleIntro',
@@ -147,7 +147,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(moduleIntroDefinition.acceptMode).toBe('remove')
   })
 
-  test('card key and English prompt of each module; an unknown module has no card', () => {
+  test('card key and English prompt of each module; an unknown module has no card', async () => {
     const intro = (module: string) => ({ ...buildModuleIntroSuggestion('designer', NOW), targets: [{ key: module }] })
     expect(moduleIntroDefinition.card(intro('designer'), describeContext)).toEqual({
       key: 'moduleIntro.card.designer',
@@ -165,7 +165,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(() => moduleIntroDefinition.card(intro('users'), describeContext)).toThrow()
   })
 
-  test('Do it builds a request from the visible targets, shown as the request text of its card; no request without a target or when the prompt fails', () => {
+  test('Do it builds a request from the visible targets, shown as the request text of its card; no request without a target or when the prompt fails', async () => {
     const visible = { ...designSuggestion, targets: [{ key: 'b:labels' }] }
     const params = { userUuid: 'u1', surveyId: 7, cycle: '0', describeContext, definitions, newId: () => 'r9' }
     expect(buildSuggestionRequest({ ...params, suggestion: visible })).toEqual({
@@ -201,7 +201,7 @@ describe('module introduction and suggestion actions (217)', () => {
     expect(buildSuggestionRequest({ ...params, suggestion: { ...visible, targets: [] } })).toBeNull()
   })
 
-  test('the claim drops a request of another user, survey, cycle or area: claimed, so it is never sent', () => {
+  test('the claim drops a request of another user, survey, cycle or area: claimed, so it is never sent', async () => {
     const claimed: string[] = []
     let pending: SuggestionRequest | null = introRequest()
     const claim = (requestId: string) => {
@@ -271,7 +271,7 @@ describe('module introduction and suggestion actions (217)', () => {
   test('when send creates no turn (busy, applying, not ready) nothing is marked and the card stays', async () => {
     const store = newStore()
     store.add({ userUuid: 'u1', suggestion: designSuggestion })
-    enter(store, 'designer')
+    await enter(store, 'designer')
     const { send } = recordingSend(null)
     const request = introRequest({ area: 'design', suggestionId: designSuggestion.id })
     expect(
@@ -290,31 +290,31 @@ describe('module introduction and suggestion actions (217)', () => {
 
   test('accepting the introduction removes it from Help (any open survey) and marks the module seen', async () => {
     const store = newStore()
-    enter(store, 'designer')
+    await enter(store, 'designer')
     const { send } = recordingSend('c2')
     expect(await acceptSuggestion({ request: introRequest(), send, store })).toBe('c2')
     expect(helpPending(store)).toEqual([])
     expect(store.getInProgressConversationIds('u1')).toEqual([])
     expect(store.isModuleSeen({ userUuid: 'u1', module: 'designer' })).toBe(true)
-    enter(store, 'designer')
+    await enter(store, 'designer')
     expect(helpPending(store)).toEqual([])
   })
 
-  test('dismissing hides the visible targets; the introduction also marks its module seen for good', () => {
+  test('dismissing hides the visible targets; the introduction also marks its module seen for good', async () => {
     const store = newStore()
     store.add({ userUuid: 'u1', suggestion: designSuggestion })
-    enter(store, 'analysis')
+    await enter(store, 'analysis')
     dismissSuggestion({ suggestion: designSuggestion, userUuid: 'u1', store, definitions })
     expect(visibleIn(store, 7, ['design'])).toEqual([])
     expect(store.isModuleSeen({ userUuid: 'u1', module: 'analysis' })).toBe(false)
     dismissSuggestion({ suggestion: buildModuleIntroSuggestion('analysis', NOW), userUuid: 'u1', store })
     expect(visibleIn(store, null, ['help'])).toEqual([])
     expect(store.isModuleSeen({ userUuid: 'u1', module: 'analysis' })).toBe(true)
-    enter(store, 'analysis')
+    await enter(store, 'analysis')
     expect(visibleIn(store, null, ['help'])).toEqual([])
   })
 
-  test('the mock provider answers the introduction prompt from the manual (e2e script)', () => {
+  test('the mock provider answers the introduction prompt from the manual (e2e script)', async () => {
     const start = [
       system(`${assistantMarkers.help}\nYou are the help assistant.`),
       user(buildModuleIntroPrompt('designer')),

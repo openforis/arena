@@ -65,7 +65,7 @@ export const AiPolicyBlockedTooltip = (props: Props) => {
   const showPolicyLink = canEditPolicy && reasonKeys.some((key) => key.startsWith('aiPolicy.blocked.'))
 
   const openPolicyTab = useCallback(() => {
-    runAction('changePolicy')
+    void runAction('changePolicy')
   }, [runAction])
 
   const renderTitle = useCallback(() => {

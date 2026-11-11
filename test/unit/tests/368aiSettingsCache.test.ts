@@ -91,7 +91,7 @@ describe('createAiSettingsCache (368)', () => {
   })
 
   test('a fetch that started before a reset cannot write its result', async () => {
-    let release: (value: Record<string, unknown>) => void = () => undefined
+    let release!: (value: Record<string, unknown>) => void
     let calls = 0
     const cache = createAiSettingsCache({
       fetchSettings: () => {

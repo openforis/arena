@@ -92,7 +92,7 @@ const suggestionCards = (page: Page, text: string | RegExp) =>
   assistantPanel(page).getByTestId(TestId.aiAssistant.suggestionCard).filter({ hasText: text })
 
 test.describe('AI assistant Design suggestions (mock provider)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { withExpressions: false, publish: false } })
 

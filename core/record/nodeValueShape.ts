@@ -8,14 +8,13 @@ import * as DateUtils from '@core/dateUtils'
 import { isUuid } from '@core/uuid'
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 
-type Value = unknown
-type ShapeCheck = (value: Value) => boolean
+type ShapeCheck = (value: unknown) => boolean
 type PlainObject = Record<string, unknown>
 
 // codes, names and srs ids
 const maxShortStringChars = 255
 const integerPattern = /^[+-]?\d{1,16}$/
-const decimalPattern = /^[+-]?(\d+\.?\d*|\.\d+)([eE][+-]?\d+)?$/
+const decimalPattern = /^[+-]?(\d+(\.\d*)?|\.\d+)([eE][+-]?\d+)?$/
 const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/
 const timePattern = /^(\d{1,2}):(\d{2})(?::(\d{2}))?$/
 const booleanValues = new Set(['true', 'false'])
@@ -25,7 +24,7 @@ const booleanValues = new Set(['true', 'false'])
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a plain object.
  */
-const isPlainObject = (value: Value): value is PlainObject =>
+const isPlainObject = (value: unknown): value is PlainObject =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
 /**
@@ -34,7 +33,7 @@ const isPlainObject = (value: Value): value is PlainObject =>
  * @param {number} [maxChars] - The longest accepted string.
  * @returns {boolean} Whether the value is a short enough string.
  */
-const isString = (value: Value, maxChars: number = maxShortStringChars): value is string =>
+const isString = (value: unknown, maxChars: number = maxShortStringChars): value is string =>
   typeof value === 'string' && value.length <= maxChars
 
 /**
@@ -42,14 +41,14 @@ const isString = (value: Value, maxChars: number = maxShortStringChars): value i
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a non-empty short string.
  */
-const isNonEmptyShortString = (value: Value): boolean => isString(value) && value.trim().length > 0
+const isNonEmptyShortString = (value: unknown): boolean => isString(value) && value.trim().length > 0
 
 /**
  * Returns true for a finite number or a string of a plain decimal number.
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is numeric.
  */
-const isNumeric = (value: Value): boolean => {
+const isNumeric = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isFinite(value)
   return typeof value === 'string' && value.length <= 64 && decimalPattern.test(value) && Number.isFinite(Number(value))
 }
@@ -59,7 +58,7 @@ const isNumeric = (value: Value): boolean => {
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is an integer.
  */
-const isInteger = (value: Value): boolean => {
+const isInteger = (value: unknown): boolean => {
   if (typeof value === 'number') return Number.isSafeInteger(value)
   return typeof value === 'string' && integerPattern.test(value)
 }
@@ -70,7 +69,7 @@ const isInteger = (value: Value): boolean => {
  * @param {unknown} value - The value.
  * @returns {boolean} Whether the value is a lower-case uuid.
  */
-const isUuidString = (value: Value): boolean =>
+const isUuidString = (value: unknown): boolean =>
   typeof value === 'string' && value === value.toLowerCase() && isUuid(value)
 
 /**
@@ -100,7 +99,7 @@ const isTime: ShapeCheck = (value) => {
  * @param {string[]} required - The props that must be present.
  * @returns {boolean} Whether the value has the shape.
  */
-const hasProps = (value: Value, checkByProp: Record<string, ShapeCheck>, required: string[]): boolean => {
+const hasProps = (value: unknown, checkByProp: Record<string, ShapeCheck>, required: string[]): boolean => {
   if (!isPlainObject(value)) return false
   const entries = Object.entries(value)
   const allowed = entries.every(([prop, propValue]) => checkByProp[prop]?.(propValue) === true)
@@ -193,7 +192,7 @@ const shapeCheckByType: Record<string, ShapeCheck> = {
  * @param {unknown} params.value - The value to store (untrusted input allowed).
  * @returns {boolean} Whether the value is acceptable.
  */
-export const isNodeValueShapeValid = ({ nodeDef, value }: { nodeDef: any; value: Value }): boolean => {
+export const isNodeValueShapeValid = ({ nodeDef, value }: { nodeDef: any; value: unknown }): boolean => {
   const check = shapeCheckByType[NodeDef.getType(nodeDef)]
   if (!check) return false
   if (value === null || value === undefined) return true
@@ -208,5 +207,5 @@ const serializedOverheadChars = 1000
  * @param {unknown} value - The value (untrusted JSON input).
  * @returns {boolean} Whether the value is small enough.
  */
-export const isNodeValueSizeValid = (value: Value): boolean =>
+export const isNodeValueSizeValid = (value: unknown): boolean =>
   (JSON.stringify(value) ?? '').length <= NodesBatchLimits.maxValueChars + serializedOverheadChars

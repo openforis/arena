@@ -33,7 +33,7 @@ export const createRateLimiter = ({
 
   return {
     take: (key: string): boolean => {
-      if (!(limitPerMinute > 0)) return true
+      if (limitPerMinute <= 0) return true
       const time = now()
       if (callTimesByKey.size > MAX_KEYS) for (const known of callTimesByKey.keys()) prune(known, time)
       const recent = prune(key, time)

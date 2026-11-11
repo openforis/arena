@@ -31,7 +31,7 @@ const invalidRecord = buildInvalidTreeRecord()
 const isBatchUpdateRequest = (request: { url(): string }) => request.url().includes('/records/nodes/update')
 
 test.describe('AI cleaning assistant (mock model on the stub local server)', () => {
-  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock')
+  test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server
 
   test.use({ sampleSurveyOptions: { records: [invalidRecord] } })
 

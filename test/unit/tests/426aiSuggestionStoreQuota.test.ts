@@ -74,7 +74,7 @@ describe('suggestion store: quota, expiry and the stored shape (426)', () => {
     }
     expect((data.get(KEY) ?? '').length).toBeLessThanOrEqual(12_000)
     // the latest survey keeps its suggestion
-    expect(store.getPending({ userUuid, surveyId: 15 }).length).toBe(1)
+    expect(store.getPending({ userUuid, surveyId: 15 })).toHaveLength(1)
     expect(store.getPending({ userUuid, surveyId: 15 })[0].targets.length).toBeGreaterThan(0)
     expect(log).toHaveBeenCalledWith(expect.stringMatching(/storage is full.*pruned/))
     expect(

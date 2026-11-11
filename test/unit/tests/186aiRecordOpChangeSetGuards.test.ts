@@ -46,9 +46,15 @@ test('a record operation never reaches the survey paths', async () => {
     isSurveyDirty: () => false,
     postNodeDef: fail,
     putNodeDefProps: fail,
-    onNodeDefCreated: fail,
-    onNodeDefUpdated: fail,
-    onNodeDefSaved: fail,
+    onNodeDefCreated: () => {
+      void fail()
+    },
+    onNodeDefUpdated: () => {
+      void fail()
+    },
+    onNodeDefSaved: () => {
+      void fail()
+    },
   }
   expect(await applyChangeSet({ changeSet, operationIds: ['op1'], deps })).toEqual([])
 })

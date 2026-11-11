@@ -29,14 +29,16 @@ describe('access level (250)', () => {
   })
 
   test('every category has a rank, and the ranks follow the panel groups', () => {
-    expect(Object.keys(aiCategoryAccessRanks).sort()).toEqual(Object.values(AiFeatureCategory).sort())
+    expect(Object.keys(aiCategoryAccessRanks).sort((a, b) => a.localeCompare(b))).toEqual(
+      Object.values(AiFeatureCategory).sort((a, b) => a.localeCompare(b))
+    )
     for (const [index, group] of FEATURE_GROUPS.entries()) {
       for (const category of group.categories) {
         expect([category, aiCategoryAccessRanks[category]]).toEqual([category, index + 1])
       }
     }
     expect(getAiCategoryAccessRank('unknown')).toBeNull()
-    expect(getAiCategoriesOfRank(1).sort()).toEqual(['assistantSuggestions', 'chat'])
+    expect(getAiCategoriesOfRank(1).sort((a, b) => a.localeCompare(b))).toEqual(['assistantSuggestions', 'chat'])
   })
 
   test('a category is within a level when its rank is not above it', () => {

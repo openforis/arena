@@ -115,7 +115,9 @@ describe('AI routes: permissions with real users (056)', () => {
     const modelRoute = () => route('post', '/ai/model')
 
     test('the matrix covers every gateway feature of the registry, and only those', () => {
-      expect(Object.keys(allowedByFeature).sort()).toEqual([...gatewayFeatureKeys].sort())
+      expect(Object.keys(allowedByFeature).sort((a, b) => a.localeCompare(b))).toEqual(
+        [...gatewayFeatureKeys].sort((a, b) => a.localeCompare(b))
+      )
     })
 
     test.each(gatewayFeatureKeys)('%s', async (feature) => {

@@ -37,7 +37,7 @@ describe('NodeDefManager.insertNodeDef lists the new node definition in the pare
 
   test('a node definition in two cycles is added to the parent layout of both', async () => {
     const { params } = await insert(['0', '1'], '0')
-    expect(Object.keys(params.props.layout).sort()).toEqual(['0', '1'])
+    expect(Object.keys(params.props.layout).sort((a, b) => a.localeCompare(b))).toEqual(['0', '1'])
   })
 
   test('a node definition in one cycle only is added to that cycle (the designer)', async () => {

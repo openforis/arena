@@ -305,7 +305,12 @@ export const AssistantProviderChip = (props: Props) => {
         open={open && anchor !== null}
         transformOrigin={{ vertical: 'bottom', horizontal: 'left' }}
       >
-        <ProviderChooser choices={choices} onChoose={choose} onManage={manage} t={t} />
+        <ProviderChooser
+          choices={choices}
+          onChoose={(id, makeDefault) => void choose(id, makeDefault)}
+          onManage={manage}
+          t={t}
+        />
       </Popover>
     </>
   )

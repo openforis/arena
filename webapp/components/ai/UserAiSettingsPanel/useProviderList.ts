@@ -244,7 +244,7 @@ export const useProviderList = ({ settings, reloadSettings }: Params): ProviderL
    */
   const onDialogSaved = useCallback(() => {
     setDialog(null)
-    reloadSettings()
+    void reloadSettings()
   }, [reloadSettings])
 
   return {

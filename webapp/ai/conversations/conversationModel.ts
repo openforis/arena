@@ -75,7 +75,32 @@ export const toConversationTitle = (text: string): string => {
 }
 
 // quotes and markdown emphasis models wrap titles in
-const TITLE_WRAPPERS = /^["'`*_#«»“”‘’\s]+|["'`*_«»“”‘’\s]+$/g
+const TITLE_WRAPPER_CHARS = '"\'`*_«»“”‘’'
+
+/**
+ * Removes the wrapping characters and spaces at the start (also `#`) and at the end of a title.
+ * @param {string} title - The title.
+ * @returns {string} The title without them.
+ */
+const stripTitleWrappers = (title: string): string => {
+  const isWrapper = (char: string) => TITLE_WRAPPER_CHARS.includes(char) || /\s/.test(char)
+  let start = 0
+  let end = title.length
+  while (start < end && (isWrapper(title[start]) || title[start] === '#')) start += 1
+  while (end > start && isWrapper(title[end - 1])) end -= 1
+  return title.slice(start, end)
+}
+
+/**
+ * Removes the periods at the end of a title.
+ * @param {string} title - The title.
+ * @returns {string} The title without them.
+ */
+const stripFinalPeriods = (title: string): string => {
+  let end = title.length
+  while (end > 0 && (title[end - 1] === '.' || title[end - 1] === '。')) end -= 1
+  return title.slice(0, end)
+}
 
 /**
  * Cleans a title written by the model: one line, without wrapping quotes or emphasis, no final period.
@@ -83,6 +108,6 @@ const TITLE_WRAPPERS = /^["'`*_#«»“”‘’\s]+|["'`*_«»“”‘’\s]+$
  * @returns {string} The title, at most 60 characters (empty when nothing is left).
  */
 export const cleanConversationTitle = (title: string): string => {
-  const oneLine = title.replaceAll(/\s+/g, ' ').replaceAll(TITLE_WRAPPERS, '')
-  return toConversationTitle(oneLine.replace(/[.。]+$/, '').replaceAll(TITLE_WRAPPERS, ''))
+  const oneLine = stripTitleWrappers(title.replaceAll(/\s+/g, ' '))
+  return toConversationTitle(stripTitleWrappers(stripFinalPeriods(oneLine)))
 }

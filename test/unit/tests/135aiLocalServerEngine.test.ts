@@ -158,7 +158,7 @@ describe('createLocalServerEngine', () => {
     const result = streamText({ model: engine.createModel(modelOptions), prompt: 'hi', maxRetries: 0 })
     let text = ''
     let reasoning = ''
-    for await (const part of result.fullStream) {
+    for await (const part of result.stream) {
       if (part.type === 'text-delta') text += part.text
       if (part.type === 'reasoning-delta') reasoning += part.text
     }

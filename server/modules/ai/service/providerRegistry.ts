@@ -63,6 +63,15 @@ export const isSupported = (provider: string): boolean => validProviders.has(pro
 const noRedirectFetch: FetchLike = (input, init) => fetch(input, { ...init, redirect: 'error' })
 
 /**
+ * Throws when a provider that needs an API key has none.
+ * @param {string} provider - Provider identifier.
+ * @param {string} [apiKey] - The API key.
+ */
+const assertApiKey = (provider: string, apiKey?: string): void => {
+  if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })
+}
+
+/**
  * Returns the cap of a provider answer: it follows the output tokens the server allows, so a legitimate long answer is
  * not cut.
  * @returns {number} The cap, in bytes.
@@ -109,15 +118,15 @@ export const buildModel = (cfg: ProviderConfig, { fetchImpl }: { fetchImpl?: Fet
 
   switch (provider) {
     case providers.openai: {
-      if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })
+      assertApiKey(provider, apiKey)
       return createOpenAI({ apiKey })(model)
     }
     case providers.anthropic: {
-      if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })
+      assertApiKey(provider, apiKey)
       return createAnthropic({ apiKey })(model)
     }
     case providers.google: {
-      if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })
+      assertApiKey(provider, apiKey)
       return createGoogleGenerativeAI({ apiKey })(model)
     }
     case providers.openaiCompatible: {

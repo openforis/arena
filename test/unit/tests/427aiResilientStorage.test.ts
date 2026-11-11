@@ -72,7 +72,7 @@ describe('resilient storage (427)', () => {
     expect(data.get('k')).toBe('xxxx'.slice(0, 4))
     expect(wrapper.read('k')).toBe('xxxx')
     expect(log).toHaveBeenCalledTimes(1)
-    expect(log).toHaveBeenCalledWith(expect.stringMatching(/full.*k.*pruned.*level 2/))
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('k was pruned to fit (level 2)'))
   })
 
   test('nothing fits: the value stays in memory, is read from there, and the log says so', () => {
@@ -81,7 +81,7 @@ describe('resilient storage (427)', () => {
     const wrapper = createResilientStorage({ getStorage: () => storage, log })
     data.set('k', 'old')
     wrapper.write('k', 'too long', () => null)
-    expect(log).toHaveBeenCalledWith(expect.stringMatching(/full.*k.*memory/))
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('k stays in memory'))
     // the older stored value must not come back over the newer one
     expect(wrapper.read('k')).toBe('too long')
     expect(calls.setItem).toBe(1)
@@ -149,7 +149,7 @@ describe('resilient storage (427)', () => {
     data.set('p.a', '1')
     data.set('other', '1')
     wrapper.write('p.b', 'too long for the storage')
-    expect(wrapper.keys('p.').sort()).toEqual(['p.a', 'p.b'])
+    expect(wrapper.keys('p.').sort((a, b) => a.localeCompare(b))).toEqual(['p.a', 'p.b'])
   })
 
   test('an error that is not a quota error is not retried with a smaller value', () => {

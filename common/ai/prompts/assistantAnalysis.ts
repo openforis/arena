@@ -63,8 +63,9 @@ export const buildAssistantAnalysisPrompt = ({
 }): string => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyLabel = Survey.getLabel(surveyInfo, lang)
+  const surveyLabelPart = surveyLabel ? ` label=${pq(surveyLabel, 200)}` : ''
   const context = [
-    `- Survey: ${pq(Survey.getName(surveyInfo), 200)}${surveyLabel ? ` label=${pq(surveyLabel, 200)}` : ''}`,
+    `- Survey: ${pq(Survey.getName(surveyInfo), 200)}${surveyLabelPart}`,
     `- Survey languages: ${(Survey.getLanguages(surveyInfo) as string[]).join(', ')}; labels are in ${pq(lang, 16)}`,
     `- Current cycle: ${pq(cycle, 16)}`,
     viewDescription ? `- Current view: ${pq(viewDescription, 300)}` : null,
