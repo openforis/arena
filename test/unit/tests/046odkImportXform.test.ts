@@ -183,26 +183,23 @@ describe('odkImport / xform', () => {
 
   test('getItextTranslations resolves translations and the explicit default language', () => {
     const { translations, defaultLang } = XForm.getItextTranslations(xform)
-    expect(defaultLang).toBe('English')
-    expect(translations['/data/name:label']).toEqual({ English: 'Name', French: 'Nom' })
+    // English language names are mapped to their ISO 639-1 code
+    expect(defaultLang).toBe('en')
+    expect(translations['/data/name:label']).toEqual({ en: 'Name', fr: 'Nom' })
   })
 
   test('resolveLabels prefers itext indirection, falls back to a literal label in the default language', () => {
     const { translations } = XForm.getItextTranslations(xform)
 
     expect(
-      XForm.resolveLabels({ labelRef: '/data/name:label', labelText: null, translations, defaultLanguage: 'English' })
-    ).toEqual({ English: 'Name', French: 'Nom' })
+      XForm.resolveLabels({ labelRef: '/data/name:label', labelText: null, translations, defaultLanguage: 'en' })
+    ).toEqual({ en: 'Name', fr: 'Nom' })
 
-    expect(XForm.resolveLabels({ labelRef: null, labelText: 'Age', translations, defaultLanguage: 'English' })).toEqual(
-      {
-        English: 'Age',
-      }
-    )
+    expect(XForm.resolveLabels({ labelRef: null, labelText: 'Age', translations, defaultLanguage: 'en' })).toEqual({
+      en: 'Age',
+    })
 
-    expect(XForm.resolveLabels({ labelRef: null, labelText: null, translations, defaultLanguage: 'English' })).toEqual(
-      {}
-    )
+    expect(XForm.resolveLabels({ labelRef: null, labelText: null, translations, defaultLanguage: 'en' })).toEqual({})
   })
 
   test('labelFromElementName splits camelCase/PascalCase and snake_case ids into a readable label', () => {
@@ -246,9 +243,49 @@ describe('odkImport / xform', () => {
     expect(translations['/data/name:label']).toEqual({
       en: 'Name',
       pt: 'Nome',
-      // an unrecognized code (not in Arena's known ISO 639-1 list) is left as the raw attribute value,
-      // rather than guessing - "xx-made-up" isn't a real language, so this falls through unnormalized
-      'Klingon (xx-made-up)': '???',
+      // "xx-made-up" is not an ISO 639-1 code: its texts are used only where the default language has none
+    })
+  })
+
+  describe('getItextTranslations with languages not supported by Arena', () => {
+    const xformWithTranslations = (translationsXml: string) =>
+      XForm.parseXForm(`<?xml version="1.0"?>
+<h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
+  <h:head>
+    <model>
+      <itext>${translationsXml}</itext>
+      <instance><data id="x"><name/></data></instance>
+    </model>
+  </h:head>
+  <h:body><input ref="/data/name"><label ref="jr:itext('/data/name:label')"/></input></h:body>
+</h:html>`)
+
+    test('the "default" translation (XLSForm columns without a language) fills the default language', () => {
+      const xform = xformWithTranslations(`
+        <translation lang="default" default="true()">
+          <text id="/data/name:label"><value>Name</value></text>
+          <text id="/data/name:hint"><value>Hint</value></text>
+        </translation>
+        <translation lang="French (fr)">
+          <text id="/data/name:label"><value>Nom</value></text>
+        </translation>
+        <translation lang="Bahasa Indonesia">
+          <text id="/data/name:label"><value>Nama</value></text>
+        </translation>`)
+      const { translations, defaultLang } = XForm.getItextTranslations(xform)
+      // the default language is the first supported one, the texts in a supported language are not replaced
+      expect(defaultLang).toBe('fr')
+      expect(translations).toEqual({ '/data/name:label': { fr: 'Nom' }, '/data/name:hint': { fr: 'Hint' } })
+    })
+
+    test('without supported languages, the texts are in English', () => {
+      const xform = xformWithTranslations(`
+        <translation lang="default" default="true()">
+          <text id="/data/name:label"><value>Name</value></text>
+        </translation>`)
+      const { translations, defaultLang } = XForm.getItextTranslations(xform)
+      expect(defaultLang).toBe('en')
+      expect(translations).toEqual({ '/data/name:label': { en: 'Name' } })
     })
   })
 
@@ -271,6 +308,6 @@ describe('odkImport / xform', () => {
   <h:body><upload ref="/data/photo_field"><label ref="jr:itext('/data/photo_field:label')"/></upload></h:body>
 </h:html>`)
     const { translations } = XForm.getItextTranslations(xformWithMediaItext)
-    expect(translations['/data/photo_field:label']).toEqual({ English: 'Take a photo' })
+    expect(translations['/data/photo_field:label']).toEqual({ en: 'Take a photo' })
   })
 })

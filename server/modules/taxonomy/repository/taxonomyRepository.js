@@ -414,6 +414,8 @@ export const fetchTaxaWithVernacularNamesStream = ({
   extraPropsDefs,
   draft = false,
 }) => {
+  // language codes and extra prop names are passed as parameters (values and quoted column aliases)
+  const params = DbUtils.newQueryParams([taxonomyUuid])
   const vernacularNamesSubSelects = A.pipe(
     A.map(
       (langCode) =>
@@ -425,8 +427,8 @@ export const fetchTaxaWithVernacularNamesStream = ({
             ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
         WHERE
             vn.taxon_uuid = t.uuid
-            AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = '${langCode}'
-       ) AS ${langCode}`
+            AND ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.lang, draft, 'vn.')} = ${params.add(langCode)}
+       ) AS ${params.add(langCode, ':name')}`
     ),
     A.join(', ')
   )(vernacularLangCodes)
@@ -438,7 +440,10 @@ export const fetchTaxaWithVernacularNamesStream = ({
 
   const propsCol = draft ? 't.props || t.props_draft' : 't.props'
   const extraPropsFields = Object.keys(extraPropsDefs)
-    .map((extraProp) => `(${propsCol})#>>'{${Taxon.propKeys.extra},${extraProp}}' AS ${extraProp}`)
+    .map(
+      (extraProp) =>
+        `(${propsCol})#>>${params.add([Taxon.propKeys.extra, extraProp])}::text[] AS ${params.add(extraProp, ':name')}`
+    )
     .join(', ')
 
   const select = `SELECT
@@ -451,7 +456,7 @@ export const fetchTaxaWithVernacularNamesStream = ({
           t.taxonomy_uuid = $1
       ORDER BY ${getTaxaOrderBy(draft)}`
 
-  return new DbUtils.QueryStream(DbUtils.formatQuery(select, [taxonomyUuid]))
+  return new DbUtils.QueryStream(DbUtils.formatQuery(select, params.values))
 }
 
 const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
