@@ -17,16 +17,17 @@ export const updateAttributeValue = ({
   dateModified: dataModifiedParam = null,
   sideEffect = false,
 }) => {
+  const valueChanged = !NodeValues.isValueEqual({
+    survey,
+    nodeDef: attributeDef,
+    value: Node.getValue(attribute),
+    valueSearch: value,
+    record,
+    parentNode: entity,
+    strict: true,
+  })
   if (
-    !NodeValues.isValueEqual({
-      survey,
-      nodeDef: attributeDef,
-      value: Node.getValue(attribute),
-      valueSearch: value,
-      record,
-      parentNode: entity,
-      strict: true,
-    }) ||
+    valueChanged ||
     dataModifiedParam // always update attribute when dateModified changes
   ) {
     // update existing attribute (if value changed);
@@ -38,7 +39,11 @@ export const updateAttributeValue = ({
       (nodeUpdated) =>
         // reset defaultValueApplied meta information
         Node.isDefaultValueApplied(attribute) ? Node.assocIsDefaultValueApplied(false)(nodeUpdated) : nodeUpdated,
-      (nodeUpdated) => (refData ? NodeRefData.assocRefData(refData)(nodeUpdated) : nodeUpdated)
+      (nodeUpdated) => {
+        if (refData) return NodeRefData.assocRefData(refData)(nodeUpdated)
+        // ref data of the previous value would be read by the expression evaluator instead of the new value
+        return valueChanged ? NodeRefData.dissocRefData(nodeUpdated) : nodeUpdated
+      }
     )(attribute)
 
     const updateResult = new RecordUpdateResult({ record })
