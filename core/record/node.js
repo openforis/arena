@@ -89,14 +89,17 @@ export const getNodeDefUuids = (nodes) =>
     A.uniq
   )(nodes)
 
+const _isChildHiddenWhenNotRelevantDefault =
+  ({ cycle, node }) =>
+  (childDef) =>
+    NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
+
 export const getNodeLayoutChildren =
-  ({ cycle, nodeDef, childDefs }) =>
+  ({ cycle, nodeDef, childDefs, isChildHidden = null }) =>
   (node) => {
+    const isHidden = isChildHidden ?? _isChildHiddenWhenNotRelevantDefault({ cycle, node })
     const hiddenDefsByUuid = childDefs.reduce(
-      (uuidsMap, childDef) =>
-        NodeDefLayout.isHiddenWhenNotRelevant(cycle)(childDef) && !isChildApplicable(childDef.uuid)(node)
-          ? { ...uuidsMap, [childDef.uuid]: true }
-          : uuidsMap,
+      (uuidsMap, childDef) => (isHidden(childDef) ? { ...uuidsMap, [childDef.uuid]: true } : uuidsMap),
       {}
     )
     return NodeDefLayout.getLayoutChildrenCompressed({ cycle, hiddenDefsByUuid })(nodeDef)
