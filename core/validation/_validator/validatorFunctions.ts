@@ -18,6 +18,17 @@ export type ValidatorFn = (propName: string, obj: unknown) => ValidatorResult | 
  */
 const validNameRegex = /^[a-z][a-z0-9_]{0,39}$/ // At most 40 characters long
 
+// characters allowed in names (the full format is checked by validateName)
+const nameCharsRegex = /^[a-z0-9_]*$/
+
+/**
+ * Returns true if the name contains only the characters allowed in names (lowercase letters, numbers and "_"),
+ * without checking the full name format (e.g. the first letter or the length).
+ * @param name - The name to check.
+ * @returns True if the name contains only characters allowed in names.
+ */
+export const isNameCharsValid = (name: unknown): boolean => typeof name === 'string' && nameCharsRegex.test(name)
+
 // Email local part and domain are validated separately to keep each regex simple
 const validEmailLocalPartRegex = /^([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*|".+")$/
 const validEmailDomainRegex = /^(\[\d{1,3}(\.\d{1,3}){3}]|([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,})$/

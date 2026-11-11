@@ -38,6 +38,13 @@ describe('Validator.checkNamesAreValid', () => {
   })
 })
 
+test('Validator.checkNamesAreValid reports the specified error key', () => {
+  const errorKey = Validation.messageKeys.nodeDefEdit.nameInvalid
+  expect(getError(() => Validator.checkNamesAreValid(['plot no'], errorKey))).toEqual(
+    badRequest(errorKey, { name: 'plot no' })
+  )
+})
+
 describe('Category names check', () => {
   const newLevel = ({ name = 'region', propsDraft = {} } = {}) => ({
     ...Category.newLevel(Category.newCategory(), { [CategoryLevel.keysProps.name]: name }, 0),
