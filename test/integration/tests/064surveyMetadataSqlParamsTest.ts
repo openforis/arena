@@ -11,6 +11,7 @@ import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxonomy from '@core/survey/taxonomy'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import * as ObjectUtils from '@core/objectUtils'
+import * as Validation from '@core/validation/validation'
 import { FileFormats } from '@core/fileFormats'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -170,6 +171,49 @@ describe('Survey metadata passed to SQL queries as parameters', () => {
         }),
       ])
     )
+  })
+
+  test('invalid level and extra prop names and vernacular language codes are not saved', async () => {
+    const user = getContextUser()
+    const textExtraDef = ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text })
+    const newCategory = ({ levelName = 'region', extraName = 'area' } = {}) => {
+      const category = Category.newCategory({
+        [Category.keysProps.name]: 'invalid_names',
+        [Category.keysProps.itemExtraDef]: { [extraName]: textExtraDef },
+      })
+      return Category.assocLevelsArray([Category.newLevel(category, { name: levelName }, 0)])(category)
+    }
+    const nameInvalidKey = Validation.messageKeys.nameInvalid
+
+    await expect(
+      CategoryManager.insertCategory({ user, surveyId, category: newCategory({ levelName: 'Region' }) })
+    ).rejects.toThrow(nameInvalidKey)
+    await expect(
+      CategoryManager.insertCategory({ user, surveyId, category: newCategory({ extraName: '2020_area' }) })
+    ).rejects.toThrow(nameInvalidKey)
+    await expect(
+      TaxonomyManager.insertTaxonomy({
+        user,
+        surveyId,
+        taxonomy: Taxonomy.newTaxonomy({
+          [Taxonomy.keysProps.name]: 'invalid_langs',
+          [Taxonomy.keysProps.vernacularLanguageCodes]: ['swa', 'en'],
+        }),
+      })
+    ).rejects.toThrow('survey.languageCodeInvalid')
+    await expect(
+      TaxonomyManager.updateTaxonomyProp(user, surveyId, taxonomyUuid, Taxonomy.keysProps.extraPropsDefs, {
+        status: textExtraDef,
+        'max height': textExtraDef,
+      })
+    ).rejects.toThrow(nameInvalidKey)
+
+    const categories = await CategoryManager.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true })
+    expect(Object.values(categories).map(Category.getName)).toEqual([categoryName])
+    const taxonomies = await TaxonomyManager.fetchTaxonomiesBySurveyId({ surveyId, draft: true })
+    expect(taxonomies.map(Taxonomy.getName)).toEqual([taxonomyName])
+    const taxonomy = taxonomies[0]
+    expect(Object.keys(Taxonomy.getExtraPropsDefs(taxonomy))).toEqual(['status'])
   })
 
   test('adding and removing a cycle updates the node defs cycles and layouts', async () => {

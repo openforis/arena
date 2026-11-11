@@ -1,12 +1,15 @@
 import * as A from '@core/arena'
+import * as ObjectUtils from '@core/objectUtils'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
-import SystemError from '@core/systemError'
+import SystemError, { StatusCodes } from '@core/systemError'
+import { languageCodesISO639part2 } from '@core/app/languages'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { ExtraPropDefsUpdater } from '@core/survey/extraPropDefsUpdater'
 import * as Taxon from '@core/survey/taxon'
 import * as Taxonomy from '@core/survey/taxonomy'
+import * as Validator from '@core/validation/validator'
 import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import { db } from '@server/db/db'
@@ -21,6 +24,38 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 import * as TaxonomyValidator from '../taxonomyValidator'
+
+// vernacular language codes and extra prop names are used as export column names and in expressions:
+// check them before saving
+
+/**
+ * Throws a bad request error if the prop value contains vernacular language codes not in the ISO 639-2 list
+ * or invalid extra prop names.
+ * @param {!string} key - The key of the taxonomy prop.
+ * @param {unknown} value - The value of the taxonomy prop.
+ * @returns {void}
+ */
+export const checkTaxonomyProp = (key, value) => {
+  if (key === Taxonomy.keysProps.vernacularLanguageCodes) {
+    const langsInvalid = [value ?? []].flat().filter((lang) => !languageCodesISO639part2.includes(lang))
+    if (langsInvalid.length > 0) {
+      throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
+    }
+  } else if (key === Taxonomy.keysProps.extraPropsDefs) {
+    Validator.checkNamesAreValid(Object.keys(value ?? {}))
+  }
+}
+
+/**
+ * Throws a bad request error if the taxonomy has invalid vernacular language codes or extra prop names.
+ * @param {!object} taxonomy - The taxonomy to check.
+ * @returns {void}
+ */
+export const checkTaxonomy = (taxonomy) => {
+  for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(taxonomy)) {
+    checkTaxonomyProp(key, value)
+  }
+}
 
 /**.
  * ====== CREATE
@@ -37,8 +72,9 @@ import * as TaxonomyValidator from '../taxonomyValidator'
 export const insertTaxonomy = async (
   { user, surveyId, taxonomy, addLogs = true, system = false, backup = false },
   client = db
-) =>
-  client.tx(async (t) => {
+) => {
+  checkTaxonomy(taxonomy)
+  return client.tx(async (t) => {
     const [taxonomyInserted] = await DbUtils.runQueries(t, [
       () => TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy, backup }, t),
       ...(addLogs
@@ -47,6 +83,7 @@ export const insertTaxonomy = async (
     ])
     return validateTaxonomy(surveyId, [], taxonomyInserted, true, t)
   })
+}
 
 export const insertTaxa = async ({ user, surveyId, taxa, addLogs = true, backup = false, client = db }) =>
   client.tx(async (t) =>
@@ -327,8 +364,9 @@ export const unpublishTaxonomiesProps = async (surveyId, client = db) =>
     )
   )
 
-export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) =>
-  client.tx(
+export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, value, system = false, client = db) => {
+  checkTaxonomyProp(key, value)
+  return client.tx(
     async (t) =>
       (
         await DbUtils.runQueries(t, [
@@ -350,6 +388,7 @@ export const updateTaxonomyProp = async (user, surveyId, taxonomyUuid, key, valu
         ])
       )[0]
   )
+}
 
 export const updateTaxonAndVernacularNames = async (user, surveyId, taxon, client = db) =>
   client.tx(async (t) =>

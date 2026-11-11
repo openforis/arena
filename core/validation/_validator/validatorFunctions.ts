@@ -65,6 +65,8 @@ export const validateNotKeyword =
     return ValidatorNameKeywords.isKeyword(value) ? { key: errorKey, params: { value } } : null
   }
 
+export const isNameValid = (name: unknown): boolean => typeof name === 'string' && validNameRegex.test(name)
+
 export const validateName =
   (errorKey: string, errorParams: Record<string, unknown> = {}): ValidatorFn =>
   (propName, item) => {

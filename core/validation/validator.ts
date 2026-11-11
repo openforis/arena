@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import { Objects } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as Validation from './validation'
 import * as ValidationResult from './validationResult'
@@ -79,6 +80,18 @@ export const validate = async (
   }
 
   return validation
+}
+
+/**
+ * Throws a bad request error if one of the names is not valid: names of category levels and extra props are used as
+ * export column names and in expressions. Blank names are allowed (reported by the validation of the item).
+ * @param names - The names to check.
+ */
+export const checkNamesAreValid = (names: unknown[]): void => {
+  const nameInvalid = names.find((name) => !Objects.isEmpty(name) && !ValidatorFunctions.isNameValid(name))
+  if (nameInvalid !== undefined) {
+    throw new SystemError(Validation.messageKeys.nameInvalid, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
+  }
 }
 
 // Validator functions
