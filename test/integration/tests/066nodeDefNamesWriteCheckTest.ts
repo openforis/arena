@@ -32,6 +32,9 @@ const fetchNodeDefNames = async (surveyId: number): Promise<string[]> => {
     .sort()
 }
 
+const surveyExists = async (surveyId: number): Promise<boolean> =>
+  (await db.oneOrNone('SELECT id FROM survey WHERE id = $1', [surveyId])) !== null
+
 const createBackupWithNodeDefName = async ({ nodeDefName, newName }: { nodeDefName: string; newName: string }) => {
   const exportJob: any = new SurveyExportJob({ surveyId: Survey.getId(survey), user: getContextUser(), backup: true })
   await exportJob.start()
@@ -64,7 +67,7 @@ describe('Node def names check on write', () => {
 
   afterAll(async () => {
     for (const surveyId of createdSurveyIds) {
-      await SurveyManager.deleteSurvey(surveyId)
+      await SurveyManager.deleteSurvey(surveyId) // NOSONAR
     }
   })
 
@@ -107,15 +110,12 @@ describe('Node def names check on write', () => {
     // the temporary survey is deleted once the job transaction has ended
     const temporarySurveyId = job.context.surveyId
     expect(temporarySurveyId).toBeDefined()
-    let surveyIdFound = temporarySurveyId
-    for (let attempt = 0; attempt < 20 && surveyIdFound; attempt++) {
-      await new Promise((resolve) => setTimeout(resolve, 200))
-      surveyIdFound = await db.oneOrNone(
-        'SELECT id FROM survey WHERE id = $1',
-        [temporarySurveyId],
-        (row) => row?.id ?? null
-      )
+    let surveyFound = true
+    for (let attempt = 0; attempt < 20 && surveyFound; attempt++) {
+      // polling: sequential on purpose
+      await new Promise((resolve) => setTimeout(resolve, 200)) // NOSONAR
+      surveyFound = await surveyExists(temporarySurveyId) // NOSONAR
     }
-    expect(surveyIdFound).toBeNull()
+    expect(surveyFound).toBe(false)
   })
 })

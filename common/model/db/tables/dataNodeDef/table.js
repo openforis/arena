@@ -145,7 +145,8 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   _getConstraintFk(tableReferenced, column) {
-    return `CONSTRAINT ${StringUtils.quoteDouble(`${this.name}_${tableReferenced.name}_fk`)} 
+    const constraintName = StringUtils.quoteDouble(`${this.name}_${tableReferenced.name}_fk`)
+    return `CONSTRAINT ${constraintName} 
     FOREIGN KEY (${column}) 
     REFERENCES ${tableReferenced.nameQualified} (${columnSet.uuid}) 
     ON DELETE CASCADE`
@@ -167,7 +168,8 @@ export default class TableDataNodeDef extends TableSurveyRdb {
   }
 
   getConstraintUuidUnique() {
-    return `CONSTRAINT ${StringUtils.quoteDouble(`${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1`)} UNIQUE (${columnSet.uuid})`
+    const constraintName = StringUtils.quoteDouble(`${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1`)
+    return `CONSTRAINT ${constraintName} UNIQUE (${columnSet.uuid})`
   }
 
   getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
