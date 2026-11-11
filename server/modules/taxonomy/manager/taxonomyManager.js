@@ -37,7 +37,10 @@ import * as TaxonomyValidator from '../taxonomyValidator'
  */
 export const checkTaxonomyProp = (key, value) => {
   if (key === Taxonomy.keysProps.vernacularLanguageCodes) {
-    const langsInvalid = [value ?? []].flat().filter((lang) => !languageCodesISO639part2.includes(lang))
+    const langsInvalid = [value ?? []]
+      .flat()
+      .filter((lang) => !languageCodesISO639part2.includes(lang))
+      .map((lang) => (typeof lang === 'string' ? lang : JSON.stringify(lang)))
     if (langsInvalid.length > 0) {
       throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
     }
