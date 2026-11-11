@@ -1,7 +1,10 @@
+import { Surveys } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 
 import * as RecordUtils from '../../utils/recordUtils'
 import * as SurveyUtils from '../../utils/surveyUtils'
@@ -112,5 +115,61 @@ describe('RecordNodesUpdater (replace nodes) Test', () => {
 
     const plotNodeMissingInOriginalRecord = RecordUtils.findNodeByPath('cluster/plot[2]')(survey, record)
     expect(plotNodeMissingInOriginalRecord).toBeNull()
+  })
+
+  it('Test replace code attribute value with stale ref data in target node', async () => {
+    const user = getContextUser()
+    const survey = await SB.survey(
+      user,
+      SB.entity(
+        'cluster',
+        SB.attribute('cluster_id', nodeDefType.integer).key(),
+        SB.attribute('land_use', nodeDefType.code).category('land_use'),
+        SB.attribute('forest_type', nodeDefType.text).applyIf(`land_use == 'forest'`)
+      )
+    )
+      .categories(SB.category('land_use').items(SB.categoryItem('forest'), SB.categoryItem('other')))
+      .build()
+
+    const categoryUuid = Survey.getCategoryByName('land_use')(survey).uuid
+    const getItem = (code) => Surveys.getCategoryItemByCodePaths({ survey, categoryUuid, codePaths: [code] })
+    const forestItem = getItem('forest')
+    const otherItem = getItem('other')
+    const forestTypeDef = Survey.getNodeDefByName('forest_type')(survey)
+
+    const recordTarget = RB.record(
+      user,
+      survey,
+      RB.entity(
+        'cluster',
+        RB.attribute('cluster_id', 1),
+        RB.attribute('land_use', Node.newNodeValueCode({ itemUuid: forestItem.uuid })),
+        RB.attribute('forest_type', 'beech')
+      )
+    ).build()
+    // nodes fetched from the DB carry the ref data of their current value
+    const landUseTarget = RecordUtils.findNodeByPath('cluster/land_use')(survey, recordTarget)
+    landUseTarget[NodeRefData.keys.refData] = { [NodeRefData.keys.categoryItem]: forestItem }
+
+    // source record (e.g. from Arena Mobile): land use changed, no ref data
+    const { record: recordSourceRaw } = await Record.updateAttributesWithValues({
+      survey,
+      entityDefUuid: Survey.getNodeDefRoot(survey).uuid,
+      valuesByDefUuid: { [landUseTarget.nodeDefUuid]: Node.newNodeValueCode({ itemUuid: otherItem.uuid }) },
+    })(JSON.parse(JSON.stringify(recordTarget))) // copy with the same node uuids
+    const recordSource = RecordUtils.shiftDateModifiedIntoTheFuture(recordSourceRaw)
+
+    const { record: recordMerged } = await Record.replaceUpdatedNodes({
+      survey,
+      recordSource,
+      sideEffect: false,
+    })(recordTarget)
+
+    const landUseMerged = RecordUtils.findNodeByPath('cluster/land_use')(survey, recordMerged)
+    expect(Node.getCategoryItemUuid(landUseMerged)).toBe(otherItem.uuid)
+    expect(NodeRefData.getCategoryItem(landUseMerged)).toBeUndefined()
+    // relevance evaluated with the new value, not with the one in the stale ref data
+    const rootMerged = RecordUtils.findNodeByPath('cluster')(survey, recordMerged)
+    expect(Node.isChildApplicable(forestTypeDef.uuid)(rootMerged)).toBe(false)
   })
 })
