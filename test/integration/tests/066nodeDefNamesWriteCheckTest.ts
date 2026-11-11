@@ -6,6 +6,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
 
+import { db } from '@server/db/db'
 import ArenaImportJob from '@server/modules/arenaImport/service/arenaImport/arenaImportJob'
 import * as NodeDefManager from '@server/modules/nodeDef/manager/nodeDefManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -102,5 +103,19 @@ describe('Node def names check on write', () => {
     }
     expect(job.isSucceeded()).toBe(false)
     expect(JSON.stringify(job.errors)).toContain(nameInvalidKey)
+
+    // the temporary survey is deleted once the job transaction has ended
+    const temporarySurveyId = job.context.surveyId
+    expect(temporarySurveyId).toBeDefined()
+    let surveyIdFound = temporarySurveyId
+    for (let attempt = 0; attempt < 20 && surveyIdFound; attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 200))
+      surveyIdFound = await db.oneOrNone(
+        'SELECT id FROM survey WHERE id = $1',
+        [temporarySurveyId],
+        (row) => row?.id ?? null
+      )
+    }
+    expect(surveyIdFound).toBeNull()
   })
 })
