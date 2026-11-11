@@ -15,6 +15,7 @@ import * as UserManager from '@server/modules/user/manager/userManager'
 import * as UserService from '@server/modules/user/service/userService'
 
 import * as apiRouter from './apiRouter'
+import { registerArenaServerServices } from './arenaServerServices'
 import * as ExpiredUserInvitationsCleanup from './schedulers/expiredUserInvitationsCleanup'
 import * as RecordPreviewCleanup from './schedulers/recordPreviewCleanup'
 import * as StaleJobsCleanup from './schedulers/staleJobsCleanup'
@@ -49,6 +50,7 @@ export const run = async () => {
     initialMiddlewares: httpRequestLogger ? [httpRequestLogger] : [],
   })
   const { express: app, serviceRegistry } = arenaApp
+  registerArenaServerServices(serviceRegistry)
 
   // Fail any pending/running job rows left behind by a previous incarnation of this exact process
   // (crash or restart): must run before this process enqueues any job of its own, since a
