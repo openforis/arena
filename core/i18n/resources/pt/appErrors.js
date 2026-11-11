@@ -104,6 +104,7 @@ Tente atualizar a página.`,
     fileNotFound: 'Arquivo não encontrado',
     languageCodeInvalid: 'O código de idioma não é válido: {{lang}}',
     cycleKeysInvalid: 'Os ciclos devem ser numerados consecutivamente, começando por 1',
+    srsCodeInvalid: 'O código do sistema de referência espacial não é válido: {{code}}',
   },
   unsupportedFunctionType: 'Tipo de função não suportado: {{exprType}}',
   aiNotConfigured:

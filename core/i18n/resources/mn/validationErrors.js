@@ -174,6 +174,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'Хэл шаардлагатай',
     langInvalid: 'Хэлний код буруу байна: {{lang}}',
+    srsInvalid: 'Орон зайн лавлах системийн код буруу байна: {{code}}',
     srsRequired: 'Орон зайн лавлах систем шаардлагатай',
     cycleRequired: 'Мөчлөг шаардлагатай',
     cyclesRequired: 'Наад зах нь нэг мөчлөг тодорхойлогдсон байх ёстой',

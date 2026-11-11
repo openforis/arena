@@ -174,6 +174,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'Jezik je obavezan',
     langInvalid: 'Kod jezika nije važeći: {{lang}}',
+    srsInvalid: 'Kod prostornog referentnog sistema nije važeći: {{code}}',
     srsRequired: 'Prostorni referentni sistem je obavezan',
     cycleRequired: 'Ciklus je obavezan',
     cyclesRequired: 'Mora biti definisan najmanje jedan ciklus',
