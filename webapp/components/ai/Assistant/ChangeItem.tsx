@@ -1,7 +1,5 @@
 import './ChangeItem.scss'
 
-import React from 'react'
-
 import type { OperationConflict, OperationResult } from '@webapp/ai/changeSets/types'
 import { useI18nT } from '@webapp/store/system'
 import { TestId } from '@webapp/utils/testId'

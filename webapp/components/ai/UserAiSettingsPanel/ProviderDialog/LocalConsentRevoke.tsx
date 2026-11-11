@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { getCurrentUserUuid } from '@webapp/ai/engines/capabilitiesStore'
 import { hasLocalServerConsent, revokeLocalServerConsent } from '@webapp/ai/engines/localServerConsent'

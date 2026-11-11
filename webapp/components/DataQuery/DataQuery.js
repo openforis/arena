@@ -1,6 +1,5 @@
 import './dataQuery.scss'
 
-import { useEffect } from 'react'
 import { useDispatch } from 'react-redux'
 import classNames from 'classnames'
 
@@ -10,14 +9,10 @@ import { Paginator } from '@webapp/components/Table'
 
 import { DataExplorerActions, DataExplorerSelectors, DataExplorerState } from '@webapp/store/dataExplorer'
 
-import { NotificationActions } from '@webapp/store/ui'
-
 import { RecordEditModal } from '@webapp/views/App/views/Data/common/RecordEditModal'
 
 import { useNodeDefLabelSwitch } from '../survey/NodeDefLabelSwitch'
 import { useDataQuery } from './store'
-import { isChartTruncated } from './store/queryLimit'
-import QueryNodeDefsSelector from './QueryNodeDefsSelector'
 import ButtonBar from './ButtonBar'
 import Visualizer from './Visualizer'
 import { QuerySidebar } from './QuerySidebar/QuerySidebar'
@@ -47,20 +42,12 @@ const DataQuery = () => {
     setLimit,
     setOffset,
     setData,
-  } = useDataQuery({ query, displayType })
-
-  // a chart set from code (assistant query card) skips the display type button check: same warning as there
-  const chartTruncated = isChartTruncated({ displayType, count })
-  useEffect(() => {
-    if (chartTruncated) {
-      dispatch(
-        NotificationActions.showNotification({
-          key: 'dataView:charts.warning.tooManyItemsToShowChart',
-          params: { maxItems: DataExplorerState.chartMaxItems },
-        })
-      )
-    }
-  }, [chartTruncated, dispatch])
+  } = useDataQuery({
+    query,
+    // scatter chart (available only in raw mode) is used to find outliers: fetch a random sample including them
+    randomize:
+      displayType === DataExplorerState.displayTypes.chart && chartType === DataExplorerState.chartTypes.scatter,
+  })
 
   const { nodeDefLabelType, toggleLabelFunction } = useNodeDefLabelSwitch()
 
@@ -81,6 +68,8 @@ const DataQuery = () => {
             dataLoading={dataLoading}
             nodeDefLabelType={nodeDefLabelType}
             onNodeDefLabelTypeChange={toggleLabelFunction}
+            setQueryLimit={setLimit}
+            setQueryOffset={setOffset}
           />
         </div>
 

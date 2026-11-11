@@ -1,6 +1,6 @@
 import './ChangeSetCard.scss'
 
-import React, { useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button } from '@webapp/components/buttons'

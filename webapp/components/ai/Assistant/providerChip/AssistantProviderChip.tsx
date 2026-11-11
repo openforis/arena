@@ -1,6 +1,6 @@
 import './AssistantProviderChip.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import classNames from 'classnames'
 import Popover from '@mui/material/Popover'
 

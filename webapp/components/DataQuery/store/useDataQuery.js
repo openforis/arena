@@ -6,16 +6,18 @@ import { Query } from '@common/model/query'
 import { useOnUpdate } from '@webapp/components/hooks'
 
 import { useActions } from './actions'
-import { getQueryLimitForDisplayType } from './queryLimit'
 
-const defaultOffset = 0
+const defaults = {
+  [Query.displayTypes.table]: { limit: 15, offset: 0 },
+}
 
-export const useDataQuery = ({ query, limitData = true, displayType = null }) => {
-  const initialLimit = limitData ? getQueryLimitForDisplayType(displayType) : null
+export const useDataQuery = ({ query, limitData = true, randomize = false }) => {
+  const defaultValues = defaults[Query.getDisplayType(query)]
+  const initialLimit = limitData ? defaultValues.limit : null
   const [data, setData] = useState(null)
   const [count, setCount] = useState(null)
   const [limit, setLimit] = useState(initialLimit)
-  const [offset, setOffset] = useState(defaultOffset)
+  const [offset, setOffset] = useState(defaultValues.offset)
 
   const hasSelection = Query.hasSelection(query)
   const mode = Query.getMode(query)
@@ -40,12 +42,6 @@ export const useDataQuery = ({ query, limitData = true, displayType = null }) =>
 
   // on entity def uuid or filter update: reset data
   useOnUpdate(Actions.reset, [entityDefUuid, filter])
-
-  // the limit follows the display type, also when it is set from code (assistant query cards)
-  useOnUpdate(() => {
-    setOffset(defaultOffset)
-    if (limitData) setLimit(getQueryLimitForDisplayType(displayType))
-  }, [displayType])
 
   // on mount or on update entityDefUuid, offset, attributeDefUuids, dimensions, measures, sort or filter: fetch or reset data
   useEffect(() => {

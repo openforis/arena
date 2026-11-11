@@ -1,7 +1,5 @@
 import './ProviderMonogram.scss'
 
-import React from 'react'
-
 import { getProviderMonogram } from './providerMonogram'
 
 type Props = {

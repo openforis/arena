@@ -1,10 +1,10 @@
 @use '~@webapp/style/vars' as *;
 
 .ai-cleaning-card {
-  border: 1px solid $greyBorder;
+  border: 1px solid $colorOutline;
   border-radius: 4px;
   padding: 0.5rem;
-  background-color: $white;
+  background-color: $colorSurface;
 
   ul {
     list-style: none;
@@ -29,7 +29,7 @@
   }
 
   &__new-errors {
-    color: $orange;
+    color: $colorWarning;
     font-size: 0.8rem;
   }
 
@@ -42,7 +42,7 @@
 
   &__path {
     font-size: 0.8rem;
-    color: $grey;
+    color: $colorSurfaceVariant;
   }
 
   &__from {
@@ -56,17 +56,17 @@
     border-radius: 8px;
 
     &--fixes {
-      background-color: $greenLight;
-      color: $green;
+      background-color: $colorSuccessContainer;
+      color: $colorSuccess;
     }
 
     &--stillInvalid {
-      background-color: $pink;
-      color: $red;
+      background-color: $colorErrorContainer;
+      color: $colorError;
     }
 
     &--noErrors {
-      background-color: $greyAppBg;
+      background-color: $colorBackground;
     }
   }
 
@@ -74,7 +74,7 @@
     font-size: 0.8rem;
 
     &--conflict {
-      color: $orange;
+      color: $colorWarning;
     }
 
     &--failed {

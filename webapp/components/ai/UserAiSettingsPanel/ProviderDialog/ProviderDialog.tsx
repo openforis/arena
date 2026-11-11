@@ -1,6 +1,6 @@
 import './ProviderDialog.scss'
 
-import React, { useCallback } from 'react'
+import { useCallback } from 'react'
 
 import { AI_PROVIDER_NAME_MAX_CHARS } from '@common/ai/providerIds'
 

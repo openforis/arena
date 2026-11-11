@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { useI18n } from '@webapp/store/system'
 
 import type { DataBadgeKind } from './featureGroups'

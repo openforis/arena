@@ -2,7 +2,7 @@
 .ai-assistant-card {
   margin: 0.5rem 0;
   padding: 0.5rem;
-  border: 1px solid var(--greyBorder);
+  border: 1px solid var(--color-outline);
   border-radius: 0.5rem;
 
   &__header {
@@ -25,7 +25,7 @@
     display: flex;
     gap: 0.5rem;
     padding: 0.25rem 0;
-    border-bottom: 1px solid var(--colorGrey200);
+    border-bottom: 1px solid var(--color-background);
   }
 
   &__row-title {
@@ -41,7 +41,7 @@
   }
 
   &__from {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     text-decoration: line-through;
   }
 
@@ -61,16 +61,16 @@
   &__hint {
     width: 100%;
     margin: 0;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 
   // Apply all of changes that were not reviewed
   &__confirm {
     margin: 0.5rem 0;
     padding: 0.5rem;
-    border: 1px solid var(--orange);
+    border: 1px solid var(--color-warning);
     border-radius: 0.25rem;
-    background-color: var(--orangeLight);
+    background-color: var(--color-warning-container);
 
     p {
       margin: 0;
@@ -86,7 +86,7 @@
   }
 
   &__count {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     white-space: nowrap;
   }
 
@@ -101,21 +101,21 @@
 
   &__chip {
     padding: 0.1rem 0.5rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 1rem;
     font-size: 0.8rem;
 
     &--applied {
-      color: var(--green);
+      color: var(--color-success);
     }
 
     &--conflict,
     &--failed {
-      color: var(--red);
+      color: var(--color-error);
     }
 
     &--skipped {
-      color: var(--orange);
+      color: var(--color-warning);
     }
   }
 
@@ -146,7 +146,7 @@
       display: flex;
       gap: 0.5rem;
       padding: 0.15rem 0;
-      border-bottom: 1px solid var(--colorGrey200);
+      border-bottom: 1px solid var(--color-background);
       overflow: hidden;
       white-space: nowrap;
     }

@@ -111,7 +111,7 @@ export const startSurveysListExportJob = async ({ draft = true, template = false
  * @param {number} params.surveyId - Survey id.
  * @param {string} params.cycle - Cycle key.
  * @param {AbortSignal} [params.signal] - Cancellation signal.
- * @returns {Promise<{surveyName: string, nodeDefs: object[]}>} The items.
+ * @returns {Promise<{surveyName: string, nodeDefs: any[]}>} The items.
  */
 export const fetchSchemaSummaryAiItems = async ({ surveyId, cycle, signal }) => {
   // errorHandledLocally: the progress dialog shows the error

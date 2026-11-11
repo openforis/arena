@@ -6,6 +6,8 @@
  * record data also carries design content (survey name, labels). `normalizeAiPolicy` and `getEffectiveAiPolicy`
  * clamp to it and `getAllowedLevel` applies it to a policy that was not clamped.
  */
+import { Authorizer, type Survey as ArenaSurvey, type User as ArenaUser } from '@openforis/arena-core'
+
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import type { AiDataClass } from './features'
@@ -168,3 +170,13 @@ export const findLevelsAboveCeiling = ({ policy, ceilings }: { policy: AiPolicy;
   aiPolicyDataClasses.filter(
     (dataClass) => getPolicyLevelIndex(policy[dataClass]) > getPolicyLevelIndex(ceilings[dataClass])
   )
+
+/**
+ * Returns true when the user can change the survey AI policy (system admin or survey administrator).
+ * Delegates to canManageUserGroups today; a separate name lets the AI policy rule change on its own.
+ * @param {ArenaUser} user - The user.
+ * @param {ArenaSurvey} surveyInfo - The survey info.
+ * @returns {boolean} True when allowed.
+ */
+export const canEditSurveyAiPolicy = (user: ArenaUser, surveyInfo: ArenaSurvey): boolean =>
+  Authorizer.canManageUserGroups(user, surveyInfo)

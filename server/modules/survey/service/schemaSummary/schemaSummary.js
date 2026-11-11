@@ -337,7 +337,7 @@ export const buildSchemaSummaryItems = ({
  * @param {() => boolean} [params.stopIfFunction] - Returns true when the job is canceled.
  * @param {string} [params.fileFormat] - csv or xlsx: the file the rows are written to.
  * @param {{fetchSurvey: (surveyId: number|string) => Promise<object>}} [deps] - The dependencies (tests).
- * @returns {Promise<object[]>} The rows.
+ * @returns {Promise<any[]>} The rows.
  * @throws {SystemError} aiDescriptionsInvalid (400) when a description is for a node def that is not in the export.
  */
 export const generateSchemaSummaryItems = async (

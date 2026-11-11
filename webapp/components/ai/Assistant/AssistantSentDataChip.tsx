@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { TooltipNew } from '@webapp/components/TooltipNew'
 import { useI18nT } from '@webapp/store/system'

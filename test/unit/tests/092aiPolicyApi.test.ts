@@ -75,15 +75,15 @@ const runChain = async (
   return res
 }
 
-// the global registry is restored after the tests: the survey service registered here is a fake
+// set around each test (other tests of the bundle register the real services) and restored after
 let previousSurveyService: unknown
-beforeAll(() => {
+beforeEach(() => {
   const registry = ServiceRegistry.getInstance()
   previousSurveyService = (registry as any).services[ServiceType.survey]
   registry.registerService(ServiceType.survey, { get: async () => surveyInfo } as any)
 })
 
-afterAll(() => {
+afterEach(() => {
   const registry = ServiceRegistry.getInstance()
   if (previousSurveyService) registry.registerService(ServiceType.survey, previousSurveyService as any)
   else delete (registry as any).services[ServiceType.survey]

@@ -2,7 +2,7 @@
  * Who may use a tool: the one set of `requires` checks (a tool is offered only when its check passes).
  */
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import type { AiToolContext } from '../types'
 

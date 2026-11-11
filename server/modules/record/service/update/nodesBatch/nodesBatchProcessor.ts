@@ -4,7 +4,7 @@
 import type { Node as ArenaNode, Record as ArenaRecord, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { WebSocketEvent } from '@openforis/arena-server'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import SystemError from '@core/systemError'
 import * as Node from '@core/record/node'

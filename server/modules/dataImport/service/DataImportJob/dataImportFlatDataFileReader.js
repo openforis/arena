@@ -3,6 +3,7 @@ import { FlatDataExportModel, Objects } from '@openforis/arena-core'
 import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as Node from '@core/record/node'
 import { VALUE_PROP_DEFAULT, parseNodeValueProps } from '@core/record/nodeValueParser'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'

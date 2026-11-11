@@ -1,6 +1,5 @@
 import './AiDataLocationBadge.scss'
 
-import React from 'react'
 import classNames from 'classnames'
 
 import type { AiDataClass } from '@common/ai/features'

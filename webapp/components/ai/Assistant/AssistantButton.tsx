@@ -1,6 +1,6 @@
 import './AssistantButton.scss'
 
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 
 import { Button } from '@webapp/components/buttons'
 import { useI18nT } from '@webapp/store/system'

@@ -11,9 +11,10 @@ import { uuidv4 } from '@core/uuid'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as RecordApi from '@server/modules/record/api/recordApi'
 import { requireNodeUuidBelongsToRecord } from '@server/modules/record/api/recordNodeOwnership'
+import { requireNotOwnedRecordViewAllowed } from '@server/modules/record/api/recordOwnerMiddleware'
 import {
   requireRecordMatchesUserGroupQualifiers,
-  requireRecordMatchesUserGroupQualifiersRead,
+  requireRecordReadableByUserGroup,
 } from '@server/modules/record/api/recordQualifierMiddleware'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -118,10 +119,11 @@ describe('Record file routes: node of another record (058)', () => {
         ({ method, path: routePath }) => method === 'get' && routePath === path
       )
       expect(route).toBeDefined()
-      expect(route?.handlers.slice(0, 3)).toEqual([
+      expect(route?.handlers.slice(0, 4)).toEqual([
         AuthMiddleware.requireRecordViewPermission,
         requireNodeUuidBelongsToRecord,
-        requireRecordMatchesUserGroupQualifiersRead,
+        requireNotOwnedRecordViewAllowed,
+        requireRecordReadableByUserGroup,
       ])
     }
   )
@@ -322,9 +324,10 @@ describe('Record read routes: user group qualifiers (058)', () => {
   })
 
   test.each([docxPath, pdfPath])('the export %s checks the group qualifiers after the view permission', (path) => {
-    expect(route('get', path).handlers.slice(0, 2)).toEqual([
+    expect(route('get', path).handlers.slice(0, 3)).toEqual([
       AuthMiddleware.requireRecordViewPermission,
-      requireRecordMatchesUserGroupQualifiersRead,
+      requireNotOwnedRecordViewAllowed,
+      requireRecordReadableByUserGroup,
     ])
   })
 

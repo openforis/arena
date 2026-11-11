@@ -5,10 +5,10 @@
   min-width: 0;
   max-width: 100%;
   padding: 0.15rem 0.6rem 0.15rem 0.5rem;
-  border: 1px solid var(--blue);
+  border: 1px solid var(--color-primary);
   border-radius: 999px;
-  background-color: var(--blueLight);
-  color: var(--blueDark);
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary-container);
   font: inherit;
   font-weight: 600;
   cursor: pointer;
@@ -19,7 +19,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid var(--blueDark);
+    outline: 2px solid var(--color-on-primary-container);
     outline-offset: 2px;
   }
 
@@ -29,9 +29,9 @@
 
   // not usable now (unreachable, blocked or on another computer)
   &--bad {
-    border-color: var(--red);
+    border-color: var(--color-error);
     background-color: transparent;
-    color: var(--red);
+    color: var(--color-error);
   }
 
   &__text {
@@ -60,7 +60,7 @@
 
   &__title {
     padding: 6px 8px 4px;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
     font-size: 0.72rem;
     font-weight: 600;
     letter-spacing: 0.06em;
@@ -84,17 +84,17 @@
 
     &:hover:not([aria-disabled='true']),
     &--selected {
-      background-color: var(--blueLight);
+      background-color: var(--color-primary-container);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--blueDark);
+      outline: 2px solid var(--color-on-primary-container);
       outline-offset: -2px;
     }
 
     small {
       display: block;
-      color: var(--colorGrey700);
+      color: var(--color-on-surface-variant);
       font-size: 0.74rem;
     }
   }
@@ -107,12 +107,12 @@
   &__radio {
     width: 14px;
     height: 14px;
-    border: 2px solid var(--colorGrey500);
+    border: 2px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 50%;
   }
 
   &__row--selected &__radio {
-    border: 4px solid var(--blue);
+    border: 4px solid var(--color-primary);
   }
 
   &__rows {
@@ -127,7 +127,7 @@
   }
 
   .ai-provider-chooser__reason {
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 
   &__footer {
@@ -136,7 +136,7 @@
     gap: 6px;
     margin-top: 4px;
     padding: 8px;
-    border-top: 1px solid var(--colorGrey300);
+    border-top: 1px solid var(--color-surface-variant);
     font-size: 0.8rem;
   }
 
@@ -151,7 +151,7 @@
     padding: 0;
     border: none;
     background: none;
-    color: var(--blueDark);
+    color: var(--color-on-primary-container);
     font: inherit;
     font-weight: 600;
     cursor: pointer;

@@ -14,19 +14,19 @@
   &__hint,
   &__level-hint,
   &__note {
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
     font-size: 0.85rem;
   }
 
   &__ceiling-note {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     font-size: 0.8rem;
     font-style: italic;
   }
 
   &__read-only {
     padding: 0.5rem 0.75rem;
-    border-left: 3px solid var(--orangeLight);
-    background-color: var(--white);
+    border-left: 3px solid var(--color-warning-container);
+    background-color: var(--color-surface);
   }
 }

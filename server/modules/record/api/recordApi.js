@@ -25,6 +25,7 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 import { NodesBatchLimits } from '@common/record/nodesBatchLimits'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { assertFeatureEnabled } from '../../ai/service/featureGate'
+import { minMobileAppVersionRecordsDownload } from '@common/mobile'
 import * as RecordService from '../service/recordService'
 
 import {
@@ -40,20 +41,22 @@ import {
   requireRecordsEditPermission,
   requireRecordsExportPermission,
   requireSurveyViewPermission,
+  requireRecordsMergePermission,
 } from '../../auth/authApiMiddleware'
 import { requireMobileAppMinVersion } from '../../mobile/api/mobileAppVersionMiddleware'
 import {
   requireMergeRecordsMatchUserGroupQualifiers,
   requireRecordMatchesUserGroupQualifiers,
-  requireRecordMatchesUserGroupQualifiersRead,
+  requireRecordReadableByUserGroup,
   requireRecordsMatchUserGroupQualifiers,
   requireRecordsReadableByUserGroup,
 } from './recordQualifierMiddleware'
 import { requireNodeBelongsToRecord, requireNodeUuidBelongsToRecord } from './recordNodeOwnership'
 import { parseNodesBatchRequest } from '../service/update/nodesBatch/nodesBatchRequest'
 import { NodesBatchMessageKeys } from '../service/update/nodesBatch/nodesBatchTypes'
+import { requireNotOwnedRecordsViewAllowed, requireNotOwnedRecordViewAllowed } from './recordOwnerMiddleware'
 
-const fetchRecordNodeFileAsStream = async ({ surveyId, nodeUuid }) => {
+const fetchRecordNodeFileAsStream = async ({ surveyId, recordUuid, nodeUuid }) => {
   const node = await RecordService.fetchNodeByUuid(surveyId, nodeUuid)
   // permissions are checked on recordUuid: the node must belong to that record
   const fileUuid = node && Node.getRecordUuid(node) === recordUuid ? Node.getFileUuid(node) : null
@@ -244,7 +247,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record',
     requireRecordListViewPermission,
-    requireRecordMatchesUserGroupQualifiersRead,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid } = Request.getParams(req)
@@ -407,7 +411,8 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiersRead,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const { surveyId, recordUuid, nodeUuid } = Request.getParams(req)
@@ -425,7 +430,8 @@ export const init = (app) => {
     '/survey/:surveyId/record/:recordUuid/nodes/:nodeUuid/file-exif',
     requireRecordViewPermission,
     requireNodeUuidBelongsToRecord,
-    requireRecordMatchesUserGroupQualifiersRead,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       let tempFilePath
       try {
@@ -543,7 +549,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/docx',
     requireRecordViewPermission,
-    requireRecordMatchesUserGroupQualifiersRead,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
@@ -573,7 +580,8 @@ export const init = (app) => {
   app.get(
     '/survey/:surveyId/record/:recordUuid/export/pdf',
     requireRecordViewPermission,
-    requireRecordMatchesUserGroupQualifiersRead,
+    requireNotOwnedRecordViewAllowed,
+    requireRecordReadableByUserGroup,
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)

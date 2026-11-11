@@ -1,20 +1,20 @@
 @use '~@webapp/style/vars' as *;
 
 .ai-query-card {
-  border: 1px solid $greyBorder;
+  border: 1px solid $colorOutline;
   border-radius: 4px;
   padding: 0.5rem 0.75rem;
   margin: 0.25rem 0;
-  background: $white;
+  background: $colorSurface;
   font-size: 0.85rem;
 
   &--missing {
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 
   &__title {
     font-weight: 600;
-    color: $colorTextPrimary;
+    color: $colorOnPrimaryContainer;
   }
 
   &__explanation {
@@ -27,7 +27,7 @@
   }
 
   &__label {
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
     min-width: 6rem;
   }
 

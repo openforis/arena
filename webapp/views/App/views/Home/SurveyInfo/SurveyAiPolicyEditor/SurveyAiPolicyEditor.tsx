@@ -1,6 +1,6 @@
 import './SurveyAiPolicyEditor.scss'
 
-import React, { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { aiPolicyDataClasses, type AiPolicy, type AiPolicyLevel } from '@common/ai/policy'
 

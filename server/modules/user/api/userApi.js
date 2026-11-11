@@ -15,6 +15,7 @@ import * as UserValidator from '@core/user/userValidator'
 import * as Validation from '@core/validation/validation'
 
 import SystemError, { StatusCodes } from '@core/systemError'
+import UnauthorizedError from '@server/utils/unauthorizedError'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 
 import { isValidPrefsUpdate } from '../serverOnlyPrefs'

@@ -28,8 +28,6 @@ const displayTypes = {
   chart: 'chart',
 }
 
-const chartMaxItems = 5000
-
 const availableChartTypeByMode = {
   [Query.modes.aggregate]: [chartTypes.bar, chartTypes.line, chartTypes.area, chartTypes.pie],
   [Query.modes.raw]: [chartTypes.scatter],
@@ -123,7 +121,6 @@ export const DataExplorerState = {
   keys,
   chartTypes,
   displayTypes,
-  chartMaxItems,
   // read
   isEditMode,
   isNodeDefsSelectorVisible,

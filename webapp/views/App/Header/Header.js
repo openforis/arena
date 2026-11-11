@@ -125,6 +125,7 @@ const Header = () => {
           </>
         )}
         <AssistantButton />
+        <ThemeButtonMenu />
         <PreferredUILanguageButtonMenu />
         <button
           className="app-header__btn-user"

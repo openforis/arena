@@ -1,10 +1,10 @@
 // links in answers (e.g. manual sections) must stand out from the text
 .ai-assistant-markdown a {
-  color: var(--blue);
+  color: var(--color-primary);
   text-decoration: underline;
 
   &:hover,
   &:visited {
-    color: var(--blueDark);
+    color: var(--color-on-primary-container);
   }
 }

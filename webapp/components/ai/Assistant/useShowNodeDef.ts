@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { useDispatch } from 'react-redux'
-import { useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 
@@ -34,7 +34,7 @@ export const useShowNodeDef = (): ((nodeDefUuid: string) => void) => {
         )
       }
       const formDesignerUri = appModuleUri(designerModules.formDesigner)
-      if (!pathname.startsWith(formDesignerUri)) navigate(formDesignerUri)
+      if (!pathname.startsWith(formDesignerUri)) void navigate(formDesignerUri)
     },
     [cycle, dispatch, navigate, pathname, survey, viewMode]
   )

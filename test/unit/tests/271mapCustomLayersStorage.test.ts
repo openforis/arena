@@ -149,7 +149,9 @@ describe('map custom layers storage (271)', () => {
     const { client, calls } = fakeClient({})
     const user = { uuid: 'u1', prefs: { language: 'en', mapCustomLayers: {} } }
     await updateUserPrefs(user, client as never)
-    expect(calls[0].values).toEqual([{ language: 'en' }, 'u1'])
+    // the prefs are sent as JSON text and the layers key is removed by the query
+    expect(calls[0].query).toContain("- 'mapCustomLayers')")
+    expect(calls[0].values).toEqual([JSON.stringify(user.prefs), 'u1'])
   })
 
   test('deleting a survey removes the user layers of that survey', async () => {
@@ -174,7 +176,7 @@ describe('map custom layers storage (271)', () => {
     const queries = calls.map((call) => call.query)
     expect(queries).toHaveLength(3)
     for (const query of queries) {
-      expect(query).toContain("u.prefs - 'mapCustomLayers' AS prefs")
+      expect(query).toContain("- 'mapCustomLayers' AS prefs")
       expect(query).not.toMatch(/u\.prefs,/)
     }
   })

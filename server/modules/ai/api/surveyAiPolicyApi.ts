@@ -4,7 +4,7 @@
  *   GET /api/survey/:surveyId/ai-policy  (survey view)   → { policy, ceilings, effective, canEdit }
  *   PUT /api/survey/:surveyId/ai-policy  (survey admin)  body { schema, data } → same shape
  */
-import * as Authorizer from '@core/auth/authorizer'
+import { canEditSurveyAiPolicy } from '@common/ai/policy'
 
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -46,7 +46,7 @@ const sendPolicy = async ({
   deps: SurveyAiPolicyRouteDeps
 }): Promise<void> => {
   const surveyInfo = await deps.fetchSurveyInfo(surveyId)
-  const body: SurveyAiPolicyResponse = { ...state, canEdit: Authorizer.canEditSurveyAiPolicy(user, surveyInfo) }
+  const body: SurveyAiPolicyResponse = { ...state, canEdit: canEditSurveyAiPolicy(user, surveyInfo) }
   res.json(body)
 }
 

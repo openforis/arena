@@ -4,19 +4,21 @@
  */
 import type { z } from 'zod'
 
-const FENCE_RE = /^```[a-zA-Z]*\s*([\s\S]*?)\s*```$/
+const FENCE = '```'
+const FENCE_LANGUAGE_RE = /^[a-zA-Z]*/
 
 const escapeRegExp = (value: string): string => value.replaceAll(/[.*+?^${}()|[\]\\]/g, String.raw`\$&`)
 
 /**
- * Removes a single code fence wrapping the whole text.
+ * Removes a single code fence (with optional language tag) wrapping the whole text.
+ * Plain string operations instead of a regex, to avoid super-linear backtracking on large model outputs.
  * @param {string} text - Raw text.
  * @returns {string} The trimmed text without the fence.
  */
 export const stripCodeFences = (text: string): string => {
   const trimmed = (text ?? '').trim()
-  const match = FENCE_RE.exec(trimmed)
-  return (match ? match[1] : trimmed).trim()
+  if (trimmed.length < FENCE.length * 2 || !trimmed.startsWith(FENCE) || !trimmed.endsWith(FENCE)) return trimmed
+  return trimmed.slice(FENCE.length, -FENCE.length).replace(FENCE_LANGUAGE_RE, '').trim()
 }
 
 /**

@@ -24,8 +24,8 @@ describe('the activity log fetch binds the id bounds as parameters (350)', () =>
     const { sql, values } = await runFetch({ idLessThan: 987654321 })
 
     expect(sql).not.toContain('987654321')
-    expect(sql).toMatch(/id < \$4/)
-    expect(values[3]).toBe(987654321)
+    expect(sql).toMatch(/id < \$5/)
+    expect(values[4]).toBe(987654321)
   })
 
   test('idGreaterThan is a parameter, never part of the SQL text', async () => {
@@ -41,14 +41,14 @@ describe('the activity log fetch binds the id bounds as parameters (350)', () =>
     const { sql, values } = await runFetch({ idLessThan: injection })
 
     expect(sql).not.toContain('DROP TABLE')
-    expect(values[3]).toBe(injection)
+    expect(values[4]).toBe(injection)
   })
 
   test('idGreaterThan wins when both bounds are given', async () => {
     const { sql, values } = await runFetch({ idGreaterThan: 10, idLessThan: 20 })
 
     expect(sql).toMatch(/id > \$4/)
-    expect(sql).not.toMatch(/id < \$4/)
+    expect(sql).not.toMatch(/id < \$5/)
     expect(values[3]).toBe(10)
   })
 

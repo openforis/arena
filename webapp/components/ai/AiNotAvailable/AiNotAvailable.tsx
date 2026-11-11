@@ -1,7 +1,5 @@
 import './AiNotAvailable.scss'
 
-import React from 'react'
-
 import { getAiUnavailableActions } from '@webapp/ai/engines/engineUi'
 import type { AiEngineFeatureAvailability } from '@webapp/ai/engines/featureAvailability'
 import { Button } from '@webapp/components/buttons'

@@ -3,24 +3,24 @@
   align-items: center;
   gap: 0.25rem;
   padding: 0.1rem 0.45rem;
-  border: 1px solid var(--greyBorder);
+  border: 1px solid var(--color-outline);
   border-radius: 0.75rem;
-  color: var(--colorGrey700);
+  color: var(--color-on-surface-variant);
   font-size: 0.75rem;
   line-height: 1.2;
   white-space: nowrap;
   vertical-align: middle;
 
   &--cloud {
-    background-color: var(--blueLight);
+    background-color: var(--color-primary-container);
   }
 
   &--orgHosted {
-    background-color: var(--greenLight);
+    background-color: var(--color-success-container);
   }
 
   &--onDevice {
-    background-color: var(--white);
+    background-color: var(--color-surface);
   }
 
   &--compact {

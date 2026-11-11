@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState, useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
+import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
 import * as Survey from '@core/survey/survey'
 import * as Record from '@core/record/record'
@@ -107,7 +108,7 @@ export const useAuthCanCreateUsers = () => Authorizer.canCreateUsers(useUser())
 export const useAuthCanEditUser = (user) => Authorizer.canEditUser(useUser(), useSurveyInfo(), user)
 export const useAuthCanInviteUser = () => Authorizer.canInviteUsers(useUser(), useSurveyInfo())
 export const useAuthCanManageUserGroups = () => Authorizer.canManageUserGroups(useUser(), useSurveyInfo())
-export const useAuthCanEditSurveyAiPolicy = () => Authorizer.canEditSurveyAiPolicy(useUser(), useSurveyInfo())
+export const useAuthCanEditSurveyAiPolicy = () => canEditSurveyAiPolicy(useUser(), useSurveyInfo())
 export const useAuthCanEditQualifierAttributeValue = () =>
   Authorizer.canEditQualifierAttributeValue(useUser(), useSurveyInfo())
 export const useAuthCanViewOtherUsersName = () =>

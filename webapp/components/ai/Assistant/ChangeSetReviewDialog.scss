@@ -5,7 +5,7 @@
   margin: 4vh auto;
   padding: 0;
   overflow: hidden;
-  background-color: var(--white);
+  background-color: var(--color-surface);
 }
 
 .ai-change-review {
@@ -26,7 +26,7 @@
     align-items: center;
     gap: 1rem;
     padding: 0.75rem 1rem;
-    border-bottom: 1px solid var(--greyBorder);
+    border-bottom: 1px solid var(--color-outline);
 
     h2 {
       margin: 0;
@@ -41,7 +41,7 @@
 
   &__summary {
     overflow: hidden;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -56,14 +56,14 @@
     align-items: center;
     gap: 1rem;
     padding: 0.5rem 1rem;
-    border-bottom: 1px solid var(--greyBorder);
+    border-bottom: 1px solid var(--color-outline);
   }
 
   &__search {
     flex: 1 1 15rem;
     max-width: 25rem;
     padding: 0.3rem 0.5rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 0.25rem;
   }
 
@@ -72,8 +72,8 @@
 
     button {
       padding: 0.25rem 0.75rem;
-      border: 1px solid var(--greyBorder);
-      background: var(--white);
+      border: 1px solid var(--color-outline);
+      background: var(--color-surface);
       cursor: pointer;
 
       & + button {
@@ -89,8 +89,8 @@
       }
 
       &[aria-pressed='true'] {
-        background: var(--colorPrimary);
-        color: var(--white);
+        background: var(--color-primary);
+        color: var(--color-on-primary);
       }
     }
   }
@@ -107,7 +107,7 @@
     flex-direction: column;
     width: 14rem;
     overflow-y: auto;
-    border-right: 1px solid var(--greyBorder);
+    border-right: 1px solid var(--color-outline);
 
     button {
       display: flex;
@@ -126,15 +126,15 @@
       }
 
       span:last-child {
-        color: var(--colorGrey600);
+        color: var(--color-on-surface-variant);
       }
 
       &:hover {
-        background: var(--colorGrey200);
+        background: var(--color-background);
       }
 
       &[aria-pressed='true'] {
-        background: var(--colorGrey200);
+        background: var(--color-background);
         font-weight: 600;
       }
     }
@@ -155,8 +155,8 @@
       top: 0;
       z-index: 1;
       padding: 0.4rem 0.5rem;
-      background: var(--white);
-      border-bottom: 1px solid var(--greyBorder);
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-outline);
       text-align: left;
 
       .ai-change-item__lang {
@@ -166,7 +166,7 @@
 
     td {
       padding: 0.3rem 0.5rem;
-      border-bottom: 1px solid var(--colorGrey200);
+      border-bottom: 1px solid var(--color-background);
       vertical-align: top;
     }
   }
@@ -176,18 +176,18 @@
   }
 
   &__group td {
-    background: var(--colorGrey200);
+    background: var(--color-background);
     font-weight: 600;
   }
 
   &__group-count {
     margin-left: 0.25rem;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     font-weight: normal;
   }
 
   &__row--conflict td {
-    background: var(--orangeLight);
+    background: var(--color-warning-container);
   }
 
   &__item,
@@ -201,12 +201,12 @@
 
   &__detail {
     margin-left: 0.5rem;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 
   // what a change is about, and why it can't be applied (wraps to the column width)
   &__kind {
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
     white-space: nowrap;
 
     .ai-change-item__conflict {
@@ -218,12 +218,12 @@
 
   &__badge {
     margin-left: 0.5rem;
-    color: var(--red);
+    color: var(--color-error);
     font-weight: 600;
   }
 
   &__from {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     text-decoration: line-through;
   }
 
@@ -243,7 +243,7 @@
 
   &__empty {
     padding: 2rem;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     text-align: center;
   }
 
@@ -252,11 +252,11 @@
     align-items: center;
     gap: 0.5rem;
     padding: 0.75rem 1rem;
-    border-top: 1px solid var(--greyBorder);
+    border-top: 1px solid var(--color-outline);
   }
 
   &__selected {
     margin-right: auto;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 }

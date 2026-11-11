@@ -1,6 +1,6 @@
 import './AiNotAvailable.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import { refreshAiCapabilities } from '@webapp/ai/engines/capabilitiesStore'
 import { getAiEngineErrorView } from '@webapp/ai/engines/engineUi'

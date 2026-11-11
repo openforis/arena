@@ -1,5 +1,3 @@
-import React from 'react'
-
 export type StatusPillTone = 'ok' | 'warn' | 'bad'
 
 // an icon and a text with every colour, never colour alone

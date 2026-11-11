@@ -11,7 +11,6 @@ import { getLockedRefPropsChanged } from '@core/survey/nodeDefEditGuards'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as ObjectUtils from '@core/objectUtils'
-import SystemError from '@core/systemError'
 
 import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'

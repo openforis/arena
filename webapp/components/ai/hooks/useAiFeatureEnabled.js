@@ -25,7 +25,7 @@ const settingsCache = createAiSettingsCache({ fetchSettings: () => API.aiSetting
 
 /**
  * Returns the AI settings of the user (fetched once per session, shared with the hooks).
- * @returns {Promise<object>} The settings response (a "force off" object when the fetch failed; when it failed for a
+ * @returns {Promise<any>} The settings response (a "force off" object when the fetch failed; when it failed for a
  * reason that may pass it is marked `_fetchError` and not kept, so the next call asks again).
  */
 export const fetchAiSettingsOnce = () => settingsCache.fetchOnce()

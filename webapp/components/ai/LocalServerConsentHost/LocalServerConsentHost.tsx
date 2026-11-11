@@ -1,6 +1,6 @@
 import './LocalServerConsentHost.scss'
 
-import React, { useCallback, useSyncExternalStore } from 'react'
+import { useCallback, useSyncExternalStore } from 'react'
 
 import {
   answerConsentRequest,

@@ -117,6 +117,7 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
     template = false,
     records = [],
     languages,
+    withClusterImage = false,
   } = options
 
   const user = await UserManager.fetchUserByEmail(userEmail)

@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { AnalysisQueryEntry } from '@webapp/ai/tools/analysis/queryStore'
 import { isRecordEditChangeSet } from '@webapp/ai/changeSets/recordEdits/types'
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'

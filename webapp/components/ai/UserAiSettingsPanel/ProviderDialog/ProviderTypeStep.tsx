@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { ProviderMonogram } from '@webapp/components/ai/ProviderMonogram/ProviderMonogram'
 import { TestId } from '@webapp/utils/testId'
 import { useI18nT } from '@webapp/store/system'

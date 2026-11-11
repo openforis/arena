@@ -4,7 +4,6 @@ import camelize from 'camelize'
 
 import { Objects } from '@openforis/arena-core'
 
-import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 import * as User from '@core/user/user'
 import * as UserAccessRequest from '@core/user/userAccessRequest'
@@ -19,16 +18,14 @@ import {
   sqlPrefsWithoutServerOnlyKeys,
 } from '@server/modules/user/serverOnlyPrefs'
 
-// the AI prefs (providers with their encrypted keys, usage) are never selected: only the AI services read them
-const selectFields = [
-  'u.uuid',
-  'u.name',
-  'u.email',
-  `${sqlPrefsWithoutServerOnlyKeys('u.prefs')} AS prefs`,
-  'u.props',
-  'u.status',
-]
-const columnsCommaSeparated = selectFields.join(',')
+// never selected: the AI prefs (providers with their encrypted keys, usage; only the AI services read them) and the
+// custom map layers (they may hold URL tokens; served only by the custom layers API), otherwise the users list would
+// send them to the other members of a survey
+const mapCustomLayersKey = `'${User.keysPrefs.mapCustomLayers}'`
+const prefsField = `${sqlPrefsWithoutServerOnlyKeys('u.prefs')} - ${mapCustomLayersKey} AS prefs`
+const hasProfilePictureField = 'u.profile_picture IS NOT NULL AS has_profile_picture'
+const selectFields = ['uuid', 'name', 'email', prefsField, 'props', 'status', hasProfilePictureField]
+const columnsCommaSeparated = selectFields.map(StringUtils.prependIfMissing('u.')).join(',')
 
 const userSortBy = { email: 'email', name: 'name', lastLoginTime: 'last_login_time', status: 'status' }
 
@@ -446,16 +443,17 @@ export const updatePassword = async ({ userUuid, password }, client = db) =>
 /**
  * Merges the prefs of the user into the stored ones, without the server-only keys. Prefs that are not a JSON object
  * (an array, a scalar) are not applied, since they would turn the stored prefs into one for good.
+ * mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it.
  * @param {object} user - User with the prefs to merge.
  * @param {object} [client] - Database client.
- * @returns {Promise<object>} The user.
+ * @returns {Promise<any>} The user.
  */
 export const updateUserPrefs = async (user, client = db) =>
   client.one(
     `
     UPDATE "user" u
     SET prefs = CASE WHEN ${sqlPrefsParamIsObject('$1')}
-      THEN prefs || ${sqlPrefsParamWithoutServerOnlyKeys('$1')}
+      THEN prefs || (${sqlPrefsParamWithoutServerOnlyKeys('$1')} - ${mapCustomLayersKey})
       ELSE prefs END
     WHERE u.uuid = $2
     RETURNING ${columnsCommaSeparated}`,

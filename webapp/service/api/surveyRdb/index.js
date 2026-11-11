@@ -11,7 +11,7 @@ const getEntityViewUrlPrefix = ({ surveyId, query }) =>
  * @param {number} params.surveyId - Survey id.
  * @param {object} params.query - Explorer query.
  * @param {string} params.cycle - Survey cycle.
- * @returns {{url: string, body: object}} The request.
+ * @returns {{url: string, body: any}} The request.
  */
 export const getEntityViewDataCountRequest = ({ surveyId, query, cycle }) => ({
   url: `${getEntityViewUrlPrefix({ surveyId, query })}/count`,

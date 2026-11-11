@@ -1,5 +1,5 @@
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import type { AnalysisApi } from '@webapp/ai/tools/analysis/analysisApi'
 import { createAnalysisQueryStore } from '@webapp/ai/tools/analysis/queryStore'

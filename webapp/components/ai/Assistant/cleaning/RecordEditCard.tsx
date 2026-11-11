@@ -1,7 +1,7 @@
 import './RecordEditCard.scss'
 
-import React, { useCallback, useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useCallback, useMemo, useState } from 'react'
+import { Link } from 'react-router'
 
 import type { ChangeSet, OperationResult } from '@webapp/ai/changeSets/types'
 import { isRecordEditOperation, type RecordAttributeUpdateOperation } from '@webapp/ai/changeSets/recordEdits/types'

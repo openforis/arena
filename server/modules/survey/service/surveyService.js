@@ -7,6 +7,7 @@ import { canExportSurveyData } from '@core/auth/surveyExportAuthorizer'
 import { parseAreaOfInterestJson } from '@core/geo/areaOfInterestParser'
 import * as Survey from '@core/survey/survey'
 import * as SurveyFile from '@core/survey/surveyFile'
+import * as Validation from '@core/validation/validation'
 import SystemError, { StatusCodes } from '@core/systemError'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'

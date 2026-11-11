@@ -1,5 +1,3 @@
-import React from 'react'
-
 import type { Conversation } from '@webapp/ai/conversations/types'
 import { Button } from '@webapp/components/buttons'
 import { TooltipNew } from '@webapp/components/TooltipNew'

@@ -34,13 +34,13 @@ describe('fetchSurveyAiPolicy', () => {
   })
 })
 
-describe('clearSurveyConfigurationProp', () => {
+describe('deleteSurveyConfigurationProp', () => {
   test('clearing a config key keeps the other keys', async () => {
     const client = newFakeClient()
-    await SurveyRepository.clearSurveyConfigurationProp({ surveyId: 5, key: 'filesTotalSpace' }, client)
+    await SurveyRepository.deleteSurveyConfigurationProp({ surveyId: 5, key: 'filesTotalSpace' }, client as never)
     const { query, params } = client.calls[0]
     expect(query).not.toMatch(/config\s*=\s*null/i)
-    expect(query).toContain(`config - $/key/`)
+    expect(query).toContain(`config - $/key/::text`)
     expect(params).toEqual({ surveyId: 5, key: 'filesTotalSpace' })
   })
 

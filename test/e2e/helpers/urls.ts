@@ -12,7 +12,6 @@ export const Urls = {
   records: '/app/data/records/',
   dataExplorer: '/app/data/explorer/',
   dataExport: '/app/data/export/',
-  dataExplorer: '/app/data/explorer/',
   validationReport: '/app/data/validationReport/',
   messages: '/app/systemAdmin/messages/',
   map: '/app/data/map/',

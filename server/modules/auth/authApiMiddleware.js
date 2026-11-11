@@ -3,6 +3,7 @@ import { ApiAuthMiddleware } from '@openforis/arena-server'
 import * as Request from '@server/utils/request'
 
 import { Authorizer, ServiceRegistry, ServiceType } from '@openforis/arena-core'
+import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import { StatusCodes } from '@core/systemError'
 import * as User from '@core/user/user'
 
@@ -96,7 +97,7 @@ export const createRequireSurveyAiPolicyEditPermission =
       const { surveyId } = Request.getParams(req)
       const user = Request.getUser(req)
       const surveyInfo = await fetchSurveyInfo(surveyId)
-      if (Authorizer.canEditSurveyAiPolicy(user, surveyInfo)) {
+      if (canEditSurveyAiPolicy(user, surveyInfo)) {
         next()
         return
       }

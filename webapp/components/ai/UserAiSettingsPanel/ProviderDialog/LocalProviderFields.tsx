@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { DEFAULT_LOCAL_SERVER_BASE_URL } from '@webapp/ai/engines/localServerSettings'
 import type { LocalServerTestView } from '@webapp/ai/engines/localServerTest'
 import { getAiDataLocationText } from '@webapp/ai/policy/aiFeatureAvailability'

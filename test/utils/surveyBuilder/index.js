@@ -76,6 +76,12 @@ class SurveyBuilder {
     return this
   }
 
+  // additional survey info props (e.g. survey settings)
+  props(props) {
+    this.extraProps = props
+    return this
+  }
+
   async build() {
     let survey = Survey.newSurvey({
       ownerUuid: User.getUuid(this.user),

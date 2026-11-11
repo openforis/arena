@@ -42,21 +42,21 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ai-sdk/openai-compatible@npm:3.0.62":
-  version: 3.0.62
-  resolution: "@ai-sdk/openai-compatible@npm:3.0.62"
+"@ai-sdk/openai-compatible@npm:3.0.86":
+  version: 3.0.86
+  resolution: "@ai-sdk/openai-compatible@npm:3.0.86"
   dependencies:
-    "@ai-sdk/provider": "npm:4.0.21"
-    "@ai-sdk/provider-utils": "npm:5.0.53"
+    "@ai-sdk/provider": "npm:4.0.36"
+    "@ai-sdk/provider-utils": "npm:5.0.75"
   peerDependencies:
     zod: ^3.25.76 || ^4.1.8
-  checksum: 10c0/9bfb186094b85b50cec63df6830e233ccb463b7f874fe423a4e2d1877ce965f8f6a0f1400b9f918273de724e462710ab9b293f0a03f89a605c37da68b20e73d4
+  checksum: 10c0/1e55fc65c9d55593d3e304e36184c972e7d100c90647ca8da24ff49975a1e83f4b06fc2d02bbd6650f044db933e0f8ac6f1e95eaf7ca26022dea245ff00edd6b
   languageName: node
   linkType: hard
 
-"@ai-sdk/openai@npm:^4":
-  version: 4.0.83
-  resolution: "@ai-sdk/openai@npm:4.0.83"
+"@ai-sdk/openai@npm:^4.0.109":
+  version: 4.0.109
+  resolution: "@ai-sdk/openai@npm:4.0.109"
   dependencies:
     "@ai-sdk/provider": "npm:4.0.36"
     "@ai-sdk/provider-utils": "npm:5.0.75"
@@ -10864,17 +10864,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eyes@npm:0.1.x":
-  version: 0.1.8
-  resolution: "eyes@npm:0.1.8"
-  checksum: 10c0/4c79a9cbf45746d8c9f48cc957e35ad8ea336add1c7b8d5a0e002efc791a7a62b27b2188184ef1a1eea7bc3cd06b161791421e0e6c5fe78309705a162c53eea8
-  languageName: node
-  linkType: hard
-
 "fake-indexeddb@npm:^6.2.5":
-  version: 6.2.5
-  resolution: "fake-indexeddb@npm:6.2.5"
-  checksum: 10c0/6c5e2fe84a61daa06d7ad63699d1041fe61847f15f92db12415634b3db94f363a64be9e08a3c3c4434af9c3c0132086b85c4d5dc5e8e06edae1e7daf70ce1f3c
+  version: 6.2.8
+  resolution: "fake-indexeddb@npm:6.2.8"
+  checksum: 10c0/69a85018a3a714e81ae88d9294ab54ed73f83a23dd28b926d41dabf892a939dd029207e8f2dca1238ed5ebde75f1971a7a8ab14f773d5fad396923e117b6e8fe
   languageName: node
   linkType: hard
 
@@ -15364,24 +15357,20 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "open-foris-arena@workspace:."
   dependencies:
-    "@ai-sdk/anthropic": "npm:^4"
-    "@ai-sdk/google": "npm:^4"
-    "@ai-sdk/openai": "npm:^4"
-    "@ai-sdk/openai-compatible": "npm:3.0.62"
-    "@ai-sdk/provider": "npm:4.0.21"
-    "@aws-sdk/client-s3": "npm:^3.1145.0"
-    "@babel/cli": "npm:^7.29.7"
-    "@babel/core": "npm:^7.29.7"
-    "@babel/eslint-parser": "npm:^7.29.9"
-    "@babel/helper-string-parser": "npm:^7.29.7"
-    "@babel/plugin-proposal-object-rest-spread": "npm:^7.20.7"
-    "@babel/plugin-syntax-dynamic-import": "npm:^7.8.3"
-    "@babel/preset-env": "npm:^7.29.7"
-    "@babel/preset-react": "npm:^7.29.7"
-    "@babel/preset-typescript": "npm:^7.29.7"
-    "@babel/register": "npm:^7.29.7"
-    "@babel/runtime-corejs3": "npm:^7.29.7"
-    "@codemirror/autocomplete": "npm:^6.20.3"
+    "@ai-sdk/anthropic": "npm:^4.0.97"
+    "@ai-sdk/google": "npm:^4.0.112"
+    "@ai-sdk/openai": "npm:^4.0.109"
+    "@ai-sdk/openai-compatible": "npm:3.0.86"
+    "@ai-sdk/provider": "npm:4.0.36"
+    "@aws-sdk/client-s3": "npm:^3.1163.0"
+    "@babel/cli": "npm:^8.1.0"
+    "@babel/core": "npm:^8.1.0"
+    "@babel/helper-string-parser": "npm:^8.0.8"
+    "@babel/preset-env": "npm:^8.0.7"
+    "@babel/preset-react": "npm:^8.0.1"
+    "@babel/preset-typescript": "npm:^8.0.7"
+    "@babel/runtime-corejs3": "npm:^8.1.0"
+    "@codemirror/autocomplete": "npm:^6.20.4"
     "@codemirror/lang-javascript": "npm:^6.2.5"
     "@emotion/react": "npm:^11.14.0"
     "@emotion/styled": "npm:^11.14.1"
@@ -15459,7 +15448,7 @@ __metadata:
     exceljs: "npm:^4.4.0"
     exifr: "npm:^7.1.3"
     fake-indexeddb: "npm:^6.2.5"
-    fast-csv: "npm:^5.0.7"
+    fast-csv: "npm:^5.0.8"
     file-loader: "npm:^6.2.0"
     file-saver: "npm:^2.0.5"
     georaster: "npm:1.6.0"

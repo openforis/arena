@@ -11,9 +11,9 @@
   margin: 0;
   padding: 0;
   border: none;
-  border-left: 1px solid var(--greyBorder);
+  border-left: 1px solid var(--color-outline);
   box-shadow: var(--shadow2);
-  background-color: var(--white);
+  background-color: var(--color-surface);
   z-index: var(--zIndex18PanelRight);
 
   &[open] {
@@ -26,7 +26,7 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.5rem 0.75rem;
-    border-bottom: 1px solid var(--greyBorder);
+    border-bottom: 1px solid var(--color-outline);
   }
 
   &__title {
@@ -37,7 +37,7 @@
 
   &__tabs {
     display: flex;
-    border-bottom: 1px solid var(--greyBorder);
+    border-bottom: 1px solid var(--color-outline);
   }
 
   &__tab {
@@ -49,13 +49,13 @@
     cursor: pointer;
 
     &[aria-selected='true'] {
-      border-bottom-color: var(--colorPrimary);
+      border-bottom-color: var(--color-primary);
       font-weight: 600;
     }
 
     &:disabled {
       cursor: default;
-      color: var(--grey);
+      color: var(--color-surface-variant);
     }
   }
 
@@ -65,13 +65,13 @@
   }
 
   &__notice {
-    background-color: var(--orangeLight);
+    background-color: var(--color-warning-container);
   }
 
   &__provider-notice {
     padding: 0 0.75rem 0.5rem;
     font-size: 0.8rem;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 
   &__context {
@@ -81,7 +81,7 @@
     gap: 0.25rem 0.5rem;
     padding: 0.25rem 0.75rem;
     font-size: 0.8rem;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 
   &__context-ring {
@@ -94,7 +94,7 @@
     border-radius: 50%;
 
     &:focus-visible {
-      outline: 2px solid var(--colorPrimary);
+      outline: 2px solid var(--color-primary);
       outline-offset: 2px;
     }
 
@@ -108,12 +108,12 @@
 
   &__context-ring-track {
     fill: none;
-    stroke: var(--colorGrey400);
+    stroke: var(--color-outline);
     stroke-width: 3;
 
     // unknown window (cloud): nothing to fill
     &--unknown {
-      stroke: var(--colorGrey500);
+      stroke: var(--color-on-surface-variant);
       stroke-width: 2;
       stroke-dasharray: 2 2.4;
     }
@@ -121,16 +121,16 @@
 
   &__context-ring-fill {
     fill: none;
-    stroke: var(--blue);
+    stroke: var(--color-primary);
     stroke-width: 3;
     stroke-linecap: round;
 
     &--warning {
-      stroke: var(--orange);
+      stroke: var(--color-warning);
     }
 
     &--critical {
-      stroke: var(--red);
+      stroke: var(--color-error);
     }
   }
 
@@ -155,18 +155,18 @@
   }
 
   &__empty {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 
   &__composer {
     display: flex;
     flex-direction: column;
     margin: 0.5rem 0.75rem 0.75rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 8px;
 
     &:focus-within {
-      border-color: var(--colorPrimary);
+      border-color: var(--color-primary);
     }
 
     textarea {
@@ -192,7 +192,7 @@
     gap: 0.5rem;
     padding: 0.25rem 0.4rem 0.4rem 0.6rem;
     font-size: 0.75rem;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
 
     > * {
       flex: none;
@@ -228,21 +228,21 @@
     align-items: center;
     gap: 0.25rem;
     padding: 0.1rem 0.45rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 0.75rem;
     line-height: 1.2;
     white-space: nowrap;
 
     &:focus-visible {
-      outline: 2px solid var(--colorPrimary);
+      outline: 2px solid var(--color-primary);
       outline-offset: 2px;
     }
 
     // record data: the step up from the survey design must be noticed
     &--data {
-      border-color: var(--orange);
-      color: var(--orange);
-      background-color: var(--orangeLight);
+      border-color: var(--color-warning);
+      color: var(--color-warning);
+      background-color: var(--color-warning-container);
     }
   }
 
@@ -260,7 +260,7 @@
     gap: 0.25rem;
     min-height: 2.25rem;
     padding: 0.15rem 0.75rem 0.15rem 0.35rem;
-    border-bottom: 1px solid var(--greyBorder);
+    border-bottom: 1px solid var(--color-outline);
   }
 
   &__bar-title {
@@ -276,7 +276,7 @@
     // a new conversation the model has not named yet
     &--untitled {
       font-weight: 400;
-      color: var(--colorGrey600);
+      color: var(--color-on-surface-variant);
     }
   }
 
@@ -297,11 +297,11 @@
     width: 100%;
     margin-bottom: 0.5rem;
     padding: 0.3rem 0.5rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 0.25rem;
 
     &:focus-visible {
-      border-color: var(--colorPrimary);
+      border-color: var(--color-primary);
     }
   }
 
@@ -311,7 +311,7 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 
   &__history-list {
@@ -323,11 +323,11 @@
   &__history-row {
     display: flex;
     align-items: center;
-    border-bottom: 1px solid var(--colorGrey200);
+    border-bottom: 1px solid var(--color-background);
 
     &:hover,
     &:focus-within {
-      background-color: var(--colorGrey200);
+      background-color: var(--color-background);
 
       .ai-assistant-panel__history-delete {
         visibility: visible;
@@ -354,7 +354,7 @@
     time {
       flex: none;
       font-size: 0.75rem;
-      color: var(--colorGrey600);
+      color: var(--color-on-surface-variant);
       font-variant-numeric: tabular-nums;
     }
   }
@@ -375,7 +375,7 @@
   &__history-note {
     margin: 0.75rem 0 0;
     font-size: 0.8rem;
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
   }
 
   // home page: suggestions and recent conversations scroll above the New conversation button
@@ -397,7 +397,7 @@
 
   &__home-footer {
     padding: 0.5rem 0.75rem 0.75rem;
-    border-top: 1px solid var(--greyBorder);
+    border-top: 1px solid var(--color-outline);
   }
 
   &__home-new.btn {
@@ -421,7 +421,7 @@
     gap: 0.5rem;
     width: 100%;
     padding: 0.45rem 0.6rem;
-    border: 1px solid var(--greyBorder);
+    border: 1px solid var(--color-outline);
     border-radius: 6px;
     background: none;
     text-align: left;
@@ -429,22 +429,22 @@
 
     &:hover,
     &:focus-visible {
-      border-color: var(--colorPrimary);
+      border-color: var(--color-primary);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--colorPrimary);
+      outline: 2px solid var(--color-primary);
       outline-offset: 1px;
     }
 
     .icon {
-      color: var(--colorGrey600);
+      color: var(--color-on-surface-variant);
     }
 
     time {
       flex: none;
       font-size: 0.75rem;
-      color: var(--colorGrey600);
+      color: var(--color-on-surface-variant);
       font-variant-numeric: tabular-nums;
     }
   }
@@ -452,7 +452,7 @@
 
 // ⋯ menu of the panel header (rendered in a portal)
 .ai-assistant-panel__menu-danger.btn {
-  color: var(--red);
+  color: var(--color-error);
 }
 
 // groups the cards of a tool call without a box of its own
@@ -467,7 +467,7 @@
     align-self: flex-end;
     padding: 0.5rem 0.75rem;
     border-radius: 0.5rem;
-    background-color: var(--blueLight);
+    background-color: var(--color-primary-container);
     white-space: pre-wrap;
   }
 
@@ -476,7 +476,7 @@
   }
 
   &__stopped {
-    color: var(--colorGrey600);
+    color: var(--color-on-surface-variant);
     font-style: italic;
   }
 
@@ -484,13 +484,13 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    color: var(--red);
+    color: var(--color-error);
   }
 }
 
 .ai-assistant-thinking {
   font-size: 0.8rem;
-  color: var(--colorGrey600);
+  color: var(--color-on-surface-variant);
 
   summary {
     cursor: pointer;
@@ -499,13 +499,13 @@
   &__text {
     margin-top: 0.25rem;
     padding-left: 0.5rem;
-    border-left: 2px solid var(--greyBorder);
+    border-left: 2px solid var(--color-outline);
   }
 }
 
 .ai-assistant-tool {
   font-size: 0.8rem;
-  color: var(--colorGrey600);
+  color: var(--color-on-surface-variant);
 
   &--running::after {
     content: '…';
@@ -513,7 +513,7 @@
 
   &__failed {
     margin-left: 0.5rem;
-    color: var(--red);
+    color: var(--color-error);
   }
 
   &__interrupted {
@@ -523,9 +523,9 @@
 }
 
 .ai-record-data-notice {
-  border-top: 1px solid var(--greyBorder);
+  border-top: 1px solid var(--color-outline);
   padding: 0.5rem 0.75rem;
-  color: var(--colorGrey700);
+  color: var(--color-on-surface-variant);
 }
 
 // a tab with suggestions (the button's dot is in AssistantButton.scss)
@@ -535,7 +535,7 @@
   height: 6px;
   margin-left: 0.35rem;
   border-radius: 50%;
-  background-color: var(--orange);
+  background-color: var(--color-warning);
   vertical-align: middle;
 }
 
@@ -551,14 +551,14 @@
   gap: 0.35rem;
 
   &__card {
-    border: 1px solid var(--greyBorder);
-    border-left: 3px solid var(--orange);
+    border: 1px solid var(--color-outline);
+    border-left: 3px solid var(--color-warning);
     border-radius: 6px;
 
     &:hover,
     &:focus-within {
-      border-color: var(--colorPrimary);
-      border-left-color: var(--orange);
+      border-color: var(--color-primary);
+      border-left-color: var(--color-warning);
     }
   }
 
@@ -574,7 +574,7 @@
     cursor: pointer;
 
     &:focus-visible {
-      outline: 2px solid var(--colorPrimary);
+      outline: 2px solid var(--color-primary);
       outline-offset: 1px;
     }
   }
@@ -593,8 +593,8 @@
     width: 6px;
     height: 6px;
     margin-right: 0.15rem;
-    border-right: 1.5px solid var(--colorGrey600);
-    border-bottom: 1.5px solid var(--colorGrey600);
+    border-right: 1.5px solid var(--color-on-surface-variant);
+    border-bottom: 1.5px solid var(--color-on-surface-variant);
     transform: rotate(-45deg);
   }
 

@@ -1,6 +1,6 @@
 import './AiExplainPanel.scss'
 
-import React, { useCallback, useEffect, useRef } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import { AiWorkflows, getAiErrorKey, getAiErrorMessage } from '@webapp/ai/workflows'

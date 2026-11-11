@@ -1,7 +1,5 @@
 import './ChangeItem.scss'
 
-import React from 'react'
-
 import { useI18nT } from '@webapp/store/system'
 
 import type { CardValue } from './changeSetCardModel'

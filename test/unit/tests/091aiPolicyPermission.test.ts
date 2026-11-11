@@ -1,4 +1,4 @@
-import * as Authorizer from '@core/auth/authorizer'
+import { canEditSurveyAiPolicy } from '@common/ai/policy'
 import * as AuthGroup from '@core/auth/authGroup'
 
 import { createRequireSurveyAiPolicyEditPermission } from '@server/modules/auth/authApiMiddleware'
@@ -12,39 +12,31 @@ const userWithGroup = (groupName: string, uuid = 'u-1') =>
   ({ uuid, name: `user ${groupName}`, authGroups: [{ name: groupName, surveyUuid }] }) as any
 const systemAdmin = { uuid: 'sa', name: 'admin', authGroups: [{ name: AuthGroup.groupNames.systemAdmin }] } as any
 
-describe('Authorizer.canEditSurveyAiPolicy', () => {
+describe('canEditSurveyAiPolicy', () => {
   test('system admin can edit', () => {
-    expect(Authorizer.canEditSurveyAiPolicy(systemAdmin, surveyInfo as any)).toBe(true)
+    expect(canEditSurveyAiPolicy(systemAdmin, surveyInfo as any)).toBe(true)
   })
 
   test('survey admin of the survey can edit', () => {
-    expect(Authorizer.canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyAdmin), surveyInfo as any)).toBe(
-      true
-    )
+    expect(canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyAdmin), surveyInfo as any)).toBe(true)
   })
 
   test('survey editor cannot edit', () => {
-    expect(Authorizer.canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyEditor), surveyInfo as any)).toBe(
-      false
-    )
+    expect(canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyEditor), surveyInfo as any)).toBe(false)
   })
 
   test('data editor and viewer cannot edit', () => {
-    expect(Authorizer.canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.dataEditor), surveyInfo as any)).toBe(
-      false
-    )
-    expect(Authorizer.canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyGuest), surveyInfo as any)).toBe(
-      false
-    )
+    expect(canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.dataEditor), surveyInfo as any)).toBe(false)
+    expect(canEditSurveyAiPolicy(userWithGroup(AuthGroup.groupNames.surveyGuest), surveyInfo as any)).toBe(false)
   })
 
   test('admin of another survey cannot edit', () => {
     const user = { uuid: 'x', authGroups: [{ name: AuthGroup.groupNames.surveyAdmin, surveyUuid: 'other' }] } as any
-    expect(Authorizer.canEditSurveyAiPolicy(user, surveyInfo as any)).toBe(false)
+    expect(canEditSurveyAiPolicy(user, surveyInfo as any)).toBe(false)
   })
 
   test('no user cannot edit', () => {
-    expect(Authorizer.canEditSurveyAiPolicy(null, surveyInfo as any)).toBe(false)
+    expect(canEditSurveyAiPolicy(null, surveyInfo as any)).toBe(false)
   })
 })
 

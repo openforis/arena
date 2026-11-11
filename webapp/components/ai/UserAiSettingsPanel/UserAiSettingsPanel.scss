@@ -1,8 +1,8 @@
 // small texts: the status tokens darkened to at least 4.5:1 on white and on their 12% tint
 // (the tokens themselves stay on the borders and tints)
-$text-ok: color-mix(in srgb, var(--green) 60%, black);
-$text-warn: color-mix(in srgb, var(--orange) 55%, black);
-$text-bad: color-mix(in srgb, var(--red) 60%, black);
+$text-ok: color-mix(in srgb, var(--color-success) 60%, black);
+$text-warn: color-mix(in srgb, var(--color-warning) 55%, black);
+$text-bad: color-mix(in srgb, var(--color-error) 60%, black);
 
 .user-ai-settings-panel {
   display: flex;
@@ -20,7 +20,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     min-width: 0;
     margin: 0;
     padding: 0.5rem 0.75rem 0.75rem;
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 4px;
 
     > legend {
@@ -28,22 +28,22 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
       padding: 0 0.5rem;
       font-size: 0.85rem;
       font-weight: 600;
-      color: var(--colorGrey700);
+      color: var(--color-on-surface-variant);
       text-align: center;
     }
   }
 
   &__status {
-    background: $colorSurfaceVariant;
-    border: 1px solid shade($colorOutline, 30%);
+    background: var(--color-surface-variant);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 4px;
     padding: 0.5rem 0.75rem;
     font-size: 0.9rem;
     text-align: center;
 
     &--missing {
-      background: color-mix(in srgb, var(--red) 10%, transparent);
-      border-color: var(--red);
+      background: color-mix(in srgb, var(--color-error) 10%, transparent);
+      border-color: var(--color-error);
     }
   }
 
@@ -59,26 +59,26 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
 
     &--ok {
       color: $text-ok;
-      border-color: var(--green);
-      background: color-mix(in srgb, var(--green) 12%, transparent);
+      border-color: var(--color-success);
+      background: color-mix(in srgb, var(--color-success) 12%, transparent);
     }
 
     &--warn {
       color: $text-warn;
-      border-color: var(--orange);
-      background: color-mix(in srgb, var(--orange) 12%, transparent);
+      border-color: var(--color-warning);
+      background: color-mix(in srgb, var(--color-warning) 12%, transparent);
     }
 
     &--bad {
       color: $text-bad;
-      border-color: var(--red);
-      background: color-mix(in srgb, var(--red) 12%, transparent);
+      border-color: var(--color-error);
+      background: color-mix(in srgb, var(--color-error) 12%, transparent);
     }
   }
 
   &__hint {
     font-size: 0.8rem;
-    color: $colorOnSurfaceVariant;
+    color: var(--color-on-surface-variant);
 
     &--error {
       color: $text-bad;
@@ -93,7 +93,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     padding: 0;
     border: none;
     background: none;
-    color: var(--blueDark);
+    color: var(--color-on-primary-container);
     font: inherit;
     text-decoration: underline;
     cursor: pointer;
@@ -110,11 +110,11 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     font-weight: 600;
 
     &--none {
-      color: var(--colorGrey700);
+      color: var(--color-on-surface-variant);
     }
 
     &--schema {
-      color: var(--blueDark);
+      color: var(--color-on-primary-container);
     }
 
     &--data {
@@ -149,7 +149,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
   &__levels {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 4px;
     overflow: hidden;
   }
@@ -161,8 +161,8 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     gap: 0.25rem;
     padding: 0.5rem 0.25rem;
     border: 0;
-    border-left: 1px solid var(--colorGrey500);
-    background: var(--white, #fff);
+    border-left: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
+    background: var(--color-surface);
     font: inherit;
     font-size: 0.8rem;
     font-weight: 600;
@@ -174,13 +174,13 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     }
 
     &:focus-visible {
-      outline: 2px solid var(--blueDark);
+      outline: 2px solid var(--color-on-primary-container);
       outline-offset: -3px;
     }
 
     &--on {
-      background: var(--blue);
-      color: #fff;
+      background: var(--color-primary);
+      color: var(--color-on-primary);
     }
   }
 
@@ -192,16 +192,16 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
       width: 0.6rem;
       height: 0.25rem;
       border-radius: 2px;
-      background: var(--colorGrey300);
+      background: var(--color-surface-variant);
 
       &.is-filled {
-        background: var(--blue);
+        background: var(--color-primary);
       }
     }
   }
 
   &__level--on &__level-bar i.is-filled {
-    background: #fff;
+    background: var(--color-surface);
   }
 
   &__classes {
@@ -216,12 +216,12 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     gap: 0.15rem;
     padding: 0.4rem 0.6rem;
     border-radius: 4px;
-    background: var(--colorGrey300);
-    color: var(--colorGrey700);
+    background: var(--color-surface-variant);
+    color: var(--color-on-surface-variant);
     font-size: 0.8rem;
 
     &--in {
-      background: color-mix(in srgb, var(--green) 15%, transparent);
+      background: color-mix(in srgb, var(--color-success) 15%, transparent);
       color: inherit;
     }
   }
@@ -263,7 +263,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     align-items: center;
     gap: 0.3rem;
     padding: 0.15rem 0.5rem;
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 999px;
     font-size: 0.78rem;
 
@@ -282,9 +282,9 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     }
 
     &--on {
-      border-color: var(--blue);
-      background: color-mix(in srgb, var(--blue) 10%, transparent);
-      color: var(--blueDark);
+      border-color: var(--color-primary);
+      background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+      color: var(--color-on-primary-container);
 
       button::before {
         content: '✓ ';
@@ -305,7 +305,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     cursor: help;
 
     &:focus-visible {
-      outline: 2px solid var(--blueDark);
+      outline: 2px solid var(--color-on-primary-container);
       outline-offset: 1px;
     }
   }
@@ -321,7 +321,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     margin: 0;
     padding: 0;
     list-style: none;
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 6px;
   }
 
@@ -333,11 +333,11 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     padding: 0.5rem 0.6rem;
 
     & + & {
-      border-top: 1px solid var(--colorGrey500);
+      border-top: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     }
 
     &--default {
-      background: color-mix(in srgb, var(--blueDark) 6%, transparent);
+      background: color-mix(in srgb, var(--color-on-primary-container) 6%, transparent);
     }
   }
 
@@ -362,7 +362,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
     gap: 0.4rem;
     min-width: 0;
     font-size: 0.8rem;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 
   &__provider-model {
@@ -371,7 +371,7 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
 
   &__where {
     padding: 0 0.45rem;
-    border: 1px solid var(--colorGrey500);
+    border: 1px solid color-mix(in srgb, var(--color-outline), var(--color-on-surface) 30%);
     border-radius: 1rem;
     white-space: nowrap;
   }
@@ -388,8 +388,8 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
   &__default {
     padding: 0.05rem 0.45rem;
     border-radius: 4px;
-    background: var(--blueDark);
-    color: #fff;
+    background: var(--color-on-primary-container);
+    color: var(--color-on-primary);
     font-size: 0.75rem;
     font-weight: 600;
   }
@@ -400,6 +400,6 @@ $text-bad: color-mix(in srgb, var(--red) 60%, black);
 
   &__footer-hint {
     font-size: 0.8rem;
-    color: var(--colorGrey700);
+    color: var(--color-on-surface-variant);
   }
 }

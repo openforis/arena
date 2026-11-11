@@ -1,7 +1,7 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { findNodeEditRefusal, NodeEditRefusal } from '@core/record/nodeEditRefusal'
 import { isNodeDefValueEditable } from '@core/record/nodeValueParser'
 

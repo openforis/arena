@@ -1,6 +1,6 @@
 import './AiBatchProgressDialog.scss'
 
-import React, { useCallback, useState } from 'react'
+import { useCallback, useState } from 'react'
 
 import type { AiBatchProgress } from '@webapp/ai/workflows/batchRun'
 import { Button } from '@webapp/components/buttons'

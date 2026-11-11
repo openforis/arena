@@ -1,7 +1,7 @@
 import { useCallback } from 'react'
 import { useStore } from 'react-redux'
 
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 
 import type { AiCurrentView, AiToolContext } from '@webapp/ai/tools/types'
 import * as SurveyState from '@webapp/store/survey/state'

@@ -59,6 +59,7 @@ export const run = async () => {
     initialMiddlewares: [...(httpRequestLogger ? [httpRequestLogger] : []), stripServerOnlyPrefsFromLoginResponse],
   })
   const { express: app, serviceRegistry } = arenaApp
+  registerArenaServerServices(serviceRegistry)
   // arena-server's user service cannot update the prefs (it throws), which its login uses when the current survey of
   // the user cannot be loaded
   serviceRegistry.registerService(

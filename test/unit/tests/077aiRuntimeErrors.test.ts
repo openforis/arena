@@ -26,9 +26,13 @@ describe('runtime errors', () => {
     const apiError = Object.assign(new Error('403'), {
       response: { data: { key: 'appErrors:unauthorized', params: { user: 'u' } } },
     })
-    expect(getAiErrorMessage({ error: apiError, i18n })).toBe('appErrors:unauthorized{"user":"u","interpolation":{"escapeValue":false}}')
+    expect(getAiErrorMessage({ error: apiError, i18n })).toBe(
+      'appErrors:unauthorized{"user":"u","interpolation":{"escapeValue":false}}'
+    )
     const plainKey = Object.assign(new Error('x'), { response: { data: { key: 'surveyNotFound' } } })
-    expect(getAiErrorMessage({ error: plainKey, i18n })).toBe('appErrors:surveyNotFound{"interpolation":{"escapeValue":false}}')
+    expect(getAiErrorMessage({ error: plainKey, i18n })).toBe(
+      'appErrors:surveyNotFound{"interpolation":{"escapeValue":false}}'
+    )
   })
 
   test('detects aborts', () => {

@@ -1,6 +1,6 @@
 import './ChangeSetReviewDialog.scss'
 
-import React, { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useEffect, useId, useMemo, useRef, useState } from 'react'
 
 import type { ChangeSetCardState } from '@webapp/ai/changeSets/types'
 import { Button, ButtonIconClose } from '@webapp/components/buttons'

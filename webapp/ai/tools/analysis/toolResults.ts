@@ -1,5 +1,5 @@
 import * as Survey from '@core/survey/survey'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { getEffectiveQueryLang } from '@common/ai/tasks/dataQuery'
 
 import { AiToolFailure } from '@webapp/ai/tools/toolFailure'

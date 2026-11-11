@@ -17,7 +17,7 @@ import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { AskAssistantButton } from './AskAssistantButton'
 
 const Row = (props) => {
-  const { rowNo, row, askAssistantAvailable = false } = props
+  const { item: row, itemPosition: rowNo, askAssistantAvailable = false } = props
 
   const lang = useSurveyPreferredLang()
   const user = useUser()
@@ -68,8 +68,8 @@ const Row = (props) => {
 }
 
 Row.propTypes = {
-  row: PropTypes.object.isRequired,
-  rowNo: PropTypes.number.isRequired,
+  item: PropTypes.object.isRequired,
+  itemPosition: PropTypes.number.isRequired,
   askAssistantAvailable: PropTypes.bool,
 }
 

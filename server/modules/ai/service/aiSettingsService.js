@@ -29,7 +29,7 @@ import {
 /**
  * Returns the user-facing settings (no secrets) for the AI settings panel.
  * @param {object} user - Arena user.
- * @returns {object} The access level, toggles, default provider and the public entries of the account providers.
+ * @returns {any} The access level, toggles, default provider and the public entries of the account providers.
  */
 export const getPublicSettings = (user) => {
   const raw = getRawPrefs(user)
@@ -62,7 +62,7 @@ export const buildSavedAiPrefs = ({ existing, update }) =>
  * @param {object} args.user - The user.
  * @param {object} args.update - Request body (untrusted).
  * @param {object} [args.deps] - Writer dependencies (see aiPrefsWriter).
- * @returns {Promise<object>} The user with the AI prefs as stored.
+ * @returns {Promise<any>} The user with the AI prefs as stored.
  */
 export const saveSettings = async ({ user, update, deps = createDefaultAiPrefsWriterDeps() }) =>
   changeAiPrefs({ user, deps, change: (existing) => buildSavedAiPrefs({ existing, update }) })

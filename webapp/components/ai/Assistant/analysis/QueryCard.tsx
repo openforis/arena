@@ -1,6 +1,6 @@
 import './QueryCard.scss'
 
-import React, { useCallback, useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDispatch } from 'react-redux'
 import { useNavigate } from 'react-router'
 

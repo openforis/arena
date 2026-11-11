@@ -102,6 +102,9 @@ export default {
     dataMigrationInProgress: 'この調査はアップグレード中です。しばらくしてから再度お試しください。',
     fileNotFound: 'ファイルが見つかりません',
     nodeDefRefLocked: '{{name}} は公開済みのため、カテゴリーまたは分類を変更できません。',
+    languageCodeInvalid: '言語コードが無効です：{{lang}}',
+    cycleKeysInvalid: 'サイクルは1から始まる連番である必要があります',
+    srsCodeInvalid: '空間参照系のコードが無効です：{{code}}',
   },
   unsupportedFunctionType: 'サポートされていない関数の型です：{{exprType}}',
   // AI gateway errors

@@ -24,6 +24,11 @@ type TestFixtures = {
    * (access level, toggles, providers, default provider) that another one left.
    */
   aiPrefsReset: void
+  /**
+   * When set, overrides the experimental features flag (EXPERIMENTAL_FEATURES) of the server config read by the web app,
+   * so the test does not depend on how the server is started; undefined (default): the server setting.
+   */
+  experimentalFeatures: boolean | undefined
   api: ArenaApi
   /**
    * A new, empty survey, created before the test and set as current survey of the test user.
@@ -76,7 +81,9 @@ export const test = base.extend<TestFixtures, WorkerFixtures>({
     { auto: true },
   ],
 
-  context: async ({ context, authenticated, testUser, baseURL }, use) => {
+  experimentalFeatures: [undefined, { option: true }],
+
+  context: async ({ context, authenticated, experimentalFeatures, testUser, baseURL }, use) => {
     // do not send analytics from the tests
     await context.route(/google-analytics\.com|googletagmanager\.com/, (route) => route.abort())
     if (experimentalFeatures !== undefined) {

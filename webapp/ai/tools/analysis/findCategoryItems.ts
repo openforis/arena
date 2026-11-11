@@ -4,7 +4,7 @@ import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Category from '@core/survey/category'
 import * as CategoryItem from '@core/survey/categoryItem'
-import * as Authorizer from '@core/auth/authorizer'
+import { Authorizer } from '@openforis/arena-core'
 import { ColumnNodeDef } from '@common/model/db/tables/dataNodeDef'
 
 import { findNodeDefByName } from '@webapp/ai/tools/common/nodeDefLookup'
