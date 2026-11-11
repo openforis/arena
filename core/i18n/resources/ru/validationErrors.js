@@ -13,6 +13,15 @@ export default {
   requiredField: 'Поле {{field}} обязательно',
   rowsDuplicate: 'строка: {{row}} дублирующая строка: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `Функция "{{name}}" не разрешена`,
+    expressionInvalid: `"{{text}}" не допускается в выражении`,
+    expressionRequired: 'Выражение обязательно',
+    expressionUnbalancedParentheses: 'Несбалансированные скобки',
+    expressionUnknownColumn: `"{{name}}" не является столбцом сущности`,
+    expressionUnterminatedQuote: 'Незакрытые кавычки',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Метка на языке по умолчанию для опроса обязательна',
     analysisNodeDefsRequired: 'Требуется хотя бы один вычисляемый атрибут',

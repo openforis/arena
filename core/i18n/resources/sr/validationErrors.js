@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} je obavezno',
   rowsDuplicate: 'red: {{row}} duplirani red: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `Funkcija "{{name}}" nije dozvoljena`,
+    expressionInvalid: `"{{text}}" nije dozvoljeno u izrazu`,
+    expressionRequired: 'Izraz je obavezan',
+    expressionUnbalancedParentheses: 'Neuravnotežene zagrade',
+    expressionUnknownColumn: `"{{name}}" nije kolona entiteta`,
+    expressionUnterminatedQuote: 'Tekst pod navodnicima nije zatvoren',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Oznaka na podrazumijevanom jeziku istraživanja je obavezna',
     analysisNodeDefsRequired: 'Obavezan je najmanje jedan izračunati atribut',

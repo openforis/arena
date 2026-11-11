@@ -14,6 +14,7 @@ export default {
     tooManyLayers: 'At most {{max}} custom map layers can be added',
     busy: 'The server is busy loading other services: try again in a moment',
   },
+  aggregateFunctionInvalid: `Custom aggregate function "{{name}}" is not valid: edit it to fix it`,
   cannotGetChild: `Cannot get child '{{childName}}' from attribute {{name}}`,
   cannotImportFilesExceedingQuota: 'Cannot import record files: files storage quota would be exceeded',
   cannotInsertFileExceedingQuota: 'Cannot insert file: files storage quota would be exceeded',

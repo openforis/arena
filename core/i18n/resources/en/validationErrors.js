@@ -13,6 +13,15 @@ export default {
   requiredField: '{{field}} is required',
   rowsDuplicate: 'row: {{row}} duplicate row: {{duplicateRow}}',
 
+  aggregateFunction: {
+    expressionFunctionNotAllowed: `Function "{{name}}" is not allowed`,
+    expressionInvalid: `"{{text}}" is not allowed in the expression`,
+    expressionRequired: 'Expression required',
+    expressionUnbalancedParentheses: 'Unbalanced parentheses',
+    expressionUnknownColumn: `"{{name}}" is not a column of the entity`,
+    expressionUnterminatedQuote: 'Unterminated quoted text',
+  },
+
   analysis: {
     labelDefaultLangRequired: 'Label in survey default language is required',
     analysisNodeDefsRequired: 'At least one calculated attribute is required',

@@ -28,6 +28,7 @@ export default {
   userCannotDeleteSelf: 'No puede eliminar su propia cuenta de usuario',
   userEmailInvalid:
     'El correo electrónico de invitación no se pudo entregar a {{email}}; compruebe que la dirección sea correcta',
+  aggregateFunctionInvalid: `La función de agregación personalizada "{{name}}" no es válida: edítela para corregirla`,
   cannotGetChild: "No se puede obtener el hijo '{{childName}}' del atributo {{name}}",
   cannotImportFilesExceedingQuota:
     'No se pueden importar archivos de registro: se excedería la cuota de almacenamiento de archivos',

@@ -26,6 +26,7 @@ export default {
     'Este usuário não pode ser excluído: ele é proprietário de {{count}} inventário(s); transfira a propriedade primeiro',
   userCannotDeleteSelf: 'Você não pode excluir sua própria conta de usuário',
   userEmailInvalid: 'O email de convite não pôde ser entregue a {{email}}; verifique se o endereço está correto',
+  aggregateFunctionInvalid: `A função agregada personalizada "{{name}}" não é válida: edite-a para corrigi-la`,
   cannotGetChild: `Não foi possível obter o filho '{{childName}}' do atributo {{name}}`,
   cannotImportFilesExceedingQuota:
     'Não é possível importar arquivos de registros: a cota de armazenamento seria excedida',

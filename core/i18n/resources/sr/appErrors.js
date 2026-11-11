@@ -14,6 +14,7 @@ export default {
     tooManyLayers: 'Može se dodati najviše {{max}} prilagođenih slojeva mape',
     busy: 'Server je zauzet učitavanjem drugih servisa: pokušajte ponovo za trenutak',
   },
+  aggregateFunctionInvalid: `Prilagođena agregatna funkcija "{{name}}" nije važeća: izmenite je da biste je ispravili`,
   cannotGetChild: `Nije moguće dobiti podređeni čvor '{{childName}}' iz atributa {{name}}`,
   cannotImportFilesExceedingQuota:
     'Nije moguće uvesti fajlove zapisa: kvota za skladištenje fajlova bi bila prekoračena',
