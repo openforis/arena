@@ -8,6 +8,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { NodeValues } from '../nodeValues'
+import { RecordEvaluationContext } from '../recordEvaluationContext'
 import * as RecordReader from './recordReader'
 
 import { updateAttributeValue } from './recordNodeValueUpdater'
@@ -216,17 +217,10 @@ const _replaceUpdatedNodesInEntities = ({
 }
 
 export const replaceUpdatedNodes =
-  ({
-    user,
-    survey,
-    recordSource,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
-    sideEffect = false,
-  }) =>
+  ({ recordSource, sideEffect = false, ...otherParams }) =>
   async (recordTarget) => {
+    const context = RecordEvaluationContext.extract(otherParams)
+    const { survey } = context
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
     if (Node.getUuid(rootTarget) !== Node.getUuid(rootSource)) {
@@ -243,17 +237,7 @@ export const replaceUpdatedNodes =
       passiveNodeUuids,
       sideEffect,
     })
-    return _afterNodesUpdateExceptPassiveNodes({
-      user,
-      survey,
-      updateResult,
-      passiveNodeUuids,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
-      timezoneOffset,
-      sideEffect,
-    })
+    return _afterNodesUpdateExceptPassiveNodes({ ...context, updateResult, passiveNodeUuids, sideEffect })
   }
 
 const _recalculateNodeHierarchy = ({ parentEntity, node }) => {
@@ -535,17 +519,10 @@ const _mergeRecordsNodes = ({
 }
 
 export const mergeRecords =
-  ({
-    user,
-    survey,
-    recordSource,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
-    sideEffect = false,
-  }) =>
+  ({ recordSource, sideEffect = false, ...otherParams }) =>
   async (recordTarget) => {
+    const context = RecordEvaluationContext.extract(otherParams)
+    const { survey } = context
     const { cycle } = recordTarget
     const rootSource = RecordReader.getRootNode(recordSource)
     const rootTarget = RecordReader.getRootNode(recordTarget)
@@ -577,15 +554,5 @@ export const mergeRecords =
         })
       })
     }
-    return _afterNodesUpdateExceptPassiveNodes({
-      user,
-      survey,
-      updateResult,
-      passiveNodeUuids,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
-      timezoneOffset,
-      sideEffect,
-    })
+    return _afterNodesUpdateExceptPassiveNodes({ ...context, updateResult, passiveNodeUuids, sideEffect })
   }

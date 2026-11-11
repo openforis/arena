@@ -33,11 +33,9 @@ import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenera
 import { db } from '@server/db/db'
 import * as JobManager from '@server/job/jobManager'
 import * as ActivityLogService from '@server/modules/activityLog/service/activityLogService'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as SurveyFileService from '@server/modules/survey/service/surveyFileService'
 import * as SurveyRdbManager from '@server/modules/surveyRdb/manager/surveyRdbManager'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as FileUtils from '@server/utils/file/fileUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as Response from '@server/utils/response'
@@ -62,10 +60,6 @@ import VaidationReportGenerationJob from './validationReportGenerationJob'
 import { resolveValidationReportParams } from './validationReportParams'
 
 const Logger = Log.getLogger('RecordService')
-
-const categoryItemProvider = CategoryItemProviderDefault
-const taxonProvider = TaxonProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 // The socket-to-record association is only delivery bookkeeping ("which sockets should be notified
 // about updates to this record"): it must never make the record read/write it's attached to fail.
@@ -657,11 +651,8 @@ export const mergeRecords = async (
     )
 
     const { record: recordTargetUpdated, nodes: nodesUpdated } = await Record.mergeRecords({
-      survey,
+      ...createRecordEvaluationContext({ user, survey }),
       recordSource,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
       sideEffect: true,
     })(recordTarget)
 

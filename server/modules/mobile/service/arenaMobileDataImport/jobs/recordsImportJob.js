@@ -11,12 +11,10 @@ import SystemError from '@core/systemError'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
 import DataImportBaseJob from '@server/modules/dataImport/service/DataImportJob/DataImportBaseJob'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 import { checkNodeIsValid } from './recordNodeChecks'
 import {
@@ -29,10 +27,6 @@ const resultKeys = {
   mergedRecordsMap: 'mergedRecordsMap',
   mergedSameRecordUuids: 'mergedSameRecordUuids',
 }
-
-const categoryItemProvider = CategoryItemProviderDefault
-const taxonProvider = TaxonProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 export default class RecordsImportJob extends DataImportBaseJob {
   constructor(params) {
@@ -227,10 +221,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     }
 
     const recordUpdateParams = {
-      survey,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
+      ...createRecordEvaluationContext({ user, survey }),
       recordSource: record,
       sideEffect: true,
     }

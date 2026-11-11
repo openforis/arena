@@ -12,9 +12,10 @@ import * as Validation from '@core/validation/validation'
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as RecordManager from '@server/modules/record/manager/recordManager'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import {
+  createRecordEvaluationContext,
+  RecordProvidersDefault,
+} from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
 import { DataImportFlatDataFileReader } from './dataImportFlatDataFileReader'
@@ -25,10 +26,6 @@ import { DataImportFileReader } from './dataImportFileReader'
 const defaultErrorKey = 'error'
 // Maximum time (ms) spent processing rows without letting the event loop process timers and messages.
 const eventLoopYieldIntervalMillis = 200
-
-const categoryItemProvider = CategoryItemProviderDefault
-const taxonProvider = TaxonProviderDefault
-const areaOfInterestProvider = AreaOfInterestProviderDefault
 
 const determineAncestorMultipleEntityDefUuid = ({ survey, nodeDefUuid }) => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
@@ -187,8 +184,8 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       stream,
       fileFormat,
       survey,
-      categoryItemProvider,
-      taxonProvider,
+      categoryItemProvider: RecordProvidersDefault.categoryItemProvider,
+      taxonProvider: RecordProvidersDefault.taxonProvider,
       cycle,
       nodeDefUuid,
       includeFiles,
@@ -216,6 +213,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     this.flatDataReader?.cancel()
   }
 
+  getRecordEvaluationContext() {
+    const { survey, user } = this.context
+    return createRecordEvaluationContext({ user, survey })
+  }
+
   async fetchOrCreateRecord({ valuesByDefUuid }) {
     const { currentRecord, context, tx } = this
     const flushCallback = async () => {
@@ -234,7 +236,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
 
   async onRowItem({ valuesByDefUuid, refDataByDefUuid, errors }) {
     const { context } = this
-    const { survey, includeFiles, insertMissingNodes, user } = context
+    const { includeFiles, insertMissingNodes } = context
 
     await this.yieldToEventLoopIfNeeded()
 
@@ -274,14 +276,10 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       }
 
       const { entity, updateResult: entityUpdateResult } = await Record.getOrCreateEntityByKeys({
-        user,
-        survey,
+        ...this.getRecordEvaluationContext(),
         entityDefUuid: this.ancestorMultipleEntityDefUuid,
         valuesByDefUuid,
         refDataByDefUuid,
-        categoryItemProvider,
-        taxonProvider,
-        areaOfInterestProvider,
         insertMissingNodes,
         sideEffect,
         updateDependents: false,
@@ -302,14 +300,11 @@ export default class FlatDataImportJob extends DataImportBaseJob {
       await this.clearMultipleAttributeValues({ entity, valuesByDefUuid, sideEffect })
 
       const updateResultUpdateAttributes = await Record.updateAttributesInEntityWithValues({
-        survey,
+        ...this.getRecordEvaluationContext(),
         entity,
         valuesByDefUuid,
         refDataByDefUuid,
         sideEffect,
-        categoryItemProvider,
-        taxonProvider,
-        areaOfInterestProvider,
         updateDependents: false,
       })(this.currentRecord)
 
@@ -366,7 +361,7 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     const pendingNodesByUuid = this.nodesPendingDependentsUpdateByUuid
     if (pendingNodesByUuid.size === 0) return
 
-    const { survey, includeFiles, user } = context
+    const { includeFiles } = context
 
     const nodesUpdated = {}
     pendingNodesByUuid.forEach((_node, nodeUuid) => {
@@ -380,13 +375,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     if (Object.keys(nodesUpdated).length === 0) return
 
     const { record: recordUpdated, nodes: nodesUpdatedWithDependents } = await Record.afterNodesUpdate({
-      user,
-      survey,
+      ...this.getRecordEvaluationContext(),
       record: currentRecord,
       nodes: nodesUpdated,
-      categoryItemProvider,
-      taxonProvider,
-      areaOfInterestProvider,
       sideEffect: !includeFiles,
     })
     this.currentRecord = recordUpdated
@@ -439,10 +430,9 @@ export default class FlatDataImportJob extends DataImportBaseJob {
     if (multipleAttributeDefsBeingUpdated.length > 0 && !this.entitiesWithMultipleAttributesClearedByUuid[entityUuid]) {
       const nodeDefUuidsToClear = multipleAttributeDefsBeingUpdated.map(NodeDef.getUuid)
       const entityClearUpdateResult = await Record.deleteNodesInEntityByNodeDefUuid({
-        survey,
+        ...this.getRecordEvaluationContext(),
         entity,
         nodeDefUuids: nodeDefUuidsToClear,
-        areaOfInterestProvider,
         sideEffect,
       })(this.currentRecord)
 

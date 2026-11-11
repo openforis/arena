@@ -4,9 +4,7 @@ import * as NodeRefData from '@core/record/nodeRefData'
 import * as Record from '@core/record/record'
 import * as Survey from '@core/survey/survey'
 
-import { CategoryItemProviderDefault } from '@server/modules/category/manager/categoryItemProviderDefault'
-import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProviderDefault'
-import { AreaOfInterestProviderDefault } from '@server/modules/survey/manager/areaOfInterestProviderDefault'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 type PreviewParams = {
   user: any
@@ -25,15 +23,9 @@ const _findNodeDefUuidsToClear = async ({
   lang,
 }: PreviewParams & { nodes: Record<string, any> }): Promise<string[]> => {
   const { clearedDefUuids } = await Record.updateNodesDependents({
-    user,
-    survey,
+    ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang: lang ?? Survey.getDefaultLanguage(survey) }),
     record,
     nodes,
-    categoryItemProvider: CategoryItemProviderDefault,
-    taxonProvider: TaxonProviderDefault,
-    areaOfInterestProvider: AreaOfInterestProviderDefault,
-    timezoneOffset,
-    lang: lang ?? Survey.getDefaultLanguage(survey),
     clearNonApplicableValues: true,
     sideEffect: false,
   })

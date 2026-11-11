@@ -13,6 +13,7 @@ import * as Category from '@core/survey/category'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
+import { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
@@ -67,19 +68,22 @@ const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider
   }
 }
 
-export const afterNodesUpdate = async ({
-  user,
-  survey,
-  record,
-  nodes,
-  passiveNodes = {},
-  categoryItemProvider,
-  taxonProvider,
-  areaOfInterestProvider,
-  timezoneOffset,
-  lang = undefined,
-  sideEffect = false,
-}) => {
+/**
+ * Updates the dependents of the updated nodes, then validates all the updated nodes.
+ * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
+ * @param {!object} params.record - The record.
+ * @param {!object} params.nodes - The updated nodes, indexed by UUID.
+ * @param {object} [params.passiveNodes] - Updated nodes not triggering the dependents update, indexed by UUID.
+ * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
+ * @returns {Promise<RecordUpdateResult>} - The update result.
+ */
+export const afterNodesUpdate = async ({ record, nodes, passiveNodes = {}, sideEffect = false, ...otherParams }) => {
+  const contextParam = RecordEvaluationContext.extract(otherParams)
+  const { survey, categoryItemProvider, taxonProvider } = contextParam
+  // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
+  // fall back to the survey default when no UI language was provided (e.g. background jobs)
+  const context = { ...contextParam, lang: contextParam.lang ?? Survey.getDefaultLanguage(survey) }
+
   // output
   const updateResult = new RecordUpdateResult({ record, nodes })
 
@@ -88,20 +92,7 @@ export const afterNodesUpdate = async ({
   await _populateRefDataForBigNodes({ survey, nodes: passiveNodes, categoryItemProvider, taxonProvider })
 
   // 1. update dependent nodes
-  const updateResultDependents = await updateNodesDependents({
-    user,
-    survey,
-    record,
-    nodes,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
-    timezoneOffset,
-    // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
-    // fall back to the survey default when no UI language was provided (e.g. background jobs)
-    lang: lang ?? Survey.getDefaultLanguage(survey),
-    sideEffect,
-  })
+  const updateResultDependents = await updateNodesDependents({ ...context, record, nodes, sideEffect })
 
   updateResult.merge(updateResultDependents)
 
@@ -113,12 +104,9 @@ export const afterNodesUpdate = async ({
 
   // 2. update node validations
   const nodesValidation = await RecordValidator.validateNodes({
-    survey,
+    ...context,
     record: updateResult.record,
     nodes: updateResult.nodes,
-    categoryItemProvider,
-    taxonProvider,
-    areaOfInterestProvider,
   })
   const recordValidationUpdated = A.pipe(
     Validation.getValidation,
