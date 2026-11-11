@@ -3,6 +3,7 @@ import * as A from '@core/arena'
 import { Objects } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
+import SystemError, { StatusCodes } from '@core/systemError'
 
 import * as Validation from './validation'
 import * as ValidationResult from './validationResult'
@@ -79,6 +80,23 @@ export const validate = async (
   }
 
   return validation
+}
+
+// characters allowed in names
+const nameCharsRegex = /^[a-z0-9_]*$/
+
+/**
+ * Throws a bad request error if one of the names contains characters not allowed in names (lowercase letters, numbers
+ * and "_"): names (e.g. of categories, levels and extra props) are used as export column names and file names and in
+ * expressions. The full name format (e.g. the first letter) is checked by the validation of the item, so that names
+ * being typed (e.g. "2") can be saved.
+ * @param names - The names to check.
+ */
+export const checkNamesAreValid = (names: unknown[]): void => {
+  const nameInvalid = names.find((name) => !A.isNil(name) && (typeof name !== 'string' || !nameCharsRegex.test(name)))
+  if (nameInvalid !== undefined) {
+    throw new SystemError(Validation.messageKeys.nameInvalid, { name: nameInvalid }, StatusCodes.BAD_REQUEST)
+  }
 }
 
 // Validator functions

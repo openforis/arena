@@ -183,12 +183,51 @@ export const validateCategories = async (survey, client = db) => {
 
 // ====== CREATE
 
-// level names are used as export column names (<level name>_code): check them before saving
-const _checkLevelNameIsValid = (name) => {
-  const nameKey = CategoryLevel.keysProps.name
-  const error = Validator.validateName(Validation.messageKeys.nameInvalid)(nameKey, { [nameKey]: name })
-  if (error) {
-    throw new SystemError(error.key, error.params, StatusCodes.BAD_REQUEST)
+// level and item extra prop names are used as export column names and in expressions: check them before saving
+
+/**
+ * Throws a bad request error if the prop value contains invalid names (category name or item extra prop names).
+ * @param {!string} key - The key of the category prop.
+ * @param {unknown} value - The value of the category prop.
+ * @returns {void}
+ */
+export const checkCategoryProp = (key, value) => {
+  if (key === Category.keysProps.name) {
+    Validator.checkNamesAreValid([value])
+  } else if (key === Category.keysProps.itemExtraDef) {
+    Validator.checkNamesAreValid(Object.keys(value ?? {}))
+  }
+}
+
+/**
+ * Throws a bad request error if the prop value is an invalid level name.
+ * @param {!string} key - The key of the level prop.
+ * @param {unknown} value - The value of the level prop.
+ * @returns {void}
+ */
+export const checkLevelProp = (key, value) => {
+  if (key === CategoryLevel.keysProps.name) {
+    Validator.checkNamesAreValid([value])
+  }
+}
+
+/**
+ * Throws a bad request error if the level (published or draft props) has an invalid name.
+ * @param {!object} level - The level to check.
+ * @returns {void}
+ */
+export const checkLevel = (level) => {
+  for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(level)) {
+    checkLevelProp(key, value)
+  }
+}
+
+const _checkCategory = (category) => {
+  for (const [key, value] of ObjectUtils.getPropsAndPropsDraftEntries(category)) {
+    checkCategoryProp(key, value)
+  }
+  for (const level of Category.getLevelsArray(category)) {
+    checkLevel(level)
   }
 }
 
@@ -224,15 +263,16 @@ export const insertLevel = (
   { user, surveyId, level, system = false, addLogs = true, validate = true },
   client = db
 ) => {
-  _checkLevelNameIsValid(CategoryLevel.getName(level))
+  checkLevel(level)
   return client.tx((t) => _insertLevelInTransaction({ user, surveyId, level, system, addLogs, validate, t }))
 }
 
 export const insertCategory = async (
   { user, surveyId, category, system = false, addLogs = true, validate = true, backup = false },
   client = db
-) =>
-  client.tx(async (t) => {
+) => {
+  _checkCategory(category)
+  return client.tx(async (t) => {
     const [categoryDb] = await DbUtils.runQueries(t, [
       () => CategoryRepository.insertCategory({ surveyId, category, backup, client: t }),
       ...Category.getLevelsArray(category).map(
@@ -247,6 +287,7 @@ export const insertCategory = async (
 
     return validate ? _validateCategory({ surveyId, categoryUuid: Category.getUuid(categoryDb) }, t) : categoryDb
   })
+}
 
 /**
  * Clones a category (levels and items included) from another survey into the given survey.
@@ -400,8 +441,9 @@ export const unpublishProps = async (surveyId, client = db) =>
     ])
   )
 
-export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, value, system = false }, client = db) =>
-  client.tx(async (t) => {
+export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, value, system = false }, client = db) => {
+  checkCategoryProp(key, value)
+  return client.tx(async (t) => {
     await DbUtils.runQueries(t, [
       () => CategoryRepository.updateCategoryProp(surveyId, categoryUuid, key, value, t),
       () => markSurveyDraft(surveyId, t),
@@ -423,6 +465,7 @@ export const updateCategoryProp = async ({ user, surveyId, categoryUuid, key, va
     const validateItems = [Category.keysProps.itemExtraDef].includes(key)
     return _validateCategory({ surveyId, categoryUuid, validateLevels, validateItems }, t)
   })
+}
 
 const _updateCategoryItemsExtraDef = async ({ surveyId, categoryUuid, name, itemExtraDef, deleted }, t) => {
   const items = await CategoryRepository.fetchItemsByCategoryUuid({ surveyId, categoryUuid, draft: true }, t)
@@ -469,9 +512,7 @@ export const updateCategoryItemExtraDefItem = async (
 
 export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
   client.tx(async (t) => {
-    if (key === CategoryLevel.keysProps.name) {
-      _checkLevelNameIsValid(value)
-    }
+    checkLevelProp(key, value)
     const [level] = await DbUtils.runQueries(t, [
       () => CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t),
       () => markSurveyDraft(surveyId, t),
