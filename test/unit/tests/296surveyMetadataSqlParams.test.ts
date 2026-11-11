@@ -83,20 +83,18 @@ describe('Survey info validation', () => {
   const newSurveyInfo = (props: Record<string, unknown>) =>
     Survey.newSurvey({ ownerUuid: 'owner-uuid', name: 'survey_test', languages: ['en'], ...props })
 
-  test('language codes with a safe format are valid', async () => {
-    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', 'fr', 'default'] }))
+  test('ISO 639-1 language codes are valid', async () => {
+    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', 'fr', 'zh'] }))
     expect(Validation.isValid(validation)).toBe(true)
   })
 
-  test('language codes with other characters are not valid', async () => {
-    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', langWithQuote] }))
+  test('language codes not in the ISO 639-1 list are not valid', async () => {
+    const validation = await SurveyValidator.validateSurveyInfo(newSurveyInfo({ languages: ['en', 'default'] }))
     const languagesValidation = Validation.getFieldValidation(Survey.infoKeys.languages)(validation)
     expect(getErrorKeys(languagesValidation)).toEqual([Validation.messageKeys.surveyInfoEdit.langInvalid])
-    // codes outside the known list are accepted when they have a safe format
-    expect(SurveyValidator.getInvalidLanguageCodes(['en', 'default', 'fr CA', langWithQuote])).toEqual([
-      'fr CA',
-      langWithQuote,
-    ])
+    expect(
+      SurveyValidator.getInvalidLanguageCodes(['en', 'default', 'eng', 'pt-BR', 'EN', 'constructor', langWithQuote])
+    ).toEqual(['default', 'eng', 'pt-BR', 'EN', 'constructor', langWithQuote])
   })
 
   test('the language of a new survey must be a valid code', async () => {

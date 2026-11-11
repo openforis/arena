@@ -1,5 +1,5 @@
 import * as A from '@core/arena'
-import { isLanguageCodeFormatValid } from '@core/app/languages'
+import { languageCodes } from '@core/app/languages'
 import * as Survey from '@core/survey/survey'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
@@ -29,11 +29,11 @@ const validateFieldManualLinks = (_propName, survey) => {
 }
 
 /**
- * Returns the language codes with an invalid format (e.g. containing quotes, spaces or commas).
+ * Returns the language codes not supported by Arena (not in the ISO 639-1 list).
  * @param {string[]} languages - The language codes to check.
  * @returns {string[]} - The invalid language codes.
  */
-export const getInvalidLanguageCodes = (languages) => languages.filter((lang) => !isLanguageCodeFormatValid(lang))
+export const getInvalidLanguageCodes = (languages) => languages.filter((lang) => !languageCodes.includes(lang))
 
 const validateLanguageCodes = (propName, obj) => {
   const value = Validator.getProp(propName)(obj)

@@ -243,36 +243,50 @@ describe('odkImport / xform', () => {
     expect(translations['/data/name:label']).toEqual({
       en: 'Name',
       pt: 'Nome',
-      // a code not in Arena's known ISO 639-1 list is kept as it is
-      'xx-made-up': '???',
+      // "xx-made-up" is not an ISO 639-1 code: its texts are used only where the default language has none
     })
   })
 
-  test('getItextTranslations keeps languages without a code, replacing the characters not allowed in codes', () => {
-    // XLSForm puts the "label" column (without language) in a "default" translation
-    const xformWithDefaultLang = XForm.parseXForm(`<?xml version="1.0"?>
+  describe('getItextTranslations with languages not supported by Arena', () => {
+    const xformWithTranslations = (translationsXml: string) =>
+      XForm.parseXForm(`<?xml version="1.0"?>
 <h:html xmlns:h="http://www.w3.org/1999/xhtml" xmlns="http://www.w3.org/2002/xforms">
   <h:head>
     <model>
-      <itext>
-        <translation lang="default" default="true()">
-          <text id="/data/name:label"><value>Name</value></text>
-        </translation>
-        <translation lang="English (en)">
-          <text id="/data/name:label"><value>Name (en)</value></text>
-        </translation>
-        <translation lang="Bahasa Indonesia">
-          <text id="/data/name:label"><value>Nama</value></text>
-        </translation>
-      </itext>
+      <itext>${translationsXml}</itext>
       <instance><data id="x"><name/></data></instance>
     </model>
   </h:head>
   <h:body><input ref="/data/name"><label ref="jr:itext('/data/name:label')"/></input></h:body>
 </h:html>`)
-    const { translations, defaultLang } = XForm.getItextTranslations(xformWithDefaultLang)
-    expect(defaultLang).toBe('default')
-    expect(translations['/data/name:label']).toEqual({ default: 'Name', en: 'Name (en)', Bahasa_Indonesia: 'Nama' })
+
+    test('the "default" translation (XLSForm columns without a language) fills the default language', () => {
+      const xform = xformWithTranslations(`
+        <translation lang="default" default="true()">
+          <text id="/data/name:label"><value>Name</value></text>
+          <text id="/data/name:hint"><value>Hint</value></text>
+        </translation>
+        <translation lang="French (fr)">
+          <text id="/data/name:label"><value>Nom</value></text>
+        </translation>
+        <translation lang="Bahasa Indonesia">
+          <text id="/data/name:label"><value>Nama</value></text>
+        </translation>`)
+      const { translations, defaultLang } = XForm.getItextTranslations(xform)
+      // the default language is the first supported one, the texts in a supported language are not replaced
+      expect(defaultLang).toBe('fr')
+      expect(translations).toEqual({ '/data/name:label': { fr: 'Nom' }, '/data/name:hint': { fr: 'Hint' } })
+    })
+
+    test('without supported languages, the texts are in English', () => {
+      const xform = xformWithTranslations(`
+        <translation lang="default" default="true()">
+          <text id="/data/name:label"><value>Name</value></text>
+        </translation>`)
+      const { translations, defaultLang } = XForm.getItextTranslations(xform)
+      expect(defaultLang).toBe('en')
+      expect(translations).toEqual({ '/data/name:label': { en: 'Name' } })
+    })
   })
 
   test('getItextTranslations prefers the plain-text <value> over a media-annotated one (form="image"/"audio")', () => {

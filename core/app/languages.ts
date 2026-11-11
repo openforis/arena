@@ -37,13 +37,6 @@ export const getLanguageISO639part2Label = (lang: string, translationLang: strin
 
 export const languageCodes: string[] = Object.keys(Languages)
 
-// language codes are used as JSON keys and export column names: codes outside the known list (e.g. from imported
-// forms) are accepted when they have this format
-const languageCodeFormatRegex = /^[A-Za-z][A-Za-z0-9_-]{0,31}$/
-
-export const isLanguageCodeFormatValid = (lang: unknown): boolean =>
-  typeof lang === 'string' && languageCodeFormatRegex.test(lang)
-
 export const languageItemsSortedByEnLabel = languageCodes
   .map((lang) => ({ value: lang, label: getLanguageLabel(lang) ?? '' }))
   .sort((lang1, lang2) => lang1.label.localeCompare(lang2.label))
