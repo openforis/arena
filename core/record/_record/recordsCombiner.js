@@ -4,6 +4,7 @@ import * as A from '@core/arena'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
+import * as NodeRefData from '@core/record/nodeRefData'
 import * as ObjectUtils from '@core/objectUtils'
 
 import { NodeValues } from '../nodeValues'
@@ -98,6 +99,7 @@ const _replaceAttributeValueIfEmptyOrModified = ({
     attributeDef: attrDef,
     attribute: attrTarget,
     value: Node.getValue(attrSource),
+    refData: NodeRefData.getRefData(attrSource),
     dateModified: sourceDateModified,
     sideEffect,
   })
