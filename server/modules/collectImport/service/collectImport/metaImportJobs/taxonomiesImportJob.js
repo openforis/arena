@@ -125,9 +125,11 @@ export default class TaxonomiesImportJob extends Job {
 
   async onHeaders(headers) {
     this.vernacularLangCodes = A.innerJoin((a, b) => a === b, languageCodesISO639part2, headers)
+    // extra prop names normalized like in the taxonomy import (validated before saving)
     this.extraPropsDefs = headers.reduce((extraPropsAcc, header) => {
       if (!fixedColumns.has(header) && !languageCodesISO639part2.includes(header)) {
-        extraPropsAcc[header] = { key: header }
+        const extraPropName = StringUtils.normalizeName(header)
+        extraPropsAcc[extraPropName] = { key: extraPropName, originalHeader: header }
       }
       return extraPropsAcc
     }, {})
@@ -167,8 +169,8 @@ export default class TaxonomiesImportJob extends Job {
         this.vernacularLangCodes
       )
 
-      const extra = Object.keys(this.extraPropsDefs).reduce((accExtraProps, extraPropName) => {
-        const value = row[extraPropName]
+      const extra = Object.entries(this.extraPropsDefs).reduce((accExtraProps, [extraPropName, { originalHeader }]) => {
+        const value = row[originalHeader]
         if (StringUtils.isBlank(value)) {
           return accExtraProps
         }

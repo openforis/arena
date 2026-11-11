@@ -31,6 +31,7 @@ const validateNotEmptyFirstLevelItems =
 const levelValidators = ({ levels, itemsCache, bigCategory }) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels),
   ],
@@ -255,6 +256,7 @@ const validateItemsAndDescendants = async ({
 const categoryValidators = (categories) => ({
   [`${Category.keys.props}.${Category.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(categories),
   ],

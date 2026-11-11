@@ -14,6 +14,7 @@ const validateNotEmptyTaxa = (taxaCount) => () =>
 const taxonomyValidators = (taxonomies, taxaCount) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
+    Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.nameDuplicate)(taxonomies),
   ],

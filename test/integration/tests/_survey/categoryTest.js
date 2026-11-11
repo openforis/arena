@@ -13,8 +13,8 @@ export const createCategoryTest = async () => {
   const user = getContextUser()
 
   const extraDef = {
-    extraDefText: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
-    extraDefNumber: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
+    extra_def_text: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }),
+    extra_def_number: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.number }),
   }
   const categoryReq = Category.assocItemExtraDef(extraDef)(Category.newCategory({ name: 'category_test' }))
   const category = await CategoryManager.insertCategory({ user, surveyId, category: categoryReq })
@@ -71,7 +71,7 @@ export const createCategoryItemTest = async () => {
 
   const itemCode = '1'
   const itemLabel = 'Value 1'
-  const extra = { extraDefText: 'extra 1', extraDefNumber: 3 }
+  const extra = { extra_def_text: 'extra 1', extra_def_number: 3 }
 
   const itemReq = CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
     code: itemCode,
@@ -116,12 +116,12 @@ export const updateCategoryItemExtraDefTest = async () => {
     user,
     surveyId,
     categoryUuid: Category.getUuid(category),
-    name: 'extraDefText',
+    name: 'extra_def_text',
     itemExtraDef: { name: newName, dataType: ExtraPropDef.dataTypes.text },
   })
 
-  // Renamed extra def replaces the old key; the other extra def (extraDefNumber) is preserved.
-  expect(Category.getItemExtraDefKeys(categoryUpdated)).toEqual([newName, 'extraDefNumber'])
+  // Renamed extra def replaces the old key; the other extra def (extra_def_number) is preserved.
+  expect(Category.getItemExtraDefKeys(categoryUpdated)).toEqual([newName, 'extra_def_number'])
   expect(Category.getItemExtraDef(categoryUpdated)[newName].dataType).toBe(ExtraPropDef.dataTypes.text)
 }
 
@@ -129,7 +129,7 @@ export const deleteCategoryItemExtraDefTest = async () => {
   const surveyId = getContextSurveyId()
   const user = getContextUser()
 
-  const extraDef = { extraDefText: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }) }
+  const extraDef = { extra_def_text: ExtraPropDef.newItem({ dataType: ExtraPropDef.dataTypes.text }) }
   const categoryReq = Category.assocItemExtraDef(extraDef)(
     Category.newCategory({ name: 'category_delete_extradef_test' })
   )
@@ -147,7 +147,7 @@ export const deleteCategoryItemExtraDefTest = async () => {
     CategoryItem.newItem(CategoryLevel.getUuid(level), null, {
       code: '001',
       labels: { en: 'Item 1' },
-      extra: { extraDefText: 'some value' },
+      extra: { extra_def_text: 'some value' },
     })
   )
 
@@ -155,7 +155,7 @@ export const deleteCategoryItemExtraDefTest = async () => {
     user,
     surveyId,
     categoryUuid,
-    name: 'extraDefText',
+    name: 'extra_def_text',
     itemExtraDef: null,
     deleted: true,
   })
