@@ -4126,9 +4126,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-server@npm:^2.8.11":
-  version: 2.8.11
-  resolution: "@openforis/arena-server@npm:2.8.11"
+"@openforis/arena-server@npm:^2.8.13":
+  version: 2.8.13
+  resolution: "@openforis/arena-server@npm:2.8.13"
   dependencies:
     "@aws-sdk/client-s3": "npm:^3.1159.0"
     "@godaddy/terminus": "npm:^4.12.1"
@@ -4153,7 +4153,7 @@ __metadata:
     pdfkit: "npm:^0.20.2"
     pg-promise: "npm:^12.7.1"
     socket.io: "npm:^4.8.4"
-  checksum: 10c0/1714902f3d3e5db72dba4aa1039c9fa344e06182b8d357215dc80bb70f3456f712fc13a32d7209a350db77c6db924e9e6c3fbc2a62fca9141817506d309e712a
+  checksum: 10c0/721f7c33f4330914dafe5fb79e8e031049074def9ab218ce028db51c51e3dd0d9085b915792cae396b5397572a6829d35d95a141c2111c3a60e5b7ab9257b8d3
   languageName: node
   linkType: hard
 
@@ -15364,7 +15364,7 @@ __metadata:
     "@mui/x-tree-view": "npm:^9.17.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
     "@openforis/arena-core": "npm:^2.21.0"
-    "@openforis/arena-server": "npm:^2.8.11"
+    "@openforis/arena-server": "npm:^2.8.13"
     "@playwright/test": "npm:1.65.0"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
     "@react-leaflet/core": "npm:3.0.0"

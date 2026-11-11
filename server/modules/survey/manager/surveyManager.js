@@ -273,6 +273,17 @@ export const {
 export const fetchSurveyIdsAndAppVersions = async (client = db) => SurveyRepository.fetchSurveyIdsAndAppVersions(client)
 
 /**
+ * Returns true if the per-survey data migration of the given survey hasn't completed yet.
+ * @param {!number} surveyId - The survey ID.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<boolean>} - False if the survey doesn't exist.
+ */
+export const isSurveyDataMigrationPendingById = async (surveyId, client = db) => {
+  const surveyAppVersion = await SurveyRepository.fetchSurveyAppVersionById(surveyId, client)
+  return surveyAppVersion ? isSurveyDataMigrationPending({ appVersion: surveyAppVersion.appVersion }) : false
+}
+
+/**
  * Throws a service-unavailable SystemError if the given survey's per-survey data migration hasn't
  * completed yet, i.e. its stored app version is older than the latest survey data migration version.
  * @param {object} surveyInfo - The survey info object.

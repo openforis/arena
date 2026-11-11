@@ -286,6 +286,15 @@ export const fetchSurveyIdsAndNames = async (client = db) =>
 export const fetchSurveyIdsAndAppVersions = async (client = db) =>
   client.map('SELECT id, app_version FROM survey ORDER BY date_modified DESC', [], camelize)
 
+/**
+ * Fetches the app version a survey was last migrated to.
+ * @param {!number} surveyId - The survey ID.
+ * @param {pgPromise.IDatabase} [client] - The database client.
+ * @returns {Promise<{ appVersion: string|null }|null>} - The app version, or null if the survey doesn't exist.
+ */
+export const fetchSurveyAppVersionById = async (surveyId, client = db) =>
+  client.oneOrNone('SELECT app_version FROM survey WHERE id = $1', [surveyId], camelize)
+
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     DB.transformCallback(def, draft, false, backup)

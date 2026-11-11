@@ -138,7 +138,7 @@
     "@mui/x-tree-view": "^9.17.0",
     "@ngageoint/geopackage": "^4.2.10",
     "@openforis/arena-core": "^2.21.0",
-    "@openforis/arena-server": "^2.8.11",
+    "@openforis/arena-server": "^2.8.13",
     "@react-leaflet/core": "3.0.0",
     "@reduxjs/toolkit": "^2.14.0",
     "@sendgrid/mail": "^8.1.6",

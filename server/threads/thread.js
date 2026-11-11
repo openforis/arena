@@ -3,7 +3,7 @@ import { parentPort, workerData, isMainThread } from 'node:worker_threads'
 import * as Log from '@server/log/log'
 
 import * as ThreadParams from './threadParams'
-import { ArenaServer } from '@openforis/arena-server'
+import { initArenaServerServices } from '@server/system/arenaServerServices'
 
 /**
  * Base class for thread execution in Worker Pool.
@@ -16,7 +16,7 @@ export default class Thread {
 
     if (!isMainThread) {
       // ensure services are initialized
-      ArenaServer.initServices()
+      initArenaServerServices()
 
       parentPort.on('message', this.messageHandler.bind(this))
     }
