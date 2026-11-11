@@ -89,6 +89,7 @@ export default {
   invalidSyntax: "La syntaxe de l'expression est invalide",
   networkError: 'Erreur de communication avec le serveur',
   nodeDefConversionNotAllowed: `'{{name}}' ne peut pas être converti en {{toType}}`,
+  nodeDefTypeInvalid: 'Type de définition de nœud non valide : {{type}}',
   record: {
     errorUpdating: "Erreur lors de la mise à jour de l'enregistrement",
     entityNotFound: 'Entité "{{entityName}}" avec les clés "{{keyValues}}" introuvable',
