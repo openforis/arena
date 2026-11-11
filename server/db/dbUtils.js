@@ -234,7 +234,10 @@ export const newQueryParams = (initialValues = []) => {
 // options of client.tx: statements modifying data fail (applied to top-level transactions only)
 export const txOptionsReadOnly = { mode: new pgp.txMode.TransactionMode({ readOnly: true }) }
 
-export const asName = (name) => (name.startsWith('"') ? name : StringUtils.quoteDouble(name))
+// a quoted identifier: inner double quotes are doubled
+const quotedIdentifierRegex = /^"(?:[^"]|"")*"$/
+
+export const asName = (name) => (quotedIdentifierRegex.test(name) ? name : StringUtils.quoteDouble(name))
 
 export const getPublishedCondition = ({ draft, tableAlias = null }) => {
   if (draft) return ''

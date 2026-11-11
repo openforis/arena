@@ -84,6 +84,7 @@ export default {
   invalidSyntax: 'Недопустимый синтаксис выражения',
   networkError: 'Ошибка связи с сервером',
   nodeDefConversionNotAllowed: `'{{name}}' нельзя преобразовать в {{toType}}`,
+  nodeDefTypeInvalid: 'Недопустимый тип определения узла: {{type}}',
   record: {
     errorUpdating: 'Ошибка при обновлении записи',
     entityNotFound: 'Сущность "{{entityName}}" с ключами "{{keyValues}}" не найдена',

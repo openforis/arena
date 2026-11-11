@@ -1,5 +1,6 @@
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
+import * as StringUtils from '@core/stringUtils'
 
 import TableSurveyRdb from '../tableSurveyRdb'
 import * as SQL from '../../sql'
@@ -96,9 +97,11 @@ export default class TableOlapData extends TableSurveyRdb {
       // base columns
       ...baseColumnNamesAndTypes,
       // base unit UUID
-      `${this.baseUnitUuidColumnName} ${SQL.types.uuid}`,
+      `${StringUtils.quoteDouble(this.baseUnitUuidColumnName)} ${SQL.types.uuid}`,
       // attribute columns
-      ...this.attributeDefsForColumns.map((attrDef) => `${NodeDef.getName(attrDef)} ${SQL.types.varchar}`),
+      ...this.attributeDefsForColumns.map(
+        (attrDef) => `${StringUtils.quoteDouble(NodeDef.getName(attrDef))} ${SQL.types.varchar}`
+      ),
     ]
   }
 }

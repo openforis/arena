@@ -68,6 +68,7 @@ export default {
   invalidSyntax: 'Expression syntax is invalid',
   networkError: 'Error communicating with the server',
   nodeDefConversionNotAllowed: `'{{name}}' cannot be converted to {{toType}}`,
+  nodeDefTypeInvalid: 'Invalid node definition type: {{type}}',
   record: {
     errorUpdating: 'Error updating record',
     entityNotFound: 'Entity "{{entityName}}" with keys "{{keyValues}}" not found',

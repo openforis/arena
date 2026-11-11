@@ -83,6 +83,7 @@ export default {
   invalidSyntax: 'Sintaxe da expressão é inválida',
   networkError: 'Erro de comunicação com o servidor',
   nodeDefConversionNotAllowed: `'{{name}}' não pode ser convertido para {{toType}}`,
+  nodeDefTypeInvalid: 'Tipo de definição de nó inválido: {{type}}',
   record: {
     errorUpdating: 'Erro ao atualizar registro',
     entityNotFound: 'Entidade "{{entityName}}" com chaves "{{keyValues}}" não encontrada',

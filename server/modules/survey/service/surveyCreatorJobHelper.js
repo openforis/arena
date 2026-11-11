@@ -6,9 +6,12 @@ const onJobEnd = async ({ job, surveyId }) => {
     await SurveyManager.removeSurveyTemporaryFlag({ surveyId })
     job.logDebug(`'temporary' flag removed from survey ${surveyId}`)
   } else {
+    // a job fails (and ends) as soon as an inner job fails, while its transaction is still open and holds locks on the
+    // survey schema: the temporary survey is deleted without waiting, so that the transaction can end
     job.logDebug(`deleting temporary survey ${surveyId}...`)
-    await SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
-    job.logDebug(`survey ${surveyId} deleted!`)
+    SurveyManager.deleteSurvey(surveyId, { deleteUserPrefs: false })
+      .then(() => job.logDebug(`survey ${surveyId} deleted!`))
+      .catch((error) => job.logError(`error deleting temporary survey ${surveyId}: ${error}`))
   }
 }
 

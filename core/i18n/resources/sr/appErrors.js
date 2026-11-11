@@ -71,6 +71,7 @@ export default {
   invalidSyntax: 'Sintaksa izraza nije ispravna',
   networkError: 'Greška u komunikaciji sa serverom',
   nodeDefConversionNotAllowed: `'{{name}}' ne može da se konvertuje u {{toType}}`,
+  nodeDefTypeInvalid: 'Nevažeći tip definicije čvora: {{type}}',
   record: {
     errorUpdating: 'Greška pri ažuriranju zapisa',
     entityNotFound: 'Entitet "{{entityName}}" sa ključevima "{{keyValues}}" nije pronađen',

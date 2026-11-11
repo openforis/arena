@@ -83,6 +83,7 @@ export default {
   invalidSyntax: 'Илэрхийллийн синтакс буруу байна',
   networkError: 'Сервертэй холбогдоход алдаа гарлаа',
   nodeDefConversionNotAllowed: `'{{name}}'-г {{toType}}-д хөрвүүлэх боломжгүй`,
+  nodeDefTypeInvalid: 'Зангилааны тодорхойлолтын төрөл буруу байна: {{type}}',
   record: {
     errorUpdating: 'Бичлэг шинэчлэхэд алдаа гарлаа',
     entityNotFound: '"{{entityName}}" нэртэй объект "{{keyValues}}" түлхүүрээр олдсонгүй',
