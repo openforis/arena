@@ -4,7 +4,6 @@ import PropTypes from 'prop-types'
 
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefLayout from '@core/survey/nodeDefLayout'
-import * as Node from '@core/record/node'
 
 import { elementOffset } from '@webapp/utils/domUtils'
 import { NodeDefsActions, useSurveyCycleKey } from '@webapp/store/survey'
