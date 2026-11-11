@@ -175,6 +175,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'Язык обязателен',
     langInvalid: 'Недопустимый код языка: {{lang}}',
+    srsInvalid: 'Недопустимый код системы пространственной привязки: {{code}}',
     srsRequired: 'Система пространственной привязки обязательна',
     cycleRequired: 'Цикл обязателен',
     cyclesRequired: 'Должен быть определен хотя бы один цикл',

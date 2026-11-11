@@ -1,3 +1,4 @@
+import * as StringUtils from '@core/stringUtils'
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
@@ -38,7 +39,10 @@ export default class SurveyCreatorJob extends Job {
     const surveySourceName = Survey.getName(surveyInfoArenaSurvey)
     const surveyTargetName = Survey.getName(surveyInfoTarget)
 
-    const startingName = surveyTargetName || (cloning ? `clone_${surveySourceName}` : surveySourceName)
+    // names from the request or the backup file normalized like the names entered in the survey editor
+    const startingName = StringUtils.normalizeName(
+      surveyTargetName || (cloning ? `clone_${surveySourceName}` : surveySourceName)
+    )
 
     const name = await SurveyUniqueNameGenerator.findUniqueSurveyName({ startingName })
 

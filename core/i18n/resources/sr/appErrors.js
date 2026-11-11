@@ -92,6 +92,7 @@ Pokušajte da osvježite stranicu.`,
     fileNotFound: 'Fajl nije pronađen',
     languageCodeInvalid: 'Kod jezika nije važeći: {{lang}}',
     cycleKeysInvalid: 'Ciklusi moraju biti numerisani redom, počevši od 1',
+    srsCodeInvalid: 'Kod prostornog referentnog sistema nije važeći: {{code}}',
   },
   unsupportedFunctionType: 'Nepodržan tip funkcije: {{exprType}}',
   // AI gateway errors

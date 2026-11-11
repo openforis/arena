@@ -173,6 +173,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'Language is required',
     langInvalid: 'Language code is not valid: {{lang}}',
+    srsInvalid: 'Spatial reference system code is not valid: {{code}}',
     srsRequired: 'Spatial Reference System is required',
     cycleRequired: 'Cycle is required',
     cyclesRequired: 'At least one cycle must be defined',

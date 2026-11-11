@@ -173,6 +173,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'El idioma es obligatorio',
     langInvalid: 'El código de idioma no es válido: {{lang}}',
+    srsInvalid: 'El código del sistema de referencia espacial no es válido: {{code}}',
     srsRequired: 'El sistema de referencia espacial es obligatorio',
     cycleRequired: 'El ciclo es obligatorio',
     cyclesRequired: 'Se debe definir al menos un ciclo',

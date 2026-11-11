@@ -175,6 +175,7 @@ export default {
   surveyInfoEdit: {
     langRequired: 'Idioma obrigatório',
     langInvalid: 'O código de idioma não é válido: {{lang}}',
+    srsInvalid: 'O código do sistema de referência espacial não é válido: {{code}}',
     srsRequired: 'Sistema de Referência Espacial obrigatório',
     cycleRequired: 'Ciclo obrigatório',
     cyclesRequired: 'Pelo menos um ciclo deve ser definido',

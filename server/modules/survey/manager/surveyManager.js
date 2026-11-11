@@ -98,14 +98,19 @@ const _addUserToSurveyAdmins = async ({ user, surveyInfo }, client = db) => {
   }
 }
 
-// language codes and cycle keys are used as JSON keys and export column names: imported surveys must have valid ones
-const _checkLanguagesAndCycles = (props) => {
+// language codes and cycle keys are used as JSON keys and export column names, SRS codes in queries:
+// imported surveys must have valid ones
+const _checkSurveyProps = (props) => {
   const langsInvalid = SurveyValidator.getInvalidLanguageCodes(props?.[Survey.infoKeys.languages] ?? [])
   if (langsInvalid.length > 0) {
     throw new SystemError('survey.languageCodeInvalid', { lang: langsInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
   }
   if (!SurveyValidator.areCycleKeysValid(props?.[Survey.infoKeys.cycles])) {
     throw new SystemError('survey.cycleKeysInvalid', {}, StatusCodes.BAD_REQUEST)
+  }
+  const srsCodesInvalid = SurveyValidator.getInvalidSrsCodes(props?.[Survey.infoKeys.srs] ?? [])
+  if (srsCodesInvalid.length > 0) {
+    throw new SystemError('survey.srsCodeInvalid', { code: srsCodesInvalid.join(', ') }, StatusCodes.BAD_REQUEST)
   }
 }
 
@@ -136,7 +141,7 @@ export const insertSurvey = async (params, client = db) => {
   // from the same pool. Under concurrent survey creation this starves the pool (no connectionTimeoutMillis
   // is configured) and can hang the whole server, since every other request also needs a pool connection.
   const surveyProps = { ...Survey.getProps(surveyInfoParam) }
-  _checkLanguagesAndCycles(surveyProps)
+  _checkSurveyProps(surveyProps)
   if (temporary) {
     surveyProps.temporary = true
   }
@@ -201,8 +206,8 @@ export const insertSurvey = async (params, client = db) => {
 
 export const importSurvey = async (params, client = db) => {
   const { user, surveyInfo: surveyInfoParam, backup } = params
-  _checkLanguagesAndCycles(Survey.getProps(surveyInfoParam))
-  _checkLanguagesAndCycles(Survey.getPropsDraft(surveyInfoParam))
+  _checkSurveyProps(Survey.getProps(surveyInfoParam))
+  _checkSurveyProps(Survey.getPropsDraft(surveyInfoParam))
 
   // See insertSurvey above: migrateSurveySchema opens its own separate db connections, so it must not
   // run inside a transaction held open by this function (same connection-pool starvation risk).

@@ -5,6 +5,7 @@ import * as NodeDefExpressionsValidator from './_surveyValidator/nodeDefExpressi
 
 export const {
   getInvalidLanguageCodes,
+  getInvalidSrsCodes,
   getSurveyNameValidations,
   validateNewSurvey,
   validateSurveyClone,
