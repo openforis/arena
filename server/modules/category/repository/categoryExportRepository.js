@@ -1,7 +1,7 @@
 import { Schemata } from '@openforis/arena-server'
 
 import * as Category from '@core/survey/category'
-import * as CategoryLevel from '@core/survey/categoryLevel'
+import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import * as CategoryItem from '@core/survey/categoryItem'
 
 import * as DbUtils from '@server/db/dbUtils'
@@ -34,11 +34,12 @@ const getQueryPrefix = ({ surveyId, draft = true }) => {
   `
 }
 
-const getExtraPropColumn = ({ columnPrefix, extraPropName, draft = true }) =>
-  `(${DbUtils.getPropColCombined(CategoryItem.keysProps.extra, draft, columnPrefix, false)}) ->> '${extraPropName}'`
+// the name of the extra prop is passed as a query parameter (extraPropNameParam is its placeholder)
+const getExtraPropColumn = ({ columnPrefix, extraPropNameParam, draft = true }) =>
+  `(${DbUtils.getPropColCombined(CategoryItem.keysProps.extra, draft, columnPrefix, false)}) ->> ${extraPropNameParam}`
 
-const getSelectCumulativeAreaSubquery = ({ draft = true }) => {
-  const areaColumn = getExtraPropColumn({ columnPrefix: 'ext.', extraPropName: areaPropName, draft })
+const getSelectCumulativeAreaSubquery = ({ params, draft = true }) => {
+  const areaColumn = getExtraPropColumn({ columnPrefix: 'ext.', extraPropNameParam: params.add(areaPropName), draft })
   return `COALESCE((
     SELECT SUM (COALESCE((${areaColumn})::numeric, 0))
     FROM category_item_extended ext 
@@ -48,13 +49,14 @@ const getSelectCumulativeAreaSubquery = ({ draft = true }) => {
 
 /**
  * Generates the query to export the category.
+ * Level names, languages and extra prop names are passed as query parameters, column aliases included (quoted).
  * @param {!object} params - The parameters object.
  * @param {!number} [params.surveyId] - The id of the survey.
- * @param {object[]} [params.levels] - Array of levels.
- * @param {string[]} [params.selectFields] - Array with the column names to select.
+ * @param {!object} [params.category] - The category to export (with levels).
  * @param {string[]} [params.languages] - Array with the languages in the survey.
+ * @param {boolean} [params.draft] - Whether to export draft props.
  * @param {boolean} [params.includeCumulativeArea] - Whether to include the area_cumulative field (sum of descendants area extra property value).
- * @returns {string} The query to be used to export the category.
+ * @returns {{query: string, values: Array<unknown>}} The query to be used to export the category and its parameters values.
  */
 const generateCategoryExportQuery = ({
   surveyId,
@@ -63,21 +65,30 @@ const generateCategoryExportQuery = ({
   draft = true,
   includeCumulativeArea = false,
 }) => {
+  const params = DbUtils.newQueryParams([Category.getUuid(category)])
   const levels = Category.getLevelsArray(category)
   const extraProps = Category.getItemExtraDefKeys(category)
   const queryPrefix = getQueryPrefix({ surveyId, draft })
+  const asAlias = (alias) => `AS ${params.add(alias, ':name')}`
+  // aliases are the export file headers
   const codesFields = levels.map(
-    (level, index) => `COALESCE(level_codes[${index + 1}], '') AS ${CategoryLevel.getName(level)}_code`
+    (level, index) =>
+      `COALESCE(level_codes[${index + 1}], '') ${asAlias(CategoryExportFile.getLevelCodeHeader({ level }))}`
   )
-  const getLabelsOrDescriptionsFields = (propName, aliasPrefix) =>
-    languages.map(
-      (lang) => `(${DbUtils.getPropColCombined(propName, draft, 'i.', false)}) ->> '${lang}' AS ${aliasPrefix}_${lang}`
-    )
-  const labelsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.labels, 'label')
-  const descriptionsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.descriptions, 'description')
-  const extraPropsFields = extraProps.map(
-    (extraPropName) => `${getExtraPropColumn({ columnPrefix: 'i.', extraPropName, draft })} AS ${extraPropName}`
+  const getLabelsOrDescriptionsFields = (propName, getHeader) =>
+    languages.map((language) => {
+      const column = `(${DbUtils.getPropColCombined(propName, draft, 'i.', false)}) ->> ${params.add(language)}`
+      return `${column} ${asAlias(getHeader({ language }))}`
+    })
+  const labelsFields = getLabelsOrDescriptionsFields(CategoryItem.keysProps.labels, CategoryExportFile.getLabelHeader)
+  const descriptionsFields = getLabelsOrDescriptionsFields(
+    CategoryItem.keysProps.descriptions,
+    CategoryExportFile.getDescriptionHeader
   )
+  const extraPropsFields = extraProps.map((extraPropName) => {
+    const column = getExtraPropColumn({ columnPrefix: 'i.', extraPropNameParam: params.add(extraPropName), draft })
+    return `${column} ${asAlias(extraPropName)}`
+  })
 
   const selectFields = [
     'i.uuid',
@@ -88,15 +99,16 @@ const generateCategoryExportQuery = ({
     ...labelsFields,
     ...descriptionsFields,
     ...extraPropsFields,
-    ...(includeCumulativeArea ? [getSelectCumulativeAreaSubquery({ draft })] : []),
+    ...(includeCumulativeArea ? [getSelectCumulativeAreaSubquery({ params, draft })] : []),
   ].join(', ')
 
-  return `${queryPrefix} 
+  const query = `${queryPrefix} 
     SELECT ${selectFields}
     FROM category_item_extended i
     JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level l ON l.uuid = i.level_uuid
     WHERE l.category_uuid = $1
     ORDER BY index_path, i.id`
+  return { query, values: params.values }
 }
 
 export const generateCategoryExportStream = ({
@@ -106,14 +118,13 @@ export const generateCategoryExportStream = ({
   includeCumulativeArea = false,
   draft = true,
 }) => {
-  const query = generateCategoryExportQuery({
+  const { query, values } = generateCategoryExportQuery({
     surveyId,
     category,
     languages,
     includeCumulativeArea,
     draft,
   })
-  const categoryUuid = Category.getUuid(category)
-  const queryFormatted = DbUtils.formatQuery(query, [categoryUuid])
+  const queryFormatted = DbUtils.formatQuery(query, values)
   return new DbUtils.QueryStream(queryFormatted)
 }

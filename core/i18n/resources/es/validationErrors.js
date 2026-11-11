@@ -172,10 +172,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'El idioma es obligatorio',
+    langInvalid: 'El código de idioma no es válido: {{lang}}',
     srsRequired: 'El sistema de referencia espacial es obligatorio',
     cycleRequired: 'El ciclo es obligatorio',
     cyclesRequired: 'Se debe definir al menos un ciclo',
     cyclesExceedingMax: 'Una encuesta puede tener como máximo 10 ciclos',
+    cycleKeysInvalid: 'Los ciclos deben estar numerados de forma consecutiva, empezando por 1',
     cycleDateStartBeforeDateEnd: 'La fecha de inicio del ciclo debe ser anterior a su fecha de finalización',
     cycleDateStartAfterPrevDateEnd:
       'La fecha de inicio del ciclo debe ser posterior a la fecha de finalización del ciclo anterior',

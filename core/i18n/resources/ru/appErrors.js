@@ -76,6 +76,7 @@ export default {
     'Эта версия Arena Mobile не поддерживается сервером: обновите её до версии {{minVersion}} или более поздней',
   paramIsRequired: 'Параметр {{param}} обязателен',
   paramMustBeInteger: 'Параметр {{param}} должен быть целым числом',
+  propUpdateNotAllowed: 'Свойство "{{key}}" нельзя изменить',
   unableToFindParent: 'Не удается найти родителя {{name}}',
   unableToFindNode: 'Не удается найти узел с именем {{name}}',
   unableToFindSibling: 'Не удается найти родственный элемент с именем {{name}}',
@@ -100,6 +101,8 @@ export default {
     nodeDefNameNotFound: 'Определение узла не найдено: {{name}}',
     dataMigrationInProgress: 'Это анкетирование обновляется; повторите попытку через некоторое время.',
     fileNotFound: 'Файл не найден',
+    languageCodeInvalid: 'Недопустимый код языка: {{lang}}',
+    cycleKeysInvalid: 'Циклы должны быть пронумерованы последовательно, начиная с 1',
   },
   unsupportedFunctionType: 'Неподдерживаемый тип функции: {{exprType}}',
   aiNotConfigured:

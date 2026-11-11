@@ -7,6 +7,7 @@ import SystemError, { StatusCodes } from '@core/systemError'
 import * as ObjectUtils from '@core/objectUtils'
 import * as StringUtils from '@core/stringUtils'
 import * as Validation from '@core/validation/validation'
+import * as Validator from '@core/validation/validator'
 import { checkCloneFromSurveyDuplicate } from '@core/survey/cloneFromSurveyDuplicateCheck'
 
 import * as Survey from '@core/survey/survey'
@@ -182,6 +183,15 @@ export const validateCategories = async (survey, client = db) => {
 
 // ====== CREATE
 
+// level names are used as export column names (<level name>_code): check them before saving
+const _checkLevelNameIsValid = (name) => {
+  const nameKey = CategoryLevel.keysProps.name
+  const error = Validator.validateName(Validation.messageKeys.nameInvalid)(nameKey, { [nameKey]: name })
+  if (error) {
+    throw new SystemError(error.key, error.params, StatusCodes.BAD_REQUEST)
+  }
+}
+
 const _insertLevelInTransaction = async ({
   user,
   surveyId,
@@ -210,10 +220,13 @@ const _insertLevelInTransaction = async ({
   }
 }
 
-export const insertLevel = async (
+export const insertLevel = (
   { user, surveyId, level, system = false, addLogs = true, validate = true },
   client = db
-) => client.tx(async (t) => _insertLevelInTransaction({ user, surveyId, level, system, addLogs, validate, t }))
+) => {
+  _checkLevelNameIsValid(CategoryLevel.getName(level))
+  return client.tx((t) => _insertLevelInTransaction({ user, surveyId, level, system, addLogs, validate, t }))
+}
 
 export const insertCategory = async (
   { user, surveyId, category, system = false, addLogs = true, validate = true, backup = false },
@@ -456,6 +469,9 @@ export const updateCategoryItemExtraDefItem = async (
 
 export const updateLevelProp = async (user, surveyId, categoryUuid, levelUuid, key, value, client = db) =>
   client.tx(async (t) => {
+    if (key === CategoryLevel.keysProps.name) {
+      _checkLevelNameIsValid(value)
+    }
     const [level] = await DbUtils.runQueries(t, [
       () => CategoryRepository.updateLevelProp(surveyId, levelUuid, key, value, t),
       () => markSurveyDraft(surveyId, t),

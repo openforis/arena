@@ -132,11 +132,13 @@ export const ValidatorErrorKeys = {
   },
 
   surveyInfoEdit: {
+    langInvalid: 'validationErrors:surveyInfoEdit.langInvalid',
     langRequired: 'validationErrors:surveyInfoEdit.langRequired',
     srsRequired: 'validationErrors:surveyInfoEdit.srsRequired',
     cycleRequired: 'validationErrors:surveyInfoEdit.cycleRequired',
     cyclesRequired: 'validationErrors:surveyInfoEdit.cyclesRequired',
     cyclesExceedingMax: 'validationErrors:surveyInfoEdit.cyclesExceedingMax',
+    cycleKeysInvalid: 'validationErrors:surveyInfoEdit.cycleKeysInvalid',
     cycleDateStartMandatory: 'validationErrors:surveyInfoEdit.cycleDateStartMandatory',
     cycleDateStartInvalid: 'validationErrors:surveyInfoEdit.cycleDateStartInvalid',
     cycleDateStartBeforeDateEnd: 'validationErrors:surveyInfoEdit.cycleDateStartBeforeDateEnd',

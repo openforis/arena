@@ -81,6 +81,7 @@ export default {
     'Esta versión de Arena Mobile no es compatible con el servidor: actualícela a la versión {{minVersion}} o posterior',
   paramIsRequired: 'El parámetro {{param}} es obligatorio',
   paramMustBeInteger: 'El parámetro {{param}} debe ser un número entero',
+  propUpdateNotAllowed: 'La propiedad "{{key}}" no se puede actualizar',
   unableToFindParent: 'No se puede encontrar el padre de {{name}}',
   unableToFindNode: 'No se puede encontrar el nodo con el nombre {{name}}',
   unableToFindSibling: 'No se puede encontrar el hermano con el nombre {{name}}',
@@ -105,6 +106,8 @@ export default {
     nodeDefNameNotFound: 'Definición de nodo no encontrada: {{name}}',
     dataMigrationInProgress: 'Esta encuesta se está actualizando; vuelva a intentarlo en breve.',
     fileNotFound: 'Archivo no encontrado',
+    languageCodeInvalid: 'El código de idioma no es válido: {{lang}}',
+    cycleKeysInvalid: 'Los ciclos deben estar numerados de forma consecutiva, empezando por 1',
   },
   unsupportedFunctionType: 'Tipo de función no compatible: {{exprType}}',
   aiNotConfigured:

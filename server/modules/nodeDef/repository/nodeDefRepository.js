@@ -272,17 +272,19 @@ export const updateNodeDefTypeAndProps = async (
 // CYCLES
 
 const copyNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycleStart, cycles, client = DB) => {
-  const layoutCycleStartPath = `(props || props_draft) #> '{layout,${cycleStart}}'`
+  // every new cycle gets a copy of the layout of the start cycle
+  const layoutCycleStartPath = `(props || props_draft) #> $/layoutCycleStartPath/::text[]`
   await client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || jsonb_build_object(${cycles
-      .map((c) => `'${c}', ${layoutCycleStartPath}`)
-      .join(', ')}), TRUE)
+    SET props_draft = jsonb_set(props_draft, '{layout}', (props||props_draft)->'layout' || COALESCE(
+      (SELECT jsonb_object_agg(cycle_key, ${layoutCycleStartPath}) FROM unnest($/cycles/::text[]) AS cycle_key),
+      '{}'::jsonb
+    ), TRUE)
     WHERE ${layoutCycleStartPath} IS NOT NULL
-    ${nodeDefUuid ? ' AND uuid = $1' : ''} 
+    ${nodeDefUuid ? ' AND uuid = $/nodeDefUuid/' : ''} 
   `,
-    [nodeDefUuid]
+    { layoutCycleStartPath: [NodeDef.propKeys.layout, cycleStart], cycles, nodeDefUuid }
   )
 }
 
@@ -304,23 +306,22 @@ export const deleteNodeDefsCyclesLayout = async (surveyId, nodeDefUuid, cycles, 
   client.query(
     `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') ${cycles
-      .map((c) => `- '${c}'`)
-      .join(' ')})
+    SET props_draft = jsonb_set(props_draft, '{layout}', ((props || props_draft)->'layout') - $/cycles/::text[])
     WHERE (props || props_draft) -> 'layout' IS NOT NULL
-    ${nodeDefUuid ? ' AND uuid = $1' : ''}
+    ${nodeDefUuid ? ' AND uuid = $/nodeDefUuid/' : ''}
   `,
-    [nodeDefUuid]
+    { cycles, nodeDefUuid }
   )
 
 export const deleteNodeDefsCycles = async (surveyId, cycles, client = DB) => {
   // Delete cycles from props
-  await client.query(`
+  await client.query(
+    `
     UPDATE ${getSchemaSurvey(surveyId)}.node_def
-    SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') ${cycles
-      .map((c) => `- '${c}'`)
-      .join(' ')})
-  `)
+    SET props_draft = jsonb_set(props_draft, '{cycles}', ((props || props_draft)->'cycles') - $/cycles/::text[])
+  `,
+    { cycles }
+  )
   // Delete cycles layouts
   await deleteNodeDefsCyclesLayout(surveyId, null, cycles, client)
 }
@@ -426,10 +427,13 @@ export const markNodeDefsWithoutCyclesDeleted = async (surveyId, client = DB) =>
   `)
 
 const _deleteNodeDefsProp = async (surveyId, deletePath, client = DB) =>
-  client.none(`
-    UPDATE ${getSchemaSurvey(surveyId)}.node_def 
-    SET props = props #- '{${deletePath.join(',')}}'
-  `)
+  client.none(
+    `
+    UPDATE ${getSchemaSurvey(surveyId)}.node_def
+    SET props = props #- $/deletePath/::text[]
+  `,
+    { deletePath }
+  )
 
 export const deleteNodeDefsLabels = async (surveyId, langCode, client = DB) =>
   _deleteNodeDefsProp(surveyId, [NodeDef.propKeys.labels, langCode], client)
@@ -439,16 +443,18 @@ export const deleteNodeDefsDescriptions = async (surveyId, langCode, client = DB
 
 export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, client = DB) => {
   const schema = getSchemaSurvey(surveyId)
+  // one "#-" operator per language, with the path passed as a parameter
+  const params = DbUtils.newQueryParams()
+  const deleteMessagesOperators = langs.map((lang) => `#- ${params.add(['messages', lang])}::text[]`).join(' ')
 
-  await client.query(`
+  await client.query(
+    `
     WITH
       expressions AS
       (
         SELECT
           n.uuid,
-          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${langs
-            .map((l) => `#- '{messages, ${l}}'`)
-            .join(' ')} AS expr
+          jsonb_array_elements(n.props_advanced #> '{validations, expressions}') ${deleteMessagesOperators} AS expr
         FROM
           ${schema}.node_def n
       ),
@@ -474,7 +480,9 @@ export const deleteNodeDefsValidationMessageLabels = async (surveyId, langs, cli
       expressions_agg e
     WHERE
       e.uuid = n.uuid
-  `)
+  `,
+    params.values
+  )
 }
 
 /**

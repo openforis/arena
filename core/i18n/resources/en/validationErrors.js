@@ -172,10 +172,12 @@ export default {
 
   surveyInfoEdit: {
     langRequired: 'Language is required',
+    langInvalid: 'Language code is not valid: {{lang}}',
     srsRequired: 'Spatial Reference System is required',
     cycleRequired: 'Cycle is required',
     cyclesRequired: 'At least one cycle must be defined',
     cyclesExceedingMax: 'A survey can have at most 10 cycles',
+    cycleKeysInvalid: 'Cycles must be numbered consecutively, starting from 1',
     cycleDateStartBeforeDateEnd: 'Cycle start date must be before its end date',
     cycleDateStartAfterPrevDateEnd: 'Cycle start date must be after previous cycle end date',
     cycleDateStartInvalid: 'Cycle start date is invalid',

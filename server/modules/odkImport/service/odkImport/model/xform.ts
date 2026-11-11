@@ -1,5 +1,5 @@
 import * as StringUtils from '@core/stringUtils'
-import { languageCodes } from '@core/app/languages'
+import { getLanguageLabel, languageCodes } from '@core/app/languages'
 
 import * as FileXml from '@server/utils/file/fileXml'
 
@@ -285,53 +285,74 @@ const LANG_CODE_SUFFIX_PATTERN = /\(([a-zA-Z-]+)\)\s*$/
 // ODK's official XLSForm convention for a language column is "Language Name (code)" (e.g.
 // "label::English (en)"), and pyxform/ODK Central preserve that whole string verbatim as the itext
 // <translation lang="..."> attribute - not a bare ISO code (confirmed against real pyxform output,
-// e.g. a reported `lang="Portuguese (pt)"`). Arena's own language model expects a real ISO 639-1 code
-// (core/app/languages.ts), so this extracts the parenthesized code when present and recognized,
-// falling back to the raw attribute value unchanged otherwise (already a bare code, or some other
-// convention) rather than guessing at a transformation with no evidence behind it.
-const normalizeLangCode = (rawLang: string): string => {
+// e.g. a reported `lang="Portuguese (pt)"`). Arena supports only ISO 639-1 codes (core/app/languages.ts),
+// so this extracts the parenthesized code, or maps a bare code or an English language name (e.g. "French",
+// also produced by XLSForm) to its code. Any other value (e.g. "default", for XLSForm label columns
+// without a language) is not a supported language: null.
+const languageCodeByEnglishName: Record<string, string> = Object.fromEntries(
+  languageCodes.map((code) => [getLanguageLabel(code)?.toLowerCase(), code])
+)
+
+const normalizeLangCode = (rawLang: string): string | null => {
   const match = LANG_CODE_SUFFIX_PATTERN.exec(rawLang)
-  const code = match?.[1]?.toLowerCase()
-  return code && languageCodes.includes(code) ? code : rawLang
+  const code = (match?.[1] ?? rawLang).trim().toLowerCase()
+  if (languageCodes.includes(code)) return code
+  return languageCodeByEnglishName[rawLang.trim().toLowerCase()] ?? null
+}
+
+// default language of a form without translations in a supported language
+const defaultLanguageFallback = 'en'
+
+const isTranslationDefault = (translationEl: XmlElement): boolean =>
+  ['true()', 'true'].includes(getAttribute('default')(translationEl) ?? '')
+
+const getTranslationTexts = (translationEl: XmlElement): Record<string, string> => {
+  const texts: Record<string, string> = {}
+  for (const textEl of getDirectChildrenByLocalName(translationEl, 'text')) {
+    const textId = getAttribute('id')(textEl)
+    if (!textId) continue
+    // A single <text> can carry several <value> forms (plain label, plus e.g. form="image"/"audio"/
+    // "guidance" media annotations for the same question) - prefer the one with no `form` attribute
+    // (the plain-text label), falling back to the first value present if every one is annotated.
+    const valueEls = getDirectChildrenByLocalName(textEl, 'value')
+    const valueEl = valueEls.find((el) => !getAttribute('form')(el)) ?? valueEls[0] ?? null
+    const text = getElementText(valueEl)
+    if (text !== null) texts[textId] = text
+  }
+  return texts
 }
 
 /**
  * Parses <itext><translation lang="..." default="true()"><text id="..."><value>...</value></text>...
- * into { [textId]: { [lang]: text } }, plus the resolved default language (explicit `default="true()"`
- * wins; otherwise the first translation encountered). The `lang` attribute is normalized to a bare ISO
- * code when it follows ODK's "Name (code)" convention - see normalizeLangCode.
+ * into { [textId]: { [lang]: text } }, plus the resolved default language: the one marked as
+ * `default="true()"`, otherwise the first one encountered, among the supported languages (see
+ * normalizeLangCode); defaultLanguageFallback when there are none. The texts of the translations in a
+ * language not supported (e.g. "default") are used for the default language, where it has no text.
  */
-export const getItextTranslations = (
-  xform: XmlElement
-): { translations: ItextTranslations; defaultLang: string | null } => {
+export const getItextTranslations = (xform: XmlElement): { translations: ItextTranslations; defaultLang: string } => {
   const itextEl = findFirstByLocalName(xform, 'itext')
   const translations: ItextTranslations = {}
-  let defaultLang: string | null = null
-  if (!itextEl) return { translations, defaultLang }
+  if (!itextEl) return { translations, defaultLang: defaultLanguageFallback }
 
-  getDirectChildrenByLocalName(itextEl, 'translation').forEach((translationEl) => {
+  const langTranslations = getDirectChildrenByLocalName(itextEl, 'translation').flatMap((translationEl) => {
     const rawLang = getAttribute('lang')(translationEl)
-    if (!rawLang) return
+    if (!rawLang) return []
     const lang = normalizeLangCode(rawLang)
-    const isDefault = ['true()', 'true'].includes(getAttribute('default')(translationEl) ?? '')
-    if (isDefault || !defaultLang) {
-      defaultLang = lang
-    }
-
-    getDirectChildrenByLocalName(translationEl, 'text').forEach((textEl) => {
-      const textId = getAttribute('id')(textEl)
-      if (!textId) return
-      // A single <text> can carry several <value> forms (plain label, plus e.g. form="image"/"audio"/
-      // "guidance" media annotations for the same question) - prefer the one with no `form` attribute
-      // (the plain-text label), falling back to the first value present if every one is annotated.
-      const valueEls = getDirectChildrenByLocalName(textEl, 'value')
-      const valueEl = valueEls.find((el) => !getAttribute('form')(el)) ?? valueEls[0] ?? null
-      const text = getElementText(valueEl)
-      if (text === null) return
-      if (!translations[textId]) translations[textId] = {}
-      translations[textId][lang] = text
-    })
+    return [{ lang, isDefault: isTranslationDefault(translationEl), texts: getTranslationTexts(translationEl) }]
   })
+  const supportedLangTranslations = langTranslations.filter(({ lang }) => lang !== null)
+  const defaultLang =
+    (supportedLangTranslations.find(({ isDefault }) => isDefault) ?? supportedLangTranslations[0])?.lang ??
+    defaultLanguageFallback
+
+  // texts in a supported language first, so that they are not replaced by the ones in a language not supported
+  const langTranslationsSorted = [...supportedLangTranslations, ...langTranslations.filter(({ lang }) => lang === null)]
+  for (const { lang, texts } of langTranslationsSorted) {
+    for (const [textId, text] of Object.entries(texts)) {
+      translations[textId] ??= {}
+      translations[textId][lang ?? defaultLang] ??= text
+    }
+  }
   return { translations, defaultLang }
 }
 

@@ -66,7 +66,8 @@ const _extractColumnTypeByName = ({ columnName, columnPatterns, ignoreLabelsAndD
 const _extractLevelName = ({ columnPatterns, columnName, columnType }) => {
   const pattern = columnPatterns[columnType]
   const match = columnName.match(pattern)
-  return match[1] || defaultLevelName
+  // normalized like the names entered in the category editor (level names are validated before saving)
+  return match[1] ? StringUtils.normalizeName(match[1]) : defaultLevelName
 }
 
 const _extractLang = ({ columnPatterns, columnName, columnType, defaultLang }) => {
