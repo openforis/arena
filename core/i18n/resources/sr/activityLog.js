@@ -5,6 +5,7 @@ export default {
     // Survey
     [ActivityLog.type.surveyCreate]: 'je kreirao/la istraživanje',
     [ActivityLog.type.surveyPropUpdate]: 'je ažurirao/la {{key}} istraživanja',
+    [ActivityLog.type.surveyAiPolicyUpdate]: 'je promijenio/la AI politiku istraživanja',
     [ActivityLog.type.surveyPublish]: 'je objavio/la istraživanje',
     [ActivityLog.type.surveyCollectImport]: 'je uvezao/la istraživanje iz Collect',
 

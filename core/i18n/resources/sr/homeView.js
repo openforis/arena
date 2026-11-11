@@ -184,6 +184,31 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
     preferredLanguage: 'Željeni jezik',
     sampleBasedImageInterpretation: 'Interpretacija snimaka zasnovana na uzorku',
     sampleBasedImageInterpretationEnabled: 'Interpretacija snimaka zasnovana na uzorku je omogućena',
+    aiPolicy: {
+      title: 'AI politika',
+      intro:
+        'Izaberite gdje AI smije da obrađuje sadržaj ovog istraživanja. Primjenjuje se ono što je strože: ova politika ili ograničenja ove Arena instance.',
+      schemaLabel: 'Dizajn istraživanja (šema)',
+      schemaHint: 'Definicije čvorova, oznake i izrazi.',
+      dataLabel: 'Podaci zapisa',
+      dataHint: 'Prikupljene vrijednosti i aktivnost korisnika.',
+      levelHint: {
+        off: 'AI se nikada ne koristi za ovaj sadržaj.',
+        onDevice: 'Obrađuje ga samo AI motor koji radi na uređaju korisnika.',
+        orgHosted: 'Obrađuje ga AI server kojim upravlja vaša organizacija.',
+        cloud: 'Može ga obrađivati AI provajder u oblaku.',
+      },
+      notAllowedOnInstance: 'Nije dozvoljeno na ovoj Arena instanci: {{levels}}',
+      dataLimitedBySchema:
+        'Podaci zapisa ne mogu imati slobodniju politiku od dizajna istraživanja. Nije dostupno: {{levels}}',
+      onDeviceNote: 'Na ovom uređaju: korisnicima je potreban lokalni AI server (na primjer LM Studio).',
+      readOnly: 'Samo administratori istraživanja mogu mijenjati AI politiku.',
+      saved: 'AI politika je sačuvana',
+      savedDataLowered:
+        'AI politika je sačuvana. Snižen je i nivo za podatke zapisa: ne mogu imati slobodniju politiku od dizajna istraživanja.',
+      saveError: 'Nije moguće sačuvati AI politiku: {{message}}',
+      loadError: 'Nije moguće učitati AI politiku',
+    },
     security: {
       title: 'Bezbjednost',
       dataEditorViewNotOwnedRecordsAllowed: 'Unosilac podataka može da vidi zapise čiji nije vlasnik',

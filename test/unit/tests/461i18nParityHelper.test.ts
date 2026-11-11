@@ -43,6 +43,7 @@ describe('i18n parity helper (461)', () => {
     expect(usesCyrillic('mn')).toBe(true)
     expect(usesCyrillic('en')).toBe(false)
     expect(usesCyrillic('ja')).toBe(false)
+    expect(usesCyrillic('sr')).toBe(false)
     expect(CYRILLIC_LANGUAGES.every((lang) => LANGUAGES.includes(lang))).toBe(true)
   })
 

@@ -50,7 +50,9 @@ export const pluralCategoriesOf = (lang: string): string[] =>
  * @param {string} lang - Language.
  * @returns {boolean} True for Cyrillic.
  */
-export const usesCyrillic = (lang: string): boolean => new Intl.Locale(lang).maximize().script === 'Cyrl'
+// Intl maximizes sr to Cyrl, but the Serbian of the app is written in Latin script
+export const usesCyrillic = (lang: string): boolean =>
+  lang !== 'sr' && new Intl.Locale(lang).maximize().script === 'Cyrl'
 
 export const CYRILLIC_LANGUAGES: string[] = LANGUAGES.filter(usesCyrillic)
 

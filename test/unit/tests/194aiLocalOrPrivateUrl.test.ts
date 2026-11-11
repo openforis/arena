@@ -81,6 +81,7 @@ describe('aiBaseUrlNotAllowed points to the local AI server', () => {
     mn: 'Дотоод AI сервер',
     pt: 'Servidor de IA local',
     ru: 'Локальный сервер ИИ',
+    sr: 'Lokalni AI server',
   }
 
   test('every language of the app has its expected name (a new language needs one here)', () => {
