@@ -2,6 +2,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import DataImportBaseJob from './DataImportBaseJob'
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
@@ -56,8 +57,7 @@ export default class EntitiesDeleteJob extends DataImportBaseJob {
     if (nodeUuidsToDelete.length === 0) return null
 
     const updateResult = await Record.deleteNodes({
-      user,
-      survey,
+      ...createRecordEvaluationContext({ user, survey }),
       record: currentRecord,
       nodeUuids: nodeUuidsToDelete,
       sideEffect,

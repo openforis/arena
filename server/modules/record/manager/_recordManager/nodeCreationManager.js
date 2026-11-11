@@ -9,6 +9,7 @@ import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 import * as NodeRepository from '../../repository/nodeRepository'
 
 const _createUpdateResult = ({ record, node = null, nodes = {}, sideEffect = false }) => {
@@ -94,13 +95,10 @@ export const insertNode = async (
 
   if (NodeDef.isEntity(nodeDef)) {
     const descendantsCreateResult = await RecordNodesUpdater.addDescendants({
-      user,
-      survey,
+      ...createRecordEvaluationContext({ user, survey, timezoneOffset, lang }),
       record: recordUpdated,
       parentNode: node,
       nodeDef,
-      timezoneOffset,
-      lang,
       createMultipleEntities,
     })
     Object.assign(nodesCreated, descendantsCreateResult.nodes)

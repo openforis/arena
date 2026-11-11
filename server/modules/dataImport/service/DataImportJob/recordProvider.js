@@ -10,6 +10,7 @@ import { NodeValueFormatter } from '@core/record/nodeValueFormatter'
 import * as Validation from '@core/validation/validation'
 
 import * as RecordManager from '@server/modules/record/manager/recordManager'
+import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
 import { DataImportRecordPermissions } from './dataImportRecordPermissions'
 
@@ -162,8 +163,7 @@ const fetchOrCreateRecord = async ({ valuesByDefUuid, context, tx, flushCallback
     const recordToInsert = Record.newRecord(user, cycle)
     let record = null
     const { record: recordCreated } = await RecordUpdater.createRootEntity({
-      user,
-      survey,
+      ...createRecordEvaluationContext({ user, survey }),
       record: recordToInsert,
       sideEffect: true,
     })
