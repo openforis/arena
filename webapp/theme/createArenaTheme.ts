@@ -31,7 +31,14 @@ const dataGridStyleOverrides = {
     '& .MuiDataGrid-columnHeaderTitle': {
       fontWeight: 600,
     },
+    // like in the Table component, only rows that can be selected or opened (see DataGrid component) look clickable
     '& .MuiDataGrid-row:hover': {
+      backgroundColor: 'transparent',
+    },
+    '& .MuiDataGrid-row.data-grid__row--clickable': {
+      cursor: 'pointer',
+    },
+    '& .MuiDataGrid-row.data-grid__row--clickable:hover': {
       backgroundColor: tableRowHoverBackground,
     },
     '& .MuiDataGrid-row.Mui-selected, & .MuiDataGrid-row.Mui-selected:hover': {

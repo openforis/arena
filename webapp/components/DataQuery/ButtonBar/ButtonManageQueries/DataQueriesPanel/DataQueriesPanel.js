@@ -84,9 +84,8 @@ const DataQueriesPanel = (props) => {
         columns={columns}
         isRowActive={isTableRowActive}
         module={dataQueriesModuleName}
-        onRowClick={onTableRowClick}
+        onRowOpen={onTableRowClick}
         restParams={{ requestedAt: queriesRequestedAt }}
-        selectable
         showFooter={false}
       />
     </PanelRight>

@@ -196,5 +196,14 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
     paging, sorting and search in the URL, e.g. `webapp/views/App/views/Message/MessageList.js`
   - Both have the same look: change it in the table variables of `webapp/style/_vars.scss` (used by
     `webapp/style/table.scss`) and in the `MuiDataGrid` overrides of `webapp/theme/createArenaTheme.ts` together.
+  - Both behave the same way. `onRowOpen(item)` opens (views or edits) the item of a row: a click opens it, or a
+    double click when the rows can be selected (`selectable` in `Table`, `checkboxSelection` in `DataGrid`), where
+    a click selects the row. Enter opens the row; in `Table`, Space selects it (or opens it if the table is not
+    selectable).
+    Pass `isRowOpenable(item)` when some rows cannot be opened: they do nothing on click and don't look clickable.
+    Clicks on the buttons and inputs inside a row don't select or open it.
+  - Row action buttons are the last columns, in this order: the other actions (download, show on map...), then
+    view/edit (`ButtonIconEditOrView`, or `ButtonIconEdit`), then delete (`ButtonIconDelete`). Tables whose rows
+    open an item show the view/edit button too, so that it can also be opened without knowing about the row click.
 - Generic hooks are in `webapp/components/hooks`, and many components are re-exported by
   `webapp/components/index.js`.

@@ -10,16 +10,7 @@ import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 import { TablesActions, useTableMaxRows, useTableSort, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
-export const useTable = ({
-  columns,
-  keyExtractor,
-  moduleApiUri,
-  module,
-  restParams,
-  onRowClick: onRowClickProp,
-  selectable,
-  selectOnClick,
-}) => {
+export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restParams }) => {
   const dispatch = useDispatch()
 
   const [totalCount, setTotalCount] = useState(0)
@@ -143,21 +134,16 @@ export const useTable = ({
     deselectAllItems()
   }, [JSON.stringify(restParams), search, limit])
 
-  const onRowClick = useCallback(
-    async (item) => {
-      if (onRowClickProp) {
-        await onRowClickProp(item)
-      }
-      if (selectable && selectOnClick) {
-        const key = keyExtractor({ item })
-        const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
-          item,
-          compareFn: (_item) => keyExtractor({ item: _item }) === key,
-        })
-        setSelectedItems(selectedItemsUpdated)
-      }
+  const toggleItemSelection = useCallback(
+    (item) => {
+      const key = keyExtractor({ item })
+      const selectedItemsUpdated = ArrayUtils.addOrRemoveItem({
+        item,
+        compareFn: (_item) => keyExtractor({ item: _item }) === key,
+      })
+      setSelectedItems(selectedItemsUpdated)
     },
-    [keyExtractor, onRowClickProp, selectOnClick, selectable]
+    [keyExtractor]
   )
 
   const onVisibleColumnsChange = useCallback(
@@ -180,8 +166,8 @@ export const useTable = ({
     count: Number(count),
     totalCount: Number(totalCount),
     initData,
-    onRowClick,
     onVisibleColumnsChange,
+    toggleItemSelection,
     selectedItems,
     selectAllItems,
     deselectAllItems,

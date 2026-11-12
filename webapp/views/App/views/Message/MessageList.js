@@ -9,14 +9,13 @@ import { useMessageListColumns } from './useMessageListColumns'
 
 export const MessageList = () => {
   const navigate = useNavigate()
-  const columns = useMessageListColumns()
-
-  const onRowClick = useCallback(
+  const onRowOpen = useCallback(
     (message) => {
       navigate(`${appModuleUri(systemAdminModules.message)}${message.uuid}`)
     },
     [navigate]
   )
+  const columns = useMessageListColumns({ onRowOpen })
 
   return (
     <Table
@@ -25,8 +24,7 @@ export const MessageList = () => {
       className="messages-list"
       columns={columns}
       headerLeftComponent={MessagesHeaderLeft}
-      onRowClick={onRowClick}
-      selectable={false}
+      onRowOpen={onRowOpen}
       visibleColumnsSelectionEnabled
     />
   )

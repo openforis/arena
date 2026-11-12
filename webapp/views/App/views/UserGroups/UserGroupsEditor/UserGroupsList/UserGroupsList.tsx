@@ -1,13 +1,15 @@
 import './UserGroupsList.scss'
 
-import React, { useMemo } from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router'
-import { GridColDef, GridRowParams } from '@mui/x-data-grid'
+import { GridColDef } from '@mui/x-data-grid'
+import { UserGroup as UserGroupType } from '@openforis/arena-core'
 
 import * as UserGroup from '@core/user/userGroup/userGroup'
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import { useSurveyPreferredLang } from '@webapp/store/survey'
 import { useI18n } from '@webapp/store/system'
+import { ButtonIconEdit } from '@webapp/components/buttons'
 import { DataGrid } from '@webapp/components/DataGrid'
 import LoadingBar from '@webapp/components/LoadingBar'
 
@@ -29,6 +31,13 @@ const UserGroupsList = (): React.ReactElement => {
   const navigate = useNavigate()
   const preferredLang = useSurveyPreferredLang() as string
   const { rows, loading } = useUserGroupsList()
+
+  const onRowOpen = useCallback(
+    (userGroup: UserGroupType): void => {
+      navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(userGroup)}`)
+    },
+    [navigate]
+  )
 
   const columns: GridColDef[] = useMemo(
     () => [
@@ -55,13 +64,16 @@ const UserGroupsList = (): React.ReactElement => {
         headerName: i18n.t('usersView:userGroup.members'),
         flex: 1,
       },
+      {
+        field: 'edit',
+        headerName: '',
+        width: 60,
+        renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowOpen(row)} />,
+        sortable: false,
+      },
     ],
-    [i18n, preferredLang]
+    [i18n, onRowOpen, preferredLang]
   )
-
-  const onRowClick = (params: GridRowParams): void => {
-    navigate(`${appModuleUri(userModules.userGroup as AppModule)}${UserGroup.getUuid(params.row)}`)
-  }
 
   if (loading) {
     return <LoadingBar />
@@ -73,7 +85,7 @@ const UserGroupsList = (): React.ReactElement => {
       columns={columns}
       rows={rows}
       getRowId={(row) => UserGroup.getUuid(row) as string}
-      onRowClick={onRowClick}
+      onRowOpen={onRowOpen}
     />
   )
 }

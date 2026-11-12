@@ -72,7 +72,7 @@ const PreloadedMapLayersEditor = (props) => {
     [confirm, setPreloadedMapLayers, preloadedMapLayers]
   )
 
-  const onRowDoubleClick = useCallback(({ row: preloadedMapLayer }) => {
+  const onEdit = useCallback((preloadedMapLayer) => {
     setEditedPreloadedMapLayer(preloadedMapLayer)
     setPreloadedLayerDialogVisible(true)
   }, [])
@@ -95,13 +95,6 @@ const PreloadedMapLayersEditor = (props) => {
           {!readOnly && <ButtonAdd onClick={onAddClick} size="small" />}
           <DataGrid
             columns={[
-              {
-                field: 'edit',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
-                sortable: false,
-              },
               {
                 field: 'label',
                 flex: 0.5,
@@ -157,6 +150,13 @@ const PreloadedMapLayersEditor = (props) => {
                 ? []
                 : [
                     {
+                      field: 'edit',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
+                      sortable: false,
+                    },
+                    {
                       field: 'delete',
                       width: 60,
                       headerName: '',
@@ -170,7 +170,7 @@ const PreloadedMapLayersEditor = (props) => {
             density="compact"
             getRowId={(row) => SurveyFile.getUuid(row)}
             hideFooterPagination
-            onRowDoubleClick={onRowDoubleClick}
+            onRowOpen={readOnly ? undefined : onEdit}
             rows={preloadedMapLayers}
           />
         </div>

@@ -14,6 +14,7 @@ import WarningBadge from '@webapp/components/warningBadge'
 import { State, useLocalState } from './store'
 
 const Row = (props) => {
+  const { onRowOpen } = props
   const { state, Actions } = useLocalState(props)
 
   const survey = useSurvey()
@@ -47,7 +48,7 @@ const Row = (props) => {
         />
       )}
 
-      <ButtonIconEditOrView onClick={() => Actions.edit({ state })} canEdit={canEdit} />
+      <ButtonIconEditOrView onClick={() => onRowOpen(taxonomy)} canEdit={canEdit} />
 
       {canEdit && <ButtonIconDelete onClick={() => Actions.delete({ state })} />}
     </>

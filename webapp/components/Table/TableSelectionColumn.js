@@ -18,6 +18,8 @@ export const TableSelectionColumn = ({ key = 'selected' } = {}) => ({
       />
     )
   },
-  renderItem: ({ itemSelected }) => <Checkbox allowClickEventBubbling checked={itemSelected} />,
+  renderItem: ({ itemSelected, onItemSelectToggle }) => (
+    <Checkbox checked={itemSelected} onChange={onItemSelectToggle} />
+  ),
   width: '30px',
 })

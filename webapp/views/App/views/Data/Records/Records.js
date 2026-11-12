@@ -60,9 +60,10 @@ const Records = () => {
       module="records/summary"
       noItemsLabelKey="dataView:records.noRecordsAdded"
       noItemsLabelForSearchKey="dataView:records.noRecordsAddedForThisSearch"
-      onRowDoubleClick={navigateToRecord}
+      onRowOpen={navigateToRecord}
       restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
       rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
+      selectable
       visibleColumnsSelectionEnabled
     />
   )

@@ -77,8 +77,8 @@ const SurveyDocLayoutEditor = (props: Props) => {
     [confirm, setSurveyDocImages, surveyDocImages]
   )
 
-  const onRowDoubleClick = useCallback(({ row }) => {
-    setEditedSurveyDocImage(row)
+  const onEdit = useCallback((surveyDocImage: SurveyDocImage) => {
+    setEditedSurveyDocImage(surveyDocImage)
     setDialogVisible(true)
   }, [])
 
@@ -104,35 +104,11 @@ const SurveyDocLayoutEditor = (props: Props) => {
           <DataGrid
             autoHeight
             columns={[
-              ...(readOnly
-                ? []
-                : [
-                    {
-                      field: 'edit',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onRowDoubleClick({ row })} />,
-                      sortable: false,
-                    },
-                  ]),
               {
                 field: 'fileName',
                 flex: 0.35,
                 headerName: i18n.t('common:files.fileName'),
                 renderCell: ({ row }) => <LabelWithTooltip label={SurveyFile.getName(row)} />,
-                sortable: false,
-              },
-              {
-                field: 'download',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row: surveyDocImage }) => (
-                  <ButtonDownload
-                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) })}
-                    showLabel={false}
-                    variant="text"
-                  />
-                ),
                 sortable: false,
               },
               {
@@ -173,18 +149,43 @@ const SurveyDocLayoutEditor = (props: Props) => {
                 renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
               {
-                field: 'delete',
+                field: 'download',
                 width: 60,
                 headerName: '',
-                renderCell: ({ row: surveyDocImage }) =>
-                  !readOnly && <ButtonIconDelete onClick={onDeleteClick({ surveyDocImage })} />,
+                renderCell: ({ row: surveyDocImage }) => (
+                  <ButtonDownload
+                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) })}
+                    showLabel={false}
+                    variant="text"
+                  />
+                ),
                 sortable: false,
               },
+              ...(readOnly
+                ? []
+                : [
+                    {
+                      field: 'edit',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
+                      sortable: false,
+                    },
+                    {
+                      field: 'delete',
+                      width: 60,
+                      headerName: '',
+                      renderCell: ({ row: surveyDocImage }) => (
+                        <ButtonIconDelete onClick={onDeleteClick({ surveyDocImage })} />
+                      ),
+                      sortable: false,
+                    },
+                  ]),
             ]}
             density="compact"
             getRowId={(row: SurveyDocImage) => SurveyFile.getUuid(row)}
             hideFooterPagination
-            onRowDoubleClick={readOnly ? undefined : onRowDoubleClick}
+            onRowOpen={readOnly ? undefined : onEdit}
             rows={surveyDocImages ?? []}
           />
         </div>

@@ -16,6 +16,7 @@ export const ContentRowCells = (props) => {
     item,
     itemPosition,
     itemSelected,
+    onItemSelectToggle,
     onRowExpandToggle,
     rowExpanded,
   } = props
@@ -32,6 +33,7 @@ export const ContentRowCells = (props) => {
           item={item}
           itemPosition={itemPosition}
           itemSelected={itemSelected}
+          onItemSelectToggle={onItemSelectToggle}
           {...cellProps}
         />
       ))}
@@ -60,6 +62,7 @@ ContentRowCells.propTypes = {
   item: PropTypes.object.isRequired,
   itemPosition: PropTypes.number.isRequired,
   itemSelected: PropTypes.bool,
+  onItemSelectToggle: PropTypes.func.isRequired,
   onRowExpandToggle: PropTypes.func.isRequired,
   rowExpanded: PropTypes.bool,
 }

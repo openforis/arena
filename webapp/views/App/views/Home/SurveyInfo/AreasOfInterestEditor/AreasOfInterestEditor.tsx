@@ -113,17 +113,6 @@ export const AreasOfInterestEditor = (props: Props) => {
       </div>
       <DataGrid
         columns={[
-          ...(readOnly
-            ? []
-            : [
-                {
-                  field: 'edit',
-                  width: 60,
-                  headerName: '',
-                  renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
-                  sortable: false,
-                },
-              ]),
           {
             field: 'name',
             flex: 0.3,
@@ -185,6 +174,13 @@ export const AreasOfInterestEditor = (props: Props) => {
             ? []
             : [
                 {
+                  field: 'edit',
+                  width: 60,
+                  headerName: '',
+                  renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
+                  sortable: false,
+                },
+                {
                   field: 'delete',
                   width: 60,
                   headerName: '',
@@ -196,7 +192,7 @@ export const AreasOfInterestEditor = (props: Props) => {
         density="compact"
         getRowId={(row) => row.fileUuid}
         hideFooterPagination
-        onRowDoubleClick={({ row }) => onEdit(row)}
+        onRowOpen={readOnly ? undefined : onEdit}
         rows={areasOfInterest}
       />
       {dialog.open && (

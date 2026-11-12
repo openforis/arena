@@ -3,10 +3,11 @@ import { useMemo } from 'react'
 import { User2FADevice } from '@core/user2FADevice'
 import * as DateUtils from '@core/dateUtils'
 
+import { ButtonIconEdit } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useUser } from '@webapp/store/user'
 
-export const useUser2FADeviceColumns = () => {
+export const useUser2FADeviceColumns = ({ onRowOpen }) => {
   const user = useUser()
   return useMemo(
     () => [
@@ -38,7 +39,12 @@ export const useUser2FADeviceColumns = () => {
         width: '12rem',
         renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(User2FADevice.getDateModified(item)),
       },
+      {
+        key: 'edit',
+        width: '50px',
+        renderItem: ({ item }) => <ButtonIconEdit onClick={() => onRowOpen(item)} />,
+      },
     ],
-    [user]
+    [onRowOpen, user]
   )
 }
