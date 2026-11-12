@@ -1,7 +1,5 @@
 import { Checkbox } from '@webapp/components/form'
 
-const checkboxStyle = { color: 'white' }
-
 export const TableSelectionColumn = ({ key = 'selected' } = {}) => ({
   key,
   renderHeader: ({ deselectAllItems, selectAllItems, allVisibleItemsSelected, selectedItemsCount, totalCount }) => {
@@ -9,7 +7,6 @@ export const TableSelectionColumn = ({ key = 'selected' } = {}) => ({
     return (
       <Checkbox
         checked={allItemsSelected}
-        controlStyle={checkboxStyle}
         indeterminate={selectedItemsCount > 0 && !allItemsSelected}
         onChange={(value) => {
           if (!value || allVisibleItemsSelected) {
