@@ -1,11 +1,14 @@
 import { useMemo } from 'react'
 
+import { MessageStatus, Messages } from '@openforis/arena-core'
+
 import * as DateUtils from '@core/dateUtils'
 
+import { ButtonIconEditOrView } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
-export const useMessageListColumns = () => {
+export const useMessageListColumns = ({ onRowOpen }) => {
   const i18n = useI18n()
 
   return useMemo(
@@ -33,7 +36,18 @@ export const useMessageListColumns = () => {
         width: '12rem',
         renderItem: ({ item }) => DateUtils.convertDateTimeFromISOToDisplay(item.dateModified),
       },
+      {
+        key: 'edit',
+        width: '50px',
+        renderItem: ({ item }) => (
+          // sent messages can only be viewed
+          <ButtonIconEditOrView
+            canEdit={Messages.getStatus(item) !== MessageStatus.Sent}
+            onClick={() => onRowOpen(item)}
+          />
+        ),
+      },
     ],
-    [i18n]
+    [i18n, onRowOpen]
   )
 }

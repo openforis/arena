@@ -6,6 +6,7 @@ export const ContentHeaders = (props) => {
   const {
     columns,
     deselectAllItems,
+    expandableRows = false,
     handleSortBy,
     selectedItemsCount,
     selectAllItems,
@@ -14,24 +15,31 @@ export const ContentHeaders = (props) => {
     allVisibleItemsSelected,
   } = props
 
-  return columns.map((column) => (
-    <ContentHeader
-      key={column.key}
-      column={column}
-      deselectAllItems={deselectAllItems}
-      handleSortBy={handleSortBy}
-      selectAllItems={selectAllItems}
-      selectedItemsCount={selectedItemsCount}
-      sort={sort}
-      totalCount={totalCount}
-      allVisibleItemsSelected={allVisibleItemsSelected}
-    />
-  ))
+  return (
+    <>
+      {/* expand/collapse toggle column */}
+      {expandableRows && <div />}
+      {columns.map((column) => (
+        <ContentHeader
+          key={column.key}
+          column={column}
+          deselectAllItems={deselectAllItems}
+          handleSortBy={handleSortBy}
+          selectAllItems={selectAllItems}
+          selectedItemsCount={selectedItemsCount}
+          sort={sort}
+          totalCount={totalCount}
+          allVisibleItemsSelected={allVisibleItemsSelected}
+        />
+      ))}
+    </>
+  )
 }
 
 ContentHeaders.propTypes = {
   columns: PropTypes.array,
   deselectAllItems: PropTypes.func,
+  expandableRows: PropTypes.bool,
   handleSortBy: PropTypes.func,
   selectAllItems: PropTypes.func,
   selectedItemsCount: PropTypes.number,

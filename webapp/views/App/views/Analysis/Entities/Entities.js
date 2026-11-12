@@ -11,7 +11,7 @@ import HeaderLeft from './HeaderLeft'
 const ChainsView = () => {
   const navigate = useNavigate()
 
-  const onRowClick = (nodeDef) => navigate(`${appModuleUri(analysisModules.nodeDef)}${nodeDef.uuid}`)
+  const onRowOpen = (nodeDef) => navigate(`${appModuleUri(analysisModules.nodeDef)}${nodeDef.uuid}`)
 
   return (
     <Table
@@ -19,10 +19,11 @@ const ChainsView = () => {
       gridTemplateColumns="30px repeat(3, 1fr) 50px"
       headerLeftComponent={HeaderLeft}
       module="virtual-entities"
-      onRowClick={onRowClick}
+      onRowOpen={onRowOpen}
       restParams={{}}
       rowHeaderComponent={RowHeader}
       rowComponent={Row}
+      rowProps={{ onRowOpen }}
     />
   )
 }

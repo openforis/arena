@@ -1,24 +1,15 @@
-import { useCallback } from 'react'
-import { useNavigate } from 'react-router'
-
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
 import LabelsEditor from '@webapp/components/survey/LabelsEditor'
 import Checkbox from '@webapp/components/form/checkbox'
 import { ButtonIconEdit } from '@webapp/components'
-import { appModuleUri, designerModules } from '@webapp/app/appModules'
 
 import { useCollectImportReportItem } from './store'
 
 const Row = (props) => {
-  const navigate = useNavigate()
+  const { onRowOpen } = props
   const { rowNo, row, type, nodeDefPath, onUpdate } = useCollectImportReportItem(props)
   const { icon: typeIcon, label: typeLabel } = type
-
-  const onEditClick = useCallback(() => {
-    const nodeDefUuid = CollectImportReportItem.getNodeDefUuid(row)
-    navigate(`${appModuleUri(designerModules.nodeDef)}${nodeDefUuid}/`)
-  }, [row])
 
   return (
     <>
@@ -46,7 +37,7 @@ const Row = (props) => {
         />
       </div>
       <div className="cell icon">
-        <ButtonIconEdit onClick={onEditClick} />
+        <ButtonIconEdit onClick={() => onRowOpen(row)} />
       </div>
     </>
   )

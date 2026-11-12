@@ -57,7 +57,7 @@ const Surveys = (props) => {
     setRequestedAt(Date.now())
   }, [Survey.getStatus(surveyInfo)])
 
-  const onRowClick = (surveyRow) => {
+  const onRowOpen = (surveyRow) => {
     const canEdit = Authorizer.canEditSurvey(user, surveyRow)
     dispatch(SurveyActions.setActiveSurvey(Survey.getId(surveyRow), canEdit))
   }
@@ -211,7 +211,7 @@ const Surveys = (props) => {
       module={module}
       moduleApiUri={moduleApiUri}
       noItemsLabelForSearchKey="surveysView.noSurveysMatchingFilter"
-      onRowClick={onRowClick}
+      onRowOpen={onRowOpen}
       restParams={{ lang, template, requestedAt, includeCounts, onlyOwn }}
       visibleColumnsSelectionEnabled
     />

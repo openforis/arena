@@ -1,9 +1,11 @@
 import './CollectImportReport.scss'
 
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
+import { useNavigate } from 'react-router'
 
 import * as CollectImportReportItem from '@core/survey/collectImportReportItem'
 
+import { appModuleUri, designerModules } from '@webapp/app/appModules'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
 import Table from '@webapp/components/Table'
 
@@ -16,7 +18,14 @@ import Row from './Row'
 const CollectImportReport = () => {
   const surveyId = useSurveyId()
 
+  const navigate = useNavigate()
+
   const [excludeResolved, setExcludeResolved] = useState(false)
+
+  const onRowOpen = useCallback(
+    (item) => navigate(`${appModuleUri(designerModules.nodeDef)}${CollectImportReportItem.getNodeDefUuid(item)}/`),
+    [navigate]
+  )
 
   return (
     <SurveyDefsLoader draft validate>
@@ -31,6 +40,8 @@ const CollectImportReport = () => {
         headerProps={{ excludeResolved, setExcludeResolved }}
         rowHeaderComponent={RowHeader}
         rowComponent={Row}
+        rowProps={{ onRowOpen }}
+        onRowOpen={onRowOpen}
       />
     </SurveyDefsLoader>
   )

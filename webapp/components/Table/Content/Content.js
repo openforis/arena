@@ -29,7 +29,7 @@ LoadingRows.propTypes = {
 }
 
 const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
-  [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+  [...(expandableRows ? ['40px'] : []), ...columns.map((column) => column.width || '1fr')].join(' ')
 
 const Content = (props) => {
   const {
@@ -47,8 +47,6 @@ const Content = (props) => {
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
-    onRowClick = null,
-    onRowDoubleClick = null,
     rowExpandedComponent = null,
     rowComponent: rowComponentParam,
     rowHeaderComponent: rowHeaderComponentParam,
@@ -97,6 +95,7 @@ const Content = (props) => {
         <ContentHeaders
           {..._props}
           columns={columns}
+          expandableRows={expandableRows}
           selectAllItems={selectAllItems}
           deselectAllItems={deselectAllItems}
           selectedItemsCount={selectedItemsCount}
@@ -131,8 +130,6 @@ const Content = (props) => {
               rowComponent,
               rowExpandedComponent,
               gridTemplateColumns,
-              onRowClick,
-              onRowDoubleClick,
               selected: selectedItems.some((_item) => keyExtractor({ item: _item }) === key),
             })
           })}
@@ -158,13 +155,15 @@ Content.propTypes = {
   noItemsLabelKey: PropTypes.string.isRequired,
   noItemsLabelForSearchKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
-  onRowClick: PropTypes.func,
-  onRowDoubleClick: PropTypes.func,
+  isRowOpenable: PropTypes.func,
+  onItemSelectToggle: PropTypes.func.isRequired,
+  onRowOpen: PropTypes.func,
   initData: PropTypes.func,
   rowHeaderComponent: PropTypes.elementType.isRequired,
   rowComponent: PropTypes.elementType.isRequired,
   rowExpandedComponent: PropTypes.elementType,
   rowProps: PropTypes.object,
+  selectable: PropTypes.bool,
   selectedItems: PropTypes.array,
   selectAllItems: PropTypes.func,
   sort: PropTypes.object.isRequired,

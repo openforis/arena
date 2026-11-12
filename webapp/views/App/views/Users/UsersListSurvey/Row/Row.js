@@ -10,13 +10,13 @@ import { useI18n } from '@webapp/store/system'
 import { useAuthCanEditUser, useAuthCanViewOtherUsersEmail } from '@webapp/store/user'
 import { useSurveyInfo } from '@webapp/store/survey'
 import { useOnInviteRepeat } from '@webapp/views/App/views/Users/UserEdit/store/actions/useOnInviteRepeat'
-import { Button, ButtonInvite } from '@webapp/components'
+import { Button, ButtonIconEditOrView, ButtonInvite } from '@webapp/components'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import ProfilePicture from '@webapp/components/profilePicture'
 import { CopyPasswordResetLinkButton } from './CopyResetPasswordLinkButton'
 
 const Row = (props) => {
-  const { onEditSurveyUserExtraProps, item: userListItem } = props
+  const { onEditSurveyUserExtraProps, onRowOpen, item: userListItem } = props
   const surveyInfo = useSurveyInfo()
   const surveyUuid = Survey.getUuid(surveyInfo)
   const i18n = useI18n()
@@ -82,16 +82,18 @@ const Row = (props) => {
       <div data-testid={TestId.userList.lastLogin} data-value={lastLoginTime}>
         {lastLoginTimeFormatted}
       </div>
-      <div data-testid={TestId.userList.edit}>
-        <span className={`icon icon-12px icon-action ${canEditUser ? 'icon-pencil2' : 'icon-eye'}`} />
+      <div>
+        <Button
+          iconClassName="icon-cog"
+          title="usersView:editSurveyUserExtraPropsForUser"
+          titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
+          onClick={() => onEditSurveyUserExtraProps(userListItem)}
+          variant="text"
+        />
       </div>
-      <Button
-        iconClassName="icon-cog"
-        title="usersView:editSurveyUserExtraPropsForUser"
-        titleParams={{ userName: User.getName(userListItem) ?? User.getEmail(userListItem) }}
-        onClick={(event) => onEditSurveyUserExtraProps({ event, userListItem })}
-        variant="text"
-      />
+      <div data-testid={TestId.userList.edit}>
+        <ButtonIconEditOrView canEdit={canEditUser} onClick={() => onRowOpen(userListItem)} />
+      </div>
     </>
   )
 }
@@ -99,6 +101,7 @@ const Row = (props) => {
 Row.propTypes = {
   item: PropTypes.object.isRequired,
   onEditSurveyUserExtraProps: PropTypes.func.isRequired,
+  onRowOpen: PropTypes.func.isRequired,
 }
 
 export default Row
