@@ -17,10 +17,12 @@ $tableFooterHeight: 30px;
 
   .table__content {
     position: relative;
-    padding: 10px;
     background-color: $colorSurface;
     height: calc(100% - #{$tableHeaderHeight});
     border: $tableRowBorder;
+    border-radius: $tableBorderRadius;
+    // clips the header background to the rounded corners
+    overflow: hidden;
   }
 
   .table__footer {
@@ -37,15 +39,16 @@ $tableFooterHeight: 30px;
     font-style: italic;
     text-align: center;
     margin-top: 2rem;
+    color: $colorOnSurfaceVariant;
   }
 
   .table__rows {
     position: absolute;
     overflow-y: auto;
     scrollbar-gutter: stable;
-    height: calc(100% - 50px);
-    right: 10px;
-    left: 10px;
+    height: calc(100% - #{$tableRowHeight});
+    right: 0;
+    left: 0;
   }
 
   .table__row {
@@ -87,19 +90,24 @@ $tableFooterHeight: 30px;
     }
 
     &:hover {
-      background-color: with-alpha($colorPrimaryContainer, 0.3);
+      background-color: $tableRowHoverBackground;
 
       .icon-action {
-        color: $colorWarning;
+        color: $colorPrimary;
       }
     }
   }
 
+  .table__row.selected {
+    background-color: $tableRowSelectedBackground;
+  }
+
   .table__row.active {
-    background-color: $colorHighlightContainer;
+    background-color: $tableRowSelectedBackground;
+    box-shadow: inset 3px 0 0 $colorPrimary;
 
     .icon-action {
-      color: $colorWarning;
+      color: $colorPrimary;
     }
   }
 
@@ -110,11 +118,24 @@ $tableFooterHeight: 30px;
   .table__row-header {
     @extend .table__row;
     border-bottom: none;
-    background-color: $colorInverseSurface;
-    color: $colorInverseOnSurface;
+    background: $tableHeaderAccent bottom / 100% 2px no-repeat, $colorPrimaryContainerLow;
+    color: $colorOnPrimaryContainer;
     font-weight: 600;
     overflow: hidden;
+    // aligns the columns with the rows, which always reserve the scrollbar space
     padding-right: 16px;
+
+    // node def headers (Data Explorer edit mode) are dark in the survey form: here they follow the table header
+    .survey-form__node-def-table-cell-header {
+      background-color: transparent;
+      color: inherit;
+
+      .label,
+      .icon,
+      .btn-sort-toggle {
+        color: inherit;
+      }
+    }
   }
 
   .table__row-expanded-panel-wrapper {

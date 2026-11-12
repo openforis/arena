@@ -194,5 +194,7 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
     `webapp/views/App/views/JobsMonitor/JobsMonitor.tsx`
   - `Table` (`webapp/components/Table`) loads its pages from `moduleApiUri` and `moduleApiUri/count`, and keeps
     paging, sorting and search in the URL, e.g. `webapp/views/App/views/Message/MessageList.js`
+  - Both have the same look: change it in the table variables of `webapp/style/_vars.scss` (used by
+    `webapp/style/table.scss`) and in the `MuiDataGrid` overrides of `webapp/theme/createArenaTheme.ts` together.
 - Generic hooks are in `webapp/components/hooks`, and many components are re-exported by
   `webapp/components/index.js`.
