@@ -47,7 +47,6 @@ export const ContentRow = (props) => {
   })
 
   const onRowExpandToggle = () => setRowExpanded((oldExpanded) => !oldExpanded)
-  const height = rowExpanded ? '300px' : '35px'
 
   const itemPosition = index + offset + 1
 
@@ -106,7 +105,7 @@ export const ContentRow = (props) => {
       onDoubleClick={clickable ? onDoubleClick : undefined}
       onKeyDown={clickable ? onKeyDown : undefined}
       className={className}
-      style={{ gridTemplateColumns, height }}
+      style={{ gridTemplateColumns }}
     >
       {React.createElement(rowComponent, {
         ...rowProps,

@@ -6,9 +6,9 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
 import { SurveyDocImages, type SurveyDocImage } from '@openforis/arena-core'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, Fieldset } from '@webapp/components'
+import { ButtonAdd, Fieldset } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
-import { DataGrid } from '@webapp/components/DataGrid'
+import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { Checkbox } from '@webapp/components/form'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
@@ -148,39 +148,12 @@ const SurveyDocLayoutEditor = (props: Props) => {
                 headerName: i18n.t('common.dateCreated'),
                 renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
-              {
-                field: 'download',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row: surveyDocImage }) => (
-                  <ButtonDownload
-                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) })}
-                    showLabel={false}
-                    variant="text"
-                  />
-                ),
-                sortable: false,
-              },
-              ...(readOnly
-                ? []
-                : [
-                    {
-                      field: 'edit',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
-                      sortable: false,
-                    },
-                    {
-                      field: 'delete',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row: surveyDocImage }) => (
-                        <ButtonIconDelete onClick={onDeleteClick({ surveyDocImage })} />
-                      ),
-                      sortable: false,
-                    },
-                  ]),
+              ...rowActionColumns<SurveyDocImage>({
+                getDownloadUrl: (surveyDocImage) =>
+                  API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(surveyDocImage) }),
+                onEdit: readOnly ? undefined : onEdit,
+                onDelete: readOnly ? undefined : (surveyDocImage) => onDeleteClick({ surveyDocImage })(),
+              }),
             ]}
             density="compact"
             getRowId={(row: SurveyDocImage) => SurveyFile.getUuid(row)}

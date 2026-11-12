@@ -112,7 +112,9 @@ $tableFooterHeight: 30px;
   }
 
   .table__row.expanded {
-    align-items: baseline;
+    // first line: the row cells; second line: the expanded panel, as tall as its content
+    height: auto;
+    grid-template-rows: $tableRowHeight auto;
   }
 
   .table__row-header {
@@ -138,12 +140,14 @@ $tableFooterHeight: 30px;
     }
   }
 
-  .table__row-expanded-panel-wrapper {
-    position: absolute;
-    top: 35px;
-    left: 0;
-    bottom: 0;
-    width: 100%;
+  .table__row > .table__row-expanded-panel-wrapper {
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    max-height: 300px;
+    overflow: auto;
+    white-space: normal;
+    // aligned with the cells after the expand/collapse toggle column
+    padding: 0 1rem 1rem 40px;
   }
 
   .table__paginator {

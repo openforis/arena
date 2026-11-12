@@ -4,9 +4,9 @@ import PropTypes from 'prop-types'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as DateUtils from '@core/dateUtils'
 
-import { ButtonAdd, ButtonDownload, ButtonIconDelete, ButtonIconEdit, ButtonIconMap } from '@webapp/components'
+import { ButtonAdd } from '@webapp/components'
 import { useConfirmAsync } from '@webapp/components/hooks'
-import { DataGrid } from '@webapp/components/DataGrid'
+import { DataGrid, rowActionColumns } from '@webapp/components/DataGrid'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { SurveyFilesMapPanel } from '@webapp/components/MapContainer/fileLayers'
 import { useSurveyId, useSurveyPreferredLang } from '@webapp/store/survey'
@@ -122,50 +122,13 @@ const PreloadedMapLayersEditor = (props) => {
                 headerName: i18n.t('common.dateCreated'),
                 renderCell: ({ row }) => DateUtils.formatDateTimeDisplay(SurveyFile.getDateCreated(row)),
               },
-              {
-                field: 'download',
-                width: 60,
-                headerName: '',
-                renderCell: ({ row: preloadedMapLayer }) => (
-                  <ButtonDownload
-                    href={API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(preloadedMapLayer) })}
-                    showLabel={false}
-                    variant="text"
-                  />
-                ),
-                sortable: false,
-              },
-              ...(canUseMap
-                ? [
-                    {
-                      field: 'map',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row }) => <ButtonIconMap onClick={() => onShowOnMap(row)} />,
-                      sortable: false,
-                    },
-                  ]
-                : []),
-              ...(readOnly
-                ? []
-                : [
-                    {
-                      field: 'edit',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row }) => <ButtonIconEdit onClick={() => onEdit(row)} />,
-                      sortable: false,
-                    },
-                    {
-                      field: 'delete',
-                      width: 60,
-                      headerName: '',
-                      renderCell: ({ row: preloadedMapLayer }) => (
-                        <ButtonIconDelete onClick={onDeleteClick({ preloadedMapLayer })} />
-                      ),
-                      sortable: false,
-                    },
-                  ]),
+              ...rowActionColumns({
+                getDownloadUrl: (preloadedMapLayer) =>
+                  API.getSurveyFileDownloadUrl({ surveyId, fileUuid: SurveyFile.getUuid(preloadedMapLayer) }),
+                onShowOnMap: canUseMap ? onShowOnMap : undefined,
+                onEdit: readOnly ? undefined : onEdit,
+                onDelete: readOnly ? undefined : (preloadedMapLayer) => onDeleteClick({ preloadedMapLayer })(),
+              }),
             ]}
             density="compact"
             getRowId={(row) => SurveyFile.getUuid(row)}

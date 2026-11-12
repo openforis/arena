@@ -1,0 +1,9 @@
+.btn-expand-toggle {
+  .btn-expand-toggle__icon {
+    transition: transform 0.2s;
+  }
+
+  &.btn-expand-toggle--expanded .btn-expand-toggle__icon {
+    transform: rotate(180deg);
+  }
+}

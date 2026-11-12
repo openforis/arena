@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types'
 
-import { Button } from '@webapp/components/buttons'
+import { ButtonIconExpandToggle } from '@webapp/components/buttons'
 
 import { ContentRowCell } from './ContentRowCell'
 
@@ -23,6 +23,11 @@ export const ContentRowCells = (props) => {
 
   return (
     <>
+      {expandableRows && (
+        <div>
+          {isRowExpandable({ item }) && <ButtonIconExpandToggle expanded={rowExpanded} onClick={onRowExpandToggle} />}
+        </div>
+      )}
       {columns.map((column) => (
         <ContentRowCell
           key={column.key}
@@ -37,16 +42,6 @@ export const ContentRowCells = (props) => {
           {...cellProps}
         />
       ))}
-      {expandableRows && (
-        <div>
-          <Button
-            iconClassName={rowExpanded ? 'icon-circle-up' : 'icon-circle-down'}
-            disabled={!isRowExpandable({ item })}
-            title="common.expandCollapse"
-            onClick={onRowExpandToggle}
-          />
-        </div>
-      )}
     </>
   )
 }

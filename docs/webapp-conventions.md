@@ -205,5 +205,10 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
   - Row action buttons are the last columns, in this order: the other actions (download, show on map...), then
     view/edit (`ButtonIconEditOrView`, or `ButtonIconEdit`), then delete (`ButtonIconDelete`). Tables whose rows
     open an item show the view/edit button too, so that it can also be opened without knowing about the row click.
+    In a `DataGrid`, `rowActionColumns` (`webapp/components/DataGrid`) builds the download, show on map, edit and
+    delete columns in this order.
+  - Expandable rows (`expandableRows` and `rowExpandedComponent` in `Table`) have the expand/collapse toggle
+    (`ButtonIconExpandToggle`) in the first column, only in the rows that can be expanded (`isRowExpandable`). The
+    expanded panel is as tall as its content (up to 300px, then it scrolls).
 - Generic hooks are in `webapp/components/hooks`, and many components are re-exported by
   `webapp/components/index.js`.

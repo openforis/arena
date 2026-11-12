@@ -29,7 +29,7 @@ LoadingRows.propTypes = {
 }
 
 const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
-  [...columns.map((column) => column.width || '1fr'), ...(expandableRows ? ['40px'] : [])].join(' ')
+  [...(expandableRows ? ['40px'] : []), ...columns.map((column) => column.width || '1fr')].join(' ')
 
 const Content = (props) => {
   const {
@@ -95,6 +95,7 @@ const Content = (props) => {
         <ContentHeaders
           {..._props}
           columns={columns}
+          expandableRows={expandableRows}
           selectAllItems={selectAllItems}
           deselectAllItems={deselectAllItems}
           selectedItemsCount={selectedItemsCount}
