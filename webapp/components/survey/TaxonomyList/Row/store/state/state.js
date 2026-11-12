@@ -9,19 +9,10 @@ export const keys = {
   onSelect: 'onSelect',
   canSelect: 'canSelect',
   initData: 'initData',
-  onTaxonomyOpen: 'onTaxonomyOpen',
 }
 
 // ==== CREATE
-export const create = ({
-  taxonomy,
-  canDelete,
-  selectedItemUuid,
-  onTaxonomySelect,
-  canSelect,
-  initData,
-  onTaxonomyOpen,
-}) => ({
+export const create = ({ taxonomy, canDelete, selectedItemUuid, onTaxonomySelect, canSelect, initData }) => ({
   [keys.taxonomy]: taxonomy,
   [keys.deleted]: false,
   [keys.canDelete]: canDelete,
@@ -29,12 +20,10 @@ export const create = ({
   [keys.onSelect]: onTaxonomySelect,
   [keys.canSelect]: canSelect,
   [keys.initData]: initData,
-  [keys.onTaxonomyOpen]: onTaxonomyOpen,
 })
 
 // ==== READ
 export const getOnSelect = A.prop(keys.onSelect)
-export const getOnTaxonomyOpen = A.prop(keys.onTaxonomyOpen)
 export const getInitData = A.prop(keys.initData)
 export const getTaxonomy = A.prop(keys.taxonomy)
 export const getSelectedItemUuid = A.prop(keys.selectedItemUuid)

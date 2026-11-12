@@ -1,9 +1,11 @@
-import { useMemo } from 'react'
+import { useCallback, useMemo } from 'react'
 import {
   DataGrid as MuiDataGrid,
   DataGridProps,
+  GridCellParams,
   GridColDef,
   GridDensity,
+  GridEventListener,
   GridFooter,
   GridFooterContainer,
   GridInitialState,
@@ -15,7 +17,9 @@ import {
 } from '@mui/x-data-grid'
 import classNames from 'classnames'
 
-type Props = {
+import { isEventFromInteractiveChild } from '@webapp/utils/domUtils'
+
+type Props<R extends object> = {
   allowExportToCsv?: boolean
   autoHeight?: boolean
   autoPageSize?: boolean
@@ -24,17 +28,16 @@ type Props = {
   className?: string
   columns: GridColDef[]
   density?: GridDensity
-  disableSelectionOnClick?: boolean
   exportFileName?: string
   getRowClassName?: (params: GridRowClassNameParams) => string
   getRowId?: GridRowIdGetter
   hideFooterPagination?: boolean
   initialState?: GridInitialState
+  isRowOpenable?: (row: R) => boolean
   isRowSelectable?: DataGridProps['isRowSelectable']
-  onRowClick?: DataGridProps['onRowClick']
-  onRowDoubleClick?: DataGridProps['onRowDoubleClick']
+  onRowOpen?: (row: R) => void
   onRowSelectionModelChange?: (model: GridRowSelectionModel) => void
-  rows: GridRowsProp
+  rows: readonly R[]
   rowSelectionModel?: GridRowSelectionModel
 }
 
@@ -47,7 +50,7 @@ const FooterWithExport =
     </GridFooterContainer>
   )
 
-const DataGrid = (props: Props) => {
+const DataGrid = <R extends object>(props: Props<R>) => {
   const {
     allowExportToCsv = false,
     autoHeight = false,
@@ -58,14 +61,13 @@ const DataGrid = (props: Props) => {
     columns: columnsProp,
     density = 'standard',
     exportFileName,
-    disableSelectionOnClick = true,
-    getRowClassName,
+    getRowClassName: getRowClassNameProp,
     getRowId,
     hideFooterPagination = false,
     initialState,
+    isRowOpenable,
     isRowSelectable,
-    onRowClick,
-    onRowDoubleClick,
+    onRowOpen,
     onRowSelectionModelChange,
     rows,
     rowSelectionModel,
@@ -75,6 +77,34 @@ const DataGrid = (props: Props) => {
 
   const getRowHeight = useMemo(() => (autoRowHeight ? () => 'auto' as const : undefined), [autoRowHeight])
 
+  // same behavior as the Table component: with selection, click selects and double click opens; otherwise click opens
+  const isOpenable = useCallback(
+    (row: R): boolean => Boolean(onRowOpen) && (isRowOpenable?.(row) ?? true),
+    [isRowOpenable, onRowOpen]
+  )
+
+  const onRowOpenEvent = useCallback<GridEventListener<'rowClick'>>(
+    ({ row }, event) => {
+      if (isOpenable(row) && !isEventFromInteractiveChild(event)) onRowOpen?.(row)
+    },
+    [isOpenable, onRowOpen]
+  )
+
+  const onCellKeyDown = useCallback<GridEventListener<'cellKeyDown'>>(
+    ({ row }: GridCellParams, event) => {
+      if (event.key === 'Enter' && isOpenable(row) && !isEventFromInteractiveChild(event)) onRowOpen?.(row)
+    },
+    [isOpenable, onRowOpen]
+  )
+
+  const getRowClassName = useCallback(
+    (params: GridRowClassNameParams): string =>
+      classNames(getRowClassNameProp?.(params), {
+        'data-grid__row--clickable': checkboxSelection || isOpenable(params.row),
+      }),
+    [checkboxSelection, getRowClassNameProp, isOpenable]
+  )
+
   return (
     <MuiDataGrid
       autoHeight={autoHeight}
@@ -83,17 +113,18 @@ const DataGrid = (props: Props) => {
       className={classNames('data-grid', className)}
       columns={columns}
       density={density}
-      disableRowSelectionOnClick={disableSelectionOnClick}
+      disableRowSelectionOnClick={!checkboxSelection}
       getRowClassName={getRowClassName}
       getRowHeight={getRowHeight}
       getRowId={getRowId}
       hideFooterPagination={hideFooterPagination}
       initialState={initialState}
       isRowSelectable={isRowSelectable}
-      onRowClick={onRowClick}
-      onRowDoubleClick={onRowDoubleClick}
+      onCellKeyDown={onCellKeyDown}
+      onRowClick={checkboxSelection ? undefined : onRowOpenEvent}
+      onRowDoubleClick={checkboxSelection ? onRowOpenEvent : undefined}
       onRowSelectionModelChange={onRowSelectionModelChange}
-      rows={rows}
+      rows={rows as GridRowsProp}
       rowSelectionModel={rowSelectionModel}
       slots={allowExportToCsv ? { footer: FooterWithExport({ exportFileName }) } : undefined}
     />
