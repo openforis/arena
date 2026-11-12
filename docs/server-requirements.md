@@ -63,10 +63,3 @@ object storage (S3) is usually the cheapest and most scalable option, and keeps 
   and USD 150–400 per month for a full NFI, storage and backups included, depending on provider and region.
 - **On premises** (national data center or institution): hardware and staff costs only, but power,
   connectivity, physical security and off-site backups must be guaranteed.
-
-## Information needed for a precise estimate
-
-1. Number of plots (pilot and full inventory) and of measurement cycles.
-2. Number of photos (or other files) per plot.
-3. Number of concurrent users (field teams, data cleaners, analysts).
-4. Constraints, e.g. data that must stay in the country or a mandatory national data center.
