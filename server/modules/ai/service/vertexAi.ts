@@ -135,7 +135,8 @@ const fetchModelsPage = async ({ headers, pageToken }: { headers: Record<string,
   })
   if (!response.ok) {
     const body = await response.text().catch(() => '')
-    throw new Error(`HTTP ${response.status}${body ? ` — ${body.slice(0, 200)}` : ''}`)
+    const bodySuffix = body ? ` — ${body.slice(0, 200)}` : ''
+    throw new Error(`HTTP ${response.status}${bodySuffix}`)
   }
   return response.json()
 }
