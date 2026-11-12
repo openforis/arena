@@ -24,7 +24,12 @@ export const ContentRow = (props) => {
   const [rowExpanded, setRowExpanded] = useState(false)
 
   const active = isRowActive?.(item)
-  const className = classNames('table__row', { hoverable: Boolean(onRowClick), active, expanded: rowExpanded })
+  const className = classNames('table__row', {
+    hoverable: Boolean(onRowClick),
+    active,
+    expanded: rowExpanded,
+    selected,
+  })
 
   const onRowExpandToggle = () => setRowExpanded((oldExpanded) => !oldExpanded)
   const height = rowExpanded ? '300px' : '35px'
