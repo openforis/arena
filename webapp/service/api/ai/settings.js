@@ -21,9 +21,10 @@ export const fetchSettings = async () => {
  * Saves the user's AI settings. Pass `apiKey: undefined` to keep the
  * existing key untouched; pass `apiKey: ''` to clear it.
  * @param {object} update - Settings to save.
- * @param {string} update.provider - openai|anthropic|google|openai-compatible.
+ * @param {string} update.provider - openai|anthropic|google|google-vertex|openai-compatible|vercel-ai-sdk.
  * @param {string} update.model - Model identifier.
  * @param {string} [update.baseUrl] - For openai-compatible only.
+ * @param {string} [update.location] - Google Cloud location (Vertex AI only).
  * @param {string} [update.apiKey] - New API key (omit to keep existing, '' to clear).
  * @param {boolean} update.enabled - Whether the personal override is active.
  * @returns {Promise<object>} The updated settings descriptor.
@@ -42,6 +43,7 @@ export const saveSettings = async (update) => {
  * @param {string} [draft.provider] - Provider key.
  * @param {string} [draft.model] - Model identifier.
  * @param {string} [draft.baseUrl] - Base URL (openai-compatible only).
+ * @param {string} [draft.location] - Google Cloud location (Vertex AI only).
  * @param {string} [draft.apiKey] - API key from the form, if changed.
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} The test result.
  */
@@ -56,11 +58,12 @@ export const testConnection = async (draft = {}) => {
  * @param {object} args - Args.
  * @param {string} args.provider - Provider key.
  * @param {string} [args.baseUrl] - For openai-compatible / Vercel AI SDK.
+ * @param {string} [args.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - API key from the in-progress form.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models list.
  */
-export const fetchModels = async ({ provider, baseUrl, apiKey }) => {
-  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, apiKey })
+export const fetchModels = async ({ provider, baseUrl, location, apiKey }) => {
+  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, location, apiKey })
   return data
 }
 

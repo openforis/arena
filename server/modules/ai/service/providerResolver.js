@@ -25,6 +25,10 @@ const adminDefaultConfig = () =>
         model: ENV.aiDefaultModel,
         apiKey: ENV.aiDefaultApiKey,
         baseUrl: ENV.aiDefaultBaseUrl,
+        project: ENV.aiDefaultVertexProject,
+        location: ENV.aiDefaultVertexLocation,
+        // Vertex AI without AI_DEFAULT_API_KEY: use the server credentials (e.g. GOOGLE_APPLICATION_CREDENTIALS).
+        useApplicationDefaultCredentials: true,
       }
     : null
 

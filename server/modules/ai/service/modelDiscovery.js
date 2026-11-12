@@ -13,6 +13,7 @@
 import SystemError from '@core/systemError'
 
 import * as ProviderRegistry from './providerRegistry'
+import { listVertexModels } from './vertexAi'
 
 const DEFAULT_TIMEOUT_MS = 10000
 
@@ -97,10 +98,10 @@ const listAnthropic = async ({ apiKey }) => {
 
 const listGoogle = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
-  const json = await fetchWithTimeout(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
-    { headers: { Accept: 'application/json' } }
-  )
+  // Key in a header, not in the URL, so that it doesn't end up in proxy/access logs.
+  const json = await fetchWithTimeout('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', {
+    headers: { Accept: 'application/json', 'x-goog-api-key': apiKey },
+  })
   const models = Array.isArray(json?.models) ? json.models : []
   return models
     .filter(
@@ -122,10 +123,12 @@ const listGoogle = async ({ apiKey }) => {
  * @param {string} args.provider - Provider key from `ProviderRegistry.providers`.
  * @param {string} [args.baseUrl] - Required for openai-compatible.
  * @param {string} [args.apiKey] - Required for cloud providers.
+ * @param {string} [args.location] - Google Cloud location (Vertex AI only).
+ * @param {boolean} [args.useApplicationDefaultCredentials] - Vertex AI only: allow the server credentials.
  * @returns {Promise<Array<{id: string, description?: string}>>} The models.
  * @throws {SystemError} `aiModelListFailed` on any upstream failure.
  */
-export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
+export const listForProvider = async ({ provider, baseUrl, apiKey, location, useApplicationDefaultCredentials }) => {
   try {
     switch (provider) {
       case ProviderRegistry.providers.openai:
@@ -134,6 +137,8 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
         return await listAnthropic({ apiKey })
       case ProviderRegistry.providers.google:
         return await listGoogle({ apiKey })
+      case ProviderRegistry.providers.googleVertex:
+        return await listVertexModels({ apiKey, location, useApplicationDefaultCredentials })
       case ProviderRegistry.providers.openaiCompatible: {
         if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
         return await listOpenAiCompatible({ baseUrl, apiKey })

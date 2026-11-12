@@ -118,6 +118,8 @@ export default {
   aiApiKeyMissing: '{{provider}} үйлчилгээ үзүүлэгчид API түлхүүр шаардлагатай.',
   aiBaseUrlMissing: 'OpenAI-тай нийцтэй үйлчилгээ үзүүлэгчид суурь URL шаардлагатай.',
   aiModelListFailed: 'Үйлчилгээ үзүүлэгчээс загваруудын жагсаалтыг авч чадсангүй: {{message}}',
+  aiVertexCredentialInvalid:
+    'Vertex AI-н итгэмжлэл буруу байна: үйлчилгээний бүртгэлийн JSON түлхүүр эсвэл Vertex AI API түлхүүр буулгана уу.',
   aiExpressionDescriptionMissing: 'Хүссэн илэрхийллээ энгийн үгээр тайлбарлана уу.',
   aiExpressionTypeInvalid: 'Тодорхойгүй илэрхийллийн төрөл: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Зорилтот талбаргүйгээр илэрхийлэл үүсгэх боломжгүй.',

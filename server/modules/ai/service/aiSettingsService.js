@@ -12,7 +12,7 @@
  *   user.prefs.ai = {
  *     featuresEnabled,        // master switch — user wants AI at all
  *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity, dataQuery } booleans
- *     provider, model, baseUrl, apiKeyEncrypted,
+ *     provider, model, baseUrl, location, apiKeyEncrypted,
  *     enabled,                // use OWN provider vs. admin default
  *     lastTestOk, lastTestAt,
  *   }
@@ -111,6 +111,7 @@ export const getPublicSettings = (user) => {
       provider: null,
       model: null,
       baseUrl: null,
+      location: null,
       enabled: false,
       hasApiKey: false,
       lastTestOk: null,
@@ -123,6 +124,7 @@ export const getPublicSettings = (user) => {
     provider: raw.provider || null,
     model: raw.model || null,
     baseUrl: raw.baseUrl || null,
+    location: raw.location || null,
     enabled: !!raw.enabled,
     hasApiKey: !!raw.apiKeyEncrypted,
     lastTestOk: raw.lastTestOk ?? null,
@@ -170,9 +172,14 @@ export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
     provider: raw.provider,
     model: raw.model,
     baseUrl: raw.baseUrl || null,
+    location: raw.location || null,
     apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : null,
   }
 }
+
+// Location applies only to Vertex AI.
+const sanitiseLocation = ({ provider, location }) =>
+  provider === ProviderRegistry.providers.googleVertex && location ? String(location).trim() || null : null
 
 // Throws when the provider config is incomplete.
 const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
@@ -189,17 +196,18 @@ const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) =
  * @param {object} args - Args.
  * @param {object} args.update - The submitted settings.
  * @param {boolean} args.overrideEnabled - Whether the user-provider override is active.
- * @returns {{provider: string, model: string|null, baseUrl: string|null}} - The sanitised provider config.
+ * @returns {{provider: string, model: string|null, baseUrl: string|null, location: string|null}} - The sanitised provider config.
  */
 const extractProviderConfig = ({ update, overrideEnabled }) => {
   const provider = sanitiseProvider(update.provider)
   const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
   const model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
   const baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
+  const location = sanitiseLocation({ provider, location: update.location })
   if (overrideEnabled) {
     validateProviderConfig({ provider, model, baseUrl, isFixedEndpoint })
   }
-  return { provider, model, baseUrl }
+  return { provider, model, baseUrl, location }
 }
 
 /**
@@ -225,6 +233,7 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  * @param {string} [args.update.provider] - Provider key.
  * @param {string} [args.update.model] - Model identifier.
  * @param {string} [args.update.baseUrl] - Optional custom base URL.
+ * @param {string} [args.update.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.update.apiKey] - New API key (omit to keep existing).
  * @param {boolean} [args.update.enabled] - Whether the user-provider override is active.
  * @returns {Promise<object>} The new public settings descriptor.
@@ -247,9 +256,10 @@ export const saveSettings = async ({ user, update }) => {
   let provider = existing.provider || null
   let model = existing.model || null
   let baseUrl = existing.baseUrl || null
+  let location = existing.location || null
 
   if (featuresEnabled && update.provider) {
-    ;({ provider, model, baseUrl } = extractProviderConfig({ update, overrideEnabled }))
+    ;({ provider, model, baseUrl, location } = extractProviderConfig({ update, overrideEnabled }))
   }
 
   const newAi = {
@@ -258,6 +268,7 @@ export const saveSettings = async ({ user, update }) => {
     provider,
     model,
     baseUrl,
+    location,
     apiKeyEncrypted,
     enabled: overrideEnabled,
     // Saving invalidates the previous test result.
@@ -303,10 +314,11 @@ export const clearSettings = async ({ user }) => {
  * @param {string} [args.provider] - Draft provider (overrides saved config).
  * @param {string} [args.model] - Draft model.
  * @param {string} [args.baseUrl] - Draft base URL.
+ * @param {string} [args.location] - Draft Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} Test result.
  */
-export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
+export const testConnection = async ({ user, provider, model, baseUrl, location, apiKey }) => {
   let cfg
   if (provider) {
     const providerSanitised = sanitiseProvider(String(provider))
@@ -317,6 +329,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
       provider: providerSanitised,
       model: trimmedModel || null,
       baseUrl: trimmedBaseUrl || null,
+      location: sanitiseLocation({ provider: providerSanitised, location }),
       apiKey: effectiveApiKey,
     }
   } else {
@@ -355,16 +368,18 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
  * @param {object} args.user - Arena user.
  * @param {string} args.provider - Provider key.
  * @param {string} [args.baseUrl] - Base URL (for openai-compatible / Vercel AI SDK).
+ * @param {string} [args.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - API key from the form, if any.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models.
  */
-export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
+export const listModels = async ({ user, provider, baseUrl, location, apiKey }) => {
   sanitiseProvider(provider)
   const effectiveApiKey = resolveApiKey({ user, apiKey })
   const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
   const models = await ModelDiscovery.listForProvider({
     provider,
     baseUrl: trimmedBaseUrl,
+    location: sanitiseLocation({ provider, location }),
     apiKey: effectiveApiKey,
   })
   return { models }

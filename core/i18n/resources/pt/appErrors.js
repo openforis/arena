@@ -119,6 +119,8 @@ Tente atualizar a página.`,
   aiApiKeyMissing: 'A chave de API é obrigatória para o provedor {{provider}}.',
   aiBaseUrlMissing: 'Uma URL base é obrigatória para o provedor compatível com OpenAI.',
   aiModelListFailed: 'Não foi possível listar os modelos do provedor: {{message}}',
+  aiVertexCredentialInvalid:
+    'Credencial da Vertex AI inválida: cole uma chave JSON de conta de serviço ou uma chave de API da Vertex AI.',
   aiExpressionDescriptionMissing: 'Descreva em linguagem simples a expressão que você deseja.',
   aiExpressionTypeInvalid: 'Tipo de expressão desconhecido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Não é possível gerar uma expressão sem um campo de destino.',

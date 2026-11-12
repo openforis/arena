@@ -33,6 +33,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic（Claude）',
     google: 'Google（Gemini）',
+    'google-vertex': 'Google Vertex AI（Gemini）',
     'openai-compatible': 'OpenAI互換（Azure、OpenRouter、Ollamaなど）',
     'vercel-ai-sdk': 'Vercel AI SDK（チャットエンドポイント）',
   },
@@ -43,6 +44,11 @@ export default {
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',
   apiKeyKept: '既存のキーを維持する場合は空欄のままにしてください。',
+  googleVertexApiKeyHint:
+    'サービスアカウントの JSON キー（Vertex AI ユーザーロール付き）または Vertex AI の API キーを貼り付けてください。',
+  location: 'ロケーション',
+  locationHint:
+    'Google Cloud のリージョン（例：europe-west1）。グローバルエンドポイントを使う場合は空欄のままにしてください。',
   vercelAiSdkHint:
     'Vercel AI SDKチャットエンドポイントは固定エージェントとして扱われ、モデル選択やAPIキーは適用されません。自由記述の生成は機能しますが、構造化出力機能は動作しない場合があります。',
   fetchModels: 'モデルを取得',

@@ -4,7 +4,7 @@ export default {
   enableFeatures: 'Habilitar funciones de IA',
   categoriesSection: 'Niveles de integracion de IA',
   categories: {
-    chat: 'Chatbot de documentacion',
+    chat: 'Chatbot de documentación',
     chatHint: 'Boton de ayuda flotante que responde preguntas sobre Arena, usando el proveedor de IA configurado.',
     expressions: 'Generacion y validacion de expresiones',
     expressionsHint: 'Asistencia de IA para redactar y explicar expresiones de validacion de encuesta.',
@@ -33,6 +33,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'Compatible con OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
@@ -43,6 +44,10 @@ export default {
   apiKey: 'Clave API',
   apiKeyPlaceholder: 'Pegue la clave API de su proveedor',
   apiKeyKept: 'Deje en blanco para mantener la clave existente.',
+  googleVertexApiKeyHint:
+    'Pegue una clave JSON de cuenta de servicio (con el rol Usuario de Vertex AI) o una clave de API de Vertex AI.',
+  location: 'Ubicación',
+  locationHint: 'Región de Google Cloud (p. ej. europe-west1). Deje en blanco para usar el endpoint global.',
   vercelAiSdkHint:
     'Un endpoint de chat de Vercel AI SDK se trata como un agente fijo: la seleccion de modelo y la clave API no aplican. La generacion de texto libre funciona; las funciones de salida estructurada pueden no funcionar.',
   fetchModels: 'Obtener modelos',

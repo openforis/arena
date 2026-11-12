@@ -125,6 +125,8 @@ Essayez de rafraîchir la page.`,
   aiApiKeyMissing: 'Une clé API est requise pour le fournisseur {{provider}}.',
   aiBaseUrlMissing: 'Une URL de base est requise pour le fournisseur compatible OpenAI.',
   aiModelListFailed: 'Impossible de lister les modèles du fournisseur : {{message}}',
+  aiVertexCredentialInvalid:
+    'Identifiant Vertex AI non valide : collez une clé JSON de compte de service ou une clé API Vertex AI.',
   aiExpressionDescriptionMissing: "Veuillez décrire en langage courant l'expression souhaitée.",
   aiExpressionTypeInvalid: "Type d'expression inconnu : {{expressionType}}.",
   aiExpressionNodeDefMissing: 'Impossible de générer une expression sans champ cible.',

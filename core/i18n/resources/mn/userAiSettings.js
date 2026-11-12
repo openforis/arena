@@ -34,6 +34,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'OpenAI-тэй нийцтэй (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (чатын endpoint)',
   },
@@ -44,6 +45,10 @@ export default {
   apiKey: 'API түлхүүр',
   apiKeyPlaceholder: 'Үйлчилгээ үзүүлэгчийн API түлхүүрээ буулгана уу',
   apiKeyKept: 'Одоогийн түлхүүрийг хадгалах бол хоосон үлдээнэ үү.',
+  googleVertexApiKeyHint:
+    'Үйлчилгээний бүртгэлийн JSON түлхүүр (Vertex AI User эрхтэй) эсвэл Vertex AI API түлхүүр буулгана уу.',
+  location: 'Байршил',
+  locationHint: 'Google Cloud бүс (жишээ нь europe-west1). Глобал endpoint ашиглах бол хоосон үлдээнэ үү.',
   vercelAiSdkHint:
     'Vercel AI SDK-ийн чатын endpoint-ийг тогтмол агент гэж үзнэ - загвар сонгох болон API түлхүүр хамаарахгүй. Чөлөөт текст үүсгэх боломжтой; бүтэцтэй гаралттай функцүүд ажиллахгүй байж болно.',
   fetchModels: 'Загваруудыг татах',

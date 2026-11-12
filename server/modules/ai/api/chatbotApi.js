@@ -22,6 +22,7 @@ import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as AiSettingsService from '../service/aiSettingsService'
 import * as ModelClient from '../service/modelClient'
 import { validateMessages } from '../service/chatbotService'
+import { getUserManualText } from '../service/userManualContext'
 import { closeSseStream, createSseEventWriter, openSseStream } from './serverSentEvents'
 import { formatStreamErrorForLog, formatStreamErrorForWire } from './sseErrorHelpers'
 
@@ -33,6 +34,16 @@ const CHATBOT_SYSTEM_PROMPT =
   'You are the Arena documentation assistant. Answer concisely and accurately based on what you know about the ' +
   'Open Foris Arena platform (a cloud platform for forest-inventory survey design, data collection, and ' +
   'analysis). If a question is outside that scope, say so briefly.'
+
+const CHATBOT_USER_MANUAL_INSTRUCTIONS =
+  'You are the Arena documentation assistant. Open Foris Arena is a cloud platform for forest-inventory survey ' +
+  'design, data collection, and analysis. Answer concisely and accurately, based on the Arena user manual below. ' +
+  'Refer to UI labels and manual sections as they appear in the manual. If the manual does not cover the ' +
+  'question, say so instead of guessing. If a question is outside the scope of Arena, say so briefly.'
+
+// Stable across users and languages, so that providers can cache it.
+const buildUserManualPrefix = (userManualText) =>
+  `${CHATBOT_USER_MANUAL_INSTRUCTIONS}\n\n<arena_user_manual>\n${userManualText}\n</arena_user_manual>`
 
 // Resolve a client-supplied language code to a system-prompt instruction.
 // Anything outside the supported set (or absent) falls back to the default
@@ -95,11 +106,15 @@ export const init = (app) => {
 
       try {
         const v4Messages = v5ToV4Messages(messages)
+        const userManualText = await getUserManualText()
+        const languageInstruction = buildLanguageInstruction(body?.language).trim()
         const result = await ModelClient.streamChat({
           user,
           feature: CHATBOT_FEATURE,
           messages: v4Messages,
-          system: CHATBOT_SYSTEM_PROMPT + buildLanguageInstruction(body?.language),
+          ...(userManualText
+            ? { cachedSystemPrefix: buildUserManualPrefix(userManualText), system: languageInstruction }
+            : { system: `${CHATBOT_SYSTEM_PROMPT} ${languageInstruction}` }),
           signal: abortController.signal,
         })
         for await (const delta of result.textStream) {

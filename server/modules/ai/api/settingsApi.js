@@ -56,8 +56,8 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { provider, model, baseUrl, apiKey } = Request.getBody(req) || {}
-        const result = await AiSettingsService.testConnection({ user, provider, model, baseUrl, apiKey })
+        const { provider, model, baseUrl, location, apiKey } = Request.getBody(req) || {}
+        const result = await AiSettingsService.testConnection({ user, provider, model, baseUrl, location, apiKey })
         res.json(result)
       } catch (error) {
         next(error)
@@ -72,8 +72,8 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { provider, baseUrl, apiKey } = Request.getBody(req) || {}
-        const result = await AiSettingsService.listModels({ user, provider, baseUrl, apiKey })
+        const { provider, baseUrl, location, apiKey } = Request.getBody(req) || {}
+        const result = await AiSettingsService.listModels({ user, provider, baseUrl, location, apiKey })
         res.json(result)
       } catch (error) {
         next(error)

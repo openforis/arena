@@ -43,6 +43,7 @@ export type ProviderSpec = {
   requiresBaseUrl: boolean
   requiresApiKey: boolean
   supportsModelList: boolean
+  supportsLocation?: boolean
 }
 
 export const PROVIDERS: ProviderSpec[] = [
@@ -56,6 +57,13 @@ export const PROVIDERS: ProviderSpec[] = [
   { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
   { value: AiProvider.anthropic, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
   { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
+  {
+    value: AiProvider.googleVertex,
+    requiresBaseUrl: false,
+    requiresApiKey: true,
+    supportsModelList: true,
+    supportsLocation: true,
+  },
   { value: AiProvider.openaiCompatible, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
   { value: AiProvider.vercelAiSdk, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
 ]
@@ -68,9 +76,12 @@ export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
 export const MODEL_PLACEHOLDERS: Record<string, string> = {
   [AiProvider.openai]: 'gpt-4o-mini',
   [AiProvider.anthropic]: 'claude-haiku-4-5',
-  [AiProvider.google]: 'gemini-2.0-flash',
+  [AiProvider.google]: 'gemini-2.5-flash',
+  [AiProvider.googleVertex]: 'gemini-2.5-flash',
   [AiProvider.openaiCompatible]: 'llama3.3:70b',
 }
+
+export const LOCATION_PLACEHOLDER = 'global'
 
 type AiSettings = {
   featuresEnabled?: boolean
@@ -79,6 +90,7 @@ type AiSettings = {
   provider?: string
   model?: string
   baseUrl?: string
+  location?: string
   hasApiKey?: boolean
   aiFeaturesDisabled?: boolean
   effectiveSource?: string
@@ -105,6 +117,7 @@ type SettingsUpdate = {
   provider?: string
   model?: string | null
   baseUrl?: string | null
+  location?: string | null
   apiKey?: string
 }
 
@@ -114,6 +127,7 @@ type FormState = {
   provider: string
   model: string
   baseUrl: string
+  location: string
   apiKey: string
   apiKeyDirty: boolean
   apiKeyVersion: number
@@ -126,6 +140,7 @@ const emptyForm: FormState = {
   provider: DEFAULT_PROVIDER_VALUE,
   model: '',
   baseUrl: '',
+  location: '',
   apiKey: '',
   apiKeyDirty: false,
   apiKeyVersion: 0,
@@ -165,6 +180,7 @@ type UseUserAiSettingsResult = {
   onProviderChange: (providerItem: ProviderSpec | null) => void
   onModelChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
+  onLocationChange: (value: string) => void
   onApiKeyChange: (value: string) => void
   onFeaturesEnabledChange: (checked: boolean) => void
   onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
@@ -217,6 +233,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
         model: data.model || '',
         baseUrl: data.baseUrl || '',
+        location: data.location || '',
         apiKey: '',
         apiKeyDirty: false,
         apiKeyVersion: 0,
@@ -246,7 +263,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
     const provider = providerItem?.value
     if (!provider) return
-    setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
+    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
@@ -259,6 +276,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   }, [])
   const onBaseUrlChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, baseUrl: value }))
+    setDirty(true)
+  }, [])
+  const onLocationChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, location: value }))
     setDirty(true)
   }, [])
   const onApiKeyChange = useCallback((value: string) => {
@@ -321,6 +342,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         const data = await API.aiSettings.fetchModels({
           provider: form.provider,
           baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
+          location: providerSpec.supportsLocation ? form.location : null,
           apiKey: form.apiKeyDirty ? form.apiKey : null,
         })
         const list: AiModel[] = Array.isArray(data?.models) ? data.models : []
@@ -348,7 +370,9 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       providerSpec.supportsModelList,
       providerSpec.requiresBaseUrl,
       providerSpec.requiresApiKey,
+      providerSpec.supportsLocation,
       form.baseUrl,
+      form.location,
       form.apiKeyDirty,
       form.apiKeyVersion,
       form.provider,
@@ -377,6 +401,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
               provider: form.provider,
               model: providerSpec.supportsModelList ? form.model : null,
               baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
+              location: providerSpec.supportsLocation ? form.location : null,
               ...(form.apiKeyDirty ? { apiKey: form.apiKey } : {}),
             }),
       }
@@ -395,11 +420,13 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     providerSpec.isDefault,
     providerSpec.supportsModelList,
     providerSpec.requiresBaseUrl,
+    providerSpec.supportsLocation,
     form.featuresEnabled,
     form.featureToggles,
     form.provider,
     form.model,
     form.baseUrl,
+    form.location,
     form.apiKeyDirty,
     form.apiKey,
     notifyInfo,
@@ -416,6 +443,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
             provider: form.provider,
             model: providerSpec.supportsModelList ? form.model : undefined,
             baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
+            location: providerSpec.supportsLocation ? form.location : undefined,
             apiKey: form.apiKeyDirty ? form.apiKey : undefined,
           }
       const result: TestResult = await API.aiSettings.testConnection(draft)
@@ -425,7 +453,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     } finally {
       setTesting(false)
     }
-  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.model, form.provider, providerSpec])
+  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.location, form.model, form.provider, providerSpec])
 
   const onClear = useCallback(async () => {
     setSaving(true)
@@ -475,6 +503,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     onProviderChange,
     onModelChange,
     onBaseUrlChange,
+    onLocationChange,
     onApiKeyChange,
     onFeaturesEnabledChange,
     onFeatureToggleChange,

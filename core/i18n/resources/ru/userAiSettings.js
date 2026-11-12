@@ -33,6 +33,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'Совместимый с OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (конечная точка чата)',
   },
@@ -43,6 +44,10 @@ export default {
   apiKey: 'API-ключ',
   apiKeyPlaceholder: 'Вставьте API-ключ вашего провайдера',
   apiKeyKept: 'Оставьте пустым, чтобы сохранить существующий ключ.',
+  googleVertexApiKeyHint: 'Вставьте JSON-ключ сервисного аккаунта (с ролью Vertex AI User) или API-ключ Vertex AI.',
+  location: 'Расположение',
+  locationHint:
+    'Регион Google Cloud (например, europe-west1). Оставьте пустым, чтобы использовать глобальную конечную точку.',
   vercelAiSdkHint:
     'Конечная точка чата Vercel AI SDK рассматривается как фиксированный агент - выбор модели и API-ключ не применяются. Генерация произвольного текста работает; функции структурированного вывода могут не работать.',
   fetchModels: 'Получить модели',

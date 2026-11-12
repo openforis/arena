@@ -11,6 +11,7 @@ describe('AI provider registry', () => {
       ['openai', true],
       ['anthropic', true],
       ['google', true],
+      ['google-vertex', true],
       ['openai-compatible', true],
       ['vercel-ai-sdk', true],
       ['', false],
@@ -49,6 +50,18 @@ describe('AI provider registry', () => {
       expect(() => ProviderRegistry.buildModel({ provider: 'google', model: 'gemini-2.0-flash-exp' })).toThrow(
         /aiApiKeyMissing/
       )
+    })
+
+    test('throws aiApiKeyMissing for google-vertex without credential', () => {
+      expect(() => ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash' })).toThrow(
+        /aiApiKeyMissing/
+      )
+    })
+
+    test('throws aiVertexCredentialInvalid for google-vertex with malformed JSON credential', () => {
+      expect(() =>
+        ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash', apiKey: '{"type":"x"}' })
+      ).toThrow(/aiVertexCredentialInvalid/)
     })
 
     test('throws aiBaseUrlMissing for openai-compatible without baseUrl', () => {
@@ -92,6 +105,21 @@ describe('AI provider registry', () => {
       expect(m).toBeDefined()
     })
 
+    test('returns a model handle for google-vertex with an express mode API key', () => {
+      const m = ProviderRegistry.buildModel({ provider: 'google-vertex', model: 'gemini-2.5-flash', apiKey: 'AQ.x' })
+      expect(m).toBeDefined()
+    })
+
+    test('returns a model handle for google-vertex with application default credentials (admin config)', () => {
+      const m = ProviderRegistry.buildModel({
+        provider: 'google-vertex',
+        model: 'gemini-2.5-flash',
+        project: 'my-project',
+        useApplicationDefaultCredentials: true,
+      })
+      expect(m).toBeDefined()
+    })
+
     test('returns a model handle for vercel-ai-sdk with only a baseUrl', () => {
       const m = ProviderRegistry.buildModel({
         provider: 'vercel-ai-sdk',
@@ -103,11 +131,12 @@ describe('AI provider registry', () => {
   })
 
   describe('providers constant exposes the supported keys', () => {
-    test('exposes openai, anthropic, google, openaiCompatible, vercelAiSdk', () => {
+    test('exposes openai, anthropic, google, googleVertex, openaiCompatible, vercelAiSdk', () => {
       expect(ProviderRegistry.providers).toEqual({
         openai: 'openai',
         anthropic: 'anthropic',
         google: 'google',
+        googleVertex: 'google-vertex',
         openaiCompatible: 'openai-compatible',
         vercelAiSdk: 'vercel-ai-sdk',
       })

@@ -19,6 +19,7 @@ import SystemError from '@core/systemError'
 
 import { AiProvider } from '@common/ai/aiProvider'
 import { createVercelAiSdkModel } from './vercelAiSdkProvider'
+import { buildVertexModel } from './vertexAi'
 
 export const providers = AiProvider
 
@@ -47,11 +48,15 @@ export const isSupported = (provider) => validProviders.has(provider)
  *   keyless local OpenAI-compatible servers like a default Ollama).
  * @param {string} [cfg.baseUrl] - Custom base URL (only meaningful for
  *   {@link providers.openaiCompatible}).
+ * @param {string} [cfg.project] - Google Cloud project (Vertex AI only).
+ * @param {string} [cfg.location] - Google Cloud location (Vertex AI only).
+ * @param {boolean} [cfg.useApplicationDefaultCredentials] - Vertex AI only: allow the server
+ *   Application Default Credentials when no credential is set (admin default config only).
  * @returns {object} A Vercel AI SDK language model handle ready to pass to
  *   `generateText` / `generateObject` / `streamText`.
  */
 export const buildModel = (cfg) => {
-  const { provider, model, apiKey, baseUrl } = cfg
+  const { provider, model, apiKey, baseUrl, project, location, useApplicationDefaultCredentials } = cfg
   if (!isSupported(provider)) {
     throw new SystemError('aiProviderInvalid', { provider })
   }
@@ -72,6 +77,8 @@ export const buildModel = (cfg) => {
       if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider })
       return createGoogleGenerativeAI({ apiKey })(model)
     }
+    case providers.googleVertex:
+      return buildVertexModel({ model, apiKey, project, location, useApplicationDefaultCredentials })
     case providers.openaiCompatible: {
       if (!baseUrl) throw new SystemError('aiBaseUrlMissing', { provider })
       // apiKey is optional for some local servers (e.g. Ollama with no auth)

@@ -16,6 +16,7 @@ import {
   OTHER_MODEL_VALUE,
   PROVIDERS,
   BASE_URL_PLACEHOLDERS,
+  LOCATION_PLACEHOLDER,
   useUserAiSettings,
 } from './useUserAiSettings'
 
@@ -52,6 +53,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onProviderChange,
       onModelChange,
       onBaseUrlChange,
+      onLocationChange,
       onApiKeyChange,
       onFeaturesEnabledChange,
       onFeatureToggleChange,
@@ -203,6 +205,17 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                   )}
                   {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== AiProvider.vercelAiSdk && (
                     <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
+                  )}
+                  {form.provider === AiProvider.googleVertex && (
+                    <div className="user-ai-settings-panel__hint">
+                      {i18n.t('userAiSettings:googleVertexApiKeyHint')}
+                    </div>
+                  )}
+
+                  {providerSpec.supportsLocation && (
+                    <FormItem label="userAiSettings:location" info={i18n.t('userAiSettings:locationHint')}>
+                      <Input value={form.location} onChange={onLocationChange} placeholder={LOCATION_PLACEHOLDER} />
+                    </FormItem>
                   )}
 
                   {renderModelField()}

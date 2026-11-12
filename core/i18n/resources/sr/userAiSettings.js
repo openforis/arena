@@ -34,6 +34,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'Kompatibilan sa OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (krajnja tačka za chat)',
   },
@@ -44,6 +45,9 @@ export default {
   apiKey: 'API ključ',
   apiKeyPlaceholder: 'Nalijepite API ključ vašeg provajdera',
   apiKeyKept: 'Ostavite prazno da zadržite postojeći ključ.',
+  googleVertexApiKeyHint: 'Nalepite JSON ključ servisnog naloga (sa ulogom Vertex AI User) ili Vertex AI API ključ.',
+  location: 'Lokacija',
+  locationHint: 'Google Cloud region (npr. europe-west1). Ostavite prazno za globalni endpoint.',
   vercelAiSdkHint:
     'Krajnja tačka za chat Vercel AI SDK-a se tretira kao fiksni agent - izbor modela i API ključ se ne primjenjuju. Generisanje slobodnog teksta radi; funkcije sa strukturiranim izlazom možda neće raditi.',
   fetchModels: 'Preuzmi modele',

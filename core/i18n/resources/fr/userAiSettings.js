@@ -33,6 +33,7 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic (Claude)',
     google: 'Google (Gemini)',
+    'google-vertex': 'Google Vertex AI (Gemini)',
     'openai-compatible': 'Compatible OpenAI (Azure, OpenRouter, Ollama, ...)',
     'vercel-ai-sdk': 'Vercel AI SDK (endpoint de chat)',
   },
@@ -43,6 +44,10 @@ export default {
   apiKey: 'Cle API',
   apiKeyPlaceholder: 'Collez la cle API de votre fournisseur',
   apiKeyKept: 'Laissez vide pour conserver la cle existante.',
+  googleVertexApiKeyHint:
+    'Collez une clé JSON de compte de service (avec le rôle Utilisateur Vertex AI) ou une clé API Vertex AI.',
+  location: 'Emplacement',
+  locationHint: 'Région Google Cloud (p. ex. europe-west1). Laissez vide pour utiliser le point de terminaison global.',
   vercelAiSdkHint:
     'Un endpoint chat Vercel AI SDK est traite comme un agent fixe - la selection du modele et la cle API ne s appliquent pas. La generation de texte libre fonctionne ; les fonctionnalites de sortie structuree peuvent ne pas fonctionner.',
   fetchModels: 'Recuperer les modeles',

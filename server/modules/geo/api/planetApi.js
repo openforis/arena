@@ -8,9 +8,11 @@ const fetchAvailableMonthlyMosaicsPeriods = async () => {
   const apiKey = MapUtils.mapApiKeyByProvider[MapUtils.mapProviders.planet]
   const {
     data: { mosaics },
-  } = await axios.get(
-    `https://api.planet.com/basemaps/v1/mosaics?api_key=${apiKey}&_page_size=1000&name__contains=global_monthly_`
-  )
+  } = await axios.get('https://api.planet.com/basemaps/v1/mosaics', {
+    params: { _page_size: 1000, name__contains: 'global_monthly_' },
+    // API key as basic auth user name, not as URL param, so that it doesn't end up in proxy/access logs.
+    auth: { username: apiKey, password: '' },
+  })
   return mosaics
     .map(({ name }) => {
       const matcher = name.match(planetMosaicNameRegEx)
