@@ -13,6 +13,8 @@ Documentation for people working on the Arena code. User documentation: the [use
   analysis chains.
 - [Collect import](collect-import.md): how Open Foris Collect surveys and backups are imported.
 - [Webapp conventions](webapp-conventions.md): React components, styling, state, i18n.
+- [Server requirements](server-requirements.md): software, hardware, storage and infrastructure to host
+  Arena (e.g. for a National Forest Inventory).
 
 Elsewhere in the repo: [e2e tests](../test/e2e/README.md), [load tests](../test/load/README.md),
 [Kubernetes deployment](../infra/k8s/README.md).
