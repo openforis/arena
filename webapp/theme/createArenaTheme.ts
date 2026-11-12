@@ -1,6 +1,44 @@
 import { createTheme, type Theme } from '@mui/material/styles'
+// types of palette.DataGrid and components.MuiDataGrid (the module is empty at runtime)
+import '@mui/x-data-grid/themeAugmentation'
 
-import { defaultTokens, themeModes, themePalettes, type ThemeMode } from './tokens'
+import { defaultTokens, themeColors, themeModes, themePalettes, withAlpha, type ThemeMode } from './tokens'
+
+// same look as the Table component: keep in sync with the table variables in `webapp/style/_vars.scss`
+const tableRowHoverBackground = withAlpha(themeColors.primaryContainer, 0.35)
+const tableRowSelectedBackground = withAlpha(themeColors.primaryContainer, 0.6)
+
+const dataGridStyleOverrides = {
+  root: {
+    '--DataGrid-rowBorderColor': themeColors.outline,
+    borderColor: themeColors.outline,
+    borderRadius: '8px',
+    fontSize: '0.9rem',
+    // Open Foris blue to green accent line below the header
+    '& .MuiDataGrid-container--top::after': {
+      content: '""',
+      position: 'absolute',
+      left: 0,
+      right: 0,
+      bottom: 0,
+      height: '2px',
+      background: `linear-gradient(90deg, ${themeColors.primary}, ${themeColors.success})`,
+      pointerEvents: 'none',
+    },
+    '& .MuiDataGrid-columnHeader': {
+      color: themeColors.onPrimaryContainer,
+    },
+    '& .MuiDataGrid-columnHeaderTitle': {
+      fontWeight: 600,
+    },
+    '& .MuiDataGrid-row:hover': {
+      backgroundColor: tableRowHoverBackground,
+    },
+    '& .MuiDataGrid-row.Mui-selected, & .MuiDataGrid-row.Mui-selected:hover': {
+      backgroundColor: tableRowSelectedBackground,
+    },
+  },
+}
 
 type CreateArenaThemeParams = {
   mode?: ThemeMode
@@ -34,6 +72,7 @@ export const createArenaTheme = ({
       text: { primary: palette.onSurface, secondary: palette.onSurfaceVariant },
       background: { default: palette.background, paper: palette.surface },
       divider: palette.outline,
+      DataGrid: { bg: themeColors.surface, headerBg: themeColors.primaryContainerLow, pinnedBg: themeColors.surface },
     },
     components: {
       MuiPaper: {
@@ -48,6 +87,7 @@ export const createArenaTheme = ({
           paper: mode === themeModes.dark ? { border: `1px solid ${palette.outline}` } : {},
         },
       },
+      MuiDataGrid: { styleOverrides: dataGridStyleOverrides },
     },
   })
 }

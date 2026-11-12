@@ -7,7 +7,7 @@ $rowHeaderHeight: 45px;
   .table__rows {
     overflow-y: hidden;
     overflow-x: auto;
-    height: calc(100% - 20px);
+    height: 100%;
   }
 
   .table__data-rows {

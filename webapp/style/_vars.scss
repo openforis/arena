@@ -109,9 +109,14 @@ $shadow3:
   0 0 8px 1px with-alpha($colorShadow, 0.2),
   0 0 0 1px with-alpha($colorShadow, 0.1);
 
-// table
+// table (Table component and MUI DataGrid: keep in sync with `dataGridStyleOverrides` in `webapp/theme/createArenaTheme.ts`)
 $tableRowHeight: 35px;
 $tableRowBorder: 1px solid $colorOutline;
+$tableBorderRadius: 8px;
+// Open Foris blue to green accent line below the header
+$tableHeaderAccent: linear-gradient(90deg, $colorPrimary, $colorSuccess);
+$tableRowHoverBackground: with-alpha($colorPrimaryContainer, 0.35);
+$tableRowSelectedBackground: with-alpha($colorPrimaryContainer, 0.6);
 
 // profile picture
 $profilePictureBorder: 2px solid tint($colorOutline, 50%);
