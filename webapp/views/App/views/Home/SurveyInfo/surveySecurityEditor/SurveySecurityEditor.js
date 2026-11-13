@@ -1,10 +1,11 @@
 import './SurveySecurityEditor.scss'
 
-import { useCallback, useMemo } from 'react'
+import { Fragment, useCallback, useMemo } from 'react'
 import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
 
+import { Alert } from '@webapp/components/Alert'
 import { Checkbox } from '@webapp/components/form'
 
 const mobileSecurityProps = [
@@ -49,6 +50,8 @@ export const SurveySecurityEditor = (props) => {
     onSecurityUpdate,
     keepNonApplicableValues = false,
     onKeepNonApplicableValuesUpdate = null,
+    notifyAdminsOnRecordsUploadFromMobile = false,
+    onNotifyAdminsOnRecordsUploadFromMobileUpdate = null,
   } = props
 
   const security = useMemo(
@@ -76,14 +79,26 @@ export const SurveySecurityEditor = (props) => {
 
   return (
     <div className="survey-security-editor">
+      <Alert text="homeView:surveyInfo.security.publishToApply" />
       {applicableSecurityPropKeys.map((key) => (
-        <Checkbox
-          key={key}
-          checked={security[key]}
-          disabled={!isSecurityPropApplicable(key)(security)}
-          label={`homeView:surveyInfo.security.${key}`}
-          onChange={onPropUpdate(key)}
-        />
+        <Fragment key={key}>
+          <Checkbox
+            checked={security[key]}
+            disabled={!isSecurityPropApplicable(key)(security)}
+            label={`homeView:surveyInfo.security.${key}`}
+            onChange={onPropUpdate(key)}
+          />
+          {/* shown together with the upload options: it is applicable only when records upload is allowed */}
+          {key === SurveySecurityProp.allowRecordsWithErrorsUploadFromMobile &&
+            onNotifyAdminsOnRecordsUploadFromMobileUpdate && (
+              <Checkbox
+                checked={Boolean(notifyAdminsOnRecordsUploadFromMobile)}
+                info="homeView:surveyInfo.security.notifyAdminsOnRecordsUploadFromMobileInfo"
+                label="homeView:surveyInfo.security.notifyAdminsOnRecordsUploadFromMobile"
+                onChange={onNotifyAdminsOnRecordsUploadFromMobileUpdate}
+              />
+            )}
+        </Fragment>
       ))}
       {onKeepNonApplicableValuesUpdate && (
         <Checkbox
@@ -102,4 +117,6 @@ SurveySecurityEditor.propTypes = {
   onSecurityUpdate: PropTypes.func.isRequired,
   keepNonApplicableValues: PropTypes.bool,
   onKeepNonApplicableValuesUpdate: PropTypes.func,
+  notifyAdminsOnRecordsUploadFromMobile: PropTypes.bool,
+  onNotifyAdminsOnRecordsUploadFromMobileUpdate: PropTypes.func,
 }

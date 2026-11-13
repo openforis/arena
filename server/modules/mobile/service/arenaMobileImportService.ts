@@ -17,6 +17,7 @@ export interface ArenaMobileImportParams extends ArenaMobileImportSummaryParams 
   skipMissingFiles?: boolean
   reuseUploadedFile?: boolean
   selectedRecordsUuids?: string[]
+  serverUrl?: string
 }
 
 export const startArenaMobileImportJob = (params: ArenaMobileImportParams) => {

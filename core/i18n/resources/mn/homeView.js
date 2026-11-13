@@ -186,6 +186,7 @@ export default {
     sampleBasedImageInterpretationEnabled: 'Дээж дээр суурилсан зураг тайлбарлах идэвхжсэн',
     security: {
       title: 'Аюулгүй байдал',
+      publishToApply: 'Эдгээр тохиргооны өөрчлөлт судалгааг нийтэлсний дараа хүчин төгөлдөр болно.',
       dataEditorViewNotOwnedRecordsAllowed: 'Өгөгдөл засварлагч өөрийн бус бичлэгүүдийг үзэх боломжтой',
       dataAnalystViewNotOwnedRecordsAllowed: 'Өгөгдөл шинжилэгч өөрийн бус бичлэгүүдийг үзэх боломжтой',
       visibleInMobile: 'Арена Мобайл-д харагдана',
@@ -193,6 +194,10 @@ export default {
       allowRecordsUploadFromMobile: 'Арена Мобайл-аас сервер руу бичлэг байршуулахыг зөвшөөрөх',
       allowRecordsWithErrorsUploadFromMobile:
         'Баталгаажуулалтын алдаатай бичлэгийг Арена Мобайл-аас сервер руу байршуулахыг зөвшөөрөх',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Arena Mobile-аас бичлэг байршуулах үед судалгааны админуудад и-мэйлээр мэдэгдэх',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Тэмдэглэсэн үед судалгааны админ бүр Arena Mobile-аас байршуулсан бичлэгүүдийн жагсаалт (түлхүүр утга, үүсгэгч, огноо, баталгаажуулалт, UUID) бүхий и-мэйл хүлээн авна.',
       allowRecordsMergeWithSameKeys:
         'Ижил түлхүүртэй бичлэгүүдийг нэгтгэхийг зөвшөөрөх (жишээ нь, өөр өөр Арена Мобайл төхөөрөмж дээр үүсгэсэн бичлэгүүд)',
     },

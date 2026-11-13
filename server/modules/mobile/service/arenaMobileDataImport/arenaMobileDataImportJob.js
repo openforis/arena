@@ -13,6 +13,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import FilesImportJob from '../../../arenaImport/service/arenaImport/jobs/filesImportJob'
 import ArenaFileReadJob from './jobs/arenaFileReadJob'
 import RecordsImportJob from './jobs/recordsImportJob'
+import * as RecordsUploadNotificationService from '../recordsUploadNotificationService'
 
 export default class ArenaMobileDataImportJob extends Job {
   /**
@@ -23,6 +24,7 @@ export default class ArenaMobileDataImportJob extends Job {
    * @param {!string} [params.filePath] - The file path of the file to import.
    * @param {!string} [params.conflictResolutionStrategy] - How to resolve conflicting records (duplicate keys).
    * @param {boolean} [params.skipMissingFiles] - When true, missing file content is logged as a warning instead of aborting.
+   * @param {string} [params.serverUrl] - Public URL of the server, used in the notification emails.
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
   constructor(params) {
@@ -50,7 +52,9 @@ export default class ArenaMobileDataImportJob extends Job {
     if (!Surveys.isVisibleInMobile(surveyInfo) || !Surveys.isRecordsUploadFromMobileAllowed(surveyInfo)) {
       throw new SystemError('dataImport.importFromMobileNotAllawed')
     }
-    this.setContext({ survey })
+    // published survey info, like the other Arena Mobile options
+    const notifyAdmins = Survey.isNotifyAdminsOnRecordsUploadFromMobile(surveyInfo)
+    this.setContext({ survey, notifyAdmins })
   }
 
   async beforeSuccess() {
@@ -93,6 +97,27 @@ export default class ArenaMobileDataImportJob extends Job {
     if (filePath) {
       // the file could have been deleted already, when discarding the pending import on cancel
       await FileUtils.deleteFileAsync(filePath).catch(() => null)
+    }
+
+    await this.notifySurveyAdmins()
+  }
+
+  // runs after the transaction has been committed: records are notified only when actually stored
+  async notifySurveyAdmins() {
+    const { context, user } = this
+    const { notifyAdmins, serverUrl, survey, uploadedRecordsInfo } = context
+    if (!this.isSucceeded() || !notifyAdmins || !uploadedRecordsInfo?.length) return
+    try {
+      const notifiedCount = await RecordsUploadNotificationService.notifySurveyAdmins({
+        surveyInfo: Survey.getSurveyInfo(survey),
+        user,
+        records: uploadedRecordsInfo,
+        serverUrl,
+      })
+      this.logDebug(`${notifiedCount} survey admin(s) notified about ${uploadedRecordsInfo.length} uploaded record(s)`)
+    } catch (error) {
+      // the upload succeeded: a notification failure must not affect it
+      this.logError(`error notifying survey admins: ${error.message}`)
     }
   }
 }

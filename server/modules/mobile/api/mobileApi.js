@@ -100,6 +100,7 @@ export const init = (app) => {
           skipMissingFiles,
           reuseUploadedFile,
           selectedRecordsUuids,
+          serverUrl: Request.getPublicServerUrl(req),
         })
         res.json({ job: JobUtils.jobToJSON(job) })
       } else {

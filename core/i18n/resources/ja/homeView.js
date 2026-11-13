@@ -186,12 +186,17 @@ export default {
     sampleBasedImageInterpretationEnabled: 'サンプルベースの画像判読が有効です',
     security: {
       title: 'セキュリティ',
+      publishToApply: 'これらのオプションの変更は、調査を公開すると有効になります。',
       dataEditorViewNotOwnedRecordsAllowed: 'データ編集者が他者所有の記録を閲覧可能にする',
       dataAnalystViewNotOwnedRecordsAllowed: 'データ分析者が他者所有の記録を閲覧可能にする',
       visibleInMobile: 'Arena Mobileに表示する',
       allowRecordsDownloadInMobile: 'サーバーからArena Mobileへの記録ダウンロードを許可',
       allowRecordsUploadFromMobile: 'Arena Mobileからサーバーへの記録アップロードを許可',
       allowRecordsWithErrorsUploadFromMobile: '検証エラーのある記録のArena Mobileからサーバーへのアップロードを許可',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Arena Mobileから記録がアップロードされたときに調査管理者にメールで通知する',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'チェックすると、各調査管理者にArena Mobileからアップロードされた記録の一覧（キー値、作成者、日付、検証、UUID）がメールで送信されます。',
       allowRecordsMergeWithSameKeys: '同じキーを持つ記録の統合を許可（例：異なるArena Mobile端末で作成された記録）',
     },
     srsPlaceholder: 'コードまたはラベルを入力',

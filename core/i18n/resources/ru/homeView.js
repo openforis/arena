@@ -186,6 +186,7 @@ export default {
     sampleBasedImageInterpretationEnabled: 'Интерпретация изображений на основе образцов включена',
     security: {
       title: 'Безопасность',
+      publishToApply: 'Изменения этих параметров вступают в силу после публикации опроса.',
       dataEditorViewNotOwnedRecordsAllowed: 'Редактор данных может просматривать не свои записи',
       dataAnalystViewNotOwnedRecordsAllowed: 'Аналитик данных может просматривать не свои записи',
       visibleInMobile: 'Видно в Arena Mobile',
@@ -193,6 +194,10 @@ export default {
       allowRecordsUploadFromMobile: 'Разрешить загрузку записей из Arena Mobile на сервер',
       allowRecordsWithErrorsUploadFromMobile:
         'Разрешить загрузку записей с ошибками проверки из Arena Mobile на сервер',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Уведомлять администраторов опроса по электронной почте о загрузке записей из Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Если отмечено, каждый администратор опроса получает письмо со списком записей, загруженных из Arena Mobile (значения ключей, автор, даты, проверка и UUID).',
       allowRecordsMergeWithSameKeys:
         'Разрешить объединение записей с одинаковыми ключами (например, записей, созданных на разных устройствах с Arena Mobile)',
     },

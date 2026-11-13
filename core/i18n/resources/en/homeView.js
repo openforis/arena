@@ -186,6 +186,7 @@ When checked, those values are kept in the record, even if the attributes are no
     sampleBasedImageInterpretationEnabled: 'Sample-based image interpretation enabled',
     security: {
       title: 'Security',
+      publishToApply: 'Changes to these options take effect once the survey is published.',
       dataEditorViewNotOwnedRecordsAllowed: 'Data Editor can view not owned records',
       dataAnalystViewNotOwnedRecordsAllowed: 'Data Analyst can view not owned records',
       visibleInMobile: 'Visible in Arena Mobile',
@@ -193,6 +194,10 @@ When checked, those values are kept in the record, even if the attributes are no
       allowRecordsUploadFromMobile: 'Allow uploading records from Arena Mobile to server',
       allowRecordsWithErrorsUploadFromMobile:
         'Allow uploading records with validation errors from Arena Mobile to server',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Notify survey administrators by email when records are uploaded from Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'When checked, every survey administrator receives an email listing the records uploaded from Arena Mobile (key values, creator, dates, validation and UUID).',
       allowRecordsMergeWithSameKeys:
         'Allow merging records with same keys (e.g. records created in different Arena Mobile devices)',
     },

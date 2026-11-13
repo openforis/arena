@@ -7,6 +7,7 @@ import * as NodeDef from '@core/survey/nodeDef'
 import * as Record from '@core/record/record'
 import * as Node from '@core/record/node'
 import * as User from '@core/user/user'
+import * as Validation from '@core/validation/validation'
 import SystemError from '@core/systemError'
 
 import * as ArenaSurveyFileZip from '@server/modules/arenaImport/service/arenaImport/model/arenaSurveyFileZip'
@@ -16,9 +17,11 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserService from '@server/modules/user/service/userService'
 import { createRecordEvaluationContext } from '@server/modules/record/manager/recordEvaluationContextDefault'
 
+import { UploadedRecordAction } from '../../recordsUploadedFromMobileEmail'
 import { checkNodeIsValid } from './recordNodeChecks'
 import {
   getRecordFormattedKeyValues,
+  getRecordFormattedKeyValuesByDefUuid,
   findExistingRecordSummary,
   determineRecordAction,
 } from '@server/modules/dataImport/service/DataImportJob/recordImportMatcher'
@@ -35,6 +38,8 @@ export default class RecordsImportJob extends DataImportBaseJob {
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
     this.mergedRecordsMap = {} // maps the uuid of a record to the uuid of a *different* record it has been merged into (duplicate-key case)
     this.mergedSameRecordUuids = new Set() // uuids of records merged node-by-node with their own existing (same-uuid) server record
+    this.uploadedRecordsInfo = [] // info about inserted or updated records, used to notify the survey admins
+    this.userNamesByUuid = new Map()
   }
 
   async onStart() {
@@ -241,6 +246,7 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await this.persistUpdatedNodes({ nodesUpdated, dateModified })
 
     this.updatedRecordsUuids.add(targetRecordUuid)
+    await this.trackUploadedRecordInfo({ action: UploadedRecordAction.updated })
     if (merge) {
       if (targetRecordUuid !== recordUuid) {
         // duplicate-key merge into a *different* existing record: track the uuid mapping (used by clients to
@@ -292,12 +298,47 @@ export default class RecordsImportJob extends DataImportBaseJob {
     await this.persistUpdatedNodes({ nodesUpdated: nodesIndexedByUuid, dateModified: Record.getDateModified(record) })
 
     this.insertedRecordsUuids.add(recordUuid)
+    await this.trackUploadedRecordInfo({ action: UploadedRecordAction.inserted })
 
     this.logDebug(`record insert complete (${Object.values(nodesIndexedByUuid).length} nodes inserted)`)
   }
 
+  async fetchUserName(userUuid) {
+    if (!this.userNamesByUuid.has(userUuid)) {
+      const user = userUuid ? await UserService.fetchUserByUuid(userUuid, this.tx) : null
+      this.userNamesByUuid.set(userUuid, user ? User.getName(user) : '')
+    }
+    return this.userNamesByUuid.get(userUuid)
+  }
+
+  async trackUploadedRecordInfo({ action }) {
+    const { context, currentRecord: record } = this
+    const { notifyAdmins, survey } = context
+    if (!notifyAdmins) return
+
+    const lang = Survey.getDefaultLanguage(Survey.getSurveyInfo(survey))
+    const keyValuesByDefUuid = await getRecordFormattedKeyValuesByDefUuid({ survey, record })
+    const keyValues = Object.entries(keyValuesByDefUuid).map(([nodeDefUuid, value]) => ({
+      label: NodeDef.getLabel(Survey.getNodeDefByUuid(nodeDefUuid)(survey), lang),
+      value: value ?? '',
+    }))
+    const validation = Record.getValidation(record)
+    this.uploadedRecordsInfo.push({
+      uuid: Record.getUuid(record),
+      action,
+      cycle: Record.getCycle(record),
+      keyValues,
+      ownerName: await this.fetchUserName(Record.getOwnerUuid(record)),
+      dateCreated: Record.getDateCreated(record),
+      dateModified: Record.getDateModified(record),
+      errors: Validation.getErrorsCount(validation) ?? 0,
+      warnings: Validation.getWarningsCount(validation) ?? 0,
+    })
+  }
+
   async beforeSuccess() {
     await super.beforeSuccess()
+    this.setContext({ uploadedRecordsInfo: this.uploadedRecordsInfo })
     const recordsFileUuidsArray = Array.from(this.recordsFileUuids)
     const recordsFilesCount = recordsFileUuidsArray.length
     if (recordsFilesCount > 0) {

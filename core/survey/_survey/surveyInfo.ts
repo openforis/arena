@@ -38,6 +38,7 @@ export const keys = {
   fieldManualLinks: 'fieldManualLinks',
   keepNonApplicableValues: 'keepNonApplicableValues',
   name: 'name',
+  notifyAdminsOnRecordsUploadFromMobile: 'notifyAdminsOnRecordsUploadFromMobile',
   labels: ObjectUtils.keysProps.labels,
   languages: 'languages',
   preloadedMapLayers: 'preloadedMapLayers',
@@ -140,6 +141,11 @@ export const isDocPageNumberingEnabled = (surveyInfo: any): boolean =>
 
 // when false (default), values of attributes becoming non-applicable are cleared during data entry
 export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonApplicableValues)
+
+// when true, survey admins receive an email when records are uploaded from Arena Mobile
+export const isNotifyAdminsOnRecordsUploadFromMobile = ObjectUtils.isPropTrue(
+  keys.notifyAdminsOnRecordsUploadFromMobile
+)
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled
