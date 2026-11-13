@@ -13,7 +13,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  background-color: $colorInverseSurface;
+  // same look as the data grid column headers (the background is set on the header row)
+  color: $colorOnPrimaryContainer;
 
   .label-wrapper {
     width: 100%;
@@ -23,7 +24,7 @@
 
     .icon,
     .btn-sort-toggle {
-      color: $colorInverseOnSurface;
+      color: inherit;
     }
 
     .icon-info {
@@ -53,7 +54,7 @@
       font-weight: 600;
       font-size: 0.8rem;
       text-align: center;
-      color: $colorInverseOnSurface;
+      color: inherit;
     }
   }
 }

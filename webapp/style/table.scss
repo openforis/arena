@@ -126,18 +126,6 @@ $tableFooterHeight: 30px;
     overflow: hidden;
     // aligns the columns with the rows, which always reserve the scrollbar space
     padding-right: 16px;
-
-    // node def headers (Data Explorer edit mode) are dark in the survey form: here they follow the table header
-    .survey-form__node-def-table-cell-header {
-      background-color: transparent;
-      color: inherit;
-
-      .label,
-      .icon,
-      .btn-sort-toggle {
-        color: inherit;
-      }
-    }
   }
 
   .table__row > .table__row-expanded-panel-wrapper {
