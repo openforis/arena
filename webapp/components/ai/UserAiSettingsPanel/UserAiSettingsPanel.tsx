@@ -215,6 +215,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                     <FormItem label="userAiSettings:apiKey">
                       <Input
                         type="password"
+                        autoComplete="new-password"
                         value={form.apiKey}
                         onChange={onApiKeyChange}
                         onBlur={onApiKeyBlur}
