@@ -197,6 +197,10 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
         'Autoriser le téléversement des enregistrements depuis Arena Mobile vers le serveur',
       allowRecordsWithErrorsUploadFromMobile:
         'Autoriser le téléversement des enregistrements avec des erreurs de validation depuis Arena Mobile vers le serveur',
+      notifyAdminsOnRecordsUploadFromMobile:
+        "Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile",
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        "Si cochée, chaque administrateur de formulaire reçoit un e-mail listant les enregistrements téléversés depuis Arena Mobile (valeurs des clés, créateur, dates, validation et UUID). L'option prend effet dès que les informations du formulaire sont enregistrées, sans publier le formulaire.",
       allowRecordsMergeWithSameKeys:
         'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
     },

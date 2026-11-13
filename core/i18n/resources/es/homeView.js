@@ -180,6 +180,10 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
       allowRecordsUploadFromMobile: 'Permitir la carga de registros de Arena Mobile al servidor',
       allowRecordsWithErrorsUploadFromMobile:
         'Permitir la carga al servidor de registros con errores de validación desde Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Si está marcada, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados desde Arena Mobile (valores clave, creador, fechas, validación y UUID). Se aplica al guardar la información de la encuesta, sin publicarla.',
       allowRecordsMergeWithSameKeys:
         'Permitir la fusión de registros con las mismas claves (p. ej. registros creados en distintos dispositivos con Arena Mobile)',
     },

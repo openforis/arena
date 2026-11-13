@@ -56,6 +56,32 @@ export default {
       <p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>
       $t(emails:signature)`,
   },
+  recordsUploadedFromMobile: {
+    subject_one: `$t(common.appNameFull) - {{count}} record uploaded from Arena Mobile to survey '{{surveyName}}'`,
+    subject_other: `$t(common.appNameFull) - {{count}} records uploaded from Arena Mobile to survey '{{surveyName}}'`,
+    body: `<p>Hello {{name}},</p>
+      <p>{{uploadedByName}} ({{uploadedByEmail}}) has uploaded the following record(s) from Arena Mobile to the survey <b>{{surveyFullName}}</b> on {{dateSubmitted}}:</p>
+      {{-recordsTable}}
+      <p>To find a record in $t(common.appNameFull), open the survey, go to Data > Records and search it by its key values.</p>
+      {{-accessLinkMsg}}
+      <p><i>You have received this email because you are an administrator of the survey '{{surveyName}}' and the option to be notified when records are uploaded from Arena Mobile is enabled in the survey info. Any survey administrator can disable it.</i></p>
+      $t(emails:signature)`,
+    accessLink: '<p><a href="{{serverUrl}}">Click here to access $t(common.appNameFull)</a></p>',
+    action: {
+      inserted: 'New',
+      updated: 'Updated',
+    },
+    table: {
+      keys: 'Key values',
+      cycle: 'Cycle',
+      action: 'Status',
+      owner: 'Created by',
+      dateCreated: 'Date created',
+      dateModified: 'Date modified',
+      validation: 'Errors / warnings',
+      uuid: 'Record UUID',
+    },
+  },
   userInviteRepeatConfirmation: 'User {{email}} has been successfully invited again. $t(common.emailSentConfirmation)',
   userResetPassword: {
     subject: '$t(common.appNameFull). Password reset',

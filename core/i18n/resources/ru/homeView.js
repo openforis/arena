@@ -193,6 +193,10 @@ export default {
       allowRecordsUploadFromMobile: 'Разрешить загрузку записей из Arena Mobile на сервер',
       allowRecordsWithErrorsUploadFromMobile:
         'Разрешить загрузку записей с ошибками проверки из Arena Mobile на сервер',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Уведомлять администраторов опроса по электронной почте о загрузке записей из Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Если отмечено, каждый администратор опроса получает письмо со списком записей, загруженных из Arena Mobile (значения ключей, автор, даты, проверка и UUID). Действует после сохранения информации об опросе, без его публикации.',
       allowRecordsMergeWithSameKeys:
         'Разрешить объединение записей с одинаковыми ключами (например, записей, созданных на разных устройствах с Arena Mobile)',
     },

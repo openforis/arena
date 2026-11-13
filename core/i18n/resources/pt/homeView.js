@@ -192,6 +192,10 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
       allowRecordsUploadFromMobile: 'Permitir upload de registros do Arena Mobile para o servidor',
       allowRecordsWithErrorsUploadFromMobile:
         'Permitir upload de registros com erros de validação do Arena Mobile para o servidor',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Notificar os administradores do inquérito por e-mail quando registros forem enviados do Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Quando marcada, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados do Arena Mobile (valores-chave, criador, datas, validação e UUID). Entra em vigor ao salvar as informações do inquérito, sem publicá-lo.',
       allowRecordsMergeWithSameKeys:
         'Permitir a mesclagem de registros com as mesmas chaves (ex. registros criados em diferentes dispositivos Arena Mobile)',
     },

@@ -193,6 +193,10 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
       allowRecordsUploadFromMobile: 'Dozvoli otpremanje zapisa iz Arena Mobile na server',
       allowRecordsWithErrorsUploadFromMobile:
         'Dozvoli otpremanje zapisa sa greškama validacije iz Arena Mobile na server',
+      notifyAdminsOnRecordsUploadFromMobile:
+        'Obavesti administratore ankete e-poštom kada se zapisi otpreme iz Arena Mobile',
+      notifyAdminsOnRecordsUploadFromMobileInfo:
+        'Kada je označeno, svaki administrator ankete dobija e-poruku sa spiskom zapisa otpremljenih iz Arena Mobile (vrednosti ključeva, autor, datumi, validacija i UUID). Primenjuje se kada se sačuvaju informacije o anketi, bez objavljivanja ankete.',
       allowRecordsMergeWithSameKeys:
         'Dozvoli spajanje zapisa sa istim ključevima (npr. zapisa kreiranih na različitim Arena Mobile uređajima)',
     },
