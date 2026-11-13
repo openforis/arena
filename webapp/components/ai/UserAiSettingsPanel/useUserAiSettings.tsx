@@ -42,6 +42,9 @@ export type ProviderSpec = {
   isDefault?: boolean
   requiresBaseUrl: boolean
   requiresApiKey: boolean
+  // The provider needs a model id (false for fixed-endpoint agents).
+  hasModel: boolean
+  // The models can be fetched from the provider (Vertex AI: the models list API doesn't accept API keys).
   supportsModelList: boolean
   supportsLocation?: boolean
 }
@@ -52,20 +55,40 @@ export const PROVIDERS: ProviderSpec[] = [
     isDefault: true,
     requiresBaseUrl: false,
     requiresApiKey: false,
+    hasModel: false,
     supportsModelList: false,
   },
-  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.anthropic, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
+  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, hasModel: true, supportsModelList: true },
+  {
+    value: AiProvider.anthropic,
+    requiresBaseUrl: false,
+    requiresApiKey: true,
+    hasModel: true,
+    supportsModelList: true,
+  },
+  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, hasModel: true, supportsModelList: true },
   {
     value: AiProvider.googleVertex,
     requiresBaseUrl: false,
     requiresApiKey: true,
-    supportsModelList: true,
+    hasModel: true,
+    supportsModelList: false,
     supportsLocation: true,
   },
-  { value: AiProvider.openaiCompatible, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
-  { value: AiProvider.vercelAiSdk, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
+  {
+    value: AiProvider.openaiCompatible,
+    requiresBaseUrl: true,
+    requiresApiKey: false,
+    hasModel: true,
+    supportsModelList: true,
+  },
+  {
+    value: AiProvider.vercelAiSdk,
+    requiresBaseUrl: true,
+    requiresApiKey: false,
+    hasModel: false,
+    supportsModelList: false,
+  },
 ]
 
 export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
@@ -342,7 +365,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         const data = await API.aiSettings.fetchModels({
           provider: form.provider,
           baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
-          location: providerSpec.supportsLocation ? form.location : null,
           apiKey: form.apiKeyDirty ? form.apiKey : null,
         })
         const list: AiModel[] = Array.isArray(data?.models) ? data.models : []
@@ -370,9 +392,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       providerSpec.supportsModelList,
       providerSpec.requiresBaseUrl,
       providerSpec.requiresApiKey,
-      providerSpec.supportsLocation,
       form.baseUrl,
-      form.location,
       form.apiKeyDirty,
       form.apiKeyVersion,
       form.provider,
@@ -399,7 +419,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
           ? {}
           : {
               provider: form.provider,
-              model: providerSpec.supportsModelList ? form.model : null,
+              model: providerSpec.hasModel ? form.model : null,
               baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
               location: providerSpec.supportsLocation ? form.location : null,
               ...(form.apiKeyDirty ? { apiKey: form.apiKey } : {}),
@@ -418,7 +438,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     }
   }, [
     providerSpec.isDefault,
-    providerSpec.supportsModelList,
+    providerSpec.hasModel,
     providerSpec.requiresBaseUrl,
     providerSpec.supportsLocation,
     form.featuresEnabled,
@@ -441,7 +461,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         ? {}
         : {
             provider: form.provider,
-            model: providerSpec.supportsModelList ? form.model : undefined,
+            model: providerSpec.hasModel ? form.model : undefined,
             baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
             location: providerSpec.supportsLocation ? form.location : undefined,
             apiKey: form.apiKeyDirty ? form.apiKey : undefined,

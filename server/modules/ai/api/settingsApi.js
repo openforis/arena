@@ -72,8 +72,8 @@ export const init = (app) => {
     async (req, res, next) => {
       try {
         const user = Request.getUser(req)
-        const { provider, baseUrl, location, apiKey } = Request.getBody(req) || {}
-        const result = await AiSettingsService.listModels({ user, provider, baseUrl, location, apiKey })
+        const { provider, baseUrl, apiKey } = Request.getBody(req) || {}
+        const result = await AiSettingsService.listModels({ user, provider, baseUrl, apiKey })
         res.json(result)
       } catch (error) {
         next(error)

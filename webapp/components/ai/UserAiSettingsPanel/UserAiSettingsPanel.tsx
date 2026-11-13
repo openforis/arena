@@ -89,7 +89,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
     const encryptionMissing = !settings?.encryptionConfigured
 
     const renderModelField = () => {
-      if (!providerSpec.supportsModelList) return null
+      if (!providerSpec.hasModel) return null
       const useDropdown = models.length > 0 && !form.modelFreeText
       return (
         <FormItem label="userAiSettings:model">
@@ -111,14 +111,16 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
           ) : (
             <div className="user-ai-settings-panel__model-row">
               <Input value={form.model} onChange={onModelChange} placeholder={MODEL_PLACEHOLDERS[form.provider]} />
-              <button
-                type="button"
-                className="user-ai-settings-panel__fetch-models"
-                onClick={() => fetchModels({ force: true })}
-                disabled={modelsFetching}
-              >
-                {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
-              </button>
+              {providerSpec.supportsModelList && (
+                <button
+                  type="button"
+                  className="user-ai-settings-panel__fetch-models"
+                  onClick={() => fetchModels({ force: true })}
+                  disabled={modelsFetching}
+                >
+                  {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
+                </button>
+              )}
             </div>
           )}
           {modelsError && (

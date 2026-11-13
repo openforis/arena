@@ -368,18 +368,16 @@ export const testConnection = async ({ user, provider, model, baseUrl, location,
  * @param {object} args.user - Arena user.
  * @param {string} args.provider - Provider key.
  * @param {string} [args.baseUrl] - Base URL (for openai-compatible / Vercel AI SDK).
- * @param {string} [args.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - API key from the form, if any.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models.
  */
-export const listModels = async ({ user, provider, baseUrl, location, apiKey }) => {
+export const listModels = async ({ user, provider, baseUrl, apiKey }) => {
   sanitiseProvider(provider)
   const effectiveApiKey = resolveApiKey({ user, apiKey })
   const trimmedBaseUrl = baseUrl ? String(baseUrl).trim() : null
   const models = await ModelDiscovery.listForProvider({
     provider,
     baseUrl: trimmedBaseUrl,
-    location: sanitiseLocation({ provider, location }),
     apiKey: effectiveApiKey,
   })
   return { models }

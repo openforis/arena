@@ -58,12 +58,11 @@ export const testConnection = async (draft = {}) => {
  * @param {object} args - Args.
  * @param {string} args.provider - Provider key.
  * @param {string} [args.baseUrl] - For openai-compatible / Vercel AI SDK.
- * @param {string} [args.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - API key from the in-progress form.
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models list.
  */
-export const fetchModels = async ({ provider, baseUrl, location, apiKey }) => {
-  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, location, apiKey })
+export const fetchModels = async ({ provider, baseUrl, apiKey }) => {
+  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, apiKey })
   return data
 }
 
