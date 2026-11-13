@@ -109,7 +109,6 @@ export const buildVertexModel = (cfg: VertexConfig & { model: string }) =>
   createVertex(buildVertexProviderSettings(cfg))(cfg.model)
 
 const buildAuthHeaders = async (auth: ResolvedVertexAuth): Promise<Record<string, string>> => {
-  if (auth.apiKey) return { 'x-goog-api-key': auth.apiKey }
   const googleAuth = new GoogleAuth({
     scopes: [CLOUD_PLATFORM_SCOPE],
     ...(auth.serviceAccount
@@ -147,11 +146,14 @@ const isGeminiTextModel = (id: string): boolean =>
 
 /**
  * Lists the Gemini models published on Vertex AI.
+ * Returns an empty list with an API key: the models list API accepts only OAuth2 credentials, the model id is typed.
  * @param {VertexConfig} cfg - The provider configuration.
  * @returns {Promise<Array<{id: string}>>} The models.
  */
 export const listVertexModels = async (cfg: VertexConfig): Promise<Array<{ id: string }>> => {
-  const headers = await buildAuthHeaders(resolveVertexAuth(cfg))
+  const auth = resolveVertexAuth(cfg)
+  if (auth.apiKey) return []
+  const headers = await buildAuthHeaders(auth)
   const ids = new Set<string>()
   let pageToken: string | undefined
   for (let page = 0; page < MODELS_LIST_MAX_PAGES; page++) {
