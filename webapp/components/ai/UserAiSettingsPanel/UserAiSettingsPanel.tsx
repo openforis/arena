@@ -123,7 +123,10 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
           )}
           {modelsError && (
             <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
-              {i18n.t('userAiSettings:modelsFetchFailed', { message: modelsError })}
+              {i18n.t('userAiSettings:modelsFetchFailed', {
+                message: modelsError,
+                interpolation: { escapeValue: false },
+              })}
             </div>
           )}
         </FormItem>

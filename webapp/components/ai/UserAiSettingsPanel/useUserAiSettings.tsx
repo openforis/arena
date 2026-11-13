@@ -482,7 +482,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     if (testResult) {
       const testResultMessage = testResult.ok
         ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-        : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
+        : i18n.t('userAiSettings:testFailed', {
+            message: testResult.errorMessage || 'unknown',
+            interpolation: { escapeValue: false },
+          })
       return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
     }
     return null
