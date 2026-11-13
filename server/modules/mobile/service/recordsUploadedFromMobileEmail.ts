@@ -31,7 +31,7 @@ const formatDateUTC = (date: Date | string | null | undefined): string => {
   return `${dateObj.toISOString().substring(0, 16).replace('T', ' ')} UTC`
 }
 
-const escape = (text: unknown): string => StringUtils.escapeHtml(String(text ?? ''))
+const escape = (text: string | number | null | undefined): string => StringUtils.escapeHtml(String(text ?? ''))
 
 const cell = (content: string, tag = 'td'): string =>
   `<${tag} style="border: 1px solid; padding: 4px 8px; text-align: left;">${content}</${tag}>`
