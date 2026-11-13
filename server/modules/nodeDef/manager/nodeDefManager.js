@@ -78,6 +78,10 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
   // perform updates in batch
   await DbUtils.runQueries(client, batchUpdates)
 
+  // a descendant left with no cycles is a dangling node def (invisible in every cycle, but still
+  // occupying its name); soft-delete it instead of leaving it as a live orphan
+  await NodeDefRepository.markNodeDefsWithoutCyclesDeleted(surveyId, client)
+
   return nodeDefsUpdated
 }
 
