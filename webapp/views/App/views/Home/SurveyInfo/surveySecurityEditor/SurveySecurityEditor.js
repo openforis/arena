@@ -5,6 +5,7 @@ import PropTypes from 'prop-types'
 
 import { surveySecurityDefaults, SurveySecurityProp } from '@openforis/arena-core'
 
+import { Alert } from '@webapp/components/Alert'
 import { Checkbox } from '@webapp/components/form'
 
 const mobileSecurityProps = [
@@ -78,6 +79,7 @@ export const SurveySecurityEditor = (props) => {
 
   return (
     <div className="survey-security-editor">
+      <Alert text="homeView:surveyInfo.security.publishToApply" />
       {applicableSecurityPropKeys.map((key) => (
         <Fragment key={key}>
           <Checkbox

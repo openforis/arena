@@ -187,6 +187,7 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
     sampleBasedImageInterpretationEnabled: "Interprétation d'images basée sur des échantillons activée",
     security: {
       title: 'Sécurité',
+      publishToApply: 'Les modifications de ces options prennent effet une fois le formulaire publié.',
       dataEditorViewNotOwnedRecordsAllowed:
         "L'éditeur de données peut voir les enregistrements qui ne lui appartiennent pas",
       dataAnalystViewNotOwnedRecordsAllowed:
@@ -200,7 +201,7 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
       notifyAdminsOnRecordsUploadFromMobile:
         "Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile",
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'Si cochée, chaque administrateur de formulaire reçoit un e-mail listant les enregistrements téléversés depuis Arena Mobile (valeurs des clés, créateur, dates, validation et UUID). Comme les autres options Arena Mobile, elle prend effet une fois le formulaire publié.',
+        'Si cochée, chaque administrateur de formulaire reçoit un e-mail listant les enregistrements téléversés depuis Arena Mobile (valeurs des clés, créateur, dates, validation et UUID).',
       allowRecordsMergeWithSameKeys:
         'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
     },

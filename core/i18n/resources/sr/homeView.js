@@ -186,6 +186,7 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
     sampleBasedImageInterpretationEnabled: 'Interpretacija snimaka zasnovana na uzorku je omogućena',
     security: {
       title: 'Bezbjednost',
+      publishToApply: 'Izmene ovih opcija primenjuju se kada se anketa objavi.',
       dataEditorViewNotOwnedRecordsAllowed: 'Unosilac podataka može da vidi zapise čiji nije vlasnik',
       dataAnalystViewNotOwnedRecordsAllowed: 'Analitičar podataka može da vidi zapise čiji nije vlasnik',
       visibleInMobile: 'Vidljivo u Arena Mobile',
@@ -196,7 +197,7 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
       notifyAdminsOnRecordsUploadFromMobile:
         'Obavesti administratore ankete e-poštom kada se zapisi otpreme iz Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'Kada je označeno, svaki administrator ankete dobija e-poruku sa spiskom zapisa otpremljenih iz Arena Mobile (vrednosti ključeva, autor, datumi, validacija i UUID). Kao i ostale opcije za Arena Mobile, primenjuje se kada se anketa objavi.',
+        'Kada je označeno, svaki administrator ankete dobija e-poruku sa spiskom zapisa otpremljenih iz Arena Mobile (vrednosti ključeva, autor, datumi, validacija i UUID).',
       allowRecordsMergeWithSameKeys:
         'Dozvoli spajanje zapisa sa istim ključevima (npr. zapisa kreiranih na različitim Arena Mobile uređajima)',
     },

@@ -173,6 +173,7 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
     sampleBasedImageInterpretationEnabled: 'Interpretación de imágenes basada en muestras habilitada',
     security: {
       title: 'Seguridad',
+      publishToApply: 'Los cambios en estas opciones se aplican una vez publicada la encuesta.',
       dataEditorViewNotOwnedRecordsAllowed: 'El editor de datos puede ver registros no propios',
       dataAnalystViewNotOwnedRecordsAllowed: 'El analista de datos puede ver registros no propios',
       visibleInMobile: 'Visible en Arena Mobile',
@@ -183,7 +184,7 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
       notifyAdminsOnRecordsUploadFromMobile:
         'Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'Si está marcada, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados desde Arena Mobile (valores clave, creador, fechas, validación y UUID). Como las demás opciones de Arena Mobile, se aplica una vez publicada la encuesta.',
+        'Si está marcada, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados desde Arena Mobile (valores clave, creador, fechas, validación y UUID).',
       allowRecordsMergeWithSameKeys:
         'Permitir la fusión de registros con las mismas claves (p. ej. registros creados en distintos dispositivos con Arena Mobile)',
     },

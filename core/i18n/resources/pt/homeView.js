@@ -185,6 +185,7 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
     sampleBasedImageInterpretationEnabled: 'Interpretação de imagem baseada em amostra habilitada',
     security: {
       title: 'Segurança',
+      publishToApply: 'As alterações nestas opções entram em vigor quando o inquérito é publicado.',
       dataEditorViewNotOwnedRecordsAllowed: 'Editor de dados pode visualizar registros que não possui',
       dataAnalystViewNotOwnedRecordsAllowed: 'Analista de dados pode visualizar registros que não possui',
       visibleInMobile: 'Visível no Arena Mobile',
@@ -195,7 +196,7 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
       notifyAdminsOnRecordsUploadFromMobile:
         'Notificar os administradores do inquérito por e-mail quando registros forem enviados do Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'Quando marcada, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados do Arena Mobile (valores-chave, criador, datas, validação e UUID). Como as demais opções do Arena Mobile, entra em vigor quando o inquérito é publicado.',
+        'Quando marcada, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados do Arena Mobile (valores-chave, criador, datas, validação e UUID).',
       allowRecordsMergeWithSameKeys:
         'Permitir a mesclagem de registros com as mesmas chaves (ex. registros criados em diferentes dispositivos Arena Mobile)',
     },
