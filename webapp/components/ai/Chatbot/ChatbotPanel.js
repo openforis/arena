@@ -82,6 +82,10 @@ const ChatbotPanel = ({ onClose }) => {
 
   const cancelRef = useRef(null)
   const bodyRef = useRef(null)
+  const inputRef = useRef(null)
+
+  // Keep the focus in the input field (e.g. after clicking Send or Stop).
+  const focusInput = useCallback(() => inputRef.current?.focus(), [])
 
   // Persist on every change.
   useEffect(() => {
@@ -120,6 +124,7 @@ const ChatbotPanel = ({ onClose }) => {
   const stripText = useCallback((msg) => msg?.parts?.map((p) => p.text || '').join('') || '', [])
 
   const onSend = useCallback(() => {
+    focusInput()
     const text = input.trim()
     if (!text || streaming) return
     setError(null)
@@ -188,13 +193,14 @@ const ChatbotPanel = ({ onClose }) => {
         cancelRef.current = null
       },
     })
-  }, [input, language, messages, streaming, stripText])
+  }, [focusInput, input, language, messages, streaming, stripText])
 
   const onStop = useCallback(() => {
     cancelRef.current?.()
     cancelRef.current = null
     setStreaming(false)
-  }, [])
+    focusInput()
+  }, [focusInput])
 
   const onClear = useCallback(() => {
     cancelRef.current?.()
@@ -282,12 +288,13 @@ const ChatbotPanel = ({ onClose }) => {
       ) : null}
 
       <div className="ai-chatbot-panel__input">
+        {/* Not disabled while streaming, to keep the focus: onSend ignores submissions until the reply ends or is stopped */}
         <textarea
+          ref={inputRef}
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={onKeyDown}
           placeholder={i18n.t('aiChatbot.placeholder')}
-          disabled={streaming}
         />
         <div className="ai-chatbot-panel__input-row">
           {streaming ? (
