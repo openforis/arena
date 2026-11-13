@@ -99,8 +99,8 @@ export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
 export const MODEL_PLACEHOLDERS: Record<string, string> = {
   [AiProvider.openai]: 'gpt-4o-mini',
   [AiProvider.anthropic]: 'claude-haiku-4-5',
-  [AiProvider.google]: 'gemini-2.5-flash',
-  [AiProvider.googleVertex]: 'gemini-2.5-flash',
+  [AiProvider.google]: 'gemini-3.8-flash',
+  [AiProvider.googleVertex]: 'gemini-3.8-flash',
   [AiProvider.openaiCompatible]: 'llama3.3:70b',
 }
 
@@ -131,6 +131,8 @@ type TestResult = {
   ok: boolean
   latencyMs?: number
   errorMessage?: string
+  errorKey?: string
+  errorParams?: Record<string, unknown>
 }
 
 type SettingsUpdate = {
@@ -503,7 +505,9 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
       const testResultMessage = testResult.ok
         ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
         : i18n.t('userAiSettings:testFailed', {
-            message: testResult.errorMessage || 'unknown',
+            message: testResult.errorKey
+              ? i18n.t(`appErrors:${testResult.errorKey}`, testResult.errorParams)
+              : testResult.errorMessage || 'unknown',
             interpolation: { escapeValue: false },
           })
       return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
