@@ -288,7 +288,9 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
     const provider = providerItem?.value
     if (!provider) return
-    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model: '', modelFreeText: false }))
+    // Prefill the suggested model (a placeholder looks like a value and would be sent empty).
+    const model = MODEL_PLACEHOLDERS[provider] ?? ''
+    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model, modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
