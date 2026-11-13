@@ -195,7 +195,7 @@ export default {
       notifyAdminsOnRecordsUploadFromMobile:
         'Arena Mobileから記録がアップロードされたときに調査管理者にメールで通知する',
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'チェックすると、各調査管理者にArena Mobileからアップロードされた記録の一覧（キー値、作成者、日付、検証、UUID）がメールで送信されます。調査情報を保存すると、調査を公開しなくても有効になります。',
+        'チェックすると、各調査管理者にArena Mobileからアップロードされた記録の一覧（キー値、作成者、日付、検証、UUID）がメールで送信されます。他のArena Mobileのオプションと同様に、調査を公開すると有効になります。',
       allowRecordsMergeWithSameKeys: '同じキーを持つ記録の統合を許可（例：異なるArena Mobile端末で作成された記録）',
     },
     srsPlaceholder: 'コードまたはラベルを入力',

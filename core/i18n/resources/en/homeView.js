@@ -196,7 +196,7 @@ When checked, those values are kept in the record, even if the attributes are no
       notifyAdminsOnRecordsUploadFromMobile:
         'Notify survey administrators by email when records are uploaded from Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
-        'When checked, every survey administrator receives an email listing the records uploaded from Arena Mobile (key values, creator, dates, validation and UUID). It takes effect when the survey info is saved, without publishing the survey.',
+        'When checked, every survey administrator receives an email listing the records uploaded from Arena Mobile (key values, creator, dates, validation and UUID). Like the other Arena Mobile options, it takes effect once the survey is published.',
       allowRecordsMergeWithSameKeys:
         'Allow merging records with same keys (e.g. records created in different Arena Mobile devices)',
     },

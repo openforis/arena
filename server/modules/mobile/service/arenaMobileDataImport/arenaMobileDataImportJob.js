@@ -3,7 +3,6 @@ import { Surveys, SystemError } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 
 import Job from '@server/job/job'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import PrepareImportFileJob from '@server/modules/file/service/prepareImportFileJob'
 import { RecordsUpdateThreadService } from '@server/modules/record/service/update/surveyRecordsThreadService'
 import { RecordsUpdateThreadMessageTypes } from '@server/modules/record/service/update/thread/recordsThreadMessageTypes'
@@ -53,9 +52,8 @@ export default class ArenaMobileDataImportJob extends Job {
     if (!Surveys.isVisibleInMobile(surveyInfo) || !Surveys.isRecordsUploadFromMobileAllowed(surveyInfo)) {
       throw new SystemError('dataImport.importFromMobileNotAllawed')
     }
-    // read from the draft survey info: the option takes effect without publishing the survey
-    const surveyInfoDraft = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId, draft: true }, tx))
-    const notifyAdmins = Survey.isNotifyAdminsOnRecordsUploadFromMobile(surveyInfoDraft)
+    // published survey info, like the other Arena Mobile options
+    const notifyAdmins = Survey.isNotifyAdminsOnRecordsUploadFromMobile(surveyInfo)
     this.setContext({ survey, notifyAdmins })
   }
 
@@ -107,11 +105,11 @@ export default class ArenaMobileDataImportJob extends Job {
   // runs after the transaction has been committed: records are notified only when actually stored
   async notifySurveyAdmins() {
     const { context, user } = this
-    const { notifyAdmins, serverUrl, surveyId, uploadedRecordsInfo } = context
+    const { notifyAdmins, serverUrl, survey, uploadedRecordsInfo } = context
     if (!this.isSucceeded() || !notifyAdmins || !uploadedRecordsInfo?.length) return
     try {
       const notifiedCount = await RecordsUploadNotificationService.notifySurveyAdmins({
-        surveyId,
+        surveyInfo: Survey.getSurveyInfo(survey),
         user,
         records: uploadedRecordsInfo,
         serverUrl,

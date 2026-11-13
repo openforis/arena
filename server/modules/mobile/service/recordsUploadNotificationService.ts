@@ -4,7 +4,6 @@ import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
 
 import * as Log from '@server/log/log'
-import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as Mailer from '@server/utils/mailer'
 
@@ -23,7 +22,7 @@ const fetchSurveyAdmins = async ({ surveyId, surveyUuid }: { surveyId: number; s
 /**
  * Emails the survey admins the list of records uploaded from Arena Mobile, if the survey option is enabled.
  * @param params - The parameters.
- * @param params.surveyId - The survey id.
+ * @param params.surveyInfo - The info of the published survey.
  * @param params.user - The user who uploaded the records.
  * @param params.records - The uploaded (inserted or updated) records.
  * @param params.serverUrl - Public URL of the server, linked in the email.
@@ -31,13 +30,13 @@ const fetchSurveyAdmins = async ({ surveyId, surveyUuid }: { surveyId: number; s
  * @returns The number of notified survey admins.
  */
 export const notifySurveyAdmins = async ({
-  surveyId,
+  surveyInfo,
   user,
   records,
   serverUrl = null,
   dateSubmitted = new Date(),
 }: {
-  surveyId: number
+  surveyInfo: any
   user: any
   records: UploadedRecordInfo[]
   serverUrl?: string | null
@@ -45,10 +44,9 @@ export const notifySurveyAdmins = async ({
 }): Promise<number> => {
   if (records.length === 0) return 0
 
-  // the option is read from the draft survey info: it takes effect without publishing the survey
-  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId, draft: true }))
   if (!Survey.isNotifyAdminsOnRecordsUploadFromMobile(surveyInfo)) return 0
 
+  const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const surveyAdmins = await fetchSurveyAdmins({ surveyId, surveyUuid: Survey.getUuid(surveyInfo) })
   if (surveyAdmins.length === 0) return 0
 
