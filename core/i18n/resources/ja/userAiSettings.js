@@ -33,21 +33,28 @@ export default {
     openai: 'OpenAI',
     anthropic: 'Anthropic（Claude）',
     google: 'Google（Gemini）',
+    'google-vertex': 'Google Vertex AI（Gemini）',
     'openai-compatible': 'OpenAI互換（Azure、OpenRouter、Ollamaなど）',
     'vercel-ai-sdk': 'Vercel AI SDK（チャットエンドポイント）',
   },
   defaultProviderHint: 'Arena管理者が設定したAIプロバイダーを使用します。',
   model: 'モデル',
   modelOther: 'その他（モデルIDを入力）...',
+  modelDefaultHint: '空欄のままにすると既定のモデル（{{model}}）を使用します。',
   baseUrl: 'ベースURL',
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',
   apiKeyKept: '既存のキーを維持する場合は空欄のままにしてください。',
+  googleVertexApiKeyHint:
+    'サービスアカウントの JSON キー（Vertex AI ユーザーロール付き）または Vertex AI の API キーを貼り付けてください。',
+  location: 'ロケーション',
+  locationHint:
+    'Google Cloud のリージョン（例：europe-west1）。グローバルエンドポイントを使う場合は空欄のままにしてください。',
   vercelAiSdkHint:
     'Vercel AI SDKチャットエンドポイントは固定エージェントとして扱われ、モデル選択やAPIキーは適用されません。自由記述の生成は機能しますが、構造化出力機能は動作しない場合があります。',
   fetchModels: 'モデルを取得',
   fetchingModels: 'モデルを取得中...',
-  modelsFetchFailed: 'モデルを取得できませんでした：{{message}}',
+  modelsFetchFailed: 'プロバイダーからモデルを取得できませんでした。',
 
   save: '保存',
   testConnection: '接続をテスト',
@@ -55,7 +62,10 @@ export default {
 
   testing: '接続をテスト中...',
   testOk: '接続に成功しました（{{latencyMs}} ms）。',
-  testFailed: '接続に失敗しました：{{message}}',
+  testFailed: '接続に失敗しました。',
+  errorAuthHint: 'API キーが有効で、このプロバイダーで使用できることを確認してください。',
+  showDetails: '詳細を表示',
+  hideDetails: '詳細を隠す',
 
   savedSuccessfully: 'AI設定を保存しました。',
   saveFailed: 'AI設定の保存に失敗しました：{{message}}',

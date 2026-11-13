@@ -6,6 +6,8 @@ import * as API from '@webapp/service/api'
 
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+
+import type { AiSettingsStatus } from './AiSettingsStatusMessage'
 import { useI18n } from '@webapp/store/system'
 
 export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
@@ -42,7 +44,13 @@ export type ProviderSpec = {
   isDefault?: boolean
   requiresBaseUrl: boolean
   requiresApiKey: boolean
+  // The provider needs a model id (false for fixed-endpoint agents).
+  hasModel: boolean
+  // The models can be fetched from the provider.
   supportsModelList: boolean
+  // Vertex AI: the models list API accepts a service account key, not an API key.
+  supportsModelListWithServiceAccountKeyOnly?: boolean
+  supportsLocation?: boolean
 }
 
 export const PROVIDERS: ProviderSpec[] = [
@@ -51,13 +59,41 @@ export const PROVIDERS: ProviderSpec[] = [
     isDefault: true,
     requiresBaseUrl: false,
     requiresApiKey: false,
+    hasModel: false,
     supportsModelList: false,
   },
-  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.anthropic, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, supportsModelList: true },
-  { value: AiProvider.openaiCompatible, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: true },
-  { value: AiProvider.vercelAiSdk, requiresBaseUrl: true, requiresApiKey: false, supportsModelList: false },
+  { value: AiProvider.openai, requiresBaseUrl: false, requiresApiKey: true, hasModel: true, supportsModelList: true },
+  {
+    value: AiProvider.anthropic,
+    requiresBaseUrl: false,
+    requiresApiKey: true,
+    hasModel: true,
+    supportsModelList: true,
+  },
+  { value: AiProvider.google, requiresBaseUrl: false, requiresApiKey: true, hasModel: true, supportsModelList: true },
+  {
+    value: AiProvider.googleVertex,
+    requiresBaseUrl: false,
+    requiresApiKey: true,
+    hasModel: true,
+    supportsModelList: true,
+    supportsModelListWithServiceAccountKeyOnly: true,
+    supportsLocation: true,
+  },
+  {
+    value: AiProvider.openaiCompatible,
+    requiresBaseUrl: true,
+    requiresApiKey: false,
+    hasModel: true,
+    supportsModelList: true,
+  },
+  {
+    value: AiProvider.vercelAiSdk,
+    requiresBaseUrl: true,
+    requiresApiKey: false,
+    hasModel: false,
+    supportsModelList: false,
+  },
 ]
 
 export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
@@ -68,9 +104,12 @@ export const BASE_URL_PLACEHOLDERS: Record<string, string> = {
 export const MODEL_PLACEHOLDERS: Record<string, string> = {
   [AiProvider.openai]: 'gpt-4o-mini',
   [AiProvider.anthropic]: 'claude-haiku-4-5',
-  [AiProvider.google]: 'gemini-2.0-flash',
+  [AiProvider.google]: 'gemini-3.8-flash',
+  [AiProvider.googleVertex]: 'gemini-3.8-flash',
   [AiProvider.openaiCompatible]: 'llama3.3:70b',
 }
+
+export const LOCATION_PLACEHOLDER = 'global'
 
 type AiSettings = {
   featuresEnabled?: boolean
@@ -79,7 +118,10 @@ type AiSettings = {
   provider?: string
   model?: string
   baseUrl?: string
+  location?: string
   hasApiKey?: boolean
+  apiKeyIsServiceAccount?: boolean
+  defaultModels?: Record<string, string>
   aiFeaturesDisabled?: boolean
   effectiveSource?: string
   effectiveProvider?: string
@@ -96,6 +138,9 @@ type TestResult = {
   ok: boolean
   latencyMs?: number
   errorMessage?: string
+  errorKey?: string
+  errorParams?: Record<string, unknown>
+  errorStatusCode?: number
 }
 
 type SettingsUpdate = {
@@ -105,6 +150,7 @@ type SettingsUpdate = {
   provider?: string
   model?: string | null
   baseUrl?: string | null
+  location?: string | null
   apiKey?: string
 }
 
@@ -114,6 +160,7 @@ type FormState = {
   provider: string
   model: string
   baseUrl: string
+  location: string
   apiKey: string
   apiKeyDirty: boolean
   apiKeyVersion: number
@@ -126,6 +173,7 @@ const emptyForm: FormState = {
   provider: DEFAULT_PROVIDER_VALUE,
   model: '',
   baseUrl: '',
+  location: '',
   apiKey: '',
   apiKeyDirty: false,
   apiKeyVersion: 0,
@@ -150,6 +198,44 @@ const buildModelsKey = ({
   return [provider, baseUrl || '', apiKeySegment].join('|')
 }
 
+const isServiceAccountKey = (apiKey: string): boolean => apiKey.trim().startsWith('{')
+
+// Translates an Arena API error ({ key, params }) when possible.
+const getApiErrorMessage = ({ i18n, error }: { i18n: any; error: any }): string => {
+  const { key, params } = error?.response?.data ?? {}
+  if (typeof key === 'string' && key) {
+    return i18n.t(key.includes(':') ? key : `appErrors:${key}`, { ...params, interpolation: { escapeValue: false } })
+  }
+  return error?.message || 'unknown'
+}
+
+const extractHttpStatusCode = (text: string | null | undefined): number | null => {
+  const match = /HTTP (\d{3})/.exec(text ?? '')
+  return match ? Number(match[1]) : null
+}
+
+// 401/403: most likely a wrong key, or a key not enabled for the selected provider.
+const withAuthHint = ({ i18n, summary, statusCode }: { i18n: any; summary: string; statusCode: number | null }) =>
+  statusCode === 401 || statusCode === 403 ? `${summary} ${i18n.t('userAiSettings:errorAuthHint')}` : summary
+
+const buildTestStatus = ({ i18n, testResult }: { i18n: any; testResult: TestResult }): AiSettingsStatus => {
+  if (testResult.ok) {
+    return { kind: 'ok', summary: i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs }) }
+  }
+  const failed = i18n.t('userAiSettings:testFailed')
+  if (testResult.errorKey) {
+    // Configuration error: already user friendly.
+    const message = i18n.t(`appErrors:${testResult.errorKey}`, {
+      ...testResult.errorParams,
+      interpolation: { escapeValue: false },
+    })
+    return { kind: 'fail', summary: `${failed} ${message}` }
+  }
+  const details = testResult.errorMessage || 'unknown'
+  const statusCode = testResult.errorStatusCode ?? extractHttpStatusCode(details)
+  return { kind: 'fail', summary: withAuthHint({ i18n, summary: failed, statusCode }), details }
+}
+
 type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
   loading: boolean
@@ -162,9 +248,12 @@ type UseUserAiSettingsResult = {
   modelsFetching: boolean
   modelsError: string | null
   providerSpec: ProviderSpec
+  canFetchModels: boolean
+  defaultModel: string | null
   onProviderChange: (providerItem: ProviderSpec | null) => void
   onModelChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
+  onLocationChange: (value: string) => void
   onApiKeyChange: (value: string) => void
   onFeaturesEnabledChange: (checked: boolean) => void
   onFeatureToggleChange: (category: FeatureCategory) => (checked: boolean) => void
@@ -175,7 +264,7 @@ type UseUserAiSettingsResult = {
   onSave: () => Promise<void>
   onTest: () => Promise<void>
   onClear: () => Promise<void>
-  testResultView: React.ReactElement | null
+  status: AiSettingsStatus | null
 }
 
 /**
@@ -204,6 +293,15 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     [form.provider]
   )
 
+  // Vertex AI: the key typed in the form, or the saved one, must be a service account key.
+  const canFetchModels =
+    providerSpec.supportsModelList &&
+    (!providerSpec.supportsModelListWithServiceAccountKeyOnly ||
+      (form.apiKeyDirty ? isServiceAccountKey(form.apiKey) : !!settings?.apiKeyIsServiceAccount))
+
+  // Used by the server when the model is left empty.
+  const defaultModel = settings?.defaultModels?.[form.provider] ?? null
+
   const fetchSettings = useCallback(async () => {
     setLoading(true)
     try {
@@ -217,6 +315,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
         provider: data.enabled && data.provider ? data.provider : DEFAULT_PROVIDER_VALUE,
         model: data.model || '',
         baseUrl: data.baseUrl || '',
+        location: data.location || '',
         apiKey: '',
         apiKeyDirty: false,
         apiKeyVersion: 0,
@@ -246,7 +345,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
     const provider = providerItem?.value
     if (!provider) return
-    setForm((prev) => ({ ...prev, provider, baseUrl: '', model: '', modelFreeText: false }))
+    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
@@ -259,6 +358,10 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   }, [])
   const onBaseUrlChange = useCallback((value: string) => {
     setForm((prev) => ({ ...prev, baseUrl: value }))
+    setDirty(true)
+  }, [])
+  const onLocationChange = useCallback((value: string) => {
+    setForm((prev) => ({ ...prev, location: value }))
     setDirty(true)
   }, [])
   const onApiKeyChange = useCallback((value: string) => {
@@ -300,7 +403,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
    */
   const fetchModels = useCallback(
     async ({ force = false }: { force?: boolean } = {}) => {
-      if (!providerSpec.supportsModelList) return
+      if (!canFetchModels) return
       const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
       const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
       if (!hasBaseUrl || !hasApiKey) return
@@ -316,6 +419,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
 
       setModelsFetching(true)
       setModelsError(null)
+      setTestResult(null)
       setLastModelsKey(key)
       try {
         const data = await API.aiSettings.fetchModels({
@@ -330,22 +434,23 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
           // the list (empty, stale, or a hand-typed id), preselect the first
           // returned model so the user immediately sees the available choices;
           // they can still pick "Other (type a model id)…" to free-text.
-          const currentInList = !!form.model && list.some((m) => m.id === form.model)
-          if (currentInList) {
-            setForm((prev) => ({ ...prev, modelFreeText: false }))
-          } else {
-            setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
-          }
+          // An empty model means the default one: select it when available.
+          const preferredModel = form.model || defaultModel
+          const preferredInList = !!preferredModel && list.some((m) => m.id === preferredModel)
+          const model = preferredInList ? preferredModel : list[0].id
+          setForm((prev) => ({ ...prev, model, modelFreeText: false }))
         }
       } catch (error: any) {
         setModels([])
-        setModelsError(error?.response?.data?.error || error?.message || 'unknown')
+        setModelsError(getApiErrorMessage({ i18n, error }))
       } finally {
         setModelsFetching(false)
       }
     },
     [
-      providerSpec.supportsModelList,
+      canFetchModels,
+      defaultModel,
+      i18n,
       providerSpec.requiresBaseUrl,
       providerSpec.requiresApiKey,
       form.baseUrl,
@@ -375,8 +480,9 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
           ? {}
           : {
               provider: form.provider,
-              model: providerSpec.supportsModelList ? form.model : null,
+              model: providerSpec.hasModel ? form.model : null,
               baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : null,
+              location: providerSpec.supportsLocation ? form.location : null,
               ...(form.apiKeyDirty ? { apiKey: form.apiKey } : {}),
             }),
       }
@@ -393,13 +499,15 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     }
   }, [
     providerSpec.isDefault,
-    providerSpec.supportsModelList,
+    providerSpec.hasModel,
     providerSpec.requiresBaseUrl,
+    providerSpec.supportsLocation,
     form.featuresEnabled,
     form.featureToggles,
     form.provider,
     form.model,
     form.baseUrl,
+    form.location,
     form.apiKeyDirty,
     form.apiKey,
     notifyInfo,
@@ -409,13 +517,15 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onTest = useCallback(async () => {
     setTesting(true)
     setTestResult(null)
+    setModelsError(null)
     try {
       const draft = providerSpec.isDefault
         ? {}
         : {
             provider: form.provider,
-            model: providerSpec.supportsModelList ? form.model : undefined,
+            model: providerSpec.hasModel ? form.model : undefined,
             baseUrl: providerSpec.requiresBaseUrl ? form.baseUrl : undefined,
+            location: providerSpec.supportsLocation ? form.location : undefined,
             apiKey: form.apiKeyDirty ? form.apiKey : undefined,
           }
       const result: TestResult = await API.aiSettings.testConnection(draft)
@@ -425,7 +535,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     } finally {
       setTesting(false)
     }
-  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.model, form.provider, providerSpec])
+  }, [form.apiKey, form.apiKeyDirty, form.baseUrl, form.location, form.model, form.provider, providerSpec])
 
   const onClear = useCallback(async () => {
     setSaving(true)
@@ -447,18 +557,20 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     }
   }, [notifyError, notifyInfo])
 
-  const testResultView = useMemo((): React.ReactElement | null => {
-    if (testing) {
-      return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
-    }
-    if (testResult) {
-      const testResultMessage = testResult.ok
-        ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-        : i18n.t('userAiSettings:testFailed', { message: testResult.errorMessage || 'unknown' })
-      return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
+  // Result of the last provider call, shown in a single place: test connection or models fetch.
+  const status = useMemo((): AiSettingsStatus | null => {
+    if (testing) return { kind: 'info', summary: i18n.t('userAiSettings:testing') }
+    if (testResult) return buildTestStatus({ i18n, testResult })
+    if (modelsError) {
+      const summary = withAuthHint({
+        i18n,
+        summary: i18n.t('userAiSettings:modelsFetchFailed'),
+        statusCode: extractHttpStatusCode(modelsError),
+      })
+      return { kind: 'fail', summary, details: modelsError }
     }
     return null
-  }, [i18n, testResult, testing])
+  }, [i18n, modelsError, testResult, testing])
 
   return {
     i18n,
@@ -472,9 +584,12 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     modelsFetching,
     modelsError,
     providerSpec,
+    canFetchModels,
+    defaultModel,
     onProviderChange,
     onModelChange,
     onBaseUrlChange,
+    onLocationChange,
     onApiKeyChange,
     onFeaturesEnabledChange,
     onFeatureToggleChange,
@@ -485,6 +600,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     onSave,
     onTest,
     onClear,
-    testResultView,
+    status,
   }
 }

@@ -108,6 +108,8 @@ Pokušajte da osvježite stranicu.`,
   aiApiKeyMissing: 'API ključ je obavezan za provajdera {{provider}}.',
   aiBaseUrlMissing: 'Osnovni URL je obavezan za openai-compatible provajdera.',
   aiModelListFailed: 'Nije moguće dobiti listu modela od provajdera: {{message}}',
+  aiVertexCredentialInvalid:
+    'Neispravni Vertex AI akreditivi: nalepite JSON ključ servisnog naloga ili Vertex AI API ključ.',
   aiExpressionDescriptionMissing: 'Molimo opišite željeni izraz običnim jezikom.',
   aiExpressionTypeInvalid: 'Nepoznata vrsta izraza: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Nije moguće generisati izraz bez ciljnog polja.',

@@ -97,10 +97,15 @@ export const ENV = {
   // {"translation":true,"expressionGenerate":true,"expressionExplain":true,"activityLogSummary":true,"dataDictionary":true}
   aiFeatureFlags: getJson(process.env.AI_FEATURE_FLAGS),
   // Default provider (used when user has no override)
-  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | openai-compatible
+  aiDefaultProvider: process.env.AI_DEFAULT_PROVIDER, // openai | anthropic | google | google-vertex | openai-compatible | vercel-ai-sdk
   aiDefaultModel: process.env.AI_DEFAULT_MODEL,
   aiDefaultApiKey: process.env.AI_DEFAULT_API_KEY,
   aiDefaultBaseUrl: process.env.AI_DEFAULT_BASE_URL,
+  // Google Vertex AI only (project defaults to the one of the service account key or of the server credentials)
+  aiDefaultVertexProject: process.env.AI_DEFAULT_VERTEX_PROJECT,
+  aiDefaultVertexLocation: process.env.AI_DEFAULT_VERTEX_LOCATION,
+  // Documentation chatbot: send the user manual as context (disable for models with a small context window)
+  aiChatbotUserManualEnabled: isTrue(process.env.AI_CHATBOT_USER_MANUAL_ENABLED ?? 'true'),
   // Master encryption key for user-stored API keys (32-byte hex)
   aiUserKeyEncryptionSecret: process.env.AI_USER_KEY_ENCRYPTION_SECRET,
   // Limits

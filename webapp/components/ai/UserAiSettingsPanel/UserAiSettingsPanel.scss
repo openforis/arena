@@ -44,6 +44,9 @@
   }
 
   &__fetch-models {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: none;
     border: 1px solid shade($colorOutline, 30%);
     border-radius: 4px;
@@ -103,6 +106,31 @@
     font-size: 0.85rem;
     color: $colorOnSurfaceVariant;
     padding: 0.25rem 0 0.5rem;
+  }
+
+  &__model-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  &__details-toggle {
+    background: none;
+    border: none;
+    padding: 0 0 0 0.5rem;
+    color: $colorPrimary;
+    font-size: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__details {
+    margin-top: 0.25rem;
+    color: $colorOnSurfaceVariant;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
   }
 
   &__test {

@@ -107,6 +107,8 @@ export default {
   aiApiKeyMissing: 'プロバイダー{{provider}}にはAPIキーが必要です。',
   aiBaseUrlMissing: 'openai-compatibleプロバイダーにはベースURLが必要です。',
   aiModelListFailed: 'プロバイダーからモデル一覧を取得できませんでした：{{message}}',
+  aiVertexCredentialInvalid:
+    'Vertex AI の認証情報が無効です：サービスアカウントの JSON キーまたは Vertex AI の API キーを貼り付けてください。',
   aiExpressionDescriptionMissing: '生成したい式の内容を自然な言葉で説明してください。',
   aiExpressionTypeInvalid: '不明な式の種類です：{{expressionType}}。',
   aiExpressionNodeDefMissing: '対象フィールドが指定されていないため式を生成できません。',

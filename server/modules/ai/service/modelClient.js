@@ -124,6 +124,23 @@ export const generateStructured = async ({ user, feature, prompt, system, schema
   )
 }
 
+// Anthropic needs an explicit cache breakpoint; OpenAI and Gemini cache a repeated prompt prefix automatically.
+const PROMPT_CACHE_PROVIDER_OPTIONS = { anthropic: { cacheControl: { type: 'ephemeral' } } }
+
+/**
+ * Builds the system instructions, putting the stable (cacheable) prefix first.
+ * @param {object} args - Args.
+ * @param {string} [args.system] - The system prompt.
+ * @param {string} [args.cachedSystemPrefix] - Long and stable text to send before the system prompt.
+ * @returns {string|Array<object>|undefined} The system instructions for the Vercel AI SDK.
+ */
+export const buildSystemInstructions = ({ system, cachedSystemPrefix }) => {
+  if (!cachedSystemPrefix) return system
+  const instructions = [{ role: 'system', content: cachedSystemPrefix, providerOptions: PROMPT_CACHE_PROVIDER_OPTIONS }]
+  if (system) instructions.push({ role: 'system', content: system })
+  return instructions
+}
+
 /**
  * Multi-turn streaming chat. Like {@link stream} but accepts a Vercel AI
  * SDK v4 `messages` array (`[{role, content}]`) for back-and-forth
@@ -135,11 +152,13 @@ export const generateStructured = async ({ user, feature, prompt, system, schema
  * @param {string} args.feature - Feature key (e.g. "chatbot").
  * @param {Array<{role: string, content: string}>} args.messages - Conversation history.
  * @param {string} [args.system] - Optional system prompt.
+ * @param {string} [args.cachedSystemPrefix] - Optional long and stable server-side text (e.g. documentation)
+ *   sent before `system`, marked for prompt caching and not counted in `AI_MAX_PROMPT_CHARS`.
  * @param {AbortSignal} [args.signal] - Optional cancellation signal.
  * @returns {Promise<{textStream: AsyncIterable<string>, usage: Promise<object>}>}
  *   The SDK stream result.
  */
-export const streamChat = async ({ user, feature, messages, system, signal }) => {
+export const streamChat = async ({ user, feature, messages, system, cachedSystemPrefix, signal }) => {
   assertFeaturesEnabled(feature, user)
   const totalChars =
     (messages || []).reduce((acc, m) => acc + (typeof m.content === 'string' ? m.content.length : 0), 0) +
@@ -153,7 +172,7 @@ export const streamChat = async ({ user, feature, messages, system, signal }) =>
   const result = streamText({
     model,
     messages,
-    system,
+    system: buildSystemInstructions({ system, cachedSystemPrefix }),
     abortSignal: signal,
   })
   result.usage

@@ -12,7 +12,8 @@
  *   user.prefs.ai = {
  *     featuresEnabled,        // master switch — user wants AI at all
  *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity, dataQuery } booleans
- *     provider, model, baseUrl, apiKeyEncrypted,
+ *     provider, model, baseUrl, location, apiKeyEncrypted,
+ *     apiKeyIsServiceAccount, // the key is a service account JSON key (not secret: enables the Vertex AI models list)
  *     enabled,                // use OWN provider vs. admin default
  *     lastTestOk, lastTestAt,
  *   }
@@ -28,8 +29,10 @@ import SystemError from '@core/systemError'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
+import { getDefaultModel } from './defaultModels'
 import * as ModelDiscovery from './modelDiscovery'
 import * as ProviderRegistry from './providerRegistry'
+import { isServiceAccountKeyCredential } from './vertexAi'
 
 const PREFS_KEY = 'ai'
 
@@ -111,8 +114,10 @@ export const getPublicSettings = (user) => {
       provider: null,
       model: null,
       baseUrl: null,
+      location: null,
       enabled: false,
       hasApiKey: false,
+      apiKeyIsServiceAccount: false,
       lastTestOk: null,
       lastTestAt: null,
     }
@@ -123,8 +128,10 @@ export const getPublicSettings = (user) => {
     provider: raw.provider || null,
     model: raw.model || null,
     baseUrl: raw.baseUrl || null,
+    location: raw.location || null,
     enabled: !!raw.enabled,
     hasApiKey: !!raw.apiKeyEncrypted,
+    apiKeyIsServiceAccount: !!raw.apiKeyEncrypted && !!raw.apiKeyIsServiceAccount,
     lastTestOk: raw.lastTestOk ?? null,
     lastTestAt: raw.lastTestAt || null,
   }
@@ -165,18 +172,25 @@ export const isCategoryEnabledForUser = (user, category) => {
  */
 export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   const raw = getRawPrefs(user)
-  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
+  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider) return null
+  const model = raw.model || getDefaultModel(raw.provider)
+  if (!model) return null
   return {
     provider: raw.provider,
-    model: raw.model,
+    model,
     baseUrl: raw.baseUrl || null,
+    location: raw.location || null,
     apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : null,
   }
 }
 
+// Location applies only to Vertex AI.
+const sanitiseLocation = ({ provider, location }) =>
+  provider === ProviderRegistry.providers.googleVertex && location ? String(location).trim() || null : null
+
 // Throws when the provider config is incomplete.
 const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
-  if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
+  if (!model && !isFixedEndpoint && !getDefaultModel(provider)) throw new SystemError('aiModelMissing', { provider })
   const requiresBaseUrl =
     provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
   if (requiresBaseUrl && !baseUrl) {
@@ -189,17 +203,18 @@ const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) =
  * @param {object} args - Args.
  * @param {object} args.update - The submitted settings.
  * @param {boolean} args.overrideEnabled - Whether the user-provider override is active.
- * @returns {{provider: string, model: string|null, baseUrl: string|null}} - The sanitised provider config.
+ * @returns {{provider: string, model: string|null, baseUrl: string|null, location: string|null}} - The sanitised provider config.
  */
 const extractProviderConfig = ({ update, overrideEnabled }) => {
   const provider = sanitiseProvider(update.provider)
   const isFixedEndpoint = provider === ProviderRegistry.providers.vercelAiSdk
   const model = isFixedEndpoint ? ProviderRegistry.providers.vercelAiSdk : (update.model || '').trim() || null
   const baseUrl = update.baseUrl ? String(update.baseUrl).trim() : null
+  const location = sanitiseLocation({ provider, location: update.location })
   if (overrideEnabled) {
     validateProviderConfig({ provider, model, baseUrl, isFixedEndpoint })
   }
-  return { provider, model, baseUrl }
+  return { provider, model, baseUrl, location }
 }
 
 /**
@@ -225,6 +240,7 @@ const extractProviderConfig = ({ update, overrideEnabled }) => {
  * @param {string} [args.update.provider] - Provider key.
  * @param {string} [args.update.model] - Model identifier.
  * @param {string} [args.update.baseUrl] - Optional custom base URL.
+ * @param {string} [args.update.location] - Google Cloud location (Vertex AI only).
  * @param {string} [args.update.apiKey] - New API key (omit to keep existing).
  * @param {boolean} [args.update.enabled] - Whether the user-provider override is active.
  * @returns {Promise<object>} The new public settings descriptor.
@@ -238,8 +254,10 @@ export const saveSettings = async ({ user, update }) => {
   // Encrypt-or-clear the API key independently of featuresEnabled so the
   // user can drop their key without flipping the master toggle off.
   let apiKeyEncrypted = existing.apiKeyEncrypted || null
+  let apiKeyIsServiceAccount = !!existing.apiKeyIsServiceAccount
   if (typeof update.apiKey === 'string') {
     apiKeyEncrypted = update.apiKey.length === 0 ? null : SecretBox.encrypt(update.apiKey)
+    apiKeyIsServiceAccount = isServiceAccountKeyCredential(update.apiKey)
   }
 
   // Provider config defaults: preserve existing values when the user isn't
@@ -247,9 +265,10 @@ export const saveSettings = async ({ user, update }) => {
   let provider = existing.provider || null
   let model = existing.model || null
   let baseUrl = existing.baseUrl || null
+  let location = existing.location || null
 
   if (featuresEnabled && update.provider) {
-    ;({ provider, model, baseUrl } = extractProviderConfig({ update, overrideEnabled }))
+    ;({ provider, model, baseUrl, location } = extractProviderConfig({ update, overrideEnabled }))
   }
 
   const newAi = {
@@ -258,7 +277,9 @@ export const saveSettings = async ({ user, update }) => {
     provider,
     model,
     baseUrl,
+    location,
     apiKeyEncrypted,
+    apiKeyIsServiceAccount,
     enabled: overrideEnabled,
     // Saving invalidates the previous test result.
     lastTestOk: null,
@@ -303,10 +324,12 @@ export const clearSettings = async ({ user }) => {
  * @param {string} [args.provider] - Draft provider (overrides saved config).
  * @param {string} [args.model] - Draft model.
  * @param {string} [args.baseUrl] - Draft base URL.
+ * @param {string} [args.location] - Draft Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
- * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} Test result.
+ * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string, errorKey?: string, errorParams?: object, errorStatusCode?: number}>}
+ *   Test result (errorKey/errorParams: translatable app error, for configuration errors; errorStatusCode: provider HTTP status).
  */
-export const testConnection = async ({ user, provider, model, baseUrl, apiKey }) => {
+export const testConnection = async ({ user, provider, model, baseUrl, location, apiKey }) => {
   let cfg
   if (provider) {
     const providerSanitised = sanitiseProvider(String(provider))
@@ -315,8 +338,9 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
     const effectiveApiKey = resolveApiKey({ user, apiKey })
     cfg = {
       provider: providerSanitised,
-      model: trimmedModel || null,
+      model: trimmedModel || getDefaultModel(providerSanitised),
       baseUrl: trimmedBaseUrl || null,
+      location: sanitiseLocation({ provider: providerSanitised, location }),
       apiKey: effectiveApiKey,
     }
   } else {
@@ -339,7 +363,10 @@ export const testConnection = async ({ user, provider, model, baseUrl, apiKey })
   } catch (error) {
     const latencyMs = Date.now() - start
     await stampTestResult({ user, ok: false })
-    return { ok: false, latencyMs, errorMessage: error?.message || String(error) }
+    const appError = error instanceof SystemError ? { errorKey: error.key, errorParams: error.params } : {}
+    // HTTP status of the provider response (AI SDK APICallError, possibly wrapped in a RetryError).
+    const errorStatusCode = error?.statusCode ?? error?.lastError?.statusCode
+    return { ok: false, latencyMs, errorMessage: error?.message || String(error), errorStatusCode, ...appError }
   }
 }
 

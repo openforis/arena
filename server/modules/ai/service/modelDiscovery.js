@@ -13,6 +13,7 @@
 import SystemError from '@core/systemError'
 
 import * as ProviderRegistry from './providerRegistry'
+import { listVertexModels } from './vertexAi'
 
 const DEFAULT_TIMEOUT_MS = 10000
 
@@ -97,10 +98,10 @@ const listAnthropic = async ({ apiKey }) => {
 
 const listGoogle = async ({ apiKey }) => {
   if (!apiKey) throw new SystemError('aiApiKeyMissing', { provider: ProviderRegistry.providers.google })
-  const json = await fetchWithTimeout(
-    `https://generativelanguage.googleapis.com/v1beta/models?key=${encodeURIComponent(apiKey)}`,
-    { headers: { Accept: 'application/json' } }
-  )
+  // Key in a header, not in the URL, so that it doesn't end up in proxy/access logs.
+  const json = await fetchWithTimeout('https://generativelanguage.googleapis.com/v1beta/models?pageSize=1000', {
+    headers: { Accept: 'application/json', 'x-goog-api-key': apiKey },
+  })
   const models = Array.isArray(json?.models) ? json.models : []
   return models
     .filter(
@@ -141,6 +142,9 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
       case ProviderRegistry.providers.vercelAiSdk:
         // Fixed-endpoint provider; no model selection applies.
         return []
+      case ProviderRegistry.providers.googleVertex:
+        // Service account keys only: the models list API doesn't accept API keys.
+        return await listVertexModels({ apiKey })
       default:
         throw new SystemError('aiProviderInvalid', { provider })
     }

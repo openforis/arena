@@ -120,8 +120,9 @@
     "yarn-audit-fix": "^11.1.0"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.97",
-    "@ai-sdk/google": "^4.0.112",
+    "@ai-sdk/anthropic": "^4.0.102",
+    "@ai-sdk/google": "^4.0.118",
+    "@ai-sdk/google-vertex": "^5.0.138",
     "@ai-sdk/openai": "^4.0.109",
     "@aws-sdk/client-s3": "^3.1163.0",
     "@codemirror/autocomplete": "^6.20.4",
@@ -173,6 +174,7 @@
     "file-saver": "^2.0.5",
     "georaster": "1.6.0",
     "georaster-layer-for-leaflet": "4.1.2",
+    "google-auth-library": "^11.3.1",
     "heic-to": "^1.6.7",
     "hyparquet": "1.32.0",
     "hyparquet-compressors": "1.1.3",

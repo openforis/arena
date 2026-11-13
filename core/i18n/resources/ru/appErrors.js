@@ -119,6 +119,8 @@ export default {
   aiApiKeyMissing: 'Для провайдера {{provider}} требуется ключ API.',
   aiBaseUrlMissing: 'Для провайдера, совместимого с OpenAI, требуется базовый URL.',
   aiModelListFailed: 'Не удалось получить список моделей от провайдера: {{message}}',
+  aiVertexCredentialInvalid:
+    'Недействительные учетные данные Vertex AI: вставьте JSON-ключ сервисного аккаунта или API-ключ Vertex AI.',
   aiExpressionDescriptionMissing: 'Опишите нужное выражение простыми словами.',
   aiExpressionTypeInvalid: 'Неизвестный тип выражения: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'Невозможно сгенерировать выражение без целевого поля.',

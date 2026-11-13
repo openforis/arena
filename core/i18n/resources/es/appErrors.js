@@ -124,6 +124,8 @@ export default {
   aiApiKeyMissing: 'La clave de API es obligatoria para el proveedor {{provider}}.',
   aiBaseUrlMissing: 'Se requiere una URL base para el proveedor compatible con OpenAI.',
   aiModelListFailed: 'No se pudieron listar los modelos del proveedor: {{message}}',
+  aiVertexCredentialInvalid:
+    'Credencial de Vertex AI no válida: pegue una clave JSON de cuenta de servicio o una clave de API de Vertex AI.',
   aiExpressionDescriptionMissing: 'Describa en lenguaje sencillo la expresión que desea.',
   aiExpressionTypeInvalid: 'Tipo de expresión desconocido: {{expressionType}}.',
   aiExpressionNodeDefMissing: 'No se puede generar una expresión sin un campo de destino.',

@@ -10,12 +10,14 @@ import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
 import { Fieldset } from '@webapp/components/Fieldset'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 
+import { AiSettingsStatusMessage } from './AiSettingsStatusMessage'
 import {
   FEATURE_CATEGORIES,
   MODEL_PLACEHOLDERS,
   OTHER_MODEL_VALUE,
   PROVIDERS,
   BASE_URL_PLACEHOLDERS,
+  LOCATION_PLACEHOLDER,
   useUserAiSettings,
 } from './useUserAiSettings'
 
@@ -47,11 +49,13 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       testing,
       models,
       modelsFetching,
-      modelsError,
       providerSpec,
+      canFetchModels,
+      defaultModel,
       onProviderChange,
       onModelChange,
       onBaseUrlChange,
+      onLocationChange,
       onApiKeyChange,
       onFeaturesEnabledChange,
       onFeatureToggleChange,
@@ -62,7 +66,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onSave,
       onTest,
       onClear,
-      testResultView,
+      status,
     } = useUserAiSettings()
 
     useImperativeHandle(ref, () => onSave, [onSave])
@@ -86,44 +90,56 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
     const effective = settings?.effectiveSource
     const encryptionMissing = !settings?.encryptionConfigured
 
+    const fetchingIndicator = modelsFetching ? <Spinner size={14} /> : null
+
+    const renderModelSelect = () => (
+      <div className="user-ai-settings-panel__model-row">
+        <select className="user-ai-settings-panel__model-select" value={form.model} onChange={onModelSelectChange}>
+          {models.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.description ? `${m.id} — ${m.description}` : m.id}
+            </option>
+          ))}
+          <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
+        </select>
+        {fetchingIndicator}
+      </div>
+    )
+
+    const renderModelInput = () => (
+      <div className="user-ai-settings-panel__model-row">
+        <Input
+          value={form.model}
+          onChange={onModelChange}
+          placeholder={defaultModel ?? MODEL_PLACEHOLDERS[form.provider]}
+        />
+        {canFetchModels && (
+          <button
+            type="button"
+            className="user-ai-settings-panel__fetch-models"
+            onClick={() => fetchModels({ force: true })}
+            disabled={modelsFetching}
+          >
+            {fetchingIndicator}
+            {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
+          </button>
+        )}
+      </div>
+    )
+
     const renderModelField = () => {
-      if (!providerSpec.supportsModelList) return null
+      if (!providerSpec.hasModel) return null
       const useDropdown = models.length > 0 && !form.modelFreeText
       return (
         <FormItem label="userAiSettings:model">
-          {useDropdown ? (
-            <div className="user-ai-settings-panel__model-row">
-              <select
-                className="user-ai-settings-panel__model-select"
-                value={form.model}
-                onChange={onModelSelectChange}
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.description ? `${m.id} — ${m.description}` : m.id}
-                  </option>
-                ))}
-                <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
-              </select>
-            </div>
-          ) : (
-            <div className="user-ai-settings-panel__model-row">
-              <Input value={form.model} onChange={onModelChange} placeholder={MODEL_PLACEHOLDERS[form.provider]} />
-              <button
-                type="button"
-                className="user-ai-settings-panel__fetch-models"
-                onClick={() => fetchModels({ force: true })}
-                disabled={modelsFetching}
-              >
-                {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
-              </button>
-            </div>
-          )}
-          {modelsError && (
-            <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
-              {i18n.t('userAiSettings:modelsFetchFailed', { message: modelsError })}
-            </div>
-          )}
+          <div className="user-ai-settings-panel__model-field">
+            {useDropdown ? renderModelSelect() : renderModelInput()}
+            {!form.model && defaultModel && (
+              <div className="user-ai-settings-panel__hint">
+                {i18n.t('userAiSettings:modelDefaultHint', { model: defaultModel })}
+              </div>
+            )}
+          </div>
         </FormItem>
       )
     }
@@ -193,6 +209,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                     <FormItem label="userAiSettings:apiKey">
                       <Input
                         type="password"
+                        autoComplete="new-password"
                         value={form.apiKey}
                         onChange={onApiKeyChange}
                         onBlur={onApiKeyBlur}
@@ -203,6 +220,17 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
                   )}
                   {settings?.hasApiKey && !form.apiKeyDirty && form.provider !== AiProvider.vercelAiSdk && (
                     <div className="user-ai-settings-panel__hint">{i18n.t('userAiSettings:apiKeyKept')}</div>
+                  )}
+                  {form.provider === AiProvider.googleVertex && (
+                    <div className="user-ai-settings-panel__hint">
+                      {i18n.t('userAiSettings:googleVertexApiKeyHint')}
+                    </div>
+                  )}
+
+                  {providerSpec.supportsLocation && (
+                    <FormItem label="userAiSettings:location" info={i18n.t('userAiSettings:locationHint')}>
+                      <Input value={form.location} onChange={onLocationChange} placeholder={LOCATION_PLACEHOLDER} />
+                    </FormItem>
                   )}
 
                   {renderModelField()}
@@ -241,7 +269,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
           )}
         </div>
 
-        {testResultView}
+        {status && <AiSettingsStatusMessage key={`${status.kind}|${status.summary}`} status={status} />}
       </Fieldset>
     )
   }

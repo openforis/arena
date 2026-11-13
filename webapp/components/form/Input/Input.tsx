@@ -25,6 +25,8 @@ type NumberFormatProps = {
 
 type Props = {
   allowClear?: boolean
+  // 'new-password' keeps browsers from filling a password field with the user's login password ('off' is ignored there)
+  autoComplete?: string
   autoFocus?: boolean
   className?: string
   disabled?: boolean
@@ -50,6 +52,7 @@ type Props = {
 export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
   const {
     allowClear = false,
+    autoComplete = 'off',
     autoFocus,
     className: classNameProp = null,
     disabled = false,
@@ -130,7 +133,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
     <ValidationTooltip key={`validation-${id}`} validation={validation} className="form-input-container">
       {numberFormat ? (
         <NumericFormat
-          autoComplete="off"
+          autoComplete={autoComplete}
           autoFocus={autoFocus}
           disabled={disabled || readOnly}
           className={className}
@@ -152,7 +155,7 @@ export const Input = React.forwardRef<HTMLDivElement, Props>((props, ref) => {
         />
       ) : (
         <SimpleTextInput
-          autoComplete="off"
+          autoComplete={autoComplete}
           autoFocus={autoFocus}
           className={className}
           disabled={disabled}
