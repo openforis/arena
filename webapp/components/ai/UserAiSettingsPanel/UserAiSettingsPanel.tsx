@@ -50,6 +50,8 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       modelsFetching,
       modelsError,
       providerSpec,
+      canFetchModels,
+      defaultModel,
       onProviderChange,
       onModelChange,
       onBaseUrlChange,
@@ -88,39 +90,52 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
     const effective = settings?.effectiveSource
     const encryptionMissing = !settings?.encryptionConfigured
 
+    const fetchingIndicator = modelsFetching ? <Spinner size={14} /> : null
+
+    const renderModelSelect = () => (
+      <div className="user-ai-settings-panel__model-row">
+        <select className="user-ai-settings-panel__model-select" value={form.model} onChange={onModelSelectChange}>
+          {models.map((m) => (
+            <option key={m.id} value={m.id}>
+              {m.description ? `${m.id} — ${m.description}` : m.id}
+            </option>
+          ))}
+          <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
+        </select>
+        {fetchingIndicator}
+      </div>
+    )
+
+    const renderModelInput = () => (
+      <div className="user-ai-settings-panel__model-row">
+        <Input
+          value={form.model}
+          onChange={onModelChange}
+          placeholder={defaultModel ?? MODEL_PLACEHOLDERS[form.provider]}
+        />
+        {canFetchModels && (
+          <button
+            type="button"
+            className="user-ai-settings-panel__fetch-models"
+            onClick={() => fetchModels({ force: true })}
+            disabled={modelsFetching}
+          >
+            {fetchingIndicator}
+            {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
+          </button>
+        )}
+      </div>
+    )
+
     const renderModelField = () => {
       if (!providerSpec.hasModel) return null
       const useDropdown = models.length > 0 && !form.modelFreeText
       return (
         <FormItem label="userAiSettings:model">
-          {useDropdown ? (
-            <div className="user-ai-settings-panel__model-row">
-              <select
-                className="user-ai-settings-panel__model-select"
-                value={form.model}
-                onChange={onModelSelectChange}
-              >
-                {models.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.description ? `${m.id} — ${m.description}` : m.id}
-                  </option>
-                ))}
-                <option value={OTHER_MODEL_VALUE}>{i18n.t('userAiSettings:modelOther')}</option>
-              </select>
-            </div>
-          ) : (
-            <div className="user-ai-settings-panel__model-row">
-              <Input value={form.model} onChange={onModelChange} placeholder={MODEL_PLACEHOLDERS[form.provider]} />
-              {providerSpec.supportsModelList && (
-                <button
-                  type="button"
-                  className="user-ai-settings-panel__fetch-models"
-                  onClick={() => fetchModels({ force: true })}
-                  disabled={modelsFetching}
-                >
-                  {modelsFetching ? i18n.t('userAiSettings:fetchingModels') : i18n.t('userAiSettings:fetchModels')}
-                </button>
-              )}
+          {useDropdown ? renderModelSelect() : renderModelInput()}
+          {!form.model && defaultModel && (
+            <div className="user-ai-settings-panel__hint">
+              {i18n.t('userAiSettings:modelDefaultHint', { model: defaultModel })}
             </div>
           )}
           {modelsError && (

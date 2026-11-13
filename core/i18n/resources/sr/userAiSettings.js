@@ -41,6 +41,7 @@ export default {
   defaultProviderHint: 'Koristi AI provajder koji je konfigurisao vaš Arena administrator.',
   model: 'Model',
   modelOther: 'Drugi (unesite id modela)...',
+  modelDefaultHint: 'Ostavite prazno da biste koristili podrazumevani model ({{model}}).',
   baseUrl: 'Osnovni URL',
   apiKey: 'API ključ',
   apiKeyPlaceholder: 'Nalijepite API ključ vašeg provajdera',

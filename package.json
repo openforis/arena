@@ -174,6 +174,7 @@
     "file-saver": "^2.0.5",
     "georaster": "1.6.0",
     "georaster-layer-for-leaflet": "4.1.2",
+    "google-auth-library": "^11.3.1",
     "heic-to": "^1.6.7",
     "hyparquet": "1.32.0",
     "hyparquet-compressors": "1.1.3",

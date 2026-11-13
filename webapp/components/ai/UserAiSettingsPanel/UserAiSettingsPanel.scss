@@ -44,6 +44,9 @@
   }
 
   &__fetch-models {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
     background: none;
     border: 1px solid shade($colorOutline, 30%);
     border-radius: 4px;

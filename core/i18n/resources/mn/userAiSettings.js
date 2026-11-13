@@ -41,6 +41,7 @@ export default {
   defaultProviderHint: 'Arena-ийн админы тохируулсан AI үйлчилгээ үзүүлэгчийг ашиглана.',
   model: 'Загвар',
   modelOther: 'Бусад (загварын id-г оруулна уу)...',
+  modelDefaultHint: 'Үндсэн загварыг ({{model}}) ашиглах бол хоосон үлдээнэ үү.',
   baseUrl: 'Суурь URL',
   apiKey: 'API түлхүүр',
   apiKeyPlaceholder: 'Үйлчилгээ үзүүлэгчийн API түлхүүрээ буулгана уу',

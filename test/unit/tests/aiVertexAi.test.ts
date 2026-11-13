@@ -1,4 +1,9 @@
-import { buildVertexProviderSettings, resolveVertexAuth } from '@server/modules/ai/service/vertexAi'
+import {
+  buildVertexProviderSettings,
+  isServiceAccountKeyCredential,
+  listVertexModels,
+  resolveVertexAuth,
+} from '@server/modules/ai/service/vertexAi'
 
 const serviceAccountKey = {
   type: 'service_account',
@@ -44,5 +49,18 @@ describe('Vertex AI config', () => {
       project: 'p',
       location: 'global',
     })
+  })
+
+  test('service account key credential detection', () => {
+    expect(isServiceAccountKeyCredential(` ${JSON.stringify(serviceAccountKey)}`)).toBe(true)
+    expect(isServiceAccountKeyCredential('AQ.key')).toBe(false)
+    expect(isServiceAccountKeyCredential(null)).toBe(false)
+  })
+
+  test('models list is empty with an API key (the list API accepts only OAuth2 credentials)', async () => {
+    const fetchSpy = jest.spyOn(globalThis, 'fetch')
+    await expect(listVertexModels({ apiKey: 'AQ.key' })).resolves.toEqual([])
+    expect(fetchSpy).not.toHaveBeenCalled()
+    fetchSpy.mockRestore()
   })
 })

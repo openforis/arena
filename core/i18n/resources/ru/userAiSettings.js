@@ -40,6 +40,7 @@ export default {
   defaultProviderHint: 'Используется провайдер ИИ, настроенный администратором Arena.',
   model: 'Модель',
   modelOther: 'Другая (введите идентификатор модели)...',
+  modelDefaultHint: 'Оставьте пустым, чтобы использовать модель по умолчанию ({{model}}).',
   baseUrl: 'Базовый URL',
   apiKey: 'API-ключ',
   apiKeyPlaceholder: 'Вставьте API-ключ вашего провайдера',

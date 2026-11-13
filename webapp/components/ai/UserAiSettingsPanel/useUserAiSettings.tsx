@@ -44,8 +44,10 @@ export type ProviderSpec = {
   requiresApiKey: boolean
   // The provider needs a model id (false for fixed-endpoint agents).
   hasModel: boolean
-  // The models can be fetched from the provider (Vertex AI: the models list API doesn't accept API keys).
+  // The models can be fetched from the provider.
   supportsModelList: boolean
+  // Vertex AI: the models list API accepts a service account key, not an API key.
+  supportsModelListWithServiceAccountKeyOnly?: boolean
   supportsLocation?: boolean
 }
 
@@ -72,7 +74,8 @@ export const PROVIDERS: ProviderSpec[] = [
     requiresBaseUrl: false,
     requiresApiKey: true,
     hasModel: true,
-    supportsModelList: false,
+    supportsModelList: true,
+    supportsModelListWithServiceAccountKeyOnly: true,
     supportsLocation: true,
   },
   {
@@ -115,6 +118,8 @@ type AiSettings = {
   baseUrl?: string
   location?: string
   hasApiKey?: boolean
+  apiKeyIsServiceAccount?: boolean
+  defaultModels?: Record<string, string>
   aiFeaturesDisabled?: boolean
   effectiveSource?: string
   effectiveProvider?: string
@@ -190,6 +195,17 @@ const buildModelsKey = ({
   return [provider, baseUrl || '', apiKeySegment].join('|')
 }
 
+const isServiceAccountKey = (apiKey: string): boolean => apiKey.trim().startsWith('{')
+
+// Translates an Arena API error ({ key, params }) when possible.
+const getApiErrorMessage = ({ i18n, error }: { i18n: any; error: any }): string => {
+  const { key, params } = error?.response?.data ?? {}
+  if (typeof key === 'string' && key) {
+    return i18n.t(key.includes(':') ? key : `appErrors:${key}`, { ...params, interpolation: { escapeValue: false } })
+  }
+  return error?.message || 'unknown'
+}
+
 type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
   loading: boolean
@@ -202,6 +218,8 @@ type UseUserAiSettingsResult = {
   modelsFetching: boolean
   modelsError: string | null
   providerSpec: ProviderSpec
+  canFetchModels: boolean
+  defaultModel: string | null
   onProviderChange: (providerItem: ProviderSpec | null) => void
   onModelChange: (value: string) => void
   onBaseUrlChange: (value: string) => void
@@ -244,6 +262,15 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     (): ProviderSpec => PROVIDERS.find((p) => p.value === form.provider) ?? PROVIDERS[0],
     [form.provider]
   )
+
+  // Vertex AI: the key typed in the form, or the saved one, must be a service account key.
+  const canFetchModels =
+    providerSpec.supportsModelList &&
+    (!providerSpec.supportsModelListWithServiceAccountKeyOnly ||
+      (form.apiKeyDirty ? isServiceAccountKey(form.apiKey) : !!settings?.apiKeyIsServiceAccount))
+
+  // Used by the server when the model is left empty.
+  const defaultModel = settings?.defaultModels?.[form.provider] ?? null
 
   const fetchSettings = useCallback(async () => {
     setLoading(true)
@@ -288,9 +315,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onProviderChange = useCallback((providerItem: ProviderSpec | null) => {
     const provider = providerItem?.value
     if (!provider) return
-    // Prefill the suggested model (a placeholder looks like a value and would be sent empty).
-    const model = MODEL_PLACEHOLDERS[provider] ?? ''
-    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model, modelFreeText: false }))
+    setForm((prev) => ({ ...prev, provider, baseUrl: '', location: '', model: '', modelFreeText: false }))
     setModels([])
     setModelsError(null)
     setLastModelsKey(null)
@@ -348,7 +373,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
    */
   const fetchModels = useCallback(
     async ({ force = false }: { force?: boolean } = {}) => {
-      if (!providerSpec.supportsModelList) return
+      if (!canFetchModels) return
       const hasBaseUrl = !providerSpec.requiresBaseUrl || form.baseUrl.trim().length > 0
       const hasApiKey = !providerSpec.requiresApiKey || form.apiKeyDirty || !!settings?.hasApiKey
       if (!hasBaseUrl || !hasApiKey) return
@@ -378,22 +403,23 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
           // the list (empty, stale, or a hand-typed id), preselect the first
           // returned model so the user immediately sees the available choices;
           // they can still pick "Other (type a model id)…" to free-text.
-          const currentInList = !!form.model && list.some((m) => m.id === form.model)
-          if (currentInList) {
-            setForm((prev) => ({ ...prev, modelFreeText: false }))
-          } else {
-            setForm((prev) => ({ ...prev, model: list[0].id, modelFreeText: false }))
-          }
+          // An empty model means the default one: select it when available.
+          const preferredModel = form.model || defaultModel
+          const preferredInList = !!preferredModel && list.some((m) => m.id === preferredModel)
+          const model = preferredInList ? preferredModel : list[0].id
+          setForm((prev) => ({ ...prev, model, modelFreeText: false }))
         }
       } catch (error: any) {
         setModels([])
-        setModelsError(error?.response?.data?.error || error?.message || 'unknown')
+        setModelsError(getApiErrorMessage({ i18n, error }))
       } finally {
         setModelsFetching(false)
       }
     },
     [
-      providerSpec.supportsModelList,
+      canFetchModels,
+      defaultModel,
+      i18n,
       providerSpec.requiresBaseUrl,
       providerSpec.requiresApiKey,
       form.baseUrl,
@@ -529,6 +555,8 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     modelsFetching,
     modelsError,
     providerSpec,
+    canFetchModels,
+    defaultModel,
     onProviderChange,
     onModelChange,
     onBaseUrlChange,

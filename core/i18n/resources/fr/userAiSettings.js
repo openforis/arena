@@ -40,6 +40,7 @@ export default {
   defaultProviderHint: 'Utilise le fournisseur IA configure par votre administrateur Arena.',
   model: 'Modele',
   modelOther: 'Autre (saisir un identifiant de modele)...',
+  modelDefaultHint: 'Laissez vide pour utiliser le modèle par défaut ({{model}}).',
   baseUrl: 'URL de base',
   apiKey: 'Cle API',
   apiKeyPlaceholder: 'Collez la cle API de votre fournisseur',

@@ -11,6 +11,7 @@ import { ENV } from '@core/processUtils'
 import SystemError from '@core/systemError'
 
 import * as AiSettingsService from './aiSettingsService'
+import { getDefaultModel } from './defaultModels'
 import * as ProviderRegistry from './providerRegistry'
 
 export const sources = {
@@ -22,7 +23,8 @@ const adminDefaultConfig = () =>
   ENV.aiDefaultProvider
     ? {
         provider: ENV.aiDefaultProvider,
-        model: ENV.aiDefaultModel,
+        // AI_DEFAULT_MODEL, or the built-in default model of the provider.
+        model: getDefaultModel(ENV.aiDefaultProvider),
         apiKey: ENV.aiDefaultApiKey,
         baseUrl: ENV.aiDefaultBaseUrl,
         project: ENV.aiDefaultVertexProject,

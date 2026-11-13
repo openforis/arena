@@ -13,6 +13,7 @@
  *     featuresEnabled,        // master switch — user wants AI at all
  *     featureToggles,         // { chat, expressions, translation, dataDictionary, userActivity, dataQuery } booleans
  *     provider, model, baseUrl, location, apiKeyEncrypted,
+ *     apiKeyIsServiceAccount, // the key is a service account JSON key (not secret: enables the Vertex AI models list)
  *     enabled,                // use OWN provider vs. admin default
  *     lastTestOk, lastTestAt,
  *   }
@@ -28,8 +29,10 @@ import SystemError from '@core/systemError'
 import * as UserManager from '@server/modules/user/manager/userManager'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 
+import { getDefaultModel } from './defaultModels'
 import * as ModelDiscovery from './modelDiscovery'
 import * as ProviderRegistry from './providerRegistry'
+import { isServiceAccountKeyCredential } from './vertexAi'
 
 const PREFS_KEY = 'ai'
 
@@ -114,6 +117,7 @@ export const getPublicSettings = (user) => {
       location: null,
       enabled: false,
       hasApiKey: false,
+      apiKeyIsServiceAccount: false,
       lastTestOk: null,
       lastTestAt: null,
     }
@@ -127,6 +131,7 @@ export const getPublicSettings = (user) => {
     location: raw.location || null,
     enabled: !!raw.enabled,
     hasApiKey: !!raw.apiKeyEncrypted,
+    apiKeyIsServiceAccount: !!raw.apiKeyEncrypted && !!raw.apiKeyIsServiceAccount,
     lastTestOk: raw.lastTestOk ?? null,
     lastTestAt: raw.lastTestAt || null,
   }
@@ -167,10 +172,12 @@ export const isCategoryEnabledForUser = (user, category) => {
  */
 export const getEffectiveUserConfig = (user, { decrypt = true } = {}) => {
   const raw = getRawPrefs(user)
-  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider || !raw.model) return null
+  if (!raw?.featuresEnabled || !raw.enabled || !raw.provider) return null
+  const model = raw.model || getDefaultModel(raw.provider)
+  if (!model) return null
   return {
     provider: raw.provider,
-    model: raw.model,
+    model,
     baseUrl: raw.baseUrl || null,
     location: raw.location || null,
     apiKey: decrypt && raw.apiKeyEncrypted ? SecretBox.decrypt(raw.apiKeyEncrypted) : null,
@@ -183,7 +190,7 @@ const sanitiseLocation = ({ provider, location }) =>
 
 // Throws when the provider config is incomplete.
 const validateProviderConfig = ({ provider, model, baseUrl, isFixedEndpoint }) => {
-  if (!model && !isFixedEndpoint) throw new SystemError('aiModelMissing', { provider })
+  if (!model && !isFixedEndpoint && !getDefaultModel(provider)) throw new SystemError('aiModelMissing', { provider })
   const requiresBaseUrl =
     provider === ProviderRegistry.providers.openaiCompatible || provider === ProviderRegistry.providers.vercelAiSdk
   if (requiresBaseUrl && !baseUrl) {
@@ -247,8 +254,10 @@ export const saveSettings = async ({ user, update }) => {
   // Encrypt-or-clear the API key independently of featuresEnabled so the
   // user can drop their key without flipping the master toggle off.
   let apiKeyEncrypted = existing.apiKeyEncrypted || null
+  let apiKeyIsServiceAccount = !!existing.apiKeyIsServiceAccount
   if (typeof update.apiKey === 'string') {
     apiKeyEncrypted = update.apiKey.length === 0 ? null : SecretBox.encrypt(update.apiKey)
+    apiKeyIsServiceAccount = isServiceAccountKeyCredential(update.apiKey)
   }
 
   // Provider config defaults: preserve existing values when the user isn't
@@ -270,6 +279,7 @@ export const saveSettings = async ({ user, update }) => {
     baseUrl,
     location,
     apiKeyEncrypted,
+    apiKeyIsServiceAccount,
     enabled: overrideEnabled,
     // Saving invalidates the previous test result.
     lastTestOk: null,
@@ -328,7 +338,7 @@ export const testConnection = async ({ user, provider, model, baseUrl, location,
     const effectiveApiKey = resolveApiKey({ user, apiKey })
     cfg = {
       provider: providerSanitised,
-      model: trimmedModel || null,
+      model: trimmedModel || getDefaultModel(providerSanitised),
       baseUrl: trimmedBaseUrl || null,
       location: sanitiseLocation({ provider: providerSanitised, location }),
       apiKey: effectiveApiKey,

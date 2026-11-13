@@ -40,6 +40,7 @@ export default {
   defaultProviderHint: 'Arena管理者が設定したAIプロバイダーを使用します。',
   model: 'モデル',
   modelOther: 'その他（モデルIDを入力）...',
+  modelDefaultHint: '空欄のままにすると既定のモデル（{{model}}）を使用します。',
   baseUrl: 'ベースURL',
   apiKey: 'APIキー',
   apiKeyPlaceholder: 'プロバイダーのAPIキーを貼り付けてください',

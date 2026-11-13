@@ -13,6 +13,7 @@
 import SystemError from '@core/systemError'
 
 import * as ProviderRegistry from './providerRegistry'
+import { listVertexModels } from './vertexAi'
 
 const DEFAULT_TIMEOUT_MS = 10000
 
@@ -142,8 +143,8 @@ export const listForProvider = async ({ provider, baseUrl, apiKey }) => {
         // Fixed-endpoint provider; no model selection applies.
         return []
       case ProviderRegistry.providers.googleVertex:
-        // The models list API accepts only OAuth2 credentials (no API keys): the model id is typed.
-        return []
+        // Service account keys only: the models list API doesn't accept API keys.
+        return await listVertexModels({ apiKey })
       default:
         throw new SystemError('aiProviderInvalid', { provider })
     }

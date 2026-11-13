@@ -15606,6 +15606,7 @@ __metadata:
     georaster-layer-for-leaflet: "npm:4.1.2"
     glob: "npm:^14.0.4"
     globals: "npm:^17.14.0"
+    google-auth-library: "npm:^11.3.1"
     heic-to: "npm:^1.6.7"
     html-replace-webpack-plugin: "npm:^2.6.0"
     html-webpack-plugin: "npm:^5.6.8"

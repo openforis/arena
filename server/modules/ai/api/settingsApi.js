@@ -12,6 +12,7 @@ import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 
 import * as AiSettingsService from '../service/aiSettingsService'
+import { getDefaultModels } from '../service/defaultModels'
 import * as ProviderResolver from '../service/providerResolver'
 import * as SecretBox from '@server/utils/crypto/secretBox'
 import { requireAiFeaturesEnabled } from './aiMiddleware'
@@ -25,6 +26,8 @@ const buildResponseBody = async (user) => {
     effectiveProvider: effective.provider,
     effectiveModel: effective.model,
     encryptionConfigured: SecretBox.isConfigured(),
+    // Used when the model is left empty.
+    defaultModels: getDefaultModels(),
   }
 }
 
