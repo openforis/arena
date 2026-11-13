@@ -12,6 +12,9 @@ env:
   # needed by the build job too: it's baked into the client bundle as EMAIL_FROM_RESOLVED (see webpack.config.mjs)
   ADMIN_EMAIL: ${{ secrets.ADMIN_EMAIL }}
   RATE_LIMIT_ENABLED: false
+  # required by arena-server unless NODE_ENV is development or test: throwaway values for the CI server
+  USER_AUTH_TOKEN_SECRET: ci-user-auth-token-secret
+  USER_2FA_SECRET: ci-user-2fa-secret
 
 jobs:
   build:
