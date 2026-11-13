@@ -53,7 +53,7 @@ export default {
     'Krajnja tačka za chat Vercel AI SDK-a se tretira kao fiksni agent - izbor modela i API ključ se ne primjenjuju. Generisanje slobodnog teksta radi; funkcije sa strukturiranim izlazom možda neće raditi.',
   fetchModels: 'Preuzmi modele',
   fetchingModels: 'Preuzimanje modela...',
-  modelsFetchFailed: 'Nije moguće preuzeti modele: {{message}}',
+  modelsFetchFailed: 'Nije moguće preuzeti modele od provajdera.',
 
   save: 'Sačuvaj',
   testConnection: 'Testiraj vezu',
@@ -61,7 +61,10 @@ export default {
 
   testing: 'Testiranje veze...',
   testOk: 'Veza je u redu ({{latencyMs}} ms).',
-  testFailed: 'Veza nije uspjela: {{message}}',
+  testFailed: 'Veza nije uspjela.',
+  errorAuthHint: 'Proverite da li je API ključ ispravan i omogućen za ovog provajdera.',
+  showDetails: 'Prikaži detalje',
+  hideDetails: 'Sakrij detalje',
 
   savedSuccessfully: 'AI podešavanja su sačuvana.',
   saveFailed: 'Čuvanje AI podešavanja nije uspjelo: {{message}}',

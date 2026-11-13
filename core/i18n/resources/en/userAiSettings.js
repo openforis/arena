@@ -52,7 +52,7 @@ export default {
     'A Vercel AI SDK chat endpoint is treated as a fixed agent - model selection and API key do not apply. Free-text generation works; structured-output features may not.',
   fetchModels: 'Fetch models',
   fetchingModels: 'Fetching models...',
-  modelsFetchFailed: 'Could not fetch models: {{message}}',
+  modelsFetchFailed: 'Could not fetch the models from the provider.',
 
   save: 'Save',
   testConnection: 'Test connection',
@@ -60,7 +60,10 @@ export default {
 
   testing: 'Testing connection...',
   testOk: 'Connection OK ({{latencyMs}} ms).',
-  testFailed: 'Connection failed: {{message}}',
+  testFailed: 'Connection failed.',
+  errorAuthHint: 'Check that the API key is valid and enabled for this provider.',
+  showDetails: 'Show details',
+  hideDetails: 'Hide details',
 
   savedSuccessfully: 'AI settings saved.',
   saveFailed: 'Failed to save AI settings: {{message}}',

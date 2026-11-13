@@ -48,7 +48,7 @@ export const saveSettings = async (update) => {
  * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string}>} The test result.
  */
 export const testConnection = async (draft = {}) => {
-  const { data } = await axios.post(`${BASE}/test`, draft)
+  const { data } = await axios.post(`${BASE}/test`, draft, { errorHandledLocally: true })
   return data
 }
 
@@ -62,7 +62,8 @@ export const testConnection = async (draft = {}) => {
  * @returns {Promise<{models: Array<{id: string, description?: string}>}>} Models list.
  */
 export const fetchModels = async ({ provider, baseUrl, apiKey }) => {
-  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, apiKey })
+  // Errors shown in the settings panel, not as a global error.
+  const { data } = await axios.post(`${BASE}/models`, { provider, baseUrl, apiKey }, { errorHandledLocally: true })
   return data
 }
 

@@ -53,7 +53,7 @@ export default {
     'Un endpoint chat Vercel AI SDK est traite comme un agent fixe - la selection du modele et la cle API ne s appliquent pas. La generation de texte libre fonctionne ; les fonctionnalites de sortie structuree peuvent ne pas fonctionner.',
   fetchModels: 'Recuperer les modeles',
   fetchingModels: 'Recuperation des modeles...',
-  modelsFetchFailed: 'Impossible de recuperer les modeles : {{message}}',
+  modelsFetchFailed: 'Impossible de récupérer les modèles du fournisseur.',
 
   save: 'Enregistrer',
   testConnection: 'Tester la connexion',
@@ -61,7 +61,10 @@ export default {
 
   testing: 'Test de connexion...',
   testOk: 'Connexion OK ({{latencyMs}} ms).',
-  testFailed: 'Echec de connexion : {{message}}',
+  testFailed: 'Échec de connexion.',
+  errorAuthHint: 'Vérifiez que la clé API est valide et activée pour ce fournisseur.',
+  showDetails: 'Afficher les détails',
+  hideDetails: 'Masquer les détails',
 
   savedSuccessfully: 'Parametres IA enregistres.',
   saveFailed: 'Echec de l enregistrement des parametres IA : {{message}}',

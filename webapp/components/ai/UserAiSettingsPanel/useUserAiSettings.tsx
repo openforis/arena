@@ -6,6 +6,8 @@ import * as API from '@webapp/service/api'
 
 import { useNotifyInfo, useNotifyError } from '@webapp/components/hooks'
 import { invalidateAiSettingsCache } from '@webapp/components/ai/hooks/useAiFeatureEnabled'
+
+import type { AiSettingsStatus } from './AiSettingsStatusMessage'
 import { useI18n } from '@webapp/store/system'
 
 export type FeatureCategory = 'chat' | 'expressions' | 'translation' | 'dataDictionary' | 'userActivity' | 'dataQuery'
@@ -138,6 +140,7 @@ type TestResult = {
   errorMessage?: string
   errorKey?: string
   errorParams?: Record<string, unknown>
+  errorStatusCode?: number
 }
 
 type SettingsUpdate = {
@@ -206,6 +209,33 @@ const getApiErrorMessage = ({ i18n, error }: { i18n: any; error: any }): string 
   return error?.message || 'unknown'
 }
 
+const extractHttpStatusCode = (text: string | null | undefined): number | null => {
+  const match = /HTTP (\d{3})/.exec(text ?? '')
+  return match ? Number(match[1]) : null
+}
+
+// 401/403: most likely a wrong key, or a key not enabled for the selected provider.
+const withAuthHint = ({ i18n, summary, statusCode }: { i18n: any; summary: string; statusCode: number | null }) =>
+  statusCode === 401 || statusCode === 403 ? `${summary} ${i18n.t('userAiSettings:errorAuthHint')}` : summary
+
+const buildTestStatus = ({ i18n, testResult }: { i18n: any; testResult: TestResult }): AiSettingsStatus => {
+  if (testResult.ok) {
+    return { kind: 'ok', summary: i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs }) }
+  }
+  const failed = i18n.t('userAiSettings:testFailed')
+  if (testResult.errorKey) {
+    // Configuration error: already user friendly.
+    const message = i18n.t(`appErrors:${testResult.errorKey}`, {
+      ...testResult.errorParams,
+      interpolation: { escapeValue: false },
+    })
+    return { kind: 'fail', summary: `${failed} ${message}` }
+  }
+  const details = testResult.errorMessage || 'unknown'
+  const statusCode = testResult.errorStatusCode ?? extractHttpStatusCode(details)
+  return { kind: 'fail', summary: withAuthHint({ i18n, summary: failed, statusCode }), details }
+}
+
 type UseUserAiSettingsResult = {
   i18n: ReturnType<typeof useI18n>
   loading: boolean
@@ -234,7 +264,7 @@ type UseUserAiSettingsResult = {
   onSave: () => Promise<void>
   onTest: () => Promise<void>
   onClear: () => Promise<void>
-  testResultView: React.ReactElement | null
+  status: AiSettingsStatus | null
 }
 
 /**
@@ -389,6 +419,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
 
       setModelsFetching(true)
       setModelsError(null)
+      setTestResult(null)
       setLastModelsKey(key)
       try {
         const data = await API.aiSettings.fetchModels({
@@ -486,6 +517,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
   const onTest = useCallback(async () => {
     setTesting(true)
     setTestResult(null)
+    setModelsError(null)
     try {
       const draft = providerSpec.isDefault
         ? {}
@@ -525,23 +557,20 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     }
   }, [notifyError, notifyInfo])
 
-  const testResultView = useMemo((): React.ReactElement | null => {
-    if (testing) {
-      return <div className="user-ai-settings-panel__test">{i18n.t('userAiSettings:testing')}</div>
-    }
-    if (testResult) {
-      const testResultMessage = testResult.ok
-        ? i18n.t('userAiSettings:testOk', { latencyMs: testResult.latencyMs })
-        : i18n.t('userAiSettings:testFailed', {
-            message: testResult.errorKey
-              ? i18n.t(`appErrors:${testResult.errorKey}`, testResult.errorParams)
-              : testResult.errorMessage || 'unknown',
-            interpolation: { escapeValue: false },
-          })
-      return <div className={`user-ai-settings-panel__test ${testResult.ok ? 'ok' : 'fail'}`}>{testResultMessage}</div>
+  // Result of the last provider call, shown in a single place: test connection or models fetch.
+  const status = useMemo((): AiSettingsStatus | null => {
+    if (testing) return { kind: 'info', summary: i18n.t('userAiSettings:testing') }
+    if (testResult) return buildTestStatus({ i18n, testResult })
+    if (modelsError) {
+      const summary = withAuthHint({
+        i18n,
+        summary: i18n.t('userAiSettings:modelsFetchFailed'),
+        statusCode: extractHttpStatusCode(modelsError),
+      })
+      return { kind: 'fail', summary, details: modelsError }
     }
     return null
-  }, [i18n, testResult, testing])
+  }, [i18n, modelsError, testResult, testing])
 
   return {
     i18n,
@@ -571,6 +600,6 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
     onSave,
     onTest,
     onClear,
-    testResultView,
+    status,
   }
 }

@@ -108,6 +108,31 @@
     padding: 0.25rem 0 0.5rem;
   }
 
+  &__model-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+  }
+
+  &__details-toggle {
+    background: none;
+    border: none;
+    padding: 0 0 0 0.5rem;
+    color: $colorPrimary;
+    font-size: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &__details {
+    margin-top: 0.25rem;
+    color: $colorOnSurfaceVariant;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
   &__test {
     margin-top: 0.25rem;
     font-size: 0.85rem;

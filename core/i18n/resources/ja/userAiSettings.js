@@ -54,7 +54,7 @@ export default {
     'Vercel AI SDKチャットエンドポイントは固定エージェントとして扱われ、モデル選択やAPIキーは適用されません。自由記述の生成は機能しますが、構造化出力機能は動作しない場合があります。',
   fetchModels: 'モデルを取得',
   fetchingModels: 'モデルを取得中...',
-  modelsFetchFailed: 'モデルを取得できませんでした：{{message}}',
+  modelsFetchFailed: 'プロバイダーからモデルを取得できませんでした。',
 
   save: '保存',
   testConnection: '接続をテスト',
@@ -62,7 +62,10 @@ export default {
 
   testing: '接続をテスト中...',
   testOk: '接続に成功しました（{{latencyMs}} ms）。',
-  testFailed: '接続に失敗しました：{{message}}',
+  testFailed: '接続に失敗しました。',
+  errorAuthHint: 'API キーが有効で、このプロバイダーで使用できることを確認してください。',
+  showDetails: '詳細を表示',
+  hideDetails: '詳細を隠す',
 
   savedSuccessfully: 'AI設定を保存しました。',
   saveFailed: 'AI設定の保存に失敗しました：{{message}}',

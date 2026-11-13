@@ -10,6 +10,7 @@ import { FormItem, Input as InputJS } from '@webapp/components/form/Input'
 import { Fieldset } from '@webapp/components/Fieldset'
 import { Checkbox, Dropdown } from '@webapp/components/form'
 
+import { AiSettingsStatusMessage } from './AiSettingsStatusMessage'
 import {
   FEATURE_CATEGORIES,
   MODEL_PLACEHOLDERS,
@@ -48,7 +49,6 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       testing,
       models,
       modelsFetching,
-      modelsError,
       providerSpec,
       canFetchModels,
       defaultModel,
@@ -66,7 +66,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       onSave,
       onTest,
       onClear,
-      testResultView,
+      status,
     } = useUserAiSettings()
 
     useImperativeHandle(ref, () => onSave, [onSave])
@@ -132,20 +132,14 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
       const useDropdown = models.length > 0 && !form.modelFreeText
       return (
         <FormItem label="userAiSettings:model">
-          {useDropdown ? renderModelSelect() : renderModelInput()}
-          {!form.model && defaultModel && (
-            <div className="user-ai-settings-panel__hint">
-              {i18n.t('userAiSettings:modelDefaultHint', { model: defaultModel })}
-            </div>
-          )}
-          {modelsError && (
-            <div className="user-ai-settings-panel__hint user-ai-settings-panel__hint--error">
-              {i18n.t('userAiSettings:modelsFetchFailed', {
-                message: modelsError,
-                interpolation: { escapeValue: false },
-              })}
-            </div>
-          )}
+          <div className="user-ai-settings-panel__model-field">
+            {useDropdown ? renderModelSelect() : renderModelInput()}
+            {!form.model && defaultModel && (
+              <div className="user-ai-settings-panel__hint">
+                {i18n.t('userAiSettings:modelDefaultHint', { model: defaultModel })}
+              </div>
+            )}
+          </div>
         </FormItem>
       )
     }
@@ -275,7 +269,7 @@ const UserAiSettingsPanel = React.forwardRef<() => Promise<void>, UserAiSettings
           )}
         </div>
 
-        {testResultView}
+        {status && <AiSettingsStatusMessage key={`${status.kind}|${status.summary}`} status={status} />}
       </Fieldset>
     )
   }

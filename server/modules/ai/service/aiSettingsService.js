@@ -326,8 +326,8 @@ export const clearSettings = async ({ user }) => {
  * @param {string} [args.baseUrl] - Draft base URL.
  * @param {string} [args.location] - Draft Google Cloud location (Vertex AI only).
  * @param {string} [args.apiKey] - Draft API key (falls back to saved key when omitted).
- * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string, errorKey?: string, errorParams?: object}>}
- *   Test result (errorKey/errorParams: translatable app error, for configuration errors).
+ * @returns {Promise<{ok: boolean, latencyMs: number, errorMessage?: string, errorKey?: string, errorParams?: object, errorStatusCode?: number}>}
+ *   Test result (errorKey/errorParams: translatable app error, for configuration errors; errorStatusCode: provider HTTP status).
  */
 export const testConnection = async ({ user, provider, model, baseUrl, location, apiKey }) => {
   let cfg
@@ -364,7 +364,9 @@ export const testConnection = async ({ user, provider, model, baseUrl, location,
     const latencyMs = Date.now() - start
     await stampTestResult({ user, ok: false })
     const appError = error instanceof SystemError ? { errorKey: error.key, errorParams: error.params } : {}
-    return { ok: false, latencyMs, errorMessage: error?.message || String(error), ...appError }
+    // HTTP status of the provider response (AI SDK APICallError, possibly wrapped in a RetryError).
+    const errorStatusCode = error?.statusCode ?? error?.lastError?.statusCode
+    return { ok: false, latencyMs, errorMessage: error?.message || String(error), errorStatusCode, ...appError }
   }
 }
 
