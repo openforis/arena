@@ -100,8 +100,7 @@ describe('Records uploaded from Arena Mobile email', () => {
   test('link to the server is included only when its public URL is known', async () => {
     expect((await renderEmail()).body).not.toContain('Click here to access')
     const { body } = await renderEmail({ serverUrl: 'https://arena.example.org' })
-    // the URL is HTML escaped (browsers decode it in the href)
-    expect(body).toContain('<a href="https:&#x2F;&#x2F;arena.example.org">Click here to access Open Foris Arena</a>')
+    expect(body).toContain('<a href="https://arena.example.org">Click here to access Open Foris Arena</a>')
   })
 
   test('body has no unresolved placeholders', async () => {
