@@ -1,6 +1,6 @@
 ############################################################
 
-ARG node_version=24.22.1
+ARG node_version=24.22.3
 
 # Build stage: needs the full image (compilers/headers) to install
 # dependencies and run the webpack build. Not shipped to runtime.
