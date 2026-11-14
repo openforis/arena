@@ -4037,9 +4037,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openforis/arena-core@npm:^2.18.13, @openforis/arena-core@npm:^2.21.3":
-  version: 2.21.3
-  resolution: "@openforis/arena-core@npm:2.21.3"
+"@openforis/arena-core@npm:^2.18.13, @openforis/arena-core@npm:^2.22.0":
+  version: 2.22.0
+  resolution: "@openforis/arena-core@npm:2.22.0"
   dependencies:
     "@jsep-plugin/regex": "npm:^1.1.0"
     "@turf/bearing": "npm:^7.4.0"
@@ -4055,7 +4055,7 @@ __metadata:
     n2words: "npm:^6.3.0"
     proj4: "npm:^2.22.0"
     uuid: "npm:^14.0.3"
-  checksum: 10c0/b90417650f92a4933135d0b300658abccc0ca5c66004ff7158a8679e507aba4e288a4b3bfd95f3e510c97c3af0fd2dc5df0912c7c7f7b8881b8d4bc59e75b850
+  checksum: 10c0/b54f60eb99b36a00af5ec9736433b5f0afb26c77247411a553b927dda1a44b7ba85246e8eeafba50c51fac197246b3bf690f17e6d3c3be6015af152610e2e551
   languageName: node
   linkType: hard
 
@@ -15426,7 +15426,7 @@ __metadata:
     "@mui/x-date-pickers": "npm:^9.18.0"
     "@mui/x-tree-view": "npm:^9.18.0"
     "@ngageoint/geopackage": "npm:^4.2.10"
-    "@openforis/arena-core": "npm:^2.21.3"
+    "@openforis/arena-core": "npm:^2.22.0"
     "@openforis/arena-server": "npm:^2.8.15"
     "@playwright/test": "npm:1.65.1"
     "@pmmmwh/react-refresh-webpack-plugin": "npm:^0.6.3"
