@@ -199,6 +199,7 @@ now()やuuid()のように、属性値が最初に生成される時だけ評価
     maxFileSize: '最大ファイルサイズ（MB）',
     numberOfFiles: 'ファイル数の最小・最大を変更するには「検証ルール」に移動してください。',
     showGeotagInformation: 'ジオタグ情報を表示',
+    allowScreenCaptureInMap: 'マップビューでの画面キャプチャの保存を許可',
   },
   mobileProps: {
     title: 'モバイルアプリ',

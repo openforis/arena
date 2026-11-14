@@ -203,6 +203,7 @@ Ovo je idealno za skrivanje cijelih djelova istraživanja u zavisnosti od toga k
     maxFileSize: 'Maks. veličina fajla (Mb)',
     numberOfFiles: 'Idite na Validacije da biste promijenili min. i maks. broj fajlova.',
     showGeotagInformation: 'Prikaži informacije o geooznaci',
+    allowScreenCaptureInMap: 'Dozvoli čuvanje snimka ekrana u prikazu mape',
   },
   mobileProps: {
     title: 'Mobilna aplikacija',
