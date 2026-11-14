@@ -352,6 +352,31 @@ test.describe('Map workspace', () => {
     await expect(page.getByTestId(ids.statusZoom)).not.toHaveText('Zoom 3')
   })
 
+  test('the Records panel can be resized by dragging its right edge', async ({ page, sampleSurvey: _ }) => {
+    await openMap(page)
+    await overlayCheckbox(page, COORDINATE_LAYER).check()
+    await page.getByTestId(ids.railTab('records')).click()
+    const panel = page.getByTestId(ids.railPanel('records'))
+    const handle = page.getByTestId(ids.railPanelResizeHandle('records'))
+    const panelWidth = async (): Promise<number> => (await panel.boundingBox())?.width ?? 0
+    const widthBefore = await panelWidth()
+    const handleBox = await handle.boundingBox()
+    expect(handleBox).not.toBeNull()
+    const x = handleBox!.x + handleBox!.width / 2
+    const y = handleBox!.y + handleBox!.height / 2
+    await page.mouse.move(x, y)
+    await page.mouse.down()
+    await page.mouse.move(x + 120, y, { steps: 5 })
+    await page.mouse.up()
+    await expect.poll(panelWidth).toBeGreaterThan(widthBefore + 100)
+
+    // the arrow keys resize it too
+    const widthDragged = await panelWidth()
+    await handle.focus()
+    await page.keyboard.press('ArrowLeft')
+    await expect.poll(panelWidth).toBeLessThan(widthDragged)
+  })
+
   test.describe('without the experimental features', () => {
     // what every user sees (the source of the "What's new" image)
     test.use({ experimentalFeatures: false })

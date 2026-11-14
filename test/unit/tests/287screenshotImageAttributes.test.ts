@@ -24,7 +24,13 @@ const newAttributeDef = ({
     plotDef,
     type,
     cycles,
-    { name, labels: { en: `${name} label` }, fileType: NodeDef.fileTypeValues.image, ...props },
+    {
+      name,
+      labels: { en: `${name} label` },
+      fileType: NodeDef.fileTypeValues.image,
+      [NodeDef.propKeys.screenCaptureInMapAllowed]: true,
+      ...props,
+    },
     {},
     analysis
   )
@@ -37,9 +43,16 @@ describe('Screenshot image attributes (287)', () => {
   const readOnly = newAttributeDef({ name: 'locked', props: { readOnly: true } })
   const analysis = newAttributeDef({ name: 'computed', analysis: true })
   const otherCycle = newAttributeDef({ name: 'old_photo', cycles: ['1'] })
+  const notAllowed = newAttributeDef({
+    name: 'field_photo',
+    props: { [NodeDef.propKeys.screenCaptureInMapAllowed]: false },
+  })
 
-  test('keeps only editable image file attributes of the cycle', () => {
-    const kept = filterImageAttributeDefs([photo, photos, document, text, readOnly, analysis, otherCycle], '0')
+  test('keeps only editable image file attributes of the cycle allowing the screen capture', () => {
+    const kept = filterImageAttributeDefs(
+      [photo, photos, document, text, readOnly, analysis, otherCycle, notAllowed],
+      '0'
+    )
     expect(kept.map((def) => NodeDef.getName(def))).toEqual(['photo', 'photos'])
   })
 
@@ -72,5 +85,18 @@ describe('Screenshot image attributes (287)', () => {
     })
     const [option] = toImageAttributeOptions([photo], 'en', rowEntityDef)
     expect(option).toMatchObject({ label: 'Plot photos › photo label', rowParentDefUuid: 'plot-def' })
+  })
+
+  test('the screen capture flag applies only to image file attributes and is cleared otherwise', () => {
+    expect(
+      NodeDef.isScreenCaptureInMapAllowed(
+        newAttributeDef({ name: 'p', props: { screenCaptureInMapAllowed: undefined } })
+      )
+    ).toBe(false)
+    expect(NodeDef.canAllowScreenCaptureInMap(photo)).toBe(true)
+    expect(NodeDef.canAllowScreenCaptureInMap(document)).toBe(false)
+    expect(NodeDef.isScreenCaptureInMapAllowed(NodeDef.clearNotApplicableProps('0')(photo))).toBe(true)
+    const video = NodeDef.assocProp({ key: NodeDef.propKeys.fileType, value: NodeDef.fileTypeValues.video })(photo)
+    expect(NodeDef.isScreenCaptureInMapAllowed(NodeDef.clearNotApplicableProps('0')(video))).toBe(false)
   })
 })

@@ -261,6 +261,7 @@
   }
 
   &__panel {
+    position: relative;
     display: flex;
     flex-direction: column;
     min-width: 0;
@@ -293,6 +294,25 @@
     flex-direction: column;
     min-height: 0;
     overflow-y: auto;
+  }
+
+  // drag the right edge (or use the arrow keys) to change the panel width
+  &__panel-resize-handle {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    right: -4px;
+    width: 8px;
+    height: 100%;
+    cursor: col-resize;
+    touch-action: none;
+
+    &:hover,
+    &:focus-visible,
+    &:active {
+      outline: none;
+      background: linear-gradient(to right, transparent 3px, $colorPrimary 3px, $colorPrimary 5px, transparent 5px);
+    }
   }
 }
 

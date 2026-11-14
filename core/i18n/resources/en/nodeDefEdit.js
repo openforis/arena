@@ -203,6 +203,7 @@ This is perfect for hiding entire parts of a survey based on who is logged in (l
     maxFileSize: 'Max. file size (Mb)',
     numberOfFiles: 'Go to Validations to change the Min. and Max. number of files.',
     showGeotagInformation: 'Show geotag information',
+    allowScreenCaptureInMap: 'Allow saving screen capture in map view',
   },
   mobileProps: {
     title: 'Mobile App',

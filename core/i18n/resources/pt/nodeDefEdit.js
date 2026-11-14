@@ -206,6 +206,7 @@ Se as condições definidas forem atendidas, o campo pode ser editado. Caso cont
     maxFileSize: 'Tamanho máx. do arquivo (Mb)',
     numberOfFiles: 'Vá para Validações para alterar o número mín. e máx. de arquivos.',
     showGeotagInformation: 'Mostrar informações de geotag',
+    allowScreenCaptureInMap: 'Permitir salvar captura de tela na visualização do mapa',
   },
   mobileProps: {
     title: 'Aplicativo móvel',

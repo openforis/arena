@@ -93,6 +93,7 @@ export const propKeys = {
   maxFileSize: 'maxFileSize', // max file size in MB
   fileType: 'fileType',
   geotagInformationShown: 'geotagInformationShown',
+  screenCaptureInMapAllowed: 'screenCaptureInMapAllowed',
 
   // Time
   includeSeconds: 'includeSeconds',
@@ -314,6 +315,7 @@ export const isNumberOfFilesEnabled = isMultiple
 export const getMaxFileSize = (nodeDef) => Number(getProp(propKeys.maxFileSize, MAX_FILE_SIZE_DEFAULT)(nodeDef))
 export const getFileType = getProp(propKeys.fileType, fileTypeValues.other)
 export const isGeotagInformationShown = ObjectUtils.isPropTrue(propKeys.geotagInformationShown)
+export const isScreenCaptureInMapAllowed = ObjectUtils.isPropTrue(propKeys.screenCaptureInMapAllowed)
 // geo
 export const isPositionTracking = ObjectUtils.isPropTrue(propKeys.positionTracking)
 // time
@@ -926,6 +928,8 @@ export const canHaveAutoIncrementalKey = ({ nodeDef, nodeDefParent }) => {
 
 export const canShowGeotagInformation = (nodeDef) => getFileType(nodeDef) === fileTypeValues.image
 
+export const canAllowScreenCaptureInMap = (nodeDef) => isFile(nodeDef) && getFileType(nodeDef) === fileTypeValues.image
+
 // Arena Mobile records the track only in single geo attributes
 export const canBePositionTracking = (nodeDef) => isGeo(nodeDef) && isSingle(nodeDef)
 
@@ -974,6 +978,10 @@ const notApplicablePropClearers = (cycle) => [
   {
     isToClear: (nodeDef) => !canShowGeotagInformation(nodeDef) && isGeotagInformationShown(nodeDef),
     clear: ObjectUtils.setProp(propKeys.geotagInformationShown, false),
+  },
+  {
+    isToClear: (nodeDef) => !canAllowScreenCaptureInMap(nodeDef) && isScreenCaptureInMapAllowed(nodeDef),
+    clear: ObjectUtils.setProp(propKeys.screenCaptureInMapAllowed, false),
   },
   {
     isToClear: (nodeDef) => !canBePositionTracking(nodeDef) && isPositionTracking(nodeDef),

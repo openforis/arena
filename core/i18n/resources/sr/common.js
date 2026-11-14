@@ -669,6 +669,7 @@ Pokušati ponovo?`,
     rail: {
       label: 'Paneli mape',
       close: 'Skupi panel',
+      resize: 'Promeni veličinu panela',
       tabs: {
         layers: 'Slojevi',
         records: 'Zapisi',
@@ -762,7 +763,8 @@ Pokušati ponovo?`,
       mobileNote:
         'Navedeni su samo atributi slike plohe. Terenski timovi vide ovu sliku u Arena Mobile kada se zapis preuzme na njihov uređaj.',
       noPlots: 'Na mapi nema ploha. Prikažite sloj lokacija na kartici Slojevi da biste priložili sliku zapisu plohe.',
-      noImageAttributes: 'Ova ploha nema atribut slike koji se može uređivati.',
+      noImageAttributes:
+        'Ova ploha nema atribut slike koji se može uređivati i dozvoljava snimke ekrana (uključite "Dozvoli čuvanje snimka ekrana u prikazu mape" u dizajneru obrazaca).',
       previewLoading: 'Priprema pregleda…',
       previewAlt: 'Pregled snimka mape',
       alsoDownload: 'Takođe preuzmi',

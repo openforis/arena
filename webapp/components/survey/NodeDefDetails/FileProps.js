@@ -89,6 +89,14 @@ const FileProps = (props) => {
               onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.geotagInformationShown, value })}
             />
           )}
+          {NodeDef.canAllowScreenCaptureInMap(nodeDef) && (
+            <Checkbox
+              checked={NodeDef.isScreenCaptureInMapAllowed(nodeDef)}
+              disabled={readOnly}
+              label="nodeDefEdit:fileProps.allowScreenCaptureInMap"
+              onChange={(value) => Actions.setProp({ state, key: NodeDef.propKeys.screenCaptureInMapAllowed, value })}
+            />
+          )}
         </div>
       </FormItem>
     </>
