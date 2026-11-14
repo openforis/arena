@@ -28,6 +28,10 @@ $paneResizeHandleWidth: 12px;
     transition:
       width 0.15s,
       background-color 0.15s;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
   }
 
   // divider
