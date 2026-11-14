@@ -1,7 +1,69 @@
+@use './vars' as *;
+
 @mixin full-screen-fixed() {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+$paneResizeHandleWidth: 12px;
+
+// handle to resize a side panel horizontally: an always visible divider with a grip in the middle
+// (Material 3 pane drag handle), highlighted on hover, focus and drag
+@mixin pane-resize-handle() {
+  flex-shrink: 0;
+  width: $paneResizeHandleWidth;
+  cursor: col-resize;
+  touch-action: none;
+
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    transition:
+      width 0.15s,
+      background-color 0.15s;
+  }
+
+  // divider
+  &::before {
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: $colorOutline;
+  }
+
+  // grip
+  &::after {
+    top: calc(50% - 24px);
+    width: 4px;
+    height: 48px;
+    border-radius: 2px;
+    background-color: $colorOnSurfaceVariant;
+    // keeps the grip visible over the map
+    box-shadow: 0 0 0 1px $colorSurface;
+  }
+
+  &:hover,
+  &:focus-visible,
+  &:active {
+    outline: none;
+
+    &::before {
+      width: 2px;
+      background-color: $colorPrimary;
+    }
+
+    &::after {
+      background-color: $colorPrimary;
+    }
+  }
+
+  &:active::after {
+    width: 6px;
+  }
 }

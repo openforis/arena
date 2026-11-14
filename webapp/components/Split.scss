@@ -1,9 +1,10 @@
+@use '~@webapp/style/layoutMixins' as *;
+
 .split {
   display: flex;
 
-  .gutter {
-    &.gutter-horizontal {
-      cursor: ew-resize;
-    }
+  > .gutter-horizontal {
+    position: relative;
+    @include pane-resize-handle;
   }
 }

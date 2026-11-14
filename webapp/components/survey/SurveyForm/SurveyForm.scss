@@ -54,18 +54,17 @@
     width: 100%;
   }
 
-  // nodedef-tree-select
+  // nodedef-tree-select; flat panel separated by the resize handle divider, like the map rail panels
   .survey-form__sidebar {
     height: 100%;
     position: relative;
     overflow-y: auto;
     display: flex;
     flex-direction: column;
+    background-color: $colorSurface;
 
     .nodedef-tree-select {
       flex: 1;
-      border: $formBorder;
-      background-color: $colorSurface;
     }
 
     .sidebar-bottom-bar {
@@ -87,10 +86,6 @@
           border-bottom: 2px solid $colorOutline;
         }
       }
-    }
-
-    .nodedef-tree-select {
-      border: $formBorderEdit;
     }
   }
 }

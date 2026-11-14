@@ -4,6 +4,9 @@ import ReactSplit from 'react-split'
 import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
+// same as $paneResizeHandleWidth (layoutMixins.scss)
+const GUTTER_SIZE = 12
+
 export const Split = (props) => {
   const {
     className = undefined,
@@ -19,6 +22,7 @@ export const Split = (props) => {
       className={classNames('split', className)}
       direction={direction}
       expandToMin={expandToMin}
+      gutterSize={GUTTER_SIZE}
       minSize={minSize}
       sizes={sizes}
     >
