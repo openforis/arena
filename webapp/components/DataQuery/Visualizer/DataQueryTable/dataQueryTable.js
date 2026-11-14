@@ -1,5 +1,5 @@
 import './dataQueryTable.scss'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import PropTypes from 'prop-types'
 
 import { Query } from '@common/model/query'
@@ -27,6 +27,12 @@ const DataQueryTable = (props) => {
   const { nodeDefCols, colWidth, colIndexWidth } = useTable({ data, setData, percentageVisible: Boolean(totals) })
   const sortableVariables = useQuerySortableVariables({ query })
   const sortableVariablesByUuid = useMemo(() => ObjectUtils.toUuidIndexedObj(sortableVariables), [sortableVariables])
+  const dataRowsRef = useRef(null)
+
+  // scroll back to the first row when changing page
+  useEffect(() => {
+    dataRowsRef.current?.scrollTo({ top: 0 })
+  }, [offset])
 
   if (!colWidth) return null
 
@@ -52,7 +58,7 @@ const DataQueryTable = (props) => {
         sortableVariablesByUuid={sortableVariablesByUuid}
       />
 
-      <div className="table__data-rows">
+      <div className="table__data-rows" ref={dataRowsRef}>
         {dataLoadingError && <div className="data-loading-error">{i18n.t('dataView:dataVis.errorLoadingData')}</div>}
 
         {data?.map((row, i) => {
