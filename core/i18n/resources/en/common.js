@@ -630,6 +630,7 @@ Try again?`,
     rail: {
       label: 'Map panels',
       close: 'Collapse panel',
+      resize: 'Resize panel',
       tabs: {
         layers: 'Layers',
         records: 'Records',
@@ -722,7 +723,8 @@ Try again?`,
       mobileNote:
         'Only image attributes of the plot are listed. Field teams see this image in Arena Mobile once the record is downloaded to their device.',
       noPlots: 'No plots on the map. Show a location layer in the Layers tab to attach the image to a plot record.',
-      noImageAttributes: 'This plot has no image attribute that can be edited.',
+      noImageAttributes:
+        'This plot has no editable image attribute allowing screen captures (enable "Allow saving screen capture in map view" in the form designer).',
       previewLoading: 'Preparing the preview…',
       previewAlt: 'Preview of the map screenshot',
       alsoDownload: 'Also download',

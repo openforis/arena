@@ -203,6 +203,7 @@ Si se cumplen las condiciones definidas, el campo se puede editar. Si no, será 
     maxFileSize: 'Tamaño máximo de archivo (Mb)',
     numberOfFiles: 'Vaya a Validaciones para cambiar el número mínimo y máximo de archivos.',
     showGeotagInformation: 'Mostrar información de geoetiqueta',
+    allowScreenCaptureInMap: 'Permitir guardar captura de pantalla en la vista de mapa',
   },
   mobileProps: {
     title: 'Aplicación móvil',

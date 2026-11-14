@@ -136,6 +136,7 @@ export const TestId = {
     rail: 'map-rail',
     railTab: (key) => `map-rail-tab-${key}`,
     railPanel: (key) => `map-rail-panel-${key}`,
+    railPanelResizeHandle: (key) => `map-rail-panel-resize-${key}`,
     overlayRow: (id) => `map-overlay-row-${id}`,
     statusBar: 'map-status-bar',
     statusCoordinates: 'map-status-coordinates',

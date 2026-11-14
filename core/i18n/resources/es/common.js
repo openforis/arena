@@ -610,6 +610,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     rail: {
       label: 'Paneles del mapa',
       close: 'Contraer panel',
+      resize: 'Redimensionar panel',
       tabs: {
         layers: 'Capas',
         records: 'Registros',
@@ -703,7 +704,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
         'Solo se muestran los atributos de imagen de la parcela. Los equipos de campo verán esta imagen en Arena Mobile cuando descarguen el registro en su dispositivo.',
       noPlots:
         'No hay parcelas en el mapa. Muestre una capa de ubicaciones en la pestaña Capas para adjuntar la imagen a un registro de parcela.',
-      noImageAttributes: 'Esta parcela no tiene ningún atributo de imagen editable.',
+      noImageAttributes:
+        'Esta parcela no tiene ningún atributo de imagen editable que permita capturas de pantalla (active "Permitir guardar captura de pantalla en la vista de mapa" en el diseñador de formularios).',
       previewLoading: 'Preparando la vista previa…',
       previewAlt: 'Vista previa de la captura del mapa',
       alsoDownload: 'Descargar también',

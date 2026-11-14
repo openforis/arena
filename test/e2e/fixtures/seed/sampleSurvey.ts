@@ -132,7 +132,11 @@ export const insertSampleSurvey = async (options: SampleSurveyOptions): Promise<
   if (withExpressions) plotBuilder.applyIf(nodeDefExpressions.relevantIf.plot)
 
   const clusterImageBuilders = withClusterImage
-    ? [createAttributeBuilder(clusterImage, false).prop(NodeDef.propKeys.fileType, NodeDef.fileTypeValues.image)]
+    ? [
+        createAttributeBuilder(clusterImage, false)
+          .prop(NodeDef.propKeys.fileType, NodeDef.fileTypeValues.image)
+          .prop(NodeDef.propKeys.screenCaptureInMapAllowed, true),
+      ]
     : []
 
   const clusterBuilder = SB.entity(

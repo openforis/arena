@@ -634,6 +634,7 @@ Réessayer ?`,
     rail: {
       label: 'Panneaux de la carte',
       close: 'Réduire le panneau',
+      resize: 'Redimensionner le panneau',
       tabs: {
         layers: 'Couches',
         records: 'Enregistrements',
@@ -727,7 +728,8 @@ Réessayer ?`,
         'Seuls les attributs image de la placette sont listés. Les équipes de terrain voient cette image dans Arena Mobile une fois l’enregistrement téléchargé sur leur appareil.',
       noPlots:
         'Aucune placette sur la carte. Affichez une couche de localisation dans l’onglet Couches pour joindre l’image à un enregistrement de placette.',
-      noImageAttributes: 'Cette placette n’a aucun attribut image modifiable.',
+      noImageAttributes:
+        "Cette placette n’a aucun attribut image modifiable autorisant les captures d’écran (activez « Autoriser l'enregistrement de captures d'écran dans la vue carte » dans le concepteur de formulaires).",
       previewLoading: 'Préparation de l’aperçu…',
       previewAlt: 'Aperçu de la capture de la carte',
       alsoDownload: 'Télécharger aussi',

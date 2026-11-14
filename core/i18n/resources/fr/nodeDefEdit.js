@@ -206,6 +206,7 @@ Ex. this.region = nom_attribut_region
     maxFileSize: 'Taille maximale du fichier (Mo)',
     numberOfFiles: 'Allez dans Validations pour modifier le nombre Min. et Max. de fichiers.',
     showGeotagInformation: 'Afficher les informations de géolocalisation',
+    allowScreenCaptureInMap: "Autoriser l'enregistrement de captures d'écran dans la vue carte",
   },
   mobileProps: {
     title: 'Application mobile',
