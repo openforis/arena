@@ -304,7 +304,7 @@
     top: 0;
     right: calc(-#{$paneResizeHandleWidth} / 2 - 0.5px);
     height: 100%;
-    @include pane-resize-handle;
+    @extend %pane-resize-handle;
   }
 }
 

@@ -5,6 +5,6 @@
 
   > .gutter-horizontal {
     position: relative;
-    @include pane-resize-handle;
+    @extend %pane-resize-handle;
   }
 }

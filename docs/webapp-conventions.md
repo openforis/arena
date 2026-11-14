@@ -190,8 +190,8 @@ Reuse these before using MUI directly. Recent code uses MUI components (`Box`, `
 - Dialogs: `Modal` with `ModalBody`/`ModalFooter` (`webapp/components/modal.js`), `ResizableModal`,
   `PanelRight`. For confirmations and notifications use the hooks listed under "Global state".
 - Resizable side panels: `Split` (`webapp/components/Split.js`). Style any other resize handle with the
-  `pane-resize-handle` mixin (`webapp/style/_layoutMixins.scss`), as the map rail panels do, so that every handle
-  looks the same.
+  `%pane-resize-handle` placeholder (`webapp/style/_layoutMixins.scss`), as the map rail panels do, so that every
+  handle looks the same.
 - Lists:
   - `DataGrid` (`webapp/components/DataGrid`, based on MUI X) for rows already loaded, e.g.
     `webapp/views/App/views/JobsMonitor/JobsMonitor.tsx`

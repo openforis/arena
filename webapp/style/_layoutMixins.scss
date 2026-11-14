@@ -11,8 +11,9 @@
 $paneResizeHandleWidth: 12px;
 
 // handle to resize a side panel horizontally: an always visible divider with a grip in the middle
-// (Material 3 pane drag handle), highlighted on hover, focus and drag
-@mixin pane-resize-handle() {
+// (Material 3 pane drag handle), highlighted on hover, focus and drag; a placeholder (not a mixin) so that every
+// nesting selector has a scoping root
+%pane-resize-handle {
   flex-shrink: 0;
   width: $paneResizeHandleWidth;
   cursor: col-resize;
