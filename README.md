@@ -29,8 +29,11 @@ Arena also offers a map with access to satellite images. The Arena Map can be us
 - Install a local database (PostgreSQL) as a Docker container. Run this command from command line; it will create also a database named 'arena' and a user 'arena' with password 'arena' and will make the DBMS listen on port 5444 (you can change those parameters as you wish):
 
 ```console
-$ docker run -d --name arena-db -p 5444:5432 -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:17-3.5
+$ docker run -d --name arena-db -p 5444:5432 --shm-size=1g -v arena-data:/var/lib/postgresql/data -e POSTGRES_DB=arena -e POSTGRES_PASSWORD=arena -e POSTGRES_USER=arena postgis/postgis:17-3.5
 ```
+
+- `--shm-size=1g`: Docker gives containers only 64 MB of shared memory (`/dev/shm`) by default. PostgreSQL uses it for parallel queries, and when it runs out queries fail with `could not resize shared memory segment ... No space left on device`.
+- `-v arena-data:/var/lib/postgresql/data`: keeps the data in a named volume (`arena-data`), so the container can be recreated with the same command without losing it.
 
 You can also use an already existing PostgreSQL database installed in a different way and configure Arena to connect to it.
 
