@@ -27,7 +27,8 @@ const _createAction = (handlerFn) => async (dispatch, getState) => {
 
     await handlerFn(dispatch, getState)
   } catch (error) {
-    const messageKey = error?.response?.data?.message || error.toString()
+    // no message from the server (e.g. server unreachable): don't show technical details like "AxiosError: ..."
+    const messageKey = error?.response?.data?.message || 'appErrors:networkError'
     dispatch(setLoginError(messageKey))
   } finally {
     dispatch(LoaderActions.hideLoader())
