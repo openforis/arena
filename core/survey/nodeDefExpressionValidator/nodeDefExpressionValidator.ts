@@ -39,26 +39,23 @@ export const validate = async ({
   survey,
   nodeDefCurrent,
   exprString,
-  isContextParent = false,
   selfReferenceAllowed = false,
   includeAnalysis = false,
 }: {
   survey: ArenaSurvey
   nodeDefCurrent: AnyNodeDef
   exprString: string
-  isContextParent?: boolean
   selfReferenceAllowed?: boolean
   includeAnalysis?: boolean
 }): Promise<ArenaValidationResult | null> => {
-  // isContextParent is currently ignored by arena-core: the parent node def is always the context
+  // the context ($context) is the parent entity (the root entity for itself), as when evaluating record expressions
   const { validationResult } = await new CoreNodeDefExpressionValidator().validate({
     expression: exprString,
     survey,
     nodeDefCurrent,
-    isContextParent,
     selfReferenceAllowed,
     includeAnalysis,
-  } as Parameters<CoreNodeDefExpressionValidator['validate']>[0])
+  })
   if (validationResult === null || validationResult.valid) return null
 
   return validationResult
