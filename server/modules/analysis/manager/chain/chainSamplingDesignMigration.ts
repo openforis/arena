@@ -77,10 +77,7 @@ const _migrateSamplingDesignPhaseProps = ({
 
     const attributeNodeDef = Survey.getNodeDefByUuid(attributeUuid)(survey)
     // base unit node def uuid is not touched by this migration: read it from the original sampling design
-    // (cast needed: TS's inference of this Ramda-backed getter from the untyped JS module resolves to `{}`)
-    const baseUnitNodeDefUuid = (ChainSamplingDesign.getBaseUnitNodeDefUuid as (samplingDesign: any) => string)(
-      samplingDesign
-    )
+    const baseUnitNodeDefUuid = ChainSamplingDesign.getBaseUnitNodeDefUuid(samplingDesign)
     const baseUnitNodeDef = baseUnitNodeDefUuid ? Survey.getNodeDefByUuid(baseUnitNodeDefUuid)(survey) : null
     const joinEntity = attributeNodeDef ? _findPhase2JoinEntity({ attributeNodeDef, baseUnitNodeDef, survey }) : null
     if (joinEntity) {

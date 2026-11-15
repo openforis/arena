@@ -1,17 +1,36 @@
+import type {
+  Chain as ArenaChain,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as Chain from '@common/analysis/chain'
 
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type SurveyChainParams = { survey: ArenaSurvey; chain: ArenaChain }
+
 const PLOT_AREA_SUFFIX = '_plot_area_'
 const WEIGHT_NODE_DEF_NAME = 'weight'
 const SAMPLING_PLOT_AREA_NODE_DEF_NAME_REGEX = new RegExp(String.raw`^\w+${PLOT_AREA_SUFFIX}$`)
 
-const getEntityAreaNodeDefName = ({ nodeDefParent }) => `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
+const getEntityAreaNodeDefName = ({ nodeDefParent }: { nodeDefParent: AnyNodeDef }): string =>
+  `${NodeDef.getName(nodeDefParent)}${PLOT_AREA_SUFFIX}`
 
-const isWeightNodeDef = (nodeDef) => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
+const isWeightNodeDef = (nodeDef: AnyNodeDef): boolean => WEIGHT_NODE_DEF_NAME === NodeDef.getName(nodeDef)
 
-const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, includeOnlyValid = true }) => {
+const isEntityAreaNodeDef = ({
+  nodeDef,
+  nodeDefParent,
+  includeOnlyValid = true,
+}: {
+  nodeDef: AnyNodeDef
+  nodeDefParent: AnyNodeDef
+  includeOnlyValid?: boolean
+}): boolean => {
   if (!NodeDef.isSampling(nodeDef)) return false
 
   const name = NodeDef.getName(nodeDef)
@@ -23,7 +42,11 @@ const isEntityAreaNodeDef = ({ nodeDef, nodeDefParent, includeOnlyValid = true }
   )
 }
 
-const isBaseUnitEntityAreaNodeDef = ({ survey, chain, nodeDef }) => {
+const isBaseUnitEntityAreaNodeDef = ({
+  survey,
+  chain,
+  nodeDef,
+}: SurveyChainParams & { nodeDef: AnyNodeDef }): boolean => {
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   return (
@@ -31,7 +54,7 @@ const isBaseUnitEntityAreaNodeDef = ({ survey, chain, nodeDef }) => {
   )
 }
 
-const getAllEntityAreaNodeDefs = ({ survey, chain }) => {
+const getAllEntityAreaNodeDefs = ({ survey, chain }: SurveyChainParams): AnyNodeDef[] => {
   const samplingNodeDefs = Survey.getAnalysisNodeDefs({ chain, showSamplingNodeDefs: true })(survey)
   return samplingNodeDefs.filter((nodeDef) => {
     const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -39,14 +62,32 @@ const getAllEntityAreaNodeDefs = ({ survey, chain }) => {
   })
 }
 
-const getAreaNodeDefDefaultScript = ({ nodeDefParent, isWeight }) => {
+const getAreaNodeDefDefaultScript = ({
+  nodeDefParent,
+  isWeight,
+}: {
+  nodeDefParent: AnyNodeDef
+  isWeight: boolean
+}): string => {
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
   const parentName = NodeDef.getName(nodeDefParent)
   const defaultValue = isWeight ? '1' : 'NA'
   return `${parentName}$${name} <- ${defaultValue}`
 }
 
-const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycleKeys, isWeight = false }) => {
+const newEntityAreaNodeDef = ({
+  nodeDefParent,
+  baseUnitNodeDef,
+  chainUuid,
+  cycleKeys,
+  isWeight = false,
+}: {
+  nodeDefParent: AnyNodeDef
+  baseUnitNodeDef: AnyNodeDef | null
+  chainUuid: string
+  cycleKeys: string[]
+  isWeight?: boolean
+}): AnyNodeDef => {
   const isBaseUnit = NodeDef.isEqual(nodeDefParent)(baseUnitNodeDef)
   const name = isWeight ? WEIGHT_NODE_DEF_NAME : getEntityAreaNodeDefName({ nodeDefParent })
 
@@ -74,16 +115,27 @@ const newEntityAreaNodeDef = ({ nodeDefParent, baseUnitNodeDef, chainUuid, cycle
   )
 }
 
-const determinePlotAreaNodeDefs = ({ survey, chain }) => {
-  const nodeDefsToCreate = []
-  const nodeDefsToDelete = []
-  const validNodeDefsAlreadyExisting = []
+const determinePlotAreaNodeDefs = ({
+  survey,
+  chain,
+}: SurveyChainParams): { nodeDefsToCreate: AnyNodeDef[]; nodeDefsToDelete: AnyNodeDef[] } => {
+  const nodeDefsToCreate: AnyNodeDef[] = []
+  const nodeDefsToDelete: AnyNodeDef[] = []
+  const validNodeDefsAlreadyExisting: AnyNodeDef[] = []
 
   const chainUuid = Chain.getUuid(chain)
   const cycleKeys = Survey.getCycleKeys(survey)
   const baseUnitNodeDef = Survey.getBaseUnitNodeDef({ chain })(survey)
 
-  const createAreaNodeDefIfNecessary = ({ existingNodeDef, nodeDefParent, isWeight }) => {
+  const createAreaNodeDefIfNecessary = ({
+    existingNodeDef,
+    nodeDefParent,
+    isWeight,
+  }: {
+    existingNodeDef: AnyNodeDef | undefined
+    nodeDefParent: AnyNodeDef
+    isWeight: boolean
+  }) => {
     if (existingNodeDef) {
       // weight def already existing
       validNodeDefsAlreadyExisting.push(existingNodeDef)
@@ -152,7 +204,12 @@ const determinePlotAreaNodeDefs = ({ survey, chain }) => {
   return { nodeDefsToCreate, nodeDefsToDelete }
 }
 
-const getSamplingDefsInEntities = ({ survey, chain, entities, analysisNodeDefs }) => {
+const getSamplingDefsInEntities = ({
+  survey,
+  chain,
+  entities,
+  analysisNodeDefs,
+}: SurveyChainParams & { entities: AnyNodeDef[]; analysisNodeDefs: AnyNodeDef[] }): AnyNodeDef[] => {
   const entityUuids = new Set(entities.map(NodeDef.getUuid))
 
   const samplingDefs = analysisNodeDefs.filter(
