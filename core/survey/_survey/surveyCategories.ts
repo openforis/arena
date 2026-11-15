@@ -1,4 +1,4 @@
-import { Objects } from '@openforis/arena-core'
+import { Objects, Surveys } from '@openforis/arena-core'
 import type {
   Category as ArenaCategory,
   NodeDef as ArenaNodeDef,
@@ -36,7 +36,7 @@ export const getCategoriesArray = (survey: ArenaSurvey): ArenaCategory[] =>
 export const getCategoryByUuid =
   (uuid: string) =>
   (survey: ArenaSurvey): ArenaCategory | undefined =>
-    getCategories(survey)[uuid]
+    Surveys.getCategoryByUuid({ survey, categoryUuid: uuid })
 
 export const getCategoryByName =
   (name: string) =>
