@@ -1,6 +1,14 @@
 import type { NextFunction, Request as ExpressRequest, Response } from 'express'
 
-import { ArenaRecord, ArenaRecordNode, Authorizer, NodeDef, NodeDefType, Survey, User } from '@openforis/arena-core'
+import {
+  ArenaRecord,
+  ArenaRecordNode,
+  Authorizer,
+  NodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  User,
+} from '@openforis/arena-core'
 import { Requests } from '@openforis/arena-server'
 
 import * as Record from '@core/record/record'
@@ -22,7 +30,7 @@ type UserGroupAccessFilters = {
   readable: QualifierFilter[][]
 }
 
-type SurveyAndAccessFilters = { survey: Survey; accessFilters: UserGroupAccessFilters }
+type SurveyAndAccessFilters = { survey: ArenaSurvey; accessFilters: UserGroupAccessFilters }
 
 type FetchSurveyAndAccessFiltersByCycle = (cycle: string) => Promise<SurveyAndAccessFilters>
 

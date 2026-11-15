@@ -162,6 +162,12 @@ export const assocItemExtraDef = (extraDef) => ObjectUtils.setProp(keysProps.ite
 // ========
 
 // ====== CREATE
+/**
+ * Creates a new category with the specified props and levels (by default, a single level).
+ * @param {object} [props] - The category props.
+ * @param {Array<object>|null} [levels] - The category levels.
+ * @returns {import('@openforis/arena-core').Category} - The new category.
+ */
 export const newCategory = (props = {}, levels = null) => {
   const category = {
     [keys.uuid]: uuidv4(),
