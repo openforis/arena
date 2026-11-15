@@ -89,7 +89,7 @@ export const assocDependencyGraph =
 // ====== CREATE
 export const addNodeDefDependencies =
   (nodeDef: AnyNodeDef) =>
-  async (survey: ArenaSurvey): Promise<ArenaSurvey> =>
+  (survey: ArenaSurvey): Promise<ArenaSurvey> =>
     Surveys.addNodeDefDependencies({ nodeDef, survey })
 
 export const addNodeDefsDependencies =
@@ -107,7 +107,7 @@ export const buildGraph = async (survey: ArenaSurvey): Promise<SurveyDependencyG
   return getDependencyGraph(surveyUpdated)
 }
 
-export const buildAndAssocDependencyGraph = async (survey: ArenaSurvey): Promise<ArenaSurvey> =>
+export const buildAndAssocDependencyGraph = (survey: ArenaSurvey): Promise<ArenaSurvey> =>
   Surveys.buildAndAssocDependencyGraph({ ...survey })
 
 // DELETE
