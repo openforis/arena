@@ -1,3 +1,4 @@
+import type { Category as ArenaCategory } from '@openforis/arena-core'
 import { GeoPackageAPI, GeometryColumns, FeatureColumn, GeometryType, GeoPackageDataType } from '@ngageoint/geopackage'
 import type { GeoPackage } from '@ngageoint/geopackage'
 
@@ -6,7 +7,7 @@ import { uuidv4 } from '@core/uuid'
 import { FileFormats, getExtensionByFileFormat } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { ExtraPropDef as ExtraPropDefUntyped } from '@core/survey/extraPropDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 
 import Job from '@server/job/job'
@@ -17,11 +18,6 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryRepository from '../repository/categoryRepository'
 import * as CategoryExportRepository from '../repository/categoryExportRepository'
 import { buildCategoryItemFeature } from '../manager/categoryGeoPackageFeatureBuilder'
-
-// extraPropDef.js's getName/getDataType are point-free Ramda compositions (e.g. A.prop(...)),
-// which allowJs's lightweight JS inference (checkJs is off project-wide) can't resolve to real
-// function types - it falls back to {}, making ExtraPropDef.getName(...) look "not callable"
-const ExtraPropDef: any = ExtraPropDefUntyped
 
 const locationExtraPropName = Category.locationItemExtraDefName
 const geometryColumnName = 'geom'
@@ -50,9 +46,9 @@ export default class CategoryGeoPackageExportJob extends Job {
    * Builds the feature table columns: primary key, geometry, code, labels/descriptions per language
    * and one (or 3, for geometry point extra defs) column per non-location extra property definition.
    */
-  static buildFeatureColumns({ category, languages }: { category: Record<string, any>; languages: string[] }) {
+  static buildFeatureColumns({ category, languages }: { category: ArenaCategory; languages: string[] }) {
     const extraDefs = Category.getItemExtraDefsArray(category).filter(
-      (extraDef: any) => ExtraPropDef.getName(extraDef) !== locationExtraPropName
+      (extraDef) => ExtraPropDef.getName(extraDef) !== locationExtraPropName
     )
     let columnIndex = 0
     return [
@@ -63,7 +59,7 @@ export default class CategoryGeoPackageExportJob extends Job {
         FeatureColumn.createColumn(columnIndex++, `label_${language}`, GeoPackageDataType.TEXT),
         FeatureColumn.createColumn(columnIndex++, `description_${language}`, GeoPackageDataType.TEXT),
       ]),
-      ...extraDefs.flatMap((extraDef: any) => {
+      ...extraDefs.flatMap((extraDef) => {
         const dataType = ExtraPropDef.getDataType(extraDef)
         return CategoryExportFile.getExtraPropHeaders({ extraPropDef: extraDef }).map((header: string) =>
           FeatureColumn.createColumn(

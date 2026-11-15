@@ -1,9 +1,19 @@
 import * as Validation from '@core/validation/validation'
 import { validateExtraPropDef } from './extraPropDefValidator'
 
-import { ExtraPropDef } from './extraPropDef'
+import { ExtraPropDef, ExtraPropDefItem, ExtraPropDefItems } from './extraPropDef'
 
-const updateOrDeleteExtraDef = async ({ extraPropDefs, propName, extraPropDef, deleted = false }) => {
+const updateOrDeleteExtraDef = async ({
+  extraPropDefs,
+  propName,
+  extraPropDef,
+  deleted = false,
+}: {
+  extraPropDefs: ExtraPropDefItems
+  propName: string
+  extraPropDef?: ExtraPropDefItem
+  deleted?: boolean
+}): Promise<ExtraPropDefItems> => {
   const extraPropDefsArray = ExtraPropDef.extraDefsToArray(extraPropDefs)
   const itemExtraDefsArrayUpdated = [...extraPropDefsArray]
   const oldItemIndex = itemExtraDefsArrayUpdated.findIndex((item) => ExtraPropDef.getName(item) === propName)
@@ -27,16 +37,15 @@ const updateOrDeleteExtraDef = async ({ extraPropDefs, propName, extraPropDef, d
       throw new Error('Invalid item extra def')
     }
   }
-  // prepare itemExtraDefs for storage
-  // - remove unnecessary information (uuid, name)
-  // - index stored object by extra def name
-  return itemExtraDefsArrayUpdated.reduce((acc, item, index) => {
+  // prepare for storage: remove uuid and name, index by extra def name
+  const result: ExtraPropDefItems = {}
+  for (const [index, item] of itemExtraDefsArrayUpdated.entries()) {
     const name = ExtraPropDef.getName(item)
     const dataType = ExtraPropDef.getDataType(item)
     const locked = ExtraPropDef.isLocked(item)
-    acc[name] = ExtraPropDef.newItem({ dataType, index, locked })
-    return acc
-  }, {})
+    result[name] = ExtraPropDef.newItem({ dataType, index, locked })
+  }
+  return result
 }
 
 export const ExtraPropDefsUpdater = {

@@ -25,7 +25,7 @@ const getTaxonByUuid = async ({ survey, taxonomyUuid, taxonUuid, draft = false }
  * @param {object} params.survey - The survey.
  * @param {object} params.nodeDef - The taxon node definition.
  * @param {string} params.taxonUuid - The taxon uuid.
- * @returns {Promise<object|null>} - The taxon, or null if not found.
+ * @returns {Promise<import('@openforis/arena-core').Taxon|null>} - The taxon, or null if not found.
  */
 const getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
   const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)
