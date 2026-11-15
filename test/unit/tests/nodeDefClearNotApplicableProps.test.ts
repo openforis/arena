@@ -7,11 +7,14 @@ const cycle = '0'
 
 const clear = NodeDef.clearNotApplicableProps(cycle)
 
-const newTextDef = ({ props = {}, layout = {}, propsAdvanced = {} } = {}) => ({
-  type: nodeDefType.text,
-  props: { cycles: [cycle], ...props, [NodeDefLayout.keys.layout]: { [cycle]: layout } },
-  propsAdvanced,
-})
+const newTextDef = ({ props = {}, layout = {}, propsAdvanced = {} } = {}) =>
+  NodeDef.newNodeDef(
+    null,
+    nodeDefType.text,
+    [cycle],
+    { ...props, [NodeDefLayout.keys.layout]: { [cycle]: layout } },
+    propsAdvanced
+  )
 
 describe('NodeDef.clearNotApplicableProps', () => {
   it('returns the same node def when there is nothing to clear', () => {
@@ -34,10 +37,11 @@ describe('NodeDef.clearNotApplicableProps', () => {
   })
 
   it('clears autoCreateMinCountItems only in single entities', () => {
-    const newEntityDef = (multiple: boolean) => ({
-      type: nodeDefType.entity,
-      props: { [propKeys.multiple]: multiple, [propKeys.autoCreateMinCountItems]: true },
-    })
+    const newEntityDef = (multiple: boolean) =>
+      NodeDef.newNodeDef(null, nodeDefType.entity, [cycle], {
+        [propKeys.multiple]: multiple,
+        [propKeys.autoCreateMinCountItems]: true,
+      })
     expect(NodeDef.isAutoCreateMinCountItems(clear(newEntityDef(false)))).toBe(false)
     expect(NodeDef.isAutoCreateMinCountItems(clear(newEntityDef(true)))).toBe(true)
   })
