@@ -163,7 +163,7 @@ describe('Survey compare: apply changes made in another environment', () => {
     expect(NodeDef.isPublished(qaHeight)).toBe(false)
 
     const qaTree = Survey.getNodeDefByName('tree')(qa)
-    const qaTreeChildrenInLayout = NodeDefLayout.getLayoutChildren(cycle)(qaTree).map((child) => child.i)
+    const qaTreeChildrenInLayout = NodeDefLayout.getLayoutChildrenUuids(cycle)(qaTree)
     expect(qaTreeChildrenInLayout).toContain(NodeDef.getUuid(qaHeight))
 
     const qaDbhExpressions = NodeDefValidations.getExpressions(

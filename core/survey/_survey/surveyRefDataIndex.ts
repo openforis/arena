@@ -15,7 +15,6 @@ import * as RecordReader from '@core/record/_record/recordReader'
 import * as Node from '@core/record/node'
 
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import * as CategoryItem from '@core/survey/categoryItem'
 import * as Taxon from '@core/survey/taxon'
 import * as SurveyNodeDefs from './surveyNodeDefs'
 
@@ -82,23 +81,8 @@ export const getCategoryItemByHierarchicalCodes =
 
 export const getCategoryItemsInLevel =
   ({ categoryUuid, levelIndex = 0 }: { categoryUuid: string; levelIndex?: number }) =>
-  (survey: ArenaSurvey): ArenaCategoryItem[] => {
-    const rootItems = Surveys.getCategoryItems({ survey, categoryUuid, parentItemUuid: null })
-    if (levelIndex === 0) return rootItems
-
-    let itemsPrevLevel = [...rootItems]
-    let currentLevelIndex = 1
-    while (currentLevelIndex <= levelIndex) {
-      const itemsInLevel: ArenaCategoryItem[] = []
-      for (const item of itemsPrevLevel) {
-        const parentItemUuid = CategoryItem.getUuid(item)
-        itemsInLevel.push(...Surveys.getCategoryItems({ survey, categoryUuid, parentItemUuid }))
-      }
-      currentLevelIndex += 1
-      itemsPrevLevel = itemsInLevel
-    }
-    return itemsPrevLevel
-  }
+  (survey: ArenaSurvey): ArenaCategoryItem[] =>
+    Surveys.getCategoryItemsInLevel({ survey, categoryUuid, levelIndex })
 
 // ==== taxonomy index
 

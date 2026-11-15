@@ -1,3 +1,4 @@
+import { Surveys } from '@openforis/arena-core'
 import type { Survey as ArenaSurvey, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -18,7 +19,7 @@ export const getTaxonomiesArray = (survey: ArenaSurvey): ArenaTaxonomy[] => Obje
 export const getTaxonomyByUuid =
   (uuid: string) =>
   (survey: ArenaSurvey): ArenaTaxonomy | undefined =>
-    getTaxonomies(survey)[uuid]
+    Surveys.getTaxonomyByUuid({ survey, taxonomyUuid: uuid })
 
 export const getTaxonomyByName =
   (name: string) =>
