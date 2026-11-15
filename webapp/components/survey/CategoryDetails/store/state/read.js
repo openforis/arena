@@ -51,11 +51,6 @@ export const isCategoryEmpty = (state) => {
   )
 }
 
-export const hasEmptyLevels = (state) => {
-  const category = getCategory(state)
-  Category.getLevelsArray(category).find()
-}
-
 export const isCleaned = A.propOr(false, keys.cleaned)
 
 export const isEditingItemExtraDefs = A.propOr(false, keys.editingItemExtraDefs)
