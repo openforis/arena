@@ -17,11 +17,21 @@ const workerEvents = {
   exit: 'exit',
 }
 
-/**
- * Base class for managing communication between EventLoop and Thread in worker pool.
- */
+type MessageListener = (msg: any) => void
+
+// manages the communication between the event loop and a thread in the worker pool
 export default class ThreadManager {
-  constructor(fileName, data, messageListener, exitHandler = null) {
+  readonly worker: Worker
+  readonly socketId: string | undefined
+  readonly threadId: number
+  readonly logger: Log.Logger
+
+  constructor(
+    fileName: string,
+    data: Record<string, any>,
+    messageListener: MessageListener,
+    exitHandler: (() => void) | null = null
+  ) {
     const filePath = path.resolve(ProcessUtils.ENV.arenaDist, fileName)
 
     this.worker = new Worker(filePath, { workerData: data })
@@ -46,15 +56,15 @@ export default class ThreadManager {
     this.logger.debug('thread created')
   }
 
-  addMessageListener(listener) {
+  addMessageListener(listener: MessageListener): void {
     this.worker.on(workerEvents.message, listener)
   }
 
-  removeMessageListener(listener) {
+  removeMessageListener(listener: MessageListener): void {
     this.worker.removeListener(workerEvents.message, listener)
   }
 
-  messageHandlerWrapper(messageHandler) {
+  messageHandlerWrapper(messageHandler: MessageListener): MessageListener {
     return ({ user, msg }) => {
       const { type, error } = msg
       if (type === Thread.messageTypes.error) {
@@ -69,15 +79,12 @@ export default class ThreadManager {
     }
   }
 
-  /**
-   * Post a message to thread in worker pool.
-   * @param {!object} message - Message to be sebt to the worker thread.
-   */
-  postMessage(message) {
+  // posts a message to the thread in the worker pool
+  postMessage(message: unknown): void {
     this.worker.postMessage(message)
   }
 
-  terminate() {
+  terminate(): void {
     this.worker.terminate()
   }
 }

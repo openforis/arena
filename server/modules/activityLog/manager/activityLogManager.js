@@ -46,7 +46,7 @@ const activityTypesByPermission = {
     ActivityLog.type.chainDelete,
     ActivityLog.type.chainPropUpdate,
   ],
-  [AuthGroups.permissions.userEdit]: [ActivityLog.type.userEdit],
+  [AuthGroups.permissions.userEdit]: [ActivityLog.type.userUpdate],
   [AuthGroups.permissions.userInvite]: [ActivityLog.type.userInvite],
 }
 

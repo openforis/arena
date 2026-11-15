@@ -1,3 +1,5 @@
+import type { Transform } from 'node:stream'
+
 import * as A from '@core/arena'
 import pgPromise from 'pg-promise'
 import _QueryStream from 'pg-query-stream'
@@ -7,14 +9,29 @@ import { Objects, Strings } from '@openforis/arena-core'
 import * as NumberUtils from '@core/numberUtils'
 import * as StringUtils from '@core/stringUtils'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 const pgp = pgPromise()
 
+// column name (prefixed with '?' if it's only a condition column) or pg-promise column config
+export type ColumnSetColumn = string | pgPromise.IColumnConfig<any>
+
+type StreamProcessor = (stream: NodeJS.ReadableStream) => Promise<unknown>
+
 export const QueryStream = _QueryStream
 
-export const stream = async ({ queryStream, client = db, transformer = null, processor = null }) =>
-  new Promise((resolve, reject) => {
+export const stream = async ({
+  queryStream,
+  client = db,
+  transformer = null,
+  processor = null,
+}: {
+  queryStream: _QueryStream
+  client?: DbClient
+  transformer?: Transform | null
+  processor?: StreamProcessor | null
+}): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
     let streamComplete = false
     let streamProcessed = false
     const onComplete = () => {
@@ -39,12 +56,25 @@ export const stream = async ({ queryStream, client = db, transformer = null, pro
       .catch((error) => reject(error))
   })
 
-export const fetchQueryAsStream = async ({ query, processor, client = db, transformer = null }) => {
+export const fetchQueryAsStream = async ({
+  query,
+  processor,
+  client = db,
+  transformer = null,
+}: {
+  query: string
+  processor: StreamProcessor
+  client?: DbClient
+  transformer?: Transform | null
+}): Promise<void> => {
   const queryStream = new QueryStream(query)
   return stream({ queryStream, client, transformer, processor })
 }
 
-export const selectTablesAndViewsStartingWithPrefixes = async ({ schema, prefixes }, client = db) => {
+export const selectTablesAndViewsStartingWithPrefixes = async (
+  { schema, prefixes }: { schema: string; prefixes: string[] },
+  client: DbClient = db
+): Promise<{ table_name: string; table_type: string }[]> => {
   const tableNameConditions = prefixes.map((prefix) => `table_name LIKE '${prefix}%'`).join(' OR ')
   return client.query(
     `SELECT table_name, table_type
@@ -54,12 +84,18 @@ export const selectTablesAndViewsStartingWithPrefixes = async ({ schema, prefixe
   )
 }
 
-export const selectDate = (field, fieldAlias = null) =>
+export const selectDate = (field: string, fieldAlias: string | null = null): string =>
   `to_char(${field},'YYYY-MM-DD"T"HH24:MI:ss.MS"Z"') AS ${fieldAlias || field}`
 
 export const now = "timezone('UTC', now())"
 
-export const geometryPointColumnAsText = ({ qualifiedColName, alias = null }) => {
+export const geometryPointColumnAsText = ({
+  qualifiedColName,
+  alias = null,
+}: {
+  qualifiedColName: string
+  alias?: string | null
+}): string => {
   const srsIdValue = `ST_SRID(${qualifiedColName})`
   const xValue = `ST_X(${qualifiedColName})`
   const yValue = `ST_Y(${qualifiedColName})`
@@ -67,26 +103,31 @@ export const geometryPointColumnAsText = ({ qualifiedColName, alias = null }) =>
   return `'SRID=EPSG:' || ${srsIdValue} || ';POINT(' || ${xValue} || ' ' || ${yValue} || ')'${suffix}`
 }
 
-export const insertAllQueryBatch = (schema, table, cols, valuesByColumnName, fillValuesWithNulls = false) => {
+export const insertAllQueryBatch = (
+  schema: string,
+  table: string,
+  cols: string[],
+  valuesByColumnName: Record<string, unknown>[],
+  fillValuesWithNulls = false
+): string => {
   const columnSet = createColumnSet({ schema, table, columns: cols })
 
   if (fillValuesWithNulls) {
     // fill values with nulls to prevent missing values runtime error
-    valuesByColumnName.forEach((valuesByColNameItem) =>
-      cols.reduce((acc, col) => {
-        if (acc[col] === undefined) {
-          acc[col] = null
+    for (const valuesByColNameItem of valuesByColumnName) {
+      for (const col of cols) {
+        if (valuesByColNameItem[col] === undefined) {
+          valuesByColNameItem[col] = null
         }
-        return acc
-      }, valuesByColNameItem)
-    )
+      }
+    }
   }
   return pgp.helpers.insert(valuesByColumnName, columnSet)
 }
 
-export const insertAllQuery = (schema, table, cols, itemsValues) => {
+export const insertAllQuery = (schema: string, table: string, cols: string[], itemsValues: unknown[][]): string => {
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
-    const item = {}
+    const item: Record<string, unknown> = {}
     for (const [i, element] of cols.entries()) {
       item[element] = itemValues[i]
     }
@@ -96,17 +137,16 @@ export const insertAllQuery = (schema, table, cols, itemsValues) => {
   return insertAllQueryBatch(schema, table, cols, valuesIndexedByCol)
 }
 
-/**
- * Creates a multi-items update query.
- * @param {!string} schema - The target schema.
- * @param {!string} table - The target table.
- * @param {!string} idCol - Name of the identifier column (used to build the WHERE condition) or pgromise helpers.ColumnConfig object.
- * @param {!Array} updateCols - Array of column names or pgromise helpers.ColumnConfig objects that describe the columns to update.
- * @param {!Array} itemsValues - List of array of values to use in the update. The first value in every array of values must be the value of the identifier column.
- * @returns {string} Generated query string.
- */
-export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) => {
-  const getColumnName = (col) => A.propOr(col, 'name', col)
+// multi-items update query; idCol (name or pg-promise column config) is used in the WHERE condition
+// and its value must be the first one in every array of item values
+export const updateAllQuery = (
+  schema: string,
+  table: string,
+  idCol: ColumnSetColumn,
+  updateCols: ColumnSetColumn[],
+  itemsValues: unknown[][]
+): string => {
+  const getColumnName = (col: ColumnSetColumn): string => A.propOr(col, 'name', col)
 
   const idColumnName = getColumnName(idCol)
   const idColCast = A.propOr('text', 'cast', idCol)
@@ -116,7 +156,7 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
   const columnSet = createColumnSet({ schema, table, columns: cols })
 
   const valuesIndexedByCol = itemsValues.map((itemValues) => {
-    const item = {}
+    const item: Record<string, unknown> = {}
     // Id column is always the first among item values
     item[idColumnName] = itemValues[0]
     for (const [i, updateCol] of updateCols.entries()) {
@@ -132,56 +172,47 @@ export const updateAllQuery = (schema, table, idCol, updateCols, itemsValues) =>
   )} WHERE v.${idColumnName}::${idColCast} = t.${idColumnName}::${idColCast}`
 }
 
-export const getPropsPublishedCondition = ({ draft, tableAlias = null }) => {
+export const getPropsPublishedCondition = ({
+  draft,
+  tableAlias = null,
+}: {
+  draft: boolean
+  tableAlias?: string | null
+}): string => {
   const prefix = tableAlias ? `${tableAlias}.` : ''
   return draft ? '' : `${prefix}props::text <> '{}'::text`
 }
 
-/**
- * Combines draft and published props.
- * @param {!boolean} draft - Whether the item is draft or published.
- * @param {string} tableAlias - Table alias (prefix) for the column.
- * @param {string} alias - Alias of the result column.
- * @returns {string} - The column with combined props.
- */
-export const getPropsCombined = (draft, tableAlias = '', alias = 'props') => {
+// props column combining draft and published props (if draft)
+export const getPropsCombined = (draft: boolean, tableAlias = '', alias: string | null = 'props'): string => {
   const columnPrefix = tableAlias ? Strings.appendIfMissing('.')(tableAlias) : ''
   const aliasSql = alias ? ` AS ${alias}` : ''
   const propsSql = draft ? `${columnPrefix}props || ${columnPrefix}props_draft` : `${columnPrefix}props`
   return `${propsSql}${aliasSql}`
 }
-/**
- * Combines a draft and a published column prop, if needed.
- * @param {!string} propName - Property name.
- * @param {!boolean} draft - Whether the item is draft or published.
- * @param {string} columnPrefix - Prefix (table alias) for the column.
- * @param {boolean} asText - Whether the property must be read as text.
- * @param {string} alias - Alias of the result column.
- * @returns {string} - The column with combined props.
- */
-export const getPropColCombined = (propName, draft, columnPrefix = '', asText = true, alias = null) => {
+// prop read from the props combining draft and published props (if draft)
+export const getPropColCombined = (
+  propName: string,
+  draft: boolean,
+  columnPrefix = '',
+  asText = true,
+  alias: string | null = null
+): string => {
   const aliasSql = alias ? ` AS ${alias}` : ''
   return `(${getPropsCombined(draft, columnPrefix, null)})${asText ? '->>' : '->'}'${propName}'${aliasSql}`
 }
 
-/**
- * Generates a filter condition (LIKE) with a named parameter.
- * E.g. "lower(col) LIKE $/searchValue/ where "col" is a json prop column.
- * @param {!string} propName - Property name.
- * @param {!boolean} draft - Whether the item is draft or published.
- * @param {string} columnPrefix - Prefix (table alias) for the column.
- * @returns {string} - The condition.
- */
-export const getPropFilterCondition = (propName, draft, columnPrefix = '') =>
+// LIKE condition on a prop, with the named parameter searchValue (e.g. lower(col) LIKE $/searchValue/)
+export const getPropFilterCondition = (propName: string, draft: boolean, columnPrefix = ''): string =>
   `lower(${getPropColCombined(propName, draft, columnPrefix)}) LIKE $/searchValue/`
 
 export const filterTypes = {
   includes: 'includes',
   startsWith: 'startsWith',
   endsWith: 'endsWith',
-}
+} as const
 
-export const prepareParameterForFilter = (value, filterType = filterTypes.includes) => {
+export const prepareParameterForFilter = (value: unknown, filterType: string = filterTypes.includes): string | null => {
   if (Objects.isEmpty(value)) return null
   switch (filterType) {
     case filterTypes.includes:
@@ -193,38 +224,27 @@ export const prepareParameterForFilter = (value, filterType = filterTypes.includ
   }
 }
 
-/**
- * Normalizes a LIMIT query parameter (it can come from the request).
- * @param {any} limit - The limit value.
- * @returns {number|null} - The limit as a positive integer, or null (LIMIT NULL = LIMIT ALL) if not valid.
- */
-export const normalizeLimit = (limit) => {
+// LIMIT query parameter (it can come from the request) as a positive integer, or null (LIMIT NULL = LIMIT ALL)
+export const normalizeLimit = (limit: unknown): number | null => {
   const limitNumber = NumberUtils.toNumber(limit)
   return Number.isInteger(limitNumber) && limitNumber > 0 ? limitNumber : null
 }
 
-/**
- * Normalizes an OFFSET query parameter (it can come from the request).
- * @param {any} offset - The offset value.
- * @returns {number} - The offset as a non-negative integer, or 0 if not valid.
- */
-export const normalizeOffset = (offset) => {
+// OFFSET query parameter (it can come from the request) as a non-negative integer, 0 if not valid
+export const normalizeOffset = (offset: unknown): number => {
   const offsetNumber = NumberUtils.toNumber(offset)
   return Number.isInteger(offsetNumber) && offsetNumber > 0 ? offsetNumber : 0
 }
 
 export const formatQuery = pgp.as.format
 
-/**
- * Collects positional query parameters, so that values (e.g. stored names or language codes) are escaped by pg-promise
- * instead of being written into the SQL text.
- * @param {Array<unknown>} [initialValues] - Values of the first parameters ($1, $2...).
- * @returns {{values: Array<unknown>, add: function(unknown, string=): string}} - The collected values and a function that adds
- * a value and returns its placeholder (e.g. "$2", or "$2:name" when the modifier ":name" is specified).
- */
-export const newQueryParams = (initialValues = []) => {
+// collects positional query parameters, so that values (e.g. stored names or language codes) are escaped by pg-promise
+// instead of being written into the SQL text; add returns the placeholder (e.g. "$2", or "$2:name" with modifier ":name")
+export const newQueryParams = (
+  initialValues: unknown[] = []
+): { values: unknown[]; add: (value: unknown, modifier?: string) => string } => {
   const values = [...initialValues]
-  const add = (value, modifier = '') => {
+  const add = (value: unknown, modifier = ''): string => {
     values.push(value)
     return `$${values.length}${modifier}`
   }
@@ -237,15 +257,22 @@ export const txOptionsReadOnly = { mode: new pgp.txMode.TransactionMode({ readOn
 // a quoted identifier: inner double quotes are doubled
 const quotedIdentifierRegex = /^"(?:[^"]|"")*"$/
 
-export const asName = (name) => (quotedIdentifierRegex.test(name) ? name : StringUtils.quoteDouble(name))
+export const asName = (name: string): string =>
+  quotedIdentifierRegex.test(name) ? name : StringUtils.quoteDouble(name)
 
-export const getPublishedCondition = ({ draft, tableAlias = null }) => {
+export const getPublishedCondition = ({
+  draft,
+  tableAlias = null,
+}: {
+  draft: boolean
+  tableAlias?: string | null
+}): string => {
   if (draft) return ''
   const tableAliasPrefix = tableAlias ? `${tableAlias}.` : ''
   return `${tableAliasPrefix}props::text <> '{}'::text`
 }
 
-export const getWhereClause = (...conditions) => {
+export const getWhereClause = (...conditions: (string | null | undefined | false)[]): string => {
   const nonEmptyConditions = conditions.filter((cond) => !!cond)
   return nonEmptyConditions.length > 0 ? `WHERE ${nonEmptyConditions.join(' AND ')}` : ''
 }
@@ -257,27 +284,26 @@ export const getWhereClause = (...conditions) => {
 // segment ... No space left on device". Use this in a transaction expected to run large/complex
 // queries where hitting that ceiling is a real risk and losing intra-query parallelism there is an
 // acceptable trade-off.
-export const disableParallelQueryForTransaction = async (client) =>
+export const disableParallelQueryForTransaction = async (client: DbClient): Promise<null> =>
   client.none('SET LOCAL max_parallel_workers_per_gather = 0')
 
-/**
- * Runs VACUUM on the specified table: it removes dead tuples, making their space reusable.
- * It cannot be run inside a transaction.
- * @param {!object} params - The parameters.
- * @param {!string} params.schema - The table schema.
- * @param {!string} params.table - The table name.
- * @param {boolean} [params.full] - If true, rewrites the table giving the space back to the OS (it locks the table while running).
- * @param {boolean} [params.analyze] - If true, updates the table statistics too.
- * @param {pgPromise.IDatabase} [client] - The database client (not a transaction).
- * @returns {Promise<null>} - The query result.
- */
-export const vacuumTable = async ({ schema, table, full = false, analyze = false }, client = db) => {
+// runs VACUUM on a table (not in a transaction): it removes dead tuples, making their space reusable;
+// full rewrites the table giving the space back to the OS (locking it), analyze updates the table statistics too
+export const vacuumTable = async (
+  {
+    schema,
+    table,
+    full = false,
+    analyze = false,
+  }: { schema: string; table: string; full?: boolean; analyze?: boolean },
+  client: DbClient = db
+): Promise<null> => {
   const options = [full && 'FULL', analyze && 'ANALYZE'].filter(Boolean)
   const optionsClause = options.length > 0 ? `(${options.join(', ')}) ` : ''
   return client.none(`VACUUM ${optionsClause}$1:name.$2:name`, [schema, table])
 }
 
-export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
+export const fetchSchemaTablesSize = async ({ schema }: { schema: string }, client: DbClient = db): Promise<number> =>
   client.one(
     `SELECT 
 		SUM(pg_total_relation_size(pg_catalog.pg_class.oid)) as size
@@ -290,7 +316,10 @@ export const fetchSchemaTablesSize = async ({ schema }, client = db) =>
     (row) => Number(row.size)
   )
 
-export const fetchTableSize = async ({ schema, table }, client = db) =>
+export const fetchTableSize = async (
+  { schema, table }: { schema: string; table: string },
+  client: DbClient = db
+): Promise<number> =>
   client.one(
     `SELECT pg_relation_size('"'||table_schema||'"."'||table_name||'"') AS size
     FROM information_schema.tables
@@ -299,7 +328,17 @@ export const fetchTableSize = async ({ schema, table }, client = db) =>
     (row) => Number(row.size)
   )
 
-export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, table = null }) =>
+export const createColumnSet = ({
+  pgp: pgpProp = pgp,
+  columns,
+  schema = null,
+  table = null,
+}: {
+  pgp?: pgPromise.IMain
+  columns: ColumnSetColumn[]
+  schema?: string | null
+  table?: string | null
+}): pgPromise.ColumnSet =>
   new pgpProp.helpers.ColumnSet(
     columns.map((col) => {
       if (typeof col === 'string') {
@@ -313,23 +352,28 @@ export const createColumnSet = ({ pgp: pgpProp = pgp, columns, schema = null, ta
     table ? { table: { schema, table } } : undefined
   )
 
-export const createBulkUpdateValues = ({ columnSet, values }) => pgp.helpers.values(values, columnSet)
+export const createBulkUpdateValues = ({
+  columnSet,
+  values,
+}: {
+  columnSet: pgPromise.ColumnSet
+  values: Record<string, unknown>[]
+}): string => pgp.helpers.values(values, columnSet)
 
 /**
  * Runs the specified queries and returns their results (in the same order).
- * Queries are run in parallel only when the client is the connection pool: in a task or a transaction they share
- * the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are run
- * one after the other.
- * @param {pgPromise.IDatabase|pgPromise.ITask} [client] - The db client (pool, task or transaction); when not specified,
- * the queries are expected to use the connection pool.
- * @param {Array<function(): Promise<object>>} queryFns - Functions running the queries.
- * @returns {Promise<Array<*>>} - The results of the queries.
+ * Queries are run in parallel only when the client is the connection pool (or not specified): in a task or a transaction
+ * they share the same connection, where queries cannot run concurrently (deprecated by pg, removed in pg@9), so they are
+ * run one after the other.
  */
-export const runQueries = async (client, queryFns) => {
+export const runQueries = async (
+  client: DbClient | null | undefined,
+  queryFns: (() => Promise<any>)[]
+): Promise<any[]> => {
   if (!client || client === db) {
     return Promise.all(queryFns.map((queryFn) => queryFn()))
   }
-  const results = []
+  const results: any[] = []
   for (const queryFn of queryFns) {
     results.push(await queryFn()) // NOSONAR
   }

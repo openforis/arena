@@ -8,4 +8,4 @@ export const keys = {
   user: 'user',
 }
 
-export const getSocketId = A.prop(keys.socketId)
+export const getSocketId = (params: Record<string, any>): string | undefined => A.prop(keys.socketId)(params)

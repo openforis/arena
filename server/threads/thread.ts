@@ -5,11 +5,16 @@ import * as Log from '@server/log/log'
 import * as ThreadParams from './threadParams'
 import { initArenaServerServices } from '@server/system/arenaServerServices'
 
-/**
- * Base class for thread execution in Worker Pool.
- */
+// base class for the threads executed in the worker pool
 export default class Thread {
-  constructor(params) {
+  static readonly messageTypes = {
+    error: 'error',
+  }
+
+  params: Record<string, any>
+  logger: Log.Logger
+
+  constructor(params?: Record<string, any>) {
     this.params = params || { ...workerData }
 
     this.logger = Log.getLogger('Thread')
@@ -22,23 +27,20 @@ export default class Thread {
     }
   }
 
-  get user() {
+  get user(): any {
     return this.params[ThreadParams.keys.user]
   }
 
-  get surveyId() {
+  get surveyId(): number {
     return this.params[ThreadParams.keys.surveyId]
   }
 
-  /**
-   * Send message to main event loop.
-   * @param {!object} msg - Message to send to parent port.
-   */
-  postMessage(msg) {
+  // sends a message to the main event loop
+  postMessage(msg: Record<string, any>): void {
     parentPort.postMessage({ user: this.user ?? msg.user, surveyId: this.surveyId, msg })
   }
 
-  async messageHandler(msg) {
+  async messageHandler(msg: Record<string, any>): Promise<void> {
     try {
       await this.onMessage(msg)
     } catch (error) {
@@ -50,16 +52,8 @@ export default class Thread {
     }
   }
 
-  /**
-   * Receive message from main event loop.
-   * @param {!object} msg - Message received from parent port.
-   */
-  // eslint-disable-next-line no-unused-vars
-  async onMessage(msg) {
+  // receives a message from the main event loop (to override)
+  async onMessage(_msg: Record<string, any>): Promise<void> {
     // TO OVERRIDE
   }
-}
-
-Thread.messageTypes = {
-  error: 'error',
 }

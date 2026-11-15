@@ -5,7 +5,7 @@ import { ProcessEnv } from '@openforis/arena-server'
 // same file name used by arena-server (LOG_FILE_NAME), whose poller uploads it to S3
 export const LOG_FILE_NAME = 'arena.log'
 
-export const getLogFilePath = () => path.join(path.resolve(ProcessEnv.logFolder), LOG_FILE_NAME)
+export const getLogFilePath = (): string => path.join(path.resolve(ProcessEnv.logFolder), LOG_FILE_NAME)
 
 const logger = log4js.getLogger('arena')
 
@@ -39,55 +39,56 @@ const levels = {
   error: 'error',
 }
 
-const _stringifyMsgs = (msgs) => msgs.map((msg) => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
+const _stringifyMsgs = (msgs: unknown[]): string =>
+  msgs.map((msg) => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
 
-/**
- * Logger class with custom prefix
- */
-class Logger {
-  constructor(prefix) {
+// logger with a custom prefix
+export class Logger {
+  readonly prefix: string
+
+  constructor(prefix: string) {
     this.prefix = prefix
   }
 
-  get debugEnabled() {
+  get debugEnabled(): boolean {
     return this._isLevelEnabled(levels.debug)
   }
 
-  get infoEnabled() {
+  get infoEnabled(): boolean {
     return this._isLevelEnabled(levels.info)
   }
 
-  get warnEnabled() {
+  get warnEnabled(): boolean {
     return this._isLevelEnabled(levels.warn)
   }
 
-  get errorEnabled() {
+  get errorEnabled(): boolean {
     return this._isLevelEnabled(levels.error)
   }
 
-  debug(...msgs) {
+  debug(...msgs: unknown[]): void {
     this._log(levels.debug, msgs)
   }
 
-  info(...msgs) {
+  info(...msgs: unknown[]): void {
     this._log(levels.info, msgs)
   }
 
-  warn(...msgs) {
+  warn(...msgs: unknown[]): void {
     this._log(levels.warn, msgs)
   }
 
-  error(...msgs) {
+  error(...msgs: unknown[]): void {
     this._log(levels.error, msgs)
   }
 
-  _isLevelEnabled(level) {
+  _isLevelEnabled(level: string): boolean {
     return logger.isLevelEnabled(level)
   }
 
-  _log(level, msgs) {
+  _log(level: string, msgs: unknown[]): void {
     if (this._isLevelEnabled(level)) logger.log(level, `${this.prefix} - ${_stringifyMsgs(msgs)}`)
   }
 }
 
-export const getLogger = (prefix) => new Logger(prefix)
+export const getLogger = (prefix: string): Logger => new Logger(prefix)

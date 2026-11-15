@@ -1,14 +1,16 @@
-export default class ThreadsCache {
+export default class ThreadsCache<T = any> {
+  readonly threads: Map<string, T>
+
   constructor() {
     this.threads = new Map()
   }
 
-  getThread(key) {
+  getThread(key: string): T | undefined {
     return this.threads.get(key)
   }
 
-  findThreadsKeys(keyFilterFunction) {
-    const result = []
+  findThreadsKeys(keyFilterFunction: (key: string) => boolean): string[] {
+    const result: string[] = []
     for (const key of this.threads.keys()) {
       if (keyFilterFunction(key)) {
         result.push(key)
@@ -17,12 +19,12 @@ export default class ThreadsCache {
     return result
   }
 
-  putThread(key, worker) {
+  putThread(key: string, worker: T): T {
     this.threads.set(key, worker)
     return worker
   }
 
-  removeThread(key) {
+  removeThread(key: string): void {
     this.threads.delete(key)
   }
 }

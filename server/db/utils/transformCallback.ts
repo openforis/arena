@@ -1,13 +1,18 @@
 import * as A from '../../../core/arena'
 import { mergeProps } from './mergeProps'
 
-const _assocPublishedDraft = (row) => {
+const _assocPublishedDraft = (row: Record<string, any>): Record<string, any> => {
   row.published = !A.isEmpty(row.props)
   row.draft = !A.isEmpty(row.props_draft)
   return row
 }
 
-export const transformCallback = (row, draft = false, assocPublishedDraft = false, backup = false) => {
+export const transformCallback = (
+  row: Record<string, any> | null,
+  draft = false,
+  assocPublishedDraft = false,
+  backup = false
+): any => {
   if (A.isNull(row)) {
     return null
   }

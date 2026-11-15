@@ -1,6 +1,6 @@
 export const mergeProps =
-  ({ draft = false } = {}) =>
-  (row) => {
+  ({ draft = false }: { draft?: boolean } = {}) =>
+  (row: Record<string, any> | null): Record<string, any> | null => {
     if (!row) {
       return null
     }
