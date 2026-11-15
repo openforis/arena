@@ -130,7 +130,7 @@ export const getLayoutChildren =
     NodeDefs.getLayoutChildren(cycle)(asEntity(nodeDef))
 
 // form layout children (grid items with position)
-const getLayoutChildrenItems = (cycle: string) => (nodeDef: AnyNodeDef) =>
+export const getLayoutChildrenItems = (cycle: string) => (nodeDef: AnyNodeDef) =>
   getLayoutChildren(cycle)(nodeDef) as NodeDefEntityChildPosition[]
 
 export const getLayoutChildrenSorted = (cycle: string) => (nodeDef: AnyNodeDef) => {

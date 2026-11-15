@@ -2,7 +2,13 @@ import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
 
-const validate = async ({ preloadedMapLayers, preloadedMapLayer }) =>
+const validate = async ({
+  preloadedMapLayers,
+  preloadedMapLayer,
+}: {
+  preloadedMapLayers: SurveyFile.SurveyFile[]
+  preloadedMapLayer: SurveyFile.SurveyFile
+}): Promise<Validation.ValidationInstance> =>
   Validator.validate(preloadedMapLayer, {
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.name}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyPreloadedMapLayer.fileRequired),
