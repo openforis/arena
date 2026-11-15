@@ -1,4 +1,3 @@
-import { Records } from '@openforis/arena-core'
 import type { ArenaRecord, User as ArenaUser } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -64,7 +63,11 @@ export const isReadOnly = isFlagTrue(keys.readOnly)
 export const getOwnerUuid = getStringProp(keys.ownerUuid)
 export const getOwnerName = getStringProp(keys.ownerName)
 export const getStep = getStringProp(keys.step)
-export const isInAnalysisStep = (record: ArenaRecord): boolean => Records.isInAnalysisStep(record)
+// not delegated to Records.isInAnalysisStep: it must accept a null record (e.g. survey form in designer mode)
+export const isInAnalysisStep = (record: ArenaRecord | null): boolean => {
+  const step = RecordStep.getStep(getStep(record))
+  return RecordStep.getName(step) === RecordStep.stepNames.analysis
+}
 export const getCycle = getStringProp(keys.cycle)
 export const getMergedIntoRecordUuid = getStringProp(keys.mergedIntoRecordUuid)
 export const { getDateCreated } = ObjectUtils

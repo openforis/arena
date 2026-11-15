@@ -195,10 +195,17 @@ export const getNodeParentInDescendantSingleEntities =
  * @param node - The node.
  * @returns Function returning true if the node is applicable in the specified record.
  */
+// not delegated to Records.isNodeApplicable: a missing node is considered applicable here
 export const isNodeApplicable =
-  (node: ArenaRecordNode) =>
-  (record: ArenaRecord): boolean =>
-    Records.isNodeApplicable(node)(record)
+  (node: ArenaRecordNode | null | undefined) =>
+  (record: ArenaRecord): boolean => {
+    if (Node.isRoot(node)) {
+      return true
+    }
+    const nodeParent = getParentNode(node)(record)
+    const isApplicable = Node.isChildApplicable(Node.getNodeDefUuid(node))(nodeParent)
+    return isApplicable ? isNodeApplicable(nodeParent)(record) : false
+  }
 
 // ==== dependency
 /**
