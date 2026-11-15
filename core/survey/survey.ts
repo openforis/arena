@@ -1,4 +1,3 @@
-import { createDefaultAuthGroups } from '@openforis/arena-core'
 import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -80,7 +79,7 @@ export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } =
 export const { sortableKeys } = SurveySortKeys
 
 // ====== DEFAULTS
-export const getDefaultAuthGroups = createDefaultAuthGroups
+export { createDefaultAuthGroups as getDefaultAuthGroups } from '@openforis/arena-core'
 
 // READ
 export const getSurveyInfo = SurveyInfo.getInfo
