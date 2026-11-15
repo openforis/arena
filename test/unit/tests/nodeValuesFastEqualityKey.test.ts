@@ -1,6 +1,11 @@
 import { NodeValues } from '@core/record/nodeValues'
 import { nodeDefType } from '@core/survey/nodeDefType'
 
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
+// minimal fixtures: only the props read by NodeValues
+const newNodeDef = (type: NodeDefType) => ({ type }) as ArenaNodeDef<NodeDefType>
+
 const indexableTypes = [
   nodeDefType.boolean,
   nodeDefType.text,
@@ -46,7 +51,7 @@ describe('NodeValues.getFastEqualityKeyWithoutRecordContext', () => {
   }
 
   it('marks an unsupported type (e.g. date) as not indexable', () => {
-    const nodeDef = { type: nodeDefType.date }
+    const nodeDef = newNodeDef(nodeDefType.date)
     expect(NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef, value: '2021-01-01' })).toEqual({
       supported: false,
       key: null,
@@ -59,7 +64,7 @@ describe('NodeValues.getFastEqualityKeyWithoutRecordContext', () => {
     ['integer', nodeDefType.integer, 5, 5, 6],
     ['decimal', nodeDefType.decimal, 5.5, 5.5, 6.1],
   ])('%s', (_label, type, value, sameValue, differentValue) => {
-    const nodeDef = { type }
+    const nodeDef = newNodeDef(type)
 
     it('agrees with isValueEqual for equal values', () => {
       expect(keysAgreeWithIsValueEqual({ nodeDef, value, valueSearch: sameValue })).toBe(true)
@@ -71,7 +76,7 @@ describe('NodeValues.getFastEqualityKeyWithoutRecordContext', () => {
   })
 
   describe('code', () => {
-    const nodeDef = { type: nodeDefType.code }
+    const nodeDef = newNodeDef(nodeDefType.code)
 
     it('agrees with isValueEqual for equal plain codes (e.g. 2 raw record summary values)', () => {
       expect(keysAgreeWithIsValueEqual({ nodeDef, value: 'A01', valueSearch: 'A01' })).toBe(true)
@@ -83,7 +88,9 @@ describe('NodeValues.getFastEqualityKeyWithoutRecordContext', () => {
 
     it('resolves an item indexed in the survey by itemUuid to its current code', () => {
       const itemUuid = 'item-1-uuid'
-      const surveyWithIndex = { refData: { categoryItemIndex: { [itemUuid]: { props: { code: 'A01' } } } } }
+      const surveyWithIndex = {
+        refData: { categoryItemIndex: { [itemUuid]: { props: { code: 'A01' } } } },
+      } as unknown as ArenaSurvey
       const { key } = NodeValues.getFastEqualityKeyWithoutRecordContext({
         survey: surveyWithIndex,
         nodeDef,
@@ -111,7 +118,7 @@ describe('NodeValues.getFastEqualityKeyWithoutRecordContext', () => {
 
   it('returns a null key for an empty value, for every supported type', () => {
     indexableTypes.forEach((type) => {
-      const nodeDef = { type }
+      const nodeDef = newNodeDef(type)
       expect(NodeValues.getFastEqualityKeyWithoutRecordContext({ survey, nodeDef, value: null })).toEqual({
         supported: true,
         key: null,
