@@ -15,7 +15,7 @@ export type MapCustomLayersErrorName =
   | 'tooManyLayers'
   | 'busy'
 
-// i18n keys live in core/i18n/resources/<lang>/appErrors.js, object mapCustomLayers
+// i18n keys live in core/i18n/resources/<lang>/appErrors.ts, object mapCustomLayers
 export const MAP_CUSTOM_LAYERS_ERROR_KEY_PREFIX = 'appErrors:mapCustomLayers.'
 
 // the remote service failed (502/504) or this server is saturated (503); every other error is the caller's input (400)

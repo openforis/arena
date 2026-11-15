@@ -87,8 +87,8 @@ export const JobsHeader = ({ onRefresh, highlighted = false }: Props) => {
 
 ## UI texts (i18n)
 
-- Every UI text goes through i18next. The texts are in `core/i18n/resources/<lang>/<namespace>.(js|ts)`, and
-  each namespace is registered in `core/i18n/resources/<lang>/index.js`. Missing texts fall back to English.
+- Every UI text goes through i18next. The texts are in `core/i18n/resources/<lang>/<namespace>.ts`, and
+  each namespace is registered in `core/i18n/resources/<lang>/index.ts`. Missing texts fall back to English.
   Recent PRs add new keys to every language, and big features get their own namespace (e.g. `systemLogsView.ts`).
 - Keys look like `namespace:path.to.key` (`'dataView:dataMatrixExport.preview'`). A key without a namespace
   is looked up in `common` (`'common.refresh'`). For parameters, write `{{name}}` in the text and call
@@ -175,7 +175,7 @@ the action to its `store/actions/` and register it in `useActions`, as was done 
   areas.
 - A new page needs the module in `appModules.js` and a route in the parent `ModuleSwitch`. If it appears in the
   side bar, it also needs an entry in `webapp/views/App/SideBar/Modules/utils.js` and a label
-  `appModules.<key>` in `core/i18n/resources/<lang>/common.js`.
+  `appModules.<key>` in `core/i18n/resources/<lang>/common.ts`.
 
 ## House components
 
