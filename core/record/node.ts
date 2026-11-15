@@ -269,7 +269,9 @@ export const isValueBlank = (node: Node): boolean => {
   return A.isEmpty(value)
 }
 
-export const hasUserInputValue = (node: Node): boolean => !isValueBlank(node) && !isDefaultValueApplied(node)
+// values filled in from a user group qualifier are not user input
+export const hasUserInputValue = (node: Node): boolean =>
+  !isValueBlank(node) && !isDefaultValueApplied(node) && !isQualifierValueApplied(node)
 
 // ====== Node Value extractor
 
