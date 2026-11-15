@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} sur {{total}}',
   noItems: 'Aucune nouveauté à afficher.',
   items: {
+    mobileUploadEmailNotification: {
+      title: 'Notification par e-mail des enregistrements téléversés depuis Arena Mobile',
+      description: `Dans **Infos de l'enquête → Sécurité**, cochez **Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile** : après chaque téléversement, chaque administrateur de formulaire reçoit un e-mail avec la liste des enregistrements téléversés, leurs valeurs clés, s'ils sont nouveaux ou mis à jour, l'utilisateur qui les a créés, les dates et le nombre d'erreurs et d'avertissements de validation.
+
+Un seul e-mail est envoyé par téléversement, même quand un appareil téléverse de nombreux enregistrements. L'option est disponible quand **Autoriser le téléversement des enregistrements depuis Arena Mobile vers le serveur** est cochée, et elle s'applique une fois l'enquête publiée.`,
+    },
     surveyGuestRole: {
       title: 'Nouveau rôle : Invité, pour consulter les enregistrements sans les modifier',
       description: `Invitez des utilisateurs avec le nouveau rôle **Invité** (**Utilisateurs > Inviter un utilisateur**) : ils peuvent consulter tous les enregistrements de l'enquête, aussi dans **Arena Mobile**, mais ils ne peuvent ni les modifier, ni les supprimer, ni en ajouter de nouveaux.

@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'Não há novidades para mostrar.',
   items: {
+    mobileUploadEmailNotification: {
+      title: 'Notificação por e-mail dos registros enviados do Arena Mobile',
+      description: `Em **Informações do inquérito → Segurança**, marque **Notificar os administradores do inquérito por e-mail quando registros forem enviados do Arena Mobile**: após cada envio, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados, seus valores-chave, se são novos ou atualizados, o usuário que os criou, as datas e o número de erros e avisos de validação.
+
+É enviado um único e-mail por envio, mesmo quando um dispositivo envia muitos registros. A opção está disponível quando **Permitir upload de registros do Arena Mobile para o servidor** está marcada, e entra em vigor depois que o inquérito é publicado.`,
+    },
     surveyGuestRole: {
       title: 'Novo papel: Convidado, para ver os registros sem editá-los',
       description: `Convide usuários com o novo papel **Convidado** (**Usuários > Convidar usuário**): eles podem ver todos os registros do levantamento, também no **Arena Mobile**, mas não podem editá-los nem excluí-los, nem adicionar novos.

@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} od {{total}}',
   noItems: 'Nema novih funkcija za prikaz.',
   items: {
+    mobileUploadEmailNotification: {
+      title: 'Obaveštenje e-poštom o zapisima otpremljenim iz Arena Mobile',
+      description: `U **Informacije o istraživanju → Bezbjednost** označite **Obavesti administratore ankete e-poštom kada se zapisi otpreme iz Arena Mobile**: posle svakog otpremanja, svaki administrator ankete dobija e-poruku sa spiskom otpremljenih zapisa, njihovim ključnim vrednostima, informacijom da li su novi ili ažurirani, korisnikom koji ih je kreirao, datumima i brojem grešaka i upozorenja validacije.
+
+Šalje se jedna poruka po otpremanju, čak i kada uređaj otpremi mnogo zapisa. Opcija je dostupna kada je označeno **Dozvoli otpremanje zapisa iz Arena Mobile na server** i primenjuje se kada se istraživanje objavi.`,
+    },
     surveyGuestRole: {
       title: 'Nova uloga: Gost, za pregled zapisa bez izmena',
       description: `Pozovite korisnike sa novom ulogom **Gost** (**Korisnici > Pozovi korisnika**): mogu da pregledaju sve zapise istraživanja, i u **Arena Mobile**, ali ne mogu da ih menjaju ili brišu, niti da dodaju nove.
