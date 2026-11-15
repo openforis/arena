@@ -73,7 +73,7 @@ const _validateExpressionProp =
 
 const _validateOnlyLastApplyIfEmpty =
   (nodeDefExpressions: ArenaNodeDefExpression[], i: number) =>
-  async (_propName: string, nodeDefExpression: ArenaNodeDefExpression) => {
+  (_propName: string, nodeDefExpression: ArenaNodeDefExpression) => {
     const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
     return A.isEmpty(expr) && i < nodeDefExpressions.length - 1
       ? {

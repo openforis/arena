@@ -19,7 +19,7 @@ type FindReferencedNodeDefLastParams = {
   selfReferenceAllowed?: boolean
 }
 
-export const findReferencedNodeDefLast = async ({
+export const findReferencedNodeDefLast = ({
   survey,
   nodeDef,
   exprString,

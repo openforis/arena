@@ -32,12 +32,12 @@ const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using fi
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
-const validateCategory = async (propName: string, nodeDef: AnyNodeDef) =>
+const validateCategory = (propName: string, nodeDef: AnyNodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.categoryRequired)(propName, nodeDef)
     : null
 
-const validateTaxonomy = async (propName: string, nodeDef: AnyNodeDef) =>
+const validateTaxonomy = (propName: string, nodeDef: AnyNodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.taxon
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
