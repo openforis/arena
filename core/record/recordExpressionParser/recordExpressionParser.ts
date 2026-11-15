@@ -7,7 +7,7 @@ import type {
   User as ArenaUser,
 } from '@openforis/arena-core'
 
-export const evalNodeQuery = async (
+export const evalNodeQuery = (
   survey: ArenaSurvey,
   record: ArenaRecord,
   node: ArenaRecordNode,
@@ -15,7 +15,7 @@ export const evalNodeQuery = async (
   user?: ArenaUser
 ) => new RecordExpressionEvaluator().evalExpression({ survey, record, node, query, user })
 
-export const evalApplicableExpression = async (
+export const evalApplicableExpression = (
   survey: ArenaSurvey,
   record: ArenaRecord,
   nodeCtx: ArenaRecordNode,
