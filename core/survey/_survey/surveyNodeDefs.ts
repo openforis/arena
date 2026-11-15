@@ -7,7 +7,7 @@ import type {
   NodeDefCode,
   NodeDefEntity,
   NodeDefType,
-  Survey,
+  Survey as ArenaSurvey,
 } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
@@ -25,34 +25,34 @@ type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type NodeDefsByUuid = Record<string, AnyNodeDef>
 type NodeDefPredicate = (nodeDef: AnyNodeDef) => boolean
 type NodeDefVisitor = (nodeDef: AnyNodeDef) => void
-type SurveyUpdater = (survey: Survey) => Survey
+type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 
 export type NodeDefHierarchyItem = AnyNodeDef & { children: NodeDefHierarchyItem[] }
 
 const nodeDefsKey = 'nodeDefs'
 
 // ====== READ
-export const getNodeDefs = (survey: Survey): NodeDefsByUuid => A.propOr({}, nodeDefsKey)(survey) as NodeDefsByUuid
+export const getNodeDefs = (survey: ArenaSurvey): NodeDefsByUuid => A.propOr({}, nodeDefsKey)(survey) as NodeDefsByUuid
 
-export const getNodeDefsArray = (survey: Survey): AnyNodeDef[] => Object.values(getNodeDefs(survey))
+export const getNodeDefsArray = (survey: ArenaSurvey): AnyNodeDef[] => Object.values(getNodeDefs(survey))
 
-export const getNodeDefRoot = (survey: Survey): NodeDefEntity => Surveys.getNodeDefRoot({ survey })
+export const getNodeDefRoot = (survey: ArenaSurvey): NodeDefEntity => Surveys.getNodeDefRoot({ survey })
 
-export const getQualifierNodeDefs = (survey: Survey): AnyNodeDef[] => Surveys.getQualifierDefs({ survey })
+export const getQualifierNodeDefs = (survey: ArenaSurvey): AnyNodeDef[] => Surveys.getQualifierDefs({ survey })
 
 export const getNodeDefByUuid =
   (uuid: string | null | undefined) =>
-  (survey: Survey): AnyNodeDef | null =>
+  (survey: ArenaSurvey): AnyNodeDef | null =>
     A.propOr(null, uuid)(getNodeDefs(survey)) as AnyNodeDef | null
 
 export const getNodeDefsByUuids =
   (uuids: string[] = []) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     // do not throw error if node defs are missing
     Surveys.findNodeDefsByUuids({ survey, uuids })
 
 // Note: returns a survey getter, not the source node def itself (null if the node def is not virtual).
-export const getNodeDefSource = (nodeDef: AnyNodeDef): ((survey: Survey) => AnyNodeDef | null) | null =>
+export const getNodeDefSource = (nodeDef: AnyNodeDef): ((survey: ArenaSurvey) => AnyNodeDef | null) | null =>
   NodeDef.isVirtual(nodeDef) ? getNodeDefByUuid(NodeDef.getParentUuid(nodeDef)) : null
 
 const filterNodeDefsWithoutSiblings = (nodeDefs: AnyNodeDef[]): AnyNodeDef[] => {
@@ -85,7 +85,7 @@ export const getNodeDefChildren =
     includeLayoutElements?: boolean
     includeSamplingDefsWithoutSiblings?: boolean
   } = {}) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const surveyIndexed = survey.nodeDefsIndex ? survey : SurveyNodeDefsIndex.initAndAssocNodeDefsIndex(survey)
     let childDefs = Surveys.getNodeDefChildren({
       survey: surveyIndexed,
@@ -123,7 +123,7 @@ export const getNodeDefChildrenSorted =
     includeLayoutElements?: boolean
     includeSamplingDefsWithoutSiblings?: boolean
   }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const cycleKeysToConsider = Objects.isEmpty(cycle) ? Surveys.getCycleKeys(survey) : [cycle]
     // get child defs from the cycles to consider, then combine them keeping their sorting
     let childDefs: AnyNodeDef[] = []
@@ -160,7 +160,7 @@ export const getNodeDefChildrenInOwnPage =
     includeAnalysis?: boolean
     includeLayoutElements?: boolean
   }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const children = getNodeDefChildren({ nodeDef, includeAnalysis, includeLayoutElements })(survey)
     const childrenInOwnPage = children.filter(NodeDefLayout.hasPage(cycle))
     const childrenIndex: string[] = NodeDefLayout.getIndexChildren(cycle)(nodeDef)
@@ -208,7 +208,7 @@ export const getNodeDefDescendantsInSingleEntities =
     cycle = null,
     includeSamplingDefsWithoutSiblings = false,
   }: DescendantsInSingleEntitiesParams) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const descendants: AnyNodeDef[] = []
 
     const queue = new Queue()
@@ -252,7 +252,7 @@ export const getNodeDefDescendantAttributesInSingleEntities = ({
 
 export const hasNodeDefChildrenEntities =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): boolean => {
+  (survey: ArenaSurvey): boolean => {
     if (NodeDef.isAttribute(nodeDef)) {
       return false
     }
@@ -261,14 +261,14 @@ export const hasNodeDefChildrenEntities =
 
 export const getNodeDefChildByName =
   (nodeDef: AnyNodeDef, childName: string) =>
-  (survey: Survey): AnyNodeDef | undefined =>
+  (survey: ArenaSurvey): AnyNodeDef | undefined =>
     SurveyNodeDefsIndex.hasNodeDefsIndexByName(survey)
       ? Surveys.getNodeDefByName({ survey, name: childName })
       : getNodeDefChildren({ nodeDef })(survey).find((childDef) => childName === NodeDef.getName(childDef))
 
 export const getNodeDefParent =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef | null => {
+  (survey: ArenaSurvey): AnyNodeDef | null => {
     if (NodeDef.isRoot(nodeDef)) return null
     const nodeDefParent = getNodeDefByUuid(NodeDef.getParentUuid(nodeDef))(survey)
     return NodeDef.isVirtual(nodeDef) ? getNodeDefParent(nodeDefParent)(survey) : nodeDefParent
@@ -276,65 +276,65 @@ export const getNodeDefParent =
 
 export const getNodeDefAreaBasedEstimate =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef | undefined =>
+  (survey: ArenaSurvey): AnyNodeDef | undefined =>
     getNodeDefsArray(survey).find((_nodeDef) => NodeDef.getAreaBasedEstimatedOf(_nodeDef) === NodeDef.getUuid(nodeDef))
 
 export const getAreaBasedEstimatedOfNodeDef =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef | null =>
+  (survey: ArenaSurvey): AnyNodeDef | null =>
     getNodeDefByUuid(NodeDef.getAreaBasedEstimatedOf(nodeDef))(survey)
 
 const _nodeDefKeysFilter = (nodeDef: AnyNodeDef): boolean => NodeDef.isKey(nodeDef) && !NodeDef.isDeleted(nodeDef)
 
 export const getNodeDefKeys =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefDescendantAttributesInSingleEntities({ nodeDef })(survey).filter(_nodeDefKeysFilter)
 
 export const getNodeDefKeysSorted =
   ({ nodeDef, cycle }: { nodeDef: AnyNodeDef; cycle?: string | null }) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefDescendantsInSingleEntities({ nodeDef, cycle, sorted: true })(survey).filter(_nodeDefKeysFilter)
 
-export const getNodeDefRootKeys = (survey: Survey): AnyNodeDef[] => {
+export const getNodeDefRootKeys = (survey: ArenaSurvey): AnyNodeDef[] => {
   const root = getNodeDefRoot(survey)
   return root ? getNodeDefKeys(root)(survey) : []
 }
 
 export const getNodeDefRootKeysSorted =
   ({ cycle }: { cycle?: string | null }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const root = getNodeDefRoot(survey)
     return root ? getNodeDefKeysSorted({ nodeDef: root, cycle })(survey) : []
   }
 
 export const getSummaryDefs =
   ({ nodeDef, cycle }: { nodeDef: AnyNodeDef; cycle: string }) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefDescendantAttributesInSingleEntities({ nodeDef, cycle, sorted: true })(survey).filter((childDef) =>
       NodeDefLayout.isIncludedInMultipleEntitySummary(cycle)(childDef)
     )
 
 export const getRootSummaryDefs =
   ({ cycle }: { cycle: string }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const root = getNodeDefRoot(survey)
     return root ? getSummaryDefs({ nodeDef: root, cycle })(survey) : []
   }
 
 export const isNodeDefRootKey =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): boolean =>
+  (survey: ArenaSurvey): boolean =>
     NodeDef.isKey(nodeDef) && NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
 export const canNodeDefBeQualifier =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): boolean =>
+  (survey: ArenaSurvey): boolean =>
     (NodeDef.isText(nodeDef) || NodeDef.isCode(nodeDef)) &&
     !NodeDef.isMultiple(nodeDef) &&
     NodeDef.isRoot(getNodeDefParent(nodeDef)(survey))
 
-export const getNodeDefsRootUnique = (survey: Survey): AnyNodeDef[] => {
+export const getNodeDefsRootUnique = (survey: ArenaSurvey): AnyNodeDef[] => {
   const nodeDefRoot = getNodeDefRoot(survey)
   return getNodeDefChildren({ nodeDef: nodeDefRoot })(survey).filter(
     (nodeDef) =>
@@ -346,32 +346,32 @@ export const getNodeDefsRootUnique = (survey: Survey): AnyNodeDef[] => {
 
 export const getNodeDefByName =
   (name: string) =>
-  (survey: Survey): AnyNodeDef =>
+  (survey: ArenaSurvey): AnyNodeDef =>
     Surveys.getNodeDefByName({ survey, name })
 
 export const getNodeDefsByCategoryUuid =
   (uuid: string) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefsArray(survey).filter(A.pathEq([NodeDef.keys.props, NodeDef.propKeys.categoryUuid], uuid))
 
 export const getNodeDefsByTaxonomyUuid =
   (uuid: string) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefsArray(survey).filter(A.pathEq([NodeDef.keys.props, NodeDef.propKeys.taxonomyUuid], uuid))
 
 export const findNodeDef =
   (predicate: NodeDefPredicate) =>
-  (survey: Survey): AnyNodeDef | undefined =>
+  (survey: ArenaSurvey): AnyNodeDef | undefined =>
     getNodeDefsArray(survey).find(predicate)
 
 export const findNodeDefByName =
   (name: string) =>
-  (survey: Survey): AnyNodeDef | undefined =>
+  (survey: ArenaSurvey): AnyNodeDef | undefined =>
     Surveys.findNodeDefByName({ survey, name })
 
 export const getNodeDefMaxDecimalDigits =
   (nodeDef: AnyNodeDef) =>
-  (survey?: Survey | null): number => {
+  (survey?: ArenaSurvey | null): number => {
     const referenceNodeDef =
       survey && NodeDef.isAreaBasedEstimatedOf(nodeDef) ? getAreaBasedEstimatedOfNodeDef(nodeDef)(survey) : nodeDef
     return NodeDef.getMaxNumberDecimalDigits(referenceNodeDef)
@@ -450,7 +450,7 @@ export const cloneNodeDef =
     ignoreValidations?: boolean
     existingNodeDefNames?: string[] | null
   }) =>
-  (survey: Survey): { clonedNodeDefs: AnyNodeDef[]; rootClonedNodeDef: AnyNodeDef } => {
+  (survey: ArenaSurvey): { clonedNodeDefs: AnyNodeDef[]; rootClonedNodeDef: AnyNodeDef } => {
     const nodeDef = getNodeDefByUuid(nodeDefUuid)(survey)
     const nodeDefParent = getNodeDefByUuid(targetParentNodeDefUuid)(survey)
     const existingNodeDefNames = existingNodeDefNamesParam ?? getNodeDefsArray(survey).map((nd) => NodeDef.getName(nd))
@@ -519,7 +519,7 @@ export const findAncestors =
     includeSelf?: boolean
     stopAtFirstFound?: boolean
   }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const result: AnyNodeDef[] = []
     let nodeDefToVisit = includeSelf ? nodeDef : getNodeDefParent(nodeDef)(survey)
     while (nodeDefToVisit) {
@@ -537,12 +537,12 @@ export const findAncestors =
 
 export const findAncestor =
   ({ nodeDef, predicate }: { nodeDef: AnyNodeDef; predicate: NodeDefPredicate }) =>
-  (survey: Survey): AnyNodeDef | undefined =>
+  (survey: ArenaSurvey): AnyNodeDef | undefined =>
     findAncestors({ nodeDef, predicate, includeSelf: false, stopAtFirstFound: true })(survey)[0]
 
 export const visitAncestors =
   (nodeDef: AnyNodeDef, visitorFn: NodeDefVisitor, includeSelf = true) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     findAncestors({ nodeDef, visitorFn, includeSelf })(survey)
 
 export const visitAncestorsAndSelf = (nodeDef: AnyNodeDef, visitorFn: NodeDefVisitor) =>
@@ -550,7 +550,7 @@ export const visitAncestorsAndSelf = (nodeDef: AnyNodeDef, visitorFn: NodeDefVis
 
 export const isNodeDefAncestor =
   (nodeDefAncestor: AnyNodeDef, nodeDefDescendant: AnyNodeDef) =>
-  (survey: Survey): boolean => {
+  (survey: ArenaSurvey): boolean => {
     if (NodeDef.isRoot(nodeDefDescendant)) {
       return false
     }
@@ -562,7 +562,7 @@ export const isNodeDefAncestor =
 
 export const getNodeDefAncestorMultipleEntity =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef | null => {
+  (survey: ArenaSurvey): AnyNodeDef | null => {
     let nodeDefCurrent = nodeDef
     do {
       nodeDefCurrent = getNodeDefParent(nodeDefCurrent)(survey)
@@ -572,7 +572,7 @@ export const getNodeDefAncestorMultipleEntity =
 
 export const getNodeDefAncestorsKeyAttributes =
   (nodeDef: AnyNodeDef, includeSelf = false) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     let ancestorsKeyAttributes: AnyNodeDef[] = []
     visitAncestors(
       nodeDef,
@@ -588,7 +588,7 @@ export const getNodeDefAncestorsKeyAttributes =
 
 export const getNodeDefAncestorsKeyAttributesByAncestorUuid =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): Record<string, AnyNodeDef[]> => {
+  (survey: ArenaSurvey): Record<string, AnyNodeDef[]> => {
     const ancestorsKeyAttributesIndexed: Record<string, AnyNodeDef[]> = {}
     visitAncestors(nodeDef, (ancestorDef) => {
       const ancestorKeyAttributes = getNodeDefKeys(ancestorDef)(survey)
@@ -611,7 +611,7 @@ export const getNodeDefPath =
     includeRootEntity?: boolean
     separator?: string
   }) =>
-  (survey: Survey): string => {
+  (survey: ArenaSurvey): string => {
     const pathParts: string[] = []
 
     visitAncestorsAndSelf(nodeDef, (currentNodeDef) => {
@@ -625,7 +625,7 @@ export const getNodeDefPath =
 
 export const getHierarchy =
   (filterFn: NodeDefPredicate = NodeDef.isEntity, cycle: string | undefined = undefined) =>
-  (survey: Survey): { root: NodeDefHierarchyItem; length: number } => {
+  (survey: ArenaSurvey): { root: NodeDefHierarchyItem; length: number } => {
     let length = 1
     const h = (array: NodeDefHierarchyItem[], nodeDef: AnyNodeDef): NodeDefHierarchyItem[] => {
       const childDefs: AnyNodeDef[] = []
@@ -683,7 +683,7 @@ export const visitDescendantsAndSelf =
     visitorFn,
     traverseMethod = TraverseMethod.bfs,
   }: VisitDescendantsParams & { visitorFn: NodeDefVisitor }) =>
-  (survey: Survey): void => {
+  (survey: ArenaSurvey): void => {
     const nodeDefToVisit = nodeDef ?? getNodeDefRoot(survey)
     return Surveys.visitDescendantsAndSelfNodeDef({
       survey,
@@ -700,7 +700,7 @@ export const findDescendants =
     cycle = null,
     filterFn,
   }: Omit<VisitDescendantsParams, 'traverseMethod'> & { filterFn: NodeDefPredicate }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const descendants: AnyNodeDef[] = []
     visitDescendantsAndSelf({
       nodeDef,
@@ -716,7 +716,7 @@ export const findDescendants =
 
 export const getNodeDefDescendantsAndSelf =
   ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs }: VisitDescendantsParams = {}) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     const descendants: AnyNodeDef[] = []
     visitDescendantsAndSelf({
       nodeDef,
@@ -731,7 +731,7 @@ export const getNodeDefDescendantsAndSelf =
 
 export const getNodeDefDescendants =
   ({ nodeDef = null, cycle = null, traverseMethod = TraverseMethod.bfs }: VisitDescendantsParams = {}) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     getNodeDefDescendantsAndSelf({ nodeDef, cycle, traverseMethod })(survey).filter(
       (descendant) => !NodeDef.isEqual(nodeDef)(descendant)
     )
@@ -740,7 +740,7 @@ export const getNodeDefDescendants =
 const multipleEntityFilterFunction = (nodeDef: AnyNodeDef): boolean =>
   NodeDef.isRoot(nodeDef) || NodeDef.isMultipleEntity(nodeDef)
 
-export const getOlapDataTableEntityDefs = (survey: Survey): AnyNodeDef[] =>
+export const getOlapDataTableEntityDefs = (survey: ArenaSurvey): AnyNodeDef[] =>
   ArrayUtils.sortById(findDescendants({ filterFn: multipleEntityFilterFunction })(survey)) as AnyNodeDef[]
 
 // ====== NODE DEFS CODE UTILS
@@ -748,24 +748,24 @@ export const getNodeDefParentCode = (nodeDef: AnyNodeDef) => getNodeDefByUuid(No
 
 export const getNodeDefAncestorCodes =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): AnyNodeDef[] =>
+  (survey: ArenaSurvey): AnyNodeDef[] =>
     Surveys.getNodeDefAncestorCodes({ survey, nodeDef: nodeDef as NodeDefCode })
 
 export const isNodeDefParentCode =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): boolean =>
+  (survey: ArenaSurvey): boolean =>
     getNodeDefsArray(survey).some((def) => NodeDef.getParentCodeDefUuid(def) === NodeDef.getUuid(nodeDef))
 
 export const getNodeDefCategoryLevelIndex =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): number => {
+  (survey: ArenaSurvey): number => {
     const parentCodeNodeDef = getNodeDefParentCode(nodeDef)(survey)
     return parentCodeNodeDef ? 1 + getNodeDefCategoryLevelIndex(parentCodeNodeDef)(survey) : 0
   }
 
 export const getNodeDefCodeCandidateParents =
   ({ nodeDef, category }: { nodeDef: AnyNodeDef; category: ArenaCategory }) =>
-  (survey: Survey): AnyNodeDef[] => {
+  (survey: ArenaSurvey): AnyNodeDef[] => {
     if (!category || !nodeDef) {
       return []
     }
@@ -788,6 +788,6 @@ export const getNodeDefCodeCandidateParents =
 
 export const canUpdateCategory =
   (nodeDef: AnyNodeDef) =>
-  (survey: Survey): boolean =>
+  (survey: ArenaSurvey): boolean =>
     (!NodeDef.isPublished(nodeDef) || SurveyInfo.isTemplate(SurveyInfo.getInfo(survey))) &&
     !isNodeDefParentCode(nodeDef)(survey)
