@@ -137,11 +137,11 @@ RecordEntryButtons.propTypes = {
 }
 
 const FormEntryActions = (props) => {
-  const { disableLockUnlock = false, disableValidationReport = false, entry = false } = props
+  const { disableLockUnlock = false, disableValidationReport = false, entry = false, preview = false } = props
 
   return (
     <div className="survey-form-header__actions">
-      {entry && (
+      {entry && !preview && (
         <RecordEntryButtons disableLockUnlock={disableLockUnlock} disableValidationReport={disableValidationReport} />
       )}
     </div>
@@ -152,6 +152,7 @@ FormEntryActions.propTypes = {
   disableLockUnlock: PropTypes.bool,
   disableValidationReport: PropTypes.bool,
   entry: PropTypes.bool,
+  preview: PropTypes.bool,
 }
 
 export default FormEntryActions

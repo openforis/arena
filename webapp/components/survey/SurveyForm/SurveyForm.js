@@ -201,6 +201,7 @@ const SurveyForm = (props) => {
         edit={edit}
         analysis={analysis}
         entry={entry}
+        preview={preview}
         canEditDef={canEditDef}
       />
 
