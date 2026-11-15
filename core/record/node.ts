@@ -245,7 +245,7 @@ export const removeFlags =
   }
 
 export const assocDateModified =
-  (dateModified: string): NodeUpdater =>
+  (dateModified: string | Date): NodeUpdater =>
   (node) =>
     A.assoc(keys.dateModified, dateModified, node)
 
@@ -269,7 +269,9 @@ export const isValueBlank = (node: Node): boolean => {
   return A.isEmpty(value)
 }
 
-export const hasUserInputValue = (node: Node): boolean => !isValueBlank(node) && !isDefaultValueApplied(node)
+// values filled in from a user group qualifier are not user input
+export const hasUserInputValue = (node: Node): boolean =>
+  !isValueBlank(node) && !isDefaultValueApplied(node) && !isQualifierValueApplied(node)
 
 // ====== Node Value extractor
 

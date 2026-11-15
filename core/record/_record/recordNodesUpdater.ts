@@ -5,6 +5,15 @@ import {
   RecordUpdateResult,
   NodeValues,
 } from '@openforis/arena-core'
+import type {
+  ArenaRecord,
+  ArenaRecordNode,
+  CategoryItemProvider,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  NodeRefData as ArenaNodeRefData,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -22,8 +31,23 @@ const { createRootEntity, deleteNodes } = CoreRecordUpdater
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
 import { afterNodesUpdate } from './recordNodesUpdaterCommon'
+import type { EntityKeysIndexCache } from './entityKeysIndexCache'
 
-const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type ValuesByDefUuid = Record<string, any>
+// RecordEvaluationContext params, forwarded to arena-core
+type ContextParams = { [contextParam: string]: unknown }
+type EntityAndUpdateResult = { entity: ArenaRecordNode; updateResult: RecordUpdateResult | null }
+
+const getKeyValuePairs = ({
+  survey,
+  entityDef,
+  valuesByDefUuid,
+}: {
+  survey: ArenaSurvey
+  entityDef: AnyNodeDef
+  valuesByDefUuid: ValuesByDefUuid
+}): string => {
   const keyDefs = Survey.getNodeDefKeys(entityDef)(survey)
   return keyDefs
     .map((keyDef) => {
@@ -36,7 +60,14 @@ const getKeyValuePairs = ({ survey, entityDef, valuesByDefUuid }) => {
     .join(',')
 }
 
-const _getOrFetchCategoryItem = async ({ survey, categoryItemProvider, attribute }) => {
+// the provider (optional in the evaluation context) is used only for items not found in the survey ref data
+type CategoryItemProviderParams = { survey: ArenaSurvey; categoryItemProvider?: CategoryItemProvider }
+
+const _getOrFetchCategoryItem = async ({
+  survey,
+  categoryItemProvider,
+  attribute,
+}: CategoryItemProviderParams & { attribute: ArenaRecordNode }) => {
   const refDataItem = NodeRefData.getCategoryItem(attribute)
   if (refDataItem) {
     return refDataItem
@@ -53,10 +84,15 @@ const _getOrFetchCategoryItem = async ({ survey, categoryItemProvider, attribute
   const nodeDefUuid = Node.getNodeDefUuid(attribute)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+  const item = await categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+  return item
 }
 
-const _getCodeAttributeCode = async ({ survey, categoryItemProvider, attribute }) => {
+const _getCodeAttributeCode = async ({
+  survey,
+  categoryItemProvider,
+  attribute,
+}: CategoryItemProviderParams & { attribute: ArenaRecordNode }): Promise<string | null> => {
   const value = Node.getValue(attribute)
   const code = NodeValues.getValueCode(value)
   if (Objects.isNotEmpty(code)) {
@@ -73,7 +109,12 @@ const _findCategoryItemUuidByAttribute = async ({
   parentNode,
   attributeDef,
   value,
-}) => {
+}: CategoryItemProviderParams & {
+  record: ArenaRecord
+  parentNode: ArenaRecordNode
+  attributeDef: AnyNodeDef
+  value: any
+}): Promise<string | null> => {
   const valueItemUuid = NodeValues.getValueItemUuid(value)
   if (valueItemUuid) {
     return valueItemUuid
@@ -98,7 +139,7 @@ const _findCategoryItemUuidByAttribute = async ({
   const ancestorCodes = await Promise.all(
     ancestorCodeAttributes.map((attribute) => _getCodeAttributeCode({ survey, categoryItemProvider, attribute }))
   )
-  if (ancestorCodes.some(Objects.isEmpty)) {
+  if (ancestorCodes.some((ancestorCode) => Objects.isEmpty(ancestorCode))) {
     return null
   }
   const codePaths = [...ancestorCodes, code]
@@ -106,7 +147,9 @@ const _findCategoryItemUuidByAttribute = async ({
   return item ? item.uuid : null
 }
 
-const _valueAdapterByType = {
+type ValueAdapter = (params: CategoryItemProviderParams & Omit<AttributeValueParams, 'context'>) => Promise<any>
+
+const _valueAdapterByType: Record<string, ValueAdapter> = {
   [NodeDef.nodeDefType.code]: async ({ survey, categoryItemProvider, record, parentNode, attributeDef, value }) => {
     if (NodeValues.getValueItemUuid(value)) {
       return value
@@ -131,14 +174,38 @@ const _valueAdapterByType = {
 }
 
 // params (context) are the ones of RecordEvaluationContext: providers are taken from there
-const _adaptValue = async ({ context, record, parentNode, attributeDef, value }) => {
+type AttributeValueParams = {
+  context: RecordEvaluationContext
+  record: ArenaRecord
+  parentNode: ArenaRecordNode
+  attributeDef: AnyNodeDef
+  value: any
+}
+
+const _adaptValue = async ({ context, record, parentNode, attributeDef, value }: AttributeValueParams) => {
   const valueAdapter = _valueAdapterByType[NodeDef.getType(attributeDef)]
-  return valueAdapter ? valueAdapter({ ...context, record, parentNode, attributeDef, value }) : value
+  if (!valueAdapter) return value
+  const valueAdapted = await valueAdapter({ ...context, record, parentNode, attributeDef, value })
+  return valueAdapted
 }
 
 const _addOrUpdateAttribute =
-  ({ context, entity, attributeDef, value: valueParam, refData = null, sideEffect = false }) =>
-  async (record) => {
+  ({
+    context,
+    entity,
+    attributeDef,
+    value: valueParam,
+    refData = null,
+    sideEffect = false,
+  }: {
+    context: RecordEvaluationContext
+    entity: ArenaRecordNode
+    attributeDef: AnyNodeDef
+    value: any
+    refData?: ArenaNodeRefData | null
+    sideEffect?: boolean
+  }) =>
+  async (record: ArenaRecord): Promise<RecordUpdateResult | null> => {
     const { survey } = context
     const attributeDefUuid = NodeDef.getUuid(attributeDef)
     const attribute = RecordReader.getNodeChildByDefUuid(entity, attributeDefUuid)(record)
@@ -165,8 +232,20 @@ const _addOrUpdateAttribute =
   }
 
 const _addEntityAndKeyValues =
-  ({ context, entityDef, parentNode, keyValuesByDefUuid, sideEffect = false }) =>
-  async (record) => {
+  ({
+    context,
+    entityDef,
+    parentNode,
+    keyValuesByDefUuid,
+    sideEffect = false,
+  }: {
+    context: RecordEvaluationContext
+    entityDef: AnyNodeDef
+    parentNode: ArenaRecordNode
+    keyValuesByDefUuid: ValuesByDefUuid
+    sideEffect?: boolean
+  }) =>
+  async (record: ArenaRecord): Promise<EntityAndUpdateResult> => {
     const { survey } = context
     const updateResult = new RecordUpdateResult({ record })
     const updateResultDescendants = await CoreRecordNodesUpdater.addNodeAndDescendants({
@@ -207,9 +286,24 @@ const _addEntityAndKeyValues =
     return { entity, updateResult }
   }
 
+type GetOrCreateEntityParams = {
+  entityDefUuid: string
+  valuesByDefUuid: ValuesByDefUuid
+  insertMissingNodes?: boolean
+  sideEffect?: boolean
+  entityKeysIndexCache?: EntityKeysIndexCache | null
+}
+
 const _getOrCreateEntityByKeys =
-  ({ context, entityDefUuid, valuesByDefUuid, insertMissingNodes, sideEffect = false, entityKeysIndexCache = null }) =>
-  async (record) => {
+  ({
+    context,
+    entityDefUuid,
+    valuesByDefUuid,
+    insertMissingNodes,
+    sideEffect = false,
+    entityKeysIndexCache = null,
+  }: GetOrCreateEntityParams & { context: RecordEvaluationContext }) =>
+  async (record: ArenaRecord): Promise<EntityAndUpdateResult> => {
     const { survey } = context
     if (NodeDef.getUuid(Survey.getNodeDefRoot(survey)) === entityDefUuid) {
       return { entity: RecordReader.getRootNode(record), updateResult: null }
@@ -273,14 +367,14 @@ const _getOrCreateEntityByKeys =
 
 /**
  * Finds the entity with the specified key values, inserting it (and its keys) if missing and insertMissingNodes is true.
- * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
- * @param {!string} params.entityDefUuid - The UUID of the entity definition.
- * @param {!object} params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
- * @param {boolean} [params.insertMissingNodes] - Whether to insert the entity when not found.
- * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
- * @param {boolean} [params.updateDependents] - Whether to update the dependent nodes of the inserted ones.
- * @param {object} [params.entityKeysIndexCache] - Cache of the entities indexed by key values.
- * @returns {function(object): Promise<object>} - Function taking the record and returning the entity and the update result.
+ * @param params - The RecordEvaluationContext params, plus the following ones.
+ * @param params.entityDefUuid - The UUID of the entity definition.
+ * @param params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
+ * @param params.insertMissingNodes - Whether to insert the entity when not found.
+ * @param params.sideEffect - Whether to update the record and the nodes in place.
+ * @param params.updateDependents - Whether to update the dependent nodes of the inserted ones.
+ * @param params.entityKeysIndexCache - Cache of the entities indexed by key values.
+ * @returns Function taking the record and returning the entity and the update result.
  */
 const getOrCreateEntityByKeys =
   ({
@@ -291,8 +385,8 @@ const getOrCreateEntityByKeys =
     updateDependents = true,
     entityKeysIndexCache = null,
     ...otherParams
-  }) =>
-  async (record) => {
+  }: GetOrCreateEntityParams & { updateDependents?: boolean } & ContextParams) =>
+  async (record: ArenaRecord): Promise<{ entity: ArenaRecordNode; updateResult: RecordUpdateResult }> => {
     const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
@@ -323,7 +417,7 @@ const getOrCreateEntityByKeys =
     return { entity, updateResult }
   }
 
-const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
+const _canAttributeBeUpdated = ({ entityDef, attributeDef }: { entityDef: AnyNodeDef; attributeDef: AnyNodeDef }) =>
   // consider only attributes descendants of the specified entity
   NodeDef.isDescendantOf(entityDef)(attributeDef) &&
   (NodeDef.isRoot(entityDef) || !NodeDef.isKey(attributeDef)) &&
@@ -332,22 +426,35 @@ const _canAttributeBeUpdated = ({ entityDef, attributeDef }) =>
 
 /**
  * Updates the attributes descendants of the specified entity with the specified values.
- * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
- * @param {!object} params.entity - The entity whose descendant attributes will be updated.
- * @param {!object} params.valuesByDefUuid - The values indexed by attribute definition UUID.
- * @param {object} [params.refDataByDefUuid] - The ref data of the values indexed by attribute definition UUID.
- * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
- * @param {boolean} [params.updateDependents] - Whether to update the dependent nodes of the updated ones.
- * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ * @param params - The RecordEvaluationContext params, plus the following ones.
+ * @param params.entity - The entity whose descendant attributes will be updated.
+ * @param params.valuesByDefUuid - The values indexed by attribute definition UUID.
+ * @param params.refDataByDefUuid - The ref data of the values indexed by attribute definition UUID.
+ * @param params.sideEffect - Whether to update the record and the nodes in place.
+ * @param params.updateDependents - Whether to update the dependent nodes of the updated ones.
+ * @returns Function taking the record and returning the update result.
  */
 const updateAttributesInEntityWithValues =
-  ({ entity, valuesByDefUuid, refDataByDefUuid = null, sideEffect = false, updateDependents = true, ...otherParams }) =>
-  async (record) => {
+  ({
+    entity,
+    valuesByDefUuid,
+    refDataByDefUuid = null,
+    sideEffect = false,
+    updateDependents = true,
+    ...otherParams
+  }: {
+    entity: ArenaRecordNode
+    valuesByDefUuid: ValuesByDefUuid
+    refDataByDefUuid?: Record<string, ArenaNodeRefData> | null
+    sideEffect?: boolean
+    updateDependents?: boolean
+  } & ContextParams) =>
+  async (record: ArenaRecord): Promise<RecordUpdateResult> => {
     const context = RecordEvaluationContext.extract(otherParams)
     const { survey } = context
     const updateResult = new RecordUpdateResult({ record })
 
-    const updateDependentNodes = async (nodeUpdateResult) => {
+    const updateDependentNodes = async (nodeUpdateResult: RecordUpdateResult | null): Promise<void> => {
       if (!nodeUpdateResult) return
 
       updateResult.merge(nodeUpdateResult)
@@ -397,16 +504,22 @@ const updateAttributesInEntityWithValues =
 /**
  * Updates the attributes descendants of the entity with the specified key values, inserting it if missing and
  * insertMissingNodes is true.
- * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
- * @param {!string} params.entityDefUuid - The UUID of the entity definition.
- * @param {!object} params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
- * @param {boolean} [params.insertMissingNodes] - Whether to insert the entity when not found.
- * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
- * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ * @param params - The RecordEvaluationContext params, plus the following ones.
+ * @param params.entityDefUuid - The UUID of the entity definition.
+ * @param params.valuesByDefUuid - The values (including the key values) indexed by attribute definition UUID.
+ * @param params.insertMissingNodes - Whether to insert the entity when not found.
+ * @param params.sideEffect - Whether to update the record and the nodes in place.
+ * @returns Function taking the record and returning the update result.
  */
 const updateAttributesWithValues =
-  ({ entityDefUuid, valuesByDefUuid, insertMissingNodes = false, sideEffect = false, ...otherParams }) =>
-  async (record) => {
+  ({
+    entityDefUuid,
+    valuesByDefUuid,
+    insertMissingNodes = false,
+    sideEffect = false,
+    ...otherParams
+  }: Omit<GetOrCreateEntityParams, 'entityKeysIndexCache'> & ContextParams) =>
+  async (record: ArenaRecord): Promise<RecordUpdateResult> => {
     const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
@@ -436,19 +549,24 @@ const updateAttributesWithValues =
 
 /**
  * Deletes the nodes of the specified definitions children of the specified entity.
- * @param {!object} params - The RecordEvaluationContext params, plus the following ones.
- * @param {!object} params.entity - The parent entity of the nodes to delete.
- * @param {!string[]} params.nodeDefUuids - The UUIDs of the definitions of the nodes to delete.
- * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
- * @returns {function(object): Promise<object>} - Function taking the record and returning the update result.
+ * @param params - The RecordEvaluationContext params, plus the following ones.
+ * @param params.entity - The parent entity of the nodes to delete.
+ * @param params.nodeDefUuids - The UUIDs of the definitions of the nodes to delete.
+ * @param params.sideEffect - Whether to update the record and the nodes in place.
+ * @returns Function taking the record and returning the update result.
  */
 const deleteNodesInEntityByNodeDefUuid =
-  ({ entity, nodeDefUuids, sideEffect = false, ...otherParams }) =>
-  async (record) => {
+  ({
+    entity,
+    nodeDefUuids,
+    sideEffect = false,
+    ...otherParams
+  }: { entity: ArenaRecordNode; nodeDefUuids: string[]; sideEffect?: boolean } & ContextParams) =>
+  async (record: ArenaRecord): Promise<RecordUpdateResult> => {
     const context = RecordEvaluationContext.extract(otherParams)
     const updateResult = new RecordUpdateResult({ record })
 
-    const nodeUuidsToDelete = []
+    const nodeUuidsToDelete: string[] = []
     for (const nodeDefUuid of nodeDefUuids) {
       const children = RecordReader.getNodeChildrenByDefUuid(entity, nodeDefUuid)(record)
       nodeUuidsToDelete.push(...children.map(Node.getUuid))
