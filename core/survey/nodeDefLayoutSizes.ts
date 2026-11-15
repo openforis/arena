@@ -1,9 +1,14 @@
+import type { NodeDef as ArenaNodeDef, NodeDefCoordinate, NodeDefType } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 
-const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE = {
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type GridItemHeightFn = (params: { nodeDef: AnyNodeDef }) => number
+
+const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE: Partial<Record<string, GridItemHeightFn>> = {
   [NodeDef.nodeDefType.coordinate]: ({ nodeDef }) => {
     const minHeight = 2
-    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef).length
+    const additionalFieldsNum = NodeDef.getCoordinateAdditionalFields(nodeDef as NodeDefCoordinate).length
     if (additionalFieldsNum === 0) return minHeight
     // 1 additional field => height += 1
     // 2 or 3 additional fields => height += 2
@@ -14,14 +19,14 @@ const GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE = {
     NodeDef.getTextInputType(nodeDef) === NodeDef.textInputTypes.multiLine ? 2 : 1,
 }
 
-const GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE = {
+const GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE: Partial<Record<string, GridItemHeightFn>> = {
   [NodeDef.nodeDefType.coordinate]: GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.nodeDefType.coordinate],
 }
 
-const getMinGridItemHeight = ({ nodeDef }) =>
+const getMinGridItemHeight = ({ nodeDef }: { nodeDef: AnyNodeDef }): number =>
   GRID_LAYOUT_MIN_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef }) ?? 1
 
-const getMaxGridItemHeight = ({ nodeDef }) =>
+const getMaxGridItemHeight = ({ nodeDef }: { nodeDef: AnyNodeDef }): number | undefined =>
   GRID_LAYOUT_MAX_HEIGHT_BY_NODE_DEF_TYPE[NodeDef.getType(nodeDef)]?.({ nodeDef })
 
 export const NodeDefLayoutSizes = {
