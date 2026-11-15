@@ -211,7 +211,7 @@
     "react-dropzone": "^20.2.0",
     "react-error-boundary": "^6.1.6",
     "react-google-recaptcha": "^3.1.0",
-    "react-grid-layout": "^2.3.0",
+    "react-grid-layout": "patch:react-grid-layout@npm%3A2.3.0#~/.yarn/patches/react-grid-layout-npm-2.3.0-14aabb1c4f.patch",
     "react-i18next": "^18.0.1",
     "react-is": "^19.3.1",
     "react-leaflet": "^5.0.0",
