@@ -34,7 +34,7 @@ export const TaxonomyCloneFromSurveyDialog = (props: TaxonomyCloneFromSurveyDial
   const { surveys, surveysLoading } = useOtherSurveysList()
   const [sourceSurvey, setSourceSurvey] = useState<object | null>(null)
 
-  const [taxonomiesBySurveyId, setTaxonomiesBySurveyId] = useState<Record<string, object[]>>({})
+  const [taxonomiesBySurveyId, setTaxonomiesBySurveyId] = useState<Record<string, ArenaTaxonomy[]>>({})
   const [loadingSurveyId, setLoadingSurveyId] = useState<string | number | null>(null)
   const [sourceTaxonomy, setSourceTaxonomy] = useState<ArenaTaxonomy | null>(null)
 
@@ -62,7 +62,7 @@ export const TaxonomyCloneFromSurveyDialog = (props: TaxonomyCloneFromSurveyDial
 
       setLoadingSurveyId(surveyId)
       API.fetchTaxonomies({ surveyId, draft: true })
-        .then((taxonomiesFetched: object[]) => {
+        .then((taxonomiesFetched: ArenaTaxonomy[]) => {
           setTaxonomiesBySurveyId((statePrev) => ({ ...statePrev, [surveyId]: taxonomiesFetched }))
         })
         .catch(() => {
@@ -136,8 +136,8 @@ export const TaxonomyCloneFromSurveyDialog = (props: TaxonomyCloneFromSurveyDial
           <Dropdown
             disabled={!sourceSurvey}
             items={taxonomies ?? []}
-            itemLabel={(taxonomy: object) => Taxonomy.getName(taxonomy)}
-            itemValue={(taxonomy: object) => Taxonomy.getUuid(taxonomy)}
+            itemLabel={(taxonomy: ArenaTaxonomy) => Taxonomy.getName(taxonomy)}
+            itemValue={(taxonomy: ArenaTaxonomy) => Taxonomy.getUuid(taxonomy)}
             loading={taxonomiesLoading}
             onChange={setSourceTaxonomy}
             placeholder={taxonomyDropdownPlaceholder}

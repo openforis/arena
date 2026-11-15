@@ -1,5 +1,19 @@
 import * as A from '@core/arena'
 
+export interface SamplingPolygon {
+  controlPointOffsetNorth?: number
+  controlPointOffsetEast?: number
+  isCircle?: boolean
+  lengthLatitude?: number
+  lengthLongitude?: number
+  numberOfPointsCircle?: number
+  numberOfPointsEast?: number
+  numberOfPointsNorth?: number
+  offsetEast?: number
+  offsetNorth?: number
+  radius?: number
+}
+
 const keys = {
   controlPointOffsetNorth: 'controlPointOffsetNorth',
   controlPointOffsetEast: 'controlPointOffsetEast',
@@ -12,9 +26,9 @@ const keys = {
   offsetEast: 'offsetEast',
   offsetNorth: 'offsetNorth',
   radius: 'radius',
-}
+} as const
 
-const samplingPolygonDefaults = {
+const samplingPolygonDefaults: Required<SamplingPolygon> = {
   [keys.controlPointOffsetNorth]: 0,
   [keys.controlPointOffsetEast]: 0,
   [keys.isCircle]: true,
@@ -28,10 +42,16 @@ const samplingPolygonDefaults = {
   [keys.radius]: 0,
 }
 
-export const getSamplingPolygonDefaults = () => ({ ...samplingPolygonDefaults })
+export const getSamplingPolygonDefaults = (): Required<SamplingPolygon> => ({ ...samplingPolygonDefaults })
 
-const getProp = (key) => A.propOr(samplingPolygonDefaults[key], key)
-const isPropTrue = (key) => (samplingPolygon) => getProp(key)(samplingPolygon) === true
+const getProp =
+  (key: keyof SamplingPolygon) =>
+  (samplingPolygon: SamplingPolygon): number =>
+    A.propOr(samplingPolygonDefaults[key], key)(samplingPolygon)
+const isPropTrue =
+  (key: keyof SamplingPolygon) =>
+  (samplingPolygon: SamplingPolygon): boolean =>
+    A.propOr(samplingPolygonDefaults[key], key)(samplingPolygon) === true
 
 export const getControlPointOffsetEast = getProp(keys.controlPointOffsetEast)
 export const getControlPointOffsetNorth = getProp(keys.controlPointOffsetNorth)

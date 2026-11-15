@@ -21,19 +21,7 @@ const POSTGRES_UNIQUE_VIOLATION = '23505'
 
 type DbClient = typeof db
 
-/** Minimal shape used by SurveyFile getters in this service. */
-type SurveyFileSummary = {
-  uuid: string
-  props?: {
-    size?: number
-    name?: string
-    type?: string
-    recordUuid?: string
-    nodeUuid?: string
-  }
-  content?: Buffer | null
-  dateCreated?: string
-}
+type SurveyFileSummary = SurveyFile.SurveyFile
 
 type SurveyFileServiceLike = {
   deleteFilesAndContentByUuids: (

@@ -1,16 +1,12 @@
+import type { Category as ArenaCategory } from '@openforis/arena-core'
 import { Points } from '@openforis/arena-core'
 import type { SRSIndex } from '@openforis/arena-core'
 import type { Feature } from 'geojson'
 
 import * as Category from '@core/survey/category'
-import { ExtraPropDef as ExtraPropDefUntyped } from '@core/survey/extraPropDef'
+import { ExtraPropDef } from '@core/survey/extraPropDef'
 import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { parsePoint } from '@core/survey/categoryItemPointParser'
-
-// extraPropDef.js's getName/getDataType are point-free Ramda compositions (e.g. A.prop(...)),
-// which allowJs's lightweight JS inference (checkJs is off project-wide) can't resolve to real
-// function types - it falls back to {}, making ExtraPropDef.getName(...) look "not callable"
-const ExtraPropDef: any = ExtraPropDefUntyped
 
 const locationExtraPropName = Category.locationItemExtraDefName
 
@@ -24,7 +20,7 @@ export const buildCategoryItemFeature = ({
   languages,
   srsIndex,
 }: {
-  category: Record<string, any>
+  category: ArenaCategory
   row: Record<string, any>
   languages: string[]
   srsIndex: SRSIndex
@@ -42,9 +38,9 @@ export const buildCategoryItemFeature = ({
   })
 
   const extraDefs = Category.getItemExtraDefsArray(category).filter(
-    (extraDef: any) => ExtraPropDef.getName(extraDef) !== locationExtraPropName
+    (extraDef) => ExtraPropDef.getName(extraDef) !== locationExtraPropName
   )
-  extraDefs.forEach((extraDef: any) => {
+  for (const extraDef of extraDefs) {
     const extraDefName = ExtraPropDef.getName(extraDef)
     if (ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint) {
       const otherPoint = parsePoint(row[extraDefName])
@@ -55,7 +51,7 @@ export const buildCategoryItemFeature = ({
     } else {
       properties[extraDefName] = row[extraDefName] ?? null
     }
-  })
+  }
 
   return {
     type: 'Feature',

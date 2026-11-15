@@ -109,8 +109,7 @@ export const getTaxonVernacularNameUuid =
   (survey: ArenaSurvey): string | undefined => {
     const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
     const taxon = getTaxonByCode({ taxonomyUuid, taxonCode })(survey)
-    const vernacularNamesUuidByName = Taxon.getVernacularNames(taxon)
-    return vernacularNamesUuidByName[vernacularName]
+    return taxon ? Taxon.getVernacularNameUuidByName(vernacularName)(taxon) : undefined
   }
 
 export const includesTaxonVernacularName =

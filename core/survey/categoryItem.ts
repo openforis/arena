@@ -1,6 +1,6 @@
 import * as A from '@core/arena'
 
-import { CategoryItems } from '@openforis/arena-core'
+import { CategoryItem as ArenaCategoryItem, CategoryItems, LanguageCode } from '@openforis/arena-core'
 
 import { uuidv4 } from '@core/uuid'
 import * as ObjectUtils from '@core/objectUtils'
@@ -34,7 +34,11 @@ const codeAllowedCharacters = [
 const codeNotAllowedCharactersRegExp = new RegExp(`[^${codeAllowedCharacters.join('')}]`, 'g')
 
 // ====== CREATE
-export const newItem = (levelUuid, parentItemUuid = null, props = {}) => ({
+export const newItem = (
+  levelUuid: string,
+  parentItemUuid: string | null = null,
+  props: Record<string, unknown> = {}
+): ArenaCategoryItem => ({
   [keys.uuid]: uuidv4(),
   [keys.levelUuid]: levelUuid,
   [keys.parentUuid]: parentItemUuid,
@@ -57,24 +61,27 @@ export const {
   isPublished,
   isDraft,
 } = ObjectUtils
-export const getLevelUuid = A.prop(keys.levelUuid)
-export const getParentUuid = A.prop(keys.parentUuid)
-export const getCode = ObjectUtils.getProp(keysProps.code, '')
+export const getLevelUuid = (item: ArenaCategoryItem): string => A.prop(keys.levelUuid)(item)
+export const getParentUuid = (item: ArenaCategoryItem): string | null => A.prop(keys.parentUuid)(item)
+export const getCode: (item: ArenaCategoryItem) => string = ObjectUtils.getProp(keysProps.code, '')
 export const getLabel =
-  (language, defaultToCode = true) =>
-  (item) =>
+  (language: string, defaultToCode = true) =>
+  (item: ArenaCategoryItem): string =>
     ObjectUtils.getLabel(language, defaultToCode ? getCode(item) : '')(item)
-export const getLabelWithCode = (language) => (item) => CategoryItems.getLabelWithCode(item, language)
+export const getLabelWithCode =
+  (language: string) =>
+  (item: ArenaCategoryItem): string =>
+    CategoryItems.getLabelWithCode(item, language as LanguageCode)
 export const getIndex = CategoryItems.getIndex
 
 // ====== UPDATE
-export const assocProp = ({ key, value }) => ObjectUtils.setProp(key, value)
+export const assocProp = ({ key, value }: { key: string; value: unknown }) => ObjectUtils.setProp(key, value)
 // ====== UPDATE - Extra Props
-export const dissocExtraProp = (key) => A.dissocPath([keys.props, keysProps.extra, key])
+export const dissocExtraProp = (key: string) => A.dissocPath([keys.props, keysProps.extra, key])
 export const renameExtraProp =
-  ({ nameOld, nameNew }) =>
-  (item) => {
-    const extra = getExtra(item)
+  ({ nameOld, nameNew }: { nameOld: string; nameNew: string }) =>
+  (item: ArenaCategoryItem): ArenaCategoryItem => {
+    const extra = getExtra(item) as Record<string, unknown>
     const extraUpdated = { ...extra }
     const extraProp = extra[nameOld]
     delete extraUpdated[nameOld]
@@ -85,10 +92,10 @@ export const renameExtraProp =
 // ====== UTILS
 
 // gets the ancestor codes as an array (only if ancestor codes have been populated during fetch)
-export const getAncestorCodes = (item) => {
-  const getLevelCode = (levelIndex) => A.propOr(null, `level${levelIndex}Code`)
+export const getAncestorCodes = (item: ArenaCategoryItem): string[] => {
+  const getLevelCode = (levelIndex: number) => A.propOr(null, `level${levelIndex}Code`)
 
-  const codes = []
+  const codes: string[] = []
   let levelIndex = 0
   let levelCode = getLevelCode(levelIndex)(item)
   while (levelCode !== null) {
@@ -99,9 +106,9 @@ export const getAncestorCodes = (item) => {
   return codes
 }
 
-export const getCodesHierarchy = (item) => [...getAncestorCodes(item), getCode(item)]
+export const getCodesHierarchy = (item: ArenaCategoryItem): string[] => [...getAncestorCodes(item), getCode(item)]
 
-export const normalizeCode = A.pipe(
+export const normalizeCode: (code: string) => string = A.pipe(
   StringUtils.leftTrim,
   A.replace(codeNotAllowedCharactersRegExp, '_'),
   A.slice(0, 40)

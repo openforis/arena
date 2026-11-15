@@ -1,6 +1,6 @@
-import * as A from '@core/arena'
+import { ArenaRecordNode, FileNames } from '@openforis/arena-core'
 
-import { FileNames } from '@openforis/arena-core'
+import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
 import { truncate } from '@core/stringUtils'
@@ -34,6 +34,27 @@ export const invalidPropKeys = {
   fileSize: 'fileSize',
 }
 
+export interface SurveyFileProps {
+  chainUuid?: string
+  cycle?: string
+  deleted?: boolean
+  labels?: Record<string, string>
+  name?: string
+  nodeUuid?: string
+  recordUuid?: string
+  size?: number
+  temporary?: boolean
+  type?: string
+  [key: string]: unknown
+}
+
+export interface SurveyFile {
+  uuid: string
+  props: SurveyFileProps
+  content?: Buffer | null
+  dateCreated?: string
+}
+
 export const SurveyFileType = {
   areaOfInterest: 'areaOfInterest',
   chainMau: 'chainMau',
@@ -59,8 +80,20 @@ export const createFile = ({
   nodeUuid = null,
   type = null,
   temporary = false,
-}) => {
-  const props = ObjectUtils.keepNonEmptyProps({
+}: {
+  name: string
+  labels?: Record<string, string> | null
+  uuid?: string | null
+  size?: number | null
+  content?: Buffer | null
+  chainUuid?: string | null
+  cycle?: string | null
+  recordUuid?: string | null
+  nodeUuid?: string | null
+  type?: string | null
+  temporary?: boolean
+}): SurveyFile => {
+  const props: SurveyFileProps = ObjectUtils.keepNonEmptyProps({
     [propKeys.chainUuid]: chainUuid,
     [propKeys.cycle]: cycle,
     [propKeys.labels]: labels,
@@ -81,7 +114,15 @@ export const createFile = ({
   }
 }
 
-export const createFileFromNode = ({ node, size = null, content = null }) =>
+export const createFileFromNode = ({
+  node,
+  size = null,
+  content = null,
+}: {
+  node: ArenaRecordNode
+  size?: number | null
+  content?: Buffer | null
+}): SurveyFile =>
   createFile({
     uuid: Node.getFileUuid(node),
     name: Node.getFileName(node),
@@ -92,7 +133,7 @@ export const createFileFromNode = ({ node, size = null, content = null }) =>
     type: SurveyFileType.recordAttachment,
   })
 
-export const truncateFileName = (fileName, maxLength = 10) => {
+export const truncateFileName = (fileName: string | null | undefined, maxLength = 10): string => {
   if (fileName && !A.isEmpty(fileName)) {
     const extension = FileNames.getExtension(fileName)
     return A.pipe(A.dropLast(extension.length + 1), truncate(maxLength), (name) => `${name}.${extension}`)(fileName)
@@ -103,34 +144,35 @@ export const truncateFileName = (fileName, maxLength = 10) => {
 
 // READ
 export const { getDateCreated, getLabel, getLabels, getProps, getUuid } = ObjectUtils
-export const isDeleted = (file) => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
-export const isTemporary = (file) => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
-export const getName = ObjectUtils.getProp(propKeys.name)
-export const getSize = ObjectUtils.getProp(propKeys.size)
-export const getChainUuid = ObjectUtils.getProp(propKeys.chainUuid)
-export const getCycle = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
-export const getNodeUuid = ObjectUtils.getProp(propKeys.nodeUuid)
-export const getRecordUuid = ObjectUtils.getProp(propKeys.recordUuid)
-export const getContent = A.prop(keys.content)
-export const getExtension = A.pipe(getName, FileNames.getExtension)
-export const getType = ObjectUtils.getProp(propKeys.type, SurveyFileType.recordAttachment)
+export const isDeleted = (file: SurveyFile): boolean => Boolean(ObjectUtils.getProp(propKeys.deleted, false)(file))
+export const isTemporary = (file: SurveyFile): boolean => Boolean(ObjectUtils.getProp(propKeys.temporary, false)(file))
+type FileGetter<T> = (file: SurveyFile) => T
+export const getName: FileGetter<string> = ObjectUtils.getProp(propKeys.name)
+export const getSize: FileGetter<number> = ObjectUtils.getProp(propKeys.size)
+export const getChainUuid: FileGetter<string> = ObjectUtils.getProp(propKeys.chainUuid)
+export const getCycle: FileGetter<string> = ObjectUtils.getProp(propKeys.cycle, cycleOneKey)
+export const getNodeUuid: FileGetter<string> = ObjectUtils.getProp(propKeys.nodeUuid)
+export const getRecordUuid: FileGetter<string> = ObjectUtils.getProp(propKeys.recordUuid)
+export const getContent = (file: SurveyFile): Buffer | null | undefined => A.prop(keys.content)(file)
+export const getExtension = (file: SurveyFile): string => FileNames.getExtension(getName(file))
+export const getType: FileGetter<string> = ObjectUtils.getProp(propKeys.type, SurveyFileType.recordAttachment)
 
 // UPDATE
 export const { assocLabels } = ObjectUtils
 export const assocContent = A.assoc(keys.content)
-export const assocSize = (size) => ObjectUtils.setProp(propKeys.size, size)
+export const assocSize = (size: number) => ObjectUtils.setProp(propKeys.size, size)
 
 const assocProps = A.assoc(keys.props)
 
-const hasInvalidProps = (file) => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
+const hasInvalidProps = (file: SurveyFile): boolean => Object.hasOwn(getProps(file), invalidPropKeys.fileName)
 
-export const cleanupInvalidProps = (file) => {
+export const cleanupInvalidProps = (file: SurveyFile): SurveyFile => {
   if (!hasInvalidProps(file)) {
     return file
   }
-  const props = getProps(file)
+  const props = getProps(file) as SurveyFileProps
 
-  const propsUpdated = {
+  const propsUpdated: SurveyFileProps = {
     [propKeys.name]: props[invalidPropKeys.fileName],
     [propKeys.size]: props[invalidPropKeys.fileSize],
     ...ObjectUtils.keepNonEmptyProps({
