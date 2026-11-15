@@ -1,6 +1,10 @@
-import type { Labels, NodeDefExpression as ArenaNodeDefExpression, ValidationSeverity } from '@openforis/arena-core'
-// NodeDefExpressionFactory is not exported from the arena-core package root
-import { NodeDefExpressionFactory } from '@openforis/arena-core/dist/nodeDef/nodeDef'
+import { NodeDefExpressionFactory } from '@openforis/arena-core'
+import type {
+  Labels,
+  NodeDefExpression as ArenaNodeDefExpression,
+  NodeDefExpressionFactoryParams,
+  ValidationSeverity,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -40,12 +44,14 @@ export const createExpression = ({
   messages = undefined,
   placeholder = false,
 }: CreateExpressionParams): NodeDefExpression =>
-  // the factory keeps every non-empty param, but its params type declares only applyIf, expression and severity
-  NodeDefExpressionFactory.createInstance({ applyIf, expression, messages, placeholder, severity } as unknown as {
-    applyIf?: string
-    expression: string
-    severity?: ValidationSeverity
-  })
+  // the factory keeps every non-empty param (placeholder included, not declared in its params type)
+  NodeDefExpressionFactory.createInstance({
+    applyIf,
+    expression,
+    messages,
+    placeholder,
+    severity,
+  } as NodeDefExpressionFactoryParams)
 
 export const createExpressionPlaceholder = (): NodeDefExpression => createExpression({ placeholder: true })
 

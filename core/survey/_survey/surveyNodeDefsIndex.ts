@@ -1,9 +1,12 @@
 import { Objects, Surveys } from '@openforis/arena-core'
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  SurveyNodeDefsIndex as NodeDefsIndex,
+} from '@openforis/arena-core'
 
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
-// SurveyNodeDefsIndex is not exported by arena-core: derive it from the Survey type
-type NodeDefsIndex = NonNullable<ArenaSurvey['nodeDefsIndex']>
 
 // the arena-core index functions work on a survey: wrap the index alone in a survey-like object
 const toSurvey = (nodeDefsIndex: NodeDefsIndex): ArenaSurvey => ({ nodeDefsIndex }) as ArenaSurvey
