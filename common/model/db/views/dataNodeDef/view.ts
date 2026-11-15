@@ -1,3 +1,5 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '../../../../../core/survey/survey'
 import * as NodeDef from '../../../../../core/survey/nodeDef'
 import * as NodeDefExpression from '../../../../../core/survey/nodeDefExpression'
@@ -18,12 +20,10 @@ const columnSet = {
   sampleOutlier: '_sample_outlier',
 }
 
-/**
- * Makes numeric literals SQL numbers instead of text (e.g. integer_attr > 1.5 would fail with a text literal).
- * @param {object} node - The expression node.
- * @returns {object} - The expression node with numeric literals having their number value as raw value.
- */
-const _numericLiteralsAsNumbers = (node) => {
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+
+// makes numeric literals SQL numbers instead of text (e.g. integer_attr > 1.5 would fail with a text literal)
+const _numericLiteralsAsNumbers = (node: any): any => {
   if (Array.isArray(node)) return node.map((item) => _numericLiteralsAsNumbers(item))
   if (!node || typeof node !== 'object') return node
   if (Expression.isLiteral(node) && typeof node.value === 'number') return { ...node, raw: node.value }
@@ -31,7 +31,14 @@ const _numericLiteralsAsNumbers = (node) => {
 }
 
 export default class ViewDataNodeDef extends TableDataNodeDef {
-  constructor(survey, nodeDef) {
+  static readonly columnSet = { ...TableDataNodeDef.columnSet, ...columnSet }
+
+  private readonly _virtual: boolean
+  private readonly _root: boolean
+  private readonly _tableData: TableDataNodeDef
+  private readonly _viewDataParent: ViewDataNodeDef | null
+
+  constructor(survey: ArenaSurvey, nodeDef: AnyNodeDef) {
     super(survey, nodeDef)
     this.name = `${super.name}_view`
     this._virtual = NodeDef.isVirtual(this.nodeDef)
@@ -51,7 +58,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     }
   }
 
-  get columnNodeDefUuid() {
+  get columnNodeDefUuid(): ColumnNodeDef {
     // node def can be the entity itself or it's source entity (if virtual)
     const { nodeDef } = this.tableData
     return new ColumnNodeDef(this, nodeDef)
@@ -61,16 +68,16 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return this.columnNodeDefUuid.nameFull
   }
 
-  get columnUuidName() {
+  get columnUuidName(): string {
     return this.columnNodeDefUuid.name
   }
 
-  get columnIdName() {
+  get columnIdName(): string {
     const { nodeDef } = this.tableData
     return StringUtils.quoteDouble(`_${NodeDef.getName(nodeDef)}_${TableDataNodeDef.columnSet.id}`)
   }
 
-  get columnNodeDefUuids() {
+  get columnNodeDefUuids(): ColumnNodeDef[] {
     return [
       this.columnNodeDefUuid,
       ...(this.viewDataParent
@@ -79,11 +86,11 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     ]
   }
 
-  get columnUuids() {
+  get columnUuids(): string[] {
     return this.columnNodeDefUuids.flatMap((columnNodeDef) => columnNodeDef.namesFull)
   }
 
-  get _multipleAttributeColumns() {
+  get _multipleAttributeColumns(): ColumnNodeDef[] {
     const { nodeDef, survey, tableData } = this
 
     return Survey.getNodeDefDescendantAttributesInSingleEntities({
@@ -95,7 +102,7 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
       .map((multAttrDef) => new ColumnNodeDef(tableData, multAttrDef))
   }
 
-  get _parentViewColumns() {
+  get _parentViewColumns(): ColumnNodeDef[] {
     const { nodeDef, viewDataParent } = this
     return viewDataParent
       ? viewDataParent.columnNodeDefs
@@ -109,9 +116,9 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
       : []
   }
 
-  get columnNodeDefs() {
+  get columnNodeDefs(): ColumnNodeDef[] {
     const { nodeDef, tableData, viewDataParent, virtual } = this
-    const columns = []
+    const columns: ColumnNodeDef[] = []
     // table entity uuid column - it doesn't exist for virtual entities
     if (!virtual && !NodeDef.isMultipleAttribute(nodeDef)) {
       columns.push(new ColumnNodeDef(tableData, nodeDef))
@@ -125,39 +132,36 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     return columns
   }
 
-  get columnNodeDefNames() {
+  get columnNodeDefNames(): string[] {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).names)
   }
 
-  get columnNodeDefNamesFull() {
+  get columnNodeDefNamesFull(): string[] {
     return this.columnNodeDefs.flatMap((columnNodeDef) => new ColumnNodeDef(this, columnNodeDef.nodeDef).namesFull)
   }
 
-  get columnParentUuidName() {
+  get columnParentUuidName(): string | undefined {
     return this.viewDataParent?.columnUuidName
   }
 
-  get tableData() {
+  get tableData(): TableDataNodeDef {
     return this._tableData
   }
 
-  get viewDataParent() {
+  get viewDataParent(): ViewDataNodeDef | null {
     return this._viewDataParent
   }
 
-  get root() {
+  get root(): boolean {
     return this._root
   }
 
-  get virtual() {
+  get virtual(): boolean {
     return this._virtual
   }
 
-  /**
-   * Virtual entity formula converted into SQL, with literals and identifiers as query parameters.
-   * @returns {{clause: string, params: object}|null} - The SQL clause and its parameters, or null if there is no formula.
-   */
-  get virtualExpression() {
+  // virtual entity formula converted into SQL, with literals and identifiers as query parameters (null without formula)
+  get virtualExpression(): { clause: string; params: Record<string, unknown> } | null {
     const formulas = NodeDef.getFormula(this.nodeDef)
     const expression = this.virtual && formulas.length > 0 ? NodeDefExpression.getExpression(formulas[0]) : null
     if (!expression) return null
@@ -170,5 +174,3 @@ export default class ViewDataNodeDef extends TableDataNodeDef {
     }
   }
 }
-
-ViewDataNodeDef.columnSet = columnSet

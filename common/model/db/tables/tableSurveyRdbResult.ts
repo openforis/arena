@@ -1,7 +1,8 @@
+import type { ColumnSet } from './table'
 import TableSurveyRdb from './tableSurveyRdb'
 
 class TableSurveyRdbResult extends TableSurveyRdb {
-  constructor(surveyId, name, columnSet) {
+  constructor(surveyId: number, name: string, columnSet?: ColumnSet) {
     super(surveyId, `_res_${name}`, columnSet)
   }
 }

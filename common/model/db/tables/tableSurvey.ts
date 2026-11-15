@@ -1,13 +1,15 @@
 import * as Schemata from '../schemata'
-import Table from './table'
+import Table, { ColumnSet } from './table'
 
 class TableSurvey extends Table {
-  constructor(surveyId, name, columnSet) {
+  protected _surveyId: number
+
+  constructor(surveyId: number, name: string, columnSet?: ColumnSet) {
     super(Schemata.getSchemaSurvey(surveyId), name, columnSet)
     this._surveyId = surveyId
   }
 
-  get surveyId() {
+  get surveyId(): number {
     return this._surveyId
   }
 }

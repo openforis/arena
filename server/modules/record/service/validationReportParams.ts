@@ -10,7 +10,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 const { columnSet } = TableDataNodeDef
 
 type ValidationReportFilterParams = {
-  query?: unknown
+  query?: Query.QueryItem | null
   attributeDefUuids?: string[] | null
   messageTypeKeys?: string[] | null
 }

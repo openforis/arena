@@ -9,14 +9,14 @@ export const keys = {
   measures: 'measures',
   filterRecordUuid: 'filterRecordUuid',
   filterRecordUuids: 'filterRecordUuids',
-}
+} as const
 
 export const modes = {
   raw: 'raw',
   rawEdit: 'rawEdit',
   aggregate: 'aggregate',
-}
+} as const
 
 export const displayTypes = {
   table: 'table',
-}
+} as const

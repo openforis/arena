@@ -2,6 +2,14 @@ import * as A from '@core/arena'
 import SqlBuilder from '@common/model/db/sql/sqlBuilder'
 
 class SqlSelectBuilder extends SqlBuilder {
+  protected _select: string[]
+  protected _from: string[]
+  protected _where: string[]
+  protected _groupBy: string[]
+  protected _offset: number | null
+  protected _limit: number | null
+  protected _orderBy: string[]
+
   constructor() {
     super()
     this._select = []
@@ -13,46 +21,46 @@ class SqlSelectBuilder extends SqlBuilder {
     this._orderBy = []
   }
 
-  get selectFields() {
+  get selectFields(): string[] {
     return this._select
   }
 
-  select(...fields) {
+  select(...fields: string[]): this {
     this._select.push(...fields)
     return this
   }
 
-  from(...fromTables) {
+  from(...fromTables: string[]): this {
     this._from.push(...fromTables)
     return this
   }
 
-  where(...conditions) {
+  where(...conditions: string[]): this {
     this._where.push(...conditions)
     return this
   }
 
-  groupBy(...fields) {
+  groupBy(...fields: string[]): this {
     this._groupBy.push(...fields)
     return this
   }
 
-  offset(offset) {
+  offset(offset: number | null): this {
     this._offset = offset
     return this
   }
 
-  limit(limit) {
+  limit(limit: number | null): this {
     this._limit = limit
     return this
   }
 
-  orderBy(...fields) {
+  orderBy(...fields: string[]): this {
     this._orderBy.push(...fields)
     return this
   }
 
-  build() {
+  build(): string {
     const parts = [`SELECT ${this._select.join(', ')}`, `FROM ${this._from.join(' ')}`]
 
     if (!A.isEmpty(this._where)) {

@@ -11,17 +11,17 @@ const columnSet = {
 }
 
 export default class TableCategoryItem extends TableSurvey {
-  constructor(surveyId) {
+  static readonly columnSet = columnSet
+
+  constructor(surveyId: number) {
     super(surveyId, 'category_item', columnSet)
   }
 
-  get columnLevelUuid() {
+  get columnLevelUuid(): string {
     return super.getColumn(columnSet.levelUuid)
   }
 
-  get columnParentUuid() {
+  get columnParentUuid(): string {
     return super.getColumn(columnSet.parentUuid)
   }
 }
-
-TableCategoryItem.columnSet = columnSet

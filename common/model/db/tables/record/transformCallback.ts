@@ -2,15 +2,10 @@ import camelize from 'camelize'
 
 import * as Validation from '../../../../../core/validation/validation'
 
-/**
- * Transforms the result row of a query on the record table into a Record object.
- * @param {!number} surveyId - The ID of the survey.
- * @param {boolean} [includeValidationFields] - Whether to include all the Validation fields.
- * @returns {Record} - The record object.
- */
+// transforms a row of the record table into a record (with only the validation counts if includeValidationFields is false)
 const recordTransformCallback =
-  (surveyId, includeValidationFields = true) =>
-  (record) => {
+  (surveyId: number, includeValidationFields = true) =>
+  (record: Record<string, any>): Record<string, any> => {
     const validation = Validation.getValidation(record)
 
     return {

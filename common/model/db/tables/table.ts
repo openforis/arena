@@ -12,22 +12,18 @@ const columnSetCommon = {
   uuid: 'uuid',
 }
 
-/**
- * A database table object.
- * @typedef {object} module:arena.Table
- * @property {string} schema - The schema it belongs to.
- * @property {string} name - The table name.
- * @property {string} alias - The table alias.
- * @property {string[]} columns - The table columns with alias.
- */
+export type ColumnSet = Record<string, string>
+
+// a database table (abstract), with schema, name, alias and columns (with alias)
 export default class Table {
-  /**
-   * Create an instance of a Table.
-   * @param {!string} schema - The schema.
-   * @param {!string} name - The table name.
-   * @param {{[key: string]: string}} [columnSet] - The table column set.
-   */
-  constructor(schema, name, columnSet = {}) {
+  static readonly columnSetCommon = columnSetCommon
+
+  protected _schema: string
+  protected _columnSet: ColumnSet
+  private _name: string
+  private _alias: string
+
+  constructor(schema: string, name: string, columnSet: ColumnSet = {}) {
     if (new.target === Table) {
       throw new TypeError('Cannot construct Table instance directly')
     }
@@ -37,78 +33,76 @@ export default class Table {
     this.name = name
   }
 
-  get schema() {
+  get schema(): string {
     return this._schema
   }
 
-  set schema(schema) {
+  set schema(schema: string) {
     this._schema = schema
   }
 
-  get name() {
+  get name(): string {
     return this._name
   }
 
-  set name(name) {
+  set name(name: string) {
     this._name = name
     this._alias = SQL.createAlias(name)
   }
 
-  get alias() {
+  get alias(): string {
     return this._alias
   }
 
-  set alias(alias) {
+  set alias(alias: string) {
     this._alias = alias
   }
 
-  get nameQualified() {
+  get nameQualified(): string {
     return `${this.schema}.${StringUtils.quoteDouble(this.name)}` // name should be quoted: it can contain reserved words
   }
 
-  get nameAliased() {
+  get nameAliased(): string {
     return `${this.nameQualified} AS ${this.alias}`
   }
 
-  get columns() {
+  get columns(): string[] {
     return SQL.addAlias(this.alias, ...Object.values(this._columnSet))
   }
 
-  getColumn(columnName) {
+  getColumn(columnName: string): string {
     return SQL.addAlias(this.alias, columnName)[0]
   }
 
   // ======= common columns
-  _getColumnCommon(column) {
+  _getColumnCommon(column: string): string {
     if (!Object.values(this._columnSet).includes(column)) {
       throw new TypeError(`Column ${column} does not exist`)
     }
     return this.getColumn(column)
   }
 
-  get columnDateCreated() {
+  get columnDateCreated(): string {
     return this._getColumnCommon(columnSetCommon.dateCreated)
   }
 
-  get columnDateModified() {
+  get columnDateModified(): string {
     return this._getColumnCommon(columnSetCommon.dateModified)
   }
 
-  get columnId() {
+  get columnId(): string {
     return this._getColumnCommon(columnSetCommon.id)
   }
 
-  get columnUuid() {
+  get columnUuid(): string {
     return this._getColumnCommon(columnSetCommon.uuid)
   }
 
-  get columnProps() {
+  get columnProps(): string {
     return this._getColumnCommon(columnSetCommon.props)
   }
 
-  get columnPropsDraft() {
+  get columnPropsDraft(): string {
     return this._getColumnCommon(columnSetCommon.propsDraft)
   }
 }
-
-Table.columnSetCommon = columnSetCommon

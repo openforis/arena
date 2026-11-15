@@ -1,9 +1,13 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
 
 import TableSurveyRdb from '../tableSurveyRdb'
 import * as SQL from '../../sql'
+
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const tableNamePrefix = 'olap_data'
 
@@ -24,19 +28,37 @@ const baseColumnNamesAndTypes = [
   `${baseColumnSet.expFactor}     ${SQL.types.decimal}`,
 ]
 
-const generateTableName = ({ cycle, entityDef }) => `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
+const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: AnyNodeDef }): string =>
+  `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
 
 export default class TableOlapData extends TableSurveyRdb {
-  constructor({ survey, cycle, entityDef, baseUnitDef }) {
+  static readonly baseColumnSet = baseColumnSet
+  static readonly tableNamePrefix = tableNamePrefix
+
+  private readonly _survey: ArenaSurvey
+  private readonly _entityDef: AnyNodeDef
+  private readonly _baseUnitDef: AnyNodeDef
+
+  constructor({
+    survey,
+    cycle,
+    entityDef,
+    baseUnitDef,
+  }: {
+    survey: ArenaSurvey
+    cycle: string
+    entityDef: AnyNodeDef
+    baseUnitDef: AnyNodeDef
+  }) {
     super(Survey.getId(survey), generateTableName({ cycle, entityDef }))
     this._survey = survey
     this._entityDef = entityDef
     this._baseUnitDef = baseUnitDef
   }
 
-  get attributeDefsForColumns() {
-    const sortedAttributeDefs = []
-    const attributeDefsByUuid = {}
+  get attributeDefsForColumns(): AnyNodeDef[] {
+    const sortedAttributeDefs: AnyNodeDef[] = []
+    const attributeDefsByUuid: Record<string, AnyNodeDef> = {}
     Survey.visitAncestorsAndSelf(this._entityDef, (ancestorDef) => {
       const defs = Survey.getNodeDefDescendantAttributesInSingleEntities({
         nodeDef: ancestorDef,
@@ -50,19 +72,18 @@ export default class TableOlapData extends TableSurveyRdb {
               includedAttributeTypes.has(NodeDef.getType(nodeDef)))) ||
           (NodeDef.isAnalysis(nodeDef) && includedAnalysisAttributeTypes.has(NodeDef.getType(nodeDef)))
       )
-      filteredDefs.forEach((nodeDef) => {
+      for (const nodeDef of filteredDefs) {
         const uuid = NodeDef.getUuid(nodeDef)
         if (!attributeDefsByUuid[uuid]) {
           attributeDefsByUuid[uuid] = nodeDef
           sortedAttributeDefs.unshift(nodeDef)
         }
-      })
+      }
     })(this._survey)
     return sortedAttributeDefs
-    //.sort((nodeDefA, nodeDefB) => NodeDef.getId(nodeDefA) - NodeDef.getId(nodeDefB))
   }
 
-  get columnNames() {
+  get columnNames(): string[] {
     return [
       // base columns
       ...Object.values(baseColumnSet),
@@ -73,11 +94,11 @@ export default class TableOlapData extends TableSurveyRdb {
     ]
   }
 
-  get columnNamesForInsert() {
+  get columnNamesForInsert(): string[] {
     return this.columnNames.filter((columnName) => columnName !== baseColumnSet.id)
   }
 
-  get requiredColumnNamesForInsert() {
+  get requiredColumnNamesForInsert(): string[] {
     return [
       // base columns
       baseColumnSet.expFactor,
@@ -88,11 +109,11 @@ export default class TableOlapData extends TableSurveyRdb {
     ]
   }
 
-  get baseUnitUuidColumnName() {
+  get baseUnitUuidColumnName(): string {
     return NodeDef.getName(this._baseUnitDef) + '_uuid'
   }
 
-  get columnNamesAndTypes() {
+  get columnNamesAndTypes(): string[] {
     return [
       // base columns
       ...baseColumnNamesAndTypes,
@@ -105,6 +126,3 @@ export default class TableOlapData extends TableSurveyRdb {
     ]
   }
 }
-
-TableOlapData.baseColumnSet = baseColumnSet
-TableOlapData.tableNamePrefix = tableNamePrefix

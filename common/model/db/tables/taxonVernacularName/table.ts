@@ -10,13 +10,13 @@ const columnSet = {
 }
 
 export default class TableTaxonVernacularName extends TableSurvey {
-  constructor(surveyId) {
+  static readonly columnSet = columnSet
+
+  constructor(surveyId: number) {
     super(surveyId, 'taxon_vernacular_name', columnSet)
   }
 
-  get columnTaxonUuid() {
+  get columnTaxonUuid(): string {
     return super.getColumn(columnSet.taxonUuid)
   }
 }
-
-TableTaxonVernacularName.columnSet = columnSet
