@@ -11,7 +11,7 @@ const columnSet = {
 }
 
 export default class TableCategoryItem extends TableSurvey {
-  static columnSet = columnSet
+  static readonly columnSet = columnSet
 
   constructor(surveyId: number) {
     super(surveyId, 'category_item', columnSet)

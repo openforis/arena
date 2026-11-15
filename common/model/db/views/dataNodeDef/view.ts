@@ -31,7 +31,7 @@ const _numericLiteralsAsNumbers = (node: any): any => {
 }
 
 export default class ViewDataNodeDef extends TableDataNodeDef {
-  static columnSet = { ...TableDataNodeDef.columnSet, ...columnSet }
+  static readonly columnSet = { ...TableDataNodeDef.columnSet, ...columnSet }
 
   private readonly _virtual: boolean
   private readonly _root: boolean

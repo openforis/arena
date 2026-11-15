@@ -13,8 +13,8 @@ const columnSet = {
 }
 
 export default class TableRecord extends TableSurvey {
-  static columnSet = columnSet
-  static transformCallback = tranformCallback
+  static readonly columnSet = columnSet
+  static readonly transformCallback = tranformCallback
 
   constructor(surveyId: number) {
     super(surveyId, 'record', columnSet)

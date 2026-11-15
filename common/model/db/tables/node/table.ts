@@ -22,10 +22,10 @@ const columnSet = {
 }
 
 export default class TableNode extends TableSurvey {
-  static columnSet = columnSet
+  static readonly columnSet = columnSet
 
   // a node row: meta is kept as is (not camelized)
-  static dbTransformCallback = (node: Record<string, any>): Record<string, any> =>
+  static readonly dbTransformCallback = (node: Record<string, any>): Record<string, any> =>
     A.pipe(A.dissoc(Node.keys.meta), camelize, A.assoc(Node.keys.meta, A.prop(Node.keys.meta, node)))(node)
 
   private readonly _survey: ArenaSurvey

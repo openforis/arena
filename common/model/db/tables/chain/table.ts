@@ -19,8 +19,8 @@ const scriptColumnNames = [columnSet.scriptCommon, columnSet.scriptEnd]
 const tableName = 'chain'
 
 export default class TableChain extends TableSurvey {
-  static columnSet = columnSet
-  static tableName = tableName
+  static readonly columnSet = columnSet
+  static readonly tableName = tableName
 
   private readonly _columnsNoScript: string[]
   getSelect: (params: GetSelectParams) => string

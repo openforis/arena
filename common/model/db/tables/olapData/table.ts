@@ -32,8 +32,8 @@ const generateTableName = ({ cycle, entityDef }: { cycle: string; entityDef: Any
   `${tableNamePrefix}_cycle_${cycle}_${NodeDef.getName(entityDef)}`
 
 export default class TableOlapData extends TableSurveyRdb {
-  static baseColumnSet = baseColumnSet
-  static tableNamePrefix = tableNamePrefix
+  static readonly baseColumnSet = baseColumnSet
+  static readonly tableNamePrefix = tableNamePrefix
 
   private readonly _survey: ArenaSurvey
   private readonly _entityDef: AnyNodeDef

@@ -105,20 +105,20 @@ const getColumnNameAggregateFunction = ({ nodeDef, aggregateFn }: { nodeDef: Any
 
 // a column of a node def data table or view
 export default class ColumnNodeDef {
-  static columnSuffixCodeLabel = columnSuffixCodeLabel
-  static columnSuffixFileUuid = columnSuffixFileUuid
-  static columnSuffixFileName = columnSuffixFileName
-  static columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
-  static columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
+  static readonly columnSuffixCodeLabel = columnSuffixCodeLabel
+  static readonly columnSuffixFileUuid = columnSuffixFileUuid
+  static readonly columnSuffixFileName = columnSuffixFileName
+  static readonly columnSuffixTaxonScientificName = columnSuffixTaxonScientificName
+  static readonly columnSuffixTaxonVernacularName = columnSuffixTaxonVernacularName
 
-  static getCodeLabelColumnName = getColumnNameWithSuffix(columnSuffixCodeLabel)
-  static getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileName)
-  static getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
+  static readonly getCodeLabelColumnName = getColumnNameWithSuffix(columnSuffixCodeLabel)
+  static readonly getFileNameColumnName = getColumnNameWithSuffix(columnSuffixFileName)
+  static readonly getFileUuidColumnName = getColumnNameWithSuffix(columnSuffixFileUuid)
 
-  static getColumnNames = getColumnNames
-  static getColumnName = getColumnName
-  static getColumnNameAggregateFunction = getColumnNameAggregateFunction
-  static extractColumnName = extractColumnName
+  static readonly getColumnNames = getColumnNames
+  static readonly getColumnName = getColumnName
+  static readonly getColumnNameAggregateFunction = getColumnNameAggregateFunction
+  static readonly extractColumnName = extractColumnName
 
   private readonly _table: ColumnTable
   private readonly _nodeDef: AnyNodeDef

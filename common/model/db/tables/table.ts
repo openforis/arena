@@ -16,7 +16,7 @@ export type ColumnSet = Record<string, string>
 
 // a database table (abstract), with schema, name, alias and columns (with alias)
 export default class Table {
-  static columnSetCommon = columnSetCommon
+  static readonly columnSetCommon = columnSetCommon
 
   protected _schema: string
   protected _columnSet: ColumnSet

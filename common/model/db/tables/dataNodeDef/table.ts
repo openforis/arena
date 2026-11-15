@@ -53,8 +53,8 @@ const rootDefColumnNamesAndTypes = [
 
 // table with the data of a node definition (entity or multiple attribute)
 export default class TableDataNodeDef extends TableSurveyRdb {
-  static columnSet = columnSet
-  static rootDefColumnNames = rootDefColumnNames
+  static readonly columnSet = columnSet
+  static readonly rootDefColumnNames = rootDefColumnNames
 
   private readonly _survey: ArenaSurvey
   private readonly _nodeDef: AnyNodeDef

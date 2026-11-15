@@ -10,7 +10,7 @@ const columnSet = {
 }
 
 export default class TableTaxon extends TableSurvey {
-  static columnSet = columnSet
+  static readonly columnSet = columnSet
 
   constructor(surveyId: number) {
     super(surveyId, 'taxon', columnSet)
