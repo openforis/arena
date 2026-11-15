@@ -1,3 +1,4 @@
+import { createDefaultAuthGroups } from '@openforis/arena-core'
 import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -20,7 +21,6 @@ import * as NodeDefLayoutUpdater from './nodeDefLayoutUpdater'
 import * as SurveyNodeDefsValidation from './_survey/surveyNodeDefsValidation'
 import * as SurveyCategories from './_survey/surveyCategories'
 import * as SurveyTaxonomies from './_survey/surveyTaxonomies'
-import * as SurveyDefaults from './_survey/surveyDefaults'
 import * as SurveyDependencies from './_survey/surveyDependencies'
 import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
 import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
@@ -80,7 +80,7 @@ export const { collectReportKeys, cycleOneKey, samplingPointDataCategoryName } =
 export const { sortableKeys } = SurveySortKeys
 
 // ====== DEFAULTS
-export const { getDefaultAuthGroups } = SurveyDefaults
+export const getDefaultAuthGroups = createDefaultAuthGroups
 
 // READ
 export const getSurveyInfo = SurveyInfo.getInfo

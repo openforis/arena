@@ -3,6 +3,7 @@ import type {
   NodeDef as ArenaNodeDef,
   NodeDefEntity,
   NodeDefEntityChildPosition,
+  NodeDefEntityLayoutChildItem,
   NodeDefType,
 } from '@openforis/arena-core'
 
@@ -11,8 +12,6 @@ import * as A from '@core/arena'
 import * as ObjectUtils from '@core/objectUtils'
 
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
-// NodeDefEntityLayoutChildItem is not exported by arena-core: grid item (form layout) or child uuid (table layout)
-type NodeDefEntityLayoutChildItem = NodeDefEntityChildPosition | string
 // layout of a node def: layout props by cycle key
 type Layout = Record<string, Record<string, any>>
 type LayoutUpdater = (layout: Layout) => Layout

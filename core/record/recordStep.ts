@@ -1,3 +1,10 @@
+import {
+  RecordStepAnalysisCode,
+  RecordStepCleansingCode,
+  RecordStepEntryCode,
+  RecordStepsList,
+} from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -16,24 +23,17 @@ export const stepNames = {
   analysis: 'analysis',
 } as const
 
-export const entryCode = '1'
-export const cleansingCode = '2'
-export const analysisCode = '3'
+export const entryCode: string = RecordStepEntryCode
+export const cleansingCode: string = RecordStepCleansingCode
+export const analysisCode: string = RecordStepAnalysisCode
 
-export const stepCodes: Record<string, string> = {
-  [stepNames.entry]: entryCode,
-  [stepNames.cleansing]: cleansingCode,
-  [stepNames.analysis]: analysisCode,
-}
-
-export const steps: RecordStep[] = Object.keys(stepNames).map((name) => ({ id: stepCodes[name], name }))
+export const steps: RecordStep[] = RecordStepsList
 
 export const getStepId = (step: RecordStep | null | undefined): string | undefined =>
   A.prop(keys.id)(step) as string | undefined
 
 export const getDefaultStep = (): string => getStepId(steps[0])
 
-// arena-core RecordSteps (same steps) is not exported from the package root
 export const getStep = (stepId: string | null | undefined): RecordStep | undefined =>
   steps.find((step) => step.id === stepId)
 

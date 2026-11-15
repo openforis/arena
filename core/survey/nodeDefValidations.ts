@@ -1,9 +1,11 @@
-import type { NodeDefExpression, NodeDefValidations as ArenaNodeDefValidations } from '@openforis/arena-core'
+import type {
+  NodeDefCountExpression,
+  NodeDefExpression,
+  NodeDefValidations as ArenaNodeDefValidations,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
-// NodeDefCountExpression is not exported by arena-core
-type NodeDefCountExpression = NonNullable<ArenaNodeDefValidations['count']>['min']
 type ValidationsUpdater = (validations: ArenaNodeDefValidations) => ArenaNodeDefValidations
 
 export const keys = {
