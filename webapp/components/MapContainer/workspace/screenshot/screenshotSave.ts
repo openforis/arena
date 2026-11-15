@@ -1,3 +1,5 @@
+import type { ArenaRecord, ArenaRecordNode } from '@openforis/arena-core'
+
 import { checkScreenshotSize } from '@webapp/components/MapContainer/workspace/screenshot/screenshotChecks'
 import type { ScreenshotNodeChange } from '@webapp/components/MapContainer/workspace/screenshot/screenshotNode'
 import type { ScreenshotSaveOutcome } from '@webapp/components/MapContainer/workspace/screenshot/screenshotTypes'
@@ -28,14 +30,19 @@ export type NodeSaveResult = {
 }
 
 export type ScreenshotSaveDeps = {
-  fetchRecord: (recordUuid: string) => Promise<unknown>
-  canEditRecord: (record: unknown) => boolean
-  buildChange: (record: unknown) => ScreenshotNodeChange
+  fetchRecord: (recordUuid: string) => Promise<ArenaRecord | null>
+  canEditRecord: (record: ArenaRecord) => boolean
+  buildChange: (record: ArenaRecord) => ScreenshotNodeChange
   buildRowAttribute: (rowNode: unknown, updatedNodes: Record<string, unknown>) => unknown
   confirmReplace: (fileName: string) => Promise<boolean>
   subscribe: NodeSaveSubscribe
-  postNode: (params: { record: unknown; node: unknown; blob?: Blob | null; fileName?: string }) => Promise<void>
-  deleteNode: (params: { record: unknown; nodeUuid: string }) => Promise<void>
+  postNode: (params: {
+    record: ArenaRecord
+    node: ArenaRecordNode
+    blob?: Blob | null
+    fileName?: string
+  }) => Promise<void>
+  deleteNode: (params: { record: ArenaRecord; nodeUuid: string }) => Promise<void>
   checkOut: (recordUuid: string) => Promise<void>
   timeoutMs?: number
 }
@@ -199,7 +206,7 @@ const toOutcome = (result: NodeSaveResult): ScreenshotSaveOutcome => {
  */
 const sendAndWait = async (
   deps: ScreenshotSaveDeps,
-  params: { recordUuid: string; record: unknown; node: unknown; blob?: Blob | null; fileName?: string }
+  params: { recordUuid: string; record: ArenaRecord; node: ArenaRecordNode; blob?: Blob | null; fileName?: string }
 ): Promise<{ outcome: ScreenshotSaveOutcome; nodes: Record<string, unknown> }> => {
   const { recordUuid, record, node, blob, fileName } = params
   const waiter = startNodeSaveWaiter({
@@ -231,7 +238,7 @@ const sendAndWait = async (
  */
 const sendChange = async (
   deps: ScreenshotSaveDeps,
-  { record, change, input }: { record: unknown; change: ScreenshotNodeChange; input: ScreenshotSaveInput }
+  { record, change, input }: { record: ArenaRecord; change: ScreenshotNodeChange; input: ScreenshotSaveInput }
 ): Promise<ScreenshotSaveOutcome> => {
   const { recordUuid, blob, fileName } = input
   let { node } = change

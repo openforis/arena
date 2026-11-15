@@ -1,3 +1,6 @@
+import { Records } from '@openforis/arena-core'
+import type { ArenaRecord, User as ArenaUser } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -16,9 +19,17 @@ import { RecordUserDependentStateUpdater } from './_record/recordUserDependentSt
 
 export { keys, infoKeys } from './_record/recordKeys'
 
+type RecordUpdater = (record: ArenaRecord) => ArenaRecord
+
 // ====== CREATE
 
-export const newRecord = (user, cycle, preview = false, dateCreated = null, step = null) => {
+export const newRecord = (
+  user: ArenaUser,
+  cycle: string,
+  preview = false,
+  dateCreated: string | null = null,
+  step: string | null = null
+): ArenaRecord => {
   const role = null
   return {
     [keys.uuid]: uuidv4(),
@@ -31,29 +42,36 @@ export const newRecord = (user, cycle, preview = false, dateCreated = null, step
     [keys.preview]: preview,
     [keys.dateCreated]: dateCreated,
     [keys.info]: { [infoKeys.createdWith]: AppInfo.currentAppInfo },
-  }
+  } as ArenaRecord
 }
 
 // ====== READ
-export const getSurveyUuid = A.prop(keys.surveyUuid)
+const getStringProp =
+  (key: string) =>
+  (record: ArenaRecord): string | undefined =>
+    A.prop(key)(record) as string | undefined
+
+const isFlagTrue =
+  (key: string) =>
+  (record: ArenaRecord): boolean =>
+    A.propEq(key, true)(record)
+
+export const getSurveyUuid = getStringProp(keys.surveyUuid)
 
 export const { getUuid } = ObjectUtils
-export const isPreview = A.propEq(keys.preview, true)
-export const isReadOnly = A.propEq(keys.readOnly, true)
-export const getOwnerUuid = A.prop(keys.ownerUuid)
-export const getOwnerName = A.prop(keys.ownerName)
-export const getStep = A.prop(keys.step)
-export const isInAnalysisStep = (record) => {
-  const stepId = getStep(record)
-  const step = RecordStep.getStep(stepId)
-  return RecordStep.getName(step) === RecordStep.stepNames.analysis
-}
-export const getCycle = A.prop(keys.cycle)
-export const getMergedIntoRecordUuid = A.prop(keys.mergedIntoRecordUuid)
+export const isPreview = isFlagTrue(keys.preview)
+export const isReadOnly = isFlagTrue(keys.readOnly)
+export const getOwnerUuid = getStringProp(keys.ownerUuid)
+export const getOwnerName = getStringProp(keys.ownerName)
+export const getStep = getStringProp(keys.step)
+export const isInAnalysisStep = (record: ArenaRecord): boolean => Records.isInAnalysisStep(record)
+export const getCycle = getStringProp(keys.cycle)
+export const getMergedIntoRecordUuid = getStringProp(keys.mergedIntoRecordUuid)
 export const { getDateCreated } = ObjectUtils
 export const { getDateModified } = ObjectUtils
-export const getInfo = A.propOr({}, keys.info)
-export const getCreatedWithAppId = (record) => {
+export const getInfo = (record: ArenaRecord): Record<string, any> =>
+  A.propOr({}, keys.info)(record) as Record<string, any>
+export const getCreatedWithAppId = (record: ArenaRecord): string => {
   const info = getInfo(record)
   const createdWith = info[infoKeys.createdWith]
   return AppInfo.getAppId(createdWith)
@@ -104,8 +122,14 @@ export const {
 } = RecordNodesUpdater
 export { replaceUpdatedNodes, mergeRecords } from './_record/recordsCombiner'
 export const { recomputeUserDependentNodeState } = RecordUserDependentStateUpdater
-export const assocOwnerUuid = A.assoc(keys.ownerUuid)
-export const assocReadOnly = A.assoc(keys.readOnly)
+export const assocOwnerUuid =
+  (ownerUuid: string): RecordUpdater =>
+  (record) =>
+    A.assoc(keys.ownerUuid, ownerUuid, record)
+export const assocReadOnly =
+  (readOnly: boolean): RecordUpdater =>
+  (record) =>
+    A.assoc(keys.readOnly, readOnly, record)
 
 // ====== DELETE
 export const { deleteNode } = RecordUpdater
@@ -115,9 +139,19 @@ export const { mergeNodeValidations } = RecordUpdater
 export const { getValidation } = Validation
 
 // ====== RECORD SUMMARY
-export const getFilesCount = A.prop(keys.filesCount)
-export const getFilesSize = A.prop(keys.filesSize)
-export const getFilesMissing = A.prop(keys.filesMissing)
+const getNumberProp =
+  (key: string) =>
+  (record: ArenaRecord): number | undefined =>
+    A.prop(key)(record) as number | undefined
 
-export const getKeysObj = A.propOr({}, keys.keysObj)
-export const getSummaryAttributesObj = A.propOr({}, keys.summaryAttributesObj)
+const getObjectProp =
+  (key: string) =>
+  (record: ArenaRecord): Record<string, unknown> =>
+    A.propOr({}, key)(record) as Record<string, unknown>
+
+export const getFilesCount = getNumberProp(keys.filesCount)
+export const getFilesSize = getNumberProp(keys.filesSize)
+export const getFilesMissing = getNumberProp(keys.filesMissing)
+
+export const getKeysObj = getObjectProp(keys.keysObj)
+export const getSummaryAttributesObj = getObjectProp(keys.summaryAttributesObj)
