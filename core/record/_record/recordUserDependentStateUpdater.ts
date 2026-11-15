@@ -1,6 +1,15 @@
 import * as A from '@core/arena'
 
 import { Nodes, RecordExpressionEvaluator, RecordNodesUpdater as CoreRecordNodesUpdater } from '@openforis/arena-core'
+import type {
+  ArenaRecord,
+  ArenaRecordNode,
+  NodeDef as ArenaNodeDef,
+  NodeDefExpression,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  User as ArenaUser,
+} from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,6 +19,14 @@ import * as RecordReader from './recordReader'
 import * as RecordUpdater from './recordUpdater'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
+
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type UserSurveyRecord = { user: ArenaUser; survey: ArenaSurvey; record: ArenaRecord }
+type ChildStateUpdater = (params: {
+  parentNode: ArenaRecordNode
+  nodeDefUuid: string
+  value: boolean
+}) => ArenaRecordNode
 
 // Directly evaluates `getExpressions(nodeDef)` against every instance of nodeDef's parent
 // node def, and writes the resulting boolean into the parent's meta via `assocValue`.
@@ -22,7 +39,18 @@ const { updateNodesDependents } = CoreRecordNodesUpdater
 // userProp(...) expression references no node, so it has no dependency-graph edge at all:
 // seeding with the affected (pre-existing) entity itself would silently do nothing. Instead,
 // evaluate directly and write into the parent's meta, bypassing the dependency-graph walk.
-const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpressions, assocValue }) => {
+const _recomputeBooleanState = async ({
+  user,
+  survey,
+  record,
+  nodeDefs,
+  getExpressions,
+  assocValue,
+}: UserSurveyRecord & {
+  nodeDefs: AnyNodeDef[]
+  getExpressions: (nodeDef: AnyNodeDef) => NodeDefExpression[]
+  assocValue: ChildStateUpdater
+}): Promise<ArenaRecord> => {
   const evaluator = new RecordExpressionEvaluator()
   let recordUpdated = record
 
@@ -61,18 +89,23 @@ const _recomputeBooleanState = async ({ user, survey, record, nodeDefs, getExpre
 // restriction) correctly re-triggers for a seeded, pre-existing attribute node - it also
 // already respects isDefaultValueEvaluatedOneTime and skips values the user manually edited
 // (Nodes.isDefaultValueApplied / Nodes.isValueBlank checks in canApplyDefaultValue).
-const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
+const _recomputeDefaultValues = async ({
+  user,
+  survey,
+  record,
+  nodeDefs,
+}: UserSurveyRecord & { nodeDefs: AnyNodeDef[] }): Promise<ArenaRecord> => {
   const nodeDefsToRecompute = nodeDefs.filter(
     (nodeDef) => !A.isEmpty(NodeDef.getDefaultValues(nodeDef)) && !NodeDef.isDefaultValueEvaluatedOneTime(nodeDef)
   )
   if (A.isEmpty(nodeDefsToRecompute)) return record
 
-  const nodesToRecompute = nodeDefsToRecompute.reduce((acc, nodeDef) => {
-    RecordReader.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record).forEach((node) => {
-      acc[Node.getUuid(node)] = node
-    })
-    return acc
-  }, {})
+  const nodesToRecompute: Record<string, ArenaRecordNode> = {}
+  for (const nodeDef of nodeDefsToRecompute) {
+    for (const node of RecordReader.getNodesByDefUuid(NodeDef.getUuid(nodeDef))(record)) {
+      nodesToRecompute[Node.getUuid(node)] = node
+    }
+  }
   if (A.isEmpty(nodesToRecompute)) return record
 
   const { record: recordUpdated } = await updateNodesDependents({
@@ -88,7 +121,7 @@ const _recomputeDefaultValues = async ({ user, survey, record, nodeDefs }) => {
 // Re-evaluates applicability/relevance, visibility, editability and default values for node
 // defs whose expressions depend on the given user (e.g. userProp). Pure/in-memory: it never
 // persists anything, so callers decide whether/how the result should be stored.
-const recomputeUserDependentNodeState = async ({ user, survey, record }) => {
+const recomputeUserDependentNodeState = async ({ user, survey, record }: UserSurveyRecord): Promise<ArenaRecord> => {
   const nodeDefsUserDependent = Survey.getNodeDefsArray(survey).filter(NodeDef.hasUserDependentExpressions)
   if (A.isEmpty(nodeDefsUserDependent)) return record
 

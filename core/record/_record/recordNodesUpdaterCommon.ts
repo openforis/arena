@@ -4,6 +4,16 @@ import {
   RecordNodesUpdater as CoreRecordNodesUpdater,
   NodeValues,
 } from '@openforis/arena-core'
+import type {
+  ArenaRecord,
+  ArenaRecordNode,
+  CategoryItemProvider,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  NodesMap,
+  Survey as ArenaSurvey,
+  TaxonProvider,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Validation from '@core/validation/validation'
@@ -17,7 +27,20 @@ import { RecordEvaluationContext } from '@core/record/recordEvaluationContext'
 
 const { updateNodesDependents } = CoreRecordNodesUpdater
 
-const _populateRefDataForCodeNode = async ({ survey, node, nodeDef, value, categoryItemProvider }) => {
+type PopulateRefDataParams = {
+  survey: ArenaSurvey
+  node: ArenaRecordNode
+  nodeDef: ArenaNodeDef<NodeDefType>
+  value: any
+}
+
+const _populateRefDataForCodeNode = async ({
+  survey,
+  node,
+  nodeDef,
+  value,
+  categoryItemProvider,
+}: PopulateRefDataParams & { categoryItemProvider?: CategoryItemProvider }): Promise<void> => {
   if (!categoryItemProvider || NodeRefData.getCategoryItem(node)) return
 
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
@@ -33,7 +56,13 @@ const _populateRefDataForCodeNode = async ({ survey, node, nodeDef, value, categ
   }
 }
 
-const _populateRefDataForTaxonNode = async ({ survey, node, nodeDef, value, taxonProvider }) => {
+const _populateRefDataForTaxonNode = async ({
+  survey,
+  node,
+  nodeDef,
+  value,
+  taxonProvider,
+}: PopulateRefDataParams & { taxonProvider?: TaxonProvider }): Promise<void> => {
   if (!taxonProvider || NodeRefData.getTaxon(node)) return
 
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
@@ -43,7 +72,8 @@ const _populateRefDataForTaxonNode = async ({ survey, node, nodeDef, value, taxo
   const taxonUuid = NodeValues.getTaxonUuid(value)
   if (!taxonUuid) return
 
-  const taxon = await taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
+  // draft not specified before: the providers default it to false (published taxa)
+  const taxon = await taxonProvider.getTaxonByUuid({ survey, taxonomyUuid, taxonUuid, draft: false })
   if (taxon) {
     node[NodeRefData.keys.refData] = { [NodeRefData.keys.taxon]: taxon }
   }
@@ -54,7 +84,17 @@ const _populateRefDataForTaxonNode = async ({ survey, node, nodeDef, value, taxo
 // Without refData, isNotEmpty(attr) returns false even when the node has a value,
 // causing dependent relevancy rules to be evaluated incorrectly.
 // We populate refData for affected nodes before dependent evaluation runs.
-const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider, taxonProvider }) => {
+const _populateRefDataForBigNodes = async ({
+  survey,
+  nodes,
+  categoryItemProvider,
+  taxonProvider,
+}: {
+  survey: ArenaSurvey
+  nodes: NodesMap
+  categoryItemProvider?: CategoryItemProvider
+  taxonProvider?: TaxonProvider
+}): Promise<void> => {
   for (const node of Object.values(nodes)) {
     if (Node.isValueBlank(node)) continue
 
@@ -77,7 +117,19 @@ const _populateRefDataForBigNodes = async ({ survey, nodes, categoryItemProvider
  * @param {boolean} [params.sideEffect] - Whether to update the record and the nodes in place.
  * @returns {Promise<RecordUpdateResult>} - The update result.
  */
-export const afterNodesUpdate = async ({ record, nodes, passiveNodes = {}, sideEffect = false, ...otherParams }) => {
+export const afterNodesUpdate = async ({
+  record,
+  nodes,
+  passiveNodes = {},
+  sideEffect = false,
+  ...otherParams
+}: {
+  record: ArenaRecord
+  nodes: NodesMap
+  passiveNodes?: NodesMap
+  sideEffect?: boolean
+  [contextParam: string]: unknown
+}): Promise<RecordUpdateResult> => {
   const contextParam = RecordEvaluationContext.extract(otherParams)
   const { survey, categoryItemProvider, taxonProvider } = contextParam
   // language-dependent expression functions (e.g. numberToWords) need a language to evaluate with;
@@ -113,7 +165,10 @@ export const afterNodesUpdate = async ({ record, nodes, passiveNodes = {}, sideE
     Validation.mergeValidation(nodesValidation),
     Validation.updateCounts
   )(updateResult.record)
-  updateResult.record = Validation.assocValidation(recordValidationUpdated)(updateResult.record)
+  // assocValidation is typed on plain objects
+  updateResult.record = Validation.assocValidation(recordValidationUpdated)(
+    updateResult.record as unknown as Record<string, unknown>
+  )
 
   return updateResult
 }

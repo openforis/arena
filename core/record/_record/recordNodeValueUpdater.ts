@@ -1,10 +1,30 @@
 import { RecordUpdateResult } from '@openforis/arena-core'
+import type {
+  ArenaRecord,
+  ArenaRecordNode,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  NodeRefData as ArenaNodeRefData,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import * as Node from '@core/record/node'
 import * as NodeRefData from '@core/record/nodeRefData'
 
 import { NodeValues } from '../nodeValues'
+
+type UpdateAttributeValueParams = {
+  survey: ArenaSurvey
+  record: ArenaRecord
+  entity: ArenaRecordNode
+  attributeDef: ArenaNodeDef<NodeDefType>
+  attribute: ArenaRecordNode
+  value: any
+  refData?: ArenaNodeRefData | null
+  dateModified?: Date | string | null
+  sideEffect?: boolean
+}
 
 export const updateAttributeValue = ({
   survey,
@@ -16,7 +36,7 @@ export const updateAttributeValue = ({
   refData = null,
   dateModified: dataModifiedParam = null,
   sideEffect = false,
-}) => {
+}: UpdateAttributeValueParams): RecordUpdateResult | null => {
   const valueChanged = !NodeValues.isValueEqual({
     survey,
     nodeDef: attributeDef,

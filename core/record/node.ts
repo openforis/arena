@@ -245,7 +245,7 @@ export const removeFlags =
   }
 
 export const assocDateModified =
-  (dateModified: string): NodeUpdater =>
+  (dateModified: string | Date): NodeUpdater =>
   (node) =>
     A.assoc(keys.dateModified, dateModified, node)
 
