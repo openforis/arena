@@ -1,4 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -57,8 +58,13 @@ const parseSourceNodeDefTreeItemKey = (treeItemKey: string): SourceNodeDefSelect
   return { surveyId: Number(surveyIdString), nodeDefUuid }
 }
 
-const getChildNodeDefs = ({ survey, nodeDef }: { survey: object; nodeDef: object }): object[] =>
-  Survey.getNodeDefChildrenSorted({ nodeDef })(survey)
+const getChildNodeDefs = ({
+  survey,
+  nodeDef,
+}: {
+  survey: object
+  nodeDef: ArenaNodeDef<NodeDefType>
+}): ArenaNodeDef<NodeDefType>[] => Survey.getNodeDefChildrenSorted({ nodeDef })(survey)
 
 const toNodeDefTreeItems = ({
   nodeDefs,
@@ -67,7 +73,7 @@ const toNodeDefTreeItems = ({
   surveyId,
   surveyLoaded,
 }: {
-  nodeDefs: object[]
+  nodeDefs: ArenaNodeDef<NodeDefType>[]
   lang: string
   cycle: string
   surveyId: number

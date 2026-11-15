@@ -1,4 +1,4 @@
-import type { ArenaRecord } from '@openforis/arena-core'
+import type { ArenaRecord, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -15,7 +15,7 @@ type GetPageEntityParams = {
 }
 
 type GetPageEntityFromParentParams = {
-  pageNodeDef: object
+  pageNodeDef: ArenaNodeDef<NodeDefType>
   pageNodeDefUuid: string
   parentDefUuid: string
   pagesUuidMap?: PagesUuidMap
@@ -134,7 +134,7 @@ export const getMultiplePageScopeEntityUuid = ({
   survey: object
   record: ArenaRecord
   pagesUuidMap?: PagesUuidMap
-  pageNodeDef: object
+  pageNodeDef: ArenaNodeDef<NodeDefType>
 }): string | null => {
   const parentDefUuid = NodeDef.getParentUuid(pageNodeDef)
   if (!parentDefUuid) return null

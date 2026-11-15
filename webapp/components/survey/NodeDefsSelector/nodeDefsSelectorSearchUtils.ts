@@ -1,6 +1,7 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 
-export type NodeDefFilterFunction = (nodeDef: object) => boolean
+export type NodeDefFilterFunction = (nodeDef: ArenaNodeDef<NodeDefType>) => boolean
 
 /**
  * Creates a filter function matching node definitions whose name or label contains the given search text.
@@ -19,7 +20,7 @@ export const getNodeDefSearchFilterFunction = ({
   const searchNormalized = (search ?? '').trim().toLowerCase()
   if (!searchNormalized) return null
 
-  return (nodeDef: object) => {
+  return (nodeDef: ArenaNodeDef<NodeDefType>) => {
     const nodeDefQueryItems = [NodeDef.getName(nodeDef), NodeDef.getLabel(nodeDef, lang)]
     return nodeDefQueryItems.some((item) => item.toLowerCase().includes(searchNormalized))
   }
@@ -37,5 +38,6 @@ export const combineNodeDefFilterFunctions = (
     Boolean(filterFunction)
   )
   if (filterFunctionsActive.length === 0) return null
-  return (nodeDef: object) => filterFunctionsActive.every((filterFunction) => filterFunction(nodeDef))
+  return (nodeDef: ArenaNodeDef<NodeDefType>) =>
+    filterFunctionsActive.every((filterFunction) => filterFunction(nodeDef))
 }

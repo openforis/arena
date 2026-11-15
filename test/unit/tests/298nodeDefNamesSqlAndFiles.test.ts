@@ -1,3 +1,5 @@
+import type { NodeDefType } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -24,7 +26,7 @@ const getError = (fn: () => void) => {
 
 describe('Node def write check', () => {
   const newNodeDef = (type: string, props: Record<string, unknown>) => ({
-    ...NodeDef.newNodeDef(null, type, ['0']),
+    ...NodeDef.newNodeDef(null, type as NodeDefType, ['0']), // type can be invalid on purpose
     props,
   })
 

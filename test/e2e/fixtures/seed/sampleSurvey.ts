@@ -2,6 +2,8 @@ import path from 'node:path'
 
 import log4js from 'log4js'
 
+import type { NodeDefType as ArenaNodeDefType } from '@openforis/arena-core'
+
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
 import * as Survey from '@core/survey/survey'
@@ -64,7 +66,7 @@ export type SampleSurveyOptions = {
 type ExpressionsByName = Record<string, string>
 
 const createAttributeBuilder = (nodeDef: SampleNodeDef, withExpressions: boolean) => {
-  const builder = SB.attribute(nodeDef.name, nodeDef.type).label(nodeDef.label)
+  const builder = SB.attribute(nodeDef.name, nodeDef.type as ArenaNodeDefType).label(nodeDef.label)
   if (nodeDef.key) builder.key()
   if (nodeDef.unique) builder.unique()
   if (nodeDef.category) builder.category(nodeDef.category)

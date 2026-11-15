@@ -1,7 +1,7 @@
 import { useSelector } from 'react-redux'
 
 import { Objects, Records } from '@openforis/arena-core'
-import type { ArenaRecord } from '@openforis/arena-core'
+import type { ArenaRecord, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -268,7 +268,7 @@ const getNonMultipleTreeItemStatus = (
  * @param state - Redux state
  * @returns Parent entity UUID, or null when the parent cannot be resolved
  */
-const getMultiplePageScopeEntityUuid = (pageNodeDef: object, state: unknown): string | null => {
+const getMultiplePageScopeEntityUuid = (pageNodeDef: ArenaNodeDef<NodeDefType>, state: unknown): string | null => {
   const record = RecordState.getRecord(state)
   if (!record) return null
   return resolveMultiplePageScopeEntityUuid({
