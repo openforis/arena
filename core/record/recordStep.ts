@@ -56,8 +56,9 @@ export const { getId } = ObjectUtils
 export const getName = (step: RecordStep | null | undefined): string | undefined =>
   A.prop(keys.name)(step) as string | undefined
 
+// false if a step is missing (e.g. unknown step id): its index (-1) would be adjacent to the first step one (0)
 export const areAdjacent = (step1: RecordStep | null | undefined, step2: RecordStep | null | undefined): boolean => {
-  if (!(step1 || step2)) {
+  if (!step1 || !step2) {
     return false
   }
   const idx1 = getStepIndex(getId(step1))
