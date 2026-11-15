@@ -2,6 +2,13 @@ import { NodeValueFormatter as CoreNodeValueFormatter, Objects, Records, Surveys
 import * as Node from '@core/record/node'
 
 /**
+ * Converts a value that could not be formatted to a string (objects as JSON, not as '[object Object]').
+ * @param {unknown} value - The value (not empty).
+ * @returns {string} - The value as string.
+ */
+const _valueToString = (value) => (typeof value === 'object' ? JSON.stringify(value) : String(value))
+
+/**
  * Formats a node value (falling back to its string conversion).
  * @param {object} params - The parameters.
  * @param {object} params.survey - The survey.
@@ -16,7 +23,7 @@ import * as Node from '@core/record/node'
 const format = ({ survey, cycle = undefined, nodeDef, value, node = null, showLabel = false, lang = null }) => {
   const valueFormatted = CoreNodeValueFormatter.format({ survey, cycle, nodeDef, node, value, showLabel, lang })
   if (Objects.isEmpty(valueFormatted)) {
-    return Objects.isEmpty(value) ? null : String(value)
+    return Objects.isEmpty(value) ? null : _valueToString(value)
   }
   return valueFormatted
 }
