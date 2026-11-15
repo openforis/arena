@@ -5,9 +5,10 @@ import SystemError, { StatusCodes } from '../../../../core/systemError'
 import { AggregateFunctionExpression } from '../../../../core/survey/aggregateFunctionExpression'
 import { ColumnNodeDef } from '../tables/dataNodeDef'
 import { Query } from '../../query'
+import type ViewDataNodeDef from '../views/dataNodeDef/view'
 import SqlSelectBuilder from './sqlSelectBuilder'
 
-const sqlFunctionByAggregateFunction = {
+const sqlFunctionByAggregateFunction: Record<string, string> = {
   [Query.DEFAULT_AGGREGATE_FUNCTIONS.avg]: 'AVG',
   [Query.DEFAULT_AGGREGATE_FUNCTIONS.cnt]: 'COUNT',
   [Query.DEFAULT_AGGREGATE_FUNCTIONS.max]: 'MAX',
@@ -17,17 +18,27 @@ const sqlFunctionByAggregateFunction = {
 }
 
 class SqlSelectAggBuilder extends SqlSelectBuilder {
-  constructor({ viewDataNodeDef }) {
+  private readonly _viewDataNodeDef: ViewDataNodeDef
+
+  constructor({ viewDataNodeDef }: { viewDataNodeDef: ViewDataNodeDef }) {
     super()
     this._viewDataNodeDef = viewDataNodeDef
   }
 
-  selectMeasure({ aggFunctions, nodeDefUuid, index }) {
+  selectMeasure({
+    aggFunctions,
+    nodeDefUuid,
+    index,
+  }: {
+    aggFunctions: string[]
+    nodeDefUuid: string
+    index: number
+  }): this {
     const { survey } = this._viewDataNodeDef
     const nodeDefMeasure = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
     const columnMeasure = new ColumnNodeDef(this._viewDataNodeDef, nodeDefMeasure).name
 
-    aggFunctions.forEach((aggFnNameOrUuid, aggFnIndex) => {
+    for (const [aggFnIndex, aggFnNameOrUuid] of aggFunctions.entries()) {
       const fieldAggFn = sqlFunctionByAggregateFunction[aggFnNameOrUuid]
 
       const fieldAlias = ColumnNodeDef.getColumnNameAggregateFunction({
@@ -47,17 +58,13 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
           this.addParams({ [paramName]: fieldAlias })
         }
       }
-    })
+    }
     return this
   }
 
-  /**
-   * Converts the expression of a custom aggregate function into SQL: only the allowed SQL is used, never the stored text.
-   * @param {object} aggregateFn - The custom aggregate function.
-   * @returns {string} - The SQL of the expression.
-   * @throws {SystemError} - When the expression is not valid (it may have been stored or imported without validation).
-   */
-  _customAggregateFunctionToSql(aggregateFn) {
+  // converts a custom aggregate function expression into SQL (only the allowed SQL, never the stored text);
+  // throws a SystemError if the expression is not valid (it may have been stored or imported without validation)
+  _customAggregateFunctionToSql(aggregateFn: { name: string; expression: string }): string {
     const { name, expression } = aggregateFn
     const columnNames = this._viewDataNodeDef.columnNodeDefNames
     if (AggregateFunctionExpression.validate({ expression, columnNames })) {
@@ -66,16 +73,16 @@ class SqlSelectAggBuilder extends SqlSelectBuilder {
     return AggregateFunctionExpression.toSql({ expression, columnNames })
   }
 
-  selectDimension({ dimension, index }) {
+  selectDimension({ dimension, index }: { dimension: string; index: number }): this {
     const nodeDefDimension = Survey.getNodeDefByUuid(dimension)(this._viewDataNodeDef.survey)
     const columnDimension = new ColumnNodeDef(this._viewDataNodeDef, nodeDefDimension)
-    columnDimension.names.forEach((columnName, columnIndex) => {
+    for (const [columnIndex, columnName] of columnDimension.names.entries()) {
       const paramName = `dimension_field_${index}_${columnIndex}`
       const selectFields = [`$/${paramName}:name/`]
       this.select(...selectFields)
       this.groupBy(...selectFields)
       this.addParams({ [paramName]: columnName })
-    })
+    }
     return this
   }
 }

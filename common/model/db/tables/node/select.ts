@@ -7,28 +7,35 @@ import TableCategoryItem from '../categoryItem'
 import TableTaxon from '../taxon'
 import TableTaxonVernacularName from '../taxonVernacularName'
 import { jsonBuildObject } from '../../sql'
+import type Table from '../table'
+import type TableNode from './table'
 
-const _isInsideSingleEntity = ({ survey, nodeDefUuid }) => {
+export type GetSelectParams = {
+  uuid?: string | null
+  recordUuid?: string | null
+  parentUuid?: string | null
+  nodeDefUuid?: string | null
+  // include draft props (otherwise only published ones)
+  draft?: boolean
+}
+
+const _isInsideSingleEntity = ({
+  survey,
+  nodeDefUuid,
+}: {
+  survey: TableNode['survey']
+  nodeDefUuid: string
+}): boolean => {
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   return NodeDef.isSingle(nodeDefParent)
 }
 
-/**
- * Generates the select query for the node table by the given parameters.
- *
- * @param {!object} params - The query parameters.
- * @param {string} [params.uuid=null] - The node uuid to filter by.
- * @param {string} [params.recordUuid=null] - The record uuid to filter by.
- * @param {string} [params.parentUuid=null] - The parent node uuid to filter by.
- * @param {string} [params.nodeDefUuid=null] - The node definition uuid to filter by.
- * @param {boolean} [params.draft=false] - Whether to fetch draft props or only published ones.
- * @returns {string} - The select query.
- */
-export function getSelect(params) {
+// select query for the node table (bound to a TableNode instance)
+export function getSelect(this: TableNode, params: GetSelectParams): string {
   const { uuid = null, recordUuid = null, parentUuid = null, nodeDefUuid = null, draft = false } = params
 
-  const _getPropsCombined = (table) =>
+  const _getPropsCombined = (table: Table) =>
     draft ? `${table.columnProps} || ${table.columnPropsDraft}` : `${table.columnProps}`
 
   const tableCategoryItem = new TableCategoryItem(this.surveyId)

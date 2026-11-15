@@ -1,6 +1,6 @@
 import Table from '../table'
 import TableSurvey from '../tableSurvey'
-import { getSelect } from './select'
+import { getSelect, GetSelectParams } from './select'
 
 const columnSet = {
   uuid: Table.columnSetCommon.uuid,
@@ -19,17 +19,20 @@ const scriptColumnNames = [columnSet.scriptCommon, columnSet.scriptEnd]
 const tableName = 'chain'
 
 export default class TableChain extends TableSurvey {
-  constructor(surveyId) {
+  static columnSet = columnSet
+  static tableName = tableName
+
+  private readonly _columnsNoScript: string[]
+  getSelect: (params: GetSelectParams) => string
+
+  constructor(surveyId: number) {
     super(surveyId, tableName, columnSet)
     const scriptColumns = new Set(scriptColumnNames.map((col) => this.getColumn(col)))
     this._columnsNoScript = this.columns.filter((column) => !scriptColumns.has(column))
     this.getSelect = getSelect.bind(this)
   }
 
-  get columnsNoScript() {
+  get columnsNoScript(): string[] {
     return this._columnsNoScript
   }
 }
-
-TableChain.columnSet = columnSet
-TableChain.tableName = tableName

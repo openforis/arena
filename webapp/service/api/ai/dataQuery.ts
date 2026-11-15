@@ -4,8 +4,10 @@
  */
 import axios from 'axios'
 
+import type { Query } from '@common/model/query'
+
 export type AiDataQueryGenerateResult = {
-  query: object
+  query: Query.QueryItem
   explanation: string
 }
 

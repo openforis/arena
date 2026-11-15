@@ -22,16 +22,10 @@ const jsTypeBySqlType = {
   [types.geometryPoint]: 'object', // GeoJSON Point object
 }
 
-export const getJsTypeBySqlType = (sqlType) => jsTypeBySqlType[sqlType] || 'unknown'
+export const getJsTypeBySqlType = (sqlType: string): string => jsTypeBySqlType[sqlType] || 'unknown'
 
-/**
- * Generates an alias from the specified name, splitting it into words
- * and getting the first letter of each word, to make it more or less human readable,
- * followed by a short hash of the name, to make it (almost) unique, but still short.
- * @param {!string} name - The name used to generate the alias.
- * @returns {string} - The generated alias.
- */
-export const createAlias = (name) =>
+// short, (almost) unique alias: first letter of each word in the name, followed by a short hash of the name
+export const createAlias = (name: string): string =>
   // add '_' prefix to avoid collision with reserved words
   `_${name
     // split in words
@@ -43,19 +37,19 @@ export const createAlias = (name) =>
     StringUtils.hashCode(name)
   }`
 
-const quoteIdentifier = (identifier) =>
+const quoteIdentifier = (identifier: string): string =>
   // do not quote '*' (used in count(*)) or identifiers starting with '_' (used for aliases), to avoid breaking queries
   identifier === '*' || identifier.startsWith('_') ? identifier : StringUtils.quoteDouble(identifier)
 
-export const addAlias = (alias, ...columnNames) =>
+export const addAlias = (alias: string, ...columnNames: string[]): string[] =>
   columnNames.map((columnName) => `${quoteIdentifier(alias)}.${quoteIdentifier(columnName)}`)
 
 // Json
-export const jsonAgg = (expression, orderByColumns = []) => {
+export const jsonAgg = (expression: string, orderByColumns: string[] = []): string => {
   const whenExpr = `WHEN count(${expression}) = 0 THEN '[]'`
   const orderBy = orderByColumns.length > 0 ? ` ORDER BY ${orderByColumns.join(', ')}` : ''
   const elseExpr = `ELSE json_agg(${expression}${orderBy})`
   return `CASE ${whenExpr} ${elseExpr} END`
 }
 
-export const jsonBuildObject = (...args) => `jsonb_build_object(${args.join(', ')})`
+export const jsonBuildObject = (...args: string[]): string => `jsonb_build_object(${args.join(', ')})`

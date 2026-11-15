@@ -1,3 +1,5 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Survey from '../../../../../core/survey/survey'
@@ -9,6 +11,8 @@ import TableSurveyRdb from '../tableSurveyRdb'
 import TableRecord from '../record'
 import ColumnNodeDef from './columnNodeDef'
 import { TableDataNodeDefRowUtils } from './rowUtils'
+
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
 
 const tableNamePrefix = 'data'
 
@@ -47,24 +51,25 @@ const rootDefColumnNamesAndTypes = [
   `${columnSet.recordOwnerUuid} uuid        NOT NULL`,
 ]
 
-/**
- * Table with the data of a node definition.
- * @property {Survey} survey - The survey.
- * @property {NodeDef} nodeDef - The nodeDef table.
- * @property {ColumnNodeDef[]} columnNodeDefs - The nodeDef columns.
- */
+// table with the data of a node definition (entity or multiple attribute)
 export default class TableDataNodeDef extends TableSurveyRdb {
-  constructor(survey, nodeDef) {
+  static columnSet = columnSet
+  static rootDefColumnNames = rootDefColumnNames
+
+  private readonly _survey: ArenaSurvey
+  private readonly _nodeDef: AnyNodeDef
+
+  constructor(survey: ArenaSurvey, nodeDef: AnyNodeDef) {
     super(Survey.getId(survey), `${tableNamePrefix}_${NodeDef.getName(nodeDef)}`, columnSet)
     this._survey = survey
     this._nodeDef = nodeDef
   }
 
-  get survey() {
+  get survey(): ArenaSurvey {
     return this._survey
   }
 
-  get nodeDef() {
+  get nodeDef(): AnyNodeDef {
     return this._nodeDef
   }
 
@@ -96,7 +101,7 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this.getColumn(columnSet.recordOwnerUuid)
   }
 
-  getNodeDefsForColumns({ includeAnalysis = true } = {}) {
+  getNodeDefsForColumns({ includeAnalysis = true }: { includeAnalysis?: boolean } = {}): AnyNodeDef[] {
     const { nodeDef, survey } = this
     if (NodeDef.isAttribute(nodeDef)) {
       // Multiple attr table
@@ -113,13 +118,13 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     )(survey)
   }
 
-  get columnNodeDefs() {
+  get columnNodeDefs(): ColumnNodeDef[] {
     return this.getNodeDefsForColumns({ includeAnalysis: true }).map(
       (nodeDefColumn) => new ColumnNodeDef(this, nodeDefColumn)
     )
   }
 
-  getColumnNames = ({ includeAnalysis = true } = {}) => {
+  getColumnNames = ({ includeAnalysis = true }: { includeAnalysis?: boolean } = {}): string[] => {
     const { nodeDef } = this
     const nodeDefsForColumns = this.getNodeDefsForColumns({ includeAnalysis })
     const names = [columnSet.uuid, columnSet.parentUuid, columnSet.dateCreated, columnSet.dateModified]
@@ -130,21 +135,20 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return names
   }
 
-  getColumnsWithType() {
-    const columnsAndType = []
-    columnsAndType.push(...commonColumnNamesAndTypes)
+  getColumnsWithType(): string[] {
+    const columnsAndType = [...commonColumnNamesAndTypes]
     if (NodeDef.isRoot(this.nodeDef)) {
       columnsAndType.push(...rootDefColumnNamesAndTypes)
     }
-    this.columnNodeDefs.forEach((nodeDefColumn) => {
+    for (const nodeDefColumn of this.columnNodeDefs) {
       columnsAndType.push(
         ...nodeDefColumn.names.map((name, i) => `${StringUtils.quoteDouble(name)} ${nodeDefColumn.types[i]}`)
       )
-    })
+    }
     return columnsAndType
   }
 
-  _getConstraintFk(tableReferenced, column) {
+  _getConstraintFk(tableReferenced: Table, column: string): string {
     const constraintName = StringUtils.quoteDouble(`${this.name}_${tableReferenced.name}_fk`)
     return `CONSTRAINT ${constraintName} 
     FOREIGN KEY (${column}) 
@@ -152,14 +156,14 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     ON DELETE CASCADE`
   }
 
-  getConstraintFkRecord() {
+  getConstraintFkRecord(): string | null {
     if (!NodeDef.isRoot(this.nodeDef)) {
       return null
     }
     return this._getConstraintFk(new TableRecord(this.surveyId), columnSet.recordUuid)
   }
 
-  getConstraintFkParent() {
+  getConstraintFkParent(): string | null {
     if (NodeDef.isRoot(this.nodeDef)) {
       return null
     }
@@ -167,15 +171,21 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return this._getConstraintFk(new TableDataNodeDef(this.survey, ancestorMultipleEntity), columnSet.parentUuid)
   }
 
-  getConstraintUuidUnique() {
+  getConstraintUuidUnique(): string {
     const constraintName = StringUtils.quoteDouble(`${NodeDef.getName(this.nodeDef)}_uuid_unique_ix1`)
     return `CONSTRAINT ${constraintName} UNIQUE (${columnSet.uuid})`
   }
 
-  getRowValuesByColumnName = ({ nodeRow, nodeDefColumns }) => {
+  getRowValuesByColumnName = ({
+    nodeRow,
+    nodeDefColumns,
+  }: {
+    nodeRow: Record<string, any>
+    nodeDefColumns: AnyNodeDef[]
+  }): Record<string, unknown> => {
     const { survey, nodeDef } = this
     const valuesByColumnName = TableDataNodeDefRowUtils.getValuesByColumnName({ survey, nodeRow, nodeDefColumns })
-    const result = {
+    const result: Record<string, unknown> = {
       [columnSet.uuid]: nodeRow[columnSet.uuid],
       [columnSet.parentUuid]: nodeRow[columnSet.ancestorUuid],
       [columnSet.dateCreated]: nodeRow[columnSet.dateCreated],
@@ -190,6 +200,3 @@ export default class TableDataNodeDef extends TableSurveyRdb {
     return result
   }
 }
-
-TableDataNodeDef.columnSet = columnSet
-TableDataNodeDef.rootDefColumnNames = rootDefColumnNames
