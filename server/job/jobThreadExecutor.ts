@@ -10,6 +10,9 @@ import * as Log from '@server/log/log'
 import { jobRowToSummary, jobStatus, jobThreadMessageTypes } from './jobUtils'
 import * as LocalJobRepository from './jobRepository'
 
+type JobSerialized = Record<string, any>
+type JobUpdateListener = (jobSerialized: JobSerialized) => void
+
 const logger = Log.getLogger('JobThreadExecutor')
 
 const threadCleanupDelay = 1000 // 1 sec
@@ -23,8 +26,8 @@ const activeJobSummariesByUserUuid = new DelayedDeleteCache({ deleteDelaySeconds
 
 // USER JOB WORKERS
 
-const userJobThreads = new ThreadsCache()
-const jobThreadsByJobUuid = new ThreadsCache()
+const userJobThreads = new ThreadsCache<ThreadManager>()
+const jobThreadsByJobUuid = new ThreadsCache<ThreadManager>()
 
 const _touchRunningJobs = async () => {
   const uuids = jobThreadsByJobUuid.findThreadsKeys(() => true)
@@ -38,7 +41,7 @@ const _touchRunningJobs = async () => {
 // heartbeat timer must not keep the process alive (e.g. at the end of the tests)
 setInterval(_touchRunningJobs, heartbeatInterval).unref?.()
 
-const _persistJobUpdate = async (jobSerialized) => {
+const _persistJobUpdate = async (jobSerialized: JobSerialized): Promise<void> => {
   const { uuid, status, processed, total, result, errors, ended } = jobSerialized
 
   try {
@@ -51,7 +54,7 @@ const _persistJobUpdate = async (jobSerialized) => {
 
 export const _notifyJobUpdateForTest = _persistJobUpdate
 
-const _notifyJobUpdate = (jobSerialized) => {
+const _notifyJobUpdate = (jobSerialized: JobSerialized): void => {
   const { userUuid, uuid: jobUuid } = jobSerialized
 
   const jobThread = jobThreadsByJobUuid.getThread(jobUuid)
@@ -83,11 +86,14 @@ const _notifyJobUpdate = (jobSerialized) => {
 
 // ====== READ
 
-export const getActiveJobSummary = (userUuid) => activeJobSummariesByUserUuid.get(userUuid)
+export const getActiveJobSummary = (userUuid: string) => activeJobSummariesByUserUuid.get(userUuid)
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async (userUuid, { canceledByAdmin = false } = {}) => {
+export const cancelActiveJobByUserUuid = async (
+  userUuid: string,
+  { canceledByAdmin = false }: { canceledByAdmin?: boolean } = {}
+): Promise<void> => {
   const jobThread = userJobThreads.getThread(userUuid)
   if (!jobThread) {
     return
@@ -97,7 +103,23 @@ export const cancelActiveJobByUserUuid = async (userUuid, { canceledByAdmin = fa
 
 // ====== EXECUTE
 
-const _createFailedJobSummary = ({ jobUuid, jobType, userUuid, surveyId, dateCreated, processed, total }) =>
+const _createFailedJobSummary = ({
+  jobUuid,
+  jobType,
+  userUuid,
+  surveyId,
+  dateCreated,
+  processed,
+  total,
+}: {
+  jobUuid: string
+  jobType: string
+  userUuid: string
+  surveyId?: number | null
+  dateCreated: Date
+  processed: number
+  total: number
+}) =>
   jobRowToSummary({
     uuid: jobUuid,
     userUuid,
@@ -114,25 +136,30 @@ const _createFailedJobSummary = ({ jobUuid, jobType, userUuid, surveyId, dateCre
   })
 
 /**
- * Creates the listeners of a job thread messages and termination.
+ * Creates the listeners of a job thread messages and termination (onUpdate is invoked on every job update, until it ends).
  * The job is always notified as ended to the listener, even when the thread terminates (e.g. it crashes) without notifying it:
  * otherwise the job queue would consider the job still active, preventing the user from running other jobs.
- * @param {!object} params - The parameters.
- * @param {!string} params.jobUuid - The UUID of the job.
- * @param {!string} params.jobType - The type of the job.
- * @param {!string} params.userUuid - The UUID of the user running the job.
- * @param {number} [params.surveyId] - The ID of the survey the job is running on (if any).
- * @param {function(object): void} [params.onUpdate] - Function invoked on every job update (until the job ends).
- * @returns {{onJobUpdate: function(object): void, onThreadExit: function(): void}} - The thread message and exit listeners.
  */
-export const createJobThreadListeners = ({ jobUuid, jobType, userUuid, surveyId, onUpdate }) => {
+export const createJobThreadListeners = ({
+  jobUuid,
+  jobType,
+  userUuid,
+  surveyId,
+  onUpdate,
+}: {
+  jobUuid: string
+  jobType: string
+  userUuid: string
+  surveyId?: number | null
+  onUpdate?: JobUpdateListener
+}): { onJobUpdate: JobUpdateListener; onThreadExit: () => void } => {
   const dateCreated = new Date()
   let ended = false
   // last known progress, kept when the job is marked as failed because its thread exited unexpectedly
   let processed = 0
   let total = 0
 
-  const onJobUpdate = (jobSerialized) => {
+  const onJobUpdate = (jobSerialized: JobSerialized): void => {
     if (ended) {
       // the job queue has already released this job: ignore late updates
       return
@@ -153,7 +180,10 @@ export const createJobThreadListeners = ({ jobUuid, jobType, userUuid, surveyId,
   return { onJobUpdate, onThreadExit }
 }
 
-export const executeJobThread = (job, onUpdate) => {
+// a job or the job info kept in the job queue
+type JobToExecute = { type: string; params: Record<string, any>; uuid: string }
+
+export const executeJobThread = (job: JobToExecute, onUpdate?: JobUpdateListener): void => {
   const { type: jobType, params: jobParams, uuid: jobUuid } = job
   const { user, surveyId } = jobParams
   const { uuid: userUuid } = user

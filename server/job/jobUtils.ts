@@ -21,7 +21,10 @@ export const jobThreadMessageTypes = {
   cancelJob: 'cancelJob',
 }
 
-const calculatePartialProgress = (job) => {
+// the job is a Job instance: its progress fields are protected or not declared
+type AnyJob = any
+
+const calculatePartialProgress = (job: AnyJob): number => {
   const { processed, status, total } = job
   if (status === jobStatus.succeeded) {
     return 100
@@ -32,7 +35,7 @@ const calculatePartialProgress = (job) => {
   return 0
 }
 
-const calculateJobProgress = (job) => {
+const calculateJobProgress = (job: AnyJob): number => {
   const { currentInnerJobIndex, innerJobs, processed, total } = job
   const partialProgress = calculatePartialProgress(job)
   if (
@@ -47,10 +50,10 @@ const calculateJobProgress = (job) => {
   return partialProgress + Math.floor(currentInnerJobProgress / total)
 }
 
-const calculatedElapsedMillis = (job) =>
+const calculatedElapsedMillis = (job: AnyJob): number =>
   job.startTime ? (job.endTime ?? new Date()).getTime() - job.startTime.getTime() : 0
 
-export const jobToJSON = (job) => ({
+export const jobToJSON = (job: AnyJob): Record<string, any> => ({
   [JobSerialized.keys.uuid]: job.uuid,
   [JobSerialized.keys.type]: job.type,
   [JobSerialized.keys.userUuid]: job.userUuid,
@@ -81,7 +84,7 @@ export const jobToJSON = (job) => ({
   [JobSerialized.keys.result]: job.status === jobStatus.succeeded ? job.result : null,
 })
 
-export const jobRowToSummary = (jobRow) => {
+export const jobRowToSummary = (jobRow: Record<string, any>): Record<string, any> => {
   const { uuid, userUuid, surveyId, type, status, processed, total, props, dateCreated, dateModified } = jobRow
   const ended = [jobStatus.succeeded, jobStatus.failed, jobStatus.canceled].includes(status)
   const baseProgressPercent = total > 0 ? Math.floor((100 * processed) / total) : 0
@@ -111,7 +114,7 @@ export const jobRowToSummary = (jobRow) => {
   }
 }
 
-export const jobRowToMonitorSummary = (jobRow) => {
+export const jobRowToMonitorSummary = (jobRow: Record<string, any>): Record<string, any> => {
   const { dateCreated, userName, userEmail, surveyName } = jobRow
   return {
     ...jobRowToSummary(jobRow),

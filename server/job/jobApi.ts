@@ -1,3 +1,4 @@
+import type { Express } from 'express'
 import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
@@ -5,7 +6,7 @@ import * as Response from '@server/utils/response'
 
 import * as JobManager from './jobManager'
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   app.get('/jobs', ApiAuthMiddleware.requireAdminPermission, async (req, res) => {
     const jobs = await JobManager.getAllJobsSummary()
     res.json(jobs)

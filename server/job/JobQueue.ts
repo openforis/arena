@@ -532,7 +532,7 @@ export class JobQueue {
    * @param job - The job to enqueue.
    * @throws Error if only one job per user is already running.
    */
-  enqueue(job: JobInfo): void {
+  enqueue(job: Pick<JobInfo, 'params' | 'status' | 'type' | 'uuid'>): void {
     const { params, status, type, uuid } = job
     const jobInfo: JobInfo = { params, status, type, uuid }
     const { user, surveyId } = params ?? {}

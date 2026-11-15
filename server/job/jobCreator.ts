@@ -90,8 +90,8 @@ const jobClasses = [
 
 const jobClassesByType = ObjectUtils.toIndexedObj(jobClasses, 'type')
 
-export const createJob = (jobType, params, jobUuid) => {
-  const JobClass = jobClassesByType[jobType]
+export const createJob = (jobType: string, params: Record<string, any>, jobUuid?: string | null) => {
+  const JobClass = jobClassesByType[jobType] as any
   const job = new JobClass(params)
   if (jobUuid) {
     job.uuid = jobUuid

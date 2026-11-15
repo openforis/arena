@@ -6,7 +6,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import Job from '@server/job/job'
 
 export default class ZipFileCreatorBaseJob extends Job {
-  async onStart() {
+  async onStart(): Promise<void> {
     await super.onStart()
     const { outputFileName: outputFileNameParam = null, surveyId } = this.context
 
@@ -25,13 +25,13 @@ export default class ZipFileCreatorBaseJob extends Job {
     this.setContext({ archive, outputFileName, filePath: outputFilePath })
   }
 
-  async beforeSuccess() {
+  async beforeSuccess(): Promise<void> {
     await super.beforeSuccess()
     const { archive } = this.context
     await archive?.finalize()
   }
 
-  async generateResult() {
+  async generateResult(): Promise<any> {
     const result = await super.generateResult()
     const { outputFileName } = this.context
     return {

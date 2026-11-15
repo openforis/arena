@@ -1,4 +1,4 @@
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import { jobStatus } from './jobUtils'
 
@@ -15,7 +15,7 @@ const selectAllJobs = `
   LIMIT $1
 `
 
-const rowToJob = (row) => ({
+const rowToJob = (row: Record<string, any>) => ({
   uuid: row.uuid,
   type: row.type,
   status: row.status,
@@ -31,10 +31,10 @@ const rowToJob = (row) => ({
   surveyName: row.survey_name,
 })
 
-export const getAll = ({ limit = 200 } = {}) => db.map(selectAllJobs, [limit], rowToJob)
+export const getAll = ({ limit = 200 }: { limit?: number } = {}) => db.map(selectAllJobs, [limit], rowToJob)
 
 // marks still active jobs as alive (see the stale jobs cleanup scheduler)
-export const touchActiveJobs = async ({ uuids }, client = db) => {
+export const touchActiveJobs = async ({ uuids }: { uuids: string[] }, client: DbClient = db): Promise<void> => {
   if (uuids.length === 0) return
   await client.none(
     `UPDATE job

@@ -1,23 +1,31 @@
 import { JobBase, JobStatus } from '@openforis/arena-core'
+import type { JobContext, User as ArenaUser } from '@openforis/arena-core'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as Log from '@server/log/log'
 import SystemError from '@core/systemError'
 
 // i18n key with namespace, e.g. "appErrors:generic" or "validationErrors:nameInvalid"
 const namespacedKeyRegex = /^[A-Za-z]+:/
 
-/** @augments {JobBase<any, any>} */
-export default class Job extends JobBase {
-  constructor(type, params = {}, innerJobs = []) {
-    super({ ...params, type }, innerJobs)
-    this.params = params // original reference, distinct from the (copied, shared) context
-    this.result = {} // arena's convention: generateResult()/setResult() build this up incrementally
+// the user running the job and the job specific params
+export type JobParams = { user: ArenaUser; surveyId?: number; [key: string]: any }
+
+// arena jobs: the context is not typed
+export default class Job<C extends JobContext = any, R = any> extends JobBase<C, R> {
+  // original params reference, distinct from the (copied, shared) context
+  params: JobParams
+
+  constructor(type: string, params: Partial<JobParams> = {}, innerJobs: JobBase<any, any>[] = []) {
+    super({ ...params, type } as unknown as C, innerJobs)
+    this.params = params as JobParams // original reference, distinct from the (copied, shared) context
+    this.result = {} as R // arena's convention: generateResult()/setResult() build this up incrementally
     // JobBase.generateResult() is async: overrides calling it must await it
   }
 
-  createLogger() {
-    return Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`)
+  createLogger(): JobBase<C, R>['logger'] {
+    // same methods as the arena-core logger
+    return Log.getLogger(`Job ${this.constructor.name} (${this.uuid})`) as unknown as JobBase<C, R>['logger']
   }
 
   // jobCreator.js reassigns `job.uuid` to the "real" uuid (used to track the job across the
@@ -25,7 +33,7 @@ export default class Job extends JobBase {
   // in a worker thread (see jobThread.js). The logger built in the constructor still embeds the
   // original, discarded uuid, so it needs to be re-created here. Arena's original Job class
   // always exposed this as a public method for exactly this purpose.
-  initLogger() {
+  initLogger(): void {
     this.logger = this.createLogger()
   }
 
@@ -33,7 +41,7 @@ export default class Job extends JobBase {
   // on JobBase) setStatus() method. ~12 production Job subclasses call `this.setStatusFailed()`
   // directly from their own error-handling code (validation/import jobs reporting bad data),
   // so it needs to stay callable from the outside.
-  async setStatusFailed() {
+  async setStatusFailed(): Promise<void> {
     await this.setStatus(JobStatus.failed)
   }
 
@@ -41,11 +49,11 @@ export default class Job extends JobBase {
   // original Job always defaulted to the shared `db` client instead, so that jobs started with
   // no argument (e.g. jobThread.js's `this.job.start()`, the production worker-thread entry
   // point) still run inside a real db transaction.
-  async start(client = db) {
+  async start(client: DbClient = db): Promise<void> {
     return super.start(client)
   }
 
-  getErrorInfo(error) {
+  getErrorInfo(error: any): any {
     if (error instanceof SystemError) {
       // some errors are thrown with an already namespaced key (e.g. Whisp API ones or validation errors)
       const key = namespacedKeyRegex.test(error.key) ? error.key : `appErrors:${error.key}`
@@ -61,7 +69,7 @@ export default class Job extends JobBase {
   // not a function" the moment it's reached. This crashed RecordsImportJob (and would identically
   // crash FlatDataImportJob) in production, since both call `super.execute()` from a subclass
   // whose immediate parent (DataImportBaseJob) doesn't override execute() either.
-  async execute() {
+  async execute(): Promise<void> {
     // to be extended by subclasses
   }
 
@@ -71,7 +79,8 @@ export default class Job extends JobBase {
   // the current transaction into manager/repository calls. Without this getter, all of those call
   // sites would silently receive `undefined`, breaking transactional atomicity for every job that
   // touches the database. See task-9-report.md for details.
-  get tx() {
+  // any: the JS managers and repositories declare their client param as the connection pool (client = db)
+  get tx(): any {
     return this.context.tx
   }
 }

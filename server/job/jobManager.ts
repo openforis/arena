@@ -10,7 +10,7 @@ import * as jobRepository from './jobRepository'
 
 const logger = Log.getLogger('JobManager')
 
-const queue = new JobQueue({ concurrency: ProcessUtils.ENV.jobQueueConcurrency })
+const queue = new JobQueue({ concurrency: Number(ProcessUtils.ENV.jobQueueConcurrency) })
 
 // ====== CLUSTER
 // a job can run on another server process: cancel requests are relayed to all of them
@@ -19,7 +19,9 @@ const processId = uuidv4()
 const clusterEventTargetType = 'jobQueue'
 const clusterEventTypes = { cancelByUserUuid: 'cancelByUserUuid', cancelByJobUuid: 'cancelByJobUuid' }
 
-const handleClusterEvent = (event) => {
+type ClusterEvent = { targetType: string; eventType: string; message?: Record<string, any> }
+
+const handleClusterEvent = (event: ClusterEvent): void => {
   const { targetType, eventType, message } = event
   // events are delivered to the publishing process too: it has already canceled its own jobs
   if (targetType !== clusterEventTargetType || message?.originProcessId === processId) return
@@ -36,7 +38,15 @@ export const _handleClusterEventForTest = handleClusterEvent
 
 ClusterBus.onEvent(handleClusterEvent)
 
-const publishCancelEvent = ({ eventType, targetId, message }) =>
+const publishCancelEvent = ({
+  eventType,
+  targetId,
+  message,
+}: {
+  eventType: string
+  targetId: string
+  message: Record<string, unknown>
+}) =>
   ClusterBus.publish({
     targetType: clusterEventTargetType,
     targetId,
@@ -46,7 +56,7 @@ const publishCancelEvent = ({ eventType, targetId, message }) =>
 
 // ====== READ
 
-export const getActiveJobSummary = async (userUuid) => {
+export const getActiveJobSummary = async (userUuid: string) => {
   // Check local state first: this dyno's own in-memory state is always more current than the DB
   // for a job it actually knows about - no post-enqueue race window (the DB insert might not have
   // landed yet), and no loss of composite-job detail (jobRowToSummary can't reconstruct
@@ -65,7 +75,7 @@ export const getActiveJobSummary = async (userUuid) => {
   }
 }
 
-export const getJobSummary = async (jobUuid) => {
+export const getJobSummary = async (jobUuid: string) => {
   const localSummary = queue.getJobSummary(jobUuid)
   if (localSummary) return localSummary
 
@@ -85,7 +95,7 @@ export const getAllJobsSummary = async () => {
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async (userUuid) => {
+export const cancelActiveJobByUserUuid = async (userUuid: string): Promise<void> => {
   await queue.cancelJobByUserUuid(userUuid)
   await publishCancelEvent({
     eventType: clusterEventTypes.cancelByUserUuid,
@@ -94,7 +104,7 @@ export const cancelActiveJobByUserUuid = async (userUuid) => {
   })
 }
 
-export const cancelJobByUuid = async (jobUuid) => {
+export const cancelJobByUuid = async (jobUuid: string): Promise<void> => {
   const canceledByAdmin = true
   await queue.cancelJobByUuid(jobUuid, { canceledByAdmin })
   await publishCancelEvent({
@@ -106,7 +116,7 @@ export const cancelJobByUuid = async (jobUuid) => {
 
 // ====== EXECUTE
 
-export const enqueueJob = (job) => {
+export const enqueueJob = <J extends Parameters<typeof queue.enqueue>[0]>(job: J): J => {
   queue.enqueue(job)
   return job
 }

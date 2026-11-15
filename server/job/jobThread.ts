@@ -4,11 +4,15 @@ import * as Log from '@server/log/log'
 import { jobThreadMessageTypes, jobToJSON } from './jobUtils'
 import { startJobEnsuringEndNotification } from './jobRunner'
 import * as JobCreator from './jobCreator'
+import type Job from './job'
 
 const logger = Log.getLogger('JobThread')
 
 class JobThread extends Thread {
-  createJob() {
+  private job: Job
+  private jobEndNotified: boolean
+
+  createJob(): void {
     const { jobType, jobParams, jobUuid } = this.params
 
     this.job = JobCreator.createJob(jobType, jobParams, jobUuid)
@@ -23,7 +27,7 @@ class JobThread extends Thread {
     })
   }
 
-  async onMessage(msg) {
+  async onMessage(msg: Record<string, any>): Promise<void> {
     switch (msg.type) {
       case jobThreadMessageTypes.fetchJob:
         this.sendJobToParentThread()
@@ -36,7 +40,7 @@ class JobThread extends Thread {
     }
   }
 
-  sendJobToParentThread() {
+  sendJobToParentThread(): void {
     const jobSerialized = jobToJSON(this.job)
     this.postMessage(jobSerialized)
     if (jobSerialized.ended) {
