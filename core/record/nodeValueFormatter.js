@@ -6,7 +6,11 @@ import * as Node from '@core/record/node'
  * @param {unknown} value - The value (not empty).
  * @returns {string} - The value as string.
  */
-const _valueToString = (value) => (typeof value === 'object' ? JSON.stringify(value) : String(value))
+const _valueToString = (value) => {
+  if (typeof value === 'string') return value
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value)
+  return JSON.stringify(value)
+}
 
 /**
  * Formats a node value (falling back to its string conversion).
