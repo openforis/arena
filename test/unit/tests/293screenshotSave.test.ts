@@ -1,3 +1,5 @@
+import type { ArenaRecord } from '@openforis/arena-core'
+
 import {
   saveScreenshotToRecord,
   startNodeSaveWaiter,
@@ -40,7 +42,7 @@ const setup = () => {
   const socket = createSocket()
   const calls: string[] = []
   const deps: ScreenshotSaveDeps = {
-    fetchRecord: jest.fn(async () => ({ uuid: recordUuid })),
+    fetchRecord: jest.fn(async () => ({ uuid: recordUuid }) as ArenaRecord),
     canEditRecord: jest.fn(() => true),
     buildChange: jest.fn(() => createChange),
     buildRowAttribute: jest.fn(() => ({ uuid: 'row-photo' })),

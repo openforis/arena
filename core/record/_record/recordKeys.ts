@@ -26,9 +26,9 @@ export const keys = {
   // temporary properties
   keysObj: 'keysObj',
   summaryAttributesObj: 'summaryAttributesObj',
-}
+} as const
 
 export const infoKeys = {
   createdWith: 'createdWith',
   modifiedWith: 'modifiedWith',
-}
+} as const
