@@ -346,8 +346,10 @@ export const getDateYear = _getDatePart(0)
 export const getDateMonth = _getDatePart(1)
 export const getDateDay = _getDatePart(2)
 
-export const getDateCreated = (node: Node): string | undefined => node?.dateCreated
-export const getDateModified = (node: Node): string | undefined => node?.dateModified
+// ISO strings (as in arena-core nodes); typed as Date too: some callers still handle Date values
+type NodeDate = string | Date | undefined
+export const getDateCreated = (node: Node): NodeDate => node?.dateCreated
+export const getDateModified = (node: Node): NodeDate => node?.dateModified
 
 // File
 export const getFileName = _getValuePropRaw(valuePropsFile.fileName, '')
