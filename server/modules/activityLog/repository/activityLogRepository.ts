@@ -1,4 +1,5 @@
 import camelize from 'camelize'
+import type { Survey as ArenaSurvey, User as ArenaUser } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -10,7 +11,7 @@ import * as ActivityLog from '@common/activityLog/activityLog'
 
 import * as Chain from '@common/analysis/chain'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
@@ -27,7 +28,14 @@ export const tableColumns = [
 ] // Used for activity_logs values batch insert
 
 // ===== CREATE
-export const insert = async (user, surveyId, type, content, system, client = db) => {
+export const insert = async (
+  user: ArenaUser,
+  surveyId: number,
+  type: string,
+  content: Record<string, any> | null,
+  system: boolean,
+  client: DbClient = db
+): Promise<void> => {
   if (ProcessUtils.ENV.activityLogDisabled) {
     return
   }
@@ -39,7 +47,12 @@ export const insert = async (user, surveyId, type, content, system, client = db)
   )
 }
 
-export const insertMany = async (user, surveyId, activities, client = db) => {
+export const insertMany = async (
+  user: ArenaUser,
+  surveyId: number,
+  activities: ActivityLog.ActivityLog[],
+  client: DbClient = db
+): Promise<void> => {
   if (activities.length === 0 || ProcessUtils.ENV.activityLogDisabled) {
     return
   }
@@ -59,7 +72,10 @@ export const insertMany = async (user, surveyId, activities, client = db) => {
 }
 
 // ===== READ
-export const fetchSimple = async ({ surveyId, limit = 30, offset = 0 }, client = db) =>
+export const fetchSimple = async (
+  { surveyId, limit = 30, offset = 0 }: { surveyId: number; limit?: number; offset?: number },
+  client: DbClient = db
+): Promise<ActivityLog.ActivityLog[]> =>
   client.map(
     `SELECT l.* 
     FROM ${getSurveyDBSchema(surveyId)}.activity_log l
@@ -71,7 +87,7 @@ export const fetchSimple = async ({ surveyId, limit = 30, offset = 0 }, client =
     A.camelizePartial({ limitToLevel: 1 })
   )
 
-export const count = async ({ surveyId }, client = db) =>
+export const count = async ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<number> =>
   client.one(`SELECT COUNT(*) FROM ${getSurveyDBSchema(surveyId)}.activity_log`, [], (row) => Number(row.count))
 
 export const fetch = async ({
@@ -82,7 +98,16 @@ export const fetch = async ({
   limit = 30,
   orderBy = 'DESC',
   client = db,
-}) => {
+}: {
+  surveyInfo: ArenaSurvey
+  // null: all the activity types
+  activityTypes?: string[] | null
+  idGreaterThan?: number | null
+  idLessThan?: number | null
+  limit?: number | null
+  orderBy?: string
+  client?: DbClient
+}): Promise<ActivityLog.ActivityLog[]> => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
@@ -256,12 +281,12 @@ export const fetch = async ({
   )
 }
 
-export const fetchTableSize = async ({ surveyId }, client = db) => {
+export const fetchTableSize = async ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<number> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return DbUtils.fetchTableSize({ schema, table: 'activity_log' }, client)
 }
 
-export const deleteAll = async ({ surveyId }, client = db) => {
+export const deleteAll = async ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<null> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   // keep only first 5 logs (survey creation logs); useful to determine if survey is empty or brand new
   return client.none(`DELETE FROM ${schema}.activity_log WHERE id > 5`)

@@ -1,3 +1,5 @@
+import type { Express } from 'express'
+
 import * as A from '@core/arena'
 
 import * as NodeDef from '@core/survey/nodeDef'
@@ -10,9 +12,11 @@ import * as Request from '@server/utils/request'
 import * as CategoryManager from '../../category/manager/categoryManager'
 import * as TaxonomyManager from '../../taxonomy/manager/taxonomyManager'
 
+type LiteralItem = { value: string; label: string }
+
 const toItem =
-  (type, lang = null) =>
-  (item) => {
+  (type: string, lang: string | null = null) =>
+  (item: any): LiteralItem | null => {
     if (!item) return null
     if (type === NodeDef.nodeDefType.code) {
       return { value: CategoryItem.getCode(item), label: CategoryItem.getLabel(lang)(item) }
@@ -20,7 +24,7 @@ const toItem =
     return { value: Taxon.getCode(item), label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}` }
   }
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {

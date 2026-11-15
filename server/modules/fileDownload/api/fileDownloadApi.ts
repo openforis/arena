@@ -1,3 +1,5 @@
+import type { Express, Response as ExpressResponse } from 'express'
+
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { getExtensionByFileFormat } from '@core/fileFormats'
 
@@ -8,7 +10,20 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
 import * as SurveyService from '@server/modules/survey/service/surveyService'
 
-export const sendTempFileToResponse = ({ res, tempFileUuid, tempFileName, fileFormat, outputFileName }) => {
+export const sendTempFileToResponse = ({
+  res,
+  tempFileUuid = null,
+  tempFileName = null,
+  fileFormat,
+  outputFileName,
+}: {
+  res: ExpressResponse
+  tempFileUuid?: string | null
+  // used instead of the uuid when specified
+  tempFileName?: string | null
+  fileFormat: Parameters<typeof getExtensionByFileFormat>[0]
+  outputFileName: string
+}): void => {
   const extension = getExtensionByFileFormat(fileFormat)
   const fileName = tempFileName ?? `${tempFileUuid}.${extension}`
   const filePath = FileUtils.tempFilePath(fileName)
@@ -21,7 +36,7 @@ export const sendTempFileToResponse = ({ res, tempFileUuid, tempFileName, fileFo
   })
 }
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   app.get('/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
     try {
       const downloadFileName = Request.getDownloadFileName(req)

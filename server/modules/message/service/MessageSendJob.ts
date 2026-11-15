@@ -1,4 +1,5 @@
 import { Messages, MessageNotificationType, MessageStatus } from '@openforis/arena-core'
+import type { Message, User as ArenaUser } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -10,29 +11,39 @@ import * as User from '@core/user/user'
 import * as Mailer from '@server/utils/mailer'
 import { initArenaServerServices } from '@server/system/arenaServerServices'
 
-const getMessageService = () => {
+// the methods of the arena-server message service used here
+interface MessageService {
+  getByUuid(uuid: string, client?: unknown): Promise<Message | null>
+  update(uuid: string, message: Message, client?: unknown): Promise<unknown>
+}
+
+const getMessageService = (): MessageService => {
   // Ensure services are initialized
   const serviceRegistry = initArenaServerServices()
-  return serviceRegistry.getService(ServerServiceType.message)
+  return serviceRegistry.getService(ServerServiceType.message) as unknown as MessageService
 }
 
 export default class MessageSendJob extends Job {
-  constructor(params) {
+  static readonly type = 'MessageSendJob'
+
+  private canceling: boolean
+
+  constructor(params: { user: ArenaUser; messageUuid: string }) {
     super(MessageSendJob.type, params)
     this.canceling = false
   }
 
-  async cancel(options) {
+  async cancel(options?: Parameters<Job['cancel']>[0]): Promise<void> {
     // cancel requested flag in JobBase is private: track it here to stop sending emails
     this.canceling = true
     return super.cancel(options)
   }
 
-  isCancelingOrNotRunning() {
+  isCancelingOrNotRunning(): boolean {
     return this.canceling || !this.isRunning()
   }
 
-  async execute() {
+  async execute(): Promise<void> {
     const { context, tx } = this
     const { messageUuid } = context
 
@@ -61,7 +72,7 @@ export default class MessageSendJob extends Job {
     this.logDebug(`message ${messageUuid} status updated`)
   }
 
-  async notifyUsersByEmail() {
+  async notifyUsersByEmail(): Promise<void> {
     const i18n = await i18nFactory.createI18nAsync()
 
     const { context, tx } = this
@@ -105,5 +116,3 @@ export default class MessageSendJob extends Job {
     this.logDebug(`sent ${this.processed} emails for message ${subject}`)
   }
 }
-
-MessageSendJob.type = 'MessageSendJob'

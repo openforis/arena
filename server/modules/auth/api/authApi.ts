@@ -1,3 +1,4 @@
+import type { Express } from 'express'
 import { ApiEndpoint } from '@openforis/arena-server'
 
 import { minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload } from '@common/mobile'
@@ -63,7 +64,7 @@ const sendUserSurvey = async (res, user, surveyId) => {
   }
 }
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   app.get('/api/version', async (_req, res, next) => {
     try {
       const packageJson = JSON.parse(await FileUtils.readFile('package.json'))

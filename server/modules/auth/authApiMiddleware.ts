@@ -1,3 +1,4 @@
+import type { NextFunction, Request as ExpressRequest, Response as ExpressResponse } from 'express'
 import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
@@ -48,26 +49,42 @@ export const {
   requireDownloadToken,
 } = ApiAuthMiddleware
 
-const sendError = ({ errorCode, res, req = null }) => {
+const sendError = ({
+  errorCode,
+  res,
+  req = null,
+}: {
+  errorCode: number
+  res: ExpressResponse
+  req?: ExpressRequest | null
+}): void => {
   const userName = req ? User.getName(Request.getUser(req)) : null
   const error = new UnauthorizedError(userName)
   res.status(errorCode).send(JSON.stringify(error))
 }
 
-const sendUnauthorizedError = ({ res, req = null }) => {
+const sendUnauthorizedError = ({ res, req = null }: { res: ExpressResponse; req?: ExpressRequest | null }): void => {
   sendError({ errorCode: StatusCodes.UNAUTHORIZED, res, req })
 }
 
-const sendForbiddenError = ({ res, req = null }) => {
+const sendForbiddenError = ({ res, req = null }: { res: ExpressResponse; req?: ExpressRequest | null }): void => {
   sendError({ errorCode: StatusCodes.FORBIDDEN, res, req })
 }
 
-export const requireLoggedInUser = async (req, res, next) => {
+export const requireLoggedInUser = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   const user = Request.getUser(req)
   return user ? next() : sendUnauthorizedError({ res })
 }
 
-export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) => {
+export const requireSurveyUserExtraPropsEditPermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { surveyId, userUuid } = Request.getParams(req)
     const user = Request.getUser(req)
@@ -83,7 +100,11 @@ export const requireSurveyUserExtraPropsEditPermission = async (req, res, next) 
   }
 }
 
-export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
+export const requireSurveyCloneFromViewPermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { cloneFrom } = Request.getBody(req)
     if (!cloneFrom) {
@@ -104,7 +125,11 @@ export const requireSurveyCloneFromViewPermission = async (req, res, next) => {
 }
 
 // survey export: what the export includes depends also on the user role (see SurveyService.createSurveyExportJob)
-export const requireSurveyExportPermission = async (req, res, next) => {
+export const requireSurveyExportPermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { surveyId } = Request.getParams(req)
     const user = Request.getUser(req)
@@ -120,7 +145,11 @@ export const requireSurveyExportPermission = async (req, res, next) => {
 }
 
 // survey compare: the survey used as source must be visible to the user (published templates included)
-export const requireSurveyCompareSourceViewPermission = async (req, res, next) => {
+export const requireSurveyCompareSourceViewPermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { sourceSurveyId } = Request.getParams(req)
     if (!sourceSurveyId) {
@@ -140,7 +169,11 @@ export const requireSurveyCompareSourceViewPermission = async (req, res, next) =
 }
 
 // records merge: the user must be able to edit both the source and the target record
-export const requireRecordsMergePermission = async (req, res, next) => {
+export const requireRecordsMergePermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   try {
     const { surveyId, sourceRecordUuid, targetRecordUuid } = Request.getParams(req)
     const user = Request.getUser(req)
@@ -161,7 +194,11 @@ export const requireRecordsMergePermission = async (req, res, next) => {
 }
 
 // Survey
-export const requireSurveyCreatePermission = async (req, res, next) => {
+export const requireSurveyCreatePermission = async (
+  req: ExpressRequest,
+  res: ExpressResponse,
+  next: NextFunction
+): Promise<void> => {
   const user = Request.getUser(req)
   if (Authorizer.canCreateSurvey(user)) {
     const ownedSurveys = await SurveyManager.countOwnedSurveys({ user })

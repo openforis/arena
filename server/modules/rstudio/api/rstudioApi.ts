@@ -1,3 +1,5 @@
+import type { Express } from 'express'
+
 import * as Request from '@server/utils/request'
 
 import * as User from '@core/user/user'
@@ -5,20 +7,23 @@ import * as ProcessUtils from '@core/processUtils'
 
 import { sendPoolCommand } from './rStudioPoolClient'
 
-const RStudioCommands = {
+type RStudioCommand = { command: string; payload: Record<string, unknown> }
+type RStudioCommandFactory = (params: { payload: Record<string, unknown> }) => RStudioCommand
+
+const RStudioCommands: Record<string, RStudioCommandFactory> = {
   requestInstance: ({ payload }) => ({ command: 'REQUEST_RSTUDIO', payload }),
   checkInstances: ({ payload }) => ({ command: 'CHECK_INSTANCES', payload }),
   closeInstance: ({ payload }) => ({ command: 'DELETE', payload }),
 }
 
-const RStudioApi = async ({ command }) =>
+const RStudioApi = async ({ command }: { command: RStudioCommand }) =>
   sendPoolCommand({
     command,
     poolServerUrl: ProcessUtils.ENV.rStudioPoolServerURL,
     poolServiceKey: ProcessUtils.ENV.rStudioPoolServiceKey,
   })
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   app.post('/rstudio', async (req, res, next) => {
     try {
       const user = Request.getUser(req)

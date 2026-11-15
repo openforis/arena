@@ -1,8 +1,10 @@
+import type { Express } from 'express'
+
 import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ActivityLogService from '../service/activityLogService'
 
-export const init = (app) => {
+export const init = (app: Express): void => {
   // ==== READ
   /**
    * Fetches a list of activity logs (limited to 30 items) grouped by user, type, content uuid.

@@ -115,7 +115,8 @@ const callAuthUserApi = async (user: any) => {
     (path: string, ...routeHandlers: any[]) => {
       handlers[`${method} ${path}`] = routeHandlers.at(-1)
     }
-  AuthApi.init({ get: register('get'), post: register('post'), put: register('put') })
+  // fake express app: only the registered routes are needed
+  AuthApi.init({ get: register('get'), post: register('post'), put: register('put') } as any)
 
   let body: any = null
   const res = { json: (data: any) => (body = data) }

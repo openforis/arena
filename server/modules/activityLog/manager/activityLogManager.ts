@@ -1,4 +1,4 @@
-import * as A from '@core/arena'
+import type { User as ArenaUser } from '@openforis/arena-core'
 
 import * as AuthGroups from '@core/auth/authGroup'
 import * as Survey from '@core/survey/survey'
@@ -11,7 +11,7 @@ import * as ActivityLogRepository from '@server/modules/activityLog/repository/a
 
 const activityTypesCommon = [ActivityLog.type.surveyCreate]
 
-const activityTypesByPermission = {
+const activityTypesByPermission: Record<string, string[]> = {
   [AuthGroups.permissions.surveyEdit]: [
     ActivityLog.type.surveyPropUpdate,
     ActivityLog.type.surveyPublish,
@@ -50,32 +50,36 @@ const activityTypesByPermission = {
   [AuthGroups.permissions.userInvite]: [ActivityLog.type.userInvite],
 }
 
-const _getAvailableActivityTypes = async (surveyUuid, user) => {
+// null for system admins (all activity types)
+const _getAvailableActivityTypes = (surveyUuid: string, user: ArenaUser): string[] | null => {
   if (User.isSystemAdmin(user)) {
     return null
   }
-
-  return A.pipe(
-    User.getAuthGroupBySurveyUuid({ surveyUuid }),
-    AuthGroups.getPermissions,
-    // For each permission in group, get available activity types
-    A.reduce(
-      (accActivityTypes, permission) => {
-        const activityTypes = activityTypesByPermission[permission]
-        if (activityTypes) {
-          accActivityTypes.push(...activityTypes)
-        }
-
-        return accActivityTypes
-      },
-      [...activityTypesCommon]
-    )
-  )(user)
+  const authGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(user)
+  const activityTypes = [...activityTypesCommon]
+  for (const permission of AuthGroups.getPermissions(authGroup)) {
+    activityTypes.push(...(activityTypesByPermission[permission] ?? []))
+  }
+  return activityTypes
 }
 
-export const fetch = async ({ user, surveyId, idGreaterThan, idLessThan, limit, orderBy }) => {
+export const fetch = async ({
+  user,
+  surveyId,
+  idGreaterThan,
+  idLessThan,
+  limit,
+  orderBy,
+}: {
+  user: ArenaUser
+  surveyId: number
+  idGreaterThan?: number | null
+  idLessThan?: number | null
+  limit?: number | null
+  orderBy?: string
+}) => {
   const surveyInfo = await SurveyRepository.fetchSurveyById({ surveyId })
-  const activityTypes = await _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
+  const activityTypes = _getAvailableActivityTypes(Survey.getUuid(surveyInfo), user)
   return ActivityLogRepository.fetch({ surveyInfo, activityTypes, idGreaterThan, idLessThan, limit, orderBy })
 }
 
