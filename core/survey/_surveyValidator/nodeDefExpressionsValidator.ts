@@ -1,7 +1,15 @@
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefExpression as ArenaNodeDefExpression,
+  NodeDefType,
+  Survey as ArenaSurvey,
+} from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as NodeDefValidations from '@core/survey/nodeDefValidations'
 import * as NodeDefExpression from '@core/survey/nodeDefExpression'
@@ -11,18 +19,22 @@ import * as SurveyDependencyTypes from '../_survey/surveyDependencyTypes'
 
 const { dependencyTypes } = SurveyDependencyTypes
 
-const expressionsByDependencyTypeFns = {
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+
+const expressionsByDependencyTypeFns: Record<string, (nodeDef: AnyNodeDef) => ArenaNodeDefExpression[]> = {
   [dependencyTypes.defaultValues]: NodeDef.getDefaultValues,
   [dependencyTypes.applicable]: NodeDef.getApplicable,
   [dependencyTypes.validations]: A.pipe(NodeDef.getValidations, NodeDefValidations.getExpressions),
   [dependencyTypes.formula]: NodeDef.getFormula,
-  [dependencyTypes.itemsFilter]: NodeDef.getItemsFilter,
-  [dependencyTypes.maxCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMaxCount),
-  [dependencyTypes.minCount]: A.pipe(NodeDef.getValidations, NodeDefValidations.getMinCount),
+  // count expressions are validated here only when they are arrays of expressions
+  [dependencyTypes.maxCount]: (nodeDef) =>
+    NodeDefValidations.getMaxCount(NodeDef.getValidations(nodeDef)) as ArenaNodeDefExpression[],
+  [dependencyTypes.minCount]: (nodeDef) =>
+    NodeDefValidations.getMinCount(NodeDef.getValidations(nodeDef)) as ArenaNodeDefExpression[],
   [dependencyTypes.required]: A.pipe(NodeDef.getValidations, NodeDefValidations.getRequiredIf),
 }
 
-const applyIfUniquenessByDependencyType = {
+const applyIfUniquenessByDependencyType: Record<string, boolean> = {
   [dependencyTypes.defaultValues]: true,
   [dependencyTypes.applicable]: false,
   [dependencyTypes.validations]: false,
@@ -32,7 +44,7 @@ const applyIfUniquenessByDependencyType = {
   [dependencyTypes.required]: false,
 }
 
-const errorKeyByDependencyType = {
+const errorKeyByDependencyType: Record<string, string> = {
   [dependencyTypes.defaultValues]: Validation.messageKeys.nodeDefEdit.defaultValuesInvalid,
   [dependencyTypes.applicable]: Validation.messageKeys.nodeDefEdit.applyIfInvalid,
   [dependencyTypes.validations]: Validation.messageKeys.nodeDefEdit.validationsInvalid,
@@ -42,39 +54,47 @@ const errorKeyByDependencyType = {
   [dependencyTypes.required]: Validation.messageKeys.nodeDefEdit.requiredIfInvalid,
 }
 
-const _validateExpressionProp = (survey, nodeDef, dependencyType) => async (propName, item) => {
-  const exprString = A.pathOr(null, propName.split('.'), item)
-  const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
-  const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
+const _validateExpressionProp =
+  (survey: ArenaSurvey, nodeDef: AnyNodeDef, dependencyType: string) => async (propName: string, item: unknown) => {
+    const exprString: string | null = A.pathOr(null, propName.split('.'), item)
+    const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
+    const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
 
-  return exprString
-    ? NodeDefExpressionValidator.validate({
-        survey,
-        nodeDefCurrent: nodeDef,
-        exprString,
-        isContextParent,
-        selfReferenceAllowed,
-      })
-    : null
-}
+    return exprString
+      ? NodeDefExpressionValidator.validate({
+          survey,
+          nodeDefCurrent: nodeDef,
+          exprString,
+          isContextParent,
+          selfReferenceAllowed,
+        })
+      : null
+  }
 
-const _validateOnlyLastApplyIfEmpty = (nodeDefExpressions, i) => async (propName, nodeDefExpression) => {
-  const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
-  return A.isEmpty(expr) && i < nodeDefExpressions.length - 1
-    ? {
-        key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty,
-      }
-    : null
-}
+const _validateOnlyLastApplyIfEmpty =
+  (nodeDefExpressions: ArenaNodeDefExpression[], i: number) =>
+  async (_propName: string, nodeDefExpression: ArenaNodeDefExpression) => {
+    const expr = NodeDefExpression.getApplyIf(nodeDefExpression)
+    return A.isEmpty(expr) && i < nodeDefExpressions.length - 1
+      ? {
+          key: Validation.messageKeys.nodeDefEdit.expressionApplyIfOnlyLastOneCanBeEmpty,
+        }
+      : null
+  }
 
-const _validateExpressionUniqueness = (nodeDefExpressions, nodeDefExpression) =>
+const _validateExpressionUniqueness = (
+  nodeDefExpressions: ArenaNodeDefExpression[],
+  nodeDefExpression: ArenaNodeDefExpression
+): Validation.ValidationInstance | null =>
   A.any(
     (nodeDefExpr) =>
       !ObjectUtils.isEqual(nodeDefExpression)(nodeDefExpr) &&
       NodeDefExpression.getExpression(nodeDefExpr) === NodeDefExpression.getExpression(nodeDefExpression) &&
       NodeDefExpression.getApplyIf(nodeDefExpr) === NodeDefExpression.getApplyIf(nodeDefExpression)
   )(nodeDefExpressions)
-    ? Validation.newInstance(false, {}, [{ key: Validation.messageKeys.nodeDefEdit.expressionDuplicate }])
+    ? Validation.newInstance(false, {}, [
+        ValidationResult.newInstance(Validation.messageKeys.nodeDefEdit.expressionDuplicate),
+      ])
     : null
 
 const _validateExpression = async ({
@@ -84,7 +104,14 @@ const _validateExpression = async ({
   nodeDefExpressions,
   nodeDefExpression,
   index,
-}) => {
+}: {
+  survey: ArenaSurvey
+  nodeDef: AnyNodeDef
+  dependencyType: string
+  nodeDefExpressions: ArenaNodeDefExpression[]
+  nodeDefExpression: ArenaNodeDefExpression
+  index: number
+}): Promise<Validation.ValidationInstance | null> => {
   const validateApplyIfUniqueness = applyIfUniquenessByDependencyType[dependencyType]
 
   const validation = await Validator.validate(nodeDefExpression, {
@@ -110,7 +137,11 @@ const _validateExpression = async ({
     : validation
 }
 
-export const validate = async (survey, nodeDef, dependencyType) => {
+export const validate = async (
+  survey: ArenaSurvey,
+  nodeDef: AnyNodeDef,
+  dependencyType: string
+): Promise<Validation.ValidationInstance | null> => {
   const result = Validation.newInstance()
 
   const nodeDefExpressions = expressionsByDependencyTypeFns[dependencyType](nodeDef)
@@ -122,17 +153,17 @@ export const validate = async (survey, nodeDef, dependencyType) => {
     )
   )
 
-  validations.forEach((validation, index) => {
+  for (const [index, validation] of validations.entries()) {
     if (validation) {
       Validation.setField(String(index), validation)(result)
       if (!Validation.isValid(validation)) {
         Validation.setValid(false)(result)
       }
     }
-  })
+  }
 
   if (!Validation.isValid(result)) {
-    Validation.setErrors([{ key: errorKey }])(result)
+    Validation.setErrors([ValidationResult.newInstance(errorKey)])(result)
     return result
   }
   return null

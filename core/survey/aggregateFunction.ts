@@ -8,9 +8,20 @@ const keys = {
   name: ObjectUtils.keys.name,
   placeholder: 'placeholder',
   uuid: ObjectUtils.keys.uuid,
+} as const
+
+export interface AggregateFunctionItem {
+  uuid: string
+  dateCreated?: number
+  name: string
+  expression: string
+  placeholder?: boolean
 }
 
-const newAggregateFunction = ({ name = '', expression = '' } = {}) => ({
+const newAggregateFunction = ({
+  name = '',
+  expression = '',
+}: { name?: string; expression?: string } = {}): AggregateFunctionItem => ({
   uuid: uuidv4(),
   dateCreated: Date.now(),
   name,

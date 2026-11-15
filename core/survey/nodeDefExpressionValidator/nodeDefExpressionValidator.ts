@@ -1,25 +1,22 @@
-import * as Survey from '@core/survey/survey'
-
 import {
   NodeDefExpressionEvaluator as CoreNodeDefExpressionEvaluator,
   NodeDefExpressionValidator as CoreNodeDefExpressionValidator,
 } from '@openforis/arena-core'
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  ValidationResult as ArenaValidationResult,
+} from '@openforis/arena-core'
 
-export const findReferencedNodeDefs = async ({
-  survey,
-  nodeDef,
-  exprString,
-  isContextParent = true,
-  selfReferenceAllowed = true,
-}) => {
-  const referencedNodeDefUuids = await new CoreNodeDefExpressionValidator().findReferencedNodeDefUuids({
-    expression: exprString,
-    survey,
-    nodeDef,
-    isContextParent,
-    selfReferenceAllowed,
-  })
-  return Survey.getNodeDefsByUuids(referencedNodeDefUuids)(survey)
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+
+type FindReferencedNodeDefLastParams = {
+  survey: ArenaSurvey
+  nodeDef: AnyNodeDef
+  exprString: string
+  isContextParent?: boolean
+  selfReferenceAllowed?: boolean
 }
 
 export const findReferencedNodeDefLast = async ({
@@ -28,7 +25,7 @@ export const findReferencedNodeDefLast = async ({
   exprString,
   isContextParent = true,
   selfReferenceAllowed = true,
-}) => {
+}: FindReferencedNodeDefLastParams): Promise<AnyNodeDef | null> => {
   return new CoreNodeDefExpressionEvaluator().evalExpression({
     survey,
     nodeDef,
@@ -45,7 +42,15 @@ export const validate = async ({
   isContextParent = false,
   selfReferenceAllowed = false,
   includeAnalysis = false,
-}) => {
+}: {
+  survey: ArenaSurvey
+  nodeDefCurrent: AnyNodeDef
+  exprString: string
+  isContextParent?: boolean
+  selfReferenceAllowed?: boolean
+  includeAnalysis?: boolean
+}): Promise<ArenaValidationResult | null> => {
+  // isContextParent is currently ignored by arena-core: the parent node def is always the context
   const { validationResult } = await new CoreNodeDefExpressionValidator().validate({
     expression: exprString,
     survey,
@@ -53,7 +58,7 @@ export const validate = async ({
     isContextParent,
     selfReferenceAllowed,
     includeAnalysis,
-  })
+  } as Parameters<CoreNodeDefExpressionValidator['validate']>[0])
   if (validationResult === null || validationResult.valid) return null
 
   return validationResult

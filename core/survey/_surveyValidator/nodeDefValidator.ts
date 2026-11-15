@@ -1,6 +1,7 @@
-import * as A from '@core/arena'
-
 import { NodeDefExpressionValidator } from '@openforis/arena-core'
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
+import * as A from '@core/arena'
 
 import { isHexColor } from '@core/colorUtils'
 import * as Validator from '@core/validation/validator'
@@ -15,6 +16,9 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 
 const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type ValidationOrNull = Validation.ValidationInstance | null
+
 const keysValidationFields = {
   children: 'children',
   keyAttributes: 'keyAttributes',
@@ -28,17 +32,17 @@ const MAX_FILE_SIZE_MAX = 100 // max size of files that can be uploaded using fi
 
 const nodeDefExpressionValidator = new NodeDefExpressionValidator()
 
-const validateCategory = async (propName, nodeDef) =>
+const validateCategory = async (propName: string, nodeDef: AnyNodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.code
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.categoryRequired)(propName, nodeDef)
     : null
 
-const validateTaxonomy = async (propName, nodeDef) =>
+const validateTaxonomy = async (propName: string, nodeDef: AnyNodeDef) =>
   NodeDef.getType(nodeDef) === NodeDef.nodeDefType.taxon
     ? Validator.validateRequired(Validation.messageKeys.nodeDefEdit.taxonomyRequired)(propName, nodeDef)
     : null
 
-const validateChildren = (survey) => (propName, nodeDef) => {
+const validateChildren = (survey: ArenaSurvey) => (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const children = Survey.getNodeDefChildren({ nodeDef, includeAnalysis: NodeDef.isAnalysis(nodeDef) })(survey)
     if (A.isEmpty(children)) {
@@ -49,14 +53,12 @@ const validateChildren = (survey) => (propName, nodeDef) => {
   return null
 }
 
-const countKeyAttributes = (survey, nodeDefEntity) =>
-  A.pipe(
-    Survey.getNodeDefChildren({ nodeDef: nodeDefEntity, includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) }),
-    A.filter(NodeDef.isKey),
-    A.length
-  )(survey)
+const countKeyAttributes = (survey: ArenaSurvey, nodeDefEntity: AnyNodeDef): number =>
+  Survey.getNodeDefChildren({ nodeDef: nodeDefEntity, includeAnalysis: NodeDef.isAnalysis(nodeDefEntity) })(
+    survey
+  ).filter(NodeDef.isKey).length
 
-const validateKeyAttributes = (survey) => (propName, nodeDef) => {
+const validateKeyAttributes = (survey: ArenaSurvey) => (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isEntity(nodeDef) && !NodeDef.isVirtual(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
@@ -72,7 +74,7 @@ const validateKeyAttributes = (survey) => (propName, nodeDef) => {
   return null
 }
 
-const validateKey = (survey) => (propName, nodeDef) => {
+const validateKey = (survey: ArenaSurvey) => (_propName: string, nodeDef: AnyNodeDef) => {
   if (!NodeDef.isEntity(nodeDef) && NodeDef.isKey(nodeDef)) {
     const keyAttributesCount = countKeyAttributes(survey, nodeDef)
 
@@ -84,7 +86,7 @@ const validateKey = (survey) => (propName, nodeDef) => {
   return null
 }
 
-const validateReadOnly = (propName, nodeDef) => {
+const validateReadOnly = (_propName: string, nodeDef: AnyNodeDef) => {
   if (!NodeDef.isReadOnly(nodeDef)) {
     return null
   }
@@ -100,14 +102,14 @@ const validateReadOnly = (propName, nodeDef) => {
 // a qualifier attribute value is always managed by the system (auto-filled based on the user's group,
 // then only survey admins may correct it, see canEditQualifierAttributeValue in authorizer.ts), so
 // designer-configured applicable/editability rules for it are meaningless and must be cleared
-const validateQualifierApplicable = (_propName, nodeDef) => {
+const validateQualifierApplicable = (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isQualifier(nodeDef) && !A.isEmpty(NodeDef.getApplicable(nodeDef))) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveApplicableExpression }
   }
   return null
 }
 
-const validateQualifierEditableIf = (_propName, nodeDef) => {
+const validateQualifierEditableIf = (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isQualifier(nodeDef) && (NodeDef.isReadOnly(nodeDef) || !A.isEmpty(NodeDef.getEditableIf(nodeDef)))) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveEditabilityRule }
   }
@@ -116,21 +118,21 @@ const validateQualifierEditableIf = (_propName, nodeDef) => {
 
 // a qualifier attribute value is always system-assigned, so a default value would never be applied,
 // and being effectively read-only, it can never be validated against required/unique/count/expression rules
-const validateQualifierDefaultValues = (_propName, nodeDef) => {
+const validateQualifierDefaultValues = (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isQualifier(nodeDef) && NodeDef.hasDefaultValues(nodeDef)) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveDefaultValues }
   }
   return null
 }
 
-const validateQualifierValidations = (_propName, nodeDef) => {
+const validateQualifierValidations = (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isQualifier(nodeDef) && NodeDef.hasValidationsDefined(nodeDef)) {
     return { key: Validation.messageKeys.nodeDefEdit.qualifierCannotHaveValidations }
   }
   return null
 }
 
-const validateParentEntityUuid = (_propName, nodeDef) => {
+const validateParentEntityUuid = (_propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isAnalysis(nodeDef) && A.isNil(NodeDef.getParentUuid(nodeDef))) {
     const errorKey = NodeDef.isVirtual(nodeDef)
       ? Validation.messageKeys.nodeDefEdit.entitySourceRequired
@@ -140,12 +142,12 @@ const validateParentEntityUuid = (_propName, nodeDef) => {
   return null
 }
 
-const validateVirtualEntityFormula = async (survey, nodeDef) =>
+const validateVirtualEntityFormula = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ValidationOrNull> =>
   NodeDef.isVirtual(nodeDef) && !A.isEmpty(NodeDef.getFormula(nodeDef))
     ? NodeDefExpressionsValidator.validate(survey, nodeDef, Survey.dependencyTypes.formula)
     : null
 
-const validateItemsFilterExpression = async (survey, nodeDef) => {
+const validateItemsFilterExpression = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ValidationOrNull> => {
   const expression = NodeDef.getItemsFilter(nodeDef)
   if (A.isEmpty(expression)) return null
 
@@ -153,14 +155,13 @@ const validateItemsFilterExpression = async (survey, nodeDef) => {
     survey,
     nodeDefCurrent: nodeDef,
     expression,
-    isContextParent: true,
     selfReferenceAllowed: true,
     itemsFilter: true,
   })
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
-const validateFileNameExpression = async (survey, nodeDef) => {
+const validateFileNameExpression = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ValidationOrNull> => {
   const expression = NodeDef.getFileNameExpression(nodeDef)
   if (A.isEmpty(expression)) return null
 
@@ -168,13 +169,15 @@ const validateFileNameExpression = async (survey, nodeDef) => {
     survey,
     nodeDefCurrent: nodeDef,
     expression,
-    isContextParent: true,
     selfReferenceAllowed: false,
   })
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
-const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
+const validateEnumeratingItemsExpression = async (
+  survey: ArenaSurvey,
+  nodeDef: AnyNodeDef
+): Promise<ValidationOrNull> => {
   if (!NodeDef.isEntity(nodeDef) || !NodeDef.isEnumerate(nodeDef)) return null
 
   const expression = NodeDef.getEnumeratingItemsExpression(nodeDef)
@@ -184,38 +187,30 @@ const validateEnumeratingItemsExpression = async (survey, nodeDef) => {
     survey,
     nodeDefCurrent: nodeDef,
     expression,
-    isContextParent: true,
     selfReferenceAllowed: false,
   })
   return validationResult && !validationResult.valid ? Validation.newInstance(false, {}, [validationResult]) : null
 }
 
 const validateColumnWidth =
-  ({ survey }) =>
-  (_propName, nodeDef) => {
+  ({ survey }: { survey: ArenaSurvey }) =>
+  (_propName: string, nodeDef: AnyNodeDef) => {
     const surveyInfo = Survey.getSurveyInfo(survey)
-    const cycles = Survey.getCycleKeys(surveyInfo)
-    let error = null
-    cycles.some((cycle) => {
-      const width = NodeDefLayout.getColumnWidthValue(cycle)(nodeDef)
-      const min = NodeDefLayout.columnWidthMinPx
+    const min = NodeDefLayout.columnWidthMinPx
+    const max = NodeDefLayout.columnWidthMaxPx
+    for (const cycle of Survey.getCycleKeys(surveyInfo)) {
+      const width = Number(NodeDefLayout.getColumnWidthValue(cycle)(nodeDef))
       if (width < min) {
-        error = { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeLessThan, params: { min } }
-        // break the loop
-        return true
+        return { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeLessThan, params: { min } }
       }
-      const max = NodeDefLayout.columnWidthMaxPx
       if (width > max) {
-        error = { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeGreaterThan, params: { max } }
-        // break the loop
-        return true
+        return { key: Validation.messageKeys.nodeDefEdit.columnWidthCannotBeGreaterThan, params: { max } }
       }
-      return false
-    })
-    return error
+    }
+    return null
   }
 
-const validateMaxFileSize = (_propName, nodeDef) => {
+const validateMaxFileSize = (_propName: string, nodeDef: AnyNodeDef) => {
   if (!NodeDef.isFile(nodeDef)) return null
 
   const maxSize = NodeDef.getMaxFileSize(nodeDef)
@@ -227,18 +222,18 @@ const validateMaxFileSize = (_propName, nodeDef) => {
 }
 
 // the color goes into the map layers control HTML and marker styles
-const validateMapMarkerColor = (_propName, nodeDef) => {
+const validateMapMarkerColor = (_propName: string, nodeDef: AnyNodeDef) => {
   const color = NodeDef.getMapMarkerColor(nodeDef)
   if (A.isEmpty(color) || isHexColor(color)) return null
   return { key: Validation.messageKeys.nodeDefEdit.mapMarkerColorInvalid }
 }
 
-const validateNameIsNotKeyword = (propName, nodeDef) => {
+const validateNameIsNotKeyword = (propName: string, nodeDef: AnyNodeDef) => {
   if (NodeDef.isSampling(nodeDef)) return null
   return Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword)(propName, nodeDef)
 }
 
-const propsValidations = (survey) => ({
+const propsValidations = (survey: ArenaSurvey) => ({
   [`${keys.props}.${propKeys.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     validateNameIsNotKeyword,
@@ -271,8 +266,11 @@ const propsValidations = (survey) => ({
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
 })
 
-const validateAdvancedProps = async (survey, nodeDef) => {
-  const validatorsByProp = {
+const validateAdvancedProps = async (
+  survey: ArenaSurvey,
+  nodeDef: AnyNodeDef
+): Promise<Validation.ValidationInstance> => {
+  const validatorsByProp: Record<string, Promise<ValidationOrNull>> = {
     [keysPropsAdvanced.defaultValues]: NodeDefExpressionsValidator.validate(
       survey,
       nodeDef,
@@ -290,17 +288,17 @@ const validateAdvancedProps = async (survey, nodeDef) => {
     [keysPropsAdvanced.enumeratingItemsExpression]: validateEnumeratingItemsExpression(survey, nodeDef),
   }
   const validationResultsArray = await Promise.all(Object.values(validatorsByProp))
-  const validationResultsByProp = Object.keys(validatorsByProp).reduce((acc, prop, index) => {
-    acc[prop] = validationResultsArray[index]
-    return acc
-  }, {})
+  const validationResultsByProp: Record<string, ValidationOrNull> = {}
+  for (const [index, prop] of Object.keys(validatorsByProp).entries()) {
+    validationResultsByProp[prop] = validationResultsArray[index]
+  }
   const valid = A.all(Validation.isValid, validationResultsArray)
   const notValidValidationsByProp = A.reject(Validation.isValid, validationResultsByProp)
 
   return Validation.newInstance(valid, notValidValidationsByProp)
 }
 
-export const validateNodeDef = async (survey, nodeDef) => {
+export const validateNodeDef = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ValidationOrNull> => {
   const nodeDefValidation = await Validator.validate(nodeDef, propsValidations(survey))
 
   const advancedPropsValidation = await validateAdvancedProps(survey, nodeDef)
@@ -311,29 +309,32 @@ export const validateNodeDef = async (survey, nodeDef) => {
   return A.pipe(A.mergeDeepLeft(advancedPropsValidation), Validation.setValid(valid))(nodeDefValidation)
 }
 
-export const validateNodeDefs = async (survey) => {
+export const validateNodeDefs = async (survey: ArenaSurvey): Promise<Validation.ValidationInstance> => {
   const nodeDefs = Survey.getNodeDefs(survey)
 
-  const nodeDefsValidation = []
+  const nodeDefsValidation: ValidationOrNull[] = []
   for (const nodeDef of Object.values(nodeDefs)) {
     nodeDefsValidation.push(await validateNodeDef(survey, nodeDef)) // NOSONAR
   }
 
   // exclude valid node def validations
-  const fieldsValidation = Object.values(nodeDefs).reduce((fieldsValidationAcc, nodeDef, index) => {
+  const fieldsValidation: Record<string, Validation.ValidationInstance> = {}
+  for (const [index, nodeDef] of Object.values(nodeDefs).entries()) {
     const nodeDefValidation = nodeDefsValidation[index]
-    return {
-      ...fieldsValidationAcc,
-      ...(Validation.isValid(nodeDefValidation) ? {} : { [nodeDef.uuid]: nodeDefValidation }),
+    if (!Validation.isValid(nodeDefValidation)) {
+      fieldsValidation[nodeDef.uuid] = nodeDefValidation
     }
-  }, {})
+  }
 
   return Validation.newInstance(A.isEmpty(fieldsValidation), fieldsValidation)
 }
 
 // ===== CHECK
 
-export const isValidationValidOrHasOnlyMissingChildrenErrors = (nodeDef, validation) => {
+export const isValidationValidOrHasOnlyMissingChildrenErrors = (
+  nodeDef: AnyNodeDef,
+  validation: ValidationOrNull
+): boolean => {
   if (Validation.isValid(validation)) {
     return true
   }
