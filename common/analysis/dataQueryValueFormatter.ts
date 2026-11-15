@@ -1,4 +1,5 @@
 import { Numbers } from '@openforis/arena-core'
+import type { I18n, NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -9,12 +10,23 @@ import * as DateUtils from '@core/dateUtils'
 // Aggregate function results (mean, median, sum, etc.) are capped to this many decimal places
 const MAX_AGGREGATE_VALUE_DECIMAL_DIGITS = 3
 
-const formatAggregateValue = (value) => {
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+
+type FormatParams = {
+  i18n: I18n
+  survey: ArenaSurvey
+  nodeDef: AnyNodeDef
+  value: any
+  label?: string | null
+  isMeasure?: boolean
+}
+
+const formatAggregateValue = (value: number): string => {
   const rounded = Numbers.roundToPrecision(value, MAX_AGGREGATE_VALUE_DECIMAL_DIGITS)
   return Number.isNaN(rounded) ? '' : String(rounded)
 }
 
-const formatters = {
+const formatters: Partial<Record<string, (params: FormatParams) => string>> = {
   [NodeDef.nodeDefType.boolean]: ({ value, i18n, nodeDef }) =>
     i18n.t(`surveyForm:nodeDefBoolean.labelValue.${NodeDef.getLabelValue(nodeDef)}.${value}`),
   [NodeDef.nodeDefType.code]: ({ value, label }) => label ?? value,
@@ -32,17 +44,28 @@ const formatters = {
     isMeasure ? formatAggregateValue(value) : Numbers.formatInteger(value),
 }
 
-const format = ({ i18n, survey, nodeDef, value, label, isMeasure = false }) => {
+const format = ({ i18n, survey, nodeDef, value, label, isMeasure = false }: FormatParams): string => {
   if (A.isNull(value)) {
     return ''
   }
   const formatter = formatters[NodeDef.getType(nodeDef)]
-  const formatValue = (v) => (formatter ? formatter({ i18n, survey, nodeDef, value: v, label, isMeasure }) : value)
+  const formatValue = (v: unknown) =>
+    formatter ? formatter({ i18n, survey, nodeDef, value: v, label, isMeasure }) : value
 
   return NodeDef.isMultiple(nodeDef) && Array.isArray(value) ? value.map(formatValue).join(', ') : formatValue(value)
 }
 
-const formatDataItemKey = ({ i18n, survey, nodeDef, dataItem }) => {
+const formatDataItemKey = ({
+  i18n,
+  survey,
+  nodeDef,
+  dataItem,
+}: {
+  i18n: I18n
+  survey: ArenaSurvey
+  nodeDef: AnyNodeDef
+  dataItem: Record<string, any>
+}): string => {
   const nodeDefName = NodeDef.getName(nodeDef)
   const rawValue = dataItem[nodeDefName]
   const label = dataItem[`${nodeDefName}_label`]

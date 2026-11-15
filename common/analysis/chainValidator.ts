@@ -1,3 +1,5 @@
+import type { Chain as ArenaChain, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as StringUtils from '@core/stringUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validator from '@core/validation/validator'
@@ -9,23 +11,32 @@ export const keys = {
   entityOrCategory: 'entityOrCategory',
 }
 
-const _validateLabelDefaultLanguageRequire = (defaultLang, errorMessageKey) => async (_, item) =>
-  StringUtils.isBlank(ObjectUtils.getLabel(defaultLang)(item)) ? ValidationResult.newInstance(errorMessageKey) : null
+const _validateLabelDefaultLanguageRequire =
+  (defaultLang: string, errorMessageKey: string) => (_: string, item: object) =>
+    StringUtils.isBlank(ObjectUtils.getLabel(defaultLang)(item)) ? ValidationResult.newInstance(errorMessageKey) : null
 
-const _validationsCommonProps = (defaultLang) => ({
+const _validationsCommonProps = (defaultLang: string) => ({
   [`${ObjectUtils.keys.props}.${ObjectUtils.keysProps.labels}`]: [
     _validateLabelDefaultLanguageRequire(defaultLang, Validation.messageKeys.analysis.labelDefaultLangRequired),
   ],
 })
 
 const _validateAnalysisNodeDefs =
-  ({ survey, chain }) =>
+  ({ survey, chain }: { survey: ArenaSurvey; chain: ArenaChain }) =>
   () =>
     Survey.getAnalysisNodeDefs({ chain })(survey).length === 0
       ? ValidationResult.newInstance(Validation.messageKeys.analysis.analysisNodeDefsRequired)
       : null
 
-export const validateChain = async ({ chain, defaultLang, survey }) =>
+export const validateChain = async ({
+  chain,
+  defaultLang,
+  survey,
+}: {
+  chain: ArenaChain
+  defaultLang: string
+  survey: ArenaSurvey
+}): Promise<Validation.ValidationInstance> =>
   Validator.validate(chain, {
     ..._validationsCommonProps(defaultLang),
     analysisNodeDefs: [_validateAnalysisNodeDefs({ chain, survey })],

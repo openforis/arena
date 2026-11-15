@@ -1,4 +1,10 @@
+import type { JobSerialized } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
+
+// serialized job or job summary (canceledByAdmin is set by arena)
+type Job = Omit<Partial<JobSerialized<any>>, 'status'> & { status?: string; canceledByAdmin?: boolean }
+type JobGetter<T> = (job: Job | null | undefined) => T
 
 export const keys = {
   type: 'type',
@@ -30,14 +36,14 @@ export const keys = {
 }
 
 // ===== READ
-export const getUuid = A.prop(keys.uuid)
-export const getType = A.prop(keys.type)
-export const getInnerJobs = A.propOr([], keys.innerJobs)
-export const getCurrentInnerJobIndex = A.propOr(-1, keys.currentInnerJobIndex)
-export const getProgressPercent = A.propOr(0, keys.progressPercent)
-export const getElapsedMillis = A.propOr(0, keys.elapsedMillis)
-export const getTotal = A.propOr(0, keys.total)
-export const getProcessed = A.propOr(0, keys.processed)
+export const getUuid: JobGetter<string | undefined> = A.prop(keys.uuid)
+export const getType: JobGetter<string | undefined> = A.prop(keys.type)
+export const getInnerJobs: JobGetter<Job[]> = A.propOr([], keys.innerJobs)
+export const getCurrentInnerJobIndex: JobGetter<number> = A.propOr(-1, keys.currentInnerJobIndex)
+export const getProgressPercent: JobGetter<number> = A.propOr(0, keys.progressPercent)
+export const getElapsedMillis: JobGetter<number> = A.propOr(0, keys.elapsedMillis)
+export const getTotal: JobGetter<number> = A.propOr(0, keys.total)
+export const getProcessed: JobGetter<number> = A.propOr(0, keys.processed)
 
 /**
  * Estimates the remaining milliseconds for a job based on elapsed time and progress.
@@ -49,10 +55,8 @@ export const getProcessed = A.propOr(0, keys.processed)
  *   inner job's rate when no completed ones exist yet)
  *
  * Returns null when remaining time cannot be computed (0% progress, already ended).
- * @param {object} job - Serialized job object.
- * @returns {number|null} Estimated remaining milliseconds, or null.
  */
-export const getRemainingMillis = (job) => {
+export const getRemainingMillis = (job: Job): number | null => {
   const progress = Math.min(100, Math.max(0, getProgressPercent(job)))
   if (progress <= 0 || isEnded(job)) return null
 
@@ -70,7 +74,7 @@ export const getRemainingMillis = (job) => {
 
   // Average duration of inner jobs that have already finished
   const completedInnerJobs = innerJobs.slice(0, currentInnerJobIndex)
-  let avgInnerJobDuration = null
+  let avgInnerJobDuration: number | null = null
 
   if (completedInnerJobs.length > 0) {
     const totalDuration = completedInnerJobs.reduce((sum, j) => sum + getElapsedMillis(j), 0)
@@ -94,19 +98,22 @@ export const getRemainingMillis = (job) => {
   return Math.round(currentJobRemaining + futureJobsEstimate)
 }
 
-export const getResult = A.prop(keys.result)
-export const getErrors = (job) => {
+export const getResult: JobGetter<any> = A.prop(keys.result)
+export const getErrors = (job: Job): Record<string, any> => {
   const errors = A.propOr([], keys.errors, job)
   // If errors is empty, get errors from failed inner job (if any)
   return A.isEmpty(errors) ? A.pipe(getInnerJobs, A.find(isFailed), A.propOr([], keys.errors))(job) : errors
 }
-export const getErrorsCount = (job) => Object.keys(getErrors(job)).length
-export const hasErrors = (job) => getErrorsCount(job) > 0
+export const getErrorsCount = (job: Job): number => Object.keys(getErrors(job)).length
+export const hasErrors = (job: Job): boolean => getErrorsCount(job) > 0
 
 // ===== READ (status)
-export const getStatus = A.prop(keys.status)
+export const getStatus: JobGetter<string | undefined> = A.prop(keys.status)
 
-const _isPropTrue = (prop) => A.pipe(A.prop(prop), A.equals(true))
+const _isPropTrue =
+  (prop: string): JobGetter<boolean> =>
+  (job) =>
+    A.prop(prop)(job) === true
 export const isPending = _isPropTrue(keys.pending)
 export const isRunning = _isPropTrue(keys.running)
 export const isSucceeded = _isPropTrue(keys.succeeded)

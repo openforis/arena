@@ -9,4 +9,5 @@ export const keys = {
 
 // ===== READ
 export const { getUuid, isEqual } = ObjectUtils
-export const getAggregate = A.prop(keys.aggregate)
+export const getAggregate = (stepVariable: { aggregate?: string }): string | undefined =>
+  A.prop(keys.aggregate)(stepVariable)

@@ -126,8 +126,21 @@ export const keysContent = {
   indexTo: 'indexTo',
 }
 
+export interface ActivityLog {
+  id?: number
+  type?: string
+  content?: Record<string, any>
+  system?: boolean
+  dateCreated?: string
+  userUuid?: string
+  // props associated from fetch
+  [key: string]: unknown
+}
+
+type ActivityGetter<T> = (activityLog: ActivityLog) => T
+
 // ====== CREATE
-export const newActivity = (activityType, content, system = false) => ({
+export const newActivity = (activityType: string, content: Record<string, any>, system = false): ActivityLog => ({
   [keys.type]: activityType,
   [keys.content]: content,
   [keys.system]: system,
@@ -136,29 +149,32 @@ export const newActivity = (activityType, content, system = false) => ({
 // ====== READ
 
 export const { getId } = ObjectUtils
-export const getUserUuid = A.prop(keys.userUuid)
-export const getType = A.prop(keys.type)
-export const getContent = A.prop(keys.content)
-export const isSystem = A.propEq(keys.system, true)
+export const getUserUuid: ActivityGetter<any> = A.prop(keys.userUuid)
+export const getType: ActivityGetter<any> = A.prop(keys.type)
+export const getContent: ActivityGetter<any> = A.prop(keys.content)
+export const isSystem: ActivityGetter<any> = A.propEq(keys.system, true)
 export const { getDateCreated } = ObjectUtils
 // taxonomy
-export const getTaxonomy = A.prop(keysContent.taxonomy)
+export const getTaxonomy: ActivityGetter<any> = A.prop(keysContent.taxonomy)
 // cateogry
-export const getCategory = A.prop(keysContent.category)
+export const getCategory: ActivityGetter<any> = A.prop(keysContent.category)
 
 // Props associated from fetch
-export const getUserName = A.prop(keys.userName)
-export const getRecordUuid = A.prop(keys.recordUuid)
-export const getKeysHierarchy = A.propOr([], keys.keysHierarchy)
-export const getNodeDefUuid = A.prop(keys.nodeDefUuid)
-export const getTargetUserName = A.prop(keys.targetUserName)
-export const getTargetUserUuid = A.prop(keys.targetUserUuid)
-export const getTargetUserEmail = A.prop(keys.targetUserEmail)
-export const getChainUuid = A.prop(keys.chainUuid)
-export const getChainLabels = A.prop(keys.chainLabels)
+export const getUserName: ActivityGetter<any> = A.prop(keys.userName)
+export const getRecordUuid: ActivityGetter<any> = A.prop(keys.recordUuid)
+export const getKeysHierarchy: ActivityGetter<any> = A.propOr([], keys.keysHierarchy)
+export const getNodeDefUuid: ActivityGetter<any> = A.prop(keys.nodeDefUuid)
+export const getTargetUserName: ActivityGetter<any> = A.prop(keys.targetUserName)
+export const getTargetUserUuid: ActivityGetter<any> = A.prop(keys.targetUserUuid)
+export const getTargetUserEmail: ActivityGetter<any> = A.prop(keys.targetUserEmail)
+export const getChainUuid: ActivityGetter<any> = A.prop(keys.chainUuid)
+export const getChainLabels: ActivityGetter<any> = A.prop(keys.chainLabels)
 
 // Content props
-const _getContentProp = (prop) => A.path([keys.content, prop])
+const _getContentProp =
+  (prop: string): ActivityGetter<any> =>
+  (activityLog) =>
+    A.path([keys.content, prop])(activityLog)
 export const getContentUuid = _getContentProp(keysContent.uuid)
 export const getContentParentUuid = _getContentProp(keysContent.parentUuid)
 export const getContentName = _getContentProp(keysContent.name)
