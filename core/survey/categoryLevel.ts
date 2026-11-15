@@ -22,7 +22,7 @@ export const keysProps = {
 // READ
 export const { getProps, getPropsDraft, getPropsAndPropsDraft, getUuid, isPublished } = ObjectUtils
 export const getIndex = (level: ArenaCategoryLevel): number => A.prop(keys.index)(level)
-export const getName: (level: ArenaCategoryLevel) => string = ObjectUtils.getProp(keysProps.name)
+export const getName: (level: ArenaCategoryLevel) => string | null = ObjectUtils.getProp(keysProps.name)
 // also used with category items loaded as ref data (they include the category uuid)
 export const getCategoryUuid = (level: ArenaCategoryLevel | ArenaCategoryItem): string =>
   A.prop(keys.categoryUuid)(level)

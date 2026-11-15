@@ -59,12 +59,12 @@ const assocIndex =
 // adds uuid and name to each extra def and puts them in an array sorted by index
 const extraDefsToArray = (extraDefs: ExtraPropDefItems): ExtraPropDefItem[] =>
   Object.entries(extraDefs)
-    .map(([name, item], index) => ({
+    .map(([name, item]) => ({
       ...item,
       [keys.uuid]: UUIDs.v4(),
       [keys.name]: name,
       [keys.dataType]: getDataType(item),
-      [keys.index]: getIndex(item) ?? index,
+      [keys.index]: getIndex(item),
     }))
     .sort((itemA, itemB) => getIndex(itemA) - getIndex(itemB))
     // re-assign indexes to ensure they are unique
