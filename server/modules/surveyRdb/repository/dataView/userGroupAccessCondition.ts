@@ -1,4 +1,4 @@
-import { NodeDef, NodeDefType, Survey } from '@openforis/arena-core'
+import { NodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as StringUtils from '@core/stringUtils'
 import * as NodeDefUtils from '@core/survey/nodeDef'
@@ -53,7 +53,7 @@ export const getUserGroupAccessCondition = ({
   accessFilters,
   recordUuidColumn,
 }: {
-  survey: Survey
+  survey: ArenaSurvey
   accessFilters: UserGroupAccessFilters | null
   recordUuidColumn: string
 }): SqlCondition | null => {

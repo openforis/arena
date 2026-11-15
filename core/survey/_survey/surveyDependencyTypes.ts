@@ -11,9 +11,11 @@ export const dependencyTypes = {
   required: 'required',
   validations: 'validations',
   visible: 'visible',
-}
+} as const
 
-export const isContextParentByDependencyType = {
+export type DependencyType = (typeof dependencyTypes)[keyof typeof dependencyTypes]
+
+export const isContextParentByDependencyType: Record<DependencyType, boolean> = {
   [dependencyTypes.applicable]: true,
   [dependencyTypes.defaultValues]: false,
   [dependencyTypes.editable]: true,
@@ -28,7 +30,7 @@ export const isContextParentByDependencyType = {
   [dependencyTypes.visible]: true,
 }
 
-export const selfReferenceAllowedByDependencyType = {
+export const selfReferenceAllowedByDependencyType: Record<DependencyType, boolean> = {
   [dependencyTypes.applicable]: false,
   [dependencyTypes.defaultValues]: false,
   [dependencyTypes.editable]: false,

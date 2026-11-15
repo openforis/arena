@@ -8,4 +8,4 @@ export const sortableKeys = {
   ownerName: 'owner_name',
   label: 'label',
   status: 'status',
-}
+} as const
