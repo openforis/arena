@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} of {{total}}',
   noItems: 'No new features to show.',
   items: {
+    mobileUploadEmailNotification: {
+      title: 'Email notification of the records uploaded from Arena Mobile',
+      description: `In **Survey info → Security**, check **Notify survey administrators by email when records are uploaded from Arena Mobile**: after each upload, every survey administrator receives an email listing the uploaded records, with their key values, whether they are new or updated, the user who created them, the dates and the number of validation errors and warnings.
+
+One email is sent per upload, even when a device uploads many records. The option is available when **Allow uploading records from Arena Mobile to server** is checked, and it takes effect once the survey is published.`,
+    },
     surveyGuestRole: {
       title: 'New role: Guest, to view the records without editing them',
       description: `Invite users with the new role **Guest** (**Users > Invite user**): they can view all the records of the survey, also in **Arena Mobile**, but they cannot edit or delete them, nor add new ones.

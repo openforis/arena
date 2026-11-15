@@ -26,6 +26,7 @@ export type WhatsNewItem = {
 
 // newest first
 export const whatsNewItems: WhatsNewItem[] = [
+  { id: 'mobileUploadEmailNotification', version: '2.13.2', audience: whatsNewAudiences.surveyAdmin },
   { id: 'surveyGuestRole', version: '2.13.0', audience: whatsNewAudiences.surveyAdmin },
   {
     id: 'areaOfInterest',

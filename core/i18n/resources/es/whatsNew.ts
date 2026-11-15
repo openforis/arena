@@ -6,6 +6,12 @@ export default {
   slideCounter: '{{current}} de {{total}}',
   noItems: 'No hay novedades para mostrar.',
   items: {
+    mobileUploadEmailNotification: {
+      title: 'Notificación por correo electrónico de los registros cargados desde Arena Mobile',
+      description: `En **Información de la encuesta → Seguridad**, marque **Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile**: después de cada carga, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados, sus valores clave, si son nuevos o actualizados, el usuario que los creó, las fechas y el número de errores y advertencias de validación.
+
+Se envía un solo correo por carga, aunque un dispositivo cargue muchos registros. La opción está disponible cuando **Permitir la carga de registros de Arena Mobile al servidor** está marcada, y se aplica una vez publicada la encuesta.`,
+    },
     surveyGuestRole: {
       title: 'Nuevo rol: Invitado, para ver los registros sin editarlos',
       description: `Invite usuarios con el nuevo rol **Invitado** (**Usuarios > Invitar usuario**): pueden ver todos los registros de la encuesta, también en **Arena Mobile**, pero no pueden editarlos ni eliminarlos, ni añadir nuevos.
