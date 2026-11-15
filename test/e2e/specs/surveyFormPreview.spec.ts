@@ -17,6 +17,8 @@ test.describe('Survey form preview', () => {
     await page.goto(Urls.formDesigner)
     await page.getByTestId(TestId.surveyForm.previewOpenBtn).click()
     await expect(page.getByTestId(TestId.surveyForm.previewCloseBtn)).toBeVisible()
+    // record actions (lock, export, promote/demote) are not available in preview
+    await expect(page.getByTestId(TestId.record.editLockToggleBtn)).toHaveCount(0)
   })
 
   test('applies default values and relevancy', async ({ page }) => {
