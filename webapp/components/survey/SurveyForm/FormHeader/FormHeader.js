@@ -28,7 +28,7 @@ import { FormHeaderPath } from './FormHeaderPath'
 import FormHeaderAdvancedButton from './FormHeaderAdvancedButton'
 
 const FormHeader = (props) => {
-  const { disableLockUnlock, disableValidationReport, edit, entry, preview, canEditDef, analysis } = props
+  const { disableLockUnlock, disableValidationReport, edit, entry, canEditDef, analysis } = props
 
   const dispatch = useDispatch()
   const navigate = useNavigate()
@@ -97,7 +97,6 @@ const FormHeader = (props) => {
         <FormEntryActions
           disableLockUnlock={disableLockUnlock}
           disableValidationReport={disableValidationReport}
-          preview={preview}
           entry={entry}
         />
       )}
@@ -111,7 +110,6 @@ FormHeader.propTypes = {
   canEditDef: PropTypes.bool.isRequired,
   edit: PropTypes.bool.isRequired,
   entry: PropTypes.bool.isRequired,
-  preview: PropTypes.bool.isRequired,
   analysis: PropTypes.bool.isRequired,
 }
 

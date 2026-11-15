@@ -137,25 +137,12 @@ RecordEntryButtons.propTypes = {
 }
 
 const FormEntryActions = (props) => {
-  const { disableLockUnlock = false, disableValidationReport = false, preview = false, entry = false } = props
-
-  const dispatch = useDispatch()
+  const { disableLockUnlock = false, disableValidationReport = false, entry = false } = props
 
   return (
     <div className="survey-form-header__actions">
-      {preview ? (
-        <Button
-          iconClassName="icon-eye-blocked icon-12px"
-          label="surveyForm:formEntryActions.closePreview"
-          onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
-          size="small"
-          testId={TestId.surveyForm.previewCloseBtn}
-          variant="text"
-        />
-      ) : (
-        entry && (
-          <RecordEntryButtons disableLockUnlock={disableLockUnlock} disableValidationReport={disableValidationReport} />
-        )
+      {entry && (
+        <RecordEntryButtons disableLockUnlock={disableLockUnlock} disableValidationReport={disableValidationReport} />
       )}
     </div>
   )
@@ -164,7 +151,6 @@ const FormEntryActions = (props) => {
 FormEntryActions.propTypes = {
   disableLockUnlock: PropTypes.bool,
   disableValidationReport: PropTypes.bool,
-  preview: PropTypes.bool,
   entry: PropTypes.bool,
 }
 

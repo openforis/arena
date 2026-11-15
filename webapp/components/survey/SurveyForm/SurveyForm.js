@@ -20,7 +20,7 @@ import {
   useNotAvailableEntityPageUuids,
   useTreeSelectViewMode,
 } from '@webapp/store/ui/surveyForm'
-import { RecordState } from '@webapp/store/ui/record'
+import { RecordActions, RecordState } from '@webapp/store/ui/record'
 import { useI18n } from '@webapp/store/system'
 import { useIsSidebarOpened } from '@webapp/service/storage/sidebar'
 import { TestId } from '@webapp/utils/testId'
@@ -30,6 +30,7 @@ import { useOnUpdate, useLocationPathMatcher } from '@webapp/components/hooks'
 import { NodeDefTreeSelect } from '@webapp/components/survey/NodeDefsSelector'
 
 import { Split } from '@webapp/components'
+import { ButtonIconClose } from '@webapp/components/buttons'
 import { ButtonGroup } from '@webapp/components/form'
 import { TreeSelectViewMode } from '@webapp/model'
 
@@ -200,12 +201,22 @@ const SurveyForm = (props) => {
         edit={edit}
         analysis={analysis}
         entry={entry}
-        preview={preview}
         canEditDef={canEditDef}
       />
 
+      {preview && (
+        <div className="survey-form__preview-label">
+          <span className="icon icon-eye icon-12px" />
+          {i18n.t('common.preview')}
+          <ButtonIconClose
+            label="surveyForm:formEntryActions.closePreview"
+            onClick={() => dispatch(RecordActions.deleteRecordUuidPreview())}
+            testId={TestId.surveyForm.previewCloseBtn}
+          />
+        </div>
+      )}
+
       <div className={className} data-testid={TestId.surveyForm.surveyForm}>
-        {preview && <div className="preview-label">{i18n.t('common.preview')}</div>}
         {showPageNavigation && (
           <Split sizes={[20, 80]} minSize={[0, 300]}>
             <div className="survey-form__sidebar">
