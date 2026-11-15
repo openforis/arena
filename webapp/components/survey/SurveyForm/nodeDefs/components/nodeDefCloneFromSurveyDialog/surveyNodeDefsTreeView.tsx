@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useState } from 'react'
-import type { NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
@@ -19,7 +19,7 @@ export interface SourceNodeDefSelection {
 interface SurveyLoadState {
   loading: boolean
   error: boolean
-  survey: object | null
+  survey: ArenaSurvey | null
 }
 
 interface TreeItem {
@@ -62,7 +62,7 @@ const getChildNodeDefs = ({
   survey,
   nodeDef,
 }: {
-  survey: object
+  survey: ArenaSurvey
   nodeDef: ArenaNodeDef<NodeDefType>
 }): ArenaNodeDef<NodeDefType>[] => Survey.getNodeDefChildrenSorted({ nodeDef })(survey)
 
@@ -77,7 +77,7 @@ const toNodeDefTreeItems = ({
   lang: string
   cycle: string
   surveyId: number
-  surveyLoaded: object
+  surveyLoaded: ArenaSurvey
 }): TreeItem[] =>
   nodeDefs.map((nodeDef) => {
     const nodeDefUuid = NodeDef.getUuid(nodeDef)

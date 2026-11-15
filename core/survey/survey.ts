@@ -1,3 +1,5 @@
+import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import { uuidv4 } from '@core/uuid'
@@ -24,15 +26,25 @@ import * as SurveyRefDataIndex from './_survey/surveyRefDataIndex'
 import * as SurveyNodeDefsIndex from './_survey/surveyNodeDefsIndex'
 import * as SurveyAnalysis from './_survey/surveyAnalysis'
 
+type AnyNodeDef = ArenaNodeDef<NodeDefType>
+type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
+
+type NewSurveyParams = {
+  ownerUuid: string
+  name: string
+  languages: string[]
+  label?: string | null
+  srs?: Record<string, unknown>[] | null
+  published?: boolean
+  draft?: boolean
+  template?: boolean
+  [otherProp: string]: unknown
+}
+
 /**
  * Creates a new survey info object with the specified parameters.
- * @param {!object} params - The creation parameters.
- * @param {!string} params.ownerUuid - The owner user UUID.
- * @param {!string} params.name - The survey name.
- * @param {!Array.<string>} params.languages - The survey languages.
- * @param {string} [params.label] - The label in the default language.
- * @param {object} [params.otherProps] - Other props to set.
- * @returns {object} The newly created survey info object.
+ * @param params - The creation parameters; props other than the listed ones are set as survey props.
+ * @returns The newly created survey info object.
  */
 export const newSurvey = ({
   ownerUuid,
@@ -44,21 +56,22 @@ export const newSurvey = ({
   draft = true,
   template = false,
   ...rest
-}) => ({
-  [SurveyInfo.keys.uuid]: uuidv4(),
-  [SurveyInfo.keys.props]: {
-    [SurveyInfo.keys.name]: name,
-    [SurveyInfo.keys.languages]: languages,
-    [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
-    [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [A.omit([Srs.keys.wkt], Srs.latLonSrs)],
-    [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
-    ...rest,
-  },
-  [SurveyInfo.keys.published]: published,
-  [SurveyInfo.keys.draft]: draft,
-  [SurveyInfo.keys.ownerUuid]: ownerUuid,
-  [SurveyInfo.keys.template]: template,
-})
+}: NewSurveyParams): ArenaSurvey =>
+  ({
+    [SurveyInfo.keys.uuid]: uuidv4(),
+    [SurveyInfo.keys.props]: {
+      [SurveyInfo.keys.name]: name,
+      [SurveyInfo.keys.languages]: languages,
+      [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
+      [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [A.omit([Srs.keys.wkt], Srs.latLonSrs)],
+      [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
+      ...rest,
+    },
+    [SurveyInfo.keys.published]: published,
+    [SurveyInfo.keys.draft]: draft,
+    [SurveyInfo.keys.ownerUuid]: ownerUuid,
+    [SurveyInfo.keys.template]: template,
+  }) as unknown as ArenaSurvey
 
 export const { configKeys } = SurveyConfig
 export const { keys: infoKeys, status } = SurveyInfo
@@ -71,19 +84,19 @@ export const { getDefaultAuthGroups } = SurveyDefaults
 
 // READ
 export const getSurveyInfo = SurveyInfo.getInfo
-export const getId = A.pipe(getSurveyInfo, SurveyInfo.getId)
+export const getId = (survey: ArenaSurvey): number => SurveyInfo.getId(getSurveyInfo(survey)) as number
 export const getIdSurveyInfo = SurveyInfo.getId
-export const canHaveData = (survey) => {
+export const canHaveData = (survey: ArenaSurvey): boolean => {
   const surveyInfo = getSurveyInfo(survey)
   return isPublished(surveyInfo) || isFromCollect(surveyInfo) || isFromOdk(surveyInfo)
 }
 /**
  * Returns true if all the root key attribute definitions are code attributes using the sampling point data category.
- * @param {!object} survey - The survey object.
- * @returns {boolean} - True if all key attributes are using the sampling point data category.
+ * @param survey - The survey object.
+ * @returns True if all key attributes are using the sampling point data category.
  */
-export const canRecordBeIdentifiedBySamplingPointDataItem = (survey) => {
-  const samplingPointDataNodeDefs = getSamplingPointDataNodeDefs(survey)
+export const canRecordBeIdentifiedBySamplingPointDataItem = (survey: ArenaSurvey): boolean => {
+  const samplingPointDataNodeDefs: AnyNodeDef[] = getSamplingPointDataNodeDefs(survey)
   if (samplingPointDataNodeDefs.length === 0) return false
 
   const rootEntityKeyDefs = SurveyNodeDefs.getNodeDefRootKeys(survey)
@@ -256,13 +269,19 @@ export const { dissocNodeDef, mergeNodeDefs, cloneNodeDef } = SurveyNodeDefs
 
 // replace all the node defs in the survey with the specified ones
 export const assocNodeDefsSimple =
-  ({ nodeDefs }) =>
+  ({ nodeDefs }: { nodeDefs: Record<string, AnyNodeDef> }): SurveyUpdater =>
   (survey) =>
     SurveyNodeDefs.assocNodeDefs(nodeDefs)(survey)
 
 export const assocNodeDefs =
-  ({ nodeDefs, updateDependencyGraph = false }) =>
-  async (survey) => {
+  ({
+    nodeDefs,
+    updateDependencyGraph = false,
+  }: {
+    nodeDefs: Record<string, AnyNodeDef>
+    updateDependencyGraph?: boolean
+  }) =>
+  async (survey: ArenaSurvey): Promise<ArenaSurvey> => {
     let surveyUpdated = assocNodeDefsSimple({ nodeDefs })(survey)
     if (updateDependencyGraph) {
       surveyUpdated = await SurveyDependencies.buildAndAssocDependencyGraph(surveyUpdated)
@@ -270,8 +289,9 @@ export const assocNodeDefs =
     return surveyUpdated
   }
 
+// to update the dependency graph too, use assocNodeDefs with updateDependencyGraph (it's async)
 export const assocNodeDef =
-  ({ nodeDef, updateDependencyGraph = false }) =>
+  ({ nodeDef }: { nodeDef: AnyNodeDef }): SurveyUpdater =>
   (survey) => {
     let surveyUpdated = SurveyNodeDefs.assocNodeDef(nodeDef)(survey)
     // update node defs index
@@ -281,11 +301,6 @@ export const assocNodeDef =
       survey: surveyUpdated,
       nodeDefsIndex: nodeDefsIndexUpdated,
     })
-
-    if (updateDependencyGraph) {
-      surveyUpdated = SurveyDependencies.removeNodeDefDependencies(nodeDef.uuid)(surveyUpdated)
-      surveyUpdated = SurveyDependencies.addNodeDefDependencies(nodeDef)(surveyUpdated)
-    }
     return surveyUpdated
   }
 
@@ -341,7 +356,7 @@ export const {
   getCategoryItemsInLevel,
 } = SurveyRefDataIndex
 
-export const getNodeDefCategoryItems = (nodeDef) => (survey) => {
+export const getNodeDefCategoryItems = (nodeDef: AnyNodeDef) => (survey: ArenaSurvey) => {
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
   const levelIndex = SurveyNodeDefs.getNodeDefCategoryLevelIndex(nodeDef)(survey)
   return SurveyRefDataIndex.getCategoryItemsInLevel({ categoryUuid, levelIndex })(survey)
@@ -368,7 +383,22 @@ export const {
 
 // ====== Clone node defs from another survey: category/taxonomy references resolution
 
-const _resolveClonedNodeDefsRefs = ({
+type SurveyItemGetter<T> = (key: string) => (survey: ArenaSurvey) => T | null | undefined
+
+type ResolveClonedNodeDefsRefsParams<T> = {
+  clonedNodeDefs: AnyNodeDef[]
+  sourceSurvey: ArenaSurvey
+  targetSurvey: ArenaSurvey
+  isRefNodeDef: (nodeDef: AnyNodeDef) => boolean
+  getRefUuid: (nodeDef: AnyNodeDef) => string | null
+  propKey: string
+  getItemByUuidInSurvey: SurveyItemGetter<T>
+  getItemByNameInSurvey: SurveyItemGetter<T>
+  getItemName: (item: T) => string
+  getItemUuid: (item: T) => string
+}
+
+const _resolveClonedNodeDefsRefs = <T>({
   clonedNodeDefs,
   sourceSurvey,
   targetSurvey,
@@ -379,32 +409,32 @@ const _resolveClonedNodeDefsRefs = ({
   getItemByNameInSurvey,
   getItemName,
   getItemUuid,
-}) => {
-  const uuidsToClone = []
-  const rewriteByOldUuid = {}
-  const processedUuids = new Set()
+}: ResolveClonedNodeDefsRefsParams<T>): { clonedNodeDefs: AnyNodeDef[]; uuidsToClone: string[] } => {
+  const uuidsToClone: string[] = []
+  const rewriteByOldUuid: Record<string, string> = {}
+  const processedUuids = new Set<string>()
 
-  clonedNodeDefs.filter(isRefNodeDef).forEach((nodeDef) => {
+  for (const nodeDef of clonedNodeDefs.filter(isRefNodeDef)) {
     const refUuid = getRefUuid(nodeDef)
-    if (!refUuid || processedUuids.has(refUuid)) return
+    if (!refUuid || processedUuids.has(refUuid)) continue
     processedUuids.add(refUuid)
 
     if (getItemByUuidInSurvey(refUuid)(targetSurvey)) {
       // Already present in the target survey with the same uuid: reuse as-is.
-      return
+      continue
     }
     const sourceItem = getItemByUuidInSurvey(refUuid)(sourceSurvey)
     if (!sourceItem) {
       // Dangling reference in the source survey: leave the cloned attribute as-is.
-      return
+      continue
     }
     const existingItemByName = getItemByNameInSurvey(getItemName(sourceItem))(targetSurvey)
     if (existingItemByName) {
       rewriteByOldUuid[refUuid] = getItemUuid(existingItemByName)
-      return
+      continue
     }
     uuidsToClone.push(refUuid)
-  })
+  }
 
   const clonedNodeDefsUpdated =
     Object.keys(rewriteByOldUuid).length === 0
@@ -424,13 +454,21 @@ const _resolveClonedNodeDefsRefs = ({
  * the target survey: an already existing one (matched by uuid or by name), or one that still needs
  * to be cloned from the source survey. Cloned attributes associated with an existing item matched
  * by name (different uuid) get their categoryUuid/taxonomyUuid prop rewritten accordingly.
- * @param {!object} params - The params.
- * @param {!object} params.sourceSurvey - The survey the node defs have been cloned from.
- * @param {!object} params.targetSurvey - The survey the node defs have been cloned into.
- * @param {!Array.<object>} params.clonedNodeDefs - The cloned node defs (subtree).
- * @returns {object} - { clonedNodeDefs, categoryUuidsToClone, taxonomyUuidsToClone }.
+ * @param params - The params.
+ * @param params.sourceSurvey - The survey the node defs have been cloned from.
+ * @param params.targetSurvey - The survey the node defs have been cloned into.
+ * @param params.clonedNodeDefs - The cloned node defs (subtree).
+ * @returns The updated cloned node defs and the uuids of the categories and taxonomies to clone.
  */
-export const resolveClonedNodeDefsCategoriesAndTaxonomies = ({ sourceSurvey, targetSurvey, clonedNodeDefs }) => {
+export const resolveClonedNodeDefsCategoriesAndTaxonomies = ({
+  sourceSurvey,
+  targetSurvey,
+  clonedNodeDefs,
+}: {
+  sourceSurvey: ArenaSurvey
+  targetSurvey: ArenaSurvey
+  clonedNodeDefs: AnyNodeDef[]
+}): { clonedNodeDefs: AnyNodeDef[]; categoryUuidsToClone: string[]; taxonomyUuidsToClone: string[] } => {
   const { clonedNodeDefs: clonedNodeDefsAfterCategories, uuidsToClone: categoryUuidsToClone } =
     _resolveClonedNodeDefsRefs({
       clonedNodeDefs,

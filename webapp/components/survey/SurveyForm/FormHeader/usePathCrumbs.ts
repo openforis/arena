@@ -51,7 +51,7 @@ const getNodeValue = ({
  * @returns Ordered breadcrumb items from root to the active page
  */
 export const usePathCrumbs = (entry: boolean): FormPathCrumb[] => {
-  const survey = useSurvey() as ArenaSurvey
+  const survey = useSurvey()
   const cycle = useSurveyCycleKey()
   let nodeDefCurrent = useNodeDefPage()
   const pagesUuidMap = usePagesUuidMap()

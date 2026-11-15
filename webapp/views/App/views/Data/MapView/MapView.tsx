@@ -102,7 +102,7 @@ type MapWrapperState = {
 const MapWrapper = () => {
   const i18n = useI18n()
   const lang = useSurveyPreferredLang()
-  const survey = useSurvey() as any
+  const survey = useSurvey()
 
   const surveyInfo = useSurveyInfo() as any
   const surveyId = Survey.getId(survey)
