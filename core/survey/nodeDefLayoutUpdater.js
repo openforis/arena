@@ -257,7 +257,7 @@ const _removeNodeDefFromParentLayoutCycle = ({ survey, cycle, nodeDef }) => {
  * @param {Array.<string>} [params.cyclesAdded] - The survey cycles added to the nodeDef.
  * @param {Array.<string>} [params.cyclesDeleted] - The survey cycles removed from the nodeDef.
  * @param {object} [params.layoutInParentByCycle] - The layout that needs to be kept when node def is added to the parent layout.
- * @returns {object} - The updated parent node definition, if changed.
+ * @returns {import('@openforis/arena-core').NodeDef<import('@openforis/arena-core').NodeDefType>} - The updated parent node definition, if changed.
  */
 export const updateParentLayout = ({
   survey,

@@ -3,8 +3,6 @@ import './DataMatrixExportForm.scss'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
-
 import { getDataMatrixAttributeDefs } from '@common/dataExport/dataMatrixExport'
 import { Query } from '@common/model/query'
 import { FileFormats } from '@core/fileFormats'
@@ -128,7 +126,7 @@ export const DataMatrixExportForm = (props: Props) => {
 
   const dispatch = useDispatch()
   const i18n = useI18n()
-  const survey = useSurvey() as ArenaSurvey
+  const survey = useSurvey()
   const surveyId = useSurveyId()
   const cycle = useSurveyCycleKey()
   const lang = useSurveyPreferredLang()

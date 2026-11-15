@@ -354,7 +354,11 @@ const updateParentLayout = ({ parentsContext, nodeDef, cyclesAdded = [], cyclesD
 const getExistingCycles = (context: PlanContext, nodeDef: any): string[] =>
   NodeDef.getCycles(nodeDef).filter((cycle: string) => context.targetCycleKeys.includes(cycle))
 
-const updateParentLayouts = ({ context, plan, layoutUpdatedUuids }) => {
+const updateParentLayouts = ({
+  context,
+  plan,
+  layoutUpdatedUuids,
+}: Pick<ParentLayoutsContext, 'context' | 'plan' | 'layoutUpdatedUuids'>) => {
   const parentsContext: ParentLayoutsContext = {
     context,
     plan,

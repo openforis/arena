@@ -1,3 +1,5 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as StringUtils from '@core/stringUtils'
@@ -10,7 +12,7 @@ import { I18n as I18nCore, LanguageCode, ValidationSeverity } from '@openforis/a
 type I18n = I18nCore & { language: string }
 
 const getValidationCountErrorText =
-  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  ({ survey, i18n }: { survey: ArenaSurvey; i18n: I18n }) =>
   (validationResult: ValidationResult.ValidationResultInstance): string => {
     const nodeDef = Survey.getNodeDefByUuid(
       (ValidationResult.getParams(validationResult) as { nodeDefUuid?: string }).nodeDefUuid
@@ -23,7 +25,7 @@ const getValidationCountErrorText =
   }
 
 const getValidationText =
-  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  ({ survey, i18n }: { survey: ArenaSurvey; i18n: I18n }) =>
   (validationResult: ValidationResult.ValidationResultInstance): string => {
     if (ValidationResult.hasMessages(validationResult)) {
       return ValidationResult.getMessage(i18n.language as LanguageCode)(validationResult)
@@ -45,14 +47,14 @@ const getJointText =
     getterFn,
   }: {
     i18n: I18n
-    survey: unknown
+    survey: ArenaSurvey
     getterFn: (v: Validation.ValidationInstance) => ValidationResult.ValidationResultInstance[]
   }) =>
   (validation: Validation.ValidationInstance): string =>
     getterFn(validation).map(getValidationText({ survey, i18n })).join(', ')
 
 const getValidationMessage =
-  ({ survey, i18n }: { survey: unknown; i18n: I18n }) =>
+  ({ survey, i18n }: { survey: ArenaSurvey; i18n: I18n }) =>
   (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string } | null => {
     const errorText = getJointText({ i18n, survey, getterFn: Validation.getErrors })(validation)
 
@@ -69,7 +71,7 @@ const getValidationMessage =
   }
 
 const getFieldValidationMessage =
-  ({ survey, field, i18n }: { survey: unknown; field: string; i18n: I18n }) =>
+  ({ survey, field, i18n }: { survey: ArenaSurvey; field: string; i18n: I18n }) =>
   (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string } => {
     const message = getValidationMessage({ survey, i18n })(validation)
     if (message) {
@@ -108,7 +110,7 @@ const getNormalizedFieldValidations = (
 }
 
 const getJointMessages =
-  ({ i18n, survey, showKeys = true }: { i18n: I18n; survey: unknown; showKeys?: boolean }) =>
+  ({ i18n, survey, showKeys = true }: { i18n: I18n; survey: ArenaSurvey; showKeys?: boolean }) =>
   (validation: Validation.ValidationInstance): { severity: ValidationResult.Severity; text: string }[] => {
     const messages: { severity: ValidationResult.Severity; text: string }[] = []
 
@@ -136,7 +138,7 @@ const getJointMessage =
     severity = null,
   }: {
     i18n: I18n
-    survey: unknown
+    survey: ArenaSurvey
     showKeys?: boolean
     severity?: ValidationResult.Severity | null
   }) =>

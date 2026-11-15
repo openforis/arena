@@ -40,7 +40,7 @@ type Props = {
 
 export const RecordPrintableExportModal = ({ open, initialFormat, onClose }: Props) => {
   const i18n = useI18n()
-  const survey = useSurvey() as object
+  const survey = useSurvey()
   const surveyId = useSurveyId() as string | number
   const lang = useSurveyPreferredLang() as string
   const record = useRecord() as ArenaRecord | null | undefined
