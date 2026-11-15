@@ -25,6 +25,8 @@ import {
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
 type Node = ArenaRecordNode
 type NodeUpdater = (node: Node) => Node
+// node value shape depends on the node def type: kept as a named alias for readability
+type NodeValue = any // NOSONAR
 
 export {
   valuePropsByType,
@@ -82,7 +84,7 @@ export const { getParentUuid } = ObjectUtils
 
 export const getRecordUuid = (node: Node): string => A.prop(keys.recordUuid)(node) as string
 
-export const getValue = (node: Node = {} as Node, defaultValue: any = {}): any =>
+export const getValue = (node: Node = {} as Node, defaultValue: NodeValue = {}): NodeValue =>
   A.propOr(defaultValue, keys.value, node)
 
 const _getValuePropRaw =
@@ -170,7 +172,7 @@ export const newNode = (
   nodeDefUuid: string,
   recordUuid: string,
   parentNode: Node | null = null,
-  value: any = null
+  value: NodeValue = null
 ): Node => {
   // ISO string (as in arena-core nodes and in the nodes fetched from the db): smaller than a Date object
   const now = new Date().toISOString()
@@ -189,7 +191,7 @@ export const newNode = (
   }
 }
 
-export const newNodePlaceholder = (nodeDef: AnyNodeDef, parentNode: Node, value: any = null): Node => ({
+export const newNodePlaceholder = (nodeDef: AnyNodeDef, parentNode: Node, value: NodeValue = null): Node => ({
   ...newNode(NodeDef.getUuid(nodeDef), getRecordUuid(parentNode), parentNode, value),
   [keys.placeholder]: true,
 })
@@ -200,7 +202,7 @@ export const newNodePlaceholder = (nodeDef: AnyNodeDef, parentNode: Node, value:
 // ======
 //
 export const assocValue =
-  (value: any): NodeUpdater =>
+  (value: NodeValue): NodeUpdater =>
   (node) =>
     A.assoc(keys.value, value, node)
 export const { assocValidation } = Validation
