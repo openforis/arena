@@ -84,7 +84,8 @@ const _getOrFetchCategoryItem = async ({
   const nodeDefUuid = Node.getNodeDefUuid(attribute)
   const nodeDef = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
   const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-  return categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+  const item = await categoryItemProvider.getItemByUuid({ survey, categoryUuid, itemUuid })
+  return item
 }
 
 const _getCodeAttributeCode = async ({
@@ -138,7 +139,7 @@ const _findCategoryItemUuidByAttribute = async ({
   const ancestorCodes = await Promise.all(
     ancestorCodeAttributes.map((attribute) => _getCodeAttributeCode({ survey, categoryItemProvider, attribute }))
   )
-  if (ancestorCodes.some(Objects.isEmpty)) {
+  if (ancestorCodes.some((ancestorCode) => Objects.isEmpty(ancestorCode))) {
     return null
   }
   const codePaths = [...ancestorCodes, code]
@@ -183,7 +184,9 @@ type AttributeValueParams = {
 
 const _adaptValue = async ({ context, record, parentNode, attributeDef, value }: AttributeValueParams) => {
   const valueAdapter = _valueAdapterByType[NodeDef.getType(attributeDef)]
-  return valueAdapter ? valueAdapter({ ...context, record, parentNode, attributeDef, value }) : value
+  if (!valueAdapter) return value
+  const valueAdapted = await valueAdapter({ ...context, record, parentNode, attributeDef, value })
+  return valueAdapted
 }
 
 const _addOrUpdateAttribute =

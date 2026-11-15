@@ -183,6 +183,46 @@ const _afterNodesUpdateExceptPassiveNodes = async ({
   return afterNodesUpdate({ ...otherParams, record: updateResult.record, nodes: activeNodes, passiveNodes })
 }
 
+type ChildrenSourceAndTarget = {
+  childrenSource: ArenaRecordNode[]
+  childrenTarget: ArenaRecordNode[]
+  updateResult: RecordUpdateResult
+  sideEffect?: boolean
+}
+
+// deletes the target nodes that are not in the source record
+const _deleteTargetChildrenNotInSource = ({
+  childrenSource,
+  childrenTarget,
+  updateResult,
+  sideEffect,
+}: ChildrenSourceAndTarget): void => {
+  const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
+  if (childrenTargetToDelete.length === 0) return
+
+  const childrenTargetToDeleteUuids = childrenTargetToDelete.map((child) => Node.getUuid(child))
+  const nodesDeleteUpdateResult = Records.removeNodes(childrenTargetToDeleteUuids, { sideEffect })(updateResult.record)
+  updateResult.merge(nodesDeleteUpdateResult)
+}
+
+// adds the source nodes (and their descendants) that are not in the target record
+const _addSourceChildrenNotInTarget = ({
+  childrenSource,
+  childrenTarget,
+  recordSource,
+  updateResult,
+  sideEffect,
+}: ChildrenSourceAndTarget & { recordSource: ArenaRecord }): void => {
+  for (const childSourceToAdd of _getNodesArrayDifference(childrenSource, childrenTarget)) {
+    RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
+      const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
+      // clear internal id (not deleted: it would switch the node to the V8 dictionary mode)
+      newNodeToAdd[Node.keys.id] = undefined
+      updateResult.addNode(newNodeToAdd, { sideEffect })
+    })(recordSource)
+  }
+}
+
 const _replaceUpdatedNodesInEntities = ({
   survey,
   recordSource,
@@ -222,25 +262,8 @@ const _replaceUpdatedNodesInEntities = ({
       childDefUuid
     )(updateResult.record)
 
-    // delete nodes that are not in source record
-    const childrenTargetToDelete = _getNodesArrayDifference(childrenTarget, childrenSource).map(Node.assocDeleted(true))
-    if (childrenTargetToDelete.length > 0) {
-      const childrenTargetToDeleteUuids = childrenTargetToDelete.map(Node.getUuid)
-      const nodesDeleteUpdateResult = Records.removeNodes(childrenTargetToDeleteUuids, { sideEffect })(
-        updateResult.record
-      )
-      updateResult.merge(nodesDeleteUpdateResult)
-    }
-
-    // add new nodes (in source record but not in target record) to updateResult (and record)
-    for (const childSourceToAdd of _getNodesArrayDifference(childrenSource, childrenTarget)) {
-      RecordReader.visitDescendantsAndSelf(childSourceToAdd, (visitedChildSource) => {
-        const newNodeToAdd = Node.assocCreated(true)(visitedChildSource) // new node for the server
-        // clear internal id (not deleted: it would switch the node to the V8 dictionary mode)
-        newNodeToAdd[Node.keys.id] = undefined
-        updateResult.addNode(newNodeToAdd, { sideEffect })
-      })(recordSource)
-    }
+    _deleteTargetChildrenNotInSource({ childrenSource, childrenTarget, updateResult, sideEffect })
+    _addSourceChildrenNotInTarget({ childrenSource, childrenTarget, recordSource, updateResult, sideEffect })
 
     // update existing nodes (nodes in both source and target records)
 
