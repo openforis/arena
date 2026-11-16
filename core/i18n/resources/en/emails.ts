@@ -8,7 +8,7 @@ export default {
   userInviteCommon: `<p>You have been invited by {{invitingUserName}} to join the $t(common.appNameFull) survey '{{surveyName}} - {{surveyLabel}}' as {{groupLabel}}</p>
       {{-message}}
       <p>With the role of <b>{{groupLabel}}</b> you have the following permissions: <br/> 
-        <ul>{{groupPermissions}}</ul>
+        <ul>{{-groupPermissions}}</ul>
       </p>`,
   userInvite: {
     subject: 'You have been invited to $t(common.appNameFull)!',

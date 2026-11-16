@@ -17,6 +17,7 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as AuthManager from '@server/modules/auth/manager/authManager'
 import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
+import { UserInviteEmail } from './userInviteEmail'
 
 export const getResetPasswordUrl = ({ serverUrl, uuid }) => `${serverUrl}/guest/resetPassword/${uuid}`
 
@@ -198,17 +199,15 @@ const _inviteUser = async (
     const messageParam = message ? `<hr><p>${marked.parse(message)}</p><hr>` : undefined
     const invitingUserName = _getPrettyFormatUserName({ user, i18n })
 
-    const groupName = AuthGroup.getName(group)
-
-    const emailParams = {
+    const emailParams = UserInviteEmail.getMsgParams({
+      i18n,
       invitingUserName,
       serverUrl,
       surveyName: Survey.getName(surveyInfo),
       surveyLabel: Survey.getLabel(surveyInfo, lang),
-      groupLabel: `$t(auth:authGroups.${groupName}.label)`,
-      groupPermissions: `$t(userInviteView.groupPermissions.${groupName})`,
+      groupName: AuthGroup.getName(group),
       message: messageParam,
-    }
+    })
 
     const userToInvite = await UserManager.fetchUserByEmail(email, t)
     if (userToInvite) {
