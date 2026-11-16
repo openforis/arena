@@ -1,4 +1,4 @@
-import type { Express } from 'express'
+import type { Router } from 'express'
 
 import * as A from '@core/arena'
 
@@ -24,7 +24,7 @@ const toItem =
     return { value: Taxon.getCode(item), label: `(${Taxon.getCode(item)}) ${Taxon.getScientificName(item)}` }
   }
 
-export const init = (app: Express): void => {
+export const init = (app: Router): void => {
   // ==== READ
   app.get('/expression/literal/item', async (req, res, next) => {
     try {

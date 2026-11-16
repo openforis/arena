@@ -9,28 +9,32 @@ const defaultOptions = {
  * When the timeout for an item is reached,
  * the item is automatically removed from the cache to save memory.
  */
-export default class IdleTimeoutCache extends ItemsCache {
-  constructor(options = {}) {
+type IdleTimeoutCacheOptions = { itemIdleTimeoutSeconds: number }
+
+export default class IdleTimeoutCache<T = any> extends ItemsCache<T, IdleTimeoutCacheOptions> {
+  private readonly _itemTimeoutIdByKey: Record<string, NodeJS.Timeout>
+
+  constructor(options: Partial<IdleTimeoutCacheOptions> = {}) {
     super({ ...defaultOptions, ...options })
     this._itemTimeoutIdByKey = {}
   }
 
-  get(key) {
+  get(key: string): T | undefined {
     this._resetItemIdleTimeout(key)
     return super.get(key)
   }
 
-  set(key, item) {
+  set(key: string, item: T): this {
     this._resetItemIdleTimeout(key)
     return super.set(key, item)
   }
 
-  delete(key) {
+  delete(key: string): this {
     this._clearItemIdleTimeout(key)
     return super.delete(key)
   }
 
-  _clearItemIdleTimeout(key) {
+  _clearItemIdleTimeout(key: string): void {
     const timeoutId = this._itemTimeoutIdByKey[key]
     if (timeoutId) {
       clearTimeout(timeoutId)
@@ -38,7 +42,7 @@ export default class IdleTimeoutCache extends ItemsCache {
     delete this._itemTimeoutIdByKey[key]
   }
 
-  _resetItemIdleTimeout(key) {
+  _resetItemIdleTimeout(key: string): void {
     this._clearItemIdleTimeout(key)
 
     const timeoutId = setTimeout(() => {

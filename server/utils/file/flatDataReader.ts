@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream'
 import { parse } from '@fast-csv/parse'
 
 import { SystemError } from '@openforis/arena-core'
@@ -8,9 +9,13 @@ import * as StringUtils from '@core/stringUtils'
 import * as FileUtils from './fileUtils'
 import { ExcelReader } from './excelReader'
 
-const _extractValidHeaders = (row) => {
+type Row = Record<string, any>
+type HeadersListener = ((headers: string[]) => void | Promise<void>) | null
+type TotalChangeListener = ((total: number) => void) | null
+
+const _extractValidHeaders = (row: unknown[]): string[] => {
   // remove last empty columns
-  const headers = []
+  const headers: string[] = []
   let nonEmptyHeaderFound = false
   for (let index = row.length - 1; index >= 0; index--) {
     const header = StringUtils.trim(row[index])
@@ -30,7 +35,7 @@ const _extractValidHeaders = (row) => {
   return headers
 }
 
-const _rowToObject = ({ headers, row }) => {
+const _rowToObject = ({ headers, row }: { headers: string[]; row: unknown[] }): Row => {
   const result = Object.create(null)
   for (let index = 0; index < headers.length; index++) {
     const header = headers[index]
@@ -41,29 +46,27 @@ const _rowToObject = ({ headers, row }) => {
   return result
 }
 
-/**
- * Reads the rows of a flat data stream one at a time (CSV rows are not kept in memory).
- * @param {object} params - The parameters.
- * @param {object} params.stream - The readable stream.
- * @param {string} [params.fileFormat] - Format of the data (csv or xlsx).
- * @param {(headers: string[]) => void | Promise<void>} [params.onHeaders] - Called (and awaited) with the headers, before the first row is yielded.
- * @param {(total: number) => void} [params.onTotalChange] - Called when the total number of rows changes.
- * @yields {object} The rows, as objects indexed by header.
- */
+// reads the rows (objects indexed by header) of a flat data stream (csv or xlsx) one at a time (CSV rows are not kept
+// in memory); onHeaders is called (and awaited) with the headers before the first row is yielded
 export async function* generateRowsFromStream({
   stream,
   fileFormat = FileFormats.csv,
   onHeaders = null,
   onTotalChange = null,
-}) {
+}: {
+  stream: Readable
+  fileFormat?: string
+  onHeaders?: HeadersListener
+  onTotalChange?: TotalChangeListener
+}): AsyncGenerator<Row> {
   const csv = fileFormat === FileFormats.csv
   const rows = csv
     ? stream.pipe(parse({ ignoreEmpty: true }))
     : await ExcelReader.extractRowsFromExcelStream({ stream })
   if (onTotalChange && !csv) {
-    onTotalChange(rows.length)
+    onTotalChange((rows as unknown[][]).length)
   }
-  let headers = null
+  let headers: string[] | null = null
   let total = 0
   for await (const row of rows) {
     // Skip first row (headers)
@@ -79,15 +82,16 @@ export async function* generateRowsFromStream({
   }
 }
 
-/**
- * Reads the rows of a flat data file one at a time (CSV rows are not kept in memory).
- * @param {object} params - The parameters.
- * @param {string} params.filePath - Path of the file.
- * @param {string} [params.fileFormat] - Format of the file (csv or xlsx).
- * @param {(headers: string[]) => void | Promise<void>} [params.onHeaders] - Called (and awaited) with the headers, before the first row is yielded.
- * @yields {object} The rows, as objects indexed by header.
- */
-export async function* generateRowsFromFile({ filePath, fileFormat = FileFormats.csv, onHeaders = null }) {
+// reads the rows of a flat data file one at a time (see generateRowsFromStream)
+export async function* generateRowsFromFile({
+  filePath,
+  fileFormat = FileFormats.csv,
+  onHeaders = null,
+}: {
+  filePath: string
+  fileFormat?: string
+  onHeaders?: HeadersListener
+}): AsyncGenerator<Row> {
   const stream = FileUtils.createReadStream(filePath)
   try {
     yield* generateRowsFromStream({ stream, fileFormat, onHeaders })
@@ -96,23 +100,23 @@ export async function* generateRowsFromFile({ filePath, fileFormat = FileFormats
   }
 }
 
-/**
- * Creates a reader of the rows of a stream.
- * @param {object} params - The parameters.
- * @param {object} params.stream - The input stream.
- * @param {string} [params.fileFormat] - The file format (csv or xlsx).
- * @param {Function|null} [params.onHeaders] - Called with the headers.
- * @param {Function|null} [params.onRow] - Called with every row.
- * @param {Function|null} [params.onTotalChange] - Called with the total number of rows.
- * @returns {{start: Function, cancel: Function}} - The reader.
- */
+type ReaderParams = {
+  fileFormat?: string
+  onHeaders?: HeadersListener
+  onRow?: ((row: Row) => unknown) | null
+  onTotalChange?: TotalChangeListener
+}
+
+export type FlatDataReader = { start: () => Promise<void>; cancel: () => void }
+
+// reader of the rows of a stream (csv or xlsx)
 export const createReaderFromStream = ({
   stream,
   fileFormat = FileFormats.csv,
   onHeaders = null,
   onRow = null,
   onTotalChange = null,
-}) => {
+}: ReaderParams & { stream: Readable }): FlatDataReader => {
   const readerStatus = { canceled: false }
 
   const cancel = () => {
@@ -138,11 +142,23 @@ export const createReaderFromStream = ({
   return { start, cancel }
 }
 
-export const createReaderFromFile = ({ filePath, fileFormat, onHeaders = null, onRow = null, onTotalChange = null }) =>
+export const createReaderFromFile = ({
+  filePath,
+  fileFormat,
+  onHeaders = null,
+  onRow = null,
+  onTotalChange = null,
+}: ReaderParams & { filePath: string }): FlatDataReader =>
   createReaderFromStream({ stream: FileUtils.createReadStream(filePath), fileFormat, onHeaders, onRow, onTotalChange })
 
-export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.csv }) => {
-  let result = []
+export const readHeadersFromStream = async ({
+  stream,
+  fileFormat = FileFormats.csv,
+}: {
+  stream: Readable
+  fileFormat?: string
+}): Promise<string[]> => {
+  let result: string[] = []
 
   const reader = createReaderFromStream({
     stream,
@@ -157,7 +173,13 @@ export const readHeadersFromStream = async ({ stream, fileFormat = FileFormats.c
   return result
 }
 
-export const calculateTotalRowsFromFile = async ({ filePath, fileFormat }) => {
+export const calculateTotalRowsFromFile = async ({
+  filePath,
+  fileFormat,
+}: {
+  filePath: string
+  fileFormat?: string
+}): Promise<number> => {
   let result = 0
   const reader = createReaderFromFile({ filePath, fileFormat, onTotalChange: (total) => (result = total) })
   await reader.start()

@@ -2,18 +2,20 @@ import ExcelJS from 'exceljs'
 
 import { Objects } from '@openforis/arena-core'
 
-import { FlatDataWriterUtils } from './flatDataWriterUtils'
-import { CsvField } from './csvField'
+import type { Writable } from 'node:stream'
+
+import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
+import { CsvField, CsvFieldItem } from './csvField'
 import { StreamUtils } from '../streamUtils'
 
-const headerCellStyle = { font: { bold: true } }
+const headerCellStyle: Partial<ExcelJS.Style> = { font: { bold: true } }
 
-const cellBorderStyle = {
+const cellBorderStyle: Partial<ExcelJS.Border> = {
   style: 'thin',
   color: { argb: '00000000' },
 }
 
-const cellBorder = {
+const cellBorder: Partial<ExcelJS.Borders> = {
   bottom: cellBorderStyle,
   left: cellBorderStyle,
   right: cellBorderStyle,
@@ -25,7 +27,12 @@ export const writeItemsToStream = async ({
   items = [],
   fields = null,
   options = FlatDataWriterUtils.defaultOptions,
-}) => {
+}: {
+  outputStream: Writable
+  items?: Record<string, any>[]
+  fields?: CsvFieldItem[] | null
+  options?: FlatDataWriterOptions
+}): Promise<void | null> => {
   if (Objects.isEmpty(fields) && (Objects.isEmpty(items) || Objects.isEmpty(items[0]))) return null
 
   const { objectTransformer = null } = options
@@ -45,7 +52,6 @@ export const writeItemsToStream = async ({
   worksheet.columns = fieldNames.map((field) => ({
     header: field,
     key: field,
-    type: field?.type ?? 'string',
   }))
 
   // set style to header row

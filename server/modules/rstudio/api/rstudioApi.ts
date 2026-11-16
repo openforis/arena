@@ -1,4 +1,4 @@
-import type { Express } from 'express'
+import type { Router } from 'express'
 
 import * as Request from '@server/utils/request'
 
@@ -23,7 +23,7 @@ const RStudioApi = async ({ command }: { command: RStudioCommand }) =>
     poolServiceKey: ProcessUtils.ENV.rStudioPoolServiceKey,
   })
 
-export const init = (app: Express): void => {
+export const init = (app: Router): void => {
   app.post('/rstudio', async (req, res, next) => {
     try {
       const user = Request.getUser(req)

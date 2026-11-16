@@ -12,14 +12,15 @@ const lockName = 'scheduler-temporary-surveys-cleanup'
 const items = 'stale temporary surveys'
 const task = `deleting ${items}`
 
-const deleteTemporarySurveys = async (olderThan24Hours = false) => {
+// all the temporary surveys, or only the ones created more than 24 hours ago
+const deleteTemporarySurveys = async (olderThan24Hours = false): Promise<void> => {
   try {
     await runWithClusterLock({
       lockName,
       fn: async () => {
         Logger.debug(task)
 
-        const count = await SurveyService.deleteTemporarySurveys(olderThan24Hours)
+        const count = await SurveyService.deleteTemporarySurveys({ olderThan24Hours })
 
         Logger.debug(`${count} ${items} deleted`)
       },
@@ -29,7 +30,7 @@ const deleteTemporarySurveys = async (olderThan24Hours = false) => {
   }
 }
 
-export const init = async () => {
+export const init = async (): Promise<void> => {
   await deleteTemporarySurveys()
 
   Logger.debug('Schedule job to be executed every day at 00:00')
