@@ -202,10 +202,6 @@ Si elle est cochée, ces valeurs sont conservées dans l'enregistrement, même s
         "Avertir les administrateurs de formulaire par e-mail lors du téléversement d'enregistrements depuis Arena Mobile",
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'Si cochée, chaque administrateur de formulaire reçoit un e-mail listant les enregistrements téléversés depuis Arena Mobile (valeurs des clés, créateur, dates, validation et UUID).',
-      formPreviewForDataEntryUsers:
-        "Autoriser les utilisateurs de saisie à afficher l'aperçu du formulaire brouillon (non publié)",
-      formPreviewForDataEntryUsersInfo:
-        "Les utilisateurs pouvant saisir des données mais pas modifier le formulaire verront un bouton Aperçu du formulaire dans la liste des enregistrements, pour tester le formulaire avec les dernières modifications non publiées (par ex. pour les tests de recette). Les données saisies dans l'aperçu ne sont pas enregistrées.",
       allowRecordsMergeWithSameKeys:
         'Autoriser la fusion des enregistrements avec les mêmes clés (ex. enregistrements créés sur différents appareils Arena Mobile)',
     },

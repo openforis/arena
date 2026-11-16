@@ -118,9 +118,6 @@ export default {
     step: 'Paso',
     updateRecordsStep: 'Actualizar paso de registros',
     validateAll: 'Validar todo',
-    formPreview: 'Vista previa del formulario',
-    formPreviewInfo:
-      'Vista previa del formulario borrador (no publicado): los datos introducidos en la vista previa no se guardan',
     viewRecord: 'Ver registro',
   },
   recordsClone: {

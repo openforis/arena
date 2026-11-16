@@ -122,7 +122,6 @@ export const {
   getFieldManualLinks,
   isKeepNonApplicableValues,
   isNotifyAdminsOnRecordsUploadFromMobile,
-  isFormPreviewForDataEntryUsers,
   getUserExtraPropDefs,
   getUserExtraPropDefsArray,
   isSampleBasedImageInterpretationEnabled,

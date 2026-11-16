@@ -82,9 +82,6 @@ export const init = (app) => {
       if (Record.getOwnerUuid(recordToCreate) !== User.getUuid(user)) {
         throw new Error('Error record create. User is different')
       }
-      if (Record.isPreview(recordToCreate) && !(await RecordService.canCreateRecordPreview({ user, surveyId }))) {
-        throw new UnauthorizedError(User.getName(user))
-      }
 
       await RecordService.createRecord({ socketId, user, surveyId, recordToCreate })
 

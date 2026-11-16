@@ -129,8 +129,6 @@ Merge cannot be performed.`,
     step: 'Step',
     updateRecordsStep: 'Update records step',
     validateAll: 'Validate all',
-    formPreview: 'Preview form',
-    formPreviewInfo: 'Preview the draft (not published) form: data entered in the preview is not saved',
     viewRecord: 'View record',
   },
   recordsClone: {

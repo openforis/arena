@@ -36,7 +36,6 @@ export const keys = {
   defaultCycleKey: 'defaultCycleKey',
   descriptions: ObjectUtils.keysProps.descriptions,
   fieldManualLinks: 'fieldManualLinks',
-  formPreviewForDataEntryUsers: 'formPreviewForDataEntryUsers',
   keepNonApplicableValues: 'keepNonApplicableValues',
   name: 'name',
   notifyAdminsOnRecordsUploadFromMobile: 'notifyAdminsOnRecordsUploadFromMobile',
@@ -147,9 +146,6 @@ export const isKeepNonApplicableValues = ObjectUtils.isPropTrue(keys.keepNonAppl
 export const isNotifyAdminsOnRecordsUploadFromMobile = ObjectUtils.isPropTrue(
   keys.notifyAdminsOnRecordsUploadFromMobile
 )
-
-// when true, users who cannot edit the survey but can enter data can preview the draft (not published) form
-export const isFormPreviewForDataEntryUsers = ObjectUtils.isPropTrue(keys.formPreviewForDataEntryUsers)
 
 export const isSampleBasedImageInterpretationEnabled = ObjectUtils.isPropTrue(
   keys.sampleBasedImageInterpretationEnabled

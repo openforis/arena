@@ -44,7 +44,6 @@ const SurveyInfoForm = () => {
     setLanguages,
     setName,
     setNotifyAdminsOnRecordsUploadFromMobile,
-    setFormPreviewForDataEntryUsers,
     setPreloadedMapLayers,
     setPreloadedMapLayersEnabled,
     setSamplingPolygon,
@@ -150,8 +149,6 @@ const SurveyInfoForm = () => {
           onKeepNonApplicableValuesUpdate: setKeepNonApplicableValues,
           notifyAdminsOnRecordsUploadFromMobile: surveyInfoObject.notifyAdminsOnRecordsUploadFromMobile,
           onNotifyAdminsOnRecordsUploadFromMobileUpdate: setNotifyAdminsOnRecordsUploadFromMobile,
-          formPreviewForDataEntryUsers: surveyInfoObject.formPreviewForDataEntryUsers,
-          onFormPreviewForDataEntryUsersUpdate: setFormPreviewForDataEntryUsers,
         },
       }
     )

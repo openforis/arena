@@ -45,7 +45,6 @@ export const useSurveyInfoForm = () => {
   const setKeepNonApplicableValues = (value) => setObjectField(Survey.infoKeys.keepNonApplicableValues, value)
   const setNotifyAdminsOnRecordsUploadFromMobile = (value) =>
     setObjectField(Survey.infoKeys.notifyAdminsOnRecordsUploadFromMobile, value)
-  const setFormPreviewForDataEntryUsers = (value) => setObjectField(Survey.infoKeys.formPreviewForDataEntryUsers, value)
   const setName = (value) => setObjectField(Survey.infoKeys.name, StringUtils.normalizeName(value))
   const setLabels = (labels) => setObjectField(Survey.infoKeys.labels, labels)
   const setLanguages = (value) => setObjectField(Survey.infoKeys.languages, value)
@@ -84,7 +83,6 @@ export const useSurveyInfoForm = () => {
     setDefaultCycleKey,
     setDescriptions,
     setFieldManualLinks,
-    setFormPreviewForDataEntryUsers,
     setKeepNonApplicableValues,
     setLabels,
     setLanguages,

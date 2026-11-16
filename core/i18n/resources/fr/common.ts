@@ -369,7 +369,6 @@ Réessayer ?`,
     export: 'Exportation de données',
     import: 'Importation de données',
     validationReport: 'Rapport de validation',
-    formPreview: 'Aperçu du formulaire',
 
     users: 'Utilisateurs',
     user: 'Profil utilisateur',

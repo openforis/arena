@@ -85,15 +85,6 @@ const _dissocSocketBestEffort = async ({ recordUuid, socketId }) => {
 }
 
 // RECORD
-// preview records are allowed to survey editors or, when enabled in the (published) survey, to data entry users
-export const canCreateRecordPreview = async ({ user, surveyId }) => {
-  const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
-  return (
-    Authorizer.canEditSurvey(user, surveyInfo) ||
-    (Survey.isFormPreviewForDataEntryUsers(surveyInfo) && Authorizer.canCreateRecord(user, surveyInfo))
-  )
-}
-
 export const createRecord = async ({ user, surveyId, recordToCreate }) => {
   Logger.debug('creating record: ', recordToCreate)
 

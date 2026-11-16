@@ -129,8 +129,6 @@ export default {
     step: 'ステップ',
     updateRecordsStep: '記録のステップを更新',
     validateAll: 'すべて検証',
-    formPreview: 'フォームをプレビュー',
-    formPreviewInfo: '下書き（未公開）フォームをプレビュー：プレビューで入力したデータは保存されません',
     viewRecord: '記録を表示',
   },
   recordsClone: {

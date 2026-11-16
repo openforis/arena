@@ -197,9 +197,6 @@ export default {
         'Arena Mobileから記録がアップロードされたときに調査管理者にメールで通知する',
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'チェックすると、各調査管理者にArena Mobileからアップロードされた記録の一覧（キー値、作成者、日付、検証、UUID）がメールで送信されます。',
-      formPreviewForDataEntryUsers: 'データ入力ユーザーに下書き（未公開）フォームのプレビューを許可する',
-      formPreviewForDataEntryUsersInfo:
-        'データを入力できるが調査を編集できないユーザーには、レコード一覧に「フォームをプレビュー」ボタンが表示され、最新の未公開の変更でフォームをテストできます（例：ユーザー受け入れテスト）。プレビューで入力したデータは保存されません。',
       allowRecordsMergeWithSameKeys: '同じキーを持つ記録の統合を許可（例：異なるArena Mobile端末で作成された記録）',
     },
     srsPlaceholder: 'コードまたはラベルを入力',

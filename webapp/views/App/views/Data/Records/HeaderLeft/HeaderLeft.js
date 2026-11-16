@@ -21,7 +21,6 @@ import {
   useAuthCanEditRecord,
   useAuthCanExportRecords,
   useAuthCanExportRecordsList,
-  useAuthCanPreviewDraftFormInDataEntry,
   useAuthCanUpdateRecordsStep,
   useAuthCanUseAnalysis,
   useAuthCanValidateAllRecords,
@@ -30,7 +29,6 @@ import { useI18n } from '@webapp/store/system'
 
 import { RecordsCloneModal } from '../../RecordsCloneModal'
 import { RecordsDataExportModal } from './RecordsDataExportModal'
-import { FormPreviewButton } from './FormPreviewButton'
 import { UpdateRecordsStepDropdown } from './UpdateRecordsStepDropdown'
 import { RecordMergePreviewModal } from './RecordMergePreviewModal'
 import { RecordKeyValuesExtractor } from '../recordKeyValuesExtractor'
@@ -131,7 +129,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
   const lang = useSurveyPreferredLang()
   const confirm = useConfirmAsync()
   const record = useRecord()
-  const canPreviewDraftForm = useAuthCanPreviewDraftFormInDataEntry()
 
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
@@ -258,7 +255,6 @@ const HeaderLeft = ({ handleSearch, navigateToRecord, onRecordsUpdate, search, s
           label="common.new"
         />
       )}
-      {published && canPreviewDraftForm && <FormPreviewButton />}
       {(totalCount > 0 || StringUtils.isNotBlank(search)) && (
         <input
           className="records__header-left__input-search"

@@ -128,8 +128,6 @@ export default {
     step: 'Алхам',
     updateRecordsStep: 'Бичлэгийн алхамыг шинэчлэх',
     validateAll: 'Бүгдийг баталгаажуулах',
-    formPreview: 'Маягтыг урьдчилан харах',
-    formPreviewInfo: 'Ноорог (нийтлээгүй) маягтыг урьдчилан харах: оруулсан өгөгдөл хадгалагдахгүй',
     viewRecord: 'Бичлэгийг харах',
   },
   recordsClone: {

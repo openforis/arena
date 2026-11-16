@@ -368,7 +368,6 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
     export: 'Exportação de dados',
     import: 'Importação de dados',
     validationReport: 'Relatório de validação',
-    formPreview: 'Visualização do formulário',
 
     users: 'Usuários',
     user: 'Perfil de usuário',

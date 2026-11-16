@@ -365,7 +365,6 @@ Try again?`,
     export: 'Data Export',
     import: 'Data Import',
     validationReport: 'Validation report',
-    formPreview: 'Form preview',
 
     users: 'Users',
     user: 'User Profile',
