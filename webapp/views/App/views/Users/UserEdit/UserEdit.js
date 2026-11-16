@@ -148,7 +148,7 @@ const UserEdit = ({ ownProfile = false }) => {
           value={User.getEmail(userToUpdate)}
         />
       )}
-      <UserExtraPropsEditor onChange={onExtraChange} user={userToUpdate} />
+      <UserExtraPropsEditor onChange={onExtraChange} readOnly={!canEdit} user={userToUpdate} />
 
       {(canViewSystemAdmin || (canViewSurveyManager && !systemAdmin)) && (
         <div className="form-input-container">

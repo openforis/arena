@@ -19,7 +19,7 @@ const itemsToExtraProps = (items) =>
   }, {})
 
 export const UserExtraPropsEditor = (props) => {
-  const { onChange, user } = props
+  const { onChange, readOnly = false, user } = props
 
   const extra = User.getExtra(user)
 
@@ -66,6 +66,8 @@ export const UserExtraPropsEditor = (props) => {
     setState((statePrev) => ({ ...statePrev, editing: editingItem }))
   }, [])
 
+  if (readOnly && items.length === 0) return null
+
   return (
     <ExpansionPanel buttonLabel="extraProp.label_other" className="extra-props" startClosed={items.length === 0}>
       <div className="form">
@@ -80,16 +82,19 @@ export const UserExtraPropsEditor = (props) => {
             onDelete={onItemDelete}
             onEditChange={onItemEditChange}
             onSave={onItemSave}
+            readOnly={readOnly}
             uuid={uuid}
             value={value}
           />
         ))}
-        <ButtonAdd
-          className="btn-add"
-          disabled={editing || items.some((item) => item.newItem)}
-          label="extraProp.addExtraProp"
-          onClick={onAdd}
-        />
+        {!readOnly && (
+          <ButtonAdd
+            className="btn-add"
+            disabled={editing || items.some((item) => item.newItem)}
+            label="extraProp.addExtraProp"
+            onClick={onAdd}
+          />
+        )}
       </div>
     </ExpansionPanel>
   )
@@ -97,5 +102,6 @@ export const UserExtraPropsEditor = (props) => {
 
 UserExtraPropsEditor.propTypes = {
   onChange: PropTypes.func.isRequired,
+  readOnly: PropTypes.bool,
   user: PropTypes.object.isRequired,
 }
