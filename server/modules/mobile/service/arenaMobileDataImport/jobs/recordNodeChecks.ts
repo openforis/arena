@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Node from '@core/record/node'
 
@@ -7,7 +8,7 @@ import { TaxonProviderDefault } from '@server/modules/taxonomy/manager/taxonProv
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const _checkParentValid = ({ nodes, node, nodeDef }) => {
+const _checkParentValid = ({ nodes, node, nodeDef }: { nodes: any; node: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   const parentUuid = Node.getParentUuid(node)
   if ((!parentUuid && !NodeDef.isRoot(nodeDef)) || (parentUuid && !nodes[parentUuid])) {
     return { warn: 'has missing or invalid parent_uuid' }
@@ -15,14 +16,22 @@ const _checkParentValid = ({ nodes, node, nodeDef }) => {
   return null
 }
 
-const _checkNotEmptyMultiple = ({ node, nodeDef }) => {
+const _checkNotEmptyMultiple = ({ node, nodeDef }: { node: any; nodeDef: ArenaNodeDef<NodeDefType> }) => {
   if (NodeDef.isMultipleAttribute(nodeDef) && Node.isValueBlank(node)) {
     return { warn: 'is multiple and has an empty value' }
   }
   return null
 }
 
-const _checkHierarchyValid = ({ nodes, node, nodeDef }) => {
+const _checkHierarchyValid = ({
+  nodes,
+  node,
+  nodeDef,
+}: {
+  nodes: any
+  node: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const nodeHierarchy = Node.getHierarchy(node)
   if (
     nodeHierarchy.length !== NodeDef.getMetaHierarchy(nodeDef)?.length ||
@@ -33,7 +42,15 @@ const _checkHierarchyValid = ({ nodes, node, nodeDef }) => {
   return null
 }
 
-const _checkCategoryItemExists = async ({ survey, node, nodeDef }) => {
+const _checkCategoryItemExists = async ({
+  survey,
+  node,
+  nodeDef,
+}: {
+  survey: ArenaSurvey
+  node: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   if (!NodeDef.isCode(nodeDef)) return null
   const itemUuid = Node.getCategoryItemUuid(node)
   if (!itemUuid) return null
@@ -42,7 +59,15 @@ const _checkCategoryItemExists = async ({ survey, node, nodeDef }) => {
   return null
 }
 
-const _checkTaxonExists = async ({ survey, node, nodeDef }) => {
+const _checkTaxonExists = async ({
+  survey,
+  node,
+  nodeDef,
+}: {
+  survey: ArenaSurvey
+  node: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   if (!NodeDef.isTaxon(nodeDef)) return null
   const taxonUuid = Node.getTaxonUuid(node)
   if (!taxonUuid) return null
@@ -51,7 +76,19 @@ const _checkTaxonExists = async ({ survey, node, nodeDef }) => {
   return null
 }
 
-export const checkNodeIsValid = async ({ survey, nodes, node, nodeDef }) => {
+type NodeCheckResult = { valid: boolean; error?: string; warn?: string }
+
+export const checkNodeIsValid = async ({
+  survey,
+  nodes,
+  node,
+  nodeDef,
+}: {
+  survey: ArenaSurvey
+  nodes: any
+  node: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+}): Promise<NodeCheckResult> => {
   if (!nodeDef) {
     return { valid: false, warn: 'refers to a missing node definition' }
   }

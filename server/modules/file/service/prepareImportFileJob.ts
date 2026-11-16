@@ -6,25 +6,24 @@ import * as TempFileManager from '../manager/tempFileManager'
  * Merges uploaded temp chunks into a single file before the main import work starts.
  */
 export default class PrepareImportFileJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('PrepareImportFileJob', params)
   }
 
-  async shouldExecute() {
+  shouldExecute() {
     const { fileId, filePath, totalChunks } = this.context
-    return !filePath && Boolean(fileId && totalChunks)
+    return Promise.resolve(!filePath && Boolean(fileId && totalChunks))
   }
 
   async execute() {
-    const { fileId, totalChunks, totalFileSize } = this.context
+    const { fileId, totalChunks } = this.context
 
     this.total = totalChunks
 
     const filePath = await TempFileManager.mergeTempChunks({
       fileId,
       totalChunks,
-      totalFileSize,
-      onChunkMerged: async () => {
+      onChunkMerged: () => {
         this.incrementProcessedItems()
       },
     })

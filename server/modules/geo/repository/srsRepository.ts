@@ -1,10 +1,10 @@
 import { SRSFactory } from '@openforis/arena-core'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 const DATUM_NAME_REGEX = /DATUM\["([\w\s]+)"/
 
-const extractName = (row) => {
+const extractName = (row: any) => {
   const { auth_name, auth_srid, srtext: wkt } = row
   const datumNameMatch = wkt.match(DATUM_NAME_REGEX)
 
@@ -17,7 +17,7 @@ const extractName = (row) => {
   return authNameAndCode
 }
 
-const rowToSrs = (row) => {
+const rowToSrs = (row: any) => {
   const { srid: code, srtext: wkt } = row
   const name = extractName(row)
   return SRSFactory.createInstance({ code: String(code), name, wkt })
@@ -30,11 +30,13 @@ const rowToSrs = (row) => {
  * @param {import('@server/db/db').DbClient} [client] - The database client.
  * @returns {Promise<import('@openforis/arena-core').SRS[]>} - The SRSs.
  */
-export const fetchSRSsByCodes = async ({ srsCodes }, client = db) =>
+export const fetchSRSsByCodes = ({ srsCodes }: { srsCodes: any }, client: DbClient = db) =>
   // "IN ()" is not valid SQL
-  srsCodes.length === 0 ? [] : client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)
+  srsCodes.length === 0
+    ? Promise.resolve([])
+    : client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)
 
-export const findSRSByCodeOrName = async (codeOrName, client = db) => {
+export const findSRSByCodeOrName = (codeOrName: any, client: DbClient = db) => {
   const codeOrNameTrimmed = codeOrName.trim().toLowerCase()
   const codeSearch = `${codeOrNameTrimmed}%`
   const nameSearch = `%DATUM[%${codeOrNameTrimmed}%`

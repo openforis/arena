@@ -4,7 +4,7 @@ import * as FileUtils from '@server/utils/file/fileUtils'
 import { ZipUtils } from '@server/utils/file/zipUtils'
 
 export default class ZipCreationJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ZipCreationJob', params)
   }
 

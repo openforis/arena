@@ -31,6 +31,11 @@ export const getStorageFunctionOrThrow = ({
   operation,
   defaultFn = null,
   storageType = getFileContentStorageType(),
+}: {
+  functionByStorageType: Record<string, any>
+  operation: any
+  defaultFn?: any
+  storageType?: any
 }) => {
   const tempFileStorageType =
     storageType === fileContentStorageTypes.db ? fileContentStorageTypes.fileSystem : storageType
@@ -41,7 +46,7 @@ export const getStorageFunctionOrThrow = ({
   return fn
 }
 
-export const deleteTempFile = async (fileNameOrPath) => {
+export const deleteTempFile = async (fileNameOrPath: any) => {
   const deleteFn = getStorageFunctionOrThrow({
     functionByStorageType: contentDeleteFunctionByStorageType,
     operation: 'deleteTempFile',
@@ -53,13 +58,23 @@ export const deleteTempFile = async (fileNameOrPath) => {
  * Throws an error if the file id is not a uuid: it is used to build temp file names.
  * @param {string} fileId - The file id to check.
  */
-const checkFileIdIsValid = (fileId) => {
+const checkFileIdIsValid = (fileId: string) => {
   if (typeof fileId !== 'string' || !isUuid(fileId)) {
     throw new Error(`Invalid file id: ${fileId}`)
   }
 }
 
-export const writeChunkToTempFile = async ({ fileId, chunk, filePath = null, fileContent = null }) => {
+export const writeChunkToTempFile = async ({
+  fileId,
+  chunk,
+  filePath = null,
+  fileContent = null,
+}: {
+  fileId: string
+  chunk: any
+  filePath?: string
+  fileContent?: any
+}) => {
   checkFileIdIsValid(fileId)
   const writeChunkFunction = getStorageFunctionOrThrow({
     functionByStorageType: chunkWriteFunctionByStorageType,
@@ -68,13 +83,22 @@ export const writeChunkToTempFile = async ({ fileId, chunk, filePath = null, fil
   await writeChunkFunction({ filePath, fileContent, fileId, chunk })
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
+export const mergeTempChunks = async ({
+  fileId,
+  totalChunks,
+  onChunkMerged = null,
+}: {
+  fileId: string
+  totalChunks: any
+  onChunkMerged?: any
+}) => {
   checkFileIdIsValid(fileId)
   const mergeChunksFunction = getStorageFunctionOrThrow({
     functionByStorageType: chunkMergeFunctionByStorageType,
     operation: 'mergeTempChunks',
   })
-  return mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
+  // async: an invalid file id must reject, not throw
+  return await mergeChunksFunction({ fileId, totalChunks, onChunkMerged })
 }
 
 export const keepFileFunctionByStorageType = {
@@ -96,7 +120,7 @@ export const getKeptFilePathFunctionByStorageType = {
  * @param {!string} params.filePath - The current local path of the merged temp file.
  * @returns {Promise<void>} - Resolved once the file has been moved.
  */
-export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+export const keepFileForLaterUse = async ({ fileId, filePath }: { fileId: string; filePath: string }) => {
   checkFileIdIsValid(fileId)
   const keepFn = getStorageFunctionOrThrow({
     functionByStorageType: keepFileFunctionByStorageType,
@@ -113,7 +137,7 @@ export const keepFileForLaterUse = async ({ fileId, filePath }) => {
  * @param {!string} params.fileId - The uuid the file was originally uploaded with.
  * @returns {Promise<string>} - The local path of the kept file.
  */
-export const getKeptFilePath = async ({ fileId }) => {
+export const getKeptFilePath = async ({ fileId }: { fileId: string }) => {
   checkFileIdIsValid(fileId)
   const getFn = getStorageFunctionOrThrow({
     functionByStorageType: getKeptFilePathFunctionByStorageType,
@@ -139,7 +163,7 @@ export const deletePendingImportFunctionByStorageType = {
  * @param {!string} params.fileId - The uuid the file was originally uploaded with.
  * @returns {Promise<void>} - A promise resolved when the file has been deleted (or found to not exist).
  */
-export const deletePendingImportFileIfAny = async ({ fileId }) => {
+export const deletePendingImportFileIfAny = async ({ fileId }: { fileId: string }) => {
   checkFileIdIsValid(fileId)
   const deleteFn = getStorageFunctionOrThrow({
     functionByStorageType: deletePendingImportFunctionByStorageType,

@@ -5,8 +5,8 @@ import ArenaMobileDataImportSummaryJob from '@server/modules/mobile/service/aren
 
 export interface ArenaMobileImportSummaryParams {
   user: any
-  filePath: string
-  fileId: string
+  filePath?: string
+  fileId?: string
   totalChunks?: number
   totalFileSize?: number
   surveyId: number

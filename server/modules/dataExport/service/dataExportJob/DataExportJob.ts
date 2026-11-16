@@ -10,7 +10,7 @@ import CategoriesExportJob from './jobs/CategoriesExportJob'
 import FilesExportJob from './jobs/FilesExportJob'
 import ZipCreationJob from './jobs/ZipCreationJob'
 
-const createInternalJobs = (params) => {
+const createInternalJobs = (params: any) => {
   const { options } = params ?? {}
   const { includeCategories, includeFiles } = options ?? {}
   return [
@@ -22,7 +22,9 @@ const createInternalJobs = (params) => {
 }
 
 export default class DataExportJob extends Job {
-  constructor(params) {
+  static readonly type = 'DataExportJob'
+
+  constructor(params?: any) {
     super(DataExportJob.type, params, createInternalJobs(params))
   }
 
@@ -101,5 +103,3 @@ export default class DataExportJob extends Job {
     return DownloadAuthTokenUtils.generateToken({ userUuid, fileName: outputFileName })
   }
 }
-
-DataExportJob.type = 'DataExportJob'

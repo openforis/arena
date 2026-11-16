@@ -27,11 +27,11 @@ const getRequestHeaders = () => {
   return { 'x-api-key': apiKey, 'Content-Type': 'application/json' }
 }
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const wait = (ms: any) => new Promise((resolve) => setTimeout(resolve, ms))
 
 // Wraps errors coming from the external Whisp API (e.g. its own 401s) so they are never
 // mistaken by clients for an Arena authentication error (see appErrorsMiddleware.js on the client).
-const wrapWhispApiError = (error) => {
+const wrapWhispApiError = (error: any) => {
   const whispStatus = error.response?.status
   const message = error.response?.data?.message ?? error.message
   logger.error(`Whisp API error (status ${whispStatus}): ${message}`)
@@ -39,7 +39,7 @@ const wrapWhispApiError = (error) => {
 }
 
 // Whisp rate limit error message is like "Rate limit exceeded. Try again in 12 seconds."
-const extractRateLimitWaitMs = (error) => {
+const extractRateLimitWaitMs = (error: any) => {
   const words = String(error.response?.data?.message ?? '').split(' ')
   const secondsWordIndex = words.findIndex((word) => word.startsWith('seconds'))
   const seconds = secondsWordIndex > 0 ? Number(words[secondsWordIndex - 1]) : 0
@@ -47,7 +47,7 @@ const extractRateLimitWaitMs = (error) => {
 }
 
 // Sends a request to the Whisp API, waiting and retrying when its rate limit is exceeded
-const sendRequest = async (requestFn) => {
+const sendRequest = async (requestFn: any) => {
   for (let attempt = 0; ; attempt++) {
     try {
       return await requestFn() // NOSONAR
@@ -62,7 +62,7 @@ const sendRequest = async (requestFn) => {
   }
 }
 
-const waitForProcessing = async ({ token, pollingPeriod }) => {
+const waitForProcessing = async ({ token, pollingPeriod }: { token: any; pollingPeriod: any }) => {
   const url = `${whispApiGeoProcessingStatusUrl}/${token}`
   const headers = getRequestHeaders()
 
@@ -87,7 +87,15 @@ const waitForProcessing = async ({ token, pollingPeriod }) => {
   }
 }
 
-const generateData = async ({ geojson, analysisOptions = {}, pollingPeriod = defaultPollingPeriod }) => {
+const generateData = async ({
+  geojson,
+  analysisOptions = {},
+  pollingPeriod = defaultPollingPeriod,
+}: {
+  geojson: any
+  analysisOptions?: any
+  pollingPeriod?: any
+}) => {
   const requestPayload = { ...geojson, analysisOptions: { ...analysisOptions, async: true } }
   const headers = getRequestHeaders()
   const { data: processStartData } = await sendRequest(() =>

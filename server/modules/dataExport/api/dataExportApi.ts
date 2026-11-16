@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { FileFormats } from '@core/fileFormats'
 import { isUuid } from '@core/uuid'
@@ -12,18 +13,18 @@ import * as SurveyService from '@server/modules/survey/service/surveyService'
 
 import * as DataExportService from '../service/dataExportService'
 
-const checkExportUuid = (exportUuid) => {
+const checkExportUuid = (exportUuid: string) => {
   if (!isUuid(exportUuid)) {
     throw new Error('Invalid exportUuid specified')
   }
 }
 
-export const init = (app) => {
+export const init = (app: Router) => {
   app.post(
     '/survey/:surveyId/data-export',
     AuthMiddleware.requireRecordsExportPermission,
     requireRecordsReadableByUserGroup,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const { surveyId, cycle, recordUuids, search, options } = Request.getParams(req)
 
@@ -44,28 +45,24 @@ export const init = (app) => {
     }
   )
 
-  app.post(
-    '/survey/:surveyId/data-matrix-export',
-    AuthMiddleware.requireRecordsExportPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, cycle, options } = Request.getParams(req)
+  app.post('/survey/:surveyId/data-matrix-export', AuthMiddleware.requireRecordsExportPermission, (req, res, next) => {
+    try {
+      const { surveyId, cycle, options } = Request.getParams(req)
 
-        const user = Request.getUser(req)
+      const user = Request.getUser(req)
 
-        const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
+      const job = DataExportService.startDataMatrixExportJob({ user, surveyId, cycle, options })
 
-        res.json({ job: JobUtils.jobToJSON(job) })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ job: JobUtils.jobToJSON(job) })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   app.post(
     '/survey/:surveyId/data-summary-export',
     AuthMiddleware.requireRecordAnalysisPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const { surveyId, cycle, lang, options } = Request.getParams(req)
 
