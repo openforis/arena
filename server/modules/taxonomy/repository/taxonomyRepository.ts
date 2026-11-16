@@ -1,4 +1,4 @@
-import pgPromise from 'pg-promise'
+import type { Taxon as ArenaTaxon, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 import toSnakeCase from 'to-snake-case'
 
 import { Objects } from '@openforis/arena-core'
@@ -11,7 +11,7 @@ import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 
 import * as DB from '@server/db'
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 
 import {
@@ -32,10 +32,10 @@ const searchValueProcessorByType = {
 }
 
 // taxa follow their position in the last imported file; the ones without it (e.g. added later) go last
-const getTaxaOrderBy = (draft) =>
+const getTaxaOrderBy = (draft: boolean) =>
   `(${DbUtils.getPropColCombined(Taxon.propKeys.position, draft, 't.')})::integer NULLS LAST, t.id`
 
-const getTaxonVernacularNameSelectFields = (draft) => `
+const getTaxonVernacularNameSelectFields = (draft: boolean) => `
   t.*,
   vn.uuid AS vernacular_name_uuid,
   ${DbUtils.getPropColCombined(TaxonVernacularName.keysProps.name, draft, 'vn.')} AS vernacular_name,
@@ -43,7 +43,10 @@ const getTaxonVernacularNameSelectFields = (draft) => `
 
 // ============== CREATE
 
-export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, client = db) => {
+export const insertTaxonomy = (
+  { surveyId, taxonomy, backup = false }: { surveyId: number; taxonomy: ArenaTaxonomy; backup?: boolean },
+  client: DbClient = db
+) => {
   const { props, propsDraft } = Taxonomy.getPropsAndPropsDraft({ backup })(taxonomy)
   return client.one(
     `
@@ -78,11 +81,23 @@ export const insertTaxonomy = async ({ surveyId, taxonomy, backup = false }, cli
  * @param {!string} [params.taxonUuid] - The UUID of the taxon.
  * @param {!object} [params.vernacularNames] - The vernacular names indexed by language code.
  * @param {boolean} [params.backup] - Whether the vernacular names come from a survey backup (props are published).
- * @param {pgPromise.IDatabase} [params.client] - The database client.
+ * @param {DbClient} [params.client] - The database client.
  * @returns {Array.<function(): Promise<null>>} - The functions running the insert/update queries (not started yet):
  * to be run with DbUtils.runQueries.
  */
-const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, backup = false, client = db }) =>
+const _insertOrUpdateVernacularNames = ({
+  surveyId,
+  taxonUuid,
+  vernacularNames,
+  backup = false,
+  client = db,
+}: {
+  surveyId: number
+  taxonUuid: string
+  vernacularNames: Record<string, any[]>
+  backup?: boolean
+  client?: DbClient
+}) =>
   A.pipe(
     A.values,
     A.flatten,
@@ -102,7 +117,17 @@ const _insertOrUpdateVernacularNames = ({ surveyId, taxonUuid, vernacularNames, 
     })
   )(vernacularNames)
 
-const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => {
+const insertTaxon = async ({
+  surveyId,
+  taxon,
+  backup = false,
+  client = db,
+}: {
+  surveyId: number
+  taxon: ArenaTaxon
+  backup?: boolean
+  client?: DbClient
+}) => {
   const { props, propsDraft } = Taxon.getPropsAndPropsDraft({ backup })(taxon)
 
   // insert the taxon first: the vernacular names reference it
@@ -123,13 +148,30 @@ const insertTaxon = async ({ surveyId, taxon, backup = false, client = db }) => 
   )
 }
 
-export const insertTaxa = async ({ surveyId, taxa, backup = false, client = db }) =>
+export const insertTaxa = ({
+  surveyId,
+  taxa,
+  backup = false,
+  client = db,
+}: {
+  surveyId: number
+  taxa: ArenaTaxon[]
+  backup?: boolean
+  client?: DbClient
+}) =>
   DbUtils.runQueries(
     client,
     taxa.map((taxon) => () => insertTaxon({ surveyId, taxon, backup, client }))
   )
 
-export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, taxonomyUuid }, client = db) => {
+export const cloneTaxonomyFromSurvey = async (
+  {
+    sourceSurveyId,
+    targetSurveyId,
+    taxonomyUuid,
+  }: { sourceSurveyId: number; targetSurveyId: number; taxonomyUuid: string },
+  client: DbClient = db
+) => {
   const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
   const targetSchema = Schemata.getSchemaSurvey(targetSurveyId)
 
@@ -167,7 +209,7 @@ export const cloneTaxonomyFromSurvey = async ({ sourceSurveyId, targetSurveyId, 
 
 // ============== READ
 
-export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client = db) =>
+export const fetchTaxonomyByUuid = (surveyId: number, uuid: any, draft: boolean = false, client: DbClient = db) =>
   client.one(
     `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxonomy
      WHERE uuid = $1`,
@@ -175,9 +217,23 @@ export const fetchTaxonomyByUuid = async (surveyId, uuid, draft = false, client 
     (record) => DB.transformCallback(record, draft, true)
   )
 
-export const fetchTaxonomiesBySurveyId = async (
-  { surveyId, draft = false, backup = false, limit = null, offset = 0, search = null },
-  client = db
+export const fetchTaxonomiesBySurveyId = (
+  {
+    surveyId,
+    draft = false,
+    backup = false,
+    limit = null,
+    offset = 0,
+    search = null,
+  }: {
+    surveyId: number
+    draft?: boolean
+    backup?: boolean
+    limit?: number | null
+    offset?: number
+    search?: string | null
+  },
+  client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const propColName = DbUtils.getPropColCombined(Taxonomy.keysProps.name, draft)
@@ -221,7 +277,7 @@ export const fetchTaxonomiesBySurveyId = async (
   )
 }
 
-export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
+export const countTaxonomiesBySurveyId = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.one(
     `
       SELECT COUNT(*) 
@@ -230,7 +286,10 @@ export const countTaxonomiesBySurveyId = async ({ surveyId }, client = db) =>
     (r) => Number.parseInt(r.count, 10)
   )
 
-export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = db) => {
+export const countTaxaBySurveyId = (
+  { surveyId, draft = false }: { surveyId: number; draft?: boolean },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const whereCondition = draft ? '' : `WHERE t.props <> '{}'::jsonb`
   return client.one(
@@ -243,7 +302,12 @@ export const countTaxaBySurveyId = async ({ surveyId, draft = false }, client = 
   )
 }
 
-export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = false, client = db) => {
+export const countTaxaByTaxonomyUuid = (
+  surveyId: number,
+  taxonomyUuid: string,
+  draft: boolean = false,
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const publishedCondition = draft ? '' : `AND t.props <> '{}'::jsonb`
   return client.one(
@@ -257,7 +321,10 @@ export const countTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, draft = fa
   )
 }
 
-const fetchTaxaCountIndexedByTaxonomyUuid = async ({ surveyId, draft = false }, client = db) => {
+const fetchTaxaCountIndexedByTaxonomyUuid = async (
+  { surveyId, draft = false }: { surveyId: number; draft?: boolean },
+  client: DbClient = db
+): Promise<Record<string, number>> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 't' })
   const whereClause = propsPublishedCondition ? `WHERE ${propsPublishedCondition}` : ''
@@ -267,13 +334,16 @@ const fetchTaxaCountIndexedByTaxonomyUuid = async ({ surveyId, draft = false }, 
     ${whereClause}
     GROUP BY t.taxonomy_uuid`
   )
-  return counts.reduce((acc, row) => {
+  return counts.reduce((acc: Record<string, number>, row) => {
     acc[row.taxonomy_uuid] = Number(row.count)
     return acc
   }, {})
 }
 
-const fetchTaxonomyUuidsExceedingMaxItems = async ({ surveyId, draft }, client) => {
+const fetchTaxonomyUuidsExceedingMaxItems = async (
+  { surveyId, draft }: { surveyId: number; draft: boolean },
+  client: DbClient
+) => {
   const itemsCountIndexedByTaxonomyUuid = await fetchTaxaCountIndexedByTaxonomyUuid({ surveyId, draft }, client)
   return Object.entries(itemsCountIndexedByTaxonomyUuid).reduce((acc, [taxonomyUuid, count]) => {
     if (count > Taxonomy.maxTaxaInIndex) {
@@ -283,9 +353,23 @@ const fetchTaxonomyUuidsExceedingMaxItems = async ({ surveyId, draft }, client) 
   }, [])
 }
 
-export const fetchTaxa = async (
-  { surveyId, taxonomyUuid = null, draft = false, backup = false, limit = null, offset = 0 },
-  client = db
+export const fetchTaxa = (
+  {
+    surveyId,
+    taxonomyUuid = null,
+    draft = false,
+    backup = false,
+    limit = null,
+    offset = 0,
+  }: {
+    surveyId: number
+    taxonomyUuid?: string
+    draft?: boolean
+    backup?: boolean
+    limit?: number | null
+    offset?: number
+  },
+  client: DbClient = db
 ) =>
   client.map(
     `SELECT t.*
@@ -317,8 +401,17 @@ export const fetchTaxaWithVernacularNames = async (
     backup = false,
     limit = null,
     offset = 0,
+  }: {
+    surveyId: number
+    taxonomyUuid?: string
+    taxonUuid?: string
+    draft?: boolean
+    includeBigTaxonomies?: any
+    backup?: boolean
+    limit?: number | null
+    offset?: number
   },
-  client = db
+  client: DbClient = db
 ) => {
   const taxonomyUuidsExceedingMaxItems = includeBigTaxonomies
     ? []
@@ -336,7 +429,7 @@ export const fetchTaxaWithVernacularNames = async (
   }
   const whereCondition = DbUtils.getWhereClause(...whereConditions)
 
-  const queryParams = { taxonomyUuid, taxonUuid, limit, offset }
+  const queryParams: Record<string, unknown> = { taxonomyUuid, taxonUuid, limit, offset }
   if (!allTaxonomiesIncluded && taxonomyUuidsExceedingMaxItems.length > 0) {
     queryParams.excludedTaxonomyUuids = taxonomyUuidsExceedingMaxItems
   }
@@ -413,6 +506,12 @@ export const fetchTaxaWithVernacularNamesStream = ({
   vernacularLangCodes,
   extraPropsDefs,
   draft = false,
+}: {
+  surveyId: number
+  taxonomyUuid: string
+  vernacularLangCodes: any
+  extraPropsDefs: any
+  draft?: boolean
 }) => {
   // language codes and extra prop names are passed as parameters (values and quoted column aliases)
   const params = DbUtils.newQueryParams([taxonomyUuid])
@@ -459,7 +558,15 @@ export const fetchTaxaWithVernacularNamesStream = ({
   return new DbUtils.QueryStream(DbUtils.formatQuery(select, params.values))
 }
 
-const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searchValue, orderByProp, draft, client) =>
+const findTaxaByCondition = (
+  surveyId: number,
+  taxonomyUuid: string,
+  whereCondition: any,
+  searchValue: string | null,
+  orderByProp: any,
+  draft: boolean,
+  client: DbClient
+) =>
   client.map(
     `SELECT *
        FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
@@ -471,7 +578,7 @@ const findTaxaByCondition = async (surveyId, taxonomyUuid, whereCondition, searc
     (taxon) => DB.transformCallback(taxon, draft, true)
   )
 
-const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
+const toSearchValue = (filterValue: string, searchType = searchTypes.equals) => {
   if (A.isEmpty(filterValue)) return null
   let searchValue = String(filterValue).trim().toLowerCase().replaceAll('*', '%')
   searchValue = searchValueProcessorByType[searchType](searchValue)
@@ -485,7 +592,7 @@ const toSearchValue = (filterValue, searchType = searchTypes.equals) => {
  * @param {object} [client] - The database client.
  * @returns {Promise<Array<{uuid: string, taxonomy_uuid: string, props: object, props_draft: object}>>} The taxa rows.
  */
-export const fetchTaxaWithExcelCellObjects = async ({ surveyId }, client = db) =>
+export const fetchTaxaWithExcelCellObjects = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.any(
     `SELECT uuid, taxonomy_uuid, props, props_draft
     FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
@@ -503,9 +610,14 @@ export const fetchTaxaWithExcelCellObjects = async ({ surveyId }, client = db) =
  * @param {object} [client] - The database client.
  * @returns {Promise<boolean>} True if the scientific name is already in use.
  */
-export const existsOtherTaxonWithScientificName = async (
-  { surveyId, taxonomyUuid, taxonUuid, scientificName },
-  client = db
+export const existsOtherTaxonWithScientificName = (
+  {
+    surveyId,
+    taxonomyUuid,
+    taxonUuid,
+    scientificName,
+  }: { surveyId: number; taxonomyUuid: string; taxonUuid: string; scientificName: any },
+  client: DbClient = db
 ) =>
   client.one(
     `SELECT EXISTS (
@@ -516,7 +628,13 @@ export const existsOtherTaxonWithScientificName = async (
     (row) => row.exists
   )
 
-export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = false, client = db) => {
+export const fetchTaxonByCode = async (
+  surveyId: number,
+  taxonomyUuid: string,
+  code: string,
+  draft: boolean = false,
+  client: DbClient = db
+) => {
   const searchValue = toSearchValue(code)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(Taxon.propKeys.code, draft) : ''
 
@@ -532,19 +650,36 @@ export const fetchTaxonByCode = async (surveyId, taxonomyUuid, code, draft = fal
   return A.head(taxa)
 }
 
-const findTaxaByPropLike = async (surveyId, taxonomyUuid, filterProp, filterValue, draft = false, client = db) => {
+const findTaxaByPropLike = (
+  surveyId: number,
+  taxonomyUuid: string,
+  filterProp: any,
+  filterValue: string,
+  draft: boolean = false,
+  client: DbClient = db
+) => {
   const searchValue = toSearchValue(filterValue)
   const filterCondition = searchValue ? DbUtils.getPropFilterCondition(filterProp, draft) : ''
   return findTaxaByCondition(surveyId, taxonomyUuid, filterCondition, searchValue, filterProp, draft, client)
 }
 
-export const findTaxaByCode = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
-  findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, `${filterValue}*`, draft, client)
+export const findTaxaByCode = (
+  surveyId: number,
+  taxonomyUuid: string,
+  filterValue: string,
+  draft: boolean = false,
+  client: DbClient = db
+) => findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.code, `${filterValue}*`, draft, client)
 
-export const findTaxaByScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
-  findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, `*${filterValue}*`, draft, client)
+export const findTaxaByScientificName = (
+  surveyId: number,
+  taxonomyUuid: string,
+  filterValue: string,
+  draft: boolean = false,
+  client: DbClient = db
+) => findTaxaByPropLike(surveyId, taxonomyUuid, Taxon.propKeys.scientificName, `*${filterValue}*`, draft, client)
 
-export const findTaxaFilteringFields = async ({
+export const findTaxaFilteringFields = ({
   surveyId,
   taxonomyUuid,
   filterFields,
@@ -552,6 +687,14 @@ export const findTaxaFilteringFields = async ({
   orderByFields,
   draft = false,
   client = db,
+}: {
+  surveyId: number
+  taxonomyUuid: string
+  filterFields: any
+  filterValue: string
+  orderByFields: any
+  draft?: boolean
+  client?: DbClient
 }) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const searchValue = toSearchValue(filterValue, searchTypes.includes)
@@ -586,7 +729,13 @@ export const findTaxaFilteringFields = async ({
   )
 }
 
-export const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
+export const findTaxaByCodeOrScientificName = (
+  surveyId: number,
+  taxonomyUuid: string,
+  filterValue: string,
+  draft: boolean = false,
+  client: DbClient = db
+) =>
   findTaxaFilteringFields({
     surveyId,
     taxonomyUuid,
@@ -597,7 +746,13 @@ export const findTaxaByCodeOrScientificName = async (surveyId, taxonomyUuid, fil
     client,
   })
 
-export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterValue, draft = false, client = db) =>
+export const findTaxaByVernacularName = (
+  surveyId: number,
+  taxonomyUuid: string,
+  filterValue: string,
+  draft: boolean = false,
+  client: DbClient = db
+) =>
   findTaxaFilteringFields({
     surveyId,
     taxonomyUuid,
@@ -608,7 +763,12 @@ export const findTaxaByVernacularName = async (surveyId, taxonomyUuid, filterVal
     client,
   })
 
-export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = false, client = db) =>
+export const fetchTaxonVernacularNameByUuid = (
+  surveyId: number,
+  uuid: any,
+  draft: boolean = false,
+  client: DbClient = db
+) =>
   client.one(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
      FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon t
@@ -619,9 +779,14 @@ export const fetchTaxonVernacularNameByUuid = async (surveyId, uuid, draft = fal
     (record) => DB.transformCallback(record, draft, true)
   )
 
-export const fetchTaxaWithVernacularNamesByTaxonUuid = async (
-  { surveyId, taxonomyUuid, taxonUuid, draft = false },
-  client = db
+export const fetchTaxaWithVernacularNamesByTaxonUuid = (
+  {
+    surveyId,
+    taxonomyUuid,
+    taxonUuid,
+    draft = false,
+  }: { surveyId: number; taxonomyUuid: string; taxonUuid: string; draft?: boolean },
+  client: DbClient = db
 ) =>
   client.map(
     `SELECT ${getTaxonVernacularNameSelectFields(draft)}
@@ -634,7 +799,7 @@ export const fetchTaxaWithVernacularNamesByTaxonUuid = async (
     (record) => DB.transformCallback(record, draft, true)
   )
 
-export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = db) =>
+export const fetchTaxonByUuid = (surveyId: number, uuid: any, draft: boolean = false, client: DbClient = db) =>
   client.one(
     `SELECT * FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE uuid = $1
@@ -644,25 +809,38 @@ export const fetchTaxonByUuid = async (surveyId, uuid, draft = false, client = d
   )
 
 export const fetchTaxonWithVernacularNamesByUuid = async (
-  { surveyId, taxonomyUuid, taxonUuid, draft = false },
-  client = db
+  {
+    surveyId,
+    taxonomyUuid,
+    taxonUuid,
+    draft = false,
+  }: { surveyId: number; taxonomyUuid: string; taxonUuid: string; draft?: boolean },
+  client: DbClient = db
 ) => {
   const taxa = await fetchTaxaWithVernacularNames({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
   return A.head(taxa)
 }
 
 export const fetchTaxonWithVernacularNamesByCode = async (
-  { surveyId, taxonomyUuid, taxonCode, draft = false },
-  client = db
+  {
+    surveyId,
+    taxonomyUuid,
+    taxonCode,
+    draft = false,
+  }: { surveyId: number; taxonomyUuid: string; taxonCode: any; draft?: boolean },
+  client: DbClient = db
 ) => {
   const taxon = await fetchTaxonByCode(surveyId, taxonomyUuid, taxonCode, draft, client)
   const taxonUuid = Taxon.getUuid(taxon)
   if (!taxonUuid) return null
 
-  return fetchTaxonWithVernacularNamesByUuid({ surveyId, taxonUuid, draft }, client)
+  return fetchTaxonWithVernacularNamesByUuid({ surveyId, taxonomyUuid, taxonUuid, draft }, client)
 }
 
-export const fetchPublishedVernacularNameUuids = async ({ surveyId, taxonomyUuid }, client = db) =>
+export const fetchPublishedVernacularNameUuids = (
+  { surveyId, taxonomyUuid }: { surveyId: number; taxonomyUuid: string },
+  client: DbClient = db
+) =>
   client.map(
     `SELECT vn.uuid
      FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name vn
@@ -675,10 +853,15 @@ export const fetchPublishedVernacularNameUuids = async ({ surveyId, taxonomyUuid
 
 // ============== UPDATE
 
-export const updateTaxonomyProp = async (surveyId, taxonomyUuid, key, value, client = db) =>
-  updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyUuid, key, value, client)
+export const updateTaxonomyProp = (
+  surveyId: number,
+  taxonomyUuid: string,
+  key: string,
+  value: unknown,
+  client: DbClient = db
+) => updateSurveySchemaTableProp(surveyId, 'taxonomy', taxonomyUuid, key, value, client)
 
-export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
+export const updateTaxonProps = ({ surveyId, taxon }: { surveyId: number; taxon: ArenaTaxon }, client: DbClient = db) =>
   client.none(
     `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.taxon
      SET props_draft = $2
@@ -686,7 +869,7 @@ export const updateTaxonProps = async ({ surveyId, taxon }, client = db) =>
     [Taxon.getUuid(taxon), Taxon.getProps(taxon)]
   )
 
-export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db) =>
+export const updateTaxonAndVernacularNames = (surveyId: number, taxon: ArenaTaxon, client: DbClient = db) =>
   DbUtils.runQueries(client, [
     () => updateTaxonProps({ surveyId, taxon }, client),
     ..._insertOrUpdateVernacularNames({
@@ -707,7 +890,15 @@ export const updateTaxonAndVernacularNames = async (surveyId, taxon, client = db
  * @param {object} [client] - The database client.
  * @returns {Promise<null>} The query result.
  */
-export const updateTaxonPropsAndPropsDraft = async ({ surveyId, taxonUuid, props, propsDraft }, client = db) =>
+export const updateTaxonPropsAndPropsDraft = (
+  {
+    surveyId,
+    taxonUuid,
+    props,
+    propsDraft,
+  }: { surveyId: number; taxonUuid: string; props: Record<string, any>; propsDraft: Record<string, any> },
+  client: DbClient = db
+) =>
   client.none(
     `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.taxon
      SET props = $2, props_draft = $3
@@ -715,13 +906,13 @@ export const updateTaxonPropsAndPropsDraft = async ({ surveyId, taxonUuid, props
     [taxonUuid, props, propsDraft]
   )
 
-export const updateTaxa = async (surveyId, taxa, client = db) =>
+export const updateTaxa = (surveyId: number, taxa: ArenaTaxon[], client: DbClient = db) =>
   DbUtils.runQueries(
     client,
     taxa.map((taxon) => () => updateTaxonAndVernacularNames(surveyId, taxon, client))
   )
 
-export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
+export const updateTaxaProps = ({ surveyId, taxa }: { surveyId: number; taxa: ArenaTaxon[] }, client: DbClient = db) =>
   DbUtils.runQueries(
     client,
     taxa.map((taxon) => () => updateTaxonProps({ surveyId, taxon }, client))
@@ -734,7 +925,7 @@ export const updateTaxaProps = async ({ surveyId, taxa }, client = db) =>
 // server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
 // so surveys with no pending taxon extra-value edits (the common case) never pull taxon data into
 // memory.
-export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db) =>
+export const fetchTaxaWithChangedExtraValues = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.any(
     `SELECT t.taxonomy_uuid AS "taxonomyUuid",
             t.props->'extra' AS "extraPublished",
@@ -746,11 +937,11 @@ export const fetchTaxaWithChangedExtraValues = async ({ surveyId }, client = db)
 
 // ============== DELETE
 
-export const deleteTaxonomy = async (surveyId, taxonomyUuid, client = db) =>
+export const deleteTaxonomy = (surveyId: number, taxonomyUuid: string, client: DbClient = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'taxonomy', taxonomyUuid, client)
 
 // only unpublished taxa are deleted
-export const deleteDraftTaxaByUuids = async (surveyId, taxonUuids, client = db) =>
+export const deleteDraftTaxaByUuids = (surveyId: number, taxonUuids: string[], client: DbClient = db) =>
   client.none(
     `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE uuid IN ($1:csv)
@@ -759,7 +950,11 @@ export const deleteDraftTaxaByUuids = async (surveyId, taxonUuids, client = db) 
   )
 
 // only unpublished vernacular names are deleted
-export const deleteDraftVernacularNamesByUuids = async (surveyId, vernacularNameUuids, client = db) =>
+export const deleteDraftVernacularNamesByUuids = (
+  surveyId: number,
+  vernacularNameUuids: string[],
+  client: DbClient = db
+) =>
   client.none(
     `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon_vernacular_name
      WHERE uuid IN ($1:csv)
@@ -767,7 +962,7 @@ export const deleteDraftVernacularNamesByUuids = async (surveyId, vernacularName
     [vernacularNameUuids]
   )
 
-export const deleteDraftTaxaByTaxonomyUuid = async (surveyId, taxonomyUuid, client = db) =>
+export const deleteDraftTaxaByTaxonomyUuid = (surveyId: number, taxonomyUuid: string, client: DbClient = db) =>
   client.none(
     `DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.taxon
      WHERE taxonomy_uuid = $1

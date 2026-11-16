@@ -1,14 +1,23 @@
 import * as A from '@core/arena'
+import type { ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import * as StringUtils from '@core/stringUtils'
 
 import * as TaxonomyValidator from '../taxonomyValidator'
 
 export default class TaxonCSVParser {
+  // extra prop defs, with the CSV column header of each one
+  extraPropsDefs: Record<string, ExtraPropDefItem & { key: string; originalHeader: string }>
+  processedRow: number
+  rowsByField: Record<string, Record<string, number>>
+  taxonomyUuid: string
+  vernacularLanguageCodes: string[]
+
   constructor({ taxonomyUuid, vernacularLanguageCodes, extraPropsDefs }) {
     this.taxonomyUuid = taxonomyUuid
     this.vernacularLanguageCodes = vernacularLanguageCodes
@@ -75,14 +84,7 @@ export default class TaxonCSVParser {
         Validation.setField(
           field,
           Validation.newInstance(false, {}, [
-            {
-              key: errorKeyDuplicate,
-              params: {
-                value,
-                row: this.processedRow + 1,
-                duplicateRow,
-              },
-            },
+            ValidationResult.newInstance(errorKeyDuplicate, { value, row: this.processedRow + 1, duplicateRow }),
           ])
         )
       )(validation)
@@ -112,14 +114,14 @@ export default class TaxonCSVParser {
     }, {})
   }
 
-  _parseExtraProps(row) {
-    return Object.values(this.extraPropsDefs).reduce((accExtraProps, extraProp) => {
-      const { key, originalHeader } = extraProp
+  _parseExtraProps(row: Record<string, any>): Record<string, unknown> {
+    const extraProps: Record<string, unknown> = {}
+    for (const { key, originalHeader } of Object.values(this.extraPropsDefs)) {
       const value = row[originalHeader]
-      if (StringUtils.isBlank(value)) {
-        return accExtraProps
+      if (!StringUtils.isBlank(value)) {
+        extraProps[key] = value
       }
-      return { ...accExtraProps, [key]: value }
-    }, {})
+    }
+    return extraProps
   }
 }

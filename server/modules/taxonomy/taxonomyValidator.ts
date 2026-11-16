@@ -1,3 +1,4 @@
+import type { Taxon as ArenaTaxon, Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 import * as Taxonomy from '@core/survey/taxonomy'
 import * as Taxon from '@core/survey/taxon'
 import * as TaxonVernacularName from '@core/survey/taxonVernacularName'
@@ -8,10 +9,10 @@ import * as ObjectUtils from '@core/objectUtils'
 
 // ====== TAXONOMY
 
-const validateNotEmptyTaxa = (taxaCount) => () =>
+const validateNotEmptyTaxa = (taxaCount: number) => () =>
   taxaCount === 0 ? { key: Validation.messageKeys.taxonomyEdit.taxaEmpty } : null
 
-const taxonomyValidators = (taxonomies, taxaCount) => ({
+const taxonomyValidators = (taxonomies: ArenaTaxonomy[], taxaCount: number) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateName(Validation.messageKeys.nameInvalid),
@@ -21,12 +22,15 @@ const taxonomyValidators = (taxonomies, taxaCount) => ({
   taxa: [validateNotEmptyTaxa(taxaCount)],
 })
 
-export const validateTaxonomy = async (taxonomies, taxonomy, taxaCount) =>
-  Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
+export const validateTaxonomy = (
+  taxonomies: ArenaTaxonomy[],
+  taxonomy: ArenaTaxonomy,
+  taxaCount: number
+): Promise<Validation.ValidationInstance> => Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
 
 // ====== TAXON
 
-const _validateVernacularNames = (_, taxon) => {
+const _validateVernacularNames = (_: any, taxon: ArenaTaxon) => {
   const vernacularNamesByLang = Taxon.getVernacularNames(taxon)
   const vernacularNamesDuplicate = Object.values(vernacularNamesByLang).reduce(
     (duplicatesAcc, vernacularNamesPerLang) => {
@@ -54,7 +58,7 @@ const _validateVernacularNames = (_, taxon) => {
   return null
 }
 
-const taxonValidators = (taxa) => ({
+const taxonValidators = (taxa: ArenaTaxon[]) => ({
   [`${ObjectUtils.keys.props}.${Taxon.propKeys.code}`]: [
     Validator.validateRequired(Validation.messageKeys.taxonomyEdit.codeRequired),
     Validator.validateItemPropUniqueness(Validation.messageKeys.taxonomyEdit.codeDuplicate)(taxa),
@@ -72,4 +76,5 @@ const taxonValidators = (taxa) => ({
   [Taxon.keys.vernacularNames]: [_validateVernacularNames],
 })
 
-export const validateTaxon = async (taxa, taxon) => Validator.validate(taxon, taxonValidators(taxa))
+export const validateTaxon = (taxa: ArenaTaxon[], taxon: ArenaTaxon): Promise<Validation.ValidationInstance> =>
+  Validator.validate(taxon, taxonValidators(taxa))

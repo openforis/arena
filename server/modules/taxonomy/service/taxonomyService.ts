@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 
 import * as Survey from '@core/survey/survey'
@@ -52,7 +53,7 @@ export const {
  * @returns {number} The survey id, converted to a number.
  * @throws {Error} If the value is not a positive integer.
  */
-const _validateSurveyId = ({ surveyId, paramName }) => {
+const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: any }) => {
   if (!NumberUtils.isInteger(surveyId) || Number(surveyId) <= 0) {
     throw new Error(`${paramName} must be a positive integer`)
   }
@@ -70,7 +71,17 @@ const _validateSurveyId = ({ surveyId, paramName }) => {
  * @returns {Promise<Taxonomy>} The cloned taxonomy.
  * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
  */
-export const cloneTaxonomyFromSurvey = async ({ user, sourceSurveyId, sourceTaxonomyUuid, targetSurveyId }) => {
+export const cloneTaxonomyFromSurvey = async ({
+  user,
+  sourceSurveyId,
+  sourceTaxonomyUuid,
+  targetSurveyId,
+}: {
+  user: ArenaUser
+  sourceSurveyId: number
+  sourceTaxonomyUuid: string
+  targetSurveyId: number
+}) => {
   const sourceSurveyIdValidated = _validateSurveyId({ surveyId: sourceSurveyId, paramName: 'sourceSurveyId' })
   const targetSurveyIdValidated = _validateSurveyId({ surveyId: targetSurveyId, paramName: 'targetSurveyId' })
 
@@ -88,7 +99,19 @@ export const cloneTaxonomyFromSurvey = async ({ user, sourceSurveyId, sourceTaxo
   })
 }
 
-export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFormat, draft = false }) => {
+export const exportTaxa = async ({
+  surveyId,
+  taxonomyUuid,
+  outputStream,
+  fileFormat,
+  draft = false,
+}: {
+  surveyId: number
+  taxonomyUuid: string
+  outputStream: any
+  fileFormat: string
+  draft?: boolean
+}) => {
   const { taxonomy, taxaStream: taxaQueryStream } = await TaxonomyManager.fetchTaxaWithVernacularNamesStream(
     surveyId,
     taxonomyUuid,
@@ -101,12 +124,26 @@ export const exportTaxa = async ({ surveyId, taxonomyUuid, outputStream, fileFor
 
   await DbUtils.stream({
     queryStream: taxaQueryStream,
-    processor: async (dbStream) =>
+    processor: (dbStream) =>
       FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream, fields, fileFormat }),
   })
 }
 
-export const exportTaxaImportTemplate = async ({ surveyId, taxonomyUuid, draft, res, fileFormat, templateType }) => {
+export const exportTaxaImportTemplate = async ({
+  surveyId,
+  taxonomyUuid,
+  draft,
+  res,
+  fileFormat,
+  templateType,
+}: {
+  surveyId: number
+  taxonomyUuid: string
+  draft: boolean
+  res: any
+  fileFormat: string
+  templateType: any
+}) => {
   const [survey, taxonomy] = await Promise.all([
     SurveyManager.fetchSurveyById({ surveyId, draft }),
     TaxonomyManager.fetchTaxonomyByUuid(surveyId, taxonomyUuid, draft),
@@ -123,7 +160,19 @@ export const exportTaxaImportTemplate = async ({ surveyId, taxonomyUuid, draft, 
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const importTaxonomy = ({ user, surveyId, taxonomyUuid, filePath, fileFormat }) => {
+export const importTaxonomy = ({
+  user,
+  surveyId,
+  taxonomyUuid,
+  filePath,
+  fileFormat,
+}: {
+  user: ArenaUser
+  surveyId: number
+  taxonomyUuid: string
+  filePath: string
+  fileFormat: string
+}) => {
   const job = new TaxonomyImportJob({
     user,
     surveyId,
