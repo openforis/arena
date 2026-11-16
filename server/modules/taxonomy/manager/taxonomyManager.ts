@@ -75,7 +75,7 @@ export const checkTaxonomy = (taxonomy: ArenaTaxonomy) => {
  * @param root0.backup
  * @param client
  */
-export const insertTaxonomy = (
+export const insertTaxonomy = async (
   {
     user,
     surveyId,
@@ -86,8 +86,9 @@ export const insertTaxonomy = (
   }: { user: ArenaUser; surveyId: number; taxonomy: ArenaTaxonomy; addLogs?: any; system?: any; backup?: boolean },
   client: DbClient = db
 ) => {
+  // async: an invalid taxonomy must reject, not throw
   checkTaxonomy(taxonomy)
-  return client.tx(async (t) => {
+  return await client.tx(async (t) => {
     const [taxonomyInserted] = await DbUtils.runQueries(t, [
       () => TaxonomyRepository.insertTaxonomy({ surveyId, taxonomy, backup }, t),
       ...(addLogs
@@ -496,7 +497,7 @@ export const unpublishTaxonomiesProps = (surveyId: number, client: DbClient = db
     )
   )
 
-export const updateTaxonomyProp = (
+export const updateTaxonomyProp = async (
   user: ArenaUser,
   surveyId: number,
   taxonomyUuid: string,
@@ -505,8 +506,9 @@ export const updateTaxonomyProp = (
   system = false,
   client: DbClient = db
 ) => {
+  // async: an invalid prop must reject, not throw
   checkTaxonomyProp(key, value)
-  return client.tx(
+  return await client.tx(
     async (t) =>
       (
         await DbUtils.runQueries(t, [
