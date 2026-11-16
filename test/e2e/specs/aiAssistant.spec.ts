@@ -46,7 +46,7 @@ const userMessages = (page: Page) => assistantPanel(page).getByTestId(TestId.aiA
 const logOutAndBackIn = async (page: Page, { baseURL, user }: { baseURL: string; user: TestUser }): Promise<void> => {
   await page.getByTestId(TestId.header.userBtn).click()
   await page.getByTestId(TestId.header.userLogoutBtn).click()
-  await expect(page.locator('button.btn.login')).toBeVisible()
+  await expect(page.locator('button.guest__submit')).toBeVisible()
   const response = await page.context().request.post(`${baseURL}/auth/login`, {
     data: { email: user.email, password: user.password },
   })
@@ -581,15 +581,16 @@ test.describe('AI assistant context meter (stub local server)', () => {
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.newConversationBtn)).toBeDisabled()
     await expect(assistantPanel(page).getByTestId(TestId.aiAssistant.menuBtn)).toBeDisabled()
 
-    // closed, the panel follows the route: Help away from the designer (the answer goes on in the background)
+    // a running answer keeps its area: away from the designer the panel still shows it, with its Stop button
     await closeAssistantPanel(page)
     await navigateInApp(page, Urls.home)
     await openAssistantPanel(page)
-    await expect(assistantPanel(page).getByRole('tab', { name: 'Help', exact: true })).toHaveAttribute(
+    await expect(assistantPanel(page).getByRole('tab', { name: 'Design', exact: true })).toHaveAttribute(
       'aria-selected',
       'true'
     )
-    await expect(userMessages(page)).toHaveCount(0)
+    await expect(assistantPanel(page)).toHaveAttribute('data-busy', 'true')
+    await expect(userMessages(page)).toHaveCount(1)
     await closeAssistantPanel(page)
 
     await navigateInApp(page, Urls.formDesigner)

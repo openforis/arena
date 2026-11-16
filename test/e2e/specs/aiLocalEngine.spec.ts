@@ -129,9 +129,11 @@ test.describe('Local AI provider (stub local server)', () => {
       await expect(summaryModal(page)).toContainText('could not be reached')
       await expect(page.getByTestId(TestId.ai.engineErrorRetry)).toBeVisible()
 
-      // Retry probes again: the provider is now known to be unreachable, and nothing falls back to another one
+      // Retry probes again: the provider is now known to be unreachable, the message still names its address,
+      // and nothing falls back to another one
       await page.getByTestId(TestId.ai.engineErrorRetry).click()
-      await expect(summaryModal(page)).toContainText('No AI engine can be used for this request.')
+      await expect(summaryModal(page)).toContainText('could not be reached')
+      await expect(summaryModal(page)).not.toContainText('No AI engine can be used for this request.')
       await closeSummary(page)
       await expect(page.locator('.btn-ai-summary')).toBeDisabled()
       await page.getByTestId(TestId.ai.policyBlocked).hover()

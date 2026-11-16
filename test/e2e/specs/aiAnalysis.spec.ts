@@ -73,8 +73,8 @@ test.describe('AI analysis assistant (mock provider)', () => {
 
     await expect(page.locator('.data-query-chart-wrapper')).toBeVisible({ timeout: 30_000 })
     await expect(page.locator('.data-query-chart-wrapper .recharts-bar-rectangle')).toHaveCount(3)
-    // review focus 5: the chart loads with the chart cap, not the table page size
-    expect(queryBodies.some((body) => body.limit === 5000)).toBe(true)
+    // an aggregate chart loads all its rows, not the table page size
+    expect(queryBodies.some((body) => body.limit == null)).toBe(true)
   })
 
   test.describe('with the stub local server', () => {
