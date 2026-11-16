@@ -251,7 +251,7 @@ const UserEdit = ({ ownProfile = false }) => {
 
       {(canEdit || canRemove || invitationExpired) && (
         <div className="user-edit__buttons">
-          {userUuid && (
+          {canEdit && userUuid && (
             <Button
               iconClassName="icon-pencil"
               label="userPasswordChangeView.changePassword"
