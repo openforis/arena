@@ -135,3 +135,18 @@ test.describe('Form preview for data entry users', () => {
     expect(response.status()).toBe(403)
   })
 })
+
+test.describe('Form preview from the records list for survey editors', () => {
+  test('is available even when not enabled for data entry users', async ({ page, sampleSurvey }) => {
+    await setDraftClusterIdLabel(sampleSurvey)
+    await page.goto(Urls.records)
+
+    await page.getByRole('button', { name: 'Preview form' }).click()
+
+    await expect(page.getByTestId(TestId.surveyForm.previewCloseBtn)).toBeVisible()
+    await expect(page.getByText(draftLabel)).toBeVisible()
+
+    await page.getByTestId(TestId.surveyForm.previewCloseBtn).click()
+    await expect(page).toHaveURL(new RegExp(`${Urls.records}$`))
+  })
+})
