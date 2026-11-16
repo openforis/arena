@@ -337,6 +337,12 @@ export const fetchTemporarySurveyIds = async ({ olderThan24Hours = false } = {},
   )
 
 // ============== UPDATE
+/**
+ * Marks the survey as draft (it has unpublished changes).
+ * @param {number} surveyId - The survey ID.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<null>} - The result promise.
+ */
 export const markSurveyDraft = async (surveyId, client = db) =>
   client.none(`UPDATE survey SET draft = true, date_modified = ${dbNow} WHERE id = $1`, [surveyId])
 

@@ -6,13 +6,11 @@ import { Objects, Strings } from '@openforis/arena-core'
 
 import { Schemata } from '@common/model/db'
 import {
-  getSurveyDBSchema,
   bulkUpdateSurveySchemaTableProp,
   updateSurveySchemaTableProp,
   deleteSurveySchemaTableRecord,
   deleteSurveySchemaTableRecords,
   deleteSurveySchemaTableProp,
-  dbTransformCallback,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as DB from '../../../db'
 import { db } from '../../../db/db'
@@ -45,11 +43,11 @@ export const insertCategory = ({
   const { props, propsDraft } = Category.getPropsAndPropsDraft({ backup })(category)
   return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category (uuid, props, props_draft)
+        INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.category (uuid, props, props_draft)
         VALUES ($1, $2, $3)
         RETURNING *`,
     [Category.getUuid(category), props, propsDraft],
-    (def) => dbTransformCallback(def, true, true)
+    (def) => DB.transformCallback(def, true, true)
   )
 }
 
@@ -67,18 +65,18 @@ export const insertLevel = ({
   const { props, propsDraft } = CategoryLevel.getPropsAndPropsDraft({ backup })(level)
   return client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_level (uuid, category_uuid, index, props, props_draft)
+        INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.category_level (uuid, category_uuid, index, props, props_draft)
         VALUES ($1, $2, $3, $4, $5)
         RETURNING *`,
     [Category.getUuid(level), CategoryLevel.getCategoryUuid(level), CategoryLevel.getIndex(level), props, propsDraft],
-    (def) => dbTransformCallback(def, true, true)
+    (def) => DB.transformCallback(def, true, true)
   )
 }
 
 export const insertItem = (surveyId: number, item: any, client: DbClient = db) =>
   client.one(
     `
-        INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
+        INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
         VALUES ($1, $2, $3, $4)
         RETURNING *`,
     [Category.getUuid(item), CategoryItem.getLevelUuid(item), CategoryItem.getParentUuid(item), item.props],
@@ -102,7 +100,7 @@ export const insertItems = async (
 
   await client.none(
     DbUtils.insertAllQuery(
-      getSurveyDBSchema(surveyId),
+      Schemata.getSchemaSurvey(surveyId),
       'category_item',
       ['uuid', 'level_uuid', 'parent_uuid', 'props', 'props_draft'],
       values
@@ -118,8 +116,8 @@ export const cloneCategoryFromSurvey = async (
   }: { sourceSurveyId: number; targetSurveyId: number; categoryUuid: string },
   client: DbClient = db
 ) => {
-  const sourceSchema = getSurveyDBSchema(sourceSurveyId)
-  const targetSchema = getSurveyDBSchema(targetSurveyId)
+  const sourceSchema = Schemata.getSchemaSurvey(sourceSurveyId)
+  const targetSchema = Schemata.getSchemaSurvey(targetSurveyId)
 
   await client.none(
     `
@@ -253,7 +251,7 @@ export const countCategories = (
 ) =>
   client.one(
     `SELECT COUNT(*) 
-     FROM ${getSurveyDBSchema(surveyId)}.category
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.category
      ${draft ? '' : "WHERE props::text <> '{}'::text"}`,
     [],
     (r) => Number.parseInt(r.count, 10)
@@ -277,7 +275,7 @@ export const fetchCategoriesBySurveyId = (
   },
   client: DbClient = db
 ) => {
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft, 'c.')
   return client.map(
     `SELECT 
@@ -458,8 +456,8 @@ export const fetchItemByUuid = async (
   const item = await client.oneOrNone(
     `
       SELECT i.*, l.category_uuid
-      FROM ${getSurveyDBSchema(surveyId)}.category_item i
-        JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+      FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item i
+        JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level l 
         ON l.uuid = i.level_uuid
       WHERE i.uuid = $1
     `,
@@ -482,8 +480,8 @@ export const countItemsBySurveyId = ({ surveyId }: { surveyId: number }, client:
 export const countItemsByCategoryUuid = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.one(
     `SELECT COUNT(*) 
-    FROM ${getSurveyDBSchema(surveyId)}.category_item i
-     JOIN ${getSurveyDBSchema(surveyId)}.category_level l 
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item i
+     JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level l 
         ON l.uuid = i.level_uuid
         AND l.category_uuid = $1`,
     [categoryUuid],
@@ -496,7 +494,7 @@ export const countItemsByLevelUuid = (
 ) =>
   client.one(
     `SELECT COUNT(*) 
-    FROM ${getSurveyDBSchema(surveyId)}.category_item i
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item i
     WHERE i.level_uuid = $1`,
     [levelUuid],
     (r) => Number.parseInt(r.count, 10)
@@ -776,7 +774,7 @@ export const fetchIndex = async (
     ORDER BY l.category_uuid, ${indexColumn}
     `,
     queryParams,
-    (row) => dbTransformCallback(row, draft, true)
+    (row) => DB.transformCallback(row, draft, true)
   )
 }
 
@@ -845,7 +843,7 @@ export const updateCategoryValidation = (
 ) =>
   client.none(
     `
-      UPDATE ${getSurveyDBSchema(surveyId)}.category 
+      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.category 
       SET validation = $1::jsonb 
       WHERE uuid = $2
     `,
@@ -854,13 +852,13 @@ export const updateCategoryValidation = (
 
 export const markCategoriesPublishedBySurveyId = (surveyId: number, client: DbClient = db) =>
   client.any(`
-      UPDATE ${getSurveyDBSchema(surveyId)}.category
+      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.category
       SET published = true
   `)
 
 export const markCategoriesUnpublishedBySurveyId = (surveyId: number, client: DbClient = db) =>
   client.any(`
-      UPDATE ${getSurveyDBSchema(surveyId)}.category
+      UPDATE ${Schemata.getSchemaSurvey(surveyId)}.category
       SET published = false
   `)
 
@@ -903,7 +901,7 @@ export const updateItemsProps = async (
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
   await client.none(
     DbUtils.updateAllQuery(
-      getSurveyDBSchema(surveyId),
+      Schemata.getSchemaSurvey(surveyId),
       'category_item',
       { name: 'uuid', cast: 'uuid' },
       [{ name: draftProps ? 'props_draft' : 'props', cast: 'jsonb' }],
@@ -924,8 +922,8 @@ export const fetchCategoryItemsWithChangedExtraValues = ({ surveyId }: { surveyI
     `SELECT cl.category_uuid AS "categoryUuid",
             ci.props->'extra' AS "extraPublished",
             ci.props_draft->'extra' AS "extraDraft"
-     FROM ${getSurveyDBSchema(surveyId)}.category_item ci
-     JOIN ${getSurveyDBSchema(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
+     FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item ci
+     JOIN ${Schemata.getSchemaSurvey(surveyId)}.category_level cl ON cl.uuid = ci.level_uuid
      WHERE ci.props_draft ? 'extra'
        AND (ci.props_draft -> 'extra') IS DISTINCT FROM (ci.props -> 'extra')`
   )
@@ -941,7 +939,7 @@ export const deleteLevel = (surveyId: number, levelUuid: string, client: DbClien
 export const deleteLevelsByCategory = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.none(
     `
-      DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
+      DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.category_level 
       WHERE category_uuid = $1
     `,
     [categoryUuid]
@@ -950,12 +948,12 @@ export const deleteLevelsByCategory = (surveyId: number, categoryUuid: string, c
 export const deleteLevelsEmptyByCategory = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.map(
     `
-      DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level l
+      DELETE FROM ${Schemata.getSchemaSurvey(surveyId)}.category_level l
       WHERE 
         l.category_uuid = $1
         AND NOT EXISTS (
           SELECT i.uuid 
-          FROM ${getSurveyDBSchema(surveyId)}.category_item i
+          FROM ${Schemata.getSchemaSurvey(surveyId)}.category_item i
           WHERE i.level_uuid = l.uuid
         )
       RETURNING l.uuid
