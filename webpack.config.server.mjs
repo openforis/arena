@@ -36,7 +36,7 @@ export default {
   target: 'node',
   entry: {
     server: entry('server/server.js'),
-    jobThread: entry('server/job/jobThread.js'),
+    jobThread: entry('server/job/jobThread.ts'),
     recordsUpdateThread: entry('server/modules/record/service/update/thread/recordsUpdateThread.js'),
   },
   output: {

@@ -241,6 +241,18 @@ export const fetchUserByUuid = _userFetcher(UserRepository.fetchUserByUuid)
 
 export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUserByUuidWithPassword)
 
+/**
+ * Fetches the users (with their auth groups and invitation), optionally paginated, filtered and sorted.
+ * @param {object} params - The parameters.
+ * @param {number} [params.offset] - The offset.
+ * @param {boolean} [params.onlyAccepted] - Whether to fetch only the users who accepted the invitation.
+ * @param {number} [params.limit] - The limit.
+ * @param {string} [params.search] - The search text.
+ * @param {string} [params.sortBy] - The sort field.
+ * @param {string} [params.sortOrder] - The sort order.
+ * @param {object} [client] - The db client.
+ * @returns {Promise<import('@openforis/arena-core').User[]>} - The users.
+ */
 export const fetchUsers = async (
   { offset, onlyAccepted = false, limit, search = null, sortBy, sortOrder },
   client = db

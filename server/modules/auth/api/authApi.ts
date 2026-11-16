@@ -1,0 +1,154 @@
+import type { Express } from 'express'
+import { ApiEndpoint } from '@openforis/arena-server'
+
+import { minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload } from '@common/mobile'
+
+import * as Request from '@server/utils/request'
+import * as Response from '@server/utils/response'
+import * as FileUtils from '@server/utils/file/fileUtils'
+
+import * as Survey from '@core/survey/survey'
+import * as User from '@core/user/user'
+import { Authorizer } from '@openforis/arena-core'
+import * as ProcessUtils from '@core/processUtils'
+import SystemError from '@core/systemError'
+
+import * as Log from '@server/log/log'
+import * as AuthMiddleware from '@server/modules/auth/authApiMiddleware'
+import * as SurveyService from '../../survey/service/surveyService'
+import * as UserService from '../../user/service/userService'
+import * as RecordService from '../../record/service/recordService'
+
+const Logger = Log.getLogger('AuthAPI')
+
+const sendResponse = (res, user, survey = null, error = null) => res.json({ user, survey, error })
+
+/**
+ * Removes the survey from the user prefs and sends the user without survey.
+ * @param {!object} res - The response.
+ * @param {!object} user - The user.
+ * @param {!number} surveyId - ID of the survey to remove from the user prefs.
+ * @returns {Promise<void>} - Resolves when the response has been sent.
+ */
+const deletePrefSurveyAndSendUser = async (res, user, surveyId) => {
+  const _user = User.deletePrefSurvey(surveyId)(user)
+  sendResponse(res, await UserService.updateUserPrefsAndFetchGroups(_user))
+}
+
+const sendUserSurvey = async (res, user, surveyId) => {
+  try {
+    let survey = await SurveyService.fetchSurveyById({ surveyId, draft: false, validate: false })
+    const surveyInfo = Survey.getSurveyInfo(survey)
+    if (!Authorizer.canViewSurvey(user, surveyInfo)) {
+      // the current survey pref can be set to any survey id: treat a survey the user cannot view as not found
+      await deletePrefSurveyAndSendUser(res, user, surveyId)
+      return
+    }
+    if (Authorizer.canEditSurvey(user, surveyInfo)) {
+      survey = await SurveyService.fetchSurveyById({ surveyId, draft: true, validate: true })
+      survey = await SurveyService.fetchAndAssocStorageInfo({ survey })
+    }
+    sendResponse(res, user, survey)
+  } catch (error) {
+    Logger.error(`error loading survey with id ${surveyId}: ${error.toString()}`)
+
+    if (error instanceof SystemError && error.key === 'survey.dataMigrationInProgress') {
+      // Survey data migration still in progress: keep the user's current survey preference untouched,
+      // it's not a case of the survey being missing or inaccessible, just temporarily unavailable.
+      sendResponse(res, user, null, { key: error.key, params: error.params })
+      return
+    }
+
+    // Survey not found (or otherwise inaccessible) with user pref: removing user pref
+    await deletePrefSurveyAndSendUser(res, user, surveyId)
+  }
+}
+
+export const init = (app: Express): void => {
+  app.get('/api/version', async (_req, res, next) => {
+    try {
+      const packageJson = JSON.parse(await FileUtils.readFile('package.json'))
+      const { version } = packageJson
+      res.json({ version, minMobileAppVersionRecordsDownload, minMobileAppVersionRecordsUpload })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/api/changelog', AuthMiddleware.requireAdminPermission, async (_req, res, next) => {
+    try {
+      const content = await FileUtils.readFile('CHANGELOG.md')
+      res.json({ content })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/auth/user', async (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const surveysCount = await UserService.fetchUserSurveysCount(User.getUuid(user))
+      const userWithCounts = { ...user, ...surveysCount }
+      const surveyId = User.getPrefSurveyCurrent(user)
+
+      if (surveyId) {
+        await sendUserSurvey(res, userWithCounts, surveyId)
+      } else {
+        sendResponse(res, userWithCounts)
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.post('/auth/logout', async (req, res, next) => {
+    try {
+      // Before logout checkOut record if there's an opened thread
+      const socketId = Request.getSocketId(req)
+      await RecordService.dissocSocketFromUpdateThread(socketId)
+
+      res.clearCookie('refreshToken', {
+        httpOnly: true,
+        path: ApiEndpoint.auth.tokenRefresh(),
+        sameSite: 'strict',
+        secure: ProcessUtils.isEnvProduction,
+      })
+      Response.sendOk(res)
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  // ===== RESET PASSWORD
+  app.post('/auth/reset-password', async (req, res, next) => {
+    try {
+      const { email } = Request.getParams(req)
+      const serverUrl = Request.getPublicServerUrl(req)
+      // never return the reset token: it is only sent by email
+      const { error } = await UserService.generateResetPasswordUuid(email, serverUrl)
+      res.json({ error })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.get('/auth/reset-password/:uuid', async (req, res, next) => {
+    try {
+      const { uuid } = Request.getParams(req)
+      const user = await UserService.findResetPasswordUserByUuid(uuid)
+      res.json({ user })
+    } catch (error) {
+      next(error)
+    }
+  })
+
+  app.put('/auth/reset-password/:uuid', async (req, res, next) => {
+    try {
+      const { uuid, name, password, title } = Request.getParams(req)
+      await UserService.resetPassword({ uuid, name, password, title })
+      res.json({ result: true })
+    } catch (error) {
+      next(error)
+    }
+  })
+}

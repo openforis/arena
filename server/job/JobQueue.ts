@@ -197,7 +197,7 @@ export class JobQueue {
       if (jobUuid === runningJobUuid) {
         // cancel job thread; actual bookkeeping cleanup happens later via onJobEnd once the
         // thread acknowledges the cancellation
-        await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid) // NOSONAR
+        JobThreadExecutor.cancelActiveJobByUserUuid(userUuid)
       } else {
         // remove queued job from the queue directly
         const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
@@ -238,7 +238,7 @@ export class JobQueue {
     if (jobUuid === runningJobUuid) {
       // cancel job thread; actual bookkeeping cleanup happens later via onJobEnd once the
       // thread acknowledges the cancellation
-      await JobThreadExecutor.cancelActiveJobByUserUuid(userUuid, { canceledByAdmin })
+      JobThreadExecutor.cancelActiveJobByUserUuid(userUuid, { canceledByAdmin })
     } else {
       // remove queued job from the queue directly
       const queueIndex = this._queue.findIndex((jobInfoQueued) => jobInfoQueued.uuid === jobUuid)
@@ -532,7 +532,7 @@ export class JobQueue {
    * @param job - The job to enqueue.
    * @throws Error if only one job per user is already running.
    */
-  enqueue(job: JobInfo): void {
+  enqueue(job: Pick<JobInfo, 'params' | 'status' | 'type' | 'uuid'>): void {
     const { params, status, type, uuid } = job
     const jobInfo: JobInfo = { params, status, type, uuid }
     const { user, surveyId } = params ?? {}
