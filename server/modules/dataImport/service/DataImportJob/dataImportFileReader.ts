@@ -43,13 +43,10 @@ export class DataImportFileReader {
       const extension = FileUtils.getFileExtension(fileNameParam)
       possibleFileNames.push(`${fileUuid}.bin`, `${fileUuid}.${extension}`)
     }
-    for (const fileName of possibleFileNames) {
-      const entryName = [directories.files, fileName].join(pathSeparator)
-      if (this.fileZip.hasEntry(entryName)) {
-        return await this.fileZip.getEntryData(entryName)
-      }
-    }
-    return null
+    const entryName = possibleFileNames
+      .map((fileName) => [directories.files, fileName].join(pathSeparator))
+      .find((name) => this.fileZip.hasEntry(name))
+    return entryName ? await this.fileZip.getEntryData(entryName) : null
   }
 
   close() {
