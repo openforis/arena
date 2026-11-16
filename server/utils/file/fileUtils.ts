@@ -45,7 +45,8 @@ export const readFile = (path: string): Promise<string> => fsp.readFile(path, { 
 
 export const readBinaryFile = (path: string): Promise<Buffer> => fsp.readFile(path)
 
-export const writeFile = (path: string, data: string | Buffer = ''): Promise<void> => fsp.writeFile(path, data)
+export const writeFile = (path: string, data: Parameters<typeof fsp.writeFile>[1] = ''): Promise<void> =>
+  fsp.writeFile(path, data)
 
 export const appendFile = (path: string, data: string | Buffer = ''): Promise<void> => fsp.appendFile(path, data)
 

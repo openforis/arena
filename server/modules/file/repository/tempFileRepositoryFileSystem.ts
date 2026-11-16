@@ -3,12 +3,22 @@ import { endWriteStream, writeStreamAndWaitForEnd } from '@server/utils/ioUtils'
 
 import { getChunkFileName } from '../tempFileUtils'
 
-export const deleteFile = async ({ fileNameOrPath }) => {
+export const deleteFile = async ({ fileNameOrPath }: { fileNameOrPath: any }) => {
   const filePath = fileNameOrPath.startsWith('/') ? fileNameOrPath : FileUtils.tempFilePath(fileNameOrPath)
   await FileUtils.deleteFileAsync(filePath)
 }
 
-export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
+export const writeChunkToTempFile = async ({
+  filePath = null,
+  fileContent = null,
+  fileId,
+  chunk,
+}: {
+  filePath?: string
+  fileContent?: any
+  fileId: string
+  chunk: any
+}) => {
   const destFileName = getChunkFileName({ fileId, chunk })
   const destFilePath = FileUtils.tempFilePath(destFileName)
   if (filePath) {
@@ -20,7 +30,15 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
   }
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
+export const mergeTempChunks = async ({
+  fileId,
+  totalChunks,
+  onChunkMerged = null,
+}: {
+  fileId: string
+  totalChunks: any
+  onChunkMerged?: any
+}) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)
   const writeStream = FileUtils.createWriteStream(finalFilePath)
@@ -39,22 +57,22 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
 }
 
 const pendingImportFilePrefix = 'pendingImport_'
-const getPendingImportFileName = (fileId) => `${pendingImportFilePrefix}${fileId}`
+const getPendingImportFileName = (fileId: string) => `${pendingImportFilePrefix}${fileId}`
 
-export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+export const keepFileForLaterUse = async ({ fileId, filePath }: { fileId: string; filePath: string }) => {
   const destPath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
   await FileUtils.renameFile(filePath, destPath)
 }
 
-export const getKeptFilePath = async ({ fileId }) => {
+export const getKeptFilePath = ({ fileId }: { fileId: string }) => {
   const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
   if (!FileUtils.exists(filePath)) {
-    return null
+    return Promise.resolve(null)
   }
-  return filePath
+  return Promise.resolve(filePath)
 }
 
-export const deletePendingImportFileIfAny = async ({ fileId }) => {
+export const deletePendingImportFileIfAny = async ({ fileId }: { fileId: string }) => {
   const filePath = FileUtils.tempFilePath(getPendingImportFileName(fileId))
   if (FileUtils.exists(filePath)) {
     await FileUtils.deleteFileAsync(filePath)

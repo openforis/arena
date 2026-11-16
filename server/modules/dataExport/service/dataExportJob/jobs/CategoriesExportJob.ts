@@ -11,7 +11,7 @@ import * as CategoryManager from '@server/modules/category/manager/categoryManag
 const categoriesOutputFolderName = 'categories'
 
 export default class CategoriesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('CategoriesExportJob', params)
   }
 

@@ -304,7 +304,7 @@ export const fetchEntitiesFileUuidsByCycle = async ({
   cycle: cycleParam,
   includeDataFromAllCycles,
   filterRecordUuids,
-  callback,
+  callback = null,
 }) => {
   const recordOwnerUuid = _getRecordOwnerUuidForQuery({ user, survey })
 

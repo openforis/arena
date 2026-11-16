@@ -32,7 +32,15 @@ const resultKeys = {
 }
 
 export default class RecordsImportJob extends DataImportBaseJob {
-  constructor(params) {
+  static readonly type = 'RecordsImportJob'
+  mergedRecordsMap: any
+  mergedSameRecordUuids: Set<string>
+  recordsFileUuids: Set<string>
+  uploadedRecordsInfo: any
+  userNamesByUuid: Map<string, string>
+  userQualifierFilters: any
+
+  constructor(params?: any) {
     super(RecordsImportJob.type, params)
 
     this.recordsFileUuids = new Set() // used to check validity of file UUIDs in FilesImportJob
@@ -354,5 +362,3 @@ export default class RecordsImportJob extends DataImportBaseJob {
     return result
   }
 }
-
-RecordsImportJob.type = 'RecordsImportJob'

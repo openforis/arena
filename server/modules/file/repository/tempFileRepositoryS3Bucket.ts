@@ -10,7 +10,7 @@ export { checkCanAccessS3Bucket } from './fileRepositoryS3BucketCommon'
 
 const tempPrefix = 'temp/'
 
-const getTempFileKey = ({ fileUuid }) => `${tempPrefix}${fileUuid}`
+const getTempFileKey = ({ fileUuid }: { fileUuid: string }) => `${tempPrefix}${fileUuid}`
 
 const {
   uploadFileContent,
@@ -23,9 +23,20 @@ const {
   getFileKey: getTempFileKey,
 })
 
-export const deleteFile = async ({ fileNameOrPath }) => deleteFileCommon({ fileUuid: fileNameOrPath })
+export const deleteFile = ({ fileNameOrPath }: { fileNameOrPath: any }) =>
+  deleteFileCommon({ fileUuid: fileNameOrPath })
 
-export const writeChunkToTempFile = async ({ filePath = null, fileContent = null, fileId, chunk }) => {
+export const writeChunkToTempFile = async ({
+  filePath = null,
+  fileContent = null,
+  fileId,
+  chunk,
+}: {
+  filePath?: string
+  fileContent?: any
+  fileId: string
+  chunk: any
+}) => {
   const fileUuid = getChunkFileName({ fileId, chunk })
   if (filePath) {
     const contentStream = FileUtils.createReadStream(filePath)
@@ -38,7 +49,7 @@ export const writeChunkToTempFile = async ({ filePath = null, fileContent = null
   }
 }
 
-const calculateTotalChunksSize = async ({ totalChunks, fileId }) => {
+const calculateTotalChunksSize = async ({ totalChunks, fileId }: { totalChunks: any; fileId: string }) => {
   let totalContentLength = 0
   for (let chunk = 1; chunk <= totalChunks; chunk += 1) {
     const chunkFileName = getChunkFileName({ fileId, chunk })
@@ -51,7 +62,7 @@ const calculateTotalChunksSize = async ({ totalChunks, fileId }) => {
   return totalContentLength
 }
 
-export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
+export const mergeTempChunksToS3 = async ({ fileId, totalChunks }: { fileId: string; totalChunks: any }) => {
   const totalContentLength = await calculateTotalChunksSize({ fileId, totalChunks })
 
   const finalFileName = FileUtils.newTempFileName()
@@ -84,7 +95,15 @@ export const mergeTempChunksToS3 = async ({ fileId, totalChunks }) => {
   }
 }
 
-export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = null }) => {
+export const mergeTempChunks = async ({
+  fileId,
+  totalChunks,
+  onChunkMerged = null,
+}: {
+  fileId: string
+  totalChunks: any
+  onChunkMerged?: any
+}) => {
   const finalFileName = FileUtils.newTempFileName()
   const finalFilePath = FileUtils.tempFilePath(finalFileName)
   const writeStream = FileUtils.createWriteStream(finalFilePath)
@@ -108,7 +127,7 @@ export const mergeTempChunks = async ({ fileId, totalChunks, onChunkMerged = nul
   }
 }
 
-export const deleteOldTempFiles = async ({ olderThanHours }) => {
+export const deleteOldTempFiles = async ({ olderThanHours }: { olderThanHours: any }) => {
   const files = await listFiles({ prefix: tempPrefix })
   const cutoff = new Date(Date.now() - olderThanHours * 60 * 60 * 1000)
   const oldFiles = files.filter((file) => {
@@ -123,9 +142,9 @@ export const deleteOldTempFiles = async ({ olderThanHours }) => {
 }
 
 const pendingImportPrefix = 'pendingImport/'
-const getPendingImportFileKey = ({ fileId }) => `${pendingImportPrefix}${fileId}`
+const getPendingImportFileKey = ({ fileId }: { fileId: string }) => `${pendingImportPrefix}${fileId}`
 
-export const keepFileForLaterUse = async ({ fileId, filePath }) => {
+export const keepFileForLaterUse = async ({ fileId, filePath }: { fileId: string; filePath: string }) => {
   const fileUuid = getPendingImportFileKey({ fileId })
   const contentStream = FileUtils.createReadStream(filePath)
   const contentLength = FileUtils.getFileSize(filePath)
@@ -137,7 +156,7 @@ export const keepFileForLaterUse = async ({ fileId, filePath }) => {
 // pendingImport/<fileId> is left untouched and is only ever removed by the periodic temp-file TTL
 // sweep (deleteOldTempFiles), not by this function or its callers - same lifecycle the local file
 // on the fileSystem backend would have had.
-export const getKeptFilePath = async ({ fileId }) => {
+export const getKeptFilePath = async ({ fileId }: { fileId: string }) => {
   const fileUuid = getPendingImportFileKey({ fileId })
   let size
   try {
@@ -168,7 +187,7 @@ export const getKeptFilePath = async ({ fileId }) => {
   }
 }
 
-export const deletePendingImportFileIfAny = async ({ fileId }) => {
+export const deletePendingImportFileIfAny = async ({ fileId }: { fileId: string }) => {
   const fileUuid = getPendingImportFileKey({ fileId })
   await deleteFile({ fileNameOrPath: fileUuid })
 }

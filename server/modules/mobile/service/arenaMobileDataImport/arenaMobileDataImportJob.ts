@@ -16,6 +16,8 @@ import RecordsImportJob from './jobs/recordsImportJob'
 import * as RecordsUploadNotificationService from '../recordsUploadNotificationService'
 
 export default class ArenaMobileDataImportJob extends Job {
+  static readonly type = 'ArenaMobileDataImportJob'
+
   /**
    * Creates a new data import job to import survey records and files in Arena format.
    * @param {!object} params - The import parameters.
@@ -27,11 +29,11 @@ export default class ArenaMobileDataImportJob extends Job {
    * @param {string} [params.serverUrl] - Public URL of the server, used in the notification emails.
    * @returns {ArenaMobileDataImportJob} - The import job.
    */
-  constructor(params) {
+  constructor(params?: any) {
     super(ArenaMobileDataImportJob.type, params, [
       new PrepareImportFileJob(),
       new ArenaFileReadJob(),
-      new RecordsImportJob(),
+      new RecordsImportJob() as unknown as Job, // DataImportBaseJob (JS) generates the result synchronously
       new FilesImportJob(),
     ])
   }
@@ -60,27 +62,28 @@ export default class ArenaMobileDataImportJob extends Job {
   async beforeSuccess() {
     await super.beforeSuccess()
 
-    const { context, user, updatedRecordsUuids } = this
+    const { context, user } = this
     const { survey } = context
 
     const surveyId = Survey.getId(survey)
 
-    const surveyInfo = Survey.getSurveyInfo(survey)
-    const cycleKeys = Survey.getCycleKeys(surveyInfo)
+    // the updated records are tracked by the records import job
+    const recordsImportJob = this.innerJobs.find(
+      (job) => job instanceof RecordsImportJob
+    ) as unknown as RecordsImportJob
+    const updatedRecordsUuids: Set<string> = recordsImportJob?.updatedRecordsUuids ?? new Set()
 
-    // reload udpated records in update threads
-    cycleKeys.forEach((cycle) => {
-      const thread = RecordsUpdateThreadService.getThread({ surveyId, cycle })
-      if (thread) {
-        updatedRecordsUuids.forEach((recordUuid) => {
-          thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordReload, user, surveyId, recordUuid })
-        })
+    // reload the updated records in the records update thread (one for all surveys and cycles)
+    const thread = RecordsUpdateThreadService.getThread()
+    if (thread) {
+      for (const recordUuid of updatedRecordsUuids) {
+        thread.postMessage({ type: RecordsUpdateThreadMessageTypes.recordReload, user, surveyId, recordUuid })
       }
-    })
+    }
   }
 
   generateResult() {
-    return this.combineInnerJobsResults()
+    return Promise.resolve(this.combineInnerJobsResults())
   }
 
   async onEnd() {
@@ -121,5 +124,3 @@ export default class ArenaMobileDataImportJob extends Job {
     }
   }
 }
-
-ArenaMobileDataImportJob.type = 'ArenaMobileDataImportJob'

@@ -5,7 +5,7 @@ import * as FileUtils from '../../../utils/file/fileUtils'
 
 import * as TempFileManager from '../manager/tempFileManager'
 
-const getFileContentOrPath = (req) => {
+const getFileContentOrPath = (req: any) => {
   const filePath = Request.getFilePath(req)
   if (filePath) {
     return { filePath }
@@ -18,11 +18,25 @@ const getFileContentOrPath = (req) => {
   throw new TypeError('Missing file content or path in request')
 }
 
-const writeChunkIfNeeded = async ({ filePath, fileContent, fileId, chunk, totalChunks, totalFileSize }) => {
+const newBadRequestError = (message: string) => Object.assign(new Error(message), { statusCode: 400 })
+
+const writeChunkIfNeeded = async ({
+  filePath,
+  fileContent,
+  fileId,
+  chunk,
+  totalChunks,
+}: {
+  filePath: string
+  fileContent: any
+  fileId: string
+  chunk: any
+  totalChunks: any
+}) => {
   const isSingleFile = !totalChunks
 
   if (!isSingleFile) {
-    await TempFileManager.writeChunkToTempFile({ filePath, fileContent, fileId, chunk, totalChunks, totalFileSize })
+    await TempFileManager.writeChunkToTempFile({ filePath, fileContent, fileId, chunk })
     if (filePath) {
       await FileUtils.deleteFileAsync(filePath)
     }
@@ -31,7 +45,7 @@ const writeChunkIfNeeded = async ({ filePath, fileContent, fileId, chunk, totalC
   return { isSingleFile }
 }
 
-const getChunkedFileParams = (req) => {
+const getChunkedFileParams = (req: any) => {
   const { fileId = undefined } = Request.getParams(req)
   const { filePath, fileContent } = getFileContentOrPath(req)
 
@@ -46,22 +60,23 @@ const getChunkedFileParams = (req) => {
 
     // fileId is used to name the temp chunk files
     if (typeof fileId !== 'string' || !isUuid(fileId)) {
-      const error = new Error('Invalid fileId for chunked upload')
-      error.statusCode = 400
-      throw error
+      throw newBadRequestError('Invalid fileId for chunked upload')
     }
     if (!isValidPositiveInteger(chunk) || !isValidPositiveInteger(totalChunks)) {
-      const error = new Error('Invalid chunk or totalChunks for chunked upload')
-      error.statusCode = 400
-      throw error
+      throw newBadRequestError('Invalid chunk or totalChunks for chunked upload')
     }
     if (!isValidPositiveInteger(totalFileSize)) {
-      const error = new Error('Invalid totalFileSize for chunked upload')
-      error.statusCode = 400
-      throw error
+      throw newBadRequestError('Invalid totalFileSize for chunked upload')
     }
   }
   return { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize }
+}
+
+export type ChunkedFileUploadResult = {
+  filePath?: string
+  fileId?: string
+  totalChunks?: number
+  totalFileSize?: number
 }
 
 /**
@@ -72,7 +87,11 @@ const getChunkedFileParams = (req) => {
  * @param {object} params.req - The HTTP request.
  * @returns {Promise<{filePath?: string, fileId?: string, totalChunks?: number, totalFileSize?: number}|null>} The file path or chunk metadata when upload is complete; otherwise null.
  */
-export const processChunkedFileForBackgroundMerge = async ({ req }) => {
+export const processChunkedFileForBackgroundMerge = async ({
+  req,
+}: {
+  req: any
+}): Promise<ChunkedFileUploadResult | null> => {
   const { chunk, fileContent, fileId, filePath, totalChunks, totalFileSize } = getChunkedFileParams(req)
 
   const { isSingleFile } = await writeChunkIfNeeded({
@@ -81,7 +100,6 @@ export const processChunkedFileForBackgroundMerge = async ({ req }) => {
     fileId,
     chunk,
     totalChunks,
-    totalFileSize,
   })
 
   const isChunkingComplete = totalChunks && chunk === totalChunks

@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import { ConflictResolutionStrategy } from '@common/dataImport'
 
 import * as JobUtils from '@server/job/jobUtils'
@@ -17,7 +18,7 @@ import * as SurveyMobilePackageService from '../service/surveyMobilePackageServi
 
 const Logger = Log.getLogger('Mobile API')
 
-const fetchSurvey = async ({ surveyId, cycle, draft = false }) =>
+const fetchSurvey = ({ surveyId, cycle, draft = false }: { surveyId: number; cycle: string; draft?: boolean }) =>
   SurveyService.fetchSurveyAndNodeDefsAndRefDataBySurveyId({
     surveyId,
     cycle,
@@ -27,7 +28,7 @@ const fetchSurvey = async ({ surveyId, cycle, draft = false }) =>
     includeBigTaxonomies: true,
   })
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ====== READ - all survey data
   app.get('/mobile/survey/:surveyId', AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {

@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import { Points } from '@openforis/arena-core'
 
 import { Query } from '@common/model/query'
@@ -14,7 +15,15 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as SurveyRdbService from '@server/modules/surveyRdb/service/surveyRdbService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-const generateLocationGeoJson = ({ survey, longitude, latitude }) => {
+const generateLocationGeoJson = ({
+  survey,
+  longitude,
+  latitude,
+}: {
+  survey: ArenaSurvey
+  longitude: any
+  latitude: any
+}) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   if (Survey.isSampleBasedImageInterpretationEnabled(surveyInfo)) {
     const samplingPolygon = Survey.getSamplingPolygon(surveyInfo)
@@ -31,7 +40,15 @@ const generateLocationGeoJson = ({ survey, longitude, latitude }) => {
   }
 }
 
-const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
+const extractKeys = ({
+  survey,
+  ancestorKeyDefs,
+  dataItem,
+}: {
+  survey: ArenaSurvey
+  ancestorKeyDefs: any
+  dataItem: any
+}) =>
   ancestorKeyDefs
     .map((ancestorDef) =>
       DataQueryValueFormatter.formatDataItemKey({ i18n: i18nInstance, survey, nodeDef: ancestorDef, dataItem })
@@ -39,7 +56,9 @@ const extractKeys = ({ survey, ancestorKeyDefs, dataItem }) =>
     .join(' - ')
 
 export class GeoJsonDataExportJob extends Job {
-  constructor(params) {
+  static readonly type = 'GeoJsonDataExportJob'
+
+  constructor(params?: any) {
     super(GeoJsonDataExportJob.type, params)
   }
 
@@ -75,7 +94,7 @@ export class GeoJsonDataExportJob extends Job {
       const pointLatLng = Points.toLatLong(point, srsIndex)
       if (pointLatLng) {
         const { x: longitude, y: latitude } = pointLatLng
-        const feature = generateLocationGeoJson({ survey, ancestorKeyDefs, longitude, latitude })
+        const feature = generateLocationGeoJson({ survey, longitude, latitude })
         const name = extractKeys({ survey, ancestorKeyDefs, dataItem })
         GeoJsonUtils.setFeatureName({ feature, name })
         features.push(feature)
@@ -91,8 +110,6 @@ export class GeoJsonDataExportJob extends Job {
   generateResult() {
     const { context } = this
     const { tempFileName } = context
-    return { tempFileName }
+    return Promise.resolve({ tempFileName })
   }
 }
-
-GeoJsonDataExportJob.type = 'GeoJsonDataExportJob'

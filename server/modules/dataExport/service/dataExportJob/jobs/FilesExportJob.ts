@@ -11,27 +11,24 @@ import * as SurveyFileService from '@server/modules/survey/service/surveyFileSer
 const filesOutputDir = 'files'
 
 export default class FilesExportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('FilesExportJob', params)
   }
 
   async execute() {
     const { survey, cycle, fileNamesByFileUuid, includeDataFromAllCycles, recordUuids } = this.context
 
-    const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle(
-      {
-        user: this.user,
-        survey,
-        cycle,
-        includeDataFromAllCycles,
-        filterRecordUuids: recordUuids,
-      },
-      this.tx
-    )
+    const { fileUuidsByCycle, total } = await SurveyRdbService.fetchEntitiesFileUuidsByCycle({
+      user: this.user,
+      survey,
+      cycle,
+      includeDataFromAllCycles,
+      filterRecordUuids: recordUuids,
+    })
     this.total = total
 
     // write the files in subfolders by cycle
-    for (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle)) {
+    for (const [cycle, fileUuids] of Object.entries(fileUuidsByCycle as Record<string, string[]>)) {
       for (const fileUuid of fileUuids) {
         const exportedFileName = fileNamesByFileUuid[fileUuid]
         if (Objects.isNotEmpty(exportedFileName)) {

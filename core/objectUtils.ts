@@ -66,7 +66,7 @@ export const getExtraProp = (extraPropKey: string) => A.pipe(getExtra, A.propOr(
 
 export const getDate =
   (prop: string) =>
-  (obj: ObjectType): unknown =>
+  (obj: ObjectType): Date | null =>
     A.pipe(A.propOr(null, prop), A.unless(A.isNil, DateUtils.parseISO))(obj)
 export const getDateCreated = getDate(keys.dateCreated)
 export const getDateModified = getDate(keys.dateModified)

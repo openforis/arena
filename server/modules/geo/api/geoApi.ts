@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import axios from 'axios'
 
 import { Objects } from '@openforis/arena-core'
@@ -23,14 +24,14 @@ const elevationApiUrls = [
   ({ lat, lng }) => `https://api.open-elevation.com/api/v1/lookup?locations=${lat},${lng}`,
 ]
 
-const getMapTileForwardUrl = (req) => {
+const getMapTileForwardUrl = (req: any) => {
   const { provider, period, x, y, z, proc } = Request.getParams(req)
   const apiKey = MapUtils.mapApiKeyByProvider[provider]
 
   return MapUtils.getMapTileUrl({ provider, x, y, z, period, apiKey, proc })
 }
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ==== READ
   app.get(`${uriPrefix}srs/find`, AuthMiddleware.requireSurveyViewPermission, async (req, res, next) => {
     try {
@@ -93,8 +94,8 @@ export const init = (app) => {
         if (!Objects.isEmpty(elevation)) {
           break
         }
-      } catch (error) {
-        // ignore it
+      } catch {
+        // elevation service not reachable: try the next one
       }
     }
     res.json(elevation)
@@ -113,7 +114,7 @@ export const init = (app) => {
   app.post(
     `${uriPrefix}whisp/sampling-point-data/start`,
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const user = Request.getUser(req)
         const { surveyId } = Request.getParams(req)
@@ -128,7 +129,7 @@ export const init = (app) => {
   app.post(
     `${uriPrefix}geojsondata/:attributeDefUuid/start-export`,
     AuthMiddleware.requireMapUsePermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const user = Request.getUser(req)
         const { surveyId, cycle, attributeDefUuid } = Request.getParams(req)
@@ -140,7 +141,7 @@ export const init = (app) => {
     }
   )
 
-  app.get(`${uriPrefix}geojsondata/download/:tempFileName`, async (req, res) => {
+  app.get(`${uriPrefix}geojsondata/download/:tempFileName`, (req, res) => {
     const { tempFileName } = Request.getParams(req)
 
     FileUtils.checkIsValidTempFileName(tempFileName)
