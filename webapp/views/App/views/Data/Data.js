@@ -1,12 +1,13 @@
 import { useDispatch } from 'react-redux'
+import { useLocation } from 'react-router'
 
 import * as Survey from '@core/survey/survey'
 import { Authorizer } from '@openforis/arena-core'
 
-import { appModules, dataModules } from '@webapp/app/appModules'
+import { appModuleUri, appModules, dataModules } from '@webapp/app/appModules'
 
 import { useSurveyInfo } from '@webapp/store/survey'
-import { useUser } from '@webapp/store/user'
+import { useAuthCanPreviewDraftFormInDataEntry, useUser } from '@webapp/store/user'
 
 import ModuleSwitch from '@webapp/components/moduleSwitch'
 import SurveyDefsLoader from '@webapp/components/survey/SurveyDefsLoader'
@@ -20,13 +21,19 @@ import Explorer from './Explorer'
 import DataExport from './DataExport'
 import DataImport from './DataImport'
 import { MapView } from './MapView'
+import { FormPreview } from './FormPreview'
 
 const Data = () => {
   const dispatch = useDispatch()
   const user = useUser()
   const surveyInfo = useSurveyInfo()
+  const { pathname } = useLocation()
+  const canPreviewDraftForm = useAuthCanPreviewDraftFormInDataEntry()
+  // the form preview needs the draft survey definitions
+  const formPreview = canPreviewDraftForm && pathname.startsWith(appModuleUri(dataModules.formPreview))
   const draftDefs =
-    (Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo)
+    formPreview ||
+    ((Survey.isFromCollect(surveyInfo) || Survey.isFromOdk(surveyInfo)) && !Survey.isPublished(surveyInfo))
 
   return (
     <SurveyDefsLoader
@@ -75,6 +82,15 @@ const Data = () => {
                 {
                   component: DataExport,
                   path: dataModules.export.path,
+                },
+              ]
+            : []),
+          // Draft form preview
+          ...(canPreviewDraftForm
+            ? [
+                {
+                  component: FormPreview,
+                  path: dataModules.formPreview.path,
                 },
               ]
             : []),

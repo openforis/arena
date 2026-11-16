@@ -391,6 +391,7 @@ Pokušati ponovo?`,
     export: 'Izvoz podataka',
     import: 'Uvoz podataka',
     validationReport: 'Izvještaj o validaciji',
+    formPreview: 'Pregled obrasca',
 
     users: 'Korisnici',
     user: 'Profil korisnika',

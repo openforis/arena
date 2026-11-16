@@ -52,6 +52,8 @@ export const SurveySecurityEditor = (props) => {
     onKeepNonApplicableValuesUpdate = null,
     notifyAdminsOnRecordsUploadFromMobile = false,
     onNotifyAdminsOnRecordsUploadFromMobileUpdate = null,
+    formPreviewForDataEntryUsers = false,
+    onFormPreviewForDataEntryUsersUpdate = null,
   } = props
 
   const security = useMemo(
@@ -108,6 +110,14 @@ export const SurveySecurityEditor = (props) => {
           onChange={onKeepNonApplicableValuesUpdate}
         />
       )}
+      {onFormPreviewForDataEntryUsersUpdate && (
+        <Checkbox
+          checked={Boolean(formPreviewForDataEntryUsers)}
+          info="homeView:surveyInfo.security.formPreviewForDataEntryUsersInfo"
+          label="homeView:surveyInfo.security.formPreviewForDataEntryUsers"
+          onChange={onFormPreviewForDataEntryUsersUpdate}
+        />
+      )}
     </div>
   )
 }
@@ -119,4 +129,6 @@ SurveySecurityEditor.propTypes = {
   onKeepNonApplicableValuesUpdate: PropTypes.func,
   notifyAdminsOnRecordsUploadFromMobile: PropTypes.bool,
   onNotifyAdminsOnRecordsUploadFromMobileUpdate: PropTypes.func,
+  formPreviewForDataEntryUsers: PropTypes.bool,
+  onFormPreviewForDataEntryUsersUpdate: PropTypes.func,
 }

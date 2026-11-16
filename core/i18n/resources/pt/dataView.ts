@@ -129,6 +129,9 @@ A mesclagem não pode ser realizada.`,
     step: 'Etapa',
     updateRecordsStep: 'Atualizar etapa dos registros',
     validateAll: 'Validar tudo',
+    formPreview: 'Visualizar formulário',
+    formPreviewInfo:
+      'Visualizar o formulário rascunho (não publicado): os dados inseridos na visualização não são salvos',
     viewRecord: 'Visualizar registro',
   },
   recordsClone: {

@@ -416,6 +416,7 @@ export default {
     export: 'Экспорт данных',
     import: 'Импорт данных',
     validationReport: 'Отчет о проверке',
+    formPreview: 'Предварительный просмотр формы',
 
     users: 'Пользователи',
     user: 'Профиль пользователя',

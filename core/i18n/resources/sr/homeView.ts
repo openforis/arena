@@ -198,6 +198,9 @@ Kada je označeno, te vrijednosti se zadržavaju u zapisu, čak i ako atributi v
         'Obavesti administratore ankete e-poštom kada se zapisi otpreme iz Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'Kada je označeno, svaki administrator ankete dobija e-poruku sa spiskom zapisa otpremljenih iz Arena Mobile (vrednosti ključeva, autor, datumi, validacija i UUID).',
+      formPreviewForDataEntryUsers: 'Dozvoli korisnicima za unos podataka pregled nacrta (neobjavljenog) obrasca',
+      formPreviewForDataEntryUsersInfo:
+        'Korisnici koji mogu da unose podatke, ali ne mogu da uređuju istraživanje, videće dugme Pregled obrasca u listi zapisa, kako bi testirali obrazac sa poslednjim neobjavljenim izmenama (npr. za testiranje prihvatljivosti). Podaci uneti u pregledu se ne čuvaju.',
       allowRecordsMergeWithSameKeys:
         'Dozvoli spajanje zapisa sa istim ključevima (npr. zapisa kreiranih na različitim Arena Mobile uređajima)',
     },
