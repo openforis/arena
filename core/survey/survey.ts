@@ -31,7 +31,7 @@ type SurveyUpdater = (survey: ArenaSurvey) => ArenaSurvey
 type NewSurveyParams = {
   ownerUuid: string
   name: string
-  languages: string[]
+  languages?: string[]
   label?: string | null
   srs?: Record<string, unknown>[] | null
   published?: boolean
@@ -61,7 +61,7 @@ export const newSurvey = ({
     [SurveyInfo.keys.props]: {
       [SurveyInfo.keys.name]: name,
       [SurveyInfo.keys.languages]: languages,
-      [SurveyInfo.keys.labels]: label ? { [languages[0]]: label } : {},
+      [SurveyInfo.keys.labels]: label ? { [languages?.[0]]: label } : {},
       [SurveyInfo.keys.srs]: srs && srs.length > 0 ? srs : [A.omit([Srs.keys.wkt], Srs.latLonSrs)],
       [SurveyInfo.keys.cycles]: { [SurveyInfo.cycleOneKey]: SurveyCycle.newCycle() },
       ...rest,

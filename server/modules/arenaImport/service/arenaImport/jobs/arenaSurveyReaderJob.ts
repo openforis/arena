@@ -8,7 +8,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Reads the schema from a Arena backup file and saves it into the job context under idmlSource property.
  */
 export default class ArenaSurveyReaderJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ArenaSurveyReaderJob', params)
   }
 

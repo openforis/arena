@@ -20,7 +20,7 @@ const NODES_INSERT_BATCH_SIZE = 10000
  * @param {!object} record - The record object.
  * @returns {object} - The modified record.
  */
-const prepareRecordSummaryToStore = (record) => {
+const prepareRecordSummaryToStore = (record: any) => {
   let maxDateModified = null
   for (const node of Record.getNodesArray(record)) {
     const nodeDateModified = Record.getDateModified(node)
@@ -35,7 +35,9 @@ const prepareRecordSummaryToStore = (record) => {
 }
 
 export default class RecordsImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'RecordsImportJob'
+
+  constructor(params?: any) {
     super(RecordsImportJob.type, params)
   }
 
@@ -50,8 +52,7 @@ export default class RecordsImportJob extends Job {
 
     // use a batch persister to persist nodes in batch
     const nodesBatchPersister = new BatchPersister(
-      async (nodes) =>
-        RecordManager.insertNodesInBatch({ user: this.user, surveyId, nodes, systemActivity: true }, this.tx),
+      (nodes) => RecordManager.insertNodesInBatch({ user: this.user, surveyId, nodes, systemActivity: true }, this.tx),
       NODES_INSERT_BATCH_SIZE
     )
 
@@ -116,5 +117,3 @@ export default class RecordsImportJob extends Job {
     }
   }
 }
-
-RecordsImportJob.type = 'RecordsImportJob'

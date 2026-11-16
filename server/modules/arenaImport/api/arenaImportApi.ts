@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as Survey from '@core/survey/survey'
 
 import * as JobUtils from '@server/job/jobUtils'
@@ -7,7 +8,7 @@ import * as Request from '@server/utils/request'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as ArenaImportService from '../service/arenaImportService'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // CREATE
 
   app.post('/survey/arena-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {

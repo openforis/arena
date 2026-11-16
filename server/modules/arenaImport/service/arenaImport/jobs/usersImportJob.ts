@@ -1,3 +1,6 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
+import type { User as ArenaUser } from '@openforis/arena-core'
 import Job from '@server/job/job'
 import * as AuthGroup from '@core/auth/authGroup'
 import * as User from '@core/user/user'
@@ -11,12 +14,15 @@ import * as UserInvitationsRepository from '@server/modules/user/repository/user
 import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
 import * as DbUtils from '@server/db/dbUtils'
 
-const _associateToGroup = async ({ userUuid, groupName }, client) => {
+const _associateToGroup = async ({ userUuid, groupName }: { userUuid: string; groupName: any }, client: DbClient) => {
   const group = await AuthGroupRepository.fetchGroupByName({ name: groupName }, client)
   await AuthGroupRepository.insertUserGroup({ groupUuid: AuthGroup.getUuid(group), userUuid }, client)
 }
 
-const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userUuid }, client) => {
+const _associateToSurveyGroup = async (
+  { survey, arenaSurvey, user, userUuid }: { survey: ArenaSurvey; arenaSurvey: any; user: ArenaUser; userUuid: string },
+  client: DbClient
+) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyUuid = Survey.getUuid(surveyInfo)
 
@@ -44,11 +50,20 @@ const _associateToSurveyGroup = async ({ survey, arenaSurvey, user, userUuid }, 
 
 // Inserts a new user and associate it to the user group of the specified survey.
 // It returns the newly inserted user or an already existing one, if it has the same uuid or email.
-const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFileZip }, client) => {
+const insertUser = async (
+  {
+    user,
+    surveyId,
+    survey,
+    arenaSurvey,
+    arenaSurveyFileZip,
+  }: { user: ArenaUser; surveyId: number; survey: ArenaSurvey; arenaSurvey: any; arenaSurveyFileZip: any },
+  client: DbClient
+) => {
   let userAlreadyExisting = false
   try {
     userAlreadyExisting = await UserManager.fetchUserByUuid(User.getUuid(user), client)
-  } catch (e) {
+  } catch {
     userAlreadyExisting = false
   }
 
@@ -98,7 +113,15 @@ const insertUser = async ({ user, surveyId, survey, arenaSurvey, arenaSurveyFile
   return userAlreadyExisting || user
 }
 
-const insertInvitations = async ({ survey, arenaSurveyFileZip, user, newUserUuidByOldUuid }, client) => {
+const insertInvitations = async (
+  {
+    survey,
+    arenaSurveyFileZip,
+    user,
+    newUserUuidByOldUuid,
+  }: { survey: ArenaSurvey; arenaSurveyFileZip: any; user: ArenaUser; newUserUuidByOldUuid: Record<string, any> },
+  client: DbClient
+) => {
   const userInvitations = await ArenaSurveyFileZip.getUserInvitations(arenaSurveyFileZip)
   if (userInvitations.length > 0) {
     // exclude invitations with user not in users list (user invited that never accepted the invitation)
@@ -117,14 +140,14 @@ const insertInvitations = async ({ survey, arenaSurveyFileZip, user, newUserUuid
 }
 
 export default class UsersImportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('UsersImportJob', params)
   }
 
   // accounts, passwords and global roles come from the imported file: only system admins can restore them;
   // otherwise records are assigned to the importing user (see RecordsImportJob)
-  async shouldExecute() {
-    return User.isSystemAdmin(this.user)
+  shouldExecute() {
+    return Promise.resolve(User.isSystemAdmin(this.user))
   }
 
   async execute() {
@@ -139,7 +162,7 @@ export default class UsersImportJob extends Job {
 
     const insertedUsers = await DbUtils.runQueries(
       this.tx,
-      users.map((user) => async () => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
+      users.map((user) => () => insertUser({ user, surveyId, survey, arenaSurveyFileZip, arenaSurvey }, this.tx))
     )
     // map of user uuids in the db by user uuid in the zip file being imported (users could be already inserted in the db with a different uuid)
     const newUserUuidByOldUuid = users.reduce(

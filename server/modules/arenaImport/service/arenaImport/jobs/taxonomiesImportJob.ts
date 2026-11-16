@@ -12,7 +12,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Saves the list of inserted taxonomies in the "taxonomies" context property.
  */
 export default class TaxonomiesImportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('TaxonomiesImportJob', params)
   }
 

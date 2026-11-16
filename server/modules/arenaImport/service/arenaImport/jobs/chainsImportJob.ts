@@ -9,7 +9,7 @@ import * as ArenaSurveyFileZip from '../model/arenaSurveyFileZip'
  * Saves the list of inserted chains in the "chains" context property.
  */
 export default class ChainsImportJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('ChainsImportJob', params)
   }
 
