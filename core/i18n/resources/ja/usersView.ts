@@ -87,7 +87,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'ユーザーのバックアップ',
     backupTitle: 'ユーザーのバックアップ',
     backupInfo:
-      'すべてのユーザーが調査でのロールとユーザーグループとともにエクスポートされ、別のArenaサーバーに復元できます。2FAデバイスはエクスポートされません。',
+      'ユーザーは調査でのロールとユーザーグループとともにエクスポートされ、別のArenaサーバーに復元できます。2FAデバイスはエクスポートされません。',
+    exportScope: {
+      all: 'すべてのユーザー',
+      selected: '選択したユーザー（{{count}}）',
+      emails: '次のメールアドレスのユーザー',
+      emailsPlaceholder: '1行に1つのメールアドレス（またはカンマ区切り）',
+    },
     includePasswords: 'パスワードを含める',
     passwordsWarning:
       'バックアップファイルにはパスワードのハッシュが含まれます。安全な場所に保管し、使用後は削除してください。',

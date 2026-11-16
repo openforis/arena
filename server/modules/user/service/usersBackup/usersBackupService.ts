@@ -11,13 +11,19 @@ import { UsersBackupPreview, UsersBackupUserAction } from './usersBackupModel'
 const startExportJob = ({
   user,
   includePasswords = true,
+  emails = null,
   serverUrl,
 }: {
   user: any
   includePasswords?: boolean
+  // when null, all the users are exported
+  emails?: string[] | null
   serverUrl: string
 }) => {
-  const job = new UsersBackupExportJob({ user, includePasswords, serverUrl })
+  if (emails !== null && (!Array.isArray(emails) || emails.some((email) => typeof email !== 'string'))) {
+    throw new Error('Invalid emails parameter')
+  }
+  const job = new UsersBackupExportJob({ user, includePasswords, emails, serverUrl })
   JobManager.enqueueJob(job)
   return JobUtils.jobToJSON(job)
 }

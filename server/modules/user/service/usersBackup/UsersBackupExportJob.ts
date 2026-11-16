@@ -16,7 +16,7 @@ import {
 import { groupByUserUuid } from './usersBackupUtils'
 
 /**
- * Exports all the users (with their survey roles and user groups) into a zip file
+ * Exports all the users (or only the ones with the specified emails) (with their survey roles and user groups) into a zip file
  * that can be imported into another Arena server with UsersBackupImportJob.
  * 2FA devices, sessions, tokens, invitations and preferences are not exported.
  */
@@ -29,10 +29,10 @@ export default class UsersBackupExportJob extends ZipFileCreatorBaseJob {
   }
 
   async execute() {
-    const { archive, user, includePasswords = true, serverUrl } = this.context as any
+    const { archive, user, includePasswords = true, emails = null, serverUrl } = this.context as any
     const { tx } = this
 
-    const users = await UsersBackupRepository.fetchUsersForBackup({ includePasswords }, tx)
+    const users = await UsersBackupRepository.fetchUsersForBackup({ includePasswords, emails }, tx)
     this.total = users.length
 
     const authGroupsByUserUuid = groupByUserUuid(await UsersBackupRepository.fetchAuthGroupMembershipsForBackup(tx))

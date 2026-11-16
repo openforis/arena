@@ -2,10 +2,17 @@ import axios from 'axios'
 
 import { objectToFormData } from '../utils/apiUtils'
 
-export const startUsersBackupExport = async ({ includePasswords }: { includePasswords: boolean }) => {
+// emails: when null, all the users are exported
+export const startUsersBackupExport = async ({
+  includePasswords,
+  emails = null,
+}: {
+  includePasswords: boolean
+  emails?: string[] | null
+}) => {
   const {
     data: { job },
-  } = await axios.post('/api/users/backup/export', { includePasswords })
+  } = await axios.post('/api/users/backup/export', { includePasswords, emails })
   return job
 }
 

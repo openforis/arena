@@ -236,9 +236,9 @@ export const init = (app) => {
   app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
     try {
       const user = Request.getUser(req)
-      const { includePasswords = true } = Request.getParams(req)
+      const { includePasswords = true, emails = null } = Request.getParams(req)
       const serverUrl = Request.getPublicServerUrl(req)
-      const job = UsersBackupService.startExportJob({ user, includePasswords, serverUrl })
+      const job = UsersBackupService.startExportJob({ user, includePasswords, emails, serverUrl })
       res.json({ job })
     } catch (error) {
       next(error)

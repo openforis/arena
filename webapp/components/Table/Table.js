@@ -10,30 +10,36 @@ import Content from './Content'
 import { Footer } from './Footer'
 import { useTable } from './useTable'
 
+// default props as constants: new objects or functions at every render would re-render all the (memoized) rows
+const defaultKeyExtractor = ({ item }) => ObjectUtils.getUuid(item)
+const defaultIsRowExpandable = () => true
+const emptyProps = {}
+
 const Table = (props) => {
   const {
-    cellProps = {},
+    cellProps = emptyProps,
     cellTestIdExtractor = null,
     className = '',
     columns = null,
     expandableRows = false,
     gridTemplateColumns = '1fr',
     headerLeftComponent = DummyComponent,
-    headerProps = {},
+    headerProps = emptyProps,
     isRowActive = null,
-    isRowExpandable = () => true,
+    isRowExpandable = defaultIsRowExpandable,
     isRowOpenable = null,
-    keyExtractor = ({ item }) => ObjectUtils.getUuid(item),
+    keepSelectionOnSearch = false,
+    keyExtractor = defaultKeyExtractor,
     module,
     moduleApiUri = null,
     noItemsLabelKey = 'common.noItems',
     noItemsLabelForSearchKey = 'common.noItems',
     onRowOpen = null,
-    restParams = {},
+    restParams = emptyProps,
     rowHeaderComponent = DummyComponent,
     rowComponent = DummyComponent,
     rowExpandedComponent = DummyComponent,
-    rowProps = {},
+    rowProps = emptyProps,
     selectable = false,
     showFooter = true,
     showHeader = true,
@@ -68,6 +74,7 @@ const Table = (props) => {
     moduleApiUri,
     module,
     restParams,
+    keepSelectionOnSearch,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -158,6 +165,7 @@ Table.propTypes = {
   isRowActive: PropTypes.func, // Checks whether a row must be highlighted
   isRowExpandable: PropTypes.func, // Checks if a row rendering an item can be expanded
   isRowOpenable: PropTypes.func, // Checks if the item of a row can be opened (onRowOpen); rows that cannot be opened do nothing on click
+  keepSelectionOnSearch: PropTypes.bool, // if true, selected items are kept when the search text changes
   keyExtractor: PropTypes.func,
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,

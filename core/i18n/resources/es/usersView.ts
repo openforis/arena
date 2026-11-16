@@ -84,7 +84,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'Copia de seguridad de usuarios',
     backupTitle: 'Copia de seguridad de usuarios',
     backupInfo:
-      'Todos los usuarios se exportarán con sus roles en las encuestas y sus grupos de usuarios, para poder restaurarlos en otro servidor de Arena. Los dispositivos 2FA no se exportan.',
+      'Los usuarios se exportarán con sus roles en las encuestas y sus grupos de usuarios, para poder restaurarlos en otro servidor de Arena. Los dispositivos 2FA no se exportan.',
+    exportScope: {
+      all: 'Todos los usuarios',
+      selected: 'Usuarios seleccionados ({{count}})',
+      emails: 'Usuarios con estos correos electrónicos',
+      emailsPlaceholder: 'Un correo electrónico por línea (o separados por comas)',
+    },
     includePasswords: 'Incluir contraseñas',
     passwordsWarning:
       'El archivo de copia de seguridad contendrá los hashes de las contraseñas: guárdelo en un lugar seguro y elimínelo después de usarlo.',

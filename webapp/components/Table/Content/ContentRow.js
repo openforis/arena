@@ -1,4 +1,5 @@
-import React, { useCallback, useState } from 'react'
+import React, { memo, useCallback, useState } from 'react'
+import PropTypes from 'prop-types'
 import classNames from 'classnames'
 
 import { isEventFromInteractiveChild } from '@webapp/utils/domUtils'
@@ -12,9 +13,11 @@ const isEventFromRowCells = (event) => {
   return !expandedPanel || !event.currentTarget.contains(expandedPanel)
 }
 
-export const ContentRow = (props) => {
+const ContentRowComponent = (props) => {
   const {
+    cellProps,
     cellTestIdExtractor,
+    columns,
     expandableRows,
     gridTemplateColumns,
     index,
@@ -121,6 +124,8 @@ export const ContentRow = (props) => {
         isRowExpandable,
         rowExpanded,
         selected,
+        // props of the default row component (ContentRowCells), used when the table has columns
+        ...(columns ? { cellProps, columns, itemSelected: selected } : {}),
         onItemSelectToggle: toggleSelected,
       })}
       {rowExpanded && (
@@ -129,3 +134,29 @@ export const ContentRow = (props) => {
     </div>
   )
 }
+
+ContentRowComponent.propTypes = {
+  cellProps: PropTypes.object,
+  cellTestIdExtractor: PropTypes.func,
+  columns: PropTypes.array,
+  expandableRows: PropTypes.bool,
+  gridTemplateColumns: PropTypes.string,
+  index: PropTypes.number.isRequired,
+  initData: PropTypes.func,
+  isRowActive: PropTypes.func,
+  isRowExpandable: PropTypes.func,
+  isRowOpenable: PropTypes.func,
+  item: PropTypes.object.isRequired,
+  module: PropTypes.string,
+  offset: PropTypes.number,
+  onItemSelectToggle: PropTypes.func.isRequired,
+  onRowOpen: PropTypes.func,
+  rowComponent: PropTypes.elementType.isRequired,
+  rowExpandedComponent: PropTypes.elementType,
+  rowProps: PropTypes.object,
+  selectable: PropTypes.bool,
+  selected: PropTypes.bool,
+}
+
+// memoized: a change in the table (e.g. a row selected) re-renders only the rows whose props changed
+export const ContentRow = memo(ContentRowComponent)
