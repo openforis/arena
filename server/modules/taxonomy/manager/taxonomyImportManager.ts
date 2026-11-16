@@ -1,3 +1,6 @@
+import type { Taxonomy as ArenaTaxonomy, User as ArenaUser } from '@openforis/arena-core'
+
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
 import BatchPersister from '@server/db/batchPersister'
@@ -11,7 +14,7 @@ import * as TaxonomyManager from './taxonomyManager'
 import { TaxonComparator } from './taxonComparator'
 import SystemError from '@core/systemError'
 
-const createPredefinedTaxa = (taxonomy) => [
+const createPredefinedTaxa = (taxonomy: ArenaTaxonomy) => [
   Taxon.newTaxon({
     taxonomyUuid: Taxonomy.getUuid(taxonomy),
     code: Taxon.unknownCode,
@@ -31,6 +34,21 @@ const createPredefinedTaxa = (taxonomy) => [
 const predefinedCodes = new Set([Taxon.unknownCode, Taxon.unlistedCode])
 
 export default class TaxonomyImportManager {
+  batchPersisterInsert: any
+  batchPersisterUpdate: any
+  existingTaxa: any
+  existingTaxaByCode: any
+  existingTaxaByScientificName: any
+  extraPropsDefs: Record<string, Record<string, unknown>>
+  insertedCodes: any
+  insertedScientificNames: any
+  seenCodes: any
+  surveyId: number
+  taxonomy: ArenaTaxonomy
+  tx: DbClient
+  user: ArenaUser
+  vernacularLanguageCodes: any
+
   constructor({ user, surveyId, taxonomy, vernacularLanguageCodes, extraPropsDefs, tx }) {
     this.user = user
     this.surveyId = surveyId
@@ -39,10 +57,10 @@ export default class TaxonomyImportManager {
     this.extraPropsDefs = extraPropsDefs
     this.tx = tx
 
-    this.batchPersisterInsert = new BatchPersister(async (taxa) =>
+    this.batchPersisterInsert = new BatchPersister((taxa) =>
       TaxonomyManager.insertTaxa({ user: this.user, surveyId: this.surveyId, taxa, client: this.tx })
     )
-    this.batchPersisterUpdate = new BatchPersister(async (items) =>
+    this.batchPersisterUpdate = new BatchPersister((items) =>
       TaxonomyManager.updateTaxa(this.user, this.surveyId, items, this.tx)
     )
     this.insertedCodes = new Set() // Inserted taxa codes

@@ -15,7 +15,7 @@ import * as TaxonomyService from '../service/taxonomyService'
 
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 
-const sendTaxonomies = async (res, surveyId, draft, validate) => {
+const sendTaxonomies = async (res: any, surveyId: number, draft: boolean, validate: any) => {
   const taxonomies = await TaxonomyService.fetchTaxonomiesBySurveyId({ surveyId, draft, validate })
 
   res.json({ taxonomies: ObjectUtils.toUuidIndexedObj(taxonomies) })
@@ -24,7 +24,7 @@ const sendTaxonomies = async (res, surveyId, draft, validate) => {
 // props edited by the taxonomy editor: extra props and vernacular languages are updated through dedicated routes or import
 const taxonomyUpdatablePropKeys = [Taxonomy.keysProps.name, Taxonomy.keysProps.descriptions]
 
-export const init = (app) => {
+export const init = (app: any) => {
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {

@@ -1,3 +1,4 @@
+import type { DbClient } from '@server/db/db'
 import { Schemata } from '../../../../common/model/db'
 
 import * as DB from '../../../db'
@@ -21,7 +22,7 @@ export const getSurveyDBSchema = Schemata.getSchemaSurvey
  * @param client
  * @deprecated - Implement it in survey repository.
  */
-export const markSurveyDraft = async (surveyId, client = db) =>
+export const markSurveyDraft = (surveyId: number, client: DbClient = db) =>
   client.query(
     `UPDATE survey
     SET draft         = true,
@@ -30,7 +31,7 @@ export const markSurveyDraft = async (surveyId, client = db) =>
     [surveyId]
   )
 
-export const publishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
+export const publishSurveySchemaTableProps = (surveyId: number, tableName: string, client: DbClient = db) =>
   client.query(`
     UPDATE
       ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
@@ -39,7 +40,7 @@ export const publishSurveySchemaTableProps = async (surveyId, tableName, client 
       props_draft = '{}'::jsonb
   `)
 
-export const unpublishSurveySchemaTableProps = async (surveyId, tableName, client = db) =>
+export const unpublishSurveySchemaTableProps = (surveyId: number, tableName: string, client: DbClient = db) =>
   client.query(`
     UPDATE
       ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
@@ -48,7 +49,14 @@ export const unpublishSurveySchemaTableProps = async (surveyId, tableName, clien
       props = '{}'::jsonb
   `)
 
-export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUuid, key, value, client = db) =>
+export const updateSurveySchemaTableProp = (
+  surveyId: number,
+  tableName: string,
+  recordUuid: string,
+  key: string,
+  value: unknown,
+  client: DbClient = db
+) =>
   client.one(
     `UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName}
      SET props_draft = props_draft || $1
@@ -58,12 +66,17 @@ export const updateSurveySchemaTableProp = async (surveyId, tableName, recordUui
     (def) => dbTransformCallback(def, true)
   )
 
-export const bulkUpdateSurveySchemaTableProp = async (
-  { surveyId, tableName, updates, draftProps = true },
-  client = db
+export const bulkUpdateSurveySchemaTableProp = (
+  {
+    surveyId,
+    tableName,
+    updates,
+    draftProps = true,
+  }: { surveyId: number; tableName: string; updates: any; draftProps?: any },
+  client: DbClient = db
 ) => {
   if (!updates || updates.length === 0) {
-    return []
+    return Promise.resolve([])
   }
   const schema = Schemata.getSchemaSurvey(surveyId)
 
@@ -104,7 +117,12 @@ export const bulkUpdateSurveySchemaTableProp = async (
   return client.many(query)
 }
 
-export const deleteSurveySchemaTableRecords = async (surveyId, tableName, recordUuids, client = db) =>
+export const deleteSurveySchemaTableRecords = (
+  surveyId: number,
+  tableName: string,
+  recordUuids: string[],
+  client: DbClient = db
+) =>
   client.map(
     `
     DELETE 
@@ -114,12 +132,22 @@ export const deleteSurveySchemaTableRecords = async (surveyId, tableName, record
     (def) => dbTransformCallback(def, true)
   )
 
-export const deleteSurveySchemaTableRecord = async (surveyId, tableName, recordUuid, client = db) => {
+export const deleteSurveySchemaTableRecord = async (
+  surveyId: number,
+  tableName: string,
+  recordUuid: string,
+  client: DbClient = db
+) => {
   const recordsDeleted = await deleteSurveySchemaTableRecords(surveyId, tableName, [recordUuid], client)
   return recordsDeleted[0]
 }
 
-export const deleteSurveySchemaTableProp = async (surveyId, tableName, deletePath, client = db) =>
+export const deleteSurveySchemaTableProp = (
+  surveyId: number,
+  tableName: string,
+  deletePath: string[],
+  client: DbClient = db
+) =>
   client.none(`UPDATE ${Schemata.getSchemaSurvey(surveyId)}.${tableName} SET props = props #- $/deletePath/::text[]`, {
     deletePath,
   })

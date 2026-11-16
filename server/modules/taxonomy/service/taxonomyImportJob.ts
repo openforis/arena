@@ -1,3 +1,5 @@
+import type { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
+
 import * as A from '@core/arena'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -23,10 +25,23 @@ import SystemError from '@core/systemError'
 const requiredColumns = ['code', 'scientific_name']
 const fixedColumns = new Set([...requiredColumns, 'family', 'genus'])
 
-const filterExtraPropsColumns = (columns) =>
+const filterExtraPropsColumns = (columns: any) =>
   columns.filter((column) => !fixedColumns.has(column) && !languageCodesISO639part2.includes(column))
 
 export default class TaxonomyImportJob extends Job {
+  static readonly type = 'TaxonomyImportJob'
+  currentRow: any
+  extraPropsDefs: any
+  fileFormat: string
+  filePath: string
+  flatDataReader: FlatDataReader.FlatDataReader
+  missingPublishedTaxaCodes: any
+  taxonCSVParser: TaxonCSVParser
+  taxonomy: ArenaTaxonomy
+  taxonomyImportManager: TaxonomyImportManager
+  taxonomyUuid: string
+  vernacularLanguageCodes: any
+
   static maxMissingPublishedTaxaCodesPreview = 10
 
   constructor(params) {
@@ -77,8 +92,8 @@ export default class TaxonomyImportJob extends Job {
     this.flatDataReader = FlatDataReader.createReaderFromFile({
       filePath,
       fileFormat,
-      onHeaders: async (headers) => this._onHeaders(headers),
-      onRow: async (row) => this._onRow(row),
+      onHeaders: (headers) => this._onHeaders(headers),
+      onRow: (row) => this._onRow(row),
       onTotalChange: (total) => {
         this.total = total
       },
@@ -249,5 +264,3 @@ export default class TaxonomyImportJob extends Job {
     return valid
   }
 }
-
-TaxonomyImportJob.type = 'TaxonomyImportJob'
