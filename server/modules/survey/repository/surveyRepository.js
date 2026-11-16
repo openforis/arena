@@ -295,6 +295,15 @@ export const fetchSurveyIdsAndAppVersions = async (client = db) =>
 export const fetchSurveyAppVersionById = async (surveyId, client = db) =>
   client.oneOrNone('SELECT app_version FROM survey WHERE id = $1', [surveyId], camelize)
 
+/**
+ * Fetches a survey by id.
+ * @param {object} params - The parameters.
+ * @param {number} params.surveyId - The survey ID.
+ * @param {boolean} [params.draft] - Whether to fetch the draft props.
+ * @param {boolean} [params.backup] - Whether to fetch both draft and published props.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<import('@openforis/arena-core').Survey>} - The survey.
+ */
 export const fetchSurveyById = async ({ surveyId, draft = false, backup = false }, client = db) =>
   client.one(`SELECT ${_getSurveySelectFields()} FROM survey WHERE id = $1`, [surveyId], (def) =>
     DB.transformCallback(def, draft, false, backup)

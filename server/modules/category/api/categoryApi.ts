@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as Request from '@server/utils/request'
 import * as Response from '@server/utils/response'
 
@@ -21,7 +22,7 @@ const categoryUpdatablePropKeys = [
 ]
 const levelUpdatablePropKeys = [CategoryLevel.keysProps.name]
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ==== CREATE
   app.post('/survey/:surveyId/categories', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {
@@ -79,7 +80,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/categories/:categoryUuid/import',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const { surveyId, categoryUuid } = Request.getParams(req)
         const user = Request.getUser(req)
@@ -93,23 +94,19 @@ export const init = (app) => {
     }
   )
 
-  app.post(
-    '/survey/:surveyId/categories/import',
-    AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const user = Request.getUser(req)
-        const { surveyId } = Request.getParams(req)
-        const filePath = Request.getFilePath(req)
+  app.post('/survey/:surveyId/categories/import', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
+    try {
+      const user = Request.getUser(req)
+      const { surveyId } = Request.getParams(req)
+      const filePath = Request.getFilePath(req)
 
-        const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
+      const job = CategoryService.createBatchImportJob({ user, surveyId, filePath })
 
-        res.json({ job })
-      } catch (error) {
-        next(error)
-      }
+      res.json({ job })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   app.post(
     '/survey/:surveyId/categories/:categoryUuid/levels',
@@ -148,21 +145,17 @@ export const init = (app) => {
   )
 
   // categories export (start job)
-  app.post(
-    '/survey/:surveyId/categories/export',
-    AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
-      try {
-        const { surveyId, fileFormat, draft = false } = Request.getParams(req)
-        const user = Request.getUser(req)
+  app.post('/survey/:surveyId/categories/export', AuthMiddleware.requireSurveyEditPermission, (req, res, next) => {
+    try {
+      const { surveyId, fileFormat, draft = false } = Request.getParams(req)
+      const user = Request.getUser(req)
 
-        const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
-        res.json({ job })
-      } catch (error) {
-        next(error)
-      }
+      const job = CategoryService.exportAllCategories({ user, surveyId, fileFormat, draft })
+      res.json({ job })
+    } catch (error) {
+      next(error)
     }
-  )
+  })
 
   // categories export (download generated zip file)
   app.get(
@@ -286,7 +279,7 @@ export const init = (app) => {
   app.post(
     '/survey/:surveyId/categories/:categoryUuid/export/geopackage',
     AuthMiddleware.requireSurveyEditPermission,
-    async (req, res, next) => {
+    (req, res, next) => {
       try {
         const { surveyId, categoryUuid, draft = true } = Request.getParams(req)
         const user = Request.getUser(req)

@@ -1,3 +1,5 @@
+import type { Category as ArenaCategory } from '@openforis/arena-core'
+import type { DbClient } from '@server/db/db'
 import * as A from '@core/arena'
 
 import { Objects, Strings } from '@openforis/arena-core'
@@ -29,7 +31,17 @@ const itemDBTransformCallback =
 
 // ============== CREATE
 
-export const insertCategory = async ({ surveyId, category, backup = false, client = db }) => {
+export const insertCategory = ({
+  surveyId,
+  category,
+  backup = false,
+  client = db,
+}: {
+  surveyId: number
+  category: ArenaCategory
+  backup?: boolean
+  client?: DbClient
+}) => {
   const { props, propsDraft } = Category.getPropsAndPropsDraft({ backup })(category)
   return client.one(
     `
@@ -41,7 +53,17 @@ export const insertCategory = async ({ surveyId, category, backup = false, clien
   )
 }
 
-export const insertLevel = async ({ surveyId, level, backup = false, client = db }) => {
+export const insertLevel = ({
+  surveyId,
+  level,
+  backup = false,
+  client = db,
+}: {
+  surveyId: number
+  level: any
+  backup?: boolean
+  client?: DbClient
+}) => {
   const { props, propsDraft } = CategoryLevel.getPropsAndPropsDraft({ backup })(level)
   return client.one(
     `
@@ -53,7 +75,7 @@ export const insertLevel = async ({ surveyId, level, backup = false, client = db
   )
 }
 
-export const insertItem = async (surveyId, item, client = db) =>
+export const insertItem = (surveyId: number, item: any, client: DbClient = db) =>
   client.one(
     `
         INSERT INTO ${getSurveyDBSchema(surveyId)}.category_item (uuid, level_uuid, parent_uuid, props_draft)
@@ -63,7 +85,10 @@ export const insertItem = async (surveyId, item, client = db) =>
     itemDBTransformCallback()
   )
 
-export const insertItems = async ({ surveyId, items, backup = false }, client = db) => {
+export const insertItems = async (
+  { surveyId, items, backup = false }: { surveyId: number; items: any[]; backup?: boolean },
+  client: DbClient = db
+) => {
   const values = items.map((item) => {
     const { props, propsDraft } = CategoryItem.getPropsAndPropsDraft({ backup })(item)
     return [
@@ -85,7 +110,14 @@ export const insertItems = async ({ surveyId, items, backup = false }, client = 
   )
 }
 
-export const cloneCategoryFromSurvey = async ({ sourceSurveyId, targetSurveyId, categoryUuid }, client = db) => {
+export const cloneCategoryFromSurvey = async (
+  {
+    sourceSurveyId,
+    targetSurveyId,
+    categoryUuid,
+  }: { sourceSurveyId: number; targetSurveyId: number; categoryUuid: string },
+  client: DbClient = db
+) => {
   const sourceSchema = getSurveyDBSchema(sourceSurveyId)
   const targetSchema = getSurveyDBSchema(targetSurveyId)
 
@@ -131,6 +163,14 @@ const _getFetchCategoriesAndLevelsQuery = ({
   offset = null,
   limit = null,
   search = null,
+}: {
+  surveyId: number
+  draft: boolean
+  includeValidation: any
+  backup?: boolean
+  offset?: number
+  limit?: number | null
+  search?: string | null
 }) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
 
@@ -207,7 +247,10 @@ const _getFetchCategoriesAndLevelsQuery = ({
     ${backup || draft ? '' : 'WHERE c.published'}`
 }
 
-export const countCategories = async ({ surveyId, draft = false }, client = db) =>
+export const countCategories = (
+  { surveyId, draft = false }: { surveyId: number; draft?: boolean },
+  client: DbClient = db
+) =>
   client.one(
     `SELECT COUNT(*) 
      FROM ${getSurveyDBSchema(surveyId)}.category
@@ -216,9 +259,23 @@ export const countCategories = async ({ surveyId, draft = false }, client = db) 
     (r) => Number.parseInt(r.count, 10)
   )
 
-export const fetchCategoriesBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, offset = 0, limit = null, search = null },
-  client = db
+export const fetchCategoriesBySurveyId = (
+  {
+    surveyId,
+    draft = false,
+    includeValidation = false,
+    offset = 0,
+    limit = null,
+    search = null,
+  }: {
+    surveyId: number
+    draft?: boolean
+    includeValidation?: any
+    offset?: number
+    limit?: number | null
+    search?: string | null
+  },
+  client: DbClient = db
 ) => {
   const schema = getSurveyDBSchema(surveyId)
   const nameColumn = DbUtils.getPropColCombined(Category.keysProps.name, draft, 'c.')
@@ -246,9 +303,25 @@ export const fetchCategoriesBySurveyId = async (
 }
 
 export const fetchCategoriesAndLevelsBySurveyId = async (
-  { surveyId, draft = false, includeValidation = false, backup = false, offset = 0, limit = null, search = null },
-  client = db
-) => {
+  {
+    surveyId,
+    draft = false,
+    includeValidation = false,
+    backup = false,
+    offset = 0,
+    limit = null,
+    search = null,
+  }: {
+    surveyId: number
+    draft?: boolean
+    includeValidation?: any
+    backup?: boolean
+    offset?: number
+    limit?: number | null
+    search?: string | null
+  },
+  client: DbClient = db
+): Promise<Record<string, ArenaCategory>> => {
   const { categories } = await client.one(
     _getFetchCategoriesAndLevelsQuery({ surveyId, draft, includeValidation, backup, offset, limit, search }),
     {
@@ -261,8 +334,14 @@ export const fetchCategoriesAndLevelsBySurveyId = async (
 }
 
 export const fetchCategoryAndLevelsByUuid = async (
-  { surveyId, categoryUuid, draft = false, includeValidation = false, backup = false },
-  client = db
+  {
+    surveyId,
+    categoryUuid,
+    draft = false,
+    includeValidation = false,
+    backup = false,
+  }: { surveyId: number; categoryUuid: string; draft?: boolean; includeValidation?: any; backup?: boolean },
+  client: DbClient = db
 ) => {
   const { categories } = await client.one(
     `${_getFetchCategoriesAndLevelsQuery({ surveyId, draft: true, includeValidation, backup })} 
@@ -273,8 +352,22 @@ export const fetchCategoryAndLevelsByUuid = async (
 }
 
 export const fetchItemsByCategoryUuid = async (
-  { surveyId, categoryUuid, draft = false, backup = false, limit = null, offset = null },
-  client = db
+  {
+    surveyId,
+    categoryUuid,
+    draft = false,
+    backup = false,
+    limit = null,
+    offset = null,
+  }: {
+    surveyId: number
+    categoryUuid: string
+    draft?: boolean
+    backup?: boolean
+    limit?: number | null
+    offset?: number
+  },
+  client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -296,7 +389,15 @@ export const fetchItemsByCategoryUuid = async (
   return backup || draft ? items : A.filter((item) => item.published)(items)
 }
 
-const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null, tableAlias = 'i' }) => {
+const getWhereConditionItemsWithLevelParentAndCode = ({
+  draft,
+  parentUuid = null,
+  tableAlias = 'i',
+}: {
+  draft: boolean
+  parentUuid?: string
+  tableAlias?: any
+}) => {
   const codeColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, `${tableAlias}.`, true)
   return `${tableAlias}.level_uuid = $/levelUuid/ 
     AND parent_uuid ${parentUuid ? '= $/parentUuid/' : ' IS NULL'} 
@@ -304,8 +405,14 @@ const getWhereConditionItemsWithLevelParentAndCode = ({ draft, parentUuid = null
 }
 
 export const countItemsByLevelParentAndCode = async (
-  { surveyId, levelUuid, parentUuid, code, draft = false },
-  client = db
+  {
+    surveyId,
+    levelUuid,
+    parentUuid,
+    code,
+    draft = false,
+  }: { surveyId: number; levelUuid: string; parentUuid: string; code: string; draft?: boolean },
+  client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const row = await client.one(
@@ -319,8 +426,14 @@ export const countItemsByLevelParentAndCode = async (
 }
 
 export const fetchItemsByLevelParentAndCode = async (
-  { surveyId, levelUuid, parentUuid, code, draft = false },
-  client = db
+  {
+    surveyId,
+    levelUuid,
+    parentUuid,
+    code,
+    draft = false,
+  }: { surveyId: number; levelUuid: string; parentUuid: string; code: string; draft?: boolean },
+  client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexColumn = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -338,7 +451,10 @@ export const fetchItemsByLevelParentAndCode = async (
   return draft ? items : A.filter((item) => item.published)(items)
 }
 
-export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = false }, client = db) => {
+export const fetchItemByUuid = async (
+  { surveyId, uuid, draft = false, backup = false }: { surveyId: number; uuid: any; draft?: boolean; backup?: boolean },
+  client: DbClient = db
+) => {
   const item = await client.oneOrNone(
     `
       SELECT i.*, l.category_uuid
@@ -353,7 +469,7 @@ export const fetchItemByUuid = async ({ surveyId, uuid, draft = false, backup = 
   return item && (backup || draft || item.published) ? item : null
 }
 
-export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
+export const countItemsBySurveyId = ({ surveyId }: { surveyId: number }, client: DbClient = db) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return client.one(
     `SELECT COUNT(*) 
@@ -363,7 +479,7 @@ export const countItemsBySurveyId = async ({ surveyId }, client = db) => {
   )
 }
 
-export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = db) =>
+export const countItemsByCategoryUuid = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.one(
     `SELECT COUNT(*) 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -374,7 +490,10 @@ export const countItemsByCategoryUuid = async (surveyId, categoryUuid, client = 
     (r) => Number.parseInt(r.count, 10)
   )
 
-export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db) =>
+export const countItemsByLevelUuid = (
+  { surveyId, levelUuid }: { surveyId: number; levelUuid: string },
+  client: DbClient = db
+) =>
   client.one(
     `SELECT COUNT(*) 
     FROM ${getSurveyDBSchema(surveyId)}.category_item i
@@ -383,7 +502,15 @@ export const countItemsByLevelUuid = async ({ surveyId, levelUuid }, client = db
     (r) => Number.parseInt(r.count, 10)
   )
 
-const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
+const _getCategoryItemSearchCondition = ({
+  draft,
+  searchValue,
+  lang: _lang,
+}: {
+  draft: boolean
+  searchValue: string | null
+  lang: string
+}) => {
   if (Objects.isEmpty(searchValue)) return ''
   const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
   const labelsCol = DbUtils.getPropColCombined(CategoryItem.keysProps.labels, draft, 'i.', false)
@@ -393,10 +520,24 @@ const _getCategoryItemSearchCondition = ({ draft, searchValue, lang }) => {
   )`
 }
 
-const _getSearchQueryParam = ({ searchValue }) =>
+const _getSearchQueryParam = ({ searchValue }: { searchValue: string | null }) =>
   `%${String(searchValue).toLocaleLowerCase().trim().replaceAll(' ', '%')}%`
 
-const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, lang, limit = Number.NaN }) => {
+const _getSelectItemsByParentId = ({
+  surveyId,
+  parentUuid,
+  draft,
+  searchValue,
+  lang,
+  limit = Number.NaN,
+}: {
+  surveyId: number
+  parentUuid: string
+  draft: boolean
+  searchValue: string | null
+  lang: string
+  limit?: number | null
+}) => {
   const searchValueCondition = _getCategoryItemSearchCondition({ draft, searchValue, lang })
   const schema = Schemata.getSchemaSurvey(surveyId)
   const indexCol = DbUtils.getPropColCombined(CategoryItem.keysProps.index, draft, 'i.', false)
@@ -411,9 +552,23 @@ const _getSelectItemsByParentId = ({ surveyId, parentUuid, draft, searchValue, l
     ${limit ? 'LIMIT $/limit/' : ''}`
 }
 
-export const countItemsByParentUuid = async (
-  { surveyId, categoryUuid, parentUuid = null, draft = false, search: searchValue = null, lang = null },
-  client = db
+export const countItemsByParentUuid = (
+  {
+    surveyId,
+    categoryUuid,
+    parentUuid = null,
+    draft = false,
+    search: searchValue = null,
+    lang = null,
+  }: {
+    surveyId: number
+    categoryUuid: string
+    parentUuid?: string
+    draft?: boolean
+    search?: string | null
+    lang?: string
+  },
+  client: DbClient = db
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang })
@@ -433,8 +588,16 @@ export const fetchItemsByParentUuid = async (
     search: searchValue = null,
     lang = null,
     limit = Number.NaN,
+  }: {
+    surveyId: number
+    categoryUuid: string
+    parentUuid?: string
+    draft?: boolean
+    search?: string | null
+    lang?: string
+    limit?: number | null
   },
-  client = db
+  client: DbClient = db
 ) => {
   const search = _getSearchQueryParam({ searchValue })
   const select = _getSelectItemsByParentId({ surveyId, parentUuid, draft, searchValue, lang, limit })
@@ -446,7 +609,10 @@ export const fetchItemsByParentUuid = async (
   return draft ? items : A.filter((item) => item.published)(items)
 }
 
-export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelIndex }, client = db) => {
+export const countItemsByLevelIndex = (
+  { surveyId, categoryUuid, levelIndex }: { surveyId: number; categoryUuid: string; levelIndex: any },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return client.one(
     `SELECT COUNT(i.*) 
@@ -460,9 +626,23 @@ export const countItemsByLevelIndex = async ({ surveyId, categoryUuid, levelInde
   )
 }
 
-export const fetchItemsByLevelIndex = async (
-  { surveyId, categoryUuid, levelIndex, limit = null, offset = null, draft = false },
-  client = db
+export const fetchItemsByLevelIndex = (
+  {
+    surveyId,
+    categoryUuid,
+    levelIndex,
+    limit = null,
+    offset = null,
+    draft = false,
+  }: {
+    surveyId: number
+    categoryUuid: string
+    levelIndex: any
+    limit?: number | null
+    offset?: number
+    draft?: boolean
+  },
+  client: DbClient = db
 ) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
 
@@ -502,7 +682,10 @@ export const fetchItemsByLevelIndex = async (
   )
 }
 
-export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = false }, client = db) => {
+export const fetchItemsCountIndexedByCategoryUuid = async (
+  { surveyId, draft = false }: { surveyId: number; draft?: boolean },
+  client: DbClient = db
+): Promise<Record<string, number>> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 'i' })
   const whereClause = propsPublishedCondition ? `WHERE ${propsPublishedCondition}` : ''
@@ -520,7 +703,10 @@ export const fetchItemsCountIndexedByCategoryUuid = async ({ surveyId, draft = f
   }, {})
 }
 
-export const fetchChildrenItemsCountByItemUuid = async ({ surveyId, categoryUuid, draft = false }, client = db) => {
+export const fetchChildrenItemsCountByItemUuid = async (
+  { surveyId, categoryUuid, draft = false }: { surveyId: number; categoryUuid: string; draft?: boolean },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const propsPublishedCondition = DbUtils.getPropsPublishedCondition({ draft, tableAlias: 'ci' })
   const whereCondtions = ['cl.category_uuid  = $/categoryUuid/ ']
@@ -541,7 +727,10 @@ export const fetchChildrenItemsCountByItemUuid = async ({ surveyId, categoryUuid
   }, {})
 }
 
-const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) => {
+const fetchCategoryUuidsExceedingMaxItems = async (
+  { surveyId, draft }: { surveyId: number; draft: boolean },
+  client: DbClient
+) => {
   const itemsCountIndexedByCategoryUuid = await fetchItemsCountIndexedByCategoryUuid({ surveyId, draft }, client)
   return Object.entries(itemsCountIndexedByCategoryUuid).reduce((acc, [categoryUuid, count]) => {
     if (count > Category.maxCategoryItemsInIndex) {
@@ -551,7 +740,14 @@ const fetchCategoryUuidsExceedingMaxItems = async ({ surveyId, draft }, client) 
   }, [])
 }
 
-export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories = true }, client = db) => {
+export const fetchIndex = async (
+  {
+    surveyId,
+    draft = false,
+    includeBigCategories = true,
+  }: { surveyId: number; draft?: boolean; includeBigCategories?: any },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const categoryUuidsExceedingMaxItems = includeBigCategories
     ? []
@@ -586,7 +782,16 @@ export const fetchIndex = async ({ surveyId, draft = false, includeBigCategories
 
 export const { codeJointField, cumulativeAreaField, generateCategoryExportStream } = CategoryExportRepository
 
-export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, code, draft = false }, client = db) => {
+export const fetchItemByCode = (
+  {
+    surveyId,
+    categoryUuid,
+    parentItemUuid,
+    code,
+    draft = false,
+  }: { surveyId: number; categoryUuid: string; parentItemUuid: string; code: string; draft?: boolean },
+  client: DbClient = db
+) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   const codeCol = DbUtils.getPropColCombined(CategoryItem.keysProps.code, draft, 'i.')
   return client.oneOrNone(
@@ -602,7 +807,15 @@ export const fetchItemByCode = async ({ surveyId, categoryUuid, parentItemUuid, 
   )
 }
 
-export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths, draft = false }, client = db) => {
+export const fetchItemByCodePaths = async (
+  {
+    surveyId,
+    categoryUuid,
+    codePaths,
+    draft = false,
+  }: { surveyId: number; categoryUuid: string; codePaths: any; draft?: boolean },
+  client: DbClient = db
+) => {
   let currentItem = null
   for (const code of codePaths) {
     const parentItemUuid = currentItem ? CategoryItem.getUuid(currentItem) : null
@@ -616,10 +829,20 @@ export const fetchItemByCodePaths = async ({ surveyId, categoryUuid, codePaths, 
 
 // ============== UPDATE
 
-export const updateCategoryProp = async (surveyId, categoryUuid, key, value, client = db) =>
-  updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
+export const updateCategoryProp = (
+  surveyId: number,
+  categoryUuid: string,
+  key: string,
+  value: unknown,
+  client: DbClient = db
+) => updateSurveySchemaTableProp(surveyId, 'category', categoryUuid, key, value, client)
 
-export const updateCategoryValidation = async (surveyId, categoryUuid, validation, client = db) =>
+export const updateCategoryValidation = (
+  surveyId: number,
+  categoryUuid: string,
+  validation: any,
+  client: DbClient = db
+) =>
   client.none(
     `
       UPDATE ${getSurveyDBSchema(surveyId)}.category 
@@ -629,25 +852,42 @@ export const updateCategoryValidation = async (surveyId, categoryUuid, validatio
     [validation, categoryUuid]
   )
 
-export const markCategoriesPublishedBySurveyId = async (surveyId, client = db) =>
+export const markCategoriesPublishedBySurveyId = (surveyId: number, client: DbClient = db) =>
   client.any(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category
       SET published = true
   `)
 
-export const markCategoriesUnpublishedBySurveyId = async (surveyId, client = db) =>
+export const markCategoriesUnpublishedBySurveyId = (surveyId: number, client: DbClient = db) =>
   client.any(`
       UPDATE ${getSurveyDBSchema(surveyId)}.category
       SET published = false
   `)
 
-export const updateLevelProp = async (surveyId, levelUuid, key, value, client = db) =>
-  updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
+export const updateLevelProp = (
+  surveyId: number,
+  levelUuid: string,
+  key: string,
+  value: unknown,
+  client: DbClient = db
+) => updateSurveySchemaTableProp(surveyId, 'category_level', levelUuid, key, value, client)
 
-export const updateItemProp = async (surveyId, itemUuid, key, value, client = db) =>
-  updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
+export const updateItemProp = (
+  surveyId: number,
+  itemUuid: string,
+  key: string,
+  value: unknown,
+  client: DbClient = db
+) => updateSurveySchemaTableProp(surveyId, 'category_item', itemUuid, key, value, client)
 
-export const updateItemsIndexes = async ({ surveyId, indexByItemUuid, draftProps = true }, client = db) => {
+export const updateItemsIndexes = async (
+  {
+    surveyId,
+    indexByItemUuid,
+    draftProps = true,
+  }: { surveyId: number; indexByItemUuid: Record<string, number>; draftProps?: any },
+  client: DbClient = db
+) => {
   const updates = Object.entries(indexByItemUuid).map(([uuid, index]) => ({
     recordUuid: uuid,
     key: CategoryItem.keysProps.index,
@@ -656,7 +896,10 @@ export const updateItemsIndexes = async ({ surveyId, indexByItemUuid, draftProps
   await bulkUpdateSurveySchemaTableProp({ surveyId, tableName: 'category_item', updates, draftProps }, client)
 }
 
-export const updateItemsProps = async ({ surveyId, items, draftProps = true }, client = db) => {
+export const updateItemsProps = async (
+  { surveyId, items, draftProps = true }: { surveyId: number; items: any[]; draftProps?: any },
+  client: DbClient = db
+) => {
   const values = items.map((item) => [CategoryItem.getUuid(item), CategoryItem.getProps(item)])
   await client.none(
     DbUtils.updateAllQuery(
@@ -676,7 +919,7 @@ export const updateItemsProps = async ({ surveyId, items, draftProps = true }, c
 // server/modules/survey/service/publish/nodeDefExtraPropDependencyUtils.js). Filtered at the DB level
 // so surveys with no pending item extra-value edits (the common case) never pull item data into
 // memory.
-export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, client = db) =>
+export const fetchCategoryItemsWithChangedExtraValues = ({ surveyId }: { surveyId: number }, client: DbClient = db) =>
   client.any(
     `SELECT cl.category_uuid AS "categoryUuid",
             ci.props->'extra' AS "extraPublished",
@@ -689,13 +932,13 @@ export const fetchCategoryItemsWithChangedExtraValues = async ({ surveyId }, cli
 
 // ============== DELETE
 
-export const deleteCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteCategory = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'category', categoryUuid, client)
 
-export const deleteLevel = async (surveyId, levelUuid, client = db) =>
+export const deleteLevel = (surveyId: number, levelUuid: string, client: DbClient = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'category_level', levelUuid, client)
 
-export const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteLevelsByCategory = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.none(
     `
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level 
@@ -704,7 +947,7 @@ export const deleteLevelsByCategory = async (surveyId, categoryUuid, client = db
     [categoryUuid]
   )
 
-export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client = db) =>
+export const deleteLevelsEmptyByCategory = (surveyId: number, categoryUuid: string, client: DbClient = db) =>
   client.map(
     `
       DELETE FROM ${getSurveyDBSchema(surveyId)}.category_level l
@@ -721,11 +964,11 @@ export const deleteLevelsEmptyByCategory = async (surveyId, categoryUuid, client
     A.prop('uuid')
   )
 
-export const deleteItem = async (surveyId, itemUuid, client = db) =>
+export const deleteItem = (surveyId: number, itemUuid: string, client: DbClient = db) =>
   deleteSurveySchemaTableRecord(surveyId, 'category_item', itemUuid, client)
 
-export const deleteItems = async (surveyId, itemUuids, client = db) =>
+export const deleteItems = (surveyId: number, itemUuids: string[], client: DbClient = db) =>
   deleteSurveySchemaTableRecords(surveyId, 'category_item', itemUuids, client)
 
-export const deleteItemLabels = async (surveyId, langCode, client = db) =>
+export const deleteItemLabels = (surveyId: number, langCode: any, client: DbClient = db) =>
   deleteSurveySchemaTableProp(surveyId, 'category_item', ['labels', langCode], client)
