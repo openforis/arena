@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import * as SurveyFile from '@core/survey/surveyFile'
 import * as Validation from '@core/validation/validation'
 import * as Validator from '@core/validation/validator'
@@ -8,7 +9,7 @@ const validate = async ({
 }: {
   preloadedMapLayers: SurveyFile.SurveyFile[]
   preloadedMapLayer: SurveyFile.SurveyFile
-}): Promise<Validation.ValidationInstance> =>
+}): Promise<ArenaValidation> =>
   Validator.validate(preloadedMapLayer, {
     [`${SurveyFile.keys.props}.${SurveyFile.propKeys.name}`]: [
       Validator.validateRequired(Validation.messageKeys.surveyPreloadedMapLayer.fileRequired),

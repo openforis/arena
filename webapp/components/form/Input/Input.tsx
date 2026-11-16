@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import '../form.scss'
 
 import React, { useCallback, useRef } from 'react'
@@ -6,7 +7,6 @@ import classNames from 'classnames'
 import { TextField } from '@mui/material'
 
 import { Objects } from '@openforis/arena-core'
-import type { ValidationInstance } from '@core/validation/validation'
 
 import { useI18n } from '@webapp/store/system'
 import { ButtonIconCancel } from '@webapp/components/buttons'
@@ -45,7 +45,7 @@ type Props = {
   textTransformFunction?: (value: string) => string
   title?: string | number
   type?: 'text' | 'number' | 'password'
-  validation?: ValidationInstance | null
+  validation?: ArenaValidation | null
   value?: string | number
 }
 

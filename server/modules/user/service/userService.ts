@@ -1,4 +1,9 @@
-import type { User as ArenaUser, Survey as ArenaSurvey, Message } from '@openforis/arena-core'
+import type {
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+  Message,
+  Validation as ArenaValidation,
+} from '@openforis/arena-core'
 import * as fs from 'node:fs'
 
 import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
@@ -128,7 +133,7 @@ const _checkUserAccessRequest = async ({ userAccessRequest }: { userAccessReques
 type UserAccessRequestInsertResult = {
   error?: string
   errorParams?: Record<string, unknown>
-  validation?: Validation.ValidationInstance
+  validation?: ArenaValidation
   requestInserted?: any
 }
 
@@ -215,7 +220,7 @@ const _insertOrCloneSurvey = async ({
 }
 
 type UserAccessRequestAcceptResult = {
-  validation?: Validation.ValidationInstance
+  validation?: ArenaValidation
   survey?: any
   userInvited?: ArenaUser
 }

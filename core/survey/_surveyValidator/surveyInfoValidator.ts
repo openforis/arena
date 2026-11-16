@@ -1,4 +1,4 @@
-import type { Survey as ArenaSurvey } from '@openforis/arena-core'
+import type { Survey as ArenaSurvey, Validation as ArenaValidation } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 import { languageCodes } from '@core/app/languages'
@@ -92,7 +92,7 @@ export const validateSurveyImportFromCollect = async ({ newSurvey, surveyInfos }
 export const validateSurveyInfo = async (
   surveyInfo: ArenaSurvey,
   surveyInfos?: SurveyInfoWithId[]
-): Promise<Validation.ValidationInstance> => {
+): Promise<ArenaValidation> => {
   const validation = await Validator.validate(surveyInfo, {
     [`${infoKeys.props}.${infoKeys.languages}`]: languageValidations,
     [`${infoKeys.props}.${infoKeys.name}`]: getSurveyNameValidations({ surveyInfos }),

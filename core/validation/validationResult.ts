@@ -12,14 +12,12 @@ export const keys = {
 
 export type Severity = ValidationSeverity
 
-export type ValidationResultInstance = ValidationResult
-
 export const newInstance = (
   key: string,
   params: Record<string, unknown> | null = null,
   sev: ValidationSeverity | null = null,
   messages: Record<string, string> | null = null
-): ValidationResultInstance => {
+): ValidationResult => {
   const result: ValidationResult = {
     key,
     valid: false,

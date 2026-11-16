@@ -1,9 +1,10 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import { MessagePropsKey } from '@openforis/arena-core'
 
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 
-export const validateMessage = async (message: Record<string, unknown>): Promise<Validation.ValidationInstance> =>
+export const validateMessage = async (message: Record<string, unknown>): Promise<ArenaValidation> =>
   Validator.validate(message, {
     [`props.${MessagePropsKey.subject}`]: [Validator.validateRequired(Validation.messageKeys.message.subjectRequired)],
     [`props.${MessagePropsKey.body}`]: [Validator.validateRequired(Validation.messageKeys.message.bodyRequired)],

@@ -1,5 +1,10 @@
 import { NodeDefExpressionValidator } from '@openforis/arena-core'
-import type { NodeDef as ArenaNodeDef, NodeDefType, Survey as ArenaSurvey } from '@openforis/arena-core'
+import type {
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Survey as ArenaSurvey,
+  Validation as ArenaValidation,
+} from '@openforis/arena-core'
 
 import * as A from '@core/arena'
 
@@ -17,7 +22,7 @@ import * as NodeDefValidationsValidator from './nodeDefValidationsValidator'
 const { keys, keysPropsAdvanced, propKeys } = NodeDef
 
 type AnyNodeDef = ArenaNodeDef<NodeDefType>
-type ValidationOrNull = Validation.ValidationInstance | null
+type ValidationOrNull = ArenaValidation | null
 
 const keysValidationFields = {
   children: 'children',
@@ -266,10 +271,7 @@ const propsValidations = (survey: ArenaSurvey) => ({
   [`${keys.props}.${propKeys.taxonomyUuid}`]: [validateTaxonomy],
 })
 
-const validateAdvancedProps = async (
-  survey: ArenaSurvey,
-  nodeDef: AnyNodeDef
-): Promise<Validation.ValidationInstance> => {
+const validateAdvancedProps = async (survey: ArenaSurvey, nodeDef: AnyNodeDef): Promise<ArenaValidation> => {
   const validatorsByProp: Record<string, Promise<ValidationOrNull>> = {
     [keysPropsAdvanced.defaultValues]: NodeDefExpressionsValidator.validate(
       survey,
@@ -309,7 +311,7 @@ export const validateNodeDef = async (survey: ArenaSurvey, nodeDef: AnyNodeDef):
   return A.pipe(A.mergeDeepLeft(advancedPropsValidation), Validation.setValid(valid))(nodeDefValidation)
 }
 
-export const validateNodeDefs = async (survey: ArenaSurvey): Promise<Validation.ValidationInstance> => {
+export const validateNodeDefs = async (survey: ArenaSurvey): Promise<ArenaValidation> => {
   const nodeDefs = Survey.getNodeDefs(survey)
 
   const nodeDefsValidation: ValidationOrNull[] = []
@@ -318,7 +320,7 @@ export const validateNodeDefs = async (survey: ArenaSurvey): Promise<Validation.
   }
 
   // exclude valid node def validations
-  const fieldsValidation: Record<string, Validation.ValidationInstance> = {}
+  const fieldsValidation: Record<string, ArenaValidation> = {}
   for (const [index, nodeDef] of Object.values(nodeDefs).entries()) {
     const nodeDefValidation = nodeDefsValidation[index]
     if (!Validation.isValid(nodeDefValidation)) {

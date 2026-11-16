@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation, ValidationResult as ArenaValidationResult } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Dates } from '@openforis/arena-core'
@@ -23,7 +24,7 @@ const _validateDateIsBefore = (
   dateStr: string | null,
   dateToCompareStr: string | null,
   errorMessageKey: string
-): ValidationResult.ValidationResultInstance | null => {
+): ArenaValidationResult | null => {
   if (!dateStr || !dateToCompareStr) {
     return null
   }
@@ -76,9 +77,7 @@ const _getCyclesErrorKey = (cycles: Record<string, SurveyCycleType>, cyclesSize:
   return null
 }
 
-export const validateCycles = async (
-  cycles: Record<string, SurveyCycleType>
-): Promise<Validation.ValidationInstance> => {
+export const validateCycles = async (cycles: Record<string, SurveyCycleType>): Promise<ArenaValidation> => {
   const cyclesArray: SurveyCycleType[] = A.values(cycles)
   const cyclesSize = cyclesArray.length
 

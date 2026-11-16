@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import './SurveyDocImageEditor.scss'
 
 import { useCallback, useEffect, useState } from 'react'
@@ -12,7 +13,6 @@ import {
 
 import { SurveyDocImageValidator } from '@core/survey/surveyDocImageValidator'
 import * as SurveyFile from '@core/survey/surveyFile'
-import type { ValidationInstance } from '@core/validation/validation'
 import * as Validation from '@core/validation/validation'
 
 import { Button, ButtonDownload, Dropzone, Modal, ModalBody, ModalFooter, RadioButtonGroup } from '@webapp/components'
@@ -43,7 +43,7 @@ type State = {
   labels: Record<string, string>
   documentPlace: SurveyDocPlace | undefined
   applyIf: string
-  validation: ValidationInstance | null
+  validation: ArenaValidation | null
 }
 
 const SurveyDocImageEditor = (props: Props) => {

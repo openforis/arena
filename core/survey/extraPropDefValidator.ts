@@ -1,3 +1,4 @@
+import type { Validation as ArenaValidation } from '@openforis/arena-core'
 import { ExtraPropDef, ExtraPropDefItem } from '@core/survey/extraPropDef'
 
 import * as ObjectUtils from '@core/objectUtils'
@@ -10,7 +11,7 @@ export const validateExtraPropDef = async ({
 }: {
   extraPropDef: ExtraPropDefItem
   extraPropDefsArray: ExtraPropDefItem[]
-}): Promise<Validation.ValidationInstance> => {
+}): Promise<ArenaValidation> => {
   const extraDefName = ExtraPropDef.getName(extraPropDef)
 
   return Validator.validate(extraPropDef, {
