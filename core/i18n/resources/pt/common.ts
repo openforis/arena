@@ -727,7 +727,7 @@ Para publicar sem atualizar os dados existentes, marque "Pular atualização de 
       mobileNote:
         'Apenas os atributos de imagem da parcela são listados. As equipes de campo veem esta imagem no Arena Mobile depois de baixar o registro no dispositivo.',
       noPlots:
-        'Nenhuma parcela no mapa. Mostre uma camada de localização na aba Camadas para anexar a imagem a um registro de parcela.',
+        'Nenhuma parcela visível no mapa. Para anexar a imagem a um registro de parcela, mostre uma camada de localização na aba Camadas e mova o mapa até uma parcela.',
       noImageAttributes:
         'Esta parcela não tem nenhum atributo de imagem editável que permita capturas de tela (ative "Permitir salvar captura de tela na visualização do mapa" no designer de formulários).',
       previewLoading: 'Preparando a pré-visualização…',

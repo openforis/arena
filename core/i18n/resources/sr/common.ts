@@ -763,7 +763,8 @@ Pokušati ponovo?`,
       fileName: 'Naziv fajla',
       mobileNote:
         'Navedeni su samo atributi slike plohe. Terenski timovi vide ovu sliku u Arena Mobile kada se zapis preuzme na njihov uređaj.',
-      noPlots: 'Na mapi nema ploha. Prikažite sloj lokacija na kartici Slojevi da biste priložili sliku zapisu plohe.',
+      noPlots:
+        'U prikazu mape nema ploha. Da biste priložili sliku zapisu plohe, prikažite sloj lokacija na kartici Slojevi i pomerite mapu do plohe.',
       noImageAttributes:
         'Ova ploha nema atribut slike koji se može uređivati i dozvoljava snimke ekrana (uključite "Dozvoli čuvanje snimka ekrana u prikazu mape" u dizajneru obrazaca).',
       previewLoading: 'Priprema pregleda…',
