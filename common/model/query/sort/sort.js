@@ -22,8 +22,9 @@ export const deleteSortCriteria = (idx) => (sort) => sort.filter((sortCriteria, 
 
 // ====== SQL utils
 // the sort comes from the client: never put its order value into the SQL as it is
+// empty values last in both orders (Postgres puts them first when descending): the top rows are the largest values
 const _getSqlOrder = (sortCriteria) =>
-  String(SortCriteria.getOrder(sortCriteria)).toLowerCase() === SortCriteria.orders.desc ? 'DESC' : 'ASC'
+  String(SortCriteria.getOrder(sortCriteria)).toLowerCase() === SortCriteria.orders.desc ? 'DESC NULLS LAST' : 'ASC'
 
 export const toSql = (sort) =>
   sort.reduce(
