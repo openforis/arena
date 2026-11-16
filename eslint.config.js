@@ -146,7 +146,10 @@ export default [
       // Playwright fixtures receive a `use` callback that is not a React hook
       'react-hooks/rules-of-hooks': 'off',
       // helpers performing assertions
-      'playwright/expect-expect': ['warn', { assertFunctionNames: ['expectReportMessages', 'publishSurvey'] }],
+      'playwright/expect-expect': [
+        'warn',
+        { assertFunctionNames: ['expectReportMessages', 'publishSurvey', 'validateAndImport'] },
+      ],
     },
   },
 
