@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Objects, PointFactory, Points, SystemError } from '@openforis/arena-core'
@@ -11,7 +12,7 @@ import { ExtraPropDef } from '@core/survey/extraPropDef'
 
 import * as FlatDataReader from '@server/utils/file/flatDataReader'
 
-const _checkSrs = ({ survey, srs, columnName }) => {
+const _checkSrs = ({ survey, srs, columnName }: { survey: ArenaSurvey; srs: any; columnName: any }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveySrss = Survey.getSRS(surveyInfo)
   if (!surveySrss.some((surveySrs) => Srs.getCode(surveySrs) === srs)) {
@@ -19,7 +20,7 @@ const _checkSrs = ({ survey, srs, columnName }) => {
   }
 }
 
-const _getItemValue = ({ survey, item, row }) => {
+const _getItemValue = ({ survey, item, row }: { survey: ArenaSurvey; item: any; row: any }) => {
   // single column
   const itemColumns = CategoryImportSummary.getItemColumns(item)
   if (itemColumns.length === 1) {
@@ -56,7 +57,19 @@ const _getItemValue = ({ survey, item, row }) => {
   return null
 }
 
-export const createRowsReaderFromStream = async ({ stream, survey, summary, onRowItem, onTotalChange }) => {
+export const createRowsReaderFromStream = ({
+  stream,
+  survey,
+  summary,
+  onRowItem,
+  onTotalChange,
+}: {
+  stream: any
+  survey: ArenaSurvey
+  summary: any
+  onRowItem: any
+  onTotalChange: any
+}) => {
   const fileFormat = CategoryImportSummary.getFileFormat(summary)
   const items = CategoryImportSummary.getItems(summary)
 

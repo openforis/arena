@@ -1,3 +1,4 @@
+import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Points } from '@openforis/arena-core'
@@ -28,22 +29,30 @@ const validateNotEmptyFirstLevelItems =
       ? { key: Validation.messageKeys.categoryEdit.itemsEmpty }
       : null
 
-const levelValidators = ({ levels, itemsCache, bigCategory }) => ({
+const levelValidators = ({ levels, itemsCache, bigCategory }: { levels: any; itemsCache: any; bigCategory: any }) => ({
   [`${CategoryLevel.keys.props}.${CategoryLevel.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateName(Validation.messageKeys.nameInvalid),
     Validator.validateNotKeyword(Validation.messageKeys.nameCannotBeKeyword),
     Validator.validateItemPropUniqueness(Validation.messageKeys.categoryEdit.levelDuplicate)(levels),
   ],
-  ...(!bigCategory ? { [keys.items]: [validateNotEmptyFirstLevelItems({ itemsCache, bigCategory })] } : {}),
+  ...(!bigCategory ? { [keys.items]: [validateNotEmptyFirstLevelItems({ itemsCache })] } : {}),
 })
 
 const validateLevel =
   ({ levels, itemsCache, bigCategory }) =>
-  async (level) =>
+  (level) =>
     Validator.validate(level, levelValidators({ levels, itemsCache, bigCategory }))
 
-const validateLevels = async ({ category, itemsCache, bigCategory }) => {
+const validateLevels = async ({
+  category,
+  itemsCache,
+  bigCategory,
+}: {
+  category: ArenaCategory
+  itemsCache: any
+  bigCategory: any
+}) => {
   const levels = Category.getLevelsArray(category)
 
   const validations = await Promise.all(levels.map(validateLevel({ levels, itemsCache, bigCategory })))
@@ -52,20 +61,24 @@ const validateLevels = async ({ category, itemsCache, bigCategory }) => {
 
   return valid
     ? null
-    : Validation.newInstance(false, { ...validations }, [{ key: Validation.messageKeys.categoryEdit.levelsInvalid }])
+    : Validation.newInstance(
+        false,
+        Object.fromEntries(validations.map((validation, index) => [String(index), validation])),
+        [ValidationResult.newInstance(Validation.messageKeys.categoryEdit.levelsInvalid)]
+      )
 }
 
 // ====== ITEMS
 
-const codeToKey = (code) => (code ?? '').toLocaleLowerCase()
+const codeToKey = (code: string) => (code ?? '').toLocaleLowerCase()
 
-const groupItemsByParentAndCode = (items) =>
+const groupItemsByParentAndCode = (items: any[]) =>
   ObjectUtils.groupByProps(CategoryItem.getParentUuid, (item) => codeToKey(CategoryItem.getCode(item)))(items)
 
-const getSiblingItems = ({ itemsByParentAndCode, item }) =>
+const getSiblingItems = ({ itemsByParentAndCode, item }: { itemsByParentAndCode: any; item: any }) =>
   A.path([CategoryItem.getParentUuid(item), codeToKey(CategoryItem.getCode(item))])(itemsByParentAndCode)
 
-const validateItemCodeUniqueness = (itemsByParentAndCode) => (_propName, item) => {
+const validateItemCodeUniqueness = (itemsByParentAndCode: any) => (_propName, item) => {
   const siblingItems = getSiblingItems({ itemsByParentAndCode, item })
   const isUnique = siblingItems?.length === 1
   return isUnique ? null : { key: Validation.messageKeys.categoryEdit.codeDuplicate }
@@ -78,7 +91,15 @@ const validateNotEmptyChildrenItems =
       ? { key: Validation.messageKeys.categoryEdit.childrenEmpty, severity: ValidationResult.severity.warning }
       : null
 
-const itemValidators = ({ isLeaf, itemsByParentAndCode, childrenCount = 0 }) => ({
+const itemValidators = ({
+  isLeaf,
+  itemsByParentAndCode,
+  childrenCount = 0,
+}: {
+  isLeaf: any
+  itemsByParentAndCode: any
+  childrenCount?: any
+}) => ({
   [`${CategoryItem.keys.props}.${CategoryItem.keysProps.code}`]: [
     Validator.validateRequired(Validation.messageKeys.categoryEdit.codeRequired),
     Validator.validateNotKeyword(Validation.messageKeys.categoryEdit.codeCannotBeKeyword),
@@ -130,12 +151,32 @@ const _validateItemExtraProps =
       : validation
   }
 
-const validateAllItems = async ({ survey, category, itemsCache, onProgress = null, stopIfFn = null }) => {
+const validateAllItems = ({
+  survey,
+  category,
+  itemsCache,
+  onProgress = null,
+  stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  category: ArenaCategory
+  itemsCache: any
+  onProgress?: any
+  stopIfFn?: any
+}) => {
   const itemsToValidate = itemsCache.getFirstLevelItems()
   return validateItemsAndDescendants({ survey, category, itemsCache, itemsToValidate, onProgress, stopIfFn })
 }
 
-const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validation }) => {
+const _addChildrenValidation = ({
+  itemsValidationsByUuid,
+  itemChildren,
+  validation,
+}: {
+  itemsValidationsByUuid: Record<string, any>
+  itemChildren: any
+  validation: any
+}) => {
   const childrenValid = A.all((itemChild) =>
     Validation.isValid(itemsValidationsByUuid[CategoryItem.getUuid(itemChild)])
   )(itemChildren)
@@ -145,7 +186,7 @@ const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validati
       const childValidation = itemsValidationsByUuid[CategoryItem.getUuid(itemChild)]
       return Validation.isError(childValidation)
     })
-    const validationResult = { key: Validation.messageKeys.categoryEdit.childrenInvalid }
+    const validationResult = ValidationResult.newInstance(Validation.messageKeys.categoryEdit.childrenInvalid)
     validation = A.pipe(
       A.defaultTo(Validation.newInstance()),
       Validation.setValid(false),
@@ -155,8 +196,16 @@ const _addChildrenValidation = ({ itemsValidationsByUuid, itemChildren, validati
   return validation
 }
 
-const _createItemsInvalidValidationResult = ({ errorsFound, warningsFound, itemsValidationsByUuid }) => {
-  const validationResult = { key: Validation.messageKeys.categoryEdit.itemsInvalid }
+const _createItemsInvalidValidationResult = ({
+  errorsFound,
+  warningsFound,
+  itemsValidationsByUuid,
+}: {
+  errorsFound: any
+  warningsFound: any
+  itemsValidationsByUuid: Record<string, any>
+}) => {
+  const validationResult = ValidationResult.newInstance(Validation.messageKeys.categoryEdit.itemsInvalid)
   const errors = errorsFound ? [validationResult] : []
   const warnings = warningsFound ? [validationResult] : []
   const valid = !errorsFound && !warningsFound
@@ -170,6 +219,13 @@ const validateItemsAndDescendants = async ({
   itemsToValidate,
   onProgress = null,
   stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  category: ArenaCategory
+  itemsCache: any
+  itemsToValidate: any
+  onProgress?: any
+  stopIfFn?: any
 }) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const srsIndex = Survey.getSRSIndex(surveyInfo)
@@ -253,7 +309,7 @@ const validateItemsAndDescendants = async ({
 
 // ====== CATEGORY
 
-const categoryValidators = (categories) => ({
+const categoryValidators = (categories: ArenaCategory[]) => ({
   [`${Category.keys.props}.${Category.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateName(Validation.messageKeys.nameInvalid),
@@ -262,7 +318,7 @@ const categoryValidators = (categories) => ({
   ],
 })
 
-const validateCategoryProps = async (categories, category) =>
+const validateCategoryProps = (categories: ArenaCategory[], category: ArenaCategory) =>
   Validator.validate(category, categoryValidators(categories))
 
 export const validateCategory = async ({
@@ -275,6 +331,16 @@ export const validateCategory = async ({
   validateItems: _validateItems = true,
   onProgress = null,
   stopIfFn = null,
+}: {
+  survey: ArenaSurvey
+  categories: ArenaCategory[]
+  category: ArenaCategory
+  items: any[]
+  bigCategory?: any
+  validateLevels?: any
+  validateItems?: any
+  onProgress?: any
+  stopIfFn?: any
 }) => {
   const itemsCache = !bigCategory && items && (_validateLevels || _validateItems) ? new ItemsCache(items) : null
   const categoryValidation = await validateCategoryProps(categories, category)
@@ -302,7 +368,15 @@ export const validateCategory = async ({
   )(categoryValidation)
 }
 
-export const validateItems = async ({ category, itemsToValidate, itemsCountByItemUuid }) => {
+export const validateItems = async ({
+  category,
+  itemsToValidate,
+  itemsCountByItemUuid,
+}: {
+  category: ArenaCategory
+  itemsToValidate: any
+  itemsCountByItemUuid: Record<string, number>
+}) => {
   const prevValidation = Category.getValidation(category)
   const itemsByParentAndCode = groupItemsByParentAndCode(itemsToValidate)
   const prevItemsValidation = Validation.getFieldValidation(keys.items)(prevValidation)
@@ -327,6 +401,10 @@ export const validateItems = async ({ category, itemsToValidate, itemsCountByIte
 }
 
 class ItemsCache {
+  items: any[]
+  itemsByParentUuid: Record<string, any>
+  itemsByUuid: Record<string, any>
+
   constructor(items) {
     this.items = items
     this.itemsByParentUuid = {}
