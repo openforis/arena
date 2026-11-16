@@ -192,6 +192,11 @@ export const dataModules = {
     key: 'validationReport',
     path: 'validationReport',
   },
+  // preview of the draft form for users who cannot access the form designer
+  formPreview: {
+    key: 'formPreview',
+    path: 'formPreview',
+  },
 }
 
 export const userModules = {

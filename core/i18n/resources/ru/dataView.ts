@@ -131,6 +131,8 @@ export default {
     step: 'Шаг',
     updateRecordsStep: 'Обновить шаг записей',
     validateAll: 'Проверить всё',
+    formPreview: 'Предварительный просмотр формы',
+    formPreviewInfo: 'Предварительный просмотр черновика (неопубликованной) формы: введенные данные не сохраняются',
     viewRecord: 'Просмотреть запись',
   },
   recordsClone: {
