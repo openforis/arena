@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
 import * as A from '@core/arena'
 import * as StringUtils from '@core/stringUtils'
 
@@ -33,8 +34,7 @@ const operandConverterByNodeDefType = {
     // convert constant date values to Arena format
     const match = collectConstantDateValueRegExp.exec(String(collectOperand).trim())
     if (match) {
-      // eslint-disable-next-line no-unused-vars
-      const [_, year, month, day] = match
+      const [, year, month, day] = match
       return JSON.stringify(`${year}-${month}-${day}`)
     }
     return collectOperand
@@ -43,15 +43,14 @@ const operandConverterByNodeDefType = {
     // convert constant time values to Arena format
     const match = collectConstantTimeValueRegExp.exec(String(collectOperand).trim())
     if (match) {
-      // eslint-disable-next-line no-unused-vars
-      const [_, minute, second] = match
+      const [, minute, second] = match
       return JSON.stringify(`${minute}:${second}`)
     }
     return collectOperand
   },
 }
 
-const checkExpressionParserByType = {
+const checkExpressionParserByType: Record<string, (params: { collectCheck: any; nodeDef: any }) => string | null> = {
   [collectCheckType.compare]: ({ collectCheck, nodeDef }) => {
     const attributes = CollectSurvey.getAttributes(collectCheck)
     const exprParts = Object.entries(attributes).reduce((accParts, [collectOperator, collectRightOperand]) => {
@@ -86,7 +85,15 @@ const checkExpressionParserByType = {
   },
 }
 
-const isUniqueCheckConvertible = ({ survey, collectValidationRule, nodeDefCurrent }) => {
+const isUniqueCheckConvertible = ({
+  survey,
+  collectValidationRule,
+  nodeDefCurrent,
+}: {
+  survey: ArenaSurvey
+  collectValidationRule: any
+  nodeDefCurrent: any
+}) => {
   const { expr } = CollectSurvey.getAttributes(collectValidationRule)
   const nodeDefName = NodeDef.getName(nodeDefCurrent)
   const nodeDefParent = Survey.getNodeDefParent(nodeDefCurrent)(survey)
@@ -114,17 +121,29 @@ const checkExpressionConverterByType = {
         : null,
     }
   },
-  [collectCheckType.pattern]: async ({ collectExpr }) => {
+  [collectCheckType.pattern]: ({ collectExpr }) => {
     const regexDelimited = `${A.pipe(StringUtils.prependIfMissing('^'), StringUtils.appendIfMissing('$'))(collectExpr)}`
     return { exprConverted: `/${regexDelimited}/.test(this)\n` }
   },
   // uniqueness expressions are converted only in simple cases, otherwise they must be converted "manually"
-  [collectCheckType.unique]: async ({ survey, collectValidationRule, nodeDefCurrent }) => ({
+  [collectCheckType.unique]: ({ survey, collectValidationRule, nodeDefCurrent }) => ({
     unique: isUniqueCheckConvertible({ survey, collectValidationRule, nodeDefCurrent }),
   }),
 }
 
-const convertCheckExpression = async ({ survey, checkType, collectValidationRule, collectExpr, nodeDefCurrent }) => {
+const convertCheckExpression = async ({
+  survey,
+  checkType,
+  collectValidationRule,
+  collectExpr,
+  nodeDefCurrent,
+}: {
+  survey: ArenaSurvey
+  checkType: any
+  collectValidationRule: any
+  collectExpr: any
+  nodeDefCurrent: any
+}): Promise<{ exprConverted?: string | null; unique?: boolean }> => {
   const converter = checkExpressionConverterByType[checkType]
   if (converter) {
     return converter({ survey, collectValidationRule, collectExpr, nodeDefCurrent })
@@ -134,7 +153,17 @@ const convertCheckExpression = async ({ survey, checkType, collectValidationRule
   }
 }
 
-const parseValidationRule = async ({ survey, collectValidationRule, nodeDef: nodeDefCurrent, defaultLanguage }) => {
+const parseValidationRule = async ({
+  survey,
+  collectValidationRule,
+  nodeDef: nodeDefCurrent,
+  defaultLanguage,
+}: {
+  survey: ArenaSurvey
+  collectValidationRule: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  defaultLanguage: any
+}) => {
   const checkType = CollectSurvey.getElementName(collectValidationRule)
   const checkExpressionParser = checkExpressionParserByType[checkType]
   if (!checkExpressionParser) {
@@ -200,7 +229,17 @@ const parseValidationRule = async ({ survey, collectValidationRule, nodeDef: nod
   }
 }
 
-export const parseValidationRules = async ({ survey, nodeDef, collectValidationRules, defaultLanguage }) => {
+export const parseValidationRules = async ({
+  survey,
+  nodeDef,
+  collectValidationRules,
+  defaultLanguage,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  collectValidationRules: any
+  defaultLanguage: any
+}) => {
   const validationRules = []
   const importIssues = []
   let unique = false

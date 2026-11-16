@@ -7,7 +7,9 @@ import CollectSurveyReaderJob from './metaImportJobs/collectSurveyReaderJob'
 import RecordsImportJob from './dataImportJobs/recordsImportJob'
 
 export default class CollectDataImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'CollectDataImportJob'
+
+  constructor(params?: any) {
     super(CollectDataImportJob.type, params, [
       new CollectSurveyReaderJob(),
       new RecordsImportJob(),
@@ -23,5 +25,3 @@ export default class CollectDataImportJob extends Job {
     this.setResult({ insertedRecords })
   }
 }
-
-CollectDataImportJob.type = 'CollectDataImportJob'

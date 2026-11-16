@@ -4,7 +4,7 @@ import { PointFactory, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDefItems } from '@core/survey/extraPropDef'
 import * as CollectImportJobContext from '../collectImportJobContext'
 
 import * as CategoryManager from '../../../../category/manager/categoryManager'
@@ -25,7 +25,7 @@ const keysItem = {
 const samplingPointDataZipEntryPath = 'sampling_design/sampling_design.csv'
 
 class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
-  constructor(params) {
+  constructor(params?: any) {
     super(
       {
         ...params,
@@ -35,14 +35,14 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
     )
   }
 
-  async logCategoryImportActivity() {
+  logCategoryImportActivity() {
     // Do not log category import activity for sampling point data category
-    return this // avoids eslint complain
+    return Promise.resolve()
   }
 
-  async shouldExecute() {
+  shouldExecute() {
     // Skip import if summary is not specified (csv file not found)
-    return Boolean(this.summary)
+    return Promise.resolve(Boolean(this.summary))
   }
 
   async beforeSuccess() {
@@ -56,7 +56,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
   }
 
   // Start of overridden methods from CategoryImportJob
-  async createReadStream() {
+  createReadStream() {
     const collectSurveyFileZip = CollectImportJobContext.getCollectSurveyFileZip(this.context)
     return collectSurveyFileZip.getEntryStream(samplingPointDataZipEntryPath)
   }
@@ -78,7 +78,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
 
   extractItemExtraDef() {
     const itemExtraDef = super.extractItemExtraDef()
-    const itemExtraDefUpdated = Object.entries(itemExtraDef).reduce((acc, [key, extraDef]) => {
+    const itemExtraDefUpdated = Object.entries(itemExtraDef).reduce((acc: ExtraPropDefItems, [key, extraDef]) => {
       if (!Object.keys(keysExtra).includes(key)) {
         acc[key] = { ...extraDef, [ExtraPropDef.keys.index]: Object.values(acc).length }
       }
@@ -126,7 +126,7 @@ class SamplingPointDataImportInternalJob extends CategoryImportInternalJob {
 }
 
 export default class SamplingPointDataImportJob extends CategoryImportJob {
-  constructor(params) {
+  constructor(params?: any) {
     super(params, 'SamplingPointDataImportJob', SamplingPointDataImportInternalJob)
   }
 }

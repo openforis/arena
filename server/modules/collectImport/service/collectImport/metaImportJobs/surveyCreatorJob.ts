@@ -18,7 +18,7 @@ import * as SrsManager from '../../../../geo/manager/srsManager'
 import * as CollectSurvey from '../model/collectSurvey'
 
 export default class SurveyCreatorJob extends Job {
-  constructor(params) {
+  constructor(params?: any) {
     super('SurveyCreatorJob', params)
   }
 

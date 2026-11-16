@@ -1,3 +1,4 @@
+import type { Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as Expression from '@core/expressionParser/expression'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
@@ -13,7 +14,17 @@ import * as NodeDefExpressionValidator from '@core/survey/nodeDefExpressionValid
  * @param {boolean} [params.advancedExpressionEditor] - The generated expression will be ready for the 'advanced' expression editor.
  * @returns {Promise<string>} - The converted expression or null if the conversion is not possible.
  */
-const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionEditor = true }) => {
+const convert = async ({
+  survey,
+  nodeDefCurrent,
+  expression,
+  advancedExpressionEditor = true,
+}: {
+  survey: ArenaSurvey
+  nodeDefCurrent: any
+  expression: any
+  advancedExpressionEditor?: any
+}) => {
   const itemsToReplace = [
     // operators
     { pattern: '\n', replace: ' ' }, // replace carriage return with space

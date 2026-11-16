@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import { FileFormats } from '@core/fileFormats'
 import * as Survey from '@core/survey/survey'
 import * as Validation from '@core/validation/validation'
@@ -15,7 +16,7 @@ import * as Response from '@server/utils/response'
 import * as AuthMiddleware from '../../auth/authApiMiddleware'
 import * as CollectImportService from '../service/collectImportService'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // CREATE
 
   app.post('/survey/collect-import', AuthMiddleware.requireSurveyCreatePermission, async (req, res, next) => {
@@ -77,7 +78,7 @@ export const init = (app) => {
         const surveyInfo = Survey.getSurveyInfo(survey)
         const messageLangCode = Survey.getDefaultLanguage(surveyInfo)
 
-        const reportItemsQueryStream = await CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
+        const reportItemsQueryStream = CollectImportService.fetchReportItemsStream({ surveyId, messageLangCode })
 
         const fields = ['id', 'node_def_uuid', 'node_def_name', 'type', 'expression', 'apply_if', 'message', 'resolved']
 
@@ -91,7 +92,7 @@ export const init = (app) => {
 
         await DbUtils.stream({
           queryStream: reportItemsQueryStream,
-          processor: async (dbStream) =>
+          processor: (dbStream) =>
             FlatDataWriter.writeItemsStreamToStream({ stream: dbStream, outputStream: res, fields, fileFormat }),
         })
       } catch (error) {

@@ -1,3 +1,4 @@
+import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { Authorizer, Queue } from '@openforis/arena-core'
 
 import * as A from '@core/arena'
@@ -29,7 +30,19 @@ import * as CollectAttributeValueExtractor from './collectAttributeValueExtracto
 const categoryItemProvider = CategoryItemProviderDefault
 const taxonProvider = TaxonProviderDefault
 
-const evaluateApplicability = async ({ user, survey, childDef, record, node }) => {
+const evaluateApplicability = async ({
+  user,
+  survey,
+  childDef,
+  record,
+  node,
+}: {
+  user: ArenaUser
+  survey: ArenaSurvey
+  childDef: any
+  record: any
+  node: any
+}) => {
   let applicable = true
   const expressionsApplicable = NodeDef.getApplicable(childDef)
 
@@ -47,7 +60,10 @@ const evaluateApplicability = async ({ user, survey, childDef, record, node }) =
 }
 
 export default class RecordsImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'RecordsImportJob'
+  batchPersister: any
+
+  constructor(params?: any) {
     super(RecordsImportJob.type, params)
 
     this.batchPersister = new BatchPersister(this.nodesBatchInsertHandler.bind(this), 2500)
@@ -113,7 +129,13 @@ export default class RecordsImportJob extends Job {
       // This.logDebug(`${entryName} parseToJson done`)
 
       // this.logDebug(`${entryName} recordToCreate start`)
-      const recordToCreate = Record.newRecord(user, cycle, false, CollectRecord.getDateCreated(collectRecordJson), step)
+      const recordToCreate = Record.newRecord(
+        user,
+        cycle,
+        false,
+        CollectRecord.getDateCreated(collectRecordJson),
+        String(step)
+      )
 
       /* NOSONAR */ await ActivityLogManager.insert(
         user,
@@ -228,13 +250,13 @@ export default class RecordsImportJob extends Job {
     return this._insertNodesFromQueue({ survey, record: recordUpdated, nodeDefNamesByPath, queue })
   }
 
-  async _insertNodesFromQueueItem({ survey, record, nodeDefNamesByPath, queue, item }) {
+  _insertNodesFromQueueItem({ survey, record, nodeDefNamesByPath, queue, item }) {
     const { nodeParent, collectNodeDef, collectNodeDefPath, collectNode } = item
 
     const nodeDefsInfo = this._extractNodeDefInfoByCollectPath({ survey, nodeDefNamesByPath, collectNodeDefPath })
     if (!nodeDefsInfo) {
       this.logInfo(`could not find the node def in the path "${collectNodeDefPath}"; skipping it`)
-      return record
+      return Promise.resolve(record)
     }
     return nodeDefsInfo.reduce(async (recordPromise, { uuid: nodeDefUuid, field }) => {
       const recordCurrent = await recordPromise
@@ -274,7 +296,7 @@ export default class RecordsImportJob extends Job {
 
     let nodeToInsert = Node.newNode(NodeDef.getUuid(nodeDef), Record.getUuid(record), nodeParent)
 
-    const valueAndMeta = NodeDef.isAttribute(nodeDef)
+    const valueAndMeta: { value?: unknown; meta?: Record<string, unknown> } | null = NodeDef.isAttribute(nodeDef)
       ? await CollectAttributeValueExtractor.extractAttributeValueAndMeta({
           survey,
           categoryItemProvider,
@@ -431,5 +453,3 @@ export default class RecordsImportJob extends Job {
     )
   }
 }
-
-RecordsImportJob.type = 'RecordsImportJob'

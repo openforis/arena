@@ -34,7 +34,7 @@ const arenaFileTypeByCollectFileType = {
 }
 
 // coordinate specific props: allowOnlyDeviceCoordinate, accuracy and altitude
-const _extractCoordinateProps = (collectNodeDef) => {
+const _extractCoordinateProps = (collectNodeDef: any) => {
   const props = {}
   for (const [uiAttributeName, propKey] of [
     ['allowOnlyDeviceCoordinate', NodeDef.propKeys.allowOnlyDeviceCoordinate],
@@ -49,12 +49,18 @@ const _extractCoordinateProps = (collectNodeDef) => {
 }
 
 // text input type (short/memo => singleLine/multiLine)
-const _extractTextProps = (collectNodeDef) =>
+const _extractTextProps = (collectNodeDef: any) =>
   CollectSurvey.getAttribute('type', 'short')(collectNodeDef) === 'memo'
     ? { [NodeDef.propKeys.textInputType]: NodeDef.textInputTypes.multiLine }
     : {}
 
-const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
+const _updateVisibilityLayoutProps = ({
+  collectNodeDef,
+  updateLayoutProp,
+}: {
+  collectNodeDef: any
+  updateLayoutProp: any
+}) => {
   const hiddenWhenNotRelevant = CollectSurvey.getUiAttribute('hideWhenNotRelevant', false)(collectNodeDef)
   if (hiddenWhenNotRelevant) {
     updateLayoutProp({ propName: NodeDefLayout.keys.hiddenWhenNotRelevant, value: hiddenWhenNotRelevant })
@@ -68,7 +74,17 @@ const _updateVisibilityLayoutProps = ({ collectNodeDef, updateLayoutProp }) => {
   }
 }
 
-const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath, nodeDefUuid, field }) => {
+const _addNodeDefInfoToCache = ({
+  nodeDefsInfoByCollectPath,
+  collectNodeDefPath,
+  nodeDefUuid,
+  field,
+}: {
+  nodeDefsInfoByCollectPath: Record<string, any>
+  collectNodeDefPath: any
+  nodeDefUuid: string
+  field: any
+}) => {
   let nodeDefsInfo = nodeDefsInfoByCollectPath[collectNodeDefPath]
   if (!nodeDefsInfo) {
     nodeDefsInfo = []
@@ -81,7 +97,13 @@ const _addNodeDefInfoToCache = ({ nodeDefsInfoByCollectPath, collectNodeDefPath,
 }
 
 export default class NodeDefsImportJob extends Job {
-  constructor(params) {
+  static readonly type = 'NodeDefsImportJob'
+  importIssues: any
+  nodeDefUniqueNameGenerator: any
+  nodeDefs: any
+  nodeDefsInfoByCollectPath: Record<string, any>
+
+  constructor(params?: any) {
     super(NodeDefsImportJob.type, params)
 
     this.nodeDefs = {} // Node definitions by uuid
@@ -235,7 +257,7 @@ export default class NodeDefsImportJob extends Job {
       }
     } else if (type === NodeDef.nodeDefType.code) {
       // 3b. Add parent code def uuid
-      const parentCodeDefUuid = await this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
+      const parentCodeDefUuid = this._getCodeParentUuid(nodeDef, parentPath, collectNodeDef)
       if (parentCodeDefUuid) {
         propsUpdated[NodeDef.propKeys.parentCodeDefUuid] = parentCodeDefUuid
       }
@@ -621,7 +643,7 @@ export default class NodeDefsImportJob extends Job {
     this.total = count
   }
 
-  async _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
+  _getCodeParentUuid(nodeDef, parentPath, collectNodeDef) {
     const collectCodeParentExpr = NodeDef.nodeDefType.code ? CollectSurvey.getAttribute('parent')(collectNodeDef) : null
     if (collectCodeParentExpr) {
       // starting from the node def parent path, find the path of the node referenced by collectCodeParentExpr
@@ -667,10 +689,10 @@ export default class NodeDefsImportJob extends Job {
   }
 }
 
-const _createNodeDef = (parentNodeDef, type, props, propsAdvanced = {}) =>
+const _createNodeDef = (parentNodeDef: any, type: any, props: Record<string, any>, propsAdvanced = {}) =>
   NodeDef.newNodeDef(parentNodeDef, type, [Survey.cycleOneKey], props, propsAdvanced)
 
-const determineNodeDefPageUuid = (type, collectNodeDef) => {
+const determineNodeDefPageUuid = (type: any, collectNodeDef: any) => {
   if (type === NodeDef.nodeDefType.entity) {
     const multiple = CollectSurvey.getAttributeBoolean('multiple')(collectNodeDef)
     if (multiple) {
@@ -692,5 +714,3 @@ const determineNodeDefPageUuid = (type, collectNodeDef) => {
   // Attribute => parent page
   return null
 }
-
-NodeDefsImportJob.type = 'NodeDefsImportJob'

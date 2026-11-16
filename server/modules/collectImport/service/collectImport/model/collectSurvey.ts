@@ -26,7 +26,10 @@ const collectNodeDefTypes = {
   time: 'time',
 }
 
-const nodeDefFieldsExtractorByCollectType = {
+// type (and field, for range attributes split into 2 node defs) of the node defs created for a Collect node def
+type CollectNodeDefField = { type: string; field?: string }
+
+const nodeDefFieldsExtractorByCollectType: Record<string, (collectNodeDef: any) => CollectNodeDefField[]> = {
   [collectNodeDefTypes.boolean]: () => [{ type: nodeDefType.boolean }],
   [collectNodeDefTypes.code]: () => [{ type: nodeDefType.code }],
   [collectNodeDefTypes.coordinate]: () => [{ type: nodeDefType.coordinate }],
@@ -55,7 +58,7 @@ export const layoutTypes = {
 
 export const samplingPointDataCodeListNames = ['sampling_design', 'ofc_sampling_design']
 
-export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef) => {
+export const getNodeDefFieldsByCollectNodeDef = (collectNodeDef: any) => {
   const collectType = getElementName(collectNodeDef)
   const fieldsExtractor = nodeDefFieldsExtractorByCollectType[collectType]
   return fieldsExtractor?.(collectNodeDef)
@@ -81,13 +84,13 @@ export const toLabels =
 
 export const getElements = A.propOr([], keys.elements)
 
-export const getElementsByName = (name) =>
+export const getElementsByName = (name: string) =>
   A.pipe(
     getElements,
     A.filter((el) => getElementName(el) === name)
   )
 
-export const getElementsByPath = (path) => (xml) =>
+export const getElementsByPath = (path: any) => (xml) =>
   A.reduce(
     (acc, pathPart) =>
       A.ifElse(
@@ -99,9 +102,9 @@ export const getElementsByPath = (path) => (xml) =>
     path
   )
 
-export const getElementByName = (name) => A.pipe(getElementsByName(name), A.head)
+export const getElementByName = (name: string) => A.pipe(getElementsByName(name), A.head)
 
-export const getNodeDefChildByName = (name) =>
+export const getNodeDefChildByName = (name: string) =>
   A.pipe(
     getElements,
     A.find((el) => getNodeDefName(el) === name)
@@ -111,11 +114,11 @@ export const getElementName = A.prop(keys.name)
 
 export const getText = A.pipe(getElements, A.find(A.propEq(keys.type, keys.text)), A.prop(keys.text))
 
-export const getChildElementText = (name) => A.pipe(getElementByName(name), getText)
+export const getChildElementText = (name: string) => A.pipe(getElementByName(name), getText)
 
 export const getAttributes = A.propOr({}, keys.attributes)
 
-export const getAttribute = (name, defaultValue = null) => A.pipe(getAttributes, A.propOr(defaultValue, name))
+export const getAttribute = (name: string, defaultValue = null) => A.pipe(getAttributes, A.propOr(defaultValue, name))
 
 /**
  * Returns the attribute called 'name' of a node def element.
@@ -124,9 +127,9 @@ const getNodeDefName = getAttribute('name')
 
 export const getAttributeName = getNodeDefName
 
-export const getAttributeBoolean = (name) => A.pipe(getAttribute(name), A.equals('true'))
+export const getAttributeBoolean = (name: string) => A.pipe(getAttribute(name), A.equals('true'))
 
-const _transformValue = (value) =>
+const _transformValue = (value: unknown) =>
   value === 'true' || value === 'false'
     ? value === 'true' // cast value into boolean
     : value
@@ -149,7 +152,7 @@ export const getCollectAttribute =
 
 export const getNodeDefRoot = A.pipe(getElementsByPath(['schema', 'entity']), A.head)
 
-export const getNodeDefByPath = (collectNodeDefPath) => (collectSurvey) => {
+export const getNodeDefByPath = (collectNodeDefPath: any) => (collectSurvey) => {
   const collectAncestorNodeNames = A.pipe(A.split('/'), A.reject(A.isEmpty))(collectNodeDefPath)
 
   let currentCollectNode = getElementByName('schema')(collectSurvey)
@@ -170,15 +173,16 @@ export const getNodeDefByPath = (collectNodeDefPath) => (collectSurvey) => {
   return currentCollectNode
 }
 
-export const getNodeDefChildren = (collectNodeDef) => A.pipe(getElements, A.filter(_isNodeDefElement))(collectNodeDef)
+export const getNodeDefChildren = (collectNodeDef: any) =>
+  A.pipe(getElements, A.filter(_isNodeDefElement))(collectNodeDef)
 
 const _isNodeDefElement = A.pipe(getElementName, (name) => A.includes(name, A.keys(collectNodeDefTypes)))
 
-export const isCollectEarthSurvey = (collectSurvey) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
+export const isCollectEarthSurvey = (collectSurvey: any) => getAttribute('collect:target', null)(collectSurvey) === 'CE'
 
-export const getUri = (collectSurvey) => getChildElementText('uri')(collectSurvey)
+export const getUri = (collectSurvey: any) => getChildElementText('uri')(collectSurvey)
 
-export const visitNodeDefs = ({ collectSurvey, visitor }) => {
+export const visitNodeDefs = ({ collectSurvey, visitor }: { collectSurvey: any; visitor: any }) => {
   const stack = []
   const rootDef = getNodeDefRoot(collectSurvey)
   stack.push({ def: rootDef, parentPath: '' })
@@ -206,7 +210,7 @@ export const visitNodeDefs = ({ collectSurvey, visitor }) => {
   }
 }
 
-export const generateArenaNodeDefNamesByPath = (collectSurvey) => {
+export const generateArenaNodeDefNamesByPath = (collectSurvey: any) => {
   const namesByPath = {}
   const nodeDefUniqueNameGenerator = new NodeDefUniqueNameGenerator()
 

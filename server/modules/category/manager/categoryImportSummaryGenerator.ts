@@ -219,7 +219,7 @@ export const createImportSummaryFromStream = async ({
   ignoreLabelsAndDescriptions = false,
 }: {
   stream: any
-  fileFormat: string
+  fileFormat?: string
   defaultLang: any
   codeColumnPattern?: any
   ignoreLabelsAndDescriptions?: any

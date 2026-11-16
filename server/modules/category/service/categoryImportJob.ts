@@ -12,7 +12,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import { ExtraPropDef, type ExtraPropDataType } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDataType, type ExtraPropDefItems } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
 import * as ValidationResult from '@core/validation/validationResult'
 import * as StringUtils from '@core/stringUtils'
@@ -150,7 +150,7 @@ export class CategoryImportInternalJob extends Job {
   extractItemExtraDef() {
     const items = CategoryImportSummary.getItems(this.summary)
 
-    const extraDefs = {}
+    const extraDefs: ExtraPropDefItems = {}
     let index = 0
     for (const item of items) {
       if (CategoryImportSummary.isItemExtra(item)) {

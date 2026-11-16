@@ -1,6 +1,7 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 
@@ -10,7 +11,23 @@ import * as CollectImportReportManager from '../manager/collectImportReportManag
 import CollectImportJob from './collectImport/collectImportJob'
 
 // COLLECT SURVEY IMPORT
-export const startCollectImportJob = ({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options }) => {
+export const startCollectImportJob = ({
+  user,
+  filePath,
+  fileId,
+  totalChunks,
+  totalFileSize,
+  newSurvey,
+  options,
+}: {
+  user: ArenaUser
+  filePath?: string
+  fileId?: string
+  totalChunks?: number
+  totalFileSize?: number
+  newSurvey: any
+  options: any
+}) => {
   const job = new CollectImportJob({ user, filePath, fileId, totalChunks, totalFileSize, newSurvey, options })
 
   JobManager.enqueueJob(job)
@@ -29,7 +46,14 @@ export const countReportItems = CollectImportReportManager.countItems
 export const fetchReportItemsStream = CollectImportReportManager.fetchItemsStream
 
 // UPDATE
-export const updateReportItem = async (user, surveyId, itemId, props, resolved, client = db) =>
+export const updateReportItem = (
+  user: ArenaUser,
+  surveyId: number,
+  itemId: number,
+  props: Record<string, any>,
+  resolved: any,
+  client: DbClient = db
+) =>
   client.tx(async (tx) => {
     // 1. update import report item
     const itemUpdated = await CollectImportReportManager.updateItem(surveyId, itemId, props, resolved, tx)
