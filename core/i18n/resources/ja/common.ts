@@ -398,7 +398,8 @@ export default {
     about: 'このアプリについて',
     changelog: '変更履歴',
     whatsNew: '新機能',
-    disclaimer: '免責事項',
+    termsOfService: '利用規約',
+    privacyNotice: 'プライバシーに関する通知',
     userManual: 'ユーザーマニュアル',
   },
   surveyDefsLoader: {

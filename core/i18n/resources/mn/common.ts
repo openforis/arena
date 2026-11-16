@@ -402,7 +402,8 @@ export default {
     about: 'Тухай',
     changelog: 'Өөрчлөлтийн түүх',
     whatsNew: 'Шинэ боломжууд',
-    disclaimer: 'Хариуцлагаас татгалзах',
+    termsOfService: 'Үйлчилгээний нөхцөл',
+    privacyNotice: 'Нууцлалын мэдэгдэл',
     userManual: 'Хэрэглэгчийн гарын авлага',
   },
   surveyDefsLoader: {
