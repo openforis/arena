@@ -17,6 +17,7 @@ import { getWorkerSurveyEditor, insertSurveyEditor } from '../fixtures/testUsers
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
+if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
 
 test.describe('AI features (mock provider)', () => {
   test.skip(!aiMock, 'needs a server started with AI_MOCK_PROVIDER_ENABLED=true and AI_DEFAULT_PROVIDER=mock') // NOSONAR: deliberate, needs the AI mock provider server

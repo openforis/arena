@@ -11,6 +11,7 @@ import { type LocalModelServerStub, startLocalModelServer } from '../stubs/local
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
+if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
 
 /**
  * Writes the stub server as the only local provider before any page script runs (on every navigation of this page),

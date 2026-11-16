@@ -19,6 +19,7 @@ import { Urls } from '../helpers/urls'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
+if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
 
 // the sample survey has 19 node definitions, each with an English label and no description
 // the category labels card also says "missing in French"; only the texts card says "text(s) ... missing"

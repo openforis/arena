@@ -10,6 +10,7 @@ import { Urls } from '../helpers/urls'
 
 // the server must run with the mock provider (see test/e2e/README.md)
 const aiMock = process.env.E2E_AI_MOCK === 'true'
+if (!aiMock && process.env.CI) throw new Error('E2E_AI_MOCK must be true in CI: the AI specs would be skipped')
 
 /**
  * Waits for a gateway call of the feature (the batch runs in the browser, through POST /api/ai/model).
