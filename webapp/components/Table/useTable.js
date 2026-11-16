@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useCallback, useLayoutEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -10,7 +10,14 @@ import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 import { TablesActions, useTableMaxRows, useTableSort, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
-export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restParams }) => {
+export const useTable = ({
+  columns,
+  keyExtractor,
+  moduleApiUri,
+  module,
+  restParams,
+  keepSelectionOnSearch = false,
+}) => {
   const dispatch = useDispatch()
 
   const [totalCount, setTotalCount] = useState(0)
@@ -63,13 +70,18 @@ export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restPara
     },
   })
 
-  const initData = () => {
-    fetchData()
-    fetchCount()
-  }
+  // stable function (passed to every row) calling the latest fetch functions
+  const fetchAllRef = useRef(null)
+  useLayoutEffect(() => {
+    fetchAllRef.current = () => {
+      fetchData()
+      fetchCount()
+    }
+  })
+  const initData = useCallback(() => fetchAllRef.current(), [])
 
   // init data on mount and on restParams and search update
-  useEffect(initData, [JSON.stringify(restParams), search])
+  useEffect(initData, [initData, JSON.stringify(restParams), search])
 
   if (totalCount < count) {
     setTotalCount(count)
@@ -132,7 +144,7 @@ export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restPara
   // reset selected items when filter, search or page size change, or data is refreshed (e.g. records update)
   useOnUpdate(() => {
     deselectAllItems()
-  }, [JSON.stringify(restParams), search, limit])
+  }, [JSON.stringify(restParams), keepSelectionOnSearch ? null : search, limit])
 
   const toggleItemSelection = useCallback(
     (item) => {

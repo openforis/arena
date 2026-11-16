@@ -87,7 +87,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'Backup de usuários',
     backupTitle: 'Backup de usuários',
     backupInfo:
-      'Todos os usuários serão exportados com seus papéis nos inventários e seus grupos de usuários, para que possam ser restaurados em outro servidor Arena. Os dispositivos 2FA não são exportados.',
+      'Os usuários serão exportados com seus papéis nos inventários e seus grupos de usuários, para que possam ser restaurados em outro servidor Arena. Os dispositivos 2FA não são exportados.',
+    exportScope: {
+      all: 'Todos os usuários',
+      selected: 'Usuários selecionados ({{count}})',
+      emails: 'Usuários com estes e-mails',
+      emailsPlaceholder: 'Um e-mail por linha (ou separados por vírgulas)',
+    },
     includePasswords: 'Incluir senhas',
     passwordsWarning:
       'O arquivo de backup conterá os hashes das senhas: guarde-o em um lugar seguro e exclua-o após o uso.',

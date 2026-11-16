@@ -1,6 +1,6 @@
 import './Records.scss'
 
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router'
 
 import * as Record from '@core/record/record'
@@ -36,6 +36,12 @@ const Records = () => {
   }, [setRecordsRequestedAt])
 
   const columns = useColumns({ categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate })
+  // memoized: new objects at every render would re-render all the rows
+  const cellProps = useMemo(() => ({ onRecordsUpdate }), [onRecordsUpdate])
+  const rowProps = useMemo(
+    () => ({ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }),
+    [categoryItemsByCodeDefUuid, navigateToRecord, onRecordsUpdate]
+  )
 
   const noCols = 3 + nodeDefKeys.length
   const gridTemplateColumns = `30px 70px repeat(${noCols}, ${1 / noCols}fr) 80px 80px 80px 80px`
@@ -51,7 +57,7 @@ const Records = () => {
 
   return (
     <Table
-      cellProps={{ onRecordsUpdate }}
+      cellProps={cellProps}
       className="records"
       columns={columns}
       gridTemplateColumns={gridTemplateColumns}
@@ -62,7 +68,7 @@ const Records = () => {
       noItemsLabelForSearchKey="dataView:records.noRecordsAddedForThisSearch"
       onRowOpen={navigateToRecord}
       restParams={{ cycle, includeCounts: true, recordsRequestedAt }}
-      rowProps={{ navigateToRecord, onRecordsUpdate, categoryItemsByCodeDefUuid }}
+      rowProps={rowProps}
       selectable
       visibleColumnsSelectionEnabled
     />

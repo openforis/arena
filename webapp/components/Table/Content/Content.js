@@ -28,17 +28,25 @@ LoadingRows.propTypes = {
   rows: PropTypes.number.isRequired,
 }
 
+// default props as constants: new objects at every render would re-render all the (memoized) rows
+const emptyProps = {}
+
 const getGridTemplateColumnsFromColumns = ({ columns, expandableRows }) =>
   [...(expandableRows ? ['40px'] : []), ...columns.map((column) => column.width || '1fr')].join(' ')
 
 const Content = (props) => {
   const {
     cellProps,
+    cellTestIdExtractor,
     columns,
     deselectAllItems,
     expandableRows = false,
     gridTemplateColumns: gridTemplateColumnsParam,
     handleSortBy,
+    initData,
+    isRowActive,
+    isRowExpandable,
+    isRowOpenable,
     keyExtractor,
     list,
     loading = false,
@@ -47,10 +55,13 @@ const Content = (props) => {
     noItemsLabelKey,
     noItemsLabelForSearchKey,
     offset,
+    onItemSelectToggle,
+    onRowOpen,
     rowExpandedComponent = null,
     rowComponent: rowComponentParam,
     rowHeaderComponent: rowHeaderComponentParam,
-    rowProps = {},
+    rowProps = emptyProps,
+    selectable = false,
     selectedItems = [],
     selectAllItems,
     sort,
@@ -84,26 +95,11 @@ const Content = (props) => {
   }
 
   const selectedItemsCount = selectedItems.length
+  const selectedKeys = new Set(selectedItems.map((selectedItem) => keyExtractor({ item: selectedItem })))
 
   const hasColumns = columns?.length > 0
-  const rowComponent = hasColumns
-    ? (_props) => <ContentRowCells {..._props} cellProps={cellProps} columns={columns} itemSelected={_props.selected} />
-    : rowComponentParam
-
-  const rowHeaderComponent = hasColumns
-    ? (_props) => (
-        <ContentHeaders
-          {..._props}
-          columns={columns}
-          expandableRows={expandableRows}
-          selectAllItems={selectAllItems}
-          deselectAllItems={deselectAllItems}
-          selectedItemsCount={selectedItemsCount}
-          totalCount={totalCount}
-          allVisibleItemsSelected={allVisibleItemsSelected}
-        />
-      )
-    : rowHeaderComponentParam
+  // components must not be created inline: React would remount all the rows at every render
+  const rowComponent = hasColumns ? ContentRowCells : rowComponentParam
 
   const gridTemplateColumns = hasColumns
     ? getGridTemplateColumnsFromColumns({ columns, expandableRows })
@@ -112,7 +108,21 @@ const Content = (props) => {
   return (
     <div className="table__content">
       <div className="table__row-header" ref={headerRef} style={{ gridTemplateColumns }}>
-        {React.createElement(rowHeaderComponent, { sort, handleSortBy, ...rowProps })}
+        {hasColumns ? (
+          <ContentHeaders
+            allVisibleItemsSelected={allVisibleItemsSelected}
+            columns={columns}
+            deselectAllItems={deselectAllItems}
+            expandableRows={expandableRows}
+            handleSortBy={handleSortBy}
+            selectAllItems={selectAllItems}
+            selectedItemsCount={selectedItemsCount}
+            sort={sort}
+            totalCount={totalCount}
+          />
+        ) : (
+          React.createElement(rowHeaderComponentParam, { sort, handleSortBy, ...rowProps })
+        )}
       </div>
 
       {loading ? (
@@ -121,17 +131,31 @@ const Content = (props) => {
         <div className="table__rows" data-testid={TestId.table.rows(module)} onScroll={onRowsScroll} ref={tableRef}>
           {list.map((item, index) => {
             const key = keyExtractor({ item })
-            return React.createElement(ContentRow, {
-              ...props,
-              ...rowProps,
-              key,
-              index,
-              item,
-              rowComponent,
-              rowExpandedComponent,
-              gridTemplateColumns,
-              selected: selectedItems.some((_item) => keyExtractor({ item: _item }) === key),
-            })
+            return (
+              <ContentRow
+                key={key}
+                cellProps={cellProps}
+                cellTestIdExtractor={cellTestIdExtractor}
+                columns={columns}
+                expandableRows={expandableRows}
+                gridTemplateColumns={gridTemplateColumns}
+                index={index}
+                initData={initData}
+                isRowActive={isRowActive}
+                isRowExpandable={isRowExpandable}
+                isRowOpenable={isRowOpenable}
+                item={item}
+                module={module}
+                offset={offset}
+                onItemSelectToggle={onItemSelectToggle}
+                onRowOpen={onRowOpen}
+                rowComponent={rowComponent}
+                rowExpandedComponent={rowExpandedComponent}
+                rowProps={rowProps}
+                selectable={selectable}
+                selected={selectedKeys.has(key)}
+              />
+            )
           })}
         </div>
       )}
@@ -141,6 +165,7 @@ const Content = (props) => {
 
 Content.propTypes = {
   cellProps: PropTypes.object,
+  cellTestIdExtractor: PropTypes.func,
   columns: PropTypes.array,
   deselectAllItems: PropTypes.func,
   expandableRows: PropTypes.bool,
@@ -155,6 +180,7 @@ Content.propTypes = {
   noItemsLabelKey: PropTypes.string.isRequired,
   noItemsLabelForSearchKey: PropTypes.string.isRequired,
   offset: PropTypes.number.isRequired,
+  isRowExpandable: PropTypes.func,
   isRowOpenable: PropTypes.func,
   onItemSelectToggle: PropTypes.func.isRequired,
   onRowOpen: PropTypes.func,
