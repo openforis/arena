@@ -112,6 +112,9 @@ USE_HTTPS=false
 ## Set to true to enable experimental features
 # EXPERIMENTAL_FEATURES=false
 
+# Google Analytics (not mandatory): Google tag ID (e.g. G-XXXXXXXXXX); disabled if not set
+# GOOGLE_ANALYTICS_ID=
+
 # RStudio Server (not mandatory)
 # RSTUDIO_DOWNLOAD_SERVER_URL=
 # RSTUDIO_SERVER_URL=
