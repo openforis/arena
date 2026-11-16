@@ -23,6 +23,7 @@ import * as TempFilesCleanup from './schedulers/tempFilesCleanup'
 import * as TemporarySurveysCleanup from './schedulers/temporarySurveysCleanup'
 import * as UserResetPasswordCleanup from './schedulers/userResetPasswordCleanup'
 import * as UserTempAuthTokensCleanup from './schedulers/userTempAuthTokensCleanup'
+import { googleAnalyticsScriptHandler } from './googleAnalyticsScript'
 import { mobilePreviewMiddleware } from './mobilePreviewMiddleware'
 import { SwaggerInitializer } from './swaggerInitializer'
 import { systemErrorMiddleware } from './systemErrorMiddleware'
@@ -66,6 +67,9 @@ export const run = async () => {
   app.use(/^\/$/, (req, res) => res.redirect('/app/home/'))
 
   const { arenaRoot, arenaDist: dist } = ProcessUtils.ENV
+
+  // Google Analytics (optional, GOOGLE_ANALYTICS_ID)
+  app.get('/analytics.js', googleAnalyticsScriptHandler)
 
   // static resources
   app.use('/', express.static(dist))
