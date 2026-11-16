@@ -64,6 +64,11 @@ def main():
     lang = 'en-gb' if voice.startswith('b') else 'en-us'
     model, voices = ensure_model(model_dir, voice)
     kokoro = Kokoro(str(model), str(voices))
+    if any(i.name == 'speed' and i.type == 'tensor(float)' for i in kokoro.sess.get_inputs()):
+        # current model.onnx export: float speed (kokoro-onnx 0.4.7 sends int32) and (1, n) audio (kokoro-onnx expects (n,))
+        run = kokoro.sess.run
+        kokoro.sess.run = lambda names, feed, *rest: [out.reshape(-1) for out in run(
+            names, {**feed, 'speed': np.array([speed], dtype=np.float32)}, *rest)]
 
     clips, scenes, subtitles = [], [], []
     start = 0.0
