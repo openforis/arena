@@ -1,10 +1,26 @@
+import type {
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+  Taxon as ArenaTaxon,
+} from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 import * as Taxonomy from '@core/survey/taxonomy'
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
 
-const getTaxonByCode = async ({ survey, taxonomyUuid, taxonCode, draft = false }) => {
+const getTaxonByCode = ({
+  survey,
+  taxonomyUuid,
+  taxonCode,
+  draft = false,
+}: {
+  survey: ArenaSurvey
+  taxonomyUuid: string
+  taxonCode: any
+  draft?: boolean
+}) => {
   const surveyId = Survey.getId(survey)
   return TaxonomyRepository.fetchTaxonWithVernacularNamesByCode({
     surveyId,
@@ -14,7 +30,17 @@ const getTaxonByCode = async ({ survey, taxonomyUuid, taxonCode, draft = false }
   })
 }
 
-const getTaxonByUuid = async ({ survey, taxonomyUuid, taxonUuid, draft = false }) => {
+const getTaxonByUuid = ({
+  survey,
+  taxonomyUuid,
+  taxonUuid,
+  draft = false,
+}: {
+  survey: ArenaSurvey
+  taxonomyUuid: string
+  taxonUuid: string
+  draft?: boolean
+}) => {
   const surveyId = Survey.getId(survey)
   return TaxonomyRepository.fetchTaxonWithVernacularNamesByUuid({ surveyId, taxonomyUuid, taxonUuid, draft })
 }
@@ -27,15 +53,23 @@ const getTaxonByUuid = async ({ survey, taxonomyUuid, taxonUuid, draft = false }
  * @param {string} params.taxonUuid - The taxon uuid.
  * @returns {Promise<import('@openforis/arena-core').Taxon|null>} - The taxon, or null if not found.
  */
-const getOrFetchTaxon = async ({ survey, nodeDef, taxonUuid }) => {
+const getOrFetchTaxon = ({
+  survey,
+  nodeDef,
+  taxonUuid,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+  taxonUuid: string
+}): Promise<ArenaTaxon | null> => {
   const taxonInSurvey = Survey.getTaxonByUuid(taxonUuid)(survey)
   if (taxonInSurvey) {
-    return taxonInSurvey
+    return Promise.resolve(taxonInSurvey)
   }
   const taxonomyUuid = NodeDef.getTaxonomyUuid(nodeDef)
   const taxonomy = Survey.getTaxonomyByUuid(taxonomyUuid)(survey)
   if (!Taxonomy.isBigTaxonomy(taxonomy)) {
-    return null
+    return Promise.resolve(null)
   }
   return getTaxonByUuid({ survey, taxonomyUuid, taxonUuid })
 }

@@ -1,3 +1,4 @@
+import type { Taxonomy as ArenaTaxonomy } from '@openforis/arena-core'
 import { getLanguageISO639part2Label } from '@core/app/languages'
 import { DataImportTemplateTypes } from '@core/dataImport'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
@@ -17,7 +18,7 @@ const genericExtraPropDefsArray = ExtraPropDef.extraDefsToArray({
   numeric_prop: { dataType: ExtraPropDef.dataTypes.number },
 })
 
-const generateTemplate = ({ taxonomy, templateType }) => {
+const generateTemplate = ({ taxonomy, templateType }: { taxonomy: ArenaTaxonomy; templateType: any }) => {
   const vernacularLanguageCodes =
     templateType === DataImportTemplateTypes.generic
       ? genericVernacularLanguageCodes

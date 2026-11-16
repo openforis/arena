@@ -185,8 +185,8 @@ export const groupByProp = groupByProps
 export const clone = (obj: any): any => (A.isNil(obj) ? obj : structuredClone(obj))
 
 export const getPropsAndPropsDraft =
-  ({ backup = false } = {}): ((obj: Record<string, unknown>) => Record<string, unknown>) =>
-  (obj: Record<string, unknown>): Record<string, unknown> => {
+  ({ backup = false } = {}) =>
+  (obj: ObjectType): { props: Record<string, any>; propsDraft: Record<string, any> } => {
     // if not backup, keep published props empty (consider only propsDraft)
     // if backup, keep both props and propsDraft
     const props = getProps(obj)
@@ -197,7 +197,7 @@ export const getPropsAndPropsDraft =
     }
   }
 
-export const getPropsAndPropsDraftCombined = (obj: Record<string, unknown>): Record<string, unknown> => ({
+export const getPropsAndPropsDraftCombined = (obj: ObjectType): Record<string, unknown> => ({
   ...getProps(obj),
   ...getPropsDraft(obj),
 })
@@ -207,7 +207,7 @@ export const getPropsAndPropsDraftCombined = (obj: Record<string, unknown>): Rec
  * @param obj - The object.
  * @returns The [key, value] entries of the props followed by the ones of the draft props.
  */
-export const getPropsAndPropsDraftEntries = (obj: Record<string, unknown>): [string, unknown][] => [
+export const getPropsAndPropsDraftEntries = (obj: ObjectType): [string, unknown][] => [
   ...Object.entries(getProps(obj) ?? {}),
   ...Object.entries(getPropsDraft(obj) ?? {}),
 ]

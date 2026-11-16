@@ -1,4 +1,4 @@
-import type { Transform } from 'node:stream'
+import type { Readable, Transform } from 'node:stream'
 
 import * as A from '@core/arena'
 import pgPromise from 'pg-promise'
@@ -16,7 +16,7 @@ const pgp = pgPromise()
 // column name (prefixed with '?' if it's only a condition column) or pg-promise column config
 export type ColumnSetColumn = string | pgPromise.IColumnConfig<any>
 
-type StreamProcessor = (stream: NodeJS.ReadableStream) => Promise<unknown>
+type StreamProcessor = (stream: Readable) => Promise<unknown>
 
 export const QueryStream = _QueryStream
 
@@ -42,7 +42,7 @@ export const stream = async ({
     client
       .stream(queryStream, (dbStream) => {
         const transformedStream = transformer ? dbStream.pipe(transformer) : dbStream
-        processor?.(transformedStream)
+        processor?.(transformedStream as Readable)
           .then(() => {
             streamProcessed = true
             onComplete()
