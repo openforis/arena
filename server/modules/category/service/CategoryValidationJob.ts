@@ -5,6 +5,8 @@ import * as Category from '@core/survey/category'
 import * as CategoryManager from '../manager/categoryManager'
 
 export class CategoryValidationJob extends Job {
+  static readonly type = 'CategoryValidationJob'
+
   constructor(params, type = CategoryValidationJob.type) {
     super(type, params)
   }
@@ -26,5 +28,3 @@ export class CategoryValidationJob extends Job {
     this.setContext({ category: categoryUpdated })
   }
 }
-
-CategoryValidationJob.type = 'CategoryValidationJob'
