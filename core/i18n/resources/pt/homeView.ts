@@ -197,6 +197,10 @@ Se marcado, esses valores são mantidos no registro, mesmo que os atributos não
         'Notificar os administradores do inquérito por e-mail quando registros forem enviados do Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'Quando marcada, cada administrador do inquérito recebe um e-mail com a lista dos registros enviados do Arena Mobile (valores-chave, criador, datas, validação e UUID).',
+      formPreviewForDataEntryUsers:
+        'Permitir que os usuários de entrada de dados visualizem o formulário rascunho (não publicado)',
+      formPreviewForDataEntryUsersInfo:
+        'Os usuários que podem inserir dados mas não podem editar o inventário verão um botão Visualizar formulário na lista de registros, para testar o formulário com as últimas alterações não publicadas (p. ex. para testes de aceitação). Os dados inseridos na visualização não são salvos.',
       allowRecordsMergeWithSameKeys:
         'Permitir a mesclagem de registros com as mesmas chaves (ex. registros criados em diferentes dispositivos Arena Mobile)',
     },

@@ -5,6 +5,7 @@ export {
   useUser,
   useAuthCanEditSurvey,
   useAuthCanCreateRecord,
+  useAuthCanPreviewDraftFormInDataEntry,
   useAuthCanEditRecord,
   useAuthCanCleanseRecords,
   useAuthCanDeleteAllRecords,

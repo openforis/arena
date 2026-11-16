@@ -105,6 +105,11 @@ persists the root entity through the same `persistNode` pipeline described below
 default values are created as for any node) and then applies the values of the user's group
 qualifiers. The new nodes reach the form via `nodesUpdate` events.
 
+A **preview record** (`preview: true`, checked in with the draft survey) can be created only by survey
+editors or, when `formPreviewForDataEntryUsers` is enabled in the published survey info, by data entry
+users: see `RecordService.canCreateRecordPreview`. It is opened from the Form Designer (editors only) or from
+Data > Records > Preview form (`FormPreview` view, which loads the draft survey definitions).
+
 Check-in doesn't lock the record: several users can have it open and edit it at the same time.
 
 **Check-out.** On unmount (and `beforeunload`) the form calls `RecordActions.checkOutRecord`.

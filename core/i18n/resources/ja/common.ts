@@ -363,6 +363,7 @@ export default {
     export: 'データエクスポート',
     import: 'データインポート',
     validationReport: '検証レポート',
+    formPreview: 'フォームのプレビュー',
 
     users: 'ユーザー',
     user: 'ユーザープロフィール',
