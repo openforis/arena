@@ -311,9 +311,14 @@ export const helpModules = {
     key: 'whatsNew',
     path: 'whats-new',
   },
-  disclaimer: {
-    key: 'disclaimer',
-    uri: 'https://openforis.org/arena-legal-disclaimer/',
+  termsOfService: {
+    key: 'termsOfService',
+    uri: 'https://www.openforis.org/arena-terms/',
+    external: true,
+  },
+  privacyNotice: {
+    key: 'privacyNotice',
+    uri: 'https://www.fao.org/contact-us/data-protection-and-privacy/en/',
     external: true,
   },
   userManual: {
@@ -324,6 +329,9 @@ export const helpModules = {
 }
 
 const userManualLanguages = new Set(['en', 'fr', 'es'])
+
+// languages of the FAO website also available as Arena UI languages
+const privacyNoticeLanguages = new Set(['en', 'fr', 'es', 'ru'])
 
 const releasesDownloadBaseUrl = 'https://github.com/openforis/arena/releases'
 
@@ -351,6 +359,17 @@ export const getUserManualUri = (lang, appVersion = ProcessUtils.ENV.application
   const releaseTag = extractReleaseTag(appVersion)
   const downloadPath = releaseTag ? `download/${releaseTag}` : 'latest/download'
   return `${releasesDownloadBaseUrl}/${downloadPath}/arena-user-manual-${manualLang}.pdf`
+}
+
+/**
+ * Returns the URL of the FAO privacy notice in the specified UI language if available (English otherwise).
+ * @param {string} [lang] - UI language code (e.g. 'fr').
+ * @returns {string} - The URL of the privacy notice.
+ */
+export const getPrivacyNoticeUri = (lang) => {
+  const langCode = lang?.split('-')[0]
+  const noticeLang = privacyNoticeLanguages.has(langCode) ? langCode : 'en'
+  return `https://www.fao.org/contact-us/data-protection-and-privacy/${noticeLang}/`
 }
 
 const allAppModuleGroups = [

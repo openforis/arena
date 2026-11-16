@@ -460,7 +460,8 @@ export default {
     about: 'О программе',
     changelog: 'Журнал изменений',
     whatsNew: 'Что нового',
-    disclaimer: 'Отказ от ответственности',
+    termsOfService: 'Условия использования',
+    privacyNotice: 'Уведомление о конфиденциальности',
     userManual: 'Руководство пользователя',
   },
   surveyDefsLoader: {
