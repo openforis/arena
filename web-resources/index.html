@@ -40,6 +40,9 @@
 
     <meta name="theme-color" content="#ffffff" />
 
+    <!-- Google Analytics: loaded only when GOOGLE_ANALYTICS_ID is set on the server (empty script otherwise) -->
+    <script src="/analytics.js" async></script>
+
     <style>
       #preloader-wrapper {
         width: 100vw;
@@ -118,16 +121,6 @@
       }
     </style>
   </head>
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-08YPKWTSF0"></script>
-  <script>
-    window.dataLayer = window.dataLayer || []
-    function gtag() {
-      dataLayer.push(arguments)
-    }
-    gtag('js', new Date())
-    gtag('config', 'G-08YPKWTSF0')
-  </script>
   <body>
     <!-- Preloader container -->
     <div id="preloader-wrapper">
