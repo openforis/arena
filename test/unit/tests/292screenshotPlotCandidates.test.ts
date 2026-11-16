@@ -90,6 +90,12 @@ describe('Screenshot plot candidates (292)', () => {
     expect(candidates.map((candidate) => candidate.key)).toEqual(['r2-n2', 'r5-n5', 'r1-n1', 'r6-n6'])
   })
 
+  test('keeps only the plots inside the map view', () => {
+    const bounds = { south: 41, west: 12, north: 42, east: 13 }
+    const candidates = buildPlotCandidates({ layers: [clusterLayer, otherLayer], center: null, bounds })
+    expect(candidates.map((candidate) => candidate.key)).toEqual(['r1-n1', 'r5-n5'])
+  })
+
   test('returns no candidates without layers', () => {
     expect(buildPlotCandidates({ layers: [], center: { lat: 0, lng: 0 } })).toEqual([])
   })

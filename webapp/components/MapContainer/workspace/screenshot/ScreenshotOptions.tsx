@@ -44,7 +44,7 @@ type ScreenshotOptionsFieldsProps = {
  * @param {Function} props.onOptionChange - Changes an option.
  * @param {ScreenshotTarget} props.target - Where the image goes.
  * @param {Function} props.onTargetChange - Changes the target.
- * @param {boolean} props.hasPlots - Whether plots are on the map (attach and fit to plot need one).
+ * @param {boolean} props.hasPlots - Whether plots are in the map view (attach and fit to plot need one).
  * @returns {React.ReactElement} The fields.
  */
 export const ScreenshotOptionsFields = ({

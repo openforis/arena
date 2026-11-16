@@ -704,7 +704,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
       mobileNote:
         'Solo se muestran los atributos de imagen de la parcela. Los equipos de campo verán esta imagen en Arena Mobile cuando descarguen el registro en su dispositivo.',
       noPlots:
-        'No hay parcelas en el mapa. Muestre una capa de ubicaciones en la pestaña Capas para adjuntar la imagen a un registro de parcela.',
+        'No hay parcelas visibles en el mapa. Para adjuntar la imagen a un registro de parcela, muestre una capa de ubicaciones en la pestaña Capas y mueva el mapa hasta una parcela.',
       noImageAttributes:
         'Esta parcela no tiene ningún atributo de imagen editable que permita capturas de pantalla (active "Permitir guardar captura de pantalla en la vista de mapa" en el diseñador de formularios).',
       previewLoading: 'Preparando la vista previa…',

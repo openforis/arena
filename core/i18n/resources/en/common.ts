@@ -723,7 +723,8 @@ Try again?`,
       fileName: 'File name',
       mobileNote:
         'Only image attributes of the plot are listed. Field teams see this image in Arena Mobile once the record is downloaded to their device.',
-      noPlots: 'No plots on the map. Show a location layer in the Layers tab to attach the image to a plot record.',
+      noPlots:
+        'No plots in the map view. To attach the image to a plot record, show a location layer in the Layers tab and move the map to a plot.',
       noImageAttributes:
         'This plot has no editable image attribute allowing screen captures (enable "Allow saving screen capture in map view" in the form designer).',
       previewLoading: 'Preparing the preview…',

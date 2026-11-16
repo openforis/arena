@@ -2,6 +2,7 @@ import {
   countPointsInBounds,
   getScaleBar,
   isLngInRange,
+  isPointInBounds,
   metersPerPixel,
 } from '@webapp/components/MapContainer/workspace/statusbar/mapScale'
 
@@ -41,6 +42,14 @@ describe('Map scale and records in view (252)', () => {
     expect(isLngInRange(10, -180, 180)).toBe(true)
     expect(isLngInRange(-30, -40, -20)).toBe(true)
     expect(isLngInRange(100, -400, 0)).toBe(true)
+  })
+
+  test('isPointInBounds checks latitude and longitude, also across the antimeridian', () => {
+    const bounds = { south: 0, west: 170, north: 20, east: 190 }
+    expect(isPointInBounds({ lat: 10, lng: -175 }, bounds)).toBe(true)
+    expect(isPointInBounds({ lat: 20, lng: 170 }, bounds)).toBe(true)
+    expect(isPointInBounds({ lat: 21, lng: 175 }, bounds)).toBe(false)
+    expect(isPointInBounds({ lat: 10, lng: 0 }, bounds)).toBe(false)
   })
 
   test('countPointsInBounds counts points inside, also across the antimeridian', () => {
