@@ -18,6 +18,8 @@ const emailServices = {
 const emailService = ProcessUtils.ENV.emailService
 const from = ProcessUtils.ENV.emailFromResolved
 
+type EmailSendResult = { accepted?: string[]; rejected?: string[] }
+
 // functions exported by the email provider modules
 type EmailProvider = {
   validateEnv: (params: { from: string }) => void
@@ -54,7 +56,13 @@ if (typeof emailProvider.logTransportOptionsType === 'function') {
 emailProvider.validateEnv({ from })
 emailProvider.init?.()
 
-export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, log = true }) => {
+export const sendCustomEmail = async ({
+  to = null,
+  bcc = null,
+  subject,
+  html,
+  log = true,
+}): Promise<EmailSendResult> => {
   const toRecipients = ArrayUtils.toArray(to)
   const bccRecipients = ArrayUtils.toArray(bcc)
   const recipientsCount = toRecipients.length + bccRecipients.length
@@ -73,7 +81,7 @@ export const sendCustomEmail = async ({ to = null, bcc = null, subject, html, lo
     if (log) {
       logger.debug(`sent ${logMessageCommonPart}`)
     }
-    return result ?? { accepted: [...toRecipients, ...bccRecipients], rejected: [] }
+    return (result as EmailSendResult | undefined) ?? { accepted: [...toRecipients, ...bccRecipients], rejected: [] }
   } catch (error) {
     logger.error(`error sending ${logMessageCommonPart}: ${error.message}`)
     throw error

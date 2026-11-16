@@ -6,7 +6,7 @@ import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 
 import * as UserManager from '../manager/userManager'
 
-const exportUsersIntoStream = async ({ outputStream, fileFormat }) => {
+const exportUsersIntoStream = async ({ outputStream, fileFormat }: { outputStream: any; fileFormat: string }) => {
   const transformSurveyNames = (surveyNames) =>
     surveyNames
       ? Object.values(AuthGroup.groupNames).reduce(

@@ -502,6 +502,27 @@ const _fetchSurveysWithCounts = async ({ surveys, draft, includeDbSize, onProgre
   return surveysWithCounts
 }
 
+/**
+ * Fetches the info of the surveys visible to the specified user.
+ * @param {object} params - The parameters.
+ * @param {import('@openforis/arena-core').User} params.user - The user.
+ * @param {boolean} [params.draft] - Whether to fetch the draft props.
+ * @param {boolean} [params.template] - Whether to fetch templates instead of surveys.
+ * @param {number} [params.offset] - The offset.
+ * @param {number} [params.limit] - The max number of surveys to fetch.
+ * @param {string} [params.lang] - The language used to sort by label.
+ * @param {string} [params.search] - The text to search.
+ * @param {string} [params.sortBy] - The field to sort by.
+ * @param {string} [params.sortOrder] - The sort order (asc or desc).
+ * @param {boolean} [params.includeCounts] - Whether to include the counts (records, nodes, ...).
+ * @param {boolean} [params.includeDbSize] - Whether to include the db size.
+ * @param {boolean} [params.includeOwnerEmailAddress] - Whether to include the email address of the owner.
+ * @param {boolean} [params.onlyOwn] - Whether to fetch only the surveys owned by the user.
+ * @param {boolean} [params.withChains] - Whether to fetch only the surveys with processing chains.
+ * @param {Function} [params.onProgress] - Called with the progress while fetching the counts.
+ * @param {Function} [params.stopIfFunction] - Returns true when the fetch must stop.
+ * @returns {Promise<import('@openforis/arena-core').Survey[]>} - The surveys info.
+ */
 export const fetchUserSurveysInfo = async ({
   user,
   draft = true,
@@ -700,18 +721,10 @@ export const updateSurveyConfigurationProp = async ({ surveyId, key, value }, cl
   return fetchSurveyById({ surveyId, draft: true, validate: true }, client)
 }
 
-export const updateSurveyOwner = async ({ user, surveyId, ownerUuid }, client = db) =>
+export const updateSurveyOwner = async ({ user, surveyId, ownerUuid, system = false }, client = db) =>
   client.tx(async (t) => {
     await SurveyRepository.updateSurveyOwner({ surveyId, ownerUuid }, t)
-    const systemActivity = false
-    await ActivityLogRepository.insert(
-      user,
-      surveyId,
-      ActivityLog.type.surveyOwnerUpdate,
-      { ownerUuid },
-      systemActivity,
-      t
-    )
+    await ActivityLogRepository.insert(user, surveyId, ActivityLog.type.surveyOwnerUpdate, { ownerUuid }, system, t)
   })
 
 export const { removeSurveyTemporaryFlag, updateSurveyDependencyGraphs } = SurveyRepository

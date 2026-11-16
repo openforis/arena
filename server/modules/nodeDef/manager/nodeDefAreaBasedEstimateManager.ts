@@ -1,13 +1,16 @@
-import { db } from '@server/db/db'
+import type { Survey as ArenaSurvey, NodeDef as ArenaNodeDef, NodeDefType } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as NodeDef from '@core/survey/nodeDef'
 
 import * as NodeDefRepository from '../repository/nodeDefRepository'
 import { AreaBasedEstimatedOfNodeDef } from '@common/analysis/areaBasedEstimatedNodeDef'
-import * as ChainRepository from '@server/modules/analysis/repository/chain'
 
-const insertNodeDefAreaBasedEstimate = async ({ survey, chainUuid, estimatedOfNodeDef }, client = db) => {
+const insertNodeDefAreaBasedEstimate = (
+  { survey, chainUuid, estimatedOfNodeDef }: { survey: ArenaSurvey; chainUuid: string; estimatedOfNodeDef: any },
+  client: DbClient = db
+) => {
   const nodeDef = AreaBasedEstimatedOfNodeDef.newNodeDef({
     survey,
     chainUuid,
@@ -17,18 +20,18 @@ const insertNodeDefAreaBasedEstimate = async ({ survey, chainUuid, estimatedOfNo
   return NodeDefRepository.insertNodeDef(surveyId, nodeDef, client)
 }
 
-const updateNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) => {
+const updateNodeDefAreaBasedEstimate = async (
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient = db
+) => {
   const nodeDefAreaBasedEstimate = Survey.getNodeDefAreaBasedEstimate(nodeDef)(survey)
   if (!nodeDefAreaBasedEstimate) {
     return null
   }
   const surveyId = Survey.getId(survey)
-  const chainUuid = NodeDef.getChainUuid(nodeDefAreaBasedEstimate)
-  const chain = await ChainRepository.fetchChain({ surveyId, chainUuid }, client)
 
   let nodeDefAreaBasedEstimateUpdated = AreaBasedEstimatedOfNodeDef.updateNodeDef({
     survey,
-    chain,
     nodeDefAreaBasedEstimate,
     areaBasedEstimatedOfNodeDef: nodeDef,
   })
@@ -45,7 +48,10 @@ const updateNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) 
   return nodeDefAreaBasedEstimateUpdated
 }
 
-const insertOrDeleteNodeDefAreaBasedEstimate = async ({ survey, nodeDef }, client = db) => {
+const insertOrDeleteNodeDefAreaBasedEstimate = async (
+  { survey, nodeDef }: { survey: ArenaSurvey; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient = db
+) => {
   const chainUuid = NodeDef.getChainUuid(nodeDef)
   if (NodeDef.hasAreaBasedEstimated(nodeDef)) {
     // insert new area based estimate node def
