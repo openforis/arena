@@ -164,9 +164,10 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
     })
 
     test('a malformed value does not roll back the valid edit of another attribute of the same record', async () => {
-      const record = await insertRecord({ key: 'shape-mixed' })
+      // gate 2: the plot is already not applicable, so the gate edit clears nothing
+      const record = await insertRecord({ key: 'shape-mixed', gate: 2 })
 
-      const results = await update([editOf(record, 'root/num', 1, 'oops'), editOf(record, 'root/gate', 1, 5)])
+      const results = await update([editOf(record, 'root/num', 1, 'oops'), editOf(record, 'root/gate', 2, 5)])
 
       expect(results[0]).toMatchObject({ index: 0, status: 'failed', messageKey: invalidValueKey })
       expect(results[1]).toEqual({ index: 1, status: 'applied' })
@@ -201,17 +202,30 @@ describe('Batch record edit: value shape, applicability and activity log bounds 
       expect(Node.getValue(nodeOf(await fetchRecord(applicable), 'root/plot/plot_num'))).toBe(8)
     })
 
-    test('is refused once an earlier request made the entity not applicable', async () => {
-      const record = await insertRecord({ key: 'applicability-flip', gate: 1 })
+    test('is edited once an earlier request made the entity applicable', async () => {
+      const record = await insertRecord({ key: 'applicability-flip', gate: 2 })
 
-      const gateResults = await update([editOf(record, 'root/gate', 1, 2)])
+      const gateResults = await update([editOf(record, 'root/gate', 2, 1)])
       expect(gateResults).toEqual([{ index: 0, status: 'applied' }])
 
       // the applicability is read from the stored record, so the next request sees the new state
       const results = await update([editOf(record, 'root/plot/plot_num', 3, 9)])
 
-      expect(results[0]).toMatchObject({ index: 0, status: 'failed', messageKey: notEditableKey })
-      expect(Node.getValue(nodeOf(await fetchRecord(record), 'root/plot/plot_num'))).toBe(3)
+      expect(results).toEqual([{ index: 0, status: 'applied' }])
+      expect(Node.getValue(nodeOf(await fetchRecord(record), 'root/plot/plot_num'))).toBe(9)
+    })
+
+    test('an edit that would make the entity not applicable (and clear its values) is refused', async () => {
+      const record = await insertRecord({ key: 'applicability-clear', gate: 1 })
+
+      const results = await update([editOf(record, 'root/gate', 1, 2)])
+
+      expect(results).toEqual([
+        { index: 0, status: 'failed', messageKey: 'appErrors:record.nodesBatchWouldClearValues' },
+      ])
+      const recordDb = await fetchRecord(record)
+      expect(Node.getValue(nodeOf(recordDb, 'root/gate'))).toBe(1)
+      expect(Node.getValue(nodeOf(recordDb, 'root/plot/plot_num'))).toBe(3)
     })
   })
 
@@ -410,16 +424,12 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
     expect(text).not.toMatch(/does not exist|relation|schema/i)
   }
 
-  const callWithMissingSurvey = async ({ init, method, path, body = {} }: any) => {
+  const callWithMissingSurvey = async ({ init, method, path, body = {}, surveyId = missingSurveyId }: any) => {
     const aiOn = jest.replaceProperty(ENV, 'aiFeaturesEnabled', true)
     try {
       const route = collectRoutes(init).find((r) => r.method === method && r.path === path)
       const res = createFakeResponse()
-      await route!.handlers.at(-1)(
-        { params: { surveyId: missingSurveyId }, query: { cycle: '0' }, body, user: aiUser },
-        res,
-        jest.fn()
-      )
+      await route!.handlers.at(-1)({ params: { surveyId }, query: { cycle: '0' }, body, user: aiUser }, res, jest.fn())
       return res
     } finally {
       aiOn.restore()
@@ -446,11 +456,15 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
   })
 
   test('a batch refused for lack of a slot is a 429 with a Retry-After header', async () => {
+    // the route reads the cycles of the survey first: it needs a real one
+    const survey = await SB.survey(getContextUser(), SB.entity('root', SB.attribute('root_key').key())).buildAndStore()
+    const surveyId = Survey.getId(survey)
     // the user already has a batch in flight (one at a time per user)
-    const slot = NodesBatchProcessSlots.tryAcquire({ userUuid: aiUser.uuid, surveyId: Number(missingSurveyId) })
+    const slot = NodesBatchProcessSlots.tryAcquire({ userUuid: aiUser.uuid, surveyId: Number(surveyId) })
     expect(slot.ok).toBe(true)
     try {
       const res = await callWithMissingSurvey({
+        surveyId: String(surveyId),
         init: RecordApi.init,
         method: 'post',
         path: '/survey/:surveyId/records/nodes/update',
@@ -461,6 +475,7 @@ describe('Routes do not send the text of an unexpected error (059)', () => {
       expect(res.headers['retry-after']).toBe(String(NodesBatchLimits.busyRetryAfterSeconds))
     } finally {
       if (slot.ok) slot.release()
+      await SurveyManager.deleteSurvey(surveyId)
     }
   })
 })
