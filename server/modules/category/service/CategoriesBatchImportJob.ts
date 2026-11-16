@@ -2,6 +2,7 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 
 import Job from '@server/job/job'
 import FileZip from '@server/utils/file/fileZip'
@@ -11,13 +12,17 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import CategoryBatchImportJob from './CategoryBatchImportJob'
 import * as CategoryImportJobParams from './categoryImportJobParams'
 
-const extractCategoryNameFromZipEntryName = (entryName) => {
+const extractCategoryNameFromZipEntryName = (entryName: any) => {
   const lastIndexOfDirSeparator = entryName.lastIndexOf('/')
   const fileName = lastIndexOfDirSeparator > 0 ? entryName.substring(lastIndexOfDirSeparator + 1) : entryName
   return FileUtils.getBaseName(fileName)
 }
 
 export default class CategoriesBatchImportJob extends Job {
+  static readonly type = 'CategoriesBatchImportJob'
+  insertedCategories: any
+  updatedCategories: any
+
   constructor(params) {
     super(CategoriesBatchImportJob.type, params)
     this.insertedCategories = 0
@@ -79,7 +84,7 @@ export default class CategoriesBatchImportJob extends Job {
     }
     if (errorKey) {
       this.addError({
-        error: Validation.newInstance(false, {}, [{ key: errorKey }]),
+        error: Validation.newInstance(false, {}, [ValidationResult.newInstance(errorKey)]),
       })
       await this.setStatusFailed()
       return false
@@ -116,5 +121,3 @@ export default class CategoriesBatchImportJob extends Job {
     }
   }
 }
-
-CategoriesBatchImportJob.type = 'CategoriesBatchImportJob'

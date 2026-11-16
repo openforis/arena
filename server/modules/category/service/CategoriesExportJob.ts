@@ -8,6 +8,10 @@ import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
 import * as CategoryManager from '../manager/categoryManager'
 
 export default class CategoriesExportJob extends Job {
+  static readonly type = 'CategoriesExportJob'
+  archiver: any
+  categoriesTempFolderName: any
+
   constructor(params, type = CategoriesExportJob.type) {
     super(type, params)
   }
@@ -65,10 +69,11 @@ export default class CategoriesExportJob extends Job {
     this.incrementProcessedItems()
   }
 
-  async beforeSuccess() {
+  beforeSuccess() {
     const { tempFileName } = this.context
 
     this.setResult({ tempFileName })
+    return Promise.resolve()
   }
 
   async onEnd() {
@@ -79,5 +84,3 @@ export default class CategoriesExportJob extends Job {
     await FileUtils.rmdir(FileUtils.tempFilePath(this.categoriesTempFolderName))
   }
 }
-
-CategoriesExportJob.type = 'CategoriesExportJob'

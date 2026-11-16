@@ -1,3 +1,4 @@
+import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import { ExtraPropDef } from '@core/survey/extraPropDef'
@@ -5,14 +6,14 @@ import { CategoryExportFile } from '@core/survey/categoryExportFile'
 import { FileFormats } from '@core/fileFormats'
 import { parsePoint } from '@core/survey/categoryItemPointParser'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
 import * as FlatDataWriter from '@server/utils/file/flatDataWriter'
 import * as CategoryRepository from '../repository/categoryRepository'
 
 const levelPositionField = 'level'
 
-const transformGeometryPointExtraProperty = ({ extraDef, obj }) => {
+const transformGeometryPointExtraProperty = ({ extraDef, obj }: { extraDef: any; obj: any }) => {
   // split geometry point into separate columns
   const extraDefName = ExtraPropDef.getName(extraDef)
   const geometryPoint = obj[extraDefName]
@@ -53,6 +54,15 @@ const getCategoryExportHeaders = ({
   includeCodeJoint = false,
   includeLevelPosition = false,
   includeCumulativeArea = false,
+}: {
+  category: ArenaCategory
+  languages?: any
+  language?: any
+  includeUuid?: boolean
+  includeSingleCode?: any
+  includeCodeJoint?: any
+  includeLevelPosition?: any
+  includeCumulativeArea?: any
 }) => {
   const levels = Category.getLevelsArray(category)
   const flat = levels.length === 1
@@ -99,8 +109,20 @@ export const exportCategoryToStream = async (
     includeReportingDataCumulativeArea = false,
     outputStream,
     fileFormat = FileFormats.csv,
+  }: {
+    survey: ArenaSurvey
+    categoryUuid: string
+    draft?: boolean
+    language?: any
+    includeUuid?: boolean
+    includeSingleCode?: any
+    includeCodeJoint?: any
+    includeLevelPosition?: any
+    includeReportingDataCumulativeArea?: any
+    outputStream: any
+    fileFormat?: string
   },
-  client = db
+  client: DbClient = db
 ) => {
   const surveyId = Survey.getId(survey)
   const category = await CategoryRepository.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
@@ -131,7 +153,7 @@ export const exportCategoryToStream = async (
   return DbUtils.stream({
     client,
     queryStream,
-    processor: async (dbStream) =>
+    processor: (dbStream) =>
       FlatDataWriter.writeItemsStreamToStream({
         stream: dbStream,
         outputStream,

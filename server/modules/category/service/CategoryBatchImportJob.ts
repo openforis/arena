@@ -11,7 +11,7 @@ class CategoryBatchImportInternalJob extends CategoryImportInternalJob {
     super(params, 'CategoryBatchImportInternalJob')
   }
 
-  async createReadStream() {
+  createReadStream() {
     const { fileZipEntryName, fileZip } = this.context
     return fileZip.getEntryStream(fileZipEntryName)
   }

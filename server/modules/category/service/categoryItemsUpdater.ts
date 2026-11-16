@@ -1,17 +1,33 @@
+import type { Category as ArenaCategory, User as ArenaUser } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
+import * as A from '@core/arena'
 import { ArrayUtils } from '@core/arrayUtils'
 import * as ObjectUtils from '@core/objectUtils'
 import * as Validation from '@core/validation/validation'
 
 import BatchPersister from '@server/db/batchPersister'
+import type { DbClient } from '@server/db/db'
 import * as CategoryManager from '../manager/categoryManager'
 
 export default class CategoryItemsUpdater {
+  category: ArenaCategory
+  errorHandler: any
+  existingItems: any
+  existingItemsProcessedByUuid: Record<string, boolean>
+  itemExtraPropsExtrator: any
+  itemsBatchInserter: any
+  itemsBatchUpdater: any
+  itemsCacheByCodes: any
+  latestIndexByParent: any
+  surveyId: number
+  tx: DbClient
+  user: ArenaUser
+
   constructor({ surveyId, category, user, tx, errorHandler, itemExtraPropsExtrator }) {
     this.surveyId = surveyId
     this.category = category
@@ -33,10 +49,10 @@ export default class CategoryItemsUpdater {
      */
     this.latestIndexByParent = {}
 
-    this.itemsBatchInserter = new BatchPersister(async (items) =>
+    this.itemsBatchInserter = new BatchPersister((items) =>
       CategoryManager.insertItems(this.user, this.surveyId, items, this.tx)
     )
-    this.itemsBatchUpdater = new BatchPersister(async (items) =>
+    this.itemsBatchUpdater = new BatchPersister((items) =>
       CategoryManager.updateItemsProps(this.user, this.surveyId, Category.getUuid(this.category), items, this.tx)
     )
 
@@ -108,7 +124,7 @@ export default class CategoryItemsUpdater {
 
     if (Category.isPublished(category)) {
       const code = ArrayUtils.last(itemCodes)
-      item = await this._insertOrUpdateItemOfPublishedCategory({ level, parentItemUuid, code, itemProps, item })
+      item = await this._insertOrUpdateItemOfPublishedCategory({ level, parentItemUuid, code, itemProps })
     } else {
       // when category is not published, always insert new items (old items deleted previously)
       item = await this._insertNewItem({ level, parentItemUuid, itemProps })
@@ -196,7 +212,7 @@ export default class CategoryItemsUpdater {
   }
 
   _putItemIntoCache(itemCodes, item) {
-    const { props, ...itemWithoutProps } = item
+    const itemWithoutProps = A.omit([ObjectUtils.keys.props])(item)
     this.itemsCacheByCodes[String(itemCodes)] = itemWithoutProps // store item without props in cache to save memory
   }
 
