@@ -23,6 +23,13 @@ const rowToSrs = (row) => {
   return SRSFactory.createInstance({ code: String(code), name, wkt })
 }
 
+/**
+ * Fetches the SRSs with the specified codes.
+ * @param {object} params - The parameters.
+ * @param {string[]} params.srsCodes - The SRS codes.
+ * @param {import('@server/db/db').DbClient} [client] - The database client.
+ * @returns {Promise<import('@openforis/arena-core').SRS[]>} - The SRSs.
+ */
 export const fetchSRSsByCodes = async ({ srsCodes }, client = db) =>
   // "IN ()" is not valid SQL
   srsCodes.length === 0 ? [] : client.map(`SELECT * FROM spatial_ref_sys WHERE srid IN ($1:csv)`, [srsCodes], rowToSrs)

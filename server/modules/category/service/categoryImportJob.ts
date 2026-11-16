@@ -1,6 +1,7 @@
 import * as fs from 'node:fs'
 import * as A from '@core/arena'
 
+import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { Objects, Points } from '@openforis/arena-core'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
@@ -11,8 +12,9 @@ import * as Survey from '@core/survey/survey'
 import * as Category from '@core/survey/category'
 import * as CategoryImportSummary from '@core/survey/categoryImportSummary'
 import * as CategoryLevel from '@core/survey/categoryLevel'
-import { ExtraPropDef } from '@core/survey/extraPropDef'
+import { ExtraPropDef, type ExtraPropDataType } from '@core/survey/extraPropDef'
 import * as Validation from '@core/validation/validation'
+import * as ValidationResult from '@core/validation/validationResult'
 import * as StringUtils from '@core/stringUtils'
 
 import * as SurveyManager from '@server/modules/survey/manager/surveyManager'
@@ -24,7 +26,7 @@ import CategoryItemsUpdater from './categoryItemsUpdater'
 import { CategoryValidationJob } from './CategoryValidationJob'
 import * as CategoryService from './categoryService'
 
-const toNumber = (value) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)
+const toNumber = (value: unknown) => Number(typeof value === 'string' ? value.replaceAll(',', '') : value)
 
 const extraPropProcessorByDataType = {
   [ExtraPropDef.dataTypes.number]: ({ value }) => {
@@ -44,6 +46,14 @@ const extraPropProcessorByDataType = {
 }
 
 export class CategoryImportInternalJob extends Job {
+  category: ArenaCategory
+  itemsByCodes: any
+  itemsUpdater: any
+  srsIndex: any
+  summary: any
+  survey: ArenaSurvey | null
+  totalItemsInserted: any
+
   constructor(params, type = 'CategoryImportInternalJob') {
     super(type, params)
 
@@ -129,12 +139,12 @@ export class CategoryImportInternalJob extends Job {
   }
 
   // Start of methods that can be overridden by subclasses
-  async createReadStream() {
-    return fs.createReadStream(CategoryImportSummary.getFilePath(this.summary))
+  createReadStream() {
+    return Promise.resolve(fs.createReadStream(CategoryImportSummary.getFilePath(this.summary)))
   }
 
-  async getOrCreateSummary() {
-    return CategoryImportJobParams.getSummary(this.params)
+  getOrCreateSummary() {
+    return Promise.resolve(CategoryImportJobParams.getSummary(this.params))
   }
 
   extractItemExtraDef() {
@@ -146,7 +156,7 @@ export class CategoryImportInternalJob extends Job {
       if (CategoryImportSummary.isItemExtra(item)) {
         const itemKey = CategoryImportSummary.getItemKey(item)
         extraDefs[itemKey] = ExtraPropDef.newItem({
-          dataType: CategoryImportSummary.getItemDataType(item),
+          dataType: CategoryImportSummary.getItemDataType(item) as ExtraPropDataType,
           index,
         })
         index++
@@ -183,7 +193,7 @@ export class CategoryImportInternalJob extends Job {
 
   // End of methods that can be overridden by subclasses
 
-  async _fetchOrCreateCategory() {
+  _fetchOrCreateCategory() {
     const { surveyId, user, tx } = this
     const categoryUuid = CategoryImportJobParams.getCategoryUuid(this.params)
     if (categoryUuid) {
@@ -323,7 +333,7 @@ export class CategoryImportInternalJob extends Job {
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportFlatDataParser.createRowsReaderFromStream({
+    const reader = CategoryImportFlatDataParser.createRowsReaderFromStream({
       stream: await this.createReadStream(),
       survey,
       summary,
@@ -416,12 +426,14 @@ export class CategoryImportInternalJob extends Job {
 
   _addError(key, params = {}) {
     this.addError({
-      error: Validation.newInstance(false, {}, [{ key, params }]),
+      error: Validation.newInstance(false, {}, [ValidationResult.newInstance(key, params)]),
     })
   }
 }
 
 export default class CategoryImportJob extends Job {
+  static readonly type = 'CategoryImportJob'
+
   constructor(params, type = CategoryImportJob.type, internalJobConstructor = CategoryImportInternalJob) {
     super(type, params, [new internalJobConstructor(params), new CategoryValidationJob(params)])
   }
@@ -435,5 +447,3 @@ export default class CategoryImportJob extends Job {
     }
   }
 }
-
-CategoryImportJob.type = 'CategoryImportJob'

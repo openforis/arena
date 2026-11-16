@@ -1,3 +1,4 @@
+import type { Category as ArenaCategory } from '@openforis/arena-core'
 import { Schemata } from '@openforis/arena-server'
 
 import * as Category from '@core/survey/category'
@@ -12,7 +13,7 @@ export const codeJointField = 'code_joint'
 const areaPropName = Category.reportingDataItemExtraDefKeys.area
 const codeJointSeparator = '*'
 
-const getQueryPrefix = ({ surveyId, draft = true }) => {
+const getQueryPrefix = ({ surveyId, draft = true }: { surveyId: number; draft?: boolean }) => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   return `WITH RECURSIVE category_item_extended AS (
       SELECT *, 
@@ -35,10 +36,18 @@ const getQueryPrefix = ({ surveyId, draft = true }) => {
 }
 
 // the name of the extra prop is passed as a query parameter (extraPropNameParam is its placeholder)
-const getExtraPropColumn = ({ columnPrefix, extraPropNameParam, draft = true }) =>
+const getExtraPropColumn = ({
+  columnPrefix,
+  extraPropNameParam,
+  draft = true,
+}: {
+  columnPrefix: any
+  extraPropNameParam: any
+  draft?: boolean
+}) =>
   `(${DbUtils.getPropColCombined(CategoryItem.keysProps.extra, draft, columnPrefix, false)}) ->> ${extraPropNameParam}`
 
-const getSelectCumulativeAreaSubquery = ({ params, draft = true }) => {
+const getSelectCumulativeAreaSubquery = ({ params, draft = true }: { params: any; draft?: boolean }) => {
   const areaColumn = getExtraPropColumn({ columnPrefix: 'ext.', extraPropNameParam: params.add(areaPropName), draft })
   return `COALESCE((
     SELECT SUM (COALESCE((${areaColumn})::numeric, 0))
@@ -64,6 +73,12 @@ const generateCategoryExportQuery = ({
   languages,
   draft = true,
   includeCumulativeArea = false,
+}: {
+  surveyId: number
+  category: ArenaCategory
+  languages: any
+  draft?: boolean
+  includeCumulativeArea?: any
 }) => {
   const params = DbUtils.newQueryParams([Category.getUuid(category)])
   const levels = Category.getLevelsArray(category)
@@ -117,6 +132,12 @@ export const generateCategoryExportStream = ({
   languages = [],
   includeCumulativeArea = false,
   draft = true,
+}: {
+  surveyId: number
+  category: ArenaCategory
+  languages?: any
+  includeCumulativeArea?: any
+  draft?: boolean
 }) => {
   const { query, values } = generateCategoryExportQuery({
     surveyId,

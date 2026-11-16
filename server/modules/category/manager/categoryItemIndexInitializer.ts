@@ -1,18 +1,19 @@
+import type { Category as ArenaCategory } from '@openforis/arena-core'
 import { Objects } from '@openforis/arena-core'
 
 import * as Category from '@core/survey/category'
 import * as CategoryLevel from '@core/survey/categoryLevel'
 import * as CategoryItem from '@core/survey/categoryItem'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 import * as CategoryRepository from '../repository/categoryRepository'
 
-const shouldItemIndexBeInitialized = (item) => item && Objects.isEmpty(CategoryItem.getIndex(item))
+const shouldItemIndexBeInitialized = (item: any) => item && Objects.isEmpty(CategoryItem.getIndex(item))
 
-const isIndexable = ({ item, draft }) =>
+const isIndexable = ({ item, draft }: { item: any; draft: boolean }) =>
   (draft && CategoryItem.isDraft(item)) || (!draft && CategoryItem.isPublished(item))
 
-const itemsSortFunction = (itemA, itemB) => {
+const itemsSortFunction = (itemA: any, itemB: any) => {
   const indexA = CategoryItem.getIndex(itemA)
   const indexB = CategoryItem.getIndex(itemB)
 
@@ -41,7 +42,13 @@ const itemsSortFunction = (itemA, itemB) => {
   return CategoryItem.getId(itemA) - CategoryItem.getId(itemB)
 }
 
-const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
+const calculateIndexesByItemUuid = ({
+  itemsByParentUuid,
+  draft,
+}: {
+  itemsByParentUuid: Record<string, any>
+  draft: boolean
+}) => {
   const indexByItemUuid = {}
 
   for (const groupItems of Object.values(itemsByParentUuid)) {
@@ -58,7 +65,7 @@ const calculateIndexesByItemUuid = ({ itemsByParentUuid, draft }) => {
   return indexByItemUuid
 }
 
-const groupItemsByParentUuid = (items) => {
+const groupItemsByParentUuid = (items: any[]) => {
   const itemsByParentUuid = {}
   let shouldIndexesBeInitialized = false
   for (const item of items) {
@@ -70,7 +77,10 @@ const groupItemsByParentUuid = (items) => {
   return { shouldIndexesBeInitialized, itemsByParentUuid }
 }
 
-const _initializeSurveyCategoryItemsIndexesInternal = async ({ surveyId, category, draft = true }, client = db) => {
+const _initializeSurveyCategoryItemsIndexesInternal = async (
+  { surveyId, category, draft = true }: { surveyId: number; category: ArenaCategory; draft?: boolean },
+  client: DbClient = db
+) => {
   const categoryUuid = Category.getUuid(category)
   const levels = Category.getLevelsArray(category)
 
@@ -89,7 +99,10 @@ const _initializeSurveyCategoryItemsIndexesInternal = async ({ surveyId, categor
   }
 }
 
-export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category }, client = db) => {
+export const initializeSurveyCategoryItemsIndexes = async (
+  { surveyId, category }: { surveyId: number; category: ArenaCategory },
+  client: DbClient = db
+) => {
   if (Category.isPublished(category)) {
     await _initializeSurveyCategoryItemsIndexesInternal({ surveyId, category, draft: false }, client)
   }
@@ -103,7 +116,10 @@ export const initializeSurveyCategoryItemsIndexes = async ({ surveyId, category 
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<void>} - A promise resolving to void.
  */
-export const initializeCategoryItemIndexesForSurvey = async ({ surveyId }, client = db) => {
+export const initializeCategoryItemIndexesForSurvey = async (
+  { surveyId }: { surveyId: number },
+  client: DbClient = db
+) => {
   await client.tx(async (t) => {
     const categoriesByUuid = await CategoryRepository.fetchCategoriesAndLevelsBySurveyId({ surveyId, draft: true }, t)
 
