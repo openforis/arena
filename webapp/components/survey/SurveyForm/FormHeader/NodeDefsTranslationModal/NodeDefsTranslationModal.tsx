@@ -467,7 +467,7 @@ const NodeDefsTranslationModal = ({
           disabled={isSaving}
           iconClassName="icon-checkmark icon-14px"
           label="surveyForm:nodeDefsTranslation.apply"
-          onClick={onApply}
+          onClick={() => void onApply()}
           variant="contained"
         />
       </ModalFooter>

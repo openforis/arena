@@ -219,19 +219,51 @@ const runCall = async <T>({
       onResult(await call.run(signal), index)
       return { succeeded: true, failedSize: 0, notRunSize: 0 }
     } catch (error) {
-      // what the HTTP client throws when its request is aborted is not always an AbortError
-      if (signal?.aborted || isAiAbortError(error)) return stopped(cancelled)
-      const key = getAiErrorKey(error)
-      if (key === 'aiRateLimited' && retries < AI_BATCH_RATE_LIMIT_RETRIES) {
-        await waitUnlessAborted(rateLimitWaitMs, signal)
-        if (signal?.aborted) return stopped(cancelled)
-      } else if (isRunStoppingError(error)) return stopped({ cause: 'error', error })
-      else if (key !== null && UNUSABLE_ANSWER_KEYS.includes(key) && call.split) {
-        // repeating the same call would get the same cut-off answer: run each half instead
-        return runHalves({ halves: call.split(), index, guard, onResult, signal, rateLimitWaitMs })
-      } else return { succeeded: false, failedSize: call.size, notRunSize: 0 }
+      switch (afterCallError({ error, retries, signal, canSplit: Boolean(call.split) })) {
+        case 'cancelled':
+          return stopped(cancelled)
+        case 'stop':
+          return stopped({ cause: 'error', error })
+        case 'split':
+          // repeating the same call would get the same cut-off answer: run each half instead
+          return runHalves({ halves: call.split?.() ?? [], index, guard, onResult, signal, rateLimitWaitMs })
+        case 'failed':
+          return { succeeded: false, failedSize: call.size, notRunSize: 0 }
+        default:
+          await waitUnlessAborted(rateLimitWaitMs, signal)
+          if (signal?.aborted) return stopped(cancelled)
+      }
     }
   }
+}
+
+/**
+ * Decides what follows a failed call.
+ * @param {object} params - Parameters.
+ * @param {unknown} params.error - What the call threw.
+ * @param {number} params.retries - Repeats already made after a rate limit.
+ * @param {AbortSignal} [params.signal] - Cancellation signal.
+ * @param {boolean} params.canSplit - Whether the call can be split in halves.
+ * @returns {string} cancelled, retry (after a wait), stop (the run), split (run the halves) or failed (go on).
+ */
+const afterCallError = ({
+  error,
+  retries,
+  signal,
+  canSplit,
+}: {
+  error: unknown
+  retries: number
+  signal?: AbortSignal
+  canSplit: boolean
+}): 'cancelled' | 'retry' | 'stop' | 'split' | 'failed' => {
+  // what the HTTP client throws when its request is aborted is not always an AbortError
+  if (signal?.aborted || isAiAbortError(error)) return 'cancelled'
+  const key = getAiErrorKey(error)
+  if (key === 'aiRateLimited' && retries < AI_BATCH_RATE_LIMIT_RETRIES) return 'retry'
+  if (isRunStoppingError(error)) return 'stop'
+  if (key !== null && UNUSABLE_ANSWER_KEYS.includes(key) && canSplit) return 'split'
+  return 'failed'
 }
 
 /**

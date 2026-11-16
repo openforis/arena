@@ -109,7 +109,7 @@ export const CategoryLabelsBatchHost = () => {
     [getSurvey, notifyWarning, start, userUuid]
   )
 
-  useEffect(() => onCategoryLabelsBatchRequest(onRequest), [onRequest])
+  useEffect(() => onCategoryLabelsBatchRequest((suggestion) => void onRequest(suggestion)), [onRequest])
 
   const closeReview = useCallback(() => {
     review?.release()

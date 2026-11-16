@@ -77,7 +77,7 @@ export const useUserAiSettings = (): UseUserAiSettingsResult => {
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect -- fetch settings on mount
-    fetchSettings()
+    void fetchSettings()
     // only on mount: a language change must not reload the settings and drop the unsaved form
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])

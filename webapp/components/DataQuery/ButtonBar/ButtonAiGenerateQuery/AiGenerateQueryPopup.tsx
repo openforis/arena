@@ -98,7 +98,7 @@ export const AiGenerateQueryPopup = (props: Props) => {
         <Button
           className="btn-primary"
           label={busy ? 'dataView:dataQuery.ai.generating' : 'dataView:dataQuery.ai.generate'}
-          onClick={onGenerate}
+          onClick={() => void onGenerate()}
           disabled={busy || !descriptionTrimmed}
         />
       </ModalFooter>

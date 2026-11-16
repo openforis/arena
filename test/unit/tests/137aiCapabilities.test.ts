@@ -221,7 +221,7 @@ describe('user switch and failures', () => {
     const cache = createAiSettingsCache({ fetchSettings: () => reads[index++].promise })
     const store = createCapabilitiesStore({
       loadSettings: async ({ force }) => {
-        if (force) cache.invalidate()
+        if (force) void cache.invalidate()
         return (await cache.fetchOnce()) as any
       },
       loadLocalProviders: () => [],

@@ -69,7 +69,7 @@ describe('data dictionary in the browser (256)', () => {
       },
     })
     expect(sizes).toEqual([4, 2, 2, 1, 1])
-    expect(Object.keys(aiDescriptions).sort()).toEqual(['u0', 'u1', 'u3'])
+    expect(Object.keys(aiDescriptions).sort((a, b) => a.localeCompare(b))).toEqual(['u0', 'u1', 'u3'])
     expect(failedCount).toBe(1)
     expect(notDoneCount).toBe(0)
   })
