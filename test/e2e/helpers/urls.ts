@@ -10,6 +10,7 @@ export const Urls = {
   surveyHierarchy: '/app/designer/surveyHierarchy/',
   records: '/app/data/records/',
   dataExport: '/app/data/export/',
+  dataImport: '/app/data/import/',
   dataExplorer: '/app/data/explorer/',
   validationReport: '/app/data/validationReport/',
   messages: '/app/systemAdmin/messages/',
