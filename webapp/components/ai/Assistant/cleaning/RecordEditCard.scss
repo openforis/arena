@@ -42,7 +42,7 @@
 
   &__path {
     font-size: 0.8rem;
-    color: $colorSurfaceVariant;
+    color: var(--color-on-surface-variant);
   }
 
   &__from {
@@ -57,7 +57,7 @@
 
     &--fixes {
       background-color: $colorSuccessContainer;
-      color: $colorSuccess;
+      color: $colorOnSuccessContainer;
     }
 
     &--stillInvalid {
