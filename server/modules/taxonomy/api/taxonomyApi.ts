@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as Request from '../../../utils/request'
 import * as Response from '../../../utils/response'
 
@@ -24,7 +25,7 @@ const sendTaxonomies = async (res: any, surveyId: number, draft: boolean, valida
 // props edited by the taxonomy editor: extra props and vernacular languages are updated through dedicated routes or import
 const taxonomyUpdatablePropKeys = [Taxonomy.keysProps.name, Taxonomy.keysProps.descriptions]
 
-export const init = (app: any) => {
+export const init = (app: Router) => {
   // ====== CREATE
   app.post('/survey/:surveyId/taxonomies', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
     try {

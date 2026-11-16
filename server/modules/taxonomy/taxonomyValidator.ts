@@ -9,10 +9,10 @@ import * as ObjectUtils from '@core/objectUtils'
 
 // ====== TAXONOMY
 
-const validateNotEmptyTaxa = (taxaCount: any) => () =>
+const validateNotEmptyTaxa = (taxaCount: number) => () =>
   taxaCount === 0 ? { key: Validation.messageKeys.taxonomyEdit.taxaEmpty } : null
 
-const taxonomyValidators = (taxonomies: any, taxaCount: any) => ({
+const taxonomyValidators = (taxonomies: ArenaTaxonomy[], taxaCount: number) => ({
   [`${ObjectUtils.keys.props}.${Taxonomy.keysProps.name}`]: [
     Validator.validateRequired(Validation.messageKeys.nameRequired),
     Validator.validateName(Validation.messageKeys.nameInvalid),
@@ -22,8 +22,11 @@ const taxonomyValidators = (taxonomies: any, taxaCount: any) => ({
   taxa: [validateNotEmptyTaxa(taxaCount)],
 })
 
-export const validateTaxonomy = (taxonomies: any, taxonomy: ArenaTaxonomy, taxaCount: any) =>
-  Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
+export const validateTaxonomy = (
+  taxonomies: ArenaTaxonomy[],
+  taxonomy: ArenaTaxonomy,
+  taxaCount: number
+): Promise<Validation.ValidationInstance> => Validator.validate(taxonomy, taxonomyValidators(taxonomies, taxaCount))
 
 // ====== TAXON
 
@@ -73,4 +76,5 @@ const taxonValidators = (taxa: ArenaTaxon[]) => ({
   [Taxon.keys.vernacularNames]: [_validateVernacularNames],
 })
 
-export const validateTaxon = (taxa: ArenaTaxon[], taxon: ArenaTaxon) => Validator.validate(taxon, taxonValidators(taxa))
+export const validateTaxon = (taxa: ArenaTaxon[], taxon: ArenaTaxon): Promise<Validation.ValidationInstance> =>
+  Validator.validate(taxon, taxonValidators(taxa))
