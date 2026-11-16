@@ -18,7 +18,22 @@ const emailServices = {
 const emailService = ProcessUtils.ENV.emailService
 const from = ProcessUtils.ENV.emailFromResolved
 
-const emailProviders = {
+// functions exported by the email provider modules
+type EmailProvider = {
+  validateEnv: (params: { from: string }) => void
+  init?: () => void
+  logTransportOptionsType?: () => string
+  sendEmail: (params: {
+    to?: string | string[] | null
+    bcc?: string | string[] | null
+    from: string
+    subject: string
+    html: string
+    text?: string | null
+  }) => Promise<unknown>
+}
+
+const emailProviders: Record<string, EmailProvider> = {
   [emailServices.sendgrid]: MailerSendgrid,
   [emailServices.office365]: MailerOffice365,
   [emailServices.amazonSES]: MailerAmazonSES,

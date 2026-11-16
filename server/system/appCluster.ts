@@ -106,7 +106,7 @@ export const run = async () => {
   }
 
   // ====== Update app version in DB
-  const infoService = serviceRegistry.getService(ServiceType.info)
+  const infoService = serviceRegistry.getService(ServiceType.info) as unknown as { updateVersion: () => Promise<void> }
   await infoService.updateVersion()
 
   // ====== Start server

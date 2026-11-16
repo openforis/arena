@@ -16,7 +16,7 @@ const mockRes = (): MockRes => {
 
 const getContentDisposition = (fileName: string): string => {
   const res = mockRes()
-  Response.setContentTypeFile({ res, fileName })
+  Response.setContentTypeFile({ res: res as any, fileName })
   return String(res.headers['Content-Disposition'])
 }
 

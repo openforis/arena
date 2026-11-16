@@ -1,4 +1,4 @@
-import type { Express, Response as ExpressResponse } from 'express'
+import type { Response as ExpressResponse, Router } from 'express'
 
 import { ExportFileNameGenerator } from '@common/dataExport/exportFileNameGenerator'
 import { getExtensionByFileFormat } from '@core/fileFormats'
@@ -36,7 +36,7 @@ export const sendTempFileToResponse = ({
   })
 }
 
-export const init = (app: Express): void => {
+export const init = (app: Router): void => {
   app.get('/download', AuthMiddleware.requireDownloadToken, async (req, res, next) => {
     try {
       const downloadFileName = Request.getDownloadFileName(req)

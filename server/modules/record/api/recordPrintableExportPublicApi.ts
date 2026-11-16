@@ -1,10 +1,10 @@
-import type { Express, NextFunction, Request, Response } from 'express'
+import type { NextFunction, Request, Response, Router } from 'express'
 
 import { StatusCodes } from '@core/systemError'
 
 import * as RecordPrintableExportShareService from '@server/modules/record/service/recordPrintableExportShareService'
 
-export const init = (app: Express): void => {
+export const init = (app: Router): void => {
   app.get('/public/record-export/:token', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const tokenParam = req.params.token

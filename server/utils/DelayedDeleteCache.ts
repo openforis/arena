@@ -9,23 +9,27 @@ const defaultOptions = {
  * When an item is deleted, a timeout is started and the delete will be delayed
  * by the specified seconds.
  */
-export default class DelayedDeleteCache extends ItemsCache {
-  constructor(options = {}) {
+type DelayedDeleteCacheOptions = { deleteDelaySeconds: number }
+
+export default class DelayedDeleteCache<T = any> extends ItemsCache<T, DelayedDeleteCacheOptions> {
+  private readonly _deleteTimeoutIdByKey: Record<string, NodeJS.Timeout>
+
+  constructor(options: Partial<DelayedDeleteCacheOptions> = {}) {
     super({ ...defaultOptions, ...options })
     this._deleteTimeoutIdByKey = {}
   }
 
-  set(key, item) {
+  set(key: string, item: T): this {
     this._clearDeleteTimeout(key)
     return super.set(key, item)
   }
 
-  delete(key) {
+  delete(key: string): this {
     this._resetDeleteTimeout(key)
     return this
   }
 
-  _clearDeleteTimeout(key) {
+  _clearDeleteTimeout(key: string): void {
     const timeoutId = this._deleteTimeoutIdByKey[key]
     if (timeoutId) {
       clearTimeout(timeoutId)
@@ -33,7 +37,7 @@ export default class DelayedDeleteCache extends ItemsCache {
     delete this._deleteTimeoutIdByKey[key]
   }
 
-  _resetDeleteTimeout(key) {
+  _resetDeleteTimeout(key: string): void {
     this._clearDeleteTimeout(key)
 
     const timeoutId = setTimeout(() => {

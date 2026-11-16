@@ -20,7 +20,9 @@ const deleteExpiredUserTempAuthTokens = async () => {
         Logger.debug(task)
 
         const serviceRegistry = ServiceRegistry.getInstance()
-        const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken)
+        const userTempAuthTokenService = serviceRegistry.getService(ServerServiceType.userTempAuthToken) as unknown as {
+          cleanupExpired: () => Promise<number>
+        }
         const count = await userTempAuthTokenService.cleanupExpired()
         Logger.debug(`${count} ${items} deleted`)
       },

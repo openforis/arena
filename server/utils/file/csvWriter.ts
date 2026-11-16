@@ -1,10 +1,17 @@
+import type { Readable, Writable } from 'node:stream'
 import { format } from '@fast-csv/format'
 
-import { FlatDataWriterUtils } from './flatDataWriterUtils'
-import { CsvField } from './csvField'
+import { FlatDataWriterOptions, FlatDataWriterUtils } from './flatDataWriterUtils'
+import { CsvField, CsvFieldItem } from './csvField'
 import { StreamUtils } from '../streamUtils'
 
-const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtils.defaultOptions }) => {
+const transformJsonToCsv = ({
+  fields,
+  options: optionsParam = FlatDataWriterUtils.defaultOptions,
+}: {
+  fields?: CsvFieldItem[] | null
+  options?: FlatDataWriterOptions
+}) => {
   const options = { ...FlatDataWriterUtils.defaultOptions, ...optionsParam }
   const { objectTransformer = null } = options
   const rowTransformer = objectTransformer ?? FlatDataWriterUtils.defaultObjectTransformer(options)
@@ -13,7 +20,7 @@ const transformJsonToCsv = ({ fields, options: optionsParam = FlatDataWriterUtil
     alwaysWriteHeaders: !!fieldNames, // alwaysWriteHeaders set to true throws an error if headers is not specified as an array
     headers: fieldNames ?? true, // if fieldNames is null or undefined, include all fields
     quoteColumns: true,
-    transform: (row) => rowTransformer(row), // use this syntax to avoid passing callback function to rowTranformer callback
+    transform: (row: Record<string, any>) => rowTransformer(row), // use this syntax to avoid passing callback function to rowTranformer callback
   }
   return format(formatOptions)
 }
@@ -23,8 +30,13 @@ export const writeItemsToStream = ({
   items,
   fields: fieldsParam = null,
   options = FlatDataWriterUtils.defaultOptions,
-}) =>
-  new Promise((resolve, reject) => {
+}: {
+  outputStream: Writable
+  items: Record<string, any>[]
+  fields?: CsvFieldItem[] | null
+  options?: FlatDataWriterOptions
+}): Promise<void> =>
+  new Promise<void>((resolve, reject) => {
     const fields = fieldsParam ?? Object.keys(items[0] ?? {})
     const transform = transformJsonToCsv({ fields, options })
     const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
@@ -43,7 +55,17 @@ export const writeItemsToStream = ({
     transform.end()
   })
 
-export const pipeDataStreamToStream = ({ stream, fields, options, outputStream }) => {
+export const pipeDataStreamToStream = ({
+  stream,
+  fields,
+  options,
+  outputStream,
+}: {
+  stream: Readable
+  fields?: CsvFieldItem[] | null
+  options?: FlatDataWriterOptions
+  outputStream: Writable
+}): Promise<void> => {
   const csvTransform = transformJsonToCsv({ fields, options })
   const outputCompletePromise = StreamUtils.waitForWritableStreamComplete(outputStream)
   stream.pipe(csvTransform).pipe(outputStream)

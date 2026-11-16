@@ -1,10 +1,15 @@
 import * as StringUtils from '@core/stringUtils'
 
-const defaultOptions = { objectTransformer: null, removeNewLines: true }
+export type FlatDataWriterOptions = {
+  objectTransformer?: ((obj: Record<string, any>) => Record<string, any>) | null
+  removeNewLines?: boolean
+}
+
+const defaultOptions: FlatDataWriterOptions = { objectTransformer: null, removeNewLines: true }
 
 const defaultObjectTransformer =
-  (options = {}) =>
-  (obj) => {
+  (options: FlatDataWriterOptions = {}) =>
+  (obj: Record<string, any>): Record<string, any> => {
     const { removeNewLines = true } = options
     if (!removeNewLines) return obj
 

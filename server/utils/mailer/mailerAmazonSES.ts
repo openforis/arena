@@ -2,15 +2,20 @@ import * as nodemailer from 'nodemailer'
 
 import * as ProcessUtils from '@core/processUtils'
 
-import { assertRequiredEnvVars, assertResolvedFromAddress, assertTransportOptionsEnv } from './mailerProviderUtils'
+import {
+  assertNumericEnvVar,
+  assertRequiredEnvVars,
+  assertResolvedFromAddress,
+  assertTransportOptionsEnv,
+} from './mailerProviderUtils'
 
-const emailService = 'office365'
+const emailService = 'amazonSES'
 const authUser = ProcessUtils.ENV.emailAuthUser
 const authPass = ProcessUtils.ENV.emailAuthPassword
 
 const defaultTransportOptions = {
-  host: 'smtp.office365.com',
-  port: '587',
+  host: ProcessUtils.ENV.emailAmazonSESHost,
+  port: ProcessUtils.ENV.emailAmazonSESPort,
   auth: { user: authUser, pass: authPass },
   secure: true,
 }
@@ -20,6 +25,7 @@ const getTransportOptions = () => ProcessUtils.ENV.emailTransportOptions ?? defa
 export const validateEnv = ({ from }) => {
   assertTransportOptionsEnv({ emailService })
   assertResolvedFromAddress({ emailService, from })
+  assertNumericEnvVar({ emailService, variableName: 'EMAIL_AMAZON_SES_PORT' })
 
   if (!ProcessUtils.ENV.emailTransportOptions) {
     assertRequiredEnvVars({
@@ -27,6 +33,7 @@ export const validateEnv = ({ from }) => {
       variables: [
         ['EMAIL_AUTH_USER', authUser],
         ['EMAIL_AUTH_PASSWORD', authPass],
+        ['EMAIL_AMAZON_SES_HOST', ProcessUtils.ENV.emailAmazonSESHost],
       ],
     })
   }
@@ -35,13 +42,13 @@ export const validateEnv = ({ from }) => {
 export const logTransportOptionsType = () => (ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default')
 
 export const sendEmail = async ({ to = null, bcc = null, from, subject, html, text = null }) => {
-  const transporter = nodemailer.createTransport(getTransportOptions())
+  // custom transport options are set by the server administrator
+  const transporter = nodemailer.createTransport(getTransportOptions()) // NOSONAR
 
   const info = await transporter.sendMail({
     from,
     to,
     bcc,
-    replyTo: from,
     subject,
     html,
     text,

@@ -1,4 +1,4 @@
-import type { Express } from 'express'
+import type { Router } from 'express'
 import { ApiAuthMiddleware } from '@openforis/arena-server'
 
 import * as Request from '@server/utils/request'
@@ -6,7 +6,7 @@ import * as JobUtils from '@server/job/jobUtils'
 
 import { MessageService } from '../service/messageService'
 
-export const init = (app: Express): void => {
+export const init = (app: Router): void => {
   app.post('/message/send', ApiAuthMiddleware.requireAdminPermission, (req, res, next) => {
     try {
       const { messageUuid } = Request.getParams(req)
