@@ -1,9 +1,10 @@
+import type { User as ArenaUser, Survey as ArenaSurvey, Message } from '@openforis/arena-core'
 import * as fs from 'node:fs'
 
 import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
 import { ServerServiceType, WebSocketEvent, WebSocketServer } from '@openforis/arena-server'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import * as ProcessUtils from '@core/processUtils'
 import * as i18nFactory from '@core/i18n/i18nFactory'
@@ -44,7 +45,7 @@ const Logger = Log.getLogger('UserService')
 
 // ====== CREATE
 
-export const insertSystemAdminUserIfNotExisting = async (client = db) =>
+export const insertSystemAdminUserIfNotExisting = (client: DbClient = db) =>
   client.tx(async (t) => {
     Logger.debug('checking if admin users exist...')
     const adminsCount = await UserManager.countSystemAdministrators(t)
@@ -80,7 +81,10 @@ export const insertSystemAdminUserIfNotExisting = async (client = db) =>
  * @param {!string} serverUrl - Address of the server.
  * @returns {Promise<{uuid?: string, error?: string}>} - The generated password reset uuid, or the error.
  */
-export const generateResetPasswordUuid = async (email, serverUrl) => {
+export const generateResetPasswordUuid = async (
+  email: string,
+  serverUrl: string
+): Promise<{ uuid?: string; error?: string }> => {
   try {
     return await db.tx(async (t) => {
       const { uuid, user } = await UserManager.generateResetPasswordUuid(email, t)
@@ -95,7 +99,7 @@ export const generateResetPasswordUuid = async (email, serverUrl) => {
   }
 }
 
-const _checkUserAccessRequest = async ({ userAccessRequest }) => {
+const _checkUserAccessRequest = async ({ userAccessRequest }: { userAccessRequest: any }) => {
   // verify reCaptcha
   const { reCaptchaToken } = userAccessRequest
   const reCaptchaVerified = await ReCaptchaUtils.verifyReCaptcha({ token: reCaptchaToken })
@@ -121,7 +125,20 @@ const _checkUserAccessRequest = async ({ userAccessRequest }) => {
   return { ok: true }
 }
 
-export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) => {
+type UserAccessRequestInsertResult = {
+  error?: string
+  errorParams?: Record<string, unknown>
+  validation?: Validation.ValidationInstance
+  requestInserted?: any
+}
+
+export const insertUserAccessRequest = async ({
+  userAccessRequest,
+  serverUrl,
+}: {
+  userAccessRequest: any
+  serverUrl: string
+}): Promise<UserAccessRequestInsertResult> => {
   const requestCheck = await _checkUserAccessRequest({ userAccessRequest })
   if (requestCheck.error) {
     return requestCheck
@@ -136,7 +153,7 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
     // send a confirmation email to the requester first, to verify that the given email address can be reached
     let rejected = []
     try {
-      ;({ rejected } = await Mailer.sendEmail({
+      ;({ rejected = [] } = await Mailer.sendEmail({
         to: email,
         msgKey: 'emails:userAccessRequestConfirmation',
         msgParams: { firstName, serverUrl, supportEmail: ProcessUtils.ENV.supportEmail },
@@ -165,13 +182,21 @@ export const insertUserAccessRequest = async ({ userAccessRequest, serverUrl }) 
   }
 }
 
-const _fetchSurveyTemplateId = async ({ user, templateUuid }) => {
+const _fetchSurveyTemplateId = async ({ user, templateUuid }: { user: ArenaUser; templateUuid: string }) => {
   const templates = await SurveyManager.fetchUserSurveysInfo({ user, draft: false, template: true })
-  const template = templates.find((t) => t.uuid === templateUuid)
+  const template = templates.find((t) => Survey.getUuid(t) === templateUuid)
   return template ? Survey.getId(template) : null
 }
 
-const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }) => {
+const _insertOrCloneSurvey = async ({
+  user,
+  surveyInfoTarget,
+  templateUuid,
+}: {
+  user: ArenaUser
+  surveyInfoTarget: any
+  templateUuid: string
+}) => {
   const templateId = templateUuid ? await _fetchSurveyTemplateId({ user, templateUuid }) : null
   if (templateId) {
     const job = new SurveyCloneJob({ user, surveyId: templateId, surveyInfoTarget })
@@ -189,7 +214,21 @@ const _insertOrCloneSurvey = async ({ user, surveyInfoTarget, templateUuid }) =>
   return await SurveyManager.insertSurvey({ user, surveyInfo: surveyInfoTarget, updateUserPrefs: false })
 }
 
-export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAccept }) => {
+type UserAccessRequestAcceptResult = {
+  validation?: Validation.ValidationInstance
+  survey?: any
+  userInvited?: ArenaUser
+}
+
+export const acceptUserAccessRequest = async ({
+  user,
+  serverUrl,
+  accessRequestAccept,
+}: {
+  user: ArenaUser
+  serverUrl: string
+  accessRequestAccept: any
+}): Promise<UserAccessRequestAcceptResult> => {
   const { accessRequestUuid, surveyName, surveyLabel, role, templateUuid = null } = accessRequestAccept
 
   // 1) validation
@@ -198,7 +237,7 @@ export const acceptUserAccessRequest = async ({ user, serverUrl, accessRequestAc
   if (!accessRequestDb) {
     return {
       validation: Validation.newInstance(false, {}, [
-        Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound,
+        ValidationResult.newInstance(Validation.messageKeys.userAccessRequestAccept.accessRequestNotFound),
       ]),
     }
   }
@@ -298,7 +337,7 @@ export const {
 
 export { fetchUserSurveysCount } from '../repository/userRepository'
 
-export const findResetPasswordUserByUuid = async (resetPasswordUuid) => {
+export const findResetPasswordUserByUuid = async (resetPasswordUuid: string) => {
   const userUuid = await UserManager.findResetPasswordUserUuidByUuid(resetPasswordUuid)
   return userUuid ? UserManager.fetchUserByUuid(userUuid) : null
 }
@@ -315,12 +354,18 @@ export const { fetchUserInvitationsBySurveyUuid } = UserInvitationManager
  * @param {!object} params.surveyInfo - The survey info.
  * @returns {Promise<boolean>} - True if the link can be returned to a survey user.
  */
-const _canSurveyUserGetResetPasswordUrl = async ({ userToInvite, surveyInfo }) => {
+const _canSurveyUserGetResetPasswordUrl = ({
+  userToInvite,
+  surveyInfo,
+}: {
+  userToInvite: ArenaUser
+  surveyInfo: ArenaSurvey
+}) => {
   const surveyUuid = Survey.getUuid(surveyInfo)
   if (User.isSurveyManager(userToInvite)) {
     const surveyGroup = User.getAuthGroupBySurveyUuid({ surveyUuid })(userToInvite)
     if (AuthGroup.getName(surveyGroup) !== AuthGroup.groupNames.surveyAdmin) {
-      return false
+      return Promise.resolve(false)
     }
   }
   return UserInviteService.isUserInvolvedOnlyInSurvey({ userToInvite, surveyUuid })
@@ -333,7 +378,15 @@ const _canSurveyUserGetResetPasswordUrl = async ({ userToInvite, surveyInfo }) =
  * @param {!string} params.userUuid - UUID of the invited user.
  * @param {!number} params.surveyId - ID of the survey.
  */
-const _checkCanGetSurveyUserResetPasswordUrl = async ({ user, userUuid, surveyId }) => {
+const _checkCanGetSurveyUserResetPasswordUrl = async ({
+  user,
+  userUuid,
+  surveyId,
+}: {
+  user: ArenaUser
+  userUuid: string
+  surveyId: number
+}) => {
   const surveyInfo = Survey.getSurveyInfo(await SurveyManager.fetchSurveyById({ surveyId }))
   const surveyUuid = Survey.getUuid(surveyInfo)
   const invitation = await UserInvitationManager.fetchUserInvitationBySurveyAndUserUuid({ surveyUuid, userUuid })
@@ -359,7 +412,17 @@ const _checkCanGetSurveyUserResetPasswordUrl = async ({ user, userUuid, surveyId
  * @param {number} [params.surveyId] - ID of the survey the user has been invited to (required for non system admins).
  * @returns {Promise<string>} - The reset password URL.
  */
-export const fetchResetPasswordUrl = async ({ user, serverUrl, userUuid, surveyId = null }) => {
+export const fetchResetPasswordUrl = async ({
+  user,
+  serverUrl,
+  userUuid,
+  surveyId = null,
+}: {
+  user: ArenaUser
+  serverUrl: any
+  userUuid: string
+  surveyId?: number
+}) => {
   if (surveyId) {
     await _checkCanGetSurveyUserResetPasswordUrl({ user, userUuid, surveyId })
   } else if (!User.isSystemAdmin(user)) {
@@ -371,7 +434,15 @@ export const fetchResetPasswordUrl = async ({ user, serverUrl, userUuid, surveyI
 
 // ====== INSERT
 
-export const insertUser = async ({ user, userToInsert, profilePicture = null }) => {
+export const insertUser = async ({
+  user,
+  userToInsert,
+  profilePicture = null,
+}: {
+  user: ArenaUser
+  userToInsert: any
+  profilePicture?: any
+}) => {
   const email = User.getEmail(userToInsert)
   const status = User.userStatus.ACCEPTED
   const passwordPlain = User.getPassword(userToInsert)
@@ -401,7 +472,15 @@ export const insertUser = async ({ user, userToInsert, profilePicture = null }) 
  * @param {!Array} params.authGroupsNew - The new auth groups for the user being updated.
  * @returns {boolean} True if user can assign the given roles, false otherwise.
  */
-const _canAssignGlobalRoles = ({ user, userToUpdateOld, authGroupsNew }) => {
+const _canAssignGlobalRoles = ({
+  user,
+  userToUpdateOld,
+  authGroupsNew,
+}: {
+  user: ArenaUser
+  userToUpdateOld: any
+  authGroupsNew: any
+}) => {
   if (User.isSystemAdmin(user)) {
     return true
   }
@@ -439,7 +518,19 @@ const _canAssignGlobalRoles = ({ user, userToUpdateOld, authGroupsNew }) => {
  * @throws {SystemError} If more than one survey group found for the user.
  * @throws {UnauthorizedError} If user lacks permission to edit group or email.
  */
-const _checkCanUpdateSurveyRoleAndEmail = async ({ user, surveyId, userToUpdateOld, userToUpdate, authGroupsNew }) => {
+const _checkCanUpdateSurveyRoleAndEmail = async ({
+  user,
+  surveyId,
+  userToUpdateOld,
+  userToUpdate,
+  authGroupsNew,
+}: {
+  user: ArenaUser
+  surveyId: number
+  userToUpdateOld: any
+  userToUpdate: ArenaUser
+  authGroupsNew: any
+}) => {
   const surveyAuthGroupsNew = authGroupsNew.filter((authGroup) => AuthGroup.getSurveyId(authGroup) === surveyId)
   if (surveyAuthGroupsNew.length > 1) {
     throw new SystemError(`cannot have more than 1 survey group for user (${surveyAuthGroupsNew.length} found)`)
@@ -459,12 +550,22 @@ const _checkCanUpdateSurveyRoleAndEmail = async ({ user, surveyId, userToUpdateO
 
   // Check if email has changed and user can edit email
   const emailChanged = User.getEmail(userToUpdateOld) !== User.getEmail(userToUpdate)
-  if (emailChanged && !Authorizer.canEditUserEmail(user, surveyInfo, userToUpdateOld)) {
+  if (emailChanged && !Authorizer.canEditUserEmail(user)) {
     throw new UnauthorizedError(User.getName(user))
   }
 }
 
-const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateOld = null }) => {
+const _checkCanUpdateUser = async ({
+  user,
+  surveyId,
+  userToUpdate,
+  userToUpdateOld = null,
+}: {
+  user: ArenaUser
+  surveyId: number
+  userToUpdate: ArenaUser
+  userToUpdateOld?: any
+}) => {
   const userToUpdateOldData = userToUpdateOld || (await UserManager.fetchUserByUuid(User.getUuid(userToUpdate)))
   const authGroupsNew = await AuthManager.fetchGroupsByUuids(User.getAuthGroupsUuids(userToUpdate))
 
@@ -482,16 +583,13 @@ const _checkCanUpdateUser = async ({ user, surveyId, userToUpdate, userToUpdateO
       userToUpdate,
       authGroupsNew,
     })
-  } else if (
-    User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate) &&
-    !Authorizer.canEditUserEmail(user, null, userToUpdateOldData)
-  ) {
+  } else if (User.getEmail(userToUpdateOldData) !== User.getEmail(userToUpdate) && !Authorizer.canEditUserEmail(user)) {
     // email can be changed only by system admins, even outside a survey
     throw new UnauthorizedError(User.getName(user))
   }
 }
 
-export const updateUser = async (user, surveyId, userToUpdate, file) => {
+export const updateUser = async (user: ArenaUser, surveyId: number, userToUpdate: ArenaUser, file: any) => {
   const userToUpdateUuid = User.getUuid(userToUpdate)
   const userToUpdateOld = surveyId ? await UserManager.fetchUserByUuid(userToUpdateUuid) : null
 
@@ -518,7 +616,17 @@ export const updateUser = async (user, surveyId, userToUpdate, file) => {
   return updatedUser
 }
 
-export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, title }) => {
+export const resetPassword = async ({
+  uuid: resetPasswordUuid,
+  name,
+  password,
+  title,
+}: {
+  uuid: any
+  name: string
+  password: any
+  title: any
+}) => {
   const user = await findResetPasswordUserByUuid(resetPasswordUuid)
   if (user) {
     const passwordEncrypted = UserPasswordUtils.encryptPassword(password)
@@ -534,10 +642,23 @@ export const resetPassword = async ({ uuid: resetPasswordUuid, name, password, t
   }
 }
 
-export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
-  UserManager.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
+export const updateUserAuthGroupExtraProps = ({
+  surveyId,
+  userUuid,
+  extraProps,
+}: {
+  surveyId: number
+  userUuid: string
+  extraProps: any
+}) => UserManager.updateUserAuthGroupExtraProps({ surveyId, userUuid, extraProps })
 
-export const updateUserPassword = async ({ user, passwordChangeForm }) => {
+export const updateUserPassword = async ({
+  user,
+  passwordChangeForm,
+}: {
+  user: ArenaUser
+  passwordChangeForm: any
+}) => {
   const userUuid = User.getUuid(user)
   const userToUpdateUuid = UserPasswordChangeForm.getUserUuid(passwordChangeForm) ?? userUuid
   const isSystemAdmin = User.isSystemAdmin(user)
@@ -576,7 +697,15 @@ export const updateUserPassword = async ({ user, passwordChangeForm }) => {
 // DELETE
 export const { deleteUserResetPasswordExpired } = UserManager
 
-export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId }) => {
+export const deleteUserFromSurvey = async ({
+  user,
+  userUuidToRemove,
+  surveyId,
+}: {
+  user: ArenaUser
+  userUuidToRemove: any
+  surveyId: number
+}) => {
   const userToDelete = await db.tx(async (t) => {
     const survey = await SurveyManager.fetchSurveyById({ surveyId, draft: true }, t)
     const userToDeleteData = await UserManager.fetchUserByUuid(userUuidToRemove, t)
@@ -617,7 +746,7 @@ export const deleteUserFromSurvey = async ({ user, userUuidToRemove, surveyId })
   return userToDelete
 }
 
-export const deleteUser = async ({ user, userUuidToDelete }) =>
+export const deleteUser = ({ user, userUuidToDelete }: { user: ArenaUser; userUuidToDelete: any }) =>
   db.tx(async (t) => {
     if (User.getUuid(user) === userUuidToDelete) {
       throw new SystemError('appErrors:userCannotDeleteSelf', {}, StatusCodes.BAD_REQUEST)
@@ -648,7 +777,9 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
 
     // Messages the target authored block deletion the same way (message.created_by_user_uuid has no
     // ON DELETE action). MessageService has no by-author query, so fetch all and filter.
-    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message)
+    const messageService = ServiceRegistry.getInstance().getService(ServerServiceType.message) as unknown as {
+      getAll(client?: DbClient): Promise<Message[]>
+    }
     const messages = await messageService.getAll(t)
     const ownMessagesCount = messages.filter((message) => message.createdByUserUuid === userUuidToDelete).length
     if (ownMessagesCount > 0) {
@@ -683,7 +814,7 @@ export const deleteUser = async ({ user, userUuidToDelete }) =>
   })
 
 // returns name and label of the survey if deleted, null otherwise
-const _deleteUntouchedSurvey = async ({ surveyId }, client) => {
+const _deleteUntouchedSurvey = async ({ surveyId }: { surveyId: number }, client: DbClient) => {
   try {
     const recordsCount = await RecordManager.countAllRecordsBySurveyId({ surveyId }, client)
     if (recordsCount > 0) {
@@ -701,7 +832,7 @@ const _deleteUntouchedSurvey = async ({ surveyId }, client) => {
   }
 }
 
-const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
+const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client: DbClient) => {
   const surveys = await UserManager.fetchSurveysOfExpiredInvitationUsers(client)
   Logger.info(
     `IDs of untouched surveys of users with expired invitation to delete: ${surveys.map(({ surveyId }) => surveyId)}`
@@ -718,7 +849,15 @@ const _deleteUntouchedSurveysOfExpiredInvitationUsers = async (client) => {
 }
 
 // a failure sending the email must not interrupt the cleanup
-const _notifyUserRegistrationExpired = async ({ user, surveys, i18n }) => {
+const _notifyUserRegistrationExpired = async ({
+  user,
+  surveys,
+  i18n,
+}: {
+  user: ArenaUser
+  surveys: any
+  i18n: any
+}) => {
   const email = User.getEmail(user)
   try {
     const { msgKey, getMsgParams } = UserRegistrationExpiredEmail
@@ -729,7 +868,7 @@ const _notifyUserRegistrationExpired = async ({ user, surveys, i18n }) => {
   }
 }
 
-export const deleteExpiredInvitationsUsersAndSurveys = async (client = db) => {
+export const deleteExpiredInvitationsUsersAndSurveys = async (client: DbClient = db) => {
   // surveys must be deleted before their users: they are identified by the users' expired invitations
   const deletedSurveys = await _deleteUntouchedSurveysOfExpiredInvitationUsers(client)
   const deletedSurveyIds = deletedSurveys.map(({ surveyId }) => surveyId)
@@ -775,7 +914,7 @@ export const { updateUserPrefs, updateUserPrefsAndFetchGroups } = UserManager
 export const { inviteUsers } = UserInviteService
 
 // ==== WebSocket events
-export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }) => {
+export const notifyActiveUsersAboutSurveyUpdate = async ({ surveyId }: { surveyId: number }) => {
   const activeUserUuidsUsingSurvey = await UserManager.fetchActiveUserUuidsWithPreferredSurveyId({ surveyId })
   for (const userUuid of activeUserUuidsUsingSurvey) {
     WebSocketServer.notifyUser(userUuid, WebSocketEvent.surveyUpdate, { surveyId })

@@ -1,6 +1,7 @@
+import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { marked } from 'marked'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -19,9 +20,10 @@ import * as UserManager from '../manager/userManager'
 import * as UserInvitationManager from '../manager/userInvitationManager'
 import { UserInviteEmail } from './userInviteEmail'
 
-export const getResetPasswordUrl = ({ serverUrl, uuid }) => `${serverUrl}/guest/resetPassword/${uuid}`
+export const getResetPasswordUrl = ({ serverUrl, uuid }: { serverUrl: any; uuid: any }) =>
+  `${serverUrl}/guest/resetPassword/${uuid}`
 
-const _getPrettyFormatUserName = ({ user, i18n }) => {
+const _getPrettyFormatUserName = ({ user, i18n }: { user: ArenaUser; i18n: any }) => {
   const parts = []
   const titleKey = User.getTitle(user)
   if (titleKey && titleKey !== User.titleKeys.preferNotToSay) {
@@ -31,7 +33,10 @@ const _getPrettyFormatUserName = ({ user, i18n }) => {
   return parts.join(' ')
 }
 
-const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, t) => {
+const _generateResetPasswordAndSendEmail = async (
+  { email, emailParams, i18n }: { email: string; emailParams: any; i18n: any },
+  t: DbClient
+) => {
   const { serverUrl } = emailParams
   // Add user to reset password table
   const { uuid } = await UserManager.generateResetPasswordUuid(email, t)
@@ -41,13 +46,13 @@ const _generateResetPasswordAndSendEmail = async ({ email, emailParams, i18n }, 
     urlResetPassword: getResetPasswordUrl({ serverUrl, uuid }),
   }
   // Send email
-  const { rejected } = await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
+  const { rejected = [] } = await Mailer.sendEmail({ to: email, msgKey: 'emails:userInvite', msgParams, i18n })
   if (rejected.length > 0) {
     throw new SystemError('appErrors:userEmailInvalid', { email })
   }
 }
 
-const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
+const _checkUserCanBeInvited = (userToInvite: ArenaUser, surveyUuid: string) => {
   if (!User.hasAccepted(userToInvite)) {
     throw new SystemError(
       'appErrors:userHasPendingInvitation',
@@ -66,7 +71,26 @@ const _checkUserCanBeInvited = (userToInvite, surveyUuid) => {
   }
 }
 
-const _inviteNewUserAndSendEmail = async ({ user, email, group, survey, surveyCycleKey, emailParams, i18n }, t) => {
+const _inviteNewUserAndSendEmail = async (
+  {
+    user,
+    email,
+    group,
+    survey,
+    surveyCycleKey,
+    emailParams,
+    i18n,
+  }: {
+    user: ArenaUser
+    email: string
+    group: any
+    survey: ArenaSurvey
+    surveyCycleKey: any
+    emailParams: any
+    i18n: any
+  },
+  t: DbClient
+) => {
   // Add user to db
   const userToInvite = await UserManager.insertUser(
     {
@@ -88,7 +112,15 @@ const _inviteNewUserAndSendEmail = async ({ user, email, group, survey, surveyCy
   return userToInvite
 }
 
-const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
+const _checkCanInviteToGroup = ({
+  user,
+  group,
+  surveyInfo,
+}: {
+  user: ArenaUser
+  group: any
+  surveyInfo: ArenaSurvey
+}) => {
   // Only system admins can invite new system admins
   if (!User.isSystemAdmin(user) && AuthGroup.isSystemAdminGroup(group)) {
     throw new UnauthorizedError(User.getName(user))
@@ -121,7 +153,10 @@ const _checkCanInviteToGroup = ({ user, group, surveyInfo }) => {
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<boolean>} - True if the user is involved only in the specified survey.
  */
-export const isUserInvolvedOnlyInSurvey = async ({ userToInvite, surveyUuid }, client = db) => {
+export const isUserInvolvedOnlyInSurvey = async (
+  { userToInvite, surveyUuid }: { userToInvite: ArenaUser; surveyUuid: string },
+  client: DbClient = db
+) => {
   if (User.isSystemAdmin(userToInvite) || User.hasAuthGroupsInOtherSurveys({ surveyUuid })(userToInvite)) {
     return false
   }
@@ -133,7 +168,17 @@ export const isUserInvolvedOnlyInSurvey = async ({ userToInvite, surveyUuid }, c
   return !invitedToOtherSurveys
 }
 
-const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParams, i18n }, t) => {
+const _repeatInvitation = async (
+  {
+    user,
+    survey,
+    userToInvite,
+    email,
+    emailParams,
+    i18n,
+  }: { user: ArenaUser; survey: ArenaSurvey; userToInvite: ArenaUser; email: string; emailParams: any; i18n: any },
+  t: DbClient
+) => {
   const surveyUuid = Survey.getUuid(survey)
   const userToInviteUuid = User.getUuid(userToInvite)
   // Generate reset password and send email again
@@ -156,8 +201,26 @@ const _repeatInvitation = async ({ user, survey, userToInvite, email, emailParam
  * @param {pgPromise.IDatabase} t - The database transaction.
  */
 const _invitePendingUser = async (
-  { user, survey, group, userToInvite, email, repeatInvitation, emailParams, i18n },
-  t
+  {
+    user,
+    survey,
+    group,
+    userToInvite,
+    email,
+    repeatInvitation,
+    emailParams,
+    i18n,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    group: any
+    userToInvite: ArenaUser
+    email: string
+    repeatInvitation: any
+    emailParams: any
+    i18n: any
+  },
+  t: DbClient
 ) => {
   const surveyInfo = Survey.getSurveyInfo(survey)
   const surveyUuid = Survey.getUuid(surveyInfo)
@@ -185,9 +248,29 @@ const _invitePendingUser = async (
   await _repeatInvitation({ user, survey, userToInvite, email, emailParams, i18n }, t)
 }
 
-const _inviteUser = async (
-  { user, i18n, email, survey, invitation, group, repeatInvitation, surveyCycleKey, serverUrl },
-  client = db
+const _inviteUser = (
+  {
+    user,
+    i18n,
+    email,
+    survey,
+    invitation,
+    group,
+    repeatInvitation,
+    surveyCycleKey,
+    serverUrl,
+  }: {
+    user: ArenaUser
+    i18n: any
+    email: string
+    survey: ArenaSurvey
+    invitation: any
+    group: any
+    repeatInvitation: any
+    surveyCycleKey: any
+    serverUrl: any
+  },
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const lang = User.getLang(user)
@@ -237,8 +320,22 @@ const _inviteUser = async (
   })
 
 export const inviteUsers = async (
-  { user, surveyId, surveyCycleKey, invitation, serverUrl, repeatInvitation = false },
-  client = db
+  {
+    user,
+    surveyId,
+    surveyCycleKey,
+    invitation,
+    serverUrl,
+    repeatInvitation = false,
+  }: {
+    user: ArenaUser
+    surveyId: number
+    surveyCycleKey: any
+    invitation: any
+    serverUrl: any
+    repeatInvitation?: any
+  },
+  client: DbClient = db
 ) => {
   const groupUuid = UserGroupInvitation.getGroupUuid(invitation)
   const group = await AuthManager.fetchGroupByUuid(groupUuid, client)

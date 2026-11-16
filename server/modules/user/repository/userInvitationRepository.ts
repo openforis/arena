@@ -1,4 +1,5 @@
-import { db } from '@server/db/db'
+import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
 
 import * as Survey from '@core/survey/survey'
 import * as User from '@core/user/user'
@@ -9,7 +10,10 @@ export const tableName = 'user_invitation'
 
 export const tableColumns = ['user_uuid', 'survey_uuid', 'invited_by', 'invited_date', 'removed_date']
 
-export const insertUserInvitation = async ({ user, survey, userToInvite }, client = db) =>
+export const insertUserInvitation = (
+  { user, survey, userToInvite }: { user: ArenaUser; survey: ArenaSurvey; userToInvite: ArenaUser },
+  client: DbClient = db
+) =>
   client.one(
     `INSERT INTO ${tableName} (user_uuid, survey_uuid, invited_by)
       VALUES ($1, $2, $3)
@@ -17,14 +21,20 @@ export const insertUserInvitation = async ({ user, survey, userToInvite }, clien
     [User.getUuid(userToInvite), Survey.getUuid(Survey.getSurveyInfo(survey)), User.getUuid(user)]
   )
 
-export const deleteUserInvitation = async ({ surveyUuid, userUuid }, client = db) =>
+export const deleteUserInvitation = (
+  { surveyUuid, userUuid }: { surveyUuid: string; userUuid: string },
+  client: DbClient = db
+) =>
   client.query(
     `DELETE FROM ${tableName} 
     WHERE survey_uuid = $1 AND user_uuid = $2`,
     [surveyUuid, userUuid]
   )
 
-export const updateRemovedDate = async ({ surveyUuid, userUuidToRemove }, client = db) =>
+export const updateRemovedDate = (
+  { surveyUuid, userUuidToRemove }: { surveyUuid: string; userUuidToRemove: any },
+  client: DbClient = db
+) =>
   client.oneOrNone(
     `UPDATE ${tableName}
     SET removed_date = (now() AT TIME ZONE 'UTC')
@@ -34,7 +44,10 @@ export const updateRemovedDate = async ({ surveyUuid, userUuidToRemove }, client
     [userUuidToRemove, surveyUuid]
   )
 
-export const fetchUserInvitationBySurveyAndUserUuid = async ({ surveyUuid, userUuid }, client = db) =>
+export const fetchUserInvitationBySurveyAndUserUuid = (
+  { surveyUuid, userUuid }: { surveyUuid: string; userUuid: string },
+  client: DbClient = db
+) =>
   client.oneOrNone(
     `SELECT *
     FROM user_invitation
@@ -52,7 +65,10 @@ export const fetchUserInvitationBySurveyAndUserUuid = async ({ surveyUuid, userU
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<boolean>} - True if the user has been invited to other surveys.
  */
-export const existsUserInvitationInOtherSurveys = async ({ userUuid, surveyUuid }, client = db) =>
+export const existsUserInvitationInOtherSurveys = (
+  { userUuid, surveyUuid }: { userUuid: string; surveyUuid: string },
+  client: DbClient = db
+) =>
   client.one(
     `SELECT EXISTS (
       SELECT 1
@@ -63,7 +79,7 @@ export const existsUserInvitationInOtherSurveys = async ({ userUuid, surveyUuid 
     (row) => row.result
   )
 
-export const fetchUserInvitationsBySurveyUuid = async ({ surveyUuid }, client = db) =>
+export const fetchUserInvitationsBySurveyUuid = ({ surveyUuid }: { surveyUuid: string }, client: DbClient = db) =>
   client.map(
     `
     SELECT *
@@ -74,7 +90,10 @@ export const fetchUserInvitationsBySurveyUuid = async ({ surveyUuid }, client = 
     camelize
   )
 
-export const insertManyBatch = async ({ survey, userInvitations }, client = db) =>
+export const insertManyBatch = (
+  { survey, userInvitations }: { survey: ArenaSurvey; userInvitations: any },
+  client: DbClient = db
+) =>
   userInvitations.length > 0 &&
   client.none(
     DbUtils.insertAllQueryBatch(
@@ -91,7 +110,7 @@ export const insertManyBatch = async ({ survey, userInvitations }, client = db) 
     )
   )
 
-export const deleteExpiredInvitations = async (client = db) =>
+export const deleteExpiredInvitations = (client: DbClient = db) =>
   client.map(
     `DELETE FROM user_invitation ui
     WHERE ui.invited_date < NOW() - INTERVAL '1 MONTH' 

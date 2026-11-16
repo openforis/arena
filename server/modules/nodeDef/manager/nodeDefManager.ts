@@ -1,5 +1,12 @@
+import type {
+  NodeDefPropsWithLayout,
+  User as ArenaUser,
+  Survey as ArenaSurvey,
+  NodeDef as ArenaNodeDef,
+  NodeDefType,
+} from '@openforis/arena-core'
 import * as A from '@core/arena'
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import { NodeDefsFixer, Objects } from '@openforis/arena-core'
 
@@ -15,7 +22,7 @@ import * as Log from '@server/log/log'
 import * as ActivityLog from '@common/activityLog/activityLog'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 import * as NodeDefRepository from '../repository/nodeDefRepository'
-import { markSurveyDraft } from '../../survey/repository/surveySchemaRepositoryUtils'
+import { markSurveyDraft } from '../../survey/repository/surveyRepository'
 import { NodeDefAreaBasedEstimateManager } from './nodeDefAreaBasedEstimateManager'
 import * as DbUtils from '@server/db/dbUtils'
 
@@ -33,13 +40,24 @@ export {
   unpublishNodeDefsProps,
 } from '../repository/nodeDefRepository'
 
-const _persistNodeDefLayout = async ({ surveyId, nodeDef }, client = db) => {
+const _persistNodeDefLayout = (
+  { surveyId, nodeDef }: { surveyId: number; nodeDef: ArenaNodeDef<NodeDefType> },
+  client: DbClient = db
+) => {
   const { uuid: nodeDefUuid, parentUuid, props } = nodeDef
-  const { layout } = props
+  const { layout } = props as NodeDefPropsWithLayout<unknown>
   return NodeDefRepository.updateNodeDefProps({ surveyId, nodeDefUuid, parentUuid, props: { layout } }, client)
 }
 
-const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cyclesPrev }, client = db) => {
+const _onAncestorCyclesUpdate = async (
+  {
+    survey,
+    nodeDefAncestor,
+    cycles,
+    cyclesPrev,
+  }: { survey: ArenaSurvey; nodeDefAncestor: any; cycles: any; cyclesPrev: any },
+  client: DbClient = db
+) => {
   const nodeDefsUpdated = {}
 
   const surveyId = Survey.getId(survey)
@@ -83,9 +101,23 @@ const _onAncestorCyclesUpdate = async ({ survey, nodeDefAncestor, cycles, cycles
 
 // ======= CREATE
 
-export const insertNodeDef = async (
-  { user, survey, cycle = Survey.cycleOneKey, nodeDef: nodeDefParam, system = false, addLogs = true },
-  client = db
+export const insertNodeDef = (
+  {
+    user,
+    survey,
+    cycle = Survey.cycleOneKey,
+    nodeDef: nodeDefParam,
+    system = false,
+    addLogs = true,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    cycle?: string
+    nodeDef: ArenaNodeDef<NodeDefType>
+    system?: any
+    addLogs?: any
+  },
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
@@ -131,8 +163,17 @@ export const fetchNodeDefsBySurveyId = async (
     includeDeleted = false,
     backup = false,
     includeAnalysis = true,
+  }: {
+    surveyId: number
+    surveyCycles: any
+    cycle?: string
+    draft?: boolean
+    advanced?: any
+    includeDeleted?: boolean
+    backup?: boolean
+    includeAnalysis?: boolean
   },
-  client = db
+  client: DbClient = db
 ) => {
   const nodeDefsDb = await NodeDefRepository.fetchNodeDefsBySurveyId(
     { surveyId, cycle, draft, advanced, includeDeleted, backup, includeAnalysis },
@@ -155,7 +196,13 @@ export const fetchNodeDefsBySurveyId = async (
 
 // ======= UPDATE
 
-const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
+const _propsUpdateRequiresParentLayoutUpdate = ({
+  nodeDef,
+  props,
+}: {
+  nodeDef: ArenaNodeDef<NodeDefType>
+  props: Record<string, any>
+}) =>
   NodeDef.isCoordinate(nodeDef) &&
   A.intersection(Object.keys(props))([
     NodeDef.propKeys.includeAccuracy,
@@ -163,13 +210,38 @@ const _propsUpdateRequiresParentLayoutUpdate = ({ nodeDef, props }) =>
     NodeDef.propKeys.includeAltitudeAccuracy,
   ]).length > 0
 
-const _isNameOrLabelOrActiveChanged = ({ nodeDefPrev, nodeDef, props, propsAdvanced }) =>
+const _isNameOrLabelOrActiveChanged = ({
+  nodeDefPrev,
+  nodeDef,
+  props,
+  propsAdvanced,
+}: {
+  nodeDefPrev: any
+  nodeDef: ArenaNodeDef<NodeDefType>
+  props: Record<string, any>
+  propsAdvanced: any
+}) =>
   (NodeDef.propKeys.name in props && NodeDef.getName(nodeDefPrev) !== NodeDef.getName(nodeDef)) ||
   (NodeDef.propKeys.labels in props && !Objects.isEqual(NodeDef.getLabels(nodeDefPrev), NodeDef.getLabels(nodeDef))) ||
   (NodeDef.keysPropsAdvanced.active in propsAdvanced && NodeDef.isActive(nodeDefPrev) !== NodeDef.isActive(nodeDef))
 
 // Returns the area based estimate node def inserted, deleted or updated (if any).
-const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, nodeDef, props, propsAdvanced }, t) => {
+const _updateAreaBasedEstimateOnPropsUpdate = (
+  {
+    survey,
+    nodeDefPrev,
+    nodeDef,
+    props,
+    propsAdvanced,
+  }: {
+    survey: ArenaSurvey
+    nodeDefPrev: any
+    nodeDef: ArenaNodeDef<NodeDefType>
+    props: Record<string, any>
+    propsAdvanced: any
+  },
+  t: DbClient
+) => {
   const hasAreaBasedEstimateChanged =
     NodeDef.keysPropsAdvanced.hasAreaBasedEstimated in propsAdvanced &&
     NodeDef.hasAreaBasedEstimated(nodeDefPrev) !== NodeDef.hasAreaBasedEstimated(nodeDef)
@@ -181,19 +253,37 @@ const _updateAreaBasedEstimateOnPropsUpdate = async ({ survey, nodeDefPrev, node
   if (_isNameOrLabelOrActiveChanged({ nodeDefPrev, nodeDef, props, propsAdvanced })) {
     return NodeDefAreaBasedEstimateManager.updateNodeDefAreaBasedEstimate({ survey, nodeDef }, t)
   }
-  return null
+  return Promise.resolve(null)
 }
 
-export const updateNodeDefProps = async (
-  { user, survey, nodeDefUuid, parentUuid, props = {}, propsAdvanced = {}, system = false, markSurveyAsDraft = true },
-  client = db
+export const updateNodeDefProps = (
+  {
+    user,
+    survey,
+    nodeDefUuid,
+    parentUuid,
+    props = {},
+    propsAdvanced = {},
+    system = false,
+    markSurveyAsDraft = true,
+  }: {
+    user: ArenaUser
+    survey: ArenaSurvey
+    nodeDefUuid: string
+    parentUuid: string
+    props?: Record<string, any>
+    propsAdvanced?: any
+    system?: any
+    markSurveyAsDraft?: any
+  },
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
 
     const nodeDefPrev = Survey.getNodeDefByUuid(nodeDefUuid)(survey)
 
-    const nodeDefsUpdated = {}
+    const nodeDefsUpdated: Record<string, ArenaNodeDef<NodeDefType>> = {}
     let surveyUpdated = survey
 
     const _addNodeDefsUpdatedToSurvey = (nodeDefs) => {
@@ -280,7 +370,15 @@ export const updateNodeDefProps = async (
     return nodeDefsUpdated
   })
 
-const rebuildDescendantNodeDefHierarchy = ({ nodeDefOriginal, nodeDefUpdated, nodeDefDescendant }) => {
+const rebuildDescendantNodeDefHierarchy = ({
+  nodeDefOriginal,
+  nodeDefUpdated,
+  nodeDefDescendant,
+}: {
+  nodeDefOriginal: any
+  nodeDefUpdated: any
+  nodeDefDescendant: any
+}) => {
   const nodeDefUuid = NodeDef.getUuid(nodeDefUpdated)
   const newMetaHierarchyFirstPart = [...NodeDef.getMetaHierarchy(nodeDefUpdated), nodeDefUuid]
 
@@ -294,7 +392,13 @@ const rebuildDescendantNodeDefHierarchy = ({ nodeDefOriginal, nodeDefUpdated, no
   return NodeDef.assocMetaHierarchy(updatedMetaHierarchy)(nodeDefDescendant)
 }
 
-const checkCanMoveNodeDef = ({ nodeDef, targetParentNodeDef }) => {
+const checkCanMoveNodeDef = ({
+  nodeDef,
+  targetParentNodeDef,
+}: {
+  nodeDef: ArenaNodeDef<NodeDefType>
+  targetParentNodeDef: any
+}) => {
   if (NodeDef.isEntity(nodeDef)) {
     // Validation: prevent moving an entity into itself or into one of its descendants
     if (NodeDef.isEqual(nodeDef)(targetParentNodeDef)) {
@@ -306,7 +410,17 @@ const checkCanMoveNodeDef = ({ nodeDef, targetParentNodeDef }) => {
   }
 }
 
-const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, t }) => {
+const updateDescendantsLayout = async ({
+  survey,
+  nodeDefSource,
+  nodeDefUpdated,
+  t,
+}: {
+  survey: ArenaSurvey
+  nodeDefSource: any
+  nodeDefUpdated: any
+  t: DbClient
+}) => {
   const nodeDefsUpdatedByUuid = {}
   const surveyId = Survey.getId(survey)
   const descendants = Survey.getNodeDefDescendants({ nodeDef: nodeDefSource })(survey)
@@ -342,7 +456,13 @@ const updateDescendantsLayout = async ({ survey, nodeDefSource, nodeDefUpdated, 
   return nodeDefsUpdatedByUuid
 }
 
-const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
+const getLayoutInParentEntityByCycles = ({
+  survey,
+  nodeDef,
+}: {
+  survey: ArenaSurvey
+  nodeDef: ArenaNodeDef<NodeDefType>
+}) => {
   const nodeDefUuid = NodeDef.getUuid(nodeDef)
   const nodeDefSourceLayoutPrevByCycle = {}
   const nodeDefSourceParent = Survey.getNodeDefParent(nodeDef)(survey)
@@ -358,8 +478,18 @@ const getLayoutInParentEntityByCycles = ({ survey, nodeDef }) => {
 }
 
 export const addOrRemoveNodeDefInParentLayout = async (
-  { survey, nodeDef, add = true, layoutInParentByCycle = null },
-  client = db
+  {
+    survey,
+    nodeDef,
+    add = true,
+    layoutInParentByCycle = null,
+  }: {
+    survey: ArenaSurvey
+    nodeDef: ArenaNodeDef<NodeDefType>
+    add?: any
+    layoutInParentByCycle?: Record<string, any>
+  },
+  client: DbClient = db
 ) => {
   const nodeDefParent = Survey.getNodeDefParent(nodeDef)(survey)
   if (nodeDefParent) {
@@ -379,7 +509,15 @@ export const addOrRemoveNodeDefInParentLayout = async (
   }
 }
 
-export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeDefUuid }, client = db) =>
+export const moveNodeDef = (
+  {
+    user,
+    survey,
+    nodeDefUuid,
+    targetParentNodeDefUuid,
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDefUuid: string; targetParentNodeDefUuid: string },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const result = {}
 
@@ -425,7 +563,10 @@ export const moveNodeDef = async ({ user, survey, nodeDefUuid, targetParentNodeD
     return result
   })
 
-export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, client = db) =>
+export const convertNodeDef = (
+  { user, survey, nodeDefUuid, toType }: { user: ArenaUser; survey: ArenaSurvey; nodeDefUuid: string; toType: any },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
 
@@ -468,7 +609,7 @@ export const convertNodeDef = async ({ user, survey, nodeDefUuid, toType }, clie
     return nodeDefUpdated
   })
 
-export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) => {
+export const publishNodeDefsProps = async (surveyId: number, langsDeleted: any, client: DbClient = db) => {
   await NodeDefRepository.publishNodeDefsProps(surveyId, client)
 
   if (!A.isEmpty(langsDeleted)) {
@@ -489,7 +630,15 @@ export const publishNodeDefsProps = async (surveyId, langsDeleted, client = db) 
 
 // ======= DELETE
 
-export const markNodeDefDeleted = async ({ user, survey, nodeDefUuid, cycle = null }, client = db) =>
+export const markNodeDefDeleted = (
+  {
+    user,
+    survey,
+    nodeDefUuid,
+    cycle = null,
+  }: { user: ArenaUser; survey: ArenaSurvey; nodeDefUuid: string; cycle?: string },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const surveyId = Survey.getId(survey)
     const nodeDef = await NodeDefRepository.markNodeDefDeleted(surveyId, nodeDefUuid, t)

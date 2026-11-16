@@ -1,4 +1,6 @@
+import type { Router } from 'express'
 import { Authorizer, ServiceRegistry } from '@openforis/arena-core'
+import type { UserGroup } from '@openforis/arena-core'
 import { ServerServiceType } from '@openforis/arena-server'
 
 import * as A from '@core/arena'
@@ -24,7 +26,7 @@ import { UserExportService } from '../service/userExportService'
 import { UsersBackupService } from '../service/usersBackup/usersBackupService'
 import * as FileUtils from '@server/utils/file/fileUtils'
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ==== CREATE
 
   app.post('/survey/:surveyId/users/invite', AuthMiddleware.requireUserInvitePermission, async (req, res, next) => {
@@ -170,7 +172,10 @@ export const init = (app) => {
         const user = Request.getUser(req)
         const survey = await SurveyManager.fetchSurveyById({ surveyId })
         const surveyUuid = Survey.getUuid(survey)
-        const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup)
+        // UserGroupService is not exported by arena-server
+        const userGroupService = ServiceRegistry.getInstance().getService(ServerServiceType.userGroup) as unknown as {
+          getManyByUser(params: { userUuid: string; surveyUuid?: string }): Promise<UserGroup[]>
+        }
         const userGroups = await userGroupService.getManyByUser({ userUuid: User.getUuid(user), surveyUuid })
         const userGroup = userGroups[0]
         res.json({ user, userGroup })
@@ -233,7 +238,7 @@ export const init = (app) => {
   })
 
   // users backup (to be imported into another server)
-  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+  app.post('/users/backup/export', AuthMiddleware.requireAdminPermission, (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { includePasswords = true, emails = null } = Request.getParams(req)
@@ -245,7 +250,7 @@ export const init = (app) => {
     }
   })
 
-  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+  app.get('/users/backup/export/download', AuthMiddleware.requireAdminPermission, (req, res, next) => {
     try {
       const { tempFileName } = Request.getParams(req)
       FileUtils.checkIsValidTempFileName(tempFileName)
@@ -269,7 +274,7 @@ export const init = (app) => {
     }
   })
 
-  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, async (req, res, next) => {
+  app.post('/users/backup/import', AuthMiddleware.requireAdminPermission, (req, res, next) => {
     try {
       const user = Request.getUser(req)
       const { tempFileName, actionsByEmail, restorePasswordEmails } = Request.getParams(req)
@@ -307,7 +312,6 @@ export const init = (app) => {
       const { surveyId, offset, limit, onlyAccepted = false, includeSystemAdmins = false } = Request.getParams(req)
 
       const list = await UserService.fetchUsersBySurveyId({
-        user,
         surveyId,
         offset,
         limit,

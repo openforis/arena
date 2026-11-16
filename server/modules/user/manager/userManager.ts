@@ -1,8 +1,9 @@
+import type { User as ArenaUser, Survey as ArenaSurvey } from '@openforis/arena-core'
 import * as A from '@core/arena'
 
 import { Objects } from '@openforis/arena-core'
 
-import { db } from '@server/db/db'
+import { db, DbClient } from '@server/db/db'
 
 import * as ActivityLog from '@common/activityLog/activityLog'
 
@@ -56,7 +57,15 @@ export const {
 export const { fetchSurveyIdsOfExpiredInvitationUsers, fetchSurveysOfExpiredInvitationUsers } = AuthGroupRepository
 
 // ==== CREATE
-const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = null }, client = db) => {
+const _determineGroupsToAddTo = async (
+  {
+    user,
+    userToAdd,
+    group,
+    surveyInfo = null,
+  }: { user: ArenaUser; userToAdd: any; group: any; surveyInfo?: ArenaSurvey },
+  client: DbClient = db
+) => {
   const groupsToAdd = []
   if (
     (AuthGroup.isSurveyManagerGroup(group) || AuthGroup.getName(group) === groupNames.surveyAdmin) &&
@@ -84,7 +93,15 @@ const _determineGroupsToAddTo = async ({ user, userToAdd, group, surveyInfo = nu
  * @param {!object} params.group - The group to check.
  * @param {object} [params.surveyInfo] - The survey info.
  */
-const _checkGroupBelongsToSurvey = ({ user, group, surveyInfo }) => {
+const _checkGroupBelongsToSurvey = ({
+  user,
+  group,
+  surveyInfo,
+}: {
+  user: ArenaUser
+  group: any
+  surveyInfo: ArenaSurvey
+}) => {
   if (
     AuthGroup.isSurveyGroup(group) &&
     (!surveyInfo || AuthGroup.getSurveyUuid(group) !== Survey.getUuid(surveyInfo))
@@ -93,7 +110,10 @@ const _checkGroupBelongsToSurvey = ({ user, group, surveyInfo }) => {
   }
 }
 
-export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, client = db) =>
+export const addUserToGroup = (
+  { user, surveyInfo, group, userToAdd }: { user: ArenaUser; surveyInfo: ArenaSurvey; group: any; userToAdd: any },
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     _checkGroupBelongsToSurvey({ user, group, surveyInfo })
     const surveyId = Survey.getIdSurveyInfo(surveyInfo)
@@ -113,7 +133,7 @@ export const addUserToGroup = async ({ user, surveyInfo, group, userToAdd }, cli
     }
   })
 
-export const insertUser = async (
+export const insertUser = (
   {
     user,
     email,
@@ -125,8 +145,19 @@ export const insertUser = async (
     profilePicture = null,
     surveyInfo = null,
     surveyCycleKey = null,
+  }: {
+    user: ArenaUser
+    email: string
+    password: any
+    status: any
+    group: any
+    name?: string
+    title?: any
+    profilePicture?: any
+    surveyInfo?: ArenaSurvey
+    surveyCycleKey?: any
   },
-  client = db
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const surveyId = surveyInfo ? Survey.getIdSurveyInfo(surveyInfo) : null
@@ -154,7 +185,7 @@ export const insertUser = async (
     return newUser
   })
 
-export const insertSystemAdminUser = async ({ email, password }, client = db) =>
+export const insertSystemAdminUser = ({ email, password }: { email: string; password: any }, client: DbClient = db) =>
   client.tx(async (t) => {
     const status = User.userStatus.ACCEPTED
     const newUser = await UserRepository.insertUser({ email, password, status }, t)
@@ -164,7 +195,7 @@ export const insertSystemAdminUser = async ({ email, password }, client = db) =>
     await AuthGroupRepository.insertUserGroup({ groupUuid: systemAdminGroupUuid, userUuid }, t)
   })
 
-export const generateResetPasswordUuid = async (email, client = db) => {
+export const generateResetPasswordUuid = async (email: string, client: DbClient = db) => {
   const user = await UserRepository.fetchUserByEmail(email, client)
   if (!user) {
     throw new Error(Validation.messageKeys.user.emailNotFound)
@@ -180,7 +211,17 @@ export { insertUserAccessRequest } from '../repository/userAccessRequestReposito
 
 // ==== READ
 
-const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUuid = {}, userGroups = [], t }) => {
+const _attachAuthGroupsAndInvitationToUser = async ({
+  user,
+  invitationsByUserUuid = {},
+  userGroups = [],
+  t,
+}: {
+  user: ArenaUser
+  invitationsByUserUuid?: Record<string, any>
+  userGroups?: any
+  t?: DbClient
+}) => {
   // Assoc auth groups
 
   const _userGroups = A.isEmpty(userGroups)
@@ -199,7 +240,15 @@ const _attachAuthGroupsAndInvitationToUser = async ({ user, invitationsByUserUui
   return userUpdated
 }
 
-const _attachAuthGroupsAndInvitationToUsers = async ({ users, invitationsByUserUuid = {}, t }) => {
+const _attachAuthGroupsAndInvitationToUsers = async ({
+  users,
+  invitationsByUserUuid = {},
+  t,
+}: {
+  users: any
+  invitationsByUserUuid?: Record<string, any>
+  t: DbClient
+}) => {
   if (users.length === 0) return users
 
   const usersUuids = users.map(User.getUuid)
@@ -253,9 +302,23 @@ export const fetchUserByUuidWithPassword = _userFetcher(UserRepository.fetchUser
  * @param {object} [client] - The db client.
  * @returns {Promise<import('@openforis/arena-core').User[]>} - The users.
  */
-export const fetchUsers = async (
-  { offset, onlyAccepted = false, limit, search = null, sortBy, sortOrder },
-  client = db
+export const fetchUsers = (
+  {
+    offset,
+    onlyAccepted = false,
+    limit,
+    search = null,
+    sortBy,
+    sortOrder,
+  }: {
+    offset?: number
+    onlyAccepted?: boolean
+    limit?: number | null
+    search?: string | null
+    sortBy?: string | null
+    sortOrder?: string | null
+  },
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const users = (await UserRepository.fetchUsers({ offset, onlyAccepted, limit, search, sortBy, sortOrder }, t)).map(
@@ -264,9 +327,21 @@ export const fetchUsers = async (
     return _attachAuthGroupsAndInvitationToUsers({ users, t })
   })
 
-export const fetchUsersBySurveyId = async (
-  { surveyId, offset = 0, limit = null, onlyAccepted = false, includeSystemAdmins = false },
-  client = db
+export const fetchUsersBySurveyId = (
+  {
+    surveyId,
+    offset = 0,
+    limit = null,
+    onlyAccepted = false,
+    includeSystemAdmins = false,
+  }: {
+    surveyId: number
+    offset?: number
+    limit?: number | null
+    onlyAccepted?: boolean
+    includeSystemAdmins?: boolean
+  },
+  client: DbClient = db
 ) =>
   client.tx(async (t) => {
     const users = (await UserRepository.fetchUsersBySurveyId({ surveyId, offset, limit, includeSystemAdmins }, t)).map(
@@ -283,7 +358,7 @@ export const fetchUsersBySurveyId = async (
     return _attachAuthGroupsAndInvitationToUsers({ users: usersFiltered, invitationsByUserUuid, t })
   })
 
-export const findUserByEmailAndPassword = async (email, password, passwordCompareFn) => {
+export const findUserByEmailAndPassword = async (email: string, password: any, passwordCompareFn: any) => {
   const user = await UserRepository.fetchUserAndPasswordByEmail(email)
 
   if (user && (await passwordCompareFn(password, user.password)))
@@ -301,7 +376,13 @@ export {
   deleteExpiredUserAccessRequests,
 } from '../repository/userAccessRequestRepository'
 
-export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFormat }) => {
+export const exportUserAccessRequestsIntoStream = async ({
+  outputStream,
+  fileFormat,
+}: {
+  outputStream: any
+  fileFormat: string
+}) => {
   const fields = [
     'email',
     ...Object.values(UserAccessRequest.keysProps).map((key) => StringUtils.toSnakeCase(key)),
@@ -350,7 +431,15 @@ export const exportUserAccessRequestsIntoStream = async ({ outputStream, fileFor
 
 // ==== UPDATE
 
-const _insertOrDeleteUserGroup = async ({ userUuid, authGroupsNew, userToUpdateOld, groupName }, client = db) => {
+const _insertOrDeleteUserGroup = async (
+  {
+    userUuid,
+    authGroupsNew,
+    userToUpdateOld,
+    groupName,
+  }: { userUuid: string; authGroupsNew: any; userToUpdateOld: any; groupName: any },
+  client: DbClient = db
+) => {
   const group = User.getAuthGroupByName(groupName)(userToUpdateOld)
   if (group) {
     // user previously associated to the group: remove user from group
@@ -365,7 +454,13 @@ const _insertOrDeleteUserGroup = async ({ userUuid, authGroupsNew, userToUpdateO
   }
 }
 
-const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client = db) =>
+const _updateUser = (
+  user: ArenaUser,
+  surveyId: number,
+  userToUpdate: ArenaUser,
+  profilePicture: any,
+  client: DbClient = db
+) =>
   client.tx(async (t) => {
     const userUuid = User.getUuid(userToUpdate)
     const userToUpdateOld = await fetchUserByUuid(userUuid, t)
@@ -435,20 +530,30 @@ const _updateUser = async (user, surveyId, userToUpdate, profilePicture, client 
 
 export const updateUser = _userFetcher(_updateUser, 4)
 
-export const updateUserAuthGroupExtraProps = async ({ surveyId, userUuid, extraProps }) =>
-  AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
+export const updateUserAuthGroupExtraProps = ({
+  surveyId,
+  userUuid,
+  extraProps,
+}: {
+  surveyId: number
+  userUuid: string
+  extraProps: any
+}) => AuthGroupRepository.updateUserGroupExtraProps({ surveyId, userUuid, extraProps })
 
-export const updateUserPrefs = async (user) => UserRepository.updateUserPrefs(user)
+export const updateUserPrefs = (user: ArenaUser) => UserRepository.updateUserPrefs(user)
 
-export const updateUserPrefsAndFetchGroups = async (user) => ({
+export const updateUserPrefsAndFetchGroups = async (user: ArenaUser) => ({
   ...(await updateUserPrefs(user)),
   [User.keys.authGroups]: await AuthGroupRepository.fetchUserGroups(User.getUuid(user)),
 })
 
 // ==== DELETE
 
-export const deleteUserFromSurvey = async ({ user, userUuidToRemove, survey }, client = db) =>
-  client.tx(async (t) => {
+export const deleteUserFromSurvey = (
+  { user, userUuidToRemove, survey }: { user: ArenaUser; userUuidToRemove: any; survey: ArenaSurvey },
+  client: DbClient = db
+) =>
+  client.tx((t) => {
     const surveyId = Survey.getId(survey)
     const surveyUuid = Survey.getUuid(Survey.getSurveyInfo(survey))
     return DbUtils.runQueries(t, [

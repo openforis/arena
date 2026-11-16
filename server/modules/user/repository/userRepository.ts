@@ -1,4 +1,5 @@
-import { db } from '@server/db/db'
+import type { User as ArenaUser } from '@openforis/arena-core'
+import { db, DbClient } from '@server/db/db'
 
 import camelize from 'camelize'
 
@@ -37,9 +38,29 @@ const surveyCurrentJsonbPath = `'{${User.keysPrefs.surveys},${User.keysPrefs.cur
 
 // CREATE
 
-export const importNewUser = async (
-  { surveyId, surveyCycleKey, name, uuid, email, password, status, title, profilePicture },
-  client = db
+export const importNewUser = (
+  {
+    surveyId,
+    surveyCycleKey,
+    name,
+    uuid,
+    email,
+    password,
+    status,
+    title,
+    profilePicture,
+  }: {
+    surveyId: number
+    surveyCycleKey: any
+    name: string
+    uuid: any
+    email: string
+    password: any
+    status: any
+    title: any
+    profilePicture: any
+  },
+  client: DbClient = db
 ) =>
   client.one(
     `
@@ -59,9 +80,27 @@ export const importNewUser = async (
     camelize
   )
 
-export const insertUser = async (
-  { email, password, status, name = null, title = null, profilePicture = null, surveyId = null, surveyCycleKey = null },
-  client = db
+export const insertUser = (
+  {
+    email,
+    password,
+    status,
+    name = null,
+    title = null,
+    profilePicture = null,
+    surveyId = null,
+    surveyCycleKey = null,
+  }: {
+    email: string
+    password: any
+    status: any
+    name?: string
+    title?: any
+    profilePicture?: any
+    surveyId?: number
+    surveyCycleKey?: any
+  },
+  client: DbClient = db
 ) =>
   client.one(
     `
@@ -82,7 +121,7 @@ export const insertUser = async (
 
 // READ
 
-export const countUsers = async ({ search = null } = {}, client = db) =>
+export const countUsers = ({ search = null }: { search?: string | null } = {}, client: DbClient = db) =>
   client.one(
     `
     SELECT count(*)
@@ -93,7 +132,7 @@ export const countUsers = async ({ search = null } = {}, client = db) =>
     (row) => Number(row.count)
   )
 
-export const countUsersBySurveyId = async (surveyId, countSystemAdmins = false, client = db) =>
+export const countUsersBySurveyId = (surveyId: number, countSystemAdmins = false, client: DbClient = db) =>
   client.one(
     `
     SELECT count(*)
@@ -124,7 +163,7 @@ FROM survey s
   LEFT JOIN user_invitation ui ON ui.survey_uuid = s.uuid AND ui.user_uuid = gu.user_uuid
 GROUP BY gu.user_uuid`
 
-const getUsersSelectQueryPrefix = ({ includeSurveys = false }) => `
+const getUsersSelectQueryPrefix = ({ includeSurveys = false }: { includeSurveys?: boolean }) => `
   WITH us AS (
     SELECT DISTINCT ON(us.user_uuid)
       us.user_uuid, 
@@ -142,6 +181,13 @@ const _usersSelectQuery = ({
   sortBy = userSortBy.email,
   sortOrder = DbOrder.asc,
   includeSurveys = false,
+}: {
+  onlyAccepted?: boolean
+  selectFields: any
+  search?: string | null
+  sortBy?: string | null
+  sortOrder?: string | null
+  includeSurveys?: boolean
 }) => {
   // check sort by parameters
   const orderBy = orderByFieldBySortBy[sortBy] ?? 'email'
@@ -205,9 +251,23 @@ const _usersSelectQuery = ({
     ORDER BY ${orderBy} ${orderByDirection} NULLS LAST`
 }
 
-export const fetchUsers = async (
-  { offset = 0, onlyAccepted = false, limit = null, search = null, sortBy = 'email', sortOrder = 'ASC' },
-  client = db
+export const fetchUsers = (
+  {
+    offset = 0,
+    onlyAccepted = false,
+    limit = null,
+    search = null,
+    sortBy = 'email',
+    sortOrder = 'ASC',
+  }: {
+    offset?: number
+    onlyAccepted?: boolean
+    limit?: number | null
+    search?: string | null
+    sortBy?: string | null
+    sortOrder?: string | null
+  },
+  client: DbClient = db
 ) =>
   client.map(
     `${_usersSelectQuery({ onlyAccepted, selectFields, search, sortBy, sortOrder })}
@@ -221,7 +281,7 @@ export const fetchUsers = async (
     camelize
   )
 
-export const fetchUsersIntoStream = async ({ processor }, client = db) => {
+export const fetchUsersIntoStream = ({ processor }: { processor: any }, client: DbClient = db) => {
   const select = _usersSelectQuery({
     selectFields: ['u.email', 'u.name', `u.props ->> '${User.keysProps.title}' AS title`, 'u.status'],
     includeSurveys: true,
@@ -229,9 +289,14 @@ export const fetchUsersIntoStream = async ({ processor }, client = db) => {
   return DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(select, []), client, processor })
 }
 
-export const fetchUsersBySurveyId = async (
-  { surveyId, offset = 0, limit = null, includeSystemAdmins = false },
-  client = db
+export const fetchUsersBySurveyId = (
+  {
+    surveyId,
+    offset = 0,
+    limit = null,
+    includeSystemAdmins = false,
+  }: { surveyId: number; offset?: number; limit?: number | null; includeSystemAdmins?: boolean },
+  client: DbClient = db
 ) =>
   client.map(
     `${getUsersSelectQueryPrefix({ includeSurveys: false })}
@@ -261,7 +326,10 @@ export const fetchUsersBySurveyId = async (
     camelize
   )
 
-export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, client = db) => {
+export const fetchActiveUserUuidsWithPreferredSurveyId = (
+  { surveyId }: { surveyId: number },
+  client: DbClient = db
+) => {
   return client.map(
     `SELECT u.uuid 
     FROM "user" u 
@@ -277,7 +345,7 @@ export const fetchActiveUserUuidsWithPreferredSurveyId = async ({ surveyId }, cl
   )
 }
 
-export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
+export const fetchUserByUuidWithPassword = (uuid: any, client: DbClient = db) =>
   client.one(
     `
     SELECT ${columnsCommaSeparated}, u.password
@@ -287,7 +355,7 @@ export const fetchUserByUuidWithPassword = async (uuid, client = db) =>
     camelize
   )
 
-export const fetchUserByUuid = async (uuid, client = db) =>
+export const fetchUserByUuid = (uuid: any, client: DbClient = db) =>
   client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}
@@ -297,7 +365,7 @@ export const fetchUserByUuid = async (uuid, client = db) =>
     camelize
   )
 
-export const fetchUserByEmail = async (email, client = db) =>
+export const fetchUserByEmail = (email: string, client: DbClient = db) =>
   client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}
@@ -307,7 +375,7 @@ export const fetchUserByEmail = async (email, client = db) =>
     camelize
   )
 
-export const fetchUserSurveysCount = async (uuid, client = db) =>
+export const fetchUserSurveysCount = (uuid: any, client: DbClient = db) =>
   client.one(
     `SELECT
       (SELECT COUNT(*) FROM survey s WHERE s.owner_uuid = $1 AND s.published)::int AS surveys_count_published,
@@ -316,7 +384,7 @@ export const fetchUserSurveysCount = async (uuid, client = db) =>
     camelize
   )
 
-export const fetchUserAndPasswordByEmail = async (email, client = db) =>
+export const fetchUserAndPasswordByEmail = (email: string, client: DbClient = db) =>
   client.oneOrNone(
     `
     SELECT ${columnsCommaSeparated}, password
@@ -326,7 +394,7 @@ export const fetchUserAndPasswordByEmail = async (email, client = db) =>
     camelize
   )
 
-export const fetchUserProfilePicture = async (uuid, client = db) =>
+export const fetchUserProfilePicture = (uuid: any, client: DbClient = db) =>
   client.one(
     `
     SELECT profile_picture
@@ -350,7 +418,7 @@ export const expiredInvitationWhereCondition = `
     WHERE uar.email = u.email AND uar.date_created >= NOW() - INTERVAL '1 WEEK'
   )`
 
-export const fetchUsersWithExpiredInvitation = (client = db) =>
+export const fetchUsersWithExpiredInvitation = (client: DbClient = db) =>
   client.map(
     `
     SELECT ${columnsCommaSeparated}
@@ -360,7 +428,7 @@ export const fetchUsersWithExpiredInvitation = (client = db) =>
     camelize
   )
 
-export const fetchSystemAdministratorsEmail = async (client = db) =>
+export const fetchSystemAdministratorsEmail = (client: DbClient = db) =>
   client.map(
     `
     SELECT u.email
@@ -376,7 +444,7 @@ export const fetchSystemAdministratorsEmail = async (client = db) =>
     (row) => row.email
   )
 
-export const countSystemAdministrators = async (client = db) =>
+export const countSystemAdministrators = (client: DbClient = db) =>
   client.one(
     `
     SELECT COUNT (*)
@@ -392,9 +460,23 @@ export const countSystemAdministrators = async (client = db) =>
 
 // ==== UPDATE
 
-export const updateUser = async (
-  { userUuid, name, email, profilePictureSet = false, profilePicture = null, props = {} },
-  client = db
+export const updateUser = (
+  {
+    userUuid,
+    name,
+    email,
+    profilePictureSet = false,
+    profilePicture = null,
+    props = {},
+  }: {
+    userUuid: string
+    name: string
+    email: string
+    profilePictureSet?: any
+    profilePicture?: any
+    props?: Record<string, any>
+  },
+  client: DbClient = db
 ) =>
   client.one(
     `
@@ -410,7 +492,16 @@ export const updateUser = async (
     camelize
   )
 
-export const updateNamePasswordAndStatus = async ({ userUuid, name, password, status, title }, client = db) =>
+export const updateNamePasswordAndStatus = (
+  {
+    userUuid,
+    name,
+    password,
+    status,
+    title,
+  }: { userUuid: string; name: string; password: any; status: any; title: any },
+  client: DbClient = db
+) =>
   client.one(
     `
     UPDATE "user" u
@@ -421,7 +512,7 @@ export const updateNamePasswordAndStatus = async ({ userUuid, name, password, st
     camelize
   )
 
-export const updatePassword = async ({ userUuid, password }, client = db) =>
+export const updatePassword = ({ userUuid, password }: { userUuid: string; password: any }, client: DbClient = db) =>
   client.one(
     `
     UPDATE "user" u
@@ -435,7 +526,7 @@ export const updatePassword = async ({ userUuid, password }, client = db) =>
 // ==== PREFS
 
 // mapCustomLayers is written only by the custom layers API: a stale copy sent by the client must not overwrite it
-export const updateUserPrefs = async (user, client = db) =>
+export const updateUserPrefs = (user: ArenaUser, client: DbClient = db) =>
   client.one(
     `
     UPDATE "user" u
@@ -446,7 +537,7 @@ export const updateUserPrefs = async (user, client = db) =>
     camelize
   )
 
-export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
+export const deleteUsersPrefsSurvey = async (surveyId: number, client: DbClient = db) => {
   // Remove from surveys current pref
   await client.query(
     `
@@ -463,7 +554,10 @@ export const deleteUsersPrefsSurvey = async (surveyId, client = db) => {
 `)
 }
 
-export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db) =>
+export const deleteUserPrefsSurvey = (
+  { userUuid, surveyId }: { userUuid: string; surveyId: number },
+  client: DbClient = db
+) =>
   client.query(
     `
     UPDATE "user"
@@ -490,7 +584,10 @@ export const deleteUserPrefsSurvey = async ({ userUuid, surveyId }, client = db)
  * @param {object} [client] - The database client.
  * @returns {Promise<object>} The query result.
  */
-export const deleteUserMapCustomLayersSurvey = async ({ userUuid, surveyId }, client = db) =>
+export const deleteUserMapCustomLayersSurvey = (
+  { userUuid, surveyId }: { userUuid: string; surveyId: number },
+  client: DbClient = db
+) =>
   client.query(`UPDATE "user" SET prefs = prefs #- ARRAY[$/layersKey/, $/surveyId/]::text[] WHERE uuid = $/userUuid/`, {
     userUuid,
     layersKey: User.keysPrefs.mapCustomLayers,
@@ -504,7 +601,7 @@ export const deleteUserMapCustomLayersSurvey = async ({ userUuid, surveyId }, cl
  * @param cycleKeysDeleted
  * @param client
  */
-export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, client = db) => {
+export const resetUsersPrefsSurveyCycle = async (surveyId: number, cycleKeysDeleted: any, client: DbClient = db) => {
   const surveyCyclePath = `'{${User.keysPrefs.surveys},${surveyId},${User.keysSurveyPrefs.cycle}}'`
   await client.query(
     `
@@ -516,7 +613,7 @@ export const resetUsersPrefsSurveyCycle = async (surveyId, cycleKeysDeleted, cli
   )
 }
 
-export const deleteUser = (userUuid, client = db) =>
+export const deleteUser = (userUuid: string, client: DbClient = db) =>
   client.oneOrNone(
     `DELETE FROM "user" u
     WHERE u.uuid = $1
@@ -525,8 +622,8 @@ export const deleteUser = (userUuid, client = db) =>
     camelize
   )
 
-export const deleteUsersWithExpiredInvitation = (client = db) =>
-  client.any(
+export const deleteUsersWithExpiredInvitation = (client: DbClient = db) =>
+  client.map(
     `
     DELETE FROM "user" u
     WHERE ${expiredInvitationWhereCondition}
