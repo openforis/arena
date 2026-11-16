@@ -13,6 +13,7 @@ import { RecordCycle } from '@core/record/recordCycle'
 
 import { FileUtils } from '@webapp/utils/fileUtils'
 import * as API from '@webapp/service/api'
+import { TestId } from '@webapp/utils/testId'
 
 import { JobActions } from '@webapp/store/app'
 import { useI18n, useSystemConfigFileUploadLimitMB } from '@webapp/store/system'
@@ -80,6 +81,7 @@ export const DataImportFlatDataView = () => {
     dataImportType,
     file,
     fileFormat,
+    fileId,
     jobCompleted,
     nodeDefLabelType,
     selectedNodeDefUuid,
@@ -208,6 +210,7 @@ export const DataImportFlatDataView = () => {
     surveyId,
     file,
     fileFormat,
+    fileId,
     cycle,
     nodeDefUuid: selectedNodeDefUuid,
     insertNewRecords: dataImportType === importTypes.insertNewRecords,
@@ -310,6 +313,7 @@ export const DataImportFlatDataView = () => {
                   startFunction={API.startDataImportFromCsvJob}
                   startFunctionParams={{ ...importStartParams, dryRun: true }}
                   onUploadComplete={onImportJobStart}
+                  testId={TestId.dataImport.validateFileBtn}
                 />
                 <ButtonIconInfo title="dataImportView:validateFileInfo" />
               </div>
@@ -327,6 +331,7 @@ export const DataImportFlatDataView = () => {
                 strongConfirm={deleteExistingEntities}
                 strongConfirmRequiredText={deleteExistingEntities ? 'update' : null}
                 onUploadComplete={onImportJobStart}
+                testId={TestId.dataImport.startImportBtn}
               />
             </>
           )}
