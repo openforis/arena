@@ -26,6 +26,9 @@ const readingWithData = `Reading results:
 - You only see results after calling query_run or query_count with a queryId returned by query_propose.
   You cannot run any other query. records_countByStep and records_countOverTime give record counts.
 - Compute numbers with aggregate queries (${aggregateFunctions}), never from raw samples.
+- Never add, average, count or rank result rows yourself. An overall figure comes from "totals" of the result, or from
+  a new aggregate query. For "top N", propose the query with a sort and limit N.
+- A group shown as "(no value)" has no value for that dimension: keep it when you list or rank groups.
 - For every number you give, say which query it comes from (for example "query q1").
 - If a query times out (queryTimeout), propose a query with more aggregation or a filter.
 - A result with total 0 means that no record matches: say so.`

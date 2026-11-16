@@ -119,6 +119,7 @@ describe('query_propose', () => {
       'measures',
       'filter',
       'sort',
+      'limit',
       'explanation',
     ])
   })

@@ -35,6 +35,13 @@ export const proposeQueryInputSchema = z.object({
         'attribute, or the entity name for the count), order asc or desc. Sort a measure desc to get the top groups, ' +
         'e.g. the species with most trees'
     ),
+  limit: z
+    .number()
+    .int()
+    .min(1)
+    .max(200)
+    .nullish()
+    .describe('Optional: how many rows query_run returns. For a "top N" question set it to N, with a sort'),
   explanation: z.string().max(1000).describe("Short explanation of the query, in the user's language"),
 })
 
@@ -68,6 +75,9 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
   const { survey, cycle, lang, includeAnalysis } = getAnalysisContext(ctx)
   const aiResult = toDataQueryAiResult(input)
   const { query, errors } = toQuery({ survey, cycle, lang, aiResult, includeAnalysis })
+  // without a sort the first N rows are arbitrary ones
+  if (input.limit && (input.sort ?? []).length === 0)
+    errors.push('a limit needs a sort: add the sort that defines the first rows')
   if (!query || errors.length > 0) {
     return {
       error: {
@@ -77,7 +87,13 @@ const execute = async (input: ProposeQueryInput, ctx: any) => {
       },
     }
   }
-  const entry = store.add({ query, explanation: input.explanation, entityName: input.entity, mode: input.mode })
+  const entry = store.add({
+    query,
+    explanation: input.explanation,
+    entityName: input.entity,
+    mode: input.mode,
+    ...(input.limit ? { limit: input.limit } : {}),
+  })
   return {
     queryId: entry.id,
     entity: input.entity,

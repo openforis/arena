@@ -4,6 +4,8 @@ export type AnalysisQueryEntry = {
   explanation: string
   entityName: string
   mode: string
+  // rows the model asked for (top N); the card and the Explorer show the whole query
+  limit?: number
   createdAt: string
 }
 

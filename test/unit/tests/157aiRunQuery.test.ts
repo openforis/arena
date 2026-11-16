@@ -1,8 +1,9 @@
 import SystemError from '@core/systemError'
 import * as Survey from '@core/survey/survey'
+import { Query } from '@common/model/query'
 
 import { proposeQueryTool } from '@webapp/ai/tools/analysis/proposeQuery'
-import { createRunQueryTools } from '@webapp/ai/tools/analysis/runQuery'
+import { createRunQueryTools, NO_VALUE } from '@webapp/ai/tools/analysis/runQuery'
 import { TOOL_RESULT_BUDGET_CHARS } from '@webapp/ai/tools/common/toolResult'
 
 import { newAnalysisToolContext, newFakeAnalysisApi, runTool } from '@test/unit/utils/aiAnalysisTestUtils'
@@ -32,6 +33,8 @@ const rawRow = (idx: number, text = 'x') => ({
   dbh: 12.5,
 })
 
+const isTotalsQuery = (query: any) => Query.isModeAggregate(query) && Query.getDimensions(query).length === 0
+
 /**
  * Proposes a query in a new context and returns the tools and the context.
  */
@@ -39,8 +42,12 @@ const setUp = async ({
   input = aggregateInput,
   rows = [],
   count = 0,
-}: { input?: object; rows?: object[]; count?: number } = {}) => {
-  const { api, calls } = newFakeAnalysisApi({ fetchQueryRows: () => rows, fetchQueryCount: () => count })
+  totals = [{ dbh_avg: 99.5 }],
+}: { input?: object; rows?: object[]; count?: number; totals?: object[] } = {}) => {
+  const { api, calls } = newFakeAnalysisApi({
+    fetchQueryRows: ({ query }: any) => (isTotalsQuery(query) ? totals : rows),
+    fetchQueryCount: () => count,
+  })
   const [countTool, runQueryTool] = createRunQueryTools({ api })
   const ctx = newAnalysisToolContext({ survey })
   await runTool(proposeQueryTool, input, ctx)
@@ -83,22 +90,29 @@ describe('query_run', () => {
       name: 'fetchQueryRows',
       params: { surveyId: Survey.getId(survey), cycle: Survey.cycleOneKey, limit: 201 },
     })
-    expect(calls[1].name).toBe('fetchQueryCount')
+    expect(calls.map((call) => call.name)).toEqual(['fetchQueryRows', 'fetchQueryCount', 'fetchQueryRows'])
     expect(result.columns).toEqual(['tree_type', 'tree_type_label', 'dbh_avg'])
     expect(result.rows).toHaveLength(200)
     expect(result.rows[3]).toEqual(['T3', 'Type 3', 3.5])
     expect(result).toMatchObject({ queryId: 'q1', mode: 'aggregate', total: 250, truncated: true })
     expect(JSON.stringify(result).length).toBeLessThanOrEqual(TOOL_RESULT_BUDGET_CHARS)
-    expect(result.note).toContain('first 200 of 250 rows')
-    expect(result.note).toContain('sort order')
+    // no sort: the rows are an arbitrary subset
+    expect(result.note).toContain('Only 200 of 250 rows')
+    expect(result.note).toContain('do not rank')
+    expect(result.totals).toEqual({ dbh_avg: 99.5 })
+    // the note and the totals come before the rows
+    const keys = Object.keys(result)
+    expect(keys.indexOf('note')).toBeLessThan(keys.indexOf('rows'))
+    expect(keys.indexOf('totals')).toBeLessThan(keys.indexOf('rows'))
   })
 
   test('aggregate: few groups, no count request', async () => {
     const rows = [aggregateRow(1), aggregateRow(2), aggregateRow(3)]
     const { runQueryTool, ctx, calls } = await setUp({ rows })
     const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
-    expect(calls.map((call) => call.name)).toEqual(['fetchQueryRows'])
-    expect(result).toMatchObject({ total: 3, truncated: false })
+    expect(calls.map((call) => call.name)).toEqual(['fetchQueryRows', 'fetchQueryRows'])
+    expect(result).toMatchObject({ total: 3, truncated: false, totals: { dbh_avg: 99.5 } })
+    expect(result.note).toBeUndefined()
   })
 
   test('raw: 50 rows plus the total, label columns kept, other view columns dropped', async () => {
@@ -197,6 +211,7 @@ describe('fix round 1', () => {
     await runTool(runQueryTool, { queryId: 'q1' }, ctx)
     await runTool(countTool, { queryId: 'q1' }, ctx)
     expect(calls.map((call) => call.name)).toEqual(['fetchQueryRows', 'fetchQueryCount', 'fetchQueryCount'])
+    expect(calls.every((call) => !isTotalsQuery(call.params.query))).toBe(true)
     for (const call of calls) expect(call.params.signal).toBe(ctx.signal)
   })
 
@@ -218,5 +233,80 @@ describe('fix round 1', () => {
     const ctx = newAnalysisToolContext({ survey })
     await runTool(proposeQueryTool, aggregateInput, ctx)
     expect((await runTool(runQueryTool, { queryId: 'q1' }, ctx)).error.code).toBe('queryTimeout')
+  })
+})
+
+describe('numbers the model must not compute itself', () => {
+  const sortedInput = { ...aggregateInput, sort: [{ attribute: 'dbh', order: 'desc' }] }
+
+  test('totals: the same query without dimensions and sort, one row', async () => {
+    const { runQueryTool, ctx, calls } = await setUp({ input: sortedInput, rows: [aggregateRow(1), aggregateRow(2)] })
+    const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
+    const stored = ctx.analysisQueries.get('q1').query
+    const totalsCall = calls[1].params
+    expect(totalsCall.limit).toBe(1)
+    expect(Query.getDimensions(totalsCall.query)).toEqual([])
+    expect(Query.getSort(totalsCall.query)).toEqual([])
+    expect(Query.getMeasures(totalsCall.query)).toEqual(Query.getMeasures(stored))
+    expect(Query.getFilter(totalsCall.query)).toEqual(Query.getFilter(stored))
+    expect(result.totals).toEqual({ dbh_avg: 99.5 })
+  })
+
+  test('totals: a failed request leaves the rows; a single group or a raw query asks for none', async () => {
+    const { api } = newFakeAnalysisApi({
+      fetchQueryRows: ({ query }: any) =>
+        isTotalsQuery(query) ? Promise.reject(new Error('boom')) : [aggregateRow(1), aggregateRow(2)],
+    })
+    const [, failingRunTool] = createRunQueryTools({ api })
+    const failingCtx = newAnalysisToolContext({ survey })
+    await runTool(proposeQueryTool, aggregateInput, failingCtx)
+    const failed = await runTool(failingRunTool, { queryId: 'q1' }, failingCtx)
+    expect(failed.rows).toHaveLength(2)
+    expect(failed.totals).toBeUndefined()
+
+    const single = await setUp({ rows: [aggregateRow(1)] })
+    await runTool(single.runQueryTool, { queryId: 'q1' }, single.ctx)
+    expect(single.calls).toHaveLength(1)
+
+    const raw = await setUp({ input: rawInput, rows: [rawRow(1), rawRow(2)] })
+    expect((await runTool(raw.runQueryTool, { queryId: 'q1' }, raw.ctx)).totals).toBeUndefined()
+    expect(raw.calls).toHaveLength(1)
+  })
+
+  test('limit: only the top rows are asked for and returned, and the note says they are the top ones', async () => {
+    const rows = Array.from({ length: 6 }, (_, idx) => aggregateRow(idx))
+    const { runQueryTool, ctx, calls } = await setUp({ input: { ...sortedInput, limit: 5 }, rows, count: 40 })
+    const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
+    expect(calls[0].params.limit).toBe(6)
+    expect(result.rows).toHaveLength(5)
+    expect(result).toMatchObject({ total: 40, truncated: true, totals: { dbh_avg: 99.5 } })
+    expect(result.note).toContain('first 5 of 40 rows')
+    expect(result.note).toContain('top rows')
+    expect(result.note).toContain('"totals"')
+  })
+
+  test('limit: refused without a sort, and never above the cap', async () => {
+    const ctx = newAnalysisToolContext({ survey })
+    const refused = await runTool(proposeQueryTool, { ...aggregateInput, limit: 5 }, ctx)
+    expect(refused.error.code).toBe('invalidProposal')
+    expect(refused.error.issues[0].message).toContain('limit needs a sort')
+    expect(proposeQueryTool.inputSchema.safeParse({ ...sortedInput, limit: 201 }).success).toBe(false)
+    expect(proposeQueryTool.inputSchema.safeParse({ ...sortedInput, limit: 0 }).success).toBe(false)
+  })
+
+  test('a group without a value is marked on its first column only; raw nulls stay null', async () => {
+    const rows = [
+      { tree_type: null, tree_type_label: null, dbh_avg: null },
+      { tree_type: 'T1', tree_type_label: null, dbh_avg: 2 },
+    ]
+    const { runQueryTool, ctx } = await setUp({ rows })
+    const result = await runTool(runQueryTool, { queryId: 'q1' }, ctx)
+    expect(result.rows).toEqual([
+      [NO_VALUE, null, null],
+      ['T1', null, 2],
+    ])
+
+    const raw = await setUp({ input: rawInput, rows: [rawRow(1)] })
+    expect((await runTool(raw.runQueryTool, { queryId: 'q1' }, raw.ctx)).rows[0][3]).toBeNull()
   })
 })
