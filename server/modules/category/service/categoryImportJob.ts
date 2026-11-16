@@ -333,7 +333,7 @@ export class CategoryImportInternalJob extends Job {
     })
     await this.itemsUpdater.init()
 
-    const reader = await CategoryImportFlatDataParser.createRowsReaderFromStream({
+    const reader = CategoryImportFlatDataParser.createRowsReaderFromStream({
       stream: await this.createReadStream(),
       survey,
       summary,
