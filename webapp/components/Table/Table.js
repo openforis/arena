@@ -10,31 +10,36 @@ import Content from './Content'
 import { Footer } from './Footer'
 import { useTable } from './useTable'
 
+// default props as constants: new objects or functions at every render would re-render all the (memoized) rows
+const defaultKeyExtractor = ({ item }) => ObjectUtils.getUuid(item)
+const defaultIsRowExpandable = () => true
+const emptyProps = {}
+
 const Table = (props) => {
   const {
-    cellProps = {},
+    cellProps = emptyProps,
     cellTestIdExtractor = null,
     className = '',
     columns = null,
     expandableRows = false,
     gridTemplateColumns = '1fr',
     headerLeftComponent = DummyComponent,
-    headerProps = {},
+    headerProps = emptyProps,
     isRowActive = null,
-    isRowExpandable = () => true,
+    isRowExpandable = defaultIsRowExpandable,
     isRowOpenable = null,
     keepSelectionOnSearch = false,
-    keyExtractor = ({ item }) => ObjectUtils.getUuid(item),
+    keyExtractor = defaultKeyExtractor,
     module,
     moduleApiUri = null,
     noItemsLabelKey = 'common.noItems',
     noItemsLabelForSearchKey = 'common.noItems',
     onRowOpen = null,
-    restParams = {},
+    restParams = emptyProps,
     rowHeaderComponent = DummyComponent,
     rowComponent = DummyComponent,
     rowExpandedComponent = DummyComponent,
-    rowProps = {},
+    rowProps = emptyProps,
     selectable = false,
     showFooter = true,
     showHeader = true,

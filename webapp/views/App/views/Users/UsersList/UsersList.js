@@ -23,6 +23,8 @@ UserRowExpanded.propTypes = {
 // users who have not accepted the invitation yet cannot be edited
 const isRowOpenable = (user) => User.hasAccepted(user)
 
+const isRowExpandable = ({ item }) => !User.isSystemAdmin(item)
+
 export const UsersList = () => {
   const navigate = useNavigate()
   const onRowOpen = useCallback(
@@ -44,7 +46,7 @@ export const UsersList = () => {
       className="users-list"
       columns={columns}
       expandableRows
-      isRowExpandable={({ item }) => !User.isSystemAdmin(item)}
+      isRowExpandable={isRowExpandable}
       isRowOpenable={isRowOpenable}
       keepSelectionOnSearch
       onRowOpen={onRowOpen}

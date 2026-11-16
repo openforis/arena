@@ -1,4 +1,4 @@
-import { useEffect, useCallback, useState, useMemo } from 'react'
+import { useEffect, useCallback, useLayoutEffect, useRef, useState, useMemo } from 'react'
 import { useNavigate } from 'react-router'
 import { useDispatch } from 'react-redux'
 
@@ -70,13 +70,18 @@ export const useTable = ({
     },
   })
 
-  const initData = () => {
-    fetchData()
-    fetchCount()
-  }
+  // stable function (passed to every row) calling the latest fetch functions
+  const fetchAllRef = useRef(null)
+  useLayoutEffect(() => {
+    fetchAllRef.current = () => {
+      fetchData()
+      fetchCount()
+    }
+  })
+  const initData = useCallback(() => fetchAllRef.current(), [])
 
   // init data on mount and on restParams and search update
-  useEffect(initData, [JSON.stringify(restParams), search])
+  useEffect(initData, [initData, JSON.stringify(restParams), search])
 
   if (totalCount < count) {
     setTotalCount(count)
