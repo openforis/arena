@@ -1,3 +1,4 @@
+import type { Category as ArenaCategory, Survey as ArenaSurvey } from '@openforis/arena-core'
 import { PointFactory, Points } from '@openforis/arena-core'
 
 import { ArrayUtils } from '@core/arrayUtils'
@@ -40,7 +41,7 @@ const templateExtraValueByType = {
   [ExtraPropDef.dataTypes.geometryPoint]: Points.toString(PointFactory.createInstance({ x: 12.48902, y: 41.88302 })),
 }
 
-const templateExtraValueGenerator = ({ extraDef }) => {
+const templateExtraValueGenerator = ({ extraDef }: { extraDef: any }) => {
   const extraDefName = ExtraPropDef.getName(extraDef)
 
   if (extraDefName.endsWith('_x')) return 12.48902
@@ -50,7 +51,17 @@ const templateExtraValueGenerator = ({ extraDef }) => {
   return templateExtraValueByType[ExtraPropDef.getDataType(extraDef)]
 }
 
-const generateDescendantItems = ({ levels, levelIndex = 0, previousLevelCodes = [], numItemsPerLevel = 2 }) => {
+const generateDescendantItems = ({
+  levels,
+  levelIndex = 0,
+  previousLevelCodes = [],
+  numItemsPerLevel = 2,
+}: {
+  levels: any
+  levelIndex?: any
+  previousLevelCodes?: any
+  numItemsPerLevel?: any
+}) => {
   const codes = ArrayUtils.fromNumberOfElements(numItemsPerLevel).map((codeIndex) => `${codeIndex + 1}`)
 
   return codes.reduce((acc, code) => {
@@ -72,7 +83,7 @@ const generateDescendantItems = ({ levels, levelIndex = 0, previousLevelCodes = 
   }, [])
 }
 
-const generateExtraDefsForTemplate = (category) => {
+const generateExtraDefsForTemplate = (category: ArenaCategory) => {
   const extraDefs = Category.getItemExtraDefsArray(category)
   return extraDefs.reduce((acc, extraDef) => {
     if (ExtraPropDef.getDataType(extraDef) === ExtraPropDef.dataTypes.geometryPoint) {
@@ -90,10 +101,17 @@ const generateExtraDefsForTemplate = (category) => {
   }, [])
 }
 
-const generateItems = ({ levels, numItemsPerLevel = 2 }) => generateDescendantItems({ levels, numItemsPerLevel })
+const generateItems = ({ levels, numItemsPerLevel = 2 }: { levels: any; numItemsPerLevel?: any }) =>
+  generateDescendantItems({ levels, numItemsPerLevel })
 
-const generateTemplate = ({ survey, category: categoryProp = null }) => {
-  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey))
+const generateTemplate = ({
+  survey,
+  category: categoryProp = null,
+}: {
+  survey: ArenaSurvey
+  category?: ArenaCategory
+}) => {
+  const languages = Survey.getLanguages(Survey.getSurveyInfo(survey)) as string[]
   const category = categoryProp || generateCategoryTemplate()
   const levels = Category.getLevelsArray(category)
   const flat = levels.length === 1
@@ -138,7 +156,7 @@ const generateTemplate = ({ survey, category: categoryProp = null }) => {
   }))
 }
 
-const generateSamplingPointDataTemplate = ({ survey }) =>
+const generateSamplingPointDataTemplate = ({ survey }: { survey: ArenaSurvey }) =>
   generateTemplate({ survey, category: generateSamplingPointDataCategoryTemplate() })
 
 export const CategoryImportTemplateGenerator = {

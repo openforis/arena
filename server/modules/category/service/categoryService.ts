@@ -1,3 +1,4 @@
+import type { User as ArenaUser } from '@openforis/arena-core'
 import { Authorizer, Points } from '@openforis/arena-core'
 
 import * as Survey from '@core/survey/survey'
@@ -25,7 +26,17 @@ import CategoryGeoPackageExportJob from './CategoryGeoPackageExportJob'
 import { createSamplingPointDataRecordFinder } from './samplingPointDataRecordFinder'
 import CategoriesBatchImportJob from './CategoriesBatchImportJob'
 
-export const importCategory = ({ user, surveyId, categoryUuid, summary }) => {
+export const importCategory = ({
+  user,
+  surveyId,
+  categoryUuid,
+  summary,
+}: {
+  user: ArenaUser
+  surveyId: number
+  categoryUuid: string
+  summary: any
+}) => {
   const job = new CategoryImportJob({
     user,
     surveyId,
@@ -38,7 +49,15 @@ export const importCategory = ({ user, surveyId, categoryUuid, summary }) => {
   return job
 }
 
-export const createBatchImportJob = ({ user, surveyId, filePath }) => {
+export const createBatchImportJob = ({
+  user,
+  surveyId,
+  filePath,
+}: {
+  user: ArenaUser
+  surveyId: number
+  filePath: string
+}) => {
   const job = new CategoriesBatchImportJob({ user, surveyId, filePath })
   JobManager.enqueueJob(job)
   return job
@@ -56,6 +75,18 @@ export const exportCategory = async ({
   includeReportingDataCumulativeArea = false,
   res,
   fileFormat = FileFormats.csv,
+}: {
+  surveyId: number
+  categoryUuid: string
+  draft: boolean
+  language?: any
+  includeUuid?: boolean
+  includeSingleCode?: any
+  includeCodeJoint?: any
+  includeLevelPosition?: any
+  includeReportingDataCumulativeArea?: any
+  res: any
+  fileFormat?: string
 }) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
@@ -82,7 +113,17 @@ export const exportCategory = async ({
   })
 }
 
-export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res, fileFormat }) => {
+export const exportCategoryImportTemplateGeneric = async ({
+  surveyId,
+  draft,
+  res,
+  fileFormat,
+}: {
+  surveyId: number
+  draft: boolean
+  res: any
+  fileFormat: string
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey })
   const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'CategoryImportGeneric', fileFormat })
@@ -90,7 +131,19 @@ export const exportCategoryImportTemplateGeneric = async ({ surveyId, draft, res
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, draft, res, fileFormat }) => {
+export const exportCategoryImportTemplate = async ({
+  surveyId,
+  categoryUuid,
+  draft,
+  res,
+  fileFormat,
+}: {
+  surveyId: number
+  categoryUuid: string
+  draft: boolean
+  res: any
+  fileFormat: string
+}) => {
   const category = await CategoryManager.fetchCategoryAndLevelsByUuid({ surveyId, categoryUuid, draft })
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateTemplate({ survey, category })
@@ -105,7 +158,17 @@ export const exportCategoryImportTemplate = async ({ surveyId, categoryUuid, dra
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, draft, res, fileFormat }) => {
+export const exportCategoryImportTemplateSamplingPointData = async ({
+  surveyId,
+  draft,
+  res,
+  fileFormat,
+}: {
+  surveyId: number
+  draft: boolean
+  res: any
+  fileFormat: string
+}) => {
   const survey = await SurveyManager.fetchSurveyById({ surveyId, draft })
   const templateData = CategoryImportTemplateGenerator.generateSamplingPointDataTemplate({ survey })
   const fileName = ExportFileNameGenerator.generate({ survey, fileType: 'SamplingPointDataImport', fileFormat })
@@ -113,7 +176,17 @@ export const exportCategoryImportTemplateSamplingPointData = async ({ surveyId, 
   await FlatDataWriter.writeItemsToStream({ outputStream: res, fileFormat, items: templateData })
 }
 
-export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
+export const exportAllCategories = ({
+  user,
+  surveyId,
+  fileFormat,
+  draft,
+}: {
+  user: ArenaUser
+  surveyId: number
+  fileFormat: string
+  draft: boolean
+}) => {
   const job = new CategoriesExportJob({
     user,
     surveyId,
@@ -126,7 +199,17 @@ export const exportAllCategories = ({ user, surveyId, fileFormat, draft }) => {
   return job
 }
 
-export const exportCategoryToGeoPackage = ({ user, surveyId, categoryUuid, draft }) => {
+export const exportCategoryToGeoPackage = ({
+  user,
+  surveyId,
+  categoryUuid,
+  draft,
+}: {
+  user: ArenaUser
+  surveyId: number
+  categoryUuid: string
+  draft: boolean
+}) => {
   const job = new CategoryGeoPackageExportJob({ user, surveyId, categoryUuid, draft })
 
   JobManager.enqueueJob(job)
@@ -134,19 +217,29 @@ export const exportCategoryToGeoPackage = ({ user, surveyId, categoryUuid, draft
   return job
 }
 
-const _getSamplingPointDataCategory = async ({ surveyId, draft = true }) => {
+const _getSamplingPointDataCategory = async ({ surveyId, draft = true }: { surveyId: number; draft?: boolean }) => {
   const categories = await CategoryManager.fetchCategoriesBySurveyId({ surveyId, draft })
   return categories.find((category) => Category.getName(category) === Category.samplingPointDataCategoryName)
 }
 
-export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }) => {
+export const countSamplingPointData = async ({ surveyId, levelIndex = 0 }: { surveyId: number; levelIndex?: any }) => {
   const category = await _getSamplingPointDataCategory({ surveyId })
   const categoryUuid = Category.getUuid(category)
   const count = await CategoryManager.countItemsByLevelIndex({ surveyId, categoryUuid, levelIndex })
   return count
 }
 
-export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, offset }) => {
+export const fetchSamplingPointData = async ({
+  surveyId,
+  levelIndex = 0,
+  limit,
+  offset,
+}: {
+  surveyId: number
+  levelIndex?: any
+  limit: number | null
+  offset: number
+}) => {
   const draft = true
   const category = await _getSamplingPointDataCategory({ surveyId, draft })
   if (!category) return []
@@ -198,7 +291,7 @@ export const fetchSamplingPointData = async ({ surveyId, levelIndex = 0, limit, 
  * @returns {number} The survey id, converted to a number.
  * @throws {Error} If the value is not a positive integer.
  */
-const _validateSurveyId = ({ surveyId, paramName }) => {
+const _validateSurveyId = ({ surveyId, paramName }: { surveyId: number; paramName: any }) => {
   if (!NumberUtils.isInteger(surveyId) || Number(surveyId) <= 0) {
     throw new Error(`${paramName} must be a positive integer`)
   }
@@ -216,7 +309,17 @@ const _validateSurveyId = ({ surveyId, paramName }) => {
  * @returns {Promise<Category>} The cloned and validated category.
  * @throws {UnauthorizedError} If the user is not allowed to view the source survey.
  */
-export const cloneCategoryFromSurvey = async ({ user, sourceSurveyId, sourceCategoryUuid, targetSurveyId }) => {
+export const cloneCategoryFromSurvey = async ({
+  user,
+  sourceSurveyId,
+  sourceCategoryUuid,
+  targetSurveyId,
+}: {
+  user: ArenaUser
+  sourceSurveyId: number
+  sourceCategoryUuid: string
+  targetSurveyId: number
+}) => {
   const sourceSurveyIdValidated = _validateSurveyId({ surveyId: sourceSurveyId, paramName: 'sourceSurveyId' })
   const targetSurveyIdValidated = _validateSurveyId({ surveyId: targetSurveyId, paramName: 'targetSurveyId' })
 

@@ -16,7 +16,7 @@ const dataTypes = {
   text: 'text',
 } as const
 
-type ExtraPropDataType = (typeof dataTypes)[keyof typeof dataTypes]
+export type ExtraPropDataType = (typeof dataTypes)[keyof typeof dataTypes]
 
 // stored extra prop def (props indexed by name)
 export interface ExtraPropDefItem {
