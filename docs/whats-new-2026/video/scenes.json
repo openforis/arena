@@ -52,72 +52,6 @@
       ]
     },
     {
-      "id": "stats",
-      "say": [
-        "Twenty twenty-six was a year of steady releases.",
-        "Seventy-one versions of Arena,",
-        "eighteen headline features,",
-        "and three new interface languages: Portuguese, Japanese, and Serbian."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "2026 at a glance"
-        },
-        {
-          "type": "title",
-          "text": "A year of steady releases"
-        },
-        {
-          "type": "stat",
-          "at": 1,
-          "value": 71,
-          "label": "Arena releases",
-          "sub": "from v2.2.13 to v2.12.0",
-          "x": 120,
-          "y": 310,
-          "w": 520,
-          "h": 380
-        },
-        {
-          "type": "stat",
-          "at": 2,
-          "value": 18,
-          "label": "headline features",
-          "sub": "in the in-app “What’s new”",
-          "x": 700,
-          "y": 310,
-          "w": 520,
-          "h": 380
-        },
-        {
-          "type": "stat",
-          "at": 3,
-          "value": 3,
-          "label": "new interface languages",
-          "sub": "Portuguese, Japanese, Serbian",
-          "x": 1280,
-          "y": 310,
-          "w": 520,
-          "h": 380
-        },
-        {
-          "type": "chips",
-          "at": 3,
-          "delay": 1.6,
-          "x": 1280,
-          "y": 730,
-          "w": 520,
-          "row": true,
-          "items": [
-            "Português",
-            "日本語",
-            "Српски"
-          ]
-        }
-      ]
-    },
-    {
       "id": "look",
       "say": [
         "Arena has a fresh look.",
@@ -159,6 +93,53 @@
           "delay": 0.8,
           "x": 1560,
           "y": 140
+        }
+      ]
+    },
+    {
+      "id": "branding",
+      "say": [
+        "With branding, every survey gets its own look:",
+        "up to three logos, a background image, and a primary colour, across the whole application."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Survey admins"
+        },
+        {
+          "type": "title",
+          "text": "Branding: each survey with its own look"
+        },
+        {
+          "type": "shot",
+          "src": "deck:branding-landing.jpg",
+          "x": 120,
+          "y": 290,
+          "w": 1000,
+          "h": 660
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "deck:branding-tab.png",
+          "x": 1180,
+          "y": 300,
+          "w": 620,
+          "h": 360
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "delay": 0.8,
+          "x": 1180,
+          "y": 720,
+          "w": 620,
+          "items": [
+            "Up to 3 logos",
+            "A background image",
+            "Primary colour across the app"
+          ]
         }
       ]
     },
@@ -263,368 +244,21 @@
       ]
     },
     {
-      "id": "surveys",
-      "say": [
-        "Moving surveys between servers is easier.",
-        "Compare a survey with one from another server, and apply only the changes you pick.",
-        "You can even create a survey from an O-D-K form, and import its data."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Survey management"
-        },
-        {
-          "type": "title",
-          "text": "Move surveys between servers and tools"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/surveyCompare.png",
-          "x": 120,
-          "y": 320,
-          "w": 1060,
-          "h": 470,
-          "caption": "Compare and update",
-          "sub": "e.g. test → production, only the changes you pick"
-        },
-        {
-          "type": "shot",
-          "at": 2,
-          "src": "web:whats-new/odkImport.png",
-          "x": 1240,
-          "y": 320,
-          "w": 560,
-          "h": 420,
-          "caption": "Import from ODK (beta)",
-          "sub": "Form and data from ODK Collect"
-        }
-      ]
-    },
-    {
-      "id": "branding",
-      "say": [
-        "With branding, every survey gets its own look:",
-        "up to three logos, a background image, and a primary colour, across the whole application."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Survey admins"
-        },
-        {
-          "type": "title",
-          "text": "Branding: each survey with its own look"
-        },
-        {
-          "type": "shot",
-          "src": "deck:branding-landing.jpg",
-          "x": 120,
-          "y": 290,
-          "w": 1000,
-          "h": 660
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "deck:branding-tab.png",
-          "x": 1180,
-          "y": 300,
-          "w": 620,
-          "h": 360
-        },
-        {
-          "type": "chips",
-          "at": 1,
-          "delay": 0.8,
-          "x": 1180,
-          "y": 720,
-          "w": 620,
-          "items": [
-            "Up to 3 logos",
-            "A background image",
-            "Primary colour across the app"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "print",
-      "say": [
-        "Need a paper copy? Records can now be printed, in Word or P-D-F.",
-        "They follow the form layout, with pictures, a Q-R code, and your own letterhead."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Data entry"
-        },
-        {
-          "type": "title",
-          "text": "Print records, ready to file or share"
-        },
-        {
-          "type": "shot",
-          "src": "deck:printed-record.png",
-          "x": 1120,
-          "y": 250,
-          "w": 680,
-          "h": 790,
-          "paper": true
-        },
-        {
-          "type": "chips",
-          "delay": 1.2,
-          "x": 120,
-          "y": 330,
-          "w": 820,
-          "items": [
-            "Word or PDF, portrait or landscape"
-          ]
-        },
-        {
-          "type": "chips",
-          "at": 1,
-          "x": 120,
-          "y": 420,
-          "w": 820,
-          "items": [
-            "Follows the form layout",
-            "Pictures included",
-            "QR code to open the record online",
-            "Your own header and footer"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "relevance",
-      "say": [
-        "Data entry keeps your data cleaner.",
-        "When a change makes some fields no longer relevant, their values are cleared, after asking you first."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Data entry"
-        },
-        {
-          "type": "title",
-          "text": "Cleaner data while you type"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/clearNonApplicableValues.png",
-          "x": 260,
-          "y": 380,
-          "w": 1400,
-          "h": 440
-        },
-        {
-          "type": "chips",
-          "at": 1,
-          "delay": 2.5,
-          "x": 260,
-          "y": 880,
-          "w": 1400,
-          "row": true,
-          "items": [
-            "Selection kept when changing page",
-            "Merge records with the same keys",
-            "Minimum number of entities created automatically"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "security",
-      "say": [
-        "Security gets stronger:",
-        "two-factor authentication,",
-        "Q-R code login for Arena Mobile,",
-        "and finer control over which user groups can see which records."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Security"
-        },
-        {
-          "type": "title",
-          "text": "Safer access, finer control"
-        },
-        {
-          "type": "card",
-          "at": 1,
-          "icon": "lock",
-          "title": "Two-factor authentication",
-          "text": "A code from an authenticator app at login; each code works only once.",
-          "x": 120,
-          "y": 340,
-          "w": 520,
-          "h": 430
-        },
-        {
-          "type": "card",
-          "at": 2,
-          "icon": "qr",
-          "title": "QR code login",
-          "text": "Sign in to Arena Mobile by scanning a code shown in Arena.",
-          "x": 700,
-          "y": 340,
-          "w": 520,
-          "h": 430
-        },
-        {
-          "type": "card",
-          "at": 3,
-          "icon": "users",
-          "title": "Group visibility",
-          "text": "Read-only access to other groups’ records, and access-aware exports.",
-          "x": 1280,
-          "y": 340,
-          "w": 520,
-          "h": 430
-        }
-      ]
-    },
-    {
-      "id": "explorer",
-      "say": [
-        "In the Data Explorer, export species-by-record tables, ready for vegetation analysis tools.",
-        "And, new in version two point twelve: totals and percentages in aggregate mode."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Data Explorer"
-        },
-        {
-          "type": "title",
-          "text": "Explore and export your data"
-        },
-        {
-          "type": "shot",
-          "src": "web:whats-new/dataMatrixExport.png",
-          "x": 120,
-          "y": 290,
-          "w": 1100,
-          "h": 380,
-          "caption": "Data matrix export",
-          "sub": "For Turboveg, Juice and Synbiosys"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/dataQueryTotals.png",
-          "x": 1060,
-          "y": 470,
-          "w": 740,
-          "h": 400,
-          "caption": "Totals and percentages"
-        },
-        {
-          "type": "badge",
-          "at": 1,
-          "text": "New in 2.12",
-          "x": 1590,
-          "y": 430
-        }
-      ]
-    },
-    {
-      "id": "map",
-      "say": [
-        "The map has a brand new workspace.",
-        "Add your own layers, from K-M-L, Shapefile and Geo JSON files, to W-M-S services.",
-        "Measure distances and areas, take screenshots, and jump to any coordinate or record."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "Maps"
-        },
-        {
-          "type": "title",
-          "text": "A new map workspace"
-        },
-        {
-          "type": "shot",
-          "src": "web:whats-new/mapWorkspace.png",
-          "x": 660,
-          "y": 260,
-          "w": 1000,
-          "h": 380
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "web:whats-new/mapWorkspaceLayers.jpg",
-          "x": 740,
-          "y": 420,
-          "w": 1000,
-          "h": 380
-        },
-        {
-          "type": "shot",
-          "at": 2,
-          "src": "web:whats-new/mapWorkspaceMeasure.jpg",
-          "x": 820,
-          "y": 590,
-          "w": 1000,
-          "h": 380
-        },
-        {
-          "type": "chips",
-          "at": 1,
-          "x": 120,
-          "y": 360,
-          "w": 500,
-          "items": [
-            "KML, KMZ, Shapefile, GeoJSON",
-            "WMS, WMTS and XYZ layers"
-          ]
-        },
-        {
-          "type": "chips",
-          "at": 2,
-          "x": 120,
-          "y": 540,
-          "w": 500,
-          "items": [
-            "Measure distances and areas",
-            "Screenshots, also into a record",
-            "Search coordinates or record keys"
-          ]
-        }
-      ]
-    },
-    {
       "id": "aoi",
       "theme": "dark",
       "say": [
-        "And now, the highlight of version two point twelve: areas of interest.",
+        "With areas of interest, Arena checks if a location is inside an area.",
         "In the survey info, add one or more polygons, for example the municipalities of a pilot area, and check them on a map as you add them.",
         "They also show up as layers in the data map."
       ],
       "items": [
         {
-          "type": "badge",
-          "text": "New in 2.12",
-          "x": 120,
-          "y": 96
-        },
-        {
           "type": "kicker",
-          "text": "Survey design · Maps",
-          "y": 160
+          "text": "Survey design · Maps"
         },
         {
           "type": "title",
           "text": "Areas of interest",
-          "y": 196,
           "size": 96
         },
         {
@@ -705,39 +339,193 @@
       ]
     },
     {
-      "id": "aoiForm",
-      "theme": "dark",
+      "id": "print",
       "say": [
-        "In the form, a location far outside the area gets a warning,",
-        "and a reading with poor accuracy asks for a better G-P-S signal."
+        "Need a paper copy? Records can now be printed, in Word or P-D-F.",
+        "They follow the form layout, with pictures, a Q-R code, and your own letterhead."
       ],
       "items": [
         {
           "type": "kicker",
-          "text": "Areas of interest · Data entry"
+          "text": "Data entry"
         },
         {
           "type": "title",
-          "text": "Warnings as you collect"
+          "text": "Print records, ready to file or share"
         },
         {
           "type": "shot",
-          "src": "web:whats-new/areaOfInterestOutside.png",
-          "x": 300,
+          "src": "deck:printed-record.png",
+          "x": 1120,
+          "y": 250,
+          "w": 680,
+          "h": 790,
+          "paper": true
+        },
+        {
+          "type": "chips",
+          "delay": 1.2,
+          "x": 120,
+          "y": 330,
+          "w": 820,
+          "items": [
+            "Word or PDF, portrait or landscape"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "x": 120,
+          "y": 420,
+          "w": 820,
+          "items": [
+            "Follows the form layout",
+            "Pictures included",
+            "QR code to open the record online",
+            "Your own header and footer"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "explorer",
+      "say": [
+        "New in the Data Explorer, still experimental: describe the data you need, and A-I builds the query for you.",
+        "Then export species-by-record tables, ready for vegetation analysis tools."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data Explorer"
+        },
+        {
+          "type": "title",
+          "text": "Ask, explore, export"
+        },
+        {
+          "type": "shot",
+          "src": "web:whats-new/dataQueryAiGenerate.png",
+          "x": 120,
           "y": 290,
-          "w": 560,
-          "h": 640,
-          "caption": "828 m outside the area"
+          "w": 800,
+          "h": 480,
+          "caption": "Ask AI (experimental)",
+          "sub": "Describe the data, AI builds the query"
         },
         {
           "type": "shot",
           "at": 1,
-          "src": "web:whats-new/areaOfInterestUncertain.png",
-          "x": 1060,
+          "src": "web:whats-new/dataMatrixExport.png",
+          "x": 860,
+          "y": 540,
+          "w": 940,
+          "h": 440,
+          "caption": "Data matrix export",
+          "sub": "For Turboveg, Juice and Synbiosys"
+        }
+      ]
+    },
+    {
+      "id": "totals",
+      "say": [
+        "In aggregate mode, the Data Explorer now shows totals and percentages:",
+        "a total row, and the percentage of each row, from the new View menu."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Data Explorer"
+        },
+        {
+          "type": "title",
+          "text": "Totals and percentages"
+        },
+        {
+          "type": "shot",
+          "src": "web:whats-new/dataQueryTotals.png",
+          "x": 120,
           "y": 290,
-          "w": 560,
-          "h": 640,
-          "caption": "8 m inside, but ±30 m accuracy"
+          "w": 1100,
+          "h": 680
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "x": 1300,
+          "y": 420,
+          "w": 500,
+          "items": [
+            "Total row",
+            "Percentage of each row",
+            "View › Show total and percentage"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "map",
+      "say": [
+        "The map has a brand new workspace.",
+        "Add your own layers, from K-M-L, Shapefile and Geo JSON files, to W-M-S services.",
+        "Measure distances and areas, take screenshots, and jump to any coordinate or record."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Maps"
+        },
+        {
+          "type": "title",
+          "text": "A new map workspace"
+        },
+        {
+          "type": "shot",
+          "src": "web:whats-new/mapWorkspace.png",
+          "x": 660,
+          "y": 260,
+          "w": 1000,
+          "h": 380
+        },
+        {
+          "type": "shot",
+          "at": 1,
+          "src": "web:whats-new/mapWorkspaceLayers.jpg",
+          "x": 740,
+          "y": 420,
+          "w": 1000,
+          "h": 380
+        },
+        {
+          "type": "shot",
+          "at": 2,
+          "src": "web:whats-new/mapWorkspaceMeasure.jpg",
+          "x": 820,
+          "y": 590,
+          "w": 1000,
+          "h": 380
+        },
+        {
+          "type": "chips",
+          "at": 1,
+          "x": 120,
+          "y": 360,
+          "w": 500,
+          "items": [
+            "KML, KMZ, Shapefile, GeoJSON",
+            "WMS, WMTS and XYZ layers"
+          ]
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 120,
+          "y": 540,
+          "w": 500,
+          "items": [
+            "Measure distances and areas",
+            "Screenshots, also into a record",
+            "Search coordinates or record keys"
+          ]
         }
       ]
     },
@@ -745,7 +533,7 @@
       "id": "analysis",
       "say": [
         "For analysis, run Whisp on every sampling point, in the background,",
-        "and build richer processing chains, with two-phase sampling and templates."
+        "and build richer processing chains, with an area file per cycle, and chains from templates."
       ],
       "items": [
         {
@@ -780,108 +568,9 @@
           "y": 380,
           "w": 620,
           "items": [
-            "Two-phase sampling",
             "Area file per cycle",
             "Chains from templates",
             "GeoPackage export of categories"
-          ]
-        }
-      ]
-    },
-    {
-      "id": "aiDesign",
-      "say": [
-        "Optional A-I features help survey designers:",
-        "write expressions from plain language,",
-        "explain existing ones,",
-        "and translate labels in one click."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "AI assistant (optional)"
-        },
-        {
-          "type": "title",
-          "text": "AI for survey designers"
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "deck:ai-expression-generate.png",
-          "x": 120,
-          "y": 330,
-          "w": 520,
-          "h": 400,
-          "caption": "Expressions from plain language"
-        },
-        {
-          "type": "shot",
-          "at": 2,
-          "src": "deck:ai-expression-explain.png",
-          "x": 700,
-          "y": 330,
-          "w": 520,
-          "h": 400,
-          "caption": "Explain any expression"
-        },
-        {
-          "type": "shot",
-          "at": 3,
-          "src": "deck:ai-translation.png",
-          "x": 1280,
-          "y": 330,
-          "w": 520,
-          "h": 400,
-          "caption": "Translate labels"
-        }
-      ]
-    },
-    {
-      "id": "aiAsk",
-      "say": [
-        "Or simply ask: A-I builds Data Explorer queries for you,",
-        "and a help chatbot answers your questions about Arena.",
-        "You choose the provider: Anthropic, OpenAI, Google, or your own."
-      ],
-      "items": [
-        {
-          "type": "kicker",
-          "text": "AI assistant (optional)"
-        },
-        {
-          "type": "title",
-          "text": "Ask in plain language"
-        },
-        {
-          "type": "shot",
-          "src": "deck:ai-query-result.png",
-          "x": 120,
-          "y": 290,
-          "w": 1000,
-          "h": 590
-        },
-        {
-          "type": "shot",
-          "at": 1,
-          "src": "deck:ai-chatbot.png",
-          "x": 1220,
-          "y": 250,
-          "w": 520,
-          "h": 720
-        },
-        {
-          "type": "chips",
-          "at": 2,
-          "x": 120,
-          "y": 920,
-          "w": 1000,
-          "row": true,
-          "items": [
-            "Anthropic",
-            "OpenAI",
-            "Google",
-            "Self-hosted"
           ]
         }
       ]
@@ -936,37 +625,210 @@
       ]
     },
     {
-      "id": "admins",
+      "id": "security",
       "say": [
-        "And system administrators get live server logs, user backup and restore, and much more."
+        "Security gets stronger:",
+        "two-factor authentication,",
+        "Q-R code login for Arena Mobile,",
+        "and finer control over which user groups can see which records."
       ],
       "items": [
         {
           "type": "kicker",
-          "text": "System administrators"
+          "text": "Security"
         },
         {
           "type": "title",
-          "text": "Everything for system admins"
+          "text": "Safer access, finer control"
         },
         {
-          "type": "shot",
-          "src": "web:whats-new/systemLogs.png",
+          "type": "card",
+          "at": 1,
+          "icon": "lock",
+          "title": "Two-factor authentication",
+          "text": "A code from an authenticator app at login; each code works only once.",
           "x": 120,
-          "y": 300,
-          "w": 1000,
-          "h": 420,
-          "caption": "System logs, live"
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 2,
+          "icon": "qr",
+          "title": "QR code login",
+          "text": "Sign in to Arena Mobile by scanning a code shown in Arena.",
+          "x": 700,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 3,
+          "icon": "users",
+          "title": "Group visibility",
+          "text": "Read-only access to other groups’ records, and access-aware exports.",
+          "x": 1280,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        }
+      ]
+    },
+    {
+      "id": "uploadEmail",
+      "say": [
+        "Survey administrators can now get an email when records are uploaded from Arena Mobile.",
+        "One email per upload lists the records: their keys, new or updated, who created them, and their errors and warnings.",
+        "Turn it on in the survey info, under Security."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Survey admins"
+        },
+        {
+          "type": "title",
+          "text": "An email for every upload from Arena Mobile"
+        },
+        {
+          "type": "card",
+          "delay": 1.2,
+          "icon": "phone",
+          "title": "Records uploaded",
+          "text": "From Arena Mobile, by any field team.",
+          "x": 120,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "icon": "mail",
+          "title": "One email per upload",
+          "text": "To every survey administrator, even when a device uploads many records.",
+          "x": 700,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "delay": 2.4,
+          "icon": "list",
+          "title": "Every record listed",
+          "text": "Keys, new or updated, creator, dates, errors and warnings.",
+          "x": 1280,
+          "y": 320,
+          "w": 520,
+          "h": 420
+        },
+        {
+          "type": "chips",
+          "at": 2,
+          "x": 120,
+          "y": 800,
+          "w": 1680,
+          "row": true,
+          "items": [
+            "Survey info › Security",
+            "Off by default"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "surveys",
+      "say": [
+        "Moving surveys between servers is easier.",
+        "Compare a survey with one from another server, and apply only the changes you pick.",
+        "You can even create a survey from an O-D-K form, and import its data."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Survey management"
+        },
+        {
+          "type": "title",
+          "text": "Move surveys between servers and tools"
         },
         {
           "type": "shot",
-          "delay": 2.2,
-          "src": "web:whats-new/usersBackup.png",
-          "x": 1000,
-          "y": 560,
-          "w": 800,
-          "h": 360,
-          "caption": "Users backup and restore"
+          "at": 1,
+          "src": "web:whats-new/surveyCompare.png",
+          "x": 120,
+          "y": 320,
+          "w": 1060,
+          "h": 470,
+          "caption": "Compare and update",
+          "sub": "e.g. test → production, only the changes you pick"
+        },
+        {
+          "type": "shot",
+          "at": 2,
+          "src": "web:whats-new/odkImport.png",
+          "x": 1240,
+          "y": 320,
+          "w": 560,
+          "h": 420,
+          "caption": "Import from ODK (beta)",
+          "sub": "Form and data from ODK Collect"
+        }
+      ]
+    },
+    {
+      "id": "guest",
+      "say": [
+        "And there is a new role: Guest.",
+        "Guests can view all the records of a survey, also in Arena Mobile, but they cannot edit or delete them, nor add new ones.",
+        "Add them to a user group, and they see only a part of the data, for example the plots of a region."
+      ],
+      "items": [
+        {
+          "type": "kicker",
+          "text": "Users"
+        },
+        {
+          "type": "title",
+          "text": "New role: Guest"
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "icon": "eye",
+          "title": "View the records",
+          "text": "All the records of the survey, also in Arena Mobile.",
+          "x": 120,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 1,
+          "delay": 3.2,
+          "icon": "noEdit",
+          "title": "No editing",
+          "text": "Guests cannot edit or delete records, nor add new ones.",
+          "x": 700,
+          "y": 340,
+          "w": 520,
+          "h": 430
+        },
+        {
+          "type": "card",
+          "at": 2,
+          "icon": "users",
+          "title": "Only their group",
+          "text": "With user groups, only a part of the data, e.g. the plots of a region.",
+          "x": 1280,
+          "y": 340,
+          "w": 520,
+          "h": 430
         }
       ]
     },
