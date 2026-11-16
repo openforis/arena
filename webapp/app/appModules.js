@@ -311,9 +311,14 @@ export const helpModules = {
     key: 'whatsNew',
     path: 'whats-new',
   },
-  disclaimer: {
-    key: 'disclaimer',
-    uri: 'https://openforis.org/arena-legal-disclaimer/',
+  termsOfService: {
+    key: 'termsOfService',
+    uri: 'https://www.openforis.org/arena-terms/',
+    external: true,
+  },
+  privacyNotice: {
+    key: 'privacyNotice',
+    uri: 'https://www.fao.org/contact-us/data-protection-and-privacy/en/',
     external: true,
   },
   userManual: {

@@ -114,7 +114,8 @@ const getHelpModule = (user, lang) =>
       helpModules.about,
       helpModules.whatsNew,
       ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
-      helpModules.disclaimer,
+      helpModules.termsOfService,
+      helpModules.privacyNotice,
     ],
   })
 

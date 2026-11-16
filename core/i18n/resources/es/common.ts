@@ -379,7 +379,8 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     about: 'Acerca de',
     changelog: 'Registro de cambios',
     whatsNew: 'Novedades',
-    disclaimer: 'Descargo de responsabilidad',
+    termsOfService: 'Términos de servicio',
+    privacyNotice: 'Aviso de privacidad',
     userManual: 'Manual de usuario',
   },
   surveyDefsLoader: {
