@@ -57,7 +57,6 @@ const errorKeyByDependencyType: Record<string, string> = {
 const _validateExpressionProp =
   (survey: ArenaSurvey, nodeDef: AnyNodeDef, dependencyType: string) => async (propName: string, item: unknown) => {
     const exprString: string | null = A.pathOr(null, propName.split('.'), item)
-    const isContextParent = SurveyDependencyTypes.isContextParentByDependencyType[dependencyType]
     const selfReferenceAllowed = SurveyDependencyTypes.selfReferenceAllowedByDependencyType[dependencyType]
 
     return exprString
@@ -65,7 +64,6 @@ const _validateExpressionProp =
           survey,
           nodeDefCurrent: nodeDef,
           exprString,
-          isContextParent,
           selfReferenceAllowed,
         })
       : null

@@ -180,7 +180,6 @@ const convert = async ({
     survey,
     nodeDefCurrent,
     exprString: normalized,
-    isContextParent: true,
     selfReferenceAllowed: true,
   })
 

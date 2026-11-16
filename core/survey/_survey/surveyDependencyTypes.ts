@@ -15,21 +15,6 @@ export const dependencyTypes = {
 
 export type DependencyType = (typeof dependencyTypes)[keyof typeof dependencyTypes]
 
-export const isContextParentByDependencyType: Record<DependencyType, boolean> = {
-  [dependencyTypes.applicable]: true,
-  [dependencyTypes.defaultValues]: false,
-  [dependencyTypes.editable]: true,
-  [dependencyTypes.fileName]: true,
-  [dependencyTypes.formula]: false,
-  [dependencyTypes.itemsFilter]: true,
-  [dependencyTypes.maxCount]: true,
-  [dependencyTypes.minCount]: true,
-  [dependencyTypes.parentCode]: false,
-  [dependencyTypes.required]: true,
-  [dependencyTypes.validations]: false,
-  [dependencyTypes.visible]: true,
-}
-
 export const selfReferenceAllowedByDependencyType: Record<DependencyType, boolean> = {
   [dependencyTypes.applicable]: false,
   [dependencyTypes.defaultValues]: false,

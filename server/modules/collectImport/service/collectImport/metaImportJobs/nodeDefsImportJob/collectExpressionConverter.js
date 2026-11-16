@@ -124,7 +124,6 @@ const convert = async ({ survey, nodeDefCurrent, expression, advancedExpressionE
     survey,
     nodeDefCurrent,
     exprString: converted,
-    isContextParent: true,
     selfReferenceAllowed: true,
   })
 
