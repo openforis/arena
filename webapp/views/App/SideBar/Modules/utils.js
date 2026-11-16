@@ -15,6 +15,7 @@ import {
   userModules,
   helpModules,
   systemAdminModules,
+  getPrivacyNoticeUri,
   getUserManualUri,
 } from '@webapp/app/appModules'
 
@@ -115,7 +116,7 @@ const getHelpModule = (user, lang) =>
       helpModules.whatsNew,
       ...(User.isSystemAdmin(user) ? [helpModules.changelog] : []),
       helpModules.termsOfService,
-      helpModules.privacyNotice,
+      { ...helpModules.privacyNotice, uri: getPrivacyNoticeUri(lang) },
     ],
   })
 
