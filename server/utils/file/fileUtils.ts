@@ -15,7 +15,7 @@ const encodings = {
 
 // ====== DIR
 
-export const mkdir = async (path: string): Promise<string | undefined> => fsp.mkdir(path, { recursive: true })
+export const mkdir = (path: string): Promise<string | undefined> => fsp.mkdir(path, { recursive: true })
 
 export const rmdir = async (path: string): Promise<void> => {
   if (exists(path)) {
@@ -41,16 +41,16 @@ export { join, sep } from 'node:path'
 
 // ====== FILE
 
-export const readFile = async (path: string): Promise<string> => fsp.readFile(path, { encoding: encodings.utf8 })
+export const readFile = (path: string): Promise<string> => fsp.readFile(path, { encoding: encodings.utf8 })
 
-export const readBinaryFile = async (path: string): Promise<Buffer> => fsp.readFile(path)
+export const readBinaryFile = (path: string): Promise<Buffer> => fsp.readFile(path)
 
-export const writeFile = async (path: string, data: string | Buffer = ''): Promise<void> => fsp.writeFile(path, data)
+export const writeFile = (path: string, data: string | Buffer = ''): Promise<void> => fsp.writeFile(path, data)
 
-export const appendFile = async (path: string, data: string | Buffer = ''): Promise<void> => fsp.appendFile(path, data)
+export const appendFile = (path: string, data: string | Buffer = ''): Promise<void> => fsp.appendFile(path, data)
 
-export const copyFile = async (src: string, dest: string): Promise<void> => fsp.copyFile(src, dest)
-export const renameFile = async (src: string, dest: string): Promise<void> => fsp.rename(src, dest)
+export const copyFile = (src: string, dest: string): Promise<void> => fsp.copyFile(src, dest)
+export const renameFile = (src: string, dest: string): Promise<void> => fsp.rename(src, dest)
 
 export const { createWriteStream, createReadStream } = fs
 
@@ -127,7 +127,7 @@ export const checkIsValidTempFileName = (tempFileName: string | null | undefined
   }
   return true
 }
-export const writeStreamToTempFile = async (inputStream: Readable): Promise<{ tempFilePath: string }> =>
+export const writeStreamToTempFile = (inputStream: Readable): Promise<{ tempFilePath: string }> =>
   new Promise((resolve, reject) => {
     const tempFilePath = newTempFilePath()
     const writeStream = createWriteStream(tempFilePath)

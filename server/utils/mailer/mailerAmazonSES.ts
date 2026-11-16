@@ -42,7 +42,8 @@ export const validateEnv = ({ from }) => {
 export const logTransportOptionsType = () => (ProcessUtils.ENV.emailTransportOptions ? 'custom' : 'default')
 
 export const sendEmail = async ({ to = null, bcc = null, from, subject, html, text = null }) => {
-  const transporter = nodemailer.createTransport(getTransportOptions())
+  // custom transport options are set by the server administrator
+  const transporter = nodemailer.createTransport(getTransportOptions()) // NOSONAR
 
   const info = await transporter.sendMail({
     from,
