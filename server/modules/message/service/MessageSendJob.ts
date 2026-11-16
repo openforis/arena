@@ -33,7 +33,7 @@ export default class MessageSendJob extends Job {
     this.canceling = false
   }
 
-  async cancel(options?: Parameters<Job['cancel']>[0]): Promise<void> {
+  cancel(options?: Parameters<Job['cancel']>[0]): Promise<void> {
     // cancel requested flag in JobBase is private: track it here to stop sending emails
     this.canceling = true
     return super.cancel(options)

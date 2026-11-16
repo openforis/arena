@@ -13,7 +13,6 @@ import * as Chain from '@common/analysis/chain'
 
 import { db, DbClient } from '@server/db/db'
 import * as DbUtils from '@server/db/dbUtils'
-import { getSurveyDBSchema } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
 import * as NodeKeysHierarchyView from '@server/modules/surveyRdb/schemaRdb/nodeKeysHierarchyView'
 import { Schemata } from '@openforis/arena-server'
 
@@ -41,7 +40,7 @@ export const insert = async (
   }
   await client.none(
     `
-    INSERT INTO ${getSurveyDBSchema(surveyId)}.activity_log (type, user_uuid, content, system)
+    INSERT INTO ${Schemata.getSchemaSurvey(surveyId)}.activity_log (type, user_uuid, content, system)
     VALUES ($1, $2, $3::jsonb, $4)`,
     [type, User.getUuid(user), content || {}, system]
   )
@@ -58,7 +57,7 @@ export const insertMany = async (
   }
   await client.none(
     DbUtils.insertAllQueryBatch(
-      getSurveyDBSchema(surveyId),
+      Schemata.getSchemaSurvey(surveyId),
       tableName,
       tableColumns,
       activities.map((activity) => ({
@@ -72,13 +71,13 @@ export const insertMany = async (
 }
 
 // ===== READ
-export const fetchSimple = async (
+export const fetchSimple = (
   { surveyId, limit = 30, offset = 0 }: { surveyId: number; limit?: number; offset?: number },
   client: DbClient = db
 ): Promise<ActivityLog.ActivityLog[]> =>
   client.map(
     `SELECT l.* 
-    FROM ${getSurveyDBSchema(surveyId)}.activity_log l
+    FROM ${Schemata.getSchemaSurvey(surveyId)}.activity_log l
     ORDER BY l.id
     OFFSET $/offset/
     LIMIT $/limit/
@@ -87,10 +86,10 @@ export const fetchSimple = async (
     A.camelizePartial({ limitToLevel: 1 })
   )
 
-export const count = async ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<number> =>
-  client.one(`SELECT COUNT(*) FROM ${getSurveyDBSchema(surveyId)}.activity_log`, [], (row) => Number(row.count))
+export const count = ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<number> =>
+  client.one(`SELECT COUNT(*) FROM ${Schemata.getSchemaSurvey(surveyId)}.activity_log`, [], (row) => Number(row.count))
 
-export const fetch = async ({
+export const fetch = ({
   surveyInfo,
   activityTypes = null,
   idGreaterThan = null,
@@ -111,7 +110,7 @@ export const fetch = async ({
   const surveyUuid = Survey.getUuid(surveyInfo)
   const surveyId = Survey.getIdSurveyInfo(surveyInfo)
   const published = Survey.isPublished(surveyInfo)
-  const schema = getSurveyDBSchema(surveyId)
+  const schema = Schemata.getSchemaSurvey(surveyId)
 
   const limitedById = idGreaterThan || idLessThan
   const conditionLimitedById = idGreaterThan ? ' id > $4' : ' id < $5'
@@ -286,7 +285,7 @@ export const fetchTableSize = async ({ surveyId }: { surveyId: number }, client:
   return DbUtils.fetchTableSize({ schema, table: 'activity_log' }, client)
 }
 
-export const deleteAll = async ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<null> => {
+export const deleteAll = ({ surveyId }: { surveyId: number }, client: DbClient = db): Promise<null> => {
   const schema = Schemata.getSchemaSurvey(surveyId)
   // keep only first 5 logs (survey creation logs); useful to determine if survey is empty or brand new
   return client.none(`DELETE FROM ${schema}.activity_log WHERE id > 5`)

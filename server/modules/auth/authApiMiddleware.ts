@@ -71,13 +71,13 @@ const sendForbiddenError = ({ res, req = null }: { res: ExpressResponse; req?: E
   sendError({ errorCode: StatusCodes.FORBIDDEN, res, req })
 }
 
-export const requireLoggedInUser = async (
-  req: ExpressRequest,
-  res: ExpressResponse,
-  next: NextFunction
-): Promise<void> => {
+export const requireLoggedInUser = (req: ExpressRequest, res: ExpressResponse, next: NextFunction): void => {
   const user = Request.getUser(req)
-  return user ? next() : sendUnauthorizedError({ res })
+  if (user) {
+    next()
+  } else {
+    sendUnauthorizedError({ res })
+  }
 }
 
 export const requireSurveyUserExtraPropsEditPermission = async (

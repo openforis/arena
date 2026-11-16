@@ -90,10 +90,10 @@ export const getActiveJobSummary = (userUuid: string) => activeJobSummariesByUse
 
 // ====== UPDATE
 
-export const cancelActiveJobByUserUuid = async (
+export const cancelActiveJobByUserUuid = (
   userUuid: string,
   { canceledByAdmin = false }: { canceledByAdmin?: boolean } = {}
-): Promise<void> => {
+): void => {
   const jobThread = userJobThreads.getThread(userUuid)
   if (!jobThread) {
     return

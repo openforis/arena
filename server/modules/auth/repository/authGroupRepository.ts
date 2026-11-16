@@ -11,11 +11,7 @@ const dbTransformCallback = A.camelizePartial({ limitToLevel: 1 })
 
 // ==== CREATE
 
-const insertGroup = async (
-  authGroup: ArenaAuthGroup,
-  surveyId: number,
-  client: DbClient = db
-): Promise<ArenaAuthGroup> =>
+const insertGroup = (authGroup: ArenaAuthGroup, surveyId: number, client: DbClient = db): Promise<ArenaAuthGroup> =>
   client.one(
     `
     INSERT INTO auth_group (name, survey_uuid, permissions, record_steps)
@@ -45,7 +41,7 @@ export const createSurveyGroups = async (
   return groups
 }
 
-export const insertUserGroup = async (
+export const insertUserGroup = (
   {
     groupUuid,
     userUuid,
@@ -64,10 +60,7 @@ export const insertUserGroup = async (
 
 // ==== READ
 
-export const fetchGroupByName = async (
-  { name }: { name: string },
-  client: DbClient = db
-): Promise<ArenaAuthGroup | null> =>
+export const fetchGroupByName = ({ name }: { name: string }, client: DbClient = db): Promise<ArenaAuthGroup | null> =>
   client.one(
     `
       SELECT auth_group.*
@@ -78,7 +71,7 @@ export const fetchGroupByName = async (
     dbTransformCallback
   )
 
-export const fetchGroupByUuid = async (groupUuid: string, client: DbClient = db): Promise<ArenaAuthGroup | null> =>
+export const fetchGroupByUuid = (groupUuid: string, client: DbClient = db): Promise<ArenaAuthGroup | null> =>
   client.one(
     `
     SELECT auth_group.*
@@ -88,7 +81,7 @@ export const fetchGroupByUuid = async (groupUuid: string, client: DbClient = db)
     dbTransformCallback
   )
 
-export const fetchGroupsByUuids = async (groupUuids: string[], client: DbClient = db): Promise<ArenaAuthGroup[]> =>
+export const fetchGroupsByUuids = (groupUuids: string[], client: DbClient = db): Promise<ArenaAuthGroup[]> =>
   client.map(
     `
     SELECT g.*, s.id as survey_id
@@ -100,7 +93,7 @@ export const fetchGroupsByUuids = async (groupUuids: string[], client: DbClient 
     dbTransformCallback
   )
 
-export const fetchSurveyGroups = async (surveyId: number, client: DbClient = db): Promise<ArenaAuthGroup[]> =>
+export const fetchSurveyGroups = (surveyId: number, client: DbClient = db): Promise<ArenaAuthGroup[]> =>
   client.map(
     `
     SELECT auth_group.*
@@ -112,7 +105,7 @@ export const fetchSurveyGroups = async (surveyId: number, client: DbClient = db)
     dbTransformCallback
   )
 
-export const fetchUserGroups = async (userUuid: string, client: DbClient = db): Promise<ArenaAuthGroup[]> =>
+export const fetchUserGroups = (userUuid: string, client: DbClient = db): Promise<ArenaAuthGroup[]> =>
   client.map(
     `
     SELECT g.*, gu.props
@@ -126,7 +119,7 @@ export const fetchUserGroups = async (userUuid: string, client: DbClient = db): 
     dbTransformCallback
   )
 
-export const fetchUsersGroups = async (userUuids: string[], client: DbClient = db) =>
+export const fetchUsersGroups = (userUuids: string[], client: DbClient = db) =>
   client.map(
     `
     SELECT gu.user_uuid, gu.props, g.*
@@ -148,7 +141,7 @@ const untouchedSurveyTolerance = '10 MINUTES'
  * @param {pgPromise.IDatabase} [client] - The database client.
  * @returns {Promise<Array<{surveyId: number, userUuid: string}>>} - The ids of the surveys with the uuid of their user.
  */
-export const fetchSurveysOfExpiredInvitationUsers = async (client: DbClient = db) =>
+export const fetchSurveysOfExpiredInvitationUsers = (client: DbClient = db) =>
   client.map(
     `
     SELECT DISTINCT s.id, u.uuid AS user_uuid
@@ -221,7 +214,7 @@ export const updateUserGroup = async (
   )
 }
 
-export const updateUserGroupExtraProps = async (
+export const updateUserGroupExtraProps = (
   { surveyId, userUuid, extraProps }: { surveyId: number; userUuid: string; extraProps: Record<string, unknown> },
   client: DbClient = db
 ) =>
@@ -241,7 +234,7 @@ export const updateUserGroupExtraProps = async (
 
 // ==== DELETE
 
-export const deleteAllUserGroups = async (userUuid: string, client: DbClient = db) =>
+export const deleteAllUserGroups = (userUuid: string, client: DbClient = db) =>
   client.query(
     `
     DELETE FROM auth_group_user
@@ -251,7 +244,7 @@ export const deleteAllUserGroups = async (userUuid: string, client: DbClient = d
 
 // ==== DELETE
 
-export const deleteUserGroupBySurveyAndUser = async (surveyId: number, userUuid: string, client: DbClient = db) =>
+export const deleteUserGroupBySurveyAndUser = (surveyId: number, userUuid: string, client: DbClient = db) =>
   client.query(
     `
     DELETE
@@ -279,7 +272,7 @@ export const deleteUserGroupBySurveyAndUser = async (surveyId: number, userUuid:
     [userUuid, surveyId]
   )
 
-export const deleteUserGroupByUserAndGroupUuid = async (
+export const deleteUserGroupByUserAndGroupUuid = (
   { userUuid, groupUuid }: { userUuid: string; groupUuid: string },
   client: DbClient = db
 ) =>

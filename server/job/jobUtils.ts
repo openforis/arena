@@ -22,7 +22,7 @@ export const jobThreadMessageTypes = {
 }
 
 // the job is a Job instance: its progress fields are protected or not declared
-type AnyJob = any
+type AnyJob = any // NOSONAR
 
 const calculatePartialProgress = (job: AnyJob): number => {
   const { processed, status, total } = job

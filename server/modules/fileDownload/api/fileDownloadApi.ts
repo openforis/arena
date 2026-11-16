@@ -32,7 +32,7 @@ export const sendTempFileToResponse = ({
     path: filePath,
     name: outputFileName,
     fileFormat,
-    onEnd: async () => FileUtils.deleteFile(filePath),
+    onEnd: () => FileUtils.deleteFile(filePath),
   })
 }
 

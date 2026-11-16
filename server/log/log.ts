@@ -40,7 +40,7 @@ const levels = {
 }
 
 const _stringifyMsgs = (msgs: unknown[]): string =>
-  msgs.map((msg) => (typeof msg === 'object' ? JSON.stringify(msg) : msg)).join(' ')
+  msgs.map((msg) => (typeof msg === 'object' ? JSON.stringify(msg) : String(msg))).join(' ')
 
 // logger with a custom prefix
 export class Logger {

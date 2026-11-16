@@ -71,7 +71,7 @@ export const fetchQueryAsStream = async ({
   return stream({ queryStream, client, transformer, processor })
 }
 
-export const selectTablesAndViewsStartingWithPrefixes = async (
+export const selectTablesAndViewsStartingWithPrefixes = (
   { schema, prefixes }: { schema: string; prefixes: string[] },
   client: DbClient = db
 ): Promise<{ table_name: string; table_type: string }[]> => {
@@ -212,7 +212,10 @@ export const filterTypes = {
   endsWith: 'endsWith',
 } as const
 
-export const prepareParameterForFilter = (value: unknown, filterType: string = filterTypes.includes): string | null => {
+export const prepareParameterForFilter = (
+  value: string | number | null | undefined,
+  filterType: string = filterTypes.includes
+): string | null => {
   if (Objects.isEmpty(value)) return null
   switch (filterType) {
     case filterTypes.includes:
@@ -284,12 +287,12 @@ export const getWhereClause = (...conditions: (string | null | undefined | false
 // segment ... No space left on device". Use this in a transaction expected to run large/complex
 // queries where hitting that ceiling is a real risk and losing intra-query parallelism there is an
 // acceptable trade-off.
-export const disableParallelQueryForTransaction = async (client: DbClient): Promise<null> =>
+export const disableParallelQueryForTransaction = (client: DbClient): Promise<null> =>
   client.none('SET LOCAL max_parallel_workers_per_gather = 0')
 
 // runs VACUUM on a table (not in a transaction): it removes dead tuples, making their space reusable;
 // full rewrites the table giving the space back to the OS (locking it), analyze updates the table statistics too
-export const vacuumTable = async (
+export const vacuumTable = (
   {
     schema,
     table,
@@ -303,7 +306,7 @@ export const vacuumTable = async (
   return client.none(`VACUUM ${optionsClause}$1:name.$2:name`, [schema, table])
 }
 
-export const fetchSchemaTablesSize = async ({ schema }: { schema: string }, client: DbClient = db): Promise<number> =>
+export const fetchSchemaTablesSize = ({ schema }: { schema: string }, client: DbClient = db): Promise<number> =>
   client.one(
     `SELECT 
 		SUM(pg_total_relation_size(pg_catalog.pg_class.oid)) as size
@@ -316,7 +319,7 @@ export const fetchSchemaTablesSize = async ({ schema }: { schema: string }, clie
     (row) => Number(row.size)
   )
 
-export const fetchTableSize = async (
+export const fetchTableSize = (
   { schema, table }: { schema: string; table: string },
   client: DbClient = db
 ): Promise<number> =>

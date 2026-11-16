@@ -49,7 +49,7 @@ export default class Job<C extends JobContext = any, R = any> extends JobBase<C,
   // original Job always defaulted to the shared `db` client instead, so that jobs started with
   // no argument (e.g. jobThread.js's `this.job.start()`, the production worker-thread entry
   // point) still run inside a real db transaction.
-  async start(client: DbClient = db): Promise<void> {
+  start(client: DbClient = db): Promise<void> {
     return super.start(client)
   }
 
