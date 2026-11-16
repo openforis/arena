@@ -94,7 +94,7 @@ const getEmailsToExport = ({
   selectedUsers: any[]
   emailsText: string
 }): string[] | null => {
-  if (scope === ExportScope.selected) return selectedUsers.map(User.getEmail)
+  if (scope === ExportScope.selected) return selectedUsers.map((user) => User.getEmail(user))
   if (scope === ExportScope.emails) return parseEmails(emailsText)
   return null
 }
