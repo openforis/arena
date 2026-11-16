@@ -88,6 +88,8 @@ export const ENV = {
   activityLogDisabled: isTrue(process.env.ACTIVITY_LOG_DISABLED),
   // HTTP requests log (always enabled in development)
   logHttpRequests: isTrue(process.env.LOG_HTTP_REQUESTS),
+  // Google Analytics tag ID (e.g. G-XXXXXXXXXX): analytics disabled if not set
+  googleAnalyticsId: process.env.GOOGLE_ANALYTICS_ID,
   // Experimental features
   experimentalFeatures: isTrue(process.env.EXPERIMENTAL_FEATURES),
   // ===== AI =====

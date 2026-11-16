@@ -139,7 +139,7 @@ const webPackConfig = {
     proxy: [
       {
         // Proxy all server-served routes:
-        context: ['/img', '/geo', '/mobile-preview', '/api', '/auth', '/socket.io'],
+        context: ['/img', '/geo', '/mobile-preview', '/analytics.js', '/api', '/auth', '/socket.io'],
         target: 'http://localhost:9090',
       },
       {
