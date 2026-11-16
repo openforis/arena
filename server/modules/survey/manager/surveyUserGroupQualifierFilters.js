@@ -30,10 +30,13 @@ const _buildQualifierFilters = async ({ survey, userGroup }, client) => {
 
     if (NodeDef.isCode(nodeDef)) {
       const categoryUuid = NodeDef.getCategoryUuid(nodeDef)
-      const item = /* NOSONAR */ await CategoryItemProviderDefault.getItemByCode(
-        { survey, categoryUuid, code: qualifierValue },
-        client
-      )
+      // the provider reads the client from its params
+      const item = /* NOSONAR */ await CategoryItemProviderDefault.getItemByCode({
+        survey,
+        categoryUuid,
+        code: qualifierValue,
+        client,
+      })
       if (!item) continue
       filters.push({
         nodeDef,
