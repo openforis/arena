@@ -347,6 +347,7 @@ Para publicar sin actualizar los datos existentes, marque "Omitir actualización
     export: 'Exportación de datos',
     import: 'Importación de datos',
     validationReport: 'Informe de validación',
+    formPreview: 'Vista previa del formulario',
     users: 'Usuarios',
     user: 'Perfil de usuario',
     userPasswordChange: 'Cambiar contraseña',

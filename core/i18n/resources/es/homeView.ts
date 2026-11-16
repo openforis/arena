@@ -185,6 +185,10 @@ Si está marcado, esos valores se conservan en el registro, aunque los atributos
         'Notificar por correo electrónico a los administradores de la encuesta la carga de registros desde Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'Si está marcada, cada administrador de la encuesta recibe un correo electrónico con la lista de los registros cargados desde Arena Mobile (valores clave, creador, fechas, validación y UUID).',
+      formPreviewForDataEntryUsers:
+        'Permitir a los usuarios de entrada de datos ver la vista previa del formulario borrador (no publicado)',
+      formPreviewForDataEntryUsersInfo:
+        'Los usuarios que pueden introducir datos pero no pueden editar la encuesta verán un botón Vista previa del formulario en la lista de registros, para probar el formulario con los últimos cambios no publicados (p. ej. para pruebas de aceptación). Los datos introducidos en la vista previa no se guardan.',
       allowRecordsMergeWithSameKeys:
         'Permitir la fusión de registros con las mismas claves (p. ej. registros creados en distintos dispositivos con Arena Mobile)',
     },

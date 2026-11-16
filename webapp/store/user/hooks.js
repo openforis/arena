@@ -67,6 +67,15 @@ export const useAuthCanUseAnalysis = () => Authorizer.canAnalyzeRecords(useUser(
 
 // ====== Auth / Records
 export const useAuthCanCreateRecord = () => Authorizer.canCreateRecord(useUser(), useSurveyInfo())
+// preview of the draft form from the records list: always for survey editors, for data entry users if enabled in the survey
+export const useAuthCanPreviewDraftFormInDataEntry = () => {
+  const user = useUser()
+  const surveyInfo = useSurveyInfo()
+  return (
+    Authorizer.canEditSurvey(user, surveyInfo) ||
+    (Survey.isFormPreviewForDataEntryUsers(surveyInfo) && Authorizer.canCreateRecord(user, surveyInfo))
+  )
+}
 const _canEditRecord = ({ user, surveyInfo, record }) => {
   const canEdit = Authorizer.canEditRecord(user, record) && !Record.isReadOnly(record)
   return canEdit && (Survey.isPublished(surveyInfo) || Record.isPreview(record))
