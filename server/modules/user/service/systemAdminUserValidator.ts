@@ -2,7 +2,7 @@ import * as Validator from '@core/validation/validator'
 import * as Validation from '@core/validation/validation'
 import { UserPasswordValidator } from '@core/user/userPasswordValidator'
 
-const validate = async ({ email, password }) =>
+const validate = ({ email, password }: { email: string; password: any }) =>
   Validator.validate(
     { email, password },
     {

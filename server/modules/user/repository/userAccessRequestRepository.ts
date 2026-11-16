@@ -61,7 +61,7 @@ export const fetchUserAccessRequests = (
     camelize
   )
 
-export const fetchUserAccessRequestsAsStream = async (
+export const fetchUserAccessRequestsAsStream = (
   { processor }: { processor: (dbStream: any) => any },
   client: any = db
 ) => DbUtils.fetchQueryAsStream({ query: DbUtils.formatQuery(userAccessRequestsSelect, []), client, processor })

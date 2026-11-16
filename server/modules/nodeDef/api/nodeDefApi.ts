@@ -1,3 +1,4 @@
+import type { Router } from 'express'
 import * as A from '@core/arena'
 
 import * as Request from '@server/utils/request'
@@ -20,6 +21,16 @@ const sendRespNodeDefsAndValidation = async ({
   validate = true,
   nodeDefsUpdated = null,
   includeAnalysis = true,
+}: {
+  res: any
+  surveyId: number
+  cycle: string
+  sendNodeDefs?: any
+  draft?: boolean
+  advanced?: any
+  validate?: any
+  nodeDefsUpdated?: any
+  includeAnalysis?: boolean
 }) => {
   const survey = await SurveyService.fetchSurveyAndNodeDefsBySurveyId({
     surveyId,
@@ -37,7 +48,7 @@ const sendRespNodeDefsAndValidation = async ({
   })
 }
 
-export const init = (app) => {
+export const init = (app: Router) => {
   // ==== CREATE
 
   app.post('/survey/:surveyId/nodeDef', AuthMiddleware.requireSurveyEditPermission, async (req, res, next) => {
@@ -104,8 +115,8 @@ export const init = (app) => {
     AuthMiddleware.requireSurveyViewPermission,
     async (req, res, next) => {
       try {
-        const { surveyId, cycle, draft = true, advanced = true, validate = true, nodeDefUuid } = Request.getParams(req)
-        const nodeDef = await NodeDefService.fetchNodeDef({ surveyId, cycle, draft, advanced, validate, nodeDefUuid })
+        const { surveyId, draft = true, advanced = true, nodeDefUuid } = Request.getParams(req)
+        const nodeDef = await NodeDefService.fetchNodeDef({ surveyId, draft, advanced, nodeDefUuid })
         res.json({ nodeDef })
       } catch (error) {
         next(error)
@@ -149,7 +160,7 @@ export const init = (app) => {
       const { surveyId } = Request.getParams(req)
       const { nodeDefs, cycle } = Request.getBody(req)
 
-      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, cycle, surveyId })
+      const _nodeDefsUpdatedArray = await NodeDefService.updateNodeDefsProps({ nodeDefs, surveyId })
       const _nodeDefsUpdated = ObjectUtils.toUuidIndexedObj(_nodeDefsUpdatedArray)
 
       const { nodeDefsUpdated, nodeDefsValidation } = await NodeDefService.fetchNodeDefsUpdatedAndValidated({
