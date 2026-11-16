@@ -198,6 +198,9 @@ When checked, those values are kept in the record, even if the attributes are no
         'Notify survey administrators by email when records are uploaded from Arena Mobile',
       notifyAdminsOnRecordsUploadFromMobileInfo:
         'When checked, every survey administrator receives an email listing the records uploaded from Arena Mobile (key values, creator, dates, validation and UUID).',
+      formPreviewForDataEntryUsers: 'Allow data entry users to preview the draft (not published) form',
+      formPreviewForDataEntryUsersInfo:
+        'Users who can enter data but cannot edit the survey will see a Preview form button in the records list, to test the form with the latest unpublished changes (e.g. for user acceptance testing). The data entered in the preview is not saved.',
       allowRecordsMergeWithSameKeys:
         'Allow merging records with same keys (e.g. records created in different Arena Mobile devices)',
     },

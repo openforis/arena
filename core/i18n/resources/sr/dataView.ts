@@ -130,6 +130,8 @@ Spajanje nije moguće izvršiti.`,
     step: 'Korak',
     updateRecordsStep: 'Ažuriraj korak zapisa',
     validateAll: 'Validiraj sve',
+    formPreview: 'Pregled obrasca',
+    formPreviewInfo: 'Pregled nacrta (neobjavljenog) obrasca: podaci uneti u pregledu se ne čuvaju',
     viewRecord: 'Prikaži zapis',
   },
   recordsClone: {

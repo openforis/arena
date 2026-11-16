@@ -131,6 +131,9 @@ La fusion ne peut pas être effectuée.`,
     step: 'Étape',
     updateRecordsStep: "Mettre à jour l'étape des enregistrements",
     validateAll: 'Tout valider',
+    formPreview: 'Aperçu du formulaire',
+    formPreviewInfo:
+      "Aperçu du formulaire brouillon (non publié) : les données saisies dans l'aperçu ne sont pas enregistrées",
     viewRecord: "Voir l'enregistrement",
   },
   recordsClone: {
