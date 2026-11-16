@@ -63,7 +63,7 @@ export const updateSurveySchemaTableProp = (
      WHERE uuid = $2
      RETURNING *`,
     [JSON.stringify({ [key]: value }), recordUuid],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 
 export const bulkUpdateSurveySchemaTableProp = (
@@ -129,7 +129,7 @@ export const deleteSurveySchemaTableRecords = (
     FROM ${Schemata.getSchemaSurvey(surveyId)}.${tableName} 
     WHERE uuid IN ($1:csv) RETURNING *`,
     [recordUuids],
-    (def) => dbTransformCallback(def, true)
+    (def) => DB.transformCallback(def, true)
   )
 
 export const deleteSurveySchemaTableRecord = async (

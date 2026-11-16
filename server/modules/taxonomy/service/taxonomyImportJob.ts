@@ -42,7 +42,7 @@ export default class TaxonomyImportJob extends Job {
   taxonomyUuid: string
   vernacularLanguageCodes: any
 
-  static maxMissingPublishedTaxaCodesPreview = 10
+  static readonly maxMissingPublishedTaxaCodesPreview = 10
 
   constructor(params) {
     super(TaxonomyImportJob.type, params)
@@ -237,7 +237,7 @@ export default class TaxonomyImportJob extends Job {
 
     // validate extra props column names (normalized) uniqueness
     const extraPropsColumns = filterExtraPropsColumns(columns)
-    const extraPropsColumnsNormalized = extraPropsColumns.map(StringUtils.normalizeName)
+    const extraPropsColumnsNormalized: string[] = extraPropsColumns.map((column) => StringUtils.normalizeName(column))
     if (extraPropsColumns.length !== new Set(extraPropsColumnsNormalized).size) {
       const duplicateColumns = Array.from(
         new Set(extraPropsColumnsNormalized.filter((item, index, arr) => arr.indexOf(item) !== index))

@@ -19,8 +19,8 @@ import * as DbUtils from '@server/db/dbUtils'
 import {
   publishSurveySchemaTableProps,
   unpublishSurveySchemaTableProps,
-  markSurveyDraft,
 } from '@server/modules/survey/repository/surveySchemaRepositoryUtils'
+import { markSurveyDraft } from '@server/modules/survey/repository/surveyRepository'
 import * as ActivityLogRepository from '@server/modules/activityLog/repository/activityLogRepository'
 
 import * as TaxonomyRepository from '../repository/taxonomyRepository'
