@@ -10,7 +10,14 @@ import { useAsyncGetRequest, useOnUpdate } from '@webapp/components/hooks'
 import { getLimit, getOffset, getSearch, getSort, updateQuery } from '@webapp/components/Table/tableLink'
 import { TablesActions, useTableMaxRows, useTableSort, useTableVisibleColumns } from '@webapp/store/ui/tables'
 
-export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restParams }) => {
+export const useTable = ({
+  columns,
+  keyExtractor,
+  moduleApiUri,
+  module,
+  restParams,
+  keepSelectionOnSearch = false,
+}) => {
   const dispatch = useDispatch()
 
   const [totalCount, setTotalCount] = useState(0)
@@ -132,7 +139,7 @@ export const useTable = ({ columns, keyExtractor, moduleApiUri, module, restPara
   // reset selected items when filter, search or page size change, or data is refreshed (e.g. records update)
   useOnUpdate(() => {
     deselectAllItems()
-  }, [JSON.stringify(restParams), search, limit])
+  }, [JSON.stringify(restParams), keepSelectionOnSearch ? null : search, limit])
 
   const toggleItemSelection = useCallback(
     (item) => {

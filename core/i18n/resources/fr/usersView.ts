@@ -89,7 +89,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'Sauvegarder les utilisateurs',
     backupTitle: 'Sauvegarder les utilisateurs',
     backupInfo:
-      "Tous les utilisateurs seront exportés avec leurs rôles dans les formulaires et leurs groupes d'utilisateurs, afin de pouvoir les restaurer sur un autre serveur Arena. Les appareils 2FA ne sont pas exportés.",
+      "Les utilisateurs seront exportés avec leurs rôles dans les formulaires et leurs groupes d'utilisateurs, afin de pouvoir les restaurer sur un autre serveur Arena. Les appareils 2FA ne sont pas exportés.",
+    exportScope: {
+      all: 'Tous les utilisateurs',
+      selected: 'Utilisateurs sélectionnés ({{count}})',
+      emails: 'Utilisateurs avec ces adresses e-mail',
+      emailsPlaceholder: 'Une adresse e-mail par ligne (ou séparées par des virgules)',
+    },
     includePasswords: 'Inclure les mots de passe',
     passwordsWarning:
       'Le fichier de sauvegarde contiendra les hachages des mots de passe : conservez-le en lieu sûr et supprimez-le après utilisation.',

@@ -5,6 +5,7 @@ import { useDispatch } from 'react-redux'
 import type { ThunkDispatch, UnknownAction } from '@reduxjs/toolkit'
 
 import * as DateUtils from '@core/dateUtils'
+import * as User from '@core/user/user'
 
 import {
   Button,
@@ -15,8 +16,10 @@ import {
   Modal,
   ModalBody,
   ModalFooter,
+  RadioButtonGroup,
 } from '@webapp/components'
 import { Checkbox } from '@webapp/components/form'
+import { Input } from '@webapp/components/form/Input'
 import * as API from '@webapp/service/api'
 import { JobActions } from '@webapp/store/app'
 import { useI18n } from '@webapp/store/system'
@@ -64,21 +67,82 @@ const BackupDownloadButton = ({ job }: { job: any }) => {
   )
 }
 
-const UsersBackupExportModal = ({ onClose }: { onClose: () => void }) => {
+const ExportScope = {
+  all: 'all',
+  selected: 'selected',
+  emails: 'emails',
+} as const
+
+type ExportScopeType = (typeof ExportScope)[keyof typeof ExportScope]
+
+// emails can be separated by new lines, commas, semicolons or spaces
+const parseEmails = (text: string): string[] => [
+  ...new Set(
+    text
+      .split(/[\s,;]+/)
+      .map((email) => email.trim())
+      .filter(Boolean)
+  ),
+]
+
+const getEmailsToExport = ({
+  scope,
+  selectedUsers,
+  emailsText,
+}: {
+  scope: ExportScopeType
+  selectedUsers: any[]
+  emailsText: string
+}): string[] | null => {
+  if (scope === ExportScope.selected) return selectedUsers.map(User.getEmail)
+  if (scope === ExportScope.emails) return parseEmails(emailsText)
+  return null
+}
+
+const UsersBackupExportModal = ({ onClose, selectedUsers }: { onClose: () => void; selectedUsers: any[] }) => {
   const dispatch = useDispatch<ThunkDispatch<any, any, UnknownAction>>()
   const i18n = useI18n()
   const [includePasswords, setIncludePasswords] = useState(true)
+  const [scope, setScope] = useState<ExportScopeType>(selectedUsers.length > 0 ? ExportScope.selected : ExportScope.all)
+  const [emailsText, setEmailsText] = useState('')
+
+  const emails = getEmailsToExport({ scope, selectedUsers, emailsText })
 
   const onStart = useCallback(async () => {
-    const job = await API.startUsersBackupExport({ includePasswords })
+    const job = await API.startUsersBackupExport({ includePasswords, emails })
     onClose()
     dispatch(JobActions.showJobMonitor({ job, closeButton: BackupDownloadButton }))
-  }, [dispatch, includePasswords, onClose])
+  }, [dispatch, emails, includePasswords, onClose])
 
   return (
     <Modal className="users-backup-modal" title="usersView:usersBackup.backupTitle" onClose={onClose} showCloseButton>
       <ModalBody>
         <p>{i18n.t('usersView:usersBackup.backupInfo')}</p>
+        <RadioButtonGroup
+          className="users-backup-modal__scope"
+          items={[
+            { key: ExportScope.all, label: 'usersView:usersBackup.exportScope.all' },
+            {
+              key: ExportScope.selected,
+              label: 'usersView:usersBackup.exportScope.selected',
+              labelParams: { count: selectedUsers.length },
+              disabled: selectedUsers.length === 0,
+            },
+            { key: ExportScope.emails, label: 'usersView:usersBackup.exportScope.emails' },
+          ]}
+          onChange={(value: string) => setScope(value as ExportScopeType)}
+          value={scope}
+        />
+        {scope === ExportScope.emails && (
+          <Input
+            className="users-backup-modal__emails"
+            inputType="textarea"
+            onChange={setEmailsText}
+            placeholder="usersView:usersBackup.exportScope.emailsPlaceholder"
+            textAreaRows={5}
+            value={emailsText}
+          />
+        )}
         <Checkbox
           checked={includePasswords}
           label="usersView:usersBackup.includePasswords"
@@ -89,7 +153,13 @@ const UsersBackupExportModal = ({ onClose }: { onClose: () => void }) => {
         )}
       </ModalBody>
       <ModalFooter>
-        <Button className="modal-footer__item" label="usersView:usersBackup.backup" onClick={onStart} primary />
+        <Button
+          className="modal-footer__item"
+          disabled={emails?.length === 0}
+          label="usersView:usersBackup.backup"
+          onClick={onStart}
+          primary
+        />
       </ModalFooter>
     </Modal>
   )
@@ -319,7 +389,13 @@ const UsersBackupImportUsersModal = ({
   )
 }
 
-export const UsersBackupButtons = ({ onUsersRestored }: { onUsersRestored?: () => void }) => {
+export const UsersBackupButtons = ({
+  onUsersRestored,
+  selectedUsers = [],
+}: {
+  onUsersRestored?: () => void
+  selectedUsers?: any[]
+}) => {
   const [openModal, setOpenModal] = useState<'export' | 'importFile' | 'importUsers' | null>(null)
   const [importPreview, setImportPreview] = useState<ImportPreview | null>(null)
 
@@ -354,7 +430,7 @@ export const UsersBackupButtons = ({ onUsersRestored }: { onUsersRestored?: () =
         ]}
         variant="outlined"
       />
-      {openModal === 'export' && <UsersBackupExportModal onClose={closeModal} />}
+      {openModal === 'export' && <UsersBackupExportModal onClose={closeModal} selectedUsers={selectedUsers} />}
       {openModal === 'importFile' && (
         <UsersBackupImportFileModal onClose={closeModal} onPreviewRead={onImportPreviewRead} />
       )}

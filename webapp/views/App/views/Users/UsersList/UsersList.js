@@ -8,6 +8,7 @@ import * as User from '@core/user/user'
 
 import { appModuleUri, userModules } from '@webapp/app/appModules'
 import Table from '@webapp/components/Table'
+import { useUserIsSystemAdmin } from '@webapp/store/user'
 
 import { UserSurveysTable } from './UserSurveysTable'
 import { TableHeaderLeft } from './TableHeaderLeft'
@@ -28,7 +29,9 @@ export const UsersList = () => {
     (user) => navigate(`${appModuleUri(userModules.user)}${User.getUuid(user)}`),
     [navigate]
   )
-  const columns = useUsersListColumns({ isRowOpenable, onRowOpen })
+  // system admins can select users to back up only some of them (row click still opens the user)
+  const isSystemAdmin = useUserIsSystemAdmin()
+  const columns = useUsersListColumns({ isRowOpenable, onRowOpen, selectable: isSystemAdmin })
   // the table is re-mounted (and its data fetched again) when its key changes
   const [tableKey, setTableKey] = useState(0)
   const onUsersRestored = useCallback(() => setTableKey((key) => key + 1), [])
@@ -43,6 +46,7 @@ export const UsersList = () => {
       expandableRows
       isRowExpandable={({ item }) => !User.isSystemAdmin(item)}
       isRowOpenable={isRowOpenable}
+      keepSelectionOnSearch
       onRowOpen={onRowOpen}
       rowExpandedComponent={UserRowExpanded}
       headerLeftComponent={TableHeaderLeft}

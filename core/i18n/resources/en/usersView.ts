@@ -87,7 +87,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'Backup users',
     backupTitle: 'Backup users',
     backupInfo:
-      'All users will be exported with their survey roles and user groups, so that they can be restored into another Arena server. 2FA devices are not exported.',
+      'The users will be exported with their survey roles and user groups, so that they can be restored into another Arena server. 2FA devices are not exported.',
+    exportScope: {
+      all: 'All users',
+      selected: 'Selected users ({{count}})',
+      emails: 'Users with these emails',
+      emailsPlaceholder: 'One email per line (or separated by commas)',
+    },
     includePasswords: 'Include passwords',
     passwordsWarning:
       'The backup file will contain the password hashes: keep it in a safe place and delete it after use.',

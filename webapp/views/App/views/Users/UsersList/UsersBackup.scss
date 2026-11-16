@@ -13,6 +13,15 @@
     }
   }
 
+  .users-backup-modal__scope {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  .users-backup-modal__emails {
+    align-self: stretch;
+  }
+
   .users-backup-modal__info ul {
     margin: 0;
     text-align: left;

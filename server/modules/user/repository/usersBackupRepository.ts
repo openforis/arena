@@ -45,20 +45,24 @@ export type UserGroupRow = {
 
 // READ
 
+// emails: when specified, only the users with these emails are fetched
 export const fetchUsersForBackup = (
-  { includePasswords }: { includePasswords: boolean },
+  { includePasswords, emails = null }: { includePasswords: boolean; emails?: string[] | null },
   client: any = db
-): Promise<UserBackupRow[]> =>
-  client.map(
+): Promise<UserBackupRow[]> => {
+  if (emails?.length === 0) return Promise.resolve([])
+  return client.map(
     `
     SELECT u.uuid, u.email, u.name, u.status, u.props,
       ${includePasswords ? 'u.password' : 'NULL AS password'},
       u.profile_picture IS NOT NULL AS has_profile_picture
     FROM "user" u
+    ${emails ? 'WHERE LOWER(u.email) IN ($1:csv)' : ''}
     ORDER BY u.email`,
-    [],
+    [emails?.map((email) => email.toLowerCase())],
     camelize
   )
+}
 
 export const fetchAuthGroupMembershipsForBackup = (client: any = db): Promise<AuthGroupMembershipRow[]> =>
   client.map(

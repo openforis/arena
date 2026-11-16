@@ -5,16 +5,18 @@ import * as DateUtils from '@core/dateUtils'
 
 import ProfilePicture from '@webapp/components/profilePicture'
 import { ButtonIconEdit } from '@webapp/components'
+import { TableSelectionColumn } from '@webapp/components/Table/TableSelectionColumn'
 import { LabelWithTooltip } from '@webapp/components/form/LabelWithTooltip'
 import { useI18n } from '@webapp/store/system'
 
 import { CopyPasswordResetLinkButton } from '../UsersListSurvey/Row/CopyResetPasswordLinkButton'
 
-export const useUsersListColumns = ({ isRowOpenable, onRowOpen }) => {
+export const useUsersListColumns = ({ isRowOpenable, onRowOpen, selectable = false }) => {
   const i18n = useI18n()
 
   return useMemo(
     () => [
+      ...(selectable ? [TableSelectionColumn()] : []),
       {
         key: 'profile-picture',
         width: '40px',
@@ -107,6 +109,6 @@ export const useUsersListColumns = ({ isRowOpenable, onRowOpen }) => {
         renderItem: ({ item }) => <ButtonIconEdit disabled={!isRowOpenable(item)} onClick={() => onRowOpen(item)} />,
       },
     ],
-    [i18n, isRowOpenable, onRowOpen]
+    [i18n, isRowOpenable, onRowOpen, selectable]
   )
 }

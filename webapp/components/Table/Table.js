@@ -23,6 +23,7 @@ const Table = (props) => {
     isRowActive = null,
     isRowExpandable = () => true,
     isRowOpenable = null,
+    keepSelectionOnSearch = false,
     keyExtractor = ({ item }) => ObjectUtils.getUuid(item),
     module,
     moduleApiUri = null,
@@ -68,6 +69,7 @@ const Table = (props) => {
     moduleApiUri,
     module,
     restParams,
+    keepSelectionOnSearch,
   })
 
   if (loadingCount && totalCount <= 0) {
@@ -158,6 +160,7 @@ Table.propTypes = {
   isRowActive: PropTypes.func, // Checks whether a row must be highlighted
   isRowExpandable: PropTypes.func, // Checks if a row rendering an item can be expanded
   isRowOpenable: PropTypes.func, // Checks if the item of a row can be opened (onRowOpen); rows that cannot be opened do nothing on click
+  keepSelectionOnSearch: PropTypes.bool, // if true, selected items are kept when the search text changes
   keyExtractor: PropTypes.func,
   module: PropTypes.string.isRequired,
   moduleApiUri: PropTypes.string,

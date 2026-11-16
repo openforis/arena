@@ -89,7 +89,13 @@ $t(common.pressRefreshToReloadPage)`,
     backup: 'Napravi rezervnu kopiju korisnika',
     backupTitle: 'Rezervna kopija korisnika',
     backupInfo:
-      'Svi korisnici biće izvezeni sa svojim ulogama u istraživanjima i korisničkim grupama, kako bi mogli biti vraćeni na drugi Arena server. 2FA uređaji se ne izvoze.',
+      'Korisnici će biti izvezeni sa svojim ulogama u istraživanjima i korisničkim grupama, kako bi mogli biti vraćeni na drugi Arena server. 2FA uređaji se ne izvoze.',
+    exportScope: {
+      all: 'Svi korisnici',
+      selected: 'Izabrani korisnici ({{count}})',
+      emails: 'Korisnici sa ovim e-mail adresama',
+      emailsPlaceholder: 'Jedna e-mail adresa po redu (ili odvojene zarezima)',
+    },
     includePasswords: 'Uključi lozinke',
     passwordsWarning:
       'Fajl rezervne kopije sadržaće heševe lozinki: čuvajte ga na sigurnom mjestu i obrišite ga nakon upotrebe.',

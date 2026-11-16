@@ -158,6 +158,26 @@ describe('Users backup export/import', () => {
     expect(user.userGroups).toContainEqual({ name: userGroupName, surveyName: name })
   })
 
+  test('only the users with the specified emails are exported (case insensitive)', async () => {
+    const exportJob = new UsersBackupExportJob({
+      user: getContextUser(),
+      includePasswords: false,
+      emails: [email.toUpperCase(), 'not_existing@openforis-arena.org'],
+      serverUrl: 'https://arena-dev.example.org',
+    })
+    await exportJob.start()
+    expect(exportJob.status).toBe(JobStatus.succeeded)
+    const filePath = FileUtils.tempFilePath((exportJob.result as any).outputFileName)
+    const fileZip = new FileZip(filePath)
+    await fileZip.init()
+    const users: UsersBackupUser[] = JSON.parse(fileZip.getEntryAsText(UsersBackupFile.users))
+    fileZip.close()
+    await fsp.unlink(filePath)
+
+    expect(users.map((u) => u.email)).toEqual([email])
+    expect(users[0].password).toBeNull()
+  })
+
   test('preview tells if the user exists in this server', async () => {
     const existingUser = await findPreviewUser()
     expect(existingUser).toMatchObject({ email, name, existing: true })
